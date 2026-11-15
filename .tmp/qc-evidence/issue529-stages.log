@@ -1,0 +1,32 @@
+checkout SHA: 0fd90fcd0298d3565c2151e0596da91bf641b261
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+inner 540 s, outer 600 s, guard 6144 MiB
+pytest: -p qc_sage_session -o addopts= -p sage_extensions.testing.suite_budget --no-time-gates -q tests/lattices/test_the_vinberg_call_returns_the_facets.sage tests/lattices/test_the_divided_class_construction.sage tests/lattices/test_stable_isotropic_plane_orbits.sage tests/lattices/test_setwise_stabilizer_discriminant_images.sage
+...............                                                          [100%]
+=============================== warnings summary ===============================
+tests/lattices/test_the_vinberg_call_returns_the_facets.sage: 114 warnings
+  /repos/vinal/src/sage/vinal.py:193: PendingDeprecationWarning: the matrix subclass is not the recommended way to represent matrices or deal with linear algebra (see https://docs.scipy.org/doc/numpy/user/numpy-for-matlab-users.html). Please adjust your code to use regular ndarray.
+    m2 = np.dot( np.dot(g, s.M), g.transpose())
+
+tests/lattices/test_the_vinberg_call_returns_the_facets.sage: 114 warnings
+  /repos/vinal/src/sage/vinal.py:194: PendingDeprecationWarning: the matrix subclass is not the recommended way to represent matrices or deal with linear algebra (see https://docs.scipy.org/doc/numpy/user/numpy-for-matlab-users.html). Please adjust your code to use regular ndarray.
+    m1 = np.dot( np.dot( Matrix(a), s.M), g.transpose() )
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+========================== test-call performance gate ==========================
+tests/lattices/test_the_divided_class_construction.sage::test_a_named_class_loop_runs_at_the_one_residue_it_determines: 23.02 s > 20 s
+15 passed, 228 warnings in 66.30s (0:01:06)
+[peakrss] tim529: child waited=0 shell_code=0 samples=37
+[peakrss] peak tree RSS      : 731 MiB
+[peakrss] low-water MemAvail : 12499 MiB
+[peakrss] peak single VmHWM  : 731 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      720 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    70.0s procs=  3 rss=   731 MiB hwm=   731 MiB avail= 12656 MiB
+[peakrss]   t=    72.0s procs=  3 rss=   731 MiB hwm=   731 MiB avail= 12672 MiB
+[peakrss]   t=    68.0s procs=  3 rss=   720 MiB hwm=   720 MiB avail= 12706 MiB
+[peakrss]   t=    66.0s procs=  3 rss=   711 MiB hwm=   711 MiB avail= 12762 MiB
+[peakrss]   t=    64.0s procs=  3 rss=   701 MiB hwm=   701 MiB avail= 12660 MiB
+launcher exit: 0

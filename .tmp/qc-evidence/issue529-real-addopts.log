@@ -1,0 +1,26 @@
+checkout SHA: 0fd90fcd0298d3565c2151e0596da91bf641b261
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+inner 540 s, outer 600 s, guard 6144 MiB
+pytest: -p qc_sage_session -q tests/engineering/test_the_timing_record_names_each_stage.py
+..                                                                       [100%]
+-------------- generated report log file: tests/.report/run.jsonl --------------
+============================== slowest durations ===============================
+0.89s call     tests/engineering/test_the_timing_record_names_each_stage.py::test_a_run_keeps_its_report_log_and_its_junit_file
+0.74s call     tests/engineering/test_the_timing_record_names_each_stage.py::test_a_stage_timed_call_writes_its_stage_records_in_order_with_their_durations
+0.00s setup    tests/engineering/test_the_timing_record_names_each_stage.py::test_a_stage_timed_call_writes_its_stage_records_in_order_with_their_durations
+0.00s setup    tests/engineering/test_the_timing_record_names_each_stage.py::test_a_run_keeps_its_report_log_and_its_junit_file
+0.00s teardown tests/engineering/test_the_timing_record_names_each_stage.py::test_a_run_keeps_its_report_log_and_its_junit_file
+0.00s teardown tests/engineering/test_the_timing_record_names_each_stage.py::test_a_stage_timed_call_writes_its_stage_records_in_order_with_their_durations
+2 passed in 1.93s
+[peakrss] tim529: child waited=0 shell_code=0 samples=3
+[peakrss] peak tree RSS      : 447 MiB
+[peakrss] low-water MemAvail : 11333 MiB
+[peakrss] peak single VmHWM  : 447 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      437 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     4.0s procs=  3 rss=   447 MiB hwm=   447 MiB avail= 11333 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   299 MiB hwm=   299 MiB avail= 11500 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     2 MiB hwm=     3 MiB avail= 11598 MiB
+launcher exit: 0

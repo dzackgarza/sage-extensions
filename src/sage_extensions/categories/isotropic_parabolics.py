@@ -44,6 +44,7 @@ from sage_extensions.categories.modules.pure.modules import ModuleSubobjects
 from sage_extensions.categories.rings.ring_foundation import (
     OwnedCategoryOverBaseRing,
 )
+from sage_extensions.timing import timed_stage
 
 
 def _integral_solution(system, target):
@@ -4384,6 +4385,7 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             point_set = libgap.eval("Set([" + ",".join(str(point) for point in points) + "])")
             return int(libgap.Length(libgap.Orbit(action, point_set, libgap.eval("OnSets"))))
 
+        @timed_stage("stabilizer discriminant image orders", input=lambda self, *arguments, **keywords: self.ambient_lattice())
         def stabilizer_discriminant_image_orders(self):
             r"""Return `(upper, lower)`: the bound on `\rho(G_P)` and the order of the returned images.
 
@@ -4591,6 +4593,7 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             return total // part
 
         @cached_method
+        @timed_stage("parabolic completeness decision", input=lambda self, *arguments, **keywords: self.ambient_lattice())
         def parabolic_completeness_decision(self):
             r"""Return `(complete, reason)` for the parabolic's generators, `reason` ``None`` when complete.
 

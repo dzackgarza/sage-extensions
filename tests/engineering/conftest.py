@@ -10,18 +10,27 @@ The tests here ask what ``sage_extensions.testing.suite_budget`` and
 abbreviation starts a separate pytest over a tree written for it, and reports
 the exit status, the outcome of each test the run reported, the failure
 messages, and the run's own output.
+
+The timing record has the same shape of question — does a stage-timed call leave
+records, and does a run keep its own report log — so ``stage_records_of`` reads
+one call's records back out of the record file and ``archived_test_run`` reports
+the kinds of file a probe run kept.  Both are bound as builtins for the same
+reason: the lint admits exactly the names a directory's ``conftest.py`` binds.
 """
 
 from __future__ import annotations
 
 import builtins
 import json
+import os
 import shutil
 import subprocess
 import sys
 import tempfile
 from dataclasses import dataclass
 from pathlib import Path
+
+from sage_extensions import timing as sage_timing
 
 PROBE_ROOT = Path(__file__).resolve().parents[2] / ".tmp" / "plugin-probes"
 
@@ -116,8 +125,69 @@ def pytest_configure(config) -> None:
     as the tests that name it.
     """
     builtins.probe_run = probe_run
+    builtins.stage_records_of = stage_records_of
+    builtins.archived_test_run = archived_test_run
 
 
 def pytest_unconfigure(config) -> None:
     r"""Remove the session's abbreviation, leaving ``builtins`` as it was found."""
     del builtins.probe_run
+    del builtins.stage_records_of
+    del builtins.archived_test_run
+
+
+def stage_records_of(invoke):
+    r"""The stage records one call appends, read back from this process's own file.
+
+    ``invoke`` is the call — a stage-timed call of the library — and the records
+    are read from ``sage_extensions.timing.record_path()`` after it, from the
+    byte offset that file had before, so a test reads the records of its own
+    call rather than of any earlier call in the same process.  Reading the file
+    is the point: the record is what a timing question is answered from, so a
+    test that held the durations in memory would prove nothing about it.
+    """
+    path = sage_timing.record_path()
+    before = path.stat().st_size if path is not None and path.is_file() else 0
+    invoke()
+    return sage_timing.read_stage_records(path, after=before)
+
+
+def archived_test_run(tree, *arguments):
+    r"""Run pytest over ``tree`` under the timing plugin and report what it kept.
+
+    The run keeps its report log and JUnit file per run
+    (``sage_extensions.testing.timing_record``), so this starts a run whose
+    record directory is a fresh one and reports the *kinds* of file it left
+    there: ``("junit", "run")` for a run that wrote both.  The directory is the
+    plugin's own setting (``SAGE_EXTENSIONS_TIMING_DIR``), so the run under test
+    writes beside the real record directory, never into it, and the probe tree
+    carries its own ``pytest.ini`` so the repository's ``addopts`` — which want
+    a host's ``pytest-reportlog`` — do not reach it.
+    """
+    PROBE_ROOT.mkdir(parents=True, exist_ok=True)
+    root = Path(tempfile.mkdtemp(prefix="timing-", dir=PROBE_ROOT))
+    kept = Path(tempfile.mkdtemp(prefix="record-", dir=PROBE_ROOT))
+    try:
+        (root / "pytest.ini").write_text("[pytest]\n")
+        for name, source in tree.items():
+            written = root / name
+            written.parent.mkdir(parents=True, exist_ok=True)
+            written.write_text(source)
+        environment = dict(os.environ, SAGE_EXTENSIONS_TIMING_DIR=str(kept))
+        subprocess.run(
+            [
+                sys.executable, "-m", "pytest",
+                "-c", str(root / "pytest.ini"),
+                "-p", "sage_extensions.testing.timing_record",
+                *arguments,
+                str(root),
+            ],
+            cwd=root,
+            capture_output=True,
+            text=True,
+            env=environment,
+        )
+        return tuple(sorted(entry.stem.split("-")[0] for entry in kept.iterdir()))
+    finally:
+        shutil.rmtree(root)
+        shutil.rmtree(kept)

@@ -69,6 +69,7 @@ from sage_extensions.categories.sets.finite_ordered_sets import (
 )
 from sage_extensions.logic import AtomicProposition
 from sage_extensions.refine import refine
+from sage_extensions.timing import timed_stage
 from sage_extensions.tensors.tensor import _engine_component_matrix, tensor
 
 _VINBERG_NF_PROJECT = Path(__file__).resolve().parents[4] / "src.bak" / "backends" / "external" / "vinbergs_algorithm" / "references" / "VinbergsAlgorithmNF"
@@ -1158,6 +1159,7 @@ class HyperbolicLattices(OwnedCategoryOverBaseRing):
             )
 
         @cached_method
+        @timed_stage("Vinberg walk", input=lambda self, *arguments, **keywords: self)
         def _vinberg_search(self, controlling_vector, max_roots, max_decompositions, admits_root=None):
             r"""Run Vinberg's algorithm and return completeness with the roots.
 

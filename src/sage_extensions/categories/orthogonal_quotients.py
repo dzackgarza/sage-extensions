@@ -15,6 +15,7 @@ from sage_extensions.categories.sets.indexed_families import finite_indexed_fami
 from sage_extensions.categories.rings.ring_foundation import _owned_integers
 from sage_extensions.categories.sets.cardinals import cardinal
 from sage_extensions.categories.sets.set_categories import NN, Set, Sets
+from sage_extensions.timing import stage, timed_stage
 
 
 def _letters_in_owned_order(factor_groups, letters):
@@ -3630,11 +3631,27 @@ def _plane_parabolic_incidence_flags(subgroup, plane, flag):
     return tuple(flags)
 
 
+@timed_stage(
+    "isotropic orbit representatives",
+    input=lambda subgroup, *arguments, **keywords: subgroup.supergroup().domain(),
+)
 def _subgroup_isotropic_orbit_representatives(subgroup, rank, *, flag=False):
+    r"""Return the subgroup's orbits of primitive isotropic subobjects, as one timed row.
+
+    The row is the ambient ``O(L)``-orbits, split under the subgroup: the
+    character quotient's image (:mod:`sage_extensions.timing` records it as the
+    ``discriminant image`` stage), the ambient row, and the splitting of each
+    ambient representative by the coset walk and its transport, which the
+    per-representative stages record together as one interval because they are
+    one walk over the orbit's representatives rather than a measurement of any
+    single one of them.
+    """
     if not flag and index(rank) == 0:
         return subgroup.supergroup().isotropic_orbit_representatives(0)
-    _assert_isotropic_splitting_has_character_data(subgroup)
-    quotient = subgroup.finite_character_quotient()
+    lattice = subgroup.supergroup().domain()
+    with stage("discriminant image", lattice):
+        _assert_isotropic_splitting_has_character_data(subgroup)
+        quotient = subgroup.finite_character_quotient()
     orthogonal_group = subgroup.supergroup()
     representatives = []
     # The ambient classes always come from the port's classification: the
@@ -3643,44 +3660,45 @@ def _subgroup_isotropic_orbit_representatives(subgroup, rank, *, flag=False):
     # (its Normaliz walk is measured at over twenty minutes before failing),
     # while the port's line route answers the same classes in tens of seconds.
     sourced = orthogonal_group.isotropic_orbit_representatives(rank, flag=flag)
-    for representative in sourced:
-        line_image = (
-            quotient.isotropic_line_stabilizer_image(representative)
-            if not flag and rank == 1
-            else None
-        )
-        if line_image == "NOSPLIT":
-            # The sign witness (or trivial quotient) proves G_0 = G Stab(x) for its index.
-            representatives.append(representative)
-            continue
-        if line_image is not None:
+    with stage("coset splitting and transport", lattice):
+        for representative in sourced:
+            line_image = (
+                quotient.isotropic_line_stabilizer_image(representative)
+                if not flag and rank == 1
+                else None
+            )
+            if line_image == "NOSPLIT":
+                # The sign witness (or trivial quotient) proves G_0 = G Stab(x) for its index.
+                representatives.append(representative)
+                continue
+            if line_image is not None:
+                representatives.extend(
+                    splitting.transport_isotropic_object(representative)
+                    for splitting in quotient.splitting_isometries_from_line_class(*line_image)
+                )
+                continue
+            if not flag and index(rank) == 1:
+                from_divided_classes = _line_orbit_from_divided_classes(subgroup, representative)
+                if from_divided_classes is not None:
+                    representatives.extend(from_divided_classes)
+                    continue
+            if not flag and rank == 2:
+                from_planes = _plane_orbit_from_odd_stabilizer(subgroup, representative)
+                if from_planes is not None:
+                    representatives.extend(from_planes)
+                    continue
+            if not flag and rank == 2:
+                from_parabolic = _plane_orbit_from_parabolic_stabilizer(subgroup, representative)
+                if from_parabolic is not None:
+                    representatives.extend(from_parabolic)
+                    continue
+            stabilizer = quotient.exact_isotropic_stabilizer_generators(
+                representative, flag=flag
+            )
             representatives.extend(
                 splitting.transport_isotropic_object(representative)
-                for splitting in quotient.splitting_isometries_from_line_class(*line_image)
+                for splitting in quotient.splitting_isometries(stabilizer)
             )
-            continue
-        if not flag and index(rank) == 1:
-            from_divided_classes = _line_orbit_from_divided_classes(subgroup, representative)
-            if from_divided_classes is not None:
-                representatives.extend(from_divided_classes)
-                continue
-        if not flag and rank == 2:
-            from_planes = _plane_orbit_from_odd_stabilizer(subgroup, representative)
-            if from_planes is not None:
-                representatives.extend(from_planes)
-                continue
-        if not flag and rank == 2:
-            from_parabolic = _plane_orbit_from_parabolic_stabilizer(subgroup, representative)
-            if from_parabolic is not None:
-                representatives.extend(from_parabolic)
-                continue
-        stabilizer = quotient.exact_isotropic_stabilizer_generators(
-            representative, flag=flag
-        )
-        representatives.extend(
-            splitting.transport_isotropic_object(representative)
-            for splitting in quotient.splitting_isometries(stabilizer)
-        )
     return finite_ordered_set(tuple(representatives))
 
 

@@ -44,9 +44,17 @@ testpaths = ["tests"]
 # which names the blocking call instead of leaving it to bisection.
 # --durations ranks test phases, pytest-durations aggregates them by file, and
 # the report log plus JUnit xml make runs comparable to each other.
+#
+# Those two files are overwritten by the next run, so
+# sage_extensions.testing.timing_record copies them, at the end of the session,
+# into .timings/ at the checkout's root, named by commit and start time
+# (CONTRIBUTING.md ENV-03).  That directory is untracked and holds the library's
+# own stage records (sage_extensions.timing) beside them, so a run's wall times
+# outlive the run.
 addopts = """
   -p sage_extensions.testing.suite_budget
   -p sage_extensions.testing.test_lint
+  -p sage_extensions.testing.timing_record
   --timeout=60 --timeout-method=signal
   --durations=0 --durations-min=0
   --junit-xml=tests/.report/junit.xml

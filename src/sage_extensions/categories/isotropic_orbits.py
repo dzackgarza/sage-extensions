@@ -24,6 +24,7 @@ from sage_extensions.categories.sets.finite_ordered_sets import (
 )
 from sage_extensions.categories.sets.set_categories import NN, Sets, FiniteSets, CountableSets
 from sage_extensions.owned_category import _object_of, owned_category_join
+from sage_extensions.timing import stage, timed_stage
 
 
 def _held(lattice, element):
@@ -1571,8 +1572,17 @@ def _witt_one_hilbert_line_representatives(lattice):
     return finite_ordered_set((line,))
 
 
+@timed_stage(
+    "ambient O(L) row",
+    input=lambda orthogonal_group, *arguments, **keywords: orthogonal_group.domain(),
+)
 def _isotropic_orbit_representatives(orthogonal_group, rank, *, flag=False):
-    r"""Return full-``O(L)`` orbit representatives of primitive isotropic subobjects/flags."""
+    r"""Return full-``O(L)`` orbit representatives of primitive isotropic subobjects/flags.
+
+    This is the ambient row of every subgroup row that rests on it: the
+    ``O(L)``-orbits themselves, recorded as one stage of the timing record
+    (:mod:`sage_extensions.timing`) under the lattice they are computed for.
+    """
     lattice = orthogonal_group.domain()
     if flag:
         flag_type = rank if isinstance(rank, FlagType) else FlagType.complete(index(rank))
@@ -1808,6 +1818,10 @@ class _DividedClassPlaneOrbitDecomposition:
     :meth:`_establish_plane_stabilizer_images` decides.
     """
 
+    @timed_stage(
+        "discriminant images",
+        input=lambda self, subgroup, representatives, stabilizer_generators=None: representatives[0].inclusion().codomain(),
+    )
     def __init__(self, subgroup, representatives, stabilizer_generators=None) -> None:
         from sage.libs.gap.libgap import libgap
         from sage_extensions.categories.group.groups import _element_to_engine
@@ -2060,13 +2074,16 @@ class _DividedClassPlaneOrbitDecomposition:
         an unknown double-coset count in either direction.
         """
         plane = _primitive_isotropic_plane_of(self._lattice, self._starts[position][0])
-        if plane.is_parabolic_complete() is not True:
+        with stage("parabolic completeness", plane):
+            complete = plane.is_parabolic_complete()
+        if complete is not True:
             raise ValueError(
                 f"the stabilizer of {plane} in O({self._lattice}) is not established: the generators "
                 f"of the plane's parabolic are not established to be the whole setwise stabilizer, and "
                 f"no other statement supplies them. The missing factor: {plane.parabolic_obstruction()}"
             )
-        family = tuple(plane.parabolic_stabilizer_generators())
+        with stage("parabolic stabilizer family", plane):
+            family = tuple(plane.parabolic_stabilizer_generators())
         if not family:
             raise ValueError(
                 f"the stabilizer of {plane} in O({self._lattice}) is not established: its parabolic is "
@@ -2081,15 +2098,23 @@ class _DividedClassPlaneOrbitDecomposition:
     def _point_of(self, plane):
         return self._point_of_classes(_divided_discriminant_classes(self._lattice, plane))
 
+    @timed_stage("divided-class orbit set", input=lambda self, *arguments, **keywords: self._lattice)
     def orbits(self):
-        r"""Return one :class:`IsotropicPlaneOrbit` per orbit of the subgroup."""
+        r"""Return one :class:`IsotropicPlaneOrbit` per orbit of the subgroup.
+
+        The second half of the row: the class sets the discriminant image moves
+        (``ambient divided-class row``), the subgroup's orbits among them
+        (``coset action``), and the planes realized from the stabilizer where
+        the class set is not the whole story.
+        """
         from sage_extensions.categories.sets.finite_ordered_sets import finite_ordered_set
 
         action = self._setwise_action
-        ambient_orbits = [
-            _libgap().AsList(_libgap().Orbit(self._image, point, action))
-            for _plane, _classes, point in self._starts
-        ]
+        with stage("ambient divided-class row", self._lattice):
+            ambient_orbits = [
+                _libgap().AsList(_libgap().Orbit(self._image, point, action))
+                for _plane, _classes, point in self._starts
+            ]
         from_stabilizer = self._establish_plane_stabilizer_images([len(orbit) for orbit in ambient_orbits])
         points = []
         owners = []
@@ -2107,23 +2132,25 @@ class _DividedClassPlaneOrbitDecomposition:
         ]
         seen = [False] * len(points)
         orbits = []
-        for start in range(len(points)):
-            if seen[start]:
-                continue
-            seen[start] = True
-            stack = [start]
-            while stack:
-                current = stack.pop()
-                for graph in graphs:
-                    following = graph[current]
-                    if not seen[following]:
-                        seen[following] = True
-                        stack.append(following)
-            orbits.append(IsotropicPlaneOrbit(self, owners[start], points[start]))
+        with stage("coset action", self._lattice):
+            for start in range(len(points)):
+                if seen[start]:
+                    continue
+                seen[start] = True
+                stack = [start]
+                while stack:
+                    current = stack.pop()
+                    for graph in graphs:
+                        following = graph[current]
+                        if not seen[following]:
+                            seen[following] = True
+                            stack.append(following)
+                orbits.append(IsotropicPlaneOrbit(self, owners[start], points[start]))
         for start in sorted(from_stabilizer):
             orbits.extend(self._orbits_from_stabilizer(start))
         return finite_ordered_set(tuple(orbits))
 
+    @timed_stage("coset walk and transport", input=lambda self, start: self._starts[start][0])
     def _orbits_from_stabilizer(self, start):
         r"""One orbit per double coset ``\Gamma \backslash G / G_x``, from the plane's stabilizer.
 
@@ -2212,8 +2239,18 @@ def _primitive_isotropic_plane_of(lattice, plane):
     )
 
 
+@timed_stage(
+    "divided-class plane row",
+    input=lambda subgroup, representatives, stabilizer_generators=None: subgroup.supergroup().domain(),
+)
 def _divided_class_isotropic_plane_orbits(subgroup, representatives, stabilizer_generators=None):
-    r"""Return the subgroup's orbits of primitive isotropic planes, by divided classes."""
+    r"""Return the subgroup's orbits of primitive isotropic planes, by divided classes.
+
+    This is the row whose stages the timing record keeps (:mod:`sage_extensions.timing`):
+    the discriminant images the decomposition is built from, the ambient
+    divided-class row, the plane's parabolic and its completeness decision, the
+    coset action, and the walk and transport that realize each orbit.
+    """
     if representatives is None:
         raise ValueError(
             f"the divided-class plane orbits of {subgroup} need the O(L)-orbit representatives of "
@@ -2720,6 +2757,7 @@ class IsotropicVectorReductionImage(SageObject):
         reflection = self._lattice.reflection(lift)
         return self.contains_lift(reflection)
 
+    @timed_stage("cusp chamber", input=lambda self, *arguments, **keywords: self.lattice())
     def cusp_chamber(
         self,
         controlling_vector=None,
@@ -2934,6 +2972,7 @@ class IsotropicVectorReductionImage(SageObject):
             )
         return tuple(records)
 
+    @timed_stage("controlling vector", input=lambda self, *arguments, **keywords: self.lattice())
     def _computed_controlling_vector(self):
         r"""Return the class in ``N`` computed as the point of the hyperbolic space.
 

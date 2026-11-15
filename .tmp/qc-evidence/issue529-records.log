@@ -1,0 +1,30 @@
+# #529: the record one combined run left in .timings/ (checkout 0fd90fc, before this commit)
+# command: python -m pytest -p qc_sage_session -q tests/engineering/test_the_timing_record_names_each_stage.py \
+#            tests/lattices/test_setwise_stabilizer_discriminant_images.sage tests/lattices/test_the_vinberg_call_returns_its_facets.sage
+#          under the repository addopts (report log, JUnit, timing_record, suite_budget, test_lint)
+
+$ ls -l .timings/
+total 140
+-rw------- 1 projects projects 1704 Nov 15 06:50 junit-0fd90fcd0298-20261115T064915Z.xml
+-rw------- 1 projects projects 600 Nov 15 06:53 junit-0fd90fcd0298-20261115T065226Z.xml
+-rw------- 1 projects projects 113783 Nov 15 06:50 run-0fd90fcd0298-20261115T064915Z.jsonl
+-rw------- 1 projects projects 5555 Nov 15 06:53 run-0fd90fcd0298-20261115T065226Z.jsonl
+-rw------- 1 projects projects 5385 Nov 15 06:50 stages-0fd90fcd0298-20261115T064913Z.jsonl
+-rw------- 1 projects projects 2176 Nov 15 06:53 stages-0fd90fcd0298-20261115T065224Z.jsonl
+
+$ python3 -c 'census of stages-0fd90fcd0298-20261115T064913Z.jsonl'
+15 stage records
+    1  discriminant image                 slowest    0.002 s
+    1  ambient O(L) row                   slowest    0.320 s
+    1  coset splitting and transport      slowest    0.011 s
+    1  isotropic orbit representatives    slowest    0.336 s
+    1  parabolic completeness decision    slowest    0.127 s
+    1  discriminant images                slowest   20.290 s
+    1  ambient divided-class row          slowest    0.000 s
+    1  coset action                       slowest    0.000 s
+    1  divided-class orbit set            slowest    0.925 s
+    1  divided-class plane row            slowest   21.227 s
+    5  Vinberg walk                       slowest    5.913 s
+
+first line of the file:
+{"record": "stage", "stage": "discriminant image", "input": "Integral lattice of rank 5 and signature (2, 3)", "commit": "0fd90fcd0298d3565c2151e0596da91bf641b261", "run": "20261115T064913Z", "pid": 1672935, "started": "2026-11-15T06:49:16.020138+00:00", "finished": "2026-11-15T06:49:16.021669+00:00", "seconds": 0.0015324489795602858, "outcome": "returned"}

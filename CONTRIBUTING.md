@@ -6440,6 +6440,17 @@ A construct that survives these questions is allowed.  The catalogue exists to m
 
 - **Violation Example**: Running undocumented one-off ad-hoc bash scripts for builds or tests.
 
+#### `ENV-03`: Every Run Keeps Its Timing Record in `.timings/`
+
+- **Rule**: A timing question is answered by reading the record of a run that already happened, never by re-running the computation under a wrapper. Two records exist, both under `.timings/` at the checkout's root, which is untracked (`.gitignore`) and never edited by hand:
+  - a **test run**'s report log and JUnit file — the two files `pyproject.toml`'s `addopts` write to `tests/.report/` — copied per run by `sage_extensions.testing.timing_record` into `run-<commit>-<start>.jsonl` and `junit-<commit>-<start>.xml`, where `<start>` is the run's own start time;
+  - a **long computation**'s stage records, appended as JSONL by `sage_extensions.timing` to `stages-<commit>-<start>.jsonl`, one line per stage, carrying the stage's name, the name of its input, its wall time, its outcome and the commit. One logger, `logging.getLogger("sage_extensions")`, carries them all; a stage is two clock readings around work done once per call, never a wrapper per element.
+
+  Every CI workflow whose jobs this repository defines uploads that directory as an artifact with 90-day retention; the two QC tiers (`development.yml`, `ambient.yml`) call a reusable `ai-review-ci` workflow that this repository does not define, so their record is that workflow's to upload.
+- **Rationale**: #390's cost measurements were bought by re-running the `Õ(T_Co)` plane row under wrappers, 30 to 90 minutes a run, and each re-run replaced the previous numbers; a record written by the run itself costs a clock reading and answers the question afterwards. Naming the file by commit and start time is what makes the record attributable: `tests/.report/` holds one run's files and the next run overwrites them, so a directory of these files is the only thing that outlives a run.
+- **Violation Example**: Timing a stage by wrapping the public call in a probe script, so that the measurement's own overhead and its own copy of the library decide the answer; or writing a stage's duration into the test output and nowhere else.
+- **Correct Example**: `stage("ambient O(L) row", lattice)` around the ambient row inside `_subgroup_isotropic_orbit_representatives`, and `sage_extensions.timing.read_stage_records()` in a test that makes one small stage-timed call and reads the names back in order.
+
 * * *
 
 ### 14. Formalization Requests and Search (`FSA-*`)

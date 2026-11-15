@@ -1548,3 +1548,27 @@ the lint, which is what a turn's feedback loop allows.
 The probe sources behind these logs are session probes, not library code, and stay out of the tree: each execs the
 test file through `sage.repl.preparse` and runs the test's body for the cusps named on its command line, or prints
 the chamber, the transporter and the membership answer at one cusp.
+
+## #529 — the durable timing record
+
+`src/sage_extensions/timing.py` is the one logger (`logging.getLogger("sage_extensions")`) the long
+computations record their stages through, and `src/sage_extensions/testing/timing_record.py` is the pytest
+plugin that keeps a run's report log and JUnit file. Both write `.timings/` at the checkout's root, named by
+commit and start time (`CONTRIBUTING.md` ENV-03); the test is
+`tests/engineering/test_the_timing_record_names_each_stage.py`. Every run below is in the pinned image with the
+indefinite port bound at `/work`, the checkout at `/repos/sage-extensions`, from the checkout at `0fd90fc` plus
+this commit's working tree, except the two rows marked *base*, which are a clean worktree at `0fd90fc`.
+
+| log | tree | result |
+| --- | --- | --- |
+| `issue529-neighbours.log` | this commit | `tests/engineering/` plus the two small-indefinite line-row files, `--no-time-gates` with `test_lint` loaded: **3 failed, 12 passed in 49.0 s**; the three failures are `test_polyhedral_engine_routes.sage`'s two (Julia/Hecke route) and `test_SO_U_has_two_orbits_on_the_primitive_isotropic_lines_of_U` |
+| `issue529-baseline.log` | base | the same command on the clean worktree: **3 failed, 10 passed in 47.4 s**, the same three test ids, and the same 22.50 s performance-gate report on the small-indefinite file as this tree's 22.48 s — so the instrumentation moved no result and no gate |
+| `issue529-stages.log` | this commit | the Vinberg, divided-class and stable-plane files, `--no-time-gates`: **15 passed in 66.3 s**; the divided-class construction's own 23.02 s call-gate report is the same file's pre-existing overrun |
+| `issue529-real-addopts.log` | this commit | the new test file under the repository's real addopts: **2 passed in 1.93 s**, and `.timings/` afterwards holds `run-0fd90fcd0298-20261115T064853Z.jsonl`, `junit-…xml` and `stages-…jsonl` — the plugin's copy and the library's records in one directory |
+| `issue529-combined-addopts.log` | this commit | the new test file, the setwise-stabilizer file and the Vinberg file under the real addopts: **9 passed in 82.5 s**; the run is red on the call gate for `test_every_setwise_stabilizer_generator_has_a_discriminant_image` at 38.13 s, which the two rows below show is this venue's |
+| `issue529-setwise-base.log` | base | `test_setwise_stabilizer_discriminant_images.sage` alone under the real addopts: **2 passed in 60.6 s**, first test **41.51 s > 20 s**, plane call 17.99 s |
+| `issue529-setwise-mine.log` | this commit | the same file alone: **2 passed in 60.9 s**, first test **41.07 s > 20 s**, plane call 18.54 s — the plane call the new stages wrap costs 0.55 s more, and the gate failure is the base's |
+| `issue529-records.log` | this commit | the census of the six files the combined run left in `.timings/`: 15 stage records, 11 stage names, the plane row at 21.227 s of which the discriminant images are 20.290 s and the orbit set 0.925 s, and 5 Vinberg walks slowest 5.913 s |
+
+The three pre-existing failures and the 22 s gate report were re-measured on the clean worktree in the same
+session rather than assumed; nothing in this commit touches the code they run.

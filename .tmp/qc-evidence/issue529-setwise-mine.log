@@ -1,0 +1,29 @@
+checkout SHA: 0fd90fcd0298d3565c2151e0596da91bf641b261
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+inner 540 s, outer 600 s, guard 6144 MiB
+pytest: -p qc_sage_session -q tests/lattices/test_setwise_stabilizer_discriminant_images.sage
+..                                                                       [100%]
+-------------- generated report log file: tests/.report/run.jsonl --------------
+========================== test-call performance gate ==========================
+tests/lattices/test_setwise_stabilizer_discriminant_images.sage::test_every_setwise_stabilizer_generator_has_a_discriminant_image: 41.07 s > 20 s
+============================== slowest durations ===============================
+41.07s call     tests/lattices/test_setwise_stabilizer_discriminant_images.sage::test_every_setwise_stabilizer_generator_has_a_discriminant_image
+18.54s call     tests/lattices/test_setwise_stabilizer_discriminant_images.sage::test_the_divided_class_plane_call_takes_the_setwise_stabilizer_generators
+0.00s setup    tests/lattices/test_setwise_stabilizer_discriminant_images.sage::test_every_setwise_stabilizer_generator_has_a_discriminant_image
+0.00s setup    tests/lattices/test_setwise_stabilizer_discriminant_images.sage::test_the_divided_class_plane_call_takes_the_setwise_stabilizer_generators
+0.00s teardown tests/lattices/test_setwise_stabilizer_discriminant_images.sage::test_every_setwise_stabilizer_generator_has_a_discriminant_image
+0.00s teardown tests/lattices/test_setwise_stabilizer_discriminant_images.sage::test_the_divided_class_plane_call_takes_the_setwise_stabilizer_generators
+2 passed in 60.90s (0:01:00)
+[peakrss] tim529: child waited=1 shell_code=1 samples=35
+[peakrss] peak tree RSS      : 551 MiB
+[peakrss] low-water MemAvail : 9565 MiB
+[peakrss] peak single VmHWM  : 551 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      540 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    66.1s procs=  3 rss=   551 MiB hwm=   551 MiB avail=  9884 MiB
+[peakrss]   t=    68.1s procs=  3 rss=   551 MiB hwm=   551 MiB avail= 10142 MiB
+[peakrss]   t=    64.1s procs=  3 rss=   549 MiB hwm=   549 MiB avail= 10112 MiB
+[peakrss]   t=    62.1s procs=  3 rss=   542 MiB hwm=   542 MiB avail=  9957 MiB
+[peakrss]   t=    60.1s procs=  3 rss=   539 MiB hwm=   539 MiB avail= 10156 MiB
