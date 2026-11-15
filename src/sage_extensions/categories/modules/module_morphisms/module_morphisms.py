@@ -1274,9 +1274,12 @@ class ModuleMorphismMethods:
             case "scalar":
                 return _owned_engine_element(ring, image[0])
             case "sparse":
-                return codomain.element_class(codomain, {
-                    label: _owned_engine_element(ring, image[index])
-                    for index, label in enumerate(row_labels)
+                # The exact engine decides each zero coefficient; the
+                # nonzero ones are raised once into the owned ring.
+                return _SparseFreeModuleElement._from_owned_support(codomain, {
+                    label: _owned_engine_element(ring, entry)
+                    for label, entry in zip(row_labels, image, strict=True)
+                    if entry
                 })
             case "combination":
                 return codomain.linear_combination({
