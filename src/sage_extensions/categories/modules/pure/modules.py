@@ -1696,20 +1696,20 @@ class Modules(OwnedCategoryOverBaseRing):
             r"""Return ``r^{-1} v``: division by a unit of the scalar ring.
 
             ``v / r`` is the scalar action of the inverse of ``r`` in the
-            module's scalar ring, so an integer divides a vector of a
-            ``QQ``-module through its image in ``QQ``, and a scalar that is not
-            a unit there is refused by the ring's own unit inverse,
+            module's scalar ring: one formula ``v / r = r^{-1} v`` for every
+            element of every module (Bourbaki, *Algebra I*, Ch. II, Section
+            1.1).  An integer therefore divides a vector of a ``QQ``-module
+            through its image in ``QQ``, and a scalar that is not a unit there
+            is refused by the ring's own unit inverse,
             ``Monoids.ElementMethods.inverse_of_unit``, whose computation hook
-            ``_unit_inverse_decision`` the ring's element realization supplies
-            (``v / r = r^{-1} v``, Bourbaki, *Algebra I*, Ch. II, Section 1.1).
+            ``_unit_inverse_decision`` the ring's element realization supplies.
 
-            An element of the scalar ring is not divided here.  It divides
-            through the ring's own element methods, which state ``x y^{-1}``:
-            for the field realizations beside it, and for an owned ring with a
-            backend realization, that method precedes this one in the element
-            class.  The two agree when the ring is commutative and differ
-            otherwise, so the ring's own division is the one a ring element
-            gets.
+            A ring is a left module over itself, so its elements carry this
+            method too, and for them it would be the scalar action
+            ``b^{-1} a``.  They divide in the ring instead, ``a b^{-1}``, which
+            ``OwnedRings.ElementMethods.__truediv__`` states at the ring level
+            of the element class, ahead of this one.  The two agree exactly
+            when the ring commutes.
             """
             ring = self.parent().base_ring()
             return self.parent().scalar_multiple(ring(scalar).inverse_of_unit(), self)

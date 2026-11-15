@@ -26,9 +26,15 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 1
+      - name: Check out the Sage pytest collector plugin
+        uses: actions/checkout@v4
+        with:
+          repository: dzackgarza/ai-review-ci
+          ref: main
+          path: .qc-infra
       - name: Mark the checkout as a safe git directory
         run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
-      - name: Run the test file
+      - name: Run the test file through the repository's own just test
         env:
           PYTHONPATH: src
           TEST_TIMEOUT: ${{ inputs.timeout || '7200' }}
@@ -36,7 +42,9 @@ jobs:
           set -o pipefail
           "$SAGE_BIN" --version
           git rev-parse HEAD
-          sage_python="$("$SAGE_BIN" -c "import sys; print(sys.executable)")"
-          "$sage_python" -m pytest tests/lattices/test_the_isotropic_reduction_image.sage \
+          # The recipe reads the QC plugins and sage.just from ~/ai-review-ci.
+          mkdir -p "$HOME"
+          ln -sfn "$GITHUB_WORKSPACE/.qc-infra" "$HOME/ai-review-ci"
+          just test tests/lattices/test_the_isotropic_reduction_image.sage \
             --no-time-gates --timeout "$TEST_TIMEOUT" -v
         shell: bash
