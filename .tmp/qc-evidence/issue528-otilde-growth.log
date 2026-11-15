@@ -1,0 +1,1344 @@
+tree SHA: fed237beab614867dcbec17b4a5eae9c56b20320 (detached worktree of refs/remotes/omm/main)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+probe: .tmp/qc-evidence/issue528-otilde-growth.py
+command: /workspace/nucleus/work/home/sage-image/run.sh -w /work -- /sage/.venv/bin/python -u -s /probe.py cap=540
+inner 570 s, outer 598 s, peakrss guard 6144 MiB
+[    0.0s] shadowed to_vector at: framed_free_modules.FramedFreeModules.ElementMethods
+[    0.0s] timed: spanning
+[    0.0s] counted: transport, register, registry_scan, lift_lookup, certified_parabolic, same_subobject
+[    1.7s] lattice Integral lattice of rank 11 and signature (2, 9); subgroup {g in Orthogonal group O(Integral lattice of rank 11 and signature (2, 9)) : rho_L(g) lies in Subgroup of Orthogonal group of Finitely presented module on 11 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 2, 1 ↦ 2, 2 ↦ 2, 3 ↦ 2, 4 ↦ 2, 5 ↦ 2, 6 ↦ 2, 7 ↦ 2, 8 ↦ 2, 9 ↦ 2, 10 ↦ 2]}
+[   10.1s]   window   22801 to_vector over  10.0 s
+[   10.1s]      site    6077  modules.py:7148:_matrix_column_coordinates
+[   10.1s]      site    5562  coloured_vector_families.py:594:<genexpr>
+[   10.1s]      site    3872  eichler_criterion.py:40:_column_matrix_from_images
+[   10.1s]      site    1485  lattices.py:5831:_evaluate_gram
+[   16.7s]   sampled 15 times; leaf now finite_ordered_sets.py:_element_constructor_; to_vector=27543
+[   16.8s]      leaf    2  isotropic_orbits.py:_isotropic_orbit_representatives
+[   16.8s]      leaf    1  ring_foundation.py:_backend
+[   16.8s]      leaf    1  finitely_presented_modules.py:_submodule_image_key
+[   16.8s]      site    6078  modules.py:7148:_matrix_column_coordinates
+[   16.8s]      site    5562  coloured_vector_families.py:594:<genexpr>
+[   16.8s]      site    3872  eichler_criterion.py:40:_column_matrix_from_images
+[   16.8s]      site    2979  lattice_morphisms.py:1755:integral_restriction
+[   16.8s]      site    2217  lattices.py:5831:_evaluate_gram
+[   20.1s]   window    9099 to_vector over  10.0 s
+[   20.1s]      site    3301  lattice_morphisms.py:1755:integral_restriction
+[   20.1s]      site    1636  lattices.py:5831:_evaluate_gram
+[   20.1s]      site    1636  lattices.py:5832:_evaluate_gram
+[   20.1s]      site     612  coloured_vector_families.py:594:<genexpr>
+Timeout (0:00:20)!
+Thread 0x00007cc124efb6c0 [Thread-1 (sampl] (most recent call first):
+  File "/probe.py", line 373 in sampler
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Thread 0x00007cc319953780 [python] (most recent call first):
+  <invalid frame>
+[   30.1s]   window    9335 to_vector over  10.0 s
+[   30.1s]      site    3495  lattice_morphisms.py:1755:integral_restriction
+[   30.1s]      site    2322  coloured_vector_families.py:594:<genexpr>
+[   30.1s]      site     771  lattices.py:5831:_evaluate_gram
+[   30.1s]      site     771  lattices.py:5832:_evaluate_gram
+[   31.9s]   sampled 30 times; leaf now finite_ordered_sets.py:__contains__; to_vector=45150
+[   31.9s]      leaf    2  isotropic_orbits.py:_isotropic_orbit_representatives
+[   32.0s]      leaf    2  objects.py:__contains__
+[   32.0s]      leaf    2  ring_foundation.py:_element_constructor_
+[   32.0s]      site   10818  coloured_vector_families.py:594:<genexpr>
+[   32.0s]      site    7848  modules.py:7148:_matrix_column_coordinates
+[   32.0s]      site    7392  lattice_morphisms.py:1755:integral_restriction
+[   32.1s]      site    4179  lattices.py:5831:_evaluate_gram
+[   32.1s]      site    4179  lattices.py:5832:_evaluate_gram
+[   40.1s]   window    9687 to_vector over  10.0 s
+[   40.1s]      site    3074  lattice_morphisms.py:1755:integral_restriction
+[   40.1s]      site    2322  coloured_vector_families.py:594:<genexpr>
+[   40.1s]      site    1166  lattices.py:5831:_evaluate_gram
+[   40.1s]      site    1165  lattices.py:5832:_evaluate_gram
+Timeout (0:00:20)!
+Thread 0x00007cc124efb6c0 [Thread-1 (sampl] (most recent call first):
+  File "/probe.py", line 373 in sampler
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Thread 0x00007cc319953780 [python] (most recent call first):
+  File "/sage/.venv/lib/python3.14/site-packages/sage/categories/category.py", line ??? in __contains__
+  <invalid frame>
+[   47.2s]   sampled 45 times; leaf now ring_foundation.py:zero; to_vector=56734
+[   47.2s]      leaf    4  ring_foundation.py:_element_constructor_
+[   47.2s]      leaf    3  objects.py:__contains__
+[   47.2s]      leaf    3  ring_foundation.py:__contains__
+[   47.2s]      site   12685  lattice_morphisms.py:1755:integral_restriction
+[   47.2s]      site   11124  coloured_vector_families.py:594:<genexpr>
+[   47.2s]      site    8257  modules.py:7148:_matrix_column_coordinates
+[   47.3s]      site    5988  lattices.py:5831:_evaluate_gram
+[   47.3s]      site    5988  lattices.py:5832:_evaluate_gram
+[   50.1s]   window    7936 to_vector over  10.0 s
+[   50.1s]      site    3648  lattice_morphisms.py:1755:integral_restriction
+[   50.1s]      site    1217  lattices.py:5832:_evaluate_gram
+[   50.1s]      site    1216  lattices.py:5831:_evaluate_gram
+[   50.1s]      site     457  lattices.py:8388:_eichler_transvection_column_matrix
+[   53.8s]   SPAN block    1:     5.09 ms a call over 50 calls; last basis coordinate size 282, largest so far 282; cache 49; tracked objects 818957; gc counts (1296, 11, 0)
+[   60.1s]   window   12617 to_vector over  10.0 s
+[   60.1s]      site    2790  coloured_vector_families.py:594:<genexpr>
+[   60.1s]      site    2356  lattice_morphisms.py:1755:integral_restriction
+[   60.1s]      site    1990  lattices.py:5831:_evaluate_gram
+[   60.1s]      site    1989  lattices.py:5832:_evaluate_gram
+Timeout (0:00:20)!
+Thread 0x00007cc124efb6c0 [Thread-1 (sampl] (most recent call first):
+  File "/probe.py", line 373 in sampler
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Thread 0x00007cc319953780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/framed/framed_free_modules.py", line 352 in __call__
+  <invalid frame>
+[   62.4s]   sampled 60 times; leaf now ring_foundation.py:__init__; to_vector=73148
+[   62.4s]      leaf    5  ring_foundation.py:_element_constructor_
+[   62.4s]      leaf    3  objects.py:__contains__
+[   62.5s]      leaf    3  ring_foundation.py:__contains__
+[   62.5s]      site   17207  lattice_morphisms.py:1755:integral_restriction
+[   62.5s]      site   13914  coloured_vector_families.py:594:<genexpr>
+[   62.5s]      site    9791  modules.py:7148:_matrix_column_coordinates
+[   62.5s]      site    8521  lattices.py:5831:_evaluate_gram
+[   62.5s]      site    8521  lattices.py:5832:_evaluate_gram
+[   71.5s]   window   22886 to_vector over  11.4 s
+[   71.5s]      site   14099  modules.py:7148:_matrix_column_coordinates
+[   71.5s]      site    2101  lattice_morphisms.py:1755:integral_restriction
+[   71.5s]      site    1529  polyhedral_cones.py:306:engine_row
+[   71.5s]      site    1256  lattices.py:5831:_evaluate_gram
+[   78.1s]   sampled 75 times; leaf now owned_category.py:_subcategory_hook_; to_vector=132860
+[   78.1s]      leaf    6  ring_foundation.py:_element_constructor_
+[   78.1s]      leaf    4  ring_foundation.py:__contains__
+[   78.1s]      leaf    4  ring_foundation.py:__call__
+[   78.1s]      site   26734  lattices.py:5831:_evaluate_gram
+[   78.1s]      site   26734  lattices.py:5832:_evaluate_gram
+[   78.1s]      site   23912  modules.py:7148:_matrix_column_coordinates
+[   78.2s]      site   18409  lattice_morphisms.py:1755:integral_restriction
+[   78.2s]      site   14076  coloured_vector_families.py:594:<genexpr>
+Timeout (0:00:20)!
+Thread 0x00007cc124efb6c0 [Thread-1 (sampl] (most recent call first):
+  File "/probe.py", line 373 in sampler
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Thread 0x00007cc319953780 [python] (most recent call first):
+  File "/work/src/sage_indefinite_port/indefinite/indefinite_reduction.py", line ??? in _source_nearest_integer
+  <invalid frame>
+[   81.7s]   window   47337 to_vector over  10.2 s
+[   81.7s]      site   20348  lattices.py:5831:_evaluate_gram
+[   81.7s]      site   20348  lattices.py:5832:_evaluate_gram
+[   81.7s]      site    1452  lattices.py:8688:eichler_transvection_half_vector
+[   81.7s]      site    1452  isotropic_parabolics.py:3237:<genexpr>
+[   86.0s]   SPAN block    2:     3.05 ms a call over 50 calls; last basis coordinate size 2, largest so far 282; cache 83; tracked objects 1323344; gc counts (1140, 1, 7)
+[   90.6s]   SPAN block    3:     1.89 ms a call over 50 calls; last basis coordinate size 4, largest so far 282; cache 109; tracked objects 1450976; gc counts (729, 3, 18)
+[   91.7s]   window   35659 to_vector over  10.0 s
+[   91.7s]      site   15620  coloured_vector_families.py:594:<genexpr>
+[   91.7s]      site    5547  modules.py:7148:_matrix_column_coordinates
+[   91.7s]      site    3872  eichler_criterion.py:40:_column_matrix_from_images
+[   91.7s]      site    2708  lattices.py:5832:_evaluate_gram
+[   93.4s]   sampled 90 times; leaf now ring_foundation.py:__call__; to_vector=180556
+[   93.4s]      leaf    6  ring_foundation.py:_element_constructor_
+[   93.4s]      leaf    5  ring_foundation.py:__call__
+[   93.4s]      leaf    4  objects.py:__contains__
+[   93.4s]      site   33215  lattices.py:5831:_evaluate_gram
+[   93.5s][   93.5s]    SPAN block    4:     1.89 ms a call over 50 calls; last basis coordinate size -1, largest so far 282; cache 134; tracked objects 1503374; gc counts (92, 10, 0)     site   33215  lattices.py:5832:_evaluate_gram
+
+[   93.6s]      site   30924  modules.py:7148:_matrix_column_coordinates
+[   93.6s]      site   30456  coloured_vector_families.py:594:<genexpr>
+[   93.6s]      site   18682  lattice_morphisms.py:1755:integral_restriction
+[   96.5s]   SPAN block    5:     1.90 ms a call over 50 calls; last basis coordinate size 4, largest so far 282; cache 159; tracked objects 1612859; gc counts (787, 6, 7)
+Timeout (0:00:20)!
+Thread 0x00007cc124efb6c0 [Thread-1 (sampl] (most recent call first):
+  File "/probe.py", line 373 in sampler
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Thread 0x00007cc319953780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_foundation.py", line ??? in codomain
+  <invalid frame>
+[  105.1s]   window   14299 to_vector over  13.3 s
+[  105.1s]      site    3800  coloured_vector_families.py:594:<genexpr>
+[  105.1s]      site    2878  lattices.py:5831:_evaluate_gram
+[  105.1s]      site    2878  lattices.py:5832:_evaluate_gram
+[  105.1s]      site    2258  modules.py:7148:_matrix_column_coordinates
+[  108.7s]   sampled 105 times; leaf now objects.py:__contains__; to_vector=209523
+[  108.7s]      leaf    7  mor_foundation.py:_copy_operation_metadata
+[  108.7s]      leaf    7  ring_foundation.py:_element_constructor_
+[  108.7s]      leaf    6  ring_foundation.py:__call__
+[  108.8s]      site   38896  coloured_vector_families.py:594:<genexpr>
+[  108.8s]      site   35453  lattices.py:5831:_evaluate_gram
+[  108.8s]      site   35453  lattices.py:5832:_evaluate_gram
+[  108.8s]      site   33367  modules.py:7148:_matrix_column_coordinates
+[  108.8s]      site   18893  lattice_morphisms.py:1755:integral_restriction
+[  110.1s]   SPAN block    6:     1.07 ms a call over 50 calls; last basis coordinate size -1, largest so far 282; cache 171; tracked objects 1974385; gc counts (397, 2, 10)
+[  111.3s]   SPAN block    7:     0.30 ms a call over 50 calls; last basis coordinate size -1, largest so far 282; cache 171; tracked objects 1987548; gc counts (1525, 0, 12)
+[  115.1s]   window   33358 to_vector over  10.0 s
+[  115.1s]      site    8249  eichler.py:894:coordinates
+[  115.1s]      site    5820  coloured_vector_families.py:594:<genexpr>
+[  115.1s]      site    4301  recursive.py:134:<genexpr>
+[  115.1s]      site    4280  recursive.py:192:_isometry_from_column_matrix
+Timeout (0:00:20)!
+Thread 0x00007cc124efb6c0 [Thread-1 (sampl] (most recent call first):
+  File "/probe.py", line 373 in sampler
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Thread 0x00007cc319953780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py", line ??? in _from_engine_element
+  <invalid frame>
+[  124.3s]   sampled 120 times; leaf now ring_foundation.py:__contains__; to_vector=229810
+[  124.3s]      leaf    8  mor_foundation.py:_copy_operation_metadata
+[  124.3s]      leaf    7  ring_foundation.py:_element_constructor_
+[  124.3s]      leaf    6  ring_foundation.py:__call__
+[  124.3s]      site   39556  modules.py:7148:_matrix_column_coordinates
+[  124.3s]      site   39316  coloured_vector_families.py:594:<genexpr>
+[  124.4s]      site   36520  lattices.py:5831:_evaluate_gram
+[  124.4s]      site   36520  lattices.py:5832:_evaluate_gram
+[  124.4s]      site   19165  lattice_morphisms.py:1755:integral_restriction
+[  125.1s]   window    5060 to_vector over  10.0 s
+[  125.1s]      site    2617  modules.py:7148:_matrix_column_coordinates
+[  125.1s]      site    2399  lattice_morphisms.py:2235:<genexpr>
+[  125.1s]      site      11  powers.py:695:<genexpr>
+[  125.1s]      site      11  finitely_presented_modules.py:561:<genexpr>
+[  135.1s]   window    3003 to_vector over  10.0 s
+[  135.1s]      site    3003  lattice_morphisms.py:2235:<genexpr>
+[  139.5s]   sampled 135 times; leaf now owned_category.py:_owned_join_as_tuple; to_vector=234276
+[  139.5s]      leaf    8  mor_foundation.py:_copy_operation_metadata
+[  139.5s]      leaf    7  ring_foundation.py:_element_constructor_
+[  139.5s]      leaf    6  ring_foundation.py:__call__
+[  139.5s]      site   39556  modules.py:7148:_matrix_column_coordinates
+[  139.6s]      site   39316  coloured_vector_families.py:594:<genexpr>
+[  139.6s]      site   36520  lattices.py:5831:_evaluate_gram
+[  139.6s]      site   36520  lattices.py:5832:_evaluate_gram
+[  139.6s]      site   19165  lattice_morphisms.py:1755:integral_restriction
+Timeout (0:00:20)!
+Thread 0x00007cc124efb6c0 [Thread-1 (sampl] (most recent call first):
+  File "/probe.py", line 373 in sampler
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Thread 0x00007cc319953780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py", line 2490 in Of
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_foundation.py", line 310 in End
+  <invalid frame>
+[  145.1s]   window    3379 to_vector over  10.0 s register=1
+[  145.1s]      site    3090  lattice_morphisms.py:2235:<genexpr>
+[  145.1s]      site     265  modules.py:7148:_matrix_column_coordinates
+[  145.1s]      site      12  lattices.py:5831:_evaluate_gram
+[  145.1s]      site      12  lattices.py:5832:_evaluate_gram
+Timeout (0:00:20)!
+Thread 0x00007cc124efb6c0 [Thread-1 (sampl] (most recent call first):
+  File "/probe.py", line 373 in sampler
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Thread 0x00007cc319953780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 2003 in _iter_splitting_isometries_in_im_rho_from_image
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3482 in _plane_orbit_from_parabolic_stabilizer
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3706 in _subgroup_isotropic_orbit_representatives
+  File "/repos/sage-extensions/src/sage_extensions/timing.py", line 393 in timed
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 522 in isotropic_orbit_representatives
+  File "/probe.py", line 456 in main
+  File "/probe.py", line 483 in <module>
+Timeout (0:00:20)!
+Thread 0x00007cc124efb6c0 [Thread-1 (sampl] (most recent call first):
+  File "/probe.py", line 373 in sampler
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Thread 0x00007cc319953780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 2003 in _iter_splitting_isometries_in_im_rho_from_image
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3482 in _plane_orbit_from_parabolic_stabilizer
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3706 in _subgroup_isotropic_orbit_representatives
+  File "/repos/sage-extensions/src/sage_extensions/timing.py", line 393 in timed
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 522 in isotropic_orbit_representatives
+  File "/probe.py", line 456 in main
+  File "/probe.py", line 483 in <module>
+Timeout (0:00:20)!
+Thread 0x00007cc124efb6c0 [Thread-1 (sampl] (most recent call first):
+  File "/probe.py", line 373 in sampler
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Thread 0x00007cc319953780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 2003 in _iter_splitting_isometries_in_im_rho_from_image
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3482 in _plane_orbit_from_parabolic_stabilizer
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3706 in _subgroup_isotropic_orbit_representatives
+  File "/repos/sage-extensions/src/sage_extensions/timing.py", line 393 in timed
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 522 in isotropic_orbit_representatives
+  File "/probe.py", line 456 in main
+  File "/probe.py", line 483 in <module>
+Timeout (0:00:20)!
+Thread 0x00007cc124efb6c0 [Thread-1 (sampl] (most recent call first):
+  File "/probe.py", line 373 in sampler
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Thread 0x00007cc319953780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 2003 in _iter_splitting_isometries_in_im_rho_from_image
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3482 in _plane_orbit_from_parabolic_stabilizer
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3706 in _subgroup_isotropic_orbit_representatives
+  File "/repos/sage-extensions/src/sage_extensions/timing.py", line 393 in timed
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 522 in isotropic_orbit_representatives
+  File "/probe.py", line 456 in main
+  File "/probe.py", line 483 in <module>
+Timeout (0:00:20)!
+Thread 0x00007cc124efb6c0 [Thread-1 (sampl] (most recent call first):
+  File "/probe.py", line 373 in sampler
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Thread 0x00007cc319953780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 2003 in _iter_splitting_isometries_in_im_rho_from_image
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3482 in _plane_orbit_from_parabolic_stabilizer
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3706 in _subgroup_isotropic_orbit_representatives
+  File "/repos/sage-extensions/src/sage_extensions/timing.py", line 393 in timed
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 522 in isotropic_orbit_representatives
+  File "/probe.py", line 456 in main
+  File "/probe.py", line 483 in <module>
+Timeout (0:00:20)!
+Thread 0x00007cc124efb6c0 [Thread-1 (sampl] (most recent call first):
+  File "/probe.py", line 373 in sampler
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Thread 0x00007cc319953780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 2003 in _iter_splitting_isometries_in_im_rho_from_image
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3482 in _plane_orbit_from_parabolic_stabilizer
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3706 in _subgroup_isotropic_orbit_representatives
+  File "/repos/sage-extensions/src/sage_extensions/timing.py", line 393 in timed
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 522 in isotropic_orbit_representatives
+  File "/probe.py", line 456 in main
+  File "/probe.py", line 483 in <module>
+[  277.9s]   sampled 146 times; leaf now orthogonal_quotients.py:_iter_splitting_isometries_in_im_rho_from_image; to_vector=238829
+[  281.0s]      leaf    8  mor_foundation.py:_copy_operation_metadata
+[  281.0s]      leaf    8  torsion_form_modules.py:_normalized_form_automorphism
+[  281.0s]      leaf    7  set_categories.py:__call__
+[  281.0s]      site   40579  modules.py:7148:_matrix_column_coordinates
+[  281.1s]      site   39316  coloured_vector_families.py:594:<genexpr>
+[  281.1s]      site   36569  lattices.py:5831:_evaluate_gram
+[  281.1s]      site   36569  lattices.py:5832:_evaluate_gram
+[  281.1s]      site   19165  lattice_morphisms.py:1755:integral_restriction
+Timeout (0:00:20)!
+Thread 0x00007cc124efb6c0 [Thread-1 (sampl] (most recent call first):
+  File "/probe.py", line 373 in sampler
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Thread 0x00007cc319953780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 2027 in _iter_splitting_isometries_in_im_rho_from_image
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3482 in _plane_orbit_from_parabolic_stabilizer
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3706 in _subgroup_isotropic_orbit_representatives
+  File "/repos/sage-extensions/src/sage_extensions/timing.py", line 393 in timed
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 522 in isotropic_orbit_representatives
+  File "/probe.py", line 456 in main
+  File "/probe.py", line 483 in <module>
+[  282.3s]   window    2373 to_vector over 137.2 s transport=1
+[  282.3s]      site    1540  lattice_morphisms.py:2235:<genexpr>
+[  282.3s]      site     758  modules.py:7148:_matrix_column_coordinates
+[  282.3s]      site      37  lattices.py:5831:_evaluate_gram
+[  282.3s]      site      37  lattices.py:5832:_evaluate_gram
+[  282.3s]   window armed at 200 s, to open on the next coordinate read
+[  282.3s] PROFILE window 1 opens
+[  283.9s]   SPAN block    8:     2.56 ms a call over 50 calls; last basis coordinate size 4, largest so far 282; cache 192; tracked objects 2252514; gc counts (537, 3, 0)
+[  284.9s]   SPAN block    9:     2.85 ms a call over 50 calls; last basis coordinate size 8, largest so far 282; cache 217; tracked objects 2282841; gc counts (40, 3, 2)
+[  286.0s]   SPAN block   10:     2.88 ms a call over 50 calls; last basis coordinate size 9, largest so far 282; cache 242; tracked objects 2314225; gc counts (561, 3, 4)
+[  287.0s]   SPAN block   11:     2.87 ms a call over 50 calls; last basis coordinate size 4, largest so far 282; cache 267; tracked objects 2344719; gc counts (1085, 3, 6)
+[  288.1s]   SPAN block   12:     2.94 ms a call over 50 calls; last basis coordinate size 6, largest so far 282; cache 292; tracked objects 2375677; gc counts (41, 4, 8)
+[  289.2s]   SPAN block   13:     2.93 ms a call over 50 calls; last basis coordinate size 8, largest so far 282; cache 317; tracked objects 2406606; gc counts (34, 4, 10)
+[  290.2s]   SPAN block   14:     2.80 ms a call over 50 calls; last basis coordinate size 12, largest so far 282; cache 342; tracked objects 2438187; gc counts (549, 4, 12)
+[  291.3s]   SPAN block   15:     2.81 ms a call over 50 calls; last basis coordinate size 4, largest so far 282; cache 367; tracked objects 2468627; gc counts (1006, 4, 14)
+[  292.3s]   SPAN block   16:     2.80 ms a call over 50 calls; last basis coordinate size 4, largest so far 282; cache 392; tracked objects 2499609; gc counts (1016, 4, 16)
+[  292.3s]   window    4834 to_vector over  10.0 s register=220 transport=220
+[  292.3s]      site     882  probe.py:226:<genexpr>
+[  292.3s]      site     881  framed_free_modules.py:1371:_span_basis_elements
+[  292.3s]      site     876  lattices.py:5831:_evaluate_gram
+[  292.3s]      site     876  lattices.py:5832:_evaluate_gram
+[  293.4s]   SPAN block   17:     2.78 ms a call over 50 calls; last basis coordinate size 4, largest so far 282; cache 417; tracked objects 2530857; gc counts (34, 5, 18)
+[  293.6s]   sampled 158 times; leaf now mor_categories.py:_cached_between; to_vector=244367
+[  293.7s]      leaf    8  set_categories.py:__call__
+[  293.7s]      leaf    8  mor_foundation.py:_copy_operation_metadata
+[  293.7s]      leaf    8  torsion_form_modules.py:_normalized_form_automorphism
+[  293.7s]      site   41081  modules.py:7148:_matrix_column_coordinates
+[  293.7s]      site   39316  coloured_vector_families.py:594:<genexpr>
+[  293.7s]      site   37573  lattices.py:5831:_evaluate_gram
+[  293.7s]      site   37573  lattices.py:5832:_evaluate_gram
+[  293.7s]      site   19165  lattice_morphisms.py:1755:integral_restriction
+[  294.4s]   SPAN block   18:     2.85 ms a call over 50 calls; last basis coordinate size 12, largest so far 282; cache 442; tracked objects 2562437; gc counts (561, 5, 20)
+[  295.5s]   SPAN block   19:     2.83 ms a call over 50 calls; last basis coordinate size 4, largest so far 282; cache 467; tracked objects 2592527; gc counts (819, 5, 22)
+[  296.6s]   SPAN block   20:     2.86 ms a call over 50 calls; last basis coordinate size 3, largest so far 282; cache 492; tracked objects 2623426; gc counts (752, 5, 24)
+[  297.6s]   SPAN block   21:     2.75 ms a call over 50 calls; last basis coordinate size 21, largest so far 282; cache 517; tracked objects 2654937; gc counts (40, 6, 26)
+[  298.7s]   SPAN block   22:     2.78 ms a call over 50 calls; last basis coordinate size 15, largest so far 282; cache 542; tracked objects 2686596; gc counts (569, 6, 28)
+[  299.8s]   SPAN block   23:     2.99 ms a call over 50 calls; last basis coordinate size 176, largest so far 282; cache 567; tracked objects 2716627; gc counts (595, 6, 30)
+[  300.9s]   SPAN block   24:     2.76 ms a call over 50 calls; last basis coordinate size 4, largest so far 282; cache 592; tracked objects 2747634; gc counts (579, 6, 32)
+Timeout (0:00:20)!
+Thread 0x00007cc124efb6c0 [Thread-1 (sampl] (most recent call first):
+  File "/probe.py", line 373 in sampler
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Thread 0x00007cc319953780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py", line 6625 in _from_engine_element
+  File "/repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py", line 5781 in __add__
+  <invalid frame>
+[  301.9s]   SPAN block   25:     2.75 ms a call over 50 calls; last basis coordinate size 6, largest so far 282; cache 617; tracked objects 2778622; gc counts (819, 6, 34)
+[  302.3s]   window    5208 to_vector over  10.0 s register=237 transport=237
+[  302.3s]      site     948  lattices.py:5831:_evaluate_gram
+[  302.3s]      site     948  lattices.py:5832:_evaluate_gram
+[  302.3s]      site     946  framed_free_modules.py:1371:_span_basis_elements
+[  302.3s]      site     945  probe.py:226:<genexpr>
+[  303.7s]   SPAN block   26:     2.81 ms a call over 50 calls; last basis coordinate size 8, largest so far 282; cache 642; tracked objects 2802741; gc counts (40, 6, 0)
+[  304.8s]   SPAN block   27:     2.82 ms a call over 50 calls; last basis coordinate size 22, largest so far 282; cache 667; tracked objects 2834238; gc counts (573, 6, 2)
+[  305.8s]   SPAN block   28:     2.74 ms a call over 50 calls; last basis coordinate size 14, largest so far 282; cache 692; tracked objects 2864231; gc counts (570, 6, 4)
+[  307.0s]   SPAN block   29:     2.86 ms a call over 50 calls; last basis coordinate size 4, largest so far 282; cache 717; tracked objects 2895265; gc counts (582, 6, 6)
+[  308.0s]   SPAN block   30:     2.77 ms a call over 50 calls; last basis coordinate size 23, largest so far 282; cache 742; tracked objects 2926919; gc counts (39, 7, 8)
+[  309.1s]   SPAN block   31:     2.75 ms a call over 50 calls; last basis coordinate size 34, largest so far 282; cache 767; tracked objects 2957994; gc counts (42, 7, 10)
+[  309.4s]   sampled 173 times; leaf now mor_categories.py:Of; to_vector=252089
+[  309.4s]      leaf    9  set_categories.py:__call__
+[  309.4s]      leaf    8  mor_foundation.py:_copy_operation_metadata
+[  309.4s]      leaf    8  torsion_form_modules.py:_normalized_form_automorphism
+[  309.4s]      site   41783  modules.py:7148:_matrix_column_coordinates
+[  309.5s]      site   39316  coloured_vector_families.py:594:<genexpr>
+[  309.5s]      site   38977  lattices.py:5831:_evaluate_gram
+[  309.5s]      site   38977  lattices.py:5832:_evaluate_gram
+[  309.5s]      site   19165  lattice_morphisms.py:1755:integral_restriction
+[  310.2s]   SPAN block   32:     2.83 ms a call over 50 calls; last basis coordinate size 38, largest so far 282; cache 792; tracked objects 2988948; gc counts (40, 7, 12)
+[  311.2s]   SPAN block   33:     2.72 ms a call over 50 calls; last basis coordinate size 34, largest so far 282; cache 817; tracked objects 3020713; gc counts (573, 7, 14)
+[  312.3s]   SPAN block   34:     2.76 ms a call over 50 calls; last basis coordinate size 8, largest so far 282; cache 842; tracked objects 3050479; gc counts (550, 7, 16)
+[  312.3s]   window    4730 to_vector over  10.0 s register=215 transport=215
+[  312.3s]      site     860  lattices.py:5831:_evaluate_gram
+[  312.3s]      site     860  lattices.py:5832:_evaluate_gram
+[  312.3s]      site     860  framed_free_modules.py:1371:_span_basis_elements
+[  312.3s]      site     860  probe.py:226:<genexpr>
+[  313.3s]   SPAN block   35:     2.73 ms a call over 50 calls; last basis coordinate size 12, largest so far 282; cache 867; tracked objects 3082295; gc counts (40, 8, 18)
+[  314.4s]   SPAN block   36:     2.69 ms a call over 50 calls; last basis coordinate size 25, largest so far 282; cache 892; tracked objects 3114193; gc counts (573, 8, 20)
+[  315.4s]   SPAN block   37:     2.71 ms a call over 50 calls; last basis coordinate size 25, largest so far 282; cache 917; tracked objects 3144271; gc counts (553, 8, 22)
+[  316.5s]   SPAN block   38:     2.73 ms a call over 50 calls; last basis coordinate size 47, largest so far 282; cache 942; tracked objects 3175739; gc counts (40, 9, 24)
+[  317.6s]   SPAN block   39:     2.72 ms a call over 50 calls; last basis coordinate size 15, largest so far 282; cache 967; tracked objects 3207599; gc counts (566, 9, 26)
+[  318.6s]   SPAN block   40:     2.72 ms a call over 50 calls; last basis coordinate size 11, largest so far 282; cache 992; tracked objects 3237606; gc counts (566, 9, 28)
+[  319.7s]   SPAN block   41:     2.74 ms a call over 50 calls; last basis coordinate size 63, largest so far 282; cache 1017; tracked objects 3268636; gc counts (578, 9, 30)
+[  320.8s]   SPAN block   42:     2.73 ms a call over 50 calls; last basis coordinate size 24, largest so far 282; cache 1042; tracked objects 3300112; gc counts (40, 10, 32)
+Timeout (0:00:20)!
+Thread 0x00007cc124efb6c0 [Thread-1 (sampl] (most recent call first):
+  File "/probe.py", line 373 in sampler
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Thread 0x00007cc319953780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py", line 5774 in _operator_operand
+  File "/repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py", line 5867 in __eq__
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/framed/framed_free_modules.py", line 269 in <genexpr>
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/framed/framed_free_modules.py", line 275 in __hash__
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py", line 2015 in transport_isotropic_object
+  File "/probe.py", line 272 in counted
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3483 in _plane_orbit_from_parabolic_stabilizer
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3706 in _subgroup_isotropic_orbit_representatives
+  File "/repos/sage-extensions/src/sage_extensions/timing.py", line 393 in timed
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 522 in isotropic_orbit_representatives
+  File "/probe.py", line 456 in main
+  File "/probe.py", line 483 in <module>
+[  321.9s]   SPAN block   43:     2.73 ms a call over 50 calls; last basis coordinate size 18, largest so far 282; cache 1067; tracked objects 3331044; gc counts (45, 10, 34)
+[  322.3s] PROFILE window 1 closes
+[  322.3s]          90141633 function calls (89554544 primitive calls) in 39.971 seconds
+
+   Ordered by: internal time
+   List reduced from 920 to 18 due to restriction <18>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+       36    5.559    0.154    5.559    0.154 {built-in method gc.get_objects}
+331128/302093    1.298    0.000    6.380    0.000 /repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py:778(__call__)
+  2811636    1.088    0.000    1.862    0.000 /repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py:6779(_element_constructor_)
+ 10334294    1.038    0.000    1.040    0.000 {built-in method builtins.isinstance}
+  1807567    0.950    0.000    1.233    0.000 /sage/.venv/lib/python3.14/site-packages/sage/categories/category.py:436(__classcall__)
+    13605    0.911    0.000    1.695    0.000 /repos/sage-extensions/src/sage_extensions/refine.py:394(_declaring_classes)
+  1210465    0.793    0.000    1.472    0.000 /repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py:525(__contains__)
+       37    0.748    0.020    2.103    0.057 {built-in method time.sleep}
+ 10544783    0.739    0.000    0.739    0.000 {method 'setdefault' of 'dict' objects}
+     9981    0.719    0.000    2.001    0.000 /repos/sage-extensions/src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py:527(__init__)
+  1084758    0.697    0.000    1.416    0.000 /repos/sage-extensions/src/sage_extensions/categories/abstract_categories/objects.py:158(__contains__)
+     1815    0.633    0.000   11.160    0.006 /probe.py:212(timed)
+121752/74588    0.623    0.000    8.701    0.000 /repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py:2166(Of)
+  1086490    0.562    0.000    3.343    0.000 /repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py:540(__call__)
+  2811636    0.554    0.000    2.417    0.000 /repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py:6789(__call__)
+  1213569    0.548    0.000    0.835    0.000 /sage/.venv/lib/python3.14/site-packages/sage/categories/category.py:693(__contains__)
+    21768    0.491    0.000    2.179    0.000 /repos/sage-extensions/src/sage_extensions/owned_category.py:1198(_owned_join_as_tuple)
+  2817078    0.463    0.000    0.555    0.000 /repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py:6793(__contains__)
+
+
+
+[  322.3s]          90141633 function calls (89554544 primitive calls) in 39.971 seconds
+
+   Ordered by: call count
+   List reduced from 920 to 12 due to restriction <12>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+ 10544783    0.739    0.000    0.739    0.000 {method 'setdefault' of 'dict' objects}
+ 10334294    1.038    0.000    1.040    0.000 {built-in method builtins.isinstance}
+  2934698    0.323    0.000    0.323    0.000 /repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py:6692(__int__)
+  2817078    0.463    0.000    0.555    0.000 /repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py:6793(__contains__)
+  2811636    0.554    0.000    2.417    0.000 /repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py:6789(__call__)
+  2811636    1.088    0.000    1.862    0.000 /repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py:6779(_element_constructor_)
+  2402643    0.152    0.000    0.152    0.000 {method 'startswith' of 'str' objects}
+  2214943    0.175    0.000    0.175    0.000 {built-in method builtins.vars}
+  1807567    0.950    0.000    1.233    0.000 /sage/.venv/lib/python3.14/site-packages/sage/categories/category.py:436(__classcall__)
+  1708788    0.311    0.000    0.487    0.000 /repos/sage-extensions/src/sage_extensions/refine.py:403(_is_bookkeeping_or_hook)
+  1601171    0.369    0.000    0.369    0.000 /repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py:6684(__init__)
+  1522064    0.190    0.000    0.196    0.000 {method 'get' of 'dict' objects}
+
+
+
+[  322.3s]   window    5220 to_vector over  10.0 s register=237 transport=237
+[  322.3s]      site     951  probe.py:226:<genexpr>
+[  322.3s]      site     950  framed_free_modules.py:1371:_span_basis_elements
+[  322.3s]      site     948  lattices.py:5831:_evaluate_gram
+[  322.3s]      site     948  lattices.py:5832:_evaluate_gram
+[  322.7s]   SPAN block   44:     1.94 ms a call over 50 calls; last basis coordinate size 17, largest so far 282; cache 1092; tracked objects 3360770; gc counts (963, 0, 37)
+[  323.3s]   SPAN block   45:     1.15 ms a call over 50 calls; last basis coordinate size 15, largest so far 282; cache 1117; tracked objects 3391216; gc counts (36, 0, 39)
+[  323.9s]   SPAN block   46:     1.16 ms a call over 50 calls; last basis coordinate size 29, largest so far 282; cache 1142; tracked objects 3422257; gc counts (37, 0, 41)
+[  324.4s]   SPAN block   47:     1.16 ms a call over 50 calls; last basis coordinate size 4, largest so far 282; cache 1167; tracked objects 3453335; gc counts (32, 0, 43)
+[  325.0s] [  325.0s]   SPAN block   48:     1.17 ms a call over 50 calls; last basis coordinate size 7, largest so far 282; cache 1192; tracked objects 3484441; gc counts (43, 0, 45)
+  sampled 188 times; leaf now lattices.py:subobject_on; to_vector=261263
+[  325.1s]      leaf   10  lattices.py:subobject_on
+[  326.0s]      leaf    9  set_categories.py:__call__
+[  326.0s]      leaf    8  mor_foundation.py:_copy_operation_metadata
+[  326.0s]      site   42617  modules.py:7148:_matrix_column_coordinates
+[  326.0s]      site   40645  lattices.py:5831:_evaluate_gram
+[  326.0s]      site   40645  lattices.py:5832:_evaluate_gram
+[  326.0s]      site   39316  coloured_vector_families.py:594:<genexpr>
+[  326.0s]      site   19165  lattice_morphisms.py:1755:integral_restriction
+[  326.6s]   SPAN block   49:     1.20 ms a call over 50 calls; last basis coordinate size 162, largest so far 282; cache 1217; tracked objects 3508301; gc counts (573, 11, 1)
+[  327.2s]   SPAN block   50:     1.16 ms a call over 50 calls; last basis coordinate size 8, largest so far 282; cache 1242; tracked objects 3537913; gc counts (43, 0, 4)
+[  327.8s]   SPAN block   51:     1.14 ms a call over 50 calls; last basis coordinate size 27, largest so far 282; cache 1267; tracked objects 3569309; gc counts (532, 0, 6)
+[  328.4s]   SPAN block   52:     1.16 ms a call over 50 calls; last basis coordinate size 10, largest so far 283; cache 1292; tracked objects 3600421; gc counts (539, 0, 8)
+[  329.0s]   SPAN block   53:     1.16 ms a call over 50 calls; last basis coordinate size 4, largest so far 283; cache 1317; tracked objects 3631456; gc counts (509, 0, 10)
+[  329.6s]   SPAN block   54:     1.17 ms a call over 50 calls; last basis coordinate size 6, largest so far 283; cache 1342; tracked objects 3662457; gc counts (527, 0, 12)
+[  330.2s]   SPAN block   55:     1.18 ms a call over 50 calls; last basis coordinate size 19, largest so far 283; cache 1367; tracked objects 3693485; gc counts (525, 0, 14)
+[  330.2s]   window armed at 330 s, to open on the next coordinate read
+[  330.2s] PROFILE window 2 opens
+[  331.2s]   SPAN block   56:     2.71 ms a call over 50 calls; last basis coordinate size 36, largest so far 283; cache 1392; tracked objects 3724543; gc counts (493, 0, 16)
+[  332.3s]   SPAN block   57:     2.71 ms a call over 50 calls; last basis coordinate size 4, largest so far 283; cache 1417; tracked objects 3755661; gc counts (526, 0, 18)
+[  332.4s]   window    7392 to_vector over  10.0 s register=336 transport=336
+[  332.4s]      site    1344  lattices.py:5831:_evaluate_gram
+[  332.4s]      site    1344  lattices.py:5832:_evaluate_gram
+[  332.4s]      site    1344  framed_free_modules.py:1371:_span_basis_elements
+[  332.4s]      site    1344  probe.py:226:<genexpr>
+[  333.5s]   SPAN block   58:     2.83 ms a call over 50 calls; last basis coordinate size 8, largest so far 283; cache 1442; tracked objects 3786798; gc counts (534, 0, 20)
+[  334.6s]   SPAN block   59:     2.84 ms a call over 50 calls; last basis coordinate size 24, largest so far 283; cache 1467; tracked objects 3817747; gc counts (542, 0, 22)
+[  335.7s]   SPAN block   60:     2.72 ms a call over 50 calls; last basis coordinate size 41, largest so far 283; cache 1492; tracked objects 3848754; gc counts (538, 0, 24)
+[  336.8s]   SPAN block   61:     2.73 ms a call over 50 calls; last basis coordinate size 4, largest so far 283; cache 1517; tracked objects 3879802; gc counts (522, 0, 26)
+[  338.0s]   SPAN block   62:     2.74 ms a call over 50 calls; last basis coordinate size 4, largest so far 283; cache 1542; tracked objects 3910796; gc counts (522, 0, 28)
+[  339.1s]   SPAN block   63:     2.71 ms a call over 50 calls; last basis coordinate size 8, largest so far 283; cache 1567; tracked objects 3941884; gc counts (538, 0, 30)
+[  340.2s] [  340.2s]   SPAN block   64:     2.81 ms a call over 50 calls; last basis coordinate size 2, largest so far 283; cache 1592; tracked objects 3972794; gc counts (479, 0, 32)
+  sampled 201 times; leaf now lattices.py:subobject_on; to_vector=270063
+[  340.2s]      leaf   19  lattices.py:subobject_on
+[  340.2s]      leaf    9  set_categories.py:__call__
+[  340.2s]      leaf    8  mor_foundation.py:_copy_operation_metadata
+[  340.2s]      site   43417  modules.py:7148:_matrix_column_coordinates
+[  340.3s]      site   42245  lattices.py:5831:_evaluate_gram
+[  340.3s]      site   42245  lattices.py:5832:_evaluate_gram
+[  340.3s]      site   39316  coloured_vector_families.py:594:<genexpr>
+[  340.3s]      site   19165  lattice_morphisms.py:1755:integral_restriction
+[  341.3s]   SPAN block   65:     2.75 ms a call over 50 calls; last basis coordinate size 10, largest so far 283; cache 1617; tracked objects 4003858; gc counts (529, 0, 34)
+Timeout (0:00:20)!
+Thread 0x00007cc124efb6c0 [Thread-1 (sampl] (most recent call first):
+  File "/probe.py", line 373 in sampler
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Thread 0x00007cc319953780 [python] (most recent call first):
+  File "/sage/.venv/lib/python3.14/site-packages/sage/categories/category.py", line ??? in __contains__
+  <invalid frame>
+[  342.4s]   SPAN block   66:     2.73 ms a call over 50 calls; last basis coordinate size 4, largest so far 283; cache 1642; tracked objects 4034932; gc counts (530, 0, 36)
+[  342.4s]   window    4950 to_vector over  10.1 s register=225 transport=225
+[  342.4s]      site     900  lattices.py:5831:_evaluate_gram
+[  342.4s]      site     900  lattices.py:5832:_evaluate_gram
+[  342.4s]      site     900  framed_free_modules.py:1371:_span_basis_elements
+[  342.4s]      site     900  probe.py:226:<genexpr>
+[  343.6s]   SPAN block   67:     2.75 ms a call over 50 calls; last basis coordinate size 4, largest so far 283; cache 1667; tracked objects 4065951; gc counts (507, 0, 38)
+[  344.7s]   SPAN block   68:     2.92 ms a call over 50 calls; last basis coordinate size 8, largest so far 283; cache 1692; tracked objects 4096834; gc counts (538, 0, 40)
+[  345.8s]   SPAN block   69:     2.68 ms a call over 50 calls; last basis coordinate size 22, largest so far 283; cache 1717; tracked objects 4128009; gc counts (535, 0, 42)
+[  347.0s]   SPAN block   70:     2.73 ms a call over 50 calls; last basis coordinate size 24, largest so far 283; cache 1742; tracked objects 4159017; gc counts (530, 0, 44)
+[  348.1s]   SPAN block   71:     2.70 ms a call over 50 calls; last basis coordinate size 21, largest so far 283; cache 1767; tracked objects 4190112; gc counts (535, 0, 46)
+[  349.2s]   SPAN block   72:     2.71 ms a call over 50 calls; last basis coordinate size 44, largest so far 283; cache 1792; tracked objects 4221180; gc counts (539, 0, 48)
+[  350.3s]   SPAN block   73:     2.70 ms a call over 50 calls; last basis coordinate size 10, largest so far 283; cache 1817; tracked objects 4252277; gc counts (522, 0, 50)
+[  351.4s] [  351.4s]   SPAN block   74:     2.72 ms a call over 50 calls; last basis coordinate size 18, largest so far 283; cache 1842; tracked objects 4283366; gc counts (527, 0, 52)
+STAGE leaf lattices.py:subobject_on for 9 consecutive samples
+[  351.4s]   chain: ('lattices.py:3999:subobject_on', 'lattices.py:9378:primitive_isotropic_subobject', 'lattice_morphisms.py:2015:transport_isotropic_object', 'orthogonal_quotients.py:3483:_plane_orbit_from_parabolic_stabilizer', 'orthogonal_quotients.py:3706:_subgroup_isotropic_orbit_representatives', 'timing.py:393:timed', 'predicate_subgroups.py:522:isotropic_orbit_representatives')
+[  351.4s]   to_vector at stage start 275573
+[  352.6s]   SPAN block   75:     2.73 ms a call over 50 calls; last basis coordinate size 6, largest so far 283; cache 1867; tracked objects 4314429; gc counts (534, 0, 54)
+[  352.6s]   window    4950 to_vector over  10.1 s register=225 transport=225
+[  352.6s]      site     900  lattices.py:5831:_evaluate_gram
+[  352.6s]      site     900  lattices.py:5832:_evaluate_gram
+[  352.6s]      site     900  framed_free_modules.py:1371:_span_basis_elements
+[  352.6s]      site     900  probe.py:226:<genexpr>
+[  355.1s]   SPAN block   76:     2.79 ms a call over 50 calls; last basis coordinate size 10, largest so far 283; cache 1892; tracked objects 4334232; gc counts (38, 0, 1)
+[  355.4s]   sampled 214 times; leaf now owned_category.py:_cat; to_vector=276863
+[  355.5s]      leaf   29  lattices.py:subobject_on
+[  355.5s]      leaf    9  set_categories.py:__call__
+[  355.5s]      leaf    8  mor_foundation.py:_copy_operation_metadata
+[  355.5s]      site   44037  modules.py:7148:_matrix_column_coordinates
+[  355.5s]      site   43481  lattices.py:5831:_evaluate_gram
+[  355.5s]      site   43481  lattices.py:5832:_evaluate_gram
+[  355.5s]      site   39316  coloured_vector_families.py:594:<genexpr>
+[  355.5s]      site   19165  lattice_morphisms.py:1755:integral_restriction
+[  356.3s]   SPAN block   77:     2.76 ms a call over 50 calls; last basis coordinate size 19, largest so far 283; cache 1917; tracked objects 4365410; gc counts (38, 0, 3)
+[  357.4s]   SPAN block   78:     2.76 ms a call over 50 calls; last basis coordinate size 57, largest so far 283; cache 1942; tracked objects 4396759; gc counts (532, 0, 5)
+[  358.6s]   SPAN block   79:     2.84 ms a call over 50 calls; last basis coordinate size 33, largest so far 283; cache 1967; tracked objects 4427887; gc counts (543, 0, 7)
+[  359.7s]   SPAN block   80:     2.75 ms a call over 50 calls; last basis coordinate size 13, largest so far 283; cache 1992; tracked objects 4459012; gc counts (538, 0, 9)
+[  360.9s]   SPAN block   81:     2.73 ms a call over 50 calls; last basis coordinate size 15, largest so far 283; cache 2017; tracked objects 4490168; gc counts (539, 0, 11)
+Timeout (0:00:20)!
+Thread 0x00007cc124efb6c0 [Thread-1 (sampl] (most recent call first):
+  File "/probe.py", line 373 in sampler
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Thread 0x00007cc319953780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/owned_category.py", line ??? in _owned_sort_uniq
+  <invalid frame>
+[  362.0s]   SPAN block   82:     2.71 ms a call over 50 calls; last basis coordinate size 14, largest so far 286; cache 2042; tracked objects 4521317; gc counts (535, 0, 13)
+[  362.6s]   window    4180 to_vector over  10.0 s register=190 transport=190
+[  362.6s]      site     760  lattices.py:5831:_evaluate_gram
+[  362.6s]      site     760  lattices.py:5832:_evaluate_gram
+[  362.6s]      site     760  framed_free_modules.py:1371:_span_basis_elements
+[  362.6s]      site     760  probe.py:226:<genexpr>
+[  363.2s]   SPAN block   83:     2.71 ms a call over 50 calls; last basis coordinate size 12, largest so far 286; cache 2067; tracked objects 4552459; gc counts (531, 0, 15)
+[  364.4s]   SPAN block   84:     2.80 ms a call over 50 calls; last basis coordinate size 20, largest so far 286; cache 2092; tracked objects 4583413; gc counts (542, 0, 17)
+[  365.5s]   SPAN block   85:     2.73 ms a call over 50 calls; last basis coordinate size 5, largest so far 286; cache 2117; tracked objects 4614451; gc counts (530, 0, 19)
+[  366.7s]   SPAN block   86:     2.72 ms a call over 50 calls; last basis coordinate size 8, largest so far 286; cache 2142; tracked objects 4645503; gc counts (527, 0, 21)
+[  367.8s]   SPAN block   87:     2.74 ms a call over 50 calls; last basis coordinate size 36, largest so far 286; cache 2167; tracked objects 4676566; gc counts (535, 0, 23)
+[  368.9s]   SPAN block   88:     2.70 ms a call over 50 calls; last basis coordinate size 14, largest so far 286; cache 2192; tracked objects 4707633; gc counts (530, 0, 25)
+[  370.1s]   SPAN block   89:     2.67 ms a call over 50 calls; last basis coordinate size 24, largest so far 286; cache 2217; tracked objects 4738772; gc counts (543, 0, 27)
+[  370.2s] PROFILE window 2 closes
+[  370.2s]          84113960 function calls (83561163 primitive calls) in 39.978 seconds
+
+   Ordered by: internal time
+   List reduced from 899 to 18 due to restriction <18>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+       34    7.636    0.225    7.636    0.225 {built-in method gc.get_objects}
+   151656    1.556    0.000    1.738    0.000 /repos/sage-extensions/src/sage_extensions/owned_category.py:1223(<genexpr>)
+304024/276763    1.181    0.000    5.830    0.000 /repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py:778(__call__)
+  2571316    0.994    0.000    1.699    0.000 /repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py:6779(_element_constructor_)
+  9674948    0.968    0.000    0.969    0.000 {built-in method builtins.isinstance}
+     1704    0.900    0.001    8.224    0.005 /probe.py:212(timed)
+  1683053    0.877    0.000    1.139    0.000 /sage/.venv/lib/python3.14/site-packages/sage/categories/category.py:436(__classcall__)
+    12780    0.853    0.000    1.588    0.000 /repos/sage-extensions/src/sage_extensions/refine.py:394(_declaring_classes)
+  1102304    0.719    0.000    1.334    0.000 /repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py:525(__contains__)
+  9905352    0.693    0.000    0.693    0.000 {method 'setdefault' of 'dict' objects}
+  1018203    0.648    0.000    1.315    0.000 /repos/sage-extensions/src/sage_extensions/categories/abstract_categories/objects.py:158(__contains__)
+114357/70053    0.580    0.000    8.811    0.000 /repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py:2166(Of)
+   992708    0.512    0.000    3.040    0.000 /repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py:540(__call__)
+  1139187    0.508    0.000    0.776    0.000 /sage/.venv/lib/python3.14/site-packages/sage/categories/category.py:693(__contains__)
+  2571316    0.506    0.000    2.205    0.000 /repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py:6789(__call__)
+    20448    0.462    0.000    1.339    0.000 /repos/sage-extensions/src/sage_extensions/owned_category.py:1198(_owned_join_as_tuple)
+  2576428    0.422    0.000    0.506    0.000 /repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py:6793(__contains__)
+     2556    0.366    0.000    0.813    0.000 /sage/.venv/lib/python3.14/site-packages/sage/quadratic_forms/quadratic_form__local_field_invariants.py:191(_rational_diagonal_form_and_transformation)
+
+
+
+[  370.2s]          84113960 function calls (83561163 primitive calls) in 39.978 seconds
+
+   Ordered by: call count
+   List reduced from 899 to 12 due to restriction <12>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+  9905352    0.693    0.000    0.693    0.000 {method 'setdefault' of 'dict' objects}
+  9674948    0.968    0.000    0.969    0.000 {built-in method builtins.isinstance}
+  2680062    0.292    0.000    0.292    0.000 /repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py:6692(__int__)
+  2576428    0.422    0.000    0.506    0.000 /repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py:6793(__contains__)
+  2571316    0.506    0.000    2.205    0.000 /repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py:6789(__call__)
+  2571316    0.994    0.000    1.699    0.000 /repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py:6779(_element_constructor_)
+  2256948    0.143    0.000    0.143    0.000 {method 'startswith' of 'str' objects}
+  2080584    0.164    0.000    0.164    0.000 {built-in method builtins.vars}
+  1683053    0.877    0.000    1.139    0.000 /sage/.venv/lib/python3.14/site-packages/sage/categories/category.py:436(__classcall__)
+  1605168    0.292    0.000    0.458    0.000 /repos/sage-extensions/src/sage_extensions/refine.py:403(_is_bookkeeping_or_hook)
+  1469012    0.335    0.000    0.335    0.000 /repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py:6684(__init__)
+  1408178    0.176    0.000    0.181    0.000 {method 'get' of 'dict' objects}
+
+
+
+[  370.8s]   SPAN block   90:     1.27 ms a call over 50 calls; last basis coordinate size 9, largest so far 286; cache 2242; tracked objects 4769645; gc counts (38, 2, 29)
+[  371.1s]   sampled 228 times; leaf now set_categories.py:__call__; to_vector=284755
+[  371.1s]      leaf   40  lattices.py:subobject_on
+[  371.1s]      leaf   10  set_categories.py:__call__
+[  371.1s]      leaf    8  mor_foundation.py:_copy_operation_metadata
+[  371.1s]      site   44917  lattices.py:5831:_evaluate_gram
+[  371.1s]      site   44917  lattices.py:5832:_evaluate_gram
+[  371.2s]      site   44753  modules.py:7148:_matrix_column_coordinates
+[  371.2s]      site   39316  coloured_vector_families.py:594:<genexpr>
+[  371.4s] [  371.5s]     site   19165  lattice_morphisms.py:1755:integral_restriction 
+  SPAN block   91:     1.14 ms a call over 50 calls; last basis coordinate size 22, largest so far 286; cache 2267; tracked objects 4801085; gc counts (1558, 1, 31)
+[  372.1s]   SPAN block   92:     1.15 ms a call over 50 calls; last basis coordinate size 18, largest so far 286; cache 2292; tracked objects 4832121; gc counts (1536, 1, 33)
+[  372.8s]   SPAN block   93:     1.18 ms a call over 50 calls; last basis coordinate size 8, largest so far 286; cache 2317; tracked objects 4863004; gc counts (1518, 1, 35)
+[  372.8s]   window    5720 to_vector over  10.2 s register=260 transport=260
+[  372.8s]      site    1040  lattices.py:5831:_evaluate_gram
+[  372.8s]      site    1040  lattices.py:5832:_evaluate_gram
+[  372.8s]      site    1040  framed_free_modules.py:1371:_span_basis_elements
+[  372.8s]      site    1040  probe.py:226:<genexpr>
+[  373.4s]   SPAN block   94:     1.15 ms a call over 50 calls; last basis coordinate size 4, largest so far 286; cache 2342; tracked objects 4894013; gc counts (1504, 1, 37)
+[  374.1s]   SPAN block   95:     1.18 ms a call over 50 calls; last basis coordinate size 19, largest so far 286; cache 2367; tracked objects 4925081; gc counts (1562, 1, 39)
+[  374.8s]   SPAN block   96:     1.14 ms a call over 50 calls; last basis coordinate size 4, largest so far 286; cache 2392; tracked objects 4956089; gc counts (1551, 1, 41)
+[  375.4s]   SPAN block   97:     1.14 ms a call over 50 calls; last basis coordinate size 44, largest so far 286; cache 2417; tracked objects 4987201; gc counts (1553, 1, 43)
+[  376.1s]   SPAN block   98:     1.12 ms a call over 50 calls; last basis coordinate size 37, largest so far 286; cache 2442; tracked objects 5018044; gc counts (140, 2, 45)
+[  376.7s]   SPAN block   99:     1.14 ms a call over 50 calls; last basis coordinate size 28, largest so far 286; cache 2467; tracked objects 5049078; gc counts (138, 2, 47)
+[  377.4s]   SPAN block  100:     1.13 ms a call over 50 calls; last basis coordinate size 11, largest so far 286; cache 2492; tracked objects 5080158; gc counts (36, 2, 49)
+[  378.1s]   SPAN block  101:     1.16 ms a call over 50 calls; last basis coordinate size 23, largest so far 286; cache 2517; tracked objects 5111217; gc counts (154, 2, 51)
+[  378.8s]   SPAN block  102:     1.20 ms a call over 50 calls; last basis coordinate size 23, largest so far 286; cache 2542; tracked objects 5142765; gc counts (540, 2, 53)
+[  379.6s]   SPAN block  103:     1.24 ms a call over 50 calls; last basis coordinate size 4, largest so far 286; cache 2567; tracked objects 5173459; gc counts (193, 2, 55)
+[  380.3s]   SPAN block  104:     1.20 ms a call over 50 calls; last basis coordinate size 25, largest so far 286; cache 2592; tracked objects 5204372; gc counts (143, 2, 57)
+[  381.2s]   SPAN block  105:     1.49 ms a call over 50 calls; last basis coordinate size 164, largest so far 286; cache 2617; tracked objects 5236005; gc counts (573, 2, 59)
+Timeout (0:00:20)!
+Thread 0x00007cc124efb6c0 [Thread-1 (sampl] (most recent call first):
+  File "/probe.py", line 373 in sampler
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Thread 0x00007cc319953780 [python] (most recent call first):
+  File "/sage/.venv/lib/python3.14/site-packages/sage/matrix/matrix_space.py", line 743 in __classcall__
+  File "/sage/.venv/lib/python3.14/site-packages/sage/quadratic_forms/quadratic_form__local_field_invariants.py", line 253 in _rational_diagonal_form_and_transformation
+  File "/sage/.venv/lib/python3.14/site-packages/sage/quadratic_forms/quadratic_form__local_field_invariants.py", line 182 in rational_diagonal_form
+  File "/sage/.venv/lib/python3.14/site-packages/sage/quadratic_forms/quadratic_form__local_field_invariants.py", line 333 in signature_vector
+  File "/repos/sage-extensions/src/sage_extensions/categories/_lattice.py", line 1692 in _sylvester
+  File "/repos/sage-extensions/src/sage_extensions/categories/_lattice.py", line 1754 in _signature_pair_of_gram
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattices.py", line 10296 in _repr_
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/framed/framed_free_modules.py", line 1401 in _span_basis_elements
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattices.py", line 3998 in subobject_on
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattices.py", line 9378 in primitive_isotropic_subobject
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py", line 2015 in transport_isotropic_object
+  File "/probe.py", line 272 in counted
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3483 in _plane_orbit_from_parabolic_stabilizer
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3706 in _subgroup_isotropic_orbit_representatives
+  File "/repos/sage-extensions/src/sage_extensions/timing.py", line 393 in timed
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 522 in isotropic_orbit_representatives
+  File "/probe.py", line 456 in main
+  File "/probe.py", line 483 in <module>
+[  382.1s]   SPAN block  106:     1.47 ms a call over 50 calls; last basis coordinate size 11, largest so far 286; cache 2642; tracked objects 5267114; gc counts (1422, 2, 61)
+[  382.9s]   SPAN block  107:     1.34 ms a call over 50 calls; last basis coordinate size 19, largest so far 286; cache 2667; tracked objects 5298205; gc counts (1352, 2, 63)
+[  382.9s]   window    7700 to_vector over  10.1 s register=350 transport=350
+[  382.9s]      site    1400  lattices.py:5831:_evaluate_gram
+[  382.9s]      site    1400  lattices.py:5832:_evaluate_gram
+[  382.9s]      site    1400  framed_free_modules.py:1371:_span_basis_elements
+[  382.9s]      site    1400  probe.py:226:<genexpr>
+[  383.6s]   SPAN block  108:     1.25 ms a call over 50 calls; last basis coordinate size 4, largest so far 286; cache 2692; tracked objects 5329150; gc counts (37, 3, 65)
+[  384.3s]   SPAN block  109:     1.25 ms a call over 50 calls; last basis coordinate size 169, largest so far 286; cache 2717; tracked objects 5360809; gc counts (578, 3, 67)
+[  386.6s]   sampled 241 times; leaf now owned_category.py:mro; to_vector=295297
+[  386.6s]      leaf   44  lattices.py:subobject_on
+[  386.6s]      leaf   10  set_categories.py:__call__
+[  386.6s]      leaf    8  mor_foundation.py:_copy_operation_metadata
+[  386.6s]      site   46833  lattices.py:5831:_evaluate_gram
+[  386.6s]      site   46833  lattices.py:5832:_evaluate_gram
+[  386.6s]      site   45711  modules.py:7148:_matrix_column_coordinates
+[  386.6s]      site   39316  coloured_vector_families.py:594:<genexpr>
+[  386.6s]      site   19165  lattice_morphisms.py:1755:integral_restriction
+[  387.1s]   SPAN block  110:     1.23 ms a call over 50 calls; last basis coordinate size 14, largest so far 286; cache 2742; tracked objects 5377850; gc counts (40, 3, 0)
+[  388.4s]   SPAN block  111:     2.85 ms a call over 50 calls; last basis coordinate size 45, largest so far 286; cache 2767; tracked objects 5408791; gc counts (41, 3, 2)
+[  389.4s]   SPAN block  112:     1.42 ms a call over 50 calls; last basis coordinate size 30, largest so far 286; cache 2792; tracked objects 5440411; gc counts (565, 3, 4)
+[  390.5s]   SPAN block  113:     1.86 ms a call over 50 calls; last basis coordinate size 82, largest so far 286; cache 2817; tracked objects 5471215; gc counts (1239, 3, 6)
+[  391.6s]   SPAN block  114:     2.18 ms a call over 50 calls; last basis coordinate size 17, largest so far 286; cache 2842; tracked objects 5502278; gc counts (1219, 3, 8)
+[  392.5s]   SPAN block  115:     1.75 ms a call over 50 calls; last basis coordinate size 4, largest so far 286; cache 2867; tracked objects 5533293; gc counts (1132, 3, 10)
+[  392.9s]   window    4798 to_vector over  10.0 s register=218 transport=218
+[  392.9s]      site     873  lattices.py:5831:_evaluate_gram
+[  392.9s]      site     872  lattices.py:5832:_evaluate_gram
+[  392.9s]      site     872  framed_free_modules.py:1371:_span_basis_elements
+[  392.9s]      site     872  probe.py:226:<genexpr>
+[  393.6s]   SPAN block  116:     1.58 ms a call over 50 calls; last basis coordinate size 24, largest so far 286; cache 2892; tracked objects 5564394; gc counts (1238, 3, 12)
+[  394.6s]   SPAN block  117:     1.70 ms a call over 50 calls; last basis coordinate size 4, largest so far 286; cache 2917; tracked objects 5595411; gc counts (1181, 3, 14)
+[  395.4s]   SPAN block  118:     1.36 ms a call over 50 calls; last basis coordinate size 5, largest so far 286; cache 2942; tracked objects 5626574; gc counts (39, 4, 16)
+[  396.2s]   SPAN block  119:     1.27 ms a call over 50 calls; last basis coordinate size 4, largest so far 286; cache 2967; tracked objects 5657485; gc counts (34, 4, 18)
+[  397.0s]   SPAN block  120:     1.25 ms a call over 50 calls; last basis coordinate size 53, largest so far 286; cache 2992; tracked objects 5689207; gc counts (566, 4, 20)
+[  397.7s]   SPAN block  121:     1.23 ms a call over 50 calls; last basis coordinate size 38, largest so far 286; cache 3017; tracked objects 5719685; gc counts (1002, 4, 22)
+[  398.4s]   SPAN block  122:     1.18 ms a call over 50 calls; last basis coordinate size 8, largest so far 286; cache 3042; tracked objects 5750993; gc counts (39, 5, 24)
+[  399.2s]   SPAN block  123:     1.16 ms a call over 50 calls; last basis coordinate size 26, largest so far 286; cache 3067; tracked objects 5782059; gc counts (42, 5, 26)
+[  399.9s]   SPAN block  124:     1.15 ms a call over 50 calls; last basis coordinate size 20, largest so far 286; cache 3092; tracked objects 5813787; gc counts (541, 5, 28)
+[  400.6s]   SPAN block  125:     1.18 ms a call over 50 calls; last basis coordinate size 13, largest so far 286; cache 3117; tracked objects 5844063; gc counts (839, 5, 30)
+[  401.4s]   SPAN block  126:     1.19 ms a call over 50 calls; last basis coordinate size 15, largest so far 286; cache 3142; tracked objects 5875161; gc counts (1026, 5, 32)
+Timeout (0:00:20)!
+Thread 0x00007cc124efb6c0 [Thread-1 (sampl] (most recent call first):
+  File "/probe.py", line 373 in sampler
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Thread 0x00007cc319953780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py", line 763 in __init__
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/additive_mors.py", line 46 in __init__
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/additive_mors.py", line 85 in __init__
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/additive_mors.py", line 420 in __init__
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/fibered_modules.py", line 113 in __init__
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py", line 436 in _initialize_lower_arrow
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py", line 540 in __init__
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py", line 3131 in _from_constructed_element_map
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py", line 1750 in _framed_coordinate_morphism
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/framed/finitely_generated/finitely_presented_modules.py", line 3361 in _presented_module_from_morphism
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/pure/modules.py", line 4426 in _call_
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/pure/modules.py", line 4387 in __call__
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/framed/framed_free_modules.py", line 588 in _represented_cokernel_of_morphism
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py", line 2600 in cokernel
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/pure/modules.py", line 4193 in is_primitive
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattices.py", line 9379 in primitive_isotropic_subobject
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py", line 2015 in transport_isotropic_object
+  File "/probe.py", line 272 in counted
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3483 in _plane_orbit_from_parabolic_stabilizer
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3706 in _subgroup_isotropic_orbit_representatives
+  File "/repos/sage-extensions/src/sage_extensions/timing.py", line 393 in timed
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 522 in isotropic_orbit_representatives
+  File "/probe.py", line 456 in main
+  File "/probe.py", line 483 in <module>
+[  402.1s]   SPAN block  127:     1.16 ms a call over 50 calls; last basis coordinate size 61, largest so far 286; cache 3167; tracked objects 5906332; gc counts (1021, 5, 34)
+[  402.3s]   sampled 256 times; leaf now additive_mors.py:__init__; to_vector=305045
+[  402.4s]      leaf   47  lattices.py:subobject_on
+[  402.4s]      leaf   12  set_categories.py:__call__
+[  402.4s]      leaf    8  set_categories.py:_element_constructor_
+[  402.4s]      site   48605  lattices.py:5831:_evaluate_gram
+[  402.4s]      site   48605  lattices.py:5832:_evaluate_gram
+[  402.4s]      site   46599  modules.py:7148:_matrix_column_coordinates
+[  402.5s]      site   39316  coloured_vector_families.py:594:<genexpr>
+[  402.5s]      site   19165  lattice_morphisms.py:1755:integral_restriction[  402.8s] 
+  SPAN block  128:     1.16 ms a call over 50 calls; last basis coordinate size 4, largest so far 286; cache 3192; tracked objects 5937820; gc counts (39, 6, 36)
+[  402.9s]   window    6828 to_vector over  10.0 s register=311 transport=311
+[  402.9s]      site    1244  lattices.py:5832:_evaluate_gram
+[  402.9s]      site    1243  lattices.py:5831:_evaluate_gram
+[  402.9s]      site    1241  framed_free_modules.py:1371:_span_basis_elements
+[  402.9s]      site    1240  probe.py:226:<genexpr>
+[  403.6s]   SPAN block  129:     1.15 ms a call over 50 calls; last basis coordinate size 5, largest so far 286; cache 3217; tracked objects 5968901; gc counts (41, 6, 38)
+[  404.3s]   SPAN block  130:     1.17 ms a call over 50 calls; last basis coordinate size 65, largest so far 286; cache 3242; tracked objects 6000740; gc counts (573, 6, 40)
+[  405.0s]   SPAN block  131:     1.20 ms a call over 50 calls; last basis coordinate size 15, largest so far 286; cache 3267; tracked objects 6030732; gc counts (587, 6, 42)
+[  405.8s]   SPAN block  132:     1.15 ms a call over 50 calls; last basis coordinate size 159, largest so far 286; cache 3292; tracked objects 6061894; gc counts (854, 6, 44)
+[  406.5s]   SPAN block  133:     1.16 ms a call over 50 calls; last basis coordinate size 44, largest so far 286; cache 3317; tracked objects 6093672; gc counts (41, 7, 46)
+[  407.3s]   SPAN block  134:     1.18 ms a call over 50 calls; last basis coordinate size 3, largest so far 286; cache 3342; tracked objects 6124639; gc counts (42, 7, 48)
+[  408.0s]   SPAN block  135:     1.17 ms a call over 50 calls; last basis coordinate size 126, largest so far 286; cache 3367; tracked objects 6156439; gc counts (569, 7, 50)
+[  408.7s]   SPAN block  136:     1.11 ms a call over 50 calls; last basis coordinate size 183, largest so far 297; cache 3392; tracked objects 6186495; gc counts (590, 7, 52)
+[  409.5s]   SPAN block  137:     1.11 ms a call over 50 calls; last basis coordinate size 23, largest so far 460; cache 3417; tracked objects 6218479; gc counts (47, 8, 54)
+[  410.2s]   SPAN block  138:     1.12 ms a call over 50 calls; last basis coordinate size 38, largest so far 460; cache 3442; tracked objects 6250427; gc counts (565, 8, 56)
+[  411.0s]   SPAN block  139:     1.18 ms a call over 50 calls; last basis coordinate size 94, largest so far 460; cache 3467; tracked objects 6280313; gc counts (561, 8, 58)
+[  411.7s]   SPAN block  140:     1.18 ms a call over 50 calls; last basis coordinate size 43, largest so far 460; cache 3492; tracked objects 6312116; gc counts (44, 9, 60)
+[  412.6s]   SPAN block  141:     1.28 ms a call over 50 calls; last basis coordinate size 37, largest so far 460; cache 3517; tracked objects 6343144; gc counts (36, 9, 62)
+[  412.9s]   window    7460 to_vector over  10.0 s register=339 transport=339
+[  412.9s]      site    1357  framed_free_modules.py:1371:_span_basis_elements
+[  412.9s]      site    1356  lattices.py:5831:_evaluate_gram
+[  412.9s]      site    1356  lattices.py:5832:_evaluate_gram
+[  412.9s]      site    1356  probe.py:226:<genexpr>
+[  413.5s]   SPAN block  142:     1.33 ms a call over 50 calls; last basis coordinate size 25, largest so far 460; cache 3542; tracked objects 6374096; gc counts (36, 9, 64)
+[  414.4s]   SPAN block  143:     1.53 ms a call over 50 calls; last basis coordinate size 33, largest so far 460; cache 3567; tracked objects 6405096; gc counts (39, 9, 66)
+[  415.3s]   SPAN block  144:     1.36 ms a call over 50 calls; last basis coordinate size 32, largest so far 460; cache 3592; tracked objects 6436912; gc counts (565, 9, 68)
+[  416.1s]   SPAN block  145:     1.25 ms a call over 50 calls; last basis coordinate size 25, largest so far 460; cache 3617; tracked objects 6466912; gc counts (562, 9, 70)
+[  416.9s]   SPAN block  146:     1.22 ms a call over 50 calls; last basis coordinate size 47, largest so far 460; cache 3642; tracked objects 6498372; gc counts (40, 10, 72)
+[  417.7s]   SPAN block  147:     1.15 ms a call over 50 calls; last basis coordinate size 47, largest so far 460; cache 3667; tracked objects 6530279; gc counts (569, 10, 74)
+[  418.1s]   sampled 270 times; leaf now owned_category.py:_owned_join_as_tuple; to_vector=316147
+[  418.1s]      leaf   52  lattices.py:subobject_on
+[  418.1s]      leaf   13  set_categories.py:__call__
+[  418.1s]      leaf    9  ring_foundation.py:_element_constructor_
+[  418.1s]      site   50625  lattices.py:5831:_evaluate_gram
+[  418.1s]      site   50625  lattices.py:5832:_evaluate_gram
+[  418.1s]      site   47607  modules.py:7148:_matrix_column_coordinates
+[  418.1s]      site   39316  coloured_vector_families.py:594:<genexpr>
+[  418.1s]      site   19165  lattice_morphisms.py:1755:integral_restriction
+[  418.7s]   SPAN block  148:     1.46 ms a call over 50 calls; last basis coordinate size 34, largest so far 460; cache 3692; tracked objects 6560128; gc counts (573, 10, 76)
+[  419.6s]   SPAN block  149:     1.48 ms a call over 50 calls; last basis coordinate size 22, largest so far 460; cache 3717; tracked objects 6591208; gc counts (545, 10, 78)
+[  421.0s]   SPAN block  150:     2.26 ms a call over 50 calls; last basis coordinate size 44, largest so far 460; cache 3742; tracked objects 6622545; gc counts (561, 10, 80)
+Timeout (0:00:20)!
+Thread 0x00007cc124efb6c0 [Thread-1 (sampl] (most recent call first):
+  File "/probe.py", line 373 in sampler
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Thread 0x00007cc319953780 [python] (most recent call first):
+  File "/probe.py", line 244 in timed
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattices.py", line 3999 in subobject_on
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattices.py", line 9378 in primitive_isotropic_subobject
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py", line 2015 in transport_isotropic_object
+  File "/probe.py", line 272 in counted
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3483 in _plane_orbit_from_parabolic_stabilizer
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3706 in _subgroup_isotropic_orbit_representatives
+  File "/repos/sage-extensions/src/sage_extensions/timing.py", line 393 in timed
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 522 in isotropic_orbit_representatives
+  File "/probe.py", line 456 in main
+  File "/probe.py", line 483 in <module>
+[  422.1s]   SPAN block  151:     1.81 ms a call over 50 calls; last basis coordinate size 8, largest so far 992; cache 3767; tracked objects 6654055; gc counts (39, 11, 82)
+[  423.3s]   SPAN block  152:     2.12 ms a call over 50 calls; last basis coordinate size 11, largest so far 992; cache 3792; tracked objects 6686046; gc counts (566, 11, 84)
+[  423.3s]   window    5664 to_vector over  10.4 s register=257 transport=257
+[  423.3s]      site    1032  probe.py:226:<genexpr>
+[  423.3s]      site    1030  framed_free_modules.py:1371:_span_basis_elements
+[  423.3s]      site    1028  lattices.py:5831:_evaluate_gram
+[  423.3s]      site    1028  lattices.py:5832:_evaluate_gram
+[  426.4s]   SPAN block  153:     1.85 ms a call over 50 calls; last basis coordinate size 24, largest so far 992; cache 3817; tracked objects 6698930; gc counts (42, 11, 0)
+[  427.5s]   SPAN block  154:     1.60 ms a call over 50 calls; last basis coordinate size 22, largest so far 992; cache 3842; tracked objects 6730703; gc counts (569, 11, 2)
+[  428.5s]   SPAN block  155:     1.59 ms a call over 50 calls; last basis coordinate size 24, largest so far 992; cache 3867; tracked objects 6760783; gc counts (569, 11, 4)
+[  429.3s]   SPAN block  156:     1.20 ms a call over 50 calls; last basis coordinate size 96, largest so far 992; cache 3892; tracked objects 6791884; gc counts (569, 11, 6)
+[  430.1s]   SPAN block  157:     1.18 ms a call over 50 calls; last basis coordinate size 48, largest so far 992; cache 3917; tracked objects 6821608; gc counts (37, 0, 9)
+[  430.9s]   SPAN block  158:     1.15 ms a call over 50 calls; last basis coordinate size 48, largest so far 992; cache 3942; tracked objects 6852652; gc counts (42, 0, 11)
+[  431.7s]   SPAN block  159:     1.15 ms a call over 50 calls; last basis coordinate size 22, largest so far 992; cache 3967; tracked objects 6883916; gc counts (504, 0, 13)
+[  432.5s]   SPAN block  160:     1.15 ms a call over 50 calls; last basis coordinate size 11, largest so far 992; cache 3992; tracked objects 6914960; gc counts (514, 0, 15)
+[  433.2s] [  433.3s]   sampled 283 times; leaf now lattices.py:subobject_on; to_vector=323413
+[  433.3s]      leaf   55  lattices.py:subobject_on  SPAN block  161:     1.13 ms a call over 50 calls; last basis coordinate size 11, largest so far 992; cache 4017; tracked objects 6946111; gc counts (538, 0, 17)
+
+[  433.3s]      leaf   13  set_categories.py:__call__
+[  433.3s]   window    4982 to_vector over  10.0 s register=227 transport=227
+[  433.3s]      site     908  lattices.py:5831:_evaluate_gram
+[  433.3s]      site     908  lattices.py:5832:_evaluate_gram
+[  433.3s]      site     905  framed_free_modules.py:1371:_span_basis_elements
+[  433.3s]      site     904  probe.py:226:<genexpr>
+[  433.3s]      leaf    9  objects.py:__contains__
+[  433.3s]      site   51945  lattices.py:5831:_evaluate_gram
+[  433.3s]      site   51945  lattices.py:5832:_evaluate_gram
+[  433.3s]      site   48267  modules.py:7148:_matrix_column_coordinates
+[  433.3s]      site   39316  coloured_vector_families.py:594:<genexpr>
+[  433.3s]      site   19165  lattice_morphisms.py:1755:integral_restriction
+[  434.0s]   SPAN block  162:     1.14 ms a call over 50 calls; last basis coordinate size 91, largest so far 992; cache 4042; tracked objects 6977218; gc counts (537, 0, 19)
+[  434.8s]   SPAN block  163:     1.13 ms a call over 50 calls; last basis coordinate size 24, largest so far 992; cache 4067; tracked objects 7008395; gc counts (534, 0, 21)
+[  435.6s]   SPAN block  164:     1.14 ms a call over 50 calls; last basis coordinate size 11, largest so far 992; cache 4092; tracked objects 7039464; gc counts (539, 0, 23)
+[  436.4s]   SPAN block  165:     1.16 ms a call over 50 calls; last basis coordinate size 139, largest so far 992; cache 4117; tracked objects 7070576; gc counts (537, 0, 25)
+[  437.2s]   SPAN block  166:     1.13 ms a call over 50 calls; last basis coordinate size 16, largest so far 992; cache 4142; tracked objects 7101763; gc counts (526, 0, 27)
+[  438.0s]   SPAN block  167:     1.14 ms a call over 50 calls; last basis coordinate size 14, largest so far 992; cache 4167; tracked objects 7132800; gc counts (518, 0, 29)
+[  438.8s]   SPAN block  168:     1.14 ms a call over 50 calls; last basis coordinate size 150, largest so far 992; cache 4192; tracked objects 7163851; gc counts (538, 0, 31)
+[  439.6s]   SPAN block  169:     1.14 ms a call over 50 calls; last basis coordinate size 11, largest so far 992; cache 4217; tracked objects 7194884; gc counts (505, 0, 33)
+[  440.4s]   SPAN block  170:     1.16 ms a call over 50 calls; last basis coordinate size 34, largest so far 992; cache 4242; tracked objects 7225890; gc counts (543, 0, 35)
+[  441.2s]   SPAN block  171:     1.15 ms a call over 50 calls; last basis coordinate size 12, largest so far 992; cache 4267; tracked objects 7256953; gc counts (538, 0, 37)
+Timeout (0:00:20)!
+Thread 0x00007cc124efb6c0 [Thread-1 (sampl] (most recent call first):
+  File "/probe.py", line 373 in sampler
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Thread 0x00007cc319953780 [python] (most recent call first):
+  File "/probe.py", line 244 in timed
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattices.py", line 3999 in subobject_on
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattices.py", line 9378 in primitive_isotropic_subobject
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py", line 2015 in transport_isotropic_object
+  File "/probe.py", line 272 in counted
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3483 in _plane_orbit_from_parabolic_stabilizer
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3706 in _subgroup_isotropic_orbit_representatives
+  File "/repos/sage-extensions/src/sage_extensions/timing.py", line 393 in timed
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 522 in isotropic_orbit_representatives
+  File "/probe.py", line 456 in main
+  File "/probe.py", line 483 in <module>
+[  442.0s]   SPAN block  172:     1.14 ms a call over 50 calls; last basis coordinate size 7, largest so far 992; cache 4292; tracked objects 7287981; gc counts (525, 0, 39)
+[  442.8s]   SPAN block  173:     1.12 ms a call over 50 calls; last basis coordinate size 15, largest so far 992; cache 4317; tracked objects 7319127; gc counts (514, 0, 41)
+[  443.6s]   SPAN block  174:     1.14 ms a call over 50 calls; last basis coordinate size 8, largest so far 992; cache 4342; tracked objects 7350096; gc counts (530, 0, 43)
+[  443.6s]   window    7118 to_vector over  10.3 s register=323 transport=323
+[  443.6s]      site    1296  probe.py:226:<genexpr>
+[  443.6s]      site    1295  framed_free_modules.py:1371:_span_basis_elements
+[  443.6s]      site    1292  lattices.py:5831:_evaluate_gram
+[  443.6s]      site    1292  lattices.py:5832:_evaluate_gram
+[  444.4s]   SPAN block  175:     1.14 ms a call over 50 calls; last basis coordinate size 30, largest so far 992; cache 4367; tracked objects 7381141; gc counts (537, 0, 45)
+[  445.2s]   SPAN block  176:     1.14 ms a call over 50 calls; last basis coordinate size 4, largest so far 992; cache 4392; tracked objects 7412185; gc counts (513, 0, 47)
+[  446.0s]   SPAN block  177:     1.14 ms a call over 50 calls; last basis coordinate size 15, largest so far 992; cache 4417; tracked objects 7443187; gc counts (509, 0, 49)
+[  446.8s]   SPAN block  178:     1.12 ms a call over 50 calls; last basis coordinate size 4, largest so far 992; cache 4442; tracked objects 7474310; gc counts (535, 0, 51)
+[  447.6s]   SPAN block  179:     1.13 ms a call over 50 calls; last basis coordinate size 51, largest so far 992; cache 4467; tracked objects 7505402; gc counts (534, 0, 53)
+[  448.4s]   SPAN block  180:     1.11 ms a call over 50 calls; last basis coordinate size 167, largest so far 992; cache 4492; tracked objects 7536567; gc counts (538, 0, 55)
+[  448.7s]   sampled 297 times; leaf now cardinals.py:cardinal; to_vector=334401
+[  448.7s]      leaf   60  lattices.py:subobject_on
+[  449.1s] [  449.2s]      leaf   13  set_categories.py:__call__
+[  449.2s]      leaf    9  objects.py:__contains__
+  SPAN block  181:     1.11 ms a call over 50 calls; last basis coordinate size 32, largest so far 992; cache 4517; tracked objects 7567825; gc counts (530, 0, 57)
+[  449.2s]      site   53945  lattices.py:5831:_evaluate_gram
+[  449.2s]      site   53945  lattices.py:5832:_evaluate_gram
+[  449.2s]      site   49267  modules.py:7148:_matrix_column_coordinates
+[  449.2s]      site   39316  coloured_vector_families.py:594:<genexpr>
+[  449.2s]      site   19165  lattice_morphisms.py:1755:integral_restriction
+[  450.0s]   SPAN block  182:     1.13 ms a call over 50 calls; last basis coordinate size 41, largest so far 992; cache 4542; tracked objects 7598915; gc counts (537, 0, 59)
+[  450.8s]   SPAN block  183:     1.12 ms a call over 50 calls; last basis coordinate size 44, largest so far 992; cache 4567; tracked objects 7630063; gc counts (538, 0, 61)
+[  451.6s]   SPAN block  184:     1.13 ms a call over 50 calls; last basis coordinate size 9, largest so far 992; cache 4592; tracked objects 7661166; gc counts (530, 0, 63)
+[  452.4s]   SPAN block  185:     1.12 ms a call over 50 calls; last basis coordinate size 9, largest so far 992; cache 4617; tracked objects 7692316; gc counts (534, 0, 65)
+[  453.2s]   SPAN block  186:     1.13 ms a call over 50 calls; last basis coordinate size 4, largest so far 992; cache 4642; tracked objects 7723418; gc counts (518, 0, 67)
+[  453.6s]   window    7102 to_vector over  10.0 s register=323 transport=323
+[  453.6s]      site    1292  lattices.py:5831:_evaluate_gram
+[  453.6s]      site    1292  lattices.py:5832:_evaluate_gram
+[  453.6s]      site    1291  framed_free_modules.py:1371:_span_basis_elements
+[  453.6s]      site    1290  probe.py:226:<genexpr>
+[  454.0s]   SPAN block  187:     1.10 ms a call over 50 calls; last basis coordinate size 117, largest so far 992; cache 4667; tracked objects 7754647; gc counts (538, 0, 69)
+[  454.9s]   SPAN block  188:     1.10 ms a call over 50 calls; last basis coordinate size 25, largest so far 992; cache 4692; tracked objects 7785838; gc counts (543, 0, 71)
+[  455.7s]   SPAN block  189:     1.14 ms a call over 50 calls; last basis coordinate size 9, largest so far 992; cache 4717; tracked objects 7816885; gc counts (529, 0, 73)
+[  456.5s]   SPAN block  190:     1.11 ms a call over 50 calls; last basis coordinate size 13, largest so far 992; cache 4742; tracked objects 7848063; gc counts (534, 0, 75)
+[  457.3s]   SPAN block  191:     1.10 ms a call over 50 calls; last basis coordinate size 30, largest so far 992; cache 4767; tracked objects 7879274; gc counts (538, 0, 77)
+[  458.1s]   SPAN block  192:     1.12 ms a call over 50 calls; last basis coordinate size 13, largest so far 992; cache 4792; tracked objects 7910412; gc counts (531, 0, 79)
+[  459.0s]   SPAN block  193:     1.12 ms a call over 50 calls; last basis coordinate size 11, largest so far 992; cache 4817; tracked objects 7941489; gc counts (533, 0, 81)
+[  459.8s]   SPAN block  194:     1.10 ms a call over 50 calls; last basis coordinate size 117, largest so far 992; cache 4842; tracked objects 7972684; gc counts (538, 0, 83)
+[  460.6s]   SPAN block  195:     1.11 ms a call over 50 calls; last basis coordinate size 19, largest so far 992; cache 4867; tracked objects 8003887; gc counts (534, 0, 85)
+[  461.5s]   SPAN block  196:     1.18 ms a call over 50 calls; last basis coordinate size 8, largest so far 992; cache 4892; tracked objects 8034946; gc counts (515, 0, 87)
+Timeout (0:00:20)!
+Thread 0x00007cc124efb6c0 [Thread-1 (sampl] (most recent call first):
+  File "/probe.py", line 373 in sampler
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Thread 0x00007cc319953780 [python] (most recent call first):
+  <invalid frame>
+[  462.5s]   SPAN block  197:     1.38 ms a call over 50 calls; last basis coordinate size 36, largest so far 992; cache 4917; tracked objects 8066022; gc counts (537, 0, 89)
+[  463.6s]   SPAN block  198:     1.43 ms a call over 50 calls; last basis coordinate size 10, largest so far 992; cache 4942; tracked objects 8097211; gc counts (534, 0, 91)
+[  463.6s]   window    6098 to_vector over  10.0 s register=277 transport=277
+[  463.6s]      site    1110  probe.py:226:<genexpr>
+[  463.6s]      site    1109  framed_free_modules.py:1371:_span_basis_elements
+[  463.6s]      site    1108  lattices.py:5831:_evaluate_gram
+[  463.6s]      site    1108  lattices.py:5832:_evaluate_gram
+[  464.7s]   sampled 311 times; leaf now lattices.py:subobject_on; to_vector=344313
+[  464.7s]      leaf   67  lattices.py:subobject_on
+[  464.7s]      leaf   14  set_categories.py:__call__
+[  464.7s]      leaf   10  objects.py:__contains__
+[  464.7s]      site   55745  lattices.py:5831:_evaluate_gram
+[  464.7s]      site   55745  lattices.py:5832:_evaluate_gram
+[  464.7s]      site   50167  modules.py:7148:_matrix_column_coordinates
+[  464.7s]      site   39316  coloured_vector_families.py:594:<genexpr>
+[  464.7s]      site   20497  probe.py:226:<genexpr>
+[  464.8s]   SPAN block  199:     1.61 ms a call over 50 calls; last basis coordinate size 9, largest so far 992; cache 4967; tracked objects 8128413; gc counts (534, 0, 93)
+[  465.7s]   SPAN block  200:     1.24 ms a call over 50 calls; last basis coordinate size 4, largest so far 992; cache 4992; tracked objects 8159541; gc counts (518, 0, 95)
+[  466.6s]   SPAN block  201:     1.14 ms a call over 50 calls; last basis coordinate size 111, largest so far 992; cache 5017; tracked objects 8190755; gc counts (538, 0, 97)
+[  467.5s]   SPAN block  202:     1.15 ms a call over 50 calls; last basis coordinate size 15, largest so far 992; cache 5042; tracked objects 8221931; gc counts (533, 0, 99)
+[  468.7s]   SPAN block  203:     1.34 ms a call over 50 calls; last basis coordinate size 4, largest so far 992; cache 5067; tracked objects 8252965; gc counts (513, 0, 101)
+[  469.8s]   SPAN block  204:     1.64 ms a call over 50 calls; last basis coordinate size 283, largest so far 992; cache 5092; tracked objects 8284165; gc counts (538, 0, 103)
+[  471.1s]   SPAN block  205:     1.61 ms a call over 50 calls; last basis coordinate size 167, largest so far 992; cache 5117; tracked objects 8315428; gc counts (539, 0, 105)
+[  473.9s]   window    4136 to_vector over  10.3 s register=188 transport=188
+[  473.9s]      site     752  lattices.py:5831:_evaluate_gram
+[  473.9s]      site     752  lattices.py:5832:_evaluate_gram
+[  473.9s]      site     752  framed_free_modules.py:1371:_span_basis_elements
+[  473.9s]      site     752  probe.py:226:<genexpr>
+[  474.8s]   SPAN block  206:     1.61 ms a call over 50 calls; last basis coordinate size 73, largest so far 992; cache 5142; tracked objects 8325066; gc counts (39, 0, 1)
+[  475.9s]   SPAN block  207:     1.48 ms a call over 50 calls; last basis coordinate size 12, largest so far 992; cache 5167; tracked objects 8356551; gc counts (528, 0, 3)
+[  477.0s]   SPAN block  208:     1.50 ms a call over 50 calls; last basis coordinate size 8, largest so far 992; cache 5192; tracked objects 8387722; gc counts (531, 0, 5)
+[  478.0s]   SPAN block  209:     1.39 ms a call over 50 calls; last basis coordinate size 17, largest so far 992; cache 5217; tracked objects 8418685; gc counts (509, 0, 7)
+[  478.9s]   SPAN block  210:     1.25 ms a call over 50 calls; last basis coordinate size 5, largest so far 992; cache 5242; tracked objects 8449786; gc counts (517, 0, 9)
+[  479.8s]   SPAN block  211:     1.15 ms a call over 50 calls; last basis coordinate size 8, largest so far 992; cache 5267; tracked objects 8480911; gc counts (525, 0, 11)
+[  480.0s]   sampled 324 times; leaf now objects.py:__contains__; to_vector=351231
+[  480.0s]      leaf   72  lattices.py:subobject_on
+[  480.0s]      leaf   14  set_categories.py:__call__
+[  480.0s]      leaf   11  objects.py:__contains__
+[  480.0s]      site   57005  lattices.py:5831:_evaluate_gram
+[  480.1s]      site   57005  lattices.py:5832:_evaluate_gram
+[  480.1s]      site   50797  modules.py:7148:_matrix_column_coordinates
+[  480.1s]      site   39316  coloured_vector_families.py:594:<genexpr>
+[  480.1s]      site   21753  probe.py:226:<genexpr>
+[  480.6s]   SPAN block  212:     1.12 ms a call over 50 calls; last basis coordinate size 8, largest so far 992; cache 5292; tracked objects 8512031; gc counts (530, 0, 13)
+[  481.5s]   SPAN block  213:     1.11 ms a call over 50 calls; last basis coordinate size 53, largest so far 992; cache 5317; tracked objects 8543283; gc counts (543, 0, 15)
+Timeout (0:00:20)!
+Thread 0x00007cc124efb6c0 [Thread-1 (sampl] (most recent call first):
+  File "/probe.py", line 373 in sampler
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Thread 0x00007cc319953780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py", line 812 in __call__
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/framed/formed/form_modules.py", line 449 in <lambda>
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py", line 1228 in _call_
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py", line 811 in __call__
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py", line 569 in <lambda>
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py", line 1228 in _call_
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py", line 811 in __call__
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/pure/modules.py", line 7146 in _matrix_column_coordinates
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/pure/modules.py", line 7769 in <genexpr>
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/pure/modules.py", line 7768 in _engine_matrix
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/framed/finitely_generated/finitely_presented_modules.py", line 3462 in _presented_module_from_morphism
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/pure/modules.py", line 4426 in _call_
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/pure/modules.py", line 4387 in __call__
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/framed/framed_free_modules.py", line 588 in _represented_cokernel_of_morphism
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py", line 2600 in cokernel
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/pure/modules.py", line 4193 in is_primitive
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattices.py", line 9379 in primitive_isotropic_subobject
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py", line 2015 in transport_isotropic_object
+  File "/probe.py", line 272 in counted
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3483 in _plane_orbit_from_parabolic_stabilizer
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3706 in _subgroup_isotropic_orbit_representatives
+  File "/repos/sage-extensions/src/sage_extensions/timing.py", line 393 in timed
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 522 in isotropic_orbit_representatives
+  File "/probe.py", line 456 in main
+  File "/probe.py", line 483 in <module>
+[  482.4s]   SPAN block  214:     1.13 ms a call over 50 calls; last basis coordinate size 8, largest so far 992; cache 5342; tracked objects 8574355; gc counts (521, 0, 17)
+[  483.2s]   SPAN block  215:     1.14 ms a call over 50 calls; last basis coordinate size 39, largest so far 992; cache 5367; tracked objects 8605412; gc counts (525, 0, 19)
+[  484.1s]   SPAN block  216:     1.16 ms a call over 50 calls; last basis coordinate size 21, largest so far 992; cache 5392; tracked objects 8636492; gc counts (529, 0, 21)
+[  484.1s]   window    5764 to_vector over  10.2 s register=262 transport=262
+[  484.1s]      site    1048  lattices.py:5831:_evaluate_gram
+[  484.1s]      site    1048  lattices.py:5832:_evaluate_gram
+[  484.1s]      site    1048  framed_free_modules.py:1371:_span_basis_elements
+[  484.1s]      site    1048  probe.py:226:<genexpr>
+[  485.1s]   SPAN block  217:     1.17 ms a call over 50 calls; last basis coordinate size 14, largest so far 992; cache 5417; tracked objects 8667611; gc counts (534, 0, 23)
+[  486.1s]   SPAN block  218:     1.42 ms a call over 50 calls; last basis coordinate size 19, largest so far 992; cache 5442; tracked objects 8698689; gc counts (530, 0, 25)
+[  487.2s]   SPAN block  219:     1.30 ms a call over 50 calls; last basis coordinate size 30, largest so far 992; cache 5467; tracked objects 8729750; gc counts (530, 0, 27)
+[  488.5s]   SPAN block  220:     1.78 ms a call over 50 calls; last basis coordinate size 8, largest so far 992; cache 5492; tracked objects 8760891; gc counts (534, 0, 29)
+[  489.5s]   SPAN block  221:     1.28 ms a call over 50 calls; last basis coordinate size 35, largest so far 992; cache 5517; tracked objects 8792039; gc counts (530, 0, 31)
+[  490.4s]   SPAN block  222:     1.20 ms a call over 50 calls; last basis coordinate size 28, largest so far 992; cache 5542; tracked objects 8823047; gc counts (533, 0, 33)
+[  491.4s]   SPAN block  223:     1.24 ms a call over 50 calls; last basis coordinate size 22, largest so far 992; cache 5567; tracked objects 8854178; gc counts (521, 0, 35)
+[  492.6s]   SPAN block  224:     1.56 ms a call over 50 calls; last basis coordinate size 14, largest so far 992; cache 5592; tracked objects 8885313; gc counts (529, 0, 37)
+[  493.8s]   SPAN block  225:     1.41 ms a call over 50 calls; last basis coordinate size 15, largest so far 992; cache 5617; tracked objects 8916450; gc counts (527, 0, 39)
+[  494.1s]   window    5358 to_vector over  10.0 s register=244 transport=244
+[  494.1s]      site     976  lattices.py:5831:_evaluate_gram
+[  494.1s]      site     976  lattices.py:5832:_evaluate_gram
+[  494.1s]      site     974  framed_free_modules.py:1371:_span_basis_elements
+[  494.1s]      site     972  probe.py:226:<genexpr>
+[  494.9s]   SPAN block  226:     1.31 ms a call over 50 calls; last basis coordinate size 24, largest so far 992; cache 5642; tracked objects 8947578; gc counts (543, 0, 41)
+[  496.1s]   sampled 339 times; leaf now lattices.py:subobject_on; to_vector=359713
+[  496.1s]      leaf   79  lattices.py:subobject_on
+[  496.1s]      leaf   14  set_categories.py:__call__
+[  496.1s]      leaf   12  objects.py:__contains__
+[  496.1s]      site   58545  lattices.py:5831:_evaluate_gram
+[  496.1s]      site   58545  lattices.py:5832:_evaluate_gram
+[  496.1s]      site   51567  modules.py:7148:_matrix_column_coordinates
+[  496.1s]      site   39316  coloured_vector_families.py:594:<genexpr>
+[  496.1s]      site   23297  probe.py:226:<genexpr>
+[  496.1s]   SPAN block  227:     1.65 ms a call over 50 calls; last basis coordinate size 17, largest so far 992; cache 5667; tracked objects 8978687; gc counts (538, 0, 43)
+[  497.3s]   SPAN block  228:     1.49 ms a call over 50 calls; last basis coordinate size 8, largest so far 992; cache 5692; tracked objects 9009867; gc counts (543, 0, 45)
+[  498.6s]   SPAN block  229:     1.69 ms a call over 50 calls; last basis coordinate size 177, largest so far 992; cache 5717; tracked objects 9041015; gc counts (543, 0, 47)
+[  499.8s]   SPAN block  230:     1.41 ms a call over 50 calls; last basis coordinate size 41, largest so far 992; cache 5742; tracked objects 9072080; gc counts (538, 0, 49)
+[  501.2s]   SPAN block  231:     2.23 ms a call over 50 calls; last basis coordinate size 8, largest so far 992; cache 5767; tracked objects 9103109; gc counts (542, 0, 51)
+Timeout (0:00:20)!
+Thread 0x00007cc124efb6c0 [Thread-1 (sampl] (most recent call first):
+  File "/probe.py", line 373 in sampler
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Thread 0x00007cc319953780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattices.py", line ??? in base_ring
+  <invalid frame>
+[  502.3s]   SPAN block  232:     1.86 ms a call over 50 calls; last basis coordinate size 15, largest so far 992; cache 5792; tracked objects 9134097; gc counts (530, 0, 53)
+[  503.2s]   SPAN block  233:     1.23 ms a call over 50 calls; last basis coordinate size 81, largest so far 992; cache 5817; tracked objects 9165113; gc counts (537, 0, 55)
+[  504.2s]   SPAN block  234:     1.20 ms a call over 50 calls; last basis coordinate size 6, largest so far 992; cache 5842; tracked objects 9196180; gc counts (521, 0, 57)
+[  504.2s]   window    4542 to_vector over  10.1 s register=206 transport=206
+[  504.2s]      site     828  probe.py:226:<genexpr>
+[  504.2s]      site     826  framed_free_modules.py:1371:_span_basis_elements
+[  504.2s]      site     824  lattices.py:5831:_evaluate_gram
+[  504.2s]      site     824  lattices.py:5832:_evaluate_gram
+[  505.1s]   SPAN block  235:     1.17 ms a call over 50 calls; last basis coordinate size 4, largest so far 992; cache 5867; tracked objects 9227144; gc counts (505, 0, 59)
+[  506.1s]   SPAN block  236:     1.19 ms a call over 50 calls; last basis coordinate size 38, largest so far 992; cache 5892; tracked objects 9258223; gc counts (529, 0, 61)
+[  507.0s]   SPAN block  237:     1.12 ms a call over 50 calls; last basis coordinate size 38, largest so far 992; cache 5917; tracked objects 9289379; gc counts (525, 0, 63)
+[  507.9s]   SPAN block  238:     1.17 ms a call over 50 calls; last basis coordinate size 62, largest so far 992; cache 5942; tracked objects 9320375; gc counts (521, 0, 65)
+[  508.8s]   SPAN block  239:     1.13 ms a call over 50 calls; last basis coordinate size 44, largest so far 992; cache 5967; tracked objects 9351459; gc counts (539, 0, 67)
+[  509.7s]   SPAN block  240:     1.14 ms a call over 50 calls; last basis coordinate size 8, largest so far 992; cache 5992; tracked objects 9382553; gc counts (529, 0, 69)
+[  510.6s]   SPAN block  241:     1.20 ms a call over 50 calls; last basis coordinate size 4, largest so far 992; cache 6017; tracked objects 9413646; gc counts (518, 0, 71)
+[  511.6s]   SPAN block  242:     1.16 ms a call over 50 calls; last basis coordinate size 13, largest so far 992; cache 6042; tracked objects 9444754; gc counts (517, 0, 73)
+[  511.7s]   sampled 353 times; leaf now refine.py:owned_parent_class; to_vector=368179
+[  511.8s]      leaf   86  lattices.py:subobject_on
+[  511.8s]      leaf   16  set_categories.py:__call__
+[  511.8s]      leaf   13  objects.py:__contains__
+[  511.8s]      site   60085  lattices.py:5831:_evaluate_gram
+[  511.8s]      site   60085  lattices.py:5832:_evaluate_gram
+[  511.8s]      site   52337  modules.py:7148:_matrix_column_coordinates
+[  511.8s]      site   39316  coloured_vector_families.py:594:<genexpr>
+[  511.8s]      site   24835  probe.py:226:<genexpr>
+[  512.6s]   SPAN block  243:     1.15 ms a call over 50 calls; last basis coordinate size 15, largest so far 992; cache 6067; tracked objects 9475926; gc counts (521, 0, 75)
+[  513.5s]   SPAN block  244:     1.16 ms a call over 50 calls; last basis coordinate size 75, largest so far 992; cache 6092; tracked objects 9507039; gc counts (533, 0, 77)
+[  514.5s]   SPAN block  245:     1.14 ms a call over 50 calls; last basis coordinate size 55, largest so far 992; cache 6117; tracked objects 9538119; gc counts (538, 0, 79)
+[  514.5s]   window    6050 to_vector over  10.3 s register=275 transport=275
+[  514.5s]      site    1100  lattices.py:5831:_evaluate_gram
+[  514.5s]      site    1100  lattices.py:5832:_evaluate_gram
+[  514.5s]      site    1100  framed_free_modules.py:1371:_span_basis_elements
+[  514.5s]      site    1100  probe.py:226:<genexpr>
+[  515.4s]   SPAN block  246:     1.16 ms a call over 50 calls; last basis coordinate size 18, largest so far 992; cache 6142; tracked objects 9569220; gc counts (542, 0, 81)
+[  516.4s]   SPAN block  247:     1.26 ms a call over 50 calls; last basis coordinate size 13, largest so far 992; cache 6167; tracked objects 9600338; gc counts (525, 0, 83)
+[  517.3s]   SPAN block  248:     1.18 ms a call over 50 calls; last basis coordinate size 9, largest so far 992; cache 6192; tracked objects 9631381; gc counts (513, 0, 85)
+[  518.3s]   SPAN block  249:     1.19 ms a call over 50 calls; last basis coordinate size 33, largest so far 992; cache 6217; tracked objects 9662465; gc counts (538, 0, 87)
+[  519.3s]   SPAN block  250:     1.22 ms a call over 50 calls; last basis coordinate size 4, largest so far 992; cache 6242; tracked objects 9693494; gc counts (521, 0, 89)
+[  520.2s]   SPAN block  251:     1.21 ms a call over 50 calls; last basis coordinate size 42, largest so far 992; cache 6267; tracked objects 9724537; gc counts (537, 0, 91)
+[  521.2s]   SPAN block  252:     1.18 ms a call over 50 calls; last basis coordinate size 4, largest so far 992; cache 6292; tracked objects 9755613; gc counts (522, 0, 93)
+Timeout (0:00:20)!
+Thread 0x00007cc124efb6c0 [Thread-1 (sampl] (most recent call first):
+  File "/probe.py", line 373 in sampler
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Thread 0x00007cc319953780 [python] (most recent call first):
+  File "/probe.py", line 244 in timed
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattices.py", line 3999 in subobject_on
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattices.py", line 9378 in primitive_isotropic_subobject
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py", line 2015 in transport_isotropic_object
+  File "/probe.py", line 272 in counted
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3483 in _plane_orbit_from_parabolic_stabilizer
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3706 in _subgroup_isotropic_orbit_representatives
+  File "/repos/sage-extensions/src/sage_extensions/timing.py", line 393 in timed
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 522 in isotropic_orbit_representatives
+  File "/probe.py", line 456 in main
+  File "/probe.py", line 483 in <module>
+[  522.1s]   SPAN block  253:     1.19 ms a call over 50 calls; last basis coordinate size 4, largest so far 992; cache 6317; tracked objects 9786594; gc counts (525, 0, 95)
+[  523.1s]   SPAN block  254:     1.17 ms a call over 50 calls; last basis coordinate size 19, largest so far 992; cache 6342; tracked objects 9817757; gc counts (530, 0, 97)
+[  524.1s]   SPAN block  255:     1.19 ms a call over 50 calls; last basis coordinate size 38, largest so far 992; cache 6367; tracked objects 9848669; gc counts (493, 0, 99)
+[  524.5s]   window    6036 to_vector over  10.0 s register=274 transport=274
+[  524.5s]      site    1100  lattices.py:5831:_evaluate_gram
+[  524.5s]      site    1099  lattices.py:5832:_evaluate_gram
+[  524.5s]      site    1096  framed_free_modules.py:1371:_span_basis_elements
+[  524.5s]      site    1096  probe.py:226:<genexpr>
+[  525.0s]   SPAN block  256:     1.18 ms a call over 50 calls; last basis coordinate size 20, largest so far 992; cache 6392; tracked objects 9879752; gc counts (517, 0, 101)
+[  526.0s]   SPAN block  257:     1.14 ms a call over 50 calls; last basis coordinate size 23, largest so far 992; cache 6417; tracked objects 9910832; gc counts (531, 0, 103)
+[  526.9s]   sampled 367 times; leaf now lattices.py:subobject_on; to_vector=376763
+[  526.9s]      leaf   89  lattices.py:subobject_on
+[  526.9s]      leaf   17  set_categories.py:__call__
+[  526.9s]      leaf   15  objects.py:__contains__
+[  526.9s]      site   61645  lattices.py:5831:_evaluate_gram
+[  526.9s]      site   61645  lattices.py:5832:_evaluate_gram
+[  526.9s]      site   53117  modules.py:7148:_matrix_column_coordinates
+[  526.9s]      site   39316  coloured_vector_families.py:594:<genexpr>
+[  526.9s]      site   26397  probe.py:226:<genexpr>
+[  527.0s]   SPAN block  258:     1.18 ms a call over 50 calls; last basis coordinate size 10, largest so far 992; cache 6442; tracked objects 9941951; gc counts (531, 0, 105)
+[  528.0s]   SPAN block  259:     1.25 ms a call over 50 calls; last basis coordinate size 4, largest so far 992; cache 6467; tracked objects 9972986; gc counts (505, 0, 107)
+[  529.0s]   SPAN block  260:     1.16 ms a call over 50 calls; last basis coordinate size 13, largest so far 992; cache 6492; tracked objects 10004032; gc counts (517, 0, 109)
+[  530.0s]   SPAN block  261:     1.16 ms a call over 50 calls; last basis coordinate size 33, largest so far 992; cache 6517; tracked objects 10035174; gc counts (534, 0, 111)
+[  531.0s]   SPAN block  262:     1.22 ms a call over 50 calls; last basis coordinate size 15, largest so far 992; cache 6542; tracked objects 10066321; gc counts (526, 0, 113)
+[  531.9s]   SPAN block  263:     1.19 ms a call over 50 calls; last basis coordinate size 23, largest so far 992; cache 6567; tracked objects 10097459; gc counts (537, 0, 115)
+[  532.9s]   SPAN block  264:     1.17 ms a call over 50 calls; last basis coordinate size 30, largest so far 992; cache 6592; tracked objects 10128592; gc counts (533, 0, 117)
+[  533.9s]   SPAN block  265:     1.18 ms a call over 50 calls; last basis coordinate size 4, largest so far 992; cache 6617; tracked objects 10159705; gc counts (501, 0, 119)
+[  534.9s]   SPAN block  266:     1.19 ms a call over 50 calls; last basis coordinate size 8, largest so far 992; cache 6642; tracked objects 10190773; gc counts (521, 0, 121)
+[  534.9s]   window    5514 to_vector over  10.4 s register=251 transport=251
+[  534.9s]      site    1004  framed_free_modules.py:1371:_span_basis_elements
+[  534.9s]      site    1004  probe.py:226:<genexpr>
+[  534.9s]      site    1001  lattices.py:5832:_evaluate_gram
+[  534.9s]      site    1000  lattices.py:5831:_evaluate_gram
+[  535.9s]   SPAN block  267:     1.19 ms a call over 50 calls; last basis coordinate size 5, largest so far 992; cache 6667; tracked objects 10221836; gc counts (517, 0, 123)
+[  536.9s]   SPAN block  268:     1.23 ms a call over 50 calls; last basis coordinate size 18, largest so far 992; cache 6692; tracked objects 10252829; gc counts (525, 0, 125)
+[  537.9s]   SPAN block  269:     1.23 ms a call over 50 calls; last basis coordinate size 25, largest so far 992; cache 6717; tracked objects 10283805; gc counts (529, 0, 127)
+[  538.9s]   SPAN block  270:     1.22 ms a call over 50 calls; last basis coordinate size 56, largest so far 992; cache 6742; tracked objects 10314870; gc counts (530, 0, 129)
+[  540.1s]   SPAN block  271:     1.60 ms a call over 50 calls; last basis coordinate size 97, largest so far 992; cache 6767; tracked objects 10346135; gc counts (530, 0, 131)
+Timeout (0:00:20)!
+Thread 0x00007cc124efb6c0 [Thread-1 (sampl] (most recent call first):
+  File "/probe.py", line 373 in sampler
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Thread 0x00007cc319953780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/owned_category.py", line 1178 in _owned_sort_uniq
+  File "/repos/sage-extensions/src/sage_extensions/owned_category.py", line 1208 in _owned_join_as_tuple
+  File "/repos/sage-extensions/src/sage_extensions/owned_category.py", line 1260 in owned_category_join
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py", line 987 in _init_category_
+  File "/sage/.venv/lib/python3.14/site-packages/sage/categories/homset.py", line 694 in __init__
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py", line 960 in __init__
+  File "/repos/sage-extensions/src/sage_extensions/owned_category.py", line 834 in retaining_initializer
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py", line 909 in __classcall__
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py", line 2268 in Of
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py", line 2299 in Of
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py", line 1126 in super_categories
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py", line 244 in _declared_category_reaches
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py", line 262 in <genexpr>
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py", line 261 in _minimal_inherited_homs
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py", line 2309 in Of
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py", line 2453 in _carves_the_same_mor
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py", line 2256 in <genexpr>
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py", line 2253 in Of
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py", line 2551 in super_categories
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py", line 244 in _declared_category_reaches
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py", line 197 in _arrow_is_inherited_from_subcategory
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py", line 1003 in _already_parented_arrow
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_foundation.py", line 53 in __call__
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py", line 1014 in __call__
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py", line 3462 in __call__
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/framed/finitely_generated/finitely_presented_modules.py", line 3262 in _presented_module_from_morphism
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/pure/modules.py", line 4426 in _call_
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/pure/modules.py", line 4387 in __call__
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/framed/framed_free_modules.py", line 588 in _represented_cokernel_of_morphism
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py", line 2600 in cokernel
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/pure/modules.py", line 4193 in is_primitive
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattices.py", line 9379 in primitive_isotropic_subobject
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py", line 2015 in transport_isotropic_object
+  File "/probe.py", line 272 in counted
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3483 in _plane_orbit_from_parabolic_stabilizer
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3706 in _subgroup_isotropic_orbit_representatives
+  File "/repos/sage-extensions/src/sage_extensions/timing.py", line 393 in timed
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 522 in isotropic_orbit_representatives
+  File "/probe.py", line 456 in main
+  File "/probe.py", line 483 in <module>
+[  544.0s]   sampled 381 times; leaf now owned_category.py:_owned_flatten_categories; to_vector=384199
+[  544.0s]      leaf   91  lattices.py:subobject_on
+[  544.0s]      leaf   17  set_categories.py:__call__
+[  544.0s]      leaf   15  objects.py:__contains__
+[  544.0s]      site   62997  lattices.py:5831:_evaluate_gram
+[  544.0s]      site   62997  lattices.py:5832:_evaluate_gram
+[  544.0s]      site   53793  modules.py:7148:_matrix_column_coordinates
+[  544.0s]      site   39316  coloured_vector_families.py:594:<genexpr>
+[  544.0s]      site   27749  probe.py:226:<genexpr>
+[  544.8s]   SPAN block  272:     1.33 ms a call over 50 calls; last basis coordinate size 244, largest so far 992; cache 6792; tracked objects 10350692; gc counts (38, 0, 1)
+[  544.9s]   window    3376 to_vector over  10.0 s register=154 transport=154
+[  544.9s]      site     616  lattices.py:5831:_evaluate_gram
+[  544.9s]      site     616  lattices.py:5832:_evaluate_gram
+[  544.9s]      site     613  framed_free_modules.py:1371:_span_basis_elements
+[  544.9s]      site     612  probe.py:226:<genexpr>
+[  546.2s]   SPAN block  273:     1.63 ms a call over 50 calls; last basis coordinate size 42, largest so far 992; cache 6817; tracked objects 10382070; gc counts (513, 0, 3)
+[  547.4s]   SPAN block  274:     1.47 ms a call over 50 calls; last basis coordinate size 19, largest so far 992; cache 6842; tracked objects 10413201; gc counts (539, 0, 5)
+[  548.5s]   SPAN block  275:     1.36 ms a call over 50 calls; last basis coordinate size 42, largest so far 992; cache 6867; tracked objects 10444200; gc counts (499, 0, 7)
+[  549.6s]   SPAN block  276:     1.18 ms a call over 50 calls; last basis coordinate size 38, largest so far 992; cache 6892; tracked objects 10475260; gc counts (515, 0, 9)
+[  550.6s]   SPAN block  277:     1.25 ms a call over 50 calls; last basis coordinate size 46, largest so far 992; cache 6917; tracked objects 10506351; gc counts (539, 0, 11)
+[  551.6s]   SPAN block  278:     1.24 ms a call over 50 calls; last basis coordinate size 24, largest so far 992; cache 6942; tracked objects 10537433; gc counts (535, 0, 13)
+[  552.8s]   SPAN block  279:     1.22 ms a call over 50 calls; last basis coordinate size 38, largest so far 992; cache 6967; tracked objects 10568531; gc counts (531, 0, 15)
+[  553.8s]   SPAN block  280:     1.18 ms a call over 50 calls; last basis coordinate size 18, largest so far 992; cache 6992; tracked objects 10599626; gc counts (525, 0, 17)
+[  554.8s]   SPAN block  281:     1.16 ms a call over 50 calls; last basis coordinate size 8, largest so far 992; cache 7017; tracked objects 10630741; gc counts (526, 0, 19)
+[  554.9s]   window    5060 to_vector over  10.0 s register=230 transport=230
+[  554.9s]      site     920  lattices.py:5831:_evaluate_gram
+[  554.9s]      site     920  lattices.py:5832:_evaluate_gram
+[  554.9s]      site     920  framed_free_modules.py:1371:_span_basis_elements
+[  554.9s]      site     920  probe.py:226:<genexpr>
+[  555.8s]   SPAN block  282:     1.16 ms a call over 50 calls; last basis coordinate size 24, largest so far 992; cache 7042; tracked objects 10661902; gc counts (530, 0, 21)
+[  557.5s]   SPAN block  283:     2.19 ms a call over 50 calls; last basis coordinate size 12, largest so far 992; cache 7067; tracked objects 10692977; gc counts (518, 0, 23)
+[  558.9s]   SPAN block  284:     1.74 ms a call over 50 calls; last basis coordinate size 24, largest so far 992; cache 7092; tracked objects 10724138; gc counts (543, 0, 25)
+[  559.8s]   sampled 395 times; leaf now lattices.py:subobject_on; to_vector=391613
+[  559.9s]      leaf  103  lattices.py:subobject_on
+[  559.9s]      leaf   17  set_categories.py:__call__
+[  559.9s]      leaf   15  objects.py:__contains__
+[  559.9s]      site   64345  lattices.py:5831:_evaluate_gram
+[  559.9s]      site   64345  lattices.py:5832:_evaluate_gram
+[  559.9s]      site   54467  modules.py:7148:_matrix_column_coordinates
+[  559.9s]      site   39316  coloured_vector_families.py:594:<genexpr>
+[  559.9s]      site   29097  probe.py:226:<genexpr>
+[  559.9s]   SPAN block  285:     1.19 ms a call over 50 calls; last basis coordinate size 67, largest so far 992; cache 7117; tracked objects 10755350; gc counts (535, 0, 27)
+[  560.9s]   SPAN block  286:     1.18 ms a call over 50 calls; last basis coordinate size 67, largest so far 992; cache 7142; tracked objects 10786436; gc counts (537, 0, 29)
+Timeout (0:00:20)!
+Thread 0x00007cc124efb6c0 [Thread-1 (sampl] (most recent call first):
+  File "/probe.py", line 373 in sampler
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Thread 0x00007cc319953780 [python] (most recent call first):
+  File "/probe.py", line 244 in timed
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattices.py", line 3999 in subobject_on
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattices.py", line 9378 in primitive_isotropic_subobject
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py", line 2015 in transport_isotropic_object
+  File "/probe.py", line 272 in counted
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3483 in _plane_orbit_from_parabolic_stabilizer
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3706 in _subgroup_isotropic_orbit_representatives
+  File "/repos/sage-extensions/src/sage_extensions/timing.py", line 393 in timed
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 522 in isotropic_orbit_representatives
+  File "/probe.py", line 456 in main
+  File "/probe.py", line 483 in <module>
+[  562.0s]   SPAN block  287:     1.20 ms a call over 50 calls; last basis coordinate size 16, largest so far 992; cache 7167; tracked objects 10817626; gc counts (526, 0, 31)
+[  563.0s]   SPAN block  288:     1.24 ms a call over 50 calls; last basis coordinate size 51, largest so far 992; cache 7192; tracked objects 10848737; gc counts (529, 0, 33)
+[  564.0s]   SPAN block  289:     1.23 ms a call over 50 calls; last basis coordinate size 41, largest so far 992; cache 7217; tracked objects 10879917; gc counts (538, 0, 35)
+[  565.1s]   SPAN block  290:     1.27 ms a call over 50 calls; last basis coordinate size 65, largest so far 992; cache 7242; tracked objects 10911016; gc counts (538, 0, 37)
+[  565.1s]   window    4764 to_vector over  10.2 s register=216 transport=216
+[  565.1s]      site     868  probe.py:226:<genexpr>
+[  565.1s]      site     867  framed_free_modules.py:1371:_span_basis_elements
+[  565.1s]      site     864  lattices.py:5831:_evaluate_gram
+[  565.1s]      site     864  lattices.py:5832:_evaluate_gram
+[  566.2s]   SPAN block  291:     1.21 ms a call over 50 calls; last basis coordinate size 27, largest so far 992; cache 7267; tracked objects 10942174; gc counts (537, 0, 39)
+[  567.2s]   SPAN block  292:     1.20 ms a call over 50 calls; last basis coordinate size 10, largest so far 992; cache 7292; tracked objects 10973328; gc counts (518, 0, 41)
+[  568.2s]   SPAN block  293:     1.18 ms a call over 50 calls; last basis coordinate size 14, largest so far 992; cache 7317; tracked objects 11004457; gc counts (533, 0, 43)
+[peakrss] probe528growth: child waited=124 shell_code=124 samples=285
+[peakrss] peak tree RSS      : 2687 MiB
+[peakrss] low-water MemAvail : 10433 MiB
+[peakrss] peak single VmHWM  : 2690 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     2679 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   566.3s procs=  3 rss=  2687 MiB hwm=  2687 MiB avail= 10921 MiB
+[peakrss]   t=   568.3s procs=  3 rss=  2681 MiB hwm=  2690 MiB avail= 10858 MiB
+[peakrss]   t=   558.3s procs=  3 rss=  2626 MiB hwm=  2659 MiB avail= 10499 MiB
+[peakrss]   t=   564.3s procs=  3 rss=  2598 MiB hwm=  2680 MiB avail= 10433 MiB
+[peakrss]   t=   562.3s procs=  3 rss=  2592 MiB hwm=  2673 MiB avail= 10472 MiB

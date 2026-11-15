@@ -1,0 +1,936 @@
+tree SHA: fed237beab614867dcbec17b4a5eae9c56b20320 (detached worktree of refs/remotes/omm/main)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+probe: .tmp/qc-evidence/issue528-otilde-stage-slice.py
+command: /workspace/nucleus/work/home/sage-image/run.sh -w /work -- /sage/.venv/bin/python -u -s /probe.py cap=540
+inner 570 s, outer 598 s, peakrss guard 6144 MiB
+[    0.0s] shadowed to_vector at: framed_free_modules.FramedFreeModules.ElementMethods
+[    1.8s] lattice Integral lattice of rank 11 and signature (2, 9); subgroup {g in Orthogonal group O(Integral lattice of rank 11 and signature (2, 9)) : rho_L(g) lies in Subgroup of Orthogonal group of Finitely presented module on 11 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 2, 1 ↦ 2, 2 ↦ 2, 3 ↦ 2, 4 ↦ 2, 5 ↦ 2, 6 ↦ 2, 7 ↦ 2, 8 ↦ 2, 9 ↦ 2, 10 ↦ 2]}
+[   16.9s]   sampled 15 times; leaf now ring_foundation.py:__init__; to_vector=26580
+[   16.9s]      leaf    3  ring_foundation.py:_element_constructor_
+[   16.9s]      leaf    2  mor_foundation.py:_copy_operation_metadata
+[   16.9s]      leaf    2  ring_foundation.py:__init__
+[   16.9s]      site    5901  modules.py:7148:_matrix_column_coordinates
+[   16.9s]      site    5256  coloured_vector_families.py:594:<genexpr>
+[   17.0s]      site    3872  eichler_criterion.py:40:_column_matrix_from_images
+[   17.0s]      site    3087  lattice_morphisms.py:1755:integral_restriction
+[   17.0s]      site    1994  lattices.py:5831:_evaluate_gram
+Timeout (0:00:20)!
+Thread 0x0000779ca6efb6c0 [Thread-1 (sampl] (most recent call first):
+  File "/probe.py", line 200 in sampler
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Thread 0x0000779e9ba4c780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py", line 5774 in _operator_operand
+  <invalid frame>
+[   32.1s]   sampled 30 times; leaf now ring_foundation.py:__call__; to_vector=37745
+[   32.1s]      leaf    4  ring_foundation.py:_element_constructor_
+[   32.1s]      leaf    3  ring_foundation.py:__call__
+[   32.1s]      leaf    2  mor_foundation.py:_copy_operation_metadata
+[   32.1s]      site    8105  lattice_morphisms.py:1755:integral_restriction
+[   32.1s]      site    6326  modules.py:7148:_matrix_column_coordinates
+[   32.1s]      site    5562  coloured_vector_families.py:594:<genexpr>
+[   32.1s]      site    3872  eichler_criterion.py:40:_column_matrix_from_images
+[   32.1s]      site    3672  lattices.py:5831:_evaluate_gram
+Timeout (0:00:20)!
+Thread 0x0000779ca6efb6c0 [Thread-1 (sampl] (most recent call first):
+  File "/probe.py", line 200 in sampler
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Thread 0x0000779e9ba4c780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py", line ??? in _element_constructor_
+  <invalid frame>
+[   47.1s]   sampled 45 times; leaf now modules.py:scalar_action; to_vector=48569
+[   47.1s]      leaf    4  ring_foundation.py:_element_constructor_
+[   47.1s]      leaf    3  ring_foundation.py:__call__
+[   47.1s]      leaf    2  mor_foundation.py:_copy_operation_metadata
+[   47.1s]      site   12862  lattice_morphisms.py:1755:integral_restriction
+[   47.1s]      site    6893  modules.py:7148:_matrix_column_coordinates
+[   47.1s]      site    6174  coloured_vector_families.py:594:<genexpr>
+[   47.1s]      site    5122  lattices.py:5831:_evaluate_gram
+[   47.1s]      site    5122  lattices.py:5832:_evaluate_gram
+Timeout (0:00:20)!
+Thread 0x0000779ca6efb6c0 [Thread-1 (sampl] (most recent call first):
+  File "/probe.py", line 200 in sampler
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Thread 0x0000779e9ba4c780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py", line 534 in __contains__
+  <invalid frame>
+[   62.2s]   sampled 60 times; leaf now framed_free_modules.py:__call__; to_vector=65512
+[   62.2s]      leaf    6  ring_foundation.py:_element_constructor_
+[   62.2s]      leaf    3  ring_foundation.py:__call__
+[   62.2s]      leaf    3  set_categories.py:__call__
+[   62.3s]      site   16996  lattice_morphisms.py:1755:integral_restriction
+[   62.3s]      site   10818  coloured_vector_families.py:594:<genexpr>
+[   62.3s]      site    8718  modules.py:7148:_matrix_column_coordinates
+[   62.3s]      site    7052  lattices.py:5831:_evaluate_gram
+[   62.3s]      site    7052  lattices.py:5832:_evaluate_gram
+[   77.9s]   sampled 75 times; leaf now lattices.py:_evaluate_gram; to_vector=93485
+[   77.9s]      leaf    7  ring_foundation.py:_element_constructor_
+[   77.9s]      leaf    5  set_categories.py:__call__
+[   77.9s]      leaf    3  ring_foundation.py:__init__
+[   77.9s]      site   23392  modules.py:7148:_matrix_column_coordinates
+[   77.9s]      site   20450  lattice_morphisms.py:1755:integral_restriction
+[   77.9s]      site   11448  coloured_vector_families.py:594:<genexpr>
+[   77.9s]      site    9305  lattices.py:5831:_evaluate_gram
+[   78.0s]      site    9305  lattices.py:5832:_evaluate_gram
+Timeout (0:00:20)!
+Thread 0x0000779ca6efb6c0 [Thread-1 (sampl] (most recent call first):
+  File "/probe.py", line 200 in sampler
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Thread 0x0000779e9ba4c780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py", line ??? in _element_constructor_
+  <invalid frame>
+[   93.2s]   sampled 90 times; leaf now set_categories.py:__call__; to_vector=155408
+[   93.2s]      leaf    7  ring_foundation.py:_element_constructor_
+[   93.2s]      leaf    6  set_categories.py:__call__
+[   93.2s]      leaf    4  ring_foundation.py:__init__
+[   93.2s]      site   31140  lattices.py:5831:_evaluate_gram
+[   93.3s]      site   31140  lattices.py:5832:_evaluate_gram
+[   93.3s]      site   27003  modules.py:7148:_matrix_column_coordinates
+[   93.3s]      site   20545  lattice_morphisms.py:1755:integral_restriction
+[   93.3s]      site   12968  coloured_vector_families.py:594:<genexpr>
+Timeout (0:00:20)!
+Thread 0x0000779ca6efb6c0 [Thread-1 (sampl] (most recent call first):
+  File "/probe.py", line 200 in sampler
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Thread 0x0000779e9ba4c780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_foundation.py", line 322 in Aut
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_foundation.py", line ??? in operation
+  <invalid frame>
+[  108.4s]   sampled 105 times; leaf now magmas.py:Commutative; to_vector=184344
+[  108.4s]      leaf    8  mor_foundation.py:_copy_operation_metadata
+[  108.4s]      leaf    8  ring_foundation.py:_element_constructor_
+[  108.4s]      leaf    7  set_categories.py:__call__
+[  108.4s]      site   34658  lattices.py:5831:_evaluate_gram
+[  108.4s]      site   34658  lattices.py:5832:_evaluate_gram
+[  108.4s]      site   30342  modules.py:7148:_matrix_column_coordinates
+[  108.4s]      site   21028  coloured_vector_families.py:594:<genexpr>
+[  108.5s]      site   20844  lattice_morphisms.py:1755:integral_restriction
+Timeout (0:00:20)!
+Thread 0x0000779ca6efb6c0 [Thread-1 (sampl] (most recent call first):
+  File "/probe.py", line 200 in sampler
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Thread 0x0000779e9ba4c780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py", line ??? in position_of
+  <invalid frame>
+[  123.5s]   sampled 120 times; leaf now refine.py:__get__; to_vector=221646
+[  123.6s]      leaf    9  mor_foundation.py:_copy_operation_metadata
+[  123.6s]      leaf    9  ring_foundation.py:_element_constructor_
+[  123.6s]      leaf    7  set_categories.py:__call__
+[  123.6s]      site   40897  modules.py:7148:_matrix_column_coordinates
+[  123.6s]      site   37925  lattices.py:5831:_evaluate_gram
+[  123.6s]      site   37925  lattices.py:5832:_evaluate_gram
+[  123.6s]      site   23948  coloured_vector_families.py:594:<genexpr>
+[  123.6s]      site   21414  lattice_morphisms.py:1755:integral_restriction
+[  138.7s]   sampled 135 times; leaf now mor_foundation.py:_has_category_packet_surface; to_vector=226596
+[  138.7s]      leaf   10  mor_foundation.py:_copy_operation_metadata
+[  138.8s]      leaf    9  ring_foundation.py:_element_constructor_
+[  138.8s]      leaf    7  set_categories.py:__call__
+[  138.8s]      site   40908  modules.py:7148:_matrix_column_coordinates
+[  138.8s]      site   37925  lattices.py:5831:_evaluate_gram
+[  138.8s]      site   37925  lattices.py:5832:_evaluate_gram
+[  138.9s]      site   23948  coloured_vector_families.py:594:<genexpr>
+[  138.9s]      site   21414  lattice_morphisms.py:1755:integral_restriction
+Timeout (0:00:20)!
+Thread 0x0000779ca6efb6c0 [Thread-1 (sampl] (most recent call first):
+  File "/probe.py", line 200 in sampler
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Thread 0x0000779e9ba4c780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py", line ??? in __call__
+  <invalid frame>
+Timeout (0:00:20)!
+Thread 0x0000779ca6efb6c0 [Thread-1 (sampl] (most recent call first):
+  File "/probe.py", line 200 in sampler
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Thread 0x0000779e9ba4c780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 2003 in _iter_splitting_isometries_in_im_rho_from_image
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3482 in _plane_orbit_from_parabolic_stabilizer
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3706 in _subgroup_isotropic_orbit_representatives
+  File "/repos/sage-extensions/src/sage_extensions/timing.py", line 393 in timed
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 522 in isotropic_orbit_representatives
+  File "/probe.py", line 277 in main
+  File "/probe.py", line 304 in <module>
+Timeout (0:00:20)!
+Thread 0x0000779ca6efb6c0 [Thread-1 (sampl] (most recent call first):
+  File "/probe.py", line 200 in sampler
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Thread 0x0000779e9ba4c780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 2003 in _iter_splitting_isometries_in_im_rho_from_image
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3482 in _plane_orbit_from_parabolic_stabilizer
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3706 in _subgroup_isotropic_orbit_representatives
+  File "/repos/sage-extensions/src/sage_extensions/timing.py", line 393 in timed
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 522 in isotropic_orbit_representatives
+  File "/probe.py", line 277 in main
+  File "/probe.py", line 304 in <module>
+Timeout (0:00:20)!
+Thread 0x0000779ca6efb6c0 [Thread-1 (sampl] (most recent call first):
+  File "/probe.py", line 200 in sampler
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Thread 0x0000779e9ba4c780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 2003 in _iter_splitting_isometries_in_im_rho_from_image
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3482 in _plane_orbit_from_parabolic_stabilizer
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3706 in _subgroup_isotropic_orbit_representatives
+  File "/repos/sage-extensions/src/sage_extensions/timing.py", line 393 in timed
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 522 in isotropic_orbit_representatives
+  File "/probe.py", line 277 in main
+  File "/probe.py", line 304 in <module>
+Timeout (0:00:20)!
+Thread 0x0000779ca6efb6c0 [Thread-1 (sampl] (most recent call first):
+  File "/probe.py", line 200 in sampler
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Thread 0x0000779e9ba4c780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 2003 in _iter_splitting_isometries_in_im_rho_from_image
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3482 in _plane_orbit_from_parabolic_stabilizer
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3706 in _subgroup_isotropic_orbit_representatives
+  File "/repos/sage-extensions/src/sage_extensions/timing.py", line 393 in timed
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 522 in isotropic_orbit_representatives
+  File "/probe.py", line 277 in main
+  File "/probe.py", line 304 in <module>
+Timeout (0:00:20)!
+Thread 0x0000779ca6efb6c0 [Thread-1 (sampl] (most recent call first):
+  File "/probe.py", line 200 in sampler
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Thread 0x0000779e9ba4c780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 2003 in _iter_splitting_isometries_in_im_rho_from_image
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3482 in _plane_orbit_from_parabolic_stabilizer
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3706 in _subgroup_isotropic_orbit_representatives
+  File "/repos/sage-extensions/src/sage_extensions/timing.py", line 393 in timed
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 522 in isotropic_orbit_representatives
+  File "/probe.py", line 277 in main
+  File "/probe.py", line 304 in <module>
+Timeout (0:00:20)!
+Thread 0x0000779ca6efb6c0 [Thread-1 (sampl] (most recent call first):
+  File "/probe.py", line 200 in sampler
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Thread 0x0000779e9ba4c780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 2003 in _iter_splitting_isometries_in_im_rho_from_image
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3482 in _plane_orbit_from_parabolic_stabilizer
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3706 in _subgroup_isotropic_orbit_representatives
+  File "/repos/sage-extensions/src/sage_extensions/timing.py", line 393 in timed
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 522 in isotropic_orbit_representatives
+  File "/probe.py", line 277 in main
+  File "/probe.py", line 304 in <module>
+[  271.7s]   sampled 149 times; leaf now orthogonal_quotients.py:_iter_splitting_isometries_in_im_rho_from_image; to_vector=232469
+[  274.6s]      leaf   10  mor_foundation.py:_copy_operation_metadata
+[  274.7s]      leaf    9  ring_foundation.py:_element_constructor_
+[  274.7s]      leaf    8  set_categories.py:__call__
+[  274.7s]      site   41931  modules.py:7148:_matrix_column_coordinates
+[  274.7s]      site   37974  lattices.py:5831:_evaluate_gram
+[  274.7s]      site   37974  lattices.py:5832:_evaluate_gram
+[  274.8s]      site   23948  coloured_vector_families.py:594:<genexpr>
+[  274.8s]      site   21414  lattice_morphisms.py:1755:integral_restriction
+Timeout (0:00:20)!
+Thread 0x0000779ca6efb6c0 [Thread-1 (sampl] (most recent call first):
+  File "/probe.py", line 200 in sampler
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Thread 0x0000779e9ba4c780 [python] (most recent call first):
+  File "/sage/.venv/lib/python3.14/site-packages/sage/modules/free_module.py", line 2295 in _element_constructor_
+  <invalid frame>
+[  286.9s]   sampled 160 times; leaf now objects.py:__contains__; to_vector=244625
+[  286.9s]      leaf   10  mor_foundation.py:_copy_operation_metadata
+[  286.9s]      leaf    9  ring_foundation.py:_element_constructor_
+[  287.0s]      leaf    9  set_categories.py:__call__
+[  287.0s]      site   43281  modules.py:7148:_matrix_column_coordinates
+[  287.0s]      site   40674  lattices.py:5831:_evaluate_gram
+[  287.0s]      site   40674  lattices.py:5832:_evaluate_gram
+[  287.0s]      site   23948  coloured_vector_families.py:594:<genexpr>
+[  287.0s]      site   21414  lattice_morphisms.py:1755:integral_restriction
+Timeout (0:00:20)!
+Thread 0x0000779ca6efb6c0 [Thread-1 (sampl] (most recent call first):
+  File "/probe.py", line 200 in sampler
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Thread 0x0000779e9ba4c780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/framed/framed_free_modules.py", line 104 in __init__
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/framed/framed_free_modules.py", line 380 in _element_constructor_
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/framed/framed_free_modules.py", line ??? in __call__
+  <invalid frame>
+[  302.1s]   sampled 175 times; leaf now set_categories.py:__call__; to_vector=262953
+[  302.2s]      leaf   11  set_categories.py:__call__
+[  302.2s]      leaf   10  mor_foundation.py:_copy_operation_metadata
+[  302.2s]      leaf    9  ring_foundation.py:_element_constructor_
+[  302.2s]      site   45317  modules.py:7148:_matrix_column_coordinates
+[  302.2s]      site   44746  lattices.py:5831:_evaluate_gram
+[  302.3s]      site   44746  lattices.py:5832:_evaluate_gram
+[  302.3s]      site   23948  coloured_vector_families.py:594:<genexpr>
+[  302.3s]      site   21414  lattice_morphisms.py:1755:integral_restriction
+[  317.6s]   sampled 190 times; leaf now mor_categories.py:Of; to_vector=281061
+[  317.6s]      leaf   11  set_categories.py:__call__
+[  317.6s]      leaf   10  mor_foundation.py:_copy_operation_metadata
+[  317.6s]      leaf    9  ring_foundation.py:_element_constructor_
+[  317.7s]      site   48770  lattices.py:5831:_evaluate_gram
+[  317.7s]      site   48770  lattices.py:5832:_evaluate_gram
+[  317.7s]      site   47329  modules.py:7148:_matrix_column_coordinates
+[  317.7s]      site   23948  coloured_vector_families.py:594:<genexpr>
+[  317.7s]      site   21414  lattice_morphisms.py:1755:integral_restriction
+Timeout (0:00:20)!
+Thread 0x0000779ca6efb6c0 [Thread-1 (sampl] (most recent call first):
+  File "/probe.py", line 200 in sampler
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Thread 0x0000779e9ba4c780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/owned_category.py", line ??? in <genexpr>
+  <invalid frame>
+[  332.9s]   sampled 204 times; leaf now mor_categories.py:__init__; to_vector=298393
+[  332.9s]      leaf   11  set_categories.py:__call__
+[  332.9s]      leaf   10  mor_foundation.py:_copy_operation_metadata
+[  332.9s]      leaf    9  ring_foundation.py:_element_constructor_
+[  333.0s]      site   52622  lattices.py:5831:_evaluate_gram
+[  333.0s]      site   52622  lattices.py:5832:_evaluate_gram
+[  333.0s]      site   49255  modules.py:7148:_matrix_column_coordinates
+[  333.0s]      site   23948  coloured_vector_families.py:594:<genexpr>
+[  333.0s]      site   21414  lattice_morphisms.py:1755:integral_restriction
+Timeout (0:00:20)!
+Thread 0x0000779ca6efb6c0 [Thread-1 (sampl] (most recent call first):
+  File "/probe.py", line 200 in sampler
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Thread 0x0000779e9ba4c780 [python] (most recent call first):
+  <invalid frame>
+[  348.0s]   sampled 218 times; leaf now owned_category.py:_init_category_; to_vector=314859
+[  348.0s]      leaf   11  set_categories.py:__call__
+[  348.0s]      leaf   10  mor_foundation.py:_copy_operation_metadata
+[  348.0s]      leaf   10  ring_foundation.py:_element_constructor_
+[  348.0s]      site   56282  lattices.py:5831:_evaluate_gram
+[  348.0s]      site   56282  lattices.py:5832:_evaluate_gram
+[  348.0s]      site   51085  modules.py:7148:_matrix_column_coordinates
+[  348.0s]      site   23948  coloured_vector_families.py:594:<genexpr>
+[  348.0s]      site   21414  lattice_morphisms.py:1755:integral_restriction
+Timeout (0:00:20)!
+Thread 0x0000779ca6efb6c0 [Thread-1 (sampl] (most recent call first):
+  File "/probe.py", line 200 in sampler
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Thread 0x0000779e9ba4c780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/refine.py", line 271 in owned_parent_class
+  File "/repos/sage-extensions/src/sage_extensions/refine.py", line 343 in _rebuild_parent_class
+  File "/repos/sage-extensions/src/sage_extensions/refine.py", line 517 in realize_owned_category
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py", line 964 in __init__
+  File "/repos/sage-extensions/src/sage_extensions/owned_category.py", line 834 in retaining_initializer
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py", line 909 in __classcall__
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py", line 2268 in Of
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py", line 2299 in Of
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py", line 1126 in super_categories
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py", line 244 in _declared_category_reaches
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py", line 262 in <genexpr>
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py", line 261 in _minimal_inherited_homs
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py", line 2309 in Of
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py", line 2453 in _carves_the_same_mor
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py", line 2256 in <genexpr>
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py", line 2253 in Of
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py", line 2551 in super_categories
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py", line 244 in _declared_category_reaches
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py", line 197 in _arrow_is_inherited_from_subcategory
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py", line 1003 in _already_parented_arrow
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_foundation.py", line 53 in __call__
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py", line 1014 in __call__
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py", line 3462 in __call__
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/framed/finitely_generated/finitely_presented_modules.py", line 3262 in _presented_module_from_morphism
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/pure/modules.py", line 4426 in _call_
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/pure/modules.py", line 4387 in __call__
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/framed/framed_free_modules.py", line 588 in _represented_cokernel_of_morphism
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py", line 2600 in cokernel
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/pure/modules.py", line 4193 in is_primitive
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattices.py", line 9379 in primitive_isotropic_subobject
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py", line 2015 in transport_isotropic_object
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3483 in _plane_orbit_from_parabolic_stabilizer
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3706 in _subgroup_isotropic_orbit_representatives
+  File "/repos/sage-extensions/src/sage_extensions/timing.py", line 393 in timed
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 522 in isotropic_orbit_representatives
+  File "/probe.py", line 277 in main
+  File "/probe.py", line 304 in <module>
+[  363.8s]   sampled 232 times; leaf now _lattice.py:_sylvester; to_vector=331419
+[  363.9s]      leaf   11  set_categories.py:__call__
+[  363.9s]      leaf   10  mor_foundation.py:_copy_operation_metadata
+[  363.9s]      leaf   10  ring_foundation.py:_element_constructor_
+[  363.9s]      site   59962  lattices.py:5831:_evaluate_gram
+[  363.9s]      site   59962  lattices.py:5832:_evaluate_gram
+[  363.9s]      site   52925  modules.py:7148:_matrix_column_coordinates
+[  363.9s]      site   23948  coloured_vector_families.py:594:<genexpr>
+[  364.0s]      site   22995  framed_free_modules.py:1371:_span_basis_elements
+[  379.0s]   sampled 247 times; leaf now ring_foundation.py:__classcall__; to_vector=349769
+[  379.0s]      leaf   11  set_categories.py:__call__
+[  379.1s]      leaf   10  mor_foundation.py:_copy_operation_metadata
+[  379.1s]      leaf   10  ring_foundation.py:_element_constructor_
+[  379.1s]      site   64038  lattices.py:5831:_evaluate_gram
+[  379.1s]      site   64038  lattices.py:5832:_evaluate_gram
+[  379.1s]      site   54965  modules.py:7148:_matrix_column_coordinates
+[  379.1s]      site   27073  framed_free_modules.py:1371:_span_basis_elements
+[  379.1s]      site   23948  coloured_vector_families.py:594:<genexpr>
+Timeout (0:00:20)!
+Thread 0x0000779ca6efb6c0 [Thread-1 (sampl] (most recent call first):
+  File "/probe.py", line 200 in sampler
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Thread 0x0000779e9ba4c780 [python] (most recent call first):
+  File "/sage/.venv/lib/python3.14/site-packages/sage/quadratic_forms/quadratic_form.py", line 786 in __getitem__
+  File "/sage/.venv/lib/python3.14/site-packages/sage/quadratic_forms/quadratic_form.py", line 1159 in Hessian_matrix
+  File "/sage/.venv/lib/python3.14/site-packages/sage/quadratic_forms/quadratic_form.py", line 1135 in matrix
+  File "/sage/.venv/lib/python3.14/site-packages/sage/quadratic_forms/quadratic_form.py", line 700 in __pari__
+  File "/sage/.venv/lib/python3.14/site-packages/sage/quadratic_forms/quadratic_form__local_field_invariants.py", line 240 in _rational_diagonal_form_and_transformation
+  File "/sage/.venv/lib/python3.14/site-packages/sage/quadratic_forms/quadratic_form__local_field_invariants.py", line 182 in rational_diagonal_form
+  File "/sage/.venv/lib/python3.14/site-packages/sage/quadratic_forms/quadratic_form__local_field_invariants.py", line 333 in signature_vector
+  File "/repos/sage-extensions/src/sage_extensions/categories/_lattice.py", line 1692 in _sylvester
+  File "/repos/sage-extensions/src/sage_extensions/categories/_lattice.py", line 1754 in _signature_pair_of_gram
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattices.py", line 10296 in _repr_
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/framed/framed_free_modules.py", line 1401 in _span_basis_elements
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattices.py", line 3998 in subobject_on
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py", line 1637 in image
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py", line 2002 in transport_isotropic_object
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3483 in _plane_orbit_from_parabolic_stabilizer
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3706 in _subgroup_isotropic_orbit_representatives
+  File "/repos/sage-extensions/src/sage_extensions/timing.py", line 393 in timed
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 522 in isotropic_orbit_representatives
+  File "/probe.py", line 277 in main
+  File "/probe.py", line 304 in <module>
+[  394.3s]   sampled 260 times; leaf now refine.py:_declaring_classes; to_vector=365121
+[  394.3s]      leaf   11  ring_foundation.py:_element_constructor_
+[  394.3s]      leaf   11  set_categories.py:__call__
+[  394.3s]      leaf   10  mor_foundation.py:_copy_operation_metadata
+[  394.3s]      site   67450  lattices.py:5831:_evaluate_gram
+[  394.3s]      site   67450  lattices.py:5832:_evaluate_gram
+[  394.3s]      site   56669  modules.py:7148:_matrix_column_coordinates
+[  394.3s]      site   30485  framed_free_modules.py:1371:_span_basis_elements
+[  394.4s]      site   23948  coloured_vector_families.py:594:<genexpr>
+Timeout (0:00:20)!
+Thread 0x0000779ca6efb6c0 [Thread-1 (sampl] (most recent call first):
+  File "/probe.py", line 200 in sampler
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Thread 0x0000779e9ba4c780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py", line 5360 in Mor
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_foundation.py", line 439 in operation
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py", line 435 in _initialize_lower_arrow
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py", line 540 in __init__
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py", line 3219 in _element_constructor_
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_foundation.py", line 61 in __call__
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py", line 1014 in __call__
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py", line 3462 in __call__
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/framed/framed_free_modules.py", line 1565 in _module_subobject_constructor_data
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattices.py", line 442 in _lattice_subobject_on_basis
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattices.py", line 426 in _lattice_subobject_spanning
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattices.py", line 3999 in subobject_on
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py", line 1637 in image
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py", line 2002 in transport_isotropic_object
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3483 in _plane_orbit_from_parabolic_stabilizer
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3706 in _subgroup_isotropic_orbit_representatives
+  File "/repos/sage-extensions/src/sage_extensions/timing.py", line 393 in timed
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 522 in isotropic_orbit_representatives
+  File "/probe.py", line 277 in main
+  File "/probe.py", line 304 in <module>
+[  409.4s]   sampled 275 times; leaf now owned_category.py:__init__; to_vector=383749
+[  409.5s]      leaf   12  objects.py:__contains__
+[  409.5s]      leaf   12  set_categories.py:__call__
+[  409.5s]      leaf   11  mor_foundation.py:_copy_operation_metadata
+[  409.5s]      site   71590  lattices.py:5831:_evaluate_gram
+[  409.5s]      site   71590  lattices.py:5832:_evaluate_gram
+[  409.5s]      site   58739  modules.py:7148:_matrix_column_coordinates
+[  409.5s]      site   34623  framed_free_modules.py:1371:_span_basis_elements
+[  409.5s]      site   23948  coloured_vector_families.py:594:<genexpr>
+Timeout (0:00:20)!
+Thread 0x0000779ca6efb6c0 [Thread-1 (sampl] (most recent call first):
+  File "/probe.py", line 200 in sampler
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Thread 0x0000779e9ba4c780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py", line 6625 in _from_engine_element
+  File "/repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py", line 8055 in _owned_engine_element
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/framed/framed_free_modules.py", line 1392 in basis_element
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/finite_ordered_sets.py", line 400 in <genexpr>
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/finite_ordered_sets.py", line 400 in from_indexed
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/framed/framed_free_modules.py", line 1398 in _span_basis_elements
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattices.py", line 3998 in subobject_on
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py", line 1637 in image
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py", line 2002 in transport_isotropic_object
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3483 in _plane_orbit_from_parabolic_stabilizer
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3706 in _subgroup_isotropic_orbit_representatives
+  File "/repos/sage-extensions/src/sage_extensions/timing.py", line 393 in timed
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 522 in isotropic_orbit_representatives
+  File "/probe.py", line 277 in main
+  File "/probe.py", line 304 in <module>
+[  425.3s]   sampled 288 times; leaf now refine.py:<genexpr>; to_vector=399067
+[  425.4s]      leaf   13  _lattice.py:_sylvester
+[  425.4s]      leaf   12  ring_foundation.py:_element_constructor_
+[  425.4s]      leaf   12  objects.py:__contains__
+[  425.4s]      site   74994  lattices.py:5831:_evaluate_gram
+[  425.4s]      site   74994  lattices.py:5832:_evaluate_gram
+[  425.4s]      site   60441  modules.py:7148:_matrix_column_coordinates
+[  425.5s]      site   38027  framed_free_modules.py:1371:_span_basis_elements
+[  425.5s]      site   23948  coloured_vector_families.py:594:<genexpr>
+[  440.6s]   sampled 303 times; leaf now refine.py:_supply_participant_implementations; to_vector=417537
+[  440.6s]      leaf   13  objects.py:__contains__
+[  440.6s]      leaf   13  _lattice.py:_sylvester
+[  440.6s]      leaf   12  ring_foundation.py:_element_constructor_
+[  440.7s]      site   79098  lattices.py:5831:_evaluate_gram
+[  440.7s]      site   79098  lattices.py:5832:_evaluate_gram
+[  440.7s]      site   62493  modules.py:7148:_matrix_column_coordinates
+[  440.7s]      site   42133  framed_free_modules.py:1371:_span_basis_elements
+[  440.7s]      site   23948  coloured_vector_families.py:594:<genexpr>
+Timeout (0:00:20)!
+Thread 0x0000779ca6efb6c0 [Thread-1 (sampl] (most recent call first):
+  File "/probe.py", line 200 in sampler
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Thread 0x0000779e9ba4c780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattices.py", line 5834 in _evaluate_gram
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattices.py", line 5845 in b
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattices.py", line 9387 in <genexpr>
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattices.py", line 9386 in primitive_isotropic_subobject
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py", line 2015 in transport_isotropic_object
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3483 in _plane_orbit_from_parabolic_stabilizer
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3706 in _subgroup_isotropic_orbit_representatives
+  File "/repos/sage-extensions/src/sage_extensions/timing.py", line 393 in timed
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 522 in isotropic_orbit_representatives
+  File "/probe.py", line 277 in main
+  File "/probe.py", line 304 in <module>
+[  455.8s]   sampled 318 times; leaf now objects.py:__contains__; to_vector=435963
+[  455.8s]      leaf   14  objects.py:__contains__
+[  455.9s]      leaf   13  ring_foundation.py:_element_constructor_
+[  455.9s]      leaf   13  set_categories.py:__call__
+[  455.9s]      site   83194  lattices.py:5831:_evaluate_gram
+[  455.9s]      site   83194  lattices.py:5832:_evaluate_gram
+[  455.9s]      site   64541  modules.py:7148:_matrix_column_coordinates
+[  455.9s]      site   46227  framed_free_modules.py:1371:_span_basis_elements
+[  455.9s]      site   23948  coloured_vector_families.py:594:<genexpr>
+Timeout (0:00:20)!
+Thread 0x0000779ca6efb6c0 [Thread-1 (sampl] (most recent call first):
+  File "/probe.py", line 200 in sampler
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Thread 0x0000779e9ba4c780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/objects.py", line 169 in __contains__
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/pure/modules.py", line 1553 in _mor_endpoint
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/pure/modules.py", line 1537 in Mor
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py", line 138 in _category_mor
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py", line 157 in _category_accepts_morphism
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/resolutions.py", line 495 in _object
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/resolutions.py", line 601 in selected_degree_zero
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/pure/modules.py", line 5063 in selected_resolution
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/objects.py", line 116 in realize
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/objects.py", line 383 in selected_resolution
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/pure/modules.py", line 1934 in selected_module_resolution
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/framed/finitely_generated/finitely_presented_modules.py", line 221 in _fix_selected_module_presentation
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/framed/finitely_generated/finitely_presented_modules.py", line 367 in __init__
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/framed/finitely_generated/finitely_presented_modules.py", line 1928 in __init__
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/framed/finitely_generated/finitely_presented_modules.py", line 2284 in __init__
+  File "/repos/sage-extensions/src/sage_extensions/owned_category.py", line 1665 in _object_of
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/framed/finitely_generated/finitely_presented_modules.py", line 2378 in _new_presented_module
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/framed/finitely_generated/finitely_presented_modules.py", line 3473 in _presented_module_from_morphism
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/pure/modules.py", line 4426 in _call_
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/pure/modules.py", line 4387 in __call__
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/framed/framed_free_modules.py", line 588 in _represented_cokernel_of_morphism
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py", line 2600 in cokernel
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/pure/modules.py", line 4193 in is_primitive
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattices.py", line 9379 in primitive_isotropic_subobject
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py", line 2015 in transport_isotropic_object
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3483 in _plane_orbit_from_parabolic_stabilizer
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3706 in _subgroup_isotropic_orbit_representatives
+  File "/repos/sage-extensions/src/sage_extensions/timing.py", line 393 in timed
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 522 in isotropic_orbit_representatives
+  File "/probe.py", line 277 in main
+  File "/probe.py", line 304 in <module>
+[  471.2s]   sampled 330 times; leaf now set_categories.py:Infinite; to_vector=449825
+[  471.2s]      leaf   15  set_categories.py:_element_constructor_
+[  471.2s]      leaf   14  objects.py:__contains__
+[  471.3s]      leaf   14  _lattice.py:_sylvester
+[  471.3s]      site   86274  lattices.py:5831:_evaluate_gram
+[  471.3s]      site   86274  lattices.py:5832:_evaluate_gram
+[  471.3s]      site   66081  modules.py:7148:_matrix_column_coordinates
+[  471.3s]      site   49307  framed_free_modules.py:1371:_span_basis_elements
+[  471.3s]      site   25004  framed_free_modules.py:1576:<genexpr>
+Timeout (0:00:20)!
+Thread 0x0000779ca6efb6c0 [Thread-1 (sampl] (most recent call first):
+  File "/probe.py", line 200 in sampler
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Thread 0x0000779e9ba4c780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/refine.py", line 424 in _is_bookkeeping_or_hook
+  File "/repos/sage-extensions/src/sage_extensions/refine.py", line 384 in _final_category_operations
+  File "/repos/sage-extensions/src/sage_extensions/refine.py", line 334 in owned_parent_class
+  File "/repos/sage-extensions/src/sage_extensions/refine.py", line 343 in _rebuild_parent_class
+  File "/repos/sage-extensions/src/sage_extensions/refine.py", line 517 in realize_owned_category
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py", line 964 in __init__
+  File "/repos/sage-extensions/src/sage_extensions/owned_category.py", line 834 in retaining_initializer
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py", line 1191 in __init__
+  File "/repos/sage-extensions/src/sage_extensions/owned_category.py", line 834 in retaining_initializer
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py", line 909 in __classcall__
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py", line 2268 in Of
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py", line 1126 in super_categories
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py", line 244 in _declared_category_reaches
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py", line 262 in <genexpr>
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py", line 261 in _minimal_inherited_homs
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py", line 2309 in Of
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py", line 2453 in _carves_the_same_mor
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py", line 2256 in <genexpr>
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py", line 2253 in Of
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py", line 2551 in super_categories
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py", line 244 in _declared_category_reaches
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py", line 197 in _arrow_is_inherited_from_subcategory
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py", line 1003 in _already_parented_arrow
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_foundation.py", line 53 in __call__
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py", line 1014 in __call__
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py", line 3462 in __call__
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/framed/finitely_generated/finitely_presented_modules.py", line 3262 in _presented_module_from_morphism
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/pure/modules.py", line 4426 in _call_
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/pure/modules.py", line 4387 in __call__
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/framed/framed_free_modules.py", line 588 in _represented_cokernel_of_morphism
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py", line 2600 in cokernel
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/pure/modules.py", line 4193 in is_primitive
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattices.py", line 9379 in primitive_isotropic_subobject
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py", line 2015 in transport_isotropic_object
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3483 in _plane_orbit_from_parabolic_stabilizer
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3706 in _subgroup_isotropic_orbit_representatives
+  File "/repos/sage-extensions/src/sage_extensions/timing.py", line 393 in timed
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 522 in isotropic_orbit_representatives
+  File "/probe.py", line 277 in main
+  File "/probe.py", line 304 in <module>
+[  486.4s]   sampled 345 times; leaf now indexed_families.py:value; to_vector=468151
+[  486.4s]      leaf   16  set_categories.py:_element_constructor_
+[  486.4s]      leaf   15  objects.py:__contains__
+[  486.4s]      leaf   14  ring_foundation.py:_element_constructor_
+[  486.4s]      site   90346  lattices.py:5831:_evaluate_gram
+[  486.5s]      site   90346  lattices.py:5832:_evaluate_gram
+[  486.5s]      site   68117  modules.py:7148:_matrix_column_coordinates
+[  486.5s]      site   53379  framed_free_modules.py:1371:_span_basis_elements
+[  486.5s]      site   27040  framed_free_modules.py:1576:<genexpr>
+[  501.6s]   sampled 360 times; leaf now framed_free_modules.py:_span_basis_elements; to_vector=486615
+[  501.6s]      leaf   16  set_categories.py:_element_constructor_
+[  501.6s]      leaf   15  objects.py:__contains__
+[  501.6s]      leaf   14  ring_foundation.py:_element_constructor_
+[  501.6s]      site   94450  lattices.py:5831:_evaluate_gram
+[  501.6s]      site   94450  lattices.py:5832:_evaluate_gram
+[  501.6s]      site   70169  modules.py:7148:_matrix_column_coordinates
+[  501.7s]      site   57483  framed_free_modules.py:1371:_span_basis_elements
+[  501.7s]      site   29090  framed_free_modules.py:1576:<genexpr>
+Timeout (0:00:20)!
+Thread 0x0000779ca6efb6c0 [Thread-1 (sampl] (most recent call first):
+  File "/probe.py", line 200 in sampler
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Thread 0x0000779e9ba4c780 [python] (most recent call first):
+  File "/sage/.venv/lib/python3.14/site-packages/sage/quadratic_forms/quadratic_form.py", line 786 in __getitem__
+  File "/sage/.venv/lib/python3.14/site-packages/sage/quadratic_forms/quadratic_form.py", line 1159 in Hessian_matrix
+  File "/sage/.venv/lib/python3.14/site-packages/sage/quadratic_forms/quadratic_form.py", line 1135 in matrix
+  File "/sage/.venv/lib/python3.14/site-packages/sage/quadratic_forms/quadratic_form.py", line 700 in __pari__
+  File "/sage/.venv/lib/python3.14/site-packages/sage/quadratic_forms/quadratic_form__local_field_invariants.py", line 240 in _rational_diagonal_form_and_transformation
+  File "/sage/.venv/lib/python3.14/site-packages/sage/quadratic_forms/quadratic_form__local_field_invariants.py", line 182 in rational_diagonal_form
+  File "/sage/.venv/lib/python3.14/site-packages/sage/quadratic_forms/quadratic_form__local_field_invariants.py", line 333 in signature_vector
+  File "/repos/sage-extensions/src/sage_extensions/categories/_lattice.py", line 1692 in _sylvester
+  File "/repos/sage-extensions/src/sage_extensions/categories/_lattice.py", line 1754 in _signature_pair_of_gram
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattices.py", line 10296 in _repr_
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/framed/framed_free_modules.py", line 1401 in _span_basis_elements
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattices.py", line 3998 in subobject_on
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattices.py", line 9378 in primitive_isotropic_subobject
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py", line 2015 in transport_isotropic_object
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3483 in _plane_orbit_from_parabolic_stabilizer
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3706 in _subgroup_isotropic_orbit_representatives
+  File "/repos/sage-extensions/src/sage_extensions/timing.py", line 393 in timed
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 522 in isotropic_orbit_representatives
+  File "/probe.py", line 277 in main
+  File "/probe.py", line 304 in <module>
+[  516.8s]   sampled 375 times; leaf now _lattice.py:_sylvester; to_vector=505161
+[  516.8s]      leaf   16  objects.py:__contains__
+[  516.8s]      leaf   16  set_categories.py:_element_constructor_
+[  516.8s]      leaf   16  _lattice.py:_sylvester
+[  516.8s]      site   98570  lattices.py:5831:_evaluate_gram
+[  516.8s]      site   98570  lattices.py:5832:_evaluate_gram
+[  516.9s]      site   72229  modules.py:7148:_matrix_column_coordinates
+[  516.9s]      site   61605  framed_free_modules.py:1371:_span_basis_elements
+[  516.9s]      site   31152  framed_free_modules.py:1576:<genexpr>
+Timeout (0:00:20)!
+Thread 0x0000779ca6efb6c0 [Thread-1 (sampl] (most recent call first):
+  File "/probe.py", line 200 in sampler
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Thread 0x0000779e9ba4c780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/owned_category.py", line 161 in mro
+  File "/sage/.venv/lib/python3.14/site-packages/sage/categories/homset.py", line 694 in __init__
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py", line 960 in __init__
+  File "/repos/sage-extensions/src/sage_extensions/owned_category.py", line 834 in retaining_initializer
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py", line 1191 in __init__
+  File "/repos/sage-extensions/src/sage_extensions/owned_category.py", line 834 in retaining_initializer
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py", line 909 in __classcall__
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py", line 2268 in Of
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py", line 1126 in super_categories
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py", line 244 in _declared_category_reaches
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py", line 262 in <genexpr>
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py", line 261 in _minimal_inherited_homs
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py", line 2309 in Of
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py", line 2453 in _carves_the_same_mor
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py", line 2256 in <genexpr>
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py", line 2253 in Of
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py", line 2551 in super_categories
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py", line 244 in _declared_category_reaches
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py", line 197 in _arrow_is_inherited_from_subcategory
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py", line 1003 in _already_parented_arrow
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_foundation.py", line 53 in __call__
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py", line 1014 in __call__
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py", line 3462 in __call__
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/framed/finitely_generated/finitely_presented_modules.py", line 3262 in _presented_module_from_morphism
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/pure/modules.py", line 4426 in _call_
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/pure/modules.py", line 4387 in __call__
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/framed/framed_free_modules.py", line 588 in _represented_cokernel_of_morphism
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py", line 2600 in cokernel
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/pure/modules.py", line 4193 in is_primitive
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattices.py", line 9379 in primitive_isotropic_subobject
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py", line 2015 in transport_isotropic_object
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3483 in _plane_orbit_from_parabolic_stabilizer
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3706 in _subgroup_isotropic_orbit_representatives
+  File "/repos/sage-extensions/src/sage_extensions/timing.py", line 393 in timed
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 522 in isotropic_orbit_representatives
+  File "/probe.py", line 277 in main
+  File "/probe.py", line 304 in <module>
+[  532.4s]   sampled 386 times; leaf now mor_foundation.py:_copy_operation_metadata; to_vector=518263
+[  532.4s]      leaf   17  set_categories.py:_element_constructor_
+[  532.4s]      leaf   16  objects.py:__contains__
+[  532.4s]      leaf   16  _lattice.py:_sylvester
+[  532.4s]      site  101482  lattices.py:5831:_evaluate_gram
+[  532.4s]      site  101482  lattices.py:5832:_evaluate_gram
+[  532.5s]      site   73685  modules.py:7148:_matrix_column_coordinates
+[  532.5s]      site   64515  framed_free_modules.py:1371:_span_basis_elements
+[  532.5s]      site   32608  framed_free_modules.py:1576:<genexpr>
+Timeout (0:00:20)!
+Thread 0x0000779ca6efb6c0 [Thread-1 (sampl] (most recent call first):
+  File "/probe.py", line 200 in sampler
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Thread 0x0000779e9ba4c780 [python] (most recent call first):
+  File "/sage/.venv/lib/python3.14/site-packages/sage/quadratic_forms/quadratic_form.py", line 786 in __getitem__
+  File "/sage/.venv/lib/python3.14/site-packages/sage/quadratic_forms/quadratic_form.py", line 1159 in Hessian_matrix
+  File "/sage/.venv/lib/python3.14/site-packages/sage/quadratic_forms/quadratic_form.py", line 1135 in matrix
+  File "/sage/.venv/lib/python3.14/site-packages/sage/quadratic_forms/quadratic_form.py", line 700 in __pari__
+  File "/sage/.venv/lib/python3.14/site-packages/sage/quadratic_forms/quadratic_form__local_field_invariants.py", line 240 in _rational_diagonal_form_and_transformation
+  File "/sage/.venv/lib/python3.14/site-packages/sage/quadratic_forms/quadratic_form__local_field_invariants.py", line 182 in rational_diagonal_form
+  File "/sage/.venv/lib/python3.14/site-packages/sage/quadratic_forms/quadratic_form__local_field_invariants.py", line 333 in signature_vector
+  File "/repos/sage-extensions/src/sage_extensions/categories/_lattice.py", line 1692 in _sylvester
+  File "/repos/sage-extensions/src/sage_extensions/categories/_lattice.py", line 1754 in _signature_pair_of_gram
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattices.py", line 10296 in _repr_
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/framed/framed_free_modules.py", line 1401 in _span_basis_elements
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattices.py", line 3998 in subobject_on
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py", line 1637 in image
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py", line 2002 in transport_isotropic_object
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3483 in _plane_orbit_from_parabolic_stabilizer
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3706 in _subgroup_isotropic_orbit_representatives
+  File "/repos/sage-extensions/src/sage_extensions/timing.py", line 393 in timed
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 522 in isotropic_orbit_representatives
+  File "/probe.py", line 277 in main
+  File "/probe.py", line 304 in <module>
+[  547.6s]   sampled 401 times; leaf now set_categories.py:__int__; to_vector=536929
+[  547.6s]      leaf   18  set_categories.py:_element_constructor_
+[  547.6s]      leaf   17  objects.py:__contains__
+[  547.6s]      leaf   16  set_categories.py:__call__
+[  547.6s]      site  105630  lattices.py:5831:_evaluate_gram
+[  547.7s]      site  105630  lattices.py:5832:_evaluate_gram
+[  547.7s]      site   75759  modules.py:7148:_matrix_column_coordinates
+[  547.7s]      site   68663  framed_free_modules.py:1371:_span_basis_elements
+[  547.7s]      site   34682  framed_free_modules.py:1576:<genexpr>
+Timeout (0:00:20)!
+Thread 0x0000779ca6efb6c0 [Thread-1 (sampl] (most recent call first):
+  File "/probe.py", line 200 in sampler
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Thread 0x0000779e9ba4c780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/objects.py", line 169 in __contains__
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py", line 2302 in _cardinality_decision
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py", line 2503 in cardinality
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/pure/modules.py", line 7929 in _coordinate_framed_free_module
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/pure/modules.py", line 7902 in _require_matrix_mor
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/pure/modules.py", line 7758 in _engine_matrix
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py", line 5337 in compose
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py", line 1986 in __mul__
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 2129 in _iter_splitting_isometries_in_im_rho_from_image
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3482 in _plane_orbit_from_parabolic_stabilizer
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3706 in _subgroup_isotropic_orbit_representatives
+  File "/repos/sage-extensions/src/sage_extensions/timing.py", line 393 in timed
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 522 in isotropic_orbit_representatives
+  File "/probe.py", line 277 in main
+  File "/probe.py", line 304 in <module>
+[  562.8s]   sampled 416 times; leaf now refine.py:_supply_participant_implementations; to_vector=555525
+[  562.8s]      leaf   18  set_categories.py:_element_constructor_
+[  562.8s]      leaf   17  objects.py:__contains__
+[  562.8s]      leaf   17  set_categories.py:__call__
+[  562.8s]      site  109762  lattices.py:5831:_evaluate_gram
+[  562.8s]      site  109762  lattices.py:5832:_evaluate_gram
+[  562.9s]      site   77825  modules.py:7148:_matrix_column_coordinates
+[  562.9s]      site   72797  framed_free_modules.py:1371:_span_basis_elements
+[  562.9s]      site   36748  framed_free_modules.py:1576:<genexpr>
+Fatal Python error: Segmentation fault
+
+Thread 0x0000779ca6efb6c0 (most recent call first):
+  File "/probe.py", line 200 in sampler
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Current thread 0x0000779e9ba4c780 (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/refine.py", line 399 in _declaring_classes
+  File "/repos/sage-extensions/src/sage_extensions/refine.py", line 379 in _final_category_operations
+  File "/repos/sage-extensions/src/sage_extensions/refine.py", line 334 in owned_parent_class
+  File "/repos/sage-extensions/src/sage_extensions/refine.py", line 343 in _rebuild_parent_class
+  File "/repos/sage-extensions/src/sage_extensions/refine.py", line 517 in realize_owned_category
+  File "/repos/sage-extensions/src/sage_extensions/refine.py", line 582 in refine
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattices.py", line 9393 in primitive_isotropic_subobject
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py", line 2015 in transport_isotropic_object
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3483 in _plane_orbit_from_parabolic_stabilizer
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3706 in _subgroup_isotropic_orbit_representatives
+  File "/repos/sage-extensions/src/sage_extensions/timing.py", line 393 in timed
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 522 in isotropic_orbit_representatives
+  File "/probe.py", line 277 in main
+  File "/probe.py", line 304 in <module>
+
+Current thread's C stack trace (most recent call first):
+  Binary file "/sage/.venv/bin/python", at _Py_DumpStack+0x30 [0x12acbb0]
+  Binary file "/sage/.venv/bin/python" [0x131c2ab]
+  Binary file "/sage/.venv/bin/python" [0x131c1f7]
+  Binary file "/lib/x86_64-linux-gnu/libc.so.6", at +0x3fd70 [0x779e9ba8ed70]
+  Binary file "/lib/x86_64-linux-gnu/libc.so.6", at +0xa06a6 [0x779e9baef6a6]
+  Binary file "/lib/x86_64-linux-gnu/libc.so.6", at +0xa1eeb [0x779e9baf0eeb]
+  Binary file "/lib/x86_64-linux-gnu/libc.so.6", at malloc+0xfe [0x779e9baf19ce]
+  Binary file "/sage/.venv/bin/python" [0x1801f09]
+  Binary file "/sage/.venv/bin/python" [0x1830db5]
+  Binary file "/sage/.venv/bin/python" [0x1925e63]
+  Binary file "/sage/.venv/bin/python" [0x192593b]
+  Binary file "/sage/.venv/bin/python" [0x1809f0d]
+  Binary file "/sage/.venv/bin/python" [0x1817bc6]
+  Binary file "/sage/.venv/lib/python3.14/site-packages/sage/misc/cachefunc.cpython-314-x86_64-linux-gnu.so", at +0x17ce1 [0x779e99f48ce1]
+  Binary file "/sage/.venv/lib/python3.14/site-packages/sage/cpython/string.cpython-314-x86_64-linux-gnu.so", at +0x53cd [0x779e9b6843cd]
+  Binary file "/sage/.venv/bin/python" [0x1ac3558]
+  Binary file "/sage/.venv/lib/python3.14/site-packages/sage/misc/cachefunc.cpython-314-x86_64-linux-gnu.so", at +0x109af [0x779e99f419af]
+  Binary file "/sage/.venv/lib/python3.14/site-packages/sage/misc/cachefunc.cpython-314-x86_64-linux-gnu.so", at +0x49907 [0x779e99f7a907]
+  Binary file "/sage/.venv/bin/python" [0x1822fe1]
+  Binary file "/sage/.venv/bin/python" [0x1892a83]
+  Binary file "/sage/.venv/bin/python", at PyEval_EvalCode+0xa6 [0x18936bc]
+  Binary file "/sage/.venv/bin/python" [0x1929339]
+  Binary file "/sage/.venv/bin/python" [0x1a7109b]
+  Binary file "/sage/.venv/bin/python" [0x1a70c41]
+  Binary file "/sage/.venv/bin/python" [0x19835c6]
+  Binary file "/sage/.venv/bin/python" [0x198350e]
+  Binary file "/sage/.venv/bin/python" [0x198341d]
+  Binary file "/sage/.venv/bin/python", at Py_RunMain+0x40c [0x198404c]
+  Binary file "/sage/.venv/bin/python" [0x1983c16]
+  Binary file "/sage/.venv/bin/python" [0x1983a70]
+  Binary file "/lib/x86_64-linux-gnu/libc.so.6", at +0x29ca8 [0x779e9ba78ca8]
+  Binary file "/lib/x86_64-linux-gnu/libc.so.6", at __libc_start_main+0x85 [0x779e9ba78d65]
+  <truncated rest of calls>
+
+Extension modules: tree_sitter_sage._binding, wcwidth._wcwidth_c, sage.cpython.string, sage.misc.instancedoc, sage.misc.lazy_import, sage.misc.lazy_attribute, sage.misc.persist, sage.structure.sage_object, sage.misc.nested_class, sage.misc.classcall_metaclass, sage.misc.inherit_comparison, sage.cpython.getattr, sage.categories.category_cy_helper, sage.misc.function_mangling, sage.cpython.dict_del_by_value, sage.misc.weak_dict, sage.misc.cachefunc, sage.misc.c3_controlled, sage.misc.fast_methods, sage.cpython.builtin_types, sage.structure.richcmp, sage.structure.category_object, cysignals.signals, sage.structure.coerce_dict, sage.arith.power, sage.categories.morphism, sage.categories.map, sage.structure.debug_options, sage.misc.lazy_string, sage.categories.category_singleton, sage.categories.functor, sage.misc.constant_function, sage.sets.pythonclass, gmpy2.gmpy2, sage.categories.action, sage.structure.coerce, sage.structure.coerce_maps, sage.cpython.type, sage.structure.parent, sage.structure.element, sage.rings.fast_arith, sage.libs.gmp.pylong, sage.misc.randstate, sage.categories.coercion_methods, sage.misc.misc_c, sage.rings.ring, sage.rings.number_field.number_field_base, sage.rings.abc, sage.misc.allocator, sage.arith.functions, cypari2.stack, cypari2.string_utils, cypari2.convert, cypari2.closure, cypari2.gen, cypari2.handle_error, cypari2.pari_instance, cypari2.custom_block, sage.rings.rational, sage.arith.rational_reconstruction, sage.rings.number_field.number_field_element_base, sage.rings.integer_ring, sage.rings.integer, sage.arith.srange, sage.misc.fpickle, sage.symbolic.function, sage.misc.derivative, sage.rings.real_double_element_gsl, sage.rings.real_double, sage.rings.complex_conversion, sage.ext.memory, sage.libs.pari.convert_sage_complex_double, sage.misc.parser, sage.rings.complex_double, sage.rings.complex_mpfr, sage.libs.mpmath.utils, sage.libs.pari.convert_sage_real_mpfr, sage.rings.real_mpfr, sage.structure.parent_gens, sage.structure.mutability, sage.structure.element_wrapper, sage.rings.morphism, sage.symbolic.expression, sage.symbolic.ring, sage.calculus.var, sage.matrix.args, sage.modules.free_module_element, sage.modules.module, sage.rings.finite_rings.element_base, sage.rings.finite_rings.finite_field_base, sage.structure.factory, sage.structure.coerce_actions, sage.matrix.constructor, sage.sets.family, sage.structure.list_clone, sage.cpython.debug, sage.misc.sage_timeit_class, sage.misc.session, sage.misc.reset, sage.libs.ntl.error, sage.libs.ntl.convert, sage.libs.ntl.ntl_ZZ, sage.libs.ntl.ntl_ZZ_pContext, sage.libs.ntl.ntl_ZZ_p, sage.libs.ntl.ntl_ZZX, sage.libs.ntl.ntl_ZZ_pX, sage.libs.ntl.ntl_ZZ_pEContext, sage.libs.ntl.ntl_ZZ_pE, sage.libs.ntl.ntl_ZZ_pEX, sage.libs.ntl.ntl_lzz_pContext, sage.rings.finite_rings.integer_mod, sage.libs.ntl.ntl_lzz_p, sage.libs.ntl.ntl_lzz_pX, sage.libs.ntl.ntl_mat_ZZ, sage.libs.ntl.ntl_GF2, sage.libs.ntl.ntl_GF2X, sage.libs.ntl.ntl_GF2EContext, sage.libs.ntl.ntl_GF2E, sage.libs.ntl.ntl_GF2EX, sage.libs.ntl.ntl_mat_GF2E, sage.libs.ntl.ntl_mat_GF2, sage.libs.symmetrica.symmetrica, memory_allocator.memory_allocator, sage.data_structures.bitset_base, sage.data_structures.bitset, sage.rings.polynomial.commutative_polynomial, sage.misc.binary_tree, sage.rings.polynomial.polynomial_compiled, sage.rings.polynomial.polydict, sage.rings.padics.pow_computer, sage.rings.padics.local_generic_element, sage.rings.padics.padic_generic_element, sage.rings.padics.common_conversion, sage.libs.pari.convert_gmp, sage.rings.padics.padic_capped_relative_element, sage.rings.padics.padic_capped_absolute_element, sage.rings.padics.padic_floating_point_element, sage.rings.padics.padic_fixed_mod_element, sage.rings.polynomial.multi_polynomial, sage.rings.fraction_field_element, sage.rings.function_field.element, sage.rings.function_field.element_rational, sage.rings.power_series_ring_element, sage.rings.polynomial.multi_polynomial_ring_base, sage.rings.polynomial.polynomial_element, sage.rings.finite_rings.element_pari_ffelt, sage.rings.finite_rings.element_givaro, sage.rings.convert.mpfi, sage.rings.real_mpfi, sage.rings.complex_interval, sage.rings.real_lazy, sage.rings.number_field.number_field_morphisms, sage.rings.polynomial.evaluation_ntl, sage.rings.number_field.number_field_element, sage.rings.real_arb, sage.rings.polynomial.polynomial_complex_arb, sage.rings.complex_arb, sage.rings.number_field.number_field_element_quadratic, sage.groups.group, sage.rings.finite_rings.residue_field, sage.rings.padics.padic_printing, sage.rings.padics.padic_ext_element, sage.rings.padics.pow_computer_ext, sage.rings.padics.padic_ZZ_pX_element, sage.rings.padics.padic_ZZ_pX_FM_element, sage.rings.padics.padic_ZZ_pX_CR_element, sage.rings.padics.padic_ZZ_pX_CA_element, sage.libs.flint.fmpz_poly_sage, sage.rings.polynomial.evaluation_flint, sage.rings.polynomial.polynomial_integer_dense_flint, sage.rings.padics.pow_computer_flint, sage.rings.padics.qadic_flint_CR, sage.rings.padics.qadic_flint_CA, sage.rings.padics.qadic_flint_FP, sage.rings.padics.qadic_flint_FM, sage.rings.padics.pow_computer_relative, sage.rings.padics.relative_ramified_CR, sage.rings.padics.relative_ramified_CA, sage.rings.padics.relative_ramified_FP, sage.rings.padics.relative_ramified_FM, sage.rings.semirings.tropical_semiring, sage.rings.polynomial.laurent_polynomial, sage.rings.polynomial.cyclotomic, sage.libs.flint.fmpq_poly_sage, sage.rings.polynomial.polynomial_rational_flint, sage.rings.power_series_poly, sage.rings.power_series_mpoly, sage.rings.laurent_series_ring_element, sage.rings.finite_rings.element_ntl_gf2e, sage.libs.singular.ring, sage.libs.singular.singular, sage.libs.singular.polynomial, sage.rings.noncommutative_ideals, sage.rings.polynomial.plural, sage.rings.polynomial.multi_polynomial_ideal_libsingular, sage.libs.singular.option, sage.libs.singular.function, sage.rings.polynomial.multi_polynomial_libsingular, sage.rings.complex_mpc, sage.rings.tate_algebra_element, sage.rings.puiseux_series_ring_element, sage.rings.bernmm, sage.rings.bernoulli_mod_p, sage.combinat.combinat_cython, sage.monoids.free_abelian_monoid_element, sage.sets.recursively_enumerated_set, sage.combinat.integer_lists.base, sage.combinat.integer_lists.invlex, sage.combinat.permutation_cython, sage.combinat.partitions, sage.libs.flint.arith_sage, sage.matrix.matrix0, sage.matrix.matrix1, sage.matrix.matrix2, sage.matrix.matrix_dense, sage.modules.vector_integer_dense, sage.arith.multi_modular, sage.rings.polynomial.polynomial_zmod_flint, sage.matrix.matrix_modn_dense_flint, sage.modules.vector_modn_dense, sage.matrix.matrix_modn_dense_float, sage.matrix.matrix_modn_dense_double, sage.modules.vector_mod2_dense, sage.matrix.matrix_mod2_dense, sage.libs.pari.convert_flint, sage.libs.linbox.linbox_flint_interface, sage.libs.pari.convert_sage, sage.libs.pari.convert_sage_matrix, sage.matrix.matrix_integer_dense, sage.modules.vector_rational_dense, sage.matrix.matrix_rational_dense, sage.algebras.quatalg.quaternion_algebra_element, sage.algebras.quatalg.quaternion_algebra_cython, sage.combinat.words.word_datatypes, sage.combinat.words.word_char, sage.misc.search, sage.modular.modsym.p1list, sage.quadratic_forms.quadratic_form__evaluate, sage.quadratic_forms.count_local_2, sage.data_structures.blas_dict, sage.modules.with_basis.indexed_element, sage.misc.lazy_list, sage.misc.callable_dict, sage.algebras.finite_dimensional_algebras.finite_dimensional_algebra_element, sage.algebras.clifford_algebra_element, sage.libs.gap.util, sage.libs.gap.libgap, sage.libs.gap.element, sage.groups.libgap_wrapper, sage.groups.matrix_gps.group_element_gap, sage.groups.matrix_gps.group_element, sage.modular.arithgroup.arithgroup_element, sage.modular.arithgroup.congroup, sage.modular.arithgroup.farey_symbol, sage.rings.polynomial.ore_polynomial_element, sage.rings.factorint, sage.data_structures.pairing_heap, sage.graphs.base.c_graph, sage.graphs.base.graph_backends, sage.graphs.base.dense_graph, sage.graphs.base.static_sparse_graph, sage.graphs.base.static_sparse_backend, sage.graphs.generic_graph_pyx, sage.graphs.views, sage.graphs.base.boost_graph, sage.graphs.base.static_dense_graph, sage.groups.perm_gps.partn_ref.data_structures, sage.sets.disjoint_set, sage.graphs.connectivity, sage.graphs.distances_all_pairs, sage.graphs.line_graph, sage.graphs.path_enumeration, sage.graphs.graph_decompositions.slice_decomposition, sage.graphs.traversals, sage.graphs.independent_sets, sage.graphs.weakly_chordal, sage.graphs.asteroidal_triples, sage.graphs.graph_decompositions.tree_decomposition, sage.graphs.graph_decompositions.fast_digraph, sage.graphs.graph_decompositions.vertex_separation, sage.graphs.graph_decompositions.clique_separators, sage.graphs.graph_decompositions.bandwidth, sage.graphs.graph_decompositions.cutwidth, sage.graphs.spanning_tree, sage.graphs.graph_decompositions.graph_products, sage.graphs.comparability, sage.graphs.isoperimetric_inequalities, sage.graphs.graph_coloring, sage.graphs.hyperbolicity, sage.graphs.chrompoly, sage.graphs.graph_decompositions.rankwidth, sage.graphs.matchpoly, sage.graphs.cliquer, sage.numerical.backends.generic_backend, sage.graphs.convexity_properties, sage.groups.perm_gps.permgroup_element, sage.sets.finite_set_map_cy, sage.probability.probability_distribution, sage.functions.prime_pi, sage.ext.fast_callable, interpreters.wrapper_rdf, sage.ext.interpreters.wrapper_rdf, sage.calculus.integration, sage.calculus.interpolation, sage.calculus.ode, sage.crypto.boolean_function, sage.crypto.sbox, sage.ext.fast_eval, sage.plot.plot3d.transform, sage.plot.plot3d.base, sage.plot.plot3d.index_face_set, sage.plot.plot3d.parametric_surface, sage.plot.plot3d.shapes, sage.combinat.expnums, sage.combinat.debruijn_sequence, sage.combinat.set_partition_iterator, sage.combinat.posets.hasse_cython, sage.geometry.toric_lattice_element, sage.geometry.point_collection, sage.geometry.abc, sage.combinat.enumeration_mod_permgroup, sage.geometry.triangulation.base, cysignals.alarm, cysignals.pselect, cysignals.pysignals, sage.interfaces.process, sage.dynamics.arithmetic_dynamics.projective_ds_helper, sage.quadratic_forms.ternary, sage.matrix.matrix_generic_dense, sage.groups.semimonomial_transformations.semimonomial_transformation, sage.matrix.matrix_sparse, sage.data_structures.binary_search, sage.modules.vector_rational_sparse, sage.modules.vector_integer_sparse, sage.matrix.matrix_rational_sparse, sage.modules.vector_modn_sparse, sage.matrix.matrix_modn_sparse, sage.matrix.matrix_integer_sparse, sage.combinat.root_system.reflection_group_c, sage.combinat.root_system.reflection_group_element, sage.arith.numerical_approx, numpy._core._multiarray_umath, numpy.linalg._umath_linalg, sage.matrix.action, sage.matrix.matrix_numpy_dense, sage.matrix.matrix_double_dense, sage.matrix.matrix_real_double_dense, sage.libs.flint.ulong_extras_sage, sage.graphs.base.sparse_graph, sage.rings.finite_rings.hom_finite_field, cython.cimports.libc.math, _cyutility, scipy._cyutility, scipy._lib._ccallback_c, scipy.linalg._fblas, scipy.linalg._flapack, scipy.linalg._batched_linalg, numpy.random._common, numpy.random.bit_generator, numpy.random._bounded_integers, numpy.random._pcg64, numpy.random._generator, numpy.random._mt19937, numpy.random._philox, numpy.random._sfc64, numpy.random.mtrand, charset_normalizer.md, charset_normalizer.cd, scipy.linalg._cythonized_array_utils, scipy.linalg._solve_toeplitz, scipy.linalg._internal_matfuncs, scipy.linalg._linalg_pythran, scipy.linalg.cython_blas, scipy.linalg.cython_lapack, scipy.linalg._decomp_update, sage.modules.vector_numpy_dense, sage.modules.vector_double_dense, sage.modules.vector_real_double_dense, PyNormaliz_cpp, sage.graphs.bliss, ppl.congruence, ppl.constraint, ppl.linear_algebra, ppl.generator, ppl.mip_problem, ppl.polyhedron, ppl.bit_arrays, sage.modules.numpy_util (total: 388)
+------------------------------------------------------------------------
+/sage/.venv/lib/python3.14/site-packages/cysignals/signals.cpython-314-x86_64-linux-gnu.so(+0x86e5) [0x779e99d836e5]
+/sage/.venv/lib/python3.14/site-packages/cysignals/signals.cpython-314-x86_64-linux-gnu.so(+0x8786) [0x779e99d83786]
+/sage/.venv/lib/python3.14/site-packages/cysignals/signals.cpython-314-x86_64-linux-gnu.so(+0x8b54) [0x779e99d83b54]
+/lib/x86_64-linux-gnu/libc.so.6(+0x3fd70) [0x779e9ba8ed70]
+/lib/x86_64-linux-gnu/libc.so.6(+0x9469c) [0x779e9bae369c]
+/lib/x86_64-linux-gnu/libc.so.6(gsignal+0x12) [0x779e9ba8ec42]
+/sage/.venv/bin/python() [0x131c213]
+/lib/x86_64-linux-gnu/libc.so.6(+0x3fd70) [0x779e9ba8ed70]
+/lib/x86_64-linux-gnu/libc.so.6(+0xa06a6) [0x779e9baef6a6]
+/lib/x86_64-linux-gnu/libc.so.6(+0xa1eeb) [0x779e9baf0eeb]
+/lib/x86_64-linux-gnu/libc.so.6(malloc+0xfe) [0x779e9baf19ce]
+/sage/.venv/bin/python() [0x1801f09]
+/sage/.venv/bin/python() [0x1830db5]
+/sage/.venv/bin/python() [0x1925e63]
+/sage/.venv/bin/python() [0x192593b]
+/sage/.venv/bin/python() [0x1809f0d]
+/sage/.venv/bin/python() [0x1817bc6]
+/sage/.venv/lib/python3.14/site-packages/sage/misc/cachefunc.cpython-314-x86_64-linux-gnu.so(+0x17ce1) [0x779e99f48ce1]
+/sage/.venv/lib/python3.14/site-packages/sage/cpython/string.cpython-314-x86_64-linux-gnu.so(+0x53cd) [0x779e9b6843cd]
+/sage/.venv/bin/python() [0x1ac3558]
+/sage/.venv/lib/python3.14/site-packages/sage/misc/cachefunc.cpython-314-x86_64-linux-gnu.so(+0x109af) [0x779e99f419af]
+/sage/.venv/lib/python3.14/site-packages/sage/misc/cachefunc.cpython-314-x86_64-linux-gnu.so(+0x49907) [0x779e99f7a907]
+/sage/.venv/bin/python() [0x1822fe1]
+/sage/.venv/bin/python() [0x1892a83]
+/sage/.venv/bin/python(PyEval_EvalCode+0xa6) [0x18936bc]
+/sage/.venv/bin/python() [0x1929339]
+/sage/.venv/bin/python() [0x1a7109b]
+/sage/.venv/bin/python() [0x1a70c41]
+/sage/.venv/bin/python() [0x19835c6]
+/sage/.venv/bin/python() [0x198350e]
+/sage/.venv/bin/python() [0x198341d]
+/sage/.venv/bin/python(Py_RunMain+0x40c) [0x198404c]
+/sage/.venv/bin/python() [0x1983c16]
+/sage/.venv/bin/python() [0x1983a70]
+/lib/x86_64-linux-gnu/libc.so.6(+0x29ca8) [0x779e9ba78ca8]
+/lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0x85) [0x779e9ba78d65]
+/sage/.venv/bin/python(_start+0x29) [0x19f75e9]
+------------------------------------------------------------------------
+[peakrss] probe528slice: child waited=124 shell_code=124 samples=285
+[peakrss] peak tree RSS      : 4373 MiB
+[peakrss] low-water MemAvail : 9086 MiB
+[peakrss] peak single VmHWM  : 4373 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     4362 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   568.3s procs=  3 rss=  4373 MiB hwm=  4373 MiB avail=  9656 MiB
+[peakrss]   t=   566.3s procs=  3 rss=  4350 MiB hwm=  4350 MiB avail=  9673 MiB
+[peakrss]   t=   564.3s procs=  3 rss=  4328 MiB hwm=  4328 MiB avail=  9689 MiB
+[peakrss]   t=   562.3s procs=  3 rss=  4306 MiB hwm=  4306 MiB avail=  9699 MiB
+[peakrss]   t=   560.3s procs=  3 rss=  4283 MiB hwm=  4283 MiB avail=  9702 MiB
