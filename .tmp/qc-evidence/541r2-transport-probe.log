@@ -1,0 +1,22 @@
+=== tree: 3a3440f0db46e3f603206e3ca87750163f51cf51 (modified paths: 1)
+=== port: 991b88b095a42a1e3679569ea42328c900c120f6
+=== load: 4.56 3.81 3.28 4/386 2364018
+=== command: sage-image/run.sh -w /work, probe probe541transport.py at /probe.py, inner 540 s, outer 570 s
+generators: e_0: q=0, e_1: q=0, e_2: q=0, e_3: q=0
+pairings: [[0, 1, 0, 0], [1, 0, 0, 0], [0, 0, 0, 1], [0, 0, 1, 0]]
+plane Integral lattice of rank 2 and signature (0, 0): rank 2, primitive True
+isometry moves the plane to the span of e_2 and e_1
+span constructions for one transport: 1
+moved: rank 2, primitive True
+the images lie in it: True, True
+a vector outside the image is outside it: False
+transport on U+U: median 0.10 ms over 20
+[peakrss] run: child waited=0 shell_code=0 samples=1
+[peakrss] peak tree RSS      : 8 MiB
+[peakrss] low-water MemAvail : 12887 MiB
+[peakrss] peak single VmHWM  : 9 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   run.sh                        1 MiB peak
+[peakrss]   t=     0.0s procs=  2 rss=     8 MiB hwm=     9 MiB avail= 12887 MiB
+=== launcher exit: 0

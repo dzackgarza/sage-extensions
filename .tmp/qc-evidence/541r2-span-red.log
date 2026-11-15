@@ -1,0 +1,43 @@
+=== ran on: 4c9e42cda0dbf984b450ae5857d416be342b69c4 (1 modified paths)
+=== command: pytest tests/lattices/test_a_plane_transport_builds_one_span.sage -o addopts= -p qc_sage_session -p sage_extensions.testing.test_lint
+F                                                                        [100%]
+=================================== FAILURES ===================================
+________________ test_transporting_a_plane_builds_its_span_once ________________
+
+    def test_transporting_a_plane_builds_its_span_once() -> None:
+        r"""One span per transport, and the plane it returns is the image of the basis.
+    
+        \(U\oplus U\) has basis \(e_1,f_1,e_2,f_2\) with \(b(e_i,f_i)=1\) and
+        \(q(e_i)=q(f_i)=0\).  Both \(\langle e_1,f_2\rangle\) and its image under
+        the summand swap \(\langle e_2,f_1\rangle\) are primitive totally isotropic
+        planes, and \(e_1\) lies in the first and not in the second.
+        """
+        lattice = Lattices(ZZ)("U") + Lattices(ZZ)("U")
+        e1, f1, e2, f2 = lattice.module_generators()
+        plane = lattice.primitive_isotropic_subobject(e1, f2)
+        images = {0: e2, 1: f2, 2: e1, 3: f1}
+        isometry = lattice.Isom(lattice)(lambda label: images[int(label)])
+    
+        constructing = Lattices(ZZ).ParentMethods
+        original = constructing.subobject_on
+        built = []
+    
+        def counted(self, generating_set):
+            built.append(1)
+            return original(self, generating_set)
+    
+        constructing.subobject_on = counted
+        moved = isometry.transport_isotropic_object(plane)
+        constructing.subobject_on = original
+    
+>       assert tuple(built) == (1,)
+E       assert (1, 1) == (1,)
+E         
+E         Left contains one more item: 1
+E         Use -v to get more diff
+
+tests/lattices/test_a_plane_transport_builds_one_span.sage:44: AssertionError
+=========================== short test summary info ============================
+FAILED tests/lattices/test_a_plane_transport_builds_one_span.sage::test_transporting_a_plane_builds_its_span_once
+1 failed in 1.40s
+=== exit: 1

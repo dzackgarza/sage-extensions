@@ -2458,3 +2458,38 @@ previous round's 14.6 and 18.9 ms is the transport's -0.66 ms a plane on a plane
 whose 14 ms are mostly the walk (the transport is 2.3 of them).  So the row at
 low load is **292.3 s to the first plane and 72.0 planes/s**, and the census, not
 the row, is the measurement of the repair.
+
+## The review round's second pass (#541, 2026-11-15/16)
+
+Commands are the previous section's: the same image, the same blanked `addopts`,
+`-p qc_sage_session`, and `-p sage_extensions.testing.test_lint` where the lint
+was loaded.  The comparison rule is the same: diff FAILED ids against a clean
+worktree at the base commit, never absolute counts.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `541r2-description-red.log` | `4c9e42cda0` | the description contract of this round on the tree before the repair: **2 failed** -- a second read renders the name again (`assert (1, 1) == (1,)`), and a filtered subset's display returns the description function itself (`assert <function ...> == "the even numbers below six"`) |
+| `541r2-subobject-red.log` | `dad9e44187` | the span-basis contract on the tree before `18b34bd`: **1 failed**, `assert (1, 1) == (1,)` -- building `L.subobject_on` rendered the ambient lattice, and the test renders the lattice once by hand to show its guard is live |
+| `541r2-green.log` | `3a3440f` | the description file with the subobject file: **3 passed in 1.18 s**, test lint loaded, 0 findings |
+| `541r2-green-final.log` | `acbce0b` + the annotation | the three files of this round (description, subobject, one-span transport): **4 passed in 1.88 s**, test lint loaded |
+| `541r2-sets-base.log`, `541r2-sets.log` | `4c9e42cda0` / `3a3440f` | `tests/sets`: 10 failed, **66 passed** and 102 errors against 10 failed, **67 passed** and 102 errors; FAILED/ERROR id sets identical, and the extra pass is the new filtered-subset test |
+| `541r2-modules-base.log`, `541r2-modules.log` | same | `tests/modules`, where the span bases are consumed: 68 failed, 177 passed, 69 errors on both trees, FAILED/ERROR id sets identical |
+| `541r2-span-red.log`, `541r2-span-green.log` | `4c9e42cda0` / `acbce0b` | one transport of the plane `<e_1, f_2>` of `U (+) U` by the summand swap: **2 span constructions -> 1**; red is `assert (1, 1) == (1,)`, green asserts the images of the basis lie in the transported plane and `e_1` does not |
+| `541r2-transport-consumers-base.log`, `541r2-transport-consumers.log` | same | the four lattice files that transport planes (partial flag orbits, parabolic retention, line transporter, cusp lattices): 8 failed, 11 passed on both trees, FAILED id sets identical |
+| `541r2-transport-probe.log` | `acbce0b` | the transport probe on `U (+) U`: **1** span construction a transport, the images of the basis in the moved plane, `e_1` outside it |
+| `541r2-step-census.log` | `3a3440f` (before the transport repair) | the census of one coset step in the row itself, `setprofile` window at plane 150 at load **2.27**: interval between transports **12.86 ms** median, inside `transport_isotropic_object` **11.36 ms**, outside it **1.50 ms**; profiled, `primitive_isotropic_subobject` 43.7 and `ModuleMorphismMethods.image` 23.1 of the transport's 72.8 ms inclusive, `subobject_on` **2.0 calls a plane**, `_MorCategoryOf.Of` 129.6 calls |
+| `541r2-row.log` | `acbce0b` | the row once at load average **0.86 2.66 2.92** on 4 CPUs (the lowest of the round), inner cap 540 s: **first plane at 309.6 s**, **19 000 planes by 534.7 s = 84.4 planes/s, 11.9 ms a plane**, the interval between transports a median of **9.17 ms early and 9.68 ms by plane 19 000** as RSS grows to 4.4 GiB, and **one span construction a plane** (19 447 for 19 000 planes, the 447 before the loop) |
+| `541r2-calibration.log` | `1e3da25` | the fixed-work calibration of the previous section, run in its own process at load **1.54 2.09 2.41**: **0.362 s**, the same number as the previous round's row, so the two rows' rates are on one machine speed |
+
+What the second pass measured.  The census contradicts the premise that the
+walk is the per-plane cost: `splitting_isometries` materialises its lifts before
+the first plane, and after it the step outside `transport_isotropic_object` is
+1.50 ms while the transport is 11.36 ms.  Inside the transport the plane's span
+was built twice -- once by `(self * obj.inclusion()).image()`, whose subobject
+the transport only read the basis of, and once by
+`primitive_isotropic_subobject`, where the plane is admitted -- so the repair
+removes one of the two.  Against the pre-repair median interval of 12.86 ms the
+post-repair early median is 9.17 ms (-29%, matching the image's 23.1 of 72.8 ms
+profiled), and against the previous round's 13.9 ms mean at the same 0.362 s
+calibration this round's mean is 11.9 ms.  The walk is unchanged: 309.6 s here
+against 292.3 s there, at a higher load.
