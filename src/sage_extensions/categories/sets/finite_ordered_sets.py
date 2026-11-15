@@ -85,7 +85,7 @@ class OrderedEnumeratedSets(OwnedCategory):
         index_of: Callable[[PointT], IndexT | None],
         contains: Callable[[PointT], bool] | None = None,
         equivalent: Callable[[PointT, PointT], bool] | None = None,
-        name: str | None = None,
+        name: str | Callable[[], str] | None = None,
     ) -> Sets().ObjectType:
         r"""Construct an ordered enumerated set from its chosen enumeration."""
         assert index_set in EnumeratedSets(), (
@@ -119,7 +119,7 @@ class OrderedEnumeratedSets(OwnedCategory):
             index_of: Callable[[PointT], IndexT | None],
             contains: Callable[[PointT], bool] | None = None,
             equivalent: Callable[[PointT, PointT], bool] | None = None,
-            name: str | None = None,
+            name: str | Callable[[], str] | None = None,
             **rest,
         ) -> None:
             assert callable(element_at), (
@@ -257,9 +257,19 @@ class OrderedEnumeratedSets(OwnedCategory):
                 return point
             raise ValueError(f"{self} is empty, so it has no element")
 
+        def description(self):
+            r"""What this set was named with, rendered now.
+
+            A name given as a function is a description of the set's source, and
+            rendering it is the reader's act: the set asks it here and not at
+            construction, so building the set computes no display.
+            """
+            return self._name() if callable(self._name) else self._name
+
         def _repr_(self) -> str:
             size = cardinal(self.cardinality())
-            prefix = f"{self._name} = " if self._name else ""
+            described = self.description()
+            prefix = f"{described} = " if described else ""
             if size.is_finite():
                 count = int(size.finite_value())
                 shown = tuple(self) if count <= 12 else tuple(islice(self, 6))
@@ -371,7 +381,7 @@ class FiniteOrderedSets(OwnedCategory):
         index_of: Callable[[PointT], IndexT | None] | None = None,
         contains: Callable[[PointT], bool] | None = None,
         equivalent: Callable[[PointT, PointT], bool] | None = None,
-        name: str | None = None,
+        name: str | Callable[[], str] | None = None,
     ) -> ObjectOfCategory:
         r"""Construct the finite ordered set enumerated by ``element_at`` on ``index_set``.
 
