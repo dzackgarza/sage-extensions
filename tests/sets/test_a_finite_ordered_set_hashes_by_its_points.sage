@@ -1,27 +1,12 @@
-r"""A finite ordered set hashes the data it compares: its points, in order (#531).
+r"""A finite ordered set hashes its points, in order, and nothing weaker (#531).
 
-:meth:`FiniteOrderedSets.ParentMethods.__eq__` decides equality of two finite
-ordered sets by their cardinality and then their points, in order, point by
-point.  A hash must be a function of that same data: Python's data model states
-the one required property, "objects which compare equal have the same hash
-value" (Python 3.14 documentation, *Data model*, ``object.__hash__``), and a
-hash that ignores what equality reads does not merely collide -- it puts every
-set of one cardinality in one bucket, so every dictionary keyed by such a set
-compares its stored keys one by one.
-
-That is what #390 measured on the rank-5 lattice below: the span bases
-``_lattice_subobject_spanning`` is keyed by are finite ordered sets of lattice
-vectors, the cache reached 1197 entries on 5 hash values, and one lookup
-compared 5415 stored keys of 51 us each in the last window of the run
-(``.tmp/qc-evidence/issue390-subobject-scan.log``, 335226fc95).
-
-The statement here is the contract and its quantitative form on span bases of
-one rank: two equal sets hash equally, and distinct sets of one cardinality do
-not share a hash.  Distinct contents give distinct hashes with the probability
-of a collision in Python's 64-bit hash, which for ``N = 200`` sets is
-``N(N-1)/2 * 2^-64`` about ``1e-15`` pairs: the assertion that all 200 values
-are distinct is therefore not a flake but a statement about the hash reaching
-the points, and it fails outright for a hash of the cardinality alone.
+:meth:`FiniteOrderedSets.ParentMethods.__hash__` is ``hash(tuple(self))``, which
+is the data :meth:`__eq__` compares: two equal sets hash equally, two distinct
+sets of one cardinality hash apart on their points, and a set carrying a point
+that refuses a hash refuses one too.  The span bases below are the finite ordered
+sets the cache of ``_lattice_subobject_spanning`` is keyed by (#390), and a
+64-bit hash of 200 distinct contents collides on no pair short of probability
+``1e-15``, so the count of distinct values is an assertion and not a tolerance.
 """
 
 from sage_extensions.all import *  # noqa: F401,F403

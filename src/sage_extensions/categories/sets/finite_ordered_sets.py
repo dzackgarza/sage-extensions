@@ -613,9 +613,8 @@ class FiniteOrderedSets(OwnedCategory):
         def __hash__(self) -> int:
             r"""Return the hash of the tuple of the points, which is what :meth:`__eq__` compares.
 
-            A set carrying a point that refuses a hash is unhashable, as the
-            tuple of those points is, rather than a key weaker than the
-            equality it stands for.
+            A set carrying a point that refuses a hash is unhashable, as the tuple
+            of those points is.
             """
             return hash(tuple(self))
 
