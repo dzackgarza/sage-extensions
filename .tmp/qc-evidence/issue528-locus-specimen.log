@@ -1,0 +1,213 @@
+tree SHA: fed237beab614867dcbec17b4a5eae9c56b20320 (detached worktree of refs/remotes/omm/main)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+probe: .tmp/qc-evidence/issue528-locus-specimen.py
+command: /workspace/nucleus/work/home/sage-image/run.sh -w /work -- /sage/.venv/bin/python -u -s /probe.py
+inner 560 s, outer 590 s, peakrss guard 6144 MiB
+[    0.1s] === U(2)+<2>: rank 3, even True
+[    0.3s]   marked -2*e_0 + e_1 - 2*e_2: divisibility 2, reduction rank 1
+[    0.7s]     identity               |P/mP|=      4 build=  0.21s base_point=  0.01s integral=True
+[    0.7s]     negation               |P/mP|=      4 build=  0.02s base_point=  0.00s integral=True
+[    0.8s]     reflection             |P/mP|=      4 build=  0.02s base_point=  0.00s integral=True
+[    0.8s]     negation*reflection    |P/mP|=      4 build=  0.02s base_point=  0.00s integral=True
+[    0.9s]   marked -2*e_0 + e_1 + 2*e_2: divisibility 2, reduction rank 1
+[    1.1s]     identity               |P/mP|=      4 build=  0.09s base_point=  0.00s integral=True
+[    1.1s]     negation               |P/mP|=      4 build=  0.02s base_point=  0.00s integral=True
+[    1.2s]     reflection             |P/mP|=      4 build=  0.02s base_point=  0.00s integral=True
+[    1.2s]     negation*reflection    |P/mP|=      4 build=  0.02s base_point=  0.00s integral=True
+[    1.3s]   marked -e_0: divisibility 2, reduction rank 1
+[    1.4s]     identity               |P/mP|=      4 build=  0.08s base_point=  0.00s integral=True
+[    1.4s]     negation               |P/mP|=      4 build=  0.02s base_point=  0.00s integral=True
+[    1.5s]     reflection             |P/mP|=      4 build=  0.02s base_point=  0.00s integral=True
+[    1.5s]     negation*reflection    |P/mP|=      4 build=  0.02s base_point=  0.00s integral=True
+[    1.6s]   marked -e_0 + 2*e_1 - 2*e_2: divisibility 2, reduction rank 1
+[    1.7s]     identity               |P/mP|=      4 build=  0.09s base_point=  0.00s integral=True
+[    1.7s]     negation               |P/mP|=      4 build=  0.02s base_point=  0.00s integral=True
+[    1.8s]     reflection             |P/mP|=      4 build=  0.02s base_point=  0.00s integral=True
+[    1.8s]     negation*reflection    |P/mP|=      4 build=  0.02s base_point=  0.00s integral=True
+[    1.8s] === U(2)+U(2): rank 4, even True
+[    2.0s]   marked -2*e_0 - e_1 - 2*e_2 + e_3: divisibility 2, reduction rank 2
+[    2.1s]     identity               |P/mP|=     16 build=  0.13s base_point=  0.00s integral=True
+[    2.2s]     negation               |P/mP|=     16 build=  0.03s base_point=  0.00s integral=True
+[    2.2s]   marked -2*e_0 - e_1 - e_2 + 2*e_3: divisibility 2, reduction rank 2
+[    2.4s]     identity               |P/mP|=     16 build=  0.10s base_point=  0.00s integral=True
+[    2.4s]     negation               |P/mP|=     16 build=  0.03s base_point=  0.00s integral=True
+[    2.5s]   marked -2*e_0 - e_1 + e_2 - 2*e_3: divisibility 2, reduction rank 2
+[    2.6s]     identity               |P/mP|=     16 build=  0.10s base_point=  0.00s integral=True
+[    2.7s]     negation               |P/mP|=     16 build=  0.03s base_point=  0.00s integral=True
+[    2.7s]   marked -2*e_0 - e_1 + 2*e_2 - e_3: divisibility 2, reduction rank 2
+[    2.9s]     identity               |P/mP|=     16 build=  0.09s base_point=  0.00s integral=True
+[    2.9s]     negation               |P/mP|=     16 build=  0.03s base_point=  0.00s integral=True
+[    2.9s] === U(2)+U(2)+<2>: rank 5, even True
+[    3.1s]   marked -2*e_0 - e_1 - 2*e_2 + e_3: divisibility 2, reduction rank 3
+[    3.3s]     identity               |P/mP|=     64 build=  0.14s base_point=  0.01s integral=True
+[    3.4s]     negation               |P/mP|=     64 build=  0.03s base_point=  0.00s integral=True
+[    3.4s]     transvection           |P/mP|=     64 build=  0.03s base_point=  0.00s integral=True
+[    3.5s]     negation*transvection  |P/mP|=     64 build=  0.03s base_point=  0.00s integral=True
+[    3.7s]     reflection             |P/mP|=     64 build=  0.18s base_point=  0.00s integral=True
+[    3.8s]     negation*reflection    |P/mP|=     64 build=  0.03s base_point=  0.00s integral=True
+[    3.8s]   marked -2*e_0 - e_1 - 2*e_2 + 2*e_3 - 2*e_4: divisibility 2, reduction rank 3
+[    4.0s]     identity               |P/mP|=     64 build=  0.10s base_point=  0.00s integral=True
+[    4.0s]     negation               |P/mP|=     64 build=  0.03s base_point=  0.00s integral=True
+[    4.1s]     reflection             |P/mP|=     64 build=  0.03s base_point=  0.00s integral=True
+[    4.2s]     negation*reflection    |P/mP|=     64 build=  0.03s base_point=  0.00s integral=True
+[    4.2s]   marked -2*e_0 - e_1 - 2*e_2 + 2*e_3 + 2*e_4: divisibility 2, reduction rank 3
+[    4.4s]     identity               |P/mP|=     64 build=  0.11s base_point=  0.00s integral=True
+[    4.5s]     negation               |P/mP|=     64 build=  0.03s base_point=  0.00s integral=True
+[    4.5s]     reflection             |P/mP|=     64 build=  0.03s base_point=  0.00s integral=True
+[    4.6s]     negation*reflection    |P/mP|=     64 build=  0.03s base_point=  0.00s integral=True
+[    4.7s]   marked -2*e_0 - e_1 - e_2 + 2*e_3: divisibility 2, reduction rank 3
+[    4.8s]     identity               |P/mP|=     64 build=  0.10s base_point=  0.00s integral=True
+[    4.9s]     negation               |P/mP|=     64 build=  0.03s base_point=  0.00s integral=True
+[    4.9s]     transvection           |P/mP|=     64 build=  0.03s base_point=  0.00s integral=True
+[    5.0s]     negation*transvection  |P/mP|=     64 build=  0.03s base_point=  0.00s integral=True
+[    5.1s]     reflection             |P/mP|=     64 build=  0.03s base_point=  0.00s integral=True
+[    5.1s]     negation*reflection    |P/mP|=     64 build=  0.03s base_point=  0.00s integral=True
+[    5.1s] === U(4)+<2>: rank 3, even True
+[    5.2s]   marked -e_0: divisibility 4, reduction rank 1
+[    5.4s]     identity               |P/mP|=      8 build=  0.10s base_point=  0.00s integral=True
+[    5.5s]     negation               |P/mP|=      8 build=  0.02s base_point=  0.00s integral=True
+[    5.5s]     reflection             |P/mP|=      8 build=  0.02s base_point=  0.00s integral=True
+[    5.5s]     negation*reflection    |P/mP|=      8 build=  0.02s base_point=  0.00s integral=True
+[    5.6s]   marked -e_0 + e_1 - 2*e_2: divisibility 4, reduction rank 1
+[    5.8s]     identity               |P/mP|=     64 build=  0.08s base_point=  0.00s integral=True
+[    5.8s]     negation               |P/mP|=     64 build=  0.02s base_point=  0.00s integral=True
+[    5.9s]     reflection             |P/mP|=     64 build=  0.02s base_point=  0.00s integral=True
+[    5.9s]     negation*reflection    |P/mP|=     64 build=  0.02s base_point=  0.00s integral=True
+[    6.0s]   marked -e_0 + e_1 + 2*e_2: divisibility 4, reduction rank 1
+[    6.1s]     identity               |P/mP|=     64 build=  0.08s base_point=  0.00s integral=True
+[    6.1s]     negation               |P/mP|=     64 build=  0.02s base_point=  0.00s integral=True
+[    6.2s]     reflection             |P/mP|=     64 build=  0.02s base_point=  0.00s integral=True
+[    6.2s]     negation*reflection    |P/mP|=     64 build=  0.02s base_point=  0.00s integral=True
+[    6.3s]   marked e_0 - e_1 - 2*e_2: divisibility 4, reduction rank 1
+[    6.4s]     identity               |P/mP|=     64 build=  0.08s base_point=  0.00s integral=True
+[    6.4s]     negation               |P/mP|=     64 build=  0.02s base_point=  0.00s integral=True
+[    6.7s]     reflection             |P/mP|=     64 build=  0.02s base_point=  0.00s integral=True
+[    6.7s]     negation*reflection    |P/mP|=     64 build=  0.02s base_point=  0.00s integral=True
+[    6.7s] === U(5)+U(4): rank 4, even True
+[    6.9s]   marked -2*e_0 - e_2: divisibility 2, reduction rank 2
+[    7.0s]     identity               |P/mP|=     64 build=  0.11s base_point=  0.00s integral=True
+[    7.1s]     negation               |P/mP|=     64 build=  0.03s base_point=  0.00s integral=True
+[    7.1s]   marked -2*e_0 - e_3: divisibility 2, reduction rank 2
+[    7.3s]     identity               |P/mP|=     64 build=  0.10s base_point=  0.00s integral=True
+[    7.3s]     negation               |P/mP|=     64 build=  0.03s base_point=  0.00s integral=True
+[    7.4s]   marked -2*e_0 + e_3: divisibility 2, reduction rank 2
+[    7.5s]     identity               |P/mP|=     64 build=  0.09s base_point=  0.00s integral=True
+[    7.6s]     negation               |P/mP|=     64 build=  0.03s base_point=  0.00s integral=True
+[    7.6s]   marked -2*e_0 + e_2: divisibility 2, reduction rank 2
+[    7.8s]     identity               |P/mP|=     64 build=  0.10s base_point=  0.00s integral=True
+[    7.8s]     negation               |P/mP|=     64 build=  0.03s base_point=  0.00s integral=True
+[    7.8s] === U(5)+U(5)+U(4): rank 6, even True
+[    8.0s]   marked -2*e_0 - 2*e_1 - 2*e_2 + 2*e_3 - e_4: divisibility 2, reduction rank 4
+[    8.2s]     identity               |P/mP|=   4096 build=  0.16s base_point=  0.01s integral=True
+[    8.3s]     negation               |P/mP|=   4096 build=  0.04s base_point=  0.00s integral=True
+[    8.4s]     transvection           |P/mP|=   4096 build=  0.04s base_point=  0.00s integral=False
+[    8.5s]     negation*transvection  |P/mP|=   4096 build=  0.04s base_point=  0.00s integral=False
+[    8.6s]   marked -2*e_0 - 2*e_1 - 2*e_2 + 2*e_3 - e_5: divisibility 2, reduction rank 4
+[    8.8s]     identity               |P/mP|=   4096 build=  0.13s base_point=  0.00s integral=True
+[    8.8s]     negation               |P/mP|=   4096 build=  0.04s base_point=  0.00s integral=True
+[    8.9s]     transvection           |P/mP|=   4096 build=  0.04s base_point=  0.00s integral=False
+[    9.0s]     negation*transvection  |P/mP|=   4096 build=  0.04s base_point=  0.00s integral=False
+[    9.1s]   marked -2*e_0 - 2*e_1 - 2*e_2 + 2*e_3 + e_5: divisibility 2, reduction rank 4
+[    9.3s]     identity               |P/mP|=   4096 build=  0.12s base_point=  0.00s integral=True
+[    9.3s]     negation               |P/mP|=   4096 build=  0.04s base_point=  0.00s integral=True
+[    9.4s]     transvection           |P/mP|=   4096 build=  0.04s base_point=  0.00s integral=False
+[    9.5s]     negation*transvection  |P/mP|=   4096 build=  0.04s base_point=  0.00s integral=False
+[    9.6s]   marked -2*e_0 - 2*e_1 - 2*e_2 + 2*e_3 + e_4: divisibility 2, reduction rank 4
+[   10.0s]     identity               |P/mP|=   4096 build=  0.39s base_point=  0.00s integral=True
+[   10.1s]     negation               |P/mP|=   4096 build=  0.04s base_point=  0.01s integral=True
+[   10.2s]     transvection           |P/mP|=   4096 build=  0.04s base_point=  0.00s integral=False
+[   10.3s]     negation*transvection  |P/mP|=   4096 build=  0.04s base_point=  0.00s integral=False
+[   10.3s] === U+U(2): rank 4, even True
+[   10.4s]   marked -2*e_0 - 2*e_1 - 2*e_2 + e_3: divisibility 2, reduction rank 2
+[   10.6s]     identity               |P/mP|=     16 build=  0.12s base_point=  0.00s integral=True
+[   10.6s]     negation               |P/mP|=     16 build=  0.03s base_point=  0.00s integral=True
+[   10.7s]     reflection             |P/mP|=     16 build=  0.03s base_point=  0.00s integral=True
+[   10.7s]     negation*reflection    |P/mP|=     16 build=  0.03s base_point=  0.00s integral=True
+[   10.8s]   marked -2*e_0 - 2*e_1 - e_2 + 2*e_3: divisibility 2, reduction rank 2
+[   10.9s]     identity               |P/mP|=     16 build=  0.10s base_point=  0.00s integral=True
+[   11.0s]     negation               |P/mP|=     16 build=  0.03s base_point=  0.00s integral=True
+[   11.1s]     reflection             |P/mP|=     16 build=  0.03s base_point=  0.00s integral=True
+[   11.1s]     negation*reflection    |P/mP|=     16 build=  0.03s base_point=  0.00s integral=True
+[   11.2s]   marked -2*e_0 - 2*e_1 + e_2 - 2*e_3: divisibility 2, reduction rank 2
+[   11.3s]     identity               |P/mP|=     16 build=  0.10s base_point=  0.00s integral=True
+[   11.4s]     negation               |P/mP|=     16 build=  0.03s base_point=  0.00s integral=True
+[   11.4s]     reflection             |P/mP|=     16 build=  0.03s base_point=  0.00s integral=True
+[   11.5s]     negation*reflection    |P/mP|=     16 build=  0.03s base_point=  0.00s integral=True
+[   11.6s]   marked -2*e_0 - 2*e_1 + 2*e_2 - e_3: divisibility 2, reduction rank 2
+[   11.7s]     identity               |P/mP|=     16 build=  0.10s base_point=  0.00s integral=True
+[   11.8s]     negation               |P/mP|=     16 build=  0.03s base_point=  0.00s integral=True
+[   11.8s] === U+<2>: rank 3, even True
+[   11.9s]   marked -e_0: divisibility 1, reduction rank 1
+[   12.0s]     identity               |P/mP|=      2 build=  0.10s base_point=  0.00s integral=True
+[   12.1s]     negation               |P/mP|=      2 build=  0.02s base_point=  0.00s integral=True
+[   12.1s]     reflection             |P/mP|=      2 build=  0.02s base_point=  0.00s integral=True
+[   12.1s]     negation*reflection    |P/mP|=      2 build=  0.02s base_point=  0.00s integral=True
+[   12.2s]   marked -e_0 + e_1 - e_2: divisibility 1, reduction rank 1
+[   12.3s]     identity               |P/mP|=      2 build=  0.09s base_point=  0.00s integral=True
+[   12.4s]     negation               |P/mP|=      2 build=  0.02s base_point=  0.00s integral=True
+[   12.4s]     reflection             |P/mP|=      2 build=  0.02s base_point=  0.00s integral=True
+[   12.5s]     negation*reflection    |P/mP|=      2 build=  0.02s base_point=  0.00s integral=True
+[   12.5s]   marked -e_0 + e_1 + e_2: divisibility 1, reduction rank 1
+[   12.7s]     identity               |P/mP|=      2 build=  0.09s base_point=  0.00s integral=True
+[   12.7s]     negation               |P/mP|=      2 build=  0.03s base_point=  0.00s integral=True
+[   12.8s]     reflection             |P/mP|=      2 build=  0.02s base_point=  0.00s integral=True
+[   12.8s]     negation*reflection    |P/mP|=      2 build=  0.03s base_point=  0.00s integral=True
+[   12.9s]   marked e_0 - e_1 - e_2: divisibility 1, reduction rank 1
+[   13.0s]     identity               |P/mP|=      2 build=  0.08s base_point=  0.00s integral=True
+[   13.0s]     negation               |P/mP|=      2 build=  0.02s base_point=  0.00s integral=True
+[   13.1s]     reflection             |P/mP|=      2 build=  0.02s base_point=  0.00s integral=True
+[   13.1s]     negation*reflection    |P/mP|=      2 build=  0.02s base_point=  0.00s integral=True
+[   13.1s] === U(2)+A2(2): rank 4, even True
+[   13.6s]   marked -2*e_0 + e_1 - 2*e_2 - 2*e_3: divisibility 2, reduction rank 2
+[   13.8s]     identity               |P/mP|=    256 build=  0.12s base_point=  0.00s integral=True
+[   13.9s]     negation               |P/mP|=    256 build=  0.03s base_point=  0.00s integral=True
+[   16.0s]     reflection             |P/mP|=    256 build=  0.03s base_point=  0.00s integral=False locus=  0.13s enumerated=  1.84s agree=True nonempty=True zero_in=False whole=False
+[   16.0s]       CANDIDATE U(2)+A2(2) | div 2 | reflection at 1.97 s
+[   17.9s]     negation*reflection    |P/mP|=    256 build=  0.03s base_point=  0.00s integral=False locus=  0.12s enumerated=  1.74s agree=True nonempty=True zero_in=False whole=False
+[   17.9s]       CANDIDATE U(2)+A2(2) | div 2 | negation*reflection at 1.86 s
+[   18.0s]   marked -2*e_0 + e_1 - 2*e_2: divisibility 2, reduction rank 2
+[   18.1s]     identity               |P/mP|=    256 build=  0.09s base_point=  0.00s integral=True
+[   18.2s]     negation               |P/mP|=    256 build=  0.03s base_point=  0.00s integral=True
+[   20.3s]     reflection             |P/mP|=    256 build=  0.03s base_point=  0.00s integral=False locus=  0.13s enumerated=  1.83s agree=True nonempty=True zero_in=False whole=False
+[   20.3s]       CANDIDATE U(2)+A2(2) | div 2 | reflection at 1.96 s
+[   22.3s]     negation*reflection    |P/mP|=    256 build=  0.03s base_point=  0.00s integral=False locus=  0.13s enumerated=  1.75s agree=True nonempty=True zero_in=False whole=False
+[   22.3s]       CANDIDATE U(2)+A2(2) | div 2 | negation*reflection at 1.87 s
+[   22.4s]   marked -2*e_0 + e_1 - 2*e_3: divisibility 2, reduction rank 2
+[   22.5s]     identity               |P/mP|=    256 build=  0.10s base_point=  0.00s integral=True
+[   22.6s]     negation               |P/mP|=    256 build=  0.03s base_point=  0.00s integral=True
+[   24.5s]     reflection             |P/mP|=    256 build=  0.03s base_point=  0.00s integral=False locus=  0.12s enumerated=  1.72s agree=True nonempty=True zero_in=False whole=False
+[   24.5s]       CANDIDATE U(2)+A2(2) | div 2 | reflection at 1.84 s
+[   26.4s]     negation*reflection    |P/mP|=    256 build=  0.03s base_point=  0.00s integral=False locus=  0.12s enumerated=  1.66s agree=True nonempty=True zero_in=False whole=False
+[   26.4s]       CANDIDATE U(2)+A2(2) | div 2 | negation*reflection at 1.77 s
+[   26.5s]   marked -2*e_0 + e_1 + 2*e_3: divisibility 2, reduction rank 2
+[   26.6s]     identity               |P/mP|=    256 build=  0.10s base_point=  0.00s integral=True
+[   26.7s]     negation               |P/mP|=    256 build=  0.03s base_point=  0.00s integral=True
+[   29.1s]     reflection             |P/mP|=    256 build=  0.03s base_point=  0.00s integral=False locus=  0.12s enumerated=  2.15s agree=True nonempty=True zero_in=False whole=False
+[   29.1s]       CANDIDATE U(2)+A2(2) | div 2 | reflection at 2.27 s
+[   31.0s]     negation*reflection    |P/mP|=    256 build=  0.03s base_point=  0.00s integral=False locus=  0.12s enumerated=  1.66s agree=True nonempty=True zero_in=False whole=False
+[   31.0s]       CANDIDATE U(2)+A2(2) | div 2 | negation*reflection at 1.78 s
+[   31.0s] 
+[   31.0s] === candidates: non-integral base point, nonempty locus, zero class absent ===
+[   31.0s]      1.77s |P/mP|=   256  U(2)+A2(2) | div 2 | negation*reflection  marked -2*e_0 + e_1 - 2*e_3
+[   31.0s]      1.78s |P/mP|=   256  U(2)+A2(2) | div 2 | negation*reflection  marked -2*e_0 + e_1 + 2*e_3
+[   31.0s]      1.84s |P/mP|=   256  U(2)+A2(2) | div 2 | reflection  marked -2*e_0 + e_1 - 2*e_3
+[   31.0s]      1.86s |P/mP|=   256  U(2)+A2(2) | div 2 | negation*reflection  marked -2*e_0 + e_1 - 2*e_2 - 2*e_3
+[   31.0s]      1.87s |P/mP|=   256  U(2)+A2(2) | div 2 | negation*reflection  marked -2*e_0 + e_1 - 2*e_2
+[   31.0s]      1.96s |P/mP|=   256  U(2)+A2(2) | div 2 | reflection  marked -2*e_0 + e_1 - 2*e_2
+[   31.0s]      1.97s |P/mP|=   256  U(2)+A2(2) | div 2 | reflection  marked -2*e_0 + e_1 - 2*e_2 - 2*e_3
+[   31.0s]      2.27s |P/mP|=   256  U(2)+A2(2) | div 2 | reflection  marked -2*e_0 + e_1 + 2*e_3
+[   31.0s] RESULT candidates=8
+[peakrss] probe528spec: child waited=0 shell_code=0 samples=18
+[peakrss] peak tree RSS      : 462 MiB
+[peakrss] low-water MemAvail : 11208 MiB
+[peakrss] peak single VmHWM  : 462 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      451 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    34.0s procs=  3 rss=   462 MiB hwm=   462 MiB avail= 11208 MiB
+[peakrss]   t=    32.0s procs=  3 rss=   460 MiB hwm=   460 MiB avail= 11223 MiB
+[peakrss]   t=    30.0s procs=  3 rss=   457 MiB hwm=   457 MiB avail= 11254 MiB
+[peakrss]   t=    28.0s procs=  3 rss=   454 MiB hwm=   454 MiB avail= 11278 MiB
+[peakrss]   t=    26.0s procs=  3 rss=   449 MiB hwm=   449 MiB avail= 11310 MiB
+launcher exit: 0
