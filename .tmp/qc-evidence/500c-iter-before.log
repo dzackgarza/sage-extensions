@@ -1,0 +1,54 @@
+provider SHA: af3edeec7807e10d77340587554ff92e43998015
+port SHA: 991b88b0
+command: python /probe500.py
+OwnedRings().Finite(): Category of finite countable owned rings
+=== GF(4)
+  in FiniteSets(): True
+  in OwnedRings().Finite(): True
+  __iter__ owner: sage_extensions.categories.rings.ring_foundation.OwnedRings.ParentMethods
+  first four points: (0 mod Ideal (z2^2 + z2 + 1 mod Ideal (2) of Integer Ring) of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring / Ideal (2) of Integer Ring, z2 mod
+  cardinality(): 4
+
+=== GF(2)
+  in FiniteSets(): True
+  in OwnedRings().Finite(): True
+  __iter__ owner: sage_extensions.categories.rings.ring_foundation.OwnedRings.ParentMethods
+  first four points: (0 mod Ideal (2) of Integer Ring, 1 mod Ideal (2) of Integer Ring)
+  cardinality(): 2
+
+=== Zmod(8)
+  in FiniteSets(): True
+  in OwnedRings().Finite(): True
+  __iter__ owner: sage_extensions.categories.rings.ring_foundation.OwnedRings.ParentMethods
+  first four points: (0 mod Ideal (8) of Integer Ring, 1 mod Ideal (8) of Integer Ring, 2 mod Ideal (8) of Integer Ring, 3 mod Ideal (8) of Integer Ring)
+  cardinality(): 8
+
+=== Zmod(6)
+  in FiniteSets(): True
+  in OwnedRings().Finite(): True
+  __iter__ owner: sage_extensions.categories.rings.ring_foundation.OwnedRings.ParentMethods
+  first four points: (0 mod Ideal (6) of Integer Ring, 1 mod Ideal (6) of Integer Ring, 2 mod Ideal (6) of Integer Ring, 3 mod Ideal (6) of Integer Ring)
+  cardinality(): 6
+
+=== QQ(i)
+  in FiniteSets(): False
+  in OwnedRings().Finite(): False
+  __iter__ owner: sage_extensions.categories.algebras.algebras.Owned_OwnedAlgebraParent_with_category
+  first four points: RAISED TypeError: cannot enumerate Free module on {1, a} over Fraction Field of Integer Ring: it is not placed among finite sets
+  cardinality(): ℵ_0
+
+=== ZZ['x']
+  in FiniteSets(): False
+  in OwnedRings().Finite(): False
+  __iter__ owner: sage_extensions.categories.rings.ring_foundation.OwnedRings.ParentMethods
+  first four points: RAISED TypeError: cannot enumerate Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring: it is not placed among finite sets
+  cardinality(): ℵ_0
+
+=== ZZ
+  in FiniteSets(): False
+  in OwnedRings().Finite(): False
+  __iter__ owner: sage_extensions.categories.modules.framed.framed_free_modules.FramedFreeModules.FinitelyGenerated.ParentMethods
+  first four points: RAISED TypeError: unable to coerce <class 'dict'> to an integer
+  cardinality(): ℵ_0
+
+launcher exit: 0

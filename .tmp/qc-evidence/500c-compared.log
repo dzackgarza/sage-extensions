@@ -1,0 +1,45 @@
+=== mine: .tmp/sweep-mine500.log
+=== base: .scratch/wt500b/.tmp/sweep-base500b.log
+=== FAILED ids compared, never counts
+
+tests/categories
+    mine[61 failed, 59 passed in 40.11s] base[61 failed, 59 passed in 11.79s]
+    only-mine[0] fixed[0]
+tests/algebras
+    mine[64 failed, 149 passed in 62.19s (0:01:02)] base[64 failed, 149 passed in 57.15s]
+    only-mine[0] fixed[0]
+tests/modules
+    mine[82 failed, 227 passed, 1 warning in 33.64s] base[84 failed, 225 passed, 1 warning in 40.60s]
+    only-mine[0] fixed[2]
+    fixed     FAILED tests/modules/test_the_order_ideal_of_a_ring_element_over_its_base_ring.sage::test_the_order_ideal_of_a_rational_polynomial_is_the_unit_ideal
+    fixed     FAILED tests/modules/test_the_order_ideal_of_a_ring_element_over_its_base_ring.sage::test_the_order_ideal_of_an_integer_polynomial_is_the_ideal_of_its_coefficients
+tests/sets
+    mine[29 failed, 127 passed in 6.13s] base[29 failed, 127 passed in 6.47s]
+    only-mine[0] fixed[0]
+tests/foundations
+    mine[2 failed, 6 passed in 4.22s] base[2 failed, 6 passed in 4.66s]
+    only-mine[0] fixed[0]
+tests/objects
+    mine[115 failed, 211 passed in 50.27s] base[115 failed, 211 passed in 35.58s]
+    only-mine[0] fixed[0]
+tests/functions
+    mine[48 failed, 15 passed in 4.95s] base[48 failed, 15 passed in 6.84s]
+    only-mine[0] fixed[0]
+tests/engineering
+    mine[2 failed, 6 passed in 29.45s] base[2 failed, 6 passed in 26.01s]
+    only-mine[0] fixed[0]
+tests/divisors
+    mine[42 failed, 25 passed in 11.62s] base[42 failed, 25 passed in 11.58s]
+    only-mine[0] fixed[0]
+tests/tensors
+    mine[19 failed, 24 passed in 2.48s] base[19 failed, 24 passed in 3.52s]
+    only-mine[0] fixed[0]
+tests/topology
+    mine[1 failed in 1.37s] base[1 failed in 1.39s]
+    only-mine[0] fixed[0]
+tests/*.py
+    mine[25 passed in 11.15s] base[25 passed in 11.34s]
+    only-mine[0] fixed[0]
+
+directories in one sweep only: []
+total ids: mine 465, base 467

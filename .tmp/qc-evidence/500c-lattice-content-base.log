@@ -1,0 +1,18 @@
+provider SHA: af3edeec7807e10d77340587554ff92e43998015
+port SHA: 991b88b0
+command: python -m pytest -p qc_sage_session tests/lattices/test_content_and_doubling.sage -o addopts= -q --tb=no -rf
+...F                                                                     [100%]
+=========================== short test summary info ============================
+FAILED tests/lattices/test_content_and_doubling.sage::test_index_two_sublattices_of_a_hyperbolic_summand
+1 failed, 3 passed in 1.96s
+[peakrss] run500-base500c-test_content_and_doubling: child waited=1 shell_code=1 samples=2
+[peakrss] peak tree RSS      : 307 MiB
+[peakrss] low-water MemAvail : 11546 MiB
+[peakrss] peak single VmHWM  : 307 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      295 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   run.sh                        3 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     2.0s procs=  3 rss=   307 MiB hwm=   307 MiB avail= 11546 MiB
+[peakrss]   t=     0.0s procs=  2 rss=    10 MiB hwm=    10 MiB avail= 11730 MiB

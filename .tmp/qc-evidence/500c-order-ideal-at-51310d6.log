@@ -1,0 +1,23 @@
+provider SHA: 51310d613cd8c27860c70ff2f3370fedc6a18f21
+port SHA: 991b88b0
+command: python /probe500.py
+python: 3.14.10
+=== ZZ['x']: 2*x + 2
+  order_ideal owner: sage_extensions.categories.modules.framed.framed_free_modules.FramedFreeModules.ElementMethods
+  order_ideal(): Ideal (2) of Integer Ring
+  == ZZ.ideal(2) (ZZ case): True
+  == QQ.ideal(1) (QQ case): False
+  parent of value: OwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType
+=== QQ['x']: x + 1
+  order_ideal owner: sage_extensions.categories.modules.framed.framed_free_modules.FramedFreeModules.ElementMethods
+  order_ideal(): Finitely presented module on 1 module generators over Fraction Field of Integer Ring
+  == ZZ.ideal(2) (ZZ case): False
+  == QQ.ideal(1) (QQ case): True
+  parent of value: OwnedJoinCategory.parent_class
+=== QQ(i): a + 1
+  order_ideal owner: sage_extensions.categories.modules.framed.framed_free_modules.FramedFreeModules.ElementMethods
+  order_ideal(): Finitely presented module on 1 module generators over Fraction Field of Integer Ring
+  == ZZ.ideal(2) (ZZ case): False
+  == QQ.ideal(1) (QQ case): True
+  parent of value: OwnedJoinCategory.parent_class
+launcher exit: 0

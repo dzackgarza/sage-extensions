@@ -1,0 +1,100 @@
+provider SHA: ef39a9bfbbbab52431a8f7c1e8a666be34b5fd36
+port SHA: 991b88b0
+command: python -m pytest -p qc_sage_session tests/rings -o addopts= -q --tb=no -rf
+..............F...F.FF.FFF..........F....F..FF.FFFFF.....FFFF........... [ 21%]
+.............F...........F...............F............F...F...F.FF.F.... [ 43%]
+....F..FFF.F..F.FFFFFF...........F.......F....FFF...................F.F. [ 64%]
+.........F.....FF..F..............F.........F................F....F..... [ 86%]
+FF.F........FFFF...FFF..........F..F.FFF..FFF                            [100%]
+=========================== short test summary info ============================
+FAILED tests/rings/test_commutative_algebra.sage::test_finite_unit_localization_and_prime_localization_are_distinct
+FAILED tests/rings/test_commutative_algebra.sage::test_affine_prime_spectrum_zariski_basis_and_structure_sheaf_stalks
+FAILED tests/rings/test_commutative_algebra.sage::test_special_fiber_of_xy_equals_t_is_the_node_with_its_local_ring_at_the_origin
+FAILED tests/rings/test_commutative_algebra.sage::test_affine_spec_is_contravariant_on_commutative_algebra_maps
+FAILED tests/rings/test_commutative_algebra.sage::test_module_local_fiber_rank_generic_rank_and_fitting_loci
+FAILED tests/rings/test_commutative_algebra.sage::test_annihilators_and_fiber_ranks_of_integer_modules
+FAILED tests/rings/test_commutative_algebra.sage::test_localized_cyclic_module_vanishes_exactly_when_its_ideal_meets_the_inverted_set
+FAILED tests/rings/test_commutative_algebra.sage::test_commutative_algebra_coproduct_of_two_polynomial_rings_is_the_polynomial_ring_in_two_variables
+FAILED tests/rings/test_completion_comparisons.sage::test_maximal_adic_completion_agrees_before_and_after_localization
+FAILED tests/rings/test_completion_maps.sage::test_completion_of_the_dual_numbers_at_their_nilpotent_ideal_is_injective
+FAILED tests/rings/test_completion_maps.sage::test_completion_at_an_idempotent_ideal_is_the_quotient_and_is_not_separated
+FAILED tests/rings/test_completion_maps.sage::test_artin_name_requires_finite_length
+FAILED tests/rings/test_completion_maps.sage::test_a_ring_map_carrying_the_ideal_into_the_ideal_induces_a_map_of_completions
+FAILED tests/rings/test_curve_normalization.sage::test_cusp_normalization_retains_the_actual_finite_birational_map
+FAILED tests/rings/test_curve_normalization.sage::test_cusp_conductor_is_the_maximal_ideal_at_the_cusp
+FAILED tests/rings/test_curve_normalization.sage::test_a_smooth_affine_line_is_its_own_normalization
+FAILED tests/rings/test_elementary_arithmetic_of_owned_rings.sage::test_rationals_in_lowest_terms_and_their_inverses
+FAILED tests/rings/test_elementary_arithmetic_of_owned_rings.sage::test_owned_rational_equality_realizes_exact_python_fraction_literals
+FAILED tests/rings/test_elementary_arithmetic_of_owned_rings.sage::test_the_owned_integers_coerce_canonically_into_the_rationals_and_reals
+FAILED tests/rings/test_elementary_arithmetic_of_owned_rings.sage::test_three_is_a_primitive_root_modulo_seven
+FAILED tests/rings/test_factorizations_and_roots_in_extensions.sage::test_the_factors_of_x_to_the_fourth_minus_one_and_the_roots_of_x_squared_minus_two_are_simple
+FAILED tests/rings/test_five_adic_completion_and_its_lattice.sage::test_the_original_lattice_constructs_computes_and_displays
+FAILED tests/rings/test_gaussian_integers_as_a_predicate_subring.sage::test_reduction_modulo_six_sends_minus_one_to_five_on_units
+FAILED tests/rings/test_ideals_of_the_axes_and_of_the_integers.sage::test_primes_and_maximal_ideals_of_the_axes
+FAILED tests/rings/test_ideals_of_the_axes_and_of_the_integers.sage::test_the_associated_primes_of_zero_on_the_axes_are_the_two_lines
+FAILED tests/rings/test_ideals_of_the_axes_and_of_the_integers.sage::test_the_two_lines_of_the_axes_meet_in_zero
+FAILED tests/rings/test_ideals_of_the_axes_and_of_the_integers.sage::test_four_and_six_intersect_in_twelve
+FAILED tests/rings/test_ideals_of_the_axes_and_of_the_integers.sage::test_subobject_join_and_meet_retain_the_commutative_ideal_structure
+FAILED tests/rings/test_ideals_of_the_axes_and_of_the_integers.sage::test_localized_ideal_subobject_join_and_meet_retain_local_source_data
+FAILED tests/rings/test_integer_residue_rings.sage::test_a_product_of_fields_is_normal
+FAILED tests/rings/test_local_base_maximal_ideals.sage::test_power_series_over_a_local_base_retain_the_base_maximal_ideal
+FAILED tests/rings/test_local_base_maximal_ideals.sage::test_dual_numbers_over_a_local_base_retain_the_base_maximal_ideal
+FAILED tests/rings/test_local_base_maximal_ideals.sage::test_padic_principal_quotient_cardinality_is_residue_size_to_valuation
+FAILED tests/rings/test_local_completions.sage::test_completion_is_the_limit_of_the_truncations_by_powers_of_the_maximal_ideal
+FAILED tests/rings/test_local_module_maps_frontier.sage::test_multiplication_by_x_on_the_local_ring_of_the_node_has_kernel_generated_by_y
+FAILED tests/rings/test_local_regularities.sage::test_cusp_origin_has_local_dimension_one_and_embedding_dimension_two
+FAILED tests/rings/test_local_rings_of_the_cusp_and_the_axes.sage::test_the_residue_map_at_the_origin_of_the_cusp_is_evaluation_at_the_origin
+FAILED tests/rings/test_local_rings_of_the_cusp_and_the_axes.sage::test_the_origin_of_the_cusp_has_height_one
+FAILED tests/rings/test_local_rings_of_the_cusp_and_the_axes.sage::test_the_maximal_ideal_of_the_local_ring_at_the_origin_contains_x_and_y
+FAILED tests/rings/test_local_rings_of_the_cusp_and_the_axes.sage::test_the_local_ring_of_the_axes_at_one_line_is_a_field
+FAILED tests/rings/test_local_rings_of_the_cusp_and_the_axes.sage::test_the_source_residue_map_of_the_cusp_sends_x_plus_two_to_two
+FAILED tests/rings/test_localization_restrictions.sage::test_localization_source_map_determines_ring_morphism_equality
+FAILED tests/rings/test_localizations_of_polynomial_algebras.sage::test_inverting_x_over_z_one_half
+FAILED tests/rings/test_localizations_of_polynomial_algebras.sage::test_the_cusp_is_a_one_dimensional_domain
+FAILED tests/rings/test_localizations_of_polynomial_algebras.sage::test_x_is_a_nonunit_and_x_plus_one_a_unit_at_the_origin_of_the_cusp
+FAILED tests/rings/test_localizations_of_polynomial_algebras.sage::test_the_local_ring_of_the_cusp_at_the_origin_has_krull_dimension_one
+FAILED tests/rings/test_number_field_archive_reconciliation.sage::test_characteristic_polynomial_is_the_minimal_polynomial_raised_to_the_relative_degree
+FAILED tests/rings/test_number_field_archive_reconciliation.sage::test_the_conjugates_of_root_five_are_plus_and_minus_root_five
+FAILED tests/rings/test_number_field_integral_form_archive.sage::test_root_five_order_is_not_maximal_and_has_fraction_field_the_number_field
+FAILED tests/rings/test_owned_rings.sage::test_the_algebraic_reals_embed_in_the_reals_and_the_algebraic_numbers_do_not
+FAILED tests/rings/test_owned_rings.sage::test_the_centre_of_the_two_by_two_rational_matrices_is_the_scalars
+FAILED tests/rings/test_owned_rings.sage::test_owned_ring_cardinality_distinguishes_countable_and_uncountable_infinite_rings
+FAILED tests/rings/test_points_of_the_spectrum_of_the_integers.sage::test_the_residue_fields_of_spec_z
+FAILED tests/rings/test_prime_local_ideals.sage::test_a_prime_local_principal_quotient_has_residue_size_to_valuation
+FAILED tests/rings/test_q_root_five_as_a_rational_algebra.sage::test_a_quadratic_field_is_its_own_normal_closure
+FAILED tests/rings/test_quadratic_and_cyclotomic_field_invariants.sage::test_norm_trace_and_minimal_polynomial_of_root_five
+FAILED tests/rings/test_quadratic_and_cyclotomic_field_invariants.sage::test_the_real_cube_root_of_two_generates_a_non_galois_cubic_field
+FAILED tests/rings/test_quadratic_and_cyclotomic_field_invariants.sage::test_signatures_count_real_and_complex_places
+FAILED tests/rings/test_quotient_localization_spectrum.sage::test_the_open_set_where_x_is_invertible_on_the_quadric_cone_is_smooth
+FAILED tests/rings/test_reduced_normalization.sage::test_reducible_node_normalizes_componentwise_and_retains_the_map
+FAILED tests/rings/test_reduced_normalization.sage::test_total_quotient_ring_of_reduced_node_is_product_of_component_fields
+FAILED tests/rings/test_reduced_normalization.sage::test_local_length_divides_out_nonrational_residue_degree
+FAILED tests/rings/test_reduced_normalization.sage::test_the_conductor_of_the_cusp_is_its_maximal_ideal_at_the_origin
+FAILED tests/rings/test_ring_parent_mor_dispatch.sage::test_there_is_exactly_one_ring_morphism_out_of_the_integers
+FAILED tests/rings/test_rings_archive.sage::test_the_central_two_by_two_rational_matrices_are_the_scalar_matrices
+FAILED tests/rings/test_rings_are_algebras_over_themselves.sage::test_the_augmentation_ideal_of_the_symmetric_group_algebra_has_codimension_one
+FAILED tests/rings/test_the_gaussian_integers_as_a_ring_of_integers.sage::test_the_gaussian_integers_are_the_maximal_order_of_q_i
+FAILED tests/rings/test_the_gaussian_integers_as_a_ring_of_integers.sage::test_one_plus_i_becomes_a_unit_after_inverting_two
+FAILED tests/rings/test_the_gaussian_integers_as_a_ring_of_integers.sage::test_the_local_ring_at_one_plus_i
+FAILED tests/rings/test_the_gaussian_integers_as_a_ring_of_integers.sage::test_dedekind_ideal_colon_uses_fractional_ideal_inverses
+FAILED tests/rings/test_the_gaussian_integers_as_a_ring_of_integers.sage::test_the_inert_prime_three_stays_a_nonunit_after_inverting_two
+FAILED tests/rings/test_unit_group_functor.sage::test_the_units_of_the_field_with_five_elements_are_cyclic_of_order_four_generated_by_two
+FAILED tests/rings/test_unit_group_functor.sage::test_the_square_roots_of_one_in_the_units_of_the_field_with_five_elements_are_one_and_four
+FAILED tests/rings/test_unit_group_functor.sage::test_reduction_modulo_five_sends_minus_one_to_the_element_of_order_two
+74 failed, 259 passed in 49.64s
+[peakrss] run500-dir500-rings2: child waited=0 shell_code=0 samples=30
+[peakrss] peak tree RSS      : 2769 MiB
+[peakrss] low-water MemAvail : 7822 MiB
+[peakrss] peak single VmHWM  : 2801 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   julia                      2035 MiB peak
+[peakrss]   python                      746 MiB peak
+[peakrss]   Singular                      9 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    52.1s procs=  5 rss=  2769 MiB hwm=  2801 MiB avail=  8155 MiB
+[peakrss]   t=    50.1s procs=  5 rss=  2753 MiB hwm=  2785 MiB avail=  8144 MiB
+[peakrss]   t=    48.1s procs=  5 rss=  2722 MiB hwm=  2755 MiB avail=  8109 MiB
+[peakrss]   t=    46.0s procs=  5 rss=  2692 MiB hwm=  2726 MiB avail=  8078 MiB
+[peakrss]   t=    44.0s procs=  5 rss=  2593 MiB hwm=  2594 MiB avail=  8183 MiB
+launcher exit: 0

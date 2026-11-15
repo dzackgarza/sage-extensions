@@ -1463,3 +1463,38 @@ answers `order_ideal`, `__iter__` and `adic_completion` and what each returns.
 | `500b-sweep-tree-extra.log` | `6828f81` | the root `tests/*.py` (**25 passed in 10.92 s**), and the two lattice files that read the framed content: `test_content_and_doubling.sage` 1 failed, 3 passed; `test_reflection_rational_line.sage` 4 passed |
 | `500b-sweep-base-extra.log` | `ba3ab60` | the same two lattice files on the base: 1 failed, 3 passed and 4 passed, the same ids |
 | `500b-regression-compared.log` | `6828f81` against `ba3ab60` | FAILED ids compared per target: **840 on each side, 0 only on the tree, 0 only on the base**; the only count difference is `tests/categories` 59 passed against 56, which is the three new tests. Not swept as one directory: `tests/lattices`, 5.6 GiB resident and unfinished after 25 minutes here |
+
+## Issue #500, the third review: the order-ideal regression, its owner, and the three notes
+
+The second review's tree (`6828f810a0`) raised on `(2x+2).order_ideal()` for `ZZ['x']` and on `(x+1).order_ideal()` for
+`QQ['x']`: the rebuild rule of #500 keeps `Modules.ElementMethods.order_ideal` on these rings, and that method read
+`dual.codomain()` off a dual that, for an infinite chosen basis, is the product `R^S` and has no codomain attribute.
+The mathematics such a call must answer is `ZZ.ideal(2)` and `QQ.ideal(1)`; both are the values the same calls
+returned at `51310d6`. `af3edee` asserts them red, `ef39a9b` repairs the method at its owner, `b5cfd57` moves the
+ring-point enumeration onto `OwnedRings().Finite()`, `1b8358c` states the completion at the zero ideal by its map.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `500c-red.log` | `af3edee` (with only the test added to `9bc1185`) | `tests/modules/test_the_order_ideal_of_a_ring_element_over_its_base_ring.sage`: **2 failed in 1.34 s**, both at `modules.py:1663 in order_ideal -- regular = dual.codomain()`, `AttributeError: 'GeneralModules.parent_class' object has no attribute 'codomain'` |
+| `500c-tests.log` | `1b8358c` | the two test files this issue changes, with the test lint plugin on: **5 passed in 1.85 s** |
+| `500c-tests-uncommitted.log` | the working tree whose `src` and `tests` are `b5cfd57`'s and `1b8358c`'s, before they were committed | the two files above plus `tests/rings/test_elements_divide_in_their_own_ring.sage`: **10 passed in 21.14 s** |
+| `500c-lint-uncommitted.log` | the same working tree | the two files with `-o addopts= -p sage_extensions.testing.test_lint`: **5 passed in 6.01 s** |
+| `500c-order-ideal-at-51310d6.log` | `51310d6` (a clean worktree) | `(2x+2).order_ideal()` on `ZZ['x']` is `Ideal (2) of Integer Ring` and equal to `ZZ.ideal(2)`; `(x+1).order_ideal()` on `QQ['x']` is equal to `QQ.ideal(1)`; `(1+i).order_ideal()` on `QQ(i)` is equal to `QQ.ideal(1)`. All three answered by `FramedFreeModules.ElementMethods.order_ideal` |
+| `500c-coercion-at-51310d6.log` | `51310d6` | `has_coerce_map_from` read source by source (int, `ZZ`, `QQ`, `QQ(i)`, `ZZ['x']`, the module `ZZ**2`) on `ZZ['x']`, `QQ(i)` and `M_2(QQ)`, with `_coerce_map_from_`'s owner |
+| `500c-coercion-on-main.log` | `9bc1185` | the same probe on main. **Appeared: `int` on all three rings, and `ZZ` on `M_2(QQ)`** (whose hook owner moves from `sage.structure.parent.Parent` to `OwnedRings.ParentMethods`). **Vanished: none.** Values: `ZZ['x'](3) == 3*1`, `QQ(i)(3) == 3`, `M_2(QQ)(3) == M_2(QQ)(ZZ(3)) == 3*I`; every module and cross-ring source stays refused |
+| `500c-iter-before.log` | `af3edee` (a clean worktree) | before the move: `GF(2)`, `GF(4)`, `Zmod(6)`, `Zmod(8)` enumerate through `OwnedRings.ParentMethods`; `QQ(i)` and `ZZ['x']` refuse with `it is not placed among finite sets`; `ZZ` already raises `unable to coerce <class 'dict'> to an integer` from the framed free module's enumeration |
+| `500c-iter-after.log` | the working tree whose `src` is `b5cfd57`'s | after the move: the four finite rings enumerate the same points through `OwnedRings.Finite.ParentMethods`; `QQ(i)` and `ZZ['x']` refuse with `it is not a finite ring, so its points are not a finite iteration of its selected engine`; `ZZ` is unchanged. The intermediate state, with the general refusal deleted, is not in this log: measured then, `tuple(ZZ['x'])` handed back the ring itself forever and `iter(QQ(i))`/`iter(ZZ)` reached the framed coordinate enumeration and raised on the first element |
+| `500c-completion-map.log` | `9bc1185` | the completion of `QQ(i)` at `(0)`: the kernel is the zero ideal, `completion_map().is_injective()` is `True`, `is_surjective()` is the proposition `is_surjective(...)` (decided only between finite enumerated endpoints), `as_isomorphism()` refuses for lack of it, and `is_isomorphic_to(field)` is `True` |
+| `500c-rings-tree.log` | the working tree of `b5cfd57` | `tests/rings`, one pytest process: **74 failed, 259 passed in 49.64 s** |
+| `500c-rings-base.log` | `af3edee` | the same command on a clean worktree: **74 failed, 259 passed in 55.75 s**. The 74 FAILED ids are identical; the earlier run of this change had 19 more and they were all the `refine` name shadowed by a local import, repaired before this log |
+| `500c-sweep-tree.log` | the working tree of `b5cfd57` | eleven test directories, one pytest process each, plus the root `tests/*.py`: 465 FAILED ids |
+| `500c-sweep-base.log` | `af3edee` | the same twelve targets on a clean worktree: 467 FAILED ids |
+| `500c-compared.log` | the two sweeps above | FAILED ids compared per target: **0 only on the tree**, and the only two ids only on the base are the two red tests this issue adds, so **0 new and 2 fixed**. `tests/lattices` is not swept as a directory (5.6 GiB resident, unfinished after 25 minutes on this host); its two files that read the framed content are below |
+| `500c-lattice-content-tree.log` | the working tree of `b5cfd57` | `tests/lattices/test_content_and_doubling.sage`: 1 failed, 3 passed (`test_index_two_sublattices_of_a_hyperbolic_summand`) |
+| `500c-lattice-content-base.log` | `af3edee` | the same file on a clean worktree: 1 failed, 3 passed, the same id |
+| `500c-lattice-reflection-tree.log` | the working tree of `b5cfd57` | `tests/lattices/test_reflection_rational_line.sage`: **4 passed** |
+| `500c-lattice-reflection-base.log` | `af3edee` | the same file: **4 passed** |
+
+The probe sources behind the `500c-*` measurement logs are session probes, not library code, and stay out of the
+tree as the repository requires: each one builds the rings named in its row and prints what the call returned, its
+value and the class that answered, so the log carries every reading it is cited for.

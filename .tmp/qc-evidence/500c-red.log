@@ -1,0 +1,124 @@
+provider SHA: 9bc11855f51df06a4ccaecb13c5ffbe6c0647f4a
+port SHA: 991b88b0
+command: python -m pytest -p qc_sage_session tests/modules/test_the_order_ideal_of_a_ring_element_over_its_base_ring.sage
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+time gates on: star import 0.32 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: asyncio-1.5.0, xdist-3.8.0, reportlog-1.0.0, platformdirs-4.13.5, hypothesis-6.170.15, anyio-4.15.1, timeout-2.4.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+timeout: 60.0s
+timeout method: signal
+timeout func_only: False
+collected 2 items
+
+tests/modules/test_the_order_ideal_of_a_ring_element_over_its_base_ring.sage F [ 50%]
+F                                                                        [100%]
+
+=================================== FAILURES ===================================
+_ test_the_order_ideal_of_an_integer_polynomial_is_the_ideal_of_its_coefficients _
+
+>   return self._cached_methods[name]
+E   KeyError: 'codomain'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_the_order_ideal_of_an_integer_polynomial_is_the_ideal_of_its_coefficients() -> None:
+        r"""$O_{\mathbf{Z}[x]}(2x+2) = (2)$: the values of the functionals at $2x+2$.
+    
+        $\mathbf{Z}[x]$ is free on the monomials over $\mathbf{Z}$, so a linear
+        functional $\varphi$ is its family of values on them, and
+        $\varphi(2x+2) = 2\varphi(1) + 2\varphi(x)$: every value is divisible by
+        $2$.  The functional that is $1$ on $1$ and $0$ on every other monomial
+        attains $2$, so the values generate exactly $(2)$.
+        """
+        line = ZZ["x"]
+        x = line.algebra_generator("x")
+    
+>       assert (2 * x + 2).order_ideal() == ZZ.ideal(2)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/modules/test_the_order_ideal_of_a_ring_element_over_its_base_ring.sage:30: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/modules/pure/modules.py:1663: in order_ideal
+    regular = dual.codomain()
+              ^^^^^^^^^^^^^
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    ???
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: 'GeneralModules.parent_class' object has no attribute 'codomain'
+
+sage/cpython/getattr.pyx:357: AttributeError
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Integer Ring retains its module laws as an undecided proposition
+_______ test_the_order_ideal_of_a_rational_polynomial_is_the_unit_ideal ________
+
+>   return self._cached_methods[name]
+E   KeyError: 'codomain'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_the_order_ideal_of_a_rational_polynomial_is_the_unit_ideal() -> None:
+        r"""$O_{\mathbf{Q}[x]}(x+1) = \mathbf{Q}$: the coefficients generate the field.
+    
+        Over $\mathbf{Q}$ the same functional that is $1$ on $1$ attains the
+        coefficient $1$ of $x+1$, so the values generate the unit ideal of
+        $\mathbf{Q}$ -- which is $\mathbf{Q}$ itself.
+        """
+        line = QQ["x"]
+        x = line.algebra_generator("x")
+    
+>       assert (x + 1).order_ideal() == QQ.ideal(1)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/modules/test_the_order_ideal_of_a_ring_element_over_its_base_ring.sage:43: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/modules/pure/modules.py:1663: in order_ideal
+    regular = dual.codomain()
+              ^^^^^^^^^^^^^
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    return self.getattr_from_category(name)
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    attr = getattr_from_other_class(self, cls, name)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: 'GeneralModules.parent_class' object has no attribute 'codomain'
+
+sage/cpython/getattr.pyx:357: AttributeError
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:782 Elementwise module morphism Module over Fraction Field of Integer Ring on Classes in the multilinear tensor presentation -> Module over Fraction Field of Integer Ring on Fraction Field of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+------ generated xml file: /repos/sage-extensions/tests/.report/junit.xml ------
+-------------- generated report log file: tests/.report/run.jsonl --------------
+============================== slowest durations ===============================
+0.05s call     tests/modules/test_the_order_ideal_of_a_ring_element_over_its_base_ring.sage::test_the_order_ideal_of_a_rational_polynomial_is_the_unit_ideal
+0.04s call     tests/modules/test_the_order_ideal_of_a_ring_element_over_its_base_ring.sage::test_the_order_ideal_of_an_integer_polynomial_is_the_ideal_of_its_coefficients
+0.00s setup    tests/modules/test_the_order_ideal_of_a_ring_element_over_its_base_ring.sage::test_the_order_ideal_of_an_integer_polynomial_is_the_ideal_of_its_coefficients
+0.00s setup    tests/modules/test_the_order_ideal_of_a_ring_element_over_its_base_ring.sage::test_the_order_ideal_of_a_rational_polynomial_is_the_unit_ideal
+0.00s teardown tests/modules/test_the_order_ideal_of_a_ring_element_over_its_base_ring.sage::test_the_order_ideal_of_a_rational_polynomial_is_the_unit_ideal
+0.00s teardown tests/modules/test_the_order_ideal_of_a_ring_element_over_its_base_ring.sage::test_the_order_ideal_of_an_integer_polynomial_is_the_ideal_of_its_coefficients
+=========================== short test summary info ============================
+FAILED tests/modules/test_the_order_ideal_of_a_ring_element_over_its_base_ring.sage::test_the_order_ideal_of_an_integer_polynomial_is_the_ideal_of_its_coefficients
+FAILED tests/modules/test_the_order_ideal_of_a_ring_element_over_its_base_ring.sage::test_the_order_ideal_of_a_rational_polynomial_is_the_unit_ideal
+============================== 2 failed in 1.34s ===============================
+[peakrss] run500-probe500-red: child waited=1 shell_code=1 samples=2
+[peakrss] peak tree RSS      : 298 MiB
+[peakrss] low-water MemAvail : 11753 MiB
+[peakrss] peak single VmHWM  : 298 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      287 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     2.0s procs=  3 rss=   298 MiB hwm=   298 MiB avail= 11753 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     2 MiB hwm=     2 MiB avail= 11982 MiB
