@@ -1498,3 +1498,29 @@ ring-point enumeration onto `OwnedRings().Finite()`, `1b8358c` states the comple
 The probe sources behind the `500c-*` measurement logs are session probes, not library code, and stay out of the
 tree as the repository requires: each one builds the rings named in its row and prints what the call returned, its
 value and the class that answered, so the log carries every reading it is cited for.
+
+## Issue #500, fourth review (added 2026-11-15)
+
+Base for every comparison: a clean worktree at `5f17b92fe7`, the main this round
+started from.  "The tree" is the working tree whose `src` and `tests` are
+`c5af4fc`, `7b23fc3` and `1a53c51`.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `500d-red.log` | `5f17b92fe7` (a clean worktree, with only the new test copied in) | `tests/rings/test_a_ring_states_no_enumeration_of_its_points.sage`: **1 failed in 1.36 s** at `assert __iter__ is None` -- the general ring still answers `__iter__` with a method there |
+| `500d-tests.log` | `c5af4fc`, `7b23fc3`, `1a53c51` | the four files this issue owns, with the test lint plugin on: **11 passed in 18.40 s** |
+| `500d-order-ideal.log` | the tree of `1a53c51` | per object: the module, its base ring, the dual's shape, which method answers, the order ideal, whether it is in `CommutativeIdeals(R)`, the values `dual_evaluation_image_generators` returns, the framed level's own answer, and `dual_evaluation` at the first coordinate functional of the product. `Modules.ElementMethods.order_ideal` answers on `ZZ['x']`, `QQ['x']`, `QQ(i)` and `Zmod(8)`; `FramedFreeModules.ElementMethods.order_ideal` on `ZZ**2` and `Lattices(ZZ)([[2]])`. Values: `(2x+2)` -> `Ideal (2)` of `ZZ`, `(x+1)` -> the unit ideal of `QQ`, `(-6,9)` -> `(3)`, `6e0` -> `(6)`, every one of them in `CommutativeIdeals` of its base ring. `Zmod(8)(3)` raises `ValueError: ... has no chosen resolution` from the dual's own owner, in both levels |
+| `500d-iter.log` | the tree of `7b23fc3` | `ZZ['x']`, `QQ['x']`, `QQ` and `QQ(i)` resolve `__iter__` to `None`; `iter` and `tuple` raise `TypeError` at once (`'...' object is not iterable`), so `tuple(ZZ['x'])` does not read `ZZ['x'][0]`. `ZZ` resolves it to `FramedFreeModules.FinitelyGenerated.ParentMethods` and raises `unable to coerce <class 'dict'> to an integer` (#526, unchanged). `Zmod(8)`, `Zmod(1)`, `GF(2)`, `GF(4)`, `GF(9)` enumerate 8, 1, 2, 4 and 9 points through `OwnedRings.Finite.ParentMethods` |
+| `500d-finite-probe.log` | the tree of `7b23fc3` | the finite rings of every owned constructor: quotient `Z/8` (8 points), `Z/1` (1), prime field `Z/2` (2), residue field of `Z/4` (2), polynomial quotients `GF(4)` (4) and `GF(9)` (9) -- all in the finite-ring axiom, all enumerating through `OwnedRings.Finite.ParentMethods`. Products `GF(2) x GF(2)` (4) and `Z/4 x GF(3)` (12) are in the axiom and **do not enumerate**: their class resolves `__iter__` to `FramedFreeModules.FinitelyGenerated.ParentMethods`, which raises `ValueError: (0,) should be of length 2` |
+| `500d-finite-probe-before.log` | `5f17b92fe7`, unmodified | the same probe before this round: same constructor answers everywhere except that an infinite ring refuses with `it is not a finite ring, so its points are not a finite iteration of its selected engine`. The two products already answered through the framed module's coordinate iteration, so the placement change does not move them |
+| `500d-sweep-tree.log` | the tree of `c5af4fc`, `7b23fc3`, `1a53c51` | twelve test directories, one pytest process each, plus the twenty root `tests/*.py` files: FAILED ids listed per target |
+| `500d-sweep-base.log` | `5f17b92fe7` (a clean worktree) | the same targets on the base |
+| `500d-compared.log` | the two sweeps above, and the two below | FAILED ids compared per target: **0 only on the tree, 0 only on the base** for every target. The one count difference is `tests/rings` **260 passed against 259** -- the new test |
+| `500d-lattices-tree.log` | the tree of `1a53c51` | `tests/lattices/test_content_and_doubling.sage`: 1 failed, 3 passed (`test_index_two_sublattices_of_a_hyperbolic_summand`); `tests/lattices/test_reflection_rational_line.sage`: **4 passed** |
+| `500d-lattices-base.log` | `5f17b92fe7` | the same two files: the same ids |
+| `500d-extra-tree.log` | the tree of `1a53c51` | the seven files that read the dual, the order ideal or a lattice element: `test_lattice_semantic_api` 4 passed, `test_lattice_elements` 6, `test_named_lattice_constructions` 12, `test_hodge_calculus` 3, `test_hyperbolic_space` 3 failed, `test_all_ones_form_correlation` 2 passed, `test_infinite_form_duality` 2 failed |
+| `500d-extra-base.log` | `5f17b92fe7` | the same seven, id for id |
+
+The probe sources behind the `500d-*` measurement logs are session probes, not
+library code, and stay out of the tree: each prints the rings, the values and the
+class that answered, so the log carries every reading it is cited for.

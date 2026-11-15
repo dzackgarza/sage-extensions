@@ -1,0 +1,9 @@
+=== ran on: the working tree whose src and tests are 9cfb525c519b41c3cc5b67adc64366aae69f8f96 (committed as c5af4fc, 7b23fc3, 1a53c51)
+=== command: pytest -p qc_sage_session -o addopts= -p sage_extensions.testing.test_lint tests/modules/test_the_order_ideal_of_a_ring_element_over_its_base_ring.sage tests/categories/test_the_refined_category_answers_with_its_own_operation.sage tests/rings/test_a_ring_states_no_enumeration_of_its_points.sage tests/rings/test_elements_divide_in_their_own_ring.sage
+tree SHA: 5f17b92fe7370eb8db460d9f6919b99bcb4cd243
+selection: tests/modules/test_the_order_ideal_of_a_ring_element_over_its_base_ring.sage tests/categories/test_the_refined_category_answers_with_its_own_operation.sage tests/rings/test_a_ring_states_no_enumeration_of_its_points.sage tests/rings/test_elements_divide_in_their_own_ring.sage
+started: 2026-11-15T05:20:30+00:00
+...........                                                              [100%]
+11 passed in 18.40s
+exit: 0
+finished: 2026-11-15T05:20:52+00:00

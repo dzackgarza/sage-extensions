@@ -1,0 +1,58 @@
+=== ran on: the working tree of 9cfb525c519b41c3cc5b67adc64366aae69f8f96 (committed as 7b23fc3)
+=== command: session probe over the finite rings of the owned quotient, prime field, residue field, polynomial quotient and product constructors
+
+---- owned quotient ZZ/8
+   ring: Integer Ring / Ideal (8) of Integer Ring
+   in FiniteSets: True | in the finite-ring axiom: True
+   cardinality: 8
+   level answering __iter__: OwnedRings.Finite.ParentMethods
+   points: 8 first: ['0 mod Ideal (8) of Int', '1 mod Ideal (8) of Int', '2 mod Ideal (8) of Int']
+
+---- owned quotient ZZ/1 (the zero ring)
+   ring: Integer Ring / Ideal (1) of Integer Ring
+   in FiniteSets: True | in the finite-ring axiom: True
+   cardinality: 1
+   level answering __iter__: OwnedRings.Finite.ParentMethods
+   points: 1 first: ['0 mod Ideal (1) of Int']
+
+---- prime field ZZ/2
+   ring: Integer Ring / Ideal (2) of Integer Ring
+   in FiniteSets: True | in the finite-ring axiom: True
+   cardinality: 2
+   level answering __iter__: OwnedRings.Finite.ParentMethods
+   points: 2 first: ['0 mod Ideal (2) of Int', '1 mod Ideal (2) of Int']
+
+---- residue field of ZZ/4 at (2)
+   ring: Integer Ring / Ideal (2) of Integer Ring
+   in FiniteSets: True | in the finite-ring axiom: True
+   cardinality: 2
+   level answering __iter__: OwnedRings.Finite.ParentMethods
+   points: 2 first: ['0 mod Ideal (2) of Int', '1 mod Ideal (2) of Int']
+
+---- quotient GF(2)[x]/(x^2+x+1)
+   ring: Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring / Ideal (2) of Integer Ring / Ideal (z2^2 + z2 + 1 mod Ideal (2) of Integer Ring) of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring / Ideal (2) of Integer Ring
+   in FiniteSets: True | in the finite-ring axiom: True
+   cardinality: 4
+   level answering __iter__: OwnedRings.Finite.ParentMethods
+   points: 4 first: ['0 mod Ideal (z2^2 + z2', 'z2 mod Ideal (z2^2 + z', 'z2 + 1 mod Ideal (2) o']
+
+---- quotient GF(3)[x]/(x^2+2)
+   ring: Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring / Ideal (3) of Integer Ring / Ideal (z2^2 - z2 + 2 mod Ideal (3) of Integer Ring) of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring / Ideal (3) of Integer Ring
+   in FiniteSets: True | in the finite-ring axiom: True
+   cardinality: 9
+   level answering __iter__: OwnedRings.Finite.ParentMethods
+   points: 9 first: ['0 mod Ideal (z2^2 - z2', 'z2 mod Ideal (z2^2 - z', 'z2 + 1 mod Ideal (3) o']
+
+---- owned product GF(2) x GF(2)
+   ring: Finite ring with 4 elements
+   in FiniteSets: True | in the finite-ring axiom: True
+   cardinality: 4
+   level answering __iter__: FramedFreeModules.FinitelyGenerated.ParentMethods
+   tuple raised ValueError : (0,) should be of length 2
+
+---- owned product ZZ/4 x GF(3)
+   ring: Finite ring with 12 elements
+   in FiniteSets: True | in the finite-ring axiom: True
+   cardinality: 12
+   level answering __iter__: FramedFreeModules.FinitelyGenerated.ParentMethods
+   tuple raised ValueError : (0,) should be of length 2

@@ -1,0 +1,17 @@
+=== ran on: the working tree of 9cfb525c519b41c3cc5b67adc64366aae69f8f96
+=== sweep extra500d
+=== tree: 5f17b92fe7370eb8db460d9f6919b99bcb4cd243
+=== started: 2026-11-15T05:19:16+00:00
+tests/lattices/test_lattice_semantic_api.sage: 4 passed in 1.87s
+tests/lattices/test_lattice_elements.sage: 6 passed in 1.65s
+tests/lattices/test_named_lattice_constructions.sage: 12 passed in 2.85s
+tests/lattices/test_hodge_calculus.sage: 3 passed in 1.88s
+tests/lattices/test_hyperbolic_space.sage: 3 failed in 1.57s
+    FAILED tests/lattices/test_hyperbolic_space.sage::test_positive_cone_component_through_a_timelike_vector_separates_the_two_sheets
+    FAILED tests/lattices/test_hyperbolic_space.sage::test_hyperbolic_space_identifies_positive_multiples_of_a_timelike_vector
+    FAILED tests/lattices/test_hyperbolic_space.sage::test_projectivized_isotropic_cone_is_the_whole_hyperbolic_line_with_two_ideal_ends
+tests/forms/test_all_ones_form_correlation.sage: 2 passed in 1.39s
+tests/forms/test_infinite_form_duality.sage: 2 failed in 1.43s
+    FAILED tests/forms/test_infinite_form_duality.sage::test_the_standard_form_on_a_countable_free_module_is_not_perfect
+    FAILED tests/forms/test_infinite_form_duality.sage::test_u_is_unimodular_but_the_form_two_is_only_nondegenerate
+=== finished: 2026-11-15T05:19:36+00:00

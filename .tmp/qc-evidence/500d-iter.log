@@ -1,0 +1,63 @@
+=== ran on: the working tree of 9cfb525c519b41c3cc5b67adc64366aae69f8f96 (committed as 7b23fc3)
+=== command: session probe, printing type(ring).__iter__ and what iter()/tuple() return or raise
+
+== Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring
+   type.__iter__: None
+   iter raised TypeError : 'Owned_NativeFreeAlgebraParent_with_category' object is not iterable
+   tuple raised TypeError : 'Owned_NativeFreeAlgebraParent_with_category' object is not iterable
+
+== Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring
+   type.__iter__: None
+   iter raised TypeError : 'Owned_NativeFreeAlgebraParent_with_category' object is not iterable
+   tuple raised TypeError : 'Owned_NativeFreeAlgebraParent_with_category' object is not iterable
+
+== Integer Ring
+   type.__iter__: <function FramedFreeModules.FinitelyGenerated.ParentMethods.__iter__ at 0x72c8fdd87ab0>
+   iter raised TypeError : unable to coerce <class 'dict'> to an integer
+   tuple raised TypeError : unable to coerce <class 'dict'> to an integer
+
+== Fraction Field of Integer Ring
+   type.__iter__: None
+   iter raised TypeError : 'OwnedJoinCategory.parent_class' object is not iterable
+   tuple raised TypeError : 'OwnedJoinCategory.parent_class' object is not iterable
+
+== Free module on {1, a} over Fraction Field of Integer Ring
+   type.__iter__: None
+   iter raised TypeError : 'Owned_OwnedAlgebraParent_with_category' object is not iterable
+   tuple raised TypeError : 'Owned_OwnedAlgebraParent_with_category' object is not iterable
+
+== Integer Ring / Ideal (8) of Integer Ring
+   in OwnedRings().Finite(): True
+   type.__iter__: <function OwnedRings.Finite.ParentMethods.__iter__ at 0x72c8fe343a00>
+   finite level? True
+   tuple count 8
+
+== Integer Ring / Ideal (1) of Integer Ring
+   in OwnedRings().Finite(): True
+   type.__iter__: <function OwnedRings.Finite.ParentMethods.__iter__ at 0x72c8fe343a00>
+   finite level? True
+   tuple count 1
+
+== Integer Ring / Ideal (2) of Integer Ring
+   in OwnedRings().Finite(): True
+   type.__iter__: <function OwnedRings.Finite.ParentMethods.__iter__ at 0x72c8fe343a00>
+   finite level? True
+   tuple count 2
+
+== Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring / Ideal (2) of Integer Ring / Ideal (z2^2 + z2 + 1 mod Ideal (2) of Integer Ring) of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring / Ideal (2) of Integer Ring
+   in OwnedRings().Finite(): True
+   type.__iter__: <function OwnedRings.Finite.ParentMethods.__iter__ at 0x72c8fe343a00>
+   finite level? True
+   tuple count 4
+
+== Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring / Ideal (3) of Integer Ring / Ideal (z2^2 - z2 + 2 mod Ideal (3) of Integer Ring) of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring / Ideal (3) of Integer Ring
+   in OwnedRings().Finite(): True
+   type.__iter__: <function OwnedRings.Finite.ParentMethods.__iter__ at 0x72c8fe343a00>
+   finite level? True
+   tuple count 9
+
+== Finite ring with 4 elements
+   in OwnedRings().Finite(): True
+   type.__iter__: <function FramedFreeModules.FinitelyGenerated.ParentMethods.__iter__ at 0x72c8fdd87ab0>
+   finite level? False
+   tuple raised ValueError : (0,) should be of length 2
