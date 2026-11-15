@@ -1677,8 +1677,7 @@ class Modules(OwnedCategoryOverBaseRing):
             with no basis at all the dual is smaller and still unpresented:
             $\operatorname{Hom}_{\mathbf{Z}}(\mathbf{Z}/8, \mathbf{Z}) = 0$,
             so $O_{\mathbf{Z}/8}(2) = (0)$, and this level does not compute it
-            until the dual of a finitely presented module is presented
-            (its own issue).
+            until the dual of a finitely presented module is presented.
 
             Where the dual does carry a generating family -- a module with a
             chosen finite basis, above all -- this level answers.  Where it
@@ -1703,13 +1702,13 @@ class Modules(OwnedCategoryOverBaseRing):
             ring = module.base_ring()
             dual = module.dual_module()
             assert dual.has_selected_module_resolution(), (
-                f"the order ideal of {self} is the image of evaluation at it, "
-                f"computed from the values of a generating family of the dual "
-                f"{dual}, and that dual has no selected generating family here: "
-                f"this library holds none for it, so the image has no generating "
-                f"family of values to be spanned by.  The values themselves are "
-                f"the linear functionals on {module} at {self}, which need no "
-                "presentation of the dual to be defined"
+                f"the order ideal of {self} is the ideal that the values of "
+                f"the linear functionals on {module} at {self} generate, and "
+                f"those values cannot be collected here: the functionals from "
+                f"{module} to {ring} are {dual}, and no family of them that "
+                f"generates it is known, so there is nothing to range over.  "
+                f"The values themselves exist without one, and each is a "
+                f"functional applied to {self}"
             )
             evaluation = Modules(ring).Mor(dual, ring.regular_module())(
                 {

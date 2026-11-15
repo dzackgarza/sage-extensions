@@ -28,9 +28,6 @@ presentation, and an infinite ring.
 * ``adic_completion`` is ``OwnedRings.ParentMethods.adic_completion``, the
   ring's inverse limit, not the module's base change to the completed scalar
   ring of ``ModulesWithChosenFinitePresentation.ParentMethods``.
-
-The order those levels are kept in is stated once, in
-``sage_extensions.refine._owned_mixins``; this file does not restate it.
 """
 
 from sage_extensions.all import *  # noqa: F401,F403
@@ -122,16 +119,13 @@ def test_the_framed_level_answers_the_question_the_general_level_left_undecided(
 
     $\mathbf{Z}[x]$ is free on the monomials, so it is torsion-free: a basis
     element is killed only by a scalar killing its coefficient, and $\mathbf{Z}$
-    is a domain.  Its members annihilate nothing, so $\operatorname{Ann}_{\mathbf{Z}}(\mathbf{Z}[x]) = (0)$,
+    is a domain.  A nonzero scalar of $\mathbf{Z}$ annihilates no element of
+    $\mathbf{Z}[x]$, so $\operatorname{Ann}_{\mathbf{Z}}(\mathbf{Z}[x]) = (0)$,
     and that is the zero ideal of the base ring $\mathbf{Z}$ -- an element of the
     ideals of $\mathbf{Z}$, not a submodule of $\mathbf{Z}[x]$.
 
-    Both answers come from ``FramedFreeModules.ParentMethods``, the level the
-    category order puts first for a framed free module.  The general module
-    level states the same two questions as undecided propositions, since it has
-    no basis to read; before the category order was repaired it answered them
-    here and both came back undecided.  That is the whole difference, and it is
-    a change of answer, so it is stated.
+    Both answers come from ``FramedFreeModules.ParentMethods``, the level that
+    reads the frame, because the module level has no basis to read here.
     """
     line = ZZ["x"]
     ideal = line.annihilator()
