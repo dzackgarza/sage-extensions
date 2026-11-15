@@ -1,0 +1,23 @@
+[    0.6s] the specimen: Integral lattice of rank 5 and signature (3, 2)
+[    0.6s]     the reduction isometry is not the identity: True
+[    1.1s] at the identity of the reduction:
+[    1.1s]     the base point restricts integrally: True
+[    1.1s]     integral_base_point_or_none() returns the base point: True
+[    1.1s]     the locus was consulted: False
+[    1.2s] at the transvection of the reduction:
+[    1.2s]     the base point restricts integrally: True
+[    1.2s]     integral_base_point_or_none() returns the base point: True
+[    1.2s]     the locus was consulted: False
+[    1.2s] PROBE DONE
+[peakrss] p528early: child waited=0 shell_code=0 samples=3
+[peakrss] peak tree RSS      : 304 MiB
+[peakrss] low-water MemAvail : 6852 MiB
+[peakrss] peak single VmHWM  : 304 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      293 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     4.0s procs=  3 rss=   304 MiB hwm=   304 MiB avail=  6852 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   205 MiB hwm=   205 MiB avail=  7019 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     5 MiB hwm=     5 MiB avail=  7419 MiB
+launcher exit: 0

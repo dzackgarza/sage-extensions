@@ -1,0 +1,18 @@
+......                                                                   [100%]
+========================== test-call performance gate ==========================
+tests/lattices/test_the_integral_lift_locus_is_a_union_of_transvection_cosets.sage::test_the_locus_at_a_non_identity_reduction_is_every_class_that_lifts: 201.07 s > 20 s
+6 passed in 227.02s (0:03:47)
+[peakrss] p528ft: child waited=0 shell_code=0 samples=118
+[peakrss] peak tree RSS      : 426 MiB
+[peakrss] low-water MemAvail : 8195 MiB
+[peakrss] peak single VmHWM  : 426 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      415 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   234.4s procs=  3 rss=   426 MiB hwm=   426 MiB avail=  9576 MiB
+[peakrss]   t=   232.4s procs=  3 rss=   424 MiB hwm=   424 MiB avail=  9626 MiB
+[peakrss]   t=   230.4s procs=  3 rss=   418 MiB hwm=   418 MiB avail=  9696 MiB
+[peakrss]   t=   228.4s procs=  3 rss=   416 MiB hwm=   416 MiB avail=  9763 MiB
+[peakrss]   t=   226.4s procs=  3 rss=   415 MiB hwm=   415 MiB avail=  9744 MiB
+launcher exit: 0

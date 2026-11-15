@@ -165,7 +165,12 @@ class PredicateSubgroups(OwnedParameterizedCategory):
         ) -> None:
             self._predicate = predicate
             self._admitted_members = {}
-            self._description = description
+            # The clause that cuts this subgroup out, declared and set at the
+            # level that introduces it: it is what the rendering prints beside
+            # the ambient group and what a record names, and it is not the
+            # realization's ``_description``, which says what a whole group
+            # prints.
+            self._predicate_clause = description
             self._character_data = dict(character_data or {})
             self._character_data_complete = (
                 bool(character_data)
@@ -895,20 +900,22 @@ class PredicateSubgroups(OwnedParameterizedCategory):
             r"""Return this subgroup's own name: the condition that cuts it out.
 
             Every construction of this owner states one clause -- ``sn_RR(g) =
-            1`` for ``O^+(L)``, ``rho_L(g) lies in ...`` for a preimage, ``g
-            lies in every selected subgroup`` for an intersection -- and the
-            clause is the whole of what a reader is told about the subgroup
-            without rendering it.  The rendering is not this: ``_repr_`` prints
-            the clause beside the ambient group, and an orthogonal group prints
-            its whole module, so two subgroups of one ``O(L)`` render alike past
-            any clamp.
+            1`` for ``O^+(L)``, ``rho_L(g) lies in ...`` for a preimage -- and
+            the clause is the whole of what a reader is told about the subgroup.
+            This is not the subgroup's rendering: ``_repr_`` writes the clause
+            beside the ambient group, which is a rendering of the pair.
+
+            An intersection is named by the condition its construction states
+            too, but its construction states its operands instead of a clause,
+            so it states its own description one level down
+            (:meth:`IntersectionSubgroups.ParentMethods.description`).
 
             Read by :func:`sage_extensions.categories._lattice._group_label`.
             """
-            return f"the subgroup where {self._description}"
+            return f"the subgroup where {self._predicate_clause}"
 
         def _repr_(self):
-            return f"{{g in {self.supergroup()} : {self._description}}}"
+            return f"{{g in {self.supergroup()} : {self._predicate_clause}}}"
 
 
 class _PredicateSubgroupConstruction(OwnedParameterizedCategory):
@@ -1494,6 +1501,27 @@ class IntersectionSubgroups(_PredicateSubgroupConstruction):
                         return
         def intersected_subgroups(self):
             return self._intersected_subgroups
+
+        def description(self) -> str:
+            r"""Return this intersection's own name: the subgroups it meets.
+
+            An intersection's defining data are its operands, and each of them
+            states its own description, so the name is theirs: ``the
+            intersection of`` the operands' descriptions.  The condition this
+            subgroup's construction states -- ``g lies in every selected
+            subgroup`` -- says what an intersection is and not which one it is,
+            so it is the rendering's clause (:meth:`_repr_`) and not this.
+
+            The operands are written in one order because an intersection is
+            symmetric and the retained set has no chosen one: the sorted order of
+            their descriptions, so one call writes one name in every process.
+
+            Read by :func:`sage_extensions.categories._lattice._group_label`.
+            """
+            described = sorted(
+                subgroup.description() for subgroup in self._intersected_subgroups
+            )
+            return "the intersection of " + " and ".join(described)
 
         def _restricted_preimage_generating_morphism(self, morphism, target, generated):
             r"""``E ->> f^-1(K) cap B`` through the Schreier morphism onto ``(f i)^-1(K)``.

@@ -1,0 +1,24 @@
+[    0.2s] T_Co of rank 11, isotropic basis vectors ['ep', 'fp']
+[    0.7s] line ep: divisibility 2, reduction rank 9
+[    0.8s]     162 short vectors of the reduction
+[    0.8s]     isotropic ones: []
+[    0.8s]     the reduction has no non-identity Eichler transvection here
+[    1.5s]     at the identity: the base point is integral: True; P/mP has 262144 classes
+[    1.7s] line fp: divisibility 2, reduction rank 9
+[    1.8s]     162 short vectors of the reduction
+[    1.8s]     isotropic ones: []
+[    1.8s]     the reduction has no non-identity Eichler transvection here
+[    2.1s]     at the identity: the base point is integral: True; P/mP has 262144 classes
+[    2.1s] PROBE DONE
+[peakrss] p528tco2: child waited=0 shell_code=0 samples=3
+[peakrss] peak tree RSS      : 305 MiB
+[peakrss] low-water MemAvail : 8960 MiB
+[peakrss] peak single VmHWM  : 305 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      294 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     4.0s procs=  3 rss=   305 MiB hwm=   305 MiB avail=  8960 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   164 MiB hwm=   164 MiB avail=  9060 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     0 MiB hwm=     0 MiB avail=  9191 MiB
+launcher exit: 0

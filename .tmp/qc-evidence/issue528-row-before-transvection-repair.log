@@ -1,0 +1,21 @@
+[    0.0s] not instrumented: the row's own time
+[    0.0s] lattice Integral lattice of rank 11 and signature (2, 9)
+[  130.3s] 
+[  130.3s] the ambient row: 130.2 s, decided True
+[  130.3s] planes: 1
+[  130.3s]   call                                     calls   seconds   us/call
+[  130.3s] RESULT row_seconds=130.2 decided=True 
+[peakrss] row528before: child waited=0 shell_code=0 samples=67
+[peakrss] peak tree RSS      : 566 MiB
+[peakrss] low-water MemAvail : 11696 MiB
+[peakrss] peak single VmHWM  : 566 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      555 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   132.2s procs=  3 rss=   566 MiB hwm=   566 MiB avail= 11848 MiB
+[peakrss]   t=   130.2s procs=  3 rss=   553 MiB hwm=   553 MiB avail= 11696 MiB
+[peakrss]   t=   128.2s procs=  3 rss=   539 MiB hwm=   539 MiB avail= 12113 MiB
+[peakrss]   t=   126.2s procs=  3 rss=   537 MiB hwm=   537 MiB avail= 12167 MiB
+[peakrss]   t=   116.2s procs=  3 rss=   536 MiB hwm=   536 MiB avail= 11893 MiB
+launcher exit: 0

@@ -1,0 +1,38 @@
+[    0.1s] U(5) + U(4) at -2e0 - e2: rank 4, even True, divisibility 2
+[    0.3s] U(5) + U(4) at -2e0 - e2: raised StopIteration()
+[    0.3s] U(5) + U(5) at -2e0 - e2: rank 4, even True, divisibility 5
+[    0.5s] U(5) + U(5) at -2e0 - e2: raised StopIteration()
+[    0.5s] U(4) + U(4) at -2e0 - e2: rank 4, even True, divisibility 4
+[    0.6s] U(4) + U(4) at -2e0 - e2: raised StopIteration()
+[    0.6s] U(4) + U(4) at -e0 - e2: rank 4, even True, divisibility 4
+[    0.7s] U(4) + U(4) at -e0 - e2: raised StopIteration()
+[    0.7s] U(6) + U(4) at -2e0 - e2: rank 4, even True, divisibility 4
+[    0.8s] U(6) + U(4) at -2e0 - e2: raised StopIteration()
+[    0.8s] U(3) + U(4) at -2e0 - e2: rank 4, even True, divisibility 2
+[    0.8s] U(3) + U(4) at -2e0 - e2: raised StopIteration()
+[    0.8s] U(5) + U(4) + U(4) at -2e0 - e2: rank 6, even True, divisibility 2
+[    1.5s]     the base point is integral: True
+[    1.7s]     P/mP has 4096 classes, period 8
+[    2.3s]     the locus has 2048 classes, computed in 0.59 s
+[    2.3s] U(5) + U(5) + U(4) at -2e0 - e4: rank 6, even True, divisibility 2
+[    2.9s]     the base point is integral: False
+[    2.9s]     P/mP has 4096 classes, period 8
+[    3.3s]     the locus has 512 classes, computed in 0.41 s
+[    3.4s] U(5) + U(4) + U(4) at -2e0 - e4: rank 6, even True, divisibility 2
+[    3.7s]     the base point is integral: True
+[    3.8s]     P/mP has 4096 classes, period 8
+[    4.5s]     the locus has 2048 classes, computed in 0.75 s
+[    4.5s] PROBE DONE
+[peakrss] p528spec2: child waited=0 shell_code=0 samples=4
+[peakrss] peak tree RSS      : 324 MiB
+[peakrss] low-water MemAvail : 8491 MiB
+[peakrss] peak single VmHWM  : 324 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      313 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     6.0s procs=  3 rss=   324 MiB hwm=   324 MiB avail=  8491 MiB
+[peakrss]   t=     4.0s procs=  3 rss=   318 MiB hwm=   318 MiB avail=  8549 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   300 MiB hwm=   300 MiB avail=  8668 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     7 MiB hwm=     7 MiB avail=  8622 MiB
+launcher exit: 0

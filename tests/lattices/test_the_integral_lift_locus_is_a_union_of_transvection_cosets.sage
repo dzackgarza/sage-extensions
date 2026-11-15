@@ -28,18 +28,18 @@ in this session is an owned set and an owned set is not equal to a Python one.
 from sage_extensions.all import *  # noqa: F401,F403
 
 
-def _marked_line_lift_torsor(lattice, marked, reduction_isometry=None):
+def _marked_line_lift_torsor(lattice, marked, reduction_isometry):
     r"""The lift torsor of a reduction of ``lattice`` at the line spanned by ``marked``.
 
     ``marked`` must be a primitive isotropic vector of ``lattice``, so that its line is a
     rank-one primitive totally isotropic subobject and the reduction along it is defined.
-    ``reduction_isometry`` is an isometry of that reduction, by default its identity; a
-    nontrivial one lifts to a base point that is not the identity of the lattice, which is
-    the case the locus' per-class test has to answer for.
+    ``reduction_isometry`` is an isometry of that reduction, and it is supplied at every
+    call: the identity of the reduction and an isometry of the reduction that is not the
+    identity ask different questions of the lift, and a call that leaves the choice
+    implicit is not saying which one it asks.
     """
     reduction = lattice.primitive_isotropic_subobject(marked).isotropic_reduction()
-    isometry = reduction.Isom(reduction).identity() if reduction_isometry is None else reduction_isometry
-    return reduction.rational_lifts(reduction, isometry)
+    return reduction.rational_lifts(reduction, reduction_isometry)
 
 
 def _reduction_transvection(lattice, marked):
@@ -105,7 +105,10 @@ def _assert_locus_is_the_integral_classes(lattice, divisibility, marked=None) ->
     """
     if marked is None:
         marked = _first_basis_line(lattice)
-    torsor = _marked_line_lift_torsor(lattice, marked)
+    reduction = lattice.primitive_isotropic_subobject(marked).isotropic_reduction()
+    torsor = _marked_line_lift_torsor(
+        lattice, marked, reduction.Isom(reduction).identity()
+    )
     integral_classes = _classes_that_lift_integrally(lattice, torsor)
     zero = torsor.integral_parameter_quotient().codomain().zero()
 
@@ -165,40 +168,49 @@ def test_the_locus_of_a_divisibility_two_control_with_a_nontrivial_kernel_is_eve
 
 
 def test_the_locus_at_a_non_identity_reduction_is_every_class_that_lifts() -> None:
-    r"""On `U(2) + U(2) + <2>` at a reduction isometry that is not the identity.
+    r"""On `U(5) + U(5) + U(4)` at the transvection of the reduction at `-2 e_1 - e_5`.
 
-    The other tests reduce at the identity isometry of the reduction, where the base point of
-    the lift is the identity of the lattice and its coordinate matrix is the identity.  That
-    makes every reading of the lift's integrality agree, so it cannot separate the lift's own
-    matrix from a transposed reading of it -- the failure the review of `0a55452cfa` reported,
-    where `base_images` was filled by rows and the product `T * base_images` was read as the
-    lift's matrix.
-
-    This test answers the same question at an Eichler transvection of the reduction, whose
-    lift's base point is not the identity and whose coordinate matrix is not symmetric: the
-    locus' classes are exactly the classes of `P/mP` whose lift restricts to an isometry of the
-    lattice, against the lift's own `integral_restriction`.
+    The marked vector with coordinates `(-2, 0, 0, 0, -1, 0)` on the basis of `U(5) + U(5) +
+    U(4)` is primitive isotropic of divisibility two, and the lift of the reduction's
+    transvection has a base point that is not an isometry of the lattice.  What this test
+    decides: that base point does not restrict integrally, so `integral_base_point_or_none`
+    cannot answer from it and has to walk the locus; the lift it answers with restricts
+    integrally; the reported locus is exactly the classes of `P/mP` whose own parameter lift
+    restricts to an isometry of the lattice, decided class by class over the whole parameter
+    quotient against the lift's own `integral_restriction`; the zero class is in it on both
+    sides; and it is not the whole quotient.
     """
     lattice = (
-        Lattices(ZZ)([[0, 2], [2, 0]])
-        + Lattices(ZZ)([[0, 2], [2, 0]])
-        + Lattices(ZZ)([[2]])
+        Lattices(ZZ)([[0, 5], [5, 0]])
+        + Lattices(ZZ)([[0, 5], [5, 0]])
+        + Lattices(ZZ)([[0, 4], [4, 0]])
     )
-    marked = _first_basis_line(lattice)
+    labels = tuple(lattice.module_generating_set())
+    marked = lattice.linear_combination({
+        label: ZZ(coefficient)
+        for label, coefficient in zip(labels, (-2, 0, 0, 0, -1, 0), strict=True)
+    })
     isometry = _reduction_transvection(lattice, marked)
     reduction = lattice.primitive_isotropic_subobject(marked).isotropic_reduction()
     # The isometry is not the identity: the test is not the identity case again.
     assert isometry != reduction.Isom(reduction).identity()
-    torsor = _marked_line_lift_torsor(lattice, marked, reduction_isometry=isometry)
+    torsor = _marked_line_lift_torsor(lattice, marked, isometry)
     integral_classes = _classes_that_lift_integrally(lattice, torsor)
     reported = set(torsor.integral_parameter_classes())
     quotient = torsor.integral_parameter_quotient()
 
+    # The base point is not integral, so the locus is consulted and not bypassed.
+    assert lattice.div(marked) == 2
+    assert torsor.base_point().integral_restriction(lattice, lattice) is None
+    answered = torsor.integral_base_point_or_none()
+    assert answered.integral_restriction(lattice, lattice) in lattice.Isom(lattice)
     assert reported == integral_classes
-    # The comparison is neither of two empty sets nor of the whole parameter quotient.
+    # Neither side is empty, neither is the whole quotient, and at a base point that is not
+    # integral the zero parameter is on neither side.
     zero = quotient.codomain().zero()
-    assert zero in integral_classes
-    assert zero in reported
+    assert integral_classes
+    assert zero not in integral_classes
+    assert zero not in reported
     assert reported != set(quotient.codomain())
 
 
@@ -235,5 +247,3 @@ def test_the_locus_of_a_section_with_unequal_smith_steps_is_every_class_that_lif
     })
 
     _assert_locus_is_the_integral_classes(lattice, 2, marked=marked)
-
-

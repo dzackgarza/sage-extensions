@@ -5866,21 +5866,25 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
         return witness
 
     def description(self) -> str:
-        r"""Return this isometry family's own name, for a timing record's input.
+        r"""Return the automorphism group's name, for a timing record's input.
 
         The automorphism group of a lattice is ``O(L)`` -- the name
         :meth:`...Lattices.ParentMethods.orthogonal_group` gives it, and the
         name its rendering begins with -- and the lattice is named beside it in
-        the same record, so this states the group and not its domain.  A family
-        between two lattices states that it is one, since which two is the
-        domain and the codomain the record names elsewhere.
+        the same record, so this states the group and not its domain.
 
-        Read by :func:`sage_extensions.categories._lattice._group_label`, which
-        writes the name of the subgroup an orbit row is taken under.
+        Only the automorphism group states a name here.  The isometries between
+        two lattices are not a group and no record names them: the one reader,
+        :func:`sage_extensions.categories._lattice._group_label`, is asked for
+        the group an orbit row is taken under, and an orbit row is taken under
+        automorphisms of the lattice it is computed on.  A name for the
+        two-lattice family would be a branch nothing reaches.
         """
-        if self.domain() is self.codomain():
-            return "O(L)"
-        return "the isometries between its domain and its codomain"
+        assert self.domain() is self.codomain(), (
+            f"only the automorphism group states a description, but this family is "
+            f"the isometries from {self.domain()} to {self.codomain()}"
+        )
+        return "O(L)"
 
     def _repr_(self):
         if self.domain() is self.codomain():

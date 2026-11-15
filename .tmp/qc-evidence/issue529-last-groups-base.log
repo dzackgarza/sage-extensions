@@ -1,0 +1,57 @@
+tree SHA: 108ef8def05803943206d9c94fe748063abc1d14
+port SHA: 991b88b0
+inner 560 s, outer 620 s, guard 4096 MiB
+command: /sage/.venv/bin/python -u -s -m pytest -p qc_sage_session -o addopts= -p sage_extensions.testing.suite_budget --no-time-gates -q tests/groups/test_generated_model_character_quotient.sage tests/groups/test_character_intersection_generators.sage tests/groups/test_predicate_kernel_and_stabilizer_subgroups_of_s4.sage
+proot warning: can't sanitize binding "/workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/wt529base/.tmp/issue529-probe.py": No such file or directory
+.....F..............F                                                    [100%]
+=================================== FAILURES ===================================
+_________ test_adjust_witness_into_subgroup_matches_elementwise_search _________
+
+    def test_adjust_witness_into_subgroup_matches_elementwise_search() -> None:
+        _L, G, _OG, _pre, inter = _m_model()
+        q = inter.finite_character_quotient()
+        outside = next(g for g in G.group_generators() if g not in inter)
+>       inside = next(g for g in G.group_generators() if g in inter and g != G.one())
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       StopIteration
+
+tests/groups/test_generated_model_character_quotient.sage:158: StopIteration
+____________ test_normalizer_retains_its_conjugation_action_functor ____________
+
+    def test_normalizer_retains_its_conjugation_action_functor() -> None:
+        group = Groups.S(3)
+        subgroup = group.subgroup((group((1, 2)),))
+        normalizer = group.normalizer(subgroup)
+        action = normalizer.stabilizer_action()
+        point = action.domain().an_object()
+        identity = action.domain().Mor(point, point)(group.one())
+    
+        assert normalizer.stabilized_object() is subgroup
+        assert action.domain() is group.classifying_category()
+        assert action.codomain() is Sets()
+>       assert action(identity)(subgroup) is subgroup
+E       assert Subgroup of Symmetric group S_3 is Subgroup of Symmetric group S_3
+E        +  where Subgroup of Symmetric group S_3 = Generic endomorphism of Subgroups of Symmetric group S_3 with Symmetric group S_3-action(Subgroup of Symmetric group S_3)
+E        +    where Generic endomorphism of Subgroups of Symmetric group S_3 with Symmetric group S_3-action = Symmetric group S_3-action functor on Subgroups of Symmetric group S_3 with Symmetric group S_3-action: Category of the unique object of B(Symmetric group S_3) -> Category of sets(1 in B(Symmetric group S_3))
+
+tests/groups/test_predicate_kernel_and_stabilizer_subgroups_of_s4.sage:69: AssertionError
+=============================== time-gate report ===============================
+session star import took 4.38 s; the measured ceiling is 3 s
+=========================== short test summary info ============================
+FAILED tests/groups/test_generated_model_character_quotient.sage::test_adjust_witness_into_subgroup_matches_elementwise_search
+FAILED tests/groups/test_predicate_kernel_and_stabilizer_subgroups_of_s4.sage::test_normalizer_retains_its_conjugation_action_functor
+2 failed, 19 passed in 21.66s
+[peakrss] pytest529groupsbase: child waited=1 shell_code=1 samples=18
+[peakrss] peak tree RSS      : 495 MiB
+[peakrss] low-water MemAvail : 10834 MiB
+[peakrss] peak single VmHWM  : 495 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      482 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   sh                            1 MiB peak
+[peakrss]   t=    32.1s procs=  4 rss=   495 MiB hwm=   495 MiB avail= 10906 MiB
+[peakrss]   t=    34.1s procs=  4 rss=   495 MiB hwm=   495 MiB avail= 10834 MiB
+[peakrss]   t=    30.1s procs=  4 rss=   494 MiB hwm=   494 MiB avail= 11006 MiB
+[peakrss]   t=    28.1s procs=  4 rss=   485 MiB hwm=   485 MiB avail= 11183 MiB
+[peakrss]   t=    26.1s procs=  4 rss=   482 MiB hwm=   482 MiB avail= 11198 MiB

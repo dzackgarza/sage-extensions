@@ -1493,7 +1493,7 @@ def keyword_arguments(**keywords) -> str:
     r"""A call's keyword arguments as a record name's tail: ``, name=value`` each.
 
     A stage's name says what was computed, and for a call whose result depends on
-    a bound or a filter the arguments are part of that: ``cusp_chamber()`` and
+    a bound the arguments are part of that: ``cusp_chamber()`` and
     ``cusp_chamber(max_decompositions=200)`` are two computations, and a name
     that left the bound out describes neither of them.  So the call site writes
     the keywords the call was given, in name order, and a reader of the line
@@ -1501,9 +1501,11 @@ def keyword_arguments(**keywords) -> str:
 
     A value is written by its ``repr``, which is exact for every number this
     library passes -- an owned ring element's ``repr`` is its value, a bound the
-    caller wrote is written back as it was given -- or by its owner's own
-    description where it states one (a group or a subgroup, through its public
-    ``description()``).  ``None`` states no bound and no filter and is left out.
+    caller wrote is written back as it was given.  ``None`` states no bound and
+    is left out.  A callable is not passed here at all: its ``repr`` is its
+    function's name and the address of the process that made it, which says
+    where the call ran and not what it computed, and the call that built the
+    filter states in its own record which subgroup the filter cuts out.
     Nothing is hashed, canonicalized or made unique: two calls may share the
     text, and the record's ``id`` is what tells their lines apart
     (:mod:`sage_extensions.timing`).
@@ -1524,8 +1526,6 @@ def keyword_arguments(**keywords) -> str:
         match value:
             case None:
                 continue
-            case _ if callable(getattr(value, "description", None)):
-                written.append(f"{name}={value.description()}")
             case _:
                 written.append(f"{name}={value!r}")
     return "".join(f", {entry}" for entry in written)
@@ -1565,18 +1565,24 @@ def _lattice_label(lattice) -> str:
 
 
 def _group_label(group) -> str:
-    r"""A subgroup's name in a timing record: the description its owner states.
+    r"""A group's name in a timing record: the description its own construction states.
 
-    Each owner names its own kind, through its public
-    ``description()``: a predicate subgroup states the condition that cuts it
-    out (``the subgroup where sn_RR(g) = 1`` for ``O^+(L)``), a subgroup given
-    by generators states the description its caller wrote or that it is
-    generated, and a lattice's isometry group states ``O(L)``
-    (:meth:`sage_extensions.categories.group.groups.Subgroups.ParentMethods.description`,
-    :meth:`sage_extensions.categories.group.predicate_subgroups.PredicateSubgroups.ParentMethods.description`,
-    :meth:`sage_extensions.categories.lattice_morphisms.LatticeIsometryMor.description`).
-    A group whose owner states no description has no name here, and this raises
-    rather than naming it something its owner did not say.
+    Each kind states its own, through its public ``description()``, where its
+    defining data are stored: a subgroup states the sentence its constructing
+    owner wrote for it (a transport, the group of integral points)
+    (:meth:`...group.groups.Subgroups.ParentMethods.description`), a generated
+    subgroup says whose generators it is
+    (:meth:`...group.groups.GeneratedSubgroups.ParentMethods.description`), a
+    predicate subgroup states the condition that cuts it out (``the subgroup
+    where sn_RR(g) = 1`` for ``O^+(L)``,
+    :meth:`...predicate_subgroups.PredicateSubgroups.ParentMethods.description`),
+    an intersection states the operands it meets
+    (:meth:`...predicate_subgroups.IntersectionSubgroups.ParentMethods.description`),
+    and a lattice's isometry group states ``O(L)``
+    (:meth:`...lattice_morphisms.LatticeIsometryMor.description`).
+
+    A kind that states no description has no name here, and this raises rather
+    than naming the group something its construction did not say.
 
     EXAMPLES::
 
@@ -1589,6 +1595,9 @@ def _group_label(group) -> str:
         'the subgroup where sn_RR(g) = 1'
         sage: _group_label(lattice.stable_orthogonal_group()).startswith(
         ....:     "the subgroup where rho_L(g) lies in")
+        True
+        sage: _group_label(lattice.O_plus().intersection(lattice.stable_orthogonal_group())).startswith(
+        ....:     "the intersection of the subgroup where rho_L(g) lies in")
         True
     """
     return group.description()

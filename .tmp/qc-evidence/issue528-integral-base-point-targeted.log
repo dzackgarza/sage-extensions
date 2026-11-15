@@ -1,0 +1,52 @@
+[    0.7s] U + A3(2) at (-2,2,-1,2,-1): gram [[0, 1, 0, 0, 0], [1, 0, 0, 0, 0], [0, 0, 4, 2, 0], [0, 0, 2, 4, 2], [0, 0, 0, 2, 4]], div 2, reduction rank 3, period 8, P/mP 512 classes
+[    1.0s]     33 integral isometries of the reduction to try
+[    2.4s]     0 of 33 have a base point that is not integral
+[    2.6s] U + A3(2) at the first basis line: gram [[0, 1, 0, 0, 0], [1, 0, 0, 0, 0], [0, 0, 4, 2, 0], [0, 0, 2, 4, 2], [0, 0, 0, 2, 4]], div 1, reduction rank 3, period 2, P/mP 8 classes
+[    2.9s]     37 integral isometries of the reduction to try
+[    4.1s]     0 of 37 have a base point that is not integral
+[    4.4s] U(2) + A3(2) at the first basis line: gram [[0, 2, 0, 0, 0], [2, 0, 0, 0, 0], [0, 0, 4, 2, 0], [0, 0, 2, 4, 2], [0, 0, 0, 2, 4]], div 2, reduction rank 3, period 4, P/mP 64 classes
+[    4.7s]     37 integral isometries of the reduction to try
+[    6.1s]     0 of 37 have a base point that is not integral
+[    6.3s] U + A3 at the first basis line: gram [[0, 1, 0, 0, 0], [1, 0, 0, 0, 0], [0, 0, 2, -1, 0], [0, 0, -1, 2, -1], [0, 0, 0, -1, 2]], div 1, reduction rank 3, period 2, P/mP 8 classes
+[    6.6s]     37 integral isometries of the reduction to try
+[    7.8s]     0 of 37 have a base point that is not integral
+[    8.0s] U(2) + A3 at the first basis line: gram [[0, 2, 0, 0, 0], [2, 0, 0, 0, 0], [0, 0, 2, -1, 0], [0, 0, -1, 2, -1], [0, 0, 0, -1, 2]], div 2, reduction rank 3, period 4, P/mP 64 classes
+[    8.3s]     37 integral isometries of the reduction to try
+[    9.8s]     0 of 37 have a base point that is not integral
+[   10.0s] U(3) + A2 at the first basis line: gram [[0, 3, 0, 0], [3, 0, 0, 0], [0, 0, 2, -1], [0, 0, -1, 2]], div 3, reduction rank 2, period 6, P/mP 36 classes
+[   10.1s]     23 integral isometries of the reduction to try
+[   10.8s]     0 of 23 have a base point that is not integral
+[   11.1s] U(3) + A3 at the first basis line: gram [[0, 3, 0, 0, 0], [3, 0, 0, 0, 0], [0, 0, 2, -1, 0], [0, 0, -1, 2, -1], [0, 0, 0, -1, 2]], div 3, reduction rank 3, period 6, P/mP 216 classes
+[   11.4s]     37 integral isometries of the reduction to try
+[   12.7s]     0 of 37 have a base point that is not integral
+[   13.3s] U(2) + U(2) + A2 at the first basis line: gram [[0, 2, 0, 0, 0, 0], [2, 0, 0, 0, 0, 0], [0, 0, 0, 2, 0, 0], [0, 0, 2, 0, 0, 0], [0, 0, 0, 0, 2, -1], [0, 0, 0, 0, -1, 2]], div 2, reduction rank 4, period 4, P/mP 256 classes
+[   13.8s]     60 integral isometries of the reduction to try
+[   16.2s]     0 of 60 have a base point that is not integral
+[   16.5s] U(2) + D4 at the first basis line: gram [[0, 2, 0, 0, 0, 0], [2, 0, 0, 0, 0, 0], [0, 0, 2, -1, 0, 0], [0, 0, -1, 2, -1, 0], [0, 0, 0, -1, 2, -1], [0, 0, 0, 0, -1, 2]], div 2, reduction rank 4, period 4, P/mP 256 classes
+[   18.0s]     43 integral isometries of the reduction to try
+[   20.0s]     0 of 43 have a base point that is not integral
+[   20.3s] U + D4 at the first basis line: gram [[0, 1, 0, 0, 0, 0], [1, 0, 0, 0, 0, 0], [0, 0, 2, -1, 0, 0], [0, 0, -1, 2, -1, 0], [0, 0, 0, -1, 2, -1], [0, 0, 0, 0, -1, 2]], div 1, reduction rank 4, period 2, P/mP 16 classes
+[   21.9s]     43 integral isometries of the reduction to try
+[   23.6s]     0 of 43 have a base point that is not integral
+[   23.9s] U(2) + U(2) + <2> at the first basis line: gram [[0, 2, 0, 0, 0], [2, 0, 0, 0, 0], [0, 0, 0, 2, 0], [0, 0, 2, 0, 0], [0, 0, 0, 0, 2]], div 2, reduction rank 3, period 4, P/mP 64 classes
+[   24.1s]     58 integral isometries of the reduction to try
+[   26.0s]     0 of 58 have a base point that is not integral
+[   26.3s] U(3) + <1> + A2 at the first basis line: gram [[0, 3, 0, 0, 0], [3, 0, 0, 0, 0], [0, 0, 1, 0, 0], [0, 0, 0, 2, -1], [0, 0, 0, -1, 2]], div 3, reduction rank 3, period 6, P/mP 216 classes
+[   26.5s]     31 integral isometries of the reduction to try
+[   27.9s]     0 of 31 have a base point that is not integral
+[   27.9s] 
+[   27.9s] RESULT torsors=476 hits=0 seconds=27.9
+[   27.9s] PROBE DONE
+[peakrss] p528target2: child waited=1 shell_code=1 samples=16
+[peakrss] peak tree RSS      : 437 MiB
+[peakrss] low-water MemAvail : 11779 MiB
+[peakrss] peak single VmHWM  : 437 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      426 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    30.0s procs=  3 rss=   437 MiB hwm=   437 MiB avail= 11779 MiB
+[peakrss]   t=    28.0s procs=  3 rss=   431 MiB hwm=   431 MiB avail= 11810 MiB
+[peakrss]   t=    26.0s procs=  3 rss=   420 MiB hwm=   420 MiB avail= 11849 MiB
+[peakrss]   t=    24.0s procs=  3 rss=   410 MiB hwm=   410 MiB avail= 11879 MiB
+[peakrss]   t=    22.0s procs=  3 rss=   405 MiB hwm=   405 MiB avail= 11895 MiB

@@ -1,0 +1,58 @@
+[    0.2s] U(5)+U(4)+<2>: rank 5, even True
+[   15.4s] U(5)+U(3)+<2>: rank 5, even True
+[   20.6s] U(5)+U(2)+<2>: rank 5, even True
+[   35.5s] U(4)+U(4)+<2>: rank 5, even True
+[   65.3s] U(6)+U(4)+<2>: rank 5, even True
+[   96.5s] U(5)+U(4)+<-2>: rank 5, even True
+[  102.0s] U(3)+U(4)+<2>: rank 5, even True
+[  109.2s] U(5)+U(4)+A2: rank 6, even True
+[  112.5s]     HIT U(5)+U(4)+A2 at (-2, 0, -1, 0, 0, 0): div 2, period 8, P/mP 4096
+[  112.7s]     HIT U(5)+U(4)+A2 at (-2, 0, 1, 0, 0, 0): div 2, period 8, P/mP 4096
+[  113.0s]     HIT U(5)+U(4)+A2 at (2, 0, -1, 0, 0, 0): div 2, period 8, P/mP 4096
+[  113.3s]     HIT U(5)+U(4)+A2 at (2, 0, 1, 0, 0, 0): div 2, period 8, P/mP 4096
+[  113.6s]     HIT U(5)+U(4)+A2 at (-2, 0, 0, -1, 0, 0): div 2, period 8, P/mP 4096
+[  113.9s]     HIT U(5)+U(4)+A2 at (-2, 0, 0, 1, 0, 0): div 2, period 8, P/mP 4096
+[  114.2s]     HIT U(5)+U(4)+A2 at (2, 0, 0, -1, 0, 0): div 2, period 8, P/mP 4096
+[  114.5s]     HIT U(5)+U(4)+A2 at (2, 0, 0, 1, 0, 0): div 2, period 8, P/mP 4096
+[  114.7s]     HIT U(5)+U(4)+A2 at (0, -2, -1, 0, 0, 0): div 2, period 8, P/mP 4096
+[  115.0s]     HIT U(5)+U(4)+A2 at (0, -2, 1, 0, 0, 0): div 2, period 8, P/mP 4096
+[  115.3s]     HIT U(5)+U(4)+A2 at (0, 2, -1, 0, 0, 0): div 2, period 8, P/mP 4096
+[  115.6s]     HIT U(5)+U(4)+A2 at (0, 2, 1, 0, 0, 0): div 2, period 8, P/mP 4096
+[  115.9s]     HIT U(5)+U(4)+A2 at (0, -2, 0, -1, 0, 0): div 2, period 8, P/mP 4096
+[  116.2s]     HIT U(5)+U(4)+A2 at (0, -2, 0, 1, 0, 0): div 2, period 8, P/mP 4096
+[  116.4s]     HIT U(5)+U(4)+A2 at (0, 2, 0, -1, 0, 0): div 2, period 8, P/mP 4096
+[  116.7s]     HIT U(5)+U(4)+A2 at (0, 2, 0, 1, 0, 0): div 2, period 8, P/mP 4096
+[  116.7s] U(5)+U(4)+<4>: rank 5, even True
+[  123.5s] 
+[  123.5s] RESULT torsors=264 hits=16 seconds=123.3
+[  123.5s]   U(5)+U(4)+A2 (-2, 0, -1, 0, 0, 0) div=2 period=8 classes=4096
+[  123.5s]   U(5)+U(4)+A2 (-2, 0, 1, 0, 0, 0) div=2 period=8 classes=4096
+[  123.5s]   U(5)+U(4)+A2 (2, 0, -1, 0, 0, 0) div=2 period=8 classes=4096
+[  123.5s]   U(5)+U(4)+A2 (2, 0, 1, 0, 0, 0) div=2 period=8 classes=4096
+[  123.5s]   U(5)+U(4)+A2 (-2, 0, 0, -1, 0, 0) div=2 period=8 classes=4096
+[  123.5s]   U(5)+U(4)+A2 (-2, 0, 0, 1, 0, 0) div=2 period=8 classes=4096
+[  123.5s]   U(5)+U(4)+A2 (2, 0, 0, -1, 0, 0) div=2 period=8 classes=4096
+[  123.5s]   U(5)+U(4)+A2 (2, 0, 0, 1, 0, 0) div=2 period=8 classes=4096
+[  123.5s]   U(5)+U(4)+A2 (0, -2, -1, 0, 0, 0) div=2 period=8 classes=4096
+[  123.5s]   U(5)+U(4)+A2 (0, -2, 1, 0, 0, 0) div=2 period=8 classes=4096
+[  123.5s]   U(5)+U(4)+A2 (0, 2, -1, 0, 0, 0) div=2 period=8 classes=4096
+[  123.5s]   U(5)+U(4)+A2 (0, 2, 1, 0, 0, 0) div=2 period=8 classes=4096
+[  123.5s]   U(5)+U(4)+A2 (0, -2, 0, -1, 0, 0) div=2 period=8 classes=4096
+[  123.5s]   U(5)+U(4)+A2 (0, -2, 0, 1, 0, 0) div=2 period=8 classes=4096
+[  123.5s]   U(5)+U(4)+A2 (0, 2, 0, -1, 0, 0) div=2 period=8 classes=4096
+[  123.5s]   U(5)+U(4)+A2 (0, 2, 0, 1, 0, 0) div=2 period=8 classes=4096
+[  123.5s] PROBE DONE
+[peakrss] p528r5b: child waited=0 shell_code=0 samples=71
+[peakrss] peak tree RSS      : 858 MiB
+[peakrss] low-water MemAvail : 6165 MiB
+[peakrss] peak single VmHWM  : 858 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      847 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   130.2s procs=  3 rss=   858 MiB hwm=   858 MiB avail= 10038 MiB
+[peakrss]   t=   132.2s procs=  3 rss=   858 MiB hwm=   858 MiB avail=  9922 MiB
+[peakrss]   t=   134.2s procs=  3 rss=   858 MiB hwm=   858 MiB avail= 10150 MiB
+[peakrss]   t=   136.2s procs=  3 rss=   858 MiB hwm=   858 MiB avail= 10056 MiB
+[peakrss]   t=   138.2s procs=  3 rss=   858 MiB hwm=   858 MiB avail=  9915 MiB
+launcher exit: 0

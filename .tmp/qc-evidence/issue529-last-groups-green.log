@@ -1,0 +1,56 @@
+tree SHA: 108ef8def05803943206d9c94fe748063abc1d14
+port SHA: 991b88b0
+inner 560 s, outer 620 s, guard 4096 MiB
+command: /sage/.venv/bin/python -u -s -m pytest -p qc_sage_session -o addopts= -p sage_extensions.testing.suite_budget --no-time-gates -q tests/groups/test_generated_model_character_quotient.sage tests/groups/test_character_intersection_generators.sage tests/groups/test_predicate_kernel_and_stabilizer_subgroups_of_s4.sage
+proot warning: can't sanitize binding "/workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/wt529last/.tmp/issue529-probe.py": No such file or directory
+.....F..............F                                                    [100%]
+=================================== FAILURES ===================================
+_________ test_adjust_witness_into_subgroup_matches_elementwise_search _________
+
+    def test_adjust_witness_into_subgroup_matches_elementwise_search() -> None:
+        _L, G, _OG, _pre, inter = _m_model()
+        q = inter.finite_character_quotient()
+        outside = next(g for g in G.group_generators() if g not in inter)
+>       inside = next(g for g in G.group_generators() if g in inter and g != G.one())
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       StopIteration
+
+tests/groups/test_generated_model_character_quotient.sage:158: StopIteration
+____________ test_normalizer_retains_its_conjugation_action_functor ____________
+
+    def test_normalizer_retains_its_conjugation_action_functor() -> None:
+        group = Groups.S(3)
+        subgroup = group.subgroup((group((1, 2)),))
+        normalizer = group.normalizer(subgroup)
+        action = normalizer.stabilizer_action()
+        point = action.domain().an_object()
+        identity = action.domain().Mor(point, point)(group.one())
+    
+        assert normalizer.stabilized_object() is subgroup
+        assert action.domain() is group.classifying_category()
+        assert action.codomain() is Sets()
+>       assert action(identity)(subgroup) is subgroup
+E       assert the subgroup transported from a subgroup the engine computed is Subgroup of Symmetric group S_3
+E        +  where the subgroup transported from a subgroup the engine computed = Generic endomorphism of Subgroups of Symmetric group S_3 with Symmetric group S_3-action(Subgroup of Symmetric group S_3)
+E        +    where Generic endomorphism of Subgroups of Symmetric group S_3 with Symmetric group S_3-action = Symmetric group S_3-action functor on Subgroups of Symmetric group S_3 with Symmetric group S_3-action: Category of the unique object of B(Symmetric group S_3) -> Category of sets(1 in B(Symmetric group S_3))
+
+tests/groups/test_predicate_kernel_and_stabilizer_subgroups_of_s4.sage:69: AssertionError
+=========================== short test summary info ============================
+FAILED tests/groups/test_generated_model_character_quotient.sage::test_adjust_witness_into_subgroup_matches_elementwise_search
+FAILED tests/groups/test_predicate_kernel_and_stabilizer_subgroups_of_s4.sage::test_normalizer_retains_its_conjugation_action_functor
+2 failed, 19 passed in 21.78s
+[peakrss] pytest529groups3: child waited=1 shell_code=1 samples=16
+[peakrss] peak tree RSS      : 488 MiB
+[peakrss] low-water MemAvail : 11751 MiB
+[peakrss] peak single VmHWM  : 488 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      475 MiB peak
+[peakrss]   run.sh                        7 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   sh                            1 MiB peak
+[peakrss]   t=    28.1s procs=  4 rss=   488 MiB hwm=   488 MiB avail= 11764 MiB
+[peakrss]   t=    30.1s procs=  4 rss=   488 MiB hwm=   488 MiB avail= 11751 MiB
+[peakrss]   t=    26.1s procs=  4 rss=   478 MiB hwm=   478 MiB avail= 11862 MiB
+[peakrss]   t=    24.1s procs=  4 rss=   475 MiB hwm=   475 MiB avail= 11870 MiB
+[peakrss]   t=    22.1s procs=  4 rss=   471 MiB hwm=   471 MiB avail= 11844 MiB

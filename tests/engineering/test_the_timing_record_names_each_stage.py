@@ -118,7 +118,8 @@ def test_the_two_rows_of_one_lattice_are_named_apart():
     ``Õ(L)`` is the discriminant kernel and ``Õ⁺(L)`` its intersection with the
     spinor kernel, and the two rows are different computations of one lattice.
     Each row's name holds the description its subgroup states for itself
-    (:meth:`sage_extensions.categories.group.groups.Subgroups.ParentMethods.description`)
+    (:meth:`sage_extensions.categories.group.predicate_subgroups.PredicateSubgroups.ParentMethods.description`,
+    :meth:`sage_extensions.categories.group.predicate_subgroups.IntersectionSubgroups.ParentMethods.description`)
     -- the preimage sentence, and the intersection sentence -- which is what a
     reader of the line is told about the group the row is taken under.
     """

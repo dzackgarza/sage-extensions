@@ -1,0 +1,29 @@
+[    0.1s] === the T_Co specimen (Fraction Field of Integer Ring, rank 11) ===
+[    0.2s]   a.to_vector                   13
+[    0.2s]   e.to_vector                   11
+[    0.2s]   gram_tensor                    1
+[    0.2s]   module_generating_set         54
+[    0.2s]   ring.fraction_field            1
+[    0.2s]   ring.one                      13
+[    0.2s]   ring.zero                     46
+[    0.2s]   the transvection fixes e: True
+[    0.2s] COUNTS tco a.to_vector=13 e.to_vector=11 gram_tensor=1 module_generating_set=54 ring.fraction_field=1 ring.one=13 ring.zero=46
+[    0.2s] 
+[    0.2s] === the rank-3 control (Lattice of rank 3 and signature (2, 1)) ===
+[    0.2s]   a.to_vector                    5
+[    0.2s]   e.to_vector                    3
+[    0.2s]   gram_tensor                    1
+[    0.2s]   module_generating_set         25
+[    0.2s]   ring.fraction_field            1
+[    0.2s]   ring.one                       4
+[    0.2s]   ring.zero                     15
+[    0.2s]   the transvection fixes e: True
+[    0.2s] COUNTS control a.to_vector=5 e.to_vector=3 gram_tensor=1 module_generating_set=25 ring.fraction_field=1 ring.one=4 ring.zero=15
+[peakrss] counts528: child waited=0 shell_code=0 samples=1
+[peakrss] peak tree RSS      : 0 MiB
+[peakrss] low-water MemAvail : 13725 MiB
+[peakrss] peak single VmHWM  : 0 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   timeout                       0 MiB peak
+[peakrss]   t=     0.0s procs=  1 rss=     0 MiB hwm=     0 MiB avail= 13725 MiB
+launcher exit: 0

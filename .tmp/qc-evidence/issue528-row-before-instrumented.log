@@ -1,0 +1,30 @@
+[    0.0s] instrumented: _owned_engine_element, _engine_element, _engine_ring, _engine_component_matrix, eichler_transvection, _eichler_transvection_column_matrix, _element_constructor_@ring_foundation.IntegerModRing_generic, _element_constructor_@ring_foundation.PolynomialQuotientRing_generic, _element_constructor_@ring_foundation.PolynomialRing_generic, _element_constructor_@ring_foundation.RngMor, _element_constructor_@ring_foundation.RingMor, _element_constructor_@ring_foundation.PredicateSubrings.ParentMethods, _element_constructor_@ring_foundation.PredicateSubrings.ParentMethods, _element_constructor_@ring_foundation.LocalizationRings.ParentMethods, _element_constructor_@ring_foundation.LocalizationRings.ParentMethods, _element_constructor_@ring_foundation._PredicateSubringParent, _element_constructor_@ring_foundation._OwnedRingParent, to_vector@framed_free_modules.FramedFreeModules.ElementMethods, to_vector@framed_free_modules.FramedFreeModules.ElementMethods, _framing_lift@framed_free_modules.Modules.ParentMethods, _framing_lift@framed_free_modules._SparseFreeModuleParent
+[    0.0s] lattice Integral lattice of rank 11 and signature (2, 9)
+[  203.8s] 
+[  203.8s] the ambient row: 203.7 s, decided True
+[  203.8s] planes: 1
+[  203.8s]   call                                     calls   seconds   us/call
+[  203.8s]   eichler_transvection                      4096   107.376   26214.8
+[  203.8s]   _eichler_transvection_column_matrix       4096   100.076   24432.7
+[  203.8s]   _owned_engine_element                 21552901    32.693       1.5
+[  203.8s]   _element_constructor_                 57811206    31.160       0.5
+[  203.8s]   _engine_element                        5874505    14.351       2.4
+[  203.8s]   _engine_component_matrix                  4161     9.805    2356.3
+[  203.8s]   _engine_ring                           4403484     2.564       0.6
+[  203.8s]   _framing_lift                           283604     1.380       4.9
+[  203.8s]   to_vector                               189221     1.337       7.1
+[  203.8s] RESULT row_seconds=203.7 decided=True _eichler_transvection_column_matrix=4096 _element_constructor_=57811206 _engine_component_matrix=4161 _engine_element=5874505 _engine_ring=4403484 _framing_lift=283604 _owned_engine_element=21552901 eichler_transvection=4096 to_vector=189221
+[peakrss] row528beforec: child waited=0 shell_code=0 samples=104
+[peakrss] peak tree RSS      : 585 MiB
+[peakrss] low-water MemAvail : 9529 MiB
+[peakrss] peak single VmHWM  : 585 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      574 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   206.1s procs=  3 rss=   585 MiB hwm=   585 MiB avail= 13244 MiB
+[peakrss]   t=   204.1s procs=  3 rss=   579 MiB hwm=   579 MiB avail= 13248 MiB
+[peakrss]   t=   202.1s procs=  3 rss=   564 MiB hwm=   564 MiB avail= 13257 MiB
+[peakrss]   t=   196.1s procs=  3 rss=   551 MiB hwm=   551 MiB avail= 13270 MiB
+[peakrss]   t=   198.1s procs=  3 rss=   551 MiB hwm=   551 MiB avail= 13270 MiB
+launcher exit: 0

@@ -1,0 +1,28 @@
+[    0.0s] instrumented: _owned_engine_element, _engine_element, _engine_ring, _engine_component_matrix, eichler_transvection, _eichler_transvection_column_matrix, _element_constructor_@ring_foundation.IntegerModRing_generic, _element_constructor_@ring_foundation.PolynomialQuotientRing_generic, _element_constructor_@ring_foundation.PolynomialRing_generic, _element_constructor_@ring_foundation.RngMor, _element_constructor_@ring_foundation.RingMor, _element_constructor_@ring_foundation.PredicateSubrings.ParentMethods, _element_constructor_@ring_foundation.PredicateSubrings.ParentMethods, _element_constructor_@ring_foundation.LocalizationRings.ParentMethods, _element_constructor_@ring_foundation.LocalizationRings.ParentMethods, _element_constructor_@ring_foundation._PredicateSubringParent, _element_constructor_@ring_foundation._OwnedRingParent, to_vector@framed_free_modules.FramedFreeModules.ElementMethods, to_vector@framed_free_modules.FramedFreeModules.ElementMethods, _framing_lift@framed_free_modules.Modules.ParentMethods, _framing_lift@framed_free_modules._SparseFreeModuleParent
+[    0.0s] lattice Integral lattice of rank 11 and signature (2, 9)
+[  522.8s] the row did not return inside its 520 s cap
+[  522.8s] 
+[  522.8s] the ambient row: 522.8 s, decided False
+[  522.8s]   call                                     calls   seconds   us/call
+[  522.8s]   _element_constructor_                 56359107    61.184       1.1
+[  522.8s]   _owned_engine_element                 20521534    19.384       0.9
+[  522.8s]   _engine_element                        3333921    12.276       3.7
+[  522.8s]   _engine_ring                           3024272     1.388       0.5
+[  522.8s]   to_vector                               494208     1.268       2.6
+[  522.8s]   _framing_lift                           709999     1.139       1.6
+[  522.8s]   _engine_component_matrix                     7     0.004     586.9
+[  522.8s] RESULT row_seconds=522.8 decided=False _element_constructor_=56359107 _engine_component_matrix=7 _engine_element=3333921 _engine_ring=3024272 _framing_lift=709999 _owned_engine_element=20521534 to_vector=494208
+[peakrss] row528afterc: child waited=0 shell_code=0 samples=272
+[peakrss] peak tree RSS      : 3180 MiB
+[peakrss] low-water MemAvail : 10067 MiB
+[peakrss] peak single VmHWM  : 3180 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     3169 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   524.2s procs=  3 rss=  3180 MiB hwm=  3180 MiB avail= 10684 MiB
+[peakrss]   t=   526.3s procs=  3 rss=  3180 MiB hwm=  3180 MiB avail= 10684 MiB
+[peakrss]   t=   528.3s procs=  3 rss=  3180 MiB hwm=  3180 MiB avail= 10675 MiB
+[peakrss]   t=   530.3s procs=  3 rss=  3180 MiB hwm=  3180 MiB avail= 10675 MiB
+[peakrss]   t=   532.3s procs=  3 rss=  3180 MiB hwm=  3180 MiB avail= 10675 MiB
+launcher exit: 0

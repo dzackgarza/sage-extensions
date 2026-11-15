@@ -1,0 +1,64 @@
+[    0.0s] instrumented: _owned_engine_element, _engine_element, _engine_ring, _engine_component_matrix, eichler_transvection, _eichler_transvection_column_matrix, _element_constructor_@ring_foundation.IntegerModRing_generic, _element_constructor_@ring_foundation.PolynomialQuotientRing_generic, _element_constructor_@ring_foundation.PolynomialRing_generic, _element_constructor_@ring_foundation.RngMor, _element_constructor_@ring_foundation.RingMor, _element_constructor_@ring_foundation.PredicateSubrings.ParentMethods, _element_constructor_@ring_foundation.PredicateSubrings.ParentMethods, _element_constructor_@ring_foundation.LocalizationRings.ParentMethods, _element_constructor_@ring_foundation.LocalizationRings.ParentMethods, _element_constructor_@ring_foundation._PredicateSubringParent, _element_constructor_@ring_foundation._OwnedRingParent, to_vector@framed_free_modules.FramedFreeModules.ElementMethods, to_vector@framed_free_modules.FramedFreeModules.ElementMethods, _framing_lift@framed_free_modules.Modules.ParentMethods, _framing_lift@framed_free_modules._SparseFreeModuleParent
+[    0.0s] lattice Integral lattice of rank 11 and signature (2, 9)
+[   30.0s]   progress   30.0 s: eichler_transvection=897 to_vector=32267 _engine_component_matrix=917
+[   60.1s]   progress   60.1 s: eichler_transvection=2048 to_vector=47643 _engine_component_matrix=2072
+[   90.1s]   progress   90.1 s: eichler_transvection=3262 to_vector=65824 _engine_component_matrix=3296
+[  120.1s]   progress  120.1 s: eichler_transvection=4449 to_vector=82174 _engine_component_matrix=4491
+[  150.1s]   progress  150.1 s: eichler_transvection=5521 to_vector=102450 _engine_component_matrix=5584
+[  180.2s]   progress  180.2 s: eichler_transvection=5652 to_vector=189201 _engine_component_matrix=5757
+[  210.2s]   progress  210.2 s: eichler_transvection=5652 to_vector=246966 _engine_component_matrix=5799
+[  240.2s]   progress  240.2 s: eichler_transvection=5652 to_vector=266722 _engine_component_matrix=5799
+[  391.3s]   progress  391.3 s: eichler_transvection=5652 to_vector=271902 _engine_component_matrix=5799
+[  424.5s]   progress  424.5 s: eichler_transvection=5652 to_vector=302008 _engine_component_matrix=5799
+[  454.8s]   progress  454.8 s: eichler_transvection=5652 to_vector=334120 _engine_component_matrix=5799
+[  484.9s]   progress  484.9 s: eichler_transvection=5652 to_vector=367204 _engine_component_matrix=5799
+[  514.9s]   progress  514.9 s: eichler_transvection=5652 to_vector=399586 _engine_component_matrix=5799
+[  544.9s]   progress  544.9 s: eichler_transvection=5652 to_vector=431698 _engine_component_matrix=5799
+[  574.9s]   progress  574.9 s: eichler_transvection=5652 to_vector=468060 _engine_component_matrix=5799
+------------------------------------------------------------------------
+/sage/.venv/lib/python3.14/site-packages/cysignals/signals.cpython-314-x86_64-linux-gnu.so(+0x86e5) [0x7ab1b782f6e5]
+/sage/.venv/lib/python3.14/site-packages/cysignals/signals.cpython-314-x86_64-linux-gnu.so(+0x8786) [0x7ab1b782f786]
+/sage/.venv/lib/python3.14/site-packages/cysignals/signals.cpython-314-x86_64-linux-gnu.so(+0x8b54) [0x7ab1b782fb54]
+/lib/x86_64-linux-gnu/libc.so.6(+0x3fd70) [0x7ab1b953ad70]
+/lib/x86_64-linux-gnu/libc.so.6(+0xa06a6) [0x7ab1b959b6a6]
+/lib/x86_64-linux-gnu/libc.so.6(+0xa1eeb) [0x7ab1b959ceeb]
+/lib/x86_64-linux-gnu/libc.so.6(malloc+0xfe) [0x7ab1b959d9ce]
+/sage/.venv/bin/python() [0x1801f09]
+/sage/.venv/bin/python() [0x185b5f6]
+/sage/.venv/bin/python() [0x185b327]
+/sage/.venv/bin/python() [0x1810537]
+/sage/.venv/bin/python() [0x1817bc6]
+/sage/.venv/lib/python3.14/site-packages/sage/misc/cachefunc.cpython-314-x86_64-linux-gnu.so(+0x17ce1) [0x7ab1b79f4ce1]
+/sage/.venv/lib/python3.14/site-packages/sage/cpython/string.cpython-314-x86_64-linux-gnu.so(+0x53cd) [0x7ab1b91303cd]
+/sage/.venv/bin/python() [0x1ac3558]
+/sage/.venv/lib/python3.14/site-packages/sage/misc/cachefunc.cpython-314-x86_64-linux-gnu.so(+0x109af) [0x7ab1b79ed9af]
+/sage/.venv/lib/python3.14/site-packages/sage/misc/cachefunc.cpython-314-x86_64-linux-gnu.so(+0x49907) [0x7ab1b7a26907]
+/sage/.venv/bin/python() [0x1822fe1]
+/sage/.venv/bin/python() [0x1892a83]
+/sage/.venv/bin/python(PyEval_EvalCode+0xa6) [0x18936bc]
+/sage/.venv/bin/python() [0x1929339]
+/sage/.venv/bin/python() [0x1a7109b]
+/sage/.venv/bin/python() [0x1a70c41]
+/sage/.venv/bin/python() [0x19835c6]
+/sage/.venv/bin/python() [0x198350e]
+/sage/.venv/bin/python() [0x198341d]
+/sage/.venv/bin/python(Py_RunMain+0x40c) [0x198404c]
+/sage/.venv/bin/python() [0x1983c16]
+/sage/.venv/bin/python() [0x1983a70]
+/lib/x86_64-linux-gnu/libc.so.6(+0x29ca8) [0x7ab1b9524ca8]
+/lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0x85) [0x7ab1b9524d65]
+/sage/.venv/bin/python(_start+0x29) [0x19f75e9]
+------------------------------------------------------------------------
+[peakrss] otilde528: child waited=124 shell_code=124 samples=295
+[peakrss] peak tree RSS      : 3382 MiB
+[peakrss] low-water MemAvail : 9581 MiB
+[peakrss] peak single VmHWM  : 3382 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     3371 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   588.3s procs=  3 rss=  3382 MiB hwm=  3382 MiB avail= 10870 MiB
+[peakrss]   t=   586.3s procs=  3 rss=  3360 MiB hwm=  3360 MiB avail= 10894 MiB
+[peakrss]   t=   584.3s procs=  3 rss=  3341 MiB hwm=  3341 MiB avail= 10910 MiB
+[peakrss]   t=   580.3s procs=  3 rss=  3339 MiB hwm=  3339 MiB avail= 10910 MiB
+[peakrss]   t=   582.3s procs=  3 rss=  3339 MiB hwm=  3339 MiB avail= 10910 MiB

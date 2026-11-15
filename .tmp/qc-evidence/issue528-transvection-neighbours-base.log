@@ -1,0 +1,58 @@
+tree SHA: a8ce60f6b2c89e186efaeaa2992a8933dd4c9c12
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+tests: tests/lattices/test_eichler_isometry_relations.sage tests/lattices/test_two_u_eichler_model.sage tests/lattices/test_isotropic_reduction.sage tests/lattices/test_integral_reduction_lift_witness.sage tests/lattices/test_the_integral_lift_locus_is_a_union_of_transvection_cosets.sage
+inner 600 s, outer 660 s, guard 6144 MiB
+......F.....................                                             [100%]
+=================================== FAILURES ===================================
+___ test_approximate_generating_family_uses_exact_two_u_perpendicular_frames ___
+
+    def test_approximate_generating_family_uses_exact_two_u_perpendicular_frames() -> None:
+        model = Lattices(ZZ)("A2").two_u_eichler_model()
+        lattice = model.lattice()
+        family = model.approximate_generating_family()
+        isometries = tuple(family)
+        linear_generators = tuple(model.special_linear_group().group_generators())
+        e, f, e_prime, f_prime = model.hyperbolic_basis()
+        complement = model.orthogonal_complement()
+        inclusion = model.complement_inclusion()
+        embedded = tuple(inclusion(point) for point in complement.module_generators())
+        perpendicular_frames = (
+            (e, e_prime, f_prime),
+            (f, e_prime, f_prime),
+            (e, f, e_prime),
+            (e, f, f_prime),
+        )
+    
+        assert all(model.left_action(generator) in isometries for generator in linear_generators)
+        assert all(model.right_action(generator) in isometries for generator in linear_generators)
+>       assert all(
+            model.eichler_transvection(isotropic, orthogonal) in isometries
+            for isotropic, frame in zip(
+                model.hyperbolic_basis(),
+                perpendicular_frames,
+                strict=True,
+            )
+            for orthogonal in (*frame, *embedded)
+        )
+E       assert False
+E        +  where False = all(<generator object test_approximate_generating_family_uses_exact_two_u_perpendicular_frames.<locals>.<genexpr> at 0x7bf5c554aac0>)
+
+tests/lattices/test_two_u_eichler_model.sage:78: AssertionError
+========================== test-call performance gate ==========================
+tests/lattices/test_the_integral_lift_locus_is_a_union_of_transvection_cosets.sage::test_the_locus_at_a_non_identity_reduction_is_every_class_that_lifts: 207.43 s > 20 s
+=========================== short test summary info ============================
+FAILED tests/lattices/test_two_u_eichler_model.sage::test_approximate_generating_family_uses_exact_two_u_perpendicular_frames
+1 failed, 27 passed in 247.99s (0:04:07)
+[peakrss] neigh528base: child waited=1 shell_code=1 samples=130
+[peakrss] peak tree RSS      : 566 MiB
+[peakrss] low-water MemAvail : 10164 MiB
+[peakrss] peak single VmHWM  : 566 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      555 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    86.1s procs=  3 rss=   566 MiB hwm=   566 MiB avail= 11593 MiB
+[peakrss]   t=    82.1s procs=  3 rss=   565 MiB hwm=   565 MiB avail= 11606 MiB
+[peakrss]   t=    84.1s procs=  3 rss=   565 MiB hwm=   565 MiB avail= 11541 MiB
+[peakrss]   t=    76.1s procs=  3 rss=   564 MiB hwm=   564 MiB avail= 11703 MiB
+[peakrss]   t=    78.1s procs=  3 rss=   564 MiB hwm=   564 MiB avail= 11578 MiB

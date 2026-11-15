@@ -1,0 +1,31 @@
+tree SHA: 6d848c5bc977b93684abff54391bab9f3deb75dd
+port SHA: 991b88b0
+inner 500 s, outer 560 s, guard 4096 MiB
+command: /sage/.venv/bin/python -u /probe.py
+=== the _group_label doctest
+doctest result: TestResults(failed=0, attempted=7)
+=== the intersection's operands
+cardinality: 2
+operands: ['sn_RR(g) = 1', 'rho_L(g) lies in Subgroup of Orthogonal ']
+description: the intersection of the subgroup where rho_L(g) lies in Subgroup of Orthogonal group of Finitely presented module on 4 module generators over Integer Ring with invariant factors Invariant-factor famil
+aut == op: False
+same object: False
+description reversed construction: the intersection of the subgroup where rho_L(g) lies in Subgroup of Orthogonal group of Finitely presented module on 4 module generators over Integer Ring with invariant factors Invariant-factor famil
+=== a generated subgroup
+without a description: a subgroup given by its own generators
+with a description: the subgroup of the test
+its rendering: the subgroup of the test
+=== a kind that states none
+bare raised NotImplementedError: a subgroup whose construction stated no description has no name in a timing record: the ki
+[peakrss] probe529namesfinal: child waited=0 shell_code=0 samples=2
+[peakrss] peak tree RSS      : 418 MiB
+[peakrss] low-water MemAvail : 11076 MiB
+[peakrss] peak single VmHWM  : 418 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      405 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   sh                            1 MiB peak
+[peakrss]   t=     2.0s procs=  4 rss=   418 MiB hwm=   418 MiB avail= 11076 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     2 MiB hwm=     2 MiB avail= 11225 MiB
+launcher exit: 0

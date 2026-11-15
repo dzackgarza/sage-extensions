@@ -124,6 +124,7 @@ _HANDLER_LOCK = threading.RLock()
 # of its own continues the counter rather than sharing a name with it.
 _STAGE_COUNTER = count(1)
 
+
 class _OpenStages(threading.local):
     r"""The stages one thread has open, innermost last, and the pid they opened under.
 
