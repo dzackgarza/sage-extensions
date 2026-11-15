@@ -209,6 +209,11 @@ def _integral_preimage_solver(morphism, ring):
 
         return solve_field
 
+    from sage_extensions.categories.rings.ring_foundation import _owned_integers
+
+    if ring is _owned_integers():
+        return _engine_integer_preimage_solver(morphism, ring)
+
     smith_data = morphism.smith_form()
     smith = smith_data["diagonal"]
     left = smith_data["left_change"]
@@ -248,6 +253,49 @@ def _integral_preimage_solver(morphism, ring):
             {label: solution[position] for position, label in enumerate(right.domain().module_generating_set()) if solution[position]}
         )
         return right(normalized_solution)
+
+    return solve
+
+
+def _engine_integer_preimage_solver(morphism, ring):
+    r"""Solve ``f(x) = t`` over ``ZZ`` on one engine Smith form ``D = U A V``.
+
+    The same reduction as the generic Smith route (Cohen, *A Course in
+    Computational Algebraic Number Theory*, Algorithm 2.4.14 and the
+    solution of linear systems over ``ZZ`` by the Smith normal form):
+    ``A x = t`` holds exactly when ``D y = U t`` with ``x = V y``, decided
+    entry by entry on the engine matrices factored once for the arrow.
+    """
+    from sage.modules.free_module_element import vector
+    from sage_extensions.categories.modules.pure.modules import _engine_matrix
+
+    backend = _engine_matrix(morphism)
+    diagonal, left, right = backend.smith_form()
+    engine_ring = backend.base_ring()
+    width = backend.ncols()
+    pivots = tuple(diagonal[index, index] for index in range(min(backend.nrows(), width)))
+    source_labels = tuple(morphism.domain().module_generating_set())
+    domain = morphism.domain()
+
+    def solve(target):
+        shifted = left * vector(engine_ring, tuple(_engine_element(ring, ring(value)) for value in target))
+        solution = [engine_ring.zero()] * width
+        for index, value in enumerate(shifted):
+            divisor = pivots[index] if index < len(pivots) else engine_ring.zero()
+            if divisor == 0:
+                if value != 0:
+                    return None
+                continue
+            quotient, remainder = value.quo_rem(divisor)
+            if remainder != 0:
+                return None
+            solution[index] = quotient
+        coordinates = right * vector(engine_ring, solution)
+        return domain.linear_combination({
+            label: _owned_engine_element(ring, coefficient)
+            for label, coefficient in zip(source_labels, coordinates, strict=True)
+            if coefficient
+        })
 
     return solve
 

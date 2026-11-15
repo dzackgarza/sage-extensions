@@ -520,8 +520,8 @@ class IntegralStructureAction(SageObject):
 
     The defining datum is the pair ``(G, i: L -> Res(V))``.  Stabilizers,
     transporters, and the associated coset decompositions are operations of
-    that action. Under a justified stable containing bound, the least invariant
-    module ``M`` supplies the finite residue quotient ``M/dM``.
+    that action. A justified stable containing bound ``M``, or else the least
+    invariant module, supplies the finite residue quotient ``M/dM``.
     """
 
     def __init__(self, rational_group, lattice_inclusion) -> None:
@@ -676,8 +676,21 @@ class IntegralStructureAction(SageObject):
     invariant_overlattice = invariant_module
 
     @cached_method
+    def residue_reference_module(self):
+        r"""Return the stable module ``M`` whose residues ``M/dM`` carry the lattice orbit.
+
+        Any ``G``-stable ``M`` with ``dM <= L <= M`` does: the orbit of ``L/dM``
+        in ``M/dM`` is the orbit of ``L`` under ``G`` whatever ``M`` is.  A
+        justified stable containing bound is such an ``M`` already, so the least
+        invariant module, an orbit-span closure over every generator, is
+        computed only when no bound is supplied.
+        """
+        containing = self.stable_containing_bound()
+        return self.invariant_module() if containing is None else containing
+
+    @cached_method
     def quotient_exponent(self):
-        invariant = self.invariant_module()
+        invariant = self.residue_reference_module()
         selected_into_invariant = self.lattice_inclusion().factor_through(invariant)
         quotient = selected_into_invariant.cokernel()
         exponent = quotient.exponent()
@@ -690,7 +703,7 @@ class IntegralStructureAction(SageObject):
     @cached_method
     def finite_quotient_action(self):
         return FiniteCommensurabilityQuotient(
-            self.rational_group(), self.invariant_module(), self.quotient_exponent()
+            self.rational_group(), self.residue_reference_module(), self.quotient_exponent()
         )
 
     def finite_module(self):
