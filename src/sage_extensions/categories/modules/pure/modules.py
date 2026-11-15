@@ -2461,11 +2461,16 @@ class Modules(OwnedCategoryOverBaseRing):
         def is_torsion_free(self):
             r"""Return whether every element a non-zero-divisor kills is zero.
 
-            Torsion means killed by a non-zero-divisor of the scalar ring: over
-            an integral domain, whose nonzero elements are its
-            non-zero-divisors, that is $\ker(M \to \operatorname{Frac}(R)
+            Torsion means killed by a non-zero-divisor of the scalar ring, which
+            is Mathlib's reading: ``Submodule.torsion`` collects the elements
+            $x$ with $a \cdot x = 0$ for some non-zero-divisor $a$
+            (``Mathlib/Algebra/Module/Torsion/Basic.lean``, module docstring).
+            Over a domain that set is $\ker(M \to \operatorname{Frac}(R)
             \otimes_R M)$, the submodule :meth:`torsion_submodule` returns
-            (Stacks Project, Definition \S 15.22.1 and Lemma \S 15.22.2).
+            (Stacks, Definition 15.22.1 and Lemma 15.22.2, Tags 0536 and 0537),
+            which is the domain case of the reading and not its statement:
+            Stacks puts a domain in the hypothesis, where the nonzero scalars
+            are the non-zero-divisors.
             Killing by any nonzero scalar is the other convention and a
             different predicate: over $\mathbf{Z}/4$ it refutes
             $\mathbf{Z}/4[x]$, since $2 \cdot (2x) = 0$, although the scalar
