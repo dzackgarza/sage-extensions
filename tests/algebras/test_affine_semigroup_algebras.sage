@@ -80,24 +80,23 @@ def test_a_semigroup_algebra_keeps_its_identity_after_a_polynomial_ring_is_built
     assert augmentation(generator * generator) == generator * generator
 
 
-def test_the_generating_module_of_a_semigroup_algebra_is_the_module_it_was_built_on() -> None:
-    r"""The module answers on the free side whichever construction came first.
+def test_the_presentation_of_a_semigroup_algebra_answers_the_same_in_both_orders() -> None:
+    r"""The chosen presentation of ``QQ[S]`` answers the same in either order.
 
-    ``generating_module`` is declared twice for ``QQ[S]``: by
-    ``SymmetricAlgebras.ParentMethods``, which returns the module the algebra
-    was built on, and by
-    ``AlgebrasWithChosenFinitePresentation.ParentMethods``, which reads
-    ``presentation_ring()``.  ``QQ[S]`` reached as the free algebra on its
-    generators keeps its resolution truncated in degree zero, so the presented
-    declaration has no presentation to read; the two declarations do not agree
-    and the free one is the answer.  Building ``QQ[y]`` first is the history
-    that used to put the presented declaration ahead of it.
+    ``QQ[S]`` for ``S = <(1,0), (0,1)>`` is a free algebra and a finitely
+    presented algebra at once -- ``AffineSemigroupAlgebras`` is a subcategory of
+    ``AlgebrasWithChosenFinitePresentation`` -- and the session's category
+    construction order decides which of the two categories'
+    ``ParentMethods`` a join of them puts first.  A free algebra has the trivial
+    finite presentation, its own selected generators and no relations, and that
+    answer is not allowed to depend on the order: the presentation ring is the
+    algebra, the relation family is empty, the presentation morphism is the
+    algebra's own identity, and the lift is the element itself.
+
+    Each order needs its own process: the first parent class a session builds
+    is the one it keeps for the rest of that session.  The runner in this
+    directory's ``conftest.py`` runs the session script in a fresh interpreter
+    and reports its exit status.
     """
-    QQ.polynomial_ring("y")
-    algebra = AffineSemigroupAlgebras(QQ)(((1, 0), (0, 1)),)
-
-    assert (
-        algebra.generating_module().module_generating_set()
-        is algebra.algebra_generating_set()
-    )
-    assert algebra.generating_module() is algebra.generating_module()
+    assert session_order_verdict(polynomial_ring_first=False) == 0
+    assert session_order_verdict(polynomial_ring_first=True) == 0
