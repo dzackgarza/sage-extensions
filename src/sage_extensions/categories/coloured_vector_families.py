@@ -439,27 +439,28 @@ class _ColouredFamilyRealization:
 
     @cached_method
     def family_section(self):
-        r"""A section ``L tensor Q -> F_Q(I)`` of the surjective rational family, solved once on the framing."""
+        r"""A section ``L tensor Q -> F_Q(I)`` of the surjective rational family, solved once on the framing.
+
+        Fundamental.g:378-425 FindTransformation selects an independent
+        subfamily before solving. If ``j: Q^B -> Q^I`` includes its indices
+        and ``B`` is the square matrix of the basis vectors, then
+        ``j B^-1`` is a right inverse of the whole family: its rows at the
+        basis positions are those of ``B^-1``, read from the retained
+        adjugate and determinant, and its other rows are zero.
+        """
+        from sage.matrix.constructor import zero_matrix
+        from sage_extensions.categories.modules.pure.modules import _morphism_from_engine_matrix
+
         family = self.rational_family()
         rational = self.rational_space()
-        # Fundamental.g:378-425 FindTransformation selects an independent
-        # subfamily before solving. If j:Q^B -> Q^I includes its indices,
-        # then j*(family*j)^-1 is a right inverse of the whole family.
-        # Keep the original free-module endpoint and solve only the basis
-        # family, rather than extract all redundant columns for each cell.
-        indices = tuple(self.indices())
-        basis_indices = finite_ordered_set(tuple(
-            indices[position] for position in self._coordinate_basis_data()[0]
-        ))
-        basis_positions = rational.base_ring().free_module(basis_indices)
-        inclusion = Modules(rational.base_ring()).Mor(basis_positions, family.domain())(
-            lambda index: family.domain().module_generator(index)
+        basis_rows, adjugate, determinant = self._coordinate_basis_data()
+        inverse = (adjugate.change_ring(SageQQ) / determinant).transpose()
+        section = zero_matrix(SageQQ, int(self._indices.cardinality()), inverse.ncols())
+        for position, row in enumerate(basis_rows):
+            section.set_row(row, inverse.row(position))
+        return _morphism_from_engine_matrix(
+            Modules(rational.base_ring()).Mor(rational, family.domain()), section
         )
-        basis_family = family * inclusion
-        return Modules(rational.base_ring()).Mor(rational, family.domain())({
-            label: inclusion(basis_family.lift(rational.module_generator(label)))
-            for label in rational.module_generating_set()
-        })
 
     def rational_transformation(self, target, sigma):
         r"""The rational isometry ``T_sigma`` with ``T_sigma(v_i) = w_sigma(i)``.
@@ -475,12 +476,12 @@ class _ColouredFamilyRealization:
         target_family = target.rational_family()
         source_positions = self.rational_family().domain()
         target_positions = target_family.domain()
-        relabel = Modules(source_positions.base_ring()).Mor(source_positions, target_positions)(
-            lambda index: target_positions.module_generator(sigma(index))
-        )
         rational_target = target.rational_space()
         rational_source = self.rational_space()
         if not self.spans_rational_space():
+            relabel = Modules(source_positions.base_ring()).Mor(source_positions, target_positions)(
+                lambda index: target_positions.module_generator(sigma(index))
+            )
             source_span, target_span = self.rational_span(), target.rational_span()
             source_inclusion, target_inclusion = source_span.inclusion(), target_span.inclusion()
             family = self.rational_family()
@@ -490,11 +491,17 @@ class _ColouredFamilyRealization:
                 ))))
             )
             return partial.witt_extension(source_inclusion, target_inclusion)
-        # T_sigma = w o relabel o section, the product of the three framed
-        # matrices, raised once instead of evaluated per generator.
+        # T_sigma = w o relabel o section, the product of the framed
+        # matrices, raised once instead of evaluated per generator.  The
+        # relabelling is a permutation matrix, so w o relabel is w with its
+        # columns taken in the order sigma gives.
         from sage_extensions.categories.modules.pure.modules import _engine_matrix, _morphism_from_engine_matrix
 
-        product = _engine_matrix(target_family) * _engine_matrix(relabel) * _engine_matrix(self.family_section())
+        target_columns = {index: column for column, index in enumerate(target_positions.module_generating_set())}
+        relabelled = _engine_matrix(target_family).matrix_from_columns(
+            [target_columns[sigma(index)] for index in source_positions.module_generating_set()]
+        )
+        product = relabelled * _engine_matrix(self.family_section())
         linear = _morphism_from_engine_matrix(
             Modules(rational_source.base_ring()).Mor(rational_source, rational_target), product
         )
