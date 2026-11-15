@@ -1,0 +1,19 @@
+tree SHA: 63797cf6f079d0ef63e2e379f7c3380887ac3487
+port SHA: 991b88b0
+inner 300 s, outer 340 s, guard 4096 MiB
+command: /sage/.venv/bin/python -u -s -m sage_extensions.testing.test_lint tests/engineering/test_the_timing_record_names_each_stage.py; echo lint-exit=$?
+proot warning: can't sanitize binding "/workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/wt529base/.tmp/issue529-probe.py": No such file or directory
+tests/engineering/test_the_timing_record_names_each_stage.py:38: TL13 stage_records_of is not a session name
+tests/engineering/test_the_timing_record_names_each_stage.py:72: TL13 stage_records_of is not a session name
+tests/engineering/test_the_timing_record_names_each_stage.py:85: TL13 probe_run is not a session name
+tests/engineering/test_the_timing_record_names_each_stage.py:112: TL13 kept_test_run is not a session name
+1 files, 4 findings (TL13)
+lint-exit=1
+[peakrss] lintbase: child waited=0 shell_code=0 samples=1
+[peakrss] peak tree RSS      : 2 MiB
+[peakrss] low-water MemAvail : 8056 MiB
+[peakrss] peak single VmHWM  : 2 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   timeout                       2 MiB peak
+[peakrss]   t=     0.0s procs=  1 rss=     2 MiB hwm=     2 MiB avail=  8056 MiB
+launcher exit: 0

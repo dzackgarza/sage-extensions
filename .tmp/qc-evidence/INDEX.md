@@ -1692,3 +1692,23 @@ The probes behind these rows are session probes and stay out of the tree: `issue
 probe S with the hash of a finite ordered set censused by caller and cardinality (and the process time of each
 transport recorded beside its wall time); `issue531-hash-census-row.py` runs the ambient `O(L)` plane row of `T_Co`
 under that census and prints it while the row runs, so a cap leaves the table behind.
+
+## #529, third review — one record per run, an input named without rendering it, and the workflow's record
+
+The reviewer's findings on `63797cf`, and what each one measured. `${ARGS}` is
+`-p qc_sage_session -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates -q`.
+
+| log | tree | result |
+| --- | --- | --- |
+| `issue529-engineering-red.log` | `63797cf`'s `timing_record.py` and `_named` | `${ARGS} tests/engineering/test_the_timing_record_names_each_stage.py`: **2 failed, 3 passed in 5.28 s** — the `-n 2` run kept `('report',)` against the one `('junit', 'report')` a run writes: a worker's copy of the controller's report log, and no JUnit file at that moment; and the four stage records carried `Integral lattice of rank 5 and signature (2, 3)`, the signature being the diagonalization the record was paying for |
+| `issue529-engineering-tests.log` | `5e15399` | the same command: **5 passed in 5.26 s**, with `test_lint` loaded and the session's run, so the in-session lint reports nothing |
+| `issue529-engineering-all.log` | `5e15399` | `${ARGS} tests/engineering/`: **2 failed, 11 passed in 33.44 s**; both failures are `test_polyhedral_engine_routes.sage`'s `u.basis()` rows |
+| `issue529-base-polyhedral.log` | clean worktree `63797cf` | `test_polyhedral_engine_routes.sage` alone: **2 failed in 1.16 s**, the same two ids, `AttributeError: ... has no attribute 'basis'` — pre-existing, not this change's |
+| `issue529-readme-record.log` | `5e15399` | the command `results/issue529-readme-record.patch` installs, `pytest --doctest-glob=README.md README.md`: **1 passed in 0.39 s**, `time gates on: star import 0.32 s (ceiling 3 s)`, and `.timings/` afterwards holds `junit-5e15399a8bae-20261115T081817Z.xml` and `run-5e15399a8bae-20261115T081817Z.jsonl` — the two files the upload step names |
+| `issue529-lint-base.log` | `63797cf` | `python -m sage_extensions.testing.test_lint tests/engineering/test_the_timing_record_names_each_stage.py`: **4 findings, all TL13** for the names `tests/engineering/conftest.py` binds in `pytest_configure` — the standalone entry point does not run that hook, so this directory is not lintable through it; at `5e15399` the same command reports the same four plus one for the new test's `kept_test_run`, and the applicable check is the in-session lint the row above carries |
+
+The workflow change is `results/issue529-readme-record.patch`, not history: the connection's GitHub App may not
+update a file under `.github/workflows/`. `git apply --check` passes against `63797cf`, and the command the patch
+installs is the one `issue529-readme-record.log` runs. ENV-03's sentence that named `results/issue529-upload-error.patch`
+as the thing to install with `git apply` was stale — the change landed as `c68730d47` — and that file is deleted in
+this commit.

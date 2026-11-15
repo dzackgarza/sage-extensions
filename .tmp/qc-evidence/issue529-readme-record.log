@@ -1,0 +1,42 @@
+tree SHA: 5e15399a8bae66cc25d7f87b55d57ab31128c29d
+port SHA: 991b88b0
+inner 300 s, outer 340 s, guard 4096 MiB
+command: rm -rf .timings; /sage/.venv/bin/python -u -s -m pytest --doctest-glob=README.md README.md -v; echo pytest-exit=$?; ls .timings
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0 -- /sage/.venv/bin/python
+cachedir: .pytest_cache
+time gates on: star import 0.32 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+hypothesis profile 'default'
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: asyncio-1.5.0, xdist-3.8.0, reportlog-1.0.0, platformdirs-4.13.5, hypothesis-6.170.15, anyio-4.15.1, timeout-2.4.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+timeout: 60.0s
+timeout method: signal
+timeout func_only: False
+collecting ... collected 1 item
+
+README.md::README.md PASSED                                              [100%]
+
+------ generated xml file: /repos/sage-extensions/tests/.report/junit.xml ------
+-------------- generated report log file: tests/.report/run.jsonl --------------
+============================== slowest durations ===============================
+0.26s call     README.md::README.md
+0.00s setup    README.md::README.md
+0.00s teardown README.md::README.md
+============================== 1 passed in 0.39s ===============================
+pytest-exit=0
+junit-5e15399a8bae-20261115T081817Z.xml
+run-5e15399a8bae-20261115T081817Z.jsonl
+[peakrss] ev529r: child waited=0 shell_code=0 samples=2
+[peakrss] peak tree RSS      : 322 MiB
+[peakrss] low-water MemAvail : 9992 MiB
+[peakrss] peak single VmHWM  : 322 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      309 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   sh                            1 MiB peak
+[peakrss]   t=     2.0s procs=  4 rss=   322 MiB hwm=   322 MiB avail=  9992 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     3 MiB hwm=     3 MiB avail= 10187 MiB
+launcher exit: 0
