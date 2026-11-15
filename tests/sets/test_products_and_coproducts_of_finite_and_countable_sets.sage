@@ -301,19 +301,20 @@ def test_finite_family_hash_does_not_require_hashable_index_labels() -> None:
     assert hash(list_first) == hash(list_second)
 
 
-def test_equal_families_of_points_with_a_hashable_and_an_unhashable_form_hash_alike() -> None:
-    r"""``#531``: the family hash reads the index set's cardinality, not the index set.
+def test_equal_families_are_one_construction_in_both_construction_orders() -> None:
+    r"""``SET-05``: equal families have one product and one coproduct, built in either order.
 
-    A point can have a hashable and an unhashable form -- a Sage vector and its
-    immutable copy are equal and only one of them hashes -- so two equal index
-    sets can differ in hashability, and so can two equal families over them.  A
-    hash of the index set would give those families two values, which is why the
-    family hash reads the cardinality instead.  A tuple and its subclass with no
-    hash are that pair of forms.
+    Each pair below is one family presented twice: one index set carries the
+    point ``(1, 2)``, the other carries the same tuple as a class that refuses a
+    hash, so the two sets are equal and only one of them hashes.  A construction
+    is interned by the family's equality, not by what the points would hash to,
+    so the family built second finds the one built first -- and that has to hold
+    whichever of the two is the first.  A store that finds a family only by the
+    key its points supply finds the pair only when the hashable presentation is
+    the one stored first, which is what building each pair both ways decides.
 
-    The interns follow: the key-less family is stored in the bucket its
-    cardinality names, and the family that has a key reads that bucket when its
-    key looks up nothing, so the two are one product.
+    The two pairs carry different factors, so neither pair's construction is a
+    candidate for the other's, and the assertions at the end say so.
     """
     from sage_extensions.categories.sets.finite_ordered_sets import finite_ordered_set
     from sage_extensions.categories.sets.indexed_families import indexed_family
@@ -323,21 +324,67 @@ def test_equal_families_of_points_with_a_hashable_and_an_unhashable_form_hash_al
 
         __hash__ = None
 
-    factor = Sets.Δ[1]
-    keyless_labels = finite_ordered_set((UnhashablePoint((1, 2)),))
-    keyed_labels = finite_ordered_set(((1, 2),))
-    keyless = indexed_family(keyless_labels, lambda label: factor)
-    keyed = indexed_family(keyed_labels, lambda label: factor)
+    def pair(factor):
+        r"""Two equal one-factor families over the two forms of one index point."""
+        unhashable = indexed_family(
+            finite_ordered_set((UnhashablePoint((1, 2)),)), lambda label: factor
+        )
+        hashed = indexed_family(finite_ordered_set(((1, 2),)), lambda label: factor)
+        assert unhashable == hashed
+        assert hash(unhashable) == hash(hashed)
+        with pytest.raises(TypeError):
+            hash(finite_ordered_set((UnhashablePoint((1, 2)),)))
+        return unhashable, hashed
 
-    assert keyless_labels == keyed_labels
+    products = []
+    coproducts = []
+    for factor, unhashable_first in ((Sets().Δ[1], True), (Sets().Δ[2], False)):
+        unhashable, hashed = pair(factor)
+        first, second = (unhashable, hashed) if unhashable_first else (hashed, unhashable)
+        product = Sets().product(first)
+        assert Sets().product(second) is product
+        assert Sets().product(first) is product
+        coproduct = Sets().coproduct(first)
+        assert Sets().coproduct(second) is coproduct
+        assert Sets().coproduct(first) is coproduct
+        assert product is not coproduct
+        products.append(product)
+        coproducts.append(coproduct)
+    assert products[0] is not products[1]
+    assert coproducts[0] is not coproducts[1]
+
+
+def test_a_family_over_a_set_of_mutable_vectors_builds_its_product() -> None:
+    r"""An index set of mutable vectors indexes a product, and two equal ones share it.
+
+    A finite ordered set of mutable Sage vectors is equal to the set of their
+    immutable copies and refuses a hash, because it hashes the tuple of its
+    points; ``filtered`` presents the same points from a materialized
+    enumeration rather than from an admitted hash table.  Whether a point can be
+    hashed is not a hypothesis of interning a family, so the family over the
+    filtered set builds, and the two equal families below are one product and one
+    coproduct.
+    """
+    from sage_extensions.categories.sets.finite_ordered_sets import finite_ordered_set
+    from sage_extensions.categories.sets.indexed_families import indexed_family
+
+    first, second = vector([int(1), int(2)]), vector([int(3), int(4)])
+    mutable = finite_ordered_set((first, second))
+    filtered = mutable.filtered(lambda point: True)
+    assert tuple(filtered) == (first, second)
     with pytest.raises(TypeError):
-        hash(keyless_labels)
-    assert keyless == keyed
-    assert hash(keyless) == hash(keyed)
+        hash(filtered)
 
-    keyless_product = Sets().product(keyless)
-    assert Sets().product(keyed) is keyless_product
-    assert Sets().product(keyless) is keyless_product
+    factor = Sets().Δ[1]
+    family = indexed_family(filtered, lambda point: factor)
+    product = Sets().product(family)
+    assert product.factor(first) is factor
+    assert product.factor(second) is factor
+    again = indexed_family(mutable.filtered(lambda point: True), lambda point: factor)
+    assert again == family
+    assert Sets().product(again) is product
+    coproduct = Sets().coproduct(family)
+    assert Sets().coproduct(again) is coproduct
 
 
 def test_a_construction_of_an_undecided_family_equality_is_built() -> None:
