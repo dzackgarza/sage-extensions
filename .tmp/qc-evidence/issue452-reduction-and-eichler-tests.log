@@ -1,0 +1,29 @@
+provider SHA: 8f6d5cfa7a1a11466bf771c0e84b01b3b35bcd99
+command: just test -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates -q --tb=short tests/lattices/test_isotropic_reduction.sage tests/lattices/test_eichler_isometry_relations.sage tests/lattices/test_two_u_eichler_model.sage
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+.............F.....                                                      [100%]
+=================================== FAILURES ===================================
+___ test_approximate_generating_family_uses_exact_two_u_perpendicular_frames ___
+tests/lattices/test_two_u_eichler_model.sage:78: in test_approximate_generating_family_uses_exact_two_u_perpendicular_frames
+    assert all(
+E   assert False
+E    +  where False = all(<generator object test_approximate_generating_family_uses_exact_two_u_perpendicular_frames.<locals>.<genexpr> at 0x717c06972df0>)
+=========================== short test summary info ============================
+FAILED tests/lattices/test_two_u_eichler_model.sage::test_approximate_generating_family_uses_exact_two_u_perpendicular_frames
+1 failed, 18 passed in 7.94s
+error: recipe `test` failed on line 154 with exit code 1
+[peakrss] run: child waited=1 shell_code=1 samples=7
+[peakrss] peak tree RSS      : 525 MiB
+[peakrss] low-water MemAvail : 9598 MiB
+[peakrss] peak single VmHWM  : 525 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      507 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   just                          4 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   sh                            1 MiB peak
+[peakrss]   t=    12.0s procs=  5 rss=   525 MiB hwm=   525 MiB avail=  9598 MiB
+[peakrss]   t=    10.0s procs=  5 rss=   520 MiB hwm=   520 MiB avail=  9617 MiB
+[peakrss]   t=     8.0s procs=  5 rss=   480 MiB hwm=   480 MiB avail=  9806 MiB
+[peakrss]   t=     6.0s procs=  5 rss=   471 MiB hwm=   471 MiB avail=  9821 MiB
+[peakrss]   t=     4.0s procs=  5 rss=   329 MiB hwm=   329 MiB avail=  9923 MiB

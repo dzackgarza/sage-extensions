@@ -1,0 +1,23 @@
+provider SHA: 8f6d5cfa7a1a11466bf771c0e84b01b3b35bcd99
+probe: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/wt452/.tmp/qc-evidence/issue452-unequal-steps-locus.py
+[    0.2s] lattice U + A3(2), marked (-2, 2, -1, 2, -1) q 0 primitive True div 2
+[    0.8s] rank 3 period 8 denominator 4 smith invariants (1, 2, 2) steps (4, 2, 2)
+[    0.8s] V ((0, 0, -1), (-1, 0, -2), (1, -1, 0))
+[    0.8s] V permutes the cube False
+[   16.6s] classes of P/mP 512 reported by the locus 512 integral by direct enumeration 512 in 15.095247030258179 s
+[   16.6s] reported == integral True reported inside integral True
+[   16.6s] done
+[peakrss] run: child waited=0 shell_code=0 samples=10
+[peakrss] peak tree RSS      : 319 MiB
+[peakrss] low-water MemAvail : 8049 MiB
+[peakrss] peak single VmHWM  : 319 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      308 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   run.sh                        0 MiB peak
+[peakrss]   t=    18.0s procs=  3 rss=   319 MiB hwm=   319 MiB avail=  8049 MiB
+[peakrss]   t=    16.0s procs=  3 rss=   317 MiB hwm=   317 MiB avail=  8066 MiB
+[peakrss]   t=    14.0s procs=  3 rss=   316 MiB hwm=   316 MiB avail=  8082 MiB
+[peakrss]   t=    10.0s procs=  3 rss=   315 MiB hwm=   315 MiB avail=  8088 MiB
+[peakrss]   t=    12.0s procs=  3 rss=   315 MiB hwm=   315 MiB avail=  8087 MiB
