@@ -120,6 +120,7 @@ class OrderedEnumeratedSets(OwnedCategory):
             contains: Callable[[PointT], bool] | None = None,
             equivalent: Callable[[PointT, PointT], bool] | None = None,
             name: str | None = None,
+            points_hash: bool | None = None,
             **rest,
         ) -> None:
             assert callable(element_at), (
@@ -136,10 +137,30 @@ class OrderedEnumeratedSets(OwnedCategory):
             self._contains_function = contains
             self._equivalent_function = equivalent or _DEFAULT_EQUIVALENCE
             self._name = name
+            self._points_hash = points_hash
             super().__init__(facade=True, **rest)
 
         def index_set(self) -> Sets().ObjectType:
             return self._index_set
+
+        def points_have_a_hash(self) -> bool:
+            r"""Whether hashing this set's points is what its own hash does.
+
+            :meth:`__hash__` hashes the tuple of the points, so the set hashes
+            exactly when every point does.  Where this set admitted its own
+            points it recorded the admission -- ``from_indexed`` builds a hash
+            table of them or falls back to equality on that same data -- and
+            that record answers even for a point whose type declares a
+            ``__hash__`` that raises.  A set presented with maps supplied from
+            outside recorded nothing, and its points then answer through the
+            declaration their types carry (``Hashable``), which is only the
+            statement that no point's type declares itself unhashable.
+            """
+            match self._points_hash:
+                case None:
+                    return all(isinstance(point, Hashable) for point in self)
+                case recorded:
+                    return recorded
 
         def enumeration(self) -> Callable[[IndexT], PointT]:
             r"""The chosen bijection from the index set onto this set."""
@@ -392,6 +413,11 @@ class FiniteOrderedSets(OwnedCategory):
         assert index_set in EnumeratedSets(), (
             f"a finite ordered set needs an enumerated index set, but {index_set} is not enumerated"
         )
+        # Whether this construction admitted its own points to a hash table:
+        # the one place the question is answered on the points themselves, and
+        # the declaration `points_have_a_hash` reports (`#531`).  ``None`` here
+        # means the maps were supplied, so no admission was made.
+        points_hash: bool | None = None
         if index_of is None:
             indices = tuple(index_set)
             points = tuple(element_at(index) for index in indices)
@@ -410,6 +436,7 @@ class FiniteOrderedSets(OwnedCategory):
             try:
                 lookup = dict(zip(points, indices, strict=True))
             except (TypeError, ValueError):
+                points_hash = False
                 for offset, present in enumerate(points):
                     for earlier in points[:offset]:
                         equal = True if present is earlier else present == earlier
@@ -441,6 +468,7 @@ class FiniteOrderedSets(OwnedCategory):
                             for present in points
                         ))
             else:
+                points_hash = True
                 if len(lookup) != len(points):
                     raise ValueError("an enumeration must select distinct points at distinct indices")
                 def index_of(point):
@@ -498,6 +526,7 @@ class FiniteOrderedSets(OwnedCategory):
             contains=contains,
             equivalent=equivalent,
             name=name,
+            points_hash=points_hash,
         )
 
     class ParentMethods:

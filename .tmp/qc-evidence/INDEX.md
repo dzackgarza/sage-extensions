@@ -1855,6 +1855,34 @@ first ambient class, because on main that input is what does not return.
 | `501-tests.log` | this round's commits | the five files of #500/#530 under the repository addopts: **14 passed in 1.34 s** |
 | `501-algebras-tree.log`, `501-algebras-b61.log`, `501-algebras-compared.log`, `501-algebras-ids.log` | this tree and `b61feeb`, both with the change | `tests/algebras`, one pytest process each: **45 failed, 44 passed, 124 errors in 32.78 s** against **45 failed, 44 passed, 124 errors in 32.64 s**, **0 FAILED/ERROR ids only on either side**. The same directory on `27d76f3` has 21 ids fewer, so those 21 are main's and predate this round: their root exception on `test_power_algebras.sage` is `RecursionError: maximum recursion depth exceeded` through `objects.py:172`, `set_categories.py:532` and `ring_foundation.py:6651`, reached while an exterior or divided power algebra of a torsion module is built. Open, and not repaired here |
 
+## #531 round 4: the quotient hash's cover, and the interners' key
+
+The tree is `ca9b5a8` unless a row names another; the base is a clean worktree at
+`76b4449`, the commit the round started from. Port `991b88b0`. Each run is one
+pytest process in the pinned image with the repository's own addopts; the
+products file carries its own pre-existing lint findings, so the three
+directory runs carry `--no-test-lint`, and the two clean test files are also run
+with the gate on (`issue531r4-lint-gate.log`).
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `issue531r4-red-quotient.log` | `76b4449` with the test file of `ab14fef` | `tests/rings/test_a_quotient_class_hashes_by_its_class.sage`: **1 failed, 4 passed in 0.24 s**; the failure is `test_classes_of_a_laurent_quotient_refuse_a_hash` at `:84: Failed: DID NOT RAISE TypeError` |
+| `issue531r4-green-quotient.log` | `ab14fef` with `9fd14a2` | the same file: **5 passed in 0.21 s** |
+| `issue531r4-red-sets.log` | `76b4449` with the test file of `ca9b5a8` | `tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage`: **8 failed, 27 passed in 1.98 s**, of which the two this change states are red there -- `test_finite_family_hash_does_not_require_hashable_index_labels` and `test_equal_families_of_points_with_a_hashable_and_an_unhashable_form_hash_alike` -- and six are main's own |
+| `issue531r4-sets.log` / `issue531r4-sets-base.log` | `ca9b5a8` / `76b4449` | `tests/sets`: **29 failed, 135 passed in 6.45 s** against **29 failed, 133 passed in 7.20 s**, the 29 FAILED ids identical; the two extra passes are the two tests this change adds |
+| `issue531r4-rings.log` / `issue531r4-rings-base.log` | `ca9b5a8` / `76b4449` | `tests/rings`: **76 failed, 263 passed in 44.30 s** against **76 failed, 261 passed in 43.65 s**, FAILED ids identical |
+| `issue531r4-categories-objects.log` / `-base.log` | `ca9b5a8` / `76b4449` | `tests/categories` + `tests/objects`: **183 failed, 264 passed in 56.19 s** against **183 failed, 264 passed in 54.87 s**, FAILED ids identical |
+| `issue531r4-lint-gate.log` | `ca9b5a8` | `tests/rings/test_a_quotient_class_hashes_by_its_class.sage` + `tests/sets/test_a_finite_ordered_set_hashes_by_its_points.sage` with the test lint in force: **10 passed in 1.80 s**; `test_lint` on the rings file alone: **1 files, 0 findings** |
+
+The probe that named the engines is a session probe and stays out of the tree: it
+prints, for each quotient, its engine's class, `cover_ring()`, `base_ring()` and
+whether `_engine_quotient_reduction_is_canonical` admits it, which is how the
+table in `9fd14a2`'s message was read.  A second session probe was meant to
+build a mutable Sage vector and its immutable copy -- equal, one hashing -- as
+the point pair the family hash must not separate; it stopped at
+`NameError: name 'vector' is not defined` under the session import, so no such
+row is claimed, and the test uses a tuple and a subclass of it with no hash
+instead.
 ## #528, second round: are the lift tests more numerous, or dearer?
 
 `204ffbb96e` corrected the integral locus' Smith reading *and* replaced its per-class test: the

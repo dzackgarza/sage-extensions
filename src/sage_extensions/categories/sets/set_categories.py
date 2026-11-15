@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import Callable, Iterable
+from collections.abc import Callable, Hashable, Iterable
 from itertools import count, islice, product
 from math import comb
 from operator import index as integer_index
@@ -6321,8 +6321,37 @@ def _finite_words(alphabet, *, commutative):
     )
 
 
-def _finite_family_key(family: IndexedFamily) -> tuple[Parent, tuple[Parent, ...]]:
-    r"""The key of a finite construction: its index set and its factors, up to equality.
+_FiniteFamilyKey = tuple[Parent, tuple[Parent, ...]]
+_FiniteFamilyStore = (
+    "tuple[dict[_FiniteFamilyKey, Sets().ObjectType],"
+    " dict[int, list[tuple[IndexedFamily, Sets().ObjectType]]]]"
+)
+
+
+def _declares_a_hash(value) -> bool:
+    r"""Whether ``value`` supplies a hash of its own, read from what declares one.
+
+    Hashability is a declaration, not a trial: Python declares it on the type
+    (``__hash__ is None`` is what ``Hashable`` reads), and an owned finite
+    ordered set hashes the tuple of its points, so it declares what its own
+    construction admitted (`#531`; ``FiniteOrderedSets.ParentMethods.points_have_a_hash``).
+    The set's type is not enough for the second case -- every finite ordered set
+    has a ``__hash__`` and only some of them have a hash -- which is why the set
+    answers for itself.
+    """
+    from sage_extensions.categories.sets.finite_ordered_sets import (
+        FiniteOrderedSets,
+    )
+
+    match value:
+        case _ if isinstance(value, Parent) and value in FiniteOrderedSets():
+            return value.points_have_a_hash()
+        case _:
+            return isinstance(value, Hashable)
+
+
+def _finite_family_key(family: IndexedFamily) -> _FiniteFamilyKey | None:
+    r"""The key of a finite construction, or ``None`` when it declares no hash.
 
     Equal families of sets have one product and one coproduct (`SET-05`), so
     the key is the index set with the factors in its enumeration, which hash
@@ -6331,51 +6360,92 @@ def _finite_family_key(family: IndexedFamily) -> tuple[Parent, tuple[Parent, ...
     factors (`CON-14`).  Resolving a finite family is legitimate here; its
     labels are retained by the family rather than replaced by positions.
 
-    A finite ordered set carrying a point that refuses a hash has no hash
-    (`#531`), so a family over one has no key here; the interners below compare
-    those families by equality instead of dropping the construction.
+    A family over an index set, or with a factor, that declares no hash has no
+    key here; the interners below compare that family by equality, in the
+    bucket its index set's cardinality names.
     """
-    return family.index_set(), tuple(family)
+    index_set = family.index_set()
+    match _declares_a_hash(index_set):
+        case False:
+            return None
+        case True:
+            factors = tuple(family)
+            match all(_declares_a_hash(factor) for factor in factors):
+                case True:
+                    return index_set, factors
+                case False:
+                    return None
+
+
+def _equal_interned_family(
+    known_families: Iterable[tuple[IndexedFamily, Sets().ObjectType]],
+    family: IndexedFamily,
+) -> Sets().ObjectType | None:
+    r"""The construction ``family`` is already interned as, if a known family equals it.
+
+    ``==`` of two families is undecided exactly when a value's equality is, and
+    an undecided comparison is neither equality nor inequality: it interns
+    nothing, and the caller builds and retains a second construction.
+    """
+    for known, interned in known_families:
+        equal = True if known is family else known == family
+        if equal is True:
+            return interned
+    return None
 
 
 def _interned_by_equality(
-    family: IndexedFamily, store: tuple[dict, list], build
+    family: IndexedFamily,
+    store: _FiniteFamilyStore,
+    build: Callable[[IndexedFamily], Sets().ObjectType],
 ) -> Sets().ObjectType:
-    r"""Intern a finite construction by the family's equality, keyed by hash when it has one.
+    r"""Intern a finite construction by the family's equality, keyed where it has a key.
 
-    ``store`` is the construction's hash-keyed store with the families it has
-    interned, and ``build`` performs the construction.  The key is a hash of the
-    index set's points, so it exists only for a family over an index set whose
-    points hash; the families themselves are compared, which every family
-    supports.  Hashing is a storage optimization and never the contract: two
-    presentations of one family are one construction (`SET-05`).  The store
-    retains the families it has interned, which is what comparing them later
-    requires.
+    ``store`` is the construction's store: the families it has interned under an
+    exact key, and the families that declare no key, bucketed by the cardinality
+    of their index set.  ``build`` performs the construction.
+
+    Hashing is a storage optimization and never the contract: two presentations
+    of one family are one construction (`SET-05`).  A family whose index set and
+    factors declare hashes is stored under that key and found in one lookup, so
+    n distinct constructions cost n lookups.  A family without a key is compared
+    with the families of its own bucket, which holds only families without a
+    key; a family with a key also reads that bucket after its lookup misses,
+    because an equal family may declare no hash (one point may have a hashable
+    and an unhashable form).  The converse is not done: a key-less family is
+    compared only within its bucket, so an equal family stored under a key is a
+    second construction there.  The bucket is the index set's cardinality
+    because that is the invariant equality always supplies -- a factor's hash is
+    not one, since equal factors may differ in hashability, which is the
+    argument that fixed ``FiniteOrderedSets.__hash__``.
+
+    An undecided family equality interns nothing: the family is built and kept
+    beside the one it could not be compared with
+    (``test_a_construction_of_an_undecided_family_equality_is_built``).  An
+    undecided comparison *inside* a key is the proposition's own refusal -- a
+    proposition has no Python truth value -- and it propagates rather than
+    selecting the keyed construction.
     """
-    keyed, interned_families = store
+    keyed, by_cardinality = store
+    cardinality = int(family.index_set().cardinality().finite_value())
     key = _finite_family_key(family)
-    try:
-        hash(key)
-    except TypeError:
-        key = None
-    else:
-        interned = keyed.get(key)
-        if interned is not None:
-            return interned
-    for known, interned in interned_families:
-        equal = True if known is family else known == family
-        if equal is True:
-            if key is not None:
-                keyed[key] = interned
-            return interned
+    interned = None if key is None else keyed.get(key)
+    if interned is None:
+        interned = _equal_interned_family(
+            by_cardinality.get(cardinality, ()), family
+        )
+    if interned is not None:
+        if key is not None:
+            keyed[key] = interned
+        return interned
     interned = build(family)
-    interned_families.append((family, interned))
+    by_cardinality.setdefault(cardinality, []).append((family, interned))
     if key is not None:
         keyed[key] = interned
     return interned
 
 
-_FINITE_PRODUCTS: tuple[dict, list[tuple[IndexedFamily, Sets().ObjectType]]] = ({}, [])
+_FINITE_PRODUCTS: _FiniteFamilyStore = ({}, {})
 
 
 def _cartesian_product_of_finite_family(family: IndexedFamily) -> Sets().ObjectType:
@@ -6487,7 +6557,7 @@ def _cartesian_product_morphism[IndexT](
     )
 
 
-_FINITE_COPRODUCTS: tuple[dict, list[tuple[IndexedFamily, Sets().ObjectType]]] = ({}, [])
+_FINITE_COPRODUCTS: _FiniteFamilyStore = ({}, {})
 
 
 def _coproduct_of_finite_family(family: IndexedFamily) -> Sets().ObjectType:

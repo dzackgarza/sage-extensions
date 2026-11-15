@@ -1,0 +1,61 @@
+tree SHA: 76b44493793e43f915dbe2129019f8e9cb5fb0ce
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+inner 300 s, outer 360 s, guard 6144 MiB
+command: python -m pytest -p qc_sage_session tests/rings/test_a_quotient_class_hashes_by_its_class.sage -q   (repository addopts)
+...F.                                                                    [100%]
+=================================== FAILURES ===================================
+_______________ test_classes_of_a_laurent_quotient_refuse_a_hash _______________
+
+    def test_classes_of_a_laurent_quotient_refuse_a_hash() -> None:
+        r"""A Laurent cover reduces no representative, so a class of its quotient has no hash.
+    
+        In ``QQ[t^{\pm 1}]/(t - 1)`` the classes of ``t`` and of ``1`` are equal.
+        ``reduce`` over a Laurent polynomial ring is not a normal form -- it returns
+        the representative it was given -- so the two classes would carry two hashes,
+        and the class refuses one instead.
+        """
+        laurent = QQ.laurent_polynomial_ring("t")
+        t = laurent.algebra_generator("t")
+        quotient = laurent.quotient_ring(laurent.ideal(t - laurent.one()))
+        lifted = quotient(t)
+        relifted = quotient(laurent.one())
+    
+        assert lifted == relifted
+>       with pytest.raises(TypeError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE TypeError
+
+tests/rings/test_a_quotient_class_hashes_by_its_class.sage:84: Failed
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:830 Elementwise module morphism Module over Fraction Field of Integer Ring on Classes in the multilinear tensor presentation -> Module over Fraction Field of Integer Ring on Fraction Field of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+-------------- generated report log file: tests/.report/run.jsonl --------------
+============================== slowest durations ===============================
+0.08s call     tests/rings/test_a_quotient_class_hashes_by_its_class.sage::test_classes_of_a_laurent_quotient_refuse_a_hash
+0.08s call     tests/rings/test_a_quotient_class_hashes_by_its_class.sage::test_a_class_over_zz_refuses_a_hash_because_reduction_is_no_normal_form
+0.04s call     tests/rings/test_a_quotient_class_hashes_by_its_class.sage::test_classes_of_a_polynomial_quotient_over_a_field_hash_through_its_normal_form
+0.01s call     tests/rings/test_a_quotient_class_hashes_by_its_class.sage::test_classes_with_different_lifts_are_one_key
+0.00s call     tests/rings/test_a_quotient_class_hashes_by_its_class.sage::test_distinct_classes_of_one_modulus_hash_apart
+0.00s setup    tests/rings/test_a_quotient_class_hashes_by_its_class.sage::test_classes_with_different_lifts_are_one_key
+0.00s setup    tests/rings/test_a_quotient_class_hashes_by_its_class.sage::test_distinct_classes_of_one_modulus_hash_apart
+0.00s setup    tests/rings/test_a_quotient_class_hashes_by_its_class.sage::test_classes_of_a_polynomial_quotient_over_a_field_hash_through_its_normal_form
+0.00s setup    tests/rings/test_a_quotient_class_hashes_by_its_class.sage::test_classes_of_a_laurent_quotient_refuse_a_hash
+0.00s setup    tests/rings/test_a_quotient_class_hashes_by_its_class.sage::test_a_class_over_zz_refuses_a_hash_because_reduction_is_no_normal_form
+0.00s teardown tests/rings/test_a_quotient_class_hashes_by_its_class.sage::test_classes_of_a_laurent_quotient_refuse_a_hash
+0.00s teardown tests/rings/test_a_quotient_class_hashes_by_its_class.sage::test_classes_of_a_polynomial_quotient_over_a_field_hash_through_its_normal_form
+0.00s teardown tests/rings/test_a_quotient_class_hashes_by_its_class.sage::test_classes_with_different_lifts_are_one_key
+0.00s teardown tests/rings/test_a_quotient_class_hashes_by_its_class.sage::test_a_class_over_zz_refuses_a_hash_because_reduction_is_no_normal_form
+0.00s teardown tests/rings/test_a_quotient_class_hashes_by_its_class.sage::test_distinct_classes_of_one_modulus_hash_apart
+=========================== short test summary info ============================
+FAILED tests/rings/test_a_quotient_class_hashes_by_its_class.sage::test_classes_of_a_laurent_quotient_refuse_a_hash
+1 failed, 4 passed in 1.37s
+[peakrss] red531: child waited=1 shell_code=1 samples=2
+[peakrss] peak tree RSS      : 307 MiB
+[peakrss] low-water MemAvail : 13438 MiB
+[peakrss] peak single VmHWM  : 307 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      296 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     2.0s procs=  3 rss=   307 MiB hwm=   307 MiB avail= 13438 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     2 MiB hwm=     2 MiB avail= 13666 MiB
