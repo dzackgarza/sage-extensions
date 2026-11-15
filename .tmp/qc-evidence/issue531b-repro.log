@@ -1,0 +1,32 @@
+tree SHA: 63797cf6f079d0ef63e2e379f7c3380887ac3487
+port SHA: 991b88b0
+inner 120 s, outer 180 s, guard 4096 MiB
+command: /sage/.venv/bin/python -u -s /probe.py
+session ZZ: Integer Ring <class 'sage_extensions.categories.rings.ring_foundation._OwnedRingParent_with_category'>
+--- vector([1, 2]) ---
+  parent of the points: Ambient free module of rank 2 over the principal ideal domain Integer Ring
+  mutable  : (1, 2) -> TypeError: mutable vectors are unhashable
+  immutable: (1, 2) -> -3550055125485641917
+  equal? True identical? False
+  the sets are equal? True
+  hash of the set holding the mutable   point: 5300508251815892961
+  hash of the set holding the immutable point: -2700102052487898497
+--- matrix([[1, 0], [0, 1]]) ---
+  parent of the points: Full MatrixSpace of 2 by 2 dense matrices over Integer Ring
+  mutable  : [1 0]
+[0 1] -> TypeError: mutable matrices are unhashable
+  immutable: [1 0]
+[0 1] -> 1
+  equal? True identical? False
+  the sets are equal? True
+  hash of the set holding the mutable   point: 5300508251815892961
+  hash of the set holding the immutable point: 8810013589662299418
+PROBE DONE
+[peakrss] repro531: child waited=0 shell_code=0 samples=1
+[peakrss] peak tree RSS      : 2 MiB
+[peakrss] low-water MemAvail : 9165 MiB
+[peakrss] peak single VmHWM  : 3 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   timeout                       3 MiB peak
+[peakrss]   t=     0.0s procs=  1 rss=     2 MiB hwm=     3 MiB avail=  9165 MiB
+launcher exit: 0

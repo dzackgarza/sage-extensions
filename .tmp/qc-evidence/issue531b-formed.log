@@ -1,0 +1,17 @@
+tree SHA: 63797cf6f079d0ef63e2e379f7c3380887ac3487
+port SHA: 991b88b0
+inner 300 s, outer 360 s, guard 4096 MiB
+command: /sage/.venv/bin/python -u -s -m pytest -o addopts= -p qc_sage_session tests/categories/test_formed_vector_space_placement.sage -q
+.                                                                        [100%]
+1 passed in 1.81s
+[peakrss] formed531b: child waited=0 shell_code=0 samples=2
+[peakrss] peak tree RSS      : 306 MiB
+[peakrss] low-water MemAvail : 12745 MiB
+[peakrss] peak single VmHWM  : 306 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      295 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     2.0s procs=  3 rss=   306 MiB hwm=   306 MiB avail= 12745 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     2 MiB hwm=     3 MiB avail= 12833 MiB
+launcher exit: 0

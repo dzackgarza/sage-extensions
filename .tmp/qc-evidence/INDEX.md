@@ -1692,3 +1692,21 @@ The probes behind these rows are session probes and stay out of the tree: `issue
 probe S with the hash of a finite ordered set censused by caller and cardinality (and the process time of each
 transport recorded beside its wall time); `issue531-hash-census-row.py` runs the ambient `O(L)` plane row of `T_Co`
 under that census and prints it while the row runs, so a cap leaves the table behind.
+
+### #531: the fallback removed, and what reads the hash
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `issue531b-repro.log` | `63797cf6f0` (main, before the change) | the defect the review names, reproduced: a mutable `vector([1, 2])` is unhashable and equals its immutable copy, `FOS((mutable)) == FOS((immutable))` is **True**, and the two hashes are **5300508251815892961** and **-2700102052487898497**; the same for a mutable and an immutable `identity_matrix(2)` (**5300508251815892961** against **8810013589662299418**) |
+| `issue531b-red.log` | `63797cf6f0` (the red test alone) | the new test: **1 failed, 4 passed in 3.55 s**; `test_a_set_with_an_unhashable_point_is_unhashable` fails `DID NOT RAISE TypeError` on `hash` of the set holding the mutable point |
+| `issue531b-formed-broken.log` | the FOS repair alone, before the quotient hash | what the strict hash exposes: `tests/categories/test_formed_vector_space_placement.sage` **1 failed in 2.42 s** — `A2` over `F_3`'s `radical()` raises, the span basis over `ZZ/(3)` cannot key `_lattice_subobject_spanning` |
+| `issue531b-formed.log` | the tree of this push | the same file: **1 passed in 1.81 s** — the quotient class hashes, so the sparse vector, the span basis and the cache key do |
+| `issue531b-census.log` | the tree of this push | who hashes a finite ordered set, counted: **127 hashes from three callers** — `lattices.py:3976 subobject_on` 104, `set_categories.py:1504 _finite_product` 21, `modules.py:816 tensor_product` 2 — over `A2 (x) F_3`'s radical, 400 `subobject_on` calls on `U + U + <-2>` and one product; **4 refusals, all at `subobject_on`**, on a one-point span basis of a `_SparseFreeModuleElement` over `ZZ/(3)` |
+| `issue531b-green.log` | the tree of this push | the two new test files: **7 passed in 2.70 s** |
+| `issue531b-sets-slice.log`, `issue531b-sets-slice-base.log` | the tree of this push; `63797cf6f0` (a clean worktree) | `tests/sets`: **29 failed, 132 passed in 8.97 s** against **29 failed, 131 passed in 8.46 s**; the FAILED id sets are identical, so the extra pass is the new file |
+| `issue531b-neighbours.log`, `issue531b-neighbours-base.log` | the same two trees | `tests/categories tests/objects`: **174 failed, 272 passed in 55.75 s** against **176 failed, 270 passed in 50.71 s**; **no FAILED id is the changed tree's alone**, and the two that are the clean worktree's alone pass here, so they are this host's flakes |
+| `issue531b-rings.log`, `issue531b-rings-base.log` | the same two trees | `tests/rings`: **74 failed, 260 passed in 46.51 s** against **74 failed, 260 passed in 55.63 s**, the same FAILED ids |
+| `issue531b-lint.log` | the tree of this push | `test_lint` on the three touched test files: **3 files, 138 findings**, all 138 in `test_products_and_coproducts_of_finite_and_countable_sets.sage` and in the codes it already carried (TL01, TL02, TL03, TL04, TL08, TL09, TL10); the two new files carry none |
+
+The probes behind the census and the reproduction stay out of the tree: the reproduction builds the mutable and immutable Sage point pairs; the census wraps
+`FiniteOrderedSets.ParentMethods.__hash__`, records the calling frame's file, line and function, and re-raises so a refusal is counted where it happens.

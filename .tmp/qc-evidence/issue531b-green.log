@@ -1,0 +1,35 @@
+tree SHA: 63797cf6f079d0ef63e2e379f7c3380887ac3487
+port SHA: 991b88b0
+inner 300 s, outer 360 s, guard 4096 MiB
+command: /sage/.venv/bin/python -u -s -m pytest -o addopts= -p qc_sage_session tests/sets/test_a_finite_ordered_set_hashes_by_its_points.sage tests/rings/test_a_quotient_class_hashes_by_its_class.sage -v
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0 -- /sage/.venv/bin/python
+cachedir: .pytest_cache
+hypothesis profile 'default'
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: asyncio-1.5.0, xdist-3.8.0, reportlog-1.0.0, platformdirs-4.13.5, hypothesis-6.170.15, anyio-4.15.1, timeout-2.4.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 7 items
+
+tests/sets/test_a_finite_ordered_set_hashes_by_its_points.sage::test_equal_finite_ordered_sets_hash_equally PASSED [ 14%]
+tests/sets/test_a_finite_ordered_set_hashes_by_its_points.sage::test_distinct_span_bases_of_one_rank_do_not_share_a_hash PASSED [ 28%]
+tests/sets/test_a_finite_ordered_set_hashes_by_its_points.sage::test_a_span_basis_finds_its_own_cache_entry_without_scanning_the_others PASSED [ 42%]
+tests/sets/test_a_finite_ordered_set_hashes_by_its_points.sage::test_a_finite_ordinal_hashes_by_its_points_like_the_set_they_form PASSED [ 57%]
+tests/sets/test_a_finite_ordered_set_hashes_by_its_points.sage::test_a_set_with_an_unhashable_point_is_unhashable PASSED [ 71%]
+tests/rings/test_a_quotient_class_hashes_by_its_class.sage::test_classes_with_different_lifts_are_one_key PASSED [ 85%]
+tests/rings/test_a_quotient_class_hashes_by_its_class.sage::test_distinct_classes_of_one_modulus_hash_apart PASSED [100%]
+
+============================== 7 passed in 2.70s ===============================
+[peakrss] new531: child waited=0 shell_code=0 samples=3
+[peakrss] peak tree RSS      : 335 MiB
+[peakrss] low-water MemAvail : 12522 MiB
+[peakrss] peak single VmHWM  : 335 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      324 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     4.0s procs=  3 rss=   335 MiB hwm=   335 MiB avail= 12522 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   305 MiB hwm=   305 MiB avail= 12826 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     2 MiB hwm=     2 MiB avail= 13039 MiB
+launcher exit: 0
