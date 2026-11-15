@@ -1,0 +1,17 @@
+tree SHA: a6cac20d79a1dfe6f01cfa66c86b4fe0ae39506f
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+tests: tests/lattices/test_eichler_transvection_construction.sage tests/lattices/test_eichler_isometry_relations.sage tests/lattices/test_isotropic_reduction.sage
+inner 400 s, outer 460 s, guard 6144 MiB
+...........                                                              [100%]
+11 passed in 1.30s
+[peakrss] rebased528: child waited=0 shell_code=0 samples=2
+[peakrss] peak tree RSS      : 318 MiB
+[peakrss] low-water MemAvail : 13484 MiB
+[peakrss] peak single VmHWM  : 318 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      307 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     2.0s procs=  3 rss=   318 MiB hwm=   318 MiB avail= 13484 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     1 MiB hwm=     1 MiB avail= 13729 MiB
+launcher exit: 0
