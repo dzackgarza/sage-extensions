@@ -206,7 +206,7 @@ class PosetCategory(OwnedCategory):
         self._objects = indexed_family(
             ordered_set,
             lambda value: _object_of(self, value=value),
-            name=f"Objects of the poset category on {ordered_set}",
+            name=lambda ordered_set=ordered_set: f"Objects of the poset category on {ordered_set}",
         )
         super().__init__()
 
@@ -1500,7 +1500,7 @@ class _ConeCategory(OwnedCategory):
             return indexed_family(
                 domain.object_set(),
                 lambda label: self.structure_morphism(domain(label)),
-                name=f"Structure morphisms of {self}",
+                name=lambda self=self: f"Structure morphisms of {self}",
             )
 
         def _repr_(self) -> str:
@@ -1581,7 +1581,7 @@ class _CoconeCategory(OwnedCategory):
             return indexed_family(
                 domain.object_set(),
                 lambda label: self.costructure_morphism(domain(label)),
-                name=f"Costructure morphisms of {self}",
+                name=lambda self=self: f"Costructure morphisms of {self}",
             )
 
         def _repr_(self) -> str:

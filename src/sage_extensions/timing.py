@@ -31,12 +31,22 @@ other's records — two runs started in the same second are two processes, and t
 processes are two pids — and a record is never a claim about which commit
 produced it: the commit is in its name and in every line.
 
-**What a record line holds.**  ``stage`` (the name), ``input`` (the name of what
+**What a record line holds.**  ``stage`` (the name), ``id`` (this stage's own
+id, unique within the run's file), ``parent`` (the ``id`` of the stage that
+encloses it, ``null`` for a stage nothing encloses), ``input`` (the name of what
 was computed, written by the caller), ``seconds`` (wall time,
 ``time.perf_counter``), ``started`` and
 ``finished`` (UTC, ISO 8601), ``outcome`` (``"returned"`` or ``"raised"``, with
 ``error`` naming the exception class), ``commit``, ``run`` (the process's start
 stamp, which is the file's own name) and ``pid``.
+
+**What identifies a record.**  Its run and its ``id``: ``run`` is the file, the
+``id`` is the line, and ``parent`` says which line's stage contains it, so a
+reader tells two records apart and finds a stage's sub-stages by these two
+fields, in one file, without reading a name.  ``input`` is what a reader is told
+about the computation -- the owner's public description of the input, which the
+call site writes -- and it is a description, not an identity: two computations
+may carry one name, and nothing here makes a name unique.
 
 **What it costs when nobody reads it.**  A stage is two ``perf_counter``
 readings, the fitting of its input's name, and one appended line.  Nothing is
@@ -46,11 +56,13 @@ nothing.
 
 **The input's name is the caller's.**  ``input`` is a string the call site builds
 from what it already holds — the row's parameters, a plane's position, the
-lattice's rank and generator labels — and this module inspects nothing it is
-handed.  A record whose name came from reading its object would be a record that
-depends on a class and on whatever that class happens to carry; a name read off a
-display would be a computation, on a lattice an invariant one, bought for a log
-line.  ``input`` is a name, so it is written where the name is known.
+lattice's ring and Gram, the coordinates of a vector — and this module inspects
+nothing it is handed.  A name whose text came from reading its object would be a
+record that depends on a class and on whatever that class happens to carry; a
+name read off a display would be a computation, on a lattice an invariant one,
+bought for a log line.  ``input`` is a name, so it is written where the name is
+known, and it is not asked to be unique: a record's identity is its run and its
+stage id, above.
 
 **Which logger it is.**  ``sage_extensions.timing``, a child of the package's
 logger and nobody else's: this module sets that child's level and leaves
@@ -72,6 +84,7 @@ import time
 from contextlib import contextmanager
 from datetime import datetime, timezone
 from functools import lru_cache, wraps
+from itertools import count
 from pathlib import Path
 
 __all__ = [
@@ -104,7 +117,17 @@ logger.setLevel(logging.INFO)
 # is given is resolved under it too: one lock for the process's record, taken
 # once, rather than two that could disagree about which process this is.
 _HANDLER_LOCK = threading.RLock()
-_INPUT_LIMIT = 240
+
+# The id of the next stage this process opens.  One counter for the process is
+# what makes an id unique within the run's file: one process writes one file, so
+# two ids of one counter are two lines of that file, and a fork that takes a file
+# of its own continues the counter rather than sharing a name with it.
+_STAGE_COUNTER = count(1)
+
+# The stages this thread has open, innermost last, with the pid they were opened
+# under: a forked child inherits its parent's stack, and its own file holds none
+# of those ids, so the child starts from an empty one.
+_OPEN_STAGES = threading.local()
 
 _PROCESS_START = datetime.now(timezone.utc)
 _PROCESS_ID = os.getpid()
@@ -256,15 +279,20 @@ def _installed_handler() -> _JSONLineHandler:
         return _HANDLER
 
 
-def _named(name: str) -> str:
-    r"""A caller's name for its input, fitted to one line of the record.
+def _open_stage_ids() -> list[int]:
+    r"""The ids of the stages this thread has open, outermost first.
 
-    Whitespace is collapsed and the text is cut to the limit; nothing else is
-    done to it.  The name is the caller's, so this has nothing to inspect and
-    nothing to render.
+    Held per thread, because stages nest within a computation and two threads'
+    stacks are not one; and emptied for a process that forked, because that
+    process writes a file of its own and the parent's open ids are not lines of
+    it.
     """
-    text = " ".join(name.split())
-    return text if len(text) <= _INPUT_LIMIT else text[: _INPUT_LIMIT - 1] + "…"
+    stack = getattr(_OPEN_STAGES, "stack", None)
+    if stack is None or _OPEN_STAGES.pid != os.getpid():
+        stack = []
+        _OPEN_STAGES.stack = stack
+        _OPEN_STAGES.pid = os.getpid()
+    return stack
 
 
 def _emit(entry: dict) -> None:
@@ -279,21 +307,35 @@ def stage(name: str, input: str):
 
     ``name`` is the stage — ``"ambient O(L) row"``, ``"coset walk and
     transport"`` — and ``input`` is the name of what it was computed for, a
-    string the caller writes from what it holds.  Nothing about the input is read
-    here (:func:`_named` only fits the text), so a record never depends on what
-    an object happens to carry.  The record is written when the block ends,
-    whether it returned or raised, and the exception is re-raised unchanged:
-    timing a stage is not a place to close an error.
+    string the caller writes from what it holds: ``"a rank-11 lattice of Gram
+    ..."``, ``"the subgroup where ..."``, a vector's coordinates.  Nothing about
+    the input is read here, so a record never depends on what an object happens
+    to carry, and the name identifies nothing: two computations may be named
+    alike.
+
+    What identifies the record is its ``id`` and its ``parent``.  The ``id`` is
+    this process's next, and one process writes one file, so it is unique there;
+    the ``parent`` is the ``id`` of the stage that encloses this one, ``None``
+    when nothing does.  A reader tells two records apart by the pair, and finds a
+    stage's sub-stages as the records whose ``parent`` is its ``id``.
+
+    The record is written when the block ends, whether it returned or raised,
+    and the exception is re-raised unchanged: timing a stage is not a place to
+    close an error.
     """
+    open_stages = _open_stage_ids()
     entry = {
         "stage": name,
-        "input": _named(input),
+        "id": next(_STAGE_COUNTER),
+        "parent": open_stages[-1] if open_stages else None,
+        "input": " ".join(input.split()),
         "commit": current_commit(),
         "run": _process_stamp(),
         "pid": os.getpid(),
     }
     started = datetime.now(timezone.utc)
     clock = time.perf_counter()
+    open_stages.append(entry["id"])
     try:
         yield
     except BaseException as error:
@@ -306,6 +348,8 @@ def stage(name: str, input: str):
         )
         _emit(entry)
         raise
+    finally:
+        open_stages.pop()
     entry.update(
         started=started.isoformat(),
         finished=datetime.now(timezone.utc).isoformat(),

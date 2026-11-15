@@ -112,15 +112,8 @@ def pytest_sessionfinish(session: pytest.Session, exitstatus: int) -> None:
             "run wrote: keeping it would file one run's timings under this run's name"
         )
         destination = directory / f"{written.stem}-{commit}-{stamp}{written.suffix}"
-        try:
-            # Exclusive create, not a check followed by a copy: the destination
-            # is this run's name, and a name already taken is a record of
-            # another run — never something to write over.
-            kept = destination.open("xb")
-        except FileExistsError:
-            raise FileExistsError(
-                f"this run's {option} would be kept at {destination}, where a record of {commit} "
-                "already is: one run's timings would be filed as another's"
-            ) from None
-        with kept, written.open("rb") as source:
+        # Exclusive create, not a check followed by a copy: the destination is
+        # this run's name, so a name already taken is a record of another run
+        # and `open` says so by raising -- there is nothing to decide here.
+        with destination.open("xb") as kept, written.open("rb") as source:
             shutil.copyfileobj(source, kept)

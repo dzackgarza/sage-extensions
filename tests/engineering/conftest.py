@@ -26,6 +26,7 @@ from __future__ import annotations
 
 import builtins
 import json
+import re
 import shutil
 import subprocess
 import sys
@@ -230,37 +231,54 @@ def _sizes(directory: Path) -> dict[str, int]:
     }
 
 
-def _name_parts(name: str) -> tuple[str, str, str, str]:
-    r"""``<kind>-<commit>-<start>-<pid>.<suffix>``, split into its four parts."""
-    stem, _, suffix = name.partition(".")
-    kind, commit, stamp = stem.split("-", 2)
-    return kind, commit, stamp, suffix
+RECORD_NAME = re.compile(
+    r"(?P<kind>[-\w]+)-(?P<commit>[0-9a-f]{12})-(?P<start>\d{8}T\d{12}Z)-(?P<pid>\d+)"
+    r"\.(?P<suffix>[a-z]+)"
+)
+r"""A record file's whole name: kind, commit, start, pid and suffix.
+
+A file whose name this does not match is not a record of a run -- the probe
+directories, the report logs and the JUnit files keep their own names -- so the
+search below selects by the pattern rather than reading a name and handling the
+failure.
+"""
+
+
+def _record_name_parts(name: str):
+    r"""A record file's name matched by ``RECORD_NAME``: kind, commit, start, pid, suffix.
+
+    The one parse of a record's name: every reader -- the start's moment, the
+    pid, the kind, the commit, the suffix -- asks here, so a name cannot be read
+    one way by the selection and another by the reader, and a file that is not a
+    record's is refused once rather than handled by each reader.
+    """
+    parts = RECORD_NAME.fullmatch(name)
+    assert parts is not None, f"{name} is not the name of a timing record"
+    return parts
 
 
 def _stamp_of(name: str) -> tuple[float, str]:
-    r"""A record file's start, as a wall clock, and the pid its stamp ends with.
-
-    The stamp is ``<start>-<pid>``: the microsecond start time the record is
-    named by and the process that wrote it.  A name that is not of that shape
-    is not one of these files, and ``ValueError`` says so.
-    """
-    _kind, _commit, stamp, _suffix = _name_parts(name)
-    start, _, pid = stamp.rpartition("-")
-    moment = datetime.strptime(start, "%Y%m%dT%H%M%S%fZ").replace(tzinfo=timezone.utc)
-    return moment.timestamp(), pid
+    r"""A record file's start, as a wall clock, and the pid its stamp ends with."""
+    parts = _record_name_parts(name)
+    moment = datetime.strptime(parts["start"], "%Y%m%dT%H%M%S%fZ").replace(tzinfo=timezone.utc)
+    return moment.timestamp(), parts["pid"]
 
 
 def _record_file(path: Path, *, after: int = 0) -> RecordFile:
     r"""The file at ``path``, read by its name and by the lines past ``after``."""
-    kind, commit, stamp, suffix = _name_parts(path.name)
+    parts = _record_name_parts(path.name)
     return RecordFile(
         name=path.name,
-        kind=kind,
-        suffix=suffix,
-        commit=commit,
-        stamp=stamp,
+        kind=parts["kind"],
+        suffix=parts["suffix"],
+        commit=parts["commit"],
+        stamp=parts["start"] + "-" + parts["pid"],
         head=_head_commit(),
-        records=sage_timing.read_stage_records(path, after=after) if suffix == "jsonl" else (),
+        records=(
+            sage_timing.read_stage_records(path, after=after)
+            if parts["suffix"] == "jsonl"
+            else ()
+        ),
     )
 
 
@@ -299,10 +317,9 @@ def _kept_by(directory: Path, probe: ProbeRun) -> tuple[Path, ...]:
     """
     selected = []
     for name in sorted(_sizes(directory)):
-        try:
-            start, pid = _stamp_of(name)
-        except ValueError:
+        if RECORD_NAME.fullmatch(name) is None:
             continue
+        start, pid = _stamp_of(name)
         if pid == str(probe.pid) and start >= probe.launched:
             selected.append(directory / name)
     return tuple(selected)

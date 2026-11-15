@@ -96,7 +96,7 @@ class DirectSumObjects(OwnedCategory):
                 family = indexed_family(
                     labels,
                     lambda label: values[int(labels.ranking_map()(label))],
-                    name=f"Direct summands of {underlying_object}",
+                    name=lambda underlying_object=underlying_object: f"Direct summands of {underlying_object}",
                 )
 
         if underlying_object not in self:

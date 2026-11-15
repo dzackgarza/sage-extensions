@@ -19,9 +19,11 @@ from sage.structure.element import parent as element_parent
 from sage.structure.sage_object import SageObject
 
 from sage_extensions.categories._lattice import (
-    lattice_record_name,
+    _group_label,
+    _lattice_label,
+    keyword_arguments,
     orbit_row_record_name,
-    subgroup_record_name,
+    vector_label,
 )
 from sage_extensions.categories.modules.pure.modules import ModuleSubobjects
 from sage_extensions.categories.sets.finite_ordered_sets import (
@@ -2254,17 +2256,16 @@ def _plane_representatives_record_name(representatives, subgroup) -> str:
     r"""The ambient plane representatives, named for a timing record.
 
     The name is the call site's: how many representatives the row runs on, the
-    lattice's held name, and the subgroup the row is taken under -- the last
-    because two subgroup rows of one lattice over the same representatives are
-    two computations (``orthogonal_quotients.py``'s row name is this one's
+    lattice's own description, and the subgroup the row is taken under -- the
+    last because two subgroup rows of one lattice over the same representatives
+    are two computations (``orthogonal_quotients.py``'s row name is this one's
     sibling).  Nothing is read off a plane (:mod:`sage_extensions.timing` names
-    no object).
+    no object), and no name is made unique: the record's ``id`` does that.
     """
     count = len(representatives)
     return (
         f"{count} ambient plane representative{'s' if count != 1 else ''} of "
-        f"{lattice_record_name(subgroup.supergroup().domain())} "
-        f"under {subgroup_record_name(subgroup)}"
+        f"{_lattice_label(subgroup.supergroup().domain())} under {_group_label(subgroup)}"
     )
 
 
@@ -2373,35 +2374,32 @@ class CuspLayerEnumeration(SageObject):
         return f"layer {self._number} of the cusp chamber walk"
 
 
-def _cusp_record_name(reduction_image) -> str:
-    r"""Name the cusp a reduction image is attached to, for a timing record.
+def _cusp_record_name(reduction_image, controlling_vector=None, *, max_roots=None, max_decompositions=None) -> str:
+    r"""Name one computation at a cusp: the cusp, and the bounds the call was given.
 
-    The cusp is the primitive isotropic vector the image is computed at, in the
-    ambient lattice and under the subgroup: ``G_v``, its chamber and its computed
-    vertex are properties of that cusp, and a lattice on its own carries several
-    (Sterk's five on ``T_{En}``), so a name that stops at the lattice names every
-    cusp of it at once.
-    """
-    return (
-        f"the cusp of {reduction_image.vector()} in "
-        f"{lattice_record_name(reduction_image.lattice())} "
-        f"under {subgroup_record_name(reduction_image.subgroup())}"
-    )
-
-
-def _cusp_chamber_record_name(reduction_image, controlling_vector) -> str:
-    r"""Name one chamber computation at a cusp, the point it grows from included.
-
-    ``cusp_chamber`` accepts the vertex to grow the chamber from, and the walk it
-    runs depends on it; ``None`` leaves the choice to the computation, and the
-    name says so rather than naming a point nobody supplied.
+    The cusp is the primitive isotropic vector the reduction image is attached to,
+    in the ambient lattice and under the subgroup: ``G_v``, its chamber and its
+    computed vertex are properties of that cusp, and a lattice on its own carries
+    several (Sterk's five on ``T_{En}``).  The controlling vector is written by
+    its coordinates in its lattice's basis and the bounds by the keyword
+    arguments the call was given (:func:`..._lattice.keyword_arguments`), so
+    ``cusp_chamber()`` and ``cusp_chamber(max_decompositions=200)`` are two
+    names.  A name is a description, not an identity: the record's ``id`` and
+    its ``parent`` are what a reader tells two records apart by
+    (:mod:`sage_extensions.timing`).
     """
     point = (
-        "its own vertex"
+        ""
         if controlling_vector is None
-        else f"the controlling vector ({', '.join(str(int(entry)) for entry in controlling_vector.to_vector())})"
+        else f", controlling vector {vector_label(controlling_vector)}"
     )
-    return f"{_cusp_record_name(reduction_image)} at {point}"
+    return (
+        f"the cusp of {vector_label(reduction_image.vector())} in "
+        f"{_lattice_label(reduction_image.lattice())} "
+        f"under {_group_label(reduction_image.subgroup())}"
+        f"{point}"
+        f"{keyword_arguments(max_roots=max_roots, max_decompositions=max_decompositions)}"
+    )
 
 
 class IsotropicVectorReductionImage(SageObject):
@@ -2821,8 +2819,13 @@ class IsotropicVectorReductionImage(SageObject):
 
     @timed_stage(
         "cusp chamber",
-        input=lambda self, *arguments, **keywords: _cusp_chamber_record_name(
-            self, arguments[0] if arguments else keywords.get("controlling_vector")
+        input=lambda self, controlling_vector=None, *, max_roots=None, max_decompositions=None: (
+            _cusp_record_name(
+                self,
+                controlling_vector,
+                max_roots=max_roots,
+                max_decompositions=max_decompositions,
+            )
         ),
     )
     def cusp_chamber(
@@ -3039,10 +3042,7 @@ class IsotropicVectorReductionImage(SageObject):
             )
         return tuple(records)
 
-    @timed_stage(
-        "controlling vector",
-        input=lambda self, *arguments, **keywords: _cusp_record_name(self),
-    )
+    @timed_stage("controlling vector", input=lambda self: _cusp_record_name(self))
     def _computed_controlling_vector(self):
         r"""Return the class in ``N`` computed as the point of the hyperbolic space.
 

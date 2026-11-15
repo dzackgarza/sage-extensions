@@ -1,0 +1,27 @@
+provider SHA: 8b7e517ad88cd919c20271ebb18d17d14fe05cc1
+.........                                                                [100%]
+=============================== warnings summary ===============================
+tests/engineering/test_the_timing_record_names_each_stage.py: 30 warnings
+  /repos/vinal/src/sage/vinal.py:193: PendingDeprecationWarning: the matrix subclass is not the recommended way to represent matrices or deal with linear algebra (see https://docs.scipy.org/doc/numpy/user/numpy-for-matlab-users.html). Please adjust your code to use regular ndarray.
+    m2 = np.dot( np.dot(g, s.M), g.transpose())
+
+tests/engineering/test_the_timing_record_names_each_stage.py: 30 warnings
+  /repos/vinal/src/sage/vinal.py:194: PendingDeprecationWarning: the matrix subclass is not the recommended way to represent matrices or deal with linear algebra (see https://docs.scipy.org/doc/numpy/user/numpy-for-matlab-users.html). Please adjust your code to use regular ndarray.
+    m1 = np.dot( np.dot( Matrix(a), s.M), g.transpose() )
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+9 passed, 60 warnings in 11.41s
+[peakrss] final-timing-record-tests: child waited=0 shell_code=0 samples=8
+[peakrss] peak tree RSS      : 620 MiB
+[peakrss] low-water MemAvail : 9739 MiB
+[peakrss] peak single VmHWM  : 620 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      507 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    12.0s procs=  4 rss=   620 MiB hwm=   620 MiB avail= 10142 MiB
+[peakrss]   t=     8.0s procs=  4 rss=   541 MiB hwm=   541 MiB avail=  9739 MiB
+[peakrss]   t=    10.0s procs=  4 rss=   538 MiB hwm=   538 MiB avail=  9772 MiB
+[peakrss]   t=    14.0s procs=  3 rss=   518 MiB hwm=   518 MiB avail= 13473 MiB
+[peakrss]   t=     6.0s procs=  3 rss=   499 MiB hwm=   499 MiB avail= 10013 MiB
+launcher exit: 0

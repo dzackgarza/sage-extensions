@@ -51,7 +51,12 @@ from sage.structure.sage_object import SageObject
 
 from sage_extensions.categories.sets.indexed_families import finite_indexed_family_from_values
 from sage_extensions.categories.lattices import Lattices
-from sage_extensions.categories._lattice import lattice_record_name, signature_pair
+from sage_extensions.categories._lattice import (
+    _lattice_label,
+    keyword_arguments,
+    signature_pair,
+    vector_label,
+)
 from sage_extensions.categories.sets.cardinals import cardinal
 from sage_extensions.categories.rings.ring_foundation import (
     _owned_engine_element,
@@ -169,35 +174,30 @@ def _rational_pair(value):
 
 
 def _vinberg_walk_record_name(lattice, controlling_vector, max_roots, max_decompositions, admits_root) -> str:
-    r"""Name one Vinberg walk in a timing record, by every argument the cache keys on.
+    r"""Name one Vinberg walk in a timing record: the lattice, the point, the bounds.
 
     ``_vinberg_search`` is cached on ``(controlling_vector, max_roots,
-    max_decompositions, admits_root)``, so a record that names only the lattice
-    names four walks at once: the point the chamber is grown from decides which
-    vertices are written down, and the root filter decides which walls survive.
-    The point is written as its coordinates in the lattice's framing, or as the
-    engine's own point when none was supplied, and the filter by the name it was
-    defined under -- a callable has no data to identify it by and its name is
-    what its call site chose.
+    max_decompositions, admits_root)``, and all four are what a reader of the
+    line needs to know which walk a duration belongs to: the point the chamber is
+    grown from decides which vertices are written down, and the bounds and the
+    root filter decide which walls survive.  The lattice is named by its ring and
+    Gram (:func:`..._lattice._lattice_label`), the point by its coordinates in
+    the lattice's basis, and the bounds and the filter by the keyword arguments
+    the call was given (:func:`..._lattice.keyword_arguments`).
+
+    A name is a description and not an identity -- the record's ``id`` and
+    ``parent`` are what a reader tells two records apart by
+    (:mod:`sage_extensions.timing`) -- so two filters that share a ``def`` name
+    share this name too, and their walks are still two records.
     """
-    if controlling_vector is None:
-        point = "the engine's own point"
-    else:
-        point = "(" + ", ".join(str(int(entry)) for entry in _framing_coordinates(controlling_vector)) + ")"
-    roots = "no root bound" if max_roots is None else f"at most {max_roots} roots"
-    decompositions = (
-        "no decomposition bound"
-        if max_decompositions is None
-        else f"at most {max_decompositions} decompositions"
-    )
-    admitted = (
-        "every root admitted"
-        if admits_root is None
-        else f"admits_root={getattr(admits_root, '__name__', 'a supplied filter')}"
+    point = (
+        "the engine's own point"
+        if controlling_vector is None
+        else vector_label(controlling_vector)
     )
     return (
-        f"{lattice_record_name(lattice)}, controlling vector: {point}, "
-        f"{roots}, {decompositions}, {admitted}"
+        f"{_lattice_label(lattice)}, controlling vector {point}"
+        f"{keyword_arguments(max_roots=max_roots, max_decompositions=max_decompositions, admits_root=admits_root)}"
     )
 
 

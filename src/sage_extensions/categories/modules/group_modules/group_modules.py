@@ -691,7 +691,7 @@ class ModulesOverGroupAlgebra(Modules):
             return finite_indexed_family(
                 indices,
                 lambda tagged: identity if int(tagged.summand_index()) == 0 else self.action_of(generators.value(tagged.summand_element())),
-                name=f"Identity and chosen action generators on {self}",
+                name=lambda self=self: f"Identity and chosen action generators on {self}",
             )
 
         def module_invariants(self):

@@ -880,7 +880,7 @@ class OwnedNumberFields(CategoryPacketMethods, OwnedCategory):
             return finite_indexed_family(
                 embeddings,
                 lambda embedding: embedding(self),
-                name=f"Conjugates of {self} in {target}",
+                name=lambda self=self, target=target: f"Conjugates of {self} in {target}",
             )
 
 

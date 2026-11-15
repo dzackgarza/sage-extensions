@@ -88,7 +88,7 @@ class AffineSemigroupAlgebras(OwnedCategoryOverBaseRing):
                     lambda coordinate: integers(
                         raw[int(labels.ranking_map()(label))][int(coordinate)]
                     ),
-                    name=f"Coordinates of affine semigroup generator {label}",
+                    name=lambda label=label: f"Coordinates of affine semigroup generator {label}",
                 ),
                 name="Affine semigroup generator coordinates",
             )

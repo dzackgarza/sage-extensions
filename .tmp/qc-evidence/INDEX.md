@@ -1873,6 +1873,7 @@ with the gate on (`issue531r4-lint-gate.log`).
 | `issue531r4-rings.log` / `issue531r4-rings-base.log` | `ca9b5a8` / `76b4449` | `tests/rings`: **76 failed, 263 passed in 44.30 s** against **76 failed, 261 passed in 43.65 s**, FAILED ids identical |
 | `issue531r4-categories-objects.log` / `-base.log` | `ca9b5a8` / `76b4449` | `tests/categories` + `tests/objects`: **183 failed, 264 passed in 56.19 s** against **183 failed, 264 passed in 54.87 s**, FAILED ids identical |
 | `issue531r4-lint-gate.log` | `ca9b5a8` | `tests/rings/test_a_quotient_class_hashes_by_its_class.sage` + `tests/sets/test_a_finite_ordered_set_hashes_by_its_points.sage` with the test lint in force: **10 passed in 1.80 s**; `test_lint` on the rings file alone: **1 files, 0 findings** |
+| `issue531r4-intern-count.log` / `-base.log` | `5277c4e` / `76b4449` | 200 distinct products over one four-point label set, with `IndexedFamily.__eq__` wrapped by the session probe: **0 family comparisons, 0.2827 s** against **20100 comparisons, 2.2002 s**, and the store's own count **0 families in the cardinality buckets against 201**. The intermediate tree `ca9b5a8`, whose bucket also held the keyed families, made **19900 comparisons in 2.1957 s** -- the count is what found that, and no log of it is published because the run wrote over itself |
 
 The probe that named the engines is a session probe and stays out of the tree: it
 prints, for each quotient, its engine's class, `cover_ring()`, `base_ring()` and
@@ -1882,7 +1883,9 @@ build a mutable Sage vector and its immutable copy -- equal, one hashing -- as
 the point pair the family hash must not separate; it stopped at
 `NameError: name 'vector' is not defined` under the session import, so no such
 row is claimed, and the test uses a tuple and a subclass of it with no hash
-instead.
+instead.  The probe behind the comparison counts (`issue531r4-intern-count.log`)
+builds 200 products over one label set and wraps `IndexedFamily.__eq__` to count
+the comparisons; it is the same file on both trees.
 ## #528, second round: are the lift tests more numerous, or dearer?
 
 `204ffbb96e` corrected the integral locus' Smith reading *and* replaced its per-class test: the
@@ -1991,3 +1994,62 @@ once per class again, so it is removed with the mechanism it counted.
 | --- | --- | --- |
 | `issue528-locus-tests-restored.log` | `cff6a3a` + the restore | `tests/lattices/test_the_integral_lift_locus_is_a_union_of_transvection_cosets.sage` with the test lint plugin: **6 passed in 13.24 s**, the new non-identity-reduction test included |
 | `issue528-row-after-restore.log` | `cff6a3a` + the restore | `T_Co`'s ambient plane row, cap 520 s: **did not return**; `_lift_at` **1536 calls, 162.155 s** and `eichler_transvection` **1536 calls, 30.851 s** inside the window -- about 105 ms a class, against the matrix test's row of 217.9 s (`issue528-repaired-row-counts.log`) |
+## The fifth review of #500: the torsion reading and the provider order
+
+The four logs below are the runs the commits `030a528` and `476f87c` cite.  The
+probes were run in the adopted image with the checkout bound at
+`/repos/sage-extensions` and the port at `/work`, the same shape as above but
+with `PYTHONPATH=/ci/tool-artifacts/pytest_plugins:/work/src:/work:/repos/sage-extensions/src`
+and the script bound at `/probe.py`.  The tree is `6e4e097`, which is the four
+commits merged onto the remote main `1cc2481`; the source files these logs
+measure are unchanged by that merge.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `issue500r5-name-owners.py` | the tree of `476f87c` | the probe: for twenty-six constructed objects and each of `ParentMethods`, `ElementMethods`, `MorphismMethods`, computes the order the deleted insertion loop gave and the order the tree gives, prints the two wherever they differ, and then asks, for every name any provider declares, which provider answers it first under each |
+| `issue500r5-name-owners.log` | the tree of `476f87c` | three runs in fresh processes: the orders differ in **2, 1 and 1** of the 78 pairs -- always `Modules.FinitelyGenerated` against `FramedFreeModules`, in `QQ(i)` and `Z[x]/(x^2)`'s `ParentMethods` -- and **no name's answering provider moves in any run** |
+| `issue500r5-answering-class.py` | the tree of `030a528` | the probe: names the class in the rebuilt type's method resolution order that declares `_torsion_freeness_decision`, and the answer |
+| `issue500r5-answering-class.log` | the tree of `030a528` | `Z[x]/(x^2)`: `AlgebrasWithChosenFinitePresentation.ParentMethods` **True**; `Z/4[x]`, `Z[x]`, `Q(i)`: `FramedFreeModules.ParentMethods` **True** |
+| `issue500r5-refusal.log` | the tree of `587aabd` | the order-ideal refusal on `2` in `Z/8` as a `Z`-module, printed: the message names the element, the ideal, the functionals that are missing and what they are for, and no word STY-49 bans |
+| `issue500r5-tests.log` | the tree of `6e4e097` | `tests/categories/test_the_refined_category_answers_with_its_own_operation.sage tests/modules/test_the_order_ideal_of_a_ring_element_over_its_base_ring.sage`, test lint loaded: **10 passed in 0.91 s**; the same two files at `a106d23` with the two new tests: **2 failed, 8 passed in 4.59 s** |
+| `issue500r5-sweep.log` | the tree of `6e4e097` and a clean worktree at `1cc2481` | a digest, assembled from the run logs and labelled as one: twelve directories, the five root test modules and `tests/lattices/test_lattice_surfaces.sage`, each summary line with its count of FAILED/ERROR ids, and the ids present on one side only -- **none, in any of the fourteen**; the only count that differs is `tests/categories`, 45 passed against 42, the three tests this round adds |
+
+## #531 round 5 (2026-11-15): one store for the finite interners
+
+The round's work is `aafb4ac` (the red tests) and `df5f484` (the repair).  The
+two red rows are at the round's base `1cc2481`, the base the review read; the
+head rows are at `1775a6f`, whose measured content is the tree this evidence
+commit produces, and the base rows at `5fabcdc`, the remote main the round is
+rebased onto.  The SHAs the repair was first written and measured at are older
+than its rebases -- `d43bab4` and `aed5e3e` -- and the patches of `aafb4ac`
+against `d43bab4` and `df5f484` against `aed5e3e` are byte-identical
+(`git show --format= <sha> -- src tests` on each side, digest
+`75dd05cb…` and `c87f2942…`).
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `issue531-r5-order.py`, `issue531-r5-order.log` | `1cc2481` | item 1, both construction orders, with both stores emptied between runs: **product and coproduct are one object when the key-less family is built first and two objects when the keyed one is** (`True` then `False`, both operations) -- the order the existing test did not build |
+| `issue531-r5-red.py`, `issue531-r5-red.log` | `1cc2481` | item 2: a mutable `vector(QQ, [1, 2])` answers `isinstance(..., Hashable)` **True** while `hash` raises `TypeError: mutable vectors are unhashable`; `T = S.filtered(lambda p: True)` over two mutable vectors reports `points_have_a_hash` **True**, and the product of the one-factor family over `T` raises `TypeError: cannot use 'tuple' as a dict key (mutable vectors are unhashable)`.  The probe reads `points_have_a_hash`, which the repair deletes, so it runs at the base only |
+| `issue531-r5-factors.py`, `issue531-r5-factors.log` | `1cc2481` | the counterexample to keying the store by the factors: `hash(finite_ordered_set(([0],)))` raises `TypeError: unhashable type: 'list'`, and yet `Sets().product` of a family with that factor **builds and interns** (`second product is the first` True, coproduct likewise); a family whose values are Python lists is refused by the product with its own message |
+| `issue531-r5-accept.py`, `issue531-r5-accept.log` | `1775a6f` | the repair, measured: one product and one coproduct in **both** orders; a family whose factor refuses a hash still interns; the product over the filtered set of mutable `QQ` vectors builds with `factor(v) is factor` and two equal filtered families share it; an undecided family equality builds **both** constructions and keeps both |
+| `issue531-r5-four-head-mine.log` | `1775a6f` | `tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage`, `tests/sets/test_a_finite_ordered_set_hashes_by_its_points.sage`, `tests/rings/test_a_quotient_class_hashes_by_its_class.sage`, `tests/modules/test_dual_point_hash.sage`, `--no-test-lint`: **6 failed, 47 passed in 4.08 s** |
+| `issue531-r5-four-head-base.log` | `5fabcdc` (a clean worktree) | the same four files: **6 failed, 46 passed in 4.12 s**; the six FAILED ids are identical -- `test_unchecked_discrete_diagram_cannot_certify_infinite_factors`, `test_finite_diagram_restricted_to_infinite_parity_family`, `test_constant_countable_coproduct_has_diagonal_enumeration`, `test_selected_nonconstant_countable_coproduct_is_enumerated`, `test_componentwise_set_maps_accept_additive_diagrams`, `test_infinite_componentwise_set_maps_use_a_selected_natural_transformation` -- so the extra pass is this round's net one test |
+| `issue531-r5-sets-head-mine.log` | `1775a6f` | `tests/sets`, `--no-test-lint`: **29 failed, 136 passed in 12.11 s** |
+| `issue531-r5-sets-head-base.log` | `5fabcdc` | the same directory: **29 failed, 135 passed in 12.97 s**; the FAILED id sets are identical, and the one extra pass is the added test net one against the one it replaces |
+| `issue531-r5-lint-head-mine.log` | `1775a6f` | `test_lint` on the three test files this round touches: **3 files, 167 findings** |
+| `issue531-r5-lint-head-base.log` | `5fabcdc` | the same three: **3 files, 161 findings** -- the products file already ends the run red at the base, and the six added findings are the three kinds its other tests carry (TL01 local imports, TL08 `finite_ordered_set` and `indexed_family` construction), which a test in that file cannot avoid without rewriting the file |
+
+## #529, the seventh round: identity is the run and the stage id, the name describes the input
+
+The record's `input` stops being an identity: every stage line now carries `id`
+(unique in the run's file) and `parent` (the enclosing stage's `id`), and the
+canonical-form naming machinery is deleted. The first log is the red state on
+main; the rest are the repair, on the commit this section's push names.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `issue529-reflection-hyperbolic-main-red.log` | main `1cc2481` | `tests/lattices/test_reflection_hyperbolic.sage` alone: **3 failed, 1 passed in 2.05 s**, all three red on `TypeError: 200 of _OwnedRingParent_with_category.element_class has no canonical form for a record name` at `_lattice.py:1579` -- the `.sage` bound `max_decompositions=200` raised inside the timed call, so the Vinberg walk did not run. The second call of each walk failed as `KeyError: ((None, None, 200, None), ())`: the raise sat inside `cached_method` |
+| `issue529-timing-record-tests-green.log` | `8b7e517` | `tests/engineering/test_the_timing_record_names_each_stage.py` with the test lint and the suite budget: **9 passed in 11.41 s**, the three round-7 tests among them (the `Õ`/`Õ⁺` rows of one lattice named apart; a stage's record carrying its own `id` and its enclosing stage's `id`; `cusp_chamber(max_decompositions=200)` named, not refused) |
+| `issue529-vinberg-tests-green.log` | `8b7e517` | `tests/lattices/test_reflection_hyperbolic.sage` and `tests/lattices/test_the_subgroup_cusp_chamber.sage`: **7 passed in 155.61 s** -- the file that was red on main above, and the `.sage` literals at `test_the_subgroup_cusp_chamber.sage:119-120` (`max_decompositions=400` beside a filter) |
+| `issue529-reduction-image-cusps-green.log` | `8b7e517` | the two cusp-chamber tests of `tests/lattices/test_the_isotropic_reduction_image.sage` selected by node id -- `max_decompositions=8` and `max_decompositions=20`, the file's literal sites: **2 passed in 148.92 s** |
+| `issue529-reduction-image-whole-file-capped.log` | main `1cc2481` + the repair, before it was committed | the same file whole, capped at 560 s: **6 passed** and the seventh still running when the cap killed it (peak RSS 1882 MiB). No verdict on the file; the two cusp-chamber tests above are what was decided |

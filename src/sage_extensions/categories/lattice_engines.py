@@ -1085,14 +1085,6 @@ function finite_form_isometry_group(gram_entries, invariants, modulus, modulus_q
     return order(group), [matrix(generator) for generator in gens(group)]
 end
 
-function square_shell(gram_entries, square)
-    gram = _zz_matrix(gram_entries)
-    lattice = integer_lattice(; gram=change_base_ring(QQ, gram))
-    vectors = Oscar.Hecke.short_vectors(lattice, ZZ(square), ZZ(square))
-    return matrix(ZZ, length(vectors), nrows(gram),
-                  [coordinate for (v, _) in vectors for coordinate in v])
-end
-
 function rational_witt_index(gram_entries)
     gram = _qq_matrix(gram_entries)
     _anisotropic, hyperbolic, radical = Oscar.Hecke._quadratic_form_decomposition(gram)
@@ -1291,14 +1283,6 @@ class _OscarLatticeAdapter:
             SageQQ(modulus_qf),
         )
         return SageZZ(order), tuple(generator.change_ring(SageZZ) for generator in generators)
-
-    def square_shell(self, gram, square):
-        r"""Return one coordinate row per sign pair of nonzero square vectors."""
-        return self._bridge().call(
-            "DzackResearchOscarLatticeAdapter.square_shell",
-            _integer_engine_matrix(gram),
-            SageZZ(int(square)),
-        )
 
     def rational_witt_index(self, gram):
         r"""Return the Witt index of the quadratic space ``(QQ^n, gram)``."""

@@ -1,0 +1,14 @@
+provider SHA: 1cc248135c6d292ab69359f0089af8f8f0c5377c
+......[peakrss] reduction-image-tests: child waited=124 shell_code=124 samples=280
+[peakrss] peak tree RSS      : 1882 MiB
+[peakrss] low-water MemAvail : 11558 MiB
+[peakrss] peak single VmHWM  : 1882 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     1871 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   352.2s procs=  3 rss=  1882 MiB hwm=  1882 MiB avail= 12189 MiB
+[peakrss]   t=   354.2s procs=  3 rss=  1882 MiB hwm=  1882 MiB avail= 12087 MiB
+[peakrss]   t=   356.2s procs=  3 rss=  1882 MiB hwm=  1882 MiB avail= 11997 MiB
+[peakrss]   t=   350.2s procs=  3 rss=  1818 MiB hwm=  1818 MiB avail= 12267 MiB
+[peakrss]   t=   358.2s procs=  3 rss=  1800 MiB hwm=  1881 MiB avail= 12004 MiB

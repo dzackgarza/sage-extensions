@@ -1,0 +1,16 @@
+provider SHA: 280fab48b95ffd4ab6821b93d0b61b752a0f9c76
+port SHA: 991b88b0
+command: python /probe.py
+### Z[x]/(x^2): Free module on {[1], [x]} over Integer Ring
+  answers from: sage_extensions.categories.algebras.algebras.AlgebrasWithChosenFinitePresentation.ParentMethods
+  answer: True
+### Zmod(4)['x']: Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring / Ideal (4) of Integer Ring
+  answers from: sage_extensions.categories.modules.framed.framed_free_modules.FramedFreeModules.ParentMethods
+  answer: True
+### Z['x']: Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring
+  answers from: sage_extensions.categories.modules.framed.framed_free_modules.FramedFreeModules.ParentMethods
+  answer: True
+### Q(i): Free module on {1, a} over Fraction Field of Integer Ring
+  answers from: sage_extensions.categories.modules.framed.framed_free_modules.FramedFreeModules.ParentMethods
+  answer: True
+launcher exit: 0
