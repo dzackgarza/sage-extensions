@@ -85,6 +85,7 @@ from sage_extensions.categories.sets.set_categories import (
     Sets,
 )
 from sage_extensions.logic import AtomicProposition, conjunction, negation
+from sage_extensions.owned_category_bases import CategoryWithAxiom
 from sage_extensions.refine import RealizationHook
 
 
@@ -1309,13 +1310,19 @@ def _finitely_presented_algebra_from_data(
     presentation_ideal, selected_relations = _relations_to_ideal(
         presentation_ring, relations
     )
-    if presentation_ring in AlgebrasWithChosenFinitePresentation(base):
+    if (
+        presentation_ring in AlgebrasWithChosenFinitePresentation(base)
+        and (presentation_ring.relations().cardinality() == cardinal(0)) is False
+    ):
         # A quotient of a quotient is one quotient of the same free
         # presentation: for A = P/I, the algebra A/(J) is P/(I + J~) where J~
         # lifts the new relations to P.  Consolidating here keeps one chosen
         # presentation and one scalar ring, so a second closed embedding into
         # an already presented algebra reaches the same construction as the
-        # first rather than needing a tower of quotient objects.
+        # first rather than needing a tower of quotient objects.  An algebra
+        # presented with no relations, as a free algebra presents itself, has
+        # no relations to consolidate: it is the presentation ring of its
+        # quotient, which is computed directly below.
         source = presentation_ring.presentation_ring()
         existing = presentation_ring.relations()
         lifted_relations = selected_relations.map(
@@ -1580,8 +1587,76 @@ class FreeAlgebras(OwnedCategoryOverBaseRing):
         def _algebra_mor_class(self):
             return FramedFreeAlgebraMor
 
+    class FinitelyGeneratedAsAlgebra(CategoryWithAxiom):
+        r"""Free algebras on a finite set of generators.
+
+        An algebra free on a finite set ``S`` is presented by ``S`` and no
+        relations: its framing ``Free(S) -> A`` is a length-zero free
+        resolution (``CAT-29``), a finite presentation
+        ``F_m -> F_n -> A -> 0`` with ``m = 0`` (lean-categories
+        ``FOUNDATIONS.md``, Definition 75.1, stated there for modules and
+        here in the associative or commutative theory the free algebra is
+        free in).  So every object of this category is an algebra with that
+        chosen finite presentation, and its presentation answers are the
+        free algebra's own: the presentation ring is the algebra, the
+        relation family is empty, the quotient map is the augmentation of
+        its degree-zero resolution, and an element lifts to itself.
+
+        This category precedes both ``FreeAlgebras(R)`` and
+        ``AlgebrasWithChosenFinitePresentation(R)`` in an object's parent
+        class, so the operations the two define alike are answered here.
+        """
+
+        def extra_super_categories(self):
+            return [AlgebrasWithChosenFinitePresentation(self.base_ring())]
+
+        class ParentMethods:
+            def _algebra_mor_class(self):
+                return FramedFreeAlgebraMor
+
+            def presentation_ring(self):
+                r"""A free algebra is presented on itself."""
+                return self
+
+            @cached_method
+            def relations(self):
+                r"""A free algebra is presented with no relations: the empty family."""
+                return indexed_family(
+                    finite_ordered_set(()),
+                    lambda index: self.zero(),
+                    name="Defining relation family",
+                )
+
+            def algebra_presentation_morphism(self):
+                r"""The quotient map of the presentation by no relations: the augmentation, the identity."""
+                return self.selected_algebra_resolution().augmentation()
+
+            def lift_to_presentation(self, element):
+                r"""An element of a free algebra is its own presentation-ring representative."""
+                return self(element)
+
+            def _has_selected_exact_coefficient_presentation(self) -> bool:
+                r"""A free algebra computes in itself: its presentation is itself, with no relations.
+
+                The ring contract this answers (``OwnedRings``) asks whether
+                coefficient computations are lifted to a nontrivial selected
+                presentation; a free algebra's presentation ring is the
+                algebra, so lifting would ask the same computation again.
+                """
+                return False
+
 
 class GradedFreeAlgebras(OwnedCategoryOverBaseRing):
+    r"""Graded algebras built by a free construction on a module ``M``.
+
+    Their degree pieces are the powers of ``M`` the construction names,
+    ``T^n(M)``, ``Sym^n(M)``, ``Lambda^n(M)`` or ``Gamma^n(M)``.  Such an
+    algebra is free relative to modules: ``T(M)`` is free on the module
+    ``M``.  It is free on a set of generators only when ``M`` is free, as
+    ``T(R^2/(2 e_1))`` is not, so this category is not a subcategory of
+    ``FreeAlgebras(R)``; an algebra that is both is placed in both.
+    """
+
     def an_object(self):
         r"""The polynomial algebra on one generator, graded by degree."""
         from sage_extensions.categories.modules.pure.modules import Modules
@@ -1594,7 +1669,7 @@ class GradedFreeAlgebras(OwnedCategoryOverBaseRing):
 
     def super_categories(self):
 
-        return [FreeAlgebras(self.base_ring()), GradedAlgebras(self.base_ring())]
+        return [GradedAlgebras(self.base_ring())]
 
     class ParentMethods:
         def _realize_graded_piece_basis_label(self, degree, label):
