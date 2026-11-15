@@ -1,0 +1,44 @@
+=== ran on: ac941dc62b46db71b7debe2c2517a50d94c31194 (2 modified paths)
+=== command: pytest tests/sets/test_a_description_is_asked_for_when_it_is_read.sage -o addopts= -p qc_sage_session -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_______________ test_a_description_is_asked_for_when_it_is_read ________________
+
+>   return self._cached_methods[name]
+E   KeyError: 'description'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_a_description_is_asked_for_when_it_is_read() -> None:
+        r"""Building a named set asks its name for nothing; reading the description asks once."""
+        asked = []
+    
+        def description():
+            asked.append(1)
+            return "the even squares"
+    
+        points = FiniteOrderedSets().from_indexed(
+            Sets.Δ[3], lambda position: (2 * int(position),), name=description
+        )
+    
+        assert tuple(asked) == ()
+>       assert points.description() == "the even squares"
+               ^^^^^^^^^^^^^^^^^^
+
+tests/sets/test_a_description_is_asked_for_when_it_is_read.sage:25: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    ???
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: 'FiniteOrderedSets.parent_class' object has no attribute 'description'
+
+sage/cpython/getattr.pyx:362: AttributeError
+=========================== short test summary info ============================
+FAILED tests/sets/test_a_description_is_asked_for_when_it_is_read.sage::test_a_description_is_asked_for_when_it_is_read
+1 failed in 0.44s

@@ -1,0 +1,36 @@
+=== ran on: ac941dc62b46db71b7debe2c2517a50d94c31194 (2 modified paths)
+=== command: pytest tests/sets/test_the_points_of_a_finite_ordinal_are_values.sage -o addopts= -p qc_sage_session -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates
+..FF                                                                     [100%]
+=================================== FAILURES ===================================
+________________ test_a_released_natural_number_is_not_retained ________________
+
+    def test_a_released_natural_number_is_not_retained() -> None:
+        r"""Released, a natural is collected: nothing in the set holds it alive."""
+        point = NN(70002)
+        reference = weakref.ref(point)
+        value = int(point)
+        del point
+    
+        gc.collect()
+    
+>       assert reference() is None
+E       AssertionError: assert 70002 is None
+E        +  where 70002 = <weakref at 0x75083c00c180; to 'sage_extensions.categories.sets.set_categories.NaturalNumberSets.element_class' at 0x75083c014050>()
+
+tests/sets/test_the_points_of_a_finite_ordinal_are_values.sage:35: AssertionError
+_______________ test_a_natural_number_read_back_is_the_one_point _______________
+
+    def test_a_natural_number_read_back_is_the_one_point() -> None:
+        r"""Pickled or copied, a natural names its value, so it comes back as this point."""
+        point = NN(70003)
+    
+>       assert loads(dumps(point)) is point
+E       AssertionError: assert 70003 is 70003
+E        +  where 70003 = loads(b'x\x9c\x85R\xdbn\xd3@\x10M\ni\xa8{\xa3\xd0\xa6\\\xca\xfd\xd6p1\xb7O\x80\'\x10\x162/~\x89V\xeb\xf5$^\xe1\xac3\xbb\xeb\...\xfd\x81\x04\xf4\xc5\x00\xe3P}\xc9\r\xfa\x1e~9\xc0WM>\xc5\xd7a0\'\xbcj\x00\xdf|0{\xed\x96\x99\xe1\xdb<\xfe\r}\x191\xd4')
+E        +    where b'x\x9c\x85R\xdbn\xd3@\x10M\ni\xa8{\xa3\xd0\xa6\\\xca\xfd\xd6p1\xb7O\x80\'\x10\x162/~\x89V\xeb\xf5$^\xe1\xac3\xbb\xeb\...\xfd\x81\x04\xf4\xc5\x00\xe3P}\xc9\r\xfa\x1e~9\xc0WM>\xc5\xd7a0\'\xbcj\x00\xdf|0{\xed\x96\x99\xe1\xdb<\xfe\r}\x191\xd4' = dumps(70003)
+
+tests/sets/test_the_points_of_a_finite_ordinal_are_values.sage:43: AssertionError
+=========================== short test summary info ============================
+FAILED tests/sets/test_the_points_of_a_finite_ordinal_are_values.sage::test_a_released_natural_number_is_not_retained
+FAILED tests/sets/test_the_points_of_a_finite_ordinal_are_values.sage::test_a_natural_number_read_back_is_the_one_point
+2 failed, 2 passed in 0.53s

@@ -1,0 +1,167 @@
+=== tree: 18b34bde9d1069853dbd784ca00edf29a5f950b5 (modified paths: 0)
+=== port: 991b88b095a42a1e3679569ea42328c900c120f6
+=== command: sage-image/run.sh -w /work, probe probe541tco.py at /probe.py, cap 540 s
+
+===== 0. the specimen =====
+generators ('h', 'ep', 'fp', 'a1', 'a2', 'a3', 'a4', 'a5', 'a6', 'a7', 'a8')
+**the Gram of T_Co on its generators**
+      2    0    0    0    0    0    0    0    0    0    0
+      0    0    2    0    0    0    0    0    0    0    0
+      0    2    0    0    0    0    0    0    0    0    0
+      0    0    0   -4    0    2    0    0    0    0    0
+      0    0    0    0   -4    0    2    0    0    0    0
+      0    0    0    2    0   -4    2    0    0    0    0
+      0    0    0    0    2    2   -4    2    0    0    0
+      0    0    0    0    0    0    2   -4    2    0    0
+      0    0    0    0    0    0    0    2   -4    2    0
+      0    0    0    0    0    0    0    0    2   -4    2
+      0    0    0    0    0    0    0    0    0    2   -4
+norms b(e,e): 2 0 0 -4 -4 -4 -4 -4 -4 -4 -4
+
+===== 1. the plane and the isometry =====
+plane Integral lattice of rank 2 and signature (0, 0)
+the isometry is a reflection in a vector of norm four with even pairings
+
+===== A. one plane transport on T_Co (rank 11) =====
+cold (a fresh span inside the timed region): 2.33 ms f0 2.05 ms f0 2.21 ms f0
+warm median 1.73 ms over 20 transports
+
+===== B. one cold transport on T_Co, object by object =====
+one transport of one fresh plane: 44.69 ms under setprofile, 8294 calls, 0 span constructions
+
+-- own time, top 25 (own ms | calls | incl ms | site)
+   30.556 |       75 |    30.556 | ring_foundation.py:5756 _OwnedRingElement.__init__
+    0.933 |       87 |   139.197 | set_categories.py:779 OwnedSetMorphism.__call__
+    0.747 |      608 |     1.214 | set_categories.py:6791 NaturalNumberSets.ParentMethods._element_constructor_
+    0.734 |      279 |     1.515 | set_categories.py:526 AugmentedSimplexCategory.ParentMethods.__contains__
+    0.650 |      608 |     1.864 | set_categories.py:6817 NaturalNumberSets.ParentMethods.__call__
+    0.593 |      239 |     2.992 | set_categories.py:541 AugmentedSimplexCategory.ParentMethods.__call__
+    0.375 |      608 |     0.375 | set_categories.py:6821 NaturalNumberSets.ParentMethods.__contains__
+    0.350 |      650 |     0.350 | set_categories.py:6687 NaturalNumberSets.ElementMethods.__int__
+    0.349 |      267 |     0.370 | category.py:436 Category.__classcall__
+    0.244 |      329 |     0.244 | set_categories.py:6801 NaturalNumberSets.ParentMethods._point
+    0.225 |        1 |     0.460 | free_module.py:2376 FreeModule_generic.is_submodule
+    0.215 |       75 |    30.771 | ring_foundation.py:6624 _OwnedRingParent._from_engine_element
+    0.210 |      138 |     0.289 | lattices.py:3946 Lattices.ParentMethods.base_ring
+    0.210 |       34 |     3.569 | finite_ordered_sets.py:229 OrderedEnumeratedSets.ParentMethods._element_constructor_
+    0.205 |      149 |     0.324 | category.py:3128 JoinCategory.is_subcategory
+    0.175 |      132 |     0.175 | ring_foundation.py:5760 _OwnedRingElement._backend
+    0.171 |       49 |     0.393 | ring_foundation.py:5713 _operand_in_ring
+    0.160 |        8 |     0.195 | matrix_space.py:1077 MatrixSpace._element_constructor_
+    0.150 |       90 |     0.399 | finite_ordered_sets.py:203 OrderedEnumeratedSets.ParentMethods.__contains__
+    0.139 |       69 |    38.821 | mor_categories.py:1648 CategoricalIsomorphism.__call__
+    0.137 |       81 |     0.321 | objects.py:158 OwnedCategory.__contains__
+    0.136 |       93 |     0.232 | category.py:693 Category.__contains__
+    0.133 |      110 |     0.263 | ring_foundation.py:6649 _OwnedRingParent.__call__
+    0.130 |      110 |     0.130 | ring_foundation.py:6653 _OwnedRingParent._element_constructor_
+    0.127 |       68 |     1.090 | framed_free_modules.py:354 _SparseFreeModuleParent._element_constructor_
+
+-- constructors, by inclusive time (incl ms | calls | own ms | site)
+   30.884 |       12 |    0.084 | framed_free_modules.py:96 _SparseFreeModuleElement.__init__
+   30.556 |       75 |   30.556 | ring_foundation.py:5756 _OwnedRingElement.__init__
+    3.569 |       34 |    0.210 | finite_ordered_sets.py:229 OrderedEnumeratedSets.ParentMethods._element_constructor_
+    1.214 |      608 |    0.747 | set_categories.py:6791 NaturalNumberSets.ParentMethods._element_constructor_
+    1.090 |       68 |    0.127 | framed_free_modules.py:354 _SparseFreeModuleParent._element_constructor_
+    1.007 |        1 |    0.006 | lattice_morphisms.py:2497 LatticeEmbeddingMor._element_constructor_
+    0.991 |        1 |    0.016 | lattice_morphisms.py:665 LatticeMorphismMethods.__init__
+    0.813 |        1 |    0.008 | free_module.py:7879 FreeModule_submodule_pid.__init__
+    0.805 |        1 |    0.110 | free_module.py:6718 FreeModule_submodule_with_basis_pid.__init__
+    0.767 |        2 |    0.032 | module_morphisms.py:527 ModuleMorphismMethods.__init__
+    0.657 |        1 |    0.024 | module_morphisms.py:3090 _ModuleMorCommonMethods._element_constructor_
+    0.370 |      267 |    0.349 | category.py:436 Category.__classcall__
+    0.218 |        3 |    0.073 | owned_category.py:1714 OwnedParent.__init__
+    0.195 |        8 |    0.160 | matrix_space.py:1077 MatrixSpace._element_constructor_
+    0.195 |        8 |    0.079 | mor_categories.py:2166 _MorCategoryOf.Of
+    0.178 |        1 |    0.004 | free_module.py:3989 FreeModule_generic_pid.__init__
+    0.174 |        1 |    0.005 | free_module.py:3892 FreeModule_generic_domain.__init__
+    0.171 |        1 |    0.011 | form_modules.py:427 FormedModuleMorphism.__init__
+    0.169 |        1 |    0.020 | free_module.py:2070 FreeModule_generic.__init__
+    0.155 |        3 |    0.040 | mor_categories.py:2473 _EndCategoryOf.Of
+
+-- what the named sites build inside themselves
+
+lattice_morphisms.py:1989 LatticeIsometryMethods.transport_isotropic_object  calls=1 own=0.069 ms incl=44.654 ms
+      42.818 ms incl |       1 calls | module_morphisms.py:1601 ModuleMorphismMethods.image
+       1.049 ms incl |       1 calls | lattice_morphisms.py:1982 LatticeIsometryMethods.__mul__
+       0.628 ms incl |       1 calls | finite_ordered_sets.py:152 OrderedEnumeratedSets.ParentMethods.__iter__
+       0.454 ms incl |       3 calls | lattice_morphisms.py:2011 LatticeIsometryMethods.transport_isotropic_object.<locals>.<genexpr>
+       0.454 ms incl |       2 calls | framed_free_modules.py:266 _SparseFreeModuleElement.__hash__
+       0.321 ms incl |       1 calls | objects.py:158 OwnedCategory.__contains__
+       0.289 ms incl |       1 calls | lattices.py:3946 Lattices.ParentMethods.base_ring
+       0.135 ms incl |       1 calls | modules.py:1936 Modules.ParentMethods.module_generating_set
+       0.085 ms incl |       1 calls | ring_foundation.py:5444 OwnedCategoryOverBaseRing.__classcall__
+       0.028 ms incl |       2 calls | mor_foundation.py:86 CategoricalArrow.codomain
+
+framed_free_modules.py:1315 _span_basis_elements  calls=1 own=0.109 ms incl=41.515 ms
+      34.820 ms incl |       3 calls | indexed_families.py:227 IndexedFamily.__iter__.<locals>.<genexpr>
+       2.313 ms incl |      22 calls | framed_free_modules.py:119 _SparseFreeModuleElement.__call__
+       1.498 ms incl |       1 calls | finite_ordered_sets.py:376 FiniteOrderedSets.from_indexed
+       1.446 ms incl |      12 calls | finite_ordered_sets.py:177 OrderedEnumeratedSets.ParentMethods.__iter__.<locals>.<genexpr>
+       1.293 ms incl |       1 calls | free_module.py:1809 Module_free_ambient.submodule
+       0.628 ms incl |       1 calls | finite_ordered_sets.py:152 OrderedEnumeratedSets.ParentMethods.__iter__
+       0.370 ms incl |       1 calls | category.py:436 Category.__classcall__
+       0.321 ms incl |       1 calls | objects.py:158 OwnedCategory.__contains__
+       0.289 ms incl |       1 calls | lattices.py:3946 Lattices.ParentMethods.base_ring
+       0.225 ms incl |      22 calls | ring_foundation.py:7985 _linear_algebra_element
+       0.136 ms incl |       1 calls | framed_free_modules.py:1294 _finite_support_labels
+       0.094 ms incl |       1 calls | indexed_families.py:226 IndexedFamily.__iter__
+
+lattices.py:3995 Lattices.ParentMethods.subobject_on  calls=1 own=0.028 ms incl=42.620 ms
+      41.515 ms incl |       1 calls | framed_free_modules.py:1315 _span_basis_elements
+       0.736 ms incl |       1 calls | finite_ordered_sets.py:530 FiniteOrderedSets.ParentMethods.__eq__
+       0.340 ms incl |       1 calls | finite_ordered_sets.py:565 FiniteOrderedSets.ParentMethods.__hash__
+       0.001 ms incl |       1 calls | lattices.py:409 <lambda>
+
+module_morphisms.py:1601 ModuleMorphismMethods.image  calls=1 own=0.018 ms incl=42.818 ms
+      42.620 ms incl |       1 calls | lattices.py:3995 Lattices.ParentMethods.subobject_on
+       0.487 ms incl |       1 calls | set_categories.py:2477 Sets.ParentMethods.cardinality
+       0.289 ms incl |       1 calls | lattices.py:3946 Lattices.ParentMethods.base_ring
+       0.232 ms incl |       1 calls | category.py:693 Category.__contains__
+       0.228 ms incl |       1 calls | indexed_families.py:411 indexed_family
+       0.135 ms incl |       1 calls | modules.py:1936 Modules.ParentMethods.module_generating_set
+       0.095 ms incl |       1 calls | cardinals.py:730 Cardinalities.ParentMethods.is_finite
+       0.042 ms incl |       1 calls | module_morphisms.py:789 ModuleMorphismMethods._require_established_linearity
+       0.011 ms incl |       1 calls | ring_foundation.py:8262 CommutativeRings
+
+===== C. the same transport without a profiler, site by site =====
+24 sites wrapped; not wrapped: sage_extensions.categories.modules.module_morphisms.module_morphisms._engine_image: module 'sage_extensions.categories.modules.module_morphisms.module_morphisms' has no attribute '_engine_image'; sage_extensions.categories.lattices._lattice_subobject_spanning: a cached descriptor, not a plain callable
+5 transports with the wrappers counting: median 2.92 ms
+
+-- own ms per plane, then inclusive ms per plane, then calls per plane
+  18.092 |   18.596 |      1.0 | sage_extensions.categories.lattices._span_basis_elements
+   0.249 |    0.283 |      1.0 | FiniteOrderedSets.from_indexed
+   0.224 |    0.224 |    608.0 | NaturalNumberSets.ParentMethods.__call__
+   0.152 |   18.766 |      1.0 | Lattices.ParentMethods.subobject_on
+   0.095 |   18.867 |      1.0 | ModuleMorphismMethods.image
+   0.057 |    0.057 |      8.0 | _MorCategoryOf.Of
+   0.020 |    0.022 |      3.0 | sage_extensions.refine.realize_owned_category
+   0.017 |    0.017 |      1.0 | sage_extensions.categories.modules.framed.framed_free_modules._finite_support_labels
+   0.015 |    0.015 |      1.0 | sage_extensions.categories.modules.framed.framed_free_modules._known_finite_generator_family
+   0.002 |    0.002 |      3.0 | sage_extensions.refine.owned_parent_class
+   0.000 |    0.000 |      0.0 | sage_extensions.refine._declaring_classes
+   0.000 |    0.000 |      0.0 | sage_extensions.refine._final_category_operations
+   0.000 |    0.000 |      0.0 | sage_extensions.refine._is_bookkeeping_or_hook
+   0.000 |    0.000 |      0.0 | sage_extensions.refine.refine
+   0.000 |    0.000 |      0.0 | sage_extensions.owned_category._owned_join_as_tuple
+   0.000 |    0.000 |      0.0 | sage_extensions.owned_category.owned_category_join
+   0.000 |    0.000 |      0.0 | sage_extensions.categories.abstract_categories.mor_categories._minimal_inherited_homs
+   0.000 |    0.000 |      0.0 | CategoricalMor.__init__
+   0.000 |    0.000 |      0.0 | ModuleMorphismMethods.cokernel
+   0.000 |    0.000 |      0.0 | sage_extensions.categories.lattices._lattice_subobject_on_basis
+   0.000 |    0.000 |      0.0 | sage_extensions.categories.lattices._module_subobject_constructor_data
+   0.000 |    0.000 |      0.0 | Lattices.ParentMethods.b
+   0.000 |    0.000 |      0.0 | Homset.__init__
+   0.000 |    0.000 |      0.0 | Lattices.ParentMethods._repr_
+
+PROBE DONE
+[peakrss] run: child waited=0 shell_code=0 samples=2
+[peakrss] peak tree RSS      : 298 MiB
+[peakrss] low-water MemAvail : 13512 MiB
+[peakrss] peak single VmHWM  : 298 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      287 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     2.0s procs=  3 rss=   298 MiB hwm=   298 MiB avail= 13512 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     1 MiB hwm=     2 MiB avail= 13689 MiB
+=== launcher exit: 0

@@ -2435,3 +2435,26 @@ per-plane rate does not separate the trees either: 52.9 and 68.6 planes/s on the
 repair against 55.2 and 59.6 on the base, with the rate drifting inside a run as
 the machine's load moved (run 1 goes 72.2 -> 52.9 over 209 s while the load
 average goes 1.5 -> 5.9).
+
+## #541, the review round: the table declared, the release observed, and the census' display
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `541-review-release-red.log` | `ac941dc62b` | the release test of this round on the tree before the intern table has a lifetime: **2 failed** -- `assert reference() is None` reports `assert 70002 is None` (the strong `cached_method` holds the element) and the pickle test `False`.  The file and `tests/sets/conftest.py` were copied onto that tree, so the log's "2 modified paths" is exactly them |
+| `541-review-green.log` | `18b34bd` | the description contract file with the two sets files: **8 passed in 0.52 s**, test lint loaded, 0 findings |
+| `541-review-retain.log` | `309ab54` | the retention probe after the review's three source findings: 10^6 distinct naturals leave the table at **1 entry and +0.0 MiB** in 1.1 s; pickle protocols 0/2/5 and `copy`/`deepcopy` return the interned point; `loads(dumps(NN)) is NN` |
+| `541-review-sets-dir.log` | `18b34bd` | `tests/sets` whole: **29 failed, 149 passed in 7.37 s**; the 29 are the tree's, and this round adds the description test |
+| `541-review-modules-base.log`, `541-review-modules-fix.log` | `ac941dc62b` / `18b34bd` | `tests/modules`, where the span bases are consumed: **90 failed, 224 passed** on both trees, FAILED id sets identical under `sort` and `diff` |
+| `541-review-description-red.log` | `ac941dc62b` | the description contract at the base: **1 failed**, `KeyError: 'description'` from `sage/structure/category_object.pyx`: a named set has no way to describe itself except by being displayed |
+| `541-census-before.log`, `541-census-after.log` | `6b6cfe2` + the review fixes / `309ab54` + the description repair | one plane transport on T_Co, the same probe minutes apart: warm **2.29 -> 1.63 ms**, cold 2.38/2.34/2.26 -> 1.69/1.60/1.64 ms, wrapped-site median **2.53 -> 1.86 ms**, and `Lattices._repr_` **0.588 ms over 1.0 calls a plane -> 0.000 ms over 0.0 calls** |
+| `541-census-final.log` | `18b34bd` | the same probe on the pushed commit: warm **1.73 ms**, `Lattices._repr_` still 0 calls a plane.  The cold and per-site figures are higher than `-after`'s on this run (cold 2.33/2.05/2.21 ms, wrapped-site median 2.92 ms) because the machine was carrying a load of 1.5-2.3; the warm median over 20 transports and the call count are the stable readings |
+| `541-row11-repair.log` | `18b34bd` | the Otilde(T_Co) plane row once, at load average **0.55 1.19 1.89** on 4 CPUs (the lowest of the round), calibration **0.362 s**, `ROW_DEADLINE=540` inside 570 s inner / 590 s outer: **first plane at 292.3 s = 807 units**, **19 637 planes** by 565.2 s, **71.96 planes/s, 13.9 ms a plane** |
+
+What the row run says.  The first-plane stage transports nothing, so it cannot
+carry the repair: its 345.4 s and 341.8 s in the previous round's two runs and
+292.3 s here differ by the machine, whose load was 1.55 and 2.50 then and 0.55
+here.  The per-plane rate is where the repair lands, and 13.9 ms against the
+previous round's 14.6 and 18.9 ms is the transport's -0.66 ms a plane on a plane
+whose 14 ms are mostly the walk (the transport is 2.3 of them).  So the row at
+low load is **292.3 s to the first plane and 72.0 planes/s**, and the census, not
+the row, is the measurement of the repair.
