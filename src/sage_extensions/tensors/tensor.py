@@ -21,6 +21,7 @@ the rank vector, and a tensor is an element of it built by the module's
 element constructor from its row-major components.
 """
 
+from copy import copy
 from fractions import Fraction
 from functools import singledispatch
 from math import prod
@@ -1146,7 +1147,6 @@ def _covariant_bilinear_coordinate_rows(value, left_rank, right_rank):
 
 
 
-@cached_function
 def _engine_component_matrix(value):
     r"""Private engine adapter (`OWN-06`): the Sage matrix of a two-index tensor.
 
@@ -1170,14 +1170,21 @@ def _engine_component_matrix(value):
             f"cannot write a tensor with index ranks ({rows}, {columns}) as a matrix: "
             f"an index of infinite rank has no finite matrix"
         )
-    rows, columns = int(rows), int(columns)
-    ring = value.base_ring()
-    return _sage_matrix(
-        _linear_algebra_ring(ring),
-        rows,
-        columns,
-        [_linear_algebra_element(ring, value[i, j]) for i in range(rows) for j in range(columns)],
-    )
+    # A tensor is immutable, so its engine matrix is read once and retained
+    # on it; each caller receives its own mutable copy.
+    retained = value.__dict__.get("_engine_component_matrix")
+    if retained is None:
+        rows, columns = int(rows), int(columns)
+        ring = value.base_ring()
+        retained = _sage_matrix(
+            _linear_algebra_ring(ring),
+            rows,
+            columns,
+            [_linear_algebra_element(ring, value[i, j]) for i in range(rows) for j in range(columns)],
+        )
+        retained.set_immutable()
+        value.__dict__["_engine_component_matrix"] = retained
+    return copy(retained)
 
 
 # Protected engine-adapter contract (OWN-05, OWN-06, OWN-24): the
