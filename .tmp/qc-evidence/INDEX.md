@@ -2292,3 +2292,51 @@ T_Co itself, which is the row's own lattice.
 | `541-tco-census-after-ordinal-repair.log` | the repair | the same transport: **2.43 ms**, `_span_basis_elements` 1.070 ms, `from_indexed` 0.145 ms, `NN` 0.162 ms over the same 644 calls |
 | `541-sets-dir-after.log`, `541-sets-dir-base.log` | the repair / a clean tree at `664a9c3` | `tests/sets/` whole: **29 failed, 146 passed in 7.44 s** against **29 failed, 144 passed in 8.27 s**; the 29 FAILED ids are the same set, so no new failure |
 | `541-row-after-ordinal-repair-1.log`, `-2.log` | the pushed tree | the row under the ten-minute cap, twice: **0 planes by 511.5 s and by 511.6 s**, calib 0.378 both times (>= 1352 calib units), both stack-sampled inside `_finite_family_key` -> `__hash__` -> `point_at`. The 838-unit run `353418f` quotes does **not** reproduce |
+
+## #540, fourth round: the free algebra's own presentation, and two operations the tree refuses
+
+Base: main `664a9c3b72`, port at `991b88b095`, image `ghcr.io/dzackgarza/sage@sha256:59568577…`
+through `~/sage-image/run.sh -w /work`.  Every run blanks the repository `addopts` and loads
+`qc_sage_session`; `--no-time-gates` is passed where a row is legitimately over the 20 s call
+ceiling.  "plain order" is a session with no `QQ.polynomial_ring` built first; "poly order" is
+one that builds `QQ.polynomial_ring("y")` first.
+
+| log | tree | result |
+| --- | --- | --- |
+| `540d-presentation-row-red.log` | main `664a9c3` with this round's test files | `tests/algebras/test_affine_semigroup_algebras.sage`: **1 failed, 3 passed in 3.49 s**; both orders' session scripts exit 1 at `assert algebra.presentation_ring() is algebra` |
+| `540d-two-orders-on-main.log` | main `664a9c3` | the conftest session script run twice on main: **order 0 returncode 1, order 1 returncode 1**, both at `assert algebra.presentation_ring() is algebra` (line 15 of the script as it stood) -- the record for the claim that the red row is red for the presentation methods, not for the augmentation |
+| `540d-algebra-and-cells.log` | this round's tree | `tests/algebras/test_affine_semigroup_algebras.sage` + `tests/algebras/test_free_algebra_issue614_cells.sage` in one process: **1 failed, 8 passed in 5.31 s**, the failure `test_cell_61_tensor_and_divided_power_algebras_of_a_torsion_module`, which fails alone on main too |
+| `540d-toric-and-sets.log` | this round's tree | `tests/divisors/test_toric_class_groups.sage` after the two `tests/sets` triggers in one process: **3 failed, 10 passed in 1.95 s** -- all 8 toric rows pass |
+| `540d-toric-and-sets-main.log` | main `664a9c3` | the same three files: **3 failed, 10 passed in 2.41 s**, the same three `tests/sets` ids |
+| `540d-algebras-dir.log` | this round's tree | the whole `tests/algebras/` directory in one process: **103 failed, 112 passed in 102.83 s** |
+| `540d-algebras-dir-main.log` | main `664a9c3` | the same directory: **103 failed, 112 passed in 88.86 s**; the two FAILED-id sets are identical (`comm -23` and `comm -13` both empty) |
+| `540d-lint.log` | this round's tree | `python -m sage_extensions.testing.test_lint tests/algebras/test_affine_semigroup_algebras.sage`: **1 files, 0 findings** |
+| `540d-rebased-cells-toric-sets.log` | the rebased tree, on `e763219` | the two algebra files, the toric file and the two `tests/sets` triggers in one process: **4 failed, 18 passed in 6.45 s** -- every toric row and every row of this round's algebra file pass |
+| `540d-sets-on-the-new-base.log` | `e763219` | the two `tests/sets` files alone: **3 failed, 2 passed in 1.33 s**, the same three ids, so they are not this round's |
+
+Not evidence that anything passed: the two operations this round did **not** deliver, and the runs
+that establish why.  The placement of the two `ParentMethods` was attacked three ways and each was
+measured on 2026-11-15 in the same image:
+
+- declaring `FreeAlgebras(R).FinitelyGeneratedAsAlgebra()` a subcategory of
+  `AlgebrasWithChosenFinitePresentation(R)` through a `CategoryWithAxiom` with that
+  `extra_super_categories` leaves the object's category holding the plain `FreeAlgebras(R)` and
+  `AlgebrasWithChosenFinitePresentation(R)` as incomparable factors, so the join still orders the
+  two `ParentMethods` by creation: `FramedFreeAlgebraMor` plain, `PresentedAlgebraMor` poly.
+- additionally placing a finitely generated free algebra in that refinement makes the two
+  comparable and answers `PresentedAlgebraMor` in both orders, but puts every free algebra inside
+  `AlgebrasWithChosenFinitePresentation`; `AffineSemigroupAlgebras(ZZ)(((1,0),(0,1),(1,1)))` then
+  dies building its own relation lift, at `free_algebras.py:1311`'s quotient-of-a-quotient branch
+  reading `lift_to_presentation` of a free algebra.
+- one shared `_algebra_mor_class_of` keyed on the algebra -- first on AWCFP membership, then on
+  `is_free` -- answers deterministically, but `tests/algebras/test_free_algebra_issue614_cells.sage`
+  then loses `SparseFreeAlgebraMorphism` from the graded Mor's element class and its cell 84 cannot
+  substitute in `Sym(ZZ[NN])` (`3 failed, 2 passed` against main's `1 failed, 4 passed`).
+
+The augmentation, likewise: building it as `self.Mor(self).identity()` (`algebras.py:5324`) gives
+`augmentation().parent() is A.Mor(A)` for `QQ[S]` and in the toric chart, but the tensor algebra of
+the torsion module in cell 61 realizes its degree-zero resolution *during* construction
+(`QuotientRing._reduce_` -> `homogeneous_components` -> `algebra_generator` -> the augmentation
+factory), so the graded element class of `GradedAlgebras(ZZ)` is built there and cell 84's sparse
+arrow loses its class; with the branch reverted the cells file returns to main's `1 failed, 4
+passed` and `QQ[S]`'s augmentation parent is `Mor_UnitalAlg(A, A)` again.

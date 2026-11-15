@@ -1,0 +1,139 @@
+tree: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/wt540main
+tree SHA: e7632190cbcc2540599adced4245b07b1eaaf73f
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+tests: tests/sets/test_cardinality_construction_comparisons.sage tests/sets/test_standard_cardinals_archive.sage
+inner 300 s, outer 340 s, guard 6144 MiB, extra '-o addopts= -p sage_extensions.testing.suite_budget --no-time-gates --durations=0'
+command: /sage/.venv/bin/python -m pytest -p qc_sage_session tests/sets/test_cardinality_construction_comparisons.sage tests/sets/test_standard_cardinals_archive.sage -o addopts= -p sage_extensions.testing.suite_budget --no-time-gates --durations=0
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+time gates OFF (--no-time-gates): star import 0.33 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: asyncio-1.5.0, xdist-3.8.0, reportlog-1.0.0, platformdirs-4.13.5, hypothesis-6.170.15, anyio-4.15.1, timeout-2.4.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 5 items
+
+tests/sets/test_cardinality_construction_comparisons.sage FF             [ 40%]
+tests/sets/test_standard_cardinals_archive.sage .F.                      [100%]
+
+=================================== FAILURES ===================================
+____ test_cardinality_compares_a_countable_power_set_with_two_to_aleph_zero ____
+
+    def test_cardinality_compares_a_countable_power_set_with_two_to_aleph_zero() -> None:
+        naturals = Sets.Δ[aleph0]
+        power_set = naturals.power_set()
+>       comparison = Sets().cardinality_functor().power_set_comparison(power_set)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/sets/test_cardinality_construction_comparisons.sage:13: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/functors/cardinality.py:82: in power_set_comparison
+    return self.codomain().Mor(expected, self(power_set)).unique_morphism()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:2328: in sage.misc.cachefunc.CachedMethodCallerNoArgs.__call__
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Set of Morphisms from (2)^(ℵ_0) to (2)^(ℵ_0) in Card: cardinalities with a unique morphism kappa -> lambda exactly when kappa <= lambda
+
+    @cached_method
+    def unique_morphism(self) -> CardinalityMorphism:
+        empty = self.is_empty()
+        if empty is True:
+            raise ValueError(
+                f"there is no morphism {self.domain()} -> {self.codomain()} of cardinals: "
+                f"{self.domain()} is not <= {self.codomain()}"
+            )
+>       assert empty is False, (
+               ^^^^^^^^^^^^^^
+            f"cannot give the morphism {self.domain()} -> {self.codomain()} of cardinals: it is "
+            f"undecided whether {self.domain()} <= {self.codomain()}"
+        )
+E       AssertionError: cannot give the morphism (2)^(ℵ_0) -> (2)^(ℵ_0) of cardinals: it is undecided whether (2)^(ℵ_0) <= (2)^(ℵ_0)
+
+src/sage_extensions/categories/sets/cardinals.py:369: AssertionError
+_ test_cardinality_comparisons_retain_countable_and_continuum_factor_arithmetic _
+
+    def test_cardinality_comparisons_retain_countable_and_continuum_factor_arithmetic() -> None:
+        polynomial = QQ.polynomial_ring("y")
+        countable_product = ZZ.product_with(polynomial)
+        continuum_product = ZZ.product_with(RR)
+        continuum_coproduct = QQbar.coproduct_with(CC)
+        cardinality = Sets().cardinality_functor()
+    
+>       countable_comparison = cardinality.cartesian_product_comparison(countable_product)
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/sets/test_cardinality_construction_comparisons.sage:27: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/functors/cardinality.py:64: in cartesian_product_comparison
+    return self.codomain().Mor(expected, self(product)).unique_morphism()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:2328: in sage.misc.cachefunc.CachedMethodCallerNoArgs.__call__
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Set of Morphisms from ℵ_0 to ℵ_0 in Card: cardinalities with a unique morphism kappa -> lambda exactly when kappa <= lambda
+
+    @cached_method
+    def unique_morphism(self) -> CardinalityMorphism:
+        empty = self.is_empty()
+        if empty is True:
+            raise ValueError(
+                f"there is no morphism {self.domain()} -> {self.codomain()} of cardinals: "
+                f"{self.domain()} is not <= {self.codomain()}"
+            )
+>       assert empty is False, (
+               ^^^^^^^^^^^^^^
+            f"cannot give the morphism {self.domain()} -> {self.codomain()} of cardinals: it is "
+            f"undecided whether {self.domain()} <= {self.codomain()}"
+        )
+E       AssertionError: cannot give the morphism ℵ_0 -> ℵ_0 of cardinals: it is undecided whether ℵ_0 <= ℵ_0
+
+src/sage_extensions/categories/sets/cardinals.py:369: AssertionError
+____________ test_rational_power_series_have_continuum_cardinality _____________
+
+    def test_rational_power_series_have_continuum_cardinality() -> None:
+        power_series = QQ.power_series_ring("t")
+    
+        assert power_series.cardinality() == continuum
+        # A finitely generated QQ-algebra is a quotient of some QQ[x_1, ..., x_n], hence
+        # countable, so the continuum-sized QQ[[t]] is not finitely generated.
+>       assert not power_series.is_finitely_generated()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/sets/test_standard_cardinals_archive.sage:26: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = is_finitely_generated(Ring over Fraction Field of Integer Ring)
+
+    def __bool__(self):
+>       raise TypeError(f"the proposition {self} has no Python truth value, because it may be undecided; call ask(...) on it to get True, False or Unknown")
+E       TypeError: the proposition is_finitely_generated(Ring over Fraction Field of Integer Ring) has no Python truth value, because it may be undecided; call ask(...) on it to get True, False or Unknown
+
+src/sage_extensions/logic.py:44: TypeError
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:830 Elementwise module morphism Module over Fraction Field of Integer Ring on Classes in the multilinear tensor presentation -> Module over Fraction Field of Integer Ring on Fraction Field of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+============================== slowest durations ===============================
+0.06s call     tests/sets/test_standard_cardinals_archive.sage::test_rational_power_series_have_continuum_cardinality
+0.03s call     tests/sets/test_cardinality_construction_comparisons.sage::test_cardinality_comparisons_retain_countable_and_continuum_factor_arithmetic
+0.01s call     tests/sets/test_standard_cardinals_archive.sage::test_matrix_ring_cardinality_tracks_the_coefficient_ring
+0.01s call     tests/sets/test_standard_cardinals_archive.sage::test_rational_polynomial_ring_is_countable
+
+(11 durations < 0.005s hidden.  Use -vv to show these durations.)
+=========================== short test summary info ============================
+FAILED tests/sets/test_cardinality_construction_comparisons.sage::test_cardinality_compares_a_countable_power_set_with_two_to_aleph_zero
+FAILED tests/sets/test_cardinality_construction_comparisons.sage::test_cardinality_comparisons_retain_countable_and_continuum_factor_arithmetic
+FAILED tests/sets/test_standard_cardinals_archive.sage::test_rational_power_series_have_continuum_cardinality
+========================= 3 failed, 2 passed in 1.33s ==========================
+[peakrss] pytest540: child waited=1 shell_code=1 samples=2
+[peakrss] peak tree RSS      : 304 MiB
+[peakrss] low-water MemAvail : 13365 MiB
+[peakrss] peak single VmHWM  : 304 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      293 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     2.0s procs=  3 rss=   304 MiB hwm=   304 MiB avail= 13365 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     0 MiB hwm=     0 MiB avail= 13565 MiB

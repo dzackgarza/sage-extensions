@@ -1,0 +1,66 @@
+tree: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/wt540main
+tree SHA: 664a9c3b72821fa6dec738d786c7cf402c908dea
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+tests: tests/algebras/test_affine_semigroup_algebras.sage
+inner 560 s, outer 600 s, guard 6144 MiB, extra '-o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates --durations=0'
+command: /sage/.venv/bin/python -m pytest -p qc_sage_session tests/algebras/test_affine_semigroup_algebras.sage -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates --durations=0
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+time gates OFF (--no-time-gates): star import 0.33 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: asyncio-1.5.0, xdist-3.8.0, reportlog-1.0.0, platformdirs-4.13.5, hypothesis-6.170.15, anyio-4.15.1, timeout-2.4.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 4 items
+
+tests/algebras/test_affine_semigroup_algebras.sage ...F                  [100%]
+
+=================================== FAILURES ===================================
+_ test_the_presentation_of_a_semigroup_algebra_answers_the_same_in_both_orders _
+
+    def test_the_presentation_of_a_semigroup_algebra_answers_the_same_in_both_orders() -> None:
+        r"""The chosen presentation of ``QQ[S]`` answers the same in either order.
+    
+        ``QQ[S]`` for ``S = <(1,0), (0,1)>`` is a free algebra and a finitely
+        presented algebra at once -- ``AffineSemigroupAlgebras`` is a subcategory of
+        ``AlgebrasWithChosenFinitePresentation`` -- and the session's category
+        construction order decides which of the two categories'
+        ``ParentMethods`` a join of them puts first.  A free algebra has the trivial
+        finite presentation, its own selected generators and no relations, and that
+        answer is not allowed to depend on the order: the presentation ring is the
+        algebra, the relation family is empty, the presentation morphism is the
+        algebra's own identity, and the lift is the element itself.
+    
+        Each order needs its own process: the first parent class a session builds
+        is the one it keeps for the rest of that session.  The runner in this
+        directory's ``conftest.py`` runs the session script in a fresh interpreter
+        and reports its exit status.
+        """
+>       assert session_order_verdict(polynomial_ring_first=False) == 0
+E       assert 1 == 0
+E        +  where 1 = session_order_verdict(polynomial_ring_first=False)
+E        +  and   0 = Integer(0)
+
+tests/algebras/test_affine_semigroup_algebras.sage:101: AssertionError
+============================== slowest durations ===============================
+1.93s call     tests/algebras/test_affine_semigroup_algebras.sage::test_the_presentation_of_a_semigroup_algebra_answers_the_same_in_both_orders
+0.18s call     tests/algebras/test_affine_semigroup_algebras.sage::test_semigroup_algebra_of_the_monoid_generated_by_e1_e2_and_their_sum_satisfies_z_equals_xy
+0.07s call     tests/algebras/test_affine_semigroup_algebras.sage::test_a_semigroup_algebra_keeps_its_identity_after_a_polynomial_ring_is_built
+0.05s call     tests/algebras/test_affine_semigroup_algebras.sage::test_linearly_independent_semigroup_generators_give_the_polynomial_algebra
+
+(8 durations < 0.005s hidden.  Use -vv to show these durations.)
+=========================== short test summary info ============================
+FAILED tests/algebras/test_affine_semigroup_algebras.sage::test_the_presentation_of_a_semigroup_algebra_answers_the_same_in_both_orders
+========================= 1 failed, 3 passed in 3.49s ==========================
+[peakrss] pytest540: child waited=1 shell_code=1 samples=4
+[peakrss] peak tree RSS      : 604 MiB
+[peakrss] low-water MemAvail : 9838 MiB
+[peakrss] peak single VmHWM  : 604 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      326 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     4.0s procs=  4 rss=   604 MiB hwm=   604 MiB avail=  9838 MiB
+[peakrss]   t=     6.0s procs=  3 rss=   337 MiB hwm=   337 MiB avail=  9851 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   299 MiB hwm=   299 MiB avail= 10070 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     1 MiB hwm=     1 MiB avail=  9902 MiB

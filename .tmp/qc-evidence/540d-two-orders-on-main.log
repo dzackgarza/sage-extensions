@@ -1,0 +1,28 @@
+provider SHA: 664a9c3b72821fa6dec738d786c7cf402c908dea (worktree /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/wt540main)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+probe: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/probe540y.py order=plain
+order 0 returncode 1
+STDERR: Traceback (most recent call last):
+  File "<string>", line 15, in <module>
+    assert augmentation.parent() is algebra.Mor(algebra)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
+
+order 1 returncode 1
+STDERR: Traceback (most recent call last):
+  File "<string>", line 15, in <module>
+    assert augmentation.parent() is algebra.Mor(algebra)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
+
+[peakrss] probe540: child waited=0 shell_code=0 samples=2
+[peakrss] peak tree RSS      : 382 MiB
+[peakrss] low-water MemAvail : 10866 MiB
+[peakrss] peak single VmHWM  : 382 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      274 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     2.0s procs=  4 rss=   382 MiB hwm=   382 MiB avail= 10866 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     1 MiB hwm=     1 MiB avail= 11125 MiB
+launcher exit: 0 order=plain
