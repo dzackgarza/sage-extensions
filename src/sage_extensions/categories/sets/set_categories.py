@@ -8,6 +8,7 @@ from itertools import count, islice, product
 from math import comb
 from operator import index as integer_index
 from typing import TYPE_CHECKING, Any, Self, SupportsIndex, TypeVar
+from weakref import WeakValueDictionary
 
 from sage.categories.category import Category
 from sage.categories.category_with_axiom import all_axioms
@@ -6701,6 +6702,18 @@ class NaturalNumberSets(OwnedCategory):
         def __ne__(self, other):
             return not self == other
 
+        def __reduce__(self):
+            r"""A natural is read back as the one point of its value, not as a second one."""
+            return self.parent(), (int(self),)
+
+        def __copy__(self):
+            r"""A copy of a natural is the natural."""
+            return self.parent()(int(self))
+
+        def __deepcopy__(self, memo):
+            r"""A deep copy of a natural is the natural."""
+            return self.parent()(int(self))
+
         def _semiring_operand(self, other):
             r"""Read another natural here, or defer to a larger semiring.
 
@@ -6770,6 +6783,10 @@ class NaturalNumberSets(OwnedCategory):
         def __init__(self, **rest) -> None:
             super().__init__(**rest)
 
+        def __reduce__(self):
+            r""":math:`\mathbb N` itself, so a natural read back is a point of this set."""
+            return _natural_numbers, ()
+
         def _element_constructor_(self, value):
             r"""The natural number ``value`` names; its admission is :meth:`__contains__`."""
             match value:
@@ -6780,9 +6797,8 @@ class NaturalNumberSets(OwnedCategory):
                 case _:
                     raise ValueError(f"{value!r} is not a natural number")
 
-        @cached_method
         def _point(self, number: int):
-            r"""The one point of this set naming ``number``.
+            r"""The one point of this set naming ``number``, while anything references it.
 
             A natural number is its value, so two constructions of one value are
             one object: equal naturals are equal here whatever carried them, and
@@ -6791,8 +6807,21 @@ class NaturalNumberSets(OwnedCategory):
             the plane row asks for one span basis, and so one ordinal, per plane
             it transports -- would otherwise build every point of it again on
             every enumeration.
+
+            The table holds each point weakly, so the set keeps no natural alive
+            and a value's entry goes with the value: interning with a lifetime,
+            not a cache that grows by one entry per natural ever built
+            (``STY-55``).  :meth:`__reduce__` and the two copy protocols of a
+            natural come back through the set applied to the value, so a natural
+            read back is the one point.
             """
-            return self.element_class(self, number)
+            interned = self.__dict__.get("_interned_points")
+            if interned is None:
+                interned = self.__dict__["_interned_points"] = WeakValueDictionary()
+            point = interned.get(number)
+            if point is None:
+                point = interned[number] = self.element_class(self, number)
+            return point
 
         def __call__(self, value):
             r"""Construct an owned natural number without Sage coercion discovery."""
@@ -7180,6 +7209,11 @@ class WellOrderedSets(OwnedCategory):
 
 
 NN = _object_of(NaturalNumberSets())
+
+
+def _natural_numbers():
+    r"""The set $\mathbb N$ itself: what a value of it reduces to in a pickle."""
+    return NN
 
 
 def register_set_axioms() -> None:
