@@ -2219,32 +2219,17 @@ class ModuleMorphismMethods:
             f"cannot compute a preimage under {domain} -> {codomain}: the {fractions}-module {extension} must be finitely generated with chosen generators, but it is in {extension.category()}"
         )
 
-        if not _has_finite_free_framing(extension):
-            return self._presented_extension_solver()(element)
-
-        if element.parent() is not codomain:
-            element = codomain(element)
-
-        extension_framing, scale, cleared_span = self._integral_extension_coordinate_span()
-        target_coordinates = extension_framing.lift(element.underlying_element())
-        coefficients = {
-            label: scale * coefficient
-            for label, coefficient in target_coordinates.parent()._selected_module_coefficients(target_coordinates).items()
-        }
-        if any(coefficient not in ring for coefficient in coefficients.values()):
-            return None
-        target = cleared_span.codomain().linear_combination({
-            label: ring(coefficient) for label, coefficient in coefficients.items()
-        })
-        return cleared_span._preimage_or_none(target)
+        return self._extension_smith_solver()(element)
 
     @cached_method
-    def _presented_extension_solver(self):
-        r"""Solve integral preimages into ``Res(W)`` for a presented ``Frac(R)``-module ``W``.
+    def _extension_smith_solver(self):
+        r"""Solve integral preimages into ``Res(W)`` for a finitely generated ``Frac(R)``-module ``W``.
 
-        ``W = F_0 / im(F_1)`` over ``K = Frac(R)``. A matrix ``P`` whose rows
+        ``W = F_0 / im(F_1)`` over ``K = Frac(R)``; a free framing is the
+        case ``F_1 = 0``. A matrix ``P`` whose rows
         span the annihilator of the relation columns maps ``F_0`` onto
-        ``K^k`` with kernel exactly the relations, so ``x`` lifts ``t``
+        ``K^k`` with kernel exactly the relations (``P = 1`` for a free
+        framing), so ``x`` lifts ``t``
         precisely when ``P G x = P t`` for the coordinate columns ``G`` of
         the generator images. Clearing one denominator gives an integral
         system, solved by its Smith form ``D = U A V``: ``x = V y`` with
@@ -2253,7 +2238,7 @@ class ModuleMorphismMethods:
         projection and Smith data are fixed by this arrow; a query changes
         only the right-hand side.
         """
-        from sage.matrix.constructor import matrix as sage_matrix
+        from sage.matrix.constructor import identity_matrix, matrix as sage_matrix
         from sage.modules.free_module_element import vector as sage_vector
         from sage.rings.integer_ring import ZZ as SageZZ
         from sage_extensions.categories.modules.pure.modules import _engine_matrix
@@ -2262,17 +2247,21 @@ class ModuleMorphismMethods:
         ring = domain.base_ring()
         fractions = codomain.extension_ring()
         extension = codomain.module_over_extension()
-        presentation = extension.presentation()
         framing = extension.framing_morphism()
-        labels = tuple(presentation.codomain().module_generating_set())
         field = _linear_algebra_ring(fractions)
+        if _has_finite_free_framing(extension):
+            labels = tuple(extension.module_generating_set())
+            projection = identity_matrix(field, len(labels))
+        else:
+            presentation = extension.presentation()
+            labels = tuple(presentation.codomain().module_generating_set())
+            relations = _engine_matrix(presentation).change_ring(field)
+            projection = relations.transpose().right_kernel_matrix()
 
         def coordinates(value):
             lifted = framing.lift(value).to_vector()
             return sage_vector(field, [_linear_algebra_element(fractions, lifted(label)) for label in labels])
 
-        relations = _engine_matrix(presentation).change_ring(field)
-        projection = relations.transpose().right_kernel_matrix()
         source_labels = tuple(domain.module_generating_set())
         images = sage_matrix(
             field,
@@ -2308,43 +2297,6 @@ class ModuleMorphismMethods:
             })
 
         return solve
-
-    @cached_method
-    def _integral_extension_coordinate_span(self):
-        r"""Retain the integral coordinate span used by extension-framing preimages.
-
-        The module morphism owns this private workspace. Its fixed generator
-        images determine one denominator and one integral linear system; a
-        queried target changes only the right-hand side.
-        """
-        domain, codomain = self.domain(), self.codomain()
-        ring = domain.base_ring()
-        extension = codomain.module_over_extension()
-        extension_framing = extension.framing_morphism()
-        image_coordinates = {
-            label: extension_framing.lift(self(domain.module_generator(label)).underlying_element())
-            for label in domain.module_generating_set()
-        }
-        denominator = reduce(
-            lambda current, coefficient: current.lcm(coefficient.denominator()),
-            tuple(
-                coefficient
-                for coordinates in image_coordinates.values()
-                for coefficient in coordinates.parent()._selected_module_coefficients(coordinates).values()
-            ),
-            ring.one(),
-        )
-        scale = codomain.ring_map()(denominator)
-        cleared_module = ring._fresh_free_module_on(extension.module_generating_set())
-
-        def cleared(coordinates):
-            return cleared_module.linear_combination({
-                label: ring(scale * coefficient)
-                for label, coefficient in coordinates.parent()._selected_module_coefficients(coordinates).items()
-            })
-
-        cleared_span = domain.module_category().Mor(domain, cleared_module)({label: cleared(coordinates) for label, coordinates in image_coordinates.items()})
-        return extension_framing, scale, cleared_span
 
     def orthogonal_complement(self):
         r"""Return ``im(self)^perp`` when the codomain carries a scalar-valued pairing."""

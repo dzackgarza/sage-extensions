@@ -126,3 +126,24 @@ def test_the_lattice_of_rank_three_is_the_standard_cubic_lattice() -> None:
     assert cubic.determinant() == 1
     assert cubic.is_positive_definite()
     assert cubic.is_isometric(Lattices(ZZ)([[1, 0, 0], [0, 1, 0], [0, 0, 1]]))
+
+
+def test_distinct_cones_of_one_shape_hash_apart_and_equal_cones_hash_alike() -> None:
+    r"""Three two-dimensional cones on two rays in ``Z^2`` have three hashes; one cone cut out twice has one.
+
+    The quadrant, the cone on ``(0, 1), (2, 1)`` and the cone on ``(1, 1), (1, -1)``
+    are distinct sets with the same numbers of rays, facets and dimensions.  The
+    quadrant cut out by ``x, y >= 0`` and by ``2x, y >= 0`` is one set.
+    """
+    lattice = Lattices(ZZ)([[1, 0], [0, 1]])
+    quadrant = lattice.reduction_cell(((1, 0), (0, 1)))
+    narrow = lattice.reduction_cell(((1, 0), (-1, 2)))
+    diagonal = lattice.reduction_cell(((1, 1), (1, -1)))
+    doubled = lattice.reduction_cell(((2, 0), (0, 1)))
+
+    assert quadrant != narrow
+    assert quadrant != diagonal
+    assert narrow != diagonal
+    assert cardinal(sum(1 for _ in {hash(quadrant), hash(narrow), hash(diagonal)})) == cardinal(3)
+    assert quadrant == doubled
+    assert hash(quadrant) == hash(doubled)

@@ -529,8 +529,19 @@ class RationalPolyhedralCones(OwnedParameterizedCategory):
             return super().__eq__(other)
 
         def __hash__(self) -> int:
-            r"""Hash the ambient lattice and the cone as a subset, which equality compares."""
-            return hash((id(self.ambient_lattice()), self._engine_polyhedron()))
+            r"""Hash the ambient lattice and a canonical form of the cone as a subset.
+
+            Equal cones are one subset of ``L tensor QQ``.  A pointed cone is
+            spanned by its primitive rays, which are determined by the subset, so
+            their hashes, as a set, are the canonical form; a cone with a
+            lineality space hashes its dimension and that of its lineality space.
+            """
+            lattice = id(self.ambient_lattice())
+            match self.is_pointed():
+                case True:
+                    return hash((lattice, tuple(sorted(hash(ray) for ray in self.primitive_rays()))))
+                case False:
+                    return hash((lattice, int(self.dimension()), int(self.lineality_generators().cardinality().finite_value())))
 
         def is_equal_to(self, other) -> bool:
             r"""Return whether the two cones are the same subset of ``L tensor QQ``.

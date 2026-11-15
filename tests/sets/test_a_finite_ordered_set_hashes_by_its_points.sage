@@ -143,10 +143,10 @@ def test_a_point_that_refuses_a_hash_is_not_a_point_of_a_finite_set() -> None:
 
     A mutable Sage vector or matrix refuses a hash and equals its immutable copy.
     It can change after a set holding it is built, so it is not a point of a set:
-    the construction refuses it, and the set of the immutable copy is the set.  The
-    mutable vector is still a candidate for membership, and it lies in the set of
-    its immutable copy.  A Python list is refused the same way, and the tuple of
-    its entries is a point.  The points are built over Python integers,
+    the construction refuses it, and the set of the immutable copy is the set.  A
+    candidate for membership is looked up in the table of the points, so the
+    mutable vector is refused there too, as ``[0] in {}`` is.  A Python list is
+    refused the same way, and the tuple of its entries is a point.  The points are built over Python integers,
     ``int(...)``, because the preparser makes a literal a library integer that
     Sage's constructors reject (``tests/forms/test_the_coble_anti_isometry.sage``).
     """
@@ -169,9 +169,40 @@ def test_a_point_that_refuses_a_hash_is_not_a_point_of_a_finite_set() -> None:
         relocated = FiniteOrderedSets()((immutable,))
         assert fixed == relocated
         assert hash(fixed) == hash(relocated)
-        assert mutable in fixed
+        with pytest.raises(TypeError):
+            mutable in fixed
 
     with pytest.raises(TypeError):
         FiniteOrderedSets()(([0], [1]))
     labels = FiniteOrderedSets()(((0,), (1,)))
     assert hash(labels) == hash(FiniteOrderedSets()(((0,), (1,))))
+
+
+def test_a_candidate_of_undecided_equality_is_not_found_absent() -> None:
+    r"""The inverse of the enumeration does not answer "absent" when equality is undecided.
+
+    The two symbolic points hash alike, so the table compares them, and their
+    equality is a proposition, which has no truth value: the lookup refuses
+    rather than reporting that the candidate is not a point.  The same holds of
+    the inverse of a filtered set.
+    """
+    from sage_extensions.logic import AtomicProposition
+
+    class SymbolicPoint:
+        r"""A point that states its equality as a proposition."""
+
+        def __eq__(self, other):
+            return AtomicProposition("equal_symbolic_points", self, other)
+
+        def __hash__(self):
+            # A Python integer: the preparser makes the literal a library integer.
+            return int(0)
+
+    present, candidate = SymbolicPoint(), SymbolicPoint()
+    points = FiniteOrderedSets()((present,))
+    assert points.enumeration_inverse()(present) == points.enumeration_inverse()(present)
+    with pytest.raises(TypeError):
+        points.enumeration_inverse()(candidate)
+    filtered = points.filtered(lambda point: True)
+    with pytest.raises(TypeError):
+        filtered.enumeration_inverse()(candidate)

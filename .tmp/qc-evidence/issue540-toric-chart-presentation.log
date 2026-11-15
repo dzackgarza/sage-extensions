@@ -1,0 +1,49 @@
+=== #540: a toric chart's data is read from that chart's own presentation
+=== image: ghcr.io/dzackgarza/sage@sha256:59568577... (Sage 11.0.beta5, Python 3.14.10)
+=== port repo at /work: 991b88b095a42a1e3679569ea42328c900c120f6
+=== tree: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/wt540
+=== base SHA: 2291235e3d2c04d7ca5effb4b9c0f8b6cfaa5537
+=== fixed SHA: f7bc9b9bde49d39e69a0e1136c74ebf29f719cc6
+=== launch: ~/sage-image/run.sh -w /work -b <port>:/work -b <tree>:/repos/sage-extensions -b ~/ai-review-ci:/ci
+===          PYTHONPATH=/ci/tool-artifacts/pytest_plugins:/work/src:/work:/repos/sage-extensions/src
+
+--- 1. the file the issue names, in one process, on the base tree ---
+/sage/.venv/bin/python -m pytest -p qc_sage_session tests/divisors/test_toric_class_groups.sage
+collected 7 items
+tests/divisors/test_toric_class_groups.sage .......                      [100%]
+(the summary line is lost: timing_record's `git -C /repos/sage-extensions rev-parse HEAD`
+ fails inside proot, the worktree's .git file naming a host path; the seven dots are the
+ seven collected tests and no F appears)
+
+--- 2. the same file, ten hash seeds, one process each, base tree ---
+seed 0:   rc=0  7 passed in 2.08s      seed 11:  rc=0  7 passed in 2.03s
+seed 1:   rc=0  7 passed in 2.35s      seed 13:  rc=0  7 passed in 2.09s
+seed 2:   rc=0  7 passed in 2.08s      seed 42:  rc=0  7 passed in 2.08s
+seed 3:   rc=0  7 passed in 2.14s      seed 99:  rc=0  7 passed in 2.08s
+seed 7:   rc=0  7 passed in 1.97s      seed 123: rc=0  7 passed in 1.99s
+
+--- 3. why the four failures the issue reports cannot occur here ---
+probe, base tree: cones of `projective_space_fan()` and of `hirzebruch_surface_fan(0)`
+over one `ZZ.free_module(2)` that have the same rays
+  same rays [(0, 1), (1, 0)]   eq: False   hash eq: True   engine cones eq: True
+  same rays [(0, 1), (1, 0)]   eq: False   hash eq: True   engine cones eq: False
+`fans.py:751` requires `element_parent(other) is self.parent()` for cone equality, while
+`fans.py:95` hashes the ray coordinates, so equal-cone cache hits happen only inside one
+fan object.  Inside one fan the equal copies are `c.intersection(c)`, `C.faces(k)` members
+and pairwise intersections of maximal cones; over P2, P1xP1, Hirzebruch 2, the A1 cone and
+P3 the Hilbert basis came back in the same order from every copy, 0 disagreements out of
+every pair tested, so the base tree has no failing instance to observe and the repair is
+the invariant, not a reproduced red.
+
+--- 4. the 18 test files that reach the toric chart API, one process ---
+tests/schemes/test_toric_*.sage tests/divisors/test_toric_*.sage
+tests/divisors/test_cox_ring_grading.sage tests/objects/test_standard_triangle.sage
+tests/objects/test_projective_plane_over_qq.sage tests/schemes/test_lattice_polygon_invariants.sage
+base 2291235e3d:  42 failed, 72 passed in 15.53s
+fixed f7bc9b9:    42 failed, 73 passed in 13.40s
+the FAILED id sets are identical (42 and 42, `diff` empty); the extra pass is the new test
+
+--- 5. the test lint on tests/schemes/test_toric_schemes.sage ---
+/sage/.venv/bin/python -m sage_extensions.testing.test_lint <base file>  -> 1 files, 34 findings
+/sage/.venv/bin/python -m sage_extensions.testing.test_lint <fixed file> -> 1 files, 34 findings
+the finding kinds compare equal after stripping line numbers; no finding is in the new test
