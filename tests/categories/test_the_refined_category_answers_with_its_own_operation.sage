@@ -74,10 +74,18 @@ def test_the_ring_states_the_completion_of_the_field_at_the_zero_ideal() -> None
     base change $M \otimes_R \hat{R}$ would need the ideal to be an ideal of the
     module's base ring, and the zero ideal of $\mathbf{Q}(i)$ is not an ideal of
     $\mathbf{Q}$; the ring's inverse limit is defined, and at $(0)$ in a field
-    every quotient $\mathbf{Q}(i)/(0)^n$ is the field itself.
+    every quotient $\mathbf{Q}(i)/(0)^n$ is the field itself, so the completion
+    map is injective and its codomain is the field again.
+
+    The map is stated by what it is decided to be.  ``is_injective`` reads the
+    kernel, which is the zero ideal; ``is_surjective`` is undecided for these
+    two endpoints, because the decision between infinite sets is not
+    implemented, so the test does not claim the map is a bijection.
     """
     field = QuadraticField(-1)
     completion = field.adic_completion(field.ideal(0))
+    completion_map = completion.completion_map()
 
-    assert completion.completion_source() is field
-    assert completion.completion_map().domain() is field
+    assert completion.completion_map_kernel() == field.ideal(0)
+    assert completion_map.is_injective() is True
+    assert completion.is_isomorphic_to(field)
