@@ -6776,9 +6776,23 @@ class NaturalNumberSets(OwnedCategory):
                 case _ if element_parent(value) is self:
                     return value
                 case _ if value in self:
-                    return self.element_class(self, int(value))
+                    return self._point(int(value))
                 case _:
                     raise ValueError(f"{value!r} is not a natural number")
+
+        @cached_method
+        def _point(self, number: int):
+            r"""The one point of this set naming ``number``.
+
+            A natural number is its value, so two constructions of one value are
+            one object: equal naturals are equal here whatever carried them, and
+            a point of an ordinal is a value like any other.  The index set of a
+            span basis is a finite ordinal, and a reader that enumerates it --
+            the plane row asks for one span basis, and so one ordinal, per plane
+            it transports -- would otherwise build every point of it again on
+            every enumeration.
+            """
+            return self.element_class(self, number)
 
         def __call__(self, value):
             r"""Construct an owned natural number without Sage coercion discovery."""
