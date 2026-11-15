@@ -1,0 +1,59 @@
+probe: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.tmp/qc-evidence/issue390-stage-alone.py
+tree SHA: a71272add96485c3e6ceeda07572bf40c5b2b5c0
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+inner 590 s, outer 650 s, guard 6144 MiB, args 'stage=disc_images'
+[0.0s] probe: T_Co's plane row setup, stage 'disc_images' alone (#528)
+[0.0s] cap 560 s, python 3.14.10
+[0.0s] the GAP proxy is installed on 3 sage_extensions modules
+[0.2s] calibration (fixed workload, for the run's CPU share): 0.162 s
+[2.0s] inputs built in 1.8 s; calling the stage alone
+[110.3s] 
+[110.3s] === GAP primitives, by time in this stage ===
+[110.3s]   SmallGeneratingSet                           2 calls       0.004 s
+[110.3s]   PreImage                                     2 calls       0.003 s
+[110.3s]   Stabilizer                                   2 calls       0.001 s
+[110.3s]   Group                                        2 calls       0.000 s
+[110.3s]   Image                                        2 calls       0.000 s
+[110.3s]   SymmetricGroup                               2 calls       0.000 s
+[110.3s]   GroupHomomorphismByImagesNC                  2 calls       0.000 s
+[110.3s]   Identity                                     2 calls       0.000 s
+[110.3s] 
+[110.3s] === the stage alone ===
+[110.3s]   stage                                                 calls   seconds  peak MiB
+[110.3s]   disc_images                                               1     108.2       nan
+[110.3s] === inside it (each sub-stage's own total, children included) ===
+[110.3s]   ambient_discriminant_images                               1   108.248
+[110.3s]   not inside a named sub-stage                                    0.000
+[110.3s] === below them ===
+[110.3s]   _ambient_generators                                       1    72.839
+[110.3s]   calibration (fixed workload, for the run's CPU share)      1     0.162
+[110.3s] the stage returned ([ f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11 ] -> [ f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11 ], [ f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11 ] -> [ f1,
+[110.3s] 
+[110.3s] === everything else this run timed, outside the stage ===
+[110.3s]   row                                                   calls   seconds
+[110.3s]   input: lattice construction                               1       0.0
+[110.3s]   input: stable orthogonal group                            1       1.8
+[110.3s]   input: character quotient                                 1       1.8
+[110.3s]   _ambient_generators                                       1      72.8
+[110.3s]   ambient_discriminant_images                               1     108.2
+[110.3s]   inputs proper (the rows above marked input:), total               3.7
+[110.3s] 
+[110.3s] the VM's 1-minute load average while this run went on: first 1.60, peak 1.99, last 1.99 (55 samples of /proc/loadavg)
+[110.3s] 
+[110.3s] peak VmRSS (python, sampled) 622 MiB
+[110.3s] RESULT stage=disc_images seconds=108.25 inputs=3.72 calib=0.162 load_peak=1.99
+[110.3s] PROBE DONE
+[peakrss] p528b-base-disc_images: child waited=0 shell_code=0 samples=57
+[peakrss] peak tree RSS      : 634 MiB
+[peakrss] low-water MemAvail : 9228 MiB
+[peakrss] peak single VmHWM  : 634 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      623 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   112.1s procs=  3 rss=   634 MiB hwm=   634 MiB avail=  9230 MiB
+[peakrss]   t=   110.1s procs=  3 rss=   632 MiB hwm=   632 MiB avail=  9231 MiB
+[peakrss]   t=   108.1s procs=  3 rss=   631 MiB hwm=   631 MiB avail=  9228 MiB
+[peakrss]   t=   104.1s procs=  3 rss=   630 MiB hwm=   630 MiB avail=  9231 MiB
+[peakrss]   t=   106.1s procs=  3 rss=   630 MiB hwm=   630 MiB avail=  9230 MiB
+launcher exit: 0

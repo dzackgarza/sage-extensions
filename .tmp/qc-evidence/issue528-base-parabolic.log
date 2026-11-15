@@ -1,0 +1,47 @@
+probe: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.tmp/qc-evidence/issue390-stage-alone.py
+tree SHA: a71272add96485c3e6ceeda07572bf40c5b2b5c0
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+inner 500 s, outer 560 s, guard 6144 MiB, args 'stage=parabolic input=direct'
+[0.0s] probe: T_Co's plane row setup, stage 'parabolic' alone (#528)
+[0.0s] cap 560 s, python 3.14.10
+[0.0s] the GAP proxy is installed on 3 sage_extensions modules
+[0.2s] calibration (fixed workload, for the run's CPU share): 0.163 s
+[0.4s] inputs built in 0.2 s; calling the stage alone
+[27.6s] 
+[27.6s] === GAP primitives, by time in this stage ===
+[27.6s] 
+[27.6s] === the stage alone ===
+[27.6s]   stage                                                 calls   seconds  peak MiB
+[27.6s]   parabolic                                                 1      27.2       425
+[27.6s] === inside it (each sub-stage's own total, children included) ===
+[27.6s]   not inside a named sub-stage                                   27.211
+[27.6s] === below them ===
+[27.6s]   calibration (fixed workload, for the run's CPU share)      1     0.163
+[27.7s] the stage returned (Morphism from Integral lattice of rank 11 and signature (2, 9) to Integral lattice of rank 11 and signature (2, 9), Morphism from Integral lattice of rank 11 a
+[27.7s] 
+[27.7s] === everything else this run timed, outside the stage ===
+[27.7s]   row                                                   calls   seconds
+[27.7s]   input: lattice construction                               1       0.0
+[27.7s]   input: direct primitive isotropic plane                   1       0.2
+[27.7s]   inputs proper (the rows above marked input:), total               0.2
+[27.7s] 
+[27.7s] the VM's 1-minute load average while this run went on: first 2.70, peak 2.70, last 2.46 (14 samples of /proc/loadavg)
+[27.7s] 
+[27.7s] peak VmRSS (python, sampled) 425 MiB
+[27.7s] RESULT stage=parabolic seconds=27.21 inputs=0.23 calib=0.163 load_peak=2.70
+[27.7s] PROBE DONE
+[peakrss] p528d-base-parabolic: child waited=0 shell_code=0 samples=16
+[peakrss] peak tree RSS      : 2493 MiB
+[peakrss] low-water MemAvail : 11296 MiB
+[peakrss] peak single VmHWM  : 2493 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   julia                      2057 MiB peak
+[peakrss]   python                      425 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    28.0s procs=  4 rss=  2493 MiB hwm=  2493 MiB avail= 11296 MiB
+[peakrss]   t=    26.0s procs=  4 rss=  2489 MiB hwm=  2489 MiB avail= 11301 MiB
+[peakrss]   t=    24.0s procs=  4 rss=  2488 MiB hwm=  2488 MiB avail= 11301 MiB
+[peakrss]   t=    22.0s procs=  4 rss=  2466 MiB hwm=  2469 MiB avail= 11306 MiB
+[peakrss]   t=    20.0s procs=  4 rss=  2335 MiB hwm=  2335 MiB avail= 11439 MiB
+launcher exit: 0

@@ -1,0 +1,75 @@
+probe: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.tmp/qc-evidence/issue390-stage-alone.py
+tree SHA: a71272add96485c3e6ceeda07572bf40c5b2b5c0
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+inner 590 s, outer 650 s, guard 6144 MiB, args 'stage=walk'
+[0.0s] probe: T_Co's plane row setup, stage 'walk' alone (#528)
+[0.0s] cap 560 s, python 3.14.10
+[0.0s] the GAP proxy is installed on 3 sage_extensions modules
+[0.2s] calibration (fixed workload, for the run's CPU share): 0.168 s
+[260.9s] inputs built in 131.4 s; calling the stage alone
+[413.9s] 
+[413.9s] === GAP primitives, by time in this stage ===
+[413.9s]   FactorCosetAction                            1 calls     139.623 s
+[413.9s]   Image                                      472 calls       4.841 s
+[413.9s]   IsomorphismPermGroup                         1 calls       1.000 s
+[413.9s]   Subgroup                                     3 calls       0.039 s
+[413.9s]   ClosureGroup                                11 calls       0.029 s
+[413.9s]   Intersection                                 1 calls       0.024 s
+[413.9s]   TrivialSubgroup                              1 calls       0.000 s
+[413.9s]   function_factory                             1 calls       0.000 s
+[413.9s]   Order                                        3 calls       0.000 s
+[413.9s]   Index                                        1 calls       0.000 s
+[413.9s]   GeneratorsOfGroup                            1 calls       0.000 s
+[413.9s]   Range                                        1 calls       0.000 s
+[413.9s] 
+[413.9s] === the stage alone ===
+[413.9s]   stage                                                 calls   seconds  peak MiB
+[413.9s]   walk                                                      1     152.9      1448
+[413.9s] === inside it (each sub-stage's own total, children included) ===
+[413.9s]   _joint_discriminant_image_gap                             1     0.055
+[413.9s]   not inside a named sub-stage                                  152.887
+[413.9s] === below them ===
+[413.9s]   _im_rho_engine_and_section                                1   129.308
+[413.9s]   _ambient_generators                                       2    98.665
+[413.9s]   ambient_discriminant_images                               1    27.604
+[413.9s]   calibration (fixed workload, for the run's CPU share)      1     0.168
+[413.9s]   _sign_descent_rank                                        1     0.000
+[413.9s] the stage returned Morphism from Integral lattice of rank 11 and signature (2, 9) to Integral lattice of rank 11 and signature (2, 9)
+[413.9s] 
+[413.9s] === everything else this run timed, outside the stage ===
+[413.9s]   row                                                   calls   seconds
+[413.9s]   input: lattice construction                               1       0.0
+[413.9s]   input: stable orthogonal group                            1       2.1
+[413.9s]   input: ambient O(L) plane row (its first plane)           1     101.6
+[413.9s]   input: parabolic family                                   1     131.4
+[413.9s]   input: character quotient                                 1       0.0
+[413.9s]   _sign_descent_rank                                        1       0.0
+[413.9s]   input: pre-warm _sign_descent_rank                        1       0.0
+[413.9s]   _ambient_generators                                       2      98.7
+[413.9s]   ambient_discriminant_images                               1      27.6
+[413.9s]   _im_rho_engine_and_section                                1     129.3
+[413.9s]   input: pre-warm _im_rho_engine_and_section                1     129.3
+[413.9s]   input: pre-warm ambient_discriminant_images               1       0.0
+[413.9s]   _joint_discriminant_image_gap                             1       0.1
+[413.9s]   inputs proper (the rows above marked input:), total             364.4
+[413.9s] 
+[413.9s] the VM's 1-minute load average while this run went on: first 2.55, peak 2.80, last 2.80 (134 samples of /proc/loadavg)
+[413.9s] 
+[413.9s] peak VmRSS (python, sampled) 1448 MiB
+[413.9s] RESULT stage=walk seconds=152.94 inputs=364.43 calib=0.168 load_peak=2.80
+[413.9s] PROBE DONE
+[peakrss] p528b-base-walk: child waited=0 shell_code=0 samples=210
+[peakrss] peak tree RSS      : 3480 MiB
+[peakrss] low-water MemAvail : 3677 MiB
+[peakrss] peak single VmHWM  : 3571 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   julia                      2060 MiB peak
+[peakrss]   python                     1499 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   414.2s procs=  4 rss=  3480 MiB hwm=  3552 MiB avail=  5578 MiB
+[peakrss]   t=   412.2s procs=  4 rss=  3409 MiB hwm=  3481 MiB avail=  5655 MiB
+[peakrss]   t=   416.2s procs=  4 rss=  3404 MiB hwm=  3571 MiB avail=  5713 MiB
+[peakrss]   t=   406.2s procs=  4 rss=  3344 MiB hwm=  3416 MiB avail=  5554 MiB
+[peakrss]   t=   408.2s procs=  4 rss=  3344 MiB hwm=  3416 MiB avail=  5554 MiB
+launcher exit: 0

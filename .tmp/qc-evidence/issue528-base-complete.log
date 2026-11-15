@@ -1,0 +1,47 @@
+probe: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.tmp/qc-evidence/issue390-stage-alone.py
+tree SHA: a71272add96485c3e6ceeda07572bf40c5b2b5c0
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+inner 500 s, outer 560 s, guard 6144 MiB, args 'stage=complete input=direct'
+[0.0s] probe: T_Co's plane row setup, stage 'complete' alone (#528)
+[0.0s] cap 560 s, python 3.14.10
+[0.0s] the GAP proxy is installed on 3 sage_extensions modules
+[0.2s] calibration (fixed workload, for the run's CPU share): 0.163 s
+[0.4s] inputs built in 0.2 s; calling the stage alone
+[37.8s] 
+[37.8s] === GAP primitives, by time in this stage ===
+[37.8s] 
+[37.8s] === the stage alone ===
+[37.8s]   stage                                                 calls   seconds  peak MiB
+[37.8s]   complete                                                  1      37.5       426
+[37.8s] === inside it (each sub-stage's own total, children included) ===
+[37.8s]   not inside a named sub-stage                                   37.477
+[37.8s] === below them ===
+[37.8s]   calibration (fixed workload, for the run's CPU share)      1     0.163
+[37.8s] the stage returned True
+[37.8s] 
+[37.8s] === everything else this run timed, outside the stage ===
+[37.8s]   row                                                   calls   seconds
+[37.8s]   input: lattice construction                               1       0.0
+[37.8s]   input: direct primitive isotropic plane                   1       0.2
+[37.8s]   inputs proper (the rows above marked input:), total               0.2
+[37.8s] 
+[37.8s] the VM's 1-minute load average while this run went on: first 2.21, peak 3.05, last 3.05 (19 samples of /proc/loadavg)
+[37.8s] 
+[37.8s] peak VmRSS (python, sampled) 426 MiB
+[37.8s] RESULT stage=complete seconds=37.48 inputs=0.23 calib=0.163 load_peak=3.05
+[37.8s] PROBE DONE
+[peakrss] p528d-base-complete: child waited=0 shell_code=0 samples=22
+[peakrss] peak tree RSS      : 2483 MiB
+[peakrss] low-water MemAvail : 10412 MiB
+[peakrss] peak single VmHWM  : 2508 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   julia                      2069 MiB peak
+[peakrss]   python                      429 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    38.0s procs=  4 rss=  2483 MiB hwm=  2483 MiB avail= 11079 MiB
+[peakrss]   t=    36.0s procs=  4 rss=  2482 MiB hwm=  2482 MiB avail= 11107 MiB
+[peakrss]   t=    32.0s procs=  4 rss=  2481 MiB hwm=  2481 MiB avail= 11027 MiB
+[peakrss]   t=    34.0s procs=  4 rss=  2481 MiB hwm=  2481 MiB avail= 11128 MiB
+[peakrss]   t=    30.0s procs=  4 rss=  2479 MiB hwm=  2479 MiB avail= 11129 MiB
+launcher exit: 0

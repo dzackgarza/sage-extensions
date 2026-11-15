@@ -1,0 +1,42 @@
+probe: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.tmp/qc-evidence/issue390-stage-alone.py
+tree SHA: 3a1964060ab55a6b09207f0ceeff67960fb3ef9b
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+inner 590 s, outer 650 s, guard 6144 MiB, args 'stage=lattice'
+[0.0s] probe: T_Co's plane row setup, stage 'lattice' alone (#528)
+[0.0s] cap 560 s, python 3.14.10
+[0.0s] the GAP proxy is installed on 3 sage_extensions modules
+[0.3s] calibration (fixed workload, for the run's CPU share): 0.325 s
+[0.3s] inputs built in 0.0 s; calling the stage alone
+[0.4s] 
+[0.4s] === GAP primitives, by time in this stage ===
+[0.4s] 
+[0.4s] === the stage alone ===
+[0.4s]   stage                                                 calls   seconds  peak MiB
+[0.4s]   lattice                                                   1       0.1       nan
+[0.4s] === inside it (each sub-stage's own total, children included) ===
+[0.4s]   not inside a named sub-stage                                    0.061
+[0.4s] === below them ===
+[0.4s]   calibration (fixed workload, for the run's CPU share)      1     0.325
+[0.4s] the stage returned Integral lattice of rank 11 and signature (2, 9)
+[0.4s] 
+[0.4s] === everything else this run timed, outside the stage ===
+[0.4s]   row                                                   calls   seconds
+[0.4s]   inputs proper (the rows above marked input:), total               0.0
+[0.4s] 
+[0.4s] the VM's 1-minute load average while this run went on: first 5.82, peak 5.82, last 5.82 (1 samples of /proc/loadavg)
+[0.4s] 
+[0.4s] peak VmRSS (python, sampled) 270 MiB
+[0.4s] RESULT stage=lattice seconds=0.06 inputs=0.00 calib=0.325 load_peak=5.82
+[0.4s] PROBE DONE
+[peakrss] p528b-main-lattice: child waited=0 shell_code=0 samples=2
+[peakrss] peak tree RSS      : 280 MiB
+[peakrss] low-water MemAvail : 12785 MiB
+[peakrss] peak single VmHWM  : 280 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      269 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   bash                          3 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     2.0s procs=  3 rss=   280 MiB hwm=   280 MiB avail= 12785 MiB
+[peakrss]   t=     0.0s procs=  2 rss=    11 MiB hwm=    11 MiB avail= 13015 MiB
+launcher exit: 0
