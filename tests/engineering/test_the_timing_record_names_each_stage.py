@@ -100,3 +100,19 @@ def test_a_debug_record_of_a_child_logger_reaches_the_run_log():
 
     assert "a debug record" in run.log
 
+
+
+def test_a_run_keeps_the_files_its_own_options_name():
+    r"""The plugin keeps what the run's options named, under this run's name.
+
+    The probe run asks for a JUnit file of its own and is given its report log
+    by ``probe_run``; both appear in the record directory named by the commit
+    and by one start stamp, and the report log keeps the lines the run wrote.
+    """
+    kept = kept_test_run({"test_the_probe.py": "def test_the_probe():\n    assert 1 + 1 == 2\n"})
+
+    assert tuple(entry.kind for entry in kept) == ("junit", "report")
+    assert tuple(entry.suffix for entry in kept) == ("xml", "jsonl")
+    assert all(entry.commit == entry.head[:12] for entry in kept)
+    assert all(entry.stamp == kept[0].stamp for entry in kept)
+    assert kept[1].records

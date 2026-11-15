@@ -1628,3 +1628,26 @@ library code, each printing the objects and the answering class it is cited for.
 | `530-merged-a.log` | `97f9467` (this commit merged onto `5d408ca`) | the four lint-clean files of the change under the repository addopts: **8 passed in 0.93 s** |
 | `530-merged-sweep-compared.log` | `97f9467` against `5d408ca` | `tests/modules tests/rings tests/forms tests/categories` on the merged tree and on the merge's own base, same test files: FAILED/ERROR ids identical except this change's new test assertion; 193 failed, 395 passed, 318 errors in 99.18 s against 194, 394, 318 in 105.20 s. The ~100 s pair also shows the earlier 256.71 s as a VM outlier |
 | `530-merged-sweep-new-ids.log`, `530-merged-sweep-base-ids.log` | the same two runs | the sorted ids those two runs produced, extracted from their output |
+
+## #529 — the reviewer's two regressions, and the repairs around them
+
+`450a781` is the red commit: `tests/engineering/test_the_timing_record_names_each_stage.py` holds a test of the
+stage wrapper under `cached_method` and a test of the package logger, and neither passes there. The repairs are the
+commit after it: the stage moved into the bodies of `_vinberg_search` and `parabolic_completeness_decision`, the
+timing logger made a child (`sage_extensions.timing`) that leaves `sage_extensions` alone, `current_commit`/`timing_directory`
+asserted instead of falling back, the handler's write unwrapped, the plugin reading `config.option.report_log` and
+`config.option.xmlpath`, and the dead paths deleted. Every run below is in the pinned image with the indefinite port
+at `/work` and the checkout at `/repos/sage-extensions`.
+
+| log | tree | result |
+| --- | --- | --- |
+| `issue529-review-red.log` | `450a781` | `${ARGS}` = `-p qc_sage_session -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates -q tests/engineering/`: **4 failed, 7 passed in 86.41 s** — `('Vinberg walk', 'Vinberg walk') == ('Vinberg walk',)`, `'a debug record' in ''`, and the two `test_polyhedral_engine_routes.sage` Julia/Hecke rows that fail at `5d408ca` too |
+| `issue529-review-green.log` | this commit | the four tests of the file: **4 passed in 6.25 s** |
+| `issue529-review-neighbours.log` | this commit | `tests/engineering/` plus the Vinberg-facet and setwise-stabilizer files, `--no-time-gates` with `test_lint` loaded: **2 failed, 17 passed in 94.08 s**, the two failures the same Julia/Hecke rows — the reindented bodies and the dropped nested stage moved no result |
+| `issue529-review-real-addopts.log` | this commit | the test file under the repository's real addopts: **4 passed in 5.02 s**, and `.timings/` held `run-450a781380ab-20261115T073451Z.jsonl` and `junit-450a781380ab-20261115T073451Z.xml` — the names the addopts' own options give, read from those options |
+| `issue529-review-logger-before.log` | `450a781` | the logger probe on the red commit: `pytest.log` holds `DEBUG probe.other` and nothing for `sage_extensions.categories.probe`; `logging.getLogger("sage_extensions")` reads `level 20 propagate False` |
+| `issue529-review-logger-probe.log` | this commit | the same probe after the repair: `pytest.log` holds both `DEBUG sage_extensions.categories.probe` and `DEBUG probe.other`; the package logger reads `level 0 propagate True`, and `sage_extensions.timing` is the one at `20` |
+
+The two workflow steps of ENV-03 are on `main` as `34b52a8`; the `if-no-files-found: error` that make a run without
+a record fail its job are `results/issue529-upload-error.patch`, `git apply --check` clean against this tree, because
+the connection's GitHub App may not update a file under `.github/workflows/`.
