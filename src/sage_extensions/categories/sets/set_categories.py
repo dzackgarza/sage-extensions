@@ -6322,7 +6322,7 @@ def _finite_words(alphabet, *, commutative):
 
 
 def _finite_family_key(family: IndexedFamily) -> tuple[Parent, tuple[Parent, ...]]:
-    r"""Intern a finite construction by its index set and its factors, up to equality.
+    r"""The key of a finite construction: its index set and its factors, up to equality.
 
     Equal families of sets have one product and one coproduct (`SET-05`), so
     the key is the index set with the factors in its enumeration, which hash
@@ -6330,13 +6330,57 @@ def _finite_family_key(family: IndexedFamily) -> tuple[Parent, tuple[Parent, ...
     finite sets of one cardinality with different points stay different
     factors (`CON-14`).  Resolving a finite family is legitimate here; its
     labels are retained by the family rather than replaced by positions.
+
+    A finite ordered set carrying a point that refuses a hash has no hash
+    (`#531`), so a family over one has no key here; the interners below compare
+    those families by equality instead of dropping the construction.
     """
     return family.index_set(), tuple(family)
 
 
-@cached_function(key=_finite_family_key)
+def _interned_by_equality(
+    family: IndexedFamily, store: tuple[dict, list], build
+) -> Sets().ObjectType:
+    r"""Intern a finite construction by the family's equality, keyed by hash when it has one.
+
+    ``store`` is the construction's hash-keyed store with the families it has
+    interned, and ``build`` performs the construction.  The key is a hash of the
+    index set's points, so it exists only for a family over an index set whose
+    points hash; the families themselves are compared, which every family
+    supports.  Hashing is a storage optimization and never the contract: two
+    presentations of one family are one construction (`SET-05`).  The store
+    retains the families it has interned, which is what comparing them later
+    requires.
+    """
+    keyed, interned_families = store
+    key = _finite_family_key(family)
+    try:
+        hash(key)
+    except TypeError:
+        key = None
+    else:
+        interned = keyed.get(key)
+        if interned is not None:
+            return interned
+    for known, interned in interned_families:
+        equal = True if known is family else known == family
+        if equal is True:
+            if key is not None:
+                keyed[key] = interned
+            return interned
+    interned = build(family)
+    interned_families.append((family, interned))
+    if key is not None:
+        keyed[key] = interned
+    return interned
+
+
+_FINITE_PRODUCTS: tuple[dict, list[tuple[IndexedFamily, Sets().ObjectType]]] = ({}, [])
+
+
 def _cartesian_product_of_finite_family(family: IndexedFamily) -> Sets().ObjectType:
-    return _cartesian_product_of(family)
+    r"""Return the product of a finite family of sets, one object per equal family."""
+    return _interned_by_equality(family, _FINITE_PRODUCTS, _cartesian_product_of)
 
 
 def _cartesian_product_morphism[IndexT](
@@ -6443,9 +6487,12 @@ def _cartesian_product_morphism[IndexT](
     )
 
 
-@cached_function(key=_finite_family_key)
+_FINITE_COPRODUCTS: tuple[dict, list[tuple[IndexedFamily, Sets().ObjectType]]] = ({}, [])
+
+
 def _coproduct_of_finite_family(family: IndexedFamily) -> Sets().ObjectType:
-    return _coproduct_of_indexed_family(family)
+    r"""Return the coproduct of a finite family of sets, one object per equal family."""
+    return _interned_by_equality(family, _FINITE_COPRODUCTS, _coproduct_of_indexed_family)
 
 
 @cached_function(key=lambda family: id(family))
