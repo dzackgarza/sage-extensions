@@ -8,7 +8,6 @@ from itertools import count, islice, product
 from math import comb
 from operator import index as integer_index
 from typing import TYPE_CHECKING, Any, Self, SupportsIndex, TypeVar
-from weakref import WeakValueDictionary
 
 from sage.categories.category import Category
 from sage.categories.category_with_axiom import all_axioms
@@ -17,6 +16,7 @@ from sage.categories.morphism import Morphism, SetMorphism
 from sage.categories.sets_cat import Sets as SageSets
 from sage.misc.abstract_method import abstract_method
 from sage.misc.cachefunc import cached_function, cached_method
+from sage.misc.weak_dict import WeakValueDictionary
 from sage.rings.integer_ring import ZZ as SageZZ
 from sage.sets.disjoint_set import DisjointSet as SageDisjointSet
 from sage.sets.set import Set as SageSet
@@ -6708,11 +6708,11 @@ class NaturalNumberSets(OwnedCategory):
 
         def __copy__(self):
             r"""A copy of a natural is the natural."""
-            return self.parent()(int(self))
+            return self
 
         def __deepcopy__(self, memo):
             r"""A deep copy of a natural is the natural."""
-            return self.parent()(int(self))
+            return self
 
         def _semiring_operand(self, other):
             r"""Read another natural here, or defer to a larger semiring.
@@ -6782,6 +6782,7 @@ class NaturalNumberSets(OwnedCategory):
     class ParentMethods:
         def __init__(self, **rest) -> None:
             super().__init__(**rest)
+            self._interned_points = WeakValueDictionary()
 
         def __reduce__(self):
             r""":math:`\mathbb N` itself, so a natural read back is a point of this set."""
@@ -6802,25 +6803,15 @@ class NaturalNumberSets(OwnedCategory):
 
             A natural number is its value, so two constructions of one value are
             one object: equal naturals are equal here whatever carried them, and
-            a point of an ordinal is a value like any other.  The index set of a
-            span basis is a finite ordinal, and a reader that enumerates it --
-            the plane row asks for one span basis, and so one ordinal, per plane
-            it transports -- would otherwise build every point of it again on
-            every enumeration.
-
-            The table holds each point weakly, so the set keeps no natural alive
-            and a value's entry goes with the value: interning with a lifetime,
-            not a cache that grows by one entry per natural ever built
-            (``STY-55``).  :meth:`__reduce__` and the two copy protocols of a
-            natural come back through the set applied to the value, so a natural
-            read back is the one point.
+            a point of an ordinal is a value like any other.  The set holds each
+            point weakly, so a natural lives while something references it and no
+            longer: an entry goes with the value it names.  :meth:`__reduce__` of
+            the element and of the set and the two copy protocols come back
+            through this constructor, so a natural read back is the one point.
             """
-            interned = self.__dict__.get("_interned_points")
-            if interned is None:
-                interned = self.__dict__["_interned_points"] = WeakValueDictionary()
-            point = interned.get(number)
+            point = self._interned_points.get(number)
             if point is None:
-                point = interned[number] = self.element_class(self, number)
+                point = self._interned_points[number] = self.element_class(self, number)
             return point
 
         def __call__(self, value):
@@ -7213,7 +7204,7 @@ NN = _object_of(NaturalNumberSets())
 
 def _natural_numbers():
     r"""The set $\mathbb N$ itself: what a value of it reduces to in a pickle."""
-    return NN
+    return NaturalNumberSets().an_object()
 
 
 def register_set_axioms() -> None:
