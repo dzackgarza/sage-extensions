@@ -1,0 +1,15 @@
+
+no tests ran in 0.89s
+! _pytest.outcomes.Exit: test lint: 1 findings (run just test-lint for all)
+tests/lattices/test_the_coble_divisor_groups.sage:95: TL11 generators: write group_generators, module_generators or algebra_generators !
+[peakrss] issue312: child waited=1 shell_code=1 samples=2
+[peakrss] peak tree RSS      : 301 MiB
+[peakrss] low-water MemAvail : 9203 MiB
+[peakrss] peak single VmHWM  : 301 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      290 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     2.0s procs=  3 rss=   301 MiB hwm=   301 MiB avail=  9203 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     6 MiB hwm=     6 MiB avail=  9396 MiB
+launcher exit: 1

@@ -1,0 +1,18 @@
+[     0.5s] divided class: [0] - [1]
+[     0.5s]   x = 0: q(x = [0] in Fraction Field of Integer Ring / (2)Integer Ring, b(x, c) = [0] in Fraction Field of Integer Ring / (1)Integer Ring, difference 0
+[     0.5s]   x = [1]: q(x = [(3)/(2)] in Fraction Field of Integer Ring / (2)Integer Ring, b(x, c) = [(1)/(2)] in Fraction Field of Integer Ring / (1)Integer Ring, difference (4)/(4)
+[     0.5s]   x = [0]: q(x = [(1)/(2)] in Fraction Field of Integer Ring / (2)Integer Ring, b(x, c) = [(1)/(2)] in Fraction Field of Integer Ring / (1)Integer Ring, difference (0)/(4)
+[     0.6s]   x = [0] + [1]: q(x = [0] in Fraction Field of Integer Ring / (2)Integer Ring, b(x, c) = [0] in Fraction Field of Integer Ring / (1)Integer Ring, difference 0
+[     0.6s] is_characteristic: False
+DONE
+[peakrss] issue348: child waited=0 shell_code=0 samples=2
+[peakrss] peak tree RSS      : 254 MiB
+[peakrss] low-water MemAvail : 6179 MiB
+[peakrss] peak single VmHWM  : 254 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      243 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     2.0s procs=  3 rss=   254 MiB hwm=   254 MiB avail=  6179 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     0 MiB hwm=     0 MiB avail=  6348 MiB
+launcher exit: 0

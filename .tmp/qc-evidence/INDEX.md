@@ -1961,3 +1961,19 @@ set and category machinery under it is what the comparison ranks first: `set_cat
 `_element_constructor_` 4.3 -> 34.4 s at 9.2x, and, multiplicatively, `component` 597x,
 `index_set` 459x, `family` 442x, `point_at` 66x. The commit that grew it is not bisected in
 this round, and the row's number at main is not the whole row.
+
+## #528, the review of `0a55452cfa`: what a test of its matrix reading can and cannot see
+
+The review ordered a behaviour test whose reduction isometry has a non-integral base point, red at
+`0a55452cfa`. Two probes were run before writing it, and the answer they give is why the test
+below is green at that commit and not red.
+
+| log or table | tree | what it is |
+| --- | --- | --- |
+| `issue528-lift-transpose.py` | -- | the probe: per class of the parameter quotient, the lift's own `integral_restriction`, the locus' reported classes, and both matrix readings (`T * B^t`, what `0a55452cfa` computes, and `T * B`, with the images in columns), at every signed permutation and Eichler transvection of a control's reduction and their pairwise products |
+| `issue528-lift-transpose.log` | `cff6a3a` | `U(2) + U(2) + <2>`: 110 reduction isometries, **30** with a base point whose coordinate matrix is not symmetric; at the three printed, `membership_disagreements` **0** and `matrix_disagreements` **0** -- the two readings give the same class set, and both agree with the truth and with the reported locus. `U + A3(2)`: 6 isometries, 4 with a non-symmetric base-point matrix, again **0**. The transposed product is a different *matrix* (it differs from the lift's at 64 of 64 and 63 of 64 classes there) but it is the same *verdict*: integrality and `det` are transpose-invariant for a square matrix |
+| `issue528-lift-nonintegral-base.py` | -- | the search for the case the review names: every lift of a reduction isometry, over the seven small controls the locus' tests use, asked whether its **base point** restricts integrally |
+| `issue528-lift-nonintegral-base.log` | `cff6a3a` | **0 of 252** reduction isometries have a base point that does not restrict integrally: every rational lift of a reduction isometry of `U + <2>`, `U + U + <2>`, `U(2) + <2>`, `U(2) + U(2)`, `U(4) + <2>`, `U(2) + U(2) + <2>` and `U + A3(2)` is already an isometry of the lattice. The condition the review says the answer changes under does not occur on a control a test can afford |
+| `issue528-integrality-split.py` | -- | the per-lattice datum the ordered repair would cache: identity of the objects across two accesses, and the per-call cost and split of `integral_restriction` and `is_integral_on` |
+| `issue528-integrality-split.log` | `cff6a3a` | `ModulesOverIntegralDomains(ZZ)(L)` **is the same module**, its `generic_fibre_map()` **the same morphism**, `Modules(QQ).restriction_of_scalars(f)` **the same category**, and `_integral_extension_coordinate_span()` **the same datum** on a second access; `integral_restriction(L, L)` **3.61 ms** a call and `is_integral_on(L, L)` **2.66 ms** a call on the rank-5 control, both dominated by element and ring construction (`_element_constructor_`, `isinstance`, `__contains__`, `__classcall__`), not by a repeated frame. The profile of the T_Co row agrees: `_integral_extension_coordinate_span` is called twice per row at both trees |
+| `issue528-locus-nonidentity-test-on-0a55452.log` | `cff6a3a` | the new test `test_the_locus_at_a_non_identity_reduction_is_every_class_that_lifts` with the file's six others and the test lint plugin: **7 passed in 12.52 s** -- green, not red, at the commit under review |

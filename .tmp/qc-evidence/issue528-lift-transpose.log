@@ -1,0 +1,124 @@
+probe: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.tmp/qc-evidence/issue528-lift-transpose.py
+tree SHA: cff6a3aa6229f555c1788e05966c761adeb81087
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+inner 460 s, outer 520 s, guard 6144 MiB, args ''
+[    0.4s] 
+[    0.4s] ### U(2) + U(2) + <2>, marked at the first basis vector
+[    0.4s]   lattice Integral lattice of rank 5 and signature (3, 2), divisibility of the marked vector 2
+[    4.6s]   110 reduction isometries tried; 30 have a base point whose matrix is not symmetric or whose base point does not restrict integrally
+[    4.6s] 
+[    4.6s] === U(2) + U(2) + <2>, marked at the first basis vector, at Eichler transvection t(0, 2)
+[    7.0s]   classes                   64
+[    7.0s]   truth                     32
+[    7.0s]   reported                  32
+[    7.0s]   transposed                32
+[    7.0s]   columns                   32
+[    7.0s]   base_symmetric            False
+[    7.0s]   reported_equals_truth     True
+[    7.0s]   transposed_equals_truth   True
+[    7.0s]   columns_equals_truth      True
+[    7.0s]   membership_disagreements  0
+[    7.0s]   matrix_disagreements      0
+[    7.0s]   T_times_Bt_differs_from_the_lift_matrix64
+[    7.0s]   T_times_B_differs_from_the_lift_matrix63
+[    7.0s]   base_point_integral       True
+[    7.0s] 
+[    7.0s] === U(2) + U(2) + <2>, marked at the first basis vector, at Eichler transvection t(1, 2)
+[    9.2s]   classes                   64
+[    9.2s]   truth                     32
+[    9.2s]   reported                  32
+[    9.2s]   transposed                32
+[    9.2s]   columns                   32
+[    9.2s]   base_symmetric            False
+[    9.2s]   reported_equals_truth     True
+[    9.2s]   transposed_equals_truth   True
+[    9.2s]   columns_equals_truth      True
+[    9.2s]   membership_disagreements  0
+[    9.2s]   matrix_disagreements      0
+[    9.2s]   T_times_Bt_differs_from_the_lift_matrix64
+[    9.2s]   T_times_B_differs_from_the_lift_matrix63
+[    9.2s]   base_point_integral       True
+[    9.2s] 
+[    9.2s] === U(2) + U(2) + <2>, marked at the first basis vector, at (signed permutation (1, 1, -1) over (0, 1, 2)) * (Eichler transvection t(0, 2))
+[   11.5s]   classes                   64
+[   11.5s]   truth                     32
+[   11.5s]   reported                  32
+[   11.5s]   transposed                32
+[   11.5s]   columns                   32
+[   11.5s]   base_symmetric            False
+[   11.5s]   reported_equals_truth     True
+[   11.5s]   transposed_equals_truth   True
+[   11.5s]   columns_equals_truth      True
+[   11.5s]   membership_disagreements  0
+[   11.5s]   matrix_disagreements      0
+[   11.5s]   T_times_Bt_differs_from_the_lift_matrix64
+[   11.5s]   T_times_B_differs_from_the_lift_matrix63
+[   11.5s]   base_point_integral       True
+[   11.6s] 
+[   11.6s] ### U + A3(2), marked at -2e0 + 2e1 - e2 + 2e3 - e4
+[   11.6s]   lattice Integral lattice of rank 5 and signature (4, 1), divisibility of the marked vector 2
+[   11.9s]   6 reduction isometries tried; 4 have a base point whose matrix is not symmetric or whose base point does not restrict integrally
+[   11.9s] 
+[   11.9s] === U + A3(2), marked at -2e0 + 2e1 - e2 + 2e3 - e4, at signed permutation (-1, -1, -1) over (0, 1, 2)
+[   33.6s]   classes                   512
+[   33.6s]   truth                     512
+[   33.6s]   reported                  512
+[   33.6s]   transposed                512
+[   33.6s]   columns                   512
+[   33.6s]   base_symmetric            False
+[   33.6s]   reported_equals_truth     True
+[   33.6s]   transposed_equals_truth   True
+[   33.6s]   columns_equals_truth      True
+[   33.6s]   membership_disagreements  0
+[   33.6s]   matrix_disagreements      0
+[   33.6s]   T_times_Bt_differs_from_the_lift_matrix512
+[   33.6s]   T_times_B_differs_from_the_lift_matrix511
+[   33.6s]   base_point_integral       True
+[   33.6s] 
+[   33.6s] === U + A3(2), marked at -2e0 + 2e1 - e2 + 2e3 - e4, at signed permutation (-1, -1, -1) over (2, 1, 0)
+[   56.8s]   classes                   512
+[   56.8s]   truth                     512
+[   56.8s]   reported                  512
+[   56.8s]   transposed                512
+[   56.8s]   columns                   512
+[   56.8s]   base_symmetric            False
+[   56.8s]   reported_equals_truth     True
+[   56.8s]   transposed_equals_truth   True
+[   56.8s]   columns_equals_truth      True
+[   56.8s]   membership_disagreements  0
+[   56.8s]   matrix_disagreements      0
+[   56.8s]   T_times_Bt_differs_from_the_lift_matrix512
+[   56.8s]   T_times_B_differs_from_the_lift_matrix511
+[   56.8s]   base_point_integral       True
+[   56.8s] 
+[   56.8s] === U + A3(2), marked at -2e0 + 2e1 - e2 + 2e3 - e4, at (signed permutation (-1, -1, -1) over (0, 1, 2)) * (signed permutation (-1, -1, -1) over (2, 1, 0))
+[   74.8s]   classes                   512
+[   74.9s]   truth                     512
+[   74.9s]   reported                  512
+[   74.9s]   transposed                512
+[   74.9s]   columns                   512
+[   74.9s]   base_symmetric            False
+[   74.9s]   reported_equals_truth     True
+[   74.9s]   transposed_equals_truth   True
+[   74.9s]   columns_equals_truth      True
+[   74.9s]   membership_disagreements  0
+[   74.9s]   matrix_disagreements      0
+[   74.9s]   T_times_Bt_differs_from_the_lift_matrix512
+[   74.9s]   T_times_B_differs_from_the_lift_matrix511
+[   74.9s]   base_point_integral       True
+[   74.9s] 
+[   74.9s] PROBE DONE
+[peakrss] p528t: child waited=0 shell_code=0 samples=39
+[peakrss] peak tree RSS      : 386 MiB
+[peakrss] low-water MemAvail : 11502 MiB
+[peakrss] peak single VmHWM  : 386 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      375 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    76.1s procs=  3 rss=   386 MiB hwm=   386 MiB avail= 13108 MiB
+[peakrss]   t=    74.0s procs=  3 rss=   385 MiB hwm=   385 MiB avail= 13121 MiB
+[peakrss]   t=    72.0s procs=  3 rss=   383 MiB hwm=   383 MiB avail= 13122 MiB
+[peakrss]   t=    70.0s procs=  3 rss=   382 MiB hwm=   382 MiB avail= 13130 MiB
+[peakrss]   t=    68.0s procs=  3 rss=   381 MiB hwm=   381 MiB avail= 13143 MiB
+launcher exit: 0

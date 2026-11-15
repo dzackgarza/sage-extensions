@@ -1,0 +1,29 @@
+.....                                                                    [100%]
+========================== test-call performance gate ==========================
+tests/lattices/test_the_isotropic_reduction_image.sage::test_each_cusp_reduces_to_a_hyperbolic_rank_ten_lattice: 28.11 s > 20 s
+tests/lattices/test_the_isotropic_reduction_image.sage::test_sterks_published_cusp_roots_are_reflections_of_the_stabilizer_image: 91.34 s > 20 s
+tests/lattices/test_unpolarized_enriques_strata.sage::test_the_o_row_states_two_primitive_isotropic_lines: 42.08 s > 20 s
+tests/lattices/test_unpolarized_enriques_strata.sage::test_the_o_row_states_two_primitive_isotropic_planes: 23.77 s > 20 s
+============================== slowest durations ===============================
+91.34s call     tests/lattices/test_the_isotropic_reduction_image.sage::test_sterks_published_cusp_roots_are_reflections_of_the_stabilizer_image
+42.08s call     tests/lattices/test_unpolarized_enriques_strata.sage::test_the_o_row_states_two_primitive_isotropic_lines
+28.11s call     tests/lattices/test_the_isotropic_reduction_image.sage::test_each_cusp_reduces_to_a_hyperbolic_rank_ten_lattice
+23.77s call     tests/lattices/test_unpolarized_enriques_strata.sage::test_the_o_row_states_two_primitive_isotropic_planes
+4.59s call     tests/lattices/test_the_isotropic_reduction_image.sage::test_the_kernel_of_the_levi_map_acts_trivially_on_the_discriminant_group
+
+(10 durations < 0.005s hidden.  Use -vv to show these durations.)
+5 passed in 190.61s (0:03:10)
+[peakrss] issue312: child waited=0 shell_code=0 samples=101
+[peakrss] peak tree RSS      : 893 MiB
+[peakrss] low-water MemAvail : 6392 MiB
+[peakrss] peak single VmHWM  : 893 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      882 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   196.2s procs=  3 rss=   893 MiB hwm=   893 MiB avail=  7758 MiB
+[peakrss]   t=   198.2s procs=  3 rss=   893 MiB hwm=   893 MiB avail=  7805 MiB
+[peakrss]   t=   194.2s procs=  3 rss=   892 MiB hwm=   892 MiB avail=  7811 MiB
+[peakrss]   t=   192.2s procs=  3 rss=   889 MiB hwm=   889 MiB avail=  7926 MiB
+[peakrss]   t=   190.2s procs=  3 rss=   887 MiB hwm=   887 MiB avail=  8066 MiB
+launcher exit: 0

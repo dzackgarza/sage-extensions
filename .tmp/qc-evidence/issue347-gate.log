@@ -1,0 +1,17 @@
+
+no tests ran in 1.13s
+! _pytest.outcomes.Exit: test lint: 2 findings (run just test-lint for all)
+tests/rings/test_localization_fraction_equality.sage:24: TL01 from sage_extensions.logic import ...: take every name from the session
+tests/rings/test_localization_fraction_equality.sage:117: TL02 private attribute ._selected_representation_kind !
+[peakrss] issue347pytest: child waited=1 shell_code=1 samples=3
+[peakrss] peak tree RSS      : 316 MiB
+[peakrss] low-water MemAvail : 11032 MiB
+[peakrss] peak single VmHWM  : 316 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      306 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     4.0s procs=  3 rss=   316 MiB hwm=   316 MiB avail= 11032 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   250 MiB hwm=   250 MiB avail= 11094 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     1 MiB hwm=     1 MiB avail= 11273 MiB
+launcher exit: 1

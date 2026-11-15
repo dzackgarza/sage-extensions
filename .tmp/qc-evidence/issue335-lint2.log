@@ -1,0 +1,15 @@
+.                                                                        [100%]
+1 passed, 4 deselected in 1.24s
+[peakrss] issue335pytest: child waited=0 shell_code=0 samples=4
+[peakrss] peak tree RSS      : 299 MiB
+[peakrss] low-water MemAvail : 8721 MiB
+[peakrss] peak single VmHWM  : 300 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      289 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     6.0s procs=  3 rss=   299 MiB hwm=   300 MiB avail=  8721 MiB
+[peakrss]   t=     4.0s procs=  3 rss=   280 MiB hwm=   281 MiB avail=  8935 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   160 MiB hwm=   160 MiB avail=  8723 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     7 MiB hwm=     7 MiB avail=  8797 MiB
+launcher exit: 0

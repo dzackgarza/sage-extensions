@@ -1,0 +1,56 @@
+[    38.2s] Gamma_En,2 in 37.4s
+[    38.7s] levi_action() for Sterk_1: domain {g in Orthogonal group O(Integral lattice of rank 12 and signature (2, 10)) : g(im(Generic morphism:
+  From: Integral lattice of rank 1 and signature (0, 0)
+  To:   Integral lattice of rank 12 and signature (2, 10)))=im(Generic morphism:
+  From: Integral lattice of rank 1 and signature (0, 0)
+  To:   Integral lattice of rank 12 and signature (2, 10))}, codomain Orthogonal group O(Integral lattice of rank 10 and signature (1, 9))
+Sterk_1's printed roots: 12
+    of them orthogonal to v: 12
+    their classes in N: squares [-4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4]
+    distinct classes: 12
+Traceback (most recent call last):
+  File "sage/misc/cachefunc.pyx", line 1965, in sage.misc.cachefunc.CachedMethodCaller.__call__
+    return cache[k]
+KeyError: (({g in Orthogonal group O(Integral lattice of rank 12 and signature (2, 10)) : rho_L(g) lies in Subgroup of Orthogonal group of Finitely presented module on 12 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 2, 1 ↦ 2, 2 ↦ 2, 3 ↦ 2, 4 ↦ 2, 5 ↦ 2, 6 ↦ 2, 7 ↦ 2, 8 ↦ 2, 9 ↦ 2]},), ())
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "sage/misc/cachefunc.pyx", line 1965, in sage.misc.cachefunc.CachedMethodCaller.__call__
+    return cache[k]
+KeyError: (({g in Orthogonal group O(Integral lattice of rank 12 and signature (2, 10)) : rho_L(g) lies in Subgroup of Orthogonal group of Finitely presented module on 12 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 2, 1 ↦ 2, 2 ↦ 2, 3 ↦ 2, 4 ↦ 2, 5 ↦ 2, 6 ↦ 2, 7 ↦ 2, 8 ↦ 2, 9 ↦ 2]}, False), ())
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/probe.py", line 50, in <module>
+    action = reduction.levi_action(subgroup=gamma)
+  File "sage/misc/cachefunc.pyx", line 1970, in sage.misc.cachefunc.CachedMethodCaller.__call__
+    w = self._instance_call(*args, **kwds)
+  File "sage/misc/cachefunc.pyx", line 1848, in sage.misc.cachefunc.CachedMethodCaller._instance_call
+    return self.f(self._instance, *args, **kwds)
+  File "/repos/sage-extensions/.scratch/wt312/src/sage_extensions/categories/lattices.py", line 11453, in levi_action
+    return self._levi_action_in_subgroup(subgroup, pointwise=False)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "sage/misc/cachefunc.pyx", line 1970, in sage.misc.cachefunc.CachedMethodCaller.__call__
+    w = self._instance_call(*args, **kwds)
+  File "sage/misc/cachefunc.pyx", line 1848, in sage.misc.cachefunc.CachedMethodCaller._instance_call
+    return self.f(self._instance, *args, **kwds)
+  File "/repos/sage-extensions/.scratch/wt312/src/sage_extensions/categories/lattices.py", line 11488, in _levi_action_in_subgroup
+    raise ValueError(f"{subgroup} must be a subgroup of {ambient}")
+ValueError: {g in Orthogonal group O(Integral lattice of rank 12 and signature (2, 10)) : rho_L(g) lies in Subgroup of Orthogonal group of Finitely presented module on 12 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 2, 1 ↦ 2, 2 ↦ 2, 3 ↦ 2, 4 ↦ 2, 5 ↦ 2, 6 ↦ 2, 7 ↦ 2, 8 ↦ 2, 9 ↦ 2]} must be a subgroup of Orthogonal group O(Integral lattice of rank 12 and signature (2, 10))
+[peakrss] issue312: child waited=1 shell_code=1 samples=23
+[peakrss] peak tree RSS      : 476 MiB
+[peakrss] low-water MemAvail : 7240 MiB
+[peakrss] peak single VmHWM  : 476 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      465 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   run.sh                        1 MiB peak
+[peakrss]   t=    42.1s procs=  3 rss=   476 MiB hwm=   476 MiB avail=  7240 MiB
+[peakrss]   t=    40.1s procs=  3 rss=   467 MiB hwm=   467 MiB avail=  7261 MiB
+[peakrss]   t=    38.1s procs=  3 rss=   465 MiB hwm=   465 MiB avail=  7292 MiB
+[peakrss]   t=    36.1s procs=  3 rss=   461 MiB hwm=   461 MiB avail=  7290 MiB
+[peakrss]   t=    34.1s procs=  3 rss=   454 MiB hwm=   454 MiB avail=  7299 MiB
+launcher exit: 1

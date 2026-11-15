@@ -28,14 +28,42 @@ in this session is an owned set and an owned set is not equal to a Python one.
 from sage_extensions.all import *  # noqa: F401,F403
 
 
-def _marked_line_lift_torsor(lattice, marked):
-    r"""The lift torsor of the identity reduction of ``lattice`` at the line spanned by ``marked``.
+def _marked_line_lift_torsor(lattice, marked, reduction_isometry=None):
+    r"""The lift torsor of a reduction of ``lattice`` at the line spanned by ``marked``.
 
     ``marked`` must be a primitive isotropic vector of ``lattice``, so that its line is a
     rank-one primitive totally isotropic subobject and the reduction along it is defined.
+    ``reduction_isometry`` is an isometry of that reduction, by default its identity; a
+    nontrivial one lifts to a base point that is not the identity of the lattice, which is
+    the case the locus' per-class test has to answer for.
     """
     reduction = lattice.primitive_isotropic_subobject(marked).isotropic_reduction()
-    return reduction.rational_lifts(reduction, reduction.Isom(reduction).identity())
+    isometry = reduction.Isom(reduction).identity() if reduction_isometry is None else reduction_isometry
+    return reduction.rational_lifts(reduction, isometry)
+
+
+def _reduction_transvection(lattice, marked):
+    r"""A non-identity isometry of the reduction at ``marked``: an Eichler transvection.
+
+    The reduction's basis carries an isotropic vector and a vector perpendicular to it, so the
+    transvection ``t(e, a)`` of that pair is an isometry of the reduction that is not the
+    identity.  Its lift's base point is not the identity either: it moves the marked line's
+    complement, so the locus' per-class test is asked about parameters that do not fix the
+    base point's images.
+    """
+    reduction = lattice.primitive_isotropic_subobject(marked).isotropic_reduction()
+    labels = tuple(reduction.module_generating_set())
+    basis_vector = {label: reduction.module_generator(label) for label in labels}
+    zero = reduction.base_ring().zero()
+    direction_label = next(
+        label for label in labels
+        if basis_vector[label].q() == zero and basis_vector[label] != reduction.zero()
+    )
+    partner_label = next(
+        label for label in labels
+        if label != direction_label and basis_vector[direction_label].b(basis_vector[label]) == zero
+    )
+    return reduction.eichler_transvection(basis_vector[direction_label], basis_vector[partner_label])
 
 
 def _first_basis_line(lattice):
@@ -134,6 +162,44 @@ def test_the_locus_of_a_divisibility_two_control_with_a_nontrivial_kernel_is_eve
     )
 
     _assert_locus_is_the_integral_classes(lattice, 2)
+
+
+def test_the_locus_at_a_non_identity_reduction_is_every_class_that_lifts() -> None:
+    r"""On `U(2) + U(2) + <2>` at a reduction isometry that is not the identity.
+
+    The other tests reduce at the identity isometry of the reduction, where the base point of
+    the lift is the identity of the lattice and its coordinate matrix is the identity.  That
+    makes every reading of the lift's integrality agree, so it cannot separate the lift's own
+    matrix from a transposed reading of it -- the failure the review of `0a55452cfa` reported,
+    where `base_images` was filled by rows and the product `T * base_images` was read as the
+    lift's matrix.
+
+    This test answers the same question at an Eichler transvection of the reduction, whose
+    lift's base point is not the identity and whose coordinate matrix is not symmetric: the
+    locus' classes are exactly the classes of `P/mP` whose lift restricts to an isometry of the
+    lattice, against the lift's own `integral_restriction`.
+    """
+    lattice = (
+        Lattices(ZZ)([[0, 2], [2, 0]])
+        + Lattices(ZZ)([[0, 2], [2, 0]])
+        + Lattices(ZZ)([[2]])
+    )
+    marked = _first_basis_line(lattice)
+    isometry = _reduction_transvection(lattice, marked)
+    reduction = lattice.primitive_isotropic_subobject(marked).isotropic_reduction()
+    # The isometry is not the identity: the test is not the identity case again.
+    assert isometry != reduction.Isom(reduction).identity()
+    torsor = _marked_line_lift_torsor(lattice, marked, reduction_isometry=isometry)
+    integral_classes = _classes_that_lift_integrally(lattice, torsor)
+    reported = set(torsor.integral_parameter_classes())
+    quotient = torsor.integral_parameter_quotient()
+
+    assert reported == integral_classes
+    # The comparison is neither of two empty sets nor of the whole parameter quotient.
+    zero = quotient.codomain().zero()
+    assert zero in integral_classes
+    assert zero in reported
+    assert reported != set(quotient.codomain())
 
 
 def test_the_locus_of_a_divisibility_four_control_is_every_class_that_lifts() -> None:

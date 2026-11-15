@@ -1,0 +1,44 @@
+[     0.2s] built the k = 1 and k = 2 grams: 17 x 17
+[   237.1s] the shipped frame: 19 walls, 44 dominant vectors
+[   237.1s] dominant norms: [-40, -38, -36, -34, -32, -30, -28, -26, -24, -22, -20, -18, -16, -14, -12, -10, -8, -6, -4, -2, 0] counts [3, 4, 3, 3, 4, 2, 2, 3, 2, 2, 2, 2, 2, 2, 1, 1, 2, 1, 1, 1, 1]
+
+=== the 19 walls in the model's coordinates (a, b, x, y) ===
+  wall  0: (  0,   0) q(x) =  -2 q(y) =   0 square  -2 x = [1, 0, 0, 0, 0, 0, 0, 0] y = [0, 0, 0, 0, 0, 0, 0, 0]
+  wall  1: (  0,   0) q(x) =  -2 q(y) =   0 square  -2 x = [0, 1, 0, 0, 0, 0, 0, 0] y = [0, 0, 0, 0, 0, 0, 0, 0]
+  wall  2: (  0,   0) q(x) =  -2 q(y) =   0 square  -2 x = [0, 0, 1, 0, 0, 0, 0, 0] y = [0, 0, 0, 0, 0, 0, 0, 0]
+  wall  3: (  0,   0) q(x) =  -2 q(y) =   0 square  -2 x = [0, 0, 0, 1, 0, 0, 0, 0] y = [0, 0, 0, 0, 0, 0, 0, 0]
+  wall  4: (  0,   0) q(x) =  -2 q(y) =   0 square  -2 x = [0, 0, 0, 0, 1, 0, 0, 0] y = [0, 0, 0, 0, 0, 0, 0, 0]
+  wall  5: (  0,   0) q(x) =  -2 q(y) =   0 square  -2 x = [0, 0, 0, 0, 0, 1, 0, 0] y = [0, 0, 0, 0, 0, 0, 0, 0]
+  wall  6: (  0,   0) q(x) =  -2 q(y) =   0 square  -2 x = [0, 0, 0, 0, 0, 0, 1, 0] y = [0, 0, 0, 0, 0, 0, 0, 0]
+  wall  7: (  0,   0) q(x) =  -2 q(y) =   0 square  -2 x = [0, 0, 0, 0, 0, 0, 0, 1] y = [0, 0, 0, 0, 0, 0, 0, 0]
+  wall  8: (  0,   0) q(x) =   0 q(y) =  -2 square  -2 x = [0, 0, 0, 0, 0, 0, 0, 0] y = [1, 0, 0, 0, 0, 0, 0, 0]
+  wall  9: (  0,   0) q(x) =   0 q(y) =  -2 square  -2 x = [0, 0, 0, 0, 0, 0, 0, 0] y = [0, 1, 0, 0, 0, 0, 0, 0]
+  wall 10: (  0,   0) q(x) =   0 q(y) =  -2 square  -2 x = [0, 0, 0, 0, 0, 0, 0, 0] y = [0, 0, 1, 0, 0, 0, 0, 0]
+  wall 11: (  0,   0) q(x) =   0 q(y) =  -2 square  -2 x = [0, 0, 0, 0, 0, 0, 0, 0] y = [0, 0, 0, 1, 0, 0, 0, 0]
+  wall 12: (  0,   0) q(x) =   0 q(y) =  -2 square  -2 x = [0, 0, 0, 0, 0, 0, 0, 0] y = [0, 0, 0, 0, 1, 0, 0, 0]
+  wall 13: (  0,   0) q(x) =   0 q(y) =  -2 square  -2 x = [0, 0, 0, 0, 0, 0, 0, 0] y = [0, 0, 0, 0, 0, 1, 0, 0]
+  wall 14: (  0,   0) q(x) =   0 q(y) =  -2 square  -2 x = [0, 0, 0, 0, 0, 0, 0, 0] y = [0, 0, 0, 0, 0, 0, 1, 0]
+  wall 15: (  0,   0) q(x) =   0 q(y) =  -2 square  -2 x = [0, 0, 0, 0, 0, 0, 0, 0] y = [0, 0, 0, 0, 0, 0, 0, 1]
+  wall 16: ( -1,   1) q(x) =   0 q(y) =   0 square  -2 x = [0, 0, 0, 0, 0, 0, 0, 0] y = [0, 0, 0, 0, 0, 0, 0, 0]
+  wall 17: (  0,  -1) q(x) =  -2 q(y) =   0 square  -2 x = [-2, -4, -6, -5, -4, -3, -2, -3] y = [0, 0, 0, 0, 0, 0, 0, 0]
+  wall 18: (  0,  -1) q(x) =   0 q(y) =  -2 square  -2 x = [0, 0, 0, 0, 0, 0, 0, 0] y = [-2, -4, -6, -5, -4, -3, -2, -3]
+
+=== the shipped enumeration, counted (same code, counters) ===
+Traceback (most recent call last):
+  File "/probe.py", line 85, in <module>
+    system = matrix(SageZZ, [covector])
+TypeError: matrix() takes 1 positional argument but 2 were given
+[peakrss] issue334: child waited=1 shell_code=1 samples=126
+[peakrss] peak tree RSS      : 328 MiB
+[peakrss] low-water MemAvail : 8521 MiB
+[peakrss] peak single VmHWM  : 328 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      318 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   250.6s procs=  3 rss=   328 MiB hwm=   328 MiB avail= 10111 MiB
+[peakrss]   t=   236.5s procs=  3 rss=   327 MiB hwm=   327 MiB avail=  8562 MiB
+[peakrss]   t=   238.6s procs=  3 rss=   327 MiB hwm=   327 MiB avail=  8561 MiB
+[peakrss]   t=   240.6s procs=  3 rss=   327 MiB hwm=   327 MiB avail=  8557 MiB
+[peakrss]   t=   242.6s procs=  3 rss=   327 MiB hwm=   327 MiB avail=  8545 MiB
+launcher exit: 1

@@ -1,0 +1,20 @@
+tests/lattices/test_scattone_plane_orbits.sage::test_the_card_inputs_are_the_published_rank_21_lattices
+tests/lattices/test_scattone_plane_orbits.sage::test_6jrx_has_the_cards_plane_orbits_under_o
+tests/lattices/test_scattone_plane_orbits.sage::test_6jry_has_the_cards_plane_orbits_under_o
+tests/lattices/test_scattone_plane_orbits.sage::test_6jrx_has_the_cards_plane_orbits_under_o_plus
+tests/lattices/test_scattone_plane_orbits.sage::test_6jry_has_the_cards_plane_orbits_under_o_plus
+
+5 tests collected in 1.01s
+[peakrss] issue335pytest: child waited=0 shell_code=0 samples=3
+[peakrss] peak tree RSS      : 301 MiB
+[peakrss] low-water MemAvail : 8694 MiB
+[peakrss] peak single VmHWM  : 301 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      290 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   run.sh                        6 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     4.0s procs=  3 rss=   301 MiB hwm=   301 MiB avail=  8787 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   218 MiB hwm=   218 MiB avail=  8694 MiB
+[peakrss]   t=     0.0s procs=  2 rss=    12 MiB hwm=    13 MiB avail=  8699 MiB
+launcher exit: 0

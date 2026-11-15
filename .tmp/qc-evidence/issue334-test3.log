@@ -1,0 +1,59 @@
+.FF.F.F.                                                                 [100%]
+=================================== FAILURES ===================================
+_________ test_the_degree_two_summand_genus_has_the_cards_class_count __________
+tests/lattices/test_genus_of_the_scattone_summands.sage:53: in test_the_degree_two_summand_genus_has_the_cards_class_count
+    assert representatives.cardinality() == expected
+E   assert 1 == 4
+E     
+E     Use -v to get more diff
+_____ test_the_degree_two_summand_genus_through_the_unimodular_complement ______
+tests/lattices/test_genus_of_the_scattone_summands.sage:75: in test_the_degree_two_summand_genus_through_the_unimodular_complement
+    assert representatives.cardinality() == cardinal(row["rows"]["O"]["planes"])
+E   assert 1 == 4
+E     
+E     Use -v to get more diff
+_________ test_the_degree_four_summand_genus_has_the_cards_class_count _________
+tests/lattices/test_genus_of_the_scattone_summands.sage:109: in test_the_degree_four_summand_genus_has_the_cards_class_count
+    assert representatives.cardinality() == expected
+E   assert 1 == 9
+E     
+E     Use -v to get more diff
+_____ test_the_degree_four_summand_genus_through_the_unimodular_complement _____
+tests/lattices/test_genus_of_the_scattone_summands.sage:146: in test_the_degree_four_summand_genus_through_the_unimodular_complement
+    assert representatives.cardinality() == cardinal(row["rows"]["O"]["planes"])
+E   assert 1 == 9
+E     
+E     Use -v to get more diff
+========================== test-call performance gate ==========================
+tests/lattices/test_genus_of_the_scattone_summands.sage::test_the_degree_two_summand_genus_has_the_cards_class_count: 90.58 s > 20 s
+tests/lattices/test_genus_of_the_scattone_summands.sage::test_the_degree_four_summand_genus_has_the_cards_class_count: 26.82 s > 20 s
+============================== slowest durations ===============================
+90.58s call     tests/lattices/test_genus_of_the_scattone_summands.sage::test_the_degree_two_summand_genus_has_the_cards_class_count
+26.82s call     tests/lattices/test_genus_of_the_scattone_summands.sage::test_the_degree_four_summand_genus_has_the_cards_class_count
+0.17s call     tests/lattices/test_genus_of_the_scattone_summands.sage::test_a_definite_genus_with_two_spinor_genera_keeps_its_split
+0.15s call     tests/lattices/test_genus_of_the_scattone_summands.sage::test_the_degree_two_summand_genus_is_the_rank_seventeen_lattice
+0.01s call     tests/lattices/test_genus_of_the_scattone_summands.sage::test_the_degree_four_summand_genus_mass_is_the_siegel_mass
+0.01s call     tests/lattices/test_genus_of_the_scattone_summands.sage::test_the_degree_two_summand_genus_mass_is_the_siegel_mass
+0.01s call     tests/lattices/test_genus_of_the_scattone_summands.sage::test_the_degree_two_summand_genus_through_the_unimodular_complement
+
+(17 durations < 0.005s hidden.  Use -vv to show these durations.)
+=========================== short test summary info ============================
+FAILED tests/lattices/test_genus_of_the_scattone_summands.sage::test_the_degree_two_summand_genus_has_the_cards_class_count
+FAILED tests/lattices/test_genus_of_the_scattone_summands.sage::test_the_degree_two_summand_genus_through_the_unimodular_complement
+FAILED tests/lattices/test_genus_of_the_scattone_summands.sage::test_the_degree_four_summand_genus_has_the_cards_class_count
+FAILED tests/lattices/test_genus_of_the_scattone_summands.sage::test_the_degree_four_summand_genus_through_the_unimodular_complement
+4 failed, 4 passed in 118.57s (0:01:58)
+[peakrss] issue334: child waited=1 shell_code=1 samples=62
+[peakrss] peak tree RSS      : 769 MiB
+[peakrss] low-water MemAvail : 7775 MiB
+[peakrss] peak single VmHWM  : 773 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      762 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   120.1s procs=  3 rss=   769 MiB hwm=   770 MiB avail=  9705 MiB
+[peakrss]   t=   108.1s procs=  3 rss=   746 MiB hwm=   758 MiB avail=  8259 MiB
+[peakrss]   t=   110.1s procs=  3 rss=   746 MiB hwm=   758 MiB avail=  8256 MiB
+[peakrss]   t=   112.1s procs=  3 rss=   746 MiB hwm=   758 MiB avail=  8250 MiB
+[peakrss]   t=   114.1s procs=  3 rss=   746 MiB hwm=   758 MiB avail=  8248 MiB
+launcher exit: 1

@@ -1,0 +1,28 @@
+........                                                                 [100%]
+========================== test-call performance gate ==========================
+tests/lattices/test_genus_of_the_scattone_summands.sage::test_the_degree_two_summand_genus_has_the_cards_class_count: 84.31 s > 20 s
+tests/lattices/test_genus_of_the_scattone_summands.sage::test_the_degree_four_summand_genus_has_the_cards_class_count: 25.48 s > 20 s
+============================== slowest durations ===============================
+84.31s call     tests/lattices/test_genus_of_the_scattone_summands.sage::test_the_degree_two_summand_genus_has_the_cards_class_count
+25.48s call     tests/lattices/test_genus_of_the_scattone_summands.sage::test_the_degree_four_summand_genus_has_the_cards_class_count
+1.62s call     tests/lattices/test_genus_of_the_scattone_summands.sage::test_the_degree_four_summand_genus_through_the_unimodular_complement
+1.42s call     tests/lattices/test_genus_of_the_scattone_summands.sage::test_the_degree_two_summand_genus_through_the_unimodular_complement
+0.14s call     tests/lattices/test_genus_of_the_scattone_summands.sage::test_a_definite_genus_with_two_spinor_genera_keeps_its_split
+0.11s call     tests/lattices/test_genus_of_the_scattone_summands.sage::test_the_degree_two_summand_genus_is_the_rank_seventeen_lattice
+
+(18 durations < 0.005s hidden.  Use -vv to show these durations.)
+8 passed in 113.47s (0:01:53)
+[peakrss] issue334: child waited=0 shell_code=0 samples=59
+[peakrss] peak tree RSS      : 803 MiB
+[peakrss] low-water MemAvail : 10178 MiB
+[peakrss] peak single VmHWM  : 803 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      792 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   116.1s procs=  3 rss=   803 MiB hwm=   803 MiB avail= 10178 MiB
+[peakrss]   t=   114.1s procs=  3 rss=   801 MiB hwm=   801 MiB avail= 10178 MiB
+[peakrss]   t=    94.1s procs=  3 rss=   777 MiB hwm=   777 MiB avail= 10262 MiB
+[peakrss]   t=    96.1s procs=  3 rss=   777 MiB hwm=   788 MiB avail= 10255 MiB
+[peakrss]   t=    98.1s procs=  3 rss=   777 MiB hwm=   788 MiB avail= 10255 MiB
+launcher exit: 0

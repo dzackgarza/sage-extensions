@@ -1,0 +1,26 @@
+[     1.9s] levi action
+[     1.9s] levi.kernel() -> {g in {g in Orthogonal group O(Integral lattice of rank 12 and signature (2, 10)) : g(im(Generic morphism:
+  From: Integral lattice of rank 1 and signature (0, 0)
+  To:   Integral lattice of rank 12 and signature (2, 10)))=im(Generic morphism:
+  From: Integral lattice of rank 1 and signature (0, 0)
+  To:   Integral lattice of rank 12 and signature (2, 10))} : elements mapped to the identity by the defining morphism} in 0.0s
+[   613.4s] kernel generators: 1035
+[   696.1s] nontrivial discriminant images among them: 0
+    kernel generator: fixes v True
+    kernel generator: fixes v True
+    kernel generator: fixes v True
+DONE
+[peakrss] issue312: child waited=0 shell_code=0 samples=351
+[peakrss] peak tree RSS      : 543 MiB
+[peakrss] low-water MemAvail : 4918 MiB
+[peakrss] peak single VmHWM  : 548 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      538 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   700.9s procs=  3 rss=   543 MiB hwm=   548 MiB avail=  6824 MiB
+[peakrss]   t=   698.9s procs=  3 rss=   540 MiB hwm=   545 MiB avail=  6825 MiB
+[peakrss]   t=   696.9s procs=  3 rss=   539 MiB hwm=   544 MiB avail=  6827 MiB
+[peakrss]   t=   694.9s procs=  3 rss=   537 MiB hwm=   543 MiB avail=  6829 MiB
+[peakrss]   t=   692.9s procs=  3 rss=   536 MiB hwm=   542 MiB avail=  6831 MiB
+launcher exit: 0

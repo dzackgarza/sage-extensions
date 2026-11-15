@@ -1,0 +1,30 @@
+........                                                                 [100%]
+========================== test-call performance gate ==========================
+tests/lattices/test_genus_of_the_scattone_summands.sage::test_the_degree_two_summand_genus_has_the_cards_class_count: 95.83 s > 20 s
+tests/lattices/test_genus_of_the_scattone_summands.sage::test_the_degree_four_summand_genus_has_the_cards_class_count: 35.08 s > 20 s
+============================== slowest durations ===============================
+95.83s call     tests/lattices/test_genus_of_the_scattone_summands.sage::test_the_degree_two_summand_genus_has_the_cards_class_count
+35.08s call     tests/lattices/test_genus_of_the_scattone_summands.sage::test_the_degree_four_summand_genus_has_the_cards_class_count
+2.10s call     tests/lattices/test_genus_of_the_scattone_summands.sage::test_the_degree_two_summand_genus_through_the_unimodular_complement
+1.87s call     tests/lattices/test_genus_of_the_scattone_summands.sage::test_the_degree_four_summand_genus_through_the_unimodular_complement
+0.19s call     tests/lattices/test_genus_of_the_scattone_summands.sage::test_a_definite_genus_with_two_spinor_genera_keeps_its_split
+0.12s call     tests/lattices/test_genus_of_the_scattone_summands.sage::test_the_degree_two_summand_genus_is_the_rank_seventeen_lattice
+0.01s call     tests/lattices/test_genus_of_the_scattone_summands.sage::test_the_degree_four_summand_genus_mass_is_the_siegel_mass
+0.01s call     tests/lattices/test_genus_of_the_scattone_summands.sage::test_the_degree_two_summand_genus_mass_is_the_siegel_mass
+
+(16 durations < 0.005s hidden.  Use -vv to show these durations.)
+8 passed in 135.66s (0:02:15)
+[peakrss] issue334: child waited=0 shell_code=0 samples=70
+[peakrss] peak tree RSS      : 790 MiB
+[peakrss] low-water MemAvail : 8618 MiB
+[peakrss] peak single VmHWM  : 791 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      780 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   136.1s procs=  3 rss=   790 MiB hwm=   790 MiB avail=  9017 MiB
+[peakrss]   t=   134.1s procs=  3 rss=   788 MiB hwm=   788 MiB avail=  8986 MiB
+[peakrss]   t=   106.1s procs=  3 rss=   776 MiB hwm=   776 MiB avail=  9010 MiB
+[peakrss]   t=   108.1s procs=  3 rss=   776 MiB hwm=   776 MiB avail=  8950 MiB
+[peakrss]   t=   110.1s procs=  3 rss=   776 MiB hwm=   776 MiB avail=  8886 MiB
+launcher exit: 0

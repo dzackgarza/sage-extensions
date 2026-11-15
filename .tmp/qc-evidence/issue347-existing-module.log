@@ -1,0 +1,64 @@
+....FFFF.....                                                            [100%]
+=================================== FAILURES ===================================
+______________ test_rationals_in_lowest_terms_and_their_inverses _______________
+tests/rings/test_elementary_arithmetic_of_owned_rings.sage:67: in test_rationals_in_lowest_terms_and_their_inverses
+    assert q.numerator() == 3
+E   assert 6 == 3
+E    +  where 6 = numerator()
+E    +    where numerator = (6)/(8).numerator
+E    +  and   3 = Integer(3)
+_____ test_owned_rational_equality_realizes_exact_python_fraction_literals _____
+tests/rings/test_elementary_arithmetic_of_owned_rings.sage:78: in test_owned_rational_equality_realizes_exact_python_fraction_literals
+    literal = Fraction(1, 2)
+              ^^^^^^^^^^^^^^^
+/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/fractions.py:299: in __new__
+    raise TypeError("both arguments should be "
+E   TypeError: both arguments should be Rational instances
+___ test_the_owned_integers_coerce_canonically_into_the_rationals_and_reals ____
+tests/rings/test_elementary_arithmetic_of_owned_rings.sage:92: in test_the_owned_integers_coerce_canonically_into_the_rationals_and_reals
+    real_coercion = RR.coerce_map_from(ZZ)
+                    ^^^^^^^^^^^^^^^^^^^^^^
+sage/structure/parent.pyx:2095: in sage.structure.parent.Parent.coerce_map_from
+    ???
+sage/structure/parent.pyx:2131: in sage.structure.parent.Parent.coerce_map_from
+    ???
+/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/copy.py:82: in copy
+    return copier(x)
+           ^^^^^^^^^
+sage/categories/map.pyx:195: in sage.categories.map.Map.__copy__
+    ???
+sage/categories/map.pyx:259: in sage.categories.map.Map.parent
+    ???
+/sage/.venv/lib/python3.14/site-packages/sage/categories/homset.py:449: in Hom
+    raise ValueError("{} is not in {}".format(O, category))
+E   ValueError: Integer Ring is not in Category of sets
+_________________ test_three_is_a_primitive_root_modulo_seven __________________
+tests/rings/test_elementary_arithmetic_of_owned_rings.sage:107: in test_three_is_a_primitive_root_modulo_seven
+    assert three.additive_order() == 7
+           ^^^^^^^^^^^^^^^^^^^^
+sage/structure/element.pyx:494: in sage.structure.element.Element.__getattr__
+    ???
+sage/structure/element.pyx:507: in sage.structure.element.Element.getattr_from_category
+    ???
+sage/cpython/getattr.pyx:357: in sage.cpython.getattr.getattr_from_other_class
+    ???
+E   AttributeError: 'OwnedJoinCategory.element_class' object has no attribute 'additive_order'
+=========================== short test summary info ============================
+FAILED tests/rings/test_elementary_arithmetic_of_owned_rings.sage::test_rationals_in_lowest_terms_and_their_inverses
+FAILED tests/rings/test_elementary_arithmetic_of_owned_rings.sage::test_owned_rational_equality_realizes_exact_python_fraction_literals
+FAILED tests/rings/test_elementary_arithmetic_of_owned_rings.sage::test_the_owned_integers_coerce_canonically_into_the_rationals_and_reals
+FAILED tests/rings/test_elementary_arithmetic_of_owned_rings.sage::test_three_is_a_primitive_root_modulo_seven
+4 failed, 9 passed in 1.62s
+[peakrss] issue347pytest: child waited=1 shell_code=1 samples=4
+[peakrss] peak tree RSS      : 297 MiB
+[peakrss] low-water MemAvail : 10169 MiB
+[peakrss] peak single VmHWM  : 297 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      286 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     4.0s procs=  3 rss=   297 MiB hwm=   297 MiB avail= 10466 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   173 MiB hwm=   173 MiB avail= 10533 MiB
+[peakrss]   t=     6.0s procs=  2 rss=     7 MiB hwm=     7 MiB avail= 10653 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     4 MiB hwm=     4 MiB avail= 10169 MiB
+launcher exit: 1

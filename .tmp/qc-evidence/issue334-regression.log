@@ -1,0 +1,28 @@
+..........                                                               [100%]
+============================== slowest durations ===============================
+3.19s call     tests/lattices/test_genus.sage::test_published_four_spinor_genus_is_counted_from_all_generators
+1.46s call     tests/lattices/test_genus.sage::test_definite_genus_mass_and_class_number_are_exact
+0.61s call     tests/lattices/test_genus.sage::test_indefinite_genus_enumerates_each_nontrivial_spinor_seed
+0.61s call     tests/lattices/test_genus.sage::test_genus_of_a2_is_determined_by_signature_and_discriminant_form
+0.22s call     tests/lattices/test_genus.sage::test_level_uses_the_quadratic_discriminant_form_for_even_lattices
+0.22s call     tests/lattices/test_genus.sage::test_level_of_an_odd_lattice_is_the_bilinear_level
+0.19s call     tests/lattices/test_genus.sage::test_indefinite_isotropic_genus_has_complete_spinor_seed_enumeration
+0.03s call     tests/lattices/test_genus.sage::test_indefinite_signature_does_not_imply_rational_isotropy
+0.02s call     tests/lattices/test_genus.sage::test_unimodular_even_lattice_has_level_one
+
+(21 durations < 0.005s hidden.  Use -vv to show these durations.)
+10 passed in 7.08s
+[peakrss] issue334: child waited=0 shell_code=0 samples=6
+[peakrss] peak tree RSS      : 510 MiB
+[peakrss] low-water MemAvail : 10308 MiB
+[peakrss] peak single VmHWM  : 511 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      501 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    10.0s procs=  3 rss=   510 MiB hwm=   511 MiB avail= 10308 MiB
+[peakrss]   t=     8.0s procs=  3 rss=   508 MiB hwm=   508 MiB avail= 10419 MiB
+[peakrss]   t=     6.0s procs=  3 rss=   499 MiB hwm=   499 MiB avail= 10519 MiB
+[peakrss]   t=     4.0s procs=  3 rss=   360 MiB hwm=   360 MiB avail= 10778 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   282 MiB hwm=   282 MiB avail= 10848 MiB
+launcher exit: 0

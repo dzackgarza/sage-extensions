@@ -1,0 +1,25 @@
+vector parent is the named lattice: True
+vector parent is Gamma's domain:    False
+vector parent == Gamma's domain:    False
+named lattice == Gamma's domain:    False
+labels equal: False
+gram equal: True
+discriminant groups equal: False
+O equal: False
+domain(list) -> e_0, q = 0
+domain(tuple) -> e_0, q = 0
+DONE
+[peakrss] issue312: child waited=0 shell_code=0 samples=14
+[peakrss] peak tree RSS      : 481 MiB
+[peakrss] low-water MemAvail : 11450 MiB
+[peakrss] peak single VmHWM  : 481 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      470 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    24.0s procs=  3 rss=   481 MiB hwm=   481 MiB avail= 11450 MiB
+[peakrss]   t=    26.0s procs=  3 rss=   481 MiB hwm=   481 MiB avail= 11450 MiB
+[peakrss]   t=    22.0s procs=  3 rss=   476 MiB hwm=   476 MiB avail= 11456 MiB
+[peakrss]   t=    20.0s procs=  3 rss=   465 MiB hwm=   465 MiB avail= 11460 MiB
+[peakrss]   t=    18.0s procs=  3 rss=   457 MiB hwm=   457 MiB avail= 11464 MiB
+launcher exit: 0
