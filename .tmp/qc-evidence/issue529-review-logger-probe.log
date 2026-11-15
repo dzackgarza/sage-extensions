@@ -1,0 +1,37 @@
+# #529 review: the package logger and the log file, measured on their own
+# checkout: this tree, with the repair applied; pinned image, port at /work
+# command: sh /probe529/probe.sh inside the image, whose source is:
+  set -eu
+  work=/tmp/probe529
+  rm -rf "$work"; mkdir -p "$work"
+  cd "$work"
+  printf '[pytest]\n' > pytest.ini
+  cat > test_x.py <<'EOF'
+  import logging
+  
+  
+  def test_child_of_the_package():
+      logging.getLogger("sage_extensions.categories.probe").debug("a debug record")
+  
+  
+  def test_other_logger():
+      logging.getLogger("probe.other").debug("another debug record")
+  EOF
+  /sage/.venv/bin/python -m pytest -c pytest.ini -o log_file=pytest.log -o log_file_level=DEBUG -p sage_extensions.testing.timing_record -q || true
+  echo "--- files"; ls
+  echo "--- pytest.log"; cat pytest.log 2>/dev/null || echo "(no pytest.log)"
+  echo "--- package logger state"
+  /sage/.venv/bin/python -c "import sage_extensions.timing as t, logging; p = logging.getLogger('sage_extensions'); print('package level', p.level, 'propagate', p.propagate, 'child', t.logger.name, t.logger.level)"
+# output:
+..                                                                       [100%]
+2 passed in 0.08s
+--- files
+__pycache__
+pytest.ini
+pytest.log
+test_x.py
+--- pytest.log
+DEBUG    sage_extensions.categories.probe:test_x.py:5 a debug record
+DEBUG    probe.other:test_x.py:9 another debug record
+--- package logger state
+package level 0 propagate True child sage_extensions.timing 20

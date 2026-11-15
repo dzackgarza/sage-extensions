@@ -12,6 +12,8 @@ arithmetic and of the product functor.
 
 from sage_extensions.all import *  # noqa: F401,F403
 
+import pytest
+
 
 def test_indexed_family_cache_does_not_decide_undecidable_index_equality() -> None:
     from sage_extensions.categories.sets.indexed_families import IndexedFamily
@@ -217,7 +219,7 @@ def test_finite_indexed_family_rank_cache_supplies_product_factors() -> None:
     from sage_extensions.categories.sets.finite_ordered_sets import finite_ordered_set
     from sage_extensions.categories.sets.indexed_families import indexed_family
 
-    labels = finite_ordered_set(([0], [1]))
+    labels = finite_ordered_set(((0,), (1,)))
     factor = Sets.Δ[1]
     evaluations = []
 
@@ -227,23 +229,23 @@ def test_finite_indexed_family_rank_cache_supplies_product_factors() -> None:
 
     family = indexed_family(labels, selected)
     product = Sets().product(family)
-    assert product.factor([0]) is factor
-    assert product.factor([0]) is family(labels.ranking_map().inverse()(0))
-    assert product.factor([1]) is factor
+    assert product.factor((0,)) is factor
+    assert product.factor((0,)) is family(labels.ranking_map().inverse()(0))
+    assert product.factor((1,)) is factor
     assert tuple(value for value in family) == (factor, factor)
     assert tuple(family.items()) == ((labels.ranking_map().inverse()(0), factor),
                                     (labels.ranking_map().inverse()(1), factor))
     assert evaluations == [0, 1]
     point = product((factor(0), factor(1)))
-    assert product.projection([0])(point) == factor(0)
-    assert product.projection([1])(point) == factor(1)
+    assert product.projection((0,))(point) == factor(0)
+    assert product.projection((1,))(point) == factor(1)
 
 
-def test_finite_family_hash_does_not_require_hashable_index_labels() -> None:
+def test_a_finite_family_hash_reads_its_index_set_and_not_its_values() -> None:
     from sage_extensions.categories.sets.finite_ordered_sets import finite_ordered_set
     from sage_extensions.categories.sets.indexed_families import indexed_family
 
-    labels = finite_ordered_set(([0], [1]))
+    labels = finite_ordered_set(((0,), (1,)))
     first = indexed_family(labels, lambda label: Sets.Δ[1] if label[0] == 0 else Sets.Δ[2])
     second = indexed_family(labels, lambda label: Sets.Δ[1] if label[0] == 0 else Sets.Δ[2])
     assert first == second
@@ -255,6 +257,12 @@ def test_finite_family_hash_does_not_require_hashable_index_labels() -> None:
     unhashable_second = indexed_family(labels, lambda label: [label[0]])
     assert unhashable_first == unhashable_second
     assert hash(unhashable_first) == hash(unhashable_second)
+
+    # The hash reads the index set, and a finite ordered set carrying a point
+    # that refuses a hash is unhashable (#531), so a family over one is too.
+    unhashable_labels = finite_ordered_set(([0], [1]))
+    with pytest.raises(TypeError):
+        hash(indexed_family(unhashable_labels, lambda label: label[0]))
 
 
 def test_infinite_constant_additive_product_retains_its_monoid_and_projections() -> None:

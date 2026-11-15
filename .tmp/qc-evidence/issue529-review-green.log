@@ -1,0 +1,30 @@
+checkout SHA: 450a781380ab388904f40d76b86144a6967d7a29
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+inner 540 s, outer 600 s, guard 6144 MiB
+pytest: -p qc_sage_session -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates -q tests/engineering/test_the_timing_record_names_each_stage.py -v
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+time gates OFF (--no-time-gates): star import 0.77 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: asyncio-1.5.0, xdist-3.8.0, reportlog-1.0.0, platformdirs-4.13.5, hypothesis-6.170.15, anyio-4.15.1, timeout-2.4.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 4 items
+
+tests/engineering/test_the_timing_record_names_each_stage.py ....        [100%]
+
+============================== 4 passed in 6.25s ===============================
+[peakrss] tim529: child waited=0 shell_code=0 samples=6
+[peakrss] peak tree RSS      : 557 MiB
+[peakrss] low-water MemAvail : 12166 MiB
+[peakrss] peak single VmHWM  : 557 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      468 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     6.0s procs=  4 rss=   557 MiB hwm=   557 MiB avail= 12262 MiB
+[peakrss]   t=     8.0s procs=  4 rss=   556 MiB hwm=   556 MiB avail= 12240 MiB
+[peakrss]   t=    10.0s procs=  3 rss=   479 MiB hwm=   479 MiB avail= 12291 MiB
+[peakrss]   t=     4.0s procs=  3 rss=   316 MiB hwm=   316 MiB avail= 12450 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   219 MiB hwm=   219 MiB avail= 12166 MiB
+launcher exit: 0

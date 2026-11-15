@@ -1,0 +1,72 @@
+tree SHA: da0fa12c5bc49bd13a8d1d10efdcc1c7f7de1f45
+port SHA: 991b88b0
+inner 560 s, outer 620 s, guard 4096 MiB
+command: /sage/.venv/bin/python -u -s /probe.py cap=520
+[0.0s] probe J: the Otilde row, sliced by stage (#390)
+[0.0s] cap 520 s, python 3.14.10
+[0.0s] lattice Integral lattice of rank 11 and signature (2, 9) of rank 11
+[1.9s] Otilde(T_Co) = lattice.stable_orthogonal_group()
+[1.9s] calling stable.isotropic_orbit_representatives(2)
+[31.9s] progress stage='ambient O(L) plane row' lifts=0 planes=0 rate=0.0/s rss=486 MiB
+[62.0s] progress stage='ambient O(L) plane row' lifts=0 planes=0 rate=0.0/s rss=487 MiB
+[92.0s] progress stage='ambient O(L) plane row' lifts=0 planes=0 rate=0.0/s rss=488 MiB
+[122.0s] progress stage='ambient O(L) plane row' lifts=0 planes=0 rate=0.0/s rss=489 MiB
+[152.1s] progress stage='ambient O(L) plane row' lifts=0 planes=0 rate=0.0/s rss=489 MiB
+[182.1s] progress stage='ambient O(L) plane row' lifts=0 planes=0 rate=0.0/s rss=490 MiB
+[212.1s] progress stage='ambient O(L) plane row' lifts=0 planes=0 rate=0.0/s rss=490 MiB
+[242.1s] progress stage='ambient O(L) plane row' lifts=0 planes=0 rate=0.0/s rss=491 MiB
+[272.1s] progress stage='ambient O(L) plane row' lifts=0 planes=0 rate=0.0/s rss=497 MiB
+[302.1s] progress stage='ambient O(L) plane row' lifts=0 planes=0 rate=0.0/s rss=499 MiB
+[332.2s] progress stage='ambient O(L) plane row' lifts=0 planes=0 rate=0.0/s rss=500 MiB
+[362.2s] progress stage='ambient O(L) plane row' lifts=0 planes=0 rate=0.0/s rss=501 MiB
+[392.2s] progress stage='ambient O(L) plane row' lifts=0 planes=0 rate=0.0/s rss=503 MiB
+[422.2s] progress stage='ambient O(L) plane row' lifts=0 planes=0 rate=0.0/s rss=505 MiB
+[452.3s] progress stage='ambient O(L) plane row' lifts=0 planes=0 rate=0.0/s rss=509 MiB
+[482.3s] progress stage='ambient O(L) plane row' lifts=0 planes=0 rate=0.0/s rss=510 MiB
+[512.3s] progress stage='ambient O(L) plane row' lifts=0 planes=0 rate=0.0/s rss=510 MiB
+[521.9s] the row did not return inside its 520 s cap
+[521.9s] 
+[521.9s] === stage table ===
+[521.9s] stage                                                            calls     seconds    share  peak MiB
+[521.9s] ambient O(L) plane row                                               1       520.0   100.0%       511
+[521.9s] stable orthogonal group                                              1         1.9     0.4%       294
+[521.9s] lattice construction                                                 1         0.0     0.0%       nan
+[521.9s] plane admission (primitive_isotropic_subobject)                      1         0.0     0.0%       nan
+[521.9s] row assembly: deduplicate the returned planes                        2         0.0     0.0%       nan
+[521.9s] residual (row time not inside an accounted stage)                              0.0     0.0%
+[521.9s] 
+[521.9s] === the walk's own setup, by GAP primitive ===
+[521.9s]   the breadth-first walk itself (not proxied)                    0.000 s
+[521.9s]   walk setup, exclusive                                 0.000 s
+[521.9s] 
+[521.9s] walk started at None s, ended at None s
+[521.9s] (the first point's spelling is inside the walk setup, not in the per-lift list)
+[521.9s] cosets of the coset action (degree): 0
+[521.9s] lifts produced: 0, planes transported: 0
+[521.9s] 
+[521.9s] === per-call cost by quarter of the calls (is the cost growing?) ===
+[521.9s] lift rate over the sampled window (lifts/s):
+[521.9s]          2 s ->      131 s: 0 -> 0 lifts, 0.00/s
+[521.9s]        131 s ->      262 s: 0 -> 0 lifts, 0.00/s
+[521.9s]        262 s ->      393 s: 0 -> 0 lifts, 0.00/s
+[521.9s]        393 s ->      522 s: 0 -> 0 lifts, 0.00/s
+[521.9s] 
+[521.9s] the stabilizer shim answered 0 trivial-group questions
+[521.9s] row wall time: 520.0 s, decided: False
+[521.9s] peak VmRSS (python, sampled): 511 MiB, VmHWM now 511 MiB
+[521.9s]   peak in 'ambient O(L) plane row': 511 MiB
+[521.9s]   peak in 'stable orthogonal group': 294 MiB
+[521.9s] PROBE J DONE
+[peakrss] row531base: child waited=2 shell_code=2 samples=262
+[peakrss] peak tree RSS      : 521 MiB
+[peakrss] low-water MemAvail : 6758 MiB
+[peakrss] peak single VmHWM  : 521 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      510 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   504.7s procs=  3 rss=   521 MiB hwm=   521 MiB avail= 10938 MiB
+[peakrss]   t=   506.7s procs=  3 rss=   521 MiB hwm=   521 MiB avail= 11126 MiB
+[peakrss]   t=   508.7s procs=  3 rss=   521 MiB hwm=   521 MiB avail= 10910 MiB
+[peakrss]   t=   510.7s procs=  3 rss=   521 MiB hwm=   521 MiB avail= 11080 MiB
+[peakrss]   t=   512.7s procs=  3 rss=   521 MiB hwm=   521 MiB avail= 11037 MiB

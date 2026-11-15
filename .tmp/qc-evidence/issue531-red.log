@@ -1,0 +1,94 @@
+tree SHA: da0fa12c5bc49bd13a8d1d10efdcc1c7f7de1f45
+port SHA: 991b88b0
+inner 300 s, outer 360 s, guard 4096 MiB
+command: /sage/.venv/bin/python -u -s -m pytest -o addopts= -p qc_sage_session tests/sets/test_a_finite_ordered_set_hashes_by_its_points.sage -v
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0 -- /sage/.venv/bin/python
+cachedir: .pytest_cache
+hypothesis profile 'default'
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: asyncio-1.5.0, xdist-3.8.0, reportlog-1.0.0, platformdirs-4.13.5, hypothesis-6.170.15, anyio-4.15.1, timeout-2.4.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 3 items
+
+tests/sets/test_a_finite_ordered_set_hashes_by_its_points.sage::test_equal_finite_ordered_sets_hash_equally PASSED [ 33%]
+tests/sets/test_a_finite_ordered_set_hashes_by_its_points.sage::test_distinct_span_bases_of_one_rank_do_not_share_a_hash FAILED [ 66%]
+tests/sets/test_a_finite_ordered_set_hashes_by_its_points.sage::test_a_span_basis_finds_its_own_cache_entry_without_scanning_the_others FAILED [100%]
+
+=================================== FAILURES ===================================
+___________ test_distinct_span_bases_of_one_rank_do_not_share_a_hash ___________
+
+    def test_distinct_span_bases_of_one_rank_do_not_share_a_hash() -> None:
+        r"""Two hundred distinct rank-two span bases take two hundred distinct hashes.
+    
+        The sets are pairwise distinct as sets of vectors, which the test states by
+        their coordinates, so a hash that reads the points separates them: with
+        ``N = 200`` the number of colliding pairs a 64-bit hash is expected to
+        produce is ``N(N-1)/2 * 2^-64``, about ``1e-15``, and the assertion is that
+        the number of distinct values is ``N`` exactly.  A hash of the cardinality
+        alone gives one value, which is the defect of #531 and the reason one cache
+        lookup in #390's run compared every stored span basis in turn.
+        """
+        lattice = _small_lattice()
+        bases = _span_bases(lattice, _COUNT)
+        contents = {
+            tuple(_coordinates(point) for point in basis) for basis in bases
+        }
+        hashes = tuple(hash(basis) for basis in bases)
+        distinct_hashes = {value for value in hashes}
+    
+        assert cardinal(sum(1 for _ in bases)) == cardinal(_COUNT)
+        assert cardinal(sum(1 for _ in contents)) == cardinal(_COUNT)
+>       assert cardinal(sum(1 for _ in distinct_hashes)) == cardinal(_COUNT)
+E       assert 1 == 200
+E         
+E         Full diff:
+E         - 200
+E         + 1
+
+tests/sets/test_a_finite_ordered_set_hashes_by_its_points.sage:105: AssertionError
+___ test_a_span_basis_finds_its_own_cache_entry_without_scanning_the_others ____
+
+    def test_a_span_basis_finds_its_own_cache_entry_without_scanning_the_others() -> None:
+        r"""A set equal to one already built reaches its entry, and a new one does not.
+    
+        The dictionary a cache keeps is the consumer of the two tests above: two
+        equal finite ordered sets are one key, so a lookup reaches the stored entry,
+        and a distinct set is another key.  Written with the sets themselves as
+        keys, it is the statement #531 closes with -- the entry is found in constant
+        time, not by comparing the stored keys one by one.
+        """
+        lattice = _small_lattice()
+        bases = _span_bases(lattice, 32)
+        table = {}
+        for position, basis in enumerate(bases):
+            table[basis] = position
+        rebuilt = tuple(
+            FiniteOrderedSets()(tuple(basis)) for basis in bases
+        )
+    
+        assert cardinal(sum(1 for _ in table)) == cardinal(32)
+        assert all(table[basis] == position for position, basis in enumerate(rebuilt))
+>       assert hash(bases[0]) != hash(bases[1])
+E       assert 2 != 2
+E        +  where 2 = hash({e_0 + e_1, e_2 + e_3})
+E        +  and   2 = hash({e_0 + 2*e_1 + e_2, e_2 + 2*e_3 + e_4})
+
+tests/sets/test_a_finite_ordered_set_hashes_by_its_points.sage:129: AssertionError
+=========================== short test summary info ============================
+FAILED tests/sets/test_a_finite_ordered_set_hashes_by_its_points.sage::test_distinct_span_bases_of_one_rank_do_not_share_a_hash
+FAILED tests/sets/test_a_finite_ordered_set_hashes_by_its_points.sage::test_a_span_basis_finds_its_own_cache_entry_without_scanning_the_others
+========================= 2 failed, 1 passed in 5.11s ==========================
+[peakrss] red531c: child waited=1 shell_code=1 samples=4
+[peakrss] peak tree RSS      : 330 MiB
+[peakrss] low-water MemAvail : 11552 MiB
+[peakrss] peak single VmHWM  : 330 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      319 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     6.0s procs=  3 rss=   330 MiB hwm=   330 MiB avail= 11552 MiB
+[peakrss]   t=     4.0s procs=  3 rss=   326 MiB hwm=   326 MiB avail= 11623 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   305 MiB hwm=   305 MiB avail= 11623 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     2 MiB hwm=     2 MiB avail= 11843 MiB

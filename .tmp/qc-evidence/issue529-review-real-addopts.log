@@ -1,0 +1,34 @@
+checkout SHA: 450a781380ab388904f40d76b86144a6967d7a29
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+inner 540 s, outer 600 s, guard 6144 MiB
+pytest: -p qc_sage_session -q tests/engineering/test_the_timing_record_names_each_stage.py
+....                                                                     [100%]
+-------------- generated report log file: tests/.report/run.jsonl --------------
+============================== slowest durations ===============================
+1.78s call     tests/engineering/test_the_timing_record_names_each_stage.py::test_a_run_keeps_the_files_its_own_options_name
+1.37s call     tests/engineering/test_the_timing_record_names_each_stage.py::test_a_debug_record_of_a_child_logger_reaches_the_run_log
+1.08s call     tests/engineering/test_the_timing_record_names_each_stage.py::test_a_stage_timed_call_writes_its_stage_records_in_order_with_their_durations
+0.36s call     tests/engineering/test_the_timing_record_names_each_stage.py::test_the_vinberg_walk_runs_once_however_its_callers_spell_the_default_keyword
+0.01s setup    tests/engineering/test_the_timing_record_names_each_stage.py::test_a_debug_record_of_a_child_logger_reaches_the_run_log
+0.00s setup    tests/engineering/test_the_timing_record_names_each_stage.py::test_a_stage_timed_call_writes_its_stage_records_in_order_with_their_durations
+0.00s setup    tests/engineering/test_the_timing_record_names_each_stage.py::test_a_run_keeps_the_files_its_own_options_name
+0.00s setup    tests/engineering/test_the_timing_record_names_each_stage.py::test_the_vinberg_walk_runs_once_however_its_callers_spell_the_default_keyword
+0.00s teardown tests/engineering/test_the_timing_record_names_each_stage.py::test_a_run_keeps_the_files_its_own_options_name
+0.00s teardown tests/engineering/test_the_timing_record_names_each_stage.py::test_the_vinberg_walk_runs_once_however_its_callers_spell_the_default_keyword
+0.00s teardown tests/engineering/test_the_timing_record_names_each_stage.py::test_a_stage_timed_call_writes_its_stage_records_in_order_with_their_durations
+0.00s teardown tests/engineering/test_the_timing_record_names_each_stage.py::test_a_debug_record_of_a_child_logger_reaches_the_run_log
+4 passed in 5.02s
+[peakrss] tim529: child waited=0 shell_code=0 samples=5
+[peakrss] peak tree RSS      : 584 MiB
+[peakrss] low-water MemAvail : 12585 MiB
+[peakrss] peak single VmHWM  : 584 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      457 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     8.0s procs=  4 rss=   584 MiB hwm=   584 MiB avail= 12585 MiB
+[peakrss]   t=     6.0s procs=  4 rss=   577 MiB hwm=   577 MiB avail= 12615 MiB
+[peakrss]   t=     4.0s procs=  3 rss=   317 MiB hwm=   317 MiB avail= 12742 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   138 MiB hwm=   138 MiB avail= 12910 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     0 MiB hwm=     0 MiB avail= 13043 MiB
+launcher exit: 0

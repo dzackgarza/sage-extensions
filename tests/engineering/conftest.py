@@ -12,17 +12,18 @@ the exit status, the outcome of each test the run reported, the failure
 messages, and the run's own output.
 
 The timing record has the same shape of question — does a stage-timed call leave
-records, and does a run keep its own report log — so ``stage_records_of`` reads
-one call's records back out of the record file and ``archived_test_run`` reports
-the kinds of file a probe run kept.  Both are bound as builtins for the same
-reason: the lint admits exactly the names a directory's ``conftest.py`` binds.
+records, does a cached call run its stage once, and does a run keep its own
+report log — so ``stage_records_of`` reads one call's records back out of the
+record file, ``kept_test_run`` reports the files a probe run kept, and
+``probe_run`` reports the log a run's own logging configuration filled.  All are
+bound as builtins for the same reason: the lint admits exactly the names a
+directory's ``conftest.py`` binds.
 """
 
 from __future__ import annotations
 
 import builtins
 import json
-import os
 import shutil
 import subprocess
 import sys
@@ -32,7 +33,8 @@ from pathlib import Path
 
 from sage_extensions import timing as sage_timing
 
-PROBE_ROOT = Path(__file__).resolve().parents[2] / ".tmp" / "plugin-probes"
+SOURCE_TREE = Path(__file__).resolve().parents[2]
+PROBE_ROOT = SOURCE_TREE / ".tmp" / "plugin-probes"
 
 
 @dataclass(frozen=True)
@@ -42,13 +44,17 @@ class ProbeRun:
     ``outcomes`` maps each node id the run reported to ``passed`` or
     ``failed``; ``messages`` holds the failure messages, so a test can ask
     which file a finding was reported against; ``transcript`` is the run's own
-    output, where a plugin writes a measurement that fails no test.
+    output, where a plugin writes a measurement that fails no test; ``log`` is
+    the file the probe's own configuration names with ``log_file``, which is
+    where a library's own logging configuration decides whether a record
+    arrives.
     """
 
     exit_status: int
     outcomes: dict[str, str]
     messages: tuple[str, ...]
     transcript: str
+    log: str
 
 
 def probe_run(tree: dict[str, str], *arguments: str) -> ProbeRun:
@@ -58,12 +64,15 @@ def probe_run(tree: dict[str, str], *arguments: str) -> ProbeRun:
     pytest's own, the plugin under test among them.  The probe directory
     carries its own ``pytest.ini``, so the repository's ``addopts`` do not
     reach the run: each plugin is loaded only when a test asks for it, and
-    nothing written there is linted or gated by the outer run.
+    nothing written there is linted or gated by the outer run.  That
+    configuration names the run's log ``pytest.log``, so every probe writes the
+    file :attr:`ProbeRun.log` reads and a run that writes none is an error
+    rather than an empty string.
     """
     PROBE_ROOT.mkdir(parents=True, exist_ok=True)
     root = Path(tempfile.mkdtemp(prefix="probe-", dir=PROBE_ROOT))
     try:
-        (root / "pytest.ini").write_text("[pytest]\n")
+        (root / "pytest.ini").write_text("[pytest]\nlog_file = pytest.log\n")
         for name, source in tree.items():
             (root / name).write_text(source)
         report = root / "report.jsonl"
@@ -82,6 +91,7 @@ def probe_run(tree: dict[str, str], *arguments: str) -> ProbeRun:
         records = [
             json.loads(line) for line in report.read_text().splitlines() if line.strip()
         ]
+        written = root / "pytest.log"
         return ProbeRun(
             exit_status=completed.returncode,
             outcomes=_outcomes(records),
@@ -89,6 +99,7 @@ def probe_run(tree: dict[str, str], *arguments: str) -> ProbeRun:
                 message for message in map(_failure_message, records) if message
             ),
             transcript=completed.stdout + completed.stderr,
+            log=written.read_text(),
         )
     finally:
         shutil.rmtree(root)
@@ -126,68 +137,109 @@ def pytest_configure(config) -> None:
     """
     builtins.probe_run = probe_run
     builtins.stage_records_of = stage_records_of
-    builtins.archived_test_run = archived_test_run
+    builtins.kept_test_run = kept_test_run
 
 
 def pytest_unconfigure(config) -> None:
     r"""Remove the session's abbreviation, leaving ``builtins`` as it was found."""
     del builtins.probe_run
     del builtins.stage_records_of
-    del builtins.archived_test_run
+    del builtins.kept_test_run
 
 
-def stage_records_of(invoke):
-    r"""The stage records one call appends, read back from this process's own file.
+@dataclass(frozen=True)
+class RecordFile:
+    r"""One file the timing record wrote, as its own name and its own lines say.
 
-    ``invoke`` is the call — a stage-timed call of the library — and the records
-    are read from ``sage_extensions.timing.record_path()`` after it, from the
-    byte offset that file had before, so a test reads the records of its own
-    call rather than of any earlier call in the same process.  Reading the file
-    is the point: the record is what a timing question is answered from, so a
-    test that held the durations in memory would prove nothing about it.
+    ``kind``, ``commit`` and ``stamp`` are the three parts of the file's name,
+    ``<kind>-<commit>-<stamp>.<suffix>``; ``head`` is the commit of this
+    checkout read from git by the test side, so a test can ask whether the
+    record names the commit it came from without asking the library that wrote
+    it; ``records`` are the JSONL lines the call under test appended, empty for
+    a file that carries no lines of its own.
     """
-    path = sage_timing.record_path()
-    before = path.stat().st_size if path is not None and path.is_file() else 0
+
+    name: str
+    kind: str
+    suffix: str
+    commit: str
+    stamp: str
+    head: str
+    records: tuple[dict, ...]
+
+
+def _head_commit() -> str:
+    r"""The commit of this checkout, read by git here and not by the library."""
+    completed = subprocess.run(
+        ("git", "-C", str(SOURCE_TREE), "rev-parse", "HEAD"),
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    return completed.stdout.strip()
+
+
+def _sizes(directory: Path) -> dict[str, int]:
+    r"""Each file of ``directory`` and how many bytes it holds."""
+    return {
+        entry.name: entry.stat().st_size for entry in directory.iterdir() if entry.is_file()
+    }
+
+
+def _record_file(path: Path, *, after: int = 0) -> RecordFile:
+    r"""The file at ``path``, read by its name and by the lines past ``after``."""
+    stem, _, suffix = path.name.partition(".")
+    kind, commit, stamp = stem.split("-")
+    return RecordFile(
+        name=path.name,
+        kind=kind,
+        suffix=suffix,
+        commit=commit,
+        stamp=stamp,
+        head=_head_commit(),
+        records=sage_timing.read_stage_records(path, after=after) if suffix == "jsonl" else (),
+    )
+
+
+def stage_records_of(invoke) -> RecordFile:
+    r"""The record file one stage-timed call appended to, read back from disk.
+
+    ``invoke`` is the call.  The file is found by what the directory held before
+    and after — the one file that grew — and not through the writer's own
+    :func:`sage_extensions.timing.record_path`, so a name the writer got wrong
+    is a name this reads and a test can refuse; and ``records`` are the lines
+    that call appended, not those of an earlier call in the same process.
+    """
+    directory = sage_timing.timing_directory()
+    before = _sizes(directory)
     invoke()
-    return sage_timing.read_stage_records(path, after=before)
+    grown = sorted(
+        name for name, size in _sizes(directory).items() if size > before.get(name, 0)
+    )
+    assert len(grown) == 1, (
+        f"one stage-timed call should append to one record file, but these grew: {grown}"
+    )
+    return _record_file(directory / grown[0], after=before.get(grown[0], 0))
 
 
-def archived_test_run(tree, *arguments):
-    r"""Run pytest over ``tree`` under the timing plugin and report what it kept.
+def kept_test_run(tree, *arguments) -> tuple[RecordFile, ...]:
+    r"""Run a probe pytest under the timing plugin and report the files it kept.
 
-    The run keeps its report log and JUnit file per run
-    (``sage_extensions.testing.timing_record``), so this starts a run whose
-    record directory is a fresh one and reports the *kinds* of file it left
-    there: ``("junit", "run")` for a run that wrote both.  The directory is the
-    plugin's own setting (``SAGE_EXTENSIONS_TIMING_DIR``), so the run under test
-    writes beside the real record directory, never into it, and the probe tree
-    carries its own ``pytest.ini`` so the repository's ``addopts`` — which want
-    a host's ``pytest-reportlog`` — do not reach it.
+    The plugin keeps a run's report log and JUnit file where every run keeps
+    them, so this asks what appeared in the record directory while the probe
+    ran.  The probe tree, its isolated ``pytest.ini`` and the report log the run
+    wrote are ``probe_run``'s — this adds the plugin and the JUnit file's own
+    option to the run and reads the directory, rather than starting a second
+    pytest of its own.
     """
-    PROBE_ROOT.mkdir(parents=True, exist_ok=True)
-    root = Path(tempfile.mkdtemp(prefix="timing-", dir=PROBE_ROOT))
-    kept = Path(tempfile.mkdtemp(prefix="record-", dir=PROBE_ROOT))
-    try:
-        (root / "pytest.ini").write_text("[pytest]\n")
-        for name, source in tree.items():
-            written = root / name
-            written.parent.mkdir(parents=True, exist_ok=True)
-            written.write_text(source)
-        environment = dict(os.environ, SAGE_EXTENSIONS_TIMING_DIR=str(kept))
-        subprocess.run(
-            [
-                sys.executable, "-m", "pytest",
-                "-c", str(root / "pytest.ini"),
-                "-p", "sage_extensions.testing.timing_record",
-                *arguments,
-                str(root),
-            ],
-            cwd=root,
-            capture_output=True,
-            text=True,
-            env=environment,
-        )
-        return tuple(sorted(entry.stem.split("-")[0] for entry in kept.iterdir()))
-    finally:
-        shutil.rmtree(root)
-        shutil.rmtree(kept)
+    directory = sage_timing.timing_directory()
+    before = set(_sizes(directory))
+    probe_run(
+        tree,
+        "-p", "sage_extensions.testing.timing_record",
+        "--junit-xml=junit.xml",
+        *arguments,
+    )
+    return tuple(
+        _record_file(directory / name) for name in sorted(set(_sizes(directory)) - before)
+    )

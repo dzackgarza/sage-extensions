@@ -366,12 +366,12 @@ class IndexedFamily[IndexT, ValueT]:
 
         if self.cardinality().is_finite() is not True or self.index_set() not in EnumeratedSets():
             return object.__hash__(self)
-        # Neither indices nor values are required to be hashable.  In
-        # particular, distinct representations of equal points may differ in
-        # hashability, so branching on the ability to hash a value would
-        # violate the implication f == g => hash(f) == hash(g).  The index
-        # set is a necessary equality invariant; collisions between different
-        # value assignments are permitted by the hash contract.
+        # The values are never read: distinct representations of equal values
+        # may differ in hashability, so branching on their ability to hash
+        # would violate the implication f == g => hash(f) == hash(g).  The
+        # index set is the necessary equality invariant, and its own hash reads
+        # its points, so a family over an index set carrying a point that
+        # refuses a hash is unhashable, as that set is.
         return hash(self.index_set())
 
     def _repr_(self):

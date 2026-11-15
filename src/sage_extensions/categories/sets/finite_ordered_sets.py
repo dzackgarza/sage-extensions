@@ -611,8 +611,13 @@ class FiniteOrderedSets(OwnedCategory):
             return negation(self == other)
 
         def __hash__(self) -> int:
-            # Do not hash members: group/lattice elements may normalize expensively.
-            return hash(int(self.cardinality()))
+            r"""Return the hash of the tuple of the points, which is what :meth:`__eq__` compares.
+
+            A set carrying a point that refuses a hash is unhashable, as the
+            tuple of those points is, rather than a key weaker than the
+            equality it stands for.
+            """
+            return hash(tuple(self))
 
         def _repr_(self) -> str:
             return "{" + ", ".join(repr(element) for element in self) + "}"

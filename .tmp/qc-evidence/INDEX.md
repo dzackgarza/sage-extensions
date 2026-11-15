@@ -1629,6 +1629,106 @@ library code, each printing the objects and the answering class it is cited for.
 | `530-merged-sweep-compared.log` | `97f9467` against `5d408ca` | `tests/modules tests/rings tests/forms tests/categories` on the merged tree and on the merge's own base, same test files: FAILED/ERROR ids identical except this change's new test assertion; 193 failed, 395 passed, 318 errors in 99.18 s against 194, 394, 318 in 105.20 s. The ~100 s pair also shows the earlier 256.71 s as a VM outlier |
 | `530-merged-sweep-new-ids.log`, `530-merged-sweep-base-ids.log` | the same two runs | the sorted ids those two runs produced, extracted from their output |
 
+## #529 — the reviewer's two regressions, and the repairs around them
+
+`450a781` is the red commit: `tests/engineering/test_the_timing_record_names_each_stage.py` holds a test of the
+stage wrapper under `cached_method` and a test of the package logger, and neither passes there. The repairs are the
+commit after it: the stage moved into the bodies of `_vinberg_search` and `parabolic_completeness_decision`, the
+timing logger made a child (`sage_extensions.timing`) that leaves `sage_extensions` alone, `current_commit`/`timing_directory`
+asserted instead of falling back, the handler's write unwrapped, the plugin reading `config.option.report_log` and
+`config.option.xmlpath`, and the dead paths deleted. Every run below is in the pinned image with the indefinite port
+at `/work` and the checkout at `/repos/sage-extensions`.
+
+| log | tree | result |
+| --- | --- | --- |
+| `issue529-review-red.log` | `450a781` | `${ARGS}` = `-p qc_sage_session -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates -q tests/engineering/`: **4 failed, 7 passed in 86.41 s** — `('Vinberg walk', 'Vinberg walk') == ('Vinberg walk',)`, `'a debug record' in ''`, and the two `test_polyhedral_engine_routes.sage` Julia/Hecke rows that fail at `5d408ca` too |
+| `issue529-review-green.log` | this commit | the four tests of the file: **4 passed in 6.25 s** |
+| `issue529-review-neighbours.log` | this commit | `tests/engineering/` plus the Vinberg-facet and setwise-stabilizer files, `--no-time-gates` with `test_lint` loaded: **2 failed, 17 passed in 94.08 s**, the two failures the same Julia/Hecke rows — the reindented bodies and the dropped nested stage moved no result |
+| `issue529-review-real-addopts.log` | this commit | the test file under the repository's real addopts: **4 passed in 5.02 s**, and `.timings/` held `run-450a781380ab-20261115T073451Z.jsonl` and `junit-450a781380ab-20261115T073451Z.xml` — the names the addopts' own options give, read from those options |
+| `issue529-review-logger-before.log` | `450a781` | the logger probe on the red commit: `pytest.log` holds `DEBUG probe.other` and nothing for `sage_extensions.categories.probe`; `logging.getLogger("sage_extensions")` reads `level 20 propagate False` |
+| `issue529-review-logger-probe.log` | this commit | the same probe after the repair: `pytest.log` holds both `DEBUG sage_extensions.categories.probe` and `DEBUG probe.other`; the package logger reads `level 0 propagate True`, and `sage_extensions.timing` is the one at `20` |
+
+The two workflow steps of ENV-03 are on `main` as `34b52a8`; the `if-no-files-found: error` that make a run without
+a record fail its job are `results/issue529-upload-error.patch`, `git apply --check` clean against this tree, because
+the connection's GitHub App may not update a file under `.github/workflows/`.
+## #531: a finite ordered set hashes the points its equality compares
+
+`FiniteOrderedSets.ParentMethods.__hash__` (`src/sage_extensions/categories/sets/finite_ordered_sets.py`) hashed
+`hash(int(self.cardinality()))` while `__eq__` compares the cardinality and then the points in order, so every set
+of one size was one dictionary key's bucket: #390's cache of `_lattice_subobject_spanning`, keyed by the span basis,
+reached 1197 entries on 5 hash values and one lookup compared 5415 stored keys of 51 us each. The repair hashes the
+ordered points with their own hashes (falling back to the cardinality only for a set carrying a point that refuses
+a hash), which is the data equality reads and keeps Python's contract, "objects which compare equal have the same
+hash value". The new file `tests/sets/test_a_finite_ordered_set_hashes_by_its_points.sage` states it: equal sets
+hash equally, 200 distinct rank-two span bases on `U + U + <-2>` take 200 distinct hashes, and a dictionary keyed by
+those sets reaches each entry without scanning the others.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `issue531-red.log` | `da0fa12` (the red test alone) | the new file: **2 failed, 1 passed in 5.11 s**; `test_distinct_span_bases_of_one_rank_do_not_share_a_hash` fails `assert 1 == 200`, `test_a_span_basis_finds_its_own_cache_entry_without_scanning_the_others` fails `assert 2 != 2` |
+| `issue531-lint-red.log` | the same tree | `test_lint` on the new file: **1 files, 0 findings** |
+| `issue531-green.log` | the repair | the new file, now four tests: **4 passed in 7.06 s** |
+| `issue531-hash-cost-before.log` | `da0fa12` | one hash of a lattice vector 3.2 us, of a rank-2 span basis 5.2 us, `__eq__` of two equal rank-2 span bases 61.9 us; 200 distinct span bases took **1 distinct hash value** |
+| `issue531-point-hash.log` | `da0fa12` | two equal vectors built separately hash equally (-4024491175064079283 twice); a fifteen-point set 5.2 us to hash against 344.4 us to compare; an isometry is hashable |
+| `issue531-sets-slice.log` | the repair | `tests/sets`, one pytest process: **29 failed, 131 passed in 21.00 s** |
+| `issue531-sets-slice-base.log` | `da0fa12` (a clean worktree) | the same: **29 failed, 127 passed in 27.28 s**; the 29 FAILED ids are identical to the row above, so the 4 extra passes are the new file and nothing regressed |
+
+The probes behind the two measurement rows are session probes and stay out of the tree: `issue531-hash-cost.py`
+times a hash and counts distinct hash values over 200 span bases, `issue531-point-hash.py` hashes equal vectors
+built two ways, and `issue531-subobject-scan-after.py` is #390's probe S with the hash of a finite ordered set
+censused by caller and cardinality.
+
+### #531: the rerun of #390's reproduction, and the T_Co row
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `issue531-subobject-scan-after.log` | the repair (`0066795`) | #390's probe S unchanged in its workload — 600 transports on `U + U + <-2>`, windows of 100 — with the hash censused: **600 transports in 32.0 s, mean 53.34 ms** (the record on `cef9c5d` is 104.7 s, mean 174.43 ms); `_lattice_subobject_spanning` cache **1187 entries on 1187 distinct hash values** (the record: 1197 on 5); the equality comparisons `subobject_on` makes are **1.0 per call in every window** (the record: 525.3 rising to 5415.4); process time per transport **14.89 ms in the first window against 12.16 ms in the last, ratio 0.82** — flat in the number of subobjects built, where the wall clock of this host (load 9) moves 35.15 to 22.46 ms with no trend |
+| `issue531-hash-census-row.log`, `issue531-hash-census-row-large.log` | the repair | who hashes a finite ordered set inside the ambient `O(L)` plane row of `T_Co`: 1040 hashes of sets of at most 129 points in the first 150 s, then **one hash of a lazily enumerated 131072-point image set (points `_GeneralPresentedElement`), 20.6 s**, asked from `set_categories.py:1504 _finite_product` — its interning key is an index set this large. That is the one cost the repair adds (it was `O(1)` before) and it is the interning site's, not the hash's: no other consumer in this row hashes a set of more than 512 points |
+| `issue531-tco-row.log` | the repair | the `Otilde(T_Co)` plane row capped at 520 s (probe J, `cap=520`, inner 560 s): **0 lifts, 0 planes transported; the whole cap inside the ambient `O(L)` plane row** (519.9 s of 520.0 s), so the transport's per-plane time is not reached |
+| `issue531-tco-row-base.log` | `da0fa12` (a clean worktree) | the same probe and cap on the tree before the change: **also 0 lifts, 520.0 s in the same stage** — the row's setup, not this hash, is what keeps the transport from starting. The record's 138.5 s for that stage belongs to `484e4c52`; main has moved since. Against the record's **637 ms per plane** the transport therefore cannot be timed from the row on this tree |
+| `issue531-lint.log` | the repair | `test_lint` on the new file: **1 files, 0 findings** |
+
+The probes behind these rows are session probes and stay out of the tree: `issue531-subobject-scan-after.py` is #390's
+probe S with the hash of a finite ordered set censused by caller and cardinality (and the process time of each
+transport recorded beside its wall time); `issue531-hash-census-row.py` runs the ambient `O(L)` plane row of `T_Co`
+under that census and prints it while the row runs, so a cap leaves the table behind.
+
+### #531: the fallback removed, and what reads the hash
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `issue531b-repro.log` | `63797cf6f0` (main, before the change) | the defect the review names, reproduced: a mutable `vector([1, 2])` is unhashable and equals its immutable copy, `FOS((mutable)) == FOS((immutable))` is **True**, and the two hashes are **5300508251815892961** and **-2700102052487898497**; the same for a mutable and an immutable `identity_matrix(2)` (**5300508251815892961** against **8810013589662299418**) |
+| `issue531b-red.log` | `63797cf6f0` (the red test alone) | the new test: **1 failed, 4 passed in 3.55 s**; `test_a_set_with_an_unhashable_point_is_unhashable` fails `DID NOT RAISE TypeError` on `hash` of the set holding the mutable point |
+| `issue531b-formed-broken.log` | the FOS repair alone, before the quotient hash | what the strict hash exposes: `tests/categories/test_formed_vector_space_placement.sage` **1 failed in 2.42 s** — `A2` over `F_3`'s `radical()` raises, the span basis over `ZZ/(3)` cannot key `_lattice_subobject_spanning` |
+| `issue531b-formed.log` | the tree of this push | the same file: **1 passed in 1.81 s** — the quotient class hashes, so the sparse vector, the span basis and the cache key do |
+| `issue531b-census.log` | the tree of this push | who hashes a finite ordered set, counted: **127 hashes from three callers** — `lattices.py:3976 subobject_on` 104, `set_categories.py:1504 _finite_product` 21, `modules.py:816 tensor_product` 2 — over `A2 (x) F_3`'s radical, 400 `subobject_on` calls on `U + U + <-2>` and one product; **4 refusals, all at `subobject_on`**, on a one-point span basis of a `_SparseFreeModuleElement` over `ZZ/(3)` |
+| `issue531b-green.log` | the tree of this push | the two new test files: **7 passed in 2.70 s** |
+| `issue531b-sets-slice.log`, `issue531b-sets-slice-base.log` | the tree of this push; `63797cf6f0` (a clean worktree) | `tests/sets`: **29 failed, 132 passed in 8.97 s** against **29 failed, 131 passed in 8.46 s**; the FAILED id sets are identical, so the extra pass is the new file |
+| `issue531b-neighbours.log`, `issue531b-neighbours-base.log` | the same two trees | `tests/categories tests/objects`: **174 failed, 272 passed in 55.75 s** against **176 failed, 270 passed in 50.71 s**; **no FAILED id is the changed tree's alone**, and the two that are the clean worktree's alone pass here, so they are this host's flakes |
+| `issue531b-rings.log`, `issue531b-rings-base.log` | the same two trees | `tests/rings`: **74 failed, 260 passed in 46.51 s** against **74 failed, 260 passed in 55.63 s**, the same FAILED ids |
+| `issue531b-lint.log` | the tree of this push | `test_lint` on the three touched test files: **3 files, 138 findings**, all 138 in `test_products_and_coproducts_of_finite_and_countable_sets.sage` and in the codes it already carried (TL01, TL02, TL03, TL04, TL08, TL09, TL10); the two new files carry none |
+
+The probes behind the census and the reproduction stay out of the tree: the reproduction builds the mutable and immutable Sage point pairs; the census wraps
+`FiniteOrderedSets.ParentMethods.__hash__`, records the calling frame's file, line and function, and re-raises so a refusal is counted where it happens.
+## #529, third review — one record per run, an input named without rendering it, and the workflow's record
+
+The reviewer's findings on `63797cf`, and what each one measured. `${ARGS}` is
+`-p qc_sage_session -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates -q`.
+
+| log | tree | result |
+| --- | --- | --- |
+| `issue529-engineering-red.log` | `63797cf`'s `timing_record.py` and `_named` | `${ARGS} tests/engineering/test_the_timing_record_names_each_stage.py`: **2 failed, 3 passed in 5.28 s** — the `-n 2` run kept `('report',)` against the one `('junit', 'report')` a run writes: a worker's copy of the controller's report log, and no JUnit file at that moment; and the four stage records carried `Integral lattice of rank 5 and signature (2, 3)`, the signature being the diagonalization the record was paying for |
+| `issue529-engineering-tests.log` | `5e15399` | the same command: **5 passed in 5.26 s**, with `test_lint` loaded and the session's run, so the in-session lint reports nothing |
+| `issue529-engineering-all.log` | `5e15399` | `${ARGS} tests/engineering/`: **2 failed, 11 passed in 33.44 s**; both failures are `test_polyhedral_engine_routes.sage`'s `u.basis()` rows |
+| `issue529-base-polyhedral.log` | clean worktree `63797cf` | `test_polyhedral_engine_routes.sage` alone: **2 failed in 1.16 s**, the same two ids, `AttributeError: ... has no attribute 'basis'` — pre-existing, not this change's |
+| `issue529-readme-record.log` | `5e15399` | the command `results/issue529-readme-record.patch` installs, `pytest --doctest-glob=README.md README.md`: **1 passed in 0.39 s**, `time gates on: star import 0.32 s (ceiling 3 s)`, and `.timings/` afterwards holds `junit-5e15399a8bae-20261115T081817Z.xml` and `run-5e15399a8bae-20261115T081817Z.jsonl` — the two files the upload step names |
+| `issue529-lint-base.log` | `63797cf` | `python -m sage_extensions.testing.test_lint tests/engineering/test_the_timing_record_names_each_stage.py`: **4 findings, all TL13** for the names `tests/engineering/conftest.py` binds in `pytest_configure` — the standalone entry point does not run that hook, so this directory is not lintable through it; at `5e15399` the same command reports the same four plus one for the new test's `kept_test_run`, and the applicable check is the in-session lint the row above carries |
+
+The workflow change is `results/issue529-readme-record.patch`, not history: the connection's GitHub App may not
+update a file under `.github/workflows/`. `git apply --check` passes against `63797cf`, and the command the patch
+installs is the one `issue529-readme-record.log` runs. ENV-03's sentence that named `results/issue529-upload-error.patch`
+as the thing to install with `git apply` was stale — the change landed as `c68730d47` — and that file is deleted in
+this commit.
 ## #500 and #530, sixth round (added 2026-11-15)
 
 | log | commit cited | result |

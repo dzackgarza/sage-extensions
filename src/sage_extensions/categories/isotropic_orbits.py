@@ -2074,9 +2074,7 @@ class _DividedClassPlaneOrbitDecomposition:
         an unknown double-coset count in either direction.
         """
         plane = _primitive_isotropic_plane_of(self._lattice, self._starts[position][0])
-        with stage("parabolic completeness", plane):
-            complete = plane.is_parabolic_complete()
-        if complete is not True:
+        if plane.is_parabolic_complete() is not True:
             raise ValueError(
                 f"the stabilizer of {plane} in O({self._lattice}) is not established: the generators "
                 f"of the plane's parabolic are not established to be the whole setwise stabilizer, and "

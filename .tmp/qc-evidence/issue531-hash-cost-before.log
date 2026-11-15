@@ -1,0 +1,27 @@
+tree SHA: da0fa12c5bc49bd13a8d1d10efdcc1c7f7de1f45
+port SHA: 991b88b0
+inner 300 s, outer 360 s, guard 4096 MiB
+command: /sage/.venv/bin/python -u -s /probe.py
+[0.04s] lattice Integral lattice of rank 5 and signature (2, 3), rank 5
+[0.04s] labels (0, 1, 2, 3, 4)
+[0.04s] hash of a lattice vector: 3.2 us
+[0.05s] basis type sage_extensions.categories.sets.finite_ordered_sets.FiniteOrderedSets.parent_class, cardinality 2
+[0.05s] two equal span bases: equal? True, hashes 2 and 2
+[0.05s] hash of a rank-2 span basis: 5.2 us
+[0.11s] __eq__ of two equal rank-2 span bases: 61.9 us
+[0.49s] built 200 span bases, cardinalities [2]
+[0.49s] distinct hash values: 1
+[0.51s] distinct bases among them: 400
+[1.50s] equal pairs among the 200 bases: 0
+[1.51s] one span from two generating families: equal? True, hashes 2 and 2
+[peakrss] probe531cost: child waited=0 shell_code=0 samples=2
+[peakrss] peak tree RSS      : 284 MiB
+[peakrss] low-water MemAvail : 12507 MiB
+[peakrss] peak single VmHWM  : 284 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      273 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     2.0s procs=  3 rss=   284 MiB hwm=   284 MiB avail= 12507 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     0 MiB hwm=     0 MiB avail= 12563 MiB
+launcher exit: 0
