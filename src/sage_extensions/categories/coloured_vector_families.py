@@ -107,11 +107,18 @@ class _LabelledPairingGraph:
     def _size(self):
         return int(self._positions.cardinality())
 
+    @cached_method
+    def _rankings(self):
+        r"""The positions in ranking order and their ranks, read once from the ranking map."""
+        unranking = self._positions.ranking_map().inverse()
+        positions = tuple(unranking(vertex) for vertex in range(self._size()))
+        return positions, {position: vertex for vertex, position in enumerate(positions)}
+
     def _vertex(self, position):
-        return int(self._positions.ranking_map()(position))
+        return self._rankings()[1][position]
 
     def _position(self, vertex):
-        return self._positions.ranking_map().inverse()(int(vertex))
+        return self._rankings()[0][int(vertex)]
 
     @cached_method
     def _pairings(self):

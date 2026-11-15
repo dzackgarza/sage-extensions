@@ -838,12 +838,19 @@ class IntegralStructureAction(SageObject):
         def generators(key):
             return quotient._submodule_generator_images_from_key(key)
 
+        # The orbit search applies the same few letter images at every
+        # point; each letter's residue automorphism is built once.
+        residue_maps = {}
+
         def action(element, key):
             images = generators(key)
             if not images:
                 return key
-            automorphism = self.quotient_automorphism(element)
-            return quotient._submodule_image_key(automorphism.forward(), images)
+            retained = residue_maps.get(id(element))
+            if retained is None:
+                retained = (element, self.quotient_automorphism(element).forward())
+                residue_maps[id(element)] = retained
+            return quotient._submodule_image_key(retained[1], images)
 
         witness = FiniteGSets(rational_group).transporter_from_finite_orbit(source_key, target_key, action)
         if witness is None:
