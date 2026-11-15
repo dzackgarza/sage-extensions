@@ -1,0 +1,19 @@
+tree SHA: aa136df5c82bab1084bf265d783ef03569cbc61c (detached worktree of refs/remotes/omm/main)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+probe: .tmp/qc-evidence/issue528-coordinate-read.py
+command: /workspace/nucleus/work/home/sage-image/run.sh -w /work -- /sage/.venv/bin/python -u -s /probe.py
+inner 570 s, outer 598 s, peakrss guard 6144 MiB
+[  0.03s] lattice Integral lattice of rank 11 and signature (2, 9), rank 11
+[  0.03s] one to_vector of the dense vector: 0.000 ms
+[  0.03s] one to_vector of the two-term vector: 0.000 ms
+[  0.12s] one cold span basis, 2.0 to_vector a call: 2.319 ms
+[  0.19s] one cold span basis with the coordinates retained: 1.816 ms
+[  0.19s] RESULT dense_to_vector_ms=.. span_ms=2.319 span_reads=2.0 cached_span_ms=1.816 cached_span_reads=2.0 ratio=1.28
+[peakrss] probe528reads: child waited=0 shell_code=0 samples=1
+[peakrss] peak tree RSS      : 1 MiB
+[peakrss] low-water MemAvail : 13608 MiB
+[peakrss] peak single VmHWM  : 1 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   timeout                       1 MiB peak
+[peakrss]   t=     0.0s procs=  1 rss=     1 MiB hwm=     1 MiB avail= 13608 MiB
+launcher exit: 0

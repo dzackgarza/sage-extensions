@@ -1,0 +1,265 @@
+tree SHA: fed237beab614867dcbec17b4a5eae9c56b20320 (detached worktree of refs/remotes/omm/main)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+probe: .tmp/qc-evidence/issue528-otilde-stage-slice.py
+command: /workspace/nucleus/work/home/sage-image/run.sh -w /work -- /sage/.venv/bin/python -u -s /probe.py cap=540
+inner 570 s, outer 598 s, peakrss guard 6144 MiB
+[    0.0s] shadowed to_vector at: framed_free_modules.FramedFreeModules.ElementMethods
+[    0.0s] counted: transport, register, registry_scan, lift_lookup, certified_parabolic, same_subobject
+[    1.5s] lattice Integral lattice of rank 11 and signature (2, 9); subgroup {g in Orthogonal group O(Integral lattice of rank 11 and signature (2, 9)) : rho_L(g) lies in Subgroup of Orthogonal group of Finitely presented module on 11 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 2, 1 ↦ 2, 2 ↦ 2, 3 ↦ 2, 4 ↦ 2, 5 ↦ 2, 6 ↦ 2, 7 ↦ 2, 8 ↦ 2, 9 ↦ 2, 10 ↦ 2]}
+[   10.1s]   window   21896 to_vector over  10.0 s
+[   10.1s]      site    5723  modules.py:7148:_matrix_column_coordinates
+[   10.1s]      site    4950  coloured_vector_families.py:594:<genexpr>
+[   10.1s]      site    3872  eichler_criterion.py:40:_column_matrix_from_images
+[   10.1s]      site    1189  lattice_morphisms.py:1755:integral_restriction
+[   16.6s]   sampled 15 times; leaf now set_categories.py:__call__; to_vector=27120
+[   16.6s]      leaf    2  module_morphisms.py:_engine_image
+[   16.6s]      leaf    1  refine.py:<genexpr>
+[   16.6s]      leaf    1  finitely_presented_modules.py:_relation_contains
+[   16.6s]      site    5828  modules.py:7148:_matrix_column_coordinates
+[   16.6s]      site    5256  coloured_vector_families.py:594:<genexpr>
+[   16.6s]      site    3872  eichler_criterion.py:40:_column_matrix_from_images
+[   16.6s]      site    3377  lattice_morphisms.py:1755:integral_restriction
+[   16.6s]      site    2069  lattices.py:5831:_evaluate_gram
+[   20.1s]   window   10118 to_vector over  10.0 s
+[   20.1s]      site    3015  lattice_morphisms.py:1755:integral_restriction
+[   20.1s]      site    1904  lattices.py:5831:_evaluate_gram
+[   20.1s]      site    1904  lattices.py:5832:_evaluate_gram
+[   20.1s]      site     918  coloured_vector_families.py:594:<genexpr>
+Timeout (0:00:20)!
+Thread 0x000071246eefb6c0 [Thread-1 (sampl] (most recent call first):
+  File "/probe.py", line 288 in sampler
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Thread 0x0000712663a6a780 [python] (most recent call first):
+  File "/sage/.venv/lib/python3.14/site-packages/sage/categories/category.py", line ??? in __classcall__
+  <invalid frame>
+[   30.1s]   window    8148 to_vector over  10.0 s
+[   30.1s]      site    3037  lattice_morphisms.py:1755:integral_restriction
+[   30.1s]      site    1459  lattices.py:5831:_evaluate_gram
+[   30.1s]      site    1459  lattices.py:5832:_evaluate_gram
+[   30.1s]      site     484  lattices.py:8388:_eichler_transvection_column_matrix
+[   31.7s]   sampled 30 times; leaf now ring_foundation.py:_operator_operand; to_vector=41352
+[   31.7s]      leaf    2  ring_foundation.py:__init__
+[   31.7s]      leaf    2  module_morphisms.py:_engine_image
+[   31.7s]      leaf    2  ring_foundation.py:_element_constructor_
+[   31.8s]      site    7903  lattice_morphisms.py:1755:integral_restriction
+[   31.8s]      site    6944  modules.py:7148:_matrix_column_coordinates
+[   31.8s]      site    6174  coloured_vector_families.py:594:<genexpr>
+[   31.8s]      site    4713  lattices.py:5831:_evaluate_gram
+[   31.8s]      site    4713  lattices.py:5832:_evaluate_gram
+[   40.4s]   window    9592 to_vector over  10.3 s
+[   40.4s]      site    3033  lattice_morphisms.py:1755:integral_restriction
+[   40.4s]      site    1816  lattices.py:5831:_evaluate_gram
+[   40.4s]      site    1816  lattices.py:5832:_evaluate_gram
+[   40.4s]      site     706  modules.py:7148:_matrix_column_coordinates
+Timeout (0:00:20)!
+Thread 0x000071246eefb6c0 [Thread-1 (sampl] (most recent call first):
+  File "/probe.py", line 288 in sampler
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Thread 0x0000712663a6a780 [python] (most recent call first):
+  File "/work/src/sage_indefinite_port/indefinite/indefinite_reduction.py", line 63 in _indefinite_gram_schmidt
+  File "/work/src/sage_indefinite_port/indefinite/indefinite_reduction.py", line 89 in _indefinite_lll
+  File "/work/src/sage_indefinite_port/indefinite/indefinite_reduction.py", line 137 in _compute_indefinite_reduction
+  File "/work/src/sage_indefinite_port/indefinite/indefinite_reduction.py", line 391 in _nondegenerate_reduction
+  File "/work/src/sage_indefinite_port/indefinite/indefinite_reduction.py", line 520 in _indefinite_reduction
+  File "/work/src/sage_indefinite_port/indefinite/indefinite_reduction.py", line 545 in indefinite_reduced_presentation
+  File "/work/src/sage_indefinite_port/indefinite/recursive.py", line 869 in isometry
+  File "/work/src/sage_indefinite_port/indefinite/recursive.py", line 1712 in _isotropic_pointed_isometry
+  File "/work/src/sage_indefinite_port/indefinite/recursive.py", line 1597 in pointed_isometry
+  File "/work/src/sage_indefinite_port/indefinite/recursive.py", line 1771 in <genexpr>
+  File "/work/src/sage_indefinite_port/indefinite/recursive.py", line 1771 in primitive_vector_classes
+  File "/work/src/sage_indefinite_port/indefinite/isotropic_induction.py", line 109 in _computed_isotropic_vector_classes
+  File "/work/src/sage_indefinite_port/indefinite/isotropic_induction.py", line 75 in isotropic_vector_classes
+  File "/work/src/sage_indefinite_port/indefinite/marked_lattices.py", line 195 in primitive_marking_classes
+  File "/repos/sage-extensions/src/sage_extensions/categories/isotropic_orbits.py", line 1649 in _isotropic_orbit_representatives
+  File "/repos/sage-extensions/src/sage_extensions/timing.py", line 393 in timed
+  File "/repos/sage-extensions/src/sage_extensions/categories/isotropic_orbits.py", line 1421 in _isotropic_plane_orbit_representatives
+  File "/repos/sage-extensions/src/sage_extensions/categories/isotropic_orbits.py", line 1623 in _isotropic_orbit_representatives
+  File "/repos/sage-extensions/src/sage_extensions/timing.py", line 393 in timed
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py", line 5236 in isotropic_orbit_representatives
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3677 in _subgroup_isotropic_orbit_representatives
+  File "/repos/sage-extensions/src/sage_extensions/timing.py", line 393 in timed
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 522 in isotropic_orbit_representatives
+  File "/probe.py", line 370 in main
+  File "/probe.py", line 397 in <module>
+[   46.9s]   sampled 45 times; leaf now modules.py:<lambda>; to_vector=59301
+[   46.9s]      leaf    4  set_categories.py:__call__
+[   46.9s]      leaf    3  ring_foundation.py:__init__
+[   46.9s]      leaf    3  ring_foundation.py:_element_constructor_
+[   46.9s]      site   12055  lattice_morphisms.py:1755:integral_restriction
+[   47.0s]      site    9414  coloured_vector_families.py:594:<genexpr>
+[   47.0s]      site    8878  modules.py:7148:_matrix_column_coordinates
+[   47.0s]      site    7661  lattices.py:5831:_evaluate_gram
+[   47.0s]      site    7661  lattices.py:5832:_evaluate_gram
+[   50.4s]   window   12082 to_vector over  10.0 s
+[   50.4s]      site    3272  lattice_morphisms.py:1755:integral_restriction
+[   50.4s]      site    2628  coloured_vector_families.py:594:<genexpr>
+[   50.4s]      site    1656  lattices.py:5831:_evaluate_gram
+[   50.4s]      site    1656  lattices.py:5832:_evaluate_gram
+[   60.4s]   window   39443 to_vector over  10.0 s
+[   60.4s]      site   14217  modules.py:7148:_matrix_column_coordinates
+[   60.4s]      site   10056  lattices.py:5831:_evaluate_gram
+[   60.4s]      site   10056  lattices.py:5832:_evaluate_gram
+[   60.4s]      site    1529  polyhedral_cones.py:306:engine_row
+Timeout (0:00:20)!
+Thread 0x000071246eefb6c0 [Thread-1 (sampl] (most recent call first):
+  File "/probe.py", line 288 in sampler
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Thread 0x0000712663a6a780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py", line ??? in __call__
+  <invalid frame>
+[   62.1s]   sampled 60 times; leaf now form_modules.py:b; to_vector=112870
+[   62.1s]      leaf    7  set_categories.py:__call__
+[   62.1s]      leaf    4  ring_foundation.py:__init__
+[   62.1s]      leaf    4  ring_foundation.py:_element_constructor_
+[   62.1s]      site   23095  modules.py:7148:_matrix_column_coordinates
+[   62.2s]      site   22285  lattices.py:5831:_evaluate_gram
+[   62.2s]      site   22285  lattices.py:5832:_evaluate_gram
+[   62.2s]      site   13781  lattice_morphisms.py:1755:integral_restriction
+[   62.2s]      site    9882  coloured_vector_families.py:594:<genexpr>
+[   70.5s]   window   37607 to_vector over  10.1 s
+[   70.5s]      site   11709  lattices.py:5832:_evaluate_gram
+[   70.5s]      site   11708  lattices.py:5831:_evaluate_gram
+[   70.5s]      site    3872  eichler_criterion.py:40:_column_matrix_from_images
+[   70.5s]      site    2748  modules.py:7148:_matrix_column_coordinates
+[   77.6s]   sampled 75 times; leaf now coloured_vector_families.py:_graph; to_vector=163206
+[   77.6s]      leaf    7  set_categories.py:__call__
+[   77.6s]      leaf    5  ring_foundation.py:__init__
+[   77.6s]      leaf    5  lattice_morphisms.py:_computed_group_generators
+[   77.6s]      site   32384  lattices.py:5831:_evaluate_gram
+[   77.6s]      site   32384  lattices.py:5832:_evaluate_gram
+[   77.6s]      site   29336  modules.py:7148:_matrix_column_coordinates
+[   77.6s]      site   22962  coloured_vector_families.py:594:<genexpr>
+[   77.6s]      site   14036  lattice_morphisms.py:1755:integral_restriction
+[   80.5s]   window   30817 to_vector over  10.0 s
+[   80.5s]      site   14440  coloured_vector_families.py:594:<genexpr>
+[   80.5s]      site    4738  modules.py:7148:_matrix_column_coordinates
+[   80.5s]      site    3996  lattices.py:5831:_evaluate_gram
+[   80.5s]      site    3996  lattices.py:5832:_evaluate_gram
+Timeout (0:00:20)!
+Thread 0x000071246eefb6c0 [Thread-1 (sampl] (most recent call first):
+  File "/probe.py", line 288 in sampler
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Thread 0x0000712663a6a780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_foundation.py", line ??? in _copy_operation_metadata
+  <invalid frame>
+[   90.5s]   window    9979 to_vector over  10.0 s
+[   90.5s]      site    6068  eichler.py:894:coordinates
+[   90.5s]      site    1903  recursive.py:162:_isometry_from_row_matrix
+[   90.5s]      site     480  lattices.py:5831:_evaluate_gram
+[   90.5s]      site     480  lattices.py:5832:_evaluate_gram
+[   92.7s]   sampled 90 times; leaf now cardinals.py:cardinal; to_vector=188728
+[   92.7s]      leaf    7  set_categories.py:__call__
+[   92.8s]      leaf    7  lattice_morphisms.py:_computed_group_generators
+[   92.8s]      leaf    7  mor_foundation.py:_copy_operation_metadata
+[   92.8s]      site   34307  lattices.py:5831:_evaluate_gram
+[   92.8s]      site   34307  lattices.py:5832:_evaluate_gram
+[   92.8s]      site   31454  modules.py:7148:_matrix_column_coordinates
+[   92.8s]      site   27622  coloured_vector_families.py:594:<genexpr>
+[   92.8s]      site   14215  lattice_morphisms.py:1755:integral_restriction
+[  100.7s]   window   27353 to_vector over  10.2 s
+[  100.7s]      site    7454  modules.py:7148:_matrix_column_coordinates
+[  100.7s]      site    4366  recursive.py:134:<genexpr>
+[  100.7s]      site    4345  recursive.py:192:_isometry_from_column_matrix
+[  100.7s]      site    2920  coloured_vector_families.py:594:<genexpr>
+Timeout (0:00:20)!
+Thread 0x000071246eefb6c0 [Thread-1 (sampl] (most recent call first):
+  File "/probe.py", line 288 in sampler
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Thread 0x0000712663a6a780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/refine.py", line ??? in <genexpr>
+  <invalid frame>
+[  107.9s]   sampled 105 times; leaf now set_categories.py:__int__; to_vector=209092
+[  107.9s]      leaf    7  ring_foundation.py:__init__
+[  108.0s]      leaf    7  set_categories.py:__call__
+[  108.0s]      leaf    7  lattice_morphisms.py:_computed_group_generators
+[  108.0s]      site   38485  modules.py:7148:_matrix_column_coordinates
+[  108.0s]      site   36065  lattices.py:5831:_evaluate_gram
+[  108.0s]      site   36065  lattices.py:5832:_evaluate_gram
+[  108.0s]      site   27622  coloured_vector_families.py:594:<genexpr>
+[  108.1s]      site   14633  lattice_morphisms.py:1755:integral_restriction
+[  110.8s]   window    3091 to_vector over  10.0 s
+[  110.8s]      site    2927  lattice_morphisms.py:2235:<genexpr>
+[  110.8s]      site     142  modules.py:7148:_matrix_column_coordinates
+[  110.8s]      site      11  finitely_presented_modules.py:561:<genexpr>
+[  110.8s]      site      11  modules.py:7943:coordinates
+[  120.8s]   window    3069 to_vector over  10.0 s
+[  120.8s]      site    3069  lattice_morphisms.py:2235:<genexpr>
+Timeout (0:00:20)!
+Thread 0x000071246eefb6c0 [Thread-1 (sampl] (most recent call first):
+  File "/probe.py", line 288 in sampler
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Thread 0x0000712663a6a780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py", line ??? in __contains__
+  <invalid frame>
+[  123.2s]   sampled 120 times; leaf now set_categories.py:__call__; to_vector=213932
+[  123.2s]      leaf   11  set_categories.py:__call__
+[  123.2s]      leaf    8  ring_foundation.py:__init__
+[  123.2s]      leaf    7  ring_foundation.py:_element_constructor_
+[  123.2s]      site   38485  modules.py:7148:_matrix_column_coordinates
+[  123.2s]      site   36065  lattices.py:5831:_evaluate_gram
+[  123.2s]      site   36065  lattices.py:5832:_evaluate_gram
+[  123.3s]      site   27622  coloured_vector_families.py:594:<genexpr>
+[  123.3s]      site   14633  lattice_morphisms.py:1755:integral_restriction
+Timeout (0:00:20)!
+Thread 0x000071246eefb6c0 [Thread-1 (sampl] (most recent call first):
+  File "/probe.py", line 288 in sampler
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Thread 0x0000712663a6a780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 2003 in _iter_splitting_isometries_in_im_rho_from_image
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3482 in _plane_orbit_from_parabolic_stabilizer
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3706 in _subgroup_isotropic_orbit_representatives
+  File "/repos/sage-extensions/src/sage_extensions/timing.py", line 393 in timed
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 522 in isotropic_orbit_representatives
+  File "/probe.py", line 370 in main
+  File "/probe.py", line 397 in <module>
+Timeout (0:00:20)!
+Thread 0x000071246eefb6c0 [Thread-1 (sampl] (most recent call first):
+  File "/probe.py", line 288 in sampler
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Thread 0x0000712663a6a780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 2003 in _iter_splitting_isometries_in_im_rho_from_image
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3482 in _plane_orbit_from_parabolic_stabilizer
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3706 in _subgroup_isotropic_orbit_representatives
+  File "/repos/sage-extensions/src/sage_extensions/timing.py", line 393 in timed
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 522 in isotropic_orbit_representatives
+  File "/probe.py", line 370 in main
+  File "/probe.py", line 397 in <module>
+Timeout (0:00:20)!
+Thread 0x000071246eefb6c0 [Thread-1 (sampl] (most recent call first):
+  File "/probe.py", line 288 in sampler
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Thread 0x0000712663a6a780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 2003 in _iter_splitting_isometries_in_im_rho_from_image
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3482 in _plane_orbit_from_parabolic_stabilizer
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3706 in _subgroup_isotropic_orbit_representatives
+  File "/repos/sage-extensions/src/sage_extensions/timing.py", line 393 in timed
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 522 in isotropic_orbit_representatives
+  File "/probe.py", line 370 in main
+  File "/probe.py", line 397 in <module>

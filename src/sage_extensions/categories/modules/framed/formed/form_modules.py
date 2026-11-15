@@ -596,7 +596,13 @@ class FormedModuleMorphism:
     def __ne__(self, other) -> bool | Predicate:
         return negation(self == other)
 
-    __hash__ = None
+    def __hash__(self) -> int:
+        r"""Hash the module map ``f`` by the module morphisms' own hash.
+
+        Equal pairs ``(f,h)`` have equal module maps ``f``, so they hash
+        equally; ``h`` is not read.
+        """
+        return super().__hash__()
 
     def __mul__(self, other):
         if not isinstance(other, FormedModuleMorphism):

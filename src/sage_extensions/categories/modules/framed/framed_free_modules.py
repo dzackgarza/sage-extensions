@@ -51,7 +51,7 @@ from sage_extensions.categories.sets.cardinals import (
 from sage_extensions.categories.sets.finite_ordered_sets import (
     FiniteOrderedSets,
     finite_ordered_set,
-    interned_labels,
+    interned_finite_ordered_set,
 )
 from sage_extensions.categories.sets.indexed_families import (
     IndexedFamily,
@@ -1648,7 +1648,7 @@ def _module_generating_set(labels):
             # and the symmetric algebra on the same ordered labels must land on
             # the same selected index set, because the module's framing records
             # that set object (OWN-02).
-            return interned_labels(tuple(labels))
+            return interned_finite_ordered_set(tuple(labels))
         case _:
             assert labels in Sets(), (
                 f"cannot form a free module on {labels!r}: give a rank or a set of basis labels"

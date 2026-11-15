@@ -1,0 +1,18 @@
+tree SHA: b4bb5189d83e8a9c4ed17e7ac304fe0ca57b8e84
+file: tests/lattices/test_the_integral_lift_locus_is_a_union_of_transvection_cosets.sage tests/groups/test_a_supplied_trivialization_point_is_returned_as_supplied.sage tests/lattices/test_integral_reduction_lift_witness.sage
+..........                                                               [100%]
+10 passed in 12.98s
+[peakrss] run: child waited=0 shell_code=0 samples=8
+[peakrss] peak tree RSS      : 383 MiB
+[peakrss] low-water MemAvail : 13362 MiB
+[peakrss] peak single VmHWM  : 383 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      372 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    14.0s procs=  3 rss=   383 MiB hwm=   383 MiB avail= 13362 MiB
+[peakrss]   t=    12.0s procs=  3 rss=   368 MiB hwm=   368 MiB avail= 13377 MiB
+[peakrss]   t=    10.0s procs=  3 rss=   366 MiB hwm=   366 MiB avail= 13370 MiB
+[peakrss]   t=     8.0s procs=  3 rss=   364 MiB hwm=   364 MiB avail= 13376 MiB
+[peakrss]   t=     6.0s procs=  3 rss=   355 MiB hwm=   355 MiB avail= 13384 MiB
+exit: 0

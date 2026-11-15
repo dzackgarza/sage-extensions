@@ -72,19 +72,15 @@ class IndexedFamily[IndexT, ValueT]:
         return cardinal(self.index_set().cardinality())
 
     def value(self, index: IndexT) -> ValueT:
-        r"""Return the chosen value at this label, including unhashable labels.
+        r"""Return the chosen value at this label, addressed by any object equal to it.
 
         Unverified specimen: a family chooses its value once, not each time
-        a Python list is used to address the same point of its index set::
+        a new tuple is used to address the same point of its index set::
 
             sage: from sage_extensions.categories.sets.finite_ordered_sets import finite_ordered_set
-            sage: labels = finite_ordered_set(([0], [1]))
+            sage: labels = finite_ordered_set(((0,), (1,)))
             sage: family = indexed_family(labels, lambda label: finite_ordered_set((label[0],)))
-            sage: family.value([0]) is family.value([0])
-            True
-            sage: labels = finite_ordered_set((([0],),))
-            sage: family = indexed_family(labels, lambda label: finite_ordered_set((label[0][0],)))
-            sage: family.value(([0],)) is family.value(([0],))
+            sage: family.value((0,)) is family.value((0,))
             True
         """
         return self._value_at_normalized_index(self.index_set()(index))
@@ -365,25 +361,19 @@ class IndexedFamily[IndexT, ValueT]:
         of the index set, which every finite enumerated index set supplies
         without being enumerated and without its points being read.
 
-        Neither the values nor the index set are read.  A family of sets may
-        present a value that refuses a hash, and a finite ordered set hashes the
-        tuple of its points, which refuses when a point does.  Hashing the index
-        set would be sound where it hashes -- a refusal is consistent with
-        equality, so an equal pair with one unhashable index set breaks nothing
-        -- but it would leave a family whose equality is decided without a hash
-        for no reason but its points.  This class hashes wherever its equality
-        decides, and the cardinality is what equality supplies to every family
-        that decides.
+        The values are not read: a family's values need not hash -- a family
+        of Python lists is a family whose equality decides -- and this class
+        hashes wherever its equality decides.  Equality of two families over
+        finite enumerated index sets is decided whenever their points and their
+        values decide equality, which is what the hash needs: ``hash(f) ==
+        hash(g)`` whenever ``f == g`` is decided true.
 
-        No consumer here hashes a family.  The finite constructions of
-        ``Sets().product`` and ``Sets().coproduct`` are interned by the index
-        set's cardinality and compare families by ``==``
-        (``set_categories._interned_by_equality``), so this hash is what
-        extensional equality owes Python's containers, not a key this library
-        builds.  Equality of two families over finite enumerated index sets is
-        decided whenever their points and their values decide equality, which is
-        what the hash needs: ``hash(f) == hash(g)`` whenever ``f == g`` is
-        decided true.
+        No consumer here keys on this hash.  The finite constructions of
+        ``Sets().product`` and ``Sets().coproduct`` are interned under the index
+        set and the hashes of the factors, which are sets and hash
+        (``set_categories._finite_family_key``), and compare the families of one
+        key by ``==``; this hash is what extensional equality owes Python's
+        containers.
         """
         from sage_extensions.categories.sets.set_categories import EnumeratedSets
 

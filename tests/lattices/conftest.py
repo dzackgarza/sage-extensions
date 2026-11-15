@@ -8,9 +8,12 @@ The digest is generated, not edited, by
 ``dzackgarza/lattice-database`` at the commit its ``_provenance.ref`` names, so
 reading it in one place here keeps every expected number the database's.
 
-This module binds one name, ``card``, as a builtin, which is the mechanism the
-lint documents: a directory's ``conftest.py`` binds the session abbreviations its
-tests use, and the lint reads the allowed names after the conftests have run.
+This module binds two names as builtins, which is the mechanism the lint
+documents: a directory's ``conftest.py`` binds the abbreviations its tests use,
+and the lint reads the allowed names after the conftests have run.  ``card`` is a
+row of the digest; ``owned_ring_crossings`` counts the constructions between the
+engine's data and the owned ring that one action makes, which a test asks for as
+a call count and may not name itself.
 """
 
 from __future__ import annotations
@@ -35,3 +38,38 @@ def card(section: str, tag: str) -> dict:
 
 
 builtins.card = card
+
+
+def owned_ring_crossings(action):
+    r"""Return ``action()`` and the number of owned-ring crossings it made.
+
+    A crossing is one construction between the engine's data and the owned ring:
+    ``ring_foundation._owned_engine_element`` raises an engine value into the
+    owned ring, and it is what an arrangement that did a computation's own
+    arithmetic in the owned ring multiplies by the size of that computation.
+    A lattice test asks the number for one Eichler transvection, whose matrix
+    has ``rank^2`` entries but whose crossings are one decision per generator.
+
+    The name of that crossing is private, so a test may not write it (``TL01``,
+    ``TL02``): the patch lives here, beside the card reader, and it restores the
+    function it shadows whatever the action does.  A test asserts on the number,
+    which is a call count and never a time.
+    """
+    from sage_extensions.categories.rings import ring_foundation
+
+    counted = []
+    original = ring_foundation._owned_engine_element
+
+    def crossing(*arguments, **keywords):
+        counted.append(1)
+        return original(*arguments, **keywords)
+
+    ring_foundation._owned_engine_element = crossing
+    try:
+        value = action()
+    finally:
+        ring_foundation._owned_engine_element = original
+    return value, sum(counted)
+
+
+builtins.owned_ring_crossings = owned_ring_crossings

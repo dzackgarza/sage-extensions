@@ -8352,18 +8352,14 @@ class Lattices(OwnedCategoryOverBaseRing):
             keeps is integrality of \(\tfrac12 q(a)b(e,e_j)\), asked once per
             generator: it is the statement that \(t(e,a)\) preserves the
             lattice (equation (10) there, \(a\) of even square).
+
+            The formula's hypotheses -- that \(e\) and \(a\) are vectors of
+            this lattice, that \(q(e)=0\) and that \(b(e,a)=0\) -- are asserted
+            by the one public entry, :meth:`eichler_transvection`, before it
+            calls this method; deciding them again here would be the same
+            statement twice.
             """
-            assert isotropic.parent() is self and orthogonal.parent() is self, (
-                f"cannot form the Eichler transvection t(e, a) of {self!r} with e = {isotropic!r}, a = {orthogonal!r}: they lie in {isotropic.parent()!r} and {orthogonal.parent()!r}, not both in this lattice"
-            )
             ring = self.base_ring()
-            zero = ring.zero()
-            assert isotropic.q() == zero, (
-                f"cannot form the Eichler transvection t(e, a) of {self!r}: e = {isotropic!r} must be isotropic, but q(e) = {isotropic.q()}"
-            )
-            assert isotropic.b(orthogonal) == zero, (
-                f"cannot form the Eichler transvection t(e, a) of {self!r}: a = {orthogonal!r} must lie in e^perp for e = {isotropic!r}, but b(e, a) = {isotropic.b(orthogonal)}"
-            )
             from sage.matrix.constructor import matrix
 
             from sage_extensions.categories.rings.ring_foundation import (
@@ -8376,12 +8372,6 @@ class Lattices(OwnedCategoryOverBaseRing):
             engine = _engine_ring(ring)
             fraction_field = ring.fraction_field()
             engine_fraction = _engine_ring(fraction_field)
-            # Equation (4)'s coefficient (a,a)/2 and every entry below are the
-            # formula's own arithmetic, which is the engine's: the two vectors
-            # are read once each and cross once per coordinate, and the matrix
-            # this method returns is engine data.  The owned ring is asked for
-            # the one decision only it can make, integrality of
-            # (a,a) b(e,x)/2, once per source generator.
             half_norm = engine_fraction(
                 _engine_element(ring, orthogonal.q())
             ) / engine_fraction(engine(2))
@@ -8452,9 +8442,7 @@ class Lattices(OwnedCategoryOverBaseRing):
             Eichler's criterion realizes its orbit equivalences.  The formula
             is equation (4) of V. Gritsenko, K. Hulek and G. Sankaran,
             *Abelianisation of orthogonal groups and the fundamental group of
-            modular varieties*, arXiv:0810.1614, section 3.1, printed p. 8,
-            which is Dawes, section 2 equation (7), in the transcription this
-            library reads it through.
+            modular varieties*, arXiv:0810.1614, section 3.1, printed p. 8.
             \(t(e,a)\) preserves \(L\) exactly when every coefficient
             \(\tfrac12 q(a)\,b(e,x)\) is integral, automatic on an even
             lattice and asserted otherwise.

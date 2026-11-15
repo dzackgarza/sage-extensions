@@ -1,0 +1,121 @@
+tree SHA: 9e9c24ade14e330adfc5a715280d76c64f88db6d
+file: tests/lattices/test_levi_sections_and_supplied_preimages.sage tests/lattices/test_isotropic_reduction.sage tests/lattices/test_eichler_transvection_construction.sage tests/lattices/test_stable_isotropic_line_transporter.sage tests/lattices/test_two_u_eichler_model.sage tests/lattices/test_parabolic_induction.sage tests/lattices/test_cusp_lattices.sage tests/lattices/test_orthogonal_stabilizers.sage tests/lattices/test_eichler_isometry_relations.sage
+..F..........FF...F..................FF........                          [100%]
+=================================== FAILURES ===================================
+____ test_the_split_two_plane_preimage_uses_the_supplied_kernel_and_cosets _____
+tests/lattices/test_levi_sections_and_supplied_preimages.sage:52: in test_the_split_two_plane_preimage_uses_the_supplied_kernel_and_cosets
+    kernel.select_group_resolution(generators=Set(tuple(kernel(value) for value in kernel_family)))
+src/sage_extensions/categories/group/groups.py:5974: in select_group_resolution
+    raise ValueError(f"{self} already has a selected generating resolution")
+E   ValueError: {g in {g in Orthogonal group O(Integral lattice of rank 4 and signature (2, 2)) : g(im(Generic morphism:
+E     From: Integral lattice of rank 1 and signature (0, 0)
+E     To:   Integral lattice of rank 4 and signature (2, 2)))=im(Generic morphism:
+E     From: Integral lattice of rank 1 and signature (0, 0)
+E     To:   Integral lattice of rank 4 and signature (2, 2))} : elements mapped to the identity by the defining morphism} already has a selected generating resolution
+__ test_stable_component_line_transporter_matches_an_eichler_transvection[A2] __
+tests/lattices/test_stable_isotropic_line_transporter.sage:25: in test_stable_component_line_transporter_matches_an_eichler_transvection
+    witness = group.isotropic_equivalence_witness(source, target)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/predicate_subgroups.py:685: in isotropic_equivalence_witness
+    return _subgroup_isotropic_equivalence_witness(
+src/sage_extensions/categories/orthogonal_quotients.py:3731: in _subgroup_isotropic_equivalence_witness
+    if not flag and quotient.invariant_separates_isotropic_orbits(left, right):
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/orthogonal_quotients.py:2317: in invariant_separates_isotropic_orbits
+    source = _isotropic_line_class_points(lattice, left)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   NameError: name '_isotropic_line_class_points' is not defined
+_ test_stable_component_line_transporter_matches_an_eichler_transvection[A2_twist_minus_one] _
+tests/lattices/test_stable_isotropic_line_transporter.sage:25: in test_stable_component_line_transporter_matches_an_eichler_transvection
+    witness = group.isotropic_equivalence_witness(source, target)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/predicate_subgroups.py:685: in isotropic_equivalence_witness
+    return _subgroup_isotropic_equivalence_witness(
+src/sage_extensions/categories/orthogonal_quotients.py:3731: in _subgroup_isotropic_equivalence_witness
+    if not flag and quotient.invariant_separates_isotropic_orbits(left, right):
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/orthogonal_quotients.py:2317: in invariant_separates_isotropic_orbits
+    source = _isotropic_line_class_points(lattice, left)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   NameError: name '_isotropic_line_class_points' is not defined
+___ test_approximate_generating_family_uses_exact_two_u_perpendicular_frames ___
+tests/lattices/test_two_u_eichler_model.sage:78: in test_approximate_generating_family_uses_exact_two_u_perpendicular_frames
+    assert all(
+E   assert False
+E    +  where False = all(<generator object test_approximate_generating_family_uses_exact_two_u_perpendicular_frames.<locals>.<genexpr> at 0x7435d6817bc0>)
+_______________ test_E10_has_a_single_cusp_and_it_reduces_to_E8 ________________
+tests/lattices/test_cusp_lattices.sage:101: in test_E10_has_a_single_cusp_and_it_reduces_to_E8
+    cusp_set = lattice.cusps()
+               ^^^^^^^^^^^^^^^
+src/sage_extensions/categories/lattices.py:9733: in cusps
+    return self.Aut().cusps(rank)
+           ^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/lattice_morphisms.py:5242: in cusps
+    return finite_ordered_set(tuple(_cusp(representative) for representative in self.isotropic_orbit_representatives(rank)))
+                                                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/lattice_morphisms.py:5236: in isotropic_orbit_representatives
+    return _isotropic_orbit_representatives(self, rank, flag=flag)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/timing.py:392: in timed
+    with stage(name, input(*arguments, **keywords)):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/contextlib.py:141: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+src/sage_extensions/timing.py:344: in stage
+    "commit": current_commit(),
+              ^^^^^^^^^^^^^^^^
+src/sage_extensions/timing.py:247: in current_commit
+    completed = subprocess.run(
+/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/subprocess.py:578: in run
+    raise CalledProcessError(retcode, process.args,
+E   subprocess.CalledProcessError: Command '('git', '-C', '/repos/sage-extensions', 'rev-parse', 'HEAD')' returned non-zero exit status 128.
+________ test_a_cusp_transporter_carries_a_line_onto_the_representative ________
+tests/lattices/test_cusp_lattices.sage:127: in test_a_cusp_transporter_carries_a_line_onto_the_representative
+    cusp = lattice.cusps()[0]
+           ^^^^^^^^^^^^^^^
+src/sage_extensions/categories/lattices.py:9733: in cusps
+    return self.Aut().cusps(rank)
+           ^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/lattice_morphisms.py:5242: in cusps
+    return finite_ordered_set(tuple(_cusp(representative) for representative in self.isotropic_orbit_representatives(rank)))
+                                                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/lattice_morphisms.py:5236: in isotropic_orbit_representatives
+    return _isotropic_orbit_representatives(self, rank, flag=flag)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/timing.py:392: in timed
+    with stage(name, input(*arguments, **keywords)):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/contextlib.py:141: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+src/sage_extensions/timing.py:344: in stage
+    "commit": current_commit(),
+              ^^^^^^^^^^^^^^^^
+src/sage_extensions/timing.py:247: in current_commit
+    completed = subprocess.run(
+/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/subprocess.py:578: in run
+    raise CalledProcessError(retcode, process.args,
+E   subprocess.CalledProcessError: Command '('git', '-C', '/repos/sage-extensions', 'rev-parse', 'HEAD')' returned non-zero exit status 128.
+=========================== short test summary info ============================
+FAILED tests/lattices/test_levi_sections_and_supplied_preimages.sage::test_the_split_two_plane_preimage_uses_the_supplied_kernel_and_cosets
+FAILED tests/lattices/test_stable_isotropic_line_transporter.sage::test_stable_component_line_transporter_matches_an_eichler_transvection[A2]
+FAILED tests/lattices/test_stable_isotropic_line_transporter.sage::test_stable_component_line_transporter_matches_an_eichler_transvection[A2_twist_minus_one]
+FAILED tests/lattices/test_two_u_eichler_model.sage::test_approximate_generating_family_uses_exact_two_u_perpendicular_frames
+FAILED tests/lattices/test_cusp_lattices.sage::test_E10_has_a_single_cusp_and_it_reduces_to_E8
+FAILED tests/lattices/test_cusp_lattices.sage::test_a_cusp_transporter_carries_a_line_onto_the_representative
+6 failed, 41 passed in 15.65s
+[peakrss] run: child waited=1 shell_code=1 samples=10
+[peakrss] peak tree RSS      : 610 MiB
+[peakrss] low-water MemAvail : 13162 MiB
+[peakrss] peak single VmHWM  : 616 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      605 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    18.0s procs=  3 rss=   610 MiB hwm=   616 MiB avail= 13162 MiB
+[peakrss]   t=    16.0s procs=  3 rss=   606 MiB hwm=   616 MiB avail= 13162 MiB
+[peakrss]   t=    14.0s procs=  3 rss=   566 MiB hwm=   566 MiB avail= 13209 MiB
+[peakrss]   t=    12.0s procs=  3 rss=   561 MiB hwm=   561 MiB avail= 13209 MiB
+[peakrss]   t=    10.0s procs=  3 rss=   550 MiB hwm=   550 MiB avail= 13221 MiB
+exit: 1

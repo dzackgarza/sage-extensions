@@ -441,7 +441,7 @@ def _named_polynomial_variables(names):
     """Intern a polynomial variable index set by its normalized ordered names.
 
     This is the same intern the free-module route uses
-    (``sets.finite_ordered_sets.interned_labels``), so ``R[x, y]`` and
+    (``sets.finite_ordered_sets.interned_finite_ordered_set``), so ``R[x, y]`` and
     ``R.free_module(("x", "y")).symmetric_algebra()`` reach one label set and
     therefore one algebra.
     """

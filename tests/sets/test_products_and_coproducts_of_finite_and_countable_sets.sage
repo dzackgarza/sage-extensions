@@ -219,7 +219,7 @@ def test_finite_indexed_family_rank_cache_supplies_product_factors() -> None:
     from sage_extensions.categories.sets.finite_ordered_sets import finite_ordered_set
     from sage_extensions.categories.sets.indexed_families import indexed_family
 
-    labels = finite_ordered_set(([0], [1]))
+    labels = finite_ordered_set(((0,), (1,)))
     factor = Sets.Δ[1]
     evaluations = []
 
@@ -229,32 +229,32 @@ def test_finite_indexed_family_rank_cache_supplies_product_factors() -> None:
 
     family = indexed_family(labels, selected)
     product = Sets().product(family)
-    assert product.factor([0]) is factor
-    assert product.factor([0]) is family(labels.ranking_map().inverse()(0))
-    assert product.factor([1]) is factor
+    assert product.factor((0,)) is factor
+    assert product.factor((0,)) is family(labels.ranking_map().inverse()(0))
+    assert product.factor((1,)) is factor
     assert tuple(value for value in family) == (factor, factor)
     assert tuple(family.items()) == ((labels.ranking_map().inverse()(0), factor),
                                     (labels.ranking_map().inverse()(1), factor))
     assert evaluations == [0, 1]
     point = product((factor(0), factor(1)))
-    assert product.projection([0])(point) == factor(0)
-    assert product.projection([1])(point) == factor(1)
+    assert product.projection((0,))(point) == factor(0)
+    assert product.projection((1,))(point) == factor(1)
 
 
-def test_equal_finite_families_of_unhashable_labels_share_one_construction() -> None:
+def test_equal_finite_families_over_separately_built_label_sets_share_one_construction() -> None:
     r"""``SET-05``: equal families have one product and one coproduct.
 
-    A finite ordered set of Python lists carries a point that refuses a hash, so
-    the set has none, and no index set has to have one for its family to be
-    interned.  The families themselves are compared, and two separately built
-    equal families are one product and one coproduct.
+    Two label sets built separately from the same points are equal sets and
+    distinct objects, so the two families on them are equal families, and they
+    are one product and one coproduct.
     """
     from sage_extensions.categories.sets.finite_ordered_sets import finite_ordered_set
     from sage_extensions.categories.sets.indexed_families import indexed_family
 
     factor = Sets.Δ[1]
-    first = indexed_family(finite_ordered_set(([0], [1])), lambda label: factor)
-    second = indexed_family(finite_ordered_set(([0], [1])), lambda label: factor)
+    first = indexed_family(finite_ordered_set(((0,), (1,))), lambda label: factor)
+    second = indexed_family(finite_ordered_set(((0,), (1,))), lambda label: factor)
+    assert first.index_set() is not second.index_set()
     product = Sets().product(first)
     coproduct = Sets().coproduct(first)
 
@@ -266,17 +266,13 @@ def test_equal_finite_families_of_unhashable_labels_share_one_construction() -> 
     assert Sets().product(first) is not coproduct
 
 
-def test_finite_family_hash_does_not_require_hashable_index_labels() -> None:
-    r"""A family over labels that refuse a hash has a hash, because equality decides.
+def test_a_finite_family_hashes_whatever_its_values_are() -> None:
+    r"""Equal families over one finite label set hash equally, whatever their values are.
 
-    The hash reads the cardinality of the index set, and every finite enumerated
-    index set supplies one, whatever its points are.  Equality of two such
-    families is decided -- the index sets are finite ordered sets whose points are
-    Python lists that decide their own equality, and the values are compared index
-    by index -- so ``f == g`` implies one cardinality for the two, and the hash
-    respects equality.  The values need not support hashing either: equality is
-    their own extensional relation, and a value that refuses a hash is not a
-    family that cannot be hashed.
+    The hash reads the cardinality of the index set, which equal families share.
+    The values need not support hashing: equality compares them index by index
+    by their own relation, and a family whose values are Python lists is a family
+    whose equality decides.
     """
     from sage_extensions.categories.sets.finite_ordered_sets import finite_ordered_set
     from sage_extensions.categories.sets.indexed_families import indexed_family
@@ -292,55 +288,32 @@ def test_finite_family_hash_does_not_require_hashable_index_labels() -> None:
     assert unhashable_first == unhashable_second
     assert hash(unhashable_first) == hash(unhashable_second)
 
-    # The points of the index set need not hash: the hash reads their number.
-    list_labels = finite_ordered_set(([0], [1]))
-    list_first = indexed_family(list_labels, lambda label: label[0])
-    list_second = indexed_family(finite_ordered_set(([0], [1])), lambda label: label[0])
-    assert list_labels == finite_ordered_set(([0], [1]))
-    assert list_first == list_second
-    assert hash(list_first) == hash(list_second)
-
 
 def test_equal_families_are_one_construction_in_both_construction_orders() -> None:
     r"""``SET-05``: equal families have one product and one coproduct, built in either order.
 
     Each pair below is one family presented twice: one index set carries the
-    point ``(1, 2)``, the other carries the same tuple as a class that refuses a
-    hash, so the two sets are equal and only one of them hashes.  A construction
-    is interned by the family's equality, not by what the points would hash to,
-    so the family built second finds the one built first -- and that has to hold
-    whichever of the two is the first.  A store that finds a family only by the
-    key its points supply finds the pair only when the hashable presentation is
-    the one stored first, which is what building each pair both ways decides.
-
-    The two pairs carry different factors, so neither pair's construction is a
-    candidate for the other's, and the assertions at the end say so.
+    integer ``1`` and the other the rational ``1``, so the two sets are equal and
+    are different objects.  The family built second finds the construction of the
+    one built first, and each pair is built in both orders.  The two pairs carry
+    different factors, so neither pair's construction is the other's.
     """
     from sage_extensions.categories.sets.finite_ordered_sets import finite_ordered_set
     from sage_extensions.categories.sets.indexed_families import indexed_family
 
-    class UnhashablePoint(tuple):
-        r"""A point with a hashable form: the same tuple, without a hash."""
-
-        __hash__ = None
-
     def pair(factor):
-        r"""Two equal one-factor families over the two forms of one index point."""
-        unhashable = indexed_family(
-            finite_ordered_set((UnhashablePoint((1, 2)),)), lambda label: factor
-        )
-        hashed = indexed_family(finite_ordered_set(((1, 2),)), lambda label: factor)
-        assert unhashable == hashed
-        assert hash(unhashable) == hash(hashed)
-        with pytest.raises(TypeError):
-            hash(finite_ordered_set((UnhashablePoint((1, 2)),)))
-        return unhashable, hashed
+        r"""Two equal one-factor families over the two presentations of one index point."""
+        integral = indexed_family(finite_ordered_set((ZZ(1),)), lambda label: factor)
+        rational = indexed_family(finite_ordered_set((QQ(1),)), lambda label: factor)
+        assert integral == rational
+        assert integral.index_set() is not rational.index_set()
+        return integral, rational
 
     products = []
     coproducts = []
-    for factor, unhashable_first in ((Sets().Δ[1], True), (Sets().Δ[2], False)):
-        unhashable, hashed = pair(factor)
-        first, second = (unhashable, hashed) if unhashable_first else (hashed, unhashable)
+    for factor, integral_first in ((Sets().Δ[1], True), (Sets().Δ[2], False)):
+        integral, rational = pair(factor)
+        first, second = (integral, rational) if integral_first else (rational, integral)
         product = Sets().product(first)
         assert Sets().product(second) is product
         assert Sets().product(first) is product
@@ -354,33 +327,34 @@ def test_equal_families_are_one_construction_in_both_construction_orders() -> No
     assert coproducts[0] is not coproducts[1]
 
 
-def test_a_family_over_a_set_of_mutable_vectors_builds_its_product() -> None:
-    r"""An index set of mutable vectors indexes a product, and two equal ones share it.
+def test_a_family_over_a_set_of_immutable_vectors_builds_its_product() -> None:
+    r"""A set of vectors indexes a product, and two equal such families share it.
 
-    A finite ordered set of mutable Sage vectors is equal to the set of their
-    immutable copies and refuses a hash, because it hashes the tuple of its
-    points; ``filtered`` presents the same points from a materialized
-    enumeration rather than from an admitted hash table.  Whether a point can be
-    hashed is not a hypothesis of interning a family, so the family over the
-    filtered set builds, and the two equal families below are one product and one
+    The points of a finite ordered set hash, so its points are the immutable
+    vectors; a mutable vector can change after the set is built, and the set
+    refuses it.  ``filtered`` presents the same points from a materialized
+    enumeration, and the two equal families below are one product and one
     coproduct.
     """
     from sage_extensions.categories.sets.finite_ordered_sets import finite_ordered_set
     from sage_extensions.categories.sets.indexed_families import indexed_family
 
     first, second = vector([int(1), int(2)]), vector([int(3), int(4)])
-    mutable = finite_ordered_set((first, second))
-    filtered = mutable.filtered(lambda point: True)
-    assert tuple(filtered) == (first, second)
     with pytest.raises(TypeError):
-        hash(filtered)
+        finite_ordered_set((first, second))
+    first.set_immutable()
+    second.set_immutable()
+    points = finite_ordered_set((first, second))
+    filtered = points.filtered(lambda point: True)
+    assert tuple(filtered) == (first, second)
+    assert filtered == points
 
     factor = Sets().Δ[1]
     family = indexed_family(filtered, lambda point: factor)
     product = Sets().product(family)
     assert product.factor(first) is factor
     assert product.factor(second) is factor
-    again = indexed_family(mutable.filtered(lambda point: True), lambda point: factor)
+    again = indexed_family(points.filtered(lambda point: True), lambda point: factor)
     assert again == family
     assert Sets().product(again) is product
     coproduct = Sets().coproduct(family)
@@ -390,14 +364,13 @@ def test_a_family_over_a_set_of_mutable_vectors_builds_its_product() -> None:
 def test_a_construction_of_an_undecided_family_equality_is_built() -> None:
     r"""An undecided family equality interns nothing, and replaces nothing.
 
-    The interners compare families by equality inside one bucket, and a
-    comparison whose value is a proposition is neither equality nor inequality.
-    It is not equality, so the second family is built instead of taking the first
-    construction; it is not inequality either, so the first construction stays
-    and both are retained.  Each family here carries a set of one symbolic point,
-    whose own equality is undecided, and both have two factors, so the store's
-    bucket for a two-point index set holds both and the comparison it makes is
-    the proposition.
+    The two families here have factors whose hashes agree, so each is compared
+    with the other, and the comparison is a proposition: it is neither equality
+    nor inequality.  It is not equality, so the second family gets its own product
+    and its own coproduct; it is not inequality either, so the first
+    constructions stay, and each family finds its own construction afterwards.
+    Each family carries a set of one symbolic point, whose own equality is
+    undecided; its hash is one constant, which agrees with any equality.
     """
     from sage_extensions.categories.sets.finite_ordered_sets import finite_ordered_set
     from sage_extensions.categories.sets.indexed_families import indexed_family
@@ -409,6 +382,10 @@ def test_a_construction_of_an_undecided_family_equality_is_built() -> None:
         def __eq__(self, other):
             return AtomicProposition("equal_symbolic_points", self, other)
 
+        def __hash__(self):
+            # A Python integer: the preparser makes the literal a library integer.
+            return int(0)
+
     labels = finite_ordered_set((0, 1))
     factor = Sets.Δ[1]
     first_factor = finite_ordered_set((SymbolicPoint(),))
@@ -417,6 +394,7 @@ def test_a_construction_of_an_undecided_family_equality_is_built() -> None:
     second = indexed_family(labels, lambda label: second_factor if label == 0 else factor)
 
     # The comparison is the proposition, which has no Python truth value at all.
+    assert hash(first_factor) == hash(second_factor)
     with pytest.raises(TypeError):
         bool(first == second)
 
@@ -425,6 +403,53 @@ def test_a_construction_of_an_undecided_family_equality_is_built() -> None:
     assert second_product is not first_product
     assert first_product.factor(0) is first_factor
     assert second_product.factor(0) is second_factor
+    assert Sets().product(first) is first_product
+    assert Sets().product(second) is second_product
+
+    first_coproduct = Sets().coproduct(first)
+    second_coproduct = Sets().coproduct(second)
+    assert second_coproduct is not first_coproduct
+    assert Sets().coproduct(first) is first_coproduct
+    assert Sets().coproduct(second) is second_coproduct
+
+
+def test_a_product_is_found_without_comparing_the_families_of_other_products() -> None:
+    r"""Finding a product compares the family with the family of that product alone.
+
+    Three hundred products of one-point sets with a two-point set are built, and
+    the factors' points count each comparison made of them.  The family of the
+    last product, presented again with a new but equal one-point set, finds that
+    product, and the search compares exactly one pair of points: the two equal
+    points.  A search that compared the family with the family of every stored
+    product would compare a point with each of the three hundred.  The same holds
+    of the coproducts.
+    """
+    comparisons = []
+
+    class CountedPoint:
+        r"""A point equal to the points of the same number, counting its comparisons."""
+
+        def __init__(self, number):
+            self.number = number
+
+        def __eq__(self, other):
+            comparisons.append(other)
+            return self.number == other.number
+
+        def __hash__(self):
+            return hash(self.number)
+
+    count = 300
+    second = FiniteOrderedSets()((-1, -2))
+    for construction in (Sets().product, Sets().coproduct):
+        built = tuple(
+            construction((FiniteOrderedSets()((CountedPoint(number),)), second))
+            for number in range(count)
+        )
+        comparisons.clear()
+        again = FiniteOrderedSets()((CountedPoint(count - 1),))
+        assert construction((again, second)) is built[-1]
+        assert cardinal(sum(1 for _ in comparisons)) == cardinal(1)
 
 
 def test_infinite_constant_additive_product_retains_its_monoid_and_projections() -> None:

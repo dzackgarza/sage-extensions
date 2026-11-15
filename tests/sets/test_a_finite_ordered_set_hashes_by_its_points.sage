@@ -1,12 +1,13 @@
-r"""A finite ordered set hashes its points, in order, and nothing weaker (#531).
+r"""A finite ordered set hashes its points, in order, and nothing weaker.
 
 :meth:`FiniteOrderedSets.ParentMethods.__hash__` is ``hash(tuple(self))``, which
 is the data :meth:`__eq__` compares: two equal sets hash equally, two distinct
 sets of one cardinality hash apart on their points, and a set carrying a point
-that refuses a hash refuses one too.  The span bases below are the finite ordered
-sets the cache of ``_lattice_subobject_spanning`` is keyed by (#390), and a
-64-bit hash of 200 distinct contents collides on no pair short of probability
-``1e-15``, so the count of distinct values is an assertion and not a tolerance.
+that refuses a hash is not a point of a finite ordered set.  The span bases below
+are the finite ordered sets the cache of ``_lattice_subobject_spanning`` is keyed
+by, and a 64-bit hash of 200 distinct contents collides on no pair short of
+probability ``1e-15``, so the count of distinct values is an assertion and not a
+tolerance.
 """
 
 from sage_extensions.all import *  # noqa: F401,F403
@@ -33,8 +34,7 @@ def _span_basis(lattice, index):
     of the lattice's generators, which is independent for every ``k``, so the
     set is a basis of the rank-two span it generates.  The bases are built
     through :class:`FiniteOrderedSets`, which is the class whose hash is at
-    issue: its points are lattice vectors, the objects the cache of #390 keys
-    on.
+    issue: its points are lattice vectors, the objects that cache keys on.
     """
     labels = tuple(lattice.module_generating_set())
     points = tuple(lattice.module_generator(label) for label in labels)
@@ -78,8 +78,8 @@ def test_distinct_span_bases_of_one_rank_do_not_share_a_hash() -> None:
     ``N = 200`` the number of colliding pairs a 64-bit hash is expected to
     produce is ``N(N-1)/2 * 2^-64``, about ``1e-15``, and the assertion is that
     the number of distinct values is ``N`` exactly.  A hash of the cardinality
-    alone gives one value, which is the defect of #531 and the reason one cache
-    lookup in #390's run compared every stored span basis in turn.
+    alone gives one value, and a cache lookup then compares every stored span
+    basis in turn.
     """
     lattice = _small_lattice()
     bases = _span_bases(lattice, _COUNT)
@@ -101,8 +101,8 @@ def test_a_span_basis_finds_its_own_cache_entry_without_scanning_the_others() ->
     The dictionary a cache keeps is the consumer of the two tests above: two
     equal finite ordered sets are one key, so a lookup reaches the stored entry,
     and a distinct set is another key.  Written with the sets themselves as
-    keys, it is the statement #531 closes with -- the entry is found in constant
-    time, not by comparing the stored keys one by one.
+    keys, the entry is found in constant time, not by comparing the stored keys
+    one by one.
     """
     lattice = _small_lattice()
     bases = _span_bases(lattice, 32)
@@ -138,17 +138,17 @@ def test_a_finite_ordinal_hashes_by_its_points_like_the_set_they_form() -> None:
     assert hash(ordinal) != hash(shifted)
 
 
-def test_a_set_with_an_unhashable_point_is_unhashable() -> None:
-    r"""An equal pair of sets, one of whose points refuses a hash, has one hash: none.
+def test_a_point_that_refuses_a_hash_is_not_a_point_of_a_finite_set() -> None:
+    r"""The points of a finite ordered set hash; a mutable vector is refused, its immutable copy is a point.
 
-    :class:`tuple` and :class:`frozenset` hash their contents and refuse a hash
-    when a content does not hash; a finite ordered set is the same data.  A
-    mutable Sage vector or matrix is unhashable and equals its immutable copy,
-    so the two sets below are equal: a hash that fell back to something weaker
-    than the points when a point refused a hash gives these two equal sets two
-    values.  The points are built over Python integers, ``int(...)``, because
-    the preparser makes a literal a library integer that Sage's constructors
-    reject (``tests/forms/test_the_coble_anti_isometry.sage``).
+    A mutable Sage vector or matrix refuses a hash and equals its immutable copy.
+    It can change after a set holding it is built, so it is not a point of a set:
+    the construction refuses it, and the set of the immutable copy is the set.  The
+    mutable vector is still a candidate for membership, and it lies in the set of
+    its immutable copy.  A Python list is refused the same way, and the tuple of
+    its entries is a point.  The points are built over Python integers,
+    ``int(...)``, because the preparser makes a literal a library integer that
+    Sage's constructors reject (``tests/forms/test_the_coble_anti_isometry.sage``).
     """
     mutable_vector = vector([int(1), int(2)])
     immutable_vector = vector([int(1), int(2)])
@@ -164,12 +164,14 @@ def test_a_set_with_an_unhashable_point_is_unhashable() -> None:
         (mutable_matrix, immutable_matrix),
     ):
         with pytest.raises(TypeError):
-            hash(mutable)
-        floating = FiniteOrderedSets()((mutable,))
+            FiniteOrderedSets()((mutable,))
         fixed = FiniteOrderedSets()((immutable,))
         relocated = FiniteOrderedSets()((immutable,))
-        assert floating == fixed
         assert fixed == relocated
         assert hash(fixed) == hash(relocated)
-        with pytest.raises(TypeError):
-            hash(floating)
+        assert mutable in fixed
+
+    with pytest.raises(TypeError):
+        FiniteOrderedSets()(([0], [1]))
+    labels = FiniteOrderedSets()(((0,), (1,)))
+    assert hash(labels) == hash(FiniteOrderedSets()(((0,), (1,))))
