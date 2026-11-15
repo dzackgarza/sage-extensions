@@ -1,0 +1,33 @@
+# just tensor-boundary (scope=all) on the two trees, with the repository recipe.
+# ast-grep 0.51.2 from `uvx --from ast-grep-cli ast-grep`, standing in for the
+# recipe's pinned @ast-grep/cli@0.41.0, which this host has no npm to install;
+# the patterns are the recipe's own and are matched as AST patterns.
+
+## main: refs/remotes/omm/main 52cbab3e7c77c2202311a59057a3c332a15b1efc
+ 168  $X.transpose()
+   0  $X.T
+   0  $X.matrix_action_right($$$A)
+   0  $X.matrix_action_left($$$A)
+   0  $X.einsum($$$A)
+   0  $X.matmul($$$A)
+   0  $X.dot($$$A)
+   0  $X @ $Y
+168 suspected coordinate operations outside sage_extensions/tensors/: state the owned pullback, contraction, composition, inverse or application instead.
+
+## fixed: 52cbab3 with this round's changes
+ 166  $X.transpose()
+   0  $X.T
+   0  $X.matrix_action_right($$$A)
+   0  $X.matrix_action_left($$$A)
+   0  $X.einsum($$$A)
+   0  $X.matmul($$$A)
+   0  $X.dot($$$A)
+   0  $X @ $Y
+166 suspected coordinate operations outside sage_extensions/tensors/: state the owned pullback, contraction, composition, inverse or application instead.
+
+## polyhedral_cones.py
+main findings on this file: 0
+fixed findings on this file: 0
+the recipe prints the first 40 findings of each pattern, so the file's absence from
+the printed list is not evidence; the totals are: 168 -> 166, exactly the two
+$X.transpose() calls of the removed orthogonal projection, and no pattern's count rose.

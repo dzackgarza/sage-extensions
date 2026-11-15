@@ -5,7 +5,6 @@ from sage.arith.misc import gcd
 from sage.geometry.cone import Cone as SageCone
 from sage.geometry.polyhedron.constructor import Polyhedron
 from sage.matrix.constructor import matrix
-from sage.matrix.special import identity_matrix
 from sage.misc.cachefunc import cached_method
 from sage.rings.integer_ring import ZZ as SageZZ
 from sage.rings.rational_field import QQ as SageQQ
@@ -532,27 +531,23 @@ class RationalPolyhedralCones(OwnedParameterizedCategory):
 
         @cached_method
         def __hash__(self) -> int:
-            r"""Hash the ambient lattice and a canonical form of the cone.
+            r"""Hash the ambient lattice and the canonical form of the cone.
 
-            Equal cones are one subset of ``L tensor QQ``.  A pointed cone is
-            spanned by its primitive rays, which the subset determines, so
-            their hashes, as a set, are the canonical form.  A cone with a
-            lineality space hashes the Hermite basis of the lattice that space
-            meets together with the primitive rays of the cone's image modulo
-            it (:meth:`_canonical_form_modulo_lineality`), which is a complete
-            invariant of the cone; the dimension and the lineality dimension
-            are not, and put the two sides of one line in one bucket.
+            Equal cones are one subset of ``L tensor QQ``, and
+            :meth:`_canonical_form_modulo_lineality` states a complete
+            invariant of that subset: the Hermite basis of the lattice the
+            lineality space meets, and the primitive rays of the cone's image
+            modulo it.  A pointed cone meets no lattice along a lineality, so
+            its basis is empty and its image is itself, and the pointed case
+            is this one.
 
             The hash is cached: a cone is a factor of the interned finite
             products and coproducts (`SET-05`), and the canonical form is
             computed from the private exact polyhedron.
             """
-            lattice = id(self.ambient_lattice())
-            match self.is_pointed():
-                case True:
-                    return hash((lattice, tuple(sorted(hash(ray) for ray in self.primitive_rays()))))
-                case False:
-                    return hash((lattice, self._canonical_form_modulo_lineality()))
+            return hash(
+                (id(self.ambient_lattice()), self._canonical_form_modulo_lineality())
+            )
 
         @cached_method
         def _lineality_lattice_basis(self):
@@ -583,27 +578,34 @@ class RationalPolyhedralCones(OwnedParameterizedCategory):
         def _image_rays_modulo_lineality(self):
             r"""Return the primitive rays of this cone's image modulo its lineality.
 
-            The cone modulo its lineality space is a pointed cone in
-            ``(L / Lambda) tensor QQ``.  The orthogonal projection onto the
-            orthogonal complement of ``Lambda`` is an isomorphism of that
-            quotient with a subspace of ``L tensor QQ``, fixed by the ambient
-            framing, so the image of each extreme ray is read there and stated
-            by the primitive integral vector on it, which the ray determines.
-            A ray of a cone is not in its lineality space, so no image is zero.
+            The cone modulo its lineality space is a pointed cone, and each of
+            its extreme rays is the image of an extreme ray of the cone, which
+            is not in the lineality space.  The image is stated by the
+            primitive integral vector on each extreme ray, read in the
+            transversal of ``Lambda`` that its Hermite basis singles out: at
+            each pivot column the basis row is subtracted until that
+            coordinate is reduced modulo the pivot entry, and, a row vanishing
+            left of its own pivot, the columns are reduced independently.
+            That transversal is determined by ``Lambda`` and the ambient
+            framing, and the primitive vector on a ray by the cone, so the
+            image does not depend on the presentation that cut the cone out.
             """
-            basis = self._lineality_lattice_basis()
-            rank = int(self.ambient_lattice().module_rank())
-            if basis.nrows() == 0:
-                projection = identity_matrix(SageQQ, rank)
-            else:
-                rows = basis.change_ring(SageQQ)
-                projection = identity_matrix(SageQQ, rank) - rows.transpose() * (
-                    rows * rows.transpose()
-                ).inverse() * rows
+            reductions = []
+            for row in self._lineality_lattice_basis().rows():
+                entries = tuple(int(entry) for entry in row)
+                pivot = next(column for column, entry in enumerate(entries) if entry)
+                reductions.append((pivot, entries))
             images = []
             for ray in self._engine.rays():
-                image = matrix(SageQQ, [tuple(ray)]) * projection
-                primitive = _primitive_integral_coordinates(tuple(image[0]))
+                image = list(_primitive_integral_coordinates(tuple(ray)))
+                for pivot, entries in reductions:
+                    multiple = image[pivot] // entries[pivot]
+                    if multiple:
+                        image = [
+                            coordinate - multiple * entry
+                            for coordinate, entry in zip(image, entries, strict=True)
+                        ]
+                primitive = _primitive_integral_coordinates(tuple(image))
                 assert any(primitive), (
                     f"the ray {ray} of {self} lies in its lineality space, so the exact "
                     f"polyhedron reported a ray that is not an extreme ray of the cone"
@@ -618,10 +620,12 @@ class RationalPolyhedralCones(OwnedParameterizedCategory):
             It is the Hermite basis of the lattice the lineality space meets,
             and the primitive rays of the cone's image modulo that lattice,
             both stated as integer coordinate vectors of the ambient framing.
+            A pointed cone meets no lattice along a lineality: its basis is
+            empty, its image is itself, and its form is its primitive rays.
             Two cones of one lattice with one canonical form are one set: a
             cone that contains a direction contains both of its rays, so the
             lineality space is determined by the cone, and the cone is the
-            preimage of its own image, which its extreme rays span.
+            lineality space plus its extreme rays, which its image states.
             """
             return (
                 tuple(

@@ -1990,15 +1990,20 @@ class SetSubobjectCategory(SliceCategory):
             positions in its enumeration.
 
             Over an infinite ambient set this is the hash of that set, and
-            every subset of it hashes alike.  No finer invariant is decidable.
-            Equality there is containment both ways, and :meth:`is_contained_in`
-            states each containment as a proposition unless the inclusion's
-            domain is a finite enumeration, so two subsets that no procedure
-            separates may yet be decided equal, and a hash that separated them
-            would contradict that decision.  The presentation is not an
-            invariant to hash instead: one subset is cut out by many
-            predicates, and equal subsets are not obliged to share the
-            predicate that decides their members.
+            every subset of it hashes alike.  Equality there is containment
+            both ways, and :meth:`is_contained_in` states each containment as a
+            proposition unless the inclusion's domain is a finite enumeration,
+            so two subsets that no procedure separates may yet be decided
+            equal, and a hash that separated them would contradict that
+            decision.  The reason is Rice's theorem: over an infinite ambient
+            set the subsets are given by arbitrary computable predicates, so a
+            computable invariant that is constant on equal sets is constant on
+            all of them (Rice, *Trans. Amer. Math. Soc.* 74 (1953), 358-366).
+            A subclass whose equality is decidable refines the hash, as the
+            finite enumerated sets above do.  The presentation is not such a
+            refinement: one subset is cut out by many predicates, and equal
+            subsets are not obliged to share the predicate that decides their
+            members.
 
             The hash is cached.  A subset is a factor of the interned finite
             products and coproducts, whose store keys a family by its factors'

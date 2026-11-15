@@ -60,14 +60,14 @@ def test_triangles_with_one_vertex_set_are_one_polytope_with_one_hash() -> None:
     r"""A polytope is its vertex set: one triangle is one set, five are five hashes.
 
     A polytope is the convex hull of its vertices, so two polytopes of one
-    lattice are equal exactly when they have the same vertices -- what
-    containment both ways, the equality of two subsets of an infinite ambient
-    set, states as a proposition that no procedure decides.  The triangle on
-    ``(0, 0), (1, 0), (0, 1)`` listed from another corner is the same polytope,
-    and so is the polytope of the halfspaces ``x >= 0``, ``y >= 0`` and
-    ``x + y <= 1``, whose vertices the private exact polyhedron computes
+    lattice are equal exactly when they have the same vertices.  The triangle
+    on ``(0, 0), (1, 0), (0, 1)`` listed from another corner is the same
+    polytope, and so is the polytope of the halfspaces ``x >= 0``, ``y >= 0``
+    and ``x + y <= 1``, whose vertices the private exact polyhedron computes
     instead of reading.  Five triangles with different vertices are five sets,
-    so their hashes take five values.
+    so their hashes take five values.  An equal triangle is one factor, so the
+    interned products of ``SET-05`` find one product for its three
+    presentations, and a triangle with other vertices gives another product.
     """
     lattice = ZZ ^ 2
     category = ConvexPolytopes(lattice)
@@ -80,6 +80,17 @@ def test_triangles_with_one_vertex_set_are_one_polytope_with_one_hash() -> None:
     assert hash(triangle) == hash(relocated)
     assert hash(triangle) == hash(cut)
     assert cut.n_vertices() == 3
+
+    product = Sets().product((triangle, Sets.Δ[1]))
+    assert product.factor(0) is triangle
+    assert Sets().product((triangle, Sets.Δ[1])) is product
+    assert Sets().product((relocated, Sets.Δ[1])) is product
+    assert Sets().product((cut, Sets.Δ[1])) is product
+
+    other = category(((0, 0), (2, 0), (0, 1)))
+    other_product = Sets().product((other, Sets.Δ[1]))
+    assert other_product is not product
+    assert other_product.factor(0) is other
 
     triangles = [
         category(vertices)

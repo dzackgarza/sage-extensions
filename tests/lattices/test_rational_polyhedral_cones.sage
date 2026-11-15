@@ -149,20 +149,19 @@ def test_distinct_cones_of_one_shape_hash_apart_and_equal_cones_hash_alike() -> 
     assert hash(quadrant) == hash(doubled)
 
 
-def test_a_cone_with_a_lineality_space_is_not_hashed_by_its_dimensions_alone() -> None:
-    r"""Three half-planes of one dimension and one lineality dimension are three hashes.
+def test_three_half_planes_of_one_dimension_and_one_lineality_space_are_three_sets() -> None:
+    r"""Three half-planes of one dimension and one lineality dimension are three sets.
 
     ``y >= 0``, ``y <= x`` and ``x + y <= 0`` each have dimension two and a
-    lineality space of dimension one, so a hash of those two numbers puts them
-    in one bucket.  They are three sets: the lineality lattices they meet are
-    ``<(1, 0)>``, ``<(1, 1)>`` and ``<(1, -1)>``, and the cone modulo its
-    lineality space is a ray on ``(0, 1)``, ``(1, -1)`` and ``(-1, -1)``
-    respectively.  The hash reads the lineality lattice in Hermite normal form
-    and the primitive rays of that image: the half-plane ``y >= 0`` is the set
-    with ``y > 0``, the half-plane ``y <= x`` the one with ``y - x < 0``,
-    whose primitive integral direction in the plane orthogonal to the
-    lineality is ``(1, -1)``, and ``x + y <= 0`` the one with
-    ``x + y < 0``, whose direction there is ``(-1, -1)``.
+    lineality space of dimension one, so the dimension and the lineality
+    dimension do not separate them.  They are three sets: the lineality
+    lattices they meet are ``<(1, 0)>``, ``<(1, 1)>`` and ``<(1, -1)>``, and
+    the cone modulo its lineality space is a ray, on ``(0, 1)`` for
+    ``y >= 0`` and on the class of ``(0, -1)`` for ``y <= x`` and for
+    ``x + y <= 0``, the latter's extreme ray ``(-1, 0)`` being
+    ``(0, -1) - (1, -1)``.
+    The half-planes are the sets ``{(x, y) : y >= 0}``,
+    ``{(x, y) : y - x <= 0}`` and ``{(x, y) : x + y <= 0}``.
     """
     lattice = Lattices(ZZ)([[1, 0], [0, 1]])
     upper = lattice.reduction_cell(((0, 1),))
@@ -179,13 +178,14 @@ def test_a_cone_with_a_lineality_space_is_not_hashed_by_its_dimensions_alone() -
     assert cardinal(sum(1 for _ in {hash(upper), hash(steeper), hash(mirror)})) == cardinal(3)
 
 
-def test_two_half_planes_of_one_lineality_lattice_hash_apart_by_their_images() -> None:
+def test_two_half_planes_of_one_lineality_lattice_are_two_sets() -> None:
     r"""``y >= 0`` and ``y <= 0`` meet one lineality lattice and differ on its two sides.
 
     Each has dimension two and one lineality generator, on ``(1, 0)``, so the
     two cones share their lineality lattice; their extreme rays are ``(0, 1)``
-    and ``(0, -1)``, the two images of the plane modulo that line.  A hash of
-    the dimension and the lineality dimension would put them in one bucket.
+    and ``(0, -1)``, the two images of the plane modulo that line.  The two
+    sets are the two sides of the line, and the ray they meet it on is what
+    separates them.
     """
     lattice = Lattices(ZZ)([[1, 0], [0, 1]])
     upper = lattice.reduction_cell(((0, 1),))
@@ -197,14 +197,14 @@ def test_two_half_planes_of_one_lineality_lattice_hash_apart_by_their_images() -
     assert hash(upper) != hash(lower)
 
 
-def test_two_quarter_spaces_of_one_dimension_and_one_lineality_line_hash_apart() -> None:
-    r"""Two quarter-spaces of ``Z^3`` with one lineality line have two hashes.
+def test_two_quarter_spaces_of_one_dimension_and_one_lineality_line_are_two_sets() -> None:
+    r"""Two quarter-spaces of ``Z^3`` with one lineality line are two sets.
 
     ``{y >= 0, z >= 0}`` and ``{y <= 0, z >= 0}`` both have dimension three,
     one lineality generator on ``(1, 0, 0)`` and two extreme rays, so neither
     the dimension nor the number of rays separates them.  Their images modulo
     the lineality are the quadrants of the ``(y, z)`` plane cut out by the
-    signs ``(+, +)`` and ``(-, +)``, which is what the hash reads.
+    signs ``(+, +)`` and ``(-, +)``.
     """
     lattice = Lattices(ZZ)([[1, 0, 0], [0, 1, 0], [0, 0, 1]])
     upper = lattice.reduction_cell(((0, 1, 0), (0, 0, 1)))

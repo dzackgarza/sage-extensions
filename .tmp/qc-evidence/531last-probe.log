@@ -1,0 +1,116 @@
+tree SHA: 52cbab3e7c77c2202311a59057a3c332a15b1efc
+port SHA: 991b88b0
+inner 300 s, outer 400 s, guard 4096 MiB
+command: /sage/.venv/bin/python -u -s /probe.py
+quadrant: pointed=True dim=2
+  lines     []
+  rays      [(1, 0), (0, 1)]
+  images    ((0, 1), (1, 0))
+  form      ((), ((0, 1), (1, 0)))
+  hash      8661679495170154033
+narrow: pointed=True dim=2
+  lines     []
+  rays      [(2, 1), (0, 1)]
+  images    ((0, 1), (2, 1))
+  form      ((), ((0, 1), (2, 1)))
+  hash      -4323570905394875677
+diagonal: pointed=True dim=2
+  lines     []
+  rays      [(1, 1), (1, -1)]
+  images    ((1, -1), (1, 1))
+  form      ((), ((1, -1), (1, 1)))
+  hash      8458489090551704931
+doubled: pointed=True dim=2
+  lines     []
+  rays      [(1, 0), (0, 1)]
+  images    ((0, 1), (1, 0))
+  form      ((), ((0, 1), (1, 0)))
+  hash      8661679495170154033
+upper: pointed=False dim=2
+  lines     [(1, 0)]
+  rays      [(0, 1)]
+  images    ((0, 1),)
+  form      (((1, 0),), ((0, 1),))
+  hash      -242375878741777195
+steeper: pointed=False dim=2
+  lines     [(1, 1)]
+  rays      [(0, -1)]
+  images    ((0, -1),)
+  form      (((1, 1),), ((0, -1),))
+  hash      8724894764623625588
+mirror: pointed=False dim=2
+  lines     [(1, -1)]
+  rays      [(-1, 0)]
+  images    ((0, -1),)
+  form      (((1, -1),), ((0, -1),))
+  hash      -5574343903750701825
+lower: pointed=False dim=2
+  lines     [(1, 0)]
+  rays      [(0, -1)]
+  images    ((0, -1),)
+  form      (((1, 0),), ((0, -1),))
+  hash      -2171813539330838782
+upper3: pointed=False dim=3
+  lines     [(1, 0, 0)]
+  rays      [(0, 1, 0), (0, 0, 1)]
+  images    ((0, 0, 1), (0, 1, 0))
+  form      (((1, 0, 0),), ((0, 0, 1), (0, 1, 0)))
+  hash      6776144716443654069
+lower3: pointed=False dim=3
+  lines     [(1, 0, 0)]
+  rays      [(0, 0, 1), (0, -1, 0)]
+  images    ((0, -1, 0), (0, 0, 1))
+  form      (((1, 0, 0),), ((0, -1, 0), (0, 0, 1)))
+  hash      4509220021646105259
+wedges: pointed=False dim=3
+  lines     [(0, 0, 1)]
+  rays      [(1, 0, 0), (0, 1, 0)]
+  images    ((0, 1, 0), (1, 0, 0))
+  form      (((0, 0, 1),), ((0, 1, 0), (1, 0, 0)))
+  hash      4204814836261987587
+scaled_wedges: pointed=False dim=3
+  lines     [(0, 0, 1)]
+  rays      [(1, 0, 0), (0, 1, 0)]
+  images    ((0, 1, 0), (1, 0, 0))
+  form      (((0, 0, 1),), ((0, 1, 0), (1, 0, 0)))
+  hash      4204814836261987587
+swapped_wedges: pointed=False dim=3
+  lines     [(0, 0, 1)]
+  rays      [(1, 0, 0), (0, 1, 0)]
+  images    ((0, 1, 0), (1, 0, 0))
+  form      (((0, 0, 1),), ((0, 1, 0), (1, 0, 0)))
+  hash      4204814836261987587
+negative_line: pointed=False dim=2
+  lines     [(0, 1)]
+  rays      [(-1, 0)]
+  images    ((-1, 0),)
+  form      (((0, 1),), ((-1, 0),))
+  hash      7192138075614739752
+positive_line: pointed=False dim=2
+  lines     [(0, 1)]
+  rays      [(1, 0)]
+  images    ((1, 0),)
+  form      (((0, 1),), ((1, 0),))
+  hash      -6006271794446551266
+--- equality implies one form, and the hash agrees with equality
+pairs checked=120 mismatches=0
+--- polytope vertex set read from the engine polyhedron
+engine vertices [(1, 0), (0, 1), (0, 0)]
+triangle set frozenset({(0, 1), (1, 0), (0, 0)})
+cut set      frozenset({(1, 0), (0, 0), (0, 1)})
+equal True True hash equal True True
+--- one product for the three presentations
+factor True
+triangle True
+relocated True
+cut True
+other is not True True
+five hashes 5
+[peakrss] probe531: child waited=0 shell_code=0 samples=1
+[peakrss] peak tree RSS      : 5 MiB
+[peakrss] low-water MemAvail : 12497 MiB
+[peakrss] peak single VmHWM  : 5 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   timeout                       6 MiB peak
+[peakrss]   t=     0.0s procs=  1 rss=     5 MiB hwm=     5 MiB avail= 12497 MiB
+launcher exit: 0

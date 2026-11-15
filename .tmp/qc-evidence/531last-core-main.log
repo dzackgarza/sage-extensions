@@ -1,0 +1,281 @@
+tree SHA: 52cbab3e7c77c2202311a59057a3c332a15b1efc
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+inner 520 s, outer 580 s, guard 6144 MiB
+command: python -m pytest -p qc_sage_session tests/schemes/test_polytopes.sage tests/lattices/test_rational_polyhedral_cones.sage tests/sets/test_a_subset_is_a_cache_key.sage tests/objects/test_standard_triangle.sage tests/lattices/test_reduction_cell_adjacency.sage tests/lattices/test_reduction_cell_faces.sage -q -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates  (repository addopts)
+FFF...................FF.FFF                                             [100%]
+=================================== FAILURES ===================================
+____________ test_triangle_with_vertices_0_0_0_3_6_0_satisfies_pick ____________
+
+    def test_triangle_with_vertices_0_0_0_3_6_0_satisfies_pick() -> None:
+        r"""Area 9; boundary points `\gcd(0,3) + \gcd(6,3) + \gcd(6,0) = 3 + 3 + 6 = 12`;
+        Pick's theorem `9 = I + 12/2 - 1` gives 4 interior points, 16 in all."""
+        lattice = ZZ.free_module(2)
+        triangle = ConvexPolytopes(lattice)(((0, 0), (0, 3), (6, 0)))
+    
+        assert triangle.dimension() == 2
+        assert triangle.volume() == 9
+        assert triangle.normalized_volume() == 18
+        assert triangle.n_integral_points() == 16
+        assert triangle.n_interior_points() == 4
+        assert triangle.n_boundary_points() == 12
+>       assert triangle.interior_contains_point((1, 1))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/schemes/test_polytopes.sage:19: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/schemes/polytopes.py:1006: in interior_contains_point
+    self._engine_coordinates(point)
+src/sage_extensions/categories/schemes/polytopes.py:700: in _engine_coordinates
+    point = self.rational_point(point)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Lattice Polygon of dimension 2 with 3 vertices, point = (1, 1)
+
+    def rational_point(self, point):
+        r"""Return ``point`` of ``M`` or ``M_QQ`` as a point of ``M_QQ = M tensor QQ``.
+    
+        ``M`` includes into ``M_QQ`` by ``m |-> m tensor 1``, which keeps
+        the coordinates of ``m`` in the shared frame.
+        """
+        ambient = self.ambient_space()
+        lattice = self.ambient_lattice()
+>       match point.parent():
+              ^^^^^^^^^^^^
+            case parent if parent is lattice:
+E           AttributeError: 'tuple' object has no attribute 'parent'
+
+src/sage_extensions/categories/schemes/polytopes.py:684: AttributeError
+____ test_square_has_ehrhart_polynomial_2t_plus_1_squared_and_h_star_1_6_1 _____
+
+    def test_square_has_ehrhart_polynomial_2t_plus_1_squared_and_h_star_1_6_1() -> None:
+        r"""`t[-1,1]^2` has `(2t+1)^2` lattice points; `h^* = (1, L(1) - 3, I) = (1, 6, 1)`,
+        summing to the normalized volume 8.  It is reflexive; its polar dual is the
+        reflexive diamond `\operatorname{conv}\{\pm e_1, \pm e_2\}`, whose polar dual is
+        the square again."""
+        lattice = ZZ.free_module(2)
+        square = ConvexPolytopes(lattice)(((-1, -1), (-1, 1), (1, 1), (1, -1)))
+        polynomial = square.ehrhart_polynomial()
+        t = polynomial.parent().algebra_generator("t")
+        polar = square.polar_dual()
+    
+        assert polynomial == 4 * t**2 + 4 * t + 1
+        assert tuple(square.h_star_vector()) == (1, 6, 1)
+        assert square.is_reflexive()
+        assert polar.is_reflexive()
+        assert polar.n_integral_points() == 5
+        assert polar.volume() == 2
+>       assert polar.polar_dual() == square
+
+tests/schemes/test_polytopes.sage:40: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = is_subset(Lattice Polygon of dimension 2 with 4 vertices, Lattice Polygon of dimension 2 with 4 vertices) and is_subset(Lattice Polygon of dimension 2 with 4 vertices, Lattice Polygon of dimension 2 with 4 vertices)
+
+    def __bool__(self):
+>       raise TypeError(f"the proposition {self} has no Python truth value, because it may be undecided; call ask(...) on it to get True, False or Unknown")
+E       TypeError: the proposition is_subset(Lattice Polygon of dimension 2 with 4 vertices, Lattice Polygon of dimension 2 with 4 vertices) and is_subset(Lattice Polygon of dimension 2 with 4 vertices, Lattice Polygon of dimension 2 with 4 vertices) has no Python truth value, because it may be undecided; call ask(...) on it to get True, False or Unknown
+
+src/sage_extensions/logic.py:44: TypeError
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:830 Elementwise module morphism Module over Fraction Field of Integer Ring on Classes in the multilinear tensor presentation -> Module over Fraction Field of Integer Ring on Fraction Field of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+___ test_dodecahedron_has_coxeter_diagram_h3_and_symmetry_group_of_order_120 ___
+
+>   return self._cached_methods[name]
+E   KeyError: 'f_vector'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_dodecahedron_has_coxeter_diagram_h3_and_symmetry_group_of_order_120() -> None:
+        r"""The dodecahedron `\{5, 3\}` has 20 vertices, 30 edges, 12 faces, and full
+        symmetry group the Coxeter group `H_3` of order 120 (Coxeter, *Regular
+        Polytopes*, Table I)."""
+        dodecahedron = RegularPolytopes().from_schlafli_symbol("{5,3}")
+        diagram = dodecahedron.symmetry_coxeter_diagram()
+        first, second, third = diagram.vertices()
+    
+        assert dodecahedron.dimension() == 3
+>       assert tuple(dodecahedron.f_vector()) == (1, 20, 30, 12, 1)
+                     ^^^^^^^^^^^^^^^^^^^^^
+
+tests/schemes/test_polytopes.sage:52: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    ???
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: 'RegularPolytopes.parent_class' object has no attribute 'f_vector'
+
+sage/cpython/getattr.pyx:357: AttributeError
+___________________ test_the_lattice_points_of_the_triangle ____________________
+
+    def test_the_lattice_points_of_the_triangle() -> None:
+        r"""The three vertices are all its lattice points, all on the boundary; Pick: $A = i + b/2 - 1 = 0 + 3/2 - 1$."""
+        polytope = triangle()
+        assert polytope.n_integral_points() == 3
+        assert polytope.n_interior_points() == 0
+        assert polytope.n_boundary_points() == 3
+>       assert polytope.contains_point([0, 0])
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/objects/test_standard_triangle.sage:43: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/schemes/polytopes.py:1001: in contains_point
+    return bool(self._engine_polyhedron().contains(self._engine_coordinates(point)))
+                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/schemes/polytopes.py:700: in _engine_coordinates
+    point = self.rational_point(point)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Lattice Polygon of dimension 2 with 3 vertices, point = [0, 0]
+
+    def rational_point(self, point):
+        r"""Return ``point`` of ``M`` or ``M_QQ`` as a point of ``M_QQ = M tensor QQ``.
+    
+        ``M`` includes into ``M_QQ`` by ``m |-> m tensor 1``, which keeps
+        the coordinates of ``m`` in the shared frame.
+        """
+        ambient = self.ambient_space()
+        lattice = self.ambient_lattice()
+>       match point.parent():
+              ^^^^^^^^^^^^
+            case parent if parent is lattice:
+E           AttributeError: 'list' object has no attribute 'parent'
+
+src/sage_extensions/categories/schemes/polytopes.py:684: AttributeError
+_________________ test_the_ehrhart_polynomial_of_the_triangle __________________
+
+    def test_the_ehrhart_polynomial_of_the_triangle() -> None:
+        r"""$|t\Delta \cap \mathbb Z^2| = \binom{t+2}{2}$: $6$ points in $2\Delta$."""
+>       assert triangle().ehrhart_polynomial()(2) == 6
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: 'Owned_NativeFreeAlgebraParent_with_category.element_class' object is not callable
+
+tests/objects/test_standard_triangle.sage:49: TypeError
+________ test_the_toric_variety_of_the_triangle_is_the_projective_plane ________
+
+    def test_the_toric_variety_of_the_triangle_is_the_projective_plane() -> None:
+>       assert triangle().toric_variety().is_isomorphic_to(ProjectiveSpaces(QQ)(2))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: ConvexPolytopes.Integral.ParentMethods.toric_variety() missing 1 required positional argument: 'base_ring'
+
+tests/objects/test_standard_triangle.sage:60: TypeError
+_ test_a_quadrant_meets_its_reflection_in_a_ray_and_its_opposite_only_at_the_origin _
+
+>   return self._cached_methods[name]
+E   KeyError: 'transported_by'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_a_quadrant_meets_its_reflection_in_a_ray_and_its_opposite_only_at_the_origin() -> None:
+        r"""The cones on \((e_0,e_1)\) and \((-e_0,e_1)\) share the ray \(\mathbb R_{\ge0}e_1\);
+        the cones on \((e_0,e_1)\) and \((-e_0,-e_1)\) meet only in \(0\).  The reflection
+        \(e_0\mapsto-e_0\) in \(O(\mathbb Z^2)\) carries the first onto the second.
+        """
+        lattice = Lattices(ZZ)([[1, 0], [0, 1]])
+        first = lattice.reduction_cell(((1, 0), (0, 1)))
+        reflected = lattice.reduction_cell(((-1, 0), (0, 1)))
+        opposite = lattice.reduction_cell(((-1, 0), (0, -1)))
+    
+        common = first.intersection(reflected)
+        assert common.dimension() == 1
+        assert common.is_face_of(first)
+        assert common.is_face_of(reflected)
+        assert first.is_adjacent_to(reflected)
+        assert not first.is_adjacent_to(opposite)
+    
+        e0, e1 = lattice.module_generators()
+        labels = lattice.module_generating_set()
+        reflection = lattice.O()({labels[0]: -e0, labels[1]: e1})
+>       assert first.transported_by(reflection).is_equal_to(reflected)
+               ^^^^^^^^^^^^^^^^^^^^
+
+tests/lattices/test_reduction_cell_adjacency.sage:26: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    return self.getattr_from_category(name)
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    attr = getattr_from_other_class(self, cls, name)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: 'RationalPolyhedralCones.parent_class[Sets.parent_class[_ConditionSetEngine].ObjectType].ObjectType' object has no attribute 'transported_by'
+
+sage/cpython/getattr.pyx:362: AttributeError
+____ test_the_positive_quadrant_has_two_rays_and_a_stabilizer_of_order_two _____
+
+>   return self._cached_methods[name]
+E   KeyError: 'facet'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_the_positive_quadrant_has_two_rays_and_a_stabilizer_of_order_two() -> None:
+        r"""\(O(\mathbb Z^2)\) is the signed permutation group of order \(2^2\cdot2!=8\).
+        The quadrant \(\mathbb R_{\ge0}e_0+\mathbb R_{\ge0}e_1\) has two rays and is
+        stabilized exactly by \(\{1,\ (e_0\leftrightarrow e_1)\}\); the swap moves the
+        ray through \(e_0\), so the stabilizer of that ray inside it is trivial.
+        """
+        lattice = Lattices(ZZ)([[1, 0], [0, 1]])
+        orthogonal = lattice.O()
+        cell = lattice.reduction_cell(((1, 0), (0, 1)))
+        e0, e1 = lattice.module_generators()
+        labels = lattice.module_generating_set()
+        swap = orthogonal({labels[0]: e1, labels[1]: e0})
+    
+        assert orthogonal.cardinality() == 8
+        assert cell.faces(1).cardinality() == 2
+        assert cell.faces(2).cardinality() == 1
+        assert cell.faces(3).cardinality() == 0
+    
+        stabilizer = cell.stabilizer(orthogonal)
+        assert stabilizer.cardinality() == 2
+        assert swap in stabilizer
+    
+>       ray = cell.facet((1, 0))
+              ^^^^^^^^^^
+
+tests/lattices/test_reduction_cell_faces.sage:28: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    return self.getattr_from_category(name)
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    attr = getattr_from_other_class(self, cls, name)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: 'RationalPolyhedralCones.parent_class[Sets.parent_class[_ConditionSetEngine].ObjectType].ObjectType' object has no attribute 'facet'. Did you mean: 'faces'?
+
+sage/cpython/getattr.pyx:362: AttributeError
+=========================== short test summary info ============================
+FAILED tests/schemes/test_polytopes.sage::test_triangle_with_vertices_0_0_0_3_6_0_satisfies_pick
+FAILED tests/schemes/test_polytopes.sage::test_square_has_ehrhart_polynomial_2t_plus_1_squared_and_h_star_1_6_1
+FAILED tests/schemes/test_polytopes.sage::test_dodecahedron_has_coxeter_diagram_h3_and_symmetry_group_of_order_120
+FAILED tests/objects/test_standard_triangle.sage::test_the_lattice_points_of_the_triangle
+FAILED tests/objects/test_standard_triangle.sage::test_the_ehrhart_polynomial_of_the_triangle
+FAILED tests/objects/test_standard_triangle.sage::test_the_toric_variety_of_the_triangle_is_the_projective_plane
+FAILED tests/lattices/test_reduction_cell_adjacency.sage::test_a_quadrant_meets_its_reflection_in_a_ray_and_its_opposite_only_at_the_origin
+FAILED tests/lattices/test_reduction_cell_faces.sage::test_the_positive_quadrant_has_two_rays_and_a_stabilizer_of_order_two
+8 failed, 20 passed in 3.28s
+[peakrss] tests531: child waited=1 shell_code=1 samples=4
+[peakrss] peak tree RSS      : 483 MiB
+[peakrss] low-water MemAvail : 12702 MiB
+[peakrss] peak single VmHWM  : 483 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      472 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     6.0s procs=  3 rss=   483 MiB hwm=   483 MiB avail= 12702 MiB
+[peakrss]   t=     4.0s procs=  3 rss=   345 MiB hwm=   345 MiB avail= 12840 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   291 MiB hwm=   291 MiB avail= 12857 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     2 MiB hwm=     3 MiB avail= 13055 MiB

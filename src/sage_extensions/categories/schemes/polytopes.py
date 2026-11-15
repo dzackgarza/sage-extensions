@@ -780,13 +780,12 @@ class ConvexPolytopes(OwnedParameterizedCategory):
             lattice vertex and the same point of the ambient space are one
             point, so the polytope of a vertex list and the polytope the
             private exact polyhedron computes from a halfspace description meet
-            here, and the order that polyhedron enumerated its vertices in no
-            longer matters.  The set is cached because it is what this
-            polytope's equality and hash read, and it is computed from that
-            polyhedron.
+            here.  The set is cached because it is what this polytope's
+            equality and hash read, and it is read from that polyhedron.
             """
             return frozenset(
-                self._engine_coordinates(vertex) for vertex in self.vertices()
+                self._engine_coordinates(self.ambient_space()(tuple(vertex)))
+                for vertex in self._engine_polyhedron().vertices()
             )
 
         def is_equal_to(self, other) -> bool:
@@ -796,9 +795,6 @@ class ConvexPolytopes(OwnedParameterizedCategory):
             same vertices: a polytope is the convex hull of its vertex set, and
             the vertices are the points of the polytope that are not a convex
             combination of other points of it, so the subset determines them.
-            This is decidable; containment both ways, which is how two subsets
-            of an infinite ambient set are compared, is a proposition that no
-            procedure decides.
             """
             return (
                 other.ambient_lattice() is self.ambient_lattice()
