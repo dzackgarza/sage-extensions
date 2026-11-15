@@ -1029,20 +1029,42 @@ def test_a_subset_is_a_factor_and_equal_subsets_give_one_product() -> None:
 
 
 def test_a_polytope_is_a_factor_of_a_product() -> None:
-    r"""A convex polytope is a set, so it is a factor; asked again, its product is the same object.
+    r"""``SET-05``: an equal triangle is one factor, and different triangles are not.
 
-    Equality of two polytopes is containment both ways, which this library
-    states as a proposition, so a second triangle is compared and gets its own
-    product beside the first.
+    A polytope is the convex hull of its vertices, so its vertex set decides
+    the equality of two polytopes of one lattice -- what containment both ways,
+    the equality of two subsets of an infinite ambient set, leaves as a
+    proposition that no procedure decides.  A triangle and the triangle on the
+    same vertices listed from another corner are one set: one hash, and one
+    product with ``Delta[1]``.  Triangles with different vertices are
+    different convex hulls, and five of them have five hashes.
     """
     lattice = ZZ ^ 2
     triangle = ConvexPolytopes(lattice)([[0, 0], [1, 0], [0, 1]])
+    relocated = ConvexPolytopes(lattice)([[1, 0], [0, 1], [0, 0]])
     other = ConvexPolytopes(lattice)([[0, 0], [2, 0], [0, 1]])
+
+    assert triangle == relocated
+    assert triangle != other
+    assert hash(triangle) == hash(relocated)
 
     product = Sets().product((triangle, Sets.Δ[1]))
     assert product.factor(0) is triangle
     assert Sets().product((triangle, Sets.Δ[1])) is product
+    assert Sets().product((relocated, Sets.Δ[1])) is product
     other_product = Sets().product((other, Sets.Δ[1]))
     assert other_product is not product
     assert other_product.factor(0) is other
-    assert Sets().product((triangle, Sets.Δ[1])) is product
+
+    triangles = [
+        ConvexPolytopes(lattice)(vertices)
+        for vertices in (
+            ((0, 0), (1, 0), (0, 1)),
+            ((0, 0), (2, 0), (0, 1)),
+            ((0, 0), (1, 0), (0, 2)),
+            ((0, 0), (1, 1), (0, 1)),
+            ((0, 0), (1, 0), (1, 1)),
+        )
+    ]
+    assert cardinal(sum(1 for _ in {hash(each) for each in triangles})) == cardinal(5)
+

@@ -54,3 +54,42 @@ def test_dodecahedron_has_coxeter_diagram_h3_and_symmetry_group_of_order_120() -
     assert diagram.coxeter_entry(second, third) == 3
     assert diagram.coxeter_entry(first, third) == 2
     assert dodecahedron.symmetry_group().order() == 120
+
+
+def test_triangles_with_one_vertex_set_are_one_polytope_with_one_hash() -> None:
+    r"""A polytope is its vertex set: one triangle is one set, five are five hashes.
+
+    A polytope is the convex hull of its vertices, so two polytopes of one
+    lattice are equal exactly when they have the same vertices -- what
+    containment both ways, the equality of two subsets of an infinite ambient
+    set, states as a proposition that no procedure decides.  The triangle on
+    ``(0, 0), (1, 0), (0, 1)`` listed from another corner is the same polytope,
+    and so is the polytope of the halfspaces ``x >= 0``, ``y >= 0`` and
+    ``x + y <= 1``, whose vertices the private exact polyhedron computes
+    instead of reading.  Five triangles with different vertices are five sets,
+    so their hashes take five values.
+    """
+    lattice = ZZ ^ 2
+    category = ConvexPolytopes(lattice)
+    triangle = category(((0, 0), (1, 0), (0, 1)))
+    relocated = category(((1, 0), (0, 1), (0, 0)))
+    cut = category.from_halfspaces(((0, (1, 0)), (0, (0, 1)), (1, (-1, -1))))
+
+    assert triangle == relocated
+    assert triangle == cut
+    assert hash(triangle) == hash(relocated)
+    assert hash(triangle) == hash(cut)
+    assert cut.n_vertices() == 3
+
+    triangles = [
+        category(vertices)
+        for vertices in (
+            ((0, 0), (1, 0), (0, 1)),
+            ((0, 0), (2, 0), (0, 1)),
+            ((0, 0), (1, 0), (0, 2)),
+            ((0, 0), (1, 1), (0, 1)),
+            ((0, 0), (1, 0), (1, 1)),
+        )
+    ]
+    assert triangles[0] != triangles[1]
+    assert cardinal(sum(1 for _ in {hash(each) for each in triangles})) == cardinal(5)

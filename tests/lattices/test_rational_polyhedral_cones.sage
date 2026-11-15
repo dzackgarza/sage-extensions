@@ -147,3 +147,74 @@ def test_distinct_cones_of_one_shape_hash_apart_and_equal_cones_hash_alike() -> 
     assert cardinal(sum(1 for _ in {hash(quadrant), hash(narrow), hash(diagonal)})) == cardinal(3)
     assert quadrant == doubled
     assert hash(quadrant) == hash(doubled)
+
+
+def test_a_cone_with_a_lineality_space_is_not_hashed_by_its_dimensions_alone() -> None:
+    r"""Three half-planes of one dimension and one lineality dimension are three hashes.
+
+    ``y >= 0``, ``y <= x`` and ``x + y <= 0`` each have dimension two and a
+    lineality space of dimension one, so a hash of those two numbers puts them
+    in one bucket.  They are three sets: the lineality lattices they meet are
+    ``<(1, 0)>``, ``<(1, 1)>`` and ``<(1, -1)>``, and the cone modulo its
+    lineality space is a ray on ``(0, 1)``, ``(1, -1)`` and ``(-1, -1)``
+    respectively.  The hash reads the lineality lattice in Hermite normal form
+    and the primitive rays of that image: the half-plane ``y >= 0`` is the set
+    with ``y > 0``, the half-plane ``y <= x`` the one with ``y - x < 0``,
+    whose primitive integral direction in the plane orthogonal to the
+    lineality is ``(1, -1)``, and ``x + y <= 0`` the one with
+    ``x + y < 0``, whose direction there is ``(-1, -1)``.
+    """
+    lattice = Lattices(ZZ)([[1, 0], [0, 1]])
+    upper = lattice.reduction_cell(((0, 1),))
+    steeper = lattice.reduction_cell(((1, -1),))
+    mirror = lattice.reduction_cell(((-1, -1),))
+
+    for cone in (upper, steeper, mirror):
+        assert not cone.is_pointed()
+        assert cone.dimension() == 2
+        assert cone.lineality_generators().cardinality() == 1
+
+    assert upper != steeper
+    assert steeper != mirror
+    assert cardinal(sum(1 for _ in {hash(upper), hash(steeper), hash(mirror)})) == cardinal(3)
+
+
+def test_two_half_planes_of_one_lineality_lattice_hash_apart_by_their_images() -> None:
+    r"""``y >= 0`` and ``y <= 0`` meet one lineality lattice and differ on its two sides.
+
+    Each has dimension two and one lineality generator, on ``(1, 0)``, so the
+    two cones share their lineality lattice; their extreme rays are ``(0, 1)``
+    and ``(0, -1)``, the two images of the plane modulo that line.  A hash of
+    the dimension and the lineality dimension would put them in one bucket.
+    """
+    lattice = Lattices(ZZ)([[1, 0], [0, 1]])
+    upper = lattice.reduction_cell(((0, 1),))
+    lower = lattice.reduction_cell(((0, -1),))
+
+    assert upper.lineality_generators() == lower.lineality_generators()
+    assert upper.primitive_rays() != lower.primitive_rays()
+    assert upper != lower
+    assert hash(upper) != hash(lower)
+
+
+def test_two_quarter_spaces_of_one_dimension_and_one_lineality_line_hash_apart() -> None:
+    r"""Two quarter-spaces of ``Z^3`` with one lineality line have two hashes.
+
+    ``{y >= 0, z >= 0}`` and ``{y <= 0, z >= 0}`` both have dimension three,
+    one lineality generator on ``(1, 0, 0)`` and two extreme rays, so neither
+    the dimension nor the number of rays separates them.  Their images modulo
+    the lineality are the quadrants of the ``(y, z)`` plane cut out by the
+    signs ``(+, +)`` and ``(-, +)``, which is what the hash reads.
+    """
+    lattice = Lattices(ZZ)([[1, 0, 0], [0, 1, 0], [0, 0, 1]])
+    upper = lattice.reduction_cell(((0, 1, 0), (0, 0, 1)))
+    lower = lattice.reduction_cell(((0, -1, 0), (0, 0, 1)))
+
+    for cone in (upper, lower):
+        assert not cone.is_pointed()
+        assert cone.dimension() == 3
+        assert cone.lineality_generators().cardinality() == 1
+        assert cone.primitive_rays().cardinality() == 2
+
+    assert upper.lineality_generators() == lower.lineality_generators()
+    assert hash(upper) != hash(lower)

@@ -1,0 +1,287 @@
+tree SHA: d1ab7fc7856b1132cf1c745128eddce0e5f7e6ca
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+inner 280 s, outer 320 s, guard 6144 MiB
+command: python -m pytest -p qc_sage_session tests/schemes/test_polytopes.sage tests/sets/test_a_subset_is_a_cache_key.sage tests/lattices/test_rational_polyhedral_cones.sage -q -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates  (repository addopts)
+FFFFF...........FFF                                                      [100%]
+=================================== FAILURES ===================================
+____________ test_triangle_with_vertices_0_0_0_3_6_0_satisfies_pick ____________
+
+    def test_triangle_with_vertices_0_0_0_3_6_0_satisfies_pick() -> None:
+        r"""Area 9; boundary points `\gcd(0,3) + \gcd(6,3) + \gcd(6,0) = 3 + 3 + 6 = 12`;
+        Pick's theorem `9 = I + 12/2 - 1` gives 4 interior points, 16 in all."""
+        lattice = ZZ.free_module(2)
+        triangle = ConvexPolytopes(lattice)(((0, 0), (0, 3), (6, 0)))
+    
+        assert triangle.dimension() == 2
+        assert triangle.volume() == 9
+        assert triangle.normalized_volume() == 18
+        assert triangle.n_integral_points() == 16
+        assert triangle.n_interior_points() == 4
+        assert triangle.n_boundary_points() == 12
+>       assert triangle.interior_contains_point((1, 1))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/schemes/test_polytopes.sage:19: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/schemes/polytopes.py:942: in interior_contains_point
+    self._engine_coordinates(point)
+src/sage_extensions/categories/schemes/polytopes.py:700: in _engine_coordinates
+    point = self.rational_point(point)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Lattice Polygon of dimension 2 with 3 vertices, point = (1, 1)
+
+    def rational_point(self, point):
+        r"""Return ``point`` of ``M`` or ``M_QQ`` as a point of ``M_QQ = M tensor QQ``.
+    
+        ``M`` includes into ``M_QQ`` by ``m |-> m tensor 1``, which keeps
+        the coordinates of ``m`` in the shared frame.
+        """
+        ambient = self.ambient_space()
+        lattice = self.ambient_lattice()
+>       match point.parent():
+              ^^^^^^^^^^^^
+            case parent if parent is lattice:
+E           AttributeError: 'tuple' object has no attribute 'parent'
+
+src/sage_extensions/categories/schemes/polytopes.py:684: AttributeError
+____ test_square_has_ehrhart_polynomial_2t_plus_1_squared_and_h_star_1_6_1 _____
+
+    def test_square_has_ehrhart_polynomial_2t_plus_1_squared_and_h_star_1_6_1() -> None:
+        r"""`t[-1,1]^2` has `(2t+1)^2` lattice points; `h^* = (1, L(1) - 3, I) = (1, 6, 1)`,
+        summing to the normalized volume 8.  It is reflexive; its polar dual is the
+        reflexive diamond `\operatorname{conv}\{\pm e_1, \pm e_2\}`, whose polar dual is
+        the square again."""
+        lattice = ZZ.free_module(2)
+        square = ConvexPolytopes(lattice)(((-1, -1), (-1, 1), (1, 1), (1, -1)))
+        polynomial = square.ehrhart_polynomial()
+        t = polynomial.parent().algebra_generator("t")
+        polar = square.polar_dual()
+    
+        assert polynomial == 4 * t**2 + 4 * t + 1
+        assert tuple(square.h_star_vector()) == (1, 6, 1)
+        assert square.is_reflexive()
+        assert polar.is_reflexive()
+        assert polar.n_integral_points() == 5
+        assert polar.volume() == 2
+>       assert polar.polar_dual() == square
+
+tests/schemes/test_polytopes.sage:40: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = is_subset(Lattice Polygon of dimension 2 with 4 vertices, Lattice Polygon of dimension 2 with 4 vertices) and is_subset(Lattice Polygon of dimension 2 with 4 vertices, Lattice Polygon of dimension 2 with 4 vertices)
+
+    def __bool__(self):
+>       raise TypeError(f"the proposition {self} has no Python truth value, because it may be undecided; call ask(...) on it to get True, False or Unknown")
+E       TypeError: the proposition is_subset(Lattice Polygon of dimension 2 with 4 vertices, Lattice Polygon of dimension 2 with 4 vertices) and is_subset(Lattice Polygon of dimension 2 with 4 vertices, Lattice Polygon of dimension 2 with 4 vertices) has no Python truth value, because it may be undecided; call ask(...) on it to get True, False or Unknown
+
+src/sage_extensions/logic.py:44: TypeError
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:830 Elementwise module morphism Module over Fraction Field of Integer Ring on Classes in the multilinear tensor presentation -> Module over Fraction Field of Integer Ring on Fraction Field of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+___ test_dodecahedron_has_coxeter_diagram_h3_and_symmetry_group_of_order_120 ___
+
+>   return self._cached_methods[name]
+E   KeyError: 'f_vector'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_dodecahedron_has_coxeter_diagram_h3_and_symmetry_group_of_order_120() -> None:
+        r"""The dodecahedron `\{5, 3\}` has 20 vertices, 30 edges, 12 faces, and full
+        symmetry group the Coxeter group `H_3` of order 120 (Coxeter, *Regular
+        Polytopes*, Table I)."""
+        dodecahedron = RegularPolytopes().from_schlafli_symbol("{5,3}")
+        diagram = dodecahedron.symmetry_coxeter_diagram()
+        first, second, third = diagram.vertices()
+    
+        assert dodecahedron.dimension() == 3
+>       assert tuple(dodecahedron.f_vector()) == (1, 20, 30, 12, 1)
+                     ^^^^^^^^^^^^^^^^^^^^^
+
+tests/schemes/test_polytopes.sage:52: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    ???
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: 'RegularPolytopes.parent_class' object has no attribute 'f_vector'
+
+sage/cpython/getattr.pyx:357: AttributeError
+______ test_triangles_with_one_vertex_set_are_one_polytope_with_one_hash _______
+
+    def test_triangles_with_one_vertex_set_are_one_polytope_with_one_hash() -> None:
+        r"""A polytope is its vertex set: one triangle is one set, five are five hashes.
+    
+        A polytope is the convex hull of its vertices, so two polytopes of one
+        lattice are equal exactly when they have the same vertices -- what
+        containment both ways, the equality of two subsets of an infinite ambient
+        set, states as a proposition that no procedure decides.  The triangle on
+        ``(0, 0), (1, 0), (0, 1)`` listed from another corner is the same polytope,
+        and so is the polytope of the halfspaces ``x >= 0``, ``y >= 0`` and
+        ``x + y <= 1``, whose vertices the private exact polyhedron computes
+        instead of reading.  Five triangles with different vertices are five sets,
+        so their hashes take five values.
+        """
+        lattice = ZZ ^ 2
+        category = ConvexPolytopes(lattice)
+        triangle = category(((0, 0), (1, 0), (0, 1)))
+        relocated = category(((1, 0), (0, 1), (0, 0)))
+        cut = category.from_halfspaces(((0, (1, 0)), (0, (0, 1)), (1, (-1, -1))))
+    
+>       assert triangle == relocated
+
+tests/schemes/test_polytopes.sage:78: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = is_subset(Lattice Polygon of dimension 2 with 3 vertices, Lattice Polygon of dimension 2 with 3 vertices) and is_subset(Lattice Polygon of dimension 2 with 3 vertices, Lattice Polygon of dimension 2 with 3 vertices)
+
+    def __bool__(self):
+>       raise TypeError(f"the proposition {self} has no Python truth value, because it may be undecided; call ask(...) on it to get True, False or Unknown")
+E       TypeError: the proposition is_subset(Lattice Polygon of dimension 2 with 3 vertices, Lattice Polygon of dimension 2 with 3 vertices) and is_subset(Lattice Polygon of dimension 2 with 3 vertices, Lattice Polygon of dimension 2 with 3 vertices) has no Python truth value, because it may be undecided; call ask(...) on it to get True, False or Unknown
+
+src/sage_extensions/logic.py:44: TypeError
+_________________ test_a_subset_hash_decides_each_member_once __________________
+
+    def test_a_subset_hash_decides_each_member_once() -> None:
+        r"""The hash of a subset of ``{a, b}`` decides ``a`` and ``b`` once.
+    
+        The subset is cut out of a finite enumerated ambient set by a predicate
+        that records the points it is asked about.  Its hash asks about both
+        points and then caches the answer: a second and a third hash of the same
+        subset add no questions, though each hash is a lookup of the product the
+        subset is a factor of.
+        """
+        points = FiniteOrderedSets()(("a", "b"))
+        asked = []
+    
+        def is_selected(point):
+            asked.append(point)
+            return point == "a"
+    
+        subset = points.power_set().from_predicate(is_selected)
+        before = tuple(asked)
+        hash(subset)
+        assert tuple(asked) != before
+        settled = tuple(asked)
+        hash(subset)
+        hash(subset)
+>       assert tuple(asked) == settled
+E       AssertionError: assert ('a', 'b', 'a...'a', 'b', ...) == ('a', 'b', 'a', 'b')
+E         
+E         Left contains 4 more items, first extra item: 'a'
+E         Use -v to get more diff
+
+tests/sets/test_a_subset_is_a_cache_key.sage:36: AssertionError
+___ test_a_cone_with_a_lineality_space_is_not_hashed_by_its_dimensions_alone ___
+
+    def test_a_cone_with_a_lineality_space_is_not_hashed_by_its_dimensions_alone() -> None:
+        r"""Three half-planes of one dimension and one lineality dimension are three hashes.
+    
+        ``y >= 0``, ``y <= x`` and ``x + y <= 0`` each have dimension two and a
+        lineality space of dimension one, so a hash of those two numbers puts them
+        in one bucket.  They are three sets: the lineality lattices they meet are
+        ``<(1, 0)>``, ``<(1, 1)>`` and ``<(1, -1)>``, and the cone modulo its
+        lineality space is a ray on ``(0, 1)``, ``(1, -1)`` and ``(-1, -1)``
+        respectively.  The hash reads the lineality lattice in Hermite normal form
+        and the primitive rays of that image: the half-plane ``y >= 0`` is the set
+        with ``y > 0``, the half-plane ``y <= x`` the one with ``y - x < 0``,
+        whose primitive integral direction in the plane orthogonal to the
+        lineality is ``(1, -1)``, and ``x + y <= 0`` the one with
+        ``x + y < 0``, whose direction there is ``(-1, -1)``.
+        """
+        lattice = Lattices(ZZ)([[1, 0], [0, 1]])
+        upper = lattice.reduction_cell(((0, 1),))
+        steeper = lattice.reduction_cell(((1, -1),))
+        mirror = lattice.reduction_cell(((-1, -1),))
+    
+        for cone in (upper, steeper, mirror):
+            assert not cone.is_pointed()
+            assert cone.dimension() == 2
+            assert cone.lineality_generators().cardinality() == 1
+    
+        assert upper != steeper
+        assert steeper != mirror
+>       assert cardinal(sum(1 for _ in {hash(upper), hash(steeper), hash(mirror)})) == cardinal(3)
+E       assert 1 == 3
+E         
+E         Use -v to get more diff
+
+tests/lattices/test_rational_polyhedral_cones.sage:179: AssertionError
+___ test_two_half_planes_of_one_lineality_lattice_hash_apart_by_their_images ___
+
+    def test_two_half_planes_of_one_lineality_lattice_hash_apart_by_their_images() -> None:
+        r"""``y >= 0`` and ``y <= 0`` meet one lineality lattice and differ on its two sides.
+    
+        Each has dimension two and one lineality generator, on ``(1, 0)``, so the
+        two cones share their lineality lattice; their extreme rays are ``(0, 1)``
+        and ``(0, -1)``, the two images of the plane modulo that line.  A hash of
+        the dimension and the lineality dimension would put them in one bucket.
+        """
+        lattice = Lattices(ZZ)([[1, 0], [0, 1]])
+        upper = lattice.reduction_cell(((0, 1),))
+        lower = lattice.reduction_cell(((0, -1),))
+    
+        assert upper.lineality_generators() == lower.lineality_generators()
+        assert upper.primitive_rays() != lower.primitive_rays()
+        assert upper != lower
+>       assert hash(upper) != hash(lower)
+E       assert -4087457728965163519 != -4087457728965163519
+E        +  where -4087457728965163519 = hash(Rational polyhedral cone in Integral lattice of rank 2 and signature (2, 0) cut out by 1 half-spaces)
+E        +  and   -4087457728965163519 = hash(Rational polyhedral cone in Integral lattice of rank 2 and signature (2, 0) cut out by 1 half-spaces)
+
+tests/lattices/test_rational_polyhedral_cones.sage:197: AssertionError
+__ test_two_quarter_spaces_of_one_dimension_and_one_lineality_line_hash_apart __
+
+    def test_two_quarter_spaces_of_one_dimension_and_one_lineality_line_hash_apart() -> None:
+        r"""Two quarter-spaces of ``Z^3`` with one lineality line have two hashes.
+    
+        ``{y >= 0, z >= 0}`` and ``{y <= 0, z >= 0}`` both have dimension three,
+        one lineality generator on ``(1, 0, 0)`` and two extreme rays, so neither
+        the dimension nor the number of rays separates them.  Their images modulo
+        the lineality are the quadrants of the ``(y, z)`` plane cut out by the
+        signs ``(+, +)`` and ``(-, +)``, which is what the hash reads.
+        """
+        lattice = Lattices(ZZ)([[1, 0, 0], [0, 1, 0], [0, 0, 1]])
+        upper = lattice.reduction_cell(((0, 1, 0), (0, 0, 1)))
+        lower = lattice.reduction_cell(((0, -1, 0), (0, 0, 1)))
+    
+        for cone in (upper, lower):
+            assert not cone.is_pointed()
+            assert cone.dimension() == 3
+            assert cone.lineality_generators().cardinality() == 1
+            assert cone.primitive_rays().cardinality() == 2
+    
+        assert upper.lineality_generators() == lower.lineality_generators()
+>       assert hash(upper) != hash(lower)
+E       assert 6484398359848519918 != 6484398359848519918
+E        +  where 6484398359848519918 = hash(Rational polyhedral cone in Integral lattice of rank 3 and signature (3, 0) cut out by 2 half-spaces)
+E        +  and   6484398359848519918 = hash(Rational polyhedral cone in Integral lattice of rank 3 and signature (3, 0) cut out by 2 half-spaces)
+
+tests/lattices/test_rational_polyhedral_cones.sage:220: AssertionError
+=========================== short test summary info ============================
+FAILED tests/schemes/test_polytopes.sage::test_triangle_with_vertices_0_0_0_3_6_0_satisfies_pick
+FAILED tests/schemes/test_polytopes.sage::test_square_has_ehrhart_polynomial_2t_plus_1_squared_and_h_star_1_6_1
+FAILED tests/schemes/test_polytopes.sage::test_dodecahedron_has_coxeter_diagram_h3_and_symmetry_group_of_order_120
+FAILED tests/schemes/test_polytopes.sage::test_triangles_with_one_vertex_set_are_one_polytope_with_one_hash
+FAILED tests/sets/test_a_subset_is_a_cache_key.sage::test_a_subset_hash_decides_each_member_once
+FAILED tests/lattices/test_rational_polyhedral_cones.sage::test_a_cone_with_a_lineality_space_is_not_hashed_by_its_dimensions_alone
+FAILED tests/lattices/test_rational_polyhedral_cones.sage::test_two_half_planes_of_one_lineality_lattice_hash_apart_by_their_images
+FAILED tests/lattices/test_rational_polyhedral_cones.sage::test_two_quarter_spaces_of_one_dimension_and_one_lineality_line_hash_apart
+8 failed, 11 passed in 2.40s
+[peakrss] tests531: child waited=1 shell_code=1 samples=3
+[peakrss] peak tree RSS      : 338 MiB
+[peakrss] low-water MemAvail : 12216 MiB
+[peakrss] peak single VmHWM  : 338 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      327 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     4.0s procs=  3 rss=   338 MiB hwm=   338 MiB avail= 12216 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   298 MiB hwm=   298 MiB avail= 12257 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     2 MiB hwm=     3 MiB avail= 12483 MiB
