@@ -177,36 +177,6 @@ def _semigroup_monomial(algebra, exponents):
     return _owned_engine_element(algebra, monomial)
 
 
-@cached_function
-def _semigroup_generator_positions(algebra):
-    r"""The generators of ``algebra`` by lattice point, in its own index order.
-
-    An exponent vector handed to ``_semigroup_monomial`` is indexed by
-    ``algebra.algebra_generating_set()``, and the algebra records the lattice
-    point of each of those generators because it recorded them from the cone it
-    was built from.  The chart caches here are keyed by the cone's value, so one
-    chart answers for every cone equal to that cone, and an equal cone may list
-    the same Hilbert basis in another order: a position read off the cone
-    argument is then not a position in the chart's algebra.  Locating each point
-    in the algebra's own presentation is what makes the two agree.
-
-    The datum is the algebra's, so it is keyed by the algebra: two algebras
-    equal as presentations have the same generator coordinates in the same
-    order, and the map is read once per algebra.
-    """
-    coordinates = algebra.affine_semigroup_generator_coordinates()
-    points = tuple(
-        tuple(int(entry) for entry in coordinates[label])
-        for label in algebra.algebra_generating_set()
-    )
-    positions = {point: position for position, point in enumerate(points)}
-    assert len(positions) == len(points), (
-        f"the affine semigroup algebra {algebra} presents two of its generators at one "
-        "lattice point, so its monomials are not indexed by their exponent vectors"
-    )
-    return points, positions
-
-
 def _semigroup_generator_point(cone, generator):
     r"""The lattice point of a semigroup generator, as a chart's algebra records it."""
     return tuple(int(entry) for entry in _engine_vector(cone.character_lattice(), generator))
@@ -217,21 +187,22 @@ def _chart_semigroup_generators(cone, chart):
 
     ``cone`` is a cone equal to the one ``chart`` was built from, so the two
     present one semigroup and ``cone``'s generators are the chart's as lattice
-    points.  The chart's algebra fixes the order: what is read off these
-    generators — a character on the overlap, the variable of a divisor's
-    support, a chart pullback — is assigned to the chart's positions, never to
+    points.  The chart's algebra fixes the order — it is the algebra's own
+    datum, ``affine_semigroup_generator_positions`` — so what is read off these
+    generators (a character on the overlap, the variable of a divisor's
+    support, a chart pullback) is assigned to the chart's positions, never to
     the order ``cone`` happens to list its own.
     """
-    points, positions = _semigroup_generator_positions(chart.coordinate_algebra())
+    positions = chart.coordinate_algebra().affine_semigroup_generator_positions()
     by_point = {
         _semigroup_generator_point(cone, generator): generator
         for generator in cone.semigroup_generators()
     }
-    assert len(by_point) == len(points), (
+    assert len(by_point) == len(positions), (
         f"the semigroup of {cone} presents {len(by_point)} generators while the chart "
-        f"{chart} was built from one presenting {len(points)}"
+        f"{chart} was built from one presenting {len(positions)}"
     )
-    ordered = tuple(by_point.get(point) for point in points)
+    ordered = tuple(by_point.get(point) for point in sorted(positions, key=positions.__getitem__))
     assert all(generator is not None for generator in ordered), (
         f"the semigroup of {cone} and the chart {chart} have different generators, "
         "although that chart was built from a cone equal to this one"
@@ -250,8 +221,8 @@ def _face_supporting_character_monomial(face, cone, chart):
     decides which variable each point is.
     """
     algebra = chart.coordinate_algebra()
-    points, positions = _semigroup_generator_positions(algebra)
-    exponents = [0 for _ in points]
+    positions = algebra.affine_semigroup_generator_positions()
+    exponents = [0 for _ in positions]
     for generator in cone.face_supporting_generators(face):
         position = positions.get(_semigroup_generator_point(cone, generator))
         assert position is not None, (
@@ -272,8 +243,8 @@ def _character_monomial(character, cone, chart):
     order a cone equal to the chart's own happens to list its generators in.
     """
     algebra = chart.coordinate_algebra()
-    points, positions = _semigroup_generator_positions(algebra)
-    exponents = [0 for _ in points]
+    positions = algebra.affine_semigroup_generator_positions()
+    exponents = [0 for _ in positions]
     for generator, multiplicity in zip(
         cone.semigroup_generators(),
         cone.semigroup_coefficients(character),

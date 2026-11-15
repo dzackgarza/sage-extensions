@@ -50,3 +50,24 @@ def test_semigroup_algebra_of_the_monoid_generated_by_e1_e2_and_their_sum_satisf
     assert x != y
     assert x * y == y * x
     assert x + y != z
+
+
+def test_a_semigroup_algebra_keeps_its_identity_after_a_polynomial_ring_is_built() -> None:
+    r"""The identity and the degree-zero augmentation of ``QQ[S]`` are arrows of
+    ``QQ[S]``'s own Mor, whatever else has been built.
+
+    ``QQ[S]`` for ``S = <(1,0), (0,1)>`` is a symmetric algebra and a finitely
+    presented algebra at once, so which parent class supplies its Mor is
+    decided by lookup, and building ``QQ[y]`` first is enough to change that
+    lookup.  Its identity and the augmentation of its selected resolution do
+    not depend on the answer: both are the identity on ``QQ[S]``'s own
+    endpoints, so both fix every element.
+    """
+    QQ.polynomial_ring("y")
+    algebra = AffineSemigroupAlgebras(QQ)(((1, 0), (0, 1)),)
+    generator = algebra.algebra_generator(next(iter(algebra.algebra_generating_set())))
+
+    assert algebra.Mor(algebra).identity()(generator) == generator
+    augmentation = algebra.selected_algebra_resolution().augmentation()
+    assert augmentation(generator) == generator
+    assert augmentation(generator * generator) == generator * generator

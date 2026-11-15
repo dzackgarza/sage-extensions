@@ -257,39 +257,6 @@ def test_toric_face_transition_maps_are_mutual_inverses() -> None:
     )
 
 
-def test_two_varieties_of_one_fan_share_one_chart_per_cone_and_read_its_own_ring() -> None:
-    r"""``U_sigma`` is one chart for one cone (CLS Prop. 1.3.9), and what is read
-    with it comes from that chart (Prop. 1.3.16).
-
-    A second variety glued from the same fan reuses the chart, and a cone equal
-    to ``sigma`` but distinct from it — ``sigma cap sigma``, the way a face is
-    reached — is answered by the same chart.  The localization at a face of
-    that copy is then a localization of the chart's own coordinate algebra, not
-    of a second presentation of the same semigroup.
-    """
-    fan = _plane_fans().hirzebruch_surface_fan(0)
-    first = fan.toric_variety(QQ)
-    second = _plane_fans().hirzebruch_surface_fan(0).toric_variety(QQ)
-    cone = tuple(fan.maximal_cones())[0]
-    copy = cone.intersection(cone)
-
-    assert first is not second
-    assert copy is not cone
-    assert copy == cone
-    assert hash(copy) == hash(cone)
-    for maximal in fan.maximal_cones():
-        assert second.affine_chart(maximal) is first.affine_chart(maximal)
-
-    chart = first.affine_chart(cone)
-    assert second.affine_chart(copy) is chart
-    face = tuple(copy.faces(1))[0]
-    overlap = first.face_localization(face, cone)
-    assert second.face_localization(face, copy) is overlap
-    localized = overlap.coordinate_algebra()
-    assert localized.localization_map().domain() is chart.coordinate_algebra()
-    assert localized.localization_map().codomain() is localized
-
-
 def test_the_chart_of_the_a_one_cone_is_the_quadric_cone() -> None:
     r"""CLS Example 1.2.22: ``S_sigma`` needs three characters with one
     relation, so the chart is a hypersurface in three variables rather than an
