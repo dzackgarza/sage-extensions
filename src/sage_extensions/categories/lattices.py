@@ -8327,7 +8327,32 @@ class Lattices(OwnedCategoryOverBaseRing):
             return self.Aut()(image)
 
         def _eichler_transvection_column_matrix(self, isotropic, orthogonal):
-            r"""Return the exact column matrix of the Eichler transvection ``t(e,a)``."""
+            r"""Return the exact column matrix of the Eichler transvection ``t(e,a)``.
+
+            The matrix is the formula, not a computation about it: with
+            \(\mathbb Z e\) completed to a hyperbolic plane, the unique
+            orthogonal extension of \(v\mapsto v-(a,v)e\) on \(e^\perp\) is
+
+            \[
+            t(e,a)\colon v\longmapsto v-(a,v)\,e+(e,v)\,a-\tfrac12(a,a)(e,v)\,e ,
+            \]
+
+            which is equation (4) of V. Gritsenko, K. Hulek and G. Sankaran,
+            *Abelianisation of orthogonal groups and the fundamental group of
+            modular varieties*, arXiv:0810.1614, section 3.1, printed p. 8.
+            Entry \((i,j)\) of the returned matrix is the coefficient of
+            \(e_i\) in the image of \(e_j\), so the columns are the images of
+            the basis.
+
+            The arithmetic is the engine's and crossings into the owned ring are
+            the caller's: \(e\) and \(a\) are read once each and crossed once per
+            coordinate, the Gram pairing and the \(\mathrm{rank}^2\) entries are
+            engine operations, and the matrix returned is engine data, as
+            `eichler_transvection` needs it.  The one decision the owned ring
+            keeps is integrality of \(\tfrac12 q(a)b(e,e_j)\), asked once per
+            generator: it is the statement that \(t(e,a)\) preserves the
+            lattice (equation (10) there, \(a\) of even square).
+            """
             assert isotropic.parent() is self and orthogonal.parent() is self, (
                 f"cannot form the Eichler transvection t(e, a) of {self!r} with e = {isotropic!r}, a = {orthogonal!r}: they lie in {isotropic.parent()!r} and {orthogonal.parent()!r}, not both in this lattice"
             )
@@ -8339,8 +8364,6 @@ class Lattices(OwnedCategoryOverBaseRing):
             assert isotropic.b(orthogonal) == zero, (
                 f"cannot form the Eichler transvection t(e, a) of {self!r}: a = {orthogonal!r} must lie in e^perp for e = {isotropic!r}, but b(e, a) = {isotropic.b(orthogonal)}"
             )
-            fraction_field = ring.fraction_field()
-            half_norm = fraction_field(orthogonal.q()) / fraction_field(ring(2))
             from sage.matrix.constructor import matrix
 
             from sage_extensions.categories.rings.ring_foundation import (
@@ -8351,11 +8374,24 @@ class Lattices(OwnedCategoryOverBaseRing):
 
             labels = tuple(self.module_generating_set())
             engine = _engine_ring(ring)
+            fraction_field = ring.fraction_field()
+            engine_fraction = _engine_ring(fraction_field)
+            # Equation (4)'s coefficient (a,a)/2 and every entry below are the
+            # formula's own arithmetic, which is the engine's: the two vectors
+            # are read once each and cross once per coordinate, and the matrix
+            # this method returns is engine data.  The owned ring is asked for
+            # the one decision only it can make, integrality of
+            # (a,a) b(e,x)/2, once per source generator.
+            half_norm = engine_fraction(
+                _engine_element(ring, orthogonal.q())
+            ) / engine_fraction(engine(2))
+            isotropic_values = isotropic.to_vector()
+            orthogonal_values = orthogonal.to_vector()
             isotropic_coordinates = tuple(
-                _engine_element(ring, isotropic.to_vector()(label)) for label in labels
+                _engine_element(ring, isotropic_values(label)) for label in labels
             )
             orthogonal_coordinates = tuple(
-                _engine_element(ring, orthogonal.to_vector()(label)) for label in labels
+                _engine_element(ring, orthogonal_values(label)) for label in labels
             )
             gram = _engine_component_matrix(self.gram_tensor())
             pairings_with_isotropic = gram * matrix(
@@ -8364,44 +8400,36 @@ class Lattices(OwnedCategoryOverBaseRing):
             pairings_with_orthogonal = gram * matrix(
                 engine, len(labels), 1, orthogonal_coordinates
             )
-            columns = []
+            engine_one = engine.one()
+            engine_zero = engine.zero()
+            coefficients = []
             for source_position, label in enumerate(labels):
-                pairing_with_isotropic = _owned_engine_element(
-                    ring, pairings_with_isotropic[source_position, 0]
-                )
-                pairing_with_orthogonal = _owned_engine_element(
-                    ring, pairings_with_orthogonal[source_position, 0]
-                )
-                half_coefficient = half_norm * fraction_field(pairing_with_isotropic)
-                assert half_coefficient in ring, (
+                pairing_with_isotropic = pairings_with_isotropic[source_position, 0]
+                pairing_with_orthogonal = pairings_with_orthogonal[source_position, 0]
+                half_coefficient = half_norm * engine_fraction(pairing_with_isotropic)
+                assert _owned_engine_element(fraction_field, half_coefficient) in ring, (
                     f"the Eichler transvection t(e, a) with e = {isotropic!r}, a = {orthogonal!r} does not preserve {self!r}: q(a) b(e, {self.module_generator(label)})/2 = {half_coefficient} is not in {ring}"
                 )
-                integral_half_coefficient = ring(half_coefficient)
-                columns.append(
-                    tuple(
-                        (
-                            (ring.one() if target_position == source_position else zero)
-                            - pairing_with_orthogonal
-                            * _owned_engine_element(
-                                ring, isotropic_coordinates[target_position]
-                            )
-                            + pairing_with_isotropic
-                            * _owned_engine_element(
-                                ring, orthogonal_coordinates[target_position]
-                            )
-                            - integral_half_coefficient
-                            * _owned_engine_element(
-                                ring, isotropic_coordinates[target_position]
-                            )
-                        )
-                        for target_position in range(len(labels))
+                coefficients.append(
+                    (
+                        pairing_with_isotropic,
+                        pairing_with_orthogonal,
+                        engine(half_coefficient),
                     )
                 )
+            # The column matrix: entry (target, source) is the coefficient of
+            # the target generator in the image of the source generator.
             return matrix(
                 engine,
                 [
                     [
-                        _engine_element(ring, columns[source_position][target_position])
+                        (engine_one if target_position == source_position else engine_zero)
+                        - coefficients[source_position][1]
+                        * isotropic_coordinates[target_position]
+                        + coefficients[source_position][0]
+                        * orthogonal_coordinates[target_position]
+                        - coefficients[source_position][2]
+                        * isotropic_coordinates[target_position]
                         for source_position in range(len(labels))
                     ]
                     for target_position in range(len(labels))
@@ -8422,9 +8450,11 @@ class Lattices(OwnedCategoryOverBaseRing):
             \(\mathbb Z e\).  These transvections generate the stable
             orthogonal group and put vectors into normal form, which is how
             Eichler's criterion realizes its orbit equivalences.  The formula
-            is transcribed at ``notes/topics/coble-enriques-lattice-theory/``
-            ``reflective-two-elementary-lattices.md``, which attributes it to
-            Dawes, section 2 equation (7).
+            is equation (4) of V. Gritsenko, K. Hulek and G. Sankaran,
+            *Abelianisation of orthogonal groups and the fundamental group of
+            modular varieties*, arXiv:0810.1614, section 3.1, printed p. 8,
+            which is Dawes, section 2 equation (7), in the transcription this
+            library reads it through.
             \(t(e,a)\) preserves \(L\) exactly when every coefficient
             \(\tfrac12 q(a)\,b(e,x)\) is integral, automatic on an even
             lattice and asserted otherwise.
