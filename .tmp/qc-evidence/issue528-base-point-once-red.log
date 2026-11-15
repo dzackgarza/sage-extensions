@@ -1,0 +1,41 @@
+..F                                                                      [100%]
+=================================== FAILURES ===================================
+_________ test_the_lift_torsor_computes_its_base_point_once_per_torsor _________
+
+    def test_the_lift_torsor_computes_its_base_point_once_per_torsor() -> None:
+        r"""The base point is a datum of the torsor, not of the call that reads it.
+    
+        The torsor's point set cuts the rational isometries by a predicate, and
+        admitting a point into such a set decides that predicate: one membership
+        test of the marked line and one per lattice generator, each a preimage
+        computation.  The point asked for is the image of the identity under the
+        trivialization fixed at construction, so it is the same point on every
+        call and is computed once per torsor -- ``Torsors.from_trivialization``
+        says as much when a base point is supplied, and this holds when it is not.
+        """
+        lattice = Lattices(ZZ)("U") + Lattices(ZZ)([[2]])
+        line = lattice.basis_vector(0)
+        reduction = line.isotropic_reduction()
+        fibre = reduction.rational_lifts(reduction, reduction.Isom(reduction).identity())
+    
+        base = fibre.base_point()
+    
+>       assert base is fibre.base_point()
+E       assert Morphism from Lattice of rank 3 and signature (2, 1) to Lattice of rank 3 and signature (2, 1) is Morphism from Lattice of rank 3 and signature (2, 1) to Lattice of rank 3 and signature (2, 1)
+E        +  where Morphism from Lattice of rank 3 and signature (2, 1) to Lattice of rank 3 and signature (2, 1) = base_point()
+E        +    where base_point = <sage_extensions.owned_category.OwnedJoinCategory.parent_class object at 0x7cff648b2ed0>.base_point
+
+tests/lattices/test_integral_reduction_lift_witness.sage:56: AssertionError
+=========================== short test summary info ============================
+FAILED tests/lattices/test_integral_reduction_lift_witness.sage::test_the_lift_torsor_computes_its_base_point_once_per_torsor
+1 failed, 2 passed in 1.34s
+[peakrss] p528red: child waited=1 shell_code=1 samples=2
+[peakrss] peak tree RSS      : 323 MiB
+[peakrss] low-water MemAvail : 13852 MiB
+[peakrss] peak single VmHWM  : 323 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      312 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     2.0s procs=  3 rss=   323 MiB hwm=   323 MiB avail= 13852 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     0 MiB hwm=     0 MiB avail= 14047 MiB
