@@ -99,6 +99,24 @@ def test_the_ring_states_the_completion_of_the_field_at_the_zero_ideal() -> None
     assert completion_map.is_injective() is True
     assert completion.is_isomorphic_to(field)
 
+
+def test_z_x_mod_x_squared_is_free_of_rank_two_hence_torsion_free() -> None:
+    r"""$\mathbf{Z}[x]/(x^2)$ is free on $\{1, x\}$ over $\mathbf{Z}$, so it is torsion-free.
+
+    The algebra is free on the two classes of $1$ and $x$: $r(a + bx) = 0$ over
+    the integers forces $a = b = 0$, so no nonzero scalar kills a nonzero
+    element.  It is also a framed free module over $\mathbf{Z}$ on those two
+    classes, and that category and the category of algebras with a chosen
+    finite presentation over $\mathbf{Z}$ are neither below the other, so which
+    of the two answers is the category order's to say.
+    """
+    x = ZZ["x"].algebra_generator("x")
+    algebra = ZZ["x"].quotient_by_relations([x**2])
+
+    assert algebra.module_rank() == 2
+    assert algebra.is_torsion_free() is True
+
+
 def test_the_framed_level_answers_the_question_the_general_level_left_undecided() -> None:
     r"""On $\mathbf{Z}[x]$ the module questions are answered, not merely asked.
 
@@ -121,3 +139,40 @@ def test_the_framed_level_answers_the_question_the_general_level_left_undecided(
     assert line.is_torsion_free() is True
     assert ideal in CommutativeIdeals(ZZ)
     assert ideal == ZZ.ideal(0)
+
+
+def test_the_free_modules_over_a_domain_and_over_a_field_are_torsion_free() -> None:
+    r"""$\mathbf{Q}[x]$, $\mathbf{Z}[x, y]$ and $\mathbf{Q}(i)$ are torsion-free with zero annihilator.
+
+    Each is free on a chosen family, over a field for two of them and over
+    $\mathbf{Z}$ for the third, so $r m = 0$ with $r \neq 0$ reads $r a_s = 0$
+    in every coefficient and forces $m = 0$: no nonzero scalar kills an
+    element.  The scalars annihilating every element are therefore none, and
+    their ideal is the zero ideal of the base ring -- an element of that ring's
+    ideals, not a submodule of the module.
+    """
+    for module in (QQ["x"], ZZ["x", "y"], QuadraticField(-1)):
+        ring = module.base_ring()
+        ideal = module.annihilator()
+
+        assert module.is_torsion_free() is True
+        assert ideal in CommutativeIdeals(ring)
+        assert ideal == ring.ideal(0)
+
+
+def test_a_free_module_over_a_ring_with_zero_divisors_is_torsion_free() -> None:
+    r"""$\mathbf{Z}/4[x]$ is torsion-free although $2 \cdot (2x) = 0$ there.
+
+    An element is torsion when a non-zero-divisor kills it, and the
+    non-zero-divisors of $\mathbf{Z}/4$ are its units, which kill nothing: the
+    scalar $2$ is a zero-divisor, so $2 \cdot (2x) = 0$ is not a torsion
+    element's annihilation.  Free on the monomials, the ring is therefore
+    torsion-free, and the level answering is the framed free module's -- the
+    one that reads the monomials.
+    """
+    line = Zmod(4)["x"]
+    element = 2 * line.algebra_generator("x")
+
+    assert 2 * element == line.zero()
+    assert element != line.zero()
+    assert line.is_torsion_free() is True
