@@ -30,7 +30,6 @@ from sage_extensions.categories.modules.pure.modules import (
     _require_matrix_mor,
 )
 from sage_extensions.categories.rings.ring_foundation import (
-    IntegralDomains,
     OwnedCategoryOverBaseRing,
     OwnedFields,
     OwnedRings,
@@ -679,16 +678,22 @@ class FramedFreeModules(OwnedCategoryOverBaseRing):
             return self.module_generating_set().cardinality()
 
         def _torsion_freeness_decision(self) -> bool:
-            r"""A free module over a domain is torsion-free.
+            r"""A free module over a ring is torsion-free.
 
-            A basis element is killed only by a scalar killing its coefficient,
-            and a domain has none nonzero.  Off a domain there is no fraction
-            field and hence no torsion submodule to be zero, so the question is
-            not asked rather than answered ``True``.
+            An element is torsion when a non-zero-divisor kills it, which is
+            the submodule $\ker(M \to \operatorname{Frac}(R) \otimes_R M)$
+            where the fraction field exists -- Stacks Project, Definition
+            \S 15.22.1 and Lemma \S 15.22.2.  A free module has none: a frame
+            is linearly independent, so $r \sum_s a_s e_s = \sum_s (r a_s) e_s
+            = 0$ reads $r a_s = 0$ for every $s$, and a non-zero-divisor kills
+            no nonzero coefficient.
+
+            No hypothesis on the ring is needed, because the hypothesis is on
+            the scalar: over $\mathbf{Z}/4$ the non-zero-divisors are the
+            units, so $\mathbf{Z}/4[x]$ is torsion-free even though
+            $2 \cdot (2x) = 0$.  Killing by a nonzero scalar is the other
+            convention, and it is not this one.
             """
-            assert self.base_ring() in IntegralDomains(), (
-                f"torsion-freeness of a module over {self.base_ring()} needs an integral-domain base"
-            )
             return True
 
         @RealizationHook

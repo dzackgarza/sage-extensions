@@ -168,11 +168,17 @@ def test_a_free_module_over_a_ring_with_zero_divisors_is_torsion_free() -> None:
     scalar $2$ is a zero-divisor, so $2 \cdot (2x) = 0$ is not a torsion
     element's annihilation.  Free on the monomials, the ring is therefore
     torsion-free, and the level answering is the framed free module's -- the
-    one that reads the monomials.
+    one that reads the monomials.  $\mathbf{Z}/4[x]/(x^2)$, free on
+    $\{1, x\}$ over the same ring, is torsion-free for the same reason, and
+    there the algebra level answers: the two categories are incomparable, and
+    neither level asks for a domain, which is not a hypothesis of this reading.
     """
     line = Zmod(4)["x"]
-    element = 2 * line.algebra_generator("x")
+    x = line.algebra_generator("x")
+    element = 2 * x
+    truncated = line.quotient_by_relations([x**2])
 
     assert 2 * element == line.zero()
     assert element != line.zero()
     assert line.is_torsion_free() is True
+    assert truncated.is_torsion_free() is True

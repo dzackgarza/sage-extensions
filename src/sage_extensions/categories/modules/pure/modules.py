@@ -2460,6 +2460,22 @@ class Modules(OwnedCategoryOverBaseRing):
             return AtomicProposition("is_torsion_free", self)
 
         def is_torsion_free(self):
+            r"""Return whether every element a non-zero-divisor kills is zero.
+
+            Torsion means killed by a non-zero-divisor of the scalar ring: over
+            an integral domain, whose nonzero elements are its
+            non-zero-divisors, that is $\ker(M \to \operatorname{Frac}(R)
+            \otimes_R M)$, the submodule :meth:`torsion_submodule` returns
+            (Stacks Project, Definition \S 15.22.1 and Lemma \S 15.22.2).
+            Killing by any nonzero scalar is the other convention and a
+            different predicate: over $\mathbf{Z}/4$ it refutes
+            $\mathbf{Z}/4[x]$, since $2 \cdot (2x) = 0$, although the scalar
+            $2$ there is a zero-divisor and so kills nothing in this one.
+
+            A level that computes an answer decides it
+            (:meth:`_torsion_freeness_decision`); where none does, this returns
+            the undecided proposition rather than either answer.
+            """
             return self._torsion_freeness_decision()
 
         def is_framed_module(self) -> bool:
