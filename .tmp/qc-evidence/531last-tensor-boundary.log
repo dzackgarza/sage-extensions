@@ -26,8 +26,14 @@
 166 suspected coordinate operations outside sage_extensions/tensors/: state the owned pullback, contraction, composition, inverse or application instead.
 
 ## polyhedral_cones.py
-main findings on this file: 0
-fixed findings on this file: 0
-the recipe prints the first 40 findings of each pattern, so the file's absence from
-the printed list is not evidence; the totals are: 168 -> 166, exactly the two
-$X.transpose() calls of the removed orthogonal projection, and no pattern's count rose.
+lines of the printed list mentioning this file -- main 0, fixed 0.
+The recipe prints the first 40 findings of each pattern, so that printed list is
+truncated and this file's absence from it is not evidence; the totals are 168 ->
+166, and the per-file count below is what decides which calls those two were.
+
+## the file itself, both trees, one pattern
+$ ast-grep run --lang python --pattern '$X.transpose()' --json src/sage_extensions/categories/polyhedral_cones.py
+main: 2 hit(s)
+  line 600: projection = identity_matrix(SageQQ, rank) - rows.transpose() * (
+  line 601: rows * rows.transpose()
+fixed: 0 hit(s)
