@@ -9,12 +9,14 @@ the session, into :func:`sage_extensions.timing.timing_directory` — ``.timings
 at the source tree's root, which ``.gitignore`` keeps out of git — named by the
 resolved commit and the run's start time, after the file's own name:
 
-* ``run-<commit>-<start>.jsonl`` — the report log;
-* ``junit-<commit>-<start>.xml`` — the JUnit file.
+* ``run-<commit>-<start>-<pid>.jsonl`` — the report log;
+* ``junit-<commit>-<start>-<pid>.xml`` — the JUnit file.
 
-The library's own stage records (:mod:`sage_extensions.timing`) land in the same
-directory, as ``stages-<commit>-<start>.jsonl``, so one directory holds the
-per-test and per-stage wall times of the runs that produced them.
+``<commit>`` is the first twelve characters of the resolved commit and ``<start>``
+the run's start time to the microsecond, both written by
+:mod:`sage_extensions.timing`'s own stamp.  The library's stage records land in
+the same directory, as ``stages-<commit>-<start>-<pid>.jsonl``, so one directory
+holds the per-test and per-stage wall times of the runs that produced them.
 
 Both paths are the run's own options and not a second copy of the addopts: a
 run whose configuration put its report log somewhere else is kept from where it
@@ -110,8 +112,15 @@ def pytest_sessionfinish(session: pytest.Session, exitstatus: int) -> None:
             "run wrote: keeping it would file one run's timings under this run's name"
         )
         destination = directory / f"{written.stem}-{commit}-{stamp}{written.suffix}"
-        assert not destination.exists(), (
-            f"this run's {option} would be kept at {destination}, where a record of {commit} already "
-            "is: one run's timings would be filed as another's"
-        )
-        shutil.copyfile(written, destination)
+        try:
+            # Exclusive create, not a check followed by a copy: the destination
+            # is this run's name, and a name already taken is a record of
+            # another run — never something to write over.
+            kept = destination.open("xb")
+        except FileExistsError:
+            raise FileExistsError(
+                f"this run's {option} would be kept at {destination}, where a record of {commit} "
+                "already is: one run's timings would be filed as another's"
+            ) from None
+        with kept, written.open("rb") as source:
+            shutil.copyfileobj(source, kept)

@@ -40,7 +40,7 @@ from sage.misc.cachefunc import cached_method
 from sage.rings.integer_ring import ZZ as SageZZ
 from sage.structure.element import parent as element_parent
 
-from sage_extensions.categories._lattice import lattice_record_name
+from sage_extensions.categories._lattice import subobject_record_name
 from sage_extensions.categories.modules.pure.modules import ModuleSubobjects
 from sage_extensions.categories.rings.ring_foundation import (
     OwnedCategoryOverBaseRing,
@@ -4388,9 +4388,7 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
 
         @timed_stage(
             "stabilizer discriminant image orders",
-            input=lambda self, *arguments, **keywords: (
-                f"a rank-{self.module_rank()} subobject of {lattice_record_name(self.ambient_lattice())}"
-            ),
+            input=lambda self, *arguments, **keywords: subobject_record_name(self),
         )
         def stabilizer_discriminant_image_orders(self):
             r"""Return `(upper, lower)`: the bound on `\rho(G_P)` and the order of the returned images.
@@ -4647,7 +4645,7 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             """
             with stage(
                 "parabolic completeness decision",
-                f"a rank-{self.module_rank()} subobject of {lattice_record_name(self.ambient_lattice())}",
+                subobject_record_name(self),
             ):
                 if self.splitting_complement() is not None:
                     return True, None
