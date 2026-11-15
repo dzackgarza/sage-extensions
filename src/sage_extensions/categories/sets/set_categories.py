@@ -6439,9 +6439,11 @@ def _interned_by_equality(
             keyed[key] = interned
         return interned
     interned = build(family)
-    by_cardinality.setdefault(cardinality, []).append((family, interned))
-    if key is not None:
-        keyed[key] = interned
+    match key:
+        case None:
+            by_cardinality.setdefault(cardinality, []).append((family, interned))
+        case _:
+            keyed[key] = interned
     return interned
 
 
