@@ -1,0 +1,46 @@
+tree SHA: b33d19351fe77c72c6711e51829b77fb0645f679
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+inner 300 s, outer 360 s, guard 4096 MiB
+command: python -m pytest -p qc_sage_session tests/lattices/test_rational_polyhedral_cones.sage -q -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates  (repository addopts)
+..............F                                                          [100%]
+=================================== FAILURES ===================================
+_________ test_one_cone_with_a_lineality_of_non_unit_pivot_is_one_hash _________
+
+    def test_one_cone_with_a_lineality_of_non_unit_pivot_is_one_hash() -> None:
+        r"""Two presentations of one half-plane of ``Z^3`` are one cone and one hash.
+    
+        The cone ``{<(-1, 3, 0), x> >= 0, <(3, -11, 1), x> >= 0}`` has dimension
+        three and the lineality line ``<(3, 1, 2)>``, whose Hermite basis has the
+        pivot ``3`` in its first coordinate, so the line is not a coordinate line.
+        Its other extreme ray is ``(-11, -3, 0)``.  The third covector
+        ``(0, -2, 1)`` is ``(3, -11, 1) + 3(-1, 3, 0)``, a positive combination of
+        the first two, so it cuts out the same cone.  The private exact polyhedron
+        states an extreme ray only up to a lineality vector: it reports
+        ``(-11, -3, 0)`` for the first presentation and ``(-2, 0, 6)``, which is
+        ``(-11, -3, 0) + 3(3, 1, 2)``, for the second.  Those two are one ray
+        modulo the lineality, so the two presentations are one set and one hash.
+        """
+        lattice = Lattices(ZZ)([[1, 0, 0], [0, 1, 0], [0, 0, 1]])
+        short = lattice.reduction_cell(((-1, 3, 0), (3, -11, 1)))
+        longer = lattice.reduction_cell(((-1, 3, 0), (3, -11, 1), (0, -2, 1)))
+    
+        assert short == longer
+>       assert hash(short) == hash(longer)
+E       assert -6807208723917895006 == 7125180495658982574
+E        +  where -6807208723917895006 = hash(Rational polyhedral cone in Integral lattice of rank 3 and signature (3, 0) cut out by 2 half-spaces)
+E        +  and   7125180495658982574 = hash(Rational polyhedral cone in Integral lattice of rank 3 and signature (3, 0) cut out by 3 half-spaces)
+
+tests/lattices/test_rational_polyhedral_cones.sage:242: AssertionError
+=========================== short test summary info ============================
+FAILED tests/lattices/test_rational_polyhedral_cones.sage::test_one_cone_with_a_lineality_of_non_unit_pivot_is_one_hash
+1 failed, 14 passed in 0.88s
+[peakrss] tests531: child waited=1 shell_code=1 samples=2
+[peakrss] peak tree RSS      : 321 MiB
+[peakrss] low-water MemAvail : 13536 MiB
+[peakrss] peak single VmHWM  : 321 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      310 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     2.0s procs=  3 rss=   321 MiB hwm=   321 MiB avail= 13536 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     0 MiB hwm=     0 MiB avail= 13750 MiB
