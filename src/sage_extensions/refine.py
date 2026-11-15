@@ -110,8 +110,6 @@ def _owned_mixins(category: Category, attr: str) -> tuple[type, ...]:
             reached[provider].append(cat)
     ordering = TopologicalSorter()
     for provider in reached:
-        ordering.add(provider)
-    for provider in reached:
         ordering.add(
             provider,
             *(
