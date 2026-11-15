@@ -1,0 +1,19 @@
+tree SHA: 1cc248135c6d292ab69359f0089af8f8f0c5377c
+port SHA: 991b88b0
+inner 300 s, outer 360 s, guard 4096 MiB
+command: /sage/.venv/bin/python -u -s /probe.py
+equal families: True
+keyless first: product(first) is product(second) -> True
+keyed first: product(first) is product(second) -> True
+mutable vector isinstance Hashable: True
+hash(mutable vector) raises: TypeError mutable vectors are unhashable
+T points: ((1, 2), (3, 4)) points_have_a_hash: True
+product over the filtered mutable-vector index raises: TypeError cannot use 'tuple' as a dict key (mutable vectors are unhashable)
+[peakrss] r5red: child waited=0 shell_code=0 samples=1
+[peakrss] peak tree RSS      : 3 MiB
+[peakrss] low-water MemAvail : 11717 MiB
+[peakrss] peak single VmHWM  : 3 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   timeout                       3 MiB peak
+[peakrss]   t=     0.0s procs=  1 rss=     3 MiB hwm=     3 MiB avail= 11717 MiB
+launcher exit: 0
