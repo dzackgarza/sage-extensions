@@ -14,7 +14,7 @@ from _abc import _abc_init
 from collections import defaultdict
 from collections.abc import Callable, Iterable, Iterator
 from contextlib import contextmanager
-from functools import cache, update_wrapper
+from functools import update_wrapper
 from graphlib import TopologicalSorter
 
 from sage.categories.category import Category
@@ -268,7 +268,6 @@ def _owned_dynamic_class(name: str, bases: tuple[type, ...], doccls: type) -> ty
     return result
 
 
-@cache
 def owned_parent_class(implementation: type, category: Category) -> type:
     r"""The class of a parent of ``implementation`` whose owned methods are those of ``category``.
 
@@ -278,8 +277,7 @@ def owned_parent_class(implementation: type, category: Category) -> type:
     there are none.  A construction that knows its category before the object
     exists instantiates this class, so the ``__init__`` of every level runs in
     one cooperative chain; ``_rebuild_parent_class`` gives an existing object
-    the same class.  The class is a function of the pair, built once per pair
-    as Sage builds each dynamic class once (``dynamic_class_internal``).
+    the same class.
     """
     providers = _owned_mixins(category, "ParentMethods")
     if not providers:
