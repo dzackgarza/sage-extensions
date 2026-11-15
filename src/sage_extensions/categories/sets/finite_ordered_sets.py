@@ -611,8 +611,39 @@ class FiniteOrderedSets(OwnedCategory):
             return negation(self == other)
 
         def __hash__(self) -> int:
-            # Do not hash members: group/lattice elements may normalize expensively.
-            return hash(int(self.cardinality()))
+            r"""Return the hash of the ordered points, which is the data :meth:`__eq__` compares.
+
+            Two finite ordered sets are equal when their cardinalities agree and
+            their points agree in order (:meth:`__eq__`), so the hash has to be a
+            function of the ordered points and of nothing else.  Python's data
+            model states the one property a hash must have -- "objects which
+            compare equal have the same hash value" (Python 3.14 documentation,
+            *Data model*, ``object.__hash__``) -- and hashing the cardinality
+            alone satisfies it while making it useless: every set of one size
+            lands in one bucket, so a dictionary keyed by these sets compares
+            its stored keys one by one.  That is what #390 measured and #531
+            repairs: the span bases the cache of ``_lattice_subobject_spanning``
+            is keyed by reached 1197 entries on 5 hash values, and one lookup
+            compared 5415 stored keys of 51 us each.
+
+            A point contributes its own hash.  The points of this library are
+            not required to be hashable -- a sparse vector refuses a hash while
+            one of its coefficients has undecided zero-ness
+            (:meth:`sage_extensions.categories.modules.framed.framed_free_modules._SparseFreeModuleElement.__hash__`)
+            -- so a set containing such a point hashes by its cardinality alone.
+            The contract then still holds for it: two equal sets that both carry
+            an unhashable point both take the cardinality hash.  It would not
+            hold for a decided equality that paired a hashable point with an
+            unhashable one, and no point of this library does that, because the
+            one refusal above is a point whose equality is undecided too, and an
+            undecided comparison leaves ``__eq__`` a proposition rather than
+            ``True``.
+            """
+            try:
+                points = tuple(hash(point) for point in self)
+            except TypeError:
+                return hash((FiniteOrderedSets, int(self.cardinality())))
+            return hash((FiniteOrderedSets, int(self.cardinality()), points))
 
         def _repr_(self) -> str:
             return "{" + ", ".join(repr(element) for element in self) + "}"

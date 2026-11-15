@@ -127,3 +127,27 @@ def test_a_span_basis_finds_its_own_cache_entry_without_scanning_the_others() ->
     assert cardinal(sum(1 for _ in table)) == cardinal(32)
     assert all(table[basis] == position for position, basis in enumerate(rebuilt))
     assert hash(bases[0]) != hash(bases[1])
+
+
+def test_the_finite_ordinals_take_the_hash_of_their_points_too() -> None:
+    r"""The finite ordinals inherit the contract: \(\Delta[2]\) and \(\Delta[3]\) hash apart.
+
+    ``AugmentedSimplexCategory`` is the one category refining ``FiniteOrderedSets``
+    (``set_categories.py``, ``super_categories``), so an ordinal is a finite
+    ordered set and takes this hash with its points ``0, ..., n``.  Stated here
+    because a repair of the hash changes the inherited value as well: what a
+    dictionary keyed by index sets sees is the ordinal's hash, and two ordinals
+    of different sizes are different sets.
+    """
+    small = Sets.Δ[2]
+    large = Sets.Δ[3]
+    again = Sets.Δ[2]
+    table = {small: "two", large: "three"}
+
+    assert small == again
+    assert small != large
+    assert hash(small) == hash(again)
+    assert hash(small) != hash(large)
+    assert tuple(small) == (0, 1, 2)
+    assert cardinal(sum(1 for _ in table)) == cardinal(2)
+    assert table[again] == "two"

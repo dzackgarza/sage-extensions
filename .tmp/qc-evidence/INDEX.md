@@ -1651,3 +1651,29 @@ at `/work` and the checkout at `/repos/sage-extensions`.
 The two workflow steps of ENV-03 are on `main` as `34b52a8`; the `if-no-files-found: error` that make a run without
 a record fail its job are `results/issue529-upload-error.patch`, `git apply --check` clean against this tree, because
 the connection's GitHub App may not update a file under `.github/workflows/`.
+## #531: a finite ordered set hashes the points its equality compares
+
+`FiniteOrderedSets.ParentMethods.__hash__` (`src/sage_extensions/categories/sets/finite_ordered_sets.py`) hashed
+`hash(int(self.cardinality()))` while `__eq__` compares the cardinality and then the points in order, so every set
+of one size was one dictionary key's bucket: #390's cache of `_lattice_subobject_spanning`, keyed by the span basis,
+reached 1197 entries on 5 hash values and one lookup compared 5415 stored keys of 51 us each. The repair hashes the
+ordered points with their own hashes (falling back to the cardinality only for a set carrying a point that refuses
+a hash), which is the data equality reads and keeps Python's contract, "objects which compare equal have the same
+hash value". The new file `tests/sets/test_a_finite_ordered_set_hashes_by_its_points.sage` states it: equal sets
+hash equally, 200 distinct rank-two span bases on `U + U + <-2>` take 200 distinct hashes, and a dictionary keyed by
+those sets reaches each entry without scanning the others.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `issue531-red.log` | `da0fa12` (the red test alone) | the new file: **2 failed, 1 passed in 5.11 s**; `test_distinct_span_bases_of_one_rank_do_not_share_a_hash` fails `assert 1 == 200`, `test_a_span_basis_finds_its_own_cache_entry_without_scanning_the_others` fails `assert 2 != 2` |
+| `issue531-lint-red.log` | the same tree | `test_lint` on the new file: **1 files, 0 findings** |
+| `issue531-green.log` | the repair | the new file, now four tests: **4 passed in 7.06 s** |
+| `issue531-hash-cost-before.log` | `da0fa12` | one hash of a lattice vector 3.2 us, of a rank-2 span basis 5.2 us, `__eq__` of two equal rank-2 span bases 61.9 us; 200 distinct span bases took **1 distinct hash value** |
+| `issue531-point-hash.log` | `da0fa12` | two equal vectors built separately hash equally (-4024491175064079283 twice); a fifteen-point set 5.2 us to hash against 344.4 us to compare; an isometry is hashable |
+| `issue531-sets-slice.log` | the repair | `tests/sets`, one pytest process: **29 failed, 131 passed in 21.00 s** |
+| `issue531-sets-slice-base.log` | `da0fa12` (a clean worktree) | the same: **29 failed, 127 passed in 27.28 s**; the 29 FAILED ids are identical to the row above, so the 4 extra passes are the new file and nothing regressed |
+
+The probes behind the two measurement rows are session probes and stay out of the tree: `issue531-hash-cost.py`
+times a hash and counts distinct hash values over 200 span bases, `issue531-point-hash.py` hashes equal vectors
+built two ways, and `issue531-subobject-scan-after.py` is #390's probe S with the hash of a finite ordered set
+censused by caller and cardinality.
