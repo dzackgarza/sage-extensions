@@ -771,6 +771,70 @@ class ConvexPolytopes(OwnedParameterizedCategory):
         def n_vertices(self):
             return _owned_integers()(int(self._engine_polyhedron().n_vertices()))
 
+        @cached_method
+        def _vertex_coordinate_set(self):
+            r"""Return the vertex set as coordinates in the ambient space's frame.
+
+            A polytope is the convex hull of its vertices, so this set is the
+            polytope.  The coordinates are read in ``M tensor QQ``, where a
+            lattice vertex and the same point of the ambient space are one
+            point, so the polytope of a vertex list and the polytope the
+            private exact polyhedron computes from a halfspace description meet
+            here, and the order that polyhedron enumerated its vertices in no
+            longer matters.  The set is cached because it is what this
+            polytope's equality and hash read, and it is computed from that
+            polyhedron.
+            """
+            return frozenset(
+                self._engine_coordinates(vertex) for vertex in self.vertices()
+            )
+
+        def is_equal_to(self, other) -> bool:
+            r"""Return whether the two polytopes are the same subset of the ambient space.
+
+            Two polytopes of one lattice are equal exactly when they have the
+            same vertices: a polytope is the convex hull of its vertex set, and
+            the vertices are the points of the polytope that are not a convex
+            combination of other points of it, so the subset determines them.
+            This is decidable; containment both ways, which is how two subsets
+            of an infinite ambient set are compared, is a proposition that no
+            procedure decides.
+            """
+            return (
+                other.ambient_lattice() is self.ambient_lattice()
+                and self._vertex_coordinate_set() == other._vertex_coordinate_set()
+            )
+
+        def __eq__(self, other):
+            r"""Two polytopes of one lattice are equal when they have the same vertices.
+
+            Equal sets are one factor of a product (`SET-05`), and the subset
+            equality inherited from the ambient space states the containment of
+            two polytopes both ways as a proposition, which would put equal
+            polytopes in two products.  A polytope is its vertex set, which
+            decides it.
+            """
+            if self is other:
+                return True
+            if other in ConvexPolytopes(self.ambient_lattice()):
+                return self.is_equal_to(other)
+            return super().__eq__(other)
+
+        @cached_method
+        def __hash__(self) -> int:
+            r"""Hash the lattice and the vertex set, which :meth:`__eq__` compares.
+
+            A polytope is determined by its vertices, so their coordinates in
+            the ambient space's frame are a complete invariant of the subset:
+            equal polytopes have equal hashes, and the coordinates do not
+            depend on the order the private exact polyhedron enumerated the
+            vertices in.  The hash is cached: a polytope is a factor of the
+            interned finite products, whose store keys a family by its
+            factors' hashes (`SET-05`), and the vertex set is computed from
+            that polyhedron.
+            """
+            return hash((id(self.ambient_lattice()), self._vertex_coordinate_set()))
+
         def facets(self):
             r"""Return the codimension-one faces as owned polytopes."""
             return finite_ordered_set(

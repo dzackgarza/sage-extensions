@@ -4,6 +4,8 @@ from sage.arith.functions import lcm
 from sage.arith.misc import gcd
 from sage.geometry.cone import Cone as SageCone
 from sage.geometry.polyhedron.constructor import Polyhedron
+from sage.matrix.constructor import matrix
+from sage.matrix.special import identity_matrix
 from sage.misc.cachefunc import cached_method
 from sage.rings.integer_ring import ZZ as SageZZ
 from sage.rings.rational_field import QQ as SageQQ
@@ -528,20 +530,106 @@ class RationalPolyhedralCones(OwnedParameterizedCategory):
                 return self.is_equal_to(other)
             return super().__eq__(other)
 
+        @cached_method
         def __hash__(self) -> int:
-            r"""Hash the ambient lattice and a canonical form of the cone as a subset.
+            r"""Hash the ambient lattice and a canonical form of the cone.
 
             Equal cones are one subset of ``L tensor QQ``.  A pointed cone is
-            spanned by its primitive rays, which are determined by the subset, so
-            their hashes, as a set, are the canonical form; a cone with a
-            lineality space hashes its dimension and that of its lineality space.
+            spanned by its primitive rays, which the subset determines, so
+            their hashes, as a set, are the canonical form.  A cone with a
+            lineality space hashes the Hermite basis of the lattice that space
+            meets together with the primitive rays of the cone's image modulo
+            it (:meth:`_canonical_form_modulo_lineality`), which is a complete
+            invariant of the cone; the dimension and the lineality dimension
+            are not, and put the two sides of one line in one bucket.
+
+            The hash is cached: a cone is a factor of the interned finite
+            products and coproducts (`SET-05`), and the canonical form is
+            computed from the private exact polyhedron.
             """
             lattice = id(self.ambient_lattice())
             match self.is_pointed():
                 case True:
                     return hash((lattice, tuple(sorted(hash(ray) for ray in self.primitive_rays()))))
                 case False:
-                    return hash((lattice, int(self.dimension()), int(self.lineality_generators().cardinality().finite_value())))
+                    return hash((lattice, self._canonical_form_modulo_lineality()))
+
+        @cached_method
+        def _lineality_lattice_basis(self):
+            r"""Return a Hermite basis of the lattice this cone's lineality space meets.
+
+            The lineality generators span a subspace ``U`` of
+            ``L tensor QQ``; the points of ``L`` in it are the saturated
+            lattice ``Lambda = L cap U``, which is what the cone contributes
+            along its lineality.  The saturation of the span of the generators
+            gives a basis of ``Lambda``, and its Hermite normal form in the
+            ambient framing is a basis determined by ``Lambda`` alone, so two
+            cones with one lineality space have one basis here.  The zero rows
+            of that form are the redundant generators and are dropped.
+            """
+            rank = int(self.ambient_lattice().module_rank())
+            generators = tuple(
+                _primitive_integral_coordinates(line) for line in self._engine.lines()
+            )
+            if not generators:
+                return matrix(SageZZ, 0, rank)
+            return (
+                matrix(SageZZ, generators)
+                .saturation()
+                .hermite_form(include_zero_rows=False)
+            )
+
+        @cached_method
+        def _image_rays_modulo_lineality(self):
+            r"""Return the primitive rays of this cone's image modulo its lineality.
+
+            The cone modulo its lineality space is a pointed cone in
+            ``(L / Lambda) tensor QQ``.  The orthogonal projection onto the
+            orthogonal complement of ``Lambda`` is an isomorphism of that
+            quotient with a subspace of ``L tensor QQ``, fixed by the ambient
+            framing, so the image of each extreme ray is read there and stated
+            by the primitive integral vector on it, which the ray determines.
+            A ray of a cone is not in its lineality space, so no image is zero.
+            """
+            basis = self._lineality_lattice_basis()
+            rank = int(self.ambient_lattice().module_rank())
+            if basis.nrows() == 0:
+                projection = identity_matrix(SageQQ, rank)
+            else:
+                rows = basis.change_ring(SageQQ)
+                projection = identity_matrix(SageQQ, rank) - rows.transpose() * (
+                    rows * rows.transpose()
+                ).inverse() * rows
+            images = []
+            for ray in self._engine.rays():
+                image = matrix(SageQQ, [tuple(ray)]) * projection
+                primitive = _primitive_integral_coordinates(tuple(image[0]))
+                assert any(primitive), (
+                    f"the ray {ray} of {self} lies in its lineality space, so the exact "
+                    f"polyhedron reported a ray that is not an extreme ray of the cone"
+                )
+                images.append(tuple(int(coordinate) for coordinate in primitive))
+            return tuple(sorted(images))
+
+        @cached_method
+        def _canonical_form_modulo_lineality(self):
+            r"""Return the canonical form of this cone with its lineality space.
+
+            It is the Hermite basis of the lattice the lineality space meets,
+            and the primitive rays of the cone's image modulo that lattice,
+            both stated as integer coordinate vectors of the ambient framing.
+            Two cones of one lattice with one canonical form are one set: a
+            cone that contains a direction contains both of its rays, so the
+            lineality space is determined by the cone, and the cone is the
+            preimage of its own image, which its extreme rays span.
+            """
+            return (
+                tuple(
+                    tuple(int(entry) for entry in row)
+                    for row in self._lineality_lattice_basis().rows()
+                ),
+                self._image_rays_modulo_lineality(),
+            )
 
         def is_equal_to(self, other) -> bool:
             r"""Return whether the two cones are the same subset of ``L tensor QQ``.

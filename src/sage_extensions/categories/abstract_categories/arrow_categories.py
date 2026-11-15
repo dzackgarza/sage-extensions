@@ -1981,13 +1981,32 @@ class SetSubobjectCategory(SliceCategory):
 
             return negation(self == other)
 
+        @cached_method
         def __hash__(self) -> int:
             r"""Hash the ambient set, refined by the members when it is finite and enumerated.
 
             Equal subsets have one ambient set, and over a finite enumerated
             ambient set they have the same decided members, read here by their
-            positions in its enumeration; elsewhere equality is containment
-            both ways, and the ambient set is what it supplies to a hash.
+            positions in its enumeration.
+
+            Over an infinite ambient set this is the hash of that set, and
+            every subset of it hashes alike.  No finer invariant is decidable.
+            Equality there is containment both ways, and :meth:`is_contained_in`
+            states each containment as a proposition unless the inclusion's
+            domain is a finite enumeration, so two subsets that no procedure
+            separates may yet be decided equal, and a hash that separated them
+            would contradict that decision.  The presentation is not an
+            invariant to hash instead: one subset is cut out by many
+            predicates, and equal subsets are not obliged to share the
+            predicate that decides their members.
+
+            The hash is cached.  A subset is a factor of the interned finite
+            products and coproducts, whose store keys a family by its factors'
+            hashes (`SET-05`), and over a finite ambient set this hash decides
+            the membership of every point of it, which is not work to repeat at
+            every lookup.  A subset is a value: its predicate is fixed when it
+            is constructed, so the decisions the cached hash records do not
+            change.
             """
             from sage_extensions.categories.sets.set_categories import (
                 EnumeratedSets,
