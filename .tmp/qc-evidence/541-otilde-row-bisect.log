@@ -1,0 +1,127 @@
+Bisecting: 10 revisions left to test after this (roughly 3 steps)
+[022f7a527151b1d7ba4e75be0fad487bca075514] perf: owned category joins and owned parent classes built once
+running '/workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/bisect541pred.sh'
+=== step on 022f7a5271 at 16:21:57
+step 022f7a5271: first plane 500.0 s, calib 0.396, ratio 1263 calib units -> RED
+Bisecting: 4 revisions left to test after this (roughly 2 steps)
+[5e7eb7ccdd0776445779322af9b6557d0ee6d8e5] test: the transvection's crossings are counted where they cost, on two ranks (#528)
+running '/workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/bisect541pred.sh'
+=== step on 5e7eb7ccdd at 16:30:31
+step 5e7eb7ccdd: first plane 347.3 s, calib 0.369, ratio 941 calib units -> GREEN
+Bisecting: 2 revisions left to test after this (roughly 1 step)
+[2291235e3d2c04d7ca5effb4b9c0f8b6cfaa5537] fix: the points of a finite ordered set hash, and a finite product is found under its family's key (#531)
+running '/workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/bisect541pred.sh'
+=== step on 2291235e3d at 16:39:14
+step 2291235e3d: first plane 500.0 s, calib 0.373, ratio 1340 calib units -> RED
+Bisecting: 0 revisions left to test after this (roughly 0 steps)
+[10c390286150f044002a8662971e6c3b15703528] test: a product is found by its own family alone, and a finite set's points hash (#531)
+running '/workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/bisect541pred.sh'
+=== step on 10c3902861 at 16:47:48
+step 10c3902861: first plane 351.1 s, calib 0.696, ratio 504 calib units -> GREEN
+2291235e3d2c04d7ca5effb4b9c0f8b6cfaa5537 is the first bad commit
+commit 2291235e3d2c04d7ca5effb4b9c0f8b6cfaa5537
+Author: D. Zack Garza <dzackgarza@gmail.com>
+Date:   Sun Nov 15 14:53:31 2026 +0000
+
+    fix: the points of a finite ordered set hash, and a finite product is found under its family's key (#531)
+    
+    The interner of finite products and coproducts (df5f484) kept one store
+    keyed by the index set's cardinality and compared a new family with every
+    stored family of that cardinality, so every binary product compared with
+    every earlier binary product.  It could not key by the factors because a
+    factor could be a finite ordered set of points that refuse a hash, and a
+    key consistent with equality that every such set supplies does not exist
+    beyond its cardinality: a mutable vector equals its immutable copy, and no
+    total, non-constant invariant agrees with equality across both.
+    
+    The rule, stated once on FiniteOrderedSets: the points of a finite ordered
+    set are values; each hashes, and its hash agrees with its equality.  A set
+    is fixed by its points, and what is keyed by a set or its points (the
+    inverse of its enumeration, the interned product and coproduct, an interned
+    label set) is correct only while the points cannot change.  A point that
+    refuses a hash is mutable (a list, a mutable Sage vector: pass the tuple,
+    or the vector after set_immutable()) or its owner computes no hash for it
+    (a constant hash agrees with every equality).  SET-05 decides the
+    capability: one product per equal family needs a key that agrees with
+    equality, and a set of mutable points can stop being equal to the set it
+    was interned as.
+    
+    Consequences:
+    
+    - The interner (set_categories._finite_family_key) keys a family by its
+      index set and the multiset of its factors' hashes, and compares by ==
+      only the families of its key.  Equal families have one key in either
+      construction order; an undecided == builds and keeps both.
+    - The equality fallbacks of _on_points, from_indexed (the try at
+      finite_ordered_sets.py:415) and _filtered_ordered_set are deleted: each
+      builds the hash table of its points, which refuses an unhashable point
+      with Python's TypeError.  The query paths that admit an arbitrary
+      candidate (index_of, contains on a candidate that refuses a hash, such as
+      a mutable vector equal to a point) keep their comparison.
+    - interned_labels and its isinstance(label, Hashable) branch are deleted;
+      framed_free_modules calls interned_finite_ordered_set.  The unused
+      Hashable imports go.
+    - IndexedFamily.__hash__'s docstring names the interner's key.  Docstring
+      specimens on list labels use tuple labels.
+    
+    Owners whose points refused a hash, found by running every test directory
+    at main with the fallbacks logged, each given a hash that agrees with its
+    equality:
+    
+    - CharacterSets elements: the values on the conjugacy-class
+      representatives (their equality is identity on main, #538).
+    - Functor (objects of an arrow category and the flag diagrams among the
+      isotropic orbit representatives, _ArrowAsFunctor and
+      FiniteSequenceDiagram): the identity hash, which agrees with a functor's
+      identity equality (Sage's Element comparison; no functor defines __eq__).
+    - FormedModuleMorphism (lattice embeddings) declared __hash__ = None; it
+      hashes its module map by the module morphisms' own hash, which equal
+      pairs (f, h) share.
+    - RationalPolyhedralCones parents: the ambient lattice and the engine
+      polyhedron, which is what equality compares.
+    ConvexPolytopes parents still refuse a hash; that is #491, red at main, and
+    the triangle test now stops at facets() with the same TypeError.
+    
+    The cone hash makes the cone-keyed caches of toric_schemes share a chart
+    between equal cones of two toric varieties.  Four tests of
+    tests/divisors/test_toric_class_groups.sage, green at main, fail when the
+    file runs in one process (each passes alone): #540.  Without the cone hash,
+    three edgewalk and cone tests that are green at main fail instead, because a
+    finite ordered set of cones is refused.
+    
+    Suite evidence: every test directory was run at main (with the deleted
+    fallbacks logged) and with this repair minus the Functor, cone and formed
+    morphism hashes; every test red only with the repair was rerun with the
+    complete repair: 36 of 36 pass (tests/lattices, tests/objects,
+    tests/engineering).  tests/sets with the touched algebras and toric files:
+    34 failed / 143 passed; every failure is red at main except the four toric
+    tests of #540.  Not rerun with the complete repair: the whole suite as one pass;
+    tests/lattices files after the 240th ran past the 590 s cap at main and
+    with the repair.
+    
+    Tests: the red commit d069ddf.  tests/algebras/test_one_construction_per_label_set
+    loses the half that asserted list labels keep their identity.
+    
+    Measured in the image, the latest of 300 distinct binary products of
+    3-point sets looked up again through an equal rebuilt factor (median of 5):
+    
+      base 5fabcdc   build 0.96 s   lookup 2.72 ms
+      main 6e51d33   build 27.99 s  lookup 189.16 ms
+      this commit    build 0.75 s   lookup 1.74 ms
+      this commit, 3000 products: build 8.51 s, lookup 2.58 ms (min 1.75)
+    
+    Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+ .../categories/abstract_categories/functors.py     |  16 +-
+ .../categories/algebras/free_algebras.py           |   2 +-
+ src/sage_extensions/categories/functors/core.py    |   9 +
+ src/sage_extensions/categories/group/characters.py |  11 ++
+ .../modules/framed/formed/form_modules.py          |   8 +-
+ .../modules/framed/framed_free_modules.py          |   4 +-
+ src/sage_extensions/categories/polyhedral_cones.py |   4 +
+ .../categories/sets/finite_ordered_sets.py         | 181 +++++++--------------
+ .../categories/sets/indexed_families.py            |  44 ++---
+ .../categories/sets/set_categories.py              |  51 +++---
+ .../test_one_construction_per_label_set.sage       |  14 +-
+ 11 files changed, 142 insertions(+), 202 deletions(-)
+bisect found first bad commit

@@ -1,0 +1,96 @@
+=== tree: d1ab7fc7856b1132cf1c745128eddce0e5f7e6ca (modified paths: 0)
+=== port: 991b88b095a42a1e3679569ea42328c900c120f6
+=== command: sage-image/run.sh -w /work, port at /work, worktree at /repos/sage-extensions, probe at /probe.py, ROW_DEADLINE=500, inner cap 545 s, outer 595 s
+row: {g in Orthogonal group O(Integral lattice of rank 11 and signature (2, 9)) : rho_L(g) lies in Subgroup of Orthogonal group of Finitely presented module on 11 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 2, 1 ↦ 2, 2 ↦ 2, 3 ↦ 2, 4 ↦ 2, 5 ↦ 2, 6 ↦ 2, 7 ↦ 2, 8 ↦ 2, 9 ↦ 2, 10 ↦ 2]} on rank 11
+calibration 0.363 s
+before the row elapsed 2.7 s, planes transported 0
+before the row no plane transported yet
+  [tick] elapsed 31.2 s, planes transported 0
+  [tick] no plane transported yet
+  [tick] elapsed 61.2 s, planes transported 0
+  [tick] no plane transported yet
+  [tick] elapsed 91.3 s, planes transported 0
+  [tick] no plane transported yet
+Timeout (0:02:00)!
+Thread 0x0000770d4177f6c0 [Thread-1 (watch] (most recent call first):
+  File "/probe.py", line 91 in watchdog
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Thread 0x0000770f297d3780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/arrow_categories.py", line ??? in _from_inverse_computation
+  <invalid frame>
+  [tick] elapsed 121.3 s, planes transported 0
+  [tick] no plane transported yet
+  [tick] elapsed 151.3 s, planes transported 0
+  [tick] no plane transported yet
+  [tick] elapsed 181.3 s, planes transported 0
+  [tick] no plane transported yet
+  [tick] elapsed 211.3 s, planes transported 0
+  [tick] no plane transported yet
+Timeout (0:02:00)!
+Thread 0x0000770d4177f6c0 [Thread-1 (watch] (most recent call first):
+  File "/probe.py", line 91 in watchdog
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Thread 0x0000770f297d3780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py", line ??? in _element_constructor_
+  <invalid frame>
+  [tick] elapsed 241.3 s, planes transported 0
+  [tick] no plane transported yet
+  [tick] elapsed 271.3 s, planes transported 0
+  [tick] no plane transported yet
+Timeout (0:02:00)!
+Thread 0x0000770d4177f6c0 [Thread-1 (watch] (most recent call first):
+  File "/probe.py", line 91 in watchdog
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Thread 0x0000770f297d3780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 2003 in _iter_splitting_isometries_in_im_rho_from_image
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3482 in _plane_orbit_from_parabolic_stabilizer
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3706 in _subgroup_isotropic_orbit_representatives
+  File "/repos/sage-extensions/src/sage_extensions/timing.py", line 393 in timed
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 522 in isotropic_orbit_representatives
+  File "/probe.py", line 109 in <module>
+  [tick] elapsed 437.4 s, planes transported 0
+  [tick] no plane transported yet
+  [tick] elapsed 470.4 s, planes transported 1295
+  [tick] first plane at 441.8 s, last at 470.4 s
+  [tick] 45.27 planes/s over the walk (22.1 ms a plane)
+Timeout (0:02:00)!
+Thread 0x0000770d4177f6c0 [Thread-1 (watch] (most recent call first):
+  File "/probe.py", line 91 in watchdog
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Thread 0x0000770f297d3780 [python] (most recent call first):
+  File "/sage/.venv/lib/python3.14/site-packages/sage/modules/free_module.py", line 2495 in is_submodule
+  File "/sage/.venv/lib/python3.14/site-packages/sage/modules/free_module.py", line ??? in submodule
+  <invalid frame>
+  [tick] elapsed 500.4 s, planes transported 3283
+  [tick] first plane at 441.8 s, last at 500.4 s
+  [tick] 55.99 planes/s over the walk (17.9 ms a plane)
+[cap] elapsed 500.4 s, planes transported 3283
+[cap] first plane at 441.8 s, last at 500.4 s
+[cap] 55.99 planes/s over the walk (17.9 ms a plane)
+[cap] calibration start 0.363 s
+[peakrss] probe541row2: child waited=0 shell_code=0 samples=251
+[peakrss] peak tree RSS      : 1896 MiB
+[peakrss] low-water MemAvail : 10482 MiB
+[peakrss] peak single VmHWM  : 1896 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     1885 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   500.3s procs=  3 rss=  1896 MiB hwm=  1896 MiB avail= 11929 MiB
+[peakrss]   t=   498.3s procs=  3 rss=  1871 MiB hwm=  1871 MiB avail= 11939 MiB
+[peakrss]   t=   496.3s procs=  3 rss=  1846 MiB hwm=  1846 MiB avail= 11949 MiB
+[peakrss]   t=   494.3s procs=  3 rss=  1820 MiB hwm=  1820 MiB avail= 11960 MiB
+[peakrss]   t=   492.3s procs=  3 rss=  1800 MiB hwm=  1800 MiB avail= 11965 MiB
+=== launcher exit: 0

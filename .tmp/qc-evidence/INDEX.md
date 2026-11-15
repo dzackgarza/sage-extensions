@@ -2237,3 +2237,28 @@ them and the launcher is the one the header names.
 | `540r-lint-base.log` | `52cbab3` (main, the merged tree the round before) | `python -m sage_extensions.testing.test_lint tests/algebras/test_affine_semigroup_algebras.sage`: **1 files, 8 findings (TL01, TL02, TL07)**, exit 1 -- five TL01 at the three function-local module imports, two TL02 at `_owned_integers`, one TL07 at `repr(algebra)`; as a pytest plugin each finding errors the tests of the file that holds it, which is the three setup errors `531f-green-merged.log` records |
 | `540r-lint-main.log` | `dcdeddde` | the same command on the file as this round leaves it: **1 files, 0 findings**, exit 0 |
 | `540r-lint-pytest-main.log` | `dcdeddde` | the file collected by pytest with `-p sage_extensions.testing.test_lint` named as well: **4 passed in 0.69 s**, so the four rows run and no finding errors them |
+
+## #541 -- the Õ(T_Co) row's setup, measured against the VM's load
+
+The row is `NamedLattices.Tco.stable_orthogonal_group().isotropic_orbit_representatives(2)`.
+`7c0859c832` reached its first transported plane at 283.9 s; main did not reach one
+at all in ten minutes, and the question was whether a commit between them slowed
+the setup or the VM's load decided the two readings.  Every run below carries
+`calib`, the wall time of one fixed workload (10M integer cubes and a GAP
+`Order(SymmetricGroup(8))`) timed in the same process, and every run is capped at
+500 s of row inside a 545 s inner and a 595 s outer kill.  Alternating order:
+base, main, main, base.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `541-otilde-row-calibrated-base-1.log` | `7c0859c832` | first plane **352.6 s**, calib 0.362 (974 units), 8758 planes at the cap, 58.89 planes/s |
+| `541-otilde-row-calibrated-base-2.log` | `7c0859c832` | first plane **356.9 s**, calib 0.364 (980), 8324 planes, 56.04 planes/s |
+| `541-otilde-row-calibrated-main-1.log` | main `d1ab7fc785` | **no plane by 514.1 s**, calib 0.415 (>= 1239) |
+| `541-otilde-row-calibrated-main-2.log` | main `d1ab7fc785` | first plane **441.8 s**, calib 0.363 (1217), 3283 planes, 55.99 planes/s |
+| `541-otilde-row-bisect.log` | -- | the `git bisect run` transcript: predicate `first plane / calib >= 1100`, `022f7a5271` red (1263), `5e7eb7ccdd` green (941), `2291235e3d` red (1340), `10c3902861` green (504); **`2291235e3d2c04d7ca5effb4b9c0f8b6cfaa5537 is the first bad commit`** |
+| `541-bisect-step-022f7a5271.log`, `-5e7eb7ccdd.log`, `-2291235e3d.log`, `-10c3902861.log` | each step's own tree | the four step runs, each with its stack samples (`faulthandler`, every 120 s): at 120 s the base sits in `integral_restriction` and by 240 s in the coset walk, while main sits in `_finite_family_key` -> `__hash__` -> `point_at` |
+| `541-hash-red.log` | main `d1ab7fc785` | `tests/sets/test_the_hash_of_a_finite_ordered_set_is_one_datum.sage`: **1 failed, 2 passed in 2.03 s**, `assert (0, 1, 2, 3, 0, 1, ...) == (0, 1, 2, 3)` |
+| `541-hash-green.log` | the repair | the same file: **3 passed in 1.18 s** |
+| `541-hash-lint.log` | the repair | test lint: **1 files, 0 findings** |
+| `541-otilde-row-after-hash-repair.log` | the repair | first plane **483.6 s**, calib 0.577 (838 units), 2089 planes, 72.67 planes/s |
+| `541-framing-test-after-docs.log` | the docs commit | `tests/modules/test_the_embedded_framing_is_one_datum.sage`: **2 passed in 1.10 s** |
