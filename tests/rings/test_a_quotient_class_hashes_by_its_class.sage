@@ -13,6 +13,8 @@ the class, every set of vectors over ``ZZ/(n)`` is unhashable, and the cache of
 
 from sage_extensions.all import *  # noqa: F401,F403
 
+import pytest
+
 
 def test_classes_with_different_lifts_are_one_key() -> None:
     r"""``1`` and ``4`` are one class of ``ZZ/(3)``, and one dictionary key."""
@@ -36,3 +38,25 @@ def test_distinct_classes_of_one_modulus_hash_apart() -> None:
     assert first != second
     assert hash(first) != hash(second)
     assert cardinal(sum(1 for _ in {first: cardinal(0), second: cardinal(1)})) == cardinal(2)
+
+
+def test_a_class_over_zz_refuses_a_hash_because_reduction_is_no_normal_form() -> None:
+    r"""Over ``ZZ``, one class has many engine representatives, so it has no hash.
+
+    In ``ZZ[x,y]/(4, 6x)`` the classes of ``x`` and of ``3x`` are equal, since
+    \(2x = 6x - 4x\) lies in the ideal.  Sage's representative of the two is
+    ``xbar`` and ``-xbar``: over a coefficient ring that is not a field
+    ``ideal.reduce`` returns the representative it was given, so a hash of the
+    representative is a hash of the lift.
+    """
+    polynomials = ZZ.polynomial_ring("x,y")
+    x = polynomials.algebra_generator("x")
+    quotient = polynomials.quotient_ring(polynomials.ideal(ZZ(4), ZZ(6) * x))
+    lifted = quotient(x)
+    relifted = quotient(ZZ(3) * x)
+
+    assert lifted == relifted
+    with pytest.raises(TypeError):
+        hash(lifted)
+    with pytest.raises(TypeError):
+        hash(relifted)
