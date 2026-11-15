@@ -1,0 +1,23 @@
+=== ran on: ac4edea7e558e61680b754cbc9cad795bef441e9 (0 modified paths)
+=== command: sage-image/run.sh -w /work, probe at /probe.py
+resident before: 267.2 MiB, ('weak value table', 1)
+1000000 constructions in 1.1 s: resident 267.2 MiB (+0.0), weak value table holds 1, sum 499999500000
+after releasing the sum: ('weak value table', 1)
+two constructions are one object: True
+pickle protocol 0: same object True
+pickle protocol 2: same object True
+pickle protocol 5: same object True
+copy: same object True
+deepcopy: same object True
+the set pickles to itself: True
+[peakrss] probe541retain: child waited=0 shell_code=0 samples=2
+[peakrss] peak tree RSS      : 278 MiB
+[peakrss] low-water MemAvail : 13387 MiB
+[peakrss] peak single VmHWM  : 278 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      267 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     2.0s procs=  3 rss=   278 MiB hwm=   278 MiB avail= 13387 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     1 MiB hwm=     1 MiB avail= 13583 MiB
+=== exit: 0

@@ -1,0 +1,23 @@
+=== ran on: ac941dc62b46db71b7debe2c2517a50d94c31194 (0 modified paths)
+=== command: sage-image/run.sh -w /work, probe at /probe.py
+resident before: 266.8 MiB, ('cached_method cache', 3)
+1000000 constructions in 1.6 s: resident 554.3 MiB (+287.5), cached_method cache holds 1000000, sum 499999500000
+after releasing the sum: ('cached_method cache', 1000000)
+two constructions are one object: True
+pickle protocol 0: refused TypeError: Cannot convert NaturalNumberSets.element_class to sage.structure.parent.Parent
+pickle protocol 2: same object False
+pickle protocol 5: same object False
+copy: same object False
+deepcopy: same object False
+the set pickles to itself: False
+[peakrss] probe541retain: child waited=0 shell_code=0 samples=2
+[peakrss] peak tree RSS      : 370 MiB
+[peakrss] low-water MemAvail : 13467 MiB
+[peakrss] peak single VmHWM  : 370 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      359 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     2.0s procs=  3 rss=   370 MiB hwm=   370 MiB avail= 13467 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     1 MiB hwm=     1 MiB avail= 13759 MiB
+=== exit: 0

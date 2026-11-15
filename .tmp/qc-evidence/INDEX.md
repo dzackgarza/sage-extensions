@@ -2397,3 +2397,40 @@ calib 0.378 (>= 1353 units), and neither run's stack samples enter
 `_finite_family_key`: the 120 s sample of the rebased run is inside
 `integral_restriction` at `isotropic_lifts.py:644`, the residue locus' own
 per-representative test.
+
+## #541, the naturals' intern table given a lifetime, and the row at low load
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `541-weak-natural-red.log` | `9d07255` | the two test files before the repair: **3 failed, 5 passed in 2.65 s**.  Both lifetime tests stop at `assert 3 == 2` -- the strong `cached_method` table is the third reference -- and the pickle test at `loads(dumps(point)) is point` False.  Test lint loaded, no finding on either file |
+| `541-weak-natural-green.log` | `ac4edea` | the two test files after: **8 passed in 0.40 s**, test lint loaded, **0 findings** |
+| `541-weak-natural-sets-dir-base.log`, `541-weak-natural-sets-dir-fix.log` | `ac941dc62b` / `ac4edea` | `tests/sets` whole: **29 failed, 146 passed in 6.68 s** against **29 failed, 149 passed in 7.79 s**; the FAILED id sets are identical under `sort` and `diff`, and the three that now pass are this round's tests |
+| `541-weak-natural-retain-base.log`, `541-weak-natural-retain-fix.log` | `ac941dc62b` / `ac4edea` | 10^6 distinct naturals, one probe on both trees: resident **+287.5 MiB, table of 1 000 000 entries**, 1.6 s at the base, against **+0.0 MiB, table of 1 entry**, 1.1 s.  Pickle protocols 0/2/5, `copy` and `deepcopy`: base refuses 0 (`TypeError: Cannot convert NaturalNumberSets.element_class to sage.structure.parent.Parent`) and loses identity on the rest; the repair returns the one point on all of them, and `loads(dumps(NN)) is NN` (False at the base) |
+| `541-weak-natural-point-base.log`, `541-weak-natural-point-fix.log` | `ac941dc62b` / `ac4edea` | one point of `NN`, 200 000 hits and 200 000 misses: a repeat construction **0.22 -> 0.24 us**, a first construction **1.10 -> 1.02 us** (a second pair of runs put the repeat at 0.25 and the first at 1.17 us, so the hit is +0.02-0.03 us and the miss is inside the noise) |
+| `541-row10-repair-1.log`, `541-row10-base-1.log`, `541-row10-repair-2.log`, `541-row10-base-2.log` | `ac4edea` / `7c0859c832` | the Otilde(T_Co) plane row, four runs alternating between the repaired tree and the base, each calibrated and killed at 590 s outer / 570 s inner with `ROW_DEADLINE=540`: see the table below |
+
+The row, in the order it was run.  Load averages are the line the log's own header
+records, read from `/proc/loadavg` on 4 CPUs immediately before the run; "units"
+is the first-plane time divided by the run's own calibration.
+
+| run | tree | load before | calibration | first plane | units | planes at the cap | planes/s over the walk | first 29 s window |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `-repair-1` | `ac4edea` | 1.55 1.54 2.48 | 0.365 s | **345.4 s** | **946** | 11 036 by 554.1 s | **52.88** (18.9 ms) | 72.19 |
+| `-base-1` | `7c0859c832` | 5.76 3.82 3.02 | 0.713 s | **478.5 s** | **671** | 5 283 by 567.2 s | **59.55** (16.8 ms) | 49.74 |
+| `-repair-2` | `ac4edea` | 2.50 5.91 4.97 | 0.568 s | **341.8 s** | **602** | 14 305 by 550.4 s | **68.55** (14.6 ms) | 69.03 |
+| `-base-2` | `7c0859c832` | 1.79 2.64 3.64 | 0.429 s | **349.3 s** | **814** | 11 690 by 561.2 s | **55.17** (18.1 ms) | 54.98 |
+
+What the four runs decide.  The repaired tree's first plane is **345.4 s and
+341.8 s** in two runs whose calibrations differ by 55 % (0.365 and 0.568 s): the
+stage is reproducible in absolute seconds and the calibration is not, so the
+same 345 s reads as 946 units in one run and 602 in the other.  The base tree's
+two runs are **349.3 s** at load 1.79 and **478.5 s** at load 5.76.  So at
+comparable load -- 345.4 s (load 1.55) against 349.3 s (load 1.79) -- the
+repaired row's first plane is within 1.1 % of the base tree's, which is the
+parity `ac941dc62b` could not establish from 957 and 1209 units; those two runs
+had near-equal calibrations (0.369, 0.364) and first planes 353.3 s and 440.0 s,
+so their disagreement was the 8.45 load of the second, not the calibration.  The
+per-plane rate does not separate the trees either: 52.9 and 68.6 planes/s on the
+repair against 55.2 and 59.6 on the base, with the rate drifting inside a run as
+the machine's load moved (run 1 goes 72.2 -> 52.9 over 209 s while the load
+average goes 1.5 -> 5.9).

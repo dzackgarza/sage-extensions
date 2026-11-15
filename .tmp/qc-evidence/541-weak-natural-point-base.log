@@ -1,0 +1,4 @@
+=== ran on: ac941dc62b46db71b7debe2c2517a50d94c31194 (0 modified paths)
+a repeat construction of 5: 0.22 us over 200000
+a first construction of a new value: 1.10 us over 200000
+same object: True
