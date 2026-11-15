@@ -418,11 +418,15 @@ class _ColouredFamilyRealization:
     @cached_method
     def rational_family(self):
         r"""The family as the rational module morphism ``F_Q(I) -> L tensor Q``."""
+        from sage_extensions.categories.modules.pure.modules import _morphism_from_engine_matrix
+
         rational = self.rational_space()
-        rationalization = self.rationalization()
         positions = rational.base_ring().free_module(self._indices)
-        return Modules(rational.base_ring()).Mor(positions, rational)(
-            lambda index: rationalization(self.vector(index)).underlying_element()
+        # The base change keeps the lattice framing, so column i is the
+        # coordinate row of v_i already read once for the family matrix.
+        return _morphism_from_engine_matrix(
+            Modules(rational.base_ring()).Mor(positions, rational),
+            self._family_coordinate_matrix().transpose().change_ring(SageQQ),
         )
 
     @cached_method
@@ -486,10 +490,16 @@ class _ColouredFamilyRealization:
                 ))))
             )
             return partial.witt_extension(source_inclusion, target_inclusion)
-        section = self.family_section()
-        return rational_source.Isom(rational_target)(
-            lambda label: target_family(relabel(section(rational_source.module_generator(label))))
+        # T_sigma = w o relabel o section, the product of the three framed
+        # matrices, raised once instead of evaluated per generator.
+        from sage_extensions.categories.modules.pure.modules import _engine_matrix, _morphism_from_engine_matrix
+
+        product = _engine_matrix(target_family) * _engine_matrix(relabel) * _engine_matrix(self.family_section())
+        linear = _morphism_from_engine_matrix(
+            Modules(rational_source.base_ring()).Mor(rational_source, rational_target), product
         )
+        isometries = rational_source.Isom(rational_target)
+        return isometries.element_class(isometries, linear)
 
     @cached_method
     def configuration_isometry(self, generator):
@@ -944,9 +954,7 @@ def _transporter(homset, source_family, target_family):
     ).transporter(target_rationalization)
     if transporter is None:
         return None
-    composite = rational_source.Isom(rational_target)(
-        lambda label: transporter(equivalence(rational_source.module_generator(label)))
-    )
+    composite = transporter * equivalence
     restricted = composite.integral_restriction(source_lattice, target_lattice)
     assert restricted is not None, (
         f"the transporter {transporter} of the integral structures does not restrict to an isometry "
