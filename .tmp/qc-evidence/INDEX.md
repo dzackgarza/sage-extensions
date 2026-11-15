@@ -1778,3 +1778,20 @@ there).
 | `issue531r2-lint.log` | this tree | `test_lint` on the three touched test files: **3 files, 144 findings**, all in `test_products_and_coproducts_of_finite_and_countable_sets.sage` and in the codes it already carried; the two files of this change carry none |
 
 The product probe stays out of the tree: it builds the family over `finite_ordered_set(([0], [1]))` twice, reports whether the index set hashes, and compares the two products by identity.
+## #529, third review — one run one record, a caller's name for its input, and the README as a recipe
+
+The reviewer's three findings on `fc4f322`, and what each one measured.  `${ARGS}` is
+`-p qc_sage_session -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates -q`.
+
+| log | tree | result |
+| --- | --- | --- |
+| `issue529c-red.log` | `fc4f322`'s stamps | `${ARGS} tests/engineering/test_the_timing_record_names_each_stage.py -k 'two_runs or parallel'`: **1 failed, 1 passed in 9.98 s** — `assert ('junit', 'report') == ('junit', 'junit', 'report', 'report')`: two probes started before either was waited on kept one record between them, because both stamped to the second and the second copy landed on the first |
+| `issue529c-tests.log` | `ad28ef0` | the timing-record file and the suite-plugin file: **8 passed in 9.91 s**, with `test_lint` loaded; the two-run test now sees four files, two stamps, and each report log naming only its own test, and the `-n 2` test checks the probe's exit status |
+| `issue529c-engineering-all.log` | `ad28ef0` | `${ARGS} tests/engineering/`: **2 failed, 12 passed in 30.43 s**; both failures are `test_polyhedral_engine_routes.sage`'s `u.basis()` rows |
+| `issue529c-plane-names.log` | `ad28ef0` | a probe over the plane row of `U + U + <-2>`: the names the stages now record — `rank-2 subobject row of the rank-5 lattice on generators 0, 1, 2, 3, 4`, `1 ambient plane representative of …`, `a rank-2 subobject of …` — and the row returns 1 orbit; no stage of this row printed an object, and `_named` inspected none |
+| `issue529c-neighbours.log` | `ad28ef0` | the Vinberg and small-indefinite line-row files, which hold the call sites: **1 failed, 9 passed in 25.27 s**, the failure `test_isotropic_parabolic_restriction.sage`'s `kernel.group_generators()` `ValueError` |
+| `issue529c-base-parabolic.log` | clean worktree `fc4f322` | the same file alone: **1 failed, 1 passed in 7.25 s**, the same test id and the same `ValueError` at `set_categories.py:4463` — pre-existing, and not on a path this change touches |
+| `issue529c-just-readme.log` | `ad28ef0` | `SAGE_BIN=/sage/.venv/bin/sage just readme`: **1 passed in 0.39 s**, and `.timings/` holds `junit-ad28ef011653-20261115T090006896917Z-1810853.xml` and `run-ad28ef011653-20261115T090006896917Z-1810853.jsonl` — the recipe the workflow step runs, and the record it leaves |
+
+The README workflow step is `results/issue529-readme-record.patch`, not history: the connection's GitHub App may
+not update a file under `.github/workflows/`, and `git apply --check` passes against `ad28ef0`.

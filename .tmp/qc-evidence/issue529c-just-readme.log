@@ -1,0 +1,43 @@
+tree SHA: ad28ef011653034fd2f7cadb5e504267ed8f8646
+port SHA: 991b88b0
+inner 300 s, outer 340 s, guard 4096 MiB
+command: rm -rf .timings; SAGE_BIN=/sage/.venv/bin/sage just readme; echo just-exit=$?; ls .timings
+proot warning: can't sanitize binding "/workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/wt529c/.tmp/issue529-probe.py": No such file or directory
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+time gates on: star import 0.31 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: asyncio-1.5.0, xdist-3.8.0, reportlog-1.0.0, platformdirs-4.13.5, hypothesis-6.170.15, anyio-4.15.1, timeout-2.4.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+timeout: 60.0s
+timeout method: signal
+timeout func_only: False
+collected 1 item
+
+README.md .                                                              [100%]
+
+------ generated xml file: /repos/sage-extensions/tests/.report/junit.xml ------
+-------------- generated report log file: tests/.report/run.jsonl --------------
+============================== slowest durations ===============================
+0.25s call     README.md::README.md
+0.00s setup    README.md::README.md
+0.00s teardown README.md::README.md
+============================== 1 passed in 0.39s ===============================
+just-exit=0
+junit-ad28ef011653-20261115T090006896917Z-1810853.xml
+run-ad28ef011653-20261115T090006896917Z-1810853.jsonl
+[peakrss] jr529d: child waited=0 shell_code=0 samples=2
+[peakrss] peak tree RSS      : 154 MiB
+[peakrss] low-water MemAvail : 13315 MiB
+[peakrss] peak single VmHWM  : 154 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      133 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   just                          4 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   bash                          3 MiB peak
+[peakrss]   sh                            1 MiB peak
+[peakrss]   t=     2.0s procs=  6 rss=   154 MiB hwm=   154 MiB avail= 13315 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     2 MiB hwm=     2 MiB avail= 13316 MiB
+launcher exit: 0
