@@ -1,0 +1,56 @@
+provider SHA: 0a8a95bf7435ba534500e6f16016d31bebd5f691
+port SHA: 991b88b0
+command: python -m pytest -p qc_sage_session tests/rings/test_elements_divide_in_their_own_ring.sage -o addopts= -q
+...F.                                                                    [100%]
+=================================== FAILURES ===================================
+_________ test_an_integer_literal_divides_in_the_parent_the_two_share __________
+
+    def test_an_integer_literal_divides_in_the_parent_the_two_share() -> None:
+        r"""$\mathbf{Z}(3)/2 = 3/2$ in $\mathbf{Q}$, and $e_{12}/2 = \frac{1}{2}e_{12}$ in $M_2(\mathbf{Q})$.
+    
+        $2$ is not a unit of $\mathbf{Z}$, so the quotient of $3$ by it is not an
+        integer: the coercion model brings $3$ and $2$ into the parent the two have
+        in common, $\mathbf{Q}$, and the ring divides there.  A matrix ring has no
+        such larger parent, and there the literal is the scalar matrix $2I$, so
+        $e_{12} / 2I$ is $\frac{1}{2}e_{12}$ by the same law.  Neither quotient is
+        an operator the element class states for numerals: the ring's division is
+        the one every owned ring answers with, and a numeral enters it through the
+        ring's own coercion.
+        """
+        matrices = QQ.matrix_space(2)
+        e12 = matrices.matrix_unit(0, 1)
+    
+        assert ZZ(3) / 2 == QQ(3) / QQ(2)
+        assert (ZZ(3) / 2).parent() is QQ
+        assert 2 / ZZ(4) == QQ(1) / QQ(2)
+        assert RR(3) / 2 == RR(3) / RR(2)
+>       assert e12 / 2 == (QQ(1) / QQ(2)) * e12
+               ^^^^^^^^^^^^^^^^
+
+tests/rings/test_elements_divide_in_their_own_ring.sage:81: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/structure/element.pyx:1726: in sage.structure.element.Element.__truediv__
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   TypeError: unsupported operand parent(s) for /: 'Free module on {Generic endomorphism of Free module on {[0], [1]} over Fraction Field of Integer Ring, Generic endomorphism of Free module on {[0], [1]} over Fraction Field of Integer Ring, Generic endomorphism of Free module on {[0], [1]} over Fraction Field of Integer Ring, Generic endomorphism of Free module on {[0], [1]} over Fraction Field of Integer Ring} over Fraction Field of Integer Ring' and 'Integer Ring'
+
+sage/structure/coerce.pyx:1297: TypeError
+=========================== short test summary info ============================
+FAILED tests/rings/test_elements_divide_in_their_own_ring.sage::test_an_integer_literal_divides_in_the_parent_the_two_share
+1 failed, 4 passed in 19.32s
+[peakrss] run500-base-red: child waited=1 shell_code=1 samples=11
+[peakrss] peak tree RSS      : 2371 MiB
+[peakrss] low-water MemAvail : 10212 MiB
+[peakrss] peak single VmHWM  : 2399 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   julia                      2066 MiB peak
+[peakrss]   python                      322 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    20.0s procs=  4 rss=  2371 MiB hwm=  2399 MiB avail= 10551 MiB
+[peakrss]   t=    18.0s procs=  4 rss=  2254 MiB hwm=  2254 MiB avail= 10678 MiB
+[peakrss]   t=    16.0s procs=  4 rss=  2064 MiB hwm=  2064 MiB avail= 10856 MiB
+[peakrss]   t=    14.0s procs=  4 rss=  1902 MiB hwm=  1902 MiB avail= 10955 MiB
+[peakrss]   t=    12.0s procs=  4 rss=  1390 MiB hwm=  1390 MiB avail= 11433 MiB

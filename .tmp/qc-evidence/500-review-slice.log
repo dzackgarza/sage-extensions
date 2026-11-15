@@ -1,0 +1,20 @@
+provider SHA: 9fd76e4e17042ca123f605a9a1cc7bb5ad246041
+port SHA: 991b88b0
+command: python -m pytest -p qc_sage_session -o addopts= -p sage_extensions.testing.test_lint tests/rings/test_elements_divide_in_their_own_ring.sage -q
+.....                                                                    [100%]
+5 passed in 18.50s
+[peakrss] run500-slice: child waited=0 shell_code=0 samples=11
+[peakrss] peak tree RSS      : 2254 MiB
+[peakrss] low-water MemAvail : 10507 MiB
+[peakrss] peak single VmHWM  : 2363 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   julia                      2043 MiB peak
+[peakrss]   python                      308 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    18.0s procs=  4 rss=  2254 MiB hwm=  2254 MiB avail= 10627 MiB
+[peakrss]   t=    20.0s procs=  4 rss=  2229 MiB hwm=  2363 MiB avail= 10507 MiB
+[peakrss]   t=    16.0s procs=  4 rss=  2060 MiB hwm=  2112 MiB avail= 10768 MiB
+[peakrss]   t=    14.0s procs=  4 rss=  1851 MiB hwm=  1891 MiB avail= 10966 MiB
+[peakrss]   t=    12.0s procs=  4 rss=  1503 MiB hwm=  1503 MiB avail= 11308 MiB
+launcher exit: 0

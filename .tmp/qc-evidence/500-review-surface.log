@@ -1,0 +1,92 @@
+provider SHA: 9fd76e4e17042ca123f605a9a1cc7bb5ad246041
+port SHA: 991b88b0
+command: python /probe500.py
+finding 1: one operator, one hook, and the coercion that lets a numeral reach it
+
+  where / and the hook are written, by element class:
+    ZZ       __truediv__  sage_extensions.categories.rings.ring_foundation.OwnedRings.ElementMethods [__truediv__]
+    ZZ       __rtruediv__ sage.structure.element.Element [__rtruediv__]
+    ZZ       _div_        sage_extensions.categories.rings.ring_foundation._OwnedRingElement [_div_]
+    QQ       __truediv__  sage_extensions.categories.rings.ring_foundation.LocalizationRings.ElementMethods [divide_by_unit]
+    QQ       __rtruediv__ sage.structure.element.Element [__rtruediv__]
+    QQ       _div_        sage.structure.element.RingElement [_div_]
+    QQ[x]    __truediv__  sage_extensions.categories.algebras.free_algebras.Owned_NativeFreeAlgebraParent_with_category.element_class [__truediv__]
+    QQ[x]    __rtruediv__ sage.structure.element.Element [__rtruediv__]
+    QQ[x]    _div_        sage_extensions.categories.rings.ring_foundation._OwnedRingElement [_div_]
+    QQ(i)    __truediv__  sage_extensions.categories.algebras.algebras.Owned_OwnedAlgebraParent_with_category.element_class [__truediv__]
+    QQ(i)    __rtruediv__ sage.structure.element.Element [__rtruediv__]
+    QQ(i)    _div_        sage_extensions.categories.rings.ring_foundation._OwnedRingElement [_div_]
+    M_2(QQ)  __truediv__  sage_extensions.categories.rings.ring_foundation.OwnedRings.ElementMethods [__truediv__]
+    M_2(QQ)  __rtruediv__ sage.structure.element.Element [__rtruediv__]
+    M_2(QQ)  _div_        sage.categories.monoids.Monoids.ElementMethods [_div_]
+    M_2(ZZ)  __truediv__  sage_extensions.categories.rings.ring_foundation.OwnedRings.ElementMethods [__truediv__]
+    M_2(ZZ)  __rtruediv__ sage.structure.element.Element [__rtruediv__]
+    M_2(ZZ)  _div_        sage.categories.monoids.Monoids.ElementMethods [_div_]
+    RR       __truediv__  sage_extensions.categories.rings.ring_foundation.OwnedRings.ElementMethods [__truediv__]
+    RR       __rtruediv__ sage.structure.element.Element [__rtruediv__]
+    RR       _div_        sage_extensions.rings.real.ExactRealNumber [_div_]
+    CC       __truediv__  sage_extensions.categories.rings.ring_foundation.OwnedRings.ElementMethods [__truediv__]
+    CC       __rtruediv__ sage.structure.element.Element [__rtruediv__]
+    CC       _div_        sage_extensions.rings.complex.ExactComplexNumber [_div_]
+
+  the canonical sources each ring states (its own hook, as the model asks it):
+    ZZ       int -> <function _owned_ring_from_integer at 0x7870e59c4040>; owned ZZ -> <function _owned_ring_from_integer at 0x7870e59c4040>; Sage ZZ -> None
+    QQ       int -> <function _owned_ring_from_integer at 0x7870e59c4040>; owned ZZ -> <function _owned_ring_from_integer at 0x7870e59c4040>; Sage ZZ -> None
+    QQ[x]    int -> <function _owned_ring_from_integer at 0x7870e59c4040>; owned ZZ -> <function _owned_ring_from_integer at 0x7870e59c4040>; Sage ZZ -> None
+    QQ(i)    int -> <function _owned_ring_from_integer at 0x7870e59c4040>; owned ZZ -> <function _owned_ring_from_integer at 0x7870e59c4040>; Sage ZZ -> None
+    M_2(QQ)  int -> <function _owned_ring_from_integer at 0x7870e59c4040>; owned ZZ -> <function _owned_ring_from_integer at 0x7870e59c4040>; Sage ZZ -> None
+    M_2(ZZ)  int -> <function _owned_ring_from_integer at 0x7870e59c4040>; owned ZZ -> <function _owned_ring_from_integer at 0x7870e59c4040>; Sage ZZ -> None
+    RR       int -> None; owned ZZ -> True; Sage ZZ -> True
+    CC       int -> None; owned ZZ -> True; Sage ZZ -> True
+
+  a session literal (the session's own integer) divides:
+  ZZ(3) / ZZ(2)                      = (3)/(2)
+  ZZ(3).parent()                     = Fraction Field of Integer Ring
+  ZZ(2) / ZZ(4)                      = (1)/(2)
+  QQ(3) / ZZ(2)                      = (3)/(2)
+  QQ[x](x) / ZZ(2)                   = (1)/(2)*x
+  RR(3) / ZZ(2)                      = 3/2
+  CC(3) / ZZ(2)                      = 3/2
+  e12 / ZZ(2)                        = Generic endomorphism of Free module on {[0], [1]} over Fraction Field of Integer Ring
+  e12 / ZZ(2) == (1/2) e12           = True
+  e12 / (1 + e21)                    = Generic endomorphism of Free module on {[0], [1]} over Fraction Field of Integer Ring
+  e12/(1+e21) == e12 - e11           = True
+  (1+e21)^-1 e12 == e12 - e22        = True
+  M_2(ZZ)(1) / ZZ(2)                 raises TypeError: no conversion of this rational to integer
+
+  and a Python int, from outside a session:
+  ZZ(3) / 2                          = (3)/(2)
+  2 / ZZ(3)                          = (2)/(3)
+  e12 / 2                            = Generic endomorphism of Free module on {[0], [1]} over Fraction Field of Integer Ring
+  M_2(QQ)(1) / 2                     = Generic endomorphism of Free module on {[0], [1]} over Fraction Field of Integer Ring
+  1 / (RR(2).sqrt() - 1)             = 1/(sqrt(2) - 1)
+
+  a raw Sage integer is still outside the owned universe:
+    ZZ       refuses it: TypeError
+    QQ[x]    refuses it: TypeError
+    QQ       accepts it
+    RR       accepts it
+    M_2(ZZ)  refuses it: TypeError
+
+  the module formula is a module's:
+  v / 2                              = (1)/(2)*[v]
+  v / 2 == (1/2) v                   = True
+  v / ZZ(2)                          = (1)/(2)*[v]
+  a ZZ-lattice vector / 2            raises ZeroDivisionError: 2 is not a unit
+
+finding 2: the names a rebuild moves, recorded while these objects were built
+  Owned_NativeFreeAlgebraParent_with_category.element_class (element): ['__truediv__', 'order_ideal']
+  Owned_OwnedAlgebraParent_with_category (parent): ['__iter__', 'adic_completion']
+  Owned_OwnedAlgebraParent_with_category.element_class (element): ['__truediv__', 'order_ideal']
+  Owned_NativeFreeAlgebraParent_with_category.element_class (element): ['__truediv__', 'order_ideal']
+
+  a category's construction and identity names are never among them:
+    ZZ       declares [] and takes __init__ from sage_extensions.categories.rings.ring_foundation._OwnedRingElement
+    QQ       declares [] and takes __init__ from sage_extensions.categories.rings.ring_foundation.LocalizationRings.ElementMethods
+    QQ[x]    declares [] and takes __init__ from sage_extensions.categories.rings.ring_foundation._OwnedRingElement
+    QQ(i)    declares [] and takes __init__ from sage_extensions.categories.rings.ring_foundation._OwnedRingElement
+    M_2(QQ)  declares [] and takes __init__ from sage_extensions.categories.modules.module_morphisms.module_morphisms.ModuleMorphismMethods
+    M_2(ZZ)  declares [] and takes __init__ from sage_extensions.categories.modules.module_morphisms.module_morphisms.ModuleMorphismMethods
+    RR       declares [] and takes __init__ from sage_extensions.rings.real.ExactRealNumber
+    CC       declares [] and takes __init__ from sage_extensions.rings.complex.ExactComplexNumber
+launcher exit: 0

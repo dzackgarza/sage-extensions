@@ -1394,3 +1394,40 @@ direct `_div_` call.
 | `500-integer-literal-division.log` | `7717c62` | an integer divisor on an engine-backed ring: `ZZ(3)/2 = 3/2`, `QQ[x](x)/2`, `(1 + sqrt5)/2`, and `Sterk.sterk_roots()` returning its five diagrams |
 | `500-refine-resolution-surface.log` | `7717c62` | the names the two rebuild rules resolve, over fourteen object kinds: `__truediv__` and `order_ideal` on the refined element classes, `__add__`/`__sub__` and `norm`/`trace` where a category level had moved in front of the realization, `__iter__`/`adic_completion` on the refined parents |
 | `500-regression-compared.log` | `7717c62` against `a71272a` | fourteen directories and the root `tests/*.py`, one pytest process each per tree, FAILED ids and not counts: every row has an empty only-on-this-tree set; `tests/rings` has **two fixed ids** and 74 failed, 258 passed against 76 failed, 252 passed. Not measured: `tests/lattices` as one directory (6245 MiB, stopped by the 6144 MiB guard on both trees) and `tests/groups` (1000 s cap) |
+## Issue #500, the review of `7717c62`: one operator, the `_div_` hook, and the narrowed rebuild rule
+
+The review found three things in `7717c62`: a second division operator at `_OwnedRingElement`, a `refine` rule that
+went past the issue (`_realization_operations`, and a dunder widening that let `__init__`, `__eq__`, `__hash__` and
+`__call__` be copied onto rebuilt classes), and a contract docstring that said "its division by a unit" where
+`ZZ(3)/2` answers `3/2`. `904e079` answers all three and `9fd76e4` corrects the sentence that named the wrong owner
+of the quotient's parent. The operator is the ring category's (`OwnedRings.ElementMethods.__truediv__ =
+Element.__truediv__`), the engine-backed realization implements `_div_`, `_OwnedRingElement.__truediv__` and its
+`__rtruediv__` are gone, `_realization_operations` is deleted, and the rebuild rule keeps the Python protocol
+operations on an object's value while `_RUNTIME_OWNED_NAMES` keeps construction and identity where the runtime put
+them. `QQ`, and the localization and quotient realizations, answer `divide_by_unit`: the same law `a b^{-1}` stated
+at the monoid level, not the module's `b^{-1} a`.
+
+The coercion the operator needed is not the one `7717c62` recorded. `sage.structure.element.parent` answers `int`
+for a Python `int`, so the coercion model asks `_coerce_map_from_(int)` and never passes through Sage's ZZ; what it
+met was that no owned ring stated a coercion from the integers. A session's literal is not even a Python int: the
+preparsed `.sage` test's `2` is the session's own integer, which is why `ZZ(3)/2` divided on the old tree while
+`e12/2` did not. `OwnedRings.ParentMethods` states the map from both -- the prime ring's unique unital morphism --
+and `_OwnedRingParent` states it too, because it answers the canonical sources it knows before the category does.
+
+| row | at 0a8a95b (main before this push) | on `9fd76e4` |
+| --- | --- | --- |
+| `M_2(QQ)`: `e12 / 2` | `TypeError: unsupported operand parent(s) for /: ... and 'Integer Ring'` | `(1/2) e12` |
+| `ZZ`: `3 / 2` | `3/2`, through the realization's own operator | `3/2`, through `OwnedRings.ElementMethods` and `_OwnedRingElement._div_` |
+| `QQ[x]`, `QQ(i)`: `__truediv__` | `_OwnedRingElement.__truediv__`, installed by `_realization_operations` | `OwnedRings.ElementMethods [Element.__truediv__]`, kept by `_final_category_operations` |
+| names a rebuild moves | `__add__`, `__radd__`, `__rsub__`, `__sub__`, `norm`, `trace`; and `order_ideal`, `__iter__`, `adic_completion` | `__truediv__` and `order_ideal` on element classes; `__iter__` and `adic_completion` on parents |
+| a category's `__init__` on a rebuilt class | reachable: every dunder passed the filter | never: `_RUNTIME_OWNED_NAMES` |
+| `M_2(ZZ)(1) / 2`, open | `TypeError` | `TypeError: no conversion of this rational to integer`, the matrix realization's inverse over ZZ, not the ring's unit refusal |
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `500-review-surface.log` | `9fd76e4` | where `__truediv__`, `__rtruediv__` and `_div_` are written for eight owned rings; the canonical sources each states (`int` and the session's integers answered, a raw Sage integer not); `ZZ(3)/2 = 3/2` with parent `QQ`, `ZZ(2)/ZZ(4) = 1/2`, `QQ(3)/ZZ(2)`, `QQ[x](x)/ZZ(2)`, `RR(3)/ZZ(2)`, `CC(3)/ZZ(2)`, `e12/ZZ(2) = (1/2)e12`, `e12/(1+e21) = e12 - e11` against `(1+e21)^{-1} e12 = e12 - e22`, the module's `v/2 = (1/2)v`, the lattice's `2 is not a unit`; then the names the rebuilds moved, and that no rebuilt class declares a category's `__init__` |
+| `500-review-literal-is-the-session-integer.log` | `9fd76e4` | a preparsed test's literal: `parent(2)` prints `Integer Ring` and `type(2)` is `_OwnedRingParent_with_category.element_class`, so the session's literal is the session's integer. The probe file was removed after the run |
+| `500-review-slice.log` | `9fd76e4` | `tests/rings/test_elements_divide_in_their_own_ring.sage`: **5 passed in 18.50 s**, lint plugin on (the fix commit cites the first run of this file at `d3ca9ee`, 18.30 s) |
+| `500-review-gate-410.log` | `9fd76e4` | #410's slice -- four cause-A ids, the cause-B id and #150's contract: **6 passed in 1.89 s** |
+| `500-review-base-red.log` | `0a8a95b` | the same test file at main: **1 failed, 4 passed in 19.32 s**, red on `test_an_integer_literal_divides_in_the_parent_the_two_share` at `e12 / 2` |
+| `500-review-regression-compared.log` | `9fd76e4` against `0a8a95b` | fourteen directories and the root `tests/*.py`, one pytest process each per tree, FAILED ids compared: **every row has an empty only-on-this-tree set**; `tests/rings` is 74 failed, 259 passed against 75 failed, 258 passed, with the one fixed id being the new test. The sweeps ran on `d3ca9ee`, whose `src` and `tests` are `9fd76e4`'s (`git diff d3ca9ee 9fd76e4 -- src tests` is empty) |

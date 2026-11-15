@@ -1,0 +1,44 @@
+=== regression: issue 500's review against 0a8a95b
+=== mine: the tree of this push (9fd76e4)
+=== base: 0a8a95b
+=== the sweeps ran on d3ca9ee, whose src and tests are 9fd76e4's:
+===   git diff d3ca9ee 9fd76e4 -- src tests   is empty
+=== and this push lands on 9b0169d, whose src and tests are 0a8a95b's:
+===   git diff 0a8a95b 9b0169d -- src tests   is empty
+=== the base worktree is a clean checkout of 0a8a95b with this push's test file added,
+=== so the new id is collected in both runs and a fix would not read as a new test
+=== FAILED ids compared, never counts
+
+tests/rings
+    mine[74 failed, 259 passed in 44.86s] base[75 failed, 258 passed in 36.94s] only-mine[0] fixed[1]
+    fixed     tests/rings/test_elements_divide_in_their_own_ring.sage::test_an_integer_literal_divides_in_the_parent_the_two_share
+tests/algebras
+    mine[64 failed, 149 passed in 47.11s] base[64 failed, 149 passed in 45.73s] only-mine[0] fixed[0]
+tests/modules
+    mine[82 failed, 225 passed, 1 warning in 33.86s] base[82 failed, 225 passed, 1 warning in 33.82s] only-mine[0] fixed[0]
+tests/foundations
+    mine[2 failed, 6 passed in 4.29s] base[2 failed, 6 passed in 4.20s] only-mine[0] fixed[0]
+tests/categories
+    mine[61 failed, 56 passed in 11.04s] base[61 failed, 56 passed in 10.66s] only-mine[0] fixed[0]
+tests/sets
+    mine[29 failed, 127 passed in 5.55s] base[29 failed, 127 passed in 5.53s] only-mine[0] fixed[0]
+tests/objects
+    mine[115 failed, 211 passed in 35.27s] base[115 failed, 211 passed in 35.76s] only-mine[0] fixed[0]
+tests/tensors
+    mine[19 failed, 24 passed in 2.40s] base[19 failed, 24 passed in 2.41s] only-mine[0] fixed[0]
+tests/topology
+    mine[1 failed in 1.25s] base[1 failed in 1.23s] only-mine[0] fixed[0]
+tests/functions
+    mine[48 failed, 15 passed in 4.70s] base[48 failed, 15 passed in 4.62s] only-mine[0] fixed[0]
+tests/engineering
+    mine[4 failed, 4 passed in 22.76s] base[4 failed, 4 passed in 22.89s] only-mine[0] fixed[0]
+tests/divisors
+    mine[42 failed, 25 passed in 12.23s] base[42 failed, 25 passed in 11.60s] only-mine[0] fixed[0]
+tests/forms
+    mine[48 failed, 93 passed in 321.86s (0:05:21)] base[48 failed, 93 passed in 316.15s (0:05:16)] only-mine[0] fixed[0]
+tests/schemes
+    mine[250 failed, 161 passed in 89.22s (0:01:29)] base[250 failed, 161 passed in 90.35s (0:01:30)] only-mine[0] fixed[0]
+tests/*.py
+    mine[25 passed in 10.67s] base[25 passed in 11.11s] only-mine[0] fixed[0]
+
+directories in one sweep only: []
