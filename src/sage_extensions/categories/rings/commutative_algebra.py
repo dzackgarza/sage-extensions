@@ -990,6 +990,25 @@ class QuotientRings(OwnedCategory):
         def _repr_(self):
             return f"{self.lift()} mod {self.parent().defining_ideal()}"
 
+        def __hash__(self):
+            r"""Return the hash of the class, through the engine's representative of it.
+
+            Two classes are equal exactly when their lifts differ by an element
+            of the defining ideal (:meth:`_richcmp_`), so a hash of the lift
+            would separate equal classes.  The engine's representative of a
+            class is a function of that class, and the engine hashes it as that
+            representative; a quotient whose classes the engine does not realize
+            refuses a hash rather than offering one its equality does not
+            respect.
+            """
+            parent = self.parent()
+            if parent._preamble_engine_ring is None:
+                raise TypeError(
+                    f"a class of {parent} has no engine representative to hash, and its lift "
+                    "does not determine the class"
+                )
+            return hash((id(parent), parent._engine_element(self)))
+
     class ParentMethods:
         _derived_construction_parameters = frozenset({"base_ring"})
 
