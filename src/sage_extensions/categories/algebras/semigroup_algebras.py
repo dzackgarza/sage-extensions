@@ -1,6 +1,7 @@
 r"""Affine semigroup algebras from finite lattice-generator presentations."""
 
 from sage.matrix.constructor import column_matrix as _engine_column_matrix
+from sage.misc.cachefunc import cached_method
 from sage.rings.integer_ring import ZZ as SageZZ
 from sage.schemes.toric.ideal import ToricIdeal as _SageToricIdeal
 
@@ -92,6 +93,32 @@ class AffineSemigroupAlgebras(OwnedCategoryOverBaseRing):
                 ),
                 name="Affine semigroup generator coordinates",
             )
+
+        @cached_method
+        def affine_semigroup_generator_positions(self):
+            r"""Return each generator's lattice point, keyed by its presentation position.
+
+            ``algebra_generating_set()`` is the index order of every exponent
+            vector this algebra's monomials are built from, and
+            ``affine_semigroup_generator_coordinates`` names the lattice point
+            at each label.  This is that datum read the other way round: a
+            lattice point of the semigroup finds the variable presenting it.
+            The presentation is injective on its generators, so the map is a
+            bijection onto the positions; two generators at one lattice point
+            would make the position ambiguous and is refused.
+            """
+            coordinates = self.affine_semigroup_generator_coordinates()
+            labels = self.algebra_generating_set()
+            ranking = labels.ranking_map()
+            positions = {}
+            for label in labels:
+                point = tuple(int(entry) for entry in coordinates[label])
+                assert point not in positions, (
+                    f"{self} presents two of its generators at the lattice point {point}, "
+                    "so its monomials are not indexed by their exponent vectors"
+                )
+                positions[point] = int(ranking(label))
+            return positions
 
     def _call_(
         self,
