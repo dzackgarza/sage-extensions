@@ -168,6 +168,39 @@ def _rational_pair(value):
     return (int(value.numerator()), int(value.denominator()))
 
 
+def _vinberg_walk_record_name(lattice, controlling_vector, max_roots, max_decompositions, admits_root) -> str:
+    r"""Name one Vinberg walk in a timing record, by every argument the cache keys on.
+
+    ``_vinberg_search`` is cached on ``(controlling_vector, max_roots,
+    max_decompositions, admits_root)``, so a record that names only the lattice
+    names four walks at once: the point the chamber is grown from decides which
+    vertices are written down, and the root filter decides which walls survive.
+    The point is written as its coordinates in the lattice's framing, or as the
+    engine's own point when none was supplied, and the filter by the name it was
+    defined under -- a callable has no data to identify it by and its name is
+    what its call site chose.
+    """
+    if controlling_vector is None:
+        point = "the engine's own point"
+    else:
+        point = "(" + ", ".join(str(int(entry)) for entry in _framing_coordinates(controlling_vector)) + ")"
+    roots = "no root bound" if max_roots is None else f"at most {max_roots} roots"
+    decompositions = (
+        "no decomposition bound"
+        if max_decompositions is None
+        else f"at most {max_decompositions} decompositions"
+    )
+    admitted = (
+        "every root admitted"
+        if admits_root is None
+        else f"admits_root={getattr(admits_root, '__name__', 'a supplied filter')}"
+    )
+    return (
+        f"{lattice_record_name(lattice)}, controlling vector: {point}, "
+        f"{roots}, {decompositions}, {admitted}"
+    )
+
+
 def _framing_coordinates(element):
     r"""Return the element's ordered framing coefficients, lowered to the engine ring.
 
@@ -1181,7 +1214,16 @@ class HyperbolicLattices(OwnedCategoryOverBaseRing):
             **keywords)`` for the key's argument fixer, so ``admits_root=None``
             written out and left off would be two cache entries for one walk.
             """
-            with stage("Vinberg walk", f"{lattice_record_name(self)}, {max_roots} roots at most"):
+            with stage(
+                "Vinberg walk",
+                _vinberg_walk_record_name(
+                    self,
+                    controlling_vector,
+                    max_roots,
+                    max_decompositions,
+                    admits_root,
+                ),
+            ):
                 assert self.base_ring() is _owned_integers(), (
                     f"cannot run Vinberg's algorithm on {self} over {self.base_ring()}: the "
                     f"algorithm holds over any totally real ring of integers, but the "

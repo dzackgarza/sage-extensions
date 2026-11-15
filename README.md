@@ -26,10 +26,13 @@ True
 
 The block runs on every push, under the repository's own pytest configuration,
 in the [README example workflow](.github/workflows/readme.yml), so the run keeps
-its timing record (`CONTRIBUTING.md` ENV-03). Locally:
+its timing record (`CONTRIBUTING.md` ENV-03). Locally, `SAGE_BIN` names the
+launcher this host runs — inside the image that is
+`/sage/.venv/bin/sage`, and on the host it is the wrapper that enters the
+image, `~/ai-review-ci/scripts/sage-docker`:
 
 ```bash
-SAGE_BIN=/sage/.venv/bin/sage just readme
+SAGE_BIN="$HOME/ai-review-ci/scripts/sage-docker" just readme
 ```
 
 ## Read next
