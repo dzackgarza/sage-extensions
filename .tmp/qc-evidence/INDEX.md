@@ -1628,3 +1628,22 @@ library code, each printing the objects and the answering class it is cited for.
 | `530-merged-a.log` | `97f9467` (this commit merged onto `5d408ca`) | the four lint-clean files of the change under the repository addopts: **8 passed in 0.93 s** |
 | `530-merged-sweep-compared.log` | `97f9467` against `5d408ca` | `tests/modules tests/rings tests/forms tests/categories` on the merged tree and on the merge's own base, same test files: FAILED/ERROR ids identical except this change's new test assertion; 193 failed, 395 passed, 318 errors in 99.18 s against 194, 394, 318 in 105.20 s. The ~100 s pair also shows the earlier 256.71 s as a VM outlier |
 | `530-merged-sweep-new-ids.log`, `530-merged-sweep-base-ids.log` | the same two runs | the sorted ids those two runs produced, extracted from their output |
+
+## #500 and #530, sixth round (added 2026-11-15)
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `500e-red.log` | `27d76f3` (the test and the module-level rewrite, with `refine.py` at its base commit) | `tests/modules/test_the_order_ideal_of_a_ring_element_over_its_base_ring.sage` plus the categories file: **3 failed, 3 passed in 2.65 s**. The new test and both polynomial tests stop at the stated hypothesis: `Modules.ElementMethods.order_ideal` is reached, its dual `Mor(Free module on Coproduct ... , Integer Ring)` holds no generating family, and the value is not computed. This is the red state the test was committed in |
+| `500e-answering-level-base.log`, `500e-answering-level-tree.log` | base `9d278f5`, then the tree with the `refine.py` repair (committed as `6578c33`) | per object (`ZZ`, `QQ`, `RR`, `CC`, `ZZ**2`, `QQ**2`, `ZZ['x']`, `QQ['x']`, `QQ(i)`, `Zmod(8)`, `GF(4)`, `M_2(QQ)`, its regular module, `Lattices(ZZ)(2)`): the class that declares each of `__truediv__`, `__rmul__`, `__add__`, `order_ideal`, `__iter__`, `adic_completion`, `content`, `to_vector`, `primitive_part`, for the parent and for the element class. The only differences the repair makes are `order_ideal` and `primitive_part` on `QQ(i)`, `ZZ['x']` and `QQ['x']`: from `Modules.ElementMethods` and `Modules.Free.ElementMethods` to `FramedFreeModules.ElementMethods`. Division, the scalar action, iteration, the completion, the content and the coordinates are unchanged on all fourteen, and `M_2(QQ)`'s `e12/e12 = e11`, `ZZ**2`'s `v/2`, `RR(3)/2`, `CC(3)/2` and `tuple(Zmod(8))` print the same on both trees |
+| `500e-green.log` | `27d76f3` + `6578c33` | the three files of the repair with `-p qc_sage_session`: **8 passed in 1.94 s** |
+| `500e-tests.log` | `6578c33` with the working-tree changes that are `6a24ab7` and `618fb82` | the five files of this round under the repository's own addopts (`test lint`, `suite_budget`): **13 passed in 1.42 s** |
+| `500e-lattice-test.log` | the same tree | `tests/lattices/test_lattice_semantic_api.sage` alone: **4 passed in 1.80 s** |
+| `500e-sweep-tree-ids.log`, `500e-sweep-base-ids.log`, `500e-sweep-compared.log` | tree `6578c33` + the two following commits' content (7 files dirty), base `9d278f5` (clean) | `tests/modules tests/categories tests/rings tests/forms`, one pytest process each: **265 failed, 642 passed in 410.06 s** against **265 failed, 641 passed in 423.47 s**. The FAILED/ERROR id sets are identical -- **0 ids only on either side**; the one count difference is this round's new test |
+| `500e-lattice-tree-ids.log`, `500e-lattice-base-ids.log` | the same two trees | the seven `tests/lattices` files that read the dual, the order ideal or the content: **2 failed, 21 passed** on the tree against **3 failed, 20 passed** on the base. The one id only on the base is the rewritten test's old name, `test_the_infinite_rank_dual_is_the_product_and_evaluates_by_projections` |
+| `500e-lattice-batch-killed.log` | the same tree | 40 `tests/lattices` files from `test_arithmetic_applications` on, cut by the inner 550 s cap at 79% of the batch's tests with the ids unprinted; peak tree RSS 5880 MiB (julia 5168 MiB). Recorded as an unfinished run, not as a comparison |
+| `500e-lattice-L2-unfinished.log` | the same tree and the base | a second seven-file `tests/lattices` batch whose tree run never reached its summary and whose base run was cut at its first line. Unfinished; no ids |
+
+`tests/lattices` is not run as one directory on this host: the 40-file batch above is the
+measurement that says so, at 5.9 GiB and past 550 s. The comparison this round can
+stand on is the seven files that read the changed operations, and the four directories
+of the sweep.

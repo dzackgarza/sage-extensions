@@ -1,0 +1,76 @@
+probe: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/wt500/.tmp/probe500j.py
+tree SHA: 9d278f59e63029d12be06dd28c46775e96411907
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+inner 400 s, outer 470 s, guard 6144 MiB, args ''
+### ZZ: Integer Ring
+  parent.element_class: __truediv__=ring_foundation.OwnedRings.ElementMethods  __rmul__=ring_foundation._OwnedRingElement  __add__=ring_foundation._OwnedRingElement  order_ideal=framed_free_modules.FramedFreeModules.ElementMethods  __iter__=-  adic_completion=-  content=modules.Modules.Free.ElementMethods  to_vector=framed_free_modules.FramedFreeModules.ElementMethods  primitive_part=framed_free_modules.FramedFreeModules.ElementMethods
+  parent: __truediv__=-  __rmul__=parent.Parent  __add__=modules.Modules.ParentMethods  order_ideal=-  __iter__=framed_free_modules.FramedFreeModules.FinitelyGenerated.ParentMethods  adic_completion=modules.ModulesWithChosenFinitePresentation.ParentMethods  content=-  to_vector=-  primitive_part=-
+### QQ: Fraction Field of Integer Ring
+  parent.element_class: __truediv__=ring_foundation.LocalizationRings.ElementMethods  __rmul__=modules.Modules.ElementMethods  __add__=algebras.Algebras.ElementMethods  order_ideal=modules.Modules.ElementMethods  __iter__=-  adic_completion=-  content=-  to_vector=-  primitive_part=-
+  parent: __truediv__=-  __rmul__=parent.Parent  __add__=modules.Modules.ParentMethods  order_ideal=-  __iter__=ring_foundation.OwnedRings.ParentMethods  adic_completion=ring_foundation.OwnedRings.ParentMethods  content=-  to_vector=-  primitive_part=-
+### RR: Real Field
+  parent.element_class: __truediv__=ring_foundation.OwnedRings.ElementMethods  __rmul__=real.ExactRealNumber  __add__=algebras.Algebras.ElementMethods  order_ideal=framed_free_modules.FramedFreeModules.ElementMethods  __iter__=-  adic_completion=-  content=modules.Modules.Free.ElementMethods  to_vector=framed_free_modules.FramedFreeModules.ElementMethods  primitive_part=framed_free_modules.FramedFreeModules.ElementMethods
+  parent: __truediv__=-  __rmul__=ring.Ring  __add__=modules.Modules.ParentMethods  order_ideal=-  __iter__=ring.Ring  adic_completion=modules.ModulesWithChosenFinitePresentation.ParentMethods  content=-  to_vector=-  primitive_part=-
+### CC: Complex Field
+  parent.element_class: __truediv__=ring_foundation.OwnedRings.ElementMethods  __rmul__=complex.ExactComplexNumber  __add__=algebras.Algebras.ElementMethods  order_ideal=framed_free_modules.FramedFreeModules.ElementMethods  __iter__=-  adic_completion=-  content=modules.Modules.Free.ElementMethods  to_vector=framed_free_modules.FramedFreeModules.ElementMethods  primitive_part=framed_free_modules.FramedFreeModules.ElementMethods
+  parent: __truediv__=-  __rmul__=ring.Ring  __add__=modules.Modules.ParentMethods  order_ideal=-  __iter__=ring.Ring  adic_completion=modules.ModulesWithChosenFinitePresentation.ParentMethods  content=-  to_vector=-  primitive_part=-
+### ZZ**2: Free module on {[0], [1]} over Integer Ring
+  parent.element_class: __truediv__=modules.Modules.ElementMethods  __rmul__=framed_free_modules._SparseFreeModuleElement  __add__=modules.Modules.ElementMethods  order_ideal=framed_free_modules.FramedFreeModules.ElementMethods  __iter__=framed_free_modules._SparseFreeModuleElement  adic_completion=-  content=modules.Modules.Free.ElementMethods  to_vector=framed_free_modules.FramedFreeModules.ElementMethods  primitive_part=framed_free_modules.FramedFreeModules.ElementMethods
+  parent: __truediv__=-  __rmul__=parent.Parent  __add__=modules.Modules.ParentMethods  order_ideal=-  __iter__=framed_free_modules.FramedFreeModules.FinitelyGenerated.ParentMethods  adic_completion=modules.ModulesWithChosenFinitePresentation.ParentMethods  content=-  to_vector=-  primitive_part=-
+### QQ**2: Free module on {[0], [1]} over Fraction Field of Integer Ring
+  parent.element_class: __truediv__=modules.Modules.ElementMethods  __rmul__=framed_free_modules._SparseFreeModuleElement  __add__=modules.Modules.ElementMethods  order_ideal=framed_free_modules.FramedFreeModules.ElementMethods  __iter__=framed_free_modules._SparseFreeModuleElement  adic_completion=-  content=modules.Modules.Free.ElementMethods  to_vector=framed_free_modules.FramedFreeModules.ElementMethods  primitive_part=framed_free_modules.FramedFreeModules.ElementMethods
+  parent: __truediv__=-  __rmul__=parent.Parent  __add__=modules.Modules.ParentMethods  order_ideal=-  __iter__=framed_free_modules.FramedFreeModules.FinitelyGenerated.ParentMethods  adic_completion=modules.ModulesWithChosenFinitePresentation.ParentMethods  content=-  to_vector=-  primitive_part=-
+### ZZ['x']: Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring
+  parent.element_class: __truediv__=free_algebras.Owned_NativeFreeAlgebraParent_with_category.element_class  __rmul__=modules.Modules.ElementMethods  __add__=algebras.Algebras.ElementMethods  order_ideal=free_algebras.Owned_NativeFreeAlgebraParent_with_category.element_class  __iter__=-  adic_completion=-  content=modules.Modules.Free.ElementMethods  to_vector=framed_free_modules.FramedFreeModules.ElementMethods  primitive_part=modules.Modules.Free.ElementMethods
+  parent: __truediv__=-  __rmul__=parent.Parent  __add__=modules.Modules.ParentMethods  order_ideal=-  __iter__=ring_foundation.OwnedRings.ParentMethods  adic_completion=ring_foundation.OwnedRings.ParentMethods  content=-  to_vector=-  primitive_part=-
+### QQ['x']: Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring
+  parent.element_class: __truediv__=free_algebras.Owned_NativeFreeAlgebraParent_with_category.element_class  __rmul__=modules.Modules.ElementMethods  __add__=algebras.Algebras.ElementMethods  order_ideal=free_algebras.Owned_NativeFreeAlgebraParent_with_category.element_class  __iter__=-  adic_completion=-  content=modules.Modules.Free.ElementMethods  to_vector=framed_free_modules.FramedFreeModules.ElementMethods  primitive_part=modules.Modules.Free.ElementMethods
+  parent: __truediv__=-  __rmul__=parent.Parent  __add__=modules.Modules.ParentMethods  order_ideal=-  __iter__=ring_foundation.OwnedRings.ParentMethods  adic_completion=ring_foundation.OwnedRings.ParentMethods  content=-  to_vector=-  primitive_part=-
+### QQ(i): Free module on {1, a} over Fraction Field of Integer Ring
+  parent.element_class: __truediv__=algebras.Owned_OwnedAlgebraParent_with_category.element_class  __rmul__=modules.Modules.ElementMethods  __add__=algebras.Algebras.ElementMethods  order_ideal=algebras.Owned_OwnedAlgebraParent_with_category.element_class  __iter__=-  adic_completion=-  content=modules.Modules.Free.ElementMethods  to_vector=framed_free_modules.FramedFreeModules.ElementMethods  primitive_part=modules.Modules.Free.ElementMethods
+  parent: __truediv__=-  __rmul__=parent.Parent  __add__=modules.Modules.ParentMethods  order_ideal=-  __iter__=algebras.Owned_OwnedAlgebraParent_with_category  adic_completion=algebras.Owned_OwnedAlgebraParent_with_category  content=-  to_vector=-  primitive_part=-
+### Zmod(8): Integer Ring / Ideal (8) of Integer Ring
+  parent.element_class: __truediv__=commutative_algebra.QuotientRings.ElementMethods  __rmul__=modules.Modules.ElementMethods  __add__=algebras.Algebras.ElementMethods  order_ideal=modules.Modules.ElementMethods  __iter__=-  adic_completion=-  content=-  to_vector=-  primitive_part=-
+  parent: __truediv__=-  __rmul__=parent.Parent  __add__=modules.Modules.ParentMethods  order_ideal=-  __iter__=ring_foundation.OwnedRings.Finite.ParentMethods  adic_completion=ring_foundation.OwnedRings.ParentMethods  content=-  to_vector=-  primitive_part=-
+### GF(4): Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring / Ideal (2) of Integer Ring / Ideal (z2^2 + z2 + 1 mod Ideal (2) of Integer Ring) of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring / Ideal (2) of Integer Ring
+  parent.element_class: __truediv__=commutative_algebra.QuotientRings.ElementMethods  __rmul__=modules.Modules.ElementMethods  __add__=algebras.Algebras.ElementMethods  order_ideal=modules.Modules.ElementMethods  __iter__=-  adic_completion=-  content=-  to_vector=-  primitive_part=-
+  parent: __truediv__=-  __rmul__=parent.Parent  __add__=modules.Modules.ParentMethods  order_ideal=-  __iter__=ring_foundation.OwnedRings.Finite.ParentMethods  adic_completion=ring_foundation.OwnedRings.ParentMethods  content=-  to_vector=-  primitive_part=-
+### M_2(QQ): Free module on {Generic endomorphism of Free module on {[0], [1]} over Fraction Field of Integer Ring, Generic endomorphism of Free module on {[0], [1]} over Fraction Field of Integer Ring, Generic endomorphism of Free module on {[0], [1]} over Fraction Field of Integer Ring, Generic endomorphism of Free module on {[0], [1]} over Fraction Field of Integer Ring} over Fraction Field of Integer Ring
+  parent.element_class: __truediv__=ring_foundation.OwnedRings.ElementMethods  __rmul__=module_morphisms.ModuleMorphismMethods  __add__=module_morphisms.ModuleMorphismMethods  order_ideal=framed_free_modules.FramedFreeModules.ElementMethods  __iter__=-  adic_completion=module_morphisms.ModuleMorphismMethods  content=modules.Modules.Free.ElementMethods  to_vector=framed_free_modules.FramedFreeModules.ElementMethods  primitive_part=framed_free_modules.FramedFreeModules.ElementMethods
+  parent: __truediv__=-  __rmul__=parent.Parent  __add__=modules.Modules.ParentMethods  order_ideal=-  __iter__=ring_foundation.OwnedRings.ParentMethods  adic_completion=ring_foundation.OwnedRings.ParentMethods  content=-  to_vector=-  primitive_part=-
+### M_2(QQ) regular: Free module on {(GenericendomorphismofFreemoduleon{[0],[1]}overFractionFieldofIntegerRing)*[0]} over Free module on {Generic endomorphism of Free module on {[0], [1]} over Fraction Field of Integer Ring, Generic endomorphism of Free module on {[0], [1]} over Fraction Field of Integer Ring, Generic endomorphism of Free module on {[0], [1]} over Fraction Field of Integer Ring, Generic endomorphism of Free module on {[0], [1]} over Fraction Field of Integer Ring} over Fraction Field of Integer Ring
+  parent.element_class: __truediv__=modules.Modules.ElementMethods  __rmul__=framed_free_modules._SparseFreeModuleElement  __add__=modules.Modules.ElementMethods  order_ideal=framed_free_modules.FramedFreeModules.ElementMethods  __iter__=framed_free_modules._SparseFreeModuleElement  adic_completion=-  content=modules.Modules.Free.ElementMethods  to_vector=framed_free_modules.FramedFreeModules.ElementMethods  primitive_part=framed_free_modules.FramedFreeModules.ElementMethods
+  parent: __truediv__=-  __rmul__=parent.Parent  __add__=modules.Modules.ParentMethods  order_ideal=-  __iter__=framed_free_modules.FramedFreeModules.FinitelyGenerated.ParentMethods  adic_completion=modules.ModulesWithChosenFinitePresentation.ParentMethods  content=-  to_vector=-  primitive_part=-
+### Lattices(ZZ)(2): Integral lattice of rank 2 and signature (2, 0)
+  parent.element_class: __truediv__=modules.Modules.ElementMethods  __rmul__=framed_free_modules._SparseFreeModuleElement  __add__=modules.Modules.ElementMethods  order_ideal=framed_free_modules.FramedFreeModules.ElementMethods  __iter__=framed_free_modules._SparseFreeModuleElement  adic_completion=-  content=modules.Modules.Free.ElementMethods  to_vector=framed_free_modules.FramedFreeModules.ElementMethods  primitive_part=framed_free_modules.FramedFreeModules.ElementMethods
+  parent: __truediv__=-  __rmul__=parent.Parent  __add__=lattices.Lattices.ParentMethods  order_ideal=-  __iter__=framed_free_modules.FramedFreeModules.FinitelyGenerated.ParentMethods  adic_completion=modules.ModulesWithChosenFinitePresentation.ParentMethods  content=-  to_vector=-  primitive_part=-
+### division behaviour
+Traceback (most recent call last):
+  File "/probe.py", line 51, in <module>
+    print(f"  M_2(QQ): e12 / e12 == e11: {(QQ.matrix_space(2).matrix_unit(0,1) / QQ.matrix_space(2).matrix_unit(0,1)) == QQ.matrix_space(2).matrix_unit(0,0)}")
+                                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  File "sage/structure/element.pyx", line 1724, in sage.structure.element.Element.__truediv__
+    return (<Element>left)._div_(right)
+  File "sage/structure/element.pyx", line 1762, in sage.structure.element.Element._div_
+    return python_op(other)
+  File "/sage/.venv/lib/python3.14/site-packages/sage/categories/monoids.py", line 274, in _div_
+    return left * ~right
+                  ^^^^^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/pure/modules.py", line 7444, in inverse
+    _engine_matrix(self).change_ring(_linear_algebra_ring(ring)).inverse()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "sage/matrix/matrix_rational_dense.pyx", line 814, in sage.matrix.matrix_rational_dense.Matrix_rational_dense.inverse
+    return self._invert_flint()
+  File "sage/matrix/matrix_rational_dense.pyx", line 718, in sage.matrix.matrix_rational_dense.Matrix_rational_dense._invert_flint
+    raise ZeroDivisionError("input matrix must be nonsingular")
+ZeroDivisionError: input matrix must be nonsingular
+[peakrss] p500j: child waited=1 shell_code=1 samples=2
+[peakrss] peak tree RSS      : 302 MiB
+[peakrss] low-water MemAvail : 12730 MiB
+[peakrss] peak single VmHWM  : 306 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      295 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     2.0s procs=  3 rss=   302 MiB hwm=   306 MiB avail= 12730 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     2 MiB hwm=     2 MiB avail= 12930 MiB
