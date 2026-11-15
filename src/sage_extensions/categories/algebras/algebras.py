@@ -3546,28 +3546,7 @@ class AlgebrasWithChosenFinitePresentation(OwnedCategoryOverBaseRing):
 
     class ParentMethods:
         def _algebra_mor_class(self):
-            r"""The arrows of a presented algebra: images of its presentation generators.
-
-            A presentation on *independent* generators is a free algebra, and the
-            free arrows apply to it; only a presentation with relations needs
-            the presented arrows, whose element class reads the presentation
-            ring and the lift to it.  Asking the free-algebra category first
-            makes this answer a function of the algebra's own structure instead
-            of a race between this parent class and
-            ``FreeAlgebras.ParentMethods``: an algebra that is both (an affine
-            semigroup algebra on a free monoid is the polynomial algebra) has
-            one arrow class whichever order its parent classes are listed in,
-            and the class that can build its own augmentation.
-            """
-            from sage_extensions.categories.algebras.free_algebras import (
-                FreeAlgebras,
-            )
-
-            match self in FreeAlgebras(self.algebra_base_ring()):
-                case True:
-                    return FreeAlgebras.ParentMethods._algebra_mor_class(self)
-                case False:
-                    return PresentedAlgebraMor
+            return PresentedAlgebraMor
 
         def selected_algebra_presentation(self):
             r"""Return the one chosen truncation-one algebra resolution."""
@@ -4918,18 +4897,23 @@ class PresentedAlgebraMor(_AlgebraMorCommonMethods, UnitalMultiplicativeAlgebraM
         the integers regarded over themselves has no algebra generating set,
         and its identity is still the identity.  A Mor object has one identity,
         so this is cached.
+
+        The arrow is the element map fixing every element, as
+        :meth:`AlgebraMor.identity` builds it.  Reading the engine's own
+        identity hom instead fixes the right map but names the engine ring's
+        endpoints, and those are not this algebra's whenever the algebra is its
+        own presentation ring: the semigroup algebra of a free monoid is the
+        polynomial ring, and the presented arrow class refuses an engine map
+        whose endpoints are that ring rather than the algebra built on it.  It
+        must not query the selected generator resolution either: free algebras
+        use this identity as the augmentation of their own degree-zero
+        resolution while that resolution is being installed.
         """
         if self.domain() is not self.codomain():
             raise ValueError(
                 f"the identity morphism exists only on Mor(A, A), but this is Mor({self.domain()}, {self.codomain()})"
             )
-        domain = self.domain()
-        # The identity is already represented by the engine's identity
-        # morphism.  It must not query the selected generator resolution:
-        # free algebras use this morphism as the augmentation of their own
-        # degree-zero resolution while that resolution is being installed.
-        engine = _engine_ring(domain)
-        identity = self._from_engine_morphism(engine.hom(engine))
+        identity = self._from_constructed_element_map(lambda element: element)
         identity._preamble_is_identity = True
         return identity
 

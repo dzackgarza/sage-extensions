@@ -1,0 +1,22 @@
+tree: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/wt540c
+tree SHA: b64b6d1b3f0ecc7b701491a847b76d1c066a630a
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+tests: tests/algebras/test_affine_semigroup_algebras.sage
+extra: -q --no-header -p no:cacheprovider --tb=short
+....                                                                     [100%]
+-------------- generated report log file: tests/.report/run.jsonl --------------
+============================== slowest durations ===============================
+0.20s call     tests/algebras/test_affine_semigroup_algebras.sage::test_semigroup_algebra_of_the_monoid_generated_by_e1_e2_and_their_sum_satisfies_z_equals_xy
+0.13s call     tests/algebras/test_affine_semigroup_algebras.sage::test_the_generating_module_of_a_semigroup_algebra_is_the_module_it_was_built_on
+0.08s call     tests/algebras/test_affine_semigroup_algebras.sage::test_a_semigroup_algebra_keeps_its_identity_after_a_polynomial_ring_is_built
+0.05s call     tests/algebras/test_affine_semigroup_algebras.sage::test_linearly_independent_semigroup_generators_give_the_polynomial_algebra
+0.00s setup    tests/algebras/test_affine_semigroup_algebras.sage::test_linearly_independent_semigroup_generators_give_the_polynomial_algebra
+0.00s setup    tests/algebras/test_affine_semigroup_algebras.sage::test_semigroup_algebra_of_the_monoid_generated_by_e1_e2_and_their_sum_satisfies_z_equals_xy
+0.00s setup    tests/algebras/test_affine_semigroup_algebras.sage::test_a_semigroup_algebra_keeps_its_identity_after_a_polynomial_ring_is_built
+0.00s setup    tests/algebras/test_affine_semigroup_algebras.sage::test_the_generating_module_of_a_semigroup_algebra_is_the_module_it_was_built_on
+0.00s teardown tests/algebras/test_affine_semigroup_algebras.sage::test_the_generating_module_of_a_semigroup_algebra_is_the_module_it_was_built_on
+0.00s teardown tests/algebras/test_affine_semigroup_algebras.sage::test_linearly_independent_semigroup_generators_give_the_polynomial_algebra
+0.00s teardown tests/algebras/test_affine_semigroup_algebras.sage::test_semigroup_algebra_of_the_monoid_generated_by_e1_e2_and_their_sum_satisfies_z_equals_xy
+0.00s teardown tests/algebras/test_affine_semigroup_algebras.sage::test_a_semigroup_algebra_keeps_its_identity_after_a_polynomial_ring_is_built
+4 passed in 0.79s
+launcher exit: 0

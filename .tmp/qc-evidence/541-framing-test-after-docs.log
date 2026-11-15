@@ -1,0 +1,5 @@
+=== ran on: dc88abceb4da4c251508ba1cbb3efb4b2600ff26 (2 modified paths)
+=== command: test tests/modules/test_the_embedded_framing_is_one_datum.sage
+..                                                                       [100%]
+2 passed in 1.10s
+=== exit recorded above

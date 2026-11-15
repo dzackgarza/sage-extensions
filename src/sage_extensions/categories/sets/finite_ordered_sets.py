@@ -553,12 +553,27 @@ class FiniteOrderedSets(OwnedCategory):
             return negation(self == other)
 
         def __hash__(self) -> int:
-            r"""Return the hash of the tuple of the points, which is what :meth:`__eq__` compares.
+            r"""Return the hash of the tuple of the points, computed once.
+
+            The hash is the datum :meth:`__eq__` compares -- the tuple of the
+            points -- and the points of a finite ordered set are values, so the
+            set is fixed by them and that hash does not change.  It is computed
+            on the first ask and read on every later one: a reader does ask
+            repeatedly, because the store that keeps one product per equal family
+            keys a family by its factors' hashes (``SET-05``), and a set whose
+            points are reached through a map -- an image, a product section --
+            would otherwise build all of them again per ask.
 
             The points hash and their hashes agree with their equality (the rule
-            of :class:`FiniteOrderedSets`), so equal sets hash equally.
+            of :class:`FiniteOrderedSets`), so equal sets hash equally, and a set
+            carrying a point that refuses a hash refuses one too: the computation
+            raises before anything is retained.
             """
-            return hash(tuple(self))
+            retained = self.__dict__.get("_retained_hash")
+            if retained is None:
+                retained = hash(tuple(self))
+                self.__dict__["_retained_hash"] = retained
+            return retained
 
         def _repr_(self) -> str:
             return "{" + ", ".join(repr(element) for element in self) + "}"

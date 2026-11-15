@@ -1,0 +1,13 @@
+=== python -m sage_extensions.testing.test_lint tests/algebras/test_affine_semigroup_algebras.sage
+tree: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/wt540r0
+tree SHA: 52cbab3e7c77c2202311a59057a3c332a15b1efc
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+tests/algebras/test_affine_semigroup_algebras.sage:8: TL01 from sage_extensions.categories.algebras.semigroup_algebras import ...: take every name from the session
+tests/algebras/test_affine_semigroup_algebras.sage:9: TL01 from sage_extensions.categories.algebras.free_algebras import ...: take every name from the session
+tests/algebras/test_affine_semigroup_algebras.sage:10: TL01 from sage_extensions.categories.rings.ring_foundation import ...: take every name from the session
+tests/algebras/test_affine_semigroup_algebras.sage:10: TL02 imports the private name _owned_integers
+tests/algebras/test_affine_semigroup_algebras.sage:19: TL07 repr(): a representation, not a mathematical value
+tests/algebras/test_affine_semigroup_algebras.sage:38: TL01 from sage_extensions.categories.algebras.semigroup_algebras import ...: take every name from the session
+tests/algebras/test_affine_semigroup_algebras.sage:39: TL01 from sage_extensions.categories.rings.ring_foundation import ...: take every name from the session
+tests/algebras/test_affine_semigroup_algebras.sage:39: TL02 imports the private name _owned_integers
+1 files, 8 findings (TL01, TL02, TL07)

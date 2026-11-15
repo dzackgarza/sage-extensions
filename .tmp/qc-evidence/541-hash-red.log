@@ -1,0 +1,26 @@
+=== ran on: 537093385f0dc3dfc133071f2127e2cc92bdb7f4 (3 modified paths)
+=== command: test tests/sets/test_the_hash_of_a_finite_ordered_set_is_one_datum.sage
+.F.                                                                      [100%]
+=================================== FAILURES ===================================
+______________ test_the_second_ask_for_a_hash_constructs_nothing _______________
+
+    def test_the_second_ask_for_a_hash_constructs_nothing() -> None:
+        r"""Asked twice, the set answers with the one hash it computed, not a second walk."""
+        record = []
+        points = _image_set_recording_its_enumeration(record)
+        hash(points)
+        asked = tuple(record)
+    
+        hash(points)
+    
+>       assert tuple(record) == asked
+E       assert (0, 1, 2, 3, 0, 1, ...) == (0, 1, 2, 3)
+E         
+E         Left contains 4 more items, first extra item: 0
+E         Use -v to get more diff
+
+tests/sets/test_the_hash_of_a_finite_ordered_set_is_one_datum.sage:61: AssertionError
+=========================== short test summary info ============================
+FAILED tests/sets/test_the_hash_of_a_finite_ordered_set_is_one_datum.sage::test_the_second_ask_for_a_hash_constructs_nothing
+1 failed, 2 passed in 2.03s
+=== exit recorded above

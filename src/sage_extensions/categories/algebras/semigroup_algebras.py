@@ -96,13 +96,13 @@ class AffineSemigroupAlgebras(OwnedCategoryOverBaseRing):
 
         @cached_method
         def affine_semigroup_generator_positions(self):
-            r"""Return each generator's lattice point, keyed by its presentation position.
+            r"""Return each generator's presentation position, keyed by its lattice point.
 
             ``algebra_generating_set()`` is the index order of every exponent
             vector this algebra's monomials are built from, and
             ``affine_semigroup_generator_coordinates`` names the lattice point
             at each label.  This is that datum read the other way round: a
-            lattice point of the semigroup finds the variable presenting it.
+            lattice point of the semigroup finds the position presenting it.
             The presentation is injective on its generators, so the map is a
             bijection onto the positions; two generators at one lattice point
             would make the position ambiguous and is refused.
@@ -110,14 +110,14 @@ class AffineSemigroupAlgebras(OwnedCategoryOverBaseRing):
             coordinates = self.affine_semigroup_generator_coordinates()
             labels = self.algebra_generating_set()
             ranking = labels.ranking_map()
-            positions = {}
-            for label in labels:
-                point = tuple(int(entry) for entry in coordinates[label])
-                assert point not in positions, (
-                    f"{self} presents two of its generators at the lattice point {point}, "
-                    "so its monomials are not indexed by their exponent vectors"
-                )
-                positions[point] = int(ranking(label))
+            positions = {
+                tuple(int(entry) for entry in coordinates[label]): int(ranking(label))
+                for label in labels
+            }
+            assert len(positions) == len(tuple(labels)), (
+                f"{self} presents two of its generators at one lattice point, "
+                "so its monomials are not indexed by their exponent vectors"
+            )
             return positions
 
     def _call_(

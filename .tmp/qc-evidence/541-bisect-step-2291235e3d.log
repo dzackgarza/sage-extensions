@@ -1,0 +1,98 @@
+=== tree: 2291235e3d2c04d7ca5effb4b9c0f8b6cfaa5537 (modified paths: 0)
+=== port: 2291235e3d2c04d7ca5effb4b9c0f8b6cfaa5537
+=== command: sage-image/run.sh -w /work, port at /work, worktree at /repos/sage-extensions, probe at /probe.py, ROW_DEADLINE=500, inner cap 545 s, outer 595 s
+row: {g in Orthogonal group O(Integral lattice of rank 11 and signature (2, 9)) : rho_L(g) lies in Subgroup of Orthogonal group of Finitely presented module on 11 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 2, 1 ↦ 2, 2 ↦ 2, 3 ↦ 2, 4 ↦ 2, 5 ↦ 2, 6 ↦ 2, 7 ↦ 2, 8 ↦ 2, 9 ↦ 2, 10 ↦ 2]} on rank 11
+calibration 0.373 s
+before the row elapsed 3.4 s, planes transported 0
+before the row no plane transported yet
+  [tick] elapsed 31.6 s, planes transported 0
+  [tick] no plane transported yet
+  [tick] elapsed 61.7 s, planes transported 0
+  [tick] no plane transported yet
+  [tick] elapsed 91.7 s, planes transported 0
+  [tick] no plane transported yet
+Timeout (0:02:00)!
+Thread 0x000078c9bfc7f6c0 [Thread-1 (watch] (most recent call first):
+  File "/probe.py", line 91 in watchdog
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Thread 0x000078cba7da3780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py", line ??? in __init__
+  <invalid frame>
+  [tick] elapsed 121.7 s, planes transported 0
+  [tick] no plane transported yet
+  [tick] elapsed 151.7 s, planes transported 0
+  [tick] no plane transported yet
+  [tick] elapsed 181.7 s, planes transported 0
+  [tick] no plane transported yet
+  [tick] elapsed 211.7 s, planes transported 0
+  [tick] no plane transported yet
+Timeout (0:02:00)!
+Thread 0x000078c9bfc7f6c0 [Thread-1 (watch] (most recent call first):
+  File "/probe.py", line 91 in watchdog
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Thread 0x000078cba7da3780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py", line ??? in _cached_between
+  <invalid frame>
+  [tick] elapsed 241.8 s, planes transported 0
+  [tick] no plane transported yet
+  [tick] elapsed 271.8 s, planes transported 0
+  [tick] no plane transported yet
+  [tick] elapsed 301.8 s, planes transported 0
+  [tick] no plane transported yet
+  [tick] elapsed 331.9 s, planes transported 0
+  [tick] no plane transported yet
+Timeout (0:02:00)!
+Thread 0x000078c9bfc7f6c0 [Thread-1 (watch] (most recent call first):
+  File "/probe.py", line 91 in watchdog
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Thread 0x000078cba7da3780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py", line ??? in _element_constructor_
+  <invalid frame>
+  [tick] elapsed 361.9 s, planes transported 0
+  [tick] no plane transported yet
+  [tick] elapsed 391.9 s, planes transported 0
+  [tick] no plane transported yet
+  [tick] elapsed 421.9 s, planes transported 0
+  [tick] no plane transported yet
+  [tick] elapsed 451.9 s, planes transported 0
+  [tick] no plane transported yet
+Timeout (0:02:00)!
+Thread 0x000078c9bfc7f6c0 [Thread-1 (watch] (most recent call first):
+  File "/probe.py", line 91 in watchdog
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Thread 0x000078cba7da3780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py", line ??? in _owned_engine_element
+  <invalid frame>
+  [tick] elapsed 481.9 s, planes transported 0
+  [tick] no plane transported yet
+  [tick] elapsed 511.9 s, planes transported 0
+  [tick] no plane transported yet
+[cap] elapsed 511.9 s, planes transported 0
+[cap] no plane transported yet
+[cap] calibration start 0.373 s
+[peakrss] probe541row2: child waited=0 shell_code=0 samples=257
+[peakrss] peak tree RSS      : 664 MiB
+[peakrss] low-water MemAvail : 11342 MiB
+[peakrss] peak single VmHWM  : 664 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      653 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   512.3s procs=  3 rss=   664 MiB hwm=   664 MiB avail= 12099 MiB
+[peakrss]   t=   510.3s procs=  3 rss=   663 MiB hwm=   663 MiB avail= 12181 MiB
+[peakrss]   t=   426.3s procs=  3 rss=   662 MiB hwm=   662 MiB avail= 12499 MiB
+[peakrss]   t=   506.3s procs=  3 rss=   662 MiB hwm=   662 MiB avail= 12300 MiB
+[peakrss]   t=   508.3s procs=  3 rss=   662 MiB hwm=   662 MiB avail= 12235 MiB
+=== launcher exit: 0

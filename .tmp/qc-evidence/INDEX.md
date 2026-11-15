@@ -2223,3 +2223,49 @@ them and the launcher is the one the header names.
 | `532-probe.log` | `9bc00c1` + the quotient repair | the reviewer's pair: one form `(((3, 1, 2),), ((-1, 3), (0, 1)))` and one hash for both presentations, and `cardinal({short, longer}) == 1`; **398 cones of `Z^3` cut out twice with a redundant positive combination, 0 disagreements**; on the sample's 79003 pairs the canonical form equals the cone equality everywhere (**0 form collisions among unequal cones**), and the one unequal pair with one hash is a CPython collision (`hash(-1) == hash(-2)`), which the family store resolves by comparing inside the bucket; the two sides of one line stay two sets; the polytope vertex set and the four product assertions are unchanged |
 | `532-cost.log` | `9bc00c1` + the quotient repair | the first hash of a fresh cone and the cached ones: pointed `Z^2` 0.462 ms, pointed `Z^3` 0.261 ms, with a lineality `Z^3` 1.008 ms, cached 0.0001–0.0004 ms; the whole `Z^1` cut out by no covector is the zero cone and hashes as `((), ())` |
 | `532-tensor-boundary.log` | `9bc00c1` + the quotient repair | `just tensor-boundary scope=all`: 168 on main, **166** here, `polyhedral_cones.py` contributing none and adding none; the two that leave are the removed projection's `$X.transpose()` calls |
+| `540r-red-reproduction.log` | `75cbec5` (the repair reverted, `5370933`'s probe deleted) | `tests/divisors/test_toric_class_groups.sage`, one process: **5 failed, 3 passed in 1.12 s** -- the new first row, `test_the_class_group_of_the_hirzebruch_surface_survives_a_polynomial_ring_built_first`, and the four rows the flipped parent-class order reaches, each at the endpoints `ValueError` through `toric_schemes.py:262` -> `algebras.py:4645` -> `:4789` -> `:4911`; the three rows that do not reach it pass |
+| `540r-red-algebras-file.log` | `75cbec5` | `tests/algebras/test_affine_semigroup_algebras.sage`, one process: **1 failed, 3 passed in 0.83 s** -- `test_a_semigroup_algebra_keeps_its_identity_after_a_polynomial_ring_is_built` fails at `augmentation` on the same `ValueError`; the file's four rows run at all now, its three pre-existing lint findings (TL01, TL02, TL07) being gone |
+| `540r-toric-fix.log` | `b64b6d1` | the same file, one process: **8 passed in 2.10 s**, the new first row included |
+| `540r-algebras-file.log` | `b64b6d1` | the same algebras file, one process: **4 passed in 0.79 s**, no lint finding |
+| `540r-both-orders-probe.log` | `b64b6d1` | `QQ[S]` for `S = <(1,0),(0,1)>` in both construction orders, one process each, no `QQ[y]` first and `QQ[y]` first: `_algebra_mor_class()` is `FramedFreeAlgebraMor` in the first and `PresentedAlgebraMor` in the second, and in **both** `selected_algebra_resolution().augmentation()` is built, fixes `s0`, has parent `Mor_UnitalAlg(A, A)`, `algebra_framing_morphism()` is the identity of `A.Mor(A)`, and `class_group()` of the Hirzebruch surface is free of rank 2 |
+| `540r-scenario-base.log` | `52cbab3` (main) | the issue's scenario, `tests/sets/test_cardinality_construction_comparisons.sage`, `tests/sets/test_standard_cardinals_archive.sage` and `tests/divisors/test_toric_class_groups.sage` in one process: **3 failed, 9 passed in 2.89 s**, the three failures the two `tests/sets` files' own |
+| `540r-scenario-fix.log` | `b64b6d1` | the same three files on the repaired tree: **3 failed, 10 passed in 2.67 s**; the FAILED id set is identical to main's and the extra pass is the new toric row |
+| `540r-algebras-base.log` | `52cbab3` (main) | `tests/algebras` with `--ignore=tests/algebras/test_module_structure.sage` (that file aborts inside `QuadraticField` on both trees), one process: **44 failed, 43 passed, 125 errors in 42.71 s** |
+| `540r-algebras-fix.log` | `b64b6d1` | the same directory on the repaired tree: **44 failed, 47 passed, 122 errors in 43.88 s**; the FAILED id set is identical to main's, the four extra passes are the semigroup file's four rows, which no longer error at setup, and the three fewer errors are that file's lint findings |
+| `540r-edge-refused.log` | `52cbab3` with `5370933`'s probe removed | the placement repair this review asks for, measured: with `FreeAlgebras(R)` declared below `AlgebrasWithChosenFinitePresentation(R)` the two quadric-cone rows of the toric file fail (**....FF..**) because the presented parent class then answers for the polynomial algebra a semigroup algebra is built from and `_finitely_presented_algebra_from_data` (`free_algebras.py:1319`, `:1320`) reads a resolution truncated in degree zero; the same happens with `presentation_ring()` answering its degree-zero source, and with `SymmetricAlgebras(R)` declared below the presented category as well |
+| `540r-rebased-red-reproduction.log` | `1bbe9a9` | the row above's tree after the series was rebased onto main `b33d193` (`#531`'s cone canonical form): `tests/divisors/test_toric_class_groups.sage` **5 failed, 3 passed in 1.66 s**, the same five rows |
+| `540r-rebased-toric-fix.log` | `6141e01` | the same file at the rebased repair: **8 passed in 3.03 s** |
+| `540r-rebased-algebras-file.log` | `6141e01` | `tests/algebras/test_affine_semigroup_algebras.sage`: **4 passed in 1.33 s** |
+| `540r-rebased-scenario-base.log` | `b33d193` (main) | the issue's scenario at the new base: **3 failed, 9 passed in 3.32 s**, the two `tests/sets` files' three |
+| `540r-rebased-scenario-fix.log` | `6141e01` | the same three files at the rebased repair: **3 failed, 10 passed in 1.81 s**, FAILED ids identical |
+| `540r-rebased-algebras-base.log` | `b33d193` (main) | `tests/algebras` with `test_module_structure.sage` ignored: **44 failed, 43 passed, 125 errors in 25.07 s** |
+| `540r-rebased-algebras-fix.log` | `6141e01` | the same directory at the rebased repair: **44 failed, 47 passed, 122 errors in 21.91 s**; FAILED ids identical to the new base's |
+| `540r-lint-base.log` | `52cbab3` (main, the merged tree the round before) | `python -m sage_extensions.testing.test_lint tests/algebras/test_affine_semigroup_algebras.sage`: **1 files, 8 findings (TL01, TL02, TL07)**, exit 1 -- five TL01 at the three function-local module imports, two TL02 at `_owned_integers`, one TL07 at `repr(algebra)`; as a pytest plugin each finding errors the tests of the file that holds it, which is the three setup errors `531f-green-merged.log` records |
+| `540r-lint-main.log` | `dcdeddde` | the same command on the file as this round leaves it: **1 files, 0 findings**, exit 0 |
+| `540r-lint-pytest-main.log` | `dcdeddde` | the file collected by pytest with `-p sage_extensions.testing.test_lint` named as well: **4 passed in 0.69 s**, so the four rows run and no finding errors them |
+
+## #541 -- the Õ(T_Co) row's setup, measured against the VM's load
+
+The row is `NamedLattices.Tco.stable_orthogonal_group().isotropic_orbit_representatives(2)`.
+`7c0859c832` reached its first transported plane at 283.9 s; main did not reach one
+at all in ten minutes, and the question was whether a commit between them slowed
+the setup or the VM's load decided the two readings.  Every run below carries
+`calib`, the wall time of one fixed workload (10M integer cubes and a GAP
+`Order(SymmetricGroup(8))`) timed in the same process, and every run is capped at
+500 s of row inside a 545 s inner and a 595 s outer kill.  Alternating order:
+base, main, main, base.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `541-otilde-row-calibrated-base-1.log` | `7c0859c832` | first plane **352.6 s**, calib 0.362 (974 units), 8758 planes at the cap, 58.89 planes/s |
+| `541-otilde-row-calibrated-base-2.log` | `7c0859c832` | first plane **356.9 s**, calib 0.364 (980), 8324 planes, 56.04 planes/s |
+| `541-otilde-row-calibrated-main-1.log` | main `d1ab7fc785` | **no plane by 514.1 s**, calib 0.415 (>= 1239) |
+| `541-otilde-row-calibrated-main-2.log` | main `d1ab7fc785` | first plane **441.8 s**, calib 0.363 (1217), 3283 planes, 55.99 planes/s |
+| `541-otilde-row-bisect.log` | -- | the `git bisect run` transcript: predicate `first plane / calib >= 1100`, `022f7a5271` red (1263), `5e7eb7ccdd` green (941), `2291235e3d` red (1340), `10c3902861` green (504); **`2291235e3d2c04d7ca5effb4b9c0f8b6cfaa5537 is the first bad commit`** |
+| `541-bisect-step-022f7a5271.log`, `-5e7eb7ccdd.log`, `-2291235e3d.log`, `-10c3902861.log` | each step's own tree | the four step runs, each with its stack samples (`faulthandler`, every 120 s): at 120 s the base sits in `integral_restriction` and by 240 s in the coset walk, while main sits in `_finite_family_key` -> `__hash__` -> `point_at` |
+| `541-hash-red.log` | main `d1ab7fc785` | `tests/sets/test_the_hash_of_a_finite_ordered_set_is_one_datum.sage`: **1 failed, 2 passed in 2.03 s**, `assert (0, 1, 2, 3, 0, 1, ...) == (0, 1, 2, 3)` |
+| `541-hash-green.log` | the repair | the same file: **3 passed in 1.18 s** |
+| `541-hash-lint.log` | the repair | test lint: **1 files, 0 findings** |
+| `541-otilde-row-after-hash-repair.log` | the repair | first plane **483.6 s**, calib 0.577 (838 units), 2089 planes, 72.67 planes/s |
+| `541-framing-test-after-docs.log` | the docs commit | `tests/modules/test_the_embedded_framing_is_one_datum.sage`: **2 passed in 1.10 s** |
+| `541-two-test-files-on-the-pushed-tree.log` | the pushed tree (`ea895a8` + this round's four commits) | `tests/sets/test_the_hash_of_a_finite_ordered_set_is_one_datum.sage` and `tests/modules/test_the_embedded_framing_is_one_datum.sage` together: **5 passed in 1.36 s** |
