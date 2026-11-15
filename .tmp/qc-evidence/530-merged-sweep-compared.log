@@ -1,0 +1,13 @@
+After merging the remote main (5d408ca, the residue-transport perf branch) into this
+commit: the same four directories, same method -- this tree, then the merge's own base
+library from git archive 5d408ca with the same test files.
+
+merged tree (97f9467): 193 failed, 395 passed, 318 errors in 99.18s
+merged base (5d408ca): 194 failed, 394 passed, 318 errors in 105.20s
+
+  only on the merged tree: (none)
+  only on the merged base:
+    FAILED tests/modules/test_the_dual_of_a_module_is_its_module_of_functionals.sage::test_the_dual_of_an_infinite_free_module_is_the_module_of_functionals
+
+The 99.18 s against 105.20 s also settles the earlier outlier: the same directories cost
+~100 s either way, and the 256.71 s of 530-sweep-new.log was the VM, not this change.

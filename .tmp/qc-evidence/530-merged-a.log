@@ -1,0 +1,43 @@
+tree SHA: 97f9467902e801635fd14f1e27cb3bd3a8cf25c3
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+inner 300 s, outer 360 s, guard 6144 MiB
+command: python -m pytest -p qc_sage_session tests/modules/test_the_dual_of_a_module_is_its_module_of_functionals.sage tests/modules/test_the_order_ideal_of_a_ring_element_over_its_base_ring.sage tests/categories/test_the_refined_category_answers_with_its_own_operation.sage tests/rings/test_a_ring_states_no_enumeration_of_its_points.sage -q   (repository addopts)
+........                                                                 [100%]
+-------------- generated report log file: tests/.report/run.jsonl --------------
+============================== slowest durations ===============================
+0.07s call     tests/modules/test_the_order_ideal_of_a_ring_element_over_its_base_ring.sage::test_the_order_ideal_of_a_rational_polynomial_is_the_unit_ideal
+0.05s call     tests/categories/test_the_refined_category_answers_with_its_own_operation.sage::test_a_finite_ring_enumerates_its_points_through_its_engine
+0.04s call     tests/modules/test_the_order_ideal_of_a_ring_element_over_its_base_ring.sage::test_the_order_ideal_of_an_integer_polynomial_is_the_ideal_of_its_coefficients
+0.04s call     tests/categories/test_the_refined_category_answers_with_its_own_operation.sage::test_the_module_level_states_the_order_ideal_of_an_algebra_element
+0.04s call     tests/categories/test_the_refined_category_answers_with_its_own_operation.sage::test_the_ring_states_the_completion_of_the_field_at_the_zero_ideal
+0.02s call     tests/modules/test_the_dual_of_a_module_is_its_module_of_functionals.sage::test_a_functional_pairs_with_a_vector_by_its_values_on_the_basis
+0.01s call     tests/modules/test_the_dual_of_a_module_is_its_module_of_functionals.sage::test_the_dual_of_an_infinite_free_module_is_the_module_of_functionals
+0.00s setup    tests/modules/test_the_dual_of_a_module_is_its_module_of_functionals.sage::test_the_dual_of_an_infinite_free_module_is_the_module_of_functionals
+0.00s setup    tests/categories/test_the_refined_category_answers_with_its_own_operation.sage::test_the_ring_states_the_completion_of_the_field_at_the_zero_ideal
+0.00s setup    tests/rings/test_a_ring_states_no_enumeration_of_its_points.sage::test_a_polynomial_ring_states_no_enumeration_of_its_points
+0.00s call     tests/rings/test_a_ring_states_no_enumeration_of_its_points.sage::test_a_polynomial_ring_states_no_enumeration_of_its_points
+0.00s setup    tests/modules/test_the_dual_of_a_module_is_its_module_of_functionals.sage::test_a_functional_pairs_with_a_vector_by_its_values_on_the_basis
+0.00s setup    tests/categories/test_the_refined_category_answers_with_its_own_operation.sage::test_the_module_level_states_the_order_ideal_of_an_algebra_element
+0.00s setup    tests/categories/test_the_refined_category_answers_with_its_own_operation.sage::test_a_finite_ring_enumerates_its_points_through_its_engine
+0.00s setup    tests/modules/test_the_order_ideal_of_a_ring_element_over_its_base_ring.sage::test_the_order_ideal_of_an_integer_polynomial_is_the_ideal_of_its_coefficients
+0.00s setup    tests/modules/test_the_order_ideal_of_a_ring_element_over_its_base_ring.sage::test_the_order_ideal_of_a_rational_polynomial_is_the_unit_ideal
+0.00s teardown tests/modules/test_the_dual_of_a_module_is_its_module_of_functionals.sage::test_the_dual_of_an_infinite_free_module_is_the_module_of_functionals
+0.00s teardown tests/rings/test_a_ring_states_no_enumeration_of_its_points.sage::test_a_polynomial_ring_states_no_enumeration_of_its_points
+0.00s teardown tests/modules/test_the_order_ideal_of_a_ring_element_over_its_base_ring.sage::test_the_order_ideal_of_a_rational_polynomial_is_the_unit_ideal
+0.00s teardown tests/categories/test_the_refined_category_answers_with_its_own_operation.sage::test_the_ring_states_the_completion_of_the_field_at_the_zero_ideal
+0.00s teardown tests/categories/test_the_refined_category_answers_with_its_own_operation.sage::test_a_finite_ring_enumerates_its_points_through_its_engine
+0.00s teardown tests/modules/test_the_dual_of_a_module_is_its_module_of_functionals.sage::test_a_functional_pairs_with_a_vector_by_its_values_on_the_basis
+0.00s teardown tests/categories/test_the_refined_category_answers_with_its_own_operation.sage::test_the_module_level_states_the_order_ideal_of_an_algebra_element
+0.00s teardown tests/modules/test_the_order_ideal_of_a_ring_element_over_its_base_ring.sage::test_the_order_ideal_of_an_integer_polynomial_is_the_ideal_of_its_coefficients
+8 passed in 0.93s
+[peakrss] tests530: child waited=0 shell_code=0 samples=2
+[peakrss] peak tree RSS      : 316 MiB
+[peakrss] low-water MemAvail : 12878 MiB
+[peakrss] peak single VmHWM  : 316 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      305 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     2.0s procs=  3 rss=   316 MiB hwm=   316 MiB avail= 12878 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     6 MiB hwm=     6 MiB avail= 13122 MiB
+launcher exit: 0

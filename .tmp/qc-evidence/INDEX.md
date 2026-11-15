@@ -1620,3 +1620,11 @@ repeating it (`STY-54`).
 
 The probe sources are beside them (`530-probe-*.py`), session probes and not
 library code, each printing the objects and the answering class it is cited for.
+
+**After the merge of the remote main (`5d408ca`, the residue-transport perf branch).**
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `530-merged-a.log` | `97f9467` (this commit merged onto `5d408ca`) | the four lint-clean files of the change under the repository addopts: **8 passed in 0.93 s** |
+| `530-merged-sweep-compared.log` | `97f9467` against `5d408ca` | `tests/modules tests/rings tests/forms tests/categories` on the merged tree and on the merge's own base, same test files: FAILED/ERROR ids identical except this change's new test assertion; 193 failed, 395 passed, 318 errors in 99.18 s against 194, 394, 318 in 105.20 s. The ~100 s pair also shows the earlier 256.71 s as a VM outlier |
+| `530-merged-sweep-new-ids.log`, `530-merged-sweep-base-ids.log` | the same two runs | the sorted ids those two runs produced, extracted from their output |
