@@ -334,6 +334,18 @@ class PredicateSubgroups(OwnedParameterizedCategory):
             )
             return self._selected_schreier_augmentation(words)
 
+        def character_data(self) -> dict:
+            r"""Return the character conditions this subgroup was constructed with.
+
+            ``determinant_kernel``, ``spinor_kernel`` and ``discriminant_preimages``
+            are the conditions; each holds the datum its name states -- a truth
+            value for a kernel, the finite subgroups whose preimages are met for a
+            preimage.  The data is the constructing call's, held and not computed,
+            and it is what a timing record uses to tell one character subgroup
+            from another (:func:`sage_extensions.categories._lattice.record_name`).
+            """
+            return dict(self._character_data)
+
         def _character_data_snapshot(self):
             r"""Return private finite-character representation metadata."""
             return dict(self._character_data)

@@ -26,8 +26,14 @@ from sage.rings.fraction_field import FractionField_generic as SageFractionField
 from sage.rings.ideal import Ideal_generic as SageIdeal
 from sage.rings.infinity import Infinity
 from sage.rings.integer_ring import ZZ as SageZZ
+from sage.rings.polynomial.multi_polynomial_ring_base import (
+    MPolynomialRing_base as SageMultivariatePolynomialRing,
+)
 from sage.rings.polynomial.polynomial_quotient_ring import (
     PolynomialQuotientRing_generic,
+)
+from sage.rings.polynomial.polynomial_ring import (
+    PolynomialRing_generic as SageUnivariatePolynomialRing,
 )
 from sage.rings.quotient_ring import QuotientRing_generic
 from sage.rings.rational_field import QQ as SageQQ
@@ -926,18 +932,30 @@ def _engine_quotient_reduction_is_canonical(engine) -> bool:
     ``__hash__``.  A hash of a class must not depend on which lift was written
     down, so it can be the engine's hash of the engine's representative only
     where that representative is one per class: in ``ZZ/(n)``, whose
-    representatives are the residues, and in a quotient over a coefficient field,
-    where ``ideal.reduce`` is Singular's normal form with respect to a Gröbner
-    basis.  Over ``ZZ`` Sage's ``Ideal_generic.reduce`` returns the
-    representative it was given -- in ``ZZ[x,y]/(4, 6x)`` the one class of ``x``
-    and ``3x`` has the representatives ``xbar`` and ``-xbar`` -- so no
-    representative is selected there.
+    representatives are the residues, and in the quotient of a univariate or
+    multivariate polynomial ring over an exact field, where ``ideal.reduce`` is
+    Singular's normal form with respect to a Gröbner basis.
+
+    The cover decides it, not the base ring.  A quotient's ``base_ring()`` is
+    its cover, and the base ring of a *Laurent* polynomial ring is the field
+    below it, so asking ``base_ring()`` to be a field admits
+    ``QQ[t^{+-1}]/(t - 1)`` and ``QQ[u^{+-1}, v^{+-1}]/(u - 1)``, whose
+    ``reduce`` returns the representative it was given: the classes of ``t``
+    and of ``1`` are one class there and would carry two hashes.  A
+    power-series cover fails the same way.  Over ``ZZ`` the non-reduction is
+    the one already recorded -- in ``ZZ[x,y]/(4, 6x)`` the one class of ``x``
+    and ``3x`` has the representatives ``xbar`` and ``-xbar`` -- so a
+    polynomial cover is admitted only over a field, which is then also exact.
     """
     match engine:
         case SageIntegerModRing():
             return True
         case QuotientRing_generic():
-            return engine.base_ring() in SageFields()
+            cover = engine.cover_ring()
+            return isinstance(
+                cover,
+                (SageUnivariatePolynomialRing, SageMultivariatePolynomialRing),
+            ) and cover.base_ring().is_field() and cover.base_ring().is_exact()
         case _ if engine is not None and engine in SageFields():
             return True
         case _:

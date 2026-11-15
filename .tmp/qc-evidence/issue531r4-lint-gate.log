@@ -1,0 +1,50 @@
+tree SHA: 408f8cf98a8981cfefa2f955e2e69124a072d918
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+inner 300 s, outer 360 s, guard 6144 MiB
+command: python -m pytest -p qc_sage_session tests/rings/test_a_quotient_class_hashes_by_its_class.sage tests/sets/test_a_finite_ordered_set_hashes_by_its_points.sage -q   (repository addopts)
+..........                                                               [100%]
+-------------- generated report log file: tests/.report/run.jsonl --------------
+============================== slowest durations ===============================
+0.82s call     tests/sets/test_a_finite_ordered_set_hashes_by_its_points.sage::test_distinct_span_bases_of_one_rank_do_not_share_a_hash
+0.17s call     tests/rings/test_a_quotient_class_hashes_by_its_class.sage::test_classes_of_a_laurent_quotient_refuse_a_hash
+0.08s call     tests/rings/test_a_quotient_class_hashes_by_its_class.sage::test_a_class_over_zz_refuses_a_hash_because_reduction_is_no_normal_form
+0.07s call     tests/sets/test_a_finite_ordered_set_hashes_by_its_points.sage::test_a_span_basis_finds_its_own_cache_entry_without_scanning_the_others
+0.04s call     tests/rings/test_a_quotient_class_hashes_by_its_class.sage::test_classes_of_a_polynomial_quotient_over_a_field_hash_through_its_normal_form
+0.02s call     tests/sets/test_a_finite_ordered_set_hashes_by_its_points.sage::test_equal_finite_ordered_sets_hash_equally
+0.01s call     tests/rings/test_a_quotient_class_hashes_by_its_class.sage::test_classes_with_different_lifts_are_one_key
+0.00s call     tests/sets/test_a_finite_ordered_set_hashes_by_its_points.sage::test_a_finite_ordinal_hashes_by_its_points_like_the_set_they_form
+0.00s call     tests/sets/test_a_finite_ordered_set_hashes_by_its_points.sage::test_a_set_with_an_unhashable_point_is_unhashable
+0.00s setup    tests/rings/test_a_quotient_class_hashes_by_its_class.sage::test_classes_with_different_lifts_are_one_key
+0.00s setup    tests/rings/test_a_quotient_class_hashes_by_its_class.sage::test_classes_of_a_laurent_quotient_refuse_a_hash
+0.00s setup    tests/rings/test_a_quotient_class_hashes_by_its_class.sage::test_distinct_classes_of_one_modulus_hash_apart
+0.00s setup    tests/sets/test_a_finite_ordered_set_hashes_by_its_points.sage::test_equal_finite_ordered_sets_hash_equally
+0.00s call     tests/rings/test_a_quotient_class_hashes_by_its_class.sage::test_distinct_classes_of_one_modulus_hash_apart
+0.00s setup    tests/rings/test_a_quotient_class_hashes_by_its_class.sage::test_classes_of_a_polynomial_quotient_over_a_field_hash_through_its_normal_form
+0.00s setup    tests/sets/test_a_finite_ordered_set_hashes_by_its_points.sage::test_distinct_span_bases_of_one_rank_do_not_share_a_hash
+0.00s setup    tests/rings/test_a_quotient_class_hashes_by_its_class.sage::test_a_class_over_zz_refuses_a_hash_because_reduction_is_no_normal_form
+0.00s setup    tests/sets/test_a_finite_ordered_set_hashes_by_its_points.sage::test_a_set_with_an_unhashable_point_is_unhashable
+0.00s setup    tests/sets/test_a_finite_ordered_set_hashes_by_its_points.sage::test_a_span_basis_finds_its_own_cache_entry_without_scanning_the_others
+0.00s setup    tests/sets/test_a_finite_ordered_set_hashes_by_its_points.sage::test_a_finite_ordinal_hashes_by_its_points_like_the_set_they_form
+0.00s teardown tests/sets/test_a_finite_ordered_set_hashes_by_its_points.sage::test_distinct_span_bases_of_one_rank_do_not_share_a_hash
+0.00s teardown tests/rings/test_a_quotient_class_hashes_by_its_class.sage::test_classes_of_a_laurent_quotient_refuse_a_hash
+0.00s teardown tests/rings/test_a_quotient_class_hashes_by_its_class.sage::test_classes_with_different_lifts_are_one_key
+0.00s teardown tests/sets/test_a_finite_ordered_set_hashes_by_its_points.sage::test_a_set_with_an_unhashable_point_is_unhashable
+0.00s teardown tests/sets/test_a_finite_ordered_set_hashes_by_its_points.sage::test_a_span_basis_finds_its_own_cache_entry_without_scanning_the_others
+0.00s teardown tests/rings/test_a_quotient_class_hashes_by_its_class.sage::test_a_class_over_zz_refuses_a_hash_because_reduction_is_no_normal_form
+0.00s teardown tests/sets/test_a_finite_ordered_set_hashes_by_its_points.sage::test_equal_finite_ordered_sets_hash_equally
+0.00s teardown tests/rings/test_a_quotient_class_hashes_by_its_class.sage::test_classes_of_a_polynomial_quotient_over_a_field_hash_through_its_normal_form
+0.00s teardown tests/sets/test_a_finite_ordered_set_hashes_by_its_points.sage::test_a_finite_ordinal_hashes_by_its_points_like_the_set_they_form
+0.00s teardown tests/rings/test_a_quotient_class_hashes_by_its_class.sage::test_distinct_classes_of_one_modulus_hash_apart
+10 passed in 1.63s
+[peakrss] lintgate: child waited=0 shell_code=0 samples=3
+[peakrss] peak tree RSS      : 345 MiB
+[peakrss] low-water MemAvail : 13705 MiB
+[peakrss] peak single VmHWM  : 345 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      334 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     4.0s procs=  3 rss=   345 MiB hwm=   345 MiB avail= 13705 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   303 MiB hwm=   303 MiB avail= 13723 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     2 MiB hwm=     2 MiB avail= 13936 MiB
+launcher exit: 0

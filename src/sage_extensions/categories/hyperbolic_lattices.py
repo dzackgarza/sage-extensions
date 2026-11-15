@@ -51,7 +51,12 @@ from sage.structure.sage_object import SageObject
 
 from sage_extensions.categories.sets.indexed_families import finite_indexed_family_from_values
 from sage_extensions.categories.lattices import Lattices
-from sage_extensions.categories._lattice import lattice_record_name, signature_pair
+from sage_extensions.categories._lattice import (
+    _lattice_label,
+    record_name,
+    signature_pair,
+    vector_label,
+)
 from sage_extensions.categories.sets.cardinals import cardinal
 from sage_extensions.categories.rings.ring_foundation import (
     _owned_engine_element,
@@ -173,31 +178,26 @@ def _vinberg_walk_record_name(lattice, controlling_vector, max_roots, max_decomp
 
     ``_vinberg_search`` is cached on ``(controlling_vector, max_roots,
     max_decompositions, admits_root)``, so a record that names only the lattice
-    names four walks at once: the point the chamber is grown from decides which
-    vertices are written down, and the root filter decides which walls survive.
-    The point is written as its coordinates in the lattice's framing, or as the
-    engine's own point when none was supplied, and the filter by the name it was
-    defined under -- a callable has no data to identify it by and its name is
-    what its call site chose.
+    names four walks at once.  The label states the point and the bounds in
+    words; the digest (:func:`sage_extensions.categories._lattice.record_name`)
+    is over all four arguments, so two filters that share a name -- the same
+    ``def`` asked at two cusps -- are still two walks, because a callable's
+    canonical form carries the values it closed over.
     """
-    if controlling_vector is None:
-        point = "the engine's own point"
-    else:
-        point = "(" + ", ".join(str(int(entry)) for entry in _framing_coordinates(controlling_vector)) + ")"
-    roots = "no root bound" if max_roots is None else f"at most {max_roots} roots"
-    decompositions = (
-        "no decomposition bound"
-        if max_decompositions is None
-        else f"at most {max_decompositions} decompositions"
+    point = (
+        "the engine's own point"
+        if controlling_vector is None
+        else vector_label(controlling_vector)
     )
-    admitted = (
-        "every root admitted"
-        if admits_root is None
-        else f"admits_root={getattr(admits_root, '__name__', 'a supplied filter')}"
-    )
-    return (
-        f"{lattice_record_name(lattice)}, controlling vector: {point}, "
-        f"{roots}, {decompositions}, {admitted}"
+    return record_name(
+        f"{_lattice_label(lattice)}, controlling vector {point}, "
+        f"{'no' if max_roots is None else max_roots} root bound, "
+        f"{'no' if max_decompositions is None else max_decompositions} decomposition bound",
+        lattice,
+        controlling_vector,
+        max_roots=max_roots,
+        max_decompositions=max_decompositions,
+        admits_root=admits_root,
     )
 
 

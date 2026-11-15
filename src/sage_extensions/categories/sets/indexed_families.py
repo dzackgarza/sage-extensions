@@ -356,11 +356,27 @@ class IndexedFamily[IndexT, ValueT]:
         return negation(self == other)
 
     def __hash__(self):
-        r"""Hash selected finite extensional data; otherwise retain identity.
+        r"""Hash the index set's cardinality; otherwise retain identity.
 
         Finiteness alone supplies no enumeration of the index set. The
         extensional-equality owner also requires a selected enumeration;
         hashing must not attempt to iterate an unenumerated finite index.
+
+        Equality compares the two index sets and then the values index by
+        index, so equal families have index sets of one cardinality: that
+        cardinality is the invariant this hash reads, and it exists for every
+        finite enumerated index set (#531).  Neither the values nor the points
+        of the index set may be read here.  A point can have a hashable and an
+        unhashable form -- a Sage vector and its immutable copy are equal and
+        only one of them hashes -- so a family over one and a family over the
+        other are equal families of one cardinality whose index sets differ in
+        hashability, and a hash of the index set would give them two values.
+        That is the argument that removed the cardinality fallback from
+        ``FiniteOrderedSets.__hash__``, applied to the family that reads it.
+
+        Equality of two such families is decided whenever their index sets'
+        points and their values decide equality, which is what the hash needs:
+        hash(f) == hash(g) whenever f == g is decided true.
         """
         from sage_extensions.categories.sets.set_categories import EnumeratedSets
 
@@ -368,11 +384,8 @@ class IndexedFamily[IndexT, ValueT]:
             return object.__hash__(self)
         # The values are never read: distinct representations of equal values
         # may differ in hashability, so branching on their ability to hash
-        # would violate the implication f == g => hash(f) == hash(g).  The
-        # index set is the necessary equality invariant, and its own hash reads
-        # its points, so a family over an index set carrying a point that
-        # refuses a hash is unhashable, as that set is.
-        return hash(self.index_set())
+        # would violate the implication f == g => hash(f) == hash(g).
+        return hash((IndexedFamily, int(self.cardinality().finite_value())))
 
     def _repr_(self):
         from sage_extensions.categories.sets.set_categories import (
