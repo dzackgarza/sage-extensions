@@ -1,0 +1,35 @@
+probe: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.tmp/qc-evidence/issue528-lift-nonintegral-base.py
+tree SHA: cff6a3aa6229f555c1788e05966c761adeb81087
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+inner 440 s, outer 500 s, guard 6144 MiB, args ''
+[    0.5s] 
+[    0.5s] ### U + <2>: rank 3, divisibility 1, reduction rank 1, 2 isometries tried, 0 with a base point that does not restrict integrally
+[    4.0s] 
+[    4.0s] ### U + U + <2>: rank 5, divisibility 1, reduction rank 3, 110 isometries tried, 0 with a base point that does not restrict integrally
+[    4.2s] 
+[    4.2s] ### U(2) + <2>: rank 3, divisibility 2, reduction rank 1, 2 isometries tried, 0 with a base point that does not restrict integrally
+[    5.0s] 
+[    5.0s] ### U(2) + U(2): rank 4, divisibility 2, reduction rank 2, 20 isometries tried, 0 with a base point that does not restrict integrally
+[    5.2s] 
+[    5.2s] ### U(4) + <2>: rank 3, divisibility 4, reduction rank 1, 2 isometries tried, 0 with a base point that does not restrict integrally
+[    8.9s] 
+[    8.9s] ### U(2) + U(2) + <2>: rank 5, divisibility 2, reduction rank 3, 110 isometries tried, 0 with a base point that does not restrict integrally
+[    9.3s] 
+[    9.3s] ### U + A3(2) at -2e0 + 2e1 - e2 + 2e3 - e4: rank 5, divisibility 2, reduction rank 3, 6 isometries tried, 0 with a base point that does not restrict integrally
+[    9.3s] 
+[    9.3s] controls with a non-integral base point: 0
+[    9.3s] PROBE DONE
+[peakrss] p528t: child waited=0 shell_code=0 samples=6
+[peakrss] peak tree RSS      : 361 MiB
+[peakrss] low-water MemAvail : 13577 MiB
+[peakrss] peak single VmHWM  : 361 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      350 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    10.0s procs=  3 rss=   361 MiB hwm=   361 MiB avail= 13577 MiB
+[peakrss]   t=     8.0s procs=  3 rss=   352 MiB hwm=   352 MiB avail= 13586 MiB
+[peakrss]   t=     6.0s procs=  3 rss=   337 MiB hwm=   337 MiB avail= 13599 MiB
+[peakrss]   t=     4.0s procs=  3 rss=   324 MiB hwm=   324 MiB avail= 13608 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   313 MiB hwm=   313 MiB avail= 13608 MiB
+launcher exit: 0

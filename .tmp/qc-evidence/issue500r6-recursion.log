@@ -1,0 +1,139 @@
+=== where the RecursionError on a finitely presented algebra runs, and what does not recurse
+=== tree: 2ac0d5c for the first two blocks, 851df47 for the rest; neither touches algebras.py or the paths below
+=== probes: issue500r6-recursion.py (the frame census) and the throwaway probes whose output follows
+
+=== probe: TensorAlgebras/SymmetricAlgebras construct, and the two objects' calls
+=== run PYTHONHASHSEED=0
+### TensorAlgebras(ZZ)
+  -> Category of tensor algebras over Integer Ring
+### SymmetricAlgebras(ZZ)
+  -> Category of symmetric algebras over Integer Ring
+### ZZ[x]/(x^2).is_torsion_free()
+  -> True
+### ZZ[x]/(x^2)._represented_relation_torsion_witness()
+  RecursionError after 1302 frames
+  repeating cycle of None frames:
+    head probe_recursion.py:27 in show
+    head probe_recursion.py:56 in <lambda>
+    head algebras.py:3804 in _represented_relation_torsion_witness
+    head algebras.py:3564 in presentation_ring
+    head algebras.py:3553 in selected_algebra_presentation
+    head algebras.py:2057 in selected_algebra_resolution
+    head objects.py:383 in selected_resolution
+    head objects.py:116 in realize
+    head algebras.py:1115 in selected_resolution
+    head mor_foundation.py:438 in operation
+    head mor_foundation.py:307 in Mor
+    head mor_categories.py:2313 in Of
+### ZZ[x]/(2x)._represented_relation_torsion_witness()
+  RecursionError after 1302 frames
+  repeating cycle of None frames:
+    head probe_recursion.py:27 in show
+    head probe_recursion.py:57 in <lambda>
+    head algebras.py:3804 in _represented_relation_torsion_witness
+    head algebras.py:3564 in presentation_ring
+    head algebras.py:3553 in selected_algebra_presentation
+    head algebras.py:2057 in selected_algebra_resolution
+    head objects.py:383 in selected_resolution
+    head objects.py:116 in realize
+    head algebras.py:1115 in selected_resolution
+    head mor_foundation.py:438 in operation
+    head mor_foundation.py:307 in Mor
+    head mor_categories.py:2313 in Of
+### ZZ[x]/(2x).is_torsion_free()
+  RecursionError after 1302 frames
+  repeating cycle of None frames:
+    head probe_recursion.py:27 in show
+    head probe_recursion.py:58 in <lambda>
+    head modules.py:2484 in is_torsion_free
+    head algebras.py:3773 in _torsion_freeness_decision
+    head algebras.py:3804 in _represented_relation_torsion_witness
+    head algebras.py:3564 in presentation_ring
+    head algebras.py:3553 in selected_algebra_presentation
+    head algebras.py:2057 in selected_algebra_resolution
+    head objects.py:383 in selected_resolution
+    head objects.py:116 in realize
+    head algebras.py:1115 in selected_resolution
+    head mor_foundation.py:438 in operation
+=== seed 0 launcher exit: 0
+=== probe: the frame census of Z[x]/(2x).is_torsion_free()
+=== run PYTHONHASHSEED=0
+frames: 1303; distinct: 58
+    127  owned_category.py:669 in linearize
+     43  cachefunc.pyx:2890 in sage.misc.cachefunc.CachedMethod.__get__
+     43  cachefunc.pyx:2256 in sage.misc.cachefunc.CachedMethodCallerNoArgs.__init__
+     43  category_object.pyx:852 in sage.structure.category_object.CategoryObject.__getattr__
+     43  category_object.pyx:865 in sage.structure.category_object.CategoryObject.getattr_from_category
+     43  lazy_attribute.pyx:127 in sage.misc.lazy_attribute._lazy_attribute.__get__
+     43  category.py:1717 in parent_class
+     43  owned_category.py:968 in _make_named_class
+     43  owned_category.py:698 in _owned_implementation_bases
+     43  owned_category.py:678 in _declared_category_linearization
+     43  owned_category.py:667 in linearize
+     42  modules.py:1522 in super_categories
+     42  algebras.py:2115 in _commutativity_decision
+     42  algebras.py:1798 in multiplication
+     42  cachefunc.pyx:2328 in sage.misc.cachefunc.CachedMethodCallerNoArgs.__call__
+     42  native_modules.py:287 in multiplication
+     42  modules.py:816 in tensor_product
+     42  cachefunc.pyx:1029 in sage.misc.cachefunc.CachedFunction.__call__
+     42  modules.py:6463 in _module_tensor_product
+     42  modules.py:6496 in _module_tensor_product_with_data
+     42  modules.py:5919 in _tensor_label_set
+     42  set_categories.py:1488 in product
+     42  set_categories.py:1501 in _finite_product
+     42  set_categories.py:1501 in <genexpr>
+     42  indexed_families.py:232 in <genexpr>
+     42  indexed_families.py:135 in _value_at_normalized_index
+     42  modules.py:5922 in <lambda>
+     42  modules.py:1937 in module_generating_set
+      3  classcall_metaclass.pyx:328 in sage.misc.classcall_metaclass.ClasscallMetaclass.__call__
+      1  probe_recursion_frames.py:22 in <module>
+      1  modules.py:2484 in is_torsion_free
+      1  algebras.py:3773 in _torsion_freeness_decision
+      1  algebras.py:3804 in _represented_relation_torsion_witness
+      1  algebras.py:3564 in presentation_ring
+      1  algebras.py:3553 in selected_algebra_presentation
+      1  algebras.py:2057 in selected_algebra_resolution
+      1  objects.py:383 in selected_resolution
+      1  objects.py:116 in realize
+      1  algebras.py:1115 in selected_resolution
+      1  mor_foundation.py:438 in operation
+      1  mor_foundation.py:307 in Mor
+      1  mor_categories.py:2313 in Of
+      1  mor_categories.py:2314 in <genexpr>
+      1  mor_categories.py:244 in _declared_category_reaches
+      1  mor_categories.py:1126 in super_categories
+      1  mor_categories.py:2268 in Of
+      1  mor_categories.py:909 in __classcall__
+      1  classcall_metaclass.pyx:477 in sage.misc.classcall_metaclass.typecall
+      1  owned_category.py:834 in retaining_initializer
+      1  module_morphisms.py:3452 in __init__
+      1  module_morphisms.py:3018 in _initialize_module_mor_parent
+      1  free_algebras.py:1793 in super_categories
+      1  graded_algebras.py:343 in __classcall__
+      1  graded_modules.py:459 in __classcall__
+      1  graded_modules.py:109 in _grading_parity
+      1  ring_foundation.py:6645 in __call__
+      1  ring_foundation.py:6672 in _element_constructor_
+      1  ring_foundation.py:6844 in base_ring
+=== seed 0 launcher exit: 0
+=== probe: the two dual-numbers objects, the generator, and the framed category
+=== run PYTHONHASHSEED=0
+  an_object(): Free module on {[1], [x]} over Integer Ring
+  by_relations: Free module on {[1], [x]} over Integer Ring
+  an_object is by_relations: False
+  an_object == by_relations: False
+  an_object.relations(): RecursionError
+  by_relations.relations(): RecursionError
+  an_object.is_torsion_free(): True
+  by_relations.is_torsion_free(): True
+=== seed 0 launcher exit: 0
+=== run PYTHONHASHSEED=0
+by_relations: in FramedFreeModules(ZZ) -> True; module_rank -> 2
+an_object(): in FramedFreeModules(ZZ) -> True; module_rank -> 2
+=== seed 0 launcher exit: 0
+=== run PYTHONHASHSEED=0
+algebra: Free module on {[1], [x]} over Integer Ring
+algebra_generator('x'): RecursionError
+=== seed 0 launcher exit: 0

@@ -1,0 +1,261 @@
+provider SHA: 1cc248135c6d292ab69359f0089af8f8f0c5377c
+FFFF.....                                                                [100%]
+=================================== FAILURES ===================================
+_ test_a_stage_timed_call_writes_its_stage_records_in_order_with_their_durations _
+
+    def test_a_stage_timed_call_writes_its_stage_records_in_order_with_their_durations():
+        r"""One call, four records, each naming the row, the lattice and the subgroup.
+    
+        The name is the caller's: the row's rank, the lattice's ring and Gram, and
+        the subgroup the row is taken under, which is the description that subgroup
+        was constructed with.  Nothing is read off an object and nothing is
+        rendered, so the four records say what the run computed.
+        """
+        lattice = _small_lattice()
+        written = stage_records_of(
+            lambda: lattice.stable_orthogonal_group().isotropic_orbit_representatives(1)
+        )
+    
+        assert written.kind == "stages"
+        assert written.suffix == "jsonl"
+        assert written.commit == written.head[:12]
+        assert all(record["commit"] == written.head for record in written.records)
+        assert all(record["run"] == written.stamp for record in written.records)
+        assert tuple(record["stage"] for record in written.records) == (
+            "discriminant image",
+            "ambient O(L) row",
+            "coset splitting and transport",
+            "isotropic orbit representatives",
+        )
+        assert all(record["outcome"] == "returned" for record in written.records)
+        assert all(record["seconds"] >= 0 for record in written.records)
+        # The three stages the subgroup's row wraps name the subgroup; the ambient
+        # row inside them is the whole group's row, and says so.
+>       assert _record_named(written.records, "ambient O(L) row").endswith(" under O(L)")
+E       AssertionError: assert False
+E        +  where False = <built-in method endswith of str object at 0x7d1be23dfa60>(' under O(L)')
+E        +    where <built-in method endswith of str object at 0x7d1be23dfa60> = 'rank-1 subobject row of a rank-5 lattice under O(L) #c8a91d28303f0d60'.endswith
+E        +      where 'rank-1 subobject row of a rank-5 lattice under O(L) #c8a91d28303f0d60' = _record_named(({'stage': 'discriminant image', 'input': 'rank-1 subobject row of a rank-5 lattice under the subgroup with rho_L(g) i...1cc62570a2026c61', 'commit': '1cc248135c6d292ab69359f0089af8f8f0c5377c', 'run': '20261115T114020387271Z-1889057', ...}), 'ambient O(L) row')
+E        +        where ({'stage': 'discriminant image', 'input': 'rank-1 subobject row of a rank-5 lattice under the subgroup with rho_L(g) i...1cc62570a2026c61', 'commit': '1cc248135c6d292ab69359f0089af8f8f0c5377c', 'run': '20261115T114020387271Z-1889057', ...}) = RecordFile(name='stages-1cc248135c6d-20261115T114020387271Z-1889057.jsonl', kind='stages', suffix='jsonl', commit='1cc....164494+00:00', 'finished': '2026-11-15T11:40:21.510050+00:00', 'seconds': 0.3455542500014417, 'outcome': 'returned'})).records
+
+tests/engineering/test_the_timing_record_names_each_stage.py:102: AssertionError
+------------------------------ Captured log call -------------------------------
+INFO     sage_extensions.timing:timing.py:261 discriminant image
+INFO     sage_extensions.timing:timing.py:261 ambient O(L) row
+INFO     sage_extensions.timing:timing.py:261 coset splitting and transport
+INFO     sage_extensions.timing:timing.py:261 isotropic orbit representatives
+_______________ test_the_two_rows_of_one_lattice_are_named_apart _______________
+
+>   return self._cached_methods[name]
+E   KeyError: 'description'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_the_two_rows_of_one_lattice_are_named_apart():
+        r"""The ``Õ`` row and the ``Õ⁺`` row of one lattice carry two names.
+    
+        ``Õ(L)`` is the discriminant kernel and ``Õ⁺(L)`` its intersection with the
+        spinor kernel, and the two rows are different computations of one lattice.
+        Each row's name holds the description its subgroup states for itself
+        (:meth:`sage_extensions.categories.group.groups.Subgroups.ParentMethods.description`)
+        -- the preimage sentence, and the intersection sentence -- which is what a
+        reader of the line is told about the group the row is taken under.
+        """
+        lattice = _small_lattice()
+        stable = lattice.stable_orthogonal_group()
+        positive = stable.intersection(lattice.O_plus())
+        kernel_row = stage_records_of(lambda: stable.isotropic_orbit_representatives(1))
+        positive_row = stage_records_of(lambda: positive.isotropic_orbit_representatives(1))
+    
+        kernel_name = _record_named(kernel_row.records, "discriminant image")
+        positive_name = _record_named(positive_row.records, "discriminant image")
+    
+>       assert stable.description() in kernel_name
+               ^^^^^^^^^^^^^^^^^^
+
+tests/engineering/test_the_timing_record_names_each_stage.py:134: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    ???
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: 'PreimageSubgroups.parent_class' object has no attribute 'description'
+
+sage/cpython/getattr.pyx:362: AttributeError
+------------------------------ Captured log call -------------------------------
+INFO     sage_extensions.timing:timing.py:261 discriminant image
+INFO     sage_extensions.timing:timing.py:261 ambient O(L) row
+INFO     sage_extensions.timing:timing.py:261 coset splitting and transport
+INFO     sage_extensions.timing:timing.py:261 isotropic orbit representatives
+INFO     sage_extensions.timing:timing.py:261 discriminant image
+INFO     sage_extensions.timing:timing.py:261 ambient O(L) row
+INFO     sage_extensions.timing:timing.py:261 coset splitting and transport
+INFO     sage_extensions.timing:timing.py:261 isotropic orbit representatives
+_______ test_a_stage_record_carries_the_id_of_the_stage_that_encloses_it _______
+
+    def test_a_stage_record_carries_the_id_of_the_stage_that_encloses_it():
+        r"""Three nested stages, each record carrying its own ``id`` and its parent's.
+    
+        A cusp chamber opens the walk of its subgroup, which asks for a point of its
+        own, which runs the full group's walk: ``cusp chamber``, then ``controlling
+        vector``, then a ``Vinberg walk`` inside it.  So the call's records are three
+        levels deep, and each record's ``parent`` is the ``id`` of the record that
+        encloses it, which a reader uses to find a stage's sub-stages.
+        """
+        cusp, _second = _two_cusps()
+        written = stage_records_of(lambda: cusp.cusp_chamber(max_decompositions=20))
+    
+>       identities = tuple(record["id"] for record in written.records)
+                     ^^^^^
+
+tests/engineering/test_the_timing_record_names_each_stage.py:151: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+.0 = <tuple_iterator object at 0x7d1bc2ecf520>
+
+>   identities = tuple(record["id"] for record in written.records)
+                       ^^^^^^^^^^^^
+E   KeyError: 'id'
+
+tests/engineering/test_the_timing_record_names_each_stage.py:151: KeyError
+------------------------------ Captured log call -------------------------------
+INFO     sage_extensions.timing:timing.py:261 Vinberg walk
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:830 Elementwise module morphism Module over Fraction Field of Integer Ring on Classes in the multilinear tensor presentation -> Module over Fraction Field of Integer Ring on Fraction Field of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+INFO     sage_extensions.timing:timing.py:261 controlling vector
+INFO     sage_extensions.timing:timing.py:261 Vinberg walk
+INFO     sage_extensions.timing:timing.py:261 cusp chamber
+____________ test_an_integer_keyword_argument_is_named_not_refused _____________
+
+    def test_an_integer_keyword_argument_is_named_not_refused():
+        r"""``cusp_chamber(max_decompositions=ZZ(200))`` writes a record naming the bound.
+    
+        ``ZZ(200)`` is this library's integer and not Python's, and the keyword
+        arguments are written by their own ``repr``, so the bound is in the name and
+        no value is refused for its type.
+        """
+        cusp, _second = _two_cusps()
+>       written = stage_records_of(lambda: cusp.cusp_chamber(max_decompositions=ZZ(200)))
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/engineering/test_the_timing_record_names_each_stage.py:182: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/engineering/conftest.py:297: in stage_records_of
+    invoke()
+tests/engineering/test_the_timing_record_names_each_stage.py:182: in <lambda>
+    written = stage_records_of(lambda: cusp.cusp_chamber(max_decompositions=ZZ(200)))
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/timing.py:320: in timed
+    with stage(name, input(*arguments, **keywords)):
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/isotropic_orbits.py:2819: in <lambda>
+    input=lambda self, *arguments, **keywords: _cusp_record_name(self, *arguments, **keywords),
+                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/isotropic_orbits.py:2392: in _cusp_record_name
+    return record_name(
+src/sage_extensions/categories/_lattice.py:1512: in record_name
+    {key: _canonical(keywords[key]) for key in sorted(keywords)},
+          ^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+value = 200
+
+    def _canonical(value):
+        r"""The canonical form of one record input: plain data, exact, never rendered.
+    
+        Every kind this repository's long rows are computed on is stated here, and a
+        value of no stated kind raises: a record name that fell back to a rendering
+        would be a name that changes with a display and identifies nothing, which is
+        the failure this function exists to remove.
+    
+        * a **lattice** is its base ring and its Gram entries, as the ring's own
+          elements; a **subobject** is its ambient lattice and its generators'
+          coordinates there, which is what tells two planes of one lattice apart;
+        * a **vector** is its coordinates in its lattice's basis;
+        * a **character subgroup** is its conditions and their targets, recursively;
+          a **generated subgroup** is its generators, each read through the group's
+          engine, which prints its images on the module's letters -- the matrix; the
+          whole group is itself, since its lattice is the caller's other input;
+        * a **cusp** (an isotropic reduction image) is its lattice, its isotropic
+          vector and its subgroup;
+        * a **callable** is its qualified name and its captured values, because two
+          filters of one name that are asked at two cusps are two filters.
+        """
+        from sage_extensions.categories.group.groups import GeneratedSubgroups, OwnedGroups
+        from sage_extensions.categories.group.predicate_subgroups import PredicateSubgroups
+        from sage_extensions.categories.isotropic_orbits import IsotropicVectorReductionImage
+        from sage_extensions.categories.lattices import Lattices
+    
+        if value is None or isinstance(value, (bool, int, str)):
+            return value
+        if isinstance(value, (list, tuple)):
+            return [_canonical(item) for item in value]
+        if isinstance(value, (set, frozenset)):
+            return sorted((_canonical(item) for item in value), key=repr)
+        if isinstance(value, dict):
+            return {str(key): _canonical(value[key]) for key in sorted(value, key=str)}
+        if isinstance(value, Lattices.ParentMethods):
+            return _canonical_lattice(value)
+        if isinstance(value, Lattices.ElementMethods):
+            return ["vector", _coordinates(value)]
+        if isinstance(value, IsotropicVectorReductionImage):
+            return [
+                "cusp",
+                _canonical_lattice(value.lattice()),
+                _coordinates(value.vector()),
+                _canonical_group(value.subgroup()),
+            ]
+        if isinstance(value, PredicateSubgroups.ParentMethods):
+            return _canonical_group(value)
+        if isinstance(value, GeneratedSubgroups.ParentMethods):
+            return _canonical_group(value)
+        if isinstance(value, OwnedGroups.ParentMethods):
+            return ["the whole group"]
+        if callable(value):
+            return [
+                "callable",
+                value.__qualname__,
+                [_canonical(_cell_contents(cell)) for cell in value.__closure__ or ()],
+            ]
+>       raise TypeError(
+            f"{value!r} of {type(value).__name__} has no canonical form for a record name: state its "
+            "kind in sage_extensions.categories._lattice._canonical, because a rendering here is a "
+            "name that identifies nothing"
+        )
+E       TypeError: 200 of _OwnedRingParent_with_category.element_class has no canonical form for a record name: state its kind in sage_extensions.categories._lattice._canonical, because a rendering here is a name that identifies nothing
+
+src/sage_extensions/categories/_lattice.py:1579: TypeError
+=============================== warnings summary ===============================
+tests/engineering/test_the_timing_record_names_each_stage.py: 30 warnings
+  /repos/vinal/src/sage/vinal.py:193: PendingDeprecationWarning: the matrix subclass is not the recommended way to represent matrices or deal with linear algebra (see https://docs.scipy.org/doc/numpy/user/numpy-for-matlab-users.html). Please adjust your code to use regular ndarray.
+    m2 = np.dot( np.dot(g, s.M), g.transpose())
+
+tests/engineering/test_the_timing_record_names_each_stage.py: 30 warnings
+  /repos/vinal/src/sage/vinal.py:194: PendingDeprecationWarning: the matrix subclass is not the recommended way to represent matrices or deal with linear algebra (see https://docs.scipy.org/doc/numpy/user/numpy-for-matlab-users.html). Please adjust your code to use regular ndarray.
+    m1 = np.dot( np.dot( Matrix(a), s.M), g.transpose() )
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/engineering/test_the_timing_record_names_each_stage.py::test_a_stage_timed_call_writes_its_stage_records_in_order_with_their_durations
+FAILED tests/engineering/test_the_timing_record_names_each_stage.py::test_the_two_rows_of_one_lattice_are_named_apart
+FAILED tests/engineering/test_the_timing_record_names_each_stage.py::test_a_stage_record_carries_the_id_of_the_stage_that_encloses_it
+FAILED tests/engineering/test_the_timing_record_names_each_stage.py::test_an_integer_keyword_argument_is_named_not_refused
+4 failed, 5 passed, 60 warnings in 9.94s
+[peakrss] round8-tests-at-base: child waited=1 shell_code=1 samples=7
+[peakrss] peak tree RSS      : 824 MiB
+[peakrss] low-water MemAvail : 13283 MiB
+[peakrss] peak single VmHWM  : 826 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      518 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    10.0s procs=  6 rss=   824 MiB hwm=   826 MiB avail= 13283 MiB
+[peakrss]   t=    12.0s procs=  5 rss=   761 MiB hwm=   762 MiB avail= 13313 MiB
+[peakrss]   t=     8.0s procs=  4 rss=   560 MiB hwm=   562 MiB avail= 13412 MiB
+[peakrss]   t=     6.0s procs=  3 rss=   510 MiB hwm=   510 MiB avail= 13527 MiB
+[peakrss]   t=     4.0s procs=  3 rss=   484 MiB hwm=   484 MiB avail= 13536 MiB

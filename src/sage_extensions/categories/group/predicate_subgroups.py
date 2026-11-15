@@ -334,18 +334,6 @@ class PredicateSubgroups(OwnedParameterizedCategory):
             )
             return self._selected_schreier_augmentation(words)
 
-        def character_data(self) -> dict:
-            r"""Return the character conditions this subgroup was constructed with.
-
-            ``determinant_kernel``, ``spinor_kernel`` and ``discriminant_preimages``
-            are the conditions; each holds the datum its name states -- a truth
-            value for a kernel, the finite subgroups whose preimages are met for a
-            preimage.  The data is the constructing call's, held and not computed,
-            and it is what a timing record uses to tell one character subgroup
-            from another (:func:`sage_extensions.categories._lattice.record_name`).
-            """
-            return dict(self._character_data)
-
         def _character_data_snapshot(self):
             r"""Return private finite-character representation metadata."""
             return dict(self._character_data)
@@ -902,6 +890,22 @@ class PredicateSubgroups(OwnedParameterizedCategory):
                     continue
                 incidences.append(candidate)
             return finite_ordered_set(tuple(incidences))
+
+        def description(self) -> str:
+            r"""Return this subgroup's own name: the condition that cuts it out.
+
+            Every construction of this owner states one clause -- ``sn_RR(g) =
+            1`` for ``O^+(L)``, ``rho_L(g) lies in ...`` for a preimage, ``g
+            lies in every selected subgroup`` for an intersection -- and the
+            clause is the whole of what a reader is told about the subgroup
+            without rendering it.  The rendering is not this: ``_repr_`` prints
+            the clause beside the ambient group, and an orthogonal group prints
+            its whole module, so two subgroups of one ``O(L)`` render alike past
+            any clamp.
+
+            Read by :func:`sage_extensions.categories._lattice._group_label`.
+            """
+            return f"the subgroup where {self._description}"
 
         def _repr_(self):
             return f"{{g in {self.supergroup()} : {self._description}}}"

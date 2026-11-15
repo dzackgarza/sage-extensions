@@ -1,0 +1,346 @@
+provider SHA: 1cc248135c6d292ab69359f0089af8f8f0c5377c
+.FFF                                                                     [100%]
+=================================== FAILURES ===================================
+_________ test_vinberg_enumeration_closes_the_polyhedron_of_u_plus_a1 __________
+
+>   return cache[k]
+E   KeyError: ((None, None, 200, None), ())
+
+sage/misc/cachefunc.pyx:1965: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_vinberg_enumeration_closes_the_polyhedron_of_u_plus_a1() -> None:
+        r"""The search on \(U\oplus A_1\) completes, which certifies reflectivity.
+    
+        Each wall of the fundamental polyhedron is the mirror of a root, so each
+        accepted vector is a root, its reflection is an involution of \(O(L)\)
+        negating it, and its length obeys Vinberg's bound.  The verdict is card
+        `0026`'s ``hyperbolic.reflective``, and the lattice is checked to be that
+        card's lattice by its Gram.
+        """
+        stated = card_0026()
+        lattice = u_plus_a1()
+>       roots = lattice.vinberg_simple_roots(max_decompositions=200)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/lattices/test_reflection_hyperbolic.sage:74: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/hyperbolic_lattices.py:1323: in vinberg_simple_roots
+    _complete, roots = self._vinberg_search(
+sage/misc/cachefunc.pyx:1970: in sage.misc.cachefunc.CachedMethodCaller.__call__
+    ???
+sage/misc/cachefunc.pyx:1848: in sage.misc.cachefunc.CachedMethodCaller._instance_call
+    ???
+src/sage_extensions/categories/hyperbolic_lattices.py:1219: in _vinberg_search
+    _vinberg_walk_record_name(
+src/sage_extensions/categories/hyperbolic_lattices.py:192: in _vinberg_walk_record_name
+    return record_name(
+src/sage_extensions/categories/_lattice.py:1512: in record_name
+    {key: _canonical(keywords[key]) for key in sorted(keywords)},
+          ^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+value = 200
+
+    def _canonical(value):
+        r"""The canonical form of one record input: plain data, exact, never rendered.
+    
+        Every kind this repository's long rows are computed on is stated here, and a
+        value of no stated kind raises: a record name that fell back to a rendering
+        would be a name that changes with a display and identifies nothing, which is
+        the failure this function exists to remove.
+    
+        * a **lattice** is its base ring and its Gram entries, as the ring's own
+          elements; a **subobject** is its ambient lattice and its generators'
+          coordinates there, which is what tells two planes of one lattice apart;
+        * a **vector** is its coordinates in its lattice's basis;
+        * a **character subgroup** is its conditions and their targets, recursively;
+          a **generated subgroup** is its generators, each read through the group's
+          engine, which prints its images on the module's letters -- the matrix; the
+          whole group is itself, since its lattice is the caller's other input;
+        * a **cusp** (an isotropic reduction image) is its lattice, its isotropic
+          vector and its subgroup;
+        * a **callable** is its qualified name and its captured values, because two
+          filters of one name that are asked at two cusps are two filters.
+        """
+        from sage_extensions.categories.group.groups import GeneratedSubgroups, OwnedGroups
+        from sage_extensions.categories.group.predicate_subgroups import PredicateSubgroups
+        from sage_extensions.categories.isotropic_orbits import IsotropicVectorReductionImage
+        from sage_extensions.categories.lattices import Lattices
+    
+        if value is None or isinstance(value, (bool, int, str)):
+            return value
+        if isinstance(value, (list, tuple)):
+            return [_canonical(item) for item in value]
+        if isinstance(value, (set, frozenset)):
+            return sorted((_canonical(item) for item in value), key=repr)
+        if isinstance(value, dict):
+            return {str(key): _canonical(value[key]) for key in sorted(value, key=str)}
+        if isinstance(value, Lattices.ParentMethods):
+            return _canonical_lattice(value)
+        if isinstance(value, Lattices.ElementMethods):
+            return ["vector", _coordinates(value)]
+        if isinstance(value, IsotropicVectorReductionImage):
+            return [
+                "cusp",
+                _canonical_lattice(value.lattice()),
+                _coordinates(value.vector()),
+                _canonical_group(value.subgroup()),
+            ]
+        if isinstance(value, PredicateSubgroups.ParentMethods):
+            return _canonical_group(value)
+        if isinstance(value, GeneratedSubgroups.ParentMethods):
+            return _canonical_group(value)
+        if isinstance(value, OwnedGroups.ParentMethods):
+            return ["the whole group"]
+        if callable(value):
+            return [
+                "callable",
+                value.__qualname__,
+                [_canonical(_cell_contents(cell)) for cell in value.__closure__ or ()],
+            ]
+>       raise TypeError(
+            f"{value!r} of {type(value).__name__} has no canonical form for a record name: state its "
+            "kind in sage_extensions.categories._lattice._canonical, because a rendering here is a "
+            "name that identifies nothing"
+        )
+E       TypeError: 200 of _OwnedRingParent_with_category.element_class has no canonical form for a record name: state its kind in sage_extensions.categories._lattice._canonical, because a rendering here is a name that identifies nothing
+
+src/sage_extensions/categories/_lattice.py:1579: TypeError
+_________________________ test_u_plus_a1_is_reflective _________________________
+
+>   return cache[k]
+E   KeyError: ((None, None, 200, None), ())
+
+sage/misc/cachefunc.pyx:1965: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_u_plus_a1_is_reflective() -> None:
+        r"""\(U\oplus A_1\) is reflective, by card `0026`'s certified field.
+    
+        The Vinberg search on this lattice completes, and the verdict it returns is
+        compared with the card's rather than typed.
+        """
+        stated = card_0026()
+        lattice = u_plus_a1()
+    
+>       assert lattice.is_reflective(max_decompositions=200) is bool(stated["reflective"])
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/lattices/test_reflection_hyperbolic.sage:103: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/hyperbolic_lattices.py:1371: in is_reflective
+    complete, _roots = self._vinberg_search(controlling_vector, max_roots, max_decompositions)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:1970: in sage.misc.cachefunc.CachedMethodCaller.__call__
+    w = self._instance_call(*args, **kwds)
+sage/misc/cachefunc.pyx:1848: in sage.misc.cachefunc.CachedMethodCaller._instance_call
+    return self.f(self._instance, *args, **kwds)
+src/sage_extensions/categories/hyperbolic_lattices.py:1219: in _vinberg_search
+    _vinberg_walk_record_name(
+src/sage_extensions/categories/hyperbolic_lattices.py:192: in _vinberg_walk_record_name
+    return record_name(
+src/sage_extensions/categories/_lattice.py:1512: in record_name
+    {key: _canonical(keywords[key]) for key in sorted(keywords)},
+          ^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+value = 200
+
+    def _canonical(value):
+        r"""The canonical form of one record input: plain data, exact, never rendered.
+    
+        Every kind this repository's long rows are computed on is stated here, and a
+        value of no stated kind raises: a record name that fell back to a rendering
+        would be a name that changes with a display and identifies nothing, which is
+        the failure this function exists to remove.
+    
+        * a **lattice** is its base ring and its Gram entries, as the ring's own
+          elements; a **subobject** is its ambient lattice and its generators'
+          coordinates there, which is what tells two planes of one lattice apart;
+        * a **vector** is its coordinates in its lattice's basis;
+        * a **character subgroup** is its conditions and their targets, recursively;
+          a **generated subgroup** is its generators, each read through the group's
+          engine, which prints its images on the module's letters -- the matrix; the
+          whole group is itself, since its lattice is the caller's other input;
+        * a **cusp** (an isotropic reduction image) is its lattice, its isotropic
+          vector and its subgroup;
+        * a **callable** is its qualified name and its captured values, because two
+          filters of one name that are asked at two cusps are two filters.
+        """
+        from sage_extensions.categories.group.groups import GeneratedSubgroups, OwnedGroups
+        from sage_extensions.categories.group.predicate_subgroups import PredicateSubgroups
+        from sage_extensions.categories.isotropic_orbits import IsotropicVectorReductionImage
+        from sage_extensions.categories.lattices import Lattices
+    
+        if value is None or isinstance(value, (bool, int, str)):
+            return value
+        if isinstance(value, (list, tuple)):
+            return [_canonical(item) for item in value]
+        if isinstance(value, (set, frozenset)):
+            return sorted((_canonical(item) for item in value), key=repr)
+        if isinstance(value, dict):
+            return {str(key): _canonical(value[key]) for key in sorted(value, key=str)}
+        if isinstance(value, Lattices.ParentMethods):
+            return _canonical_lattice(value)
+        if isinstance(value, Lattices.ElementMethods):
+            return ["vector", _coordinates(value)]
+        if isinstance(value, IsotropicVectorReductionImage):
+            return [
+                "cusp",
+                _canonical_lattice(value.lattice()),
+                _coordinates(value.vector()),
+                _canonical_group(value.subgroup()),
+            ]
+        if isinstance(value, PredicateSubgroups.ParentMethods):
+            return _canonical_group(value)
+        if isinstance(value, GeneratedSubgroups.ParentMethods):
+            return _canonical_group(value)
+        if isinstance(value, OwnedGroups.ParentMethods):
+            return ["the whole group"]
+        if callable(value):
+            return [
+                "callable",
+                value.__qualname__,
+                [_canonical(_cell_contents(cell)) for cell in value.__closure__ or ()],
+            ]
+>       raise TypeError(
+            f"{value!r} of {type(value).__name__} has no canonical form for a record name: state its "
+            "kind in sage_extensions.categories._lattice._canonical, because a rendering here is a "
+            "name that identifies nothing"
+        )
+E       TypeError: 200 of _OwnedRingParent_with_category.element_class has no canonical form for a record name: state its kind in sage_extensions.categories._lattice._canonical, because a rendering here is a name that identifies nothing
+
+src/sage_extensions/categories/_lattice.py:1579: TypeError
+_ test_the_edgewalk_and_vinbergs_algorithm_agree_that_u_plus_a1_is_reflective __
+
+>   return cache[k]
+E   KeyError: ((None, None, 200, None), ())
+
+sage/misc/cachefunc.pyx:1965: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_the_edgewalk_and_vinbergs_algorithm_agree_that_u_plus_a1_is_reflective() -> None:
+        r"""Both decide reflectivity of \(U\oplus A_1\) as card `0026` states it.
+    
+        The two routes are independent — the edgewalk terminates on every input and
+        Vinberg's search only on a certificate — so their agreement with the card is
+        two measurements of the same verdict.  The walls the edgewalk reports are
+        roots whose reflections are involutions of \(O(L)\).
+        """
+        stated = card_0026()
+        lattice = u_plus_a1()
+    
+        assert lattice.edgewalk_is_reflective() is bool(stated["reflective"])
+>       assert lattice.is_reflective(max_decompositions=200) is bool(stated["reflective"])
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/lattices/test_reflection_hyperbolic.sage:118: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/hyperbolic_lattices.py:1371: in is_reflective
+    complete, _roots = self._vinberg_search(controlling_vector, max_roots, max_decompositions)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:1970: in sage.misc.cachefunc.CachedMethodCaller.__call__
+    w = self._instance_call(*args, **kwds)
+sage/misc/cachefunc.pyx:1848: in sage.misc.cachefunc.CachedMethodCaller._instance_call
+    return self.f(self._instance, *args, **kwds)
+src/sage_extensions/categories/hyperbolic_lattices.py:1219: in _vinberg_search
+    _vinberg_walk_record_name(
+src/sage_extensions/categories/hyperbolic_lattices.py:192: in _vinberg_walk_record_name
+    return record_name(
+src/sage_extensions/categories/_lattice.py:1512: in record_name
+    {key: _canonical(keywords[key]) for key in sorted(keywords)},
+          ^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+value = 200
+
+    def _canonical(value):
+        r"""The canonical form of one record input: plain data, exact, never rendered.
+    
+        Every kind this repository's long rows are computed on is stated here, and a
+        value of no stated kind raises: a record name that fell back to a rendering
+        would be a name that changes with a display and identifies nothing, which is
+        the failure this function exists to remove.
+    
+        * a **lattice** is its base ring and its Gram entries, as the ring's own
+          elements; a **subobject** is its ambient lattice and its generators'
+          coordinates there, which is what tells two planes of one lattice apart;
+        * a **vector** is its coordinates in its lattice's basis;
+        * a **character subgroup** is its conditions and their targets, recursively;
+          a **generated subgroup** is its generators, each read through the group's
+          engine, which prints its images on the module's letters -- the matrix; the
+          whole group is itself, since its lattice is the caller's other input;
+        * a **cusp** (an isotropic reduction image) is its lattice, its isotropic
+          vector and its subgroup;
+        * a **callable** is its qualified name and its captured values, because two
+          filters of one name that are asked at two cusps are two filters.
+        """
+        from sage_extensions.categories.group.groups import GeneratedSubgroups, OwnedGroups
+        from sage_extensions.categories.group.predicate_subgroups import PredicateSubgroups
+        from sage_extensions.categories.isotropic_orbits import IsotropicVectorReductionImage
+        from sage_extensions.categories.lattices import Lattices
+    
+        if value is None or isinstance(value, (bool, int, str)):
+            return value
+        if isinstance(value, (list, tuple)):
+            return [_canonical(item) for item in value]
+        if isinstance(value, (set, frozenset)):
+            return sorted((_canonical(item) for item in value), key=repr)
+        if isinstance(value, dict):
+            return {str(key): _canonical(value[key]) for key in sorted(value, key=str)}
+        if isinstance(value, Lattices.ParentMethods):
+            return _canonical_lattice(value)
+        if isinstance(value, Lattices.ElementMethods):
+            return ["vector", _coordinates(value)]
+        if isinstance(value, IsotropicVectorReductionImage):
+            return [
+                "cusp",
+                _canonical_lattice(value.lattice()),
+                _coordinates(value.vector()),
+                _canonical_group(value.subgroup()),
+            ]
+        if isinstance(value, PredicateSubgroups.ParentMethods):
+            return _canonical_group(value)
+        if isinstance(value, GeneratedSubgroups.ParentMethods):
+            return _canonical_group(value)
+        if isinstance(value, OwnedGroups.ParentMethods):
+            return ["the whole group"]
+        if callable(value):
+            return [
+                "callable",
+                value.__qualname__,
+                [_canonical(_cell_contents(cell)) for cell in value.__closure__ or ()],
+            ]
+>       raise TypeError(
+            f"{value!r} of {type(value).__name__} has no canonical form for a record name: state its "
+            "kind in sage_extensions.categories._lattice._canonical, because a rendering here is a "
+            "name that identifies nothing"
+        )
+E       TypeError: 200 of _OwnedRingParent_with_category.element_class has no canonical form for a record name: state its kind in sage_extensions.categories._lattice._canonical, because a rendering here is a name that identifies nothing
+
+src/sage_extensions/categories/_lattice.py:1579: TypeError
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:830 Elementwise module morphism Module over Fraction Field of Integer Ring on Classes in the multilinear tensor presentation -> Module over Fraction Field of Integer Ring on Fraction Field of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+=========================== short test summary info ============================
+FAILED tests/lattices/test_reflection_hyperbolic.sage::test_vinberg_enumeration_closes_the_polyhedron_of_u_plus_a1
+FAILED tests/lattices/test_reflection_hyperbolic.sage::test_u_plus_a1_is_reflective
+FAILED tests/lattices/test_reflection_hyperbolic.sage::test_the_edgewalk_and_vinbergs_algorithm_agree_that_u_plus_a1_is_reflective
+3 failed, 1 passed in 2.05s
+[peakrss] reflection_hyperbolic_main: child waited=1 shell_code=1 samples=3
+[peakrss] peak tree RSS      : 342 MiB
+[peakrss] low-water MemAvail : 11584 MiB
+[peakrss] peak single VmHWM  : 342 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      331 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     4.0s procs=  3 rss=   342 MiB hwm=   342 MiB avail= 12739 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   279 MiB hwm=   280 MiB avail= 11584 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     2 MiB hwm=     2 MiB avail= 11762 MiB

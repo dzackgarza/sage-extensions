@@ -298,35 +298,6 @@ class NamedLattices:
         return _C([[0, 0, 49], [0, 49, 7], [49, 7, 3]]).twist(-1)
 
 
-def catalogue_lattice_name(lattice) -> str | None:
-    r"""The name ``NamedLattices`` holds ``lattice`` under, or ``None``.
-
-    ``NamedLattices``' entries are ``lazy_class_attribute`` singletons: the class
-    body holds each entry's descriptor until the entry is first read, and the
-    lattice itself afterwards.  This function is the catalogue's own read of its
-    own class body, so it looks there and builds nothing: an entry nobody has
-    read yet is a descriptor and is not the object handed in.  The body's
-    definition order decides between aliases, and ``U`` stands before ``H``.
-
-    Identity is the relation the catalogue promises: ``Lattices(ZZ)("U")`` is
-    equal to ``NamedLattices.U`` and is not it, so a lattice built again from the
-    same presentation has no catalogue name and answers ``None``.
-
-    EXAMPLES::
-
-        sage: from sage_extensions.catalogue import NamedLattices, catalogue_lattice_name
-        sage: from sage_extensions.categories.lattices import Lattices
-        sage: catalogue_lattice_name(NamedLattices.Tco)
-        'Tco'
-        sage: catalogue_lattice_name(Lattices(ZZ)("U")) is None
-        True
-    """
-    for name, entry in tuple(vars(NamedLattices).items()):
-        if entry is lattice:
-            return name
-    return None
-
-
 def _catalogue_entry(name):
     r"""``Lattices.<name>``: the catalogue entry itself, read on first access."""
 

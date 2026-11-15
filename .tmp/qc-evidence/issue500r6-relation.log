@@ -1,0 +1,131 @@
+=== the precedence relation on the classes the walk reaches: irreflexive, antisymmetric, transitive where measured
+=== tree: 6e51d33
+=== probe: issue500r6-relation.py (33 object/level pairs, one seed) and issue500r6-extension.py (14 objects x 3 levels x seeds 0 and 4)
+=== relation:
+=== run PYTHONHASHSEED=0
+### seed 0
+{"obj": "ZZ", "attr": "ParentMethods", "providers": 30, "self": [], "self-count": 0, "symmetric": [], "symmetric-count": 0, "untransitive": []}
+{"obj": "ZZ", "attr": "ElementMethods", "providers": 12, "self": [], "self-count": 0, "symmetric": [], "symmetric-count": 0, "untransitive": []}
+{"obj": "ZZ", "attr": "MorphismMethods", "providers": 0, "self": [], "self-count": 0, "symmetric": [], "symmetric-count": 0, "untransitive": []}
+{"obj": "QQ(i)", "attr": "ParentMethods", "providers": 34, "self": [], "self-count": 0, "symmetric": [], "symmetric-count": 0, "untransitive": []}
+{"obj": "QQ(i)", "attr": "ElementMethods", "providers": 13, "self": [], "self-count": 0, "symmetric": [], "symmetric-count": 0, "untransitive": []}
+{"obj": "QQ(i)", "attr": "MorphismMethods", "providers": 0, "self": [], "self-count": 0, "symmetric": [], "symmetric-count": 0, "untransitive": []}
+{"obj": "ZZ**2", "attr": "ParentMethods", "providers": 11, "self": [], "self-count": 0, "symmetric": [], "symmetric-count": 0, "untransitive": []}
+{"obj": "ZZ**2", "attr": "ElementMethods", "providers": 5, "self": [], "self-count": 0, "symmetric": [], "symmetric-count": 0, "untransitive": []}
+{"obj": "ZZ**2", "attr": "MorphismMethods", "providers": 0, "self": [], "self-count": 0, "symmetric": [], "symmetric-count": 0, "untransitive": []}
+{"obj": "Zmod(8)**2", "attr": "ParentMethods", "providers": 12, "self": [], "self-count": 0, "symmetric": [], "symmetric-count": 0, "untransitive": []}
+{"obj": "Zmod(8)**2", "attr": "ElementMethods", "providers": 5, "self": [], "self-count": 0, "symmetric": [], "symmetric-count": 0, "untransitive": []}
+{"obj": "Zmod(8)**2", "attr": "MorphismMethods", "providers": 0, "self": [], "self-count": 0, "symmetric": [], "symmetric-count": 0, "untransitive": []}
+{"obj": "ZZ[x]", "attr": "ParentMethods", "providers": 29, "self": [], "self-count": 0, "symmetric": [], "symmetric-count": 0, "untransitive": []}
+{"obj": "ZZ[x]", "attr": "ElementMethods", "providers": 13, "self": [], "self-count": 0, "symmetric": [], "symmetric-count": 0, "untransitive": []}
+{"obj": "ZZ[x]", "attr": "MorphismMethods", "providers": 0, "self": [], "self-count": 0, "symmetric": [], "symmetric-count": 0, "untransitive": []}
+{"obj": "ZZ[x,y]", "attr": "ParentMethods", "providers": 29, "self": [], "self-count": 0, "symmetric": [], "symmetric-count": 0, "untransitive": []}
+{"obj": "ZZ[x,y]", "attr": "ElementMethods", "providers": 13, "self": [], "self-count": 0, "symmetric": [], "symmetric-count": 0, "untransitive": []}
+{"obj": "ZZ[x,y]", "attr": "MorphismMethods", "providers": 0, "self": [], "self-count": 0, "symmetric": [], "symmetric-count": 0, "untransitive": []}
+{"obj": "ZZ**NN", "attr": "ParentMethods", "providers": 7, "self": [], "self-count": 0, "symmetric": [], "symmetric-count": 0, "untransitive": []}
+{"obj": "ZZ**NN", "attr": "ElementMethods", "providers": 5, "self": [], "self-count": 0, "symmetric": [], "symmetric-count": 0, "untransitive": []}
+{"obj": "ZZ**NN", "attr": "MorphismMethods", "providers": 0, "self": [], "self-count": 0, "symmetric": [], "symmetric-count": 0, "untransitive": []}
+{"obj": "M_2(QQ) regular", "attr": "ParentMethods", "providers": 10, "self": [], "self-count": 0, "symmetric": [], "symmetric-count": 0, "untransitive": []}
+{"obj": "M_2(QQ) regular", "attr": "ElementMethods", "providers": 5, "self": [], "self-count": 0, "symmetric": [], "symmetric-count": 0, "untransitive": []}
+{"obj": "M_2(QQ) regular", "attr": "MorphismMethods", "providers": 0, "self": [], "self-count": 0, "symmetric": [], "symmetric-count": 0, "untransitive": []}
+{"obj": "Lattices(ZZ)(2)", "attr": "ParentMethods", "providers": 19, "self": [], "self-count": 0, "symmetric": [], "symmetric-count": 0, "untransitive": []}
+{"obj": "Lattices(ZZ)(2)", "attr": "ElementMethods", "providers": 7, "self": [], "self-count": 0, "symmetric": [], "symmetric-count": 0, "untransitive": []}
+{"obj": "Lattices(ZZ)(2)", "attr": "MorphismMethods", "providers": 0, "self": [], "self-count": 0, "symmetric": [], "symmetric-count": 0, "untransitive": []}
+{"obj": "Zmod(4)[x]", "attr": "ParentMethods", "providers": 26, "self": [], "self-count": 0, "symmetric": [], "symmetric-count": 0, "untransitive": []}
+{"obj": "Zmod(4)[x]", "attr": "ElementMethods", "providers": 13, "self": [], "self-count": 0, "symmetric": [], "symmetric-count": 0, "untransitive": []}
+{"obj": "Zmod(4)[x]", "attr": "MorphismMethods", "providers": 0, "self": [], "self-count": 0, "symmetric": [], "symmetric-count": 0, "untransitive": []}
+{"obj": "ZZ[x]/(x^2)", "attr": "ParentMethods", "providers": 25, "self": [], "self-count": 0, "symmetric": [], "symmetric-count": 0, "untransitive": []}
+{"obj": "ZZ[x]/(x^2)", "attr": "ElementMethods", "providers": 11, "self": [], "self-count": 0, "symmetric": [], "symmetric-count": 0, "untransitive": []}
+{"obj": "ZZ[x]/(x^2)", "attr": "MorphismMethods", "providers": 0, "self": [], "self-count": 0, "symmetric": [], "symmetric-count": 0, "untransitive": []}
+=== seed 0 launcher exit: 0
+=== linear extension: whether each order puts a pair the relation orders the wrong way round
+=== run PYTHONHASHSEED=0
+### seed 0
+{"obj": "ZZ", "attr": "ParentMethods", "providers": 30, "new-violations": [], "old-violations": []}
+{"obj": "ZZ", "attr": "ElementMethods", "providers": 12, "new-violations": [], "old-violations": []}
+{"obj": "ZZ", "attr": "MorphismMethods", "providers": 0, "new-violations": [], "old-violations": []}
+{"obj": "QQ", "attr": "ParentMethods", "providers": 29, "new-violations": [], "old-violations": []}
+{"obj": "QQ", "attr": "ElementMethods", "providers": 12, "new-violations": [], "old-violations": []}
+{"obj": "QQ", "attr": "MorphismMethods", "providers": 0, "new-violations": [], "old-violations": []}
+{"obj": "QQ(i)", "attr": "ParentMethods", "providers": 34, "new-violations": [], "old-violations": []}
+{"obj": "QQ(i)", "attr": "ElementMethods", "providers": 13, "new-violations": [], "old-violations": []}
+{"obj": "QQ(i)", "attr": "MorphismMethods", "providers": 0, "new-violations": [], "old-violations": []}
+{"obj": "Zmod(8)", "attr": "ParentMethods", "providers": 23, "new-violations": [], "old-violations": []}
+{"obj": "Zmod(8)", "attr": "ElementMethods", "providers": 9, "new-violations": [], "old-violations": []}
+{"obj": "Zmod(8)", "attr": "MorphismMethods", "providers": 0, "new-violations": [], "old-violations": []}
+{"obj": "GF(9)", "attr": "ParentMethods", "providers": 29, "new-violations": [], "old-violations": []}
+{"obj": "GF(9)", "attr": "ElementMethods", "providers": 11, "new-violations": [], "old-violations": []}
+{"obj": "GF(9)", "attr": "MorphismMethods", "providers": 0, "new-violations": [], "old-violations": []}
+{"obj": "ZZ**2", "attr": "ParentMethods", "providers": 11, "new-violations": [], "old-violations": []}
+{"obj": "ZZ**2", "attr": "ElementMethods", "providers": 5, "new-violations": [], "old-violations": []}
+{"obj": "ZZ**2", "attr": "MorphismMethods", "providers": 0, "new-violations": [], "old-violations": []}
+{"obj": "Zmod(8)**2", "attr": "ParentMethods", "providers": 12, "new-violations": [], "old-violations": []}
+{"obj": "Zmod(8)**2", "attr": "ElementMethods", "providers": 5, "new-violations": [], "old-violations": []}
+{"obj": "Zmod(8)**2", "attr": "MorphismMethods", "providers": 0, "new-violations": [], "old-violations": []}
+{"obj": "ZZ[x]", "attr": "ParentMethods", "providers": 29, "new-violations": [], "old-violations": []}
+{"obj": "ZZ[x]", "attr": "ElementMethods", "providers": 13, "new-violations": [], "old-violations": []}
+{"obj": "ZZ[x]", "attr": "MorphismMethods", "providers": 0, "new-violations": [], "old-violations": []}
+{"obj": "ZZ[x,y]", "attr": "ParentMethods", "providers": 29, "new-violations": [], "old-violations": []}
+{"obj": "ZZ[x,y]", "attr": "ElementMethods", "providers": 13, "new-violations": [], "old-violations": []}
+{"obj": "ZZ[x,y]", "attr": "MorphismMethods", "providers": 0, "new-violations": [], "old-violations": []}
+{"obj": "ZZ**NN", "attr": "ParentMethods", "providers": 7, "new-violations": [], "old-violations": []}
+{"obj": "ZZ**NN", "attr": "ElementMethods", "providers": 5, "new-violations": [], "old-violations": []}
+{"obj": "ZZ**NN", "attr": "MorphismMethods", "providers": 0, "new-violations": [], "old-violations": []}
+{"obj": "M_2(QQ) regular", "attr": "ParentMethods", "providers": 10, "new-violations": [], "old-violations": []}
+{"obj": "M_2(QQ) regular", "attr": "ElementMethods", "providers": 5, "new-violations": [], "old-violations": []}
+{"obj": "M_2(QQ) regular", "attr": "MorphismMethods", "providers": 0, "new-violations": [], "old-violations": []}
+{"obj": "Lattices(ZZ)(2)", "attr": "ParentMethods", "providers": 19, "new-violations": [], "old-violations": []}
+{"obj": "Lattices(ZZ)(2)", "attr": "ElementMethods", "providers": 7, "new-violations": [], "old-violations": []}
+{"obj": "Lattices(ZZ)(2)", "attr": "MorphismMethods", "providers": 0, "new-violations": [], "old-violations": []}
+{"obj": "Zmod(4)[x]", "attr": "ParentMethods", "providers": 26, "new-violations": [], "old-violations": []}
+{"obj": "Zmod(4)[x]", "attr": "ElementMethods", "providers": 13, "new-violations": [], "old-violations": []}
+{"obj": "Zmod(4)[x]", "attr": "MorphismMethods", "providers": 0, "new-violations": [], "old-violations": []}
+{"obj": "ZZ[x]/(x^2)", "attr": "ParentMethods", "providers": 25, "new-violations": [], "old-violations": []}
+{"obj": "ZZ[x]/(x^2)", "attr": "ElementMethods", "providers": 11, "new-violations": [], "old-violations": []}
+{"obj": "ZZ[x]/(x^2)", "attr": "MorphismMethods", "providers": 0, "new-violations": [], "old-violations": []}
+=== seed 0 launcher exit: 0
+=== run PYTHONHASHSEED=4
+### seed 4
+{"obj": "ZZ", "attr": "ParentMethods", "providers": 30, "new-violations": [], "old-violations": []}
+{"obj": "ZZ", "attr": "ElementMethods", "providers": 12, "new-violations": [], "old-violations": []}
+{"obj": "ZZ", "attr": "MorphismMethods", "providers": 0, "new-violations": [], "old-violations": []}
+{"obj": "QQ", "attr": "ParentMethods", "providers": 29, "new-violations": [], "old-violations": []}
+{"obj": "QQ", "attr": "ElementMethods", "providers": 12, "new-violations": [], "old-violations": []}
+{"obj": "QQ", "attr": "MorphismMethods", "providers": 0, "new-violations": [], "old-violations": []}
+{"obj": "QQ(i)", "attr": "ParentMethods", "providers": 34, "new-violations": [], "old-violations": []}
+{"obj": "QQ(i)", "attr": "ElementMethods", "providers": 13, "new-violations": [], "old-violations": []}
+{"obj": "QQ(i)", "attr": "MorphismMethods", "providers": 0, "new-violations": [], "old-violations": []}
+{"obj": "Zmod(8)", "attr": "ParentMethods", "providers": 23, "new-violations": [], "old-violations": []}
+{"obj": "Zmod(8)", "attr": "ElementMethods", "providers": 9, "new-violations": [], "old-violations": []}
+{"obj": "Zmod(8)", "attr": "MorphismMethods", "providers": 0, "new-violations": [], "old-violations": []}
+{"obj": "GF(9)", "attr": "ParentMethods", "providers": 29, "new-violations": [], "old-violations": []}
+{"obj": "GF(9)", "attr": "ElementMethods", "providers": 11, "new-violations": [], "old-violations": []}
+{"obj": "GF(9)", "attr": "MorphismMethods", "providers": 0, "new-violations": [], "old-violations": []}
+{"obj": "ZZ**2", "attr": "ParentMethods", "providers": 11, "new-violations": [], "old-violations": []}
+{"obj": "ZZ**2", "attr": "ElementMethods", "providers": 5, "new-violations": [], "old-violations": []}
+{"obj": "ZZ**2", "attr": "MorphismMethods", "providers": 0, "new-violations": [], "old-violations": []}
+{"obj": "Zmod(8)**2", "attr": "ParentMethods", "providers": 12, "new-violations": [], "old-violations": []}
+{"obj": "Zmod(8)**2", "attr": "ElementMethods", "providers": 5, "new-violations": [], "old-violations": []}
+{"obj": "Zmod(8)**2", "attr": "MorphismMethods", "providers": 0, "new-violations": [], "old-violations": []}
+{"obj": "ZZ[x]", "attr": "ParentMethods", "providers": 29, "new-violations": [], "old-violations": []}
+{"obj": "ZZ[x]", "attr": "ElementMethods", "providers": 13, "new-violations": [], "old-violations": []}
+{"obj": "ZZ[x]", "attr": "MorphismMethods", "providers": 0, "new-violations": [], "old-violations": []}
+{"obj": "ZZ[x,y]", "attr": "ParentMethods", "providers": 29, "new-violations": [], "old-violations": []}
+{"obj": "ZZ[x,y]", "attr": "ElementMethods", "providers": 13, "new-violations": [], "old-violations": []}
+{"obj": "ZZ[x,y]", "attr": "MorphismMethods", "providers": 0, "new-violations": [], "old-violations": []}
+{"obj": "ZZ**NN", "attr": "ParentMethods", "providers": 7, "new-violations": [], "old-violations": []}
+{"obj": "ZZ**NN", "attr": "ElementMethods", "providers": 5, "new-violations": [], "old-violations": []}
+{"obj": "ZZ**NN", "attr": "MorphismMethods", "providers": 0, "new-violations": [], "old-violations": []}
+{"obj": "M_2(QQ) regular", "attr": "ParentMethods", "providers": 10, "new-violations": [], "old-violations": []}
+{"obj": "M_2(QQ) regular", "attr": "ElementMethods", "providers": 5, "new-violations": [], "old-violations": []}
+{"obj": "M_2(QQ) regular", "attr": "MorphismMethods", "providers": 0, "new-violations": [], "old-violations": []}
+{"obj": "Lattices(ZZ)(2)", "attr": "ParentMethods", "providers": 19, "new-violations": [], "old-violations": []}
+{"obj": "Lattices(ZZ)(2)", "attr": "ElementMethods", "providers": 7, "new-violations": [], "old-violations": []}
+{"obj": "Lattices(ZZ)(2)", "attr": "MorphismMethods", "providers": 0, "new-violations": [], "old-violations": []}
+{"obj": "Zmod(4)[x]", "attr": "ParentMethods", "providers": 26, "new-violations": [], "old-violations": []}
+{"obj": "Zmod(4)[x]", "attr": "ElementMethods", "providers": 13, "new-violations": [], "old-violations": []}
+{"obj": "Zmod(4)[x]", "attr": "MorphismMethods", "providers": 0, "new-violations": [], "old-violations": []}
+{"obj": "ZZ[x]/(x^2)", "attr": "ParentMethods", "providers": 25, "new-violations": [], "old-violations": []}
+{"obj": "ZZ[x]/(x^2)", "attr": "ElementMethods", "providers": 11, "new-violations": [], "old-violations": []}
+{"obj": "ZZ[x]/(x^2)", "attr": "MorphismMethods", "providers": 0, "new-violations": [], "old-violations": []}
+=== seed 4 launcher exit: 0

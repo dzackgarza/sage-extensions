@@ -683,10 +683,13 @@ class FramedFreeModules(OwnedCategoryOverBaseRing):
         def _torsion_freeness_decision(self) -> bool:
             r"""A free module over a ring is torsion-free.
 
-            An element is torsion when a non-zero-divisor kills it, which is
-            the submodule $\ker(M \to \operatorname{Frac}(R) \otimes_R M)$
-            where the fraction field exists -- Stacks Project, Definition
-            \S 15.22.1 and Lemma \S 15.22.2.  A free module has none: a frame
+            An element is torsion when a non-zero-divisor kills it
+            (``Submodule.torsion``, ``Mathlib/Algebra/Module/Torsion/Basic.lean``
+            module docstring), which over a domain is the submodule
+            $\ker(M \to \operatorname{Frac}(R) \otimes_R M)$ where the fraction
+            field exists (Stacks, Definition 15.22.1 and Lemma 15.22.2, Tags
+            0536 and 0537 -- both stated for a domain, which is the case where
+            the fraction field exists).  A free module has none: a frame
             is linearly independent, so $r \sum_s a_s e_s = \sum_s (r a_s) e_s
             = 0$ reads $r a_s = 0$ for every $s$, and a non-zero-divisor kills
             no nonzero coefficient.

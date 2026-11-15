@@ -1,0 +1,120 @@
+base: tree a71272a row 232.364 s calib 0.164 s decided True 5448 functions 448757911 calls
+main: tree cff6a3a row 520.007 s calib 0.162 s decided False 5350 functions 1408289407 calls
+
+ONE OF THE TABLES IS TRUNCATED (decided=False).  Its call counts are the calls that
+completed, not the row's, and are not comparable with the other tree's; only the
+per-call cost of an entry is readable, and the printed ranking says so below.
+
+sum of own time over all functions: base 232.2 s, main 519.5 s (the rows' own exclusive time)
+sum of call counts:                base 448757911, main 1408289407 (3.14x)
+
+=== own time that grew between the trees (functions whose own time is up, floor 0.02 s) ===
+  file:line                                         function                       base own main own    delta base calls main calls  x calls
+  sage_extensions/categories/sets/set_categories.py __call__                         10.514   75.238  +64.724   13609692  124658275     9.16
+  sage_extensions/categories/sets/set_categories.py __contains__                      5.286   37.644  +32.357   12837044  115435562     8.99
+  sage_extensions/categories/sets/set_categories.py _element_constructor_             4.257   34.418  +30.161    8719195   79868191     9.16
+  sage_extensions/categories/abstract_categories/mo Of                                1.636   15.466  +13.829     378987    5067557    13.37
+  sage_extensions/categories/sets/set_categories.py __init__                          1.986   11.556   +9.570    4663939   44729798     9.59
+  ~:0                                               <built-in method builtins.get     1.648   11.001   +9.352    4233398   26680101     6.30
+  sage_extensions/categories/sets/set_categories.py __int__                           1.145   10.464   +9.319    9006163   82329036     9.14
+  sage/.venv/lib/python3.14/site-packages/sage/cate __classcall__                     9.015   18.153   +9.138   14729598   37673426     2.56
+  sage/.venv/lib/python3.14/site-packages/sage/cate is_subcategory                    0.774    8.533   +7.759    1908654   29855053    15.64
+  sage_extensions/categories/abstract_categories/mo base_category                     0.543    8.023   +7.480    2146970   38651637    18.00
+  sage_extensions/owned_category.py:857             _subcategory_hook_                0.489    6.258   +5.769    1891342   29839711    15.78
+  sage_extensions/categories/abstract_categories/mo __init__                          0.183    5.331   +5.148      41218    1666953    40.44
+  sage_extensions/categories/abstract_categories/mo _cached_between                   0.453    5.405   +4.953     274131    5041317    18.39
+  sage_extensions/categories/abstract_categories/mo __call__                          0.711    5.620   +4.908     972134    9629628     9.91
+  sage_extensions/categories/abstract_categories/mo _copy_operation_metadata          0.400    4.734   +4.334     199609    3363877    16.85
+  sage_extensions/categories/sets/finite_ordered_se _element_constructor_             0.531    4.734   +4.202     233962    2531251    10.82
+  sage_extensions/categories/abstract_categories/mo _asked_of_the_category            0.352    4.535   +4.183     176299    3355097    19.03
+  sage_extensions/categories/sets/set_categories.py <lambda>                          0.377    4.466   +4.090     765268   10393139    13.58
+  sage_extensions/refine.py:94                      __get__                           0.605    4.222   +3.617    2281447   21823246     9.57
+  sage_extensions/categories/abstract_categories/mo _category_mor                     0.096    3.635   +3.538      69248    3327473    48.05
+  sage_extensions/categories/abstract_categories/ar _require_base_morphisms           0.087    3.374   +3.287      33184    1663266    50.12
+  sage_extensions/categories/sets/set_categories.py point_at                          0.014    3.208   +3.193      18995    1247099    65.65
+  sage_extensions/categories/sets/set_categories.py position_of                       0.417    3.578   +3.161     720745    7481956    10.38
+  ~:0                                               <built-in method builtins.isi    13.974   17.105   +3.131   69980928  175513116     2.51
+  sage_extensions/categories/abstract_categories/mo _has_category_packet_surface      0.198    2.867   +2.669     475947    8404981    17.66
+  sage_extensions/categories/abstract_categories/mo category_packet                   0.240    2.775   +2.535     222793    5024278    22.55
+  sage_extensions/categories/sets/finite_ordered_se __contains__                      0.447    2.862   +2.416     758728    6297699     8.30
+  sage_extensions/categories/sets/set_categories.py component                         0.006    2.408   +2.403       1389     828880   596.75
+  sage_extensions/categories/abstract_categories/mo operation                         0.222    2.522   +2.301     199607    3363876    16.85
+  sage_extensions/categories/abstract_categories/ar _represented_morphism_categor     0.063    2.331   +2.269      32841    1663166    50.64
+  sage_extensions/categories/sets/set_categories.py index_set                         0.005    2.236   +2.231      10829    4974373   459.36
+  ~:0                                               <built-in method builtins.id>     0.328    2.517   +2.189    3403891   32405135     9.52
+  sage_extensions/categories/sets/indexed_families. _value_at_normalized_index        0.437    2.568   +2.131     213319    2064684     9.68
+  sage_extensions/categories/abstract_categories/mo Mor                               0.067    2.180   +2.113      74718    3329853    44.57
+  sage_extensions/categories/abstract_categories/mo MorCategory                       0.067    2.133   +2.066     119887    4998719    41.70
+  sage_extensions/categories/abstract_categories/mo <genexpr>                         0.136    2.181   +2.045     427828   10040322    23.47
+  sage/.venv/lib/python3.14/site-packages/sage/modu _element_constructor_             0.570    2.548   +1.979     189987    1116247     5.88
+  sage_extensions/categories/abstract_categories/mo mor_family                        0.059    1.875   +1.816     184674    6671403    36.13
+  sage_extensions/categories/abstract_categories/ar _isomorphism_from_known_inver     0.045    1.846   +1.801      33061    1663235    50.31
+  sage_extensions/categories/abstract_categories/mo _category_accepts_morphism        0.052    1.837   +1.785      69244    3327473    48.05
+
+=== call counts that grew between the trees (functions called more often) ===
+  file:line                                         function                       base own main own    delta base calls main calls  x calls
+  sage_extensions/categories/sets/set_categories.py __call__                         10.514   75.238  +64.724   13609692  124658275     9.16
+  ~:0                                               <built-in method builtins.isi    13.974   17.105   +3.131   69980928  175513116     2.51
+  sage_extensions/categories/sets/set_categories.py __contains__                      5.286   37.644  +32.357   12837044  115435562     8.99
+  sage_extensions/categories/sets/set_categories.py __int__                           1.145   10.464   +9.319    9006163   82329036     9.14
+  sage_extensions/categories/sets/set_categories.py _element_constructor_             4.257   34.418  +30.161    8719195   79868191     9.16
+  sage_extensions/categories/sets/set_categories.py __init__                          1.986   11.556   +9.570    4663939   44729798     9.59
+  sage_extensions/categories/abstract_categories/mo base_category                     0.543    8.023   +7.480    2146970   38651637    18.00
+  ~:0                                               <built-in method builtins.id>     0.328    2.517   +2.189    3403891   32405135     9.52
+  sage_extensions/owned_category.py:857             _subcategory_hook_                0.489    6.258   +5.769    1891342   29839711    15.78
+  sage/.venv/lib/python3.14/site-packages/sage/cate is_subcategory                    0.774    8.533   +7.759    1908654   29855053    15.64
+  sage/.venv/lib/python3.14/site-packages/sage/cate __classcall__                     9.015   18.153   +9.138   14729598   37673426     2.56
+  ~:0                                               <built-in method builtins.get     1.648   11.001   +9.352    4233398   26680101     6.30
+  sage_extensions/categories/sets/set_categories.py _normalize_admitted_element       0.183    1.426   +1.243    2249654   21816074     9.70
+  sage_extensions/refine.py:94                      __get__                           0.605    4.222   +3.617    2281447   21823246     9.57
+  ~:0                                               <built-in method builtins.set     0.109    1.504   +1.395     998333   16820482    16.85
+  ~:0                                               <method 'get' of 'dict' objec     0.587    2.232   +1.645    3596972   15108445     4.20
+  sage_extensions/categories/sets/set_categories.py <lambda>                          0.377    4.466   +4.090     765268   10393139    13.58
+  sage_extensions/categories/abstract_categories/mo <genexpr>                         0.136    2.181   +2.045     427828   10040322    23.47
+  sage_extensions/categories/abstract_categories/mo _mor_endpoint                     0.047    0.646   +0.599     637358   10102209    15.85
+  sage_extensions/categories/abstract_categories/mo forward                           0.114    0.966   +0.852     771775    9565711    12.39
+  sage_extensions/categories/abstract_categories/mo __call__                          0.711    5.620   +4.908     972134    9629628     9.91
+  sage_extensions/categories/sets/indexed_families. index_set                         0.070    1.268   +1.198     335615    8385044    24.98
+  sage_extensions/categories/abstract_categories/mo _has_category_packet_surface      0.198    2.867   +2.669     475947    8404981    17.66
+  sage_extensions/categories/sets/set_categories.py position_of                       0.417    3.578   +3.161     720745    7481956    10.38
+  sage/.venv/lib/python3.14/site-packages/sage/cate codomain                          0.186    1.805   +1.619     643236    7211404    11.21
+  sage/.venv/lib/python3.14/site-packages/sage/cate domain                            0.248    2.024   +1.776     671764    7216747    10.74
+  sage_extensions/categories/abstract_categories/mo mor_family                        0.059    1.875   +1.816     184674    6671403    36.13
+  sage_extensions/categories/sets/set_categories.py family                            0.002    0.954   +0.952      13134    5803641   441.88
+  sage_extensions/categories/sets/finite_ordered_se __contains__                      0.447    2.862   +2.416     758728    6297699     8.30
+  sage_extensions/categories/sets/cardinals.py:94/1 is_finite                         0.174    1.749   +1.575     407046    5657570    13.90
+  sage_extensions/categories/sets/finite_ordered_se index_set                         0.125    0.966   +0.841     564782    5638354     9.98
+  sage_extensions/categories/sets/set_categories.py index_set                         0.005    2.236   +2.231      10829    4974373   459.36
+  sage_extensions/categories/abstract_categories/ar base_category                     0.022    0.806   +0.784     104378    4991974    47.83
+  sage_extensions/categories/abstract_categories/mo MorCategory                       0.067    2.133   +2.066     119887    4998719    41.70
+  sage_extensions/categories/abstract_categories/mo category_packet                   0.240    2.775   +2.535     222793    5024278    22.55
+  sage_extensions/categories/abstract_categories/mo Mors                              0.037    0.465   +0.428     253031    5036289    19.90
+  sage_extensions/categories/abstract_categories/mo _cached_between                   0.453    5.405   +4.953     274131    5041317    18.39
+  sage_extensions/categories/abstract_categories/mo codomain_object                   0.122    1.264   +1.142     297034    5050521    17.00
+  sage_extensions/categories/abstract_categories/mo domain_object                     0.132    1.535   +1.403     297752    5050551    16.96
+  sage_extensions/categories/abstract_categories/mo Of                                1.636   15.466  +13.829     378987    5067557    13.37
+
+=== present at one tree only, by own time (a rename or a new call) ===
+  file:line                                         function                       base own main own    delta base calls main calls  x calls
+  sage/.venv/lib/python3.14/site-packages/sage/geom _init_Vrepresentation_from_pp     1.053    0.000   -1.053          6          0     0.00
+  sage_extensions/categories/isotropic_lifts.py:563 coefficients_at                   0.362    0.000   -0.362      13056          0     0.00
+  sage_extensions/categories/lattices.py:8461       eichler_transvection_matrix       0.271    0.000   -0.271       2432          0     0.00
+  sage_extensions/categories/lattices.py:8306       _eichler_transvection_column_     0.000    0.236   +0.236          0       1024      inf
+  sage_extensions/categories/algebras/algebras.py:1 __sub__                           0.000    0.225   +0.225          0     247808      inf
+  sage_extensions/refine.py:374                     _declaring_classes                0.000    0.176   +0.176          0       2393      inf
+  sage/.venv/lib/python3.14/site-packages/sage/geom _convert_constraint_to_ppl        0.157    0.000   -0.157       1529          0     0.00
+  sage_extensions/categories/modules/orbit_spans.py _rational_orbit_span              0.107    0.000   -0.107          1          0     0.00
+  sage_extensions/categories/modules/pure/modules.p image                             0.060    0.000   -0.060       1827          0     0.00
+  sage_extensions/refine.py:326                     _final_category_operations        0.000    0.055   +0.055          0       2393      inf
+  sage_extensions/refine.py:383                     _is_bookkeeping_or_hook           0.000    0.054   +0.054          0     265413      inf
+  sage/.venv/lib/python3.14/site-packages/sage/geom _set_data                         0.053    0.000   -0.053       3370          0     0.00
+  sage_extensions/categories/sets/finite_ordered_se points_have_a_hash                0.000    0.046   +0.046          0       1070      inf
+  sage_extensions/categories/isotropic_lifts.py:574 parameter_at                      0.043    0.000   -0.043       2432          0     0.00
+  sage_extensions/categories/polyhedral_cones.py:27 engine_row                        0.037    0.000   -0.037       1684          0     0.00
+  ~:0                                               <function Sequence_generic.__     0.036    0.000   -0.036     354644          0     0.00
+  sage_extensions/categories/polyhedral_cones.py:33 <genexpr>                         0.029    0.000   -0.029      85707          0     0.00
+  sage_extensions/categories/polyhedral_cones.py:53 _integral_covector                0.029    0.000   -0.029       1529          0     0.00
+  sage_extensions/categories/isotropic_lifts.py:372 _parameter_at                     0.000    0.021   +0.021          0       1024      inf
+
+a function whose own time grew at an unchanged call count is a dearer call; one whose
+call count grew is more calls.  Entries under 0.02 s at both trees are not ranked.

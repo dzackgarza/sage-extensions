@@ -37,10 +37,6 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from sage_extensions import timing as sage_timing
-from sage_extensions.categories._lattice import (
-    subgroup_record_name,
-    subobject_record_name,
-)
 
 SOURCE_TREE = Path(__file__).resolve().parents[2]
 PROBE_ROOT = SOURCE_TREE / ".tmp" / "plugin-probes"
@@ -184,8 +180,6 @@ def pytest_configure(config) -> None:
     """
     builtins.probe_run = probe_run
     builtins.stage_records_of = stage_records_of
-    builtins.subgroup_record_name = subgroup_record_name
-    builtins.subobject_record_name = subobject_record_name
     builtins.kept_test_run = kept_test_run
     builtins.simultaneous_test_runs = simultaneous_test_runs
 
@@ -194,8 +188,6 @@ def pytest_unconfigure(config) -> None:
     r"""Remove the session's abbreviation, leaving ``builtins`` as it was found."""
     del builtins.probe_run
     del builtins.stage_records_of
-    del builtins.subgroup_record_name
-    del builtins.subobject_record_name
     del builtins.kept_test_run
     del builtins.simultaneous_test_runs
 
@@ -239,15 +231,9 @@ def _sizes(directory: Path) -> dict[str, int]:
     }
 
 
-def _name_parts(name: str) -> tuple[str, str, str, str]:
-    r"""``<kind>-<commit>-<start>-<pid>.<suffix>``, split into its four parts."""
-    stem, _, suffix = name.partition(".")
-    kind, commit, stamp = stem.split("-", 2)
-    return kind, commit, stamp, suffix
-
-
 RECORD_NAME = re.compile(
-    r"[-\w]+-(?P<commit>[0-9a-f]{12})-(?P<start>\d{8}T\d{12}Z)-(?P<pid>\d+)\.[a-z]+"
+    r"(?P<kind>[-\w]+)-(?P<commit>[0-9a-f]{12})-(?P<start>\d{8}T\d{12}Z)-(?P<pid>\d+)"
+    r"\.(?P<suffix>[a-z]+)"
 )
 r"""A record file's whole name: kind, commit, start, pid and suffix.
 
@@ -258,25 +244,41 @@ failure.
 """
 
 
-def _stamp_of(name: str) -> tuple[float, str]:
-    r"""A record file's start, as a wall clock, and the pid its stamp ends with."""
+def _record_name_parts(name: str):
+    r"""A record file's name matched by ``RECORD_NAME``: kind, commit, start, pid, suffix.
+
+    The one parse of a record's name: every reader -- the start's moment, the
+    pid, the kind, the commit, the suffix -- asks here, so a name cannot be read
+    one way by the selection and another by the reader, and a file that is not a
+    record's is refused once rather than handled by each reader.
+    """
     parts = RECORD_NAME.fullmatch(name)
     assert parts is not None, f"{name} is not the name of a timing record"
+    return parts
+
+
+def _stamp_of(name: str) -> tuple[float, str]:
+    r"""A record file's start, as a wall clock, and the pid its stamp ends with."""
+    parts = _record_name_parts(name)
     moment = datetime.strptime(parts["start"], "%Y%m%dT%H%M%S%fZ").replace(tzinfo=timezone.utc)
     return moment.timestamp(), parts["pid"]
 
 
 def _record_file(path: Path, *, after: int = 0) -> RecordFile:
     r"""The file at ``path``, read by its name and by the lines past ``after``."""
-    kind, commit, stamp, suffix = _name_parts(path.name)
+    parts = _record_name_parts(path.name)
     return RecordFile(
         name=path.name,
-        kind=kind,
-        suffix=suffix,
-        commit=commit,
-        stamp=stamp,
+        kind=parts["kind"],
+        suffix=parts["suffix"],
+        commit=parts["commit"],
+        stamp=parts["start"] + "-" + parts["pid"],
         head=_head_commit(),
-        records=sage_timing.read_stage_records(path, after=after) if suffix == "jsonl" else (),
+        records=(
+            sage_timing.read_stage_records(path, after=after)
+            if parts["suffix"] == "jsonl"
+            else ()
+        ),
     )
 
 
@@ -315,11 +317,10 @@ def _kept_by(directory: Path, probe: ProbeRun) -> tuple[Path, ...]:
     """
     selected = []
     for name in sorted(_sizes(directory)):
-        parts = RECORD_NAME.fullmatch(name)
-        if parts is None:
+        if RECORD_NAME.fullmatch(name) is None:
             continue
-        start = datetime.strptime(parts["start"], "%Y%m%dT%H%M%S%fZ").replace(tzinfo=timezone.utc)
-        if parts["pid"] == str(probe.pid) and start.timestamp() >= probe.launched:
+        start, pid = _stamp_of(name)
+        if pid == str(probe.pid) and start >= probe.launched:
             selected.append(directory / name)
     return tuple(selected)
 
