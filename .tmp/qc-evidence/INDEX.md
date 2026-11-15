@@ -1854,3 +1854,19 @@ first ambient class, because on main that input is what does not return.
 | `501-answering-level.log` | this round's tree, `probe501b.py` | the class declaring each of twelve operations, for the parent and the element class, on the same 25 objects: identical to `500e-answering-level-tree.log`'s list, so the three deletions in `algebras.py` moved no answer |
 | `501-tests.log` | this round's commits | the five files of #500/#530 under the repository addopts: **14 passed in 1.34 s** |
 | `501-algebras-tree.log`, `501-algebras-b61.log`, `501-algebras-compared.log`, `501-algebras-ids.log` | this tree and `b61feeb`, both with the change | `tests/algebras`, one pytest process each: **45 failed, 44 passed, 124 errors in 32.78 s** against **45 failed, 44 passed, 124 errors in 32.64 s**, **0 FAILED/ERROR ids only on either side**. The same directory on `27d76f3` has 21 ids fewer, so those 21 are main's and predate this round: their root exception on `test_power_algebras.sage` is `RecursionError: maximum recursion depth exceeded` through `objects.py:172`, `set_categories.py:532` and `ring_foundation.py:6651`, reached while an exterior or divided power algebra of a torsion module is built. Open, and not repaired here |
+
+## #528, second round: are the lift tests more numerous, or dearer?
+
+`204ffbb96e` corrected the integral locus' Smith reading *and* replaced its per-class test: the
+old test formed, per class, `eichler_transvection_matrix(f, s(a)) * base_images` with
+`base_images` computed once for the lattice; the new one composes the owned isometries,
+`eichler_transvection(f, s(a)) * base_point()`, and asks the composition for its
+`integral_restriction`. The two explanations have different owners, so one probe counts both.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `issue528-lift-test-cost.py` | base `a71272add9`, `204ffbb96e` | the probe: one file, run unchanged on both trees. It calls the same public entry at both, `IsotropicReductionLiftTorsors.integral_parameter_classes()`, on the commit's own control `U(2) + U(2) + <2>` (the one where #405 reproduced: 64 classes reported, 32 lifting), wraps by name the calls the test can make (`eichler_transvection`, `eichler_transvection_matrix`, `integral_restriction`, `is_integral_on`, `_preimage_or_none`, `factor_through_or_none`, `_fraction_equality_status`, `_lift_at`, `parameterization`, `base_point`, `_target_section`) and reports a name a tree does not have as absent rather than as zero. Its `row` mode runs the same instrumentation over T_Co's ambient plane row, capped, and prints the counts whether the row returns or not |
+| `issue528-lift-cost-base-control.log` | base `a71272add9` | the control: locus **0.042 s**, **2** classes tested, each by `eichler_transvection_matrix` -- **20.97 ms a test**, no composition, no `integral_restriction` |
+| `issue528-lift-cost-204ffbb-control.log` | `204ffbb96e` | the same control: locus **0.165 s**, **8** classes tested, each by `_lift_at` (composition) -- **20.6 ms a test**. On the rank-5 control the count went up 4x and the per-test cost did **not** move: the control alone would have said the cost is owed |
+| `issue528-lift-costs-base-row.log` | base `a71272add9` | T_Co's ambient plane row, **61.3 s and decided**: **1536 lift tests**, `eichler_transvection_matrix` 3.43 s in total, **2.23 ms a test**, `parameterization` 0.63 s over 5 calls |
+| `issue528-lift-costs-204ffbb-row.log` | `204ffbb96e` | the same row, capped at 240 s and **not returned**: **1362 lift tests**, `_lift_at` **183.67 s of the 240** -- **134.9 ms a test**, of which `eichler_transvection` is 40.29 s (29.6 ms), so **105 ms a test is the composition and the integral restriction**. The count is the same order as the base's 1536 (the base finished its whole row with it); the per-test cost is **61x**. The question is decided for dearer tests, and the rank-5 control was the wrong input to decide it on |
