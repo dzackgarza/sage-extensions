@@ -4970,14 +4970,9 @@ class PresentedAlgebraMor(_AlgebraMorCommonMethods, UnitalMultiplicativeAlgebraM
         so this is cached.
 
         The arrow is the element map fixing every element, as
-        :meth:`AlgebraMor.identity` builds it.  Reading the engine's own
-        identity hom instead fixes the right map but names the engine ring's
-        endpoints, and those are not this algebra's whenever the algebra is its
-        own presentation ring: the semigroup algebra of a free monoid is the
-        polynomial ring, and the presented arrow class refuses an engine map
-        whose endpoints are that ring rather than the algebra built on it.  It
-        must not query the selected generator resolution either: free algebras
-        use this identity as the augmentation of their own degree-zero
+        :meth:`AlgebraMor.identity` builds it, so its endpoints are this Mor's
+        two objects.  It reads no selected generator resolution: a free algebra
+        uses this identity as the augmentation of its own degree-zero
         resolution while that resolution is being installed.
         """
         if self.domain() is not self.codomain():

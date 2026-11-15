@@ -114,7 +114,7 @@ class AffineSemigroupAlgebras(OwnedCategoryOverBaseRing):
                 tuple(int(entry) for entry in coordinates[label]): int(ranking(label))
                 for label in labels
             }
-            assert len(positions) == len(tuple(labels)), (
+            assert len(positions) == labels.cardinality(), (
                 f"{self} presents two of its generators at one lattice point, "
                 "so its monomials are not indexed by their exponent vectors"
             )
