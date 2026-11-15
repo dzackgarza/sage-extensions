@@ -2,19 +2,23 @@ r"""Which category level answers the operations a refinement rebuilds a class fo
 
 Refining an object into another category rebuilds its class with the categories
 it now reaches, and when two of those levels declare the same operation the
-rebuild keeps the one the final category order names.  Three operations answer
-that way, each measured here by what it returns.
+rebuild keeps the one the final category order names.
 
-``QQ(i)`` is the object all three act on: an algebra over ``QQ`` that is also a
-finitely generated framed free module, a module with a chosen finite
+``QQ(i)`` is the object two of these act on: an algebra over ``QQ`` that is
+also a finitely generated framed free module, a module with a chosen finite
 presentation, and an infinite ring.
 
 * ``order_ideal`` is ``Modules.ElementMethods.order_ideal`` -- the image of the
   linear functionals -- not the coordinate reading of
-  ``FramedFreeModules.ElementMethods.order_ideal``.
-* ``__iter__`` is ``OwnedRings.ParentMethods.__iter__``, which enumerates a ring
-  only among finite sets, not the fair coordinate enumeration of
-  ``FramedFreeModules.FinitelyGenerated.ParentMethods``.
+  ``FramedFreeModules.ElementMethods.order_ideal``.  On ``QQ(i)`` the two agree,
+  so that example states the level only in its docstring; the value that tells
+  them apart is in
+  ``tests/modules/test_the_order_ideal_of_a_ring_element_over_its_base_ring.sage``,
+  where the module's dual is a product and only the module level can read it.
+* ``__iter__`` is ``OwnedRings.Finite.ParentMethods.__iter__``, which enumerates
+  a *finite* ring's points through its selected engine; ``QQ(i)`` is not finite,
+  so it states no enumeration of its points and no level of this rebuild gives
+  it one.
 * ``adic_completion`` is ``OwnedRings.ParentMethods.adic_completion``, the
   ring's inverse limit, not the module's base change to the completed scalar
   ring of ``ModulesWithChosenFinitePresentation.ParentMethods``.
@@ -32,8 +36,9 @@ def test_the_module_level_states_the_order_ideal_of_an_algebra_element() -> None
     $\mathbf{Q}(i)$: it is the ideal the values of the linear functionals at the
     element generate, and $1 + i \neq 0$ makes it the unit ideal of
     $\mathbf{Q}$.  The level is stated because the framed free module's
-    coordinate reading states an ideal of the same ring as well, so the returned
-    ideal alone does not say which of the two answered.
+    coordinate reading states an ideal of the same ring as well, and here both
+    readings give the same ideal -- so this value alone does not say which of
+    the two answered.
     """
     field = QuadraticField(-1)
     element = field(1 + field.primitive_element())
@@ -41,20 +46,25 @@ def test_the_module_level_states_the_order_ideal_of_an_algebra_element() -> None
     assert element.order_ideal() == QQ.ideal(1)
 
 
-def test_an_infinite_ring_states_no_enumeration_of_its_points() -> None:
-    r"""$\mathbf{Q}(i)$ is not finite, so ``__iter__`` refuses instead of enumerating.
+def test_a_finite_ring_enumerates_its_points_through_its_engine() -> None:
+    r"""$\mathbf{Z}/8$ is finite, so it states its eight residue classes.
 
-    ``OwnedRings.ParentMethods.__iter__`` answers: a ring enumerates its points
-    through its selected engine when it is placed among finite sets, and
-    $\mathbf{Q}(i)$ is infinite.  The framed free module's enumeration of
-    coordinate tuples over $\{1, i\}$ would hand back an iterator instead of
-    refusing, so the refusal is the statement that the ring's points are not
-    enumerated at all.
+    ``OwnedRings.Finite.ParentMethods.__iter__`` answers.  The ring has eight
+    points, each an element of it and each different from the others, and the
+    classes of $0, \ldots, 7$ are exactly those eight points: the enumeration
+    is of the ring's whole underlying set, not of a generating family of it.
     """
-    field = QuadraticField(-1)
+    ring = Zmod(8)
+    points = tuple(ring)
 
-    with pytest.raises(TypeError):
-        iter(field)
+    assert int(sum(1 for _ in points)) == int(ring.cardinality())
+    assert all(point in ring for point in points)
+    assert all(
+        point != other
+        for position, point in enumerate(points)
+        for other in points[:position]
+    )
+    assert all(ring(residue) in points for residue in range(8))
 
 
 def test_the_ring_states_the_completion_of_the_field_at_the_zero_ideal() -> None:

@@ -3555,6 +3555,46 @@ class OwnedRings(CategoryPacketMethods, OwnedCategory):
             r"""Hopkins–Levitzki: a left Artinian unital ring is left Noetherian."""
             return [OwnedRings().Noetherian()]
 
+    class Finite(CategoryWithAxiom):
+        r"""Finite rings: the underlying set of the ring is finite.
+
+        A finite ring is placed among the finite sets, and it is exactly the
+        rings whose points are enumerated by the engine that realizes them.
+        Enumerating the points of a ring is stated here rather than on the
+        general ring category: an infinite ring's points are not a finite
+        iteration, so the general ring states no enumeration of them at all
+        (``STY-48``, ``STY-89``).
+        """
+
+        @classmethod
+        def _repr_object_names(cls):
+            return "finite rings"
+
+        def an_object(self):
+            r"""The field of two elements."""
+            return GF(2)
+
+        def extra_super_categories(self):
+            r"""A finite ring's underlying set is finite."""
+            return [owned_sets.FiniteSets()]
+
+        class ParentMethods:
+            def __iter__(self):
+                r"""Enumerate the points of the ring through its selected engine.
+
+                The ring is a finite set, so its points are all the values of
+                the engine that realizes it, each read back as an element of
+                this ring.  Ring adjunction syntax is implemented by
+                ``__getitem__`` and is not an enumeration protocol, so this is
+                the ring's whole enumeration of its points.
+                """
+                engine = self._selected_engine_ring()
+                if engine is None or engine is self:
+                    raise TypeError(
+                        f"cannot enumerate {self}: no selected finite engine enumeration is available"
+                    )
+                return iter(_owned_engine_element(self, point) for point in engine)
+
     class Commutative(CategoryWithAxiom):
         r"""Commutative unital rings in the owned mathematical graph."""
 
@@ -4279,22 +4319,25 @@ class OwnedRings(CategoryPacketMethods, OwnedCategory):
 
     class ParentMethods:
         def __iter__(self):
-            r"""Enumerate the points of a finite owned ring through its selected engine.
+            r"""A ring states no enumeration of its points unless it is finite.
 
-            Ring adjunction syntax is implemented by ``__getitem__`` and is
-            not an enumeration protocol. For a finite ring, the selected
-            engine already enumerates the underlying points; expose those
-            points as owned elements instead of allowing Python's sequence
-            fallback to repeatedly return the ring itself.
+            The enumeration of a finite ring's points is stated where the
+            finiteness is: :class:`OwnedRings.Finite`, whose selected engine
+            supplies the finite iteration.  A ring outside that axiom has no
+            such iteration, and the refusal is not a gap in an enumeration the
+            ring otherwise has -- an infinite ring's points are not a finite
+            iteration.
+
+            It is stated here rather than left absent because ``__getitem__``
+            is the adjunction syntax ``R[x_1, ..., x_n]``, not an index into a
+            sequence, and Python's sequence fallback would read that
+            construction as iteration: ``ZZ['x'][0]`` is the ring itself, so
+            the fallback would hand back the ring forever.
             """
-            from sage_extensions.categories.sets.set_categories import FiniteSets
-
-            if self not in FiniteSets():
-                raise TypeError(f"cannot enumerate {self}: it is not placed among finite sets")
-            engine = self._selected_engine_ring()
-            if engine is None or engine is self:
-                raise TypeError(f"cannot enumerate {self}: no selected finite engine enumeration is available")
-            return iter(_owned_engine_element(self, point) for point in engine)
+            raise TypeError(
+                f"cannot enumerate {self}: it is not a finite ring, so its points are not a "
+                "finite iteration of its selected engine"
+            )
 
         def _coerce_map_from_(self, source):
             r"""Return the canonical map from ``source`` into this ring, where the ring states one.
@@ -6462,6 +6505,16 @@ class _OwnedRingParent(Parent):
             # above this one reach it through super().__init__.
             super().__init__(base=base, category=placement)
             realize_owned_category(self)
+
+            # A ring whose placement states a finite underlying set enumerates
+            # its points through its selected engine, and that is an axiom of
+            # the ring, not a method of the general ring category (STY-48).
+            # The placement states the finiteness -- the constructor's
+            # statement, never the engine's class (ARC-08).
+            if self in owned_sets.FiniteSets():
+                from sage_extensions.refine import refine as _refine_into_finite
+
+                _refine_into_finite(self, OwnedRings().Finite())
 
             # The primitive owned ring now exists as a Parent.  Cache every
             # canonical native ring before its regular module/algebra datum is
