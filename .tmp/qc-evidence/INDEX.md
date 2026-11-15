@@ -1520,6 +1520,7 @@ started from.  "The tree" is the working tree whose `src` and `tests` are
 | `500d-lattices-base.log` | `5f17b92fe7` | the same two files: the same ids |
 | `500d-extra-tree.log` | the tree of `1a53c51` | the seven files that read the dual, the order ideal or a lattice element: `test_lattice_semantic_api` 4 passed, `test_lattice_elements` 6, `test_named_lattice_constructions` 12, `test_hodge_calculus` 3, `test_hyperbolic_space` 3 failed, `test_all_ones_form_correlation` 2 passed, `test_infinite_form_duality` 2 failed |
 | `500d-extra-base.log` | `5f17b92fe7` | the same seven, id for id |
+| `500d-merge-check.log` | `7232ec0` (the merged tree; the file is `7a35416`'s, from the #285/#312 chat) | `tests/lattices/test_the_isotropic_reduction_image.sage`'s five new cusp-chamber tests under this issue's changes: **5 passed in 942.10 s**, the chamber test 938.17 s past the 20 s call gate (`--no-time-gates`, as `7a35416` measured 907.97 s). The whole file run without `-k` was cut at a 1500 s cap after eleven tests had passed and none failed |
 
 The probe sources behind the `500d-*` measurement logs are session probes, not
 library code, and stay out of the tree: each prints the rings, the values and the
