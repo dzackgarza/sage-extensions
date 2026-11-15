@@ -2683,15 +2683,17 @@ class _TensorConstructor:
                 f"tensor.from_matrix needs a matrix over {ring}; {matrix!r} lies in "
                 f"{parent}, which is not a space of matrices"
             )
+        from sage_extensions.categories.modules.pure.modules import _engine_matrix
+        from sage_extensions.categories.rings.ring_foundation import _owned_engine_element
+
+        # The engine matrix is the matrix's retained realization, row-major in
+        # the same label order; reading it is one engine call, not one owned
+        # coordinate evaluation per entry.
         return self(
             ring,
             (parent.nrows(),),
             (parent.ncols(),),
-            tuple(
-                matrix[row_label, column_label]
-                for row_label in parent.row_index_set()
-                for column_label in parent.column_index_set()
-            ),
+            tuple(_owned_engine_element(ring, entry) for entry in _engine_matrix(matrix).list()),
         )
 
     def from_morphism(self, morphism):

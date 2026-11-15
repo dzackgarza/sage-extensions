@@ -7343,7 +7343,9 @@ class MatrixSpaces(OwnedCategoryOverBaseRing):
                         for column, label in enumerate(labels)
                     }
                 ),
-                name=f"Kernel spanning family of {self}",
+                # The name is read only when the family is printed; printing the
+                # matrix (its endpoints' signatures) per kernel is not paid here.
+                name=lambda: f"Kernel spanning family of {self}",
             )
 
         def symmetrized_right_multiplication(self):

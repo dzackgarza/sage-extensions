@@ -33,7 +33,7 @@ class IndexedFamily[IndexT, ValueT]:
         value: Callable[[IndexT], ValueT] | Parent,
         *,
         value_category=None,
-        name: str | None = None,
+        name: str | Callable[[], str] | None = None,
         **rest,
     ) -> None:
         self._constant_value = value if isinstance(value, Parent) else None
@@ -280,7 +280,7 @@ class IndexedFamily[IndexT, ValueT]:
         self,
         function: Callable[[ValueT], MappedValueT],
         *,
-        name: str | None = None,
+        name: str | Callable[[], str] | None = None,
     ) -> IndexedFamily[IndexT, MappedValueT]:
         if not callable(function):
             raise TypeError(f"cannot map {function!r} over the family {self}: it is not callable")
@@ -381,7 +381,8 @@ class IndexedFamily[IndexT, ValueT]:
         )
 
         index_set = self.index_set()
-        label = self._name or "Indexed family"
+        name = self._name() if callable(self._name) else self._name
+        label = name or "Indexed family"
         if index_set in FiniteSets() and index_set in EnumeratedSets():
             size = int(index_set.cardinality().finite_value())
             shown = tuple(index_set) if size <= 12 else tuple(islice(index_set, 6))
@@ -390,7 +391,7 @@ class IndexedFamily[IndexT, ValueT]:
             )
             suffix = "" if size <= 12 else ", ..."
             data = f"[{entries}{suffix}]"
-            prefix = f"{label}: " if self._name else ""
+            prefix = f"{label}: " if name else ""
             count = "" if size <= 12 else f" ({size} entries)"
             return f"{prefix}{data}{count}"
 
@@ -402,7 +403,7 @@ def indexed_family[IndexT, ValueT](
     value: Callable[[IndexT], ValueT] | Parent,
     *,
     value_category=None,
-    name: str | None = None,
+    name: str | Callable[[], str] | None = None,
 ) -> IndexedFamily[IndexT, ValueT]:
     r"""Return the family ``index |-> value(index)`` as an owned mathematical object.
 
@@ -493,7 +494,7 @@ def finite_indexed_family_from_values(
     index_set,
     values,
     *,
-    name: str | None = None,
+    name: str | Callable[[], str] | None = None,
 ) -> IndexedFamily:
     r"""Read finite literal data as an indexed family, preserving its labels.
 
