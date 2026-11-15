@@ -22,8 +22,6 @@ routines that read their fields are the rules' own methods and the
 construction functions below, which share their owner.
 """
 
-import hashlib
-import json
 import re
 from bisect import bisect_right
 from itertools import accumulate, product
@@ -1470,352 +1468,181 @@ def signature_pair(positive, negative):
     return signature_pairs().pair(cardinal(positive), cardinal(negative))
 
 
-_DIGEST_LENGTH = 16
-r"""Hex characters of the digest a record name carries: sixty-four bits of it."""
-
-
-def record_name(label: str, /, *data, **keywords) -> str:
-    r"""``<label> #<digest>``: a readable label and a digest of the canonical inputs.
-
-    This is the one mechanism every timing record's ``input`` is built by
-    (:mod:`sage_extensions.timing`).  The label is written for a reader -- the
-    row's rank, the stage's subject -- and may repeat: two computations whose
-    labels read the same are told apart by the digest, which is taken over the
-    call's own inputs in the canonical form :func:`_canonical` states (a
-    lattice's Gram entries with its base ring, a subobject's position in its
-    ambient lattice, a subgroup's character data or its generators, a vector's
-    coordinates, a callable's definition and its captured values, and every
-    keyword argument, sorted by name).  So a label that describes nothing --
-    "a rank-2 subobject of L" for every plane of ``L``, "rho_L(g) in a stated
-    subgroup" for every preimage -- is still a name no other computation shares.
-
-    Nothing is cut from either part: a truncated digest is not a digest, and a
-    label that had to be shortened would be a label that hid its input.
-
-    EXAMPLES::
-
-        sage: from sage_extensions.categories._lattice import record_name
-        sage: from sage_extensions.categories.lattices import Lattices
-        sage: first = Lattices(ZZ)("U") + Lattices(ZZ)("U") + Lattices(ZZ)([[-2]])
-        sage: second = Lattices(ZZ)("U") + Lattices(ZZ)("U") + Lattices(ZZ)([[-8]])
-        sage: name = record_name("a row", first)
-        sage: name.startswith("a row #")
-        True
-        sage: record_name("a row", first) == name
-        True
-        sage: record_name("a row", second) != name
-        True
-    """
-    payload = json.dumps(
-        [
-            [_canonical(item) for item in data],
-            {key: _canonical(keywords[key]) for key in sorted(keywords)},
-        ],
-        sort_keys=True,
-        separators=(",", ":"),
-    )
-    digest = hashlib.sha256(payload.encode("utf-8")).hexdigest()
-    return f"{label} #{digest[: _DIGEST_LENGTH]}"
-
-
-
-def _canonical(value):
-    r"""The canonical form of one record input: plain data, exact, never rendered.
-
-    Every kind this repository's long rows are computed on is stated here, and a
-    value of no stated kind raises: a record name that fell back to a rendering
-    would be a name that changes with a display and identifies nothing, which is
-    the failure this function exists to remove.
-
-    * a **lattice** is its base ring and its Gram entries, as the ring's own
-      elements; a **subobject** is its ambient lattice and its generators'
-      coordinates there, which is what tells two planes of one lattice apart;
-    * a **vector** is its coordinates in its lattice's basis;
-    * a **character subgroup** is its conditions and their targets, recursively;
-      a **generated subgroup** is its generators, each read through the group's
-      engine, which prints its images on the module's letters -- the matrix; the
-      whole group is itself, since its lattice is the caller's other input;
-    * a **cusp** (an isotropic reduction image) is its lattice, its isotropic
-      vector and its subgroup;
-    * a **callable** is its qualified name and its captured values, because two
-      filters of one name that are asked at two cusps are two filters.
-    """
-    from sage_extensions.categories.group.groups import GeneratedSubgroups, OwnedGroups
-    from sage_extensions.categories.group.predicate_subgroups import PredicateSubgroups
-    from sage_extensions.categories.isotropic_orbits import IsotropicVectorReductionImage
-    from sage_extensions.categories.lattices import Lattices
-
-    if value is None or isinstance(value, (bool, int, str)):
-        return value
-    if isinstance(value, (list, tuple)):
-        return [_canonical(item) for item in value]
-    if isinstance(value, (set, frozenset)):
-        return sorted((_canonical(item) for item in value), key=repr)
-    if isinstance(value, dict):
-        return {str(key): _canonical(value[key]) for key in sorted(value, key=str)}
-    if isinstance(value, Lattices.ParentMethods):
-        return _canonical_lattice(value)
-    if isinstance(value, Lattices.ElementMethods):
-        return ["vector", _coordinates(value)]
-    if isinstance(value, IsotropicVectorReductionImage):
-        return [
-            "cusp",
-            _canonical_lattice(value.lattice()),
-            _coordinates(value.vector()),
-            _canonical_group(value.subgroup()),
-        ]
-    if isinstance(value, PredicateSubgroups.ParentMethods):
-        return _canonical_group(value)
-    if isinstance(value, GeneratedSubgroups.ParentMethods):
-        return _canonical_group(value)
-    if isinstance(value, OwnedGroups.ParentMethods):
-        return ["the whole group"]
-    if callable(value):
-        return [
-            "callable",
-            value.__qualname__,
-            [_canonical(_cell_contents(cell)) for cell in value.__closure__ or ()],
-        ]
-    raise TypeError(
-        f"{value!r} of {type(value).__name__} has no canonical form for a record name: state its "
-        "kind in sage_extensions.categories._lattice._canonical, because a rendering here is a "
-        "name that identifies nothing"
-    )
-
-
-def _cell_contents(cell):
-    r"""What a closure cell holds, for a callable's canonical form.
-
-    A cell whose name is declared but not yet bound has no contents; that
-    callable has no canonical form until it is bound, and reading it raises
-    rather than letting two filters with different future values share a name.
-    """
-    return cell.cell_contents
-
-
-def _canonical_lattice(lattice):
-    r"""A lattice as its base ring and exact Gram entries; a subobject as its position.
-
-    A subobject's own Gram repeats its ambient lattice's data, so what a record
-    has to add is where it sits: the coordinates, in the ambient lattice's
-    generators, of the images of its own.  Two lines of one lattice are two
-    positions and so two canonical forms, which is what makes their records
-    different names.
-    """
-    from sage_extensions.categories.modules.pure.modules import ModuleSubobjects
-
-    if lattice in ModuleSubobjects(lattice.base_ring()):
-        inclusion = lattice.inclusion()
-        domain = inclusion.domain()
-        return [
-            "subobject",
-            _canonical_lattice(inclusion.codomain()),
-            [
-                _coordinates(inclusion(domain.module_generator(label)))
-                for label in domain.module_generating_set()
-            ],
-        ]
-    ring, _labels, matrix = lattice._engine_gram()
-    return [
-        "lattice",
-        str(ring),
-        [[repr(entry) for entry in row] for row in matrix.rows()],
-    ]
-
-
-def _coordinates(vector) -> list:
-    r"""A vector's coordinates in its lattice's generators, each as an exact rendering."""
-    return [repr(coordinate) for coordinate in vector.to_vector()]
-
-
 def vector_label(vector) -> str:
-    r"""A vector's readable label: its coordinates in its lattice's generators.
+    r"""A vector's name in a timing record: its coordinates in its lattice's basis.
 
     One rendering for every vector a record names -- a cusp's and a walk's
     controlling vector alike -- so the same vector is written the same way
-    wherever a record asks for it, and it is the coordinates the digest is taken
-    over (:func:`_coordinates`).
-    """
-    return "(" + ", ".join(repr(coordinate) for coordinate in vector.to_vector()) + ")"
-
-
-def _canonical_group(group):
-    r"""A subgroup as its character conditions, or as its generators' images.
-
-    The conditions are the ones the constructing call stated
-    (:meth:`...predicate_subgroups.character_data`), and each is followed through
-    to the datum it names -- so two preimages of two *different* finite subgroups
-    are two canonical forms even when neither subgroup states a description of
-    itself.  A generated subgroup has no conditions and is stated by its
-    generators, which the group's engine prints as images on the module's
-    letters: an element's matrix, and not a rendering that reads the same for
-    every element of the group.
-    """
-    from sage_extensions.categories.group.predicate_subgroups import PredicateSubgroups
-
-    if isinstance(group, PredicateSubgroups.ParentMethods):
-        conditions = group.character_data()
-        canonical = []
-        for key in sorted(conditions):
-            held = conditions[key]
-            match key:
-                case "determinant_kernel" | "spinor_kernel":
-                    canonical.append([key, bool(held)])
-                case "discriminant_preimages":
-                    canonical.append([key, [_canonical_group(target) for target in held]])
-                case _:
-                    raise ValueError(
-                        f"the character condition {key!r} of {group} has no canonical form for a "
-                        "record name: state it in sage_extensions.categories._lattice."
-                        "_canonical_group, because two subgroups that differ in it would otherwise "
-                        "share a name"
-                    )
-        return ["character subgroup", canonical]
-    return [
-        "generated subgroup",
-        [_element_images(group, element) for element in group.group_generators()],
-    ]
-
-
-def _element_images(group, element) -> str:
-    r"""One group element as the group's engine prints it: its images on the letters."""
-    from sage_extensions.categories.group.groups import _element_to_engine
-
-    return repr(_element_to_engine(group, element))
-
-
-def _lattice_label(lattice) -> str:
-    r"""A lattice's readable label: its catalogue name, or its rank.
-
-    The label carries no identity -- the digest does (:func:`record_name`) -- and
-    so this says only what a reader needs to know what the line is about.
-    """
-    from sage_extensions.catalogue import catalogue_lattice_name
-
-    name = catalogue_lattice_name(lattice)
-    if name is not None:
-        return f"the catalogue lattice NamedLattices.{name}"
-    return f"a rank-{lattice.module_rank()} lattice"
-
-
-def _group_label(group) -> str:
-    r"""A subgroup's readable label: which conditions cut it out, or that nothing does."""
-    from sage_extensions.categories.group.groups import GeneratedSubgroups
-    from sage_extensions.categories.group.predicate_subgroups import PredicateSubgroups
-
-    if isinstance(group, PredicateSubgroups.ParentMethods):
-        words = {
-            "determinant_kernel": "det(g) = 1",
-            "spinor_kernel": "sn(g) = 1",
-            "discriminant_preimages": "rho_L(g) in a stated subgroup",
-        }
-        conditions = [
-            words[key] for key in sorted(group.character_data()) if key in words
-        ]
-        return "the subgroup with " + " and ".join(conditions)
-    if isinstance(group, GeneratedSubgroups.ParentMethods):
-        return "a generated subgroup"
-    return "O(L)"
-
-
-def lattice_record_name(lattice) -> str:
-    r"""Name a lattice in a timing record: a readable label and its Gram's digest.
-
-    The label is the catalogue's name where the catalogue holds the lattice,
-    else the rank; the digest is over the base ring and the exact Gram entries
-    (:func:`_canonical`), so two lattices of one rank -- whose generator labels
-    are positional, ``generators 0, 1`` -- do not share a name.
-
-    EXAMPLES::
-
-        sage: from sage_extensions.all import NamedLattices, Lattices
-        sage: from sage_extensions.categories._lattice import lattice_record_name
-        sage: lattice_record_name(NamedLattices.Tco).startswith("the catalogue lattice NamedLattices.Tco #")
-        True
-        sage: lattice_record_name(Lattices(ZZ)("U")).startswith("a rank-2 lattice #")
-        True
-    """
-    return record_name(_lattice_label(lattice), lattice)
-
-
-def subgroup_record_name(subgroup) -> str:
-    r"""Name a subgroup in a timing record: a readable label and its own digest.
-
-    Two rows of one lattice under two subgroups of ``O(L)`` are two
-    computations, and the label alone cannot say which: every preimage of an
-    undescribed finite subgroup reads the same in words.  The digest is over the
-    subgroup's conditions and their targets, or over a generated subgroup's
-    generators (:func:`_canonical_group`), so those two preimages differ.
+    wherever a record asks for it.  It is a description of the input and not an
+    identity (a record's identity is its run and its stage id,
+    :mod:`sage_extensions.timing`), so two vectors of two lattices with the same
+    coordinates share a name.
 
     EXAMPLES::
 
         sage: from sage_extensions.all import Lattices
-        sage: from sage_extensions.categories._lattice import subgroup_record_name
-        sage: lattice = Lattices(ZZ)("U") + Lattices(ZZ)("U") + Lattices(ZZ)([[-2]])
-        sage: name = subgroup_record_name(lattice.stable_orthogonal_group())
-        sage: name.startswith("the subgroup with rho_L(g) in a stated subgroup #")
-        True
-        sage: subgroup_record_name(lattice.Aut()).startswith("O(L) #")
-        True
+        sage: from sage_extensions.categories._lattice import vector_label
+        sage: lattice = Lattices(ZZ)("U")
+        sage: vector_label(lattice.basis_vector(0) + lattice.basis_vector(1))
+        '(1, 1)'
     """
-    return record_name(_group_label(subgroup), subgroup)
+    return "(" + ", ".join(repr(coordinate) for coordinate in vector.to_vector()) + ")"
+
+
+def keyword_arguments(**keywords) -> str:
+    r"""A call's keyword arguments as a record name's tail: ``, name=value`` each.
+
+    A stage's name says what was computed, and for a call whose result depends on
+    a bound or a filter the arguments are part of that: ``cusp_chamber()`` and
+    ``cusp_chamber(max_decompositions=200)`` are two computations, and a name
+    that left the bound out describes neither of them.  So the call site writes
+    the keywords the call was given, in name order, and a reader of the line
+    reads the bound.
+
+    A value is written as it states itself -- a number, an owned ring element, a
+    bound the caller wrote -- and a callable as the name its ``def`` has, which
+    is the only public description a filter carries.  ``None`` states no bound
+    and no filter and is left out.  Nothing is hashed, canonicalized or made
+    unique: two calls may share the text, and the record's ``id`` is what tells
+    their lines apart (:mod:`sage_extensions.timing`).
+
+    EXAMPLES::
+
+        sage: from sage_extensions.categories._lattice import keyword_arguments
+        sage: keyword_arguments()
+        ''
+        sage: keyword_arguments(max_decompositions=200)
+        ', max_decompositions=200'
+        sage: keyword_arguments(max_roots=None, max_decompositions=200)
+        ', max_decompositions=200'
+    """
+    written = []
+    for name in sorted(keywords):
+        value = keywords[name]
+        match value:
+            case None:
+                continue
+            case _ if callable(value):
+                written.append(f"{name}={value.__name__}")
+            case _:
+                written.append(f"{name}={value}")
+    return "".join(f", {entry}" for entry in written)
+
+
+def _lattice_label(lattice) -> str:
+    r"""A lattice's name in a timing record: its ring and its Gram matrix.
+
+    The name is the input's public description: the ring the form is over and
+    the exact Gram entries in the lattice's own generators, which is the matrix
+    :meth:`...Lattices.ParentMethods.gram_matrix` states.  So a reader knows
+    which lattice a line is about, and two lattices of one rank are told apart
+    here because their Grams are written out.
+
+    It is a description and not an identity -- a record is identified by its run
+    and its stage id (:mod:`sage_extensions.timing`) -- so nothing is
+    canonicalized, decomposed or diagonalized for a log line, and two lattices
+    whose Grams are equal share the name, which is right: the same input.
+
+    EXAMPLES::
+
+        sage: from sage_extensions.all import Lattices
+        sage: from sage_extensions.categories._lattice import _lattice_label
+        sage: _lattice_label(Lattices(ZZ)("U"))
+        'the rank-2 lattice over Integer Ring of Gram [[0, 1], [1, 0]]'
+    """
+    ring, _labels, matrix = lattice._engine_gram()
+    rows = ", ".join(
+        "[" + ", ".join(str(int(entry)) for entry in row) + "]" for row in matrix.rows()
+    )
+    return f"the rank-{lattice.module_rank()} lattice over {ring} of Gram [{rows}]"
+
+
+def _group_label(group) -> str:
+    r"""A subgroup's name in a timing record: the description its construction stated.
+
+    Every predicate subgroup is constructed with one -- ``"sn_RR(g) = 1"`` for
+    ``O^+(L)``, the preimage sentence of ``discriminant_preimage`` for
+    :math:`\widetilde O(L)` -- and it is the description the group's own
+    rendering prints (:meth:`...groups.Subgroups.ParentMethods._repr_`).  It is
+    read off the attribute the constructing call retains it in and written as it
+    stands; nothing is rendered here, so a name that reads the same for two
+    subgroups is two names and the record's ``id`` tells their lines apart.
+
+    The whole orthogonal group states no description and is ``O(L)``; a subgroup
+    given by generators states whichever its caller wrote.
+
+    EXAMPLES::
+
+        sage: from sage_extensions.all import Lattices
+        sage: from sage_extensions.categories._lattice import _group_label
+        sage: lattice = Lattices(ZZ)("U") + Lattices(ZZ)("U")
+        sage: _group_label(lattice.Aut())
+        'O(L)'
+        sage: _group_label(lattice.O_plus())
+        'the subgroup where sn_RR(g) = 1'
+    """
+    from sage_extensions.categories.group.groups import GeneratedSubgroups
+    from sage_extensions.categories.group.predicate_subgroups import PredicateSubgroups
+
+    if isinstance(group, PredicateSubgroups.ParentMethods):
+        return f"the subgroup where {group._description}"
+    if isinstance(group, GeneratedSubgroups.ParentMethods):
+        return "a generated subgroup"
+    return "O(L)"
 
 
 def orbit_row_record_name(rank, *, flag, lattice, subgroup) -> str:
     r"""Name one orbit row in a timing record: its rank, its lattice and its group.
 
     The rows of one lattice differ by the rank of the isotropic subobjects and by
-    the subgroup they are taken under; both are in the label, and the digest is
-    over both objects, so neither a shared label nor a shared rank makes two rows
-    one name.  Written once, here, because four call sites name this row.
+    the subgroup they are taken under, so both are written; the lattice and the
+    subgroup are named by their own descriptions (:func:`_lattice_label`,
+    :func:`_group_label`).  Written once, here, because four call sites name this
+    row.
 
     EXAMPLES::
 
         sage: from sage_extensions.all import Lattices
         sage: from sage_extensions.categories._lattice import orbit_row_record_name
         sage: lattice = Lattices(ZZ)("U") + Lattices(ZZ)("U")
-        sage: name = orbit_row_record_name(1, flag=False, lattice=lattice, subgroup=lattice.Aut())
-        sage: name.startswith("rank-1 subobject row of a rank-4 lattice under O(L) #")
-        True
-        sage: orbit_row_record_name(1, flag=False, lattice=lattice, subgroup=lattice.stable_orthogonal_group()) != name
-        True
+        sage: orbit_row_record_name(1, flag=False, lattice=lattice, subgroup=lattice.Aut())
+        'the rank-1 subobject row of the rank-4 lattice over Integer Ring of Gram [[0, 1, 0, 0], [1, 0, 0, 0], [0, 0, 0, 1], [0, 0, 1, 0]] under O(L)'
     """
     kind = "flag" if flag else "subobject"
-    count = int(rank)
-    return record_name(
-        f"rank-{count} {kind} row of {_lattice_label(lattice)} under {_group_label(subgroup)}",
-        count,
-        flag=flag,
-        lattice=lattice,
-        subgroup=subgroup,
+    return (
+        f"the rank-{int(rank)} {kind} row of {_lattice_label(lattice)} "
+        f"under {_group_label(subgroup)}"
     )
 
 
 def subobject_record_name(subobject) -> str:
-    r"""Name a primitive isotropic subobject in a timing record: its rank and position.
+    r"""Name a primitive isotropic subobject in a timing record: its generators.
 
-    The label says what it is and the digest says which one it is: a subobject's
-    canonical form is its ambient lattice and the coordinates of its own
-    generators' images there (:func:`_canonical_lattice`), so every line of one
-    lattice and every plane of it are separate names.
+    A subobject's description is its rank, its ambient lattice, and the
+    coordinates of its own generators in that lattice's basis: which line or
+    plane of ``L`` a stage was computed at.  Those coordinates are read off the
+    inclusion the subobject retains; nothing is canonicalized, so two bases of
+    one subobject are two names, and the record's ``id`` is what identifies the
+    record either way (:mod:`sage_extensions.timing`).
 
     EXAMPLES::
 
         sage: from sage_extensions.all import Lattices
         sage: from sage_extensions.categories._lattice import subobject_record_name
-        sage: lattice = Lattices(ZZ)("U") + Lattices(ZZ)("U")
-        sage: first = lattice.primitive_isotropic_subobject(lattice.module_generator(0))
-        sage: second = lattice.primitive_isotropic_subobject(lattice.module_generator(2))
-        sage: first_name = subobject_record_name(first)
-        sage: first_name.startswith("a rank-1 subobject of a rank-4 lattice #")
-        True
-        sage: subobject_record_name(second) != first_name
-        True
+        sage: lattice = Lattices(ZZ)("U")
+        sage: line = lattice.primitive_isotropic_subobject(lattice.basis_vector(0))
+        sage: subobject_record_name(line)
+        'the rank-1 subobject of the rank-2 lattice over Integer Ring of Gram [[0, 1], [1, 0]] generated by (1, 0)'
     """
-    return record_name(
-        f"a rank-{subobject.module_rank()} subobject of "
-        f"{_lattice_label(subobject.ambient_lattice())}",
-        subobject,
+    inclusion = subobject.inclusion()
+    domain = inclusion.domain()
+    generators = " and ".join(
+        vector_label(inclusion(domain.module_generator(label)))
+        for label in domain.module_generating_set()
+    )
+    return (
+        f"the rank-{subobject.module_rank()} subobject of "
+        f"{_lattice_label(subobject.ambient_lattice())} generated by {generators}"
     )
 
 
