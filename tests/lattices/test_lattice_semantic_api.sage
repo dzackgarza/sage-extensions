@@ -1,76 +1,51 @@
 from sage_extensions.all import *
 
-from sage_extensions.categories.modules.pure.modules import Modules
-from sage_extensions.categories.sets.indexed_families import IndexedFamily
-
-
-def test_the_infinite_rank_dual_is_the_product_and_evaluates_by_projections() -> None:
-    r"""The algebraic dual of \\(\\mathbb Q^{(\\mathbb N)}\\) is the product
-    \\(\\prod_{\\mathbb N} \\mathbb Q\\), given by its projections.
+def test_the_infinite_rank_dual_is_the_module_of_functionals_and_evaluates() -> None:
+    r"""The algebraic dual of \(\mathbb Q^{(\mathbb N)}\) is its module of
+    functionals, and the correlation is an injection that is not onto.
 
     The domain is the direct sum: every vector is a finitely supported function
     on the basis labels, so the correlation's image of a vector vanishes outside
-    a finite set of indices.  The product's constant family is an element of the
-    dual that vanishes nowhere, so it is not in the image.  Evaluation of a
-    functional at a vector is the finite sum of the vector's coefficients
-    against the functional's projections; no basis of the dual is chosen.
+    a finite set of indices.  A functional is its family of values on the basis,
+    which is exactly an element of the module of morphisms into the free module
+    of rank one, and evaluation at a vector is the finite sum of the vector's
+    coefficients against those values; no basis of the dual is chosen.
 
-    OPEN: `correlation.is_surjective()` raises `cannot compute the cokernel ...
-    no algorithm is available for these modules` (domain the direct-sum lattice,
-    codomain the product module). The assertion is kept rather than removed:
-    deciding it needs the comparison of the direct-sum image with the product
-    (the constant family lies outside the finite span), not a general
-    infinite-rank cokernel.
+    The dual is \(\prod_{\mathbb N} \mathbb Q\), of dimension
+    \(2^{\aleph_0}\) over \(\mathbb Q\), so no countable family of its points
+    generates it and this library holds no presentation of it.  It is the Mor,
+    not a product object built beside it, and the correlation's images are
+    points of that Mor.
+
+    The constant functional -- one at every basis vector -- is a point of the
+    dual that no finite-support vector maps to, which is the retained witness
+    that the correlation is not onto.  It is read off the construction and is
+    not a cokernel computation.
     """
     lattice = Lattices(QQ)(QQ**NN)
     ring = lattice.base_ring()
     dual = lattice.linear_dual()
-    construction = lattice._dual_product_construction()
     correlation = lattice.metric_map()
-
-    assert construction is not None
-    assert dual is construction.object()
 
     e0 = lattice.basis_vector(0)
     e1 = lattice.basis_vector(1)
     e7 = lattice.basis_vector(7)
     first = correlation(e0)
     assert first.parent() is dual
+    assert dual is lattice.module_category().Mor(lattice, ring.regular_module())
     assert lattice.dual_evaluation(first, e0) == ring.one()
     assert lattice.dual_evaluation(first, e1) == ring.zero()
     assert lattice.dual_evaluation(first, lattice.basis_vector(0) + 3 * lattice.basis_vector(2)) == ring.one()
-
-    unit = ring.regular_module()(ring.one())
-    constant = Modules(ring).product_element(
-        construction, IndexedFamily(NN, lambda _index: unit)
-    )
-    assert constant.parent() is dual
-    assert Modules(ring).product_component(construction, constant, NN(0)) == unit
-    assert Modules(ring).product_component(construction, constant, NN(7)) == unit
-    assert lattice.dual_evaluation(constant, e0) == ring.one()
-    assert lattice.dual_evaluation(constant, e1) == ring.one()
-    assert lattice.dual_evaluation(constant, e7) == ring.one()
-
-    # The correlation's image is the direct sum inside the product: at index 7
-    # the image of e_0 vanishes and the constant family does not, read through
-    # the product's projections rather than by an undecided element equality.
-    zero = ring.regular_module()(ring.zero())
-    assert Modules(ring).product_component(construction, first, NN(7)) == zero
-    assert Modules(ring).product_component(construction, constant, NN(7)) == unit
     assert lattice.dual_evaluation(first, e7) == ring.zero()
     assert correlation.is_injective()
     assert lattice.is_nondegenerate()
     assert not lattice.is_unimodular()
 
-    # Non-surjectivity is refuted by the retained witness, not by a cokernel:
-    # it is an element of the product whose component at every index is one,
-    # while every value of the correlation vanishes away from the finite
-    # support of its argument.
     witness = correlation.non_surjectivity_witness()
-    assert witness is not None
     assert witness.parent() is dual
-    assert Modules(ring).product_component(construction, witness, NN(0)) == unit
-    assert Modules(ring).product_component(construction, witness, NN(7)) == unit
+    assert lattice.dual_evaluation(witness, e0) == ring.one()
+    assert lattice.dual_evaluation(witness, e1) == ring.one()
+    assert lattice.dual_evaluation(witness, e7) == ring.one()
     assert not correlation.is_surjective()
 
 
