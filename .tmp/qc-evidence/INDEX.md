@@ -1976,3 +1976,20 @@ main; the rest are the repair, on the commit this section's push names.
 | `issue529-vinberg-tests-green.log` | `8b7e517` | `tests/lattices/test_reflection_hyperbolic.sage` and `tests/lattices/test_the_subgroup_cusp_chamber.sage`: **7 passed in 155.61 s** -- the file that was red on main above, and the `.sage` literals at `test_the_subgroup_cusp_chamber.sage:119-120` (`max_decompositions=400` beside a filter) |
 | `issue529-reduction-image-cusps-green.log` | `8b7e517` | the two cusp-chamber tests of `tests/lattices/test_the_isotropic_reduction_image.sage` selected by node id -- `max_decompositions=8` and `max_decompositions=20`, the file's literal sites: **2 passed in 148.92 s** |
 | `issue529-reduction-image-whole-file-capped.log` | main `1cc2481` + the repair, before it was committed | the same file whole, capped at 560 s: **6 passed** and the seventh still running when the cap killed it (peak RSS 1882 MiB). No verdict on the file; the two cusp-chamber tests above are what was decided |
+
+## #529, the eighth round: each owner names its kind, and a stage asserts its own close
+
+The group's name moved out of the naming layer: `Subgroups.ParentMethods`,
+`PredicateSubgroups.ParentMethods` and `LatticeIsometryMor` each state their own
+`description()`, and `_group_label` is `return group.description()`. The lattice
+name reads the public `gram_matrix()` and each entry's `repr`; a keyword argument
+is written by its `repr` or its owner's description, with no callable branch; a
+stage's close asserts it closed its own id; and the tests that asserted only
+`!=` or a two-level parent now assert the description and a three-level chain.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `issue529b-tests-at-base-1cc2481.log` | base `1cc2481` | the round-8 test file and `conftest.py` copied into a worktree of that commit, nothing else changed: **4 failed, 5 passed in 9.94 s**. The Integer test is red on `TypeError: 200 of _OwnedRingParent_with_category.element_class has no canonical form for a record name` -- `ZZ(200)` reached `_canonical`; the parent test red on `KeyError: 'id'`; the row test red on `AttributeError: ... has no attribute 'description'` |
+| `issue529b-timing-record-tests-green.log` | `238ec3c` | `tests/engineering/test_the_timing_record_names_each_stage.py` with the test lint and the suite budget: **9 passed in 10.24 s** |
+| `issue529b-vinberg-tests-green.log` | `238ec3c` | `tests/lattices/test_reflection_hyperbolic.sage` and `tests/lattices/test_the_subgroup_cusp_chamber.sage`: **7 passed in 131.41 s** |
+| `issue529b-reduction-image-cusps-green.log` | `238ec3c` | the two cusp-chamber tests of `tests/lattices/test_the_isotropic_reduction_image.sage` by node id (`max_decompositions=8` and `=20`): **2 passed in 149.95 s** |
