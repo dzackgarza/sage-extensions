@@ -1,0 +1,24 @@
+probe: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.tmp/qc-evidence/issue528-lift-matrix-equivalence.py
+tree SHA: 76b44493793e43f915dbe2129019f8e9cb5fb0ce
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+inner 420 s, outer 480 s, guard 6144 MiB, args 'line'
+[    0.6s] control U2+U2+<2>: the locus tested 8 classes in 0.133 s
+[    0.7s] control U2+U2+<2>: 8 of 8 classes agree; 0 disagree
+[    0.7s] RESULT control U2+U2+<2> tested=8 agree=8 disagree=0 matrix_seconds=0.133 composition_seconds=0.121
+[   38.7s] T_En cusp 4 line: the locus tested 1024 classes in 37.205 s
+[  104.7s] T_En cusp 4 line: 1024 of 1024 classes agree; 0 disagree
+[  104.7s] RESULT T_En cusp 4 line tested=1024 agree=1024 disagree=0 matrix_seconds=37.205 composition_seconds=66.028
+[peakrss] p528eq: child waited=0 shell_code=0 samples=54
+[peakrss] peak tree RSS      : 340 MiB
+[peakrss] low-water MemAvail : 13288 MiB
+[peakrss] peak single VmHWM  : 340 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      329 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   102.0s procs=  3 rss=   340 MiB hwm=   340 MiB avail= 13444 MiB
+[peakrss]   t=   104.0s procs=  3 rss=   340 MiB hwm=   340 MiB avail= 13421 MiB
+[peakrss]   t=   106.0s procs=  3 rss=   340 MiB hwm=   340 MiB avail= 13288 MiB
+[peakrss]   t=    94.0s procs=  3 rss=   339 MiB hwm=   339 MiB avail= 13508 MiB
+[peakrss]   t=    96.0s procs=  3 rss=   339 MiB hwm=   339 MiB avail= 13355 MiB
+launcher exit: 0
