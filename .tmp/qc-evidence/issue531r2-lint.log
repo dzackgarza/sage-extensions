@@ -1,0 +1,158 @@
+tree SHA: 10c133af338f3db1e2c1bf564d1e5b0762acb6ca
+port SHA: 991b88b0
+inner 300 s, outer 360 s, guard 2048 MiB
+command: /sage/.venv/bin/python -u -s -m sage_extensions.testing.test_lint tests/sets/test_a_finite_ordered_set_hashes_by_its_points.sage tests/rings/test_a_quotient_class_hashes_by_its_class.sage tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:19: TL01 from sage_extensions.categories.sets.indexed_families import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:20: TL01 from sage_extensions.logic import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:40: TL02 private attribute ._value_at_normalized_index
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:41: TL02 private attribute ._value_at_normalized_index
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:43: TL02 private attribute ._value_at_normalized_index
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:44: TL02 private attribute ._value_at_normalized_index
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:45: TL10 len(): ask for a cardinality
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:50: TL02 private attribute ._value_at_normalized_index
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:52: TL02 private attribute ._value_at_normalized_index
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:53: TL10 len(): ask for a cardinality
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:57: TL01 from sage_extensions.categories.sets.indexed_families import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:67: TL03 isinstance(): introspection is not mathematics
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:82: TL02 private attribute ._value_at_normalized_index
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:83: TL02 private attribute ._value_at_normalized_index
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:84: TL02 private attribute ._value_at_normalized_index
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:85: TL02 private attribute ._value_at_normalized_index
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:87: TL02 private attribute ._value_at_normalized_index
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:88: TL10 len(): ask for a cardinality
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:92: TL01 from sage_extensions.categories.sets.indexed_families import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:103: TL03 isinstance(): introspection is not mathematics
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:110: TL02 private attribute ._value_at_normalized_index
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:111: TL02 private attribute ._value_at_normalized_index
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:112: TL10 len(): ask for a cardinality
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:116: TL01 from sage_extensions.categories.group.magmas import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:117: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:139: TL04 try/except: expected failures are asserted with pytest.raises
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:148: TL01 from sage_extensions.categories.group.magmas import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:167: TL01 from sage_extensions.categories.abstract_categories.functors import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:168: TL01 from sage_extensions.categories.functors.core import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:169: TL01 from sage_extensions.categories.group.magmas import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:170: TL01 from sage_extensions.categories.sets.indexed_families import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:178: TL08 indexed_family: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:194: TL01 from sage_extensions.categories.abstract_categories.functors import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:195: TL01 from sage_extensions.categories.functors.core import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:196: TL01 from sage_extensions.categories.sets.indexed_families import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:203: TL08 indexed_family: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:219: TL01 from sage_extensions.categories.sets.finite_ordered_sets import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:220: TL01 from sage_extensions.categories.sets.indexed_families import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:222: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:230: TL08 indexed_family: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:252: TL01 from sage_extensions.categories.sets.finite_ordered_sets import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:253: TL01 from sage_extensions.categories.sets.indexed_families import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:256: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:256: TL08 indexed_family: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:257: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:257: TL08 indexed_family: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:270: TL01 from sage_extensions.categories.sets.finite_ordered_sets import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:271: TL01 from sage_extensions.categories.sets.indexed_families import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:273: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:274: TL08 indexed_family: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:275: TL08 indexed_family: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:281: TL08 indexed_family: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:282: TL08 indexed_family: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:288: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:290: TL08 indexed_family: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:294: TL01 from sage_extensions.categories.group.magmas import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:295: TL01 from sage_extensions.categories.sets.indexed_families import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:296: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:301: TL08 indexed_family: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:306: TL08 indexed_family: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:319: TL08 indexed_family: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:322: TL04 try/except: expected failures are asserted with pytest.raises
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:323: TL08 indexed_family: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:332: TL01 from sage_extensions.categories.abstract_categories.functors import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:333: TL01 from sage_extensions.categories.functors.core import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:334: TL01 from sage_extensions.categories.group.magmas import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:335: TL01 from sage_extensions.categories.sets.indexed_families import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:341: TL08 indexed_family: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:357: TL04 try/except: expected failures are asserted with pytest.raises
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:365: TL09 test_unproved_infinite_value_category_cannot_place_monoid_product asserts nothing
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:366: TL01 from sage_extensions.categories.group.magmas import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:367: TL01 from sage_extensions.categories.sets.indexed_families import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:368: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:372: TL04 try/except: expected failures are asserted with pytest.raises
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:373: TL08 indexed_family: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:378: TL04 try/except: expected failures are asserted with pytest.raises
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:379: TL08 indexed_family: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:387: TL01 from sage_extensions.categories.abstract_categories.functors import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:388: TL01 from sage_extensions.categories.group.magmas import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:389: TL01 from sage_extensions.categories.sets.indexed_families import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:393: TL08 indexed_family: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:395: TL04 try/except: expected failures are asserted with pytest.raises
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:396: TL08 indexed_family: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:403: TL08 indexed_family: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:410: TL01 from sage_extensions.categories.abstract_categories.functors import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:411: TL01 from sage_extensions.categories.group.magmas import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:412: TL01 from sage_extensions.categories.sets.indexed_families import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:413: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:421: TL08 indexed_family: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:427: TL08 indexed_family: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:442: TL01 from sage_extensions.categories.functors.core import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:463: TL04 try/except: expected failures are asserted with pytest.raises
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:471: TL08 indexed_family: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:475: TL04 try/except: expected failures are asserted with pytest.raises
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:476: TL08 indexed_family: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:485: TL01 from sage_extensions.categories.abstract_categories.functors import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:486: TL01 from sage_extensions.categories.group.magmas import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:487: TL01 from sage_extensions.categories.sets.indexed_families import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:492: TL08 indexed_family: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:495: TL09 an assertion that holds of anything
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:528: TL01 from sage_extensions.categories.abstract_categories.functors import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:529: TL01 from sage_extensions.categories.functors.core import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:546: TL04 try/except: expected failures are asserted with pytest.raises
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:553: TL01 from sage_extensions.categories.sets.indexed_families import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:555: TL08 indexed_family: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:556: TL04 try/except: expected failures are asserted with pytest.raises
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:566: TL01 from sage_extensions.categories.abstract_categories.functors import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:567: TL01 from sage_extensions.categories.functors.core import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:584: TL04 try/except: expected failures are asserted with pytest.raises
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:598: TL04 try/except: expected failures are asserted with pytest.raises
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:607: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:607: TL02 imports the private name _coproduct_morphism
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:623: TL04 try/except: expected failures are asserted with pytest.raises
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:636: TL10 len(): ask for a cardinality
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:649: TL01 from sage_extensions.categories.sets.indexed_families import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:651: TL08 indexed_family: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:659: TL08 indexed_family: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:665: TL01 from sage_extensions.categories.abstract_categories.functors import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:666: TL01 from sage_extensions.categories.sets.indexed_families import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:672: TL08 indexed_family: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:677: TL08 indexed_family: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:741: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:741: TL02 imports the private name _cartesian_product_morphism
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:754: TL04 try/except: expected failures are asserted with pytest.raises
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:763: TL01 from sage_extensions.categories.abstract_categories.functors import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:764: TL01 from sage_extensions.categories.functors.core import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:765: TL01 from sage_extensions.categories.group.magmas import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:766: TL01 from sage_extensions.categories.sets.indexed_families import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:767: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:767: TL02 imports the private name _cartesian_product_morphism
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:767: TL02 imports the private name _coproduct_morphism
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:775: TL08 indexed_family: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:787: TL01 from sage_extensions.categories.group.magmas import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:788: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:788: TL02 imports the private name _cartesian_product_morphism
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:788: TL02 imports the private name _coproduct_morphism
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:806: TL01 from sage_extensions.categories.abstract_categories.functors import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:807: TL01 from sage_extensions.categories.functors.core import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:808: TL01 from sage_extensions.categories.sets.indexed_families import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:809: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:809: TL02 imports the private name _cartesian_product_morphism
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:809: TL02 imports the private name _coproduct_morphism
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:819: TL08 indexed_family: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:841: TL04 try/except: expected failures are asserted with pytest.raises
+3 files, 144 findings (TL01, TL02, TL03, TL04, TL08, TL09, TL10)
+[peakrss] r2lint: child waited=1 shell_code=1 samples=2
+[peakrss] peak tree RSS      : 10 MiB
+[peakrss] low-water MemAvail : 13757 MiB
+[peakrss] peak single VmHWM  : 10 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     2.0s procs=  3 rss=    10 MiB hwm=    10 MiB avail= 13757 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     1 MiB hwm=     1 MiB avail= 13915 MiB

@@ -1762,3 +1762,19 @@ value is the one the answering method returns on `ZZ['x']` at `2x+2` and at
 `QQ`, both implementations and the answering one raise the same `TypeError:
 integer content requires a free module over ZZ`, so the move changes no answer
 there).
+
+### #531 round 2: the quotient hash's canonical representative, and the interning key
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `issue531r2-probe-engine.log` | `ad28ef0116` | the engine of a quotient and its representative: `ZZ[x,y]/(4, 6x)` has engine `QuotientRing_generic` over `Integer Ring`, and its one class of `x` and `3x` has the representatives `xbar` and `-xbar` with engine hashes **3744985340818229357** and **-3744986470996619882**; `QQ[t]/(t^2+1)` is not a `QuotientRings` object at all (it is a free module on `{1, t}`, with no `_preamble_engine_ring`) |
+| `issue531r2-red.log` | `ad28ef0116` (the red test alone) | the new ZZ test: **1 failed, 2 passed in 2.19 s**, `DID NOT RAISE TypeError` on the hash of the class of `x` |
+| `issue531r2-gate.log` | this tree | the quotient file, the formed-module file and the finite ordered set file: **9 passed in 3.06 s** — `ZZ/(3)` still hashes, so `A2` over `F_3`'s `radical()` still returns, and the class over `ZZ` refuses a hash |
+| `issue531r2-product-base.log` | `ad28ef0116` (a clean worktree) | what round 1's restated test had narrowed: the index set of `[0], [1]` has no hash, and `Sets().product(family)` raises `TypeError: … FiniteOrderedSets.parent_class is not hashable and does not implement _cache_key()` |
+| `issue531r2-product.log` | this tree | the same family: `Sets().product(family)` returns **Product of the family over {[0], [1]}**, and a separately built equal family returns **the same object** |
+| `issue531r2-sets-slice.log`, `issue531r2-sets-slice-base.log` | this tree; `ad28ef0116` (a clean worktree) | `tests/sets`: **29 failed, 133 passed in 8.23 s** against **29 failed, 132 passed in 8.96 s**, the same FAILED ids (the extra pass is the new SET-05 test; the restored list-label test passes on both) |
+| `issue531r2-rings.log`, `issue531r2-rings-base.log` | the same two trees | `tests/rings`: **74 failed, 263 passed in 39.92 s** against **74 failed, 262 passed in 40.69 s**, the same FAILED ids (the extra pass is the new ZZ test) |
+| `issue531r2-neighbours.log`, `issue531r2-neighbours-base.log` | the same two trees | `tests/categories tests/objects`: **174 failed, 272 passed in 49.41 s** against **176 failed, 270 passed in 48.14 s**; no FAILED id is this tree's alone, and the two that are the clean worktree's alone are the same two that passed on round 1's tree, so they are this host's flakes |
+| `issue531r2-lint.log` | this tree | `test_lint` on the three touched test files: **3 files, 144 findings**, all in `test_products_and_coproducts_of_finite_and_countable_sets.sage` and in the codes it already carried; the two files of this change carry none |
+
+The product probe stays out of the tree: it builds the family over `finite_ordered_set(([0], [1]))` twice, reports whether the index set hashes, and compares the two products by identity.

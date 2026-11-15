@@ -1,0 +1,15 @@
+tree SHA: ad28ef011653034fd2f7cadb5e504267ed8f8646
+port SHA: 991b88b0
+inner 180 s, outer 240 s, guard 4096 MiB
+command: /sage/.venv/bin/python -u -s /probe.py
+the index set hashes? no: unhashable type: 'list'
+Sets().product(family) -> TypeError: <class 'sage_extensions.categories.sets.finite_ordered_sets.FiniteOrderedSets.parent_class'> is not hashable and does not implement _cache_key()
+PROBE DONE
+[peakrss] r2prbase: child waited=0 shell_code=0 samples=1
+[peakrss] peak tree RSS      : 1 MiB
+[peakrss] low-water MemAvail : 13952 MiB
+[peakrss] peak single VmHWM  : 1 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   timeout                       2 MiB peak
+[peakrss]   t=     0.0s procs=  1 rss=     1 MiB hwm=     1 MiB avail= 13952 MiB
+launcher exit: 0

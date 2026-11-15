@@ -1,0 +1,55 @@
+tree SHA: ad28ef011653034fd2f7cadb5e504267ed8f8646
+port SHA: 991b88b0
+inner 300 s, outer 360 s, guard 4096 MiB
+command: /sage/.venv/bin/python -u -s -m pytest -o addopts= -p qc_sage_session tests/rings/test_a_quotient_class_hashes_by_its_class.sage -v
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0 -- /sage/.venv/bin/python
+cachedir: .pytest_cache
+hypothesis profile 'default'
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: asyncio-1.5.0, xdist-3.8.0, reportlog-1.0.0, platformdirs-4.13.5, hypothesis-6.170.15, anyio-4.15.1, timeout-2.4.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 3 items
+
+tests/rings/test_a_quotient_class_hashes_by_its_class.sage::test_classes_with_different_lifts_are_one_key PASSED [ 33%]
+tests/rings/test_a_quotient_class_hashes_by_its_class.sage::test_distinct_classes_of_one_modulus_hash_apart PASSED [ 66%]
+tests/rings/test_a_quotient_class_hashes_by_its_class.sage::test_a_class_over_zz_refuses_a_hash_because_reduction_is_no_normal_form FAILED [100%]
+
+=================================== FAILURES ===================================
+___ test_a_class_over_zz_refuses_a_hash_because_reduction_is_no_normal_form ____
+
+    def test_a_class_over_zz_refuses_a_hash_because_reduction_is_no_normal_form() -> None:
+        r"""Over ``ZZ``, one class has many engine representatives, so it has no hash.
+    
+        In ``ZZ[x,y]/(4, 6x)`` the classes of ``x`` and of ``3x`` are equal, since
+        \(2x = 6x - 4x\) lies in the ideal.  Sage's representative of the two is
+        ``xbar`` and ``-xbar``: over a coefficient ring that is not a field
+        ``ideal.reduce`` returns the representative it was given, so a hash of the
+        representative is a hash of the lift.
+        """
+        polynomials = ZZ.polynomial_ring("x,y")
+        x = polynomials.algebra_generator("x")
+        quotient = polynomials.quotient_ring(polynomials.ideal(ZZ(4), ZZ(6) * x))
+        lifted = quotient(x)
+        relifted = quotient(ZZ(3) * x)
+    
+        assert lifted == relifted
+>       with pytest.raises(TypeError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE TypeError
+
+tests/rings/test_a_quotient_class_hashes_by_its_class.sage:59: Failed
+=========================== short test summary info ============================
+FAILED tests/rings/test_a_quotient_class_hashes_by_its_class.sage::test_a_class_over_zz_refuses_a_hash_because_reduction_is_no_normal_form
+========================= 1 failed, 2 passed in 2.19s ==========================
+[peakrss] r2red: child waited=1 shell_code=1 samples=2
+[peakrss] peak tree RSS      : 311 MiB
+[peakrss] low-water MemAvail : 13328 MiB
+[peakrss] peak single VmHWM  : 311 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      300 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     2.0s procs=  3 rss=   311 MiB hwm=   311 MiB avail= 13328 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     2 MiB hwm=     2 MiB avail= 13554 MiB
