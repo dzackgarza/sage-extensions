@@ -1,0 +1,60 @@
+# The README example runs as the repository's own recipe (#529)
+
+`readme.yml` spells the README example's command out itself, which is the same
+command the `readme` recipe in the `justfile` runs, written twice.  `justfile` is
+declared orchestration (CONTRIBUTING.md ENV-02) and the image carries `just`, so
+the step runs the recipe:
+
+    - name: Run the README example
+        run: just readme
+
+The example itself is unchanged: `just readme` runs
+`pytest --doctest-glob=README.md README.md` under the repository's own `addopts`,
+which load `sage_extensions.testing.timing_record`, so the run keeps its record
+in `.timings/` (ENV-03) and the upload step below has the files it names.
+
+It is a file rather than history because the connection that pushed this work
+may not update a file under `.github/workflows/`.
+
+**Install (one command, from the repository root):**
+
+```sh
+git apply results/issue529-readme-record.patch
+```
+
+The diff is against `fc4f322`.
+
+**What it was measured on.**  In the pinned image (Sage 11.0.beta5, `just`
+1.59.0, pytest 9.1.1), at `fc4f322` with only the `justfile` recipe in place:
+
+```
+$ SAGE_BIN=/sage/.venv/bin/sage just readme
+collected 1 item
+README.md .                                                              [100%]
+------ generated xml file: /repos/sage-extensions/tests/.report/junit.xml ------
+-------------- generated report log file: tests/.report/run.jsonl --------------
+1 passed in 0.49s
+$ ls .timings
+junit-fc4f32206119-20261115T084849505401Z-1787715.xml
+run-fc4f32206119-20261115T084849505401Z-1787715.jsonl
+```
+
+diff --git a/.github/workflows/readme.yml b/.github/workflows/readme.yml
+index 7319f2e..b97f661 100644
+--- a/.github/workflows/readme.yml
++++ b/.github/workflows/readme.yml
+@@ -32,13 +32,7 @@ jobs:
+           uv pip install --quiet --python "$sage_python" "sage-julia-bridge @ git+https://github.com/dzackgarza/sage-julia-bridge"
+           uv pip install --quiet --python "$sage_python" --no-deps -e .
+       - name: Run the README example
+-        # Under the repository's own addopts, which load the timing plugin: the
+-        # bare `python -m doctest README.md` this step used to run loaded no
+-        # plugin and wrote no .timings/, so the upload below had nothing to
+-        # upload and failed a green run.
+-        run: |
+-          sage_python="$("$SAGE_BIN" -c 'import sys; print(sys.executable)')"
+-          "$sage_python" -m pytest --doctest-glob=README.md README.md
++        run: just readme
+       # The run's own timing record (CONTRIBUTING.md ENV-03): the test run's
+       # report log and JUnit file as the run's plugin copied them into
+       # .timings/, and the stage records the library appended as it computed.

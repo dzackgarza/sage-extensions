@@ -25,12 +25,11 @@ True
 ```
 
 The block runs on every push, under the repository's own pytest configuration,
-in the [README example workflow](.github/workflows/readme.yml); running it that
-way is also what keeps the run's timing record (`CONTRIBUTING.md` ENV-03).
-Locally:
+in the [README example workflow](.github/workflows/readme.yml), so the run keeps
+its timing record (`CONTRIBUTING.md` ENV-03). Locally:
 
 ```bash
-just readme
+SAGE_BIN=/sage/.venv/bin/sage just readme
 ```
 
 ## Read next

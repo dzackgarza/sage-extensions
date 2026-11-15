@@ -12,12 +12,14 @@ the exit status, the outcome of each test the run reported, the failure
 messages, and the run's own output.
 
 The timing record has the same shape of question — does a stage-timed call leave
-records, does a cached call run its stage once, and does a run keep its own
-report log — so ``stage_records_of`` reads one call's records back out of the
-record file, ``kept_test_run`` reports the files a probe run kept, and
-``probe_run`` reports the log a run's own logging configuration filled.  All are
-bound as builtins for the same reason: the lint admits exactly the names a
-directory's ``conftest.py`` binds.
+records, does a cached call run its stage once, does a run keep its own report
+log, and do two runs started together keep two — so ``stage_records_of`` reads
+one call's records back out of the record file, ``kept_test_run`` reports the
+files a probe run kept and what that run exited with, ``simultaneous_test_runs``
+starts one probe per tree before waiting on any of them, and ``probe_run``
+reports the log a run's own logging configuration filled.  All are bound as
+builtins for the same reason: the lint admits exactly the names a directory's
+``conftest.py`` binds.
 """
 
 from __future__ import annotations
@@ -69,40 +71,56 @@ def probe_run(tree: dict[str, str], *arguments: str) -> ProbeRun:
     file :attr:`ProbeRun.log` reads and a run that writes none is an error
     rather than an empty string.
     """
-    PROBE_ROOT.mkdir(parents=True, exist_ok=True)
-    root = Path(tempfile.mkdtemp(prefix="probe-", dir=PROBE_ROOT))
+    root = _probe_directory(tree)
     try:
-        (root / "pytest.ini").write_text("[pytest]\nlog_file = pytest.log\n")
-        for name, source in tree.items():
-            (root / name).write_text(source)
-        report = root / "report.jsonl"
         completed = subprocess.run(
-            [
-                sys.executable, "-m", "pytest",
-                "-c", str(root / "pytest.ini"),
-                f"--report-log={report}",
-                *arguments,
-                str(root),
-            ],
-            cwd=root,
-            capture_output=True,
-            text=True,
+            _probe_command(root, arguments), cwd=root, capture_output=True, text=True
         )
-        records = [
-            json.loads(line) for line in report.read_text().splitlines() if line.strip()
-        ]
-        written = root / "pytest.log"
-        return ProbeRun(
-            exit_status=completed.returncode,
-            outcomes=_outcomes(records),
-            messages=tuple(
-                message for message in map(_failure_message, records) if message
-            ),
-            transcript=completed.stdout + completed.stderr,
-            log=written.read_text(),
-        )
+        return _probe_report(root, completed.returncode, completed.stdout + completed.stderr)
     finally:
         shutil.rmtree(root)
+
+
+def _probe_directory(tree: dict[str, str]) -> Path:
+    r"""A probe tree on disk: its files, and the configuration the run is given.
+
+    ``log_file`` is the probe's own, so every probe writes the log
+    :attr:`ProbeRun.log` reads and a run that writes none is an error rather than
+    an empty string.
+    """
+    PROBE_ROOT.mkdir(parents=True, exist_ok=True)
+    root = Path(tempfile.mkdtemp(prefix="probe-", dir=PROBE_ROOT))
+    (root / "pytest.ini").write_text("[pytest]\nlog_file = pytest.log\n")
+    for name, source in tree.items():
+        (root / name).write_text(source)
+    return root
+
+
+def _probe_command(root: Path, arguments: tuple[str, ...]) -> list[str]:
+    r"""The command that runs pytest over the probe tree at ``root``."""
+    return [
+        sys.executable, "-m", "pytest",
+        "-c", str(root / "pytest.ini"),
+        f"--report-log={root / 'report.jsonl'}",
+        *arguments,
+        str(root),
+    ]
+
+
+def _probe_report(root: Path, exit_status: int, output: str) -> ProbeRun:
+    r"""What the run in ``root`` reported, read off its own files."""
+    records = [
+        json.loads(line)
+        for line in (root / "report.jsonl").read_text().splitlines()
+        if line.strip()
+    ]
+    return ProbeRun(
+        exit_status=exit_status,
+        outcomes=_outcomes(records),
+        messages=tuple(message for message in map(_failure_message, records) if message),
+        transcript=output,
+        log=(root / "pytest.log").read_text(),
+    )
 
 
 def _failure_message(record: dict) -> str:
@@ -138,6 +156,7 @@ def pytest_configure(config) -> None:
     builtins.probe_run = probe_run
     builtins.stage_records_of = stage_records_of
     builtins.kept_test_run = kept_test_run
+    builtins.simultaneous_test_runs = simultaneous_test_runs
 
 
 def pytest_unconfigure(config) -> None:
@@ -145,6 +164,7 @@ def pytest_unconfigure(config) -> None:
     del builtins.probe_run
     del builtins.stage_records_of
     del builtins.kept_test_run
+    del builtins.simultaneous_test_runs
 
 
 @dataclass(frozen=True)
@@ -189,7 +209,7 @@ def _sizes(directory: Path) -> dict[str, int]:
 def _record_file(path: Path, *, after: int = 0) -> RecordFile:
     r"""The file at ``path``, read by its name and by the lines past ``after``."""
     stem, _, suffix = path.name.partition(".")
-    kind, commit, stamp = stem.split("-")
+    kind, commit, stamp = stem.split("-", 2)
     return RecordFile(
         name=path.name,
         kind=kind,
@@ -222,7 +242,24 @@ def stage_records_of(invoke) -> RecordFile:
     return _record_file(directory / grown[0], after=before.get(grown[0], 0))
 
 
-def kept_test_run(tree, *arguments) -> tuple[RecordFile, ...]:
+@dataclass(frozen=True)
+class KeptRun:
+    r"""One probe run, and the record files that appeared while it was in flight.
+
+    ``probe`` is what the run itself reported — its exit status among it — so a
+    test can refuse a run that failed anywhere, and not only in the assertion it
+    went looking for.
+    """
+
+    files: tuple[RecordFile, ...]
+    probe: ProbeRun
+
+
+PLUGIN_ARGUMENTS = ("-p", "sage_extensions.testing.timing_record", "--junit-xml=junit.xml")
+r"""The arguments that load the plugin under test and ask the run for its JUnit file."""
+
+
+def kept_test_run(tree, *arguments) -> KeptRun:
     r"""Run a probe pytest under the timing plugin and report the files it kept.
 
     The plugin keeps a run's report log and JUnit file where every run keeps
@@ -234,12 +271,49 @@ def kept_test_run(tree, *arguments) -> tuple[RecordFile, ...]:
     """
     directory = sage_timing.timing_directory()
     before = set(_sizes(directory))
-    probe_run(
-        tree,
-        "-p", "sage_extensions.testing.timing_record",
-        "--junit-xml=junit.xml",
-        *arguments,
+    probe = probe_run(tree, *PLUGIN_ARGUMENTS, *arguments)
+    return KeptRun(
+        files=tuple(
+            _record_file(directory / name) for name in sorted(set(_sizes(directory)) - before)
+        ),
+        probe=probe,
     )
-    return tuple(
-        _record_file(directory / name) for name in sorted(set(_sizes(directory)) - before)
-    )
+
+
+def simultaneous_test_runs(*trees: dict[str, str]) -> tuple[tuple[RecordFile, ...], tuple[ProbeRun, ...]]:
+    r"""Run one probe pytest per tree at once, and report the files they kept.
+
+    Two runs started together is the case a record's name has to survive: both
+    begin within the same second, so a name stamped to the second is one name.
+    Every probe is started before any is waited on, which is what makes them
+    concurrent, and each keeps its own report log and JUnit file through the same
+    plugin arguments ``kept_test_run`` uses.
+    """
+    directory = sage_timing.timing_directory()
+    before = set(_sizes(directory))
+    roots = [_probe_directory(tree) for tree in trees]
+    try:
+        processes = [
+            subprocess.Popen(
+                _probe_command(root, PLUGIN_ARGUMENTS),
+                cwd=root,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                text=True,
+            )
+            for root in roots
+        ]
+        probes = []
+        for root, process in zip(roots, processes):
+            output, _ = process.communicate()
+            probes.append(_probe_report(root, process.returncode, output or ""))
+        return (
+            tuple(
+                _record_file(directory / name)
+                for name in sorted(set(_sizes(directory)) - before)
+            ),
+            tuple(probes),
+        )
+    finally:
+        for root in roots:
+            shutil.rmtree(root)

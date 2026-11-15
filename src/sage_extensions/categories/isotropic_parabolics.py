@@ -40,6 +40,7 @@ from sage.misc.cachefunc import cached_method
 from sage.rings.integer_ring import ZZ as SageZZ
 from sage.structure.element import parent as element_parent
 
+from sage_extensions.categories._lattice import lattice_record_name
 from sage_extensions.categories.modules.pure.modules import ModuleSubobjects
 from sage_extensions.categories.rings.ring_foundation import (
     OwnedCategoryOverBaseRing,
@@ -4385,7 +4386,12 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             point_set = libgap.eval("Set([" + ",".join(str(point) for point in points) + "])")
             return int(libgap.Length(libgap.Orbit(action, point_set, libgap.eval("OnSets"))))
 
-        @timed_stage("stabilizer discriminant image orders", input=lambda self, *arguments, **keywords: self.ambient_lattice())
+        @timed_stage(
+            "stabilizer discriminant image orders",
+            input=lambda self, *arguments, **keywords: (
+                f"a rank-{self.module_rank()} subobject of {lattice_record_name(self.ambient_lattice())}"
+            ),
+        )
         def stabilizer_discriminant_image_orders(self):
             r"""Return `(upper, lower)`: the bound on `\rho(G_P)` and the order of the returned images.
 
@@ -4639,7 +4645,10 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             ``cached_method`` builds its argument fixer from with
             ``(*arguments, **keywords)``.
             """
-            with stage("parabolic completeness decision", self.ambient_lattice()):
+            with stage(
+                "parabolic completeness decision",
+                f"a rank-{self.module_rank()} subobject of {lattice_record_name(self.ambient_lattice())}",
+            ):
                 if self.splitting_complement() is not None:
                     return True, None
                 rank = int(self.module_rank())

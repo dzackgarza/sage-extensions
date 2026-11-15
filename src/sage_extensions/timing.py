@@ -27,31 +27,32 @@ functions no cache reads a signature from.
 **Where the record goes.**  :func:`timing_directory` is ``.timings/`` in the
 source tree this module is a file of, which ``.gitignore`` keeps out of git and
 ``CONTRIBUTING.md`` ENV-03 states, and which the call creates and asserts.  One
-file per process, named by the resolved commit and the process's start time, so
-two runs of the same commit never overwrite each other's records and a record
-is never a claim about which commit produced it: the commit is in its name and
-in every line.
+file per process, named by the resolved commit, the process's start time to the
+microsecond and its pid, so two runs of the same commit never overwrite each
+other's records — two runs started in the same second are two processes, and two
+processes are two pids — and a record is never a claim about which commit
+produced it: the commit is in its name and in every line.
 
 **What a record line holds.**  ``stage`` (the name), ``input`` (the name of what
-was computed, read off the object and never rendered from it), ``seconds``
-(wall time, ``time.perf_counter``), ``started`` and
+was computed, written by the caller), ``seconds`` (wall time,
+``time.perf_counter``), ``started`` and
 ``finished`` (UTC, ISO 8601), ``outcome`` (``"returned"`` or ``"raised"``, with
 ``error`` naming the exception class), ``commit``, ``run`` (the process's start
 stamp, which is the file's own name) and ``pid``.
 
 **What it costs when nobody reads it.**  A stage is two ``perf_counter``
-readings, the reading of its input's name, and one appended line.  Nothing is
+readings, the fitting of its input's name, and one appended line.  Nothing is
 measured per element, no computation is re-run to time it, and the handler is
 added on the first record rather than at import, so importing the library writes
 nothing.
 
-**The input is named, not rendered.**  ``repr`` is a computation, and for a
-lattice it is an invariant one: ``Lattices``'s ``_repr_`` states the signature,
-which it reads off the form.  Naming an input that way would put a
-diagonalization inside a log line's cost, and a rendering that raised would take
-a measured call down for the record's sake.  So an object states its own cheap
-name with ``_timing_name`` — the lattice's is ``Integral lattice of rank 11`` —
-and an object that states none is recorded by the name of its class.
+**The input's name is the caller's.**  ``input`` is a string the call site builds
+from what it already holds — the row's parameters, a plane's position, the
+lattice's rank and generator labels — and this module inspects nothing it is
+handed.  A record whose name came from reading its object would be a record that
+depends on a class and on whatever that class happens to carry; a name read off a
+display would be a computation, on a lattice an invariant one, bought for a log
+line.  ``input`` is a name, so it is written where the name is known.
 
 **Which logger it is.**  ``sage_extensions.timing``, a child of the package's
 logger and nobody else's: this module sets that child's level and leaves
@@ -102,8 +103,11 @@ r"""The logger every stage record is emitted through."""
 logger.setLevel(logging.INFO)
 
 _PROCESS_START = datetime.now(timezone.utc)
-_FILE_STAMP = _PROCESS_START.strftime("%Y%m%dT%H%M%SZ")
 _PROCESS_ID = os.getpid()
+# To the microsecond and with the pid, because a second is long enough for two
+# runs to start in it: two runs are two processes, and two processes are two
+# pids, so the pair names one process's record and no other's.
+_FILE_STAMP = f"{_PROCESS_START.strftime('%Y%m%dT%H%M%S%fZ')}-{_PROCESS_ID}"
 _HANDLER_LOCK = threading.Lock()
 _INPUT_LIMIT = 240
 
@@ -189,11 +193,12 @@ def current_commit() -> str:
 
 
 def record_path() -> Path:
-    r"""This process's stage-record file: ``stages-<commit>-<start>.jsonl``.
+    r"""This process's stage-record file: ``stages-<commit>-<start>-<pid>.jsonl``.
 
-    Named by the resolved commit and the process's start time, so a second run
-    of the same commit appends to a file of its own rather than overwriting the
-    first one's, and the two are comparable by name alone.
+    Named by the resolved commit, the process's start time to the microsecond and
+    its pid, so a second run of the same commit appends to a file of its own
+    rather than to the first one's, and two runs that began in the same second —
+    a worker and its controller, two probes started together — are two files.
     """
     return timing_directory() / f"stages-{current_commit()[:12]}-{_FILE_STAMP}.jsonl"
 
@@ -209,21 +214,14 @@ def _installed_handler() -> _JSONLineHandler:
         return handler
 
 
-def _named(target) -> str:
-    r"""The input's name: a string as given, else the cheap name the object states.
+def _named(name: str) -> str:
+    r"""A caller's name for its input, fitted to one line of the record.
 
-    Nothing is rendered.  ``repr`` is a computation and, on this library's
-    lattices, an invariant one — the display states the signature, read off the
-    form — so an object that can be named for nothing states the name with
-    ``_timing_name``, and one that states none is named by its class.  Either way
-    a stage's cost is a clock reading, not a rendering.
+    Whitespace is collapsed and the text is cut to the limit; nothing else is
+    done to it.  The name is the caller's, so this has nothing to inspect and
+    nothing to render.
     """
-    if isinstance(target, str):
-        text = target
-    else:
-        stated = getattr(target, "_timing_name", None)
-        text = type(target).__name__ if stated is None else stated()
-    text = " ".join(text.split())
+    text = " ".join(name.split())
     return text if len(text) <= _INPUT_LIMIT else text[: _INPUT_LIMIT - 1] + "…"
 
 
@@ -234,16 +232,16 @@ def _emit(entry: dict) -> None:
 
 
 @contextmanager
-def stage(name: str, input):
+def stage(name: str, input: str):
     r"""Record the wall time of one stage of a computation, named for its input.
 
     ``name`` is the stage — ``"ambient O(L) row"``, ``"coset walk and
-    transport"`` — and ``input`` is what the stage was computed for, kept by
-    :func:`_named`: a string passed here is recorded verbatim, an object by the
-    name it states with ``_timing_name``, and one that states none by its class.
-    The record is written when the block ends, whether it returned or raised, and
-    the exception is re-raised unchanged: timing a stage is not a place to close
-    an error.
+    transport"`` — and ``input`` is the name of what it was computed for, a
+    string the caller writes from what it holds.  Nothing about the input is read
+    here (:func:`_named` only fits the text), so a record never depends on what
+    an object happens to carry.  The record is written when the block ends,
+    whether it returned or raised, and the exception is re-raised unchanged:
+    timing a stage is not a place to close an error.
     """
     entry = {
         "stage": name,
@@ -281,9 +279,9 @@ def timed_stage(name: str, *, input):
     Only for a function no cache reads a signature from: under ``cached_method``
     the stage goes inside the method's body instead, because the wrapper's
     ``(*arguments, **keywords)`` is what the cache would then key on.  ``input``
-    is a callable reading the name of the stage's input out of the call's
-    arguments, and :func:`functools.wraps` leaves the signature and docstring the
-    function's own for every other reader.
+    is a callable naming the stage's input out of the call's arguments, and
+    :func:`functools.wraps` leaves the signature and docstring the function's own
+    for every other reader.
     """
 
     def decorate(function):

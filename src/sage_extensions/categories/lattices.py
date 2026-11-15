@@ -10246,26 +10246,6 @@ class Lattices(OwnedCategoryOverBaseRing):
                     return f"{kind} of rank {rank} and signature ({pos}, {neg})"
             return f"{kind} of rank {rank} over {self.base_ring()}"
 
-        def _timing_name(self) -> str:
-            r"""Name this lattice for a timing record, which may not compute an invariant.
-
-            The display :meth:`_repr_` states the signature, and the signature is
-            read off the form by a congruence diagonalization; a timing record's
-            line names its input for the cost of a clock reading, so it reads the
-            rank, which the module already holds
-            (:mod:`sage_extensions.timing`).
-
-            EXAMPLES::
-
-                sage: from sage_extensions.categories.lattices import Lattices
-                sage: Lattices(ZZ)("U")._timing_name()
-                'Integral lattice of rank 2'
-            """
-            from sage.rings.integer_ring import ZZ
-
-            kind = "Integral lattice" if _engine_ring(self.base_ring()) is ZZ else "Lattice"
-            return f"{kind} of rank {self.module_rank()}"
-
         def _latex_(self):
             r"""Display $L$ with its invariants; the Gram is $G_L$, not $L$.
 

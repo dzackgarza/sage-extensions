@@ -15,11 +15,12 @@ one call, and the walk runs once.  And the logger the record is written through
 must not quieten the logger its package already had: a DEBUG record of a child
 logger still reaches the run's log file.
 
-Two facts are about the run rather than the library.  A run keeps one record of
-itself: ``pytest-xdist`` finishes a session in each worker's process, and the
-report log and the JUnit file are the controller's.  And a stage names its input
-without rendering it, because a rendering of a lattice is an invariant computed
-for a log line.
+Three facts are about the run rather than the library.  A run keeps one record
+of itself: ``pytest-xdist`` finishes a session in each worker's process, and the
+report log and the JUnit file are the controller's.  Two runs started in the same
+second keep two records, because a record's name is its run's.  And a stage
+names its input in words its call site writes, so the record says what the run
+was computing rather than what an object happens to print.
 
 The order asserted is the order the run *wrote* the lines, which is the order
 the stages ended: a stage's line carries its wall time, so the outermost one is
@@ -40,12 +41,11 @@ def _hyperbolic_triangle():
 
 
 def test_a_stage_timed_call_writes_its_stage_records_in_order_with_their_durations():
-    r"""One call, four records, each naming the lattice by its rank and nothing computed.
+    r"""One call, four records, each naming the row and the lattice it ran on.
 
-    The lattice display states the signature, and reading it off the form is a
-    congruence diagonalization: an invariant computed for a log line.  A stage
-    names its input instead, so the four records carry the rank of the lattice
-    the row was computed for, as the lattice states it.
+    The name is the caller's: the row's rank, and the lattice's rank with the
+    labels of its generators.  Nothing is read off an object and nothing is
+    rendered, so the four records say what the run computed.
     """
     lattice = _small_lattice()
     written = stage_records_of(
@@ -66,7 +66,7 @@ def test_a_stage_timed_call_writes_its_stage_records_in_order_with_their_duratio
     assert all(record["outcome"] == "returned" for record in written.records)
     assert all(record["seconds"] >= 0 for record in written.records)
     assert tuple(record["input"] for record in written.records) == (
-        "Integral lattice of rank 5",
+        "rank-1 subobject row of the rank-5 lattice on generators 0, 1, 2, 3, 4",
     ) * 4
 
 
@@ -122,8 +122,10 @@ def test_a_run_keeps_the_files_its_own_options_name():
     by ``probe_run``; both appear in the record directory named by the commit
     and by one start stamp, and the report log keeps the lines the run wrote.
     """
-    kept = kept_test_run({"test_the_probe.py": "def test_the_probe():\n    assert 1 + 1 == 2\n"})
+    run = kept_test_run({"test_the_probe.py": "def test_the_probe():\n    assert 1 + 1 == 2\n"})
+    kept = run.files
 
+    assert run.probe.exit_status == 0
     assert tuple(entry.kind for entry in kept) == ("junit", "report")
     assert tuple(entry.suffix for entry in kept) == ("xml", "jsonl")
     assert all(entry.commit == entry.head[:12] for entry in kept)
@@ -142,10 +144,45 @@ def test_a_parallel_run_keeps_one_record():
     run beside a directory of records that are not runs.  One record, whatever
     the number of workers.
     """
-    kept = kept_test_run(
+    run = kept_test_run(
         {"test_the_probe.py": "def test_the_probe():\n    assert 1 + 1 == 2\n"},
         "-n", "2",
     )
+    kept = run.files
 
+    assert run.probe.exit_status == 0
     assert tuple(entry.kind for entry in kept) == ("junit", "report")
     assert all(entry.stamp == kept[0].stamp for entry in kept)
+
+
+def test_two_runs_started_together_keep_two_records():
+    r"""Two runs begun in one second are two records, each holding its own test.
+
+    The record's name is its run's: the start to the microsecond and the pid of
+    the process that kept it.  A stamp to the second is one name for two runs, and
+    then the second run's copy lands on the first run's file — one record, holding
+    one of the two tests, with nothing to say that the other ever ran.  Both
+    probes here are started before either is waited on, so they begin together.
+    """
+    files, probes = simultaneous_test_runs(
+        {"test_the_first_probe.py": "def test_the_first_probe():\n    assert 1 + 1 == 2\n"},
+        {"test_the_second_probe.py": "def test_the_second_probe():\n    assert 2 + 2 == 4\n"},
+    )
+
+    assert tuple(probe.exit_status for probe in probes) == (0, 0)
+    assert tuple(entry.kind for entry in files) == ("junit", "junit", "report", "report")
+    assert files[0].stamp != files[1].stamp
+    assert files[2].stamp != files[3].stamp
+    assert {
+        tuple(sorted(
+            {
+                record["nodeid"] for record in entry.records
+                if record.get("when") in ("setup", "call", "teardown")
+            }
+        ))
+        for entry in files
+        if entry.kind == "report"
+    } == {
+        ("test_the_first_probe.py::test_the_first_probe",),
+        ("test_the_second_probe.py::test_the_second_probe",),
+    }

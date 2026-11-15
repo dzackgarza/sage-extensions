@@ -5,6 +5,7 @@ from sage.libs.gap.libgap import libgap
 from sage.misc.cachefunc import cached_method
 from sage.structure.element import parent as element_parent
 
+from sage_extensions.categories._lattice import lattice_record_name
 from sage_extensions.categories.group.g_sets import FiniteGSets
 from sage_extensions.categories.group.groups import Subgroups
 from sage_extensions.categories.sets.finite_ordered_sets import (
@@ -3633,7 +3634,10 @@ def _plane_parabolic_incidence_flags(subgroup, plane, flag):
 
 @timed_stage(
     "isotropic orbit representatives",
-    input=lambda subgroup, *arguments, **keywords: subgroup.supergroup().domain(),
+    input=lambda subgroup, rank, *, flag=False: (
+        f"rank-{rank} {'flag' if flag else 'subobject'} row of "
+        f"{lattice_record_name(subgroup.supergroup().domain())}"
+    ),
 )
 def _subgroup_isotropic_orbit_representatives(subgroup, rank, *, flag=False):
     r"""Return the subgroup's orbits of primitive isotropic subobjects, as one timed row.
@@ -3649,7 +3653,8 @@ def _subgroup_isotropic_orbit_representatives(subgroup, rank, *, flag=False):
     if not flag and index(rank) == 0:
         return subgroup.supergroup().isotropic_orbit_representatives(0)
     lattice = subgroup.supergroup().domain()
-    with stage("discriminant image", lattice):
+    row = f"rank-{rank} {'flag' if flag else 'subobject'} row of {lattice_record_name(lattice)}"
+    with stage("discriminant image", row):
         _assert_isotropic_splitting_has_character_data(subgroup)
         quotient = subgroup.finite_character_quotient()
     orthogonal_group = subgroup.supergroup()
@@ -3660,7 +3665,7 @@ def _subgroup_isotropic_orbit_representatives(subgroup, rank, *, flag=False):
     # (its Normaliz walk is measured at over twenty minutes before failing),
     # while the port's line route answers the same classes in tens of seconds.
     sourced = orthogonal_group.isotropic_orbit_representatives(rank, flag=flag)
-    with stage("coset splitting and transport", lattice):
+    with stage("coset splitting and transport", row):
         for representative in sourced:
             line_image = (
                 quotient.isotropic_line_stabilizer_image(representative)

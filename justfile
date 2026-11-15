@@ -153,13 +153,12 @@ test *args:
     PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" \
         "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
 
-# A bare `python -m doctest` loads no plugin and leaves .timings/ empty.
 # The README example, under the repository's own pytest configuration.
 readme:
     #!/usr/bin/env bash
     set -euo pipefail
-    "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" \
-        -m pytest --doctest-glob=README.md README.md
+    sage_python="$("${SAGE_BIN:?set SAGE_BIN to the sage of the image}" -c 'import sys; print(sys.executable)')"
+    "$sage_python" -m pytest --doctest-glob=README.md README.md
 
 # The suite runs in parallel, one Sage process per worker, and records which
 # test ran each line; only lines a passing test ran count as covered.

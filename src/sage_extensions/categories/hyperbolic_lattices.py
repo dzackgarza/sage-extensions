@@ -51,7 +51,7 @@ from sage.structure.sage_object import SageObject
 
 from sage_extensions.categories.sets.indexed_families import finite_indexed_family_from_values
 from sage_extensions.categories.lattices import Lattices
-from sage_extensions.categories._lattice import signature_pair
+from sage_extensions.categories._lattice import lattice_record_name, signature_pair
 from sage_extensions.categories.sets.cardinals import cardinal
 from sage_extensions.categories.rings.ring_foundation import (
     _owned_engine_element,
@@ -1181,7 +1181,7 @@ class HyperbolicLattices(OwnedCategoryOverBaseRing):
             **keywords)`` for the key's argument fixer, so ``admits_root=None``
             written out and left off would be two cache entries for one walk.
             """
-            with stage("Vinberg walk", self):
+            with stage("Vinberg walk", f"{lattice_record_name(self)}, {max_roots} roots at most"):
                 assert self.base_ring() is _owned_integers(), (
                     f"cannot run Vinberg's algorithm on {self} over {self.base_ring()}: the "
                     f"algorithm holds over any totally real ring of integers, but the "
