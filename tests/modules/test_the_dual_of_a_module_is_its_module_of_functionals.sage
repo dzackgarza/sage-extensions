@@ -9,8 +9,10 @@ functional applied to the vector.
 
 $\mathbf{Q}^{(\mathbf{N})}$ states this where it is visible: the module of
 morphisms $\mathbf{Q}^{(\mathbf{N})} \to \mathbf{Q}$ carries no chosen
-presentation, because no family of its points generates it, and it is still the
-dual, and a functional is still written down by its values on the basis.
+presentation, and this library holds no presentation of it -- it is
+$\prod_{\mathbf{N}} \mathbf{Q}$, of dimension $2^{\aleph_0}$ over $\mathbf{Q}$,
+so no countable family of its points generates it -- and it is still the dual,
+and a functional is still written down by its values on the basis.
 """
 
 from sage_extensions.all import *  # noqa: F401,F403

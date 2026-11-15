@@ -358,16 +358,22 @@ def _final_category_operations(
     only if the final order is read again after the refinement.
 
     The first provider of a name in ``providers`` order is the one the final
-    category selects.  When it is already carried and ``built`` resolves that
-    name to another of the category's providers, its descriptor is returned for
-    the caller to alias, so the class resolves the name as the category does.
-    A name ``built`` resolves to a realization outside these providers keeps
-    that realization: this orders the category's own levels, and a computation
-    the category leaves to its realizations is not one of them.  Names are the
-    public ones and the Python protocol operations on the object's value, a
-    ``__truediv__`` among them; a single-underscore name is a construction hook
-    and stays on the provider that declared it, and so does a dunder that
-    constructs the object or names its identity (``_is_bookkeeping_or_hook``).
+    category selects, and that order is the category hierarchy's: a provider
+    whose categories are below another's precedes it (:func:`_owned_mixins`,
+    :func:`_precedes`).  The ring and module levels are incomparable as
+    categories, so the hierarchy does not order those two and the walk's own
+    order decides; the framed and general module levels are comparable, and the
+    framed level precedes.  When the selected provider is already carried and
+    ``built`` resolves that name to another of the category's providers, its
+    descriptor is returned for the caller to alias, so the class resolves the
+    name as the category does.  A name ``built`` resolves to a realization
+    outside these providers keeps that realization: this orders the category's
+    own levels, and a computation the category leaves to its realizations is not
+    one of them.  Names are the public ones and the Python protocol operations
+    on the object's value, a ``__truediv__`` among them; a single-underscore
+    name is a construction hook and stays on the provider that declared it, and
+    so does a dunder that constructs the object or names its identity
+    (``_is_bookkeeping_or_hook``).
     """
     known = frozenset(providers)
     resolved = _declaring_classes(built)
