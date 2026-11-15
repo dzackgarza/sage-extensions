@@ -1440,3 +1440,24 @@ and `_OwnedRingParent` states it too, because it answers the canonical sources i
 | `500-review-gate-410.log` | `9fd76e4` | #410's slice -- four cause-A ids, the cause-B id and #150's contract: **6 passed in 1.89 s** |
 | `500-review-base-red.log` | `0a8a95b` | the same test file at main: **1 failed, 4 passed in 19.32 s**, red on `test_an_integer_literal_divides_in_the_parent_the_two_share` at `e12 / 2` |
 | `500-review-regression-compared.log` | `9fd76e4` against `0a8a95b` | fourteen directories and the root `tests/*.py`, one pytest process each per tree, FAILED ids compared: **every row has an empty only-on-this-tree set**; `tests/rings` is 74 failed, 259 passed against 75 failed, 258 passed, with the one fixed id being the new test. The sweeps ran on `d3ca9ee`, whose `src` and `tests` are `9fd76e4`'s (`git diff d3ca9ee 9fd76e4 -- src tests` is empty) |
+
+## Issue #500, the second review: one authority for the integer coercion, the positive criterion, and the three tests
+
+The review of `9fd76e4` found the integer coercion stated twice, a deny-list deciding which dunders the rebuild rule
+may order, three moved operations with no test, and one false sentence in the ring contract. `6828f81` answers all
+four. The criterion is now the Python language reference's container protocol (Data Model, §3.3.7) and numeric
+protocol (§3.3.8) plus public names, 62 names; the integer map is stated once, on `OwnedRings`, and the
+engine-backed realization defers to it through `super()`; the tests are
+`tests/categories/test_the_refined_category_answers_with_its_own_operation.sage`, stating for `QQ(i)` which level
+answers `order_ideal`, `__iter__` and `adic_completion` and what each returns.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `500b-findings.log` | `6828f81` | the four findings read on the tree that answers them: the two `_coerce_map_from_` hooks and which names their bytecode holds (`_OwnedRingParent`'s no longer names `_owned_ring_from_integer`); for eight rings what the `int` case, the session integer and a raw Sage integer answer, and the integer case reached through `super()`; the criterion's answer for twenty-one names and its 62-name size; the names the rule installs on each of the eight rings' classes, with the dunders outside the value protocol; the level answering each of the three moved operations on `QQ(i)` and its value; the ring contract's docstring |
+| `500b-criterion.log` | `6828f81` | the old deny-list and the new criterion run over the same providers for eighteen constructed objects (the eight review rings, `ZZ**2`, `QQ**2`, two lattices, `ZZ_5`, `ZZ/8`, `Zp(5)`, `ZZ[i]`, `QQ[x,y]`): **the same four names are selected by both** -- `__truediv__`, `order_ideal` on element classes, `__iter__` and `adic_completion` on parent classes -- with **nothing selected by only one of the two** |
+| `500b-tests.log` | `6828f81` | `tests/categories/test_the_refined_category_answers_with_its_own_operation.sage` and `tests/rings/test_elements_divide_in_their_own_ring.sage`: **8 passed in 16.57 s**, lint plugin on (the fix commit cites the first run of the same two files on the same content, 18.91 s) |
+| `500b-sweep-tree.log` | `6828f81` | thirteen test directories, one pytest process each: 840 FAILED ids in total. The runs were made on the working tree before it was committed, and its `src` and `tests` are `6828f81`'s |
+| `500b-sweep-base.log` | `ba3ab60` | a clean worktree at the commit fetched from main: the same thirteen directories and the root `tests/*.py` |
+| `500b-sweep-tree-extra.log` | `6828f81` | the root `tests/*.py` (**25 passed in 10.92 s**), and the two lattice files that read the framed content: `test_content_and_doubling.sage` 1 failed, 3 passed; `test_reflection_rational_line.sage` 4 passed |
+| `500b-sweep-base-extra.log` | `ba3ab60` | the same two lattice files on the base: 1 failed, 3 passed and 4 passed, the same ids |
+| `500b-regression-compared.log` | `6828f81` against `ba3ab60` | FAILED ids compared per target: **840 on each side, 0 only on the tree, 0 only on the base**; the only count difference is `tests/categories` 59 passed against 56, which is the three new tests. Not swept as one directory: `tests/lattices`, 5.6 GiB resident and unfinished after 25 minutes here |

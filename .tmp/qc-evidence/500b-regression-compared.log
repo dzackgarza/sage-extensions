@@ -1,0 +1,31 @@
+commit: 6828f810a0007815ab4ec62647483429f46d6ea4
+comparison: FAILED ids of this tree against a clean worktree at ba3ab60, the commit fetched from main,
+one pytest process per target on each side.
+  tree logs: 500b-sweep-tree.log (thirteen directories), 500b-sweep-tree-extra.log (the root tests and two lattice files)
+  base logs: 500b-sweep-base.log (the same directories and the root tests), 500b-sweep-base-extra.log (the two lattice files)
+The base worktree has no test file this push adds, so the three new ids exist on the tree only, and pass.
+
+target                                          tree                                        base
+tests/algebras                                  64 failed, 149 passed in 66.61s (0:01:06)   64 failed, 149 passed in 43.82s
+tests/categories                                61 failed, 59 passed in 10.90s              61 failed, 56 passed in 11.60s
+tests/divisors                                  42 failed, 25 passed in 17.38s              42 failed, 25 passed in 11.40s
+tests/engineering                               4 failed, 4 passed in 31.26s                4 failed, 4 passed in 22.53s
+tests/forms                                     48 failed, 93 passed in 412.06s (0:06:52)   48 failed, 93 passed in 331.46s (0:05:31)
+tests/foundations                               2 failed, 6 passed in 3.77s                 2 failed, 6 passed in 4.25s
+tests/functions                                 48 failed, 15 passed in 5.74s               48 failed, 15 passed in 4.73s
+tests/lattices/test_content_and_doubling.sage   1 failed, 3 passed in 1.79s                 1 failed, 3 passed in 1.77s
+tests/lattices/test_reflection_rational_line.sage4 passed in 1.45s                           4 passed in 1.45s
+tests/modules                                   82 failed, 225 passed, 1 warning in 34.24s  82 failed, 225 passed, 1 warning in 33.87s
+tests/objects                                   115 failed, 211 passed in 41.17s            115 failed, 211 passed in 37.50s
+tests/rings                                     74 failed, 259 passed in 36.37s             74 failed, 259 passed in 38.79s
+tests/schemes                                   250 failed, 161 passed in 88.64s (0:01:28)  250 failed, 161 passed in 89.36s (0:01:29)
+tests/sets                                      29 failed, 127 passed in 5.52s              29 failed, 127 passed in 5.59s
+tests/tensors                                   19 failed, 24 passed in 2.96s               19 failed, 24 passed in 2.50s
+tests/test_*.py                                 25 passed in 10.92s                         25 passed in 9.98s
+tests/topology                                  1 failed in 1.22s                           1 failed in 1.30s
+
+FAILED ids: 840 on the tree, 840 on the base; 0 only on the tree, 0 only on the base
+
+Not swept as one directory: tests/lattices.  It reaches 5.6 GiB resident and had not finished after 25
+minutes on this host, so the two files under it that read the framed content were run on both trees
+and match; the lattice side of the moved names has no other consumer in the test tree.

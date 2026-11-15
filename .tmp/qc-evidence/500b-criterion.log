@@ -1,0 +1,21 @@
+commit: 6828f810a0007815ab4ec62647483429f46d6ea4
+command: python /repos/sage-extensions/.scratch/issue500/probe_criterion.py
+tree: this commit's src and tests
+
+
+constructed 18 objects: ['CC', 'Lattices(QQ)([[1]])', 'Lattices(ZZ)(2)', 'M_2(QQ)', 'M_2(ZZ)', 'QQ', 'QQ(i)', 'QQ**2', 'QQ[x,y]', 'QQ[x]', 'RR', 'ZZ', 'ZZ**2', 'ZZ/8', 'ZZ[i]', 'ZZ[x]', 'ZZ_5', 'Zp(5)']
+
+selected by the new criterion:
+  __iter__: ['Owned_OwnedAlgebraParent_with_category', 'Owned_OwnedRingParent_with_category']
+  __truediv__: ['Owned_AdicCompletionAlgebraParent_with_category.element_class', 'Owned_NativeFreeAlgebraParent_with_category.element_class', 'Owned_OwnedAlgebraParent_with_category.element_class', 'Owned_OwnedRingParent_with_category.element_class']
+  adic_completion: ['Owned_OwnedAlgebraParent_with_category', 'Owned_OwnedRingParent_with_category']
+  order_ideal: ['Owned_NativeFreeAlgebraParent_with_category.element_class', 'Owned_OwnedAlgebraParent_with_category.element_class']
+
+selected by the old criterion:
+  __iter__: ['Owned_OwnedAlgebraParent_with_category', 'Owned_OwnedRingParent_with_category']
+  __truediv__: ['Owned_AdicCompletionAlgebraParent_with_category.element_class', 'Owned_NativeFreeAlgebraParent_with_category.element_class', 'Owned_OwnedAlgebraParent_with_category.element_class', 'Owned_OwnedRingParent_with_category.element_class']
+  adic_completion: ['Owned_OwnedAlgebraParent_with_category', 'Owned_OwnedRingParent_with_category']
+  order_ideal: ['Owned_NativeFreeAlgebraParent_with_category.element_class', 'Owned_OwnedAlgebraParent_with_category.element_class']
+
+only the old criterion selected: []
+only the new criterion selected: []

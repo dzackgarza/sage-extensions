@@ -1,0 +1,11 @@
+commit: 6828f810a0007815ab4ec62647483429f46d6ea4
+command: python -m pytest -p qc_sage_session -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates -q --tb=short tests/categories/test_the_refined_category_answers_with_its_own_operation.sage tests/rings/test_elements_divide_in_their_own_ring.sage
+tree: this commit, worktree unchanged
+
+tree SHA: 6828f810a0007815ab4ec62647483429f46d6ea4
+selection: tests/categories/test_the_refined_category_answers_with_its_own_operation.sage tests/rings/test_elements_divide_in_their_own_ring.sage
+started: 2026-11-15T03:28:16+00:00
+........                                                                 [100%]
+8 passed in 16.57s
+exit: 0
+finished: 2026-11-15T03:28:35+00:00
