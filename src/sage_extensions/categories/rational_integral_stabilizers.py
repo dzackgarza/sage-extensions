@@ -971,10 +971,11 @@ class FiniteCommensurabilityQuotient(SageObject):
 
     @cached_method
     def _reference_frame(self):
-        r"""The basis matrix ``B`` of ``M`` in the framing of ``V``, with ``B^-1``.
+        r"""The basis matrix ``B`` of ``M`` in the framing of ``V``.
 
         Column ``s`` holds the ``V``-coordinates of the ``s``-th generator of
-        ``M``; ``M`` has full rank in ``V``, so ``B`` is invertible over ``QQ``.
+        ``M``. ``M`` need not have full rank in ``V``, so ``B`` need not be
+        square.
         """
         from sage.matrix.constructor import matrix as sage_matrix
         from sage_extensions.categories.rings.ring_foundation import _engine_element
@@ -990,23 +991,33 @@ class FiniteCommensurabilityQuotient(SageObject):
             columns.append([_engine_element(fractions, coordinates(point)) for point in labels])
         basis = sage_matrix(columns).transpose()
         basis.set_immutable()
-        return basis, basis.inverse()
+        return basis
 
     def restricted_automorphism(self, automorphism):
         r"""Restrict one ``g in G`` to the stable reference lattice ``M``.
 
-        In the basis of ``M`` the restriction is ``B^-1 A B`` for ``A`` the
-        matrix of ``g`` on ``V``; ``g`` preserves ``M`` exactly when it and
-        ``B^-1 A^-1 B`` are integral.
+        In the basis of ``M`` the restriction is the matrix ``X`` with
+        ``A B = B X`` for ``A`` the matrix of ``g`` on ``V`` (``X = B^-1 A B``
+        when ``M`` has full rank); ``g`` preserves ``M`` exactly when ``X``
+        and the solution for ``A^-1`` exist and are integral.
         """
         from sage_extensions.categories.modules.pure.modules import _engine_matrix
         from sage_extensions.categories.rings.ring_foundation import _owned_engine_element
 
         lattice = self.reference_lattice()
-        basis, inverse_basis = self._reference_frame()
+        basis = self._reference_frame()
         ambient = _engine_matrix(automorphism.module_morphism())
-        restricted = inverse_basis * ambient * basis
-        if not (restricted.denominator() == 1 and (inverse_basis * ambient.inverse() * basis).denominator() == 1):
+
+        def restriction(matrix):
+            image = matrix * basis
+            try:
+                solution = basis.solve_right(image)
+            except ValueError:
+                return None
+            return solution if basis * solution == image and solution.denominator() == 1 else None
+
+        restricted = restriction(ambient)
+        if restricted is None or restriction(ambient.inverse()) is None:
             raise ValueError(
                 f"cannot restrict {automorphism} to {lattice}: it or its inverse does not preserve the reference lattice"
             )

@@ -1923,7 +1923,6 @@ class Modules(OwnedCategoryOverBaseRing):
                 case _:
                     return _ModuleScalarAction(ring, self, True)
 
-        @cached_method
         def module_category(self):
             return Modules(self.base_ring())
 
