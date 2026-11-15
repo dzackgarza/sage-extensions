@@ -1204,3 +1204,4 @@ d1639f56d3db46ac997b5ef3bd96ef1c171b5e2fbb6a61ef7420b11624eada8d  541-bisect-ste
 7aabf84f9755e206fc8811d8ffad948f6fae6c7c27657f171fa7a10c3e3653f2  541-hash-green.log
 6dd941bdf53130f54b8a2c672354d928dbadb44aeb9c32f459fcb5e5da8f560a  541-hash-lint.log
 691afbd0292b642ec29a377ec340c102b526aade6b59dd6c1077714a98631e1f  541-framing-test-after-docs.log
+e7908d8ec4abdfe76d821f00cb03ebf05786eee56bac7ff565ad14031e799757  541-two-test-files-on-the-pushed-tree.log

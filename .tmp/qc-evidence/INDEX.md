@@ -2262,3 +2262,4 @@ base, main, main, base.
 | `541-hash-lint.log` | the repair | test lint: **1 files, 0 findings** |
 | `541-otilde-row-after-hash-repair.log` | the repair | first plane **483.6 s**, calib 0.577 (838 units), 2089 planes, 72.67 planes/s |
 | `541-framing-test-after-docs.log` | the docs commit | `tests/modules/test_the_embedded_framing_is_one_datum.sage`: **2 passed in 1.10 s** |
+| `541-two-test-files-on-the-pushed-tree.log` | the pushed tree (`ea895a8` + this round's four commits) | `tests/sets/test_the_hash_of_a_finite_ordered_set_is_one_datum.sage` and `tests/modules/test_the_embedded_framing_is_one_datum.sage` together: **5 passed in 1.36 s** |
