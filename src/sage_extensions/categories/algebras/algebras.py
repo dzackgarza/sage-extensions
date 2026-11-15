@@ -3560,12 +3560,50 @@ class AlgebrasWithChosenFinitePresentation(OwnedCategoryOverBaseRing):
                         f"is truncated in degree {selected.truncation()}"
                     )
 
+        def _is_its_own_presentation_ring(self) -> bool:
+            r"""Whether the selected degree-zero resolution is built on this algebra.
+
+            A free algebra is the free source of its own degree-zero resolution,
+            so that resolution already states a presentation: this algebra, on
+            its own selected generators.  A quotient's degree-zero source is its
+            presentation ring, which is a different algebra.
+            """
+            selected = self.selected_algebra_resolution()
+            return selected.truncation() == 0 and selected.level(0) is self
+
         def presentation_ring(self):
-            return self.selected_algebra_presentation().level(0)
+            r"""Return the algebra this one's finite presentation is stated on.
+
+            A free algebra is its own presentation ring: its selected
+            generators present it and it has no relations, so the selected
+            degree-zero resolution is already the presentation.  Every other
+            algebra with a chosen finite presentation reads its presentation
+            ring from degree zero of its one-level selected presentation.
+            """
+            match self._is_its_own_presentation_ring():
+                case True:
+                    return self
+                case False:
+                    return self.selected_algebra_presentation().level(0)
 
         def generating_module(self):
             r"""Return the exact module on which the selected free algebra is built."""
-            generating = self.presentation_ring().generating_module()
+            presentation = self.presentation_ring()
+            match presentation is self:
+                case True:
+                    # A free algebra is its own presentation ring, so reading
+                    # the module back through this presentation route would ask
+                    # this very method.  Its free-algebra realization supplies
+                    # the module, and that realization is the more specific
+                    # answer wherever the library builds one.
+                    raise TypeError(
+                        f"the generating module of {self} is the module its free-algebra "
+                        "realization was built on; this algebra is its own presentation ring, "
+                        "so the presentation route below would ask this same method"
+                    )
+                case False:
+                    pass
+            generating = presentation.generating_module()
             module_labels = generating.module_generating_set()
             algebra_labels = self.algebra_generating_set()
             assert module_labels is algebra_labels, (
@@ -3590,7 +3628,22 @@ class AlgebrasWithChosenFinitePresentation(OwnedCategoryOverBaseRing):
             return self(value)
 
         def relations(self):
-            return self.selected_algebra_presentation().relations()
+            r"""Return the relation family of the chosen finite presentation.
+
+            A free algebra presents itself with no relations, so this is the
+            empty indexed family on the presentation ring.  A quotient reads
+            the relations retained with the degree-one level of its selected
+            presentation.
+            """
+            match self._is_its_own_presentation_ring():
+                case True:
+                    return indexed_family(
+                        finite_ordered_set(()),
+                        lambda index: self.zero(),
+                        name="Defining relation family",
+                    )
+                case False:
+                    return self.selected_algebra_presentation().relations()
 
         @cached_method
         def presentation_ideal(self):
@@ -3891,10 +3944,28 @@ class AlgebrasWithChosenFinitePresentation(OwnedCategoryOverBaseRing):
             return variable_count - 1
 
         def algebra_presentation_morphism(self):
-            return self.selected_algebra_presentation().augmentation()
+            r"""Return the quotient map of the chosen finite presentation.
+
+            A free algebra is its own presentation ring, so its quotient map is
+            its identity, drawn in its own Mor.
+            """
+            match self._is_its_own_presentation_ring():
+                case True:
+                    return self.Mor(self).identity()
+                case False:
+                    return self.selected_algebra_presentation().augmentation()
 
         def lift_to_presentation(self, element):
-            return self._selected_algebra_presentation_backend.lift(element)
+            r"""Return the presentation-ring representative of ``element``.
+
+            A free algebra is its own presentation ring, so the representative
+            is the element itself.
+            """
+            match self._is_its_own_presentation_ring():
+                case True:
+                    return self(element)
+                case False:
+                    return self._selected_algebra_presentation_backend.lift(element)
 
         def presentation_normal_form_terms(self, element):
             r"""Return the coefficients of the selected presentation representative.
