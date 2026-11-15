@@ -605,82 +605,10 @@ class IsotropicReductionLiftTorsors(OwnedCategoryOverBaseRing):
             tested = tuple(
                 coordinates_at(indices) for indices in parameters(coset_steps)
             )
-            # The test is the lift's *matrix*, and the one datum every class's
-            # test needs is built once here.  The lift at a parameter is
-            # ``phi(a) = t(f, s(a)) * base``, so its images of the source
-            # generators are the transvection's column matrix times the base
-            # point's coordinate matrix: ``base_images`` below.  Composing the
-            # two owned isometries instead and asking the composition for its
-            # ``integral_restriction`` builds a transvection, a composition and
-            # a preimage of the target's frame **per class** -- measured at
-            # 134.9 ms a class against this reading's 2.23 ms on `T_Co`'s
-            # ambient plane row, where the row makes one test per class of
-            # every candidate (#528).
-            base = self.base_point()
-            rational_source = base.domain()
-            rational_target = base.codomain()
-            isotropic_vector = self._target_witt.isotropic_vector()
-            source_labels = tuple(source.module_generating_set())
-            target_labels = tuple(target.module_generating_set())
-            assert (
-                tuple(rational_target.module_generating_set()) == target_labels
-                and isotropic_vector.parent() is rational_target
-            ), (
-                f"the integral lift locus of {self.reduction_isometry()!r} is read in "
-                f"the target's own coordinates only when its rationalization carries "
-                f"the target's generators and the marked isotropic vector: "
-                f"{rational_target!r} is indexed by "
-                f"{tuple(rational_target.module_generating_set())} against the target's "
-                f"{target_labels}, and the marked vector lies in "
-                f"{isotropic_vector.parent()!r}"
-            )
-            from sage.matrix.constructor import matrix as _matrix
-            from sage.rings.rational_field import QQ as _QQ
-
-            base_images = _matrix(
-                _QQ,
-                len(target_labels),
-                len(source_labels),
-                [
-                    entry
-                    for label in source_labels
-                    for entry in rational_target.rational_coordinates(
-                        base(rational_source.module_generator(label))
-                    ).list()
-                ],
-            )
-
-            def lifts_integrally(coordinates):
-                r"""Whether the lift at these coordinates restricts to an isometry of ``L'``.
-
-                The lift is ``phi(a) = t(f, s(a)) * base``, so its images of the
-                source generators are the transvection's column matrix times the
-                base point's, and it restricts to an isometry of ``L'`` exactly
-                when every coordinate of every image in the target's basis is an
-                integer and the coordinate matrix has determinant ``+-1``.  This
-                is the reading
-                :meth:`...LatticeIsometryMethods.integral_restriction` makes,
-                with its one per-lattice datum -- the base point's images --
-                taken once instead of once per class.
-                """
-                images = (
-                    rational_target._eichler_transvection_column_matrix(
-                        isotropic_vector, self._target_section(self._parameter_at(coordinates))
-                    )
-                    * base_images
-                )
-                for entry in images.list():
-                    if entry.denominator() != 1:
-                        return False
-                return int(
-                    _matrix(
-                        ZZ,
-                        [[int(entry) for entry in row] for row in images.rows()],
-                    ).determinant()
-                ) in (1, -1)
-
             passing_coordinates = tuple(
-                coordinates for coordinates in tested if lifts_integrally(coordinates)
+                coordinates
+                for coordinates in tested
+                if self._lift_at(coordinates).integral_restriction(source, target) is not None
             )
             passing = tuple(class_of(coordinates) for coordinates in passing_coordinates)
             kernel = tuple(

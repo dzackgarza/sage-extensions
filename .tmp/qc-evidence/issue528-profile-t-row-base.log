@@ -1,0 +1,75 @@
+probe: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.tmp/qc-evidence/issue528-row-profile.py
+tree SHA: a71272add96485c3e6ceeda07572bf40c5b2b5c0
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+inner 560 s, outer 600 s, guard 6144 MiB, args 'cap=520 sha=a71272a'
+[    0.2s] calibration (fixed workload, for the run's CPU share): 0.164 s
+[    0.2s] tree a71272a, cap 520 s, python 3.14.10
+[    0.2s] input: lattice 0.03 s: Integral lattice of rank 11 and signature (2, 9)
+[    2.2s] input: stable orthogonal group 1.96 s
+[    2.2s] input: its supergroup (the ambient O(L)) Orthogonal group O(Integral lattice of rank 11 and signature (2, 9))
+[  234.5s] the row returned 1 plane representatives in 232.4 s
+[  234.5s] the profiled row: 232.4 s (calib 0.164 s, decided True)
+[  234.6s] table: /repos/sage-extensions/.tmp/qc528/a71272a-row.tsv (5448 functions, 448757911 calls)
+[  234.6s] 
+[  234.6s] === the row's biggest entries by own time ===
+[  234.6s]   file:line                                           function                            own s    cum s     calls
+[  234.6s]   ~:0                                                 <built-in method builtins.isins    13.974   14.014  69980928
+[  234.6s]   sage_extensions/categories/abstract_categories/objects.py:158__contains__                       11.023   19.904  10482779
+[  234.6s]   sage/.venv/lib/python3.14/site-packages/sage/categories/category.py:436__classcall__                       9.015   11.327  14729598
+[  234.6s]   sage_extensions/categories/rings/ring_foundation.py:6459_from_engine_element                8.999   13.047  11129482
+[  234.6s]   sage_extensions/categories/rings/ring_foundation.py:6488_element_constructor_               8.479   10.391  16112731
+[  234.6s]   sage/.venv/lib/python3.14/site-packages/sage/categories/category.py:693__contains__                        6.846   10.071  11728278
+[  234.6s]   sage_extensions/categories/rings/ring_foundation.py:5571_operand_in_ring                    6.553   21.980   7463515
+[  234.6s]   sage_extensions/categories/sets/set_categories.py:777__call__                            6.116  138.519   1205931
+[  234.6s]   sage_extensions/categories/rings/ring_foundation.py:2169_fraction_equality_status           4.910   52.950    846849
+[  234.6s]   sage_extensions/categories/rings/ring_foundation.py:7551_own_ring                           4.333   23.322   7389350
+[  234.6s]   sage_extensions/categories/sets/set_categories.py:6716_element_constructor_               4.223    7.071   8711673
+[  234.6s]   sage_extensions/categories/rings/ring_foundation.py:6484__call__                            4.182   14.563  16112731
+[  234.6s]   sage_extensions/categories/rings/ring_foundation.py:5601__init__                            4.048    4.048  11129482
+[  234.6s]   sage_extensions/categories/sets/set_categories.py:524__contains__                        3.450    6.302   4062164
+[  234.6s]   sage/.venv/lib/python3.14/site-packages/sage/categories/category_with_axiom.py:2021__classget__                        3.346    4.543   2198490
+[  234.6s]   sage_extensions/owned_category.py:1102              is_subcategory                      3.090    3.104  11451670
+[  234.6s]   sage_extensions/categories/rings/ring_foundation.py:1110__init__                            2.858    6.127   1690359
+[  234.6s]   sage_extensions/categories/rings/ring_foundation.py:5605_backend                            2.836    2.836  16446071
+[  234.6s]   sage_extensions/categories/rings/ring_foundation.py:2253localization_source                 2.762    2.762   9141383
+[  234.6s]   sage_extensions/categories/rings/ring_foundation.py:5609_operator_operand                   2.746   23.759   7226554
+[  234.6s]   sage_extensions/categories/rings/ring_foundation.py:1649fraction                            2.626   26.892   1225612
+[  234.6s]   sage_extensions/categories/rings/ring_foundation.py:5668__mul__                             2.518   28.992   2879542
+[  234.6s]   sage_extensions/categories/rings/ring_foundation.py:5711__eq__                              2.484   14.245   3156457
+[  234.6s]   sage_extensions/categories/rings/ring_foundation.py:7839_owned_engine_element               2.478   28.665   5366644
+[  234.6s]   sage_extensions/categories/rings/ring_foundation.py:5644_mul_                               2.358   17.260   2880499
+[  234.6s] 
+[  234.6s] === the row's biggest entries by cumulative time ===
+[  234.6s]   file:line                                           function                            own s    cum s     calls
+[  234.6s]   sage_extensions/categories/lattice_morphisms.py:5223isotropic_orbit_representatives     0.000  232.364         1
+[  234.6s]   sage_extensions/categories/isotropic_orbits.py:1574 _isotropic_orbit_representative     0.000  232.364         2
+[  234.6s]   sage_extensions/categories/isotropic_orbits.py:1397 _isotropic_plane_orbit_represen     0.000  232.364         1
+[  234.6s]   isotropic_induction.py:68                           isotropic_vector_classes            0.000  232.176         2
+[  234.6s]   isotropic_induction.py:78                           _computed_isotropic_vector_clas     0.000  232.176         2
+[  234.6s]   marked_lattices.py:181                              primitive_marking_classes           0.000  220.857         1
+[  234.6s]   recursive.py:1754                                   primitive_vector_classes            0.001  220.853         1
+[  234.6s]   ~:0                                                 <built-in method builtins.next>     0.042  183.310     80054
+[  234.6s]   recursive.py:1771                                   <genexpr>                           0.000  183.238        59
+[  234.6s]   recursive.py:1572                                   pointed_isometry                    0.001  183.238        29
+[  234.6s]   recursive.py:1695                                   _isotropic_pointed_isometry         0.002  182.900        28
+[  234.6s]   sage_extensions/categories/sets/set_categories.py:777__call__                            6.116  138.519   1205931
+[  234.6s]   sage_extensions/categories/isotropic_lifts.py:267   integral_members                    0.000  127.650         8
+[  234.6s]   sage_extensions/categories/isotropic_lifts.py:201   _integral_lift_locus                0.001  127.634         8
+[  234.6s]   sage_extensions/categories/isotropic_lifts.py:411   integral_parameter_classes          0.011  114.676         8
+[  234.6s] 
+[  234.6s] RESULT row_seconds=232.36 decided=True calib=0.164 calls=448757911 table=/repos/sage-extensions/.tmp/qc528/a71272a-row.tsv
+[  234.6s] PROBE DONE
+[peakrss] p528tt-base-row: child waited=0 shell_code=0 samples=121
+[peakrss] peak tree RSS      : 600 MiB
+[peakrss] low-water MemAvail : 9907 MiB
+[peakrss] peak single VmHWM  : 606 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      595 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   238.2s procs=  3 rss=   600 MiB hwm=   606 MiB avail= 10061 MiB
+[peakrss]   t=   240.2s procs=  3 rss=   600 MiB hwm=   606 MiB avail=  9907 MiB
+[peakrss]   t=   234.2s procs=  3 rss=   595 MiB hwm=   595 MiB avail= 10243 MiB
+[peakrss]   t=   236.2s procs=  3 rss=   595 MiB hwm=   595 MiB avail= 10133 MiB
+[peakrss]   t=   232.2s procs=  3 rss=   587 MiB hwm=   587 MiB avail= 10342 MiB
+launcher exit: 0
