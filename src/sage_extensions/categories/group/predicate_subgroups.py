@@ -165,7 +165,12 @@ class PredicateSubgroups(OwnedParameterizedCategory):
         ) -> None:
             self._predicate = predicate
             self._admitted_members = {}
-            self._description = description
+            # The clause that cuts this subgroup out, declared and set at the
+            # level that introduces it: it is what the rendering prints beside
+            # the ambient group and what a record names, and it is not the
+            # realization's ``_description``, which says what a whole group
+            # prints.
+            self._predicate_clause = description
             self._character_data = dict(character_data or {})
             self._character_data_complete = (
                 bool(character_data)
@@ -907,10 +912,10 @@ class PredicateSubgroups(OwnedParameterizedCategory):
 
             Read by :func:`sage_extensions.categories._lattice._group_label`.
             """
-            return f"the subgroup where {self._description}"
+            return f"the subgroup where {self._predicate_clause}"
 
         def _repr_(self):
-            return f"{{g in {self.supergroup()} : {self._description}}}"
+            return f"{{g in {self.supergroup()} : {self._predicate_clause}}}"
 
 
 class _PredicateSubgroupConstruction(OwnedParameterizedCategory):

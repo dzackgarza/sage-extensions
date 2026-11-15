@@ -2545,14 +2545,22 @@ end
 
         if not (self.determinant_kernel and self.spinor_kernel):
             return _subgroup_from_gap(
-                self._discriminant_group, self._joint_discriminant_image_gap()
+                self._discriminant_group,
+                self._joint_discriminant_image_gap(),
+                f"the joint discriminant image of {self.subgroup} in "
+                f"{self._discriminant_group}",
             )
         factors, _product, _embeddings, projections = self._gap_product()
         position = next(
             index for index, (label, _group) in enumerate(factors) if label == "discriminant"
         )
         projected = libgap.Image(projections[position], self._gap_subgroup())
-        return _subgroup_from_gap(self._discriminant_group, projected)
+        return _subgroup_from_gap(
+            self._discriminant_group,
+            projected,
+            f"the projected discriminant image of {self.subgroup} in "
+            f"{self._discriminant_group}",
+        )
 
     @cached_method
     def discriminant_image_membership(self):

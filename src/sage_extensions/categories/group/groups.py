@@ -380,7 +380,7 @@ def _matrix_group_element_matrix(group, element):
     return matrix()
 
 
-def _subgroup_from_gap(group, gap_subgroup):
+def _subgroup_from_gap(group, gap_subgroup, stated_description):
     r"""Return the owned subgroup of ``group`` modelled by the GAP subgroup.
 
     Uses Sage's private ``_subgroup_constructor`` of
@@ -388,11 +388,20 @@ def _subgroup_from_gap(group, gap_subgroup):
     ``sage.groups.libgap_wrapper.ParentLibGAP``, which builds the engine
     subgroup of a GAP subgroup without re-reading its generators; no public
     Sage operation constructs a subgroup from a GAP subgroup object.
+
+    ``stated_description`` is the caller's: what it computed and the group the
+    result lies in, since this construction knows the GAP subgroup and nothing
+    about the computation that asked for it
+    (:func:`_transported_subgroup`).
     """
     engine = _engine_group(group)
     match engine:
         case PermutationGroup_generic() | ParentLibGAP():
-            return _transported_subgroup(group, engine._subgroup_constructor(gap_subgroup))
+            return _transported_subgroup(
+                group,
+                engine._subgroup_constructor(gap_subgroup),
+                stated_description,
+            )
         case _:
             assert False, f"{group} does not construct subgroups from GAP data in this engine"
 
@@ -1884,9 +1893,19 @@ def _own_group(
     assert group in SageGroups(), f"{group} is not a group"
     match group:
         case PermutationGroup_subgroup() | AbelianGroup_subgroup():
-            return _transported_subgroup(_own_group(group.ambient_group()), group)
+            return _transported_subgroup(
+                _own_group(group.ambient_group()),
+                group,
+                "the subgroup of its ambient group with the same elements as the "
+                "Sage subgroup it was realized from",
+            )
         case ParentLibGAP() if group.ambient() is not group:
-            return _transported_subgroup(_own_group(group.ambient()), group)
+            return _transported_subgroup(
+                _own_group(group.ambient()),
+                group,
+                "the subgroup of its ambient group with the same elements as the "
+                "Sage subgroup it was realized from",
+            )
         case _:
             placement = (_owned_group_category(group), *refinements)
             presentation_data = {}
@@ -1958,17 +1977,19 @@ def _own_group(
             return owned
 
 
-def _transported_subgroup(group, engine_subgroup):
+def _transported_subgroup(group, engine_subgroup, stated_description):
     r"""Return the subgroup of ``group`` computed by ``engine_subgroup``.
 
-    The construction states the subgroup's name for a timing record, because
-    this is the one kind that neither writes a description nor cuts itself out by
-    a condition: the source is the subgroup the engine computed, the map is the
-    transport that makes the owned copy of it, and the name states both
-    (:meth:`Subgroups.ParentMethods.description`,
-    :func:`sage_extensions.categories._lattice._group_label`).  It is written
-    here and nothing is read off a rendering of the source, whose generator list
-    can be longer than the line.
+    ``stated_description`` is what the caller that asked for the transport
+    computed, and the group the result lies in -- "the centre of ...", "the
+    derived subgroup of ...", "the image of ... in ...".  This construction is
+    the one kind that neither writes a sentence nor cuts itself out by a
+    condition, so the caller states it, and it is the *only* thing said here: it
+    becomes the record's name (:meth:`Subgroups.ParentMethods.description`,
+    :func:`sage_extensions.categories._lattice._group_label`) and no
+    ``description`` is passed, so the rendering is the realization's own
+    ("Subgroup of ...").  Nothing is read off a rendering of the source, whose
+    generator list can be longer than the line.
     """
     subgroup = _object_of(
         Cat().meet(
@@ -1982,7 +2003,7 @@ def _transported_subgroup(group, engine_subgroup):
         _ambient=OwnedGroups(),
         _engine=(OwnedGroups(), _GroupEngine, _GroupElement),
         engine=engine_subgroup,
-        description="the subgroup transported from a subgroup the engine computed",
+        stated_description=stated_description,
         supergroup=group,
     )
     if _is_finitely_generated_witness(engine_subgroup):
@@ -1999,6 +2020,12 @@ def _integral_points_subgroup(group, engine_subgroup, ring, *, refinements=(), d
     The construction records ``ring`` as its datum: a subgroup built here is
     the group of ``ring``-points of its ambient, which is what makes it
     arithmetic (``Subgroups.ParentMethods.is_arithmetic_group``).
+
+    ``description`` is the name the construction gives the group of points
+    (``SL_2(ZZ)``), and it is passed under both names a subgroup carries: the
+    rendering (``description``, which the realization prints) and the record's
+    words (``stated_description``,
+    :meth:`Subgroups.ParentMethods.description`).
     """
     return _object_of(
         Cat().meet(
@@ -2012,6 +2039,7 @@ def _integral_points_subgroup(group, engine_subgroup, ring, *, refinements=(), d
         _engine=(OwnedGroups(), _GroupEngine, _GroupElement),
         engine=engine_subgroup,
         description=description,
+        stated_description=description,
         supergroup=group,
         integral_points_ring=ring,
     )
@@ -2028,6 +2056,12 @@ def _generated_subgroup(
 
     ``refinements`` are the placements the calling construction has proved
     about the subgroup, such as ``_finite_if_image_of`` for an image.
+    ``description`` is the sentence the caller wrote, and it is passed under
+    both names a subgroup carries: the rendering (``description``, which the
+    realization prints) and the record's words (``stated_description``,
+    :meth:`Subgroups.ParentMethods.description`); a caller that wrote none has
+    the generated subgroup say it is given by its generators
+    (:meth:`GeneratedSubgroups.ParentMethods.description`).
     """
     return _object_of(
         Cat().meet(
@@ -2047,6 +2081,7 @@ def _generated_subgroup(
         selected_subgroup_generators=generators,
         cardinality_decision=cardinality_decision,
         description=description,
+        stated_description=description,
     )
 
 
@@ -2226,7 +2261,11 @@ class _SubgroupCollection(Sets().ObjectType):
         match group:
             case _ if group in OwnedFiniteGroups():
                 return (
-                    _subgroup_from_gap(group, subgroup)
+                    _subgroup_from_gap(
+                        group,
+                        subgroup,
+                        f"a subgroup of {group} that GAP lists",
+                    )
                     for subgroup in _gap_model(group).AllSubgroups()
                 )
             case _:
@@ -3825,6 +3864,7 @@ class GroupMorphism:
         return _subgroup_from_gap(
             codomain,
             self._gap_morphism_crossing().Image(),
+            f"the image of {source} in {codomain}",
         )
 
     @cached_method
@@ -6746,7 +6786,11 @@ class OwnedGroups(CategoryPacketMethods, OwnedCategory):
                 case _ if self in OwnedAbelianGroups():
                     return self, OwnedGroups().Mor(self, self).identity()
                 case _ if self in OwnedFiniteGroups():
-                    center = _subgroup_from_gap(self, _gap_model(self).Center())
+                    center = _subgroup_from_gap(
+                        self,
+                        _gap_model(self).Center(),
+                        f"the centre of {self}",
+                    )
                     return center, center.inclusion()
                 case _:
                     assert False, (
@@ -6759,7 +6803,11 @@ class OwnedGroups(CategoryPacketMethods, OwnedCategory):
             r"""Return the derived subgroup ``[G,G]``."""
             match self:
                 case _ if self in OwnedFiniteGroups():
-                    return _subgroup_from_gap(self, _gap_model(self).DerivedSubgroup())
+                    return _subgroup_from_gap(
+                        self,
+                        _gap_model(self).DerivedSubgroup(),
+                        f"the derived subgroup of {self}",
+                    )
                 case _:
                     assert False, (
                         f"the commutator subgroup [{self},{self}] is defined for every group, but the current "
@@ -6883,6 +6931,7 @@ class OwnedGroups(CategoryPacketMethods, OwnedCategory):
                         _gap_model(subgroup),
                         _element_to_engine(self, group_element.inverse()),
                     ),
+                    f"the conjugate of {subgroup} by {group_element}",
                 )
 
             def _subgroup_conjugacy_decision(self, left, right) -> bool:
@@ -8285,20 +8334,18 @@ class Subgroups(OwnedParameterizedCategory):
         return "subgroups"
 
     class ParentMethods:
-        def __init__(self, supergroup, integral_points_ring=None, description=None, **rest) -> None:
+        def __init__(self, supergroup, integral_points_ring=None, stated_description=None, **rest) -> None:
             self._supergroup = supergroup
             self._integral_points_ring = integral_points_ring
-            # The sentence the constructing owner wrote for this subgroup,
+            # The words this subgroup's construction states for a timing record,
             # declared and set at the one level every subgroup kind is built
-            # through.  It is forwarded to the realization as well, which is what
-            # ``_repr_`` and ``_latex_`` read, and a kind whose construction
-            # states its clause at its own level -- a predicate subgroup -- has
-            # taken the keyword there and forwards none.
-            self._stated_description = description
-            if description is None:
-                super().__init__(facade=supergroup, **rest)
-            else:
-                super().__init__(facade=supergroup, description=description, **rest)
+            # through, and this level's own datum.  The rendering is a different
+            # datum with a different owner: the realization's ``_description``
+            # (``_GroupEngine``), which a construction writes with its
+            # ``description`` keyword when it wants the object to print that
+            # sentence.  Nothing here forwards one to the other.
+            self._stated_description = stated_description
+            super().__init__(facade=supergroup, **rest)
 
         def supergroup(self):
             return self._supergroup
@@ -8307,12 +8354,12 @@ class Subgroups(OwnedParameterizedCategory):
             r"""Return the description this subgroup's construction stated, for a record.
 
             ``_stated_description`` is declared and set here, at the level every
-            subgroup kind is built through, and it is the sentence the
-            constructing owner wrote about the subgroup: what a transport was
-            made from and by, the name a group of integral points was built
-            under.  A kind whose defining data say more states its own
-            description at its own level, and that one is read instead: a
-            generated subgroup
+            subgroup kind is built through, and it is the sentence the caller
+            that built the subgroup wrote: what a transport computed and the
+            group it lies in (:func:`_transported_subgroup`), the name a group of
+            integral points was built under.  A kind whose defining data say more
+            states its own description at its own level, and that one is read
+            instead: a generated subgroup
             (:meth:`GeneratedSubgroups.ParentMethods.description`), a predicate
             subgroup
             (:meth:`...predicate_subgroups.PredicateSubgroups.ParentMethods.description`),

@@ -263,7 +263,8 @@ def test_discriminant_image_is_the_joint_preimage_then_projection_on_three_corre
                 libgap.Subgroup(
                     _gap_model(OG), [_element_to_engine(OG, g) for g in piece.group_generators()]
                 ),
-            )
+            ),
+            f"the meet of the marginal pieces in {OG}",
         )
     assert int(marginal.cardinality()) == int(image.cardinality())
 
