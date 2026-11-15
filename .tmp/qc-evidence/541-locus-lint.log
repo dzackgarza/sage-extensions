@@ -1,0 +1,4 @@
+=== ran on: f3dd15671eb6beedad8199c19ed4571fef1068f5 (1 modified paths)
+=== command: python -m sage_extensions.testing.test_lint tests/lattices/test_the_integral_lift_locus_is_a_subset_of_the_torsor.sage
+1 files, 0 findings
+=== exit: 0

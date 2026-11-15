@@ -1,0 +1,19 @@
+=== tree: f3dd15671eb6beedad8199c19ed4571fef1068f5 (modified paths: 1)
+=== port: 991b88b095a42a1e3679569ea42328c900c120f6
+=== command: sage-image/run.sh -w /work, probe at /probe.py, inner cap 540 s, outer 570 s
+torsor: coordinate != one: True
+torsor: trivialization(coordinate) == lift: True
+torsor: base_point == T.integral_base_point(): True
+torsor: difference(lift, base) == coordinate: True
+locus: is_empty is False: True
+locus: inclusion codomain == T: True
+locus: base point is a member: True
+members: is_empty is False: True
+[peakrss] probe541doctest: child waited=0 shell_code=0 samples=1
+[peakrss] peak tree RSS      : 1 MiB
+[peakrss] low-water MemAvail : 13769 MiB
+[peakrss] peak single VmHWM  : 1 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   timeout                       2 MiB peak
+[peakrss]   t=     0.0s procs=  1 rss=     1 MiB hwm=     1 MiB avail= 13769 MiB
+=== launcher exit: 0

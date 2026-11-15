@@ -1,0 +1,12 @@
+=== ran on: f3dd15671eb6beedad8199c19ed4571fef1068f5 (1 modified paths)
+=== port: 991b88b095a42a1e3679569ea42328c900c120f6
+=== command: pytest tests/lattices/test_the_coble_lattice_line_orbit_call_returns.sage -o addopts= -p qc_sage_session -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates --durations=0
+.                                                                        [100%]
+========================== test-call performance gate ==========================
+tests/lattices/test_the_coble_lattice_line_orbit_call_returns.sage::test_the_coble_lattice_line_orbit_call_returns_primitive_isotropic_lines: 59.51 s > 20 s
+============================== slowest durations ===============================
+59.51s call     tests/lattices/test_the_coble_lattice_line_orbit_call_returns.sage::test_the_coble_lattice_line_orbit_call_returns_primitive_isotropic_lines
+
+(2 durations < 0.005s hidden.  Use -vv to show these durations.)
+1 passed in 59.76s
+=== exit: 0

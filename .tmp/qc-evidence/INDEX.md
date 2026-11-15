@@ -2353,3 +2353,23 @@ the parameter's residue class, so nothing is asked for.
 | --- | --- | --- |
 | `541-locus-probe.py`, `541-locus-baseline.log` | main `e763219` | `T_Co` at its first isotropic vector, identity reduction isometry: `\|passing\|` 256, `\|kernel\|` 512, period 4, `\|C\|` 131072; residue locus **0.004 s**, `integral_members()` **65.218 s**, `is_empty()` 0.000 s, `integral_base_point_or_none()` 0.016 s; a subset of the torsor **0.000 s**, one admitted point 0.003 s, membership 0.000 s |
 | `541-locus-red.log` | main `e763219` | `tests/lattices/test_the_integral_lift_locus_is_a_subset_of_the_torsor.sage`: **3 failed in 2.03 s**, `AttributeError: ... has no attribute 'integral_lift_locus'` |
+
+## #541 -- the locus is the subset, and the row reaches its first plane at base parity
+
+`_integral_lift_locus` built `C x ker r` to name the integral lift locus, and the
+product interner keys a family by its factors' hashes, so each candidate the
+`T_Co` plane row tested walked the residue locus' 131072 classes.  The locus is
+the subset of the torsor cut out by the parameter's residue class; the repair
+constructs that subset, admits one point so its emptiness is decided, and returns
+the empty set when the residue locus is empty.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `541-locus-after.log` | the repair | same probe, same specimen: `integral_members()` **0.021 s** (was 65.218 s), `integral_base_point_or_none()` 0.000 s (was 0.016 s), the subset cut in 0.000 s, one admitted point 0.003 s, membership 0.000 s |
+| `541-locus-green.log` | the repair | the new file with `test_the_integral_lift_locus_is_a_union_of_transvection_cosets.sage` and `test_integral_reduction_lift_witness.sage`: **12 passed in 16.24 s** |
+| `541-locus-lint.log` | the repair | test lint on the new file: **1 files, 0 findings** |
+| `541-coble-line-base.log`, `541-coble-line-after.log` | main `e763219` / the repair | `test_the_coble_lattice_line_orbit_call_returns.sage`, the port's own consumer of `integral_members`: **100.0 s -> 59.5 s**, 1 passed on both |
+| `541-levi-files-base.log`, `541-levi-files-after.log` | main `e763219` / the repair | nine Levi/isotropic-reduction files: **5 failed, 38 passed** on both, the FAILED ids identical |
+| `541-locus-doctests-broken.log`, `-base.log` | the repair / main `e763219` | `sage -t` on `isotropic_lifts.py`: 24 of 24 and 19 of 19 failed — the forker attributes nested-scope docstrings to `_vector_denominator.ParentMethods`, so the module's doctests are not runnable this way at either tree |
+| `541-locus-doctest-run.log` | the repair | the examples this round touches, run by hand: `integral_torsor`'s four, `integral_lift_locus`'s two, `integral_members`' one — all hold |
+| `541-row-after-locus.log`, `541-row-probe.py` | the repair | the `Õ(T_Co)` plane row, `ROW_DEADLINE=500`, calib **0.369 s**: **first plane at 353.3 s = 957 calib units** (base `7c0859c832` 974-980, main `e763219` >= 1352), **11 191 planes** by 502.1 s at **75.2 planes/s, 13.3 ms a plane** |

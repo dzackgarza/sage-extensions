@@ -222,10 +222,31 @@ class IsotropicReductionLiftTorsors(OwnedCategoryOverBaseRing):
 
                 ``T_Z = phi(r^{-1}(C))``,  ``r^{-1}(C) = { s(c) + k : c in C, k in mP }``
 
-            for the section ``s`` of ``r`` selected by the cokernel. ``T_Z`` is
-            constructed as the image of ``C x ker(r)`` under
-            ``(c, k) |-> phi(s(c) + k)``, a bijection onto ``T_Z`` with its inverse
-            ``lift |-> (r(x), x - s(r(x)))``, ``x = phi^{-1}(lift)`` read in ``P``.
+            for the section ``s`` of ``r`` selected by the cokernel.
+
+            **What is constructed, and what is not.**  ``r`` is a cokernel
+            projection, hence onto, and ``phi`` is a bijection onto ``T``, so
+            ``r^{-1}(C)`` being ``{ s(c) + k }`` and ``T_Z`` being its
+            ``phi``-image are one statement: ``T_Z`` *is* the subset of ``T`` of
+            the lifts whose parameter class lies in ``C``, and that subset is
+            what is constructed here, cut out by ``lift |-> r(phi^{-1}(lift)) in
+            C``.  The pair decomposition is read as pairs, in either direction,
+            and is not needed to name the subset.
+
+            Presenting it as the image of the product ``C x ker(r)`` instead
+            makes a construction that asks nothing into one that walks ``C``: a
+            product of a finite index set is interned under its factors' hashes
+            (``SET-05``, ``set_categories._finite_family_key``), and the hash of
+            a finite set is the hash of its tuple of points, so the product's
+            key enumerates the whole residue locus.  A locus is also a subset of
+            the set it lies in -- facts its inclusion states and the image of a
+            product cannot -- and :meth:`integral_lift_locus` is read through
+            that inclusion.
+
+            ``T_Z`` is empty exactly when ``C`` is, since ``r`` is onto and
+            ``phi`` bijective, and that is decided here rather than by an
+            enumeration; ``C`` nonempty then supplies one admitted point, which
+            is what decides that the subset is not empty without listing it.
             """
             target = self.target_reduction().isotropic_embedding().codomain()
             integral_kernel = self.acting_group().predicate_subgroup(
@@ -234,50 +255,62 @@ class IsotropicReductionLiftTorsors(OwnedCategoryOverBaseRing):
             )
             residue = self.integral_parameter_quotient()
             lattice_inclusion = residue.domain().inclusion()
-            period = residue.kernel()
-            period_inclusion = period.inclusion()
             classes = self.integral_parameter_classes()
-            # C x ker(r), the decomposition r^{-1}(C) = { s(c) + k }; its
-            # components are read by the product's own projections and its
-            # points built by its universal map from the component maps.
-            period_set = period.inclusion().domain()
-            pairs = classes.product_with(period_set)
-            class_projection, period_projection = (pairs.projection(index) for index in pairs.index_set())
             parameterization = self.parameterization()
             coordinates = parameterization.inverse()
-
-            def lift_of(pair):
-                parameter_point = (
-                    residue.preimage(class_projection(pair))
-                    + period_inclusion(period_projection(pair))
-                )
-                return parameterization(lattice_inclusion(parameter_point).underlying_element())
 
             def parameter_of(lift):
                 return lattice_inclusion.lift(lattice_inclusion.codomain().wrap(coordinates(lift)))
 
-            to_class = Sets().Mor(self, classes)(lambda lift: residue(parameter_of(lift)))
-            to_period = Sets().Mor(self, period_set)(
-                lambda lift: period_inclusion.lift(
-                    parameter_of(lift) - residue.preimage(residue(parameter_of(lift)))
-                )
-            )
-            ranking = pairs.index_set().ranking_map()
-            components = (to_class, to_period)
-            pair_of = pairs.from_maps(self, lambda index: components[int(ranking(index))])
+            def in_residue(locus_lift):
+                r"""Whether this lift's parameter class is one of ``C``'s."""
+                return residue(parameter_of(locus_lift)) in classes
 
-            locus = Sets().image_set(Sets().Mor(pairs, self)(lift_of), pairs, inverse=pair_of)
+            if classes.is_empty() is True:
+                # T_Z = phi(r^{-1}(C)) is empty here, and an empty subset cut out
+                # by a predicate decides nothing about itself: the empty set is
+                # the presentation that decides its own emptiness.
+                return integral_kernel, finite_ordered_set(())
+            locus = self.condition_set(in_residue)
+            # One admitted point decides that the subset is not empty.  Its
+            # parameter class lies in C by construction, so the lift costs one
+            # transvection and its integral restriction is already tested.
+            locus(self.integral_base_point())
             return integral_kernel, locus
+
+        @cached_method
+        def integral_lift_locus(self):
+            r"""The integral lift locus ``T_Z``, as a subset of the rational lift torsor ``T``.
+
+            ``T_Z`` is the set of integral lifts of this reduction isometry,
+            presented as the subset of ``T`` cut out by the parameter's residue
+            class (:meth:`_integral_lift_locus` states the theorem), so it
+            answers with the inclusion of a subset of ``T`` and membership is
+            one class test.  It is empty exactly when the finite residue locus
+            :meth:`integral_parameter_classes` is.
+
+            EXAMPLES::
+
+                sage: U = Lattices(ZZ)("U") + Lattices(ZZ)([[2]])
+                sage: R = U.basis_vector(0).isotropic_reduction()
+                sage: T = R.rational_lifts(R, R.Isom(R).identity())
+                sage: T.integral_lift_locus().is_empty()
+                False
+                sage: T.integral_lift_locus().inclusion().codomain() == T
+                True
+            """
+            _integral_kernel, locus = self._integral_lift_locus()
+            return locus
 
         @cached_method
         def integral_members(self):
             r"""The integral lift locus ``T_Z = phi(r^{-1}(C))`` with its ``K_Z``-action.
 
-            ``T_Z`` is constructed in :meth:`_integral_lift_locus` from the finite
-            residue locus ``C``; it is empty exactly when ``C`` is, which the
-            image and product constructions decide from ``C`` (finite, decided)
-            and ``ker r`` (a module, nonempty). The integral kernel ``K_Z`` acts
-            by composition. Emptiness is never inferred from one chosen
+            ``T_Z`` is constructed in :meth:`_integral_lift_locus` as the subset
+            of the torsor ``T`` cut out by the parameter's residue class; it is
+            empty exactly when the finite residue locus ``C`` is, which that
+            construction decides from ``C`` alone. The integral kernel ``K_Z``
+            acts by composition. Emptiness is never inferred from one chosen
             rational lift.
             """
             integral_kernel, locus = self._integral_lift_locus()

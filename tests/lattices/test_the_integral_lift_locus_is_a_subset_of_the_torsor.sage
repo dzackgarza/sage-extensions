@@ -11,9 +11,9 @@ That is the presentation, and it is what these tests pin.  The pair decompositio
 ``r^{-1}(C) = {s(c) + k}`` says the same thing, but presenting ``T_Z`` as the image of the
 product ``C x ker r`` makes the construction of a subset a construction of a product: a
 product of a finite index set is interned under its factors' hashes (``SET-05``), and the
-hash of a finite set walks its points, so the product cost one walk of every class of
-``C`` -- 131072 of them on ``T_Co``, 65 s a candidate -- where the subset costs nothing.
-A locus is a subset of the set it lies in, so it has that subset's inclusion, and
+hash of a finite set is the hash of its tuple of points, so the product's key enumerates
+every class of ``C`` -- on ``T_Co`` its 131072 classes, once per candidate the plane row
+tests.  A locus is a subset of the set it lies in, so it has that subset's inclusion, and
 membership in it is the class test; these are the two facts a product presentation cannot
 state.
 """
