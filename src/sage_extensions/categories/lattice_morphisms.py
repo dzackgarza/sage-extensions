@@ -1933,7 +1933,7 @@ class LatticeIsometryMethods:
         # The complete type-(1,1) coordinate tensor determines this linear
         # map in the selected endpoint framings. Retain that same value used
         # by hashing instead of reevaluating each generator image per query.
-        return other._coordinate_tensor() == self._coordinate_tensor()
+        return other._engine_coordinate_matrix() == self._engine_coordinate_matrix()
 
     def __ne__(self, other) -> bool:
         return not self == other
@@ -1957,9 +1957,21 @@ class LatticeIsometryMethods:
             (
                 id(self.domain()),
                 id(self.codomain()),
-                self._coordinate_tensor(),
+                self._engine_coordinate_matrix(),
             )
         )
+
+    def _engine_coordinate_matrix(self):
+        r"""The immutable engine matrix of this isometry in the selected framings.
+
+        It is the coordinate tensor's own components, retained by the module
+        owner, so equality and hashing read one engine value instead of
+        raising every entry into an owned tensor.
+        """
+        coordinates = self.module_morphism()._framed_coordinate_morphism()
+        if coordinates._engine_matrix_cache is None:
+            _engine_matrix(coordinates)
+        return coordinates._engine_matrix_cache
 
     def determinant(self):
         r"""Return the determinant of this automorphism/isometry tensor."""

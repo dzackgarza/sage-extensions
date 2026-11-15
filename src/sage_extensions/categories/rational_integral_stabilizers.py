@@ -962,29 +962,57 @@ class FiniteCommensurabilityQuotient(SageObject):
         r"""Return the quotient morphism ``M -> M/dM``."""
         return self.scaling_morphism().cokernel_projection()
 
-    def restricted_automorphism(self, automorphism):
-        r"""Restrict one ``g in G`` to the stable reference lattice ``M``."""
+    @cached_method
+    def _reference_frame(self):
+        r"""The basis matrix ``B`` of ``M`` in the framing of ``V``, with ``B^-1``.
+
+        Column ``s`` holds the ``V``-coordinates of the ``s``-th generator of
+        ``M``; ``M`` has full rank in ``V``, so ``B`` is invertible over ``QQ``.
+        """
+        from sage.matrix.constructor import matrix as sage_matrix
+        from sage_extensions.categories.rings.ring_foundation import _engine_element
+
         lattice = self.reference_lattice()
         inclusion = self.reference_inclusion()
-        space = self.ambient_restricted_space()
+        extension = self.ambient_restricted_space().module_over_extension()
+        fractions = extension.base_ring()
+        labels = tuple(extension.module_generating_set())
+        columns = []
+        for label in lattice.module_generating_set():
+            coordinates = inclusion(lattice.module_generator(label)).underlying_element().to_vector()
+            columns.append([_engine_element(fractions, coordinates(point)) for point in labels])
+        basis = sage_matrix(columns).transpose()
+        basis.set_immutable()
+        return basis, basis.inverse()
 
-        def image(label):
-            embedded = inclusion(lattice.module_generator(label)).underlying_element()
-            moved = space.wrap(automorphism(embedded))
-            return inclusion.lift(moved)
+    def restricted_automorphism(self, automorphism):
+        r"""Restrict one ``g in G`` to the stable reference lattice ``M``.
 
-        forward = lattice.Aut()({label: image(label) for label in lattice.module_generating_set()})
-        inverse = ~automorphism
-        if not all(
-            inclusion.is_in_image(
-                space.wrap(inverse(inclusion(generator).underlying_element()))
-            )
-            for generator in lattice.module_generators()
-        ):
+        In the basis of ``M`` the restriction is ``B^-1 A B`` for ``A`` the
+        matrix of ``g`` on ``V``; ``g`` preserves ``M`` exactly when it and
+        ``B^-1 A^-1 B`` are integral.
+        """
+        from sage_extensions.categories.modules.pure.modules import _engine_matrix
+        from sage_extensions.categories.rings.ring_foundation import _owned_engine_element
+
+        lattice = self.reference_lattice()
+        basis, inverse_basis = self._reference_frame()
+        ambient = _engine_matrix(automorphism.module_morphism())
+        restricted = inverse_basis * ambient * basis
+        if not (restricted.denominator() == 1 and (inverse_basis * ambient.inverse() * basis).denominator() == 1):
             raise ValueError(
-                f"cannot restrict {automorphism} to {lattice}: its inverse does not preserve the reference lattice"
+                f"cannot restrict {automorphism} to {lattice}: it or its inverse does not preserve the reference lattice"
             )
-        return forward
+        ring = lattice.base_ring()
+        labels = tuple(lattice.module_generating_set())
+        return lattice.Aut()({
+            label: lattice.linear_combination({
+                row_label: _owned_engine_element(ring, restricted[row, column])
+                for row, row_label in enumerate(labels)
+                if restricted[row, column]
+            })
+            for column, label in enumerate(labels)
+        })
 
     @cached_method
     def quotient_automorphism(self, automorphism):
