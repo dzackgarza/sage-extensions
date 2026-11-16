@@ -21,6 +21,13 @@ reports the log a run's own logging configuration filled.  All are bound as
 builtins for the same reason: the lint admits exactly the names a directory's
 ``conftest.py`` binds.
 
+The declared category graph has the same shape of question, asked of a tree
+written for it: ``declared_graph_report`` runs the tool ``just category-graph``
+spells over a source tree the test supplies -- the module as a subprocess, its
+data read from the file ``--output`` writes and not from what it prints -- and
+``declared_graph_document`` is that report's document, required to exist so a
+view that refuses the tree fails the test that asked for its data.
+
 The acceptance drivers are instruments of the same kind: each takes one row of
 an orbit computation and reports what the row did.  ``incidence_row_outcome``
 is the Γ_{Co,2} driver's row step on one subgroup under one cap, and
@@ -38,6 +45,7 @@ from __future__ import annotations
 import builtins
 import importlib.util
 import json
+import os
 import re
 import shutil
 import subprocess
@@ -49,7 +57,6 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from sage_extensions import timing as sage_timing
-from sage_extensions.testing.category_graph import read as read_category_graph
 
 SOURCE_TREE = Path(__file__).resolve().parents[2]
 PROBE_ROOT = SOURCE_TREE / ".tmp" / "plugin-probes"
@@ -182,16 +189,90 @@ def _outcomes(records: list[dict]) -> dict[str, str]:
     return {nodeid: "failed" if nodeid in failed else "passed" for nodeid in sorted(reported)}
 
 
-def declared_category_graph():
-    r"""The category graph this checkout declares, read out of its source.
+GRAPH_ROOT = SOURCE_TREE / ".tmp" / "category-graph-probes"
 
-    ``just category-graph`` prints the same graph.  The reader parses the source
-    with ``ast`` and imports nothing of the preamble, so a test of it asks about
-    the declarations the tree writes rather than about the classes Sage joined
-    from them; the checkout it reads is this file's own, whether the run works
-    in a worktree or in the repository.
+
+@dataclass(frozen=True)
+class GraphReport:
+    r"""What one run of the declared-category-graph tool reported.
+
+    ``exit_status`` is the run's; ``written`` is the text the view wrote to the
+    file ``--output`` names, which is the tool's data for the views that answer
+    with one and is absent for a view that prints; ``transcript`` is the run's
+    own output, so a test that fails says what the tool said about the tree it
+    was given.
     """
-    return read_category_graph(SOURCE_TREE)
+
+    exit_status: int
+    written: str | None
+    transcript: str
+
+
+def _tool_environment() -> dict[str, str]:
+    r"""This process's environment with the checkout's ``src`` first on the path."""
+    return {
+        **os.environ,
+        "PYTHONPATH": os.pathsep.join(
+            (str(SOURCE_TREE / "src"), os.environ.get("PYTHONPATH", ""))
+        ),
+    }
+
+
+def declared_graph_report(tree: dict[str, str], *arguments: str) -> GraphReport:
+    r"""Run the declared-category-graph tool over a source tree written for it.
+
+    ``tree`` maps a path inside the tree to that file's source, so the run reads
+    declarations written for the test and no file of this checkout: a category
+    renamed here changes no assertion there.  ``arguments`` are the tool's own
+    -- the view as ``--format VIEW``, and the selection a view takes -- and the
+    command is the one ``just category-graph`` spells, so what a test reads is
+    what the recipe produces.  The tree is written under ``.tmp/`` and removed.
+    """
+    GRAPH_ROOT.mkdir(parents=True, exist_ok=True)
+    root = Path(tempfile.mkdtemp(prefix="declared-graph-", dir=GRAPH_ROOT))
+    try:
+        for name, source in tree.items():
+            path = root / name
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(source)
+        document = root / "report.json"
+        finished = subprocess.run(
+            (
+                sys.executable,
+                "-m",
+                "sage_extensions.testing.category_graph",
+                *arguments,
+                "--output",
+                str(document),
+                str(root),
+            ),
+            capture_output=True,
+            text=True,
+            cwd=SOURCE_TREE,
+            env=_tool_environment(),
+        )
+        return GraphReport(
+            exit_status=finished.returncode,
+            written=document.read_text() if document.is_file() else None,
+            transcript=f"{finished.stdout}{finished.stderr}",
+        )
+    finally:
+        shutil.rmtree(root)
+
+
+def declared_graph_document(tree: dict[str, str], *arguments: str) -> dict:
+    r"""The document one data view of the graph wrote for ``tree``.
+
+    A view that refuses the tree, or fails on it, leaves no document; the
+    assertion carries the run's exit status and its own words rather than
+    letting the caller read a missing file.
+    """
+    report = declared_graph_report(tree, *arguments)
+    assert report.written is not None, (
+        f"' {' '.join(arguments)}' wrote no report of the tree: exit status "
+        f"{report.exit_status}: {report.transcript}"
+    )
+    return json.loads(report.written)
 
 
 def pytest_configure(config) -> None:
@@ -203,7 +284,8 @@ def pytest_configure(config) -> None:
     name is removed when the session ends, so the binding lasts exactly as long
     as the tests that name it.
     """
-    builtins.declared_category_graph = declared_category_graph
+    builtins.declared_graph_report = declared_graph_report
+    builtins.declared_graph_document = declared_graph_document
     builtins.probe_run = probe_run
     builtins.stage_records_of = stage_records_of
     builtins.kept_test_run = kept_test_run
@@ -216,7 +298,8 @@ def pytest_configure(config) -> None:
 
 def pytest_unconfigure(config) -> None:
     r"""Remove the session's abbreviation, leaving ``builtins`` as it was found."""
-    del builtins.declared_category_graph
+    del builtins.declared_graph_report
+    del builtins.declared_graph_document
     del builtins.probe_run
     del builtins.stage_records_of
     del builtins.kept_test_run
