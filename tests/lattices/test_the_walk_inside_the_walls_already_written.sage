@@ -72,3 +72,55 @@ def test_the_walk_at_the_first_cusp_writes_down_only_what_the_walls_allow() -> N
     assert cardinal(sum(1 for _ in walls)) == cardinal(12)
     assert all(admits_root(wall) for wall in walls)
     assert all(lattice.q(wall) in (ZZ(-2), ZZ(-4)) for wall in walls)
+
+
+def test_every_candidate_a_layer_writes_down_lies_in_the_cell() -> None:
+    r"""A layer's candidates pair nonpositively with every normal of the cell.
+
+    Conditions (58) are \(b(v,e_i)\le0\) against every normal already in the
+    sequence, and the normals of the cell at the controlling vector are among
+    them: a candidate of the layer that pairs positively with one of them lies
+    outside the cell the walk enumerated in, and writing it down is writing down
+    a solution the sequence refuses.  The orthant of the layer's coefficients
+    is not that condition — the cell's Gram has no positive entry off the
+    diagonal, so \(d\ge c\) is necessary and not sufficient — which is why the
+    candidates are tested against the cell's own normals here and not against
+    the coefficients' floors.
+
+    The specimen is the reduction of \(U\oplus U\oplus A_2\) at the first
+    plane's generator, which is \(U\oplus A_2\) at the point \(e_2+f_2\) of its
+    hyperbolic space: the cell there is cut by the two \(A_2\) roots through
+    that point and by the two roots of the plane, so its Gram has a negative
+    entry off the diagonal and its duals are not the coordinate axes.  A
+    candidate outside the cell pairs positively with a dual, because
+    \(b(x,\tilde w_i)=\det(G)\,u_i(x)\): the test is the coordinates' own, in
+    the reduction, and not the engine's frame.
+
+    The candidates below are the ones the walk's layer enumeration writes down
+    (:meth:`cusp_layer_enumerations`), which is the set this test is about, and
+    each layer's list is read through its cell's duals.
+    """
+    lattice = Lattices(ZZ)("U") + Lattices(ZZ)("U") + Lattices(ZZ)("A2")
+    image = lattice.stable_orthogonal_group().isotropic_vector_reduction_image(
+        lattice.basis_vector(0)
+    )
+    reduction = image.reduction()
+    records = image.cusp_layer_enumerations(
+        controlling_vector=lattice.basis_vector(2) + lattice.basis_vector(3),
+        layers=8,
+    )
+
+    assert records
+    assert any(tuple(record.cell_candidates()) for record in records)
+    for record in records:
+        duals = record.cell_dual_normals()
+        outside = tuple(
+            candidate
+            for candidate in record.cell_candidates()
+            if any(reduction.b(candidate, dual) > 0 for dual in duals)
+        )
+        assert not outside, (
+            f"layer {record.layer_number()} of square {record.square()} at offset "
+            f"{record.offset()} writes down {outside[0]} outside the cell: it pairs "
+            f"positively with a dual of the cell's normals"
+        )
