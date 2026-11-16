@@ -2618,3 +2618,5 @@ suite rows are compared by their FAILED id sets, not by their seconds.
 | `541rev-forms-ctl.log` | `9a04b45` | `tests/forms` as one directory, unchanged: **43 failed, 40 passed, 58 errors in 95.98 s** | 
 | `541rev-forms-fix1.log` | `961b68a` + the finding-1 repair | the same directory: **38 failed, 48 passed, 58 errors in 123.98 s**; the three new tests are among the 48, and the FAILED/ERROR id set differs from the control's by the five regression ids and nothing else | 
 | `541rev-finding-2-red.log` | `ae8becb` | the second contract file on the finding-1 tree: **2 failed in 1.71 s**, each at `TypeError: base_ring (=Real Field) must be a ring or a semiring` | 
+| `541rev-finding-2-green.log` | the repair's commit | the two contract files and the laziness file: **7 passed in 5.44 s** | 
+| `541rev-finding-2-probe.log` | the repair's commit | `_coordinate_images` on a projection of `RR^2` reads `((1, 0), (0, 0))` and `_relation_images(RR^2)` reads `()` -- the two answers the review's probe found at `240ce65` and lost at `2bc5aff` | 

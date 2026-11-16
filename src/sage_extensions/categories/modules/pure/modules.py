@@ -7960,14 +7960,33 @@ def _coordinate_framed_free_module(module, ring) -> bool:
 def _coordinate_images(morphism):
     r"""Return the coordinates of each ``f(e_s)`` in the module generators of the codomain.
 
-    Column ``s`` of the morphism's retained coordinate matrix is the coordinate
-    vector of ``f(e_s)`` (:func:`_engine_matrix`, the one materialization of a
-    framed morphism), so the images are read off it rather than recomputed by
-    applying ``f`` to each generator.  Engine adapters that take a family of
-    generating vectors lower a morphism of free modules through this.
+    The coordinates are the definition: the image of every module generator of
+    the domain, read in the codomain's chosen generators.  A morphism of finite
+    framed free modules retains them as one engine matrix, column ``s`` of which
+    is the coordinate vector of ``f(e_s)`` (:func:`_engine_matrix`), and there
+    they are read off that matrix.  A matrix is a Sage matrix over the ring's
+    selected linear-algebra parent, and an owned exact field whose engine is
+    inexact selects the field itself, which is no Sage ring
+    (:func:`...ring_foundation._choose_linear_algebra_ring`); there the images
+    come from ``f``.  Engine adapters that take a family of generating vectors
+    lower a morphism of free modules through this.
     """
+    from sage.categories.rings import Rings as SageRings
+
     ring = morphism.domain().base_ring()
-    return tuple(
-        tuple(_owned_engine_element(ring, entry) for entry in column)
-        for column in _engine_matrix(morphism).columns()
-    )
+    match _linear_algebra_ring(ring) in SageRings():
+        case True:
+            return tuple(
+                tuple(_owned_engine_element(ring, entry) for entry in column)
+                for column in _engine_matrix(morphism).columns()
+            )
+        case False:
+            labels = tuple(morphism.codomain().module_generating_set())
+            return tuple(
+                tuple(
+                    morphism(morphism.domain().module_generator(source_label))
+                    .to_vector()(label)
+                    for label in labels
+                )
+                for source_label in morphism.domain().module_generating_set()
+            )

@@ -1,0 +1,22 @@
+tree SHA: 961b68a75340517b8b15c210f639ba75d934f477 (modified paths: 4)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 13.05 13.39 9.28 14/692 2676563
+files: /repos/sage-extensions/.tmp/probe2c.py
+inner 540 s, outer 600 s, guard 6144 MiB
+images: ((1, 0), (0, 0))
+equals ((RR(1),RR(0)),(RR(0),RR(0))): True
+relation images of V: ()
+engine: Real Field
+[peakrss] wt541revtests: child waited=0 shell_code=0 samples=4
+[peakrss] peak tree RSS      : 282 MiB
+[peakrss] low-water MemAvail : 5046 MiB
+[peakrss] peak single VmHWM  : 282 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      271 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     6.0s procs=  3 rss=   282 MiB hwm=   282 MiB avail=  5046 MiB
+[peakrss]   t=     4.0s procs=  3 rss=   205 MiB hwm=   205 MiB avail=  5214 MiB
+[peakrss]   t=     2.0s procs=  3 rss=    68 MiB hwm=    68 MiB avail=  5483 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     3 MiB hwm=     3 MiB avail=  5694 MiB
+launcher exit: 0
