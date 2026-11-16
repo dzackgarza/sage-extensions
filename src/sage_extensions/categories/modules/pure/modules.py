@@ -7529,33 +7529,50 @@ class MatrixSpaces(OwnedCategoryOverBaseRing):
 
         T = transpose
 
-        def inverse(self):
-            r"""Return the inverse matrix morphism with reversed endpoints.
+        def _inverse_in_the_ring(self):
+            r"""Return the inverse matrix over the coefficient ring, refusing a matrix with none.
 
-            Exact scalar comparisons and division are retained through
-            the generic computation when a symbolic model is inexact.
+            A square matrix $A$ over a commutative ring $R$ is inverted in
+            $M_n(R)$ exactly when $\det(A)$ is a unit of $R$: then
+            $A\operatorname{adj}(A) = \det(A)I$ puts
+            $\det(A)^{-1}\operatorname{adj}(A)$, and so the inverse, in the
+            ring, and $\det(AB) = \det(A)\det(B)$ makes every matrix the ring
+            inverts have a unit determinant.  The determinant is read into $R$
+            and $R$ decides whether it is a unit; the engine matrix is then
+            inverted and its entries are read back into $R$.
 
-            EXAMPLES::
+            A matrix whose determinant is not a unit is refused instead of
+            inverted: over $\mathbf{Z}$ the inverse of $2I$ in
+            $M_2(\mathbf{Q})$ is $\frac{1}{2}I$, and reading that back is the
+            conversion of a rational the ring has already stated it does not
+            contain.
 
-                sage: from sage_extensions.rings.real import RR
-                sage: V = RR ** 2
-                sage: A = V.module_category().Mor(V, V).from_rows(((RR.pi(), 1), (0, 1)))
-                sage: B = A.inverse()
-                sage: assert B.domain() is V and B.codomain() is V
-                sage: assert all(A(B(v)) == v and B(A(v)) == v for v in V.module_generators())
-                sage: Z = RR ** 0
-                sage: z = Z.module_category().Mor(Z, Z).from_rows(())
-                sage: assert z.inverse()(Z.zero()) == Z.zero()
+            The hypothesis is that the selected linear-algebra parent of $R$ is
+            a Sage ring; the exact real and complex fields are their own, and
+            there the inverse is the inverse linear map.
             """
-            if self.parent().nrows() != self.parent().ncols():
-                raise ValueError(
-                    f"{self} has no inverse: the matrix has shape {self.parent().matrix_shape()}, not square"
-                )
+            from sage.categories.rings import Rings as SageRings
 
             ring = self.parent().base_ring()
-            backend = (
-                _engine_matrix(self).change_ring(_linear_algebra_ring(ring)).inverse()
+            assert _linear_algebra_ring(ring) in SageRings(), (
+                f"the selected linear-algebra parent of {ring} is not a Sage ring, so no engine matrix "
+                f"inverts {self}; the inverse of a matrix over it is the inverse of its linear map"
             )
+            determinant = self.determinant()
+            match determinant.is_unit():
+                case True:
+                    pass
+                case False:
+                    raise ZeroDivisionError(
+                        f"{self} has no inverse in {self.parent()}: its determinant {determinant} "
+                        f"is not a unit of {ring}"
+                    )
+                case _:
+                    raise ValueError(
+                        f"whether the determinant {determinant} of {self} is a unit of {ring} is undecided, "
+                        "so the ring cannot state whether it inverts the matrix"
+                    )
+            backend = _engine_matrix(self).inverse()
             source = self.codomain()
             codomain = self.domain()
             target = _require_matrix_mor(source.module_category().Mor(source, codomain))
@@ -7567,7 +7584,7 @@ class MatrixSpaces(OwnedCategoryOverBaseRing):
                 for row in range(target.nrows())
             )
 
-        __invert__ = inverse
+        __invert__ = _inverse_in_the_ring
 
         def __matmul__(self, other):
 
@@ -7752,37 +7769,54 @@ class MatrixEndomorphismSpaces(OwnedCategoryOverBaseRing):
             r"""Return whether this endomorphism is invertible in \(\operatorname{End}_R(M)\).
 
             A unit of a ring is an element with a two-sided inverse in it, and
-            an endomorphism has one in \(\operatorname{End}_R(M)\) exactly when
-            it is an isomorphism of \(M\): a bijective linear map has a
+            an endomorphism of \(M = R^n\) has one exactly when it is an
+            automorphism of \(M\): a bijective linear map has a
             set-theoretic inverse, that inverse is linear, and the two compose
-            to the identity on either side.  So this is decided as injectivity
-            together with surjectivity, which are the kernel and the cokernel
-            of the morphism, and not from a determinant -- that is a criterion
-            for the special case of a finite free module, carrying hypotheses
-            the definition of a unit does not.
+            to the identity on either side.
+
+            For a commutative \(R\) whose scalars carry an exact engine matrix,
+            this is decided by the determinant: \(A\) is invertible in
+            \(M_n(R)\) exactly when \(\det(A)\) is a unit of \(R\), by
+            \(A\operatorname{adj}(A) = \det(A)I\) and the multiplicativity of
+            the determinant.  The kernel and the cokernel are not what decides
+            it there: over \(\mathbf{Z}/4\) this library computes no kernel of
+            an endomorphism, while the ring inverts the matrix through its
+            determinant.  A ring whose selected linear-algebra parent is not a
+            Sage ring -- the exact real and complex fields are their own --
+            keeps the kernel and cokernel computation, which is the one its own
+            arithmetic supplies, and so does a noncommutative \(R\), which has
+            no determinant.
 
             Reading the units of \(\operatorname{End}_R(M)\) is what gives
             \(\operatorname{Aut}_R(M)\) its group structure, through the unit
             group functor on the owned ring category.
             """
-            return self.is_injective() and self.is_surjective()
+            from sage.categories.rings import Rings as SageRings
+
+            ring = self.parent().base_ring()
+            match ring.is_commutative() is True and _linear_algebra_ring(ring) in SageRings():
+                case True:
+                    return self.determinant().is_unit()
+                case False:
+                    return self.is_injective() and self.is_surjective()
 
         def _unit_inverse_decision(self):
             r"""Return the inverse of this endomorphism in its own ring, or refuse a nonunit.
 
             The units of \(M_n(R)=\operatorname{End}_R(R^n)\) are the
             automorphisms of \(R^n\), which ``_unit_decision`` decides, and the
-            inverse of one in the ring is the inverse linear map, which the
-            endomorphism itself constructs.  Neither step leaves the ring: over
-            \(\mathbf{Z}\) the inverse of \(2I\) would be \(\frac{1}{2}I\), whose
-            entries are not integers, so \(2I\) has no inverse in
-            \(M_2(\mathbf{Z})\) at all and is refused here instead of by an
-            engine computing in a larger ring and failing to read the result
-            back.
+            inverse of one in the ring is the inverse matrix, which the matrix
+            space states: over a commutative \(R\) a unit determinant makes
+            \(\det(A)^{-1}\operatorname{adj}(A)\) a matrix over \(R\) whose
+            product with \(A\) is the identity.  The coefficient ring need not
+            be a domain, and a nonunit is refused by its determinant before any
+            matrix is inverted, so no inverse is answered from a larger ring.
 
             A nonunit is refused, not computed: ``inverse_of_unit`` is what
             division by the element multiplies by, so its error is the ring's
-            statement of the hypothesis the division failed.
+            statement of the hypothesis the division failed.  An undecided unit
+            predicate leaves the inverse unstated rather than answering it from
+            a larger ring.
             """
             match self.is_unit():
                 case True:
@@ -7800,10 +7834,10 @@ class MatrixEndomorphismSpaces(OwnedCategoryOverBaseRing):
             An element of a matrix ring is inverted in that ring, so \(A^{-1}\)
             is the two-sided inverse of \(A\) in \(\operatorname{End}_R(R^n)\):
             the ring's unit inverse, which exists exactly on the units.  The
-            matrix space's own ``~`` computes in the coefficient fraction field
-            and reads the result back, which answers for a nonunit as much as
-            the field does -- \(\frac{1}{2}I\) for \(2I\) over \(\mathbf{Z}\) --
-            so the endomorphism ring states its inverse here instead.
+            same computation is the matrix space's ``~`` and the ring's
+            ``inverse_of_unit``, so no spelling of the inverse of a nonunit can
+            answer with the inverse in a larger ring -- \(\frac{1}{2}I\) for
+            \(2I\) over \(\mathbf{Z}\).
             """
             return self.inverse_of_unit()
 
