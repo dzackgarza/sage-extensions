@@ -229,3 +229,23 @@ def test_a_row_of_a_lattice_with_no_isotropic_plane_decides_with_its_line_vertex
 
     assert outcome.status is RowStatus.DECIDED
     assert outcome.counts == (0, 1, 0)
+
+
+def test_the_run_reaches_the_rows_its_own_default_specification_names():
+    r"""The driver's default specification selects the two Coble rows, and a run reaches them.
+
+    The default names ``O`` and ``Gamma_{Co,2}``, and the second label carries a
+    comma.  A driver that splits the specification on commas therefore reads
+    three names, stops on ``Gamma_{Co`` and exits on the error status without
+    computing a row; one that reads the specification against its own labels
+    reaches the first row.  With a cap of no seconds no row is computed, so the
+    run ends on the undecided status -- the same status the single-row
+    specification gives -- and never on the error status, and a name that is not
+    a row of the driver still ends on the error status.
+    """
+    spent = ["--lattice", "6JRS", "--cap", "0"]
+
+    assert incidence_rows_exit(spent) != RowStatus.ERROR.exit_status
+    assert incidence_rows_exit(spent) == RowStatus.UNDECIDED.exit_status
+    assert incidence_rows_exit(spent + ["--rows", "O"]) == RowStatus.UNDECIDED.exit_status
+    assert incidence_rows_exit(spent + ["--rows", "eta"]) == RowStatus.ERROR.exit_status
