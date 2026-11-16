@@ -448,7 +448,15 @@ class RelativeProjectivizationQuasiCoherentMorphismMethods:
     def __ne__(self, other) -> bool:
         return not self == other
 
-    __hash__ = None
+    def __hash__(self) -> int:
+        r"""Hash the construction the arrow comes from, which decides equality.
+
+        Two such arrows are equal exactly when they lie in one set of morphisms,
+        come from one relative projectivization and agree in being the identity.
+        Those three data are what a hash reads; the projectivization is
+        retained, so its identity is stable while the arrow exists.
+        """
+        return hash((id(self.parent()), id(self.relative_projectivization()), self.is_identity()))
 
 
 class RelativeProjectivizationQuasiCoherentMorphism(

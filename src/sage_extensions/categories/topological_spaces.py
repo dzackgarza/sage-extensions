@@ -463,7 +463,14 @@ class ContinuousMap:
     def __ne__(self, other) -> bool:
         return not self == other
 
-    __hash__ = None
+    def __hash__(self) -> int:
+        r"""Hash the underlying set map, which is what equality compares.
+
+        Two continuous maps of one set of morphisms are equal exactly when their
+        underlying set maps are, and a set map's own hash reads its values on
+        its domain, so equal maps hash alike.
+        """
+        return hash((id(self.parent()), self.underlying_set_morphism()))
 
 
 class TopologicalSpaceMor(CategoricalMor):

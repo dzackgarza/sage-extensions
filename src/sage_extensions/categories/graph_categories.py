@@ -167,7 +167,14 @@ class GraphMorphism:
     def __ne__(self, other):
         return negation(self == other)
 
-    __hash__ = None
+    def __hash__(self) -> int:
+        r"""Hash the underlying vertex map, which is what equality compares.
+
+        Two graph morphisms of one set of morphisms are equal exactly when their
+        underlying set maps are, and a set map's own hash reads its values on
+        its domain, so equal morphisms hash alike.
+        """
+        return hash((id(self.parent()), self.underlying_set_morphism()))
 
 
 class DigraphMor(CategoricalMor):

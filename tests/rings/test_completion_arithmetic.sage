@@ -35,8 +35,7 @@ def test_exact_zero_and_exact_lazy_inverse_are_decided_in_the_completion() -> No
 
     assert zero.is_zero()
     assert not zero
-    with pytest.raises(TypeError):
-        hash(zero)
+    assert FiniteOrderedSets()((zero,)).cardinality() == 1
 
     unit = completion.one() - x_hat
     inverse = unit.inverse_of_unit()

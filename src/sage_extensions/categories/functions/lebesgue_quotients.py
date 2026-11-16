@@ -100,7 +100,15 @@ class _AEClass:
         equal = statement if decision is Unknown else decision
         return equal if op == op_EQ else negation(equal)
 
-    __hash__ = None
+    def __hash__(self) -> int:
+        r"""Hash the classes of one quotient alike.
+
+        Equality here is equality of the representatives almost everywhere, and
+        a representative may be changed on a null set without changing the
+        class.  No datum of one representative is invariant under that, so the
+        quotient is what a hash reads, which is the rule of :class:`Sets`.
+        """
+        return hash(id(self.parent()))
 
     def _repr_(self):
         return f"[{self.representative()}] a.e."

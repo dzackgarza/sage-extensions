@@ -1122,7 +1122,15 @@ class FiberedFormedModuleMorphism:
     def __ne__(self, other) -> bool | Predicate:
         return negation(self == other)
 
-    __hash__ = None
+    def __hash__(self) -> int:
+        r"""Hash the fibered morphisms of one set of morphisms alike.
+
+        Equality here compares the semilinear module component on a finite
+        spanning family and the value component, and neither component supplies
+        a hash of its own, so the set of morphisms is what a hash reads, which
+        is the rule of :class:`Sets`.
+        """
+        return hash(id(self.parent()))
 
     def map_value(self, value):
         changed = self.base_changed_domain()

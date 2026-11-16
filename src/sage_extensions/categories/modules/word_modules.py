@@ -399,7 +399,16 @@ class _WordClass:
         equal = conjunction(difference(label) == presentation.base_ring().zero() for label in difference.support().domain())
         return equal if op == op_EQ else negation(equal)
 
-    __hash__ = None
+    def __hash__(self) -> int:
+        r"""Hash the classes of one word quotient alike.
+
+        Equality here is that the difference of two normalized representatives
+        normalizes to zero, which the presentation's relations decide: two
+        distinct representatives may be one class.  No invariant of the retained
+        representative is known to survive the relations, so the quotient is
+        what a hash reads, which is the rule of :class:`Sets`.
+        """
+        return hash(id(self.parent()))
 
     def _repr_(self):
         return repr(self._representative)
