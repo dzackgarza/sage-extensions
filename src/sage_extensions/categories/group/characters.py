@@ -150,6 +150,26 @@ class CharacterSets(OwnedParameterizedCategory):
         def __call__(self, element):
             return self.class_function()(element)
 
+        def __eq__(self, other) -> bool:
+            r"""Two characters of ``G`` are equal exactly when they are one class function.
+
+            A character is its class function, and a class function is fixed
+            by its values on the conjugacy-class representatives, so equality
+            compares exactly the values :meth:`__hash__` hashes; equal
+            characters therefore have one hash.
+            """
+            if self is other:
+                return True
+            if other not in self.parent():
+                return False
+            return all(
+                self(representative) == other(representative)
+                for representative in self.conjugacy_class_representatives()
+            )
+
+        def __ne__(self, other) -> bool:
+            return not self == other
+
         def __hash__(self) -> int:
             r"""Hash the values on the conjugacy-class representatives of ``G``.
 
