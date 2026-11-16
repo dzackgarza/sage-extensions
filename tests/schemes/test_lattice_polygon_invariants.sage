@@ -95,6 +95,30 @@ def test_the_standard_simplex_from_its_halfspaces() -> None:
     assert simplex == ConvexPolytopes(lattice)(((0, 0), (1, 0), (0, 1)))
 
 
+def test_the_plane_cut_out_by_no_halfspace_is_refused_as_unbounded() -> None:
+    r"""A family of no halfspace imposes no condition, so it cuts out all of ``QQ^2``,
+    which contains the line ``QQ e_1`` and is unbounded; the tautology ``0 >= 0``
+    imposes no condition either and cuts out the same plane.  Both are refused as
+    unbounded regions, rather than handed on as a point of ``QQ^0``."""
+    import pytest
+
+    lattice = ZZ.free_module(2)
+
+    with pytest.raises(ValueError):
+        ConvexPolytopes(lattice).from_halfspaces(())
+    with pytest.raises(ValueError):
+        ConvexPolytopes(lattice).from_halfspaces(((0, (0, 0)),))
+
+
+def test_the_whole_space_of_the_trivial_lattice_is_the_one_point_polytope() -> None:
+    r"""In rank 0 the whole space ``QQ^0`` is one point, which is a polytope: the empty
+    family of halfspaces is bounded there, and is not refused."""
+    point = ConvexPolytopes(ZZ.free_module(0)).from_halfspaces(())
+
+    assert point.dimension() == 0
+    assert point.n_vertices() == 1
+
+
 def test_there_are_sixteen_reflexive_polygons() -> None:
     r"""Up to lattice isomorphism there are exactly 16 reflexive polygons (CLS Thm. 8.3.7)."""
     lattice = ZZ.free_module(2)
