@@ -392,6 +392,27 @@ class DiscriminantQuadraticModules(OwnedCategoryOverBaseRing):
             )
 
         @cached_method
+        def generating_classes_with_norms(self):
+            r"""Return the module's generating classes, each with its norm ``q``.
+
+            ``q`` is the diagonal of the chosen bilinear lift ``G``, ``G(s, s)
+            = q(s)``, so a generating class's norm is one evaluation of the
+            lift.  The characteristic decision compares that norm with the
+            class's pairing against the class under test, on every generating
+            class, so the norms are a datum of the module and not of the class
+            asking: they are read on the first request, with the classes they
+            belong to, and every later decision reuses them.
+            """
+            form = self.form()
+            return tuple(
+                (
+                    generating_class,
+                    form.lift_pairing(generating_class, generating_class).lift(),
+                )
+                for generating_class in self.module_generators()
+            )
+
+        @cached_method
         def isotropic_subgroups(self):
             r"""Return all subgroups on which ``q`` vanishes identically."""
             return _isotropic_subgroups(self, quadratic=True)
@@ -548,15 +569,16 @@ class DiscriminantQuadraticModules(OwnedCategoryOverBaseRing):
             module where it is, ``q`` modulo the integers is a homomorphism, as
             is ``b(v, .)``, so two of them that agree on a generating set agree
             everywhere.  The values compared are the chosen bilinear lift's:
-            ``G(s, s) = q(s)``, and ``G(s, v)`` modulo the integers is
-            ``b(s, v)``.  One call therefore costs two lift evaluations per
-            generating class -- its norm and its pairing with the class -- and
-            not one ``q`` and one ``b`` per class of the module.
+            ``G(s, s) = q(s)`` is the generating class's norm, a datum of the
+            module, and ``G(s, v)`` modulo the integers is ``b(s, v)``.  One
+            call therefore costs one lift evaluation per generating class --
+            its pairing with the class under test -- and not one ``q`` and one
+            ``b`` per class of the module.
 
             The lifts are elements of the owned rational field, and the owned
-            integers coerce them, where the engine's own integer ring refuses
-            a foreign element outright and decides every class
-            non-characteristic.
+            integers coerce them, where the engine's own integer ring refuses a
+            foreign element outright; the membership is therefore asked of this
+            module's own base ring.
             """
             parent = self.parent()
             integers = parent.base_ring()
@@ -564,10 +586,8 @@ class DiscriminantQuadraticModules(OwnedCategoryOverBaseRing):
                 return False
             form = parent.form()
             return all(
-                form.lift_pairing(generating_class, generating_class).lift()
-                - form.lift_pairing(generating_class, self).lift()
-                in integers
-                for generating_class in parent.module_generators()
+                norm - form.lift_pairing(generating_class, self).lift() in integers
+                for generating_class, norm in parent.generating_classes_with_norms()
             )
 
 
