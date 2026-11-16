@@ -8,53 +8,133 @@ and the cell \(P_0\) at that point is their intersection.  §4.1, the equation
 coordinates of that cell, the vectors of the layer whose coordinates along the
 normals are nonpositive.
 
-The cell is therefore the walk's own object, and the layers a call reports are
-only that call's when the walk has one: a walk that cut no cell has no
-coordinates to enumerate in, and its layers are the whole lattice's.  The
-records below carry the cell's normals and the adjugate duals of their Gram, so
-that a candidate can be tested against the cell without a coordinate
-computation: \(b(x,\tilde w_i)=\det(G)\,u_i(x)\) for the coordinates \(u(x)\)
-along the normals, which is what makes "pairs nonpositively with every dual"
-the cone condition (58).
+The cell is therefore the walk's own object.  A walk whose roots through the
+point cut no cell has no coordinates to enumerate in, and its layers are the
+whole lattice's, so a record of that state carries no normals and no duals and
+its two candidate lists are the one whole-lattice search.  A walk that cuts a
+cell enumerates in its normals, and the record carries them with the adjugate
+duals of their Gram, so that a candidate can be tested against the cell without
+a coordinate computation: \(b(x,\tilde w_i)=\det(G)\,u_i(x)\) for the
+coordinates \(u(x)\) along the normals, which is what makes "pairs nonpositively
+with every dual" the cone condition (58).  The normals are read from the walk
+that cuts the cell, so their orientation is the chamber's and not its
+negation's: each of them is a wall of the chamber at the same point, with that
+sign, and the walls through the point are exactly them.
 
-The lattice is \(U\oplus U\oplus A_1\) at its first isotropic basis vector: the
-reduction is \(U\oplus A_1\), of rank three and signature (1, 2), at the point
-\(e_2+f_2\) of its hyperbolic space.  It is small enough to run whole: two
-layers, each enumerated both ways.
+Both lattices are read at their first isotropic basis vector, and the point of
+the hyperbolic space is named as a class of the reduction, lifted to
+\(v^\perp\) by the reduction's own frame: \(U\oplus U\oplus A_1\) reduces to
+\(U\oplus A_1\) of rank three and signature (1, 2), and
+\(U\oplus U\oplus A_1\oplus A_1\) to \(U\oplus A_1\oplus A_1\) of rank four and
+signature (1, 3).  Both are small enough to run whole.
 """
 
 from sage_extensions.all import *  # noqa: F401,F403
 
 
-def _cusp_image():
-    r"""Return \(U\oplus U\oplus A_1\) and its reduction image at the isotropic \(e_0\).
+def _reduction_image(*names):
+    r"""Return the reduction image of the lattice named by ``names`` at its first isotropic vector.
 
-    The vector \(e_0\) is primitive and isotropic and the group is the stable
-    orthogonal group of the lattice, so the reduction \(e_0^\perp/\mathbf Z e_0\)
-    is \(U\oplus A_1\) and every reflection of the lattice lies in the group: the
-    cell the walk cuts is the full reflection arrangement's.
+    The vector is a primitive isotropic basis vector and the group is the stable
+    orthogonal group of the lattice, so the reduction is \(v^\perp/\mathbf Z v\)
+    and every reflection of the lattice lies in the group: the cell the walk cuts
+    is the full reflection arrangement's.
     """
-    lattice = Lattices(ZZ)("U") + Lattices(ZZ)("U") + Lattices(ZZ)("A1")
-    return lattice, lattice.stable_orthogonal_group().isotropic_vector_reduction_image(
+    lattice = Lattices(ZZ)(names[0])
+    for name in names[1:]:
+        lattice = lattice + Lattices(ZZ)(name)
+    return lattice.stable_orthogonal_group().isotropic_vector_reduction_image(
         lattice.basis_vector(0)
     )
 
 
-def _point_on_a_mirror(lattice):
-    r"""Return \(e_2+f_2\), a point of the hyperbolic space of the reduction.
+def _class(reduction, *coordinates):
+    r"""Return the class of the reduction with the given coordinates in its frame."""
+    return reduction(coordinates)
 
-    It pairs zero with the isotropic vector \(e_0\) and has square \(2\), so it
-    spans a timelike class in \(e_0^\perp/\mathbf Z e_0\) and is a point of that
-    hyperbolic space: the point \(p_0\) of Vinberg 1972, §3.2.
+
+def _coordinates(element):
+    r"""Return the coordinate tuple of a lattice element."""
+    return tuple(int(entry) for entry in element.to_vector())
+
+
+def _coordinates_of(family):
+    r"""Return the coordinate tuples of a family of lattice elements, in order."""
+    return tuple(_coordinates(element) for element in family)
+
+
+def _pairing_matrix(reduction, family):
+    r"""Return the matrix of the form on the family, as one contraction.
+
+    ``gram_matrix`` is the lattice's own pairing of a finite family; the entries
+    below are read off that matrix and never re-derived pairing by pairing.
     """
-    return lattice.basis_vector(2) + lattice.basis_vector(3)
+    return reduction.gram_matrix(basis=tuple(family))
 
 
-def _gram_determinant(reduction, normals):
-    r"""Return \(\det G\) for the Gram \(G=(b(w_i,w_j))\) of ``normals``."""
-    return Lattices(ZZ)(
-        [[reduction.b(left, right) for right in normals] for left in normals]
-    ).determinant()
+def _count(family):
+    r"""Return the cardinality of a finite family, as the index arithmetic below needs it."""
+    return int(cardinal(sum(1 for _ in family)))
+
+
+def test_a_walk_that_cuts_no_cell_reports_the_whole_lattice_layers() -> None:
+    r"""A point whose roots cut no cell has no cell coordinates, and its layers are the lattice's.
+
+    The point is the class \((-3,-3,-1,-1)\) of \(U\oplus A_1\oplus A_1\), of
+    square \(14\), and the walk's cone at it is the single normal
+    \((-1,1,0,0)\) in the reduction's frame: one independent root in a
+    \(v_0^\perp\) of rank three.  Vinberg's cell (1972, §3.2, rule 1 and (39),
+    p. 27) is cut by the roots through the point, and one normal spans no
+    coordinate system of the rank-three perpendicular, so the walk has none to
+    enumerate the layer (57) in and enumerates it over the whole lattice
+    (§4.1, p. 30).  The record then states that: no normals, no duals, and
+    both of its candidate lists are the one whole-lattice search.
+    """
+    image = _reduction_image("U", "U", "A1", "A1")
+    reduction = image.reduction()
+    controlling_vector = image.class_lift(_class(reduction, -3, -3, -1, -1))
+    records = image.cusp_layer_enumerations(controlling_vector=controlling_vector, layers=1)
+
+    assert records
+    for record in records:
+        assert _coordinates_of(record.cell_normals()) == ()
+        assert _coordinates_of(record.cell_dual_normals()) == ()
+        assert sorted(_coordinates_of(record.cell_candidates())) == sorted(
+            _coordinates_of(record.whole_lattice_candidates())
+        )
+
+
+def test_the_cell_normals_are_the_chambers_walls_through_the_point() -> None:
+    r"""The normals the record carries are the walls through the point, with their orientation.
+
+    The point is the class \((1,1,0)\) of \(U\oplus A_1\), of square \(2\), and
+    the chamber is the one the same call computes at it
+    (:meth:`IsotropicVectorReductionImage.cusp_chamber`).  A root and its
+    negative span one mirror, so the pairing with the point alone does not say
+    which of them cuts the cell: the two are distinguished by which half-spaces
+    bound the chamber, and the walk reads the cone it wrote down rather than a
+    family it reoriented.  Asserted: the normals of the record are exactly the
+    chamber's walls that pass through the point, as vectors and not as
+    rays.
+    """
+    image = _reduction_image("U", "U", "A1")
+    reduction = image.reduction()
+    point = _class(reduction, 1, 1, 0)
+    controlling_vector = image.class_lift(point)
+    chamber = image.cusp_chamber(controlling_vector)
+    walls = tuple(chamber.wall_roots())
+    pairings = _pairing_matrix(reduction, (point,) + walls)
+    through_the_point = tuple(
+        wall for index, wall in enumerate(walls) if pairings[0, index + 1] == ZZ.zero()
+    )
+    records = image.cusp_layer_enumerations(controlling_vector=controlling_vector, layers=2)
+
+    assert records
+    assert through_the_point
+    for record in records:
+        assert sorted(_coordinates_of(record.cell_normals())) == sorted(
+            _coordinates_of(through_the_point)
+        )
 
 
 def test_the_dual_normals_are_the_adjugate_duals_of_the_cell_normals() -> None:
@@ -66,27 +146,31 @@ def test_the_dual_normals_are_the_adjugate_duals_of_the_cell_normals() -> None:
     the identity is not \(\det(G)\) times a dual basis vector, and the test it
     gives is then some other cone.
     """
-    lattice, image = _cusp_image()
+    image = _reduction_image("U", "U", "A1")
     reduction = image.reduction()
-    records = image.cusp_layer_enumerations(controlling_vector=_point_on_a_mirror(lattice), layers=2)
+    records = image.cusp_layer_enumerations(
+        controlling_vector=image.class_lift(_class(reduction, 1, 1, 0)), layers=2
+    )
 
     assert records
     for record in records:
-        normals = record.cell_normals()
-        duals = record.cell_dual_normals()
+        normals = tuple(record.cell_normals())
+        duals = tuple(record.cell_dual_normals())
         assert normals
-        assert cardinal(sum(1 for _ in duals)) == cardinal(sum(1 for _ in normals))
-        determinant = _gram_determinant(reduction, normals)
-        assert determinant != 0
-        pairings = tuple(
-            tuple(reduction.b(normal, dual) for dual in duals) for normal in normals
-        )
+        assert _count(duals) == _count(normals)
+        determinant = _pairing_matrix(reduction, normals).determinant()
+        assert determinant != ZZ.zero()
+        pairings = _pairing_matrix(reduction, normals + duals)
+        size = _count(normals)
         expected = tuple(
-            tuple(determinant if i == j else ZZ.zero() for j, _ in enumerate(duals))
-            for i, _ in enumerate(normals)
+            tuple(determinant if i == j else ZZ.zero() for j in range(size))
+            for i in range(size)
         )
-        assert pairings == expected, (
-            f"the duals of layer {record.layer_number()} pair with the normals as {pairings}, "
+        actual = tuple(
+            tuple(pairings[i, size + j] for j in range(size)) for i in range(size)
+        )
+        assert actual == expected, (
+            f"the duals of layer {record.layer_number()} pair with the normals as {actual}, "
             f"not {expected}"
         )
 
@@ -99,28 +183,36 @@ def test_each_layers_cell_enumeration_is_its_whole_lattice_solutions_in_the_cell
     at all; the two agree on the cell, which is the statement #400 asks of the
     coordinate enumeration.  The cell is proper at these layers -- some
     whole-lattice candidate pairs positively with a dual and so lies outside it
-    -- so the agreement is not the equality of two identical searches.
+    -- so the agreement is not the equality of two identical searches.  The
+    pairings of the candidates with the duals are one contraction of the family,
+    read as the block the duals' rows have against the candidates' columns.
     """
-    lattice, image = _cusp_image()
+    image = _reduction_image("U", "U", "A1")
     reduction = image.reduction()
-    records = image.cusp_layer_enumerations(controlling_vector=_point_on_a_mirror(lattice), layers=2)
+    records = image.cusp_layer_enumerations(
+        controlling_vector=image.class_lift(_class(reduction, 1, 1, 0)), layers=2
+    )
 
     assert records
     for record in records:
-        duals = record.cell_dual_normals()
+        duals = tuple(record.cell_dual_normals())
         whole_lattice = tuple(record.whole_lattice_candidates())
+        size = _count(duals)
+        pairings = _pairing_matrix(reduction, duals + whole_lattice)
+
+        def inside(index):
+            return all(
+                pairings[row, size + index] <= ZZ.zero() for row in range(size)
+            )
+
         in_the_cell = tuple(
-            candidate
-            for candidate in whole_lattice
-            if all(reduction.b(candidate, dual) <= 0 for dual in duals)
+            candidate for index, candidate in enumerate(whole_lattice) if inside(index)
         )
         outside = tuple(
-            candidate
-            for candidate in whole_lattice
-            if any(reduction.b(candidate, dual) > 0 for dual in duals)
+            candidate for index, candidate in enumerate(whole_lattice) if not inside(index)
         )
-        assert sorted(tuple(int(entry) for entry in candidate.to_vector()) for candidate in in_the_cell) == sorted(
-            tuple(int(entry) for entry in candidate.to_vector()) for candidate in record.cell_candidates()
+        assert sorted(_coordinates_of(in_the_cell)) == sorted(
+            _coordinates_of(record.cell_candidates())
         ), (
             f"layer {record.layer_number()} of square {record.square()} at offset {record.offset()} "
             f"is not the layer's whole-lattice solutions in the cell"
