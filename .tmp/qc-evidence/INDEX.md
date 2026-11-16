@@ -2867,3 +2867,29 @@ with the shared `.git` bound at its host path, the port at `/work`) or
 | `520-r2-tip-tests.log` | the round's evidence commit, after the rebase onto the main it is pushed on | the five tests of the file, durations printed: **5 passed in 14.83 s**, the slowest call 3.35 s. |
 | `520-r2-tip-engineering.log` | the round's evidence commit, after the rebase onto the main it is pushed on | the directory that holds the test and its harness, after the rebase: **2 failed, 24 passed in 94.49 s**, 26 collected -- the base's 21 passed plus this file's 5, which replace the two the previous round left there. |
 | `520-r2-base-engineering-rebased.log` | `fb74227`, the base the round is rebased onto | the same directory without this round: **2 failed, 21 passed in 95.74 s**, 23 collected, the same two FAILED ids. |
+## #554, the review of `8e7ba2613e`/`08322dee5d`: the double dual is the primal lattice, the dual is not
+
+`08322dee5d` decided containment, equality and the hash of two polytopes by asking whether the other's
+category has `Sets().Subobjects(self.ambient_space())` among its immediate supercategories.
+`ConvexPolytopes.ambient_space()` is `QQ.free_module(lattice.module_generating_set())`
+(`polytopes.py:542`), so the space is keyed by the *labels* of the lattice and not by the lattice: `M`,
+its dual `M^*` and every rank-2 lattice on the labels `{0, 1}` share one space, and the square of `M`
+was thereby compared with the diamond of `M^*`, a subset of another space. The repair lands the one
+identification that is canonical, at its owner: `polar_dual` of a polytope framed by a dual lattice
+frames its result by the primal, through the evaluation isomorphism
+`Modules(ZZ).dualization().double_dual_morphism(M)`, and the relations route again on the category of
+the lattice (`other in ConvexPolytopes(self.ambient_lattice())`), so an operand of another kind is not
+asked for its `ambient_category()` and two lattices are not identified with each other.
+
+Still to be filed by the owner, and not repaired here: `ConvexPolytopes.ambient_space()`
+(`polytopes.py:542`) and `RationalPolyhedralCones.ambient_space()` (`polyhedral_cones.py:231-233`) key
+the rational space on the lattice's generating-set labels, so two lattices with the same labels share
+one space. With the three relations no longer routed on the space that is latent, but it is wrong: the
+space a polytope lies in is `M tensor QQ`, and `M` is the lattice.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `554-double-dual-red.log` | `1488acf` + the test commit of this round | `tests/schemes/test_polytopes.sage -k double_polar_dual`: **1 failed, 5 deselected in 2.55 s** (test lint loaded, no finding), at `assert doubled.ambient_lattice() is lattice`: the double polar dual's frame is the dual of the dual, `(M^*)^*`, not `M` |
+| `554-double-dual-main-probe.log` | `1488acf` | the defect on main: `doubled.ambient_lattice() is M` **False**; `diamond.is_contained_in(square)` **True** and `doubled == square` **True** (the two spaces identified, so the vertex test and the equality ran across them); `square == 1` **raises** `AttributeError: 'int' object has no attribute 'ambient_category'`, and `square == None` likewise; `polar` and the double polar's engine vertices `(±1, 0)`/`(0, ±1)` and `(±1, ±1)` |
+| `554-double-dual-main-probe.py` | -- | the probe: the lattice, the dual, the double dual and their labels; `double_dual_morphism`'s codomain and its images of the basis; the four relations and the two equality operands that are not sets |
+
