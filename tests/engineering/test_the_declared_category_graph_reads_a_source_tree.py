@@ -253,6 +253,37 @@ def test_a_category_nothing_declares_is_a_piece_of_the_graph():
     assert cells["0-cells"] == 11
     assert cells["H_0 rank"] == 2
 
+
+def test_breadth_counts_the_declarations_into_a_node_and_not_the_joins():
+    r"""Three declarations into ``Objects``, one each into three others, no axiom.
+
+    Breadth is how many categories declare a node directly, and it is the
+    architectural diagnostic: a large count says the intermediate categories
+    between the node and its claimants are missing.  ``Objects`` is declared by
+    ``FiniteObjects``, ``Paths`` and ``Sliced``; ``FiniteObjects`` and ``Paths``
+    by ``FinitePaths``; and ``FinitePaths.Connected`` by ``Aliased``.  The joins
+    Sage supplies are not declarations: ``Paths.Connected`` is written nowhere
+    and declares ``Paths`` and ``Objects.Connected`` because that is how the
+    axiom mechanism works, so counting those edges would report ``Paths`` as
+    claimed twice where one category claims it, and report an axiom vertex as a
+    claimant of anything at all.
+
+    The header's own figures say what each count is over: six declarations
+    written, eight joins computed, and fourteen 1-cells in all.
+    """
+    assert declared_graph_breadth(_toy_tree()) == {
+        "Objects": 3,
+        "FiniteObjects": 1,
+        "FinitePaths.Connected": 1,
+        "Paths": 1,
+    }
+
+    figures = declared_graph_figures(_toy_tree(), "shape")
+    assert figures["declarations"] == 6
+    assert figures["computed joins"] == 8
+
+
+def test_a_slice_up_from_a_category_is_the_diamond_it_inherits_along():
     r"""Up from ``FinitePaths``: the two categories it declares, and their one parent.
 
     The axiom vertices are refinements of categories in the slice rather than

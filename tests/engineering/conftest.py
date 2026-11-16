@@ -30,7 +30,8 @@ writes to the file ``--output`` names, required to exist so a view that refuses
 the tree fails the test that asked for its data; and ``declared_graph_figures``
 reads a view's printed figures back as numbers, because the answer ``shape`` and
 ``cells`` give is the reading they print, which ``CAT-25`` reads a change's
-category-graph delta off.
+category-graph delta off, and ``declared_graph_breadth`` is that reading's
+breadth rows, one count per category.
 
 The acceptance drivers are instruments of the same kind: each takes one row of
 an orbit computation and reports what the row did.  ``incidence_row_outcome``
@@ -299,6 +300,29 @@ def declared_graph_figures(tree: dict[str, str], view: str) -> dict[str, int]:
     return _figures(report.output)
 
 
+def declared_graph_breadth(tree: dict[str, str]) -> dict[str, int]:
+    r"""Each category the shape view gives a breadth to, and the count it gives it.
+
+    The view states one row per node it counts into -- the count, then the
+    category -- so a node the answer omits is a node no declaration it read
+    names, and a node whose count grew is a node more categories claim.
+    """
+    report = declared_graph_report(tree, "shape")
+    assert report.exit_status == 0, f"the shape view: {report.transcript}"
+    return {
+        name: int(count)
+        for count, name in re.findall(r"(?m)^ +(\d+) +(\S+)$", _section(report.output, "Breadth"))
+    }
+
+
+def _section(output: str, heading: str) -> str:
+    r"""The text of the answer's ``## heading`` section, empty when it states none."""
+    for section in output.split("\n## ")[1:]:
+        if section.startswith(heading):
+            return section
+    return ""
+
+
 _HEADER_FIGURES = (
     ("categories", r"categories (\d+)"),
     ("declarations", r"declarations (\d+)"),
@@ -343,6 +367,7 @@ def pytest_configure(config) -> None:
     builtins.declared_graph_report = declared_graph_report
     builtins.declared_graph_document = declared_graph_document
     builtins.declared_graph_figures = declared_graph_figures
+    builtins.declared_graph_breadth = declared_graph_breadth
     builtins.probe_run = probe_run
     builtins.stage_records_of = stage_records_of
     builtins.kept_test_run = kept_test_run
@@ -358,6 +383,7 @@ def pytest_unconfigure(config) -> None:
     del builtins.declared_graph_report
     del builtins.declared_graph_document
     del builtins.declared_graph_figures
+    del builtins.declared_graph_breadth
     del builtins.probe_run
     del builtins.stage_records_of
     del builtins.kept_test_run
