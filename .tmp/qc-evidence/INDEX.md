@@ -2953,3 +2953,4 @@ parent the review names.
 | `524r2-walk-green-at-3fae3b5.log` | `3fae3b5` (main, the push base) + this round's test only | the same selection: **1 passed, 3 deselected in 0.69 s** |
 | `524r2-stated-valueerror-absent-at-bf4388a.log` | `bf4388a` | the mechanism `a20a385` states, probed: `discriminant_group()` of `U(2) + <2>` built in 0.25 s, its module `is_torsion()` True, `_finitely_presented_torsion()` True, `twist(-1)` in 0.05 s — no `ValueError` |
 | `524r2-stated-valueerror-absent-at-3fae3b5.log` | `3fae3b5` | the same probe on `main`: the same answers, with the module in `Torsion()` |
+| `524r2-walk-green-at-82cad5b.log` | `82cad5b`, the rebased head this round is pushed from, clean tree | the same selection after `main` advanced to `4936110`: **1 passed, 3 deselected in 2.39 s** (load 19.91) |

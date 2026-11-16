@@ -1,0 +1,21 @@
+tree SHA: 82cad5beb485a6d3d2e7ffe44d408a9188f5fae2 (modified paths: 0)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 19.91 15.00 8.37 10/754 3001167
+files: tests/forms/test_a_torsion_cokernel_carries_its_torsion_forms.sage
+inner 400 s
+.                                                                        [100%]
+1 passed, 3 deselected in 2.39s
+[peakrss] probe554tests: child waited=0 shell_code=0 samples=7
+[peakrss] peak tree RSS      : 330 MiB
+[peakrss] low-water MemAvail : 2750 MiB
+[peakrss] peak single VmHWM  : 330 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      319 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    12.0s procs=  3 rss=   330 MiB hwm=   330 MiB avail=  2750 MiB
+[peakrss]   t=    10.0s procs=  3 rss=   329 MiB hwm=   329 MiB avail=  2948 MiB
+[peakrss]   t=     8.0s procs=  3 rss=   308 MiB hwm=   308 MiB avail=  3114 MiB
+[peakrss]   t=     6.0s procs=  3 rss=   263 MiB hwm=   263 MiB avail=  3169 MiB
+[peakrss]   t=     4.0s procs=  3 rss=   201 MiB hwm=   201 MiB avail=  3358 MiB
+pytest exit: 0
