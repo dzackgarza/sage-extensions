@@ -47,7 +47,6 @@ from sage_extensions.categories._lattice import (
     _discriminant_of_gram,
     _generating_set_for,
     _gram_is_even,
-    _hyperbolic_plane_name,
     _IdentityGram,
     _lattice,
     _lattice_from_gram_tensor,
@@ -5437,6 +5436,41 @@ class Lattices(OwnedCategoryOverBaseRing):
                 case False:
                     return None
 
+        def _displayed_orthogonal_blocks(self):
+            r"""Return the blocks of the displayed basis that pair to zero across blocks.
+
+            A Gram entry \(b(g_i, g_j)\) is one pairing of two displayed
+            generators, so the graph on the displayed basis with an edge where
+            that pairing is nonzero has components whose spans pair to zero
+            across components: the lattice is the orthogonal sum of those
+            spans.  This is the sum a displayed Gram matrix exhibits, and
+            :meth:`is_decomposable` and :meth:`indecomposable_summands` read it
+            from here, so neither can claim a splitting the other denies.
+            """
+            rank = self.module_rank()
+            if rank.is_finite() is not True:
+                return None
+            n = int(rank)
+            gram = self.gram_tensor()
+            zero = self.base_ring().zero()
+            blocks = []
+            reached = set()
+            for start in range(n):
+                if start in reached:
+                    continue
+                reached.add(start)
+                block = [start]
+                frontier = [start]
+                while frontier:
+                    row = frontier.pop()
+                    for column in range(n):
+                        if column not in reached and gram[row, column] != zero:
+                            reached.add(column)
+                            block.append(column)
+                            frontier.append(column)
+                blocks.append(tuple(sorted(block)))
+            return tuple(blocks)
+
         def is_decomposable(self):
             r"""Whether this lattice has a nontrivial integral orthogonal sum.
 
@@ -5457,16 +5491,8 @@ class Lattices(OwnedCategoryOverBaseRing):
                 return True
             if self.base_ring() is _owned_integers() and self.form_content() > 1:
                 return self.untwisted_form().is_decomposable()
-            gram = self.gram_tensor()
-            reached = {0}
-            frontier = [0]
-            while frontier:
-                row = frontier.pop()
-                for column in range(n):
-                    if column not in reached and gram[row, column] != self.base_ring().zero():
-                        reached.add(column)
-                        frontier.append(column)
-            if len(reached) < n:
+            blocks = self._displayed_orthogonal_blocks()
+            if blocks is not None and len(blocks) > 1:
                 return True
             if n == 2 and self.base_ring() is _owned_integers():
                 binary = self._binary_orthogonal_split()
@@ -5576,9 +5602,30 @@ class Lattices(OwnedCategoryOverBaseRing):
             ``L + M + N`` is, ``+`` being binary -- so this descends through
             the represented decompositions until every summand is
             indecomposable.
+
+            A lattice presented by a Gram matrix carries no represented
+            decomposition, and two facts still exhibit one: an orthogonal
+            partition of the displayed basis, whose blocks are the summands in
+            the displayed order, and a definite binary splitting.  A lattice
+            that neither reads is returned as its own summand, which is the
+            statement that this family has nothing finer to report.
             """
 
             if self.decomposition() is None:
+                blocks = self._displayed_orthogonal_blocks()
+                if blocks is not None and len(blocks) > 1:
+                    gram = self.gram_tensor()
+                    category = Lattices(self.base_ring())
+                    return finite_family(
+                        tuple(
+                            summand
+                            for block in blocks
+                            for summand in category(
+                                [[gram[row, column] for column in block] for row in block]
+                            ).indecomposable_summands()
+                        ),
+                        name="Indecomposable summands",
+                    )
                 split = self._binary_orthogonal_split() if self.module_rank().is_finite() and int(self.module_rank()) == 2 else None
                 if split is not None:
                     first, second, _, _ = split
@@ -9641,41 +9688,42 @@ class Lattices(OwnedCategoryOverBaseRing):
             return finite_ordered_set(tuple(matches))
 
         def hyperbolic_plane_summand_count(self):
-            r"""Return the number of represented indecomposable hyperbolic-plane summands.
+            r"""Return the number of orthogonal hyperbolic planes in this lattice's isometry class.
 
-            The count reads the presentation, as :meth:`decomposition_names`
-            does: a summand is a hyperbolic-plane summand when its displayed
-            Gram is the plane's own, \(b(e,e) = b(f,f) = 0\) and
-            \(b(e,f) = 1\) on its generators.  A summand presented by another
-            Gram of the same binary lattice is isometric to \(U\) without being
-            presented as it, and deciding that isometry is a different question
-            (:meth:`is_isometric`, undecided outside the exact regimes), not a
-            reading of what the decomposition represents.
+            This is the \(U\)-index, the largest \(k\) with
+            \(L \cong U^k \oplus M\), which :meth:`hyperbolic_index` decides
+            (:meth:`integral_hyperbolic_index` is the same number stated for a
+            \(\mathbf{Z}\)-lattice).  It is a property of the isometry class: a
+            lattice presented by a Gram matrix in a basis that displays no
+            plane has the same number as one built as an orthogonal sum, and
+            whether a *particular* summand is the plane is not the question
+            (that is an isometry of the summand, :meth:`is_isometric`).
             """
-            return sum(
-                1
-                for summand in self.indecomposable_summands()
-                if _hyperbolic_plane_name(summand.gram_tensor()) is not None
-            )
+            return self.hyperbolic_index()
 
         def splits_two_hyperbolic_planes(self) -> bool:
-            r"""Return whether the represented decomposition splits at least two copies of ``U``.
+            r"""Return whether the isometry class of this lattice splits ``U + U``.
 
-            This reads the selected decomposition.  A Gram-matrix presentation
-            with no represented decomposition therefore answers ``False`` even
-            when the abstract lattice is isometric to one splitting ``U + U``.
+            The count is the \(U\)-index (:meth:`hyperbolic_plane_summand_count`),
+            so this answers the question about the lattice and not about the
+            basis its Gram matrix happens to be written in.  The witness is
+            :meth:`two_hyperbolic_plane_splitting`.  An index of two or more
+            already exhibits the two summands, so no separate decomposability
+            question is asked here.
             """
-            if not self.is_decomposable():
-                return False
             return self.hyperbolic_plane_summand_count() >= 2
 
         def eichler_criterion_applies(self) -> bool:
             r"""Return whether Eichler's criterion classifies primitive-vector orbits here.
 
-            The hypothesis is read off the presented decomposition
-            (:meth:`splits_two_hyperbolic_planes`), so a lattice presented by a
-            Gram matrix is not covered by the criterion however it decomposes:
-            apply it to a presentation that carries the splitting.
+            The hypothesis is a property of the isometry class: an even lattice
+            with \(L \cong U \oplus U \oplus M\), the largest such \(k\) being
+            the \(U\)-index of :meth:`hyperbolic_plane_summand_count`
+            (Gritsenko--Hulek--Sankaran, *Moduli of K3 Surfaces and
+            Irreducible Symplectic Manifolds*, Lemma 7.8, p. 503, as cited in
+            ``orthogonal_quotients.isotropic_line_stabilizer_image``).  No basis
+            has to display the planes, and no enlargement of \(L\) supplies
+            them.
             """
             return bool(self.is_even()) and self.splits_two_hyperbolic_planes()
 
