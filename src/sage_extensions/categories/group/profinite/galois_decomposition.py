@@ -147,7 +147,7 @@ def _finite_decomposition_group(quotient, prime_above):
         prime_above,
         action,
         lambda automorphism: _image_prime(prime_above, automorphism) == prime_above,
-        description=f"Decomposition group at {prime_above}",
+        lambda: f"Decomposition group at {prime_above}",
     )
 
 
