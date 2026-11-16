@@ -3542,3 +3542,15 @@ the base this push lands on.
 | `536r3-the-cell-of-two-classes.log` | `3fae3b5`, probe | the class of `e_2+e_3` and its lift, the chamber's three walls, the two that pass through the class, and the no-cell record (no normals, no duals, both lists equal) |
 | `536r3-the-cone-computed-once.log` | `4c13fb5`, probe holding the walk | `FundCone` **2.303 s** then **0.000 s**, same roots, distinct lists, and the cell cached |
 | `536r3-clause-repair-on-main.log` | `cb492da` | `tests/groups/test_finite_index_cosets_of_gamma_zero_two.sage`: **2 passed in 1.62 s** — the stabilizer caller of `#537` is red at `3fae3b5` (2 failed in 2.52 s, `TypeError ... unexpected keyword argument 'description'`) and repaired on main by `539650a`, so this round does not repeat it |
+
+## `#536`, round 3: the base advanced, and the same file on it, 2026-11-16
+
+The rows of the event above were measured at `cb492da` and `cc2ba5a`.  Main advanced to
+`3e65f1f` while the round was being assembled, so the same file is run again on the base
+the push lands on and on the rebased head.  This corrects which tree is "the base this
+push lands on" without rewriting the earlier event.
+
+| log | tree | result |
+| --- | --- | --- |
+| `536r3-red-base-3e65f1f.log` | `3e65f1f`, the base this push lands on | the file: **1 failed, 3 passed in 13.17 s**, the refusal at `isotropic_orbits.py:3077` |
+| `536r3-green-head-e409adb.log` | the rebased head | the same file: **4 passed in 9.66 s**; slowest 3.87 s, 2.14 s, 0.43 s, 0.22 s |
