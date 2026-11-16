@@ -12,14 +12,13 @@ divisibility two, so two different such vectors share a square and a
 divisibility while their divided classes differ.  On a unimodular lattice
 every divided class is trivial and the square alone decides.
 
-The hypothesis is read off the presented decomposition, so the K3 lattice
-appears here twice: once built as ``U^3 + E8^2``, where the three hyperbolic
-planes are summands, and once as the catalogue's ``LK3``, which is presented by
-a Gram matrix.  The two are isometric.  A partition of a displayed basis into
-mutually orthogonal blocks does exhibit an orthogonal sum, so ``LK3`` is
-decomposable; but the sum is not a datum of its presentation, no summand of it
-is the hyperbolic plane, and the criterion -- which reads the summands a
-presentation gives -- does not apply to it.
+The hypothesis is a property of the isometry class: an even lattice isometric
+to ``U + U + M`` (Gritsenko--Hulek--Sankaran, Lemma 7.8, p. 503).  So the K3
+lattice appears here twice, built as ``U^3 + E8^2`` and as the catalogue's
+``LK3``, whose Gram matrix is the block diagonal of those five summands; both
+carry three hyperbolic planes and the criterion applies to both.  A basis is not
+part of the hypothesis, so a basis that displays no isotropic direction at all
+does not remove it either.
 """
 
 from sage_extensions.all import *
@@ -34,7 +33,21 @@ def _two_elementary_specimen():
     return lattice
 
 
-def test_the_criterion_reads_its_hypothesis_off_the_decomposition() -> None:
+def _scrambled_k3():
+    r"""The K3 lattice in a basis that displays no isotropic direction.
+
+    ``e_i + e_{i+1}`` for the first twenty-one displayed generators and the
+    last one unchanged: a unimodular change of basis, so the same lattice, and
+    every displayed generator now pairs with its neighbours, so no partition of
+    the display splits it and no displayed generator is isotropic.
+    """
+    standard = _decomposed_k3()
+    basis = tuple(standard.module_generators())
+    changed = tuple(basis[position] + basis[position + 1] for position in range(21)) + (basis[21],)
+    return Lattices(ZZ)(tuple(tuple(standard.b(x, y) for y in changed) for x in changed))
+
+
+def test_the_criterion_reads_its_hypothesis_off_the_isometry_class() -> None:
     decomposed = _decomposed_k3()
     assert decomposed.indecomposable_summands().cardinality() == 5
     assert decomposed.hyperbolic_plane_summand_count() == 3
@@ -46,26 +59,35 @@ def test_the_criterion_reads_its_hypothesis_off_the_decomposition() -> None:
     assert not NamedLattices.E10.splits_two_hyperbolic_planes()
     assert not NamedLattices.E10.eichler_criterion_applies()
 
-    # The catalogue's K3 lattice is isometric to the decomposed one.  Its
-    # displayed Gram is the block diagonal of the five summands, and a
-    # partition of a displayed basis into mutually orthogonal blocks exhibits
-    # an orthogonal sum, so it is decomposable.  A Gram matrix presents the
-    # lattice, not a family of summands: nothing here is the hyperbolic plane,
-    # and the criterion reads the summands of a presented decomposition.
+    # The catalogue's K3 lattice is isometric to the decomposed one, and its
+    # displayed Gram is the block diagonal of the same five summands, so the
+    # partition of the displayed basis reads them off the display in the same
+    # order.  Three of them are hyperbolic planes, and a plane is a plane in
+    # whatever basis it is presented.
     assert NamedLattices.LK3.is_isometric(decomposed)
     assert NamedLattices.LK3.is_decomposable()
-    assert NamedLattices.LK3.hyperbolic_plane_summand_count() == 0
-    assert not NamedLattices.LK3.eichler_criterion_applies()
+    assert NamedLattices.LK3.indecomposable_summands().cardinality() == 5
+    assert tuple(
+        int(summand.module_rank())
+        for summand in NamedLattices.LK3.indecomposable_summands()
+    ) == (2, 2, 2, 8, 8)
+    assert tuple(NamedLattices.LK3.decomposition_names()) == tuple(
+        decomposed.decomposition_names()
+    )
+    assert NamedLattices.LK3.hyperbolic_plane_summand_count() == 3
+    assert NamedLattices.LK3.splits_two_hyperbolic_planes()
+    assert NamedLattices.LK3.eichler_criterion_applies()
 
 
-def test_raw_gram_factor_does_not_count_as_a_represented_u_summand() -> None:
-    r"""A factor presented by another Gram of the plane is not a presented ``U``.
+def test_a_plane_presented_by_another_gram_is_a_second_hyperbolic_plane() -> None:
+    r"""The plane in its own basis and the plane in another basis are one lattice twice.
 
-    ``U`` is the plane in the basis ``e, f`` with ``b(e, f) = 1``, where both
-    generators are isotropic: its displayed Gram is ``((0, 1), (1, 0))``.  The
-    factor below is the same lattice in the basis ``(2, 1), (1, 0)``, where
-    neither generator is isotropic, so it is isometric to ``U`` without being
-    presented as it -- the reading ``decomposition_names()`` reports.
+    ``U`` is the plane in a basis ``e, f`` with ``b(e, f) = 1``, where both
+    generators are isotropic.  The factor below is the same lattice in the basis
+    ``(2, 1), (1, 0)``: the second generator is isotropic and the first has
+    square two, so the display names it nothing -- ``decomposition_names()``
+    reports one unnamed summand -- while its isometry class is ``U``.  The
+    count is the ``U``-index, so it counts both, and the criterion applies.
     """
     raw_u = Lattices(ZZ)([[2, 1], [1, 0]])
     lattice = raw_u + NamedLattices.U
@@ -73,8 +95,23 @@ def test_raw_gram_factor_does_not_count_as_a_represented_u_summand() -> None:
     assert raw_u.is_isometric(NamedLattices.U)
     assert raw_u.is_indecomposable()
     assert tuple(lattice.decomposition_names()) == (None, "U")
-    assert lattice.hyperbolic_plane_summand_count() == 1
-    assert not lattice.splits_two_hyperbolic_planes()
+    assert lattice.hyperbolic_plane_summand_count() == 2
+    assert lattice.splits_two_hyperbolic_planes()
+    assert lattice.eichler_criterion_applies()
+
+
+def test_a_basis_that_displays_no_isotropic_direction_keeps_the_hypothesis() -> None:
+    r"""The criterion applies to the same lattice read in a basis that shows nothing.
+
+    Decomposability of the display is not decided here -- every displayed
+    generator of the scrambled basis pairs with a neighbour -- and the three
+    hyperbolic planes are still the lattice's own.
+    """
+    scrambled = _scrambled_k3()
+
+    assert scrambled.hyperbolic_plane_summand_count() == 3
+    assert scrambled.splits_two_hyperbolic_planes()
+    assert scrambled.eichler_criterion_applies()
 
 
 def test_on_a_unimodular_lattice_the_square_decides() -> None:
