@@ -184,3 +184,24 @@ def test_a_completion_states_whether_a_power_of_its_ideal_is_zero() -> None:
     assert line_completion.completion_defining_power_vanishes() is False
     assert completion.completion_map() in Rings().Core().Mor(field, completion)
     assert line_completion.completion_map() not in Rings().Core().Mor(line, line_completion)
+
+
+def test_the_rank_one_basis_at_a_vanishing_power_is_not_read_off_an_engine() -> None:
+    r"""Every completion at a vanishing power is free of rank one on its source.
+
+    ``QQ``, ``QQ(i)`` and ``GF(5)`` completed at their zero ideals are one
+    mathematical situation: the completion is the ring, so read over its
+    source it is free on the unit and its frame is $R^1 \to A^\wedge$,
+    $e_0 \mapsto 1$.  A decision made from the engine the two presentations
+    share gives that basis to the number field and to neither the rationals
+    nor the finite field; a decision made from the ideal's vanishing power
+    gives it to all three.
+    """
+    for ring in (QQ, QuadraticField(-1, "a"), GF(5)):
+        completion = ring.adic_completion(ring.ideal(ring.zero()))
+        frame = completion.framing_morphism()
+
+        assert completion.base_ring() is ring
+        assert frame.domain() is ring.free_module(1)
+        assert frame(frame.domain().module_generator(NN(0))) == completion.one()
+        assert completion.module_generating_set().cardinality() == 1
