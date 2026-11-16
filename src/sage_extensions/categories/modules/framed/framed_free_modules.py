@@ -538,6 +538,7 @@ class FramedFreeModules(OwnedCategoryOverBaseRing):
                 }
             )
 
+        @cached_method
         def to_vector(self) -> "FramedFreeModules.ElementMethods":
             r"""The coordinates of this element in the chosen basis ``I``.
 
@@ -551,6 +552,8 @@ class FramedFreeModules(OwnedCategoryOverBaseRing):
             ``framing_morphism().lift``: the augmentation of a module that is
             its own framing source is its identity, whose general preimage
             solver reads coordinates.
+
+            An element does not change, so its coordinates are read once.
             """
             return self.parent()._framing_lift(self)
 
