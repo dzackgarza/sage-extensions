@@ -1,0 +1,5 @@
+=== worktree HEAD: bdf238b48986759ac3243b6c6ff14d5c23d14b02 (1 modified paths)
+=== files: tests/modules/test_the_torsion_placement_is_the_claiming_construction.sage tests/modules/test_a_torsion_claim_is_refuted_when_asked.sage tests/modules/test_the_real_field_answers_primitivity_publicly.sage tests/modules/test_a_presented_module_is_built_before_it_computes.sage
+........................                                                 [100%]
+24 passed in 2.81s
+=== exit: 0

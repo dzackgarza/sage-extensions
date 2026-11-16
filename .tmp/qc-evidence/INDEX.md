@@ -3514,3 +3514,12 @@ The four card files on the tree this round pushes, and the restriction-of-scalar
 | `541r6-cards-at-e638da1.log` | `e638da1`, the head after the rebase onto `3bba334` | the same four files: **24 passed in 2.15 s** |
 | `551r2-6-green-at-d918653.log` | `d918653`, the head this pushes | the same file, the test lint loaded, at the head that carries the evidence files and the fixture's removed `os` import: **13 passed in 18.90 s** |
 | `551r2-7-green-at-62f1cdf.log` | `62f1cdf`, the head that carries this round's code, rebased onto `main` at `1d91923` | the same file, the test lint loaded: **13 passed in 18.75 s**.  The advance touched none of this round's files (`git diff --name-only d918653 1d91923` names no `testing/` file and no `tests/engineering/` file) |
+
+## `#541`, round 6: the same capability for matrix inversion, 2026-11-16
+
+The two remaining engine-matrix routings on the matrix owner state the same category now.
+
+| log | tree | result |
+| --- | --- | --- |
+| `541r6-cards-at-dc25610.log` | `bdf238b` with the routing change | the four card files: **24 passed in 2.81 s** |
+| `541r6-probe-inverse.log` | `bdf238b` with the routing change | the swap of `ZZ^2` and `QQ^2` invert, `2 e_0, e_1` is a nonunit over `ZZ` and a unit over `QQ` |

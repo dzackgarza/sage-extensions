@@ -1,0 +1,7 @@
+=== probe: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/probe541r6inverse.py
+=== worktree HEAD: bdf238b48986759ac3243b6c6ff14d5c23d14b02 (1 modified paths)
+ZZ is_unit: True inverse: Generic endomorphism of Free module on {[0], [1]} over Integer Ring
+ZZ double is_unit: False
+QQ is_unit: True inverse: Generic endomorphism of Free module on {[0], [1]} over Fraction Field of Integer Ring
+QQ double is_unit: True
+=== exit: 0
