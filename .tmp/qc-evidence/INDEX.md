@@ -3364,3 +3364,16 @@ of the pushed code and rest on no file-level argument.
 | --- | --- | --- |
 | `537r3-green-tests-run.log` | `b896a53` | the file: **15 passed in 3.71 s** |
 | `537r3-probe-run.log` | `b896a53` | the same probe: the same answers again, byte for byte |
+
+Note, 2026-11-16: `main` moved again after the last correction, and the ids that
+one quotes are the ids of the history it was written on.  The history this round
+is pushed from is the eight commits below this note; `git log` on the pushed tip
+names them, and this note therefore quotes none.  What does not move is the code
+the runs cover: every file this round edits -- `categories/group`,
+`lattice_morphisms.py`, `lattices.py`, `rational_integral_stabilizers.py`,
+`isotropic_orbits.py`, `isotropic_lifts.py`, `modules`,
+`orthogonal_quotients.py`, `polyhedral_cones.py`, `reduction_complexes.py`,
+`tests/groups`, `tests/lattices`, `tests/test_finite_cosets.py` -- is identical
+between the tree the final runs cite (`b896a53`) and the pushed tip
+(`git diff --stat b896a53 <tip> -- <those paths>` is empty), so the green and the
+probe are runs of this round's files as they are pushed.
