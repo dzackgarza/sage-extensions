@@ -1,0 +1,199 @@
+tree SHA: 76c52510557507e0c742384c33ae91fb268889b8 (modified paths: 0)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 10.30 12.82 8.54 7/703 3006561
+files: tests/groups/test_conjugation_by_the_identity_fixes_a_subgroup.sage tests/groups/test_a_subgroup_built_from_a_subgroup_states_its_description.sage tests/groups/test_predicate_kernel_and_stabilizer_subgroups_of_s4.sage tests/groups/test_the_classifying_category_of_s3.sage tests/groups/test_transporter_from_a_finite_orbit.sage tests/groups/test_double_cosets_from_a_finite_orbit.sage tests/groups/test_a_subgroup_acts_through_its_inclusion.sage tests/lattices/test_cyclic_normalizers.sage
+inner 900 s
+...FF..........F..........EEEEEEE                                        [100%]
+==================================== ERRORS ====================================
+___ ERROR at setup of test_three_cycle_on_z3_has_normalizer_of_order_twelve ____
+tests/lattices/test_cyclic_normalizers.sage:21: TL01 from sage.matrix.constructor import ...: take every name from the session
+tests/lattices/test_cyclic_normalizers.sage:22: TL01 from sage.rings.finite_rings.finite_field_constructor import ...: take every name from the session
+tests/lattices/test_cyclic_normalizers.sage:23: TL01 from sage_extensions.categories.lattice_centralizers import ...: take every name from the session
+tests/lattices/test_cyclic_normalizers.sage:31: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/lattices/test_cyclic_normalizers.sage:54: TL10 len(): ask for a cardinality
+tests/lattices/test_cyclic_normalizers.sage:54: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/lattices/test_cyclic_normalizers.sage:71: TL10 len(): ask for a cardinality
+tests/lattices/test_cyclic_normalizers.sage:71: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/lattices/test_cyclic_normalizers.sage:87: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/lattices/test_cyclic_normalizers.sage:101: TL09 an assertion that holds of anything
+tests/lattices/test_cyclic_normalizers.sage:116: TL10 len(): ask for a cardinality
+tests/lattices/test_cyclic_normalizers.sage:122: TL10 len(): ask for a cardinality
+_ ERROR at setup of test_order_two_subgroup_has_normalizer_equal_to_centralizer _
+tests/lattices/test_cyclic_normalizers.sage:21: TL01 from sage.matrix.constructor import ...: take every name from the session
+tests/lattices/test_cyclic_normalizers.sage:22: TL01 from sage.rings.finite_rings.finite_field_constructor import ...: take every name from the session
+tests/lattices/test_cyclic_normalizers.sage:23: TL01 from sage_extensions.categories.lattice_centralizers import ...: take every name from the session
+tests/lattices/test_cyclic_normalizers.sage:31: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/lattices/test_cyclic_normalizers.sage:54: TL10 len(): ask for a cardinality
+tests/lattices/test_cyclic_normalizers.sage:54: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/lattices/test_cyclic_normalizers.sage:71: TL10 len(): ask for a cardinality
+tests/lattices/test_cyclic_normalizers.sage:71: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/lattices/test_cyclic_normalizers.sage:87: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/lattices/test_cyclic_normalizers.sage:101: TL09 an assertion that holds of anything
+tests/lattices/test_cyclic_normalizers.sage:116: TL10 len(): ask for a cardinality
+tests/lattices/test_cyclic_normalizers.sage:122: TL10 len(): ask for a cardinality
+____ ERROR at setup of test_trivial_subgroup_has_normalizer_the_whole_group ____
+tests/lattices/test_cyclic_normalizers.sage:21: TL01 from sage.matrix.constructor import ...: take every name from the session
+tests/lattices/test_cyclic_normalizers.sage:22: TL01 from sage.rings.finite_rings.finite_field_constructor import ...: take every name from the session
+tests/lattices/test_cyclic_normalizers.sage:23: TL01 from sage_extensions.categories.lattice_centralizers import ...: take every name from the session
+tests/lattices/test_cyclic_normalizers.sage:31: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/lattices/test_cyclic_normalizers.sage:54: TL10 len(): ask for a cardinality
+tests/lattices/test_cyclic_normalizers.sage:54: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/lattices/test_cyclic_normalizers.sage:71: TL10 len(): ask for a cardinality
+tests/lattices/test_cyclic_normalizers.sage:71: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/lattices/test_cyclic_normalizers.sage:87: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/lattices/test_cyclic_normalizers.sage:101: TL09 an assertion that holds of anything
+tests/lattices/test_cyclic_normalizers.sage:116: TL10 len(): ask for a cardinality
+tests/lattices/test_cyclic_normalizers.sage:122: TL10 len(): ask for a cardinality
+_ ERROR at setup of test_rotation_on_a2_is_inverted_and_restricted_gamma_loses_inversion _
+tests/lattices/test_cyclic_normalizers.sage:21: TL01 from sage.matrix.constructor import ...: take every name from the session
+tests/lattices/test_cyclic_normalizers.sage:22: TL01 from sage.rings.finite_rings.finite_field_constructor import ...: take every name from the session
+tests/lattices/test_cyclic_normalizers.sage:23: TL01 from sage_extensions.categories.lattice_centralizers import ...: take every name from the session
+tests/lattices/test_cyclic_normalizers.sage:31: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/lattices/test_cyclic_normalizers.sage:54: TL10 len(): ask for a cardinality
+tests/lattices/test_cyclic_normalizers.sage:54: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/lattices/test_cyclic_normalizers.sage:71: TL10 len(): ask for a cardinality
+tests/lattices/test_cyclic_normalizers.sage:71: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/lattices/test_cyclic_normalizers.sage:87: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/lattices/test_cyclic_normalizers.sage:101: TL09 an assertion that holds of anything
+tests/lattices/test_cyclic_normalizers.sage:116: TL10 len(): ask for a cardinality
+tests/lattices/test_cyclic_normalizers.sage:122: TL10 len(): ask for a cardinality
+_______ ERROR at setup of test_chiral_hermitian_lattice_has_no_inverter ________
+tests/lattices/test_cyclic_normalizers.sage:21: TL01 from sage.matrix.constructor import ...: take every name from the session
+tests/lattices/test_cyclic_normalizers.sage:22: TL01 from sage.rings.finite_rings.finite_field_constructor import ...: take every name from the session
+tests/lattices/test_cyclic_normalizers.sage:23: TL01 from sage_extensions.categories.lattice_centralizers import ...: take every name from the session
+tests/lattices/test_cyclic_normalizers.sage:31: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/lattices/test_cyclic_normalizers.sage:54: TL10 len(): ask for a cardinality
+tests/lattices/test_cyclic_normalizers.sage:54: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/lattices/test_cyclic_normalizers.sage:71: TL10 len(): ask for a cardinality
+tests/lattices/test_cyclic_normalizers.sage:71: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/lattices/test_cyclic_normalizers.sage:87: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/lattices/test_cyclic_normalizers.sage:101: TL09 an assertion that holds of anything
+tests/lattices/test_cyclic_normalizers.sage:116: TL10 len(): ask for a cardinality
+tests/lattices/test_cyclic_normalizers.sage:122: TL10 len(): ask for a cardinality
+_ ERROR at setup of test_finite_subgroup_normalizer_realizes_full_automorphisms_on_z3 _
+tests/lattices/test_cyclic_normalizers.sage:21: TL01 from sage.matrix.constructor import ...: take every name from the session
+tests/lattices/test_cyclic_normalizers.sage:22: TL01 from sage.rings.finite_rings.finite_field_constructor import ...: take every name from the session
+tests/lattices/test_cyclic_normalizers.sage:23: TL01 from sage_extensions.categories.lattice_centralizers import ...: take every name from the session
+tests/lattices/test_cyclic_normalizers.sage:31: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/lattices/test_cyclic_normalizers.sage:54: TL10 len(): ask for a cardinality
+tests/lattices/test_cyclic_normalizers.sage:54: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/lattices/test_cyclic_normalizers.sage:71: TL10 len(): ask for a cardinality
+tests/lattices/test_cyclic_normalizers.sage:71: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/lattices/test_cyclic_normalizers.sage:87: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/lattices/test_cyclic_normalizers.sage:101: TL09 an assertion that holds of anything
+tests/lattices/test_cyclic_normalizers.sage:116: TL10 len(): ask for a cardinality
+tests/lattices/test_cyclic_normalizers.sage:122: TL10 len(): ask for a cardinality
+_ ERROR at setup of test_finite_subgroup_normalizer_image_shrinks_on_nonisometric_eigenspaces _
+tests/lattices/test_cyclic_normalizers.sage:21: TL01 from sage.matrix.constructor import ...: take every name from the session
+tests/lattices/test_cyclic_normalizers.sage:22: TL01 from sage.rings.finite_rings.finite_field_constructor import ...: take every name from the session
+tests/lattices/test_cyclic_normalizers.sage:23: TL01 from sage_extensions.categories.lattice_centralizers import ...: take every name from the session
+tests/lattices/test_cyclic_normalizers.sage:31: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/lattices/test_cyclic_normalizers.sage:54: TL10 len(): ask for a cardinality
+tests/lattices/test_cyclic_normalizers.sage:54: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/lattices/test_cyclic_normalizers.sage:71: TL10 len(): ask for a cardinality
+tests/lattices/test_cyclic_normalizers.sage:71: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/lattices/test_cyclic_normalizers.sage:87: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/lattices/test_cyclic_normalizers.sage:101: TL09 an assertion that holds of anything
+tests/lattices/test_cyclic_normalizers.sage:116: TL10 len(): ask for a cardinality
+tests/lattices/test_cyclic_normalizers.sage:122: TL10 len(): ask for a cardinality
+=================================== FAILURES ===================================
+___________ test_an_element_of_the_subgroup_conjugates_it_to_itself ____________
+
+    def test_an_element_of_the_subgroup_conjugates_it_to_itself() -> None:
+        group = Groups.S(3)
+        transposition = group((1, 2))
+        subgroup = group.subgroup((transposition,))
+    
+>       assert group.conjugate_subgroup(transposition, subgroup) is subgroup
+E       assert Subgroup of Symmetric group S_3 is Subgroup of Symmetric group S_3
+E        +  where Subgroup of Symmetric group S_3 = conjugate_subgroup((1 2), Subgroup of Symmetric group S_3)
+E        +    where conjugate_subgroup = Symmetric group S_3.conjugate_subgroup
+
+tests/groups/test_conjugation_by_the_identity_fixes_a_subgroup.sage:52: AssertionError
+_______ test_an_element_outside_the_subgroup_that_normalizes_it_fixes_it _______
+
+    def test_an_element_outside_the_subgroup_that_normalizes_it_fixes_it() -> None:
+        r"""$(3\,4)$ lies outside $\langle(1\,2)\rangle$ in $S_4$ and commutes with $(1\,2)$.
+    
+        Its conjugation fixes the subgroup, so the point it names is the subgroup
+        itself and not a second subgroup with the same elements.
+        """
+        group = Groups.S(4)
+        transposition = group((1, 2))
+        subgroup = group.subgroup((transposition,))
+        outside = group((3, 4))
+    
+        assert outside not in subgroup
+>       assert group.conjugate_subgroup(outside, subgroup) is subgroup
+E       assert Subgroup of Symmetric group S_4 is Subgroup of Symmetric group S_4
+E        +  where Subgroup of Symmetric group S_4 = conjugate_subgroup((3 4), Subgroup of Symmetric group S_4)
+E        +    where conjugate_subgroup = Symmetric group S_4.conjugate_subgroup
+
+tests/groups/test_conjugation_by_the_identity_fixes_a_subgroup.sage:67: AssertionError
+____________ test_normalizer_retains_its_conjugation_action_functor ____________
+
+    def test_normalizer_retains_its_conjugation_action_functor() -> None:
+        group = Groups.S(3)
+        subgroup = group.subgroup((group((1, 2)),))
+        normalizer = group.normalizer(subgroup)
+        action = normalizer.stabilizer_action()
+        point = action.domain().an_object()
+        identity = action.domain().Mor(point, point)(group.one())
+    
+        assert normalizer.stabilized_object() is subgroup
+        assert action.domain() is group.classifying_category()
+        assert action.codomain() is Sets()
+        assert action(identity)(subgroup) is subgroup
+        assert normalizer.inclusion().codomain() is group
+        restricted = normalizer.restricted_stabilizer_action()
+        assert restricted.domain() is normalizer.classifying_category()
+        assert restricted.codomain() is action.codomain()
+        assert restricted(restricted.domain().an_object()) is action(action.domain().an_object())
+        point = restricted.domain().an_object()
+        for element in normalizer:
+            arrow = restricted.domain().Mor(point, point)(element)
+>           assert restricted(arrow)(subgroup) == subgroup
+E           assert Subgroup of S...tric group S_3 == Subgroup of S...tric group S_3
+E             
+E             Use -v to get more diff
+
+tests/groups/test_predicate_kernel_and_stabilizer_subgroups_of_s4.sage:78: AssertionError
+====================== test lint: 12 findings in 1 files =======================
+tests/lattices/test_cyclic_normalizers.sage:21: TL01 from sage.matrix.constructor import ...: take every name from the session
+tests/lattices/test_cyclic_normalizers.sage:22: TL01 from sage.rings.finite_rings.finite_field_constructor import ...: take every name from the session
+tests/lattices/test_cyclic_normalizers.sage:23: TL01 from sage_extensions.categories.lattice_centralizers import ...: take every name from the session
+tests/lattices/test_cyclic_normalizers.sage:31: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/lattices/test_cyclic_normalizers.sage:54: TL10 len(): ask for a cardinality
+tests/lattices/test_cyclic_normalizers.sage:54: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/lattices/test_cyclic_normalizers.sage:71: TL10 len(): ask for a cardinality
+tests/lattices/test_cyclic_normalizers.sage:71: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/lattices/test_cyclic_normalizers.sage:87: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/lattices/test_cyclic_normalizers.sage:101: TL09 an assertion that holds of anything
+tests/lattices/test_cyclic_normalizers.sage:116: TL10 len(): ask for a cardinality
+tests/lattices/test_cyclic_normalizers.sage:122: TL10 len(): ask for a cardinality
+=========================== short test summary info ============================
+FAILED tests/groups/test_conjugation_by_the_identity_fixes_a_subgroup.sage::test_an_element_of_the_subgroup_conjugates_it_to_itself
+FAILED tests/groups/test_conjugation_by_the_identity_fixes_a_subgroup.sage::test_an_element_outside_the_subgroup_that_normalizes_it_fixes_it
+FAILED tests/groups/test_predicate_kernel_and_stabilizer_subgroups_of_s4.sage::test_normalizer_retains_its_conjugation_action_functor
+ERROR tests/lattices/test_cyclic_normalizers.sage::test_three_cycle_on_z3_has_normalizer_of_order_twelve
+ERROR tests/lattices/test_cyclic_normalizers.sage::test_order_two_subgroup_has_normalizer_equal_to_centralizer
+ERROR tests/lattices/test_cyclic_normalizers.sage::test_trivial_subgroup_has_normalizer_the_whole_group
+ERROR tests/lattices/test_cyclic_normalizers.sage::test_rotation_on_a2_is_inverted_and_restricted_gamma_loses_inversion
+ERROR tests/lattices/test_cyclic_normalizers.sage::test_chiral_hermitian_lattice_has_no_inverter
+ERROR tests/lattices/test_cyclic_normalizers.sage::test_finite_subgroup_normalizer_realizes_full_automorphisms_on_z3
+ERROR tests/lattices/test_cyclic_normalizers.sage::test_finite_subgroup_normalizer_image_shrinks_on_nonisometric_eigenspaces
+3 failed, 23 passed, 7 errors in 16.53s
+[peakrss] probe556one: child waited=1 shell_code=1 samples=12
+[peakrss] peak tree RSS      : 592 MiB
+[peakrss] low-water MemAvail : 2009 MiB
+[peakrss] peak single VmHWM  : 592 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      581 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    20.0s procs=  3 rss=   592 MiB hwm=   592 MiB avail=  2407 MiB
+[peakrss]   t=    18.0s procs=  3 rss=   580 MiB hwm=   580 MiB avail=  2596 MiB
+[peakrss]   t=    16.0s procs=  3 rss=   571 MiB hwm=   571 MiB avail=  2647 MiB
+[peakrss]   t=    14.0s procs=  3 rss=   562 MiB hwm=   562 MiB avail=  2643 MiB
+[peakrss]   t=    12.0s procs=  3 rss=   511 MiB hwm=   511 MiB avail=  2273 MiB
+pytest exit: 1

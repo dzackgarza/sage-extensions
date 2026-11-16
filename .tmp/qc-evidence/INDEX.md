@@ -2986,3 +2986,34 @@ shape as the section above; `523r4-probe.py` is the probe.
 | `523r3-red-test-commit.log` | `f7d2e12`, clean tree | `tests/rings/test_a_matrix_ring_divides_only_by_its_units.sage` alone: **2 failed, 7 passed in 3.09 s** — `f.inverse()` for a distinct-endpoint map over Z/4 raises `AssertionError: cannot compute the kernel` while `~f` answers, and `a.determinant() is a.determinant()` is False (`assert 1 is 1`) |
 | `523r3-green-fix-commit.log` | `e5c7a25`, clean tree | the same file alone: **9 passed in 2.57 s** |
 | `523r3-probe-fix-commit.log` | `e5c7a25`, clean tree | the deciding expressions of the issue, one per line with its wall time: division by a unit and by a nonunit over ZZ, Z/4 and Z[x]; the distinct-endpoint inverse over Z/4 with both composites the identity; the empty and the rectangular matrix; `inverse() is inverse()`, `determinant() is determinant()` and `inverse_of_unit() is inverse()`; `A @ ~A` the identity over QQ and ZZ in ranks 2, 4, 6; the rank-one matrix space over the noncommutative M_2(ZZ), whose three spellings of the inverse all take the kernel route |
+## `#556` round 2: the conjugate's pair, its engine and its constructor, 2026-11-16
+
+The review of the pushed round (`511b11a`) named six defects in the conjugate
+subgroup construction.  The reds are on `3fae3b5` (the `main` this round was
+rebased onto), the repairs on `76c5251`, the consumer tests the changed
+semantics supersede on `76851e6`.  Runs are one file per process under the
+adopted runtime, through `.scratch/wt556r_tests_one.sh`:
+`run.sh -w /work`, `PYTHONPATH=/repos/sage-extensions/src:/ci/tool-artifacts/pytest_plugins:/work/src:/work`,
+`/sage/.venv/bin/python -m pytest -o addopts= -p sage_extensions.testing.suite_budget
+-p sage_extensions.testing.test_lint -p qc_sage_session --no-time-gates`, and the
+probes through `.scratch/wt556r_launch.sh` on the same image.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `556r2-red-five-at-3fae3b5.log` | `3fae3b5` + this round's tests only | the four files of the subject: **5 failed, 4 passed in 7.06 s**, one failure per finding: `left is right` (the law at a normalizing element), `AttributeError: ... no attribute 'conjugated_subgroup'`, `TypeError: _GroupEngine.__call__() takes 2 positional arguments but 3 were given` (the stored pair shadowing the operation), `AssertionError: cannot compute O(...) as a finite group` (the engine asked at construction), and `AssertionError` at `groups.py:321` (`_element_to_engine` refusing a non-GAP element) |
+| `556r2-green-nine-at-76851e6.log` | `76851e6`, clean tree | the same four files: **9 passed in 1.92 s** |
+| `556r2-consumers-red-at-76c5251.log` | `76c5251`, clean tree | the seven consumer files of the subgroup constructions: **3 failed, 23 passed, 7 errors in 16.53 s** -- the three clauses that read the fixed point as object identity, and the seven errors are `tests/lattices/test_cyclic_normalizers.sage`, whose test-lint findings are in its own source (its imports, `len`, `generators`) and are not this round's |
+| `556r2-consumers-green-at-76851e6.log` | `76851e6`, clean tree | the same seven files: **26 passed in 15.58 s** |
+| `556r2-probe-six-at-3fae3b5.log` | `3fae3b5`, clean tree | `556r2-probe-six.py`: all six findings as the review states them -- `h.H` is `H` itself and carries no pair, `g.(h.H) is (gh).H` False, the conjugate kind's stored pair reached instead of its operation (`TypeError`), the abelian invariant engine refused at `_element_to_engine`, `O(U)` refused by `_assert_definite_over_integers` at construction, and one non-fixed finite conjugate costing **2** `libgap.ConjugateSubgroup` calls before any order is read |
+| `556r2-probe-six-at-76851e6.log` | `76851e6`, clean tree | the same probe: the law True, the pair retained, the transported trivial subgroup of order 1, the abelian conjugate of order 2 with its generator in it, `O(U)` formed and `g^-1.(g.H) is H`, one engine conjugation per pair and none at construction (**0** forming, **1** on the first request), and the two construction data read as **required** |
+
+Correction of the measurement stated in `76c5251`'s body: that body says one
+fresh non-fixed conjugate of `S(4)` "costs one `libgap.ConjugateSubgroup` call
+(the counter reads 1; reading its order costs no second one)".  Measured on the
+tree it names, forming the conjugate costs **none** (the engine is realized on
+first request) and the first request for its order costs **one**; the pair is
+not conjugated twice, which is what the sentence was about, but the count is
+read at formation in the sentence where the probe reads it at the order.  On
+`3fae3b5` the same specimen reads **2** before anything is asked of the answer:
+the deleted hook's equality test and the construction each called
+`libgap.ConjugateSubgroup` once.

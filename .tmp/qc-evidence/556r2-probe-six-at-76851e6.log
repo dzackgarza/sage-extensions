@@ -1,0 +1,46 @@
+probe: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/p556r/probe.py
+tree SHA: 76851e652fbb561fa63c37c19326bf657523dff1 (modified paths: 0)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 9.27 11.11 8.71 8/669 3013604
+inner 300 s, outer 360 s, guard 6144 MiB, args ''
+=== 1. the action law with a normalizing element
+h.H retains the pair                                       (True, True)
+h.H is H itself                                            False
+h.H order and (1 2) in it                                  (2, True)
+g.(h.H) is (gh).H                                          True
+(2 3) in g.(h.H)                                           True
+(1 2) not in g.(h.H)                                       True
+=== 2. a conjugate conjugates its own subgroups
+conjugate order                                            2
+(2 3) carries its trivial subgroup to itself               1
+=== 3. an engine with no GAP model of its elements
+engine kind                                                AbelianGroup_class_with_category
+conjugate order                                            2
+generator in the conjugate                                 True
+=== 4. a group with no engine
+O(U) supplies an engine                                    False
+the conjugate is formed                                    True
+g^-1.(g.H) is H                                            True
+=== 5. one pair's engine conjugations
+engine conjugations: forming a conjugate that is not H     0
+engine conjugations: reading its order                     0
+its order                                                  2
+engine conjugations: after reading its order               1
+engine conjugations: forming a conjugate by an element of H 0
+its order                                                  2
+engine conjugations: after reading its order               1
+=== 6. the declared construction contract
+conjugated_subgroup                                        required
+conjugator                                                 required
+[peakrss] probe556head: child waited=0 shell_code=0 samples=3
+[peakrss] peak tree RSS      : 413 MiB
+[peakrss] low-water MemAvail : 2280 MiB
+[peakrss] peak single VmHWM  : 413 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      402 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     4.0s procs=  3 rss=   413 MiB hwm=   413 MiB avail=  2280 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   217 MiB hwm=   217 MiB avail=  2530 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     3 MiB hwm=     3 MiB avail=  2802 MiB
+launcher exit: 0

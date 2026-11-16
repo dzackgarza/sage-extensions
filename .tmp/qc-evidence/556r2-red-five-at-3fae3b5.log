@@ -1,0 +1,275 @@
+tree SHA: 3fae3b5881fb53773d0ff08db050e89c05e1919c (modified paths: 4)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 22.69 15.26 8.34 6/687 3000487
+files: tests/groups/test_conjugation_of_a_subgroup_is_a_function_and_an_action.sage tests/groups/test_a_conjugate_conjugates_a_subgroup_of_its_own.sage tests/groups/test_a_conjugate_is_formed_without_an_ambient_engine.sage tests/groups/test_a_non_gap_engine_conjugates_a_subgroup.sage
+inner 600 s
+....FFFFF                                                                [100%]
+=================================== FAILURES ===================================
+______________ test_a_normalizing_element_composes_in_the_action _______________
+
+    def test_a_normalizing_element_composes_in_the_action() -> None:
+        r"""$g.(h.H) = (gh).H$ when $h$ lies in $H$.
+    
+        $H = \langle(1\,2)\rangle$ is carried to itself by its own element
+        $(1\,2)$, so $h.H$ is the point $H$; the law still names the pair, and
+        $g = (1\,3)$ must carry $h.H$ to the subgroup $gh = (1\,2\,3)$ names.  An
+        answer that reads $h.H$ as $H$ itself reads $g.(h.H)$ off the pair $(H, g)$
+        while $(gh).H$ is the pair $(H, gh)$: two subgroups with the same two
+        elements, carrying $(2\,3)$.
+        """
+        group = Groups.S(3)
+        transposition = group((1, 2))
+        subgroup = group.subgroup((transposition,))
+        flagging = group((1, 3))
+    
+        left = group.conjugate_subgroup(
+            flagging, group.conjugate_subgroup(transposition, subgroup)
+        )
+        right = group.conjugate_subgroup(flagging * transposition, subgroup)
+    
+>       assert left is right
+E       assert Subgroup of Symmetric group S_3 is Subgroup of Symmetric group S_3
+
+tests/groups/test_conjugation_of_a_subgroup_is_a_function_and_an_action.sage:102: AssertionError
+_________ test_a_conjugate_by_an_element_it_contains_retains_the_pair __________
+
+>   return self._cached_methods[name]
+E   KeyError: 'conjugated_subgroup'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_a_conjugate_by_an_element_it_contains_retains_the_pair() -> None:
+        r"""$h.H$ states the pair $(H, h)$ its image is read from.
+    
+        The conjugate of a subgroup by an element of it is that subgroup as a
+        point, and the subgroup it answers is the image of the pair: $h$ carries
+        $H$ to itself, so the answer contains $(1\,2)$ and has order two, and it
+        retains the subgroup and the element a later conjugation composes with.
+        """
+        group = Groups.S(3)
+        transposition = group((1, 2))
+        subgroup = group.subgroup((transposition,))
+    
+        conjugate = group.conjugate_subgroup(transposition, subgroup)
+    
+>       assert conjugate.conjugated_subgroup() is subgroup
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/groups/test_conjugation_of_a_subgroup_is_a_function_and_an_action.sage:121: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    ???
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: 'OwnedJoinCategory.parent_class[_GroupEngine].ObjectType' object has no attribute 'conjugated_subgroup'. Did you mean: 'conjugate_subgroup'?
+
+sage/cpython/getattr.pyx:362: AttributeError
+______________ test_a_conjugate_conjugates_a_subgroup_of_its_own _______________
+
+    def test_a_conjugate_conjugates_a_subgroup_of_its_own() -> None:
+        r"""$(2\,3)$ carries the trivial subgroup of $\langle(2\,3)\rangle$ to itself."""
+        group = Groups.S(3)
+        subgroup = group.subgroup((group((1, 2)),))
+        conjugate = group.conjugate_subgroup(group((1, 2, 3)), subgroup)
+        inner = group((2, 3))
+        trivial = conjugate.subgroup(())
+    
+        assert inner in conjugate
+>       transported = conjugate.conjugate_subgroup(inner, trivial)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/groups/test_a_conjugate_conjugates_a_subgroup_of_its_own.sage:26: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Subgroup of Symmetric group S_3, group_element = (2 3)
+subgroup = Subgroup of Subgroup of Symmetric group S_3
+
+    def conjugate_subgroup(self, group_element, subgroup):
+        r"""Return ``g H g^-1``, the image of ``H`` under conjugation by ``g``.
+    
+        ``G`` acts on its set of subgroups by this formula, so one element
+        and one subgroup name one subgroup: the pair (and the normal form
+        of a pair one of whose members is itself a conjugate) is
+        constructed once, and equal calls answer that subgroup rather than
+        a second one with the same elements.
+    
+        The law of the action is the construction's.  A conjugate retains
+        the subgroup and the conjugating element it was built from
+        (:class:`ConjugateSubgroups`), so conjugating a conjugate composes
+        the elements -- ``g.(h.H) = (gh).H`` -- and the two sides of that
+        law are one construction of one pair.  An element that carries
+        ``H`` to itself therefore answers ``H`` with the selected data and
+        maps it retains: the identity, every element of ``H``, and each
+        further element a realization decides for
+        (``_conjugate_subgroup_construction``).
+        """
+        assert group_element in self, f"{group_element} is not an element of {self}"
+        assert subgroup is self or subgroup in self.subgroups(), f"{subgroup} is not a subgroup of {self}"
+        match subgroup:
+            case _ if subgroup in ConjugateSubgroups(self):
+                # g.(h.H) = (g h).H. The conjugated subgroup retains the pair
+                # it was constructed from, and conjugating composes with it.
+                source = subgroup.conjugated_subgroup()
+                conjugator = group_element * subgroup.conjugator()
+            case _:
+                source, conjugator = subgroup, group_element
+        if source is self or conjugator == self.one() or source.is_parent_of(conjugator) is True:
+            # g H g^-1 = H for g in H, so this element fixes the point H.
+            return source
+>       return self._conjugated_subgroup(source, conjugator)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: _GroupEngine.__call__() takes 2 positional arguments but 3 were given
+
+src/sage_extensions/categories/group/groups.py:6775: TypeError
+_____________ test_a_conjugate_is_formed_without_an_ambient_engine _____________
+
+>   return cache[k]
+E   KeyError: ((Subgroup of Orthogonal group O(Integral lattice of rank 2 and signature (1, 1)), Morphism from Integral lattice of rank 2 and signature (1, 1) to Integral lattice of rank 2 and signature (1, 1)), ())
+
+sage/misc/cachefunc.pyx:1965: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_a_conjugate_is_formed_without_an_ambient_engine() -> None:
+        r"""$g^{-1}.(g.H) = H$ in $O(U)$, whose isometries no engine realizes."""
+        plane = Lattices(ZZ)("U")
+        isometries = plane.O()
+        labels = plane.module_generating_set()
+        first, second = plane.module_generators()
+        swap = isometries({labels[0]: second, labels[1]: first})
+        reflection = isometries({labels[0]: -first, labels[1]: second})
+        subgroup = isometries.subgroup((reflection,))
+    
+>       conjugate = isometries.conjugate_subgroup(swap, subgroup)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/groups/test_a_conjugate_is_formed_without_an_ambient_engine.sage:29: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/group/groups.py:6775: in conjugate_subgroup
+    return self._conjugated_subgroup(source, conjugator)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:1970: in sage.misc.cachefunc.CachedMethodCaller.__call__
+    ???
+sage/misc/cachefunc.pyx:1848: in sage.misc.cachefunc.CachedMethodCaller._instance_call
+    ???
+src/sage_extensions/categories/group/groups.py:6791: in _conjugated_subgroup
+    selected = self._conjugate_subgroup_construction(conjugator, subgroup)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/groups.py:7098: in _conjugate_subgroup_construction
+    self, _engine_conjugating_element(self, group_element)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/groups.py:2070: in _engine_conjugating_element
+    match _law_reversed(group):
+          ^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/groups.py:953: in _law_reversed
+    return _engine_law_reversed(_engine_group(group))
+                                ^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/groups.py:155: in _engine_group
+    return group._engine_group()
+           ^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:2328: in sage.misc.cachefunc.CachedMethodCallerNoArgs.__call__
+    ???
+src/sage_extensions/categories/lattice_morphisms.py:4598: in _engine_group
+    self._assert_definite_over_integers("compute")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Orthogonal group O(Integral lattice of rank 2 and signature (1, 1))
+operation = 'compute'
+
+    def _assert_definite_over_integers(self, operation: str) -> None:
+        r"""State the hypothesis of the finite routes of ``O(L)``: ``L`` definite of finite rank over ``ZZ``.
+    
+        ``O(L)`` is finite for such ``L`` (``lean-categories``
+        ``orthogonalGroup_finite``, ``LeanCategories/Lattices/Valued/Mass.lean:41``,
+        with ``L(-1)`` for negative definite ``L``).  A definite lattice over
+        ``QQ`` is a quadratic space ``V`` whose ``O(V)`` is not finite in rank
+        at least 2 (``O(x^2+y^2)`` contains the rotation ``(3/5, 4/5)``); no
+        exact computation of it is supplied here (``CAT-01``).
+        """
+        lattice = self.domain()
+>       assert lattice.base_ring() is _owned_integers() and lattice.module_rank().is_finite() and lattice.is_definite(), (
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            f"cannot {operation} O({lattice}) as a finite group: that computation is supplied for a definite "
+            f"lattice of finite rank over ZZ, and {lattice} is a lattice over {lattice.base_ring()} of rank "
+            f"{lattice.module_rank()}"
+        )
+E       AssertionError: cannot compute O(Integral lattice of rank 2 and signature (1, 1)) as a finite group: that computation is supplied for a definite lattice of finite rank over ZZ, and Integral lattice of rank 2 and signature (1, 1) is a lattice over Integer Ring of rank 2
+
+src/sage_extensions/categories/lattice_morphisms.py:4548: AssertionError
+_________________ test_a_non_gap_engine_conjugates_a_subgroup __________________
+
+>   return cache[k]
+E   KeyError: ((Subgroup of Group of order 8 generated by Group generators: [group element of order 2 ↦ group element of order 2, group element of order 4 ↦ group element of order 4], group element of order 4), ())
+
+sage/misc/cachefunc.pyx:1965: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_a_non_gap_engine_conjugates_a_subgroup() -> None:
+        r"""$A$ is abelian, so $g H g^{-1} = H$ for its subgroup of order two."""
+        group = Groups.Abelian([2, 4])
+        short, long = tuple(group.group_generators())
+        subgroup = group.subgroup((short,))
+    
+>       conjugate = group.conjugate_subgroup(long, subgroup)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/groups/test_a_non_gap_engine_conjugates_a_subgroup.sage:23: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/group/groups.py:6775: in conjugate_subgroup
+    return self._conjugated_subgroup(source, conjugator)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:1970: in sage.misc.cachefunc.CachedMethodCaller.__call__
+    w = self._instance_call(*args, **kwds)
+sage/misc/cachefunc.pyx:1848: in sage.misc.cachefunc.CachedMethodCaller._instance_call
+    return self.f(self._instance, *args, **kwds)
+src/sage_extensions/categories/group/groups.py:6791: in _conjugated_subgroup
+    selected = self._conjugate_subgroup_construction(conjugator, subgroup)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/groups.py:7097: in _conjugate_subgroup_construction
+    _element_to_engine(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+group = Group of order 8 generated by Group generators: [group element of order 2 ↦ group element of order 2, group element of order 4 ↦ group element of order 4]
+element = group element of order 4
+
+    def _element_to_engine(group, element):
+        r"""Return the GAP element modelling ``element`` of ``group``."""
+        match group:
+            case _ if group in GroupAutomorphismGroups():
+                return element.gap()
+            case _:
+>               assert _encodes_elements_in_gap(_engine_group(group)), (
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    f"an element of {group} cannot be passed to GAP: the elements of {group} are not "
+                    f"represented as permutations, words, or GAP group elements"
+                )
+E               AssertionError: an element of Group of order 8 generated by Group generators: [group element of order 2 ↦ group element of order 2, group element of order 4 ↦ group element of order 4] cannot be passed to GAP: the elements of Group of order 8 generated by Group generators: [group element of order 2 ↦ group element of order 2, group element of order 4 ↦ group element of order 4] are not represented as permutations, words, or GAP group elements
+
+src/sage_extensions/categories/group/groups.py:321: AssertionError
+=========================== short test summary info ============================
+FAILED tests/groups/test_conjugation_of_a_subgroup_is_a_function_and_an_action.sage::test_a_normalizing_element_composes_in_the_action
+FAILED tests/groups/test_conjugation_of_a_subgroup_is_a_function_and_an_action.sage::test_a_conjugate_by_an_element_it_contains_retains_the_pair
+FAILED tests/groups/test_a_conjugate_conjugates_a_subgroup_of_its_own.sage::test_a_conjugate_conjugates_a_subgroup_of_its_own
+FAILED tests/groups/test_a_conjugate_is_formed_without_an_ambient_engine.sage::test_a_conjugate_is_formed_without_an_ambient_engine
+FAILED tests/groups/test_a_non_gap_engine_conjugates_a_subgroup.sage::test_a_non_gap_engine_conjugates_a_subgroup
+5 failed, 4 passed in 7.06s
+[peakrss] probe556one: child waited=1 shell_code=1 samples=7
+[peakrss] peak tree RSS      : 472 MiB
+[peakrss] low-water MemAvail : 3541 MiB
+[peakrss] peak single VmHWM  : 478 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      467 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    12.0s procs=  3 rss=   472 MiB hwm=   478 MiB avail=  3689 MiB
+[peakrss]   t=    10.0s procs=  3 rss=   471 MiB hwm=   478 MiB avail=  3541 MiB
+[peakrss]   t=     8.0s procs=  3 rss=   470 MiB hwm=   470 MiB avail=  3753 MiB
+[peakrss]   t=     6.0s procs=  3 rss=   425 MiB hwm=   425 MiB avail=  4010 MiB
+[peakrss]   t=     4.0s procs=  3 rss=   310 MiB hwm=   310 MiB avail=  4314 MiB
+pytest exit: 1

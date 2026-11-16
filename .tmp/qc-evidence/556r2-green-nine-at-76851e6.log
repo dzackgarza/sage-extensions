@@ -1,0 +1,20 @@
+tree SHA: 76851e652fbb561fa63c37c19326bf657523dff1 (modified paths: 0)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 8.72 10.86 8.68 8/688 3013990
+files: tests/groups/test_conjugation_of_a_subgroup_is_a_function_and_an_action.sage tests/groups/test_a_conjugate_conjugates_a_subgroup_of_its_own.sage tests/groups/test_a_conjugate_is_formed_without_an_ambient_engine.sage tests/groups/test_a_non_gap_engine_conjugates_a_subgroup.sage
+inner 600 s
+.........                                                                [100%]
+9 passed in 1.92s
+[peakrss] probe556one: child waited=0 shell_code=0 samples=4
+[peakrss] peak tree RSS      : 305 MiB
+[peakrss] low-water MemAvail : 5044 MiB
+[peakrss] peak single VmHWM  : 305 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      294 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     6.0s procs=  3 rss=   305 MiB hwm=   305 MiB avail=  5044 MiB
+[peakrss]   t=     4.0s procs=  3 rss=   264 MiB hwm=   264 MiB avail=  5181 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   118 MiB hwm=   118 MiB avail=  5625 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     7 MiB hwm=     7 MiB avail=  6120 MiB
+pytest exit: 0
