@@ -118,3 +118,27 @@ def test_the_character_of_a_finite_free_representation_is_the_trace_of_its_actio
     assert character(group.one()) == 3
     assert character(transposition) == 1
     assert character(three_cycle) == 0
+
+
+def test_an_equivariant_automorphism_of_a_representation_is_an_element_of_its_automorphism_group() -> None:
+    r"""$r = 1 - 2P_{\mathrm{triv}}$ commutes with $S_3$, so $r\in\mathrm{Aut}_{\mathbb{Q}[S_3]}(\mathbb{Q}^3)$.
+
+    $r$ is an involution with eigenvalue $1$ on the sum-zero plane and $-1$ on
+    the invariant line: it fixes $e_0 - e_1$ and negates $e_0 + e_1 + e_2$.
+    """
+    _, representation = _permutation_module_of_s3()
+    labels = representation.module_generating_set()
+    total = sum(representation.module_generator(label) for label in labels)
+    reflection = representation.Mor(representation)(
+        {
+            label: representation.module_generator(label) - (QQ(2) / QQ(3)) * total
+            for label in labels
+        }
+    )
+    automorphism = reflection.as_automorphism().forward()
+    identity = representation.Mor(representation).identity()
+    difference = representation.module_generator(0) - representation.module_generator(1)
+
+    assert automorphism * automorphism == identity
+    assert automorphism(difference) == difference
+    assert automorphism(total) == -total
