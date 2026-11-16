@@ -98,6 +98,7 @@ from sage_extensions.logic import (
 )
 from sage_extensions.owned_category_bases import CategoryWithAxiom
 from sage_extensions.refine import RealizationHook
+from sage_extensions.validation import validator
 
 if TYPE_CHECKING:
     from sage_extensions.lexicon.category_theory import ObjectOfCategory
@@ -3468,6 +3469,57 @@ class Modules(OwnedCategoryOverBaseRing):
                 return module
 
             class ParentMethods:
+                @validator
+                def validate_torsion_claim(self) -> None:
+                    r"""Refute this claimed torsion placement if its relation morphism leaves a free summand.
+
+                    The claim is made by the construction that placed the module
+                    here, ``Modules(R).FinitelyPresented().Torsion()(rho)``
+                    (``CAT-04``); this validator is the claim's refutation and
+                    belongs to the category the claim was made in, so a module
+                    that claims nothing carries none.  Over a principal ideal
+                    domain ``coker(rho)`` is torsion exactly when the relation
+                    morphism becomes surjective over the fraction field, and
+                    scalar extension preserves the rank of this exact relation
+                    matrix.
+
+                    This is a validator, not part of any computation: the claim's
+                    construction passes its own ``check`` argument, which is
+                    ``False`` by default, so the refutation runs only when a
+                    caller asks for it or under strict checking (``OWN-22``).  It
+                    reads the presentation, and therefore builds it when it runs.
+                    """
+                    from sage.matrix.constructor import matrix
+
+                    from sage_extensions.categories.modules.framed.finitely_generated.finitely_presented_modules import (
+                        _relation_images,
+                    )
+
+                    ring = self.base_ring()
+                    presentation = self.presentation()
+                    width = int(presentation.codomain().module_generating_set().cardinality())
+                    relation_images = _relation_images(self)
+                    field = ring.fraction_field_map().codomain()
+                    relations = matrix(
+                        _engine_ring(ring),
+                        len(relation_images),
+                        width,
+                        [
+                            _engine_element(ring, coefficient)
+                            for image in relation_images
+                            for coefficient in image
+                        ],
+                    )
+                    match int(relations.change_ring(_engine_ring(field)).rank()) == width:
+                        case True:
+                            pass
+                        case False:
+                            raise ValueError(
+                                f"{self} is claimed to be a torsion {ring}-module, but its relation matrix "
+                                "does not have full rank over the fraction field: the cokernel has a nonzero "
+                                "free summand"
+                            )
+
                 def invariants(self):
                     r"""Return the invariant factors of this finite presented torsion module."""
                     return self.invariant_factors()
@@ -4388,10 +4440,10 @@ def _finitely_presented_torsion(module):
     ``Modules(R).FinitelyPresented().Torsion()`` is a placement claim, and the
     construction that places an object is the one that makes it (``CAT-04``).
     A cokernel of a presentation is built before it computes, so it carries no
-    such claim, and a consumer that routed on that membership asks the question
-    itself instead (``DEF-03``): ``is_torsion()`` computes from the module's
-    invariant factors, and finite presentation is asked of the placement that
-    states it.
+    such claim, and a consumer that reads this asks the property itself:
+    ``is_torsion()`` answers ``True`` for a module placed in the torsion
+    category and computes from the invariant factors otherwise, and finite
+    presentation is asked of the placement that states it.
 
     Returns ``True``, ``False``, or the undecided proposition ``is_torsion(M)``.
     """

@@ -92,7 +92,6 @@ from sage_extensions.categories.modules.pure.modules import (
     ModulesWithChosenFinitePresentation,
     TensorProductModules,
     VectorSpaces,
-    _finitely_presented_torsion,
     _regular_module_scalar_identification,
     _scalar_value_identification,
 )
@@ -3436,23 +3435,11 @@ class BilinearFormModules(OwnedCategoryOverBaseRing):
             ):
                 r"""Equip ``module`` with the bilinear form represented by ``gram``.
 
-                The value object is explicit.  Descent to the quotient is the
-                validator ``validate_descent`` (``OWN-22``).
+                The value object is explicit, and the caller states this module's
+                torsion placement by constructing here; descent to the quotient is
+                the validator ``validate_descent`` (``OWN-22``), which the caller
+                asks for.
                 """
-                match _finitely_presented_torsion(module):
-                    case True:
-                        pass
-                    case False:
-                        raise ValueError(
-                            f"a torsion bilinear form in {self} is defined on a finitely presented torsion "
-                            f"{self.base_ring()}-module, but {module} is not one: it is in {module.category()}"
-                        )
-                    case _:
-                        raise ValueError(
-                            f"a torsion bilinear form in {self} is defined on a finitely presented torsion "
-                            f"{self.base_ring()}-module, and whether {module} is one is undecided"
-                        )
-
                 rank = int(module.module_generating_set().cardinality())
                 values = _coerced_gram(value_module, gram, rank)
                 formed = FormModules(module.base_ring())(
@@ -3638,24 +3625,11 @@ class QuadraticFormModules(OwnedCategoryOverBaseRing):
             ):
                 r"""Equip ``module`` with ``q(x)=x^T gram x`` valued in ``value_module``.
 
-                Symmetry of ``gram`` is the validator of the quadratic map, and
-                descent to the quotient is the validator ``validate_descent``
-                (``OWN-22``).
+                The caller states this module's torsion placement by constructing
+                here.  Symmetry of ``gram`` is the validator of the quadratic map,
+                and descent to the quotient is the validator ``validate_descent``
+                (``OWN-22``), which the caller asks for.
                 """
-                match _finitely_presented_torsion(module):
-                    case True:
-                        pass
-                    case False:
-                        raise ValueError(
-                            f"a torsion quadratic form in {self} is defined on a finitely presented torsion "
-                            f"{self.base_ring()}-module, but {module} is not one: it is in {module.category()}"
-                        )
-                    case _:
-                        raise ValueError(
-                            f"a torsion quadratic form in {self} is defined on a finitely presented torsion "
-                            f"{self.base_ring()}-module, and whether {module} is one is undecided"
-                        )
-
                 rank = int(module.module_generating_set().cardinality())
                 values = _coerced_gram(value_module, gram, rank)
                 formed = FormModules(module.base_ring())(
@@ -3666,7 +3640,7 @@ class QuadraticFormModules(OwnedCategoryOverBaseRing):
                     _subobject_lift=_subobject_lift,
                     _subobject_inclusion_factory=_subobject_inclusion_factory,
                 )
-                formed.validate_descent()
+                formed.validate_descent(check=False)
                 return formed
 
             def from_relations_and_gram(self, relation_rows, gram, value_module):
@@ -4577,11 +4551,6 @@ def _form_module_categories(module, *, bilinear, extra_categories):
         categories.append(FreeFormModules(base_ring))
     if is_presented:
         categories.append(FormModules(base_ring).FinitelyPresented())
-        match _finitely_presented_torsion(module):
-            case True:
-                categories.append(FormModules(base_ring).FinitelyPresented().Torsion())
-            case _:
-                pass
     if module in FramedFreeModules(base_ring).FinitelyGenerated():
         categories.append(FreeFormModules(base_ring).FinitelyGenerated())
     if bilinear:

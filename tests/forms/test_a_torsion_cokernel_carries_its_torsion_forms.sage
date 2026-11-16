@@ -3,9 +3,11 @@ r"""A cokernel whose invariants are torsion carries the torsion forms on it.
 Membership in ``Modules(R).FinitelyPresented().Torsion()`` is a placement claim
 (``CAT-04``), and a cokernel of a presentation is built before it computes, so
 it makes no such claim: the question "is this module torsion" is asked of the
-predicate ``is_torsion()``, which reads the invariant factors.  The torsion form
-categories and the formed-module placement ask it, so the twists, the primary
-parts and the orthogonal quotients of a discriminant form exist.
+predicate ``is_torsion()``, which reads the invariant factors.  A torsion form's
+placement is claimed by the construction that knows torsion -- the discriminant
+form, the twist functor, the primary part, the orthogonal quotient -- so the
+twists, the primary parts and the orthogonal quotients of a discriminant form
+exist and stay in the refinement they were claimed in.
 
 Over $Z$, $\langle 3 \rangle$ has discriminant group $Z/3$ with $b = 1/3$, and
 $A_1$ has $q = 1/2 \bmod 1$ on $Z/2$.
