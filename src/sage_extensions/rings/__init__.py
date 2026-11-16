@@ -1,7 +1,5 @@
 r"""Owned ring implementations and the public ring-construction surface."""
 
-from sage.misc.cachefunc import cached_function
-
 from sage_extensions.categories.rings.commutative_algebra import (
     AdicCompletions,
     DistinguishedOpenSubobjects,
@@ -154,62 +152,53 @@ def QuadraticField(discriminant, name="a"):
     return _QuadraticField(discriminant, name)
 
 
-@cached_function
-def session_ring_objects() -> dict[str, object]:
-    r"""Return the standard session scalar names under their owned parents."""
-    from sage.all import AA as SageAA
-    from sage.all import CDF as SageCDF
-    from sage.all import QQ as SageQQ
-    from sage.all import RDF as SageRDF
-    from sage.all import ZZ as SageZZ
-    from sage.all import QQbar as SageQQbar
+# The session's scalar names.  Each is the one owned object of its name, bound
+# here in this module's body so that the session imports it from this module's
+# ``__all__`` like every other name it publishes: a name's definition and its
+# binding are the same statement, and no function of another module writes the
+# session's namespace while it imports (AGENTS, §4 "One source of truth, stated
+# once, inline").
+ZZ = _owned_integers()
+QQ = _owned_rationals()
+AA = _public_commutative_ring(_owned_real_algebraic_numbers())
+QQbar = _public_commutative_ring(_owned_algebraic_numbers())
+RDF = _public_commutative_ring(_owned_real_double_field())
+CDF = _public_commutative_ring(_owned_complex_double_field())
 
-    integers = _owned_integers()
-    rationals = _owned_rationals()
-    _set_owned_ring_display(integers, "Integer Ring")
-    _set_owned_ring_display(rationals, "Rational Field")
-    aa = _public_commutative_ring(_owned_real_algebraic_numbers())
-    _set_owned_ring_display(aa, "Real Algebraic Field")
-    qqbar = _public_commutative_ring(_owned_algebraic_numbers())
-    _set_owned_ring_display(qqbar, "Algebraic Closure of Rational Field")
-    rdf = _public_commutative_ring(_owned_real_double_field())
-    _set_owned_ring_display(rdf, "Real double field", kind="real")
-    cdf = _public_commutative_ring(_owned_complex_double_field())
-    _set_owned_ring_display(cdf, "Complex double field", kind="complex")
-    return {
-        "ZZ": integers,
-        "QQ": rationals,
-        "AA": aa,
-        "QQbar": qqbar,
-        "RR": RR,
-        "RDF": rdf,
-        "CDF": cdf,
-        "CC": CC,
-    }
-
-
-def ring_constructor_surface() -> dict[str, object]:
-    r"""Return the constructors exported into a preamble session."""
-    return {
-        "GF": GF,
-        "Zmod": Zmod,
-        "Zp": Zp,
-        "Qp": Qp,
-        "RealField": RealField,
-        "ComplexField": ComplexField,
-        "CyclotomicField": CyclotomicField,
-        "QuadraticField": QuadraticField,
-    }
+_set_owned_ring_display(ZZ, "Integer Ring")
+_set_owned_ring_display(QQ, "Rational Field")
+_set_owned_ring_display(AA, "Real Algebraic Field")
+_set_owned_ring_display(QQbar, "Algebraic Closure of Rational Field")
+_set_owned_ring_display(RDF, "Real double field", kind="real")
+_set_owned_ring_display(CDF, "Complex double field", kind="complex")
 
 
 def _restore_session_ring_bindings(scope: dict) -> None:
     r"""Restore public scalar names after Sage code has modified a namespace.
 
-    This is namespace repair only: the objects returned by
-    :func:`session_ring_objects` are already fully constructed owned objects.
+    This is namespace repair only: every object bound here is this module's own,
+    already fully constructed owned object.  The scope a repair is asked for is
+    the one a load wrote a file into; the session's own namespace is not one of
+    them, because ``sage_extensions/all.py`` binds each of its names itself.
     """
-    scope.update(session_ring_objects())
-    scope.update(ring_constructor_surface())
+    scope.update(
+        ZZ=ZZ,
+        QQ=QQ,
+        AA=AA,
+        QQbar=QQbar,
+        RR=RR,
+        RDF=RDF,
+        CDF=CDF,
+        CC=CC,
+        GF=GF,
+        Zmod=Zmod,
+        Zp=Zp,
+        Qp=Qp,
+        RealField=RealField,
+        ComplexField=ComplexField,
+        CyclotomicField=CyclotomicField,
+        QuadraticField=QuadraticField,
+    )
     for name in _REMOVED_ENGINE_SPELLINGS:
         scope.pop(name, None)
 
@@ -225,9 +214,11 @@ _REMOVED_ENGINE_SPELLINGS = ("FiniteField", "IntegerModRing", "Integers")
 
 
 __all__ = [
+    "AA",
     "AdicCompletions",
     "AdicallyCompleteRings",
     "ArtinianRings",
+    "CDF",
     "CommutativeIdeals",
     "CommutativeRings",
     "OwnedCommutativeRings",
@@ -271,9 +262,12 @@ __all__ = [
     "PrimeLocalizations",
     "PrimeSpectra",
     "PrincipalIdealDomains",
+    "QQ",
+    "QQbar",
     "Qp",
     "QuadraticField",
     "QuotientRings",
+    "RDF",
     "RR",
     "CC",
     "ComplexRelation",
@@ -303,7 +297,7 @@ __all__ = [
     "Rings",
     "UnitInterval",
     "ZariskiClosedSubobjects",
+    "ZZ",
     "Zmod",
     "Zp",
-    "ring_constructor_surface",
 ]

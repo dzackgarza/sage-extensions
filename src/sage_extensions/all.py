@@ -11,7 +11,6 @@ import sys as _sys
 from importlib import import_module as _import_module
 from importlib.util import find_spec as _find_spec
 from pathlib import Path as _Path
-from typing import cast as _cast
 
 # The session's numeric vocabulary and its parser are one contract: decimal
 # literals remain explicit MPFR approximations even though ``RealNumber`` now
@@ -280,9 +279,6 @@ from sage_extensions.categories.fundamental_groupoids import (  # noqa: F401
 from sage_extensions.categories.pointed_topological_spaces import (  # noqa: F401
     TopologicalSpaceCoslices,
 )
-from sage_extensions.categories.rings.ring_foundation import (
-    _OwnedRingParent,
-)
 from sage_extensions.categories.topological_spaces import (  # noqa: F401
     ContinuousMap,
     TopologicalSpaceMor,
@@ -298,9 +294,6 @@ from sage_extensions.categories.vinberg_invariants import (  # noqa: F401
 from sage_extensions.logic import Predicate, Propositions, Unknown, ask  # noqa: F401
 from sage_extensions.rings import (  # noqa: F401
     _restore_session_ring_bindings,
-)
-from sage_extensions.rings import (
-    session_ring_objects as _session_ring_objects,
 )
 from sage_extensions.utilities import (
     lmap as lmap,
@@ -507,13 +500,10 @@ def load(filename: str, globals: dict | None = None, attach: bool = False) -> No
     scope["load"] = load
 
 
-# This is deliberately last.  Internal modules may import backend names while
-# they load; the public session receives only owned scalar objects, owned
-# constructors, and the owned runtime names emitted by the research dialect.
-_restore_session_ring_bindings(globals())
-_session_rings = _session_ring_objects()
-ZZ: _OwnedRingParent = _cast(_OwnedRingParent, _session_rings["ZZ"])
-QQ: _OwnedRingParent = _cast(_OwnedRingParent, _session_rings["QQ"])
+# The dialect's names are the owned constructors, and the scalar rings are the
+# names the ring package declares: this module binds every session name itself,
+# through the imports above and the assignments here, so the session's namespace
+# is the module's text and nothing outside it writes into it.
 Integer = _language_runtime.Integer
 RealNumber = _language_runtime.RealNumber
 ComplexNumber = _language_runtime.ComplexNumber
@@ -539,6 +529,3 @@ _lazy_import(
 )
 _lazy_import("sage_extensions.coble", "Coble")
 _lazy_import("sage_extensions.sterk", "Sterk")
-
-
-_language_runtime.install(globals())
