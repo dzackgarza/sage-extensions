@@ -1,0 +1,94 @@
+#name: Coble kernel incidence rows (#381)
+## The Tits-building incidence of the two kernel rows of #381: the edges
+## between the Otilde(T_Co)-orbits and the Otilde+(T_Co)-orbits of primitive
+## isotropic lines and planes of T_Co, through the public
+## tits_building_incidence().  Each edge is asserted to join a line that lies
+## in its plane, and the edge count of each row is recorded per group.
+##
+## The two plane rows are 189720 planes each (#390), so the incident sets are
+## the same size: this is the job that reports later, never the per-test gate.
+## It is the row selection of the #391 driver, so the two rows whose values
+## are already decided (O(T_Co): one edge; Gamma_{Co,2}: 13 edges over 4 line
+## and 7 plane cusps) can be re-run from here with
+##   rows: "O,Gamma_{Co,2}"
+## and the small-lattice check of the same code with
+##   lattice: "6JRS"   (U + U + <-2>, where |O(A_L)| = 1, so both kernel rows
+##                      are their ambient rows and the driver says so)
+##
+## Install (one command, from the repository root):
+##   mkdir -p .github/workflows && cp results/coble-kernel-incidence-rows.yml .github/workflows/
+## Then dispatch from the Actions tab (the "Coble kernel incidence rows (#381)" workflow).
+##
+## The job reports every row it decided and names every row that did not
+## return inside its per-call cap or inside the job's budget; it is red in
+## both cases.  A row that returns an edge which breaks its contract is red
+## apart from that, and the line says which clause broke.
+on:
+  workflow_dispatch:
+    inputs:
+      cap:
+        description: "seconds one row call may take before its row is undecided"
+        required: false
+        default: "10800"
+        type: string
+      budget:
+        description: "seconds for the whole run, 0 for no budget"
+        required: false
+        default: "28800"
+        type: string
+      rows:
+        description: "comma-separated rows: O, Gamma_{Co,2}, Otilde, Otilde+"
+        required: false
+        default: "Otilde,Otilde+"
+        type: string
+      lattice:
+        description: "the lattice: Tco, 6JRS, U+U(2)+<-2>, 6JRX, 6JRY"
+        required: false
+        default: "Tco"
+        type: string
+permissions:
+  contents: read
+concurrency:
+  group: coble-kernel-incidence-rows
+  cancel-in-progress: false
+jobs:
+  kernel-incidence-rows:
+    name: Each kernel incidence row against the public incidence call
+    runs-on: ubuntu-latest
+    container: ghcr.io/dzackgarza/sage:develop
+    timeout-minutes: 350
+    steps:
+      - name: Check out the commit under test
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: Mark the checkout as a safe git directory
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - name: Run the kernel incidence rows
+        env:
+          PYTHONPATH: src
+          COBLE_CALL_CAP: ${{ inputs.cap || '10800' }}
+          COBLE_ROW_BUDGET: ${{ inputs.budget || '28800' }}
+          COBLE_ROWS: ${{ inputs.rows || 'Otilde,Otilde+' }}
+          COBLE_LATTICE: ${{ inputs.lattice || 'Tco' }}
+        run: |-
+          set -o pipefail
+          "$SAGE_BIN" --version
+          git rev-parse HEAD
+          sage_python="$("$SAGE_BIN" -c "import sys; print(sys.executable)")"
+          "$sage_python" tests/coble_gamma_co_2_incidence_rows.py \
+            --rows "$COBLE_ROWS" --lattice "$COBLE_LATTICE" \
+            --cap "$COBLE_CALL_CAP" --budget "$COBLE_ROW_BUDGET"
+        shell: bash
+      # The run's own timing record (CONTRIBUTING.md ENV-03): the test run's
+      # report log and JUnit file as the run's plugin copied them into
+      # .timings/, and the stage records the library appended as it computed.
+      - name: Keep the run's timing record
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: timings-${{ github.job }}-${{ github.sha }}
+          path: .timings/
+          retention-days: 90
+          if-no-files-found: error
+          include-hidden-files: true

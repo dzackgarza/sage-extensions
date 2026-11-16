@@ -1,13 +1,16 @@
 r"""The Tits-building incidence rows on the Coble lattice, through the public call.
 
-This is the acceptance entry point of #391: the incidence between the
-``Gamma_{Co,2}``-orbits of primitive isotropic lines and planes of ``T_Co``,
-and the ``O(T_Co)`` incidence through the same route.  It is not collected by
-pytest (its file name does not begin with ``test_``), because these two rows
-are measured in minutes and share one subgroup/orbit/cusp cache; they belong
-in the dedicated CI job, not repeated throughout the per-test gate.  The final
-route fits the runtime's 6144 MiB guard: the measured two-row run peaked at
-3718 MiB tree RSS.
+This is the acceptance entry point of #391 and of #381's last step: the
+incidence between the line orbits and the plane orbits of ``T_Co`` under each
+of the four groups whose rows return -- ``O(T_Co)``, ``Gamma_{Co,2}``,
+``Otilde(T_Co) = ker rho`` and ``Otilde+(T_Co) = ker(rho, sn_RR)``.  It is not
+collected by pytest (its file name does not begin with ``test_``), because
+these rows are measured in minutes and share one subgroup/orbit/cusp cache;
+they belong in the dedicated CI job, not repeated throughout the per-test
+gate.  The two rows of #391 fit the runtime's 6144 MiB guard: the measured
+two-row run peaked at 3718 MiB tree RSS.  The two kernel rows of #381 are the
+rows of ``coble_kernel_plane_rows.py`` read at their planes, so they are the
+row selection ``--rows Otilde,Otilde+``, not the default.
 
 ``T_Co = <2> + U(2) + E8(-2)`` is the Coble period lattice, D. Dolgachev and
 S. Kondo, *Enriques surfaces and Borel--Weil--Bott type duality*, Izv. Math.
@@ -32,11 +35,21 @@ parabolic's family is certified complete (``is_parabolic_complete``, #331,
 #366), so the stabilizer never reaches the indefinite port's generic
 enumeration, which is killed at the memory guard on this lattice.
 
+**The kernel rows.**  ``Otilde`` and ``Otilde+`` cut the discriminant image
+instead of forcing it: ``chi(Otilde)`` is trivial and ``chi(Otilde+)`` is
+trivial, so the double cosets at a plane are the plain cosets of
+``chi(Stab P)`` in ``chi(O(L))``, and the incidence call reads them by the
+same parabolic covering.  Their plane rows are 189720 planes each (#390), so
+the incidence of those two rows is dispatched as its own job, and each row's
+edges are recorded per group; no count is typed, because the two rows have no
+card (lattice-database#7).
+
 **What is asserted.**  The decided Gamma relation has 13 edges over four line
 cusps and seven plane cusps.  No lattice-database card holds a ``T_Co`` value
 (lattice-database#7); this acceptance value is checked against representatives
 from both the pinned and the image's indefinite-port checkouts.  In addition,
-the cited construction guarantees for every output:
+the cited construction guarantees for every output of the incidence call on
+any lattice whose rows return through this route:
 
 * each edge joins a line that lies in its plane -- the edge's line term is
   contained in its plane term, and one subgroup element carries the selected
@@ -54,6 +67,25 @@ the cited construction guarantees for every output:
   ``O(T_Co)``, so the left group of every double-coset computation is the
   parabolic's own image and each plane contributes its one transitive orbit
   of lines; that is the value ``main`` held at ``85284b8d18``.
+
+For the two kernel rows the same construction guarantees, and this driver
+checks, the first three clauses too -- their counts are recorded and not
+compared with anything, and the one comparison that does hold is between the
+two rows: ``Otilde+`` is a subgroup of ``Otilde``, so its line and plane rows
+have at least as many cusps as ``Otilde``'s.  The edge count of a kernel row
+is *not* monotone in the group: a finer group has more vertices, so a coarser
+group's edge is not one of its edges.
+
+**The small-lattice check.**  ``--lattice`` reads the same driver on a lattice
+whose rows the gate can afford, so the code that the dispatched job runs is
+exercised in minutes:
+``--lattice 6JRS=U+U+<-2>`` has ``|O(A_L)| = 1``, hence ``Otilde = O(L)`` and
+``Otilde+ = O^+(L)``, and the driver's rows must equal the ambient rows; on
+``U+U(2)+<-2>`` the discriminant image is non-trivial (``|O(A_L)| = 2``) and
+the kernel rows split into three line cusps and two plane cusps of their own.
+``tests/lattices/test_the_kernel_incidence_rows.sage`` gates the same two
+lattices on the same guarantees, and additionally on the subgroup's own flag
+row, which is the relation read through a different public call.
 
 The counts each row prints are the numbers the commit body of the push that
 lands this file records.
@@ -78,9 +110,13 @@ decided relation, 4 a row step that raised -- and the statuses and those exit
 statuses are the vocabulary of ``tests/coble_row_status.py``, shared with the
 kernel-plane-rows driver.
 
-    sage -python tests/coble_gamma_co_2_incidence_rows.py            # both rows
+    sage -python tests/coble_gamma_co_2_incidence_rows.py            # the two #391 rows
     sage -python tests/coble_gamma_co_2_incidence_rows.py --cap 10800
     sage -python tests/coble_gamma_co_2_incidence_rows.py --budget 28800
+    sage -python tests/coble_gamma_co_2_incidence_rows.py \
+        --rows 'Otilde,Otilde+' --lattice Tco                     # the #381 rows
+    sage -python tests/coble_gamma_co_2_incidence_rows.py \
+        --rows 'Otilde,Otilde+' --lattice 6JRS                    # the small-lattice check
 """
 
 import argparse
@@ -327,56 +363,186 @@ def run_row(lattice, subgroup, label, cap) -> RowOutcome:
         signal.signal(signal.SIGALRM, previous_handler)
 
 
-def _rows(lattice):
-    r"""Yield each row's label with its subgroup, built when the row is taken.
+ROW_LABELS = ("O", "Gamma_{Co,2}", "Otilde", "Otilde+")
+
+
+def _row_subgroup(lattice, label):
+    r"""The subgroup of one row, built when the row runs.
 
     The Gamma_{Co,2} subgroup is the image-preimage stabilizer of A_{U(2)} in the
     discriminant group, and building it costs far more than the first row's
     subgroup does; a row's subgroup is therefore built when that row runs, so the
-    first row starts without waiting on the second.
+    first row starts without waiting on the second.  The two kernel rows are
+    ``Otilde = ker rho`` and ``Otilde+ = ker(rho, sn_RR)``, the rows of #390.
     """
-    yield "O(T_Co)", lattice.Aut()
-    yield "Gamma_{Co,2}", lattice.Aut().discriminant_point_stabilizer(_decomposition(lattice))
+    match label:
+        case "O":
+            return lattice.Aut()
+        case "Gamma_{Co,2}":
+            return lattice.Aut().discriminant_point_stabilizer(_decomposition(lattice))
+        case "Otilde":
+            return lattice.stable_orthogonal_group()
+        case "Otilde+":
+            return lattice.stable_orthogonal_group().intersection(lattice.O_plus())
+    raise ValueError(f"{label} is not a row of the incidence driver, which has {ROW_LABELS}")
+
+
+def _lattice_by_name(name):
+    r"""The lattice one driver run is about: the Coble lattice, or a specimen the gate can afford.
+
+    ``Tco`` is the object of the dispatched job.  The others exist so that the
+    code this job runs is exercised on a lattice whose rows return in seconds:
+    ``6JRS = U + U + <-2>`` has ``|O(A_L)| = 1``, hence ``Otilde = O(L)``, and
+    ``U+U(2)+<-2>`` has ``|O(A_L)| = 2``, so each kernel row there is a
+    genuinely smaller group than its ambient row's.  Both are gate lattices of
+    the kernel plane rows (``test_the_stable_plane_rows_...``).
+    """
+    match name:
+        case "Tco":
+            return NamedLattices.Tco
+        case "6JRS":
+            return Lattices(ZZ)("U") + Lattices(ZZ)("U") + Lattices(ZZ)([[-2]])
+        case "U+U(2)+<-2>":
+            return (
+                Lattices(ZZ)("U")
+                + Lattices(ZZ)([[0, 2], [2, 0]])
+                + Lattices(ZZ)([[-2]])
+            )
+        case "6JRX":
+            return _scattone(1)
+        case "6JRY":
+            return _scattone(2)
+    raise ValueError(f"{name} is not a lattice of this driver")
+
+
+def _scattone(k):
+    r"""``Lambda_{2k} = U^2 + E8(-1)^2 + <-2k>``, the rank-21 cards 6JRX and 6JRY."""
+    return (
+        Lattices(ZZ)("U")
+        + Lattices(ZZ)("U")
+        + Lattices(ZZ)("E8")
+        + Lattices(ZZ)("E8")
+        + Lattices(ZZ)([[-2 * k]])
+    )
+
+
+LATTICE_NAMES = ("Tco", "6JRS", "U+U(2)+<-2>", "6JRX", "6JRY")
+
+
+def _trivial_image_row_agreement(lattice, rows):
+    r"""Why a kernel row differs from its ambient row where ``rho`` is trivial, or ``None``.
+
+    ``Otilde`` is the kernel of the discriminant representation, so where
+    ``|O(A_L)| = 1`` it *is* ``O(L)``; the sign condition that cuts ``Otilde+``
+    out of ``Otilde`` is then the whole of the index-two subgroup
+    ``lattice.O_plus()``, so both kernel rows are the ambient rows and their
+    counts are not free -- they are the ambient counts, computed here through
+    the ambient group objects.  That is the one place the driver compares a
+    counted number with another, and it makes the small-lattice run
+    self-checking; on a lattice with a non-trivial discriminant image the
+    function returns ``None`` -- there is nothing to compare, and the rows are
+    recorded only.
+    """
+    target = lattice.discriminant_group().orthogonal_group()
+    if target.cardinality() != cardinal(1):
+        return None
+    log(
+        f"the discriminant image of {lattice} is trivial, so each kernel row is its "
+        "ambient row's; comparing the counts"
+    )
+    ambient = lattice.Aut()
+    for label, other in (("Otilde", ambient), ("Otilde+", lattice.O_plus())):
+        if label not in rows:
+            continue
+        edges, line_count, plane_count = rows[label]
+        other_lines = int(other.cusps(1).cardinality())
+        other_planes = int(other.cusps(2).cardinality())
+        if (line_count, plane_count) != (other_lines, other_planes):
+            return (
+                f"the {label} row has {line_count} line and {plane_count} plane cusps, "
+                f"but the discriminant image of {lattice} is trivial, so its rows are "
+                f"the ambient ones: {other_lines} line and {other_planes} plane cusps"
+            )
+        other_edges = int(other.tits_building_incidence().cardinality())
+        if edges != other_edges:
+            return (
+                f"the {label} row has {edges} edges, but the discriminant image of "
+                f"{lattice} is trivial, so its incidence is the ambient one's, "
+                f"which has {other_edges}"
+            )
+    log(f"each kernel row agrees with the ambient row of {lattice}")
+    return None
 
 
 def main(argv):
-    r"""Run both incidence rows and report each row's outcome as an exit status.
+    r"""Run the selected incidence rows and report each row's outcome as an exit status.
 
     The statuses and exit statuses are ``tests/coble_row_status.py``'s: ``0``
-    both rows decided as the decided relation, ``1`` a row undecided or the
-    whole-run budget spent, ``2`` a returned edge or relation that breaks the
+    every selected row decided as the decided relation, ``1`` a row undecided or
+    the whole-run budget spent, ``2`` a returned edge or relation that breaks the
     contract, ``3`` a decided row whose counts are not the decided relation, and
-    ``4`` a row step that raised.
+    ``4`` a row step that raised.  On ``T_Co`` the decided relation is ``O``: one
+    edge, and ``Gamma_{Co,2}``: 13 edges over 4 line and 7 plane cusps (#391);
+    on a lattice whose discriminant image is trivial the kernel rows are decided
+    by their ambient rows instead (:func:`_trivial_image_row_agreement`), and on
+    any other lattice the rows are recorded, with ``Otilde+``'s two vertex counts
+    at least ``Otilde``'s.
     """
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--cap", type=float, default=10800,
                         help="seconds one row may take before it is undecided; 0 leaves no time")
     parser.add_argument("--budget", type=int, default=28800,
                         help="seconds the whole run may take, 0 for no budget")
+    parser.add_argument("--rows", default="O,Gamma_{Co,2}",
+                        help=f"comma-separated rows to run, from {ROW_LABELS}")
+    parser.add_argument("--lattice", default="Tco",
+                        help=f"the lattice to run on, from {LATTICE_NAMES}")
     arguments = parser.parse_args(argv)
+    selected = [name.strip() for name in arguments.rows.split(",") if name.strip()]
+    for name in selected:
+        if name not in ROW_LABELS:
+            log(f"[run] {RowStatus.ERROR.words}: {name} is not a row of this driver, which has {ROW_LABELS}")
+            return RowStatus.ERROR.exit_status
     started = time.monotonic()
-    lattice = NamedLattices.Tco
-    log(f"the Coble period lattice {lattice} of rank {lattice.module_rank()}")
+    lattice = _lattice_by_name(arguments.lattice)
+    log(f"the lattice {lattice} of rank {lattice.module_rank()}")
+    log(f"the rows {selected}")
     counts = {}
-    for label, subgroup in _rows(lattice):
+    for label in selected:
         if arguments.budget and time.monotonic() - started > arguments.budget:
             log(f"[run] {RowStatus.UNDECIDED.words}: the whole-run budget is spent")
             return RowStatus.UNDECIDED.exit_status
-        outcome = run_row(lattice, subgroup, label, arguments.cap)
+        outcome = run_row(lattice, _row_subgroup(lattice, label), label, arguments.cap)
         log(outcome.report())
         if outcome.status is not RowStatus.DECIDED:
             return outcome.status.exit_status
         counts[label] = outcome.counts
-    if counts["O(T_Co)"][0] != 1:
-        log("the O(T_Co) incidence through this route is not one edge")
+    if lattice is NamedLattices.Tco:
+        if "O" in counts and counts["O"][0] != 1:
+            log("the O(T_Co) incidence through this route is not one edge")
+            return RowStatus.COUNT_MISMATCH.exit_status
+        if "Gamma_{Co,2}" in counts and counts["Gamma_{Co,2}"] != (13, 4, 7):
+            log("the Gamma_{Co,2} incidence is not the decided 13-edge relation over 4 line and 7 plane cusps")
+            return RowStatus.COUNT_MISMATCH.exit_status
+    disagreement = _trivial_image_row_agreement(lattice, counts)
+    if disagreement is not None:
+        log(f"[run] {RowStatus.COUNT_MISMATCH.words}: {disagreement}")
         return RowStatus.COUNT_MISMATCH.exit_status
-    if counts["Gamma_{Co,2}"] != (13, 4, 7):
-        log("the Gamma_{Co,2} incidence is not the decided 13-edge relation over 4 line and 7 plane cusps")
-        return RowStatus.COUNT_MISMATCH.exit_status
+    if "Otilde" in counts and "Otilde+" in counts:
+        coarse, fine = counts["Otilde"], counts["Otilde+"]
+        if fine[1] < coarse[1] or fine[2] < coarse[2]:
+            log(
+                f"the Otilde+ row has {fine[1]} line and {fine[2]} plane cusps against "
+                f"Otilde's {coarse[1]} and {coarse[2]}, but Otilde+ is a subgroup of "
+                "Otilde, so its vertex rows cannot be smaller"
+            )
+            return RowStatus.COUNT_MISMATCH.exit_status
     log(
-        f"the O(T_Co) incidence has {counts['O(T_Co)'][0]} edge; the Gamma_{{Co,2}} incidence has "
-        f"{counts['Gamma_{Co,2}'][0]} edges over {counts['Gamma_{Co,2}'][1]} line orbits and "
-        f"{counts['Gamma_{Co,2}'][2]} plane orbits"
+        "recorded counts: "
+        + "; ".join(
+            f"{label} {row[0]} edges over {row[1]} line and {row[2]} plane cusps"
+            for label, row in counts.items()
+        )
     )
     return RowStatus.DECIDED.exit_status
 
