@@ -912,12 +912,27 @@ def _blocks(graph: Graph) -> list[list[str]]:
 
 
 def render_shape(declarations: list[CategoryDeclaration]) -> str:
-    """Breadth, depth and shortcuts.  The intended shape is deep and narrow."""
-    edges = _all_edges(declarations)
+    r"""Breadth, depth and shortcuts.  The intended shape is deep and narrow.
+
+    ``AGENTS.md`` defines breadth as the number of categories that declare a
+    node directly, and it is the architectural diagnostic: a large count says
+    the categories between it and its claimants are missing.  The count is over
+    the written declarations alone.  An edge Sage's join supplies is not a
+    declaration -- the axiom mechanism supplies it from the declarations above
+    and below -- so counting it reports a base as claimed by more categories the
+    moment an axiom is nested under it: the tests' toy tree has one claimant of
+    ``Paths`` and two edges into it, because ``Paths.Connected`` also lies there.
+    Depth and the pieces are read on the written edges and the joins together,
+    because a join is a step of inheritance an object really takes.
+    """
+    declared = _declared_edges(declarations)
+    joined = _axiom_edges(declarations, declared) - declared
+    edges = declared | joined
     vertices = _vertices(declarations, edges)
     directed = _digraph(vertices, edges)
     breadth = {
-        _name(vertex): d for vertex, d in directed.in_degree(labels=True).items()
+        _name(vertex): d
+        for vertex, d in _digraph(vertices, declared).in_degree(labels=True).items()
     }
     depth = _chains_above(directed)
 
@@ -925,14 +940,16 @@ def render_shape(declarations: list[CategoryDeclaration]) -> str:
         "The declared graph as numbers.  Intended shape: near-tree, deep and narrow.",
         "",
         (
-            f"categories {directed.order()}   declarations {directed.size()}   pieces {_graph(vertices, edges).connected_components_number()}"
+            f"categories {directed.order()}   declarations {len(declared)}   "
+            f"computed joins {len(joined)}   "
+            f"pieces {_graph(vertices, edges).connected_components_number()}"
         ),
-        f"longest chain of declarations = {max(depth.values(), default=0)}",
+        f"longest chain of declarations and joins = {max(depth.values(), default=0)}",
         "",
         "## Breadth: categories declared directly by the most others",
         "",
-        "Each count is the number of unfactored declarations into that node,",
-        "unless every claimant's own definition places it one step below.",
+        "Each count is the number of written declarations into that node; an edge",
+        "Sage's join supplies is the axiom mechanism, not a contributor.",
         "",
     ]
     for name in sorted(breadth, key=lambda n: (-breadth[n], n))[:15]:
