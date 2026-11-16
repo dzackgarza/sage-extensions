@@ -1031,13 +1031,12 @@ def test_a_subset_is_a_factor_and_equal_subsets_give_one_product() -> None:
 def test_a_polytope_is_a_factor_of_a_product() -> None:
     r"""``SET-05``: an equal triangle is one factor, and different triangles are not.
 
-    A polytope is the convex hull of its vertices, so its vertex set decides
-    the equality of two polytopes of one lattice -- what containment both ways,
-    the equality of two subsets of an infinite ambient set, leaves as a
-    proposition that no procedure decides.  A triangle and the triangle on the
-    same vertices listed from another corner are one set: one hash, and one
-    product with ``Delta[1]``.  Triangles with different vertices are
-    different convex hulls, and five of them have five hashes.
+    A polytope is the convex hull of its vertices, so the vertex set of a
+    polytope of a lattice decides the equality of two such polytopes: a
+    triangle and the triangle on the same vertices listed from another corner
+    are one set -- one hash, and one product with ``Delta[1]``.  Triangles
+    with different vertices are different convex hulls, and five of them have
+    five hashes.
     """
     lattice = ZZ ^ 2
     triangle = ConvexPolytopes(lattice)([[0, 0], [1, 0], [0, 1]])

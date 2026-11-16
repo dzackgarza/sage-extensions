@@ -43,3 +43,28 @@ def matrices_materialized_by(action):
 
 
 builtins.matrices_materialized_by = matrices_materialized_by
+
+
+def coordinate_images_of(morphism):
+    r"""Return the coordinates of each image of the morphism's domain generators.
+
+    A test may not name a private entry (``TL01``, ``TL02``); this is the
+    coordinates of ``f(e_s)`` in the codomain's chosen generators, which is what
+    the module owner's lowering of a morphism of free modules reads.
+    """
+    from sage_extensions.categories.modules.pure.modules import _coordinate_images
+
+    return _coordinate_images(morphism)
+
+
+def relation_images_of(module):
+    r"""Return the coordinate images of a presented module's selected relation morphism."""
+    from sage_extensions.categories.modules.framed.finitely_generated.finitely_presented_modules import (
+        _relation_images,
+    )
+
+    return _relation_images(module)
+
+
+builtins.coordinate_images_of = coordinate_images_of
+builtins.relation_images_of = relation_images_of

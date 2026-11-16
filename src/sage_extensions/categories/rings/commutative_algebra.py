@@ -2529,7 +2529,7 @@ def _affine_quotient_normalization_data(quotient):
                 normalizations[int(position)],
                 normalization_maps[int(position)],
             ),
-            name=lambda quotient=quotient: f"Normalized components of {quotient}",
+            description=lambda quotient=quotient: f"Normalized components of {quotient}",
         )
         component_module_numerators = finite_indexed_family(
             component_indices,
@@ -3700,7 +3700,17 @@ class _AdicCompletionElement(_OwnedAlgebraElement):
     def __ne__(self, other):
         return negation(self._completion_equal(other))
 
-    __hash__ = None
+    def __hash__(self) -> int:
+        r"""Hash the elements of one completion alike.
+
+        Equality here is decided on the retained exact source expressions and,
+        failing that, on the backend values: two different expressions for one
+        element are equal, and a finite approximation with no exact source is
+        separated from everything it does not decide.  No datum of one
+        presentation is invariant under that, so the completion is what a hash
+        reads, which is the rule of :class:`Sets`.
+        """
+        return hash(id(self.parent()))
 
     def __bool__(self):
         return bool(negation(self._completion_equal(self.parent().zero())))

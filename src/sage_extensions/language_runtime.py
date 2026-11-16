@@ -7,11 +7,14 @@ the functions below and every backend value is crossed back before return.
 
 from __future__ import annotations
 
+from functools import cache
+from importlib import import_module
 from typing import cast
 
 from sage.structure.element import parent as element_parent
 from sageparse import Context, Node, splice
 from sageparse.extensions.research import EXTENSION as _RESEARCH_EXTENSION
+from sageparse.preparser import register_extension
 
 from sage_extensions.categories.rings.ring_foundation import (
     OwnedRings,
@@ -130,10 +133,10 @@ _RUNTIME = {
 _IMPORTS = {
     name: f"from sage_extensions.language_runtime import {name}" for name in _RUNTIME
 }
-# Modules whose star import is the complete session. A module that re-exports
-# the session under another name adds it through register_session_module.
-_SESSION_MODULES: set[str] = {"sage_extensions.all"}
-_SESSION_NAMES: frozenset[str] = frozenset()
+# The modules whose star import is the complete session.  A file that writes
+# ``from <module> import *`` binds the names that module publishes, and the
+# lowering below keeps a subscript ordinary when its index is one of them.
+_SESSION_MODULES: frozenset[str] = frozenset({"sage_extensions.all"})
 _RESEARCH_ASSIGNMENT = _RESEARCH_EXTENSION["assignment"]
 
 
@@ -143,26 +146,51 @@ def _root(node: Node) -> Node:
     return node
 
 
-def _has_session_star_import(node: Node, context: Context) -> bool:
-    """Whether this source imports the complete preamble session."""
+def _session_star_import(node: Node, context: Context) -> str | None:
+    r"""The session module whose ``import *`` the file holding ``node`` writes."""
     stack = [_root(node)]
-    expected = {f"from{module}import*" for module in _SESSION_MODULES}
+    expected = {f"from{module}import*": module for module in _SESSION_MODULES}
     while stack:
         current = stack.pop()
         if current.type == "import_from_statement":
             written = "".join(context.text(current).split())
             if written in expected:
-                return True
+                return expected[written]
         stack.extend(current.children)
-    return False
+    return None
 
 
-def _assignment_uses_session_name(node: Node, context: Context) -> bool:
+@cache
+def _session_names(module: str) -> frozenset[str]:
+    r"""The names ``from <module> import *`` binds: that module's public namespace.
+
+    The statement's own definition: ``import *`` binds the module's ``__all__``
+    when it declares one and every name not starting with an underscore when it
+    does not, which is the same set a reader of the module resolves.  The
+    session's names are therefore read from the session module, never handed to
+    this one to hold: a caller that passed its ``globals()`` here would put the
+    names of a module into a table this module owns, and the module's namespace
+    would then depend on when it imported.
+
+    A module's public namespace is fixed once its import returns, and
+    ``import_module`` returns only a module whose body has finished, so the set
+    is read once per module and every later assignment in every file that
+    star-imports it compares against the same frozen set.
+    """
+    return frozenset(
+        name
+        for name in vars(import_module(module))
+        if not name.startswith("_")
+    )
+
+
+def _assignment_uses_session_name(node: Node, context: Context, module: str) -> bool:
     right = node.child_by_field_name("right")
     if right is None or right.type != "subscript":
         return False
+    names = _session_names(module)
     return any(
-        child.type == "identifier" and context.text(child) in _SESSION_NAMES
+        child.type == "identifier" and context.text(child) in names
         for child in right.children_by_field_name("subscript")
     )
 
@@ -173,35 +201,22 @@ def _lower_session_assignment(node: Node, context: Context) -> str | None:
     The upstream research dialect interprets R = A[x] as a generator
     declaration when x is unbound in the file. A star import binds names at
     runtime but contributes no identifier nodes to that static bound-name
-    scan. The preamble owns exactly which names its star import supplies, so
-    it resolves that one missing binding fact here. Every other assignment is
+    scan. The session module owns exactly which names its star import supplies,
+    so it resolves that one missing binding fact here. Every other assignment is
     delegated unchanged to the upstream research lowering.
     """
-    if (
-        _SESSION_NAMES
-        and _has_session_star_import(node, context)
-        and _assignment_uses_session_name(node, context)
-    ):
+    module = _session_star_import(node, context)
+    if module is not None and _assignment_uses_session_name(node, context, module):
         return splice(node, context)
     return _RESEARCH_ASSIGNMENT(node, context)
 
 
 _EXTENSION = {"assignment": _lower_session_assignment}
 
+# Importing this module installs it, as importing ``sageparse.preparser.research``
+# installs the dialect it extends: the rules, the names they emit and the imports
+# that bind them are the module's declarations, so registering them is what the
+# module does, not a step a caller performs on it.
+register_extension(_EXTENSION, runtime=_RUNTIME, imports=_IMPORTS)
 
-def install(session_namespace: dict[str, object]) -> None:
-    from sageparse.preparser import register_extension
-
-    global _SESSION_NAMES
-    _SESSION_NAMES = frozenset(
-        name for name in session_namespace if not name.startswith("_")
-    )
-    register_extension(_EXTENSION, runtime=_RUNTIME, imports=_IMPORTS)
-
-
-def register_session_module(module: str) -> None:
-    """Treat ``from <module> import *`` as importing the complete session."""
-    _SESSION_MODULES.add(module)
-
-
-__all__ = tuple(_RUNTIME) + ("install", "register_session_module")
+__all__ = tuple(_RUNTIME)

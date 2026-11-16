@@ -55,7 +55,9 @@ as a contract violation, because it is a statement about the library's
 answer and not about the budget; the driver's exit status says which
 happened -- 0 both rows decided and equal to their double cosets, 1 a row
 undecided or the whole-run budget spent, 2 a representative that breaks the
-contract, 3 a decided row whose count differs from its double cosets.
+contract, 3 a decided row whose count differs from its double cosets.  The
+statuses and those exit statuses are the vocabulary of
+``tests/coble_row_status.py``, shared with the incidence-row driver.
 
     sage -python tests/coble_kernel_plane_rows.py            # both rows
     sage -python tests/coble_kernel_plane_rows.py --cap 10800
@@ -63,12 +65,19 @@ contract, 3 a decided row whose count differs from its double cosets.
 """
 
 import argparse
-import enum
 import signal
 import sys
 import time
 
 from sage_extensions.all import *  # noqa: F401,F403
+
+from coble_row_status import (
+    EXIT_COUNT_MISMATCH,
+    EXIT_DECIDED,
+    EXIT_UNDECIDED,
+    RowStatus,
+    exit_status,
+)
 
 
 class RowUndecided(Exception):
@@ -89,19 +98,6 @@ def log(message=""):
 def _coble_lattice():
     r"""``T_Co = <2> + (U + E8(-1))(2)``: Dolgachev--Kondo (3.6), p. 513."""
     return NamedLattices.Tco
-
-
-class RowStatus(enum.Enum):
-    r"""What one kernel plane row did: decided, undecided, or a broken contract.
-
-    Three outcomes, not a boolean: a cap the caller set and an answer of the
-    library's that breaks the row's contract are different facts about the
-    run, and the driver reports them apart (exit statuses 1 and 2).
-    """
-
-    DECIDED = "decided"
-    UNDECIDED = "undecided"
-    CONTRACT_VIOLATION = "contract violation"
 
 
 def _plane_contract_violation(subobject) -> str | None:
@@ -142,7 +138,7 @@ def run_row(subgroup, label, cap):
         signal.setitimer(signal.ITIMER_REAL, cap)
         planes = tuple(subgroup.isotropic_orbit_representatives(2))
     except RowUndecided:
-        log(f"[{label}] undecided: the row did not return inside its {cap:.0f} s cap")
+        log(f"[{label}] undecided: the row did not return inside its {cap:g} s cap")
         return None, RowStatus.UNDECIDED
     finally:
         signal.setitimer(signal.ITIMER_REAL, 0)
@@ -264,13 +260,14 @@ def check_row_count(lattice, subgroup, label, count):
 def main(argv):
     r"""Run both kernel plane rows and report each row's outcome as an exit status.
 
-    ``0`` when both rows are decided and equal to their double cosets, ``1``
-    when a row is undecided or the whole-run budget is spent, ``2`` when a
-    returned representative breaks the row's contract, and ``3`` when a
-    decided row's count differs from its double cosets.
+    The statuses and exit statuses are ``tests/coble_row_status.py``'s: ``0``
+    when both rows are decided and equal to their double cosets, ``1`` when a
+    row is undecided or the whole-run budget is spent, ``2`` when a returned
+    representative breaks the row's contract, and ``3`` when a decided row's
+    count differs from its double cosets.
     """
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--cap", type=int, default=10800,
+    parser.add_argument("--cap", type=float, default=10800,
                         help="seconds one row call may take before it is undecided")
     parser.add_argument("--budget", type=int, default=28800,
                         help="seconds the whole run may take, 0 for no budget")
@@ -286,20 +283,18 @@ def main(argv):
     ):
         if arguments.budget and time.monotonic() - started > arguments.budget:
             log("the whole-run budget is spent")
-            return 1
+            return EXIT_UNDECIDED
         count, status = run_row(subgroup, label, arguments.cap)
-        if status is RowStatus.UNDECIDED:
-            return 1
-        if status is RowStatus.CONTRACT_VIOLATION:
-            return 2
+        if status is not RowStatus.DECIDED:
+            return exit_status(status)
         if not check_row_count(lattice, subgroup, label, count):
-            return 3
+            return EXIT_COUNT_MISMATCH
         counts[label] = count
     if counts["Otilde+"] < counts["Otilde"]:
         log("the Otilde+ row has fewer planes than the Otilde row")
-        return 3
+        return EXIT_COUNT_MISMATCH
     log(f"the Otilde count is {counts['Otilde']} and the Otilde+ count is {counts['Otilde+']}")
-    return 0
+    return EXIT_DECIDED
 
 
 if __name__ == "__main__":

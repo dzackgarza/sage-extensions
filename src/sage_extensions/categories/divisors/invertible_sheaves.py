@@ -1948,7 +1948,16 @@ class _ChosenTrivializationQuasiCoherentMorphismMethods:
         )
         return decision if op == op_EQ else negation(decision)
 
-    __hash__ = None
+    def __hash__(self) -> int:
+        r"""Hash the arrows of one pair of line bundles alike.
+
+        Equality here is the conjunction of the chartwise equalities of the
+        local maps, and two different trivialized presentations may have equal
+        local maps, so no datum of one presentation is invariant under it.  The
+        endpoints are: equal arrows have one source and one target, which is
+        what a hash reads, as it does when an arrow has no finite probe.
+        """
+        return hash((id(self.domain()), id(self.codomain())))
 
     def __mul__(self, other):
         match other:
@@ -2105,7 +2114,16 @@ class _PullbackLineBundleQuasiCoherentMorphismMethods:
         )
         return decision if op == op_EQ else negation(decision)
 
-    __hash__ = None
+    def __hash__(self) -> int:
+        r"""Hash the arrows of one pair of line bundles alike.
+
+        Pullback is not faithful, so two arrows with different ambient
+        morphisms are equal when they agree on every chart.  No datum of one
+        ambient presentation is invariant under that; the endpoints are, since
+        equal arrows have one source and one target, and they are what a hash
+        reads, as it does when an arrow has no finite probe.
+        """
+        return hash((id(self.domain()), id(self.codomain())))
 
     def __mul__(self, other):
         match other:

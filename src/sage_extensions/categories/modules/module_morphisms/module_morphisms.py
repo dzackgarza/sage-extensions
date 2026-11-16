@@ -727,9 +727,11 @@ class ModuleMorphismMethods:
         ring = codomain.base_ring()
         targets = None
         if codomain in FiniteSets():
-            from sage_extensions.categories.modules.pure.modules import Modules
+            from sage_extensions.categories.modules.pure.modules import (
+                _finitely_presented_torsion,
+            )
 
-            if codomain in EnumeratedSets() or codomain in Modules(ring).FinitelyPresented().Torsion():
+            if codomain in EnumeratedSets() or _finitely_presented_torsion(codomain) is True:
                 targets = tuple(codomain)
         if targets is None:
             probes = [codomain.zero()]
@@ -810,7 +812,9 @@ class ModuleMorphismMethods:
         linear extension is linear by construction, and the relations of the
         chosen presentation are what has to be checked instead.
         """
-        from sage_extensions.categories.modules.pure.modules import Modules
+        from sage_extensions.categories.modules.pure.modules import (
+            _finitely_presented_torsion,
+        )
 
         function = self._element_function
         if function is None:
@@ -822,7 +826,6 @@ class ModuleMorphismMethods:
         if source_elements is not None:
             return self._verify_elementwise_on_finite_source(source_elements)
 
-        ring = domain.base_ring()
         match domain:
             case _ if domain.is_finite() is not True:
                 self._check_elementwise_zero()
@@ -833,7 +836,7 @@ class ModuleMorphismMethods:
                     codomain,
                 )
                 return AtomicProposition("is_linear", self)
-            case _ if domain in EnumeratedSets() or domain in Modules(ring).FinitelyPresented().Torsion():
+            case _ if domain in EnumeratedSets() or _finitely_presented_torsion(domain) is True:
                 return self._verify_elementwise_on_finite_source(tuple(domain))
             case _:
                 self._check_elementwise_zero()
@@ -1901,29 +1904,80 @@ class ModuleMorphismMethods:
         quotient module.  Every other ring takes this map's cokernel and asks
         it: there the invariant factors are the presented owner's to read.
         """
-        ring = self.domain().base_ring()
-        match ring:
-            case _ if ring in PrincipalIdealDomains() and _has_finite_free_framing(
-                self.domain()
-            ) and _has_finite_free_framing(self.codomain()):
-                from sage_extensions.categories.modules.pure.modules import (
-                    _engine_matrix,
-                )
-
-                coordinate_matrix = _engine_matrix(self)
-                rank = int(coordinate_matrix.rank())
-                if rank != coordinate_matrix.ncols():
-                    return False
-                divisors = coordinate_matrix.smith_form()[0]
-                return all(
-                    _owned_engine_element(ring, divisors[index, index]).is_unit()
-                    is True
-                    for index in range(rank)
-                )
-            case _:
+        match self._primitivity_by_invariant_factors():
+            case None:
                 if not self.is_injective():
                     return False
                 return self.cokernel().is_torsion_free()
+            case answer:
+                return answer
+
+    def _primitivity_by_invariant_factors(self):
+        r"""Return the criterion's answer from the retained matrix, or ``None`` without one.
+
+        The hypotheses of the criterion are that both endpoints are finitely
+        framed free modules over a principal ideal domain and that the arrow
+        retains a coordinate matrix: the matrix is a Sage matrix over the
+        ring's selected linear-algebra parent, and an owned exact field whose
+        engine is inexact selects the field itself, which is no Sage ring.
+        Outside them this answers ``None`` and :meth:`is_primitive` asks the
+        definition.
+
+        An elementary divisor whose unit-ness is undecided also answers
+        ``None``: a criterion that has not read its answer is not a refutation,
+        and answering ``False`` there would report not-primitive for a span
+        nothing has shown to be non-saturated.
+        """
+        coordinate_matrix = self._smith_coordinate_matrix()
+        match coordinate_matrix:
+            case None:
+                return None
+            case _:
+                pass
+        ring = self.domain().base_ring()
+        rank = int(coordinate_matrix.rank())
+        if rank != coordinate_matrix.ncols():
+            return False
+        divisors = coordinate_matrix.smith_form()[0]
+        units = tuple(
+            _owned_engine_element(ring, divisors[index, index]).is_unit()
+            for index in range(rank)
+        )
+        if any(unit is False for unit in units):
+            return False
+        return True if all(unit is True for unit in units) else None
+
+    def _smith_coordinate_matrix(self):
+        r"""Return the retained coordinate matrix of this arrow, or ``None`` without one.
+
+        A matrix of this kind exists exactly when both endpoints are finitely
+        framed free modules over a principal ideal domain and the ring's
+        selected linear-algebra parent is a Sage ring: the matrix is built over
+        that parent (:func:`...pure.modules._engine_matrix`), and an owned exact
+        field whose engine is inexact selects the field itself, which is no Sage
+        ring.  It states whether the matrix exists; :meth:`is_primitive` and
+        :meth:`saturation` state what it is for.
+        """
+        from sage.categories.rings import Rings as SageRings
+
+        from sage_extensions.categories.modules.pure.modules import (
+            _engine_matrix,
+        )
+        from sage_extensions.categories.rings.ring_foundation import (
+            _linear_algebra_ring,
+        )
+
+        ring = self.domain().base_ring()
+        match (
+            ring in PrincipalIdealDomains()
+            and _has_finite_free_framing(self.domain())
+            and _has_finite_free_framing(self.codomain())
+            and _linear_algebra_ring(ring) in SageRings()
+        ):
+            case True:
+                return _engine_matrix(self)
+            case False:
+                return None
 
     is_saturated = is_primitive
 
@@ -1943,21 +1997,20 @@ class ModuleMorphismMethods:
             f"injective map, and this map has nonzero kernel"
         )
         ring = self.domain().base_ring()
-        match ring:
-            case _ if ring in PrincipalIdealDomains() and _has_finite_free_framing(
-                self.domain()
-            ) and _has_finite_free_framing(self.codomain()):
+        match self._smith_coordinate_matrix():
+            case None:
+                quotient = self.cokernel()
+                projection = quotient.torsion_free_quotient_projection()
+                composite = projection * quotient.presentation_projection()
+                return composite.kernel()
+            case coordinate_matrix:
                 from sage.modules.free_module import FreeModule
-
-                from sage_extensions.categories.modules.pure.modules import (
-                    _engine_matrix,
-                )
 
                 target_labels = tuple(self.codomain().module_generating_set())
                 # One row per source generator, one column per ambient generator:
                 # the retained matrix stores the transposed orientation, whose
                 # column ``s`` is the coordinate vector of ``f(e_s)``.
-                A = _engine_matrix(self).transpose()
+                A = coordinate_matrix.transpose()
                 smith, left, right = A.smith_form()
                 rank = int(A.rank())
                 # D = left * A * right.  The primitive closure of the row lattice of A
@@ -1971,11 +2024,6 @@ class ModuleMorphismMethods:
                     for row in basis_rows
                 )
                 return self.codomain().subobject_on(generators)
-            case _:
-                quotient = self.cokernel()
-                projection = quotient.torsion_free_quotient_projection()
-                composite = projection * quotient.presentation_projection()
-                return composite.kernel()
 
     def index(self):
         r"""Return the cardinality of the cokernel."""
@@ -3686,7 +3734,7 @@ class TensorProductModuleMorphismMethods:
             # One reading of the values as scalars, taken at its owner: a value
             # object that is a ring's regular module, or a restriction of
             # scalars from one, has the ring as its scalar ring, and its
-            # identification is that datum, not a second reading (#307, #320).
+            # identification is that datum, not a second reading.
             scalar_identification = _scalar_value_identification(
                 values, left.base_ring()
             )
@@ -4158,10 +4206,9 @@ class ModuleAutomorphismGroup(CoreMor):
         ``basis_change()``), ``B`` is block upper triangular; it is generated
         by the block ``GL(n_i, R)`` (Sage's generators) and the elementary
         automorphisms ``b_k |-> b_k + b_j`` for ``j`` in an earlier block
-        than ``k`` (Levi decomposition ``B = L U``; unverified: no source was
-        opened, recorded in research issue #398, *Generators of parabolic subgroups
-        of GL(M) over a PID*; untrusted computation).  The result is the
-        stabilizer subgroup of the flag under the natural module action,
+        than ``k`` (Levi decomposition ``B = L U``; the generators are unverified,
+        no source for them was opened, so the computation is untrusted).  The result
+        is the stabilizer subgroup of the flag under the natural module action,
         with that generating morphism.
         """
         from sage_extensions.categories.group.predicate_subgroups import StabilizerSubgroups

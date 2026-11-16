@@ -2593,3 +2593,57 @@ and `de9a1d1`.
 | `541r4-modules-subset-repaired.log` | the repair before the last two, kept for the record | the six files that the recursion and the dropped torsion placement broke in a first shape of the fix, after their repair: **6 failed, 30 passed**, every failure one of the base's own |
 | `541r4-lattices-base.log`, `541r4-lattices-repaired.log` | `897e7f7` / `a6e6a31` | the decision's consumers in `tests/lattices`: the two display/transport contract files and the primitivity file pass in both; `test_zero_isotropic_subobjects.sage` fails the same three ids in both. The repaired-tree run was killed inside `test_lattice_elements.sage` at the 260 s inner cap, at load 14 |
 | `541r4-lattice-elements-repaired.log` | `a6e6a31` | `test_lattice_elements.sage` (six tests, all passing) and `test_chosen_target_primitive_embeddings.sage`, which did not finish inside 260 s at load 21 -- the gap the commit body names |
+
+## `#547`: a finite product with a large finite factor, 2026-11-16
+
+`cb05527` is the main the red test is red at.  The two commits were rebased onto
+`2b9d2cf` (`#543`, which landed while they ran) and the fix is `6c9a308` there;
+the directory and consumer rows below are that rebased pair.  Load was not
+recorded for these runs: the probe rows are a shape in the factor's size, and the
+suite rows are compared by their FAILED id sets, not by their seconds.
+
+| log | tree | result |
+| --- | --- | --- |
+| `547-probe.py` | -- | the probe: one product per row, over a factor built through the enumeration it owns, which records every position its map is asked for |
+| `547-probe-base.log` | `cb05527` | the probe without a declared key, which that tree has none of: hashing a fresh factor **14.6 / 57.2 / 226.1 ms**, and placing its product **14.6 / 55.4 / 218.9 ms**, at 2048 / 8192 / 32768 points |
+| `547-probe-fix.log` | `6c9a308` | a declaring factor places its product in **1.03 / 0.21 / 0.21 / 0.24 ms reading 0 points** at 2048 / 8192 / 32768 / 131072 (the 2048 row is the first keyed construction in the process); a non-declaring factor in **13.4 / 52.6 / 208.4 / 891.1 ms reading all of them**; a second declaration of one datum at 32768 points **0.01 ms, 0 points** |
+| `547-red.log` | `cb05527` | the new test file with the test lint loaded: **3 failed in 0.48 s**, each at `FiniteOrderedSets.from_indexed() got an unexpected keyword argument 'key'` |
+| `547-green.log` | `6c9a308` | the same file with the test lint loaded: **3 passed in 0.26 s**, no finding |
+| `547-sets-base.log` | `2b9d2cf` | `tests/sets` as one directory: **24 failed, 162 passed in 7.74 s** |
+| `547-sets-fix.log` | `6c9a308` | the same directory: **24 failed, 165 passed in 8.08 s** -- the three new tests -- with FAILED id sets identical to the base's |
+| `547-consumers-base.log`, `547-consumers-fix.log` | `2b9d2cf`, `6c9a308` | the seven product and coproduct consumers outside `tests/sets` (`objects`, `categories`, `groups`): **20 failed, 31 passed** in 2.65 s and 3.46 s, FAILED id sets identical |
+| `541rev-finding-1-red.log` | `961b68a` | the new contract file on that commit: **3 failed in 4.59 s**, each at the `from_module` torsion guard | 
+| `541rev-forms-base.log` | `9a04b45` | `tests/forms/test_torsion_forms.sage` and `tests/forms/test_discriminant_subgroups.sage`: **8 failed, 12 passed in 4.09 s** | 
+| `541rev-forms-240ce65.log` | `240ce65` | the same two files on the parent of the placement change: **5 failed, 15 passed in 4.51 s**; the three differences are the regression | 
+| `541rev-forms-ctl.log` | `9a04b45` | `tests/forms` as one directory, unchanged: **43 failed, 40 passed, 58 errors in 95.98 s** | 
+| `541rev-forms-fix1.log` | `961b68a` + the finding-1 repair | the same directory: **38 failed, 48 passed, 58 errors in 123.98 s**; the three new tests are among the 48, and the FAILED/ERROR id set differs from the control's by the five regression ids and nothing else | 
+| `541rev-finding-2-red.log` | `ae8becb` | the second contract file on the finding-1 tree: **2 failed in 1.71 s**, each at `TypeError: base_ring (=Real Field) must be a ring or a semiring` | 
+| `541rev-finding-2-green.log` | the repair's commit | the two contract files and the laziness file: **7 passed in 5.44 s** | 
+| `541rev-finding-2-probe.log` | the repair's commit | `_coordinate_images` on a projection of `RR^2` reads `((1, 0), (0, 0))` and `_relation_images(RR^2)` reads `()` -- the two answers the review's probe found at `240ce65` and lost at `2bc5aff` | 
+
+## #521, the session binds its own names, and the dialect reads them
+
+`sage_extensions.all` published six scalar rings and installed the research dialect
+by handing its own `globals()` to two functions. The rings now belong to
+`sage_extensions.rings`, which binds them in its body and declares them in
+`__all__`, and the dialect registers at import and resolves the session's
+vocabulary from the session module by `import *`'s own definition. The base is
+the merge base `2f8c801`, a clean worktree; the repair is the source commit
+`bc56fad`.
+
+The pytest shape differs from this file's header in one way: the run keeps the
+repository's two plugins and the durations,
+`-o addopts= -p qc_sage_session -p sage_extensions.testing.suite_budget -p
+sage_extensions.testing.test_lint -q --no-header --durations=5`, because the change
+is a namespace the test lint also reads.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `issue521-test-red.log` | `dbf2911` | the new test file alone, run in the base worktree (HEAD `2f8c801` with the two new test files in it, which is `dbf2911`'s content): **1 failed, 2 passed in 1.59 s** -- `AssertionError: assert ('AA', 'CDF', 'QQbar', 'RDF') == ()` |
+| `issue521-test-green.log` | `bc56fad` (the two modified paths are this section's own files) | the same file: **3 passed in 2.11 s** |
+| `issue521-test-base.log` | `2f8c801` | `tests/foundations`, `tests/rings`, `test_group_algebras.sage`, `test_coextension_of_scalars.sage`, `test_products_equalizers_and_fibre_products_of_lines.sage`: **54 failed, 161 errors, 153 passed in 245.45 s** |
+| `issue521-test-repair.log` | `bc56fad` | the same selection: **54 failed, 161 errors, 156 passed in 372.51 s**; the 215 FAILED/ERROR ids are the same set test for test, and the three extra passes are the new file.  Same host, different wall times: the runs of this host vary by a third |
+| `issue521-names-base.txt`, `issue521-names-repair.txt` | `2f8c801`, `bc56fad` | the session's public namespace, one name per line: **678 names against 677**, the difference being `ring_constructor_surface`, which the installer's dictionary had leaked into the session |
+| `issue521-session.py`, `issue521-session-base.log`, `issue521-session-repair.log` | both | the sixteen scalar names against the ring package's exports (`identical=True` and `declared=True` for each here; six of them not on the package at all there) and the lowering of `M = Modules[ZZ]`, `R = ZZ[x]`, `T = Modules[k]`, which is the same text in both trees |
+| `issue521-load.py`, `issue521-load-base.log`, `issue521-load-repair.log` | both | the scope a `load` writes into, holding the session's names and polluted with `ZZ` and `Integers`: the session's `ZZ` back, `AA`/`RDF`/`GF` present, the engine spellings gone, and `41 + 1` an owned 42 -- the same lines in both trees |
+| `issue521-cpu.py`, `issue521-cpu-base-1.log`, `issue521-cpu-base-2.log`, `issue521-cpu-repair-1.log`, `issue521-cpu-repair-2.log` | both | CPU seconds to lower 200 assignments, five repetitions each: **0.0942 / 0.0832 s at the base against 0.0884 / 0.0817 s here**, so the per-assignment tree walk both trees run is the same work |

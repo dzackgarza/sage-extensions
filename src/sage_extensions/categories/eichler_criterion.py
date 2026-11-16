@@ -324,7 +324,7 @@ class TwoUEichlerModel(SageObject):
                 isotropic,
                 complement_inclusion(complement.module_generator(label)),
             ),
-            name=lambda lattice=lattice: f"K-direction Eichler transvections in {lattice}",
+            description=lambda lattice=lattice: f"K-direction Eichler transvections in {lattice}",
         )
 
     def approximate_generating_family(self):
@@ -343,7 +343,7 @@ class TwoUEichlerModel(SageObject):
         return finite_indexed_family(
             family.index_set(),
             lambda label: family.value(label).base_change(ring_map),
-            name=lambda ring_map=ring_map: f"Eichler approximate generators over {ring_map.codomain()}",
+            description=lambda ring_map=ring_map: f"Eichler approximate generators over {ring_map.codomain()}",
         )
 
     def covering_vector_representatives(self, square):

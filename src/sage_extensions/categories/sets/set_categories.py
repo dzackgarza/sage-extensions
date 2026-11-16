@@ -421,8 +421,8 @@ class _OrdinalPointAtPosition:
     r"""The point at a position in the finite ordinal ``[n]``.
 
     ``[n]`` retains its enumeration on the parent, and a parent must survive a
-    pickle round trip, so the map is a module-level object rather than a closure
-    (issue #20).  It carries no state: position ``k`` is the point ``k``.
+    pickle round trip, so the map is a module-level object rather than a closure.
+    It carries no state: position ``k`` is the point ``k``.
     """
 
     def __call__(self, position):
@@ -2612,6 +2612,27 @@ class Sets(CategoryPacketMethods, OwnedCategory):
             r"""Return the represented subset of ``self`` cut out by ``predicate``."""
             return Sets().condition_set(self, predicate)
 
+        def empty_subset(self) -> Sets().ObjectType:
+            r"""Return the empty subset \(\emptyset\hookrightarrow X\) of this set.
+
+            The empty subset is the subset of \(X\) cut out by the predicate that
+            holds nowhere: it has \(X\)'s inclusion, it admits no point of \(X\),
+            and the construction decides that it is empty rather than searching
+            \(X\) for a point to keep.
+
+            EXAMPLES::
+
+                sage: from sage_extensions.categories.sets.set_categories import NN
+                sage: empty = NN.empty_subset()
+                sage: empty.is_empty()
+                True
+                sage: empty.inclusion().codomain() == NN
+                True
+                sage: empty.is_parent_of(NN(0))
+                False
+            """
+            return _empty_subset(self)
+
         def image_set(self, map_, *, inverse=None) -> Sets().ObjectType:
             r"""Return the image of ``self`` under ``map_``, with ``inverse`` on the image when one is selected."""
             return Sets().image_set(map_, self, inverse=inverse)
@@ -4251,6 +4272,43 @@ def _condition_set(
     )
 
 
+def _excludes_every_point(point) -> bool:
+    r"""The predicate no point satisfies: the empty subset's own."""
+    return False
+
+
+def _empty_subset(universe: Parent) -> Sets().ObjectType:
+    r"""The empty subset of a set, constructed by the set owner.
+
+    The empty subset is the subset of the set cut out by the predicate that
+    holds nowhere, so it has the set's inclusion and admits no point of it.  A
+    finite enumerated set is filtered, which decides the same subset from its
+    own points; any other set keeps the predicate, and the construction's own
+    statement that it selects nothing decides that the subset is empty and has
+    cardinality zero.
+    """
+    assert universe in Sets(), (
+        f"the empty subset needs a set to be a subset of, but {universe} is not in the "
+        "category of sets"
+    )
+    from sage_extensions.categories.sets.finite_ordered_sets import (
+        _filtered_ordered_set,
+    )
+
+    match universe:
+        case _ if Sets().is_provably_finite(universe) and universe in EnumeratedSets():
+            ordered_subset = _filtered_ordered_set(universe, _excludes_every_point)
+            if ordered_subset is not None:
+                return ordered_subset
+    return _object_of(
+        FiniteSets(),
+        _engine=(FiniteSets(), _ConditionSetEngine, None),
+        universe=universe,
+        predicate=_excludes_every_point,
+        no_points=True,
+    )
+
+
 class _ConditionSetEngine:
     r"""The subset \(\{x\in X : P(x)\}\) of a set \(X\) cut out by a predicate \(P\).
 
@@ -4261,16 +4319,24 @@ class _ConditionSetEngine:
     subset of a finite enumerated set is built there by the ordered filter
     engine when every membership is decided.  Otherwise the finite subset
     retains its predicate without a selected enumeration.
+
+    ``Sets().empty_subset`` is the route for the subset that selects nothing:
+    the datum then states that, and the emptiness and the cardinality are its
+    own decisions.
     """
 
     def __init__(
         self,
         universe: Parent,
         predicate: Callable[[SourcePointT], bool | Predicate],
+        no_points: bool = False,
         **rest,
     ) -> None:
         self._universe = universe
         self._predicate = predicate
+        # A construction that states that it selects nothing hands that fact
+        # here; the predicate and the universe are then asked for no point.
+        self._no_points = no_points
         self._admitted_members = {}
         self._selected_point_computation = None
         super().__init__(facade=True, **rest)
@@ -4385,9 +4451,12 @@ class _ConditionSetEngine:
         point in this subset. Such a point excludes emptiness even if the
         universe is infinite or has no selected enumeration. Failed or
         undecided membership tests retain no member and supply no negative
-        existence conclusion. Other available decisions, including finite
+        existence conclusion. A construction that selects nothing decides
+        emptiness itself. Other available decisions, including finite
         exhaustion, remain with the inherited set operation.
         """
+        if self._no_points:
+            return True
         if self._admitted_members:
             return False
         return super()._emptiness_decision()
@@ -4397,8 +4466,11 @@ class _ConditionSetEngine:
 
         Finite placement by itself supplies no iteration. The literal,
         image and predicate realizations below retain their own finite
-        iteration data even when no enumeration category was selected.
+        iteration data even when no enumeration category was selected, and a
+        construction that selects nothing counts zero.
         """
+        if self._no_points:
+            return cardinal(0)
         universe = self.universe()
         if not Sets().is_provably_finite(universe):
             return super()._cardinality_decision()
@@ -4475,6 +4547,10 @@ class _ConditionSetEngine:
         return self._retain_admitted_member(element)
 
     def __iter__(self):
+        if self._no_points:
+            # The enumeration of the set with no points is empty, and asking
+            # the universe for its own would be a search that keeps nothing.
+            return iter(())
         universe = self.universe()
         # Use an actual supplied iterator. A complete search iterator need
         # not supply the ranking isomorphism required by EnumeratedSets
@@ -4499,6 +4575,8 @@ class _ConditionSetEngine:
                 yield point
 
     def _repr_(self) -> str:
+        if self._no_points:
+            return f"The empty subset of {self.universe()}"
         return f"Subset of {self.universe()} cut out by {self.predicate()}"
 
 
@@ -6338,8 +6416,36 @@ def _finite_family_key(family: IndexedFamily) -> int:
     Equal families have equal index sets, which enumerate in one order, and
     equal factors index by index; every set hashes consistently with its
     equality (the rule of :class:`Sets`), so equal families have one key.
+
+    A factor that declares the datum naming it (``FiniteOrderedSets.from_indexed``)
+    contributes that datum and not its hash
+    (:meth:`FiniteOrderedSets.ParentMethods.declared_key`).  The datum is the
+    factor's own, two declaring factors are equal exactly when their data are, and
+    reading it costs nothing in the factor's points.  Every other factor
+    contributes its hash, which for a finite ordered set is the hash of the tuple
+    of its points, read once and kept.  So a family whose factors all declare their
+    datum is placed by its key without reading a point of any of them, at whatever
+    size; a factor that declares none is keyed as before.
     """
-    return hash((family.index_set(), tuple(hash(factor) for factor in family)))
+    return hash((family.index_set(), tuple(_factor_key(factor) for factor in family)))
+
+
+def _factor_key(factor) -> tuple:
+    r"""The key one factor of a finite family contributes to the family's key.
+
+    A finite ordered set that declares the datum naming it contributes that datum;
+    every other set contributes its hash.  The tag keeps the two apart, so a
+    declared datum is never read as a hash of some other set's points, and the
+    declared datum is itself hashed because the store that holds the families is a
+    dictionary.
+    """
+    from sage_extensions.categories.sets.finite_ordered_sets import FiniteOrderedSets
+
+    if factor in FiniteOrderedSets():
+        declared = factor.declared_key()
+        if declared is not None:
+            return ("declared", declared)
+    return ("hashed", hash(factor))
 
 
 def _equal_interned_family(
@@ -7113,7 +7219,14 @@ class PartiallyOrderedSetMorphism:
 
         return negation(self == other)
 
-    __hash__ = None
+    def __hash__(self) -> int:
+        r"""Hash the underlying set map, which is what equality compares.
+
+        Two such morphisms of one set of morphisms are equal exactly when their
+        underlying set maps are, and a set map's own hash reads its values on
+        its domain, so equal morphisms hash alike.
+        """
+        return hash((id(self.parent()), self.underlying_set_morphism()))
 
     def is_identity(self):
         if self.domain() is not self.codomain():

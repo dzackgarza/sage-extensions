@@ -224,29 +224,18 @@ class IsotropicReductionLiftTorsors(OwnedCategoryOverBaseRing):
 
             for the section ``s`` of ``r`` selected by the cokernel.
 
-            **What is constructed, and what is not.**  ``r`` is a cokernel
-            projection, hence onto, and ``phi`` is a bijection onto ``T``, so
-            ``r^{-1}(C)`` being ``{ s(c) + k }`` and ``T_Z`` being its
-            ``phi``-image are one statement: ``T_Z`` *is* the subset of ``T`` of
-            the lifts whose parameter class lies in ``C``, and that subset is
-            what is constructed here, cut out by ``lift |-> r(phi^{-1}(lift)) in
-            C``.  The pair decomposition is read as pairs, in either direction,
-            and is not needed to name the subset.
-
-            Presenting it as the image of the product ``C x ker(r)`` instead
-            makes a construction that asks nothing into one that walks ``C``: a
-            product of a finite index set is interned under its factors' hashes
-            (``SET-05``, ``set_categories._finite_family_key``), and the hash of
-            a finite set is the hash of its tuple of points, so the product's
-            key enumerates the whole residue locus.  A locus is also a subset of
-            the set it lies in -- facts its inclusion states and the image of a
-            product cannot -- and :meth:`integral_lift_locus` is read through
-            that inclusion.
+            **What is constructed.**  ``r`` is a cokernel projection, hence
+            onto, and ``phi`` is a bijection onto ``T``, so ``T_Z`` is the
+            subset of ``T`` of the lifts whose parameter lies in ``P`` with its
+            class in ``C``, cut out by ``lift |-> r(phi^{-1}(lift)) in C``.  A
+            parameter outside ``P`` is a point of ``T`` that no class of
+            ``P/mP`` names, and the predicate answers ``False`` for it.
 
             ``T_Z`` is empty exactly when ``C`` is, since ``r`` is onto and
-            ``phi`` bijective, and that is decided here rather than by an
-            enumeration; ``C`` nonempty then supplies one admitted point, which
-            is what decides that the subset is not empty without listing it.
+            ``phi`` bijective, so emptiness is decided from ``C``.  ``C`` empty
+            gives the empty subset of ``T`` (``Sets().empty_subset``); ``C``
+            nonempty supplies one admitted point, which decides that the subset
+            is not empty without listing it.
             """
             target = self.target_reduction().isotropic_embedding().codomain()
             integral_kernel = self.acting_group().predicate_subgroup(
@@ -260,17 +249,22 @@ class IsotropicReductionLiftTorsors(OwnedCategoryOverBaseRing):
             coordinates = parameterization.inverse()
 
             def parameter_of(lift):
-                return lattice_inclusion.lift(lattice_inclusion.codomain().wrap(coordinates(lift)))
+                return lattice_inclusion.codomain().wrap(coordinates(lift))
 
             def in_residue(locus_lift):
-                r"""Whether this lift's parameter class is one of ``C``'s."""
-                return residue(parameter_of(locus_lift)) in classes
+                r"""Whether this lift's parameter lies in ``P`` with class one of ``C``'s.
+
+                ``T`` is the ``phi``-image of the whole parameter space, so a
+                lift whose parameter lies outside ``P`` is a point of ``T`` that
+                no class of ``P/mP`` names: membership answers ``False`` for it.
+                """
+                parameter = parameter_of(locus_lift)
+                if lattice_inclusion.is_in_image(parameter) is False:
+                    return False
+                return residue(lattice_inclusion.lift(parameter)) in classes
 
             if classes.is_empty() is True:
-                # T_Z = phi(r^{-1}(C)) is empty here, and an empty subset cut out
-                # by a predicate decides nothing about itself: the empty set is
-                # the presentation that decides its own emptiness.
-                return integral_kernel, finite_ordered_set(())
+                return integral_kernel, self.empty_subset()
             locus = self.condition_set(in_residue)
             # One admitted point decides that the subset is not empty.  Its
             # parameter class lies in C by construction, so the lift costs one
@@ -687,9 +681,7 @@ class IsotropicReductionLiftTorsors(OwnedCategoryOverBaseRing):
 
             The locus is presented as the image of the passing representatives and the
             kernel under the coset addition, with the inverse naming both components of
-            the pair, so the union itself is never listed as one set: on ``T_Co`` it has
-            131072 classes and it is built once per candidate the port tests, so listing it
-            was the row's own cost.
+            the pair, so the union is never listed as one set.
             """
             passing, kernel, _parameters = self._integral_parameter_cosets()
             classes_module = self.integral_parameter_quotient().codomain()

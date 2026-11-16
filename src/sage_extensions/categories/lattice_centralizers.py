@@ -394,7 +394,7 @@ def finite_subgroup_normalizer(lattice, generators):
     r"""Return all elements of ``N_{O(L)}(H)`` and ``C_{O(L)}(H)`` for definite ``L``."""
     assert lattice.is_definite(), (
         f"{lattice} is indefinite: its normalizers need the full centralizer of a "
-        f"noncyclic finite subgroup (port #50, #54)"
+        f"noncyclic finite subgroup"
     )
     generators = tuple(generators)
     one = lattice.O().one()
@@ -478,7 +478,7 @@ class CyclotomicDecomposition(SageObject):
         self._summands = finite_indexed_family(
             self._divisors,
             lambda divisor: isometry.cyclotomic_summand(int(divisor)),
-            name=lambda isometry=isometry: f"Cyclotomic summands of {isometry}",
+            description=lambda isometry=isometry: f"Cyclotomic summands of {isometry}",
         )
         nonzero = tuple(divisor for divisor in self._divisors if int(self._summands[divisor].module_rank()) != 0)
         if not nonzero:
@@ -566,7 +566,7 @@ class CyclotomicDecomposition(SageObject):
         return finite_indexed_family(
             self.nonzero_divisors(),
             lambda divisor: _restrict_isometry(self.isometry(), self.summand(divisor)),
-            name=lambda self=self: f"Cyclotomic restrictions of {self.isometry()}",
+            description=lambda self=self: f"Cyclotomic restrictions of {self.isometry()}",
         )
 
     @cached_method
@@ -576,7 +576,7 @@ class CyclotomicDecomposition(SageObject):
         return finite_indexed_family(
             self.nonzero_divisors(),
             lambda divisor: self.summand(divisor).O().centralizer(restrictions[divisor]),
-            name=lambda self=self: f"Cyclotomic component centralizers of {self.isometry()}",
+            description=lambda self=self: f"Cyclotomic component centralizers of {self.isometry()}",
         )
 
     def centralizer_group(self):
@@ -621,7 +621,7 @@ class CyclotomicDecomposition(SageObject):
         return finite_indexed_family(
             self.nonzero_divisors(),
             restrict,
-            name=lambda self=self: f"Cyclotomic restrictions of an element of {self.centralizer_group()}",
+            description=lambda self=self: f"Cyclotomic restrictions of an element of {self.centralizer_group()}",
         )
 
     def _component_tuple(self, component_isometries):
@@ -691,7 +691,7 @@ class CyclotomicDecomposition(SageObject):
             return summand.O().one()
         assert summand.is_definite(), (
             f"the twisted transporter on the summand of {divisor} needs the semilinear "
-            f"unitary isometries of an indefinite Hermitian lattice (port #51)"
+            f"unitary isometries of an indefinite Hermitian lattice"
         )
         for candidate in summand.O():
             if candidate * restriction == target * candidate:
@@ -1767,8 +1767,8 @@ def _arithmetic_centralizer_group_generators(centralizer):
     - ``f`` of infinite order: the commutant algebra of ``f``, through
       :class:`~sage_extensions.algebras.isometry_commutant.IsometryCommutant`.
     - One summand with ``d > 2`` of larger hermitian rank in an indefinite
-      ``L``: no route computes generators of its unitary group (port #18,
-      2026-10-15).  That frontier asserts.
+      ``L``: no route computes generators of its unitary group.  That frontier
+      asserts.
     """
     from sage.rings.infinity import Infinity
 
@@ -1824,7 +1824,7 @@ def _arithmetic_centralizer_group_generators(centralizer):
                 f"the centralizer of {isometry} in {group} is the unitary group of {lattice} "
                 f"as a hermitian lattice over ZZ[zeta_{divisor}], on which {isometry} acts "
                 f"by zeta_{divisor}; {lattice} is indefinite, and no route computes generators "
-                f"of that unitary group (port #18, 2026-10-15)"
+                f"of that unitary group"
             )
     return finite_ordered_set(tuple(centralizer(generator) for generator in generators))
 

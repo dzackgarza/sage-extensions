@@ -608,7 +608,15 @@ class _CartierSectionClass:
         decision = self.parent().equal(self, other)
         return decision if op == op_EQ else negation(decision)
 
-    __hash__ = None
+    def __hash__(self) -> int:
+        r"""Hash the sections of one Cartier divisor group alike.
+
+        Equality here is decided in the group: ``D + E = E + D``, and a section
+        presented by local equations on an atlas may be zero.  No datum of one
+        presentation is invariant under that decision, so the group is what a
+        hash reads, which is the rule of :class:`Sets`.
+        """
+        return hash(id(self.parent()))
 
     def _repr_(self):
         match self._kind:

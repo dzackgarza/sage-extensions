@@ -531,7 +531,7 @@ class IsotropicFlag:
 
 
 class RationalIsotropicFlagComplex:
-    r"""The quotient by a group ``G <= O(L)`` of the flags of rational isotropic subspaces (#45).
+    r"""The quotient by a group ``G <= O(L)`` of the flags of rational isotropic subspaces.
 
     A simplex orbit is a flag orbit of a :class:`FlagType`. Faces forget a
     term of the chosen representative and are transported, with an actual
@@ -582,7 +582,7 @@ class RationalIsotropicFlagComplex:
 
 
 def _isotropic_orbit_iterator(group, lattice, rank, height_bound):
-    r"""Duplicate-free first members of the ``group``-orbits (#62); an unbounded walk certifies no completion."""
+    r"""Duplicate-free first members of the ``group``-orbits; an unbounded walk certifies no completion."""
     from sage_indefinite_port.indefinite.orbit_iterators import (
         canonical_orbit_representatives,
         primitive_isotropic_hermite_subobjects,
@@ -1910,7 +1910,7 @@ class _DividedClassPlaneOrbitDecomposition:
           to be the whole of it (:meth:`_establish_by_plane_parabolic`).  That
           closure does not need the lattice to be ``N``: the block equations of
           the parabolic are solved over ``ZZ`` at any primitive isotropic plane,
-          whether or not the plane splits off the lattice (#331, #366), and
+          whether or not the plane splits off the lattice, and
           ``is_parabolic_complete()`` decides on computed indices whether the
           solution is all of the stabilizer.  It also does not need the two
           indices to agree, because with ``\rho(G_x)`` in hand the orbits are
@@ -2071,7 +2071,7 @@ class _DividedClassPlaneOrbitDecomposition:
         the statement that they are *all* of ``P_x``, and
         :meth:`...PrimitiveIsotropicSubobjects.ParentMethods.is_parabolic_complete`
         decides that on three computed indices (the radical's, the plane
-        actions' and the quotient actions' -- #331, #366).
+        actions' and the quotient actions').
 
         A family so established generates ``G_x``, so its discriminant image is
         ``\rho(G_x)`` itself and the orbits are the double cosets of
@@ -2081,8 +2081,7 @@ class _DividedClassPlaneOrbitDecomposition:
         order-`4` isotropic subgroup has order `1981808640` and the plane's own
         stabilizer maps onto a subgroup of index `8` in it, while the plane's
         divided class set is a single `\rho(O(L))`-orbit of `23715` points, so
-        the class-set count would be short by a factor `8` at every class
-        (research #645's `thm:plane-fibre`).
+        the class-set count would be short by a factor `8` at every class.
 
         When the family is not established to be all of ``P_x``, the refusal
         names the plane and the missing factor
@@ -2299,7 +2298,7 @@ def _divided_class_isotropic_plane_orbits(subgroup, representatives, stabilizer_
 
 
 class CuspLayerEnumeration(SageObject):
-    r"""One layer of the cusp chamber walk, enumerated both ways (#400).
+    r"""One layer of the cusp chamber walk, enumerated both ways.
 
     The layer is a pair (offset, square) of Vinberg's decomposition of the
     lattice over ``v_0^\perp`` and ``\mathbf Z v_0`` (E. B. Vinberg, *On the
@@ -2308,7 +2307,7 @@ class CuspLayerEnumeration(SageObject):
     vectors ``offset + v_1`` with ``v_1`` in ``v_0^\perp`` and the layer's
     square.  The record carries those candidates twice — as the walk's own
     enumeration returns them, written in the coordinates of the cell at the
-    controlling vector (#400), and as the engine's whole-lattice
+    controlling vector, and as the engine's whole-lattice
     enumeration of the same Diophantine equation returns them — as elements
     of the reduction, together with the layer's offset, the normals of that
     cell, and the adjugate duals of those normals.
@@ -2448,7 +2447,7 @@ class IsotropicVectorReductionImage(SageObject):
     answered by sifting one stabilizer chain of \(\rho(\Gamma)\) acting on
     \(A_L\) (:meth:`discriminant_image_membership`), never by listing its
     elements: at Sterk's five Enriques cusps that image has order ``696729600``,
-    and the chamber (#297) asks the question once per candidate root.
+    and the chamber asks the question once per candidate root.
 
     For a line the kernel of the setwise quotient action is \(F^+(1)\cup F^-(1)\),
     and \(K_v\) is \(F^+(1)\), the fibre that fixes \(v\): the integral
@@ -2473,7 +2472,7 @@ class IsotropicVectorReductionImage(SageObject):
 
     **Generators.**  :meth:`reflection_generators` decides, for a supplied family
     of roots of \(L\) lying in \(v^\perp\), which of their reflections lie in
-    \(G_v\); that family is what the chamber computation of #297 consumes.
+    \(G_v\); that family is what the chamber computation consumes.
     :meth:`generators` returns the images of the parabolic's own generators that
     lie in \(\Gamma\) — a subgroup of \(G_v\) — and
     :meth:`generators_are_certified_complete` says whether it is known to be all
@@ -2681,7 +2680,7 @@ class IsotropicVectorReductionImage(SageObject):
 
         The criterion of :meth:`contains` is a membership question in
         ``\rho(\Gamma)``, an element of ``O(A_L)``, and it is asked once per
-        candidate root by the chamber of #297 -- thousands of times per call.  The
+        candidate root by the chamber -- thousands of times per call.  The
         decision is therefore one stabilizer chain of ``\rho(\Gamma)`` acting on
         the discriminant group, built once and reused, with every question
         answered by sifting (A. Seress, *Permutation Group Algorithms*,
@@ -2790,7 +2789,7 @@ class IsotropicVectorReductionImage(SageObject):
         decided in ``O(A_L)`` by one sift of the chain of ``\rho(\Gamma)``
         (:meth:`discriminant_image_membership`).  The isometry is *the lift*, so
         the Levi evaluation ``\lambda(g)`` that a question about an isometry of
-        ``N`` needs is not computed here at all: the chamber (#297) asks about
+        ``N`` needs is not computed here at all: the chamber asks about
         every candidate root, and the lift's discriminant image is the only thing
         its answer depends on.
 
@@ -2823,7 +2822,7 @@ class IsotropicVectorReductionImage(SageObject):
         :meth:`reduction_image`.
 
         This is the root filter that :meth:`cusp_chamber` hands to Vinberg's
-        algorithm (#285).
+        algorithm.
         """
         lift = self.class_lift(root)
         reflection = self._lattice.reflection(lift)
@@ -2840,7 +2839,7 @@ class IsotropicVectorReductionImage(SageObject):
         max_roots=None,
         max_decompositions=None,
     ):
-        r"""Return the chamber of the reflection part of ``G_v`` on ``N`` (#285).
+        r"""Return the chamber of the reflection part of ``G_v`` on ``N``.
 
         Vinberg's algorithm on the hyperbolic reduction ``N = v^\perp/\mathbf Z v``
         with the root filter :meth:`admits_root`: a root of ``N`` is a wall of the
@@ -2940,7 +2939,7 @@ class IsotropicVectorReductionImage(SageObject):
         )
 
     def cusp_layer_enumerations(self, controlling_vector=None, *, layers):
-        r"""Return the first layers of the cusp chamber walk, each enumerated both ways (#400).
+        r"""Return the first layers of the cusp chamber walk, each enumerated both ways.
 
         The walk of :meth:`cusp_chamber` enumerates every layer of roots in
         the coordinates of the cell at the controlling vector — the normals,
@@ -2949,7 +2948,7 @@ class IsotropicVectorReductionImage(SageObject):
         an integer bounded on both sides by the layer's norm equation (E. B.
         Vinberg, *On the groups of unit elements of certain quadratic
         forms*, Math. USSR Sb. 16 (1972), §4.1, the equation (57) with the
-        conditions (58), p. 30; #400).  That enumeration is correct when the
+        conditions (58), p. 30).  That enumeration is correct when the
         candidates it returns are exactly the layer's whole-lattice
         solutions that lie in the cell, and this method exposes both sides
         of that statement for a caller to compare: it returns
@@ -3174,8 +3173,7 @@ class IsotropicVectorReductionImage(SageObject):
         which is decided on the discriminant image, since ``\Gamma`` is the
         preimage of its own.  That family is stated for a primitive isotropic
         *plane* and refuses rank one, so at a line this method raises with the
-        owner's refusal; :meth:`reflection_generators` is the line's generator
-        source (#312).
+        owner's refusal; :meth:`reflection_generators` is the line's generator source.
         """
         rho = self._discriminant_representation()
         subgroup_image = self._subgroup_discriminant_image()
@@ -3211,7 +3209,7 @@ class IsotropicVectorReductionImage(SageObject):
         member of the family, whether that reflection of ``N`` lies in ``G_v``,
         by the criterion of :meth:`contains` (:meth:`contains_root_reflection`).
         The result is ``(root, reflection of N)`` pairs, one per member in the
-        group; the reflections are what the chamber computation of #297 consumes.
+        group; the reflections are what the chamber computation consumes.
         """
         return tuple(
             (root, self.reduction_image(reflection))
@@ -3311,7 +3309,7 @@ class IsotropicVectorReductionImage(SageObject):
 
         They are *not* certified to generate \(G_v\):
         :meth:`generators_are_certified_complete` is ``False`` at a primitive
-        isotropic line (sage-extensions#312), so a component is an
+        isotropic line, so a component is an
         **identification** --- a class carried to another one by an exhibited
         element of \(G_v\) is \(\Gamma\)-equivalent to it --- while a component of
         one class is *not* a proof of inequivalence.  Two classes are known to lie
@@ -3423,7 +3421,7 @@ class IsotropicVectorReductionImage(SageObject):
         primitive isotropic plane and refuses rank one
         (``parabolic_stabilizer_generators``), and the exact generators of the
         line's parabolic are the port's line stabilizer, which at Sterk's first
-        cusp of ``T_{\mathrm{En}}`` does not return within 540 s (#312).  So
+        cusp of ``T_{\mathrm{En}}`` does not return within 540 s.  So
         :meth:`generators` is empty at a line and :meth:`reflection_generators` is
         its generator source, while :meth:`contains` decides membership in all of
         ``G_v`` regardless of whether any generating family is known.
@@ -3434,12 +3432,12 @@ class IsotropicVectorReductionImage(SageObject):
                 f"parabolic_stabilizer_generators is stated for a primitive isotropic plane and refuses "
                 f"rank one, and the port's line stabilizer generators do not return in 540 s at Sterk's "
                 f"first Enriques cusp; the reflection subgroup of G_v is available through "
-                f"reflection_generators, and the chamber of its reflection part is what #297 supplies"
+                f"reflection_generators, and the chamber of its reflection part is what cusp_chamber supplies"
             )
         if not self._line.is_parabolic_complete():
             return (
                 f"the parabolic at {self._vector!r} does not split off as an orthogonal summand of "
-                f"{self._lattice}, so its constructed generators are only a subgroup of it (#331, #297)"
+                f"{self._lattice}, so its constructed generators are only a subgroup of it"
             )
         return (
             f"the members of the parabolic's generating family at {self._vector!r} that lie in "

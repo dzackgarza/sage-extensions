@@ -1728,7 +1728,7 @@ class LocalizationRings(OwnedCategory):
             # and not a coercion of the whole value into the source.  Without
             # this split the value reaches the source as a numerator and the
             # source's own conversion refuses it with a message that names a
-            # coercion to an integer (#347).
+            # coercion to an integer.
             if isinstance(value, Fraction):
                 return self.fraction(value.numerator, value.denominator)
             # An element of a fraction field denotes the fraction of its own
@@ -4358,11 +4358,20 @@ class OwnedRings(CategoryPacketMethods, OwnedCategory):
     class ParentMethods:
         r"""A ring's points are not a sequence, so the general ring states no ``__iter__``.
 
-        A ring states an enumeration of its points only where its points are a
-        finite set, which is :class:`OwnedRings.Finite`; an iterator need not be
-        finite, and $\mathbf{Z}$, $\mathbf{Z}[x]$ and $\mathbf{Q}(i)$ are
-        countable, so the general ring has no enumeration to offer and states
-        none rather than refusing one.
+        A ring states an enumeration of its points where something enumerates
+        them, and the general ring states none because it has nothing to
+        enumerate them with: a ring whose points are a finite set enumerates
+        them through the engine that realizes it (:class:`OwnedRings.Finite`),
+        and a ring that is a finitely generated framed free module over its
+        base ring enumerates them through that framing's coordinates
+        (:class:`FramedFreeModules.FinitelyGenerated`), where each point is the
+        linear combination of the framing's basis that its coordinates name.
+
+        $\mathbf{Z}[x]$ is neither -- its monomial framing has no finite
+        basis -- so no level supplies it an enumeration and the absence below
+        answers.  It is not a claim about cardinality: $\mathbf{Z}$,
+        $\mathbf{Z}[x]$ and $\mathbf{Q}(i)$ are countable, and an iterator need
+        not be finite.
 
         ``__iter__ = None`` states that in the language rather than in a method
         of ours.  ``__getitem__`` is the adjunction syntax
@@ -4373,7 +4382,10 @@ class OwnedRings(CategoryPacketMethods, OwnedCategory):
         special method to ``None`` states that the operation is not available:
         ``iter()`` then raises ``TypeError`` without falling back to
         ``__getitem__`` (Python Language Reference, Data Model, §3.3, "Special
-        method names", on setting a special method to ``None``).
+        method names", on setting a special method to ``None``).  A stated
+        absence is the least a level says about a name, so it does not shadow
+        an enumeration a level of the same ring supplies
+        (``refine._final_category_operations``).
         """
 
         __iter__ = None
@@ -5126,7 +5138,7 @@ class OwnedOrderedRings(OwnedCategory):
             rather than on one realization's element base: every owned ordered ring's
             element class inherits them, which is what makes $\mathbb Q$'s fractions
             comparable at all -- the localization realization does not derive from the
-            integer realization whose element class used to carry them (#307).  The
+            integer realization, so it inherits no element base to carry them.  The
             value is decided by the retained engine of the parent, the same crossing the
             arithmetic uses, never by a second order written here.
             """
@@ -5506,7 +5518,7 @@ class OwnedFactorization(SageObject):
         self._factors = owned_sets.finite_indexed_family(
             indices,
             multiplicities.__getitem__,
-            name=lambda parent=parent: f"Factor multiplicities in {parent}",
+            description=lambda parent=parent: f"Factor multiplicities in {parent}",
         )
 
     def parent_ring(self):
@@ -6117,7 +6129,7 @@ class _OwnedRingElement(RingElement):
         return owned_sets.finite_indexed_family(
             indices,
             multiplicities.__getitem__,
-            name=lambda self=self: f"Roots of {self}",
+            description=lambda self=self: f"Roots of {self}",
         )
 
     def discriminant(self):
@@ -6266,7 +6278,7 @@ class _NativeRingProduct:
 
     A ring parent retains this callable as part of its algebra datum, so it is a
     module-level object rather than a closure: a parent must survive a pickle
-    round trip, and a local lambda on it cannot (issue #20).  It carries no
+    round trip, and a local lambda on it cannot.  It carries no
     state, so it pickles by reference and the datum it supplies is the native
     product ``left * right`` unchanged.
     """
@@ -6288,7 +6300,7 @@ def _rebuild_owned_ring_parent(cls):
     and installs the ``__dict__`` the constructor produced.  A parent built from
     an engine does not use this -- it rebuilds through :func:`_own_ring`, which
     returns the same owned parent -- but a parent whose construction this method
-    cannot yet name keeps the state-based route (issue #20).
+    cannot yet name keeps the state-based route.
     """
 
     return cls.__new__(cls)
@@ -6312,7 +6324,7 @@ class _OwnedRingParent(Parent):
         ``_preamble_algebra_unit``, ``_selected_data_registry``,
         ``fraction_field_localization`` and ``nonzero_multiplicative_submonoid``,
         and unpickling any of those needs a parent whose constructor has already
-        run (issue #20).  So this names the one adapter that builds this parent
+        run.  So this names the one adapter that builds this parent
         from its engine, whose single cached entry returns *this* parent when the
         engine is the one it was built from: the round-tripped object is the same
         owned parent, which is the acceptance's requirement.

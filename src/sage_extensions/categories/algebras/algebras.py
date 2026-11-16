@@ -2355,7 +2355,24 @@ class Algebras(OwnedCategoryOverBaseRing):
                     premises=(inclusion,),
                 )
             )
-            return center, Algebras(ring).Mor(center, self)(linear_inclusion)
+            # `_center_algebra` defines the centre's multiplication as the
+            # ambient product read back along `inclusion`, and its unit as
+            # `inclusion.lift(1)`, so that module inclusion is multiplicative
+            # and unit preserving by construction.  Those are the premises the
+            # arrow carries; a whole module arrow is not itself an arrow of an
+            # algebra Mor (CON-17), so the map enters at the algebra arrow type.
+            unital = Algebras(ring).Associative().Unital()
+            match (center in unital, self in unital):
+                case (True, True):
+                    arrows = unital.Mor(center, self)
+                    return center, arrows.element_class(
+                        arrows,
+                        linear_inclusion,
+                        _construction_premises=((inclusion,), (True, True)),
+                    )
+                case _:
+                    arrows = Algebras(ring).Mor(center, self)
+                    return center, arrows.element_class(arrows, linear_inclusion)
 
         def _quotient_by_algebra_elements(self, elements):
             r"""Return the quotient by the generated algebra ideal and its map.

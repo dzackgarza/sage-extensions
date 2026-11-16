@@ -6,6 +6,7 @@ from collections.abc import Callable, Iterator, Mapping
 from itertools import islice
 from typing import TYPE_CHECKING, Any
 
+from sage.misc.cachefunc import cached_method
 from sage.structure.parent import Parent
 
 from sage_extensions.categories.abstract_categories.objects import Objects
@@ -33,9 +34,15 @@ class IndexedFamily[IndexT, ValueT]:
         value: Callable[[IndexT], ValueT] | Parent,
         *,
         value_category=None,
-        name: str | Callable[[], str] | None = None,
+        name: str | None = None,
+        description: Callable[[], str] | None = None,
         **rest,
     ) -> None:
+        if name is not None and description is not None:
+            raise ValueError(
+                f"the family on {index_set} is given both the name {name!r} and a description "
+                f"function: a family is named or described, and one of the two would be lost"
+            )
         self._constant_value = value if isinstance(value, Parent) else None
         if isinstance(value, Parent):
             selected = value
@@ -52,6 +59,7 @@ class IndexedFamily[IndexT, ValueT]:
         self._unhashable_value_cache: list[tuple[IndexT, ValueT]] = []
         self._cached_hashable_values: list[tuple[IndexT, ValueT]] = []
         self._name = name
+        self._description_function = description
         self._diagram = None
         self._value_category = value_category
         super().__init__(**rest)
@@ -276,7 +284,8 @@ class IndexedFamily[IndexT, ValueT]:
         self,
         function: Callable[[ValueT], MappedValueT],
         *,
-        name: str | Callable[[], str] | None = None,
+        name: str | None = None,
+        description: Callable[[], str] | None = None,
     ) -> IndexedFamily[IndexT, MappedValueT]:
         if not callable(function):
             raise TypeError(f"cannot map {function!r} over the family {self}: it is not callable")
@@ -292,7 +301,9 @@ class IndexedFamily[IndexT, ValueT]:
             # rejecting a legitimate restriction would lose its arrow data.
             if diagram.codomain() is not function.domain() and diagram.codomain().is_subcategory(function.domain()):
                 diagram = diagram.then(diagram.codomain().inclusion_into(function.domain()))
-            return indexed_family(self.index_set(), diagram.then(function), name=name)
+            return indexed_family(
+                self.index_set(), diagram.then(function), name=name, description=description
+            )
         constant = self.constant_value()
         if constant is not None:
             mapped = function(constant)
@@ -301,16 +312,19 @@ class IndexedFamily[IndexT, ValueT]:
                 # family. Preserve this defining datum even for an infinite
                 # index set: replacing it by a callback would erase the
                 # constant-family evidence used by categorical products.
-                return indexed_family(self.index_set(), mapped, name=name)
+                return indexed_family(self.index_set(), mapped, name=name, description=description)
             # The map is already evaluated on the unique value of this
             # family. Retain that same result even when it is not a parent;
             # an opaque per-index callback would rerun the computation and
             # could assign different objects to identical input values.
-            return indexed_family(self.index_set(), lambda _index: mapped, name=name)
+            return indexed_family(
+                self.index_set(), lambda _index: mapped, name=name, description=description
+            )
         return indexed_family(
             self.index_set(),
             lambda index: function(self.value(index)),
             name=name,
+            description=description,
         )
 
     def __eq__(self, other: Any) -> bool | Predicate:
@@ -370,9 +384,9 @@ class IndexedFamily[IndexT, ValueT]:
 
         No consumer here keys on this hash.  The finite constructions of
         ``Sets().product`` and ``Sets().coproduct`` are interned under the index
-        set and the hashes of the factors, which are sets and hash
-        (``set_categories._finite_family_key``), and compare the families of one
-        key by ``==``; this hash is what extensional equality owes Python's
+        set and, per factor, the datum that factor declares for itself or else its
+        hash (``set_categories._finite_family_key``), and compare the families of
+        one key by ``==``; this hash is what extensional equality owes Python's
         containers.
         """
         from sage_extensions.categories.sets.set_categories import EnumeratedSets
@@ -384,6 +398,23 @@ class IndexedFamily[IndexT, ValueT]:
         # others.
         return hash((IndexedFamily, int(self.cardinality().finite_value())))
 
+    @cached_method
+    def description(self):
+        r"""What this family was named or described with, rendered on the first read and kept.
+
+        A family is given a name, or a description of the source it is carved out
+        of -- the lattice its values live in, the group its indices are cosets of
+        -- and a construction that states both is refused: one of the two would be
+        lost.  Rendering the description is the reader's act: the family asks it
+        here, and not at construction, so building a family computes no display.
+        Neither answer changes while the family exists, so a second reader asks
+        nothing.
+        """
+        described = self._description_function
+        if described is not None:
+            return described()
+        return self._name
+
     def _repr_(self):
         from sage_extensions.categories.sets.set_categories import (
             EnumeratedSets,
@@ -391,8 +422,8 @@ class IndexedFamily[IndexT, ValueT]:
         )
 
         index_set = self.index_set()
-        name = self._name() if callable(self._name) else self._name
-        label = name or "Indexed family"
+        described = self.description()
+        label = described or "Indexed family"
         if index_set in FiniteSets() and index_set in EnumeratedSets():
             size = int(index_set.cardinality().finite_value())
             shown = tuple(index_set) if size <= 12 else tuple(islice(index_set, 6))
@@ -401,7 +432,7 @@ class IndexedFamily[IndexT, ValueT]:
             )
             suffix = "" if size <= 12 else ", ..."
             data = f"[{entries}{suffix}]"
-            prefix = f"{label}: " if name else ""
+            prefix = f"{described}: " if described else ""
             count = "" if size <= 12 else f" ({size} entries)"
             return f"{prefix}{data}{count}"
 
@@ -413,7 +444,8 @@ def indexed_family[IndexT, ValueT](
     value: Callable[[IndexT], ValueT] | Parent,
     *,
     value_category=None,
-    name: str | Callable[[], str] | None = None,
+    name: str | None = None,
+    description: Callable[[], str] | None = None,
 ) -> IndexedFamily[IndexT, ValueT]:
     r"""Return the family ``index |-> value(index)`` as an owned mathematical object.
 
@@ -456,6 +488,7 @@ def indexed_family[IndexT, ValueT](
         value=value,
         value_category=value_category,
         name=name,
+        description=description,
     )
     if value_category is not None:
         from sage_extensions.categories.abstract_categories.cat import Cat
@@ -504,7 +537,8 @@ def finite_indexed_family_from_values(
     index_set,
     values,
     *,
-    name: str | Callable[[], str] | None = None,
+    name: str | None = None,
+    description: Callable[[], str] | None = None,
 ) -> IndexedFamily:
     r"""Read finite literal data as an indexed family, preserving its labels.
 
@@ -553,7 +587,7 @@ def finite_indexed_family_from_values(
                             f"as a family on {index_set} without an index map"
                         )
                     labels = index_set
-            family = indexed_family(labels, values.value, name=name)
+            family = indexed_family(labels, values.value, name=name, description=description)
             supplied_size = int(supplied_cardinality.finite_value())
         case Mapping():
             match index_set:
@@ -574,7 +608,7 @@ def finite_indexed_family_from_values(
                             "equal cardinalities alone do not define a family on that index set"
                         )
                     labels = index_set
-            family = indexed_family(labels, values.__getitem__, name=name)
+            family = indexed_family(labels, values.__getitem__, name=name, description=description)
             supplied_size = len(values)
         case _:
             if index_set is not None:
@@ -594,6 +628,7 @@ def finite_indexed_family_from_values(
                 labels,
                 lambda label: entries[int(labels.ranking_map()(label))],
                 name=name,
+                description=description,
             )
             supplied_size = len(entries)
 

@@ -1,0 +1,224 @@
+tree SHA: ae8becbcc6a4f0aa8453e04535eac7159df56f54 (modified paths: 2)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 31.00 28.27 20.47 15/709 2695523
+files: tests/modules/test_an_inexact_engine_field_has_coordinate_images.sage
+inner 540 s, outer 600 s, guard 6144 MiB
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+time gates OFF (--no-time-gates): star import 0.47 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: asyncio-1.5.0, xdist-3.8.0, reportlog-1.0.0, platformdirs-4.13.5, hypothesis-6.170.15, anyio-4.15.1, timeout-2.4.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 2 items
+
+tests/modules/test_an_inexact_engine_field_has_coordinate_images.sage FF [100%]
+
+=================================== FAILURES ===================================
+_______ test_the_images_of_a_real_endomorphism_are_read_in_its_own_frame _______
+
+    def test_the_images_of_a_real_endomorphism_are_read_in_its_own_frame() -> None:
+        r"""$e_0 \mapsto e_0$, $e_1 \mapsto 0$ over the owned real field."""
+        V = RR**2
+        first, _second = tuple(V.module_generators())
+        projection = V.Mor(V)({0: first, 1: V.zero()})
+    
+>       assert coordinate_images_of(projection) == ((RR(1), RR(0)), (RR(0), RR(0)))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/modules/test_an_inexact_engine_field_has_coordinate_images.sage:19: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/modules/conftest.py:57: in coordinate_images_of
+    return _coordinate_images(morphism)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/pure/modules.py:7972: in _coordinate_images
+    for column in _engine_matrix(morphism).columns()
+                  ^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/pure/modules.py:7803: in _engine_matrix
+    backend = sage_matrix(
+sage/matrix/constructor.pyx:673: in sage.matrix.constructor.matrix
+    ???
+sage/matrix/args.pyx:808: in sage.matrix.args.MatrixArgs.element
+    ???
+sage/matrix/args.pyx:1213: in sage.matrix.args.MatrixArgs.finalize
+    ???
+sage/misc/classcall_metaclass.pyx:328: in sage.misc.classcall_metaclass.ClasscallMetaclass.__call__
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cls = <class 'sage.matrix.matrix_space.MatrixSpace'>, base_ring = Real Field
+nrows_or_row_keys = 2, ncols_or_column_keys = 2, sparse = False
+implementation = None, nrows = None, ncols = None, row_keys = None
+column_keys = None, kwds = {}
+
+    @staticmethod
+    def __classcall__(cls, base_ring,
+                      nrows_or_row_keys=None, ncols_or_column_keys=None,
+                      sparse=False, implementation=None, *,
+                      nrows=None, ncols=None,
+                      row_keys=None, column_keys=None,
+                      **kwds):
+        """
+        Normalize the arguments to call the ``__init__`` constructor or delegate to another class.
+    
+        TESTS::
+    
+            sage: M1 = MatrixSpace(QQ, 2)
+            sage: M2 = MatrixSpace(QQ, 2)
+            sage: M1 is M2
+            True
+            sage: M3 = MatrixSpace(QQ, 2, implementation='flint')                       # needs sage.libs.flint
+            sage: M1 is M3                                                              # needs sage.libs.flint
+            True
+    
+        ::
+    
+            sage: M = MatrixSpace(ZZ, 10, implementation='flint')                       # needs sage.libs.flint
+            sage: M                                                                     # needs sage.libs.flint
+            Full MatrixSpace of 10 by 10 dense matrices over Integer Ring
+            sage: loads(M.dumps()) is M                                                 # needs sage.libs.flint
+            True
+    
+            sage: MatrixSpace(ZZ, 10, implementation='foobar')
+            Traceback (most recent call last):
+            ...
+            ValueError: unknown matrix implementation 'foobar' over Integer Ring
+    
+        Check that :issue:`29466` is fixed::
+    
+            sage: class MyMatrixSpace(MatrixSpace):
+            ....:     @staticmethod
+            ....:     def __classcall__(cls, base_ring, nrows, ncols=None, my_option=True, sparse=False, implementation=None):
+            ....:         return super().__classcall__(cls, base_ring, nrows, ncols=ncols, my_option=my_option, sparse=sparse, implementation=implementation)
+            ....:
+            ....:     def __init__(self, base_ring, nrows, ncols, sparse,  implementation, my_option=True):
+            ....:         super().__init__(base_ring, nrows, ncols, sparse, implementation)
+            ....:         self._my_option = my_option
+    
+            sage: MS1 = MyMatrixSpace(ZZ, 2)
+            sage: MS1._my_option
+            True
+            sage: MS2 = MyMatrixSpace(ZZ, 2, my_option=False)
+            sage: MS2._my_option
+            False
+        """
+        if base_ring not in _Semirings:
+>           raise TypeError("base_ring (=%s) must be a ring or a semiring" % base_ring)
+E           TypeError: base_ring (=Real Field) must be a ring or a semiring
+
+/sage/.venv/lib/python3.14/site-packages/sage/matrix/matrix_space.py:795: TypeError
+___________ test_a_free_module_over_the_real_field_has_no_relations ____________
+
+    def test_a_free_module_over_the_real_field_has_no_relations() -> None:
+        r"""The zero relation morphism of a zero submodule has no coordinate images."""
+        V = RR**2
+    
+>       assert relation_images_of(V) == ()
+               ^^^^^^^^^^^^^^^^^^^^^
+
+tests/modules/test_an_inexact_engine_field_has_coordinate_images.sage:26: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/modules/conftest.py:66: in relation_images_of
+    return _relation_images(module)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/framed/finitely_generated/finitely_presented_modules.py:195: in _relation_images
+    return _coordinate_images(_relation_morphism(module))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/pure/modules.py:7972: in _coordinate_images
+    for column in _engine_matrix(morphism).columns()
+                  ^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/pure/modules.py:7803: in _engine_matrix
+    backend = sage_matrix(
+sage/matrix/constructor.pyx:673: in sage.matrix.constructor.matrix
+    ???
+sage/matrix/args.pyx:808: in sage.matrix.args.MatrixArgs.element
+    ???
+sage/matrix/args.pyx:1213: in sage.matrix.args.MatrixArgs.finalize
+    ???
+sage/misc/classcall_metaclass.pyx:328: in sage.misc.classcall_metaclass.ClasscallMetaclass.__call__
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cls = <class 'sage.matrix.matrix_space.MatrixSpace'>, base_ring = Real Field
+nrows_or_row_keys = 2, ncols_or_column_keys = 0, sparse = False
+implementation = None, nrows = None, ncols = None, row_keys = None
+column_keys = None, kwds = {}
+
+    @staticmethod
+    def __classcall__(cls, base_ring,
+                      nrows_or_row_keys=None, ncols_or_column_keys=None,
+                      sparse=False, implementation=None, *,
+                      nrows=None, ncols=None,
+                      row_keys=None, column_keys=None,
+                      **kwds):
+        """
+        Normalize the arguments to call the ``__init__`` constructor or delegate to another class.
+    
+        TESTS::
+    
+            sage: M1 = MatrixSpace(QQ, 2)
+            sage: M2 = MatrixSpace(QQ, 2)
+            sage: M1 is M2
+            True
+            sage: M3 = MatrixSpace(QQ, 2, implementation='flint')                       # needs sage.libs.flint
+            sage: M1 is M3                                                              # needs sage.libs.flint
+            True
+    
+        ::
+    
+            sage: M = MatrixSpace(ZZ, 10, implementation='flint')                       # needs sage.libs.flint
+            sage: M                                                                     # needs sage.libs.flint
+            Full MatrixSpace of 10 by 10 dense matrices over Integer Ring
+            sage: loads(M.dumps()) is M                                                 # needs sage.libs.flint
+            True
+    
+            sage: MatrixSpace(ZZ, 10, implementation='foobar')
+            Traceback (most recent call last):
+            ...
+            ValueError: unknown matrix implementation 'foobar' over Integer Ring
+    
+        Check that :issue:`29466` is fixed::
+    
+            sage: class MyMatrixSpace(MatrixSpace):
+            ....:     @staticmethod
+            ....:     def __classcall__(cls, base_ring, nrows, ncols=None, my_option=True, sparse=False, implementation=None):
+            ....:         return super().__classcall__(cls, base_ring, nrows, ncols=ncols, my_option=my_option, sparse=sparse, implementation=implementation)
+            ....:
+            ....:     def __init__(self, base_ring, nrows, ncols, sparse,  implementation, my_option=True):
+            ....:         super().__init__(base_ring, nrows, ncols, sparse, implementation)
+            ....:         self._my_option = my_option
+    
+            sage: MS1 = MyMatrixSpace(ZZ, 2)
+            sage: MS1._my_option
+            True
+            sage: MS2 = MyMatrixSpace(ZZ, 2, my_option=False)
+            sage: MS2._my_option
+            False
+        """
+        if base_ring not in _Semirings:
+>           raise TypeError("base_ring (=%s) must be a ring or a semiring" % base_ring)
+E           TypeError: base_ring (=Real Field) must be a ring or a semiring
+
+/sage/.venv/lib/python3.14/site-packages/sage/matrix/matrix_space.py:795: TypeError
+============================== slowest durations ===============================
+0.05s call     tests/modules/test_an_inexact_engine_field_has_coordinate_images.sage::test_the_images_of_a_real_endomorphism_are_read_in_its_own_frame
+0.01s call     tests/modules/test_an_inexact_engine_field_has_coordinate_images.sage::test_a_free_module_over_the_real_field_has_no_relations
+
+(4 durations < 0.005s hidden.  Use -vv to show these durations.)
+=========================== short test summary info ============================
+FAILED tests/modules/test_an_inexact_engine_field_has_coordinate_images.sage::test_the_images_of_a_real_endomorphism_are_read_in_its_own_frame
+FAILED tests/modules/test_an_inexact_engine_field_has_coordinate_images.sage::test_a_free_module_over_the_real_field_has_no_relations
+============================== 2 failed in 1.71s ===============================
+[peakrss] wt541revtests: child waited=1 shell_code=1 samples=5
+[peakrss] peak tree RSS      : 327 MiB
+[peakrss] low-water MemAvail : 4544 MiB
+[peakrss] peak single VmHWM  : 332 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      321 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     8.0s procs=  3 rss=   327 MiB hwm=   332 MiB avail=  4568 MiB
+[peakrss]   t=     6.0s procs=  3 rss=   254 MiB hwm=   254 MiB avail=  4673 MiB
+[peakrss]   t=     4.0s procs=  3 rss=   118 MiB hwm=   118 MiB avail=  4611 MiB
+[peakrss]   t=     2.0s procs=  3 rss=    93 MiB hwm=    93 MiB avail=  4622 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     7 MiB hwm=     7 MiB avail=  4544 MiB

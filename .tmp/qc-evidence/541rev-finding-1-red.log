@@ -1,0 +1,219 @@
+tree SHA: 9a04b45aa110aa715b3ae440f93b9b3b4dcbe7e4 (modified paths: 1)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 11.88 7.79 5.47 9/668 2640286
+files: tests/forms/test_a_torsion_cokernel_carries_its_torsion_forms.sage
+inner 540 s, outer 600 s, guard 6144 MiB
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+time gates OFF (--no-time-gates): star import 1.47 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: asyncio-1.5.0, xdist-3.8.0, reportlog-1.0.0, platformdirs-4.13.5, hypothesis-6.170.15, anyio-4.15.1, timeout-2.4.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 3 items
+
+tests/forms/test_a_torsion_cokernel_carries_its_torsion_forms.sage FFF   [100%]
+
+=================================== FAILURES ===================================
+___________ test_the_one_third_form_on_z3_twists_by_a_negative_unit ____________
+
+    def test_the_one_third_form_on_z3_twists_by_a_negative_unit() -> None:
+        r"""Twisting $b(x,x) = 1/3$ by $-1$ gives $-1/3$, on a module that is torsion."""
+        form = Lattices(ZZ)([[3]]).discriminant_bilinear_form()
+        generator = form.module_generator(0)
+    
+>       twisted = form.twist(-1)
+                  ^^^^^^^^^^^^^^^
+
+tests/forms/test_a_torsion_cokernel_carries_its_torsion_forms.sage:22: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/modules/framed/formed/form_modules.py:2890: in twist
+    return TorsionFormTwistFunctor(
+src/sage_extensions/categories/functors/core.py:331: in __call__
+    return self.object_image(value)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/functors/core.py:233: in object_image
+    image = self._apply_object(obj)
+            ^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/framed/formed/torsion_form_modules.py:1689: in _apply_object
+    return _twisted_torsion_form(form, self.scalar(), quadratic=self._quadratic)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/framed/formed/torsion_form_modules.py:1643: in _twisted_torsion_form
+    return _torsion_form_modules(form.base_ring(), quadratic=quadratic).from_module(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Category of finitely presented finitely generated torsion modules with a bilinear form over Integer Ring
+module = Finitely presented module on 1 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 3]
+gram = (([(2)/(3)] in Fraction Field of Integer Ring / (1)Integer Ring,),)
+value_module = Fraction Field of Integer Ring / (1)Integer Ring
+_subobject_ambient = None, _subobject_generator_images = None
+_subobject_lift = None, _subobject_inclusion_factory = None
+_extra_categories = ()
+
+    def from_module(
+        self,
+        module,
+        gram,
+        value_module,
+        *,
+        _subobject_ambient=None,
+        _subobject_generator_images=None,
+        _subobject_lift=None,
+        _subobject_inclusion_factory=None,
+        _extra_categories=(),
+    ):
+        r"""Equip ``module`` with the bilinear form represented by ``gram``.
+    
+        The value object is explicit.  Descent to the quotient is the
+        validator ``validate_descent`` (``OWN-22``).
+        """
+        if (
+            module
+            not in Modules(self.base_ring()).FinitelyPresented().Torsion()
+        ):
+>           raise ValueError(
+                f"a torsion bilinear form in {self} is defined on a finitely presented torsion "
+                f"{self.base_ring()}-module, but {module} is in {module.category()}"
+            )
+E           ValueError: a torsion bilinear form in Category of finitely presented finitely generated torsion modules with a bilinear form over Integer Ring is defined on a finitely presented torsion Integer Ring-module, but Finitely presented module on 1 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 3] is in Category of modules with a represented selected finite-presentation backend over Integer Ring
+
+src/sage_extensions/categories/modules/framed/formed/form_modules.py:3438: ValueError
+______________ test_the_half_form_on_z2_has_its_two_primary_part _______________
+
+    def test_the_half_form_on_z2_has_its_two_primary_part() -> None:
+        r"""$q = 1/2 \bmod 1$ on $Z/2$ is the whole of its $2$-primary part."""
+        form = Lattices(ZZ)("A1").discriminant_quadratic_form()
+    
+>       part = form.primary_part(ZZ(2))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/forms/test_a_torsion_cokernel_carries_its_torsion_forms.sage:35: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/modules/framed/formed/form_modules.py:3734: in primary_part
+    return _torsion_form_primary_part(self, prime, quadratic=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/framed/formed/torsion_form_modules.py:621: in _torsion_form_primary_part
+    return _torsion_form_subobject_on(form, generators, quadratic=quadratic)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/framed/formed/torsion_form_modules.py:592: in _torsion_form_subobject_on
+    result = category.from_module(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Category of finitely presented finitely generated torsion modules with a quadratic form over Integer Ring
+module = Finitely presented module on 1 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 2]
+gram = (([(3)/(2)] in Fraction Field of Integer Ring / (2)Integer Ring,),)
+value_module = Fraction Field of Integer Ring / (2)Integer Ring
+_subobject_ambient = Finitely presented module on 1 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 2]
+_subobject_generator_images = <function _torsion_form_subobject_on.<locals>.ambient_image at 0x71f6c0cd2a30>
+_subobject_lift = <function _torsion_form_subobject_on.<locals>.lift_from_ambient at 0x71f6c0c8d900>
+_subobject_inclusion_factory = <function _torsion_form_subobject_on.<locals>.inclusion_factory at 0x71f6c0c8ddd0>
+_extra_categories = ()
+
+    def from_module(
+        self,
+        module,
+        gram,
+        value_module,
+        *,
+        _subobject_ambient=None,
+        _subobject_generator_images=None,
+        _subobject_lift=None,
+        _subobject_inclusion_factory=None,
+        _extra_categories=(),
+    ):
+        r"""Equip ``module`` with ``q(x)=x^T gram x`` valued in ``value_module``.
+    
+        Symmetry of ``gram`` is the validator of the quadratic map, and
+        descent to the quotient is the validator ``validate_descent``
+        (``OWN-22``).
+        """
+        if (
+            module
+            not in Modules(self.base_ring()).FinitelyPresented().Torsion()
+        ):
+>           raise ValueError(
+                f"a torsion quadratic form in {self} is defined on a finitely presented torsion "
+                f"{self.base_ring()}-module, but {module} is in {module.category()}"
+            )
+E           ValueError: a torsion quadratic form in Category of finitely presented finitely generated torsion modules with a quadratic form over Integer Ring is defined on a finitely presented torsion Integer Ring-module, but Finitely presented module on 1 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 2] is in Join of Subobjects of Finitely presented module on 1 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 2] and Category of modules with a represented selected finite-presentation backend over Integer Ring and Category of module subobjects over Integer Ring
+
+src/sage_extensions/categories/modules/framed/formed/form_modules.py:3636: ValueError
+____ test_the_orthogonal_quotient_of_a_discriminant_form_is_a_torsion_form _____
+
+    def test_the_orthogonal_quotient_of_a_discriminant_form_is_a_torsion_form() -> None:
+        r"""$A_1^{\oplus 4}$'s diagonal subgroup is isotropic, and its orthogonal quotient is formed."""
+        discriminant = (Lattices(ZZ)("A1") + Lattices(ZZ)("A1") + Lattices(ZZ)("A1") + Lattices(ZZ)("A1")).discriminant_quadratic_form()
+        diagonal = sum(discriminant.smith_form_module_generators(), discriminant.zero())
+    
+>       quotient = discriminant.orthogonal_quotient(discriminant.subgroup_on((diagonal,)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/forms/test_a_torsion_cokernel_carries_its_torsion_forms.sage:47: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/modules/framed/formed/discriminant_modules.py:469: in orthogonal_quotient
+    return TorsionQuadraticFormModules(self.base_ring()).from_module(quotient, tuple(gram), quadratic_values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Category of finitely presented finitely generated torsion modules with a quadratic form over Integer Ring
+module = Finitely presented module on 3 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 2, 1 ↦ 2]
+gram = (([1] in Fraction Field of Integer Ring / (2)Integer Ring, [(1)/(2)] in Fraction Field of Integer Ring / (2)Integer Ri...(1)/(2)] in Fraction Field of Integer Ring / (2)Integer Ring, [1] in Fraction Field of Integer Ring / (2)Integer Ring))
+value_module = Fraction Field of Integer Ring / (2)Integer Ring
+_subobject_ambient = None, _subobject_generator_images = None
+_subobject_lift = None, _subobject_inclusion_factory = None
+_extra_categories = ()
+
+    def from_module(
+        self,
+        module,
+        gram,
+        value_module,
+        *,
+        _subobject_ambient=None,
+        _subobject_generator_images=None,
+        _subobject_lift=None,
+        _subobject_inclusion_factory=None,
+        _extra_categories=(),
+    ):
+        r"""Equip ``module`` with ``q(x)=x^T gram x`` valued in ``value_module``.
+    
+        Symmetry of ``gram`` is the validator of the quadratic map, and
+        descent to the quotient is the validator ``validate_descent``
+        (``OWN-22``).
+        """
+        if (
+            module
+            not in Modules(self.base_ring()).FinitelyPresented().Torsion()
+        ):
+>           raise ValueError(
+                f"a torsion quadratic form in {self} is defined on a finitely presented torsion "
+                f"{self.base_ring()}-module, but {module} is in {module.category()}"
+            )
+E           ValueError: a torsion quadratic form in Category of finitely presented finitely generated torsion modules with a quadratic form over Integer Ring is defined on a finitely presented torsion Integer Ring-module, but Finitely presented module on 3 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 2, 1 ↦ 2] is in Category of modules with a represented selected finite-presentation backend over Integer Ring
+
+src/sage_extensions/categories/modules/framed/formed/form_modules.py:3636: ValueError
+============================== slowest durations ===============================
+0.99s call     tests/forms/test_a_torsion_cokernel_carries_its_torsion_forms.sage::test_the_orthogonal_quotient_of_a_discriminant_form_is_a_torsion_form
+0.58s call     tests/forms/test_a_torsion_cokernel_carries_its_torsion_forms.sage::test_the_one_third_form_on_z3_twists_by_a_negative_unit
+0.22s call     tests/forms/test_a_torsion_cokernel_carries_its_torsion_forms.sage::test_the_half_form_on_z2_has_its_two_primary_part
+0.01s setup    tests/forms/test_a_torsion_cokernel_carries_its_torsion_forms.sage::test_the_orthogonal_quotient_of_a_discriminant_form_is_a_torsion_form
+
+(5 durations < 0.005s hidden.  Use -vv to show these durations.)
+=========================== short test summary info ============================
+FAILED tests/forms/test_a_torsion_cokernel_carries_its_torsion_forms.sage::test_the_one_third_form_on_z3_twists_by_a_negative_unit
+FAILED tests/forms/test_a_torsion_cokernel_carries_its_torsion_forms.sage::test_the_half_form_on_z2_has_its_two_primary_part
+FAILED tests/forms/test_a_torsion_cokernel_carries_its_torsion_forms.sage::test_the_orthogonal_quotient_of_a_discriminant_form_is_a_torsion_form
+============================== 3 failed in 4.59s ===============================
+[peakrss] wt541revtests: child waited=1 shell_code=1 samples=7
+[peakrss] peak tree RSS      : 341 MiB
+[peakrss] low-water MemAvail : 9343 MiB
+[peakrss] peak single VmHWM  : 344 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      333 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    12.0s procs=  3 rss=   341 MiB hwm=   344 MiB avail=  9629 MiB
+[peakrss]   t=    10.0s procs=  3 rss=   340 MiB hwm=   340 MiB avail=  9625 MiB
+[peakrss]   t=     8.0s procs=  3 rss=   318 MiB hwm=   318 MiB avail=  9343 MiB
+[peakrss]   t=     6.0s procs=  3 rss=   288 MiB hwm=   288 MiB avail=  9431 MiB
+[peakrss]   t=     4.0s procs=  3 rss=   210 MiB hwm=   210 MiB avail=  9519 MiB

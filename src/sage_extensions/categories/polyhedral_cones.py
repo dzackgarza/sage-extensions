@@ -767,7 +767,7 @@ class RationalPolyhedralCones(OwnedParameterizedCategory):
                     self,
                     self.face_stabilizer(face, group),
                 ),
-                name=lambda dimension=dimension, self=self: f"Face incidences of dimension {dimension} in {self}",
+                description=lambda dimension=dimension, self=self: f"Face incidences of dimension {dimension} in {self}",
             )
 
         def adjacency_to(self, other, group):
@@ -918,7 +918,7 @@ class RationalPolyhedralCones(OwnedParameterizedCategory):
             return finite_indexed_family(
                 simplices,
                 lambda simplex: category.from_rays(simplex),
-                name=lambda self=self: f"Simplicial subcones covering {self}",
+                description=lambda self=self: f"Simplicial subcones covering {self}",
             )
 
         def simplicial_subcone_inclusion(self, simplex):

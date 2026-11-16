@@ -4981,7 +4981,7 @@ def _cover_pair_family(cover, transitions, *, noun):
     return finite_indexed_family(
         finite_ordered_set(expected),
         lambda pair: normalized[pair],
-        name=lambda noun=noun: f"Transition isomorphisms of {noun}",
+        description=lambda noun=noun: f"Transition isomorphisms of {noun}",
     )
 
 
@@ -7848,7 +7848,7 @@ def _glued_fiber_product_factorization(
                 left_cone_map * source_datum.chart_embedding(index),
                 right_cone_map * source_datum.chart_embedding(index),
             ),
-            name=lambda product=product: f"Chartwise factorizations through {product}",
+            description=lambda product=product: f"Chartwise factorizations through {product}",
         )
     )
 

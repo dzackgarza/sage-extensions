@@ -7,15 +7,12 @@ the parameterization of the rational lift torsor ``T``.  ``r`` is onto and ``phi
 bijection onto ``T``, so ``T_Z`` is a *subset of the torsor*: the lifts whose parameter
 class lies in ``C``.
 
-That is the presentation, and it is what these tests pin.  The pair decomposition
-``r^{-1}(C) = {s(c) + k}`` says the same thing, but presenting ``T_Z`` as the image of the
-product ``C x ker r`` makes the construction of a subset a construction of a product: a
-product of a finite index set is interned under its factors' hashes (``SET-05``), and the
-hash of a finite set is the hash of its tuple of points, so the product's key enumerates
-every class of ``C`` -- on ``T_Co`` its 131072 classes, once per candidate the plane row
-tests.  A locus is a subset of the set it lies in, so it has that subset's inclusion, and
-membership in it is the class test; these are the two facts a product presentation cannot
-state.
+That is the presentation, and it is what these tests pin: the two facts a subset of ``T``
+owes.  A locus is a subset of the set it lies in, so ``T_Z`` carries ``T``'s inclusion.  And
+membership is the class test, asked of every point of ``T``: ``phi`` is a bijection onto
+``T``, so a lift whose parameter is not in ``P`` is a point of ``T`` all the same, and it is
+not a member.  An empty residue locus gives the empty subset of ``T``, decided empty by the
+construction of that subset and not by a search of ``T``.
 """
 
 from sage_extensions.all import *  # noqa: F401,F403
@@ -110,20 +107,46 @@ def test_the_locus_is_membership_in_the_residue_class() -> None:
     assert locus(answered) == answered
 
 
+def test_a_parameter_outside_the_integral_lattice_is_not_a_member() -> None:
+    r"""Membership answers for a lift of ``T`` whose parameter is not in ``P``.
+
+    ``phi`` is a bijection onto ``T``, so a parameter outside the integral
+    parameter lattice still names a lift of the torsor.  That lift is not an
+    integral isometry of the lattice, and membership in ``T_Z`` is the question
+    that says so -- the locus is a subset of ``T``, not a set that refuses the
+    points of ``T`` outside it.
+    """
+    lattice, marked, reduction, torsor = _non_integral_base_point_control()
+    locus = torsor.integral_lift_locus()
+    parameters = torsor.parameter_space()
+    labels = tuple(parameters.module_generating_set())
+    parameter = parameters.linear_combination({labels[0]: QQ(1) / QQ(7)})
+    outside = torsor.parameterization()(parameter)
+
+    assert outside.integral_restriction(lattice, lattice) is None
+    assert locus.is_parent_of(outside) is False
+    assert locus.is_parent_of(torsor.integral_base_point()) is True
+
+
 def test_an_empty_residue_locus_gives_an_empty_subset() -> None:
-    r"""``T_Z`` is empty exactly when ``C`` is, and the locus decides it.
+    r"""``T_Z`` is empty exactly when ``C`` is, and it is still a subset of ``T``.
 
     ``U``'s and ``U(2)``'s marked null lines both reduce to rank zero, but no integral
     isometry joins the ambient lattices, whose determinants differ, so the residue locus is
     empty and so is the integral locus -- a decision the locus has to make for itself,
-    since a subset of an infinite torsor cannot be emptied by enumeration.
+    since a subset of an infinite torsor cannot be emptied by enumeration.  What it answers
+    with is the empty subset of ``T``: its inclusion lands in ``T``, and it admits no point
+    of ``T``, the torsor's own base point included.
     """
     source = Lattices(ZZ)("U")
     target = Lattices(ZZ)([[0, 2], [2, 0]])
     first = source.basis_vector(0).isotropic_reduction()
     second = target.basis_vector(0).isotropic_reduction()
     torsor = first.rational_lifts(second, first.Isom(second)(()))
+    locus = torsor.integral_lift_locus()
 
     assert source.determinant() != target.determinant()
     assert torsor.integral_parameter_classes().is_empty() is True
-    assert torsor.integral_lift_locus().is_empty() is True
+    assert locus.is_empty() is True
+    assert locus.inclusion().codomain() == torsor
+    assert locus.is_parent_of(torsor.base_point()) is False

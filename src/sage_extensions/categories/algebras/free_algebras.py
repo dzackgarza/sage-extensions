@@ -790,7 +790,7 @@ def _base_change_commutative_presentation(algebra, ring_map):
                 )
             ),
         ),
-        name=lambda algebra=algebra: f"Scalar-changed defining relations of {algebra}",
+        description=lambda algebra=algebra: f"Scalar-changed defining relations of {algebra}",
     )
     return target_presentation_ring.quotient_by_relations(mapped_relations)
 
@@ -1816,7 +1816,7 @@ class GradedFreeAlgebras(OwnedCategoryOverBaseRing):
             return indexed_family(
                 labels,
                 lambda label: self._realize_graded_piece_basis_label(degree, label),
-                name=lambda degree=degree, self=self: f"Degree-{degree} algebra monomial basis of {self}",
+                description=lambda degree=degree, self=self: f"Degree-{degree} algebra monomial basis of {self}",
             )
 
         def ideal_generators_in_degree(self, relations, degree):

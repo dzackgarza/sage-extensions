@@ -117,7 +117,7 @@ def _shell(lattice, square, coordinate_rows):
         element_at,
         index_of=index_of,
         contains=lambda element: index_of(element) is not None,
-        name=f"vectors of square {square} in {lattice}",
+        description=lambda: f"vectors of square {square} in {lattice}",
     )
 
 
@@ -350,8 +350,8 @@ def _roots_of_square(lattice, square):
     sign, positive_gram = _positive_gram(lattice)
     # ``square`` is the lattice ring's element, so its image under the sign is one
     # too: the shell's target is an exact integer of that ring, and the enumeration
-    # below reads its parent to cross into the engine.  A Python ``int`` here lost
-    # that ring and the crossing raised (#291).
+    # below reads its parent to cross into the engine.  A Python ``int`` here would
+    # lose that ring, and the crossing would read no parent.
     target = sign * square
     if target <= 0:
         return finite_ordered_set(())
@@ -937,7 +937,7 @@ def _voronoi_facets(lattice):
     return finite_indexed_family(
         finite_ordered_set(tuple(facets)),
         lambda vector: facets[vector],
-        name=lambda lattice=lattice: f"Voronoi facets of {lattice}",
+        description=lambda lattice=lattice: f"Voronoi facets of {lattice}",
     )
 
 

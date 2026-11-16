@@ -637,7 +637,7 @@ class TopologicalManifolds(OwnedCategory):
                     if self._preamble_chart_provider is not None
                     else self._preamble_charts[label]
                 ),
-                name=lambda self=self: f"Atlas charts of {self}",
+                description=lambda self=self: f"Atlas charts of {self}",
             )
 
         def open_submanifold(self, open_inclusion):
@@ -740,7 +740,7 @@ class TopologicalManifolds(OwnedCategory):
             return finite_indexed_family(
                 index_set,
                 lambda pair: self._preamble_transitions[pair],
-                name=lambda self=self: f"Atlas transitions of {self}",
+                description=lambda self=self: f"Atlas transitions of {self}",
             )
 
         def _repr_(self):
@@ -1678,7 +1678,16 @@ class HolomorphicMap:
     def __ne__(self, other) -> bool:
         return not self == other
 
-    __hash__ = None
+    def __hash__(self) -> int:
+        r"""Hash the holomorphic maps of one set of morphisms alike.
+
+        Equality here is extensional: two presentations are one map when every
+        coordinate representation of one agrees with every representation of
+        the other on the overlap of their domains.  No datum of one
+        presentation is invariant under that, so the set of morphisms is what a
+        hash reads, which is the rule of :class:`Sets`.
+        """
+        return hash(id(self.parent()))
 
     def _repr_(self):
         return f"Holomorphic map {self.domain()} -> {self.codomain()}"

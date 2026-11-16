@@ -280,16 +280,16 @@ def _regular_module_reading(value_module):
     handed a value object whose elements are the ring's scalars rather than module
     elements.  The form then reads its own Gram through the wrong element structure: on
     the A2 lattice an integral Gram answers ``is_base_ring_valued()`` False, and the
-    numerical reading raises ``(0, 0) is not an element of {0,...,3}`` (#293,
-    lattice-database #9).  The module such a caller means is the ring's regular module,
+    numerical reading raises ``(0, 0) is not an element of {0,...,3}``.  The module
+    such a caller means is the ring's regular module,
     restricted along the same map.
 
     A bare ring is also read this way, through its *own* regular module.  A ring is
     that module over itself, and its ``rho`` there has the ring as its domain, so a
     pairing with values in a ring is linear over the whole ring.  Reading the ring
     object instead left the scalar action over the ring's *base* -- its domain is
-    ``base_ring()``, ``ZZ`` for ``QQ`` -- so a rational scalar had no action at all
-    (#307).  What the readers want is the scalars, and the ring owner supplies them
+    ``base_ring()``, ``ZZ`` for ``QQ`` -- so a rational scalar had no action at all.
+    What the readers want is the scalars, and the ring owner supplies them
     through ``regular_module_isomorphism()``, so the value object is the module and
     the identification is the ring's, not a second action written here.
     """
@@ -330,7 +330,7 @@ def _scalar_value_identification(value_module, base_ring=None):
     whose extension is one -- the module structure such a restriction was formed
     with already has the extension ring as its domain, so its
     ``regular_module_identification`` reads the scalars rather than adding a
-    second action (#307).
+    second action.
 
     ``base_ring`` is the ring the pairing is taken over, when the caller has it;
     it defaults to the value object's own base ring.
@@ -2169,9 +2169,9 @@ class Modules(OwnedCategoryOverBaseRing):
             object that is the *restriction of a ring* is read through that ring's
             regular module (``_regular_module_reading``): the values of a pairing
             are module elements, and a form built on the ring's own scalar
-            structure reports an integral Gram as not base-ring valued (#293).  A
+            structure reports an integral Gram as not base-ring valued.  A
             ring stated bare stays the value object, whose own action on itself is
-            multiplication, so the pairing is linear over the whole ring (#307).
+            multiplication, so the pairing is linear over the whole ring.
             """
             from sage_extensions.categories.forms.forms import _bilinear_forms
 
@@ -4186,7 +4186,7 @@ class ModuleSubobjects(OwnedCategoryOverBaseRing):
             return finite_indexed_family(
                 labels,
                 lambda label: self.inclusion()(self.module_generator(label)),
-                name=lambda self=self: f"Embedded framing of {self}",
+                description=lambda self=self: f"Embedded framing of {self}",
             )
 
         def is_primitive(self) -> bool:
@@ -4355,6 +4355,26 @@ class ModulesWithChosenComponentPresentation(OwnedCategoryOverBaseRing):
 
     def super_categories(self):
         return [Modules(self.base_ring())]
+
+
+def _finitely_presented_torsion(module):
+    r"""Whether ``module``'s own data decides it is a finitely presented torsion module.
+
+    ``Modules(R).FinitelyPresented().Torsion()`` is a placement claim, and the
+    construction that places an object is the one that makes it (``CAT-04``).
+    A cokernel of a presentation is built before it computes, so it carries no
+    such claim, and a consumer that routed on that membership asks the question
+    itself instead (``DEF-03``): ``is_torsion()`` computes from the module's
+    invariant factors, and finite presentation is asked of the placement that
+    states it.
+
+    Returns ``True``, ``False``, or the undecided proposition ``is_torsion(M)``.
+    """
+    match module in Modules(module.base_ring()).FinitelyPresented():
+        case True:
+            return module.is_torsion()
+        case False:
+            return False
 
 
 class ModulesWithChosenFinitePresentation(OwnedCategoryOverBaseRing):
@@ -7334,7 +7354,7 @@ class MatrixSpaces(OwnedCategoryOverBaseRing):
                 return finite_indexed_family(
                     kernel_labels,
                     localized_kernel_element,
-                    name=lambda self=self: f"Localized kernel spanning family of {self}",
+                    description=lambda self=self: f"Localized kernel spanning family of {self}",
                 )
 
             from sage_extensions.rings.real import RR
@@ -7364,7 +7384,7 @@ class MatrixSpaces(OwnedCategoryOverBaseRing):
                 return finite_indexed_family(
                     positions,
                     kernel_vector,
-                    name=lambda self=self: f"Kernel spanning family of {self}",
+                    description=lambda self=self: f"Kernel spanning family of {self}",
                 )
 
             basis = (
@@ -7385,7 +7405,7 @@ class MatrixSpaces(OwnedCategoryOverBaseRing):
                 ),
                 # The name is read only when the family is printed; printing the
                 # matrix (its endpoints' signatures) per kernel is not paid here.
-                name=lambda: f"Kernel spanning family of {self}",
+                description=lambda: f"Kernel spanning family of {self}",
             )
 
         def symmetrized_right_multiplication(self):
@@ -7694,6 +7714,46 @@ class MatrixEndomorphismSpaces(OwnedCategoryOverBaseRing):
             """
             return self.is_injective() and self.is_surjective()
 
+        def _unit_inverse_decision(self):
+            r"""Return the inverse of this endomorphism in its own ring, or refuse a nonunit.
+
+            The units of \(M_n(R)=\operatorname{End}_R(R^n)\) are the
+            automorphisms of \(R^n\), which ``_unit_decision`` decides, and the
+            inverse of one in the ring is the inverse linear map, which the
+            endomorphism itself constructs.  Neither step leaves the ring: over
+            \(\mathbf{Z}\) the inverse of \(2I\) would be \(\frac{1}{2}I\), whose
+            entries are not integers, so \(2I\) has no inverse in
+            \(M_2(\mathbf{Z})\) at all and is refused here instead of by an
+            engine computing in a larger ring and failing to read the result
+            back.
+
+            A nonunit is refused, not computed: ``inverse_of_unit`` is what
+            division by the element multiplies by, so its error is the ring's
+            statement of the hypothesis the division failed.
+            """
+            match self.is_unit():
+                case True:
+                    return self.inverse()
+                case False:
+                    raise ZeroDivisionError(
+                        f"{self} is not a unit of {self.parent()}"
+                    )
+                case _:
+                    return None
+
+        def __invert__(self):
+            r"""Return the inverse of this matrix in its ring, refusing a nonunit.
+
+            An element of a matrix ring is inverted in that ring, so \(A^{-1}\)
+            is the two-sided inverse of \(A\) in \(\operatorname{End}_R(R^n)\):
+            the ring's unit inverse, which exists exactly on the units.  The
+            matrix space's own ``~`` computes in the coefficient fraction field
+            and reads the result back, which answers for a nonunit as much as
+            the field does -- \(\frac{1}{2}I\) for \(2I\) over \(\mathbf{Z}\) --
+            so the endomorphism ring states its inverse here instead.
+            """
+            return self.inverse_of_unit()
+
         def trace(self):
             ring = self.parent().base_ring()
             return sum(
@@ -7940,14 +8000,33 @@ def _coordinate_framed_free_module(module, ring) -> bool:
 def _coordinate_images(morphism):
     r"""Return the coordinates of each ``f(e_s)`` in the module generators of the codomain.
 
-    Column ``s`` of the morphism's retained coordinate matrix is the coordinate
-    vector of ``f(e_s)`` (:func:`_engine_matrix`, the one materialization of a
-    framed morphism), so the images are read off it rather than recomputed by
-    applying ``f`` to each generator.  Engine adapters that take a family of
-    generating vectors lower a morphism of free modules through this.
+    The coordinates are the definition: the image of every module generator of
+    the domain, read in the codomain's chosen generators.  A morphism of finite
+    framed free modules retains them as one engine matrix, column ``s`` of which
+    is the coordinate vector of ``f(e_s)`` (:func:`_engine_matrix`), and there
+    they are read off that matrix.  A matrix is a Sage matrix over the ring's
+    selected linear-algebra parent, and an owned exact field whose engine is
+    inexact selects the field itself, which is no Sage ring
+    (:func:`...ring_foundation._choose_linear_algebra_ring`); there the images
+    come from ``f``.  Engine adapters that take a family of generating vectors
+    lower a morphism of free modules through this.
     """
+    from sage.categories.rings import Rings as SageRings
+
     ring = morphism.domain().base_ring()
-    return tuple(
-        tuple(_owned_engine_element(ring, entry) for entry in column)
-        for column in _engine_matrix(morphism).columns()
-    )
+    match _linear_algebra_ring(ring) in SageRings():
+        case True:
+            return tuple(
+                tuple(_owned_engine_element(ring, entry) for entry in column)
+                for column in _engine_matrix(morphism).columns()
+            )
+        case False:
+            labels = tuple(morphism.codomain().module_generating_set())
+            return tuple(
+                tuple(
+                    morphism(morphism.domain().module_generator(source_label))
+                    .to_vector()(label)
+                    for label in labels
+                )
+                for source_label in morphism.domain().module_generating_set()
+            )

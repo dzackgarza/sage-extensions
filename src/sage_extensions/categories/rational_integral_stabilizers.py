@@ -370,7 +370,7 @@ class _FiniteIntegralRepresentation(SageObject):
         return data
 
     def orbit_lattice_records(self):
-        r"""Return one record per lattice-orbit point, with its maps (#286).
+        r"""Return one record per lattice-orbit point, with its maps.
 
         Each record states the orbit lattice ``L_p = t_p L``, the module image it
         was built from together with that module's own generating labels, the

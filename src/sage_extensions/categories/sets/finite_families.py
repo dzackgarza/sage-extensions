@@ -1,6 +1,6 @@
 """Finite indexed families on the canonical finite ordinal."""
 
-from collections.abc import Iterable
+from collections.abc import Callable, Iterable
 
 from sage_extensions.categories.sets.indexed_families import (
     IndexedFamily,
@@ -13,6 +13,7 @@ def finite_family[ValueT](
     values: IndexedFamily | Iterable[ValueT],
     *,
     name: str | None = None,
+    description: Callable[[], str] | None = None,
 ) -> IndexedFamily:
     r"""Return the family over \(\Delta[k-1]\) taking the stated values in order.
 
@@ -31,6 +32,7 @@ def finite_family[ValueT](
         positions,
         lambda position: entries[int(position)],
         name=name,
+        description=description,
     )
 
 

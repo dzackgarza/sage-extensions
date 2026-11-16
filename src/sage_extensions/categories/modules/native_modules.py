@@ -124,7 +124,7 @@ class _RegularModuleGenerator:
     r"""The single generator of a ring read as the regular module over itself.
 
     A module parent retains its basis maps, so the maps are module-level objects
-    rather than closures (issue #20).  This one carries the presentation, whose
+    rather than closures.  This one carries the presentation, whose
     unit is the generator.
     """
 
@@ -156,7 +156,7 @@ class _ConstantComputation:
     r"""A deferred computation that always returns the same retained value.
 
     Used where a construction retains "how to obtain this source" rather than the
-    source itself; a closure there would make the parent unpicklable (issue #20).
+    source itself; a closure there would make the parent unpicklable.
     """
 
     def __init__(self, value) -> None:

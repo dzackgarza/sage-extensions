@@ -978,7 +978,7 @@ class LeviQuotient:
         if any(factor.degree() != 1 for factor, _m in minimal.factor()):
             raise NotImplementedError(
                 f"the Levi quotient of the commutant of {commutant.isometries} has a central factor field of degree > 1 "
-                f"(centre minimal polynomial {minimal}); its unitary group has no Levi-module route (#54)"
+                f"(centre minimal polynomial {minimal}); its unitary group has no Levi-module route"
             )
         self._central = _splitting_idempotents(generic, minimal)
         self.degrees = []
@@ -989,7 +989,7 @@ class LeviQuotient:
             if n**2 != dimension:
                 raise NotImplementedError(
                     f"a factor of dimension {dimension} of the Levi quotient of the commutant of {commutant.isometries} "
-                    f"is not M_n(Q); a division Levi factor has no Levi-module route (#54)"
+                    f"is not M_n(Q); a division Levi factor has no Levi-module route"
                 )
             self.degrees.append(n)
             self._idempotents.append(self._primitive(c, n))

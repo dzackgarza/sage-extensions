@@ -1,0 +1,45 @@
+tree SHA: 5c1fbede4e2e3280754750d6a142f5d41d9cf395 (modified paths: 2)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 24.10 26.85 20.24 15/692 2696562
+files: tests/modules/test_an_inexact_engine_field_has_coordinate_images.sage tests/forms/test_a_torsion_cokernel_carries_its_torsion_forms.sage tests/modules/test_a_presented_module_is_built_before_it_computes.sage
+inner 540 s, outer 600 s, guard 6144 MiB
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+time gates OFF (--no-time-gates): star import 0.74 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: asyncio-1.5.0, xdist-3.8.0, reportlog-1.0.0, platformdirs-4.13.5, hypothesis-6.170.15, anyio-4.15.1, timeout-2.4.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 7 items
+
+tests/modules/test_an_inexact_engine_field_has_coordinate_images.sage .. [ 28%]
+                                                                         [ 28%]
+tests/forms/test_a_torsion_cokernel_carries_its_torsion_forms.sage ...   [ 71%]
+tests/modules/test_a_presented_module_is_built_before_it_computes.sage . [ 85%]
+.                                                                        [100%]
+
+============================== slowest durations ===============================
+0.86s call     tests/forms/test_a_torsion_cokernel_carries_its_torsion_forms.sage::test_the_orthogonal_quotient_of_a_discriminant_form_is_a_torsion_form
+0.66s call     tests/forms/test_a_torsion_cokernel_carries_its_torsion_forms.sage::test_the_one_third_form_on_z3_twists_by_a_negative_unit
+0.15s call     tests/forms/test_a_torsion_cokernel_carries_its_torsion_forms.sage::test_the_half_form_on_z2_has_its_two_primary_part
+0.05s call     tests/modules/test_an_inexact_engine_field_has_coordinate_images.sage::test_the_images_of_a_real_endomorphism_are_read_in_its_own_frame
+0.03s call     tests/modules/test_a_presented_module_is_built_before_it_computes.sage::test_a_plane_inclusions_quotient_is_built_before_it_is_asked
+0.01s call     tests/modules/test_a_presented_module_is_built_before_it_computes.sage::test_constructing_a_cokernel_asks_the_engine_for_no_matrix
+0.01s call     tests/modules/test_an_inexact_engine_field_has_coordinate_images.sage::test_a_free_module_over_the_real_field_has_no_relations
+
+(14 durations < 0.005s hidden.  Use -vv to show these durations.)
+============================== 7 passed in 5.44s ===============================
+[peakrss] wt541revtests: child waited=0 shell_code=0 samples=7
+[peakrss] peak tree RSS      : 344 MiB
+[peakrss] low-water MemAvail : 6568 MiB
+[peakrss] peak single VmHWM  : 344 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      333 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    12.1s procs=  3 rss=   344 MiB hwm=   344 MiB avail=  6821 MiB
+[peakrss]   t=    10.1s procs=  3 rss=   343 MiB hwm=   343 MiB avail=  7005 MiB
+[peakrss]   t=     8.0s procs=  3 rss=   326 MiB hwm=   326 MiB avail=  7335 MiB
+[peakrss]   t=     6.0s procs=  3 rss=   303 MiB hwm=   303 MiB avail=  6844 MiB
+[peakrss]   t=     4.0s procs=  3 rss=   286 MiB hwm=   286 MiB avail=  6624 MiB
+launcher exit: 0

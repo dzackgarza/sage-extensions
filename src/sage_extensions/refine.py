@@ -419,9 +419,22 @@ def _final_category_operations(
     name is a construction hook and stays on the provider that declared it, and
     so does a dunder that constructs the object or names its identity
     (``_is_bookkeeping_or_hook``).
+
+    A level states that it has no operation of a name by binding the name to
+    ``None`` -- the data model's way of stating unavailability, which
+    ``OwnedRings`` uses for the enumeration of a ring whose points no framing
+    enumerates.  That is the least a level says about a name, so it answers
+    only where no level of the category supplies one: the first provider that
+    supplies the name is the one the final order selects, and a declared
+    absence is kept only where every provider declaring the name states it.
     """
     known = frozenset(providers)
     resolved = _declaring_classes(built)
+    supplied: dict[str, type] = {}
+    for provider in providers:
+        for name, value in vars(provider).items():
+            if value is not None:
+                supplied.setdefault(name, provider)
     selected: dict[str, object] = {}
     seen: set[str] = set()
     for provider in providers:
@@ -429,10 +442,11 @@ def _final_category_operations(
             if _is_bookkeeping_or_hook(name) or name in seen:
                 continue
             seen.add(name)
-            if provider not in carried or resolved.get(name) is provider:
+            answering = supplied.get(name, provider)
+            if answering not in carried or resolved.get(name) is answering:
                 continue
             if resolved.get(name) in known:
-                selected[name] = value
+                selected[name] = vars(answering)[name]
     return selected
 
 

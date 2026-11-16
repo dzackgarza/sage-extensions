@@ -67,7 +67,7 @@ class SemilinearModuleMorphism:
         # scalar map names, and the restriction, transpose and evaluator below all use
         # that same structure.  A ring endpoint is therefore admissible exactly when it
         # is a module over the scalar map's ring -- QQ is a QQ-module and a ZZ-module,
-        # and the identity of QQ selects the first (#307).
+        # and the identity of QQ selects the first.
         source_scalars = scalar_map.domain()
         target_scalars = scalar_map.codomain()
         if domain not in Modules(source_scalars):

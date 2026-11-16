@@ -296,6 +296,21 @@ test-universe:
     fi
     echo "The proof surface stays inside the universe."
 
+# The category graph the tree declares, read out of the source with `ast`: every
+# category and what it declares, the placements each supercategory received, the
+# breadth and depth and shortcut declarations, the homology and the cycles that
+# owe a 2-cell. Views: categories (the default), by-supercategory, foreign,
+# shape, cells, audit, json, svg. AGENTS.md, "Reading the declarations".
+[positional-arguments]
+category-graph view="categories" *arguments:
+    @PYTHONPATH="src${PYTHONPATH:+:$PYTHONPATH}" \
+        "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" \
+        -m sage_extensions.testing.category_graph {{view}} {{arguments}}
+
+# The literal graph, drawn: .tmp/category-graph/declared-graph.dot and its SVG.
+category-graph-svg:
+    @just category-graph svg
+
 # Lint the test tree against the session standard (sage_extensions.testing.test_lint).
 # With no paths it lints every test.
 test-lint *paths:

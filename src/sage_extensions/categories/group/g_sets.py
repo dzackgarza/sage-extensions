@@ -77,7 +77,8 @@ def _orbit_schreier_morphism(orbit, word_section, augmentation, *, transitions=N
     ``(point position, letter position) -> image position`` of the ONE sweep
     that already evaluated every ``s.p``: ``s.p`` is then read from the table
     instead of recomputed by the action.  The words are the same words -- the
-    table selects exactly the images the comprehension would recompute.
+    table selects exactly the images the comprehension would recompute -- and
+    its letter positions index the free cover's generators, in their order.
 
     ``drop_trivial`` drops the Schreier generators that are the identity by
     the sweep's own construction: for the pair whose letter first reached a
@@ -93,11 +94,11 @@ def _orbit_schreier_morphism(orbit, word_section, augmentation, *, transitions=N
     free = augmentation.domain()
     letter_words = tuple(free.group_generators())
     if transitions is not None:
-        table, letter_count = transitions
+        table = transitions
         points = tuple(orbit)
         sections = tuple(word_section(point) for point in points)
-        assert len(table) == len(points) * len(letter_words) == len(points) * letter_count, (
-            f"the retained transition table of {orbit} covers {len(table)} pairs, but the Schreier "
+        assert len(table) == len(points) * len(letter_words), (
+            f"the transition table of {orbit} covers {len(table)} pairs, but the Schreier "
             f"family needs {len(points)} points x {len(letter_words)} letters"
         )
         pairs = [
@@ -331,12 +332,12 @@ class FiniteGSets(CategoryPacketMethods, OwnedParameterizedCategory):
         orbits are finite. Enumerating generator images then terminates at
         exactly their union; no search bound is a finiteness certificate.
         The one breadth-first sweep is retained on the resulting ``G``-set
-        with its point-transition table, so the Schreier and coset operations
-        of THIS action do not evaluate the same pairs a second and third
-        time (``_orbit_of``, ``orbit_schreier_morphism``).  The retained
-        augmentation is the sweep's own: the maintained selection contract
-        (one resolution per object/owner, realized once) already fixes its
-        letter order, and retaining the object makes that binding explicit.
+        as its own construction datum, with its point-transition table, so the
+        Schreier and coset operations of THIS action do not evaluate the same
+        pairs a second and third time (``_orbit_of``, ``orbit_schreier_morphism``).
+        The retained augmentation is the sweep's own: the maintained selection
+        contract (one resolution per object/owner, realized once) already fixes
+        its letter order, and retaining the object makes that binding explicit.
         The seeds are materialized once, so a one-shot iterable is consumed
         before, not after, the sweep.
         """
@@ -345,18 +346,19 @@ class FiniteGSets(CategoryPacketMethods, OwnedParameterizedCategory):
         points, words, transitions = self._orbit_words(
             seeds, action, augmentation, retain_transitions=True,
         )
-        g_set = self._from_orbit_sweep(points, action, augmentation, transitions)
-        g_set.__dict__["_retained_orbit_bfs"] = {
-            "seeds": seeds,
-            "augmentation": augmentation,
-            "points": tuple(points),
-            "words": words,
-            "transitions": transitions,
-            "letter_count": len(tuple(augmentation.domain().group_generators())),
-        }
-        return g_set
+        return self._from_orbit_sweep(
+            points, action, augmentation, transitions,
+            orbit_sweep={
+                "seeds": seeds,
+                "augmentation": augmentation,
+                "points": tuple(points),
+                "words": words,
+                "transitions": transitions,
+                "letter_count": len(tuple(augmentation.domain().group_generators())),
+            },
+        )
 
-    def _from_orbit_sweep(self, points, action, augmentation, transitions):
+    def _from_orbit_sweep(self, points, action, augmentation, transitions, orbit_sweep=None):
         r"""Realize the finite action from its complete generator transition table.
 
         The orbit sweep has evaluated every selected letter on every point.
@@ -365,6 +367,13 @@ class FiniteGSets(CategoryPacketMethods, OwnedParameterizedCategory):
         morphism; other group elements use the supplied defining action.
         This is the same transition-table realization used by
         ``orbit_generator_permutations``, with the actual points retained.
+
+        The table is the result's construction datum, not a view attached to
+        it afterwards: the constructor of the finite ``G``-set level
+        establishes it and ``orbit_transitions`` reads it back, so the set's
+        own generator images answer for it and no sweep state of a caller's
+        survives on the object.  ``orbit_sweep`` carries the whole sweep the
+        same way when the caller retains one.
         """
         point_set = finite_ordered_set(tuple(points))
         permutations = SymmetricGroups()(point_set)
@@ -386,15 +395,14 @@ class FiniteGSets(CategoryPacketMethods, OwnedParameterizedCategory):
             )
 
         representation = self.group().Mor(permutations).elementwise(permutation)
-        g_set = _object_of(
+        return _object_of(
             self,
             point_set=point_set,
             permutation_representation=representation,
             point_action=action,
+            orbit_transitions=(transitions, augmentation),
+            orbit_sweep=orbit_sweep,
         )
-        g_set.__dict__["_retained_transitions"] = (transitions, len(letters))
-        g_set.__dict__["_retained_transition_augmentation"] = augmentation
-        return g_set
 
     def pointed_orbit(self, subgroup, base, action, augmentation=None):
         r"""``G/H`` realized as the orbit of ``base``, for ``H`` the stabilizer of ``base``.
@@ -471,7 +479,20 @@ class FiniteGSets(CategoryPacketMethods, OwnedParameterizedCategory):
             {"acting_group", "action", "underlying_category"}
         )
 
-        def __init__(self, point_set, permutation_representation, point_action=None, **rest) -> None:
+        def __init__(
+            self, point_set, permutation_representation, point_action=None,
+            orbit_transitions=None, orbit_sweep=None, **rest,
+        ) -> None:
+            r"""Establish the presentation and the sweep a search realized it from.
+
+            ``orbit_transitions`` is ``(table, augmentation)``, the position
+            table of this ``G``-set's chosen generators against the free cover
+            ``augmentation`` (see :meth:`orbit_transitions`);
+            ``orbit_sweep`` is the whole breadth-first sweep, when a caller
+            retained it (see :meth:`orbit_sweep`).  Both are construction data
+            of this set and both default to absent: a ``G``-set presented by an
+            action alone has neither.
+            """
             assert point_set in FiniteSets(), (
                 f"cannot form a finite G-set on {point_set}: it is not a finite set, only "
                 f"known to be in {point_set.category()}"
@@ -480,6 +501,8 @@ class FiniteGSets(CategoryPacketMethods, OwnedParameterizedCategory):
             self._point_set = point_set
             self._permutation_representation = permutation_representation
             self._point_action = point_action
+            self._orbit_transitions = orbit_transitions
+            self._orbit_sweep = orbit_sweep
             super().__init__(
                 acting_group=group,
                 action=self.action_of,
@@ -526,6 +549,45 @@ class FiniteGSets(CategoryPacketMethods, OwnedParameterizedCategory):
         def permutation_representation(self):
             r"""Return the chosen action as the group morphism ``G -> Sym(X)``."""
             return self._permutation_representation
+
+        def orbit_transitions(self, augmentation):
+            r"""Return the generator transition table of this ``G``-set, or ``None``.
+
+            ``table[(point, letter)]`` is the position, in ``point_set()``, of
+            the image of the ``letter``-th free generator of ``augmentation``
+            under this set's action, at its ``point``-th point.  A ``G``-set
+            realized from a breadth-first sweep of that cover keeps the table
+            the sweep computed -- one evaluation of every ``s.p``, which the
+            Schreier construction then reads instead of evaluating the action
+            again -- and the table travels with the cover whose letters index
+            it, because the positions of one cover's letters are not another's.
+
+            A ``G``-set presented by an action alone keeps no table, and one
+            realized from a different cover has none for this one: the answer
+            is ``None``, and the caller evaluates the action.  Both cases are
+            the same absence to the caller, and neither is a defect.
+            """
+            match self._orbit_transitions:
+                case None:
+                    return None
+                case (table, cover) if cover is augmentation:
+                    return table
+                case _:
+                    return None
+
+        def orbit_sweep(self):
+            r"""Return the breadth-first sweep that realized this ``G``-set, or ``None``.
+
+            The sweep is the search's own record of one finite action: the
+            seeds it started from, the points it reached in rank order with
+            their words in the selected free cover, the generator transition
+            table those words were read from, and the augmentation they are
+            read through.  It is construction data of the set it realized, so
+            a later question about this action is answered from the action's
+            own data rather than from whichever orbit a search attached last.
+            ``None`` for a ``G``-set no sweep realized.
+            """
+            return self._orbit_sweep
 
         @cached_method
         def action_of(self, group_element):
@@ -616,7 +678,7 @@ class FiniteGSets(CategoryPacketMethods, OwnedParameterizedCategory):
             return finite_indexed_family(
                 orbits,
                 lambda orbit: self.stabilizer(orbit.representative()),
-                name=lambda self=self: f"Orbit stabilizers of {self}",
+                description=lambda self=self: f"Orbit stabilizers of {self}",
             )
 
         def is_transitive_action(self) -> bool:
@@ -734,11 +796,12 @@ class FiniteGSets(CategoryPacketMethods, OwnedParameterizedCategory):
             sweep covers every point of this ``G``-set, the orbit of ``point``
             IS this set with the retained words and transitions, and searching
             a second time is refused work, not a construction. Any other
-            point searches as before.
+            point searches as before, and the orbit that search returns is
+            realized from its own table.
             """
             augmentation = self.acting_group().selected_group_resolution().augmentation()
             category = FiniteGSets(self.acting_group())
-            retained = self.__dict__.get("_retained_orbit_bfs")
+            retained = self.orbit_sweep()
             if (
                 retained is not None
                 and len(retained["seeds"]) == 1
@@ -747,16 +810,12 @@ class FiniteGSets(CategoryPacketMethods, OwnedParameterizedCategory):
                 and retained["augmentation"] is augmentation
                 and retained["letter_count"] == len(tuple(augmentation.domain().group_generators()))
             ):
-                self.__dict__["_retained_transitions"] = (retained["transitions"], retained["letter_count"])
                 return self, retained["words"], retained["augmentation"]
             points, words, transitions = category._orbit_words(
                 (point,), self.act, augmentation, point_key=self.ranking_map(),
                 retain_transitions=True,
             )
             orbit = category._from_orbit_sweep(points, self.act, augmentation, transitions)
-            orbit.__dict__["_retained_transitions"] = (
-                transitions, len(tuple(augmentation.domain().group_generators())),
-            )
             return orbit, words, augmentation
 
         @cached_method(key=lambda self, point: self.ranking_map()(point))
@@ -765,20 +824,26 @@ class FiniteGSets(CategoryPacketMethods, OwnedParameterizedCategory):
 
             The order is that of the letters in ``orbit_schreier_factors``.
             The orbit search already computed every letter's image of every
-            point. Read those exact transitions to construct the permutations;
-            no rational, module or other supplied action is evaluated again.
+            point. Read those exact transitions from the orbit's own table
+            (``orbit_transitions``) to construct the permutations; no
+            rational, module or other supplied action is evaluated again.
             Their positions are already in the orbit's selected point order.
             """
-            orbit, _words, _augmentation = self._orbit_of(point)
-            transitions, letter_count = orbit.__dict__["_retained_transitions"]
+            orbit, _words, augmentation = self._orbit_of(point)
+            transitions = orbit.orbit_transitions(augmentation)
+            assert transitions is not None, (
+                f"the orbit of {point} in {self} was not realized from a sweep of the selected "
+                f"cover, so it has no generator transition table to read"
+            )
             point_set = orbit.point_set()
             permutations = SymmetricGroups()(point_set)
+            letters = tuple(augmentation.domain().group_generators())
             return tuple(
                 permutations([
                     transitions[(position, letter)] + 1
                     for position in range(int(point_set.cardinality()))
                 ])
-                for letter in range(letter_count)
+                for letter in range(len(letters))
             )
 
         def orbit_schreier_morphism(self, point):
@@ -792,7 +857,7 @@ class FiniteGSets(CategoryPacketMethods, OwnedParameterizedCategory):
                 orbit,
                 word_section,
                 augmentation,
-                transitions=orbit.__dict__.get("_retained_transitions"),
+                transitions=orbit.orbit_transitions(augmentation),
             )
 
         def orbit_transversal_words(self, point):
@@ -834,9 +899,12 @@ class FiniteGSets(CategoryPacketMethods, OwnedParameterizedCategory):
                 augmentation(generator)
                 for generator in augmentation.domain().group_generators()
             )
-            transitions, letter_count = orbit.__dict__["_retained_transitions"]
-            if letter_count != len(letters):
-                raise ArithmeticError("the retained orbit transitions have a different generating cover")
+            transitions = orbit.orbit_transitions(augmentation)
+            if transitions is None:
+                raise ArithmeticError(
+                    f"the orbit of {point} in {self} has no generator transition table "
+                    f"against the selected cover, so its Schreier factors are not read from one"
+                )
             transversals = [self.acting_group().one()]
             # The breadth-first sweep assigns each new point its next rank
             # and word s*t_p. Its existing transition table therefore gives
@@ -1060,13 +1128,11 @@ class LeftCosetGSets(OwnedParameterizedCategory):
             schreier = _orbit_schreier_morphism(
                 self, self._coset_word_section, self._coset_augmentation,
                 # The coset realization retains the action's literal point
-                # set. Its sweep table therefore has the same point order;
-                # its letters must also belong to this exact free cover.
-                transitions=(
-                    self._coset_action.__dict__.get("_retained_transitions")
-                    if self._coset_action.__dict__.get("_retained_transition_augmentation")
-                    is self._coset_augmentation
-                    else None
+                # set, so its sweep table is in this point order; the table
+                # belongs to that action and is asked for its cover here, so
+                # a table of another free cover is not read as this one's.
+                transitions=self._coset_action.orbit_transitions(
+                    self._coset_augmentation
                 ),
                 drop_trivial=drop_trivial,
             )

@@ -8142,7 +8142,7 @@ def _multiprojective_closed_fibre(left_map, right_map):
                 indexed_family(
                     ambient.factors().index_set(),
                     lambda label: legs[label],
-                    name=lambda ambient=ambient, scheme=scheme: f"Map from {scheme} to {ambient}",
+                    description=lambda ambient=ambient, scheme=scheme: f"Map from {scheme} to {ambient}",
                 )
             )
 

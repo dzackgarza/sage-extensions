@@ -1769,10 +1769,10 @@ class OrthogonalCharacterQuotient:
         for the Enriques period lattice no statement supplies one: Kneser's conditions fail
         there (``rank_2(N) = 2``) and ``N`` has no second hyperbolic plane, so
         Gritsenko--Hulek--Sankaran's generation statements do not reach it
-        (arXiv:0810.1614v1, Proposition 5.6, p. 17; sage-extensions#17's reading in
+        (arXiv:0810.1614v1, Proposition 5.6, p. 17; the reading is
         ``results/issue17-kernel-generation-blocker.md``).  Asking for that family is what
         stopped the ``Otilde^+(N)`` row, since ``Otilde(L)`` is an infinite arithmetic group
-        with no selected resolution (sage-extensions#310, #339).
+        with no selected resolution.
 
         A witness, on the other hand, is a single reflection, and for ``N = U + U(2) +
         E8(-2)`` it is named on the page: *"the reflection with respect to a vector of length
@@ -1887,7 +1887,7 @@ class OrthogonalCharacterQuotient:
         if j >= 1 and sign_labels:
             # A sign character that does not descend to im rho is lifted by one explicit
             # element of ker rho, exhibited below; Otilde(L)'s generating family is neither
-            # needed nor known (sage-extensions#17, #310).
+            # needed nor known.
             for label in sign_labels:
                 flip_element = self._kernel_sign_flip(label)
                 if flip_element is not None:
@@ -1998,7 +1998,7 @@ class OrthogonalCharacterQuotient:
         # GAP's own FactorCosetAction -- the native chain-based coset action,
         # the same machinery the double-coset enumeration rides (the whole
         # Coble index in 137 s), where the generic action on external coset
-        # objects did not return inside an hour (the #390 probes).
+        # objects did not return inside an hour.
         to_perm = libgap.IsomorphismPermGroup(im_rho)
         im_rho_perm = libgap.Range(to_perm)
         right = libgap.Subgroup(im_rho, list(discriminant_image_generators))
@@ -2024,9 +2024,8 @@ class OrthogonalCharacterQuotient:
         # carried its parent there -- so each lift is spelled by one owned
         # product per coset along the walk's own tree, not by a per-coset
         # word problem (whose 102 ms per double coset made the Coble kernel
-        # rows -- 189720 double cosets each -- hours, the #390 profile on
-        # main) and not by a factorization whose chain-with-words was
-        # measured past this VM's memory guard.
+        # rows -- 189720 double cosets each -- hours) and not by a factorization
+        # whose chain-with-words was measured past this VM's memory guard.
         perm_images = [libgap.Image(to_perm, image) for image in rho_images]
         small_indices = []
         closure = libgap.TrivialSubgroup(im_rho_perm)
@@ -2196,7 +2195,7 @@ end
         subgroup orbit exactly when some subgroup element does the same
         carrying, and this method decides *separation* -- that no such element
         exists -- on the finite character image alone, before any integral
-        stabilizer is computed (#391: on the ``Gamma_{Co,2}`` row of ``T_Co``
+        stabilizer is computed (on the ``Gamma_{Co,2}`` row of ``T_Co``
         every failed transporter search of the cusp rows reached the exact
         stabilizer route through the absence of this decision, and the
         adjustment inside it was killed at the memory guard).
@@ -2219,7 +2218,7 @@ end
           carrying ``left`` to ``witness(left)`` factors as ``witness s`` with
           ``s`` in ``Stab(left)``, so ``chi(witness)`` lies in
           ``chi(Gamma) chi(Stab(left))``.  Where the plane's parabolic is
-          certified complete (:meth:`is_parabolic_complete`, #331, #366) the
+          certified complete (:meth:`is_parabolic_complete`) the
           image of its family is exactly ``chi(Stab(left))``, and the test is
           one double-coset membership -- answered by GAP without listing the
           double coset.  Both answers are exact for a quotient without sign
@@ -2304,7 +2303,7 @@ end
         A subgroup element carrying ``left`` to ``right`` maps the divided
         class data of ``left`` onto that of ``right`` -- the class of the
         image is the image of the class -- so differing orbits separate the
-        subobjects before any isometry search runs (#391: on ``T_Co`` the
+        subobjects before any isometry search runs (on ``T_Co`` the
         indefinite port's plane isometry between two word-transported
         representatives of the ``Gamma_{Co,2}`` row reaches PARI's ``qfauto``
         on the reduction of the transported basis, and the search is killed
@@ -2347,7 +2346,7 @@ end
         the lift therefore generates the target plane's complete parabolic.
         Retaining both data lets every consumer use the split's own witness and
         certificate instead of repeating an integral isometry or parabolic
-        completeness computation (#391/#396).
+        completeness computation.
         """
         self.__dict__.setdefault("_isotropic_lift_registry", {})[plane] = (
             lift,
@@ -2386,7 +2385,7 @@ end
         generate `Stab(P_0)`, then the `s g_i s^{-1}` generate
         `Stab(P)=s Stab(P_0) s^{-1}`.  In particular no new completeness
         decision, and no automorphism group of a transported Levi quotient, is
-        needed (#391: that recomputation reaches PARI `qfauto` on `T_Co`).
+        needed (that recomputation reaches PARI `qfauto` on `T_Co`).
         An unregistered plane uses its own block-construction certificate.
         """
         record = self._registered_isotropic_split(plane)
@@ -2786,7 +2785,7 @@ def _subgroup_vector_orbit_representatives(subgroup, square):
             NN,
             element_at,
             index_of=index_of,
-            name=f"Square-zero orbit representatives of {subgroup}",
+            description=lambda: f"Square-zero orbit representatives of {subgroup}",
         )
 
     def split_representatives():
@@ -3374,7 +3373,7 @@ def _plane_orbit_from_odd_stabilizer(subgroup, representative):
     # subgroup objects: a comparison of two preimage subgroups can be false for the
     # same subgroup reached by another route, and a false answer here does not fail
     # loudly -- it falls through to the stabilizer enumeration this route exists to
-    # avoid (measured: 9.3 GiB and no return on `6JRX`, #379).  `O^+ = sn^{-1}(+1)` is
+    # avoid (measured: 9.3 GiB and no return on `6JRX`).  `O^+ = sn^{-1}(+1)` is
     # exactly the subgroup cut out by the spinor character alone.
     quotient = subgroup.finite_character_quotient()
     if not (
@@ -3409,7 +3408,7 @@ def _plane_orbit_from_parabolic_stabilizer(subgroup, representative):
     isotropic plane (Dutour Sikirić--Hulek, Theorem 4.9, printed pp. 33--34),
     and :meth:`...PrimitiveIsotropicSubobjects.ParentMethods.is_parabolic_complete`
     decides on three computed indices whether the family they produce is the
-    whole of `H` (#331, #366).  Where the parabolic is not established to be
+    whole of `H`.  Where the parabolic is not established to be
     complete, ``None`` is returned and the caller keeps its own route.
 
     Each returned representative is the transported plane of one double
@@ -3462,7 +3461,7 @@ def _plane_orbit_from_parabolic_stabilizer(subgroup, representative):
     # row's footprint for no mathematical content.  The split's own lifts and
     # complete source family are retained with the representatives they
     # produced: the consumers of the row never search for a witness or
-    # re-certify a transported parabolic (#391 -- the search reaches the
+    # re-certify a transported parabolic (the search reaches the
     # port's generic enumeration, and the recomputation reaches PARI's
     # qfauto overflow on this lattice).
     quotient.register_isotropic_lift(
@@ -3511,7 +3510,7 @@ def _levi_restriction_fixes_line(plane, generator, line_vector, coordinates):
 
 
 def _plane_parabolic_incidence_flags(subgroup, plane, flag):
-    r"""A flag covering of the Tits-building incidence at one plane, from its parabolic (#391).
+    r"""A flag covering of the Tits-building incidence at one plane, from its parabolic.
 
     Let ``G = O(L)``, ``P`` a primitive isotropic plane, ``F_0 = (ell_0 < P)``
     a flag whose line is one line of ``P``, ``Pi = Stab_G(P)`` the plane's
@@ -3715,14 +3714,14 @@ def _subgroup_isotropic_equivalence_witness(subgroup, left, right, *, flag=False
         # The equivariant class data separates the orbits of two primitive
         # isotropic subobjects before any isometry search runs: a subgroup
         # element carrying one to the other maps the class data of the first
-        # onto that of the second (#391: the plane isometry between two
+        # onto that of the second (the plane isometry between two
         # word-transported representatives reaches the port's generic
         # enumeration on this lattice, and the separated pairs never start it).
         if not flag and quotient.invariant_separates_isotropic_orbits(left, right):
             return None
     # The parabolic split's own lifts are ambient isometries between the
     # representatives it produced, so two registered planes have a witness
-    # that no isometry search has to find (#391).
+    # that no isometry search has to find.
     left_lift = quotient.isotropic_lift_of(left) if quotient is not None else None
     right_lift = quotient.isotropic_lift_of(right) if quotient is not None else None
     witness = (
@@ -3741,7 +3740,7 @@ def _subgroup_isotropic_equivalence_witness(subgroup, left, right, *, flag=False
         # in distinct orbits by construction (DSH Lemma 3.6, printed p. 22).
         # A second membership test in rho(Gamma) rho(Stab) is therefore not
         # merely redundant: GAP's DoubleCoset membership is the memory wall
-        # measured while deduplicating the T_Co plane cusps (#391/#396).
+        # measured while deduplicating the T_Co plane cusps.
         return None
     _assert_isotropic_splitting_has_character_data(subgroup)
     if quotient is None:

@@ -1,10 +1,21 @@
-r"""A ring's points are iterated only where they are a finite set.
+r"""A ring's points are iterated only where a level states their enumeration.
 
 $\mathbf{Z}[x]$ is countable -- its points are $0, 1, -1, x, -x, \ldots$ -- so
-nothing is missing when it states no enumeration of them: an iterator need not
-be finite, but a ring's points are not a sequence either, and the general ring
-category states no ``__iter__`` at all rather than an operation whose only
-behavior is to refuse.
+nothing is missing when a ring states no enumeration of them: an iterator need
+not be finite, but a ring's points are not a sequence either, and no level
+supplies this ring an enumeration.
+
+Two levels do supply one.  A ring whose points are a finite set is enumerated by
+the engine that realizes it (:class:`OwnedRings.Finite`, stated for
+$\mathbf{Z}/8$ in
+``tests/categories/test_the_refined_category_answers_with_its_own_operation.sage``),
+and a ring that is a finitely generated framed free module over its base ring is
+enumerated through the framing's coordinates -- the bounded integral box
+exhausts such a module, so the coordinates enumerate its points -- which
+``tests/rings/test_a_framed_ring_enumerates_its_points_through_its_framing.sage``
+states for $\mathbf{Z}$ and $\mathbf{Q}(i)$.  $\mathbf{Z}[x]$ is in neither: its
+monomial framing has no finite basis, so no coordinate box exists to exhaust it
+and the general ring's stated absence answers.
 
 The language states the refusal.  ``__getitem__`` on a ring is the adjunction
 syntax $R[x_1, \ldots, x_n]$ and not an index into a sequence, so with

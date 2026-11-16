@@ -20,11 +20,29 @@ starts one probe per tree before waiting on any of them, and ``probe_run``
 reports the log a run's own logging configuration filled.  All are bound as
 builtins for the same reason: the lint admits exactly the names a directory's
 ``conftest.py`` binds.
+
+One question is about the tree and not about a run of it: does a source file
+state what the code does, or name the issue that changed it?  A source file's
+history is the commit body's record, and nothing a reader of the code needs to
+compute with is spelled ``#`` and digits, so ``issue_number_mentions`` scans the
+files git tracks under ``src/`` for that spelling and reports each line by path
+and line number.  It scans a mapping of names to texts when a test hands it one,
+so the same call asks what it reports about a file written to be found.
+
+The acceptance drivers are instruments of the same kind: each takes one row of
+an orbit computation and reports what the row did.  ``incidence_row_reports``
+reads the Γ_{Co,2} driver's report of an undecided row and of a broken contract
+off the driver itself — its row step and its edge contract, each run on real
+data — and ``incidence_edge_containment`` is the driver's own edge contract on
+one line/plane pair.  All are bound as builtins for the same reason: the lint
+admits exactly the names a directory's ``conftest.py`` binds.
 """
 
 from __future__ import annotations
 
 import builtins
+import importlib.util
+import io
 import json
 import re
 import shutil
@@ -32,11 +50,13 @@ import subprocess
 import sys
 import tempfile
 import time
+from contextlib import redirect_stdout
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 
 from sage_extensions import timing as sage_timing
+from sage_extensions.testing.category_graph import read as read_category_graph
 
 SOURCE_TREE = Path(__file__).resolve().parents[2]
 PROBE_ROOT = SOURCE_TREE / ".tmp" / "plugin-probes"
@@ -169,6 +189,18 @@ def _outcomes(records: list[dict]) -> dict[str, str]:
     return {nodeid: "failed" if nodeid in failed else "passed" for nodeid in sorted(reported)}
 
 
+def declared_category_graph():
+    r"""The category graph this checkout declares, read out of its source.
+
+    ``just category-graph`` prints the same graph.  The reader parses the source
+    with ``ast`` and imports nothing of the preamble, so a test of it asks about
+    the declarations the tree writes rather than about the classes Sage joined
+    from them; the checkout it reads is this file's own, whether the run works
+    in a worktree or in the repository.
+    """
+    return read_category_graph(SOURCE_TREE)
+
+
 def pytest_configure(config) -> None:
     r"""Bind the abbreviation for this session, as the lint documents.
 
@@ -178,18 +210,26 @@ def pytest_configure(config) -> None:
     name is removed when the session ends, so the binding lasts exactly as long
     as the tests that name it.
     """
+    builtins.declared_category_graph = declared_category_graph
     builtins.probe_run = probe_run
     builtins.stage_records_of = stage_records_of
     builtins.kept_test_run = kept_test_run
     builtins.simultaneous_test_runs = simultaneous_test_runs
+    builtins.incidence_edge_containment = incidence_edge_containment
+    builtins.incidence_row_reports = incidence_row_reports
+    builtins.issue_number_mentions = issue_number_mentions
 
 
 def pytest_unconfigure(config) -> None:
     r"""Remove the session's abbreviation, leaving ``builtins`` as it was found."""
+    del builtins.declared_category_graph
     del builtins.probe_run
     del builtins.stage_records_of
     del builtins.kept_test_run
     del builtins.simultaneous_test_runs
+    del builtins.incidence_edge_containment
+    del builtins.incidence_row_reports
+    del builtins.issue_number_mentions
 
 
 @dataclass(frozen=True)
@@ -394,3 +434,156 @@ def simultaneous_test_runs(*trees: dict[str, str]) -> tuple[tuple[RecordFile, ..
     finally:
         for root in roots:
             shutil.rmtree(root)
+
+
+ISSUE_NUMBER = re.compile(r"#\d+")
+r"""The spelling of an issue reference: a number sign and the issue's digits.
+
+Every other number a source file states -- a dimension, a page, a coefficient, a
+count -- arrives with its own context, and a number sign introduces none of
+them, so a line carrying this spelling names an issue.
+"""
+
+
+def _tracked_source_files() -> tuple[Path, ...]:
+    r"""Every file git tracks under ``src/``, in a fixed order.
+
+    The tracked files and not a directory walk: a build's output, a ``__pycache__``
+    and a scratch file are not the library, and the commit that carries a line is
+    the record of why it is there.
+    """
+    completed = subprocess.run(
+        ("git", "-C", str(SOURCE_TREE), "ls-files", "-z", "src"),
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    return tuple(SOURCE_TREE / name for name in sorted(completed.stdout.split("\0")) if name)
+
+
+def issue_number_mentions(sources: dict[str, str] | None = None) -> tuple[str, ...]:
+    r"""Every line of a source file that names an issue, as ``path:line: text``.
+
+    ``sources`` maps a file name to its text; without it the files are the ones
+    git tracks under ``src/``.  A source file states what the code does, and the
+    history of a change -- the issue that found the defect, the rounds it took --
+    is the commit body's record, which a reader of the code does not have to hold
+    to compute anything.  So the spelling :data:`ISSUE_NUMBER` has no place in
+    one, and the report is the lines that carry it, in path and line order, with
+    the line's own text after it.
+    """
+    scanned = (
+        {
+            path.relative_to(SOURCE_TREE).as_posix(): path.read_text(encoding="utf-8")
+            for path in _tracked_source_files()
+        }
+        if sources is None
+        else sources
+    )
+    return tuple(
+        f"{name}:{number}: {line.strip()}"
+        for name, text in scanned.items()
+        for number, line in enumerate(text.splitlines(), start=1)
+        if ISSUE_NUMBER.search(line)
+    )
+
+
+# The Coble acceptance drivers ------------------------------------------------
+#
+# A driver is a script, not part of the installed package: it imports the
+# vocabulary of row statuses from the file beside it, so each is loaded by path
+# with that name registered first.
+
+DRIVER_SOURCE = SOURCE_TREE / "tests"
+
+
+@dataclass(frozen=True)
+class RowReport:
+    r"""What one run reported for a row of an acceptance driver.
+
+    ``report`` is the text the driver printed about the row — which outcome it
+    was and, for a broken contract, which clause broke — and ``exit_status`` is
+    the status ``main`` returns for that row's outcome.  A row that did not
+    return inside its cap and a row that returned an edge breaking its contract
+    are different facts about a run, so a reader tells them apart by these two
+    fields and not by one shared answer.
+    """
+
+    report: str
+    exit_status: int
+
+
+def _script(name: str):
+    r"""The module the file ``<name>.py`` of ``tests/`` defines, loaded under that name.
+
+    The drivers are scripts: each imports the shared row-status vocabulary by
+    the name of the file beside it, so the vocabulary is registered first and
+    the driver then resolves it.
+    """
+    path = DRIVER_SOURCE / f"{name}.py"
+    spec = importlib.util.spec_from_file_location(name, path)
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[name] = module
+    spec.loader.exec_module(module)
+    return module
+
+
+def _incidence_row_driver():
+    r"""The Γ_{Co,2} incidence-row driver, with the row statuses it shares."""
+    _script("coble_row_status")
+    return _script("coble_gamma_co_2_incidence_rows")
+
+
+def _row_report(driver, row_step):
+    r"""What ``row_step`` printed about one row, and the exit status the driver gives its status."""
+    printed = io.StringIO()
+    with redirect_stdout(printed):
+        _row, status = row_step()
+    return RowReport(report=printed.getvalue().strip(), exit_status=driver.exit_status(status))
+
+
+def incidence_edge_containment(line, plane):
+    r"""Why the Γ_{Co,2} driver's edge contract rejects a line/plane edge, or ``None``.
+
+    The clause is the row's: the line's retained generator must lie in the
+    plane, that is, be in the image of the plane's inclusion.
+    """
+    return _incidence_row_driver().containment_violation(line, plane)
+
+
+def incidence_row_reports():
+    r"""The Γ_{Co,2} driver's report of an undecided row and of a broken contract.
+
+    The undecided row is the driver's own row step on ``O(T_Co)`` under a cap
+    that has already expired: the subgroup is the driver's and the cap is the
+    caller's budget.  The broken contract is the driver's own edge contract on
+    the smallest row that breaks it — one real edge whose line, a primitive
+    isotropic line of ``T_Co``, does not lie in its primitive isotropic plane —
+    reported through the function the row step reports every outcome with.  Each
+    answer is the driver's words and the exit status ``main`` gives it.
+    """
+    from sage_extensions.catalogue import NamedLattices
+    from sage_extensions.coble import Coble
+
+    driver = _incidence_row_driver()
+    lattice = NamedLattices.Tco
+    undecided = _row_report(
+        driver,
+        lambda: driver.run_row(lattice, lattice.Aut(), "O(T_Co)", 0.01),
+    )
+    isotropic = Coble.isotropic_vectors()
+    plane = lattice.subobject_on((isotropic["w1"], isotropic["w3"]))
+    outside = next(
+        isotropic[name] for name in isotropic
+        if name not in ("w1", "w3") and not plane.inclusion().is_in_image(isotropic[name])
+    )
+    violation = driver.containment_violation(lattice.subobject_on((outside,)), plane)
+    contract_violation = _row_report(
+        driver,
+        lambda: driver.report_row_outcome(
+            "Gamma_{Co,2}",
+            driver.RowStatus.CONTRACT_VIOLATION,
+            f"edge 0 of 1: {violation}",
+        ),
+    )
+    return undecided, contract_violation

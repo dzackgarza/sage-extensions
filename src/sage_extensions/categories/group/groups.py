@@ -2098,8 +2098,8 @@ def _supplied_generator(group, element):
     That datum is written by the subgroup that supplies the family: reading a group's own
     selected generators (:meth:`OwnedGroups.ParentMethods.group_generators`) records each
     of them as a member of the group it acts by, through the element-side mark a free
-    cover's word values get (:meth:`GeneratedSubgroups._mark_admitted`,
-    sage-extensions#287).  A stabilizer ``S = G.stabilizer(x)`` builds its generator family
+    cover's word values get (:meth:`GeneratedSubgroups._mark_admitted`).  A stabilizer
+    ``S = G.stabilizer(x)`` builds its generator family
     in its own selected resolution, so the family ``S.group_generators()`` hands out
     carries the mark naming ``S.supergroup() = G``;
     ``G.subgroup(S.group_generators())`` reads that mark and puts no question to ``G``.
@@ -2129,7 +2129,7 @@ def _record_generators_in_supergroup(group, generators):
 
     The record is the one a free cover's word values get: the groups whose construction
     supplied the element, on the element, compared by identity
-    (:meth:`GeneratedSubgroups._mark_admitted`, sage-extensions#287).  It is written only
+    (:meth:`GeneratedSubgroups._mark_admitted`).  It is written only
     for a proper subgroup whose supergroup keeps that admission, so an ambient group, or a
     supergroup with no such record, writes nothing and the later question is asked as
     before.
@@ -2141,8 +2141,8 @@ def _record_generators_in_supergroup(group, generators):
 
     This is the subgroup construction's own statement about its own generator family, and
     nothing else: no family a caller merely asserts lies in the supergroup is admitted
-    here, which is the difference sage-extensions#341 draws between this datum and a
-    premise stated about arbitrary elements.
+    here, which is the difference between this datum and a premise stated about
+    arbitrary elements.
     """
     supergroup = group.supergroup()
     if supergroup is group:
@@ -5313,7 +5313,7 @@ class OwnedGroups(CategoryPacketMethods, OwnedCategory):
             ``f_i: H -> G_i``, the unique mediating ``h |-> (f_i(h))``
             (Mathlib ``Mathlib/Algebra/Group/Prod.lean``: ``MonoidHom.fst``,
             ``MonoidHom.inl`` with ``x |-> (x, 1)``, ``MonoidHom.prod``;
-            ``lean-categories`` request lean-categories#91).  This route
+            ``lean-categories`` request).  This route
             needs nothing of the factors but their laws, so it realizes the
             product when some factor has neither a finite realization nor a
             chosen finite presentation; the GAP route above serves those.
@@ -5912,7 +5912,7 @@ class OwnedGroups(CategoryPacketMethods, OwnedCategory):
             (:func:`_record_generators_in_supergroup`), which is what a later
             ``supergroup().subgroup(self.group_generators())`` reads instead of asking an
             infinite generated subgroup a membership question it cannot answer
-            (:func:`_supplied_generator`, sage-extensions#341).  The mark is written on each
+            (:func:`_supplied_generator`).  The mark is written on each
             element as the family is read and asks for no computation of its own, and the
             returned family is still the resolution's own object, so two reads of one
             group's generators remain the same objects.
@@ -6626,12 +6626,21 @@ class OwnedGroups(CategoryPacketMethods, OwnedCategory):
             return None
 
         def conjugate_subgroup(self, group_element, subgroup):
-            r"""Return ``g H g^-1``, the image of ``H`` under conjugation by ``g``."""
+            r"""Return ``g H g^-1``, the image of ``H`` under conjugation by ``g``.
+
+            ``G`` acts on its subgroups by this formula, so an element that
+            carries ``H`` to itself fixes that point of the subgroup set: the
+            answer is ``subgroup`` itself, with the selected data and maps it
+            retains, and not another subgroup with the same elements.  Every
+            element of ``H`` does, the identity first among them, and a
+            realization that decides the equality of ``g H g^-1`` with ``H``
+            for the remaining elements supplies those through
+            ``_conjugate_subgroup_construction``.
+            """
             assert group_element in self, f"{group_element} is not an element of {self}"
             assert subgroup is self or subgroup in self.subgroups(), f"{subgroup} is not a subgroup of {self}"
-            if subgroup is self or group_element == self.one():
-                # Conjugation by 1 is literally the identity action on the
-                # represented subgroup, including its selected data and maps.
+            if subgroup is self or group_element == self.one() or subgroup.is_parent_of(group_element) is True:
+                # g H g^-1 = H for g in H, so this element fixes the point H.
                 return subgroup
             selected = self._conjugate_subgroup_construction(group_element, subgroup)
             if selected is not None:
@@ -6921,16 +6930,31 @@ class OwnedGroups(CategoryPacketMethods, OwnedCategory):
                     )
                 return self.selected_resolution(OwnedGroups())
 
-            def conjugate_subgroup(self, group_element, subgroup):
-                r"""Return ``g H g^-1``; GAP's ``ConjugateSubgroup(H, x)`` is ``x^-1 H x``."""
-                assert group_element in self, f"{group_element} is not an element of {self}"
-                assert subgroup in self.subgroups(), f"{subgroup} is not a subgroup of {self}"
+            @RealizationHook
+            def _conjugate_subgroup_construction(self, group_element, subgroup):
+                r"""Supply ``g H g^-1`` from GAP, which also decides when it is ``H`` again.
+
+                Only ``conjugate_subgroup`` calls this, with the element and the
+                subgroup already admitted, and only after the identity and the
+                elements of ``subgroup`` itself have answered.
+
+                GAP's ``ConjugateSubgroup(H, x)`` is ``x^-1 H x``, so the engine
+                element is the inverse.  An element outside ``H`` can still
+                carry ``H`` to itself -- ``(3 4)`` outside the subgroup
+                ``<(1 2)>`` of ``S_4`` -- and the engine decides that equality
+                exactly.  The answer is then the point ``H`` the element fixes,
+                not a second subgroup with the same elements.
+                """
+                model = _gap_model(subgroup)
+                image = libgap.ConjugateSubgroup(
+                    model,
+                    _element_to_engine(self, group_element.inverse()),
+                )
+                if image == model:
+                    return subgroup
                 return _subgroup_from_gap(
                     self,
-                    libgap.ConjugateSubgroup(
-                        _gap_model(subgroup),
-                        _element_to_engine(self, group_element.inverse()),
-                    ),
+                    image,
                     f"the conjugate of {subgroup} by {group_element}",
                 )
 
@@ -7605,8 +7629,7 @@ class SymmetricGroups(OwnedCategory):
     ``SymmetricGroups().Mor(A, B)``.  ``Sym(Omega)`` is one object whichever
     route builds it, and its ambient category is the groups, so ``A.Mor(B)``
     is all group homomorphisms (``OWN-02``, ``ARC-07``).  ``lean-categories``
-    does not formalize symmetric groups; the
-    request is in research issue #432.  Every symmetric group is a permutation
+    does not formalize symmetric groups.  Every symmetric group is a permutation
     group, by its action on ``Omega``.
     """
 
@@ -7814,8 +7837,7 @@ class GeneralLinearGroups(OwnedCategory):
     ``Matrix.GeneralLinearGroup.map``), so these are the arrows of the
     category, asked of it explicitly: ``GeneralLinearGroups().Mor(A, B)``.
     ``GL_n(R)`` is one object whichever route builds it, with the groups as
-    its ambient category.  ``lean-categories`` does not formalize ``GL_n``; the request is in
-    research issue #432.
+    its ambient category.  ``lean-categories`` does not formalize ``GL_n``.
     """
 
     _MorCategory = GeneralLinearGroupMorCategoryConstruction
@@ -7856,7 +7878,7 @@ class CoxeterGroups(OwnedCategory):
     retaining ``m`` (``lean-categories`` FOUNDATIONS.md Def. 60.4).  It is
     constructed through :class:`FreeGroupQuotients` with that presentation.
     Its ambient category is the groups.  Arrows of Coxeter data are not
-    formalized in ``lean-categories`` (request in research issue #439), so this
+    formalized in ``lean-categories``, so this
     category presents its objects and states no arrows of its own; the maps
     of presentations are ``FreeGroupQuotients().Mor(W, W')``.
     """
@@ -8017,9 +8039,7 @@ class FreeGroupQuotients(OwnedCategory):
     explicitly: ``FreeGroupQuotients().Mor(A, B)``.  ``F/<<R>>`` is one object
     whichever route builds it, with the groups as its ambient category.  When ``F`` has a finite basis
     and ``R`` is finite the presentation is a chosen finite presentation, and
-    the group is also placed in :class:`GroupsWithChosenFinitePresentation`;
-    how the two relate to the resolution category of ``CAT-29`` is recorded
-    in research issue #409.
+    the group is also placed in :class:`GroupsWithChosenFinitePresentation`.
     """
 
     _MorCategory = FreeGroupQuotientMorCategoryConstruction
@@ -8404,10 +8424,9 @@ class Subgroups(OwnedParameterizedCategory):
             (Mathlib ``Subgroup.IsArithmetic``,
             ``Mathlib/NumberTheory/ModularForms/ArithmeticSubgroups.lean:102``,
             states it for subgroups of ``GL_2(RR)`` against the image of
-            ``SL_2(ZZ)``).  ``lean-categories`` does not define it; the
-            request is in research issue #412.  A subgroup constructed as the
-            integral points ``G(ZZ)`` of its ambient is arithmetic by that
-            construction (it is commensurable with itself; Mathlib
+            ``SL_2(ZZ)``).  ``lean-categories`` does not define it.  A subgroup
+            constructed as the integral points ``G(ZZ)`` of its ambient is arithmetic
+            by that construction (it is commensurable with itself; Mathlib
             ``instance : IsArithmetic 𝒮ℒ``); any other subgroup answers the
             proposition.
             """
@@ -8601,11 +8620,11 @@ class GeneratedSubgroups(OwnedParameterizedCategory):
             identity, so it lives exactly as long as the element does.  A record on the
             subgroup instead would retain one entry per value of the cover's word
             evaluation, which is one entry per word: that grows without bound in the
-            subgroup for exactly the walks this admission exists to serve
-            (sage-extensions#292 is the same shape one call away).  Elements of this
-            library are not reliably equatable — ``hash`` is the parent's for some owned
-            families, and on the #287 specimen an isometry satisfies
-            ``value == ~value`` — so the marks are compared by identity, not by value.
+            subgroup for exactly the walks this admission exists to serve (the same
+            shape one call away).  Elements of this library are not reliably equatable
+            — ``hash`` is the parent's for some owned families, and an isometry can
+            satisfy ``value == ~value`` — so the marks are compared by identity, not by
+            value.
 
             The inverse is marked with the value: ``k^-1`` for a word ``k`` is that word
             reversed, which needs no solver and no further construction.

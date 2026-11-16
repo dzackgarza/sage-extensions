@@ -11,7 +11,7 @@ engine and is used here only for conjugacy-class sizes.
 from sage.categories.morphism import Morphism
 from sage.misc.cachefunc import cached_function
 from sage.structure.element import Element
-from sage.structure.richcmp import richcmp
+from sage.structure.richcmp import op_EQ, op_NE
 
 from sage_extensions.categories.abstract_categories.mor_foundation import CategoricalArrow
 from sage_extensions.categories.abstract_categories.objects import (
@@ -151,33 +151,27 @@ class CharacterSets(OwnedParameterizedCategory):
         def __call__(self, element):
             return self.class_function()(element)
 
-        def _class_function_values(self):
-            r"""The values on the conjugacy-class representatives, the character's mathematical key."""
-            return tuple(
-                self(representative)
-                for representative in self.conjugacy_class_representatives()
-            )
-
         def _richcmp_(self, other, op):
             r"""Compare two characters of ``G`` by their values on the conjugacy classes.
 
-            A character is determined by its values on the conjugacy classes
-            (Milne, *Group Theory*, v4.01, Proposition 7.44, p. 116) and its
-            class function by its values on the classes' representatives, so
-            the value tuple decides the comparison; :meth:`__hash__` hashes
-            that same tuple.
+            A character is a class function, so its values on the conjugacy
+            classes fix it (Milne, *Group Theory*, v4.01, p. 115: "chi_V
+            depends only on the isomorphism class of the F[G]-module V, and
+            chi_V is a class function"), and a class function is a function on
+            the set of conjugacy classes (ibid., Proposition 7.47, p. 117), so
+            the value family on the representatives decides equality.  A
+            character carries no order, and the other operators stay
+            unanswered.
             """
-            if other.parent() is not self.parent():
-                return NotImplemented
-            return richcmp(
-                self._class_function_values(),
-                other._class_function_values(),
-                op,
-            )
+            if op == op_EQ:
+                return self.values() == other.values()
+            if op == op_NE:
+                return self.values() != other.values()
+            return NotImplemented
 
         def __hash__(self) -> int:
             r"""Hash the values on the conjugacy-class representatives of ``G``."""
-            return hash(self._class_function_values())
+            return hash(tuple(self.values()))
 
         def degree(self):
             r"""The value at the identity, the dimension of the representation."""

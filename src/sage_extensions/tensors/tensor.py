@@ -87,7 +87,7 @@ def index_rank_family(ranks):
     return indexed_family(
         Sets.Δ[len(entries) - 1],
         lambda index: entries[int(index)],
-        name=lambda entries=entries: f"Index ranks ({', '.join(str(entry) for entry in entries)})",
+        description=lambda entries=entries: f"Index ranks ({', '.join(str(entry) for entry in entries)})",
     )
 
 
@@ -1918,7 +1918,7 @@ class _CoordinateTensor(ModuleElement, Tensor):
         This is the tensor's stored datum, returned as data rather than as another
         tensor: a caller that has to persist or rebuild the tensor reads the
         components here and hands the same tuple back to the tensor module's
-        element constructor (issue #20).  Nothing is recomputed and no coordinate
+        element constructor.  Nothing is recomputed and no coordinate
         convention is introduced at this boundary -- the array order is the one
         ``_CoordinateTensor`` was constructed with.
         """

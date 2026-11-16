@@ -355,7 +355,17 @@ class _CauchyRealComputation(LazyFieldElement):
 class ExactRealNumber(FieldElement):
     r"""An exact, explicitly real number."""
 
-    __hash__ = None
+    def __hash__(self) -> int:
+        r"""Hash the reals of one field alike: their equality is equality of values.
+
+        Two reals are equal when the difference of their retained expressions
+        is zero, which ``AA`` decides exactly: ``sqrt(2)^2`` and ``2`` are one
+        real.  No key read off a presentation therefore agrees with this
+        equality, and the field is the one invariant a hash can read without
+        deciding a value, which is the rule of :class:`Sets`.  Distinct reals
+        of one field collide here and are still told apart by equality.
+        """
+        return hash(id(self.parent()))
 
     def __init__(self, parent: ExactRealField, expression: Expression | LazyFieldElement) -> None:
         self._expression = expression
@@ -374,10 +384,11 @@ class ExactRealNumber(FieldElement):
     def _cache_key(self):
         r"""Supply Sage's cache key for this immutable real presentation.
 
-        Real equality remains partial, so this element stays unhashable.
-        Sage's cached constructions can instead use the parent and the
-        exact stored expression, or a retained identity token for a lazy
-        computation. Distinct presentations denoting the same real may
+        Real equality remains partial, so this key may separate two
+        presentations of one value; the hash of the element itself is the
+        field's, which agrees with every decided equality.  Sage's cached
+        constructions can instead use the parent and the exact stored
+        expression, or a retained identity token for a lazy computation. Distinct presentations denoting the same real may
         occupy separate cache entries; a cache hit establishes
         neither a new equality decision nor a normal form for real values.
         """

@@ -144,7 +144,7 @@ class DiscriminantModules(OwnedCategoryOverBaseRing):
             return indexed_family(
                 index,
                 lambda prime: components[prime],
-                name=lambda self=self: f"Primary components of {self}",
+                description=lambda self=self: f"Primary components of {self}",
             )
 
         def primary_part(self, prime):
@@ -519,8 +519,7 @@ class DiscriminantQuadraticModules(OwnedCategoryOverBaseRing):
             the membership is asked of this module's own base ring: the lifts
             are elements of the owned rational field, and the owned integers
             coerce them, where the engine's own integer ring refuses a foreign
-            element outright and decides every class non-characteristic
-            (#348).
+            element outright and decides every class non-characteristic.
             """
             parent = self.parent()
             integers = parent.base_ring()
@@ -892,7 +891,7 @@ def _isotropic_subgroups(ambient, quadratic):
         element_at,
         index_of=index_of,
         contains=lambda subgroup: index_of(subgroup) is not None,
-        name=f"isotropic subgroups of {ambient}",
+        description=lambda: f"isotropic subgroups of {ambient}",
     )
 
 

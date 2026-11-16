@@ -1,0 +1,5 @@
+tree SHA: bc56fad67fc546c936de41517017c4c3826fefe7 (modified paths: 2)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+cpu times: 0.0868 0.0888 0.0858 0.0862 0.0817
+min 0.0817 s cpu for 200 assignments
+launcher exit: 0

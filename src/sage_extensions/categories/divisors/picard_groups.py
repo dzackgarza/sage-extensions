@@ -295,7 +295,16 @@ class _InvertibleSheafClass:
         decision = self.parent().equal(self, other)
         return decision if op == op_EQ else negation(decision)
 
-    __hash__ = None
+    def __hash__(self) -> int:
+        r"""Hash the class by its group and the sheaf that decides equality.
+
+        ``Pic(X).equal`` answers ``True`` exactly when the two classes retain
+        one sheaf, so the group and the identity of the retained representative
+        are the data equality compares.  The class retains that sheaf, so its
+        identity is stable while the class exists; two classes of one sheaf
+        hash alike, and a second sheaf hashes apart.
+        """
+        return hash((id(self.parent()), id(self.representative())))
 
     def _repr_(self):
         return f"[{self.representative()}]"

@@ -53,7 +53,17 @@ class _TensorClass:
         decision = True if not difference else AtomicProposition("equal", self, other)
         return decision if op == op_EQ else negation(decision)
 
-    __hash__ = None
+    def __hash__(self) -> int:
+        r"""Hash the classes of one tensor product alike.
+
+        Equality here is that the reduced difference vanishes, and the
+        reduction combines summands in one slot and keeps the summands' order:
+        ``x (x) y + z (x) w`` and ``z (x) w + x (x) y`` are one class whose
+        reduced term tuples differ.  No invariant of the terms survives that,
+        so the quotient is what a hash reads, which is the rule of
+        :class:`Sets`.
+        """
+        return hash(id(self.parent()))
 
     def _repr_(self):
         return " + ".join(

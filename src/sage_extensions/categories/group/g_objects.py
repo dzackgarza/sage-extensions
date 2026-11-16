@@ -1760,7 +1760,7 @@ class GObjects(CategoryPacketMethods, OwnedCategory):
             if underlying.is_subcategory(Sets()):
                 return self.point_set().filtered(
                     lambda point: self.act(group_element, point) == point,
-                    name=f"fixed points of {group_element} on {self}",
+                    description=lambda: f"fixed points of {group_element} on {self}",
                 )
             if self in AffineGSchemes(self.acting_group(), self.base_ring()):
                 return self._cyclic_restriction(group_element).fixed_subscheme()

@@ -92,6 +92,7 @@ from sage_extensions.categories.modules.pure.modules import (
     ModulesWithChosenFinitePresentation,
     TensorProductModules,
     VectorSpaces,
+    _finitely_presented_torsion,
     _regular_module_scalar_identification,
     _scalar_value_identification,
 )
@@ -263,7 +264,7 @@ def _form_square_commutes(
     along ``f`` is the Gram tensor of ``M``, and :meth:`Tensor.pullback` owns
     that contraction (``OWN-24``).  That is one comparison of the two Gram
     tensors, so the decision costs a Gram-matrix read, not one ``b`` evaluation
-    per pair of generators (#320).  The scalars are read by
+    per pair of generators.  The scalars are read by
     ``_scalar_value_identification``: the value object is a ring or a
     restriction of scalars from one, and in the second case the Gram tensor's
     entries are the scalars that restriction reads, not the value object's own
@@ -331,8 +332,7 @@ def _form_square_commutes(
     # over that ring and the square is one comparison of them.  Reading the
     # extension itself as the ring asked the value object to be that ring, which
     # a restriction of scalars is not, so a formed submodule over restricted
-    # scalars fell through to one :meth:`b` evaluation per pair of generators
-    # (#320).
+    # scalars fell through to one :meth:`b` evaluation per pair of generators.
     source_scalars = _scalar_value_identification(source_form.codomain())
     target_scalars = _scalar_value_identification(target_form.codomain())
     algebra_values = (
@@ -1122,7 +1122,15 @@ class FiberedFormedModuleMorphism:
     def __ne__(self, other) -> bool | Predicate:
         return negation(self == other)
 
-    __hash__ = None
+    def __hash__(self) -> int:
+        r"""Hash the fibered morphisms of one set of morphisms alike.
+
+        Equality here compares the semilinear module component on a finite
+        spanning family and the value component, and neither component supplies
+        a hash of its own, so the set of morphisms is what a hash reads, which
+        is the rule of :class:`Sets`.
+        """
+        return hash(id(self.parent()))
 
     def map_value(self, value):
         changed = self.base_changed_domain()
@@ -3012,7 +3020,7 @@ def _primary_form_component_family(form):
     return indexed_family(
         primes,
         lambda prime: form.primary_part(prime),
-        name=lambda form=form: f"Primary components of {form}",
+        description=lambda form=form: f"Primary components of {form}",
     )
 
 
@@ -3431,14 +3439,19 @@ class BilinearFormModules(OwnedCategoryOverBaseRing):
                 The value object is explicit.  Descent to the quotient is the
                 validator ``validate_descent`` (``OWN-22``).
                 """
-                if (
-                    module
-                    not in Modules(self.base_ring()).FinitelyPresented().Torsion()
-                ):
-                    raise ValueError(
-                        f"a torsion bilinear form in {self} is defined on a finitely presented torsion "
-                        f"{self.base_ring()}-module, but {module} is in {module.category()}"
-                    )
+                match _finitely_presented_torsion(module):
+                    case True:
+                        pass
+                    case False:
+                        raise ValueError(
+                            f"a torsion bilinear form in {self} is defined on a finitely presented torsion "
+                            f"{self.base_ring()}-module, but {module} is not one: it is in {module.category()}"
+                        )
+                    case _:
+                        raise ValueError(
+                            f"a torsion bilinear form in {self} is defined on a finitely presented torsion "
+                            f"{self.base_ring()}-module, and whether {module} is one is undecided"
+                        )
 
                 rank = int(module.module_generating_set().cardinality())
                 values = _coerced_gram(value_module, gram, rank)
@@ -3629,14 +3642,19 @@ class QuadraticFormModules(OwnedCategoryOverBaseRing):
                 descent to the quotient is the validator ``validate_descent``
                 (``OWN-22``).
                 """
-                if (
-                    module
-                    not in Modules(self.base_ring()).FinitelyPresented().Torsion()
-                ):
-                    raise ValueError(
-                        f"a torsion quadratic form in {self} is defined on a finitely presented torsion "
-                        f"{self.base_ring()}-module, but {module} is in {module.category()}"
-                    )
+                match _finitely_presented_torsion(module):
+                    case True:
+                        pass
+                    case False:
+                        raise ValueError(
+                            f"a torsion quadratic form in {self} is defined on a finitely presented torsion "
+                            f"{self.base_ring()}-module, but {module} is not one: it is in {module.category()}"
+                        )
+                    case _:
+                        raise ValueError(
+                            f"a torsion quadratic form in {self} is defined on a finitely presented torsion "
+                            f"{self.base_ring()}-module, and whether {module} is one is undecided"
+                        )
 
                 rank = int(module.module_generating_set().cardinality())
                 values = _coerced_gram(value_module, gram, rank)
@@ -4120,8 +4138,7 @@ class FreeFormModules(OwnedCategoryOverBaseRing):
                 ``_scalar_value_identification`` is the reading of its elements as
                 that ring's scalars.  A restriction of scalars is not a ring and
                 has no ``matrix_space``, so "a matrix over the values" is not a
-                construction; the scalar reading is the same coordinate datum
-                (``#320``).
+                construction; the scalar reading is the same coordinate datum.
 
                 On a framed module the form's coordinate Gram tensor already holds
                 every entry, and for a pulled-back form that tensor is the ambient
@@ -4560,8 +4577,11 @@ def _form_module_categories(module, *, bilinear, extra_categories):
         categories.append(FreeFormModules(base_ring))
     if is_presented:
         categories.append(FormModules(base_ring).FinitelyPresented())
-        if module in Modules(base_ring).FinitelyPresented().Torsion():
-            categories.append(FormModules(base_ring).FinitelyPresented().Torsion())
+        match _finitely_presented_torsion(module):
+            case True:
+                categories.append(FormModules(base_ring).FinitelyPresented().Torsion())
+            case _:
+                pass
     if module in FramedFreeModules(base_ring).FinitelyGenerated():
         categories.append(FreeFormModules(base_ring).FinitelyGenerated())
     if bilinear:

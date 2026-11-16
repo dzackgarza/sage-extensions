@@ -214,13 +214,13 @@ def _framing_coordinates(element):
     immediately hands them to an engine computation: the root enumeration's controlling
     vector, the wall normals multiplied by the engine Gram matrix, a polyhedral cone.
 
-    An owned-ring coefficient is the ring mismatch sage-extensions#299 records: the engine
-    vector constructor cannot find a common ring for owned coefficients, and the
-    polyhedral owners do not accept them either, so the chamber's vertex computation
-    raised ``TypeError: unable to find a common ring for all elements`` here while
-    Vinberg's root search, which passes the same coefficients to a port that reads them as
-    integers, returned.  The lowering belongs to this boundary and not to each caller:
-    it is the one place where an owned framing coordinate becomes engine data.
+    An owned-ring coefficient is a ring mismatch: the engine vector constructor cannot
+    find a common ring for owned coefficients, and the polyhedral owners do not accept
+    them either, so a chamber's vertex computation raises
+    ``TypeError: unable to find a common ring for all elements`` while Vinberg's root
+    search, which passes the same coefficients to a port that reads them as integers,
+    returns.  The lowering belongs to this boundary and not to each caller: it is the
+    one place where an owned framing coordinate becomes engine data.
     """
     parent = element.parent()
     ring = parent.base_ring()
@@ -561,14 +561,14 @@ def _filtered_vinal_class():
 
     The class carries the library's repairs of the engine's walk: the
     polynomial-time coset representatives of the constructor, the candidate
-    tests of #312, and the layer enumeration in the coordinates of the cell at
-    the controlling vector (#285, #400).  It is built by a factory and not at
-    the module's top level because ``vinal`` is imported here, so that
-    importing this module does not pay for the engine's own imports; and it is
-    a factory rather than a class defined inside :func:`_vinal_vinberg_roots`
-    so that a probe can hold the walk object itself and read its restricted
-    layer enumeration against the engine's whole-lattice one, layer by layer
-    (#400).
+    membership tests of a root in the subgroup, and the layer enumeration in
+    the coordinates of the cell at the controlling vector.  It is built by a
+    factory and not at the module's top level because ``vinal`` is imported
+    here, so that importing this module does not pay for the engine's own
+    imports; and it is a factory rather than a class defined inside
+    :func:`_vinal_vinberg_roots` so that a probe can hold the walk object
+    itself and read its restricted layer enumeration against the engine's
+    whole-lattice one, layer by layer.
     """
     from vinal import NegativeVector, VinAl
 
@@ -612,9 +612,14 @@ def _filtered_vinal_class():
             ``VinAl``'s own, attribute for attribute.  The controlling
             vector may be omitted, in which case the engine's own
             ``NegativeVector`` picks one.
+
+            ``_initial_cone`` is this walk's record of the roots
+            :meth:`FundCone` wrote down, which are the normals of the cell at
+            the controlling vector: ``None`` until it has written them.
             """
             self._admits_root = admits_root
             self._cell = _NO_CELL
+            self._initial_cone = None
             self.output = output
             self.use_coxiter = use_coxiter
             self.M = M
@@ -721,15 +726,46 @@ def _filtered_vinal_class():
                     continue
                 yield root
 
+        def FundCone(self):
+            r"""Write down the roots through the controlling vector and record them as its cell.
+
+            Vinberg, *On the groups of unit elements of certain quadratic forms*,
+            Math. USSR Sb. 16 (1972), §3.2, rule 1 with (39) (p. 27): before the
+            sequence (38) starts, the normals are the roots whose mirrors pass
+            through the point \(p_0\), and the cell \(P_0\) at it is their
+            intersection.  The enumeration that writes them is the
+            whole-lattice search of the engine's ``FundCone``: the layer
+            enumeration of §4.1 (p. 30) is measured in the coordinates of that
+            same cell, so an enumeration restricted by a cell the walk has
+            already cut would be cutting the cell by itself.
+
+            This walk therefore forgets the cell it holds before it starts, and
+            records the cone it writes as the cell's normals: :meth:`cell`
+            answers from that record and not from ``roots``, which the walk
+            keeps growing as the sequence is written down.
+            """
+            self._initial_cone = None
+            self._cell = _NO_CELL
+            roots = super().FundCone()
+            self._initial_cone = tuple(roots)
+            return roots
+
         def cell(self):
             r"""Return the cell at the controlling vector, or ``None`` when it does not span.
 
             Vinberg 1972, §3.2, rule 1 and (39) (p. 27): before the sequence
             (38) starts, the normals are the roots whose mirrors pass through
             the point \(p_0\), and they cut the cell \(P_0\) at it.  Those are
-            the roots orthogonal to ``v0``, which is what ``FundCone``
-            returns and what ``roots`` holds when the candidate enumeration
-            begins.
+            the roots orthogonal to ``v0``, which is what :meth:`FundCone`
+            returns and what this walk records when it writes them down.
+
+            The walk answers ``None`` in two states, and they are not one state:
+            while it has written no root at all -- ``FundCone`` is cutting the
+            cell itself and asks the layer enumeration on the way, so there is
+            nothing to cut with and nothing to cache -- and once that cone has
+            no normal at ``v0``, where the walk has decided that the cone cuts
+            no cell.  The normals are the cone's roots and not ``roots``, which
+            the walk keeps growing as the sequence is written down.
 
             For the layer enumeration of §4.1 (p. 30) the normals of \(P_0\)
             are useful only when they span \(v_0^\perp\) up to one
@@ -745,7 +781,7 @@ def _filtered_vinal_class():
             :meth:`Roots_decomposed_into`.
 
             A cell of \(\operatorname{rank}(v_0^\perp)-1\) normals -- a cusp
-            cell, whose cone has one lineality direction (#387,
+            cell, whose cone has one lineality direction
             ``results/issue387-the-group-of-the-card-chamber.md`` §4) -- is
             returned with that direction: the cell's fourth entry is the
             primitive vector \(m\) of \(v_0^\perp\) orthogonal to every
@@ -761,10 +797,11 @@ def _filtered_vinal_class():
             """
             if self._cell is not _NO_CELL:
                 return self._cell
-            roots = getattr(self, "roots", None)
-            if not roots:
+            roots = self._initial_cone
+            if roots is None:
                 # ``FundCone`` is cutting the cell itself and asks the layer
-                # enumeration on the way; there is nothing to cache yet.
+                # enumeration on the way; the walk has written no root yet, so
+                # the cell is not cut and there is nothing to cache.
                 return None
             self._cell = None
             normals = tuple(root for root in roots if self.v0.inner_product(root) == 0)
@@ -866,7 +903,7 @@ def _filtered_vinal_class():
             every coefficient respecting the same lower bound, so nothing
             outside the orthant is written down.
 
-            A cell with one lineality direction (#400) enumerates the layer
+            A cell with one lineality direction enumerates the layer
             in the same coordinates with the lineality coordinate added.
             Every vector of \(v_0^\perp\) is, for exactly one coset
             representative \(s\) of \(\langle w_1,\dots,w_r,m\rangle\) in
@@ -1059,7 +1096,7 @@ def _vinal_vinberg_roots(gram, controlling_vector, max_roots, max_decompositions
     filters the roots of the initial cone at the controlling vector.  A finite
     index reflection subgroup of \(O(L)\) has its own polyhedron and not the
     full group's, so the restriction is part of the algorithm and not a filter
-    of its output (#297).
+    of its output.
     """
     if admits_root is None:
         from vinal import VinAl
@@ -1199,7 +1236,7 @@ class HyperbolicLattices(OwnedCategoryOverBaseRing):
         def _vinberg_search(self, controlling_vector, max_roots, max_decompositions, admits_root=None):
             r"""Run Vinberg's algorithm and return completeness with the roots.
 
-            ``admits_root`` is the reflection-subgroup restriction of #297: a
+            ``admits_root`` is the reflection-subgroup restriction: a
             callable taking a root of this lattice and answering whether its
             reflection is in the subgroup.  It is applied to the candidate roots
             and to the roots of the initial cusp cone, inside the algorithm, and
@@ -1590,7 +1627,7 @@ class HyperbolicLattices(OwnedCategoryOverBaseRing):
             root is a wall only when ``admits_root(root)`` holds, which for a
             subgroup is the statement that the reflection in it lies there
             (:meth:`subgroup_fundamental_chamber` builds the callable for a
-            subgroup given by generators, #297).  Without it the chamber is the
+            subgroup given by generators).  Without it the chamber is the
             full group's, and for a finite-index reflection subgroup that is a
             different polyhedron.
             """
@@ -1624,7 +1661,7 @@ class HyperbolicLattices(OwnedCategoryOverBaseRing):
             where the group machinery cannot decide membership of an integral
             reflection, this call does not return a chamber.
 
-            Where it is needed (#285, research#654).  Sterk, *Compactifications
+            Where it is needed.  Sterk, *Compactifications
             of the period space of Enriques surfaces, Part I*, Math. Z. 207
             (1991), §4.3.1, p. 17 takes the chamber of \(G_v\), the image of the
             integral stabilizer \(\Gamma_v\) in \(O(v^\perp/\mathbf Z v)\); the
@@ -1641,8 +1678,8 @@ class HyperbolicLattices(OwnedCategoryOverBaseRing):
             # infinite index is not cheap; the answers are memoised for the one
             # call.  A caller whose subgroup has its own decidable criterion
             # should pass it to `fundamental_chamber(admits_root=...)` instead:
-            # that is the path #285 takes, with the discriminant criterion of
-            # the stabilizer's image (#312).
+            # that is the path `subgroup_cusp_chamber` takes, with the discriminant
+            # criterion of the stabilizer's image.
             decided = {}
 
             def admits_root(root):
@@ -1659,7 +1696,7 @@ class HyperbolicLattices(OwnedCategoryOverBaseRing):
             )
 
         def subgroup_cusp_chamber(self, cusp, *, group_generators, max_roots=None, max_decompositions=None):
-            r"""Return the chamber of the reflection part of ``Γ′`` anchored at the cusp ``cusp`` (#297).
+            r"""Return the chamber of the reflection part of ``Γ′`` anchored at the cusp ``cusp``.
 
             ``cusp`` is a primitive isotropic vector of this hyperbolic lattice,
             naming the \(0\)-cusp the chamber is anchored at, and ``group_generators``
@@ -1706,7 +1743,7 @@ class HyperbolicLattices(OwnedCategoryOverBaseRing):
             own chamber by the three statements of Vinberg 1972 §3.2 quoted
             above, and no separate certificate is needed.
 
-            Where it is needed (#297, research#668).  H. Sterk,
+            Where it is needed.  H. Sterk,
             *Compactifications of the period space of Enriques surfaces, Part I*,
             Math. Z. 207 (1991), §4.3.1, p. 17 publishes the Coxeter diagrams of
             the polarized cusps \(j = 2, \dots, 5\) with 10, 12, 11 and 14
@@ -1902,7 +1939,7 @@ class HyperbolicLattices(OwnedCategoryOverBaseRing):
             filter and no termination switch, and it publishes no isometry route.
             So the walk is asked with the lattice and nothing else; the options an
             earlier revision of this wrapper advertised have no engine behind them
-            and are not part of this API (#344).
+            and are not part of this API.
 
             The port's entry uses signature ``(n,1)``. For ``(1,n)``, use the
             existing lattice twist functor and transport its report back to this
@@ -1957,7 +1994,7 @@ class HyperbolicLattices(OwnedCategoryOverBaseRing):
             It decides reflectivity, the simple roots of the chamber found, the
             vertex orbits, and the polyhedron's isometry generators; it takes no
             start vertex, no root filter and no termination switch, so this method
-            has no parameters either (#344).
+            has no parameters either.
             """
             return self._edgewalk()
 
