@@ -16,6 +16,13 @@ def _the_gaussian_rationals_at_the_zero_ideal():
     return field, field.adic_completion(field.ideal(field.zero()))
 
 
+def _the_rational_line_at_the_origin():
+    r"""$QQ[x]$ completed at $(x)$, with its variable."""
+    line = QQ["x"]
+    x = line.algebra_generator("x")
+    return line, x, line.adic_completion(line.ideal(x))
+
+
 def _the_first_two_tiers(system):
     r"""The objects of the index category at $n = 0$ and $n = 1$, and the arrow between them.
 
@@ -73,3 +80,54 @@ def test_the_completion_map_at_the_zero_ideal_is_an_isomorphism_onto_the_ring() 
     assert completion_map.is_injective() is True
     assert completion_map.is_surjective() is True
     assert completion_map(field.one()) == completion.one()
+
+
+def test_the_inverse_system_at_a_principal_ideal_is_not_constant() -> None:
+    r"""At $I = (x)$ the tiers differ, and the transition $A/I^2 \to A/I$ is not the identity.
+
+    $x$ is already zero in $QQ[x]/(x)$, while it is not zero in $QQ[x]/(x^2)$:
+    a transition map that dropped the quotient would pass on the zero ideal,
+    where every tier is the ring and every transition is its identity.
+    """
+    _, x, completion = _the_rational_line_at_the_origin()
+    system = completion.adic_inverse_system()
+    first, second, arrow = _the_first_two_tiers(system)
+    first_tier = system(first)
+    second_tier = system(second)
+    transition = system(arrow)
+
+    assert first_tier is completion.adic_truncation(1)
+    assert second_tier is completion.adic_truncation(2)
+    assert first_tier is not second_tier
+    assert transition.domain() is second_tier
+    assert transition.codomain() is first_tier
+    assert transition(second_tier.quotient_map()(x)).is_zero()
+    assert transition(second_tier.quotient_map()(x**2)).is_zero()
+    assert not second_tier.quotient_map()(x).is_zero()
+
+
+def test_the_limit_cone_at_a_principal_ideal_commutes_with_the_transitions() -> None:
+    r"""The leg at $n+1$ followed by the transition is the leg at $n$, at $I = (x)$.
+
+    The cone's legs are the canonical projections, so they carry $x$ to $x$ at
+    the second tier and to zero at the first, and $\hat x^2 \ne 0$ in
+    $QQ[[x]]$ while its image in $QQ[x]/(x^2)$ is zero.
+    """
+    _, x, completion = _the_rational_line_at_the_origin()
+    system = completion.adic_inverse_system()
+    cone = completion.adic_limit_cone()
+    first, second, arrow = _the_first_two_tiers(system)
+    image = completion.completion_map()(x)
+    projected_second = cone.structure_morphism(second)(image)
+    projected_first = cone.structure_morphism(first)(image)
+
+    assert cone.apex() is completion
+    assert cone.diagram() is system
+    assert projected_first.is_zero()
+    assert not projected_second.is_zero()
+    assert (projected_second**2).is_zero()
+    assert not (image**2).is_zero()
+    assert system(arrow)(projected_second) == projected_first
+    assert projected_second == completion.adic_projection(2)(image)
+    assert projected_first == completion.adic_projection(1)(image)
+
