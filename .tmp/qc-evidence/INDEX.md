@@ -2907,3 +2907,21 @@ is empty), so the red above is the red of the base as well; the row at `9ddf7f5`
 | `554-double-dual-green-on-head.log` | the rebased head of this round, clean tree | the selection: **1 passed, 5 deselected in 1.03 s** |
 | `554-double-dual-green-on-pushed-head.log` | `67dd108`, the head this round was pushed from, clean tree | the same selection after main advanced to `26bdef1`: **1 passed, 5 deselected in 1.44 s**; neither `polytopes.py` nor the test file differs between `1488acf`, `9ddf7f5` and `26bdef1` |
 
+## `#517` round 3: the retained sweep's regression, the discarded words, and the derived families, 2026-11-16
+
+One file per run, in the pinned runtime (Sage 11.0.beta5, port tree `991b88b0`),
+through `.scratch/wt517r3_pytest.sh`:
+`run.sh -w /work`, `PYTHONPATH=/ci/tool-artifacts/pytest_plugins:/work/src:/work:/repos/sage-extensions/src`,
+`/sage/.venv/bin/python -m pytest -o addopts= -p qc_sage_session -p sage_extensions.testing.test_lint`.
+`b54acd7` is the tree before the repair of the issue's defect; `1488acfb` is this
+round's base on `main`.
+
+| log | tree | result |
+| --- | --- | --- |
+| `517r3-f1-red-at-b54acd7.log` | `b54acd7`, where the defect lives | `test_a_searched_orbit_carries_no_sweep.sage` alone: **1 failed in 2.42 s** — the searched orbit of `5` carries `_retained_transitions` and `_retained_transition_augmentation` beyond the same `G`-set built directly |
+| `517r3-f1-green-at-30cfb61.log` | `30cfb61`, the test commit | the same file alone: **1 passed in 2.13 s** |
+| `517r3-f2-red-at-03271a9.log` | `03271a9` | `test_the_orbit_of_a_seed_is_the_set_its_sweep_reached.sage` alone: **1 failed in 3.80 s**, at `orbit is g_set` |
+| `517r3-f2-green-at-16d99a4.log` | `16d99a4`, its repair | that file with the two #517 files and the six-test orbit-action file: **8 passed in 3.28 s** |
+| `517r3-f3-red-at-e409a63.log` | `e409a63` | `test_each_derived_family_is_computed_once.sage` alone: **2 failed in 4.76 s** |
+| `517r3-f3-green-at-7927ef8.log` | `7927ef8`, its repair | the four #517 files together: **10 passed in 6.47 s** |
+| `517r3-probe-answers-at-b54acd7.log`, `517r3-probe-answers-at-1488acfb.log` | `b54acd7` and `1488acfb` | `517r3-probe-answers.py` on the same specimens (C(3) regular and beside a fixed point, S(3) conjugation, S(3)/<(1 2)>, a counting action): every public answer of the defective tree is the repaired tree's, and the two that differ are `orbit is g_set` (the discarded words) and the `drop_trivial` family (repaired earlier in the issue). The retained table agrees with the orbit's action wherever it is read, so the retained-state defect shows no wrong answer, only carried state |

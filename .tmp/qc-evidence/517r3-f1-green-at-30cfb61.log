@@ -1,0 +1,11 @@
+=== tree: 1488acfb5636b16c6836828e5f29208d610d3712 (modified: 2 paths)
+=== port: 991b88b095a42a1e3679569ea42328c900c120f6
+=== files: tests/groups/test_a_searched_orbit_carries_no_sweep.sage
+=== start: 07:50:07
+.                                                                        [100%]
+============================= slowest 5 durations ==============================
+0.07s call     tests/groups/test_a_searched_orbit_carries_no_sweep.sage::test_a_searched_orbit_carries_only_the_state_of_the_g_set_it_is
+
+(2 durations < 0.005s hidden.  Use -vv to show these durations.)
+1 passed in 2.13s
+=== exit: 0 at 07:50:10

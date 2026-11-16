@@ -1,0 +1,13 @@
+=== tree: 03271a9ff6f7b2d2fce80d469c099def4d260d60 (modified: 1 paths)
+=== port: 991b88b095a42a1e3679569ea42328c900c120f6
+=== files: tests/groups/test_the_orbit_of_a_seed_is_the_set_its_sweep_reached.sage tests/groups/test_a_searched_orbit_carries_no_sweep.sage tests/groups/test_the_orbit_schreier_family_reads_the_orbit_action.sage
+=== start: 07:51:06
+........                                                                 [100%]
+============================= slowest 5 durations ==============================
+0.18s call     tests/groups/test_the_orbit_schreier_family_reads_the_orbit_action.sage::test_the_schreier_family_of_a_point_is_its_stabilizer
+0.03s call     tests/groups/test_the_orbit_of_a_seed_is_the_set_its_sweep_reached.sage::test_the_orbit_of_the_seed_is_the_set_the_sweep_reached
+0.03s call     tests/groups/test_the_orbit_schreier_family_reads_the_orbit_action.sage::test_the_same_action_presented_two_ways_presents_the_same_family
+0.03s call     tests/groups/test_the_orbit_schreier_family_reads_the_orbit_action.sage::test_the_dropped_generators_are_the_identity_images
+0.01s call     tests/groups/test_the_orbit_schreier_family_reads_the_orbit_action.sage::test_a_point_outside_the_familys_sweep_answers_from_its_own_orbit
+8 passed in 3.28s
+=== exit: 0 at 07:51:12
