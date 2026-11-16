@@ -12,6 +12,13 @@ component data.  An element handed to them is not one: it would supply its
 components by being iterated, which is the module's coordinate order chosen at
 the constructor, and `tensor.coordinates` is the operation that names the
 element's framing instead.
+
+Reading a tensor over another ring is the same kind of statement: it exists
+exactly when every component lies in that ring, so the ring change decides it
+and names the component that does not, with the position it stands at.  Left to
+the conversion of one entry, a component outside the ring surfaces as a rational
+that does not convert, and the caller that needs the decision is left to make it
+one component at a time.
 """
 
 from sage_extensions.all import *  # noqa: F401,F403
@@ -82,3 +89,23 @@ def test_the_component_constructors_refuse_an_element() -> None:
     with pytest.raises(TypeError):
         tensor.covector(ZZ, isotropic)
     assert tensor.coordinates(isotropic) == tensor.vector(ZZ, (1, 0, 0, 0))
+
+
+def test_a_change_of_ring_names_the_component_that_leaves_it() -> None:
+    r"""$(1, \tfrac12)$ is not integral: the ring change names $\tfrac12$ and its position.
+
+    A change of coefficients is a statement about the tensor and the ring, and it
+    holds exactly when every component lies in the ring.  The decision is the ring
+    change's: a component outside the ring is refused by it, with the component
+    and the position it stands at, and not by the conversion of that one entry,
+    which names a rational and no position -- so a caller that needs the decision
+    has to make it itself, one component at a time.
+    """
+    half = QQ(1) / QQ(2)
+    coordinates = tensor.vector(QQ, (1, half))
+    assert coordinates.component_outside(ZZ) == ((1,), half)
+    with pytest.raises(ValueError):
+        coordinates.change_ring(ZZ)
+    integral = tensor.vector(QQ, (1, QQ(2)))
+    assert integral.component_outside(ZZ) is None
+    assert integral.change_ring(ZZ) == tensor.vector(ZZ, (1, 2))

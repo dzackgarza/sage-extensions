@@ -17,7 +17,10 @@ t(e,a) = \mathrm{id} - e\otimes b(a,\cdot) + a\otimes b(e,\cdot)
 The first test asserts that tensor form, with the identity, the Gram pairings and
 the outer products all read off the tensor layer.  The second asserts the images
 the formula gives, on a control whose half coefficient \(\tfrac12 q(a)\) is
-neither zero nor \(q(a)\).
+neither zero nor \(q(a)\).  The third asserts the refusal of a transvection whose
+update leaves the ring: the construction carries the transvection, the lattice and
+the coefficient of the update that lies outside the ring, where a refusal by the
+conversion of one entry carries only that rational.
 """
 
 from sage_extensions.all import *  # noqa: F401,F403
@@ -108,10 +111,16 @@ def test_a_transvection_that_does_not_preserve_the_lattice_is_refused() -> None:
 
     The update's half coefficient is `q(a) b(e, e_1)/2 = 1/2`, and
     `t(e,a)(f) = f + a - (1/2)e` is not a vector of `L`.  `eichler_transvection`
-    refuses the pair, and the refusal is the construction's own: it names the
-    transvection, the lattice and the coefficient that lies outside the ring,
-    where the reading of the update over `ZZ` would refuse the same coefficient
-    as a rational it cannot convert and name none of them.
+    refuses the pair, and the refusal is the construction's own: it carries the
+    transvection's pair `(e, a)`, the lattice and the coefficient of the update
+    that leaves the ring, together with the position it stands at, so a reader of
+    the refusal knows which transvection, which lattice and which coefficient.
+    The reading of the update over `ZZ` refuses the same coefficient as a rational
+    it cannot convert, and names only that rational.
+
+    The coefficient is `-1/2`, the entry of the first row and the hyperbolic
+    partner's column: `t(f) = f + a - (1/2)e` read in the framing `(e, f, a)`, so
+    the refusal's position is the first row and the second column.
 
     The second specimen is the same lattice with `e` replaced by `2e_0`.  Then
     `b(e, x)` is even for every `x`, the half coefficient is an integer, and the
@@ -127,8 +136,13 @@ def test_a_transvection_that_does_not_preserve_the_lattice_is_refused() -> None:
     assert isotropic.b(partner) == ZZ.one()
     assert orthogonal.q() == ZZ.one()
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError) as caught:
         lattice.eichler_transvection(isotropic, orthogonal)
+    refusal = caught.value
+    assert (refusal.isotropic, refusal.orthogonal) == (isotropic, orthogonal)
+    assert refusal.lattice == lattice
+    assert refusal.coefficient == QQ(-1) / QQ(2)
+    assert refusal.position == (0, 1)
 
     doubled = lattice.scalar_multiple(2, isotropic)
     transvection = lattice.eichler_transvection(doubled, orthogonal)
