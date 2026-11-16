@@ -119,9 +119,14 @@ class _ModuleScalarAction(Action):
         return self._module.scalar_multiple(scalar, element)
 
 
-def _register_module_scalar_action(module) -> None:
-    r"""Register ordinary ``r*m``/``m*r`` syntax for an owned module parent."""
-    scalar_parent = module.base_ring()
+def _register_module_scalar_action(module, scalar_parent=None) -> None:
+    r"""Register ordinary ``r*m``/``m*r`` syntax for an owned module parent.
+
+    The scalars are those of ``scalar_parent``, the module's base ring unless
+    the module retains a further ring acting through it; the registration is
+    this package's one declaration of that syntax for a module parent.
+    """
+    scalar_parent = module.base_ring() if scalar_parent is None else scalar_parent
     module.register_action(_ModuleScalarAction(scalar_parent, module, True))
     if scalar_parent in OwnedRings().Commutative():
         module.register_action(_ModuleScalarAction(scalar_parent, module, False))

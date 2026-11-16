@@ -403,6 +403,29 @@ class ModulesOverGroupAlgebra(Modules):
         return self.restriction_coextension_adjunction(Modules(self.coefficient_ring()[subgroup])._group_algebra_inclusion(self.acting_group()))
 
     class ParentMethods:
+        def __init_extra__(self) -> None:
+            r"""Register the actions of ``R[G]`` and of its coefficients on this module.
+
+            ``R[G]`` acts by its ring structure, and the coefficients of ``R``
+            act through the canonical morphism ``R -> R[G]``, ``r |-> r . 1``,
+            along which the scalars of a module over ``R[G]`` restrict to ``R``.
+            `scalar_multiple` reads a scalar of either ring, so both are
+            registered: without the second, ``r * m`` for a coefficient ``r``
+            would be the one reading of this module's scalar action that the
+            coercion model could not reach.
+            """
+            from sage_extensions.categories.modules.pure.modules import (
+                _register_module_scalar_action,
+            )
+
+            super().__init_extra__()
+            coefficient_ring = self.coefficient_ring()
+            match coefficient_ring is self.base_ring():
+                case True:
+                    pass
+                case False:
+                    _register_module_scalar_action(self, coefficient_ring)
+
         def scalar_multiple(self, scalar, element):
             r"""Apply the group-algebra action, including coefficient scalars.
 
