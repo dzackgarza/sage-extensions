@@ -185,9 +185,11 @@ def _placed_algebraic_value(expression: Expression):
 
     This is the one value reading: the equality decision asks it of a
     difference, and :class:`ExactRealNumber` asks it of each side when it
-    hashes.  It normalizes first, because that is how equality reaches a value
-    the presentation's shape hides: ``cos(1)^2 + sin(1)^2`` is ``1``, while
-    ``cos(1)^2`` alone names no algebraic number.
+    hashes.  It normalizes, because that is how equality reaches a value the
+    presentation's shape hides: ``cos(1)^2 + sin(1)^2`` is ``1``, while
+    ``cos(1)^2`` alone names no algebraic number.  The normalization is asked
+    for only after the presentation itself has been read as naming no algebraic
+    number, so an expression that already places is not normalized at all.
 
     ``is_algebraic`` is asked rather than whether ``AA`` contains the
     expression: ``AA`` has no coercion from the symbolic ring, and a membership
@@ -195,7 +197,12 @@ def _placed_algebraic_value(expression: Expression):
     expression ``AA`` is told is algebraic is read by ``AA``'s coercion, which
     places it exactly.
     """
-    for candidate in (expression, expression.simplify_full()):
+
+    def normalizations():
+        yield expression
+        yield expression.simplify_full()
+
+    for candidate in normalizations():
         if candidate.is_algebraic() is not True:
             continue
         return AA(candidate)
@@ -251,18 +258,6 @@ def _relation_from_sign(sign: int, relation) -> bool:
     )
 
 
-def _placed_alike(left: Expression, right: Expression) -> bool:
-    r"""Whether the two presentations are placed alike: both, or neither.
-
-    :class:`ExactRealNumber` hashes the value it places, so a pair of
-    presentations is decided equal only when the hash would also join them.
-    Two presentations that both name an algebraic value are joined by the hash
-    of that value, and two that name none are joined by the one coarse hash of
-    the field; one of each is joined by nothing.
-    """
-    return (_placed_algebraic_value(left) is None) == (_placed_algebraic_value(right) is None)
-
-
 def _decide_relation(
     left: Expression | LazyFieldElement,
     right: Expression | LazyFieldElement,
@@ -278,13 +273,13 @@ def _decide_relation(
     applies) is reached for a difference neither decides, and its result is
     then decided the same way.
 
-    A zero difference decides the relation only when the two presentations are
-    placed alike (:func:`_placed_alike`): the hash of a real reads the value it
-    places, so two presentations it separates are left to ``RealRelation``,
-    which asks again at a higher precision, rather than decided equal by a
-    normalization their hashes do not share.  A nonzero sign decides freely --
-    two unequal reals may share a hash, and every decided inequality is
-    certified by an exact algebraic sign or by an enclosure.
+    A zero difference is the statement that the two presentations are one real,
+    and it is decided as such.  The hash of a real reads that same value
+    reading: an algebraic value hashes as its algebraic number, so the two
+    presentations of one algebraic real -- one of them possibly unnormalized --
+    are one point of a finite ordered set below.  A real whose value the reading
+    does not place hashes the field, which is coarser than equality and joins
+    every pair the reading separates.
     """
     if left is right:
         return _relation_from_sign(0, relation)
@@ -299,8 +294,6 @@ def _decide_relation(
     sign = _sign_from_algebraic(difference)
     if sign is None and precision is not None:
         sign = _sign_from_ball(difference, precision)
-    if sign == 0 and not _placed_alike(left, right):
-        return None
     if sign is None:
         return None
     return _relation_from_sign(sign, relation)
@@ -410,8 +403,10 @@ class ExactRealNumber(FieldElement):
         that algebraic number, and a rational value hashes as the rational,
         which is the hash the integers and the rationals it equals already
         carry.  A real no reading places -- a transcendental value, or a
-        general Cauchy computation -- hashes as one real of this field, since
-        equality does not place it either.
+        general Cauchy computation -- hashes as one real of this field: the
+        reading is a function of the value, so two such reals that equality
+        decides are one real hash alike, and two it separates are not required
+        to differ.
         """
         value = self._algebraic_value()
         if value is None:
@@ -420,6 +415,7 @@ class ExactRealNumber(FieldElement):
             return hash(QQ(value))
         return hash(value)
 
+    @cached_method
     def _algebraic_value(self):
         r"""Return the algebraic number this real is decided to be, or ``None``.
 
@@ -428,6 +424,11 @@ class ExactRealNumber(FieldElement):
         left coarse.  Reading is a decision about the value and not about the
         shape of the presentation, so it normalizes as the equality decision
         does (:func:`_placed_algebraic_value`).
+
+        The reading is a decision about the element, so it is made once and
+        retained: every hash of this real, and every relation it is asked to
+        decide, reads this one datum and does not normalize the presentation
+        again.
         """
         expression = self._symbolic_expression()
         if expression is None:
@@ -438,18 +439,22 @@ class ExactRealNumber(FieldElement):
         r"""Return the retained symbolic expression, or ``None`` for a computation.
 
         A real is constructed from one of the two presentations its constructor
-        admits, and this is the one place the class says which of them it holds:
+        admits, and which one it holds is decided there, once, and retained:
         ``expression`` refuses the computation, and the cache key, the rational
         coercion and the value reading read this branch.  The presentation is
         fixed at construction and never replaced, so the branch is data of the
-        element and not a question asked of an arbitrary object.
+        element, recorded by the constructor, and not a question asked of a
+        retained value again by the operations that read it.
         """
-        if isinstance(self._expression, Expression):
-            return self._expression
-        return None
+        return self._retained_expression
 
     def __init__(self, parent: ExactRealField, expression: Expression | LazyFieldElement) -> None:
         self._expression = expression
+        # The constructor admits two presentations, and this is where it says
+        # which of them it holds; the element retains that decision rather than
+        # asking it again.  A computation retains no symbolic expression and is
+        # keyed by its own identity token instead.
+        self._retained_expression = None if isinstance(expression, LazyFieldElement) else expression
         if isinstance(expression, LazyFieldElement):
             self._cache_token = object()
         FieldElement.__init__(self, parent)
@@ -554,7 +559,7 @@ class ExactRealNumber(FieldElement):
         # relations of this field already do.
         expression = self._symbolic_expression()
         if expression is not None:
-            value = _placed_algebraic_value(expression)
+            value = self._algebraic_value()
             if value is not None and value in QQ:
                 return QQ(value)
         return QQ(self.expression())
