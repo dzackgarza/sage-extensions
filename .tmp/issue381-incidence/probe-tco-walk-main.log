@@ -1,0 +1,69 @@
+# tree: 891fee04336bed6f9bbb6d14dd643266f3fd77b2
+# tree status:  M src/sage_extensions/categories/isotropic_orbits.py ?? launch-381.sh 
+# load: 1.60 1.76 1.59
+# program: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/wt-381/.tmp/probe-381-walk.py
+[rss] t=    0.0s rss=    97.4 MiB
+        0.02 s  lattice  rss   270.3 MiB
+[rss] t=    5.0s rss=   416.7 MiB
+[rss] t=   10.0s rss=   468.6 MiB
+[rss] t=   15.1s rss=   495.8 MiB
+[rss] t=   20.1s rss=   514.5 MiB
+[rss] t=   25.1s rss=   534.5 MiB
+[rss] t=   30.1s rss=   546.6 MiB
+[rss] t=   35.1s rss=   561.0 MiB
+[rss] t=   40.1s rss=   573.5 MiB
+[rss] t=   45.2s rss=   576.8 MiB
+[rss] t=   50.2s rss=   580.1 MiB
+[rss] t=   55.2s rss=   583.0 MiB
+[rss] t=   60.3s rss=   586.3 MiB
+       60.87 s  Otilde and its quotient, index 46998591897600  rss   587.2 MiB
+ambient plane 2 primitive True gram (0, 0, 0, 0)
+        0.01 s  ambient plane, taken from the O(T_Co) row's own representative  rss   587.4 MiB
+[rss] t=   65.3s rss=   594.5 MiB
+[rss] t=   70.3s rss=   597.4 MiB
+parabolic complete True
+        9.66 s  is_parabolic_complete  rss   599.6 MiB
+        0.00 s  parabolic generators 112  rss   599.6 MiB
+        0.00 s  registered the source plane, registry 1  rss   599.6 MiB
+[rss] t=   75.3s rss=   601.5 MiB
+[rss] t=  202.2s rss=  1115.8 MiB
+      134.89 s  the walk's first splitting lift arrived  rss  1219.5 MiB
+  plane     1: walk+transport+register   0.002 s  registry lookup     2.403 ms over 1 entries  found True  rss  1219.9 MiB
+  plane     2: walk+transport+register   0.028 s  registry lookup     2.353 ms over 2 entries  found True  rss  1224.9 MiB
+  plane     3: walk+transport+register   0.011 s  registry lookup     2.521 ms over 3 entries  found True  rss  1225.0 MiB
+  plane    20: walk+transport+register   0.537 s  registry lookup     5.616 ms over 20 entries  found True  rss  1227.0 MiB
+  plane    40: walk+transport+register   0.110 s  registry lookup     9.546 ms over 40 entries  found True  rss  1227.2 MiB
+  plane    60: walk+transport+register   0.112 s  registry lookup    10.752 ms over 60 entries  found True  rss  1227.3 MiB
+  plane    80: walk+transport+register   0.112 s  registry lookup    13.894 ms over 80 entries  found True  rss  1227.9 MiB
+  plane   100: walk+transport+register   0.121 s  registry lookup    17.122 ms over 100 entries  found True  rss  1229.3 MiB
+  plane   120: walk+transport+register   0.122 s  registry lookup    20.075 ms over 120 entries  found True  rss  1230.6 MiB
+  plane   140: walk+transport+register   0.122 s  registry lookup    23.676 ms over 140 entries  found True  rss  1232.0 MiB
+  plane   160: walk+transport+register   0.127 s  registry lookup    26.930 ms over 160 entries  found True  rss  1233.4 MiB
+  plane   180: walk+transport+register   0.134 s  registry lookup    29.376 ms over 180 entries  found True  rss  1234.8 MiB
+  plane   200: walk+transport+register   0.130 s  registry lookup    39.091 ms over 200 entries  found True  rss  1236.3 MiB
+        1.71 s  walked 201 planes  rss  1236.3 MiB
+  cusp     0: built in   0.001 s  rss  1236.6 MiB
+  cusp     1: built in   0.000 s  rss  1236.6 MiB
+  cusp    10: built in   0.000 s  rss  1236.6 MiB
+  cusp    20: built in   0.000 s  rss  1236.6 MiB
+  cusp    30: built in   0.000 s  rss  1236.6 MiB
+        0.00 s  40 plane cusps built  rss  1236.7 MiB
+  one non-matching caller:    44972.6 us, hit False
+  one matching caller    :    79150.1 us, hit True
+  a scan over 40 cusps of this row:    1.380 s for 40 callers, hit True
+  per caller in the scan :    34504.6 us
+        1.50 s  cusp identification measured  rss  1243.5 MiB
+[peakrss] walk-cost: child waited=0 shell_code=0 samples=107
+[peakrss] peak tree RSS      : 1250 MiB
+[peakrss] low-water MemAvail : 4689 MiB
+[peakrss] peak single VmHWM  : 1257 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     1247 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   210.1s procs=  3 rss=  1250 MiB hwm=  1254 MiB avail=  4910 MiB
+[peakrss]   t=   212.1s procs=  3 rss=  1249 MiB hwm=  1257 MiB avail=  4689 MiB
+[peakrss]   t=   208.1s procs=  3 rss=  1237 MiB hwm=  1241 MiB avail=  5078 MiB
+[peakrss]   t=   206.1s procs=  3 rss=  1206 MiB hwm=  1209 MiB avail=  5102 MiB
+[peakrss]   t=   184.1s procs=  3 rss=  1080 MiB hwm=  1080 MiB avail=  5305 MiB
+# launcher exit: 0

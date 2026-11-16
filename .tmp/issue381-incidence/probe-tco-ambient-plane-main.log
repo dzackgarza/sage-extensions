@@ -1,0 +1,75 @@
+# tree: 891fee04336bed6f9bbb6d14dd643266f3fd77b2
+# tree status:  M src/sage_extensions/categories/isotropic_orbits.py ?? launch-381.sh 
+# load: 1.64 1.70 1.53
+# program: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/wt-381/.tmp/probe-381-ambient-plane.py
+[rss] t=    0.0s rss=    97.1 MiB
+        0.03 s  O(T_Co)  rss   271.5 MiB
+[rss] t=    5.0s rss=   417.1 MiB
+[rss] t=   10.1s rss=   472.9 MiB
+[rss] t=   15.1s rss=   475.2 MiB
+[rss] t=   20.1s rss=   477.5 MiB
+[rss] t=   25.1s rss=   513.6 MiB
+[rss] t=   30.2s rss=   525.9 MiB
+[rss] t=   35.2s rss=   528.5 MiB
+[rss] t=   40.2s rss=   531.1 MiB
+[rss] t=   45.2s rss=   540.4 MiB
+[rss] t=   50.3s rss=   568.9 MiB
+[rss] t=   55.3s rss=   571.5 MiB
+[rss] t=   60.3s rss=   574.3 MiB
+[rss] t=   65.3s rss=   577.1 MiB
+[rss] t=   70.4s rss=   600.9 MiB
+[rss] t=   75.4s rss=   602.2 MiB
+[rss] t=   80.4s rss=   603.0 MiB
+[rss] t=   85.4s rss=   603.0 MiB
+[rss] t=   90.5s rss=   632.4 MiB
+[rss] t=   95.5s rss=   634.9 MiB
+[rss] t=  100.5s rss=   637.7 MiB
+[rss] t=  105.5s rss=   640.4 MiB
+[rss] t=  110.6s rss=   674.8 MiB
+[rss] t=  115.6s rss=   675.1 MiB
+[rss] t=  120.6s rss=   675.1 MiB
+[rss] t=  125.6s rss=   675.4 MiB
+[rss] t=  130.7s rss=   709.7 MiB
+[rss] t=  135.7s rss=   712.1 MiB
+[rss] t=  140.7s rss=   714.3 MiB
+[rss] t=  145.7s rss=   716.8 MiB
+[rss] t=  150.8s rss=   758.8 MiB
+      150.67 s  ambient plane row: 1 orbits  rss   762.2 MiB
+  plane 0: [(2, 0, 0, 0, -1, -1, -2, -2, -2, -2, -2), (0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0)] gram (0, 0, 0, 0)
+[rss] t=  155.8s rss=   766.1 MiB
+[rss] t=  160.8s rss=   770.4 MiB
+  parabolic complete: True
+        9.25 s  is_parabolic_complete  rss   771.0 MiB
+        0.00 s  parabolic generators 113  rss   771.0 MiB
+Traceback (most recent call last):
+  File "sage/structure/category_object.pyx", line 858, in sage.structure.category_object.CategoryObject.getattr_from_category
+    return self._cached_methods[name]
+KeyError: 'finite_character_quotient'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/probe.py", line 56, in <module>
+    print(f"  index of the parabolic image: {group.finite_character_quotient().index()}", flush=True)
+                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "sage/structure/category_object.pyx", line 852, in sage.structure.category_object.CategoryObject.__getattr__
+    return self.getattr_from_category(name)
+  File "sage/structure/category_object.pyx", line 867, in sage.structure.category_object.CategoryObject.getattr_from_category
+    attr = getattr_from_other_class(self, cls, name)
+  File "sage/cpython/getattr.pyx", line 362, in sage.cpython.getattr.getattr_from_other_class
+    raise AttributeError(dummy_error_message)
+AttributeError: 'OwnedLatticeIsometryMor_with_category_with_category' object has no attribute 'finite_character_quotient'
+[peakrss] ambient-plane: child waited=1 shell_code=1 samples=82
+[peakrss] peak tree RSS      : 782 MiB
+[peakrss] low-water MemAvail : 5884 MiB
+[peakrss] peak single VmHWM  : 782 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      772 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   162.1s procs=  3 rss=   782 MiB hwm=   782 MiB avail=  5890 MiB
+[peakrss]   t=   160.1s procs=  3 rss=   779 MiB hwm=   779 MiB avail=  5894 MiB
+[peakrss]   t=   156.1s procs=  3 rss=   776 MiB hwm=   776 MiB avail=  5884 MiB
+[peakrss]   t=   158.1s procs=  3 rss=   776 MiB hwm=   776 MiB avail=  5895 MiB
+[peakrss]   t=   152.1s procs=  3 rss=   773 MiB hwm=   773 MiB avail=  5904 MiB
+# launcher exit: 1

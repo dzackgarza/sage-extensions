@@ -1,0 +1,72 @@
+# tree: 891fee04336bed6f9bbb6d14dd643266f3fd77b2
+# tree status:  M src/sage_extensions/categories/group/predicate_subgroups.py  M src/sage_extensions/categories/isotropic_orbits.py  M src/sage_extensions/categories/orthogonal_quotients.py  M tests/coble_gamma_co_2_incidence_rows.py ?? launch-381.sh ?? tests/lattices/test_the_coble_incidence_vertices_are_its_cusp_representatives.sage 
+# load: 1.93 1.90 1.70
+# program: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/wt-381/.tmp/probe-381-walk.py
+[rss] t=    0.0s rss=    97.4 MiB
+        0.02 s  lattice  rss   270.4 MiB
+[rss] t=    5.0s rss=   414.0 MiB
+[rss] t=   10.0s rss=   474.2 MiB
+[rss] t=   15.1s rss=   495.2 MiB
+[rss] t=   20.1s rss=   517.3 MiB
+[rss] t=   25.1s rss=   530.7 MiB
+[rss] t=   30.1s rss=   549.8 MiB
+[rss] t=   35.8s rss=   567.1 MiB
+[rss] t=   40.9s rss=   471.5 MiB
+[rss] t=   45.9s rss=   474.2 MiB
+[rss] t=   50.9s rss=   468.7 MiB
+[rss] t=   55.9s rss=   471.3 MiB
+[rss] t=   61.0s rss=   474.1 MiB
+[rss] t=   66.0s rss=   475.5 MiB
+       66.46 s  Otilde and its quotient, index 46998591897600  rss   476.0 MiB
+ambient plane 2 primitive True gram (0, 0, 0, 0)
+        0.03 s  ambient plane, taken from the O(T_Co) row's own representative  rss   476.4 MiB
+[rss] t=   71.0s rss=   480.8 MiB
+[rss] t=   76.0s rss=   484.4 MiB
+[rss] t=   81.1s rss=   487.6 MiB
+parabolic complete True
+       15.47 s  is_parabolic_complete  rss   491.1 MiB
+        0.00 s  parabolic generators 112  rss   491.1 MiB
+        0.00 s  registered the source plane, registry 1  rss   491.1 MiB
+[rss] t=   86.1s rss=   492.3 MiB
+[rss] t=   91.2s rss=   496.7 MiB
+[rss] t=  224.8s rss=  1120.8 MiB
+      146.62 s  the walk's first splitting lift arrived  rss  1179.3 MiB
+  plane     1: walk+transport+register   0.002 s  registry lookup     1.045 ms over 1 entries  found True  rss  1179.3 MiB
+  plane     2: walk+transport+register   0.012 s  registry lookup     0.918 ms over 2 entries  found True  rss  1179.3 MiB
+  plane     3: walk+transport+register   0.008 s  registry lookup     0.931 ms over 3 entries  found True  rss  1179.3 MiB
+  plane    20: walk+transport+register   0.107 s  registry lookup     0.884 ms over 20 entries  found True  rss  1180.1 MiB
+  plane    40: walk+transport+register   0.116 s  registry lookup     0.799 ms over 40 entries  found True  rss  1181.3 MiB
+  plane    60: walk+transport+register   0.524 s  registry lookup     0.765 ms over 60 entries  found True  rss  1182.1 MiB
+  plane    80: walk+transport+register   0.118 s  registry lookup     0.759 ms over 80 entries  found True  rss  1182.2 MiB
+  plane   100: walk+transport+register   0.119 s  registry lookup     0.887 ms over 100 entries  found True  rss  1182.4 MiB
+  plane   120: walk+transport+register   0.114 s  registry lookup     0.743 ms over 120 entries  found True  rss  1183.6 MiB
+  plane   140: walk+transport+register   0.114 s  registry lookup     0.750 ms over 140 entries  found True  rss  1185.0 MiB
+  plane   160: walk+transport+register   0.111 s  registry lookup     0.766 ms over 160 entries  found True  rss  1186.4 MiB
+  plane   180: walk+transport+register   0.115 s  registry lookup     0.732 ms over 180 entries  found True  rss  1187.8 MiB
+  plane   200: walk+transport+register   0.112 s  registry lookup     0.740 ms over 200 entries  found True  rss  1189.2 MiB
+        1.57 s  walked 201 planes  rss  1189.2 MiB
+  cusp     0: built in   0.001 s  rss  1189.2 MiB
+  cusp     1: built in   0.000 s  rss  1189.2 MiB
+  cusp    10: built in   0.000 s  rss  1189.2 MiB
+  cusp    20: built in   0.000 s  rss  1189.2 MiB
+  cusp    30: built in   0.000 s  rss  1189.2 MiB
+        0.00 s  40 plane cusps built  rss  1189.2 MiB
+  one non-matching caller:    43544.0 us, hit False
+  one matching caller    :    66797.1 us, hit True
+  a scan over 40 cusps of this row:    1.549 s for 40 callers, hit True
+  per caller in the scan :    38735.2 us
+        1.66 s  cusp identification measured  rss  1194.6 MiB
+[peakrss] walk-cost-fixed: child waited=0 shell_code=0 samples=118
+[peakrss] peak tree RSS      : 1205 MiB
+[peakrss] low-water MemAvail : 3887 MiB
+[peakrss] peak single VmHWM  : 1208 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     1197 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   234.2s procs=  3 rss=  1205 MiB hwm=  1208 MiB avail=  3907 MiB
+[peakrss]   t=   232.2s procs=  3 rss=  1199 MiB hwm=  1202 MiB avail=  4114 MiB
+[peakrss]   t=   230.2s procs=  3 rss=  1188 MiB hwm=  1190 MiB avail=  4133 MiB
+[peakrss]   t=   228.2s procs=  3 rss=  1099 MiB hwm=  1101 MiB avail=  4215 MiB
+[peakrss]   t=   222.1s procs=  3 rss=  1037 MiB hwm=  1039 MiB avail=  4064 MiB
+# launcher exit: 0
