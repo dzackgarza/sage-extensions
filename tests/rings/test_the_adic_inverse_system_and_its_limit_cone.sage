@@ -71,15 +71,28 @@ def test_the_limit_cone_of_the_completion_projects_onto_every_tier() -> None:
 
 
 def test_the_completion_map_at_the_zero_ideal_is_an_isomorphism_onto_the_ring() -> None:
-    r"""$A \to A^\wedge$ is injective and surjective: $A^\wedge = A$ at $I = (0)$."""
+    r"""$A \to A^\wedge$ is an arrow of the core: $A^\wedge = A$ at $I = (0)$.
+
+    Every power of the zero ideal is the zero ideal, so every tier is $A$ and
+    the completion is $A$ itself presented as complete.  The map is therefore
+    an isomorphism between the two presentations, and the construction builds
+    it as one: it lies in the core, its inverse is an arrow back, and the two
+    inverse equations hold.  Injectivity and surjectivity are answered by that
+    placement, not by a claim the map carries.
+    """
     field, completion = _the_gaussian_rationals_at_the_zero_ideal()
     completion_map = completion.completion_map()
+    a = field.algebra_generator("a")
 
     assert completion_map.domain() is field
     assert completion_map.codomain() is completion
+    assert completion_map in Rings().Core().Mor(field, completion)
     assert completion_map.is_injective() is True
     assert completion_map.is_surjective() is True
     assert completion_map(field.one()) == completion.one()
+    assert completion_map.inverse()(completion_map(a)) == a
+    assert completion_map(completion_map.inverse()(completion(a))) == completion(a)
+    assert completion_map.inverse().inverse() == completion_map
 
 
 def test_the_inverse_system_at_a_principal_ideal_is_not_constant() -> None:
