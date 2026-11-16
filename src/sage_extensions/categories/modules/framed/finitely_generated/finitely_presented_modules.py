@@ -1819,9 +1819,7 @@ def _module_invariant_factor_form(module):
     # construction is where that is known: a retained invariant is a nonzero
     # non-unit exactly when its cyclic summand is torsion, so the reduced module
     # is torsion exactly when no retained invariant vanishes.  Placement is the
-    # claim of the construction that knows it (``CAT-04``), so the claim is made
-    # here instead of every cokernel deciding its own torsion placement from a
-    # rank at construction.
+    # claim of the construction that knows it (``CAT-04``).
     retained_invariants = tuple(
         invariants[int(retained_positions[int(position)])] for position in reduced_labels
     )
@@ -3574,8 +3572,7 @@ def _presented_module_from_morphism(
     alone: its relation morphism, its engine cover, its relation submodule and
     its private Smith engine are built by the first request that needs one of
     them (``AGENTS.md``, "Construction is instant").  Nothing here decides a
-    property of the cokernel.  In particular the torsion placement is not
-    computed from a rank: a caller that claims torsion passes
+    property of the cokernel: a caller that claims torsion passes
     ``Modules(R).FinitelyPresented().Torsion()``, and that constructor is the
     claim (``CAT-04``: placement is made by the construction that states it,
     never justified by an implementation's answer).  ``validate_torsion_claim``
