@@ -116,6 +116,32 @@ def displays_rendered_by(action):
 builtins.displays_rendered_by = displays_rendered_by
 
 
+def cokernels_built_by(action, morphism):
+    r"""Return ``action()`` and the number of cokernels it built of ``morphism``'s class.
+
+    A module morphism's cokernel is built by its ``cokernel``, which retains the
+    quotient it built; a decision about that cokernel which constructs no
+    quotient therefore leaves this count at zero, and that is the contract a test
+    of such a decision asserts.  The shadow is set on the arrow's own class, not
+    on a method class: an element class is realized per construction, so a
+    method class shadowed afterwards would not be the one the arrow resolves.
+    """
+    owner = type(morphism)
+    entry = getattr(owner, "cokernel")
+    built = []
+
+    def counted(self, *arguments, **keywords):
+        built.append(1)
+        return entry.__get__(self, owner)(*arguments, **keywords)
+
+    with _patched(owner, "cokernel", counted):
+        value = action()
+    return value, sum(built)
+
+
+builtins.cokernels_built_by = cokernels_built_by
+
+
 def owned_ring_crossings(action):
     r"""Return ``action()`` and the number of owned-ring crossings it made.
 

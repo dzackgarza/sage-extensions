@@ -1,0 +1,33 @@
+=== ran on: 4f540a2d927d9a9171d01913006503c41cf81334 (2 modified paths)
+=== command: pytest tests/lattices/test_a_planes_primitivity_is_decided_from_its_coordinates.sage -o addopts= -p qc_sage_session -p sage_extensions.testing.test_lint
+F                                                                        [100%]
+=================================== FAILURES ===================================
+___________ test_a_subobjects_primitivity_builds_no_quotient_module ____________
+
+    def test_a_subobjects_primitivity_builds_no_quotient_module() -> None:
+        r"""Decide primitivity of \(\langle e_1, f_2\rangle\), \(\langle e_1, 2f_2\rangle\) and lines.
+    
+        \(U\oplus U\) has basis \(e_1,f_1,e_2,f_2\) with \(b(e_i,f_i)=1\).  The span
+        of \(e_1\) and \(f_2\) is primitive, while the span of \(e_1\) and \(2f_2\)
+        has \(f_2\) outside it and twice \(f_2\) inside, so its quotient carries a
+        torsion class of order two;
+        the line spanned by \(2e_1\) has a quotient of the same kind and the line
+        spanned by \(f_1 - e_1\) does not.
+        """
+        lattice = Lattices(ZZ)("U") + Lattices(ZZ)("U")
+        e1, f1, e2, f2 = lattice.module_generators()
+        span = lattice.subobject_on((e1, f2))
+        inclusion = span.inclusion()
+    
+        decided, quotients = cokernels_built_by(span.is_primitive, inclusion)
+    
+        assert decided is True
+>       assert quotients == 0
+E       assert 1 == 0
+E        +  where 0 = Integer(0)
+
+tests/lattices/test_a_planes_primitivity_is_decided_from_its_coordinates.sage:35: AssertionError
+=========================== short test summary info ============================
+FAILED tests/lattices/test_a_planes_primitivity_is_decided_from_its_coordinates.sage::test_a_subobjects_primitivity_builds_no_quotient_module
+1 failed in 1.51s
+=== exit: 1

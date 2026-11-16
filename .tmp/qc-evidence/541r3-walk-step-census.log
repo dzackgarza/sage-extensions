@@ -1,0 +1,48 @@
+=== tree: 4f540a2d927d9a9171d01913006503c41cf81334 (modified paths: 0)
+=== port: 991b88b095a42a1e3679569ea42328c900c120f6
+=== load: 5.76 4.91 2.96 7/400 2444577
+=== command: sage-image/run.sh -w /work, probe probe541parts.py at /probe.py, inner 540 s, outer 570 s
+row: {g in Orthogonal group O(Integral lattice of rank 11 and signature (2, 9)) : rho_L(g) lies in Subgroup of Orthogonal group of Finitely presented module on 11 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 2, 1 ↦ 2, 2 ↦ 2, 3 ↦ 2, 4 ↦ 2, 5 ↦ 2, 6 ↦ 2, 7 ↦ 2, 8 ↦ 2, 9 ↦ 2, 10 ↦ 2]} on rank 11, window (120, 200)
+  [the walk's first step (its own setup) took 174086.7 ms at 509.7 s]
+
+===== A. the walk step against the plane's transport, unprofiled =====
+the walk's first next() (its own setup): 174086.7 ms
+the next 198 steps: median 0.775 ms, mean 0.782 ms, max 1.126 ms
+the 199 transports: median 10.073 ms, mean 10.092 ms
+
+block | median step ms | median transport ms
+    2..   25 |     0.795 |    10.283
+   26..   49 |     0.783 |    10.187
+   50..   73 |     0.762 |    10.029
+   74..   97 |     0.774 |     9.976
+   98..  121 |     0.770 |    10.127
+  122..  145 |     0.778 |    10.056
+  146..  169 |     0.786 |     9.894
+  170..  193 |     0.787 |     9.983
+  194..  199 |     0.764 |     9.902
+
+===== B. the transport part by part, unprofiled, 80 planes =====
+   10.015 ms | 100.0 % | `transport_isotropic_object`, whole
+    2.876 ms |  28.7 % | subobject_on (1.00 calls a plane)
+    5.425 ms |  54.2 % | is_primitive (1.00 calls a plane)
+    4.244 ms |  42.4 % | cokernel (1.00 calls a plane)
+    0.392 ms |   3.9 % | torsion_free (1.00 calls a plane)
+    0.165 ms |   1.6 % | refine (1.00 calls a plane)
+   10.015 ms | 100.0 % | outside it: the plane's basis images through the lift
+   -8.302 ms | -82.9 % | the isotropy pairings, the PrimitiveIsotropicSubobjects refinement and the rank check
+
+step share of a plane: 7.7 % (0.775 of 10.073 ms)
+[peakrss] run: child waited=0 shell_code=0 samples=258
+[peakrss] peak tree RSS      : 1423 MiB
+[peakrss] low-water MemAvail : 10376 MiB
+[peakrss] peak single VmHWM  : 1423 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     1412 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   514.6s procs=  3 rss=  1423 MiB hwm=  1423 MiB avail= 12788 MiB
+[peakrss]   t=   512.6s procs=  3 rss=  1389 MiB hwm=  1389 MiB avail= 12817 MiB
+[peakrss]   t=   510.6s procs=  3 rss=  1343 MiB hwm=  1343 MiB avail= 12442 MiB
+[peakrss]   t=   508.6s procs=  3 rss=  1262 MiB hwm=  1262 MiB avail= 12520 MiB
+[peakrss]   t=   504.6s procs=  3 rss=  1250 MiB hwm=  1250 MiB avail= 12700 MiB
+=== launcher exit: 0

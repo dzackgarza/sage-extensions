@@ -1,0 +1,32 @@
+=== tree: 80a135c701a02c99654f205bccd61cd5eca38149 (modified paths: 4)
+=== port: 991b88b095a42a1e3679569ea42328c900c120f6
+=== load: 4.61 5.09 4.55 5/364 2460174
+=== command: sage-image/run.sh -w /work, probe probe541prim.py at /probe.py, inner 300 s, outer 330 s
+
+===== the specimen =====
+T_Co: rank 11
+
+===== the pairs =====
+8 distinct isotropic pairs with vanishing pairing
+
+===== A. the span and the primitivity decision, 8 cold spans =====
+`subobject_on`            median 3.199047 ms (3.148..30.617)
+`is_primitive`            median 2.083389 ms (1.965..22.768)
+`inclusion().cokernel()`  median 4.931513 ms (4.527..20.837)
+`cokernel.is_torsion_free` median 0.471404 ms (0.425..0.597)
+answers other than primitive: []
+
+===== B. the whole constructor on the same pairs, cold =====
+`primitive_isotropic_subobject` median 4.080921 ms (3.984..7.276)
+sum of the span and the decision: 5.282 ms
+[peakrss] run: child waited=0 shell_code=0 samples=2
+[peakrss] peak tree RSS      : 290 MiB
+[peakrss] low-water MemAvail : 12993 MiB
+[peakrss] peak single VmHWM  : 290 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      279 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     2.0s procs=  3 rss=   290 MiB hwm=   290 MiB avail= 12993 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     7 MiB hwm=     7 MiB avail= 13190 MiB
+=== launcher exit: 0

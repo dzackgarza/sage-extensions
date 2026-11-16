@@ -1876,7 +1876,52 @@ class ModuleMorphismMethods:
         return self.is_surjective_mod_maximal_ideal()
 
     def is_primitive(self) -> bool:
-        r"""Return whether this monomorphism has torsion-free cokernel."""
+        r"""Return whether this monomorphism has torsion-free cokernel.
+
+        Over the integers with both endpoints finitely generated and free, the
+        cokernel is the quotient of the codomain's framing by the row lattice of
+        the inclusion's coordinate matrix \(A\).  The Smith form \(A = UDV\)
+        over a principal ideal domain writes that quotient as
+        \(\mathbf{Z}^{n-r} \oplus \bigoplus_i \mathbf{Z}/d_i\), so it is
+        torsion-free exactly when every elementary divisor \(d_i\) is a unit --
+        which is the criterion of the invariant factors that
+        :meth:`...FinitelyPresentedModules.ParentMethods._torsion_freeness_decision`
+        states of the presented quotient, read here off the matrix that decides
+        it.  The decision therefore constructs no quotient module;
+        :meth:`saturation` reads the same matrix for the primitive closure.
+
+        Every other ring takes the inclusion's quotient and asks it: there the
+        invariant factors are the presented owner's to read.
+        """
+        ring = self.domain().base_ring()
+        from sage.rings.integer_ring import ZZ as SageZZ
+
+        if (
+            _engine_ring(ring) is SageZZ
+            and _has_finite_free_framing(self.domain())
+            and _has_finite_free_framing(self.codomain())
+        ):
+            from sage.matrix.constructor import matrix
+
+            source_labels = tuple(self.domain().module_generating_set())
+            target_labels = tuple(self.codomain().module_generating_set())
+            engine = _engine_ring(ring)
+            rows = [
+                [
+                    _engine_element(
+                        ring,
+                        self(self.domain().module_generator(label)).to_vector()(target_label),
+                    )
+                    for target_label in target_labels
+                ]
+                for label in source_labels
+            ]
+            coordinate_matrix = matrix(engine, rows)
+            rank = int(coordinate_matrix.rank())
+            if rank != len(source_labels):
+                return False
+            divisors = coordinate_matrix.smith_form()[0]
+            return all(abs(int(divisors[index, index])) == 1 for index in range(rank))
         if not self.is_injective():
             return False
         return self.cokernel().is_torsion_free()
