@@ -3175,3 +3175,19 @@ The repair's commit message quotes an earlier run of the same two test files on 
 tree the fix was written in -- **6 passed in 2.74 s**; the stored log is the run at
 the head this is pushed from, where the same six pass in 3.88 s.  Neither the test
 files nor the two library files changed between the two runs.
+
+
+## `#521` round 4, re-taken: the runs at the head the round is pushed from (2026-11-16)
+
+`main` moved twice while this round was being finished -- once before the rebase onto
+`c9568ed`, again before the rebase onto `cf6ba0b`, whose one session-name addition
+(`TransvectionOutsideTheLattice`) makes the module publish 678 names rather than the
+677 the earlier rows record.  The three runs below are the same files and the same
+probe on the tree this is pushed from, so the evidence names a commit in the pushed
+history rather than a pre-rebase one.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `issue521r4-green-rebased.log` | `5f014e0`, clean tree (the rebased head) | the two test files of this round: **6 passed in 5.84 s**, exit 0, `test_lint` loaded and reporting nothing |
+| `issue521r4-probe-session-rebased.log` | `5f014e0`, clean tree | the same probe: **678** public names, `__all__` is them, the dialect's vocabulary is that declaration, `QQ[t]` and `ZZ[x, y]` declare their generators, `Sets.Δ[aleph0]`, `Modules[ZZ]` and `Modules[k]` keep the subscript, `QQ[t]` is the ring with `t` its generator, and `Integer`, `RealNumber`, `matrix` answer as before |
+| `issue521r4-mypy-rebased.log` | `5f014e0`, clean tree | the mypy tier, diff-scoped to the two changed files: the same ten errors as `issue521r4-mypy-fix.log` and `issue521r4-mypy-base.log`, with `all.py`'s three at line 509 for the one added import |

@@ -1,0 +1,16 @@
+=== tree: 5f014e0254f6ea5246eecc791ba62709d8944f27 (modified: 0 paths)
+=== files: src/sage_extensions/language_runtime.py src/sage_extensions/all.py
+=== start: 09:05:53
+src/sage_extensions/language_runtime.py:49: error: Function is missing a type annotation  [no-untyped-def]
+src/sage_extensions/language_runtime.py:54: error: Function is missing a type annotation  [no-untyped-def]
+src/sage_extensions/language_runtime.py:70: error: Function is missing a type annotation  [no-untyped-def]
+src/sage_extensions/language_runtime.py:98: error: Function is missing a type annotation  [no-untyped-def]
+src/sage_extensions/language_runtime.py:105: error: Returning Any from function declared to return "_OwnedIntegerElement"  [no-any-return]
+src/sage_extensions/language_runtime.py:108: error: Function is missing a type annotation  [no-untyped-def]
+src/sage_extensions/language_runtime.py:117: error: Function is missing a type annotation  [no-untyped-def]
+src/sage_extensions/all.py:467: error: Right operand of "or" is never evaluated  [unreachable]
+src/sage_extensions/all.py:509: error: Cannot assign multiple types to name "RealNumber" without an explicit "type[...]" annotation  [misc]
+src/sage_extensions/all.py:509: error: Incompatible types in assignment (expression has type "Callable[[int | str | _OwnedIntegerElement | ExactRealNumber], ExactRealNumber]", variable has type "type[ExactRealNumber]")  [assignment]
+/ci/tool-configs/mypy-sage.ini: note: unused section(s): [mypy-slop_detector.*], [mypy-fpylll.*], [mypy-setuptools.*], [mypy-wheel.*], [mypy-pytest.*], [mypy-tqdm.*]
+Found 10 errors in 2 files (checked 2 source files)
+=== exit: 1 at 09:06:09
