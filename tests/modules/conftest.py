@@ -1,11 +1,13 @@
 r"""Session instruments for the module tests.
 
-A test may not name a private engine entry (``TL01``, ``TL02``), so what the
-module tests measure is bound here as a builtin: a directory's ``conftest.py``
-binds the abbreviations its tests use, and ``sage_extensions.testing.test_lint``
-reads the allowed names after the conftests have run.  Each instrument patches
-through ``pytest.MonkeyPatch.context()``, so a failing action leaves the process
-as it found it.
+A test may not name a private engine entry (``TL01``, ``TL02``), so the one
+measurement the module tests take is bound here as a builtin: a directory's
+``conftest.py`` binds the names its tests use, and
+``sage_extensions.testing.test_lint`` reads the allowed names after the
+conftests have run.  The instrument patches through
+``pytest.MonkeyPatch.context()``, so a failing action leaves the process as it
+found it, and it measures behaviour a test reaches publicly -- a construction
+and its first request -- rather than a private helper's return value.
 """
 
 from __future__ import annotations
@@ -62,27 +64,4 @@ def construction_work_of(construction, request):
     return value, during_construction, during_request
 
 
-def coordinate_images_of(morphism):
-    r"""Return the coordinates of each image of the morphism's domain generators.
-
-    A test may not name a private entry (``TL01``, ``TL02``); this is the
-    coordinates of ``f(e_s)`` in the codomain's chosen generators, which is what
-    the module owner's lowering of a morphism of free modules reads.
-    """
-    from sage_extensions.categories.modules.pure.modules import _coordinate_images
-
-    return _coordinate_images(morphism)
-
-
-def relation_images_of(module):
-    r"""Return the coordinate images of a presented module's selected relation morphism."""
-    from sage_extensions.categories.modules.framed.finitely_generated.finitely_presented_modules import (
-        _relation_images,
-    )
-
-    return _relation_images(module)
-
-
 builtins.construction_work_of = construction_work_of
-builtins.coordinate_images_of = coordinate_images_of
-builtins.relation_images_of = relation_images_of
