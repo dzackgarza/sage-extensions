@@ -3087,3 +3087,15 @@ round may claim, whatever it printed.  What the row was for (the head's FAILED
 ids are the base's minus the three rows that round repaired) is therefore not
 established by it.  That selection takes twelve minutes on a loaded host; it is
 a suite and belongs to CI, and it is not re-taken here.
+
+### `#543`, round 6: the same rows at the tree the round is pushed from, 2026-11-16
+
+Main advanced to `e65da01` under the branch, and the rows above were re-taken on
+the rebased tree, whose commits are `cc7438f` (test), `d730a45` and `ec30a34`
+(the repairs) and the evidence commit this note follows.  Same pinned image,
+same launcher, same `PYTHONPATH`.
+
+| log | tree | result |
+| --- | --- | --- |
+| `543r2-green-at-rebased-head.log` | the rebased repair head | the two files: **23 passed in 2.46 s** |
+| `543r2-probe-at-rebased-head.log` | the rebased repair head | `543r2-probe.py`: the same **36** answers, and the same single difference against `543r2-probe-at-ab2e435.log` (`PredicateSubrings().an_object()(cardinal(7))` is `7` here, `TypeError: category() needs an argument` there) |
