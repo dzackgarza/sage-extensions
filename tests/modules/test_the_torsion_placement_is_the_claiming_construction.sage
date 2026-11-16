@@ -23,11 +23,16 @@ import pytest
 from sage_extensions.all import *  # noqa: F401,F403
 
 
-def _cokernel_of_a_dilation(scalar):
-    r"""Return $\operatorname{coker}\bigl(Z \xrightarrow{scalar} Z\bigr)$."""
+def _dilation_of_z(scalar):
+    r"""Return $Z \xrightarrow{scalar} Z$, the presentation datum of the specimens."""
     free = ZZ.free_module(1)
     (generator,) = free.module_generators()
-    return free.Mor(free)({0: scalar * generator}).cokernel()
+    return free.Mor(free)({0: scalar * generator})
+
+
+def _cokernel_of_a_dilation(scalar):
+    r"""Return $\operatorname{coker}\bigl(Z \xrightarrow{scalar} Z\bigr)$."""
+    return _dilation_of_z(scalar).cokernel()
 
 
 def _form_values():
@@ -98,3 +103,22 @@ def test_a_module_that_claims_no_torsion_states_no_refutation_of_one() -> None:
         module.validate_torsion_claim()
 
     assert module.is_torsion() is False
+
+
+def test_equipping_a_declared_torsion_module_keeps_its_placement() -> None:
+    r"""The generic form constructor reads the module's declared placement.
+
+    $Z/5$ is constructed in ``Modules(Z).FinitelyPresented().Torsion()``, and
+    that construction states the module's placement.  Equipping it with a form
+    keeps the placement those data already carry; neither the bilinear nor the
+    quadratic form constructor reads the invariant factors to discover it.
+    """
+    module = Modules(ZZ).FinitelyPresented().Torsion()(_dilation_of_z(ZZ(5)))
+    values = _form_values()
+    gram = ((values(QQ(1) / QQ(5)),),)
+
+    bilinear = FormModules(ZZ)(module.bilinear_forms(values)(gram))
+    quadratic = FormModules(ZZ)(module.quadratic_forms(values)(gram))
+
+    assert bilinear in FormModules(ZZ).FinitelyPresented().Torsion()
+    assert quadratic in FormModules(ZZ).FinitelyPresented().Torsion()
