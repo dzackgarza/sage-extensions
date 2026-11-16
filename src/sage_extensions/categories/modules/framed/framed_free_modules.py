@@ -9,6 +9,7 @@ from sage.misc.mrange import cantor_product as _engine_cantor_product
 from sage.misc.repr import repr_lincomb
 from sage.modules.free_module import FreeModule as _SageFreeModule
 from sage.rings.integer import Integer
+from sage.rings.integer_ring import ZZ as SageZZ
 from sage.structure.element import ModuleElement, RingElement
 from sage.structure.element import parent as element_parent
 from sage.structure.parent import Parent
@@ -516,6 +517,33 @@ class FramedFreeModules(OwnedCategoryOverBaseRing):
                 ._selected_module_coefficients(coordinates)
                 .values()
             )
+
+        def content(self):
+            r"""Return the nonnegative gcd of the coordinates in the chosen basis, over ``ZZ``.
+
+            The coordinates generate the order ideal (``order_ideal``), so
+            their gcd is its nonnegative generator.  It is read on the engine
+            values of the coordinates; no ideal is formed.  The zero element
+            has content zero.
+
+            EXAMPLES::
+
+                sage: M = ZZ**2
+                sage: M.linear_combination({0: ZZ(-6), 1: ZZ(9)}).content() == ZZ(3)
+                True
+                sage: M.zero().content() == ZZ(0)
+                True
+            """
+            ring = self.parent().base_ring()
+            if _engine_ring(ring) is not SageZZ:
+                raise TypeError("integer content requires a free module over ZZ")
+            coordinates = self.to_vector()
+            generator = Integer(0)
+            for value in (
+                coordinates.parent()._selected_module_coefficients(coordinates).values()
+            ):
+                generator = generator.gcd(_engine_element(ring, value))
+            return _owned_engine_element(ring, generator)
 
         def primitive_part(self) -> "FramedFreeModules.ElementMethods":
             r"""Return ``v/content(v)`` for a nonzero vector over ``ZZ``.

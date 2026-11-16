@@ -747,7 +747,34 @@ def _filtered_ordered_set(
     )
 
 
-class _FilteredOrderedSetEngine:
+class _OrderedSubsetEngine:
+    r"""A subobject of a finite enumerated set, enumerated by the selection it retains.
+
+    Shared realization of the subset engines below: a subset of a finite
+    enumerated set is itself an ordered set, whose enumeration is the selection
+    the construction retained, and whose inclusion into the universe is the
+    subobject it is.  Each engine supplies that selection and the decision of
+    membership in it, so the two differ only in how membership is decided.
+    """
+
+    def universe(self) -> Sets().ObjectType:
+        r"""The set \(X\) this subset is cut out of."""
+        return self._universe
+
+    @cached_method
+    def inclusion(self):
+        r"""The inclusion of this subset into the set it is cut out of."""
+        return Sets().Mono(self, self.universe())._from_subset_inclusion()
+
+    def __iter__(self):
+        return (self.enumeration()(index) for index in self.index_set())
+
+    def _repr_(self) -> str:
+        described = self.description()
+        return described if described else f"Ordered subset of {self.universe()}"
+
+
+class _FilteredOrderedSetEngine(_OrderedSubsetEngine):
     r"""Private computation class (``OWN-06``) of the ordered subset \(\{x\in S : P(x)\}\).
 
     The datum this class keeps is \((S, P)\); the inclusion into \(S\) is
@@ -759,25 +786,93 @@ class _FilteredOrderedSetEngine:
         self._predicate = predicate
         super().__init__(**rest)
 
-    def universe(self) -> Sets().ObjectType:
-        r"""The set \(S\) this subset is cut out of."""
-        return self._universe
-
     def predicate(self) -> Callable[[PointT], bool]:
         r"""The predicate \(P\) cutting this subset out of \(S\)."""
         return self._predicate
 
-    @cached_method
-    def inclusion(self):
-        r"""The inclusion \(\{x\in S : P(x)\}\hookrightarrow S\)."""
-        return Sets().Mono(self, self.universe())._from_subset_inclusion()
 
-    def __iter__(self):
-        return (self.enumeration()(index) for index in self.index_set())
+def _subset_on_positions(
+    universe: Parent,
+    positions: Iterable[int],
+    *,
+    description: Callable[[], str] | None = None,
+) -> FiniteOrderedSets().ObjectType:
+    r"""The subobject of ``universe`` on the given positions, with its inclusion.
 
-    def _repr_(self):
-        described = self.description()
-        return described if described else f"Ordered subset of {self.universe()}"
+    Protected construction contract (``OWN-05``), owned by ``FiniteOrderedSets``
+    and called only by an operation that already retains a selection of a finite
+    enumeration.  The defining datum is that selected enumeration: the points at
+    the given positions of ``universe``, in the order of ``universe``.  The
+    construction asks nothing about any point of ``universe``, so it costs what
+    reading the selection costs; a description given as a function is rendered
+    when a reader asks for the subset's description, as every named or described
+    order is.
+
+    A block of a partition of a finite enumerated set is the case this exists
+    for.  The partition is computed once, as the label of each position, and each
+    block is then the subobject on the positions carrying that label.  A subset
+    cut out point by point instead decides its membership predicate on every
+    point of the universe, once for each block.
+
+    Membership is membership of a point's position in the selection, which is the
+    question ``universe`` decides, and a point's index is its position's rank in
+    the selection, so the enumeration and membership cannot disagree.  A position
+    outside ``universe`` is refused rather than silently dropped: it is not a
+    position of the enumeration being selected from.
+    """
+    assert Sets().is_provably_finite(universe) and universe in EnumeratedSets(), (
+        f"a subset on given positions needs a finite enumerated universe, but {universe} is not one"
+    )
+    selected = tuple(int(position) for position in positions)
+    size = int(cardinal(universe.cardinality()).finite_value())
+    assert all(0 <= position < size for position in selected), (
+        f"the positions {selected} are not positions of the {size} points of {universe}"
+    )
+    ranking = universe.ranking_map()
+    ranks = frozenset(selected)
+    order = {position: index for index, position in enumerate(selected)}
+
+    def element_at(index):
+        return universe[selected[int(index)]]
+
+    def index_of(element):
+        return order.get(int(ranking(element)))
+
+    def contains(element):
+        admission = universe.is_parent_of(element)
+        if admission is not True:
+            return admission
+        return int(ranking(element)) in ranks
+
+    return _object_of(
+        FiniteOrderedSets(),
+        _engine=(FiniteOrderedSets(), _SubsetOnPositionsEngine, None),
+        universe=universe,
+        positions=selected,
+        index_set=finite_ordinal_set(len(selected)),
+        element_at=element_at,
+        index_of=index_of,
+        contains=contains,
+        description=description,
+    )
+
+
+class _SubsetOnPositionsEngine(_OrderedSubsetEngine):
+    r"""Private computation class (``OWN-06``) of the ordered subobject on positions.
+
+    The datum this class keeps is \((X, P)\): the finite enumerated set \(X\) and
+    the selected positions \(P\) of \(X\), which are the enumeration of the
+    subset.  The inclusion into \(X\) is the subobject the set is.
+    """
+
+    def __init__(self, universe: Parent, positions: tuple[int, ...], **rest) -> None:
+        self._universe = universe
+        self._positions = positions
+        super().__init__(**rest)
+
+    def positions(self) -> tuple[int, ...]:
+        r"""The positions of \(X\) this subset selects, in the order of \(X\)."""
+        return self._positions
 
 
 def _enumerated_image_set(

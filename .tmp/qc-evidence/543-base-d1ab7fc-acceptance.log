@@ -1,0 +1,128 @@
+F.FF.....F........                                                       [100%]
+=================================== FAILURES ===================================
+___ test_comparisons_of_cardinals_compose_and_are_carried_by_the_arithmetic ____
+
+    def test_comparisons_of_cardinals_compose_and_are_carried_by_the_arithmetic() -> None:
+        cardinals = Cardinalities()
+>       two_three = cardinals.Mor(2, 3).unique_morphism()
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:19: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/misc/cachefunc.pyx:2328: in sage.misc.cachefunc.CachedMethodCallerNoArgs.__call__
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Set of Morphisms from 2 to 3 in Card: cardinalities with a unique morphism kappa -> lambda exactly when kappa <= lambda
+
+    @cached_method
+    def unique_morphism(self) -> CardinalityMorphism:
+        empty = self.is_empty()
+        if empty is True:
+            raise ValueError(
+                f"there is no morphism {self.domain()} -> {self.codomain()} of cardinals: "
+                f"{self.domain()} is not <= {self.codomain()}"
+            )
+>       assert empty is False, (
+               ^^^^^^^^^^^^^^
+            f"cannot give the morphism {self.domain()} -> {self.codomain()} of cardinals: it is "
+            f"undecided whether {self.domain()} <= {self.codomain()}"
+        )
+E       AssertionError: cannot give the morphism 2 -> 3 of cardinals: it is undecided whether 2 <= 3
+
+src/sage_extensions/categories/sets/cardinals.py:369: AssertionError
+_________________ test_the_countable_sum_of_ones_is_aleph_zero _________________
+
+    def test_the_countable_sum_of_ones_is_aleph_zero() -> None:
+>       assert Cardinalities().indexed_sum(NN, lambda _index: cardinal(1)) == aleph0
+E       assert sum_{i in NN ... ...}} kappa_i == ℵ_0
+E         
+E         Use -v to get more diff
+
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:43: AssertionError
+____________ test_a_finite_cardinal_is_the_natural_number_it_counts ____________
+
+    def test_a_finite_cardinal_is_the_natural_number_it_counts() -> None:
+        r"""$|\{0, 1, 2\}| = 3$, and the finite cardinal $7$ read in $\mathbb{Z}$ and $\mathbb{Q}$ is $7$."""
+        assert cardinal(3) == 3
+        assert Sets.Δ[2].cardinality() == 3
+        assert ZZ(cardinal(7)) == 7
+>       assert QQ(cardinal(7)) == 7
+               ^^^^^^^^^^^^^^^^^^^^^
+
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:51: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/rings/ring_foundation.py:1792: in __call__
+    return self._element_constructor_(value)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/ring_foundation.py:1719: in _element_constructor_
+    if source is not self and source in Modules(self.base_ring()) and source.unformed_module() is self:
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/objects.py:172: in __contains__
+    return super().__contains__(value)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Category of modules over Integer Ring
+x = <class 'sage_extensions.categories.sets.cardinals.Cardinalities.parent_class'>
+
+    def __contains__(self, x) -> bool:
+        """
+        Membership testing.
+    
+        Returns whether ``x`` is an object in this category, that is
+        if the category of ``x`` is a subcategory of ``self``.
+    
+        EXAMPLES::
+    
+            sage: ZZ in Sets()
+            True
+        """
+        try:
+>           c = x.category()
+                ^^^^^^^^^^^^
+E           TypeError: category() needs an argument
+
+/sage/.venv/lib/python3.14/site-packages/sage/categories/category.py:706: TypeError
+________ test_nonidentity_well_order_maps_compose_with_exact_endpoints _________
+
+    def test_nonidentity_well_order_maps_compose_with_exact_endpoints() -> None:
+        well_orders = WellOrderedSets()
+        source = Sets.Δ[1]
+        target = Sets.Δ[2]
+        inclusion = well_orders.Mor(source, target)(lambda point: target(int(point) + 1))
+        shift = well_orders.Mor(target, target)(lambda point: target(min(2, int(point) + 1)))
+        composite = shift * inclusion
+        assert composite.parent() is well_orders.Mor(source, target)
+        assert composite.underlying_set_morphism().domain() is source
+        assert composite.underlying_set_morphism().codomain() is target
+        assert tuple(int(composite(point)) for point in source) == (2, 2)
+        try:
+            well_orders.Mor(target, target)(lambda point: target(2 - int(point)))
+        except ValueError:
+            pass
+        else:
+>           raise AssertionError("an order-reversing map was admitted to well-ordered Mor")
+E           AssertionError: an order-reversing map was admitted to well-ordered Mor
+
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:150: AssertionError
+=========================== short test summary info ============================
+FAILED tests/sets/test_cardinal_and_ordinal_order_morphisms.sage::test_comparisons_of_cardinals_compose_and_are_carried_by_the_arithmetic
+FAILED tests/sets/test_cardinal_and_ordinal_order_morphisms.sage::test_the_countable_sum_of_ones_is_aleph_zero
+FAILED tests/sets/test_cardinal_and_ordinal_order_morphisms.sage::test_a_finite_cardinal_is_the_natural_number_it_counts
+FAILED tests/sets/test_cardinal_and_ordinal_order_morphisms.sage::test_nonidentity_well_order_maps_compose_with_exact_endpoints
+4 failed, 14 passed in 7.65s
+[peakrss] 543-base-d1ab7fc-acceptance: child waited=1 shell_code=1 samples=7
+[peakrss] peak tree RSS      : 325 MiB
+[peakrss] low-water MemAvail : 4806 MiB
+[peakrss] peak single VmHWM  : 326 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      315 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    12.0s procs=  3 rss=   325 MiB hwm=   326 MiB avail=  4806 MiB
+[peakrss]   t=    10.0s procs=  3 rss=   324 MiB hwm=   326 MiB avail=  4910 MiB
+[peakrss]   t=     8.0s procs=  3 rss=   305 MiB hwm=   305 MiB avail=  4824 MiB
+[peakrss]   t=     6.0s procs=  3 rss=   276 MiB hwm=   276 MiB avail=  4939 MiB
+[peakrss]   t=     4.0s procs=  3 rss=   199 MiB hwm=   199 MiB avail=  4877 MiB
+launcher exit: 1

@@ -359,9 +359,19 @@ def _gram_axiom_categories(lattices, gram):
     finite_rank = _gram_rank(gram).is_finite()
     if finite_rank:
         placement = placement.FinitelyGenerated()
-    nondegenerate = _gram_is_nondegenerate(gram, ring)
-    unimodular = _gram_is_unimodular(gram, ring) if nondegenerate is True else False
-    even = _gram_is_even(gram, ring)
+    if finite_rank and _engine_ring(ring) is SageZZ:
+        # Over ZZ the three properties are read from the engine Gram matrix
+        # G: nondegenerate iff det G != 0, unimodular iff det G = +-1, and
+        # even iff every diagonal entry is even.  No owned element is formed.
+        components = _gram_engine_matrix(gram)
+        determinant = components.determinant()
+        nondegenerate = determinant != 0
+        unimodular = determinant.abs() == 1
+        even = all(components[index, index].is_even() for index in range(components.nrows()))
+    else:
+        nondegenerate = _gram_is_nondegenerate(gram, ring)
+        unimodular = _gram_is_unimodular(gram, ring) if nondegenerate is True else False
+        even = _gram_is_even(gram, ring)
     if nondegenerate is True:
         placement = placement.Nondegenerate()
         if unimodular is True:

@@ -669,18 +669,18 @@ class CategoricalMor(
     def _generated_arrow_type(self) -> type:
         r"""Return the arrow type of this Mor, shared by the Mors with its key.
 
-        ``Mor_C(A, B)`` is a category for every pair of objects, and the
-        operations of its arrows are those of the Mor classes its declared
-        graph holds: the one the family builds for these endpoints, the ones
-        the endpoints select for each declared supercategory's family, and the
-        placement and diagonal End/Aut role of the Mor object itself.  None of
-        that depends on ``A`` and ``B`` beyond those selections, so the type is
-        generated once per key, from the first Mor that asks, and every later
-        Mor with that key reuses it.  The supercategories' Mors are not
-        constructed to compute the key; their families are asked which class
-        they select (:meth:`_declared_mor_classes`), and the forgetful
-        inclusions into those Mors are built only when ``super_categories`` is
-        asked.
+        ``Mor_C(A, B)`` is a category for every pair of objects.  Its arrow
+        type is generated from its declared graph: the arrow operations a Mor
+        class supplies, for every Mor class the graph holds, ordered along the
+        graph, and the element class of this Mor's own placement.  A declared
+        supercategory's Mor contributes the class it selects and its own
+        declared supercategories, and nothing else.  So the key holds this
+        Mor's class, its placement, its diagonal role, and the class selected
+        at every node of the declared graph (:meth:`_declared_mor_classes`),
+        and the type is generated once per key, from the first Mor that asks;
+        every later Mor with that key reuses it.  The supercategories' Mors are
+        not constructed to compute the key, and the forgetful inclusions into
+        them are built only when ``super_categories`` is asked.
         """
         key = (
             type(self),
@@ -697,20 +697,27 @@ class CategoricalMor(
         return result
 
     def _declared_mor_classes(self) -> tuple:
-        r"""Return the Mor class each declared supercategory's family selects.
+        r"""Return the Mor class selected at every node of the declared graph.
 
-        The declared graph of ``Mor_C(A, B)`` holds the Mors of ``C``'s
-        declared supercategories at the endpoints' forgetful images, and each
-        of those families selects its fixed Mor class from its own endpoints
-        (:meth:`MorCategoryConstruction.fixed_category_class_for`).  The
-        selection is what those Mors are, so it is what the arrow type is
-        generated from, and it is read here without constructing them.
+        The declared graph of ``Mor_C(A, B)`` holds, for each declared
+        supercategory of a node's category, that supercategory's Mor at the
+        endpoints' forgetful images, and, where this Mor has a diagonal role,
+        the diagonal family's Mor at the same images
+        (``CategoricalMor.super_categories``).  Each of those families selects
+        its fixed Mor class from its own endpoints
+        (:meth:`MorCategoryConstruction.fixed_category_class_for`), and that
+        selection, with the declared graph it is reached along, is what the
+        arrow type is generated from.  The walk reads the family's answer
+        without constructing the Mor.
 
-        The End/Aut families state no endpoint-dependent selection: their
-        classes are their families' fixed classes, and the role itself is
-        already part of the key.
+        One input to the graph is not a declaration: a supercategory's Mor may
+        have had a diagonal role attached by another construction
+        (``_attach_end_family``), and then it declares diagonal supercategories
+        of its own.  No declaration fixes whether that has happened, so it is
+        not part of this walk; the role of this Mor is in the key beside it.
         """
         family = self.mor_family()
+        end_family = self.end_family()
         base = self.base_category()
         pending = [(base, self.domain_object(), self.codomain_object())]
         visited = {id(base)}
@@ -728,6 +735,12 @@ class CategoricalMor(
                         domain_image, codomain_image
                     )
                 )
+                if end_family is not None and category is base:
+                    selected.append(
+                        end_family.family_over(
+                            supercategory
+                        ).fixed_category_class_for(domain_image, domain_image)
+                    )
                 if id(supercategory) not in visited:
                     visited.add(id(supercategory))
                     pending.append((supercategory, domain_image, codomain_image))

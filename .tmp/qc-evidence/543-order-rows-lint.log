@@ -1,0 +1,15 @@
+...                                                                      [100%]
+3 passed in 4.06s
+[peakrss] 543-order-rows-lint: child waited=0 shell_code=0 samples=5
+[peakrss] peak tree RSS      : 308 MiB
+[peakrss] low-water MemAvail : 3261 MiB
+[peakrss] peak single VmHWM  : 308 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      297 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     8.1s procs=  3 rss=   308 MiB hwm=   308 MiB avail=  3261 MiB
+[peakrss]   t=     6.0s procs=  3 rss=   307 MiB hwm=   307 MiB avail=  3953 MiB
+[peakrss]   t=     4.0s procs=  3 rss=   268 MiB hwm=   268 MiB avail=  4023 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   139 MiB hwm=   139 MiB avail=  4213 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     7 MiB hwm=     7 MiB avail=  4521 MiB

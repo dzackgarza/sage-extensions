@@ -13,6 +13,8 @@ are the definitions of the operations on order types.
 
 from sage_extensions.all import *  # noqa: F401,F403
 
+import pytest
+
 
 def test_comparisons_of_cardinals_compose_and_are_carried_by_the_arithmetic() -> None:
     cardinals = Cardinalities()
@@ -40,13 +42,23 @@ def test_finite_indexed_sums_suprema_and_comparisons_of_cardinals() -> None:
 
 
 def test_the_countable_sum_of_ones_is_aleph_zero() -> None:
-    assert Cardinalities().indexed_sum(NN, lambda _index: cardinal(1)) == aleph0
+    r"""$\sum_{i \in \mathbb{N}} 1 = |\mathbb{N}| \cdot 1 = \aleph_0$.
+
+    The family of ones is constant, and a constant family is named by the
+    cardinal it takes.  A family named by a function is summed only where its
+    values are reachable, which an infinite index set never is.
+    """
+    assert Cardinalities().indexed_sum(NN, cardinal(1)) == aleph0
 
 
 def test_a_finite_cardinal_is_the_natural_number_it_counts() -> None:
-    r"""$|\{0, 1, 2\}| = 3$, and the finite cardinal $7$ read in $\mathbb{Z}$ and $\mathbb{Q}$ is $7$."""
+    r"""$|\{0, 1, 2\}| = 3$."""
     assert cardinal(3) == 3
     assert Sets.Δ[2].cardinality() == 3
+
+
+def test_the_rings_read_the_finite_cardinal_seven_as_seven() -> None:
+    r"""The finite cardinal $7$ read in $\mathbb{Z}$ and $\mathbb{Q}$ is $7$."""
     assert ZZ(cardinal(7)) == 7
     assert QQ(cardinal(7)) == 7
 
@@ -131,7 +143,14 @@ def test_infinite_well_order_type_uses_its_core_isomorphism() -> None:
     assert order_type(selected_isomorphism).is_identity()
 
 
-def test_nonidentity_well_order_maps_compose_with_exact_endpoints() -> None:
+@pytest.fixture
+def checking_flag():
+    previous = strict_checking()
+    yield strict_checking
+    strict_checking(previous)
+
+
+def test_nonidentity_well_order_maps_compose_with_exact_endpoints(checking_flag) -> None:
     well_orders = WellOrderedSets()
     source = Sets.Δ[1]
     target = Sets.Δ[2]
@@ -142,12 +161,21 @@ def test_nonidentity_well_order_maps_compose_with_exact_endpoints() -> None:
     assert composite.underlying_set_morphism().domain() is source
     assert composite.underlying_set_morphism().codomain() is target
     assert tuple(int(composite(point)) for point in source) == (2, 2)
-    try:
-        well_orders.Mor(target, target)(lambda point: target(2 - int(point)))
-    except ValueError:
-        pass
-    else:
-        raise AssertionError("an order-reversing map was admitted to well-ordered Mor")
+
+    # $p \mapsto 2 - p$ reverses $0 < 1 < 2$, so it is no arrow of the ordered
+    # category.  Construction retains the datum and the arrow's own validator
+    # decides the law; under the session's strict flag construction checks it.
+    reversal = lambda point: target(2 - int(point))
+    checking_flag(False)
+    declared = well_orders.Mor(target, target)(reversal)
+    with pytest.raises(ValueError):
+        declared.validate_order_preservation()
+    checking_flag(True)
+    with pytest.raises(ValueError):
+        well_orders.Mor(target, target)(reversal)
+    assert well_orders.Mor(target, target)(
+        lambda point: target(min(2, int(point) + 1))
+    ) == shift
 
 
 def test_finite_ordered_set_operations_retain_selected_well_orders() -> None:

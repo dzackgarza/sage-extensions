@@ -1,0 +1,42 @@
+fresh                                  class=OwnedCardinalityMor_with_category_with_category sets@1 card@2 is_empty=AtomicProposition
+Mor is cached: True
+after identity lookup                  class=OwnedCardinalityMor_with_category_with_category sets@1 card@2 is_empty=AtomicProposition
+Sets().Mor(d2,d2).is_empty             class=OwnedCardinalityMor_with_category_with_category sets@1 card@2 is_empty=AtomicProposition
+Sets().Mor(d2,d2).is_empty [fresh]     class=OwnedCardinalityMor_with_category_with_category sets@1 card@2 is_empty=AtomicProposition
+Sets().Mor(d2,d2).unique               class=OwnedCardinalityMor_with_category_with_category sets@1 card@2 is_empty=AtomicProposition
+Sets().Mor(d2,d2).unique [fresh]       class=OwnedCardinalityMor_with_category_with_category sets@1 card@2 is_empty=AtomicProposition
+Ordinals().Mor(1,2).is_empty           class=OwnedCardinalityMor_with_category_with_category sets@1 card@2 is_empty=AtomicProposition
+Ordinals().Mor(1,2).is_empty [fresh]   class=OwnedCardinalityMor_with_category_with_category sets@1 card@2 is_empty=AtomicProposition
+cardinal(2).Mor(3).is_empty            class=OwnedCardinalityMor_with_category_with_category sets@1 card@2 is_empty=AtomicProposition
+cardinal(2).Mor(3).is_empty [fresh]    class=OwnedCardinalityMor_with_category_with_category sets@1 card@2 is_empty=AtomicProposition
+Sets.Finite()                          class=OwnedCardinalityMor_with_category_with_category sets@1 card@2 is_empty=AtomicProposition
+Sets.Finite() [fresh]                  class=OwnedCardinalityMor_with_category_with_category sets@1 card@2 is_empty=AtomicProposition
+Sets.Δ[2].cardinality                  class=OwnedCardinalityMor_with_category_with_category sets@1 card@2 is_empty=AtomicProposition
+Sets.Δ[2].cardinality [fresh]          class=OwnedCardinalityMor_with_category_with_category sets@1 card@2 is_empty=AtomicProposition
+QQ(3)                                  class=OwnedCardinalityMor_with_category_with_category sets@1 card@2 is_empty=AtomicProposition
+QQ(3) [fresh]                          class=OwnedCardinalityMor_with_category_with_category sets@1 card@2 is_empty=AtomicProposition
+   (m.cardinality() raised AssertionError)
+m.cardinality()                        class=OwnedCardinalityMor_with_category_with_category sets@1 card@2 is_empty=AtomicProposition
+m.cardinality() [fresh]                class=OwnedCardinalityMor_with_category_with_category sets@1 card@2 is_empty=AtomicProposition
+   (m.unique_morphism() raised AssertionError)
+m.unique_morphism()                    class=OwnedCardinalityMor_with_category_with_category sets@1 card@2 is_empty=AtomicProposition
+m.unique_morphism() [fresh]            class=OwnedCardinalityMor_with_category_with_category sets@1 card@2 is_empty=AtomicProposition
+m.domain().Mor(m.codomain())           class=OwnedCardinalityMor_with_category_with_category sets@1 card@2 is_empty=AtomicProposition
+m.domain().Mor(m.codomain()) [fresh]   class=OwnedCardinalityMor_with_category_with_category sets@1 card@2 is_empty=AtomicProposition
+m.base_category()                      class=OwnedCardinalityMor_with_category_with_category sets@1 card@2 is_empty=AtomicProposition
+m.base_category() [fresh]              class=OwnedCardinalityMor_with_category_with_category sets@1 card@2 is_empty=AtomicProposition
+m.mor_category()                       class=OwnedCardinalityMor_with_category_with_category sets@1 card@2 is_empty=AtomicProposition
+m.mor_category() [fresh]               class=OwnedCardinalityMor_with_category_with_category sets@1 card@2 is_empty=AtomicProposition
+[peakrss] run: child waited=0 shell_code=0 samples=6
+[peakrss] peak tree RSS      : 281 MiB
+[peakrss] low-water MemAvail : 5452 MiB
+[peakrss] peak single VmHWM  : 281 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      270 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    10.0s procs=  3 rss=   281 MiB hwm=   281 MiB avail=  5836 MiB
+[peakrss]   t=     8.0s procs=  3 rss=   279 MiB hwm=   279 MiB avail=  5693 MiB
+[peakrss]   t=     6.0s procs=  3 rss=   237 MiB hwm=   237 MiB avail=  5482 MiB
+[peakrss]   t=     4.0s procs=  3 rss=   207 MiB hwm=   207 MiB avail=  5452 MiB
+[peakrss]   t=     2.0s procs=  3 rss=    63 MiB hwm=    63 MiB avail=  5792 MiB

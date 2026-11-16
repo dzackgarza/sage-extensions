@@ -41,6 +41,7 @@ from sage_extensions.categories.rings.ring_foundation import (
 )
 from sage_extensions.categories.sets.cardinals import cardinal
 from sage_extensions.categories.sets.finite_ordered_sets import (
+    _subset_on_positions,
     finite_ordered_set,
 )
 from sage_extensions.categories.sets.indexed_families import (
@@ -582,6 +583,34 @@ class FiniteGSets(CategoryPacketMethods, OwnedParameterizedCategory):
             labels = self._orbit_labels()
             ranking = self.ranking_map()
             return labels[int(ranking(source))] == labels[int(ranking(target))]
+
+        def _orbit_subset(self, point):
+            r"""The orbit ``G . point`` as the block of the retained partition of ``X``.
+
+            Protected computation, owned here because the partition is this
+            object's datum: ``_orbit_labels`` returns, for every position of
+            ``X``, the position of the first point of its orbit, computed once
+            from the orbits of the chosen group generators.  Its fibres are the
+            orbits, so the orbit of ``point`` is the subobject of ``X`` on the
+            positions carrying ``point``'s label, in the order of ``X``, and that
+            is a read of the partition.
+
+            ``GObjects.in_same_orbit`` is the two-point relation on ``X``, and
+            deciding it at each point of ``X`` answers the same membership by
+            re-deriving the partition; it is not asked here.  The only question
+            put to the enumeration is ``point``'s own position.
+            """
+            assert point in self, f"{point} is not a point of {self}"
+            labels = self._orbit_labels()
+            first = labels[int(self.ranking_map()(point))]
+            positions = tuple(
+                sorted(position for position, label in labels.items() if label == first)
+            )
+            return _subset_on_positions(
+                self.point_set(),
+                positions,
+                description=lambda: f"Orbit of {point} under {self.acting_group()}",
+            )
 
         def orbit_stabilizers(self):
             r"""The family of point stabilizers indexed by the orbit classes."""
@@ -1206,19 +1235,32 @@ class _Orbit:
 
     @cached_method
     def points(self):
-        r"""The subset ``G . x`` of ``X``, cut out by the orbit relation where it is decided."""
-        return self.g_set().condition_set(self._decided_orbit_relation)
+        r"""The subset ``G . x`` of ``X``, read from the orbit partition of ``X``.
+
+        A finite ``G``-set retains its orbit partition: ``_orbit_labels`` gives
+        the first point of each point's orbit, once, from the chosen group
+        generators, and the orbit of ``x`` is the block carrying ``x``'s label
+        (`FiniteGSets._orbit_subset`).  Where no such partition is retained the
+        subset is cut out by the orbit relation instead, wherever that relation
+        is decided.
+        """
+        g_set = self.g_set()
+        match g_set:
+            case _ if g_set in FiniteGSets(g_set.acting_group()):
+                return g_set._orbit_subset(self._representative)
+            case _:
+                return g_set.condition_set(self._decided_orbit_relation)
 
     def cardinality(self):
         r"""``|G . x| = [G : G_x]``, the index of the stabilizer of the representative.
 
-        This is the orbit-stabilizer theorem.  On a finite set ``X`` the
-        orbit is the subset of ``X`` cut out by the orbit relation, which
-        the construction of a finite ``G``-set decides from the orbits of
-        its chosen group generators, so its cardinality is read there.
-        Otherwise it is the index of the stabilizer, which the category of
-        the stabilizer computes (an open subgroup of a profinite group
-        knows its index from the degree of its fixed field).
+        This is the orbit-stabilizer theorem.  On a finite set ``X`` the orbit
+        is a block of the orbit partition the construction of a finite
+        ``G``-set retains, so its cardinality is the number of points carrying
+        its label and is read there.  Otherwise it is the index of the
+        stabilizer, which the category of the stabilizer computes (an open
+        subgroup of a profinite group knows its index from the degree of its
+        fixed field).
         """
         g_set = self.g_set()
         match g_set:

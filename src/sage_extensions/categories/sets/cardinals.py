@@ -63,6 +63,27 @@ def _is_session_integer(value) -> bool:
     return value in _owned_integers()
 
 
+def _order_emptiness_decision(comparison) -> bool | None:
+    r"""``not comparison`` as a decision, or ``None`` when the laws leave it undecided.
+
+    The thin order ``Card`` and the thin order ``Ord`` own one operation each:
+    the comparison of two of their objects.  The emptiness of the hom-set
+    ``kappa -> lambda`` is the negation of it, and ``Sets`` reads that through
+    the protected hook its construction supplies
+    (``set_categories.Sets.ParentMethods._emptiness_decision``, declared
+    ``bool | None``).  ``Sets`` states the proposition itself where a
+    construction supplies no decision, so the protocol stops here: a
+    proposition never leaves this function.
+    """
+    from sage_extensions.logic import negation
+
+    match negation(comparison):
+        case True | False as decided:
+            return decided
+        case _:
+            return None
+
+
 class _CardinalExpression(ABC):
     r"""A term of cardinal arithmetic, the defining datum of a cardinal.
 
@@ -339,20 +360,20 @@ class CardinalityMor(CategoricalMor):
     ) -> None:
         CategoricalMor.__init__(self, mor_family, domain, codomain)
 
-    def _emptiness_decision(self):
+    def _emptiness_decision(self) -> bool | None:
         r"""Decide ``Hom(kappa, lambda) = ∅``: empty exactly when ``kappa > lambda``.
 
         ``Sets`` owns ``is_empty`` and reads every set's emptiness through
         this protected hook, so the cardinal order supplies the decision it
         alone has and no second copy of the public operation: the Mor holds
         one arrow exactly when ``domain <= codomain``, and this is the
-        negation of that comparison.  Decided when ``le`` is decided,
-        otherwise the proposition that states it, which ``ask`` answers
-        ``Unknown``.
+        negation of that comparison.  An undecided comparison — ``2^{\aleph_0}
+        <= \aleph_1`` is one — supplies no decision, and ``Sets.is_empty``
+        states the proposition itself.
         """
-        from sage_extensions.logic import negation
-
-        return negation(Cardinalities().le(self.domain(), self.codomain()))
+        return _order_emptiness_decision(
+            Cardinalities().le(self.domain(), self.codomain())
+        )
 
     def _cardinality_decision(self):
         r"""``|Hom(kappa, lambda)|``: one when ``kappa <= lambda``, zero when it is not.
@@ -866,12 +887,34 @@ class Cardinalities(OwnedCategory):
     def indexed_sum(
         self,
         index_set: Parent,
-        summands: Callable[[IndexT], Cardinal | SupportsInt | AnInfinity],
+        summands: Cardinal | SupportsInt | AnInfinity | Callable[[IndexT], Cardinal | SupportsInt | AnInfinity],
     ) -> Cardinal:
+        r"""$\sum_{i \in I} \kappa_i$.
+
+        A constant family is named by the one cardinal it takes, and then the sum
+        is the product with the index cardinal:
+        $\sum_{i \in I} c = |\bigsqcup_{i \in I} c| = |I \times c| = |I| \cdot c$,
+        which is the product this category already states.  A family named by a
+        function is summed when the index set is finite.  Over an infinite index
+        set its values are not reachable, so nothing about their size is
+        available and the sum remains the term ``_IndexedSumCardinal``: neither
+        its finiteness nor its order is decided here.
+        """
         size = cardinal(index_set.cardinality())
-        if size.is_finite():
-            return self.sum(*(summands(index) for index in index_set))
-        return _cardinal_with_expression(_IndexedSumCardinal(index_set, summands))
+        match summands:
+            case _ if isinstance(summands, Parent) and summands in Cardinalities():
+                return self.product(size, summands)
+            case _ if summands is Infinity or _is_session_integer(summands):
+                return self.product(size, cardinal(summands))
+            case _ if callable(summands):
+                if size.is_finite():
+                    return self.sum(*(summands(index) for index in index_set))
+                return _cardinal_with_expression(_IndexedSumCardinal(index_set, summands))
+            case _:
+                raise TypeError(
+                    f"the summands of a cardinal sum are a cardinal-valued function, or the one "
+                    f"cardinal a constant family takes, but {summands!r} is neither"
+                )
 
     def indexed_product(
         self,
@@ -1333,13 +1376,9 @@ class OrdinalMor(CategoricalMor):
         ``domain <= codomain``, and an undecided comparison supplies no
         value rather than the arrow an empty hom-set does not have.
         """
-        from sage_extensions.logic import negation
-
-        match negation(Ordinals().le(self.domain(), self.codomain())):
-            case True | False as decided:
-                return decided
-            case _:
-                return None
+        return _order_emptiness_decision(
+            Ordinals().le(self.domain(), self.codomain())
+        )
 
     def _cardinality_decision(self) -> Cardinal | None:
         r"""``|Hom(alpha, beta)|``: one when ``alpha <= beta``, zero when it is not."""
