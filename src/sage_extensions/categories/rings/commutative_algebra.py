@@ -3782,11 +3782,21 @@ class _AdicCompletionAlgebraParent(_OwnedAlgebraParent):
         arithmetic_mode="finite_precision",
         completion_image=None,
         completion_map_kernel=None,
+        completion_map_is_onto=False,
         algebra_base=None,
         algebra_labels=None,
         formal_parameter_labels=None,
         extra_categories=(),
     ) -> None:
+        r"""Retain the completion's defining data on its private engine.
+
+        ``completion_map_kernel`` and ``completion_map_is_onto`` are the
+        construction's statements about its own completion map: the kernel
+        ideal of the source, and whether the map is onto.  A constructor that
+        realizes the completion on the source's own engine -- at an ideal whose
+        represented power is zero, so that every tier is the ring -- states
+        both; a finite approximation states neither.
+        """
         selected_engine_map = engine_map
         if completion_image is None:
             source_engine = _engine_ring(source)
@@ -3811,7 +3821,11 @@ class _AdicCompletionAlgebraParent(_OwnedAlgebraParent):
                 )
 
             return _ring_morphism_with_engine(
-                source, self, completion_map_image, selected_engine_map
+                source,
+                self,
+                completion_map_image,
+                selected_engine_map,
+                surjectivity_premise=True if self._adic_completion_map_is_onto else None,
             )
 
         self._adic_completion_source = source
@@ -3820,6 +3834,7 @@ class _AdicCompletionAlgebraParent(_OwnedAlgebraParent):
         self._adic_projection_lift = projection_lift
         self._adic_arithmetic_mode = arithmetic_mode
         self._adic_completion_map_kernel = completion_map_kernel
+        self._adic_completion_map_is_onto = bool(completion_map_is_onto)
         self._adic_completion_map_factory = completion_map_factory
         self._realized_completion_map = None
         match formal_parameter_labels:
@@ -5435,6 +5450,9 @@ def _adic_completion_from_owned_data(source, defining, precision):
         def projection_lift(value, _exponent):
             return _owned_engine_element(source, engine(value))
 
+        # The zero ideal has every power zero, so every truncation is the ring
+        # itself: the completion is the source on the source's own engine, and
+        # the completion map is an isomorphism onto it.
         return _AdicCompletionAlgebraParent(
             engine,
             source,
@@ -5444,6 +5462,7 @@ def _adic_completion_from_owned_data(source, defining, precision):
             arithmetic_mode="exact_backend",
             completion_image=lambda element: _engine_element(source, source(element)),
             completion_map_kernel=zero_ideal,
+            completion_map_is_onto=True,
             **degenerate_formal_data,
         )
     if len(generators) == 1 and engine is SageZZ:
