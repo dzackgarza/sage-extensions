@@ -164,3 +164,23 @@ def test_the_completion_at_the_zero_ideal_is_free_of_rank_one_over_the_ring() ->
     assert labels.cardinality() == 1
     assert frame(frame.domain().module_generator(NN(0))) == completion.one()
     assert completion.module_generating_set().cardinality() == 1
+
+
+def test_a_completion_states_whether_a_power_of_its_ideal_is_zero() -> None:
+    r"""The completion is the ring exactly when a power of its ideal is zero.
+
+    $I^n = (0)$ makes the $I$-adic topology discrete: $A$ is already complete
+    and separated for it, so $A^\wedge = A$ and the completion map is an
+    isomorphism, which the construction places in the core.  At $I = (x)$ no
+    power of the ideal is zero -- $x^k \ne 0$ in $QQ[[x]]$ -- and the map is a
+    ring homomorphism that is not an isomorphism.  The decision is the
+    retained ideal's and its precision's, and it is what the placement
+    follows.
+    """
+    field, completion = _the_gaussian_rationals_at_the_zero_ideal()
+    line, _, line_completion = _the_rational_line_at_the_origin()
+
+    assert completion.completion_defining_power_vanishes() is True
+    assert line_completion.completion_defining_power_vanishes() is False
+    assert completion.completion_map() in Rings().Core().Mor(field, completion)
+    assert line_completion.completion_map() not in Rings().Core().Mor(line, line_completion)
