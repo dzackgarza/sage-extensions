@@ -50,12 +50,12 @@ def _scrambled_k3():
 def test_the_criterion_reads_its_hypothesis_off_the_isometry_class() -> None:
     decomposed = _decomposed_k3()
     assert decomposed.indecomposable_summands().cardinality() == 5
-    assert decomposed.hyperbolic_plane_summand_count() == 3
+    assert decomposed.hyperbolic_index() == 3
     assert decomposed.splits_two_hyperbolic_planes()
     assert decomposed.eichler_criterion_applies()
 
     # E10 = U + E8 splits one hyperbolic plane, not two.
-    assert NamedLattices.E10.hyperbolic_plane_summand_count() == 1
+    assert NamedLattices.E10.hyperbolic_index() == 1
     assert not NamedLattices.E10.splits_two_hyperbolic_planes()
     assert not NamedLattices.E10.eichler_criterion_applies()
 
@@ -74,7 +74,7 @@ def test_the_criterion_reads_its_hypothesis_off_the_isometry_class() -> None:
     assert tuple(NamedLattices.LK3.decomposition_names()) == tuple(
         decomposed.decomposition_names()
     )
-    assert NamedLattices.LK3.hyperbolic_plane_summand_count() == 3
+    assert NamedLattices.LK3.hyperbolic_index() == 3
     assert NamedLattices.LK3.splits_two_hyperbolic_planes()
     assert NamedLattices.LK3.eichler_criterion_applies()
 
@@ -95,7 +95,7 @@ def test_a_plane_presented_by_another_gram_is_a_second_hyperbolic_plane() -> Non
     assert raw_u.is_isometric(NamedLattices.U)
     assert raw_u.is_indecomposable()
     assert tuple(lattice.decomposition_names()) == (None, "U")
-    assert lattice.hyperbolic_plane_summand_count() == 2
+    assert lattice.hyperbolic_index() == 2
     assert lattice.splits_two_hyperbolic_planes()
     assert lattice.eichler_criterion_applies()
 
@@ -103,13 +103,12 @@ def test_a_plane_presented_by_another_gram_is_a_second_hyperbolic_plane() -> Non
 def test_a_basis_that_displays_no_isotropic_direction_keeps_the_hypothesis() -> None:
     r"""The criterion applies to the same lattice read in a basis that shows nothing.
 
-    Decomposability of the display is not decided here -- every displayed
-    generator of the scrambled basis pairs with a neighbour -- and the three
-    hyperbolic planes are still the lattice's own.
+    Every displayed generator of the scrambled basis pairs with a neighbour,
+    and the three hyperbolic planes are still the lattice's own.
     """
     scrambled = _scrambled_k3()
 
-    assert scrambled.hyperbolic_plane_summand_count() == 3
+    assert scrambled.hyperbolic_index() == 3
     assert scrambled.splits_two_hyperbolic_planes()
     assert scrambled.eichler_criterion_applies()
 
