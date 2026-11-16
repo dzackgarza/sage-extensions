@@ -120,14 +120,17 @@ class _ModuleScalarAction(Action):
         return self._module.scalar_multiple(scalar, element)
 
 
-def _register_module_scalar_action(module, scalar_parent=None) -> None:
+def _register_module_scalar_action(module, scalar_parent) -> None:
     r"""Register ordinary ``r*m``/``m*r`` syntax for an owned module parent.
 
-    The scalars are those of ``scalar_parent``, the module's base ring unless
-    the module retains a further ring acting through it; the registration is
-    this package's one declaration of that syntax for a module parent.
+    The scalars are those of ``scalar_parent``, named by the construction that
+    establishes them: a module over ``M`` registers its own base ring, and a
+    module over ``R[G]`` registers the group algebra and, beside it, the
+    coefficient ring ``R`` acting through ``R -> R[G]``.  The registration is
+    this package's one declaration of that syntax for a module parent, and it
+    takes the ring rather than reading one off the module, since which ring
+    acts is the datum being declared.
     """
-    scalar_parent = module.base_ring() if scalar_parent is None else scalar_parent
     module.register_action(_ModuleScalarAction(scalar_parent, module, True))
     if scalar_parent in OwnedRings().Commutative():
         module.register_action(_ModuleScalarAction(scalar_parent, module, False))
@@ -1867,7 +1870,7 @@ class Modules(OwnedCategoryOverBaseRing):
             ring the preamble adopts alike, and neither has anything to state
             about its scalars afterwards.
             """
-            _register_module_scalar_action(self)
+            _register_module_scalar_action(self, self.base_ring())
 
         @object_level
         def Mono(self, codomain):
