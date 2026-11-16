@@ -7685,10 +7685,10 @@ class MatrixSpaces(OwnedCategoryOverBaseRing):
         def _inverse_in_the_ring(self):
             r"""Return the inverse of this square matrix over its coefficient ring.
 
-            The coefficient ring is commutative and its selected linear-algebra
-            parent is a Sage ring; a matrix over any other coefficient ring is
-            inverted as a linear map, which states the same inverse without a
-            determinant
+            The coefficient ring is commutative and is an object of
+            :class:`CoordinateMatrixRings`; a matrix over any other coefficient
+            ring is inverted as a linear map, which states the same inverse
+            without a determinant
             (:meth:`...module_morphisms.ModuleMorphismMethods.inverse`).  The
             matrix is inverted here exactly when its determinant is a unit of
             the ring (``Matrix.isUnit_iff_isUnit_det``,
@@ -7697,8 +7697,6 @@ class MatrixSpaces(OwnedCategoryOverBaseRing):
             the ring.  A nonunit determinant is a ``ZeroDivisionError`` naming
             that determinant, an undecided one a ``ValueError``.
             """
-            from sage.categories.rings import Rings as SageRings
-
             ring = self.parent().base_ring()
             if self.parent().nrows() != self.parent().ncols():
                 raise ValueError(
@@ -7708,8 +7706,8 @@ class MatrixSpaces(OwnedCategoryOverBaseRing):
                 f"inverting {self} by its determinant needs a commutative coefficient ring, and {ring} is not "
                 f"known to be one"
             )
-            assert _linear_algebra_ring(ring) in SageRings(), (
-                f"the selected linear-algebra parent of {ring} is not a Sage ring, so no engine matrix "
+            assert ring in CoordinateMatrixRings(), (
+                f"{ring} selects no coordinate matrix, so no engine matrix "
                 f"inverts {self}; the inverse of a matrix over it is the inverse of its linear map"
             )
             determinant = self.determinant()
@@ -7924,25 +7922,22 @@ class MatrixEndomorphismSpaces(OwnedCategoryOverBaseRing):
         def _unit_decision(self) -> bool:
             r"""Return whether this endomorphism is invertible in \(\operatorname{End}_R(M)\).
 
-            For a finite free \(M = R^n\) a unit is an automorphism of \(M\), and
-            over a commutative \(R\) whose scalars carry an engine matrix that is
+            For a finite free \(M = R^n\) a unit is an automorphism of \(M\).
+            Over a commutative \(R\) in :class:`CoordinateMatrixRings` that is
             the determinant criterion (``Matrix.isUnit_iff_isUnit_det``,
             ``Mathlib/LinearAlgebra/Matrix/NonsingularInverse.lean``).  A
-            noncommutative \(R\) has no determinant, and a ring whose selected
-            linear-algebra parent is not a Sage ring supplies the kernel and the
-            cokernel instead, which is the inverse linear map its own arithmetic
-            computes.
+            noncommutative \(R\) has no determinant, and a ring that selects no
+            coordinate matrix supplies the kernel and the cokernel instead,
+            which is the inverse linear map its own arithmetic computes.
 
             Reading the units of \(\operatorname{End}_R(M)\) is what gives
             \(\operatorname{Aut}_R(M)\) its group structure, through the unit
             group functor on the owned ring category.
             """
-            from sage.categories.rings import Rings as SageRings
-
             ring = self.parent().base_ring()
             match (
                 ring.is_commutative() is True
-                and _linear_algebra_ring(ring) in SageRings()
+                and ring in CoordinateMatrixRings()
             ):
                 case True:
                     return self.determinant().is_unit()
