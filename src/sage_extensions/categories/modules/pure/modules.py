@@ -3434,7 +3434,7 @@ class Modules(OwnedCategoryOverBaseRing):
 
                 return Lattices(self.base_ring())("U").discriminant_group()
 
-            def _call_(self, presentation):
+            def _call_(self, presentation, *, check: bool = False):
                 match self.base_ring() in PrincipalIdealDomains():
                     case True:
                         pass
@@ -3455,11 +3455,12 @@ class Modules(OwnedCategoryOverBaseRing):
                     _presented_module_from_morphism,
                 )
 
-                return _presented_module_from_morphism(
+                module = _presented_module_from_morphism(
                     presentation,
                     _extra_categories=(self,),
-                    _require_torsion=True,
                 )
+                module.validate_torsion_claim(check=check)
+                return module
 
             class ParentMethods:
                 def invariants(self):

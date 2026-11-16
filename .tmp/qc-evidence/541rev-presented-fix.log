@@ -1,0 +1,600 @@
+tree SHA: 2e9b3629f8d2d356abd544e57c2713d461d1eaf4 (modified paths: 2)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 21.33 19.20 18.73 25/852 2721307
+files: tests/modules/test_a_presented_module_is_built_before_it_computes.sage tests/modules/test_the_selected_relation_morphism_contract.sage tests/modules/test_finite_cokernel_constructor.sage tests/modules/test_torsion_modules_archive.sage tests/modules/test_pid_cokernel_rank.sage tests/modules/test_localization_constructor_convergence.sage tests/modules/test_fraction_field_quotients_archive.sage tests/modules/test_invariant_factor_framing.sage tests/forms/test_a_torsion_cokernel_carries_its_torsion_forms.sage
+inner 540 s, outer 600 s, guard 6144 MiB
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+time gates OFF (--no-time-gates): star import 4.20 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: asyncio-1.5.0, xdist-3.8.0, reportlog-1.0.0, platformdirs-4.13.5, hypothesis-6.170.15, anyio-4.15.1, timeout-2.4.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 24 items
+
+tests/modules/test_a_presented_module_is_built_before_it_computes.sage . [  4%]
+.                                                                        [  8%]
+tests/modules/test_the_selected_relation_morphism_contract.sage EEEE     [ 25%]
+tests/modules/test_finite_cokernel_constructor.sage F                    [ 29%]
+tests/modules/test_torsion_modules_archive.sage FFF                      [ 41%]
+tests/modules/test_pid_cokernel_rank.sage ..                             [ 50%]
+tests/modules/test_localization_constructor_convergence.sage F           [ 54%]
+tests/modules/test_fraction_field_quotients_archive.sage FFF             [ 66%]
+tests/modules/test_invariant_factor_framing.sage EEEEE                   [ 87%]
+tests/forms/test_a_torsion_cokernel_carries_its_torsion_forms.sage ...   [100%]
+
+==================================== ERRORS ====================================
+_ ERROR at setup of test_a_framed_free_module_states_the_empty_relation_family _
+tests/modules/test_the_selected_relation_morphism_contract.sage:19: TL01 from sage_extensions.categories.modules.pure.modules import ...: take every name from the session
+tests/modules/test_the_selected_relation_morphism_contract.sage:41: TL08 ModulesWithChosenFinitePresentation: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_the_selected_relation_morphism_contract.sage:42: TL02 private attribute ._selected_relation_morphism
+tests/modules/test_the_selected_relation_morphism_contract.sage:43: TL09 an assertion that holds of anything
+tests/modules/test_the_selected_relation_morphism_contract.sage:55: TL08 ModulesWithChosenFinitePresentation: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_the_selected_relation_morphism_contract.sage:56: TL02 private attribute ._selected_relation_morphism
+tests/modules/test_the_selected_relation_morphism_contract.sage:57: TL09 an assertion that holds of anything
+tests/modules/test_the_selected_relation_morphism_contract.sage:66: TL08 ModulesWithChosenFinitePresentation: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_the_selected_relation_morphism_contract.sage:67: TL02 private attribute ._selected_relation_morphism
+tests/modules/test_the_selected_relation_morphism_contract.sage:72: TL01 from sage_extensions.categories.modules.framed.finitely_generated.finitely_presented_modules import ...: take every name from the session
+tests/modules/test_the_selected_relation_morphism_contract.sage:72: TL02 imports the private name _relation_morphism
+tests/modules/test_the_selected_relation_morphism_contract.sage:77: TL02 private attribute ._selected_relation_morphism
+tests/modules/test_the_selected_relation_morphism_contract.sage:88: TL09 an assertion that holds of anything
+_ ERROR at setup of test_a_module_with_a_chosen_presentation_states_its_relations _
+tests/modules/test_the_selected_relation_morphism_contract.sage:19: TL01 from sage_extensions.categories.modules.pure.modules import ...: take every name from the session
+tests/modules/test_the_selected_relation_morphism_contract.sage:41: TL08 ModulesWithChosenFinitePresentation: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_the_selected_relation_morphism_contract.sage:42: TL02 private attribute ._selected_relation_morphism
+tests/modules/test_the_selected_relation_morphism_contract.sage:43: TL09 an assertion that holds of anything
+tests/modules/test_the_selected_relation_morphism_contract.sage:55: TL08 ModulesWithChosenFinitePresentation: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_the_selected_relation_morphism_contract.sage:56: TL02 private attribute ._selected_relation_morphism
+tests/modules/test_the_selected_relation_morphism_contract.sage:57: TL09 an assertion that holds of anything
+tests/modules/test_the_selected_relation_morphism_contract.sage:66: TL08 ModulesWithChosenFinitePresentation: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_the_selected_relation_morphism_contract.sage:67: TL02 private attribute ._selected_relation_morphism
+tests/modules/test_the_selected_relation_morphism_contract.sage:72: TL01 from sage_extensions.categories.modules.framed.finitely_generated.finitely_presented_modules import ...: take every name from the session
+tests/modules/test_the_selected_relation_morphism_contract.sage:72: TL02 imports the private name _relation_morphism
+tests/modules/test_the_selected_relation_morphism_contract.sage:77: TL02 private attribute ._selected_relation_morphism
+tests/modules/test_the_selected_relation_morphism_contract.sage:88: TL09 an assertion that holds of anything
+______ ERROR at setup of test_a_module_without_a_presentation_states_none ______
+tests/modules/test_the_selected_relation_morphism_contract.sage:19: TL01 from sage_extensions.categories.modules.pure.modules import ...: take every name from the session
+tests/modules/test_the_selected_relation_morphism_contract.sage:41: TL08 ModulesWithChosenFinitePresentation: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_the_selected_relation_morphism_contract.sage:42: TL02 private attribute ._selected_relation_morphism
+tests/modules/test_the_selected_relation_morphism_contract.sage:43: TL09 an assertion that holds of anything
+tests/modules/test_the_selected_relation_morphism_contract.sage:55: TL08 ModulesWithChosenFinitePresentation: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_the_selected_relation_morphism_contract.sage:56: TL02 private attribute ._selected_relation_morphism
+tests/modules/test_the_selected_relation_morphism_contract.sage:57: TL09 an assertion that holds of anything
+tests/modules/test_the_selected_relation_morphism_contract.sage:66: TL08 ModulesWithChosenFinitePresentation: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_the_selected_relation_morphism_contract.sage:67: TL02 private attribute ._selected_relation_morphism
+tests/modules/test_the_selected_relation_morphism_contract.sage:72: TL01 from sage_extensions.categories.modules.framed.finitely_generated.finitely_presented_modules import ...: take every name from the session
+tests/modules/test_the_selected_relation_morphism_contract.sage:72: TL02 imports the private name _relation_morphism
+tests/modules/test_the_selected_relation_morphism_contract.sage:77: TL02 private attribute ._selected_relation_morphism
+tests/modules/test_the_selected_relation_morphism_contract.sage:88: TL09 an assertion that holds of anything
+_____ ERROR at setup of test_the_hook_agrees_with_the_public_presentation ______
+tests/modules/test_the_selected_relation_morphism_contract.sage:19: TL01 from sage_extensions.categories.modules.pure.modules import ...: take every name from the session
+tests/modules/test_the_selected_relation_morphism_contract.sage:41: TL08 ModulesWithChosenFinitePresentation: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_the_selected_relation_morphism_contract.sage:42: TL02 private attribute ._selected_relation_morphism
+tests/modules/test_the_selected_relation_morphism_contract.sage:43: TL09 an assertion that holds of anything
+tests/modules/test_the_selected_relation_morphism_contract.sage:55: TL08 ModulesWithChosenFinitePresentation: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_the_selected_relation_morphism_contract.sage:56: TL02 private attribute ._selected_relation_morphism
+tests/modules/test_the_selected_relation_morphism_contract.sage:57: TL09 an assertion that holds of anything
+tests/modules/test_the_selected_relation_morphism_contract.sage:66: TL08 ModulesWithChosenFinitePresentation: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_the_selected_relation_morphism_contract.sage:67: TL02 private attribute ._selected_relation_morphism
+tests/modules/test_the_selected_relation_morphism_contract.sage:72: TL01 from sage_extensions.categories.modules.framed.finitely_generated.finitely_presented_modules import ...: take every name from the session
+tests/modules/test_the_selected_relation_morphism_contract.sage:72: TL02 imports the private name _relation_morphism
+tests/modules/test_the_selected_relation_morphism_contract.sage:77: TL02 private attribute ._selected_relation_morphism
+tests/modules/test_the_selected_relation_morphism_contract.sage:88: TL09 an assertion that holds of anything
+_ ERROR at setup of test_z2_mod_x_is_free_of_rank_one_and_z2_mod_2x_is_not_projective _
+tests/modules/test_invariant_factor_framing.sage:4: TL01 from sage_extensions.categories.abstract_categories.mor_categories import ...: take every name from the session
+tests/modules/test_invariant_factor_framing.sage:24: TL03 isinstance(): introspection is not mathematics
+tests/modules/test_invariant_factor_framing.sage:26: TL03 isinstance(): introspection is not mathematics
+tests/modules/test_invariant_factor_framing.sage:52: TL03 isinstance(): introspection is not mathematics
+tests/modules/test_invariant_factor_framing.sage:67: TL03 isinstance(): introspection is not mathematics
+_ ERROR at setup of test_the_hyperbolic_plane_is_unimodular_so_its_discriminant_group_is_zero _
+tests/modules/test_invariant_factor_framing.sage:4: TL01 from sage_extensions.categories.abstract_categories.mor_categories import ...: take every name from the session
+tests/modules/test_invariant_factor_framing.sage:24: TL03 isinstance(): introspection is not mathematics
+tests/modules/test_invariant_factor_framing.sage:26: TL03 isinstance(): introspection is not mathematics
+tests/modules/test_invariant_factor_framing.sage:52: TL03 isinstance(): introspection is not mathematics
+tests/modules/test_invariant_factor_framing.sage:67: TL03 isinstance(): introspection is not mathematics
+_ ERROR at setup of test_u2_has_discriminant_group_z_mod_2_squared_generated_by_the_half_basis_classes _
+tests/modules/test_invariant_factor_framing.sage:4: TL01 from sage_extensions.categories.abstract_categories.mor_categories import ...: take every name from the session
+tests/modules/test_invariant_factor_framing.sage:24: TL03 isinstance(): introspection is not mathematics
+tests/modules/test_invariant_factor_framing.sage:26: TL03 isinstance(): introspection is not mathematics
+tests/modules/test_invariant_factor_framing.sage:52: TL03 isinstance(): introspection is not mathematics
+tests/modules/test_invariant_factor_framing.sage:67: TL03 isinstance(): introspection is not mathematics
+_ ERROR at setup of test_the_a2_discriminant_quadratic_form_lives_on_z_mod_3_and_normalization_preserves_q _
+tests/modules/test_invariant_factor_framing.sage:4: TL01 from sage_extensions.categories.abstract_categories.mor_categories import ...: take every name from the session
+tests/modules/test_invariant_factor_framing.sage:24: TL03 isinstance(): introspection is not mathematics
+tests/modules/test_invariant_factor_framing.sage:26: TL03 isinstance(): introspection is not mathematics
+tests/modules/test_invariant_factor_framing.sage:52: TL03 isinstance(): introspection is not mathematics
+tests/modules/test_invariant_factor_framing.sage:67: TL03 isinstance(): introspection is not mathematics
+_ ERROR at setup of test_the_odd_unimodular_lattice_i2_has_zero_discriminant_group _
+tests/modules/test_invariant_factor_framing.sage:4: TL01 from sage_extensions.categories.abstract_categories.mor_categories import ...: take every name from the session
+tests/modules/test_invariant_factor_framing.sage:24: TL03 isinstance(): introspection is not mathematics
+tests/modules/test_invariant_factor_framing.sage:26: TL03 isinstance(): introspection is not mathematics
+tests/modules/test_invariant_factor_framing.sage:52: TL03 isinstance(): introspection is not mathematics
+tests/modules/test_invariant_factor_framing.sage:67: TL03 isinstance(): introspection is not mathematics
+=================================== FAILURES ===================================
+_______ test_infinite_numerator_module_can_have_finite_zero_localization _______
+
+    def test_infinite_numerator_module_can_have_finite_zero_localization():
+        ring = ZZ.polynomial_ring(("x",))
+        x = ring.algebra_generator("x")
+        free = ring.free_module(1)
+        numerator = free.Mor(free)({0: x * free.module_generator(0)}).cokernel()
+        localized = ring.localization(x).localize_module(numerator)
+        assert localized in AdditiveGroups().AdditiveCommutative()
+>       assert localized.is_zero() is True
+E       assert inverted_submonoid_meets(Localization of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer ......} over Integer Ring, Ideal (x) of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring) is True
+E        +  where inverted_submonoid_meets(Localization of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer ......} over Integer Ring, Ideal (x) of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring) = is_zero()
+E        +    where is_zero = Finitely presented module on 1 module generators over Localization of Free module on Coproduct of the family over NN =...ing at Submonoid generated by (x,) in Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring.is_zero
+
+tests/modules/test_finite_cokernel_constructor.sage:14: AssertionError
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:833 Elementwise module morphism Module over Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring on Classes in the multilinear tensor presentation -> Module over Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring on Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Localization of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring at Submonoid generated by (x,) in Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:833 Elementwise module morphism Module over Localization of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring at Submonoid generated by (x,) in Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring on Classes in the multilinear tensor presentation -> Module over Localization of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring at Submonoid generated by (x,) in Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring on Localization of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring at Submonoid generated by (x,) in Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+____ test_z2_mod_6_is_z2_mod_2_a_torsion_module_of_projective_dimension_one ____
+
+>   return self.cache[k]
+E   KeyError: (128588590977104, (2 + 2^2 + O(2^21),), None)
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_z2_mod_6_is_z2_mod_2_a_torsion_module_of_projective_dimension_one() -> None:
+>       R, M = two_adic_mod_6()
+               ^^^^^^^^^^^^^^^^
+
+tests/modules/test_torsion_modules_archive.sage:19: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/modules/test_torsion_modules_archive.sage:15: in two_adic_mod_6
+    return R, Modules(R)(R.quotient_ring(R.ideal(6)))
+                                         ^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/semirings.py:493: in ideal
+    result = self._ideal_generated_by(selected)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/ring_foundation.py:4132: in _ideal_generated_by
+    return _commutative_ideal(self, generators)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/commutative_ideals.py:1909: in _commutative_ideal
+    return _placed_commutative_ideal(source, generators, placement)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:1029: in sage.misc.cachefunc.CachedFunction.__call__
+    ???
+src/sage_extensions/categories/rings/commutative_ideals.py:2022: in _placed_commutative_ideal
+    syzygy_rows = _engine_ideal_syzygy_rows(source, backend, selected)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/commutative_ideals.py:1646: in _engine_ideal_syzygy_rows
+    return _polynomial_syzygy_rows(backend)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/commutative_ideals.py:1514: in _polynomial_syzygy_rows
+    return tuple(tuple(row) for row in morphism.kernel().gens())
+                                       ^^^^^^^^^^^^^^^^^
+/sage/.venv/lib/python3.14/site-packages/sage/modules/matrix_morphism.py:873: in kernel
+    V = self.matrix().left_kernel()
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/matrix/matrix2.pyx:5547: in sage.matrix.matrix2.Matrix.left_kernel
+    ???
+sage/matrix/matrix2.pyx:5383: in sage.matrix.matrix2.Matrix.right_kernel
+    ???
+sage/matrix/matrix2.pyx:4991: in sage.matrix.matrix2.Matrix.right_kernel_matrix
+    ???
+sage/matrix/matrix2.pyx:8603: in sage.matrix.matrix2.Matrix.echelonize
+    ???
+sage/structure/parent.pyx:899: in sage.structure.parent.Parent.__call__
+    ???
+sage/structure/coerce_maps.pyx:92: in sage.structure.coerce_maps.DefaultConvertMap_unique._call_
+    ???
+sage/structure/coerce_maps.pyx:87: in sage.structure.coerce_maps.DefaultConvertMap_unique._call_
+    ???
+/sage/.venv/lib/python3.14/site-packages/sage/categories/sets_cat.py:1012: in _element_constructor_from_element_class
+    return self.element_class(self, *args, **keywords)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   ValueError: negative valuation
+
+../src/sage/rings/padics/padic_template_element.pxi:186: ValueError
+_ test_in_z2_mod_6_the_generator_is_nonzero_killed_by_2_and_tor1_has_two_elements _
+
+>   return self.cache[k]
+E   KeyError: (128588590977104, (2 + 2^2 + O(2^21),), None)
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_in_z2_mod_6_the_generator_is_nonzero_killed_by_2_and_tor1_has_two_elements() -> None:
+>       R, M = two_adic_mod_6()
+               ^^^^^^^^^^^^^^^^
+
+tests/modules/test_torsion_modules_archive.sage:27: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/modules/test_torsion_modules_archive.sage:15: in two_adic_mod_6
+    return R, Modules(R)(R.quotient_ring(R.ideal(6)))
+                                         ^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/semirings.py:493: in ideal
+    result = self._ideal_generated_by(selected)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/ring_foundation.py:4132: in _ideal_generated_by
+    return _commutative_ideal(self, generators)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/commutative_ideals.py:1909: in _commutative_ideal
+    return _placed_commutative_ideal(source, generators, placement)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:1029: in sage.misc.cachefunc.CachedFunction.__call__
+    w = self.f(*args, **kwds)
+src/sage_extensions/categories/rings/commutative_ideals.py:2022: in _placed_commutative_ideal
+    syzygy_rows = _engine_ideal_syzygy_rows(source, backend, selected)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/commutative_ideals.py:1646: in _engine_ideal_syzygy_rows
+    return _polynomial_syzygy_rows(backend)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/commutative_ideals.py:1514: in _polynomial_syzygy_rows
+    return tuple(tuple(row) for row in morphism.kernel().gens())
+                                       ^^^^^^^^^^^^^^^^^
+/sage/.venv/lib/python3.14/site-packages/sage/modules/matrix_morphism.py:873: in kernel
+    V = self.matrix().left_kernel()
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/matrix/matrix2.pyx:5547: in sage.matrix.matrix2.Matrix.left_kernel
+    ???
+sage/matrix/matrix2.pyx:5383: in sage.matrix.matrix2.Matrix.right_kernel
+    ???
+sage/matrix/matrix2.pyx:4991: in sage.matrix.matrix2.Matrix.right_kernel_matrix
+    ???
+sage/matrix/matrix2.pyx:8603: in sage.matrix.matrix2.Matrix.echelonize
+    ???
+sage/structure/parent.pyx:899: in sage.structure.parent.Parent.__call__
+    ???
+sage/structure/coerce_maps.pyx:92: in sage.structure.coerce_maps.DefaultConvertMap_unique._call_
+    ???
+sage/structure/coerce_maps.pyx:87: in sage.structure.coerce_maps.DefaultConvertMap_unique._call_
+    ???
+/sage/.venv/lib/python3.14/site-packages/sage/categories/sets_cat.py:1012: in _element_constructor_from_element_class
+    return self.element_class(self, *args, **keywords)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   ValueError: negative valuation
+
+../src/sage/rings/padics/padic_template_element.pxi:186: ValueError
+___ test_z2_mod_6_has_a_length_one_resolution_and_ext1_into_z2_of_order_two ____
+
+>   return self.cache[k]
+E   KeyError: (128588590977104, (2 + 2^2 + O(2^21),), None)
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_z2_mod_6_has_a_length_one_resolution_and_ext1_into_z2_of_order_two() -> None:
+>       R, M = two_adic_mod_6()
+               ^^^^^^^^^^^^^^^^
+
+tests/modules/test_torsion_modules_archive.sage:37: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/modules/test_torsion_modules_archive.sage:15: in two_adic_mod_6
+    return R, Modules(R)(R.quotient_ring(R.ideal(6)))
+                                         ^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/semirings.py:493: in ideal
+    result = self._ideal_generated_by(selected)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/ring_foundation.py:4132: in _ideal_generated_by
+    return _commutative_ideal(self, generators)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/commutative_ideals.py:1909: in _commutative_ideal
+    return _placed_commutative_ideal(source, generators, placement)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:1029: in sage.misc.cachefunc.CachedFunction.__call__
+    w = self.f(*args, **kwds)
+src/sage_extensions/categories/rings/commutative_ideals.py:2022: in _placed_commutative_ideal
+    syzygy_rows = _engine_ideal_syzygy_rows(source, backend, selected)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/commutative_ideals.py:1646: in _engine_ideal_syzygy_rows
+    return _polynomial_syzygy_rows(backend)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/commutative_ideals.py:1514: in _polynomial_syzygy_rows
+    return tuple(tuple(row) for row in morphism.kernel().gens())
+                                       ^^^^^^^^^^^^^^^^^
+/sage/.venv/lib/python3.14/site-packages/sage/modules/matrix_morphism.py:873: in kernel
+    V = self.matrix().left_kernel()
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/matrix/matrix2.pyx:5547: in sage.matrix.matrix2.Matrix.left_kernel
+    ???
+sage/matrix/matrix2.pyx:5383: in sage.matrix.matrix2.Matrix.right_kernel
+    ???
+sage/matrix/matrix2.pyx:4991: in sage.matrix.matrix2.Matrix.right_kernel_matrix
+    ???
+sage/matrix/matrix2.pyx:8603: in sage.matrix.matrix2.Matrix.echelonize
+    ???
+sage/structure/parent.pyx:899: in sage.structure.parent.Parent.__call__
+    ???
+sage/structure/coerce_maps.pyx:92: in sage.structure.coerce_maps.DefaultConvertMap_unique._call_
+    ???
+sage/structure/coerce_maps.pyx:87: in sage.structure.coerce_maps.DefaultConvertMap_unique._call_
+    ???
+/sage/.venv/lib/python3.14/site-packages/sage/categories/sets_cat.py:1012: in _element_constructor_from_element_class
+    return self.element_class(self, *args, **keywords)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   ValueError: negative valuation
+
+../src/sage/rings/padics/padic_template_element.pxi:186: ValueError
+_ test_a_determinant_three_endomorphism_of_z2_becomes_invertible_at_the_prime_2 _
+
+    def test_a_determinant_three_endomorphism_of_z2_becomes_invertible_at_the_prime_2() -> None:
+        r"""$f(e) = e + f'$, $f(f') = 3f'$ has $\operatorname{coker} f = \mathbb Z/3$; since localization is
+        exact, $f_{(2)}$ is an isomorphism ($3$ is a unit in $\mathbb Z_{(2)}$) while $f_{(3)}$ is not.
+    
+        Source: Atiyah–Macdonald, Introduction to Commutative Algebra, 3.3 and 3.8.
+        """
+        M = ZZ**2
+        e, f = M.module_generator(0), M.module_generator(1)
+        endomorphism = M.End()({0: e + f, 1: 3 * f})
+        cokernel = endomorphism.cokernel()
+        assert cokernel.cardinality() == 3
+        assert cokernel.localize_at_prime(ZZ.ideal(2)).is_zero()
+        assert not cokernel.localize_at_prime(ZZ.ideal(3)).is_zero()
+>       assert M.localize_at_prime(ZZ.ideal(2)).module_rank() == 2
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/modules/test_localization_constructor_convergence.sage:19: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/modules/framed/finitely_generated/finitely_presented_modules.py:1246: in module_rank
+    return cardinal(sum(1 for invariant in self._invariants_with_units() if invariant == 0))
+                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:2328: in sage.misc.cachefunc.CachedMethodCallerNoArgs.__call__
+    self.cache = f(self._instance)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Finitely presented module on 2 module generators over Localization of Integer Ring at Integer Ring \ Ideal (2) of Integer Ring
+
+    @cached_method
+    def _invariants_with_units(self):
+        r"""Read the invariant factors, retaining unit and free coordinates.
+    
+        The invariant factors are the diagonal ``D`` of the Smith form
+        ``D = U A V`` of the selected relation matrix, one per generator
+        of ``F_0``, with ``0`` past the diagonal.  They need neither basis
+        change, so they are read from ``D`` itself; the basis changes as
+        owned isomorphisms are ``invariant_factor_presentation``.
+        """
+        ring = self.base_ring()
+        smith = self._selected_presentation_smith_backend()
+>       assert smith is not None, (
+               ^^^^^^^^^^^^^^^^^
+            f"cannot compute the invariant factors of {self}: its selected presentation "
+            f"over {ring} supplies no exact Smith computation"
+        )
+E       AssertionError: cannot compute the invariant factors of Finitely presented module on 2 module generators over Localization of Integer Ring at Integer Ring \ Ideal (2) of Integer Ring: its selected presentation over Localization of Integer Ring at Integer Ring \ Ideal (2) of Integer Ring supplies no exact Smith computation
+
+src/sage_extensions/categories/modules/framed/finitely_generated/finitely_presented_modules.py:1212: AssertionError
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Localization of Integer Ring at Integer Ring \ Ideal (2) of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:833 Elementwise module morphism Module over Localization of Integer Ring at Integer Ring \ Ideal (2) of Integer Ring on Classes in the multilinear tensor presentation -> Module over Localization of Integer Ring at Integer Ring \ Ideal (2) of Integer Ring on Localization of Integer Ring at Integer Ring \ Ideal (2) of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Localization of Integer Ring at Integer Ring \ Ideal (3) of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:833 Elementwise module morphism Module over Localization of Integer Ring at Integer Ring \ Ideal (3) of Integer Ring on Classes in the multilinear tensor presentation -> Module over Localization of Integer Ring at Integer Ring \ Ideal (3) of Integer Ring on Localization of Integer Ring at Integer Ring \ Ideal (3) of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+_ test_in_q_mod_6z_the_classes_of_3_and_2_generate_subgroups_of_orders_2_and_3 _
+
+>   return self._cached_methods[name]
+E   KeyError: 'subobject_on'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_in_q_mod_6z_the_classes_of_3_and_2_generate_subgroups_of_orders_2_and_3() -> None:
+        """3 * 2 = 6 and 2 * 3 = 6 lie in 6Z, and 3, 2 are not in 6Z; 4 = 2 * 2 in <2>.
+    
+        Source: by hand.
+        """
+>       T = rationals_modulo(6)
+            ^^^^^^^^^^^^^^^^^^^^
+
+tests/modules/test_fraction_field_quotients_archive.sage:21: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/modules/test_fraction_field_quotients_archive.sage:13: in rationals_modulo
+    return Q.subobject_on([Q(n)]).inclusion().cokernel()
+           ^^^^^^^^^^^^^^
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    ???
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: 'OwnedJoinCategory.parent_class' object has no attribute 'subobject_on'
+
+sage/cpython/getattr.pyx:357: AttributeError
+_ test_in_q_mod_z_the_classes_of_1_4_and_1_6_generate_the_cyclic_group_of_order_12 _
+
+>   return self._cached_methods[name]
+E   KeyError: 'subobject_on'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_in_q_mod_z_the_classes_of_1_4_and_1_6_generate_the_cyclic_group_of_order_12() -> None:
+        """<1/4, 1/6> = <1/12> since 1/12 = 1/4 - 1/6 and lcm(4, 6) = 12; in Q/2Z, 4/3 and 2/3
+        generate the same subgroup of order 3.
+    
+        Source: by hand.
+        """
+>       T = rationals_modulo(1)
+            ^^^^^^^^^^^^^^^^^^^^
+
+tests/modules/test_fraction_field_quotients_archive.sage:39: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/modules/test_fraction_field_quotients_archive.sage:13: in rationals_modulo
+    return Q.subobject_on([Q(n)]).inclusion().cokernel()
+           ^^^^^^^^^^^^^^
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    return self.getattr_from_category(name)
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    attr = getattr_from_other_class(self, cls, name)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: 'OwnedJoinCategory.parent_class' object has no attribute 'subobject_on'
+
+sage/cpython/getattr.pyx:357: AttributeError
+__________ test_archived_a2_discriminant_scales_are_value_submodules ___________
+
+    def test_archived_a2_discriminant_scales_are_value_submodules() -> None:
+        bilinear = Lattices.A2.discriminant_bilinear_form()
+        bilinear_scale = bilinear.scale_submodule()
+        bilinear_generator = bilinear_scale.embedded_module_generators()[0]
+    
+        assert bilinear_scale.ambient_module() is bilinear.value_module()
+        assert bilinear_scale.cardinality() == 3
+        assert bilinear_generator == bilinear.value_module()(QQ(1) / 3)
+    
+        quadratic = Lattices.A2.discriminant_quadratic_form()
+>       quadratic_scale = quadratic.scale_submodule()
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/modules/test_fraction_field_quotients_archive.sage:61: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/misc/cachefunc.pyx:2328: in sage.misc.cachefunc.CachedMethodCallerNoArgs.__call__
+    self.cache = f(self._instance)
+src/sage_extensions/categories/modules/framed/formed/form_modules.py:3745: in scale_submodule
+    return self.value_module().subobject_on(values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Fraction Field of Integer Ring / (2)Integer Ring
+module_generators = ([0] in Fraction Field of Integer Ring / (2)Integer Ring, [(4)/(3)] in Fraction Field of Integer Ring / (2)Integer Ring, [(4)/(3)] in Fraction Field of Integer Ring / (2)Integer Ring)
+
+    def subobject_on(self, module_generators):
+        r"""Return the cyclic submodule generated by finitely many classes.
+    
+        For ``QQ / n ZZ`` with ``n != 0``, let ``x_1,...,x_r`` be the
+        selected lifts.  The subgroup of ``QQ`` generated by these lifts
+        and ``n`` is ``g ZZ`` for one positive rational ``g``.  Hence the
+        generated submodule is
+    
+        ``g ZZ / n ZZ ~= ZZ / (n/g) ZZ``.
+    
+        The source is returned as an actual module subobject carrying its
+        inclusion into this quotient.  This PID classification is the
+        reason the operation is exact despite the ambient module's
+        countable framing.
+        """
+        match self._engine:
+            case None:
+                raise TypeError(
+                    f"cannot classify the submodule of {self} generated by {tuple(module_generators)}: "
+                    "the selected gcd/divisibility classification is the QQ/nZZ computation and no "
+                    f"general submodule-classification algorithm for Frac({self.base_ring()})/a{self.base_ring()} "
+                    "has been selected"
+                )
+            case _:
+                pass
+        classes = tuple(self(element) for element in module_generators)
+        assert not self.modulus().is_zero(), (
+            f"cannot classify the submodule of {self} generated by {classes}: the "
+            "classification gZZ/nZZ ~= ZZ/(n/g)ZZ needs a nonzero modulus n, and here n = 0 "
+            "(a finitely generated submodule of QQ itself is free)"
+        )
+    
+        field = self.fraction_field()
+        values = tuple(self.lift(element) for element in classes) + (
+            self.modulus(),
+        )
+        denominator = lcm(tuple(int(value.denominator()) for value in values))
+        numerators = tuple(
+            SageZZ(_engine_element(field, value) * denominator)
+            for value in values
+        )
+        generator_numerator = abs(gcd(numerators))
+        generator = _owned_engine_element(field,
+            SageQQ(generator_numerator) / SageQQ(denominator)
+        )
+        # ``g`` divides every lift and the modulus, so ``n/g`` is integral.
+        order_in_field = self.modulus() / generator
+>       assert int(order_in_field.denominator()) == 1, (
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            f"the submodule of {self} generated by {classes} is gZZ/nZZ with g = {generator}, "
+            f"but g does not divide the modulus n = {self.modulus()}: n/g = {order_in_field} "
+            "is not an integer"
+        )
+E       AssertionError: the submodule of Fraction Field of Integer Ring / (2)Integer Ring generated by ([0] in Fraction Field of Integer Ring / (2)Integer Ring, [(4)/(3)] in Fraction Field of Integer Ring / (2)Integer Ring, [(4)/(3)] in Fraction Field of Integer Ring / (2)Integer Ring) is gZZ/nZZ with g = (2)/(3), but g does not divide the modulus n = 2: n/g = (6)/(2) is not an integer
+
+src/sage_extensions/categories/modules/framed/fraction_field_quotients.py:429: AssertionError
+====================== test lint: 18 findings in 2 files =======================
+tests/modules/test_invariant_factor_framing.sage:4: TL01 from sage_extensions.categories.abstract_categories.mor_categories import ...: take every name from the session
+tests/modules/test_invariant_factor_framing.sage:24: TL03 isinstance(): introspection is not mathematics
+tests/modules/test_invariant_factor_framing.sage:26: TL03 isinstance(): introspection is not mathematics
+tests/modules/test_invariant_factor_framing.sage:52: TL03 isinstance(): introspection is not mathematics
+tests/modules/test_invariant_factor_framing.sage:67: TL03 isinstance(): introspection is not mathematics
+tests/modules/test_the_selected_relation_morphism_contract.sage:19: TL01 from sage_extensions.categories.modules.pure.modules import ...: take every name from the session
+tests/modules/test_the_selected_relation_morphism_contract.sage:41: TL08 ModulesWithChosenFinitePresentation: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_the_selected_relation_morphism_contract.sage:42: TL02 private attribute ._selected_relation_morphism
+tests/modules/test_the_selected_relation_morphism_contract.sage:43: TL09 an assertion that holds of anything
+tests/modules/test_the_selected_relation_morphism_contract.sage:55: TL08 ModulesWithChosenFinitePresentation: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_the_selected_relation_morphism_contract.sage:56: TL02 private attribute ._selected_relation_morphism
+tests/modules/test_the_selected_relation_morphism_contract.sage:57: TL09 an assertion that holds of anything
+tests/modules/test_the_selected_relation_morphism_contract.sage:66: TL08 ModulesWithChosenFinitePresentation: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_the_selected_relation_morphism_contract.sage:67: TL02 private attribute ._selected_relation_morphism
+tests/modules/test_the_selected_relation_morphism_contract.sage:72: TL01 from sage_extensions.categories.modules.framed.finitely_generated.finitely_presented_modules import ...: take every name from the session
+tests/modules/test_the_selected_relation_morphism_contract.sage:72: TL02 imports the private name _relation_morphism
+tests/modules/test_the_selected_relation_morphism_contract.sage:77: TL02 private attribute ._selected_relation_morphism
+tests/modules/test_the_selected_relation_morphism_contract.sage:88: TL09 an assertion that holds of anything
+=============================== time-gate report ===============================
+session star import took 4.20 s; the measured ceiling is 3 s
+collection took 11.80 s; the measured ceiling is 6 s
+============================== slowest durations ===============================
+3.66s call     tests/forms/test_a_torsion_cokernel_carries_its_torsion_forms.sage::test_the_orthogonal_quotient_of_a_discriminant_form_is_a_torsion_form
+1.86s call     tests/modules/test_pid_cokernel_rank.sage::test_a_cyclic_polynomial_quotient_has_its_exact_order_and_annihilator
+1.85s call     tests/modules/test_pid_cokernel_rank.sage::test_a_free_summand_preserves_the_polynomial_torsion_relation
+1.63s call     tests/modules/test_fraction_field_quotients_archive.sage::test_archived_a2_discriminant_scales_are_value_submodules
+1.16s call     tests/modules/test_localization_constructor_convergence.sage::test_a_determinant_three_endomorphism_of_z2_becomes_invertible_at_the_prime_2
+0.86s call     tests/modules/test_finite_cokernel_constructor.sage::test_infinite_numerator_module_can_have_finite_zero_localization
+0.71s call     tests/forms/test_a_torsion_cokernel_carries_its_torsion_forms.sage::test_the_half_form_on_z2_has_its_two_primary_part
+0.67s call     tests/modules/test_torsion_modules_archive.sage::test_z2_mod_6_is_z2_mod_2_a_torsion_module_of_projective_dimension_one
+0.48s call     tests/forms/test_a_torsion_cokernel_carries_its_torsion_forms.sage::test_the_one_third_form_on_z3_twists_by_a_negative_unit
+0.39s call     tests/modules/test_a_presented_module_is_built_before_it_computes.sage::test_constructing_a_cokernel_asks_the_engine_for_no_matrix
+0.07s call     tests/modules/test_a_presented_module_is_built_before_it_computes.sage::test_a_plane_inclusions_quotient_is_built_before_it_is_asked
+0.02s setup    tests/modules/test_torsion_modules_archive.sage::test_z2_mod_6_is_z2_mod_2_a_torsion_module_of_projective_dimension_one
+0.01s setup    tests/modules/test_pid_cokernel_rank.sage::test_a_cyclic_polynomial_quotient_has_its_exact_order_and_annihilator
+0.01s call     tests/modules/test_fraction_field_quotients_archive.sage::test_in_q_mod_6z_the_classes_of_3_and_2_generate_subgroups_of_orders_2_and_3
+0.01s setup    tests/modules/test_invariant_factor_framing.sage::test_the_hyperbolic_plane_is_unimodular_so_its_discriminant_group_is_zero
+0.01s setup    tests/forms/test_a_torsion_cokernel_carries_its_torsion_forms.sage::test_the_half_form_on_z2_has_its_two_primary_part
+
+(47 durations < 0.005s hidden.  Use -vv to show these durations.)
+=========================== short test summary info ============================
+FAILED tests/modules/test_finite_cokernel_constructor.sage::test_infinite_numerator_module_can_have_finite_zero_localization
+FAILED tests/modules/test_torsion_modules_archive.sage::test_z2_mod_6_is_z2_mod_2_a_torsion_module_of_projective_dimension_one
+FAILED tests/modules/test_torsion_modules_archive.sage::test_in_z2_mod_6_the_generator_is_nonzero_killed_by_2_and_tor1_has_two_elements
+FAILED tests/modules/test_torsion_modules_archive.sage::test_z2_mod_6_has_a_length_one_resolution_and_ext1_into_z2_of_order_two
+FAILED tests/modules/test_localization_constructor_convergence.sage::test_a_determinant_three_endomorphism_of_z2_becomes_invertible_at_the_prime_2
+FAILED tests/modules/test_fraction_field_quotients_archive.sage::test_in_q_mod_6z_the_classes_of_3_and_2_generate_subgroups_of_orders_2_and_3
+FAILED tests/modules/test_fraction_field_quotients_archive.sage::test_in_q_mod_z_the_classes_of_1_4_and_1_6_generate_the_cyclic_group_of_order_12
+FAILED tests/modules/test_fraction_field_quotients_archive.sage::test_archived_a2_discriminant_scales_are_value_submodules
+ERROR tests/modules/test_the_selected_relation_morphism_contract.sage::test_a_framed_free_module_states_the_empty_relation_family
+ERROR tests/modules/test_the_selected_relation_morphism_contract.sage::test_a_module_with_a_chosen_presentation_states_its_relations
+ERROR tests/modules/test_the_selected_relation_morphism_contract.sage::test_a_module_without_a_presentation_states_none
+ERROR tests/modules/test_the_selected_relation_morphism_contract.sage::test_the_hook_agrees_with_the_public_presentation
+ERROR tests/modules/test_invariant_factor_framing.sage::test_z2_mod_x_is_free_of_rank_one_and_z2_mod_2x_is_not_projective
+ERROR tests/modules/test_invariant_factor_framing.sage::test_the_hyperbolic_plane_is_unimodular_so_its_discriminant_group_is_zero
+ERROR tests/modules/test_invariant_factor_framing.sage::test_u2_has_discriminant_group_z_mod_2_squared_generated_by_the_half_basis_classes
+ERROR tests/modules/test_invariant_factor_framing.sage::test_the_a2_discriminant_quadratic_form_lives_on_z_mod_3_and_normalization_preserves_q
+ERROR tests/modules/test_invariant_factor_framing.sage::test_the_odd_unimodular_lattice_i2_has_zero_discriminant_group
+==================== 8 failed, 7 passed, 9 errors in 38.28s ====================
+[peakrss] wt541revtests: child waited=1 shell_code=1 samples=31
+[peakrss] peak tree RSS      : 377 MiB
+[peakrss] low-water MemAvail : 1476 MiB
+[peakrss] peak single VmHWM  : 381 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      370 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    36.3s procs=  3 rss=   377 MiB hwm=   380 MiB avail=  1989 MiB
+[peakrss]   t=    38.3s procs=  3 rss=   375 MiB hwm=   381 MiB avail=  1864 MiB
+[peakrss]   t=    42.3s procs=  3 rss=   375 MiB hwm=   381 MiB avail=  1963 MiB
+[peakrss]   t=    40.3s procs=  3 rss=   374 MiB hwm=   381 MiB avail=  1959 MiB
+[peakrss]   t=    44.3s procs=  3 rss=   373 MiB hwm=   381 MiB avail=  1828 MiB
