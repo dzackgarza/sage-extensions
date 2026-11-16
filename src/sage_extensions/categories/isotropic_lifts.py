@@ -260,9 +260,10 @@ class IsotropicReductionLiftTorsors(OwnedCategoryOverBaseRing):
                 no class of ``P/mP`` names: membership answers ``False`` for it.
                 """
                 parameter = parameter_of(locus_lift)
-                if lattice_inclusion.is_in_image(parameter) is False:
+                preimage = lattice_inclusion.preimage_or_none(parameter)
+                if preimage is None:
                     return False
-                return residue(lattice_inclusion.lift(parameter)) in classes
+                return residue(preimage) in classes
 
             if classes.is_empty() is True:
                 return integral_kernel, self.power_set().bottom()
