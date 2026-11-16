@@ -84,6 +84,23 @@ def test_the_integral_locus_is_a_subset_of_its_torsor() -> None:
     assert locus.is_empty() is False
 
 
+def test_the_nonempty_locus_is_a_point_of_the_torsors_power_set() -> None:
+    r"""``T_Z`` is a subobject of ``T``: a point of ``P(T)``, as the empty locus is.
+
+    The subsets of a set are the points of its power set, so a subset of ``T``
+    lies in ``Sets().Subobjects(T)`` and is a member of ``T.power_set()``.  The
+    empty locus is ``P(T)``'s bottom; this one is the same kind of object, cut
+    out of ``T`` by the residue-class predicate, and the two cases owe the same.
+    """
+    lattice, marked, reduction, torsor = _non_integral_base_point_control()
+    locus = torsor.integral_lift_locus()
+
+    assert lattice.div(marked) == 2
+    assert locus.is_empty() is False
+    assert locus in Sets().Subobjects(torsor)
+    assert locus in torsor.power_set()
+
+
 def test_the_locus_is_membership_in_the_residue_class() -> None:
     r"""A lift is in ``T_Z`` exactly when its parameter's class lies in the residue locus.
 
