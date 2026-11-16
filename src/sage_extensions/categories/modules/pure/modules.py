@@ -5839,7 +5839,7 @@ class RestrictedScalarsModules(OwnedCategoryOverBaseRing):
 def _restricted_scalar_framing_labels(module, scalar_basis):
     r"""Return the framing labels ``I x J`` of ``Res_f(M)`` for ``Res_f(S)`` framed on ``I``, ``M`` on ``J``."""
     scalar_labels = scalar_basis.source().module_generating_set()
-    module_labels = module.selected_generating_set()
+    module_labels = module.module_generating_set()
     return Sets().product(
         indexed_family(
             Sets.Δ[1],
