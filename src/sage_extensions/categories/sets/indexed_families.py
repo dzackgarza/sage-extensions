@@ -370,9 +370,9 @@ class IndexedFamily[IndexT, ValueT]:
 
         No consumer here keys on this hash.  The finite constructions of
         ``Sets().product`` and ``Sets().coproduct`` are interned under the index
-        set and the hashes of the factors, which are sets and hash
-        (``set_categories._finite_family_key``), and compare the families of one
-        key by ``==``; this hash is what extensional equality owes Python's
+        set and, per factor, the datum that factor declares for itself or else its
+        hash (``set_categories._finite_family_key``), and compare the families of
+        one key by ``==``; this hash is what extensional equality owes Python's
         containers.
         """
         from sage_extensions.categories.sets.set_categories import EnumeratedSets

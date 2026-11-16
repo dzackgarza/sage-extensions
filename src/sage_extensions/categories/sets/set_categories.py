@@ -6416,8 +6416,36 @@ def _finite_family_key(family: IndexedFamily) -> int:
     Equal families have equal index sets, which enumerate in one order, and
     equal factors index by index; every set hashes consistently with its
     equality (the rule of :class:`Sets`), so equal families have one key.
+
+    A factor that declares the datum naming it (``FiniteOrderedSets.from_indexed``)
+    contributes that datum and not its hash
+    (:meth:`FiniteOrderedSets.ParentMethods.declared_key`).  The datum is the
+    factor's own, two declaring factors are equal exactly when their data are, and
+    reading it costs nothing in the factor's points.  Every other factor
+    contributes its hash, which for a finite ordered set is the hash of the tuple
+    of its points, read once and kept.  So a family whose factors all declare their
+    datum is placed by its key without reading a point of any of them, at whatever
+    size; a factor that declares none is keyed as before.
     """
-    return hash((family.index_set(), tuple(hash(factor) for factor in family)))
+    return hash((family.index_set(), tuple(_factor_key(factor) for factor in family)))
+
+
+def _factor_key(factor) -> tuple:
+    r"""The key one factor of a finite family contributes to the family's key.
+
+    A finite ordered set that declares the datum naming it contributes that datum;
+    every other set contributes its hash.  The tag keeps the two apart, so a
+    declared datum is never read as a hash of some other set's points, and the
+    declared datum is itself hashed because the store that holds the families is a
+    dictionary.
+    """
+    from sage_extensions.categories.sets.finite_ordered_sets import FiniteOrderedSets
+
+    if factor in FiniteOrderedSets():
+        declared = factor.declared_key()
+        if declared is not None:
+            return ("declared", declared)
+    return ("hashed", hash(factor))
 
 
 def _equal_interned_family(
