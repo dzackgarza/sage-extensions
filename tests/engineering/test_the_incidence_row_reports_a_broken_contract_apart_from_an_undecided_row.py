@@ -19,6 +19,13 @@ carries it:
 The row's data are the lattice and the subgroup it is taken under, so no test
 here names a defect of a particular lattice: the relations are relations of
 those rows, and the counts are the rows' own counts.
+
+An edge's line lies in its plane for a reason of the form and not of the
+clause that decides it, so the test that asks the edge clause about a line
+outside a plane gives the reason: the plane is totally isotropic, so each of
+its vectors pairs trivially with each of its generators, and the line's
+generator pairs with one of them by a nonzero integer, which no vector of the
+plane does.
 """
 
 from sage_extensions.all import *  # noqa: F401,F403
@@ -91,3 +98,45 @@ def test_a_relation_that_leaves_a_vertex_without_an_edge_is_a_contract_violation
     assert unjoined.status.exit_status != spent.status.exit_status
     assert unjoined.report() != spent.report()
     assert unjoined.detail
+
+
+def test_a_line_that_pairs_nontrivially_with_the_plane_is_outside_it():
+    r"""The edge clause passes a generator of the plane and rejects a line pairing with it.
+
+    The plane is spanned by the isotropic vectors ``w1`` and ``w3``, which pair
+    trivially with each other, so every vector of the plane pairs trivially with
+    ``w1``.  ``w2`` is isotropic and pairs with ``w1`` by two, so no vector of
+    the plane is its line: that is the reason the line is outside the plane, and
+    it is read off the form, not off the predicate the clause evaluates.
+    """
+    lattice = NamedLattices.Tco
+    isotropic = Coble.isotropic_vectors()
+    plane = lattice.subobject_on((isotropic["w1"], isotropic["w3"]))
+    inside = lattice.subobject_on((isotropic["w1"],))
+    outside = lattice.subobject_on((isotropic["w2"],))
+
+    assert lattice.b(isotropic["w1"], isotropic["w1"]) == ZZ(0)
+    assert lattice.b(isotropic["w3"], isotropic["w3"]) == ZZ(0)
+    assert lattice.b(isotropic["w1"], isotropic["w3"]) == ZZ(0)
+    assert lattice.b(isotropic["w2"], isotropic["w1"]) == ZZ(2)
+
+    assert incidence_edge_containment(lattice, inside, plane) is None
+    assert incidence_edge_containment(lattice, outside, plane)
+
+
+def test_a_row_of_a_lattice_with_no_isotropic_plane_decides_with_its_line_vertex():
+    r"""A row whose lattice has no isotropic plane has no edge, and it is decided, not broken.
+
+    ``U + <-2>`` has signature ``(1, 2)``, so it carries no totally isotropic
+    plane -- a totally isotropic two-plane would force both indices of the form
+    to be at least two -- and its building has line vertices only.  Its row
+    therefore returns one line cusp, no plane cusp and no edge, and that is the
+    row's complete answer: the driver decides it, and reports no vertex of it
+    as left without an edge, because a row with no plane vertex has no edge for
+    a line vertex to carry.
+    """
+    lattice = Lattices(ZZ)("U") + Lattices(ZZ)([[-2]])
+    outcome = incidence_row_outcome(lattice, lattice.Aut(), "O(U + <-2>)", 3600)
+
+    assert outcome.status is RowStatus.DECIDED
+    assert outcome.counts == (0, 1, 0)

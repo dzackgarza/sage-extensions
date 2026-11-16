@@ -26,7 +26,9 @@ an orbit computation and reports what the row did.  ``incidence_row_outcome``
 is the Γ_{Co,2} driver's row step on one subgroup under one cap, and
 ``incidence_row_contract`` is the same driver's contract on a relation it is
 handed -- the relation is the input, so a test asks what the driver makes of a
-broken one rather than handing it the answer.  ``RowStatus`` is that driver's
+broken one rather than handing it the answer -- and ``incidence_edge_containment``
+is that contract's edge clause on one line/plane pair of a lattice.
+``RowStatus`` is that driver's
 own vocabulary of row statuses, bound for the same reason: the lint admits
 exactly the names a directory's ``conftest.py`` binds.
 """
@@ -208,6 +210,7 @@ def pytest_configure(config) -> None:
     builtins.simultaneous_test_runs = simultaneous_test_runs
     builtins.incidence_row_outcome = incidence_row_outcome
     builtins.incidence_row_contract = incidence_row_contract
+    builtins.incidence_edge_containment = incidence_edge_containment
     builtins.RowStatus = _script("coble_row_status").RowStatus
 
 
@@ -220,6 +223,7 @@ def pytest_unconfigure(config) -> None:
     del builtins.simultaneous_test_runs
     del builtins.incidence_row_outcome
     del builtins.incidence_row_contract
+    del builtins.incidence_edge_containment
     del builtins.RowStatus
 
 
@@ -471,6 +475,16 @@ def incidence_row_outcome(lattice, subgroup, label, cap):
     to run.
     """
     return _incidence_row_driver().run_row(lattice, subgroup, label, cap)
+
+
+def incidence_edge_containment(lattice, line, plane):
+    r"""Why the Γ_{Co,2} driver's edge contract rejects this line/plane edge, or ``None``.
+
+    The clause is the row's: both terms are subobjects of the row's lattice, and
+    the line's retained generator lies in the plane exactly when it is in the
+    image of the plane's inclusion.
+    """
+    return _incidence_row_driver().containment_violation(lattice, line, plane)
 
 
 def incidence_row_contract(lattice, subgroup, lines, planes, incidences):
