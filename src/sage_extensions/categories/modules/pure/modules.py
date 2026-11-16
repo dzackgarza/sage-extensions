@@ -2696,9 +2696,10 @@ class Modules(OwnedCategoryOverBaseRing):
             r"""Read the coefficients of the chosen preimage of ``element`` under the framing.
 
             Protected contract of ``Modules(R)``. Permitted callers are
-            :meth:`_framing_lift` and module
-            coordinate-transport or morphism evaluation constructors already
-            holding an owned framing vector.
+            :meth:`_framing_lift`, the tensor package's coordinate-vector
+            constructor (``tensor.coordinates``, reading the framing preimage
+            it has just lifted) and module coordinate-transport or morphism
+            evaluation constructors already holding an owned framing vector.
             The localized-module equality predicate also reads the stored
             coordinates of an actual free source vector to test whether its
             finitely many coefficients vanish after localization.
@@ -2718,7 +2719,8 @@ class Modules(OwnedCategoryOverBaseRing):
 
             Protected contract of ``Modules(R)``.  Its callers are
             ``FramingMorphism.lift``, ``ModuleMorphism.lift`` along the framing, ``FramedFreeModules`` elements'
-            ``to_vector``, and ``ModuleMorphism._call_``, which
+            ``to_vector``, ``tensor.coordinates``, which states an element's
+            coordinate vector in the tensor layer, and ``ModuleMorphism._call_``, which
             evaluates ``f(v) = sum_s a(s) f(m_s)`` on this preimage ``a``:
             evaluation must not construct the framing morphism, whose Mor set
             evaluates morphisms while it is built.  On a basis the preimage is

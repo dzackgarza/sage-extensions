@@ -8474,13 +8474,15 @@ class Lattices(OwnedCategoryOverBaseRing):
                      - \tfrac12 q(a)\,e\otimes b(e,\cdot) ,
             \]
 
-            one tensor expression on the framing of \(L\).  The contraction
-            `gram * v` of the Gram tensor with a vector is the covector
-            \(b(v,\cdot)\) -- the form is symmetric, so which of its two slots
-            the product halves is immaterial -- and `tensor.identity` is the
-            delta of that framing.  Entry \((i,j)\) of the result is the
-            coefficient of \(e_i\) in the image of \(e_j\), so the columns are
-            the images of the basis.
+            one tensor expression on the framing of \(L\).  The vectors \(e\)
+            and \(a\) enter as `tensor.coordinates`, their coordinate vectors
+            in that framing, so no coordinate is read one basis position at a
+            time here.  The contraction `gram * v` of the Gram tensor with a
+            vector is the covector \(b(v,\cdot)\) -- the form is symmetric,
+            so which of its two slots the product halves is immaterial -- and
+            `tensor.identity` is the delta of that framing.  Entry \((i,j)\) of
+            the result is the coefficient of \(e_i\) in the image of \(e_j\),
+            so the columns are the images of the basis.
 
             The expression is written over the fraction field, since
             \(\tfrac12 q(a)\) need not lie in the ring of \(L\), and read over
@@ -8497,21 +8499,10 @@ class Lattices(OwnedCategoryOverBaseRing):
             """
             ring = self.base_ring()
             fraction_field = ring.fraction_field()
-            labels = tuple(self.module_generating_set())
             gram = self.gram_tensor().change_ring(fraction_field)
             half_norm = fraction_field(orthogonal.q()) / fraction_field(ring(2))
-            isotropic_vector = tensor.vector(
-                fraction_field,
-                tuple(
-                    fraction_field(isotropic.to_vector()(label)) for label in labels
-                ),
-            )
-            orthogonal_vector = tensor.vector(
-                fraction_field,
-                tuple(
-                    fraction_field(orthogonal.to_vector()(label)) for label in labels
-                ),
-            )
+            isotropic_vector = tensor.coordinates(isotropic).change_ring(fraction_field)
+            orthogonal_vector = tensor.coordinates(orthogonal).change_ring(fraction_field)
             pairing_with_isotropic = gram * isotropic_vector
             pairing_with_orthogonal = gram * orthogonal_vector
             update = (
@@ -8637,9 +8628,11 @@ class Lattices(OwnedCategoryOverBaseRing):
             gram_values = [
                 [SageQQ(int(self.b(left, right))) for right in basis] for left in basis
             ]
-            isotropic_coordinates = [
-                SageQQ(int(isotropic.to_vector()(label))) for label in labels
-            ]
+            # The coordinates are the tensor layer's; the pairing below reads
+            # them as the rationals its integrality checks compare.
+            isotropic_coordinates = tuple(
+                SageQQ(int(entry)) for entry in tensor.coordinates(isotropic)
+            )
 
             def pairing(left_coordinates, right_coordinates):
                 return sum(
@@ -8713,9 +8706,11 @@ class Lattices(OwnedCategoryOverBaseRing):
             gram_values = [
                 [SageQQ(int(self.b(left, right))) for right in basis] for left in basis
             ]
-            isotropic_coordinates = [
-                SageQQ(int(isotropic.to_vector()(label))) for label in labels
-            ]
+            # The coordinates are the tensor layer's; the pairing below reads
+            # them as the rationals its integrality checks compare.
+            isotropic_coordinates = tuple(
+                SageQQ(int(entry)) for entry in tensor.coordinates(isotropic)
+            )
             parameter_coordinates = self._half_vector_coordinates(parameter)
 
             def pairing(left_coordinates, right_coordinates):
