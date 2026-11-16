@@ -1,0 +1,10 @@
+# tree: cab5ab33fed4fd455a4c94aa8d087a3ca41e433f
+# tree status: 
+# load: 1.85 0.94 0.86
+# command: pytest -o addopts= -p qc_sage_session -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint -q tests/lattices/test_the_kernel_incidence_rows.sage
+..                                                                       [100%]
+========================== test-call performance gate ==========================
+tests/lattices/test_the_kernel_incidence_rows.sage::test_6jrs_kernel_rows_are_the_ambient_rows: 20.81 s > 20 s
+tests/lattices/test_the_kernel_incidence_rows.sage::test_u_u_m4_kernel_rows_join_lines_to_their_planes: 58.12 s > 20 s
+2 passed in 79.26s (0:01:19)
+# launcher exit: 1

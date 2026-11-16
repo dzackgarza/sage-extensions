@@ -1,0 +1,9 @@
+# tree: 0e5ac18feb2de5b396da109b2df6367951f63610
+# tree status: 
+# load: 1.63 1.60 1.29
+# command: pytest -o addopts= -p qc_sage_session -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint -q tests/lattices/test_the_incidence_line_vertex_is_named_by_the_finite_image.sage tests/lattices/test_the_kernel_incidence_rows.sage
+.....                                                                    [100%]
+========================== test-call performance gate ==========================
+tests/lattices/test_the_kernel_incidence_rows.sage::test_u_u_m4_kernel_rows_join_lines_to_their_planes: 46.02 s > 20 s
+5 passed in 104.93s (0:01:44)
+# launcher exit: 1

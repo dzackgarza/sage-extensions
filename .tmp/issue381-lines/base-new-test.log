@@ -1,0 +1,7 @@
+# tree: cab5ab33fed4fd455a4c94aa8d087a3ca41e433f
+# tree status: ?? tests/lattices/test_the_incidence_line_vertex_is_named_by_the_finite_image.sage 
+# load: 1.19 1.53 1.18
+# command: pytest -o addopts= -p qc_sage_session -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint -q tests/lattices/test_the_incidence_line_vertex_is_named_by_the_finite_image.sage
+...                                                                      [100%]
+3 passed in 39.68s
+# launcher exit: 0

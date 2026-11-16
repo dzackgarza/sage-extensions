@@ -1,0 +1,53 @@
+# tree: 111e32f492d00dd1eebf9982d6fc1a3b156349f7
+# tree status:  M src/sage_extensions/categories/group/predicate_subgroups.py  M src/sage_extensions/categories/orthogonal_quotients.py 
+# load: 1.84 1.72 1.20
+# program: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/wt381v/.tmp/issue381-lines/probe-381-plane-lines.py
+[rss] t=    0.0s rss=    97.3 MiB
+        0.02 s  lattice  rss   270.4 MiB
+[rss] t=   10.0s rss=   472.2 MiB
+[rss] t=   20.1s rss=   526.3 MiB
+[rss] t=   30.1s rss=   557.5 MiB
+[rss] t=   40.1s rss=   580.3 MiB
+[rss] t=   50.2s rss=   587.0 MiB
+[rss] t=   60.2s rss=   593.3 MiB
+       59.68 s  Otilde and its quotient, index 46998591897600  rss   593.5 MiB
+        0.01 s  one plane, from the O(T_Co) row's own representative  rss   593.7 MiB
+        0.01 s  two lines of that plane: a generator and the sum of the two  rss   593.7 MiB
+[rss] t=   70.2s rss=   625.0 MiB
+[rss] t=   80.3s rss=   629.9 MiB
+[rss] t=   90.3s rss=   682.3 MiB
+[rss] t=  100.3s rss=   686.4 MiB
+[rss] t=  110.3s rss=   720.7 MiB
+[rss] t=  120.4s rss=   725.7 MiB
+[rss] t=  130.4s rss=   754.3 MiB
+[rss] t=  142.3s rss=   952.1 MiB
+[rss] t=  152.3s rss=   955.7 MiB
+[rss] t=  162.3s rss=   960.6 MiB
+[rss] t=  172.4s rss=   965.7 MiB
+[rss] t=  182.4s rss=   969.6 MiB
+[rss] t=  192.4s rss=   969.7 MiB
+[rss] t=  202.4s rss=   970.4 MiB
+      142.35 s  the Otilde line row: 527 line(s)  rss   977.5 MiB
+        0.01 s  527 line cusps built  rss   978.8 MiB
+    one line key (class pair and its orbit):     7.511 ms per call
+    distinct keys over the row: 527 of 527
+        3.96 s  the row's keys  rss   993.9 MiB
+[rss] t=  212.5s rss=  1013.9 MiB
+[rss] t=  222.5s rss=  1022.9 MiB
+[rss] t=  232.5s rss=  1023.2 MiB
+[rss] t=  242.6s rss=  1087.6 MiB
+[rss] t=  252.6s rss=  1111.0 MiB
+[peakrss] probe-plane-lines: child waited=124 shell_code=124 samples=260
+[peakrss] peak tree RSS      : 1724 MiB
+[peakrss] low-water MemAvail : 10114 MiB
+[peakrss] peak single VmHWM  : 1724 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     1713 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   458.2s procs=  3 rss=  1724 MiB hwm=  1724 MiB avail= 11226 MiB
+[peakrss]   t=   460.2s procs=  3 rss=  1724 MiB hwm=  1724 MiB avail= 11226 MiB
+[peakrss]   t=   462.2s procs=  3 rss=  1724 MiB hwm=  1724 MiB avail= 11225 MiB
+[peakrss]   t=   464.2s procs=  3 rss=  1724 MiB hwm=  1724 MiB avail= 11225 MiB
+[peakrss]   t=   466.2s procs=  3 rss=  1724 MiB hwm=  1724 MiB avail= 11257 MiB
+# launcher exit: 124

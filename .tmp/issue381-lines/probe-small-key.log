@@ -1,0 +1,45 @@
+# tree: cab5ab33fed4fd455a4c94aa8d087a3ca41e433f
+# tree status:  M src/sage_extensions/categories/group/predicate_subgroups.py  M src/sage_extensions/categories/orthogonal_quotients.py 
+# load: 0.92 0.65 0.77
+# program: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/wt381v/.tmp/issue381-lines/probe-381-small-key.py
+== U + U(2) + <-2>
+ Otilde: index 2 discriminant True lines 3 planes 2 (9.1 s)
+  distinct keys over the line row: 3 of 3
+  a plane's generator: key names 1 cusp(s), the witness search finds 1, the same one True
+    separated from every other cusp: True
+  a plane's sum: key names 1 cusp(s), the witness search finds 1, the same one True
+    separated from every other cusp: True
+ Otilde+: index 4 discriminant True lines 3 planes 2 (7.8 s)
+  distinct keys over the line row: 3 of 3
+  a plane's generator: key names 1 cusp(s), the witness search finds 1, the same one True
+    separated from every other cusp: True
+  a plane's sum: key names 1 cusp(s), the witness search finds 1, the same one True
+    separated from every other cusp: True
+== U + U + <-4>
+ Otilde: index 2 discriminant True lines 1 planes 1 (2.1 s)
+  distinct keys over the line row: 1 of 1
+  a plane's generator: key names 1 cusp(s), the witness search finds 1, the same one True
+    separated from every other cusp: True
+  a plane's sum: key names 1 cusp(s), the witness search finds 1, the same one True
+    separated from every other cusp: True
+ Otilde+: index 4 discriminant True lines 1 planes 1 (1.3 s)
+  distinct keys over the line row: 1 of 1
+  a plane's generator: key names 1 cusp(s), the witness search finds 1, the same one True
+    separated from every other cusp: True
+  a plane's sum: key names 1 cusp(s), the witness search finds 1, the same one True
+    separated from every other cusp: True
+elapsed 25.3 s
+[peakrss] probe-small-key: child waited=0 shell_code=0 samples=15
+[peakrss] peak tree RSS      : 605 MiB
+[peakrss] low-water MemAvail : 11905 MiB
+[peakrss] peak single VmHWM  : 605 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      594 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    28.0s procs=  3 rss=   605 MiB hwm=   605 MiB avail= 11905 MiB
+[peakrss]   t=    26.0s procs=  3 rss=   602 MiB hwm=   602 MiB avail= 11915 MiB
+[peakrss]   t=    24.0s procs=  3 rss=   589 MiB hwm=   589 MiB avail= 12042 MiB
+[peakrss]   t=    22.0s procs=  3 rss=   575 MiB hwm=   575 MiB avail= 12200 MiB
+[peakrss]   t=    20.0s procs=  3 rss=   565 MiB hwm=   565 MiB avail= 12318 MiB
+# launcher exit: 0

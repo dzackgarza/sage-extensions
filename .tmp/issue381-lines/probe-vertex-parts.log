@@ -1,0 +1,36 @@
+# tree: 0e5ac18feb2de5b396da109b2df6367951f63610
+# tree status: 
+# load: 1.91 1.69 1.34
+# program: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/wt381v/.tmp/issue381-lines/probe-381-vertex-parts.py
+[rss] t=    0.0s rss=    97.1 MiB
+        0.03 s  lattice  rss   270.4 MiB
+[rss] t=   10.0s rss=   478.6 MiB
+[rss] t=   20.0s rss=   524.1 MiB
+[rss] t=   30.0s rss=   552.9 MiB
+[rss] t=   40.1s rss=   579.2 MiB
+[rss] t=   50.1s rss=   587.9 MiB
+[rss] t=   60.1s rss=   593.3 MiB
+       68.47 s  Otilde and its quotient, index 46998591897600  rss   598.5 MiB
+        0.02 s  one plane and two of its lines: a generator and the sum  rss   598.7 MiB
+    one finite-image key of a line                           4.007 ms per call
+    one finite-image key of the other line                   4.327 ms per call
+    the two lines carry the same key: False
+    one witness question at a cusp the line is in            9.711 ms per call
+    one witness question at a cusp the line is not in        8.343 ms per call
+    one separation question at that other cusp               8.284 ms per call
+        0.34 s  the parts  rss   599.8 MiB
+    peak rss   599.8 MiB, elapsed    70.0 s
+[peakrss] probe-vertex-parts: child waited=0 shell_code=0 samples=37
+[peakrss] peak tree RSS      : 612 MiB
+[peakrss] low-water MemAvail : 10122 MiB
+[peakrss] peak single VmHWM  : 612 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      600 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    72.0s procs=  3 rss=   612 MiB hwm=   612 MiB avail= 10809 MiB
+[peakrss]   t=    70.0s procs=  3 rss=   609 MiB hwm=   609 MiB avail= 10827 MiB
+[peakrss]   t=    68.0s procs=  3 rss=   608 MiB hwm=   608 MiB avail= 10122 MiB
+[peakrss]   t=    66.0s procs=  3 rss=   607 MiB hwm=   607 MiB avail= 10127 MiB
+[peakrss]   t=    64.0s procs=  3 rss=   606 MiB hwm=   606 MiB avail= 10127 MiB
+# launcher exit: 0

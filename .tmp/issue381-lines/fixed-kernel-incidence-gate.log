@@ -1,0 +1,9 @@
+# tree: 111e32f492d00dd1eebf9982d6fc1a3b156349f7
+# tree status:  M src/sage_extensions/categories/group/predicate_subgroups.py  M src/sage_extensions/categories/orthogonal_quotients.py 
+# load: 1.36 1.53 1.23
+# command: pytest -o addopts= -p qc_sage_session -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint -q tests/lattices/test_the_kernel_incidence_rows.sage
+..                                                                       [100%]
+========================== test-call performance gate ==========================
+tests/lattices/test_the_kernel_incidence_rows.sage::test_u_u_m4_kernel_rows_join_lines_to_their_planes: 46.16 s > 20 s
+2 passed in 62.03s (0:01:02)
+# launcher exit: 1
