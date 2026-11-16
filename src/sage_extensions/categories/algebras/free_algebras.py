@@ -968,7 +968,6 @@ class _PresentedAlgebraParent(_OwnedAlgebraParent):
             self,
             presentation_ring,
             selected_relations,
-            presentation_ideal,
             lift_to_presentation,
             presentation_cover_map=self._presentation_cover_map,
         )
@@ -1554,34 +1553,28 @@ def _finitely_presented_algebra_from_data(
     )
 
 
-def _fix_free_algebra_presentation(
-    algebra, labels, generator_morphism, augmentation
-) -> None:
+def _fix_free_algebra_presentation(algebra) -> None:
     r"""Fix the chosen finite presentation of an algebra free on its own frame.
 
     An algebra free on a finite set ``S`` is presented by ``S`` and no
     relations: its framing ``Free(S) -> A`` is an isomorphism, so the
     presentation ring is the algebra itself, the relation family is empty, and
-    the quotient map is the augmentation of that framing.  The label set, the
-    generator morphism ``S -> A`` and the factory for the augmentation are the
-    framing the constructor has just fixed for this algebra; passing them on
-    fixes the presentation with the framing it is made of, at construction, so
-    no accessor installs it later (``OWN-17``) and nothing realizes the
-    framing to read it back (``OWN-23``).
+    the quotient map -- which for a free algebra is its identity -- is the
+    augmentation of that framing.  Those are the framing's own data, fixed at
+    construction; this states the presentation they describe, so an accessor
+    learns nothing the construction did not already fix (``OWN-17``) and the
+    resolution it registers is a realization of that framing (``OWN-23``).
     """
     relations = indexed_family(
         finite_ordered_set(()),
         lambda index: algebra.zero(),
         name="Defining relation family",
     )
-    presentation_ideal, selected_relations = _relations_to_ideal(algebra, relations)
     _fix_selected_algebra_presentation(
         algebra,
         algebra,
-        selected_relations,
-        presentation_ideal,
+        relations,
         lambda element: algebra(element),
-        framing=(labels, generator_morphism, augmentation),
     )
 
 
@@ -1689,25 +1682,37 @@ class FreeAlgebras(OwnedCategoryOverBaseRing):
         ``FOUNDATIONS.md``, Definition 75.1, stated there for modules and
         here in the associative or commutative theory the free algebra is
         free in).  So every object of this category is an algebra with that
-        chosen finite presentation.  The presentation is its own frame:
-        :func:`_fix_free_algebra_presentation` fixes it when the algebra's
-        framing is fixed, and ``AlgebrasWithChosenFinitePresentation``
-        derives the presentation ring, the relation family, the quotient map
-        and the lift from it.
+        chosen finite presentation: :meth:`selected_algebra_presentation`
+        states it on the frame the construction fixed, and
+        ``AlgebrasWithChosenFinitePresentation`` derives the presentation
+        ring, the relation family, the quotient map and the lift from it.
 
         This category precedes both ``FreeAlgebras(R)`` and
         ``AlgebrasWithChosenFinitePresentation(R)`` in an object's parent
         class, so the operations the two define alike are answered here.  The
         algebra Mor class is one of them: an arrow out of a free algebra is
         any map on its generators, which is the free universal property and
-        not a presentation descent, and leaving the choice to those two
-        supercategories made it depend on the order a session built them.
+        not a presentation descent.
         """
 
         def extra_super_categories(self):
             return [AlgebrasWithChosenFinitePresentation(self.base_ring())]
 
         class ParentMethods:
+            @cached_method
+            def selected_algebra_presentation(self):
+                r"""Return the chosen finite presentation the frame fixes.
+
+                The frame is the presentation read in degree zero: this algebra,
+                free on its chosen generators, with no relations.  It is fixed
+                when the algebra is constructed, so stating the presentation
+                here realizes that one datum and selects no new framing
+                (``OWN-23``); an algebra that already realized it answers with
+                the same presentation.
+                """
+                _fix_free_algebra_presentation(self)
+                return self.selected_algebra_resolution()
+
             def _algebra_mor_class(self):
                 return FramedFreeAlgebraMor
 
