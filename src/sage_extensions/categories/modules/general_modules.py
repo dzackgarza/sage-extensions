@@ -99,18 +99,20 @@ class GeneralModules(OwnedCategoryOverBaseRing):
 
             A general module is an abelian group with a ring acting on it, so
             two elements of one module are equal exactly when the underlying
-            elements are, and the module is retained beside that element: the
-            equal pairs of one module never cross into another, and the
-            underlying element is what equality reads.  A class whose
-            underlying equality is a decision may name no hashable datum --
-            a Cartier section presented by local equations, for instance --
-            and then the module alone is what a hash can read, which is the
-            coarser invariant :class:`Sets` allows.
+            elements are, and the underlying element is what equality reads.
+            The module itself is no part of that answer: two elements of
+            different modules may carry equal group elements and are unequal
+            then, and unequal objects may share a hash, so nothing is owed the
+            module here.
+
+            A group element that refuses a hash -- a mutable vector, say --
+            makes this element refuse one too, which is the rule of
+            :class:`FiniteOrderedSets` for a point that refuses a hash: such a
+            point is mutable or its owner computes no hash for it, and the
+            point becomes the tuple, or the vector after ``set_immutable()``,
+            before it is a point of a set.
             """
-            try:
-                return hash((id(self.parent()), self.underlying_element()))
-            except TypeError:
-                return hash(id(self.parent()))
+            return hash(self.underlying_element())
 
         def _repr_(self):
             return repr(self.underlying_element())
