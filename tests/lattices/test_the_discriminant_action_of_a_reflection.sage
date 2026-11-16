@@ -109,3 +109,64 @@ def test_the_discriminant_actions_of_the_roots_the_walk_asks_about() -> None:
     )
     assert cardinal(sum(1 for _ in actions)) == cardinal(156)
     assert all(action * action == one for action in actions)
+
+
+def test_the_action_of_a_reflection_is_written_before_its_maps_are_presented() -> None:
+    r"""The action is the reflection's matrix, and its two module maps are deferred.
+
+    A class of \(A_L\) moves by the dual action of the reflection's own matrix,
+    so writing that action down is one inverse and two products of the
+    lattice's framing matrices.  The element it produces is a form automorphism
+    of the discriminant form, and such an automorphism also states two
+    presented module maps; those are the transport of the same matrix through
+    the normalization, which is what the module route states per element, and
+    an element built to answer one matrix question does not need them
+    (``AGENTS.md``, "Construction is instant; checking is asked for").
+
+    ``presentations_built_by`` counts the transports: none during the
+    construction, at least one on the first request for the forward arrow, and
+    the arrow that request produced is the one every later request answers with
+    (``OWN-22``, one datum per computation).
+    """
+    lattice, transported = _first_cusp()
+    K = HyperbolicLattices(ZZ)(lattice)
+    rho = K.discriminant_representation()
+
+    image, constructed, requested = presentations_built_by(
+        lambda: rho(K.reflection(transported[0])),
+        lambda action: action.forward(),
+    )
+
+    assert constructed == 0
+    assert requested > 0
+    assert image.forward() is image.forward()
+
+
+def test_the_matrix_derived_action_is_the_module_routes_action_on_every_generator() -> None:
+    r"""The dual action of a reflection on the discriminant classes, computed two ways.
+
+    ``rho`` writes a reflection's action out of its matrix; the module route
+    presents the discriminant form's maps and transport the engine element
+    through the normalization (:meth:`LatticeMor.discriminant_isometry`).  The
+    two are different computations of one action, and a wrong frame, a missing
+    inverse or a transposed action is a disagreement on a class of \(A_L\).
+    The classes tested are the framing generators of the form and their sum,
+    which determine a homomorphism on the whole discriminant group.
+    """
+    lattice, transported = _first_cusp()
+    K = HyperbolicLattices(ZZ)(lattice)
+    form = K.discriminant_group()
+    group = form.orthogonal_group()
+    rho = K.discriminant_representation()
+    reflection = K.reflection(transported[0])
+    labels = tuple(form.module_generating_set())
+    classes = tuple(form.module_generator(label) for label in labels) + (
+        sum(form.module_generator(label) for label in labels),
+    )
+    matrix_route = rho(reflection)
+    module_route = group.from_morphism(reflection.discriminant_isometry())
+
+    assert cardinal(sum(1 for _ in classes)) == cardinal(sum(1 for _ in labels)) + 1
+    assert tuple(matrix_route(point) for point in classes) == tuple(
+        module_route(point) for point in classes
+    )

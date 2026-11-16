@@ -134,3 +134,41 @@ def built_without_display(named, action):
 
 
 builtins.built_without_display = built_without_display
+
+
+def presentations_built_by(construction, request):
+    r"""Return ``(value, presentations the construction built, the request's)``.
+
+    A finite form's automorphism is built from the engine's matrix and states
+    its two presented module maps as computations, asked for on the first
+    request that needs one: a construction that presents them has computed two
+    morphisms nobody asked for, which is the cost a matrix question must not
+    carry.  The presentation is ``_transported_map``, the transport of the
+    matrix back through the form's normalization, so counting it counts the
+    presentations.
+
+    The request runs inside the same patch, so a test can assert that the
+    instrument is live: a first request that presents nothing leaves the
+    construction's own count unfalsified.
+    """
+    from sage_extensions.categories.modules.framed.formed.torsion_form_modules import (
+        TorsionFormOrthogonalGroup,
+    )
+
+    presented = []
+    original = TorsionFormOrthogonalGroup._transported_map
+
+    def counted(self, engine_automorphism):
+        presented.append(1)
+        return original(self, engine_automorphism)
+
+    with pytest.MonkeyPatch.context() as patch:
+        patch.setattr(TorsionFormOrthogonalGroup, "_transported_map", counted)
+        value = construction()
+        during_construction = len(presented)
+        request(value)
+        during_request = len(presented) - during_construction
+    return value, during_construction, during_request
+
+
+builtins.presentations_built_by = presentations_built_by
