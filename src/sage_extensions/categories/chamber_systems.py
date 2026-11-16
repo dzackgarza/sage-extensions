@@ -17,7 +17,7 @@ from sage_extensions.categories.abstract_categories.mor_categories import (
 from sage_extensions.categories.abstract_categories.objects import OwnedCategory
 from sage_extensions.categories.sets.finite_ordered_sets import finite_ordered_set
 from sage_extensions.categories.sets.set_categories import Sets
-from sage_extensions.logic import negation
+from sage_extensions.logic import conjunction, negation
 from sage_extensions.owned_category import _object_of
 from sage_extensions.categories.abstract_categories.mor_foundation import object_level
 
@@ -78,9 +78,22 @@ class ChamberSystemMorphism:
         )
 
     def __eq__(self, other):
+        r"""Two chamber-system morphisms of one hom-set agree at every chamber.
+
+        The domain's chambers are a finite ordered set, which is the enumeration
+        the chamber-system engine keeps, so agreement is the conjunction of the
+        values at them.  Asking the retained set maps instead leaves the
+        question to :class:`Sets`, which decides a map only on a domain that is
+        an enumerated set, and a chamber system is a facade set of its chambers
+        that does not declare that enumeration on the set level.
+        """
         if element_parent(other) is not self.parent():
             return False
-        return other.underlying_set_morphism() == self.underlying_set_morphism()
+        if self is other:
+            return True
+        return conjunction(
+            self(chamber) == other(chamber) for chamber in self.parent().domain()
+        )
 
     def __ne__(self, other):
         return negation(self == other)
