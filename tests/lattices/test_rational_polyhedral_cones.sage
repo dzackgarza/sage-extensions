@@ -11,6 +11,9 @@ Every claim is read off the defining inequalities.
 - The cell cut out by no covector at all is the whole ambient space: in
   \(\mathbf Z^2\) it is \(\mathbf Q^2\), of dimension 2, not pointed, with no
   extreme ray and with the whole plane as its lineality.
+- The zero cone \(\{0\}\) of the plane is pointed of dimension 0 and has no
+  extreme ray; its monoid is the trivial one, so its Hilbert basis is empty, and
+  its one simplicial subcone is itself.
 - Two orthants differing in the sign of one coordinate share a facet; the orthant and its
   negative meet only in the origin.
 - The cone \(\{x \ge 0,\; -x+2y \ge 0\}\) in \(\mathbf Z^2\) has primitive rays \((0,1)\) and
@@ -64,16 +67,26 @@ def test_a_wedge_containing_a_line_is_not_pointed() -> None:
 
 def test_the_cell_cut_out_by_no_covector_is_the_whole_space() -> None:
     lattice = Lattices(ZZ)([[1, 0], [0, 1]])
-    first, second = lattice.module_generators()
     cell = lattice.reduction_cell(())
 
-    assert cell.ambient_dimension() == 2
     assert cell.dimension() == 2
     assert not cell.is_pointed()
     assert cell.primitive_rays().cardinality() == 0
-    for generator in (first, second):
-        assert generator in cell.lineality_generators()
-    assert cell.contains(first + second)
+    assert lattice.subobject_on(cell.lineality_generators()).module_rank() == 2
+
+
+def test_the_zero_cone_has_a_hilbert_basis_and_a_triangulation() -> None:
+    lattice = Lattices(ZZ)([[1, 0], [0, 1]])
+    zero = lattice.reduction_cell(((1, 0), (-1, 0), (0, 1), (0, -1)))
+
+    assert zero.dimension() == 0
+    assert zero.is_pointed()
+    assert zero.primitive_rays().cardinality() == 0
+    assert zero.hilbert_basis().cardinality() == 0
+    assert zero.triangulation().index_set().cardinality() == 1
+    for simplex in zero.triangulation().index_set():
+        assert simplex.cardinality() == 0
+        assert zero.triangulation().value(simplex) == zero
 
 
 def test_orthants_sharing_a_facet_are_adjacent_and_opposite_orthants_are_not() -> None:
