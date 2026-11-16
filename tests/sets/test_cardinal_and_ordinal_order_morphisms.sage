@@ -13,6 +13,8 @@ are the definitions of the operations on order types.
 
 from sage_extensions.all import *  # noqa: F401,F403
 
+import pytest
+
 
 def test_comparisons_of_cardinals_compose_and_are_carried_by_the_arithmetic() -> None:
     cardinals = Cardinalities()
@@ -141,7 +143,14 @@ def test_infinite_well_order_type_uses_its_core_isomorphism() -> None:
     assert order_type(selected_isomorphism).is_identity()
 
 
-def test_nonidentity_well_order_maps_compose_with_exact_endpoints() -> None:
+@pytest.fixture
+def checking_flag():
+    previous = strict_checking()
+    yield strict_checking
+    strict_checking(previous)
+
+
+def test_nonidentity_well_order_maps_compose_with_exact_endpoints(checking_flag) -> None:
     well_orders = WellOrderedSets()
     source = Sets.Δ[1]
     target = Sets.Δ[2]
@@ -152,12 +161,21 @@ def test_nonidentity_well_order_maps_compose_with_exact_endpoints() -> None:
     assert composite.underlying_set_morphism().domain() is source
     assert composite.underlying_set_morphism().codomain() is target
     assert tuple(int(composite(point)) for point in source) == (2, 2)
-    try:
-        well_orders.Mor(target, target)(lambda point: target(2 - int(point)))
-    except ValueError:
-        pass
-    else:
-        raise AssertionError("an order-reversing map was admitted to well-ordered Mor")
+
+    # $p \mapsto 2 - p$ reverses $0 < 1 < 2$, so it is no arrow of the ordered
+    # category.  Construction retains the datum and the arrow's own validator
+    # decides the law; under the session's strict flag construction checks it.
+    reversal = lambda point: target(2 - int(point))
+    checking_flag(False)
+    declared = well_orders.Mor(target, target)(reversal)
+    with pytest.raises(ValueError):
+        declared.validate_order_preservation()
+    checking_flag(True)
+    with pytest.raises(ValueError):
+        well_orders.Mor(target, target)(reversal)
+    assert well_orders.Mor(target, target)(
+        lambda point: target(min(2, int(point) + 1))
+    ) == shift
 
 
 def test_finite_ordered_set_operations_retain_selected_well_orders() -> None:
