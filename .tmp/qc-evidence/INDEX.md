@@ -3034,3 +3034,13 @@ so the evidence covers the pushed code and not only the pre-rebase tree.
 | `556r2-green-nine-at-89d0b4b.log` | `89d0b4b`, clean tree (the rebased tip) | the four files of the subject: **9 passed in 2.61 s** |
 | `556r2-consumers-green-at-89d0b4b.log` | `89d0b4b`, clean tree | the seven consumer files: **26 passed in 18.34 s** |
 | `556r2-probe-six-at-89d0b4b.log` | `89d0b4b`, clean tree | the six findings' probe: the same answers as `556r2-probe-six-at-76851e6.log`, including 0 engine conjugations forming a conjugate and 1 on the first request for its order, and both construction data read as required |
+
+`main` moved twice more while this round was being pushed, and the round was
+rebased each time; the ids in the two notes above are the ids of the
+`eb5baa8`-based history.  The pushed history is `2492647` (the reds' tests),
+`c591644` (the repair), `71189dd` (the two tests the review's semantics
+supersede), `2a15d9f` and `cf6ba0b` (these two notes).  The runs that cite
+`89d0b4b` are runs on a tree whose `src/sage_extensions/categories/group` and
+`tests/groups` are byte-identical to the pushed tip's (`git diff --stat
+89d0b4b cf6ba0b -- src/sage_extensions/categories/group tests/groups` is
+empty), so they cover the code that was pushed.
