@@ -7,8 +7,6 @@ the functions below and every backend value is crossed back before return.
 
 from __future__ import annotations
 
-from functools import cache
-from importlib import import_module
 from typing import cast
 
 from sage.structure.element import parent as element_parent
@@ -134,9 +132,12 @@ _IMPORTS = {
     name: f"from sage_extensions.language_runtime import {name}" for name in _RUNTIME
 }
 # The modules whose star import is the complete session.  A file that writes
-# ``from <module> import *`` binds the names that module publishes, and the
-# lowering below keeps a subscript ordinary when its index is one of them.
-_SESSION_MODULES: frozenset[str] = frozenset({"sage_extensions.all"})
+# ``from <module> import *`` binds the names that module publishes: names the
+# parse cannot see, which is why the lowering below declines to read a subscript
+# index as a name the file does not bind.  The session's own module is named here
+# rather than registered by itself, because a file can be lowered before anything
+# has imported the session, and its star import must be read the same way then.
+_SESSION_MODULES: set[str] = {"sage_extensions.all"}
 _RESEARCH_ASSIGNMENT = _RESEARCH_EXTENSION["assignment"]
 
 
@@ -146,67 +147,45 @@ def _root(node: Node) -> Node:
     return node
 
 
-def _session_star_import(node: Node, context: Context) -> str | None:
-    r"""The session module whose ``import *`` the file holding ``node`` writes."""
+def _has_session_star_import(node: Node, context: Context) -> bool:
+    r"""Whether this source imports the complete session."""
     stack = [_root(node)]
-    expected = {f"from{module}import*": module for module in _SESSION_MODULES}
+    expected = {f"from{module}import*" for module in _SESSION_MODULES}
     while stack:
         current = stack.pop()
         if current.type == "import_from_statement":
             written = "".join(context.text(current).split())
             if written in expected:
-                return expected[written]
+                return True
         stack.extend(current.children)
-    return None
-
-
-@cache
-def _session_names(module: str) -> frozenset[str]:
-    r"""The names ``from <module> import *`` binds: that module's public namespace.
-
-    The statement's own definition: ``import *`` binds the module's ``__all__``
-    when it declares one and every name not starting with an underscore when it
-    does not, which is the same set a reader of the module resolves.  The
-    session's names are therefore read from the session module, never handed to
-    this one to hold: a caller that passed its ``globals()`` here would put the
-    names of a module into a table this module owns, and the module's namespace
-    would then depend on when it imported.
-
-    A module's public namespace is fixed once its import returns, and
-    ``import_module`` returns only a module whose body has finished, so the set
-    is read once per module and every later assignment in every file that
-    star-imports it compares against the same frozen set.
-    """
-    return frozenset(
-        name
-        for name in vars(import_module(module))
-        if not name.startswith("_")
-    )
-
-
-def _assignment_uses_session_name(node: Node, context: Context, module: str) -> bool:
-    right = node.child_by_field_name("right")
-    if right is None or right.type != "subscript":
-        return False
-    names = _session_names(module)
-    return any(
-        child.type == "identifier" and context.text(child) in names
-        for child in right.children_by_field_name("subscript")
-    )
+    return False
 
 
 def _lower_session_assignment(node: Node, context: Context) -> str | None:
-    """Keep a subscript ordinary when its index comes from the session star import.
+    r"""Decline the generator reading in a file that imports the session.
 
-    The upstream research dialect interprets R = A[x] as a generator
-    declaration when x is unbound in the file. A star import binds names at
-    runtime but contributes no identifier nodes to that static bound-name
-    scan. The session module owns exactly which names its star import supplies,
-    so it resolves that one missing binding fact here. Every other assignment is
-    delegated unchanged to the upstream research lowering.
+    The upstream research dialect reads ``R = A[x]`` as a generator declaration
+    when the file binds ``x`` nowhere.  A star import contributes no identifier
+    node to that static scan, so in a file that writes
+    ``from sage_extensions.all import *`` the premise is not established: the
+    index may be a name the session supplies.  Which names those are is the
+    session's own declaration, and this module keeps no copy of it.  A copy would
+    be a second list of the session's exports to keep in step with the first, and
+    reading the session's namespace to recover the set would make the parser
+    depend on the module it is parsing, and on how far that module's import had
+    got when the parse ran.
+
+    So the lowering declines, and the assignment keeps the meaning it is written
+    with.  A name the file binds nowhere stays the ``NameError`` Sage's own
+    reading gives it.  A name the session supplies stays the object it names:
+    ``Sets.Δ[aleph0]`` is the set of cardinality ``aleph0``, where the reading
+    this replaces would have rebuilt ``aleph0`` as a generator of the set
+    construction.  Generators are declared where a file declares them --
+    ``R.<x> = A[x]`` is a ``sage_generator_assignment``, not an assignment, so
+    this rule does not reach it.  Every other assignment is delegated unchanged
+    to the upstream research lowering.
     """
-    module = _session_star_import(node, context)
-    if module is not None and _assignment_uses_session_name(node, context, module):
+    if _has_session_star_import(node, context):
         return splice(node, context)
     return _RESEARCH_ASSIGNMENT(node, context)
 
@@ -219,4 +198,16 @@ _EXTENSION = {"assignment": _lower_session_assignment}
 # module does, not a step a caller performs on it.
 register_extension(_EXTENSION, runtime=_RUNTIME, imports=_IMPORTS)
 
-__all__ = tuple(_RUNTIME)
+
+def register_session_module(module: str) -> None:
+    r"""Treat ``from <module> import *`` as importing the complete session.
+
+    A package that re-exports the session under another name says so once, here,
+    and the files that star-import it are read the way a file that star-imports
+    ``sage_extensions.all`` is: the names it binds are the session's, and no
+    subscript index in one of its files is taken for a name it does not bind.
+    """
+    _SESSION_MODULES.add(module)
+
+
+__all__ = tuple(_RUNTIME) + ("register_session_module",)
