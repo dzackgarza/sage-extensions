@@ -240,15 +240,24 @@ def _is_group_algebra(ring) -> bool:
     Read off the ring's own category: constructing ``GroupAlgebras(R)`` to
     ask would need ``Modules(R)``, which may be the category being built.
     """
-    from sage_extensions.categories.algebras.group_algebras import GroupAlgebras
-
     if ring not in OwnedRings():
         return False
-    # Sage realizes each category instance in a dynamic subclass, so the
-    # placement is recognized by its category class, not by identity.
+    return _is_group_algebra_category(ring.category())
+
+
+@functools.cache
+def _is_group_algebra_category(category) -> bool:
+    r"""Whether ``category`` lies in a ``GroupAlgebras`` placement, decided once per category.
+
+    Sage realizes each category instance in a dynamic subclass, so the
+    placement is recognized by its category class, not by identity.
+    Categories are unique objects, so the answer is a function of the category.
+    """
+    from sage_extensions.categories.algebras.group_algebras import GroupAlgebras
+
     return any(
         isinstance(placement, GroupAlgebras)
-        for placement in ring.category().all_super_categories(proper=False)
+        for placement in category.all_super_categories(proper=False)
     )
 
 

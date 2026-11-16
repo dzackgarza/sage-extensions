@@ -1190,7 +1190,9 @@ def _engine_component_matrix(value):
             _linear_algebra_ring(ring),
             rows,
             columns,
-            [_linear_algebra_element(ring, value[i, j]) for i in range(rows) for j in range(columns)],
+            # The flat components are in tensor-index order, which for two
+            # indices is the row-major order of the matrix.
+            [_linear_algebra_element(ring, entry) for entry in value._flat_components()],
         )
         retained.set_immutable()
         value.__dict__["_engine_component_matrix"] = retained

@@ -3,6 +3,7 @@ r"""A represented category ``Cat`` of categories, functors, and natural transfor
 from __future__ import annotations
 
 from collections.abc import Iterable
+from functools import cache
 from typing import TYPE_CHECKING, Any
 
 from sage.categories.category import Category
@@ -1172,38 +1173,7 @@ class Cat(CategoryPacketMethods, Category):
         this meet and ``A | B`` is the join below -- and only the two names
         are inverted.
         """
-        members = tuple(categories)
-        assert members, (
-            "the meet of categories needs at least one category, but none was given"
-        )
-
-        # ``Category.join`` builds one dynamic class from every supplied
-        # branch.  A strict supercategory contributes no new mathematics to
-        # an intersection once one of its subcategories is already present,
-        # and retaining both can make Sage linearize the same inherited
-        # method provider twice.  Determine that redundancy only from the
-        # declared category ancestry.  Calling ``is_subcategory`` here can
-        # force ``parent_class`` construction while this meet is itself still
-        # assembling those implementation classes, making the redundancy
-        # check circular.  A relation known only through a runtime hook is
-        # therefore conservatively left unpruned.
-        reduced = []
-        for member in members:
-            if any(
-                other is not member
-                and member in other._set_of_super_categories
-                and other not in member._set_of_super_categories
-                for other in members
-            ):
-                continue
-            if all(member is not known for known in reduced):
-                reduced.append(member)
-
-        if len(reduced) == 1:
-            return reduced[0]
-        from sage_extensions.owned_category import owned_category_join
-
-        return owned_category_join(tuple(reduced))
+        return _meet_of_tuple(tuple(categories))
 
     def join(self, categories: Iterable[Category]) -> Category:
         r"""Return the smallest category containing all of ``categories``.
@@ -1948,3 +1918,44 @@ __all__ = [
     "NaturalTransformationMor",
     "NaturalTransformationMorphism",
 ]
+
+
+@cache
+def _meet_of_tuple(categories: tuple[Category, ...]) -> Category:
+    r"""The meet of a tuple of categories, computed once per tuple.
+
+    Categories are unique objects, so the meet is a function of the tuple,
+    as ``_owned_category_join`` is of its tuple.
+    """
+    members = categories
+    assert members, (
+        "the meet of categories needs at least one category, but none was given"
+    )
+
+    # ``Category.join`` builds one dynamic class from every supplied
+    # branch.  A strict supercategory contributes no new mathematics to
+    # an intersection once one of its subcategories is already present,
+    # and retaining both can make Sage linearize the same inherited
+    # method provider twice.  Determine that redundancy only from the
+    # declared category ancestry.  Calling ``is_subcategory`` here can
+    # force ``parent_class`` construction while this meet is itself still
+    # assembling those implementation classes, making the redundancy
+    # check circular.  A relation known only through a runtime hook is
+    # therefore conservatively left unpruned.
+    reduced = []
+    for member in members:
+        if any(
+            other is not member
+            and member in other._set_of_super_categories
+            and other not in member._set_of_super_categories
+            for other in members
+        ):
+            continue
+        if all(member is not known for known in reduced):
+            reduced.append(member)
+
+    if len(reduced) == 1:
+        return reduced[0]
+    from sage_extensions.owned_category import owned_category_join
+
+    return owned_category_join(tuple(reduced))
