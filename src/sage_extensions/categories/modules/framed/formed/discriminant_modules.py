@@ -364,6 +364,34 @@ class DiscriminantQuadraticModules(OwnedCategoryOverBaseRing):
             return self._preamble_quadratic_value_module
 
         @cached_method
+        def has_integral_doubled_polar_form(self) -> bool:
+            r"""Whether ``2b`` is integer-valued on this module.
+
+            ``b`` is the polar pairing of ``q``, ``q(a + a') = q(a) +
+            q(a') + 2b(a, a')``, so ``q`` modulo the integers is a
+            homomorphism ``A -> QQ/ZZ`` exactly when ``2b`` is integer-valued,
+            and ``b`` is nondegenerate on a discriminant module, so a
+            characteristic class exists exactly on those modules.
+
+            The pairings of the module's generating classes with each other
+            are the values of the chosen bilinear lift ``G`` on that family --
+            ``G`` is the datum the quadratic classifier was constructed with,
+            and ``G(s, s) = q(s)`` -- so they are read as the one family the
+            value module already carries, and not as one ``b`` evaluation per
+            pair of classes (`OWN-24`).  Doubling a lift value is well defined
+            modulo the value module's integers, so the decision is whether
+            those doubled values lie in the base ring.
+
+            This is a datum of the module: it is decided on the first request
+            and every class that asks whether it is characteristic reuses it.
+            """
+            integers = self.base_ring()
+            return all(
+                2 * lifted.lift() in integers
+                for lifted in self.form().lift_coordinate_values()
+            )
+
+        @cached_method
         def isotropic_subgroups(self):
             r"""Return all subgroups on which ``q`` vanishes identically."""
             return _isotropic_subgroups(self, quadratic=True)
@@ -514,39 +542,32 @@ class DiscriminantQuadraticModules(OwnedCategoryOverBaseRing):
             quotient value modules), that ``an element x of A is called
             characteristic if b(x, a) = q(a) (mod 1) for all a of A``.
 
-            The class is decided on a generating set of classes.  ``q`` is the
-            descended norm and ``b`` its polar pairing, so ``q(x + y) = q(x) +
-            q(y) + 2b(x, y)``: ``b(v, .)`` modulo ``1`` is a homomorphism
-            ``A -> Q/Z`` always, and ``q`` modulo ``1`` is one exactly when
-            ``2b`` is integer-valued.  Two homomorphisms agreeing on a
-            generating set agree everywhere, so a class of a module with
-            integer-valued ``2b`` is characteristic exactly when it pairs with
-            each generating class as ``q`` does.  When ``2b`` is not
-            integer-valued no class is characteristic: a characteristic ``v``
-            would make ``q`` modulo ``1`` equal the homomorphism ``b(v, .)``
-            modulo ``1``, which is integer-valued on the diagonal.
+            The class is decided on the module's generating classes.
+            ``has_integral_doubled_polar_form`` decides whether ``2b`` is
+            integer-valued, without which no class is characteristic; on a
+            module where it is, ``q`` modulo the integers is a homomorphism, as
+            is ``b(v, .)``, so two of them that agree on a generating set agree
+            everywhere.  The values compared are the chosen bilinear lift's:
+            ``G(s, s) = q(s)``, and ``G(s, v)`` modulo the integers is
+            ``b(s, v)``.  One call therefore costs two lift evaluations per
+            generating class -- its norm and its pairing with the class -- and
+            not one ``q`` and one ``b`` per class of the module.
 
-            The quadratic and bilinear values live in quotient value modules,
-            so the comparison is made on their selected rational lifts, and
-            the membership is asked of this module's own base ring: the lifts
-            are elements of the owned rational field, and the owned integers
-            coerce them, where the engine's own integer ring refuses a foreign
-            element outright and decides every class non-characteristic.
+            The lifts are elements of the owned rational field, and the owned
+            integers coerce them, where the engine's own integer ring refuses
+            a foreign element outright and decides every class
+            non-characteristic (#348).
             """
             parent = self.parent()
             integers = parent.base_ring()
-            generating_classes = tuple(parent.module_generators())
-            if not all(
-                2 * parent.b(left, right).lift() in integers
-                for left in generating_classes
-                for right in generating_classes
-            ):
+            if not parent.has_integral_doubled_polar_form():
                 return False
+            form = parent.form()
             return all(
-                parent.q(generating_class).lift()
-                - parent.b(generating_class, self).lift()
+                form.lift_pairing(generating_class, generating_class).lift()
+                - form.lift_pairing(generating_class, self).lift()
                 in integers
-                for generating_class in generating_classes
+                for generating_class in parent.module_generators()
             )
 
 
