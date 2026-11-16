@@ -612,9 +612,14 @@ def _filtered_vinal_class():
             ``VinAl``'s own, attribute for attribute.  The controlling
             vector may be omitted, in which case the engine's own
             ``NegativeVector`` picks one.
+
+            ``_initial_cone`` is this walk's record of the roots
+            :meth:`FundCone` wrote down, which are the normals of the cell at
+            the controlling vector: ``None`` until it has written them.
             """
             self._admits_root = admits_root
             self._cell = _NO_CELL
+            self._initial_cone = None
             self.output = output
             self.use_coxiter = use_coxiter
             self.M = M
@@ -721,15 +726,46 @@ def _filtered_vinal_class():
                     continue
                 yield root
 
+        def FundCone(self):
+            r"""Write down the roots through the controlling vector and record them as its cell.
+
+            Vinberg, *On the groups of unit elements of certain quadratic forms*,
+            Math. USSR Sb. 16 (1972), §3.2, rule 1 with (39) (p. 27): before the
+            sequence (38) starts, the normals are the roots whose mirrors pass
+            through the point \(p_0\), and the cell \(P_0\) at it is their
+            intersection.  The enumeration that writes them is the
+            whole-lattice search of the engine's ``FundCone``: the layer
+            enumeration of §4.1 (p. 30) is measured in the coordinates of that
+            same cell, so an enumeration restricted by a cell the walk has
+            already cut would be cutting the cell by itself.
+
+            This walk therefore forgets the cell it holds before it starts, and
+            records the cone it writes as the cell's normals: :meth:`cell`
+            answers from that record and not from ``roots``, which the walk
+            keeps growing as the sequence is written down.
+            """
+            self._initial_cone = None
+            self._cell = _NO_CELL
+            roots = super().FundCone()
+            self._initial_cone = tuple(roots)
+            return roots
+
         def cell(self):
             r"""Return the cell at the controlling vector, or ``None`` when it does not span.
 
             Vinberg 1972, §3.2, rule 1 and (39) (p. 27): before the sequence
             (38) starts, the normals are the roots whose mirrors pass through
             the point \(p_0\), and they cut the cell \(P_0\) at it.  Those are
-            the roots orthogonal to ``v0``, which is what ``FundCone``
-            returns and what ``roots`` holds when the candidate enumeration
-            begins.
+            the roots orthogonal to ``v0``, which is what :meth:`FundCone`
+            returns and what this walk records when it writes them down.
+
+            The walk answers ``None`` in two states, and they are not one state:
+            while it has written no root at all -- ``FundCone`` is cutting the
+            cell itself and asks the layer enumeration on the way, so there is
+            nothing to cut with and nothing to cache -- and once that cone has
+            no normal at ``v0``, where the walk has decided that the cone cuts
+            no cell.  The normals are the cone's roots and not ``roots``, which
+            the walk keeps growing as the sequence is written down.
 
             For the layer enumeration of §4.1 (p. 30) the normals of \(P_0\)
             are useful only when they span \(v_0^\perp\) up to one
@@ -761,10 +797,11 @@ def _filtered_vinal_class():
             """
             if self._cell is not _NO_CELL:
                 return self._cell
-            roots = getattr(self, "roots", None)
-            if not roots:
+            roots = self._initial_cone
+            if roots is None:
                 # ``FundCone`` is cutting the cell itself and asks the layer
-                # enumeration on the way; there is nothing to cache yet.
+                # enumeration on the way; the walk has written no root yet, so
+                # the cell is not cut and there is nothing to cache.
                 return None
             self._cell = None
             normals = tuple(root for root in roots if self.v0.inner_product(root) == 0)
