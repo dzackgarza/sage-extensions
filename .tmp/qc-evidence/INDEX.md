@@ -2678,17 +2678,17 @@ tree therefore names the commit before it.
 | `535-r3-probe-gate.log` | `2f8c801` | the gate the round inherits: on `U + U + <1>`, `U + U + <3>`, `U + U + <-1>` `is_even` is False, `hyperbolic_index` is 2 and `eichler_criterion_applies` is False, while `_two_hyperbolic_planes` is True -- and each of the three takes the single-sign-character certificate before the criterion's gate, so both gates answer `NOSPLIT` on them. Primitive isotropic vectors of `U^2 + M` have divisibility one and trivial divided class, so no specimen at this scale reaches the class machinery. |
 | `535-r3-probe-family.log` | `2f8c801` | the family the round inherits: `LK3` is `is_decomposable` True with 5 summands named `('U','U','U',None,None)`, the scrambled K3 is an `AtomicProposition` with **cardinality 1** and names `(None,)`, and the Gram graph of `LK3` cuts at `(2, 4, 6, 14)`. |
 | `535-r3-red-family.log` | `2f8c801` | the new family contract: **2 failed in 13.99 s** -- `A_1^4` in the basis `e_1+e_2, e_2+e_3, e_3+e_4, e_4` has `is_decomposable` undecided, and the scrambled K3 does **not** raise (`DID NOT RAISE ValueError`). |
-| `535-r3-fix-family.log` | the family's test commit + the repair | the family contract and the graph file: **8 passed in 10.88 s**. |
+| `535-r3-fix-family.log` | `d7cf36d` + the family repair | the family contract and the graph file: **8 passed in 10.88 s**. |
 | `535-r3-red-graph.log` | `4089966` | the graph owner's components with a loop present: **1 failed, 3 passed in 11.56 s**, `ValueError: cannot add edge from 0 to 0 in graph without loops`. |
-| `535-r3-red-blocks.log` | `2f8c801` + the round's test commits | the displayed-blocks contract: **2 failed in 8.08 s**, `AttributeError: no attribute 'inclusion'` -- the summands are fresh Gram lattices. |
-| `535-r3-fix-blocks.log` | the blocks' test commits + the repair | the blocks contract and the graph file: **6 passed, 2 failed in 20.65 s**; the two failures are the family contract above, repaired in the next commit. |
-| `535-r3-gate-tests.log` | the family's fix commit | the gate contract's tests, which have **no red state** (see the commit body): **10 passed in 54.30 s**. |
-| `535-r3-consumers.log` | the gate's test commit + the repair | the ten files that consume the change: **42 passed, 2 failed in 97.02 s**. Both failures are pre-existing and touch no changed API. |
-| `535-r3-base-preexisting.log` | `2f8c801` + the round's test commits | the same two files without these changes: **2 failed, 1 passed in 9.42 s**, the same two FAILED ids -- `(a1+a1).orthogonal_decomposition()` wants an `embeddings` argument and `a2.basis()` is not a lattice method. |
-| `535-r3-owner-contracts.log` | the gate's test commit + the repair | `tests/lattices/test_lattice_database_owner_contracts.sage`: **11 passed, 1 failed in 152.05 s**; the failure is `hyperbolic_partner` on the odd binary lattice `[[1,0],[0,-1]]`, inside the presented module's iteration. |
-| `535-r3-base-hyperbolic-partner.log` | `2f8c801` + the round's test commits | that test alone without these changes: **1 failed in 16.07 s**, the same id and the same frame. |
-| `535-r3-heavy-stable-line.log` | the gate's fix commit | the two stable-line-orbit row files, `U(2) + <-6>` and `T_Co`: **2 passed in 1073.83 s (0:17:53)**. |
-| `535-r3-lint.log` | the gate's fix commit | the test lint on the five touched test files: **5 files, 0 findings**. |
+| `535-r3-red-blocks.log` | `5ac7ea6` | the displayed-blocks contract: **2 failed in 8.08 s**, `AttributeError: no attribute 'inclusion'` -- the summands are fresh Gram lattices. |
+| `535-r3-fix-blocks.log` | `cc7b4f8` + the blocks repair | the blocks contract and the graph file: **6 passed, 2 failed in 20.65 s**; the two failures are the family contract above, repaired in the next commit. |
+| `535-r3-gate-tests.log` | `876c3f1` | the gate contract's tests, which have **no red state** (see the commit body): **10 passed in 54.30 s**. |
+| `535-r3-consumers.log` | `738ae71` + the gate repair | the ten files that consume the change: **42 passed, 2 failed in 97.02 s**. Both failures are pre-existing and touch no changed API. |
+| `535-r3-base-preexisting.log` | `5ac7ea6` | the same two files without these changes: **2 failed, 1 passed in 9.42 s**, the same two FAILED ids -- `(a1+a1).orthogonal_decomposition()` wants an `embeddings` argument and `a2.basis()` is not a lattice method. |
+| `535-r3-owner-contracts.log` | `738ae71` + the gate repair | `tests/lattices/test_lattice_database_owner_contracts.sage`: **11 passed, 1 failed in 152.05 s**; the failure is `hyperbolic_partner` on the odd binary lattice `[[1,0],[0,-1]]`, inside the presented module's iteration. |
+| `535-r3-base-hyperbolic-partner.log` | `5ac7ea6` | that test alone without these changes: **1 failed in 16.07 s**, the same id and the same frame. |
+| `535-r3-heavy-stable-line.log` | `1db98e4` | the two stable-line-orbit row files, `U(2) + <-6>` and `T_Co`: **2 passed in 1073.83 s (0:17:53)**. |
+| `535-r3-lint.log` | `1db98e4` | the test lint on the five touched test files: **5 files, 0 findings**. |
 | `535-r3-docs.log` | the docs commit | the four files the round's docstrings name, after the docstring pass: **14 passed in 51.27 s**. |
 
 The same runs on the commit this round pushed (`main` at `39c2bed`), after the last
@@ -3423,3 +3423,38 @@ The rebase onto `0130d81` after those runs, by `git patch-id --stable`:
 | `85607a3` | `d5f3459` |
 | `e3798e4` | `b2a935f` |
 | `cc44115` | `5b9b4db` |
+
+## Correction, 2026-11-16: the round-3 row trees, and its two runs over the limit
+
+A recorded run is a dated event and is not edited afterwards; this entry is
+appended, and it says what those rows record today.
+
+**The ten round-3 row trees stand as they were recorded.**  `1ef647a` replaced
+the commit id in the tree column of ten rows of the round-3 table with a
+description of the tree's role, because the rebase before it had
+re-identified those commits.  That rewrote the provenance of runs that had
+already been made, so those ten rows are restored to what they said, and the
+correspondence is stated here instead.  The recorded ids name the commits the
+runs were made on and are still in this repository; `git patch-id --stable`
+matches each to the commit now on `main` exactly:
+
+| recorded | the same commit on `main` | subject |
+| --- | --- | --- |
+| `5ac7ea6` | `ec79c25` | test: a Gram graph's components do not depend on its diagonal |
+| `d7cf36d` | `b5909fc` | fix: a displayed Gram matrix's blocks are the Gram graph's components, as sublattices |
+| `cc7b4f8` | `c6088d2` | test: the summand family is indexed by positions, not by a slice |
+| `876c3f1` | `009796b` | fix: one decision behind decomposability and its summand family |
+| `738ae71` | `11d60e5` | test: the criterion's hypothesis has two halves, and one name for the U-index |
+| `1db98e4` | `5923e43` | fix: Eichler's hypothesis has one gate, and the U-index one name |
+
+A row that names `5ac7ea6` therefore names the same tree as `ec79c25`, and so
+on down the table; a reader who wants the commit checks out the recorded id,
+which still resolves.
+
+**The two heavy runs are withdrawn.**  `535-r3-heavy-stable-line.log` records a
+command of **1073.83 s** and `535-r3-main-heavy.log` one of **1156.96 s**.  Both
+exceed the brief's ten-minute command limit, so neither is admissible evidence
+and neither is cited.  The files they ran are consumer files of the lattice
+row, whose runs belong to CI; the second log's own durations put its single
+`T_Co` test at 1134.98 s, so no admissible command reaches that file at all.
+Nothing in this issue's claims rests on either row.
