@@ -2456,31 +2456,61 @@ end
         return bool(libgap.IsNormal(self._gap_image(), self._gap_subgroup()))
 
     def register_isotropic_covering(self, plane, source, lift, flags) -> None:
-        r"""Record the covering ``flags`` of ``plane``, computed from ``source`` by ``lift``.
+        r"""Record the row's covering of ``source``, computed once at ``plane``.
 
-        ``source`` is the caller's token for the family the covering was
-        computed from -- an ambient flag, in the incidence -- and ``lift`` the
-        isometry that carried that source's plane onto ``plane``.  Both are
-        retained because a later plane's covering is this one carried there by
-        the composite of the two planes' lifts, and nothing else about the
-        covering is recomputed.
+        ``source`` is the caller's token for the family the covering covers --
+        the position of the ambient flag among the ambient flag row, in the
+        incidence -- ``plane`` the plane the covering was computed at, and
+        ``lift`` the registered isometry that carries ``source``'s plane onto
+        it.  One record per ``source`` is the whole row: the covering of every
+        other plane is this one carried there by the composite of the two
+        planes' registered lifts (:meth:`transport_covering`), so nothing about
+        the covering is recomputed at a second plane.
 
-        The record is keyed by the plane's span, as the transport registry is,
-        so an equal-but-distinct copy of a plane finds its covering.
+        The record retains the computed plane by span, as the transport
+        registry does, so an equal-but-distinct copy of that plane finds it.
         """
         from sage_extensions.categories.isotropic_orbits import _span_key
 
-        self.__dict__.setdefault("_isotropic_covering_registry", {})[
-            (_span_key(plane), source)
-        ] = (lift, tuple(flags))
+        self.__dict__.setdefault("_isotropic_covering_registry", {})[source] = (
+            plane,
+            _span_key(plane),
+            lift,
+            tuple(flags),
+        )
 
     def isotropic_covering_of(self, plane, source):
-        r"""The recorded ``(lift, flags)`` of ``plane``'s covering from ``source``, or ``None``."""
+        r"""``(lift, flags)``: the covering ``source``'s row computed *at* ``plane``, or ``None``.
+
+        A row computes one covering per source family and no more, so this
+        answers at the plane that computation happened at -- matched by span,
+        so an equal-but-distinct copy of the plane finds it -- and at no other
+        plane of the row.  A plane the covering has not been carried to yet is
+        :meth:`isotropic_covering_reference`'s to answer, and the carry itself
+        is :meth:`transport_covering`'s.
+        """
         from sage_extensions.categories.isotropic_orbits import _span_key
 
-        return self.__dict__.get("_isotropic_covering_registry", {}).get(
-            (_span_key(plane), source)
-        )
+        record = self.__dict__.get("_isotropic_covering_registry", {}).get(source)
+        if record is None or record[1] != _span_key(plane):
+            return None
+        return record[2], record[3]
+
+    def isotropic_covering_reference(self, source):
+        r"""``(plane, lift, flags)``: the row's covering of ``source``, wherever it was computed.
+
+        ``plane`` is that plane, ``lift`` the registered isometry that carries
+        ``source``'s plane onto it, and ``flags`` the covering computed there.
+        The family at any other plane of the row is
+        ``transport_covering(lift, flags, isotropic_lift_of(other))``: the
+        composite of the two planes' registered lifts, which carries the
+        computed plane onto the other.  ``None`` where the row has computed no
+        covering for ``source``.
+        """
+        record = self.__dict__.get("_isotropic_covering_registry", {}).get(source)
+        if record is None:
+            return None
+        return record[0], record[2], record[3]
 
     def transport_covering(self, reference_lift, flags, lift):
         r"""The covering ``flags``, carried to the plane that ``lift`` carries its plane to.

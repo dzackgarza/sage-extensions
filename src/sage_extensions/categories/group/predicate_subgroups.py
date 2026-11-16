@@ -760,8 +760,13 @@ class PredicateSubgroups(OwnedParameterizedCategory):
             at one plane, carried to another by the composite of the two planes'
             registered lifts, is exactly the family of the other plane.  The
             plane's parabolic, its conjugated generators, their word section
-            and its double cosets are therefore computed once for the row,
-            which is what makes the plane count affordable at all.  The
+            and its double cosets are therefore computed once for the row and
+            once per ambient flag orbit, and the quotient retains that one
+            record per orbit, which is what makes the plane count affordable at
+            all: the record is
+            :meth:`...OrthogonalCharacterQuotient.isotropic_covering_reference`
+            and the carry is its
+            :meth:`...OrthogonalCharacterQuotient.transport_covering`.  The
             invariance is the quotient's own decision
             (:meth:`...OrthogonalCharacterQuotient.preserves_conjugation`):
             the subgroup is ``chi^-1(S)`` for its finite character image ``S``,
@@ -925,13 +930,14 @@ class PredicateSubgroups(OwnedParameterizedCategory):
                     ambient_sources.append((ambient_flag, None, None))
             sourced_flags = []
             parabolic_routed = True
-            # A covering computed at one plane is transported to every other
-            # plane whose registered lift carries that plane there: the
-            # quotient decides whether the subgroup is invariant under
-            # conjugation, and if it is, the family at the target plane is the
-            # source family carried there -- same orbits, same count -- so the
-            # plane's parabolic, its images, its word section and its double
-            # cosets are paid once for the row.
+            # The row's covering is one datum per source family: it is computed
+            # at one plane, retained by the quotient, and carried to every other
+            # plane by the composite of the two planes' registered lifts.  The
+            # carry is exact because the quotient decides whether the subgroup
+            # is invariant under conjugation by an ambient isometry; where it
+            # is, the carried family is the other plane's -- same orbits, same
+            # count -- so the plane's parabolic, its images, its word section
+            # and its double cosets are paid once for the row.
             transported_covering = quotient.preserves_conjugation()
             # The planes of this row are the plane cusps of this row: a cusp's
             # representative is the plane, so the incidence is computed at each
@@ -952,15 +958,28 @@ class PredicateSubgroups(OwnedParameterizedCategory):
                         if transported_covering
                         else None
                     )
-                    if known is not None and target_lift is not None:
-                        reference_lift, reference_flags = known
-                        sourced_flags.extend(
-                            quotient.transport_covering(
-                                reference_lift, reference_flags, target_lift
-                            )
-                        )
+                    if known is not None:
+                        # The row's covering was computed at this plane: it is
+                        # the family here, and needs no carrying.
+                        sourced_flags.extend(known[1])
                         covered_here = True
                         continue
+                    if transported_covering and target_lift is not None:
+                        # Every other plane is that one covering carried here.
+                        # The composite of the two planes' registered lifts
+                        # carries the computed plane onto this one, and the
+                        # subgroup is invariant under it, so the family it gives
+                        # is this plane's -- same orbits, same count.
+                        reference = quotient.isotropic_covering_reference(position)
+                        if reference is not None:
+                            _reference_plane, reference_lift, reference_flags = reference
+                            sourced_flags.extend(
+                                quotient.transport_covering(
+                                    reference_lift, reference_flags, target_lift
+                                )
+                            )
+                            covered_here = True
+                            continue
                     # The source row now meets the source lift at one registered
                     # plane.  Composing that normalization with the row's own
                     # lifts gives an exact ambient witness to each target plane,
