@@ -522,16 +522,16 @@ class _ColouredFamilyRealization:
                 for vertex in range(graph._size())
             )
             transformation = self._coordinate_automorphism(permutation)
-            labels = tuple(rational.module_generating_set())
-            ring = rational.base_ring()
-            return rational.O()({
-                label: rational.linear_combination({
-                    target_label: _owned_engine_element(ring, coefficient)
-                    for target_label, coefficient in zip(labels, row, strict=True)
-                    if coefficient
-                })
-                for label, row in zip(labels, transformation.rows(), strict=True)
-            })
+            # The induced map sends generator s to row s of the
+            # transformation, so its framed column matrix is the transpose,
+            # raised once as in ``rational_transformation``.
+            from sage_extensions.categories.modules.pure.modules import _morphism_from_engine_matrix
+
+            linear = _morphism_from_engine_matrix(
+                Modules(rational.base_ring()).Mor(rational, rational), transformation.transpose()
+            )
+            orthogonal = rational.O()
+            return orthogonal.element_class(orthogonal, linear)
         isometry = self.rational_transformation(self, graph.position_permutation(generator))
         return rational.O()({
             label: isometry(rational.module_generator(label))

@@ -85,7 +85,6 @@ What *is* owned, so a caller does not come here for it:
   commensurability class.
 """
 
-from functools import cache
 
 from sage.misc.cachefunc import cached_method
 from sage.rings.integer_ring import ZZ as SageZZ
@@ -834,23 +833,18 @@ class IntegralStructureAction(SageObject):
             "the residue-action computation requires a represented finite module M/dM"
         )
 
-        @cache
-        def generators(key):
-            return quotient._submodule_generator_images_from_key(key)
-
         # The orbit search applies the same few letter images at every
-        # point; each letter's residue automorphism is built once.
+        # point; each letter's residue automorphism is built once, and each
+        # point is acted on through its preimage key.
         residue_maps = {}
+        quotient_action = self.finite_quotient_action()
 
         def action(element, key):
-            images = generators(key)
-            if not images:
-                return key
             retained = residue_maps.get(id(element))
             if retained is None:
-                retained = (element, self.quotient_automorphism(element).forward())
+                retained = (element, quotient_action.quotient_cover_matrix(element))
                 residue_maps[id(element)] = retained
-            return quotient._submodule_image_key(retained[1], images)
+            return quotient._submodule_image_key_from_key(retained[1], key)
 
         witness = FiniteGSets(rational_group).transporter_from_finite_orbit(source_key, target_key, action)
         if witness is None:
@@ -969,58 +963,68 @@ class FiniteCommensurabilityQuotient(SageObject):
         r"""Return the quotient morphism ``M -> M/dM``."""
         return self.scaling_morphism().cokernel_projection()
 
-    @cached_method
-    def _reference_frame(self):
-        r"""The basis matrix ``B`` of ``M`` in the framing of ``V``.
+    def _frame_of(self, lattice_inclusion):
+        r"""The basis matrix of a lattice in the framing of ``V``.
 
-        Column ``s`` holds the ``V``-coordinates of the ``s``-th generator of
-        ``M``. ``M`` need not have full rank in ``V``, so ``B`` need not be
-        square.
+        Column ``s`` holds the ``V``-coordinates of the ``s``-th generator.
+        The lattice need not have full rank in ``V``, so the matrix need not
+        be square.
         """
         from sage.matrix.constructor import matrix as sage_matrix
         from sage_extensions.categories.rings.ring_foundation import _engine_element
 
-        lattice = self.reference_lattice()
-        inclusion = self.reference_inclusion()
+        lattice = lattice_inclusion.domain()
         extension = self.ambient_restricted_space().module_over_extension()
         fractions = extension.base_ring()
         labels = tuple(extension.module_generating_set())
         columns = []
         for label in lattice.module_generating_set():
-            coordinates = inclusion(lattice.module_generator(label)).underlying_element().to_vector()
+            coordinates = lattice_inclusion(lattice.module_generator(label)).underlying_element().to_vector()
             columns.append([_engine_element(fractions, coordinates(point)) for point in labels])
         basis = sage_matrix(columns).transpose()
         basis.set_immutable()
         return basis
 
-    def restricted_automorphism(self, automorphism):
-        r"""Restrict one ``g in G`` to the stable reference lattice ``M``.
+    @cached_method
+    def _reference_frame(self):
+        r"""The basis matrix ``B`` of ``M`` in the framing of ``V``."""
+        return self._frame_of(self.reference_inclusion())
+
+    @staticmethod
+    def _integral_solution_or_none(basis, image):
+        r"""The integral ``Y`` with ``basis Y = image``, or ``None`` when none exists."""
+        try:
+            solution = basis.solve_right(image)
+        except ValueError:
+            return None
+        return solution if basis * solution == image and solution.denominator() == 1 else None
+
+    def _restricted_matrix(self, automorphism):
+        r"""The integral matrix ``X`` of ``g`` restricted to ``M``, in the basis of ``M``.
 
         In the basis of ``M`` the restriction is the matrix ``X`` with
         ``A B = B X`` for ``A`` the matrix of ``g`` on ``V`` (``X = B^-1 A B``
         when ``M`` has full rank); ``g`` preserves ``M`` exactly when ``X``
-        and the solution for ``A^-1`` exist and are integral.
+        and the solution for ``A^-1`` exist and are integral. Column ``s`` of
+        ``X`` holds the coordinates of the image of the ``s``-th generator.
         """
         from sage_extensions.categories.modules.pure.modules import _engine_matrix
-        from sage_extensions.categories.rings.ring_foundation import _owned_engine_element
 
-        lattice = self.reference_lattice()
         basis = self._reference_frame()
         ambient = _engine_matrix(automorphism.module_morphism())
-
-        def restriction(matrix):
-            image = matrix * basis
-            try:
-                solution = basis.solve_right(image)
-            except ValueError:
-                return None
-            return solution if basis * solution == image and solution.denominator() == 1 else None
-
-        restricted = restriction(ambient)
-        if restricted is None or restriction(ambient.inverse()) is None:
+        restricted = self._integral_solution_or_none(basis, ambient * basis)
+        if restricted is None or self._integral_solution_or_none(basis, ambient.inverse() * basis) is None:
             raise ValueError(
-                f"cannot restrict {automorphism} to {lattice}: it or its inverse does not preserve the reference lattice"
+                f"cannot restrict {automorphism} to {self.reference_lattice()}: it or its inverse does not preserve the reference lattice"
             )
+        return restricted
+
+    def restricted_automorphism(self, automorphism):
+        r"""Restrict one ``g in G`` to the stable reference lattice ``M``."""
+        from sage_extensions.categories.rings.ring_foundation import _owned_engine_element
+
+        restricted = self._restricted_matrix(automorphism)
+        lattice = self.reference_lattice()
         ring = lattice.base_ring()
         labels = tuple(lattice.module_generating_set())
         return lattice.Aut()({
@@ -1031,6 +1035,37 @@ class FiniteCommensurabilityQuotient(SageObject):
             })
             for column, label in enumerate(labels)
         })
+
+    @cached_method
+    def _projection_is_the_cover_framing(self):
+        r"""Whether ``M -> M/dM`` sends each generator of ``M`` to its cover basis class.
+
+        The cokernel of ``d`` on ``M`` is presented on the framing of ``M``;
+        this reads that identification from the actual projection.
+        """
+        from sage.matrix.constructor import identity_matrix
+
+        projection = self.quotient_projection()
+        lattice = self.reference_lattice()
+        rows = [
+            tuple(projection(lattice.module_generator(label))._representative())
+            for label in lattice.module_generating_set()
+        ]
+        return rows == [tuple(row) for row in identity_matrix(SageZZ, len(rows)).rows()]
+
+    def quotient_cover_matrix(self, automorphism):
+        r"""The integral cover matrix of the automorphism of ``F_M`` induced by ``g``.
+
+        The cover of ``M/dM`` is the framing of ``M``, so the residue map
+        lifts to ``X^t``: its row ``s`` is the image of the ``s``-th
+        generator. This is the matrix the finite module's key action reads.
+        """
+        assert self._projection_is_the_cover_framing(), (
+            f"the quotient {self.quotient_module()} is not presented on the framing of {self.reference_lattice()}"
+        )
+        action = self._restricted_matrix(automorphism).transpose().change_ring(SageZZ)
+        action.set_immutable()
+        return action
 
     @cached_method
     def quotient_automorphism(self, automorphism):
@@ -1069,18 +1104,33 @@ class FiniteCommensurabilityQuotient(SageObject):
         return self.quotient_projection() * into_reference
 
     def _intermediate_image_key_or_none(self, lattice_inclusion):
-        r"""Read the canonical module key without presenting its image submodule.
+        r"""Read the canonical module key of ``L/dM`` without presenting it.
 
-        The finite-module owner computes the Hermite preimage key from the
-        same projected generators that define ``intermediate_image_or_none``.
-        Its correspondence theorem includes the quotient relations.
+        With ``B`` and ``C`` the frames of ``M`` and ``L`` in ``V``,
+        ``L <= M`` exactly when ``B Y = C`` has an integral solution, and
+        ``dM <= L`` exactly when ``C Z = dB`` has one. The columns of ``Y``
+        are the generators of ``L`` in the framing of ``M``, which is the
+        cover of ``M/dM``; their classes generate ``L/dM``, and the finite
+        module's Hermite key of those rows is the correspondence-theorem key
+        of ``intermediate_image_or_none``.
         """
-        projection = self._intermediate_projection_or_none(lattice_inclusion)
-        if projection is None:
-            return None
-        return self.quotient_module()._submodule_key_from_generators(
-            tuple(projection(generator) for generator in projection.domain().module_generators())
+        if lattice_inclusion.codomain() is not self.ambient_restricted_space():
+            raise ValueError(
+                f"{lattice_inclusion.domain()} cannot lie between dM and M for M = "
+                f"{self.reference_lattice()}: it lies in {lattice_inclusion.codomain()}, not "
+                f"in the rational space {self.ambient_restricted_space()} containing M"
+            )
+        assert self._projection_is_the_cover_framing(), (
+            f"the quotient {self.quotient_module()} is not presented on the framing of {self.reference_lattice()}"
         )
+        reference = self._reference_frame()
+        frame = self._frame_of(lattice_inclusion)
+        coordinates = self._integral_solution_or_none(reference, frame)
+        if coordinates is None:
+            return None
+        if self._integral_solution_or_none(frame, SageZZ(int(self.modulus())) * reference) is None:
+            return None
+        return self.quotient_module()._key_of_cover_rows(coordinates.transpose().change_ring(SageZZ))
 
     def intermediate_image_or_none(self, lattice_inclusion):
         r"""Return ``S_L=L/dM`` inside ``F_M`` for ``dM <= L <= M``.
