@@ -1,0 +1,49 @@
+provider SHA: 3fae3b5881fb53773d0ff08db050e89c05e1919c
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+probe SHA256: 3e851a9cc2b2aed49e154c187bdac1d55d16aad7792ac1aa0ccdae79622ade4e
+== U+U+A1
+   reduction Integral lattice of rank 3 and signature (1, 2)
+   generators [(1, 0, 0), (0, 1, 0), (0, 0, 1)]
+   gram Generic endomorphism of Free module on {[0], [1], [2]} over Integer Ring
+   rank 3
+   reduction((1,0,...)) = (1, 0, 0)
+   class of e2+e3: (1, 1, 0) square 2
+   class_lift round trip: (1, 1, 0)
+   walls [(0, 0, 1), (-1, 1, 0), (0, -1, -1)]
+   pairings of the class with the family (2, 0, 0, -1)
+   walls through the class [(0, 0, 1), (-1, 1, 0)]
+   layer 1 square -4 normals [(0, 0, 1), (-1, 1, 0)]
+   layer 2 square -2 normals [(0, 0, 1), (-1, 1, 0)]
+== U+U+A1+A1
+   reduction Integral lattice of rank 4 and signature (1, 3)
+   generators [(1, 0, 0, 0), (0, 1, 0, 0), (0, 0, 1, 0), (0, 0, 0, 1)]
+   gram Generic endomorphism of Free module on {[0], [1], [2], [3]} over Integer Ring
+   rank 4
+   reduction((1,0,...)) = (1, 0, 0, 0)
+   point square 14 b(e0,.) 0
+   class (-3, -3, -1, -1) square 14
+   records 1
+   layer 1 square -4 offset (0, -1, 0, -2)
+      normals []
+      duals []
+      cell 2 whole 2 equal True
+      cell candidates ((-1, 0, -1, -1), (0, -1, -1, -1))
+      whole candidates ((-1, 0, -1, -1), (0, -1, -1, -1))
+== the old consumer's record at the no-cell specimen
+   reported normals []
+   reported duals []
+   candidates pairing positively with every dual: [(-1, 0, -1, -1), (0, -1, -1, -1)]
+[peakrss] probe536: child waited=0 shell_code=0 samples=7
+[peakrss] peak tree RSS      : 500 MiB
+[peakrss] low-water MemAvail : 3560 MiB
+[peakrss] peak single VmHWM  : 500 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      489 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    12.0s procs=  3 rss=   500 MiB hwm=   500 MiB avail=  3768 MiB
+[peakrss]   t=    10.0s procs=  3 rss=   493 MiB hwm=   493 MiB avail=  3780 MiB
+[peakrss]   t=     8.0s procs=  3 rss=   483 MiB hwm=   483 MiB avail=  3834 MiB
+[peakrss]   t=     6.0s procs=  3 rss=   459 MiB hwm=   459 MiB avail=  3934 MiB
+[peakrss]   t=     4.0s procs=  3 rss=   304 MiB hwm=   304 MiB avail=  3687 MiB
+launcher exit: 0

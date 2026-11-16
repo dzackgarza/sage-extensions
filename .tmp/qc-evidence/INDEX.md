@@ -3523,3 +3523,22 @@ The two remaining engine-matrix routings on the matrix owner state the same cate
 | --- | --- | --- |
 | `541r6-cards-at-dc25610.log` | `bdf238b` with the routing change | the four card files: **24 passed in 2.81 s** |
 | `541r6-probe-inverse.log` | `bdf238b` with the routing change | the swap of `ZZ^2` and `QQ^2` invert, `2 e_0, e_1` is a nonunit over `ZZ` and a unit over `QQ` |
+
+## `#536`, round 3: the cell the walk cuts, and the layer it enumerates, 2026-11-16
+
+The reviewer's findings on the round-2 repair.  The test file below is
+`tests/lattices/test_the_cusp_layers_are_enumerated_in_the_cells_coordinates.sage` as
+this round rewrites it; the two reds are that file at the tree before the repair and at
+the base this push lands on.
+
+| log | tree | result |
+| --- | --- | --- |
+| `536r3-red-5871adf.log` | `5871adf`, the tree before the round's repair | the file: **1 failed, 3 passed in 12.34 s**, `assert ((-1, 1, 0, 0),) == ()` — a root reported as the cell's normal where the walk cut no cell |
+| `536r3-red-base.log` | `cb492da`, the base this push lands on | the same file: **1 failed, 3 passed in 10.15 s**, the refusal at `isotropic_orbits.py:3077` |
+| `536r3-green-head.log` | `cc2ba5a`, the head this round pushes | the same file: **4 passed in 14.76 s**; slowest 6.63 s, 2.67 s, 0.47 s, 0.25 s |
+| `536r3-wrong-orientation.log` | `cc2ba5a` with `_initial_cone = tuple(-root for root in roots)` patched in | the orientation test: **1 failed, 3 deselected in 5.26 s**, `assert [(0, 0, -1), (1, -1, 0)] == [(-1, 1, 0), (0, 0, 1)]` |
+| `536r3-wrong-orientation-complete-chamber.log` | `5fd04d3`, the same patch, the complete chamber asked before the prefix | no result in 840 s: the reoriented walk accepts no wall and never closes, which is why the prefix is asserted first |
+| `536r3-scan-points.log` | `3fae3b5`, probe over three reductions | 452 + 210 + 222 points, the cell present or absent printed for each state; `(-3,-3,-1,-1)` at square 14 of `U+A1+A1` is the state with one normal in a rank-three perpendicular |
+| `536r3-the-cell-of-two-classes.log` | `3fae3b5`, probe | the class of `e_2+e_3` and its lift, the chamber's three walls, the two that pass through the class, and the no-cell record (no normals, no duals, both lists equal) |
+| `536r3-the-cone-computed-once.log` | `4c13fb5`, probe holding the walk | `FundCone` **2.303 s** then **0.000 s**, same roots, distinct lists, and the cell cached |
+| `536r3-clause-repair-on-main.log` | `cb492da` | `tests/groups/test_finite_index_cosets_of_gamma_zero_two.sage`: **2 passed in 1.62 s** — the stabilizer caller of `#537` is red at `3fae3b5` (2 failed in 2.52 s, `TypeError ... unexpected keyword argument 'description'`) and repaired on main by `539650a`, so this round does not repeat it |

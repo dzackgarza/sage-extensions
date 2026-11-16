@@ -1,0 +1,81 @@
+provider SHA: 5871adf4e4add8668ab6bf4f253ffb45a80eabda
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+tests: tests/lattices/test_the_cusp_layers_are_enumerated_in_the_cells_coordinates.sage
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: asyncio-1.5.0, xdist-3.8.0, reportlog-1.0.0, platformdirs-4.13.5, hypothesis-6.170.15, anyio-4.15.1, timeout-2.4.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 4 items
+
+tests/lattices/test_the_cusp_layers_are_enumerated_in_the_cells_coordinates.sage F [ 25%]
+...                                                                      [100%]
+
+=================================== FAILURES ===================================
+________ test_a_walk_that_cuts_no_cell_reports_the_whole_lattice_layers ________
+
+    def test_a_walk_that_cuts_no_cell_reports_the_whole_lattice_layers() -> None:
+        r"""A point whose roots cut no cell has no cell coordinates, and its layers are the lattice's.
+    
+        The point is the class \((-3,-3,-1,-1)\) of \(U\oplus A_1\oplus A_1\), of
+        square \(14\): the roots through it are \(\pm(-1,1,0,0)\) in the reduction's
+        frame, one independent normal in a \(v_0^\perp\) of rank three.  Vinberg's
+        cell (1972, §3.2, rule 1 and (39), p. 27) is cut by the roots through the
+        point, and one normal spans no coordinate system of the rank-three
+        perpendicular, so the walk has none to enumerate the layer (57) in and
+        enumerates it over the whole lattice (§4.1, p. 30).  The record then states
+        that: no normals, no duals, and both of its candidate lists are the one
+        whole-lattice search.
+        """
+        image = _reduction_image("U", "U", "A1", "A1")
+        reduction = image.reduction()
+        controlling_vector = image.class_lift(_class(reduction, -3, -3, -1, -1))
+        records = image.cusp_layer_enumerations(controlling_vector=controlling_vector, layers=1)
+    
+        assert records
+        for record in records:
+>           assert _coordinates_of(record.cell_normals()) == ()
+E           assert ((-1, 1, 0, 0),) == ()
+E             
+E             Left contains one more item: (-1, 1, 0, 0)
+E             Use -v to get more diff
+
+tests/lattices/test_the_cusp_layers_are_enumerated_in_the_cells_coordinates.sage:100: AssertionError
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:830 Elementwise module morphism Module over Fraction Field of Integer Ring on Classes in the multilinear tensor presentation -> Module over Fraction Field of Integer Ring on Fraction Field of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+=============================== warnings summary ===============================
+tests/lattices/test_the_cusp_layers_are_enumerated_in_the_cells_coordinates.sage: 108 warnings
+  /repos/vinal/src/sage/vinal.py:193: PendingDeprecationWarning: the matrix subclass is not the recommended way to represent matrices or deal with linear algebra (see https://docs.scipy.org/doc/numpy/user/numpy-for-matlab-users.html). Please adjust your code to use regular ndarray.
+    m2 = np.dot( np.dot(g, s.M), g.transpose())
+
+tests/lattices/test_the_cusp_layers_are_enumerated_in_the_cells_coordinates.sage: 108 warnings
+  /repos/vinal/src/sage/vinal.py:194: PendingDeprecationWarning: the matrix subclass is not the recommended way to represent matrices or deal with linear algebra (see https://docs.scipy.org/doc/numpy/user/numpy-for-matlab-users.html). Please adjust your code to use regular ndarray.
+    m1 = np.dot( np.dot( Matrix(a), s.M), g.transpose() )
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+============================== slowest durations ===============================
+5.43s call     tests/lattices/test_the_cusp_layers_are_enumerated_in_the_cells_coordinates.sage::test_a_walk_that_cuts_no_cell_reports_the_whole_lattice_layers
+2.95s call     tests/lattices/test_the_cusp_layers_are_enumerated_in_the_cells_coordinates.sage::test_the_cell_normals_are_the_chambers_walls_through_the_point
+0.38s call     tests/lattices/test_the_cusp_layers_are_enumerated_in_the_cells_coordinates.sage::test_the_dual_normals_are_the_adjugate_duals_of_the_cell_normals
+0.28s call     tests/lattices/test_the_cusp_layers_are_enumerated_in_the_cells_coordinates.sage::test_each_layers_cell_enumeration_is_its_whole_lattice_solutions_in_the_cell
+
+(8 durations < 0.005s hidden.  Use -vv to show these durations.)
+=========================== short test summary info ============================
+FAILED tests/lattices/test_the_cusp_layers_are_enumerated_in_the_cells_coordinates.sage::test_a_walk_that_cuts_no_cell_reports_the_whole_lattice_layers
+================== 1 failed, 3 passed, 216 warnings in 12.34s ==================
+[peakrss] test536: child waited=1 shell_code=1 samples=9
+[peakrss] peak tree RSS      : 423 MiB
+[peakrss] low-water MemAvail : 1156 MiB
+[peakrss] peak single VmHWM  : 462 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      451 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    10.0s procs=  3 rss=   423 MiB hwm=   462 MiB avail=  1627 MiB
+[peakrss]   t=     8.0s procs=  3 rss=   421 MiB hwm=   462 MiB avail=  1871 MiB
+[peakrss]   t=     6.0s procs=  3 rss=   416 MiB hwm=   462 MiB avail=  1927 MiB
+[peakrss]   t=    12.0s procs=  3 rss=   416 MiB hwm=   462 MiB avail=  1401 MiB
+[peakrss]   t=    14.0s procs=  3 rss=   408 MiB hwm=   462 MiB avail=  1276 MiB
+launcher exit: 1

@@ -1,0 +1,30 @@
+provider SHA: cb492daee971c7b92582b4e1fad527978c115b07
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+tests: tests/groups/test_finite_index_cosets_of_gamma_zero_two.sage
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: asyncio-1.5.0, xdist-3.8.0, reportlog-1.0.0, platformdirs-4.13.5, hypothesis-6.170.15, anyio-4.15.1, timeout-2.4.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 2 items
+
+tests/groups/test_finite_index_cosets_of_gamma_zero_two.sage ..          [100%]
+
+============================== slowest durations ===============================
+0.33s call     tests/groups/test_finite_index_cosets_of_gamma_zero_two.sage::test_the_double_cosets_of_gamma_zero_two_are_its_two_cusps
+0.03s call     tests/groups/test_finite_index_cosets_of_gamma_zero_two.sage::test_the_double_cosets_of_sl2z_are_its_one_cusp
+
+(4 durations < 0.005s hidden.  Use -vv to show these durations.)
+============================== 2 passed in 1.62s ===============================
+[peakrss] test536: child waited=0 shell_code=0 samples=2
+[peakrss] peak tree RSS      : 433 MiB
+[peakrss] low-water MemAvail : 8076 MiB
+[peakrss] peak single VmHWM  : 433 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      422 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     2.0s procs=  3 rss=   433 MiB hwm=   433 MiB avail=  8076 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     6 MiB hwm=     6 MiB avail=  8418 MiB
+launcher exit: 0
