@@ -1849,6 +1849,7 @@ class Modules(OwnedCategoryOverBaseRing):
         ) -> None:
             ring = _owned_ring(base_ring)
             self._preamble_base_ring = ring
+            self._preamble_selected_framing_source = framing_source
             super().__init__(base=ring, **rest)
             match module_generating_set:
                 case None:
@@ -2042,6 +2043,16 @@ class Modules(OwnedCategoryOverBaseRing):
         def framing_source(self):
             r"""Return the free degree-zero term of the selected module resolution."""
             return self.selected_module_resolution().level(0)
+
+        def selected_framing_source(self):
+            r"""Return the degree-zero free module fixed as this module's framing.
+
+            This is the datum ``framing_source`` realizes, kept when the module
+            was framed.  A construction that needs the framing but not the
+            resolution reads it here rather than realizing the resolution
+            (``OWN-22``, ``OWN-23``).
+            """
+            return self._preamble_selected_framing_source
 
         @cached_method
         def framing_morphism(self):

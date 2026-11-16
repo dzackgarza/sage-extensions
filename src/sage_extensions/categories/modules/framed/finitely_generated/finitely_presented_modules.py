@@ -491,16 +491,35 @@ class _SelectedFinitePresentationModules(OwnedCategoryOverBaseRing):
             _extra_categories=(),
             _extra_construction_data=None,
         ):
-            r"""Return a fresh module carrying this chosen finite presentation."""
+            r"""Return a fresh module carrying this chosen finite presentation.
+
+            The presentation is the fixed datum this module already carries and
+            is evaluated by the fresh module's first request, never here
+            (``OWN-22``, ``OWN-23``).  The framing and the retained cokernel
+            morphism are construction data this module holds, so they are passed
+            as they are.
+            """
             if labels != self.module_generating_set():
                 raise ValueError(
                     f"cannot rebuild {self} on generators {labels}: its chosen generators are "
                     f"{self.module_generating_set()}"
                 )
-            return _presented_module_from_morphism(
-                self.presentation(),
-                _extra_categories=tuple(_extra_categories),
-                _extra_construction_data=_extra_construction_data,
+
+            def presentation_factory():
+                return self.presentation()
+
+            backend = self._selected_module_presentation
+
+            return _new_presented_module(
+                base_ring=self.base_ring(),
+                module_generating_set=labels,
+                presentation_factory=presentation_factory,
+                framing_source=self.selected_framing_source(),
+                cokernel_morphism=(
+                    None if backend is None else backend.cokernel_morphism()
+                ),
+                extra_categories=_extra_categories,
+                extra_construction_data=_extra_construction_data,
             )
 
         def _presented_biproduct_over(

@@ -3453,20 +3453,24 @@ class BilinearFormModules(OwnedCategoryOverBaseRing):
                 The value object is explicit, and the caller states this module's
                 torsion placement by constructing here; descent to the quotient is
                 the validator ``validate_descent`` (``OWN-22``), which the caller
-                asks for.
+                asks for.  The Gram data are stored and lowered to the bilinear
+                Hom by the first request for the form, never by the construction.
                 """
-                rank = int(module.module_generating_set().cardinality())
-                values = _coerced_gram(value_module, gram, rank)
-                formed = FormModules(module.base_ring())(
-                    module.bilinear_forms(value_module)(values),
+
+                def form_computation():
+                    rank = int(module.module_generating_set().cardinality())
+                    values = _coerced_gram(value_module, gram, rank)
+                    return module.bilinear_forms(value_module)(values)
+
+                return _form_module_from_bilinear_computation(
+                    module,
+                    form_computation,
                     _extra_categories=(self, *tuple(_extra_categories)),
                     _subobject_ambient=_subobject_ambient,
                     _subobject_generator_images=_subobject_generator_images,
                     _subobject_lift=_subobject_lift,
                     _subobject_inclusion_factory=_subobject_inclusion_factory,
                 )
-                formed.validate_descent(check=False)
-                return formed
 
             def from_relations_and_gram(self, relation_rows, gram, value_module):
                 r"""Construct a torsion bilinear form on ``coker(r)`` from relation rows and a Gram matrix.
@@ -3643,20 +3647,25 @@ class QuadraticFormModules(OwnedCategoryOverBaseRing):
                 The caller states this module's torsion placement by constructing
                 here.  Symmetry of ``gram`` is the validator of the quadratic map,
                 and descent to the quotient is the validator ``validate_descent``
-                (``OWN-22``), which the caller asks for.
+                (``OWN-22``), which the caller asks for.  The Gram data are stored
+                and lowered to the quadratic Hom by the first request for the
+                form, never by the construction.
                 """
-                rank = int(module.module_generating_set().cardinality())
-                values = _coerced_gram(value_module, gram, rank)
-                formed = FormModules(module.base_ring())(
-                    module.quadratic_forms(value_module)(values),
+
+                def form_computation():
+                    rank = int(module.module_generating_set().cardinality())
+                    values = _coerced_gram(value_module, gram, rank)
+                    return module.quadratic_forms(value_module)(values)
+
+                return _form_module_from_quadratic_computation(
+                    module,
+                    form_computation,
                     _extra_categories=(self, *tuple(_extra_categories)),
                     _subobject_ambient=_subobject_ambient,
                     _subobject_generator_images=_subobject_generator_images,
                     _subobject_lift=_subobject_lift,
                     _subobject_inclusion_factory=_subobject_inclusion_factory,
                 )
-                formed.validate_descent(check=False)
-                return formed
 
             def from_relations_and_gram(self, relation_rows, gram, value_module):
                 r"""Construct a torsion quadratic form on ``coker(r)`` from relation rows and a Gram matrix.
@@ -4688,6 +4697,37 @@ def _form_module_from_bilinear_computation(
     categories = _form_module_categories(
         module,
         bilinear=True,
+        extra_categories=_extra_categories,
+    )
+    construction_data = dict(_extra_construction_data or {})
+    construction_data["source_form"] = None
+    construction_data["source_form_computation"] = form_computation
+    return _construct_form_module(
+        module,
+        categories,
+        construction_data,
+        _subobject_ambient=_subobject_ambient,
+        _subobject_generator_images=_subobject_generator_images,
+        _subobject_lift=_subobject_lift,
+        _subobject_inclusion_factory=_subobject_inclusion_factory,
+    )
+
+
+def _form_module_from_quadratic_computation(
+    module,
+    form_computation,
+    *,
+    _extra_categories=(),
+    _extra_construction_data=None,
+    _subobject_ambient=None,
+    _subobject_generator_images=None,
+    _subobject_lift=None,
+    _subobject_inclusion_factory=None,
+):
+    r"""Equip ``module`` from defining data that computes its quadratic form lazily."""
+    categories = _form_module_categories(
+        module,
+        bilinear=False,
         extra_categories=_extra_categories,
     )
     construction_data = dict(_extra_construction_data or {})
