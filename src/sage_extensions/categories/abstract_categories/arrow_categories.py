@@ -1781,7 +1781,8 @@ class SetSubobjectCategory(SliceCategory):
     either is one parent, and its points are the subsets of that one set
     (``SET-05``).  A subobject of ``X`` is therefore an object of
     ``Subobjects(X)`` for every equal copy of ``X``; the base object the
-    category answers with is the copy ``P(X)`` keeps.
+    category answers with is the copy ``P(X)`` keeps, which is this
+    category's own, since the power set takes its base set from here.
     """
 
     @staticmethod

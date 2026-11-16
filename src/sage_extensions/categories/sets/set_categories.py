@@ -3418,6 +3418,12 @@ class PowerSets(OwnedCategory):
     ``inclusion_order()`` is \(P(X)\) partially ordered by \(A\le B\) exactly
     when \(A\subseteq B\) (the order of the Boolean algebra ``Set X``, Mathlib
     ``Set.instBooleanAlgebra`` in ``Mathlib/Order/BooleanAlgebra/Set.lean``).
+
+    Two sets built from the same points are equal and one parent is
+    \(P(X)\) of either, so the construction keeps one copy of \(X\): the one
+    ``Sets().Subobjects(X)`` keeps.  A subset's inclusion therefore ends at
+    the same object as the subobject category's base object, whichever equal
+    copy of \(X\) asked first (``SET-05``).
     """
 
     def an_object(self) -> ObjectOfCategory:
@@ -3432,7 +3438,8 @@ class PowerSets(OwnedCategory):
         return self._call_(base_set)
 
     def _call_(self, base_set):
-        r"""Construct the power object of ``base_set``."""
+        r"""Construct the power object of ``base_set``, on the copy its subobjects keep."""
+        base_set = Sets().Subobjects(base_set).base_object()
         placements = [self, _cardinalities().set_power_category(Sets.Δ[1], base_set)]
         engine = None
         if Sets().is_provably_finite(base_set):
