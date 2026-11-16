@@ -1,7 +1,6 @@
 r"""Kernels and cohomology of complexes of modules over \(\mathbb Z[x]\)."""
 
-from sage_extensions.all import *
-from sage_extensions.categories.modules.cochain_complexes import CochainComplexes
+from sage_extensions.all import *  # noqa: F401,F403
 
 
 def _koszul_specimen():
