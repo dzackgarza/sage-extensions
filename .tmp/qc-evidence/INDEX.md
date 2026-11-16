@@ -3343,3 +3343,12 @@ two `-final` runs are taken at `9cb47c6`, whose `src` and `tests` are the pushed
 tip's own, so they are the runs of the pushed code.
 | `537r3-green-tests-final.log` | `9cb47c6`, whose `src` and `tests` are the pushed tip's | the file: **15 passed in 6.66 s** |
 | `537r3-probe-final.log` | `9cb47c6`, the same tree | the same probe: byte-identical answers again, so the rebase onto `5064d72` and `1ec450f` changed none of this round's names, orders or counts |
+
+Correction, 2026-11-16 (second): `main` moved twice more, and the history that is
+pushed is `dae545c` (the tests), `5fab91e` and `ce2d801` (the repairs), rebased
+onto `383e4d1`.  The runs above are at `9cb47c6`, and the only files that differ
+between that tree and the pushed tip are `all.py`, `language_runtime.py` and two
+`foundations/session_files` tests, which no commit of this round touches:
+`git diff --stat 9cb47c6 <pushed tip> -- src/sage_extensions/categories
+tests/groups tests/lattices tests/test_finite_cosets.py` is empty.  So the green
+and the probe above are runs of the code that is pushed.
