@@ -7020,9 +7020,6 @@ class OwnedGroups(CategoryPacketMethods, OwnedCategory):
                 field = CyclotomicField(exponent)
                 engine_field = _engine_ring(field)
                 representatives = self.conjugacy_classes_representatives()
-                # One class-function object per character: the set is the
-                # index of isotypic components, and its points are equal when
-                # their class-function values agree.
                 return finite_ordered_set(
                     tuple(
                         self.character_set()._from_known_character(
