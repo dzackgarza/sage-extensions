@@ -1,0 +1,88 @@
+=== tree: b383a803505fe5f4e736a6b5c8401badfc2a0e51 (modified paths: 0)
+=== port: 991b88b095a42a1e3679569ea42328c900c120f6
+=== load: 0.94 2.25 3.42 1/329 2474437
+=== command: sage-image/run.sh -w /work, probe probe541row.py at /probe.py, inner 540 s, outer 570 s
+row: {g in Orthogonal group O(Integral lattice of rank 11 and signature (2, 9)) : rho_L(g) lies in Subgroup of Orthogonal group of Finitely presented module on 11 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 2, 1 ↦ 2, 2 ↦ 2, 3 ↦ 2, 4 ↦ 2, 5 ↦ 2, 6 ↦ 2, 7 ↦ 2, 8 ↦ 2, 9 ↦ 2, 10 ↦ 2]} on rank 11
+before the row elapsed 1.6 s, planes transported 0
+before the row no plane transported yet
+  [tick] elapsed 30.0 s, planes transported 0
+  [tick] no plane transported yet
+  [tick] elapsed 60.0 s, planes transported 0
+  [tick] no plane transported yet
+  [tick] elapsed 90.1 s, planes transported 0
+  [tick] no plane transported yet
+  [tick] elapsed 120.1 s, planes transported 0
+  [tick] no plane transported yet
+  [tick] elapsed 150.1 s, planes transported 0
+  [tick] no plane transported yet
+  [tick] elapsed 301.8 s, planes transported 0
+  [tick] no plane transported yet
+  [tick] elapsed 335.3 s, planes transported 3597
+  [tick] first plane at 306.7 s, last at 335.3 s
+  [tick] 125.71 planes/s over the walk (8.0 ms a plane)
+  [tick] elapsed 366.4 s, planes transported 7519
+  [tick] first plane at 306.7 s, last at 364.9 s
+  [tick] 129.34 planes/s over the walk (7.7 ms a plane)
+  [tick] elapsed 396.4 s, planes transported 11403
+  [tick] first plane at 306.7 s, last at 396.4 s
+  [tick] 127.11 planes/s over the walk (7.9 ms a plane)
+  [tick] elapsed 426.5 s, planes transported 15202
+  [tick] first plane at 306.7 s, last at 426.5 s
+  [tick] 126.95 planes/s over the walk (7.9 ms a plane)
+  [tick] elapsed 456.5 s, planes transported 18908
+  [tick] first plane at 306.7 s, last at 456.5 s
+  [tick] 126.24 planes/s over the walk (7.9 ms a plane)
+  [tick] elapsed 486.6 s, planes transported 23013
+  [tick] first plane at 306.7 s, last at 486.5 s
+  [tick] 127.98 planes/s over the walk (7.8 ms a plane)
+  [tick] elapsed 516.6 s, planes transported 26506
+  [tick] first plane at 306.7 s, last at 516.6 s
+  [tick] 126.31 planes/s over the walk (7.9 ms a plane)
+------------------------------------------------------------------------
+/sage/.venv/lib/python3.14/site-packages/cysignals/signals.cpython-314-x86_64-linux-gnu.so(+0x86e5) [0x7c6ef20e66e5]
+/sage/.venv/lib/python3.14/site-packages/cysignals/signals.cpython-314-x86_64-linux-gnu.so(+0x8786) [0x7c6ef20e6786]
+/sage/.venv/lib/python3.14/site-packages/cysignals/signals.cpython-314-x86_64-linux-gnu.so(+0x8b54) [0x7c6ef20e6b54]
+/lib/x86_64-linux-gnu/libc.so.6(+0x3fd70) [0x7c6ef3de9d70]
+/lib/x86_64-linux-gnu/libc.so.6(+0xa06a6) [0x7c6ef3e4a6a6]
+/lib/x86_64-linux-gnu/libc.so.6(+0xa1eeb) [0x7c6ef3e4beeb]
+/lib/x86_64-linux-gnu/libc.so.6(malloc+0xfe) [0x7c6ef3e4c9ce]
+/sage/.venv/bin/python() [0x1801f09]
+/sage/.venv/bin/python() [0x185b5f6]
+/sage/.venv/bin/python() [0x185b327]
+/sage/.venv/bin/python() [0x1810537]
+/sage/.venv/bin/python() [0x1817bc6]
+/sage/.venv/lib/python3.14/site-packages/sage/misc/cachefunc.cpython-314-x86_64-linux-gnu.so(+0x17ce1) [0x7c6ef22b7ce1]
+/sage/.venv/lib/python3.14/site-packages/sage/cpython/string.cpython-314-x86_64-linux-gnu.so(+0x53cd) [0x7c6ef39df3cd]
+/sage/.venv/bin/python() [0x1ac3558]
+/sage/.venv/lib/python3.14/site-packages/sage/misc/cachefunc.cpython-314-x86_64-linux-gnu.so(+0x109af) [0x7c6ef22b09af]
+/sage/.venv/lib/python3.14/site-packages/sage/misc/cachefunc.cpython-314-x86_64-linux-gnu.so(+0x49907) [0x7c6ef22e9907]
+/sage/.venv/bin/python() [0x1822fe1]
+/sage/.venv/bin/python() [0x1892a83]
+/sage/.venv/bin/python(PyEval_EvalCode+0xa6) [0x18936bc]
+/sage/.venv/bin/python() [0x1929339]
+/sage/.venv/bin/python() [0x1a7109b]
+/sage/.venv/bin/python() [0x1a70c41]
+/sage/.venv/bin/python() [0x19835c6]
+/sage/.venv/bin/python() [0x198350e]
+/sage/.venv/bin/python() [0x198341d]
+/sage/.venv/bin/python(Py_RunMain+0x40c) [0x198404c]
+/sage/.venv/bin/python() [0x1983c16]
+/sage/.venv/bin/python() [0x1983a70]
+/lib/x86_64-linux-gnu/libc.so.6(+0x29ca8) [0x7c6ef3dd3ca8]
+/lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0x85) [0x7c6ef3dd3d65]
+/sage/.venv/bin/python(_start+0x29) [0x19f75e9]
+------------------------------------------------------------------------
+[peakrss] run: child waited=124 shell_code=124 samples=270
+[peakrss] peak tree RSS      : 3330 MiB
+[peakrss] low-water MemAvail : 11017 MiB
+[peakrss] peak single VmHWM  : 3330 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     3319 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   538.3s procs=  3 rss=  3330 MiB hwm=  3330 MiB avail= 11017 MiB
+[peakrss]   t=   536.2s procs=  3 rss=  3313 MiB hwm=  3313 MiB avail= 11041 MiB
+[peakrss]   t=   534.2s procs=  3 rss=  3296 MiB hwm=  3296 MiB avail= 11057 MiB
+[peakrss]   t=   532.2s procs=  3 rss=  3279 MiB hwm=  3279 MiB avail= 11072 MiB
+[peakrss]   t=   530.2s procs=  3 rss=  3261 MiB hwm=  3261 MiB avail= 11088 MiB
+=== launcher exit: 124
