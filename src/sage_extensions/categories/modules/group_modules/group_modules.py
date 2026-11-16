@@ -805,11 +805,17 @@ class ModulesOverGroupAlgebra(Modules):
             and the Teichmüller lift carries them into a field of
             characteristic zero, where the Brauer character takes their sum
             (Serre, *Linear Representations of Finite Groups*, §18.1).  It is
-            not the \(\mathbb{F}_p\)-valued trace of the action: a rotation of
-            \(\mathbb{F}_2^2\) acting with order three has trace \(1\) and
-            Brauer value \(-1 = \omega + \omega^2\) at that element, so the two
-            functions differ exactly where an eigenvalue leaves the prime
-            field.
+            not the \(\mathbb{F}_p\)-valued trace of the action: the trace is
+            that sum taken in \(\mathbb{F}_p\), while the Brauer value is the
+            sum of the lifted roots of unity in characteristic zero, so the two
+            agree exactly where reduction leaves the sum unchanged.  A rotation
+            of \(\mathbb{F}_2^2\) acting with order three has trace \(1\) and
+            Brauer value \(-1 = \omega + \omega^2\) at that element; at the
+            identity of the same representation both eigenvalues are \(1\) and
+            lie in the prime field, and the trace \(2 = 0\) in
+            \(\mathbb{F}_2\) is still not the Brauer value \(2\), so the
+            difference is the reduction and not the field the eigenvalues lie
+            in.
 
             The datum is computed on the first request and kept, so a second
             request returns the same class function.
