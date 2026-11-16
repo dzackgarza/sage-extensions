@@ -45,6 +45,11 @@ def _torsion_forms():
     return BilinearFormModules(ZZ).FinitelyPresented().Torsion()
 
 
+def _torsion_quadratic_forms():
+    r"""The finitely presented torsion modules with a quadratic form: the claim."""
+    return QuadraticFormModules(ZZ).FinitelyPresented().Torsion()
+
+
 def test_a_cokernel_form_is_not_placed_in_torsion_by_a_computation() -> None:
     r"""$Z/5$ with $b = 1/5$: a construction that claimed nothing places it nowhere."""
     module = _cokernel_of_a_dilation(ZZ(5))
@@ -122,3 +127,92 @@ def test_equipping_a_declared_torsion_module_keeps_its_placement() -> None:
 
     assert bilinear in FormModules(ZZ).FinitelyPresented().Torsion()
     assert quadratic in FormModules(ZZ).FinitelyPresented().Torsion()
+
+
+def test_the_torsion_form_constructor_computes_nothing() -> None:
+    r"""$Z/5$ with $b = 1/5$: the constructor stores the claim and the Gram data.
+
+    The chosen resolution is realized and the engine matrix is materialized by
+    the first request for the form, not by the construction (``OWN-22``).  A
+    constructor that computes through either is red.
+    """
+    module = _cokernel_of_a_dilation(ZZ(5))
+    values = _form_values()
+    gram = ((values(QQ(1) / QQ(5)),),)
+
+    form, constructed, requested = construction_work_of(
+        lambda: _torsion_forms().from_module(module, gram, values),
+        lambda formed: formed.form(),
+    )
+
+    assert constructed == 0
+    assert requested > 0
+    assert form in _torsion_forms()
+    assert form.unformed_module() is module
+
+
+def test_a_quadratic_cokernel_form_is_not_placed_in_torsion_by_a_computation() -> None:
+    r"""$Z/5$ with $q = 1/5$: a construction that claimed nothing places it nowhere."""
+    module = _cokernel_of_a_dilation(ZZ(5))
+    values = _form_values()
+
+    form = FormModules(ZZ)(
+        module.quadratic_forms(values)(((values(QQ(1) / QQ(5)),),))
+    )
+
+    assert form in FormModules(ZZ).FinitelyPresented()
+    assert form not in FormModules(ZZ).FinitelyPresented().Torsion()
+    assert form.is_torsion() is True
+    assert int(form.cardinality()) == 5
+
+
+def test_the_quadratic_torsion_form_constructor_places_the_claim_it_states() -> None:
+    r"""The same module and Gram data through the quadratic torsion constructor."""
+    module = _cokernel_of_a_dilation(ZZ(5))
+    values = _form_values()
+
+    form = _torsion_quadratic_forms().from_module(
+        module,
+        ((values(QQ(1) / QQ(5)),),),
+        values,
+    )
+
+    assert form in FormModules(ZZ).FinitelyPresented().Torsion()
+    assert int(form.cardinality()) == 5
+
+
+def test_the_quadratic_torsion_form_constructor_computes_nothing() -> None:
+    r"""The quadratic constructor is as instant as the bilinear one (``OWN-22``)."""
+    module = _cokernel_of_a_dilation(ZZ(5))
+    values = _form_values()
+    gram = ((values(QQ(1) / QQ(5)),),)
+
+    form, constructed, requested = construction_work_of(
+        lambda: _torsion_quadratic_forms().from_module(module, gram, values),
+        lambda formed: formed.form(),
+    )
+
+    assert constructed == 0
+    assert requested > 0
+    assert form in _torsion_quadratic_forms()
+    assert form.unformed_module() is module
+
+
+def test_a_false_quadratic_claim_is_trusted_by_the_construction() -> None:
+    r"""$\operatorname{coker}(0) = Z$ is not torsion, and no guard refuses the claim.
+
+    A construction that checked the claim would read the invariant factors and
+    reject this; instead what it stores is the caller's module and Gram data.
+    """
+    module = _cokernel_of_a_dilation(ZZ.zero())
+    values = _form_values()
+
+    form = _torsion_quadratic_forms().from_module(
+        module,
+        ((values(QQ(1) / QQ(5)),),),
+        values,
+    )
+
+    form.validate_descent()
+    assert form in FormModules(ZZ).FinitelyPresented().Torsion()
+    assert form.unformed_module() == module
