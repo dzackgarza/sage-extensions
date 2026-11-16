@@ -505,14 +505,56 @@ class Tensor:
         return Tensor.__eq__(self, other)
 
     def change_ring(self, ring):
-        r"""Change coefficients without changing tensor variance."""
+        r"""Change coefficients without changing tensor variance.
+
+        A change of coefficients is a statement about this tensor and ``ring``,
+        and it holds exactly when every component lies in ``ring``.  A component
+        outside it is refused here, with the component, the position it stands at
+        in this tensor's index order, and ``ring`` named.  Left to the conversion
+        of that one entry, the same component surfaces as a number that does not
+        convert, which names the number and not the tensor, the position or the
+        ring, and a caller that needs the decision is left to walk the components
+        itself.
+
+        The decision, asked without a refusal, is :meth:`component_outside`.
+        """
         if ring is self.base_ring():
             return self
+        outside = self.component_outside(ring)
+        if outside is not None:
+            position, component = outside
+            raise ValueError(
+                f"cannot read this type-{self.tensor_valence()} tensor over {ring}: "
+                f"its component {component} at position {position} is not in {ring}"
+            )
         return tensor(
             ring,
             self._upper_index_ranks(),
             self._lower_index_ranks(),
             self._component_array(),
+        )
+
+    def component_outside(self, ring):
+        r"""Return the first component not in `ring` with its position, or `None`.
+
+        The components of a tensor are all in a ring or some of them are not, and
+        that is a property of the tensor and the ring: this is the decision
+        :meth:`change_ring` states, asked as the value it is, so a caller that
+        must refuse in its own terms reads it once instead of scanning the
+        components one position at a time.  The position is the index tuple in
+        this tensor's index order, the order ``self[position]`` reads.
+        """
+        return next(
+            (
+                (position, component)
+                for position, component in zip(
+                    _index_positions(self._index_ranks()),
+                    self._flat_components(),
+                    strict=True,
+                )
+                if component not in ring
+            ),
+            None,
         )
 
     def is_symmetric(self) -> bool:
@@ -2025,6 +2067,18 @@ def _flatten(components, shape: tuple[int, ...]) -> tuple:
         for block in components
         for entry in _flatten(block, shape[1:])
     )
+
+
+def _index_positions(shape):
+    r"""Every position of a tensor of `shape`, in tensor-index (row-major) order.
+
+    This is the order the stored component array is read in, so a position from it
+    is one ``self[position]`` accepts, and it is stated once here rather than at
+    each reader of the components.
+    """
+    from itertools import product as cartesian_product
+
+    return cartesian_product(*(range(int(rank)) for rank in shape))
 
 
 def _nested(entries: tuple, shape: tuple[int, ...]):

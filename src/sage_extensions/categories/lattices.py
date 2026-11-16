@@ -2567,6 +2567,28 @@ def _dynkin_numbering(lattice_gram, cartan):
     return tuple(numbering[position] for position in range(size))
 
 
+class TransvectionOutsideTheLattice(ValueError):
+    r"""The refusal of an Eichler transvection whose update is not a matrix over the ring.
+
+    An Eichler transvection `t(e,a)` has an update whose entries are
+    `\delta_{ij} - e_i b(a,e_j) + a_i b(e,e_j) - \tfrac12 q(a) e_i b(e,e_j)`, so
+    it preserves the lattice exactly when every entry lies in the ring of the
+    lattice.  The refusal carries the values that decide it: the pair `(e, a)`
+    the transvection was formed from, the lattice, the position of the first entry
+    outside the ring in the framing's index order, and that entry itself.  Its
+    message states them; the conversion of that one entry states the rational and
+    no position, and names neither the transvection nor the lattice.
+    """
+
+    def __init__(self, message, isotropic, orthogonal, lattice, position, coefficient):
+        super().__init__(message)
+        self.isotropic = isotropic
+        self.orthogonal = orthogonal
+        self.lattice = lattice
+        self.position = position
+        self.coefficient = coefficient
+
+
 class Lattices(OwnedCategoryOverBaseRing):
     r"""
     The category of lattices over a base ring, and the constructor for
@@ -8486,13 +8508,14 @@ class Lattices(OwnedCategoryOverBaseRing):
 
             The expression is written over the fraction field, since
             \(\tfrac12 q(a)\) need not lie in the ring of \(L\), and read over
-            that ring: \(t(e,a)\) preserves \(L\) exactly when every coefficient
-            \(\tfrac12 q(a)b(e,e_j)\) is integral (equation (10) there, \(a\) of
-            even square).  That is one decision per generator, stated here before
-            the update is read: the coefficient outside the ring is refused with
-            the transvection, this lattice and the coefficient
-            \(q(a)b(e,e_j)/2\) named, where the reading of the update would
-            refuse the same coefficient as a rational it cannot convert.
+            that ring: \(t(e,a)\) preserves \(L\) exactly when every entry of the
+            update lies in the ring, which is equation (10) there, read on the
+            update rather than on one coefficient of it.  That decision is the
+            ring change's: `tensor.component_outside` names the entry that lies
+            outside the ring and the position it stands at, and this method states
+            its own refusal around that name, carrying the transvection, this
+            lattice and that entry -- where the reading of the update refuses the
+            same entry as a rational it cannot convert.
 
             The formula's hypotheses -- that \(e\) and \(a\) are vectors of this
             lattice, that \(q(e)=0\) and that \(b(e,a)=0\) -- are asserted by
@@ -8502,28 +8525,12 @@ class Lattices(OwnedCategoryOverBaseRing):
             """
             ring = self.base_ring()
             fraction_field = ring.fraction_field()
-            labels = tuple(self.module_generating_set())
             gram = self.gram_tensor().change_ring(fraction_field)
             half_norm = fraction_field(orthogonal.q()) / fraction_field(ring(2))
             isotropic_vector = tensor.coordinates(isotropic).change_ring(fraction_field)
             orthogonal_vector = tensor.coordinates(orthogonal).change_ring(fraction_field)
             pairing_with_isotropic = gram * isotropic_vector
             pairing_with_orthogonal = gram * orthogonal_vector
-            # Equation (10) there: `t(e,a)` preserves `L` exactly when every
-            # coefficient `q(a) b(e, e_j)/2` is integral, which is one decision
-            # per basis vector.  Reading the update over the ring refuses such a
-            # coefficient as well, but that refusal is the conversion's: it names
-            # a rational and not the transvection, the lattice or the generator
-            # whose coefficient it is.
-            for position, label in enumerate(labels):
-                coefficient = half_norm * pairing_with_isotropic[position]
-                if coefficient not in ring:
-                    raise ValueError(
-                        f"the Eichler transvection t(e, a) with e = {isotropic!r}, "
-                        f"a = {orthogonal!r} does not preserve {self!r}: "
-                        f"q(a) b(e, {self.module_generator(label)})/2 = {coefficient} "
-                        f"is not in {ring}"
-                    )
             update = (
                 tensor.identity(fraction_field, self.module_rank())
                 - isotropic_vector.tensor_product(pairing_with_orthogonal)
@@ -8532,6 +8539,20 @@ class Lattices(OwnedCategoryOverBaseRing):
                     pairing_with_isotropic
                 )
             )
+            outside = update.component_outside(ring)
+            if outside is not None:
+                position, coefficient = outside
+                raise TransvectionOutsideTheLattice(
+                    f"the Eichler transvection t(e, a) with e = {isotropic!r}, "
+                    f"a = {orthogonal!r} does not preserve {self!r}: the coefficient "
+                    f"{coefficient} of its matrix at position {position} is not in "
+                    f"{ring}",
+                    isotropic,
+                    orthogonal,
+                    self,
+                    position,
+                    coefficient,
+                )
             return _engine_component_matrix(update.change_ring(ring))
 
         def eichler_transvection(self, isotropic, orthogonal):
@@ -8553,8 +8574,9 @@ class Lattices(OwnedCategoryOverBaseRing):
             modular varieties*, arXiv:0810.1614, section 3.1, printed p. 8.
             \(t(e,a)\) preserves \(L\) exactly when every coefficient
             \(\tfrac12 q(a)\,b(e,x)\) is integral, automatic on an even
-            lattice; otherwise the update has a coefficient outside the ring
-            of \(L\), and reading it over that ring is what refuses it.
+            lattice; otherwise the update has an entry outside the ring of
+            \(L\), and the refusal states it with the transvection and the
+            lattice, as :class:`TransvectionOutsideTheLattice` carries them.
 
             EXAMPLES::
 

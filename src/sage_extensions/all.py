@@ -174,6 +174,7 @@ from sage_extensions.categories.lattices import (  # noqa: F401  # noqa: F401
     NondegenerateLattices,
     NotPrimitiveError,
     RootLattices,
+    TransvectionOutsideTheLattice,
     nikulin_invariants,
     signature_pair,
     signature_pairs,
