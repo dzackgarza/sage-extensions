@@ -4310,6 +4310,16 @@ class CommutativeAlgebraPushouts(OwnedCategoryOverBaseRing):
         return [Algebras(self.base_ring()).Associative().Unital().Commutative()]
 
     class ParentMethods:
+        def __init__(
+            self,
+            _preamble_pushout_span,
+            _preamble_pushout_coproduct,
+            **rest,
+        ) -> None:
+            self._preamble_pushout_span = _preamble_pushout_span
+            self._preamble_pushout_coproduct = _preamble_pushout_coproduct
+            super().__init__(**rest)
+
         def pushout_span(self):
             return self._preamble_pushout_span
 

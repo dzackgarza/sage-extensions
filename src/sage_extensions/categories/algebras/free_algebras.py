@@ -822,11 +822,11 @@ class _PresentedAlgebraParent(_OwnedAlgebraParent):
         presentation_ideal,
         *,
         extra_categories=(),
-        extra_construction_data=None,
         generating_module=None,
         commutative_backend=False,
         finite_free_degree=None,
         presentation_flattening=None,
+        presentation_cover_map=None,
         generator_values=None,
         presentation_lift=None,
         finite_free_generator=None,
@@ -839,10 +839,7 @@ class _PresentedAlgebraParent(_OwnedAlgebraParent):
         self._preamble_presentation_ring = presentation_ring
         # An auxiliary native polynomial cover retains its actual map from
         # the chosen presentation.  Other realizations have no such cover.
-        self._presentation_cover_map = None
-        if extra_construction_data is not None:
-            for name, value in extra_construction_data:
-                setattr(self, name, value)
+        self._presentation_cover_map = presentation_cover_map
         if presentation_flattening is not None:
             self._presentation_cover_map = presentation_flattening
         unflatten = (
@@ -1025,11 +1022,11 @@ class _WordFramedPresentedAlgebra(_NativeMonomialEvaluation, _PresentedAlgebraPa
 
     def __init__(
         self,
-        engine,
+        quotient_engine,
         base,
         labels,
         presentation_ring,
-        relations,
+        selected_relations,
         presentation_ideal,
         *,
         generating_module,
@@ -1056,12 +1053,12 @@ class _WordFramedPresentedAlgebra(_NativeMonomialEvaluation, _PresentedAlgebraPa
         match options.get("generator_values"), options.get("presentation_flattening"):
             case (None, None):
                 self._native_word_generators = tuple(
-                    engine.gen(i) for i in range(int(labels.cardinality()))
+                    quotient_engine.gen(i) for i in range(int(labels.cardinality()))
                 )
             case (None, flattening):
                 free_engine = _engine_ring(presentation_ring)
                 self._native_word_generators = tuple(
-                    engine(flattening(free_engine.gen(i)))
+                    quotient_engine(flattening(free_engine.gen(i)))
                     for i in range(int(labels.cardinality()))
                 )
             case (values, _):
@@ -1076,11 +1073,11 @@ class _WordFramedPresentedAlgebra(_NativeMonomialEvaluation, _PresentedAlgebraPa
             injective=relations_are_linear,
         )
         super().__init__(
-            engine,
+            quotient_engine,
             base,
             labels,
             presentation_ring,
-            relations,
+            selected_relations,
             presentation_ideal,
             generating_module=generating_module,
             **options,
@@ -1533,24 +1530,50 @@ def _finitely_presented_algebra_from_data(
             word_frame["relations_are_linear"] = _generating_module is not None
             if _generating_module is None:
                 _generating_module = presentation_ring.generating_module()
-    return constructor(
-        quotient_engine,
-        base,
-        labels,
-        presentation_ring,
-        selected_relations,
-        presentation_ideal,
+    # Construction data are consumed by the level that declares them
+    # (``OWN-16``): that level's own constructor states the datum in its own
+    # signature, so the levels establishing this object's data precede the
+    # algebra implementation and each hands the rest down the chain.  The
+    # auxiliary presentation cover is the presented-algebra owner's own datum,
+    # not a category's, and reaches it directly.
+    presentation_cover_map = None
+    category_data = {}
+    for name, value in extra_construction_data:
+        match name:
+            case "_presentation_cover_map":
+                presentation_cover_map = value
+            case _:
+                category_data[name] = value
+    implementation = constructor
+    if category_data:
+        from sage_extensions.owned_category import owned_category_join
+        from sage_extensions.refine import owned_parent_class
+
+        implementation = owned_parent_class(
+            constructor,
+            owned_category_join(tuple(_extra_categories)),
+            establishing=frozenset(category_data),
+        )
+    arguments = dict(
+        quotient_engine=quotient_engine,
+        base=base,
+        labels=labels,
+        presentation_ring=presentation_ring,
+        selected_relations=selected_relations,
+        presentation_ideal=presentation_ideal,
         extra_categories=tuple(_extra_categories),
-        extra_construction_data=extra_construction_data,
         generating_module=_generating_module,
         commutative_backend=commutative_backend,
         finite_free_degree=finite_free_degree,
         presentation_flattening=presentation_flattening,
+        presentation_cover_map=presentation_cover_map,
         generator_values=generator_values,
         presentation_lift=presentation_lift,
         constructing_category=_constructing_category,
         **word_frame,
+        **category_data,
     )
+    return implementation(**arguments)
 
 
 def _fix_free_algebra_presentation(algebra) -> None:
