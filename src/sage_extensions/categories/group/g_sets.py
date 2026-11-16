@@ -319,17 +319,28 @@ class FiniteGSets(CategoryPacketMethods, OwnedParameterizedCategory):
         action is realized without evaluating the supplied action a second
         time (``orbit_schreier_morphism`` reads the images back from
         ``permutation_representation``).  The sweep is a route to that set,
-        not a datum of it: nothing of it is stored on the set afterwards, so a
-        later question about this action is answered by the action.  The seeds
-        are materialized once, so a one-shot iterable is consumed before, not
-        after, the sweep.
+        not a datum of it: a later question about this action is answered by
+        the action.  The seeds are materialized once, so a one-shot iterable is
+        consumed before, not after, the sweep.
+
+        A sweep from a single seed is that seed's orbit: every point it reached
+        is reached from the seed, and the word it assigned each one carries the
+        seed to that point, which is a transversal of the orbit.  So the answer
+        to the first orbit question is the answer this call already computed,
+        and it is cached as that question's answer rather than searched for a
+        second time (``_orbit_of``).  From several seeds the sweep is not any
+        one seed's orbit, and each seed's own orbit searches as any point's
+        does.
         """
         seeds = tuple(seeds)
         augmentation = self.group().selected_group_resolution().augmentation()
-        points, _words, transitions = self._orbit_words(
+        points, words, transitions = self._orbit_words(
             seeds, action, augmentation, retain_transitions=True,
         )
-        return self._from_orbit_sweep(points, action, augmentation, transitions)
+        g_set = self._from_orbit_sweep(points, action, augmentation, transitions)
+        if len(seeds) == 1:
+            g_set._orbit_of.set_cache((g_set, words, augmentation), seeds[0])
+        return g_set
 
     def _from_orbit_sweep(self, points, action, augmentation, transitions):
         r"""Realize the finite action from its complete generator transition table.
@@ -740,6 +751,11 @@ class FiniteGSets(CategoryPacketMethods, OwnedParameterizedCategory):
             evaluated a second time, and the words it assigns are the section
             ``p |-> t_p``.  The orbit is realized from that sweep's table,
             which is read at construction and not stored.
+
+            A set built from one seed already holds this answer for that seed:
+            the sweep ``from_finite_orbits`` ran was the seed's orbit, so its
+            points and words were cached here when the set was built, and the
+            first question about that orbit searches nothing.
             """
             augmentation = self.acting_group().selected_group_resolution().augmentation()
             category = FiniteGSets(self.acting_group())
