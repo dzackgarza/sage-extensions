@@ -2415,6 +2415,7 @@ def _commutative_algebra_coproduct_backend(left, right):
         return _presented_algebra_quotient(
             presentation,
             relations,
+            base_ring=base,
             extra_categories=(CommutativeAlgebraCoproducts(base),),
             extra_construction_data=construction_data,
             generating_module=None,
