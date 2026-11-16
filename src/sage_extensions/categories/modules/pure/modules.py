@@ -7940,16 +7940,14 @@ def _coordinate_framed_free_module(module, ring) -> bool:
 def _coordinate_images(morphism):
     r"""Return the coordinates of each ``f(e_s)`` in the module generators of the codomain.
 
-    The morphism ``f`` is applied to each module generator of its domain; no
-    side of a matrix is read.  Engine adapters that take a family of
+    Column ``s`` of the morphism's retained coordinate matrix is the coordinate
+    vector of ``f(e_s)`` (:func:`_engine_matrix`, the one materialization of a
+    framed morphism), so the images are read off it rather than recomputed by
+    applying ``f`` to each generator.  Engine adapters that take a family of
     generating vectors lower a morphism of free modules through this.
     """
-    codomain_labels = tuple(morphism.codomain().module_generating_set())
-
-    def coordinates(label):
-        image = morphism(morphism.domain().module_generator(label)).to_vector()
-        return tuple(image(codomain_label) for codomain_label in codomain_labels)
-
+    ring = morphism.domain().base_ring()
     return tuple(
-        coordinates(label) for label in morphism.domain().module_generating_set()
+        tuple(_owned_engine_element(ring, entry) for entry in column)
+        for column in _engine_matrix(morphism).columns()
     )

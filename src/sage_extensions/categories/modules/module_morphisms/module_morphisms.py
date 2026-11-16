@@ -1878,53 +1878,52 @@ class ModuleMorphismMethods:
     def is_primitive(self) -> bool:
         r"""Return whether this monomorphism has torsion-free cokernel.
 
-        Over the integers with both endpoints finitely generated and free, the
-        cokernel is the quotient of the codomain's framing by the row lattice of
-        the inclusion's coordinate matrix \(A\).  The Smith form \(A = UDV\)
-        over a principal ideal domain writes that quotient as
-        \(\mathbf{Z}^{n-r} \oplus \bigoplus_i \mathbf{Z}/d_i\), so it is
-        torsion-free exactly when every elementary divisor \(d_i\) is a unit --
-        which is the criterion of the invariant factors that
-        :meth:`...FinitelyPresentedModules.ParentMethods._torsion_freeness_decision`
-        states of the presented quotient, read here off the matrix that decides
-        it.  The decision therefore constructs no quotient module;
-        :meth:`saturation` reads the same matrix for the primitive closure.
+        A monomorphism is primitive when its cokernel is torsion-free, that is
+        when its image is a saturated submodule of its codomain.
 
-        Every other ring takes the inclusion's quotient and asks it: there the
-        invariant factors are the presented owner's to read.
+        Over a principal ideal domain with both endpoints finitely generated and
+        free, the cokernel is the quotient of the codomain's chosen frame by the
+        row lattice of this morphism's coordinate matrix \(A\).  The Smith
+        normal form \(A = UDV\) (H. J. S. Smith, *On systems of linear
+        indeterminate equations and congruences*, Phil. Trans. R. Soc. Lond.
+        151 (1861), 293--326; the module statement is the structure theorem for
+        finitely generated modules over a principal ideal domain) writes that
+        quotient as \(R^{n-r} \oplus \bigoplus_i R/(d_i)\), so the cokernel is
+        torsion-free exactly when every elementary divisor \(d_i\) is a unit.
+        That is the criterion of the invariant factors which
+        :meth:`...FinitelyPresentedModules.ParentMethods._torsion_freeness_decision`
+        states of the presented quotient, and it holds over every principal
+        ideal domain, not over the integers alone.
+
+        The decision reads the matrix this morphism already retains
+        (:func:`...pure.modules._engine_matrix`), the same source
+        :meth:`saturation` reads for the primitive closure, so it constructs no
+        quotient module.  Every other ring takes this map's cokernel and asks
+        it: there the invariant factors are the presented owner's to read.
         """
         ring = self.domain().base_ring()
-        from sage.rings.integer_ring import ZZ as SageZZ
+        match ring:
+            case _ if ring in PrincipalIdealDomains() and _has_finite_free_framing(
+                self.domain()
+            ) and _has_finite_free_framing(self.codomain()):
+                from sage_extensions.categories.modules.pure.modules import (
+                    _engine_matrix,
+                )
 
-        if (
-            _engine_ring(ring) is SageZZ
-            and _has_finite_free_framing(self.domain())
-            and _has_finite_free_framing(self.codomain())
-        ):
-            from sage.matrix.constructor import matrix
-
-            source_labels = tuple(self.domain().module_generating_set())
-            target_labels = tuple(self.codomain().module_generating_set())
-            engine = _engine_ring(ring)
-            rows = [
-                [
-                    _engine_element(
-                        ring,
-                        self(self.domain().module_generator(label)).to_vector()(target_label),
-                    )
-                    for target_label in target_labels
-                ]
-                for label in source_labels
-            ]
-            coordinate_matrix = matrix(engine, rows)
-            rank = int(coordinate_matrix.rank())
-            if rank != len(source_labels):
-                return False
-            divisors = coordinate_matrix.smith_form()[0]
-            return all(abs(int(divisors[index, index])) == 1 for index in range(rank))
-        if not self.is_injective():
-            return False
-        return self.cokernel().is_torsion_free()
+                coordinate_matrix = _engine_matrix(self)
+                rank = int(coordinate_matrix.rank())
+                if rank != coordinate_matrix.ncols():
+                    return False
+                divisors = coordinate_matrix.smith_form()[0]
+                return all(
+                    _owned_engine_element(ring, divisors[index, index]).is_unit()
+                    is True
+                    for index in range(rank)
+                )
+            case _:
+                if not self.is_injective():
+                    return False
+                return self.cokernel().is_torsion_free()
 
     is_saturated = is_primitive
 
@@ -1932,45 +1931,51 @@ class ModuleMorphismMethods:
         r"""Return the saturation of the image of an injective morphism.
 
         For ``i:S -> M`` this is the kernel of
-        ``M -> M/S -> (M/S)/Tor(M/S)``.  For finite free ``ZZ``-modules,
-        compute the primitive row lattice directly from the Smith form of the
-        coordinate matrix instead of constructing the quotient object first.
+        ``M -> M/S -> (M/S)/Tor(M/S)``.  Over a principal ideal domain with both
+        endpoints finitely generated and free, compute the primitive row lattice
+        directly from the Smith form of the coordinate matrix this morphism
+        already retains (:func:`...pure.modules._engine_matrix`, the matrix
+        :meth:`is_primitive` decides from), instead of constructing the quotient
+        object first.
         """
         assert self.is_injective(), (
             f"cannot saturate the image of {self.domain()} -> {self.codomain()}: saturation is defined for an "
             f"injective map, and this map has nonzero kernel"
         )
         ring = self.domain().base_ring()
-        from sage.rings.integer_ring import ZZ as SageZZ
-        if _engine_ring(ring) is SageZZ and _has_finite_free_framing(self.domain()) and _has_finite_free_framing(self.codomain()):
-            from sage.matrix.constructor import matrix
-            from sage.modules.free_module import FreeModule
-            source_labels = tuple(self.domain().module_generating_set())
-            target_labels = tuple(self.codomain().module_generating_set())
-            rows = []
-            for source_label in source_labels:
-                image = self(self.domain().module_generator(source_label))
-                coordinates = image.to_vector()
-                rows.append([_engine_element(ring, coordinates(label)) for label in target_labels])
-            engine = _engine_ring(ring)
-            A = matrix(engine, rows)
-            smith, left, right = A.smith_form()
-            rank = int(A.rank())
-            # D = left * A * right.  The primitive closure of the row lattice of A
-            # is spanned by the first ``rank`` rows of right^{-1}.
-            primitive_rows = tuple(right.inverse().row(i) for i in range(rank))
-            ambient = FreeModule(engine, len(target_labels))
-            primitive = ambient.submodule(primitive_rows)
-            basis_rows = tuple(tuple(row) for row in primitive.basis_matrix().rows())
-            generators = tuple(
-                self.codomain().linear_combination({target_labels[j]: _owned_engine_element(ring, value) for j, value in enumerate(row) if value})
-                for row in basis_rows
-            )
-            return self.codomain().subobject_on(generators)
-        quotient = self.cokernel()
-        projection = quotient.torsion_free_quotient_projection()
-        composite = projection * quotient.presentation_projection()
-        return composite.kernel()
+        match ring:
+            case _ if ring in PrincipalIdealDomains() and _has_finite_free_framing(
+                self.domain()
+            ) and _has_finite_free_framing(self.codomain()):
+                from sage.modules.free_module import FreeModule
+
+                from sage_extensions.categories.modules.pure.modules import (
+                    _engine_matrix,
+                )
+
+                target_labels = tuple(self.codomain().module_generating_set())
+                # One row per source generator, one column per ambient generator:
+                # the retained matrix stores the transposed orientation, whose
+                # column ``s`` is the coordinate vector of ``f(e_s)``.
+                A = _engine_matrix(self).transpose()
+                smith, left, right = A.smith_form()
+                rank = int(A.rank())
+                # D = left * A * right.  The primitive closure of the row lattice of A
+                # is spanned by the first ``rank`` rows of right^{-1}.
+                primitive_rows = tuple(right.inverse().row(i) for i in range(rank))
+                ambient = FreeModule(_engine_ring(ring), len(target_labels))
+                primitive = ambient.submodule(primitive_rows)
+                basis_rows = tuple(tuple(row) for row in primitive.basis_matrix().rows())
+                generators = tuple(
+                    self.codomain().linear_combination({target_labels[j]: _owned_engine_element(ring, value) for j, value in enumerate(row) if value})
+                    for row in basis_rows
+                )
+                return self.codomain().subobject_on(generators)
+            case _:
+                quotient = self.cokernel()
+                projection = quotient.torsion_free_quotient_projection()
+                composite = projection * quotient.presentation_projection()
+                return composite.kernel()
 
     def index(self):
         r"""Return the cardinality of the cokernel."""
