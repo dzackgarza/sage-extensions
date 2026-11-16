@@ -1959,6 +1959,7 @@ class Modules(OwnedCategoryOverBaseRing):
                     return _ModuleScalarAction(ring, self, True)
 
         def module_category(self):
+            _realize_pending_self_module_placement(self)
             return Modules(self.base_ring())
 
         def has_selected_module_resolution(self) -> bool:
@@ -6333,8 +6334,38 @@ class TensorProductModules(OwnedCategoryOverBaseRing):
             return mor._from_bilinear_evaluation(bilinear)
 
 
+def _state_pending_self_module_placement(module, realize) -> None:
+    r"""State a module reading that is built on the first module read.
+
+    A construction that fixes *which* reading of an object is the selected one
+    -- a quotient's cyclic presentation over its cover, say -- states it here
+    instead of building it, because the placement, the frame and the free and
+    regular modules the reading is stated in are derived structure
+    (``AGENTS.md``, "Construction is instant").
+
+    :func:`_realize_pending_self_module_placement` builds it at the first
+    request: the module-category accessor, or the predicate that asks whether
+    the module carries a chosen finite presentation.
+    """
+    module.__dict__["_pending_self_module_placement"] = realize
+
+
+def _realize_pending_self_module_placement(module) -> None:
+    r"""Build a stated module reading, at the first module read.
+
+    The statement is consumed before it is built, so a reading whose
+    construction itself asks this module for its category does not re-enter.
+    """
+    pending = module.__dict__.get("_pending_self_module_placement")
+    if pending is None:
+        return
+    del module.__dict__["_pending_self_module_placement"]
+    pending()
+
+
 def _represented_finite_presentation(module) -> bool:
     r"""Return whether ``module`` carries selected finite presentation data."""
+    _realize_pending_self_module_placement(module)
     return module in ModulesWithChosenFinitePresentation(module.base_ring())
 
 
