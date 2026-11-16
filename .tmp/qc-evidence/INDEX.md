@@ -3202,3 +3202,18 @@ each time; the ids in the two notes above are the ids of the `c9568ed`- and
 pushed tip's -- `git diff --stat 5f014e0 b107242 -- src/sage_extensions/all.py
 src/sage_extensions/language_runtime.py tests/foundations` is empty -- so they
 cover the code this is pushed from.
+
+
+## `#521` round 4: the trees the runs measured, named by what they are (2026-11-16)
+
+`main` advanced while this round was finished and the round was rebased onto it
+each time, so the ids in the rows above are the ids of the trees the runs measured,
+not of the commits this push carries.  The rows survive the rebases by their
+subject: this round's commits are the ones carrying its four subjects -- the reds'
+test, the repair, the two restored `541r4` rows, and the evidence -- and the four
+files they touch are the ones at the tip of this push.
+
+The red's tree is `ba303ba`, which is in the pushed history, and the log names it.
+The other logs name trees the rebases replaced; they hold the same four files as
+the tip, so every run covers the code that is pushed and none is claimed for a tree
+it did not measure.
