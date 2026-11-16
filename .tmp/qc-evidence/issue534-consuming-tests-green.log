@@ -1,0 +1,36 @@
+tree SHA: 897e7f7fd45e4d4f4cfcb29b266672e9232d25ab
+tests: tests/lattices/test_characteristic_discriminant_elements_archive.sage tests/lattices/test_isotropic_type_archive.sage
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: asyncio-1.5.0, xdist-3.8.0, reportlog-1.0.0, platformdirs-4.13.5, hypothesis-6.170.15, anyio-4.15.1, timeout-2.4.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 5 items
+
+tests/lattices/test_characteristic_discriminant_elements_archive.sage .. [ 40%]
+                                                                         [ 40%]
+tests/lattices/test_isotropic_type_archive.sage ...                      [100%]
+
+============================== slowest durations ===============================
+0.97s call     tests/lattices/test_characteristic_discriminant_elements_archive.sage::test_the_divided_class_of_a_basis_vector_of_u2_is_not_characteristic
+0.28s call     tests/lattices/test_isotropic_type_archive.sage::test_divisibility_two_u2_vector_is_even_ordinary
+0.25s call     tests/lattices/test_characteristic_discriminant_elements_archive.sage::test_diagonal_two_minus_two_has_a_characteristic_divided_class
+0.22s call     tests/lattices/test_isotropic_type_archive.sage::test_characteristic_divisibility_two_vector_is_even_characteristic
+0.08s call     tests/lattices/test_isotropic_type_archive.sage::test_divisibility_one_isotropic_vector_has_odd_cusp_type
+
+(10 durations < 0.005s hidden.  Use -vv to show these durations.)
+============================== 5 passed in 59.71s ==============================
+[peakrss] wt534-pytest: child waited=0 shell_code=0 samples=47
+[peakrss] peak tree RSS      : 283 MiB
+[peakrss] low-water MemAvail : 978 MiB
+[peakrss] peak single VmHWM  : 290 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      279 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    95.2s procs=  3 rss=   283 MiB hwm=   290 MiB avail=  4088 MiB
+[peakrss]   t=    93.2s procs=  3 rss=   276 MiB hwm=   281 MiB avail=  4183 MiB
+[peakrss]   t=    91.2s procs=  3 rss=   253 MiB hwm=   259 MiB avail=  4506 MiB
+[peakrss]   t=    89.2s procs=  3 rss=   199 MiB hwm=   205 MiB avail=  4159 MiB
+[peakrss]   t=    87.2s procs=  3 rss=   134 MiB hwm=   140 MiB avail=  4054 MiB

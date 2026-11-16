@@ -1,5 +1,32 @@
 # Issue to file: `DiscriminantClass.is_characteristic` answers `False` for every class of `A_{T_Co}`
 
+**Retracted: the defect this body reports was repaired before the body was filed.** The
+quoted line is not the code. `is_characteristic` compared the owned value lifts against
+**Sage's** integer ring only until `ef8fb06` (#348, 2026-11-11), which asks the membership
+of the module's own base ring; that commit is an ancestor of the main branch this body was
+filed against four days later. Against the owned integers the lifts are members, including
+the unreduced representative `(0)/(4)` that a mixed class produces, and against the
+engine's `ZZ` every owned value element answers `False`, `0` included -- which is what the
+`in ZZ: False` line below measures, in a probe that never called the method.
+
+Measured at `897e7f7` on the specimen below: `[h/2].is_characteristic()` is `True` and
+`zero.is_characteristic()` is `False`, the second because `q([h/2]) - b([h/2], 0) = 1/2`.
+An independent pass over all 2048 classes, built from the gram data on the 11 generators
+with `q(x+y) = q(x) + q(y) + 2b(x,y)`, finds 0 non-integral differences for `[h/2]` and
+1024 for the zero class, so the method's two answers are the form's. The cost is the
+surviving defect: 145.7 s for the first call and 113.2 s for the second, 76.7 s of it
+enumerating the classes.
+
+The consequence drawn below does not hold on this specimen either. `b` is nondegenerate on
+`A_{T_Co}`, so `[h/2]` is the only characteristic class, and its value `q([h/2]) = 1/2` is
+not one a divided isotropic class can take: for a primitive isotropic `v` of divisibility 2
+the class `[v/2]` has `q([v/2]) = (v,v)/4 = 0`. Measured: `get_isotropic_type(ep)` on
+`T_Co` answers `Even ordinary` (99.86 s), which is the correct answer, and the same
+classification answers `Even characteristic` on the lattice
+`tests/lattices/test_isotropic_type_archive.sage` names for it.
+
+`TRAPS.md` and `results/issue286-tco-run.md` carry the same correction.
+
 Not filed by a push: this project's GitHub connection reads issues and cannot create
 them, so the orchestrator posts this body. `repo:dzackgarza/sage-extensions is:issue
 is_characteristic` returns 0 hits, so no open issue holds it.

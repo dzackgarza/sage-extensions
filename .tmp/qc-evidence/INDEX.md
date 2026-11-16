@@ -2552,3 +2552,21 @@ its own tree, its own load and the exact command in its header.
 | `541r3-review-tests.log` | `80a135c` | the three contract files of the review round with the test lint loaded: **4 passed in 7.03 s** |
 | `541r3-row-repaired.log` | `b383a80` | the row on the pushed tree at load **0.94**: first plane **306.7 s**, **26 506 planes by 516.6 s**, the ticks reading **127.98 planes/s (7.8 ms a plane)** at 486.5 s and **126.31 planes/s (7.9 ms)** at 516.6 s, peak RSS 3330 MiB; against the base's **86.4 planes/s and 11.6 ms a plane** (`541r2-row-merged-second.log`) that is +47 % planes a second and -32 % a plane, the walk's setup unchanged |
 | `541r3-consumers-base.log`, `541r3-consumers-repaired.log` | `4f540a2` / `b383a80` | the nine `tests/lattices` files that consume the primitivity decision: **9 failed, 9 passed** in 177.62 s and **8 failed, 10 passed** in 172.65 s, and `diff` of the FAILED id sets is exactly `test_a_planes_primitivity_is_decided_from_its_coordinates.sage`, the contract file that is red at the base; no other id moved |
+
+## #534: the characteristic classes of `A_{T_Co}`, decided on the form rather than by the engine's integer ring
+
+The issue reports `DiscriminantClass.is_characteristic` answering `False` for every class of
+`A_{T_Co}` because the owned value lifts are not members of Sage's `ZZ`. The lifted code is
+not the tree's: `ef8fb06` (#348, 2026-11-11) asks the membership of the module's own base ring
+and answers correctly. Every log below is at base `897e7f7` (tree `897e7f7`, adopted runtime,
+`bash .scratch/wt534_launch.sh` and `bash .scratch/wt534_pytest.sh`), and each is named by what
+it decided.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `issue534-tco-characteristic-and-the-zero-class.log` | `897e7f7` | `[h/2].is_characteristic()` **True** in 258.95 s and `zero.is_characteristic()` **False** in 145.72 s, with an independent table over all 2048 classes from the gram data on 11 generators: 0 non-integral differences for `[h/2]`, 1024 for the zero class. Its `factor 1` column is a wrong polarisation (`q(g1+g2) = 1` where `q(g1)+q(g2)+b(g1,g2) = 0`): the form's relation is `q(x+y) = q(x)+q(y)+2b(x,y)`, which the same log prints on four pairs, and the `factor 2` column is the form's |
+| `issue534-tco-class-table-and-cost.log` | `897e7f7` | the same table before the polarisation was pinned: 11 generators of order 2, `elements()` **2048 in 76.68 s**, 11 `q` evaluations 0.10 s and 11 `b` evaluations 0.30 s -- the enumeration is the cost, not the form values |
+| `issue534-value-membership-in-both-integer-rings.log` | `897e7f7` | the issue's own observation, located: for the mixed classes that give the unreduced representatives `(0)/(4)` and `(4)/(4)`, `difference in ZZ` is **True** in the session's owned integers and **False** in `sage.rings.integer_ring.ZZ`, `0` included; `q([h/2]) - b([h/2], 0) = (1)/(2)` is in neither |
+| `issue534-tco-isotropic-type-even-ordinary.log` | `897e7f7` | `get_isotropic_type(ep)` on `T_Co`: **Even ordinary** in 99.86 s, `q([ep/2]) = 0`, the divided class not characteristic -- the correct classification, since the one characteristic class `[h/2]` has `q = 1/2` |
+| `issue534-five-small-forms-exact-agreement.log` | `897e7f7` | the method against an exact pass on `<2>`, `U(2)`, `diag(2,-2)`, `I_2(2)`, `U(2)+<2>`: the same characteristic class counted in each, in 0.72--4.05 s |
+| `issue534-consuming-tests-green.log` | `897e7f7` | the two files that consume the method, `test_characteristic_discriminant_elements_archive.sage` and `test_isotropic_type_archive.sage`: **5 passed in 59.71 s**, slowest call 0.97 s |

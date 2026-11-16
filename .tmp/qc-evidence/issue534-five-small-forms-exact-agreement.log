@@ -1,0 +1,24 @@
+tree SHA: 897e7f7fd45e4d4f4cfcb29b266672e9232d25ab
+probe: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/probe534c.py
+x: 0 q.lift: 0 b.lift: 0 | d: 0 num: 0 den: 1 | as rational: 0
+x: [1] q.lift: (3)/(2) b.lift: (1)/(2) | d: (4)/(4) num: 4 den: 4 | as rational: 1
+x: [0] q.lift: (1)/(2) b.lift: (1)/(2) | d: (0)/(4) num: 0 den: 4 | as rational: 0
+x: [0] + [1] q.lift: 0 b.lift: 0 | d: 0 num: 0 den: 1 | as rational: 0
+<2>: |A| = 2; exact 1 ['[0]']; library 1 ['[0]']; sets agree True; 0.73s
+U(2): |A| = 4; exact 1 ['0']; library 1 ['0']; sets agree True; 1.13s
+diag(2,-2): |A| = 4; exact 1 ['[0] + [1]']; library 1 ['[0] + [1]']; sets agree True; 0.72s
+I2(2): |A| = 4; exact 1 ['[0] + [1]']; library 1 ['[0] + [1]']; sets agree True; 1.11s
+U2+<2>: |A| = 8; exact 1 ['[2]']; library 1 ['[2]']; sets agree True; 4.05s
+[peakrss] probe534c: child waited=0 shell_code=0 samples=15
+[peakrss] peak tree RSS      : 308 MiB
+[peakrss] low-water MemAvail : 3926 MiB
+[peakrss] peak single VmHWM  : 308 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      297 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    26.1s procs=  3 rss=   308 MiB hwm=   308 MiB avail=  4251 MiB
+[peakrss]   t=    24.1s procs=  3 rss=   307 MiB hwm=   307 MiB avail=  4254 MiB
+[peakrss]   t=    28.1s procs=  3 rss=   307 MiB hwm=   308 MiB avail=  3926 MiB
+[peakrss]   t=    22.1s procs=  3 rss=   306 MiB hwm=   306 MiB avail=  4268 MiB
+[peakrss]   t=    20.1s procs=  3 rss=   303 MiB hwm=   303 MiB avail=  3939 MiB

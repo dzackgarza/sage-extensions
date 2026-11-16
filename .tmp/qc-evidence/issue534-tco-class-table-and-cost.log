@@ -1,0 +1,26 @@
+tree SHA: 897e7f7fd45e4d4f4cfcb29b266672e9232d25ab
+probe: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/probe534e.py
+generators: 11 orders: [2]
+zero: 2048 classes, 1024 with q(x) - b(x, v) not integral; first [([0], 1/2), ([0, 1], 1/2)]; 14.38s
+generators: 11 orders: [2]
+[h/2] (the divided class of h): 2048 classes, 992 with q(x) - b(x, v) not integral; first [([1, 2], 1/2), ([0, 1, 2], 1/2)]; 18.73s
+h + a1: q = -2 | div = 2 | primitive = True
+generators: 11 orders: [2]
+divided class of h + a1: q = [(3)/(2)] in Fraction Field of Integer Ring / (2)Integer Ring; 2048 classes, 992 not integral; first [([1, 2], 1/2), ([0, 1, 2], 1/2)]; 23.21s
+11 q evaluations: 0.10s
+11 b evaluations: 0.30s
+elements(): 2048 in 76.68s; total 100.30s
+[peakrss] probe534e: child waited=0 shell_code=0 samples=58
+[peakrss] peak tree RSS      : 321 MiB
+[peakrss] low-water MemAvail : 3470 MiB
+[peakrss] peak single VmHWM  : 321 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      310 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   run.sh                        5 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   114.4s procs=  3 rss=   321 MiB hwm=   321 MiB avail=  6886 MiB
+[peakrss]   t=   108.4s procs=  3 rss=   320 MiB hwm=   320 MiB avail=  6981 MiB
+[peakrss]   t=   110.4s procs=  3 rss=   320 MiB hwm=   320 MiB avail=  6936 MiB
+[peakrss]   t=   112.4s procs=  3 rss=   320 MiB hwm=   320 MiB avail=  7053 MiB
+[peakrss]   t=    70.3s procs=  3 rss=   319 MiB hwm=   319 MiB avail=  4091 MiB

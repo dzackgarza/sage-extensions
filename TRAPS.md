@@ -4075,10 +4075,24 @@ isometries by brute force*, above, at `|A| = 2048` -- past that table's largest 
 specimen (`n = 6`, 4.90 s). It blocks every character-quotient row of `#286`, including
 `R_{Gamma_En,2} = rho^-1(P)`, whose `P` is a stabilizer inside `O(A_{T_Co})`.
 
-`DiscriminantClass.is_characteristic` cannot decide on this form either: it compares
-`q(x).lift() - b(x,v).lift()` against `ZZ`, and both lifts are `OwnedJoinCategory`
-value elements, for which `in ZZ` is `False` even at `0`, so all 2048 classes answer
-`False` -- see `results/issue-to-file-discriminant-characteristic-undecided.md`.
+`DiscriminantClass.is_characteristic` decides on this form, and the claim that it could
+not was a stale reading of the source. Both value lifts are `OwnedJoinCategory` elements,
+and **Sage's** integer ring answers `False` for every one of them, `0` included; the
+method compared against that ring until `ef8fb06` (#348, 2026-11-11) asked the membership
+of the module's own base ring instead, and against the owned integers the lifts are
+members -- a mixed class gives the unreduced representative `(0)/(4)` or `(4)/(4)`, an
+integer either way. Measured at `897e7f7` on `A_{T_Co}`: `[h/2].is_characteristic()` is
+`True` and `zero.is_characteristic()` is `False`, the second because
+`q([h/2]) - b([h/2], 0) = 1/2`. An independent pass over all 2048 classes built from the
+gram data (11 generators, `q(x+y) = q(x) + q(y) + 2b(x,y)`) finds 0 non-integral
+differences for `[h/2]` and 1024 for the zero class, and agrees with the method on every
+small even lattice it was run on. The remaining defect on this specimen is cost, not
+truth: 145.7 s for the first call and 113.2 s for the second at `|A| = 2048`, because the
+method evaluates `q` and `b` on every class, and enumerating those classes costs 76.7 s
+of it.  The classification that consumes it is right here too: `get_isotropic_type(ep)` on
+`T_Co` answers `Even ordinary` (99.86 s) because the one characteristic class `[h/2]` has
+`q = 1/2`, while a primitive isotropic vector of divisibility 2 has
+`q([v/2]) = (v,v)/4 = 0`.
 
 The gate `tests/lattices/test_the_coble_lattice_from_the_cited_formula.sage` (the
 construction, the invariants and the 528/527 pair) is **3 passed in 31.25 s**, exit 0

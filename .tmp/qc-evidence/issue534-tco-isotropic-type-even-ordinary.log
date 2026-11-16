@@ -1,0 +1,18 @@
+tree SHA: 897e7f7fd45e4d4f4cfcb29b266672e9232d25ab
+probe: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/probe534i.py
+v = ep: q(v) = 0 | div(v) = 2 | primitive = True 0.43s
+q([ep/2]) = [0] in Fraction Field of Integer Ring / (2)Integer Ring | characteristic: False 83.36s
+get_isotropic_type(ep) = Even ordinary 99.86s
+[peakrss] probe534i: child waited=0 shell_code=0 samples=55
+[peakrss] peak tree RSS      : 247 MiB
+[peakrss] low-water MemAvail : 1777 MiB
+[peakrss] peak single VmHWM  : 253 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      242 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   106.3s procs=  3 rss=   247 MiB hwm=   253 MiB avail=  2540 MiB
+[peakrss]   t=   108.3s procs=  3 rss=   246 MiB hwm=   253 MiB avail=  2521 MiB
+[peakrss]   t=   104.3s procs=  3 rss=   241 MiB hwm=   247 MiB avail=  2577 MiB
+[peakrss]   t=   102.3s procs=  3 rss=   237 MiB hwm=   243 MiB avail=  2635 MiB
+[peakrss]   t=   100.3s procs=  3 rss=   235 MiB hwm=   242 MiB avail=  2724 MiB
