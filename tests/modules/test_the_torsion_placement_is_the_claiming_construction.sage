@@ -6,14 +6,13 @@ subquotient of a torsion module, the twist functor -- never refined from a
 computed answer (``DEF-03``, ``CAT-04``).  So equipping a finite cokernel with a
 form does not place the result in the torsion refinement, however its invariant
 factors read: the module is what its construction put it in, and the predicate
-:meth:`is_torsion` is available to anyone who asks.
+:meth:`is_torsion` stays available to whoever asks it.
 
-The same rule governs construction time (``OWN-22``, "Construction is
-instant"): a torsion-form constructor stores its claim and its Gram data, and
-the relation matrix that would confirm the claim is materialized by the first
-request that needs it, never by the construction.  The refutation of a false
-claim is the validator of the category the claim was made in, so a module that
-claimed nothing carries none.
+A claim is trusted, not checked (``OWN-22``: construction is instant, checking is
+asked for).  The torsion-form constructor stores the module the claimant named
+and the Gram data, and does not read the module's invariant factors to confirm
+the claim; a claim that is false is refuted where the claim is stated -- by the
+validator of the claim's category, when a caller asks it.
 
 Over $Z$, $5 \cdot 1$ has cokernel $Z/5$ with $b(x,x) = 1/5$, and the zero map
 has cokernel $Z$, which is not a torsion module.
@@ -36,49 +35,59 @@ def _form_values():
     return FractionFieldQuotients(ZZ)(1)
 
 
+def _torsion_forms():
+    r"""The finitely presented torsion modules with a bilinear form: the claim."""
+    return BilinearFormModules(ZZ).FinitelyPresented().Torsion()
+
+
 def test_a_cokernel_form_is_not_placed_in_torsion_by_a_computation() -> None:
     r"""$Z/5$ with $b = 1/5$: a construction that claimed nothing places it nowhere."""
     module = _cokernel_of_a_dilation(ZZ(5))
     values = _form_values()
-    gram = ((values(QQ(1) / QQ(5)),),)
 
-    def equip():
-        return BilinearFormModules(ZZ)(module.bilinear_forms(values)(gram))
-
-    form, constructed, requested = construction_work_of(
-        equip,
-        lambda formed: formed.cardinality(),
+    form = BilinearFormModules(ZZ)(
+        module.bilinear_forms(values)(((values(QQ(1) / QQ(5)),),))
     )
 
     assert form in FormModules(ZZ).FinitelyPresented()
     assert form not in FormModules(ZZ).FinitelyPresented().Torsion()
-    assert constructed == 0
-    assert requested > 0
+    assert form.is_torsion() is True
     assert int(form.cardinality()) == 5
 
 
-def test_the_torsion_form_constructor_states_the_claim_itself() -> None:
+def test_the_torsion_form_constructor_places_the_claim_it_states() -> None:
     r"""The same module and Gram data through the torsion form constructor."""
     module = _cokernel_of_a_dilation(ZZ(5))
     values = _form_values()
-    gram = ((values(QQ(1) / QQ(5)),),)
 
-    def claim():
-        return BilinearFormModules(ZZ).FinitelyPresented().Torsion().from_module(
-            module,
-            gram,
-            values,
-        )
-
-    form, constructed, requested = construction_work_of(
-        claim,
-        lambda formed: formed.cardinality(),
+    form = _torsion_forms().from_module(
+        module,
+        ((values(QQ(1) / QQ(5)),),),
+        values,
     )
 
     assert form in FormModules(ZZ).FinitelyPresented().Torsion()
-    assert constructed == 0
-    assert requested > 0
     assert int(form.cardinality()) == 5
+
+
+def test_a_false_claim_is_trusted_by_the_construction() -> None:
+    r"""$\operatorname{coker}(0) = Z$ is not torsion, and the form's constructor says nothing about it.
+
+    The descent validator is asked of the result, and the relations are empty, so
+    it holds: what the constructor stores is the caller's module and Gram data.
+    """
+    module = _cokernel_of_a_dilation(ZZ.zero())
+    values = _form_values()
+
+    form = _torsion_forms().from_module(
+        module,
+        ((values(QQ(1) / QQ(5)),),),
+        values,
+    )
+
+    form.validate_descent()
+    assert form in FormModules(ZZ).FinitelyPresented().Torsion()
+    assert form.unformed_module() == module
 
 
 def test_a_module_that_claims_no_torsion_states_no_refutation_of_one() -> None:
