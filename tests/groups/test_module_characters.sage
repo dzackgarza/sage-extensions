@@ -5,9 +5,14 @@ trace of each group element (Serre, *Linear Representations of Finite Groups*,
 §2.1 and §6.1).  In positive characteristic it is not: the Brauer character of
 a $p$-modular representation lifts the eigenvalues of each $p$-regular class
 through a character of the coefficient field's multiplicative group, which is
-the Teichmüller lift, so it differs from the $\mathbb{F}_p$-valued trace as
-soon as an eigenvalue moves into an extension field (§18.1).  Both are data of
-the module, asked for once and kept.
+the Teichmüller lift, so it is the sum of those lifts in a field of
+characteristic zero while the trace is that same sum taken in $\mathbb{F}_p$
+(§18.1).  The two differ unless the sum is unchanged by reduction: at the
+identity of the $\mathbb{F}_2^2$ specimen below both eigenvalues are $1$, so
+the trace is $2 = 0$ in $\mathbb{F}_2$ while the Brauer value is $2$, and at
+the order-three generator the eigenvalues are the primitive cube roots of
+unity, whose lifts sum to $-1$ against a trace of $1$.  Both are data of the
+module, asked for once and kept.
 """
 
 from sage_extensions.all import *
@@ -54,7 +59,14 @@ def test_the_character_of_sign_plus_trivial_of_s3_is_2_0_2() -> None:
 
 
 def test_the_2_modular_brauer_character_of_the_order_three_action_of_c6_on_f2_squared_is_2_minus1_minus1() -> None:
-    r"""$g$ acts on $\mathbb{F}_2^2$ by $x \mapsto y,\ y \mapsto x + y$, of order 3 with eigenvalues the primitive cube roots of unity in $\mathbb{F}_4$; their Teichmüller lifts sum to $\omega + \omega^2 = -1$, while the modular trace is $1$ (Serre, *Linear representations of finite groups*, 18.1)."""
+    r"""$g$ acts on $\mathbb{F}_2^2$ by $x \mapsto y,\ y \mapsto x + y$, of order 3 with eigenvalues the primitive cube roots of unity in $\mathbb{F}_4$; their Teichmüller lifts sum to $\omega + \omega^2 = -1$, while the modular trace is $1$ (Serre, *Linear representations of finite groups*, 18.1).
+
+    At the identity every eigenvalue is $1$ and lies in the prime field, so a
+    comparison there is not a comparison of eigenvalue fields: the trace is
+    $2 = 0$ in $\mathbb{F}_2$ and the Brauer value is $2$, an integer in
+    characteristic zero.  The Brauer character is the sum of the lifted
+    eigenvalues, not the trace read in another field.
+    """
     group = Groups.C(6)
     (g,) = group.group_generators()
     module = Modules(GF(2))(GF(2) ** 2)
@@ -70,6 +82,7 @@ def test_the_2_modular_brauer_character_of_the_order_three_action_of_c6_on_f2_sq
     # which is -1 at g^2 while the modular trace there is 1.
     assert acted not in BrauerCharacterRepresentations(GF(2)[group])
     assert brauer(group.one()) == 2
+    assert acted.action_of(group.one()).trace() == GF(2).zero()
     assert brauer(g**2) == -1
     assert brauer(g**4) == -1
     assert acted.action_of(g**2).trace() == GF(2).one()
