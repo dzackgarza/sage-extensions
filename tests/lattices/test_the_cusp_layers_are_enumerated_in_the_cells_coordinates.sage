@@ -104,32 +104,59 @@ def test_a_walk_that_cuts_no_cell_reports_the_whole_lattice_layers() -> None:
         )
 
 
+def _walls_through_the_point(reduction, point, wall_roots):
+    r"""Return the walls of ``wall_roots`` that pass through ``point``, in order.
+
+    The pairing of the point with the walls is one contraction of the family; the
+    walls through the point are the entries of its row that vanish.
+    """
+    pairings = _pairing_matrix(reduction, (point,) + tuple(wall_roots))
+    return tuple(
+        wall
+        for index, wall in enumerate(wall_roots)
+        if pairings[0, index + 1] == ZZ.zero()
+    )
+
+
 def test_the_cell_normals_are_the_chambers_walls_through_the_point() -> None:
     r"""The normals the record carries are the walls through the point, with their orientation.
 
     The point is the class \((1,1,0)\) of \(U\oplus A_1\), of square \(2\), and
-    the chamber is the one the same call computes at it
+    the walls are the ones the same call computes there
     (:meth:`IsotropicVectorReductionImage.cusp_chamber`).  A root and its
     negative span one mirror, so the pairing with the point alone does not say
     which of them cuts the cell: the two are distinguished by which half-spaces
     bound the chamber, and the walk reads the cone it wrote down rather than a
     family it reoriented.  Asserted: the normals of the record are exactly the
-    chamber's walls that pass through the point, as vectors and not as
-    rays.
+    chamber's walls that pass through the point, as vectors and not as rays.
+
+    The prefix of the sequence is asserted first, because the search at a cell
+    oriented the other way accepts no wall of the chamber -- every candidate it
+    enumerates pairs positively with the initial cone -- so the result of that
+    defect is a walk that never closes, and the complete chamber below would not
+    return at all.  The prefix is cut by that same initial cone, so it carries
+    the same walls through the point and it reddens at once.
     """
     image = _reduction_image("U", "U", "A1")
     reduction = image.reduction()
     point = _class(reduction, 1, 1, 0)
     controlling_vector = image.class_lift(point)
-    chamber = image.cusp_chamber(controlling_vector)
-    walls = tuple(chamber.wall_roots())
-    pairings = _pairing_matrix(reduction, (point,) + walls)
-    through_the_point = tuple(
-        wall for index, wall in enumerate(walls) if pairings[0, index + 1] == ZZ.zero()
-    )
     records = image.cusp_layer_enumerations(controlling_vector=controlling_vector, layers=2)
+    prefix = image.cusp_chamber(controlling_vector, max_decompositions=1)
+    prefix_through_the_point = _walls_through_the_point(
+        reduction, point, tuple(prefix.wall_roots())
+    )
 
     assert records
+    assert prefix_through_the_point
+    for record in records:
+        assert sorted(_coordinates_of(record.cell_normals())) == sorted(
+            _coordinates_of(prefix_through_the_point)
+        )
+    chamber = image.cusp_chamber(controlling_vector)
+    through_the_point = _walls_through_the_point(
+        reduction, point, tuple(chamber.wall_roots())
+    )
     assert through_the_point
     for record in records:
         assert sorted(_coordinates_of(record.cell_normals())) == sorted(
