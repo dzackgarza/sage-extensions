@@ -3099,3 +3099,11 @@ trees by what they are).  Same pinned image, same launcher, same `PYTHONPATH`.
 | --- | --- | --- |
 | `543r2-green-at-rebased-head.log` | the rebased repair head | the two files: **23 passed in 2.46 s** |
 | `543r2-probe-at-rebased-head.log` | the rebased repair head | `543r2-probe.py`: the same **36** answers, and the same single difference against `543r2-probe-at-ab2e435.log` (`PredicateSubrings().an_object()(cardinal(7))` is `7` here, `TypeError: category() needs an argument` there) |
+
+The two rows were taken once more on the tree this round is actually pushed from,
+after main advanced to `a38faef` and the branch was rebased onto it:
+
+| log | tree | result |
+| --- | --- | --- |
+| `543r2-green-at-pushed-head.log` | the pushed head | the two files: **23 passed in 2.78 s** |
+| `543r2-probe-at-pushed-head.log` | the pushed head | the same 36 answers, the same single difference against `543r2-probe-at-ab2e435.log` |
