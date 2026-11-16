@@ -2718,17 +2718,12 @@ def _selected_presentation_kernel(morphism):
     finite presentations; the result retains its actual domain inclusion.
 
     The zero map has the whole domain for kernel.  Over a principal ideal
-    domain the preimage of the target relations is free; over a polynomial
-    ring over the integers, or a quotient of one with a chosen presentation,
-    CAP computes the kernel presentation; over a polynomial ring over a field,
-    or a quotient of one, Singular does.
+    domain the preimage of the target relations is free.  Over a ring with a
+    selected exact polynomial coefficient presentation -- a polynomial ring
+    over a field or over the integers, or a quotient of one over a field --
+    Singular computes the kernel presentation, in the coefficient ring the
+    presentation names.
     """
-    from sage_extensions.categories.algebras.algebras import (
-        AlgebrasWithChosenFinitePresentation,
-    )
-    from sage_extensions.categories.algebras.free_algebras import (
-        SymmetricAlgebras,
-    )
 
     domain = morphism.domain()
     codomain = morphism.codomain()
@@ -2756,105 +2751,12 @@ def _selected_presentation_kernel(morphism):
         for label in labels
     ):
         return domain.whole_subobject()
-    integers = _owned_integers()
     match ring:
         case _ if ring in PrincipalIdealDomains():
             return _pid_presentation_kernel(morphism)
-        case _ if ring in SymmetricAlgebras(integers) or ring in AlgebrasWithChosenFinitePresentation(integers):
-            return _cap_presentation_kernel(morphism)
         case _:
             return _singular_presentation_kernel(morphism)
 
-
-def _cap_presentation_kernel(morphism):
-    r"""Return ``ker(morphism)`` through CAP over a polynomial ring over ``ZZ``.
-
-    ``ModulePresentationsForCAP`` owns the categorical kernel computation.
-    The private adapter crosses only selected relation, morphism, kernel and
-    lift matrices; the returned object is the ordinary owned finitely
-    presented module with its actual inclusion into ``morphism.domain()``.
-    """
-    from sage_categories.engines.presented_modules import kernel_presentation
-
-    domain = morphism.domain()
-    codomain = morphism.codomain()
-    ring = _owned_ring(domain.base_ring())
-    if _owned_ring(codomain.base_ring()) is not ring:
-        raise ValueError(
-            f"cannot compute the kernel of {morphism}: its domain is over {ring} and its codomain "
-            f"over {codomain.base_ring()}, but a module morphism has one base ring"
-        )
-    variable_names = tuple(ring.variable_names())
-    assert variable_names and ring.base_ring() is _owned_integers(), (
-        f"cannot compute the kernel of {morphism} with this algorithm: it needs a polynomial "
-        f"ring over ZZ, and the base ring is {ring}"
-    )
-
-    source_labels = tuple(domain.module_generating_set())
-    target_labels = tuple(codomain.module_generating_set())
-    source_relations = _relation_images(domain)
-    target_relations = _relation_images(codomain)
-    morphism_rows = tuple(
-        tuple(
-            codomain.framing_morphism().lift(morphism(domain.module_generator(source_label)))(target_label)
-            for target_label in target_labels
-        )
-        for source_label in source_labels
-    )
-    native = kernel_presentation(
-        variable_names=variable_names,
-        owned_ring=ring,
-        source_rank=len(source_labels),
-        target_rank=len(target_labels),
-        source_relation_rows=source_relations,
-        target_relation_rows=target_relations,
-        morphism_rows=morphism_rows,
-    )
-    inclusion_rows = native.inclusion_rows()
-    kernel_count = len(inclusion_rows)
-    kernel_labels = Sets.Δ[kernel_count - 1]
-    # CAP lists each relation of the kernel by its coordinates in the kernel generators.
-    presentation = _morphism_on_images(
-        _cover_free_module(domain, kernel_labels),
-        tuple(tuple(ring(coefficient) for coefficient in relation) for relation in native.relation_rows()),
-    )
-    generator_images = {
-        label: domain.linear_combination(
-            {
-                source_label: coefficient
-                for source_label, coefficient in zip(
-                    source_labels, inclusion_rows[int(label)], strict=True
-                )
-                if coefficient
-            }
-        )
-        for label in kernel_labels
-    }
-
-    def lift_from_domain(kernel, element):
-        if element.parent() is not domain:
-            element = domain(element)
-        if morphism(element) != codomain.zero():
-            return None
-        coordinates = domain.framing_morphism().lift(element)
-        source_row = tuple(
-            coordinates(label) for label in source_labels
-        )
-        lifted = native.lift_row(source_row)
-        return kernel.linear_combination(
-            {
-                label: lifted[int(label)]
-                for label in kernel_labels
-                if lifted[int(label)] != ring.zero()
-            }
-        )
-
-    return _presented_module_from_morphism(
-        presentation,
-        _subobject_ambient=domain,
-        _subobject_generator_images=generator_images,
-        _subobject_lift=lift_from_domain,
-    )
 
 def _pid_presentation_kernel(morphism):
     r"""Return ``ker(morphism)`` from selected finite presentations over a PID.
@@ -3056,7 +2958,7 @@ def _singular_coefficient_presentation(ring):
     Private adapter shared by this owner's relation, kernel, preimage and
     scalar-restriction algorithms. Return ``(P, I, lift, descend)`` in the
     Singular realization, or ``None`` if the ring has no selected polynomial
-    cover over a field with at least one variable.
+    cover over a field or over the integers with at least one variable.
     The cover and its relations come from the ring owner's exact-coefficient
     contract; a localization's larger fraction field is not such a cover.
     """
@@ -3079,14 +2981,18 @@ def _singular_coefficient_presentation(ring):
     # Field scalar restrictions retain the existing finite-basis route.
     if presentation_ring.ngens() == 0:
         return None
-    coefficient_field = presentation_ring.base_ring()
-    if coefficient_field not in SageFields():
+    coefficient_ring = presentation_ring.base_ring()
+    # A field makes every syzygy computation a standard basis one; the
+    # integers do the same through Singular's non-field coefficient ring,
+    # whose ``std``, ``modulo``, ``syz``, ``lift`` and ``reduce`` are the
+    # maintained operations (Singular manual, "modulo", "syz", "lift").
+    if coefficient_ring not in SageFields() and coefficient_ring is not SageZZ:
         return None
     # Use a global order on the same polynomial ring. A local standard
     # basis computes in a localization and can change module membership.
     # Singular also needs its multivariate parent for a single variable.
     singular_ring = _SagePolynomialRing(
-        coefficient_field,
+        coefficient_ring,
         presentation_ring.variable_names(),
         order="degrevlex",
         implementation="singular",
@@ -3338,26 +3244,32 @@ def _singular_presentation_preimage(morphism, element):
 
 
 def _singular_presentation_kernel(morphism):
-    r"""Return ``ker(morphism)`` for polynomial-presentation coefficient rings.
+    r"""Return ``ker(morphism)`` over an exact polynomial coefficient presentation.
 
-    Let ``A=P/I`` with ``P`` a polynomial ring over a field, and let
+    Let ``A = P/I`` with ``P`` a polynomial ring over a field or over the
+    integers, and let ``f : A^n/D -> A^m/Q``, where ``D`` and ``Q`` are the
+    relation submodules the selected presentations supply.  Lifting to ``P``,
+    the preimage of the target relations is
 
-    ``f : A^n/D -> A^m/Q``.
+    ``L = {x in P^n : F x in im(Q)}``,
 
-    Lifting to ``P``, a vector ``x`` represents a kernel element exactly when
+    which is the first ``n`` coordinates of ``ker([F | Q] : P^{n+t} -> P^m)``:
+    a vector of ``L`` is a kernel vector of the row-augmented matrix, and every
+    kernel vector of that matrix projects to one.  Then
+    ``ker(f) = L/D``, presented by the syzygies of the generators of ``L``
+    together with the generators of ``D`` written in those generators.  That is
+    the presentation of the cokernel of the inclusion ``D -> L``: the quotient
+    of a module by a submodule is the cokernel of the inclusion, and a cokernel
+    of a map between submodules of free modules is presented by the source
+    generators' coordinates in the target's together with the target's own
+    syzygies.
 
-    ``F x \in \operatorname{im}(Q^t,I)``.
-
-    Singular's maintained ``homolog.lib::mor_kernel(A,M,N)`` computes the
-    presentation of ``ker(A':coker(M)->coker(N))``.  Its internal first
-    ``modulo(A,N)`` is also the kernel-lift module, but ``mor_kernel`` exposes
-    only the resulting presentation.  This adapter therefore calls ``modulo``
-    once separately to recover exactly those generator lifts for the owned
-    inclusion; it does not reconstruct the presentation algorithm.
-
-    This is a private computation crossing.  The returned object is the owned
-    finitely presented module equipped with its actual inclusion into the
-    domain; no Singular module escapes into the public API.
+    Singular's maintained ``modulo`` computes ``{v : Av in B}`` -- the
+    preimage above -- ``syz`` the syzygy module, and ``lift`` the coordinates
+    of a vector in a submodule.  This adapter crosses only matrices and
+    coefficient values; the returned object is the owned finitely presented
+    module equipped with its actual inclusion into the domain, and no Singular
+    module escapes into the public API.
     """
     from sage.libs.singular.function_factory import ff
     from sage.matrix.constructor import matrix
@@ -3373,15 +3285,15 @@ def _singular_presentation_kernel(morphism):
 
     context = _singular_coefficient_presentation(ring)
     assert context is not None, (
-        f"cannot compute the kernel of {morphism} with this algorithm: {ring} needs "
-        "a selected exact polynomial coefficient presentation over a field"
+        f"cannot compute the kernel of {morphism}: the kernel of a map of presented {ring}-modules "
+        "is read over a selected exact polynomial coefficient presentation -- a polynomial ring "
+        "over a field or over the integers, or a quotient of one over a field -- and this ring "
+        "supplies none"
     )
     singular_ring, _, lift_scalar, from_singular = context
 
     source_labels = tuple(domain.module_generating_set())
     target_labels = tuple(codomain.module_generating_set())
-    source_relations = _relation_images(domain)
-    target_relations = _relation_images(codomain)
     n = len(source_labels)
     m = len(target_labels)
     assert n > 0 and m > 0, (
@@ -3393,58 +3305,111 @@ def _singular_presentation_kernel(morphism):
     for source_label in source_labels:
         image = morphism(domain.module_generator(source_label))
         coordinates = codomain.framing_morphism().lift(image)
-        coordinate_columns.append(tuple(lift_scalar(coordinates(label)) for label in target_labels))
+        coordinate_columns.append(
+            tuple(lift_scalar(coordinates(label)) for label in target_labels)
+        )
     f_matrix = matrix(
         singular_ring,
         m,
         n,
         [coordinate_columns[column][row] for row in range(m) for column in range(n)],
     )
-    source_relation_module = _singular_relation_module(source_relations, n, context)
-    target_relation_module = _singular_relation_module(target_relations, m, context)
-    # ``mor_kernel`` internally computes the same ``modulo(f_matrix, N)``
-    # before quotienting by the source relations.  Repeat only that first
-    # maintained operation so the owned kernel can retain the corresponding
-    # generator lifts and hence its actual inclusion into ``domain``.  The
-    # presentation itself comes exclusively from ``mor_kernel`` below.
-    kernel_lifts = tuple(
-        ff.modulo(
-            f_matrix,
-            target_relation_module,
-            ring=singular_ring,
-        )
+    source_relation_module = _singular_module_matrix(
+        _singular_relation_module(_relation_images(domain), n, context),
+        singular_ring,
+        n,
     )
-    kernel_presentation = ff.homolog__lib.mor_kernel(
-        f_matrix,
-        source_relation_module,
-        target_relation_module,
+    target_relation_module = _singular_module_matrix(
+        _singular_relation_module(_relation_images(codomain), m, context),
+        singular_ring,
+        m,
+    )
+    zero_target = matrix(singular_ring, m, 0, [])
+    # ``L``: the preimage of the target relations, as the first ``n``
+    # coordinates of the kernel of the row-augmented matrix ``[F | Q]``.  A
+    # zero vector generates nothing, and Singular reports a vanishing module
+    # as one zero generator; a kernel vector supported on the ``Q`` columns
+    # alone projects to zero.  What is left generates ``L``.
+    width = n + target_relation_module.ncols()
+    projected = []
+    for vector in ff.modulo(
+        f_matrix.augment(target_relation_module),
+        zero_target,
         ring=singular_ring,
+    ):
+        if all(entry == 0 for entry in vector):
+            continue
+        assert len(vector) == width, (
+            f"the preimage of the relations of {codomain} under {morphism} has "
+            f"{len(vector)} coordinates, not {width}"
+        )
+        preimage = tuple(vector[:n])
+        if any(entry != 0 for entry in preimage):
+            projected.append(preimage)
+    kernel_count = len(projected)
+    kernel_labels = Sets.Δ[kernel_count - 1]
+    lifts = matrix(
+        singular_ring,
+        n,
+        kernel_count,
+        [projected[column][row] for row in range(n) for column in range(kernel_count)],
     )
 
-    kernel_count = len(kernel_lifts)
-    kernel_labels = Sets.Δ[kernel_count - 1]
+    relation_columns = []
+    standard_relations = None
     if kernel_count:
-        kernel_columns = matrix(
-            singular_ring,
-            n,
-            kernel_count,
-            [kernel_lifts[column][row] for row in range(n) for column in range(kernel_count)],
-        )
-    else:
-        kernel_columns = matrix(singular_ring, n, 0, [])
+        relation_columns = [
+            tuple(vector)
+            for vector in ff.syz(lifts, ring=singular_ring)
+            if any(entry != 0 for entry in vector)
+        ]
+        for vector in relation_columns:
+            assert len(vector) == kernel_count, (
+                f"a syzygy of the kernel generators of {morphism} has {len(vector)} "
+                f"coordinates, not {kernel_count}"
+            )
+        for column in range(source_relation_module.ncols()):
+            relation = matrix(
+                singular_ring,
+                n,
+                1,
+                [source_relation_module[row, column] for row in range(n)],
+            )
+            coordinates = _singular_module_lift(lifts, relation)
+            assert coordinates is not None, (
+                f"{morphism} is not well defined: the relation {tuple(relation.rows()[0])} of its "
+                f"domain does not map into the relations of its codomain"
+            )
+            relation_columns.append(tuple(matrix(singular_ring, coordinates).rows()[0]))
+        if relation_columns:
+            standard_relations = ff.std(
+                matrix(
+                    singular_ring,
+                    kernel_count,
+                    len(relation_columns),
+                    [
+                        relation_columns[column][row]
+                        for row in range(kernel_count)
+                        for column in range(len(relation_columns))
+                    ],
+                ),
+                ring=singular_ring,
+            )
 
-    # Singular lists each kernel relation as a vector in the kernel generators.
     presentation = _morphism_on_images(
         _cover_free_module(domain, kernel_labels),
         tuple(
             tuple(from_singular(entry) for entry in vector)
-            for vector in kernel_presentation
-            if any(entry != 0 for entry in vector)
+            for vector in relation_columns
         ),
     )
     generator_images = {
         label: domain.linear_combination(
-            {source_label: from_singular(kernel_lifts[int(label)][position]) for position, source_label in enumerate(source_labels) if kernel_lifts[int(label)][position] != 0}
+            {
+                source_label: from_singular(lifts[position, int(label)])
+                for position, source_label in enumerate(source_labels)
+                if lifts[position, int(label)] != 0
+            }
         )
         for label in kernel_labels
     }
@@ -3461,14 +3426,21 @@ def _singular_presentation_kernel(morphism):
             1,
             [lift_scalar(coordinates(label)) for label in source_labels],
         )
-        spanning = kernel_columns.augment(
-            _singular_module_matrix(source_relation_module, singular_ring, n)
-        )
-        coefficients_in_spanning = _singular_module_lift(spanning, requested)
-        if coefficients_in_spanning is None:
+        coefficients = _singular_module_lift(lifts, requested)
+        if coefficients is None:
             return None
-        lifted = matrix(singular_ring, coefficients_in_spanning)
-        return kernel.linear_combination({label: from_singular(lifted[position, 0]) for position, label in enumerate(kernel_labels) if lifted[position, 0] != 0})
+        normal_form = matrix(singular_ring, coefficients)
+        if standard_relations is not None:
+            normal_form = matrix(ff.reduce(
+                normal_form,
+                standard_relations,
+                ring=singular_ring,
+            ))
+        return kernel.linear_combination({
+            label: from_singular(normal_form[position, 0])
+            for position, label in enumerate(kernel_labels)
+            if normal_form[position, 0] != 0
+        })
 
     return _presented_module_from_morphism(
         presentation,

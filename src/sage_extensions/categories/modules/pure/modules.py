@@ -1699,6 +1699,14 @@ class Modules(OwnedCategoryOverBaseRing):
             $\ker 8 = 0$: every functional kills $1$ and hence everything, so
             $O_{\mathbf{Z}/8}(3) = (0)$.
 
+            That kernel is a matrix kernel over $R$, and the ring decides which
+            computation supplies it: a Smith form over a principal ideal domain,
+            a standard basis over a polynomial ring over a field or over the
+            integers, and a standard basis over a quotient of a polynomial ring
+            over a field.  Over a ring with none of those exact coefficient
+            presentations the kernel computation states that it has no route for
+            the ring, rather than reporting a presentation it did not compute.
+
             Where the dual does carry a generating family -- a finitely
             presented module, and above all one with a chosen finite basis --
             this level answers.  Where it does not, this level asserts, and a
@@ -3146,7 +3154,17 @@ class Modules(OwnedCategoryOverBaseRing):
             assignment of a value to each generator that kills every relation,
             so ``Hom_R(M, R) = ker(A^t: R^n -> R^m)``.  At
             ``M = Z/8 = coker(8: Z -> Z)`` that kernel is ``0``, and the dual is
-            the zero module.
+            the zero module; at ``M = Z[x]/(x)`` it is ``ker(x: Z[x] -> Z[x])``,
+            also ``0``, and at ``M = Z[x]^2/(x e_1 + 2 e_2)`` it is the syzygy
+            module of ``(x, 2)``, which is free on ``(2, -x)``.
+
+            The kernel is computed where the ring's exact coefficient
+            presentations allow it: a Smith form over a principal ideal domain,
+            a standard basis over a polynomial ring over a field or over the
+            integers, a standard basis over a quotient of a polynomial ring over
+            a field.  Over any other ring the kernel computation states that it
+            has no route for the ring; it does not report a presentation it did
+            not compute.
 
             A free module on an infinite basis has the dual its module algebra
             gives it -- the product ``prod_S R``, which the library holds no
