@@ -441,28 +441,19 @@ def _script(name: str):
 
     The drivers are scripts: each imports the shared row-status vocabulary by
     the name of the file beside it, so the vocabulary is registered first and
-    the driver then resolves it.
+    the driver then resolves it.  A module this session has already loaded is
+    the one returned, so the vocabulary a test names and the vocabulary the
+    driver answers with are the same members.
     """
+    loaded = sys.modules.get(name)
+    if loaded is not None:
+        return loaded
     path = DRIVER_SOURCE / f"{name}.py"
     spec = importlib.util.spec_from_file_location(name, path)
     module = importlib.util.module_from_spec(spec)
     sys.modules[name] = module
     spec.loader.exec_module(module)
     return module
-
-
-@dataclass(frozen=True)
-class RowReport:
-    r"""What one row of the Γ_{Co,2} driver did, and what it returned when it decided.
-
-    ``status`` is the driver's own status object and ``counts`` its edge, line
-    cusp and plane cusp count, or ``None`` for a row that did not decide.  A
-    test asks about the row's status and its counts, never about the words a
-    run printed.
-    """
-
-    status: object
-    counts: tuple | None
 
 
 def _incidence_row_driver():
@@ -474,11 +465,12 @@ def _incidence_row_driver():
 def incidence_row_outcome(lattice, subgroup, label, cap):
     r"""What the Γ_{Co,2} driver's row step reports for one row of ``subgroup`` under ``cap``.
 
-    The cap is the caller's budget for the row's call, so a cap of zero seconds
-    is a row with no time to run.
+    The answer is the driver's own outcome: its status, the clause or cap that
+    decided it, and the row's counts when it decided.  The cap is the caller's
+    budget for the row's step, so a cap of zero seconds is a row with no time
+    to run.
     """
-    counts, status = _incidence_row_driver().run_row(lattice, subgroup, label, cap)
-    return RowReport(status=status, counts=counts)
+    return _incidence_row_driver().run_row(lattice, subgroup, label, cap)
 
 
 def incidence_row_contract(lattice, subgroup, lines, planes, incidences):

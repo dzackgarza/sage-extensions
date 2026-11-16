@@ -41,6 +41,8 @@ def test_a_row_whose_cap_is_spent_is_undecided():
     assert given.status is RowStatus.DECIDED
     assert given.counts == (0, 0, 0)
     assert spent.status.exit_status != given.status.exit_status
+    assert spent.report() != given.report()
+    assert spent.detail
 
 
 def test_a_row_whose_call_raised_is_not_an_undecided_row():
@@ -56,9 +58,11 @@ def test_a_row_whose_call_raised_is_not_an_undecided_row():
     failed = incidence_row_outcome(lattice, lattice.SO(), "SO(U(2))", 3600)
     spent = incidence_row_outcome(lattice, lattice.SO(), "SO(U(2))", 0)
 
+    assert failed.status is RowStatus.ERROR
     assert failed.status is not spent.status
-    assert failed.status is not RowStatus.DECIDED
     assert failed.status.exit_status != spent.status.exit_status
+    assert failed.report() != spent.report()
+    assert failed.detail
 
 
 def test_a_relation_that_leaves_a_vertex_without_an_edge_is_a_contract_violation():
@@ -81,7 +85,9 @@ def test_a_relation_that_leaves_a_vertex_without_an_edge_is_a_contract_violation
     unjoined = incidence_row_contract(lattice, subgroup, lines, planes, ())
     spent = incidence_row_outcome(lattice, subgroup, "O(U + U)", 0)
 
+    assert unjoined.status is RowStatus.CONTRACT_VIOLATION
     assert unjoined.status is not spent.status
-    assert unjoined.status is not RowStatus.DECIDED
     assert unjoined.counts is None
     assert unjoined.status.exit_status != spent.status.exit_status
+    assert unjoined.report() != spent.report()
+    assert unjoined.detail

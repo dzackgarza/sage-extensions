@@ -51,20 +51,27 @@ the cited construction guarantees for every output:
   of lines; that is the value ``main`` held at ``85284b8d18``.
 
 The counts each row prints are the numbers the commit body of the push that
-lands this file records.  A row that does not return inside its per-call cap
-is reported as undecided, never as failed: the cap is the caller's budget,
-not a mathematical statement.  A row that returns an edge which fails its
-check is reported apart from that, as a contract violation, because it is a
-statement about the library's answer and not about the budget: each returned
-edge's line must lie in its plane and one subgroup element must carry the line
-cusp representative into the plane cusp representative, and the edges together
-must be a relation -- no two sharing their line and plane cusp endpoints, and
-no cusp of either row left without an edge.  The driver's exit status says
-which happened -- 0 both rows decided as the decided relation, 1 a row
-undecided or the whole-run budget spent, 2 a returned edge that breaks the
-contract, 3 a decided row whose counts are not the decided relation -- and the
-statuses and those exit statuses are the vocabulary of
-``tests/coble_row_status.py``, shared with the kernel-plane-rows driver.
+lands this file records.
+
+**What a row reports.**  A row that does not return inside its per-call cap is
+reported as undecided, never as failed: the cap is the caller's budget, not a
+mathematical statement.  A row that returns an edge, or a relation over its
+vertices, which fails its check is reported apart from that, as a contract
+violation, because it is a statement about the library's answer and not about
+the budget: each returned edge's line must lie in its plane and one subgroup
+element must carry the line cusp representative into the plane cusp
+representative, and the edges together must be a relation -- no two sharing
+their line and plane cusp endpoints, and every vertex that can carry an edge
+carrying one.  The relation is the input of the contract and not something the
+contract reaches for, so the contract is asked of a relation the row returned.
+A row step that raises is reported as an error, neither of the two: the
+traceback is printed and the run ends on the error's own exit status.  The
+driver's exit status says which happened -- 0 both rows decided as the decided
+relation, 1 a row undecided or the whole-run budget spent, 2 a returned edge or
+relation that breaks the contract, 3 a decided row whose counts are not the
+decided relation, 4 a row step that raised -- and the statuses and those exit
+statuses are the vocabulary of ``tests/coble_row_status.py``, shared with the
+kernel-plane-rows driver.
 
     sage -python tests/coble_gamma_co_2_incidence_rows.py            # both rows
     sage -python tests/coble_gamma_co_2_incidence_rows.py --cap 10800
@@ -75,16 +82,12 @@ import argparse
 import signal
 import sys
 import time
+import traceback
+from dataclasses import dataclass
 
 from sage_extensions.all import *  # noqa: F401,F403
 
-from coble_row_status import (
-    EXIT_COUNT_MISMATCH,
-    EXIT_DECIDED,
-    EXIT_UNDECIDED,
-    RowStatus,
-    exit_status,
-)
+from coble_row_status import RowStatus
 
 
 class RowUndecided(Exception):
@@ -122,13 +125,15 @@ def _decomposition(lattice):
     return _span(form, (classes["ep"], classes["fp"]))
 
 
-def containment_violation(line, plane) -> str | None:
+def containment_violation(lattice, line, plane) -> str | None:
     r"""Why an edge whose line and plane these are breaks the row's contract, or ``None``.
 
-    The line term of the edge must lie in its plane term: the line's retained
-    generator is a vector of the lattice, and it lies in the plane exactly when
-    it is in the image of the plane's inclusion.
+    Both terms of an edge are subobjects of the row's lattice, and the line lies
+    in the plane exactly when the line's retained generator is in the image of
+    the plane's inclusion.
     """
+    if line.inclusion().codomain() is not lattice or plane.inclusion().codomain() is not lattice:
+        return "its line and plane are not subobjects of the row's lattice"
     domain = line.inclusion().domain()
     label = next(iter(domain.module_generating_set()))
     if plane.inclusion().is_in_image(line.inclusion()(domain.module_generator(label))):
@@ -136,7 +141,7 @@ def containment_violation(line, plane) -> str | None:
     return "its line is not contained in its plane"
 
 
-def transport_violation(subgroup, incidence) -> str | None:
+def transport_violation(lattice, subgroup, incidence) -> str | None:
     r"""Why no subgroup element carries the edge's line cusp into its plane cusp, or ``None``.
 
     The witness ``plane_transporter * line_transporter^-1`` carries the selected
@@ -151,15 +156,15 @@ def transport_violation(subgroup, incidence) -> str | None:
             "into the plane cusp representative"
         )
     moved = witness.transport_isotropic_object(incidence.line_cusp().representative())
-    return containment_violation(moved, incidence.plane_cusp().representative())
+    return containment_violation(lattice, moved, incidence.plane_cusp().representative())
 
 
-def edge_violation(subgroup, incidence) -> str | None:
+def edge_violation(lattice, subgroup, incidence) -> str | None:
     r"""Why one returned edge breaks the row's contract, or ``None``."""
-    violation = containment_violation(incidence.line(), incidence.plane())
+    violation = containment_violation(lattice, incidence.line(), incidence.plane())
     if violation is not None:
         return violation
-    return transport_violation(subgroup, incidence)
+    return transport_violation(lattice, subgroup, incidence)
 
 
 def cusp_position(cusps, cusp) -> int | None:
@@ -170,15 +175,25 @@ def cusp_position(cusps, cusp) -> int | None:
     return None
 
 
-def report_row_outcome(label, status, detail):
-    r"""Report one row's outcome in one line and return ``(None, status)``.
+@dataclass(frozen=True)
+class RowOutcome:
+    r"""What one row of this driver did, and what it returned when it decided.
 
-    The one place a row's outcome is worded.  The status names which fact about
-    the run it is, and the detail names the clause that broke or the cap that
-    expired; a row that did not decide returns no counts.
+    ``status`` is the row's status, ``detail`` names the clause that broke, the
+    cap that expired or the exception the row step raised -- the words one
+    report of the row is made of -- and ``counts`` is the row's edge, line cusp
+    and plane cusp count for a decided row, and ``None`` for a row that did not
+    decide.
     """
-    log(f"[{label}] {status.value}: {detail}")
-    return None, status
+
+    label: str
+    status: RowStatus
+    detail: str
+    counts: tuple | None = None
+
+    def report(self) -> str:
+        r"""The one line that reports this outcome."""
+        return f"[{self.label}] {self.status.words}: {self.detail}"
 
 
 def _coordinates(term):
@@ -196,41 +211,19 @@ def _coordinates(term):
     )
 
 
-def run_row(lattice, subgroup, label, cap):
-    r"""Return ``(counts, status)`` for one incidence row of ``subgroup``.
+def row_contract(lattice, subgroup, label, lines, planes, incidences) -> RowOutcome:
+    r"""What the row's returned relation says: a decided row, or the clause that broke.
 
-    The row step is the public call ``tits_building_incidence()`` under the
-    per-row cap: the alarm's ``RowUndecided`` makes the row undecided, never
-    failed, because the cap is the caller's budget and not a mathematical
-    statement.  The cap is the row's own signal for the length of that call, so
-    the handler is installed here and given back when the call ends.
+    The clauses are the row's statement about the relation it returned.  Every
+    edge joins a line that lies in its plane, and one element of the subgroup
+    carries the line cusp representative into the plane cusp representative;
+    each edge's two cusps are cusps of the row; no two edges share their line
+    and plane cusp endpoints, so the relation is not a flag-orbit count; and
+    no cusp of either row is left without an edge.
 
-    Every edge the call returns is checked against the row's contract -- its
-    line lies in its plane, and one element of the subgroup carries the line
-    cusp representative into the plane cusp representative -- and the edges
-    together are checked as a relation: each edge's two cusps are cusps of the
-    row, no two edges share their line and plane cusp endpoints, and every line
-    cusp and every plane cusp is a vertex of an edge.
-    A returned edge or set of edges that breaks the contract is a different
-    ``RowStatus`` from an undecided row, and the report names the clause and the
-    edge.  ``counts`` is the edge, line cusp and plane cusp count of a decided
-    row, and ``None`` for a row that did not decide.
+    The returned relation is the input, so the contract is a statement about
+    the library's answer and not about how the row was obtained.
     """
-    start = time.monotonic()
-    previous_handler = signal.signal(signal.SIGALRM, _alarm)
-    try:
-        signal.setitimer(signal.ITIMER_REAL, cap)
-        incidences = tuple(subgroup.tits_building_incidence())
-    except RowUndecided:
-        return report_row_outcome(
-            label, RowStatus.UNDECIDED, f"the row did not return inside its {cap:g} s cap"
-        )
-    finally:
-        signal.setitimer(signal.ITIMER_REAL, 0)
-        signal.signal(signal.SIGALRM, previous_handler)
-    elapsed = time.monotonic() - start
-    lines = tuple(subgroup.cusps(1))
-    planes = tuple(subgroup.cusps(2))
     for position, cusp in enumerate(lines):
         log(f"[{label}] line cusp {position}: {_coordinates(cusp.representative())}")
     for position, cusp in enumerate(planes):
@@ -243,19 +236,19 @@ def run_row(lattice, subgroup, label, cap):
         plane_id = cusp_position(planes, incidence.plane_cusp())
         if line_id is None or plane_id is None:
             which = "line" if line_id is None else "plane"
-            return report_row_outcome(
+            return RowOutcome(
                 label,
                 RowStatus.CONTRACT_VIOLATION,
                 f"edge {position} of {len(incidences)}: its {which} cusp is not a cusp of the row",
             )
         pair = (line_id, plane_id)
-        violation = edge_violation(subgroup, incidence)
+        violation = edge_violation(lattice, subgroup, incidence)
         if violation is None and pair in retained_pairs:
             violation = (
                 f"two edges share the line and plane cusp endpoints L{line_id} and P{plane_id}"
             )
         if violation is not None:
-            return report_row_outcome(
+            return RowOutcome(
                 label,
                 RowStatus.CONTRACT_VIOLATION,
                 f"edge {position} of {len(incidences)}: {violation}",
@@ -269,19 +262,64 @@ def run_row(lattice, subgroup, label, cap):
         )
     for position, cusp in enumerate(lines):
         if cusp not in line_vertices:
-            return report_row_outcome(
+            return RowOutcome(
                 label, RowStatus.CONTRACT_VIOLATION, f"line cusp {position} carries no edge"
             )
     for position, cusp in enumerate(planes):
         if cusp not in plane_vertices:
-            return report_row_outcome(
+            return RowOutcome(
                 label, RowStatus.CONTRACT_VIOLATION, f"plane cusp {position} carries no edge"
             )
-    log(
-        f"[{label}] {len(incidences)} edges over {len(lines)} line cusps and "
-        f"{len(planes)} plane cusps in {elapsed:.1f} s"
+    return RowOutcome(
+        label,
+        RowStatus.DECIDED,
+        f"{len(incidences)} edges over {len(lines)} line cusps and {len(planes)} plane cusps",
+        (len(incidences), len(lines), len(planes)),
     )
-    return (len(incidences), len(lines), len(planes)), RowStatus.DECIDED
+
+
+def run_row(lattice, subgroup, label, cap) -> RowOutcome:
+    r"""What one incidence row of ``subgroup`` did, within its ``cap``.
+
+    The row step is the public call ``tits_building_incidence()`` with the row's
+    cusps, under the per-row cap, and then the row's contract on the relation
+    the call returned.  The cap is the caller's budget: a cap of no seconds
+    leaves no time for the call and the row is undecided without the call being
+    made, and the alarm it sets reaches the call where Python holds control --
+    a call that does not hand control back to Python is not interrupted by it,
+    so the cap is the budget of a row and not a promise about where it stops.
+
+    The row step raising is neither an undecided row nor a broken contract: the
+    traceback is printed and the status says the step raised, so a failed call
+    is not reported as a caller who ran out of time.
+    """
+    if cap <= 0:
+        return RowOutcome(
+            label, RowStatus.UNDECIDED, f"its cap of {cap:g} s is spent before the call"
+        )
+    start = time.monotonic()
+    previous_handler = signal.signal(signal.SIGALRM, _alarm)
+    try:
+        signal.setitimer(signal.ITIMER_REAL, cap)
+        try:
+            incidences = tuple(subgroup.tits_building_incidence())
+            lines = tuple(subgroup.cusps(1))
+            planes = tuple(subgroup.cusps(2))
+        finally:
+            signal.setitimer(signal.ITIMER_REAL, 0)
+        log(f"[{label}] the row's calls returned in {time.monotonic() - start:.1f} s")
+        return row_contract(lattice, subgroup, label, lines, planes, incidences)
+    except RowUndecided:
+        return RowOutcome(
+            label, RowStatus.UNDECIDED, f"the row did not return inside its {cap:g} s cap"
+        )
+    except Exception as error:
+        traceback.print_exc()
+        return RowOutcome(
+            label, RowStatus.ERROR, f"the row step raised {type(error).__name__}: {error}"
+        )
+    finally:
+        signal.signal(signal.SIGALRM, previous_handler)
 
 
 def _rows(lattice):
@@ -301,39 +339,41 @@ def main(argv):
 
     The statuses and exit statuses are ``tests/coble_row_status.py``'s: ``0``
     both rows decided as the decided relation, ``1`` a row undecided or the
-    whole-run budget spent, ``2`` a returned edge that breaks the contract, and
-    ``3`` a decided row whose counts are not the decided relation.
+    whole-run budget spent, ``2`` a returned edge or relation that breaks the
+    contract, ``3`` a decided row whose counts are not the decided relation, and
+    ``4`` a row step that raised.
     """
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--cap", type=float, default=10800,
-                        help="seconds one row call may take before it is undecided")
+                        help="seconds one row may take before it is undecided; 0 leaves no time")
     parser.add_argument("--budget", type=int, default=28800,
                         help="seconds the whole run may take, 0 for no budget")
     arguments = parser.parse_args(argv)
     started = time.monotonic()
     lattice = NamedLattices.Tco
     log(f"the Coble period lattice {lattice} of rank {lattice.module_rank()}")
-    rows = {}
+    counts = {}
     for label, subgroup in _rows(lattice):
         if arguments.budget and time.monotonic() - started > arguments.budget:
-            log("the whole-run budget is spent")
-            return EXIT_UNDECIDED
-        counts, status = run_row(lattice, subgroup, label, arguments.cap)
-        if status is not RowStatus.DECIDED:
-            return exit_status(status)
-        rows[label] = counts
-    if rows["O(T_Co)"][0] != 1:
+            log(f"[run] {RowStatus.UNDECIDED.words}: the whole-run budget is spent")
+            return RowStatus.UNDECIDED.exit_status
+        outcome = run_row(lattice, subgroup, label, arguments.cap)
+        log(outcome.report())
+        if outcome.status is not RowStatus.DECIDED:
+            return outcome.status.exit_status
+        counts[label] = outcome.counts
+    if counts["O(T_Co)"][0] != 1:
         log("the O(T_Co) incidence through this route is not one edge")
-        return EXIT_COUNT_MISMATCH
-    if rows["Gamma_{Co,2}"] != (13, 4, 7):
+        return RowStatus.COUNT_MISMATCH.exit_status
+    if counts["Gamma_{Co,2}"] != (13, 4, 7):
         log("the Gamma_{Co,2} incidence is not the decided 13-edge relation over 4 line and 7 plane cusps")
-        return EXIT_COUNT_MISMATCH
+        return RowStatus.COUNT_MISMATCH.exit_status
     log(
-        f"the O(T_Co) incidence has {rows['O(T_Co)'][0]} edge; the Gamma_{{Co,2}} incidence has "
-        f"{rows['Gamma_{Co,2}'][0]} edges over {rows['Gamma_{Co,2}'][1]} line orbits and "
-        f"{rows['Gamma_{Co,2}'][2]} plane orbits"
+        f"the O(T_Co) incidence has {counts['O(T_Co)'][0]} edge; the Gamma_{{Co,2}} incidence has "
+        f"{counts['Gamma_{Co,2}'][0]} edges over {counts['Gamma_{Co,2}'][1]} line orbits and "
+        f"{counts['Gamma_{Co,2}'][2]} plane orbits"
     )
-    return EXIT_DECIDED
+    return RowStatus.DECIDED.exit_status
 
 
 if __name__ == "__main__":
