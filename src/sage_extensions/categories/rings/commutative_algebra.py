@@ -3559,9 +3559,39 @@ def _exact_integer_rational_parts(value, source):
 class _AdicCompletionElement(_OwnedAlgebraElement):
     r"""An element of a completion with equality respecting its information model."""
 
-    def __init__(self, parent, backend_value, *, exact_source_expression=None) -> None:
+    def __init__(
+        self,
+        parent,
+        backend_value,
+        *,
+        exact_source_expression=None,
+        exact_source_value=None,
+    ) -> None:
         super().__init__(parent, backend_value)
         self._exact_source_expression = exact_source_expression
+        self._exact_source_value = exact_source_value
+
+    def _exact_value(self):
+        r"""Return the exact value this element is, in the source ring's fraction field.
+
+        A completion of an integral domain is a ring of fractions of it: the
+        elements outside the defining ideal are inverted, and every element the
+        completion's own arithmetic builds from images of the source ring is the
+        value of one fraction ``p/q`` whose denominator is a unit there.  That
+        fraction is reduced in the source's fraction field, so it is a canonical
+        form of the value and not a presentation of it: ``(1 - x)^{-1} (1 - x)
+        x^4`` and the image of ``x^4`` retain one and the same fraction, and the
+        image of a source element retains that element over ``1`` and so hashes
+        as the source element it is the image of.
+
+        ``None`` says the completion retains no such value: the element arrived
+        from the private engine rather than from the completion's own
+        arithmetic, or the source ring is not an integral domain and states no
+        fraction field.  Such an element is hashed by the finite datum of the
+        completion's model (:meth:`exact_finite_datum`), or by the completion
+        alone.
+        """
+        return self._exact_source_value
 
     def exact_source_expression(self):
         r"""Return the retained exact source expression, or ``None``.
@@ -3588,10 +3618,11 @@ class _AdicCompletionElement(_OwnedAlgebraElement):
             case _:
                 return (self.parent(), source_expression)
 
-    def _with_source_expression(self, backend_value, source_expression):
+    def _with_source_expression(self, backend_value, source_expression, source_value=None):
         return self.parent()._completion_element(
             backend_value,
             source_expression=source_expression,
+            source_value=source_value,
         )
 
     def _add_(self, other):
@@ -3600,9 +3631,15 @@ class _AdicCompletionElement(_OwnedAlgebraElement):
         source_expression = None
         if left_source is not None and right_source is not None:
             source_expression = left_source + right_source
+        left_value = self._exact_value()
+        right_value = other._exact_value()
+        source_value = None
+        if left_value is not None and right_value is not None:
+            source_value = left_value + right_value
         return self._with_source_expression(
             self._backend() + other._backend(),
             source_expression,
+            source_value,
         )
 
     def _mul_(self, other):
@@ -3611,9 +3648,15 @@ class _AdicCompletionElement(_OwnedAlgebraElement):
         source_expression = None
         if left_source is not None and right_source is not None:
             source_expression = left_source * right_source
+        left_value = self._exact_value()
+        right_value = other._exact_value()
+        source_value = None
+        if left_value is not None and right_value is not None:
+            source_value = left_value * right_value
         return self._with_source_expression(
             self._backend() * other._backend(),
             source_expression,
+            source_value,
         )
 
     def __mul__(self, other):
@@ -3639,7 +3682,10 @@ class _AdicCompletionElement(_OwnedAlgebraElement):
         source_expression = self.exact_source_expression()
         if source_expression is not None:
             source_expression = -source_expression
-        return self._with_source_expression(-self._backend(), source_expression)
+        source_value = self._exact_value()
+        if source_value is not None:
+            source_value = -source_value
+        return self._with_source_expression(-self._backend(), source_expression, source_value)
 
     def __pow__(self, exponent, modulus=None):
         if modulus is not None:
@@ -3653,10 +3699,35 @@ class _AdicCompletionElement(_OwnedAlgebraElement):
             source_expression = source_expression**exponent
         else:
             source_expression = None
+        source_value = self._exact_value()
+        if source_value is not None:
+            source_value = source_value**exponent
         return self._with_source_expression(
             self._backend() ** exponent,
             source_expression,
+            source_value,
         )
+
+    def _exact_value_equality_status(self, other):
+        r"""Return whether the two retained exact values are equal, or ``None``.
+
+        Two retained values are fractions of the source ring, and equality in
+        the source's fraction field is exact: ``p/q = r/s`` there exactly when
+        ``p s - r q`` is zero.  A decision of inequality is about the
+        completion, not only the source, so it rests on the completion map
+        having no kernel; where the construction retains that statement, the
+        answer is exact, and where it does not, the comparison is left to the
+        arithmetic that does decide the element.
+        """
+        left = self._exact_value()
+        right = other._exact_value()
+        if left is None or right is None:
+            return None
+        if left == right:
+            return True
+        if self.parent().is_completion_map_injective() is not True:
+            return None
+        return False
 
     def _exact_source_equality_status(self, other):
         left_source = self.exact_source_expression()
@@ -3721,6 +3792,9 @@ class _AdicCompletionElement(_OwnedAlgebraElement):
         source_status = self_element._exact_source_equality_status(other)
         if source_status is not None:
             return source_status
+        value_status = self_element._exact_value_equality_status(other)
+        if value_status is not None:
+            return value_status
         mode = parent.completion_arithmetic_mode()
         if mode == "exact_backend":
             return bool(left == right)
@@ -3744,42 +3818,39 @@ class _AdicCompletionElement(_OwnedAlgebraElement):
         return negation(self._completion_equal(other))
 
     def __hash__(self) -> int:
-        r"""Hash a completion element by the value it is.
+        r"""Hash a completion element by the value its equality decides it is.
 
-        This class's equality is decided on the completion's own arithmetic and,
-        where both sides retain an exact source expression, on the source
-        difference.  A hash therefore has to be a function of the element's
-        value: an element that retains no exact source -- the inverse of
-        ``1 - x`` in ``QQ[x, y]`` completed at ``(x)``, say, and any product of
-        it -- is decided equal to the images of the source ring's elements it
-        equals, and a hash read off one presentation of a pair and off the
-        parent of the other separates them.
+        This class's equality is decided on an exact datum of the element, so
+        the hash reads that same datum and no presentation of it.  Which datum
+        is exact is the completion's own statement about its arithmetic:
 
-        An element that retains an exact source expression hashes that
-        expression, which is the source ring's own element it is the image of:
-        ``image(1)`` and the ring's ``1`` are one point of a finite ordered set.
-        That name is a function of the element exactly when the completion map
-        is injective at the parent's defining ideal, which is the parent's own
-        kernel decision (Krull's intersection theorem for a proper ideal of a
-        Noetherian ring).
+        - The completion of an integral domain is a ring of fractions of it, and
+          every element its own arithmetic builds from images of the source ring
+          is the value of one reduced fraction there
+          (:meth:`_exact_value`).  That fraction is the value, not a
+          presentation of it: ``(1 - x)^{-1} (1 - x) x^4`` and the image of
+          ``x^4`` retain one fraction, so they hash alike, and the image of a
+          source element retains that element over ``1``, so ``image(1)`` and
+          the ring's ``1`` are one point of a finite ordered set.
+        - A completion whose arithmetic is a finite model of its elements states
+          the element itself exactly, and the element hashes that
+          (:meth:`exact_finite_datum`).  The projection to the model is not a
+          truncation of some longer value there: it is the element.
 
-        Every other element hashes the truncation the parent computes for it,
-        read back in the source ring (:meth:`exact_value_source`): the value
-        the completion decides, at the parent's precision.  Where an exact
-        source is its own truncation -- the case in which the completion's own
-        projection reads that source unchanged -- this is the same hash the
-        image of that source has, which is why the two branches agree on every
-        pair the completion decides equal.  An element whose parent computes no
-        value, and one whose parent retains no finite-stage lift, hashes the
-        completion alone, which is the coarser invariant :class:`Sets` allows.
+        An element the completion holds only through its private engine, in an
+        arithmetic that retains no finite exact model, hashes the completion
+        alone.  A finite truncation of an infinite series is not such a datum:
+        ``x^4`` and its product with ``(1 - x)^{-1} (1 - x)`` agree in every
+        coefficient below three and are not the zero element, so a hash read off
+        that truncation would join them with it.
         """
-        source_expression = self.exact_source_expression()
-        if source_expression is not None and self.parent().is_completion_map_injective() is True:
-            return hash(source_expression)
-        value_source = self.parent().exact_value_source(self)
-        if value_source is None:
+        value = self._exact_value()
+        if value is not None:
+            return hash(value)
+        finite_datum = self.parent().exact_finite_datum(self)
+        if finite_datum is None:
             return hash(id(self.parent()))
-        return hash(value_source)
+        return hash(finite_datum)
 
     def __bool__(self):
         return bool(negation(self._completion_equal(self.parent().zero())))
@@ -3801,7 +3872,11 @@ class _AdicCompletionElement(_OwnedAlgebraElement):
                 raise ZeroDivisionError(f"{self} is not a unit in {self.parent()}")
             case _:
                 return None
-        return _owned_engine_element(self.parent(), self._backend() ** -1)
+        value = self._exact_value()
+        return self.parent()._completion_element(
+            self._backend() ** -1,
+            source_value=None if value is None else value**-1,
+        )
 
     def precision_absolute(self):
         r"""Return the selected absolute computation precision when represented."""
@@ -4065,25 +4140,55 @@ class _AdicCompletionAlgebraParent(_OwnedAlgebraParent):
     def completion_arithmetic_mode(self):
         return self._adic_arithmetic_mode
 
-    def exact_value_source(self, element):
-        r"""Return the source-ring element that names ``element``'s value, or ``None``.
+    @cached_method
+    def exact_value_field(self):
+        r"""Return the fraction field of the source ring, or ``None`` where it states none.
 
-        A completion whose arithmetic is exact decides the value of an element,
-        and the finite datum it computes that value from is the truncation at
-        this completion's precision, read back in the source ring: the same
-        datum ``adic_projection`` reads, and a function of the element's value
-        rather than of the presentation it arrived in.  Every element is named
-        by that datum, including one that arrived through no exact source
-        expression, which is what ``_AdicCompletionElement.__hash__`` reads for
-        such an element.
+        The completion of an integral domain is a ring of fractions of it, so a
+        fraction of source elements is a value there; and the source's fraction
+        field reduces such a fraction to one representative, which is what makes
+        a hash of it a function of the value.  A source ring that is not an
+        integral domain states no fraction field, and its completions carry
+        their elements on the finite model their arithmetic selects instead.
 
-        A completion that computes at finite precision decides no value --
-        ``_completion_equal`` only decides inequality there, on the finite
-        approximation -- and a construction that supplies no finite-stage lift
-        names none; both return ``None``, and their elements are left to the
-        one coarse hash of the completion.
+        The field is the source's own: the elements are the engine's fractions
+        of the engine's source, and nothing in the completion's public surface
+        exposes them.
         """
-        if self.completion_arithmetic_mode() == "finite_precision":
+        source = self.completion_source()
+        if source in OwnedIntegralDomains():
+            return _engine_ring(source).fraction_field()
+        return None
+
+    def _source_value(self, element):
+        r"""Return the value of a source-ring element in :meth:`exact_value_field`.
+
+        ``None`` where the source states no fraction field.
+        """
+        field = self.exact_value_field()
+        if field is None:
+            return None
+        return field(_engine_element(self.completion_source(), element))
+
+    def exact_finite_datum(self, element):
+        r"""Return the element's exact data in the completion's finite model, or ``None``.
+
+        A completion whose arithmetic is a finite model of its elements decides
+        each element exactly, and the finite datum it computes is that element:
+        the truncation at this completion's precision already *is* the value
+        there, not a projection of a longer one.  ``exact_lazy`` arithmetic is
+        the other case: its elements are infinite series, and their truncation
+        at any finite exponent agrees for series that are not equal -- ``x^4``
+        and ``0`` agree below three while differing in the fourth coefficient --
+        so no truncation is returned and the element's value is the retained
+        exact fraction (:meth:`_AdicCompletionElement._exact_value`).
+
+        A construction that supplies no finite-stage lift states no datum, and
+        neither does arithmetic at finite precision, which decides no value at
+        all: ``_completion_equal`` decides only inequality there, on the finite
+        approximation.
+        """
+        if self.completion_arithmetic_mode() in ("exact_lazy", "finite_precision"):
             return None
         projection_lift = self._completion_projection_lift()
         if projection_lift is None:
@@ -4093,13 +4198,16 @@ class _AdicCompletionAlgebraParent(_OwnedAlgebraParent):
             self.computation_precision(),
         )
 
-    def _completion_element(self, value, *, source_expression=None):
+    def _completion_element(self, value, *, source_expression=None, source_value=None):
         if element_parent(value) is not self._engine:
             value = self._engine(value)
+        if source_expression is not None and source_value is None:
+            source_value = self._source_value(source_expression)
         return self.element_class(
             self,
             value,
             exact_source_expression=source_expression,
+            exact_source_value=source_value,
         )
 
     def _element_constructor_(self, value):
