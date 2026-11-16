@@ -2,11 +2,13 @@ r"""The reals and the elements of an adic completion hash by their value.
 
 :class:`Sets` states that every object hashes consistently with its equality.
 An exact real decides equality of two presentations through the difference of
-its expression, exactly and by algebra: ``sqrt(2)^2`` and ``2`` are one real.
+its expression, exactly and by algebra: ``sqrt(2)^2`` and ``2`` are one real,
+and the coercion from the integers makes ``RR(2)`` and ``2`` one real too.
 An element of an adic completion decides it on the retained exact source
 expressions, so ``x + 1`` and ``x + 1`` computed from the two summands are one
-element.  Neither equality reads a presentation, so neither class can hash one;
-each hashes its own field, and equal elements still hash alike.
+element, and the image of a ring element is that ring element.  Neither
+equality reads a presentation, so neither class can hash one; each hashes the
+value, and equal elements hash alike.
 """
 
 from sage_extensions.all import *  # noqa: F401,F403
@@ -26,6 +28,46 @@ def test_two_presentations_of_one_real_are_one_point_of_a_finite_ordered_set() -
     assert hash(square) == hash(two)
     assert FiniteOrderedSets()((square, two)).cardinality() == 1
     assert FiniteOrderedSets()((RR(1), RR(2))).cardinality() == 2
+
+
+def test_an_exact_real_hashes_as_the_number_it_equals() -> None:
+    r"""``RR(2) = 2`` and ``RR(1/2) = 1/2``: the real and the exact number it is.
+
+    The integers and the rationals coerce into the exact reals, so ``RR(2)``
+    and ``2`` are one real and ``RR(1/2)`` and ``1/2`` are one real.  A finite
+    ordered set holds one point for each pair, and a dictionary finds the value
+    it was given by either name, which is the hash agreeing with that equality.
+
+    ``sqrt(2)^2`` is the same real as ``2`` by the algebraic decision, so it
+    enters such a set as the integer's point too.
+    """
+    two = RR(2)
+    half = RR(QQ(1) / 2)
+
+    assert two == ZZ(2)
+    assert hash(two) == hash(ZZ(2))
+    assert half == QQ(1) / 2
+    assert hash(half) == hash(QQ(1) / 2)
+    assert {ZZ(2): "two"}[two] == "two"
+    assert FiniteOrderedSets()((two, ZZ(2))).cardinality() == 1
+    assert FiniteOrderedSets()((RR(2).sqrt() ** 2, ZZ(2))).cardinality() == 1
+    assert FiniteOrderedSets()((half, QQ(1) / 2)).cardinality() == 1
+
+
+def test_two_algebraic_presentations_of_one_irrational_real_are_one_point() -> None:
+    r"""``sqrt(8)/2 = sqrt(2)``: one value, two expressions, one point.
+
+    The algebraic decision of the difference places both in the same real
+    algebraic number, so they hash alike; the rational ``2`` is a different
+    value, so a set of it and ``sqrt(2)`` holds two points.
+    """
+    root = RR(2).sqrt()
+    eighth_root_halved = RR(8).sqrt() / 2
+
+    assert root == eighth_root_halved
+    assert hash(root) == hash(eighth_root_halved)
+    assert FiniteOrderedSets()((root, eighth_root_halved)).cardinality() == 1
+    assert FiniteOrderedSets()((root, RR(2))).cardinality() == 2
 
 
 def test_two_presentations_of_one_completion_element_are_one_point() -> None:
