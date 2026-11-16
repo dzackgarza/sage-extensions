@@ -162,6 +162,9 @@ from sage_extensions.categories.lattice_morphisms import (  # noqa: F401
     LatticeMor,
     LatticeMorphism,
 )
+from sage_extensions.categories.definite_lattices import (  # noqa: F401
+    definite_indecomposable_summands,
+)
 from sage_extensions.categories.lattices import (  # noqa: F401  # noqa: F401
     DefiniteLattices,
     EvenLattices,

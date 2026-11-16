@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING
 
 from sage.libs.pari import pari
 from sage.matrix.constructor import matrix as engine_matrix
+from sage.matrix.special import identity_matrix
 from sage.modules.free_module_element import vector as engine_vector
 from sage.rings.integer_ring import ZZ as SageZZ
 from sage.rings.rational_field import QQ as SageQQ
@@ -22,6 +23,7 @@ from sage_extensions.categories.rings.ring_foundation import _owned_engine_eleme
 from sage_extensions.categories.rings.ring_foundation import (
     _engine_element,
     _engine_ring,
+    _owned_integers,
 )
 from sage_extensions.categories.schemes.polytopes import ConvexPolytopes
 from sage_extensions.categories.sets.finite_families import finite_family
@@ -211,6 +213,120 @@ def _reduction_from_transformation(lattice, basis_map):
         reduced = lattice.lattice_category()(reduced_gram)
     isometry = reduced.Isom(lattice)(images)
     return LatticeReduction(lattice, reduced, isometry, basis_map)
+
+
+def _lll_basis(basis, gram):
+    r"""The rows of ``basis`` changed to an LLL-reduced basis of their span for ``gram`` (PARI ``qflllgram``)."""
+    reduction = pari(basis * gram * basis.transpose()).qflllgram().sage()
+    return reduction.transpose() * basis
+
+
+def indecomposable_summand_bases(gram):
+    r"""Row bases of the indecomposable orthogonal summands of a positive definite ``gram``, or ``None``.
+
+    Kneser's construction (Kneser, *Quadratische Formen*, section 27; the
+    decomposition is unique by Eichler's theorem): a minimal vector is not
+    the sum of two nonzero orthogonal vectors, so the minimal vectors fall
+    into the summands along the connected components of their
+    nonorthogonality graph. The saturated span of a component, its minimal
+    vectors spanning it with finite index along a connected graph, is an
+    indecomposable summand when it splits off orthogonally; the orthogonal
+    complement of those summands is decomposed the same way. ``None`` means
+    a step did not split off orthogonally, so the decomposition is not
+    decided by this construction.
+    """
+    rank = gram.nrows()
+    if rank == 1:
+        return (identity_matrix(SageZZ, 1),)
+    vectors = engine_matrix(SageZZ, pari(gram).qfminim()[2].sage()).columns()
+    unseen = set(range(len(vectors)))
+    components = []
+    while unseen:
+        stack = [unseen.pop()]
+        component = []
+        while stack:
+            current = stack.pop()
+            component.append(vectors[current])
+            for other in tuple(unseen):
+                if vectors[current] * gram * vectors[other] != 0:
+                    unseen.remove(other)
+                    stack.append(other)
+        components.append(component)
+    pieces = [engine_matrix(SageZZ, component).row_module().basis_matrix().saturation() for component in components]
+    if len(pieces) == 1 and pieces[0].nrows() == rank:
+        return (identity_matrix(SageZZ, rank),)
+    spanned = engine_matrix(SageZZ, [row for piece in pieces for row in piece.rows()])
+    complement = (spanned * gram).right_kernel_matrix()
+    if complement.nrows() + spanned.nrows() != rank:
+        return None
+    whole = spanned.stack(complement) if complement.nrows() else spanned
+    if abs(whole.det()) != 1:
+        return None
+    summands = [_lll_basis(piece, gram) for piece in pieces]
+    if complement.nrows():
+        rest = indecomposable_summand_bases(complement * gram * complement.transpose())
+        if rest is None:
+            return None
+        summands.extend(_lll_basis(basis * complement, gram) for basis in rest)
+    return tuple(summands)
+
+
+def _summand_family(summands):
+    r"""The owned family of indecomposable summands a decomposition reports."""
+    return finite_family(tuple(summands), name="Indecomposable summands")
+
+
+def definite_indecomposable_summands(lattice):
+    r"""The indecomposable orthogonal summands of a definite integral lattice, as sublattices.
+
+    The decomposition is Kneser's (Kneser, *Quadratische Formen*, section 27)
+    and is unique (Eichler).  The Gram is LLL-reduced first, because the
+    minimal-vector enumeration of :func:`indecomposable_summand_bases` is
+    bounded by the entries of the Gram it is given, and each returned basis is
+    a set of coordinates in the reduced framing.  Its images under the
+    reduction's isometry :meth:`Lattices.lll_reduction` carry it back to
+    ``lattice``, where a summand is the span of those images with the
+    restricted form -- a sublattice of ``lattice``, not a new Gram
+    presentation of it.
+
+    ``None`` means that construction did not split the lattice off
+    orthogonally, so nothing here decides the decomposition.
+    """
+    if lattice.base_ring() is not _owned_integers() or lattice.module_rank().is_finite() is not True:
+        return None
+    if lattice.is_positive_definite() is not True and lattice.is_negative_definite() is not True:
+        return None
+    rank = int(lattice.module_rank())
+    if rank <= 1:
+        return _summand_family(() if rank == 0 else (lattice,))
+    reduction = _lll_reduction(lattice)
+    reduced = reduction.reduced
+    _sign, positive_gram = _positive_gram(reduced)
+    bases = indecomposable_summand_bases(
+        _engine_component_matrix(positive_gram).change_ring(SageZZ)
+    )
+    if bases is None:
+        return None
+    if tuple(int(basis.nrows()) for basis in bases) == (rank,):
+        return _summand_family((lattice,))
+    labels = tuple(reduced.module_generating_set())
+    return _summand_family(
+        lattice.subobject_on(
+            tuple(
+                reduction.isometry(
+                    reduced.linear_combination(
+                        {
+                            label: int(entry)
+                            for label, entry in zip(labels, row, strict=True)
+                            if entry
+                        }
+                    )
+                )
+                for row in basis.rows()
+            )
+        )
+        for basis in bases
+    )
 
 
 def _bkz_reduction(lattice, block_size=20):
@@ -1192,6 +1308,8 @@ def _kissing_number(lattice):
 
 __all__ = [
     "LatticeReduction",
+    "definite_indecomposable_summands",
+    "indecomposable_summand_bases",
 ]
 
 

@@ -5492,58 +5492,18 @@ class Lattices(OwnedCategoryOverBaseRing):
         def _definite_indecomposable_summands(self):
             r"""Return the indecomposable summands of a definite integral lattice, or ``None``.
 
-            The decomposition is Kneser's (Kneser, *Quadratische Formen*, section
-            27) and is unique by Eichler's theorem;
-            :func:`sage_extensions.categories.lattice_morphisms._indecomposable_summands`
-            computes it.  The Gram is LLL-reduced before that call because its
-            minimal-vector enumeration is bounded by the entries of the Gram it
-            is given.
-
-            ``None`` means that construction did not split the lattice off
-            orthogonally, so nothing here decides the decomposition.  A summand
-            is the span of its returned basis, hence a sublattice of this
-            lattice and not a new Gram presentation of it.
+            The decomposition is Kneser's and is unique by Eichler's theorem;
+            :func:`sage_extensions.categories.definite_lattices.definite_indecomposable_summands`
+            computes it.  ``None`` means that construction did not split the
+            lattice off orthogonally, so nothing here decides the
+            decomposition.  A summand is the span of its returned basis, hence
+            a sublattice of this lattice and not a new Gram presentation of it.
             """
-            from sage.libs.pari import pari
-            from sage_extensions.categories.lattice_morphisms import (
-                _indecomposable_summands,
+            from sage_extensions.categories.definite_lattices import (
+                definite_indecomposable_summands,
             )
 
-            if self.base_ring() is not _owned_integers() or self.module_rank().is_finite() is not True:
-                return None
-            if self.is_positive_definite() is True:
-                sign = 1
-            elif self.is_negative_definite() is True:
-                sign = -1
-            else:
-                return None
-            rank = int(self.module_rank())
-            if rank <= 1:
-                return (self,) if rank == 1 else ()
-            gram = sign * _engine_component_matrix(self.gram_tensor()).change_ring(SageZZ)
-            transformation = pari(gram).qflllgram().sage()
-            reduced = transformation.transpose() * gram * transformation
-            bases = _indecomposable_summands(reduced)
-            if bases is None:
-                return None
-            if tuple(int(basis.nrows()) for basis in bases) == (rank,):
-                return (self,)
-            labels = tuple(self.module_generating_set())
-            return tuple(
-                self.subobject_on(
-                    tuple(
-                        self.linear_combination(
-                            {
-                                label: int(entry)
-                                for label, entry in zip(labels, row)
-                                if entry
-                            }
-                        )
-                        for row in (basis * transformation.transpose()).rows()
-                    )
-                )
-                for basis in bases
-            )
+            return definite_indecomposable_summands(self)
 
         def is_decomposable(self):
             r"""Whether this lattice has a nontrivial integral orthogonal sum.
@@ -5587,7 +5547,7 @@ class Lattices(OwnedCategoryOverBaseRing):
                     return False
             summands = self._definite_indecomposable_summands()
             if summands is not None:
-                return len(summands) > 1
+                return int(summands.cardinality()) > 1
             return AtomicProposition("orthogonally decomposable", self)
 
         def _binary_orthogonal_split(self):
@@ -5711,7 +5671,7 @@ class Lattices(OwnedCategoryOverBaseRing):
                     return finite_family((category([[first]]), category([[second]])), name="Indecomposable summands")
                 definite = self._definite_indecomposable_summands()
                 if definite is not None:
-                    return finite_family(definite, name="Indecomposable summands")
+                    return definite
                 answer = self.is_decomposable()
                 if answer is False:
                     return finite_family((self,), name="Indecomposable summands")

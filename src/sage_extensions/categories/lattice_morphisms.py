@@ -50,6 +50,9 @@ from sage_extensions.categories.isotropic_orbits import (
     _isotropic_orbit_representatives,
     _isotropic_stabilizer_generators,
 )
+from sage_extensions.categories.definite_lattices import (
+    indecomposable_summand_bases,
+)
 from sage_extensions.categories.modules.framed.formed.torsion_form_modules import (
     _torsion_form_isometry,
 )
@@ -3296,15 +3299,15 @@ def _summandwise_isometry(source, target):
     r"""The column action ``W`` with ``W~ target W == source`` found summand by summand, ``False``, or ``None``.
 
     Both positive definite Grams are split into indecomposable summands
-    (``_indecomposable_summands``); the decomposition is unique (Eichler),
+    (``indecomposable_summand_bases``); the decomposition is unique (Eichler),
     so an isometry exists exactly when the summands match in isometric
     pairs, and it is assembled from one PARI ``qfisom`` per matched pair
     (Plesken-Souvignier on that summand's short vectors only). ``None``
     means a decomposition is not decided, and the caller searches the whole
     Gram.
     """
-    source_summands = _indecomposable_summands(source)
-    target_summands = _indecomposable_summands(target)
+    source_summands = indecomposable_summand_bases(source)
+    target_summands = indecomposable_summand_bases(target)
     if source_summands is None or target_summands is None:
         return None
     if len(source_summands) == 1 and len(target_summands) == 1:
@@ -3394,62 +3397,6 @@ def _definite_isometry_matrix(domain_gram, codomain_gram, sign):
     return transformation
 
 
-def _lll_basis(basis, gram):
-    r"""The rows of ``basis`` changed to an LLL-reduced basis of their span for ``gram`` (PARI ``qflllgram``)."""
-    reduction = pari(basis * gram * basis.transpose()).qflllgram().sage()
-    return reduction.transpose() * basis
-
-
-def _indecomposable_summands(gram):
-    r"""Row bases of the indecomposable orthogonal summands of a positive definite ``gram``, or ``None``.
-
-    Kneser's construction (Kneser, *Quadratische Formen*, section 27; the
-    decomposition is unique by Eichler's theorem): a minimal vector is not
-    the sum of two nonzero orthogonal vectors, so the minimal vectors fall
-    into the summands along the connected components of their
-    nonorthogonality graph. The saturated span of a component, its minimal
-    vectors spanning it with finite index along a connected graph, is an
-    indecomposable summand when it splits off orthogonally; the orthogonal
-    complement of those summands is decomposed the same way. ``None`` means
-    a step did not split off orthogonally, so the decomposition is not
-    decided by this construction.
-    """
-    rank = gram.nrows()
-    if rank == 1:
-        return (identity_matrix(SageZZ, 1),)
-    vectors = engine_matrix(SageZZ, pari(gram).qfminim()[2].sage()).columns()
-    unseen = set(range(len(vectors)))
-    components = []
-    while unseen:
-        stack = [unseen.pop()]
-        component = []
-        while stack:
-            current = stack.pop()
-            component.append(vectors[current])
-            for other in tuple(unseen):
-                if vectors[current] * gram * vectors[other] != 0:
-                    unseen.remove(other)
-                    stack.append(other)
-        components.append(component)
-    pieces = [engine_matrix(SageZZ, component).row_module().basis_matrix().saturation() for component in components]
-    if len(pieces) == 1 and pieces[0].nrows() == rank:
-        return (identity_matrix(SageZZ, rank),)
-    spanned = engine_matrix(SageZZ, [row for piece in pieces for row in piece.rows()])
-    complement = (spanned * gram).right_kernel_matrix()
-    if complement.nrows() + spanned.nrows() != rank:
-        return None
-    whole = spanned.stack(complement) if complement.nrows() else spanned
-    if abs(whole.det()) != 1:
-        return None
-    summands = [_lll_basis(piece, gram) for piece in pieces]
-    if complement.nrows():
-        rest = _indecomposable_summands(complement * gram * complement.transpose())
-        if rest is None:
-            return None
-        summands.extend(_lll_basis(basis * complement, gram) for basis in rest)
-    return tuple(summands)
-
-
 @cached_function
 def _definite_automorphisms(gram):
     r"""``|O(L)|`` and row-action generators for the positive definite integral Gram ``gram``.
@@ -3458,7 +3405,7 @@ def _definite_automorphisms(gram):
     up to the largest diagonal entry of the form it is given, which for
     ``E_8 + <2n>`` is every ``E_8`` vector of norm up to ``2n``. The Gram is
     first split into its indecomposable orthogonal summands
-    (``_indecomposable_summands``), each in an LLL-reduced basis. The
+    (``indecomposable_summand_bases``), each in an LLL-reduced basis. The
     decomposition into indecomposables is unique (Eichler), so
     ``O(L)`` is the product over isometry classes of blocks of the wreath
     products ``O(B) wr S_k``: generated by each block's ``qfauto``
@@ -3471,7 +3418,7 @@ def _definite_automorphisms(gram):
     """
     from sage.arith.misc import factorial
 
-    summands = _indecomposable_summands(gram)
+    summands = indecomposable_summand_bases(gram)
     if summands is None or len(summands) == 1:
         order_and_generators = pari(gram).qfauto()
         return SageZZ(order_and_generators[0]), tuple(
