@@ -1,0 +1,38 @@
+tree SHA: 5b22e2544b772f59ad1396c397b1f50cf96394e5 (modified paths: 1)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 16.53 19.04 19.72 15/745 2747301
+files: tests/modules/test_general_module_elements_hash_by_their_equality.sage
+inner 400 s, outer 960 s, guard 6144 MiB
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+time gates OFF (--no-time-gates): star import 1.69 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: asyncio-1.5.0, xdist-3.8.0, reportlog-1.0.0, platformdirs-4.13.5, hypothesis-6.170.15, anyio-4.15.1, timeout-2.4.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 3 items
+
+tests/modules/test_general_module_elements_hash_by_their_equality.sage . [ 33%]
+..                                                                       [100%]
+
+============================== slowest durations ===============================
+1.21s call     tests/modules/test_general_module_elements_hash_by_their_equality.sage::test_two_cartier_divisors_of_one_class_hash_alike
+0.07s call     tests/modules/test_general_module_elements_hash_by_their_equality.sage::test_the_zero_class_of_the_almost_everywhere_quotient_is_a_point
+0.03s call     tests/modules/test_general_module_elements_hash_by_their_equality.sage::test_the_zero_class_of_a_tensor_quotient_is_a_point_of_a_finite_ordered_set
+
+(6 durations < 0.005s hidden.  Use -vv to show these durations.)
+============================== 3 passed in 3.47s ===============================
+[peakrss] probe542r2tests: child waited=0 shell_code=0 samples=9
+[peakrss] peak tree RSS      : 315 MiB
+[peakrss] low-water MemAvail : 1640 MiB
+[peakrss] peak single VmHWM  : 317 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      306 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    16.1s procs=  3 rss=   315 MiB hwm=   317 MiB avail=  2388 MiB
+[peakrss]   t=    14.1s procs=  3 rss=   314 MiB hwm=   317 MiB avail=  2520 MiB
+[peakrss]   t=    12.0s procs=  3 rss=   309 MiB hwm=   311 MiB avail=  2669 MiB
+[peakrss]   t=    10.0s procs=  3 rss=   294 MiB hwm=   296 MiB avail=  2447 MiB
+[peakrss]   t=     8.0s procs=  3 rss=   259 MiB hwm=   261 MiB avail=  2606 MiB
+launcher exit: 0

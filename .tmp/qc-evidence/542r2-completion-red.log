@@ -1,0 +1,74 @@
+tree SHA: 32d9bd78eda7bf6f5964e2652536aaae66a44b09 (modified paths: 1)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 18.84 21.29 20.13 12/679 2732006
+files: tests/rings/test_reals_and_completions_hash_by_their_value.sage
+inner 400 s, outer 960 s, guard 6144 MiB
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+time gates OFF (--no-time-gates): star import 1.73 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: asyncio-1.5.0, xdist-3.8.0, reportlog-1.0.0, platformdirs-4.13.5, hypothesis-6.170.15, anyio-4.15.1, timeout-2.4.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 5 items
+
+tests/rings/test_reals_and_completions_hash_by_their_value.sage ...F.    [100%]
+
+=================================== FAILURES ===================================
+_________ test_the_image_of_a_ring_element_hashes_as_that_ring_element _________
+
+    def test_the_image_of_a_ring_element_hashes_as_that_ring_element() -> None:
+        r"""``image(1)`` is the ring's own ``1``, so the two are one point.
+    
+        The completion map is a ring map, so ``image(1)`` and ``plane.one()`` are
+        one element of the completion, and the completion retains the exact source
+        expression of every image.  A finite ordered set of the image and the ring
+        element therefore holds one point, and the same holds for ``x`` and for
+        ``x + 1``.
+        """
+        plane = QQ.polynomial_ring(("x", "y"))
+        x = plane.algebra_generator("x")
+        completion = plane.adic_completion(plane.ideal(x), precision=3)
+        image = completion.completion_map()
+    
+        assert image(1) == plane.one()
+>       assert hash(image(1)) == hash(plane.one())
+E       assert 125752016330832 == 1
+E        +  where 125752016330832 = hash(element of Ring over Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring)
+E        +    where element of Ring over Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring = Generic morphism:\n  From: Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integ...g\n  To:   Ring over Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring(1)
+E        +      where 1 = Integer(1)
+E        +  and   1 = hash(1)
+E        +    where 1 = Cached version of <function Algebras.Unital.ParentMethods.one at 0x725e9a1d4f60>()
+E        +      where Cached version of <function Algebras.Unital.ParentMethods.one at 0x725e9a1d4f60> = Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring.one
+
+tests/rings/test_reals_and_completions_hash_by_their_value.sage:88: AssertionError
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:833 Elementwise module morphism Module over Fraction Field of Integer Ring on Classes in the multilinear tensor presentation -> Module over Fraction Field of Integer Ring on Fraction Field of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:833 Elementwise module morphism Module over Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring on Classes in the multilinear tensor presentation -> Module over Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring on Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+============================== slowest durations ===============================
+0.42s call     tests/rings/test_reals_and_completions_hash_by_their_value.sage::test_the_image_of_a_ring_element_hashes_as_that_ring_element
+0.18s call     tests/rings/test_reals_and_completions_hash_by_their_value.sage::test_two_algebraic_presentations_of_one_irrational_real_are_one_point
+0.05s call     tests/rings/test_reals_and_completions_hash_by_their_value.sage::test_two_presentations_of_one_real_are_one_point_of_a_finite_ordered_set
+0.02s call     tests/rings/test_reals_and_completions_hash_by_their_value.sage::test_two_presentations_of_one_completion_element_are_one_point
+0.01s setup    tests/rings/test_reals_and_completions_hash_by_their_value.sage::test_an_exact_real_hashes_as_the_number_it_equals
+0.01s call     tests/rings/test_reals_and_completions_hash_by_their_value.sage::test_an_exact_real_hashes_as_the_number_it_equals
+
+(9 durations < 0.005s hidden.  Use -vv to show these durations.)
+=========================== short test summary info ============================
+FAILED tests/rings/test_reals_and_completions_hash_by_their_value.sage::test_the_image_of_a_ring_element_hashes_as_that_ring_element
+========================= 1 failed, 4 passed in 4.92s ==========================
+[peakrss] probe542r2tests: child waited=1 shell_code=1 samples=7
+[peakrss] peak tree RSS      : 322 MiB
+[peakrss] low-water MemAvail : 6672 MiB
+[peakrss] peak single VmHWM  : 322 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      311 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    12.0s procs=  3 rss=   322 MiB hwm=   322 MiB avail=  6672 MiB
+[peakrss]   t=    10.0s procs=  3 rss=   320 MiB hwm=   320 MiB avail=  6993 MiB
+[peakrss]   t=     8.0s procs=  3 rss=   314 MiB hwm=   314 MiB avail=  7405 MiB
+[peakrss]   t=     6.0s procs=  3 rss=   298 MiB hwm=   298 MiB avail=  7627 MiB
+[peakrss]   t=     4.0s procs=  3 rss=   264 MiB hwm=   264 MiB avail=  7816 MiB

@@ -1,0 +1,156 @@
+tree SHA: b7e9453dee02129d7f8eea30600d35bfd9ab1479 (modified paths: 1)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 20.69 21.16 20.41 19/769 2742811
+files: tests/categories/test_structurally_defined_set_maps_hash_by_their_maps.sage
+inner 400 s, outer 960 s, guard 6144 MiB
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+time gates OFF (--no-time-gates): star import 2.22 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: asyncio-1.5.0, xdist-3.8.0, reportlog-1.0.0, platformdirs-4.13.5, hypothesis-6.170.15, anyio-4.15.1, timeout-2.4.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 5 items
+
+tests/categories/test_structurally_defined_set_maps_hash_by_their_maps.sage . [ 20%]
+FFFF                                                                     [100%]
+
+=================================== FAILURES ===================================
+______ test_the_identity_of_a_two_point_chain_hashes_as_the_set_map_it_is ______
+
+    def test_the_identity_of_a_two_point_chain_hashes_as_the_set_map_it_is() -> None:
+        r"""One monotone map, named as a monotone map and as the set map it retains.
+    
+        ``Sets`` states that an arrow's hash may not depend on the arrow's parent,
+        because equality of arrows is extensional across a stronger ``Mor`` with the
+        same endpoints.  The identity of the chain ``0 < 1`` is one map of one set
+        of points, so the monotone morphism, the same morphism built again, and the
+        set map it retains all hash alike, and a finite ordered set of them holds
+        one point.
+        """
+        points = Sets.Δ[2]
+        chain = PartiallyOrderedSets()(points, lambda left, right: int(left) <= int(right))
+        monotone = PartiallyOrderedSets().Mor(chain, chain).identity()
+        rebuilt = PartiallyOrderedSets().Mor(chain, chain).identity()
+        as_a_set_map = monotone.underlying_set_morphism()
+    
+        assert monotone == rebuilt
+        assert as_a_set_map == Sets().Mor(chain, chain).identity()
+        assert hash(monotone) == hash(rebuilt)
+>       assert hash(monotone) == hash(as_a_set_map)
+E       assert -5970800896795404939 == 266130346181947110
+E        +  where -5970800896795404939 = hash(Generic endomorphism of Partial order on {0,...,2})
+E        +  and   266130346181947110 = hash(Generic endomorphism of Partial order on {0,...,2})
+
+tests/categories/test_structurally_defined_set_maps_hash_by_their_maps.sage:59: AssertionError
+_________ test_two_continuous_maps_with_the_same_values_are_one_point __________
+
+    def test_two_continuous_maps_with_the_same_values_are_one_point() -> None:
+        r"""The identity function on two points is one continuous map of the two topologies.
+    
+        Both maps send the point at ``s`` of the indiscrete space to the point at
+        ``s`` of the Sierpinski space, so they are one map and one point of a finite
+        ordered set.
+        """
+        points = Sets.Δ[1]
+        spaces = TopologicalSpaces()
+        indiscrete = spaces(points, ((), points))
+        sierpinski = spaces(points, ((), (points(1),), points))
+        toward = spaces.Mor(indiscrete, sierpinski)(
+            lambda point: sierpinski(0) if point == indiscrete(0) else sierpinski(1)
+        )
+        rebuilt = spaces.Mor(indiscrete, sierpinski)(
+            lambda point: sierpinski(0) if point == indiscrete(0) else sierpinski(1)
+        )
+    
+        assert toward == rebuilt
+        assert hash(toward) == hash(rebuilt)
+>       assert hash(toward) == hash(toward.underlying_set_morphism())
+E       assert 6874249259792759086 == -1461178811811256711
+E        +  where 6874249259792759086 = hash(Generic morphism:\n  From: {0, 1}\n  To:   {0, 1})
+E        +  and   -1461178811811256711 = hash(Generic morphism:\n  From: {0, 1}\n  To:   {0, 1})
+E        +    where Generic morphism:\n  From: {0, 1}\n  To:   {0, 1} = underlying_set_morphism()
+E        +      where underlying_set_morphism = Generic morphism:\n  From: {0, 1}\n  To:   {0, 1}.underlying_set_morphism
+
+tests/categories/test_structurally_defined_set_maps_hash_by_their_maps.sage:83: AssertionError
+_________________ test_a_graph_morphism_hashes_its_vertex_map __________________
+
+    def test_a_graph_morphism_hashes_its_vertex_map() -> None:
+        r"""The swap of the two vertices of an edge is one graph automorphism.
+    
+        The graph is symmetric, so the swap of ``0`` and ``1`` preserves the single
+        adjacency ``(0, 1)``; the identity is another, and the two are distinct
+        morphisms of the one set of endomorphisms.  The graph's own equality of the
+        two swaps is undecided here, so the test states what is decided: the two
+        builds hash alike, and the hash of the morphism is the hash of its vertex
+        map.
+        """
+        edge = Graphs().from_edges((0, 1), ((0, 1),))
+        swap = Graphs().Mor(edge, edge)(lambda vertex: edge(1 - int(vertex)))
+        identity = Graphs().Mor(edge, edge).identity()
+    
+        rebuilt = Graphs().Mor(edge, edge)(lambda vertex: edge(1 - int(vertex)))
+    
+        assert hash(swap) == hash(rebuilt)
+>       assert hash(swap) == hash(swap.underlying_set_morphism())
+E       assert 8553574787549816366 == 6040875497292131609
+E        +  where 8553574787549816366 = hash(Generic endomorphism of <sage_extensions.categories.graph_categories.Graphs.parent_class[_FiniteDigraphEngine].ObjectType object at 0x742821570c50>)
+E        +  and   6040875497292131609 = hash(Generic endomorphism of <sage_extensions.categories.graph_categories.Graphs.parent_class[_FiniteDigraphEngine].ObjectType object at 0x742821570c50>)
+E        +    where Generic endomorphism of <sage_extensions.categories.graph_categories.Graphs.parent_class[_FiniteDigraphEngine].ObjectType object at 0x742821570c50> = underlying_set_morphism()
+E        +      where underlying_set_morphism = Generic endomorphism of <sage_extensions.categories.graph_categories.Graphs.parent_class[_FiniteDigraphEngine].ObjectType object at 0x742821570c50>.underlying_set_morphism
+
+tests/categories/test_structurally_defined_set_maps_hash_by_their_maps.sage:104: AssertionError
+____________ test_a_chamber_system_morphism_hashes_its_chamber_map _____________
+
+    def test_a_chamber_system_morphism_hashes_its_chamber_map() -> None:
+        r"""One chamber and its single type: the identity of the system is a morphism.
+    
+        The system has the chambers ``{0, 1}`` and the adjacency relation of type
+        ``s`` that holds of every ordered pair, so every map of the chambers
+        preserves it.
+        """
+        system = ChamberSystems().from_adjacencies(
+            (0, 1), ("s",), {"s": ((0, 0), (0, 1), (1, 0), (1, 1))}
+        )
+        identity = ChamberSystems().Mor(system, system).identity()
+        swap = ChamberSystems().Mor(system, system)(lambda chamber: system(1 - int(chamber)))
+    
+        rebuilt = ChamberSystems().Mor(system, system)(lambda chamber: system(1 - int(chamber)))
+    
+        assert hash(identity) == hash(ChamberSystems().Mor(system, system).identity())
+        assert hash(swap) == hash(rebuilt)
+>       assert hash(swap) == hash(swap.underlying_set_morphism())
+E       assert -4008416245375279192 == -4964206785944001919
+E        +  where -4008416245375279192 = hash(Generic endomorphism of <sage_extensions.categories.chamber_systems.ChamberSystems.parent_class[_FiniteChamberSystemEngine].ObjectType object at 0x742821571650>)
+E        +  and   -4964206785944001919 = hash(Generic endomorphism of <sage_extensions.categories.chamber_systems.ChamberSystems.parent_class[_FiniteChamberSystemEngine].ObjectType object at 0x742821571650>)
+E        +    where Generic endomorphism of <sage_extensions.categories.chamber_systems.ChamberSystems.parent_class[_FiniteChamberSystemEngine].ObjectType object at 0x742821571650> = underlying_set_morphism()
+E        +      where underlying_set_morphism = Generic endomorphism of <sage_extensions.categories.chamber_systems.ChamberSystems.parent_class[_FiniteChamberSystemEngine].ObjectType object at 0x742821571650>.underlying_set_morphism
+
+tests/categories/test_structurally_defined_set_maps_hash_by_their_maps.sage:126: AssertionError
+============================== slowest durations ===============================
+0.06s call     tests/categories/test_structurally_defined_set_maps_hash_by_their_maps.sage::test_two_monotone_maps_are_one_point_and_maps_of_two_orders_are_two
+0.04s call     tests/categories/test_structurally_defined_set_maps_hash_by_their_maps.sage::test_two_continuous_maps_with_the_same_values_are_one_point
+0.04s call     tests/categories/test_structurally_defined_set_maps_hash_by_their_maps.sage::test_a_chamber_system_morphism_hashes_its_chamber_map
+0.01s call     tests/categories/test_structurally_defined_set_maps_hash_by_their_maps.sage::test_a_graph_morphism_hashes_its_vertex_map
+0.01s call     tests/categories/test_structurally_defined_set_maps_hash_by_their_maps.sage::test_the_identity_of_a_two_point_chain_hashes_as_the_set_map_it_is
+
+(10 durations < 0.005s hidden.  Use -vv to show these durations.)
+=========================== short test summary info ============================
+FAILED tests/categories/test_structurally_defined_set_maps_hash_by_their_maps.sage::test_the_identity_of_a_two_point_chain_hashes_as_the_set_map_it_is
+FAILED tests/categories/test_structurally_defined_set_maps_hash_by_their_maps.sage::test_two_continuous_maps_with_the_same_values_are_one_point
+FAILED tests/categories/test_structurally_defined_set_maps_hash_by_their_maps.sage::test_a_graph_morphism_hashes_its_vertex_map
+FAILED tests/categories/test_structurally_defined_set_maps_hash_by_their_maps.sage::test_a_chamber_system_morphism_hashes_its_chamber_map
+========================= 4 failed, 1 passed in 3.48s ==========================
+[peakrss] probe542r2tests: child waited=1 shell_code=1 samples=10
+[peakrss] peak tree RSS      : 310 MiB
+[peakrss] low-water MemAvail : 2173 MiB
+[peakrss] peak single VmHWM  : 310 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      299 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    16.1s procs=  3 rss=   310 MiB hwm=   310 MiB avail=  2173 MiB
+[peakrss]   t=    18.1s procs=  3 rss=   310 MiB hwm=   310 MiB avail=  2273 MiB
+[peakrss]   t=    14.1s procs=  3 rss=   303 MiB hwm=   303 MiB avail=  2353 MiB
+[peakrss]   t=    12.1s procs=  3 rss=   299 MiB hwm=   299 MiB avail=  2267 MiB
+[peakrss]   t=    10.1s procs=  3 rss=   265 MiB hwm=   265 MiB avail=  2568 MiB

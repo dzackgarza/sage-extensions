@@ -1,0 +1,179 @@
+tree SHA: 090a0d92c960a96d94909211161402471ee4248c (modified paths: 0)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 14.75 16.99 18.65 15/745 2754329
+files: tests/schemes/test_glued_finite_affine_atlases.sage
+inner 500 s, outer 960 s, guard 6144 MiB
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+time gates OFF (--no-time-gates): star import 2.08 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: asyncio-1.5.0, xdist-3.8.0, reportlog-1.0.0, platformdirs-4.13.5, hypothesis-6.170.15, anyio-4.15.1, timeout-2.4.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 6 items
+
+tests/schemes/test_glued_finite_affine_atlases.sage F..FFF               [100%]
+
+=================================== FAILURES ===================================
+_____ test_the_line_with_a_tripled_origin_satisfies_the_cocycle_condition ______
+
+    def test_the_line_with_a_tripled_origin_satisfies_the_cocycle_condition() -> None:
+        r"""Three lines glued pairwise by the identity of ``D(x)``: the cocycle holds on ``D(x)``.
+    
+        The triple overlap ``U_01 cap U_02`` is ``D(x)`` and ``phi_12 o phi_01 = phi_02`` there.
+        The three open immersions are pairwise distinct, and the identity on every chart
+        glues to a fold onto the line.
+        """
+        _ring, line, punctured = _line_and_punctured_line()
+        gluing = _identity_gluing(punctured)
+        tripled = Schemes(QQ).glue_affine_atlas((line, line, line), (gluing, gluing, gluing))
+        atlas = tripled.gluing_datum()
+        identity = line.Mor(line).identity()
+        fold = tripled.Mor(line)((identity, identity, identity))
+    
+>       assert atlas.triple_overlap(0, 1, 2) is punctured
+E       assert Spectrum of Localization of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Int...erated by (x^2,) in Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring is Spectrum of Localization of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Int...enerated by (x,) in Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring
+E        +  where Spectrum of Localization of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Int...erated by (x^2,) in Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring = triple_overlap(0, 1, 2)
+E        +    where triple_overlap = Finite affine scheme gluing datum indexed by {0, 1, 2}.triple_overlap
+E        +    and   0 = Integer(0)
+E        +    and   1 = Integer(1)
+E        +    and   2 = Integer(2)
+
+tests/schemes/test_glued_finite_affine_atlases.sage:48: AssertionError
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:833 Elementwise module morphism Module over Fraction Field of Integer Ring on Classes in the multilinear tensor presentation -> Module over Fraction Field of Integer Ring on Fraction Field of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+__ test_global_functions_on_the_line_with_doubled_origin_are_the_polynomials ___
+
+    def test_global_functions_on_the_line_with_doubled_origin_are_the_polynomials() -> None:
+        r"""``Gamma(X, O) = {(f, g) in QQ[x]^2 : f = g in QQ[x, 1/x]} = QQ[x]``: restriction to a chart is bijective."""
+        _ring, line, punctured = _line_and_punctured_line()
+        doubled = Schemes(QQ).glue_affine_atlas((line, line), (_identity_gluing(punctured),))
+        atlas = doubled.finite_affine_atlas()
+    
+>       assert atlas.global_function_restriction(0).is_bijective()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/schemes/test_glued_finite_affine_atlases.sage:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/structure/element.pyx:494: in sage.structure.element.Element.__getattr__
+    ???
+sage/structure/element.pyx:507: in sage.structure.element.Element.getattr_from_category
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: 'OwnedUnitalMultiplicativeAlgebraMor_with_category_with_category.ArrowType' object has no attribute 'is_bijective'. Did you mean: 'is_injective'?
+
+sage/cpython/getattr.pyx:362: AttributeError
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Localization of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring at Submonoid generated by (x,) in Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:833 Elementwise module morphism Module over Localization of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring at Submonoid generated by (x,) in Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring on Classes in the multilinear tensor presentation -> Module over Localization of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring at Submonoid generated by (x,) in Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring on Localization of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring at Submonoid generated by (x,) in Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:833 Elementwise module morphism Module over Fraction Field of Integer Ring on Classes in the multilinear tensor presentation -> Module over Fraction Field of Integer Ring on Subset of Module over Fraction Field of Integer Ring on Product of the family over {0, 1} cut out by <function Sets.SubcategoryMethods._categorical_equalizer_construction.<locals>.<lambda> at 0x7116e2aefb60> accepted without exhaustive linearity verification; the source is not represented as finite
+_____ test_global_functions_on_the_glued_projective_line_are_the_constants _____
+
+    def test_global_functions_on_the_glued_projective_line_are_the_constants() -> None:
+        r"""``Gamma(P^1, O) = QQ[x] cap QQ[1/x] = QQ``, of rank one over ``QQ``."""
+        ring, line, punctured = _line_and_punctured_line()
+        projective = Schemes(QQ).glue_affine_atlas((line, line), (_reciprocal_gluing(ring, punctured),))
+    
+>       assert projective.finite_affine_atlas().global_function_algebra().module_rank() == 1
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/schemes/test_glued_finite_affine_atlases.sage:88: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Module over Fraction Field of Integer Ring on Module over Fraction Field of Integer Ring on Subset of Module over Frac...} cut out by <function Sets.SubcategoryMethods._categorical_equalizer_construction.<locals>.<lambda> at 0x7116e2936090>
+
+    def module_rank(self):
+        r"""Return ``rank_R(M)`` (Mathlib ``Module.rank``), a cardinal.
+    
+        Over a field ``k`` the rank is the dimension: the cardinality of a
+        basis.  A basis of cardinality ``n`` identifies ``M`` with ``k^n``
+        as a set, so when ``k`` and ``M`` are finite, ``|M| = |k|^n`` and
+        ``n`` is the exact logarithm of ``|M|`` to the base ``|k|``.  A
+        more specific category with a chosen basis or presentation answers
+        from that datum; any other module answers through
+        ``_rank_decision``.
+        """
+        ring = self.base_ring()
+        match self:
+            case _ if (
+                ring in OwnedFields()
+                and ring.is_finite() is True
+                and self.is_finite() is True
+            ):
+                return cardinal(
+                    SageZZ(int(self.cardinality())).exact_log(
+                        int(ring.cardinality())
+                    )
+                )
+            case _:
+                decided = self._rank_decision()
+>               assert decided is not None, (
+                       ^^^^^^^^^^^^^^^^^^^
+                    f"the rank of {self} over {ring} is computed over a finite field for a finite "
+                    f"module, or from a chosen basis or presentation, and {self} supplies none of these"
+                )
+E               AssertionError: the rank of Module over Fraction Field of Integer Ring on Module over Fraction Field of Integer Ring on Subset of Module over Fraction Field of Integer Ring on Product of the family over {0, 1} cut out by <function Sets.SubcategoryMethods._categorical_equalizer_construction.<locals>.<lambda> at 0x7116e2936090> over Fraction Field of Integer Ring is computed over a finite field for a finite module, or from a chosen basis or presentation, and Module over Fraction Field of Integer Ring on Module over Fraction Field of Integer Ring on Subset of Module over Fraction Field of Integer Ring on Product of the family over {0, 1} cut out by <function Sets.SubcategoryMethods._categorical_equalizer_construction.<locals>.<lambda> at 0x7116e2936090> supplies none of these
+
+src/sage_extensions/categories/modules/pure/modules.py:2546: AssertionError
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:833 Elementwise module morphism Module over Fraction Field of Integer Ring on Classes in the multilinear tensor presentation -> Module over Fraction Field of Integer Ring on Subset of Module over Fraction Field of Integer Ring on Product of the family over {0, 1} cut out by <function Sets.SubcategoryMethods._categorical_equalizer_construction.<locals>.<lambda> at 0x7116e2936090> accepted without exhaustive linearity verification; the source is not represented as finite
+______ test_the_projective_plane_is_glued_from_its_three_standard_charts _______
+
+    def test_the_projective_plane_is_glued_from_its_three_standard_charts() -> None:
+        r"""``P^2 = U_0 cup U_1 cup U_2`` with ``U_i = D_+(x_i)``: three charts, and the gluing is ``P^2``."""
+        plane = ProjectiveSpaces(QQ)(2)
+        glued = plane.glued_from_standard_charts()
+    
+        assert glued.gluing_datum().transition_index_set().cardinality() == 3
+>       assert glued.is_isomorphic(plane)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/schemes/test_glued_finite_affine_atlases.sage:97: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = is_isomorphic(Scheme over Fraction Field of Integer Ring glued from the affine charts Affine charts of a finite scheme..., 1, 2, ...} over Fraction Field of Integer Ring], Projective Space of dimension 2 over Fraction Field of Integer Ring)
+
+    def __bool__(self):
+>       raise TypeError(f"the proposition {self} has no Python truth value, because it may be undecided; call ask(...) on it to get True, False or Unknown")
+E       TypeError: the proposition is_isomorphic(Scheme over Fraction Field of Integer Ring glued from the affine charts Affine charts of a finite scheme gluing: [0 ↦ Spectrum of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring, 1 ↦ Spectrum of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring, 2 ↦ Spectrum of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring], Projective Space of dimension 2 over Fraction Field of Integer Ring) has no Python truth value, because it may be undecided; call ask(...) on it to get True, False or Unknown
+
+src/sage_extensions/logic.py:44: TypeError
+============================== slowest durations ===============================
+0.84s call     tests/schemes/test_glued_finite_affine_atlases.sage::test_global_functions_on_the_line_with_doubled_origin_are_the_polynomials
+0.78s call     tests/schemes/test_glued_finite_affine_atlases.sage::test_the_projective_plane_is_glued_from_its_three_standard_charts
+0.51s call     tests/schemes/test_glued_finite_affine_atlases.sage::test_the_line_with_a_tripled_origin_satisfies_the_cocycle_condition
+0.23s call     tests/schemes/test_glued_finite_affine_atlases.sage::test_global_functions_on_the_glued_projective_line_are_the_constants
+0.02s call     tests/schemes/test_glued_finite_affine_atlases.sage::test_an_atlas_of_two_lines_glued_by_the_identity_has_one_transition
+0.02s call     tests/schemes/test_glued_finite_affine_atlases.sage::test_the_fold_of_an_atlas_of_two_lines_restricts_to_the_identity_on_each_chart
+
+(12 durations < 0.005s hidden.  Use -vv to show these durations.)
+=========================== short test summary info ============================
+FAILED tests/schemes/test_glued_finite_affine_atlases.sage::test_the_line_with_a_tripled_origin_satisfies_the_cocycle_condition
+FAILED tests/schemes/test_glued_finite_affine_atlases.sage::test_global_functions_on_the_line_with_doubled_origin_are_the_polynomials
+FAILED tests/schemes/test_glued_finite_affine_atlases.sage::test_global_functions_on_the_glued_projective_line_are_the_constants
+FAILED tests/schemes/test_glued_finite_affine_atlases.sage::test_the_projective_plane_is_glued_from_its_three_standard_charts
+========================= 4 failed, 2 passed in 5.72s ==========================
+[peakrss] probe542r2tests: child waited=1 shell_code=1 samples=10
+[peakrss] peak tree RSS      : 261 MiB
+[peakrss] low-water MemAvail : 1293 MiB
+[peakrss] peak single VmHWM  : 267 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      256 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    16.1s procs=  3 rss=   261 MiB hwm=   267 MiB avail=  1482 MiB
+[peakrss]   t=    18.1s procs=  3 rss=   260 MiB hwm=   267 MiB avail=  2416 MiB
+[peakrss]   t=    14.1s procs=  3 rss=   256 MiB hwm=   264 MiB avail=  1688 MiB
+[peakrss]   t=    12.0s procs=  3 rss=   217 MiB hwm=   225 MiB avail=  1570 MiB
+[peakrss]   t=    10.0s procs=  3 rss=   215 MiB hwm=   221 MiB avail=  1400 MiB

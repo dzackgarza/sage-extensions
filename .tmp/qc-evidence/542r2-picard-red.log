@@ -1,0 +1,64 @@
+tree SHA: ef6fc1f434e8579e3796fdb1f1e428137fb2c121 (modified paths: 1)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 18.62 18.78 19.51 18/740 2750967
+files: tests/divisors/test_divisor_classes_hash_by_their_equality.sage
+inner 400 s, outer 960 s, guard 6144 MiB
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+time gates OFF (--no-time-gates): star import 1.87 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: asyncio-1.5.0, xdist-3.8.0, reportlog-1.0.0, platformdirs-4.13.5, hypothesis-6.170.15, anyio-4.15.1, timeout-2.4.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 3 items
+
+tests/divisors/test_divisor_classes_hash_by_their_equality.sage .F.      [100%]
+
+=================================== FAILURES ===================================
+________ test_a_picard_class_hashes_the_group_that_decides_its_equality ________
+
+    def test_a_picard_class_hashes_the_group_that_decides_its_equality() -> None:
+        r"""``[L]`` is a class of ``Pic(X)``, so the class hashes the group.
+    
+        ``Pic(X).equal`` answers ``isomorphic(L, M)`` for two classes retaining
+        different sheaves, so the retained sheaf is not what the equality is a
+        relation on and a hash may not read it: every class of one ``Pic(X)``
+        hashes alike, which is the hash of the group it is a class of.  The
+        structure sheaf of the affine line carries no tensor power here, so the
+        test states the coarseness on the group itself rather than on two
+        distinct sheaves of one class.
+        """
+        _ring, _x, scheme = _affine_line()
+        classes = scheme.picard_group().underlying_set()
+        structure_class = classes(scheme.structure_sheaf())
+    
+        assert structure_class == classes.zero()
+        assert hash(structure_class) == hash(classes.zero())
+>       assert hash(structure_class) == hash(classes)
+E       AssertionError: assert -1793465262270530806 == -2123201063562690755
+E        +  where -1793465262270530806 = hash(<[RecursionError('maximum recursion depth exceeded') raised in repr()] Sets.element_class[_InvertibleSheafClass] object at 0x77f3a310ce10>)
+E        +  and   -2123201063562690755 = hash(Isomorphism classes of invertible sheaves on Spectrum of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring)
+
+tests/divisors/test_divisor_classes_hash_by_their_equality.sage:59: AssertionError
+============================== slowest durations ===============================
+0.87s call     tests/divisors/test_divisor_classes_hash_by_their_equality.sage::test_the_negation_of_the_zero_cartier_divisor_is_the_zero_divisor
+0.23s call     tests/divisors/test_divisor_classes_hash_by_their_equality.sage::test_two_classes_of_one_invertible_sheaf_are_one_point
+0.01s call     tests/divisors/test_divisor_classes_hash_by_their_equality.sage::test_a_picard_class_hashes_the_group_that_decides_its_equality
+
+(6 durations < 0.005s hidden.  Use -vv to show these durations.)
+=========================== short test summary info ============================
+FAILED tests/divisors/test_divisor_classes_hash_by_their_equality.sage::test_a_picard_class_hashes_the_group_that_decides_its_equality
+========================= 1 failed, 2 passed in 4.81s ==========================
+[peakrss] probe542r2tests: child waited=1 shell_code=1 samples=12
+[peakrss] peak tree RSS      : 301 MiB
+[peakrss] low-water MemAvail : 1006 MiB
+[peakrss] peak single VmHWM  : 306 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      296 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    20.4s procs=  3 rss=   301 MiB hwm=   306 MiB avail=  3600 MiB
+[peakrss]   t=    18.4s procs=  3 rss=   286 MiB hwm=   292 MiB avail=  3668 MiB
+[peakrss]   t=    16.3s procs=  3 rss=   284 MiB hwm=   290 MiB avail=  3713 MiB
+[peakrss]   t=    14.3s procs=  3 rss=   255 MiB hwm=   260 MiB avail=  3772 MiB
+[peakrss]   t=    12.3s procs=  3 rss=   198 MiB hwm=   204 MiB avail=  3759 MiB

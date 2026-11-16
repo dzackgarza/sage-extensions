@@ -1,0 +1,36 @@
+tree SHA: de0493a920cb606cddcdf7b25e130018945eba5d (modified paths: 1)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 16.89 18.24 19.27 17/752 2751957
+files: tests/divisors/test_divisor_classes_hash_by_their_equality.sage
+inner 400 s, outer 960 s, guard 6144 MiB
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+time gates OFF (--no-time-gates): star import 1.01 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: asyncio-1.5.0, xdist-3.8.0, reportlog-1.0.0, platformdirs-4.13.5, hypothesis-6.170.15, anyio-4.15.1, timeout-2.4.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 3 items
+
+tests/divisors/test_divisor_classes_hash_by_their_equality.sage ...      [100%]
+
+============================== slowest durations ===============================
+0.82s call     tests/divisors/test_divisor_classes_hash_by_their_equality.sage::test_the_negation_of_the_zero_cartier_divisor_is_the_zero_divisor
+0.30s call     tests/divisors/test_divisor_classes_hash_by_their_equality.sage::test_two_classes_of_one_invertible_sheaf_are_one_point
+
+(7 durations < 0.005s hidden.  Use -vv to show these durations.)
+============================== 3 passed in 2.54s ===============================
+[peakrss] probe542r2tests: child waited=0 shell_code=0 samples=6
+[peakrss] peak tree RSS      : 319 MiB
+[peakrss] low-water MemAvail : 3497 MiB
+[peakrss] peak single VmHWM  : 319 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      308 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    10.0s procs=  3 rss=   319 MiB hwm=   319 MiB avail=  3591 MiB
+[peakrss]   t=     8.0s procs=  3 rss=   317 MiB hwm=   317 MiB avail=  3658 MiB
+[peakrss]   t=     6.0s procs=  3 rss=   302 MiB hwm=   302 MiB avail=  3725 MiB
+[peakrss]   t=     4.0s procs=  3 rss=   224 MiB hwm=   224 MiB avail=  3804 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   116 MiB hwm=   116 MiB avail=  3553 MiB
+launcher exit: 0

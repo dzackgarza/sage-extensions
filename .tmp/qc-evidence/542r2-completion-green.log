@@ -1,0 +1,420 @@
+tree SHA: d6de023fa3e35a67e61b221f5cce0a2f4e9e095c (modified paths: 1)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 17.53 20.72 19.97 15/752 2732995
+files: tests/rings/test_reals_and_completions_hash_by_their_value.sage tests/rings/test_completion_arithmetic.sage tests/rings/test_completion_comparisons.sage tests/rings/test_completion_maps.sage tests/rings/test_completion_inverse_system.sage
+inner 500 s, outer 960 s, guard 6144 MiB
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+time gates OFF (--no-time-gates): star import 1.91 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: asyncio-1.5.0, xdist-3.8.0, reportlog-1.0.0, platformdirs-4.13.5, hypothesis-6.170.15, anyio-4.15.1, timeout-2.4.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 17 items
+
+tests/rings/test_reals_and_completions_hash_by_their_value.sage .....    [ 29%]
+tests/rings/test_completion_arithmetic.sage EEEE                         [ 52%]
+tests/rings/test_completion_comparisons.sage F.                          [ 64%]
+tests/rings/test_completion_maps.sage FF.FF                              [ 94%]
+tests/rings/test_completion_inverse_system.sage .                        [100%]
+
+==================================== ERRORS ====================================
+_ ERROR at setup of test_exact_polynomial_images_survive_beyond_a_low_adic_stage _
+tests/rings/test_completion_arithmetic.sage:12: TL01 from sage_extensions.logic import ...: take every name from the session
+_ ERROR at setup of test_exact_zero_and_exact_lazy_inverse_are_decided_in_the_completion _
+tests/rings/test_completion_arithmetic.sage:12: TL01 from sage_extensions.logic import ...: take every name from the session
+_ ERROR at setup of test_finite_p_adic_products_retain_exact_source_expressions _
+tests/rings/test_completion_arithmetic.sage:12: TL01 from sage_extensions.logic import ...: take every name from the session
+_ ERROR at setup of test_presented_completion_preserves_genuine_nilpotence_not_truncation_nilpotence _
+tests/rings/test_completion_arithmetic.sage:12: TL01 from sage_extensions.logic import ...: take every name from the session
+=================================== FAILURES ===================================
+______ test_maximal_adic_completion_agrees_before_and_after_localization _______
+
+    def test_maximal_adic_completion_agrees_before_and_after_localization() -> None:
+        ring = QQ.polynomial_ring(("x", "y"))
+        x = ring.algebra_generator("x")
+        y = ring.algebra_generator("y")
+        maximal = ring.ideal(x, y)
+        completion = ring.adic_completion(maximal, precision=6)
+>       comparison = completion.maximal_localization_comparison()
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/rings/test_completion_comparisons.sage:12: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/misc/cachefunc.pyx:2328: in sage.misc.cachefunc.CachedMethodCallerNoArgs.__call__
+    ???
+src/sage_extensions/categories/rings/commutative_algebra.py:3382: in maximal_localization_comparison
+    inverse = local_completion.induced_map(local_to_completion, self)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/commutative_algebra.py:3315: in induced_map
+    continuity = conjunction(
+src/sage_extensions/logic.py:160: in conjunction
+    for statement in statements:
+                     ^^^^^^^^^^
+src/sage_extensions/categories/rings/commutative_algebra.py:3316: in <genexpr>
+    target_ideal.contains_ambient_element(source_morphism(generator))
+src/sage_extensions/categories/rings/commutative_ideals.py:922: in contains_ambient_element
+    return _engine_element(ring, value) in self._engine_ideal()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/sage/.venv/lib/python3.14/site-packages/sage/rings/ideal.py:377: in __contains__
+    return self._contains_(self.__ring(x))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Ideal (x, y) of Multivariate Lazy Taylor Series Ring in x, y over Rational Field
+x = x
+
+    def _contains_(self, x):
+        """
+        Check if ``x``, which is assumed to be in the ambient ring, is in
+        this ideal.
+    
+        .. TODO::
+    
+            Implement this method.
+    
+        EXAMPLES::
+    
+            sage: P.<a> = ZZ[]
+            sage: I = P*[a]
+            sage: I._contains_(a)
+            Traceback (most recent call last):
+            ...
+            NotImplementedError
+    
+        Note that calling ``in`` does not call this method::
+    
+            sage: a in I
+            True
+        """
+>       raise NotImplementedError
+E       NotImplementedError
+
+/sage/.venv/lib/python3.14/site-packages/sage/rings/ideal.py:404: NotImplementedError
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Localization of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring at Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring \ Finitely presented module on 2 module generators over Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:833 Elementwise module morphism Module over Localization of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring at Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring \ Finitely presented module on 2 module generators over Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring on Classes in the multilinear tensor presentation -> Module over Localization of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring at Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring \ Finitely presented module on 2 module generators over Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring on Localization of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring at Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring \ Finitely presented module on 2 module generators over Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+__ test_completion_of_the_dual_numbers_at_their_nilpotent_ideal_is_injective ___
+
+>   return self.cache[k]
+E   KeyError: ((Free module on {[1], [e]} over Fraction Field of Integer Ring, Finitely presented module on 1 module generators over Free module on {[1], [e]} over Fraction Field of Integer Ring, 3), ())
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_completion_of_the_dual_numbers_at_their_nilpotent_ideal_is_injective() -> None:
+        r"""For A = Q[e]/(e^2) and I = (e), I^2 = 0, so A is I-adically complete: the
+        completion map is injective, e-hat != 0 and e-hat^2 = 0."""
+        line = QQ['e']
+        e = line.algebra_generator("e")
+        dual = line.quotient_by_relations((e**2,))
+        ebar = dual.algebra_generator("e")
+>       completion = dual.adic_completion(dual.ideal(ebar), precision=3)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/rings/test_completion_maps.sage:15: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/rings/ring_foundation.py:4686: in adic_completion
+    result = self._adic_completion_construction(ideal, precision)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/ring_foundation.py:4201: in _adic_completion_construction
+    return AdicCompletions()(self, ideal, precision=precision)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/sage/.venv/lib/python3.14/site-packages/sage/categories/category.py:592: in __call__
+    return self._call_(x, *args, **opts)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/commutative_algebra.py:3017: in _call_
+    return _adic_completion_from_owned_data(
+sage/misc/cachefunc.pyx:1029: in sage.misc.cachefunc.CachedFunction.__call__
+    ???
+src/sage_extensions/categories/rings/commutative_algebra.py:5376: in _adic_completion_from_owned_data
+    defining_is_unit = defining == unit_ideal
+                       ^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/framed/finitely_generated/finitely_presented_modules.py:463: in __eq__
+    return CommutativeIdeals.ParentMethods.__eq__(self, other)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/commutative_ideals.py:319: in __eq__
+    return bool(self._engine_ideal() == other._engine_ideal())
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/structure/element.pyx:1099: in sage.structure.element.Element.__richcmp__
+    ???
+sage/structure/element.pyx:1103: in sage.structure.element.Element._richcmp_
+    ???
+/sage/.venv/lib/python3.14/site-packages/sage/rings/ideal.py:1426: in _richcmp_
+    return Ideal_generic._richcmp_(self, other, op)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Principal ideal (ebar) of Univariate Quotient Polynomial Ring in ebar over Rational Field with modulus e^2
+other = Principal ideal (1) of Univariate Quotient Polynomial Ring in ebar over Rational Field with modulus e^2
+op = 2
+
+    def _richcmp_(self, other, op) -> bool:
+        """
+        Compare two ideals with respect to set inclusion.
+    
+        INPUT:
+    
+        - ``other`` -- an ideal
+    
+        OUTPUT: boolean
+    
+        EXAMPLES::
+    
+            sage: R = ZZ
+            sage: I = ZZ*2
+            sage: J = ZZ*(-2)
+            sage: I == J
+            True
+    
+        TESTS::
+    
+            sage: R.<x> = ZZ[]
+            sage: I = R.ideal(1-2*x,2)
+            sage: I.is_trivial()  # needs sage.libs.singular
+            True
+            sage: R.ideal(x, 2) <= R.ideal(1)  # needs sage.libs.singular
+            True
+        """
+        if self.is_zero():
+            return rich_to_bool(op, other.is_zero() - 1)
+        if other.is_zero():
+            return rich_to_bool(op, 1)  # self.is_zero() is already False
+    
+        from sage.rings.integer_ring import ZZ
+        if self.ring().base_ring() is ZZ:
+            #assert self.ring().implementation() != "singular"
+            from sage.rings.polynomial.polynomial_ring_constructor import PolynomialRing
+            Rs = PolynomialRing(ZZ, self.ring().variable_names(), implementation="singular")
+            Is = Rs.ideal(self.gens())
+            Js = Rs.ideal(other.gens())
+            return Is.__richcmp__(Js, op)
+    
+        S = set(self.gens())
+        T = set(other.gens())
+        if S == T:
+            return rich_to_bool(op, 0)
+        if S < T:
+            return rich_to_bool(op, -1)
+        if S > T:
+            return rich_to_bool(op, +1)
+>       raise NotImplementedError(f'ideal comparison in {self.ring()} is not implemented')
+E       NotImplementedError: ideal comparison in Univariate Quotient Polynomial Ring in ebar over Rational Field with modulus e^2 is not implemented
+
+/sage/.venv/lib/python3.14/site-packages/sage/rings/ideal.py:360: NotImplementedError
+_ test_completion_at_an_idempotent_ideal_is_the_quotient_and_is_not_separated __
+
+>   return self.cache[k]
+E   KeyError: ((Free module on {[1], [e]} over Fraction Field of Integer Ring, Finitely presented module on 1 module generators over Free module on {[1], [e]} over Fraction Field of Integer Ring, 3), ())
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_completion_at_an_idempotent_ideal_is_the_quotient_and_is_not_separated() -> None:
+        r"""For A = Q[e]/(e^2 - e) = Q x Q and I = (e), I^n = I for all n, so the I-adic
+        completion is A/I = Q: its kernel is I (Krull's intersection theorem fails for a
+        ring with idempotents), and it is a complete local ring."""
+        line = QQ['e']
+        e = line.algebra_generator("e")
+        product = line.quotient_by_relations((e**2 - e,))
+        ebar = product.algebra_generator("e")
+        ideal = product.ideal(ebar)
+>       completion = product.adic_completion(ideal, precision=3)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/rings/test_completion_maps.sage:33: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/rings/ring_foundation.py:4686: in adic_completion
+    result = self._adic_completion_construction(ideal, precision)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/ring_foundation.py:4201: in _adic_completion_construction
+    return AdicCompletions()(self, ideal, precision=precision)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/sage/.venv/lib/python3.14/site-packages/sage/categories/category.py:592: in __call__
+    return self._call_(x, *args, **opts)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/commutative_algebra.py:3017: in _call_
+    return _adic_completion_from_owned_data(
+sage/misc/cachefunc.pyx:1029: in sage.misc.cachefunc.CachedFunction.__call__
+    w = self.f(*args, **kwds)
+src/sage_extensions/categories/rings/commutative_algebra.py:5376: in _adic_completion_from_owned_data
+    defining_is_unit = defining == unit_ideal
+                       ^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/framed/finitely_generated/finitely_presented_modules.py:463: in __eq__
+    return CommutativeIdeals.ParentMethods.__eq__(self, other)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/commutative_ideals.py:319: in __eq__
+    return bool(self._engine_ideal() == other._engine_ideal())
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/structure/element.pyx:1099: in sage.structure.element.Element.__richcmp__
+    ???
+sage/structure/element.pyx:1103: in sage.structure.element.Element._richcmp_
+    ???
+/sage/.venv/lib/python3.14/site-packages/sage/rings/ideal.py:1426: in _richcmp_
+    return Ideal_generic._richcmp_(self, other, op)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Principal ideal (ebar) of Univariate Quotient Polynomial Ring in ebar over Rational Field with modulus e^2 - e
+other = Principal ideal (1) of Univariate Quotient Polynomial Ring in ebar over Rational Field with modulus e^2 - e
+op = 2
+
+    def _richcmp_(self, other, op) -> bool:
+        """
+        Compare two ideals with respect to set inclusion.
+    
+        INPUT:
+    
+        - ``other`` -- an ideal
+    
+        OUTPUT: boolean
+    
+        EXAMPLES::
+    
+            sage: R = ZZ
+            sage: I = ZZ*2
+            sage: J = ZZ*(-2)
+            sage: I == J
+            True
+    
+        TESTS::
+    
+            sage: R.<x> = ZZ[]
+            sage: I = R.ideal(1-2*x,2)
+            sage: I.is_trivial()  # needs sage.libs.singular
+            True
+            sage: R.ideal(x, 2) <= R.ideal(1)  # needs sage.libs.singular
+            True
+        """
+        if self.is_zero():
+            return rich_to_bool(op, other.is_zero() - 1)
+        if other.is_zero():
+            return rich_to_bool(op, 1)  # self.is_zero() is already False
+    
+        from sage.rings.integer_ring import ZZ
+        if self.ring().base_ring() is ZZ:
+            #assert self.ring().implementation() != "singular"
+            from sage.rings.polynomial.polynomial_ring_constructor import PolynomialRing
+            Rs = PolynomialRing(ZZ, self.ring().variable_names(), implementation="singular")
+            Is = Rs.ideal(self.gens())
+            Js = Rs.ideal(other.gens())
+            return Is.__richcmp__(Js, op)
+    
+        S = set(self.gens())
+        T = set(other.gens())
+        if S == T:
+            return rich_to_bool(op, 0)
+        if S < T:
+            return rich_to_bool(op, -1)
+        if S > T:
+            return rich_to_bool(op, +1)
+>       raise NotImplementedError(f'ideal comparison in {self.ring()} is not implemented')
+E       NotImplementedError: ideal comparison in Univariate Quotient Polynomial Ring in ebar over Rational Field with modulus e^2 - e is not implemented
+
+/sage/.venv/lib/python3.14/site-packages/sage/rings/ideal.py:360: NotImplementedError
+____________________ test_artin_name_requires_finite_length ____________________
+
+    def test_artin_name_requires_finite_length() -> None:
+        line = QQ.polynomial_ring(("x",))
+        x = line.algebra_generator("x")
+        line_completion = line.adic_completion(line.ideal(x))
+>       assert line_completion.adic_artin_truncation(3) in ArtinianRings()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/rings/test_completion_maps.sage:57: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Ring over Fraction Field of Integer Ring, exponent = 3
+
+    def adic_artin_truncation(self, exponent):
+        r"""Return ``A/I^exponent`` after requiring it to be Artinian."""
+        quotient = self.adic_truncation(exponent)
+        if quotient not in OwnedRings().Artinian():
+>           raise ValueError(
+                f"{quotient} is not known to be Artinian, so it has not been shown to have finite length"
+            )
+E           ValueError: Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring / Ideal (x^3) of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring is not known to be Artinian, so it has not been shown to have finite length
+
+src/sage_extensions/categories/rings/commutative_algebra.py:3216: ValueError
+_ test_a_ring_map_carrying_the_ideal_into_the_ideal_induces_a_map_of_completions _
+
+    def test_a_ring_map_carrying_the_ideal_into_the_ideal_induces_a_map_of_completions() -> None:
+        r"""f: Q[x] -> Q[x], x -> x^2 satisfies f((x)) in (x), so it induces
+        Q[[x]] -> Q[[x]] with x -> x^2, and its square sends x to x^4; x -> 1 does not
+        carry (x) into (x) and induces no continuous map (Atiyah-Macdonald ch. 10)."""
+        line = QQ['x']
+        x = line.algebra_generator("x")
+        completion = line.adic_completion(line.ideal(x))
+        x_hat = completion.completion_map()(x)
+    
+        induced = completion.induced_map(line.Mor(line)({"x": x**2}), completion)
+        assert induced(x_hat) == x_hat**2
+        assert induced(induced(x_hat)) == x_hat**4
+>       assert induced(1 - x_hat) * completion.completion_map()(1 + x**2) == completion.one() - x_hat**4
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/rings/test_completion_maps.sage:78: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/sets/set_categories.py:812: in __call__
+    image = function(point, *args, **kwargs)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+element = element of Ring over Fraction Field of Integer Ring
+
+    def image(element):
+        selected = self(element)
+        source_expression = selected.exact_source_expression()
+        if source_expression is None:
+>           raise AssertionError(
+                f"cannot evaluate the induced map of completions at {element}: it is not known as the image "
+                f"of an element of {self.completion_source()}"
+            )
+E           AssertionError: cannot evaluate the induced map of completions at element of Ring over Fraction Field of Integer Ring: it is not known as the image of an element of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring
+
+src/sage_extensions/categories/rings/commutative_algebra.py:3336: AssertionError
+======================= test lint: 1 findings in 1 files =======================
+tests/rings/test_completion_arithmetic.sage:12: TL01 from sage_extensions.logic import ...: take every name from the session
+============================== slowest durations ===============================
+1.43s call     tests/rings/test_completion_comparisons.sage::test_maximal_adic_completion_agrees_before_and_after_localization
+0.63s call     tests/rings/test_reals_and_completions_hash_by_their_value.sage::test_the_image_of_a_ring_element_hashes_as_that_ring_element
+0.58s call     tests/rings/test_completion_comparisons.sage::test_inverting_the_adic_generator_before_completion_collapses_the_topology
+0.27s call     tests/rings/test_completion_maps.sage::test_completion_of_the_dual_numbers_at_their_nilpotent_ideal_is_injective
+0.20s call     tests/rings/test_reals_and_completions_hash_by_their_value.sage::test_two_algebraic_presentations_of_one_irrational_real_are_one_point
+0.18s call     tests/rings/test_completion_inverse_system.sage::test_power_series_constructor_retains_the_same_adic_completion_data
+0.13s call     tests/rings/test_completion_maps.sage::test_artin_name_requires_finite_length
+0.13s call     tests/rings/test_completion_maps.sage::test_completion_at_an_idempotent_ideal_is_the_quotient_and_is_not_separated
+0.11s call     tests/rings/test_completion_maps.sage::test_nonmaximal_adic_completion_is_complete_but_not_declared_local
+0.06s call     tests/rings/test_reals_and_completions_hash_by_their_value.sage::test_two_presentations_of_one_real_are_one_point_of_a_finite_ordered_set
+0.03s call     tests/rings/test_completion_maps.sage::test_a_ring_map_carrying_the_ideal_into_the_ideal_induces_a_map_of_completions
+0.03s call     tests/rings/test_reals_and_completions_hash_by_their_value.sage::test_two_presentations_of_one_completion_element_are_one_point
+0.01s setup    tests/rings/test_completion_arithmetic.sage::test_exact_polynomial_images_survive_beyond_a_low_adic_stage
+0.01s teardown tests/rings/test_completion_maps.sage::test_nonmaximal_adic_completion_is_complete_but_not_declared_local
+
+(33 durations < 0.005s hidden.  Use -vv to show these durations.)
+=========================== short test summary info ============================
+FAILED tests/rings/test_completion_comparisons.sage::test_maximal_adic_completion_agrees_before_and_after_localization
+FAILED tests/rings/test_completion_maps.sage::test_completion_of_the_dual_numbers_at_their_nilpotent_ideal_is_injective
+FAILED tests/rings/test_completion_maps.sage::test_completion_at_an_idempotent_ideal_is_the_quotient_and_is_not_separated
+FAILED tests/rings/test_completion_maps.sage::test_artin_name_requires_finite_length
+FAILED tests/rings/test_completion_maps.sage::test_a_ring_map_carrying_the_ideal_into_the_ideal_induces_a_map_of_completions
+ERROR tests/rings/test_completion_arithmetic.sage::test_exact_polynomial_images_survive_beyond_a_low_adic_stage
+ERROR tests/rings/test_completion_arithmetic.sage::test_exact_zero_and_exact_lazy_inverse_are_decided_in_the_completion
+ERROR tests/rings/test_completion_arithmetic.sage::test_finite_p_adic_products_retain_exact_source_expressions
+ERROR tests/rings/test_completion_arithmetic.sage::test_presented_completion_preserves_genuine_nilpotence_not_truncation_nilpotence
+==================== 5 failed, 8 passed, 4 errors in 13.53s ====================
+[peakrss] probe542r2tests: child waited=1 shell_code=1 samples=14
+[peakrss] peak tree RSS      : 394 MiB
+[peakrss] low-water MemAvail : 5928 MiB
+[peakrss] peak single VmHWM  : 395 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      384 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    24.1s procs=  3 rss=   394 MiB hwm=   395 MiB avail=  6388 MiB
+[peakrss]   t=    26.1s procs=  3 rss=   394 MiB hwm=   395 MiB avail=  6300 MiB
+[peakrss]   t=    22.1s procs=  3 rss=   393 MiB hwm=   395 MiB avail=  6481 MiB
+[peakrss]   t=    20.1s procs=  3 rss=   390 MiB hwm=   394 MiB avail=  6637 MiB
+[peakrss]   t=    18.1s procs=  3 rss=   365 MiB hwm=   367 MiB avail=  6312 MiB

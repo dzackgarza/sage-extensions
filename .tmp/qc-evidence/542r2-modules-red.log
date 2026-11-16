@@ -1,0 +1,108 @@
+tree SHA: 5bfbf230a888f3c70fc3d700757b63870dffe60e (modified paths: 1)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 16.80 19.37 19.85 16/765 2746434
+files: tests/modules/test_general_module_elements_hash_by_their_equality.sage
+inner 400 s, outer 960 s, guard 6144 MiB
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+time gates OFF (--no-time-gates): star import 1.73 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: asyncio-1.5.0, xdist-3.8.0, reportlog-1.0.0, platformdirs-4.13.5, hypothesis-6.170.15, anyio-4.15.1, timeout-2.4.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 3 items
+
+tests/modules/test_general_module_elements_hash_by_their_equality.sage F [ 33%]
+FF                                                                       [100%]
+
+=================================== FAILURES ===================================
+_ test_the_zero_class_of_a_tensor_quotient_is_a_point_of_a_finite_ordered_set __
+
+    def test_the_zero_class_of_a_tensor_quotient_is_a_point_of_a_finite_ordered_set() -> None:
+        r"""``QQ (x)_ZZ QQ`` without a chosen framing: its zero is one element.
+    
+        The tensor product is the generators-and-relations quotient of the free
+        module on the pure tensors, so its elements are classes of that quotient.
+        The zero class and the sum of the zero class with itself are one element,
+        and each is a point of a finite ordered set.
+        """
+        rationals = Modules(ZZ)(QQ)
+        product = Modules(ZZ).tensor_product((rationals, rationals))
+        zero = product.zero()
+        doubled = zero + zero
+    
+        assert zero == doubled
+>       assert hash(zero) == hash(doubled)
+               ^^^^^^^^^^
+E       TypeError: unhashable type: 'OwnedJoinCategory.element_class'
+
+tests/modules/test_general_module_elements_hash_by_their_equality.sage:29: TypeError
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Integer Ring retains its module laws as an undecided proposition
+______________ test_two_cartier_divisors_of_one_class_hash_alike _______________
+
+    def test_two_cartier_divisors_of_one_class_hash_alike() -> None:
+        r"""``-0 = 0`` in ``CDiv(P^1_Q)``, at the module and not only at its classes.
+    
+        ``CDiv(X)`` is the group of global sections of ``K^*/O^*``, so the negation
+        of the zero divisor is the zero divisor.  The two elements are one element
+        of the module, and a finite ordered set of them holds one point.
+        """
+        line = ProjectiveSpaces(QQ)(1)
+        divisors = CartierDivisorGroups().of_scheme(line)
+        zero = divisors.zero()
+        negated = -zero
+    
+        assert negated == zero
+>       assert hash(negated) == hash(zero)
+               ^^^^^^^^^^^^^
+E       TypeError: unhashable type: 'CartierDivisorGroups.element_class'
+
+tests/modules/test_general_module_elements_hash_by_their_equality.sage:47: TypeError
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:833 Elementwise module morphism Module over Fraction Field of Integer Ring on Classes in the multilinear tensor presentation -> Module over Fraction Field of Integer Ring on Fraction Field of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Integer Ring retains its module laws as an undecided proposition
+_______ test_the_zero_class_of_the_almost_everywhere_quotient_is_a_point _______
+
+    def test_the_zero_class_of_the_almost_everywhere_quotient_is_a_point() -> None:
+        r"""The zero class of ``L^1(RR)`` modulo the null functions is one element.
+    
+        Two integrable maps that agree outside a null set are one class, so the sum
+        of the zero class with itself is the zero class.  The quotient is what the
+        class hashes, and the module holds the class as an element.
+        """
+        quotient = Lp(1, RR, RR).quotient_by_null_functions()
+        zero = quotient.zero()
+    
+>       assert hash(zero) == hash(quotient.zero())
+               ^^^^^^^^^^
+E       TypeError: unhashable type: 'OwnedJoinCategory.element_class[_LebesgueClassElement]'
+
+tests/modules/test_general_module_elements_hash_by_their_equality.sage:61: TypeError
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Real Field retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Real Field retains its module laws as an undecided proposition
+============================== slowest durations ===============================
+1.24s call     tests/modules/test_general_module_elements_hash_by_their_equality.sage::test_two_cartier_divisors_of_one_class_hash_alike
+0.06s call     tests/modules/test_general_module_elements_hash_by_their_equality.sage::test_the_zero_class_of_the_almost_everywhere_quotient_is_a_point
+
+(7 durations < 0.005s hidden.  Use -vv to show these durations.)
+=========================== short test summary info ============================
+FAILED tests/modules/test_general_module_elements_hash_by_their_equality.sage::test_the_zero_class_of_a_tensor_quotient_is_a_point_of_a_finite_ordered_set
+FAILED tests/modules/test_general_module_elements_hash_by_their_equality.sage::test_two_cartier_divisors_of_one_class_hash_alike
+FAILED tests/modules/test_general_module_elements_hash_by_their_equality.sage::test_the_zero_class_of_the_almost_everywhere_quotient_is_a_point
+============================== 3 failed in 4.87s ===============================
+[peakrss] probe542r2tests: child waited=1 shell_code=1 samples=8
+[peakrss] peak tree RSS      : 320 MiB
+[peakrss] low-water MemAvail : 2289 MiB
+[peakrss] peak single VmHWM  : 320 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      309 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    14.1s procs=  3 rss=   320 MiB hwm=   320 MiB avail=  2289 MiB
+[peakrss]   t=    12.0s procs=  3 rss=   319 MiB hwm=   319 MiB avail=  2388 MiB
+[peakrss]   t=    10.0s procs=  3 rss=   306 MiB hwm=   306 MiB avail=  2493 MiB
+[peakrss]   t=     8.0s procs=  3 rss=   302 MiB hwm=   302 MiB avail=  2635 MiB
+[peakrss]   t=     6.0s procs=  3 rss=   266 MiB hwm=   266 MiB avail=  2814 MiB

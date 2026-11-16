@@ -1,0 +1,86 @@
+tree SHA: dfa197fa9b22481b0e1a4b9f6bfc8669a8172ec5 (modified paths: 1)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 15.92 17.60 18.95 21/757 2753168
+files: tests/schemes/test_a_glued_scheme_morphism_hashes_by_its_endpoints.sage
+inner 400 s, outer 960 s, guard 6144 MiB
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+time gates OFF (--no-time-gates): star import 2.07 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: asyncio-1.5.0, xdist-3.8.0, reportlog-1.0.0, platformdirs-4.13.5, hypothesis-6.170.15, anyio-4.15.1, timeout-2.4.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 1 item
+
+tests/schemes/test_a_glued_scheme_morphism_hashes_by_its_endpoints.sage F [100%]
+
+=================================== FAILURES ===================================
+__ test_the_fold_of_a_glued_pair_of_lines_is_a_point_of_a_finite_ordered_set ___
+
+    def test_the_fold_of_a_glued_pair_of_lines_is_a_point_of_a_finite_ordered_set() -> None:
+        r"""The fold onto the line is one morphism, and its two builds hash alike.
+    
+        The identity on each chart glues to the fold ``X -> A^1_Q`` of the doubled
+        line (the two charts agree on the overlap by construction), and it restricts
+        to the identity on each chart.  A finite ordered set of the fold is built.
+        """
+        line, doubled = _glued_pair()
+        identity = line.Mor(line).identity()
+        atlas = doubled.gluing_datum()
+        fold = doubled.Mor(line)((identity, identity))
+        rebuilt = doubled.Mor(line)((identity, identity))
+    
+        assert fold * atlas.chart_embedding(1) == identity
+>       assert hash(fold) == hash(rebuilt)
+               ^^^^^^^^^^
+
+tests/schemes/test_a_glued_scheme_morphism_hashes_by_its_endpoints.sage:39: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Scheme morphism from glued charts: Scheme over Fraction Field of Integer Ring glued from the affine charts Affine char...ing] -> Spectrum of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring
+
+    def __hash__(self) -> int:
+        if (
+            self._toric_lattice_morphism is not None
+            or self._relative_projectivization_role
+            in (
+                "base_change_composite",
+                "base_change_total",
+                "base_change_base",
+                "base_projection",
+                "surjectivity_open_inclusion",
+                "surjectivity_induced_morphism",
+            )
+        ):
+            raise TypeError(f"unhashable type: {type(self).__name__}")
+        if self._relative_projectivization_source_sheaf is not None:
+            raise TypeError(f"unhashable type: {type(self).__name__}")
+        if self._gluing_role in ("chart_map", "finite_atlas", "glued_domain"):
+>           raise TypeError(f"unhashable type: {type(self).__name__}")
+E           TypeError: unhashable type: Owned_GluedSchemeMorCategory_with_category_with_category.ArrowType
+
+src/sage_extensions/categories/schemes/schemes.py:2316: TypeError
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:442 General module over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:833 Elementwise module morphism Module over Fraction Field of Integer Ring on Classes in the multilinear tensor presentation -> Module over Fraction Field of Integer Ring on Fraction Field of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+============================== slowest durations ===============================
+0.48s call     tests/schemes/test_a_glued_scheme_morphism_hashes_by_its_endpoints.sage::test_the_fold_of_a_glued_pair_of_lines_is_a_point_of_a_finite_ordered_set
+0.01s setup    tests/schemes/test_a_glued_scheme_morphism_hashes_by_its_endpoints.sage::test_the_fold_of_a_glued_pair_of_lines_is_a_point_of_a_finite_ordered_set
+
+(1 durations < 0.005s hidden.  Use -vv to show these durations.)
+=========================== short test summary info ============================
+FAILED tests/schemes/test_a_glued_scheme_morphism_hashes_by_its_endpoints.sage::test_the_fold_of_a_glued_pair_of_lines_is_a_point_of_a_finite_ordered_set
+============================== 1 failed in 4.56s ===============================
+[peakrss] probe542r2tests: child waited=1 shell_code=1 samples=8
+[peakrss] peak tree RSS      : 265 MiB
+[peakrss] low-water MemAvail : 1123 MiB
+[peakrss] peak single VmHWM  : 272 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      261 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    10.0s procs=  3 rss=   265 MiB hwm=   272 MiB avail=  1275 MiB
+[peakrss]   t=     8.0s procs=  3 rss=   257 MiB hwm=   259 MiB avail=  1332 MiB
+[peakrss]   t=    12.0s procs=  3 rss=   253 MiB hwm=   272 MiB avail=  1158 MiB
+[peakrss]   t=    14.1s procs=  3 rss=   248 MiB hwm=   272 MiB avail=  1123 MiB
+[peakrss]   t=     6.0s procs=  3 rss=   237 MiB hwm=   255 MiB avail=  1391 MiB
