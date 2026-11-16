@@ -118,6 +118,31 @@ def test_the_image_of_a_ring_element_hashes_as_that_ring_element() -> None:
     assert hash(image(x + 1)) == hash(plane(x + 1))
 
 
+def test_a_completion_element_with_no_source_hashes_the_value_it_is() -> None:
+    r"""``(1 - x)^{-1} (1 - x) = 1`` in the completion, which keeps no source for it.
+
+    The completion decides this on its exact arithmetic, so the product is the
+    element ``1`` and the two presentations are one point of a finite ordered
+    set.  The product keeps no exact source expression: the inverse of ``1 - x``
+    is no polynomial in ``x`` and ``y``.  The value it is, though, is the
+    truncation the completion computes, read back in the source ring, and that
+    is what the hash reads -- the same datum the completion's own projection
+    reads, and the ring's ``1`` for this element.
+    """
+    plane = QQ.polynomial_ring(("x", "y"))
+    x = plane.algebra_generator("x")
+    completion = plane.adic_completion(plane.ideal(x), precision=3)
+    image = completion.completion_map()
+    unit = image(1 - x)
+    product = unit.inverse_of_unit() * unit
+
+    assert product.exact_source_expression() is None
+    assert product == image(1)
+    assert hash(product) == hash(image(1))
+    assert FiniteOrderedSets()((product, image(1))).cardinality() == 1
+    assert FiniteOrderedSets()((product, image(1), completion.one())).cardinality() == 1
+
+
 def test_two_presentations_of_one_completion_element_are_one_point() -> None:
     r"""The completion of ``QQ[x, y]`` at ``(x)``: ``x + 1`` is the image of ``1`` plus ``x``.
 
