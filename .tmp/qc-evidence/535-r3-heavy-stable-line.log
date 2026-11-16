@@ -1,0 +1,11 @@
+=== tree: 1db98e40295e893d7c9342028d6edfd2eaaa3b23 (modified: 0 paths)
+=== files: tests/lattices/test_the_stable_line_orbit_row_comes_from_the_exact_finite_image.sage tests/lattices/test_the_stable_line_orbit_row_returns_on_the_coble_lattice.sage
+=== start: 06:00:10
+..                                                                       [100%]
+============================= slowest 10 durations =============================
+1053.89s call     tests/lattices/test_the_stable_line_orbit_row_returns_on_the_coble_lattice.sage::test_the_stable_line_orbit_row_returns_with_the_index_of_the_discriminant_image
+14.00s call     tests/lattices/test_the_stable_line_orbit_row_comes_from_the_exact_finite_image.sage::test_the_stable_line_orbit_row_returns_with_the_index_of_the_discriminant_image
+
+(4 durations < 0.005s hidden.  Use -vv to show these durations.)
+2 passed in 1073.83s (0:17:53)
+=== exit: 0 at 06:18:21

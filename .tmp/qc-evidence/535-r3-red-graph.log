@@ -1,0 +1,48 @@
+=== tree: 5ac7ea6c0126a92e4087198cc2735be3611abc8b (modified: 1 paths)
+=== files: tests/forms/test_gram_graph_blocks.sage
+=== start: 05:46:15
+...F                                                                     [100%]
+=================================== FAILURES ===================================
+_ test_the_component_vertex_sets_of_a_gram_graph_do_not_depend_on_its_diagonal _
+
+    def test_the_component_vertex_sets_of_a_gram_graph_do_not_depend_on_its_diagonal() -> None:
+        r"""Every nonzero diagonal entry is a loop, and a loop joins no two vertices.
+    
+        The components of $A_2 \oplus A_1$ are $\{0,1\}$ and $\{2\}$; those of the
+        Gram matrix with an interleaved block, $\{0,2\}$ and $\{1\}$, are not
+        intervals, so they are components without a cut.
+        """
+        lattice = Lattices(ZZ)("A2") + Lattices(ZZ)("A1")
+        interleaved = Lattices(ZZ)([[-2, 0, 1], [0, -2, 0], [1, 0, -2]])
+    
+>       components = lattice.gram_tensor().gram_graph().connected_component_vertex_sets()
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/forms/test_gram_graph_blocks.sage:56: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/graph_categories.py:81: in connected_component_vertex_sets
+    graph = Graph([range(len(vertices)), [(int(rank(edge[0])), int(rank(edge[1]))) for edge in self.edges()]], format="vertices_and_edges")
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/sage/.venv/lib/python3.14/site-packages/sage/graphs/graph.py:1304: in __init__
+    self.add_edges(data[1])
+/sage/.venv/lib/python3.14/site-packages/sage/graphs/generic_graph.py:13211: in add_edges
+    self._backend.add_edges(edges, self._directed, remove_loops=not loops)
+sage/graphs/base/c_graph.pyx:2350: in sage.graphs.base.c_graph.CGraphBackend.add_edges
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   ValueError: cannot add edge from 0 to 0 in graph without loops
+
+sage/graphs/base/c_graph.pyx:2441: ValueError
+============================= slowest 10 durations =============================
+0.61s call     tests/forms/test_gram_graph_blocks.sage::test_the_gram_graph_of_a2_plus_a1
+0.05s call     tests/forms/test_gram_graph_blocks.sage::test_interleaved_components_give_no_block_cut
+0.04s call     tests/forms/test_gram_graph_blocks.sage::test_the_component_vertex_sets_of_a_gram_graph_do_not_depend_on_its_diagonal
+0.02s call     tests/forms/test_gram_graph_blocks.sage::test_the_only_block_cut_of_a2_plus_a1_is_after_the_a2_block
+
+(6 durations < 0.005s hidden.  Use -vv to show these durations.)
+=========================== short test summary info ============================
+FAILED tests/forms/test_gram_graph_blocks.sage::test_the_component_vertex_sets_of_a_gram_graph_do_not_depend_on_its_diagonal
+1 failed, 3 passed in 11.56s
+=== exit: 1 at 05:46:33

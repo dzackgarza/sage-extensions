@@ -1,0 +1,68 @@
+=== tree: 738ae7130b6224897e810a8f5d11453996da92ac (modified: 2 paths)
+=== files: tests/lattices/test_eichler_orbits.sage tests/lattices/test_line_stabilizer_image_requires_eichlers_hypothesis.sage tests/lattices/test_indecomposable_property.sage tests/lattices/test_lattice_decomposition_archive.sage tests/lattices/test_named_lattice_constructions.sage tests/lattices/test_indecomposable_summands_decide_the_decomposition.sage tests/lattices/test_displayed_blocks_are_sublattices.sage tests/forms/test_gram_graph_blocks.sage tests/forms/test_gram_graph_archive.sage tests/categories/test_lattice_parent_owned_meets.sage
+=== start: 05:55:27
+.........................................FF.                             [100%]
+=================================== FAILURES ===================================
+_______ test_a1_plus_a1_decomposes_orthogonally_but_a2_is_indecomposable _______
+
+    def test_a1_plus_a1_decomposes_orthogonally_but_a2_is_indecomposable() -> None:
+        r"""A definite lattice is uniquely an orthogonal sum of indecomposables.
+    
+        $A_1 \oplus A_1$ has two summands, each isometric to $A_1$; the root
+        lattice $A_2$ is indecomposable, although it contains $A_1$.  Source:
+        Kneser, *Quadratische Formen*, Satz 27.2 (Eichler).
+        """
+        a1 = Lattices(ZZ)("A1")
+        a2 = Lattices(ZZ)("A2")
+>       summands = (a1 + a1).orthogonal_decomposition()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: Lattices.ParentMethods.orthogonal_decomposition() missing 1 required positional argument: 'embeddings'
+
+tests/forms/test_gram_graph_archive.sage:15: TypeError
+_ test_a_root_of_A2_and_its_orthogonal_complement_span_an_index_two_sublattice _
+
+>   return self._cached_methods[name]
+E   KeyError: 'basis'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_a_root_of_A2_and_its_orthogonal_complement_span_an_index_two_sublattice() -> None:
+        r"""For a root ``a1`` of ``A2``: ``(Z a1)^perp = Z(a1 + 2 a2)`` of norm ``+-6``.
+    
+        ``(a1 + 2 a2)^2 = 2 - 4 + 8 = 6`` up to the sign convention, so
+        ``A1 + <6>`` has determinant 12 and index 2 in ``A2`` (``det A2 = 3``).
+        """
+        a2 = Lattices(ZZ)("A2")
+>       a1, _ = a2.basis()
+                ^^^^^^^^
+
+tests/categories/test_lattice_parent_owned_meets.sage:13: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    ???
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: 'OwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType' object has no attribute 'basis'. Did you mean: 'base'?
+
+sage/cpython/getattr.pyx:362: AttributeError
+============================= slowest 10 durations =============================
+14.64s call     tests/lattices/test_indecomposable_property.sage::test_indecomposable_property_category_supplies_known_objects
+11.51s call     tests/lattices/test_eichler_orbits.sage::test_the_covering_list_holds_the_class_of_every_primitive_vector
+9.74s call     tests/lattices/test_line_stabilizer_image_requires_eichlers_hypothesis.sage::test_the_line_stabilizer_image_refuses_where_the_criterion_does_not_apply
+8.88s call     tests/lattices/test_eichler_orbits.sage::test_the_criterion_reads_its_hypothesis_off_the_isometry_class
+7.84s call     tests/lattices/test_eichler_orbits.sage::test_the_divided_discriminant_class_separates_two_elementary_vectors
+7.45s call     tests/lattices/test_eichler_orbits.sage::test_on_a_unimodular_lattice_the_square_decides
+3.46s call     tests/lattices/test_named_lattice_constructions.sage::test_the_tensor_product_of_a2_with_u_and_with_itself
+3.31s call     tests/lattices/test_indecomposable_property.sage::test_unbounded_construction_enumeration_is_fair_and_keeps_gluing_maps
+2.25s call     tests/lattices/test_indecomposable_summands_decide_the_decomposition.sage::test_the_family_reports_no_summands_where_the_decomposition_is_undecided
+1.92s call     tests/lattices/test_eichler_orbits.sage::test_a_basis_that_displays_no_isotropic_direction_keeps_the_hypothesis
+=========================== short test summary info ============================
+FAILED tests/forms/test_gram_graph_archive.sage::test_a1_plus_a1_decomposes_orthogonally_but_a2_is_indecomposable
+FAILED tests/categories/test_lattice_parent_owned_meets.sage::test_a_root_of_A2_and_its_orthogonal_complement_span_an_index_two_sublattice
+2 failed, 42 passed in 97.02s (0:01:37)
+=== exit: 1 at 05:57:16

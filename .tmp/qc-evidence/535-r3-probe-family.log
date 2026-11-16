@@ -1,0 +1,42 @@
+probe: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/probe535r3e.py
+tree SHA: 876c3f1484ff5c82773c277249348f4f45bae7e8 (modified paths: 0)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 17.28 19.90 20.03 17/792 2745211
+inner 600 s, outer 660 s, guard 6144 MiB, args ''
+import 2.8 s
+LK3 names: ('U', 'U', 'U', None, None)   [3.37 s]
+decomposed names: ('U', 'U', 'U', None, None)   [0.32 s]
+LK3 subobject grams: (Type (0, 2) tensor in ((Integer Ring^2)*)^{⊗2}
+[[0, 1], [1, 0]], Type (0, 2) tensor in ((Integer Ring^2)*)^{⊗2}
+[[0, 1], [1, 0]], Type (0, 2) tensor in ((Integer Ring^2)*)^{⊗2}
+[[0, 1], [1, 0]], Type (0, 2) tensor in ((Integer Ring^8)*)^{⊗2}
+[[-2, 0, 1, 0, 0, 0, 0, 0], [0, -2, 0, 1, 0, 0, 0, 0], [1, 0, -2, 1, 0, 0, 0, 0], [0, 1, 1, -2, 1, 0, 0, 0], [0, 0, 0, 1, -2, 1, 0, 0], [0, 0, 0, 0, 1, -2, 1, 0], [0, 0, 0, 0, 0, 1, -2, 1], [0, 0, 0, 0, 0, 0, 1, -2]], Type (0, 2) tensor in ((Integer Ring^8)*)^{⊗2}
+[[-2, 0, 1, 0, 0, 0, 0, 0], [0, -2, 0, 1, 0, 0, 0, 0], [1, 0, -2, 1, 0, 0, 0, 0], [0, 1, 1, -2, 1, 0, 0, 0], [0, 0, 0, 1, -2, 1, 0, 0], [0, 0, 0, 0, 1, -2, 1, 0], [0, 0, 0, 0, 0, 1, -2, 1], [0, 0, 0, 0, 0, 0, 1, -2]])   [0.02 s]
+raw_u + U names: (None, 'U')   [0.07 s]
+raw_u is_indecomposable: True   [0.01 s]
+A2+A1 summands: 2   [0.17 s]
+U**3+E8**2 cardinality: 5   [0.01 s]
+E8 alone family: 1   [0.00 s]
+A2 alone family: 1   [0.01 s]
+IPQ(2,1) decomposable: True   [0.06 s]
+IPQ(1,0) decomposable: False   [0.01 s]
+B2 decomposable: True   [0.30 s]
+D4 decomposable: False   [0.08 s]
+skew A1+A1 summands: 2   [0.05 s]
+twisted U(2) family: 1   [0.10 s]
+zero lattice family: 0   [0.04 s]
+total 7.8 s
+[peakrss] probe552: child waited=0 shell_code=0 samples=6
+[peakrss] peak tree RSS      : 314 MiB
+[peakrss] low-water MemAvail : 5100 MiB
+[peakrss] peak single VmHWM  : 314 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      303 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    10.0s procs=  3 rss=   314 MiB hwm=   314 MiB avail=  5162 MiB
+[peakrss]   t=     8.0s procs=  3 rss=   298 MiB hwm=   298 MiB avail=  5262 MiB
+[peakrss]   t=     6.0s procs=  3 rss=   290 MiB hwm=   290 MiB avail=  5100 MiB
+[peakrss]   t=     4.0s procs=  3 rss=   249 MiB hwm=   249 MiB avail=  5214 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   126 MiB hwm=   126 MiB avail=  5101 MiB
+launcher exit: 0

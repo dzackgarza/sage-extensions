@@ -1,0 +1,81 @@
+=== tree: 5ac7ea6c0126a92e4087198cc2735be3611abc8b (modified: 1 paths)
+=== files: tests/lattices/test_displayed_blocks_are_sublattices.sage
+=== start: 05:51:06
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+________ test_the_displayed_blocks_of_the_k3_gram_are_five_sublattices _________
+
+>   return self._cached_methods[name]
+E   KeyError: 'inclusion'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_the_displayed_blocks_of_the_k3_gram_are_five_sublattices() -> None:
+        lattice = NamedLattices.LK3
+        summands = lattice.indecomposable_summands()
+        ranks = tuple(int(summand.module_rank()) for summand in summands)
+    
+        assert ranks == (2, 2, 2, 8, 8)
+        assert sum(ranks) == int(lattice.module_rank())
+>       assert all(summand.inclusion().codomain() is lattice for summand in summands)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/lattices/test_displayed_blocks_are_sublattices.sage:26: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/lattices/test_displayed_blocks_are_sublattices.sage:26: in <genexpr>
+    assert all(summand.inclusion().codomain() is lattice for summand in summands)
+               ^^^^^^^^^^^^^^^^^
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    ???
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: 'OwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType' object has no attribute 'inclusion'
+
+sage/cpython/getattr.pyx:362: AttributeError
+______ test_a_display_whose_blocks_are_not_intervals_exhibits_them_anyway ______
+
+>   return self._cached_methods[name]
+E   KeyError: 'inclusion'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_a_display_whose_blocks_are_not_intervals_exhibits_them_anyway() -> None:
+        lattice = Lattices(ZZ)([[-2, 0, 1], [0, -2, 0], [1, 0, -2]])
+        summands = lattice.indecomposable_summands()
+    
+        assert tuple(int(summand.module_rank()) for summand in summands) == (2, 1)
+>       assert all(summand.inclusion().codomain() is lattice for summand in summands)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/lattices/test_displayed_blocks_are_sublattices.sage:51: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/lattices/test_displayed_blocks_are_sublattices.sage:51: in <genexpr>
+    assert all(summand.inclusion().codomain() is lattice for summand in summands)
+               ^^^^^^^^^^^^^^^^^
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    return self.getattr_from_category(name)
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    attr = getattr_from_other_class(self, cls, name)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: 'OwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType' object has no attribute 'inclusion'
+
+sage/cpython/getattr.pyx:362: AttributeError
+============================= slowest 10 durations =============================
+0.08s call     tests/lattices/test_displayed_blocks_are_sublattices.sage::test_the_displayed_blocks_of_the_k3_gram_are_five_sublattices
+0.02s call     tests/lattices/test_displayed_blocks_are_sublattices.sage::test_a_display_whose_blocks_are_not_intervals_exhibits_them_anyway
+
+(4 durations < 0.005s hidden.  Use -vv to show these durations.)
+=========================== short test summary info ============================
+FAILED tests/lattices/test_displayed_blocks_are_sublattices.sage::test_the_displayed_blocks_of_the_k3_gram_are_five_sublattices
+FAILED tests/lattices/test_displayed_blocks_are_sublattices.sage::test_a_display_whose_blocks_are_not_intervals_exhibits_them_anyway
+2 failed in 8.08s
+=== exit: 1 at 05:51:20

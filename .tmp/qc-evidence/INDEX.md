@@ -2671,3 +2671,32 @@ is a namespace the test lint also reads.
 | `542r2-consumers-schemes-{mine,base}.log` | the round's tip, and `090a0d9` | nine scheme files that build morphisms (affine, the three gluing files, standard charts, relative spec, toric, pullback): **12 failed, 17 passed, 22 errors in 36.96 s** here against the same counts in 24.73 s on the base, 34 FAILED/ERROR ids, `diff` empty both ways |
 | `542r2-rebased.log` | the rebased tip before the push | the six test files this round adds or changes: **21 passed in 6.71 s** |
 | `542r2-probe-a.py` … `542r2-probe-l.py` | the base and the repair | the measurements behind the findings: `hash(RR(2))` against `hash(2)`, `hash(AA(2))` against `hash(2)`, the image of `1` in a completion against the ring's `1`, `FiniteOrderedSets` cardinalities, the two-point chain's four hash comparisons, the fold of the glued pair, and the specimens that do not build (`QuasiCoherentSheaves(scheme)(cover, …)`, the plane cubic's structure sheaf, the affine structure sheaf's `tensor_power`) |
+## `#535` round 3: the Eichler gate, the decomposition family, and the displayed blocks (2026-11-16)
+
+The round's two authorities for Eichler's hypothesis become one gate; the
+family of indecomposable summands is decided by the same datum as
+`is_decomposable` and refused where nothing decides it; the blocks of a
+displayed Gram matrix are the Gram graph's components, taken as sublattices.
+Runs are the launcher `.scratch/launch535r3test.sh` (`pytest -o addopts= -p
+qc_sage_session -q --no-header`, the checkout bound at `/repos/sage-extensions`
+with the shared `.git` bound at its host path, the port at `/work`) and
+`.scratch/launch535r3lint.sh` (the test lint, same binding).  The tree column
+names the commit the run was made on; a run made with the repair in the working
+tree therefore names the commit before it.
+
+| log | tree | result |
+| --- | --- | --- |
+| `535-r3-probe-gate.log` | `2f8c801` | the gate the round inherits: on `U + U + <1>`, `U + U + <3>`, `U + U + <-1>` `is_even` is False, `hyperbolic_index` is 2 and `eichler_criterion_applies` is False, while `_two_hyperbolic_planes` is True -- and each of the three takes the single-sign-character certificate before the criterion's gate, so both gates answer `NOSPLIT` on them. Primitive isotropic vectors of `U^2 + M` have divisibility one and trivial divided class, so no specimen at this scale reaches the class machinery. |
+| `535-r3-probe-family.log` | `2f8c801` | the family the round inherits: `LK3` is `is_decomposable` True with 5 summands named `('U','U','U',None,None)`, the scrambled K3 is an `AtomicProposition` with **cardinality 1** and names `(None,)`, and the Gram graph of `LK3` cuts at `(2, 4, 6, 14)`. |
+| `535-r3-red-family.log` | `2f8c801` | the new family contract: **2 failed in 13.99 s** -- `A_1^4` in the basis `e_1+e_2, e_2+e_3, e_3+e_4, e_4` has `is_decomposable` undecided, and the scrambled K3 does **not** raise (`DID NOT RAISE ValueError`). |
+| `535-r3-fix-family.log` | `d7cf36d` + the family repair | the family contract and the graph file: **8 passed in 10.88 s**. |
+| `535-r3-red-graph.log` | `4089966` | the graph owner's components with a loop present: **1 failed, 3 passed in 11.56 s**, `ValueError: cannot add edge from 0 to 0 in graph without loops`. |
+| `535-r3-red-blocks.log` | `5ac7ea6` | the displayed-blocks contract: **2 failed in 8.08 s**, `AttributeError: no attribute 'inclusion'` -- the summands are fresh Gram lattices. |
+| `535-r3-fix-blocks.log` | `cc7b4f8` + the blocks repair | the blocks contract and the graph file: **6 passed, 2 failed in 20.65 s**; the two failures are the family contract above, repaired in the next commit. |
+| `535-r3-gate-tests.log` | `876c3f1` | the gate contract's tests, which have **no red state** (see the commit body): **10 passed in 54.30 s**. |
+| `535-r3-consumers.log` | `738ae71` + the gate repair | the ten files that consume the change: **42 passed, 2 failed in 97.02 s**. Both failures are pre-existing and touch no changed API. |
+| `535-r3-base-preexisting.log` | `5ac7ea6` | the same two files without these changes: **2 failed, 1 passed in 9.42 s**, the same two FAILED ids -- `(a1+a1).orthogonal_decomposition()` wants an `embeddings` argument and `a2.basis()` is not a lattice method. |
+| `535-r3-owner-contracts.log` | `738ae71` + the gate repair | `tests/lattices/test_lattice_database_owner_contracts.sage`: **11 passed, 1 failed in 152.05 s**; the failure is `hyperbolic_partner` on the odd binary lattice `[[1,0],[0,-1]]`, inside the presented module's iteration. |
+| `535-r3-base-hyperbolic-partner.log` | `5ac7ea6` | that test alone without these changes: **1 failed in 16.07 s**, the same id and the same frame. |
+| `535-r3-heavy-stable-line.log` | `1db98e4` | the two stable-line-orbit row files, `U(2) + <-6>` and `T_Co`: **2 passed in 1073.83 s (0:17:53)**. |
+| `535-r3-lint.log` | `1db98e4` | the test lint on the five touched test files: **5 files, 0 findings**. |
