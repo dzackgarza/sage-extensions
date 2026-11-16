@@ -1539,3 +1539,4 @@ e34de3bff01e7f67567fbbd4877971d1756a214cadcbb7f1643c8eee51411797  554-double-dua
 0b40b3fc5904b5bb5233b5a62d2d3d1973dcdbee425350efec06c6b18acce2c7  554-double-dual-repair-probe.py
 2c79e9f1658ef4fc7831ccb1efcbab6afc4bb37ce187e5430aa69ccdbf2d27dc  554-double-dual-red-on-base.log
 82c9da8f481f460dc4402ca340d58b7fa98e90e3afecabdc8f541accebf6478a  554-double-dual-green-on-head.log
+3e99a1d078ff563076a27f057e5a224917119adc0ff06928be835480e25c05c0  554-double-dual-green-on-pushed-head.log

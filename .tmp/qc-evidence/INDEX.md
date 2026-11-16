@@ -2905,4 +2905,5 @@ is empty), so the red above is the red of the base as well; the row at `9ddf7f5`
 | --- | --- | --- |
 | `554-double-dual-red-on-base.log` | `9ddf7f5` (main, the push base) + this round's test only | the selection: **1 failed, 5 deselected in 3.41 s** at `assert doubled.ambient_lattice() is lattice` |
 | `554-double-dual-green-on-head.log` | the rebased head of this round, clean tree | the selection: **1 passed, 5 deselected in 1.03 s** |
+| `554-double-dual-green-on-pushed-head.log` | `67dd108`, the head this round was pushed from, clean tree | the same selection after main advanced to `26bdef1`: **1 passed, 5 deselected in 1.44 s**; neither `polytopes.py` nor the test file differs between `1488acf`, `9ddf7f5` and `26bdef1` |
 
