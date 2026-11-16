@@ -1957,9 +1957,7 @@ def _nested_gram_tensor(data, ring) -> Tensor:
     r"""The type-$(0,2)$ Gram tensor with the given rows of components."""
     match _component_shape(data):
         case (rows, columns):
-            gram_tensor = tensor(ring, (), (rows, columns), data)
-            assert gram_tensor.tensor_valence() == (NN**2)((0, 2))
-            return gram_tensor
+            return tensor(ring, (), (rows, columns), data)
         case shape:
             raise TypeError(f"a Gram tensor is type (0,2), got nested shape {shape}")
 

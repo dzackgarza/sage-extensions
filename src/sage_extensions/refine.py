@@ -369,11 +369,18 @@ def owned_parent_class(
     # ``run_construction_hooks`` still executes each level exactly once.
     concrete = implementation.__dict__.get("_preamble_concrete", inherited)
     new_class = _owned_dynamic_class(f"Owned{concrete.__name__}", (*mixins, inherited), concrete)
+    # ``_owned_dynamic_class`` returns one class per (name, bases, doccls).
+    # The aliases below are a function of that class and ``providers``; a
+    # second run for the providers that last prepared it adds nothing, since
+    # each alias it set now resolves on the class itself.
+    if new_class.__dict__.get("_preamble_prepared_for") == providers:
+        return new_class
     for name, value in _final_category_operations(providers, carried, new_class).items():
         setattr(new_class, name, value)
     _supply_participant_implementations(new_class, mixins, inherited)
     new_class._preamble_concrete = concrete
     new_class._preamble_inherited = inherited
+    new_class._preamble_prepared_for = providers
     return new_class
 
 

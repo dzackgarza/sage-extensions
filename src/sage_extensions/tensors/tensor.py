@@ -76,8 +76,12 @@ _SageRings = SageRings()
 _TENSOR_TYPES = NN**2
 
 
+@cached_function
 def index_rank_family(ranks):
-    r"""Return the family \(i\mapsto\) rank of slot \(i\), for \(i\in\Delta[k-1]\)."""
+    r"""Return the family \(i\mapsto\) rank of slot \(i\), for \(i\in\Delta[k-1]\).
+
+    A function of the tuple of ranks, built once per tuple.
+    """
 
     entries = tuple(cardinal(rank) for rank in ranks)
     return indexed_family(

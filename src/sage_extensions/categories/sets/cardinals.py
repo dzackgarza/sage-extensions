@@ -1814,7 +1814,17 @@ def _cardinal_with_expression(expression: _CardinalExpression) -> Cardinal:
 def cardinal(
     value: Cardinal | SupportsInt | AnInfinity,
 ) -> Cardinal:
-    r"""Notation for ``Cardinalities()(value)``: ``value`` itself when it is a cardinal."""
+    r"""Notation for ``Cardinalities()(value)``: ``value`` itself when it is a cardinal.
+
+    A cardinal or an exact nonnegative integer goes straight to the finite
+    construction ``Cardinalities()._call_`` reaches, without the category's
+    membership dispatch.
+    """
+    match value:
+        case Cardinal():
+            return value
+        case int() | Integer() if not isinstance(value, bool) and value >= 0:
+            return _cardinal_with_expression(_FiniteCardinal(int(value)))
     return Cardinalities()(value)
 
 
