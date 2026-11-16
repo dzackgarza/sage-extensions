@@ -17,6 +17,22 @@ import pytest
 from sage_extensions.all import *  # noqa: F401,F403
 
 
+def test_the_images_of_a_real_endomorphism_are_read_in_its_own_frame() -> None:
+    r"""$e_0 \mapsto e_0$, $e_1 \mapsto 0$ over the owned real field."""
+    plane = RR**2
+    first, _second = tuple(plane.module_generators())
+    projection = plane.Mor(plane)({0: first, 1: plane.zero()})
+
+    assert projection.coordinate_images() == ((RR(1), RR(0)), (RR(0), RR(0)))
+
+
+def test_a_free_module_over_the_real_field_has_no_relations() -> None:
+    r"""The zero relation morphism of a zero submodule has no coordinate images."""
+    plane = RR**2
+
+    assert plane.presentation().coordinate_images() == ()
+
+
 def test_an_injective_endomorphism_of_the_real_plane_is_primitive() -> None:
     r"""$e_0 \mapsto e_0$, $e_1 \mapsto e_0 + e_1$ is an isomorphism of $RR^2$."""
     plane = RR**2
