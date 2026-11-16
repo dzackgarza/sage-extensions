@@ -39,6 +39,36 @@ def test_a_cardinal_order_morphism_exists_exactly_below_its_target() -> None:
         above.unique_morphism()
 
 
+def test_the_order_supplies_its_own_emptiness_after_any_earlier_construction() -> None:
+    r"""Both thin orders decide the emptiness of their own hom-sets.
+
+    ``Sets`` owns ``is_empty`` and reads what a construction supplies through
+    the protected hook ``_emptiness_decision``, which a level states on its own
+    class.  A thin order states it there, so its hom-set is answered by the
+    negation of the order's own comparison and not by whatever a class
+    resolution reached by an earlier construction selected.  The two orders are
+    asked here after each other, each through the order's own ``Mor`` and
+    through the cached hom-set, and every answer is the same decision.
+
+    An undecided comparison decides nothing, and no order may answer ``False``
+    for a hom-set it has not decided: the set states the proposition
+    ``is_empty`` and ``ask`` answers ``Unknown``.
+    """
+    cardinals = Cardinalities()
+    ordinals = Ordinals()
+
+    assert ordinals.Mor(1, 2).is_empty() is False
+    assert cardinals.Mor(2, 3).is_empty() is False
+    assert cardinal(2).Mor(3).is_empty() is False
+    assert cardinals.Mor(2, 3).is_empty() is False
+    assert cardinals.Mor(3, 2).is_empty() is True
+    assert ordinals.Mor(1, 2).is_empty() is False
+    assert ordinals.Mor(2, 1).is_empty() is True
+
+    undecided = cardinals.Mor(2 ** aleph0, aleph(1))
+    assert ask(undecided.is_empty()) is Unknown
+
+
 def test_the_one_cardinal_arrow_composes_as_the_comparison_does() -> None:
     cardinals = Cardinalities()
 

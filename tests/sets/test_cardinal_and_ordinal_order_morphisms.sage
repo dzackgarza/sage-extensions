@@ -44,11 +44,29 @@ def test_finite_indexed_sums_suprema_and_comparisons_of_cardinals() -> None:
 def test_the_countable_sum_of_ones_is_aleph_zero() -> None:
     r"""$\sum_{i \in \mathbb{N}} 1 = |\mathbb{N}| \cdot 1 = \aleph_0$.
 
-    The family of ones is constant, and a constant family is named by the
-    cardinal it takes.  A family named by a function is summed only where its
-    values are reachable, which an infinite index set never is.
+    A constant family is named by the one cardinal it takes, and the sum is
+    the product with the index cardinal, $|I| \cdot c$: over the finite index
+    set $\{0, 1, 2\}$ the constant family of threes sums to $3 \cdot 3 = 9$,
+    and over $\mathbb{N}$ the families of ones and of threes both sum to
+    $\aleph_0 \cdot 1 = \aleph_0 \cdot 3 = \aleph_0$ -- neither the index
+    cardinality alone nor the summand alone gives either answer.
+
+    A family named by a bare function supplies no such declaration, and over
+    an infinite index set only finitely many of its values are reachable: two
+    functions that agree on those and differ elsewhere -- $i \mapsto 1$ and
+    $i \mapsto 1$ except at one index, where the value is $\aleph_1$ -- have
+    different sums.  So the sum of an infinite family named by a function is
+    the term $\sum_{i \in I} \kappa_i$, and is not $\aleph_0$ on the strength
+    of the one value a reader can reach.
     """
-    assert Cardinalities().indexed_sum(NN, cardinal(1)) == aleph0
+    cardinals = Cardinalities()
+
+    assert cardinals.indexed_sum(Sets.Δ[2], cardinal(3)) == cardinal(9)
+    assert cardinals.indexed_sum(Sets.Δ[2], 3) == cardinal(9)
+    assert cardinals.indexed_sum(NN, cardinal(1)) == aleph0
+    assert cardinals.indexed_sum(NN, cardinal(3)) == aleph0
+    assert cardinals.indexed_sum(NN, 3) == aleph0
+    assert cardinals.indexed_sum(NN, lambda _index: cardinal(1)) != aleph0
 
 
 def test_a_finite_cardinal_is_the_natural_number_it_counts() -> None:
@@ -58,9 +76,13 @@ def test_a_finite_cardinal_is_the_natural_number_it_counts() -> None:
 
 
 def test_the_rings_read_the_finite_cardinal_seven_as_seven() -> None:
-    r"""The finite cardinal $7$ read in $\mathbb{Z}$ and $\mathbb{Q}$ is $7$."""
+    r"""The finite cardinal $7$ read in $\mathbb{Z}$, in $\mathbb{Q}$ and in a predicate subring of
+    $\mathbb{Q}$ is the integer $7$."""
+    subring = PredicateSubrings().an_object()
+
     assert ZZ(cardinal(7)) == 7
     assert QQ(cardinal(7)) == 7
+    assert subring(cardinal(7)) == subring(7)
 
 
 def test_ordinal_sum_product_and_power_are_not_commutative() -> None:
