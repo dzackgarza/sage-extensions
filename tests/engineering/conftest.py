@@ -20,6 +20,14 @@ starts one probe per tree before waiting on any of them, and ``probe_run``
 reports the log a run's own logging configuration filled.  All are bound as
 builtins for the same reason: the lint admits exactly the names a directory's
 ``conftest.py`` binds.
+
+One question is about the tree and not about a run of it: does a source file
+state what the code does, or name the issue that changed it?  A source file's
+history is the commit body's record, and nothing a reader of the code needs to
+compute with is spelled ``#`` and digits, so ``issue_number_mentions`` scans the
+files git tracks under ``src/`` for that spelling and reports each line by path
+and line number.  It scans a mapping of names to texts when a test hands it one,
+so the same call asks what it reports about a file written to be found.
 """
 
 from __future__ import annotations
@@ -182,6 +190,7 @@ def pytest_configure(config) -> None:
     builtins.stage_records_of = stage_records_of
     builtins.kept_test_run = kept_test_run
     builtins.simultaneous_test_runs = simultaneous_test_runs
+    builtins.issue_number_mentions = issue_number_mentions
 
 
 def pytest_unconfigure(config) -> None:
@@ -190,6 +199,7 @@ def pytest_unconfigure(config) -> None:
     del builtins.stage_records_of
     del builtins.kept_test_run
     del builtins.simultaneous_test_runs
+    del builtins.issue_number_mentions
 
 
 @dataclass(frozen=True)
@@ -394,3 +404,55 @@ def simultaneous_test_runs(*trees: dict[str, str]) -> tuple[tuple[RecordFile, ..
     finally:
         for root in roots:
             shutil.rmtree(root)
+
+
+ISSUE_NUMBER = re.compile(r"#\d+")
+r"""The spelling of an issue reference: a number sign and the issue's digits.
+
+Every other number a source file states -- a dimension, a page, a coefficient, a
+count -- arrives with its own context, and a number sign introduces none of
+them, so a line carrying this spelling names an issue.
+"""
+
+
+def _tracked_source_files() -> tuple[Path, ...]:
+    r"""Every file git tracks under ``src/``, in a fixed order.
+
+    The tracked files and not a directory walk: a build's output, a ``__pycache__``
+    and a scratch file are not the library, and the commit that carries a line is
+    the record of why it is there.
+    """
+    completed = subprocess.run(
+        ("git", "-C", str(SOURCE_TREE), "ls-files", "-z", "src"),
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    return tuple(SOURCE_TREE / name for name in sorted(completed.stdout.split("\0")) if name)
+
+
+def issue_number_mentions(sources: dict[str, str] | None = None) -> tuple[str, ...]:
+    r"""Every line of a source file that names an issue, as ``path:line: text``.
+
+    ``sources`` maps a file name to its text; without it the files are the ones
+    git tracks under ``src/``.  A source file states what the code does, and the
+    history of a change -- the issue that found the defect, the rounds it took --
+    is the commit body's record, which a reader of the code does not have to hold
+    to compute anything.  So the spelling :data:`ISSUE_NUMBER` has no place in
+    one, and the report is the lines that carry it, in path and line order, with
+    the line's own text after it.
+    """
+    scanned = (
+        {
+            path.relative_to(SOURCE_TREE).as_posix(): path.read_text(encoding="utf-8")
+            for path in _tracked_source_files()
+        }
+        if sources is None
+        else sources
+    )
+    return tuple(
+        f"{name}:{number}: {line.strip()}"
+        for name, text in scanned.items()
+        for number, line in enumerate(text.splitlines(), start=1)
+        if ISSUE_NUMBER.search(line)
+    )
