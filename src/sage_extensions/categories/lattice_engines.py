@@ -36,10 +36,9 @@ from sage_extensions.validation import validator
 # PARI manual's parisizemax default advises (The PARI Group, *PARI/GP*,
 # parisizemax: "It is possible to increase or decrease parisizemax inside a
 # running gp session, just use default as usual").  The ceiling is the
-# eight-gigabyte maximum the Sage image already sets (c052225, from
-# dzackgarza/sage c2c314e), so this owner never lowers it: it covers the
-# library's heaviest measured need, the rank-17 genus enumeration,
-# and the automorphism count of <18> + E8.
+# eight-gigabyte maximum the Sage image already sets, so this owner never
+# lowers it: it covers the library's heaviest needs, the rank-17 genus
+# enumeration and the automorphism count of <18> + E8.
 pari.default("parisizemax", "8G")
 
 
@@ -522,10 +521,9 @@ def _rational_isotropy_decision(lattice):
 def _isotropic_vector_witness(lattice):
     r"""Return a nonzero isotropic vector of ``lattice``, or ``None`` when there is none.
 
-    Migrated from ``sage-indefinite-port``'s ``find_hyperbolic_pair``.  Sage's
-    ``quadratic_forms.qfsolve.qfsolve`` returns an integer obstruction, a vector,
-    or a matrix whose columns span the radical; integral inputs receive a
-    primitive integral vector after clearing denominators.
+    Sage's ``quadratic_forms.qfsolve.qfsolve`` returns an integer obstruction,
+    a vector, or a matrix whose columns span the radical; integral inputs
+    receive a primitive integral vector after clearing denominators.
 
     ``qfsolve`` is Denis Simon's code (Sage's ``qfsolve`` module: "Interface to
     the PARI/GP quadratic forms code of Denis Simon").  Its reduction is not

@@ -200,10 +200,10 @@ def _gap_list_entry(list_object, position):
     large to convert to int`` although the position names a real entry --
     a right transversal of index ``|O(A_L)| = 46998591897600`` is one such
     list.  GAP's ``ELM_LIST`` takes the index as a GAP integer and answers
-    the same entry (measured on a list of length ``3*10**9``: position
-    ``2**31 + 5`` reads correctly through ``ELM_LIST`` and raises through
-    ``__getitem__``).  For every position a machine int can hold the two
-    agree, so this is one list read at the width its data requires.
+    the same entry: a position at or beyond ``2**31`` reads correctly through
+    ``ELM_LIST`` and raises through ``__getitem__``.  For every position a
+    machine int can hold, the two agree, so this is one list read at the
+    width its data requires.
 
     ``position`` is zero-based, as every position this module retains is;
     GAP's ``ELM_LIST`` is one-based, so the index handed over is
@@ -2573,12 +2573,11 @@ def _symmetric_group(points):
 
     The description names the degree and never formats the point set.  A
     point set's display is not free data: a coset set's ``_repr_`` materializes
-    and validates every representative, so interpolating ``Omega`` here made
-    building ``Sym(Omega)`` cost as much as presenting ``Omega`` -- on the
-    port's Enriques case, 1800 s without returning.  The points themselves are
-    retained as the separately supplied ``symmetric_points``, which
-    ``natural_points()`` returns and which the action and its validation use;
-    only the naming is degree-based.
+    and validates every representative, so interpolating ``Omega`` here would
+    make building ``Sym(Omega)`` cost as much as presenting ``Omega``.  The
+    points themselves are retained as the separately supplied
+    ``symmetric_points``, which ``natural_points()`` returns and which the
+    action and its validation use; only the naming is degree-based.
     """
     from sage.groups.perm_gps.permgroup_named import SymmetricGroup
 

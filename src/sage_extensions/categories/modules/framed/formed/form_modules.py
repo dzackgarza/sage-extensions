@@ -332,7 +332,9 @@ def _form_square_commutes(
     # object's own stated construction -- a ring's regular module, or a
     # restriction of scalars from one, whose elements are the extension's
     # scalars.  A value object with neither reading supplies no numerical Gram
-    # tensor, and the generator equations below decide the square.
+    # tensor, and the generator equations below state the square from a finite
+    # spanning family: they decide it only when both maps are known linear, and
+    # a satisfied equation without that premise leaves it undecided.
     source_scalars = _scalar_value_identification(source_form.codomain())
     target_scalars = _scalar_value_identification(target_form.codomain())
     algebra_values = (
@@ -2692,9 +2694,8 @@ class FormModules(OwnedCategoryOverBaseRing):
                     The quotient module is the cokernel of the radical's inclusion,
                     and the Gram is read on the images of this form's generators —
                     the same statement as the general subquotient, without its
-                    enumeration of the module (measured: 0.33 s against 10.6 s on
-                    ``(Z/4)^2``).  The subquotient stays the fallback when the
-                    generator counts do not line up.
+                    enumeration of the module.  The subquotient stays the
+                    fallback when the generator counts do not line up.
                     """
                     quadratic = self._torsion_form_is_quadratic()
                     radical = self.polar_radical()

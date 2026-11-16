@@ -673,10 +673,7 @@ def _filtered_vinal_class():
             Two of the conjuncts are answered here by their exact
             equivalents rather than the engine's spells, because the
             engine's spells cost a Sage matrix routine per candidate and
-            the candidates number in the millions (measured at Sterk's
-            first cusp: 1,855,003 candidates, of which the engine's root
-            test took 337.8 s and its dependence check 92.9 s, against
-            72.4 s for the whole layer enumeration):
+            the candidates number in the millions:
 
             - the repeat check asks whether the candidate is at distance
               zero from the controlling vector, that is one inner product
@@ -906,9 +903,8 @@ def _filtered_vinal_class():
             \(u\le0\) does imply \(d\ge c\), but the converse fails, and
             the relaxation is not a small one.  At Sterk's first Enriques cusp
             the layer at height 8 has 18 780 solutions with \(d\ge c\), of
-            which exactly one has \(u\le0\)
-            (``results/issue522-stage-split.md``).  The enumeration therefore
-            runs in \(u\) itself.
+            which exactly one has \(u\le0\).  The enumeration therefore runs
+            in \(u\) itself.
 
             The enumeration keeps the coefficients \(d\) integral, which is
             what makes its equation (57) the layer's and not a relaxation of

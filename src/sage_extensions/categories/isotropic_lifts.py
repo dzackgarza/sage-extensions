@@ -8,8 +8,7 @@ combinations of matrices (V. Gritsenko, K. Hulek, G. Sankaran, *Abelianisation
 of orthogonal groups and the fundamental group of modular varieties*,
 arXiv:0810.1614, section 3.1: equation (4), printed p. 8, is the transvection,
 equation (5), printed p. 9, composes and inverts it, and equation (10), printed
-p. 9, is its integrality on an even lattice; the paper is at
-``.tmp/sources/gritsenko-hulek-sankaran-arxiv-0810.1614``).
+p. 9, is its integrality on an even lattice).
 """
 
 from sage.misc.cachefunc import cached_method

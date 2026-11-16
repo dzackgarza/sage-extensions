@@ -2910,7 +2910,7 @@ def _singular_column_coordinates(coordinates, count, description):
     one column per lifted vector, and its ``reduce`` with one vector per column
     of its argument.  Both are a column of coordinates with one entry per
     generator, and each is read here, once, so that no caller keeps the first
-    entry of a column and mistakes it for the column (``#532``).
+    entry of a column and mistakes it for the column.
     """
     match (coordinates.nrows(), coordinates.ncols()):
         case (rows, 1) if rows == count:

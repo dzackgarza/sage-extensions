@@ -2701,11 +2701,11 @@ class Modules(OwnedCategoryOverBaseRing):
             chosen finite presentation states its relations through
             :meth:`presentation` — the zero morphism from the empty free module
             when its framing is a basis — and every other module states none.
-            Answering a static ``None`` here shadowed the specific owners
-            whenever a joined parent resolved this name before theirs (measured:
-            ``QQ[x]/(x)``, whose MRO puts ``Modules`` ahead of the framed-free
-            facet), so the protected contract reported "relations unknown" for an
-            object that had stated them.
+            Answering a static ``None`` here shadows the specific owners
+            whenever a joined parent resolves this name before theirs, as
+            ``QQ[x]/(x)`` does, whose MRO puts ``Modules`` ahead of the
+            framed-free facet; the protected contract then reports "relations
+            unknown" for an object that stated them.
             """
             if self not in ModulesWithChosenFinitePresentation(self.base_ring()):
                 return None

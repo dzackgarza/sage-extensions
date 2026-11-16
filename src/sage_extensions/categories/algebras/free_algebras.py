@@ -252,8 +252,8 @@ class _NativeFreeAlgebraParent(_NativeMonomialEvaluation, _OwnedAlgebraParent):
             case True:
                 # A finite free tensor algebra has no defining relations;
                 # its symmetric quotient has finitely many commutators.
-                # This property chooses no presentation data and implies
-                # the previous finite algebra generation placement.
+                # This property chooses no presentation data and implies the
+                # finite algebra generation placement.
                 algebra_placements = (
                     (
                         Algebras(base)

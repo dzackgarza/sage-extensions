@@ -1,7 +1,5 @@
 """Zeta-factor data for affine quadrics attached to integral lattices.
 
-Migrated from the formula formerly implemented by ``latticedb.site.zeta_tex`` of
-dzackgarza/lattice-database, since removed.
 The preamble owns the mathematical factorization; presentation layers may
 render the returned factors in TeX or another notation.
 """

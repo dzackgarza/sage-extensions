@@ -3489,8 +3489,8 @@ class IsotropicVectorReductionImage(SageObject):
         made here: the parabolic's constructed generator family is stated for a
         primitive isotropic plane and refuses rank one
         (``parabolic_stabilizer_generators``), and the exact generators of the
-        line's parabolic are the port's line stabilizer, which at Sterk's first
-        cusp of ``T_{\mathrm{En}}`` does not return within 540 s.  So
+        line's parabolic are the port's line stabilizer, which is not a
+        computational route at Sterk's first cusp of ``T_{\mathrm{En}}``.  So
         :meth:`generators` is empty at a line and :meth:`reflection_generators` is
         its generator source, while :meth:`contains` decides membership in all of
         ``G_v`` regardless of whether any generating family is known.
@@ -3499,9 +3499,9 @@ class IsotropicVectorReductionImage(SageObject):
             return (
                 f"the parabolic at the line {self._vector!r} has no constructed generator family: "
                 f"parabolic_stabilizer_generators is stated for a primitive isotropic plane and refuses "
-                f"rank one, and the port's line stabilizer generators do not return in 540 s at Sterk's "
-                f"first Enriques cusp; the reflection subgroup of G_v is available through "
-                f"reflection_generators, and the chamber of its reflection part is what cusp_chamber supplies"
+                f"rank one, and the port's line stabilizer generators are not a computational route at "
+                f"Sterk's first Enriques cusp; the reflection subgroup of G_v is available through "
+                f"reflection_generators, whose chamber is the reflection part of G_v"
             )
         if not self._line.is_parabolic_complete():
             return (

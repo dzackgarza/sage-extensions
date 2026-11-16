@@ -741,8 +741,8 @@ class _Genus(Sets().ObjectType):
         ``proper=False`` counts the improper spinor genera, the partition that
         admits improper isometries; it is coarser or equal, it is the
         convention of the genus enumeration in :func:`_genus_classes`, and it
-        is what this method reported before the sources were read.  Measured:
-        the two agree on ``diag(1, 20, 400)`` (four each) and on
+        is what this method reports for that convention.  The two agree on
+        ``diag(1, 20, 400)`` (four each) and on
         ``diag(1, 20, -400)`` (two each), and they differ in general.
 
         The quotient's order is read directly, because it *is* the index.  It
@@ -1194,9 +1194,9 @@ def _spinor_kernel_quotient(genus, *, proper):
     Conway--Sloane, Ch. 15, §9.3, p. 390), and is the convention of
     :meth:`_Genus.spinor_genus_count`; ``proper=False`` is the coarser improper
     kernel, which is what the genus enumeration below partitions by.  The two
-    agree whenever the improper class of the genus is the proper one: measured
-    of order four on both on ``diag(1, 20, 400)`` and of order two on both on
-    ``diag(1, 20, -400)``, repeatedly and independently of the random vector
+    agree whenever the improper class of the genus is the proper one: of order
+    four on both on ``diag(1, 20, 400)`` and of order two on both on
+    ``diag(1, 20, -400)``, independently of the random vector
     ``_proper_is_improper`` draws.
     """
     operators, kernel = (
@@ -1267,7 +1267,7 @@ def _genus_classes(gram):
     improper partition is the one that admits improper isometries; it is
     coarser than or equal to the proper one that
     :meth:`_Genus.spinor_genus_count` reports by default, and the two agree on
-    the specimens measured here, ``diag(1, 20, 400)`` and ``diag(1, 20, -400)``.
+    the specimens ``diag(1, 20, 400)`` and ``diag(1, 20, -400)``.
 
     In rank at most ``1`` the genus is one class.  In rank ``2`` the classes
     are the reduced binary forms of discriminant ``-4 det`` in the genus;

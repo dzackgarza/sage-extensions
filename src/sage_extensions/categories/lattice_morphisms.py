@@ -118,8 +118,7 @@ def _kneser_neighbour_gram(gram, coordinates):
     r"""Return the Gram matrix of the Kneser 2-neighbour ``K_w + Z(w/2)``.
 
     The construction is the one of Conway--Sloane, *Sphere Packings, Lattices
-    and Groups*, 3rd ed., read as text at
-    ``.tmp/conway-sloane-splag-3rd-ed.pdf``: Preface to the Third Edition,
+    and Groups*, 3rd ed.: Preface to the Third Edition,
     Notes on Chapter 17, section ``Neighbours``, printed p. lv ([Kne4],
     [Ven2], [Wan96]).  For ``w`` in a unimodular ``L`` with ``1/2 w`` not in
     ``L`` and ``w . w`` in ``4Z``, the neighbor ``L'' = L_w + Z(w/2)`` is
@@ -1723,9 +1722,8 @@ class LatticeIsometryMethods:
         backward factor by integer matrix inversion.  The reading is gated
         to the owned integers: over a general common base ring its units
         are not ``+-1`` and a plain integer cast can refuse or truncate a
-        valid scalar (measured on ``GF(5)``: det ``2`` is a unit with the
-        maintained preimage machinery working), so outside the owned
-        integers the maintained inverse-then-preimage route answers, and
+        valid scalar, so outside the owned integers the maintained
+        inverse-then-preimage route answers, and
         unequal or non-finite ranks keep it too.
         """
         ring = source.base_ring()
@@ -1753,10 +1751,9 @@ class LatticeIsometryMethods:
             # is +-1, and that inverse's coordinates are what the general
             # route computes as the second rational preimage.  The whole
             # per-element factor/preimage machinery of the general route is
-            # thereby answered from one coordinate pass per conversion
-            # (measured on the rank-12 Enriques line: ~75 ms per conversion
-            # inside twelve element preimages plus their solves, before the
-            # wrapping - this pass computes the same data once).
+            # thereby answered from one coordinate pass per conversion: the
+            # general route runs one element preimage and one solve per
+            # conversion, and this pass computes the same data once.
             # The framed matrix of the rational map is read in one engine
             # call: column s is the coordinate vector of the image of e_s.
             rational_matrix = _engine_matrix(_module_matrix(self))
@@ -3950,13 +3947,10 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
         for.  A bare predicate is not enough, because ``O(A_L)`` is a finite
         group and this library's canonical free cover of a finite group is the
         one on *all* of its elements, so a generator request on a predicate
-        subgroup of it filters an enumeration of the whole group: measured on
-        ``T_Co``, the joint discriminant image of the preimage entered that
-        enumeration and was killed at 4282 MiB without returning in 2400 s
-        (``_joint_discriminant_image_gap`` at
-        ``orthogonal_quotients.py:706``, reached from
+        subgroup of it filters an enumeration of the whole group -- the route
+        that ``_joint_discriminant_image_gap`` (reached from
         ``_subgroup_isotropic_orbit_representatives`` through
-        ``splitting_isometries``).
+        ``splitting_isometries``) exists to avoid.
 
         Neither ``|P|`` nor ``|orbit(point)|`` is asserted here; the consumers
         compute them (``|P| * |orbit| = |O(A_L)|`` is the index--stabilizer
@@ -5520,8 +5514,7 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
         the pair on which deciding ``2U + K`` by ``K`` fails.  Every
         decision below is a computation on the Gram matrices, and each
         source statement is cited with its printed page in Conway--Sloane,
-        *Sphere Packings, Lattices and Groups*, 3rd ed., held as text at
-        ``.tmp/conway-sloane-splag-3rd-ed.pdf`` and read with ``pdftotext``:
+        *Sphere Packings, Lattices and Groups*, 3rd ed.:
 
         - Preface to the Third Edition, Notes on Chapter 17, section
           ``Neighbours``, printed p. lv ([Kne4], [Ven2], [Wan96]): for ``u``

@@ -710,7 +710,7 @@ def _parent_of_an_element(value):
     ``isinstance(..., Parent)`` is that framework's own statement and not a
     reading of what a mathematical value carries: Sage's
     ``sage.structure.parent.is_Parent`` is deprecated with the message "use
-    ``isinstance(..., Parent)`` instead" (trac #37922), and ``None`` here says
+    ``isinstance(..., Parent)`` instead", and ``None`` here says
     what every reader of the parent asks about -- this value names no parent
     of elements.
     """

@@ -1523,8 +1523,8 @@ class IntersectionSubgroups(_PredicateSubgroupConstruction):
                         )
                         return
                 # An intersection of several character kernels/preimages is
-                # still a finite-index subgroup, even though it is no longer
-                # presented by one PreimageSubgroups object.  Restrict its
+                # still a finite-index subgroup, even though one
+                # PreimageSubgroups object does not present it.  Restrict its
                 # complete character condition to the supplied generated
                 # subgroup and apply the same finite-index Schreier lemma.
                 for character_subgroup in intersected_subgroups:

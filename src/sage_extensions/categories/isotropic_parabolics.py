@@ -2498,7 +2498,7 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             parameter of any element of `U_I`, and :meth:`unipotent_parameter_lifts`
             says so on the class.
 
-            Measured at Sterk's `P_2` of \(T_{\mathrm{En}}\): modulus `2`, `4096` of
+            At Sterk's `P_2` of \(T_{\mathrm{En}}\): modulus `2`, `4096` of
             `65536` classes admissible, rank `16`, index `16` in `\ZZ^{16}`; the
             parameters of the plane's Eichler transvections that lie in the radical and
             of the elements over the parameters supported on the third and fourth
@@ -2840,7 +2840,7 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             :meth:`unipotent_translation_rank`, read off the element's block matrix
             rather than assumed from a formula.
 
-            Measured at Sterk's `P_2` of \(T_{\mathrm{En}}\): sixteen translations whose
+            At Sterk's `P_2` of \(T_{\mathrm{En}}\): sixteen translations whose
             span has rank sixteen and covolume `1` in the coordinate lattice of
             `\operatorname{Hom}(K, I)` -- they are a `\ZZ`-basis of the whole of it, as
             `\tau(U_I)` is of rank `2 \operatorname{rank}(K) = 16` there.
@@ -2973,7 +2973,7 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             part of `a` with `c = 0` and `\tau = 0`.  It is computed as the dimension
             of the same linear system with the extra conditions `N(K) = 0`.
 
-            Measured at Sterk's `P_2` of \(T_{\mathrm{En}}\): `1`, so `U_I/Z` has rank
+            At Sterk's `P_2` of \(T_{\mathrm{En}}\): `1`, so `U_I/Z` has rank
             `17 - 1 = 16 = 2 \operatorname{rank}(K)`, the whole of
             `\operatorname{Hom}(I^\perp/I, I)`.
             """
@@ -3205,7 +3205,7 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             parabolic at `P` and acts trivially on `P^\\perp/P`; on `P` it is
             unipotent.  Because `\\(w \\notin L\\)` it acts nontrivially on the
             discriminant classes of `L`, where every transvection of
-            :meth:`parabolic_transvection_generators` acts trivially: measured on
+            :meth:`parabolic_transvection_generators` acts trivially: on
             `T_{\\mathrm{En}}` at `P_1`, those 20 generate a subgroup of
             `\\rho(O(L))` of order 1, while these generate one of order
             `\\(2^8\\)`.
@@ -3469,8 +3469,8 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
 
             The fallback of :meth:`plane_block_basis`, for a plane at which keeping
             standard basis vectors in order while they raise the rank does not give
-            a `ZZ`-basis of `L` — measured at a `T_Co` plane, where it left a
-            sublattice of index `2`.  Both completions are then the cokernels': `P`
+            a `ZZ`-basis of `L` — at a `T_Co` plane it leaves a sublattice of
+            index `2`.  Both completions are then the cokernels': `P`
             is saturated in \(P^\perp\) (`P` is saturated in `L`, and if `n v` lies
             in `P` for a `v` of \(P^\perp\) then `v` lies in `L` and `n v` in `P`),
             and \(P^\perp\) is saturated in `L` by its own definition, so both
@@ -4609,8 +4609,8 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
               ``trivial_on_plane`` equal to `1`.
 
             With all three the image is the whole product, hence `M`, hence the family
-            generates `P_I`.  At Sterk's `P_2` of \(T_{\mathrm{En}}\) all three hold --
-            measured -- so the parabolic there is generated, and that is what
+            generates `P_I`.  At Sterk's `P_2` of \(T_{\mathrm{En}}\) all three hold,
+            so the parabolic there is generated, and that is what
             :meth:`is_parabolic_complete` answers.
 
             A **split** plane needs none of this: there `L = P \perp U \perp K`, the third

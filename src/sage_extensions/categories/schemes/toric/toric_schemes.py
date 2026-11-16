@@ -360,8 +360,8 @@ def _character_on_overlap(character, face, cone, base_ring):
     # condition is <m,u> + c<m_sigma,u> >= 0, hence
     # c >= ceil(-<m,u>/<m_sigma,u>). On rays where the supporting character
     # vanishes, m is already nonnegative because it lies in tau^vee. This is
-    # exactly the least exponent found by the former repeated-addition loop,
-    # without repeated cone-membership tests and character allocations.
+    # the least exponent, without repeated cone-membership tests and character
+    # allocations.
     exponent = max(
         (
             (-value + denominator - 1) // denominator

@@ -116,7 +116,7 @@ def card_plane_orbit_lengths(tag: str, group: str):
     those orbits, in the order its citation names them
     (``integral.primitive_orbits.{group}.orbit_lengths`` on the card, which
     ``tests/cards/refresh_lattice_database_enriques.py`` emits as the row's
-    ``orbit_lengths``): ``dzackgarza/lattice-database`` d6a5393 states it for
+    ``orbit_lengths``): the lattice-database card states it for
     ``029J``'s ``O`` and ``Otilde+`` rows, 527 and 23715, beside the row total and
     the row's count of orbits.  Nothing here parses a sentence.
 
@@ -148,7 +148,7 @@ def card_plane_orbit_lengths(tag: str, group: str):
             f"lattice card {tag} states the total of its {group!r} plane row but not the "
             f"lengths of the orbits it splits into: the row states {sorted(rows[group])}, "
             f"and a per-orbit length is read from the row's own `orbit_lengths` field "
-            f"(dzackgarza/lattice-database d6a5393), not from its citation"
+            f"(dzackgarza/lattice-database card), not from its citation"
         )
     found = sorted(int(length) for length in rows[group]["orbit_lengths"])
     total = rows[group].get("planes")

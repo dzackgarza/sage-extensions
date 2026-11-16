@@ -202,13 +202,10 @@ def _double_coset_adjustment(subgroup_permutation, stabilizer_permutation, coset
     (``S`` the subgroup's character image, ``t`` the witness image) exists
     exactly when ``t`` lies in the product ``S * W``, because ``x = s t``
     reads ``t = s^-1 x`` with ``s^-1`` in ``S`` and ``x`` in ``W``.  Membership
-    in a double coset of this shape is answered by GAP without listing it
-    (measured at ``|S| * |W| ~ 1.6 * 10^9``: instant), where
-    ``Intersection`` of a group with a coset domain enumerates the coset
-    (measured on the ``Gamma_{Co,2}`` row of ``T_Co``: the ambient witness and
-    the exact stabilizer both return in seconds, and the intersection dies at
-    6.5 GiB against the runtime's memory guard; the coset has
-    ``|S| = 696729600`` elements there).
+    in a double coset of this shape is answered by GAP without listing it,
+    where ``Intersection`` of a group with a coset domain enumerates the
+    coset and exceeds the runtime's memory guard: at the ``Gamma_{Co,2}``
+    row of ``T_Co`` the coset has ``|S| = 696729600`` elements.
 
     The exhibited element walks the right cosets of ``W`` under right
     multiplication by the generators of ``S`` and their inverses: ``t`` in
@@ -778,9 +775,9 @@ class OrthogonalCharacterQuotient:
         subgroup pushed through ``rho`` from ``K_0``'s retained generating
         family, and the meet is one ``Intersection`` of small generated
         subgroups of ``O(A_L)``.  With more than one sign factor and
-        supergroup-family requirements the joint ``K_0`` family is not
-        currently formed here, and the honest legacy branch below is kept;
-        in that case this statement does not claim computation.
+        supergroup-family requirements the joint ``K_0`` family is not formed
+        here, and the product-model branch below answers; in that case this
+        statement does not claim computation.
         """
         from sage_extensions.categories.group.groups import (
             _element_to_engine,
@@ -802,7 +799,7 @@ class OrthogonalCharacterQuotient:
         if self.determinant_kernel and self.spinor_kernel:
             raise NotImplementedError(
                 "the joint intersection of two sign kernels inside O(L) is not "
-                "currently generated in this route; the legacy product-model "
+                "generated in this route; the product-model "
                 "computation is used instead"
             )
         lattice = self.lattice
@@ -840,7 +837,7 @@ class OrthogonalCharacterQuotient:
         an explicit proof at :meth:`_joint_discriminant_image_gap`), and
         ``pi_1|_{Q cap S}`` is injective, so ``|chi(self.subgroup)| = |T_tot|``
         and computing the joint subgroup in the full product model is never
-        required here.  Sign-kernel-only data keeps the legacy kernel route.
+        required here.  Sign-kernel-only data keeps the kernel route.
         """
         if self._has_discriminant and not (self.determinant_kernel and self.spinor_kernel):
             return int(libgap.Order(self._joint_discriminant_image_gap()))
@@ -2016,9 +2013,9 @@ class OrthogonalCharacterQuotient:
         # records, for every coset it reaches, the last generator image that
         # carried its parent there -- so each lift is spelled by one owned
         # product per coset along the walk's own tree, not by a per-coset
-        # word problem (whose 102 ms per double coset made the Coble kernel
-        # rows -- 189720 double cosets each -- hours) and not by a factorization
-        # whose chain-with-words was measured past this VM's memory guard.
+        # word problem, whose cost per double coset multiplies by the row's
+        # 189720 double cosets, and not by a factorization whose
+        # chain-with-words exceeds this VM's memory guard.
         perm_images = [libgap.Image(to_perm, image) for image in rho_images]
         small_indices = []
         closure = libgap.TrivialSubgroup(im_rho_perm)
@@ -2458,8 +2455,7 @@ end
         # exhibited by a double-coset membership and a canonical coset walk,
         # never by an intersection with a coset domain: GAP answers membership
         # in a double coset of hundreds of millions of elements instantly,
-        # while the intersection enumerates the coset (both measured; see
-        # _double_coset_adjustment).
+        # while the intersection enumerates the coset.
         chosen = _double_coset_adjustment(
             subgroup_permutation,
             stabilizer_permutation,
@@ -3365,8 +3361,9 @@ def _plane_orbit_from_odd_stabilizer(subgroup, representative):
     # subgroup objects: a comparison of two preimage subgroups can be false for the
     # same subgroup reached by another route, and a false answer here does not fail
     # loudly -- it falls through to the stabilizer enumeration this route exists to
-    # avoid (measured: 9.3 GiB and no return on `6JRX`).  `O^+ = sn^{-1}(+1)` is
-    # exactly the subgroup cut out by the spinor character alone.
+    # avoid, which exceeds the runtime's memory guard on `6JRX` without
+    # returning.  `O^+ = sn^{-1}(+1)` is exactly the subgroup cut out by the
+    # spinor character alone.
     quotient = subgroup.finite_character_quotient()
     if not (
         quotient.spinor_kernel
@@ -3678,8 +3675,8 @@ def _subgroup_isotropic_orbit_representatives(subgroup, rank, *, flag=False):
     # The ambient classes always come from the port's classification: the
     # in-repo discriminant-class route exhibits its representatives by an
     # integral-point enumeration that does not return on the Enriques lattice
-    # (its Normaliz walk is measured at over twenty minutes before failing),
-    # while the port's line route answers the same classes in tens of seconds.
+    # (its Normaliz walk fails there), while the port's line route answers the
+    # same classes.
     sourced = orthogonal_group.isotropic_orbit_representatives(rank, flag=flag)
     with stage("coset splitting and transport", row):
         for representative in sourced:
@@ -3733,7 +3730,7 @@ def _subgroup_isotropic_equivalence_witness(subgroup, left, right, *, flag=False
         # element carrying one to the other maps the class data of the first
         # onto that of the second (the plane isometry between two
         # word-transported representatives reaches the port's generic
-        # enumeration on this lattice, and the separated pairs never start it).
+        # enumeration on this lattice, and the separated pairs never start it.
         if not flag and quotient.invariant_separates_isotropic_orbits(left, right):
             return None
     # The parabolic split's own lifts are ambient isometries between the

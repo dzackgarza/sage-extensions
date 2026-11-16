@@ -517,10 +517,10 @@ class CatConstructionsMixin:
 
         This is how the constructions reach a category, and it has to be this
         rather than the Cat-object attribute fallback, because **most owned
-        categories are not objects the preamble builds**.  Measured on the real
-        tree: of nine representative owned categories exactly one -- the bare
-        root -- is a ``Parent``.  Every axiom category, every functorial
-        construction and every join is a class Sage constructs, including
+        categories are not objects the preamble builds**: of nine representative
+        owned categories exactly one -- the bare root -- is a ``Parent``.  Every
+        axiom category, every functorial construction and every join is a class
+        Sage constructs, including
         ``Lattices.U.category()``, which is a ``JoinCategory``.  No change to
         the preamble's own class declarations reaches those, because
         ``Category.join`` builds them inside Sage.
@@ -793,9 +793,9 @@ class OwnedCategoryMixin(CatConstructionsMixin):
     because the flip puts construction on the class but never the parameter:
     two such categories have the same provider and the same super-category
     named classes, so literally the same bases, and each object holds its own
-    parameter as instance data.  So the cache is honoured below, and measured
-    to track Sage: same key shares, different key does not, and a shared class
-    still enforces its obligations.
+    parameter as instance data.  So the cache is honoured below, and it tracks
+    Sage: same key shares, different key does not, and a shared class still
+    enforces its obligations.
     """
 
     _TIED_NAMED_CLASSES = frozenset(("parent_class", "element_class", "morphism_class"))
@@ -1838,20 +1838,19 @@ class OwnedCategoryObject:
     ``Cat``'s constructions the ordinary Sage way and nothing is installed on a
     class the preamble does not own.
 
-    **What this currently buys, stated so it is not re-derived.**  It buys no
-    computation.  Two justifications for it have been measured and falsified:
-    the \(\mathbf{Cat}\) constructions do *not* reach a category this way --
-    they arrive through ``subcategory_class``, which is what covers the joins
-    and axiom categories most owned categories actually are -- and ``Mor(C, D)``
+    **What this buys, and what it does not.**  It buys no computation.  The
+    \(\mathbf{Cat}\) constructions do *not* reach a category this way -- they
+    arrive through ``subcategory_class``, which is what covers the joins and
+    axiom categories most owned categories actually are -- and ``Mor(C, D)``
     does *not* route to the functor space by parenthood either; that follows
     the domain being an owned category, again through ``subcategory_class``.
     It is kept because a category **is** an object of \(\mathbf{Cat}\), which
     is what ``Cat.super_categories() == [Objects()]`` says, and the code should
     say it too: foundational structure is not discarded for having no callers.
-    Its one near-use so far: had Sage's ``Morphism`` been available as a base
-    for functors, it would have *required* the boundary categories to be
-    parents -- see ``abstract_categories/functors.sage``, which explains why
-    that route is closed.
+    Sage's ``Morphism`` is not available as a base for functors; were it, it
+    would *require* the boundary categories to be parents -- see
+    ``abstract_categories/functors.sage``, which explains why that route is
+    closed.
 
     The base order below every subclass must keep is
     ``OwnedCategoryMixin, OwnedCategoryObject, <Sage category base>, Parent``:

@@ -508,9 +508,9 @@ class SubobjectsCategory(
         A subobject of :math:`B` is the pair :math:`(A, f: A \hookrightarrow
         B)`.  Thus the object that contains it is ``f.codomain()``.
 
-        The migrated source also declared ``ambient()``.  That declaration is
-        not here.  It gives the codomain a second name, and it is a
-        data-accessor obligation.  The construction chain supplies such data.
+        There is no ``ambient()``.  It gives the codomain a second name for a
+        datum the construction chain already supplies: a data-accessor
+        obligation, not a new object.
         """
 
         def inclusion(self) -> Morphism:

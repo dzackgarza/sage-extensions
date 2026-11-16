@@ -50,8 +50,8 @@ class Coble:
 
     @staticmethod
     def rank_ten_coxeter_roots():
-        # The archived migration fixed the rank-ten configuration in the
-        # Nikulin (10,10,1) model U(2) + A1^8.  Construct that model directly.
+        # The rank-ten configuration is fixed in the Nikulin (10,10,1) model
+        # U(2) + A1^8.  Construct that model directly.
         lattice = NamedLattices.U_2
         for _ in range(8):
             lattice = lattice + NamedLattices.Z.twist(-2)
