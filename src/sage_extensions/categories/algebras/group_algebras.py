@@ -74,6 +74,34 @@ class GroupAlgebras(OwnedCategoryOverBaseRing):
         def _repr_(self):
             return f"Group algebra of {self.group()} over {self.base_ring()}"
 
+        def class_sum(self, conjugacy_class):
+            r"""The class sum \(\sum_{h\in C} h\) of a conjugacy class \(C\) of \(G\).
+
+            A conjugacy class is an orbit of the group's conjugation action
+            \(g.x = g\,x\,g^{-1}\), and the orbits are what
+            `Groups.conjugacy_classes` presents; the argument is one of those
+            orbits, not a set of group elements with the same members, since
+            for a finite group the two hold the same elements and only the
+            orbit is the group's class.  The sum itself is the linear
+            combination the module owns, with coefficient one on each point of
+            the class (`Modules.linear_combination`).
+
+            These sums are the class sums over which \(Z(R[G])\) has its basis
+            (Isaacs, *Character Theory of Finite Groups*, Theorem 2.4).
+            """
+            group = self.group()
+            classes = group.conjugacy_classes()
+            if conjugacy_class not in classes:
+                raise ValueError(
+                    f"{conjugacy_class} is not a conjugacy class of {group}: a class sum is the "
+                    f"sum over one of the group's conjugation orbits, which {classes} presents, "
+                    "and a set of group elements with the same members is not such an orbit"
+                )
+            one = self.base_ring().one()
+            return self.linear_combination(
+                {point: one for point in conjugacy_class.points()}
+            )
+
         @cached_method
         def _finite_group_algebra_center(self):
             r"""The pair of the centre \(Z(R[G])\) and its inclusion in \(R[G]\).
@@ -83,13 +111,10 @@ class GroupAlgebras(OwnedCategoryOverBaseRing):
             classes \(C\) of \(G\) form an \(R\)-basis of \(Z(R[G])\) (Isaacs,
             *Character Theory of Finite Groups*, Theorem 2.4).  A conjugacy
             class is an orbit of the group's conjugation action, and the orbits
-            are the group's own operation `Groups.conjugacy_classes`; the
-            classes are read from it rather than closed up beside it.  That
-            basis replaces the equalizers the general centre intersects; the
-            algebra on it is built the same way.  Each class sum is the linear
-            combination of the module's generators with coefficient one on the
-            class (`Modules.linear_combination`), which is the operation the
-            module owns for a finite family of generators.
+            are the group's own operation `Groups.conjugacy_classes`; each sum
+            is this algebra's `class_sum` of one of those orbits, which is the
+            linear combination of the module's generators with coefficient one
+            on the class.
 
             The centre and its inclusion come from ``_center_algebra``, which
             owns the product and the unit the inclusion is made by.
@@ -99,15 +124,9 @@ class GroupAlgebras(OwnedCategoryOverBaseRing):
                 f"the centre of {self} is computed from conjugacy-class sums, which needs a finite group, but "
                 f"{group} is not known to be finite"
             )
-            one = self.base_ring().one()
             class_sums = finite_ordered_set(
                 [
-                    self.linear_combination(
-                        {
-                            element: one
-                            for element in conjugacy_class.points()
-                        }
-                    )
+                    self.class_sum(conjugacy_class)
                     for conjugacy_class in group.conjugacy_classes()
                 ]
             )
