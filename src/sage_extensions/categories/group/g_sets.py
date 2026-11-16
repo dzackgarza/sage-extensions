@@ -319,17 +319,28 @@ class FiniteGSets(CategoryPacketMethods, OwnedParameterizedCategory):
         action is realized without evaluating the supplied action a second
         time (``orbit_schreier_morphism`` reads the images back from
         ``permutation_representation``).  The sweep is a route to that set,
-        not a datum of it: nothing of it is stored on the set afterwards, so a
-        later question about this action is answered by the action.  The seeds
-        are materialized once, so a one-shot iterable is consumed before, not
-        after, the sweep.
+        not a datum of it: a later question about this action is answered by
+        the action.  The seeds are materialized once, so a one-shot iterable is
+        consumed before, not after, the sweep.
+
+        A sweep from a single seed is that seed's orbit: every point it reached
+        is reached from the seed, and the word it assigned each one carries the
+        seed to that point, which is a transversal of the orbit.  So the answer
+        to the first orbit question is the answer this call already computed,
+        and it is cached as that question's answer rather than searched for a
+        second time (``_orbit_of``).  From several seeds the sweep is not any
+        one seed's orbit, and each seed's own orbit searches as any point's
+        does.
         """
         seeds = tuple(seeds)
         augmentation = self.group().selected_group_resolution().augmentation()
-        points, _words, transitions = self._orbit_words(
+        points, words, transitions = self._orbit_words(
             seeds, action, augmentation, retain_transitions=True,
         )
-        return self._from_orbit_sweep(points, action, augmentation, transitions)
+        g_set = self._from_orbit_sweep(points, action, augmentation, transitions)
+        if len(seeds) == 1:
+            g_set._orbit_of.set_cache((g_set, words, augmentation), seeds[0])
+        return g_set
 
     def _from_orbit_sweep(self, points, action, augmentation, transitions):
         r"""Realize the finite action from its complete generator transition table.
@@ -740,6 +751,11 @@ class FiniteGSets(CategoryPacketMethods, OwnedParameterizedCategory):
             evaluated a second time, and the words it assigns are the section
             ``p |-> t_p``.  The orbit is realized from that sweep's table,
             which is read at construction and not stored.
+
+            A set built from one seed already holds this answer for that seed:
+            the sweep ``from_finite_orbits`` ran was the seed's orbit, so its
+            points and words were cached here when the set was built, and the
+            first question about that orbit searches nothing.
             """
             augmentation = self.acting_group().selected_group_resolution().augmentation()
             category = FiniteGSets(self.acting_group())
@@ -778,8 +794,15 @@ class FiniteGSets(CategoryPacketMethods, OwnedParameterizedCategory):
                 for generator in augmentation.domain().group_generators()
             )
 
+        @cached_method(key=lambda self, point: self.ranking_map()(point))
         def orbit_schreier_morphism(self, point):
-            r"""Schreier's lemma on the orbit of ``point``: ``E -> G`` with image ``G_point``."""
+            r"""Schreier's lemma on the orbit of ``point``: ``E -> G`` with image ``G_point``.
+
+            The family is derived data of this ``G``-set at this point, so it is
+            computed on the first request and the later ones are answered from
+            the cache: the sections it realizes and the composites it forms are
+            not paid for twice.
+            """
             orbit, words, augmentation = self._orbit_of(point)
             ranking = orbit.ranking_map()
             word_section = Sets().Mor(orbit, augmentation.domain())(
@@ -805,6 +828,7 @@ class FiniteGSets(CategoryPacketMethods, OwnedParameterizedCategory):
             )
             return orbit, section
 
+        @cached_method(key=lambda self, point: self.ranking_map()(point))
         def orbit_schreier_factors(self, point):
             r"""Return the letters and transversals whose composites are the Schreier family.
 
@@ -817,6 +841,10 @@ class FiniteGSets(CategoryPacketMethods, OwnedParameterizedCategory):
             family uses: ``letters[j]`` is the ``j``-th letter and
             ``transversals[i]`` is ``t_p`` for the ``i``-th orbit point, the
             augmentation of that point's section word.
+
+            The pairs are derived data of this ``G``-set at this point, so they
+            are computed on the first request and later requests are answered
+            from the cache: realizing the transversals is not paid for twice.
 
             The composite law is the caller's to check: for the ``i``-th orbit
             point ``p`` and the ``j``-th letter ``s``, the family element is
@@ -1022,6 +1050,7 @@ class LeftCosetGSets(OwnedParameterizedCategory):
             self._coset_augmentation = coset_augmentation
             super().__init__(**rest)
 
+        @cached_method(key=lambda self, drop_trivial=False: bool(drop_trivial))
         def schreier_generating_morphism(self, *, drop_trivial=False):
             r"""Schreier's lemma: ``E ->> H`` from the section of ``G -> G/H``.
 
@@ -1032,6 +1061,12 @@ class LeftCosetGSets(OwnedParameterizedCategory):
             ``drop_trivial`` omits the generators whose image is the identity
             (``_orbit_schreier_morphism``), so the family presents the same
             subgroup without its trivial members.
+
+            The morphism is derived data of this coset space, so it is computed
+            on the first request for it and a later request for the same family
+            -- the whole one or the trimmed one, the default written out or not
+            -- is answered from the cache: the point-letter family is not built
+            a second time.
             """
             assert self._coset_word_section is not None, (
                 f"Schreier generators of {self.subgroup()} are read from a pointed coset space "

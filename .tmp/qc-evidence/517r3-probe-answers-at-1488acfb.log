@@ -1,0 +1,57 @@
+=== tree 1488acfb5636b16c6836828e5f29208d610d3712
+=== port 991b88b095a42a1e3679569ea42328c900c120f6
+=== start 07:46:26
+PROBE A card 3
+PROBE A point 1 orbit_card 3 orbit_points (1, (1 2 3), (1 3 2)) is_this_set False section (1, g_(1 2 3), g_(1 2 3)^2)
+PROBE A point 1 letters ((1 2 3),) transversals (1, (1 2 3), (1 3 2))
+PROBE A point 1 family (1, 1, 1)
+PROBE A point 1 perms ((1 2 3),)
+PROBE B card 4
+PROBE B one-first point 1 orbit_card 3 orbit_points (1, (1 2 3), (1 3 2)) is_this_set False section (1, g_(1 2 3), g_(1 2 3)^2)
+PROBE B one-first point 1 letters ((1 2 3),) transversals (1, (1 2 3), (1 3 2))
+PROBE B one-first point 1 family (1, 1, 1)
+PROBE B one-first point 1 perms ((1 2 3),)
+PROBE B one-first point 5 orbit_card 1 orbit_points (5,) is_this_set False section (1,)
+PROBE B one-first point 5 letters ((1 2 3),) transversals (1,)
+PROBE B one-first point 5 family ((1 2 3),)
+PROBE B one-first point 5 perms (1,)
+PROBE B five-first point 5 orbit_card 1 orbit_points (5,) is_this_set False section (1,)
+PROBE B five-first point 5 letters ((1 2 3),) transversals (1,)
+PROBE B five-first point 5 family ((1 2 3),)
+PROBE B five-first point 5 perms (1,)
+PROBE B five-first point 1 orbit_card 3 orbit_points (1, (1 2 3), (1 3 2)) is_this_set False section (1, g_(1 2 3), g_(1 2 3)^2)
+PROBE B five-first point 1 letters ((1 2 3),) transversals (1, (1 2 3), (1 3 2))
+PROBE B five-first point 1 family (1, 1, 1)
+PROBE B five-first point 1 perms ((1 2 3),)
+PROBE C five-seed-first point 5 orbit_card 1 orbit_points (5,) is_this_set False section (1,)
+PROBE C five-seed-first point 5 letters ((1 2 3),) transversals (1,)
+PROBE C five-seed-first point 5 family ((1 2 3),)
+PROBE C five-seed-first point 5 perms (1,)
+PROBE C five-seed-first point 1 orbit_card 3 orbit_points (1, (1 2 3), (1 3 2)) is_this_set False section (1, g_(1 2 3), g_(1 2 3)^2)
+PROBE C five-seed-first point 1 letters ((1 2 3),) transversals (1, (1 2 3), (1 3 2))
+PROBE C five-seed-first point 1 family (1, 1, 1)
+PROBE C five-seed-first point 1 perms ((1 2 3),)
+PROBE D card 3
+PROBE D point (1 2) orbit_card 3 orbit_points ((1 2), (2 3), (1 3)) is_this_set False section (1, g_(1 2 3), g_(1 2 3)^2)
+PROBE D point (1 2) letters ((1 2 3), (1 2)) transversals (1, (1 2 3), (1 3 2))
+PROBE D point (1 2) family (1, (1 2), 1, (1 2), 1, (1 2))
+PROBE D point (1 2) perms ((1 2 3), (2 3))
+PROBE D point (1 3) orbit_card 3 orbit_points ((1 3), (1 2), (2 3)) is_this_set False section (1, g_(1 2 3), g_(1 2))
+PROBE D point (1 3) letters ((1 2 3), (1 2)) transversals (1, (1 2 3), (1 2))
+PROBE D point (1 3) family (1, 1, (1 3), (1 3), (1 3), 1)
+PROBE D point (1 3) perms ((1 2 3), (1 3))
+PROBE D point (2 3) orbit_card 3 orbit_points ((2 3), (1 3), (1 2)) is_this_set False section (1, g_(1 2 3), g_(1 2 3)^2)
+PROBE D point (2 3) letters ((1 2 3), (1 2)) transversals (1, (1 2 3), (1 3 2))
+PROBE D point (2 3) family (1, (2 3), 1, (2 3), 1, (2 3))
+PROBE D point (2 3) perms ((1 2 3), (1 2))
+PROBE E full (1, (1 2), 1, (1 2), 1, (1 2))
+PROBE E trimmed ((1 2), (1 2), (1 2))
+PROBE E again 6
+PROBE E same object False
+PROBE F action calls after the sweep 3
+PROBE F point 1 orbit_card 3 orbit_points (1, (1 2 3), (1 3 2)) is_this_set False section (1, g_(1 2 3), g_(1 2 3)^2)
+PROBE F point 1 letters ((1 2 3),) transversals (1, (1 2 3), (1 3 2))
+PROBE F point 1 family (1, 1, 1)
+PROBE F point 1 perms ((1 2 3),)
+PROBE F action calls after the orbit question 3
+=== exit 0 at 07:46:33

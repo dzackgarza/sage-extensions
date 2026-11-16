@@ -1,0 +1,48 @@
+=== tree: b54acd747a3dfffff2955918bb62fcebcef5d8be (modified: 2 paths)
+=== port: 991b88b095a42a1e3679569ea42328c900c120f6
+=== files: tests/groups/test_a_searched_orbit_carries_no_sweep.sage
+=== start: 07:49:57
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_______ test_a_searched_orbit_carries_only_the_state_of_the_g_set_it_is ________
+
+    def test_a_searched_orbit_carries_only_the_state_of_the_g_set_it_is() -> None:
+        r"""The orbit of the fixed point ``5`` is the one-point ``G``-set, state and all.
+    
+        The family's sweep reaches four points, three of them in the regular orbit;
+        the orbit of ``5`` is ``{5}``.  Both it and the ``G``-set built directly on
+        that point set with the trivial action are asked the one question each owns,
+        the enumeration of its points, so that what remains is what a search left:
+        nothing.  A sweep retained on the orbit would be one more name than the
+        construction establishes, and it is the name a later question would read.
+        """
+        group = Groups.C(3)
+        g_set = FiniteGSets(group).from_finite_orbits(
+            (group.one(), 5), _regular_beside_a_fixed_point
+        )
+        assert g_set.cardinality() == cardinal(4)
+    
+        searched, _section = g_set.orbit_transversal_words(5)
+        assert tuple(searched) == (5,)
+    
+        direct = FiniteGSets(group)(searched.point_set(), lambda element, point: point)
+        searched.ranking_map()
+        direct.ranking_map()
+    
+>       assert names_beyond(direct, searched) == frozenset()
+E       AssertionError: assert frozenset({'_...transitions'}) == frozenset()
+E         
+E         Extra items in the left set:
+E         '_retained_transitions'
+E         '_retained_transition_augmentation'
+E         Use -v to get more diff
+
+tests/groups/test_a_searched_orbit_carries_no_sweep.sage:46: AssertionError
+============================= slowest 5 durations ==============================
+0.04s call     tests/groups/test_a_searched_orbit_carries_no_sweep.sage::test_a_searched_orbit_carries_only_the_state_of_the_g_set_it_is
+
+(2 durations < 0.005s hidden.  Use -vv to show these durations.)
+=========================== short test summary info ============================
+FAILED tests/groups/test_a_searched_orbit_carries_no_sweep.sage::test_a_searched_orbit_carries_only_the_state_of_the_g_set_it_is
+1 failed in 2.42s
+=== exit: 1 at 07:50:01
