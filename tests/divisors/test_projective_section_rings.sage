@@ -29,6 +29,27 @@ def test_section_ring_of_O_2_on_P1_is_the_coordinate_ring_of_the_conic() -> None
     assert ring.homogeneous_degree(u * w) == 2
 
 
+def test_the_two_roads_of_the_section_ring_constructor_record_one_ambient_category() -> None:
+    r"""``R(P^1, O(2))`` and ``R(P^2, O(1))`` are both objects of ``SectionRings(QQ)``.
+
+    One constructor asks for both: ``SectionRings(base)(L)`` builds the
+    semigroup algebra of a line bundle whose degree-one sections are linearly
+    independent, and ``SectionRings(base)(X, D)`` builds the ring of the cone
+    over a divisor polytope.  The category that asked is defining construction
+    data (``OWN-15``), and ``Mor`` is stated over the ambient category, so the
+    two roads have to record the same one.
+    """
+    line = ProjectiveSpaces(QQ)(1, names=("x0", "x1"))
+    from_bundle = line.O(2).section_ring()
+    fans = RationalPolyhedralFans(ZZ.free_module(2))
+    plane = fans.projective_space_fan().toric_variety(QQ)
+    from_divisor = plane.section_ring(plane.hyperplane_divisor())
+
+    assert from_bundle.ambient_category() == SectionRings(QQ)
+    assert from_divisor.ambient_category() == SectionRings(QQ)
+    assert from_bundle.ambient_category() == from_divisor.ambient_category()
+
+
 def test_section_ring_of_O_1_1_on_P1_x_P1_is_the_coordinate_ring_of_the_segre_quadric() -> None:
     r"""``R(P^1 x P^1, O(1,1))`` has pieces of rank ``(d + 1)^2``: 4, 9.
 
