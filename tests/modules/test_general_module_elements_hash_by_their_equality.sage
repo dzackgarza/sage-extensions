@@ -78,11 +78,14 @@ def test_the_zero_class_of_the_almost_everywhere_quotient_is_a_point() -> None:
     r"""The zero class of ``L^1(RR)`` modulo the null functions is one element.
 
     Two integrable maps that agree outside a null set are one class, so the sum
-    of the zero class with itself is the zero class.  The quotient is what the
-    class hashes, and the module holds the class as an element.
+    of the zero class with itself is the zero class.  The class of the zero
+    function is what the module's element is, and its hash is that class's hash:
+    the module is not mixed into the answer, so the assertion reads a value of
+    the group rather than one the module alone could supply.
     """
     quotient = Lp(1, RR, RR).quotient_by_null_functions()
     zero = quotient.zero()
 
-    assert hash(zero) == hash(quotient.zero())
-    assert FiniteOrderedSets()((zero,)).cardinality() == 1
+    assert zero == quotient.zero()
+    assert hash(zero) == hash(zero.underlying_element())
+    assert FiniteOrderedSets()((zero, zero + zero)).cardinality() == 1
