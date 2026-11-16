@@ -143,6 +143,53 @@ def test_a_completion_element_with_no_source_hashes_the_value_it_is() -> None:
     assert FiniteOrderedSets()((product, image(1), completion.one())).cardinality() == 1
 
 
+def test_two_presentations_of_one_transcendental_real_are_one_point() -> None:
+    r"""``log(2)/2 + log(2)/2 = log(2)``: one real no value reading places.
+
+    The value reading places algebraic values in ``AA`` and no others, so both
+    presentations of this real hash as one real of the field.  The equality is
+    decided just the same: the difference normalizes to zero, which is the
+    statement that the two presentations are one real, and the hash is coarser
+    than that equality rather than a reason to withhold it.
+    """
+    logarithm = RR(2).log()
+    halved_and_doubled = RR(2).log() / 2 + RR(2).log() / 2
+
+    assert halved_and_doubled == logarithm
+    assert hash(halved_and_doubled) == hash(logarithm)
+    assert FiniteOrderedSets()((halved_and_doubled, logarithm)).cardinality() == 1
+    assert logarithm != RR(2)
+
+
+def test_a_completion_element_of_any_degree_hashes_the_value_it_is() -> None:
+    r"""``(1 - x)^{-1} (1 - x) x^4 = x^4``, at a precision that truncates ``x^4`` away.
+
+    The completion is taken at precision three, so the truncation it computes
+    for the product is the zero ring element, and the truncation of ``x^4`` is
+    that same zero: a hash read off a finite truncation cannot separate the
+    product from the zero element at all, and a hash read off the exact source
+    expression separates the two presentations of the one element, because the
+    product keeps no source expression.  The value the product is has degree
+    four; the completion retains the value exactly, so the two presentations are
+    one point, and the image of ``x^4`` hashes as the ring element it is the
+    image of.
+    """
+    plane = QQ.polynomial_ring(("x", "y"))
+    x = plane.algebra_generator("x")
+    completion = plane.adic_completion(plane.ideal(x), precision=3)
+    image = completion.completion_map()
+    unit = image(1 - x)
+    product = unit.inverse_of_unit() * image((1 - x) * x ** 4)
+    fourth_power = image(x ** 4)
+
+    assert product.exact_source_expression() is None
+    assert product == fourth_power
+    assert hash(product) == hash(fourth_power)
+    assert hash(fourth_power) == hash(plane(x ** 4))
+    assert FiniteOrderedSets()((product, fourth_power)).cardinality() == 1
+    assert FiniteOrderedSets()((fourth_power, plane(x ** 4))).cardinality() == 1
+
+
 def test_two_presentations_of_one_completion_element_are_one_point() -> None:
     r"""The completion of ``QQ[x, y]`` at ``(x)``: ``x + 1`` is the image of ``1`` plus ``x``.
 
