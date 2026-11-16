@@ -2971,3 +2971,18 @@ touch are identical between the two commits, so the runs are the pushed tree's.
 | `523r4-red-at-5ce18d3.log` | `5ce18d3`, clean tree | `tests/rings/test_a_matrix_ring_divides_only_by_its_units.sage` alone: **2 failed, 7 passed in 1.92 s** — `f.inverse()` for a distinct-endpoint map over Z/4 raises `AssertionError: cannot compute the kernel` while `~f` answers, and `a.determinant() is a.determinant()` is False (`assert 1 is 1`) |
 | `523r4-green-at-63367f9.log` | `63367f9`, clean tree | the same file alone: **9 passed in 1.51 s** |
 | `523r4-probe-at-63367f9.log`, `523r4-probe.py` | `63367f9`, clean tree | the deciding expressions of the issue, one per line with its wall time: division by a unit and by a nonunit over ZZ, Z/4 and Z[x]; the distinct-endpoint inverse over Z/4 with both composites the identity; the empty and the rectangular matrix; `inverse() is inverse()`, `determinant() is determinant()` and `inverse_of_unit() is inverse()`; `A @ ~A` the identity over QQ and ZZ in ranks 2, 4, 6; the rank-one matrix space over the noncommutative M_2(ZZ), whose three spellings of the inverse all take the kernel route |
+
+## `#523` round 3, re-taken: the matrix inverse at any two endpoints, once, with its hypotheses (2026-11-16)
+
+The two commits were rebased from `ab2e435` onto `eb5baa8`, which changes their
+ids and not their content (`git diff ab2e435 eb5baa8` over the two source files
+and the test file is empty), so the three runs are taken again at the commits
+being pushed and named by what they are.  `f7d2e12` is the test commit,
+`e5c7a25` its repair, and the probe ran on that tree.  Same runtime and command
+shape as the section above; `523r4-probe.py` is the probe.
+
+| log | tree | result |
+| --- | --- | --- |
+| `523r3-red-test-commit.log` | `f7d2e12`, clean tree | `tests/rings/test_a_matrix_ring_divides_only_by_its_units.sage` alone: **2 failed, 7 passed in 3.09 s** — `f.inverse()` for a distinct-endpoint map over Z/4 raises `AssertionError: cannot compute the kernel` while `~f` answers, and `a.determinant() is a.determinant()` is False (`assert 1 is 1`) |
+| `523r3-green-fix-commit.log` | `e5c7a25`, clean tree | the same file alone: **9 passed in 2.57 s** |
+| `523r3-probe-fix-commit.log` | `e5c7a25`, clean tree | the deciding expressions of the issue, one per line with its wall time: division by a unit and by a nonunit over ZZ, Z/4 and Z[x]; the distinct-endpoint inverse over Z/4 with both composites the identity; the empty and the rectangular matrix; `inverse() is inverse()`, `determinant() is determinant()` and `inverse_of_unit() is inverse()`; `A @ ~A` the identity over QQ and ZZ in ranks 2, 4, 6; the rank-one matrix space over the noncommutative M_2(ZZ), whose three spellings of the inverse all take the kernel route |

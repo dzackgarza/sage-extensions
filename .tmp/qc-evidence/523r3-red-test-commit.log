@@ -1,0 +1,167 @@
+tree SHA: f7d2e12ddb78d859fe33f0081bd4c74cde8bde47 (modified paths: 0)
+tree: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/wt523red4
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 7.59 10.18 8.68 7/659 3018131
+probe:  files: tests/rings/test_a_matrix_ring_divides_only_by_its_units.sage extra: 
+inner 900 s, outer 960 s, guard 6144 MiB
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+time gates OFF (--no-time-gates): star import 3.03 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: asyncio-1.5.0, xdist-3.8.0, reportlog-1.0.0, platformdirs-4.13.5, hypothesis-6.170.15, anyio-4.15.1, timeout-2.4.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 9 items
+
+tests/rings/test_a_matrix_ring_divides_only_by_its_units.sage .......FF  [100%]
+
+=================================== FAILURES ===================================
+____ test_a_matrix_between_distinct_free_modules_inverts_by_its_determinant ____
+
+    def test_a_matrix_between_distinct_free_modules_inverts_by_its_determinant() -> None:
+        r"""$f: V \to W$ over $\mathbf{Z}/4$ with $\det f = 3$ has the inverse $\frac{1}{3}f$ as $W \to V$.
+    
+        The endpoints are distinct free modules of rank two: the frame of $V$ is
+        the ordinal $\{0, 1\}$ and that of $W$ is $\{a, b\}$.  $f$ is still a
+        square matrix over the coefficient ring, and $3 \cdot 3 \equiv 1 \pmod 4$,
+        so it is inverted over $R$ by the same determinant and read back as a map
+        $W \to V$ -- not by a kernel, which this ring does not supply, and not
+        only for endomorphisms.
+        """
+        ring = ZZ.quotient_ring(ZZ.ideal(4))
+        source = ring ** 2
+        target = ring.free_module(("a", "b"))
+        f = source.Mor(target).from_rows([[3, 0], [0, 1]])
+>       g = f.inverse()
+            ^^^^^^^^^^^
+
+tests/rings/test_a_matrix_ring_divides_only_by_its_units.sage:183: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py:2797: in inverse
+    assert self.is_injective(), (
+           ^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py:1839: in is_injective
+    return self.kernel().is_zero()
+           ^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:2328: in sage.misc.cachefunc.CachedMethodCallerNoArgs.__call__
+    ???
+src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py:1536: in kernel
+    represented = owner._represented_kernel_of_morphism(self)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/framed/framed_free_modules.py:1149: in _represented_kernel_of_morphism
+    return _selected_presentation_kernel(morphism)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/framed/finitely_generated/finitely_presented_modules.py:2761: in _selected_presentation_kernel
+    return _singular_presentation_kernel(morphism)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+morphism = Generic morphism:
+  From: Free module on {(1modIdeal(4)ofIntegerRing)*[0], (1modIdeal(4)ofIntegerRing)*[1]} over Integ...ule on {(1modIdeal(4)ofIntegerRing)*[a], (1modIdeal(4)ofIntegerRing)*[b]} over Integer Ring / Ideal (4) of Integer Ring
+
+    def _singular_presentation_kernel(morphism):
+        r"""Return ``ker(morphism)`` over an exact polynomial coefficient presentation.
+    
+        Let ``A = P/I`` with ``P`` a polynomial ring over a field or over the
+        integers, and let ``f : A^n/D -> A^m/Q``, where ``D`` and ``Q`` are the
+        relation submodules the selected presentations supply.  Lifting to ``P``,
+        the preimage of the target relations is
+    
+        ``L = {x in P^n : F x in im(Q)}``,
+    
+        which is the first ``n`` coordinates of ``ker([F | Q] : P^{n+t} -> P^m)``:
+        a vector of ``L`` is a kernel vector of the row-augmented matrix, and every
+        kernel vector of that matrix projects to one.  Then
+        ``ker(f) = L/D``, presented by the syzygies of the generators of ``L``
+        together with the generators of ``D`` written in those generators.  That is
+        the presentation of the cokernel of the inclusion ``D -> L``: the quotient
+        of a module by a submodule is the cokernel of the inclusion, and a cokernel
+        of a map between submodules of free modules is presented by the source
+        generators' coordinates in the target's together with the target's own
+        syzygies.
+    
+        Singular's maintained ``modulo`` computes ``{v : Av in B}`` -- the
+        preimage above -- ``syz`` the syzygy module, and ``lift`` the coordinates
+        of a vector in a submodule.  This adapter crosses only matrices and
+        coefficient values; the returned object is the owned finitely presented
+        module equipped with its actual inclusion into the domain, and no Singular
+        module escapes into the public API.
+        """
+        from sage.libs.singular.function_factory import ff
+        from sage.matrix.constructor import matrix
+    
+        domain = morphism.domain()
+        codomain = morphism.codomain()
+        ring = _owned_ring(domain.base_ring())
+        if _owned_ring(codomain.base_ring()) is not ring:
+            raise ValueError(
+                f"cannot compute the kernel of {morphism}: its domain is over {ring} and its codomain "
+                f"over {codomain.base_ring()}, but a module morphism has one base ring"
+            )
+    
+        context = _singular_coefficient_presentation(ring)
+>       assert context is not None, (
+               ^^^^^^^^^^^^^^^^^^^
+            f"cannot compute the kernel of {morphism}: the kernel of a map of presented {ring}-modules "
+            "is read over a selected exact polynomial coefficient presentation -- a polynomial ring "
+            "over a field or over the integers, or a quotient of one over a field -- and this ring "
+            "supplies none"
+        )
+E       AssertionError: cannot compute the kernel of Generic morphism:
+E         From: Free module on {(1modIdeal(4)ofIntegerRing)*[0], (1modIdeal(4)ofIntegerRing)*[1]} over Integer Ring / Ideal (4) of Integer Ring
+E         To:   Free module on {(1modIdeal(4)ofIntegerRing)*[a], (1modIdeal(4)ofIntegerRing)*[b]} over Integer Ring / Ideal (4) of Integer Ring: the kernel of a map of presented Integer Ring / Ideal (4) of Integer Ring-modules is read over a selected exact polynomial coefficient presentation -- a polynomial ring over a field or over the integers, or a quotient of one over a field -- and this ring supplies none
+
+src/sage_extensions/categories/modules/framed/finitely_generated/finitely_presented_modules.py:3290: AssertionError
+___________ test_the_inverse_of_a_matrix_is_one_datum_of_the_matrix ____________
+
+    def test_the_inverse_of_a_matrix_is_one_datum_of_the_matrix() -> None:
+        r"""The inverse and the determinant are answered once per matrix, not once per request.
+    
+        $A = \begin{pmatrix}2&1\\1&1\end{pmatrix}$ is a unit of $M_2(\mathbf{Z})$
+        with $\det A = 1$.  The unit inverse asks the determinant through the unit
+        predicate and then reads it again on its way to the matrix inverse; both
+        reads are the same datum, and the second request for the inverse returns
+        the object the first one built.
+        """
+        matrices = ZZ.matrix_space(2)
+        a = matrices.from_rows([[2, 1], [1, 1]])
+    
+>       assert a.determinant() is a.determinant()
+E       assert 1 is 1
+E        +  where 1 = determinant()
+E        +    where determinant = Generic endomorphism of Free module on {[0], [1]} over Integer Ring.determinant
+E        +  and   1 = determinant()
+E        +    where determinant = Generic endomorphism of Free module on {[0], [1]} over Integer Ring.determinant
+
+tests/rings/test_a_matrix_ring_divides_only_by_its_units.sage:206: AssertionError
+=============================== time-gate report ===============================
+session star import took 3.03 s; the measured ceiling is 3 s
+============================== slowest durations ===============================
+0.25s call     tests/rings/test_a_matrix_ring_divides_only_by_its_units.sage::test_a_matrix_over_a_polynomial_ring_inverts_by_its_unit_determinant
+0.21s call     tests/rings/test_a_matrix_ring_divides_only_by_its_units.sage::test_a_matrix_over_the_integers_mod_four_is_its_own_inverse
+0.05s call     tests/rings/test_a_matrix_ring_divides_only_by_its_units.sage::test_a_matrix_over_the_integers_mod_four_whose_determinant_is_no_unit_is_refused
+0.05s call     tests/rings/test_a_matrix_ring_divides_only_by_its_units.sage::test_a_matrix_divides_by_the_unit_inverse_of_its_divisor
+0.03s call     tests/rings/test_a_matrix_ring_divides_only_by_its_units.sage::test_a_matrix_that_is_no_unit_of_the_ring_divides_nothing
+0.03s call     tests/rings/test_a_matrix_ring_divides_only_by_its_units.sage::test_a_matrix_between_distinct_free_modules_inverts_by_its_determinant
+0.01s call     tests/rings/test_a_matrix_ring_divides_only_by_its_units.sage::test_the_public_inverse_of_2I_over_the_integers_is_refused_by_the_ring
+0.01s call     tests/rings/test_a_matrix_ring_divides_only_by_its_units.sage::test_a_matrix_divides_by_the_unit_inverse_on_the_right
+
+(19 durations < 0.005s hidden.  Use -vv to show these durations.)
+=========================== short test summary info ============================
+FAILED tests/rings/test_a_matrix_ring_divides_only_by_its_units.sage::test_a_matrix_between_distinct_free_modules_inverts_by_its_determinant
+FAILED tests/rings/test_a_matrix_ring_divides_only_by_its_units.sage::test_the_inverse_of_a_matrix_is_one_datum_of_the_matrix
+========================= 2 failed, 7 passed in 3.09s ==========================
+[peakrss] probe523: child waited=1 shell_code=1 samples=6
+[peakrss] peak tree RSS      : 338 MiB
+[peakrss] low-water MemAvail : 5171 MiB
+[peakrss] peak single VmHWM  : 341 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      330 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    10.0s procs=  3 rss=   338 MiB hwm=   341 MiB avail=  5171 MiB
+[peakrss]   t=     8.0s procs=  3 rss=   326 MiB hwm=   326 MiB avail=  5447 MiB
+[peakrss]   t=     6.0s procs=  3 rss=   316 MiB hwm=   316 MiB avail=  5467 MiB
+[peakrss]   t=     4.0s procs=  3 rss=   282 MiB hwm=   282 MiB avail=  5686 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   158 MiB hwm=   158 MiB avail=  5814 MiB
+launcher exit: 1
