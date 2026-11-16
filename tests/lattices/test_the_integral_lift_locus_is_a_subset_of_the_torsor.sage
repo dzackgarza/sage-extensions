@@ -11,8 +11,8 @@ That is the presentation, and it is what these tests pin: the two facts a subset
 owes.  A locus is a subset of the set it lies in, so ``T_Z`` carries ``T``'s inclusion.  And
 membership is the class test, asked of every point of ``T``: ``phi`` is a bijection onto
 ``T``, so a lift whose parameter is not in ``P`` is a point of ``T`` all the same, and it is
-not a member.  An empty residue locus gives the empty subset of ``T``, decided empty by the
-construction of that subset and not by a search of ``T``.
+not a member.  An empty residue locus gives the empty subset of ``T``, which is the least
+point of ``T``'s power set, decided empty by its construction and not by a search of ``T``.
 """
 
 from sage_extensions.all import *  # noqa: F401,F403
@@ -128,25 +128,30 @@ def test_a_parameter_outside_the_integral_lattice_is_not_a_member() -> None:
     assert locus.is_parent_of(torsor.integral_base_point()) is True
 
 
-def test_an_empty_residue_locus_gives_an_empty_subset() -> None:
-    r"""``T_Z`` is empty exactly when ``C`` is, and it is still a subset of ``T``.
+def test_an_empty_residue_locus_gives_the_empty_subset_of_the_torsor() -> None:
+    r"""``T_Z`` is empty exactly when ``C`` is, and it is then the empty subset of ``T``.
 
     ``U``'s and ``U(2)``'s marked null lines both reduce to rank zero, but no integral
     isometry joins the ambient lattices, whose determinants differ, so the residue locus is
     empty and so is the integral locus -- a decision the locus has to make for itself,
-    since a subset of an infinite torsor cannot be emptied by enumeration.  What it answers
-    with is the empty subset of ``T``: its inclusion lands in ``T``, and it admits no point
-    of ``T``, the torsor's own base point included.
+    since a subset of an infinite torsor cannot be emptied by enumeration.  The empty
+    subset of a set is the least point of its power set, and that is the object the empty
+    locus is: a point of ``P(T)``, carrying ``T``'s inclusion, admitting no point of ``T``.
     """
     source = Lattices(ZZ)("U")
     target = Lattices(ZZ)([[0, 2], [2, 0]])
     first = source.basis_vector(0).isotropic_reduction()
     second = target.basis_vector(0).isotropic_reduction()
     torsor = first.rational_lifts(second, first.Isom(second)(()))
+    power = torsor.power_set()
     locus = torsor.integral_lift_locus()
 
     assert source.determinant() != target.determinant()
     assert torsor.integral_parameter_classes().is_empty() is True
-    assert locus.is_empty() is True
+    assert locus is power.bottom()
+    assert locus in power
+    assert locus in Sets().Subobjects(torsor)
     assert locus.inclusion().codomain() == torsor
+    assert locus.is_empty() is True
+    assert locus.cardinality() == cardinal(0)
     assert locus.is_parent_of(torsor.base_point()) is False

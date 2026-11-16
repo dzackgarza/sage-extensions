@@ -6,6 +6,7 @@ from sage.rings.integer_ring import ZZ as SageZZ
 from sage_extensions.categories.algebras.graded_algebras import GradedAlgebras
 from sage_extensions.categories.algebras.semigroup_algebras import (
     AffineSemigroupAlgebras,
+    _affine_semigroup_algebra,
 )
 from sage_extensions.categories.modules.pure.modules import BilinearMap
 from sage_extensions.categories.rings.ring_foundation import (
@@ -382,7 +383,8 @@ def _line_bundle_section_ring(category, bundle):
         f"in degree one, although its multidegree {base_degree} is nonnegative"
     )
     names = tuple(f"s{position}" for position in range(len(semigroup_generators)))
-    return AffineSemigroupAlgebras(category.base_ring())(
+    return _affine_semigroup_algebra(
+        AffineSemigroupAlgebras(category.base_ring()),
         semigroup_generators,
         names=names,
         extra_categories=(category,),
@@ -428,7 +430,8 @@ def _toric_divisor_section_ring(category, scheme, divisor):
         tuple(int(entry) for entry in vector)
         for vector in _SageCone(cone_rays).Hilbert_basis()
     )
-    return AffineSemigroupAlgebras(category.base_ring())(
+    return _affine_semigroup_algebra(
+        AffineSemigroupAlgebras(category.base_ring()),
         hilbert_basis,
         names=tuple(f"s{position}" for position in range(len(hilbert_basis))),
         extra_categories=(category, OwnedIntegralDomains()),

@@ -113,9 +113,17 @@ from sage_extensions.owned_category import _object_of, owned_category_join
 from sage_extensions.owned_category_bases import Category, CategoryWithAxiom
 
 
-def _commutative_algebra_with_structure(algebra, base_ring, labels=None, *categories):
+def _commutative_algebra_with_structure(
+    algebra, base_ring, labels=None, *categories, constructing_category
+):
     r"""Construct the commutative owned algebra view over ``base_ring``."""
-    return _algebra_with_structure(algebra, base_ring, labels, *categories)
+    return _algebra_with_structure(
+        algebra,
+        base_ring,
+        labels,
+        *categories,
+        constructing_category=constructing_category,
+    )
 
 
 class _PrimeSpectrumTopologyData:

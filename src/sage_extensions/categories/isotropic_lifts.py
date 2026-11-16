@@ -233,9 +233,10 @@ class IsotropicReductionLiftTorsors(OwnedCategoryOverBaseRing):
 
             ``T_Z`` is empty exactly when ``C`` is, since ``r`` is onto and
             ``phi`` bijective, so emptiness is decided from ``C``.  ``C`` empty
-            gives the empty subset of ``T`` (``Sets().empty_subset``); ``C``
-            nonempty supplies one admitted point, which decides that the subset
-            is not empty without listing it.
+            gives the empty subset of ``T``, the least point of ``T``'s power
+            set, decided empty by that construction; ``C`` nonempty supplies one
+            admitted point, which decides that the subset is not empty without
+            listing it.
             """
             target = self.target_reduction().isotropic_embedding().codomain()
             integral_kernel = self.acting_group().predicate_subgroup(
@@ -264,7 +265,7 @@ class IsotropicReductionLiftTorsors(OwnedCategoryOverBaseRing):
                 return residue(lattice_inclusion.lift(parameter)) in classes
 
             if classes.is_empty() is True:
-                return integral_kernel, self.empty_subset()
+                return integral_kernel, self.power_set().bottom()
             locus = self.condition_set(in_residue)
             # One admitted point decides that the subset is not empty.  Its
             # parameter class lies in C by construction, so the lift costs one

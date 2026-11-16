@@ -256,7 +256,15 @@ def _fix_selected_module_presentation(module, base_ring, presentation, cokernel_
     module._selected_module_presentation = _SelectedModulePresentationBackend(cokernel_morphism)
 
 
-def _fix_lazy_selected_module_presentation(module, base_ring, realization_factory) -> None:
+def _fix_lazy_selected_module_presentation(
+    module,
+    base_ring,
+    realization_factory,
+    *,
+    replace=False,
+    generating_set=None,
+    generator_function=None,
+) -> None:
     r"""Fix one endpoint-determined finite presentation without realizing it.
 
     The factory is selected during construction but is not evaluated until the
@@ -264,6 +272,12 @@ def _fix_lazy_selected_module_presentation(module, base_ring, realization_factor
     morphism, generating set and generator morphism of that fixed
     presentation.  Thus the mathematical choice is made before exposure while
     its computational model remains lazy.
+
+    ``replace`` states the presentation over a degree-zero resolution already
+    registered for this module -- a construction that knew its generating
+    family before it knew its relations.  ``generating_set`` and
+    ``generator_function`` are the registration of that family, so reading the
+    module's generators does not realize the presentation either.
     """
     match module._selected_module_presentation:
         case None:
@@ -309,6 +323,9 @@ def _fix_lazy_selected_module_presentation(module, base_ring, realization_factor
         module,
         Modules(base_ring),
         selected_resolution,
+        replace=replace,
+        generating_set=generating_set,
+        generator_function=generator_function,
     )
 
 
@@ -405,9 +422,9 @@ class _SelectedFinitePresentationModules(OwnedCategoryOverBaseRing):
                 return self.zero()
             return self._from_smith_engine_element(smith.linear_combination_of_smith_form_gens(reduced))
 
-        # The selected presentation is fixed before this refinement is exposed.
-        _selected_module_presentation = None
-
+        # The selected presentation is fixed before this refinement is exposed;
+        # the slot it is recorded in is declared at the level that introduces
+        # it, ``ModulesWithChosenFinitePresentation``.
         def __init__(
             self,
             presentation=None,

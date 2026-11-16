@@ -269,19 +269,6 @@ class GradedAlgebraMor(CategoricalMor):
     def grading_monoid(self):
         return self._grading_monoid
 
-    def _arrow_type_key(self):
-        r"""Add the class of the unital algebra Mor this Mor declares, which its domain selects.
-
-        A graded algebra map is a unital algebra map, so the declared graph
-        of ``GradedAlgebras(R).Mor(A, B)`` holds
-        ``Algebras(R).Associative().Unital().Mor(A, B)``, whose class is
-        ``A._algebra_mor_class()``: ``SparseFreeAlgebraMor`` for
-        ``Sym(ZZ[NN])``, ``PresentedAlgebraMor`` for a presented algebra.
-        The arrow type includes that class's arrow methods, so two graded
-        Mors whose domains select different classes have different types.
-        """
-        return (*super()._arrow_type_key(), self.domain()._algebra_mor_class())
-
     def _element_constructor_(self, images, *, check=False):
         r"""Construct the graded algebra map; ``check=True`` runs its validators (``OWN-22``)."""
         morphism = self.element_class(self, images)
