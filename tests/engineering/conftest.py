@@ -22,19 +22,19 @@ builtins for the same reason: the lint admits exactly the names a directory's
 ``conftest.py`` binds.
 
 The acceptance drivers are instruments of the same kind: each takes one row of
-an orbit computation and reports what the row did.  ``incidence_row_reports``
-reads the Γ_{Co,2} driver's report of an undecided row and of a broken contract
-off the driver itself — its row step and its edge contract, each run on real
-data — and ``incidence_edge_containment`` is the driver's own edge contract on
-one line/plane pair.  All are bound as builtins for the same reason: the lint
-admits exactly the names a directory's ``conftest.py`` binds.
+an orbit computation and reports what the row did.  ``incidence_row_outcome``
+is the Γ_{Co,2} driver's row step on one subgroup under one cap, and
+``incidence_row_contract`` is the same driver's contract on a relation it is
+handed -- the relation is the input, so a test asks what the driver makes of a
+broken one rather than handing it the answer.  ``RowStatus`` is that driver's
+own vocabulary of row statuses, bound for the same reason: the lint admits
+exactly the names a directory's ``conftest.py`` binds.
 """
 
 from __future__ import annotations
 
 import builtins
 import importlib.util
-import io
 import json
 import re
 import shutil
@@ -42,7 +42,6 @@ import subprocess
 import sys
 import tempfile
 import time
-from contextlib import redirect_stdout
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
@@ -207,8 +206,9 @@ def pytest_configure(config) -> None:
     builtins.stage_records_of = stage_records_of
     builtins.kept_test_run = kept_test_run
     builtins.simultaneous_test_runs = simultaneous_test_runs
-    builtins.incidence_edge_containment = incidence_edge_containment
-    builtins.incidence_row_reports = incidence_row_reports
+    builtins.incidence_row_outcome = incidence_row_outcome
+    builtins.incidence_row_contract = incidence_row_contract
+    builtins.RowStatus = _script("coble_row_status").RowStatus
 
 
 def pytest_unconfigure(config) -> None:
@@ -218,8 +218,9 @@ def pytest_unconfigure(config) -> None:
     del builtins.stage_records_of
     del builtins.kept_test_run
     del builtins.simultaneous_test_runs
-    del builtins.incidence_edge_containment
-    del builtins.incidence_row_reports
+    del builtins.incidence_row_outcome
+    del builtins.incidence_row_contract
+    del builtins.RowStatus
 
 
 @dataclass(frozen=True)
@@ -435,22 +436,6 @@ def simultaneous_test_runs(*trees: dict[str, str]) -> tuple[tuple[RecordFile, ..
 DRIVER_SOURCE = SOURCE_TREE / "tests"
 
 
-@dataclass(frozen=True)
-class RowReport:
-    r"""What one run reported for a row of an acceptance driver.
-
-    ``report`` is the text the driver printed about the row — which outcome it
-    was and, for a broken contract, which clause broke — and ``exit_status`` is
-    the status ``main`` returns for that row's outcome.  A row that did not
-    return inside its cap and a row that returned an edge breaking its contract
-    are different facts about a run, so a reader tells them apart by these two
-    fields and not by one shared answer.
-    """
-
-    report: str
-    exit_status: int
-
-
 def _script(name: str):
     r"""The module the file ``<name>.py`` of ``tests/`` defines, loaded under that name.
 
@@ -466,62 +451,44 @@ def _script(name: str):
     return module
 
 
+@dataclass(frozen=True)
+class RowReport:
+    r"""What one row of the Γ_{Co,2} driver did, and what it returned when it decided.
+
+    ``status`` is the driver's own status object and ``counts`` its edge, line
+    cusp and plane cusp count, or ``None`` for a row that did not decide.  A
+    test asks about the row's status and its counts, never about the words a
+    run printed.
+    """
+
+    status: object
+    counts: tuple | None
+
+
 def _incidence_row_driver():
     r"""The Γ_{Co,2} incidence-row driver, with the row statuses it shares."""
     _script("coble_row_status")
     return _script("coble_gamma_co_2_incidence_rows")
 
 
-def _row_report(driver, row_step):
-    r"""What ``row_step`` printed about one row, and the exit status the driver gives its status."""
-    printed = io.StringIO()
-    with redirect_stdout(printed):
-        _row, status = row_step()
-    return RowReport(report=printed.getvalue().strip(), exit_status=driver.exit_status(status))
+def incidence_row_outcome(lattice, subgroup, label, cap):
+    r"""What the Γ_{Co,2} driver's row step reports for one row of ``subgroup`` under ``cap``.
 
-
-def incidence_edge_containment(line, plane):
-    r"""Why the Γ_{Co,2} driver's edge contract rejects a line/plane edge, or ``None``.
-
-    The clause is the row's: the line's retained generator must lie in the
-    plane, that is, be in the image of the plane's inclusion.
+    The cap is the caller's budget for the row's call, so a cap of zero seconds
+    is a row with no time to run.
     """
-    return _incidence_row_driver().containment_violation(line, plane)
+    counts, status = _incidence_row_driver().run_row(lattice, subgroup, label, cap)
+    return RowReport(status=status, counts=counts)
 
 
-def incidence_row_reports():
-    r"""The Γ_{Co,2} driver's report of an undecided row and of a broken contract.
+def incidence_row_contract(lattice, subgroup, lines, planes, incidences):
+    r"""What the Γ_{Co,2} driver's contract makes of one relation of a row's vertices.
 
-    The undecided row is the driver's own row step on ``O(T_Co)`` under a cap
-    that has already expired: the subgroup is the driver's and the cap is the
-    caller's budget.  The broken contract is the driver's own edge contract on
-    the smallest row that breaks it — one real edge whose line, a primitive
-    isotropic line of ``T_Co``, does not lie in its primitive isotropic plane —
-    reported through the function the row step reports every outcome with.  Each
-    answer is the driver's words and the exit status ``main`` gives it.
+    ``lines``, ``planes`` and ``incidences`` are the row's own data: the vertices
+    the row returned and the edges it joined them with.  The row step's contract
+    is the driver's statement about that relation, so a test hands it the
+    relation instead of the status the contract might have reached.
     """
-    from sage_extensions.catalogue import NamedLattices
-    from sage_extensions.coble import Coble
-
-    driver = _incidence_row_driver()
-    lattice = NamedLattices.Tco
-    undecided = _row_report(
-        driver,
-        lambda: driver.run_row(lattice, lattice.Aut(), "O(T_Co)", 0.01),
+    return _incidence_row_driver().row_contract(
+        lattice, subgroup, "row", lines, planes, incidences
     )
-    isotropic = Coble.isotropic_vectors()
-    plane = lattice.subobject_on((isotropic["w1"], isotropic["w3"]))
-    outside = next(
-        isotropic[name] for name in isotropic
-        if name not in ("w1", "w3") and not plane.inclusion().is_in_image(isotropic[name])
-    )
-    violation = driver.containment_violation(lattice.subobject_on((outside,)), plane)
-    contract_violation = _row_report(
-        driver,
-        lambda: driver.report_row_outcome(
-            "Gamma_{Co,2}",
-            driver.RowStatus.CONTRACT_VIOLATION,
-            f"edge 0 of 1: {violation}",
-        ),
-    )
-    return undecided, contract_violation
