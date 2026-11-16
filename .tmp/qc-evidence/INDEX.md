@@ -3124,3 +3124,4 @@ after main advanced to `a38faef` and the branch was rebased onto it:
 | `issue381-kernel-incidence-gate-final.log` | the same head | `tests/lattices/test_the_kernel_incidence_rows.sage`, lint on: **3 passed in 62.84 s**, longest call 21 s over the 20 s gate |
 | `issue381-gate-final2.log` | the head this pushes (rebased onto `4936110`) | `tests/lattices/test_the_kernel_incidence_rows.sage`, two specimens -- `6JRS` and `U + U + <-4>` -- with the test lint on: **2 passed in 74.46 s**, both calls over the 20 s gate (35.29 s, 38.18 s) |
 | `issue381-gate-pushed-final.log` | the head this pushes, `3fe961c` on `ab2e435` | the same gate file: **2 passed in 69.14 s**, calls 33.36 s and 35.34 s over the 20 s gate |
+| `issue381-gate-eb5baa8.log` | the head this pushes, `33971c8` on `eb5baa8` | the same gate file, last run before the push: **2 passed in 103.73 s**, calls 48.71 s and 31.15 s over the 20 s gate |
