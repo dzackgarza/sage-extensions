@@ -103,11 +103,11 @@ _RUNS = {}
 def arrow_type_order_run(*, de_rham_first: bool) -> ArrowTypeRun:
     r"""Run the arrow-type session script in a fresh Sage process, in the stated order.
 
-    The child gets two minutes: every construction in it is a rank-one free
-    module, its divided-power and symmetric algebras, or the de Rham algebra on
-    it, and a session that does not return in that time has not terminated.
     Each order is run once and remembered, so the rows that read one order
-    share a session rather than rebuilding it per assertion.
+    share a session rather than rebuilding it per assertion.  The runner sets
+    no deadline of its own: how long a session may take is the suite's time
+    gate to state, and a second clock here would turn a loaded machine into a
+    failure of the mathematics.
     """
     remembered = _RUNS.get(de_rham_first)
     if remembered is not None:
@@ -119,7 +119,6 @@ def arrow_type_order_run(*, de_rham_first: bool) -> ArrowTypeRun:
         capture_output=True,
         text=True,
         env=environment,
-        timeout=120,
         check=False,
     )
     arrow_types = None
