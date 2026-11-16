@@ -7569,12 +7569,7 @@ def _install_self_module_placement(ring) -> None:
     unit, so ``R[x]^k --(g_i)--> R[x]^1 -> A`` is exact.  That is what makes
     ``A`` an object of ``ModulesWithChosenFinitePresentation`` over its cover,
     and hence what its dual is read from: ``Hom_cover(A, cover)`` is the kernel
-    of the transpose of this map.  That placement is one refinement of the ring's
-    category per quotient ring, at construction, and it is the price of the
-    reading: the alternative measured here -- stating the module category in the
-    quotient construction's category join, which is one class build instead of
-    two -- was 22-25 ms per ring against 9-16 ms, because a larger join costs
-    more to compile than a refinement does.  No freeness, projectivity or finite
+    of the transpose of this map.  No freeness, projectivity or finite
     presentation is inferred from the label count: ``ZZ/2`` is not projective
     over ``ZZ``.
 
