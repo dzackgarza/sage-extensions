@@ -2365,6 +2365,71 @@ end
             return False
         return str(target) not in self.isotropic_class_orbit(source)
 
+    @cached_method
+    def preserves_conjugation(self) -> bool:
+        r"""Whether every ambient isometry conjugates ``self.subgroup`` to itself.
+
+        ``Gamma = chi^-1(S)`` with ``S = chi(Gamma)`` retained, so
+        ``g Gamma g^-1 = Gamma`` for every ``g`` in ``O(L)`` exactly when ``S``
+        is trivial-in-the-sense that ``Gamma`` is a kernel: a kernel of any
+        character is normal, whatever the character is -- ``ker rho`` and
+        ``ker(rho, sn)`` alike -- and that is the case this call decides.
+
+        A preimage of a *proper* subgroup of the finite image answers ``False``.
+        Its normality is then the normality of that subgroup in
+        ``chi(O(L))``, a question this route does not settle; a caller that
+        transports a family by an ambient isometry needs the invariance, so the
+        unanswered case is not transported.
+
+        Where it is used: the incidence of a row transports one plane's
+        covering to the row's other planes, which is a conjugation statement
+        and nothing else.
+        """
+        return self.subgroup_image_order() == 1
+
+    def register_isotropic_covering(self, plane, source, lift, flags) -> None:
+        r"""Record the covering ``flags`` of ``plane``, computed from ``source`` by ``lift``.
+
+        ``source`` is the caller's token for the family the covering was
+        computed from -- an ambient flag, in the incidence -- and ``lift`` the
+        isometry that carried that source's plane onto ``plane``.  Both are
+        retained because a later plane's covering is this one carried there by
+        the composite of the two planes' lifts, and nothing else about the
+        covering is recomputed.
+
+        The record is keyed by the plane's span, as the transport registry is,
+        so an equal-but-distinct copy of a plane finds its covering.
+        """
+        from sage_extensions.categories.isotropic_orbits import _span_key
+
+        self.__dict__.setdefault("_isotropic_covering_registry", {})[
+            (_span_key(plane), source)
+        ] = (lift, tuple(flags))
+
+    def isotropic_covering_of(self, plane, source):
+        r"""The recorded ``(lift, flags)`` of ``plane``'s covering from ``source``, or ``None``."""
+        from sage_extensions.categories.isotropic_orbits import _span_key
+
+        return self.__dict__.get("_isotropic_covering_registry", {}).get(
+            (_span_key(plane), source)
+        )
+
+    def transport_covering(self, reference_lift, flags, lift):
+        r"""The covering ``flags``, carried to the plane that ``lift`` carries its plane to.
+
+        Every term is transported by ``lift * ~reference_lift``, the composite
+        that carries the reference plane onto the target, and each carried
+        line's transport is registered with the same element so the certificate
+        of an edge at the target plane is read off the registry.
+        """
+        move = lift * ~reference_lift
+        carried = []
+        for flag in flags:
+            image = move.transport_isotropic_object(flag)
+            self.register_isotropic_transport(image.terms()[0], flag.terms()[0], move)
+            carried.append(image)
+        return tuple(carried)
+
     def register_isotropic_lift(self, plane, lift, parabolic_generators):
         r"""Record one representative of the parabolic split and its certified data.
 

@@ -67,13 +67,19 @@ index and no plane needs to be enumerated for it.
   the covering at the target, and the plane's parabolic, its conjugated
   generators, its word section and its double cosets are paid once for the row
   instead of once per plane -- the 8.60 s a plane the last round measured.
-  The condition is `rho(Gamma) = 1`: a subgroup that is only the preimage of a
-  proper subgroup of the finite image need not have a normal image, and a
-  subgroup cut by a sign condition does not survive conjugation either; both
-  keep the per-plane route.  The first attempt was gated on the discriminant
-  condition alone and the `Gamma_{Co,2}` row failed on it -- the row of the
-  group whose image is *not* trivial -- which is the gate doing its work; the
-  condition was then narrowed to the kernel.
+  The invariance is the quotient's decision
+  (`preserves_conjugation`): a kernel of a character is normal whatever the
+  character is -- `ker rho` and `ker(rho, sn)` alike -- while a preimage of a
+  proper subgroup of the finite image answers by not claiming it.  A reviewer
+  of the first version was right that the earlier rationale was false: it
+  excluded `Otilde+` by a non-normality that does not hold.  What keeps
+  `Otilde+` on the per-plane route is that no covering is supplied for a
+  subgroup that also cuts the spinor sign, its double cosets not descending to
+  the discriminant image -- the joint-character limitation, which is its own
+  piece of work at the covering's owner and not a property of the transport.
+  The first version was gated on the discriminant condition alone and the
+  `Gamma_{Co,2}` row failed on it, which is the gate doing its work; the
+  decision now lives on the quotient and the consumer asks it.
 * A line vertex whose divided class key is carried by exactly one cusp is that
   cusp, and the certificate's transporter is read off the row's own words
   where the two chains share a root, so no stabilizer word section is built;

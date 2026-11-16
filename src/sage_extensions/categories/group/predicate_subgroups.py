@@ -761,9 +761,17 @@ class PredicateSubgroups(OwnedParameterizedCategory):
             registered lifts, is exactly the family of the other plane.  The
             plane's parabolic, its conjugated generators, their word section
             and its double cosets are therefore computed once for the row,
-            which is what makes the plane count affordable at all; a subgroup
-            cut by a sign condition is not preserved by conjugation, and there
-            the covering is computed at every plane as it always was.
+            which is what makes the plane count affordable at all.  The
+            invariance is the quotient's own decision
+            (:meth:`...OrthogonalCharacterQuotient.preserves_conjugation`): a
+            kernel of the character, ``ker rho`` or ``ker(rho, sn)`` alike, is
+            normal in the orthogonal group, and a preimage of a proper subgroup
+            of the finite image is not transported because its normality is
+            that subgroup's, which the quotient does not settle.  What a
+            subgroup's covering *is* remains its own question: it is supplied
+            where the double cosets descend to the finite image, and a subgroup
+            that cuts a sign as well keeps the flag route until that covering
+            exists.
             """
             from sage_extensions.categories.isotropic_orbits import (
                 ArithmeticCuspIncidence,
@@ -916,24 +924,13 @@ class PredicateSubgroups(OwnedParameterizedCategory):
             sourced_flags = []
             parabolic_routed = True
             # A covering computed at one plane is transported to every other
-            # plane whose own registered lift carries that plane there, when
-            # the subgroup is the kernel of the character the row was split by:
-            # an ambient isometry conjugates that kernel to itself, so the
-            # transported family is exactly the covering at the target plane --
-            # same orbits, same count -- and the plane's parabolic, its images,
-            # its word section and its double cosets are not computed again.
-            # A subgroup that is only the preimage of a *proper* subgroup of the
-            # finite image is not preserved by conjugation (its image need not
-            # be normal), and a subgroup cut by a sign condition does not
-            # survive it either (the spinor norm is not defined on the finite
-            # image); both keep the per-plane route.
-            transported_covering = (
-                quotient._has_discriminant
-                and not quotient.determinant_kernel
-                and not quotient.spinor_kernel
-                and quotient.subgroup_image_order() == 1
-            )
-            covering_at_source = {}
+            # plane whose registered lift carries that plane there: the
+            # quotient decides whether the subgroup is invariant under
+            # conjugation, and if it is, the family at the target plane is the
+            # source family carried there -- same orbits, same count -- so the
+            # plane's parabolic, its images, its word section and its double
+            # cosets are paid once for the row.
+            transported_covering = quotient.preserves_conjugation()
             # The planes of this row are the plane cusps of this row: a cusp's
             # representative is the plane, so the incidence is computed at each
             # cusp's own representative and its plane vertex is read from the
@@ -948,21 +945,18 @@ class PredicateSubgroups(OwnedParameterizedCategory):
                     ambient_sources
                 ):
                     _ambient_line, ambient_plane = ambient_flag.terms()
-                    known = covering_at_source.get(position) if transported_covering else None
+                    known = (
+                        quotient.isotropic_covering_of(plane, position)
+                        if transported_covering
+                        else None
+                    )
                     if known is not None and target_lift is not None:
                         reference_lift, reference_flags = known
-                        # Both lifts carry the row's source plane to their own
-                        # plane, so their composite carries the reference plane
-                        # to this one, and each covered flag with it.
-                        move = target_lift * ~reference_lift
-                        for reference_flag in reference_flags:
-                            carried = move.transport_isotropic_object(reference_flag)
-                            quotient.register_isotropic_transport(
-                                carried.terms()[0],
-                                reference_flag.terms()[0],
-                                move,
+                        sourced_flags.extend(
+                            quotient.transport_covering(
+                                reference_lift, reference_flags, target_lift
                             )
-                            sourced_flags.append(carried)
+                        )
                         covered_here = True
                         continue
                     # The source row now meets the source lift at one registered
@@ -992,9 +986,8 @@ class PredicateSubgroups(OwnedParameterizedCategory):
                         parabolic_routed = False
                         break
                     if transported_covering and target_lift is not None:
-                        covering_at_source[position] = (
-                            target_lift,
-                            tuple(from_parabolic),
+                        quotient.register_isotropic_covering(
+                            plane, position, target_lift, from_parabolic
                         )
                     sourced_flags.extend(from_parabolic)
                     covered_here = True

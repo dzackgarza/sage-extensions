@@ -1,24 +1,20 @@
-r"""The line vertex of an incidence edge is the one cusp that contains the edge's line (#381).
+r"""The line vertex of an incidence edge is the one cusp that contains the edge's line.
 
 An edge of the building is a pair of cusp orbits, a line's and a plane's, and
-the line term of its flag certificate is a line of the plane.  The row that
-line belongs to records, per cusp, the divided class pair of its own
-representative's generator; for a subgroup whose finite image is trivial that
-pair is an invariant of the cusp and the row's pairs are distinct, so a line's
-pair names its cusp and no isometry search decides the vertex.  The statement
-asserted here does not mention that key: it says that of the row's cusps
-exactly one contains the edge's line, and that it is the cusp the edge names.
-That is what a vertex read off the key has to give, so an answer that named
-another cusp fails here, and the same statement read through the witness route
-is what the incidence was asked before the key decided it.
+the line term of its flag certificate is a line of the plane.  A row records,
+per cusp, the divided class pair of its own representative's generator; for a
+subgroup whose finite image is trivial that pair is an invariant of the cusp,
+and the row's pairs are distinct, so a line's pair names its cusp.
+
+The statement asserted here does not mention that pair: of the row's cusps
+exactly one contains the edge's line, and it is the cusp the edge names, and
+the same holds for the plane.  A vertex read off any invariant has to give
+that, so an answer naming another cusp fails here.
 
 The specimen is ``U + U(2) + <-2>``, whose kernel rows split the ambient rows
-into three line cusps and two plane cusps of their own, and whose incidence is
-four edges per kernel row -- the counts recorded for the dispatched run
-43866925504 of ``tests/coble_gamma_co_2_incidence_rows.py --rows 'Otilde,
-Otilde+' --lattice U+U(2)+<-2>'``.  No lattice-database card holds this row,
-so the number is computed here and compared with the run's, not with a card
-(lattice-database#7 holds no ``T_Co`` row either).
+into three line cusps and two plane cusps of their own and have four edges
+each.  No lattice-database card holds this row, so the numbers are computed
+here.
 """
 
 from sage_extensions.all import *  # noqa: F401,F403
