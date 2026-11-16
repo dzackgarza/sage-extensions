@@ -3502,3 +3502,13 @@ consumer files and suites are CI's.
 round-5 table no longer stated the tree that run was taken on.  The row is
 restored to `ad54c36`'s text, and this entry is the correction event: recorded
 today, beside the earlier event rather than substituted for it.
+
+## `#541`, round 6: the rebased head and its deciding probe, 2026-11-16
+
+The four card files on the tree this round pushes, and the restriction-of-scalars specimen whose ring reading the construction change had to keep.
+
+| log | tree | result |
+| --- | --- | --- |
+| `541r6-cards-at-fc09967.log` | `fc09967`, the pushed head | the four card files together: **24 passed in 2.60 s** |
+| `541r6-probe-extension-ring-restriction.log` | `6171902`, before the extension generating-set repair | `Res_{Z -> Q}(Q)`, `Z^1` read as a `Q`-module, and `Res_{F_2 -> A}(A)` for `A = F_2[x]/(x^2)`: the first two state no framing labels through the module accessor, so the ring reading is the specimen that decides the accessor; after the repair all three construct, the last with rank 2 and cardinality 4 |
+| `541r6-cards-at-e638da1.log` | `e638da1`, the head after the rebase onto `3bba334` | the same four files: **24 passed in 2.15 s** |

@@ -1,0 +1,9 @@
+=== probe: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/probe541r6ringrestrict.py
+=== worktree HEAD: 617190200397349bb22d33f1a8ecc862d2dfa05d (1 modified paths)
+QQ ring -> Category of restricted-scalars modules over Integer Ring
+  cardinality: ℵ_0
+QQ module -> Category of restricted-scalars modules over Integer Ring
+  cardinality: ℵ_0
+A ring -> Join of Category of modules with a represented selected finite-presentation backend over Integer Ring / Ideal (2) of Integer Ring and Category of restricted-scalars modules over Integer Ring / Ideal (2) of Integer Ring and Category of vector spaces over Integer Ring / Ideal (2) of Integer Ring
+  cardinality: 4
+=== exit: 0
