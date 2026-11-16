@@ -1,0 +1,31 @@
+provider SHA: 659b4b6b9b8d2524f0630fd00e22df86248e32f3
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+command: /repos/sage-extensions/.tmp/probe_main.py
+=== args ['--cap', '0']: exit 1 in 6.6 s
+--- stdout:
+the Coble period lattice Integral lattice of rank 11 and signature (2, 9) of rank 11
+[O(T_Co)] undecided: its cap of 0 s is spent before the call
+
+--- stderr (tail):
+
+=== args ['--cap', '600', '--budget', '700']: exit 1 in 613.5 s
+--- stdout:
+the Coble period lattice Integral lattice of rank 11 and signature (2, 9) of rank 11
+[O(T_Co)] undecided: the row did not return inside its 600 s cap
+
+--- stderr (tail):
+
+total 620.2 s
+[peakrss] run: child waited=0 shell_code=0 samples=310
+[peakrss] peak tree RSS      : 599 MiB
+[peakrss] low-water MemAvail : 2360 MiB
+[peakrss] peak single VmHWM  : 599 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      491 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   172.6s procs=  4 rss=   599 MiB hwm=   599 MiB avail=  5044 MiB
+[peakrss]   t=   174.6s procs=  4 rss=   599 MiB hwm=   599 MiB avail=  5258 MiB
+[peakrss]   t=   176.6s procs=  4 rss=   599 MiB hwm=   599 MiB avail=  5239 MiB
+[peakrss]   t=   178.6s procs=  4 rss=   599 MiB hwm=   599 MiB avail=  5054 MiB
+[peakrss]   t=   180.6s procs=  4 rss=   599 MiB hwm=   599 MiB avail=  4837 MiB

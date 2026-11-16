@@ -2837,3 +2837,33 @@ first lines record the tree SHA and the modified-path count it ran against.
 | `issue521r2-corpus.py`, `issue521r2-corpus-diff.log` | base `81b7bbd` against the round's fix commit | one preparse per `.sage` file in the tree and a digest of the lowered text: 972 files at the base, 975 on the repair, and the diff is only the three files the round adds and the one it removes — no existing file's lowering changes |
 | `issue521r2-research-rule.py`, `issue521r2-research-rule.log` | the rule the round replaces, before it was replaced | 1,033 `.sage` files under the research repository with `dzack_research.preamble.all` registered as a session module: **0** files whose lowering depends on the vocabulary the runtime used to copy, comparing the session rule's reading with the upstream rule's for each file |
 | `issue521r2-mypy-base.log`, `issue521r2-mypy-fix.log` | base `81b7bbd`, the round's fix commit | `mypy --config-file /ci/tool-configs/mypy-sage.ini --no-incremental src/sage_extensions/language_runtime.py` inside the pinned image: **7 errors** in the file in both trees, the same seven (its untyped `Integer`, `RealNumber`, `matrix`, `factorial` and `ellipsis_*` definitions), reported at lines 50-118 and 48-116 |
+## `#520` round 2: the incidence driver's outcomes, asked of real rows (2026-11-16)
+
+The row step of `tests/coble_gamma_co_2_incidence_rows.py` answers with one
+value: its status, the clause, cap or exception that decided it, and its counts.
+The statuses of `tests/coble_row_status.py` carry their exit status (0 decided,
+1 undecided or the whole-run budget spent, 2 a returned edge or relation that
+breaks the contract, 3 a decided row whose counts differ, 4 the row step
+raised), and the row's contract is a function of the relation it returned.  The
+tree column names the round's tree by what it is: `base` is main at the round's
+start (`e13a23cd9336437e18f2bbc7afc8c5a34778c6f7`), and a numbered tree is the
+round's own commit at that position, with its repair in the working tree when
+the run was made on a tree it was about to commit.  Every run is the
+launcher `.scratch_pytest.sh` (`pytest -o addopts= -p qc_sage_session -p
+sage_extensions.testing.test_lint`, the checkout bound at `/repos/sage-extensions`
+with the shared `.git` bound at its host path, the port at `/work`) or
+`.scratch_launch.sh` for a probe script.
+
+| log | tree | result |
+| --- | --- | --- |
+| `520-r2-red-tests.log` | `base` | the round's first three tests: **3 failed in 25.91 s**. A cap of 0 s is `setitimer(ITIMER_REAL, 0)`, so the row is computed and reported `DECIDED`; `SO(U(2))`'s refusal escapes `run_row` as `ArithmeticError`; the module has no `row_contract`, so a relation cannot be handed to the contract. |
+| `520-r2-fix-tests.log` | tree 2 plus its repair | the same three on the repaired row step: **3 passed in 6.85 s**. |
+| `520-r2-driver-process.log` | tree 2 plus its repair | the driver as a process: `--cap 0` prints the lattice line and `[O(T_Co)] undecided: its cap of 0 s is spent before the call`, exit 1, in 6.6 s; `--cap 600 --budget 700` prints `[O(T_Co)] undecided: the row did not return inside its 600 s cap`, exit 1, in 613.5 s -- the first row's call starts and runs, and the alarm reaches it where Python holds control. |
+| `520-r2-red-coverage.log` | tree 2 | the coverage statement: **1 failed, 4 passed in 20.46 s**. The row of `U + <-2>` -- one line cusp, no isotropic plane, no edge -- is reported `CONTRACT_VIOLATION` with detail `line cusp 0 carries no edge`. |
+| `520-r2-fix-coverage.log` | tree 4 | the five tests of the file, durations printed: **5 passed in 19.04 s**, the slowest call 5.22 s. |
+| `520-r2-gate-engineering.log` | tree 4 | the directory that holds the test and its harness: **2 failed, 26 passed in 277.74 s**. |
+| `520-r2-base-engineering.log` | `base` | the same two files whose ids fail, without this round: **2 failed in 18.80 s**, the same FAILED ids (`test_polyhedral_engine_routes.sage`'s two, `AttributeError: ... no attribute 'basis'`). |
+| `520-r2-fixture-costs.log` | tree 4 | what each candidate fixture for the refusal costs: `[[0]]` degenerate 1.19 s (`AssertionError`, the Witt index of a degenerate form), `[[2]]` and `A1.SO` decided with no cusp in 0.14/0.11 s, `diag(1,-1).SO` 4.91 s, `(U+U).Aut` 6.61 s (`TypeError` from `finite_ordered_sets.py`, the unhashable `CuspIncidence`), `U(2).SO` 2.06 s (`ArithmeticError`, the stabilizer image not certified). `U(2).SO` is the fixture the test uses. |
+| `520-r2-tip-tests.log` | the round's evidence commit, after the rebase onto the main it is pushed on | the five tests of the file, durations printed: **5 passed in 14.83 s**, the slowest call 3.35 s. |
+| `520-r2-tip-engineering.log` | the round's evidence commit, after the rebase onto the main it is pushed on | the directory that holds the test and its harness, after the rebase: **2 failed, 24 passed in 94.49 s**, 26 collected -- the base's 21 passed plus this file's 5, which replace the two the previous round left there. |
+| `520-r2-base-engineering-rebased.log` | `fb74227`, the base the round is rebased onto | the same directory without this round: **2 failed, 21 passed in 95.74 s**, 23 collected, the same two FAILED ids. |

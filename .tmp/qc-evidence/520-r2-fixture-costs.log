@@ -1,0 +1,151 @@
+provider SHA: c5a0c9eb4e4999557515ba1a400232ef1f76c76b
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+command: /repos/sage-extensions/.tmp/probe6.py
+[    0.06s] rank1 degenerate [[0]]: group in 0.03s
+Traceback (most recent call last):
+  File "/repos/sage-extensions/tests/coble_gamma_co_2_incidence_rows.py", line 310, in run_row
+    incidences = tuple(subgroup.tits_building_incidence())
+                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py", line 5228, in tits_building_incidence
+    for flag in self.isotropic_orbit_representatives(2, flag=True):
+                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py", line 5212, in isotropic_orbit_representatives
+    return _isotropic_orbit_representatives(self, rank, flag=flag)
+  File "/repos/sage-extensions/src/sage_extensions/timing.py", line 393, in timed
+    return function(*arguments, **keywords)
+  File "/repos/sage-extensions/src/sage_extensions/categories/isotropic_orbits.py", line 1649, in _isotropic_orbit_representatives
+    classes = primitive_marking_classes(category, shape, lattice)
+  File "/work/src/sage_indefinite_port/indefinite/marked_lattices.py", line 202, in primitive_marking_classes
+    classes = tuple(FLAGS(_flag_marking(line, plane)) for line, plane in INDUCTION.flag_classes(lattice))
+                                                                         ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/work/src/sage_indefinite_port/indefinite/isotropic_induction.py", line 248, in flag_classes
+    if int(lattice.witt_index()) < 2:
+           ~~~~~~~~~~~~~~~~~~^^
+  File "sage/misc/cachefunc.pyx", line 2328, in sage.misc.cachefunc.CachedMethodCallerNoArgs.__call__
+    self.cache = f(self._instance)
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattices.py", line 4594, in witt_index
+    return space.witt_index()
+           ~~~~~~~~~~~~~~~~^^
+  File "sage/misc/cachefunc.pyx", line 2328, in sage.misc.cachefunc.CachedMethodCallerNoArgs.__call__
+    self.cache = f(self._instance)
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattices.py", line 4596, in witt_index
+    assert self.module_rank().is_finite() and self.is_nondegenerate(), (
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: the Witt index is defined here for a nondegenerate quadratic space of finite dimension, and Lattice of rank 1 and signature (0, 0) is not one
+[    1.25s] rank1 degenerate [[0]]: ERROR 'the row step raised AssertionError: the Witt index is defined here for a nondege' in 1.19s
+[    1.29s] rank1 [[2]]: group in 0.04s
+[rank1 [[2]]] the row's calls returned in 0.1 s
+[    1.43s] rank1 [[2]]: DECIDED '0 edges over 0 line cusps and 0 plane cusps' in 0.14s
+[    1.47s] A1.SO: group in 0.05s
+[A1.SO] the row's calls returned in 0.1 s
+[    1.58s] A1.SO: DECIDED '0 edges over 0 line cusps and 0 plane cusps' in 0.11s
+[    1.60s] diag(1,-1).SO: group in 0.02s
+Traceback (most recent call last):
+  File "sage/misc/cachefunc.pyx", line 1965, in sage.misc.cachefunc.CachedMethodCaller.__call__
+    return cache[k]
+KeyError: ((1,), ())
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/repos/sage-extensions/tests/coble_gamma_co_2_incidence_rows.py", line 310, in run_row
+    incidences = tuple(subgroup.tits_building_incidence())
+                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 736, in tits_building_incidence
+    line_cusps = self.cusps(1)
+  File "sage/misc/cachefunc.pyx", line 1970, in sage.misc.cachefunc.CachedMethodCaller.__call__
+    w = self._instance_call(*args, **kwds)
+  File "sage/misc/cachefunc.pyx", line 1848, in sage.misc.cachefunc.CachedMethodCaller._instance_call
+    return self.f(self._instance, *args, **kwds)
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 700, in cusps
+    for representative in self.isotropic_orbit_representatives(rank)
+                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 522, in isotropic_orbit_representatives
+    return _subgroup_isotropic_orbit_representatives(
+        self, rank, flag=flag
+    )
+  File "/repos/sage-extensions/src/sage_extensions/timing.py", line 393, in timed
+    return function(*arguments, **keywords)
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3684, in _subgroup_isotropic_orbit_representatives
+    stabilizer = quotient.exact_isotropic_stabilizer_generators(
+        representative, flag=flag
+    )
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 1625, in exact_isotropic_stabilizer_generators
+    raise ArithmeticError(
+    ...<4 lines>...
+    )
+ArithmeticError: the stabilizer of Integral lattice of rank 1 and signature (0, 0) in Orthogonal group O(Integral lattice of rank 2 and signature (1, 1)) has character image of order at least 1, and the stabilizer of its divided discriminant data has order 2; no exhibited stabilizer element closes the index 2, so the exact image chi(Stab) is not certified
+[    6.50s] diag(1,-1).SO: ERROR 'the row step raised ArithmeticError: the stabilizer of Integral lattice of rank ' in 4.91s
+[    6.55s] 2U.Aut: group in 0.05s
+Traceback (most recent call last):
+  File "/repos/sage-extensions/tests/coble_gamma_co_2_incidence_rows.py", line 310, in run_row
+    incidences = tuple(subgroup.tits_building_incidence())
+                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py", line 5259, in tits_building_incidence
+    return finite_ordered_set(tuple(incidences))
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/finite_ordered_sets.py", line 863, in finite_ordered_set
+    return FiniteOrderedSets()(elements)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/sage/.venv/lib/python3.14/site-packages/sage/categories/category.py", line 592, in __call__
+    return self._call_(x, *args, **opts)
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/finite_ordered_sets.py", line 367, in _call_
+    return self._on_points(elements)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/finite_ordered_sets.py", line 404, in _on_points
+    distinct = tuple(dict.fromkeys(points))
+                     ~~~~~~~~~~~~~^^^^^^^^
+TypeError: cannot use 'sage_extensions.categories.isotropic_orbits.CuspIncidence' as a dict key (<class 'sage_extensions.categories.isotropic_orbits.CuspIncidence'> is not hashable)
+[   13.16s] 2U.Aut: ERROR "the row step raised TypeError: cannot use 'sage_extensions.categories.isotropic_" in 6.61s
+[   13.17s] U(2).SO: group in 0.01s
+Traceback (most recent call last):
+  File "sage/misc/cachefunc.pyx", line 1965, in sage.misc.cachefunc.CachedMethodCaller.__call__
+    return cache[k]
+KeyError: ((1,), ())
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/repos/sage-extensions/tests/coble_gamma_co_2_incidence_rows.py", line 310, in run_row
+    incidences = tuple(subgroup.tits_building_incidence())
+                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 736, in tits_building_incidence
+    line_cusps = self.cusps(1)
+  File "sage/misc/cachefunc.pyx", line 1970, in sage.misc.cachefunc.CachedMethodCaller.__call__
+    w = self._instance_call(*args, **kwds)
+  File "sage/misc/cachefunc.pyx", line 1848, in sage.misc.cachefunc.CachedMethodCaller._instance_call
+    return self.f(self._instance, *args, **kwds)
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 700, in cusps
+    for representative in self.isotropic_orbit_representatives(rank)
+                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 522, in isotropic_orbit_representatives
+    return _subgroup_isotropic_orbit_representatives(
+        self, rank, flag=flag
+    )
+  File "/repos/sage-extensions/src/sage_extensions/timing.py", line 393, in timed
+    return function(*arguments, **keywords)
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3684, in _subgroup_isotropic_orbit_representatives
+    stabilizer = quotient.exact_isotropic_stabilizer_generators(
+        representative, flag=flag
+    )
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 1625, in exact_isotropic_stabilizer_generators
+    raise ArithmeticError(
+    ...<4 lines>...
+    )
+ArithmeticError: the stabilizer of Integral lattice of rank 1 and signature (0, 0) in Orthogonal group O(Integral lattice of rank 2 and signature (1, 1)) has character image of order at least 1, and the stabilizer of its divided discriminant data has order 2; no exhibited stabilizer element closes the index 2, so the exact image chi(Stab) is not certified
+[   15.24s] U(2).SO: ERROR 'the row step raised ArithmeticError: the stabilizer of Integral lattice of rank ' in 2.06s
+[   15.24s] done
+[peakrss] run: child waited=0 shell_code=0 samples=16
+[peakrss] peak tree RSS      : 374 MiB
+[peakrss] low-water MemAvail : 1291 MiB
+[peakrss] peak single VmHWM  : 380 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      369 MiB peak
+[peakrss]   gap                           9 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    28.3s procs=  3 rss=   374 MiB hwm=   380 MiB avail=  2632 MiB
+[peakrss]   t=    30.3s procs=  3 rss=   374 MiB hwm=   380 MiB avail=  2464 MiB
+[peakrss]   t=    26.3s procs=  3 rss=   356 MiB hwm=   363 MiB avail=  2849 MiB
+[peakrss]   t=    24.3s procs=  3 rss=   345 MiB hwm=   352 MiB avail=  1560 MiB
+[peakrss]   t=    22.2s procs=  3 rss=   342 MiB hwm=   351 MiB avail=  1722 MiB
