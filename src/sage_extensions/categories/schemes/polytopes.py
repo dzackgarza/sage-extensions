@@ -570,7 +570,12 @@ class ConvexPolytopes(OwnedParameterizedCategory):
         truncated.  Passing from this description to the vertices is the
         private polyhedral computation.
         """
+        if lattice is not None and lattice is not self.ambient_lattice():
+            raise ValueError(
+                f"polytopes in {self} have vertices in the lattice {self.ambient_lattice()}, not in {lattice}"
+            )
         rationals = _owned_rationals()
+        labels = tuple(self.ambient_lattice().module_generating_set())
         defining_halfspaces = tuple(
             (
                 _owned_rational(constant),
@@ -588,13 +593,18 @@ class ConvexPolytopes(OwnedParameterizedCategory):
             ]
             for constant, linear_part in defining_halfspaces
         ]
-        polyhedron = Polyhedron(ieqs=engine_rows, base_ring=SageQQ)
-        assert polyhedron.is_compact(), (
-            f"the halfspaces {halfspaces} cut out an unbounded region, so they do not define a polytope"
+        # The halfspaces are written in the coordinates of the ambient lattice,
+        # so the region is a subset of ``L tensor QQ``, of dimension
+        # ``len(labels)``.  The engine otherwise reads its dimension off the rows
+        # and answers for ``QQ^0`` when the family is empty (TRAPS.md, "Sage's
+        # ``Polyhedron`` reads its ambient dimension off the H-representation
+        # rows").
+        polyhedron = Polyhedron(
+            ieqs=engine_rows, ambient_dim=len(labels), base_ring=SageQQ
         )
-        if lattice is not None and lattice is not self.ambient_lattice():
+        if not polyhedron.is_compact():
             raise ValueError(
-                f"polytopes in {self} have vertices in the lattice {self.ambient_lattice()}, not in {lattice}"
+                f"the halfspaces {halfspaces} cut out an unbounded region, so they do not define a polytope"
             )
         return _convex_polytope(
             engine_polyhedron=polyhedron,
