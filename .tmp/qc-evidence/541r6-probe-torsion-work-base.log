@@ -1,0 +1,8 @@
+=== probe: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/probe541r5g.py
+=== worktree HEAD: 3fae3b5881fb53773d0ff08db050e89c05e1919c (0 modified paths)
+plain constructed: 2 ['realize', 'matrix', 'realize'] request: 1
+claimed constructed: 2 ['realize', 'matrix', 'realize'] request: 1
+plain in torsion: False
+claimed in torsion: True
+cardinalities: 5 5
+=== exit: 0

@@ -1,0 +1,9 @@
+=== probe: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/probe541r6place.py
+=== worktree HEAD: 3fae3b5881fb53773d0ff08db050e89c05e1919c (0 modified paths)
+module cat: Category of torsion modules with a represented selected finite-presentation backend over Integer Ring
+module in torsion: True
+bilinear form cat: <class 'sage_extensions.categories.modules.module_morphisms.module_morphisms.OwnedTensorProductModuleMor_with_category_with_category.ArrowType'>
+bilinear formed in torsion: False Join of Category of finitely presented finitely generated modules with a bilinear form over Integer Ring and Category of modules with a represented selected finite-presentation backend over Integer Ring
+quadratic form: <class 'sage_extensions.categories.modules.powers.OwnedQuadraticModuleMor_with_category_with_category.ArrowType'>
+quadratic error: NotImplementedError 
+=== exit: 0

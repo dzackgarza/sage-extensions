@@ -2718,7 +2718,7 @@ each log, and every one was made in the adopted runtime with the worktree at
 | `541r5-probe-base-placement.log` | `08322de` | a fresh `coker(5)` formed without a claim is in `FormModules(ZZ).FinitelyPresented().Torsion()`, and its construction costs 4 units of work, as does the claimed one |
 | `541r5-probe-presented-construction.log` | the round's fix commits | cokernels over `ZZ` and `QQ`, a lattice plane quotient, a claimed torsion module with its elements, and `direct_sum_of_cyclics((2,3))` after the dead constructor parameters were deleted |
 | `541r5-probe-matrix-space-containment.log` | the round's fix commits | a lattice inclusion's homset is **not** in `MatrixSpaces(ZZ)` while it does retain a coordinate matrix, so `MatrixSpaces` containment is not the discriminator finding F asks for |
-| `541r5-rebased.log` | the same five files after the rebase onto `bbb0dd6`; the tree SHA it ran on is the first line of the log | **15 passed in 93.95 s** |
+| `541r5-rebased.log` | `149141a`, the tree this round pushed, after the rebase onto `bbb0dd6` | the same five files: **15 passed in 93.95 s** |
 
 ## `#543`: the cardinal and ordinal order-morphism rows, 2026-11-16
 
@@ -3468,3 +3468,37 @@ Nothing in this issue's claims rests on either row.
 **The round-4 section's base.**  Its seven commits were written on `main` at
 `67c192c`; the branch was rebased twice more before the push, and the closing
 table of that section names the rebase the push lands on, `0130d81`.
+## `#541`, round 6: the review's nine findings, 2026-11-16
+
+Each library repair is a `test:` red on the tree before it and the `fix:` that
+follows; each log's header names the commit it ran on and how many paths were
+modified, and the red rows below are the failures that commit produced.  Only
+the red test of each card and the probe on its deciding input were run; the
+consumer files and suites are CI's.
+
+| log | tree | result |
+| --- | --- | --- |
+| `541r6-f2-red-placement.log` | `3fae3b5`, this round's base, with the round's first test file | the placement file alone: **1 failed, 4 passed in 4.87 s**; the failure is the generic form constructor dropping the placement a module already declared in `Modules(ZZ).FinitelyPresented().Torsion()` |
+| `541r6-f2-green-placement.log` | its fix | that file alone: **5 passed in 8.04 s** |
+| `541r6-f1-red-torsion-instant.log` | `edc58cb`, the placement fix, with the round's second test file | the placement file alone: **2 failed, 8 passed in 9.63 s**; both torsion `from_module` constructors do two units of construction work (the resolution is realized and its engine matrix materialized) |
+| `541r6-f1-green-torsion-instant.log` | its fix | that file alone: **10 passed in 1.62 s**, the two work counters at zero and each first request counting |
+| `541r6-f4-red-coordinate-images.log` | `e0ba3ea`, the instant-construction fix, with the coordinate test | the real-field file alone: **2 failed, 3 passed in 3.33 s**; `coordinate_images` does not exist on a morphism, so the coordinate and relation images have no public surface |
+| `541r6-f4-green-coordinate-images.log` | its fix | that file alone: **5 passed in 3.06 s**, both coordinate images and the empty relation images read publicly over `RR` |
+| `541r6-f5-red-claim-boundary.log` | `37ecb0f`, the coordinate fix, with the claim test | the claim file alone: **1 failed, 3 passed in 3.28 s**; `validate_torsion_claim` reads the claimed module's relation images through the descendant adapter (two reads) |
+| `541r6-f5-green-claim-boundary.log` | its fix | that file alone: **4 passed in 3.79 s**, the read count zero and the false claim still refuted |
+| `541r6-f6-7-red-construction.log` | `6bd84a3`, the claim fix, with the laziness file | the laziness file alone: **2 failed, 2 passed in 2.08 s**; a localized cokernel and a restriction of scalars both compute inside construction |
+| `541r6-f6-7-green-construction.log` | its fix | that file alone: **4 passed in 1.86 s**, both constructions at zero and each first request counting |
+| `541r6-f8-red-category.log` | `2407435`, the construction fix, with the capability test | the real-field file alone: **1 failed, 5 passed in 6.65 s**; `CoordinateMatrixRings` is not defined, so the capability is not stated by a category |
+| `541r6-f8-green-category.log` | its fix | that file alone: **6 passed in 4.83 s**, `ZZ` and `QQ` in the category and `RR` not |
+| `541r6-probe-torsion-work-base.log` | `3fae3b5` | a claimed `coker(5)` and the same form unclaimed each cost two units to construct (`realize`, `matrix`, `realize`), so the torsion constructor computed |
+| `541r6-probe-placement-base.log` | `3fae3b5` | a module declared in `Modules(ZZ).FinitelyPresented().Torsion()` is in the refinement, and the generic bilinear form constructor drops it; the quadratic constructor does too |
+| `541r6-probe-localized-construction.log` | the construction fix | `coker(3)` over `Z[1/2]`: **0** units at construction, 5 on the first request, cardinality 3 |
+| `541r6-probe-restricted-scalars-construction.log` | the construction fix | `Res_{F_2 -> F_2[x]/(x^2)}(A^1)`: **0** units at construction, 1 on the first request, rank 2 and cardinality 4 |
+| `541r6-probe-constructors.log` | the construction fix | cokernels over `ZZ` and `QQ`, a lattice plane quotient, a claimed torsion module with its elements, and `direct_sum_of_cyclics((2, 3))` all answer as before the one-path construction |
+
+## `#541`: the round-5 rebased row restored, 2026-11-16
+
+`a2d1490` rewrote the `541r5-rebased.log` row that `ad54c36` recorded, so the
+round-5 table no longer stated the tree that run was taken on.  The row is
+restored to `ad54c36`'s text, and this entry is the correction event: recorded
+today, beside the earlier event rather than substituted for it.

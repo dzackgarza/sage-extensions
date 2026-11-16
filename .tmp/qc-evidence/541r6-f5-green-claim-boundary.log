@@ -1,0 +1,5 @@
+=== worktree HEAD: 96c975522105cd9d6622c4811c969359eb74d4f5 (3 modified paths)
+=== files: tests/modules/test_a_torsion_claim_is_refuted_when_asked.sage
+....                                                                     [100%]
+4 passed in 3.79s
+=== exit: 0

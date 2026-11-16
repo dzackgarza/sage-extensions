@@ -1,0 +1,22 @@
+=== worktree HEAD: 24074351422b94d429dd19a00291781fe4d6cb1d (1 modified paths)
+=== files: tests/modules/test_the_real_field_answers_primitivity_publicly.sage
+..F...                                                                   [100%]
+=================================== FAILURES ===================================
+___________ test_the_coordinate_matrix_capability_is_a_ring_category ___________
+
+    def test_the_coordinate_matrix_capability_is_a_ring_category() -> None:
+        r"""``Z`` and ``Q`` select a Sage matrix; the exact real field does not.
+    
+        The capability is a chosen representation of the ring's finite matrices, so
+        it is stated by a category and the constructions that need a matrix route
+        on it.  ``RR`` is an owned exact field whose engine is inexact, and its
+        linear-algebra parent is the field itself, so no Sage matrix exists there.
+        """
+>       assert ZZ in CoordinateMatrixRings()
+                     ^^^^^^^^^^^^^^^^^^^^^
+E       NameError: name 'CoordinateMatrixRings' is not defined
+
+tests/modules/test_the_real_field_answers_primitivity_publicly.sage:44: NameError
+=========================== short test summary info ============================
+FAILED tests/modules/test_the_real_field_answers_primitivity_publicly.sage::test_the_coordinate_matrix_capability_is_a_ring_category
+1 failed, 5 passed in 6.65s

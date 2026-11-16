@@ -1,0 +1,5 @@
+=== worktree HEAD: 271f1a4d0dcd757f937408e932779f1de91f414e (3 modified paths)
+=== files: tests/modules/test_a_presented_module_is_built_before_it_computes.sage
+....                                                                     [100%]
+4 passed in 1.86s
+=== exit: 0

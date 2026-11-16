@@ -1,0 +1,6 @@
+=== probe: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/probe541r6lazy2.py
+=== worktree HEAD: 6bd84a3553c84333a3a95038b08a48331c828ff8 (3 modified paths)
+restricted during: [] after: ['realize'] result: 4
+  category: Join of Category of modules with a represented selected finite-presentation backend over Integer Ring / Ideal (2) of Integer Ring and Category of restricted-scalars modules over Integer Ring / Ideal (2) of Integer Ring and Category of vector spaces over Integer Ring / Ideal (2) of Integer Ring
+  in presented: True
+=== exit: 0

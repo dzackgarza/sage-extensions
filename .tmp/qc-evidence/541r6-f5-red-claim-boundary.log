@@ -1,0 +1,20 @@
+=== worktree HEAD: 37ecb0fabd67d92a719d8a9f71a0cb599bcb24b8 (2 modified paths)
+=== files: tests/modules/test_a_torsion_claim_is_refuted_when_asked.sage
+...F                                                                     [100%]
+=================================== FAILURES ===================================
+________ test_the_claim_is_settled_by_the_modules_own_torsion_decision _________
+
+    def test_the_claim_is_settled_by_the_modules_own_torsion_decision() -> None:
+        r"""The validator asks the presented module owner; it reads no relation images itself."""
+        module = _torsion_modules()(_endomorphism_of_z(ZZ(3)))
+    
+>       assert relation_image_reads_of(module.validate_torsion_claim) == 0
+E       assert 2 == 0
+E        +  where 2 = relation_image_reads_of(validate_torsion_claim)
+E        +    where validate_torsion_claim = Finitely presented module on 1 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 3].validate_torsion_claim
+E        +  and   0 = Integer(0)
+
+tests/modules/test_a_torsion_claim_is_refuted_when_asked.sage:62: AssertionError
+=========================== short test summary info ============================
+FAILED tests/modules/test_a_torsion_claim_is_refuted_when_asked.sage::test_the_claim_is_settled_by_the_modules_own_torsion_decision
+1 failed, 3 passed in 3.28s

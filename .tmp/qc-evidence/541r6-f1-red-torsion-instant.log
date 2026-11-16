@@ -1,0 +1,49 @@
+=== worktree HEAD: edc58cbe212eb71cfb77bbcc27b5e0cabfc24af2 (1 modified paths)
+=== files: tests/modules/test_the_torsion_placement_is_the_claiming_construction.sage
+.....F..F.                                                               [100%]
+=================================== FAILURES ===================================
+______________ test_the_torsion_form_constructor_computes_nothing ______________
+
+    def test_the_torsion_form_constructor_computes_nothing() -> None:
+        r"""$Z/5$ with $b = 1/5$: the constructor stores the claim and the Gram data.
+    
+        The chosen resolution is realized and the engine matrix is materialized by
+        the first request for the form, not by the construction (``OWN-22``).  A
+        constructor that computes through either is red.
+        """
+        module = _cokernel_of_a_dilation(ZZ(5))
+        values = _form_values()
+        gram = ((values(QQ(1) / QQ(5)),),)
+    
+        form, constructed, requested = construction_work_of(
+            lambda: _torsion_forms().from_module(module, gram, values),
+            lambda formed: formed.form(),
+        )
+    
+>       assert constructed == 0
+E       assert 2 == 0
+E        +  where 0 = Integer(0)
+
+tests/modules/test_the_torsion_placement_is_the_claiming_construction.sage:148: AssertionError
+_________ test_the_quadratic_torsion_form_constructor_computes_nothing _________
+
+    def test_the_quadratic_torsion_form_constructor_computes_nothing() -> None:
+        r"""The quadratic constructor is as instant as the bilinear one (``OWN-22``)."""
+        module = _cokernel_of_a_dilation(ZZ(5))
+        values = _form_values()
+        gram = ((values(QQ(1) / QQ(5)),),)
+    
+        form, constructed, requested = construction_work_of(
+            lambda: _torsion_quadratic_forms().from_module(module, gram, values),
+            lambda formed: formed.form(),
+        )
+    
+>       assert constructed == 0
+E       assert 2 == 0
+E        +  where 0 = Integer(0)
+
+tests/modules/test_the_torsion_placement_is_the_claiming_construction.sage:195: AssertionError
+=========================== short test summary info ============================
+FAILED tests/modules/test_the_torsion_placement_is_the_claiming_construction.sage::test_the_torsion_form_constructor_computes_nothing
+FAILED tests/modules/test_the_torsion_placement_is_the_claiming_construction.sage::test_the_quadratic_torsion_form_constructor_computes_nothing
+2 failed, 8 passed in 9.63s

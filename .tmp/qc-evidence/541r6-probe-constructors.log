@@ -1,0 +1,13 @@
+=== probe: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/probe541r5i.py
+=== worktree HEAD: 1f7157c1536d44e522ce1b566bfd47de89426f9e (1 modified paths)
+cokernel: Finitely presented module on 2 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 2, 1 ↦ 2]
+invariant factors: Invariant-factor family: [0 ↦ 2, 1 ↦ 2]
+cardinality: 4
+is_torsion_free: False
+plane quotient factors: Invariant-factor family: [0 ↦ 0, 1 ↦ 0]
+claimed torsion module: Finitely presented module on 1 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 3] 3
+its elements: (0, [0], 2*[0])
+direct sum of cyclics: 6
+restriction of scalars over Z in Q:
+QQ cokernel: Invariant-factor family: []
+=== exit: 0

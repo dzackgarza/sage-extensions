@@ -1,0 +1,52 @@
+=== worktree HEAD: e0ba3eae8fc174b08d53fc32f538cf384a53a2e8 (1 modified paths)
+=== files: tests/modules/test_the_real_field_answers_primitivity_publicly.sage
+FF...                                                                    [100%]
+=================================== FAILURES ===================================
+_______ test_the_images_of_a_real_endomorphism_are_read_in_its_own_frame _______
+
+    def test_the_images_of_a_real_endomorphism_are_read_in_its_own_frame() -> None:
+        r"""$e_0 \mapsto e_0$, $e_1 \mapsto 0$ over the owned real field."""
+        plane = RR**2
+        first, _second = tuple(plane.module_generators())
+        projection = plane.Mor(plane)({0: first, 1: plane.zero()})
+    
+>       assert projection.coordinate_images() == ((RR(1), RR(0)), (RR(0), RR(0)))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/modules/test_the_real_field_answers_primitivity_publicly.sage:26: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/structure/element.pyx:494: in sage.structure.element.Element.__getattr__
+    ???
+sage/structure/element.pyx:507: in sage.structure.element.Element.getattr_from_category
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: 'OwnedModuleMor_with_category_with_category.ArrowType' object has no attribute 'coordinate_images'
+
+sage/cpython/getattr.pyx:362: AttributeError
+___________ test_a_free_module_over_the_real_field_has_no_relations ____________
+
+    def test_a_free_module_over_the_real_field_has_no_relations() -> None:
+        r"""The zero relation morphism of a zero submodule has no coordinate images."""
+        plane = RR**2
+    
+>       assert plane.presentation().coordinate_images() == ()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/modules/test_the_real_field_answers_primitivity_publicly.sage:33: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/structure/element.pyx:494: in sage.structure.element.Element.__getattr__
+    ???
+sage/structure/element.pyx:507: in sage.structure.element.Element.getattr_from_category
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: 'OwnedModuleMor_with_category_with_category.ArrowType' object has no attribute 'coordinate_images'
+
+sage/cpython/getattr.pyx:362: AttributeError
+=========================== short test summary info ============================
+FAILED tests/modules/test_the_real_field_answers_primitivity_publicly.sage::test_the_images_of_a_real_endomorphism_are_read_in_its_own_frame
+FAILED tests/modules/test_the_real_field_answers_primitivity_publicly.sage::test_a_free_module_over_the_real_field_has_no_relations
+2 failed, 3 passed in 3.33s

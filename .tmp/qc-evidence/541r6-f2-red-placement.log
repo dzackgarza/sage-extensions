@@ -1,0 +1,33 @@
+=== worktree HEAD: 3fae3b5881fb53773d0ff08db050e89c05e1919c (1 modified paths)
+=== files: tests/modules/test_the_torsion_placement_is_the_claiming_construction.sage
+....F                                                                    [100%]
+=================================== FAILURES ===================================
+_________ test_equipping_a_declared_torsion_module_keeps_its_placement _________
+
+    def test_equipping_a_declared_torsion_module_keeps_its_placement() -> None:
+        r"""The generic form constructor reads the module's declared placement.
+    
+        $Z/5$ is constructed in ``Modules(Z).FinitelyPresented().Torsion()``, and
+        that construction states the module's placement.  Equipping it with a form
+        keeps the placement those data already carry; neither the bilinear nor the
+        quadratic form constructor reads the invariant factors to discover it.
+        """
+        module = Modules(ZZ).FinitelyPresented().Torsion()(_dilation_of_z(ZZ(5)))
+        values = _form_values()
+        gram = ((values(QQ(1) / QQ(5)),),)
+    
+        bilinear = FormModules(ZZ)(module.bilinear_forms(values)(gram))
+        quadratic = FormModules(ZZ)(module.quadratic_forms(values)(gram))
+    
+>       assert bilinear in FormModules(ZZ).FinitelyPresented().Torsion()
+E       assert Finitely presented module on 1 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 5] in Category of finitely presented finitely generated torsion form modules over Integer Ring
+E        +  where Category of finitely presented finitely generated torsion form modules over Integer Ring = Torsion()
+E        +    where Torsion = Category of finitely presented finitely generated form modules over Integer Ring.Torsion
+E        +      where Category of finitely presented finitely generated form modules over Integer Ring = FinitelyPresented()
+E        +        where FinitelyPresented = Category of form modules over Integer Ring.FinitelyPresented
+E        +          where Category of form modules over Integer Ring = FormModules(ZZ)
+
+tests/modules/test_the_torsion_placement_is_the_claiming_construction.sage:123: AssertionError
+=========================== short test summary info ============================
+FAILED tests/modules/test_the_torsion_placement_is_the_claiming_construction.sage::test_equipping_a_declared_torsion_module_keeps_its_placement
+1 failed, 4 passed in 4.87s
