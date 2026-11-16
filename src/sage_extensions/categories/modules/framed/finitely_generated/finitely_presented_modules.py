@@ -11,6 +11,7 @@ and every Smith-form computation is an explicit crossing into it.
 """
 
 from sage.misc.cachefunc import cached_method
+from sage.misc.lazy_attribute import lazy_attribute
 from sage.misc.misc_c import prod
 from sage.misc.repr import repr_lincomb
 from sage.all import PolynomialRing as _SagePolynomialRing
@@ -311,6 +312,56 @@ def _fix_lazy_selected_module_presentation(module, base_ring, realization_factor
     )
 
 
+def _fix_lazy_cokernel_presentation(module, base_ring, presentation_factory, cokernel_morphism=None) -> None:
+    r"""Fix the finite presentation of a cokernel before its arrow exists.
+
+    The defining datum of ``coker(rho)`` is ``rho``, which the construction
+    already holds; the relation morphism ``F_1 -> F_0`` of that cokernel is
+    derived from it, and is built by ``presentation_factory`` on the first read
+    of the chosen module resolution (``AGENTS.md``, "Construction is instant").
+    The cokernel morphism itself is retained now, because it is supplied now.
+
+    The module is its own generator target: the selected generating set is its
+    chosen framing and the generator morphism sends the labels to those
+    generators, so both are the module's own data rather than a second record.
+    """
+    resolution_category = Modules(base_ring).FinitelyPresented().resolution_category()
+    module._selected_module_presentation = _SelectedModulePresentationBackend(cokernel_morphism)
+    labels = module.module_generating_set()
+
+    def selected_resolution():
+        from sage_extensions.categories.modules.module_morphisms.module_morphisms import (
+            _framing_morphism,
+        )
+
+        presentation = presentation_factory()
+        # The generators of the cokernel are the classes of the cover's basis
+        # vectors; asking the module for ``module_generator`` would read the
+        # chosen resolution this line is building.
+        generator_morphism = Sets().Mor(labels, module)(
+            lambda label: module._cover_generator(int(labels.ranking_map()(label)))
+        )
+        augmentation = _framing_morphism(
+            module,
+            presentation.codomain(),
+            generator_morphism,
+        )
+        return resolution_category.selected_presentation(
+            module,
+            presentation,
+            augmentation,
+            generating_set=labels,
+            generator_morphism=generator_morphism,
+        )
+
+    _fix_selected_resolution(
+        module,
+        Modules(base_ring),
+        selected_resolution,
+        replace=True,
+    )
+
+
 class _SelectedFinitePresentationModules(OwnedCategoryOverBaseRing):
     r"""Implementation refinement for modules with a selected finite presentation."""
 
@@ -359,17 +410,28 @@ class _SelectedFinitePresentationModules(OwnedCategoryOverBaseRing):
 
         def __init__(
             self,
-            presentation,
+            presentation=None,
             cokernel_morphism=None,
+            *,
+            presentation_factory=None,
             **rest,
         ) -> None:
             super().__init__(**rest)
-            _fix_selected_module_presentation(
-                self,
-                presentation.codomain().base_ring(),
-                presentation,
-                cokernel_morphism,
-            )
+            match presentation_factory:
+                case None:
+                    _fix_selected_module_presentation(
+                        self,
+                        presentation.codomain().base_ring(),
+                        presentation,
+                        cokernel_morphism,
+                    )
+                case _:
+                    _fix_lazy_cokernel_presentation(
+                        self,
+                        rest["base_ring"],
+                        presentation_factory,
+                        cokernel_morphism,
+                    )
 
         def _same_selected_presentation_as(self, other):
             r"""Return whether ``other`` is a module with the same selected presentation over this ring."""
@@ -1735,7 +1797,21 @@ def _module_invariant_factor_form(module):
             for reduced_position in relation_labels
         }
     )
-    reduced = reduced_presentation.cokernel()
+    # The invariants read above decide whether this module is torsion, and this
+    # construction is where that is known: a retained invariant is a nonzero
+    # non-unit exactly when its cyclic summand is torsion, so the reduced module
+    # is torsion exactly when no retained invariant vanishes.  Placement is the
+    # claim of the construction that knows it (``CAT-04``), so the claim is made
+    # here instead of every cokernel deciding its own torsion placement from a
+    # rank at construction.
+    retained_invariants = tuple(
+        invariants[int(retained_positions[int(position)])] for position in reduced_labels
+    )
+    match all(invariant != ring.zero() for invariant in retained_invariants):
+        case True:
+            reduced = Modules(ring).FinitelyPresented().Torsion()(reduced_presentation)
+        case False:
+            reduced = reduced_presentation.cokernel()
 
     if all(
         invariants[int(retained_positions[int(position)])] == ring.zero()
@@ -1908,32 +1984,84 @@ class _GeneralPresentedModule:
     module inside it: Sage objects over the engine ring when the base ring
     has a Sage engine, else the owned free cover and ``None``.  Both are
     private; the category states the mathematics.
+
+    A construction that does not hold them yet passes
+    ``engine_from_presentation=True``: the cover, the relation submodule and the
+    Smith engine are then built from the selected presentation on the first
+    request that needs one of them, and kept.  Constructing such a module
+    therefore computes nothing (``AGENTS.md``, "Construction is instant").  The
+    three are separate requests because realizing the presentation itself
+    constructs a framing morphism, whose Mor category asks this module for its
+    zero element; the cover answers that without the relation matrix.
     """
 
     def __init__(
         self,
-        free_module,
-        relation_submodule,
+        free_module=None,
+        relation_submodule=None,
         *,
         base_ring,
         module_generating_set,
-        presentation,
+        presentation=None,
+        framing_source=None,
         cokernel_morphism=None,
+        engine_from_presentation=False,
         **rest,
     ) -> None:
-        self._free_module = free_module
-        self._relation_submodule = relation_submodule
+        self._presented_framing_source = presentation.codomain() if framing_source is None else framing_source
+        self._presented_module_generating_set = module_generating_set
+        if engine_from_presentation:
+            self._engine_from_presentation = True
+        else:
+            self._free_module = free_module
+            self._relation_submodule = relation_submodule
         self._lifted_relation_free_module = None
         self._lifted_relation_submodule = None
         super().__init__(
             base_ring=base_ring,
             module_generating_set=module_generating_set,
             module_generator_function=lambda label: self._cover_generator(int(module_generating_set.ranking_map()(label))),
-            framing_source=presentation.codomain(),
+            framing_source=self._presented_framing_source,
             presentation=presentation,
             cokernel_morphism=cokernel_morphism,
             **rest,
         )
+
+    def presented_framing_source(self):
+        r"""Return the degree-zero module the selected presentation lands in.
+
+        A private contract of the presented-module realization: the construction
+        stored this codomain, and the engine cover of an adic completion is this
+        module itself rather than a fresh free module.
+        """
+        return self._presented_framing_source
+
+    def presented_module_generating_set(self):
+        r"""Return the labels of this module's chosen generating set.
+
+        A private contract of the presented-module realization, for the same
+        reason: the construction stored the labels, and reading
+        ``module_generating_set()`` realizes the chosen resolution, which
+        constructs the framing morphism whose Mor category asks this module for
+        its zero element.
+        """
+        return self._presented_module_generating_set
+
+    @lazy_attribute
+    def _free_module(self):
+        r"""The engine cover of the presentation, built on the first request."""
+        assert self.__dict__.get("_engine_from_presentation") is True, (
+            f"{self} was constructed with its engine cover, not with a construction for it"
+        )
+        return _engine_cover_of_presentation(self)
+
+    @lazy_attribute
+    def _relation_submodule(self):
+        r"""The relation submodule inside the cover, built on the first request."""
+        assert self.__dict__.get("_engine_from_presentation") is True, (
+            f"{self} was constructed with its relation submodule, not with a construction for it"
+        )
+        return _relation_submodule_of_presentation(self)
 
     def _scale_representative(self, scalar, representative):
         r"""Scale a private cover representative by an owned scalar."""
@@ -2304,24 +2432,40 @@ class _PresentedModule(_GeneralPresentedModule):
         self,
         engine=None,
         *,
-        free_module,
-        relation_submodule,
+        free_module=None,
+        relation_submodule=None,
         base_ring,
         module_generating_set,
-        presentation,
+        presentation=None,
+        engine_from_presentation=False,
         cokernel_morphism=None,
         **rest,
     ) -> None:
-        self._pid_engine = engine
+        if not engine_from_presentation:
+            self._pid_engine = engine
         super().__init__(
             free_module,
             relation_submodule,
             base_ring=base_ring,
             module_generating_set=module_generating_set,
             presentation=presentation,
+            engine_from_presentation=engine_from_presentation,
             cokernel_morphism=cokernel_morphism,
             **rest,
         )
+
+    @lazy_attribute
+    def _pid_engine(self):
+        r"""Sage's FGP module over the engine ring, built on the first request.
+
+        A module constructed with ``engine_from_presentation`` fixes the
+        construction of this workspace, and its model is built here, from the
+        presentation's relation matrix.
+        """
+        assert self.__dict__.get("_engine_from_presentation") is True, (
+            f"{self} was constructed with its Smith engine, not with a construction for it"
+        )
+        return _smith_engine_of_presentation(self)
 
     def _smith_engine(self):
         r"""Sage's FGP module over the engine ring, or ``None``.
@@ -2361,14 +2505,95 @@ class _PresentedModule(_GeneralPresentedModule):
         return self._from_coordinates(coordinates)
 
 
+def _engine_cover_of_presentation(module):
+    r"""The private cover a presented module's engine computes in.
+
+    The cover is a free module on the module's chosen generators: the owned
+    free module when the base ring has no Sage computation ring behind it, and
+    the Sage free module over the engine ring when it has.  An adic completion
+    keeps its own degree-zero module, because Sage's free-submodule echelon
+    constructor divides by a nonunit pivot and leaves the ring, while the
+    presentation is exact owned data.
+
+    It is built on the first request, never by the construction, and it asks
+    the presentation nothing: realizing the presentation constructs a framing
+    morphism whose Mor category asks this module for its zero element.
+    """
+    from sage.categories.rings import Rings as SageRings
+
+    base_ring = module.base_ring()
+    engine = _engine_ring(base_ring)
+    labels = module.presented_module_generating_set()
+    if engine not in SageRings():
+        # The base ring has no Sage computation ring behind it, so the cover is
+        # the owned free module; equality of elements is not decided here.
+        return _cover_free_module(module, labels)
+    from sage.modules.free_module import FreeModule as SageFreeModule
+
+    from sage_extensions.categories.rings.commutative_algebra import AdicCompletions
+
+    match base_ring:
+        case _ if base_ring in AdicCompletions():
+            return module.presented_framing_source()
+        case _:
+            return SageFreeModule(engine, int(labels.cardinality()))
+
+
+def _relation_submodule_of_presentation(module):
+    r"""The relation submodule of a presented module inside its engine cover.
+
+    The engine spans it by the images ``r(e_i)``, the columns of the matrix of
+    the selected relation morphism, materialized once by
+    :func:`...pure.modules._engine_matrix` at that framed realization.  It is
+    built on the first request, never by the construction.  ``None`` states
+    that this ring's cover holds no represented relation submodule.
+    """
+    from sage.categories.rings import Rings as SageRings
+
+    base_ring = module.base_ring()
+    engine = _engine_ring(base_ring)
+    if engine not in SageRings():
+        return None
+    from sage_extensions.categories.rings.commutative_algebra import AdicCompletions
+
+    match base_ring:
+        case _ if base_ring in AdicCompletions():
+            return None
+        case _:
+            free = module._free_module
+            relation_vectors = _engine_matrix(module.presentation()).columns()
+            return free.submodule(relation_vectors) if relation_vectors else free.zero_submodule()
+
+
+def _smith_engine_of_presentation(module):
+    r"""Sage's FGP module over the presented module's cover and relation submodule.
+
+    ``None`` for every ring but the integral one: Sage's FGP implementation
+    calls ``_clear_denom`` internally in its Smith and optimization algorithms,
+    and the live Smith-form surface of this project is the integral ``ZZ``
+    specialization.  Other Sage rings use the general finite-presentation
+    parent rather than being admitted to FGP by probing an incidental matrix
+    method.  Built on the first request, never by the construction.
+    """
+    engine = _engine_ring(module.base_ring())
+    if engine is not SageZZ:
+        return None
+    from sage.modules.fg_pid.fgp_module import FGP_Module
+
+    return FGP_Module(module._free_module, module._relation_submodule, check=False)
+
+
 def _new_presented_module(
     *,
-    free_module,
-    relation_submodule,
+    free_module=None,
+    relation_submodule=None,
     base_ring,
     module_generating_set,
-    presentation,
+    presentation=None,
+    presentation_factory=None,
     engine=None,
+    engine_from_presentation=False,
+    framing_source=None,
     cokernel_morphism=None,
     subobject_ambient=None,
     subobject_generator_images=None,
@@ -2383,14 +2608,21 @@ def _new_presented_module(
     if base_ring in OwnedFields():
         categories.append(VectorSpaces(base_ring))
     data = {
-        "engine": engine,
         "free_module": free_module,
         "relation_submodule": relation_submodule,
         "base_ring": base_ring,
         "module_generating_set": module_generating_set,
         "presentation": presentation,
+        "presentation_factory": presentation_factory,
         "cokernel_morphism": cokernel_morphism,
     }
+    match engine_from_presentation:
+        case True:
+            data["engine_from_presentation"] = True
+        case False:
+            data["engine"] = engine
+    if framing_source is not None:
+        data["framing_source"] = framing_source
     if subobject_ambient is not None or subobject_inclusion_factory is not None:
         categories.append(ModuleSubobjects(base_ring))
         if subobject_ambient is not None:
@@ -3283,119 +3515,118 @@ def _presented_module_from_morphism(
     _biproduct_factors=None,
     _require_torsion=False,
 ):
-    r"""Return ``coker(presentation)`` in ``R-Mod`` with its selected module presentation."""
-    # The cokernel here is taken in the module category.  A stricter structured
-    # morphism (lattice/form/equivariant/etc.) must first be read as its
-    # underlying R-linear arrow; otherwise later presentation constructions
-    # incorrectly inherit the stricter Mor object.
+    r"""Return ``coker(presentation)`` in ``R-Mod`` with its selected module presentation.
 
+    A presentation ``F_1 -> F_0`` is the case ``F_0`` free.  The chosen
+    presentation of the cokernel is the presentation of ``F_0`` with the images
+    of the module generators of ``F_1`` added as relations, and the cokernel
+    retains ``rho`` as the morphism it is the cokernel of.
+
+    **The construction is the datum.**  The codomain supplies the framing of the
+    cokernel and the labels of that framing, and the module is built on those
+    alone: its relation morphism, its engine cover, its relation submodule and
+    its private Smith engine are built by the first request that needs one of
+    them (``AGENTS.md``, "Construction is instant").  Nothing here decides a
+    property of the cokernel.  In particular the torsion placement is not
+    computed from a rank: a caller that claims torsion passes
+    ``Modules(R).FinitelyPresented().Torsion()``, and that constructor is the
+    claim (``CAT-04``: placement is made by the construction that states it,
+    never justified by an implementation's answer).
+
+    The ``LocalizationRings`` route is the one exception, because it returns a
+    module localized from a presentation over the source ring: that source
+    presentation is that construction's own datum, and it is built here.
+    """
     presentation_source = presentation.domain()
     presentation_target = presentation.codomain()
-    presentation = presentation_source.module_category().Mor(
-        presentation_source,
-        presentation_target,
-    )(presentation)
-    codomain = presentation.codomain()
+    codomain = presentation_target
     base_ring = codomain.base_ring()
-    assert presentation.domain().has_selected_module_resolution(), (
+    assert presentation_source.has_selected_module_resolution(), (
         f"cannot form the cokernel of {presentation}: its domain must be a {base_ring}-module "
-        f"with chosen generators, but it is in {presentation.domain().category()}"
+        f"with chosen generators, but it is in {presentation_source.category()}"
     )
-    assert presentation.domain().module_generating_set().cardinality().is_finite(), (
+    assert presentation_source.module_generating_set().cardinality().is_finite(), (
         f"cannot form the cokernel of {presentation}: its domain must be finitely generated, "
-        f"but its generators are indexed by {presentation.domain().module_generating_set()}"
+        f"but its generators are indexed by {presentation_source.module_generating_set()}"
     )
     assert codomain in ModulesWithChosenFinitePresentation(base_ring), (
         f"cannot form the cokernel of {presentation}: its codomain {codomain} must be finitely "
         f"presented with chosen generators and relations, but it is in {codomain.category()}"
     )
-    engine = _engine_ring(base_ring)
-
-    labels = codomain.module_generating_set()
-    width = int(labels.cardinality())
-    # The relations of the cokernel of p: P -> M = coker(r) are those of M,
-    # the images r(e_i), together with lifts to F_0 of the images p(e_s).
-    existing = _relation_morphism(codomain)
-    existing_images = _relation_images(codomain)
-    added_labels = presentation.domain().module_generating_set()
-
-    def added_image(source_label):
-        coordinates = codomain.framing_morphism().lift(presentation(presentation.domain().module_generator(source_label)))
-        return tuple(coordinates(label) for label in labels)
-
-    added_images = tuple(added_image(source_label) for source_label in added_labels)
-    relation_images = existing_images + added_images
-
-    torsion_decision = None
-    match base_ring in PrincipalIdealDomains():
-        case True:
-            # The cokernel is torsion exactly when the relation morphism
-            # becomes surjective over the fraction field.
-            from sage.matrix.constructor import matrix
-
-            field = base_ring.fraction_field_map().codomain()
-            # Scalar extension preserves the rank of this exact relation
-            # matrix. The selected presentation below still owns all labels
-            # and relations; only its rank is computed in the field engine.
-            relations = matrix(
-                engine,
-                len(relation_images),
-                width,
-                [_engine_element(base_ring, coefficient) for image in relation_images for coefficient in image],
-            )
-            torsion_decision = int(relations.change_ring(_engine_ring(field)).rank()) == width
-        case False:
-            pass
-    match (_require_torsion, torsion_decision):
-        case (True, True):
-            pass
-        case (True, False):
-            raise ValueError(
-                f"the cokernel of {presentation} is not a torsion {base_ring}-module: it has a nonzero free summand"
-            )
-        case (True, _):
-            raise AssertionError(
-                f"cannot decide whether the cokernel of {presentation} is a torsion {base_ring}-module: "
-                "the rank of its relation matrix over the fraction field could not be computed"
-            )
-        case _:
-            pass
-    match torsion_decision is True:
-        case True:
-            _extra_categories = (
-                *_extra_categories,
-                Modules(base_ring).FinitelyPresented().Torsion(),
-            )
-        case False:
-            pass
     from sage_extensions.categories.modules.framed.framed_free_modules import (
         FramedFreeModules,
     )
 
-    # When every selected relation is zero, the chosen generators themselves
-    # are a basis: coker(0 : R^J -> R^I) = R^I.  Keep the selected quotient
-    # and its presentation, while declaring that basis at the module owner.
-    # In particular a free functor must retain this exact module, not replace
-    # it by its framing source merely to acquire a Free placement.
-    match conjunction(
-        coefficient == base_ring.zero()
-        for image in relation_images
-        for coefficient in image
-    ):
-        case True:
-            _extra_categories = (*_extra_categories, FramedFreeModules(base_ring).FinitelyGenerated())
+    labels = codomain.module_generating_set()
+    width = int(labels.cardinality())
 
-    if (
-        not existing_images
-        and presentation.domain() in FramedFreeModules(base_ring)
-        and codomain in FramedFreeModules(base_ring)
-    ):
-        selected_presentation = presentation._framed_coordinate_morphism()
-    else:
+    def cokernel_presentation():
+        r"""The selected relation morphism ``F_1 -> F_0`` of this cokernel.
+
+        The cokernel is taken in the module category.  A stricter structured
+        morphism (lattice/form/equivariant/etc.) is first read as its
+        underlying ``R``-linear arrow, so later presentation constructions do
+        not inherit the stricter Mor object.
+
+        The relations of the cokernel of ``p: P -> M = coker(r)`` are those of
+        ``M``, the images ``r(e_i)``, together with lifts to ``F_0`` of the
+        images ``p(e_s)``.
+        """
+        arrow = presentation_source.module_category().Mor(
+            presentation_source,
+            presentation_target,
+        )(presentation)
+        existing = _relation_morphism(codomain)
+        existing_images = _relation_images(codomain)
+        added_labels = presentation_source.module_generating_set()
+
+        def added_image(source_label):
+            coordinates = codomain.framing_morphism().lift(
+                arrow(presentation_source.module_generator(source_label))
+            )
+            return tuple(coordinates(label) for label in labels)
+
+        added_images = tuple(added_image(source_label) for source_label in added_labels)
+        relation_images = existing_images + added_images
+        match _require_torsion:
+            case True:
+                # The claim is the caller's, and this refutes it.  Over a PID
+                # the cokernel is torsion exactly when the relation morphism
+                # becomes surjective over the fraction field, and scalar
+                # extension preserves the rank of this exact relation matrix.
+                from sage.matrix.constructor import matrix
+
+                field = base_ring.fraction_field_map().codomain()
+                relations = matrix(
+                    _engine_ring(base_ring),
+                    len(relation_images),
+                    width,
+                    [
+                        _engine_element(base_ring, coefficient)
+                        for image in relation_images
+                        for coefficient in image
+                    ],
+                )
+                match int(relations.change_ring(_engine_ring(field)).rank()) == width:
+                    case True:
+                        pass
+                    case False:
+                        raise ValueError(
+                            f"the cokernel of {presentation} is not a torsion {base_ring}-module: "
+                            "it has a nonzero free summand"
+                        )
+            case False:
+                pass
+        if (
+            not existing_images
+            and presentation_source in FramedFreeModules(base_ring)
+            and codomain in FramedFreeModules(base_ring)
+        ):
+            return arrow._framed_coordinate_morphism()
         existing_labels = existing.domain().module_generating_set()
         relation_labels = Sets().coproduct(
             indexed_family(
-                Sets.Δ[1],
+                Sets().Δ[1],
                 lambda index: existing_labels if int(index) == 0 else added_labels,
             )
         )
@@ -3412,7 +3643,7 @@ def _presented_module_from_morphism(
                 dict(zip(labels, coordinates, strict=True))
             )
 
-        selected_presentation = source.module_category().Mor(source, target)(relation_image)
+        return source.module_category().Mor(source, target)(relation_image)
 
     # A presentation written directly over a localization is still a finite
     # presentation over the source ring after clearing one unit denominator
@@ -3423,6 +3654,7 @@ def _presented_module_from_morphism(
     if base_ring in LocalizationRings():
         from sage_extensions.categories.modules.localizations import _localized_module
 
+        selected_presentation = cokernel_presentation()
         source_ring = base_ring.localization_source()
         source_relations = source_ring._fresh_free_module_on(selected_presentation.domain().module_generating_set())
         source_generators = source_ring._fresh_free_module_on(labels)
@@ -3468,94 +3700,21 @@ def _presented_module_from_morphism(
         )
         return localization.adopt_object_image(source_quotient, localized)
 
-    from sage.categories.rings import Rings as SageRings
-
-    pid_backend = False
-    if engine in SageRings():
-        from sage.modules.free_module import FreeModule as SageFreeModule
-
-        from sage_extensions.categories.rings.commutative_algebra import (
-            AdicCompletions,
-        )
-
-        match base_ring:
-            case _ if base_ring in AdicCompletions():
-                # A capped-precision adic engine advertises PID linear algebra,
-                # but Sage's free-submodule echelon constructor divides by a
-                # nonunit pivot and leaves the ring.  The presentation is exact
-                # owned data, so the owned free cover and the relation matrix
-                # are retained instead.
-                free = selected_presentation.codomain()
-                relation_submodule = None
-            case _:
-                free = SageFreeModule(engine, width)
-                # The engine spans the relation submodule by the images
-                # r(e_i), the columns of the matrix of the relation morphism.
-                relation_vectors = _engine_matrix(selected_presentation).columns()
-                relation_submodule = free.submodule(relation_vectors) if relation_vectors else free.zero_submodule()
-        # Sage's FGP implementation calls ``_clear_denom`` internally in
-        # its Smith/optimization algorithms.  The live Smith-form surface of
-        # this project is the integral ``ZZ`` specialization; other Sage rings
-        # use the general finite-presentation parent below rather than being
-        # admitted to FGP by probing an incidental matrix method.
-        pid_backend = engine is SageZZ
-    if pid_backend:
-        from sage.modules.fg_pid.fgp_module import FGP_Module
-
-        quotient = _new_presented_module(
-            engine=FGP_Module(free, relation_submodule, check=False),
-            free_module=free,
-            relation_submodule=relation_submodule,
-            base_ring=base_ring,
-            module_generating_set=labels,
-            presentation=selected_presentation,
-            cokernel_morphism=_cokernel_morphism,
-            subobject_ambient=_subobject_ambient,
-            subobject_generator_images=_subobject_generator_images,
-            subobject_lift=_subobject_lift,
-            subobject_inclusion_factory=_subobject_inclusion_factory,
-            biproduct_factors=_biproduct_factors,
-            extra_categories=_extra_categories,
-            extra_construction_data=_extra_construction_data,
-        )
-    elif engine in SageRings():
-        quotient = _new_presented_module(
-            free_module=free,
-            relation_submodule=relation_submodule,
-            base_ring=base_ring,
-            module_generating_set=labels,
-            presentation=selected_presentation,
-            cokernel_morphism=_cokernel_morphism,
-            subobject_ambient=_subobject_ambient,
-            subobject_generator_images=_subobject_generator_images,
-            subobject_lift=_subobject_lift,
-            subobject_inclusion_factory=_subobject_inclusion_factory,
-            biproduct_factors=_biproduct_factors,
-            extra_categories=_extra_categories,
-            extra_construction_data=_extra_construction_data,
-        )
-    else:
-        # The base ring has no Sage computation ring behind it, so the
-        # cover is the owned free module and the presentation is the only
-        # datum; equality of elements is not decided here.
-        quotient = _new_presented_module(
-            free_module=_cover_free_module(codomain, labels),
-            relation_submodule=None,
-            base_ring=base_ring,
-            module_generating_set=labels,
-            presentation=selected_presentation,
-            cokernel_morphism=_cokernel_morphism,
-            subobject_ambient=_subobject_ambient,
-            subobject_generator_images=_subobject_generator_images,
-            subobject_lift=_subobject_lift,
-            subobject_inclusion_factory=_subobject_inclusion_factory,
-            biproduct_factors=_biproduct_factors,
-            extra_categories=_extra_categories,
-            extra_construction_data=_extra_construction_data,
-        )
-
-    return quotient
-
+    return _new_presented_module(
+        base_ring=base_ring,
+        module_generating_set=labels,
+        presentation_factory=cokernel_presentation,
+        engine_from_presentation=True,
+        framing_source=codomain,
+        cokernel_morphism=_cokernel_morphism,
+        subobject_ambient=_subobject_ambient,
+        subobject_generator_images=_subobject_generator_images,
+        subobject_lift=_subobject_lift,
+        subobject_inclusion_factory=_subobject_inclusion_factory,
+        biproduct_factors=_biproduct_factors,
+        extra_categories=_extra_categories,
+        extra_construction_data=_extra_construction_data,
+    )
 
 __all__ = [
     "_relation_morphism",
