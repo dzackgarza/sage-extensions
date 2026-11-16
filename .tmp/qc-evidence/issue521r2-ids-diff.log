@@ -1,0 +1,7 @@
+=== failed/error id sets, tests/foundations tests/sets tests/rings
+=== one pytest process per tree, same command, base 81b7bbd against the rebased repair
+=== base:   58 failed, 246 passed, 252 errors in 197.25s (0:03:17)
+=== repair: 58 failed, 249 passed, 252 errors in 299.21s (0:04:59)
+=== id counts: base 310, repair 310
+=== ids in the repair that the base does not have:
+=== ids in the base that the repair does not have:
