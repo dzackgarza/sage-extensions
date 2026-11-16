@@ -1,10 +1,10 @@
-r"""A session file whose subscript names something the file binds nowhere.
+r"""A session file whose subscript names a generator the file binds nowhere.
 
-``t`` appears in no binding statement of this file, and the file star-imports
-the session, so the parse cannot establish that ``t`` is new.  The name is
-therefore Python's to report when the file runs:
+``t`` appears in no binding statement of this file and the session publishes no
+``t``, so ``QQ[t]`` is the polynomial ring written as it is written: the research
+dialect declares ``t`` its generator.
 ``tests/foundations/test_a_session_file_binds_only_what_it_writes.sage`` loads
-it and asks for that report.
+this file and asks the loaded scope for the ring and for the generator.
 """
 
 from sage_extensions.all import *  # noqa: F401,F403
