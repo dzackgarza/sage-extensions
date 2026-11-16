@@ -755,23 +755,25 @@ class PredicateSubgroups(OwnedParameterizedCategory):
             is decided between them by the witness each certificate retains.
 
             The covering of one plane is the covering of every plane, when the
-            subgroup is the kernel of the character the row was split by: an
-            ambient isometry conjugates that kernel to itself, so the family at
-            one plane, carried to another by the composite of the two planes'
+            subgroup is invariant under conjugation by the ambient group: an
+            ambient isometry then carries the subgroup to itself, so the family
+            at one plane, carried to another by the composite of the two planes'
             registered lifts, is exactly the family of the other plane.  The
             plane's parabolic, its conjugated generators, their word section
             and its double cosets are therefore computed once for the row,
             which is what makes the plane count affordable at all.  The
             invariance is the quotient's own decision
-            (:meth:`...OrthogonalCharacterQuotient.preserves_conjugation`): a
-            kernel of the character, ``ker rho`` or ``ker(rho, sn)`` alike, is
-            normal in the orthogonal group, and a preimage of a proper subgroup
-            of the finite image is not transported because its normality is
-            that subgroup's, which the quotient does not settle.  What a
-            subgroup's covering *is* remains its own question: it is supplied
-            where the double cosets descend to the finite image, and a subgroup
-            that cuts a sign as well keeps the flag route until that covering
-            exists.
+            (:meth:`...OrthogonalCharacterQuotient.preserves_conjugation`):
+            the subgroup is ``chi^-1(S)`` for its finite character image ``S``,
+            and it holds exactly when ``S`` is normal in ``chi(O(L))`` -- so for
+            the kernel of any character, ``ker rho``, ``ker(rho, sn)`` and a
+            sign kernel alike, and for the preimage of any normal image.
+            What a subgroup's covering *is* remains its own question, and it is
+            answered for every character: the double cosets descend to the
+            finite image ``chi(Pi)`` because the parabolic meets ``ker chi`` in
+            a normal subgroup of itself and that subgroup lies in the subgroup
+            of ``Pi`` the covering is taken for (D. Dutour Sikirić and
+            K. Hulek, arXiv:2302.01679v2, Lemma 3.6, printed p. 22).
             """
             from sage_extensions.categories.isotropic_orbits import (
                 ArithmeticCuspIncidence,
