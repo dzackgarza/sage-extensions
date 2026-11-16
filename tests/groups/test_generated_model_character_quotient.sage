@@ -349,7 +349,7 @@ def test_two_sign_factors_image_order_matches_the_listed_oracle() -> None:
         pre = G.discriminant_preimage(OG.trivial_subgroup())
         det_kernel = G.predicate_subgroup(
             lambda g: g.determinant() == 1,
-            "determinant one",
+            lambda: "determinant one",
             character_data={"determinant_kernel": True},
             character_data_complete=True,
         )
