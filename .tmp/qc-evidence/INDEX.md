@@ -3118,3 +3118,7 @@ after main advanced to `a38faef` and the branch was rebased onto it:
 | `issue381-u-plus-u2-driver-rebased.log` | the rebased head | the driver's `--lattice 'U+U(2)+<-2>'` run on the head that is pushed: 4 edges over 3 line and 2 plane cusps for each kernel row, exit 0 |
 | `issue381-u-u2-m4-driver.log` | the rebased head | the driver's `--lattice 'U+U(2)+<-4>'` run: 6 edges over 4 line and 3 plane cusps for each kernel row, in 4.0 s and 19.5 s, exit 0 |
 | `issue381-kernel-incidence-gate-rebased.log` | the rebased head, with the clause repair | `tests/lattices/test_the_kernel_incidence_rows.sage` with the test lint on: **3 passed in 55.45 s**, one call over the 20 s gate (21.23 s) |
+| `issue381-driver-final-6JRS.log` | the head this pushes (`464a3a5` rebased) | the driver's kernel rows on `6JRS`: 1 edge over 1 line and 1 plane cusp each, then the trivial-image agreement, exit 0 |
+| `issue381-driver-final-UU2-2.log` | the same head | the driver on `U+U(2)+<-2>`: 4 edges over 3 line and 2 plane cusps each, exit 0 |
+| `issue381-driver-final-UU2-4.log` | the same head | the driver on `U+U(2)+<-4>`, the gate's second specimen: 6 edges over 4 line and 3 plane cusps each, exit 0 |
+| `issue381-kernel-incidence-gate-final.log` | the same head | `tests/lattices/test_the_kernel_incidence_rows.sage`, lint on: **3 passed in 62.84 s**, longest call 21 s over the 20 s gate |

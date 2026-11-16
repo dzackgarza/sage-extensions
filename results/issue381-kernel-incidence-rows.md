@@ -19,7 +19,7 @@ line rows of #357, each edge joining a line that lies in its plane.
   per-test gate can afford.
 * `results/coble-kernel-incidence-rows.yml` is the dispatchable job;
   `tests/lattices/test_the_kernel_incidence_rows.sage` gates the same
-  guarantees on `6JRS = U + U + <-2>` and `U + U(2) + <-2>`.
+  guarantees on `6JRS = U + U + <-2>` and `U + U(2) + <-4>`.
 
 ## Dispatching the T_Co rows
 
@@ -38,35 +38,48 @@ then dispatch **Coble kernel incidence rows (#381)** with
 
 `rows: "O,Gamma_{Co,2}"` re-runs the two decided rows of #391 (one edge; 13
 edges over 4 line and 7 plane cusps), and `lattice: "6JRS"` runs the
-small-lattice check, which must exit 0.
+small-lattice check, which must exit 0.  `--lattice` also names
+`U+U+<-4>`, `U+U(2)+<-2>` and `U+U(2)+<-4>`.
 
-## Measured on the pinned image (this round)
+## Measured on the pinned image (the head this pushes)
 
 | run | result |
 | --- | --- |
-| driver, `--lattice 6JRS` | 1 edge over 1 line and 1 plane cusp for each kernel row, 13.7 s / 17.2 s, then agreement with the ambient rows, exit 0 |
-| driver, `--lattice U+U(2)+<-2>` | 4 edges over 3 line and 2 plane cusps for each kernel row, 41.2 s / 63.8 s, exit 0 |
-| gate file, three tests | 3 passed in 164.62 s, three calls over the 20 s gate |
-| the #391 `T_Co` incidence gate file on this tree | **2 passed in 1696.37 s** -- `Gamma_{Co,2}` 1685.31 s, `O(T_Co)` 10.11 s |
+| driver, `--lattice 6JRS` | 1 edge over 1 line and 1 plane cusp for each kernel row, then agreement with the ambient rows, exit 0 |
+| driver, `--lattice 'U+U(2)+<-2>'` | 4 edges over 3 line and 2 plane cusps for each kernel row, exit 0 |
+| driver, `--lattice 'U+U(2)+<-4>'` | 6 edges over 4 line and 3 plane cusps for each kernel row, exit 0 |
+| gate file, three tests | **3 passed in 62.84 s**, the longest call 21 s over the 20 s gate |
+| the #391 `T_Co` incidence gate file | **2 passed in 1696.37 s** -- `Gamma_{Co,2}` 1685.31 s, `O(T_Co)` 10.11 s |
 
-That last row is the cost witness, and it is new: on `main` the same file
-raised `NameError` in its first line row, so it had never run to completion.
-`Gamma_{Co,2}` -- four line cusps, seven plane cusps, thirteen edges --
-costs 28 minutes, and almost all of it is the per-flag cusp matching: the
-incidence call matches every flag's line against every cusp of the line row,
-and a probe the divided-class invariant does not separate falls through to
+That last row is the cost witness, and it is new: on `main` before this round
+the same file raised `NameError` in its first line row, so it had never run to
+completion.  `Gamma_{Co,2}` -- four line cusps, seven plane cusps, thirteen
+edges -- costs 28 minutes, and almost all of it is the per-flag cusp matching:
+the incidence call matches every flag's line against every cusp of the line
+row, and a probe the divided-class invariant does not separate falls through to
 the exact isometry search.
 
-## Two repairs this row needed first
+## The repairs this row needed first
 
-Neither kernel incidence row could return on `main` before this round, and
-neither could #391's: `488f06f` (#390) deleted `_isotropic_line_class_points`
-and left its two call sites, so every subgroup line row raised `NameError`;
-and `2291235` (#531) made a finite ordered set identify its points through
-`dict.fromkeys`, which the two incidence record classes cannot enter because
-they define no `__hash__`.  Both are repaired at the owner -- the deleted
-function restored verbatim from `1da602e`, and each record class given the
-equality its own docstring states plus a hash that agrees with it.
+Neither kernel incidence row could return on `main` when this round started,
+and neither could #391's:
+
+* `488f06f` (#390) deleted `_isotropic_line_class_points` and left its two call
+  sites, so every subgroup line row raised `NameError`; the function is
+  restored verbatim from `1da602e`, the commit that added it;
+* `2291235` (#531) made a finite ordered set identify its points through
+  `dict.fromkeys`, which the two incidence record classes cannot enter because
+  they define no `__hash__`; each now carries the equality its own docstring
+  states plus a hash that agrees with it (constant over its owner, as the
+  category prescribes for a point whose owner has no canonical hash).
+
+Two defects of other routes were found and are **not** repaired here, because
+they are not this row's: `flag_stabilizer` passing `description=` where #537
+requires a nullary `stated_clause` (the base of this push carries the repair,
+made independently while this round ran), and the same function inverting a
+basis change of the rank-two zero-form reduction lattice of
+`U + U(2) + <-2>` whose determinant is `-2`, which is why that lattice is the
+driver's and `U + U(2) + <-4>` is the gate's.
 
 ## What is *not* decided, and why
 
