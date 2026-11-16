@@ -324,14 +324,15 @@ class FiniteGSets(CategoryPacketMethods, OwnedParameterizedCategory):
         consumed before, not after, the sweep.
 
         The finished sweep is closed under every selected letter, so the
-        positions reachable in its table from one of its seeds are exactly that
-        seed's orbit, and the words composed along them carry the seed to each
-        point.  So each seed's first orbit question is answered from the table
-        the construction already filled -- its points, its section and the
-        orbit's own table -- and not searched for a second time
-        (``_orbit_of``).  That is every seed the sweep started from, and a
-        point listed twice is one seed.  The orbit of a point the sweep did not
-        start from is searched for.
+        positions reachable in its table from any of its points are exactly
+        that point's orbit, and the words composed along them carry the point
+        to each other one.  The set retains that table, and the first orbit
+        question about one of its seeds is answered from it -- the points, the
+        section and the orbit's own table -- without a second search
+        (``_orbit_of``).  A point listed twice is one seed; the orbit of a point
+        the sweep did not start from is searched for.  The orbit sets are built
+        on that first question, not here: a caller that reads only the union
+        builds none of them.
         """
         seeds = tuple(seeds)
         augmentation = self.group().selected_group_resolution().augmentation()
@@ -339,25 +340,7 @@ class FiniteGSets(CategoryPacketMethods, OwnedParameterizedCategory):
             seeds, action, augmentation, retain_transitions=True,
         )
         g_set = self._from_orbit_sweep(points, action, augmentation, transitions)
-        orbits = {}
-        for seed in finite_ordered_set(tuple(seeds)):
-            orbit_points, orbit_words, orbit_transitions = self._orbit_within_sweep(
-                points, transitions, augmentation, seed,
-            )
-            reached = tuple(orbit_points)
-            if reached not in orbits:
-                orbits[reached] = (
-                    g_set if reached == tuple(points)
-                    else self._from_orbit_sweep(
-                        orbit_points, action, augmentation, orbit_transitions,
-                    )
-                )
-            orbit = orbits[reached]
-            ranking = orbit.ranking_map()
-            section = [None] * len(orbit_points)
-            for position, point in enumerate(orbit_points):
-                section[int(ranking(point))] = orbit_words[position]
-            g_set._orbit_of.set_cache((orbit, section, augmentation), seed)
+        g_set._finished_sweep = (frozenset(seeds), points, transitions, action, augmentation, {})
         return g_set
 
     def _orbit_within_sweep(self, points, transitions, augmentation, seed):
@@ -813,14 +796,35 @@ class FiniteGSets(CategoryPacketMethods, OwnedParameterizedCategory):
             ``p |-> t_p``.  The orbit is realized from that sweep's table,
             which is read at construction and not stored.
 
-            A set built by ``from_finite_orbits`` already holds this answer for
-            each seed it was built from: that construction's sweep reached every
-            seed's orbit, and its table gives each seed's points, its section and
-            the orbit's own table, so the first question about a seed's orbit
-            searches nothing.
+            A set built by ``from_finite_orbits`` retains its construction's
+            finished sweep, which reached every seed's orbit: its table gives the
+            seed's orbit, its section and the orbit's own table, so the first
+            question about a seed searches nothing.
             """
-            augmentation = self.acting_group().selected_group_resolution().augmentation()
             category = FiniteGSets(self.acting_group())
+            sweep = self.__dict__.get("_finished_sweep")
+            if sweep is not None and point in sweep[0]:
+                _seeds, points, transitions, action, augmentation, orbits = sweep
+                orbit_points, orbit_words, orbit_transitions = category._orbit_within_sweep(
+                    points, transitions, augmentation, point,
+                )
+                # One orbit set per orbit: the points of an orbit, as a set,
+                # name it whichever of them is asked about.
+                reached = frozenset(orbit_points)
+                if reached not in orbits:
+                    orbits[reached] = (
+                        self if len(orbit_points) == len(points)
+                        else category._from_orbit_sweep(
+                            orbit_points, action, augmentation, orbit_transitions,
+                        )
+                    )
+                orbit = orbits[reached]
+                ranking = orbit.ranking_map()
+                section = [None] * len(orbit_points)
+                for position, member in enumerate(orbit_points):
+                    section[int(ranking(member))] = orbit_words[position]
+                return orbit, section, augmentation
+            augmentation = self.acting_group().selected_group_resolution().augmentation()
             representation = self.permutation_representation()
             # One permutation per group element for the duration of the sweep:
             # the representation answers a generator from its own images, and
