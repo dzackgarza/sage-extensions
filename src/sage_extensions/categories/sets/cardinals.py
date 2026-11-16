@@ -1324,7 +1324,7 @@ class OrdinalMor(CategoricalMor):
     ) -> None:
         CategoricalMor.__init__(self, mor_family, domain, codomain)
 
-    def _emptiness_decision(self) -> bool:
+    def _emptiness_decision(self) -> bool | None:
         r"""Decide ``Hom(alpha, beta) = ∅``: empty exactly when ``alpha > beta``.
 
         ``Sets`` owns ``is_empty`` and reads every set's emptiness through
