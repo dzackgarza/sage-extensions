@@ -6575,9 +6575,7 @@ class Lattices(OwnedCategoryOverBaseRing):
             r"""Return the \(U\)-index of a \(\mathbf{Z}\)-lattice.
 
             This is :meth:`hyperbolic_index` restricted to the integers: the
-            largest \(m\) with \(L \cong U^m \oplus M\), decided by the
-            constructive embedding decision of this lattice and not by the
-            genus of the sum.
+            largest \(m\) with \(L \cong U^m \oplus M\).
             """
             assert self.base_ring() is _owned_integers(), (
                 f"the integral hyperbolic index of {self} is computed over ZZ"
@@ -9753,15 +9751,13 @@ class Lattices(OwnedCategoryOverBaseRing):
 
             The hypothesis is the lattice's own: it is even, and
             \(L \cong U \oplus U \oplus M\), the largest such \(k\) being the
-            \(U\)-index of :meth:`hyperbolic_index`
-            (Gritsenko--Hulek--Sankaran, *Moduli of K3 Surfaces and
-            Irreducible Symplectic Manifolds*, Lemma 7.8, p. 503, as cited in
-            ``orthogonal_quotients.isotropic_line_stabilizer_image``).  The
-            hypothesis includes evenness: the integral Eichler transvections
-            \(t(c,a)(v) = v - (a,v)c + (c,v)a - \tfrac12 (a,a)(c,v)c\) carry the
-            halved norm of \(a\), so they are automorphisms of \(L\) only on an
-            even form (Gritsenko--Hulek--Sankaran, arXiv:1012.4155, eq. (49)).
-            This is the one predicate the criterion's routes ask.
+            \(U\)-index of :meth:`hyperbolic_index`; the criterion's
+            transvections are integral on an even form only
+            (Gritsenko--Hulek--Sankaran, *Moduli of K3 Surfaces and Irreducible
+            Symplectic Manifolds*, Lemma 7.8, p. 503, and arXiv:1012.4155,
+            eq. (49), as cited in
+            ``orthogonal_quotients.isotropic_line_stabilizer_image``).  This is
+            the one predicate the criterion's routes ask.
             """
             return bool(self.is_even()) and self.splits_two_hyperbolic_planes()
 

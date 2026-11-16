@@ -1294,9 +1294,10 @@ class OrthogonalCharacterQuotient:
         Eichler's criterion (Gritsenko--Hulek--Sankaran, Lemma 7.8, p. 503) says that, in a
         lattice with two orthogonal hyperbolic planes, the ``\widetilde{SO}(L)``-orbit of a
         primitive vector is decided by its length and its normalized discriminant class.
-        The transvections the criterion is proved with carry the halved norm of the
-        vector along the isotropic line, so the lattice it is applied to must also be
-        even; both halves of the hypothesis are the lattice's own and
+        The lattice the criterion is applied to is even as well as split by two
+        orthogonal hyperbolic planes (Gritsenko--Hulek--Sankaran, Lemma 7.8, p. 503,
+        with arXiv:1012.4155, eq. (49)); both halves of the hypothesis are the
+        lattice's own and
         :meth:`sage_extensions.categories.lattices.Lattices.eichler_criterion_applies`
         decides them.
 
