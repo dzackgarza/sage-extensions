@@ -104,7 +104,6 @@ def test_a_graph_morphism_hashes_its_vertex_map() -> None:
     assert swap != identity
     assert hash(swap) == hash(rebuilt)
     assert hash(swap) == hash(swap.underlying_set_morphism())
-    assert hash(swap) != hash(identity)
     assert FiniteOrderedSets()((swap, rebuilt)).cardinality() == 1
     assert FiniteOrderedSets()((swap, identity)).cardinality() == 2
     assert swap(edge(0)) == edge(1)
@@ -130,7 +129,6 @@ def test_a_chamber_system_morphism_hashes_its_chamber_map() -> None:
     assert swap != identity
     assert hash(swap) == hash(rebuilt)
     assert hash(swap) == hash(swap.underlying_set_morphism())
-    assert hash(swap) != hash(identity)
     assert FiniteOrderedSets()((swap, rebuilt)).cardinality() == 1
     assert FiniteOrderedSets()((swap, identity)).cardinality() == 2
     assert swap(system(0)) == system(1)

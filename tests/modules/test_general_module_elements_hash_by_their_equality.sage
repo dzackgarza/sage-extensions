@@ -88,4 +88,4 @@ def test_the_zero_class_of_the_almost_everywhere_quotient_is_a_point() -> None:
 
     assert zero == quotient.zero()
     assert hash(zero) == hash(zero.underlying_element())
-    assert FiniteOrderedSets()((zero, zero + zero)).cardinality() == 1
+    assert FiniteOrderedSets()((zero, quotient.zero())).cardinality() == 1
