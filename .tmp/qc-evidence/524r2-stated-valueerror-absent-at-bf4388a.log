@@ -1,0 +1,26 @@
+probe: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/probe524p.py
+tree SHA: bf4388a059ad5245eef112d5f86c30ecdaf9798b (modified paths: 0)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+[  0.09 s] correlation cokernel: Finitely presented module on 3 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 2, 1 ↦ 2, 2 ↦ 2]
+   category: Category of modules with a represented selected finite-presentation backend over Integer Ring
+   in FinitelyPresented(): True
+   is_torsion(): True
+   _finitely_presented_torsion(): True
+[  0.25 s] discriminant_group(): Finitely presented module on 3 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 2, 1 ↦ 2, 2 ↦ 2]
+   module category: Category of modules with a represented selected finite-presentation backend over Integer Ring
+   in Torsion(): False
+   module is_torsion(): True
+   _finitely_presented_torsion(): True
+[  0.30 s] twist(-1): Finitely presented module on 3 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 2, 1 ↦ 2, 2 ↦ 2]
+[  0.30 s] done
+[peakrss] probe524p-par: child waited=0 shell_code=0 samples=2
+[peakrss] peak tree RSS      : 272 MiB
+[peakrss] low-water MemAvail : 7470 MiB
+[peakrss] peak single VmHWM  : 272 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      261 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     2.0s procs=  3 rss=   272 MiB hwm=   272 MiB avail=  7470 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     5 MiB hwm=     5 MiB avail=  7589 MiB
+launcher exit: 0

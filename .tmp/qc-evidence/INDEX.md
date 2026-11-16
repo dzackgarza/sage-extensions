@@ -2925,3 +2925,31 @@ round's base on `main`.
 | `517r3-f3-red-at-e409a63.log` | `e409a63` | `test_each_derived_family_is_computed_once.sage` alone: **2 failed in 4.76 s** |
 | `517r3-f3-green-at-7927ef8.log` | `7927ef8`, its repair | the four #517 files together: **10 passed in 6.47 s** |
 | `517r3-probe-answers-at-b54acd7.log`, `517r3-probe-answers-at-1488acfb.log` | `b54acd7` and `1488acfb` | `517r3-probe-answers.py` on the same specimens (C(3) regular and beside a fixed point, S(3) conjugation, S(3)/<(1 2)>, a counting action): every public answer of the defective tree is the repaired tree's, and the two that differ are `orbit is g_set` (the discarded words) and the `drop_trivial` family (repaired earlier in the issue). The retained table agrees with the orbit's action wherever it is read, so the retained-state defect shows no wrong answer, only carried state |
+
+## `#524` round 2: the placement claim's red, at the parent `a20a385` was diffed against, 2026-11-16
+
+`a20a385` claimed that `_discriminant_module`'s bare cokernel raised `ValueError` out of
+`TorsionQuadraticFormModules.from_module`.  That mechanism is not at its parent: `26d2fe2` had already
+replaced the two placement reads with `_finitely_presented_torsion(module)`
+(`form_modules.py:3442`, `:3645`), and the call it names answers there — `discriminant_group()` of
+`U(2) + <2>` in **0.25 s** and its `twist(-1)` in **0.05 s** at `bf4388a`, the parent `a20a385` is
+diffed against.  The defect the placement does repair is the one below, and this round lands the red
+test `a20a385` lacked: `A_L` is outside the torsion placement its own construction declares
+(`DiscriminantModules.super_categories`, `discriminant_modules.py:70`), so it answers `cardinality()`
+and has no `elements()` at all.
+
+One file per run, in the pinned runtime (Sage 11.0.beta5, port tree `991b88b0`), through
+`.scratch/wt554_tests.sh`: `run.sh -w /work`,
+`PYTHONPATH=/repos/sage-extensions/src:/ci/tool-artifacts/pytest_plugins:/work/src:/work`,
+`/sage/.venv/bin/python -m pytest -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint -p qc_sage_session --no-time-gates`.
+`bf4388a` is `a20a385`'s parent in `main`; `discriminant_modules.py`, the two `form_modules.py` guards
+and the test file are byte-identical at `6f337e9` (the reviewer's named parent) and at `bf4388a`
+(`git diff --stat 6f337e9 bf4388a --` those three paths is empty), so the red below is the red of the
+parent the review names.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `524r2-walk-red-at-bf4388a.log` | `bf4388a` + this round's test only | `tests/forms/test_a_torsion_cokernel_carries_its_torsion_forms.sage -k walks_the_classes`: **1 failed, 3 deselected in 1.14 s**, at `classes = module.elements()`: `AttributeError: '_SelectedFinitePresentationModules.parent_class[_PresentedModule].ObjectType' object has no attribute 'elements'` |
+| `524r2-walk-green-at-3fae3b5.log` | `3fae3b5` (main, the push base) + this round's test only | the same selection: **1 passed, 3 deselected in 0.69 s** |
+| `524r2-stated-valueerror-absent-at-bf4388a.log` | `bf4388a` | the mechanism `a20a385` states, probed: `discriminant_group()` of `U(2) + <2>` built in 0.25 s, its module `is_torsion()` True, `_finitely_presented_torsion()` True, `twist(-1)` in 0.05 s — no `ValueError` |
+| `524r2-stated-valueerror-absent-at-3fae3b5.log` | `3fae3b5` | the same probe on `main`: the same answers, with the module in `Torsion()` |

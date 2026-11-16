@@ -51,3 +51,25 @@ def test_the_orthogonal_quotient_of_a_discriminant_form_is_a_torsion_form() -> N
     assert quotient.is_torsion()
     assert quotient.cardinality() == ZZ(4)
     assert quotient in FormModules(ZZ).FinitelyPresented().Torsion()
+
+
+def test_the_discriminant_module_walks_the_classes_its_order_counts() -> None:
+    r"""$Z/3$ and $(Z/2)^3$ are the classes of their modules, walked one by one.
+
+    $A_L$ is killed by $|\det L|$, so the construction that builds it states the
+    torsion placement, which ``DiscriminantModules`` declares as its super
+    category; a module outside that placement answers ``cardinality()`` and has
+    no ``elements()`` at all.  The order asserted here is read off the Gram
+    matrix, so it is not the module's own count.
+    """
+    for lattice in (
+        Lattices(ZZ)("A2"),
+        Lattices(ZZ)([[0, 2], [2, 0]]) + Lattices(ZZ)([[2]]),
+    ):
+        module = lattice.discriminant_module().unformed_module()
+        classes = module.elements()
+
+        assert module in Modules(ZZ).FinitelyPresented().Torsion()
+        assert module.cardinality() == abs(int(lattice.gram_matrix().determinant()))
+        assert classes.cardinality() == module.cardinality()
+        assert module.zero() in classes

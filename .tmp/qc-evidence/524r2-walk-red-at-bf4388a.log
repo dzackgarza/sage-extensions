@@ -1,0 +1,60 @@
+tree SHA: bf4388a059ad5245eef112d5f86c30ecdaf9798b (modified paths: 1)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 5.33 4.92 4.02 5/659 2994336
+files: tests/forms/test_a_torsion_cokernel_carries_its_torsion_forms.sage
+inner 400 s
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_______ test_the_discriminant_module_walks_the_classes_its_order_counts ________
+
+>   return self._cached_methods[name]
+E   KeyError: 'elements'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_the_discriminant_module_walks_the_classes_its_order_counts() -> None:
+        r"""$Z/3$ and $(Z/2)^3$ are the classes of their modules, walked one by one.
+    
+        $A_L$ is killed by $|\det L|$, so the construction that builds it states the
+        torsion placement, which ``DiscriminantModules`` declares as its super
+        category; a module outside that placement answers ``cardinality()`` and has
+        no ``elements()`` at all.  The order asserted here is read off the Gram
+        matrix, so it is not the module's own count.
+        """
+        for lattice in (
+            Lattices(ZZ)("A2"),
+            Lattices(ZZ)([[0, 2], [2, 0]]) + Lattices(ZZ)([[2]]),
+        ):
+            module = lattice.discriminant_module().unformed_module()
+>           classes = module.elements()
+                      ^^^^^^^^^^^^^^^
+
+tests/forms/test_a_torsion_cokernel_carries_its_torsion_forms.sage:70: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    ???
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: '_SelectedFinitePresentationModules.parent_class[_PresentedModule].ObjectType' object has no attribute 'elements'. Did you mean: 'Element'?
+
+sage/cpython/getattr.pyx:357: AttributeError
+=========================== short test summary info ============================
+FAILED tests/forms/test_a_torsion_cokernel_carries_its_torsion_forms.sage::test_the_discriminant_module_walks_the_classes_its_order_counts
+1 failed, 3 deselected in 1.14s
+[peakrss] probe554tests: child waited=1 shell_code=1 samples=3
+[peakrss] peak tree RSS      : 326 MiB
+[peakrss] low-water MemAvail : 3895 MiB
+[peakrss] peak single VmHWM  : 326 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      315 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     4.0s procs=  3 rss=   326 MiB hwm=   326 MiB avail=  3895 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   287 MiB hwm=   287 MiB avail=  4005 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     3 MiB hwm=     3 MiB avail=  4065 MiB
+pytest exit: 1
