@@ -84,3 +84,39 @@ The one change that makes either fit is the port's own loop: read
 `stabilizer_schreier_factors()` with `orbit_lattice_records()` and
 `middle_transport()`, convert those, and compose.  That is port source, and this
 repository's contract for it is the certificate above.
+
+## A live failure found while running the certificate's neighbours
+
+Running `tests/lattices/test_schreier_factors_rebuild_the_stabilizer_family.sage`
+with this file puts one id in the red on `main`, and it is **pre-existing**: the
+same id fails in a clean worktree at `bcad374`, whose tree differs from this
+commit only by the two added files.
+
+```
+tests/lattices/test_schreier_factors_rebuild_the_stabilizer_family.sage::
+    test_the_natural_g_set_factors_compose_to_its_stabilizer_family
+    assert rebuilt == family
+    AssertionError: (1, (2 3), 1, (2 3), 1, (2 3)) == ((2 3),)
+```
+
+Measured boundary, on `Groups.S(3)`'s natural G-set with the base point `1`:
+
+| datum | value |
+| --- | --- |
+| `orbit_schreier_factors` | letters `((1 2 3), (1 2))`, transversals `(1, (1 2 3), (1 3 2))` |
+| `orbit_schreier_morphism` | domain rank 6, images `(1, (2 3), 1, (2 3), 1, (2 3))` |
+| `morphism._corestrict_to_subgroup(stabilizer)` | domain rank 6, the same six images |
+| `stabilizer.selected_group_resolution()` | **domain rank 1**, single generator `g_(2 3)` |
+| `stabilizer.group_generators()` | `((2 3),)` |
+
+So the supplied Schreier morphism is not what the stabilizer presents: an
+engine-side one-generator family for the finite stabilizer wins over the
+generating morphism the G-set's `stabilizer(point)` supplies, which
+`_PredicateSubgroupConstruction` documents as becoming "the subgroup's selected
+generating datum".  The test file has not changed since `a3c8047`
+(2026-11-07) and this text is *not* a claim about which of the two is right: the
+finite stabilizer's own family is a correct generating set, and the composite
+certificate is a statement about a presentation.  It is recorded here, not
+repaired, because it is a different unit from this one -- the presentation of a
+finite stabilizer's generating family -- and repairing it either way (the
+G-set's presentation or the assertion) on this evidence would be a guess.
