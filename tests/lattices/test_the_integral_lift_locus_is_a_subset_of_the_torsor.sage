@@ -28,13 +28,37 @@ def _marked_line_lift_torsor(reduction, reduction_isometry):
     return reduction.rational_lifts(reduction, reduction_isometry)
 
 
-def _reduction_reflection(reduction):
+def _reduction_reflection(reduction, root_index):
     r"""A non-identity isometry of ``reduction``: the reflection in a basis vector of square two."""
-    labels = tuple(reduction.module_generating_set())
-    root = next(
-        label for label in labels if reduction.module_generator(label).q() == ZZ(2)
+    roots = tuple(
+        label
+        for label in reduction.module_generating_set()
+        if reduction.module_generator(label).q() == ZZ(2)
     )
-    return reduction.reflection(reduction.module_generator(root))
+    return reduction.reflection(reduction.module_generator(roots[root_index]))
+
+
+class _BasePointIntegralRestrictions:
+    r"""Count the integral restrictions the base point is asked for inside the block."""
+
+    def __init__(self, point):
+        self.point = point
+        self.count = 0
+
+    def __enter__(self):
+        point, counted = self.point, self
+        original = point.integral_restriction
+
+        def integral_restriction(source, target):
+            counted.count += 1
+            return original(source, target)
+
+        point.integral_restriction = integral_restriction
+        return self
+
+    def __exit__(self, *exception):
+        del self.point.integral_restriction
+        return False
 
 
 def _lift_at_class(torsor, residue):
@@ -51,8 +75,12 @@ def _lift_at_class(torsor, residue):
     return torsor.parameterization()(parameter)
 
 
-def _non_integral_base_point_control():
+def _non_integral_base_point_control(root_index):
     r"""``U(2) + A2`` at a marked line of divisibility two, lifting a reflection.
+
+    ``root_index`` selects which square-two basis vector of the positive-definite
+    rank-two reduction is reflected in: two isometries of one reduction, so two
+    lift torsors with a locus each.
 
     The marked vector ``-2e_0 + e_1 - 2e_3`` is primitive isotropic of divisibility two,
     its reduction is the rank-two lattice with basis of squares two and two, and the lift
@@ -68,13 +96,13 @@ def _non_integral_base_point_control():
         if coefficient
     })
     reduction = _reduction_at(lattice, marked)
-    isometry = _reduction_reflection(reduction)
+    isometry = _reduction_reflection(reduction, root_index)
     return lattice, marked, reduction, _marked_line_lift_torsor(reduction, isometry)
 
 
 def test_the_integral_locus_is_a_subset_of_its_torsor() -> None:
     r"""``T_Z`` has the inclusion of a subset of ``T``, into the torsor itself."""
-    lattice, marked, reduction, torsor = _non_integral_base_point_control()
+    lattice, marked, reduction, torsor = _non_integral_base_point_control(0)
     locus = torsor.integral_lift_locus()
 
     assert lattice.div(marked) == 2
@@ -92,7 +120,7 @@ def test_the_nonempty_locus_is_a_point_of_the_torsors_power_set() -> None:
     empty locus is ``P(T)``'s bottom; this one is the same kind of object, cut
     out of ``T`` by the residue-class predicate, and the two cases owe the same.
     """
-    lattice, marked, reduction, torsor = _non_integral_base_point_control()
+    lattice, marked, reduction, torsor = _non_integral_base_point_control(0)
     locus = torsor.integral_lift_locus()
 
     assert lattice.div(marked) == 2
@@ -132,7 +160,7 @@ def test_the_point_the_locus_admits_is_an_integral_lift() -> None:
     the residue locus: the base point of this torsor has no integral
     restriction, and the admitted lift does.
     """
-    lattice, marked, reduction, torsor = _non_integral_base_point_control()
+    lattice, marked, reduction, torsor = _non_integral_base_point_control(0)
     locus = torsor.integral_lift_locus()
 
     assert lattice.div(marked) == 2
@@ -147,7 +175,7 @@ def test_the_locus_is_membership_in_the_residue_class() -> None:
     members, and the torsor's own base point -- whose parameter is the zero class, outside
     ``C`` at this specimen -- does not.
     """
-    lattice, marked, reduction, torsor = _non_integral_base_point_control()
+    lattice, marked, reduction, torsor = _non_integral_base_point_control(0)
     locus = torsor.integral_lift_locus()
     classes = tuple(torsor.integral_parameter_classes())
     zero = torsor.integral_parameter_quotient().codomain().zero()
@@ -172,7 +200,7 @@ def test_a_parameter_outside_the_integral_lattice_is_not_a_member() -> None:
     that says so -- the locus is a subset of ``T``, not a set that refuses the
     points of ``T`` outside it.
     """
-    lattice, marked, reduction, torsor = _non_integral_base_point_control()
+    lattice, marked, reduction, torsor = _non_integral_base_point_control(0)
     locus = torsor.integral_lift_locus()
     parameters = torsor.parameter_space()
     labels = tuple(parameters.module_generating_set())
@@ -211,3 +239,25 @@ def test_an_empty_residue_locus_gives_the_empty_subset_of_the_torsor() -> None:
     assert locus.is_empty() is True
     assert locus.cardinality() == cardinal(0)
     assert locus.is_parent_of(torsor.base_point()) is False
+
+
+def test_building_the_locus_asks_the_base_point_for_no_integral_restriction() -> None:
+    r"""``T_Z`` is built from the residue locus, not by testing the torsor's base point.
+
+    The residue locus decides its classes by building a lift and asking it for its
+    integral restriction, so the locus already holds an integral lift when it is cut
+    out, and the base point's own integrality is a question its construction does
+    not ask.  The specimen is the reflection in the reduction's second square-two
+    basis vector: the first one's torsor is what the other tests read, and this one
+    is asked for its locus here and nowhere else, so the construction measured is a
+    cold one rather than a cached locus.
+    """
+    lattice, marked, reduction, torsor = _non_integral_base_point_control(1)
+    base = torsor.base_point()
+
+    assert lattice.div(marked) == 2
+    assert base.integral_restriction(lattice, lattice) is None
+    with _BasePointIntegralRestrictions(base) as asked:
+        locus = torsor.integral_lift_locus()
+        assert locus.is_empty() is False
+    assert asked.count == 0
