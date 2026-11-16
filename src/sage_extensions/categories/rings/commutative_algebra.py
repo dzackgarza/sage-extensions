@@ -3709,15 +3709,25 @@ class _AdicCompletionElement(_OwnedAlgebraElement):
         return negation(self._completion_equal(other))
 
     def __hash__(self) -> int:
-        r"""Hash the elements of one completion alike.
+        r"""Hash a completion element by the source expression that names it.
 
-        Equality here is decided on the retained exact source expressions and,
-        failing that, on the backend values: two different expressions for one
-        element are equal, and a finite approximation with no exact source is
-        separated from everything it does not decide.  No datum of one
-        presentation is invariant under that, so the completion is what a hash
-        reads, which is the rule of :class:`Sets`.
+        The completion map is a ring map, and this class retains the exact
+        source expression of every element arriving through it, so an image is
+        named by the ring element it came from and hashes as that element does:
+        ``image(1)`` and the source ring's ``1`` are one point of a finite
+        ordered set.  The name is a function of the element exactly when the
+        completion map is injective at the parent's defining ideal, which is
+        Krull's intersection theorem for a proper ideal of a Noetherian ring and
+        is the parent's own kernel decision.
+
+        An element retaining no exact source, or a completion whose retained
+        kernel is not trivial, hashes by its completion: finite series data does
+        not decide an equality here, and a kernel element names the same
+        element as zero, so nothing finer is owed.
         """
+        source_expression = self.exact_source_expression()
+        if source_expression is not None and self.parent().is_completion_map_injective() is True:
+            return hash(source_expression)
         return hash(id(self.parent()))
 
     def __bool__(self):
