@@ -1,0 +1,34 @@
+=== tree: ba303ba98ec4a1d901551e06e3b2d3f7ceb9f423 (modified: 2 paths)
+=== files: tests/foundations/test_a_session_file_binds_only_what_it_writes.sage
+=== start: 08:56:33
+.F.                                                                      [100%]
+=================================== FAILURES ===================================
+____ test_a_subscript_of_a_name_the_file_binds_nowhere_declares_a_generator ____
+
+    def test_a_subscript_of_a_name_the_file_binds_nowhere_declares_a_generator() -> None:
+        r"""A session file's unwritten subscript declares the generators it writes.
+    
+        The session publishes no ``t``, so ``QQ[t]`` in a file that binds ``t``
+        nowhere is the polynomial ring written as it is written: the loaded scope
+        holds the ring over ``QQ`` and ``t`` as its generator.
+        """
+        scope = {}
+    
+>       load("tests/foundations/session_files/a_subscript_of_an_unwritten_name.sage", scope)
+
+tests/foundations/test_a_session_file_binds_only_what_it_writes.sage:45: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/all.py:496: in load
+    _sage_load(filename, scope, attach)
+/sage/.venv/lib/python3.14/site-packages/sage/repl/load.py:288: in load
+    exec(preparse_file(f.read()) + "\n", globals)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   NameError: name 't' is not defined
+
+<string>:12: NameError
+=========================== short test summary info ============================
+FAILED tests/foundations/test_a_session_file_binds_only_what_it_writes.sage::test_a_subscript_of_a_name_the_file_binds_nowhere_declares_a_generator
+1 failed, 2 passed in 4.89s
+=== exit: 1 at 08:56:40

@@ -1,0 +1,25 @@
+=== tree: 27a1bba9112775bcfcadf2e1deada8fb08baf896 (modified: 0 paths)
+=== probe: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/probe521r4_session.py
+=== start: 09:03:04
+public names in the module: 677
+__all__ declared: True
+__all__ is the public names: True
+__all__ duplicates dropped: True
+the dialect's vocabulary: 677
+vocabulary is the declaration: True
+session name in an index: declares generators=False
+session ring in an index: declares generators=False
+unwritten name in an index: declares generators=True
+second unwritten name: declares generators=True
+file-bound name in an index: declares generators=False
+names the star import binds: 677
+that is the public namespace: True
+session name in an index: bindings the file made ['countable']
+session ring in an index: runs no further than type 'Modules' is not subscriptable
+unwritten name in an index: bindings the file made ['declared', 't']
+second unwritten name: bindings the file made ['declared', 'x', 'y']
+file-bound name in an index: runs no further than type 'Modules' is not subscriptable
+Integer is the owned element: True
+RealNumber is exact: True
+matrix multiplies: True
+=== exit: 0 at 09:03:06

@@ -3144,3 +3144,34 @@ files are the ones they name:
 The round that made the edit is recorded in this file as its own rows and is not
 otherwise altered; this note is the correction, dated today.
 
+
+## `#521` round 4: the dialect's readings, and the session's declaration of its names (2026-11-16)
+
+The review of this issue's previous round found the fix had replaced the dialect's
+grid of readings with a weaker one (a session file could declare no generator
+implicitly), the round's test asserted that new rule instead of the defect, and its
+evidence commit edited two rows of `SHA256SUMS`.  This round restores both readings
+and gives the parser the one fact they need -- which names the session's star import
+binds -- as the session's own declaration rather than a reading of its namespace.
+
+`1c168e9` is the test commit, `ffd8209` its repair, `27a1bba` the evidence rows'
+restoration; all three were rebased from `ba303ba` onto `c9568ed` and this is the
+head they are pushed from.  One file, or two, per run, in the pinned runtime
+(Sage 11.0.beta5, port tree `991b88b0`), through `.scratch/launch521r4pytest.sh`:
+`run.sh -w /work`,
+`PYTHONPATH=/ci/tool-artifacts/pytest_plugins:/work/src:/work:/repos/sage-extensions/src`,
+`/sage/.venv/bin/python -m pytest -o addopts= -p qc_sage_session
+-p sage_extensions.testing.test_lint`.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `issue521r4-red.log` | `ba303ba` with this round's two test files only | `tests/foundations/test_a_session_file_binds_only_what_it_writes.sage` alone: **1 failed, 2 passed in 4.89 s**, the failure being `load` of a session file that writes `QQ[t]` raising `NameError: name 't' is not defined` |
+| `issue521r4-green.log` | `27a1bba`, clean tree | that file with `test_the_session_names_denote_their_objects.sage`: **6 passed in 3.88 s**, exit 0, `test_lint` loaded and reporting nothing |
+| `issue521r4-probe-session-base.log` | `ba303ba`, clean worktree | `issue521r4-probe-session.py`: 677 public names, no `__all__`, the dialect's vocabulary 0, and **no** snippet of the five declaring a generator -- `QQ[t]` raises `NameError`; the star import binds 677 names |
+| `issue521r4-probe-session-fix.log` | `27a1bba`, clean tree | the same probe: `__all__` is the 677 public names, the vocabulary is that declaration, `QQ[t]` and `ZZ[x, y]` declare their generators (`t`, `x`, `y` land in the loaded scope), `Sets.Δ[aleph0]`, `Modules[ZZ]` and `Modules[k]` with `k` bound by the file keep the subscript, `QQ[t]` is the ring over `QQ` with `t` its generator, and `Integer`, `RealNumber` and `matrix` answer as before |
+| `issue521r4-mypy-base.log`, `issue521r4-mypy-fix.log` | `ba303ba` and `27a1bba` | the mypy tier, diff-scoped to `language_runtime.py` and `all.py` inside the pinned image: **the same ten errors** in both trees (seven the runtime's untyped functions, three `all.py`'s `RealNumber` binding at line 508) |
+
+The repair's commit message quotes an earlier run of the same two test files on the
+tree the fix was written in -- **6 passed in 2.74 s**; the stored log is the run at
+the head this is pushed from, where the same six pass in 3.88 s.  Neither the test
+files nor the two library files changed between the two runs.

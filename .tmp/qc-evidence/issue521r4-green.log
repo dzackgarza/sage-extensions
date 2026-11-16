@@ -1,0 +1,6 @@
+=== tree: 27a1bba9112775bcfcadf2e1deada8fb08baf896 (modified: 0 paths)
+=== files: tests/foundations/test_a_session_file_binds_only_what_it_writes.sage tests/foundations/test_the_session_names_denote_their_objects.sage
+=== start: 09:02:58
+......                                                                   [100%]
+6 passed in 3.88s
+=== exit: 0 at 09:03:04

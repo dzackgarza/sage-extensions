@@ -1,0 +1,25 @@
+=== tree: ba303ba98ec4a1d901551e06e3b2d3f7ceb9f423 (modified: 0 paths)
+=== probe: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/probe521r4_session.py
+=== start: 08:57:57
+public names in the module: 677
+__all__ declared: False
+__all__ is the public names: False
+__all__ duplicates dropped: False
+the dialect's vocabulary: 0
+vocabulary is the declaration: True
+session name in an index: declares generators=False
+session ring in an index: declares generators=False
+unwritten name in an index: declares generators=False
+second unwritten name: declares generators=False
+file-bound name in an index: declares generators=False
+names the star import binds: 677
+that is the public namespace: True
+session name in an index: bindings the file made ['countable']
+session ring in an index: runs no further than type 'Modules' is not subscriptable
+Traceback (most recent call last):
+  File "/probe.py", line 39, in <module>
+    exec(preparse.preparse(STAR + snippet), scope)
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<string>", line 2, in <module>
+NameError: name 't' is not defined
+=== exit: 1 at 08:57:58
