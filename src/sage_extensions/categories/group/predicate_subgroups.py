@@ -753,6 +753,17 @@ class PredicateSubgroups(OwnedParameterizedCategory):
             answered exactly, being the invariant it is, and a key two cusps
             share -- possible where the finite image is coarser than the row --
             is decided between them by the witness each certificate retains.
+
+            The covering of one plane is the covering of every plane, when the
+            subgroup is the kernel of the character the row was split by: an
+            ambient isometry conjugates that kernel to itself, so the family at
+            one plane, carried to another by the composite of the two planes'
+            registered lifts, is exactly the family of the other plane.  The
+            plane's parabolic, its conjugated generators, their word section
+            and its double cosets are therefore computed once for the row,
+            which is what makes the plane count affordable at all; a subgroup
+            cut by a sign condition is not preserved by conjugation, and there
+            the covering is computed at every plane as it always was.
             """
             from sage_extensions.categories.isotropic_orbits import (
                 ArithmeticCuspIncidence,
@@ -828,7 +839,28 @@ class PredicateSubgroups(OwnedParameterizedCategory):
                     )
                     # A key no cusp carries is a line of no cusp of this row:
                     # the key is the invariant, so the empty answer is exact.
-                    return [] if bucket is None else matching_cusps(term, bucket)
+                    if not bucket:
+                        return []
+                    if len(bucket) == 1:
+                        # One cusp carries the key, and the key is an invariant
+                        # of the row's orbits, so the vertex is decided: the
+                        # question that remains is the certificate's
+                        # transporter.  Where the row's own words already
+                        # exhibit one -- the two objects' chains share a root,
+                        # which is what makes their composite a transporter
+                        # rather than a bridge -- that composite is read off
+                        # them, and no stabilizer word section is built.
+                        term_root, _term_word = quotient.transported_from_root(term)
+                        cusp_root, _cusp_word = quotient.transported_from_root(
+                            bucket[0].representative()
+                        )
+                        if _span_key(term_root) == _span_key(cusp_root):
+                            carried = quotient.isotropic_transport_between(
+                                term, bucket[0].representative()
+                            )
+                            if carried is not None and carried in self:
+                                return [(bucket[0], carried)]
+                    return matching_cusps(term, bucket)
                 return matching_cusps(term, line_cusps)
 
             def plane_vertex_candidates(term):
@@ -883,6 +915,25 @@ class PredicateSubgroups(OwnedParameterizedCategory):
                     ambient_sources.append((ambient_flag, None, None))
             sourced_flags = []
             parabolic_routed = True
+            # A covering computed at one plane is transported to every other
+            # plane whose own registered lift carries that plane there, when
+            # the subgroup is the kernel of the character the row was split by:
+            # an ambient isometry conjugates that kernel to itself, so the
+            # transported family is exactly the covering at the target plane --
+            # same orbits, same count -- and the plane's parabolic, its images,
+            # its word section and its double cosets are not computed again.
+            # A subgroup that is only the preimage of a *proper* subgroup of the
+            # finite image is not preserved by conjugation (its image need not
+            # be normal), and a subgroup cut by a sign condition does not
+            # survive it either (the spinor norm is not defined on the finite
+            # image); both keep the per-plane route.
+            transported_covering = (
+                quotient._has_discriminant
+                and not quotient.determinant_kernel
+                and not quotient.spinor_kernel
+                and quotient.subgroup_image_order() == 1
+            )
+            covering_at_source = {}
             # The planes of this row are the plane cusps of this row: a cusp's
             # representative is the plane, so the incidence is computed at each
             # cusp's own representative and its plane vertex is read from the
@@ -892,9 +943,28 @@ class PredicateSubgroups(OwnedParameterizedCategory):
             for plane_cusp in plane_cusps:
                 plane = plane_cusp.representative()
                 target_lift = quotient.isotropic_lift_of(plane)
-                plane_orbit_flags = []
-                for ambient_flag, source_lift, source_witness in ambient_sources:
+                covered_here = False
+                for position, (ambient_flag, source_lift, source_witness) in enumerate(
+                    ambient_sources
+                ):
                     _ambient_line, ambient_plane = ambient_flag.terms()
+                    known = covering_at_source.get(position) if transported_covering else None
+                    if known is not None and target_lift is not None:
+                        reference_lift, reference_flags = known
+                        # Both lifts carry the row's source plane to their own
+                        # plane, so their composite carries the reference plane
+                        # to this one, and each covered flag with it.
+                        move = target_lift * ~reference_lift
+                        for reference_flag in reference_flags:
+                            carried = move.transport_isotropic_object(reference_flag)
+                            quotient.register_isotropic_transport(
+                                carried.terms()[0],
+                                reference_flag.terms()[0],
+                                move,
+                            )
+                            sourced_flags.append(carried)
+                        covered_here = True
+                        continue
                     # The source row now meets the source lift at one registered
                     # plane.  Composing that normalization with the row's own
                     # lifts gives an exact ambient witness to each target plane,
@@ -915,17 +985,23 @@ class PredicateSubgroups(OwnedParameterizedCategory):
                         ambient_flag.terms()[0],
                         witness,
                     )
-                    plane_orbit_flags.append(transported_flag)
-                if not plane_orbit_flags:
-                    parabolic_routed = False
-                    break
-                for orbit_flag in plane_orbit_flags:
-                    from_parabolic = _plane_parabolic_incidence_flags(self, plane, orbit_flag)
+                    from_parabolic = _plane_parabolic_incidence_flags(
+                        self, plane, transported_flag
+                    )
                     if from_parabolic is None:
                         parabolic_routed = False
                         break
+                    if transported_covering and target_lift is not None:
+                        covering_at_source[position] = (
+                            target_lift,
+                            tuple(from_parabolic),
+                        )
                     sourced_flags.extend(from_parabolic)
+                    covered_here = True
                 if not parabolic_routed:
+                    break
+                if not covered_here:
+                    parabolic_routed = False
                     break
             if not parabolic_routed:
                 sourced_flags = list(self.isotropic_orbit_representatives(2, flag=True))
