@@ -1,0 +1,158 @@
+# tree: bcad374a699b677d1ba9b4317c45b1b1bf540e18
+# status: ?? tests/lattices/test_the_row_retains_no_transport_for_a_carried_line.sage 
+# load: 0.68 1.74 1.51
+# argv: tests/lattices/test_the_row_retains_no_transport_for_a_carried_line.sage
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+time gates OFF (--no-time-gates): star import 0.31 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: asyncio-1.5.0, xdist-3.8.0, reportlog-1.0.0, platformdirs-4.13.5, hypothesis-6.170.15, anyio-4.15.1, timeout-2.4.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 2 items
+
+tests/lattices/test_the_row_retains_no_transport_for_a_carried_line.sage F [ 50%]
+F                                                                        [100%]
+
+=================================== FAILURES ===================================
+________________ test_the_otilde_row_retains_only_its_coverings ________________
+
+    def test_the_otilde_row_retains_only_its_coverings() -> None:
+        r"""``Otilde`` on ``U + U(2) + <-2>``: the carried plane's lines keep no datum."""
+>       _assert_no_carried_line_is_retained(_u_u_m2().stable_orthogonal_group())
+
+tests/lattices/test_the_row_retains_no_transport_for_a_carried_line.sage:106: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+subgroup = {g in Orthogonal group O(Integral lattice of rank 5 and signature (2, 3)) : rho_L(g) lies in a subgroup given by its own generators}
+
+    def _assert_no_carried_line_is_retained(subgroup) -> None:
+        r"""Assert that ``subgroup``'s incidence retains no transport of a carried line."""
+        plane_cusps = tuple(subgroup.cusps(2))
+        subgroup.cusps(1)
+        source_row = tuple(subgroup.supergroup().isotropic_orbit_representatives(2, flag=True))
+        incidences = tuple(subgroup.tits_building_incidence())
+        quotient = subgroup.finite_character_quotient()
+        covering_cusps = _covering_cusps(quotient, source_row, plane_cusps)
+        # The premises: the row carries its covering to planes that computed none, so
+        # "the covering's lines" and "the carried lines" are different sets.
+        assert _count(plane_cusps) > _count(covering_cusps)
+        assert _count(covering_cusps) > cardinal(0)
+        covering_flags = cardinal(
+            sum(
+                sum(1 for _ in quotient.isotropic_covering_reference(source)[2])
+                for source in range(int(_count(source_row)))
+            )
+        )
+        kept = [
+            incidence
+            for incidence in incidences
+            if quotient.isotropic_transport_of(incidence.line()) is not None
+        ]
+        carried = [
+            incidence
+            for incidence in kept
+            if not any(cusp is incidence.plane_cusp() for cusp in covering_cusps)
+        ]
+>       assert carried == [], (
+            f"{_count(carried)} of the {_count(incidences)} edges of {subgroup} stand over a plane "
+            f"that computed no covering and keep the transport datum of their line: the row retains "
+            f"one datum per carried line instead of releasing it once its plane's certificates exist"
+        )
+E       AssertionError: 2 of the 4 edges of {g in Orthogonal group O(Integral lattice of rank 5 and signature (2, 3)) : rho_L(g) lies in a subgroup given by its own generators} stand over a plane that computed no covering and keep the transport datum of their line: the row retains one datum per carried line instead of releasing it once its plane's certificates exist
+E       assert [Arithmetic T...nature (2, 3)] == []
+E         
+E         Left contains 2 more items, first extra item: Arithmetic Tits-building incidence Rank-1 cusp of {g in Orthogonal group O(Integral lattice of rank 5 and signature (2...e (2, 3)) : rho_L(g) lies in a subgroup given by its own generators} in Integral lattice of rank 5 and signature (2, 3)
+E         Use -v to get more diff
+
+tests/lattices/test_the_row_retains_no_transport_for_a_carried_line.sage:96: AssertionError
+------------------------------ Captured log call -------------------------------
+INFO     sage_extensions.timing:timing.py:313 discriminant image
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:444 General module over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:834 Elementwise module morphism Module over Fraction Field of Integer Ring on Classes in the multilinear tensor presentation -> Module over Fraction Field of Integer Ring on Fraction Field of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+INFO     sage_extensions.timing:timing.py:313 ambient O(L) row
+INFO     sage_extensions.timing:timing.py:313 ambient O(L) row
+INFO     sage_extensions.timing:timing.py:313 parabolic completeness decision
+INFO     sage_extensions.timing:timing.py:313 coset splitting and transport
+INFO     sage_extensions.timing:timing.py:313 isotropic orbit representatives
+INFO     sage_extensions.timing:timing.py:313 discriminant image
+INFO     sage_extensions.timing:timing.py:313 ambient O(L) row
+INFO     sage_extensions.timing:timing.py:313 coset splitting and transport
+INFO     sage_extensions.timing:timing.py:313 isotropic orbit representatives
+INFO     sage_extensions.timing:timing.py:313 ambient O(L) row
+INFO     sage_extensions.timing:timing.py:313 ambient O(L) row
+_____________ test_the_otilde_plus_row_retains_only_its_coverings ______________
+
+    def test_the_otilde_plus_row_retains_only_its_coverings() -> None:
+        r"""``Otilde+`` on ``U + U(2) + <-2>``: the carried plane's lines keep no datum."""
+        lattice = _u_u_m2()
+        stable = lattice.stable_orthogonal_group()
+>       _assert_no_carried_line_is_retained(stable.intersection(lattice.O_plus()))
+
+tests/lattices/test_the_row_retains_no_transport_for_a_carried_line.sage:113: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+subgroup = {g in Orthogonal group O(Integral lattice of rank 5 and signature (2, 3)) : g lies in every selected subgroup}
+
+    def _assert_no_carried_line_is_retained(subgroup) -> None:
+        r"""Assert that ``subgroup``'s incidence retains no transport of a carried line."""
+        plane_cusps = tuple(subgroup.cusps(2))
+        subgroup.cusps(1)
+        source_row = tuple(subgroup.supergroup().isotropic_orbit_representatives(2, flag=True))
+        incidences = tuple(subgroup.tits_building_incidence())
+        quotient = subgroup.finite_character_quotient()
+        covering_cusps = _covering_cusps(quotient, source_row, plane_cusps)
+        # The premises: the row carries its covering to planes that computed none, so
+        # "the covering's lines" and "the carried lines" are different sets.
+        assert _count(plane_cusps) > _count(covering_cusps)
+        assert _count(covering_cusps) > cardinal(0)
+        covering_flags = cardinal(
+            sum(
+                sum(1 for _ in quotient.isotropic_covering_reference(source)[2])
+                for source in range(int(_count(source_row)))
+            )
+        )
+        kept = [
+            incidence
+            for incidence in incidences
+            if quotient.isotropic_transport_of(incidence.line()) is not None
+        ]
+        carried = [
+            incidence
+            for incidence in kept
+            if not any(cusp is incidence.plane_cusp() for cusp in covering_cusps)
+        ]
+>       assert carried == [], (
+            f"{_count(carried)} of the {_count(incidences)} edges of {subgroup} stand over a plane "
+            f"that computed no covering and keep the transport datum of their line: the row retains "
+            f"one datum per carried line instead of releasing it once its plane's certificates exist"
+        )
+E       AssertionError: 2 of the 4 edges of {g in Orthogonal group O(Integral lattice of rank 5 and signature (2, 3)) : g lies in every selected subgroup} stand over a plane that computed no covering and keep the transport datum of their line: the row retains one datum per carried line instead of releasing it once its plane's certificates exist
+E       assert [Arithmetic T...nature (2, 3)] == []
+E         
+E         Left contains 2 more items, first extra item: Arithmetic Tits-building incidence Rank-1 cusp of {g in Orthogonal group O(Integral lattice of rank 5 and signature (2...of rank 5 and signature (2, 3)) : g lies in every selected subgroup} in Integral lattice of rank 5 and signature (2, 3)
+E         Use -v to get more diff
+
+tests/lattices/test_the_row_retains_no_transport_for_a_carried_line.sage:96: AssertionError
+------------------------------ Captured log call -------------------------------
+INFO     sage_extensions.timing:timing.py:313 discriminant image
+INFO     sage_extensions.timing:timing.py:313 ambient O(L) row
+INFO     sage_extensions.timing:timing.py:313 ambient O(L) row
+INFO     sage_extensions.timing:timing.py:313 coset splitting and transport
+INFO     sage_extensions.timing:timing.py:313 isotropic orbit representatives
+INFO     sage_extensions.timing:timing.py:313 discriminant image
+INFO     sage_extensions.timing:timing.py:313 ambient O(L) row
+INFO     sage_extensions.timing:timing.py:313 coset splitting and transport
+INFO     sage_extensions.timing:timing.py:313 isotropic orbit representatives
+INFO     sage_extensions.timing:timing.py:313 ambient O(L) row
+INFO     sage_extensions.timing:timing.py:313 ambient O(L) row
+============================== slowest durations ===============================
+12.09s call     tests/lattices/test_the_row_retains_no_transport_for_a_carried_line.sage::test_the_otilde_row_retains_only_its_coverings
+10.43s call     tests/lattices/test_the_row_retains_no_transport_for_a_carried_line.sage::test_the_otilde_plus_row_retains_only_its_coverings
+
+(4 durations < 0.005s hidden.  Use -vv to show these durations.)
+=========================== short test summary info ============================
+FAILED tests/lattices/test_the_row_retains_no_transport_for_a_carried_line.sage::test_the_otilde_row_retains_only_its_coverings
+FAILED tests/lattices/test_the_row_retains_no_transport_for_a_carried_line.sage::test_the_otilde_plus_row_retains_only_its_coverings
+============================== 2 failed in 23.36s ==============================
+# launcher exit: 1

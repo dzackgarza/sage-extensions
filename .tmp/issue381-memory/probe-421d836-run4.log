@@ -1,0 +1,122 @@
+# tree: bcad374a699b677d1ba9b4317c45b1b1bf540e18
+# status: ?? tests/lattices/test_the_row_retains_no_transport_for_a_carried_line.sage 
+# load: 2.62 1.67 1.09
+[rss] t=    0.0s rss=    98.0 MiB stage=startup planes=0 frames=0 registries -
+[rss] t=    5.0s rss=   411.7 MiB stage=startup planes=0 frames=0 lifts       0 transports       0 coverings    0 bridges    0
+[rss] t=   10.0s rss=   466.8 MiB stage=startup planes=0 frames=0 lifts       0 transports       0 coverings    0 bridges    0
+[rss] t=   15.1s rss=   496.4 MiB stage=startup planes=0 frames=0 lifts       0 transports       0 coverings    0 bridges    0
+[rss] t=   20.1s rss=   516.9 MiB stage=startup planes=0 frames=0 lifts       0 transports       0 coverings    0 bridges    0
+[rss] t=   25.1s rss=   528.7 MiB stage=startup planes=0 frames=0 lifts       0 transports       0 coverings    0 bridges    0
+[rss] t=   30.1s rss=   555.1 MiB stage=startup planes=0 frames=0 lifts       0 transports       0 coverings    0 bridges    0
+[rss] t=   35.1s rss=   569.8 MiB stage=startup planes=0 frames=0 lifts       0 transports       0 coverings    0 bridges    0
+[rss] t=   40.2s rss=   581.2 MiB stage=startup planes=0 frames=0 lifts       0 transports       0 coverings    0 bridges    0
+[rss] t=   45.2s rss=   585.3 MiB stage=startup planes=0 frames=0 lifts       0 transports       0 coverings    0 bridges    0
+[rss] t=   50.2s rss=   589.1 MiB stage=startup planes=0 frames=0 lifts       0 transports       0 coverings    0 bridges    0
+[rss] t=   55.2s rss=   593.0 MiB stage=startup planes=0 frames=0 lifts       0 transports       0 coverings    0 bridges    0
+     57.28 s  Otilde(T_Co), index 46998591897600, preserves conjugation True  rss   594.9 MiB  lifts       0 transports       0 coverings    0 bridges    0
+[rss] t=   60.3s rss=   602.2 MiB stage=startup planes=0 frames=0 lifts       0 transports       0 coverings    0 bridges    0
+      3.90 s  the retained plane, its parabolic (112 generators), its lift  rss   606.5 MiB  lifts       1 transports       0 coverings    0 bridges    0
+      2.60 s  A: 384 ambient generators, 5440 candidate isometries  rss   642.5 MiB  lifts       1 transports       0 coverings    0 bridges    0
+    A: 1 planes so far, 0.0 s, rss   642.5 MiB lifts       2 transports       0 coverings    0 bridges    0
+    A: 2 planes so far, 0.1 s, rss   642.6 MiB lifts       3 transports       0 coverings    0 bridges    0
+    A: 3 planes so far, 0.1 s, rss   642.7 MiB lifts       4 transports       0 coverings    0 bridges    0
+    A: 4 planes so far, 0.2 s, rss   642.8 MiB lifts       5 transports       0 coverings    0 bridges    0
+    A: 5 planes so far, 0.3 s, rss   642.8 MiB lifts       6 transports       0 coverings    0 bridges    0
+[rss] t=   65.3s rss=   643.2 MiB stage=A-lifts planes=0 frames=0 lifts      10 transports       0 coverings    0 bridges    0
+    A: 250 planes so far, 2.8 s, rss   655.2 MiB lifts     251 transports       0 coverings    0 bridges    0
+    A: 500 planes so far, 4.8 s, rss   670.2 MiB lifts     501 transports       0 coverings    0 bridges    0
+[rss] t=   70.3s rss=   679.5 MiB stage=A-lifts planes=0 frames=0 lifts     651 transports       0 coverings    0 bridges    0
+    A: 750 planes so far, 6.4 s, rss   685.7 MiB lifts     751 transports       0 coverings    0 bridges    0
+    A: 1000 planes so far, 8.3 s, rss   701.3 MiB lifts    1001 transports       0 coverings    0 bridges    0
+    A: 1250 planes so far, 10.6 s, rss   716.8 MiB lifts    1251 transports       0 coverings    0 bridges    0
+[rss] t=   75.4s rss=   718.9 MiB stage=A-lifts planes=0 frames=0 lifts    1281 transports       0 coverings    0 bridges    0
+    A: 1500 planes so far, 12.0 s, rss   732.7 MiB lifts    1501 transports       0 coverings    0 bridges    0
+    A: 1750 planes so far, 13.5 s, rss   748.1 MiB lifts    1751 transports       0 coverings    0 bridges    0
+    A: 2000 planes so far, 14.8 s, rss   763.7 MiB lifts    2001 transports       0 coverings    0 bridges    0
+[rss] t=   80.4s rss=   774.1 MiB stage=A-lifts planes=0 frames=0 lifts    2169 transports       0 coverings    0 bridges    0
+    A: 2250 planes so far, 16.9 s, rss   779.1 MiB lifts    2251 transports       0 coverings    0 bridges    0
+    A: 2500 planes so far, 18.3 s, rss   795.0 MiB lifts    2501 transports       0 coverings    0 bridges    0
+    A: 2750 planes so far, 19.8 s, rss   811.1 MiB lifts    2751 transports       0 coverings    0 bridges    0
+[rss] t=   85.4s rss=   817.7 MiB stage=A-lifts planes=0 frames=0 lifts    2857 transports       0 coverings    0 bridges    0
+    A: 3000 planes so far, 21.9 s, rss   826.6 MiB lifts    3001 transports       0 coverings    0 bridges    0
+    A: 3250 planes so far, 24.0 s, rss   842.3 MiB lifts    3251 transports       0 coverings    0 bridges    0
+     24.36 s  A: 3302 distinct planes of 5440 candidate isometries, one registered lift each  rss   845.5 MiB  lifts    3303 transports       0 coverings    0 bridges    0
+    A: one plane of the row retains 551087 B (its subobject), 8176528 B (its registered lift), 992 B (its span key): 8728607 B a plane
+[rss] t=   90.4s rss=   849.5 MiB stage=B-covering planes=3302 frames=0 lifts    3303 transports       0 coverings    0 bridges    0
+[rss] t=   95.4s rss=   851.9 MiB stage=B-covering planes=3302 frames=0 lifts    3303 transports       0 coverings    0 bridges    0
+[rss] t=  100.7s rss=   979.6 MiB stage=B-covering planes=3302 frames=0 lifts    3303 transports       0 coverings    0 bridges    0
+     12.09 s  B: the row's one covering at the retained plane: 3 flags  rss   979.9 MiB  lifts    3303 transports       3 coverings    1 bridges    0
+    C: 100 planes carried, 300 flags held,    39.84 ms a plane, rss  1007.4 MiB lifts    3303 transports     287 coverings    1 bridges    0
+[rss] t=  105.7s rss=  1017.3 MiB stage=C-carry planes=136 frames=408 lifts    3303 transports     381 coverings    1 bridges    0
+    C: 200 planes carried, 600 flags held,    28.28 ms a plane, rss  1032.7 MiB lifts    3303 transports     509 coverings    1 bridges    0
+    C: 300 planes carried, 900 flags held,    16.38 ms a plane, rss  1059.4 MiB lifts    3303 transports     759 coverings    1 bridges    0
+    C: 400 planes carried, 1200 flags held,    15.40 ms a plane, rss  1084.4 MiB lifts    3303 transports     969 coverings    1 bridges    0
+[rss] t=  111.7s rss=  1097.5 MiB stage=C-carry planes=453 frames=1359 lifts    3303 transports    1075 coverings    1 bridges    0
+    C: 500 planes carried, 1500 flags held,    20.06 ms a plane, rss  1109.3 MiB lifts    3303 transports    1178 coverings    1 bridges    0
+    C: 600 planes carried, 1800 flags held,    20.40 ms a plane, rss  1137.6 MiB lifts    3303 transports    1456 coverings    1 bridges    0
+    C: 700 planes carried, 2100 flags held,    15.49 ms a plane, rss  1166.5 MiB lifts    3303 transports    1739 coverings    1 bridges    0
+[rss] t=  116.7s rss=  1190.2 MiB stage=C-carry planes=784 frames=2352 lifts    3303 transports    1972 coverings    1 bridges    0
+    C: 800 planes carried, 2400 flags held,    15.40 ms a plane, rss  1195.5 MiB lifts    3303 transports    2019 coverings    1 bridges    0
+    C: 900 planes carried, 2700 flags held,    15.28 ms a plane, rss  1224.8 MiB lifts    3303 transports    2292 coverings    1 bridges    0
+    C: 1000 planes carried, 3000 flags held,    22.16 ms a plane, rss  1253.2 MiB lifts    3303 transports    2569 coverings    1 bridges    0
+[rss] t=  121.7s rss=  1259.5 MiB stage=C-carry planes=1022 frames=3066 lifts    3303 transports    2633 coverings    1 bridges    0
+    C: 1100 planes carried, 3300 flags held,    22.08 ms a plane, rss  1281.4 MiB lifts    3303 transports    2844 coverings    1 bridges    0
+    C: 1200 planes carried, 3600 flags held,    15.18 ms a plane, rss  1309.4 MiB lifts    3303 transports    3118 coverings    1 bridges    0
+    C: 1300 planes carried, 3900 flags held,    15.30 ms a plane, rss  1337.6 MiB lifts    3303 transports    3393 coverings    1 bridges    0
+[rss] t=  126.8s rss=  1352.3 MiB stage=C-carry planes=1352 frames=4056 lifts    3303 transports    3534 coverings    1 bridges    0
+    C: 1400 planes carried, 4200 flags held,    15.27 ms a plane, rss  1365.8 MiB lifts    3303 transports    3666 coverings    1 bridges    0
+    C: 1500 planes carried, 4500 flags held,    23.73 ms a plane, rss  1393.8 MiB lifts    3303 transports    3936 coverings    1 bridges    0
+[rss] t=  131.8s rss=  1413.8 MiB stage=C-carry planes=1569 frames=4707 lifts    3303 transports    4129 coverings    1 bridges    0
+    C: 1600 planes carried, 4800 flags held,    23.91 ms a plane, rss  1422.3 MiB lifts    3303 transports    4213 coverings    1 bridges    0
+    C: 1700 planes carried, 5100 flags held,    15.44 ms a plane, rss  1452.5 MiB lifts    3303 transports    4482 coverings    1 bridges    0
+    C: 1800 planes carried, 5400 flags held,    15.41 ms a plane, rss  1479.7 MiB lifts    3303 transports    4756 coverings    1 bridges    0
+[rss] t=  136.8s rss=  1508.4 MiB stage=C-carry planes=1897 frames=5691 lifts    3303 transports    5022 coverings    1 bridges    0
+    C: 1900 planes carried, 5700 flags held,    15.31 ms a plane, rss  1509.2 MiB lifts    3303 transports    5030 coverings    1 bridges    0
+    C: 2000 planes carried, 6000 flags held,    15.05 ms a plane, rss  1537.2 MiB lifts    3303 transports    5301 coverings    1 bridges    0
+    C: 2100 planes carried, 6300 flags held,    15.04 ms a plane, rss  1565.6 MiB lifts    3303 transports    5579 coverings    1 bridges    0
+    C: 2200 planes carried, 6600 flags held,    15.33 ms a plane, rss  1593.5 MiB lifts    3303 transports    5847 coverings    1 bridges    0
+[rss] t=  143.9s rss=  1600.0 MiB stage=C-carry planes=2224 frames=6672 lifts    3303 transports    5908 coverings    1 bridges    0
+    C: 2300 planes carried, 6900 flags held,    25.86 ms a plane, rss  1621.4 MiB lifts    3303 transports    6115 coverings    1 bridges    0
+    C: 2400 planes carried, 7200 flags held,    25.67 ms a plane, rss  1649.6 MiB lifts    3303 transports    6386 coverings    1 bridges    0
+    C: 2500 planes carried, 7500 flags held,    15.05 ms a plane, rss  1677.9 MiB lifts    3303 transports    6663 coverings    1 bridges    0
+[rss] t=  148.9s rss=  1694.2 MiB stage=C-carry planes=2558 frames=7674 lifts    3303 transports    6823 coverings    1 bridges    0
+    C: 2600 planes carried, 7800 flags held,    14.84 ms a plane, rss  1705.9 MiB lifts    3303 transports    6933 coverings    1 bridges    0
+    C: 2700 planes carried, 8100 flags held,    14.99 ms a plane, rss  1734.5 MiB lifts    3303 transports    7203 coverings    1 bridges    0
+    C: 2800 planes carried, 8400 flags held,    15.33 ms a plane, rss  1764.8 MiB lifts    3303 transports    7484 coverings    1 bridges    0
+[rss] t=  154.0s rss=  1789.3 MiB stage=C-carry planes=2887 frames=8661 lifts    3303 transports    7730 coverings    1 bridges    0
+    C: 2900 planes carried, 8700 flags held,    15.43 ms a plane, rss  1792.9 MiB lifts    3303 transports    7765 coverings    1 bridges    0
+    C: 3000 planes carried, 9000 flags held,    15.46 ms a plane, rss  1821.1 MiB lifts    3303 transports    8041 coverings    1 bridges    0
+    C: 3100 planes carried, 9300 flags held,    15.35 ms a plane, rss  1849.3 MiB lifts    3303 transports    8317 coverings    1 bridges    0
+[rss] t=  160.2s rss=  1857.5 MiB stage=C-carry planes=3129 frames=9387 lifts    3303 transports    8394 coverings    1 bridges    0
+     60.01 s  C: 3189 planes carried, 9567 flags held, 18.81 ms a plane on average  rss  1874.5 MiB  lifts    3303 transports    8562 coverings    1 bridges    0
+    C: one carried line retains 550271 B; one carried flag 220475 B; the transports registry holds 8562 datums
+[rss] t=  165.2s rss=  1890.4 MiB stage=D-edges planes=3189 frames=9567 lifts    3303 transports    8562 coverings    1 bridges    0
+[rss] t=  170.2s rss=  1907.2 MiB stage=D-edges planes=3189 frames=9567 lifts    3303 transports    8562 coverings    1 bridges    0
+[rss] t=  175.3s rss=  1910.0 MiB stage=D-edges planes=3189 frames=9567 lifts    3303 transports    8562 coverings    1 bridges    0
+[rss] t=  180.3s rss=  1937.0 MiB stage=D-edges planes=3189 frames=9567 lifts    3303 transports    8562 coverings    1 bridges    0
+[rss] t=  185.3s rss=  1967.5 MiB stage=D-edges planes=3189 frames=9567 lifts    3303 transports    8562 coverings    1 bridges    0
+[rss] t=  190.3s rss=  1971.1 MiB stage=D-edges planes=3189 frames=9567 lifts    3303 transports    8562 coverings    1 bridges    0
+[rss] t=  195.4s rss=  1980.3 MiB stage=D-edges planes=3189 frames=9567 lifts    3303 transports    8562 coverings    1 bridges    0
+[rss] t=  200.4s rss=  2025.1 MiB stage=D-edges planes=3189 frames=9567 lifts    3303 transports    8562 coverings    1 bridges    0
+[rss] t=  205.4s rss=  2027.2 MiB stage=D-edges planes=3189 frames=9567 lifts    3303 transports    8562 coverings    1 bridges    0
+[rss] t=  210.5s rss=  2029.3 MiB stage=D-edges planes=3189 frames=9567 lifts    3303 transports    8562 coverings    1 bridges    0
+[rss] t=  215.5s rss=  2086.6 MiB stage=D-edges planes=3189 frames=9567 lifts    3303 transports    8562 coverings    1 bridges    0
+[rss] t=  220.5s rss=  2090.0 MiB stage=D-edges planes=3189 frames=9567 lifts    3303 transports    8562 coverings    1 bridges    0
+[rss] t=  225.6s rss=  2093.6 MiB stage=D-edges planes=3189 frames=9567 lifts    3303 transports    8562 coverings    1 bridges    0
+[rss] t=  230.6s rss=  2144.7 MiB stage=D-edges planes=3189 frames=9567 lifts    3303 transports    8562 coverings    1 bridges    0
+[rss] t=  235.6s rss=  2146.6 MiB stage=D-edges planes=3189 frames=9567 lifts    3303 transports    8562 coverings    1 bridges    0
+[rss] t=  240.7s rss=  2148.2 MiB stage=D-edges planes=3189 frames=9567 lifts    3303 transports    8562 coverings    1 bridges    0
+[rss] t=  245.7s rss=  2196.7 MiB stage=D-edges planes=3189 frames=9567 lifts    3303 transports    8562 coverings    1 bridges    0
+[rss] t=  250.7s rss=  2205.1 MiB stage=D-edges planes=3189 frames=9567 lifts    3303 transports    8562 coverings    1 bridges    0
+[rss] t=  255.7s rss=  2205.9 MiB stage=D-edges planes=3189 frames=9567 lifts    3303 transports    8562 coverings    1 bridges    0
+[rss] t=  260.7s rss=  2206.6 MiB stage=D-edges planes=3189 frames=9567 lifts    3303 transports    8562 coverings    1 bridges    0
+[rss] t=  267.8s rss=  2214.7 MiB stage=D-edges planes=3189 frames=9567 lifts    3303 transports    8562 coverings    1 bridges    0
+[rss] t=  272.8s rss=  2214.7 MiB stage=D-edges planes=3189 frames=9567 lifts    3303 transports    8562 coverings    1 bridges    0
+[rss] t=  277.9s rss=  2214.7 MiB stage=D-edges planes=3189 frames=9567 lifts    3303 transports    8562 coverings    1 bridges    0
+[rss] t=  282.9s rss=  2214.7 MiB stage=D-edges planes=3189 frames=9567 lifts    3303 transports    8562 coverings    1 bridges    0
+[rss] t=  287.9s rss=  2214.7 MiB stage=D-edges planes=3189 frames=9567 lifts    3303 transports    8562 coverings    1 bridges    0
+[rss] t=  292.9s rss=  2214.8 MiB stage=D-edges planes=3189 frames=9567 lifts    3303 transports    8562 coverings    1 bridges    0
+[rss] t=  297.9s rss=  2214.8 MiB stage=D-edges planes=3189 frames=9567 lifts    3303 transports    8562 coverings    1 bridges    0
+[rss] t=  303.0s rss=  2214.8 MiB stage=D-edges planes=3189 frames=9567 lifts    3303 transports    8562 coverings    1 bridges    0
+[rss] t=  308.0s rss=  2214.8 MiB stage=D-edges planes=3189 frames=9567 lifts    3303 transports    8562 coverings    1 bridges    0
+[rss] t=  313.0s rss=  2241.4 MiB stage=D-edges planes=3189 frames=9567 lifts    3303 transports    8562 coverings    1 bridges    0
