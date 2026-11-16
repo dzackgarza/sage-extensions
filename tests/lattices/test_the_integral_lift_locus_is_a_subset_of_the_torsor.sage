@@ -75,6 +75,37 @@ def _lift_at_class(torsor, residue):
     return torsor.parameterization()(parameter)
 
 
+class _InclusionQuestions:
+    r"""Count the image questions the locus asks its parameter inclusion inside the block."""
+
+    def __init__(self, inclusion):
+        self.inclusion = inclusion
+        self.membership = 0
+        self.lifts = 0
+
+    def __enter__(self):
+        inclusion, counted = self.inclusion, self
+        original_membership = inclusion.is_in_image
+        original_lift = inclusion.lift
+
+        def is_in_image(element):
+            counted.membership += 1
+            return original_membership(element)
+
+        def lift(element):
+            counted.lifts += 1
+            return original_lift(element)
+
+        inclusion.is_in_image = is_in_image
+        inclusion.lift = lift
+        return self
+
+    def __exit__(self, *exception):
+        del self.inclusion.is_in_image
+        del self.inclusion.lift
+        return False
+
+
 def _non_integral_base_point_control(root_index):
     r"""``U(2) + A2`` at a marked line of divisibility two, lifting a reflection.
 
@@ -261,3 +292,27 @@ def test_building_the_locus_asks_the_base_point_for_no_integral_restriction() ->
         locus = torsor.integral_lift_locus()
         assert locus.is_empty() is False
     assert asked.count == 0
+
+
+def test_a_membership_test_asks_the_parameter_inclusion_no_image_question() -> None:
+    r"""Membership in ``T_Z`` solves the parameter's preimage once, not once per question.
+
+    Whether a lift's parameter lies in ``P``, and which class of ``P/mP`` it has when
+    it does, are one question: one preimage of the parameter, read for both facts.
+    ``is_in_image`` and ``lift`` are two questions that each solve it, and the locus
+    asks the inclusion neither.  What the locus answered while the count was taken
+    is the two membership results below --- a lift whose class is in ``C``, and the
+    base point, whose class is not.
+    """
+    lattice, marked, reduction, torsor = _non_integral_base_point_control(0)
+    locus = torsor.integral_lift_locus()
+    inclusion = torsor.integral_parameter_quotient().domain().inclusion()
+    member = _lift_at_class(torsor, tuple(torsor.integral_parameter_classes())[0])
+
+    assert lattice.div(marked) == 2
+    assert locus.is_empty() is False
+    with _InclusionQuestions(inclusion) as asked:
+        assert locus.is_parent_of(member) is True
+        assert locus.is_parent_of(torsor.base_point()) is False
+    assert asked.membership == 0
+    assert asked.lifts == 0

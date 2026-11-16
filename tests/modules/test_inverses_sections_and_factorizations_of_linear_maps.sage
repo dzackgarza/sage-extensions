@@ -36,14 +36,14 @@ def test_the_preimage_of_e0_under_a_determinant_one_map_is_e0_minus_e1() -> None
     assert f.preimage(x) == x - y
 
 
-def test_one_preimage_answers_membership_and_the_lift() -> None:
-    r"""A preimage or ``None`` is one answer to the two questions an element asks.
+def test_the_one_answer_is_a_preimage_of_the_element_or_none() -> None:
+    r"""``preimage_or_none(w)`` is a preimage of ``w``, or ``None`` when there is none.
 
-    ``is_in_image(w)`` and ``lift(w)`` are the same question --- does ``w`` have
-    a preimage, and which one --- so the preimage is the answer to both, and
-    ``preimage_or_none`` is that answer: a preimage of ``w`` when it has one and
-    ``None`` when it has none.  For $e \mapsto x$, the image is $\mathbb{Q}x$:
-    $x$ and $3x$ lift to $e$ and $3e$, and $y$, $x + y$ do not lift at all.
+    For $e \mapsto x$ the image is $\mathbb{Q}x$: $x$ and $3x$ lift to $e$ and
+    $3e$, and $y$, $x + y$ do not lift at all.  The answer is one element, so it is
+    what the two questions about ``w`` are read off: it has a preimage exactly when
+    the answer is not ``None``, the answer is the lift, and applying the map to it
+    returns ``w``.
     """
     line, plane = QQ**1, QQ**2
     e = line.module_generator(0)
@@ -54,10 +54,13 @@ def test_one_preimage_answers_membership_and_the_lift() -> None:
     assert inclusion.preimage_or_none(3 * x) == 3 * e
     assert inclusion.preimage_or_none(y) is None
     assert inclusion.preimage_or_none(x + y) is None
-    for point in (x, 3 * x):
-        assert inclusion(inclusion.preimage_or_none(point)) == point
-        assert inclusion.preimage_or_none(point) == inclusion.lift(point)
     assert inclusion.preimage_or_none(plane.zero()) == line.zero()
+    for point, answer in ((x, e), (3 * x, 3 * e), (y, None), (x + y, None)):
+        assert inclusion.is_in_image(point) == (answer is not None)
+        assert inclusion.preimage_or_none(point) == answer
+        if answer is not None:
+            assert inclusion(answer) == point
+            assert inclusion.lift(point) == answer
 
 
 def test_the_image_of_a_rational_line_in_the_plane_has_no_transverse_preimage() -> None:
