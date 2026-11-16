@@ -14,8 +14,12 @@ every divided class is trivial and the square alone decides.
 
 The hypothesis is read off the presented decomposition, so the K3 lattice
 appears here twice: once built as ``U^3 + E8^2``, where the three hyperbolic
-planes are summands, and once as the catalogue's ``LK3``, which is presented
-by a Gram matrix and therefore answers that it splits nothing.
+planes are summands, and once as the catalogue's ``LK3``, which is presented by
+a Gram matrix.  The two are isometric.  A partition of a displayed basis into
+mutually orthogonal blocks does exhibit an orthogonal sum, so ``LK3`` is
+decomposable; but the sum is not a datum of its presentation, no summand of it
+is the hyperbolic plane, and the criterion -- which reads the summands a
+presentation gives -- does not apply to it.
 """
 
 from sage_extensions.all import *
@@ -42,18 +46,32 @@ def test_the_criterion_reads_its_hypothesis_off_the_decomposition() -> None:
     assert not NamedLattices.E10.splits_two_hyperbolic_planes()
     assert not NamedLattices.E10.eichler_criterion_applies()
 
-    # The catalogue's K3 lattice is isometric to the decomposed one but is
-    # presented by a Gram matrix, so no decomposition is readable from it.
+    # The catalogue's K3 lattice is isometric to the decomposed one.  Its
+    # displayed Gram is the block diagonal of the five summands, and a
+    # partition of a displayed basis into mutually orthogonal blocks exhibits
+    # an orthogonal sum, so it is decomposable.  A Gram matrix presents the
+    # lattice, not a family of summands: nothing here is the hyperbolic plane,
+    # and the criterion reads the summands of a presented decomposition.
     assert NamedLattices.LK3.is_isometric(decomposed)
-    assert not NamedLattices.LK3.is_decomposable()
+    assert NamedLattices.LK3.is_decomposable()
+    assert NamedLattices.LK3.hyperbolic_plane_summand_count() == 0
     assert not NamedLattices.LK3.eichler_criterion_applies()
 
 
 def test_raw_gram_factor_does_not_count_as_a_represented_u_summand() -> None:
+    r"""A factor presented by another Gram of the plane is not a presented ``U``.
+
+    ``U`` is the plane in the basis ``e, f`` with ``b(e, f) = 1``, where both
+    generators are isotropic: its displayed Gram is ``((0, 1), (1, 0))``.  The
+    factor below is the same lattice in the basis ``(2, 1), (1, 0)``, where
+    neither generator is isotropic, so it is isometric to ``U`` without being
+    presented as it -- the reading ``decomposition_names()`` reports.
+    """
     raw_u = Lattices(ZZ)([[2, 1], [1, 0]])
     lattice = raw_u + NamedLattices.U
 
     assert raw_u.is_isometric(NamedLattices.U)
+    assert raw_u.is_indecomposable()
     assert tuple(lattice.decomposition_names()) == (None, "U")
     assert lattice.hyperbolic_plane_summand_count() == 1
     assert not lattice.splits_two_hyperbolic_planes()
