@@ -3352,3 +3352,15 @@ between that tree and the pushed tip are `all.py`, `language_runtime.py` and two
 `git diff --stat 9cb47c6 <pushed tip> -- src/sage_extensions/categories
 tests/groups tests/lattices tests/test_finite_cosets.py` is empty.  So the green
 and the probe above are runs of the code that is pushed.
+
+Correction, 2026-11-16 (third): `main` moved five more times.  The history this
+round is pushed from is `63f007f` (the tests), `4d1441c` and `f8c4170` (the
+repairs), rebased onto `67c192c`; this note's commit sits on the evidence tip
+above them and touches nothing but these files.  The two runs below are taken at
+`b896a53`, whose `src` and `tests` are this note's commit's own, so they are runs
+of the pushed code and rest on no file-level argument.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `537r3-green-tests-run.log` | `b896a53` | the file: **15 passed in 3.71 s** |
+| `537r3-probe-run.log` | `b896a53` | the same probe: the same answers again, byte for byte |
