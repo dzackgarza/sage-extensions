@@ -1,0 +1,4 @@
+# at d918653, with the test lint loaded as pyproject.toml loads it
+$ pytest -p sage_extensions.testing.test_lint tests/engineering/test_the_declared_category_graph_reads_a_source_tree.py
+.............                                                            [100%]
+13 passed in 18.90s

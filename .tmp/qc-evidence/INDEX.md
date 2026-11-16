@@ -3512,3 +3512,4 @@ The four card files on the tree this round pushes, and the restriction-of-scalar
 | `541r6-cards-at-fc09967.log` | `fc09967`, the pushed head | the four card files together: **24 passed in 2.60 s** |
 | `541r6-probe-extension-ring-restriction.log` | `6171902`, before the extension generating-set repair | `Res_{Z -> Q}(Q)`, `Z^1` read as a `Q`-module, and `Res_{F_2 -> A}(A)` for `A = F_2[x]/(x^2)`: the first two state no framing labels through the module accessor, so the ring reading is the specimen that decides the accessor; after the repair all three construct, the last with rank 2 and cardinality 4 |
 | `541r6-cards-at-e638da1.log` | `e638da1`, the head after the rebase onto `3bba334` | the same four files: **24 passed in 2.15 s** |
+| `551r2-6-green-at-d918653.log` | `d918653`, the head this pushes | the same file, the test lint loaded, at the head that carries the evidence files and the fixture's removed `os` import: **13 passed in 18.90 s** |
