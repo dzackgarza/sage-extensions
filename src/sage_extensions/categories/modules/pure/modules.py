@@ -7714,6 +7714,46 @@ class MatrixEndomorphismSpaces(OwnedCategoryOverBaseRing):
             """
             return self.is_injective() and self.is_surjective()
 
+        def _unit_inverse_decision(self):
+            r"""Return the inverse of this endomorphism in its own ring, or refuse a nonunit.
+
+            The units of \(M_n(R)=\operatorname{End}_R(R^n)\) are the
+            automorphisms of \(R^n\), which ``_unit_decision`` decides, and the
+            inverse of one in the ring is the inverse linear map, which the
+            endomorphism itself constructs.  Neither step leaves the ring: over
+            \(\mathbf{Z}\) the inverse of \(2I\) would be \(\frac{1}{2}I\), whose
+            entries are not integers, so \(2I\) has no inverse in
+            \(M_2(\mathbf{Z})\) at all and is refused here instead of by an
+            engine computing in a larger ring and failing to read the result
+            back.
+
+            A nonunit is refused, not computed: ``inverse_of_unit`` is what
+            division by the element multiplies by, so its error is the ring's
+            statement of the hypothesis the division failed.
+            """
+            match self.is_unit():
+                case True:
+                    return self.inverse()
+                case False:
+                    raise ZeroDivisionError(
+                        f"{self} is not a unit of {self.parent()}"
+                    )
+                case _:
+                    return None
+
+        def __invert__(self):
+            r"""Return the inverse of this matrix in its ring, refusing a nonunit.
+
+            An element of a matrix ring is inverted in that ring, so \(A^{-1}\)
+            is the two-sided inverse of \(A\) in \(\operatorname{End}_R(R^n)\):
+            the ring's unit inverse, which exists exactly on the units.  The
+            matrix space's own ``~`` computes in the coefficient fraction field
+            and reads the result back, which answers for a nonunit as much as
+            the field does -- \(\frac{1}{2}I\) for \(2I\) over \(\mathbf{Z}\) --
+            so the endomorphism ring states its inverse here instead.
+            """
+            return self.inverse_of_unit()
+
         def trace(self):
             ring = self.parent().base_ring()
             return sum(
