@@ -4,7 +4,7 @@ Refining an object into another category rebuilds its class with the categories
 it now reaches, and when two of those levels declare the same operation the
 rebuild keeps the one the final category order names.
 
-``QQ(i)`` is the object two of these act on: an algebra over ``QQ`` that is
+``QQ(i)`` is the object each of these acts on: an algebra over ``QQ`` that is
 also a finitely generated framed free module, a module with a chosen finite
 presentation, and an infinite ring.
 
@@ -19,12 +19,14 @@ presentation, and an infinite ring.
   ``tests/modules/test_the_order_ideal_of_a_ring_element_over_its_base_ring.sage``,
   where the dual ``prod_N ZZ`` has no selected generating family in this
   library and the module level therefore cannot answer at all.
-* ``__iter__`` is ``OwnedRings.Finite.ParentMethods.__iter__``, which enumerates
-  a *finite* ring's points through its selected engine; ``QQ(i)`` is not finite,
-  so no level of this rebuild gives it an enumeration, and the general ring
-  states none at all (``iter(..)`` fails in the language, which
-  ``tests/rings/test_a_ring_states_no_enumeration_of_its_points.sage`` states for
-  ``ZZ['x']``).
+* ``__iter__`` on ``QQ(i)`` is
+  ``FramedFreeModules.FinitelyGenerated.ParentMethods.__iter__``: the field is a
+  finitely generated framed free module over ``QQ``, and its framing's
+  coordinates enumerate its points.  ``OwnedRings.Finite.ParentMethods.__iter__``
+  enumerates a *finite* ring's points through its selected engine, and the
+  general ring states no enumeration at all -- which is the answer for
+  ``ZZ['x']``, whose framing has no finite basis, as
+  ``tests/rings/test_a_ring_states_no_enumeration_of_its_points.sage`` states.
 * ``adic_completion`` is ``OwnedRings.ParentMethods.adic_completion``, the
   ring's inverse limit, not the module's base change to the completed scalar
   ring of ``ModulesWithChosenFinitePresentation.ParentMethods``.

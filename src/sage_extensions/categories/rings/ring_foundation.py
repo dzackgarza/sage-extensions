@@ -4358,11 +4358,20 @@ class OwnedRings(CategoryPacketMethods, OwnedCategory):
     class ParentMethods:
         r"""A ring's points are not a sequence, so the general ring states no ``__iter__``.
 
-        A ring states an enumeration of its points only where its points are a
-        finite set, which is :class:`OwnedRings.Finite`; an iterator need not be
-        finite, and $\mathbf{Z}$, $\mathbf{Z}[x]$ and $\mathbf{Q}(i)$ are
-        countable, so the general ring has no enumeration to offer and states
-        none rather than refusing one.
+        A ring states an enumeration of its points where something enumerates
+        them, and the general ring states none because it has nothing to
+        enumerate them with: a ring whose points are a finite set enumerates
+        them through the engine that realizes it (:class:`OwnedRings.Finite`),
+        and a ring that is a finitely generated framed free module over its
+        base ring enumerates them through that framing's coordinates
+        (:class:`FramedFreeModules.FinitelyGenerated`), where each point is the
+        linear combination of the framing's basis that its coordinates name.
+
+        $\mathbf{Z}[x]$ is neither -- its monomial framing has no finite
+        basis -- so no level supplies it an enumeration and the absence below
+        answers.  It is not a claim about cardinality: $\mathbf{Z}$,
+        $\mathbf{Z}[x]$ and $\mathbf{Q}(i)$ are countable, and an iterator need
+        not be finite.
 
         ``__iter__ = None`` states that in the language rather than in a method
         of ours.  ``__getitem__`` is the adjunction syntax
@@ -4373,7 +4382,10 @@ class OwnedRings(CategoryPacketMethods, OwnedCategory):
         special method to ``None`` states that the operation is not available:
         ``iter()`` then raises ``TypeError`` without falling back to
         ``__getitem__`` (Python Language Reference, Data Model, §3.3, "Special
-        method names", on setting a special method to ``None``).
+        method names", on setting a special method to ``None``).  A stated
+        absence is the least a level says about a name, so it does not shadow
+        an enumeration a level of the same ring supplies
+        (``refine._final_category_operations``).
         """
 
         __iter__ = None

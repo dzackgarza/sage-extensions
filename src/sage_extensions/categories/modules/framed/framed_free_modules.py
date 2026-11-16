@@ -855,12 +855,20 @@ class FramedFreeModules(OwnedCategoryOverBaseRing):
                 r"""Enumerate this finite free module over ZZ, QQ or a finite ring.
 
                 Use Sage's fair Cartesian-product enumeration of scalar
-                coordinates in the retained finite basis. Every vector
-                occurs after finitely many predecessors; rational
-                denominators are included. This does not choose a ranking
-                isomorphism or decide exhaustion of a filtered subset.
+                coordinates in the retained finite basis, and build each point
+                from its coordinates by the linear combination the framing
+                defines. Every vector occurs after finitely many predecessors;
+                rational denominators are included. This does not choose a
+                ranking isomorphism or decide exhaustion of a filtered subset.
                 A zero module has just its zero vector over any base.
                 No exhaustive iterator is supplied over a real field.
+
+                A ring that is finitely generated and free over its base ring
+                is one of these modules, and the points yielded are its points:
+                the coordinates are the framing's and the element they combine
+                to is the ring element, so $\mathbf{Z}$, free of rank one over
+                itself, yields its integers, and $\mathbf{Q}(i)$, free of rank
+                two over $\mathbf{Q}$ on $\{1, i\}$, yields its field elements.
 
                 EXAMPLES::
 
@@ -869,6 +877,10 @@ class FramedFreeModules(OwnedCategoryOverBaseRing):
                     sage: points = tuple(islice(M, 9))
                     sage: assert len(set(points)) == 9
                     sage: assert M.zero() in points
+                    sage: assert all(point in ZZ for point in islice(ZZ, 9))
+                    sage: assert ZZ(3) in tuple(islice(ZZ, 9))
+                    sage: K = QuadraticField(-1)
+                    sage: assert K.primitive_element() in tuple(islice(K, 25))
                     sage: T = Lattices(QQ)([[1]])
                     sage: v = next(iter(T.elements_of_norm(QQ(1)/4)))
                     sage: assert T.q(v) == QQ(1)/4
@@ -892,7 +904,7 @@ class FramedFreeModules(OwnedCategoryOverBaseRing):
                 for coordinates in _engine_cantor_product(
                     _engine_ring(ring), repeat=len(basis_labels)
                 ):
-                    yield self(
+                    yield self.linear_combination(
                         {
                             label: _owned_engine_element(ring, coefficient)
                             for label, coefficient in zip(basis_labels, coordinates)
