@@ -2080,16 +2080,18 @@ def _engine_conjugate_of_subgroup(group, subgroup, conjugator):
     A permutation or GAP-encoded engine conjugates the subgroup's own engine
     subgroup, so the conjugate's elements, order, membership and cosets are the
     engine's exact answers; any other engine conjugates the generators of that
-    engine subgroup in its own product, which generates the same subgroup.
+    engine subgroup in its own product, which generates the same subgroup.  The
+    conjugating element is crossed into the engine once, by the group's own
+    :meth:`_to_engine`, and only the GAP branch asks GAP for it: an engine with
+    no GAP model of its elements is served by generators instead of being
+    refused by an adapter whose answer that branch does not use.
     """
     engine = _engine_group(group)
-    conjugating = _element_to_engine(
-        group, _engine_conjugating_element(group, conjugator)
-    )
+    conjugating = group._to_engine(group(_engine_conjugating_element(group, conjugator)))
     match engine:
         case PermutationGroup_generic() | ParentLibGAP():
             return engine._subgroup_constructor(
-                libgap.ConjugateSubgroup(_gap_model(subgroup), conjugating)
+                libgap.ConjugateSubgroup(_gap_model(subgroup), conjugating.gap())
             )
         case _:
             inverse = conjugating**-1
@@ -6728,10 +6730,13 @@ class OwnedGroups(CategoryPacketMethods, OwnedCategory):
             Protected construction contract under OWN-05. Only
             ``_conjugated_subgroup`` calls this hook, with the conjugator it
             composed from the request and with the subgroup that conjugator is
-            applied to. A more specific category retains any defining data of
-            its conjugated subgroup, or answers the subgroup itself when its
-            realization decides that the element carries it to itself; None
-            selects the general construction of the pair.
+            applied to. A more specific category builds the conjugate from
+            defining data of its own and retains it, or answers ``None``; None
+            selects the general construction of the pair. A realization that
+            finds the element carries the subgroup to itself answers ``None``
+            too: identifying that image with the subgroup would read
+            ``g.(h.H)`` off a pair the product does not name
+            (:meth:`conjugate_subgroup`).
             """
             return None
 
@@ -6748,11 +6753,15 @@ class OwnedGroups(CategoryPacketMethods, OwnedCategory):
             the subgroup and the conjugating element it was built from
             (:class:`ConjugateSubgroups`), so conjugating a conjugate composes
             the elements -- ``g.(h.H) = (gh).H`` -- and the two sides of that
-            law are one construction of one pair.  An element that carries
-            ``H`` to itself therefore answers ``H`` with the selected data and
-            maps it retains: the identity, every element of ``H``, and each
-            further element a realization decides for
-            (``_conjugate_subgroup_construction``).
+            law are one construction of one pair.
+
+            So an element that carries ``H`` to itself is not answered with
+            ``H`` itself: with ``h`` normalizing ``H`` the pair ``(H, h)`` is a
+            different pair from ``(H, 1)``, and ``g.(h.H)`` and ``(gh).H``
+            would be read off ``(H, g)`` and ``(H, gh)``.  The two pairs that
+            do name one point for every element are the whole group -- ``g G
+            g^-1 = G`` -- and the identity -- ``g.(1.H) = (g 1).H`` is the
+            pair of ``g``.
             """
             assert group_element in self, f"{group_element} is not an element of {self}"
             assert subgroup is self or subgroup in self.subgroups(), f"{subgroup} is not a subgroup of {self}"
@@ -6764,8 +6773,13 @@ class OwnedGroups(CategoryPacketMethods, OwnedCategory):
                     conjugator = group_element * subgroup.conjugator()
                 case _:
                     source, conjugator = subgroup, group_element
-            if source is self or conjugator == self.one() or source.is_parent_of(conjugator) is True:
-                # g H g^-1 = H for g in H, so this element fixes the point H.
+            if source is self:
+                # g G g^-1 = G: the whole group is one point for every element,
+                # so every pair names this answer.
+                return self
+            if conjugator == self.one():
+                # 1.H = H, and composing the pair (H, 1) with g gives (H, g):
+                # identifying it with H keeps g.(1.H) = (g 1).H one pair.
                 return source
             return self._conjugated_subgroup(source, conjugator)
 
@@ -6776,12 +6790,14 @@ class OwnedGroups(CategoryPacketMethods, OwnedCategory):
             Protected construction contract (``OWN-05``).  ``conjugate_subgroup``
             is the only caller, with the conjugator it composed; the cache is
             keyed by that pair, so the answers to ``g.(h.H)`` and to
-            ``(gh).H`` are one object.
+            ``(gh).H`` are one object, including when the element carries the
+            subgroup to itself.
 
-            A realization that decides the element carries the subgroup to
-            itself supplies the subgroup (``_conjugate_subgroup_construction``);
+            A realization that builds ``g H g^-1`` from data of its own
+            supplies that subgroup (``_conjugate_subgroup_construction``);
             otherwise the conjugate is the construction of the pair
-            (:func:`_conjugate_subgroup_of`).
+            (:func:`_conjugate_subgroup_of`), whose engine subgroup is
+            realized on first request and not here.
             """
             selected = self._conjugate_subgroup_construction(conjugator, subgroup)
             if selected is not None:
@@ -7066,34 +7082,6 @@ class OwnedGroups(CategoryPacketMethods, OwnedCategory):
                         self, lambda: finite_ordered_set(tuple(element for element in self))
                     )
                 return self.selected_resolution(OwnedGroups())
-
-            @RealizationHook
-            def _conjugate_subgroup_construction(self, group_element, subgroup):
-                r"""Answer ``subgroup`` when GAP decides ``group_element`` carries it to itself.
-
-                Only ``_conjugated_subgroup`` calls this, with the conjugator it
-                composed and the subgroup that conjugator is applied to.
-
-                An element outside ``H`` can still carry ``H`` to itself --
-                ``(3 4)`` outside the subgroup ``<(1 2)>`` of ``S_4`` -- and the
-                engine decides that equality exactly.  The answer is then the
-                point ``H`` the element fixes, not a second subgroup with the
-                same elements; any other conjugate is the general construction
-                of the pair, which retains it.
-
-                ``_engine_conjugating_element`` supplies the engine element whose
-                GAP conjugation is the owned one; conjugation by the inverse
-                instead would carry ``<(1 2)>`` to ``<(1 3)>`` for the
-                three-cycle ``(1 2 3)``.
-                """
-                model = _gap_model(subgroup)
-                image = libgap.ConjugateSubgroup(
-                    model,
-                    _element_to_engine(
-                        self, _engine_conjugating_element(self, group_element)
-                    ),
-                )
-                return subgroup if image == model else None
 
             def _subgroup_conjugacy_decision(self, left, right) -> bool:
                 r"""GAP's ``IsConjugate`` decides conjugacy of subgroups of a finite group."""
@@ -8880,15 +8868,14 @@ class ConjugateSubgroups(OwnedParameterizedCategory):
     The defining datum is the pair: the subgroup ``H`` and the element ``g``
     whose conjugate ``g H g^-1`` this is.  Nothing is enumerated by the
     construction -- the subgroup's members, its order and its cosets are the
-    engine subgroup's, which the pair computes -- and what the construction
-    states is the pair, so a conjugate is one object for one pair.
+    engine subgroup's, which the pair computes on first request -- and what the
+    construction states is the pair, so a conjugate is one object for one pair.
 
     Identity by that datum is the action law.  A conjugate retains the subgroup
     and the element it was built from, so conjugating it again composes elements
     instead of nesting pairs, and ``g.(h.H)`` and ``(gh).H`` are the same datum
-    and so the same subgroup.  An element that carries ``H`` to itself builds
-    no conjugate at all: the public operation answers ``H`` before reaching
-    here (:meth:`OwnedGroups.ParentMethods.conjugate_subgroup`).
+    and so the same subgroup, including when the element carries ``H`` to
+    itself (:meth:`OwnedGroups.ParentMethods.conjugate_subgroup`).
     """
 
     @staticmethod
@@ -8912,9 +8899,16 @@ class ConjugateSubgroups(OwnedParameterizedCategory):
     def _call_(self, conjugated_subgroup, conjugator):
         r"""Construct the conjugate ``conjugator conjugated_subgroup conjugator^-1``.
 
-        ``_conjugated_subgroup`` asks for the pair; the placement is read from
-        the engine subgroup the pair computes (:func:`_engine_conjugate_of_subgroup`),
-        and the name the record reads states the subgroup and the element
+        The construction states the pair and computes nothing (``OWN-22``): the
+        engine subgroup the pair defines is realized on first request by
+        :func:`_engine_conjugate_of_subgroup` and cached by the realization, so
+        building a conjugate costs one validation and one object.  The placement
+        is read from the subgroup the pair conjugates -- a conjugate is a
+        subgroup of the same ambient group, isomorphic to that subgroup, so it
+        is finite, abelian or finitely generated exactly when that one is --
+        and from the ambient group, never from the engine.
+
+        The name the record reads states the subgroup and the element
         (:func:`_named_by_its_own_words` asks the subgroup for its own words
         when the name is read, never while the conjugate is built).
         """
@@ -8927,21 +8921,31 @@ class ConjugateSubgroups(OwnedParameterizedCategory):
             raise ValueError(
                 f"{conjugated_subgroup} is not a subgroup of {group}, so it has no conjugate there"
             )
-        engine_subgroup = _engine_conjugate_of_subgroup(
-            group, conjugated_subgroup, conjugator
-        )
         subgroup = _object_of(
             Cat().meet(
                 (
-                    _owned_group_category(engine_subgroup),
                     self,
                     *_finite_if_bounded_by(group),
-                    *((OwnedAbelianGroups(),) if group in OwnedAbelianGroups() else ()),
+                    *_finite_if_image_of(conjugated_subgroup),
+                    *(
+                        (OwnedAbelianGroups(),)
+                        if conjugated_subgroup in OwnedAbelianGroups()
+                        or group in OwnedAbelianGroups()
+                        else ()
+                    ),
+                    *(
+                        (OwnedGroups().FinitelyGeneratedAsMagma(),)
+                        if conjugated_subgroup in OwnedGroups().FinitelyGeneratedAsMagma()
+                        else ()
+                    ),
+                    *((PermutationGroups(),) if group in PermutationGroups() else ()),
                 )
             ),
             _ambient=OwnedGroups(),
             _engine=(OwnedGroups(), _GroupEngine, _GroupElement),
-            engine=engine_subgroup,
+            engine_factory=lambda: _engine_conjugate_of_subgroup(
+                group, conjugated_subgroup, conjugator
+            ),
             conjugator=conjugator,
             conjugated_subgroup=conjugated_subgroup,
             stated_description=lambda: (
@@ -8949,7 +8953,10 @@ class ConjugateSubgroups(OwnedParameterizedCategory):
             ),
             supergroup=group,
         )
-        if _is_finitely_generated_witness(engine_subgroup):
+        if (
+            conjugated_subgroup in OwnedGroups().FinitelyGeneratedAsMagma()
+            or conjugated_subgroup.has_selected_group_resolution()
+        ):
             _fix_selected_group_resolution_on(
                 subgroup,
                 lambda: _engine_generators(subgroup),
@@ -8957,18 +8964,18 @@ class ConjugateSubgroups(OwnedParameterizedCategory):
         return subgroup
 
     class ParentMethods:
-        def __init__(self, conjugator=None, conjugated_subgroup=None, **rest) -> None:
-            self._conjugator = conjugator
-            self._conjugated_subgroup = conjugated_subgroup
+        def __init__(self, conjugated_subgroup, conjugator, **rest) -> None:
+            self._conjugate_source = conjugated_subgroup
+            self._conjugate_element = conjugator
             super().__init__(**rest)
 
         def conjugator(self):
             r"""Return the element this subgroup is conjugated by."""
-            return self._conjugator
+            return self._conjugate_element
 
         def conjugated_subgroup(self):
             r"""Return the subgroup this one is the conjugate of."""
-            return self._conjugated_subgroup
+            return self._conjugate_source
 
 
 def _coxeter_presentation(coxeter_matrix, names=None):
