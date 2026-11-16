@@ -71,18 +71,32 @@ class _FiniteDigraphEngine:
         r"""The vertex sets of the connected components of the underlying undirected graph.
 
         An owned finite ordered set of owned finite ordered sets of vertices,
-        each in vertex order.  Private computation of the graph owner: Sage's
-        ``Graph`` computes the components on the vertex positions.
+        each component in vertex order, and the components in the order of
+        their least vertex.  Private computation of the graph owner: Sage's
+        ``Graph`` computes the components on the vertex positions.  A loop
+        joins no two vertices, so it lies in the component of its own vertex
+        and in no other, and the components are read from the edges that are
+        not loops.
         """
         from sage.graphs.graph import Graph
 
         vertices = tuple(self.vertices())
         rank = self.vertices().ranking_map()
-        graph = Graph([range(len(vertices)), [(int(rank(edge[0])), int(rank(edge[1]))) for edge in self.edges()]], format="vertices_and_edges")
+        graph = Graph(
+            [
+                range(len(vertices)),
+                [
+                    (int(rank(edge[0])), int(rank(edge[1])))
+                    for edge in self.edges()
+                    if edge[0] != edge[1]
+                ],
+            ],
+            format="vertices_and_edges",
+        )
         return finite_ordered_set(
             tuple(
                 finite_ordered_set(tuple(vertices[position] for position in sorted(component)))
-                for component in graph.connected_components(sort=False)
+                for component in sorted(graph.connected_components(sort=False), key=min)
             )
         )
 

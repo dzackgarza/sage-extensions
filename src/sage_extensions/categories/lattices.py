@@ -5435,40 +5435,34 @@ class Lattices(OwnedCategoryOverBaseRing):
                 case False:
                     return None
 
+        @cached_method
         def _displayed_orthogonal_blocks(self):
-            r"""Return the blocks of the displayed basis that pair to zero across blocks.
+            r"""Return the summands the displayed Gram matrix exhibits.
 
-            A Gram entry \(b(g_i, g_j)\) is one pairing of two displayed
-            generators, so the graph on the displayed basis with an edge where
-            that pairing is nonzero has components whose spans pair to zero
-            across components: the lattice is the orthogonal sum of those
-            spans.  This is the sum a displayed Gram matrix exhibits, and
-            :meth:`is_decomposable` and :meth:`indecomposable_summands` read it
-            from here, so neither can claim a splitting the other denies.
+            The Gram graph of the displayed basis joins two positions where the
+            pairing of their generators is nonzero
+            (:meth:`sage_extensions.tensors.tensor.Tensor.gram_graph`), and its
+            connected components are the blocks of the display that pair to
+            zero across blocks.  Each block is the span of its generators with
+            the restricted form, so it is a sublattice of this lattice and
+            carries its inclusion.  :meth:`is_decomposable` and
+            :meth:`indecomposable_summands` claim the blocks a display
+            exhibits through this one datum.
             """
             rank = self.module_rank()
             if rank.is_finite() is not True:
                 return None
-            n = int(rank)
-            gram = self.gram_tensor()
-            zero = self.base_ring().zero()
-            blocks = []
-            reached = set()
-            for start in range(n):
-                if start in reached:
-                    continue
-                reached.add(start)
-                block = [start]
-                frontier = [start]
-                while frontier:
-                    row = frontier.pop()
-                    for column in range(n):
-                        if column not in reached and gram[row, column] != zero:
-                            reached.add(column)
-                            block.append(column)
-                            frontier.append(column)
-                blocks.append(tuple(sorted(block)))
-            return tuple(blocks)
+            labels = tuple(self.module_generating_set())
+            components = self.gram_tensor().gram_graph().connected_component_vertex_sets()
+            return tuple(
+                self.subobject_on(
+                    tuple(
+                        self.module_generator(labels[int(position)])
+                        for position in component
+                    )
+                )
+                for component in components
+            )
 
         def is_decomposable(self):
             r"""Whether this lattice has a nontrivial integral orthogonal sum.
@@ -5603,25 +5597,21 @@ class Lattices(OwnedCategoryOverBaseRing):
             indecomposable.
 
             A lattice presented by a Gram matrix carries no represented
-            decomposition, and two facts still exhibit one: an orthogonal
-            partition of the displayed basis, whose blocks are the summands in
-            the displayed order, and a definite binary splitting.  A lattice
-            that neither reads is returned as its own summand, which is the
-            statement that this family has nothing finer to report.
+            decomposition, and two facts still exhibit one: the blocks of a
+            displayed basis (:meth:`_displayed_orthogonal_blocks`), whose
+            summands are the blocks' own, and a definite binary splitting.  A
+            lattice that neither reads is returned as its own summand, which is
+            the statement that this family has nothing finer to report.
             """
 
             if self.decomposition() is None:
                 blocks = self._displayed_orthogonal_blocks()
                 if blocks is not None and len(blocks) > 1:
-                    gram = self.gram_tensor()
-                    category = Lattices(self.base_ring())
                     return finite_family(
                         tuple(
                             summand
                             for block in blocks
-                            for summand in category(
-                                [[gram[row, column] for column in block] for row in block]
-                            ).indecomposable_summands()
+                            for summand in block.indecomposable_summands()
                         ),
                         name="Indecomposable summands",
                     )
