@@ -13,9 +13,11 @@ lint documents: a directory's ``conftest.py`` binds the abbreviations its tests
 use, and the lint reads the allowed names after the conftests have run.
 ``card`` is a row of the digest; ``spans_built_by`` and ``displays_rendered_by``
 count what one action built and rendered; ``owned_ring_crossings`` counts the
-constructions between the engine's data and the owned ring.  Each instrument
-patches with ``pytest.MonkeyPatch.context()``, so a failing action leaves the
-process as it found it.
+constructions between the engine's data and the owned ring; ``vinberg_walk`` is
+the walk Vinberg's algorithm runs over one lattice, which the chamber call
+builds, runs and keeps none of.  Each instrument that patches does so with
+``pytest.MonkeyPatch.context()``, so a failing action leaves the process as it
+found it.
 """
 
 from __future__ import annotations
@@ -128,3 +130,45 @@ def owned_ring_crossings(action):
 
 
 builtins.owned_ring_crossings = owned_ring_crossings
+
+
+def vinberg_walk(lattice, controlling_vector=None, *, admits_root=None):
+    r"""Return the walk Vinberg's algorithm runs over ``lattice``.
+
+    ``HyperbolicLattices(...).fundamental_chamber`` builds this object, runs it
+    and keeps none, and it caches the search, so a walk asked a second time is
+    told apart from its first ask only on the walk itself.  A test that asks the
+    walk -- the initial cone at the controlling vector, and the cell cut there --
+    asks here, because the factory that builds it is private (``TL02``) and its
+    class is not a name of the session (``TL13``).
+
+    ``admits_root`` is the subgroup restriction the chamber call takes, read on
+    the lattice's own roots; omitted, every root is admitted and the walk's
+    polyhedron is the fundamental chamber of the whole reflection group.  The
+    controlling vector is a point of the hyperbolic space, read as the chamber
+    call reads it; omitted, the engine picks a point of negative square itself.
+    """
+    from sage_extensions.all import HyperbolicLattices
+    from sage_extensions.categories.hyperbolic_lattices import (
+        _filtered_vinal_class,
+        _framing_coordinates,
+    )
+
+    reduction = HyperbolicLattices(lattice.base_ring())(lattice)
+    gram, negated = reduction._engine_gram_of_signature_n_1()
+    coordinates = (
+        None
+        if controlling_vector is None
+        else list(_framing_coordinates(controlling_vector))
+    )
+
+    def row_filter(row):
+        if admits_root is None:
+            return True
+        element = reduction(tuple(int(entry) for entry in row))
+        return bool(admits_root(-element if negated else element))
+
+    return _filtered_vinal_class()(gram, coordinates, admits_root=row_filter)
+
+
+builtins.vinberg_walk = vinberg_walk
