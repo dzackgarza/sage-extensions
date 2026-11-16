@@ -10,16 +10,20 @@ carried family's orbits are the target stabilizer's only when that conjugate is
 again in the subgroup.
 
 A kernel of a character is normal in the orthogonal group whatever the
-character is, and that is what
-``OrthogonalCharacterQuotient.preserves_conjugation`` decides.  The preimage of
-a *proper* subgroup of the finite image is a different question -- its
-normality is that subgroup's normality in the finite image -- and the call
-answers it by not claiming the invariance.
+character is, and so is the preimage of any normal subgroup of the finite
+image; that is what ``OrthogonalCharacterQuotient.preserves_conjugation``
+decides.  A preimage of a *proper* subgroup is decided by that subgroup's
+normality in the finite image, so properness alone does not separate the two
+answers, and this test states the non-normality rather than the properness: an
+ambient generator conjugates one of the image's generators out of the image.
 
 The specimen is ``U + U(2) + <-2> + <-2>``, whose discriminant image has order
 twelve: enough for a point stabilizer to be a proper image, which is the case a
 transported covering must not be used in.  ``U + U + <-4> + <-4>`` has an image
 of order eight and is non-abelian as well.
+
+The proper *normal* image is the other side of the same statement, and it is
+its own specimen: ``tests/lattices/test_the_preimage_of_a_normal_image_is_normal.sage``.
 """
 
 from sage_extensions.all import *  # noqa: F401,F403
@@ -62,4 +66,15 @@ def test_a_kernel_is_invariant_and_a_proper_preimage_is_not() -> None:
     quotient = stabilizer.finite_character_quotient()
     assert quotient.index() > 1
     assert quotient.subgroup_image_order() > 1
+    # The image is not normal in the finite image: some generator of the
+    # orthogonal group of the discriminant form conjugates a generator of this
+    # stabilizer's image out of it.  Properness alone would not say this, and
+    # the preimage of a proper *normal* image is invariant.
+    stabilizer_image = stabilizer.discriminant_image()
+    assert stabilizer_image.cardinality() == quotient.subgroup_image_order()
+    assert any(
+        ambient * stabilizer_generator * ~ambient not in stabilizer_image
+        for ambient in image.group_generators()
+        for stabilizer_generator in stabilizer_image.group_generators()
+    )
     assert quotient.preserves_conjugation() is False

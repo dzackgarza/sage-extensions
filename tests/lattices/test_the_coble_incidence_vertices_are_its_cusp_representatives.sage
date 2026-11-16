@@ -106,3 +106,16 @@ def test_the_plus_kernel_incidence_vertices_of_u_u_m4_are_its_cusp_rows() -> Non
     stable = lattice.stable_orthogonal_group()
     relation = _assert_vertices_are_the_cusp_rows(stable.intersection(lattice.O_plus()))
     assert relation.cardinality() == cardinal(1)
+
+
+def test_the_sign_kernel_incidence_of_6jrs_is_its_cusp_rows() -> None:
+    r"""``6JRS``: ``O^+(L)`` is cut by the spinor sign alone, and its row is its own cusps.
+
+    The parabolic covering the incidence is built from descends to the finite
+    image of whatever characters cut the subgroup, and this row cuts one that
+    is not the discriminant representation: its finite image is the sign
+    character's, of order two.
+    """
+    lattice = _6jrs()
+    relation = _assert_vertices_are_the_cusp_rows(lattice.O_plus())
+    assert relation.cardinality() == cardinal(1)

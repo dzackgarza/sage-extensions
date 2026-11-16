@@ -656,6 +656,67 @@ class OrthogonalCharacterQuotient:
         return self._image_section()[2].gap_group
 
     @cached_method
+    def _character_permutation_model(self):
+        r"""A faithful permutation model of the whole character product, factor by factor.
+
+        The character image lives in a direct product of finite codomains, and
+        GAP's ``IsomorphismPermGroup`` on that product falls back to the regular
+        representation, which does not return for an image of order ``4.7e13``.
+        Each factor's own model is small -- the nonzero vectors of the ``F_2``
+        module for the discriminant factor, two points for a sign -- so the
+        product of those models, acting on the disjoint union of their moved
+        points, is a faithful permutation model of the product, and a subgroup
+        of it is computed there by the ordinary finite-group algorithms
+        (``RightTransversal``, ``DoubleCosets``, ``IsNormal``).
+
+        The returned homomorphism is defined by the product's own generators,
+        each read one factor at a time through the product's projections and
+        written back through the permutation product's embeddings (GAP
+        reference 39.5, ``GroupHomomorphismByImages``); an image family that
+        does not respect them raises there rather than returning a wrong model.
+        """
+        from functools import reduce
+        from operator import mul
+
+        from sage_extensions.categories.group.groups import _gap_model
+
+        factors, product, _embeddings, projections = self._gap_product()
+        models = tuple(
+            libgap.IsomorphismPermGroup(_gap_model(group)) for _label, group in factors
+        )
+        ranges = tuple(libgap.Range(model) for model in models)
+        if len(ranges) == 1:
+            target = ranges[0]
+            target_embeddings = (libgap.IdentityMapping(target),)
+        else:
+            target = libgap.DirectProduct(*ranges)
+            target_embeddings = tuple(
+                libgap.Embedding(target, position + 1)
+                for position in range(len(ranges))
+            )
+        generators = libgap.GeneratorsOfGroup(product)
+        images = [
+            reduce(
+                mul,
+                (
+                    libgap.Image(
+                        target_embeddings[position],
+                        libgap.Image(
+                            models[position],
+                            libgap.Image(projections[position], generator),
+                        ),
+                    )
+                    for position in range(len(ranges))
+                ),
+                libgap.One(target),
+            )
+            for generator in generators
+        ]
+        return libgap.GroupHomomorphismByImages(
+            product, target, generators, images
+        )
+
+    @cached_method
     def _gap_character_target(self):
         r"""The retained condition subgroup S of the full character product.
 
@@ -2367,68 +2428,107 @@ end
 
     @cached_method
     def preserves_conjugation(self) -> bool:
-        r"""Whether every ambient isometry conjugates ``self.subgroup`` to itself.
+        r"""Whether ``chi(Gamma)`` is normal in ``chi(O(L))``, and so ``Gamma`` in ``O(L)``.
 
-        ``Gamma = chi^-1(S)`` with ``S = chi(Gamma)`` retained, so
-        ``g Gamma g^-1 = Gamma`` for every ``g`` in ``O(L)`` exactly when ``S``
-        is trivial-in-the-sense that ``Gamma`` is a kernel: a kernel of any
-        character is normal, whatever the character is -- ``ker rho`` and
-        ``ker(rho, sn)`` alike -- and that is the case this call decides.
+        ``Gamma = chi^-1(S)`` for the retained ``S = chi(Gamma)``, and ``chi``
+        maps ``O(L)`` onto its finite image.  A surjection carries normal
+        subgroups to normal subgroups and carries the preimages of normal
+        subgroups back, so ``g Gamma g^-1 = Gamma`` for every ``g`` in ``O(L)``
+        exactly when ``S`` is normal in ``chi(O(L))``: one statement, and the
+        finite one is what this call decides.
 
-        A preimage of a *proper* subgroup of the finite image answers ``False``.
-        Its normality is then the normality of that subgroup in
-        ``chi(O(L))``, a question this route does not settle; a caller that
-        transports a family by an ambient isometry needs the invariance, so the
-        unanswered case is not transported.
+        Two cases need no normality computation -- a kernel, whose image is
+        trivial, and the whole group, whose image is all of ``chi(O(L))``.
+        Everything else is GAP's ``IsNormal`` of the retained image inside the
+        generated finite image.  A *proper* image can be normal: the
+        three-element rotation subgroup of the discriminant image of ``A_1^3``
+        is ``A_3`` in ``S_3``, and the invariance holds for its preimage as it
+        does for a kernel's.  It fails for a point stabilizer of a larger orbit,
+        which is how a row split by the stabilizer of a point still answers
+        ``False``.
 
         Where it is used: the incidence of a row transports one plane's
         covering to the row's other planes, which is a conjugation statement
         and nothing else.
         """
-        return self.subgroup_image_order() == 1
+        if self.subgroup_image_order() == 1 or self.index() == 1:
+            return True
+        return bool(libgap.IsNormal(self._gap_image(), self._gap_subgroup()))
 
     def register_isotropic_covering(self, plane, source, lift, flags) -> None:
-        r"""Record the covering ``flags`` of ``plane``, computed from ``source`` by ``lift``.
+        r"""Record the row's covering of ``source``, computed once at ``plane``.
 
-        ``source`` is the caller's token for the family the covering was
-        computed from -- an ambient flag, in the incidence -- and ``lift`` the
-        isometry that carried that source's plane onto ``plane``.  Both are
-        retained because a later plane's covering is this one carried there by
-        the composite of the two planes' lifts, and nothing else about the
-        covering is recomputed.
+        ``source`` is the caller's token for the family the covering covers --
+        the position of the ambient flag among the ambient flag row, in the
+        incidence -- ``plane`` the plane the covering was computed at, and
+        ``lift`` the registered isometry that carries ``source``'s plane onto
+        it.  One record per ``source`` is the whole row: the covering of every
+        other plane is this one carried there by the composite of the two
+        planes' registered lifts (:meth:`transport_covering`), so nothing about
+        the covering is recomputed at a second plane.
 
-        The record is keyed by the plane's span, as the transport registry is,
-        so an equal-but-distinct copy of a plane finds its covering.
+        The record retains the computed plane by span, as the transport
+        registry does, so an equal-but-distinct copy of that plane finds it.
         """
         from sage_extensions.categories.isotropic_orbits import _span_key
 
-        self.__dict__.setdefault("_isotropic_covering_registry", {})[
-            (_span_key(plane), source)
-        ] = (lift, tuple(flags))
+        self.__dict__.setdefault("_isotropic_covering_registry", {})[source] = (
+            plane,
+            _span_key(plane),
+            lift,
+            tuple(flags),
+        )
 
     def isotropic_covering_of(self, plane, source):
-        r"""The recorded ``(lift, flags)`` of ``plane``'s covering from ``source``, or ``None``."""
+        r"""``(lift, flags)``: the covering ``source``'s row computed *at* ``plane``, or ``None``.
+
+        A row computes one covering per source family and no more, so this
+        answers at the plane that computation happened at -- matched by span,
+        so an equal-but-distinct copy of the plane finds it -- and at no other
+        plane of the row.  A plane the covering has not been carried to yet is
+        :meth:`isotropic_covering_reference`'s to answer, and the carry itself
+        is :meth:`transport_covering`'s.
+        """
         from sage_extensions.categories.isotropic_orbits import _span_key
 
-        return self.__dict__.get("_isotropic_covering_registry", {}).get(
-            (_span_key(plane), source)
-        )
+        record = self.__dict__.get("_isotropic_covering_registry", {}).get(source)
+        if record is None or record[1] != _span_key(plane):
+            return None
+        return record[2], record[3]
+
+    def isotropic_covering_reference(self, source):
+        r"""``(plane, lift, flags)``: the row's covering of ``source``, wherever it was computed.
+
+        ``plane`` is that plane, ``lift`` the registered isometry that carries
+        ``source``'s plane onto it, and ``flags`` the covering computed there.
+        The family at any other plane of the row is
+        ``transport_covering(lift, flags, isotropic_lift_of(other))``: the
+        composite of the two planes' registered lifts, which carries the
+        computed plane onto the other.  ``None`` where the row has computed no
+        covering for ``source``.
+        """
+        record = self.__dict__.get("_isotropic_covering_registry", {}).get(source)
+        if record is None:
+            return None
+        return record[0], record[2], record[3]
 
     def transport_covering(self, reference_lift, flags, lift):
         r"""The covering ``flags``, carried to the plane that ``lift`` carries its plane to.
 
         Every term is transported by ``lift * ~reference_lift``, the composite
-        that carries the reference plane onto the target, and each carried
-        line's transport is registered with the same element so the certificate
-        of an edge at the target plane is read off the registry.
+        that carries the reference plane onto the target.  Construction and
+        registration are two phases: the carried family is one image of the
+        given one, built as such, and each carried line's transport is then
+        registered with the same element so the certificate of an edge at the
+        target plane is read off the registry.
         """
         move = lift * ~reference_lift
-        carried = []
-        for flag in flags:
-            image = move.transport_isotropic_object(flag)
-            self.register_isotropic_transport(image.terms()[0], flag.terms()[0], move)
-            carried.append(image)
-        return tuple(carried)
+        carried = tuple(move.transport_isotropic_object(flag) for flag in flags)
+        for flag, image in zip(flags, carried, strict=True):
+            self.register_isotropic_transport(
+                image.terms()[0], flag.terms()[0], move
+            )
+        return carried
 
     def register_isotropic_lift(self, plane, lift, parabolic_generators):
         r"""Record one representative of the parabolic split and its certified data.
@@ -3769,66 +3869,58 @@ def _plane_parabolic_incidence_flags(subgroup, plane, flag):
     represented more than once.  The public incidence call removes those
     repetitions when it retains one flag certificate per line/plane cusp pair.
 
-    Because the subgroup is the full preimage of its own discriminant image,
-    it contains ``ker rho`` restricted to ``Pi``, so both coverings descend to
-    the finite image (D. Dutour Sikiri'c and K. Hulek, arXiv:2302.01679v2,
-    Lemma 3.6, printed p. 22: the quotient map by a normal subgroup contained
-    in the left group pairs the double-coset decompositions).  The left group
-    is then exactly ``rho(Gamma) cap rho(Pi)``, computed as that intersection,
-    and the covering's right group is the discriminant image of ``R``.
+    The quotient the row was split by is one finite character ``chi`` of
+    ``O(L)`` -- the discriminant representation together with whichever sign
+    characters the subgroup cuts -- and the subgroup is the full preimage
+    ``Gamma = chi^-1(chi(Gamma))``.  Then ``U = Pi cap ker chi`` is normal in
+    ``Pi``, being the kernel of a homomorphism restricted to it, and ``U <= K``
+    because ``Gamma`` is a preimage.  The quotient map ``Pi -> Pi/U`` therefore
+    pairs the two double-coset decompositions (D. Dutour Sikiri'c and K. Hulek,
+    arXiv:2302.01679v2, Lemma 3.6, printed p. 22), and ``Pi/U`` *is* ``chi(Pi)``
+    by the definition of ``U``.  So the covering is computed in the finite
+    character image, with left group ``chi(K) = chi(Gamma) cap chi(Pi)`` and
+    right group ``chi(R)``.  No character of the quotient is special here: the
+    discriminant representation, a sign character, and the two together all
+    give a normal ``U``, and the hypothesis of the lemma is only that.
 
     Each returned flag is ``F_0`` transported by one lifted double-coset
     representative, an element of the parabolic spelled as a word in the
-    certified family and checked against the discriminant map before it
+    certified family and checked against the character map before it
     transports.  Together their line terms cover every ``K``-orbit of the
     ``Pi``-orbit, with repetitions allowed, and each plane term is the plane
-    itself.  Where the parabolic is not
-    established to be complete, or the subgroup is not a discriminant
-    preimage, ``None`` is returned and the caller keeps its own route.
+    itself.  Where the parabolic is not established to be complete, or it
+    carries no generator fixing the line, ``None`` is returned and the caller
+    keeps its own route.
     """
-    lattice = subgroup.supergroup().domain()
     quotient = subgroup.finite_character_quotient()
     family = quotient.certified_parabolic_generators(plane)
     if not family:
         return None
-    if not quotient._has_discriminant or quotient.determinant_kernel or quotient.spinor_kernel:
-        # The reduction below needs ker rho inside Gamma: a subgroup cut out
-        # by a sign character alone does not contain it, and its stabilizer
-        # orbits are not these double cosets.
-        return None
-    from sage_extensions.categories.group.groups import (
-        _element_to_engine,
-        _gap_model,
-    )
-
-    rho = lattice.discriminant_representation()
-    engine = _gap_model(quotient._discriminant_group)
+    # The finite image the covering descends to: chi on the certified parabolic,
+    # read in the character product, and its faithful permutation model, which
+    # is what the double cosets are computed in.
+    character_product = quotient._gap_product()[1]
+    to_permutation = quotient._character_permutation_model()
     images = tuple(
-        _element_to_engine(quotient._discriminant_group, rho(generator))
-        for generator in family
+        quotient._gap_of_key(quotient.image(generator)) for generator in family
     )
-    section = _GapWordSection(images, parent=engine)
-    parabolic_image = section.gap_group
-    # rho(Gamma) as a generated subgroup of the same engine model, then the
-    # left group rho(Gamma) cap rho(Pi) = rho(Gamma cap Pi): the subgroup is
-    # the full preimage of its own discriminant image, so the image of the
-    # intersection is the intersection of the images.  At index one the
-    # subgroup is all of O(L), so rho(Gamma) contains rho(Pi) and the
-    # intersection is rho(Pi) itself, read rather than computed.
+    parabolic = libgap.Subgroup(character_product, images)
+    section = _GapWordSection(
+        tuple(libgap.Image(to_permutation, image) for image in images)
+    )
+    # chi(Gamma) cap chi(Pi): at index one chi(Gamma) is the whole image and
+    # contains chi(Pi), so the left group is the parabolic's own image, read
+    # rather than computed.  Otherwise chi(Gamma) is the quotient's retained
+    # image datum, re-parented into the product so the two are comparable.
     if quotient.index() == 1:
-        left = parabolic_image
+        left = parabolic
     else:
-        owned_image = subgroup.discriminant_image()
-        gamma_image = libgap.Subgroup(
-            engine,
-            [
-                _element_to_engine(quotient._discriminant_group, generator)
-                for generator in owned_image.group_generators()
-            ],
+        subgroup_image = libgap.Subgroup(
+            character_product, libgap.GeneratorsOfGroup(quotient._gap_subgroup())
         )
-        left = libgap.Intersection(gamma_image, parabolic_image)
-    # The right group: the discriminant image of the members of the certified
-    # family whose Levi restriction on the plane fixes the line.
+        left = libgap.Intersection(subgroup_image, parabolic)
+    # The right group: the image of the members of the certified family whose
+    # Levi restriction on the plane fixes the line.
     line, plane_term = flag.terms()
     line_vector, line_coordinates = _line_generator_in_plane(plane_term, line)
     right_generators = [
@@ -3840,8 +3932,7 @@ def _plane_parabolic_incidence_flags(subgroup, plane, flag):
     ]
     if not right_generators:
         return None
-    right = libgap.Subgroup(engine, right_generators)
-    to_permutation = section._to_permutation
+    right = libgap.Subgroup(character_product, right_generators)
     permutation_image = section.permutation_group
     flags = []
     for double_coset in libgap.AsList(
@@ -3860,12 +3951,14 @@ def _plane_parabolic_incidence_flags(subgroup, plane, flag):
             element = element * (
                 family[letter - 1] if letter > 0 else ~family[-letter - 1]
             )
-        expected = libgap.PreImagesRepresentative(to_permutation, point)
-        if _element_to_engine(quotient._discriminant_group, rho(element)) != expected:
+        if (
+            libgap.Image(to_permutation, quotient._gap_of_key(quotient.image(element)))
+            != point
+        ):
             raise ArithmeticError(
-                f"the word-section lift of a double-coset representative at {plane_term} was "
-                f"checked against the discriminant map and maps elsewhere: the parabolic word "
-                f"section is inconsistent with the discriminant representation"
+                f"the word-section lift of a double-coset representative at {plane_term} "
+                f"was checked against the character map and maps elsewhere: the parabolic "
+                f"word section is inconsistent with the finite character image"
             )
         transported = element.transport_isotropic_object(flag)
         quotient.register_isotropic_transport(
