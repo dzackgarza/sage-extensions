@@ -1,0 +1,21 @@
+provider SHA: de084d829acab29659ebe74c5f10db4122099d24
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+probe SHA256: af47ea473808bd109bbf19acfdff4c544bacf23e45a5daeefa044fcb05b85fd5
+layer 1 square -4 offset (-1, 0, 0) normals [(0, 0, 1), (-1, 1, 0)] duals [(0, 0, -2), (2, -2, 0)] cell [(1, -2, 0)] whole [(-2, 1, 0), (1, -2, 0)]
+layer 2 square -2 offset (-1, 0, 0) normals [(0, 0, 1), (-1, 1, 0)] duals [(0, 0, -2), (2, -2, 0)] cell [(0, -1, -1)] whole [(-1, 0, -1), (-1, 0, 1), (0, -1, -1), (0, -1, 1)]
+layer 3 square -1 offset (-1, 0, 0) normals [(0, 0, 1), (-1, 1, 0)] duals [(0, 0, -2), (2, -2, 0)] cell [] whole []
+layer 4 square -4 offset (-1, -1, 0) normals [(0, 0, 1), (-1, 1, 0)] duals [(0, 0, -2), (2, -2, 0)] cell [] whole []
+[peakrss] probe536: child waited=0 shell_code=0 samples=18
+[peakrss] peak tree RSS      : 478 MiB
+[peakrss] low-water MemAvail : 2856 MiB
+[peakrss] peak single VmHWM  : 478 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      467 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    32.1s procs=  3 rss=   478 MiB hwm=   478 MiB avail=  3835 MiB
+[peakrss]   t=    34.1s procs=  3 rss=   478 MiB hwm=   478 MiB avail=  3809 MiB
+[peakrss]   t=    30.1s procs=  3 rss=   473 MiB hwm=   473 MiB avail=  3765 MiB
+[peakrss]   t=    28.1s procs=  3 rss=   470 MiB hwm=   470 MiB avail=  4000 MiB
+[peakrss]   t=    26.1s procs=  3 rss=   469 MiB hwm=   469 MiB avail=  3963 MiB
+launcher exit: 0

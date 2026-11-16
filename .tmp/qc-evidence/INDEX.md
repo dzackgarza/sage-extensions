@@ -2601,6 +2601,14 @@ and `de9a1d1`.
 | `541rev-finding-2-red.log` | `ae8becb` | the second contract file on the finding-1 tree: **2 failed in 1.71 s**, each at `TypeError: base_ring (=Real Field) must be a ring or a semiring` | 
 | `541rev-finding-2-green.log` | the repair's commit | the two contract files and the laziness file: **7 passed in 5.44 s** | 
 | `541rev-finding-2-probe.log` | the repair's commit | `_coordinate_images` on a projection of `RR^2` reads `((1, 0), (0, 0))` and `_relation_images(RR^2)` reads `()` -- the two answers the review's probe found at `240ce65` and lost at `2bc5aff` | 
+| `536r2-scan.log` | `2f8c801` | the walk's cell over 914 points of positive square: `U+U+A1` 434 (co-ordinates -3..3), `U+U+A1+A1` 200, `U+U+A2` 280 (-2..2): one, two or three normals, Stieltjes Gram, no cell refused |
+| `536r2-records-base.log`, `536r2-records-fix.log` | `2f8c801`, `481184c` | four layers of `cusp_layer_enumerations` at `e_2+f_2` of `U+U+A1`: the normals, duals, cell candidates and whole-lattice candidates are identical in the two trees |
+| `536r2-green-parent.log` | `2f8c801` + the test commit | the new test file with `main`'s `isotropic_orbits.py`: **2 passed in 33.88 s** |
+| `536r2-green-fix.log` | `481184c` | the same file with the repair: **2 passed in 22.13 s** |
+| `536r2-red-prewalk.log` | `5871adf`'s walk + the repair | the same file: **2 failed in 49.32 s**, each at the new refusal (`the roots through the controlling vector ... cut no cell there`), which is the walk's record of its cone being observable from the public call |
+| `536r2-chambers.log` | `481184c` | the five Vinberg-chamber files: **2 failed, 17 passed in 106.77 s**, the two failures the reviewer found at the parent (`test_hilbert_basis_of_a_nonunimodular_plane_cone_exceeds_its_rays`, `test_lorentz_plane_has_one_reflective_wall_and_orthogonal_group_of_order_four`) |
+| `536r2-image-base.log` | `2f8c801` | `test_the_isotropic_reduction_image.sage -k the_fourth_cusps_first_layers`, the call's one consumer: **1 passed in 524.76 s** |
+| `536r2-image-fix.log`, `536r2-image-segfault.log` | `481184c` | the same test: reached the host's ten-minute ceiling twice (540 s and 560 s inner) without finishing; the third run segfaulted in `element()` converting a whole-lattice candidate at layer 1, under `ring_foundation._neg_` / `framed_free_modules._neg_`, a frame the repair does not touch |
 
 ## #521, the session binds its own names, and the dialect reads them
 
@@ -2694,3 +2702,5 @@ rebase onto `8c4f5ba`:
 | `535-r3-main-heavy.log` | the two stable-line-orbit row files, `U(2) + <-6>` and `T_Co`: **2 passed in 1156.96 s (0:19:16)** |
 | `535-r3-main-base.log` | the three ids above on `8c4f5ba` without this branch's commits: **3 failed, 1 passed in 16.00 s**, the same ids |
 | `535-r3-main-docs.log` | `test_integral_hyperbolic_index_is_owned_by_the_lattice` after the docstring pass: **1 failed in 14.84 s**, the same pre-existing id |
+| `536r2-rebased.log` | `4944d38` after the last rebase onto `7f36d57` | the new file and the five Vinberg-chamber files together: **2 failed, 19 passed in 52.33 s**, the two failures the same pre-existing ids |
+| `536r2-rebased-90e3356.log` | `56cd171` after the rebase onto `90e3356` | the new file and the five Vinberg-chamber files: **2 failed, 19 passed in 141.09 s**, the same two pre-existing ids; this is the tree the round pushed |

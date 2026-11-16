@@ -1,0 +1,259 @@
+provider SHA: 5871adf4e4add8668ab6bf4f253ffb45a80eabda
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+tests: tests/lattices/test_the_cusp_layers_are_enumerated_in_the_cells_coordinates.sage
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: asyncio-1.5.0, xdist-3.8.0, reportlog-1.0.0, platformdirs-4.13.5, hypothesis-6.170.15, anyio-4.15.1, timeout-2.4.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 2 items
+
+tests/lattices/test_the_cusp_layers_are_enumerated_in_the_cells_coordinates.sage F [ 50%]
+F                                                                        [100%]
+
+=================================== FAILURES ===================================
+_______ test_the_dual_normals_are_the_adjugate_duals_of_the_cell_normals _______
+
+    def test_the_dual_normals_are_the_adjugate_duals_of_the_cell_normals() -> None:
+        r"""Each dual pairs with the normals as \(\det(G)\) on one and zero elsewhere.
+    
+        \(b(x,\tilde w_i)=\det(G)\,u_i(x)\) is the identity that makes the duals a
+        test for the cone (58): the coordinates of \(x\) along the normals are
+        nonpositive exactly when every pairing with a dual is.  A dual that fails
+        the identity is not \(\det(G)\) times a dual basis vector, and the test it
+        gives is then some other cone.
+        """
+        lattice, image = _cusp_image()
+        reduction = image.reduction()
+>       records = image.cusp_layer_enumerations(controlling_vector=_point_on_a_mirror(lattice), layers=2)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/lattices/test_the_cusp_layers_are_enumerated_in_the_cells_coordinates.sage:71: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = The image of the stabilizer of the isotropic vector e_0 in {g in Orthogonal group O(Integral lattice of rank 5 and sig...Ring with invariant factors Invariant-factor family: [0 ↦ 2]} acting on Integral lattice of rank 3 and signature (1, 2)
+controlling_vector = e_2 + e_3, layers = 2
+
+    def cusp_layer_enumerations(self, controlling_vector=None, *, layers):
+        r"""Return the first layers of the cusp chamber walk, each enumerated both ways (#400).
+    
+        The walk of :meth:`cusp_chamber` enumerates every layer of roots in
+        the coordinates of the cell at the controlling vector — the normals,
+        the lineality direction and the coset representatives of their span,
+        with the cone coordinates nonnegative and the lineality coordinate
+        an integer bounded on both sides by the layer's norm equation (E. B.
+        Vinberg, *On the groups of unit elements of certain quadratic
+        forms*, Math. USSR Sb. 16 (1972), §4.1, the equation (57) with the
+        conditions (58), p. 30; #400).  That enumeration is correct when the
+        candidates it returns are exactly the layer's whole-lattice
+        solutions that lie in the cell, and this method exposes both sides
+        of that statement for a caller to compare: it returns
+        :class:`CuspLayerEnumeration` records, the first ``layers`` of the
+        walk's height order, each with the candidates of the walk's own
+        enumeration and the candidates of the engine's whole-lattice
+        enumeration of the same layer, as elements of the reduction, with
+        the cell's normals and their adjugate duals — a candidate lies in
+        the cell exactly when it pairs nonpositively with every dual.
+    
+        ``controlling_vector`` is the point of the hyperbolic space the
+        enumeration measures height from, read as :meth:`cusp_chamber` reads
+        it; omitted, the call computes its own, and the chamber does not
+        depend on the choice (Vinberg 1972, §3.2, the construction after
+        Proposition 3, p. 27, with Propositions 4 and 5, pp. 28--29).
+    
+        The initial cone at the controlling vector is enumerated by the
+        engine's whole-lattice search on the way (the cell is cut by that
+        very enumeration), so the cost of this call is one initial cone plus
+        the bounded prefix of layers.  The cell reported is the walk's own
+        (:meth:`_FilteredVinAl.cell`), which is the only statement of it that
+        the library makes: it answers ``None`` when the roots through the
+        point do not span \(v_0^\perp\) in the coordinates the enumeration
+        uses, and the call then refuses rather than report a coordinate
+        system the walk is not enumerating in.
+        """
+        from sage_extensions.categories.hyperbolic_lattices import (
+            HyperbolicLattices,
+            _filtered_vinal_class,
+            _framing_coordinates,
+        )
+        from vinal import VinAl
+    
+        reduction = HyperbolicLattices(self._lattice.base_ring())(self._reduction)
+        control = (
+            self._computed_controlling_vector()
+            if controlling_vector is None
+            else self._class_of_the_controlling_vector(controlling_vector)
+        )
+        engine_gram, negated = reduction._engine_gram_of_signature_n_1()
+        coordinates = list(_framing_coordinates(control))
+    
+        def element(row):
+            converted = reduction(tuple(int(entry) for entry in row))
+            return -converted if negated else converted
+    
+        decided = {}
+    
+        def admits_element(root):
+            key = tuple(int(entry) for entry in root.to_vector())
+            if key not in decided:
+                decided[key] = self.admits_root(root)
+            return decided[key]
+    
+        def row_filter(row):
+            return bool(admits_element(element(row)))
+    
+        walk = _filtered_vinal_class()(engine_gram, coordinates, admits_root=row_filter)
+        walk.FundCone()
+        cell = walk.cell()
+        if cell is None:
+>           raise ValueError(
+                f"the roots through the controlling vector of {self._reduction} cut no cell "
+                f"there -- there are too few of them, they are dependent, or they do not "
+                f"span v0^perp integrally in the coordinates the enumeration uses -- so its "
+                f"layers have no cell coordinates to be enumerated in"
+            )
+E           ValueError: the roots through the controlling vector of Integral lattice of rank 3 and signature (1, 2) cut no cell there -- there are too few of them, they are dependent, or they do not span v0^perp integrally in the coordinates the enumeration uses -- so its layers have no cell coordinates to be enumerated in
+
+src/sage_extensions/categories/isotropic_orbits.py:3014: ValueError
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:830 Elementwise module morphism Module over Fraction Field of Integer Ring on Classes in the multilinear tensor presentation -> Module over Fraction Field of Integer Ring on Fraction Field of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+_ test_each_layers_cell_enumeration_is_its_whole_lattice_solutions_in_the_cell _
+
+    def test_each_layers_cell_enumeration_is_its_whole_lattice_solutions_in_the_cell() -> None:
+        r"""The walk's candidates are the layer's whole-lattice solutions in the cell.
+    
+        The walk enumerates the layer (57) in the nonpositive orthant of the cell's
+        normals (58), and the engine enumerates the same equation with no condition
+        at all; the two agree on the cell, which is the statement #400 asks of the
+        coordinate enumeration.  The cell is proper at these layers -- some
+        whole-lattice candidate pairs positively with a dual and so lies outside it
+        -- so the agreement is not the equality of two identical searches.
+        """
+        lattice, image = _cusp_image()
+        reduction = image.reduction()
+>       records = image.cusp_layer_enumerations(controlling_vector=_point_on_a_mirror(lattice), layers=2)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/lattices/test_the_cusp_layers_are_enumerated_in_the_cells_coordinates.sage:106: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = The image of the stabilizer of the isotropic vector e_0 in {g in Orthogonal group O(Integral lattice of rank 5 and sig...Ring with invariant factors Invariant-factor family: [0 ↦ 2]} acting on Integral lattice of rank 3 and signature (1, 2)
+controlling_vector = e_2 + e_3, layers = 2
+
+    def cusp_layer_enumerations(self, controlling_vector=None, *, layers):
+        r"""Return the first layers of the cusp chamber walk, each enumerated both ways (#400).
+    
+        The walk of :meth:`cusp_chamber` enumerates every layer of roots in
+        the coordinates of the cell at the controlling vector — the normals,
+        the lineality direction and the coset representatives of their span,
+        with the cone coordinates nonnegative and the lineality coordinate
+        an integer bounded on both sides by the layer's norm equation (E. B.
+        Vinberg, *On the groups of unit elements of certain quadratic
+        forms*, Math. USSR Sb. 16 (1972), §4.1, the equation (57) with the
+        conditions (58), p. 30; #400).  That enumeration is correct when the
+        candidates it returns are exactly the layer's whole-lattice
+        solutions that lie in the cell, and this method exposes both sides
+        of that statement for a caller to compare: it returns
+        :class:`CuspLayerEnumeration` records, the first ``layers`` of the
+        walk's height order, each with the candidates of the walk's own
+        enumeration and the candidates of the engine's whole-lattice
+        enumeration of the same layer, as elements of the reduction, with
+        the cell's normals and their adjugate duals — a candidate lies in
+        the cell exactly when it pairs nonpositively with every dual.
+    
+        ``controlling_vector`` is the point of the hyperbolic space the
+        enumeration measures height from, read as :meth:`cusp_chamber` reads
+        it; omitted, the call computes its own, and the chamber does not
+        depend on the choice (Vinberg 1972, §3.2, the construction after
+        Proposition 3, p. 27, with Propositions 4 and 5, pp. 28--29).
+    
+        The initial cone at the controlling vector is enumerated by the
+        engine's whole-lattice search on the way (the cell is cut by that
+        very enumeration), so the cost of this call is one initial cone plus
+        the bounded prefix of layers.  The cell reported is the walk's own
+        (:meth:`_FilteredVinAl.cell`), which is the only statement of it that
+        the library makes: it answers ``None`` when the roots through the
+        point do not span \(v_0^\perp\) in the coordinates the enumeration
+        uses, and the call then refuses rather than report a coordinate
+        system the walk is not enumerating in.
+        """
+        from sage_extensions.categories.hyperbolic_lattices import (
+            HyperbolicLattices,
+            _filtered_vinal_class,
+            _framing_coordinates,
+        )
+        from vinal import VinAl
+    
+        reduction = HyperbolicLattices(self._lattice.base_ring())(self._reduction)
+        control = (
+            self._computed_controlling_vector()
+            if controlling_vector is None
+            else self._class_of_the_controlling_vector(controlling_vector)
+        )
+        engine_gram, negated = reduction._engine_gram_of_signature_n_1()
+        coordinates = list(_framing_coordinates(control))
+    
+        def element(row):
+            converted = reduction(tuple(int(entry) for entry in row))
+            return -converted if negated else converted
+    
+        decided = {}
+    
+        def admits_element(root):
+            key = tuple(int(entry) for entry in root.to_vector())
+            if key not in decided:
+                decided[key] = self.admits_root(root)
+            return decided[key]
+    
+        def row_filter(row):
+            return bool(admits_element(element(row)))
+    
+        walk = _filtered_vinal_class()(engine_gram, coordinates, admits_root=row_filter)
+        walk.FundCone()
+        cell = walk.cell()
+        if cell is None:
+>           raise ValueError(
+                f"the roots through the controlling vector of {self._reduction} cut no cell "
+                f"there -- there are too few of them, they are dependent, or they do not "
+                f"span v0^perp integrally in the coordinates the enumeration uses -- so its "
+                f"layers have no cell coordinates to be enumerated in"
+            )
+E           ValueError: the roots through the controlling vector of Integral lattice of rank 3 and signature (1, 2) cut no cell there -- there are too few of them, they are dependent, or they do not span v0^perp integrally in the coordinates the enumeration uses -- so its layers have no cell coordinates to be enumerated in
+
+src/sage_extensions/categories/isotropic_orbits.py:3014: ValueError
+=============================== warnings summary ===============================
+tests/lattices/test_the_cusp_layers_are_enumerated_in_the_cells_coordinates.sage: 18 warnings
+  /repos/vinal/src/sage/vinal.py:193: PendingDeprecationWarning: the matrix subclass is not the recommended way to represent matrices or deal with linear algebra (see https://docs.scipy.org/doc/numpy/user/numpy-for-matlab-users.html). Please adjust your code to use regular ndarray.
+    m2 = np.dot( np.dot(g, s.M), g.transpose())
+
+tests/lattices/test_the_cusp_layers_are_enumerated_in_the_cells_coordinates.sage: 18 warnings
+  /repos/vinal/src/sage/vinal.py:194: PendingDeprecationWarning: the matrix subclass is not the recommended way to represent matrices or deal with linear algebra (see https://docs.scipy.org/doc/numpy/user/numpy-for-matlab-users.html). Please adjust your code to use regular ndarray.
+    m1 = np.dot( np.dot( Matrix(a), s.M), g.transpose() )
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+============================== slowest durations ===============================
+29.81s call     tests/lattices/test_the_cusp_layers_are_enumerated_in_the_cells_coordinates.sage::test_the_dual_normals_are_the_adjugate_duals_of_the_cell_normals
+0.88s call     tests/lattices/test_the_cusp_layers_are_enumerated_in_the_cells_coordinates.sage::test_each_layers_cell_enumeration_is_its_whole_lattice_solutions_in_the_cell
+0.01s setup    tests/lattices/test_the_cusp_layers_are_enumerated_in_the_cells_coordinates.sage::test_each_layers_cell_enumeration_is_its_whole_lattice_solutions_in_the_cell
+
+(3 durations < 0.005s hidden.  Use -vv to show these durations.)
+=========================== short test summary info ============================
+FAILED tests/lattices/test_the_cusp_layers_are_enumerated_in_the_cells_coordinates.sage::test_the_dual_normals_are_the_adjugate_duals_of_the_cell_normals
+FAILED tests/lattices/test_the_cusp_layers_are_enumerated_in_the_cells_coordinates.sage::test_each_layers_cell_enumeration_is_its_whole_lattice_solutions_in_the_cell
+======================= 2 failed, 36 warnings in 49.32s ========================
+[peakrss] test536: child waited=1 shell_code=1 samples=29
+[peakrss] peak tree RSS      : 445 MiB
+[peakrss] low-water MemAvail : 1085 MiB
+[peakrss] peak single VmHWM  : 451 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      440 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    56.4s procs=  3 rss=   445 MiB hwm=   451 MiB avail=  3725 MiB
+[peakrss]   t=    54.4s procs=  3 rss=   444 MiB hwm=   450 MiB avail=  3724 MiB
+[peakrss]   t=    52.4s procs=  3 rss=   441 MiB hwm=   448 MiB avail=  3599 MiB
+[peakrss]   t=    50.4s procs=  3 rss=   431 MiB hwm=   438 MiB avail=  3665 MiB
+[peakrss]   t=    48.4s procs=  3 rss=   421 MiB hwm=   427 MiB avail=  3714 MiB
+launcher exit: 1

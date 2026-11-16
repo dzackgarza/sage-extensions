@@ -1,0 +1,32 @@
+provider SHA: 2f8c801e73b3a4fd5dce7dfa7bfc1b97e68285f5
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+tests: tests/lattices/test_the_isotropic_reduction_image.sage -k the_fourth_cusps_first_layers
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: asyncio-1.5.0, xdist-3.8.0, reportlog-1.0.0, platformdirs-4.13.5, hypothesis-6.170.15, anyio-4.15.1, timeout-2.4.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 17 items / 16 deselected / 1 selected
+
+tests/lattices/test_the_isotropic_reduction_image.sage .                 [100%]
+
+============================== slowest durations ===============================
+515.02s call     tests/lattices/test_the_isotropic_reduction_image.sage::test_each_of_the_fourth_cusps_first_layers_agrees_with_the_whole_lattice_in_the_cell
+
+(2 durations < 0.005s hidden.  Use -vv to show these durations.)
+================= 1 passed, 16 deselected in 524.76s (0:08:44) =================
+[peakrss] test536: child waited=124 shell_code=124 samples=270
+[peakrss] peak tree RSS      : 583 MiB
+[peakrss] low-water MemAvail : 1496 MiB
+[peakrss] peak single VmHWM  : 589 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      578 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   537.7s procs=  3 rss=   583 MiB hwm=   589 MiB avail=  4301 MiB
+[peakrss]   t=   539.7s procs=  3 rss=   583 MiB hwm=   589 MiB avail=  4477 MiB
+[peakrss]   t=   523.7s procs=  3 rss=   582 MiB hwm=   588 MiB avail=  4036 MiB
+[peakrss]   t=   525.7s procs=  3 rss=   582 MiB hwm=   588 MiB avail=  4099 MiB
+[peakrss]   t=   527.7s procs=  3 rss=   582 MiB hwm=   588 MiB avail=  4114 MiB
+launcher exit: 124

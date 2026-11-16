@@ -1,0 +1,130 @@
+provider SHA: de084d829acab29659ebe74c5f10db4122099d24
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+tests: tests/lattices/test_the_vinberg_call_returns_the_facets.sage tests/lattices/test_hyperbolic_chambers.sage tests/lattices/test_reflection_hyperbolic.sage tests/lattices/test_hyperbolic_root_lengths_and_vinberg.sage tests/lattices/test_the_chamber_vertex_squares_and_cocompactness.sage
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: asyncio-1.5.0, xdist-3.8.0, reportlog-1.0.0, platformdirs-4.13.5, hypothesis-6.170.15, anyio-4.15.1, timeout-2.4.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 19 items
+
+tests/lattices/test_the_vinberg_call_returns_the_facets.sage .....       [ 26%]
+tests/lattices/test_hyperbolic_chambers.sage .FF                         [ 42%]
+tests/lattices/test_reflection_hyperbolic.sage ....                      [ 63%]
+tests/lattices/test_hyperbolic_root_lengths_and_vinberg.sage .....       [ 89%]
+tests/lattices/test_the_chamber_vertex_squares_and_cocompactness.sage .. [100%]
+
+=================================== FAILURES ===================================
+______ test_hilbert_basis_of_a_nonunimodular_plane_cone_exceeds_its_rays _______
+
+    def test_hilbert_basis_of_a_nonunimodular_plane_cone_exceeds_its_rays() -> None:
+        r"""The cone in ``ZZ^2`` spanned by ``(1,0)`` and ``(1,2)`` has index ``2``,
+        so its Hilbert basis is ``(1,0), (1,1), (1,2)``: three elements against two
+        primitive rays and two facets.  Derived by hand from the fundamental
+        parallelogram, whose only interior lattice point is ``(1,1)``.
+        """
+        lattice = Lattices(ZZ)([[1, 0], [0, 1]])
+        first, second = lattice.dual_module().module_generators()
+    
+        cone = lattice.rational_polyhedral_cone((first, first + 2 * second))
+        assert cone.is_pointed()
+        assert cone.primitive_rays().cardinality() == 2
+        assert cone.facet_covectors().cardinality() == 2
+        assert cone.hilbert_basis().cardinality() == 3
+>       assert first + second in cone.hilbert_basis()
+E       assert (Generic morphism:\n  From: Integral lattice of rank 2 and signature (2, 0)\n  To:   Integer Ring + Generic morphism:\n  From: Integral lattice of rank 2 and signature (2, 0)\n  To:   Integer Ring) in {e_1, 2*e_0 - e_1, e_0}
+E        +  where {e_1, 2*e_0 - e_1, e_0} = hilbert_basis()
+E        +    where hilbert_basis = Rational polyhedral cone in Integral lattice of rank 2 and signature (2, 0) cut out by 2 half-spaces.hilbert_basis
+
+tests/lattices/test_hyperbolic_chambers.sage:37: AssertionError
+_ test_lorentz_plane_has_one_reflective_wall_and_orthogonal_group_of_order_four _
+
+>   return self._cached_methods[name]
+E   KeyError: 'weyl_group'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_lorentz_plane_has_one_reflective_wall_and_orthogonal_group_of_order_four() -> None:
+        r"""On ``<2> + <-2>`` (basis ``a, b``) the only roots are ``+-b``, since
+        ``x^2 - y^2 = -1`` forces ``x = 0``; and ``x^2 - y^2 = 1`` forces ``y = 0``,
+        so ``O(L) = {+-1} x {+-1}`` has order ``4`` and the Weyl group is
+        ``<s_b>`` of order ``2``.  The fundamental chamber has the single wall
+        ``b^perp``.  Derived by hand.
+        """
+        lattice = Lattices(ZZ)([[2, 0], [0, -2]])
+        a, b = lattice.module_generators()
+    
+        assert lattice.O().cardinality() == 4
+>       assert lattice.weyl_group().cardinality() == 2
+               ^^^^^^^^^^^^^^^^^^
+
+tests/lattices/test_hyperbolic_chambers.sage:51: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    ???
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: 'OwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType' object has no attribute 'weyl_group'
+
+sage/cpython/getattr.pyx:362: AttributeError
+=============================== warnings summary ===============================
+tests/lattices/test_the_vinberg_call_returns_the_facets.sage: 114 warnings
+tests/lattices/test_reflection_hyperbolic.sage: 30 warnings
+tests/lattices/test_the_chamber_vertex_squares_and_cocompactness.sage: 66 warnings
+  /repos/vinal/src/sage/vinal.py:193: PendingDeprecationWarning: the matrix subclass is not the recommended way to represent matrices or deal with linear algebra (see https://docs.scipy.org/doc/numpy/user/numpy-for-matlab-users.html). Please adjust your code to use regular ndarray.
+    m2 = np.dot( np.dot(g, s.M), g.transpose())
+
+tests/lattices/test_the_vinberg_call_returns_the_facets.sage: 114 warnings
+tests/lattices/test_reflection_hyperbolic.sage: 30 warnings
+tests/lattices/test_the_chamber_vertex_squares_and_cocompactness.sage: 66 warnings
+  /repos/vinal/src/sage/vinal.py:194: PendingDeprecationWarning: the matrix subclass is not the recommended way to represent matrices or deal with linear algebra (see https://docs.scipy.org/doc/numpy/user/numpy-for-matlab-users.html). Please adjust your code to use regular ndarray.
+    m1 = np.dot( np.dot( Matrix(a), s.M), g.transpose() )
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+============================== slowest durations ===============================
+28.80s call     tests/lattices/test_the_chamber_vertex_squares_and_cocompactness.sage::test_the_chamber_rays_of_the_two_cusp_lattices_square_into_one_component
+18.54s call     tests/lattices/test_the_vinberg_call_returns_the_facets.sage::test_the_walls_of_u_2_plus_e8_minus_2_are_its_facets
+16.18s call     tests/lattices/test_the_vinberg_call_returns_the_facets.sage::test_the_walls_of_u_plus_e8_are_its_facets
+15.52s call     tests/lattices/test_the_vinberg_call_returns_the_facets.sage::test_the_walls_of_u_plus_e8_minus_2_are_its_facets
+3.28s call     tests/lattices/test_the_vinberg_call_returns_the_facets.sage::test_the_walls_of_u_plus_a1_are_its_facets
+1.86s call     tests/lattices/test_the_chamber_vertex_squares_and_cocompactness.sage::test_cocompactness_is_the_decision_on_those_rays
+1.64s call     tests/lattices/test_hyperbolic_root_lengths_and_vinberg.sage::test_vinberg_finds_the_ten_walls_of_ii_9_1
+1.45s call     tests/lattices/test_reflection_hyperbolic.sage::test_the_edgewalk_and_vinbergs_algorithm_agree_that_u_plus_a1_is_reflective
+1.08s call     tests/lattices/test_the_vinberg_call_returns_the_facets.sage::test_a_half_space_the_other_walls_imply_is_not_a_facet
+0.36s call     tests/lattices/test_reflection_hyperbolic.sage::test_vinbergs_criterion_bounds_the_root_lengths_of_the_bogachev_kolpakov_lattices
+0.28s call     tests/lattices/test_hyperbolic_root_lengths_and_vinberg.sage::test_the_possible_root_lengths_divide_twice_the_discriminant_exponent
+0.19s call     tests/lattices/test_hyperbolic_chambers.sage::test_lorentz_plane_has_one_reflective_wall_and_orthogonal_group_of_order_four
+0.16s call     tests/lattices/test_hyperbolic_chambers.sage::test_hilbert_basis_of_a_nonunimodular_plane_cone_exceeds_its_rays
+0.15s call     tests/lattices/test_reflection_hyperbolic.sage::test_vinberg_enumeration_closes_the_polyhedron_of_u_plus_a1
+0.13s call     tests/lattices/test_hyperbolic_chambers.sage::test_the_isotropic_cone_of_the_lorentz_plane_has_two_ideal_rays
+0.10s call     tests/lattices/test_hyperbolic_root_lengths_and_vinberg.sage::test_hyperbolic_refinement_preserves_both_signature_conventions
+0.07s call     tests/lattices/test_hyperbolic_root_lengths_and_vinberg.sage::test_the_isotropic_vectors_of_u_of_height_at_most_one
+0.02s call     tests/lattices/test_hyperbolic_root_lengths_and_vinberg.sage::test_a_definite_lattice_is_not_hyperbolic
+0.01s setup    tests/lattices/test_hyperbolic_root_lengths_and_vinberg.sage::test_the_isotropic_vectors_of_u_of_height_at_most_one
+0.01s setup    tests/lattices/test_the_vinberg_call_returns_the_facets.sage::test_the_walls_of_u_plus_e8_are_its_facets
+
+(37 durations < 0.005s hidden.  Use -vv to show these durations.)
+=========================== short test summary info ============================
+FAILED tests/lattices/test_hyperbolic_chambers.sage::test_hilbert_basis_of_a_nonunimodular_plane_cone_exceeds_its_rays
+FAILED tests/lattices/test_hyperbolic_chambers.sage::test_lorentz_plane_has_one_reflective_wall_and_orthogonal_group_of_order_four
+============ 2 failed, 17 passed, 420 warnings in 106.77s (0:01:46) ============
+[peakrss] test536: child waited=1 shell_code=1 samples=58
+[peakrss] peak tree RSS      : 513 MiB
+[peakrss] low-water MemAvail : 4197 MiB
+[peakrss] peak single VmHWM  : 513 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      502 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   114.5s procs=  3 rss=   513 MiB hwm=   513 MiB avail=  6530 MiB
+[peakrss]   t=   112.5s procs=  3 rss=   512 MiB hwm=   512 MiB avail=  6490 MiB
+[peakrss]   t=   106.5s procs=  3 rss=   502 MiB hwm=   502 MiB avail=  6486 MiB
+[peakrss]   t=   108.5s procs=  3 rss=   502 MiB hwm=   502 MiB avail=  6480 MiB
+[peakrss]   t=   110.5s procs=  3 rss=   502 MiB hwm=   502 MiB avail=  6484 MiB
+launcher exit: 1
