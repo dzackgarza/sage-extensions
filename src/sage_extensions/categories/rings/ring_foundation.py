@@ -6471,39 +6471,45 @@ class _OwnedRingParent(Parent):
                 )
 
                 coefficient_field = _engine_scalar_ring(engine)
-                match base:
-                    case _ if base is coefficient_field:
-                        # The defining polynomial divides with remainder over
-                        # the coefficient field, so its powers below the degree
-                        # are a basis there, and only there.
-                        degree = int(
-                            engine.defining_polynomial().degree()
-                            if engine.is_absolute()
-                            else engine.relative_polynomial().degree()
-                        )
-                        self._native_module_basis = _power_module_basis(
-                            base,
-                            degree,
-                            lambda exponent: _owned_engine_element(
-                                self, engine.gen() ** exponent
-                            ),
-                            lambda element: _engine_element(self, element).list(),
-                        )
-                    case _ if _engine_ring(base) is engine:
-                        # The base presents the same ring on the same engine,
-                        # so it is this ring: free of rank one on the unit, and
-                        # its coordinate is the element itself.
-                        self._native_module_basis = _power_module_basis(
-                            base,
-                            1,
-                            lambda _exponent: _owned_engine_element(self, engine.one()),
-                            lambda element: (_engine_element(self, element),),
-                        )
-                    case _:
-                        # No power basis of the defining polynomial is a basis
-                        # over this base, and no other is known: the module
-                        # keeps no chosen resolution rather than a false one.
-                        pass
+                if base is coefficient_field:
+                    # The defining polynomial divides with remainder over the
+                    # coefficient field, so its powers below the degree are a
+                    # basis there, and only there.
+                    degree = int(
+                        engine.defining_polynomial().degree()
+                        if engine.is_absolute()
+                        else engine.relative_polynomial().degree()
+                    )
+                    self._native_module_basis = _power_module_basis(
+                        base,
+                        degree,
+                        lambda exponent: _owned_engine_element(
+                            self, engine.gen() ** exponent
+                        ),
+                        lambda element: _engine_element(self, element).list(),
+                    )
+                elif _engine_ring(base) is engine:
+                    # The base presents the same ring on the same engine, so it
+                    # is this ring: free of rank one on the unit, and its
+                    # coordinate is the element itself.
+                    self._native_module_basis = _power_module_basis(
+                        base,
+                        1,
+                        lambda _exponent: _owned_engine_element(self, engine.one()),
+                        lambda element: (_engine_element(self, element),),
+                    )
+                else:
+                    # The defining polynomial's powers are a basis over its
+                    # coefficient field and over nothing else, so no basis is
+                    # known over this base; a parent that installed none would
+                    # read as free with no resolution at all, which is the
+                    # defect this block exists to avoid.
+                    raise TypeError(
+                        f"cannot install a module basis of {engine} over {base}: the powers of "
+                        f"the defining polynomial are a basis over its coefficient field "
+                        f"{coefficient_field}, and {base} is neither that field nor this ring "
+                        "presented on the same engine"
+                    )
             if isinstance(engine, SageNumberFieldOrder) and self is not _owned_integers():
                 # The integral basis is constructor data, but registering a
                 # selected resolution here is too early: Parent.__init__ has
