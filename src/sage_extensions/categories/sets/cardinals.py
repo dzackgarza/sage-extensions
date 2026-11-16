@@ -339,24 +339,36 @@ class CardinalityMor(CategoricalMor):
     ) -> None:
         CategoricalMor.__init__(self, mor_family, domain, codomain)
 
-    def is_empty(self):
-        r"""The cardinal-order Mor is empty exactly when its source exceeds its target.
+    def _emptiness_decision(self):
+        r"""Decide ``Hom(kappa, lambda) = ∅``: empty exactly when ``kappa > lambda``.
 
-        It is the negation of ``domain <= codomain``: decided when that
-        comparison is decided, and otherwise the proposition that states it.
+        ``Sets`` owns ``is_empty`` and reads every set's emptiness through
+        this protected hook, so the cardinal order supplies the decision it
+        alone has and no second copy of the public operation: the Mor holds
+        one arrow exactly when ``domain <= codomain``, and this is the
+        negation of that comparison.  Decided when ``le`` is decided,
+        otherwise the proposition that states it, which ``ask`` answers
+        ``Unknown``.
         """
         from sage_extensions.logic import negation
 
         return negation(Cardinalities().le(self.domain(), self.codomain()))
 
-    def cardinality(self) -> Cardinal:
-        r"""Zero or one when the cardinal comparison decides the Mor's emptiness."""
-        empty = self.is_empty()
-        assert empty is True or empty is False, (
-            f"cannot compute the cardinality of {self}: it is undecided whether {self.domain()} <= "
-            f"{self.codomain()}, so it is undecided whether this set of morphisms is empty"
-        )
-        return cardinal(0 if empty else 1)
+    def _cardinality_decision(self):
+        r"""``|Hom(kappa, lambda)|``: one when ``kappa <= lambda``, zero when it is not.
+
+        ``Sets`` reads a set's cardinality through this protected hook.  An
+        undecided comparison supplies no value, so the public operation's
+        assertion names the undecided comparison rather than reporting a
+        cardinality the order does not determine.
+        """
+        match self._emptiness_decision():
+            case True:
+                return cardinal(0)
+            case False:
+                return cardinal(1)
+            case _:
+                return None
 
     @cached_method
     def unique_morphism(self) -> CardinalityMorphism:
@@ -1312,11 +1324,32 @@ class OrdinalMor(CategoricalMor):
     ) -> None:
         CategoricalMor.__init__(self, mor_family, domain, codomain)
 
-    def is_empty(self) -> bool:
-        return not Ordinals().le(self.domain(), self.codomain())
+    def _emptiness_decision(self) -> bool:
+        r"""Decide ``Hom(alpha, beta) = ∅``: empty exactly when ``alpha > beta``.
 
-    def cardinality(self) -> Cardinal:
-        return cardinal(0 if self.is_empty() else 1)
+        ``Sets`` owns ``is_empty`` and reads every set's emptiness through
+        this protected hook, so the ordinal order supplies the decision it
+        alone has: the Mor holds one arrow exactly when
+        ``domain <= codomain``, and an undecided comparison supplies no
+        value rather than the arrow an empty hom-set does not have.
+        """
+        from sage_extensions.logic import negation
+
+        match negation(Ordinals().le(self.domain(), self.codomain())):
+            case True | False as decided:
+                return decided
+            case _:
+                return None
+
+    def _cardinality_decision(self) -> Cardinal | None:
+        r"""``|Hom(alpha, beta)|``: one when ``alpha <= beta``, zero when it is not."""
+        match self._emptiness_decision():
+            case True:
+                return cardinal(0)
+            case False:
+                return cardinal(1)
+            case _:
+                return None
 
     @cached_method
     def unique_morphism(self) -> OrdinalMorphism:
