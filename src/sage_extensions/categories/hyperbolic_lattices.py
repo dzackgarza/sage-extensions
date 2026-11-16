@@ -485,7 +485,7 @@ def _ldl_factorisation(gram):
     diagonal = [Fraction(0)] * size
     triangular = [[Fraction(0)] * size for _ in range(size)]
     for index in range(size):
-        pivot = Fraction(int(rational[index, index])) - sum(
+        pivot = _rational_of(rational[index, index]) - sum(
             (triangular[index][k] ** 2 * diagonal[k] for k in range(index)), Fraction(0)
         )
         if pivot <= 0:
@@ -493,12 +493,22 @@ def _ldl_factorisation(gram):
         diagonal[index] = pivot
         triangular[index][index] = Fraction(1)
         for row in range(index + 1, size):
-            numerator = Fraction(int(rational[row, index])) - sum(
+            numerator = _rational_of(rational[row, index]) - sum(
                 (triangular[row][k] * triangular[index][k] * diagonal[k] for k in range(index)),
                 Fraction(0),
             )
             triangular[row][index] = numerator / pivot
     return diagonal, triangular
+
+
+def _rational_of(value):
+    r"""Read an exact rational off the engine, as a \(\mathbf Q\) element of the standard library.
+
+    The engine's rationals and the owned ones both carry a numerator and a
+    denominator and neither coerces into the other's field, so the two are
+    read separately and rebuilt.
+    """
+    return Fraction(int(value.numerator()), int(value.denominator()))
 
 
 def _exact_square_root(value):
@@ -884,24 +894,39 @@ def _filtered_vinal_class():
             comparison, which :meth:`IsNewRoot` makes of every solution.
 
             This method writes down the solutions of the layer's equation
-            (57) whose coordinates along the cell normals are nonpositive,
-            and never a solution outside that orthant.  The candidate is
-            \(v=a+v_1\) with \(v_1\) in \(v_0^\perp\), the normals of the
-            cell at the controlling vector are \(w_1,\dots,w_r\), and
-            \(u\), the coordinates of \(v\) along the normals, pair as
-            \(b(v,w_i)=\sum_jg_{ij}u_j\), so (58) says \(Gu\le0\).  The
-            Gram of a cell is a Stieltjes matrix, so \(G^{-1}\) has no
-            negative entry and \(u=G^{-1}(Gu)\) is non-positive whenever
-            \(Gu\) is: every solution of (58) has nonpositive normal
-            coordinates, the orthant is a superset of the cone, and the
-            walls, which :meth:`IsNewRoot` takes out of it, are never
-            skipped.  Writing \(a'\) for the offset \(a\) with its normal
-            coordinates cancelled and \(d=-u\), the norm equation (57)
-            becomes \(d^tGd=k-q(a')\) with \(d\ge0\) in the orthant and
-            \(d\) in the coset of the offset's own coordinates: that is
-            enumerated by completion of squares along the factor \(R\),
-            every coefficient respecting the same lower bound, so nothing
-            outside the orthant is written down.
+            (57) that satisfy (58) — and not the larger set of solutions
+            inside a relaxation of it, which is what the cost of the walk is
+            made of.  The candidate is \(v=a+v_1\) with \(v_1\) in
+            \(v_0^\perp\), the normals of the cell at the controlling vector
+            are \(w_1,\dots,w_r\), and \(u\), the coordinates of \(v\)
+            along the normals, pair as \(b(v,w_i)=\sum_jg_{ij}u_j\), so (58)
+            says \(Gu\le0\).  Enumerating the coefficients \(d=-u\) of the
+            candidate along the normals from below — \(d\ge c\), \(c\) the
+            offset's own normal coordinates — is *not* the same condition:
+            the Gram of a cell is a Stieltjes matrix, so \(G^{-1}\ge0\) and
+            \(u\le0\) does imply \(d\ge c\), but the converse fails, and
+            the relaxation is not a small one.  At Sterk's first Enriques cusp
+            the layer at height 8 has 18 780 solutions with \(d\ge c\), of
+            which exactly one has \(u\le0\)
+            (``results/issue522-stage-split.md``).  The enumeration therefore
+            runs in \(u\) itself.
+
+            Writing \(u=-f\) with \(f\ge0\) and \(d=c-G^{-1}u\), the norm
+            equation (57) becomes
+
+            \[
+              u^tG^{-1}u = k-q(a)+c^tGc ,
+            \]
+
+            a positive-definite equation in the one-sided orthant \(f\ge0\):
+            completion of squares solves it along a factorisation of
+            \(G^{-1}\), each coefficient bounded below by 0 and above by the
+            residual.  The candidate is
+            \(v=a-\sum_jc_jw_j-\sum_i f_i\,\sum_j(G^{-1})_{ji}w_j\): only
+            the \(f\) for which that is integral name a vector of \(L\), and
+            the others are dropped.  The walls written after the cell enter
+            as the upper bounds of :meth:`_normal_coordinate_constraints`,
+            which is (58) against them in these same coordinates.
 
             A cell with one lineality direction enumerates the layer
             in the same coordinates with the lineality coordinate added.
@@ -928,23 +953,70 @@ def _filtered_vinal_class():
                 return super().Roots_decomposed_into(a, k)
             normals, gram, factor, lineality = cell
             if lineality is None:
-                squares, triangular = factor
+                size = len(normals)
                 beta = [Fraction(int(a.inner_product(normal))) for normal in normals]
                 center = [
                     Fraction(int(value.numerator()), int(value.denominator()))
                     for value in gram.solve_right(engine_vector(SageQQ, beta))
                 ]
-                offsets = [
-                    sum((triangular[j][i] * center[j] for j in range(len(normals))), Fraction(0))
-                    for i in range(len(normals))
-                ]
                 remaining = Fraction(int(k) - int(a.inner_product(a))) + sum(
-                    (beta[i] * center[i] for i in range(len(normals))), Fraction(0)
+                    (beta[i] * center[i] for i in range(size)), Fraction(0)
                 )
                 if remaining < 0:
                     return []
-                candidates = self._cone_combinations(normals, factor, offsets, remaining, center)
-                found = [a + vector for vector in candidates]
+                # The enumeration runs in the candidate's own normal
+                # coordinates, which is the frame in which (58) is one-sided.
+                inverse_gram = gram.inverse()
+                inverse_factor = _ldl_factorisation(inverse_gram)
+                if inverse_factor is None:
+                    raise ArithmeticError(
+                        f"the Gram matrix of the cell at {self.v0} is positive definite, so its "
+                        f"inverse is too, and the layer's enumeration in normal coordinates needs "
+                        f"its factorisation: {inverse_gram} has none"
+                    )
+                frame = tuple(
+                    engine_vector(
+                        SageQQ,
+                        [
+                            sum(
+                                (
+                                    _rational_of(inverse_gram[j, i])
+                                    * Fraction(int(normals[j][coordinate]))
+                                    for j in range(size)
+                                ),
+                                Fraction(0),
+                            )
+                            for coordinate in range(int(self.n))
+                        ],
+                    )
+                    for i in range(size)
+                )
+                offset_coordinates = [int(entry) for entry in a]
+                base = [
+                    Fraction(offset_coordinates[i])
+                    - sum(
+                        (
+                            center[j] * Fraction(int(normals[j][i]))
+                            for j in range(size)
+                        ),
+                        Fraction(0),
+                    )
+                    for i in range(int(self.n))
+                ]
+                combinations = self._cone_combinations(
+                    frame,
+                    inverse_factor,
+                    [Fraction(0)] * size,
+                    remaining,
+                    [Fraction(0)] * size,
+                    self._normal_coordinate_constraints(normals, a, center, inverse_gram),
+                )
+                found = []
+                for combination in combinations:
+                    vector = [base[i] + combination[i] for i in range(int(self.n))]
+                    if any(value.denominator != 1 for value in vector):
+                        continue
+                    found.append(self.V([int(value) for value in vector]))
                 for candidate in found:
                     if int(candidate.inner_product(candidate)) != int(k):
                         raise ArithmeticError(
@@ -991,12 +1063,26 @@ def _filtered_vinal_class():
                 low = int((-bound - alpha).__ceil__())
                 while m_square_fraction * (alpha + low - 1) ** 2 <= remaining:
                     low -= 1
+                written = self._layer_constraints(normals, offset, m)
                 for t in range(low, high + 1):
                     square = remaining - m_square_fraction * (alpha + t) ** 2
                     for combination in self._cone_combinations(
-                        normals, factor, offsets, square, x
+                        normals,
+                        factor,
+                        offsets,
+                        square,
+                        x,
+                        tuple((row, rhs + t * tilt) for row, rhs, tilt in written),
                     ):
-                        found.append(offset + combination + t * m)
+                        if any(value.denominator != 1 for value in combination):
+                            raise ArithmeticError(
+                                f"the layer enumeration at {offset} returned the combination "
+                                f"{combination}, which is not integral although the cell's "
+                                f"normals and m are"
+                            )
+                        found.append(
+                            offset + self.V([int(value) for value in combination]) + t * m
+                        )
             for candidate in found:
                 if int(candidate.inner_product(candidate)) != int(k):
                     raise ArithmeticError(
@@ -1005,9 +1091,118 @@ def _filtered_vinal_class():
                     )
             return found
 
+        def _layer_constraints(self, normals, offset, lineality=None):
+            r"""Return conditions (58) of the walls already written, in the cell's coordinates.
+
+            Vinberg, *On the groups of unit elements of certain quadratic
+            forms*, Math. USSR Sb. 16 (1972), §4.1, p. 30 asks that every
+            solution of the layer's equation (57) satisfy conditions (58),
+            \(b(v,e)\le0\) for each normal \(e\) already written down — not
+            only for the normals of the cell at the controlling vector.  A
+            candidate is \(v=a-\sum_jd_jw_j+tm\) with \(d\ge0\), where \(m\)
+            is the lineality direction when the cell has one, so the condition
+            against a written wall \(e\) reads
+
+            \[
+              \sum_jd_j\,\bigl(-b(w_j,e)\bigr)\ \le\ -b(a,e)-t\,b(m,e).
+            \]
+
+            The coefficient \(-b(w_j,e)\) is nonnegative, and that is not a
+            coincidence to be checked at run time: :meth:`IsNewRoot` accepts a
+            wall only when it pairs nonpositively with every wall already
+            written, and the normals of the cell are among them.  What is
+            returned is one triple per written wall that is not already one of
+            the normals — the row of coefficients, the right-hand side at
+            \(t=0\), and the coefficient of \(t\).  The normals are left out
+            because their own inequalities are not a bound on the enumeration
+            at all: they are exactly the orthant ``floors`` its caller passes,
+            which is what the cell's coordinates are chosen for.
+            """
+            written = tuple(tuple(int(entry) for entry in normal) for normal in normals)
+            constraints = []
+            for wall in self.roots:
+                if tuple(int(entry) for entry in wall) in written:
+                    continue
+                row = tuple(-int(wall.inner_product(normal)) for normal in normals)
+                if not any(row):
+                    continue
+                if any(coefficient < 0 for coefficient in row):
+                    raise ArithmeticError(
+                        f"the wall {wall} of the chamber at {self.v0} pairs positively with a "
+                        f"normal of the cell, so conditions (58) against it are not an upper "
+                        f"bound on the layer's coefficients: the row is {row}"
+                    )
+                constraints.append(
+                    (
+                        row,
+                        -int(offset.inner_product(wall)),
+                        0 if lineality is None else -int(lineality.inner_product(wall)),
+                    )
+                )
+            return tuple(constraints)
+
+        def _normal_coordinate_constraints(self, normals, offset, center, inverse_gram):
+            r"""Return conditions (58) of the walls written, in the layer's normal coordinates.
+
+            Vinberg 1972, §4.1, p. 30 asks every solution of (57) to satisfy
+            (58) against each normal already in the sequence (38).  The
+            enumeration of the layer runs in the candidate's own normal
+            coordinates \(u\), where that is one-sided: with \(d\) the
+            coefficients of the candidate along the cell's normals and
+            \(c=G^{-1}\beta\) the offset's own normal coordinates,
+            \(u=\beta-Gd=-G(d-c)\), so \(u\le0\iff d\ge c\).  The
+            enumeration writes \(u=-f\) with \(f\ge0\), so a written wall
+            \(e\), whose coefficients \(c^w_j=-b(w_j,e)\) are nonnegative
+            because :meth:`IsNewRoot` pairs every accepted wall nonpositively
+            with the ones before it, gives
+
+            \[
+              \sum_jc^w_jd_j\le-b(a,e)
+              \iff \sum_i\Bigl(\sum_jc^w_j(G^{-1})_{ji}\Bigr)f_i
+              \le-b(a,e)-\sum_jc^w_jc_j ,
+            \]
+
+            which is an upper bound on a nonnegative combination of \(f\):
+            the shape the enumeration prunes with.  A wall whose pairing with
+            a normal is positive has no such bound and is refused here rather
+            than silently dropped.
+            """
+            size = len(normals)
+            written = tuple(tuple(int(entry) for entry in normal) for normal in normals)
+            constraints = []
+            for wall in self.roots:
+                if tuple(int(entry) for entry in wall) in written:
+                    continue
+                coefficients = [
+                    Fraction(-int(wall.inner_product(normal))) for normal in normals
+                ]
+                if not any(coefficients):
+                    continue
+                if any(value < 0 for value in coefficients):
+                    raise ArithmeticError(
+                        f"the wall {wall} of the chamber at {self.v0} pairs positively with a "
+                        f"normal of the cell, so conditions (58) against it are not an upper "
+                        f"bound on the layer's coefficients: {coefficients}"
+                    )
+                row = tuple(
+                    sum(
+                        (
+                            coefficients[j] * _rational_of(inverse_gram[j, i])
+                            for j in range(size)
+                        ),
+                        Fraction(0),
+                    )
+                    for i in range(size)
+                )
+                right = -Fraction(int(offset.inner_product(wall))) - sum(
+                    (coefficients[j] * center[j] for j in range(size)), Fraction(0)
+                )
+                constraints.append((row, right))
+            return tuple(constraints)
+
         @staticmethod
-        def _cone_combinations(normals, factor, offsets, square, floors=None):
-            r"""Return \(-d_1w_1-\dots-d_nw_n\) for \(d\ge\text{floors}\) integral with \(d^tGd=\) ``square``.
+        def _cone_combinations(normals, factor, offsets, square, floors=None, constraints=()):
+            r"""Return \(-d_1w_1-\dots-d_nw_n\) for integral \(d\) with \(d^tGd=\) ``square``.
 
             ``factor`` is the pair \((D,L)\) of :func:`_ldl_factorisation`, so
             \(d^tGd=\sum_iD_i(L^td)_i^2\) and the \(i\)-th entry
@@ -1027,6 +1222,16 @@ def _filtered_vinal_class():
             inequality \(D_i(L^td)_i^2\le s\): the square-root bound is a
             floor, so each end of the range is extended while the exact
             inequality still holds.
+
+            ``constraints`` are the walls already written that are not
+            normals of the cell, as the rows and right-hand sides of the
+            inequalities of :meth:`_layer_constraints`: \(c^td\le r\) with
+            \(c\ge0\).  They bound each level's coefficient from above by what
+            the levels above leave of \(r\) and what the levels below take at
+            their own smallest admissible value, so a coefficient tuple that
+            violates one of them is never reached.  Every such tuple already
+            violates (58) against a wall that :meth:`IsNewRoot` would have
+            refused it for, so the solutions returned are the same ones.
             """
             size = len(normals)
             squares, triangular = factor
@@ -1035,6 +1240,16 @@ def _filtered_vinal_class():
                 if floors is None
                 else [Fraction(value) for value in floors]
             )
+            constraints = tuple(constraints)
+            lowest = [int(value.__ceil__()) for value in bounds]
+            tails = [
+                [
+                    sum((row[j] * lowest[j] for j in range(level)), 0)
+                    for level in range(size + 1)
+                ]
+                for row, _rhs in constraints
+            ]
+            partials = [0] * len(constraints)
             coefficients = [0] * size
             found = []
 
@@ -1051,15 +1266,22 @@ def _filtered_vinal_class():
                         value = sign * root - shift
                         if value.denominator != 1 or value < bounds[0]:
                             continue
+                        if any(
+                            partial + row[0] * int(value) > rhs
+                            for (row, rhs), partial in zip(constraints, partials)
+                        ):
+                            continue
                         coefficients[0] = int(value)
-                        combination = [0] * int(normals[0].degree())
+                        combination = [Fraction(0)] * int(normals[0].degree())
                         for position, coefficient in enumerate(coefficients):
                             if coefficient:
                                 combination = [
-                                    entry - coefficient * int(other)
+                                    entry
+                                    - coefficient
+                                    * Fraction(int(other.numerator()), int(other.denominator()))
                                     for entry, other in zip(combination, normals[position])
                                 ]
-                        found.append(normals[0].parent()(combination))
+                        found.append(tuple(combination))
                     coefficients[0] = 0
                     return
                 bound = _square_root_bound(remaining / squares[level])
@@ -1071,10 +1293,23 @@ def _filtered_vinal_class():
                 low = int((-bound - shift).__ceil__())
                 while squares[level] * (low - 1 + shift) ** 2 <= remaining:
                     low -= 1
-                for value in range(max(bounds[level].__ceil__(), low), high + 1):
+                for position, (row, rhs) in enumerate(constraints):
+                    if row[level] > 0:
+                        high = min(
+                            high,
+                            (rhs - tails[position][level] - partials[position]) // row[level],
+                        )
+                head = max(lowest[level], low)
+                if head > high:
+                    return
+                for value in range(head, high + 1):
                     coefficients[level] = value
                     entry = value + shift
+                    for position, (row, _rhs) in enumerate(constraints):
+                        partials[position] += row[level] * value
                     descend(level - 1, remaining - squares[level] * entry * entry)
+                    for position, (row, _rhs) in enumerate(constraints):
+                        partials[position] -= row[level] * value
                 coefficients[level] = 0
 
             descend(size - 1, Fraction(square))

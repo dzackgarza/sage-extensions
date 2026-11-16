@@ -108,15 +108,44 @@ of a deep layer it would be far more.
 ## 5. The two repairs this names
 
 1. **A discriminant action of a lattice reflection that costs what its matrix
-   costs.**  The action of an isometry on `A_L` is the dual action
-   `x -> x A^{-1}` on the dual frame, and `A^{-1}` is the isometry's own
-   matrix.  The image is built by presenting two module maps through the
-   normalization, which is the group's change of basis and not something the
-   element needs in order to be multiplied or compared, so those maps are
-   asked for on first request rather than at construction.
+   costs.**  The action of an isometry of an integral lattice on `A_L` is the
+   dual action `x -> x (R^{-1})^t` on the dual frame, where `R` is the
+   isometry's own matrix; the two frames — the dual one and the invariant-factor
+   one the finite-form engine acts on — differ by a fixed change of basis, read
+   once.  An element is then one inverse and two products of ten-by-ten
+   matrices, and the two presented module maps it also carries are asked for on
+   first request rather than at construction.
 2. **`_FilteredVinAl.Roots_decomposed_into` restricted to the walls already
    written.**  Vinberg's (58) is the condition against every normal already
-   written down, not against the cell's normals alone; the enumeration carries
-   an upper bound per wall, so a coefficient tuple that violates it is never
-   reached.  Every tuple so pruned is one `IsNewRoot` refuses anyway, so the
-   solutions returned are the same ones.
+   written down.  In the coefficients `d` along the cell's normals the cone
+   condition `u <= 0` is *not* the orthant `d >= c`: the cell's Gram is a
+   Stieltjes matrix, so `G^{-1} >= 0` makes `u <= 0` imply `d >= c`, but the
+   converse fails and the relaxation is not a small one.  The enumeration
+   therefore runs in the candidate's normal coordinates `u = -f`, `f >= 0`,
+   where (58) is one-sided, and the walls written after the cell enter as upper
+   bounds there.
+
+## 6. What the two repairs measure
+
+The enumeration, layer by layer, on `762126c` with the two repairs
+(`.scratch/probe522j_real.py`, `<tree>/.tmp/probe522j_real4.log`):
+
+```
+    layer    4: k=4 height=2  written= 9 constraints=0 candidates=     1 outside=0
+    layer    7: k=4 height=4  written= 9 constraints=0 candidates=     2 outside=0
+    layer    9: k=4 height=6  written=10 constraints=1 candidates=     0 outside=0
+    layer   11: k=4 height=8  written=10 constraints=1 candidates=     1 outside=0
+    layer   13: k=4 height=10 written=11 constraints=2 candidates=     0 outside=0
+    layer   16: k=4 height=12 written=11 constraints=2 candidates=     0 outside=0
+    layer   17: k=4 height=14 written=11 constraints=2 candidates=     0 outside=0
+    layer   20: k=4 height=16 written=11 constraints=2 candidates=     1 outside=0
+    layers 20, candidates 247, outside 0
+    layers 1.24 s, sifts 247 in 40.92 s
+```
+
+247 candidates for the whole walk, none of them outside a wall already
+written, against 1 855 003 candidates and 42 s of enumeration before it; the
+walk's own cost is now the membership question and nothing else.  The figures
+above are at load average 20 on this four-CPU host, where one question costs
+0.17 s; the same question cost 0.12 s at load 4 (`§4`), so the sift figures are
+load-bound and the candidate counts are not.
