@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import weakref
 from collections.abc import Callable, Iterable
 from itertools import chain, islice
 from typing import TYPE_CHECKING, TypeVar
@@ -48,6 +49,112 @@ class _PointsAreEqual:
 
 
 _DEFAULT_EQUIVALENCE = _PointsAreEqual()
+
+
+class _PointSequence:
+    r"""The points of a finite ordered set, in order, and the hash of that tuple.
+
+    A finite ordered set *is* its point sequence (the rule of
+    :class:`FiniteOrderedSets`): equality compares those points position by
+    position and the hash is the hash of the tuple.  So the tuple is one datum
+    of the set, and one object per point sequence is kept alive by the sets that
+    hold it (``_interned_point_sequence``).  Two equal sets then hold the *same*
+    object, so deciding that they are equal -- which the store of finite
+    products and coproducts does for every factor of every family it places
+    (``set_categories._finite_family_key``, `SET-05`) -- reads no point, at any
+    size.
+
+    ``digest`` is that tuple's hash, decided when the sequence is made, so a
+    reader of it never walks the points.  It is ``None`` when a point refuses a
+    hash: the set is then unhashable, exactly as ``hash(tuple(self))`` is, and
+    its sequence is not interned, because the registry is keyed by the digest.
+    """
+
+    __slots__ = ("points", "digest", "__weakref__")
+
+    def __init__(self, points: tuple[PointT, ...], digest: int | None) -> None:
+        self.points = points
+        self.digest = digest
+
+    def __reduce__(self):
+        # A sequence is the one object its points name, so it is rebuilt through
+        # the registry rather than copied: two sets that held one sequence still
+        # hold one sequence after a round trip.
+        return (_interned_point_sequence, (self.points,))
+
+
+# A sequence is held by the sets that hold it, not by this registry: an entry is
+# a weak reference, and one that has died is dropped the next time its bucket is
+# visited.
+_POINT_SEQUENCES: dict[int, list[weakref.ref]] = {}
+
+
+def _point_equality(left: PointT, right: PointT) -> bool | Predicate:
+    r"""Whether two points of a finite ordered set are equal.
+
+    ``True``, ``False``, or the proposition the points answer: the equality of
+    some points of this library is itself a statement, and a comparison that
+    reported one of the two answers would decide it.
+    """
+    from sage_extensions.logic import Predicate
+
+    equal = True if left is right else left == right
+    match equal:
+        case True | False | Predicate():
+            return equal
+        case _:
+            raise AssertionError(
+                f"cannot compare the points {left!r} and {right!r} of a finite ordered set: "
+                f"they answer equality with {equal!r}, which is neither True, False nor a "
+                "proposition, so one of them is not a point that decides its own equality"
+            )
+
+
+def _point_sequence_equality(left: tuple[PointT, ...], right: tuple[PointT, ...]) -> bool | Predicate:
+    r"""Whether two point sequences agree, position by position."""
+    if len(left) != len(right):
+        return False
+    for one, other in zip(left, right):
+        equal = _point_equality(one, other)
+        if equal is not True:
+            return equal
+    return True
+
+
+def _interned_point_sequence(points: tuple[PointT, ...]) -> _PointSequence:
+    r"""The one point sequence this tuple of points is.
+
+    Two finite ordered sets built separately from equal points reach this with
+    equal tuples, and the second is answered with the first one's sequence: that
+    one object is what their equality is decided by, and no reader walks the
+    points of either again.  A bucket is keyed by the tuple's hash, which equal
+    sequences share; a bucket holding a second sequence is a collision, and it is
+    resolved by comparing the points, so two sequences are one object exactly
+    when they are equal.
+
+    A sequence containing a point that refuses a hash has no digest to be looked
+    up by and is not interned: nothing is decided for it, and its set is
+    unhashable, as the tuple's hash is.
+    """
+    try:
+        digest = hash(points)
+    except TypeError:
+        return _PointSequence(points, None)
+    bucket = _POINT_SEQUENCES.get(digest)
+    if bucket is not None:
+        live = []
+        for reference in bucket:
+            sequence = reference()
+            if sequence is None:
+                continue
+            live.append(reference)
+            if _point_sequence_equality(sequence.points, points) is True:
+                _POINT_SEQUENCES[digest] = live
+                return sequence
+        bucket[:] = live
+    sequence = _PointSequence(points, digest)
+    _POINT_SEQUENCES.setdefault(digest, []).append(weakref.ref(sequence))
+    return sequence
 
 
 class OrderedEnumeratedSets(OwnedCategory):
@@ -123,7 +230,7 @@ class OrderedEnumeratedSets(OwnedCategory):
             equivalent: Callable[[PointT, PointT], bool] | None = None,
             name: str | None = None,
             description: Callable[[], str] | None = None,
-            selected_points: tuple[PointT, ...] | None = None,
+            point_sequence: _PointSequence | None = None,
             **rest,
         ) -> None:
             assert callable(element_at), (
@@ -146,7 +253,7 @@ class OrderedEnumeratedSets(OwnedCategory):
             self._equivalent_function = equivalent or _DEFAULT_EQUIVALENCE
             self._name = name
             self._description_function = description
-            self._selected_points = selected_points
+            self._point_sequence = point_sequence
             super().__init__(facade=True, **rest)
 
         def index_set(self) -> Sets().ObjectType:
@@ -160,6 +267,25 @@ class OrderedEnumeratedSets(OwnedCategory):
             r"""The chosen inverse on this set, with ``None`` allowed off it."""
             return self._index_of_function
 
+        def point_sequence(self) -> _PointSequence:
+            r"""The points of this set, in order, with their hash, as one object.
+
+            A construction that read a finite ordered set's points hands them to
+            the set here, and the set's hash is the hash of that tuple.  A
+            presentation that builds its points on demand -- an image under a
+            map, the ordering of a finite set by its ranking, a subobject on
+            given positions -- reads none of them, and this reads them once, on
+            the first ask, and keeps them: a second reader asks nothing.
+
+            Two equal sets answer with one object (``_interned_point_sequence``),
+            which is what makes their equality an identity test rather than a
+            walk of their points.
+            """
+            decided = self._point_sequence
+            if decided is None:
+                decided = self._point_sequence = _interned_point_sequence(tuple(self))
+            return decided
+
         def __iter__(self):
             r"""Iterate through the chosen enumeration.
 
@@ -169,9 +295,9 @@ class OrderedEnumeratedSets(OwnedCategory):
             isomorphism is needed when the isomorphism itself is requested,
             not to read the enumeration it represents.
 
-            A construction that read the enumeration to build its inverse
-            table kept the objects it selected, in their order, so a set built
-            that way reads them back and runs no map at all.
+            A set that holds its points -- every set whose construction read
+            them, and every set whose first hash did -- reads them back and
+            runs no map at all.
 
             The standard finite ordinal is the one self-indexed construction:
             its index set is literally itself and its selected enumeration is
@@ -180,9 +306,9 @@ class OrderedEnumeratedSets(OwnedCategory):
             """
             element_at = self.enumeration()
             index_set = self.index_set()
-            selected = self._selected_points
-            if selected is not None:
-                return iter(selected)
+            decided = self._point_sequence
+            if decided is not None:
+                return iter(decided.points)
             if index_set is self:
                 size = cardinal(self.cardinality())
                 assert size.is_finite(), (
@@ -326,15 +452,29 @@ class FiniteOrderedSets(OwnedCategory):
     hash table of the points refuse such a point, with the table's
     ``TypeError``.
 
-    A set whose points its construction read is also keyed by that construction:
-    the hash of its point sequence is decided there, and a set presented by a
-    supplied enumeration decides it on the first ask.  The product and coproduct
-    of a family are interned under their index set and their factors' hashes
+    A finite ordered set is its point sequence, so the tuple of its points is
+    the datum its equality compares and its hash reads, and a set that has read
+    its points holds both: the tuple, and its hash.  One object stands for one
+    point sequence (``_interned_point_sequence``), so two equal sets hold the
+    same tuple and are equal by an identity test.  The product and coproduct of
+    a family are interned under their index set and their factors' hashes
     (``set_categories._finite_family_key``), so placing a family reads a value
-    each factor already holds and none of its points.  No caller supplies that
-    value: a datum other than the points cannot key a set, because two sets of
-    one point sequence would then be unequal while remaining equal to every set
-    of those points, and one family would have two constructions (`SET-05`).
+    each factor holds and confirms its equality without reading a point of it,
+    at any size.  No caller supplies that value: a datum other than the
+    points cannot key a set, because two sets of one point sequence would then
+    be unequal while remaining equal to every set of those points, and one
+    family would have two constructions (`SET-05`).
+
+    Which constructions read their points, and which leave it to the first
+    reader, is the cost of the set and not of its mathematics.
+    ``from_indexed`` and the filtered subset read them and hand them over; a
+    presentation whose points are built on demand -- an image under a map, the
+    ordering of a finite set by its ranking, a subobject on given positions --
+    reads none, and the first ask for its hash or its sequence reads them once
+    and keeps them.  A finite ordered set that has not read its points cannot
+    answer with their hash, because the hash of a set is a function of its
+    points and nothing weaker; what a key costs is the second read, and a set
+    that has read its points is never read twice.
     """
 
     def an_object(self) -> ObjectOfCategory:
@@ -424,12 +564,12 @@ class FiniteOrderedSets(OwnedCategory):
         rule of :class:`FiniteOrderedSets`, and membership is that inverse's
         domain.
 
-        A construction that has to read the enumeration to build that table also
-        keeps the points it read, in order, as the set's own enumeration: the
-        defining map is not run again, and the set's hash is read from those
-        points.  A set presented by a supplied inverse keeps that map as its only
-        account of its points, and its hash is computed from that account on the
-        first ask.
+        The construction reads the points here, whichever inverse it was given:
+        they are the set's own enumeration, its hash is the hash of that tuple,
+        and the tuple is interned, so a second set of the same points is the same
+        point sequence and the two compare by identity.  A supplied inverse is
+        kept as the set's inverse, and the objects this construction selected are
+        its iteration from then on, so no reader runs the defining map again.
         """
         assert cardinal(index_set.cardinality()).is_finite(), (
             f"a finite ordered set needs a finite index set, but {index_set} is not finite"
@@ -437,17 +577,10 @@ class FiniteOrderedSets(OwnedCategory):
         assert index_set in EnumeratedSets(), (
             f"a finite ordered set needs an enumerated index set, but {index_set} is not enumerated"
         )
-        selected_points = None
+        indices = tuple(index_set)
+        points = tuple(element_at(index) for index in indices)
+        point_sequence = _interned_point_sequence(points)
         if index_of is None:
-            indices = tuple(index_set)
-            points = tuple(element_at(index) for index in indices)
-            # The points are read here, so the set keeps them here: the objects
-            # this construction selected are its enumeration from now on, its
-            # hash of them is read from them when it is asked, and a consumer
-            # that keys a construction by this set -- the store of finite
-            # products keys each factor by its hash -- reads a value of the data
-            # the set already holds and never runs its map again.
-            selected_points = points
             # These retained objects already satisfy the chosen enumeration.
             # Their admission does not need equality with other points.
             identity_indices = {id(point): index for point, index in zip(points, indices, strict=True)}
@@ -502,7 +635,7 @@ class FiniteOrderedSets(OwnedCategory):
             equivalent=equivalent,
             name=name,
             description=description,
-            selected_points=selected_points,
+            point_sequence=point_sequence,
         )
 
     class ParentMethods:
@@ -592,21 +725,14 @@ class FiniteOrderedSets(OwnedCategory):
             equivalence relation here -- two sets equal to a third are equal to
             each other -- and what lets the hash, which is the hash of those
             points, agree with it (``SET-05``).
-            """
-            from sage_extensions.logic import Predicate, conjunction
 
-            def point_equality(left, right):
-                equal = True if left is right else left == right
-                match equal:
-                    case True | False | Predicate():
-                        return equal
-                    case _:
-                        raise AssertionError(
-                            f"cannot compare the finite ordered sets {self} and {other}: their points "
-                            f"{left!r} and {right!r} answer equality with {equal!r}, which is neither "
-                            "True, False nor a proposition, so one of them is not a point that decides "
-                            "its own equality"
-                        )
+            Two sets that hold their points hold one tuple when their sequences
+            are equal (``_interned_point_sequence``), so equal sets are decided
+            here by one identity test however many points they have.  A set that
+            holds no tuple yet, or a pair whose points answer with a proposition,
+            is compared point by point.
+            """
+            from sage_extensions.logic import conjunction
 
             match other:
                 case _ if other is self:
@@ -614,8 +740,11 @@ class FiniteOrderedSets(OwnedCategory):
                 case _ if other in FiniteOrderedSets():
                     if self.cardinality() != other.cardinality():
                         return False
+                    held = self._point_sequence
+                    if held is not None and held is other._point_sequence:
+                        return True
                     return conjunction(
-                        point_equality(left, right)
+                        _point_equality(left, right)
                         for left, right in zip(self, other, strict=True)
                     )
                 case _:
@@ -626,27 +755,29 @@ class FiniteOrderedSets(OwnedCategory):
 
             return negation(self == other)
 
-        @cached_method
         def __hash__(self) -> int:
-            r"""Return the hash of the tuple of the points, which :meth:`__eq__` compares.
+            r"""Return the hash of the point sequence this set holds, which :meth:`__eq__` compares.
 
             The points of a finite ordered set are values, so the set is fixed by
-            them and this hash does not change: a construction that read the
-            points to build its inverse table keeps them and hashes those, and
-            every other set hashes its enumeration on the first ask and answers
-            from then on (``STY-55``).  A reader does ask repeatedly, because the
-            store that keeps one product per equal family keys a family by its
-            factors' hashes (``SET-05``), so a factor's hash is a value the
-            factor already holds by the time a family is placed, and placing a
-            family runs no factor's map.
+            them and this hash does not change: it is the hash of the tuple of the
+            points, decided with that tuple (``_interned_point_sequence``) when
+            the construction read them, or when the first reader asked.  Reading
+            it therefore reads no point, which is what the store of finite
+            products and coproducts does for every factor of every family it
+            places (`SET-05`); ``STY-55``'s repeated derivation is the
+            question this answers once.
 
             The points hash and their hashes agree with their equality (the rule
             of :class:`FiniteOrderedSets`), so equal sets hash equally, and a set
-            carrying a point that refuses a hash refuses one too: the computation
-            raises before anything is cached.
+            carrying a point that refuses a hash refuses one too: the tuple's own
+            hash raises, and no sequence is kept for it.
             """
-            selected = self._selected_points
-            return hash(tuple(self)) if selected is None else hash(selected)
+            decided = self.point_sequence()
+            if decided.digest is None:
+                # The sequence was made without a digest because a point refused
+                # a hash; asking again raises the TypeError that point raises.
+                return hash(decided.points)
+            return decided.digest
 
         def _repr_(self) -> str:
             return "{" + ", ".join(repr(element) for element in self) + "}"
@@ -676,8 +807,10 @@ def _filtered_ordered_set(
     the public ``filtered`` operation requires a represented enumeration.
     A successful computation selects the \(k\)-th satisfying point of
     \(S\), indexed by the ordinal counting those points. Its finite selected
-    enumeration is materialized once, not recomputed on every rank query;
-    a declined computation constructs no order.
+    enumeration is materialized once, not recomputed on every rank query; that
+    selection is the subset's point sequence, so its hash is the hash of those
+    points and no reader walks them again; a declined computation
+    constructs no order.
     """
     from sage_extensions.logic import Predicate
 
@@ -744,6 +877,7 @@ def _filtered_ordered_set(
         contains=contains,
         name=name,
         description=description,
+        point_sequence=_interned_point_sequence(points),
     )
 
 

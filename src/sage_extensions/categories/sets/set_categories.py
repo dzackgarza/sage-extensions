@@ -6356,14 +6356,18 @@ def _finite_family_key(family: IndexedFamily) -> int:
     rule of :class:`Sets`), so equal families have one key.
 
     A factor contributes its hash, and a finite ordered set's hash is the hash of
-    its point sequence, which its construction decides when it reads the points
-    and which any other set decides on the first ask.  Reading a factor's key
-    therefore reads a value the factor holds and none of its points, at whatever
-    size the factor is.  Nothing else about a factor may enter the key: a datum a
-    construction declares for itself is not the set -- two sets of one point
-    sequence would carry two data, hence two keys and two constructions for one
-    family -- and the key has to be a function of the factor's mathematics, which
-    is what its hash is.
+    its point sequence, which that set holds as one tuple with the tuple's hash
+    (``finite_ordered_sets._interned_point_sequence``) as soon as its
+    construction read the points, or as soon as the first reader asked for its
+    hash.  Reading a factor's key therefore reads a value the factor holds and
+    none of its points, at whatever size the factor is.  A set that has
+    read no point cannot answer with the hash of its points -- the hash of a set
+    is a function of its points and nothing weaker -- and the first ask reads
+    them once; the store is then the reader that asked, and the set keeps them.
+    Nothing else about a factor may enter the key: a datum a construction declares
+    for itself is not the set -- two sets of one point sequence would carry two
+    data, hence two keys and two constructions for one family -- and the key has
+    to be a function of the factor's mathematics, which is what its hash is.
     """
     return hash((family.index_set(), tuple(hash(factor) for factor in family)))
 
@@ -6397,6 +6401,11 @@ def _interned_by_equality(
     so two presentations of one family are one construction (`SET-05`), whichever
     is built first, and a family is compared by ``==`` with the families of its
     own key and with no other.
+
+    The comparison is of sets that have already answered for their keys, so each
+    of their factors holds its point sequence (``_finite_family_key`` asked), and
+    two equal factors hold one sequence: the confirmation reads no point of a
+    factor, at any size.
 
     An undecided family equality interns nothing: the family is built and kept
     beside the one it could not be compared with
