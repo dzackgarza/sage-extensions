@@ -1,0 +1,81 @@
+tree SHA: 897e7f7fd45e4d4f4cfcb29b266672e9232d25ab (modified paths: 2)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 16.57 22.90 19.70 16/702 2700219
+files: tests/modules/test_a_presented_module_is_built_before_it_computes.sage
+inner 540 s, outer 600 s, guard 6144 MiB
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+time gates OFF (--no-time-gates): star import 2.24 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: asyncio-1.5.0, xdist-3.8.0, reportlog-1.0.0, platformdirs-4.13.5, hypothesis-6.170.15, anyio-4.15.1, timeout-2.4.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 2 items
+
+tests/modules/test_a_presented_module_is_built_before_it_computes.sage F [ 50%]
+F                                                                        [100%]
+
+=================================== FAILURES ===================================
+__________ test_constructing_a_cokernel_asks_the_engine_for_no_matrix __________
+
+    def test_constructing_a_cokernel_asks_the_engine_for_no_matrix() -> None:
+        r"""$\operatorname{coker}(2 \cdot 1_{Z^2})$, built before anything is asked of it."""
+        free = ZZ.free_module(2)
+        first, second = free.module_generators()
+        dilation = free.Mor(free)({0: ZZ(2) * first, 1: ZZ(2) * second})
+    
+        quotient, constructed, requested = construction_work_of(
+            dilation.cokernel,
+            lambda module: module.invariant_factors(),
+        )
+    
+>       assert constructed == 0
+E       assert 2 == 0
+E        +  where 0 = Integer(0)
+
+tests/modules/test_a_presented_module_is_built_before_it_computes.sage:35: AssertionError
+_________ test_a_plane_inclusions_quotient_is_built_before_it_is_asked _________
+
+    def test_a_plane_inclusions_quotient_is_built_before_it_is_asked() -> None:
+        r"""The cokernel of a primitive plane's inclusion, built before it is read.
+    
+        $U \oplus U$ has basis $e_1, f_1, e_2, f_2$ with $b(e_i, f_i) = 1$, and the
+        span of $e_1$ and $f_2$ is saturated, so its quotient is free of rank two:
+        every invariant factor is $0$.
+        """
+        lattice = Lattices(ZZ)("U") + Lattices(ZZ)("U")
+        e1, f1, e2, f2 = lattice.module_generators()
+        inclusion = lattice.subobject_on((e1, f2)).inclusion()
+    
+        quotient, constructed, requested = construction_work_of(
+            inclusion.cokernel,
+            lambda module: module.invariant_factors(),
+        )
+    
+>       assert constructed == 0
+E       assert 2 == 0
+E        +  where 0 = Integer(0)
+
+tests/modules/test_a_presented_module_is_built_before_it_computes.sage:60: AssertionError
+============================== slowest durations ===============================
+0.32s call     tests/modules/test_a_presented_module_is_built_before_it_computes.sage::test_constructing_a_cokernel_asks_the_engine_for_no_matrix
+0.29s call     tests/modules/test_a_presented_module_is_built_before_it_computes.sage::test_a_plane_inclusions_quotient_is_built_before_it_is_asked
+
+(4 durations < 0.005s hidden.  Use -vv to show these durations.)
+=========================== short test summary info ============================
+FAILED tests/modules/test_a_presented_module_is_built_before_it_computes.sage::test_constructing_a_cokernel_asks_the_engine_for_no_matrix
+FAILED tests/modules/test_a_presented_module_is_built_before_it_computes.sage::test_a_plane_inclusions_quotient_is_built_before_it_is_asked
+============================== 2 failed in 7.91s ===============================
+[peakrss] wt541revtests: child waited=1 shell_code=1 samples=9
+[peakrss] peak tree RSS      : 313 MiB
+[peakrss] low-water MemAvail : 3795 MiB
+[peakrss] peak single VmHWM  : 313 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      302 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    16.1s procs=  3 rss=   313 MiB hwm=   313 MiB avail=  3795 MiB
+[peakrss]   t=    12.0s procs=  3 rss=   305 MiB hwm=   305 MiB avail=  4170 MiB
+[peakrss]   t=    14.0s procs=  3 rss=   305 MiB hwm=   305 MiB avail=  4187 MiB
+[peakrss]   t=    10.0s procs=  3 rss=   300 MiB hwm=   300 MiB avail=  4515 MiB
+[peakrss]   t=     8.0s procs=  3 rss=   289 MiB hwm=   289 MiB avail=  4685 MiB
