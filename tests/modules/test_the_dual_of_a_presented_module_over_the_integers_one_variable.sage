@@ -106,3 +106,50 @@ def test_the_kernel_of_x_and_two_over_ZZx_is_the_koszul_syzygy() -> None:
     image = kernel.inclusion()(kernel.module_generator(kernel_label))
     assert row(image) == line.zero()
     assert image in (syzygy, -syzygy)
+
+
+def test_the_kernel_of_two_and_minus_x_over_ZZx_is_free_of_rank_two() -> None:
+    r"""$\ker(2, -x, 0) = \mathbf{Z}[x]\,(x, 2, 0) \oplus \mathbf{Z}[x]\,e_2$.
+
+    The domain is $M = \mathbf{Z}[x]^3/(x e_1 + 2 e_2)$, so the map
+    $f(e_1) = 2$, $f(e_2) = -x$, $f(e_3) = 0$ is well defined: the relation
+    maps to $2x - 2x = 0$.  A triple $(a, b, c)$ of $M$ is killed by $f$
+    exactly when $2a - xb = 0$, and $\mathbf{Z}[x]$ is a unique factorization
+    domain in which $x$ does not divide $2$: $x \mid a$, say $a = xt$, and then
+    $b = 2t$.  So the kernel is free of rank two, on the classes of
+    $(x, 2, 0)$ and $(0, 0, 1)$.
+
+    The kernel therefore needs two generators, and its domain has a relation of
+    its own -- the shape in which the kernel of a presented map is not a
+    one-generator module.  It is computed over $\mathbf{Z}[x]$, where a kernel
+    is a syzygy module and not a Smith form.
+    """
+    ring = ZZ["x"]
+    x = ring.algebra_generator("x")
+    line = ring ** 1
+    cube = ring ** 3
+    (line_label,) = tuple(line.module_generating_set())
+    (first_label, second_label, third_label) = tuple(cube.module_generating_set())
+    (unit,) = tuple(line.module_generators())
+    (first, second, third) = tuple(cube.module_generators())
+    covering = cube.module_category().Mor(line, cube)(
+        {line_label: x * first + ring(2) * second}
+    )
+    module = covering.cokernel()
+    (module_first, module_second, module_third) = tuple(module.module_generating_set())
+    row = module.module_category().Mor(module, line)(
+        {
+            module_first: ring(2) * unit,
+            module_second: -x * unit,
+            module_third: line.zero(),
+        }
+    )
+
+    kernel = row.kernel()
+
+    assert kernel.module_rank() == 2
+    for kernel_label in kernel.module_generating_set():
+        assert row(kernel.inclusion()(kernel.module_generator(kernel_label))) == line.zero()
+    inclusion = kernel.inclusion()
+    assert inclusion.is_in_image(x * module.module_generator(module_first) + ring(2) * module.module_generator(module_second))
+    assert inclusion.is_in_image(module.module_generator(module_third))
