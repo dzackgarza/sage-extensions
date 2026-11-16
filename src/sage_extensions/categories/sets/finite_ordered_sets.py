@@ -133,6 +133,11 @@ class OrderedEnumeratedSets(OwnedCategory):
                 f"an ordered set needs the map from points back to positions in {index_set}, but "
                 f"{index_of!r} is not callable; without it the data is a family, not a set with an order"
             )
+            if name is not None and description is not None:
+                raise ValueError(
+                    f"the set of {index_set} is given both the name {name!r} and a description "
+                    f"function: a set is named or described, and one of the two would be lost"
+                )
             self._index_set = index_set
             self._element_at_function = element_at
             self._index_of_function = index_of
@@ -266,11 +271,11 @@ class OrderedEnumeratedSets(OwnedCategory):
             r"""What this set was named or described with, rendered on the first read and kept.
 
             A set is given a name, or a description of the source it was carved out
-            of.  Rendering the description is the reader's act: the set asks it here,
-            and not at construction, so building the set computes no display.  The
-            answer is the set's once rendered -- neither changes while the set exists
-            -- so a second reader asks nothing, and a construction that states both is
-            read by its description.
+            of, and a construction that states both is refused: one of the two would
+            be lost.  Rendering the description is the reader's act: the set asks it
+            here, and not at construction, so building the set computes no display.
+            Neither answer changes while the set exists, so a second reader asks
+            nothing.
             """
             described = self._description_function
             if described is not None:

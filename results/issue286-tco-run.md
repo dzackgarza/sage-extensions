@@ -89,12 +89,19 @@ group's own cardinality.
 `prop:gamma-co-images(2)`'s proof uses "[h/2] is the characteristic class of
 `q_{T_Co}`". Checked by hand on the computed form it holds:
 `q(w) - b(w,w) = 0`, `q(u1+u2) - b(u1+u2, w) = 1`, `q(x) - b(x,w) = -k` on
-`A_{E8(2)}`, and `1/2 + Z` cancels on the `w + z` classes. The library cannot check it:
-`DiscriminantClass.is_characteristic` compares `q(x).lift() - b(x,v).lift()` against
-`ZZ`, and on `A_{T_Co}` those lifts are owned value elements for which `in ZZ` is
-`False` even when the value is `0`, so the method answers `False` for all 2048 classes.
-Filed as `results/issue-to-file-discriminant-characteristic-undecided.md`.
-Log `.tmp/p286-probe6.log`.
+`A_{E8(2)}`, and `1/2 + Z` cancels on the `w + z` classes.
+
+**Corrected.** The paragraph here claimed the library could not check it, because
+`is_characteristic` compared `q(x).lift() - b(x,v).lift()` against `ZZ` and `in ZZ` is
+`False` for those owned value elements at `0` as well. That comparison was real and it was
+Sage's integer ring answering, not the method: `ef8fb06` (#348, 2026-11-11) had already
+asked the membership of the module's own base ring instead. Measured at `897e7f7`,
+`[h/2].is_characteristic()` is `True` and `zero.is_characteristic()` is `False`, and an
+independent pass over all 2048 classes from the gram data agrees. The `in ZZ` line of
+`.tmp/p286-probe6.log` is the engine ring's answer to a probe that never called the
+method, so the "all 2048 classes" claim it supported was an inference from the stale
+source, not a measurement. The issue filed from it is
+`results/issue-to-file-discriminant-characteristic-undecided.md`, retracted there.
 
 ## Re-measured after #319 landed
 

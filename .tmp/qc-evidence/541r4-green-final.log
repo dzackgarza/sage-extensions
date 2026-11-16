@@ -1,0 +1,45 @@
+tree SHA: 35a5ec901e77e3aa0dd76e3a02ab7f052ea2a676 (modified paths: 0)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 5.22 10.43 13.62 5/492 2585095
+files: tests/modules/test_a_presented_module_is_built_before_it_computes.sage tests/lattices/test_primitivity_is_the_torsion_freeness_of_the_inclusions_cokernel.sage tests/lattices/test_a_subobject_asks_the_ambient_lattice_for_no_display.sage tests/lattices/test_a_plane_transport_builds_one_span.sage tests/sets/test_a_description_is_asked_for_when_it_is_read.sage
+inner 300 s, outer 360 s, guard 6144 MiB
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+time gates OFF (--no-time-gates): star import 0.49 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: asyncio-1.5.0, xdist-3.8.0, reportlog-1.0.0, platformdirs-4.13.5, hypothesis-6.170.15, anyio-4.15.1, timeout-2.4.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 9 items
+
+tests/modules/test_a_presented_module_is_built_before_it_computes.sage . [ 11%]
+.                                                                        [ 22%]
+tests/lattices/test_primitivity_is_the_torsion_freeness_of_the_inclusions_cokernel.sage . [ 33%]
+.                                                                        [ 44%]
+tests/lattices/test_a_subobject_asks_the_ambient_lattice_for_no_display.sage . [ 55%]
+                                                                         [ 55%]
+tests/lattices/test_a_plane_transport_builds_one_span.sage .             [ 66%]
+tests/sets/test_a_description_is_asked_for_when_it_is_read.sage ...      [100%]
+
+============================== slowest durations ===============================
+0.11s call     tests/modules/test_a_presented_module_is_built_before_it_computes.sage::test_constructing_a_cokernel_asks_the_engine_for_no_matrix
+0.06s call     tests/modules/test_a_presented_module_is_built_before_it_computes.sage::test_a_plane_inclusions_quotient_is_built_before_it_is_asked
+0.04s call     tests/lattices/test_primitivity_is_the_torsion_freeness_of_the_inclusions_cokernel.sage::test_a_span_is_primitive_exactly_when_its_quotient_is_torsion_free
+0.03s call     tests/lattices/test_a_plane_transport_builds_one_span.sage::test_transporting_a_plane_builds_its_span_once
+0.02s call     tests/lattices/test_primitivity_is_the_torsion_freeness_of_the_inclusions_cokernel.sage::test_a_primitivity_decision_is_read_in_the_inclusions_own_codomain
+0.01s call     tests/lattices/test_a_subobject_asks_the_ambient_lattice_for_no_display.sage::test_building_a_subobject_asks_the_ambient_lattice_for_no_display
+
+(21 durations < 0.005s hidden.  Use -vv to show these durations.)
+============================== 9 passed in 1.36s ===============================
+[peakrss] probe541r4tests: child waited=0 shell_code=0 samples=3
+[peakrss] peak tree RSS      : 343 MiB
+[peakrss] low-water MemAvail : 5624 MiB
+[peakrss] peak single VmHWM  : 343 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      332 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     4.0s procs=  3 rss=   343 MiB hwm=   343 MiB avail=  5624 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   296 MiB hwm=   296 MiB avail=  5774 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     4 MiB hwm=     4 MiB avail=  5995 MiB
+launcher exit: 0

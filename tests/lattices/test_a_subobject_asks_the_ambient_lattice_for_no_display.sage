@@ -4,7 +4,7 @@ The span basis names itself after the lattice it spans -- "the canonical span
 basis in \(L\)" -- and a lattice's display computes its signature from its Gram.
 A construction that renders that name has computed a signature for a reader who
 does not exist.  The contract is the display's, so the display is what this test
-counts: the guard below is the class's rendering, and it is shown to be live by
+counts: the guard is the lattice's own rendering, and it is shown to be live by
 rendering the lattice once by hand.
 """
 
@@ -21,7 +21,7 @@ def test_building_a_subobject_asks_the_ambient_lattice_for_no_display() -> None:
         lattice.__repr__()
         return span
 
-    span, rendered = displays_rendered_by(build_and_display)
+    span, rendered = displays_rendered_by(lattice, build_and_display)
 
     assert rendered == 1
     assert span.ambient_lattice() is lattice

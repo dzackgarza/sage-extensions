@@ -10,6 +10,22 @@ Write to it in the turn the measurement is made.
 
 ## Sage
 
+### Sage's `Polyhedron` reads its ambient dimension off the H-representation rows
+
+Measured 2026-11-16 in the adopted runtime (SageMath 11.0.beta5, Python 3.14): `Polyhedron(ieqs=[], eqns=[], base_ring=QQ)` is `A 0-dimensional polyhedron in QQ^0 defined as the convex hull of 1 vertex`, and the same call with `ambient_dim=2` is `A 2-dimensional polyhedron in QQ^2 defined as the convex hull of 1 vertex and 2 lines`.
+`sage/geometry/polyhedron/constructor.py` reads the dimension from `_common_length_of(ieqs, eqns)` and falls back to the `ambient_dim` argument only when no row is stated, raising `ValueError: ambient space dimension mismatch` when the two disagree, so the argument is redundant exactly when it is inferable and required exactly when it is not.
+A cone cut out by no covector states no row, so its owned engine answered for `QQ^0`: on `Lattices(ZZ)([[1, 0], [0, 1]])`, `reduction_cell(())` reported dimension 0 and `is_pointed()` True in 0.44 s, and `from_rays` of rays spanning the space did the same in 0.00 s.
+Route chosen: state the dimension at every crossing. `RationalPolyhedralCone.__init__` passes `ambient_dim=len(labels)` to its engine; `hilbert_basis` and `_engine_ray_triangulation` state the lattice of rank `len(labels)` on Sage's `Cone`. After, both calls give dimension 2, not pointed, with the whole plane as lineality, in 0.40 s and 0.02 s.
+Reproduce: `sage -c 'from sage.geometry.polyhedron.constructor import Polyhedron; from sage.rings.rational_field import QQ; print(Polyhedron(ieqs=[], eqns=[], base_ring=QQ)); print(Polyhedron(ieqs=[], eqns=[], base_ring=QQ, ambient_dim=2))'`.
+
+### Sage's `Cone` and `PointConfiguration` refuse an empty family of rays or points
+
+Measured 2026-11-16 in the adopted runtime (SageMath 11.0.beta5, Python 3.14): `Cone([])` raises `ValueError: lattice must be given explicitly if there are no rays!` from `sage/geometry/cone.py:434`, while `Cone([], lattice=FreeModule(ZZ, 2))` is the origin, `0-d cone in 2-d lattice`, whose `Hilbert_basis()` is the empty collection -- 0.00 s for each, the timer's 0.01 s resolution.
+The lattice to state is a free module over `ZZ`: `Cone(rows, lattice=FreeModule(QQ, 2))` raises `TypeError: lattice must be a free module over ZZ` out of `normalize_rays` as soon as `rows` is nonempty, and the empty family is the one case that does not reach `normalize_rays`.
+`PointConfiguration([])` builds `The pointless empty configuration` and its `triangulate()` raises `IndexError: list index out of range` (0.00 s).
+Route chosen: `hilbert_basis` states `FreeModule(ZZ, len(labels))`, so the zero cone's Hilbert basis is the empty family; `_engine_ray_triangulation` states the same lattice and answers a ray-free family with the one simplex of no rays, `PointConfiguration` not being asked. On four specimens in ranks 2 and 3 (the wedge (0,1),(2,1); the orthant; the rays e1,e2,e3,e1+e2+e3; the cone (1,0),(1,3)) the triangulations and the Hilbert bases are unchanged by stating the lattice, in 0.30 s for all eight computations.
+Reproduce: `sage -c 'from sage.geometry.cone import Cone; from sage.geometry.triangulation.point_configuration import PointConfiguration; from sage.modules.free_module import FreeModule; from sage.rings.integer_ring import ZZ; print(Cone([], lattice=FreeModule(ZZ, 2)).Hilbert_basis()); print(PointConfiguration([]).triangulate())'`.
+
 ### The brute-force orthogonal group does not return for a half-integral elementary two-primary form
 
 Measured 2026-11-11 in the adopted runtime (SageMath 11.0.beta5, Python 3.14):
@@ -4075,10 +4091,24 @@ isometries by brute force*, above, at `|A| = 2048` -- past that table's largest 
 specimen (`n = 6`, 4.90 s). It blocks every character-quotient row of `#286`, including
 `R_{Gamma_En,2} = rho^-1(P)`, whose `P` is a stabilizer inside `O(A_{T_Co})`.
 
-`DiscriminantClass.is_characteristic` cannot decide on this form either: it compares
-`q(x).lift() - b(x,v).lift()` against `ZZ`, and both lifts are `OwnedJoinCategory`
-value elements, for which `in ZZ` is `False` even at `0`, so all 2048 classes answer
-`False` -- see `results/issue-to-file-discriminant-characteristic-undecided.md`.
+`DiscriminantClass.is_characteristic` decides on this form, and the claim that it could
+not was a stale reading of the source. Both value lifts are `OwnedJoinCategory` elements,
+and **Sage's** integer ring answers `False` for every one of them, `0` included; the
+method compared against that ring until `ef8fb06` (#348, 2026-11-11) asked the membership
+of the module's own base ring instead, and against the owned integers the lifts are
+members -- a mixed class gives the unreduced representative `(0)/(4)` or `(4)/(4)`, an
+integer either way. Measured at `897e7f7` on `A_{T_Co}`: `[h/2].is_characteristic()` is
+`True` and `zero.is_characteristic()` is `False`, the second because
+`q([h/2]) - b([h/2], 0) = 1/2`. An independent pass over all 2048 classes built from the
+gram data (11 generators, `q(x+y) = q(x) + q(y) + 2b(x,y)`) finds 0 non-integral
+differences for `[h/2]` and 1024 for the zero class, and agrees with the method on every
+small even lattice it was run on. The remaining defect on this specimen is cost, not
+truth: 145.7 s for the first call and 113.2 s for the second at `|A| = 2048`, because the
+method evaluates `q` and `b` on every class, and enumerating those classes costs 76.7 s
+of it.  The classification that consumes it is right here too: `get_isotropic_type(ep)` on
+`T_Co` answers `Even ordinary` (99.86 s) because the one characteristic class `[h/2]` has
+`q = 1/2`, while a primitive isotropic vector of divisibility 2 has
+`q([v/2]) = (v,v)/4 = 0`.
 
 The gate `tests/lattices/test_the_coble_lattice_from_the_cited_formula.sage` (the
 construction, the invariants and the 528/527 pair) is **3 passed in 31.25 s**, exit 0

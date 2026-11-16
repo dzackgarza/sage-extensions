@@ -1,0 +1,28 @@
+probe: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/wt541r4work/probe_cokernel.py
+tree SHA: 897e7f7fd45e4d4f4cfcb29b266672e9232d25ab (modified paths: 1)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 2.65 2.29 1.94 3/447 2519628
+inner 420 s, outer 480 s, guard 6144 MiB, args ''
+
+===== the specimen =====
+T_Co: rank 11
+6 isotropic pairs
+
+===== A. the quotient of a plane's inclusion, 6 cold spans =====
+`inclusion.cokernel()` median 0.145 ms (0.136..1.432)
+
+===== B. the same construction part by part (sums over the 6 spans) =====
+relation morphism of the codomain      median 0.149 ms (0.080..0.224)
+added images                           median 0.282 ms (0.273..0.333)
+rank over the fraction field           median 0.029 ms (0.028..0.096)
+engine relation submodule              median 0.206 ms (0.005..5.063)
+FGP_Module                             median 0.025 ms (0.019..0.053)
+the module construction itself         median 0.001 ms (0.000..1.233)
+[peakrss] probe541r4: child waited=0 shell_code=0 samples=1
+[peakrss] peak tree RSS      : 2 MiB
+[peakrss] low-water MemAvail : 13037 MiB
+[peakrss] peak single VmHWM  : 2 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   timeout                       3 MiB peak
+[peakrss]   t=     0.0s procs=  1 rss=     2 MiB hwm=     2 MiB avail= 13037 MiB
+launcher exit: 0

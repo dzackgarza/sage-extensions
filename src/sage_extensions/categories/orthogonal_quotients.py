@@ -1305,8 +1305,10 @@ class OrthogonalCharacterQuotient:
         of a primitive isotropic ``v`` is the isometry class of
         ``v^\perp/\mathbb{Z} v`` (Conway--Sloane, *Sphere Packings, Lattices and
         Groups*, ch. 16), which the discriminant group of a unimodular ``L`` cannot
-        see.  Where the hypothesis is not exhibited the call below returns ``None``
-        and the caller keeps its exact integral route.
+        see.  The hypothesis is decided by ``L``'s \(U\)-index, so a basis that
+        displays no isotropic direction does not remove it; where the index is
+        below two the call below returns ``None`` and the caller keeps its
+        exact integral route.
         Let ``gamma`` belong to ``Stab_{O(A_L)}(c)`` and choose ``g`` in ``O(L)`` above it
         (the character representation is computed by this quotient, so such a lift exists).
         Then ``g(v)`` has the same length and the same normalized class ``c`` as ``v``, so by
@@ -1349,7 +1351,8 @@ class OrthogonalCharacterQuotient:
                 if lattice.reflection(root) not in self.subgroup:
                     return "NOSPLIT"
         # The criterion's hypothesis is read on ``L`` itself (Gritsenko--Hulek--Sankaran,
-        # Lemma 7.8, p. 503): two orthogonal hyperbolic planes in ``L``.  It is not
+        # Lemma 7.8, p. 503): two orthogonal hyperbolic planes in ``L``, decided by the
+        # lattice's U-index and not by the retained basis.  It is not
         # transferred from the enlargement ``L + U``, whose classification is of
         # ``\widetilde{SO}(L + U)``-orbits and whose moving element need not preserve
         # ``L``.  Without the hypothesis the parabolic route below applies instead:
@@ -3046,30 +3049,17 @@ def _isotropic_divided_class_set(lattice, term):
 
 
 def _two_hyperbolic_planes(lattice):
-    r"""Whether two orthogonal unimodular hyperbolic planes are exhibited in the chosen basis.
+    r"""Whether the isometry class of ``lattice`` splits two orthogonal hyperbolic planes.
 
-    Eichler's criterion (Gritsenko--Hulek--Sankaran, *Moduli of K3 Surfaces and Irreducible
-    Symplectic Manifolds*, Lemma 7.8, p. 503) needs that hypothesis; where the retained basis
-    does not exhibit it the caller keeps the exact integral route, so the hypothesis is only
-    ever entered on a detectable basis, never assumed.
+    Eichler's criterion (Gritsenko--Hulek--Sankaran, *Moduli of K3 Surfaces and
+    Irreducible Symplectic Manifolds*, Lemma 7.8, p. 503) needs that hypothesis;
+    it is a property of the lattice, decided by its \(U\)-index, and not by
+    whether the retained basis happens to display two isotropic directions.
+    The owner of that count is
+    :meth:`sage_extensions.categories.lattices.Lattices.hyperbolic_plane_summand_count`,
+    so this asks it rather than reading the basis here.
     """
-    generators = tuple(lattice.module_generators())
-    isotropic = [v for v in generators if v.q() == lattice.base_ring().zero()]
-    planes = []
-    zero = lattice.base_ring().zero()
-    for e in isotropic:
-        for f in isotropic:
-            pairing = lattice.b(e, f)
-            if pairing not in (1, -1):
-                continue
-            if all(
-                lattice.b(e, other) == zero and lattice.b(f, other) == zero
-                for predecessor in planes
-                for other in predecessor
-            ):
-                planes.append((e, f))
-                break
-    return len(planes) >= 2
+    return bool(lattice.splits_two_hyperbolic_planes())
 
 
 def _bezout_partner(row):

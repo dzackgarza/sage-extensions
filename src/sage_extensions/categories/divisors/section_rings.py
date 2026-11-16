@@ -390,6 +390,7 @@ def _line_bundle_section_ring(category, bundle):
             ("section_scheme", bundle.scheme()),
             ("section_line_bundle", bundle),
         ),
+        constructing_category=category,
     )
 
 
@@ -435,6 +436,7 @@ def _toric_divisor_section_ring(category, scheme, divisor):
             ("section_scheme", scheme),
             ("section_divisor", divisor),
         ),
+        constructing_category=category,
     )
 
 

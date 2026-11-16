@@ -17,10 +17,14 @@ def test_s3_has_three_irreducible_characters_of_degrees_one_one_two() -> None:
     assert all(character(group.one()) == character.degree() for character in characters)
 
 
-def test_a_character_equals_the_character_built_from_its_class_function() -> None:
-    r"""A character is its class function: the values $(1, 1, 1)$, $(1, -1, 1)$ and $(2, 0, -1)$ of $S_3$'s irreducible characters on the classes of $1$, a transposition and a $3$-cycle determine them, so each is the character that its own class function builds.
+def test_a_character_equals_the_character_its_class_function_builds() -> None:
+    r"""The character that a character's own class function builds is that character.
 
-    Source: Fulton–Harris, *Representation Theory*, §2.3.
+    A character of $G$ is determined by its values on the conjugacy classes,
+    and its class function by its values on the classes' representatives; the
+    hash already reads those values.
+
+    Source: Milne, *Group Theory*, v4.01, Proposition 7.44, p. 116.
     """
     group = Groups.S(3)
 
@@ -33,16 +37,39 @@ def test_a_character_equals_the_character_built_from_its_class_function() -> Non
         assert hash(rebuilt) == hash(character)
 
 
-def test_characters_of_s3_are_equal_exactly_when_they_agree_on_its_elements() -> None:
-    r"""The value family on the conjugacy classes determines an ordinary character, so two irreducible characters of $S_3$ are equal exactly when they agree on every element of $S_3$."""
+def test_characters_built_by_different_routes_with_equal_values_are_equal() -> None:
+    r"""$S_3$'s trivial character and its character of degree $1$ that takes $1$ on a transposition are one character, $\chi_1 + \chi_2$ read back by ``character`` from its values is $\chi_1 + \chi_2$, and the two characters of degree $1$ are unequal since they differ on a transposition.
+
+    Source: Milne, *Group Theory*, v4.01, Proposition 7.44, p. 116.
+    """
     group = Groups.S(3)
-    characters = tuple(group.irreducible_characters())
+    transposition = next(element for element in group if element.order() == 2)
+    irreducibles = tuple(group.irreducible_characters())
+    trivial = group.trivial_character()
+    linear = next(
+        character
+        for character in irreducibles
+        if character.degree() == 1 and character(transposition) == 1
+    )
+    sign = next(
+        character
+        for character in irreducibles
+        if character.degree() == 1 and character(transposition) == -1
+    )
 
-    for left in characters:
-        for right in characters:
-            agree = all(left(element) == right(element) for element in group)
+    assert trivial == linear
+    assert linear == trivial
+    assert trivial != sign
 
-            assert (left == right) == agree
+    combined = linear + sign
+    representatives = group.conjugacy_classes_representatives()
+    written = group.character(
+        tuple(combined(representative) for representative in representatives)
+    )
+
+    assert written == combined
+    assert combined == written
+    assert written != linear
 
 
 def test_a_sum_of_two_irreducible_characters_has_exactly_those_constituents() -> None:

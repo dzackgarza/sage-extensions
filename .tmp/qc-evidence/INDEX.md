@@ -2552,3 +2552,44 @@ its own tree, its own load and the exact command in its header.
 | `541r3-review-tests.log` | `80a135c` | the three contract files of the review round with the test lint loaded: **4 passed in 7.03 s** |
 | `541r3-row-repaired.log` | `b383a80` | the row on the pushed tree at load **0.94**: first plane **306.7 s**, **26 506 planes by 516.6 s**, the ticks reading **127.98 planes/s (7.8 ms a plane)** at 486.5 s and **126.31 planes/s (7.9 ms)** at 516.6 s, peak RSS 3330 MiB; against the base's **86.4 planes/s and 11.6 ms a plane** (`541r2-row-merged-second.log`) that is +47 % planes a second and -32 % a plane, the walk's setup unchanged |
 | `541r3-consumers-base.log`, `541r3-consumers-repaired.log` | `4f540a2` / `b383a80` | the nine `tests/lattices` files that consume the primitivity decision: **9 failed, 9 passed** in 177.62 s and **8 failed, 10 passed** in 172.65 s, and `diff` of the FAILED id sets is exactly `test_a_planes_primitivity_is_decided_from_its_coordinates.sage`, the contract file that is red at the base; no other id moved |
+
+## #534: the characteristic classes of `A_{T_Co}`, decided on the form rather than by the engine's integer ring
+
+The issue reports `DiscriminantClass.is_characteristic` answering `False` for every class of
+`A_{T_Co}` because the owned value lifts are not members of Sage's `ZZ`. The lifted code is
+not the tree's: `ef8fb06` (#348, 2026-11-11) asks the membership of the module's own base ring
+and answers correctly. Every log below is at base `897e7f7` (tree `897e7f7`, adopted runtime,
+`bash .scratch/wt534_launch.sh` and `bash .scratch/wt534_pytest.sh`), and each is named by what
+it decided.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `issue534-tco-characteristic-and-the-zero-class.log` | `897e7f7` | `[h/2].is_characteristic()` **True** in 258.95 s and `zero.is_characteristic()` **False** in 145.72 s, with an independent table over all 2048 classes from the gram data on 11 generators: 0 non-integral differences for `[h/2]`, 1024 for the zero class. Its `factor 1` column is a wrong polarisation (`q(g1+g2) = 1` where `q(g1)+q(g2)+b(g1,g2) = 0`): the form's relation is `q(x+y) = q(x)+q(y)+2b(x,y)`, which the same log prints on four pairs, and the `factor 2` column is the form's |
+| `issue534-tco-class-table-and-cost.log` | `897e7f7` | the same table before the polarisation was pinned: 11 generators of order 2, `elements()` **2048 in 76.68 s**, 11 `q` evaluations 0.10 s and 11 `b` evaluations 0.30 s -- the enumeration is the cost, not the form values |
+| `issue534-value-membership-in-both-integer-rings.log` | `897e7f7` | the issue's own observation, located: for the mixed classes that give the unreduced representatives `(0)/(4)` and `(4)/(4)`, `difference in ZZ` is **True** in the session's owned integers and **False** in `sage.rings.integer_ring.ZZ`, `0` included; `q([h/2]) - b([h/2], 0) = (1)/(2)` is in neither |
+| `issue534-tco-isotropic-type-even-ordinary.log` | `897e7f7` | `get_isotropic_type(ep)` on `T_Co`: **Even ordinary** in 99.86 s, `q([ep/2]) = 0`, the divided class not characteristic -- the correct classification, since the one characteristic class `[h/2]` has `q = 1/2` |
+| `issue534-five-small-forms-exact-agreement.log` | `897e7f7` | the method against an exact pass on `<2>`, `U(2)`, `diag(2,-2)`, `I_2(2)`, `U(2)+<2>`: the same characteristic class counted in each, in 0.72--4.05 s |
+| `issue534-consuming-tests-green.log` | `897e7f7` | the two files that consume the method, `test_characteristic_discriminant_elements_archive.sage` and `test_isotropic_type_archive.sage`: **5 passed in 59.71 s**, slowest call 0.97 s |
+| `issue534-reconfirmed-on-the-push-base.log` | `c41476f` (the record correction, on `55defcb`) | the same statements on the pushed tree: `<2>`, `U(2)`, `diag(2,-2)`, `I_2(2)`, `U(2)+<2>` each give the same single characteristic class by the method and by the exact pass (0.6--1.1 s a form); `zero.is_characteristic()` **False** in 104.86 s, `[h/2].is_characteristic()` **True** in 180.51 s, `get_isotropic_type(ep)` **Even ordinary** in 194.18 s |
+## #541 round 4: the presented quotient's construction, the criterion over every PID, and the test repairs
+
+Measured on `main` `897e7f7` and on the four commits that follow it (`90d57a1`,
+`bb62b83`, `400940e`, `a6e6a31`).  Each log records its own tree, its own load and
+the exact command in its header.  The four fixes answer the review of `80a135c`
+and `de9a1d1`.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `541r4-red-contract-base.log` | `897e7f7` | the new contract file, `test_a_presented_module_is_built_before_it_computes.sage`, red at the base: **2 failed, `assert 1 == 0`** twice -- constructing a cokernel materialized one relation matrix -- and the two primitivity tests passing beside it |
+| `541r4-red-sets-base.log` | `897e7f7` | `test_a_set_is_named_or_described_and_not_both` red at the base: **1 failed, `DID NOT RAISE ValueError`** |
+| `541r4-green-final.log` | `35a5ec9` | the same five files on the tree this round pushes, rebased again onto `7752e73` (`#552`, which landed while it ran): **9 passed in 1.36 s** with the test lint loaded |
+| `541r4-green-rebased.log` | `7eef5b5` | the same five files after the rebase onto `5589af3` (`#538`'s character work): **9 passed in 1.29 s** with the test lint loaded |
+| `541r4-green-contract.log` | `bb62b83` | the five changed and new test files with the test lint loaded: **8 passed in 2.19 s** |
+| `541r4-cokernel-base.log` | `897e7f7` | one plane of `T_Co`, 6 cold spans, at load **2.65**: `inclusion.cokernel()` median **5.400 ms** (4.856..26.277); the part-by-part rows are warm reads of the same construction |
+| `541r4-cokernel-repaired.log` | `bb62b83` | the same probe at load **2.65**: `inclusion.cokernel()` median **0.145 ms** (0.136..1.432) -- the construction stores the datum and computes nothing |
+| `541r4-prim-base.log`, `541r4-prim-repaired.log` | `897e7f7` / `400940e` | `probe541prim.py` back to back at load **12.9** and **13.6**, under another session's job: `is_primitive` 5.619 ms and 10.869 ms with 2.7..77 ms spread in eight samples, `inclusion().cokernel()` 15.287 ms and 0.327 ms. The `is_primitive` pair is noise at that load and nothing is claimed from it; the cokernel pair is the same 37x reduction the load-2.65 run shows |
+| `541r4-modules-base.log`, `541r4-modules-base-rerun.log` | `897e7f7` twice | the 41 `tests/modules` files that mention a cokernel, a presentation, an invariant factor or a torsion decision: **24 failed, 80 passed, 45 errors** in 155.61 s and again in 75.81 s, with identical FAILED/ERROR id sets -- a deterministic baseline |
+| `541r4-modules-repaired.log` | `a6e6a31` | the same 41 files on the repaired tree: **24 failed, 80 passed, 45 errors** in 43.43 s, and `comm` in both directions against the base's id set is empty: no test moved |
+| `541r4-modules-subset-repaired.log` | the repair before the last two, kept for the record | the six files that the recursion and the dropped torsion placement broke in a first shape of the fix, after their repair: **6 failed, 30 passed**, every failure one of the base's own |
+| `541r4-lattices-base.log`, `541r4-lattices-repaired.log` | `897e7f7` / `a6e6a31` | the decision's consumers in `tests/lattices`: the two display/transport contract files and the primitivity file pass in both; `test_zero_isotropic_subobjects.sage` fails the same three ids in both. The repaired-tree run was killed inside `test_lattice_elements.sage` at the 260 s inner cap, at load 14 |
+| `541r4-lattice-elements-repaired.log` | `a6e6a31` | `test_lattice_elements.sage` (six tests, all passing) and `test_chosen_target_primitive_embeddings.sage`, which did not finish inside 260 s at load 21 -- the gap the commit body names |

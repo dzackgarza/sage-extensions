@@ -1,18 +1,21 @@
 r"""A finite ordered set's description is asked for when it is read, and rendered once.
 
-A set that carries a name carries a description of itself.  Rendering it is a
-reader's act, and a construction that renders it has computed a display nobody
-asked for -- so the name is a function of what the set was built from, and the
-set asks it when its description is requested.  A description of what a set was
-built from does not change while the set exists, so the set keeps the rendering:
-the second reader asks nothing either.
+A set is given a name, or a description of the source it was carved out of: two
+keywords, and a construction that states both is refused.  Rendering the
+description is a reader's act, and a construction that rendered it has computed
+a display nobody asked for -- so the description is a function, and the set asks
+it when its description is requested.  What a set was built from does not change
+while the set exists, so the set keeps the rendering: the second reader asks
+nothing either.
 """
+
+import pytest
 
 from sage_extensions.all import *  # noqa: F401,F403
 
 
 def test_a_description_is_asked_for_when_it_is_read() -> None:
-    r"""Building a named set asks its name for nothing; the first read asks once, the second asks nothing."""
+    r"""Building a described set asks its description for nothing; the first read asks once, the second asks nothing."""
     asked = []
 
     def description():
@@ -56,3 +59,18 @@ def test_an_ordered_subset_displays_the_description_its_construction_stated() ->
     displayed = below_six.__repr__()
     assert displayed == "the even numbers below six"
     assert tuple(asked) == (1,)
+
+
+def test_a_set_is_named_or_described_and_not_both() -> None:
+    r"""A construction that states a name and a description is refused.
+
+    The two keywords answer the same question -- what this set is called when it
+    is read -- so a set given both would silently lose one of them.
+    """
+    with pytest.raises(ValueError):
+        FiniteOrderedSets().from_indexed(
+            Sets.Δ[3],
+            lambda position: (2 * int(position),),
+            name="the even numbers",
+            description=lambda: "the even numbers below six",
+        )

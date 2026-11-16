@@ -1,0 +1,34 @@
+probe: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/probe541prim.py
+tree SHA: 90d57a1e3d2ec24e6698d4fe6c387e16309dde88 (modified paths: 4)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 13.56 14.63 15.37 12/602 2580232
+inner 300 s, outer 360 s, guard 6144 MiB, args ''
+
+===== the specimen =====
+T_Co: rank 11
+
+===== the pairs =====
+8 distinct isotropic pairs with vanishing pairing
+
+===== A. the span and the primitivity decision, 8 cold spans =====
+`subobject_on`            median 25.625466 ms (12.595..110.394)
+`is_primitive`            median 10.869116 ms (6.170..76.970)
+`inclusion().cokernel()`  median 0.326878 ms (0.209..11.378)
+`cokernel.is_torsion_free` median 21.074680 ms (16.370..61.401)
+answers other than primitive: []
+
+===== B. the whole constructor on the same pairs, cold =====
+`primitive_isotropic_subobject` median 13.136239 ms (9.976..21.525)
+sum of the span and the decision: 36.495 ms
+[peakrss] probe541r4: child waited=0 shell_code=0 samples=3
+[peakrss] peak tree RSS      : 300 MiB
+[peakrss] low-water MemAvail : 4680 MiB
+[peakrss] peak single VmHWM  : 300 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      288 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     4.0s procs=  3 rss=   300 MiB hwm=   300 MiB avail=  4680 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   238 MiB hwm=   238 MiB avail=  4733 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     3 MiB hwm=     3 MiB avail=  4775 MiB
+launcher exit: 0

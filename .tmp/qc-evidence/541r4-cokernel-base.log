@@ -1,0 +1,32 @@
+probe: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/wt541r4work/probe_cokernel.py
+tree SHA: 897e7f7fd45e4d4f4cfcb29b266672e9232d25ab (modified paths: 0)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 3.14 1.24 1.55 6/401 2489228
+inner 420 s, outer 480 s, guard 6144 MiB, args ''
+
+===== the specimen =====
+T_Co: rank 11
+6 isotropic pairs
+
+===== A. the quotient of a plane's inclusion, 6 cold spans =====
+`inclusion.cokernel()` median 5.400 ms (4.856..26.277)
+
+===== B. the same construction part by part (sums over the 6 spans) =====
+relation morphism of the codomain      median 0.131 ms (0.088..0.201)
+added images                           median 0.309 ms (0.275..0.368)
+rank over the fraction field           median 0.035 ms (0.028..0.084)
+engine relation submodule              median 0.239 ms (0.005..5.825)
+FGP_Module                             median 0.026 ms (0.023..0.038)
+the module construction itself         median 0.001 ms (0.001..1.829)
+[peakrss] probe541r4: child waited=0 shell_code=0 samples=3
+[peakrss] peak tree RSS      : 315 MiB
+[peakrss] low-water MemAvail : 12367 MiB
+[peakrss] peak single VmHWM  : 315 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      304 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     4.0s procs=  3 rss=   315 MiB hwm=   315 MiB avail= 12367 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   261 MiB hwm=   261 MiB avail= 12973 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     7 MiB hwm=     7 MiB avail= 12939 MiB
+launcher exit: 0
