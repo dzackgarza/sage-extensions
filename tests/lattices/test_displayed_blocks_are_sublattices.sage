@@ -38,7 +38,8 @@ def test_the_displayed_blocks_of_the_k3_gram_are_five_sublattices() -> None:
                         summands[left].inclusion()(x), summands[right].inclusion()(y)
                     ) == 0
     assert all(
-        summand.is_isometric_to(NamedLattices.U) for summand in summands[:3]
+        summands[position].is_isometric_to(NamedLattices.U)
+        for position in range(3)
     )
 
 
