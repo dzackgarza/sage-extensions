@@ -266,7 +266,7 @@ class IsotropicReductionLiftTorsors(OwnedCategoryOverBaseRing):
 
             if classes.is_empty() is True:
                 return integral_kernel, self.power_set().bottom()
-            locus = self.condition_set(in_residue)
+            locus = self.power_set().from_predicate(in_residue)
             # One admitted point decides that the subset is not empty.  Its
             # parameter class lies in C by construction, so the lift costs one
             # transvection and its integral restriction is already tested.
