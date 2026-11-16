@@ -1,0 +1,49 @@
+provider SHA: 2f8c801e73b3a4fd5dce7dfa7bfc1b97e68285f5
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+probe SHA256: 833f59c933afe6dfc41df8ca562902298b360ea6baa2afa1ad0787e493961d91
+== U+U+A1 rank 5 sig (2, 3)
+   e0 square 0, b(e0, v)=0
+   e1 square 0, b(e1, v)=1
+   e2 square 0, b(e2, v)=0
+   e3 square 0, b(e3, v)=0
+   e4 square -2, b(e4, v)=0
+   scanned in 57.8 s
+    (1, False, True) count 308 e.g. [((-3, -3, -3, -2), 10), ((-3, -3, -3, -1), 16), ((-3, -3, -3, 1), 16), ((-3, -3, -3, 2), 10)]
+    (2, False, True) count 126 e.g. [((-3, -3, -3, 0), 18), ((-3, -2, -2, -1), 6), ((-3, -2, -2, 0), 8), ((-3, -2, -2, 1), 6)]
+   refused: []
+== U+U+A1+A1 rank 6 sig (2, 4)
+   e0 square 0, b(e0, v)=0
+   e1 square 0, b(e1, v)=1
+   e2 square 0, b(e2, v)=0
+   e3 square 0, b(e3, v)=0
+   e4 square -2, b(e4, v)=0
+   e5 square -2, b(e5, v)=0
+   scanned in 98.1 s
+    (2, False, True) count 20 e.g. [((-2, -2, -1, 0, 0), 4), ((-2, -1, -2, 0, 0), 4), ((-2, 1, 2, 0, 0), 4), ((-2, 2, 1, 0, 0), 4)]
+    (3, False, True) count 180 e.g. [((-2, -2, -2, -1, -1), 4), ((-2, -2, -2, -1, 0), 6), ((-2, -2, -2, -1, 1), 4), ((-2, -2, -2, 0, -1), 6)]
+   refused: []
+== U+U+A2 rank 6 sig (2, 4)
+   e0 square 0, b(e0, v)=0
+   e1 square 0, b(e1, v)=1
+   e2 square 0, b(e2, v)=0
+   e3 square 0, b(e3, v)=0
+   e4 square -2, b(e4, v)=0
+   e5 square -2, b(e5, v)=0
+   scanned in 137.9 s
+    (2, False, True) count 80 e.g. [((-2, -2, -2, -1, -1), 6), ((-2, -2, -2, -1, 0), 6), ((-2, -2, -2, 0, -1), 6), ((-2, -2, -2, 0, 1), 6)]
+    (3, False, True) count 200 e.g. [((-2, -2, -2, -2, -1), 2), ((-2, -2, -2, -1, -2), 2), ((-2, -2, -2, -1, 1), 2), ((-2, -2, -2, 0, 0), 8)]
+   refused: []
+[peakrss] probe536: child waited=0 shell_code=0 samples=156
+[peakrss] peak tree RSS      : 500 MiB
+[peakrss] low-water MemAvail : 2291 MiB
+[peakrss] peak single VmHWM  : 500 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      488 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   261.8s procs=  3 rss=   500 MiB hwm=   500 MiB avail=  3656 MiB
+[peakrss]   t=   263.8s procs=  3 rss=   500 MiB hwm=   500 MiB avail=  3507 MiB
+[peakrss]   t=   265.8s procs=  3 rss=   500 MiB hwm=   500 MiB avail=  3297 MiB
+[peakrss]   t=   249.8s procs=  3 rss=   499 MiB hwm=   499 MiB avail=  4375 MiB
+[peakrss]   t=   251.8s procs=  3 rss=   499 MiB hwm=   499 MiB avail=  4219 MiB
+launcher exit: 0

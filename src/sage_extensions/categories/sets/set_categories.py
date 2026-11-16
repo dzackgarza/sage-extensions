@@ -656,6 +656,17 @@ def arrow_probe(domain):
     states only its endpoints, which is sound -- equal arrows still share it --
     and cannot distinguish arrows that the domain does not separate.
     """
+    held = getattr(domain, "__dict__", None)
+    if held is not None and "_arrow_hash_probe" in held:
+        return held["_arrow_hash_probe"]
+    probe = _domain_probe(domain)
+    if held is not None:
+        held["_arrow_hash_probe"] = probe
+    return probe
+
+
+def _domain_probe(domain):
+    r"""The probe :func:`arrow_probe` reads, computed once per domain object."""
     try:
         generating_set = domain.module_generating_set()
     except (AttributeError, TypeError, ValueError, NotImplementedError):
@@ -704,13 +715,13 @@ def arrow_hash(arrow) -> int:
     * equal arrows have equal values on the probe, so they share this hash;
     * arrows that the probe separates -- the points of a dual module, for
       instance, which are separated by their values on the module generators --
-      no longer collide.
+      get different hashes.
 
-    Hashing only the endpoints, as this definition once did, made every point of
-    a dual module collide: ``dict.fromkeys`` over 64 distinct points of a rank-6
-    standard lattice collapsed to one bucket, so each insertion compared the new
-    point with every extant key by arrow equality (measured at ~17 ms each, 22.9 s
-    for 64 points, and minutes at the few hundred a polyhedral cone carries).
+    Hashing only the endpoints makes every point of a dual module collide:
+    ``dict.fromkeys`` over 64 distinct points of a rank-6 standard lattice
+    collapses to one bucket, so each insertion compares the new point with every
+    extant key by arrow equality (measured at ~17 ms each, 22.9 s for 64 points,
+    and minutes at the few hundred a polyhedral cone carries).
 
     A probe that cannot be evaluated, or whose values are unhashable, leaves the
     endpoint hash in force rather than raising: an arrow of an arbitrary map may
@@ -6335,39 +6346,21 @@ type _FiniteFamilyStore = dict[int, list[tuple[IndexedFamily, Sets().ObjectType]
 def _finite_family_key(family: IndexedFamily) -> int:
     r"""The key a finite construction is interned under: its index set and its factors.
 
-    Equal families have equal index sets, which enumerate in one order, and
-    equal factors index by index; every set hashes consistently with its
-    equality (the rule of :class:`Sets`), so equal families have one key.
+    Equal families have equal index sets, which enumerate in one order, and equal
+    factors index by index; every set hashes consistently with its equality (the
+    rule of :class:`Sets`), so equal families have one key.
 
-    A factor that declares the datum naming it (``FiniteOrderedSets.from_indexed``)
-    contributes that datum and not its hash
-    (:meth:`FiniteOrderedSets.ParentMethods.declared_key`).  The datum is the
-    factor's own, two declaring factors are equal exactly when their data are, and
-    reading it costs nothing in the factor's points.  Every other factor
-    contributes its hash, which for a finite ordered set is the hash of the tuple
-    of its points, read once and kept.  So a family whose factors all declare their
-    datum is placed by its key without reading a point of any of them, at whatever
-    size; a factor that declares none is keyed as before.
+    A factor contributes its hash, and a finite ordered set's hash is the hash of
+    its point sequence, which its construction decides when it reads the points
+    and which any other set decides on the first ask.  Reading a factor's key
+    therefore reads a value the factor holds and none of its points, at whatever
+    size the factor is.  Nothing else about a factor may enter the key: a datum a
+    construction declares for itself is not the set -- two sets of one point
+    sequence would carry two data, hence two keys and two constructions for one
+    family -- and the key has to be a function of the factor's mathematics, which
+    is what its hash is.
     """
-    return hash((family.index_set(), tuple(_factor_key(factor) for factor in family)))
-
-
-def _factor_key(factor) -> tuple:
-    r"""The key one factor of a finite family contributes to the family's key.
-
-    A finite ordered set that declares the datum naming it contributes that datum;
-    every other set contributes its hash.  The tag keeps the two apart, so a
-    declared datum is never read as a hash of some other set's points, and the
-    declared datum is itself hashed because the store that holds the families is a
-    dictionary.
-    """
-    from sage_extensions.categories.sets.finite_ordered_sets import FiniteOrderedSets
-
-    if factor in FiniteOrderedSets():
-        declared = factor.declared_key()
-        if declared is not None:
-            return ("declared", declared)
-    return ("hashed", hash(factor))
+    return hash((family.index_set(), tuple(hash(factor) for factor in family)))
 
 
 def _equal_interned_family(

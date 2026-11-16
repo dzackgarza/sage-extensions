@@ -296,7 +296,7 @@ class GradedAlgebraMor(CategoricalMor):
         # Lifting preserves the identity: ``id`` is a two-sided unit in every
         # category it lives in, and composition reads that law off this mark.
         # An unmarked lift would be a fresh morphism whose equality with ``id``
-        # no selected data decides -- which is what ``id * id`` used to be.
+        # no selected data decides.
         if getattr(morphism, "_preamble_is_identity", False):
             lifted._preamble_is_identity = True
         return lifted

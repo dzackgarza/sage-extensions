@@ -2593,25 +2593,6 @@ and `de9a1d1`.
 | `541r4-modules-subset-repaired.log` | the repair before the last two, kept for the record | the six files that the recursion and the dropped torsion placement broke in a first shape of the fix, after their repair: **6 failed, 30 passed**, every failure one of the base's own |
 | `541r4-lattices-base.log`, `541r4-lattices-repaired.log` | `897e7f7` / `a6e6a31` | the decision's consumers in `tests/lattices`: the two display/transport contract files and the primitivity file pass in both; `test_zero_isotropic_subobjects.sage` fails the same three ids in both. The repaired-tree run was killed inside `test_lattice_elements.sage` at the 260 s inner cap, at load 14 |
 | `541r4-lattice-elements-repaired.log` | `a6e6a31` | `test_lattice_elements.sage` (six tests, all passing) and `test_chosen_target_primitive_embeddings.sage`, which did not finish inside 260 s at load 21 -- the gap the commit body names |
-
-## `#547`: a finite product with a large finite factor, 2026-11-16
-
-`cb05527` is the main the red test is red at.  The two commits were rebased onto
-`2b9d2cf` (`#543`, which landed while they ran) and the fix is `6c9a308` there;
-the directory and consumer rows below are that rebased pair.  Load was not
-recorded for these runs: the probe rows are a shape in the factor's size, and the
-suite rows are compared by their FAILED id sets, not by their seconds.
-
-| log | tree | result |
-| --- | --- | --- |
-| `547-probe.py` | -- | the probe: one product per row, over a factor built through the enumeration it owns, which records every position its map is asked for |
-| `547-probe-base.log` | `cb05527` | the probe without a declared key, which that tree has none of: hashing a fresh factor **14.6 / 57.2 / 226.1 ms**, and placing its product **14.6 / 55.4 / 218.9 ms**, at 2048 / 8192 / 32768 points |
-| `547-probe-fix.log` | `6c9a308` | a declaring factor places its product in **1.03 / 0.21 / 0.21 / 0.24 ms reading 0 points** at 2048 / 8192 / 32768 / 131072 (the 2048 row is the first keyed construction in the process); a non-declaring factor in **13.4 / 52.6 / 208.4 / 891.1 ms reading all of them**; a second declaration of one datum at 32768 points **0.01 ms, 0 points** |
-| `547-red.log` | `cb05527` | the new test file with the test lint loaded: **3 failed in 0.48 s**, each at `FiniteOrderedSets.from_indexed() got an unexpected keyword argument 'key'` |
-| `547-green.log` | `6c9a308` | the same file with the test lint loaded: **3 passed in 0.26 s**, no finding |
-| `547-sets-base.log` | `2b9d2cf` | `tests/sets` as one directory: **24 failed, 162 passed in 7.74 s** |
-| `547-sets-fix.log` | `6c9a308` | the same directory: **24 failed, 165 passed in 8.08 s** -- the three new tests -- with FAILED id sets identical to the base's |
-| `547-consumers-base.log`, `547-consumers-fix.log` | `2b9d2cf`, `6c9a308` | the seven product and coproduct consumers outside `tests/sets` (`objects`, `categories`, `groups`): **20 failed, 31 passed** in 2.65 s and 3.46 s, FAILED id sets identical |
 | `541rev-finding-1-red.log` | `961b68a` | the new contract file on that commit: **3 failed in 4.59 s**, each at the `from_module` torsion guard | 
 | `541rev-forms-base.log` | `9a04b45` | `tests/forms/test_torsion_forms.sage` and `tests/forms/test_discriminant_subgroups.sage`: **8 failed, 12 passed in 4.09 s** | 
 | `541rev-forms-240ce65.log` | `240ce65` | the same two files on the parent of the placement change: **5 failed, 15 passed in 4.51 s**; the three differences are the regression | 
@@ -2620,6 +2601,14 @@ suite rows are compared by their FAILED id sets, not by their seconds.
 | `541rev-finding-2-red.log` | `ae8becb` | the second contract file on the finding-1 tree: **2 failed in 1.71 s**, each at `TypeError: base_ring (=Real Field) must be a ring or a semiring` | 
 | `541rev-finding-2-green.log` | the repair's commit | the two contract files and the laziness file: **7 passed in 5.44 s** | 
 | `541rev-finding-2-probe.log` | the repair's commit | `_coordinate_images` on a projection of `RR^2` reads `((1, 0), (0, 0))` and `_relation_images(RR^2)` reads `()` -- the two answers the review's probe found at `240ce65` and lost at `2bc5aff` | 
+| `536r2-scan.log` | `2f8c801` | the walk's cell over 914 points of positive square: `U+U+A1` 434 (co-ordinates -3..3), `U+U+A1+A1` 200, `U+U+A2` 280 (-2..2): one, two or three normals, Stieltjes Gram, no cell refused |
+| `536r2-records-base.log`, `536r2-records-fix.log` | `2f8c801`, `481184c` | four layers of `cusp_layer_enumerations` at `e_2+f_2` of `U+U+A1`: the normals, duals, cell candidates and whole-lattice candidates are identical in the two trees |
+| `536r2-green-parent.log` | `2f8c801` + the test commit | the new test file with `main`'s `isotropic_orbits.py`: **2 passed in 33.88 s** |
+| `536r2-green-fix.log` | `481184c` | the same file with the repair: **2 passed in 22.13 s** |
+| `536r2-red-prewalk.log` | `5871adf`'s walk + the repair | the same file: **2 failed in 49.32 s**, each at the new refusal (`the roots through the controlling vector ... cut no cell there`), which is the walk's record of its cone being observable from the public call |
+| `536r2-chambers.log` | `481184c` | the five Vinberg-chamber files: **2 failed, 17 passed in 106.77 s**, the two failures the reviewer found at the parent (`test_hilbert_basis_of_a_nonunimodular_plane_cone_exceeds_its_rays`, `test_lorentz_plane_has_one_reflective_wall_and_orthogonal_group_of_order_four`) |
+| `536r2-image-base.log` | `2f8c801` | `test_the_isotropic_reduction_image.sage -k the_fourth_cusps_first_layers`, the call's one consumer: **1 passed in 524.76 s** |
+| `536r2-image-fix.log`, `536r2-image-segfault.log` | `481184c` | the same test: reached the host's ten-minute ceiling twice (540 s and 560 s inner) without finishing; the third run segfaulted in `element()` converting a whole-lattice candidate at layer 1, under `ring_foundation._neg_` / `framed_free_modules._neg_`, a frame the repair does not touch |
 
 ## #521, the session binds its own names, and the dialect reads them
 
@@ -2701,3 +2690,32 @@ tree therefore names the commit before it.
 | `535-r3-heavy-stable-line.log` | the gate's fix commit | the two stable-line-orbit row files, `U(2) + <-6>` and `T_Co`: **2 passed in 1073.83 s (0:17:53)**. |
 | `535-r3-lint.log` | the gate's fix commit | the test lint on the five touched test files: **5 files, 0 findings**. |
 | `535-r3-docs.log` | the docs commit | the four files the round's docstrings name, after the docstring pass: **14 passed in 51.27 s**. |
+
+The same runs on the commit this round pushed (`main` at `39c2bed`), after the last
+rebase onto `8c4f5ba`:
+
+| log | result |
+| --- | --- |
+| `535-r3-main-consumers.log` | the ten consuming files: **42 passed, 2 failed in 71.95 s** |
+| `535-r3-main-owner-contracts.log` | `tests/lattices/test_lattice_database_owner_contracts.sage`: **11 passed, 1 failed in 119.95 s** |
+| `535-r3-main-lint.log` | the five touched test files: **5 files, 0 findings** |
+| `535-r3-main-heavy.log` | the two stable-line-orbit row files, `U(2) + <-6>` and `T_Co`: **2 passed in 1156.96 s (0:19:16)** |
+| `535-r3-main-base.log` | the three ids above on `8c4f5ba` without this branch's commits: **3 failed, 1 passed in 16.00 s**, the same ids |
+| `535-r3-main-docs.log` | `test_integral_hyperbolic_index_is_owned_by_the_lattice` after the docstring pass: **1 failed in 14.84 s**, the same pre-existing id |
+| `536r2-rebased.log` | `4944d38` after the last rebase onto `7f36d57` | the new file and the five Vinberg-chamber files together: **2 failed, 19 passed in 52.33 s**, the two failures the same pre-existing ids |
+| `536r2-rebased-90e3356.log` | `56cd171` after the rebase onto `90e3356` | the new file and the five Vinberg-chamber files: **2 failed, 19 passed in 141.09 s**, the same two pre-existing ids; this is the tree the round pushed |
+| `525-r2-base-engineering.log` | `7f36d57` | `tests/engineering` without this round, the commit it is rebased onto: **11 failed, 14 passed in 147.84 s**.  The eleven are the two `test_polyhedral_engine_routes.sage` ids, the eight `test_the_timing_record_names_each_stage.py` ids, and `test_no_source_file_names_an_issue_number.py::test_no_source_file_names_an_issue_number`, which is red on the base tree's own `src/` -- and red for the second reason the review gave: it runs `git ls-files`, which exits 128 here too. |
+| `525-r2-base-race.log` | `7f36d57`, an earlier pass of the same command | **12 failed, 13 passed in 40.36 s**: the eleven above and, newly red, `test_the_incidence_row_reports_a_broken_contract_apart_from_an_undecided_row.py::test_a_broken_contract_is_reported_apart_from_an_undecided_row`.  That id is a race and not a state: the driver's row step is called under a `0.01` s cap, and when the cap has not expired before the driver's first `stage()` the call reaches `timing.current_commit()`, whose `git -C <tree> rev-parse HEAD` exits 128 in a worktree mount.  Run alone it is **2 passed in 9.63 s**, and the later directory pass above is green on it. |
+| `525-r2-fix-engineering.log` | `5812648` | the same directory with this round: **10 failed, 13 passed in 55.26 s**.  The FAILED ids are the base's eleven minus the scan's, one for one; the scan's file and its two tests are gone, so the base collects twenty-five and this tree twenty-three. |
+| `525-r2-greps.log` | `5812648`, with `7f36d57` for the contrast | the contract's greps, each with its full output rather than a count: the number sign 0, the issue spelling in a path 0 (**17 at the base**), the word `issue` 0 (**18 at the base**), the `.tmp` run-log pointers 0, the `results/` notes 0.  The history vocabulary is printed line by line, so each remaining match can be read: they are the instrumental `used to build` and the engine's `may advertise`. |
+| `525-r2-import.log` | `5812648` | every edited module imports in the pinned image: `sage_extensions.all` and the eight modules whose prose changed, 677 public names, exit 0. |
+#541, round 5. The runs of this round name the commit they were taken on inside
+each log, and every one was made in the adopted runtime with the worktree at
+`/work` and `PYTHONPATH` carrying the port copy.
+| log | commit | result |
+| `541r5-red-torsion-placement.log` | `2f2fcad` (this round's base) plus the round's two test files | the new file and the rewritten claim file: **3 failed, 4 passed in 8.14 s**; the three failures are the placement refined from a computed `is_torsion()`, the torsion-form constructor refuting the claim it was asked to store, and the claim's validator answering on a module that claimed nothing |
+| `541r5-green-torsion-placement.log` | the round's fix commits | the five affected files: **15 passed in 10.60 s** |
+| `541r5-probe-base-placement.log` | `08322de` | a fresh `coker(5)` formed without a claim is in `FormModules(ZZ).FinitelyPresented().Torsion()`, and its construction costs 4 units of work, as does the claimed one |
+| `541r5-probe-presented-construction.log` | the round's fix commits | cokernels over `ZZ` and `QQ`, a lattice plane quotient, a claimed torsion module with its elements, and `direct_sum_of_cyclics((2,3))` after the dead constructor parameters were deleted |
+| `541r5-probe-matrix-space-containment.log` | the round's fix commits | a lattice inclusion's homset is **not** in `MatrixSpaces(ZZ)` while it does retain a coordinate matrix, so `MatrixSpaces` containment is not the discriminator finding F asks for |
+| `541r5-rebased.log` | the same five files after the rebase onto `bbb0dd6`; the tree SHA it ran on is the first line of the log | **15 passed in 93.95 s** |

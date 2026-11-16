@@ -280,10 +280,6 @@ def _chosen_restriction_presentation(algebra, extension_ring, base_ring):
         relation_value,
         name="Restricted-algebra defining relations",
     )
-    # Private finite backend serialization required by Sage's ideal constructor.
-    presentation_ideal = presentation_engine.ideal(
-        [_engine_element(presentation_ring, relation) for relation in selected_relations]
-    )
 
     structure_map = algebra.algebra_structure_morphism()
 
@@ -313,7 +309,6 @@ def _chosen_restriction_presentation(algebra, extension_ring, base_ring):
         combined_labels,
         presentation_ring,
         selected_relations,
-        presentation_ideal,
         generator_value,
         lift_to_presentation,
         extension_labels,
@@ -426,7 +421,6 @@ def _restrict_algebra_scalars(algebra, ring_map):
             labels,
             presentation_ring,
             selected_relations,
-            presentation_ideal,
             generator_values,
             lift_to_presentation,
             restricted_scalar_labels,
@@ -467,7 +461,6 @@ def _restrict_algebra_scalars(algebra, ring_map):
             restricted,
             presentation_ring,
             selected_relations,
-            presentation_ideal,
             lambda element: lift_to_presentation(
                 module(restricted(element)).underlying_element()
             ),

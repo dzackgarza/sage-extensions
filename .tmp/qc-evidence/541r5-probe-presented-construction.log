@@ -1,0 +1,29 @@
+probe: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/probe541r5i.py
+tree SHA: 31dc5953e4bf29c20a2f220667c453df0e85d8a8 (modified paths: 1)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 20.64 16.57 16.01 24/914 2881734
+inner 300 s, outer 330 s, guard 6144 MiB, args ''
+cokernel: Finitely presented module on 2 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 2, 1 ↦ 2]
+invariant factors: Invariant-factor family: [0 ↦ 2, 1 ↦ 2]
+cardinality: 4
+is_torsion_free: False
+plane quotient factors: Invariant-factor family: [0 ↦ 0, 1 ↦ 0]
+claimed torsion module: Finitely presented module on 1 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 3] 3
+its elements: (0, [0], 2*[0])
+direct sum of cyclics: 6
+restriction of scalars over Z in Q:
+QQ cokernel: Invariant-factor family: []
+[peakrss] probe541r5i: child waited=0 shell_code=0 samples=8
+[peakrss] peak tree RSS      : 222 MiB
+[peakrss] low-water MemAvail : 1881 MiB
+[peakrss] peak single VmHWM  : 229 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      219 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    14.1s procs=  3 rss=   222 MiB hwm=   229 MiB avail=  3134 MiB
+[peakrss]   t=    12.1s procs=  3 rss=   218 MiB hwm=   224 MiB avail=  3149 MiB
+[peakrss]   t=    10.1s procs=  3 rss=   189 MiB hwm=   195 MiB avail=  3224 MiB
+[peakrss]   t=     8.1s procs=  3 rss=   173 MiB hwm=   179 MiB avail=  1881 MiB
+[peakrss]   t=     6.0s procs=  3 rss=   144 MiB hwm=   160 MiB avail=  2084 MiB
+launcher exit: 0

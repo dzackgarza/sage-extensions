@@ -68,7 +68,6 @@ from sage_extensions.categories.sets.set_categories import (
 )
 from sage_extensions.logic import AtomicProposition, conjunction, negation
 from sage_extensions.owned_category import _object_of
-from sage_extensions.validation import validator
 
 
 def _canonical_pid_associate(ring, element):
@@ -330,7 +329,7 @@ def _fix_lazy_selected_module_presentation(
     )
 
 
-def _fix_lazy_cokernel_presentation(module, base_ring, presentation_factory, cokernel_morphism=None) -> None:
+def _fix_lazy_cokernel_presentation(module, base_ring, presentation_factory, labels, cokernel_morphism=None) -> None:
     r"""Fix the finite presentation of a cokernel before its arrow exists.
 
     The defining datum of ``coker(rho)`` is ``rho``, which the construction
@@ -339,13 +338,20 @@ def _fix_lazy_cokernel_presentation(module, base_ring, presentation_factory, cok
     of the chosen module resolution (``AGENTS.md``, "Construction is instant").
     The cokernel morphism itself is retained now, because it is supplied now.
 
+    The chosen generating set is the codomain's framing, which the construction
+    also holds now.  It is registered with the pending resolution as ``labels``,
+    with the rule that reads one generator off the cover, so asking the cokernel
+    for its generators does not build the presentation either.
+
     The module is its own generator target: the selected generating set is its
     chosen framing and the generator morphism sends the labels to those
     generators, so both are the module's own data rather than a second record.
     """
     resolution_category = Modules(base_ring).FinitelyPresented().resolution_category()
     module._selected_module_presentation = _SelectedModulePresentationBackend(cokernel_morphism)
-    labels = module.module_generating_set()
+
+    def generator_function(label):
+        return module._cover_generator(int(labels.ranking_map()(label)))
 
     def selected_resolution():
         from sage_extensions.categories.modules.module_morphisms.module_morphisms import (
@@ -356,9 +362,7 @@ def _fix_lazy_cokernel_presentation(module, base_ring, presentation_factory, cok
         # The generators of the cokernel are the classes of the cover's basis
         # vectors; asking the module for ``module_generator`` would read the
         # chosen resolution this line is building.
-        generator_morphism = Sets().Mor(labels, module)(
-            lambda label: module._cover_generator(int(labels.ranking_map()(label)))
-        )
+        generator_morphism = Sets().Mor(labels, module)(generator_function)
         augmentation = _framing_morphism(
             module,
             presentation.codomain(),
@@ -377,6 +381,8 @@ def _fix_lazy_cokernel_presentation(module, base_ring, presentation_factory, cok
         Modules(base_ring),
         selected_resolution,
         replace=True,
+        generating_set=labels,
+        generator_function=generator_function,
     )
 
 
@@ -448,6 +454,7 @@ class _SelectedFinitePresentationModules(OwnedCategoryOverBaseRing):
                         self,
                         rest["base_ring"],
                         presentation_factory,
+                        rest["module_generating_set"],
                         cokernel_morphism,
                     )
 
@@ -1996,25 +2003,18 @@ class _GeneralPresentedElement(ModuleElement):
 class _GeneralPresentedModule:
     r"""A presented module over a ring with no Smith engine.
 
-    ``free_module`` is the cover and ``relation_submodule`` the relation
-    module inside it: Sage objects over the engine ring when the base ring
-    has a Sage engine, else the owned free cover and ``None``.  Both are
-    private; the category states the mathematics.
-
-    A construction that holds one of them stores it now; one that does not
-    leaves the attribute to the class, which builds it from the selected
-    presentation on the first request that needs it, and keeps it.  Constructing
-    such a module therefore computes nothing (``AGENTS.md``, "Construction is
-    instant").  The three are separate requests because realizing the
-    presentation itself constructs a framing morphism, whose Mor category asks
-    this module for its zero element; the cover answers that without the
-    relation matrix.
+    The cover, the relation submodule inside it and the Smith engine are private
+    requests of this realization: Sage objects over the engine ring when the base
+    ring has a Sage engine, else the owned free cover and ``None``.  Each is built
+    from the selected presentation on the first request that needs it, and kept,
+    so constructing such a module computes nothing (``AGENTS.md``, "Construction
+    is instant").  They are separate requests because realizing the presentation
+    itself constructs a framing morphism, whose Mor category asks this module for
+    its zero element; the cover answers that without the relation matrix.
     """
 
     def __init__(
         self,
-        free_module=None,
-        relation_submodule=None,
         *,
         base_ring,
         module_generating_set,
@@ -2025,10 +2025,6 @@ class _GeneralPresentedModule:
     ) -> None:
         self._presented_framing_source = presentation.codomain() if framing_source is None else framing_source
         self._presented_module_generating_set = module_generating_set
-        if free_module is not None:
-            self._free_module = free_module
-        if relation_submodule is not None:
-            self._relation_submodule = relation_submodule
         self._lifted_relation_free_module = None
         self._lifted_relation_submodule = None
         super().__init__(
@@ -2061,56 +2057,9 @@ class _GeneralPresentedModule:
         """
         return self._presented_module_generating_set
 
-    @validator
-    def validate_torsion_claim(self) -> None:
-        r"""Refute a claimed torsion placement whose relation morphism leaves a free summand.
-
-        ``Modules(R).FinitelyPresented().Torsion()(rho)`` is the caller's claim
-        (``CAT-04``).  Over a principal ideal domain ``coker(rho)`` is torsion
-        exactly when the relation morphism becomes surjective over the fraction
-        field, and scalar extension preserves the rank of this exact relation
-        matrix.
-
-        This is a validator, not part of any computation: the claim's
-        construction passes its own ``check`` argument, which is ``False`` by
-        default, so the refutation runs only when a caller asks for it or under
-        strict checking (``OWN-22``).  It reads the presentation, and therefore
-        builds it when it runs.
-        """
-        from sage.matrix.constructor import matrix
-
-        ring = self.base_ring()
-        presentation = self.presentation()
-        width = int(presentation.codomain().module_generating_set().cardinality())
-        relation_images = _relation_images(self)
-        field = ring.fraction_field_map().codomain()
-        relations = matrix(
-            _engine_ring(ring),
-            len(relation_images),
-            width,
-            [
-                _engine_element(ring, coefficient)
-                for image in relation_images
-                for coefficient in image
-            ],
-        )
-        match int(relations.change_ring(_engine_ring(field)).rank()) == width:
-            case True:
-                pass
-            case False:
-                raise ValueError(
-                    f"{self} is claimed to be a torsion {ring}-module, but its relation matrix "
-                    "does not have full rank over the fraction field: the cokernel has a nonzero "
-                    "free summand"
-                )
-
     @lazy_attribute
     def _free_module(self):
-        r"""The engine cover of the presentation, built on the first request.
-
-        A construction that supplied the cover stored it under this name, so the
-        class attribute answers only when nothing was supplied.
-        """
+        r"""The engine cover of the presentation, built on the first request."""
         return _engine_cover_of_presentation(self)
 
     @lazy_attribute
@@ -2485,21 +2434,14 @@ class _PresentedModule(_GeneralPresentedModule):
 
     def __init__(
         self,
-        engine=None,
         *,
-        free_module=None,
-        relation_submodule=None,
         base_ring,
         module_generating_set,
         presentation=None,
         cokernel_morphism=None,
         **rest,
     ) -> None:
-        if engine is not None:
-            self._pid_engine = engine
         super().__init__(
-            free_module,
-            relation_submodule,
             base_ring=base_ring,
             module_generating_set=module_generating_set,
             presentation=presentation,
@@ -2509,12 +2451,7 @@ class _PresentedModule(_GeneralPresentedModule):
 
     @lazy_attribute
     def _pid_engine(self):
-        r"""Sage's FGP module over the engine ring, built on the first request.
-
-        A construction that supplied the workspace stored it under this name;
-        otherwise the model is built here, from the presentation's relation
-        matrix.
-        """
+        r"""Sage's FGP module over the engine ring, built from the presentation."""
         return _smith_engine_of_presentation(self)
 
     def _smith_engine(self):
@@ -2635,13 +2572,10 @@ def _smith_engine_of_presentation(module):
 
 def _new_presented_module(
     *,
-    free_module=None,
-    relation_submodule=None,
     base_ring,
     module_generating_set,
     presentation=None,
     presentation_factory=None,
-    engine=None,
     framing_source=None,
     cokernel_morphism=None,
     subobject_ambient=None,
@@ -2657,16 +2591,12 @@ def _new_presented_module(
     if base_ring in OwnedFields():
         categories.append(VectorSpaces(base_ring))
     data = {
-        "free_module": free_module,
-        "relation_submodule": relation_submodule,
         "base_ring": base_ring,
         "module_generating_set": module_generating_set,
         "presentation": presentation,
         "presentation_factory": presentation_factory,
         "cokernel_morphism": cokernel_morphism,
     }
-    if engine is not None:
-        data["engine"] = engine
     if framing_source is not None:
         data["framing_source"] = framing_source
     if subobject_ambient is not None or subobject_inclusion_factory is not None:
@@ -3575,8 +3505,9 @@ def _presented_module_from_morphism(
     property of the cokernel: a caller that claims torsion passes
     ``Modules(R).FinitelyPresented().Torsion()``, and that constructor is the
     claim (``CAT-04``: placement is made by the construction that states it,
-    never justified by an implementation's answer).  ``validate_torsion_claim``
-    refutes a false claim when a caller asks it to.
+    never justified by an implementation's answer).  The claim's validator
+    ``validate_torsion_claim`` lives on that refinement and refutes a false
+    claim when a caller asks it to.
 
     The ``LocalizationRings`` route is the one exception, because it returns a
     module localized from a presentation over the source ring: that source

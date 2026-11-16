@@ -435,6 +435,17 @@ class PerfectDomainOrbitAdjacency(SageObject):
     def neighbor_to_target(self):
         return ~self.target_to_neighbor()
 
+    def __hash__(self) -> int:
+        r"""Hash by identity, which is what equality compares.
+
+        The adjacency defines no equality of its own, so two adjacencies are
+        equal exactly when they are the same object.  ``SageObject`` declares
+        its instances unhashable; a finite ordered set of adjacencies hashes
+        its points, so the record states the hash that agrees with its
+        equality.
+        """
+        return object.__hash__(self)
+
 
 class LorentzianPerfectDomainTraversal(SageObject):
     r"""A completed orbit traversal of Lorentzian perfect domains.

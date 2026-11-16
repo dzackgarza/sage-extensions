@@ -10,15 +10,13 @@ Two counts say so, and both are needed.  The construction realizes no chosen
 resolution -- that realization is where the arrow's Mor re-wrap, the relation
 images, the lifts of the added images and the fraction-field rank run -- and
 materializes no engine matrix.  A construction that computes through either is
-red.  The first test also runs its first request inside the same instrument and
-requires a count: otherwise the instrument never fired and a zero answers
-nothing.
+red.
 
-The second specimen's quotient is a cached object that other tests in the same
-session also read, so its count after the fact is not evidence about the
-instrument; it asserts the construction's zero and the mathematics only.  The
-liveness assertion is the first test's, and that cokernel is built on a fresh
-morphism every run.
+Each specimen also runs its first request inside the same instrument and
+requires a count: without that, a zero would answer nothing, and a cokernel read
+from another test's cache would pass the construction's count without having
+constructed anything.  Each specimen therefore names its own datum, so the
+morphism it cokernels is one no other test holds.
 
 Over $Z$, $\rho = 2 \cdot 1 \colon Z^2 \to Z^2$ has cokernel
 $Z/2 \oplus Z/2$: two invariant factors $2$, cardinality four, not torsion-free.
@@ -51,18 +49,20 @@ def test_a_plane_inclusions_quotient_is_built_before_it_is_asked() -> None:
     r"""The cokernel of a primitive plane's inclusion, built before it is read.
 
     $U \oplus U$ has basis $e_1, f_1, e_2, f_2$ with $b(e_i, f_i) = 1$, and the
-    span of $e_1$ and $f_2$ is saturated, so its quotient is free of rank two:
-    every invariant factor is $0$.
+    span of $f_2$ and $e_1$ is saturated, so its quotient is free of rank two:
+    every invariant factor is $0$.  Naming the two generators in that order
+    states the plane this specimen owns.
     """
     lattice = Lattices(ZZ)("U") + Lattices(ZZ)("U")
     e1, f1, e2, f2 = lattice.module_generators()
-    inclusion = lattice.subobject_on((e1, f2)).inclusion()
+    inclusion = lattice.subobject_on((f2, e1)).inclusion()
 
-    quotient, constructed, _requested = construction_work_of(
+    quotient, constructed, requested = construction_work_of(
         inclusion.cokernel,
         lambda module: module.invariant_factors(),
     )
 
     assert constructed == 0
+    assert requested > 0
     assert quotient.is_torsion_free() is True
     assert tuple(quotient.invariant_factors()) == (ZZ(0), ZZ(0))

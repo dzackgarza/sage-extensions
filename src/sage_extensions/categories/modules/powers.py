@@ -587,8 +587,7 @@ class QuadraticModuleMor(ModuleMor):
         # quadratic reading below consumes a *quadratic lift*: values indexed by
         # the square of the source framing.  A dict is never that datum, and
         # reading one as such iterates its keys -- the generator labels -- and
-        # coerces each label into the codomain, which is where a presented or
-        # multiset-framed module's matrix construction used to die.
+        # coerces each label into the codomain.
         if isinstance(datum, dict):
             return ModuleMor._element_constructor_(self, datum)
 

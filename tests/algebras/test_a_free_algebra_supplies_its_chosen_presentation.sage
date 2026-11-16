@@ -54,6 +54,30 @@ def test_the_free_semigroup_algebra_supplies_its_frame_and_no_relations() -> Non
     assert algebra.lift_to_presentation(x * y) == x * y
 
 
+def test_a_free_algebra_is_built_with_its_frame_and_presents_it_on_request() -> None:
+    r"""A free algebra is constructed with its frame, not with a presentation.
+
+    ``Free(S) -> A`` is a length-zero free resolution (``CAT-29``): construction
+    fixes that frame and nothing finer.  The chosen finite presentation is the
+    same datum read the other way -- ``A`` presented on itself by ``S`` with no
+    relations -- so it is realized from the frame when it is asked for, and the
+    algebra then carries it as its selected resolution.
+    """
+    algebra = QQ["s549, t549"]
+    frame = algebra.selected_algebra_resolution()
+
+    assert frame.truncation() == 0
+    assert frame.level(0) is algebra
+    assert frame.generating_set() is algebra.algebra_generating_set()
+
+    presentation = algebra.selected_algebra_presentation()
+
+    assert presentation.truncation() == 1
+    assert algebra.selected_algebra_resolution() is presentation
+    assert presentation.generating_set() is frame.generating_set()
+    assert presentation.relations().index_set().cardinality() == 0
+
+
 def test_the_tensor_algebra_supplies_its_frame_and_no_relations() -> None:
     r"""The free associative algebra presents on itself, not on a commutative model."""
     algebra = Modules(QQ).free_module(("a", "b")).tensor_algebra()

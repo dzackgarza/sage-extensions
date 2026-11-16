@@ -320,6 +320,26 @@ class MultiplicativeAlgebraMor(CategoricalMor):
             )
         return self.element_class(self, datum)
 
+    def _from_constructed_element_map(self, evaluator, *, linearity_premises=()):
+        r"""Construct an algebra map from its defining callable.
+
+        The root algebra Mor's datum is the ``R``-linear map, and its one law --
+        multiplicativity -- is thereafter the equation between the two maps out
+        of the tensor square, asked of the module Mor and carried as the arrow's
+        stated hypothesis when that equation is not decided (``CON-16``,
+        ``CON-17``).  A construction supplies the callable and the linear maps
+        whose linearity it follows from, so the element is constructed here and
+        not as a whole module arrow rebuilt at a foreign site.
+        """
+        linearity_premises = tuple(linearity_premises)
+        linear = (
+            self.domain()
+            .module_category()
+            .Mor(self.domain(), self.codomain())
+            ._from_constructed_element_map(evaluator, premises=linearity_premises)
+        )
+        return self.element_class(self, linear)
+
     @object_level
     @cached_method
     def identity(self):
@@ -1001,17 +1021,16 @@ def _install_selected_algebra_generators(
 
 
 class _SelectedFiniteAlgebraPresentationBackend:
-    r"""Computational data derived from one selected finite algebra resolution."""
+    r"""Computational data retained beside one selected finite algebra resolution.
 
-    def __init__(
-        self, presentation_ideal, lift_to_presentation, cover_map=None
-    ) -> None:
-        self._presentation_ideal = presentation_ideal
+    The presentation ideal is not among them: it is the kernel of the
+    quotient map, and ``AlgebrasWithChosenFinitePresentation.presentation_ideal``
+    computes it from the selected presentation when it is asked for.
+    """
+
+    def __init__(self, lift_to_presentation, cover_map=None) -> None:
         self._lift_to_presentation = lift_to_presentation
         self._cover_map = cover_map
-
-    def presentation_ideal(self):
-        return self._presentation_ideal
 
     def lift(self, element):
         return self._lift_to_presentation(element)
@@ -1024,13 +1043,11 @@ def _fix_selected_algebra_presentation(
     algebra,
     presentation_ring,
     relations,
-    presentation_ideal,
     lift_to_presentation,
     *,
     presentation_cover_map=None,
-    framing=None,
 ) -> None:
-    r"""Promote a selected finite presentation in its actual algebra theory.
+    r"""Fix the selected finite presentation of ``algebra`` on ``presentation_ring``.
 
     A polynomial presentation on several variables has a commutative free
     degree one. Its degeneracy cannot send commuting variables to distinct
@@ -1040,55 +1057,40 @@ def _fix_selected_algebra_presentation(
     The supplying constructors fix a free presentation on these actual
     labels; projectivity alone would not justify this generator inclusion.
 
-    ``framing`` is the degree-zero data of a caller that has just fixed this
-    algebra's framing itself — its generating label set, its generator
-    morphism and the factory for its augmentation. Those are the facts the
-    checks below read, so supplying them keeps the presentation's data fixed at
-    construction while its realization stays delayed; a constructor that
-    realizes the framing to read them back builds the algebra's identity Mor
-    and its degree-zero resolution for an algebra that may never ask
-    (``OWN-23``).
+    The degree-zero facts are the algebra's framing: its selected resolution in
+    degree zero is the free algebra ``presentation_ring`` on the label set the
+    presentation is stated on, with the generator morphism and the augmentation
+    that frame it.  They are read here rather than restated by the caller, so an
+    algebra has one framing and one presentation on it (``OWN-19``).
 
     The chosen labels are registered with the delayed presentation, so reading
-    the algebra's generating set does not realize the resolution: a free
-    algebra presents itself, and realizing it would ask that same algebra for
-    the generating set that is defining its replacement.
+    the algebra's generating set does not realize the resolution: an algebra
+    presented on itself would otherwise ask itself for the generating set that
+    is defining its presentation.
     """
     owner = algebra.algebra_framing_owner()
-    match framing:
-        case None:
-            degree_zero = algebra.selected_algebra_resolution()
-            match degree_zero.truncation():
-                case 0:
-                    pass
-                case _:
-                    raise ValueError(
-                        f"{algebra} already carries a selected algebra resolution through degree "
-                        f"{degree_zero.truncation()}; its finite presentation cannot be fixed a second time"
-                    )
-            match degree_zero.level(0) is presentation_ring:
-                case False:
-                    raise ValueError(
-                        f"the selected presentation of {algebra} is on {presentation_ring}, but its "
-                        f"degree-zero free algebra is {degree_zero.level(0)}"
-                    )
-                case True:
-                    pass
-            labels = degree_zero.generating_set()
-            presentation_generator_morphism = degree_zero.generator_morphism()
+    degree_zero = algebra.selected_algebra_resolution()
+    match degree_zero.truncation():
+        case 0:
+            pass
+        case _:
+            raise ValueError(
+                f"{algebra} already carries a selected algebra resolution through degree "
+                f"{degree_zero.truncation()}; its finite presentation cannot be fixed a second time"
+            )
+    match degree_zero.level(0) is presentation_ring:
+        case False:
+            raise ValueError(
+                f"the selected presentation of {algebra} is on {presentation_ring}, but its "
+                f"degree-zero free algebra is {degree_zero.level(0)}"
+            )
+        case True:
+            pass
+    labels = degree_zero.generating_set()
+    presentation_generator_morphism = degree_zero.generator_morphism()
 
-            def presentation_augmentation():
-                return degree_zero.augmentation()
-
-        case (label_set, generator_morphism, augmentation):
-            # The caller states the degree-zero framing it has just retained:
-            # this label set, this generator morphism, and an augmentation it
-            # builds on request.  Nothing is realized here.
-            labels = label_set
-            presentation_generator_morphism = generator_morphism
-
-            def presentation_augmentation():
-                return augmentation(algebra)
+    def presentation_augmentation():
+        return degree_zero.augmentation()
 
     if labels.is_finite() is not True or relations.index_set().is_finite() is not True:
         raise NotImplementedError(
@@ -1134,13 +1136,11 @@ def _fix_selected_algebra_presentation(
         relation_source = relation_factory()
         match presentation_ring is algebra:
             case True:
-                # An algebra presented on itself is free on the chosen
-                # generators, so its presentation has no relation to carry and
-                # its degree-one level is the algebra itself: the two faces and
-                # the degeneracy are the augmentation, which for a free algebra
-                # is its identity (``CAT-29``).  Tagging a second copy of the
-                # algebra on ``("generator", label)`` would build the algebra
-                # twice to state that it has no relations.
+                # An algebra presented on itself is free on its chosen
+                # generators, so its presentation has no relation level and
+                # degree one is the algebra itself: both faces and the
+                # degeneracy are the augmentation, which for a free algebra is
+                # its identity (``CAT-29``).
                 assert tuple(relation_labels) == (), (
                     f"the presentation of {algebra} on itself has no relation level, "
                     f"but it retains {relations}"
@@ -1208,7 +1208,6 @@ def _fix_selected_algebra_presentation(
     )
     algebra._selected_algebra_presentation_backend = (
         _SelectedFiniteAlgebraPresentationBackend(
-            presentation_ideal,
             lift_to_presentation,
             presentation_cover_map,
         )
@@ -2136,8 +2135,7 @@ class Algebras(OwnedCategoryOverBaseRing):
             The assignment is fixing data of the algebra's framing, retained
             with the resolution when the framing is fixed, so reading it does
             not realize the resolution: for a presented algebra that would
-            build the presentation's two levels to return one generator.  A
-            resolution that registered no assignment is realized here instead.
+            build the presentation's two levels to return one generator.
             """
             return self.selected_resolution_generator(
                 self.algebra_framing_owner(), label
@@ -2247,7 +2245,11 @@ class Algebras(OwnedCategoryOverBaseRing):
             selected finite module centre; the richer computation above has
             precedence when that module datum is present.
 
-            This supplies Magmas' ``_center_construction`` contract. The
+            This supplies Magmas' ``_center_construction`` contract, whose pair
+            is the centre and its exact inclusion.  Each route returns its own
+            pair: the two module computations delegate to ``_center_algebra``,
+            which owns the centre's product, its unit and the inclusion that
+            makes both of them, so no route rebuilds that arrow here.  The
             bracket-zero centre of a Lie algebra is a different construction,
             available through ``lie_center``.
             """
@@ -2261,7 +2263,7 @@ class Algebras(OwnedCategoryOverBaseRing):
                 case _ if (
                     self in GroupAlgebras(ring) and self.group() in FiniteGroups()
                 ):
-                    center = self._finite_group_algebra_center()
+                    return self._finite_group_algebra_center()
                 case _ if (
                     self.has_selected_module_resolution()
                     and self.module_generating_set().cardinality().is_finite()
@@ -2323,7 +2325,7 @@ class Algebras(OwnedCategoryOverBaseRing):
                             itertools.product(labels, repeat=2),
                             submodule,
                         )
-                    center = _center_algebra(self, submodule)
+                    return _center_algebra(self, submodule)
                 case _ if (
                     self in Algebras(ring).Associative().Unital()
                     and self.is_framed_algebra()
@@ -2346,34 +2348,6 @@ class Algebras(OwnedCategoryOverBaseRing):
                         "an associative unital algebra can also use a finite chosen algebra "
                         "generating family for its predicate ring centre"
                     )
-            submodule = center.unformed_module()
-            inclusion = submodule.inclusion()
-            linear_inclusion = (
-                center.module_category()
-                .Mor(center, self)
-                ._from_constructed_element_map(
-                    lambda element: inclusion(submodule(element)),
-                    premises=(inclusion,),
-                )
-            )
-            # `_center_algebra` defines the centre's multiplication as the
-            # ambient product read back along `inclusion`, and its unit as
-            # `inclusion.lift(1)`, so that module inclusion is multiplicative
-            # and unit preserving by construction.  Those are the premises the
-            # arrow carries; a whole module arrow is not itself an arrow of an
-            # algebra Mor (CON-17), so the map enters at the algebra arrow type.
-            unital = Algebras(ring).Associative().Unital()
-            match (center in unital, self in unital):
-                case (True, True):
-                    arrows = unital.Mor(center, self)
-                    return center, arrows.element_class(
-                        arrows,
-                        linear_inclusion,
-                        _construction_premises=((inclusion,), (True, True)),
-                    )
-                case _:
-                    arrows = Algebras(ring).Mor(center, self)
-                    return center, arrows.element_class(arrows, linear_inclusion)
 
         def _quotient_by_algebra_elements(self, elements):
             r"""Return the quotient by the generated algebra ideal and its map.
@@ -3450,16 +3424,33 @@ def _algebra_on_module(
 
 
 def _center_algebra(algebra, submodule):
-    r"""Build the induced algebra on a submodule known to be the magma centre.
+    r"""Build the induced algebra on a submodule known to be the magma centre, with its inclusion.
 
     The commutant intersected with the nucleus is a commutative associative
     subalgebra, even when the ambient algebra is not associative, and it
     contains any two-sided unit. Its multiplication is the ambient product
     read back along the injective inclusion, so ``lift`` recovers each
     product. Associativity here follows from the centre's nucleus equations.
+
+    This function owns both halves of Magmas' ``_center_construction``
+    contract: the centre and its inclusion, an arrow of the unital algebra Mor
+    when the ambient algebra is associative and unital and of the root algebra
+    Mor otherwise.  The module inclusion is an algebra map *by construction* --
+    the product above is the ambient product read back along it and the unit is
+    its lift of ``1`` -- so its two laws are the definition of that
+    construction, retained as the arrow's premises (``OWN-22``) rather than
+    re-derived: deciding them on the centre's module generators costs one
+    coordinate solve per pair (25 class-sum pairs of ``QQ[S_4]``: 24.6 s,
+    against 0.216 s for the centre itself).  The unit law costs one comparison
+    and is stated as the element equality it is.
     """
     ring = algebra.algebra_base_ring()
     inclusion = submodule.inclusion()
+
+    def included(element):
+        r"""The element in the ambient algebra, along the submodule inclusion."""
+        return inclusion(submodule(element))
+
     multiplication = BilinearMap(
         submodule,
         submodule,
@@ -3474,22 +3465,49 @@ def _center_algebra(algebra, submodule):
         "associativity": True,
         "commutativity": True,
     }
+    associative_unital = algebras.Associative().Unital()
     match algebra:
         case _ if algebra in algebras.Unital():
             law_decisions["unit"] = algebra.unit_laws_decision()
-            return _algebra_on_module(
+            unit = inclusion.lift(algebra.one())
+            center = _algebra_on_module(
                 submodule,
                 multiplication,
                 placement=(algebras.Associative().Unital().Commutative(),),
-                unit=inclusion.lift(algebra.one()),
+                unit=unit,
                 law_decisions=law_decisions,
             )
+            match algebra in associative_unital:
+                case True:
+                    arrows = associative_unital.Mor(center, algebra)
+                    return center, arrows._from_constructed_element_map(
+                        included,
+                        linearity_premises=(inclusion,),
+                        equations=(
+                            # f m_Z = m_A (f (x) f): `multiplication` *is* the
+                            # ambient product read back along `inclusion`.
+                            True,
+                            # f(1_Z) = 1_A: `unit` is `inclusion`'s lift of 1_A.
+                            inclusion(unit) == algebra.one(),
+                        ),
+                    )
+                case False:
+                    # The ambient has a unit without being associative, so the
+                    # centre's product is judged by the root Mor alone.
+                    arrows = algebras.Mor(center, algebra)
+                    return center, arrows._from_constructed_element_map(
+                        included, linearity_premises=(inclusion,)
+                    )
         case _:
-            return _algebra_on_module(
+            center = _algebra_on_module(
                 submodule,
                 multiplication,
                 placement=(algebras.Associative(), algebras.Commutative()),
                 law_decisions=law_decisions,
+            )
+            arrows = algebras.Mor(center, algebra)
+            return center, arrows._from_constructed_element_map(
+                included, linearity_premises=(inclusion,)
             )
 
 
@@ -5426,19 +5444,6 @@ class _OwnedAlgebraParent(_OwnedRingParent):
         # Both selected framing and native module datum are now queryable by
         # the algebra realization hooks this placement introduces.
         refine(self, Cat().meet(tuple(placement)))
-        if algebra_framing_source is self:
-            # An algebra whose free source is itself is free on these
-            # generators, so this framing is also its chosen finite
-            # presentation: presented on itself, by them, with no relations.
-            # It is fixed here with the framing it is made of, in the
-            # constructor, and an accessor never installs it (``OWN-17``).
-            from sage_extensions.categories.algebras.free_algebras import (
-                _fix_free_algebra_presentation,
-            )
-
-            _fix_free_algebra_presentation(
-                self, selected_labels, generator_morphism, augmentation
-            )
 
 
 @cached_function(
@@ -5896,7 +5901,6 @@ def _carry_polynomial_presentation(view, ring, base):
             lambda index: presentation(ideal.ideal_generators().value(index)),
             name="Defining relation family",
         ),
-        ideal,
         lambda element: ring(view(element)).lift(),
     )
     refine(view, AlgebrasWithChosenFinitePresentation(base))

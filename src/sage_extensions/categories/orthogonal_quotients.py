@@ -67,9 +67,9 @@ class _GapWordSection:
     parent, the generated group is bound as ``Subgroup(parent, gens)`` and GAP
     reuses the parent's chain — building ``Group(gens)`` fresh instead pays a
     new stabilizer-chain construction whose cost at the Enriques discriminant
-    image sizes was measured over the guard (`.tmp/enriques_staged2b.log`,
-    A5), while parent reuse is the documented GAP mechanism for subgroups of a
-    chained group.  Without a parent the fresh ``Group(gens)`` is used.
+    image sizes runs over the memory guard — while parent reuse is the
+    documented GAP mechanism for subgroups of a chained group.  Without a
+    parent the fresh ``Group(gens)`` is used.
 
     An explicit free-group epimorphism returns a word in the supplied
     generator positions; ``letters_of`` reads that word as signed 1-based
@@ -146,7 +146,8 @@ class _GapWordSection:
         ``RestrictedMapping``). For a group of form automorphisms this is the
         action on the finite module, of degree at most its order: O^+_8(2)
         gets a model of degree 255 in under a second, where a fresh
-        ``Group(gens)`` without the parent's filters did not finish in 1175 s.
+        ``Group(gens)`` without the parent's filters does not finish within 1175 s
+        on the same group.
         """
         if self._permutation_model is None:
             if self._parent is None:
@@ -205,10 +206,9 @@ def _double_coset_adjustment(subgroup_permutation, stabilizer_permutation, coset
     (measured at ``|S| * |W| ~ 1.6 * 10^9``: instant), where
     ``Intersection`` of a group with a coset domain enumerates the coset
     (measured on the ``Gamma_{Co,2}`` row of ``T_Co``: the ambient witness and
-    the exact stabilizer both returned in seconds, and the intersection was
-    killed at 6.5 GiB against the runtime's memory guard,
-    ``.tmp/probe391d-tco.log``; the coset has ``|S| = 696729600`` elements
-    there).
+    the exact stabilizer both return in seconds, and the intersection dies at
+    6.5 GiB against the runtime's memory guard; the coset has
+    ``|S| = 696729600`` elements there).
 
     The exhibited element walks the right cosets of ``W`` under right
     multiplication by the generators of ``S`` and their inverses: ``t`` in
@@ -216,7 +216,7 @@ def _double_coset_adjustment(subgroup_permutation, stabilizer_permutation, coset
     ``t = s w``), so the coset ``W t^-1`` lies on that walk, and the element
     ``s`` that reaches it satisfies ``s t`` in ``W`` -- the required ``x``.
     Each coset is keyed by its ``CanonicalRightCosetElement`` (two equal right
-    cosets have equal canonical elements, measured in the same log), so the
+    cosets have equal canonical elements), so the
     walk visits every coset once and its length is the index
     ``[S : S cap W]``, never an enumeration of ``S``, of ``W`` or of the coset.
     """
@@ -692,10 +692,9 @@ class OrthogonalCharacterQuotient:
         to a homomorphism on ``im rho``; the descent of each of the ``2^m``
         sign products is tested by ``GroupHomomorphismByImages`` on the
         generators of ``im rho`` — all inside the ``O(A_L)`` engine, whose
-        parent-bound chains are measured instant at the Enriques size
-        (`.tmp/measure_pathB.log`), while the direct product's own chain is
-        the measured wall (`.scratch/measure_a5_atoms.log`, t_b).  No image
-        element is listed; no ambient-order substitution.
+        parent-bound chains are instant at the Enriques size, while the direct
+        product's own chain is the bottleneck.  No image element is listed; no
+        ambient-order substitution.
         """
         from itertools import product as _product_tuples
 
@@ -1077,17 +1076,16 @@ class OrthogonalCharacterQuotient:
         r"""``im rho`` inside the ``O(A_L)`` engine, with a parent-bound word section.
 
         The subgroup is bound to the FQF engine of ``O(A_L)`` (whose chains are
-        measured instant at the Enriques size, `.tmp/measure_pathB.log`), and
-        letters index the ambient ``O(L)`` generators through ``rho``.
+        instant at the Enriques size), and letters index the ambient ``O(L)``
+        generators through ``rho``.
 
         ``rho`` is evaluated on *every* ambient generator, so this is the one
         computation of ``rho(O(L))`` the quotient schedules: the returned tuple
         is cached per subgroup (hence per lattice), and the callers that need the
         ambient generator images read them from here rather than sweeping the
         generating family again.  On ``T_Co`` one sweep is 26 s of
-        ``discriminant_morphism`` constructions
-        over 340 generators (`.tmp/p310b-probe1.log`), and the row used to
-        schedule four of them before its first lift.
+        ``discriminant_morphism`` constructions over 340 generators, which is
+        why every lift of a row reads the images from here.
         """
         from sage_extensions.categories.group.groups import (
             _element_to_engine,
@@ -1115,7 +1113,7 @@ class OrthogonalCharacterQuotient:
         double-coset walk all consume them.
 
         Computing them is a ``discriminant_morphism`` construction per generator
-        (340 generators on ``T_Co``; 26 s in one sweep, `.tmp/p310b-probe1.log`),
+        (340 generators on ``T_Co``; 26 s in one sweep),
         which is why this is memoized rather than recomputed where it is needed.
         """
         from sage_extensions.categories.group.groups import _element_to_engine
@@ -1763,10 +1761,9 @@ class OrthogonalCharacterQuotient:
         for the Enriques period lattice no statement supplies one: Kneser's conditions fail
         there (``rank_2(N) = 2``) and ``N`` has no second hyperbolic plane, so
         Gritsenko--Hulek--Sankaran's generation statements do not reach it
-        (arXiv:0810.1614v1, Proposition 5.6, p. 17; the reading is
-        ``results/issue17-kernel-generation-blocker.md``).  Asking for that family is what
-        stopped the ``Otilde^+(N)`` row, since ``Otilde(L)`` is an infinite arithmetic group
-        with no selected resolution.
+        (arXiv:0810.1614v1, Proposition 5.6, p. 17), and ``Otilde(L)`` is an infinite
+        arithmetic group with no selected resolution, so a witness of the named sign is
+        what this route asks for.
 
         A witness, on the other hand, is a single reflection, and for ``N = U + U(2) +
         E8(-2)`` it is named on the page: *"the reflection with respect to a vector of length
@@ -1990,9 +1987,8 @@ class OrthogonalCharacterQuotient:
         # bijection above, with the reduction to the finite image from
         # Dutour Sikiric--Hulek, Lemma 3.6, printed p. 22), and the action is
         # GAP's own FactorCosetAction -- the native chain-based coset action,
-        # the same machinery the double-coset enumeration rides (the whole
-        # Coble index in 137 s), where the generic action on external coset
-        # objects did not return inside an hour.
+        # the same machinery the double-coset enumeration rides -- rather than
+        # the generic action on external coset objects.
         to_perm = libgap.IsomorphismPermGroup(im_rho)
         im_rho_perm = libgap.Range(to_perm)
         right = libgap.Subgroup(im_rho, list(discriminant_image_generators))
@@ -2615,7 +2611,6 @@ class DiscriminantImageMembership:
         self._discriminant_group = quotient._discriminant_group
         self._engine = _gap_model(self._discriminant_group)
         self._image = quotient._joint_discriminant_image_gap()
-        self._converted_elements = {}
 
     def quotient(self):
         r"""Return the character quotient whose discriminant image this tests."""
@@ -2632,33 +2627,42 @@ class DiscriminantImageMembership:
     def __contains__(self, isometry) -> bool:
         return self.contains(isometry)
 
-    def _engine_element(self, isometry):
-        r"""Return the engine element of an isometry of ``O(A_L)``, converting it once.
+    @cached_method
+    def _engine_translates(self, factors):
+        r"""Return the engine elements of one family of translates, converted once.
 
-        The conversion is this object's boundary crossing: the isometry is an owned
-        element of ``O(A_L)`` and the chain sifted is the engine's, so what crosses is
-        kept here and never handed back out.  One question of :meth:`meets_translates`
-        asks about the same family of factors once per candidate, so each element is
-        converted once and then reused.
+        ``factors`` is a tuple of isometries of ``O(A_L)`` -- one family, which is what
+        :meth:`meets_translates` asks about once per candidate -- and the converted
+        family is the cached datum of this object, keyed by the family and kept by
+        ``cached_method`` (``AGENTS.md``: ``cached_method`` is the owner of a cached
+        datum of an object).  The conversion is this object's boundary crossing: the
+        isometries are owned elements and the chain sifted is the engine's, so what
+        crosses is kept here and never handed back out.
         """
         from sage_extensions.categories.group.groups import _element_to_engine
 
-        converted = self._converted_elements.get(isometry)
-        if converted is None:
-            converted = _element_to_engine(self._discriminant_group, isometry)
-            self._converted_elements[isometry] = converted
-        return converted
+        return tuple(
+            _element_to_engine(self._discriminant_group, factor) for factor in factors
+        )
 
     def meets_translates(self, factors, isometry) -> bool:
         r"""Whether ``f`` times the isometry lies in ``\rho(\Gamma)`` for some ``f`` of ``factors``.
 
         ``factors`` and ``isometry`` are isometries of the discriminant group as owned
         elements of ``O(A_L)``; their engine elements are this object's own datum
-        (:meth:`_engine_element`), so no caller converts one and none is returned.
+        (:meth:`_engine_translates`), so no caller converts one and none is returned.
+
+        The family is the datum that repeats: one question asks about the same family
+        once per candidate, so the family is converted once and kept.  The target is
+        not: it is the question's own element, so it crosses here and this object
+        retains nothing of it.
         """
-        target = self._engine_element(isometry)
+        from sage_extensions.categories.group.groups import _element_to_engine
+
+        target = _element_to_engine(self._discriminant_group, isometry)
         return any(
-            self._engine_element(factor) * target in self._image for factor in factors
+            translate * target in self._image
+            for translate in self._engine_translates(tuple(factors))
         )
 
 

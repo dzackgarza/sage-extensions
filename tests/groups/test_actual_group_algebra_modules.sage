@@ -65,3 +65,80 @@ def test_sign_and_trivial_actions_coincide_after_base_change_to_characteristic_t
     assert changed_trivial.action_of(generator) == changed_sign.action_of(generator)
     assert changed_sign.is_trivial_action()
     assert changed_trivial.is_isomorphic(changed_sign)
+
+
+def _permutation_module_of_s3():
+    r"""The permutation representation $\mathbb{Q}^3$ of $S_3$ on the three basis vectors."""
+    group = Groups.S(3)
+    vectors = Modules(QQ).free_module(3)
+
+    def act(g, vector):
+        return vectors.Mor(vectors)(
+            {label: vectors.module_generator(int(g(label + 1)) - 1) for label in range(3)}
+        )(vector)
+
+    return group, Modules(QQ[group])(vectors, act)
+
+
+def test_a_coefficient_scalar_acts_on_a_group_module_element() -> None:
+    r"""$\tfrac13\sum_i e_i$ is the invariant line of the permutation representation.
+
+    A module over $R[G]$ is a module over $R$ through the morphism
+    $R\to R[G]$, $r\mapsto r\cdot 1$, so a coefficient scalar multiplies a
+    module element: the average of the basis is fixed by every group element,
+    and three copies of it give the sum of the basis back.
+    """
+    group, representation = _permutation_module_of_s3()
+    total = sum(
+        representation.module_generator(label)
+        for label in representation.module_generating_set()
+    )
+    averaged = (QQ(1) / QQ(3)) * total
+    transposition = next(g for g in group if g.order() == 2)
+    three_cycle = next(g for g in group if g.order() == 3)
+
+    assert representation.act(transposition, averaged) == averaged
+    assert representation.act(three_cycle, averaged) == averaged
+    assert averaged + averaged + averaged == total
+
+
+def test_the_character_of_a_finite_free_representation_is_the_trace_of_its_action() -> None:
+    r"""The character of $\mathbb{Q}^3$ is the permutation character $3,1,0$.
+
+    Over a characteristic-zero field the character of a finite free
+    representation is the trace of each group element (Serre, *Linear
+    Representations of Finite Groups*, §2.1 and §6.1): the identity gives the
+    rank, a transposition fixes one basis vector, and a three-cycle fixes none.
+    """
+    group, representation = _permutation_module_of_s3()
+    transposition = next(g for g in group if g.order() == 2)
+    three_cycle = next(g for g in group if g.order() == 3)
+    character = representation.character()
+
+    assert character(group.one()) == 3
+    assert character(transposition) == 1
+    assert character(three_cycle) == 0
+
+
+def test_an_equivariant_automorphism_of_a_representation_is_an_element_of_its_automorphism_group() -> None:
+    r"""$r = 1 - 2P_{\mathrm{triv}}$ commutes with $S_3$, so $r\in\mathrm{Aut}_{\mathbb{Q}[S_3]}(\mathbb{Q}^3)$.
+
+    $r$ is an involution with eigenvalue $1$ on the sum-zero plane and $-1$ on
+    the invariant line: it fixes $e_0 - e_1$ and negates $e_0 + e_1 + e_2$.
+    """
+    _, representation = _permutation_module_of_s3()
+    labels = representation.module_generating_set()
+    total = sum(representation.module_generator(label) for label in labels)
+    reflection = representation.Mor(representation)(
+        {
+            label: representation.module_generator(label) - (QQ(2) / QQ(3)) * total
+            for label in labels
+        }
+    )
+    automorphism = reflection.as_automorphism().forward()
+    identity = representation.Mor(representation).identity()
+    difference = representation.module_generator(0) - representation.module_generator(1)
+
+    assert automorphism * automorphism == identity
+    assert automorphism(difference) == difference
+    assert automorphism(total) == -total

@@ -1,0 +1,44 @@
+provider SHA: 2f8c801e73b3a4fd5dce7dfa7bfc1b97e68285f5
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+tests: tests/lattices/test_the_cusp_layers_are_enumerated_in_the_cells_coordinates.sage
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: asyncio-1.5.0, xdist-3.8.0, reportlog-1.0.0, platformdirs-4.13.5, hypothesis-6.170.15, anyio-4.15.1, timeout-2.4.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 2 items
+
+tests/lattices/test_the_cusp_layers_are_enumerated_in_the_cells_coordinates.sage . [ 50%]
+.                                                                        [100%]
+
+=============================== warnings summary ===============================
+tests/lattices/test_the_cusp_layers_are_enumerated_in_the_cells_coordinates.sage: 30 warnings
+  /repos/vinal/src/sage/vinal.py:193: PendingDeprecationWarning: the matrix subclass is not the recommended way to represent matrices or deal with linear algebra (see https://docs.scipy.org/doc/numpy/user/numpy-for-matlab-users.html). Please adjust your code to use regular ndarray.
+    m2 = np.dot( np.dot(g, s.M), g.transpose())
+
+tests/lattices/test_the_cusp_layers_are_enumerated_in_the_cells_coordinates.sage: 30 warnings
+  /repos/vinal/src/sage/vinal.py:194: PendingDeprecationWarning: the matrix subclass is not the recommended way to represent matrices or deal with linear algebra (see https://docs.scipy.org/doc/numpy/user/numpy-for-matlab-users.html). Please adjust your code to use regular ndarray.
+    m1 = np.dot( np.dot( Matrix(a), s.M), g.transpose() )
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+============================== slowest durations ===============================
+12.50s call     tests/lattices/test_the_cusp_layers_are_enumerated_in_the_cells_coordinates.sage::test_the_dual_normals_are_the_adjugate_duals_of_the_cell_normals
+1.42s call     tests/lattices/test_the_cusp_layers_are_enumerated_in_the_cells_coordinates.sage::test_each_layers_cell_enumeration_is_its_whole_lattice_solutions_in_the_cell
+
+(4 durations < 0.005s hidden.  Use -vv to show these durations.)
+======================= 2 passed, 60 warnings in 22.13s ========================
+[peakrss] test536: child waited=0 shell_code=0 samples=16
+[peakrss] peak tree RSS      : 428 MiB
+[peakrss] low-water MemAvail : 1522 MiB
+[peakrss] peak single VmHWM  : 433 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      422 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    30.1s procs=  3 rss=   428 MiB hwm=   433 MiB avail=  2497 MiB
+[peakrss]   t=    28.1s procs=  3 rss=   427 MiB hwm=   433 MiB avail=  2522 MiB
+[peakrss]   t=    26.1s procs=  3 rss=   426 MiB hwm=   431 MiB avail=  2773 MiB
+[peakrss]   t=    24.1s procs=  3 rss=   416 MiB hwm=   421 MiB avail=  2441 MiB
+[peakrss]   t=    22.1s procs=  3 rss=   409 MiB hwm=   420 MiB avail=  2824 MiB
+launcher exit: 0

@@ -109,12 +109,6 @@ def card_line_orbit_row(tag: str, group: str) -> int:
     return rows[group]["lines"]
 
 
-# Card 029J used to state its two Otilde^+ plane orbits as "the 24242 planes in
-# two orbits, of lengths 527 and 23715" inside the row's citation, and this module
-# read the split out of that sentence.  `dzackgarza/lattice-database` d6a5393
-# states it as the row's own `orbit_lengths` field instead and the digest carries
-# the field, so no sentence is parsed for a plane row any more.
-
 def card_plane_orbit_lengths(tag: str, group: str):
     r"""Return card ``tag``'s per-orbit numbers for the primitive isotropic planes under ``group``.
 

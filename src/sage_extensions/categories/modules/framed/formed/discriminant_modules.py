@@ -1005,11 +1005,18 @@ def _discriminant_module(lattice):
     """
     assert lattice.module_rank().is_finite() and lattice.is_nondegenerate()
 
-    quotient = lattice.correlation_morphism().cokernel()
+    ring = lattice.base_ring()
+    # A nondegenerate lattice of finite rank over ZZ has a finite dual quotient, so
+    # `A_L = coker(L -> L^#)` is a torsion module: the placement is the assertion
+    # above, and it is this construction's to claim (`CAT-04`).  It is also where the
+    # module belongs for its elements to be enumerated and for a torsion form to be
+    # defined on it.
+    quotient = Modules(ring).FinitelyPresented().Torsion()(
+        lattice.correlation_morphism()
+    )
     dual_lattice = lattice.dual_lattice()
     labels = quotient.module_generating_set()
     trivial_quotient = quotient.is_zero() is True
-    ring = lattice.base_ring()
     categories = [DiscriminantModules(ring)]
     construction_data = {
         "source_lattice": lattice,

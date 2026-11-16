@@ -1,0 +1,64 @@
+tree SHA: 149141ae2bdaca4e9005975b23d31c843cc6f966 (modified paths: 0)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 21.14 18.47 16.90 20/903 2890749
+files: tests/modules/test_the_torsion_placement_is_the_claiming_construction.sage tests/modules/test_a_torsion_claim_is_refuted_when_asked.sage tests/forms/test_a_torsion_cokernel_carries_its_torsion_forms.sage tests/modules/test_the_real_field_answers_primitivity_publicly.sage tests/modules/test_a_presented_module_is_built_before_it_computes.sage
+inner 900 s, outer 960 s, guard 6144 MiB
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+time gates OFF (--no-time-gates): star import 15.80 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: asyncio-1.5.0, xdist-3.8.0, reportlog-1.0.0, platformdirs-4.13.5, hypothesis-6.170.15, anyio-4.15.1, timeout-2.4.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 15 items
+
+tests/modules/test_the_torsion_placement_is_the_claiming_construction.sage . [  6%]
+...                                                                      [ 26%]
+tests/modules/test_a_torsion_claim_is_refuted_when_asked.sage ...        [ 46%]
+tests/forms/test_a_torsion_cokernel_carries_its_torsion_forms.sage ...   [ 66%]
+tests/modules/test_the_real_field_answers_primitivity_publicly.sage ...  [ 86%]
+tests/modules/test_a_presented_module_is_built_before_it_computes.sage . [ 93%]
+.                                                                        [100%]
+
+=============================== time-gate report ===============================
+session star import took 15.80 s; the measured ceiling is 3 s
+collection took 84.45 s; the measured ceiling is 6 s
+============================== slowest durations ===============================
+2.68s call     tests/forms/test_a_torsion_cokernel_carries_its_torsion_forms.sage::test_the_orthogonal_quotient_of_a_discriminant_form_is_a_torsion_form
+1.73s call     tests/modules/test_the_torsion_placement_is_the_claiming_construction.sage::test_a_cokernel_form_is_not_placed_in_torsion_by_a_computation
+1.19s call     tests/forms/test_a_torsion_cokernel_carries_its_torsion_forms.sage::test_the_one_third_form_on_z3_twists_by_a_negative_unit
+0.64s call     tests/forms/test_a_torsion_cokernel_carries_its_torsion_forms.sage::test_the_half_form_on_z2_has_its_two_primary_part
+0.37s call     tests/modules/test_the_real_field_answers_primitivity_publicly.sage::test_an_injective_endomorphism_of_the_real_plane_is_primitive
+0.28s call     tests/modules/test_the_torsion_placement_is_the_claiming_construction.sage::test_a_false_claim_is_trusted_by_the_construction
+0.19s call     tests/modules/test_a_presented_module_is_built_before_it_computes.sage::test_a_plane_inclusions_quotient_is_built_before_it_is_asked
+0.13s call     tests/modules/test_the_torsion_placement_is_the_claiming_construction.sage::test_the_torsion_form_constructor_places_the_claim_it_states
+0.12s call     tests/modules/test_a_torsion_claim_is_refuted_when_asked.sage::test_a_false_torsion_claim_is_refuted_when_checked
+0.06s call     tests/modules/test_the_torsion_placement_is_the_claiming_construction.sage::test_a_module_that_claims_no_torsion_states_no_refutation_of_one
+0.05s call     tests/modules/test_the_real_field_answers_primitivity_publicly.sage::test_an_endomorphism_of_the_real_plane_with_a_kernel_is_not_primitive
+0.04s call     tests/modules/test_a_torsion_claim_is_refuted_when_asked.sage::test_construction_does_not_refute_the_claim
+0.04s call     tests/modules/test_a_presented_module_is_built_before_it_computes.sage::test_constructing_a_cokernel_asks_the_engine_for_no_matrix
+0.04s call     tests/modules/test_a_torsion_claim_is_refuted_when_asked.sage::test_a_true_torsion_claim_survives_the_check
+0.03s call     tests/modules/test_the_real_field_answers_primitivity_publicly.sage::test_the_real_planes_saturation_names_the_missing_smith_computation
+0.03s setup    tests/modules/test_the_torsion_placement_is_the_claiming_construction.sage::test_the_torsion_form_constructor_places_the_claim_it_states
+0.02s setup    tests/modules/test_the_torsion_placement_is_the_claiming_construction.sage::test_a_module_that_claims_no_torsion_states_no_refutation_of_one
+0.01s setup    tests/modules/test_the_real_field_answers_primitivity_publicly.sage::test_an_endomorphism_of_the_real_plane_with_a_kernel_is_not_primitive
+0.01s setup    tests/forms/test_a_torsion_cokernel_carries_its_torsion_forms.sage::test_the_orthogonal_quotient_of_a_discriminant_form_is_a_torsion_form
+0.01s setup    tests/modules/test_the_torsion_placement_is_the_claiming_construction.sage::test_a_cokernel_form_is_not_placed_in_torsion_by_a_computation
+0.01s setup    tests/modules/test_a_torsion_claim_is_refuted_when_asked.sage::test_construction_does_not_refute_the_claim
+
+(24 durations < 0.005s hidden.  Use -vv to show these durations.)
+======================== 15 passed in 93.95s (0:01:33) =========================
+[peakrss] probe541r4tests: child waited=0 shell_code=0 samples=79
+[peakrss] peak tree RSS      : 260 MiB
+[peakrss] low-water MemAvail : 1020 MiB
+[peakrss] peak single VmHWM  : 267 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      256 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   161.8s procs=  3 rss=   260 MiB hwm=   267 MiB avail=  1846 MiB
+[peakrss]   t=   167.9s procs=  3 rss=   254 MiB hwm=   267 MiB avail=  2004 MiB
+[peakrss]   t=   163.9s procs=  3 rss=   253 MiB hwm=   267 MiB avail=  2070 MiB
+[peakrss]   t=   165.9s procs=  3 rss=   253 MiB hwm=   267 MiB avail=  2115 MiB
+[peakrss]   t=   157.8s procs=  3 rss=   245 MiB hwm=   252 MiB avail=  1528 MiB
+launcher exit: 0
