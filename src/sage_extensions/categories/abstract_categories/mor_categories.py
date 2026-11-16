@@ -670,15 +670,25 @@ class CategoricalMor(
         r"""Return the arrow type of this Mor, shared by the Mors with its key.
 
         ``Mor_C(A, B)`` is a category for every pair of objects, and the
-        operations of its arrows depend on the Mor class the family builds,
-        the placement of the Mor object, its diagonal End/Aut role, and the
-        classes of the supercategories' Mors it declares.  The type is
-        generated once per :meth:`_arrow_type_key`, from the first Mor that
-        asks, and every later Mor with that key reuses it.  The forgetful
-        inclusions into the supercategories' Mors are not constructed for
-        the others; they are built only when ``super_categories`` is asked.
+        operations of its arrows are those of the Mor classes its declared
+        graph holds: the one the family builds for these endpoints, the ones
+        the endpoints select for each declared supercategory's family, and the
+        placement and diagonal End/Aut role of the Mor object itself.  None of
+        that depends on ``A`` and ``B`` beyond those selections, so the type is
+        generated once per key, from the first Mor that asks, and every later
+        Mor with that key reuses it.  The supercategories' Mors are not
+        constructed to compute the key; their families are asked which class
+        they select (:meth:`_declared_mor_classes`), and the forgetful
+        inclusions into those Mors are built only when ``super_categories`` is
+        asked.
         """
-        key = self._arrow_type_key()
+        key = (
+            type(self),
+            self.category(),
+            self.end_family(),
+            self.aut_family(),
+            self._declared_mor_classes(),
+        )
         arrow_types = self.mor_family()._arrow_types
         result = arrow_types.get(key)
         if result is None:
@@ -686,15 +696,42 @@ class CategoricalMor(
         self._configure_generated_arrow_operations(result)
         return result
 
-    def _arrow_type_key(self):
-        r"""Return the data this Mor's arrow type is keyed by.
+    def _declared_mor_classes(self) -> tuple:
+        r"""Return the Mor class each declared supercategory's family selects.
 
-        The Mor class, the placement and the End/Aut role.  A Mor class whose
-        declared graph holds a Mor whose class the endpoints select adds that
-        selection here, so that the supercategories' Mors need not be built
-        to compute the key.
+        The declared graph of ``Mor_C(A, B)`` holds the Mors of ``C``'s
+        declared supercategories at the endpoints' forgetful images, and each
+        of those families selects its fixed Mor class from its own endpoints
+        (:meth:`MorCategoryConstruction.fixed_category_class_for`).  The
+        selection is what those Mors are, so it is what the arrow type is
+        generated from, and it is read here without constructing them.
+
+        The End/Aut families state no endpoint-dependent selection: their
+        classes are their families' fixed classes, and the role itself is
+        already part of the key.
         """
-        return (type(self), self.category(), self.end_family(), self.aut_family())
+        family = self.mor_family()
+        base = self.base_category()
+        pending = [(base, self.domain_object(), self.codomain_object())]
+        visited = {id(base)}
+        selected = []
+        while pending:
+            category, domain, codomain = pending.pop()
+            for supercategory in _packet_supercategories(category):
+                domain_image, codomain_image = (
+                    category._mor_endpoints_in_supercategory(
+                        supercategory, domain, codomain
+                    )
+                )
+                selected.append(
+                    family.family_over(supercategory).fixed_category_class_for(
+                        domain_image, codomain_image
+                    )
+                )
+                if id(supercategory) not in visited:
+                    visited.add(id(supercategory))
+                    pending.append((supercategory, domain_image, codomain_image))
+        return tuple(selected)
 
     def _arrow_type_from_declared_graph(self) -> type:
         r"""Generate the arrow type from this Mor category's declared graph."""
