@@ -2615,7 +2615,6 @@ class DiscriminantImageMembership:
         self._discriminant_group = quotient._discriminant_group
         self._engine = _gap_model(self._discriminant_group)
         self._image = quotient._joint_discriminant_image_gap()
-        self._converted_elements = {}
 
     def quotient(self):
         r"""Return the character quotient whose discriminant image this tests."""
@@ -2632,33 +2631,42 @@ class DiscriminantImageMembership:
     def __contains__(self, isometry) -> bool:
         return self.contains(isometry)
 
-    def _engine_element(self, isometry):
-        r"""Return the engine element of an isometry of ``O(A_L)``, converting it once.
+    @cached_method
+    def _engine_translates(self, factors):
+        r"""Return the engine elements of one family of translates, converted once.
 
-        The conversion is this object's boundary crossing: the isometry is an owned
-        element of ``O(A_L)`` and the chain sifted is the engine's, so what crosses is
-        kept here and never handed back out.  One question of :meth:`meets_translates`
-        asks about the same family of factors once per candidate, so each element is
-        converted once and then reused.
+        ``factors`` is a tuple of isometries of ``O(A_L)`` -- one family, which is what
+        :meth:`meets_translates` asks about once per candidate -- and the converted
+        family is the cached datum of this object, keyed by the family and kept by
+        ``cached_method`` (``AGENTS.md``: ``cached_method`` is the owner of a cached
+        datum of an object).  The conversion is this object's boundary crossing: the
+        isometries are owned elements and the chain sifted is the engine's, so what
+        crosses is kept here and never handed back out.
         """
         from sage_extensions.categories.group.groups import _element_to_engine
 
-        converted = self._converted_elements.get(isometry)
-        if converted is None:
-            converted = _element_to_engine(self._discriminant_group, isometry)
-            self._converted_elements[isometry] = converted
-        return converted
+        return tuple(
+            _element_to_engine(self._discriminant_group, factor) for factor in factors
+        )
 
     def meets_translates(self, factors, isometry) -> bool:
         r"""Whether ``f`` times the isometry lies in ``\rho(\Gamma)`` for some ``f`` of ``factors``.
 
         ``factors`` and ``isometry`` are isometries of the discriminant group as owned
         elements of ``O(A_L)``; their engine elements are this object's own datum
-        (:meth:`_engine_element`), so no caller converts one and none is returned.
+        (:meth:`_engine_translates`), so no caller converts one and none is returned.
+
+        The family is the datum that repeats: one question asks about the same family
+        once per candidate, so the family is converted once and kept.  The target is
+        not: it is the question's own element, so it crosses here and this object
+        retains nothing of it.
         """
-        target = self._engine_element(isometry)
+        from sage_extensions.categories.group.groups import _element_to_engine
+
+        target = _element_to_engine(self._discriminant_group, isometry)
         return any(
-            self._engine_element(factor) * target in self._image for factor in factors
+            translate * target in self._image
+            for translate in self._engine_translates(tuple(factors))
         )
 
 
