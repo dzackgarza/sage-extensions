@@ -43,26 +43,27 @@ kind as its supergroup.
 
 **The lattices.**  ``6JRS = U + U + <-2>``, the card-named ``U + U + <-2>`` of
 the kernel plane rows' gate (``test_the_stable_plane_rows_...``), and
-``U + U(2) + <-4>``, the same shape with a non-trivial discriminant image and a
-relation that is not complete.  No lattice-database card holds a row of either
-(lattice-database#13), and none holds a ``T_Co`` row (lattice-database#7), so
-no number here is a card value: each is computed.  The specimens are split per
-lattice and per group so one costly row cannot hide another's result.
+``U + U + <-4>``, whose discriminant group has order four and whose image has
+order two, so its kernel rows are genuinely smaller than the ambient ones and
+are read through the kernel subgroup.  No lattice-database card holds a row of
+either (lattice-database#13), and none holds a ``T_Co`` row
+(lattice-database#7), so no number here is a card value: each is computed.  The
+specimens are split per lattice so one costly row cannot hide another's.
 
-``U + U(2) + <-2>`` is not the second specimen although the driver runs it:
-in this session's ring its ambient flag row cannot be built at all --
-``ModuleAutomorphismGroup.flag_stabilizer`` inverts its basis change at the
-rank-two zero-form reduction lattice, and that change has determinant ``-2``,
-so it is no basis change and has no inverse in the integer ring (``Generic
-endomorphism of Integral lattice of rank 2 and signature (0, 0) has no
-inverse ...: its determinant -2 is not a unit of Integer Ring``).  That is a defect of that route and not of this
-row, and it is not repaired here; the driver's own run of the same lattice, in
-the image's plain interpreter, decides its two rows.
+The ``U + U(2) + <2k>`` family is not among them although the driver runs two
+of its members: in this session's ring its ambient flag row cannot be built at
+all.  ``ModuleAutomorphismGroup.flag_stabilizer`` inverts a basis change of the
+rank-two zero-form reduction lattice, and that change has determinant ``2``
+(or ``-2``), so it is no basis change of that lattice and has no inverse in the
+integer ring (``ZeroDivisionError: Generic endomorphism of Integral lattice of
+rank 2 and signature (0, 0) has no inverse ...: its determinant 2 is not a unit
+of Integer Ring``).  It reproduces on ``main`` `4936110` without this file and
+is not repaired here; the driver's own runs of those lattices, in the image's
+plain interpreter, decide their two rows.
 
 The counts these rows return are recorded in the commit body of the push that
-lands this file -- six edges over four line and three plane cusps for each
-kernel row of ``U + U(2) + <-4>``, and one edge over one line and one plane
-cusp for each kernel row of ``6JRS``.
+lands this file -- one edge over one line and one plane cusp for each kernel
+row of either lattice.
 """
 
 from sage_extensions.all import *  # noqa: F401,F403
@@ -73,13 +74,9 @@ def _6jrs():
     return Lattices(ZZ)("U") + Lattices(ZZ)("U") + Lattices(ZZ)([[-2]])
 
 
-def _u_plus_u2_plus_m4():
-    r"""``U + U(2) + <-4>``: rank five, ``|A_L| = 16`` and a non-trivial image."""
-    return (
-        Lattices(ZZ)("U")
-        + Lattices(ZZ)([[0, 2], [2, 0]])
-        + Lattices(ZZ)([[-4]])
-    )
+def _u_u_m4():
+    r"""``U + U + <-4>``: rank five, ``|A_L| = 4`` and ``|O(A_L)| = 2``."""
+    return Lattices(ZZ)("U") + Lattices(ZZ)("U") + Lattices(ZZ)([[-4]])
 
 
 def _kernel_rows(lattice):
@@ -206,26 +203,17 @@ def test_6jrs_kernel_rows_are_the_ambient_rows() -> None:
         assert incidences.cardinality() == cardinal(1)
 
 
-def test_u_plus_u2_plus_m4_otilde_incidence_is_its_flag_row() -> None:
-    r"""``U + U(2) + <-4>``: every edge of ``Otilde`` joins a line to the plane it lies in."""
-    lattice = _u_plus_u2_plus_m4()
-    stable = lattice.stable_orthogonal_group()
-
-    incidences = _assert_kernel_incidence_contract(stable)
-
-    assert stable.cusps(1).cardinality() == cardinal(4)
-    assert stable.cusps(2).cardinality() == cardinal(3)
-    assert incidences.cardinality() == cardinal(6)
-
-
-def test_u_plus_u2_plus_m4_otilde_plus_incidence_is_its_flag_row() -> None:
-    r"""``U + U(2) + <-4>``: the same for ``Otilde+``, whose vertex rows cannot be smaller."""
-    lattice = _u_plus_u2_plus_m4()
+def test_u_u_m4_kernel_rows_join_lines_to_their_planes() -> None:
+    r"""``U + U + <-4>``: both kernel rows' edges join a line to the plane it lies in."""
+    lattice = _u_u_m4()
+    assert lattice.discriminant_group().orthogonal_group().cardinality() == cardinal(2)
     stable = lattice.stable_orthogonal_group()
     plus = stable.intersection(lattice.O_plus())
 
-    incidences = _assert_kernel_incidence_contract(plus)
+    coarse = _assert_kernel_incidence_contract(stable)
+    fine = _assert_kernel_incidence_contract(plus)
 
+    assert coarse.cardinality() == cardinal(1)
+    assert fine.cardinality() == cardinal(1)
     assert plus.cusps(1).cardinality() >= stable.cusps(1).cardinality()
     assert plus.cusps(2).cardinality() >= stable.cusps(2).cardinality()
-    assert incidences.cardinality() == cardinal(6)

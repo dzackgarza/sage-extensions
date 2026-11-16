@@ -3122,3 +3122,4 @@ after main advanced to `a38faef` and the branch was rebased onto it:
 | `issue381-driver-final-UU2-2.log` | the same head | the driver on `U+U(2)+<-2>`: 4 edges over 3 line and 2 plane cusps each, exit 0 |
 | `issue381-driver-final-UU2-4.log` | the same head | the driver on `U+U(2)+<-4>`, the gate's second specimen: 6 edges over 4 line and 3 plane cusps each, exit 0 |
 | `issue381-kernel-incidence-gate-final.log` | the same head | `tests/lattices/test_the_kernel_incidence_rows.sage`, lint on: **3 passed in 62.84 s**, longest call 21 s over the 20 s gate |
+| `issue381-gate-final2.log` | the head this pushes (rebased onto `4936110`) | `tests/lattices/test_the_kernel_incidence_rows.sage`, two specimens -- `6JRS` and `U + U + <-4>` -- with the test lint on: **2 passed in 74.46 s**, both calls over the 20 s gate (35.29 s, 38.18 s) |

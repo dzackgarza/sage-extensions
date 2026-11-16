@@ -19,7 +19,7 @@ line rows of #357, each edge joining a line that lies in its plane.
   per-test gate can afford.
 * `results/coble-kernel-incidence-rows.yml` is the dispatchable job;
   `tests/lattices/test_the_kernel_incidence_rows.sage` gates the same
-  guarantees on `6JRS = U + U + <-2>` and `U + U(2) + <-4>`.
+  guarantees on `6JRS = U + U + <-2>` and `U + U + <-4>`.
 
 ## Dispatching the T_Co rows
 
@@ -48,7 +48,7 @@ small-lattice check, which must exit 0.  `--lattice` also names
 | driver, `--lattice 6JRS` | 1 edge over 1 line and 1 plane cusp for each kernel row, then agreement with the ambient rows, exit 0 |
 | driver, `--lattice 'U+U(2)+<-2>'` | 4 edges over 3 line and 2 plane cusps for each kernel row, exit 0 |
 | driver, `--lattice 'U+U(2)+<-4>'` | 6 edges over 4 line and 3 plane cusps for each kernel row, exit 0 |
-| gate file, three tests | **3 passed in 62.84 s**, the longest call 21 s over the 20 s gate |
+| gate file, two specimens | **2 passed in 74.46 s**, both calls over the 20 s gate (35.29 s, 38.18 s) |
 | the #391 `T_Co` incidence gate file | **2 passed in 1696.37 s** -- `Gamma_{Co,2}` 1685.31 s, `O(T_Co)` 10.11 s |
 
 That last row is the cost witness, and it is new: on `main` before this round
@@ -77,9 +77,10 @@ Two defects of other routes were found and are **not** repaired here, because
 they are not this row's: `flag_stabilizer` passing `description=` where #537
 requires a nullary `stated_clause` (the base of this push carries the repair,
 made independently while this round ran), and the same function inverting a
-basis change of the rank-two zero-form reduction lattice of
-`U + U(2) + <-2>` whose determinant is `-2`, which is why that lattice is the
-driver's and `U + U(2) + <-4>` is the gate's.
+basis change of the rank-two zero-form reduction lattice of the
+`U + U(2) + <2k>` family -- with determinant `2` or `-2`, so it is no basis
+change of that lattice -- which is why those lattices are the driver's and
+`U + U + <-4>` is the gate's second specimen.
 
 ## What is *not* decided, and why
 
