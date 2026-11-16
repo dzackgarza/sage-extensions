@@ -217,6 +217,9 @@ from sage_extensions.categories.orbifolds import (  # noqa: F401
     Orbifolds,
     RiemannianOrbifolds,
 )
+from sage_extensions.categories.polyhedral_cones import (  # noqa: F401
+    RationalPolyhedralCones,
+)
 from sage_extensions.categories.rational_integral_stabilizers import (  # noqa: F401
     FiniteCommensurabilityQuotient,
     IntegralStructureAction,
