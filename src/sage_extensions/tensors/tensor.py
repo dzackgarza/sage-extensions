@@ -1663,6 +1663,21 @@ def _engine_coisotropic_witt_extension(partial, source_inclusion, target_inclusi
         _engine_row_action_matrix(partial)
         * _engine_row_action_matrix(target_inclusion)
     ).change_ring(SageQQ)
+    return _engine_coisotropic_witt_rows(left_form, right_form, left, right)
+
+
+def _engine_coisotropic_witt_rows(left_form, right_form, left, right):
+    r"""Private engine computation of :func:`_engine_coisotropic_witt_extension` on Sage matrices.
+
+    ``left`` and ``right`` are rational matrices whose rows are a basis of the
+    specified source space and the prescribed images, in the ambient framings
+    with Gram matrices ``left_form`` and ``right_form``.  Return the row action
+    ``X`` with ``left * X = right`` and ``X * right_form * X^t = left_form``, or
+    ``None`` under the same hypotheses as the owned entry point.
+    """
+    from sage.rings.integer_ring import ZZ as SageZZ
+    from sage.rings.rational_field import QQ as SageQQ
+
     size = left_form.nrows()
     if right_form.nrows() != size:
         raise ValueError("isometric ambient spaces must have equal dimensions")

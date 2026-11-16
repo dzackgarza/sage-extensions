@@ -440,14 +440,6 @@ class _ColouredFamilyRealization:
         )
 
     @cached_method
-    def rational_span(self):
-        rational = self.rational_space()
-        family = self.rational_family()
-        return rational.subobject_on(tuple(
-            family(family.domain().module_generator(index)) for index in self.indices()
-        ))
-
-    @cached_method
     def family_section(self):
         r"""A section ``L tensor Q -> F_Q(I)`` of the surjective rational family, solved once on the framing.
 
@@ -488,25 +480,21 @@ class _ColouredFamilyRealization:
         target_positions = target_family.domain()
         rational_target = target.rational_space()
         rational_source = self.rational_space()
+        from sage_extensions.categories.modules.pure.modules import _engine_matrix, _morphism_from_engine_matrix
+
         if not self.spans_rational_space():
-            relabel = Modules(source_positions.base_ring()).Mor(source_positions, target_positions)(
-                lambda index: target_positions.module_generator(sigma(index))
+            # The unique Witt extension of the hyperplane map, computed on
+            # the family rows and raised once, as below.
+            linear = _morphism_from_engine_matrix(
+                Modules(rational_source.base_ring()).Mor(rational_source, rational_target),
+                self._hyperplane_transformation_rows(target, sigma).transpose(),
             )
-            source_span, target_span = self.rational_span(), target.rational_span()
-            source_inclusion, target_inclusion = source_span.inclusion(), target_span.inclusion()
-            family = self.rational_family()
-            partial = source_span.Isom(target_span)(
-                lambda label: target_inclusion.lift(target_family(relabel(family.lift(
-                    source_inclusion(source_span.module_generator(label))
-                ))))
-            )
-            return partial.witt_extension(source_inclusion, target_inclusion)
+            isometries = rational_source.Isom(rational_target)
+            return isometries.element_class(isometries, linear)
         # T_sigma = w o relabel o section, the product of the framed
         # matrices, raised once instead of evaluated per generator.  The
         # relabelling is a permutation matrix, so w o relabel is w with its
         # columns taken in the order sigma gives.
-        from sage_extensions.categories.modules.pure.modules import _engine_matrix, _morphism_from_engine_matrix
-
         target_columns = {index: column for column, index in enumerate(target_positions.module_generating_set())}
         relabelled = _engine_matrix(target_family).matrix_from_columns(
             [target_columns[sigma(index)] for index in source_positions.module_generating_set()]
@@ -635,10 +623,10 @@ class _ColouredFamilyRealization:
         r"""The rational matrix induced on the lattice framing by a family permutation."""
         if not self.spans_rational_space():
             graph = self.pairing_graph()
-            sigma = Sets().Mor(self.indices(), self.indices())(
-                lambda index: graph._position(permutation[graph._vertex(index)])
+            self.assert_unique_rational_extension()
+            return self._hyperplane_transformation_rows(
+                self, lambda index: graph._position(permutation[graph._vertex(index)])
             )
-            return self._rational_transformation_matrix(self.rational_transformation(self, sigma))
         family = self._family_coordinate_matrix()
         basis_rows, adjugate, determinant = self._coordinate_basis_data()
         target = engine_matrix(
@@ -647,6 +635,41 @@ class _ColouredFamilyRealization:
         )
         numerator = adjugate * target
         return numerator.change_ring(SageQQ) / determinant
+
+    def _hyperplane_transformation_rows(self, target, sigma):
+        r"""The row action of ``T_sigma`` for a family spanning an isotropic hyperplane.
+
+        The rows of the selected independent family vectors span the
+        hyperplane ``H``; their images are the rows of ``target`` at the
+        indices ``sigma`` gives.  ``H`` contains its radical, the isotropic
+        normal, so it is coisotropic and its isometry onto the target
+        hyperplane has the unique extension of the codimension-one Witt
+        construction (``_engine_coisotropic_witt_rows``, the computation of
+        ``LatticeIsometryMethods.witt_extension`` on these matrices).
+        """
+        from sage_extensions.tensors.tensor import (
+            _engine_coisotropic_witt_rows,
+            _engine_component_matrix,
+            _engine_row_basis_positions,
+        )
+
+        family = self._family_coordinate_matrix()
+        target_family = target._family_coordinate_matrix()
+        basis_rows = tuple(_engine_row_basis_positions(family))
+        indices = tuple(self.indices())
+        target_rows = {index: row for row, index in enumerate(target.indices())}
+        left = family.matrix_from_rows(basis_rows).change_ring(SageQQ)
+        right = target_family.matrix_from_rows(
+            [target_rows[sigma(indices[row])] for row in basis_rows]
+        ).change_ring(SageQQ)
+        left_form = _engine_component_matrix(self._lattice.gram_tensor()).change_ring(SageQQ)
+        right_form = _engine_component_matrix(target._lattice.gram_tensor()).change_ring(SageQQ)
+        extension = _engine_coisotropic_witt_rows(left_form, right_form, left, right)
+        assert extension is not None, (
+            f"the family {self._family} spans an isotropic hyperplane of {self._lattice}, so its "
+            f"isometry onto the target hyperplane is coisotropic and extends"
+        )
+        return extension
 
     @staticmethod
     def _rational_transformation_matrix(isometry):
