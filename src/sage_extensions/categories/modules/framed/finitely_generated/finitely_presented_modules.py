@@ -428,9 +428,8 @@ class _SelectedFinitePresentationModules(OwnedCategoryOverBaseRing):
 
             The one datum is the relation morphism ``F_1 -> F_0``, given as a
             zero-argument construction.  It is selected now and realized by the
-            first request that needs it (``OWN-22``, ``OWN-23``).  There is no
-            second constructor that receives an already-built presentation; a
-            caller holding one states it as the construction that returns it.
+            first request that needs it (``OWN-22``, ``OWN-23``).  A caller
+            holding the relation morphism states it as that construction.
             """
             super().__init__(**rest)
             _fix_lazy_cokernel_presentation(
@@ -3634,11 +3633,9 @@ def _presented_module_from_morphism(
 
     # A presentation written directly over a localization is still a finite
     # presentation over the source ring after clearing one unit denominator
-    # per relation row.  The source presentation is the datum that keeps the
+    # per relation row.  That source presentation is the datum that keeps the
     # arithmetic exact; it is selected here and built by the first request for
-    # the module's presentation (``OWN-22``, ``OWN-23``).  Building the source
-    # quotient and localizing it now would compute the presentation, the
-    # quotient and the localization inside construction.
+    # the module's presentation (``OWN-22``, ``OWN-23``).
     if base_ring in LocalizationRings():
         from sage_extensions.categories.modules.localizations import _localized_module
 
