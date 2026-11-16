@@ -1,0 +1,95 @@
+provider SHA: 5064d72f0ca7d1933f7548f70e44f3286cf65252
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+FFFF....                                                                 [100%]
+=================================== FAILURES ===================================
+_ test_the_integral_sign_representation_has_no_invariants_and_coinvariants_z_mod_2 _
+sage/structure/category_object.pyx:858: in sage.structure.category_object.CategoryObject.getattr_from_category
+    return self._cached_methods[name]
+E   KeyError: 'codomain'
+
+During handling of the above exception, another exception occurred:
+tests/groups/test_actual_group_algebra_modules.sage:20: in test_the_integral_sign_representation_has_no_invariants_and_coinvariants_z_mod_2
+    _, _, integral_sign = _trivial_and_sign_lines(ZZ)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/groups/test_actual_group_algebra_modules.sage:8: in _trivial_and_sign_lines
+    line = Modules(ring)(Sets()(("e",)))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/sage/.venv/lib/python3.14/site-packages/sage/categories/category.py:592: in __call__
+    return self._call_(x, *args, **opts)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/pure/modules.py:515: in _call_
+    module = scalar_action.codomain().domain()
+             ^^^^^^^^^^^^^^^^^^^^^^
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    ???
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    ???
+sage/cpython/getattr.pyx:362: in sage.cpython.getattr.getattr_from_other_class
+    ???
+E   AttributeError: 'FiniteOrderedSets.parent_class' object has no attribute 'codomain'
+_ test_the_invariants_of_the_regular_representation_of_s3_are_one_dimensional __
+tests/groups/test_actual_group_algebra_modules.sage:34: in test_the_invariants_of_the_regular_representation_of_s3_are_one_dimensional
+    assert regular.module_rank() == 6
+E   assert 1 == 6
+E    +  where 1 = module_rank()
+E    +    where module_rank = Free module on {[1]} over Group algebra of Symmetric group S_3 over Fraction Field of Integer Ring.module_rank
+E    +  and   6 = Integer(6)
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:444 General module over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:833 Elementwise module morphism Module over Fraction Field of Integer Ring on Classes in the multilinear tensor presentation -> Module over Fraction Field of Integer Ring on Fraction Field of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+_________ test_q_splits_c2_but_the_splitting_field_of_c3_is_quadratic __________
+sage/structure/category_object.pyx:858: in sage.structure.category_object.CategoryObject.getattr_from_category
+    return self._cached_methods[name]
+E   KeyError: 'codomain'
+
+During handling of the above exception, another exception occurred:
+tests/groups/test_actual_group_algebra_modules.sage:43: in test_q_splits_c2_but_the_splitting_field_of_c3_is_quadratic
+    group, _, sign = _trivial_and_sign_lines(QQ)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/groups/test_actual_group_algebra_modules.sage:8: in _trivial_and_sign_lines
+    line = Modules(ring)(Sets()(("e",)))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/sage/.venv/lib/python3.14/site-packages/sage/categories/category.py:592: in __call__
+    return self._call_(x, *args, **opts)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/pure/modules.py:515: in _call_
+    module = scalar_action.codomain().domain()
+             ^^^^^^^^^^^^^^^^^^^^^^
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    return self.getattr_from_category(name)
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    attr = getattr_from_other_class(self, cls, name)
+sage/cpython/getattr.pyx:362: in sage.cpython.getattr.getattr_from_other_class
+    ???
+E   AttributeError: 'FiniteOrderedSets.parent_class' object has no attribute 'codomain'
+_ test_sign_and_trivial_actions_coincide_after_base_change_to_characteristic_two _
+sage/structure/category_object.pyx:858: in sage.structure.category_object.CategoryObject.getattr_from_category
+    return self._cached_methods[name]
+E   KeyError: 'codomain'
+
+During handling of the above exception, another exception occurred:
+tests/groups/test_actual_group_algebra_modules.sage:54: in test_sign_and_trivial_actions_coincide_after_base_change_to_characteristic_two
+    group, trivial, sign = _trivial_and_sign_lines(ZZ)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/groups/test_actual_group_algebra_modules.sage:8: in _trivial_and_sign_lines
+    line = Modules(ring)(Sets()(("e",)))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/sage/.venv/lib/python3.14/site-packages/sage/categories/category.py:592: in __call__
+    return self._call_(x, *args, **opts)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/pure/modules.py:515: in _call_
+    module = scalar_action.codomain().domain()
+             ^^^^^^^^^^^^^^^^^^^^^^
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    return self.getattr_from_category(name)
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    attr = getattr_from_other_class(self, cls, name)
+sage/cpython/getattr.pyx:362: in sage.cpython.getattr.getattr_from_other_class
+    ???
+E   AttributeError: 'FiniteOrderedSets.parent_class' object has no attribute 'codomain'
+=========================== short test summary info ============================
+FAILED tests/groups/test_actual_group_algebra_modules.sage::test_the_integral_sign_representation_has_no_invariants_and_coinvariants_z_mod_2
+FAILED tests/groups/test_actual_group_algebra_modules.sage::test_the_invariants_of_the_regular_representation_of_s3_are_one_dimensional
+FAILED tests/groups/test_actual_group_algebra_modules.sage::test_q_splits_c2_but_the_splitting_field_of_c3_is_quadratic
+FAILED tests/groups/test_actual_group_algebra_modules.sage::test_sign_and_trivial_actions_coincide_after_base_change_to_characteristic_two
+4 failed, 4 passed in 4.56s
