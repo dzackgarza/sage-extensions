@@ -2709,3 +2709,12 @@ rebase onto `8c4f5ba`:
 | `525-r2-fix-engineering.log` | `5812648` | the same directory with this round: **10 failed, 13 passed in 55.26 s**.  The FAILED ids are the base's eleven minus the scan's, one for one; the scan's file and its two tests are gone, so the base collects twenty-five and this tree twenty-three. |
 | `525-r2-greps.log` | `5812648`, with `7f36d57` for the contrast | the contract's greps, each with its full output rather than a count: the number sign 0, the issue spelling in a path 0 (**17 at the base**), the word `issue` 0 (**18 at the base**), the `.tmp` run-log pointers 0, the `results/` notes 0.  The history vocabulary is printed line by line, so each remaining match can be read: they are the instrumental `used to build` and the engine's `may advertise`. |
 | `525-r2-import.log` | `5812648` | every edited module imports in the pinned image: `sage_extensions.all` and the eight modules whose prose changed, 677 public names, exit 0. |
+#541, round 5. The runs of this round name the commit they were taken on inside
+each log, and every one was made in the adopted runtime with the worktree at
+`/work` and `PYTHONPATH` carrying the port copy.
+| log | commit | result |
+| `541r5-red-torsion-placement.log` | `2f2fcad` (this round's base) plus the round's two test files | the new file and the rewritten claim file: **3 failed, 4 passed in 8.14 s**; the three failures are the placement refined from a computed `is_torsion()`, the torsion-form constructor refuting the claim it was asked to store, and the claim's validator answering on a module that claimed nothing |
+| `541r5-green-torsion-placement.log` | the round's fix commits | the five affected files: **15 passed in 10.60 s** |
+| `541r5-probe-base-placement.log` | `08322de` | a fresh `coker(5)` formed without a claim is in `FormModules(ZZ).FinitelyPresented().Torsion()`, and its construction costs 4 units of work, as does the claimed one |
+| `541r5-probe-presented-construction.log` | the round's fix commits | cokernels over `ZZ` and `QQ`, a lattice plane quotient, a claimed torsion module with its elements, and `direct_sum_of_cyclics((2,3))` after the dead constructor parameters were deleted |
+| `541r5-probe-matrix-space-containment.log` | the round's fix commits | a lattice inclusion's homset is **not** in `MatrixSpaces(ZZ)` while it does retain a coordinate matrix, so `MatrixSpaces` containment is not the discriminator finding F asks for |

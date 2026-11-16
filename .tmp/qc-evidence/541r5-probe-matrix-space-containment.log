@@ -1,0 +1,30 @@
+probe: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/probe541r5h.py
+tree SHA: 31dc5953e4bf29c20a2f220667c453df0e85d8a8 (modified paths: 0)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 19.97 15.66 15.70 22/943 2879887
+inner 300 s, outer 330 s, guard 6144 MiB, args ''
+ZZ homset: Free module on {Generic endomorphism of Free module on {[0], [1]} over Integer Ring, Generic endomorphism of Free module on {[0], [1]} over Integer Ring, Generic endomorphism of Free module on {[0], [1]} over Integer Ring, Generic endomorphism of Free module on {[0], [1]} over Integer Ring} over Integer Ring
+ZZ homset in MatrixSpaces(ZZ): True
+is_primitive (dilation, non-injective): False
+lattice homset: Emb(Integral lattice of rank 2 and signature (0, 0), Integral lattice of rank 4 and signature (2, 2))
+lattice homset in MatrixSpaces(ZZ): False
+lattice inclusion is_primitive: True
+its saturation: Integral lattice of rank 2 and signature (0, 0)
+RR homset: Free module on {Generic endomorphism of Free module on {[0], [1]} over Real Field, Generic endomorphism of Free module on {[0], [1]} over Real Field, Generic endomorphism of Free module on {[0], [1]} over Real Field, Generic endomorphism of Free module on {[0], [1]} over Real Field} over Real Field
+RR homset in MatrixSpaces(RR): True
+RR is_primitive: True
+cokernel of dilation: Invariant-factor family: [0 ↦ 2, 1 ↦ 2]
+[peakrss] probe541r5h: child waited=0 shell_code=0 samples=9
+[peakrss] peak tree RSS      : 222 MiB
+[peakrss] low-water MemAvail : 1870 MiB
+[peakrss] peak single VmHWM  : 235 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      224 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    14.1s procs=  3 rss=   222 MiB hwm=   235 MiB avail=  2511 MiB
+[peakrss]   t=    12.1s procs=  3 rss=   215 MiB hwm=   221 MiB avail=  2704 MiB
+[peakrss]   t=    16.1s procs=  3 rss=   213 MiB hwm=   235 MiB avail=  2420 MiB
+[peakrss]   t=    10.1s procs=  3 rss=   193 MiB hwm=   199 MiB avail=  2783 MiB
+[peakrss]   t=     8.1s procs=  3 rss=   150 MiB hwm=   157 MiB avail=  2099 MiB
+launcher exit: 0
