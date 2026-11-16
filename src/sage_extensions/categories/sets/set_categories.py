@@ -6805,12 +6805,12 @@ class NaturalNumberSets(OwnedCategory):
             one object: equal naturals are equal here whatever carried them, and
             a point of an ordinal is a value like any other.  The set holds each
             point weakly, so a natural lives while something references it and no
-            longer: an entry goes with the value it names.  The element's
-            :meth:`__reduce__` is the one protocol that reaches this constructor,
-            which is what makes a natural read back the one point; the set's
-            :meth:`__reduce__` answers :math:`\mathbb N` itself rather than a
-            point, and a copy of a natural is the natural, so neither of those
-            asks this set for one.
+            longer: an entry goes with the value it names.  Of the pickling and
+            copy protocols, the element's :meth:`__reduce__` is the one that
+            reaches this constructor, which is what makes a natural read back
+            the one point; the set's :meth:`__reduce__` answers :math:`\mathbb N`
+            itself rather than a point, and a copy of a natural is the natural,
+            so neither of those asks this set for one.
             """
             point = self._interned_points.get(number)
             if point is None:

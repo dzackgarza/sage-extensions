@@ -2536,3 +2536,19 @@ algebra commits onto this round's work).  `541r2-green-pushed.log` is the three
 contract files on it: **4 passed in 1.74 s** with the test lint loaded.  The row
 is measured on `4adbc38`, the same tree without `#540`'s two algebras commits,
 which are not on the transport's path.
+
+## #541 round 3: the walk step priced apart from the plane, and the primitivity decision repaired
+
+Measured on `main` `4f540a2` and on the repair that follows it.  Each log records
+its own tree, its own load and the exact command in its header.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `541r3-walk-step-census.log` | `4f540a2` | the row's per-plane cost, unprofiled and phase by phase: the walk's first `next()` (its setup, the coset action and its 189720-point walk) **174.1 s** ending at 509.7 s; the next 198 steps a median of **0.775 ms** and flat (0.795 ms over 2..25, 0.764 ms over 194..199); the 199 transports a median of **10.073 ms** and flat (10.283 -> 9.902 ms); per plane over 80 planes `is_primitive` **5.425 ms** (54.2 %) of which `cokernel` **4.244 ms** (42.4 %), `subobject_on` 2.876 ms (28.7 %), `is_torsion_free` 0.392 ms, `refine` 0.165 ms, the rest 1.714 ms |
+| `541r3-primitivity-red.log` | `4f540a2` | the new contract file red at the base tree: **1 failed, `assert 1 == 0`** — deciding a span's primitivity built one quotient module |
+| `541r3-primitivity-green.log` | `80a135c` + the repair | the same file after the repair: **1 passed in 1.63 s**, test lint loaded |
+| `541r3-plane-parts-base.log` | `4f540a2` | one plane of `T_Co`, 8 cold spans, at load **4.36**: `subobject_on` 3.408 ms, `is_primitive` **6.512 ms**, span + decision 9.920 ms |
+| `541r3-plane-parts-repaired.log` | the repair (same tree) | the same probe at load **4.61**: `subobject_on` 3.199 ms, `is_primitive` **2.083 ms**, span + decision **5.282 ms** |
+| `541r3-review-tests.log` | `80a135c` | the three contract files of the review round with the test lint loaded: **4 passed in 7.03 s** |
+| `541r3-row-repaired.log` | `b383a80` | the row on the pushed tree at load **0.94**: first plane **306.7 s**, **26 506 planes by 516.6 s**, the ticks reading **127.98 planes/s (7.8 ms a plane)** at 486.5 s and **126.31 planes/s (7.9 ms)** at 516.6 s, peak RSS 3330 MiB; against the base's **86.4 planes/s and 11.6 ms a plane** (`541r2-row-merged-second.log`) that is +47 % planes a second and -32 % a plane, the walk's setup unchanged |
+| `541r3-consumers-base.log`, `541r3-consumers-repaired.log` | `4f540a2` / `b383a80` | the nine `tests/lattices` files that consume the primitivity decision: **9 failed, 9 passed** in 177.62 s and **8 failed, 10 passed** in 172.65 s, and `diff` of the FAILED id sets is exactly `test_a_planes_primitivity_is_decided_from_its_coordinates.sage`, the contract file that is red at the base; no other id moved |

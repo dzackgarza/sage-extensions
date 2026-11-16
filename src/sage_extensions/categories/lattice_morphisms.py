@@ -1972,16 +1972,12 @@ class LatticeIsometryMethods:
                 # isometry is again one, and ``primitive_isotropic_subobject``
                 # re-verifies both facts and places the result in the category
                 # that owns the parabolic and reduction methods, which the bare
-                # module image does not (#391: the transported representatives
-                # of the Coble plane row are consumed by exactly those
-                # methods).
+                # module image does not.
                 #
-                # So the plane's image is computed there and nowhere else.  A
-                # morphism image ``(self * obj.inclusion()).image()`` would
-                # build the same span -- its Hermite form and its restricted
-                # Gram -- a second time, and the transported plane below reads
-                # only the images of the plane's basis: the span it built would
-                # be computed for a reader that does not exist (#541).
+                # The plane's image is therefore computed there and nowhere
+                # else: the images of the plane's basis are carried by this
+                # isometry, one matrix product a vector, and their span is the
+                # image plane.
                 inclusion = obj.inclusion()
                 domain = inclusion.domain()
                 basis = tuple(

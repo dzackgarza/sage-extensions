@@ -47,6 +47,7 @@ from sage_extensions.categories._lattice import (
     _discriminant_of_gram,
     _generating_set_for,
     _gram_is_even,
+    _hyperbolic_plane_name,
     _IdentityGram,
     _lattice,
     _lattice_from_gram_tensor,
@@ -9640,12 +9641,21 @@ class Lattices(OwnedCategoryOverBaseRing):
             return finite_ordered_set(tuple(matches))
 
         def hyperbolic_plane_summand_count(self):
-            r"""Return the number of represented indecomposable hyperbolic-plane summands."""
-            plane = Lattices(self.base_ring())("U")
+            r"""Return the number of represented indecomposable hyperbolic-plane summands.
+
+            The count reads the presentation, as :meth:`decomposition_names`
+            does: a summand is a hyperbolic-plane summand when its displayed
+            Gram is the plane's own, \(b(e,e) = b(f,f) = 0\) and
+            \(b(e,f) = 1\) on its generators.  A summand presented by another
+            Gram of the same binary lattice is isometric to \(U\) without being
+            presented as it, and deciding that isometry is a different question
+            (:meth:`is_isometric`, undecided outside the exact regimes), not a
+            reading of what the decomposition represents.
+            """
             return sum(
                 1
                 for summand in self.indecomposable_summands()
-                if summand.is_isometric(plane)
+                if _hyperbolic_plane_name(summand.gram_tensor()) is not None
             )
 
         def splits_two_hyperbolic_planes(self) -> bool:
@@ -9660,7 +9670,13 @@ class Lattices(OwnedCategoryOverBaseRing):
             return self.hyperbolic_plane_summand_count() >= 2
 
         def eichler_criterion_applies(self) -> bool:
-            r"""Return whether Eichler's criterion classifies primitive-vector orbits here."""
+            r"""Return whether Eichler's criterion classifies primitive-vector orbits here.
+
+            The hypothesis is read off the presented decomposition
+            (:meth:`splits_two_hyperbolic_planes`), so a lattice presented by a
+            Gram matrix is not covered by the criterion however it decomposes:
+            apply it to a presentation that carries the splitting.
+            """
             return bool(self.is_even()) and self.splits_two_hyperbolic_planes()
 
         def are_in_one_stable_orbit(self, left, right) -> bool:

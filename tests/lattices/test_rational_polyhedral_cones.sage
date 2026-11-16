@@ -8,6 +8,9 @@ Every claim is read off the defining inequalities.
   \(\{x_0 = 0\}\), of dimension 2.
 - \(\{x_0,x_1\ge0\}\) in \(\mathbf Z^3\) contains the whole line \(\mathbf Z e_2\), so it
   is not pointed.
+- The cell cut out by no covector at all is the whole ambient space: in
+  \(\mathbf Z^2\) it is \(\mathbf Q^2\), of dimension 2, not pointed, with no
+  extreme ray and with the whole plane as its lineality.
 - Two orthants differing in the sign of one coordinate share a facet; the orthant and its
   negative meet only in the origin.
 - The cone \(\{x \ge 0,\; -x+2y \ge 0\}\) in \(\mathbf Z^2\) has primitive rays \((0,1)\) and
@@ -57,6 +60,20 @@ def test_a_wedge_containing_a_line_is_not_pointed() -> None:
     assert not wedge.is_pointed()
     assert wedge.contains(third)
     assert wedge.contains(-third)
+
+
+def test_the_cell_cut_out_by_no_covector_is_the_whole_space() -> None:
+    lattice = Lattices(ZZ)([[1, 0], [0, 1]])
+    first, second = lattice.module_generators()
+    cell = lattice.reduction_cell(())
+
+    assert cell.ambient_dimension() == 2
+    assert cell.dimension() == 2
+    assert not cell.is_pointed()
+    assert cell.primitive_rays().cardinality() == 0
+    for generator in (first, second):
+        assert generator in cell.lineality_generators()
+    assert cell.contains(first + second)
 
 
 def test_orthants_sharing_a_facet_are_adjacent_and_opposite_orthants_are_not() -> None:

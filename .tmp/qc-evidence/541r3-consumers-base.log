@@ -1,0 +1,777 @@
+=== ran on: 4f540a2d927d9a9171d01913006503c41cf81334 (2 modified paths)
+=== command: pytest tests/lattices/test_a_planes_primitivity_is_decided_from_its_coordinates.sage tests/lattices/test_a_plane_transport_builds_one_span.sage tests/lattices/test_a_subobject_asks_the_ambient_lattice_for_no_display.sage tests/lattices/test_chosen_target_primitive_embeddings.sage tests/lattices/test_general_primitive_embeddings.sage tests/lattices/test_isotropic_parabolic_restriction.sage tests/lattices/test_isotropic_line_orbits_of_small_indefinite_lattices.sage tests/lattices/test_isotropic_plane_levi_vector_equivalence.sage tests/lattices/test_complete_isotropic_flag_orbits.sage -o addopts= -p qc_sage_session -p sage_extensions.testing.test_lint
+F.....FF.F...FFFFF                                                       [100%]
+=================================== FAILURES ===================================
+___________ test_a_subobjects_primitivity_builds_no_quotient_module ____________
+
+    def test_a_subobjects_primitivity_builds_no_quotient_module() -> None:
+        r"""Decide primitivity of \(\langle e_1, f_2\rangle\), \(\langle e_1, 2f_2\rangle\) and lines.
+    
+        \(U\oplus U\) has basis \(e_1,f_1,e_2,f_2\) with \(b(e_i,f_i)=1\).  The span
+        of \(e_1\) and \(f_2\) is primitive, while the span of \(e_1\) and \(2f_2\)
+        has \(f_2\) outside it and twice \(f_2\) inside, so its quotient carries a
+        torsion class of order two;
+        the line spanned by \(2e_1\) has a quotient of the same kind and the line
+        spanned by \(f_1 - e_1\) does not.
+        """
+        lattice = Lattices(ZZ)("U") + Lattices(ZZ)("U")
+        e1, f1, e2, f2 = lattice.module_generators()
+        span = lattice.subobject_on((e1, f2))
+        inclusion = span.inclusion()
+    
+        decided, quotients = cokernels_built_by(span.is_primitive, inclusion)
+    
+        assert decided is True
+>       assert quotients == 0
+E       assert 1 == 0
+E        +  where 0 = Integer(0)
+
+tests/lattices/test_a_planes_primitivity_is_decided_from_its_coordinates.sage:35: AssertionError
+_____ test_null_plane_restriction_kernel_is_the_integral_skew_shear_group ______
+
+    def test_null_plane_restriction_kernel_is_the_integral_skew_shear_group():
+        r"""Fixing e,u in 2U forces f -> f+t*u, v -> v-t*e for t in ZZ."""
+        ambient = Lattices(ZZ)("U") + Lattices(ZZ)("U")
+        e, f, u, v = tuple(ambient.module_generators())
+        labels = tuple(ambient.module_generating_set())
+        space = ambient.primitive_isotropic_subobject(e, u)
+        kernel = space.isotropic_reduction().isotropic_action().kernel()
+        parameters = []
+>       for generator in kernel.group_generators():
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/lattices/test_isotropic_parabolic_restriction.sage:40: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/group/groups.py:5922: in group_generators
+    self.selected_group_resolution().generators(name="Group generators"),
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/groups.py:5885: in selected_group_resolution
+    return self.selected_resolution(OwnedGroups())
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/objects.py:383: in selected_resolution
+    resolution = selected.realize()
+                 ^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/objects.py:116: in realize
+    return self._resolution_factory()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/predicate_subgroups.py:53: in resolution
+    augmentation = generating_morphism(subgroup)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/groups.py:3759: in <lambda>
+    augmentation = None if generators is None else lambda kernel: kernel.free_cover(generators())
+                                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/groups.py:5954: in free_cover
+    elements = tuple(self(generator) for generator in generators)
+               ^^^^^
+src/sage_extensions/categories/group/groups.py:5954: in <genexpr>
+    elements = tuple(self(generator) for generator in generators)
+                     ^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/objects.py:417: in __call__
+    return self._element_constructor_(*arguments, **options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/predicate_subgroups.py:234: in _element_constructor_
+    return _ConditionSetEngine._element_constructor_(self, self.supergroup()(datum))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = {g in {g in Orthogonal group O(Integral lattice of rank 4 and signature (2, 2)) : g(im(Generic morphism:
+  From: Integ...)
+  To:   Integral lattice of rank 4 and signature (2, 2))} : elements mapped to the identity by the defining morphism}
+element = Morphism from Integral lattice of rank 4 and signature (2, 2) to Integral lattice of rank 4 and signature (2, 2)
+
+    def _element_constructor_(self, element):
+        member = self.is_parent_of(element)
+        if member is False:
+>           raise ValueError(f"{element!r} is not in {self}")
+E           ValueError: Morphism from Integral lattice of rank 4 and signature (2, 2) to Integral lattice of rank 4 and signature (2, 2) is not in {g in {g in Orthogonal group O(Integral lattice of rank 4 and signature (2, 2)) : g(im(Generic morphism:
+E             From: Integral lattice of rank 2 and signature (0, 0)
+E             To:   Integral lattice of rank 4 and signature (2, 2)))=im(Generic morphism:
+E             From: Integral lattice of rank 2 and signature (0, 0)
+E             To:   Integral lattice of rank 4 and signature (2, 2))} : elements mapped to the identity by the defining morphism}
+
+src/sage_extensions/categories/sets/set_categories.py:4471: ValueError
+________ test_the_line_counts_of_the_three_groups_are_the_derived_ones _________
+
+    def test_the_line_counts_of_the_three_groups_are_the_derived_ones() -> None:
+        r"""``Õ⁺``, ``Õ`` and ``O`` on ``L_d`` for d = 1, 2, 4, 9, 36: the derived line counts."""
+        for d, derived in _CASES:
+            lattice = _lattice(d)
+            orthogonal = lattice.Aut()
+            stable = lattice.stable_orthogonal_group()
+            stable_plus = stable.intersection(lattice.O_plus())
+    
+>           assert orthogonal.isotropic_orbit_representatives(1).cardinality() == derived
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/lattices/test_isotropic_line_orbits_of_small_indefinite_lattices.sage:78: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/lattice_morphisms.py:5243: in isotropic_orbit_representatives
+    return _isotropic_orbit_representatives(self, rank, flag=flag)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/timing.py:392: in timed
+    with stage(name, input(*arguments, **keywords)):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/contextlib.py:141: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+src/sage_extensions/timing.py:344: in stage
+    "commit": current_commit(),
+              ^^^^^^^^^^^^^^^^
+src/sage_extensions/timing.py:247: in current_commit
+    completed = subprocess.run(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+input = None, capture_output = True, timeout = None, check = True
+popenargs = (('git', '-C', '/repos/sage-extensions', 'rev-parse', 'HEAD'),)
+kwargs = {'text': True, 'stdout': -1, 'stderr': -1}
+
+    def run(*popenargs,
+            input=None, capture_output=False, timeout=None, check=False, **kwargs):
+        """Run command with arguments and return a CompletedProcess instance.
+    
+        The returned instance will have attributes args, returncode, stdout and
+        stderr. By default, stdout and stderr are not captured, and those attributes
+        will be None. Pass stdout=PIPE and/or stderr=PIPE in order to capture them,
+        or pass capture_output=True to capture both.
+    
+        If check is True and the exit code was non-zero, it raises a
+        CalledProcessError. The CalledProcessError object will have the return code
+        in the returncode attribute, and output & stderr attributes if those streams
+        were captured.
+    
+        If timeout (seconds) is given and the process takes too long,
+         a TimeoutExpired exception will be raised.
+    
+        There is an optional argument "input", allowing you to
+        pass bytes or a string to the subprocess's stdin.  If you use this argument
+        you may not also use the Popen constructor's "stdin" argument, as
+        it will be used internally.
+    
+        By default, all communication is in bytes, and therefore any "input" should
+        be bytes, and the stdout and stderr will be bytes. If in text mode, any
+        "input" should be a string, and stdout and stderr will be strings decoded
+        according to locale encoding, or by "encoding" if set. Text mode is
+        triggered by setting any of text, encoding, errors or universal_newlines.
+    
+        The other arguments are the same as for the Popen constructor.
+        """
+        if input is not None:
+            if kwargs.get('stdin') is not None:
+                raise ValueError('stdin and input arguments may not both be used.')
+            kwargs['stdin'] = PIPE
+    
+        if capture_output:
+            if kwargs.get('stdout') is not None or kwargs.get('stderr') is not None:
+                raise ValueError('stdout and stderr arguments may not be used '
+                                 'with capture_output.')
+            kwargs['stdout'] = PIPE
+            kwargs['stderr'] = PIPE
+    
+        with Popen(*popenargs, **kwargs) as process:
+            try:
+                stdout, stderr = process.communicate(input, timeout=timeout)
+            except TimeoutExpired as exc:
+                process.kill()
+                if _mswindows:
+                    # Windows accumulates the output in a single blocking
+                    # read() call run on child threads, with the timeout
+                    # being done in a join() on those threads.  communicate()
+                    # _after_ kill() is required to collect that and add it
+                    # to the exception.
+                    exc.stdout, exc.stderr = process.communicate()
+                else:
+                    # POSIX _communicate already populated the output so
+                    # far into the TimeoutExpired exception.
+                    process.wait()
+                raise
+            except:  # Including KeyboardInterrupt, communicate handled that.
+                process.kill()
+                # We don't call process.wait() as .__exit__ does that for us.
+                raise
+            retcode = process.poll()
+            if check and retcode:
+>               raise CalledProcessError(retcode, process.args,
+                                         output=stdout, stderr=stderr)
+E               subprocess.CalledProcessError: Command '('git', '-C', '/repos/sage-extensions', 'rev-parse', 'HEAD')' returned non-zero exit status 128.
+
+/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/subprocess.py:578: CalledProcessError
+______ test_the_rank_five_shadow_has_one_primitive_isotropic_plane_orbit _______
+
+    def test_the_rank_five_shadow_has_one_primitive_isotropic_plane_orbit() -> None:
+        r"""``L_1``: the one part of Scattone's degree-two boundary this lattice sees."""
+        lattice = _lattice(1)
+>       planes = lattice.Aut().isotropic_orbit_representatives(2)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/lattices/test_isotropic_line_orbits_of_small_indefinite_lattices.sage:110: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/lattice_morphisms.py:5243: in isotropic_orbit_representatives
+    return _isotropic_orbit_representatives(self, rank, flag=flag)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/timing.py:392: in timed
+    with stage(name, input(*arguments, **keywords)):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/contextlib.py:141: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+src/sage_extensions/timing.py:344: in stage
+    "commit": current_commit(),
+              ^^^^^^^^^^^^^^^^
+src/sage_extensions/timing.py:247: in current_commit
+    completed = subprocess.run(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+input = None, capture_output = True, timeout = None, check = True
+popenargs = (('git', '-C', '/repos/sage-extensions', 'rev-parse', 'HEAD'),)
+kwargs = {'text': True, 'stdout': -1, 'stderr': -1}
+
+    def run(*popenargs,
+            input=None, capture_output=False, timeout=None, check=False, **kwargs):
+        """Run command with arguments and return a CompletedProcess instance.
+    
+        The returned instance will have attributes args, returncode, stdout and
+        stderr. By default, stdout and stderr are not captured, and those attributes
+        will be None. Pass stdout=PIPE and/or stderr=PIPE in order to capture them,
+        or pass capture_output=True to capture both.
+    
+        If check is True and the exit code was non-zero, it raises a
+        CalledProcessError. The CalledProcessError object will have the return code
+        in the returncode attribute, and output & stderr attributes if those streams
+        were captured.
+    
+        If timeout (seconds) is given and the process takes too long,
+         a TimeoutExpired exception will be raised.
+    
+        There is an optional argument "input", allowing you to
+        pass bytes or a string to the subprocess's stdin.  If you use this argument
+        you may not also use the Popen constructor's "stdin" argument, as
+        it will be used internally.
+    
+        By default, all communication is in bytes, and therefore any "input" should
+        be bytes, and the stdout and stderr will be bytes. If in text mode, any
+        "input" should be a string, and stdout and stderr will be strings decoded
+        according to locale encoding, or by "encoding" if set. Text mode is
+        triggered by setting any of text, encoding, errors or universal_newlines.
+    
+        The other arguments are the same as for the Popen constructor.
+        """
+        if input is not None:
+            if kwargs.get('stdin') is not None:
+                raise ValueError('stdin and input arguments may not both be used.')
+            kwargs['stdin'] = PIPE
+    
+        if capture_output:
+            if kwargs.get('stdout') is not None or kwargs.get('stderr') is not None:
+                raise ValueError('stdout and stderr arguments may not be used '
+                                 'with capture_output.')
+            kwargs['stdout'] = PIPE
+            kwargs['stderr'] = PIPE
+    
+        with Popen(*popenargs, **kwargs) as process:
+            try:
+                stdout, stderr = process.communicate(input, timeout=timeout)
+            except TimeoutExpired as exc:
+                process.kill()
+                if _mswindows:
+                    # Windows accumulates the output in a single blocking
+                    # read() call run on child threads, with the timeout
+                    # being done in a join() on those threads.  communicate()
+                    # _after_ kill() is required to collect that and add it
+                    # to the exception.
+                    exc.stdout, exc.stderr = process.communicate()
+                else:
+                    # POSIX _communicate already populated the output so
+                    # far into the TimeoutExpired exception.
+                    process.wait()
+                raise
+            except:  # Including KeyboardInterrupt, communicate handled that.
+                process.kill()
+                # We don't call process.wait() as .__exit__ does that for us.
+                raise
+            retcode = process.poll()
+            if check and retcode:
+>               raise CalledProcessError(retcode, process.args,
+                                         output=stdout, stderr=stderr)
+E               subprocess.CalledProcessError: Command '('git', '-C', '/repos/sage-extensions', 'rev-parse', 'HEAD')' returned non-zero exit status 128.
+
+/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/subprocess.py:578: CalledProcessError
+_ test_complete_null_flag_orbits_and_transporters_in_split_unimodular_lattices[rank_one] _
+
+rank = 1
+
+    @pytest.mark.parametrize("rank", (1, 2, 3), ids=("rank_one", "rank_two", "rank_three"))
+    def test_complete_null_flag_orbits_and_transporters_in_split_unimodular_lattices(rank):
+        hyperbolic = Lattices(ZZ)("U")
+        ambient = hyperbolic
+        for _ in range(1, rank):
+            ambient = ambient + hyperbolic
+        basis = tuple(ambient.module_generators())
+        labels = tuple(ambient.module_generating_set())
+        group = ambient.O()
+>       flags = group.isotropic_orbit_representatives(rank, flag=True)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/lattices/test_complete_isotropic_flag_orbits.sage:22: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/lattice_morphisms.py:5243: in isotropic_orbit_representatives
+    return _isotropic_orbit_representatives(self, rank, flag=flag)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/timing.py:392: in timed
+    with stage(name, input(*arguments, **keywords)):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/contextlib.py:141: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+src/sage_extensions/timing.py:344: in stage
+    "commit": current_commit(),
+              ^^^^^^^^^^^^^^^^
+src/sage_extensions/timing.py:247: in current_commit
+    completed = subprocess.run(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+input = None, capture_output = True, timeout = None, check = True
+popenargs = (('git', '-C', '/repos/sage-extensions', 'rev-parse', 'HEAD'),)
+kwargs = {'text': True, 'stdout': -1, 'stderr': -1}
+
+    def run(*popenargs,
+            input=None, capture_output=False, timeout=None, check=False, **kwargs):
+        """Run command with arguments and return a CompletedProcess instance.
+    
+        The returned instance will have attributes args, returncode, stdout and
+        stderr. By default, stdout and stderr are not captured, and those attributes
+        will be None. Pass stdout=PIPE and/or stderr=PIPE in order to capture them,
+        or pass capture_output=True to capture both.
+    
+        If check is True and the exit code was non-zero, it raises a
+        CalledProcessError. The CalledProcessError object will have the return code
+        in the returncode attribute, and output & stderr attributes if those streams
+        were captured.
+    
+        If timeout (seconds) is given and the process takes too long,
+         a TimeoutExpired exception will be raised.
+    
+        There is an optional argument "input", allowing you to
+        pass bytes or a string to the subprocess's stdin.  If you use this argument
+        you may not also use the Popen constructor's "stdin" argument, as
+        it will be used internally.
+    
+        By default, all communication is in bytes, and therefore any "input" should
+        be bytes, and the stdout and stderr will be bytes. If in text mode, any
+        "input" should be a string, and stdout and stderr will be strings decoded
+        according to locale encoding, or by "encoding" if set. Text mode is
+        triggered by setting any of text, encoding, errors or universal_newlines.
+    
+        The other arguments are the same as for the Popen constructor.
+        """
+        if input is not None:
+            if kwargs.get('stdin') is not None:
+                raise ValueError('stdin and input arguments may not both be used.')
+            kwargs['stdin'] = PIPE
+    
+        if capture_output:
+            if kwargs.get('stdout') is not None or kwargs.get('stderr') is not None:
+                raise ValueError('stdout and stderr arguments may not be used '
+                                 'with capture_output.')
+            kwargs['stdout'] = PIPE
+            kwargs['stderr'] = PIPE
+    
+        with Popen(*popenargs, **kwargs) as process:
+            try:
+                stdout, stderr = process.communicate(input, timeout=timeout)
+            except TimeoutExpired as exc:
+                process.kill()
+                if _mswindows:
+                    # Windows accumulates the output in a single blocking
+                    # read() call run on child threads, with the timeout
+                    # being done in a join() on those threads.  communicate()
+                    # _after_ kill() is required to collect that and add it
+                    # to the exception.
+                    exc.stdout, exc.stderr = process.communicate()
+                else:
+                    # POSIX _communicate already populated the output so
+                    # far into the TimeoutExpired exception.
+                    process.wait()
+                raise
+            except:  # Including KeyboardInterrupt, communicate handled that.
+                process.kill()
+                # We don't call process.wait() as .__exit__ does that for us.
+                raise
+            retcode = process.poll()
+            if check and retcode:
+>               raise CalledProcessError(retcode, process.args,
+                                         output=stdout, stderr=stderr)
+E               subprocess.CalledProcessError: Command '('git', '-C', '/repos/sage-extensions', 'rev-parse', 'HEAD')' returned non-zero exit status 128.
+
+/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/subprocess.py:578: CalledProcessError
+_ test_complete_null_flag_orbits_and_transporters_in_split_unimodular_lattices[rank_two] _
+
+rank = 2
+
+    @pytest.mark.parametrize("rank", (1, 2, 3), ids=("rank_one", "rank_two", "rank_three"))
+    def test_complete_null_flag_orbits_and_transporters_in_split_unimodular_lattices(rank):
+        hyperbolic = Lattices(ZZ)("U")
+        ambient = hyperbolic
+        for _ in range(1, rank):
+            ambient = ambient + hyperbolic
+        basis = tuple(ambient.module_generators())
+        labels = tuple(ambient.module_generating_set())
+        group = ambient.O()
+>       flags = group.isotropic_orbit_representatives(rank, flag=True)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/lattices/test_complete_isotropic_flag_orbits.sage:22: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/lattice_morphisms.py:5243: in isotropic_orbit_representatives
+    return _isotropic_orbit_representatives(self, rank, flag=flag)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/timing.py:392: in timed
+    with stage(name, input(*arguments, **keywords)):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/contextlib.py:141: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+src/sage_extensions/timing.py:344: in stage
+    "commit": current_commit(),
+              ^^^^^^^^^^^^^^^^
+src/sage_extensions/timing.py:247: in current_commit
+    completed = subprocess.run(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+input = None, capture_output = True, timeout = None, check = True
+popenargs = (('git', '-C', '/repos/sage-extensions', 'rev-parse', 'HEAD'),)
+kwargs = {'text': True, 'stdout': -1, 'stderr': -1}
+
+    def run(*popenargs,
+            input=None, capture_output=False, timeout=None, check=False, **kwargs):
+        """Run command with arguments and return a CompletedProcess instance.
+    
+        The returned instance will have attributes args, returncode, stdout and
+        stderr. By default, stdout and stderr are not captured, and those attributes
+        will be None. Pass stdout=PIPE and/or stderr=PIPE in order to capture them,
+        or pass capture_output=True to capture both.
+    
+        If check is True and the exit code was non-zero, it raises a
+        CalledProcessError. The CalledProcessError object will have the return code
+        in the returncode attribute, and output & stderr attributes if those streams
+        were captured.
+    
+        If timeout (seconds) is given and the process takes too long,
+         a TimeoutExpired exception will be raised.
+    
+        There is an optional argument "input", allowing you to
+        pass bytes or a string to the subprocess's stdin.  If you use this argument
+        you may not also use the Popen constructor's "stdin" argument, as
+        it will be used internally.
+    
+        By default, all communication is in bytes, and therefore any "input" should
+        be bytes, and the stdout and stderr will be bytes. If in text mode, any
+        "input" should be a string, and stdout and stderr will be strings decoded
+        according to locale encoding, or by "encoding" if set. Text mode is
+        triggered by setting any of text, encoding, errors or universal_newlines.
+    
+        The other arguments are the same as for the Popen constructor.
+        """
+        if input is not None:
+            if kwargs.get('stdin') is not None:
+                raise ValueError('stdin and input arguments may not both be used.')
+            kwargs['stdin'] = PIPE
+    
+        if capture_output:
+            if kwargs.get('stdout') is not None or kwargs.get('stderr') is not None:
+                raise ValueError('stdout and stderr arguments may not be used '
+                                 'with capture_output.')
+            kwargs['stdout'] = PIPE
+            kwargs['stderr'] = PIPE
+    
+        with Popen(*popenargs, **kwargs) as process:
+            try:
+                stdout, stderr = process.communicate(input, timeout=timeout)
+            except TimeoutExpired as exc:
+                process.kill()
+                if _mswindows:
+                    # Windows accumulates the output in a single blocking
+                    # read() call run on child threads, with the timeout
+                    # being done in a join() on those threads.  communicate()
+                    # _after_ kill() is required to collect that and add it
+                    # to the exception.
+                    exc.stdout, exc.stderr = process.communicate()
+                else:
+                    # POSIX _communicate already populated the output so
+                    # far into the TimeoutExpired exception.
+                    process.wait()
+                raise
+            except:  # Including KeyboardInterrupt, communicate handled that.
+                process.kill()
+                # We don't call process.wait() as .__exit__ does that for us.
+                raise
+            retcode = process.poll()
+            if check and retcode:
+>               raise CalledProcessError(retcode, process.args,
+                                         output=stdout, stderr=stderr)
+E               subprocess.CalledProcessError: Command '('git', '-C', '/repos/sage-extensions', 'rev-parse', 'HEAD')' returned non-zero exit status 128.
+
+/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/subprocess.py:578: CalledProcessError
+_ test_complete_null_flag_orbits_and_transporters_in_split_unimodular_lattices[rank_three] _
+
+rank = 3
+
+    @pytest.mark.parametrize("rank", (1, 2, 3), ids=("rank_one", "rank_two", "rank_three"))
+    def test_complete_null_flag_orbits_and_transporters_in_split_unimodular_lattices(rank):
+        hyperbolic = Lattices(ZZ)("U")
+        ambient = hyperbolic
+        for _ in range(1, rank):
+            ambient = ambient + hyperbolic
+        basis = tuple(ambient.module_generators())
+        labels = tuple(ambient.module_generating_set())
+        group = ambient.O()
+>       flags = group.isotropic_orbit_representatives(rank, flag=True)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/lattices/test_complete_isotropic_flag_orbits.sage:22: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/lattice_morphisms.py:5243: in isotropic_orbit_representatives
+    return _isotropic_orbit_representatives(self, rank, flag=flag)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/timing.py:392: in timed
+    with stage(name, input(*arguments, **keywords)):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/contextlib.py:141: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+src/sage_extensions/timing.py:344: in stage
+    "commit": current_commit(),
+              ^^^^^^^^^^^^^^^^
+src/sage_extensions/timing.py:247: in current_commit
+    completed = subprocess.run(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+input = None, capture_output = True, timeout = None, check = True
+popenargs = (('git', '-C', '/repos/sage-extensions', 'rev-parse', 'HEAD'),)
+kwargs = {'text': True, 'stdout': -1, 'stderr': -1}
+
+    def run(*popenargs,
+            input=None, capture_output=False, timeout=None, check=False, **kwargs):
+        """Run command with arguments and return a CompletedProcess instance.
+    
+        The returned instance will have attributes args, returncode, stdout and
+        stderr. By default, stdout and stderr are not captured, and those attributes
+        will be None. Pass stdout=PIPE and/or stderr=PIPE in order to capture them,
+        or pass capture_output=True to capture both.
+    
+        If check is True and the exit code was non-zero, it raises a
+        CalledProcessError. The CalledProcessError object will have the return code
+        in the returncode attribute, and output & stderr attributes if those streams
+        were captured.
+    
+        If timeout (seconds) is given and the process takes too long,
+         a TimeoutExpired exception will be raised.
+    
+        There is an optional argument "input", allowing you to
+        pass bytes or a string to the subprocess's stdin.  If you use this argument
+        you may not also use the Popen constructor's "stdin" argument, as
+        it will be used internally.
+    
+        By default, all communication is in bytes, and therefore any "input" should
+        be bytes, and the stdout and stderr will be bytes. If in text mode, any
+        "input" should be a string, and stdout and stderr will be strings decoded
+        according to locale encoding, or by "encoding" if set. Text mode is
+        triggered by setting any of text, encoding, errors or universal_newlines.
+    
+        The other arguments are the same as for the Popen constructor.
+        """
+        if input is not None:
+            if kwargs.get('stdin') is not None:
+                raise ValueError('stdin and input arguments may not both be used.')
+            kwargs['stdin'] = PIPE
+    
+        if capture_output:
+            if kwargs.get('stdout') is not None or kwargs.get('stderr') is not None:
+                raise ValueError('stdout and stderr arguments may not be used '
+                                 'with capture_output.')
+            kwargs['stdout'] = PIPE
+            kwargs['stderr'] = PIPE
+    
+        with Popen(*popenargs, **kwargs) as process:
+            try:
+                stdout, stderr = process.communicate(input, timeout=timeout)
+            except TimeoutExpired as exc:
+                process.kill()
+                if _mswindows:
+                    # Windows accumulates the output in a single blocking
+                    # read() call run on child threads, with the timeout
+                    # being done in a join() on those threads.  communicate()
+                    # _after_ kill() is required to collect that and add it
+                    # to the exception.
+                    exc.stdout, exc.stderr = process.communicate()
+                else:
+                    # POSIX _communicate already populated the output so
+                    # far into the TimeoutExpired exception.
+                    process.wait()
+                raise
+            except:  # Including KeyboardInterrupt, communicate handled that.
+                process.kill()
+                # We don't call process.wait() as .__exit__ does that for us.
+                raise
+            retcode = process.poll()
+            if check and retcode:
+>               raise CalledProcessError(retcode, process.args,
+                                         output=stdout, stderr=stderr)
+E               subprocess.CalledProcessError: Command '('git', '-C', '/repos/sage-extensions', 'rev-parse', 'HEAD')' returned non-zero exit status 128.
+
+/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/subprocess.py:578: CalledProcessError
+________ test_complete_rank_three_flag_stabilizer_preserves_every_term _________
+
+    def test_complete_rank_three_flag_stabilizer_preserves_every_term():
+        hyperbolic = Lattices(ZZ)("U")
+        ambient = hyperbolic + hyperbolic + hyperbolic
+        basis = tuple(ambient.module_generators())
+        flag = IsotropicFlag(ambient, basis[::2])
+>       group_generators = tuple(ambient.O().isotropic_stabilizer_generators(flag, flag=True))
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/lattices/test_complete_isotropic_flag_orbits.sage:45: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/lattice_morphisms.py:5329: in isotropic_stabilizer_generators
+    return _isotropic_stabilizer_generators(self, obj, flag=flag)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/isotropic_orbits.py:1686: in _isotropic_stabilizer_generators
+    return automorphism_group_generators(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+category = Functor category [Category of finite ordinal category, Lattices(Integer Ring)]
+marked = Functor: Category of finite ordinal category -> Lattices(Integer Ring)
+
+    def automorphism_group_generators(category: Category, marked: Parent) -> Parent:
+        r"""Generators of the automorphism group of a marked lattice in ``category``, as a finite ordered set of isometries of L."""
+        match category:
+            case CosliceCategory():
+                generators = RECURSION.pointed_automorphism_generators(_marked_vector(marked))
+            case _ if category is LATTICES:
+                generators = RECURSION.orthogonal_group_generators(marked)
+            case _ if category is ARROWS:
+                sublattice = _isotropic_sublattice(marked.arrow())
+                match int(sublattice.inclusion().domain().rank()):
+                    case 1:
+                        generators = INDUCTION.line_automorphism_generators(marked.arrow().codomain(), INDUCTION.plane_vectors(sublattice)[0])
+                    case _:
+                        generators = INDUCTION.plane_automorphism_generators(sublattice)
+            case _ if category is FLAGS:
+                generators = INDUCTION.flag_automorphism_generators(_flag(marked))
+            case _:
+>               raise ValueError(f"{category} is not a category of marked lattices this port decides: Lattices, a coslice <n>/Lattices, Ar(Lattices) or Fun([2], Lattices)")
+E               ValueError: Functor category [Category of finite ordinal category, Lattices(Integer Ring)] is not a category of marked lattices this port decides: Lattices, a coslice <n>/Lattices, Ar(Lattices) or Fun([2], Lattices)
+
+/work/src/sage_indefinite_port/indefinite/marked_lattices.py:122: ValueError
+_________ test_two_hyperbolic_planes_have_no_rank_three_isotropic_flag _________
+
+    def test_two_hyperbolic_planes_have_no_rank_three_isotropic_flag():
+        r"""Signature (2,2) bounds the dimension of a null subspace by two."""
+        hyperbolic = Lattices(ZZ)("U")
+        ambient = hyperbolic + hyperbolic
+>       assert ambient.O().isotropic_orbit_representatives(3, flag=True).cardinality() == cardinal(0)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/lattices/test_complete_isotropic_flag_orbits.sage:59: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/lattice_morphisms.py:5243: in isotropic_orbit_representatives
+    return _isotropic_orbit_representatives(self, rank, flag=flag)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/timing.py:392: in timed
+    with stage(name, input(*arguments, **keywords)):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/contextlib.py:141: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+src/sage_extensions/timing.py:344: in stage
+    "commit": current_commit(),
+              ^^^^^^^^^^^^^^^^
+src/sage_extensions/timing.py:247: in current_commit
+    completed = subprocess.run(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+input = None, capture_output = True, timeout = None, check = True
+popenargs = (('git', '-C', '/repos/sage-extensions', 'rev-parse', 'HEAD'),)
+kwargs = {'text': True, 'stdout': -1, 'stderr': -1}
+
+    def run(*popenargs,
+            input=None, capture_output=False, timeout=None, check=False, **kwargs):
+        """Run command with arguments and return a CompletedProcess instance.
+    
+        The returned instance will have attributes args, returncode, stdout and
+        stderr. By default, stdout and stderr are not captured, and those attributes
+        will be None. Pass stdout=PIPE and/or stderr=PIPE in order to capture them,
+        or pass capture_output=True to capture both.
+    
+        If check is True and the exit code was non-zero, it raises a
+        CalledProcessError. The CalledProcessError object will have the return code
+        in the returncode attribute, and output & stderr attributes if those streams
+        were captured.
+    
+        If timeout (seconds) is given and the process takes too long,
+         a TimeoutExpired exception will be raised.
+    
+        There is an optional argument "input", allowing you to
+        pass bytes or a string to the subprocess's stdin.  If you use this argument
+        you may not also use the Popen constructor's "stdin" argument, as
+        it will be used internally.
+    
+        By default, all communication is in bytes, and therefore any "input" should
+        be bytes, and the stdout and stderr will be bytes. If in text mode, any
+        "input" should be a string, and stdout and stderr will be strings decoded
+        according to locale encoding, or by "encoding" if set. Text mode is
+        triggered by setting any of text, encoding, errors or universal_newlines.
+    
+        The other arguments are the same as for the Popen constructor.
+        """
+        if input is not None:
+            if kwargs.get('stdin') is not None:
+                raise ValueError('stdin and input arguments may not both be used.')
+            kwargs['stdin'] = PIPE
+    
+        if capture_output:
+            if kwargs.get('stdout') is not None or kwargs.get('stderr') is not None:
+                raise ValueError('stdout and stderr arguments may not be used '
+                                 'with capture_output.')
+            kwargs['stdout'] = PIPE
+            kwargs['stderr'] = PIPE
+    
+        with Popen(*popenargs, **kwargs) as process:
+            try:
+                stdout, stderr = process.communicate(input, timeout=timeout)
+            except TimeoutExpired as exc:
+                process.kill()
+                if _mswindows:
+                    # Windows accumulates the output in a single blocking
+                    # read() call run on child threads, with the timeout
+                    # being done in a join() on those threads.  communicate()
+                    # _after_ kill() is required to collect that and add it
+                    # to the exception.
+                    exc.stdout, exc.stderr = process.communicate()
+                else:
+                    # POSIX _communicate already populated the output so
+                    # far into the TimeoutExpired exception.
+                    process.wait()
+                raise
+            except:  # Including KeyboardInterrupt, communicate handled that.
+                process.kill()
+                # We don't call process.wait() as .__exit__ does that for us.
+                raise
+            retcode = process.poll()
+            if check and retcode:
+>               raise CalledProcessError(retcode, process.args,
+                                         output=stdout, stderr=stderr)
+E               subprocess.CalledProcessError: Command '('git', '-C', '/repos/sage-extensions', 'rev-parse', 'HEAD')' returned non-zero exit status 128.
+
+/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/subprocess.py:578: CalledProcessError
+=========================== short test summary info ============================
+FAILED tests/lattices/test_a_planes_primitivity_is_decided_from_its_coordinates.sage::test_a_subobjects_primitivity_builds_no_quotient_module
+FAILED tests/lattices/test_isotropic_parabolic_restriction.sage::test_null_plane_restriction_kernel_is_the_integral_skew_shear_group
+FAILED tests/lattices/test_isotropic_line_orbits_of_small_indefinite_lattices.sage::test_the_line_counts_of_the_three_groups_are_the_derived_ones
+FAILED tests/lattices/test_isotropic_line_orbits_of_small_indefinite_lattices.sage::test_the_rank_five_shadow_has_one_primitive_isotropic_plane_orbit
+FAILED tests/lattices/test_complete_isotropic_flag_orbits.sage::test_complete_null_flag_orbits_and_transporters_in_split_unimodular_lattices[rank_one]
+FAILED tests/lattices/test_complete_isotropic_flag_orbits.sage::test_complete_null_flag_orbits_and_transporters_in_split_unimodular_lattices[rank_two]
+FAILED tests/lattices/test_complete_isotropic_flag_orbits.sage::test_complete_null_flag_orbits_and_transporters_in_split_unimodular_lattices[rank_three]
+FAILED tests/lattices/test_complete_isotropic_flag_orbits.sage::test_complete_rank_three_flag_stabilizer_preserves_every_term
+FAILED tests/lattices/test_complete_isotropic_flag_orbits.sage::test_two_hyperbolic_planes_have_no_rank_three_isotropic_flag
+9 failed, 9 passed in 177.62s (0:02:57)
+=== exit: 1

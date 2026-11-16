@@ -312,7 +312,15 @@ class RationalPolyhedralCones(OwnedParameterizedCategory):
 
             rows = [engine_row(covector) for covector in self._halfspace_covectors]
             equations = [engine_row(covector) for covector in self._equation_covectors]
-            self._engine = Polyhedron(ieqs=rows, eqns=equations, base_ring=SageQQ)
+            # The cone lies in ``L tensor QQ``, whose dimension is the number of
+            # coordinates each row states.  The exact polyhedron engine otherwise
+            # reads the ambient dimension off the rows themselves, so a cone cut
+            # out by no covector at all is handed an empty H-representation and
+            # answers for the zero-dimensional space instead of for the whole
+            # ``L tensor QQ``.
+            self._engine = Polyhedron(
+                ambient_dim=len(labels), ieqs=rows, eqns=equations, base_ring=SageQQ
+            )
             super().__init__(**rest)
 
         def ambient_lattice(self):
