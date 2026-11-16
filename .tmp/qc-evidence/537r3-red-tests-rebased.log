@@ -1,0 +1,156 @@
+# tree: c9568ed08c466489e66604079ce1a24d5b51f0be
+# load: 8.82 8.83 8.70
+# command: /sage/.venv/bin/python -m pytest -p qc_sage_session -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates -q tests/groups/test_a_subgroup_built_from_a_subgroup_states_its_description.sage
+.........FFF.F.                                                          [100%]
+=================================== FAILURES ===================================
+____ test_an_image_names_the_subgroup_it_is_the_image_of_by_its_description ____
+
+    def test_an_image_names_the_subgroup_it_is_the_image_of_by_its_description() -> None:
+        r"""$f(H)$ is ``the image of <H's description> under <f>``.
+    
+        The image of the subgroup $C_4$ generates in $C_4$ is the whole of $C_2$,
+        and the name says which subgroup it is the image of: the rendering of that
+        subgroup names the pair and not the subgroup.
+        """
+        four, two = Groups.C(4), Groups.C(2)
+        generator = next(iter(four.group_generators()))
+        class_of_one = next(iter(two.group_generators()))
+        reduction = four.Mor(two)({generator: class_of_one})
+        source = four.subgroup((generator,))
+        image = source.image_under(reduction)
+    
+>       assert image.description() == (
+            "the image of " + source.description() + f" under {reduction}"
+        )
+E       AssertionError: assert 'a subgroup g...wn generators' == 'the image of..._2 of order 2'
+E         
+E         + a subgroup given by its own generators
+E         - the image of a subgroup given by its own generators under Generic morphism:
+E         -   From: Cyclic group C_4 of order 4
+E         -   To:   Cyclic group C_2 of order 2
+
+tests/groups/test_a_subgroup_built_from_a_subgroup_states_its_description.sage:283: AssertionError
+___ test_building_an_image_asks_the_subgroup_it_projects_for_no_description ____
+
+    def test_building_an_image_asks_the_subgroup_it_projects_for_no_description() -> None:
+        r"""The image's name is formed when it is read, not when it is built."""
+        four, two = Groups.C(4), Groups.C(2)
+        generator = next(iter(four.group_generators()))
+        class_of_one = next(iter(two.group_generators()))
+        reduction = four.Mor(two)({generator: class_of_one})
+        source = four.subgroup((generator,))
+        expected = "the image of " + source.description() + f" under {reduction}"
+        asked = _counting_description(source)
+    
+        image = source.image_under(reduction)
+    
+        assert tuple(asked) == ()
+>       assert image.description() == expected
+E       AssertionError: assert 'a subgroup g...wn generators' == 'the image of..._2 of order 2'
+E         
+E         + a subgroup given by its own generators
+E         - the image of a subgroup given by its own generators under Generic morphism:
+E         -   From: Cyclic group C_4 of order 4
+E         -   To:   Cyclic group C_2 of order 2
+
+tests/groups/test_a_subgroup_built_from_a_subgroup_states_its_description.sage:303: AssertionError
+_____________ test_a_cusp_stabilizer_names_the_subobject_it_fixes ______________
+
+    def test_a_cusp_stabilizer_names_the_subobject_it_fixes() -> None:
+        r"""$\Gamma \cap P_I$ is named after the representative $I$ it preserves.
+    
+        In $\langle 6 \rangle$ the zero sublattice is the unique primitive null
+        sublattice, and its stabilizer in $O(\langle 6 \rangle) = \{1, -1\}$ is the
+        whole group: the name states the subobject it preserves, and the subgroup
+        contains both isometries.
+        """
+        ambient = Lattices(ZZ)([[6]])
+        orthogonal = ambient.O()
+        subgroup = orthogonal.predicate_subgroup(
+            lambda automorphism: True, lambda: "the whole orthogonal group"
+        )
+        cusp = next(iter(subgroup.cusps(rank=0)))
+>       stabilizer = cusp.stabilizer()
+                     ^^^^^^^^^^^^^^^^^
+
+tests/groups/test_a_subgroup_built_from_a_subgroup_states_its_description.sage:321: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/isotropic_orbits.py:872: in stabilizer
+    stabilizer = StabilizerSubgroups(self.subgroup())(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Category of stabilizer subgroups
+x = Generic morphism:
+  From: Integral lattice of rank 0 and signature (0, 0)
+  To:   Integral lattice of rank 1 and signature (1, 0)
+args = (Orthogonal group O(Integral lattice of rank 1 and signature (1, 0))-action functor on Integral lattice of rank 1 and ...Category of modules over Integer Ring, <function _ArithmeticCuspEngine.stabilizer.<locals>.<lambda> at 0x728b09256e50>)
+opts = {}
+
+    def __call__(self, x, *args, **opts):
+        """
+        Construct an object in this category from the data in ``x``,
+        or throw :exc:`TypeError` or :exc:`NotImplementedError`.
+    
+        If ``x`` is readily in ``self`` it is returned unchanged.
+        Categories wishing to extend this minimal behavior should
+        implement :meth:`._call_`.
+    
+        EXAMPLES::
+    
+            sage: Rings()(ZZ)
+            Integer Ring
+        """
+        if x in self:
+            return x
+>       return self._call_(x, *args, **opts)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: StabilizerSubgroups._call_() missing 1 required positional argument: 'stated_clause'
+
+/sage/.venv/lib/python3.14/site-packages/sage/categories/category.py:592: TypeError
+------------------------------ Captured log call -------------------------------
+INFO     sage_extensions.timing:timing.py:313 ambient O(L) row
+INFO     sage_extensions.timing:timing.py:313 isotropic orbit representatives
+_ test_a_restricted_character_intersection_forms_no_sentence_about_the_character_subgroup _
+
+    def test_a_restricted_character_intersection_forms_no_sentence_about_the_character_subgroup() -> None:
+        r"""$B \cap \Gamma$ is cut out inside $B$ by a condition read, not formed.
+    
+        The intersection of a generated subgroup $B$ with the character subgroup
+        $\Gamma = \{g : \det g = 1\}$ is cut out inside $B$ by membership in
+        $\Gamma$, and that condition names $\Gamma$ when it is read.  Reaching the
+        generators forms no sentence about $\Gamma$: its clause is asked only by a
+        reader.  (Retaining the two operands in one set does render them, which is
+        the set's own act and not this construction's, so the count starts after
+        the intersection exists.)
+    
+        Every generator the intersection hands out lies in both operands.
+        """
+        lattice = Lattices(ZZ)([[2, 0], [0, 2]])
+        group = lattice.O()
+        asked = []
+        determinant_one = group.predicate_subgroup(
+            lambda automorphism: automorphism.determinant() == 1,
+            _CountedWords(asked, "det(g)=1"),
+            character_data={"determinant_kernel": True},
+            character_data_complete=True,
+        )
+        generated = group.subgroup((next(iter(group.group_generators())),))
+    
+        intersection = group.intersection(determinant_one, generated)
+        asked.clear()
+        family = tuple(intersection.group_generators())
+    
+>       assert tuple(asked) == ()
+E       assert (1,) == ()
+E         
+E         Left contains one more item: 1
+E         Use -v to get more diff
+
+tests/groups/test_a_subgroup_built_from_a_subgroup_states_its_description.sage:379: AssertionError
+=========================== short test summary info ============================
+FAILED tests/groups/test_a_subgroup_built_from_a_subgroup_states_its_description.sage::test_an_image_names_the_subgroup_it_is_the_image_of_by_its_description
+FAILED tests/groups/test_a_subgroup_built_from_a_subgroup_states_its_description.sage::test_building_an_image_asks_the_subgroup_it_projects_for_no_description
+FAILED tests/groups/test_a_subgroup_built_from_a_subgroup_states_its_description.sage::test_a_cusp_stabilizer_names_the_subobject_it_fixes
+FAILED tests/groups/test_a_subgroup_built_from_a_subgroup_states_its_description.sage::test_a_restricted_character_intersection_forms_no_sentence_about_the_character_subgroup
+4 failed, 11 passed in 20.52s
+# launcher exit: 1

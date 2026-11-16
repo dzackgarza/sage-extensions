@@ -1,0 +1,20 @@
+# tree: 9ee7e5eba2b15729441d44758bce621825094585
+# load: 10.86 9.52 8.95
+# program: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/probe537r3f.py
+stable.description: 'the subgroup where rho_L(g) lies in a subgroup given by its own generators'
+O(A_L).order: 2
+image.order: 1
+image.description: 'the joint discriminant image of the subgroup where rho_L(g) lies in a subgroup given by its own generators in Orthogonal group of Finitely presented module on 2 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 3]'
+cusp.representative: Integral lattice of rank 0 and signature (0, 0)
+cusp.stabilizer.description: 'the subgroup where g preserves Integral lattice of rank 0 and signature (0, 0)'
+cusp.stabilizer.order: 2
+flag_stabilizer.description: 'the subgroup where g preserves the flag {Free module on {[0]} over Integer Ring} of Free module on {[0], [1]} over Integer Ring'
+flag_stabilizer contains the shear: True
+flag_stabilizer contains the swap: False
+image.description: 'the image of a subgroup given by its own generators under Generic morphism:\n  From: Cyclic group C_4 of order 4\n  To:   Cyclic group C_2 of order 2'
+image.order: 2
+B cap Gamma asked of its operand's condition: ()
+generators lie in both operands: True
+SL_2(ZZ).description: 'SL_2(ZZ)'
+Sp_2(ZZ).description: 'Sp_2(ZZ)'
+# launcher exit: 0

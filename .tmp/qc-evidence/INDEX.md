@@ -3304,3 +3304,21 @@ test lint loaded.
 | --- | --- | --- |
 | `527r3-green-at-dc6c692.log` | `dc6c692`, this round's head, with the test lint | the whole file: **8 passed in 4.34 s**, no lint finding |
 | `527r3-green-at-fb19bd3.log` | `fb19bd3`, the pushed head, with the test lint | the whole file: **8 passed in 3.15 s**, no lint finding.  Taken because `main` gained `#542`'s `ring_foundation.py` changes between the run at `dc6c692` and this head: `git diff --stat dc6c692 fb19bd3 --` that file is not empty, so that run is not this tree's |
+## `#537` round 3: a subgroup built from a subgroup is named by its description, formed when asked, 2026-11-16
+
+The review of `5b45523` names seven findings.  The reds are taken on `5b45523`
+itself and, re-taken, on `c9568ed`, the commit this round was rebased onto; the
+repairs are `20323ac` and `9ee7e5e` on the rebased history, the tests `f31a9d7`.
+Runs are one file per process under the adopted runtime through
+`.scratch/launch537r3t.sh` (`run.sh -w /work`,
+`PYTHONPATH=/ci/tool-artifacts/pytest_plugins:/work/src:/work:/repos/sage-extensions/src`,
+`/sage/.venv/bin/python -m pytest -o addopts= -p sage_extensions.testing.suite_budget
+-p sage_extensions.testing.test_lint -p qc_sage_session --no-time-gates`), and the
+probe through `.scratch/launch537r3.sh` on the same image.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `537r3-red-tests.log` | `5b45523`, the reviewed commit, plus this round's test file | the file: **5 failed, 10 passed in 13.71 s**.  The five are the three callers the last round left broken -- the cusp stabilizer's `TypeError: StabilizerSubgroups._call_() missing 1 required positional argument: 'stated_clause'` and the flag stabilizer's `TypeError: ... got an unexpected keyword argument 'description'` -- the image's name, read as "a subgroup given by its own generators" where "the image of ... under ..." is owed (twice: the equality and the counting specimen), and the character subgroup rendered once while `B cap Gamma` is generated |
+| `537r3-red-tests-rebased.log` | `c9568ed`, the commit this round was rebased onto (97 rounds later), plus the same test file | the same file: **4 failed, 11 passed in 20.52 s**.  The flag stabilizer is green here because a round that landed on main between the review and the rebase repaired that caller itself; the rebase keeps main's line, so this round's diff does not carry it.  The other four are the same failures as above |
+| `537r3-green-tests.log` | `9ee7e5e`, the round's head | the file: **15 passed in 12.45 s**, with the suite budget's star-import note (3.25 s against a 3 s ceiling) and no failure |
+| `537r3-probe.py`, `537r3-probe.log` | `9ee7e5e`, the round's head | the deciding inputs, one small object each: `rho(Otilde(A_2))` has order **1** where `O(A_A2)` has order **2**, and its name is "the joint discriminant image of the subgroup where rho_L(g) lies in a subgroup given by its own generators in ..."; the arithmetic cusp's stabilizer at the zero sublattice of `<6>` reads "the subgroup where g preserves Integral lattice of rank 0 and signature (0, 0)" and has order 2; the flag stabilizer of `GL_2(ZZ)` names its flag and contains the shear but not the swap; `f(H)` reads "the image of a subgroup given by its own generators under Generic morphism: ..." and has order 2; `B cap Gamma` asks its operand's condition **nothing** while its two generators are formed, and both lie in both operands; `SL_2(ZZ)` and `Sp_2(ZZ)` state their own names |

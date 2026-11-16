@@ -1,0 +1,8 @@
+# tree: 9ee7e5eba2b15729441d44758bce621825094585
+# load: 10.83 9.39 8.89
+# command: /sage/.venv/bin/python -m pytest -p qc_sage_session -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates -q tests/groups/test_a_subgroup_built_from_a_subgroup_states_its_description.sage
+...............                                                          [100%]
+=============================== time-gate report ===============================
+session star import took 3.25 s; the measured ceiling is 3 s
+15 passed in 12.45s
+# launcher exit: 0
