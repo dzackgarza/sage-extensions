@@ -10,11 +10,8 @@ pins the two answers of that case on the smallest model that has them:
 stabilizer image (the whole ambient image) and a trivial one, with witnesses inside
 and outside the subgroup.
 
-At `|W| = 89181388800` -- `T_Co`'s `Otilde` line stabilizer -- the generic engine
-question this case used to be asked as does not return: 528 s inside one
-`DoubleCoset` membership with no step of the coset walk taken
-(`.tmp/p570-adjust2.log`).  The model below is small enough to state the answers;
-the size at which the generic question stalls is recorded there, not asserted here.
+The stabilizer image `W` is the whole ambient image in the first case and trivial
+in the second, so the two answers are the positive and the negative one.
 """
 
 from sage_extensions.all import *

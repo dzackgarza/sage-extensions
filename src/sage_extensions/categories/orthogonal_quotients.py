@@ -203,18 +203,14 @@ def _double_coset_adjustment(subgroup_permutation, stabilizer_permutation, coset
     exactly when ``t`` lies in the product ``S * W``, because ``x = s t``
     reads ``t = s^-1 x`` with ``s^-1`` in ``S`` and ``x`` in ``W``.  Membership
     in a double coset of this shape is answered by GAP without listing it,
-    where ``Intersection`` of a group with a coset domain enumerates the
-    coset and exceeds the runtime's memory guard: at the ``Gamma_{Co,2}``
-    row of ``T_Co`` the coset has ``|S| = 696729600`` elements.
+    while intersecting a group with a coset domain enumerates the coset,
+    which has ``|S|`` elements.
 
     **A trivial ``S`` makes the double coset the subgroup ``W``.**  Then the
-    question is ``W``'s own membership test and is decided as that, not asked
-    of GAP's ``DoubleCoset`` membership: the generic double-coset question is
-    a different computation from a subgroup question and does not reduce to it
-    inside the engine.  On ``T_Co``'s ``Otilde`` line stabilizer, where
-    ``S`` is trivial and ``|W| = 89181388800``, the generic membership did not
-    return in 528 s, while ``W``'s own membership answers at once -- the walk
-    below is a single node there.
+    question asked is ``W``'s own membership test: the coset point is the
+    element asked for when it lies in ``W``, and there is none when it does
+    not.  A nontrivial ``S`` asks the coset walk below, whose length is the
+    index ``[S : S cap W]``.
 
     The exhibited element walks the right cosets of ``W`` under right
     multiplication by the generators of ``S`` and their inverses: ``t`` in
