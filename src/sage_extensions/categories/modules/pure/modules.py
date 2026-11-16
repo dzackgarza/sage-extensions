@@ -1673,23 +1673,28 @@ class Modules(OwnedCategoryOverBaseRing):
             no selected generating family here.  For a free module on an
             infinite basis $S$ the dual is $\prod_S R$, which at $S =
             \mathbf{N}$ and $R = \mathbf{Z}$ is uncountable -- no countable
-            family generates it -- and not free (Baer--Specker).  For a module
-            with no basis at all the dual is smaller and still unpresented:
-            $\operatorname{Hom}_{\mathbf{Z}}(\mathbf{Z}/8, \mathbf{Z}) = 0$,
-            so $O_{\mathbf{Z}/8}(2) = (0)$, and this level does not compute it
-            until the dual of a finitely presented module is presented.
+            family generates it -- and not free (Baer--Specker).
 
-            Where the dual does carry a generating family -- a module with a
-            chosen finite basis, above all -- this level answers.  Where it
-            does not, this level asserts, and a more specific level answers if
-            one names this operation: on $\mathbf{Z}[x]$ the framed free
-            module's ``order_ideal`` reads the ideal off the coordinate
-            functionals of the monomial basis, and the rebuild rule of
-            ``sage_extensions.refine`` puts that level ahead of this one by the
-            category hierarchy.  The two agree wherever both answer: every
-            value of a functional at $v = \sum_s a_s e_s$ is a combination of
-            the coordinates $a_s$, and each coordinate is attained by its own
-            functional.
+            For a finitely presented module the dual is presented, and this
+            level answers: $\operatorname{Hom}_R(\operatorname{coker}(A), R)$ is
+            the kernel of the transpose $A^t$, and the dual is presented on that
+            kernel the same way any finitely presented module is.  At
+            $M = \mathbf{Z}/8$ the presentation is $8 \colon \mathbf{Z} \to
+            \mathbf{Z}$, its transpose is the same map, and
+            $\ker 8 = 0$: every functional kills $1$ and hence everything, so
+            $O_{\mathbf{Z}/8}(3) = (0)$.
+
+            Where the dual does carry a generating family -- a finitely
+            presented module, and above all one with a chosen finite basis --
+            this level answers.  Where it does not, this level asserts, and a
+            more specific level answers if one names this operation: on
+            $\mathbf{Z}[x]$ the framed free module's ``order_ideal`` reads the
+            ideal off the coordinate functionals of the monomial basis, and the
+            rebuild rule of ``sage_extensions.refine`` puts that level ahead of
+            this one by the category hierarchy.  The two agree wherever both
+            answer: every value of a functional at $v = \sum_s a_s e_s$ is a
+            combination of the coordinates $a_s$, and each coordinate is
+            attained by its own functional.
 
             EXAMPLES::
 
@@ -3119,12 +3124,19 @@ class Modules(OwnedCategoryOverBaseRing):
             The construction is the internal Mor alone, and it names no basis:
             whatever presentation ``Hom_R(M, R)`` carries is the one its
             endpoints give it, through the module's own chosen resolution.  A
-            free module on an infinite basis therefore has the dual its module
-            algebra gives it -- the product ``prod_S R``, which the library
-            holds no presentation of: ``prod_N Z`` is uncountable, so no
-            countable family generates it, and by Baer--Specker it is not free
-            -- so that it is stated as the Mor and never rebuilt, and
-            :meth:`dual_evaluation` pairs with it all the same.
+            finitely presented ``M = coker(A: R^m -> R^n)`` therefore has its
+            dual presented, as the kernel of the transpose: a functional is the
+            assignment of a value to each generator that kills every relation,
+            so ``Hom_R(M, R) = ker(A^t: R^n -> R^m)``.  At
+            ``M = Z/8 = coker(8: Z -> Z)`` that kernel is ``0``, and the dual is
+            the zero module.
+
+            A free module on an infinite basis has the dual its module algebra
+            gives it -- the product ``prod_S R``, which the library holds no
+            presentation of: ``prod_N Z`` is uncountable, so no countable family
+            generates it, and by Baer--Specker it is not free -- so that it is
+            stated as the Mor and never rebuilt, and :meth:`dual_evaluation`
+            pairs with it all the same.
             """
             ring = self.base_ring()
             if ring not in OwnedRings().Commutative():
@@ -4480,6 +4492,15 @@ class ModulesWithChosenFinitePresentation(OwnedCategoryOverBaseRing):
         return Modules(self.base_ring()).ArrowCategory()
 
     class ParentMethods:
+        # The once-only record of the backend beside this module's selected
+        # presentation (``_SelectedModulePresentationBackend``, or the lazy
+        # unwritten slot).  A chosen finite presentation is this category's
+        # datum, so it starts empty here, before any presentation is fixed, and
+        # every construction that fixes one -- a presented module, a Mor with an
+        # endpoint-determined model, a ring read over its cover -- writes it at
+        # this one level.
+        _selected_module_presentation = None
+
         @cached_method
         def invariant_factor_form(self):
             r"""Return ``self -> M_if`` with only non-unit invariant factors."""
@@ -4592,6 +4613,25 @@ class ModulesWithChosenFinitePresentation(OwnedCategoryOverBaseRing):
             isomorphic to ``coker(r)``, and rank is an isomorphism invariant.
             """
             return self.presentation().cokernel().module_rank()
+
+        def _torsion_decision(self):
+            r"""Over a PID a module with a chosen presentation is torsion exactly when its rank vanishes.
+
+            ``K tensor_R M = K tensor_R coker(r)`` is the cokernel of ``r``
+            over the fraction field, and over a principal ideal domain every
+            submodule of a free module is free, so ``r`` is injective there and
+            the dimension of the fibre is ``rank_R F_0 - rank_R F_1 = rank_R M``.
+            A vanishing rank is therefore a torsion module, whatever its
+            relations look like.
+
+            The generic-fibre route is for a module that has no presentation to
+            read; a module whose presentation is chosen here answers from it,
+            and over a base that is not a principal ideal domain it falls back
+            to that route.
+            """
+            if self.base_ring() not in PrincipalIdealDomains():
+                return super()._torsion_decision()
+            return self.module_rank() == 0
 
         @cached_method
         def presentation_object(self):
