@@ -1,10 +1,12 @@
 # What the T_Co incidence holds as it walks its planes
 
 Measured on the adopted runtime (Sage 11.0.beta5, image rootfs, the launcher's own
-log) at `bcad374a699b677d1ba9b4317c45b1b1bf540e18`, the `main` this round lands on,
-on `T_Co = <2> + U(2) + E8(-2)` (D. Dolgachev and S. Kondō, Izv. Math. 77:3
-(2013), §3 equation (3.6), printed p. 513), in the kernel row
-`Otilde(T_Co) = ker rho`.
+log) at `bcad374a699b677d1ba9b4317c45b1b1bf540e18`, the `main` the probe ran on;
+the commits this document belongs to were rebased onto `a4b5184067c3440f10b53fd11004c5e48c38a2b9`
+and nothing they touch is in the difference, so the coefficients are the ones
+measured.  The lattice is `T_Co = <2> + U(2) + E8(-2)` (D. Dolgachev and
+S. Kondō, Izv. Math. 77:3 (2013), §3 equation (3.6), printed p. 513), in the
+kernel row `Otilde(T_Co) = ker rho`.
 
 ## Why a probe, and what it is a probe of
 
