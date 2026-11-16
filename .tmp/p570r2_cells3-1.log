@@ -1,0 +1,27 @@
+tree SHA: acd1c18630eb0b47cf37e6e02221fafb5ceb664a (modified paths: 2)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 0.45 0.58 0.80 1/379 3359035
+probe: .tmp/p570r2_cells.py; inner 400 s
+[t=   3.83s] the row representative's line  hashseed=1
+[t=   3.94s] K rank 9 signature (1, 8)  hashseed=1
+[t=   4.16s] reduction 0.22 s, reduced rank 9  hashseed=1
+[t=   4.16s] profile positive index 1, sign 1  hashseed=1
+[t=   4.16s] signed view rank 9 signature (1, 8)  hashseed=1
+[t=   4.16s] perfect_complex 0.00 s  hashseed=1
+[t=   5.16s] quotient cells 3 with rows [17, 9, 129]  hashseed=1
+[t=   5.16s] adjacencies 5 with transporters [True, True, True, True, True]  hashseed=1
+[t=   5.16s] cell stabilizers [36, 28, 23]  hashseed=1
+[t=   5.16s] component preserving 92, full 93  hashseed=1
+[peakrss] probe570r2: child waited=0 shell_code=0 samples=4
+[peakrss] peak tree RSS      : 477 MiB
+[peakrss] low-water MemAvail : 12522 MiB
+[peakrss] peak single VmHWM  : 477 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      466 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     6.0s procs=  3 rss=   477 MiB hwm=   477 MiB avail= 12537 MiB
+[peakrss]   t=     4.0s procs=  3 rss=   317 MiB hwm=   317 MiB avail= 12522 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   305 MiB hwm=   305 MiB avail= 12664 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     1 MiB hwm=     1 MiB avail= 13083 MiB
+probe exit: 0

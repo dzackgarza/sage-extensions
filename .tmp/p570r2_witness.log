@@ -1,0 +1,31 @@
+tree SHA: acd1c18630eb0b47cf37e6e02221fafb5ceb664a (modified paths: 3)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 0.68 0.62 0.78 2/383 3360068
+probe: .tmp/p570r2_witness.py; inner 900 s
+[t=    2.01s] the plane's own line  rss=293 MiB
+[t=  186.91s] the line row: 527 representatives in 184.89 s  rss=984 MiB
+[t=  188.50s] the cusp at recorded position 492  rss=999 MiB
+[t=  188.50s] its transport is registered: False  rss=999 MiB
+[t=  188.50s] the outside line is the plane's own line: False  rss=999 MiB
+[t=  188.83s] one ambient witness for the incidence's word: True in 0.33 s  rss=1001 MiB
+[t=  188.84s] roots: line True, cusp True  rss=1001 MiB
+[t=  226.59s] the named question, attempt 1: True in 37.75 s  rss=1091 MiB
+[t=  226.59s]   in the subgroup: True  rss=1091 MiB
+[t=  232.24s] the named question, attempt 2: True in 5.65 s  rss=1092 MiB
+[t=  232.24s]   in the subgroup: True  rss=1092 MiB
+[t=  237.90s] the named question, attempt 3: True in 5.65 s  rss=1092 MiB
+[t=  237.90s]   in the subgroup: True  rss=1092 MiB
+[peakrss] probe570r2: child waited=0 shell_code=0 samples=122
+[peakrss] peak tree RSS      : 1103 MiB
+[peakrss] low-water MemAvail : 11601 MiB
+[peakrss] peak single VmHWM  : 1103 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     1092 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   240.1s procs=  3 rss=  1103 MiB hwm=  1103 MiB avail= 12231 MiB
+[peakrss]   t=   242.1s procs=  3 rss=  1103 MiB hwm=  1103 MiB avail= 12231 MiB
+[peakrss]   t=   224.1s procs=  3 rss=  1102 MiB hwm=  1102 MiB avail= 11652 MiB
+[peakrss]   t=   226.1s procs=  3 rss=  1102 MiB hwm=  1102 MiB avail= 11644 MiB
+[peakrss]   t=   228.1s procs=  3 rss=  1102 MiB hwm=  1102 MiB avail= 11648 MiB
+probe exit: 0

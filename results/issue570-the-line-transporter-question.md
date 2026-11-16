@@ -1,114 +1,82 @@
-# #570: where the Otilde(T_Co) transporter question at a line cusp spends its time
+# The transporter question at a line cusp, and what the parabolic family's size is
 
-**The mechanism the issue names is not the one that costs the minutes.**  At the
-named cusp the stabilizer image's closure walk is never entered -- `|lower|` equals
-`|upper|` -- and `exact_isotropic_stabilizer_generators` answers in 13.8-18.6 s.
-The minutes are in `OrthogonalCharacterQuotient.adjust_witness_into_subgroup`, and
-inside it in one engine call: GAP's membership in the double coset
-`DoubleCoset(S, 1, W)`, where the subgroup's condition `S` is trivial and
-`|W| = 89181388800`.  A double coset with a trivial left factor *is* the subgroup
-`W`, but the generic engine question does not reduce to the subgroup's own
-membership test, and it did not return in 528 s.  That case is now asked as the
-subgroup question it is: the adjuster answers in 5.43 s and the question returns.
+## The question
 
-tree eead610 (main), port 991b88b0, adopted runtime; load 0.45-2.4 during the runs
-below except where noted.
+`Otilde(T_Co)` line cusps: 527 representatives, each named by the divided class
+`2[h] + [a3] - [a4] + 2[a8]` of a plane's own line at the one cusp the finite image
+does not separate from it.  The question is `cusp.transporter_witness(line)`, the one
+#381's incidence asks at every plane.
 
-## The specimen (construction)
+## Stage split at the named cusp, with the rows built
 
-| stage | time |
-| --- | ---: |
-| `T_Co` | 0.8 s |
-| `Otilde(T_Co) = stable_orthogonal_group()` | 1.2-2.7 s |
-| `finite_character_quotient()` | 0.00 s |
-| `quotient.index()` (= `|rho(O(T_Co))|` here) | 60.64 s, 62.56 s (two runs) |
-| the plane, its line, its divided class | 0.03 s |
-| the Otilde line row, `isotropic_orbit_representatives(1)`, 527 representatives | 179.73 s (once; 300 s cap expired under load 6.9) |
-| the row entry carrying the plane line's divided class | position 492 of 527 |
+One cold process per column, adopted runtime (Sage 11.0.beta5), port `991b88b0`, the
+Otilde line row (527 representatives, 184.89 s) built first so the caches the incidence
+has are warm.
 
-`|rho(O(T_Co))| = 46998591897600`.  The cusp is the row representative whose divided
-class is the plane's own line's (`2[h] + [a3] - [a4] + 2[a8]`); the #381 evidence
-recorded position 215 at its own tree, this run's walk order gives 492.  Every probe
-after the first replays its coordinates from `.tmp/p570-row.log`.
+| stage | parent `acd1c18` (`.tmp/p570r2_before.log`) | this tree (`.tmp/p570r2_witness.log`) |
+| --- | ---: | ---: |
+| the line row, 527 representatives | 242.74 s | 184.89 s |
+| the question, first ask | 36.65 s | 37.75 s |
+| the question, asked again | 33.97 s, 35.10 s | **5.65 s, 5.65 s** |
 
-## The named question, `cusp.transporter_witness(line)`
+The first ask on this tree pays the one ambient witness between the two rows' roots
+and the cusp's first stabilizer family; a second object compared against the same
+cusp pays neither.
 
-Before (`.tmp/p570-question.log`), killed at the 575 s probe cap:
+The parts of a question, measured one stage at a time in a process that replayed the
+cusp's recorded coordinates instead of building the row (`27.40 s` and `27.10 s` warm
+there): `invariant_separates_isotropic_orbits` 47.60 s on its first call
+and 0.01 s per cusp after (the `O(A_L)` chain, cached per quotient); the port's ambient
+isometry search 15.39 s; `exact_isotropic_stabilizer_generators` 13.58 s, of which the
+parabolic family is 8.23 s (and 7.69 s is the `Subgroup` of its 91 images);
+`adjust_witness_into_subgroup` 5.50 s.
 
-| stage | time |
-| --- | ---: |
-| `invariant_separates_isotropic_orbits` | 55.52 s |
-| `isotropic_lift_of` twice | 0.00 s |
-| ambient `isotropic_equivalence_witness` (the port) | 20.55 s |
-| `separates_witness_orbits` | 0.01 s |
-| `exact_isotropic_stabilizer_generators` | 13.78 s |
-| `adjust_witness_into_subgroup` | **did not return; 480 s spent, killed** |
+## What was repaired
 
-Inside the adjuster (`.tmp/p570-adjust2.log`), with `S` the subgroup's condition:
+* A row that transports an object by a known isometry retains that isometry
+  (`register_isotropic_transport`, keyed by the transported span), so an isometry
+  between two transported objects is the composite `g_right * b * ~g_left` of their
+  words.  When the two chains have different roots, one ambient witness between the
+  roots is computed and kept -- the roots are the rows' own representatives, so that
+  search is per row, not per object.
+* The exact stabilizer generators of a cusp's representative are retained per span
+  (`exact_isotropic_stabilizer_family`): the family is a function of the span, and a
+  row asks for the same cusp's stabilizer once per object compared against it.
 
-| stage | time |
-| --- | ---: |
-| `|S|` | 1 (trivial) |
-| `IsomorphismPermGroup(product)` | 0.01 s |
-| `Subgroup(product, family images)` | 0.01 s |
-| `DoubleCoset(S, 1, W)` construction | 0.00 s |
-| **its membership test, `coset_point in ...`** | **> 528 s, no walk step taken** |
+The 5.65 s that remain are `adjust_witness_into_subgroup` -- the trivial-condition case
+repaired in round 1, whose cost is the stabilizer image's own membership test and word
+section at `|W| = 89181388800`.
 
-After the repair (`.tmp/p570-question-fixed.log`):
+## The parabolic family's size is not one number
 
-| stage | time |
-| --- | ---: |
-| `invariant_separates_isotropic_orbits` | 53.69 s |
-| the port's witness search | 20.98 s |
-| `separates_witness_orbits` | 0.01 s |
-| `exact_isotropic_stabilizer_generators` | 18.59 s (parabolic family 10.00 s of it) |
-| `adjust_witness_into_subgroup` | **5.43 s** |
-| the question | **98.80 s, answered, witness in the subgroup** |
+`isotropic_stabilizer_generators` at the same line, one cold process each:
 
-## `exact_isotropic_stabilizer_generators` at that cusp (`.tmp/p570_stages5.log`)
+| probe | family | `O(K)` family | rational group | integral stabilizer |
+| --- | ---: | ---: | ---: | ---: |
+| `.tmp/p570r2_stages.log`, three calls in one process | 91, 91, 91 | 94, 94, 94 | -- | -- |
+| `.tmp/p570r2_chain-1.log` (seed 1) | -- | **60** | 42 | 84 |
+| `.tmp/p570r2_chain-777.log` (seed 777) | -- | **94** | 52 | 104 |
+| `.tmp/p570r2_family-1.log` (seed 1) | 91 | 94 | 52 | 104 |
+| `.tmp/p570r2_family-777.log` (seed 777) | 87 | 93 | 49 | 98 |
+| `.tmp/p570r2_trace-1.log` (seed 1) | 91 | 93 | -- | -- |
+| `.tmp/p570r2_trace-777.log` (seed 777) | 84 | 93 | -- | -- |
 
-| stage | time | value |
-| --- | ---: | --- |
-| parabolic family | 10.50 s | 88 generators (92, 93, 96 in other runs of the same line) |
-| `_image_section()` | 52.11 s (60.24 s) | cached per quotient |
-| divided data `D(W)` | 0.01 s | orbit 527, walked in 0.02 s |
-| `Stabilizer(discriminant_image, data)` | 0.22 s | |
-| `PreImages` | 0.00 s | |
-| `Size(upper)` | 0.00 s | 89181388800 |
-| `Subgroup(product, images of the family)` | 7.69 s | |
-| `Size(lower)` | 0.02 s | 89181388800 |
-| `IsSubset(upper, lower)` | 0.01 s | true |
-| the closure walk | -- | **not entered**: `|lower| = |upper|` |
-| total | 91.9 s | |
+Round 1 measured 88, 92, 93 and 96 for the same line.  Every stage after `O(K)`
+inherits the count, so the family a caller receives is not determined by the
+mathematics.
 
-So the issue's premise -- that the stabilizer image closes by a transversal walk over
-minutes -- is not what happens: `|lower| = |upper|` at this cusp and the walk is
-never entered.  The cost it named is in the adjuster, and the walk-free certificate
-is already what the function performs.
+The stages above `O(K)` are one datum: `K = u^perp/u` has the same Gram in every
+run (`.tmp/p570r2_gram-1.log`, `.tmp/p570r2_gram-777.log`), the reduction of `K` is
+the same diagonal form `diag(-2,-2,-2,-2,2,-2,-2,-2,-2)` with its isometry in both,
+and the perfect complex on it reports the same three cells of 17, 9 and 129 rows,
+cell stabilizer counts 36, 28, 23, five adjacencies, and 93 generators in both seeds
+(`.tmp/p570r2_cells3-1.log`, `.tmp/p570r2_cells3-777.log`).
 
-## What remains, and whose it is
-
-The question answers in 98.80 s cold and 44.22 s asked again, where before it never
-returned.  The parts left, measured apart on the repaired tree
-(`.tmp/p570-question-fixed.log`, `.tmp/p570-repeat.log`):
-
-| stage | time | owner |
-| --- | ---: | --- |
-| `invariant_separates_isotropic_orbits` | 53.69 s (first call) | here; the `O(A_L)` chain, cached per quotient |
-| the ambient witness search | 20.98 s | **the port** (`sage_indefinite_port...marked_lattices.isometry`), paused: not repaired here |
-| `exact_isotropic_stabilizer_generators` | 18.59 s (family 10.00 s) | here |
-| `adjust_witness_into_subgroup` | 5.43 s | here, repaired by this round |
-
-Of the 527 cusps of the row, 526 are separated by the finite image and their
-question costs 0.01 s each (measured at two of them, `.tmp/p570-repeat.log`); the
-one question per plane that is not separated is the one above.
-
-## Repaired
-
-`_double_coset_adjustment` (`src/sage_extensions/categories/orthogonal_quotients.py`)
-now asks the double-coset membership as the subgroup membership it is when the
-subgroup's condition is trivial: `S` trivial makes `S * 1 * W` the subgroup `W`, and
-the element asked for is the coset point itself when it lies in `W`.  Neither
-kernel group is affected otherwise -- `Otilde` and `Otilde+` both have `S` trivial,
-which is why both kernel rows hit this -- and a nontrivial `S` keeps the generic
-engine question, which is measured instant at the sizes the other rows use.
+So the varying stage is `EichlerRecursion.orthogonal_group_generators(K)` itself: it
+returns 60, 93 or 94 elements for one lattice in different processes, where the
+perfect complex on its reduced form returns 93 in every run.  That function is the
+paused port's (`sage_indefinite_port.indefinite.recursive`, through
+`lorentzian_orthogonal_group_generators` and the groupoid cache), and
+`sage_extensions.categories.isotropic_orbits._isotropic_stabilizer_generators`
+delegates to it, so the repair at this repository's owner is the induction
+implemented in-repo -- not done in this round, and not guessed at.

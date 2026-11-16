@@ -1,0 +1,24 @@
+tree SHA: acd1c18630eb0b47cf37e6e02221fafb5ceb664a (modified paths: 2)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 0.28 0.66 0.86 2/381 3358157
+probe: .tmp/p570r2_trace.py; inner 500 s
+[t=   3.70s]  the named line
+[t=   3.81s] . enter orthogonal_group_generators rank 9
+[t=   4.02s] . cached_group rank 9: miss
+[t=   4.91s] . lorentzian_orthogonal_group_generators rank 9: 93
+[t=   5.17s]  exit  orthogonal_group_generators rank 9: 93 in 1.36 s
+[t=  12.18s]  family 84
+[peakrss] probe570r2: child waited=0 shell_code=0 samples=7
+[peakrss] peak tree RSS      : 508 MiB
+[peakrss] low-water MemAvail : 12301 MiB
+[peakrss] peak single VmHWM  : 508 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      497 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    12.0s procs=  3 rss=   508 MiB hwm=   508 MiB avail= 12301 MiB
+[peakrss]   t=    10.0s procs=  3 rss=   499 MiB hwm=   499 MiB avail= 12313 MiB
+[peakrss]   t=     8.0s procs=  3 rss=   489 MiB hwm=   489 MiB avail= 12336 MiB
+[peakrss]   t=     6.0s procs=  3 rss=   480 MiB hwm=   480 MiB avail= 12374 MiB
+[peakrss]   t=     4.0s procs=  3 rss=   320 MiB hwm=   320 MiB avail= 12518 MiB
+probe exit: 0

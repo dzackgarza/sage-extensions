@@ -1,0 +1,40 @@
+tree SHA: acd1c18630eb0b47cf37e6e02221fafb5ceb664a (modified paths: 0)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 0.15 0.47 0.86 1/371 3357188
+probe: .tmp/p570r2_stages.py; inner 900 s
+[t=    1.14s]  T_Co: 0.03 s  rss=290 MiB
+[t=    2.32s]  Otilde(T_Co): 1.17 s  rss=304 MiB
+[t=    2.35s]  the plane's own line, divided class 2*[h] + [a3] - [a4] + 2*[a8]  rss=306 MiB
+[t=    3.76s]  527 recorded representatives; the named cusp's positions: [492]  rss=320 MiB
+[t=    3.76s]  finite_character_quotient(): 0.00 s  rss=320 MiB
+[t=    3.76s]  registered lifts: line=False cusp=False  rss=320 MiB
+[t=   51.37s]    separation: 47.60 s  rss=606 MiB
+[t=   51.37s]  invariant_separates_isotropic_orbits: False  rss=606 MiB
+[t=   59.60s]  isotropic_stabilizer_generators(representative), attempt 1: 8.23 s  rss=651 MiB
+[t=   59.60s]    family size 91  rss=651 MiB
+[t=   66.45s]  isotropic_stabilizer_generators(representative), attempt 2: 6.85 s  rss=694 MiB
+[t=   66.45s]    family size 91  rss=694 MiB
+[t=   73.80s]  isotropic_stabilizer_generators(representative), attempt 3: 7.35 s  rss=732 MiB
+[t=   73.80s]    family size 91  rss=732 MiB
+[t=   89.19s]  ambient isotropic_equivalence_witness(line, representative): 15.39 s  rss=792 MiB
+[t=   89.27s]    witness is None: False; in subgroup: False  rss=792 MiB
+[t=  102.85s]  exact_isotropic_stabilizer_generators(representative): 13.58 s  rss=839 MiB
+[t=  102.85s]    stabilizer family size 91  rss=839 MiB
+[t=  108.35s]  adjust_witness_into_subgroup: 5.50 s  rss=977 MiB
+[t=  108.35s]    adjusted is None: False  rss=977 MiB
+[t=  135.75s]  the whole question again: True in 27.40 s  rss=1048 MiB
+[t=  162.85s]  the whole question a third time: True in 27.10 s  rss=1139 MiB
+[peakrss] probe570r2: child waited=0 shell_code=0 samples=84
+[peakrss] peak tree RSS      : 1150 MiB
+[peakrss] low-water MemAvail : 12118 MiB
+[peakrss] peak single VmHWM  : 1150 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     1140 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   164.1s procs=  3 rss=  1150 MiB hwm=  1150 MiB avail= 12118 MiB
+[peakrss]   t=   166.1s procs=  3 rss=  1150 MiB hwm=  1150 MiB avail= 12118 MiB
+[peakrss]   t=   162.1s procs=  3 rss=  1149 MiB hwm=  1149 MiB avail= 12118 MiB
+[peakrss]   t=   160.1s procs=  3 rss=  1136 MiB hwm=  1136 MiB avail= 12133 MiB
+[peakrss]   t=   158.1s procs=  3 rss=  1125 MiB hwm=  1125 MiB avail= 12141 MiB
+probe exit: 0

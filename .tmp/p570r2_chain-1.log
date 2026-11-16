@@ -1,0 +1,23 @@
+tree SHA: acd1c18630eb0b47cf37e6e02221fafb5ceb664a (modified paths: 2)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 0.29 0.53 0.77 2/378 3359310
+probe: .tmp/p570r2_chain.py; inner 400 s
+[t=   5.15s] O(K): 60
+[t=   9.12s] rational group generators: 42
+[t=  10.48s] integral stabilizer generators: 84
+[t=  10.81s] integral family: 84
+[t=  16.01s] a second action: rational 42, stabilizer 84
+[peakrss] probe570r2: child waited=0 shell_code=0 samples=9
+[peakrss] peak tree RSS      : 532 MiB
+[peakrss] low-water MemAvail : 12217 MiB
+[peakrss] peak single VmHWM  : 532 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      521 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    16.0s procs=  3 rss=   532 MiB hwm=   532 MiB avail= 12217 MiB
+[peakrss]   t=    14.0s procs=  3 rss=   522 MiB hwm=   522 MiB avail= 12240 MiB
+[peakrss]   t=    12.0s procs=  3 rss=   514 MiB hwm=   514 MiB avail= 12282 MiB
+[peakrss]   t=    10.0s procs=  3 rss=   500 MiB hwm=   500 MiB avail= 12308 MiB
+[peakrss]   t=     8.0s procs=  3 rss=   490 MiB hwm=   490 MiB avail= 12324 MiB
+probe exit: 0

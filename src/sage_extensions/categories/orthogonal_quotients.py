@@ -2378,6 +2378,107 @@ end
         record = self._registered_isotropic_split(plane)
         return None if record is None else record[0]
 
+    def register_isotropic_transport(self, subobject, source, transport):
+        r"""Record an isometry ``transport`` carrying ``source`` to ``subobject``.
+
+        A row that transports a representative along its walk holds the word
+        that did it, so two transported objects are related by composing their
+        words instead of by searching for an isometry.  The record is keyed by
+        the transported object's span, and the source is retained because the
+        word starts there.
+        """
+        from sage_extensions.categories.isotropic_orbits import _span_key
+
+        self.__dict__.setdefault("_isotropic_transport_registry", {})[
+            _span_key(subobject)
+        ] = (source, transport)
+
+    def isotropic_transport_of(self, subobject):
+        r"""The registered isometry carrying ``subobject``'s source to it, or ``None``.
+
+        The source is the object the row's word starts from, so the record is
+        one step of a chain, not necessarily a word from a row's base
+        representative; :meth:`transported_from_root` reads the whole chain.
+        """
+        from sage_extensions.categories.isotropic_orbits import _span_key
+
+        return self.__dict__.get("_isotropic_transport_registry", {}).get(
+            _span_key(subobject)
+        )
+
+    def transported_from_root(self, subobject):
+        r"""``(root, g)`` with ``g`` carrying the registered chain's ``root`` to ``subobject``.
+
+        Reading the chain composes one word per registered step, so it costs
+        one product per step and no isometry search.  An unregistered object is
+        its own root with the identity.
+        """
+        from sage_extensions.categories.isotropic_orbits import _span_key
+
+        g = self.supergroup.one()
+        current = subobject
+        seen = set()
+        while True:
+            key = _span_key(current)
+            if key in seen:
+                break
+            seen.add(key)
+            record = self.isotropic_transport_of(current)
+            if record is None:
+                break
+            source, step = record
+            g = step * g
+            current = source
+        return current, g
+
+    def isotropic_transport_between(self, left, right):
+        r"""An isometry carrying ``left`` to ``right`` from the registered transports, or ``None``.
+
+        ``left`` and ``right`` are carried from their roots by ``g_left`` and
+        ``g_right``, so ``g_right * b * ~g_left`` carries ``left`` to ``right``
+        for any ``b`` carrying the left root to the right root.  When the two
+        objects lie in one registered row the roots coincide, ``b`` is the
+        identity, and no isometry is searched for; the roots of two different
+        rows are representatives the rows themselves hold, so the one ambient
+        witness between them is computed once and retained.
+        """
+        from sage_extensions.categories.isotropic_orbits import _span_key
+
+        left_root, left_element = self.transported_from_root(left)
+        right_root, right_element = self.transported_from_root(right)
+        if _span_key(left_root) == _span_key(right_root):
+            return right_element * ~left_element
+        bridges = self.__dict__.setdefault("_isotropic_root_bridges", {})
+        pair = (_span_key(left_root), _span_key(right_root))
+        if pair not in bridges:
+            bridges[pair] = self.supergroup.isotropic_equivalence_witness(
+                left_root, right_root
+            )
+        bridge = bridges[pair]
+        if bridge is None:
+            return None
+        return right_element * bridge * ~left_element
+
+    def exact_isotropic_stabilizer_family(self, representative, *, flag=False):
+        r"""The exact stabilizer generators of ``representative``, computed once per span.
+
+        The returned family is a function of the subobject's span alone, and a
+        row asks for the stabilizer of the same cusp representative once per
+        object it compares against it, so the family is retained by span
+        instead of being recomputed per question.
+        """
+        from sage_extensions.categories.isotropic_orbits import _span_key
+
+        registry = self.__dict__.setdefault(
+            "_exact_isotropic_stabilizer_families", {}
+        )
+        key = (_span_key(representative), bool(flag))
+        if key not in registry:
+            registry[key] = self.exact_isotropic_stabilizer_generators(
+                representative, flag=flag
+            )
+        return registry[key]
+
     @cached_method
     def certified_parabolic_generators(self, plane):
         r"""Generators certified to be the whole parabolic at ``plane``, or ``None``.
@@ -3685,7 +3786,11 @@ def _plane_parabolic_incidence_flags(subgroup, plane, flag):
                 f"checked against the discriminant map and maps elsewhere: the parabolic word "
                 f"section is inconsistent with the discriminant representation"
             )
-        flags.append(element.transport_isotropic_object(flag))
+        transported = element.transport_isotropic_object(flag)
+        quotient.register_isotropic_transport(
+            transported.terms()[0], line, element
+        )
+        flags.append(transported)
     return tuple(flags)
 
 
@@ -3736,10 +3841,15 @@ def _subgroup_isotropic_orbit_representatives(subgroup, rank, *, flag=False):
                 representatives.append(representative)
                 continue
             if line_image is not None:
-                representatives.extend(
-                    splitting.transport_isotropic_object(representative)
-                    for splitting in quotient.splitting_isometries_from_line_class(*line_image)
-                )
+                # The coset walk's words are retained with the lines they
+                # transported: a transporter between two transported
+                # representatives is the composite of their words.
+                for splitting in quotient.splitting_isometries_from_line_class(*line_image):
+                    transported = splitting.transport_isotropic_object(representative)
+                    quotient.register_isotropic_transport(
+                        transported, representative, splitting
+                    )
+                    representatives.append(transported)
                 continue
             if not flag and index(rank) == 1:
                 from_divided_classes = _line_orbit_from_divided_classes(subgroup, representative)
@@ -3759,10 +3869,18 @@ def _subgroup_isotropic_orbit_representatives(subgroup, rank, *, flag=False):
             stabilizer = quotient.exact_isotropic_stabilizer_generators(
                 representative, flag=flag
             )
-            representatives.extend(
-                splitting.transport_isotropic_object(representative)
-                for splitting in quotient.splitting_isometries(stabilizer)
-            )
+            for splitting in quotient.splitting_isometries(stabilizer):
+                transported = splitting.transport_isotropic_object(representative)
+                source_terms = (
+                    tuple(representative.terms()) if flag else (representative,)
+                )
+                for moved, source in zip(
+                    tuple(transported.terms()) if flag else (transported,),
+                    source_terms,
+                    strict=True,
+                ):
+                    quotient.register_isotropic_transport(moved, source, splitting)
+                representatives.append(transported)
     return finite_ordered_set(tuple(representatives))
 
 
@@ -3784,11 +3902,16 @@ def _subgroup_isotropic_equivalence_witness(subgroup, left, right, *, flag=False
     # that no isometry search has to find.
     left_lift = quotient.isotropic_lift_of(left) if quotient is not None else None
     right_lift = quotient.isotropic_lift_of(right) if quotient is not None else None
-    witness = (
-        right_lift * ~left_lift
-        if left_lift is not None and right_lift is not None
-        else orthogonal_group.isotropic_equivalence_witness(left, right, flag=flag)
-    )
+    witness = None
+    if left_lift is not None and right_lift is not None:
+        witness = right_lift * ~left_lift
+    elif quotient is not None:
+        # The rows that produced these objects hold the words that transported
+        # them, so an isometry between two transported objects is the composite
+        # `g_right * b * ~g_left` of those words; no search is started for it.
+        witness = quotient.isotropic_transport_between(left, right)
+    if witness is None:
+        witness = orthogonal_group.isotropic_equivalence_witness(left, right, flag=flag)
     if witness is None:
         return None
     if witness in subgroup:
@@ -3807,7 +3930,7 @@ def _subgroup_isotropic_equivalence_witness(subgroup, left, right, *, flag=False
         quotient = subgroup.finite_character_quotient()
     if not flag and quotient.separates_witness_orbits(witness, left):
         return None
-    stabilizer = quotient.exact_isotropic_stabilizer_generators(right, flag=flag)
+    stabilizer = quotient.exact_isotropic_stabilizer_family(right, flag=flag)
     return quotient.adjust_witness_into_subgroup(witness, stabilizer)
 
 

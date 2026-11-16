@@ -1,0 +1,18 @@
+tree SHA: acd1c18630eb0b47cf37e6e02221fafb5ceb664a (modified paths: 3)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 0.37 0.54 0.76 2/396 3359858
+probe: .tmp/p570r2_gram.py; inner 300 s
+[t=   3.78s] attempt 1: reduced gram ((-2, 0, 0, 0, 0, 0, 0, 0, 0), (0, -2, 0, 0, 0, 0, 0, 0, 0), (0, 0, -2, 0, 0, 0, 0, 0, 0), (0, 0, 0, -2, 0, 0, 0, 0, 0), (0, 0, 0, 0, 2, 0, 0, 0, 0), (0, 0, 0, 0, 0, -2, 0, 0, 0), (0, 0, 0, 0, 0, 0, -2, 0, 0), (0, 0, 0, 0, 0, 0, 0, -2, 0), (0, 0, 0, 0, 0, 0, 0, 0, -2))
+[t=   3.78s] attempt 2: reduced gram ((-2, 0, 0, 0, 0, 0, 0, 0, 0), (0, -2, 0, 0, 0, 0, 0, 0, 0), (0, 0, -2, 0, 0, 0, 0, 0, 0), (0, 0, 0, -2, 0, 0, 0, 0, 0), (0, 0, 0, 0, 2, 0, 0, 0, 0), (0, 0, 0, 0, 0, -2, 0, 0, 0), (0, 0, 0, 0, 0, 0, -2, 0, 0), (0, 0, 0, 0, 0, 0, 0, -2, 0), (0, 0, 0, 0, 0, 0, 0, 0, -2))
+[peakrss] probe570r2: child waited=0 shell_code=0 samples=3
+[peakrss] peak tree RSS      : 320 MiB
+[peakrss] low-water MemAvail : 12593 MiB
+[peakrss] peak single VmHWM  : 320 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      309 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     4.0s procs=  3 rss=   320 MiB hwm=   320 MiB avail= 12593 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   302 MiB hwm=   302 MiB avail= 12604 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     2 MiB hwm=     2 MiB avail= 13033 MiB
+probe exit: 0

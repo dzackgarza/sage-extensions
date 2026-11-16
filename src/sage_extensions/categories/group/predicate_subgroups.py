@@ -909,7 +909,13 @@ class PredicateSubgroups(OwnedParameterizedCategory):
                         )
                     if witness is None:
                         continue
-                    plane_orbit_flags.append(witness.transport_isotropic_object(ambient_flag))
+                    transported_flag = witness.transport_isotropic_object(ambient_flag)
+                    quotient.register_isotropic_transport(
+                        transported_flag.terms()[0],
+                        ambient_flag.terms()[0],
+                        witness,
+                    )
+                    plane_orbit_flags.append(transported_flag)
                 if not plane_orbit_flags:
                     parabolic_routed = False
                     break

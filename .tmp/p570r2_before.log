@@ -1,0 +1,23 @@
+tree SHA: acd1c18630eb0b47cf37e6e02221fafb5ceb664a (modified paths: 0)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 1.17 1.11 0.96 2/410 3360952
+probe: .tmp/p570r2_before.py; inner 900 s
+[t=  245.93s] the line row: 527 representatives in 242.74 s
+[t=  247.50s] the cusp at recorded position 492
+[t=  284.15s] the named question, attempt 1: True in 36.65 s
+[t=  318.12s] the named question, attempt 2: True in 33.97 s
+[t=  353.23s] the named question, attempt 3: True in 35.10 s
+[peakrss] probe570r2: child waited=0 shell_code=0 samples=180
+[peakrss] peak tree RSS      : 1360 MiB
+[peakrss] low-water MemAvail : 11868 MiB
+[peakrss] peak single VmHWM  : 1360 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     1349 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   354.2s procs=  3 rss=  1360 MiB hwm=  1360 MiB avail= 12119 MiB
+[peakrss]   t=   356.2s procs=  3 rss=  1360 MiB hwm=  1360 MiB avail= 12119 MiB
+[peakrss]   t=   358.2s procs=  3 rss=  1360 MiB hwm=  1360 MiB avail= 12120 MiB
+[peakrss]   t=   348.2s procs=  3 rss=  1358 MiB hwm=  1358 MiB avail= 12119 MiB
+[peakrss]   t=   350.2s procs=  3 rss=  1358 MiB hwm=  1358 MiB avail= 12119 MiB
+probe exit: 0

@@ -1,0 +1,28 @@
+tree SHA: acd1c18630eb0b47cf37e6e02221fafb5ceb664a (modified paths: 0)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 0.83 0.79 0.92 2/378 3357625
+probe: .tmp/p570r2_family.py; inner 600 s
+[t=    3.56s] the named line  hashseed=777
+[t=   12.05s] delegated family: 87 generators in 8.47 s  hashseed=777
+[t=   12.05s] K = u^perp/u, rank 9  hashseed=777
+[t=   12.05s] pointwise perpendicular kernel: 0 generators in 0.00 s  hashseed=777
+[t=   12.31s] recursive O(K) family: 93 generators in 0.26 s  hashseed=777
+[t=   17.49s] rational group: 49 generators in 5.18 s  hashseed=777
+[t=   19.23s] integral stabilizer: 98 generators in 1.74 s  hashseed=777
+[t=   26.39s] delegated family again: 87 generators in 7.15 s  hashseed=777
+[t=   26.39s] finite character quotient: 0.00 s  hashseed=777
+[t=   26.39s] image subgroup: 0.00 s  hashseed=777
+[peakrss] probe570r2: child waited=0 shell_code=0 samples=15
+[peakrss] peak tree RSS      : 595 MiB
+[peakrss] low-water MemAvail : 12097 MiB
+[peakrss] peak single VmHWM  : 595 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      584 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    28.0s procs=  3 rss=   595 MiB hwm=   595 MiB avail= 12097 MiB
+[peakrss]   t=    26.0s procs=  3 rss=   584 MiB hwm=   584 MiB avail= 12121 MiB
+[peakrss]   t=    24.0s procs=  3 rss=   578 MiB hwm=   578 MiB avail= 12126 MiB
+[peakrss]   t=    22.0s procs=  3 rss=   566 MiB hwm=   566 MiB avail= 12122 MiB
+[peakrss]   t=    20.0s procs=  3 rss=   556 MiB hwm=   556 MiB avail= 12142 MiB
+probe exit: 0
