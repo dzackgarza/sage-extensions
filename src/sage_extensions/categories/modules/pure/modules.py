@@ -4357,6 +4357,26 @@ class ModulesWithChosenComponentPresentation(OwnedCategoryOverBaseRing):
         return [Modules(self.base_ring())]
 
 
+def _finitely_presented_torsion(module):
+    r"""Whether ``module``'s own data decides it is a finitely presented torsion module.
+
+    ``Modules(R).FinitelyPresented().Torsion()`` is a placement claim, and the
+    construction that places an object is the one that makes it (``CAT-04``).
+    A cokernel of a presentation is built before it computes, so it carries no
+    such claim, and a consumer that routed on that membership asks the question
+    itself instead (``DEF-03``): ``is_torsion()`` computes from the module's
+    invariant factors, and finite presentation is asked of the placement that
+    states it.
+
+    Returns ``True``, ``False``, or the undecided proposition ``is_torsion(M)``.
+    """
+    match module in Modules(module.base_ring()).FinitelyPresented():
+        case True:
+            return module.is_torsion()
+        case False:
+            return False
+
+
 class ModulesWithChosenFinitePresentation(OwnedCategoryOverBaseRing):
     r"""Finitely presented modules carrying one selected finite presentation.
 

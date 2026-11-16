@@ -727,9 +727,11 @@ class ModuleMorphismMethods:
         ring = codomain.base_ring()
         targets = None
         if codomain in FiniteSets():
-            from sage_extensions.categories.modules.pure.modules import Modules
+            from sage_extensions.categories.modules.pure.modules import (
+                _finitely_presented_torsion,
+            )
 
-            if codomain in EnumeratedSets() or codomain in Modules(ring).FinitelyPresented().Torsion():
+            if codomain in EnumeratedSets() or _finitely_presented_torsion(codomain) is True:
                 targets = tuple(codomain)
         if targets is None:
             probes = [codomain.zero()]
@@ -833,7 +835,7 @@ class ModuleMorphismMethods:
                     codomain,
                 )
                 return AtomicProposition("is_linear", self)
-            case _ if domain in EnumeratedSets() or domain in Modules(ring).FinitelyPresented().Torsion():
+            case _ if domain in EnumeratedSets() or _finitely_presented_torsion(domain) is True:
                 return self._verify_elementwise_on_finite_source(tuple(domain))
             case _:
                 self._check_elementwise_zero()

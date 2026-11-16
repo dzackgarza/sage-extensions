@@ -702,6 +702,18 @@ class FramedFreeModules(OwnedCategoryOverBaseRing):
             """
             return True
 
+        def _torsion_decision(self) -> bool:
+            r"""A framed free module is torsion exactly when it is the zero module.
+
+            The framing is a basis, so a non-zero-divisor kills
+            $\sum_s a_s e_s$ only when it kills every coefficient, and it kills
+            no nonzero coefficient: the torsion elements are the ones whose
+            coordinates all vanish.  Answered from the framing's rank, so a free
+            module does not ask the generic fibre, which is the integral-domain
+            route for a module that has no basis to read.
+            """
+            return self.module_rank() == 0
+
         @RealizationHook
         def _cardinality_decision(self):
             r"""Supply ``|R^(S)|`` from the represented scalar and label cardinals.

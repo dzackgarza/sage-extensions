@@ -2612,3 +2612,8 @@ suite rows are compared by their FAILED id sets, not by their seconds.
 | `547-sets-base.log` | `2b9d2cf` | `tests/sets` as one directory: **24 failed, 162 passed in 7.74 s** |
 | `547-sets-fix.log` | `6c9a308` | the same directory: **24 failed, 165 passed in 8.08 s** -- the three new tests -- with FAILED id sets identical to the base's |
 | `547-consumers-base.log`, `547-consumers-fix.log` | `2b9d2cf`, `6c9a308` | the seven product and coproduct consumers outside `tests/sets` (`objects`, `categories`, `groups`): **20 failed, 31 passed** in 2.65 s and 3.46 s, FAILED id sets identical |
+| `541rev-finding-1-red.log` | `961b68a` | the new contract file on that commit: **3 failed in 4.59 s**, each at the `from_module` torsion guard | 
+| `541rev-forms-base.log` | `9a04b45` | `tests/forms/test_torsion_forms.sage` and `tests/forms/test_discriminant_subgroups.sage`: **8 failed, 12 passed in 4.09 s** | 
+| `541rev-forms-240ce65.log` | `240ce65` | the same two files on the parent of the placement change: **5 failed, 15 passed in 4.51 s**; the three differences are the regression | 
+| `541rev-forms-ctl.log` | `9a04b45` | `tests/forms` as one directory, unchanged: **43 failed, 40 passed, 58 errors in 95.98 s** | 
+| `541rev-forms-fix1.log` | `961b68a` + the finding-1 repair | the same directory: **38 failed, 48 passed, 58 errors in 123.98 s**; the three new tests are among the 48, and the FAILED/ERROR id set differs from the control's by the five regression ids and nothing else | 
