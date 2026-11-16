@@ -65,3 +65,35 @@ def construction_work_of(construction, request):
 
 
 builtins.construction_work_of = construction_work_of
+
+
+def relation_image_reads_of(subject, action):
+    r"""Return how many times ``action`` reads ``subject``'s relation images.
+
+    The claimed torsion placement's validator is the claim's refutation, and the
+    relation matrix of the presentation is the presented-module owner's datum.
+    A validator on the claim asks that owner for its torsion decision; it does
+    not reach the descendant's relation-image adapter for the claimed module and
+    hand-assemble the matrix itself (``OWN-05``, ``STY-03``).  The count is the
+    boundary: it is zero exactly when the read goes through the module's own
+    decision.
+    """
+    from sage_extensions.categories.modules.framed.finitely_generated import (
+        finitely_presented_modules,
+    )
+
+    reads = []
+    original = finitely_presented_modules._relation_images
+
+    def counted(module):
+        if module is subject:
+            reads.append(1)
+        return original(module)
+
+    with pytest.MonkeyPatch.context() as patch:
+        patch.setattr(finitely_presented_modules, "_relation_images", counted)
+        action()
+    return len(reads)
+
+
+builtins.relation_image_reads_of = relation_image_reads_of

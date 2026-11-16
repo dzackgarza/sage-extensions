@@ -53,3 +53,10 @@ def test_a_true_torsion_claim_survives_the_check() -> None:
 
     assert module in _torsion_modules()
     assert tuple(module.invariant_factors()) == (ZZ(3),)
+
+
+def test_the_claim_is_settled_by_the_modules_own_torsion_decision() -> None:
+    r"""The validator asks the presented module owner; it reads no relation images itself."""
+    module = _torsion_modules()(_endomorphism_of_z(ZZ(3)))
+
+    assert relation_image_reads_of(module, module.validate_torsion_claim) == 0
