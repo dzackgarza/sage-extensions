@@ -2807,13 +2807,26 @@ and the launcher `launch552r3.sh`.
 | `552-r4-probe-contracts.log` | `7f36d57` | finding 2: every `ParentMethods.__init__` the presented and free constructors reach has a readable signature (no opaque level in the algebra, semigroup, free, section-ring, Cox and commutative-algebra modules), so the new refusal has no red test; the log is the record. |
 | `552-r4-test-generators.log` | `a8c60d2` | finding 4: `-k line_section_ring_is_the_free_semigroup_algebra` is **1 passed, 28 deselected in 7.32 s**; the row is green because the implementation already multiplies by the semigroup law. |
 
-The round's commits were rebased onto `dc5b828` before this push; the SHAs in the
-table above name the pre-rebase commits.  The same seven commits at the rebased
-head are `49e4412` (test, finding 1), `025f220` (fix, findings 1 and 3),
-`963dfc6` (test, finding 5), `224bf7c` (fix, finding 5), `7488912` (fix,
-finding 2), `55335d5` (test, finding 4) and `0dcf984` (round-4 evidence).
+The round's commits are rebased onto main before the push, and main moved while
+the round ran, so the SHAs above name pre-rebase commits.  The rows below are
+the same seven commits by subject at the head that was pushed:
+
+- `test: the presented-algebra constructor states its relations (#552)`
+- `fix: the presented-algebra constructor states the quotient, and one construction declares its callers (#552)`
+- `test: the conic section ring records its scheme and its divisor (#552)`
+- `fix: a level's construction data reach that level's own constructor (#552)`
+- `fix: a level whose construction contract cannot be read refuses the datum (#552)`
+- `test: the line section ring's generators are tied to their own points (#552)`
+- `evidence: round 4's red and green runs (#552)` and this one
+
+The pushed head's own SHA is the one the round's report names, and each log's
+first lines record the tree SHA and the modified-path count it ran against.
 
 | log | commit | result |
 | --- | --- | --- |
-| `552-r4-rebased-rows.log` | `0dcf984` | the four rows of this round on the rebased tree, one pytest process, `-p qc_sage_session`: **4 passed, 39 deselected in 8.63 s**. |
-| `552-r4-rebased-probe.log` | `0dcf984` | the consumer probe of the threading repair at the rebased head: the conic ring states its scheme, its divisor and pieces 6 and 15, the Cox ring states its scheme, the coproduct's factors and the pushout's span and maps are their own, and the plain, polynomial, tensor and semigroup constructions keep their ambient categories. |
+| `552-r4-rebased-rows.log` | the rebased head | the four rows of this round on the rebased tree, one pytest process, `-p qc_sage_session`: **4 passed, 39 deselected in 8.63 s**. |
+| `552-r4-rebased-probe.log` | the rebased head | the consumer probe of the threading repair at the rebased head: the conic ring states its scheme, its divisor and pieces 6 and 15, the Cox ring states its scheme, the coproduct's factors and the pushout's span and maps are their own, and the plain, polynomial, tensor and semigroup constructions keep their ambient categories. |
+
+| log | commit | result |
+| --- | --- | --- |
+| `552-r4-head-rows.log` | the pushed head | the same four rows at the head this round pushes, one pytest process, `-p qc_sage_session`: **4 passed, 39 deselected in 5.49 s**. |
