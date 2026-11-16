@@ -52,6 +52,22 @@ lattice orbits impose integrality without requiring the family to have
 finite index in the ambient lattice.  Other proper subspaces have a
 nontrivial pointwise orthogonal stabilizer and remain outside this finite
 configuration computation.
+
+A family of at most eight vectors is searched on engine data, the
+weighted-matrix test of the pinned source (fund_domain_vertices.h:507-530,
+711-839).  The family rows, the colours of the indices and the pairing
+tables are read once.  A backtrack enumerates the colour- and
+table-preserving bijections of the positions.  Each gives ``T_sigma`` as an
+integer row action: ``B^-1 B'`` on a spanning family, the coisotropic Witt
+extension on an isotropic hyperplane.  ``T_sigma`` lies in ``O(L)`` or
+``Isom(L, M)`` when that matrix is integral and unimodular.  Every element of
+``O(L)_[v]`` is such a ``T_sigma``, so the integral ones are the whole
+stabilizer, and a transporter exists exactly when some bijection gives an
+integral one.  Only the returned isometries are raised, each once from its
+matrix.  The stabilizer generators are chosen greedily from the elements, so
+they can differ from those of the graph route; they generate the same group.
+A larger family takes the labelled pairing graph and the integral-structure
+action above.
 """
 
 from itertools import permutations
@@ -328,8 +344,9 @@ class _ColouredFamilyRealization:
                 f"map into {values}"
             )
             self._colours = values.factor(1)
-            self._vector = lambda index: values.projection(0)(family(index))
-            self._colour = lambda index: values.projection(1)(family(index))
+            vector_projection, colour_projection = values.projection(0), values.projection(1)
+            self._vector = lambda index: vector_projection(family(index))
+            self._colour = lambda index: colour_projection(family(index))
 
     def indices(self):
         return self._indices
@@ -381,7 +398,7 @@ class _ColouredFamilyRealization:
         )
         family_rank = self._family_coordinate_matrix().rank()
         ambient_rank = int(lattice.module_rank())
-        pairing_rank = self.pairing_graph().rank()
+        pairing_rank = self._engine_pairing_rank()
         assert family_rank == ambient_rank or (
             family_rank == ambient_rank - 1 and pairing_rank == ambient_rank - 2
         ), (
@@ -671,6 +688,155 @@ class _ColouredFamilyRealization:
         )
         return extension
 
+    @cached_method
+    def _engine_tables(self):
+        r"""The colours of the indices and the pairing tables of the family rows, on engine data.
+
+        ``F`` holds the family rows and ``G`` the lattice Gram matrix.  The
+        pairing table is ``F G F^t``; for a proper span the relation table
+        ``C (C^t C)^-1 C^t`` of independent columns ``C`` of ``F`` is added,
+        the tables of :class:`_LabelledPairingGraph` read from the rows.  The
+        table entries are Python lists, read once for the bijection search;
+        the rational Gram matrix and the pairing matrix are returned beside them.
+        """
+        from sage_extensions.tensors.tensor import _engine_component_matrix
+
+        family = self._family_coordinate_matrix()
+        gram = _engine_component_matrix(self._lattice.gram_tensor())
+        tables = [family * gram * family.transpose()]
+        if not self.spans_rational_space():
+            columns = family.change_ring(SageQQ)
+            columns = columns.matrix_from_columns(columns.pivots())
+            tables.append(columns * (columns.transpose() * columns).inverse() * columns.transpose())
+        colours = tuple(self.colour(index) for index in self.indices())
+        return colours, tuple(table.list() for table in tables), gram.change_ring(SageQQ), tables[0]
+
+    @cached_method
+    def _engine_pairing_rank(self):
+        r"""The rank of the pairing table ``F G F^t`` of the family rows."""
+        _colours, _tables, _gram, pairing = self._engine_tables()
+        return pairing.rank()
+
+    def _engine_bijections(self, target):
+        r"""The colour- and table-preserving bijections of the indices onto ``target``'s, as position tuples.
+
+        The weighted-matrix equivalence test of the pinned source
+        (fund_domain_vertices.h:507-530, 711-839, through
+        ``LORENTZ_TestEquivalence`` and ``LinPolytope_Automorphism`` on the
+        weight matrix of colours and pairings): a backtrack that assigns the
+        positions in order and keeps an assignment only when its colour, its
+        diagonal entries and its entries against the positions already
+        assigned agree in every table.
+        """
+        colours, tables, _gram, _pairing = self._engine_tables()
+        target_colours, target_tables, _target_gram, _target_pairing = target._engine_tables()
+        size = len(colours)
+        if len(target_colours) != size or len(tables) != len(target_tables):
+            return
+        assignment = [0] * size
+        used = [False] * size
+
+        def consistent(position, image):
+            for table, target_table in zip(tables, target_tables, strict=True):
+                if table[position * size + position] != target_table[image * size + image]:
+                    return False
+                for earlier in range(position):
+                    if table[position * size + earlier] != target_table[image * size + assignment[earlier]]:
+                        return False
+            return True
+
+        def extend(position):
+            if position == size:
+                yield tuple(assignment)
+                return
+            for image in range(size):
+                if used[image] or target_colours[image] != colours[position] or not consistent(position, image):
+                    continue
+                assignment[position] = image
+                used[image] = True
+                yield from extend(position + 1)
+                used[image] = False
+
+        yield from extend(0)
+
+    def _engine_integral_transformation(self, target, images):
+        r"""The integral row action ``X`` with ``v_i X = w_images[i]``, or ``None`` when ``T_sigma`` is not integral or not invertible over ZZ.
+
+        On a spanning family ``X = B^-1 B'`` for the selected independent rows
+        ``B`` and their images ``B'``; on an isotropic hyperplane ``X`` is the
+        unique coisotropic Witt extension of the hyperplane map.
+        """
+        from sage_extensions.tensors.tensor import _engine_coisotropic_witt_rows, _engine_row_basis_positions
+
+        family = self._family_coordinate_matrix()
+        target_family = target._family_coordinate_matrix()
+        if self.spans_rational_space():
+            basis_rows, adjugate, determinant = self._coordinate_basis_data()
+            numerator = adjugate * target_family.matrix_from_rows([images[row] for row in basis_rows])
+            if any(entry % determinant for entry in numerator.list()):
+                return None
+            transformation = numerator.change_ring(SageQQ) / determinant
+        else:
+            basis_rows = tuple(_engine_row_basis_positions(family))
+            transformation = _engine_coisotropic_witt_rows(
+                self._engine_tables()[2],
+                target._engine_tables()[2],
+                family.matrix_from_rows(basis_rows).change_ring(SageQQ),
+                target_family.matrix_from_rows([images[row] for row in basis_rows]).change_ring(SageQQ),
+            )
+            assert transformation is not None, (
+                f"the family {self._family} spans an isotropic hyperplane of {self._lattice}, so its "
+                f"isometry onto the target hyperplane is coisotropic and extends"
+            )
+            if any(entry.denominator() != 1 for entry in transformation.list()):
+                return None
+        transformation = transformation.change_ring(SageZZ)
+        if transformation.det() not in (1, -1):
+            return None
+        transformation.set_immutable()
+        return transformation
+
+    def engine_transporter_rows(self, target):
+        r"""The row action of one integral ``g`` with ``g o v = w o sigma``, or ``None``: the first integral ``T_sigma``."""
+        for images in self._engine_bijections(target):
+            transformation = self._engine_integral_transformation(target, images)
+            if transformation is not None:
+                return transformation
+        return None
+
+    @cached_method
+    def engine_stabilizer_rows(self):
+        r"""Row actions generating ``O(L)_[v]``, chosen greedily from its elements.
+
+        Every ``g`` in the stabilizer is ``T_sigma`` for a colour- and
+        table-preserving permutation ``sigma``, so the integral ``T_sigma`` are
+        the whole finite group.  A ``T_sigma`` is kept when it lies outside
+        the group generated by those kept before it, which is closed by
+        products of the row actions.
+        """
+        size = int(self._lattice.module_rank())
+        identity = engine_matrix(SageZZ, size, size, 1)
+        identity.set_immutable()
+        generated = {identity}
+        generators = []
+        for images in self._engine_bijections(self):
+            transformation = self._engine_integral_transformation(self, images)
+            if transformation is None or transformation in generated:
+                continue
+            generators.append(transformation)
+            frontier = list(generated)
+            while frontier:
+                reached = []
+                for element in frontier:
+                    for generator in generators:
+                        product = element * generator
+                        product.set_immutable()
+                        if product not in generated:
+                            generated.add(product)
+                            reached.append(product)
+                frontier = reached
+        return tuple(generators)
+
     @staticmethod
     def _rational_transformation_matrix(isometry):
         r"""Lower an owned rational isometry to row coordinates at this private boundary."""
@@ -924,6 +1090,9 @@ def _stabilizer_generators(orthogonal_group, family):
 
     lattice = orthogonal_group.lattice()
     realization = _realization(lattice, family)
+    if int(realization.indices().cardinality()) <= _ENGINE_SEARCH_SIZE:
+        realization.assert_unique_rational_extension()
+        return tuple(_isometry_from_rows(orthogonal_group, rows) for rows in realization.engine_stabilizer_rows())
     if not realization.spans_lattice():
         return tuple(
             orthogonal_group(images)
@@ -964,6 +1133,11 @@ def _transporter(homset, source_family, target_family):
     target = _realization(target_lattice, target_family)
     if source.indices().cardinality() != target.indices().cardinality():
         return None
+    if int(source.indices().cardinality()) <= _ENGINE_SEARCH_SIZE:
+        source.assert_unique_rational_extension()
+        target.assert_unique_rational_extension()
+        rows = source.engine_transporter_rows(target)
+        return None if rows is None else _isometry_from_rows(homset, rows)
     sigma = source.pairing_graph().isomorphism(target.pairing_graph())
     if sigma is None:
         return None
@@ -1000,6 +1174,36 @@ def _transporter(homset, source_family, target_family):
         f"{source_lattice} -> {target_lattice}"
     )
     return _homset_element(homset, restricted)
+
+
+# A family of at most this many vectors is searched on engine data
+# (``_ColouredFamilyRealization.engine_stabilizer_rows`` and
+# ``engine_transporter_rows``): the bijections of at most 8! position tuples,
+# the bound of ``_LabelledPairingGraph._small_automorphisms``.  A larger
+# family takes the labelled pairing graph and the integral-structure action.
+_ENGINE_SEARCH_SIZE = 8
+
+
+def _isometry_from_rows(homset, rows):
+    r"""The element of ``homset`` whose row action on the framings is the unimodular integral matrix ``rows``, raised once.
+
+    Row ``s`` of ``rows`` is the coordinate row of the image of generator
+    ``s``, so the framed matrix of the module map is its transpose (columns
+    are images), as in ``LatticeIsometryMethods.integral_restriction``.  A
+    matrix between free modules is a linear map by construction (``OWN-22``),
+    so both factors are raised by the pre-validated matrix constructor.
+    """
+    from sage_extensions.categories.modules.pure.modules import _linear_arrow_from_engine_matrix
+
+    source, target = homset.domain(), homset.codomain()
+    forward_matrix = rows.transpose()
+    backward_matrix = rows.inverse().change_ring(SageZZ).transpose()
+    forward_matrix.set_immutable()
+    backward_matrix.set_immutable()
+    forward = _linear_arrow_from_engine_matrix(source.module_category().Mor(source, target), forward_matrix)
+    backward = _linear_arrow_from_engine_matrix(source.module_category().Mor(target, source), backward_matrix)
+    module_isomorphism = Modules(source.base_ring()).Core().Mor(source, target)(forward, backward)
+    return homset.element_class(homset, module_isomorphism)
 
 
 def _homset_element(homset, isometry):
