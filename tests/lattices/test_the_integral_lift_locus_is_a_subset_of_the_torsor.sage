@@ -101,6 +101,27 @@ def test_the_nonempty_locus_is_a_point_of_the_torsors_power_set() -> None:
     assert locus in torsor.power_set()
 
 
+def test_a_zero_dimensional_parameter_space_has_the_one_integral_lift() -> None:
+    r"""``U``'s marked null line reduces to rank zero, so ``T_Z`` is one lift.
+
+    The parameter lattice of a rank-zero reduction is zero, so ``P/mP`` is one
+    class and the only lift a parameter names is ``phi(0)``: the torsor's base
+    point.  The residue locus is either that class or empty, and here it is the
+    class, so the integral locus is the one-point subset of ``T`` on the base
+    point --- a finite set the set owner counts from its point.
+    """
+    U = Lattices(ZZ)("U")
+    reduction = _reduction_at(U, U.basis_vector(0))
+    torsor = _marked_line_lift_torsor(reduction, reduction.Isom(reduction).identity())
+    locus = torsor.integral_lift_locus()
+
+    assert torsor.parameter_space().module_rank() == 0
+    assert torsor.integral_parameter_classes().is_empty() is False
+    assert locus.is_parent_of(torsor.base_point()) is True
+    assert locus.is_empty() is False
+    assert locus.cardinality() == cardinal(1)
+
+
 def test_the_locus_is_membership_in_the_residue_class() -> None:
     r"""A lift is in ``T_Z`` exactly when its parameter's class lies in the residue locus.
 
