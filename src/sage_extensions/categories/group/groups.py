@@ -1945,7 +1945,7 @@ def _own_group(
                     # ARC-07: the ambient category is the category whose constructor
                     # built the object; Groups.Free and the engine groups are
                     # constructed by Groups, as subobjects record their objects' plain
-                    # category (cc66c2d1ed).
+                    # category.
                     _constructing_category=OwnedGroups(),
                     **({"symmetric_points": symmetric_points} if symmetric_points is not None else {}),
                     **({"selected_coxeter_matrix": coxeter_matrix} if coxeter_matrix is not None else {}),
@@ -1964,7 +1964,7 @@ def _own_group(
                     # ARC-07: the ambient category is the category whose constructor
                     # built the object; Groups.Free and the engine groups are
                     # constructed by Groups, as subobjects record their objects' plain
-                    # category (cc66c2d1ed).
+                    # category.
                     _constructing_category=OwnedGroups(),
                     **({"symmetric_points": symmetric_points} if symmetric_points is not None else {}),
                     **({"selected_coxeter_matrix": coxeter_matrix} if coxeter_matrix is not None else {}),

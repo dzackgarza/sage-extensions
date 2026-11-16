@@ -2909,7 +2909,7 @@ class IsotropicVectorReductionImage(SageObject):
         ``max_roots`` and ``max_decompositions`` bound the search for a caller
         who wants a prefix of the chamber — a chamber that is not of finite
         volume never stops — and a bounded search returns
-        ``is_complete_wall_set() == False``; the route of this issue passes no
+        ``is_complete_wall_set() == False``; the route taken here passes no
         bound.
         """
         from sage_extensions.categories.hyperbolic_lattices import HyperbolicLattices
