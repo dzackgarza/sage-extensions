@@ -5464,13 +5464,74 @@ class Lattices(OwnedCategoryOverBaseRing):
                 for component in components
             )
 
+        @cached_method
+        def _definite_indecomposable_summands(self):
+            r"""Return the indecomposable summands of a definite integral lattice, or ``None``.
+
+            Kneser's construction (Kneser, *Quadratische Formen*, section 27;
+            the decomposition is unique by Eichler's theorem): a minimal vector
+            of a definite lattice is not a sum of two nonzero orthogonal
+            vectors, so the minimal vectors lie in the summands, grouped along
+            the connected components of their nonorthogonality graph, and the
+            saturated span of a component splits off orthogonally.  The Gram is
+            LLL-reduced first because the minimal-vector enumeration runs on the
+            entries of the Gram it is given.
+
+            ``None`` means the construction did not split the lattice off
+            orthogonally, so nothing here decides the decomposition.  The
+            summands are the spans of the returned bases, hence sublattices of
+            this lattice and not new Gram presentations of it.
+            """
+            from sage.libs.pari import pari
+            from sage_extensions.categories.lattice_morphisms import (
+                _indecomposable_summands,
+            )
+
+            if self.base_ring() is not _owned_integers() or self.module_rank().is_finite() is not True:
+                return None
+            if self.is_positive_definite() is True:
+                sign = 1
+            elif self.is_negative_definite() is True:
+                sign = -1
+            else:
+                return None
+            rank = int(self.module_rank())
+            if rank <= 1:
+                return (self,) if rank == 1 else ()
+            gram = sign * _engine_component_matrix(self.gram_tensor()).change_ring(SageZZ)
+            transformation = pari(gram).qflllgram().sage()
+            reduced = transformation.transpose() * gram * transformation
+            bases = _indecomposable_summands(reduced)
+            if bases is None:
+                return None
+            if tuple(int(basis.nrows()) for basis in bases) == (rank,):
+                return (self,)
+            labels = tuple(self.module_generating_set())
+            return tuple(
+                self.subobject_on(
+                    tuple(
+                        self.linear_combination(
+                            {
+                                label: int(entry)
+                                for label, entry in zip(labels, row)
+                                if entry
+                            }
+                        )
+                        for row in (basis * transformation.transpose()).rows()
+                    )
+                )
+                for basis in bases
+            )
+
         def is_decomposable(self):
             r"""Whether this lattice has a nontrivial integral orthogonal sum.
 
             An exhibited sum or an orthogonal partition of the displayed basis
-            proves decomposability.  Rank one and the rank-two determinant
-            obstruction decide some negative cases.  Otherwise the property
-            remains a proposition; a connected displayed Gram is not a proof.
+            proves decomposability, and a definite integral lattice is decided
+            outright by its own decomposition into indecomposables
+            (:meth:`_definite_indecomposable_summands`).  Rank one and the
+            rank-two determinant obstruction decide further negative cases.
+            Otherwise the property remains a proposition.
             """
             rank = self.module_rank()
             if not rank.is_finite():
@@ -5502,6 +5563,9 @@ class Lattices(OwnedCategoryOverBaseRing):
             if n == 2 and self.base_ring() is _owned_integers() and self.is_even() is True:
                 if self.determinant() % 4 != 0:
                     return False
+            summands = self._definite_indecomposable_summands()
+            if summands is not None:
+                return len(summands) > 1
             return AtomicProposition("orthogonally decomposable", self)
 
         def _binary_orthogonal_split(self):
@@ -5597,11 +5661,14 @@ class Lattices(OwnedCategoryOverBaseRing):
             indecomposable.
 
             A lattice presented by a Gram matrix carries no represented
-            decomposition, and two facts still exhibit one: the blocks of a
+            decomposition, and three facts still exhibit one: the blocks of a
             displayed basis (:meth:`_displayed_orthogonal_blocks`), whose
-            summands are the blocks' own, and a definite binary splitting.  A
-            lattice that neither reads is returned as its own summand, which is
-            the statement that this family has nothing finer to report.
+            summands are the blocks' own; a definite binary splitting; and a
+            definite lattice's own decomposition
+            (:meth:`_definite_indecomposable_summands`).  Where none of them
+            decides the decomposition, this family is refused: one summand
+            would state that the lattice is indecomposable, which is exactly
+            what is not decided.
             """
 
             if self.decomposition() is None:
@@ -5620,7 +5687,19 @@ class Lattices(OwnedCategoryOverBaseRing):
                     first, second, _, _ = split
                     category = Lattices(self.base_ring())
                     return finite_family((category([[first]]), category([[second]])), name="Indecomposable summands")
-                return finite_family((self,), name="Indecomposable summands")
+                definite = self._definite_indecomposable_summands()
+                if definite is not None:
+                    return finite_family(definite, name="Indecomposable summands")
+                answer = self.is_decomposable()
+                if answer is False:
+                    return finite_family((self,), name="Indecomposable summands")
+                if answer is True:
+                    raise ValueError(
+                        f"{self!r} is decided decomposable, but no summand of it is exhibited by a represented decomposition, by the blocks of its displayed Gram matrix, by a definite binary splitting, or by its own definite decomposition"
+                    )
+                raise ValueError(
+                    f"cannot list the indecomposable summands of {self!r}: whether it is orthogonally decomposable is not decided, so a family of one summand would claim it is indecomposable"
+                )
             summands = []
             for factor in self.biproduct_factors():
                 summands.extend(factor.indecomposable_summands())
