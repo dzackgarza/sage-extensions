@@ -1,0 +1,108 @@
+probe: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/probe552_r3_pytest.py
+tree SHA: 9a403788d53478a205ffc86876a91f6b4c2ffdf2 (modified paths: 1)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 11.80 21.07 22.64 10/717 2912469
+inner 900 s, outer 960 s, guard 4096 MiB, args '-p qc_sage_session tests/divisors/test_projective_section_rings.sage -k 'conic_section_ring_states or cox_ring_states''
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_ test_the_conic_section_ring_states_its_scheme_and_the_divisor_it_is_built_on _
+
+    def test_the_conic_section_ring_states_its_scheme_and_the_divisor_it_is_built_on() -> None:
+        r"""``R(P^2, O(2))`` records the plane and the conic ``2 D_0`` it is stated on.
+    
+        The pieces are ``H^0(P^2, O(2n))``: rank 6 in degree one and 15 in degree
+        two (Hartshorne, Proposition II.5.13), and each is the character family at
+        the lattice points of the polytope of ``n * 2 D_0`` (CLS Prop. 4.3.3).
+        """
+        fans = RationalPolyhedralFans(ZZ.free_module(2))
+        plane = fans.projective_space_fan().toric_variety(QQ)
+        line = plane.hyperplane_divisor()
+        conic = ZZ(2) * line
+        ring = plane.section_ring(conic)
+    
+        assert ring.ambient_category() == SectionRings(QQ)
+>       assert ring.section_scheme() is plane
+               ^^^^^^^^^^^^^^^^^^^^^
+
+tests/divisors/test_projective_section_rings.sage:67: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Scheme over Fraction Field of Integer Ring glued from the affine charts Affine charts of a finite scheme gluing: [2-di...[0]} ↦ Spectrum of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring]
+arguments = (), options = {}
+
+    def __call__(self, *arguments, **options):
+        r"""Construct an element of this object, without coercion discovery.
+    
+        The values an owned object accepts are themselves owned, and Sage's
+        coercion graph has never heard of them: asked for a conversion map
+        it tries to build a Mor in its own ``Sets``, finds the domain absent
+        and raises, before this object's own constructor is ever reached.
+        The crossing into owned data happens in ``_element_constructor_``,
+        which is the one boundary that admits foreign values.
+        """
+>       return self._element_constructor_(*arguments, **options)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: Schemes.ParentMethods._element_constructor_() missing 1 required positional argument: 'point'
+
+src/sage_extensions/categories/abstract_categories/objects.py:417: TypeError
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:442 General module over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:833 Elementwise module morphism Module over Fraction Field of Integer Ring on Classes in the multilinear tensor presentation -> Module over Fraction Field of Integer Ring on Fraction Field of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:442 General module over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+__ test_the_projective_plane_cox_ring_states_the_scheme_it_is_the_cox_ring_of __
+
+    def test_the_projective_plane_cox_ring_states_the_scheme_it_is_the_cox_ring_of() -> None:
+        r"""``Cox(P^2) = Q[x_0, x_1, x_2]`` is graded by the divisor class group, over its scheme.
+    
+        Each generator is the ray of the fan: three rays, so three generators, and
+        the grading monoid is ``Cl(P^2) = ZZ`` (CLS Thm. 4.1.3 and Prop. 4.2.6).
+        """
+        fans = RationalPolyhedralFans(ZZ.free_module(2))
+        plane = fans.projective_space_fan().toric_variety(QQ)
+        cox = plane.cox_ring()
+    
+>       assert cox.cox_scheme() is plane
+               ^^^^^^^^^^^^^^^^
+
+tests/divisors/test_projective_section_rings.sage:83: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Scheme over Fraction Field of Integer Ring glued from the affine charts Affine charts of a finite scheme gluing: [2-di...[0]} ↦ Spectrum of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring]
+arguments = (), options = {}
+
+    def __call__(self, *arguments, **options):
+        r"""Construct an element of this object, without coercion discovery.
+    
+        The values an owned object accepts are themselves owned, and Sage's
+        coercion graph has never heard of them: asked for a conversion map
+        it tries to build a Mor in its own ``Sets``, finds the domain absent
+        and raises, before this object's own constructor is ever reached.
+        The crossing into owned data happens in ``_element_constructor_``,
+        which is the one boundary that admits foreign values.
+        """
+>       return self._element_constructor_(*arguments, **options)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: Schemes.ParentMethods._element_constructor_() missing 1 required positional argument: 'point'
+
+src/sage_extensions/categories/abstract_categories/objects.py:417: TypeError
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:442 General module over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+=========================== short test summary info ============================
+FAILED tests/divisors/test_projective_section_rings.sage::test_the_conic_section_ring_states_its_scheme_and_the_divisor_it_is_built_on
+FAILED tests/divisors/test_projective_section_rings.sage::test_the_projective_plane_cox_ring_states_the_scheme_it_is_the_cox_ring_of
+2 failed, 3 deselected in 8.89s
+pytest exit: 1
+[peakrss] red552f5: child waited=0 shell_code=0 samples=8
+[peakrss] peak tree RSS      : 351 MiB
+[peakrss] low-water MemAvail : 5160 MiB
+[peakrss] peak single VmHWM  : 351 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      340 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    12.0s procs=  3 rss=   351 MiB hwm=   351 MiB avail=  5377 MiB
+[peakrss]   t=    14.0s procs=  3 rss=   351 MiB hwm=   351 MiB avail=  5160 MiB
+[peakrss]   t=    10.0s procs=  3 rss=   348 MiB hwm=   348 MiB avail=  5467 MiB
+[peakrss]   t=     8.0s procs=  3 rss=   342 MiB hwm=   342 MiB avail=  5770 MiB
+[peakrss]   t=     6.0s procs=  3 rss=   324 MiB hwm=   324 MiB avail=  6144 MiB
+launcher exit: 0

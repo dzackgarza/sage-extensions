@@ -1,0 +1,22 @@
+probe: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/probe552_r3_pytest.py
+tree SHA: 87c8d370b05364347c712b4c76192d0330649f7e (modified paths: 3)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 15.54 20.00 22.13 22/821 2915592
+inner 900 s, outer 960 s, guard 4096 MiB, args '-p qc_sage_session tests/divisors/test_projective_section_rings.sage -k 'conic_section_ring_states or cox_ring_states''
+..                                                                       [100%]
+2 passed, 3 deselected in 10.88s
+pytest exit: 0
+[peakrss] green552f5: child waited=0 shell_code=0 samples=8
+[peakrss] peak tree RSS      : 349 MiB
+[peakrss] low-water MemAvail : 2420 MiB
+[peakrss] peak single VmHWM  : 349 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      338 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    14.0s procs=  3 rss=   349 MiB hwm=   349 MiB avail=  4419 MiB
+[peakrss]   t=    12.0s procs=  3 rss=   329 MiB hwm=   329 MiB avail=  3513 MiB
+[peakrss]   t=    10.0s procs=  3 rss=   321 MiB hwm=   321 MiB avail=  3099 MiB
+[peakrss]   t=     8.0s procs=  3 rss=   295 MiB hwm=   295 MiB avail=  3215 MiB
+[peakrss]   t=     6.0s procs=  3 rss=   246 MiB hwm=   246 MiB avail=  2482 MiB
+launcher exit: 0

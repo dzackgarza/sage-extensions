@@ -1,0 +1,54 @@
+probe: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/probe552_r3g.py
+tree SHA: 87c8d370b05364347c712b4c76192d0330649f7e (modified paths: 3)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 15.43 19.70 21.98 13/772 2916532
+inner 900 s, outer 960 s, guard 4096 MiB, args ''
+import over: 3.8 s
+section_ring(D): Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring
+free ring section_divisor(): True
+free ring piece ranks: (3, 6)
+section_ring(2D): Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring/(-s0*s2 + s5^2, s0*s4 - s3*s5, -s2*s3 + s4*s5, -s1*s2 + s4^2, s3*s4 - s1*s5, -s0*s1 + s3^2)
+conic section_scheme(): True
+conic section_divisor(): True
+conic piece ranks: (6, 15)
+conic ambient: Category of section rings over Fraction Field of Integer Ring
+conic is cached: True
+conic relations: 6
+conic semigroup generators: ((2, 0, 1), (0, 2, 1), (0, 0, 1), (1, 1, 1), (0, 1, 1), (1, 0, 1))
+conic instance section attrs: ['_section_divisor', '_section_line_bundle', '_section_scheme', 'section_semigroup_generators']
+cox_scheme(): True
+cox rays: 3
+cox grading: Finitely presented module on 3 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 0]
+cox cached: True
+coproduct: Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring/(x0^2 - 1, x1^3 - 1)
+coproduct factors: (Free module on {[1], [x]} over Fraction Field of Integer Ring, Free module on {[1], [y], [y^2]} over Fraction Field of Integer Ring)
+coproduct cached: True
+pushout: Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring/(x0^2 - 1, x0 - x1, x1^3 - 1)
+pushout span: True
+pushout maps: (Generic morphism:
+  From: Free module on {[1], [x]} over Fraction Field of Integer Ring
+  To:   Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring/(x0^2 - 1, x0 - x1, x1^3 - 1), Generic morphism:
+  From: Free module on {[1], [y], [y^2]} over Fraction Field of Integer Ring
+  To:   Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring/(x0^2 - 1, x0 - x1, x1^3 - 1))
+pushout cached: True
+plain quotient generator: [0]
+plain quotient cached: True
+polynomial ambient: Category of symmetric algebras over Fraction Field of Integer Ring
+laurent ring: Category of algebras
+tensor algebra ambient: Category of tensor algebras over Fraction Field of Integer Ring
+affine semigroup algebra: Category of affine semigroup algebras over Fraction Field of Integer Ring
+total 7.7 s
+[peakrss] probe552r3g: child waited=0 shell_code=0 samples=6
+[peakrss] peak tree RSS      : 336 MiB
+[peakrss] low-water MemAvail : 5024 MiB
+[peakrss] peak single VmHWM  : 336 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      325 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    10.0s procs=  3 rss=   336 MiB hwm=   336 MiB avail=  5629 MiB
+[peakrss]   t=     8.0s procs=  3 rss=   326 MiB hwm=   326 MiB avail=  5024 MiB
+[peakrss]   t=     6.0s procs=  3 rss=   288 MiB hwm=   288 MiB avail=  5041 MiB
+[peakrss]   t=     4.0s procs=  3 rss=   217 MiB hwm=   217 MiB avail=  5048 MiB
+[peakrss]   t=     2.0s procs=  3 rss=    99 MiB hwm=    99 MiB avail=  5071 MiB
+launcher exit: 0

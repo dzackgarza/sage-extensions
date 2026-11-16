@@ -2789,3 +2789,20 @@ main as it stood while this round ran.
 | `527-zz-adic-completion-main.log` | `bbb0dd6` | `ZZ.adic_completion(2)` raises `AttributeError: 'int' object has no attribute 'ring'`; `ZZ.adic_completion(ZZ.ideal(2))` raises `RecursionError`; the resolved method is `ModulesWithChosenFinitePresentation.ParentMethods.adic_completion` |
 | `527-zz-adic-completion-dispatch.log` | the round's tree | `ZZ` alone resolves the module owner's `adic_completion` (`QQ`, `QQ[x]`, `QQ(i)`, `Zp(5)` resolve the ring owner's), and `AdicCompletions().Local().an_object()` raises the `AttributeError` at `modules/pure/modules.py:4655` from `commutative_algebra.py:3036` |
 | `527-literal-subtraction.log` | the round's tree | `(1 - x_hat).exact_source_expression()` and `(x_hat - 1).exact_source_expression()` are `None`, `(completion.one() - x_hat)` is `-x + 1`, and the induced map evaluates at the latter |
+### #552, round 4: the third review's five findings
+
+Red states are on the commit named, green ones on the fix commit directly above
+the row.  Every run used one pytest process per file selection on the adopted
+runtime (Sage 11.0.beta5, `/sage/.venv/bin/python`), the port repo at `/work`,
+and the launcher `launch552r3.sh`.
+
+| log | commit | result |
+| --- | --- | --- |
+| `552-r4-red-constructor.log` | `cd42311` (test only) | finding 1: `pytest -o addopts= tests/test_native_ring_constructions.py -k presented_algebra_constructor_states_the_quotient` is **1 failed, 8 deselected in 10.31 s** -- `AlgebrasWithChosenFinitePresentation(QQ)(P, (x*y,))` returned `P`. |
+| `552-r4-fix-constructor.log` | `9a40378` | the same row: **1 passed, 8 deselected in 10.24 s**. |
+| `552-r4-red-section-data.log` | `87c8d37` (test only) | finding 5: `pytest -o addopts= -p qc_sage_session tests/divisors/test_projective_section_rings.sage -k 'conic_section_ring_states or cox_ring_states'` is **2 failed** -- `section_scheme()` called the stored scheme. |
+| `552-r4-fix-section-data.log` | `f5ea6f2` | the same rows: **2 passed, 3 deselected in 10.88 s**. |
+| `552-r4-probe-consumers.log` | `f5ea6f2` | probe: the conic ring states its scheme and divisor, pieces 6 and 15, cached, six relations; `cox_scheme()` is the plane with three rays and `Cl = ZZ`; the coproduct's factors and the pushout's span and maps are their own; a plain quotient and the polynomial, tensor and affine semigroup rings keep their ambient categories. |
+| `552-r4-probe-cover-map.log` | `f5ea6f2` | probe: the auxiliary presentation cover this round moved to a parameter still lifts -- `Z[x]/(2x)` gives `2x = 0`, `x != 0`, and the integer-torsion symmetric algebra keeps its polynomial presentation. |
+| `552-r4-probe-contracts.log` | `7f36d57` | finding 2: every `ParentMethods.__init__` the presented and free constructors reach has a readable signature (no opaque level in the algebra, semigroup, free, section-ring, Cox and commutative-algebra modules), so the new refusal has no red test; the log is the record. |
+| `552-r4-test-generators.log` | `a8c60d2` | finding 4: `-k line_section_ring_is_the_free_semigroup_algebra` is **1 passed, 28 deselected in 7.32 s**; the row is green because the implementation already multiplies by the semigroup law. |
