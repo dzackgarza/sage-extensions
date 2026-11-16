@@ -779,6 +779,13 @@ class PredicateSubgroups(OwnedParameterizedCategory):
             a normal subgroup of itself and that subgroup lies in the subgroup
             of ``Pi`` the covering is taken for (D. Dutour Sikirić and
             K. Hulek, arXiv:2302.01679v2, Lemma 3.6, printed p. 22).
+
+            A plane's certificates are made while the row holds the plane, and the
+            transport data of the lines carried there is released at that point
+            (:meth:`...OrthogonalCharacterQuotient.release_isotropic_transports`).
+            What the row retains as it walks is therefore its coverings and the
+            relation it returns, not one flag certificate and one transport datum
+            per line per plane.
             """
             from sage_extensions.categories.isotropic_orbits import (
                 ArithmeticCuspIncidence,
@@ -928,7 +935,60 @@ class PredicateSubgroups(OwnedParameterizedCategory):
                         break
                 else:
                     ambient_sources.append((ambient_flag, None, None))
-            sourced_flags = []
+            # The building incidence is a relation between two orbit vertices, not
+            # the quotient's set of flag orbits.  Several flags can witness the
+            # same relation, and the parabolic covering can repeat one of its
+            # K-orbits when the selected line-fixing generators are a proper
+            # subgroup of the full line stabilizer, so one actual flag certificate
+            # is retained for each endpoint pair.  The certificate is made while
+            # the row holds the plane that produced it, and the flag and the
+            # registered transport of its line are spent at that point: a row that
+            # kept them would hold one flag and one transport datum for every line
+            # of every plane -- three of each per plane, for 189720 planes --
+            # beside the relation it returns.  Identity is intentional below:
+            # every vertex is one of the retained objects of the two cusp rows, and
+            # comparing distinct cusps would start another orbit search.
+            incidences = []
+            endpoint_pairs = set()
+
+            def retain_flag(flag):
+                r"""Retain the certificate of one flag over a new endpoint pair, and answer it."""
+                line, plane = flag.terms()
+                line_vertices = line_vertex_candidates(line)
+                plane_vertices = plane_vertex_candidates(plane)
+                if len(line_vertices) != 1 or len(plane_vertices) != 1:
+                    raise ArithmeticError(
+                        f"the isotropic flag {flag} of {lattice} lies in {len(line_vertices)} "
+                        f"line cusps and {len(plane_vertices)} plane cusps of {self}; each "
+                        f"term of a flag must lie in exactly one cusp"
+                    )
+                line_cusp, line_transporter = line_vertices[0]
+                plane_cusp, plane_transporter = plane_vertices[0]
+                if line_transporter is None or plane_transporter is None:
+                    raise ArithmeticError(
+                        f"the isotropic flag {flag} of {lattice} lies in the cusps "
+                        f"{line_cusp} and {plane_cusp} of {self}, but no element of {self} "
+                        f"carries the cusp representatives to its terms"
+                    )
+                certificate = ArithmeticCuspIncidence(
+                    self,
+                    flag,
+                    line_cusp,
+                    plane_cusp,
+                    line_transporter,
+                    plane_transporter,
+                )
+                if certificate.lattice() is not lattice:
+                    raise ArithmeticError(
+                        f"the Tits building incidence of {self} has a cusp incidence in a lattice "
+                        f"other than {lattice}, the lattice {self.supergroup()} acts on"
+                    )
+                endpoints = (id(line_cusp), id(plane_cusp))
+                if endpoints not in endpoint_pairs:
+                    endpoint_pairs.add(endpoints)
+                    incidences.append(certificate)
+                return certificate
+
             parabolic_routed = True
             # The row's covering is one datum per source family: it is computed
             # at one plane, retained by the quotient, and carried to every other
@@ -949,6 +1009,8 @@ class PredicateSubgroups(OwnedParameterizedCategory):
                 plane = plane_cusp.representative()
                 target_lift = quotient.isotropic_lift_of(plane)
                 covered_here = False
+                plane_flags = []
+                carried_lines = []
                 for position, (ambient_flag, source_lift, source_witness) in enumerate(
                     ambient_sources
                 ):
@@ -961,7 +1023,7 @@ class PredicateSubgroups(OwnedParameterizedCategory):
                     if known is not None:
                         # The row's covering was computed at this plane: it is
                         # the family here, and needs no carrying.
-                        sourced_flags.extend(known[1])
+                        plane_flags.extend(known[1])
                         covered_here = True
                         continue
                     if transported_covering and target_lift is not None:
@@ -973,11 +1035,11 @@ class PredicateSubgroups(OwnedParameterizedCategory):
                         reference = quotient.isotropic_covering_reference(position)
                         if reference is not None:
                             _reference_plane, reference_lift, reference_flags = reference
-                            sourced_flags.extend(
-                                quotient.transport_covering(
-                                    reference_lift, reference_flags, target_lift
-                                )
+                            carried = quotient.transport_covering(
+                                reference_lift, reference_flags, target_lift
                             )
+                            plane_flags.extend(carried)
+                            carried_lines.extend(flag.terms()[0] for flag in carried)
                             covered_here = True
                             continue
                     # The source row now meets the source lift at one registered
@@ -1010,55 +1072,31 @@ class PredicateSubgroups(OwnedParameterizedCategory):
                         quotient.register_isotropic_covering(
                             plane, position, target_lift, from_parabolic
                         )
-                    sourced_flags.extend(from_parabolic)
+                    plane_flags.extend(from_parabolic)
                     covered_here = True
                 if not parabolic_routed:
                     break
                 if not covered_here:
                     parabolic_routed = False
                     break
+                for flag in plane_flags:
+                    retain_flag(flag)
+                if carried_lines:
+                    # The plane's certificates retain their own transporters, so
+                    # the carried lines' registered data is spent: released here,
+                    # the registry is the row's coverings and not its planes.
+                    quotient.release_isotropic_transports(carried_lines)
             if not parabolic_routed:
-                sourced_flags = list(self.isotropic_orbit_representatives(2, flag=True))
-
-            candidate_incidences = []
-            for flag in sourced_flags:
-                line, plane = flag.terms()
-                line_vertices = line_vertex_candidates(line)
-                plane_vertices = plane_vertex_candidates(plane)
-                if len(line_vertices) != 1 or len(plane_vertices) != 1:
-                    raise ArithmeticError(
-                        f"the isotropic flag {flag} of {lattice} lies in {len(line_vertices)} "
-                        f"line cusps and {len(plane_vertices)} plane cusps of {self}; each "
-                        f"term of a flag must lie in exactly one cusp"
-                    )
-                line_cusp, line_transporter = line_vertices[0]
-                plane_cusp, plane_transporter = plane_vertices[0]
-                if line_transporter is None or plane_transporter is None:
-                    raise ArithmeticError(
-                        f"the isotropic flag {flag} of {lattice} lies in the cusps "
-                        f"{line_cusp} and {plane_cusp} of {self}, but no element of {self} "
-                        f"carries the cusp representatives to its terms"
-                    )
-                candidate_incidences.append(
-                    ArithmeticCuspIncidence(
-                        self,
-                        flag,
-                        line_cusp,
-                        plane_cusp,
-                        line_transporter,
-                        plane_transporter,
-                    )
+                # The flag row's planes are no representatives, so the vertices of
+                # its flags are searched for rather than read, and the whole row is
+                # read at once: two certificates over one endpoint pair there
+                # expose an over-split flag row, which the covering route cannot.
+                incidences = []
+                endpoint_pairs = set()
+                candidate_incidences = tuple(
+                    retain_flag(flag)
+                    for flag in self.isotropic_orbit_representatives(2, flag=True)
                 )
-            if any(incidence.lattice() is not lattice for incidence in candidate_incidences):
-                raise ArithmeticError(
-                    f"the Tits building incidence of {self} has a cusp incidence in a lattice "
-                    f"other than {lattice}, the lattice {self.supergroup()} acts on"
-                )
-            # In the fallback, two candidate records whose flags are equivalent
-            # expose an over-split flag row.  The parabolic covering needs no
-            # such check: distinct double cosets over the selected line-fixing
-            # subgroup may map to one K-orbit, by the covering argument above.
-            if not parabolic_routed:
                 for position, first in enumerate(candidate_incidences):
                     for second in candidate_incidences[position + 1:]:
                         if first.line_cusp() is not second.line_cusp() or first.plane_cusp() is not second.plane_cusp():
@@ -1070,23 +1108,6 @@ class PredicateSubgroups(OwnedParameterizedCategory):
                                 f"over the line cusp {first.line_cusp()} and the plane cusp "
                                 f"{first.plane_cusp()}: the flag orbits are over-split"
                             )
-            # The building incidence is a relation between two orbit vertices,
-            # not the quotient's set of flag orbits.  Several flags can witness
-            # the same relation, and the parabolic covering can repeat one of
-            # its K-orbits when the selected line-fixing generators are a proper
-            # subgroup of the full line stabilizer.  Retain one actual flag
-            # certificate for each endpoint pair.  Identity is intentional:
-            # every match is one of the retained objects of the two cusp rows,
-            # and comparing distinct cusps would start another orbit search.
-            incidences = []
-            for candidate in candidate_incidences:
-                if any(
-                    incidence.line_cusp() is candidate.line_cusp()
-                    and incidence.plane_cusp() is candidate.plane_cusp()
-                    for incidence in incidences
-                ):
-                    continue
-                incidences.append(candidate)
             return finite_ordered_set(tuple(incidences))
 
         def _predicate_clause(self) -> str:

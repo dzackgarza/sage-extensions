@@ -395,6 +395,11 @@ def run_row(lattice, subgroup, label, cap) -> RowOutcome:
         finally:
             signal.setitimer(signal.ITIMER_REAL, 0)
         log(f"[{label}] the row's calls returned in {time.monotonic() - start:.1f} s")
+        log(
+            f"[{label}] the row retains "
+            f"{subgroup.finite_character_quotient().retained_isotropic_transport_count()} "
+            "transport data: its coverings, its planes' lifts, and nothing per carried line"
+        )
         return row_contract(lattice, subgroup, label, lines, planes, incidences)
     except RowUndecided:
         return RowOutcome(
