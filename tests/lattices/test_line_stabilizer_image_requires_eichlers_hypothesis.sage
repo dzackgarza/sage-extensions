@@ -68,3 +68,27 @@ def test_the_criterion_does_not_apply_to_an_odd_lattice_with_two_hyperbolic_plan
         lattice.are_in_one_stable_orbit(
             lattice.module_generator(0), lattice.module_generator(2)
         )
+
+
+def test_the_criterion_route_is_not_taken_on_an_odd_lattice_with_two_hyperbolic_planes() -> None:
+    r"""$U \oplus U \oplus \langle 3 \rangle$: the line stabilizer's image is refused.
+
+    Eichler's criterion is stated for an even lattice that splits two
+    orthogonal hyperbolic planes (Gritsenko--Hulek--Sankaran, Lemma 7.8,
+    p. 503), and :meth:`Lattices.eichler_criterion_applies` states the two
+    halves together.  This specimen has the two planes and is odd, so nothing
+    here is classified by the criterion, and the call refuses rather than
+    certifying the stabilizer image from the zero discriminant class.
+    """
+    lattice = Lattices(ZZ)("U") + Lattices(ZZ)("U") + Lattices(ZZ)([[3]])
+    assert lattice.is_even() is False
+    assert lattice.hyperbolic_index() == 2
+    assert lattice.eichler_criterion_applies() is False
+
+    labels = tuple(lattice.module_generating_set())
+    line = lattice.primitive_isotropic_subobject(lattice.module_generator(labels[0]))
+    automorphisms = lattice.Aut()
+    whole = automorphisms.discriminant_representation().codomain()
+    quotient = automorphisms.discriminant_preimage(whole).finite_character_quotient()
+
+    assert quotient.isotropic_line_stabilizer_image(line) is None
