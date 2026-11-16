@@ -148,7 +148,7 @@ def test_indefinite_predicate_image_with_supplied_ambient_generators():
     minus_id = group([[-1, 0], [0, -1]])
     rho = lattice.discriminant_representation()
     stable = group.predicate_subgroup(
-        lambda g: rho(g) == rho.codomain().one(), "stable kernel predicate"
+        lambda g: rho(g) == rho.codomain().one(), lambda: "stable kernel predicate"
     )
     assert stable.image_under(
         rho, index_bound=4, ambient_generators=(exchange, minus_id)

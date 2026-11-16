@@ -52,7 +52,7 @@ def _stable_plus(lattice):
     plus = lattice.O_plus()
     return orthogonal.predicate_subgroup(
         lambda automorphism: automorphism in stable and automorphism in plus,
-        "ker(rho, sn)",
+        lambda: "ker(rho, sn)",
         character_data={"discriminant_preimages": (trivial,), "spinor_kernel": True},
         character_data_complete=True,
     )

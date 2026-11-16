@@ -2327,7 +2327,7 @@ class FormModules(OwnedCategoryOverBaseRing):
                 lambda automorphism: formed_mor.preserves_forms(
                     automorphism.as_morphism()
                 ),
-                f"Isometries of {self}",
+                lambda: f"Isometries of {self}",
             )
 
         O = orthogonal_group

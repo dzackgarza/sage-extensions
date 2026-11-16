@@ -221,7 +221,10 @@ class MarkedReductionCell(SageObject):
         def preserves_marked_cell(isometry):
             return self.transported_by(isometry).is_equal_to(self)
 
-        return group.predicate_subgroup(preserves_marked_cell, f"g preserves the marked reduction cell {self}")
+        return group.predicate_subgroup(
+            preserves_marked_cell,
+            lambda: f"g preserves the marked reduction cell {self}",
+        )
 
     def adjacency_to(self, other, group):
         r"""Return the marked adjacency when one isometry transports all retained data."""

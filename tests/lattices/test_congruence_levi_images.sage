@@ -35,7 +35,9 @@ def test_congruence_levi_lifts_and_kernel_retain_the_modulus_three_condition():
     global_negative = ambient.Aut()({label: -ambient.module_generator(label) for label in labels})
     representation = _mod_three_representation(ambient)
     target = representation.codomain().subgroup((representation(global_negative),))
-    subgroup = representation.preimage_subgroup(target)
+    subgroup = representation.preimage_subgroup(
+        target, stated_clause=lambda: "the reduction(g) lies in the image of -id"
+    )
     assert negative not in subgroup and global_negative in subgroup
     minus = reduction.levi_action()(negative)
     lift = reduction.levi_lift(minus, subgroup=subgroup)

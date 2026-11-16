@@ -21,7 +21,7 @@ def test_parity_kernel_intersected_with_a_point_stabilizer_generates_a3(presente
     point_stabilizer = group.subgroup((group((1, 2)), group((1, 2, 3))))
     stabilizer = group.predicate_subgroup(
         lambda g: g in point_stabilizer,
-        "the stabilizer of the fourth point",
+        lambda: "the stabilizer of the fourth point",
         generating_morphism=group.free_cover((group((1, 2)), group((1, 2, 3)))),
     ) if presented else point_stabilizer
     intersection = parity.kernel().intersection(stabilizer)

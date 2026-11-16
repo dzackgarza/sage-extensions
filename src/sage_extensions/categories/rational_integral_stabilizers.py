@@ -498,8 +498,16 @@ class _FiniteIntegralRepresentation(SageObject):
             f"the lattice stabilizer in {group} is generated from its lattice orbit, which needs a "
             f"selected finite generating set of {group}"
         )
-        return self.permutation_representation().preimage_subgroup(
-            self.finite_stabilizer(),
+        from sage_extensions.categories.group.groups import _named_by_its_own_words
+
+        representation = self.permutation_representation()
+        finite_stabilizer = self.finite_stabilizer()
+        return representation.preimage_subgroup(
+            finite_stabilizer,
+            stated_clause=lambda: (
+                f"{representation}(g) lies in "
+                f"{_named_by_its_own_words(finite_stabilizer)}"
+            ),
             generating_morphism=self.g_set().orbit_schreier_morphism(self._selected_point()),
         )
 
@@ -796,7 +804,7 @@ class IntegralStructureAction(SageObject):
 
         return rational_group.predicate_subgroup(
             preserves_the_lattice,
-            f"g(L)=L for L={lattice}",
+            lambda: f"g(L)=L for L={lattice}",
         )
 
     def transporter(self, target_inclusion):

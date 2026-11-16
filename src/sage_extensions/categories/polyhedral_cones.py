@@ -735,7 +735,7 @@ class RationalPolyhedralCones(OwnedParameterizedCategory):
             )
             return group.predicate_subgroup(
                 lambda isometry: self.transport(isometry).is_equal_to(self),
-                f"g preserves the rational polyhedral cone {self}",
+                lambda: f"g preserves the rational polyhedral cone {self}",
             )
 
         def face_stabilizer(self, face, group):

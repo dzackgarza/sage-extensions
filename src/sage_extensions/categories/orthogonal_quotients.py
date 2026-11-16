@@ -424,7 +424,9 @@ class OrthogonalCharacterQuotient:
                     return False
             return True
 
-        return product.predicate_subgroup(allowed, "the specified finite character conditions")
+        return product.predicate_subgroup(
+            allowed, lambda: "the specified finite character conditions"
+        )
 
     def image(self, isometry):
         components = {}

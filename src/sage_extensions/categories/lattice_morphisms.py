@@ -3935,7 +3935,6 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
         need not be appended to the family --- the trivial members are those
         the orbit search itself identifies.
         """
-
         if self.domain() is not self.codomain():
             raise ValueError(f"the isometries {self.domain()} -> {self.codomain()} form no orthogonal group O(L), so {subgroup} has no preimage under O(L) -> O(A_L)")
         target = self.domain().discriminant_group().orthogonal_group()
@@ -4022,7 +4021,7 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
         generated = orthogonal.stabilizer_of_classes(point)
         stabilizer = orthogonal.predicate_subgroup(
             lambda isometry: frozenset(isometry(class_) for class_ in point) == point,
-            f"fixes the point {point} of A_L",
+            lambda: f"fixes the point {point} of A_L",
             generating_morphism=orthogonal.free_cover(
                 tuple(generated.group_generators())
             ),
@@ -4196,7 +4195,12 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
         r"""Return the subgroup ``morphism^{-1}(subgroup)`` of this group."""
         if morphism.domain() is not self:
             raise ValueError(f"cannot take the preimage of {subgroup} in {self} under {morphism}: its domain is {morphism.domain()}, not {self}")
-        return morphism.preimage_subgroup(subgroup)
+        return morphism.preimage_subgroup(
+            subgroup,
+            stated_clause=lambda: (
+                f"{morphism}(g) lies in {_named_by_its_own_words(subgroup)}"
+            ),
+        )
 
     def kernel(self, morphism):
         r"""Return the kernel subgroup of a represented group morphism."""
@@ -4392,7 +4396,7 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
 
         stabilizer = self.predicate_subgroup(
             preserves_family,
-            "isometries preserving the defining coloured vector family up to reindexing",
+            lambda: "isometries preserving the defining coloured vector family up to reindexing",
             character_data={"stabilized_family": family},
             cardinality_decision=cardinality,
             enumeration=lambda: (
@@ -5043,7 +5047,12 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
         """
         representation = self.congruence_representation(modulus)
         selected = representation.codomain().subgroup(()) if target is None else target
-        return representation.preimage_subgroup(selected)
+        return representation.preimage_subgroup(
+            selected,
+            stated_clause=lambda: (
+                f"{representation}(g) lies in {_named_by_its_own_words(selected)}"
+            ),
+        )
 
     def nonprimitive_sublattice_classes(self, saturated, divisors):
         r"""Return one inclusion per ``Stab(S)``-class of ``J <= S`` with the given elementary divisors."""

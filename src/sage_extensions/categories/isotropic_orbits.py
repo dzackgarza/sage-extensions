@@ -26,6 +26,7 @@ from sage_extensions.categories._lattice import (
     orbit_row_record_name,
     vector_label,
 )
+from sage_extensions.categories.group.groups import _named_by_its_own_words
 from sage_extensions.categories.modules.pure.modules import ModuleSubobjects
 from sage_extensions.categories.sets.finite_ordered_sets import (
     finite_ordered_set,
@@ -873,6 +874,7 @@ class _ArithmeticCuspEngine:
             self.representative().inclusion(),
             action,
             lambda element: element in parabolic,
+            lambda: f"g preserves {_named_by_its_own_words(self.representative())}",
         )
         intersection = subgroup.intersection(parabolic)
         return stabilizer.select_group_generators(
@@ -1114,6 +1116,7 @@ class ArithmeticCuspIncidence(SageObject):
             self.flag(),
             action,
             lambda element: element in line_stabilizer and element in plane_stabilizer,
+            lambda: f"g preserves both terms of the flag {self.flag()}",
         )
 
     def __eq__(self, other) -> bool:

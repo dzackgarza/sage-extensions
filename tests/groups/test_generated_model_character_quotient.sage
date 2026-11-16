@@ -187,7 +187,7 @@ def test_single_character_factors_are_generated_without_a_direct_product() -> No
     assert len(q.right_coset_transversal()) == 2
     det_kernel = G.predicate_subgroup(
         lambda g: g.determinant() == 1,
-        "determinant one",
+        lambda: "determinant one",
         character_data={"determinant_kernel": True},
         character_data_complete=True,
     )
@@ -219,7 +219,7 @@ def test_discriminant_image_is_the_joint_preimage_then_projection_on_three_corre
     spinor_kernel = L.O_plus()
     det_kernel = G.predicate_subgroup(
         lambda g: g.determinant() == 1,
-        "determinant one",
+        lambda: "determinant one",
         character_data={"determinant_kernel": True},
         character_data_complete=True,
     )

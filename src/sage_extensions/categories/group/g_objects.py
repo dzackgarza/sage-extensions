@@ -936,7 +936,7 @@ class GObjects(CategoryPacketMethods, OwnedCategory):
             (lambda left, right: Unknown) if orbit_relation is None else orbit_relation,
             lambda point: group.predicate_subgroup(
                 lambda element: action(element, point) == point,
-                f"stabilizer of {point}",
+                lambda: f"stabilizer of {point}",
             ),
         )
 

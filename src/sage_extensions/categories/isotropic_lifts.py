@@ -129,7 +129,7 @@ class IsotropicReductionLiftTorsors(OwnedCategoryOverBaseRing):
             lambda g: g(target_e) == target_e and all(
                 target_line.is_in_image(g(v) - v) for v in target_vectors
             ),
-            "the kernel of the marked-line reduction action",
+            lambda: "the kernel of the marked-line reduction action",
         )
         points = source_ambient.Isom(target_ambient).condition_set(
             lambda g: g(source_e) == target_e and all(
@@ -250,7 +250,7 @@ class IsotropicReductionLiftTorsors(OwnedCategoryOverBaseRing):
             target = self.target_reduction().isotropic_embedding().codomain()
             integral_kernel = self.acting_group().predicate_subgroup(
                 lambda g: g.integral_restriction(target, target) is not None,
-                "integral automorphisms in the marked-line reduction kernel",
+                lambda: "integral automorphisms in the marked-line reduction kernel",
             )
             residue = self.integral_parameter_quotient()
             lattice_inclusion = residue.domain().inclusion()

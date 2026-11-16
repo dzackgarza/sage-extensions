@@ -133,6 +133,13 @@ class PredicateSubgroups(OwnedParameterizedCategory):
     ):
         r"""Construct the predicate subgroup of this category's ambient group.
 
+        ``description`` is the constructing owner's words for the condition
+        that cuts this subgroup out (``g commutes with (1 2)``), as a function
+        of nothing: it is asked when the name or the rendering is read, never
+        here, so no operand of the condition is rendered while the subgroup is
+        built and a condition naming another subgroup states that subgroup's
+        own description at read (:func:`_named_by_its_own_words`).
+
         ``generating_morphism``, when the constructing owner has one, is a
         group morphism from a free group to the ambient group whose image is
         this subgroup; it becomes the subgroup's selected generating datum,
@@ -171,9 +178,12 @@ class PredicateSubgroups(OwnedParameterizedCategory):
             # the ambient group and what a record names, and it is not the
             # realization's ``_description``, which says what a whole group
             # prints.  It is the constructing owner's own words for the
-            # condition, or ``None`` when that condition names another
-            # subgroup and the owner states the clause where it stores that
-            # subgroup instead.
+            # condition, as a function of nothing, asked where it is read and
+            # never here.
+            assert callable(description), (
+                f"the condition cutting a subgroup of {supergroup} out is stated as a "
+                f"function of nothing, but {description!r} is not callable"
+            )
             self._stated_clause = description
             self._character_data = dict(character_data or {})
             self._character_data_complete = (
@@ -249,7 +259,7 @@ class PredicateSubgroups(OwnedParameterizedCategory):
 
                 sage: G = Groups.S(3)
                 sage: H = G.subgroup((G((1, 2)),))
-                sage: P = G.predicate_subgroup(lambda g: g in H, "transposition subgroup")
+                sage: P = G.predicate_subgroup(lambda g: g in H, lambda: "transposition subgroup")
                 sage: generators = P.finite_index_schreier_generators(index_bound=3)
                 sage: all(g in P for g in generators)
                 True
@@ -266,7 +276,7 @@ class PredicateSubgroups(OwnedParameterizedCategory):
                 sage: F, C = Groups.Free(1), Groups.C(2)
                 sage: s, t = F.group_generators()[0], C.group_generators()[0]
                 sage: phi = F.Mor(C)({next(iter(F.free_basis())): t})
-                sage: P = F.predicate_subgroup(lambda g: phi(g) == C.one(), "even exponent")
+                sage: P = F.predicate_subgroup(lambda g: phi(g) == C.one(), lambda: "even exponent")
                 sage: generators = P.finite_index_schreier_generators(index_bound=2)
                 sage: any(g == s*s or g == ~(s*s) for g in generators)
                 True
@@ -908,20 +918,13 @@ class PredicateSubgroups(OwnedParameterizedCategory):
             is read by the rendering (:meth:`_repr_`) and by the record's name
             (:meth:`description`), never at construction.
 
-            A kind whose condition names another *subgroup* states the clause
-            here instead, from the data its construction retained, so that the
-            operand is named by its own description when this is asked and not
-            rendered when the subgroup is built: :class:`PreimageSubgroups` and
-            :class:`StabilizerSubgroups` do.  Those kinds pass no clause of
-            their own, and a kind that passes none and states none here is
-            refused rather than rendered as ``None``.
+            A kind whose condition names another *subgroup* --
+            :class:`PreimageSubgroups`, :class:`StabilizerSubgroups` -- passes
+            a clause that names it there, so the operand is named by its own
+            description when this is asked and is not rendered when the
+            subgroup is built.
             """
-            clause = self._stated_clause
-            assert clause is not None, (
-                f"{self} was built by a construction that writes no condition of "
-                "its own, so its owner states the condition it is cut out by"
-            )
-            return clause
+            return self._stated_clause()
 
         def description(self) -> str:
             r"""Return this subgroup's own name: the condition that cuts it out.
@@ -976,7 +979,7 @@ class KernelSubgroups(_PredicateSubgroupConstruction):
             _ambient=OwnedGroups(),
             supergroup=group,
             predicate=lambda element: morphism(element) == identity,
-            description="elements mapped to the identity by the defining morphism",
+            description=lambda: "elements mapped to the identity by the defining morphism",
             kernel_morphism=morphism,
             generating_morphism_factory=generating_morphism_factory,
         )
@@ -1075,7 +1078,7 @@ class PreimageSubgroups(_PredicateSubgroupConstruction):
     def an_object(self):
 
         group = self.base()
-        whole = PredicateSubgroups(group)(lambda _element: True, "the whole group")
+        whole = PredicateSubgroups(group)(lambda _element: True, lambda: "the whole group")
         return self(group.Mor(group).identity(), whole)
 
     def _call_(
@@ -1083,8 +1086,8 @@ class PreimageSubgroups(_PredicateSubgroupConstruction):
         morphism,
         subgroup,
         *,
+        stated_clause,
         predicate=None,
-        stated_clause=None,
         character_data=None,
         character_data_complete=None,
         generating_morphism=None,
@@ -1098,18 +1101,11 @@ class PreimageSubgroups(_PredicateSubgroupConstruction):
 
         ``stated_clause`` is the constructing owner's condition for the record,
         as a function of nothing (``rho_L(g) lies in ...``, ``sn_RR(g) = 1``);
-        it is asked when the subgroup's name or rendering is read.  With none,
-        the preimage states ``morphism(g) lies in <the target's own
-        description>``, also when read: the condition names the subgroup this
-        construction operates on, so naming it here would render that subgroup
-        while the preimage is built.
+        it is asked when the subgroup's name or rendering is read, never here.
+        The condition names the subgroup this construction operates on, so the
+        owner that names it states that subgroup's own description at read
+        (:func:`_named_by_its_own_words`).
         """
-        if stated_clause is None:
-            def stated_clause():
-                return (
-                    f"{morphism}(g) lies in "
-                    f"{_named_by_its_own_words(subgroup)}"
-                )
         group = self.base()
         if morphism.domain() is not group:
             raise ValueError(
@@ -1118,7 +1114,7 @@ class PreimageSubgroups(_PredicateSubgroupConstruction):
             )
         if subgroup is morphism.codomain():
             subgroup = PredicateSubgroups(subgroup)(
-                lambda _element: True, "the whole codomain"
+                lambda _element: True, lambda: "the whole codomain"
             )
         if subgroup not in Subgroups(morphism.codomain()):
             raise ValueError(
@@ -1133,8 +1129,7 @@ class PreimageSubgroups(_PredicateSubgroupConstruction):
             _ambient=OwnedGroups(),
             supergroup=group,
             predicate=predicate,
-            description=None,
-            stated_clause=stated_clause,
+            description=stated_clause,
             character_data=character_data,
             character_data_complete=character_data_complete,
             preimage_morphism=morphism,
@@ -1147,10 +1142,9 @@ class PreimageSubgroups(_PredicateSubgroupConstruction):
         return "preimage subgroups"
 
     class ParentMethods:
-        def __init__(self, preimage_morphism, target_subgroup, stated_clause, **rest) -> None:
+        def __init__(self, preimage_morphism, target_subgroup, **rest) -> None:
             self._preimage_morphism = preimage_morphism
             self._target_subgroup = target_subgroup
-            self._stated_preimage_clause = stated_clause
             super().__init__(**rest)
             if (
                 not _retains_group_resolution(self)
@@ -1166,22 +1160,6 @@ class PreimageSubgroups(_PredicateSubgroupConstruction):
 
         def target_subgroup(self):
             return self._target_subgroup
-
-        @cached_method
-        def _predicate_clause(self) -> str:
-            r"""Return the preimage's condition, asked here.
-
-            The clause is the constructing owner's sentence when it stated one
-            (``rho_L(g) lies in ...``), and otherwise
-            ``morphism(g) lies in <the target's own description>``.  The target
-            is the subgroup this construction operates on, so it is named as it
-            names itself (``Subgroups.ParentMethods.description``) and never by
-            its rendering, which reads ``Subgroup of ...`` and says nothing
-            about which subgroup this one is.  Either way the sentence is formed
-            when a reader asks for the name or the rendering: naming the target
-            at construction would read it while the preimage is built.
-            """
-            return self._stated_preimage_clause()
 
         def has_finite_coset_space(self) -> bool:
             r"""Whether ``G/f^-1(K)`` is realized through ``f`` into a finite group with selected generators of ``G``."""
@@ -1271,8 +1249,10 @@ class PreimageSubgroups(_PredicateSubgroupConstruction):
             base = image_cosets.base_point()
             intersection = target.predicate_subgroup(
                 lambda element: image_cosets.act(inclusion(element), base) == base,
-                f"elements of {_named_by_its_own_words(target)} in "
-                f"{_named_by_its_own_words(image)}",
+                lambda: (
+                    f"elements of {_named_by_its_own_words(target)} in "
+                    f"{_named_by_its_own_words(image)}"
+                ),
             )
             orbit = FiniteGSets(target).pointed_orbit(
                 intersection,
@@ -1347,8 +1327,7 @@ class StabilizerSubgroups(_PredicateSubgroupConstruction):
             _ambient=OwnedGroups(),
             supergroup=group,
             predicate=predicate,
-            description=None,
-            stated_clause=stated_clause,
+            description=stated_clause,
             stabilized_object=stabilized_object,
             stabilizer_action=action,
             generating_morphism=generating_morphism,
@@ -1361,25 +1340,12 @@ class StabilizerSubgroups(_PredicateSubgroupConstruction):
         return "stabilizer subgroups"
 
     class ParentMethods:
-        def __init__(self, stabilized_object, stabilizer_action, stated_clause, basis_change=None, vector_witness=None, **rest) -> None:
+        def __init__(self, stabilized_object, stabilizer_action, basis_change=None, vector_witness=None, **rest) -> None:
             self._stabilized_object = stabilized_object
             self._stabilizer_action = stabilizer_action
-            self._stated_stabilized_clause = stated_clause
             self._basis_change = basis_change
             self._vector_witness = vector_witness
             super().__init__(**rest)
-
-        @cached_method
-        def _predicate_clause(self) -> str:
-            r"""Return the condition this stabilizer's owner stated, asked here.
-
-            A stabilizer's condition is the owner's sentence about the object it
-            stabilizes, and that sentence names the object -- a plane, a point,
-            a colouring, or a subgroup for a normalizer.  Asking the function
-            here is what lets the owner name a subgroup by its own description
-            while building nothing (:func:`_named_by_its_own_words`).
-            """
-            return self._stated_stabilized_clause()
 
         def owned_vector_witness(self):
             r"""The action owner's exact vector decision for this stabilizer, or ``None``."""
@@ -1439,7 +1405,7 @@ class CentralizerSubgroups(_PredicateSubgroupConstruction):
             _ambient=OwnedGroups(),
             supergroup=group,
             predicate=lambda candidate: element * candidate == candidate * element,
-            description=f"g commutes with {element}",
+            description=lambda: f"g commutes with {element}",
             centralizing_element=element,
         )
 
@@ -1459,7 +1425,7 @@ class CentralizerSubgroups(_PredicateSubgroupConstruction):
 class IntersectionSubgroups(_PredicateSubgroupConstruction):
     def an_object(self):
         group = self.base()
-        whole = PredicateSubgroups(group)(lambda _element: True, "the whole group")
+        whole = PredicateSubgroups(group)(lambda _element: True, lambda: "the whole group")
         return self((whole, whole))
 
     def _call_(
@@ -1503,7 +1469,7 @@ class IntersectionSubgroups(_PredicateSubgroupConstruction):
             _ambient=OwnedGroups(),
             supergroup=group,
             predicate=lambda element: conjunction(subgroup.is_parent_of(element) for subgroup in subgroups),
-            description="g lies in every selected subgroup",
+            description=lambda: "g lies in every selected subgroup",
             character_data=character_data,
             character_data_complete=character_data_complete,
             intersected_subgroups=Set(subgroups),
@@ -1612,7 +1578,12 @@ class IntersectionSubgroups(_PredicateSubgroupConstruction):
             corestriction at its constructing owner.
             """
             inclusion = generated.inclusion()
-            restricted = (morphism * inclusion).preimage_subgroup(target)
+            restricted = (morphism * inclusion).preimage_subgroup(
+                target,
+                stated_clause=lambda: (
+                    f"{morphism}(g) lies in {_named_by_its_own_words(target)}"
+                ),
+            )
             augmentation = restricted.schreier_generating_morphism()
             return (inclusion * restricted.inclusion() * augmentation)._corestrict_to_subgroup(self)
 
@@ -1633,7 +1604,10 @@ class IntersectionSubgroups(_PredicateSubgroupConstruction):
             inclusion = generated.inclusion()
             restricted = generated.predicate_subgroup(
                 lambda element: inclusion(element) in character_subgroup,
-                f"the inclusion into {self.supergroup()} lies in {character_subgroup}",
+                lambda: (
+                    f"the inclusion into {self.supergroup()} lies in "
+                    f"{_named_by_its_own_words(character_subgroup)}"
+                ),
             )
             augmentation = restricted.finite_index_schreier_generating_morphism(
                 index_bound=index_bound,

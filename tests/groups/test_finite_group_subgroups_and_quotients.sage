@@ -109,8 +109,13 @@ def test_reduction_from_c4_to_c2_has_kernel_image_preimages_and_lifts() -> None:
     assert reduction.image().order() == 2
     assert reduction.is_surjective()
     assert not reduction.is_injective()
-    assert reduction.preimage_subgroup(two).order() == 4
-    assert reduction.preimage_subgroup(two.subgroup((two.one(),))).order() == 2
+    assert reduction.preimage_subgroup(
+        two, stated_clause=lambda: "the reduction(g) lies in the image"
+    ).order() == 4
+    assert reduction.preimage_subgroup(
+        two.subgroup((two.one(),)),
+        stated_clause=lambda: "the reduction(g) is the identity",
+    ).order() == 2
     assert reduction(reduction.lift(target)) == target
     assert set(lifts) == set(two)
     assert all(reduction(witness) == image for image, witness in lifts.items())

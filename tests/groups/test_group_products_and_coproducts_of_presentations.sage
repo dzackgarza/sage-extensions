@@ -167,7 +167,7 @@ def test_free_product_factors_a_cocone_into_a_non_gap_predicate_group() -> None:
     reduction = free.Mor(cyclic)({label: involution})
     subgroup = free.predicate_subgroup(
         lambda element: reduction(element) == cyclic.one(),
-        "even exponent subgroup of the free cyclic group",
+        lambda: "even exponent subgroup of the free cyclic group",
     )
     from_free = free.Mor(subgroup)({label: subgroup(generator**2)})
     from_cyclic = cyclic.Mor(subgroup)(lambda _element: subgroup.one())
@@ -223,7 +223,7 @@ def test_group_product_factors_a_cone_with_no_apex_gap_realization() -> None:
     reduction = free.Mor(cyclic)({basis: involution})
     subgroup = free.predicate_subgroup(
         lambda element: reduction(element) == cyclic.one(),
-        "kernel of reduction modulo two",
+        lambda: "kernel of reduction modulo two",
     )
     inclusion = subgroup.inclusion()
     construction = Groups().product_construction((free, cyclic))

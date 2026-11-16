@@ -21,7 +21,7 @@ def _sign(group):
 
 def test_the_even_permutations_of_s4_form_a_subgroup_of_order_twelve() -> None:
     group = Groups.S(4)
-    even = group.predicate_subgroup(lambda x: x.sign() == 1, "even permutations")
+    even = group.predicate_subgroup(lambda x: x.sign() == 1, lambda: "even permutations")
 
     assert even.order() == 12
     assert even.is_finite()
@@ -42,7 +42,7 @@ def test_the_kernel_of_the_sign_of_s4_is_the_nonabelian_group_of_order_twelve() 
 
 def test_the_even_permutations_fixing_four_form_a3() -> None:
     group = Groups.S(4)
-    even = group.predicate_subgroup(lambda x: x.sign() == 1, "even permutations")
+    even = group.predicate_subgroup(lambda x: x.sign() == 1, lambda: "even permutations")
     fixing_four = group.stabilizer(4)
 
     assert fixing_four.order() == 6

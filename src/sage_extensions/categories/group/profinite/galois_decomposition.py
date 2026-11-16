@@ -96,27 +96,31 @@ def _residue_field_order(base_prime):
             return abs(ZZ(int(base_prime.residue_cardinality())))
 
 
-def FiniteGaloisSubgroup(supergroup, elements, description):
+def FiniteGaloisSubgroup(supergroup, elements, stated_clause):
     r"""The subgroup of the finite group ``supergroup`` whose elements are ``elements``.
 
     The element set is checked to contain the identity and to be closed under
     the law, which makes it a subgroup of a finite group; the subgroup is the
     predicate subgroup cut out by membership in that set.
+
+    ``stated_clause`` is the caller's words for that condition, as a function
+    of nothing: it is asked when the subgroup's name is read, and the refusal
+    below names the set it was given.
     """
     element_set = frozenset(elements)
     assert all(element in supergroup for element in element_set), (
-        f"the elements chosen for the subgroup '{description}' are not all elements of "
+        f"the elements chosen for the subgroup '{stated_clause()}' are not all elements of "
         f"{supergroup}"
     )
     assert supergroup.one() in element_set, (
-        f"the element set chosen for '{description}' is not a subgroup of {supergroup}: "
+        f"the element set chosen for '{stated_clause()}' is not a subgroup of {supergroup}: "
         f"it does not contain the identity"
     )
     assert all(left * right in element_set for left in element_set for right in element_set), (
-        f"the element set chosen for '{description}' is not a subgroup of {supergroup}: "
+        f"the element set chosen for '{stated_clause()}' is not a subgroup of {supergroup}: "
         f"it is not closed under multiplication"
     )
-    return PredicateSubgroups(supergroup)(lambda element: element in element_set, description)
+    return PredicateSubgroups(supergroup)(lambda element: element in element_set, stated_clause)
 
 
 def FiniteElementConjugacyClass(supergroup, representative):
@@ -156,7 +160,7 @@ def _finite_inertia_group(quotient, prime_above):
     decomposition = quotient.decomposition_group(prime_above)
     return PredicateSubgroups(quotient)(
         lambda automorphism: automorphism in decomposition and _fixes_residue_field(prime_above, automorphism),
-        f"Inertia group at {prime_above}",
+        lambda: f"Inertia group at {prime_above}",
     )
 
 

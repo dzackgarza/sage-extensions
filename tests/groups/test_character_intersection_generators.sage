@@ -80,8 +80,8 @@ def test_missing_finite_family_rejected_non_vacuously():
     m1 = G.Mor(C2)(lambda n: c if int(n) % 2 == 0 else C2.one())
     m2 = G.Mor(C2)(lambda n: c if int(n) % 3 == 0 else C2.one())
     # Valid character kernels: predicate is kernel of map to finite group, with correct character_data
-    K1 = G.predicate_subgroup(lambda g: m1(g) == C2.one(), "ker m1", character_data={"spinor_kernel": True}, character_data_complete=True)
-    K2 = G.predicate_subgroup(lambda g: m2(g) == C2.one(), "ker m2", character_data={"determinant_kernel": True}, character_data_complete=True)
+    K1 = G.predicate_subgroup(lambda g: m1(g) == C2.one(), lambda: "ker m1", character_data={"spinor_kernel": True}, character_data_complete=True)
+    K2 = G.predicate_subgroup(lambda g: m2(g) == C2.one(), lambda: "ker m2", character_data={"determinant_kernel": True}, character_data_complete=True)
     assert K1.contains_character_kernel() is True
     assert K2.contains_character_kernel() is True
     inter = IntersectionSubgroups(G)((K1, K2))

@@ -6,7 +6,7 @@ from sage_extensions.all import *  # noqa: F401,F403
 def test_even_permutations_of_s3_form_the_normal_subgroup_of_order_three() -> None:
     r"""$A_3 = \{g \in S_3 : \operatorname{sgn} g = 1\}$ has order 3 and index 2."""
     group = Groups.S(3)
-    alternating = group.predicate_subgroup(lambda g: g.sign() == 1, "sgn(g) = 1")
+    alternating = group.predicate_subgroup(lambda g: g.sign() == 1, lambda: "sgn(g) = 1")
 
     assert alternating.cardinality() == 3
     assert group.cardinality() / alternating.cardinality() == 2

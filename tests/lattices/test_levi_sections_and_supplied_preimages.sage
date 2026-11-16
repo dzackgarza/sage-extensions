@@ -56,7 +56,9 @@ def test_the_split_two_plane_preimage_uses_the_supplied_kernel_and_cosets():
     point = Sets.Δ[0](0)
     quotient.select_left_cosets(FiniteGSets(quotient).pointed_orbit(image, point, lambda _value, point: point))
     target = quotient.subgroup(quotient_family)
-    preimage = levi.preimage_subgroup(target)
+    preimage = levi.preimage_subgroup(
+        target, stated_clause=lambda: "the Levi action(g) lies in the supplied family"
+    )
 
     augmentation = preimage.kernel_image_generating_morphism()
     family = tuple(augmentation(letter) for letter in augmentation.domain().group_generators())
