@@ -1,0 +1,33 @@
+=== ran on: dad9e44187ae9d557abf6a0c2cc92fedef5386e6 (1 modified paths)
+=== command: pytest tests/lattices/test_a_subobject_asks_the_ambient_lattice_for_no_display.sage -o addopts= -p qc_sage_session -p sage_extensions.testing.test_lint
+F                                                                        [100%]
+=================================== FAILURES ===================================
+______ test_building_a_subobject_asks_the_ambient_lattice_for_no_display _______
+
+    def test_building_a_subobject_asks_the_ambient_lattice_for_no_display() -> None:
+        r"""Constructing \(L.subobject_on(\text{basis})\) renders no lattice."""
+        lattice = Lattices(ZZ)([[2, 1], [1, 4]])
+        basis = lattice.module_generators()
+        rendering = Lattices(ZZ).ParentMethods
+        rendered = []
+    
+        def counted_display(self):
+            rendered.append(1)
+            return "a lattice"
+    
+        rendering.__repr__ = counted_display
+        span = lattice.subobject_on(basis)
+        lattice.__repr__()
+        del rendering.__repr__
+    
+>       assert tuple(rendered) == (1,)
+E       assert (1, 1) == (1,)
+E         
+E         Left contains one more item: 1
+E         Use -v to get more diff
+
+tests/lattices/test_a_subobject_asks_the_ambient_lattice_for_no_display.sage:31: AssertionError
+=========================== short test summary info ============================
+FAILED tests/lattices/test_a_subobject_asks_the_ambient_lattice_for_no_display.sage::test_building_a_subobject_asks_the_ambient_lattice_for_no_display
+1 failed in 1.99s
+=== exit: 1

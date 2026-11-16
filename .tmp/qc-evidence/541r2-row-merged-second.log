@@ -1,0 +1,80 @@
+=== tree: 4adbc382432a5f8e41013df2b4f47ebc7dcf7da2 (modified paths: 0)
+=== port: 991b88b095a42a1e3679569ea42328c900c120f6
+=== load: 1.34 1.31 1.65 4/366 2373470
+=== command: sage-image/run.sh -w /work, probe probe541row2.py at /probe.py, inner 540 s, outer 570 s
+row: {g in Orthogonal group O(Integral lattice of rank 11 and signature (2, 9)) : rho_L(g) lies in Subgroup of Orthogonal group of Finitely presented module on 11 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 2, 1 ↦ 2, 2 ↦ 2, 3 ↦ 2, 4 ↦ 2, 5 ↦ 2, 6 ↦ 2, 7 ↦ 2, 8 ↦ 2, 9 ↦ 2, 10 ↦ 2]} on rank 11
+before the row 1.6 s, planes transported 0, span constructions 0
+  [tick 1000] 313.7 s, planes transported 1000, span constructions 1546
+  [tick 1000] first plane at 302.0 s, 0.00 planes/s over the walk (207336.4 ms a plane)
+  [tick 1000] interval between transports: median 10.17 ms, last 10.29 ms
+  [tick 2000] 325.9 s, planes transported 2000, span constructions 2546
+  [tick 2000] first plane at 302.0 s, 0.01 planes/s over the walk (103622.5 ms a plane)
+  [tick 2000] interval between transports: median 10.17 ms, last 10.53 ms
+  [tick 3000] 337.5 s, planes transported 3000, span constructions 3546
+  [tick 3000] first plane at 302.0 s, 0.01 planes/s over the walk (69074.0 ms a plane)
+  [tick 3000] interval between transports: median 10.18 ms, last 10.60 ms
+  [tick 4000] 347.8 s, planes transported 4000, span constructions 4546
+  [tick 4000] first plane at 302.0 s, 0.02 planes/s over the walk (51803.8 ms a plane)
+  [tick 4000] interval between transports: median 10.19 ms, last 10.38 ms
+  [tick 5000] 359.7 s, planes transported 5000, span constructions 5546
+  [tick 5000] first plane at 302.0 s, 0.02 planes/s over the walk (41443.3 ms a plane)
+  [tick 5000] interval between transports: median 10.20 ms, last 10.16 ms
+  [tick 6000] 372.0 s, planes transported 6000, span constructions 6546
+  [tick 6000] first plane at 302.0 s, 0.03 planes/s over the walk (34537.0 ms a plane)
+  [tick 6000] interval between transports: median 10.20 ms, last 10.12 ms
+  [tick 7000] 382.4 s, planes transported 7000, span constructions 7546
+  [tick 7000] first plane at 302.0 s, 0.03 planes/s over the walk (29603.9 ms a plane)
+  [tick 7000] interval between transports: median 10.22 ms, last 10.06 ms
+  [tick 8000] 395.2 s, planes transported 8000, span constructions 8546
+  [tick 8000] first plane at 302.0 s, 0.04 planes/s over the walk (25904.6 ms a plane)
+  [tick 8000] interval between transports: median 10.23 ms, last 10.87 ms
+  [tick 9000] 405.6 s, planes transported 9000, span constructions 9546
+  [tick 9000] first plane at 302.0 s, 0.04 planes/s over the walk (23027.1 ms a plane)
+  [tick 9000] interval between transports: median 10.25 ms, last 10.14 ms
+  [tick 10000] 418.9 s, planes transported 10000, span constructions 10546
+  [tick 10000] first plane at 302.0 s, 0.05 planes/s over the walk (20725.5 ms a plane)
+  [tick 10000] interval between transports: median 10.26 ms, last 10.06 ms
+  [tick 11000] 429.5 s, planes transported 11000, span constructions 11546
+  [tick 11000] first plane at 302.0 s, 0.05 planes/s over the walk (18842.2 ms a plane)
+  [tick 11000] interval between transports: median 10.27 ms, last 10.09 ms
+  [tick 12000] 439.9 s, planes transported 12000, span constructions 12546
+  [tick 12000] first plane at 302.0 s, 0.06 planes/s over the walk (17272.7 ms a plane)
+  [tick 12000] interval between transports: median 10.29 ms, last 10.33 ms
+  [tick 13000] 454.1 s, planes transported 13000, span constructions 13546
+  [tick 13000] first plane at 302.0 s, 0.06 planes/s over the walk (15945.0 ms a plane)
+  [tick 13000] interval between transports: median 10.31 ms, last 10.24 ms
+  [tick 14000] 464.6 s, planes transported 14000, span constructions 14546
+  [tick 14000] first plane at 302.0 s, 0.07 planes/s over the walk (14806.8 ms a plane)
+  [tick 14000] interval between transports: median 10.32 ms, last 11.26 ms
+  [tick 15000] 475.3 s, planes transported 15000, span constructions 15546
+  [tick 15000] first plane at 302.0 s, 0.07 planes/s over the walk (13820.3 ms a plane)
+  [tick 15000] interval between transports: median 10.34 ms, last 10.58 ms
+  [tick 16000] 490.4 s, planes transported 16000, span constructions 16546
+  [tick 16000] first plane at 302.0 s, 0.08 planes/s over the walk (12957.4 ms a plane)
+  [tick 16000] interval between transports: median 10.36 ms, last 10.79 ms
+  [tick 17000] 501.1 s, planes transported 17000, span constructions 17546
+  [tick 17000] first plane at 302.0 s, 0.08 planes/s over the walk (12195.8 ms a plane)
+  [tick 17000] interval between transports: median 10.38 ms, last 10.29 ms
+  [tick 18000] 511.7 s, planes transported 18000, span constructions 18546
+  [tick 18000] first plane at 302.0 s, 0.09 planes/s over the walk (11518.8 ms a plane)
+  [tick 18000] interval between transports: median 10.39 ms, last 10.48 ms
+  [tick 19000] 522.4 s, planes transported 19000, span constructions 19546
+  [tick 19000] first plane at 302.0 s, 0.09 planes/s over the walk (10913.1 ms a plane)
+  [tick 19000] interval between transports: median 10.41 ms, last 10.99 ms
+  [tick 20000] 533.5 s, planes transported 20000, span constructions 20546
+  [tick 20000] first plane at 302.0 s, 0.10 planes/s over the walk (10368.0 ms a plane)
+  [tick 20000] interval between transports: median 10.43 ms, last 10.55 ms
+[peakrss] run: child waited=124 shell_code=124 samples=270
+[peakrss] peak tree RSS      : 4740 MiB
+[peakrss] low-water MemAvail : 8754 MiB
+[peakrss] peak single VmHWM  : 4740 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     4729 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   538.2s procs=  3 rss=  4740 MiB hwm=  4740 MiB avail=  9446 MiB
+[peakrss]   t=   536.2s procs=  3 rss=  4732 MiB hwm=  4732 MiB avail=  9454 MiB
+[peakrss]   t=   534.2s procs=  3 rss=  4702 MiB hwm=  4702 MiB avail=  9485 MiB
+[peakrss]   t=   532.2s procs=  3 rss=  4672 MiB hwm=  4672 MiB avail=  9517 MiB
+[peakrss]   t=   530.2s procs=  3 rss=  4643 MiB hwm=  4643 MiB avail=  9548 MiB
+=== launcher exit: 124

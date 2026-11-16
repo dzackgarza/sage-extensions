@@ -1,0 +1,5 @@
+=== ran on: 3a3440f0db46e3f603206e3ca87750163f51cf51 (2 modified paths)
+=== command: pytest tests/lattices/test_a_plane_transport_builds_one_span.sage -o addopts= -p qc_sage_session -p sage_extensions.testing.test_lint
+.                                                                        [100%]
+1 passed in 1.17s
+=== exit: 0

@@ -135,6 +135,14 @@ class OrderedEnumeratedSets(OwnedCategory):
             self._index_of_function = index_of
             self._contains_function = contains
             self._equivalent_function = equivalent or _DEFAULT_EQUIVALENCE
+            assert name is None or isinstance(name, str) or callable(name), (
+                f"a set's name is a string, a description returning one, or nothing, but {name!r} "
+                "is none of those"
+            )
+            # Whether the name is a description is settled here, from the type
+            # the construction declared, so that reading the name never asks a
+            # canonical object what kind of thing it turned out to be.
+            self._name_is_description = name is not None and not isinstance(name, str)
             self._name = name
             super().__init__(facade=True, **rest)
 
@@ -257,14 +265,19 @@ class OrderedEnumeratedSets(OwnedCategory):
                 return point
             raise ValueError(f"{self} is empty, so it has no element")
 
+        @cached_method
         def description(self):
-            r"""What this set was named with, rendered now.
+            r"""What this set was named with, rendered on the first read and kept.
 
             A name given as a function is a description of the set's source, and
-            rendering it is the reader's act: the set asks it here and not at
-            construction, so building the set computes no display.
+            rendering it is the reader's act: the set asks it here, and not at
+            construction, so building the set computes no display.  The answer is
+            the set's once rendered -- a description of the set's source does not
+            change while the set exists -- so a second reader asks nothing.
             """
-            return self._name() if callable(self._name) else self._name
+            if self._name is None:
+                return None
+            return self._name() if self._name_is_description else self._name
 
         def _repr_(self) -> str:
             size = cardinal(self.cardinality())
@@ -589,7 +602,7 @@ def _filtered_ordered_set(
     universe: Parent,
     predicate: Callable[[PointT], bool | Predicate],
     *,
-    name: str | None = None,
+    name: str | Callable[[], str] | None = None,
 ) -> FiniteOrderedSets().ObjectType | None:
     r"""Compute the ordered subset \(\{x\in S : P(x)\}\), or decline an undecided enumeration.
 
@@ -598,7 +611,9 @@ def _filtered_ordered_set(
     ``Sets.condition_set``.  The input is an owned finite enumerated set
     with an immutable predicate on its points.  When every value is decided,
     the result is the owned finite ordered subset, with the original
-    universe, predicate and canonical inclusion retained.  ``None`` means
+    universe, predicate and canonical inclusion retained.  A name given as a
+    function is a description of the subset, rendered when a reader asks for
+    the description and not when the subset is built.  ``None`` means
     only that this optional enumeration computation is unavailable; it
     makes no claim about the subset or its cardinality.
 
@@ -705,7 +720,8 @@ class _FilteredOrderedSetEngine:
         return (self.enumeration()(index) for index in self.index_set())
 
     def _repr_(self):
-        return self._name or f"Ordered subset of {self.universe()}"
+        described = self.description()
+        return described if described else f"Ordered subset of {self.universe()}"
 
 
 def _enumerated_image_set(

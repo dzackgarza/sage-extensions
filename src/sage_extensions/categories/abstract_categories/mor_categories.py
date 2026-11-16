@@ -667,24 +667,34 @@ class CategoricalMor(
 
     @cached_method
     def _generated_arrow_type(self) -> type:
-        r"""Return the arrow type of this Mor, shared across its family's endpoints.
+        r"""Return the arrow type of this Mor, shared by the Mors with its key.
 
         ``Mor_C(A, B)`` is a category for every pair of objects, and the
-        operations of its arrows depend on ``C`` alone: on the Mor class the
-        family builds, the placement of the Mor object and its diagonal
-        End/Aut role, never on ``A`` and ``B``.  So the type is generated
-        once per family and key, from the first Mor that asks, and every
-        later Mor of that family reuses it.  The forgetful inclusions into
-        the supercategories' Mors are not constructed for the others; they
-        are built only when ``super_categories`` is asked.
+        operations of its arrows depend on the Mor class the family builds,
+        the placement of the Mor object, its diagonal End/Aut role, and the
+        classes of the supercategories' Mors it declares.  The type is
+        generated once per :meth:`_arrow_type_key`, from the first Mor that
+        asks, and every later Mor with that key reuses it.  The forgetful
+        inclusions into the supercategories' Mors are not constructed for
+        the others; they are built only when ``super_categories`` is asked.
         """
-        key = (type(self), self.category(), self.end_family(), self.aut_family())
+        key = self._arrow_type_key()
         arrow_types = self.mor_family()._arrow_types
         result = arrow_types.get(key)
         if result is None:
             result = arrow_types[key] = self._arrow_type_from_declared_graph()
         self._configure_generated_arrow_operations(result)
         return result
+
+    def _arrow_type_key(self):
+        r"""Return the data this Mor's arrow type is keyed by.
+
+        The Mor class, the placement and the End/Aut role.  A Mor class whose
+        declared graph holds a Mor whose class the endpoints select adds that
+        selection here, so that the supercategories' Mors need not be built
+        to compute the key.
+        """
+        return (type(self), self.category(), self.end_family(), self.aut_family())
 
     def _arrow_type_from_declared_graph(self) -> type:
         r"""Generate the arrow type from this Mor category's declared graph."""

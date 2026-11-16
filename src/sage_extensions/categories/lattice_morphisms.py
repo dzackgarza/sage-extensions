@@ -1999,17 +1999,24 @@ class LatticeIsometryMethods:
 
         match obj in ModuleSubobjects(self.codomain().base_ring()):
             case True:
-                image = (self * obj.inclusion()).image()
                 # The image of a primitive isotropic subobject under an
-                # isometry is again one -- the admission checks of
-                # primitive_isotropic_subobject re-verify both facts -- so the
-                # transported subobject is placed in the category that owns
-                # the parabolic and reduction methods, not left as a bare
-                # module image (#391: the transported representatives of the
-                # Coble plane row are consumed by exactly those methods).
-                domain = image.inclusion().domain()
+                # isometry is again one, and ``primitive_isotropic_subobject``
+                # re-verifies both facts and places the result in the category
+                # that owns the parabolic and reduction methods, which the bare
+                # module image does not (#391: the transported representatives
+                # of the Coble plane row are consumed by exactly those
+                # methods).
+                #
+                # So the plane's image is computed there and nowhere else.  A
+                # morphism image ``(self * obj.inclusion()).image()`` would
+                # build the same span -- its Hermite form and its restricted
+                # Gram -- a second time, and the transported plane below reads
+                # only the images of the plane's basis: the span it built would
+                # be computed for a reader that does not exist (#541).
+                inclusion = obj.inclusion()
+                domain = inclusion.domain()
                 basis = tuple(
-                    image.inclusion()(domain.module_generator(label))
+                    self(inclusion(domain.module_generator(label)))
                     for label in domain.module_generating_set()
                 )
                 return self.codomain().primitive_isotropic_subobject(*basis)
