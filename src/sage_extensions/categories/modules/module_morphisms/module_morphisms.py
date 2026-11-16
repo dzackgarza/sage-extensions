@@ -4280,7 +4280,7 @@ class ModuleAutomorphismGroup(CoreMor):
             terms,
             self.natural_module_action_functor(),
             preserves_flag,
-            description=f"g preserves the flag {terms} of {module}",
+            lambda: f"g preserves the flag {terms} of {module}",
             generating_morphism=self.free_cover(generators),
             basis_change=change,
         )

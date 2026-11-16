@@ -36,6 +36,7 @@ from sage_extensions.categories.group.cyclic_subgroups import CyclicGroups
 from sage_extensions.categories.group.groups import (
     OwnedFiniteGroups,
     OwnedGroups,
+    _named_by_its_own_words,
 )
 from sage_extensions.categories.group.predicate_subgroups import (
     IntersectionSubgroups,
@@ -3935,7 +3936,6 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
         need not be appended to the family --- the trivial members are those
         the orbit search itself identifies.
         """
-        from sage_extensions.categories.group.groups import _named_by_its_own_words
 
         if self.domain() is not self.codomain():
             raise ValueError(f"the isometries {self.domain()} -> {self.codomain()} form no orthogonal group O(L), so {subgroup} has no preimage under O(L) -> O(A_L)")
