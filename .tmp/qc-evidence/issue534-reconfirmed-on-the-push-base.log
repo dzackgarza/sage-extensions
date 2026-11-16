@@ -1,0 +1,23 @@
+tree SHA: c41476f39a7080c0b6df2d4f78dec0067a3197b7
+probe: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/probe534j.py
+<2>: exact 1 characteristic classes, library 1, same element True; 1.18s
+U(2): exact 1 characteristic classes, library 1, same element True; 1.72s
+diag(2,-2): exact 1 characteristic classes, library 1, same element True; 2.14s
+I2(2): exact 1 characteristic classes, library 1, same element True; 2.59s
+U2+<2>: exact 1 characteristic classes, library 1, same element True; 3.66s
+zero.is_characteristic(): False 104.86s
+[h/2].is_characteristic(): True 180.51s
+get_isotropic_type(ep): Even ordinary 194.18s
+[peakrss] probe534j: child waited=0 shell_code=0 samples=102
+[peakrss] peak tree RSS      : 432 MiB
+[peakrss] low-water MemAvail : 1600 MiB
+[peakrss] peak single VmHWM  : 432 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      421 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   200.5s procs=  3 rss=   432 MiB hwm=   432 MiB avail=  5827 MiB
+[peakrss]   t=   202.5s procs=  3 rss=   432 MiB hwm=   432 MiB avail=  5867 MiB
+[peakrss]   t=   198.5s procs=  3 rss=   430 MiB hwm=   430 MiB avail=  6054 MiB
+[peakrss]   t=   196.5s procs=  3 rss=   428 MiB hwm=   428 MiB avail=  6145 MiB
+[peakrss]   t=   194.5s procs=  3 rss=   425 MiB hwm=   425 MiB avail=  6302 MiB
