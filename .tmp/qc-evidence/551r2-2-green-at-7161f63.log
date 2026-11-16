@@ -1,0 +1,4 @@
+# at 7161f63
+$ pytest tests/engineering/test_the_declared_category_graph_reads_a_source_tree.py
+.............                                                            [100%]
+13 passed in 14.87s

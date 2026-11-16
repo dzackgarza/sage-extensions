@@ -1,0 +1,9 @@
+# at e3dfe82
+$ pytest tests/engineering/test_the_declared_category_graph_reads_a_source_tree.py::test_a_category_nothing_declares_is_a_piece_of_the_graph
+F                                                                        [100%]
+=================================== FAILURES ===================================
+E   assert 10 == 11
+/repos/sage-extensions/tests/engineering/test_the_declared_category_graph_reads_a_source_tree.py:249: assert 10 == 11
+=========================== short test summary info ============================
+FAILED tests/engineering/test_the_declared_category_graph_reads_a_source_tree.py::test_a_category_nothing_declares_is_a_piece_of_the_graph
+1 failed in 3.13s

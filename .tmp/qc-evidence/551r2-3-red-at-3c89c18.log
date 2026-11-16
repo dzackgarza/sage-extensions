@@ -1,0 +1,18 @@
+# at 3c89c18
+$ pytest tests/engineering/test_the_declared_category_graph_reads_a_source_tree.py -k breadth
+F                                                                        [100%]
+=================================== FAILURES ===================================
+E   AssertionError: assert {'Objects': 4...aths': 2, ...} == {'Objects': 3...1, 'Paths': 1}
+      
+      Omitting 1 identical items, use -vv to show
+      Differing items:
+      {'Paths': 2} != {'Paths': 1}
+      {'FiniteObjects': 2} != {'FiniteObjects': 1}
+      {'Objects': 4} != {'Objects': 3}
+      Left contains 4 more items:...
+      
+      ...Full output truncated (5 lines hidden), use '-vv' to show
+/repos/sage-extensions/tests/engineering/test_the_declared_category_graph_reads_a_source_tree.py:274: AssertionError: assert {'Objects': 4...aths': 2, ...} == {'Objects': 3...1, 'Paths': 1}
+=========================== short test summary info ============================
+FAILED tests/engineering/test_the_declared_category_graph_reads_a_source_tree.py::test_breadth_counts_the_declarations_into_a_node_and_not_the_joins
+1 failed, 14 deselected in 2.48s

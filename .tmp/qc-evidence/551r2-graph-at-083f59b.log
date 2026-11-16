@@ -1,0 +1,38 @@
+# at 083f59b8c01e1da01982dbb2d57ca232c6da7334
+# the graph readings of the tree at the head of this commit, and of the engineering tests' toy tree
+
+$ just category-graph shape            # this checkout, first 16 lines
+categories 1106   declarations 462   computed joins 984   pieces 382
+longest chain of declarations and joins = 17
+
+## Breadth: categories declared directly by the most others
+
+Each count is the number of written declarations into that node; an edge
+Sage's join supplies is the axiom mechanism, not a contributor.
+
+   57  Objects
+   28  Modules
+   27  Sets
+   10  Schemes
+    9  GradedAlgebras
+    8  EnumeratedSets
+
+$ just category-graph cells            # this checkout, the figures
+  0-cells 1106    1-cells 1446    2-cells 0
+  H_0 = Z^382    H_1 = Z^722    H_n = 0, n >= 2
+
+$ just category-graph shape /probe551/tree     # the engineering tests' toy tree
+categories 11   declarations 6   computed joins 8   pieces 2
+    3  Objects
+    1  FiniteObjects
+    1  FinitePaths.Connected
+    1  Paths
+
+    1  Sliced(base)
+
+## Shortcut declarations, dropped by the transitive reduction (0)
+
+
+$ just category-graph cells /probe551/tree
+  0-cells 11    1-cells 14    2-cells 0
+  H_0 = Z x Z    H_1 = Z^5    H_n = 0, n >= 2

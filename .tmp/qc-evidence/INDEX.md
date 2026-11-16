@@ -3126,6 +3126,12 @@ after main advanced to `a38faef` and the branch was rebased onto it:
 | `issue381-gate-pushed-final.log` | the head this pushes, `3fe961c` on `ab2e435` | the same gate file: **2 passed in 69.14 s**, calls 33.36 s and 35.34 s over the 20 s gate |
 | `issue381-gate-eb5baa8.log` | the head this pushes, `33971c8` on `eb5baa8` | the same gate file, last run before the push: **2 passed in 103.73 s**, calls 48.71 s and 31.15 s over the 20 s gate |
 | `issue381-gate-final3.log` | the head this pushes, on `e65da01` | the same gate file, the run of the push: **2 passed in 37.26 s**, both calls under the 20 s gate |
+| `551r2-1-red-at-e3dfe82.log` | `e3dfe82`, the first test commit | `test_a_category_nothing_declares_is_a_piece_of_the_graph` alone: **1 failed in 3.13 s** at `assert 10 == 11` -- the reader's own count of the graph's categories, not a missing argument |
+| `551r2-2-green-at-7161f63.log` | `7161f63`, its repair | the same file: **13 passed in 14.87 s** |
+| `551r2-3-red-at-3c89c18.log` | `3c89c18`, the second test commit | the file `-k breadth`: **1 failed, 14 deselected in 2.48 s** -- breadth reports `Objects` 4 and `Paths` 2 where three and one category declare them, and four rows for nodes nothing declares |
+| `551r2-4-green-at-ac833a2.log` | `ac833a2`, its repair | the file: **15 passed in 18.41 s** |
+| `551r2-5-green-at-083f59b.log`, `551r2-5-lint-at-083f59b.log` | `083f59b`, the pushed head | the file: **13 passed in 16.30 s**; the same file with `-p sage_extensions.testing.test_lint` loaded as `pyproject.toml` loads it: **13 passed in 14.81 s** |
+| `551r2-graph-at-416d5b8.log`, `551r2-graph-at-083f59b.log` | the base `416d5b8` and the pushed head | `just category-graph shape` and `cells` on this checkout and on the engineering tests' toy tree: **738 categories, 14 pieces, `H_0 = Z^14`** -> **1106, 382, `Z^382`**; 1-cells 1446 and `H_1 = Z^722` on both sides, and the toy tree 10 categories/1 piece/`H_0 = Z` -> 11/2/`Z x Z` |
 ## 2026-11-16 (#521): the two `541r4` rows of `SHA256SUMS`
 
 The evidence commit of this issue's previous round (`d3b92a4`, "evidence: the

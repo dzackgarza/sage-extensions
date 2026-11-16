@@ -1,0 +1,40 @@
+# at 416d5b86a6d14137c7a3b31987f293409949b988
+# the graph readings of the tree at the head of this commit, and of the engineering tests' toy tree
+
+$ just category-graph shape            # this checkout, first 16 lines
+categories 738   declarations 1446   pieces 14
+longest chain of declarations = 17
+
+## Breadth: categories declared directly by the most others
+
+Each count is the number of unfactored declarations into that node,
+unless every claimant's own definition places it one step below.
+
+   57  Objects
+   33  Modules
+   31  Sets
+   24  OwnedSemirings.Commutative
+   23  OwnedRngs.Commutative
+   22  Schemes
+
+$ just category-graph cells            # this checkout, the figures
+  0-cells 738    1-cells 1446    2-cells 0
+  H_0 = Z^14    H_1 = Z^722    H_n = 0, n >= 2
+
+$ just category-graph shape /probe551/tree     # the engineering tests' toy tree
+categories 10   declarations 14   pieces 1
+    4  Objects
+    2  FiniteObjects
+    2  Objects.Connected
+    2  Paths
+## Pieces apart from the largest (0)
+
+A category here declares nothing the tree defines, or only categories
+that declare nothing the tree defines.
+
+
+## Shortcut declarations, dropped by the transitive reduction (0)
+
+$ just category-graph cells /probe551/tree
+  0-cells 10    1-cells 14    2-cells 0
+  H_0 = Z    H_1 = Z^5    H_n = 0, n >= 2
