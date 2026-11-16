@@ -1945,7 +1945,7 @@ def _own_group(
                     # ARC-07: the ambient category is the category whose constructor
                     # built the object; Groups.Free and the engine groups are
                     # constructed by Groups, as subobjects record their objects' plain
-                    # category (cc66c2d1ed).
+                    # category.
                     _constructing_category=OwnedGroups(),
                     **({"symmetric_points": symmetric_points} if symmetric_points is not None else {}),
                     **({"selected_coxeter_matrix": coxeter_matrix} if coxeter_matrix is not None else {}),
@@ -1964,7 +1964,7 @@ def _own_group(
                     # ARC-07: the ambient category is the category whose constructor
                     # built the object; Groups.Free and the engine groups are
                     # constructed by Groups, as subobjects record their objects' plain
-                    # category (cc66c2d1ed).
+                    # category.
                     _constructing_category=OwnedGroups(),
                     **({"symmetric_points": symmetric_points} if symmetric_points is not None else {}),
                     **({"selected_coxeter_matrix": coxeter_matrix} if coxeter_matrix is not None else {}),
@@ -5419,8 +5419,7 @@ class OwnedGroups(CategoryPacketMethods, OwnedCategory):
             ``p_i(g) = g_i`` and, for every cone of homomorphisms
             ``f_i: H -> G_i``, the unique mediating ``h |-> (f_i(h))``
             (Mathlib ``Mathlib/Algebra/Group/Prod.lean``: ``MonoidHom.fst``,
-            ``MonoidHom.inl`` with ``x |-> (x, 1)``, ``MonoidHom.prod``;
-            ``lean-categories`` request).  This route
+            ``MonoidHom.inl`` with ``x |-> (x, 1)``, ``MonoidHom.prod``).  This route
             needs nothing of the factors but their laws, so it realizes the
             product when some factor has neither a finite realization nor a
             chosen finite presentation; the GAP route above serves those.
@@ -8771,8 +8770,8 @@ class GeneratedSubgroups(OwnedParameterizedCategory):
             identity, so it lives exactly as long as the element does.  A record on the
             subgroup instead would retain one entry per value of the cover's word
             evaluation, which is one entry per word: that grows without bound in the
-            subgroup for exactly the walks this admission exists to serve (the same
-            shape one call away).  Elements of this library are not reliably equatable
+            subgroup for exactly the walks this admission exists to serve.  Elements of
+            this library are not reliably equatable
             — ``hash`` is the parent's for some owned families, and an isometry can
             satisfy ``value == ~value`` — so the marks are compared by identity, not by
             value.

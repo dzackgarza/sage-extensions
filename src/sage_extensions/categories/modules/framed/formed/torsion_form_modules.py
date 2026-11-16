@@ -1765,7 +1765,7 @@ def _polar_form_is_nondegenerate(form, *, quadratic: bool) -> bool:
     # ``Z/2 + Z/4`` with the diagonal pairing ``1/2, 1/4`` one has
     # ``D = (2, 4)``, ``H = diag(2, 1)`` and Smith invariants ``(1, 2)``, a
     # perfect pairing whose per-position reading fails.  The product identity
-    # above is what the measurement supports.
+    # above is the one evaluated below.
     diagonal, _, _ = integral.transpose().smith_form()
     order = SageZZ(1)
     for invariant in invariants:

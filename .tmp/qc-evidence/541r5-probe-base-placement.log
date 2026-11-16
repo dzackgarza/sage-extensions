@@ -1,0 +1,24 @@
+probe: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/probe541r5g.py
+tree SHA: 08322dee5d4c53779a8ba180b89dcf0ce528eb3d (modified paths: 0)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 10.05 13.11 15.73 11/851 2867628
+inner 300 s, outer 330 s, guard 6144 MiB, args ''
+plain constructed: 4 ['realize', 'matrix', 'realize', 'realize', 'realize'] request: 1
+claimed constructed: 4 ['realize', 'matrix', 'realize', 'realize', 'realize'] request: 1
+plain in torsion: True
+claimed in torsion: True
+cardinalities: 5 5
+[peakrss] probe541r5gbase: child waited=0 shell_code=0 samples=5
+[peakrss] peak tree RSS      : 314 MiB
+[peakrss] low-water MemAvail : 6155 MiB
+[peakrss] peak single VmHWM  : 314 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      303 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     8.0s procs=  3 rss=   314 MiB hwm=   314 MiB avail=  6155 MiB
+[peakrss]   t=     6.0s procs=  3 rss=   298 MiB hwm=   298 MiB avail=  6194 MiB
+[peakrss]   t=     4.0s procs=  3 rss=   270 MiB hwm=   270 MiB avail=  6389 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   209 MiB hwm=   209 MiB avail=  6591 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     7 MiB hwm=     7 MiB avail=  6942 MiB
+launcher exit: 0

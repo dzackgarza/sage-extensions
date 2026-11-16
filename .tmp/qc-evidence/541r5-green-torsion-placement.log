@@ -1,0 +1,57 @@
+tree SHA: 089a6c35b9afff8d67965651829f8c778c58b286 (modified paths: 0)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 20.32 17.51 16.39 17/858 2884826
+files: tests/modules/test_the_torsion_placement_is_the_claiming_construction.sage tests/modules/test_a_torsion_claim_is_refuted_when_asked.sage tests/forms/test_a_torsion_cokernel_carries_its_torsion_forms.sage tests/modules/test_the_real_field_answers_primitivity_publicly.sage tests/modules/test_a_presented_module_is_built_before_it_computes.sage
+inner 900 s, outer 960 s, guard 6144 MiB
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+time gates OFF (--no-time-gates): star import 3.54 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: asyncio-1.5.0, xdist-3.8.0, reportlog-1.0.0, platformdirs-4.13.5, hypothesis-6.170.15, anyio-4.15.1, timeout-2.4.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 15 items
+
+tests/modules/test_the_torsion_placement_is_the_claiming_construction.sage . [  6%]
+...                                                                      [ 26%]
+tests/modules/test_a_torsion_claim_is_refuted_when_asked.sage ...        [ 46%]
+tests/forms/test_a_torsion_cokernel_carries_its_torsion_forms.sage ...   [ 66%]
+tests/modules/test_the_real_field_answers_primitivity_publicly.sage ...  [ 86%]
+tests/modules/test_a_presented_module_is_built_before_it_computes.sage . [ 93%]
+.                                                                        [100%]
+
+=============================== time-gate report ===============================
+session star import took 3.54 s; the measured ceiling is 3 s
+============================== slowest durations ===============================
+1.53s call     tests/forms/test_a_torsion_cokernel_carries_its_torsion_forms.sage::test_the_orthogonal_quotient_of_a_discriminant_form_is_a_torsion_form
+0.92s call     tests/modules/test_the_torsion_placement_is_the_claiming_construction.sage::test_a_cokernel_form_is_not_placed_in_torsion_by_a_computation
+0.27s call     tests/forms/test_a_torsion_cokernel_carries_its_torsion_forms.sage::test_the_half_form_on_z2_has_its_two_primary_part
+0.21s call     tests/forms/test_a_torsion_cokernel_carries_its_torsion_forms.sage::test_the_one_third_form_on_z3_twists_by_a_negative_unit
+0.17s call     tests/modules/test_the_real_field_answers_primitivity_publicly.sage::test_an_injective_endomorphism_of_the_real_plane_is_primitive
+0.13s call     tests/modules/test_a_presented_module_is_built_before_it_computes.sage::test_a_plane_inclusions_quotient_is_built_before_it_is_asked
+0.07s call     tests/modules/test_the_torsion_placement_is_the_claiming_construction.sage::test_a_false_claim_is_trusted_by_the_construction
+0.05s call     tests/modules/test_the_real_field_answers_primitivity_publicly.sage::test_an_endomorphism_of_the_real_plane_with_a_kernel_is_not_primitive
+0.05s call     tests/modules/test_the_real_field_answers_primitivity_publicly.sage::test_the_real_planes_saturation_names_the_missing_smith_computation
+0.02s call     tests/modules/test_a_presented_module_is_built_before_it_computes.sage::test_constructing_a_cokernel_asks_the_engine_for_no_matrix
+0.02s call     tests/modules/test_the_torsion_placement_is_the_claiming_construction.sage::test_the_torsion_form_constructor_places_the_claim_it_states
+0.01s setup    tests/modules/test_the_torsion_placement_is_the_claiming_construction.sage::test_a_cokernel_form_is_not_placed_in_torsion_by_a_computation
+0.01s call     tests/modules/test_a_torsion_claim_is_refuted_when_asked.sage::test_construction_does_not_refute_the_claim
+0.01s call     tests/modules/test_a_torsion_claim_is_refuted_when_asked.sage::test_a_false_torsion_claim_is_refuted_when_checked
+0.01s setup    tests/modules/test_the_real_field_answers_primitivity_publicly.sage::test_the_real_planes_saturation_names_the_missing_smith_computation
+
+(30 durations < 0.005s hidden.  Use -vv to show these durations.)
+============================= 15 passed in 10.60s ==============================
+[peakrss] probe541r4tests: child waited=0 shell_code=0 samples=14
+[peakrss] peak tree RSS      : 314 MiB
+[peakrss] low-water MemAvail : 2827 MiB
+[peakrss] peak single VmHWM  : 316 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      305 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    16.1s procs=  3 rss=   314 MiB hwm=   314 MiB avail=  3102 MiB
+[peakrss]   t=    14.1s procs=  3 rss=   310 MiB hwm=   310 MiB avail=  3282 MiB
+[peakrss]   t=    18.1s procs=  3 rss=   307 MiB hwm=   316 MiB avail=  2827 MiB
+[peakrss]   t=    24.1s procs=  3 rss=   300 MiB hwm=   316 MiB avail=  4091 MiB
+[peakrss]   t=    22.1s procs=  3 rss=   295 MiB hwm=   316 MiB avail=  3846 MiB
+launcher exit: 0

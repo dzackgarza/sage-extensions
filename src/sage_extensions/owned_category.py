@@ -1107,7 +1107,7 @@ class OwnedJoinCategory(OwnedCategoryMixin, JoinCategory):
         ``parent_class`` objects.  Owned joins deliberately flatten their
         implementation providers because the complete branch classes can have
         no common C3 linearization, so that implementation-class comparison is
-        no longer a semantic test.  The declared category graph already
+        not a semantic test.  The declared category graph already
         records the forgetful maps, including their concrete parameters, and
         the join law supplies the intersection cases.  Use that graph only;
         falling back to a branch's generic ``is_subcategory`` would simply

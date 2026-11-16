@@ -1,11 +1,11 @@
 r"""A claimed torsion placement is refuted when the caller asks, and only then.
 
-``validate_torsion_claim`` is a validator (``OWN-22``) on a module with a chosen
-finite presentation: over a principal ideal domain the cokernel of the
-presenting morphism is torsion exactly when that morphism becomes surjective
-over the fraction field, and the validator refutes the claim when it is false.
-Construction passes ``check=False``, so nothing is refuted until a caller asks,
-and asking is ``check=True`` or the strict-checking flag.
+A caller claims torsion by constructing in
+``Modules(R).FinitelyPresented().Torsion()``; nothing computes at that
+construction (``OWN-22``), and the claim's validator refutes it when the
+constructor is asked to check or the validator is called by hand.  Over a
+principal ideal domain the cokernel of the presenting morphism is torsion
+exactly when that morphism becomes surjective over the fraction field.
 
 The zero map $Z \to Z$ has cokernel $Z$, which is not torsion; $3 \cdot 1$ has
 cokernel $Z/3$, which is.
@@ -23,25 +23,33 @@ def _endomorphism_of_z(scalar):
     return free.Mor(free)({0: scalar * generator})
 
 
-def test_construction_does_not_refute_the_claim() -> None:
-    r"""The zero map's cokernel is $Z$: the module reports it, and nothing raised."""
-    module = _endomorphism_of_z(ZZ.zero()).cokernel()
+def _torsion_modules():
+    r"""The finitely presented torsion modules over $Z$: the claim's category."""
+    return Modules(ZZ).FinitelyPresented().Torsion()
 
-    assert module.is_torsion() is False
+
+def test_construction_does_not_refute_the_claim() -> None:
+    r"""The zero map presents $Z$: the claim stands until it is checked."""
+    module = _torsion_modules()(_endomorphism_of_z(ZZ.zero()))
+
+    assert module in _torsion_modules()
     assert tuple(module.invariant_factors()) == (ZZ(0),)
 
 
-def test_a_false_torsion_claim_is_refuted_when_the_caller_checks() -> None:
-    r"""The same module, with the validator asked for."""
-    module = _endomorphism_of_z(ZZ.zero()).cokernel()
+def test_a_false_torsion_claim_is_refuted_when_checked() -> None:
+    r"""The same claim, asked for: the relation matrix leaves a free summand."""
+    presentation = _endomorphism_of_z(ZZ.zero())
 
     with pytest.raises(ValueError):
-        module.validate_torsion_claim()
+        _torsion_modules()(presentation, check=True)
+
+    with pytest.raises(ValueError):
+        _torsion_modules()(presentation).validate_torsion_claim()
 
 
 def test_a_true_torsion_claim_survives_the_check() -> None:
-    r"""The cokernel of $3 \cdot 1$ is $Z/3$, and its invariant factor is $3$."""
-    module = _endomorphism_of_z(ZZ(3)).cokernel()
+    r"""The cokernel of $3 \cdot 1$ is $Z/3$, and its claim is not refuted."""
+    module = _torsion_modules()(_endomorphism_of_z(ZZ(3)), check=True)
 
-    module.validate_torsion_claim()
+    assert module in _torsion_modules()
     assert tuple(module.invariant_factors()) == (ZZ(3),)

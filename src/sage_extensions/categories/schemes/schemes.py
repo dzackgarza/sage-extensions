@@ -1699,9 +1699,9 @@ class SchemeMorphismMethods:
         affine composites compose their pullbacks and the remaining ones
         compose their realizations.
         """
-        # Keep construction-specific composition at this surviving method.
-        # The earlier duplicate __mul__ was shadowed by this definition, so
-        # glued chart arrows fell through to Sage's native-morphism adapter.
+        # Keep construction-specific composition at this surviving method: the
+        # branches below decide it, and without them a glued chart arrow falls
+        # through to Sage's native-morphism adapter.
         if self._relative_projectivization_role == "base_projection":
             if other is self.comparison().changed_projectivization().arrow().domain().projectivization_projection():
                 return self.comparison().square_composite()

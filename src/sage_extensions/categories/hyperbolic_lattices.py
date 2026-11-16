@@ -781,9 +781,8 @@ def _filtered_vinal_class():
             :meth:`Roots_decomposed_into`.
 
             A cell of \(\operatorname{rank}(v_0^\perp)-1\) normals -- a cusp
-            cell, whose cone has one lineality direction
-            ``results/issue387-the-group-of-the-card-chamber.md`` §4) -- is
-            returned with that direction: the cell's fourth entry is the
+            cell, whose cone has one lineality direction -- is returned with
+            that direction: the cell's fourth entry is the
             primitive vector \(m\) of \(v_0^\perp\) orthogonal to every
             normal, its square, the inverse of the frame
             \((w_1,\dots,w_r,m,v_0)\), and the representatives of the cosets
@@ -1937,9 +1936,8 @@ class HyperbolicLattices(OwnedCategoryOverBaseRing):
             whose signature is ``(lattice)`` alone at revision ``991b88b0`` and at
             the checkout the image carries: it prescribes no start vertex, no root
             filter and no termination switch, and it publishes no isometry route.
-            So the walk is asked with the lattice and nothing else; the options an
-            earlier revision of this wrapper advertised have no engine behind them
-            and are not part of this API.
+            So the walk is asked with the lattice and nothing else, and this method
+            takes no start vertex, no root filter and no termination switch.
 
             The port's entry uses signature ``(n,1)``. For ``(1,n)``, use the
             existing lattice twist functor and transport its report back to this

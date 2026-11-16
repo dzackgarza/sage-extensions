@@ -1,0 +1,190 @@
+tree SHA: 2f2fcad6923f44121f1cfff5133241c83ef38ee5 (modified paths: 2)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 18.27 17.36 16.39 15/839 2886101
+files: tests/modules/test_the_torsion_placement_is_the_claiming_construction.sage tests/modules/test_a_torsion_claim_is_refuted_when_asked.sage
+inner 600 s, outer 660 s, guard 6144 MiB
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+time gates OFF (--no-time-gates): star import 5.58 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: asyncio-1.5.0, xdist-3.8.0, reportlog-1.0.0, platformdirs-4.13.5, hypothesis-6.170.15, anyio-4.15.1, timeout-2.4.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 7 items
+
+tests/modules/test_the_torsion_placement_is_the_claiming_construction.sage F [ 14%]
+.FF                                                                      [ 57%]
+tests/modules/test_a_torsion_claim_is_refuted_when_asked.sage ...        [100%]
+
+=================================== FAILURES ===================================
+________ test_a_cokernel_form_is_not_placed_in_torsion_by_a_computation ________
+
+    def test_a_cokernel_form_is_not_placed_in_torsion_by_a_computation() -> None:
+        r"""$Z/5$ with $b = 1/5$: a construction that claimed nothing places it nowhere."""
+        module = _cokernel_of_a_dilation(ZZ(5))
+        values = _form_values()
+    
+        form = BilinearFormModules(ZZ)(
+            module.bilinear_forms(values)(((values(QQ(1) / QQ(5)),),))
+        )
+    
+        assert form in FormModules(ZZ).FinitelyPresented()
+>       assert form not in FormModules(ZZ).FinitelyPresented().Torsion()
+E       assert Finitely presented module on 1 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 5] not in Category of finitely presented finitely generated torsion form modules over Integer Ring
+E        +  where Category of finitely presented finitely generated torsion form modules over Integer Ring = Torsion()
+E        +    where Torsion = Category of finitely presented finitely generated form modules over Integer Ring.Torsion
+E        +      where Category of finitely presented finitely generated form modules over Integer Ring = FinitelyPresented()
+E        +        where FinitelyPresented = Category of form modules over Integer Ring.FinitelyPresented
+E        +          where Category of form modules over Integer Ring = FormModules(ZZ)
+
+tests/modules/test_the_torsion_placement_is_the_claiming_construction.sage:53: AssertionError
+______________ test_a_false_claim_is_trusted_by_the_construction _______________
+
+    def test_a_false_claim_is_trusted_by_the_construction() -> None:
+        r"""$\operatorname{coker}(0) = Z$ is not torsion, and the form's constructor says nothing about it.
+    
+        The descent validator is asked of the result, and the relations are empty, so
+        it holds: what the constructor stores is the caller's module and Gram data.
+        """
+        module = _cokernel_of_a_dilation(ZZ.zero())
+        values = _form_values()
+    
+>       form = _torsion_forms().from_module(
+            module,
+            ((values(QQ(1) / QQ(5)),),),
+            values,
+        )
+
+tests/modules/test_the_torsion_placement_is_the_claiming_construction.sage:82: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Category of finitely presented finitely generated torsion modules with a bilinear form over Integer Ring
+module = Finitely presented module on 1 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 0]
+gram = (([(1)/(5)] in Fraction Field of Integer Ring / (1)Integer Ring,),)
+value_module = Fraction Field of Integer Ring / (1)Integer Ring
+_subobject_ambient = None, _subobject_generator_images = None
+_subobject_lift = None, _subobject_inclusion_factory = None
+_extra_categories = ()
+
+    def from_module(
+        self,
+        module,
+        gram,
+        value_module,
+        *,
+        _subobject_ambient=None,
+        _subobject_generator_images=None,
+        _subobject_lift=None,
+        _subobject_inclusion_factory=None,
+        _extra_categories=(),
+    ):
+        r"""Equip ``module`` with the bilinear form represented by ``gram``.
+    
+        The value object is explicit.  Descent to the quotient is the
+        validator ``validate_descent`` (``OWN-22``).
+        """
+        match _finitely_presented_torsion(module):
+            case True:
+                pass
+            case False:
+>               raise ValueError(
+                    f"a torsion bilinear form in {self} is defined on a finitely presented torsion "
+                    f"{self.base_ring()}-module, but {module} is not one: it is in {module.category()}"
+                )
+E               ValueError: a torsion bilinear form in Category of finitely presented finitely generated torsion modules with a bilinear form over Integer Ring is defined on a finitely presented torsion Integer Ring-module, but Finitely presented module on 1 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 0] is not one: it is in Category of modules with a represented selected finite-presentation backend over Integer Ring
+
+src/sage_extensions/categories/modules/framed/formed/form_modules.py:3446: ValueError
+_______ test_a_module_that_claims_no_torsion_states_no_refutation_of_one _______
+
+    def test_a_module_that_claims_no_torsion_states_no_refutation_of_one() -> None:
+        r"""$\operatorname{coker}(0) = Z$ claims no torsion, and carries no such validator."""
+        module = _cokernel_of_a_dilation(ZZ.zero())
+    
+        with pytest.raises(AttributeError):
+>           module.validate_torsion_claim()
+
+tests/modules/test_the_torsion_placement_is_the_claiming_construction.sage:98: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/validation.py:62: in run
+    law(owner)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Finitely presented module on 1 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 0]
+
+    @validator
+    def validate_torsion_claim(self) -> None:
+        r"""Refute a claimed torsion placement whose relation morphism leaves a free summand.
+    
+        ``Modules(R).FinitelyPresented().Torsion()(rho)`` is the caller's claim
+        (``CAT-04``).  Over a principal ideal domain ``coker(rho)`` is torsion
+        exactly when the relation morphism becomes surjective over the fraction
+        field, and scalar extension preserves the rank of this exact relation
+        matrix.
+    
+        This is a validator, not part of any computation: the claim's
+        construction passes its own ``check`` argument, which is ``False`` by
+        default, so the refutation runs only when a caller asks for it or under
+        strict checking (``OWN-22``).  It reads the presentation, and therefore
+        builds it when it runs.
+        """
+        from sage.matrix.constructor import matrix
+    
+        ring = self.base_ring()
+        presentation = self.presentation()
+        width = int(presentation.codomain().module_generating_set().cardinality())
+        relation_images = _relation_images(self)
+        field = ring.fraction_field_map().codomain()
+        relations = matrix(
+            _engine_ring(ring),
+            len(relation_images),
+            width,
+            [
+                _engine_element(ring, coefficient)
+                for image in relation_images
+                for coefficient in image
+            ],
+        )
+        match int(relations.change_ring(_engine_ring(field)).rank()) == width:
+            case True:
+                pass
+            case False:
+>               raise ValueError(
+                    f"{self} is claimed to be a torsion {ring}-module, but its relation matrix "
+                    "does not have full rank over the fraction field: the cokernel has a nonzero "
+                    "free summand"
+                )
+E               ValueError: Finitely presented module on 1 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 0] is claimed to be a torsion Integer Ring-module, but its relation matrix does not have full rank over the fraction field: the cokernel has a nonzero free summand
+
+src/sage_extensions/categories/modules/framed/finitely_generated/finitely_presented_modules.py:2101: ValueError
+=============================== time-gate report ===============================
+session star import took 5.58 s; the measured ceiling is 3 s
+============================== slowest durations ===============================
+0.69s call     tests/modules/test_the_torsion_placement_is_the_claiming_construction.sage::test_a_cokernel_form_is_not_placed_in_torsion_by_a_computation
+0.18s call     tests/modules/test_the_torsion_placement_is_the_claiming_construction.sage::test_the_torsion_form_constructor_places_the_claim_it_states
+0.02s call     tests/modules/test_the_torsion_placement_is_the_claiming_construction.sage::test_a_module_that_claims_no_torsion_states_no_refutation_of_one
+0.02s call     tests/modules/test_the_torsion_placement_is_the_claiming_construction.sage::test_a_false_claim_is_trusted_by_the_construction
+0.01s call     tests/modules/test_a_torsion_claim_is_refuted_when_asked.sage::test_a_true_torsion_claim_survives_the_check
+0.01s call     tests/modules/test_a_torsion_claim_is_refuted_when_asked.sage::test_a_false_torsion_claim_is_refuted_when_checked
+0.01s setup    tests/modules/test_the_torsion_placement_is_the_claiming_construction.sage::test_a_false_claim_is_trusted_by_the_construction
+0.01s setup    tests/modules/test_the_torsion_placement_is_the_claiming_construction.sage::test_a_module_that_claims_no_torsion_states_no_refutation_of_one
+0.01s call     tests/modules/test_a_torsion_claim_is_refuted_when_asked.sage::test_construction_does_not_refute_the_claim
+
+(12 durations < 0.005s hidden.  Use -vv to show these durations.)
+=========================== short test summary info ============================
+FAILED tests/modules/test_the_torsion_placement_is_the_claiming_construction.sage::test_a_cokernel_form_is_not_placed_in_torsion_by_a_computation
+FAILED tests/modules/test_the_torsion_placement_is_the_claiming_construction.sage::test_a_false_claim_is_trusted_by_the_construction
+FAILED tests/modules/test_the_torsion_placement_is_the_claiming_construction.sage::test_a_module_that_claims_no_torsion_states_no_refutation_of_one
+========================= 3 failed, 4 passed in 8.14s ==========================
+[peakrss] probe541r4tests: child waited=1 shell_code=1 samples=14
+[peakrss] peak tree RSS      : 340 MiB
+[peakrss] low-water MemAvail : 2700 MiB
+[peakrss] peak single VmHWM  : 341 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      330 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    20.1s procs=  3 rss=   340 MiB hwm=   340 MiB avail=  3103 MiB
+[peakrss]   t=    22.1s procs=  3 rss=   340 MiB hwm=   340 MiB avail=  3163 MiB
+[peakrss]   t=    24.1s procs=  3 rss=   340 MiB hwm=   341 MiB avail=  2926 MiB
+[peakrss]   t=    16.1s procs=  3 rss=   332 MiB hwm=   332 MiB avail=  2886 MiB
+[peakrss]   t=    18.1s procs=  3 rss=   332 MiB hwm=   332 MiB avail=  3198 MiB

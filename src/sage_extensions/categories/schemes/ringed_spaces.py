@@ -2044,7 +2044,7 @@ class QuasiCoherentSheaves(CategoryPacketMethods, OwnedParameterizedCategory):
     On a non-affine represented scheme, quasi-coherent sheaves are carried by
     the finite-atlas/descent objects in ``schemes.gluing``.  The affine
     equivalence methods below deliberately retain their affine assertion;
-    placement in this category no longer means that every object has one
+    placement in this category does not mean that every object has one
     global coordinate-algebra presentation.
     """
 

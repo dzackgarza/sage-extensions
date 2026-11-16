@@ -2178,7 +2178,7 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             divisible by `\det H` entrywise, which is what the returned pair decides.
             At Sterk's `P_2` of \(T_{\mathrm{En}}\) the basis is
             `\operatorname{diag}(4, 2, 4)`, so `\Lambda_J` has index `32` in
-            `\operatorname{Sym}_2(\ZZ)` (`.tmp/qc-evidence/issue365-parameters.log`).
+            `\operatorname{Sym}_2(\ZZ)`.
             """
             J = matrix(SageZZ, self.plane_block_gram()[3])
             images = []
@@ -2367,8 +2367,7 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             -- `\det J = 4` and `A_K` has an odd entry, so the translation needs the
             class modulo two, and `J = 2 \cdot 1_2` makes the second equation's
             integrality a parity condition -- and the radical's parameters are then
-            decided on `2^{16} = 65536` classes, of which `4096` lift, an index of `16`
-            (`.tmp/qc-evidence/issue365-parameters.log`).
+            decided on `2^{16} = 65536` classes, of which `4096` lift, an index of `16`.
             """
             _change, _inverse, _h, J, _K, A = self.plane_block_gram()
             scalar = abs(int(J.determinant()))
@@ -2503,8 +2502,7 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             `65536` classes admissible, rank `16`, index `16` in `\ZZ^{16}`; the
             parameters of the plane's Eichler transvections that lie in the radical and
             of the elements over the parameters supported on the third and fourth
-            basis vectors of `K` all lie in it
-            (`.tmp/qc-evidence/issue365-parameters.log`).
+            basis vectors of `K` all lie in it.
             """
             return self._unipotent_parameter_decision()[3]
 
@@ -2515,8 +2513,7 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             `(modulus, classes, admissible)`, the numbers behind
             :meth:`unipotent_parameter_lattice`; they are what makes the returned
             lattice exact rather than a sample.  At Sterk's `P_2` of
-            \(T_{\mathrm{En}}\): `(2, 65536, 4096)`
-            (`.tmp/qc-evidence/issue365-parameters.log`).
+            \(T_{\mathrm{En}}\): `(2, 65536, 4096)`.
             """
             decision = self._unipotent_parameter_decision()
             return decision[0], decision[1], decision[2]
@@ -2770,8 +2767,7 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             the identity -- so the generator is measured and not assumed.
 
             Measured at Sterk's `P_2` of \(T_{\mathrm{En}}\): one generator, its parameter
-            `c = 0`, its translations zero, all three checks true
-            (`.tmp/qc-evidence/issue365-parameters.log`).
+            `c = 0`, its translations zero, all three checks true.
             """
             rows = int(self.plane_block_gram()[5].nrows())
             zero = matrix(SageZZ, rows, 2, 0)
@@ -2847,8 +2843,7 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             Measured at Sterk's `P_2` of \(T_{\mathrm{En}}\): sixteen translations whose
             span has rank sixteen and covolume `1` in the coordinate lattice of
             `\operatorname{Hom}(K, I)` -- they are a `\ZZ`-basis of the whole of it, as
-            `\tau(U_I)` is of rank `2 \operatorname{rank}(K) = 16` there
-            (`.tmp/qc-evidence/issue365-parameters.log`).
+            `\tau(U_I)` is of rank `2 \operatorname{rank}(K) = 16` there.
             """
             translations = []
             for parameters in self.unipotent_parameter_lattice():
@@ -2888,8 +2883,6 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             :meth:`unipotent_central_generator` -- and its image is all of
             `\tau(U_I)` -- a `\ZZ`-basis of it, by :meth:`unipotent_translation_basis`
             -- so `HN = H` and its preimage is itself, which is the whole of `U_I`.
-            (Read in the copy of Milne's notes downloaded on this machine;
-            `results/issue366-radical-generators-in-the-stabilizer.md` records the run.)
 
             Nothing here uses a transvection generation statement, so Scattone's
             Proposition 3.7.3 and its hypothesis of two orthogonal hyperbolic planes are
@@ -2967,8 +2960,7 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             plane.
 
             Measured at Sterk's `P_2` of \(T_{\mathrm{En}}\): `17 = 2 \cdot 8 + 1`,
-            against `16` translations and `1` central dimension
-            (`.tmp/qc-evidence/issue365-parameters.log`).
+            against `16` translations and `1` central dimension.
             """
             return self._unipotent_rank(zero_on_perpendicular=False)
 
@@ -2983,7 +2975,7 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
 
             Measured at Sterk's `P_2` of \(T_{\mathrm{En}}\): `1`, so `U_I/Z` has rank
             `17 - 1 = 16 = 2 \operatorname{rank}(K)`, the whole of
-            `\operatorname{Hom}(I^\perp/I, I)` (`.tmp/qc-evidence/issue353-structure2.log`).
+            `\operatorname{Hom}(I^\perp/I, I)`.
             """
             return self._unipotent_rank(zero_on_perpendicular=True)
 
@@ -3067,13 +3059,11 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             raises, rather than being silently dropped from the rank.
 
             Measured at Sterk's `P_2` of \(T_{\mathrm{En}}\): `(12, 16)` for the
-            fourteen returned unipotent transvections
-            (`.tmp/qc-evidence/issue353-structure2.log`), `(14, 16)` for the
+            fourteen returned unipotent transvections, `(14, 16)` for the
             twenty-eight generators of :meth:`parabolic_stabilizer_generators` that lie
-            in the radical (`.tmp/qc-evidence/issue353-obstruction.log`), and
-            `(16, 16)` for the family the default returns, which includes the block
-            generators of :meth:`unipotent_radical_block_generators`
-            (`.tmp/qc-evidence/issue365-parameters.log`).  The first two families fall
+            in the radical, and `(16, 16)` for the family the default returns, which
+            includes the block generators of
+            :meth:`unipotent_radical_block_generators`.  The first two families fall
             short and generate subgroups of infinite index; the third reaches the target
             and, meeting the centre in a generator, generates the radical, of rank `17`
             (:meth:`unipotent_radical_rank`, :meth:`unipotent_radical_index`).
@@ -3157,10 +3147,8 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             family's parameters span the whole parameter lattice (`16` of `16`, the
             lattice of the exact decision) and the central generator is one of its
             members, so the returned family generates the radical, of rank
-            `17 = 16 + 1`, and this returns `1`
-            (`.tmp/qc-evidence/issue365-parameters.log`).  Why the fourteen transvections
-            alone are not enough: their translations reach rank `12` of the `16`.
-            reach rank `12` of the `16`.
+            `17 = 16 + 1`, and this returns `1`.  The fourteen transvections alone
+            are not enough: their translations reach rank `12` of the `16`.
             """
             from sage.arith.misc import gcd
             from sage_extensions.categories.sets.cardinals import aleph0
@@ -4725,8 +4713,8 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
               the answer is ``True`` exactly when all three are `1` -- the radical generated,
               the plane actions of the members trivial on `I^\perp/I` filling `\GL(I)`, and
               the quotient actions of the members fixing `I` pointwise filling
-              `O(I^\perp/I)`.  At Sterk's `P_2` of \(T_{\mathrm{En}}\) all three hold
-              (`.tmp/qc-evidence/issue366-completeness.log`), so the parabolic there is
+              `O(I^\perp/I)`.  At Sterk's `P_2` of \(T_{\mathrm{En}}\) all three hold,
+              so the parabolic there is
               generated: the radical by the parameter lattice, the two Levi factors by the
               `\Gamma(2)` certificate and by computed orders.
             """
@@ -4778,8 +4766,7 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             quotient images of the members that fix `I` pointwise fill
             `O(I^\perp/I)`.  At Sterk's `P_2` of \(T_{\mathrm{En}}\) all three
             hold, so this family is the whole parabolic there and
-            :meth:`parabolic_obstruction` is ``None``
-            (`.tmp/qc-evidence/issue366-completeness.log`).
+            :meth:`parabolic_obstruction` is ``None``.
 
             Sources, all read in the arXiv text of the cited version: Dutour
             Sikirić--Hulek, arXiv:2302.01679v2, §"The Tits building",

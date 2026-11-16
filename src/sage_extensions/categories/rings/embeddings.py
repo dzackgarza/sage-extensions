@@ -61,7 +61,7 @@ class OrderEmbedding:
         # morphism or a coercions of orders, hence ZZ-linear, so the composite
         # is linear by its construction: state that as the construction's
         # premise rather than leaving the arrow merely "a function on elements",
-        # which is what made ``is_injective()`` refuse to read it.
+        # which ``is_injective()`` refuses to read.
         linear = domain.module_category().Mor(domain, codomain)._from_constructed_element_map(
             evaluate, premises=()
         )

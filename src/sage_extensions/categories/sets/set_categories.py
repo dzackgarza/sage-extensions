@@ -715,13 +715,13 @@ def arrow_hash(arrow) -> int:
     * equal arrows have equal values on the probe, so they share this hash;
     * arrows that the probe separates -- the points of a dual module, for
       instance, which are separated by their values on the module generators --
-      no longer collide.
+      get different hashes.
 
-    Hashing only the endpoints, as this definition once did, made every point of
-    a dual module collide: ``dict.fromkeys`` over 64 distinct points of a rank-6
-    standard lattice collapsed to one bucket, so each insertion compared the new
-    point with every extant key by arrow equality (measured at ~17 ms each, 22.9 s
-    for 64 points, and minutes at the few hundred a polyhedral cone carries).
+    Hashing only the endpoints makes every point of a dual module collide:
+    ``dict.fromkeys`` over 64 distinct points of a rank-6 standard lattice
+    collapses to one bucket, so each insertion compares the new point with every
+    extant key by arrow equality (measured at ~17 ms each, 22.9 s for 64 points,
+    and minutes at the few hundred a polyhedral cone carries).
 
     A probe that cannot be evaluated, or whose values are unhashable, leaves the
     endpoint hash in force rather than raising: an arrow of an arbitrary map may

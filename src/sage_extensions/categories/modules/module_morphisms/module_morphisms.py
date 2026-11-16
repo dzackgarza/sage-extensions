@@ -2753,10 +2753,24 @@ class ModuleMorphismMethods:
         may be invertible after scalar extension without ``f`` being an
         isomorphism in ``R``-modules; that fraction-field inverse is a different
         construction and is never returned here.
+
+        An endomorphism of a framed finite free module whose scalars carry an
+        exact engine matrix is inverted through that matrix, in the ring: the
+        inverse is the matrix inverse the ring contains, and its determinant
+        says whether there is one.  The kernel and cokernel are what invert
+        every other map, and over a ring whose selected linear-algebra parent is
+        not a Sage ring -- the exact real and complex fields are their own --
+        they invert the matrix too, because no engine matrix exists there.
         """
+        from sage.categories.rings import Rings as SageRings
+
         self._require_established_linearity("module-morphism inversion")
-        if self.domain() is self.codomain() and _has_finite_free_framing(self.domain()) and self.domain().base_ring().is_integral_domain() is False:
-            return self._inverse_over_a_ring_with_zero_divisors()
+        if (
+            self.domain() is self.codomain()
+            and _engine_matrix_mor(self.parent())
+            and _linear_algebra_ring(self.domain().base_ring()) in SageRings()
+        ):
+            return self._inverse_in_the_ring()
         assert self.is_injective(), (
             f"{self.domain()} -> {self.codomain()} has no inverse: it is not injective"
         )
@@ -2768,23 +2782,6 @@ class ModuleMorphismMethods:
         return codomain.module_category().Mor(codomain, self.domain())(
             lambda label: inverse_image(codomain.module_generator(label))
         )
-
-    def _inverse_over_a_ring_with_zero_divisors(self):
-        r"""The inverse of a framed endomorphism from its unit determinant.
-
-        Kernels are unavailable over a ring such as ``ZZ/6``. A free
-        endomorphism is invertible exactly when its determinant is a unit.
-        """
-        from sage_extensions.tensors.tensor import _engine_row_action_matrix
-
-        module = self.domain()
-        ring = module.base_ring()
-        inverted = ~_engine_row_action_matrix(self)
-        labels = tuple(module.module_generating_set())
-        return module.module_category().Mor(module, module)({
-            label: module.linear_combination({other: ring(int(inverted[position, column])) for column, other in enumerate(labels)})
-            for position, label in enumerate(labels)
-        })
 
     def as_automorphism(self):
         r"""Return this invertible endomorphism as an element of ``Aut_R(M)``.
