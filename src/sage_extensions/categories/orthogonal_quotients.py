@@ -273,6 +273,21 @@ def _double_coset_adjustment(subgroup_permutation, stabilizer_permutation, coset
     return reached[needle_key] * coset_point
 
 
+def _exact_stabilizer_span_key(quotient, representative, flag=False):
+    r"""The span datum an exact stabilizer family is retained by.
+
+    :meth:`OrthogonalCharacterQuotient.exact_isotropic_stabilizer_generators`
+    depends on the representative through the spans of its terms alone -- its
+    own span for a subobject, each term's for a flag -- so an
+    equal-but-distinct copy of a representative has that representative's
+    family, and two subobjects spanning different sublattices have their own.
+    """
+    from sage_extensions.categories.isotropic_orbits import _span_key
+
+    terms = tuple(representative.terms()) if flag else (representative,)
+    return (bool(flag), tuple(_span_key(term) for term in terms))
+
+
 class OrthogonalCharacterQuotient:
     r"""The finite image of ``O(L)`` under the characters defining a subgroup.
 
@@ -348,6 +363,10 @@ class OrthogonalCharacterQuotient:
                 name="Orthogonal character quotient factors",
             )
         )
+        # The transported objects the rows of this quotient record, keyed by
+        # span, and the one ambient witness kept per pair of chain roots.
+        self._transported_isotropic_objects = {}
+        self._isotropic_root_bridges = {}
 
     @property
     def _witnesses(self):
@@ -1539,6 +1558,7 @@ class OrthogonalCharacterQuotient:
             (), stab_sign_flip, point=class_points
         )
 
+    @cached_method(key=_exact_stabilizer_span_key)
     def exact_isotropic_stabilizer_generators(self, representative, *, flag=False):
         r"""Return elements of ``H = Stab_{O(L)}(representative)`` whose image ``chi(H)`` is exact.
 
@@ -1569,6 +1589,14 @@ class OrthogonalCharacterQuotient:
         ``chi(H) = U`` with every generator an exhibited element of ``H``.  A
         pass that adds nothing certifies nothing, and raises: the divided data
         need not be a complete invariant, and no smaller image is guessed.
+
+        **Retention.**  The family is a function of the spans of the
+        representative's terms
+        (:func:`_exact_stabilizer_span_key`), not of which copy of them a row
+        holds, and a row asks for the same cusp's stabilizer once per object
+        compared against it.  The datum is therefore retained here, at the
+        operation that owns it, so every caller reads the one family its span
+        has instead of recomputing it per question.
         """
         ambient = self.supergroup
         generators = list(ambient.isotropic_stabilizer_generators(representative, flag=flag))
@@ -2379,39 +2407,49 @@ end
         return None if record is None else record[0]
 
     def register_isotropic_transport(self, subobject, source, transport):
-        r"""Record an isometry ``transport`` carrying ``source`` to ``subobject``.
+        r"""Record the datum that ``transport`` carries ``source`` onto ``subobject``.
 
-        A row that transports a representative along its walk holds the word
-        that did it, so two transported objects are related by composing their
-        words instead of by searching for an isometry.  The record is keyed by
-        the transported object's span, and the source is retained because the
-        word starts there.
+        A row transports a representative by an isometry it holds, so the
+        object it produces and that isometry are one datum
+        (:class:`TransportedIsotropicObject`), returned here and retained by the
+        transported object's span: a row's consumers hold equal-but-distinct
+        copies of an object, and a kernel row registers 189720 planes, so the
+        span key is what makes the lookup one dictionary hit instead of a scan
+        of every object recorded so far.
+
+        The source is retained because the word starts there: a transport whose
+        source is itself a transported object is the next step of one chain
+        (:meth:`transported_from_root`).
         """
-        from sage_extensions.categories.isotropic_orbits import _span_key
-
-        self.__dict__.setdefault("_isotropic_transport_registry", {})[
-            _span_key(subobject)
-        ] = (source, transport)
-
-    def isotropic_transport_of(self, subobject):
-        r"""The registered isometry carrying ``subobject``'s source to it, or ``None``.
-
-        The source is the object the row's word starts from, so the record is
-        one step of a chain, not necessarily a word from a row's base
-        representative; :meth:`transported_from_root` reads the whole chain.
-        """
-        from sage_extensions.categories.isotropic_orbits import _span_key
-
-        return self.__dict__.get("_isotropic_transport_registry", {}).get(
-            _span_key(subobject)
+        from sage_extensions.categories.isotropic_orbits import (
+            TransportedIsotropicObject,
+            _span_key,
         )
 
-    def transported_from_root(self, subobject):
-        r"""``(root, g)`` with ``g`` carrying the registered chain's ``root`` to ``subobject``.
+        datum = TransportedIsotropicObject(subobject, source, transport)
+        self._transported_isotropic_objects[_span_key(subobject)] = datum
+        return datum
 
-        Reading the chain composes one word per registered step, so it costs
-        one product per step and no isometry search.  An unregistered object is
-        its own root with the identity.
+    def isotropic_transport_of(self, subobject):
+        r"""The recorded transport datum of ``subobject``, or ``None``.
+
+        The datum is one step of a chain, not necessarily a word from a row's
+        base representative; :meth:`transported_from_root` reads the whole
+        chain.
+        """
+        from sage_extensions.categories.isotropic_orbits import _span_key
+
+        return self._transported_isotropic_objects.get(_span_key(subobject))
+
+    def transported_from_root(self, subobject):
+        r"""``(root, g)`` with ``g`` carrying the registered chain's ``root`` onto ``subobject``.
+
+        Reading the chain composes one word per recorded step, so it costs one
+        product per step and no isometry search.  The order is the order the
+        steps act: ``g`` already carries the current object onto ``subobject``,
+        and the datum's word carries that object's source onto the current one,
+        so for ``root --step--> current --g--> subobject`` the composite is
+        ``g * step``.  An unregistered object is its own root with the identity.
         """
         from sage_extensions.categories.isotropic_orbits import _span_key
 
@@ -2419,28 +2457,27 @@ end
         current = subobject
         seen = set()
         while True:
-            key = _span_key(current)
+            datum = self.isotropic_transport_of(current)
+            if datum is None:
+                break
+            key = _span_key(datum.subobject())
             if key in seen:
                 break
             seen.add(key)
-            record = self.isotropic_transport_of(current)
-            if record is None:
-                break
-            source, step = record
-            g = step * g
-            current = source
+            g = g * datum.transport()
+            current = datum.source()
         return current, g
 
     def isotropic_transport_between(self, left, right):
-        r"""An isometry carrying ``left`` to ``right`` from the registered transports, or ``None``.
+        r"""An isometry carrying ``left`` onto ``right`` from the recorded transports, or ``None``.
 
         ``left`` and ``right`` are carried from their roots by ``g_left`` and
-        ``g_right``, so ``g_right * b * ~g_left`` carries ``left`` to ``right``
-        for any ``b`` carrying the left root to the right root.  When the two
-        objects lie in one registered row the roots coincide, ``b`` is the
-        identity, and no isometry is searched for; the roots of two different
-        rows are representatives the rows themselves hold, so the one ambient
-        witness between them is computed once and retained.
+        ``g_right``, so ``g_right * b * ~g_left`` carries ``left`` onto
+        ``right`` for any ``b`` carrying the left root onto the right root.
+        When the two objects lie in one registered row the roots coincide,
+        ``b`` is the identity, and no isometry is searched for; the roots of
+        two different rows are representatives the rows themselves hold, so the
+        one ambient witness between them is computed once and retained.
         """
         from sage_extensions.categories.isotropic_orbits import _span_key
 
@@ -2448,36 +2485,15 @@ end
         right_root, right_element = self.transported_from_root(right)
         if _span_key(left_root) == _span_key(right_root):
             return right_element * ~left_element
-        bridges = self.__dict__.setdefault("_isotropic_root_bridges", {})
         pair = (_span_key(left_root), _span_key(right_root))
-        if pair not in bridges:
-            bridges[pair] = self.supergroup.isotropic_equivalence_witness(
-                left_root, right_root
+        if pair not in self._isotropic_root_bridges:
+            self._isotropic_root_bridges[pair] = (
+                self.supergroup.isotropic_equivalence_witness(left_root, right_root)
             )
-        bridge = bridges[pair]
+        bridge = self._isotropic_root_bridges[pair]
         if bridge is None:
             return None
         return right_element * bridge * ~left_element
-
-    def exact_isotropic_stabilizer_family(self, representative, *, flag=False):
-        r"""The exact stabilizer generators of ``representative``, computed once per span.
-
-        The returned family is a function of the subobject's span alone, and a
-        row asks for the stabilizer of the same cusp representative once per
-        object it compares against it, so the family is retained by span
-        instead of being recomputed per question.
-        """
-        from sage_extensions.categories.isotropic_orbits import _span_key
-
-        registry = self.__dict__.setdefault(
-            "_exact_isotropic_stabilizer_families", {}
-        )
-        key = (_span_key(representative), bool(flag))
-        if key not in registry:
-            registry[key] = self.exact_isotropic_stabilizer_generators(
-                representative, flag=flag
-            )
-        return registry[key]
 
     @cached_method
     def certified_parabolic_generators(self, plane):
@@ -3930,7 +3946,7 @@ def _subgroup_isotropic_equivalence_witness(subgroup, left, right, *, flag=False
         quotient = subgroup.finite_character_quotient()
     if not flag and quotient.separates_witness_orbits(witness, left):
         return None
-    stabilizer = quotient.exact_isotropic_stabilizer_family(right, flag=flag)
+    stabilizer = quotient.exact_isotropic_stabilizer_generators(right, flag=flag)
     return quotient.adjust_witness_into_subgroup(witness, stabilizer)
 
 

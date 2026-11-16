@@ -1207,6 +1207,49 @@ def _span_key(subobject):
     )
 
 
+class TransportedIsotropicObject(SageObject):
+    r"""A primitive isotropic subobject, the object it was carried from, and that isometry.
+
+    A row transports a representative by an isometry it already holds -- a
+    coset representative of a splitting walk, a parabolic word, an ambient
+    transporter -- so what it produces is not the subobject alone: the isometry
+    that placed it there is part of the datum.  Keeping the three together is
+    what makes a transporter between two transported objects a composition of
+    their words, ``g_right * b * ~g_left`` with ``b`` carrying the left one's
+    source to the right one's, instead of an isometry search whose cost is
+    unrelated to the mathematics.
+
+    A transport whose source is itself a transported object is the next step of
+    one chain, and the isometry carrying the chain's root onto :meth:`subobject`
+    is the composite of its steps in the order they act: for
+    ``source --step--> object --transport--> subobject`` that composite is
+    ``transport * step``, not ``step * transport``.
+    """
+
+    def __init__(self, subobject, source, transport) -> None:
+        self._subobject = subobject
+        self._source = source
+        self._transport = transport
+
+    def subobject(self):
+        r"""Return the subobject this transport placed."""
+        return self._subobject
+
+    def source(self):
+        r"""Return the object the transport acts on: one step's tail, or the chain's previous object."""
+        return self._source
+
+    def transport(self):
+        r"""Return the isometry carrying :meth:`source` onto :meth:`subobject`."""
+        return self._transport
+
+    def __repr__(self) -> str:
+        return (
+            f"A transported isotropic object: {self._transport} carries "
+            f"{self._source} onto {self._subobject}"
+        )
+
+
 def _zero_isotropic_shape(lattice, rank):
     r"""The rank-``rank`` zero-form lattice used as an isotropic marking shape."""
     from sage_extensions.categories.lattices import Lattices
