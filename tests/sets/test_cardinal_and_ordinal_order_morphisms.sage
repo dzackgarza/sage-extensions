@@ -50,9 +50,13 @@ def test_the_countable_sum_of_ones_is_aleph_zero() -> None:
 
 
 def test_a_finite_cardinal_is_the_natural_number_it_counts() -> None:
-    r"""$|\{0, 1, 2\}| = 3$, and the finite cardinal $7$ read in $\mathbb{Z}$ and $\mathbb{Q}$ is $7$."""
+    r"""$|\{0, 1, 2\}| = 3$."""
     assert cardinal(3) == 3
     assert Sets.Δ[2].cardinality() == 3
+
+
+def test_the_rings_read_the_finite_cardinal_seven_as_seven() -> None:
+    r"""The finite cardinal $7$ read in $\mathbb{Z}$ and $\mathbb{Q}$ is $7$."""
     assert ZZ(cardinal(7)) == 7
     assert QQ(cardinal(7)) == 7
 
