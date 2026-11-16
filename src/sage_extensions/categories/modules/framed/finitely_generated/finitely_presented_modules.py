@@ -2599,7 +2599,7 @@ def _new_presented_module(
     base_ring,
     module_generating_set,
     presentation_factory,
-    framing_source=None,
+    framing_source,
     cokernel_morphism=None,
     subobject_ambient=None,
     subobject_generator_images=None,
@@ -2616,11 +2616,10 @@ def _new_presented_module(
     data = {
         "base_ring": base_ring,
         "module_generating_set": module_generating_set,
+        "framing_source": framing_source,
         "presentation_factory": presentation_factory,
         "cokernel_morphism": cokernel_morphism,
     }
-    if framing_source is not None:
-        data["framing_source"] = framing_source
     if subobject_ambient is not None or subobject_inclusion_factory is not None:
         categories.append(ModuleSubobjects(base_ring))
         if subobject_ambient is not None:
