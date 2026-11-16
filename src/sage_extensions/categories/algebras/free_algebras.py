@@ -193,7 +193,14 @@ class _NativeFreeAlgebraParent(_NativeMonomialEvaluation, _OwnedAlgebraParent):
     """
 
     def __init__(
-        self, engine, generating_module, flavor, *, categories=(), construction_data=()
+        self,
+        engine,
+        generating_module,
+        flavor,
+        *,
+        categories=(),
+        construction_data=(),
+        constructing_category=None,
     ) -> None:
         from sage_extensions.categories.group.magmas import AdditiveGroups
         from sage_extensions.categories.modules.framed.framed_free_modules import (
@@ -300,7 +307,11 @@ class _NativeFreeAlgebraParent(_NativeMonomialEvaluation, _OwnedAlgebraParent):
             algebra_generating_family=algebra_generators,
             algebra_framing_source=self,
             algebra_framing_owner=framing_owner,
-            constructing_category=algebra_category,
+            constructing_category=(
+                algebra_category
+                if constructing_category is None
+                else constructing_category
+            ),
             ring_placement=ring_placement,
         )
         # Algebras.ParentMethods.__init__, entered through the common parent
@@ -315,6 +326,7 @@ class _NativeFreeAlgebraParent(_NativeMonomialEvaluation, _OwnedAlgebraParent):
         labels,
         categories,
         construction_data,
+        constructing_category=None,
     ):
         r"""Preserve this native free-algebra realization under common refinement."""
         if self.base_ring() is not base_ring:
@@ -330,8 +342,15 @@ class _NativeFreeAlgebraParent(_NativeMonomialEvaluation, _OwnedAlgebraParent):
         same_labels = selected_labels is current_labels
         generating = self.generating_module()
         if same_labels:
-            if not construction_data and all(
-                self in category for category in categories
+            # An unchanged view keeps its recorded ambient category; a request
+            # for a different one is a construction datum of its own.
+            if (
+                not construction_data
+                and all(self in category for category in categories)
+                and (
+                    constructing_category is None
+                    or constructing_category is self._constructing_category
+                )
             ):
                 return self
         else:
@@ -342,19 +361,32 @@ class _NativeFreeAlgebraParent(_NativeMonomialEvaluation, _OwnedAlgebraParent):
             self._native_free_flavor,
             categories=categories,
             construction_data=construction_data,
+            constructing_category=constructing_category,
         )
 
 
 @cached_function(
-    key=lambda engine, generating_module, flavor, categories=(), construction_data=(): (
+    key=lambda engine,
+    generating_module,
+    flavor,
+    categories=(),
+    construction_data=(),
+    constructing_category=None: (
         id(generating_module),
         flavor,
         tuple(map(id, categories)),
         tuple((name, id(value)) for name, value in construction_data),
+        id(constructing_category),
     )
 )
 def _native_free_algebra(
-    engine, generating_module, flavor, *, categories=(), construction_data=()
+    engine,
+    generating_module,
+    flavor,
+    *,
+    categories=(),
+    construction_data=(),
+    constructing_category=None,
 ):
     r"""The native realization of the free functor on this exact module.
 
@@ -368,19 +400,21 @@ def _native_free_algebra(
             generating_module,
             flavor,
             categories=categories,
+            constructing_category=constructing_category,
         )
     data = dict(construction_data)
     from sage.misc.classcall_metaclass import typecall
 
-    from sage_extensions.refine import _owned_dynamic_class
+    from sage_extensions.owned_category import owned_category_join
+    from sage_extensions.refine import _owned_dynamic_class, owned_parent_class
 
-    if set(data) == {"_preamble_coproduct_factors"}:
+    if "_preamble_coproduct_factors" in data:
         implementation = _owned_dynamic_class(
             "NativeFreeAlgebraWithCoproductData",
             (CommutativeAlgebraCoproducts.ParentMethods, _NativeFreeAlgebraParent),
             _NativeFreeAlgebraParent,
         )
-    elif set(data) == {"_affine_semigroup_presentation"}:
+    elif "_affine_semigroup_presentation" in data:
         from sage_extensions.categories.algebras.semigroup_algebras import (
             AffineSemigroupAlgebras,
         )
@@ -394,12 +428,22 @@ def _native_free_algebra(
         raise TypeError(
             f"no category-level free-algebra constructor declares {tuple(data)}"
         )
+    if categories:
+        # Each datum in ``data`` names the level that establishes it.  Only
+        # those levels have to precede the object's own ``__init__``; the rest
+        # of the target category is refined on afterwards, as before.
+        implementation = owned_parent_class(
+            implementation,
+            owned_category_join(tuple(categories)),
+            establishing=frozenset(data),
+        )
     return typecall(
         implementation,
         engine=engine,
         generating_module=generating_module,
         flavor=flavor,
         categories=categories,
+        constructing_category=constructing_category,
         **data,
     )
 

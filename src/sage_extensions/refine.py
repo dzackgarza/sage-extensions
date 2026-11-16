@@ -16,6 +16,7 @@ from collections.abc import Callable, Iterable, Iterator
 from contextlib import contextmanager
 from functools import update_wrapper
 from graphlib import TopologicalSorter
+from types import FunctionType
 
 from sage.categories.category import Category
 from sage.categories.morphism import Morphism
@@ -130,6 +131,27 @@ def _owned_mixins(category: Category, attr: str) -> tuple[type, ...]:
         ordering.done(provider)
         released.extend(ordering.get_ready())
     return tuple(ordered)
+
+
+@cached_function
+def _constructor_keywords(provider: type) -> frozenset[str]:
+    """Return the construction data a level's methods class establishes.
+
+    A level establishes a datum by taking it as a keyword of its ``__init__``
+    and handing the rest of the chain down; the keyword is the datum's name in
+    the construction data of the object being built.  A level that declares no
+    constructor of its own establishes nothing and is refined on afterwards.
+    """
+    constructor = vars(provider).get("__init__")
+    if not isinstance(constructor, FunctionType):
+        return frozenset()
+    return frozenset(
+        parameter.name
+        for parameter in inspect.signature(constructor).parameters.values()
+        if parameter.kind
+        in (parameter.POSITIONAL_OR_KEYWORD, parameter.KEYWORD_ONLY)
+        and parameter.name != "self"
+    )
 
 
 @cached_function
@@ -268,7 +290,9 @@ def _owned_dynamic_class(name: str, bases: tuple[type, ...], doccls: type) -> ty
     return result
 
 
-def owned_parent_class(implementation: type, category: Category) -> type:
+def owned_parent_class(
+    implementation: type, category: Category, *, establishing: frozenset[str] = frozenset()
+) -> type:
     r"""The class of a parent of ``implementation`` whose owned methods are those of ``category``.
 
     The owned ``ParentMethods`` of ``category`` that ``implementation`` does
@@ -278,8 +302,22 @@ def owned_parent_class(implementation: type, category: Category) -> type:
     exists instantiates this class, so the ``__init__`` of every level runs in
     one cooperative chain; ``_rebuild_parent_class`` gives an existing object
     the same class.
+
+    ``establishing`` names the construction data the object is being built
+    with.  A datum is established by the level whose constructor takes it as
+    a keyword, and only that level has to precede the object's ``__init__``:
+    the other levels are refined on afterwards, as every construction of this
+    category already is.  Naming datums therefore narrows the chain to the
+    levels that would otherwise receive their keyword unconsumed, and leaves
+    ``category`` as the object's placement.
     """
     providers = _owned_mixins(category, "ParentMethods")
+    if establishing:
+        providers = tuple(
+            provider
+            for provider in providers
+            if _constructor_keywords(provider) & establishing
+        )
     if not providers:
         return implementation
     inherited = implementation.__dict__.get("_preamble_inherited", implementation)

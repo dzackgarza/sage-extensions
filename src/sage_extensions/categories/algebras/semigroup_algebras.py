@@ -127,6 +127,7 @@ class AffineSemigroupAlgebras(OwnedCategoryOverBaseRing):
         names=None,
         extra_categories=(),
         extra_construction_data=(),
+        constructing_category=None,
     ):
         coordinates = tuple(
             tuple(int(entry) for entry in row)
@@ -189,6 +190,7 @@ class AffineSemigroupAlgebras(OwnedCategoryOverBaseRing):
                 self,
                 *tuple(extra_categories),
                 construction_data=construction_data,
+                constructing_category=constructing_category,
             )
         else:
             engine_presentation = _engine_ring(presentation)

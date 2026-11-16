@@ -1533,6 +1533,7 @@ class Algebras(OwnedCategoryOverBaseRing):
             labels,
             categories,
             construction_data,
+            constructing_category=None,
         ):
             r"""Internal construction hook for a specialized algebra realization.
 
@@ -1544,7 +1545,9 @@ class Algebras(OwnedCategoryOverBaseRing):
             No engine handle is exchanged.  This hook exists because
             representation-preserving reconstruction is a constructor
             responsibility, not an ordinary mathematical operation on an
-            already constructed algebra.
+            already constructed algebra.  ``constructing_category`` is the
+            category whose public constructor asked for the algebra and becomes
+            the new parent's ambient category (``OWN-15``).
             """
 
         def __init__(
@@ -5302,6 +5305,7 @@ def _owned_algebra_view(
     construction_data=(),
     law_decisions=(),
     ring_placement=(),
+    constructing_category=None,
 ):
     # A structure view retains its source algebra as defining data. The base
     # and labels alone do not determine that algebra or its multiplication.
@@ -5329,6 +5333,7 @@ def _owned_algebra_view(
             categories=tuple(categories),
             law_decisions=tuple(law_decisions),
             ring_placement=lambda: ring_placement,
+            constructing_category=constructing_category,
             **data,
         )
     return _OwnedAlgebraParent(
@@ -5338,6 +5343,7 @@ def _owned_algebra_view(
         categories=tuple(categories),
         law_decisions=tuple(law_decisions),
         ring_placement=lambda: ring_placement,
+        constructing_category=constructing_category,
     )
 
 
@@ -5347,6 +5353,7 @@ def _algebra_with_structure(
     labels=None,
     *categories,
     construction_data=(),
+    constructing_category=None,
 ):
     r"""Construct an owned algebra view with its selected categories present.
 
@@ -5355,6 +5362,11 @@ def _algebra_with_structure(
     construction (for example a coproduct) adds its datum.  An unchanged
     view is the existing object.  Other scalar structures retain their own
     native algebra constructor, without assuming a monomial basis.
+
+    ``constructing_category`` is the category whose public constructor asked
+    for this algebra (``OWN-15``).  A realization that materializes a new
+    parent records it as its ambient category; a construction that names none
+    keeps the realization's own kind.
     """
     base = _owned_ring(base_ring)
     # An optional abstract method that a parent does not implement is the
@@ -5368,6 +5380,7 @@ def _algebra_with_structure(
             labels,
             tuple(categories),
             tuple(construction_data),
+            constructing_category=constructing_category,
         )
     )
     if specialized is not NotImplemented and specialized is not None:
@@ -5383,6 +5396,7 @@ def _algebra_with_structure(
         labels,
         tuple(categories),
         tuple(construction_data),
+        constructing_category=constructing_category,
         ring_placement=ring_placement,
     )
 
