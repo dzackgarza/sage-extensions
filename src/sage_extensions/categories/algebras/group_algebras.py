@@ -81,30 +81,31 @@ class GroupAlgebras(OwnedCategoryOverBaseRing):
             An element \(\sum a_g g\) is central exactly when \(a\) is a class
             function, so the class sums \(\sum_{h\in C} h\) over the conjugacy
             classes \(C\) of \(G\) form an \(R\)-basis of \(Z(R[G])\) (Isaacs,
-            *Character Theory of Finite Groups*, Theorem 2.4).  Each class is
-            the conjugation orbit of its representative.  That basis replaces
-            the equalizers the general centre intersects; the algebra on it is
-            built the same way.  Each class sum is the linear combination of the
-            module's generators with coefficient one on the class
-            (`Modules.linear_combination`), which is the operation the module
-            owns for a finite family of generators.
+            *Character Theory of Finite Groups*, Theorem 2.4).  A conjugacy
+            class is an orbit of the group's conjugation action, and the orbits
+            are the group's own operation `Groups.conjugacy_classes`; the
+            classes are read from it rather than closed up beside it.  That
+            basis replaces the equalizers the general centre intersects; the
+            algebra on it is built the same way.  Each class sum is the linear
+            combination of the module's generators with coefficient one on the
+            class (`Modules.linear_combination`), which is the operation the
+            module owns for a finite family of generators.
             """
             group = self.group()
             assert group in FiniteGroups(), (
                 f"the centre of {self} is computed from conjugacy-class sums, which needs a finite group, but "
                 f"{group} is not known to be finite"
             )
+            one = self.base_ring().one()
             class_sums = finite_ordered_set(
                 [
                     self.linear_combination(
                         {
-                            element: self.base_ring().one()
-                            for element in {
-                                g * representative * g.inverse() for g in group
-                            }
+                            element: one
+                            for element in conjugacy_class.points()
                         }
                     )
-                    for representative in group.conjugacy_classes_representatives()
+                    for conjugacy_class in group.conjugacy_classes()
                 ]
             )
             return _center_algebra(self, self.subobject_on(class_sums))
