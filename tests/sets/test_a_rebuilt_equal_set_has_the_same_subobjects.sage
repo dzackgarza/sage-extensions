@@ -22,3 +22,25 @@ def test_a_rebuilt_equal_set_carries_the_subobjects_of_its_power_set() -> None:
     assert subset.inclusion().codomain() == rebuilt
     assert subset in Sets().Subobjects(points)
     assert subset in Sets().Subobjects(rebuilt)
+
+
+def test_the_subobject_category_asked_first_is_the_one_the_power_set_keeps() -> None:
+    r"""The category and the power set present one set, whichever is asked first.
+
+    ``Sets().Subobjects(X)`` and ``P(X)`` are two presentations of the subsets of
+    ``X``, so neither call order decides which copy of ``X`` a subset ends at: the
+    category that answers first retains the base set, the power set takes that
+    same copy, and a subset the power set cuts out is an object of the category
+    that was asked before the power set existed.
+    """
+    points = FiniteOrderedSets()(("c", "d"))
+    rebuilt = FiniteOrderedSets()(("c", "d"))
+    category = Sets().Subobjects(points)
+
+    assert points == rebuilt and points is not rebuilt
+    subset = rebuilt.power_set().from_predicate(lambda point: point == "c")
+
+    assert rebuilt.power_set() is points.power_set()
+    assert subset.inclusion().codomain() is category.base_object()
+    assert subset in category
+    assert subset in Sets().Subobjects(rebuilt)
