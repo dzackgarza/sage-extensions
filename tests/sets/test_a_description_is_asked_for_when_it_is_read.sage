@@ -20,7 +20,7 @@ def test_a_description_is_asked_for_when_it_is_read() -> None:
         return "the even numbers"
 
     points = FiniteOrderedSets().from_indexed(
-        Sets.Δ[3], lambda position: (2 * int(position),), name=description
+        Sets.Δ[3], lambda position: (2 * int(position),), description=description
     )
 
     assert tuple(asked) == ()
@@ -48,7 +48,7 @@ def test_an_ordered_subset_displays_the_description_its_construction_stated() ->
     evens = FiniteOrderedSets().from_indexed(
         Sets.Δ[3], lambda position: (2 * int(position),), name="the even numbers"
     )
-    below_six = evens.filtered(lambda point: point[0] < 6, name=description)
+    below_six = evens.filtered(lambda point: point[0] < 6, description=description)
 
     assert tuple(asked) == ()
     assert below_six.description() == "the even numbers below six"

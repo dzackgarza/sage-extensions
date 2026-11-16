@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import builtins
 import json
+from contextlib import contextmanager
 from pathlib import Path
 
 DIGEST = Path(__file__).resolve().parents[1] / "cards" / "lattice-database-enriques.json"
@@ -38,6 +39,81 @@ def card(section: str, tag: str) -> dict:
 
 
 builtins.card = card
+
+
+_ABSENT = object()
+
+
+@contextmanager
+def _patched(owner, name, replacement):
+    r"""Shadow ``owner.name`` for the block, and restore it however the block ends.
+
+    A call count is an instrument and never a mock: the replacement calls what it
+    shadows.  The attribute is restored in ``finally``, so a failing action leaves
+    the process as it found it, and an attribute the owner inherits is removed
+    again rather than written onto the owner.
+    """
+    held = owner.__dict__.get(name, _ABSENT)
+    setattr(owner, name, replacement)
+    try:
+        yield
+    finally:
+        if held is _ABSENT:
+            if name in owner.__dict__:
+                delattr(owner, name)
+        else:
+            setattr(owner, name, held)
+
+
+def spans_built_by(action):
+    r"""Return ``action()`` and the number of spans it built.
+
+    A span of finitely many vectors of a lattice is built by
+    ``Lattices.ParentMethods.subobject_on``.  A test asks for the count through
+    this name, which is private to the arrangement and not to the mathematics,
+    so the patch lives here (``TL02``, ``TL13``).
+    """
+    from sage_extensions.all import Lattices, ZZ
+
+    parent_methods = Lattices(ZZ).ParentMethods
+    original = parent_methods.subobject_on
+    built = []
+
+    def counted(self, generating_set):
+        built.append(1)
+        return original(self, generating_set)
+
+    with _patched(parent_methods, "subobject_on", counted):
+        value = action()
+    return value, sum(built)
+
+
+builtins.spans_built_by = spans_built_by
+
+
+def displays_rendered_by(action):
+    r"""Return ``action()`` and the number of lattice displays it rendered.
+
+    A lattice's rendering computes its signature from its Gram, so counting it is
+    how a test observes that a construction rendered nothing.  The patch lives
+    here for the reason ``spans_built_by``'s does.
+    """
+    from sage_extensions.all import Lattices, ZZ
+
+    parent_methods = Lattices(ZZ).ParentMethods
+    original = parent_methods.__repr__
+    rendered = []
+
+    def counted(self):
+        rendered.append(1)
+        return original(self)
+
+    with _patched(parent_methods, "__repr__", counted):
+        value = action()
+    return value, sum(rendered)
+
+
+builtins.displays_rendered_by = displays_rendered_by
 
 
 def owned_ring_crossings(action):

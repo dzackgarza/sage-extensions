@@ -85,7 +85,8 @@ class OrderedEnumeratedSets(OwnedCategory):
         index_of: Callable[[PointT], IndexT | None],
         contains: Callable[[PointT], bool] | None = None,
         equivalent: Callable[[PointT, PointT], bool] | None = None,
-        name: str | Callable[[], str] | None = None,
+        name: str | None = None,
+        description: Callable[[], str] | None = None,
     ) -> Sets().ObjectType:
         r"""Construct an ordered enumerated set from its chosen enumeration."""
         assert index_set in EnumeratedSets(), (
@@ -95,7 +96,7 @@ class OrderedEnumeratedSets(OwnedCategory):
             case _ if Sets().is_provably_finite(index_set):
                 return FiniteOrderedSets().from_indexed(
                     index_set, element_at, index_of=index_of, contains=contains,
-                    equivalent=equivalent, name=name
+                    equivalent=equivalent, name=name, description=description
                 )
             case _ if index_set in Sets().Infinite():
                 placement = owned_category_join((self, Sets().Infinite()))
@@ -108,6 +109,7 @@ class OrderedEnumeratedSets(OwnedCategory):
             index_of=index_of,
             contains=contains,
             name=name,
+            description=description,
         )
 
     class ParentMethods:
@@ -119,7 +121,8 @@ class OrderedEnumeratedSets(OwnedCategory):
             index_of: Callable[[PointT], IndexT | None],
             contains: Callable[[PointT], bool] | None = None,
             equivalent: Callable[[PointT, PointT], bool] | None = None,
-            name: str | Callable[[], str] | None = None,
+            name: str | None = None,
+            description: Callable[[], str] | None = None,
             **rest,
         ) -> None:
             assert callable(element_at), (
@@ -135,15 +138,8 @@ class OrderedEnumeratedSets(OwnedCategory):
             self._index_of_function = index_of
             self._contains_function = contains
             self._equivalent_function = equivalent or _DEFAULT_EQUIVALENCE
-            assert name is None or isinstance(name, str) or callable(name), (
-                f"a set's name is a string, a description returning one, or nothing, but {name!r} "
-                "is none of those"
-            )
-            # Whether the name is a description is settled here, from the type
-            # the construction declared, so that reading the name never asks a
-            # canonical object what kind of thing it turned out to be.
-            self._name_is_description = name is not None and not isinstance(name, str)
             self._name = name
+            self._description_function = description
             super().__init__(facade=True, **rest)
 
         def index_set(self) -> Sets().ObjectType:
@@ -267,17 +263,19 @@ class OrderedEnumeratedSets(OwnedCategory):
 
         @cached_method
         def description(self):
-            r"""What this set was named with, rendered on the first read and kept.
+            r"""What this set was named or described with, rendered on the first read and kept.
 
-            A name given as a function is a description of the set's source, and
-            rendering it is the reader's act: the set asks it here, and not at
-            construction, so building the set computes no display.  The answer is
-            the set's once rendered -- a description of the set's source does not
-            change while the set exists -- so a second reader asks nothing.
+            A set is given a name, or a description of the source it was carved out
+            of.  Rendering the description is the reader's act: the set asks it here,
+            and not at construction, so building the set computes no display.  The
+            answer is the set's once rendered -- neither changes while the set exists
+            -- so a second reader asks nothing, and a construction that states both is
+            read by its description.
             """
-            if self._name is None:
-                return None
-            return self._name() if self._name_is_description else self._name
+            described = self._description_function
+            if described is not None:
+                return described()
+            return self._name
 
         def _repr_(self) -> str:
             size = cardinal(self.cardinality())
@@ -394,7 +392,8 @@ class FiniteOrderedSets(OwnedCategory):
         index_of: Callable[[PointT], IndexT | None] | None = None,
         contains: Callable[[PointT], bool] | None = None,
         equivalent: Callable[[PointT, PointT], bool] | None = None,
-        name: str | Callable[[], str] | None = None,
+        name: str | None = None,
+        description: Callable[[], str] | None = None,
     ) -> ObjectOfCategory:
         r"""Construct the finite ordered set enumerated by ``element_at`` on ``index_set``.
 
@@ -463,6 +462,7 @@ class FiniteOrderedSets(OwnedCategory):
             contains=contains,
             equivalent=equivalent,
             name=name,
+            description=description,
         )
 
     class ParentMethods:
@@ -492,9 +492,11 @@ class FiniteOrderedSets(OwnedCategory):
             ranking = self.ranking_map()
             return ranking.inverse()(ranking.codomain()(randrange(size)))
 
-        def filtered(self, predicate, *, name=None):
+        def filtered(self, predicate, *, name=None, description=None):
             r"""Return the ordered subset of this set cut out by ``predicate``."""
-            subset = _filtered_ordered_set(self, predicate, name=name)
+            subset = _filtered_ordered_set(
+                self, predicate, name=name, description=description
+            )
             assert subset is not None, (
                 f"cannot enumerate the subset of {self} cut out by {predicate}: some memberships "
                 "are undecided; condition_set retains this finite subset without an enumeration"
@@ -602,7 +604,8 @@ def _filtered_ordered_set(
     universe: Parent,
     predicate: Callable[[PointT], bool | Predicate],
     *,
-    name: str | Callable[[], str] | None = None,
+    name: str | None = None,
+    description: Callable[[], str] | None = None,
 ) -> FiniteOrderedSets().ObjectType | None:
     r"""Compute the ordered subset \(\{x\in S : P(x)\}\), or decline an undecided enumeration.
 
@@ -611,9 +614,9 @@ def _filtered_ordered_set(
     ``Sets.condition_set``.  The input is an owned finite enumerated set
     with an immutable predicate on its points.  When every value is decided,
     the result is the owned finite ordered subset, with the original
-    universe, predicate and canonical inclusion retained.  A name given as a
-    function is a description of the subset, rendered when a reader asks for
-    the description and not when the subset is built.  ``None`` means
+    universe, predicate and canonical inclusion retained.  A description given
+    as a function is rendered when a reader asks for the subset's description
+    and not when the subset is built.  ``None`` means
     only that this optional enumeration computation is unavailable; it
     makes no claim about the subset or its cardinality.
 
@@ -688,6 +691,7 @@ def _filtered_ordered_set(
         index_of=index_of,
         contains=contains,
         name=name,
+        description=description,
     )
 
 

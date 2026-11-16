@@ -1357,7 +1357,7 @@ def _span_basis_elements(module, module_generating_set):
             lambda position: module.linear_combination(
                 dict(zip(support_points, reduced[int(position)], strict=True))
             ),
-            name=lambda module=module: f"Canonical span basis in {module}",
+            description=lambda module=module: f"Canonical span basis in {module}",
         )
 
     # Private finite backend serialization.  Only the finite support window is
@@ -1398,7 +1398,7 @@ def _span_basis_elements(module, module_generating_set):
     return FiniteOrderedSets().from_indexed(
         positions,
         basis_element,
-        name=lambda module=module: f"Canonical span basis in {module}",
+        description=lambda module=module: f"Canonical span basis in {module}",
     )
 
 
