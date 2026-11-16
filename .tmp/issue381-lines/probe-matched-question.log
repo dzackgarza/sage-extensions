@@ -1,0 +1,40 @@
+# tree: 125bc28df01d73edd65c0423e07edab56c6e1072
+# tree status: 
+# load: 0.78 1.57 1.52
+# program: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/wt381v/.tmp/issue381-lines/probe-381-matched-question.py
+[rss] t=    0.0s rss=    97.2 MiB
+        1.19 s  Otilde  rss   290.1 MiB
+        0.04 s  one plane and one of its lines  rss   292.9 MiB
+[rss] t=   10.0s rss=   473.9 MiB
+[rss] t=   20.0s rss=   478.4 MiB
+[rss] t=   30.1s rss=   526.6 MiB
+[rss] t=   40.1s rss=   526.6 MiB
+[rss] t=   50.1s rss=   584.4 MiB
+[rss] t=   60.2s rss=   611.1 MiB
+[rss] t=   70.2s rss=   646.8 MiB
+[rss] t=   80.2s rss=   676.3 MiB
+[rss] t=   90.2s rss=   694.1 MiB
+[rss] t=  100.3s rss=   701.6 MiB
+[rss] t=  112.5s rss=   872.9 MiB
+[rss] t=  122.5s rss=   879.1 MiB
+[rss] t=  132.6s rss=   885.6 MiB
+[rss] t=  142.6s rss=   891.7 MiB
+[rss] t=  152.6s rss=   897.4 MiB
+[rss] t=  163.3s rss=   916.5 MiB
+      161.90 s  the Otilde line row: 527 lines  rss   925.5 MiB
+    the row's cusp of the plane's line is position 215
+        1.09 s  the cusp of that divided class  rss   931.2 MiB
+[peakrss] probe-matched-question: child waited=124 shell_code=124 samples=260
+[peakrss] peak tree RSS      : 1998 MiB
+[peakrss] low-water MemAvail : 11203 MiB
+[peakrss] peak single VmHWM  : 1998 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     1987 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   518.2s procs=  3 rss=  1998 MiB hwm=  1998 MiB avail= 11214 MiB
+[peakrss]   t=   516.2s procs=  3 rss=  1990 MiB hwm=  1990 MiB avail= 11222 MiB
+[peakrss]   t=   514.2s procs=  3 rss=  1983 MiB hwm=  1983 MiB avail= 11222 MiB
+[peakrss]   t=   512.2s procs=  3 rss=  1977 MiB hwm=  1977 MiB avail= 11229 MiB
+[peakrss]   t=   510.2s procs=  3 rss=  1970 MiB hwm=  1970 MiB avail= 11237 MiB
+# launcher exit: 124

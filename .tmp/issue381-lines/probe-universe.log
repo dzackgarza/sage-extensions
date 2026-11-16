@@ -1,0 +1,32 @@
+# tree: 125bc28df01d73edd65c0423e07edab56c6e1072
+# tree status: 
+# load: 1.47 1.85 1.60
+# program: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/wt381v/.tmp/issue381-lines/probe-381-universe.py
+[rss] t=    0.0s rss=    97.2 MiB
+        1.22 s  Otilde  rss   290.5 MiB
+        0.03 s  a plane, two of its lines, and the cusp of the first  rss   292.9 MiB
+    cusp.universe()                                          0.071 ms per call
+    the cusp's own representative in its universe            0.349 ms per call
+    the plane's other line in that universe                  0.319 ms per call
+[rss] t=   10.0s rss=   488.3 MiB
+[rss] t=   20.0s rss=   534.9 MiB
+[rss] t=   30.0s rss=   564.8 MiB
+[rss] t=   40.1s rss=   578.3 MiB
+[rss] t=   50.1s rss=   585.2 MiB
+    the other line's transporter question at the cusp        7.934 ms per call
+       49.25 s  the parts  rss   585.9 MiB
+    peak rss   585.9 MiB, elapsed    51.2 s
+[peakrss] probe-universe: child waited=0 shell_code=0 samples=27
+[peakrss] peak tree RSS      : 597 MiB
+[peakrss] low-water MemAvail : 12271 MiB
+[peakrss] peak single VmHWM  : 597 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      586 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    52.0s procs=  3 rss=   597 MiB hwm=   597 MiB avail= 12271 MiB
+[peakrss]   t=    50.0s procs=  3 rss=   595 MiB hwm=   595 MiB avail= 12272 MiB
+[peakrss]   t=    48.0s procs=  3 rss=   594 MiB hwm=   594 MiB avail= 12273 MiB
+[peakrss]   t=    46.0s procs=  3 rss=   593 MiB hwm=   593 MiB avail= 12273 MiB
+[peakrss]   t=    44.0s procs=  3 rss=   591 MiB hwm=   591 MiB avail= 12286 MiB
+# launcher exit: 0
