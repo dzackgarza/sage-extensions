@@ -3464,3 +3464,7 @@ and neither is cited.  The files they ran are consumer files of the lattice
 row, whose runs belong to CI; the second log's own durations put its single
 `T_Co` test at 1134.98 s, so no admissible command reaches that file at all.
 Nothing in this issue's claims rests on either row.
+
+**The round-4 section's base.**  Its seven commits were written on `main` at
+`67c192c`; the branch was rebased twice more before the push, and the closing
+table of that section names the rebase the push lands on, `0130d81`.
