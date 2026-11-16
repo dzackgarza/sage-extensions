@@ -70,6 +70,28 @@ def test_two_algebraic_presentations_of_one_irrational_real_are_one_point() -> N
     assert FiniteOrderedSets()((root, RR(2))).cardinality() == 2
 
 
+def test_the_image_of_a_ring_element_hashes_as_that_ring_element() -> None:
+    r"""``image(1)`` is the ring's own ``1``, so the two are one point.
+
+    The completion map is a ring map, so ``image(1)`` and ``plane.one()`` are
+    one element of the completion, and the completion retains the exact source
+    expression of every image.  A finite ordered set of the image and the ring
+    element therefore holds one point, and the same holds for ``x`` and for
+    ``x + 1``.
+    """
+    plane = QQ.polynomial_ring(("x", "y"))
+    x = plane.algebra_generator("x")
+    completion = plane.adic_completion(plane.ideal(x), precision=3)
+    image = completion.completion_map()
+
+    assert image(1) == plane.one()
+    assert hash(image(1)) == hash(plane.one())
+    assert FiniteOrderedSets()((image(1), plane.one())).cardinality() == 1
+    assert hash(image(x)) == hash(x)
+    assert FiniteOrderedSets()((image(x), x)).cardinality() == 1
+    assert hash(image(x + 1)) == hash(plane(x + 1))
+
+
 def test_two_presentations_of_one_completion_element_are_one_point() -> None:
     r"""The completion of ``QQ[x, y]`` at ``(x)``: ``x + 1`` is the image of ``1`` plus ``x``.
 
