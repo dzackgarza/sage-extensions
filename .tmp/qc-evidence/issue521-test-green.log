@@ -1,0 +1,12 @@
+=== tree: bc56fad67fc546c936de41517017c4c3826fefe7 (modified: 2 paths)
+=== files: tests/foundations/test_the_session_binds_its_own_names.sage
+=== start: 05:45:11
+...                                                                      [100%]
+============================= slowest 5 durations ==============================
+0.07s call     tests/foundations/test_the_session_binds_its_own_names.sage::test_the_dialect_names_are_the_owned_constructors
+0.05s call     tests/foundations/test_the_session_binds_its_own_names.sage::test_the_scalar_ring_names_denote_the_rings_they_name
+0.01s setup    tests/foundations/test_the_session_binds_its_own_names.sage::test_every_session_name_is_bound_by_a_statement_of_the_module
+
+(2 durations < 0.005s hidden.  Use -vv to show these durations.)
+3 passed in 2.11s
+=== exit: 0 at 05:45:22

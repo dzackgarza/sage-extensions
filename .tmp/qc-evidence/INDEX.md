@@ -2620,3 +2620,30 @@ suite rows are compared by their FAILED id sets, not by their seconds.
 | `541rev-finding-2-red.log` | `ae8becb` | the second contract file on the finding-1 tree: **2 failed in 1.71 s**, each at `TypeError: base_ring (=Real Field) must be a ring or a semiring` | 
 | `541rev-finding-2-green.log` | the repair's commit | the two contract files and the laziness file: **7 passed in 5.44 s** | 
 | `541rev-finding-2-probe.log` | the repair's commit | `_coordinate_images` on a projection of `RR^2` reads `((1, 0), (0, 0))` and `_relation_images(RR^2)` reads `()` -- the two answers the review's probe found at `240ce65` and lost at `2bc5aff` | 
+
+## #521, the session binds its own names, and the dialect reads them
+
+`sage_extensions.all` published six scalar rings and installed the research dialect
+by handing its own `globals()` to two functions. The rings now belong to
+`sage_extensions.rings`, which binds them in its body and declares them in
+`__all__`, and the dialect registers at import and resolves the session's
+vocabulary from the session module by `import *`'s own definition. The base is
+the merge base `2f8c801`, a clean worktree; the repair is the source commit
+`bc56fad`.
+
+The pytest shape differs from this file's header in one way: the run keeps the
+repository's two plugins and the durations,
+`-o addopts= -p qc_sage_session -p sage_extensions.testing.suite_budget -p
+sage_extensions.testing.test_lint -q --no-header --durations=5`, because the change
+is a namespace the test lint also reads.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `issue521-test-red.log` | `dbf2911` | the new test file alone, run in the base worktree (HEAD `2f8c801` with the two new test files in it, which is `dbf2911`'s content): **1 failed, 2 passed in 1.59 s** -- `AssertionError: assert ('AA', 'CDF', 'QQbar', 'RDF') == ()` |
+| `issue521-test-green.log` | `bc56fad` (the two modified paths are this section's own files) | the same file: **3 passed in 2.11 s** |
+| `issue521-test-base.log` | `2f8c801` | `tests/foundations`, `tests/rings`, `test_group_algebras.sage`, `test_coextension_of_scalars.sage`, `test_products_equalizers_and_fibre_products_of_lines.sage`: **54 failed, 161 errors, 153 passed in 245.45 s** |
+| `issue521-test-repair.log` | `bc56fad` | the same selection: **54 failed, 161 errors, 156 passed in 372.51 s**; the 215 FAILED/ERROR ids are the same set test for test, and the three extra passes are the new file.  Same host, different wall times: the runs of this host vary by a third |
+| `issue521-names-base.txt`, `issue521-names-repair.txt` | `2f8c801`, `bc56fad` | the session's public namespace, one name per line: **678 names against 677**, the difference being `ring_constructor_surface`, which the installer's dictionary had leaked into the session |
+| `issue521-session.py`, `issue521-session-base.log`, `issue521-session-repair.log` | both | the sixteen scalar names against the ring package's exports (`identical=True` and `declared=True` for each here; six of them not on the package at all there) and the lowering of `M = Modules[ZZ]`, `R = ZZ[x]`, `T = Modules[k]`, which is the same text in both trees |
+| `issue521-load.py`, `issue521-load-base.log`, `issue521-load-repair.log` | both | the scope a `load` writes into, holding the session's names and polluted with `ZZ` and `Integers`: the session's `ZZ` back, `AA`/`RDF`/`GF` present, the engine spellings gone, and `41 + 1` an owned 42 -- the same lines in both trees |
+| `issue521-cpu.py`, `issue521-cpu-base-1.log`, `issue521-cpu-base-2.log`, `issue521-cpu-repair-1.log`, `issue521-cpu-repair-2.log` | both | CPU seconds to lower 200 assignments, five repetitions each: **0.0942 / 0.0832 s at the base against 0.0884 / 0.0817 s here**, so the per-assignment tree walk both trees run is the same work |

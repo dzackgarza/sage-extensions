@@ -1,0 +1,32 @@
+=== tree: 9dc74cbce989b0fe49cd5e4b2b7b81d32203b895 (modified: 2 paths)
+=== files: tests/foundations/test_the_session_binds_its_own_names.sage
+=== start: 05:02:04
+F..                                                                      [100%]
+=================================== FAILURES ===================================
+________ test_every_session_name_is_bound_by_a_statement_of_the_module _________
+
+    def test_every_session_name_is_bound_by_a_statement_of_the_module() -> None:
+        r"""No public name of the session arrives from outside the module's own text.
+    
+        The residue is empty when every name the session publishes is the module's:
+        an area's declaration reached the session through the star import that binds
+        that area's ``__all__``, and everything else is a statement written in
+        ``all.py``.
+        """
+>       assert names_the_session_does_not_bind() == ()
+E       AssertionError: assert ('AA', 'CDF', 'QQbar', 'RDF') == ()
+E         
+E         Left contains 4 more items, first extra item: 'AA'
+E         Use -v to get more diff
+
+tests/foundations/test_the_session_binds_its_own_names.sage:36: AssertionError
+============================= slowest 5 durations ==============================
+0.06s call     tests/foundations/test_the_session_binds_its_own_names.sage::test_the_dialect_names_are_the_owned_constructors
+0.04s call     tests/foundations/test_the_session_binds_its_own_names.sage::test_the_scalar_ring_names_denote_the_rings_they_name
+0.01s call     tests/foundations/test_the_session_binds_its_own_names.sage::test_every_session_name_is_bound_by_a_statement_of_the_module
+
+(2 durations < 0.005s hidden.  Use -vv to show these durations.)
+=========================== short test summary info ============================
+FAILED tests/foundations/test_the_session_binds_its_own_names.sage::test_every_session_name_is_bound_by_a_statement_of_the_module
+1 failed, 2 passed in 1.59s
+=== exit: 1 at 05:02:15

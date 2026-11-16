@@ -1,0 +1,10 @@
+tree SHA: bc56fad67fc546c936de41517017c4c3826fefe7 (modified paths: 2)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+loaded value: 42 of parent <bound method Element.parent of 42>
+ZZ is the session's: True
+AA is the session's: True
+RDF is the session's: True
+GF is the session's: True
+load itself is bound: True
+removed spellings still gone: ['FiniteField', 'IntegerModRing', 'Integers']
+launcher exit: 0
