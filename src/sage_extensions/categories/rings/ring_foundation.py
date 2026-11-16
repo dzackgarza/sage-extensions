@@ -1,6 +1,7 @@
 """Owned scalar hierarchy and the boundary to Sage computation rings."""
 
 import operator
+from weakref import WeakValueDictionary
 
 from abc import ABCMeta
 from collections.abc import Mapping
@@ -1743,7 +1744,15 @@ class LocalizationRings(OwnedCategory):
 
             from sage_extensions.categories.modules.pure.modules import Modules
 
+            if type(value) is int:
+                # The image of ``a`` under ``R -> S^{-1}R`` is ``a/1``, and ``1`` lies in every
+                # multiplicative set.
+                return self._fraction_with_admitted_denominator(value, 1)
             source = _parent_of_an_element(value)
+            if source is self:
+                return value
+            if source is self.localization_source():
+                return self._fraction_with_admitted_denominator(value, 1)
             if source is not None and source is not self and source in Modules(self.base_ring()) and source.unformed_module() is self:
                 return source._element_of_unformed_module(value)
             if source is self:
@@ -5801,6 +5810,12 @@ def _operand_in_ring(ring, value):
     its elements, which is what makes literal arithmetic — ``a + 3``, ``3 + a``
     — the arithmetic of ``ring`` rather than a Python refusal.
     """
+    if element_parent(value) is ring:
+        return value
+    if type(value) is int:
+        # Every unital ring receives the integers, and its own constructor
+        # reads an integer literal: the canonical map ``ZZ -> ring``.
+        return ring(value)
     value = _sage_numeral(value)
     other_parent = element_parent(value)
     if isinstance(other_parent, type):
@@ -5920,7 +5935,9 @@ class _OwnedRingElement(RingElement):
         from sage_extensions.categories.modules.pure.modules import Modules
 
         other_parent = element_parent(other)
-        if other_parent is not self.parent() and other_parent in Modules(self.parent()):
+        if other_parent is self.parent():
+            return _OwnedRingElement._mul_(self, other)
+        if isinstance(other_parent, Parent) and other_parent in Modules(self.parent()):
             return other_parent.scalar_multiple(self, other)
         other = self._operator_operand(other)
         if other is NotImplemented:
@@ -6761,6 +6778,10 @@ class _OwnedRingParent(Parent):
             sage: ZZ(finite_ordered_set((4, 3)).cardinality()) == ZZ(2)
             True
         """
+        if type(value) is int:
+            return self._from_engine_element(self._engine(value))
+        if element_parent(value) is self:
+            return value
         from sage_extensions.categories.sets.cardinals import Cardinalities
 
         # A cardinal is an owned parent, not an element with a scalar parent.
@@ -7926,6 +7947,9 @@ def _owned_engine_ring(engine: Ring) -> Ring:
             )
 
 
+_OWNED_RINGS = WeakValueDictionary()
+
+
 def _own_ring(ring):
     r"""Private backend adapter: build the preamble ring represented by ``ring``.
 
@@ -7935,7 +7959,12 @@ def _own_ring(ring):
     construction.  Thus ``ZZ.base_ring() is ZZ`` and every morphism
     ``R[G] -> R`` finds one common base ring.
     """
-    if isinstance(ring, _OwnedRingParent) or ring in OwnedRings():
+    if isinstance(ring, _OwnedRingParent) or _OWNED_RINGS.get(id(ring)) is ring:
+        return ring
+    if ring in OwnedRings():
+        # Placement is fixed at construction (CON-07), so one answer per ring
+        # holds for its lifetime.
+        _OWNED_RINGS[id(ring)] = ring
         return ring
     if ring not in SageRings():
         raise TypeError(f"{ring} is not a ring")

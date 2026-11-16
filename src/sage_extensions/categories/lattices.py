@@ -5913,6 +5913,11 @@ class Lattices(OwnedCategoryOverBaseRing):
             return self._preamble_gram_tensor
 
         @cached_method
+        def _finite_module_rank(self) -> bool:
+            r"""Whether the selected framing is finite, a datum fixed at construction."""
+            return bool(self.module_rank().is_finite())
+
+        @cached_method
         def _engine_gram(self):
             r"""The retained finite Gram as one engine matrix, with its ring and framing labels."""
             gram = self.gram_tensor()
@@ -5927,9 +5932,20 @@ class Lattices(OwnedCategoryOverBaseRing):
             ring, labels, gram = self._engine_gram()
             ambient = self._engine_coordinate_space()
 
+            engine = ambient.base_ring()
+            zero = engine.zero()
+
             def row(element):
-                coordinates = element.to_vector()
-                return ambient([_engine_ring_value(ring, coordinates(label)) for label in labels])
+                # The stored coefficients are the finitely supported function on the framing labels.
+                coefficients = element.to_vector()._coefficient_data()
+                return ambient(
+                    [
+                        zero
+                        if (value := coefficients.get(label)) is None
+                        else engine(_engine_element(element_parent(value), value))
+                        for label in labels
+                    ]
+                )
 
             left_row = row(left)
             right_row = left_row if right is left else row(right)
@@ -5947,21 +5963,23 @@ class Lattices(OwnedCategoryOverBaseRing):
 
         def b(self, left, right):
             r"""Evaluate the finite lattice pairing from its retained Gram."""
-            if left not in self or right not in self:
+            if (element_parent(left) is not self and left not in self) or (
+                element_parent(right) is not self and right not in self
+            ):
                 raise TypeError(
                     f"the pairing on {self} takes two of its vectors, but {left} or {right} is not in {self}"
                 )
-            if not self.module_rank().is_finite():
+            if not self._finite_module_rank():
                 return super().b(left, right)
             return self._evaluate_gram(left, right)
 
         def norm(self, element):
             r"""Return the finite Gram contraction ``b(element, element)``."""
-            if element not in self:
+            if element_parent(element) is not self and element not in self:
                 raise TypeError(
                     f"the norm on {self} is defined on its vectors, but {element} is not in {self}"
                 )
-            if not self.module_rank().is_finite():
+            if not self._finite_module_rank():
                 return super().norm(element)
             return self._evaluate_gram(element, element)
 

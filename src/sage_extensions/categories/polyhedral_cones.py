@@ -23,6 +23,7 @@ from sage_extensions.categories.abstract_categories.objects import OwnedParamete
 from sage_extensions.categories.rings.ring_foundation import (
     _engine_element,
     _own_ring,
+    _owned_engine_element,
     _owned_integers,
     _owned_rationals,
 )
@@ -97,19 +98,23 @@ def _ambient_vector(lattice, ambient, vector):
 
 
 def _evaluate_covector(lattice, ambient, covector, vector):
-    dual = lattice.dual_module()
-    covector = dual(covector)
-    vector = _ambient_vector(lattice, ambient, vector)
-    rationals = ambient.base_ring()
-    covector_coordinates = covector.to_vector()
+    r"""``covector(vector)`` in ``QQ``: one engine sum over the covector's support, raised once.
+
+    A lattice vector is read on its own integral coordinates; reading it in
+    ``lattice tensor QQ`` first only rewrites the same labels' coefficients.
+    """
+    covector_coordinates = lattice.dual_module()(covector).to_vector()
+    if element_parent(vector) is not lattice:
+        vector = _ambient_vector(lattice, ambient, vector)
     vector_coordinates = vector.to_vector()
-    return sum(
-        (
-            rationals(covector_coordinates(label)) * vector_coordinates(label)
-            for label in covector_coordinates.support().domain()
-        ),
-        rationals.zero(),
-    )
+    value = SageQQ.zero()
+    for label in covector_coordinates.support().domain():
+        left = covector_coordinates(label)
+        right = vector_coordinates(label)
+        value += SageQQ(_engine_element(element_parent(left), left)) * SageQQ(
+            _engine_element(element_parent(right), right)
+        )
+    return _owned_engine_element(ambient.base_ring(), value)
 
 
 def _cone_contains(lattice, ambient, halfspaces, equations, vector) -> bool:

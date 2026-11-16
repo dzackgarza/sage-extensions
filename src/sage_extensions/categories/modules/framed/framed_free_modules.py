@@ -432,6 +432,16 @@ class _SparseFreeModuleParent:
             return self.zero()
         return self._basis_element(labels.an_element())
 
+    def scalar_multiple(self, scalar, element):
+        r"""``r*m``: the base ring acts on the coefficients, as in ``_lmul_``.
+
+        A scalar that is not yet an element of the base ring is read through
+        the module's scalar action.
+        """
+        if type(scalar) is int or element_parent(scalar) is self.base_ring():
+            return self._raw_scalar_multiple(scalar, element)
+        return super().scalar_multiple(scalar, element)
+
     def _raw_scalar_multiple(self, scalar, element):
         ring = self.base_ring()
         scalar = ring(scalar)
