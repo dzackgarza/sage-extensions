@@ -44,8 +44,8 @@ def test_the_centre_has_one_basis_element_per_conjugacy_class() -> None:
     assert center.dimension() == group.conjugacy_classes().cardinality()
 
 
-def test_the_class_sums_of_the_conjugacy_classes_are_an_inclusion_of_the_classes() -> None:
-    r"""The class sums \(\sum_{h\in C} h\) are the centre's basis, and are central.
+def test_the_class_sums_of_the_conjugacy_classes_are_a_basis_of_the_centre() -> None:
+    r"""The class sums \(\sum_{h\in C} h\) are the centre's basis.
 
     Each class sum is the inclusion of a basis element of the centre and
     distinct classes have distinct class sums, so the three of them span a
