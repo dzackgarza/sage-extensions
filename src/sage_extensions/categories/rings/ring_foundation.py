@@ -6494,27 +6494,20 @@ class _OwnedRingParent(Parent):
                         ),
                         lambda element: _engine_element(self, element).list(),
                     )
-                elif _engine_ring(base) is engine:
-                    # The base presents the same ring on the same engine, so it
-                    # is this ring: free of rank one on the unit, and its
-                    # coordinate is the element itself.
-                    self._native_module_basis = _power_module_basis(
-                        base,
-                        1,
-                        lambda _exponent: _owned_engine_element(self, engine.one()),
-                        lambda element: (_engine_element(self, element),),
-                    )
                 else:
                     # The defining polynomial's powers are a basis over its
                     # coefficient field and over nothing else, so no basis is
-                    # known over this base; a parent that installed none would
-                    # read as free with no resolution at all, which is the
-                    # defect this block exists to avoid.
+                    # known over this base: a construction that presents the
+                    # ring over another base states the basis it presents (the
+                    # adic completion at an ideal whose power is zero states
+                    # the rank-one one), and a presentation that states none is
+                    # refused here rather than read as free with no resolution
+                    # at all.
                     raise TypeError(
                         f"cannot install a module basis of {engine} over {base}: the powers of "
                         f"the defining polynomial are a basis over its coefficient field "
-                        f"{coefficient_field}, and {base} is neither that field nor this ring "
-                        "presented on the same engine"
+                        f"{coefficient_field} and over nothing else, and this presentation "
+                        "states no basis over this base"
                     )
             if isinstance(engine, SageNumberFieldOrder) and self is not _owned_integers():
                 # The integral basis is constructor data, but registering a

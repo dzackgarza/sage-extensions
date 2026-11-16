@@ -4092,6 +4092,26 @@ class _AdicCompletionAlgebraParent(_OwnedAlgebraParent):
                 completion_image(selected), source_expression=selected
             )
 
+        if algebra_base is None and self._adic_defining_power_vanishes:
+            # A power of the defining ideal is zero, so the completion is the
+            # source and, read over that source, it is free of rank one on the
+            # unit: the frame is the completion map, which is an isomorphism,
+            # and its inverse is that map's inverse.  The basis is stated here,
+            # by the construction that retains the datum; the ring owner reads
+            # no engine and infers no basis from a shared presentation.
+            from sage_extensions.categories.modules.native_modules import (
+                _power_module_basis,
+            )
+
+            self._native_module_basis = _power_module_basis(
+                source,
+                1,
+                lambda _exponent: self.one(),
+                lambda element: (
+                    _engine_element(source, self.completion_map().inverse()(element)),
+                ),
+            )
+
         _OwnedAlgebraParent.__init__(
             self,
             engine,
