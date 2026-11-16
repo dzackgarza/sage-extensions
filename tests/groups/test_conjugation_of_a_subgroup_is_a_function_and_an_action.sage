@@ -77,3 +77,48 @@ def test_conjugating_along_a_product_is_conjugating_by_the_product() -> None:
     assert group((1, 3)) in left
     assert group((2, 3)) not in left
     assert left is right
+
+
+def test_a_normalizing_element_composes_in_the_action() -> None:
+    r"""$g.(h.H) = (gh).H$ when $h$ lies in $H$.
+
+    $H = \langle(1\,2)\rangle$ is carried to itself by its own element
+    $(1\,2)$, so $h.H$ is the point $H$; the law still names the pair, and
+    $g = (1\,3)$ must carry $h.H$ to the subgroup $gh = (1\,2\,3)$ names.  An
+    answer that reads $h.H$ as $H$ itself reads $g.(h.H)$ off the pair $(H, g)$
+    while $(gh).H$ is the pair $(H, gh)$: two subgroups with the same two
+    elements, carrying $(2\,3)$.
+    """
+    group = Groups.S(3)
+    transposition = group((1, 2))
+    subgroup = group.subgroup((transposition,))
+    flagging = group((1, 3))
+
+    left = group.conjugate_subgroup(
+        flagging, group.conjugate_subgroup(transposition, subgroup)
+    )
+    right = group.conjugate_subgroup(flagging * transposition, subgroup)
+
+    assert left is right
+    assert group((2, 3)) in left
+    assert transposition not in left
+
+
+def test_a_conjugate_by_an_element_it_contains_retains_the_pair() -> None:
+    r"""$h.H$ states the pair $(H, h)$ its image is read from.
+
+    The conjugate of a subgroup by an element of it is that subgroup as a
+    point, and the subgroup it answers is the image of the pair: $h$ carries
+    $H$ to itself, so the answer contains $(1\,2)$ and has order two, and it
+    retains the subgroup and the element a later conjugation composes with.
+    """
+    group = Groups.S(3)
+    transposition = group((1, 2))
+    subgroup = group.subgroup((transposition,))
+
+    conjugate = group.conjugate_subgroup(transposition, subgroup)
+
+    assert conjugate.conjugated_subgroup() is subgroup
+    assert conjugate.conjugator() == transposition
+    assert conjugate.order() == 2
+    assert transposition in conjugate
