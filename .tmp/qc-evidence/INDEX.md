@@ -2718,3 +2718,4 @@ each log, and every one was made in the adopted runtime with the worktree at
 | `541r5-probe-base-placement.log` | `08322de` | a fresh `coker(5)` formed without a claim is in `FormModules(ZZ).FinitelyPresented().Torsion()`, and its construction costs 4 units of work, as does the claimed one |
 | `541r5-probe-presented-construction.log` | the round's fix commits | cokernels over `ZZ` and `QQ`, a lattice plane quotient, a claimed torsion module with its elements, and `direct_sum_of_cyclics((2,3))` after the dead constructor parameters were deleted |
 | `541r5-probe-matrix-space-containment.log` | the round's fix commits | a lattice inclusion's homset is **not** in `MatrixSpaces(ZZ)` while it does retain a coordinate matrix, so `MatrixSpaces` containment is not the discriminator finding F asks for |
+| `541r5-rebased.log` | `149141a`, the tree this round pushed, after the rebase onto `bbb0dd6` | the same five files: **15 passed in 93.95 s** |
