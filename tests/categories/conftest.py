@@ -55,6 +55,16 @@ else:
     slice_mor = AugmentedAlgebras(ZZ).Mor(gamma, gamma)
     module_mor = Modules(ZZ).Mor(gamma, gamma)
 
+# ``End_C(X)`` is ``Mor_C(X, X)`` itself, and asking for it attaches the
+# diagonal role to that interned Mor.  The role is one of the key's components,
+# so a session that asked for the endomorphisms first generates the type under a
+# different key than one that did not; both must state the same arrows.
+if os.environ["ARROW_TYPE_END_ROLE"] == "1":
+    ends = differential_graded.category_packet().Ends()
+    ends.Of(de_rham)
+    ends.Of(divided)
+    assert de_rham_mor.end_family() is ends and divided_mor.end_family() is ends
+
 arrow_types = {}
 algebra_morphism_arrows = {}
 for name, mor in (
@@ -100,20 +110,13 @@ class ArrowTypeRun:
 _RUNS = {}
 
 
-def arrow_type_order_run(*, de_rham_first: bool) -> ArrowTypeRun:
-    r"""Run the arrow-type session script in a fresh Sage process, in the stated order.
+def _session_run(environment: dict) -> ArrowTypeRun:
+    r"""Run the session script once under ``environment`` and read its report.
 
-    Each order is run once and remembered, so the rows that read one order
-    share a session rather than rebuilding it per assertion.  The runner sets
-    no deadline of its own: how long a session may take is the suite's time
-    gate to state, and a second clock here would turn a loaded machine into a
-    failure of the mathematics.
+    The runner sets no deadline of its own: how long a session may take is the
+    suite's time gate to state, and a second clock here would turn a loaded
+    machine into a failure of the mathematics.
     """
-    remembered = _RUNS.get(de_rham_first)
-    if remembered is not None:
-        return remembered
-    environment = dict(os.environ)
-    environment["ARROW_TYPE_DE_RHAM_FIRST"] = "1" if de_rham_first else "0"
     completed = subprocess.run(
         (sys.executable, "-c", _SCRIPT),
         capture_output=True,
@@ -130,14 +133,53 @@ def arrow_type_order_run(*, de_rham_first: bool) -> ArrowTypeRun:
             for name, classes in report["arrow_types"].items()
         }
         algebra_morphism_arrows = dict(report["algebra_morphism_arrows"])
-    run = ArrowTypeRun(
+    return ArrowTypeRun(
         returncode=completed.returncode,
         stderr=completed.stderr,
         arrow_types=arrow_types,
         algebra_morphism_arrows=algebra_morphism_arrows,
     )
+
+
+def arrow_type_order_run(*, de_rham_first: bool) -> ArrowTypeRun:
+    r"""Run the arrow-type session script in a fresh Sage process, in the stated order.
+
+    Each order is run once and remembered, so the rows that read one order
+    share a session rather than rebuilding it per assertion.
+    """
+    remembered = _RUNS.get(de_rham_first)
+    if remembered is not None:
+        return remembered
+    environment = dict(os.environ)
+    environment["ARROW_TYPE_DE_RHAM_FIRST"] = "1" if de_rham_first else "0"
+    environment["ARROW_TYPE_END_ROLE"] = "0"
+    run = _session_run(environment)
     _RUNS[de_rham_first] = run
     return run
 
 
+_ROLE_RUNS = {}
+
+
+def arrow_type_role_run(*, role_attached: bool) -> ArrowTypeRun:
+    r"""Run the same two Mors with their diagonal role attached first, or not at all.
+
+    ``End_C(X)`` is the interned ``Mor_C(X, X)`` with the diagonal role
+    attached, so the two arms differ only in whether that role was there when
+    each Mor first asked for its arrow type.  Each arm is run once and
+    remembered, as for the order runs, and in a fresh process: the family's
+    arrow types live for the whole session.
+    """
+    remembered = _ROLE_RUNS.get(role_attached)
+    if remembered is not None:
+        return remembered
+    environment = dict(os.environ)
+    environment["ARROW_TYPE_DE_RHAM_FIRST"] = "1"
+    environment["ARROW_TYPE_END_ROLE"] = "1" if role_attached else "0"
+    run = _session_run(environment)
+    _ROLE_RUNS[role_attached] = run
+    return run
+
+
 builtins.arrow_type_order_run = arrow_type_order_run
+builtins.arrow_type_role_run = arrow_type_role_run

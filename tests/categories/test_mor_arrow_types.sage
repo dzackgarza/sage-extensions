@@ -78,3 +78,44 @@ def test_the_module_mor_and_the_slice_mor_of_one_algebra_keep_one_arrow_type() -
     assert divided_power_first.returncode == 0, divided_power_first.stderr
     assert de_rham_first.arrow_types["module"] == divided_power_first.arrow_types["module"]
     assert de_rham_first.arrow_types["slice"] == divided_power_first.arrow_types["slice"]
+
+
+def test_the_diagonal_role_of_a_mor_is_not_one_of_its_arrow_providers() -> None:
+    r"""``End_C(X)`` carries the arrows of ``Mor_C(X, X)``'s declared graph, role or not.
+
+    Asking for ``End_C(X)`` attaches the diagonal role to the interned
+    ``Mor_C(X, X)`` and adds that role's diagonal supercategories to the Mor's
+    declared graph, so a session that asked for the endomorphisms first
+    generates each algebra's arrow type under a key holding the role.  The role
+    supplies no arrow operation of its own: the two sessions state the same
+    providers for both algebras.
+    """
+    without_role = arrow_type_role_run(role_attached=False)
+    with_role = arrow_type_role_run(role_attached=True)
+
+    assert without_role.returncode == 0, without_role.stderr
+    assert with_role.returncode == 0, with_role.stderr
+    assert with_role.arrow_types["de_rham"] == without_role.arrow_types["de_rham"]
+    assert with_role.arrow_types["divided_power"] == without_role.arrow_types["divided_power"]
+
+
+def test_the_diagonal_family_selects_one_mor_class_from_both_endpoints() -> None:
+    r"""``End_C`` selects the same Mor class at the two algebras whose Mors differ.
+
+    The two differential graded algebras above are objects of one category
+    whose Mors there are different classes -- ``AlgebraMor`` for the framed de
+    Rham algebra, the multiplicative class for ``Gamma(Z[x])`` -- and the
+    diagonal family still answers with one class for both endpoints.  A
+    diagonal entry in an arrow-type key would therefore be that same entry at
+    every endpoint, which is why the role itself, and not the class its family
+    selects, is the input to the key.
+    """
+    differential_graded = DifferentialGradedAlgebras(ZZ)
+    de_rham = DeRhamAlgebras(ZZ).an_object()
+    gamma = DividedPowerAlgebras(ZZ)(ZZ.free_module(("x",)))
+    divided = differential_graded(gamma, lambda element: gamma.zero())
+    ends = differential_graded.category_packet().Ends()
+
+    assert ends.fixed_category_class_for(
+        de_rham, de_rham
+    ) is ends.fixed_category_class_for(divided, divided)
