@@ -658,15 +658,16 @@ class IsotropicReductionLiftTorsors(OwnedCategoryOverBaseRing):
             tested = tuple(
                 coordinates_at(indices) for indices in parameters(coset_steps)
             )
-            passing_coordinates = []
-            passing_lifts = []
-            for coordinates in tested:
-                lift = self._lift_at(coordinates)
-                if lift.integral_restriction(source, target) is None:
-                    continue
-                passing_coordinates.append(coordinates)
-                passing_lifts.append(lift)
-            passing_coordinates = tuple(passing_coordinates)
+            lifts = tuple(
+                (coordinates, self._lift_at(coordinates)) for coordinates in tested
+            )
+            admitting = tuple(
+                (coordinates, lift)
+                for coordinates, lift in lifts
+                if lift.integral_restriction(source, target) is not None
+            )
+            passing_coordinates = tuple(coordinates for coordinates, _lift in admitting)
+            passing_lifts = tuple(lift for _coordinates, lift in admitting)
             passing = tuple(class_of(coordinates) for coordinates in passing_coordinates)
             kernel = tuple(
                 class_of(coordinates_at(tuple(
