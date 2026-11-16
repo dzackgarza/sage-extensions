@@ -6,6 +6,7 @@ from sage.geometry.cone import Cone as SageCone
 from sage.geometry.polyhedron.constructor import Polyhedron
 from sage.matrix.constructor import matrix
 from sage.misc.cachefunc import cached_method
+from sage.misc.lazy_attribute import lazy_attribute
 from sage.modules.free_module import FreeModule
 from sage.rings.integer_ring import ZZ as SageZZ
 from sage.rings.rational_field import QQ as SageQQ
@@ -59,7 +60,11 @@ def _integral_covector(lattice, coordinates):
     rescaling of ``a``, so a rational covector is stated by the primitive
     integral covector on its ray.
     """
-    coefficients = _primitive_integral_coordinates(tuple(coordinates))
+    return _integral_covector_on(lattice, _primitive_integral_coordinates(tuple(coordinates)))
+
+
+def _integral_covector_on(lattice, coefficients):
+    r"""The covector of ``lattice`` with the integral ``coefficients`` in its dual framing."""
     ring = lattice.base_ring()
     return lattice.dual_module()({
         label: ring(int(coefficient))
@@ -132,13 +137,26 @@ def _cone_from_engine_polyhedron(lattice, polyhedron, wall_roots=None):
         f"{polyhedron} is not a cone in {lattice}: a cone is cut out by homogeneous "
         f"equations, but some equation has a nonzero constant term"
     )
+    inequalities = tuple(
+        _primitive_integral_coordinates(tuple(inequality.A())) for inequality in polyhedron.inequalities()
+    )
+    equations = tuple(
+        _primitive_integral_coordinates(tuple(equation.A())) for equation in polyhedron.equations()
+    )
+    # The cone's engine polyhedron is the one its primitive integral rows
+    # state, as the cone would build it from its covectors: the rows are
+    # lowered here once instead of through the owned covectors.
     return _rational_polyhedral_cone(
         lattice,
-        tuple(_integral_covector(lattice, inequality.A()) for inequality in polyhedron.inequalities()),
-        equation_covectors=tuple(
-            _integral_covector(lattice, equation.A()) for equation in polyhedron.equations()
-        ),
+        tuple(_integral_covector_on(lattice, row) for row in inequalities),
+        equation_covectors=tuple(_integral_covector_on(lattice, row) for row in equations),
         wall_roots=wall_roots,
+        engine_polyhedron=Polyhedron(
+            ambient_dim=polyhedron.ambient_dim(),
+            ieqs=[[SageQQ.zero()] + [SageQQ(entry) for entry in row] for row in inequalities],
+            eqns=[[SageQQ.zero()] + [SageQQ(entry) for entry in row] for row in equations],
+            base_ring=SageQQ,
+        ),
     )
 
 
@@ -290,19 +308,40 @@ class RationalPolyhedralCones(OwnedParameterizedCategory):
             equation_covectors=(),
             wall_roots=None,
             complete=None,
+            engine_polyhedron=None,
             **rest,
         ):
+            r"""Store the defining covectors; every derived datum is built on first request (``OWN-22``).
+
+            ``engine_polyhedron`` is Sage's exact polyhedron of this H-representation
+            when the construction already computed it (:func:`_cone_from_engine_polyhedron`).
+            """
             self._lattice = lattice
-            dual = lattice.dual_module()
-            self._halfspace_covectors = finite_ordered_set(
-                tuple(dual(covector) for covector in halfspace_covectors)
-            )
-            self._equation_covectors = finite_ordered_set(
-                tuple(dual(covector) for covector in equation_covectors)
-            )
-            self._wall_roots = None if wall_roots is None else finite_ordered_set(tuple(wall_roots))
+            self._halfspace_data = halfspace_covectors
+            self._equation_data = equation_covectors
+            self._wall_root_data = wall_roots
             self._complete = complete
-            labels = tuple(dual.module_generating_set())
+            if engine_polyhedron is not None:
+                self.__dict__["_engine"] = engine_polyhedron
+            super().__init__(**rest)
+
+        @lazy_attribute
+        def _halfspace_covectors(self):
+            dual = self._lattice.dual_module()
+            return finite_ordered_set(tuple(dual(covector) for covector in self._halfspace_data))
+
+        @lazy_attribute
+        def _equation_covectors(self):
+            dual = self._lattice.dual_module()
+            return finite_ordered_set(tuple(dual(covector) for covector in self._equation_data))
+
+        @lazy_attribute
+        def _wall_roots(self):
+            return None if self._wall_root_data is None else finite_ordered_set(tuple(self._wall_root_data))
+
+        @lazy_attribute
+        def _engine(self):
+            labels = tuple(self._lattice.dual_module().module_generating_set())
 
             def engine_row(covector):
                 coordinates = covector.to_vector()
@@ -310,16 +349,16 @@ class RationalPolyhedralCones(OwnedParameterizedCategory):
                     SageQQ(int(coordinates(label))) for label in labels
                 ]
 
-            rows = [engine_row(covector) for covector in self._halfspace_covectors]
-            equations = [engine_row(covector) for covector in self._equation_covectors]
             # The cone lies in ``L tensor QQ``, of dimension the number of
             # coordinates each row states, and the engine otherwise reads that
             # dimension off the rows (TRAPS.md, "Sage's ``Polyhedron`` reads its
             # ambient dimension off the H-representation rows").
-            self._engine = Polyhedron(
-                ambient_dim=len(labels), ieqs=rows, eqns=equations, base_ring=SageQQ
+            return Polyhedron(
+                ambient_dim=len(labels),
+                ieqs=[engine_row(covector) for covector in self._halfspace_covectors],
+                eqns=[engine_row(covector) for covector in self._equation_covectors],
+                base_ring=SageQQ,
             )
-            super().__init__(**rest)
 
         def ambient_lattice(self):
             return self._lattice
@@ -1006,6 +1045,7 @@ def _rational_polyhedral_cone(
     equation_covectors=(),
     wall_roots=None,
     complete=None,
+    engine_polyhedron=None,
 ):
     category = RationalPolyhedralCones(lattice)
     ambient = category.ambient_space()
@@ -1029,6 +1069,7 @@ def _rational_polyhedral_cone(
             "equation_covectors": equations,
             "wall_roots": wall_roots,
             "complete": complete,
+            "engine_polyhedron": engine_polyhedron,
         },
     )
 
