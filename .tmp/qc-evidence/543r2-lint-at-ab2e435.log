@@ -1,0 +1,478 @@
+EEEEEEEEEEEEEEEEEEE...                                                   [100%]
+==================================== ERRORS ====================================
+_ ERROR at setup of test_comparisons_of_cardinals_compose_and_are_carried_by_the_arithmetic _
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:115: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:182: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:183: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:196: TL09 test_ordered_union_requires_a_selected_order_on_both_inputs asserts nothing
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:198: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:200: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:202: TL04 try/except: expected failures are asserted with pytest.raises
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:211: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:212: TL01 from sage_extensions.logic import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:235: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:246: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:247: TL01 from sage_extensions.logic import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:258: TL03 isinstance(): introspection is not mathematics
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:264: TL01 from sage_extensions.logic import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:266: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:281: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:283: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:284: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:295: TL01 from sage_extensions.categories.sets.finite_ordered_sets import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:305: TL10 len(): ask for a cardinality
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:309: TL10 len(): ask for a cardinality
+_ ERROR at setup of test_finite_indexed_sums_suprema_and_comparisons_of_cardinals _
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:115: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:182: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:183: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:196: TL09 test_ordered_union_requires_a_selected_order_on_both_inputs asserts nothing
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:198: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:200: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:202: TL04 try/except: expected failures are asserted with pytest.raises
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:211: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:212: TL01 from sage_extensions.logic import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:235: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:246: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:247: TL01 from sage_extensions.logic import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:258: TL03 isinstance(): introspection is not mathematics
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:264: TL01 from sage_extensions.logic import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:266: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:281: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:283: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:284: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:295: TL01 from sage_extensions.categories.sets.finite_ordered_sets import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:305: TL10 len(): ask for a cardinality
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:309: TL10 len(): ask for a cardinality
+________ ERROR at setup of test_the_countable_sum_of_ones_is_aleph_zero ________
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:115: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:182: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:183: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:196: TL09 test_ordered_union_requires_a_selected_order_on_both_inputs asserts nothing
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:198: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:200: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:202: TL04 try/except: expected failures are asserted with pytest.raises
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:211: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:212: TL01 from sage_extensions.logic import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:235: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:246: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:247: TL01 from sage_extensions.logic import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:258: TL03 isinstance(): introspection is not mathematics
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:264: TL01 from sage_extensions.logic import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:266: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:281: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:283: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:284: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:295: TL01 from sage_extensions.categories.sets.finite_ordered_sets import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:305: TL10 len(): ask for a cardinality
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:309: TL10 len(): ask for a cardinality
+___ ERROR at setup of test_a_finite_cardinal_is_the_natural_number_it_counts ___
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:115: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:182: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:183: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:196: TL09 test_ordered_union_requires_a_selected_order_on_both_inputs asserts nothing
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:198: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:200: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:202: TL04 try/except: expected failures are asserted with pytest.raises
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:211: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:212: TL01 from sage_extensions.logic import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:235: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:246: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:247: TL01 from sage_extensions.logic import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:258: TL03 isinstance(): introspection is not mathematics
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:264: TL01 from sage_extensions.logic import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:266: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:281: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:283: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:284: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:295: TL01 from sage_extensions.categories.sets.finite_ordered_sets import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:305: TL10 len(): ask for a cardinality
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:309: TL10 len(): ask for a cardinality
+___ ERROR at setup of test_the_rings_read_the_finite_cardinal_seven_as_seven ___
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:115: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:182: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:183: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:196: TL09 test_ordered_union_requires_a_selected_order_on_both_inputs asserts nothing
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:198: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:200: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:202: TL04 try/except: expected failures are asserted with pytest.raises
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:211: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:212: TL01 from sage_extensions.logic import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:235: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:246: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:247: TL01 from sage_extensions.logic import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:258: TL03 isinstance(): introspection is not mathematics
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:264: TL01 from sage_extensions.logic import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:266: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:281: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:283: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:284: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:295: TL01 from sage_extensions.categories.sets.finite_ordered_sets import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:305: TL10 len(): ask for a cardinality
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:309: TL10 len(): ask for a cardinality
+___ ERROR at setup of test_ordinal_sum_product_and_power_are_not_commutative ___
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:115: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:182: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:183: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:196: TL09 test_ordered_union_requires_a_selected_order_on_both_inputs asserts nothing
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:198: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:200: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:202: TL04 try/except: expected failures are asserted with pytest.raises
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:211: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:212: TL01 from sage_extensions.logic import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:235: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:246: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:247: TL01 from sage_extensions.logic import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:258: TL03 isinstance(): introspection is not mathematics
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:264: TL01 from sage_extensions.logic import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:266: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:281: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:283: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:284: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:295: TL01 from sage_extensions.categories.sets.finite_ordered_sets import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:305: TL10 len(): ask for a cardinality
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:309: TL10 len(): ask for a cardinality
+_ ERROR at setup of test_ordinary_ordinal_arithmetic_is_canonical_order_type_arithmetic _
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:115: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:182: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:183: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:196: TL09 test_ordered_union_requires_a_selected_order_on_both_inputs asserts nothing
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:198: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:200: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:202: TL04 try/except: expected failures are asserted with pytest.raises
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:211: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:212: TL01 from sage_extensions.logic import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:235: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:246: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:247: TL01 from sage_extensions.logic import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:258: TL03 isinstance(): introspection is not mathematics
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:264: TL01 from sage_extensions.logic import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:266: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:281: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:283: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:284: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:295: TL01 from sage_extensions.categories.sets.finite_ordered_sets import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:305: TL10 len(): ask for a cardinality
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:309: TL10 len(): ask for a cardinality
+_ ERROR at setup of test_natural_sums_of_initial_ordinals_commute_and_omega_one_follows_omega _
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:115: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:182: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:183: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:196: TL09 test_ordered_union_requires_a_selected_order_on_both_inputs asserts nothing
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:198: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:200: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:202: TL04 try/except: expected failures are asserted with pytest.raises
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:211: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:212: TL01 from sage_extensions.logic import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:235: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:246: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:247: TL01 from sage_extensions.logic import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:258: TL03 isinstance(): introspection is not mathematics
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:264: TL01 from sage_extensions.logic import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:266: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:281: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:283: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:284: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:295: TL01 from sage_extensions.categories.sets.finite_ordered_sets import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:305: TL10 len(): ask for a cardinality
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:309: TL10 len(): ask for a cardinality
+____ ERROR at setup of test_order_type_is_a_functor_from_well_orders_to_ord ____
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:115: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:182: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:183: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:196: TL09 test_ordered_union_requires_a_selected_order_on_both_inputs asserts nothing
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:198: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:200: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:202: TL04 try/except: expected failures are asserted with pytest.raises
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:211: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:212: TL01 from sage_extensions.logic import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:235: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:246: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:247: TL01 from sage_extensions.logic import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:258: TL03 isinstance(): introspection is not mathematics
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:264: TL01 from sage_extensions.logic import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:266: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:281: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:283: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:284: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:295: TL01 from sage_extensions.categories.sets.finite_ordered_sets import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:305: TL10 len(): ask for a cardinality
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:309: TL10 len(): ask for a cardinality
+__ ERROR at setup of test_infinite_well_order_type_uses_its_core_isomorphism ___
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:115: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:182: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:183: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:196: TL09 test_ordered_union_requires_a_selected_order_on_both_inputs asserts nothing
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:198: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:200: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:202: TL04 try/except: expected failures are asserted with pytest.raises
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:211: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:212: TL01 from sage_extensions.logic import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:235: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:246: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:247: TL01 from sage_extensions.logic import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:258: TL03 isinstance(): introspection is not mathematics
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:264: TL01 from sage_extensions.logic import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:266: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:281: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:283: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:284: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:295: TL01 from sage_extensions.categories.sets.finite_ordered_sets import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:305: TL10 len(): ask for a cardinality
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:309: TL10 len(): ask for a cardinality
+_ ERROR at setup of test_nonidentity_well_order_maps_compose_with_exact_endpoints _
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:115: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:182: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:183: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:196: TL09 test_ordered_union_requires_a_selected_order_on_both_inputs asserts nothing
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:198: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:200: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:202: TL04 try/except: expected failures are asserted with pytest.raises
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:211: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:212: TL01 from sage_extensions.logic import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:235: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:246: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:247: TL01 from sage_extensions.logic import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:258: TL03 isinstance(): introspection is not mathematics
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:264: TL01 from sage_extensions.logic import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:266: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:281: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:283: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:284: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:295: TL01 from sage_extensions.categories.sets.finite_ordered_sets import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:305: TL10 len(): ask for a cardinality
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:309: TL10 len(): ask for a cardinality
+_ ERROR at setup of test_finite_ordered_set_operations_retain_selected_well_orders _
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:115: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:182: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:183: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:196: TL09 test_ordered_union_requires_a_selected_order_on_both_inputs asserts nothing
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:198: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:200: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:202: TL04 try/except: expected failures are asserted with pytest.raises
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:211: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:212: TL01 from sage_extensions.logic import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:235: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:246: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:247: TL01 from sage_extensions.logic import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:258: TL03 isinstance(): introspection is not mathematics
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:264: TL01 from sage_extensions.logic import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:266: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:281: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:283: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:284: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:295: TL01 from sage_extensions.categories.sets.finite_ordered_sets import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:305: TL10 len(): ask for a cardinality
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:309: TL10 len(): ask for a cardinality
+_ ERROR at setup of test_ordered_union_requires_a_selected_order_on_both_inputs _
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:115: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:182: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:183: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:196: TL09 test_ordered_union_requires_a_selected_order_on_both_inputs asserts nothing
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:198: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:200: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:202: TL04 try/except: expected failures are asserted with pytest.raises
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:211: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:212: TL01 from sage_extensions.logic import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:235: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:246: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:247: TL01 from sage_extensions.logic import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:258: TL03 isinstance(): introspection is not mathematics
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:264: TL01 from sage_extensions.logic import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:266: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:281: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:283: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:284: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:295: TL01 from sage_extensions.categories.sets.finite_ordered_sets import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:305: TL10 len(): ask for a cardinality
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:309: TL10 len(): ask for a cardinality
+___ ERROR at setup of test_literal_union_preserves_unenumerated_finite_image ___
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:115: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:182: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:183: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:196: TL09 test_ordered_union_requires_a_selected_order_on_both_inputs asserts nothing
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:198: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:200: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:202: TL04 try/except: expected failures are asserted with pytest.raises
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:211: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:212: TL01 from sage_extensions.logic import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:235: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:246: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:247: TL01 from sage_extensions.logic import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:258: TL03 isinstance(): introspection is not mathematics
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:264: TL01 from sage_extensions.logic import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:266: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:281: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:283: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:284: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:295: TL01 from sage_extensions.categories.sets.finite_ordered_sets import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:305: TL10 len(): ask for a cardinality
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:309: TL10 len(): ask for a cardinality
+_ ERROR at setup of test_literal_union_with_infinite_set_keeps_its_coproduct_image _
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:115: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:182: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:183: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:196: TL09 test_ordered_union_requires_a_selected_order_on_both_inputs asserts nothing
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:198: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:200: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:202: TL04 try/except: expected failures are asserted with pytest.raises
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:211: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:212: TL01 from sage_extensions.logic import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:235: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:246: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:247: TL01 from sage_extensions.logic import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:258: TL03 isinstance(): introspection is not mathematics
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:264: TL01 from sage_extensions.logic import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:266: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:281: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:283: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:284: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:295: TL01 from sage_extensions.categories.sets.finite_ordered_sets import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:305: TL10 len(): ask for a cardinality
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:309: TL10 len(): ask for a cardinality
+_ ERROR at setup of test_literal_intersection_and_difference_preserve_undecided_membership _
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:115: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:182: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:183: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:196: TL09 test_ordered_union_requires_a_selected_order_on_both_inputs asserts nothing
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:198: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:200: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:202: TL04 try/except: expected failures are asserted with pytest.raises
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:211: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:212: TL01 from sage_extensions.logic import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:235: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:246: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:247: TL01 from sage_extensions.logic import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:258: TL03 isinstance(): introspection is not mathematics
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:264: TL01 from sage_extensions.logic import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:266: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:281: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:283: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:284: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:295: TL01 from sage_extensions.categories.sets.finite_ordered_sets import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:305: TL10 len(): ask for a cardinality
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:309: TL10 len(): ask for a cardinality
+_ ERROR at setup of test_ordered_intersection_retains_finite_predicate_when_membership_is_undecided _
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:115: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:182: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:183: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:196: TL09 test_ordered_union_requires_a_selected_order_on_both_inputs asserts nothing
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:198: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:200: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:202: TL04 try/except: expected failures are asserted with pytest.raises
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:211: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:212: TL01 from sage_extensions.logic import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:235: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:246: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:247: TL01 from sage_extensions.logic import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:258: TL03 isinstance(): introspection is not mathematics
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:264: TL01 from sage_extensions.logic import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:266: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:281: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:283: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:284: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:295: TL01 from sage_extensions.categories.sets.finite_ordered_sets import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:305: TL10 len(): ask for a cardinality
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:309: TL10 len(): ask for a cardinality
+_ ERROR at setup of test_ordered_and_unordered_sets_do_not_have_false_structural_equality _
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:115: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:182: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:183: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:196: TL09 test_ordered_union_requires_a_selected_order_on_both_inputs asserts nothing
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:198: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:200: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:202: TL04 try/except: expected failures are asserted with pytest.raises
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:211: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:212: TL01 from sage_extensions.logic import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:235: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:246: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:247: TL01 from sage_extensions.logic import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:258: TL03 isinstance(): introspection is not mathematics
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:264: TL01 from sage_extensions.logic import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:266: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:281: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:283: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:284: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:295: TL01 from sage_extensions.categories.sets.finite_ordered_sets import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:305: TL10 len(): ask for a cardinality
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:309: TL10 len(): ask for a cardinality
+_ ERROR at setup of test_finite_indexed_enumeration_evaluates_selected_points_once _
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:115: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:182: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:183: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:196: TL09 test_ordered_union_requires_a_selected_order_on_both_inputs asserts nothing
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:198: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:200: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:202: TL04 try/except: expected failures are asserted with pytest.raises
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:211: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:212: TL01 from sage_extensions.logic import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:235: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:246: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:247: TL01 from sage_extensions.logic import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:258: TL03 isinstance(): introspection is not mathematics
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:264: TL01 from sage_extensions.logic import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:266: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:281: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:283: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:284: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:295: TL01 from sage_extensions.categories.sets.finite_ordered_sets import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:305: TL10 len(): ask for a cardinality
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:309: TL10 len(): ask for a cardinality
+====================== test lint: 21 findings in 1 files =======================
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:115: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:182: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:183: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:196: TL09 test_ordered_union_requires_a_selected_order_on_both_inputs asserts nothing
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:198: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:200: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:202: TL04 try/except: expected failures are asserted with pytest.raises
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:211: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:212: TL01 from sage_extensions.logic import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:235: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:246: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:247: TL01 from sage_extensions.logic import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:258: TL03 isinstance(): introspection is not mathematics
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:264: TL01 from sage_extensions.logic import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:266: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:281: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:283: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:284: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:295: TL01 from sage_extensions.categories.sets.finite_ordered_sets import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:305: TL10 len(): ask for a cardinality
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:309: TL10 len(): ask for a cardinality
+=========================== short test summary info ============================
+ERROR tests/sets/test_cardinal_and_ordinal_order_morphisms.sage::test_comparisons_of_cardinals_compose_and_are_carried_by_the_arithmetic
+ERROR tests/sets/test_cardinal_and_ordinal_order_morphisms.sage::test_finite_indexed_sums_suprema_and_comparisons_of_cardinals
+ERROR tests/sets/test_cardinal_and_ordinal_order_morphisms.sage::test_the_countable_sum_of_ones_is_aleph_zero
+ERROR tests/sets/test_cardinal_and_ordinal_order_morphisms.sage::test_a_finite_cardinal_is_the_natural_number_it_counts
+ERROR tests/sets/test_cardinal_and_ordinal_order_morphisms.sage::test_the_rings_read_the_finite_cardinal_seven_as_seven
+ERROR tests/sets/test_cardinal_and_ordinal_order_morphisms.sage::test_ordinal_sum_product_and_power_are_not_commutative
+ERROR tests/sets/test_cardinal_and_ordinal_order_morphisms.sage::test_ordinary_ordinal_arithmetic_is_canonical_order_type_arithmetic
+ERROR tests/sets/test_cardinal_and_ordinal_order_morphisms.sage::test_natural_sums_of_initial_ordinals_commute_and_omega_one_follows_omega
+ERROR tests/sets/test_cardinal_and_ordinal_order_morphisms.sage::test_order_type_is_a_functor_from_well_orders_to_ord
+ERROR tests/sets/test_cardinal_and_ordinal_order_morphisms.sage::test_infinite_well_order_type_uses_its_core_isomorphism
+ERROR tests/sets/test_cardinal_and_ordinal_order_morphisms.sage::test_nonidentity_well_order_maps_compose_with_exact_endpoints
+ERROR tests/sets/test_cardinal_and_ordinal_order_morphisms.sage::test_finite_ordered_set_operations_retain_selected_well_orders
+ERROR tests/sets/test_cardinal_and_ordinal_order_morphisms.sage::test_ordered_union_requires_a_selected_order_on_both_inputs
+ERROR tests/sets/test_cardinal_and_ordinal_order_morphisms.sage::test_literal_union_preserves_unenumerated_finite_image
+ERROR tests/sets/test_cardinal_and_ordinal_order_morphisms.sage::test_literal_union_with_infinite_set_keeps_its_coproduct_image
+ERROR tests/sets/test_cardinal_and_ordinal_order_morphisms.sage::test_literal_intersection_and_difference_preserve_undecided_membership
+ERROR tests/sets/test_cardinal_and_ordinal_order_morphisms.sage::test_ordered_intersection_retains_finite_predicate_when_membership_is_undecided
+ERROR tests/sets/test_cardinal_and_ordinal_order_morphisms.sage::test_ordered_and_unordered_sets_do_not_have_false_structural_equality
+ERROR tests/sets/test_cardinal_and_ordinal_order_morphisms.sage::test_finite_indexed_enumeration_evaluates_selected_points_once
+3 passed, 19 errors in 6.28s
+[peakrss] lint-base: child waited=1 shell_code=1 samples=6
+[peakrss] peak tree RSS      : 314 MiB
+[peakrss] low-water MemAvail : 3818 MiB
+[peakrss] peak single VmHWM  : 314 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      303 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   run.sh                        0 MiB peak
+[peakrss]   t=    10.0s procs=  3 rss=   314 MiB hwm=   314 MiB avail=  4254 MiB
+[peakrss]   t=     8.0s procs=  3 rss=   308 MiB hwm=   308 MiB avail=  4363 MiB
+[peakrss]   t=     6.0s procs=  3 rss=   290 MiB hwm=   290 MiB avail=  4457 MiB
+[peakrss]   t=     4.0s procs=  3 rss=   204 MiB hwm=   204 MiB avail=  4471 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   120 MiB hwm=   120 MiB avail=  4557 MiB
+launcher exit: 1

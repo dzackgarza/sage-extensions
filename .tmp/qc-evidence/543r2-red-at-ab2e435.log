@@ -1,0 +1,68 @@
+....F..................                                                  [100%]
+=================================== FAILURES ===================================
+____________ test_the_rings_read_the_finite_cardinal_seven_as_seven ____________
+
+    def test_the_rings_read_the_finite_cardinal_seven_as_seven() -> None:
+        r"""The finite cardinal $7$ read in $\mathbb{Z}$, in $\mathbb{Q}$ and in a predicate subring of
+        $\mathbb{Q}$ is the integer $7$."""
+        subring = PredicateSubrings().an_object()
+    
+        assert ZZ(cardinal(7)) == 7
+        assert QQ(cardinal(7)) == 7
+>       assert subring(cardinal(7)) == subring(7)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:85: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/rings/ring_foundation.py:2910: in __call__
+    return self._element_constructor_(element)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/ring_foundation.py:2913: in _element_constructor_
+    return PredicateSubrings.ParentMethods._element_constructor_(self, element)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/ring_foundation.py:1100: in _element_constructor_
+    if source is not self and source in Modules(self.base_ring()) and source.unformed_module() is self:
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/objects.py:172: in __contains__
+    return super().__contains__(value)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Category of modules over Integer Ring
+x = <class 'sage_extensions.categories.sets.cardinals.Cardinalities.parent_class'>
+
+    def __contains__(self, x) -> bool:
+        """
+        Membership testing.
+    
+        Returns whether ``x`` is an object in this category, that is
+        if the category of ``x`` is a subcategory of ``self``.
+    
+        EXAMPLES::
+    
+            sage: ZZ in Sets()
+            True
+        """
+        try:
+>           c = x.category()
+                ^^^^^^^^^^^^
+E           TypeError: category() needs an argument
+
+/sage/.venv/lib/python3.14/site-packages/sage/categories/category.py:706: TypeError
+=========================== short test summary info ============================
+FAILED tests/sets/test_cardinal_and_ordinal_order_morphisms.sage::test_the_rings_read_the_finite_cardinal_seven_as_seven
+1 failed, 22 passed in 12.01s
+[peakrss] red-new-rows: child waited=1 shell_code=1 samples=9
+[peakrss] peak tree RSS      : 330 MiB
+[peakrss] low-water MemAvail : 3445 MiB
+[peakrss] peak single VmHWM  : 331 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      320 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    14.1s procs=  3 rss=   330 MiB hwm=   330 MiB avail=  3625 MiB
+[peakrss]   t=    16.1s procs=  3 rss=   324 MiB hwm=   331 MiB avail=  3445 MiB
+[peakrss]   t=    12.0s procs=  3 rss=   308 MiB hwm=   308 MiB avail=  3812 MiB
+[peakrss]   t=    10.0s procs=  3 rss=   307 MiB hwm=   307 MiB avail=  3690 MiB
+[peakrss]   t=     8.0s procs=  3 rss=   278 MiB hwm=   278 MiB avail=  3925 MiB
+launcher exit: 1

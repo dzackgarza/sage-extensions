@@ -3044,3 +3044,46 @@ supersede), `2a15d9f` and `cf6ba0b` (these two notes).  The runs that cite
 `tests/groups` are byte-identical to the pushed tip's (`git diff --stat
 89d0b4b cf6ba0b -- src/sage_extensions/categories/group tests/groups` is
 empty), so they cover the code that was pushed.
+## `#543`, round 6: the review's rows, re-taken, and one row corrected, 2026-11-16
+
+Every row is the pinned image (`/sage/.venv/bin/python`), `-p qc_sage_session`,
+`addopts` blanked, the worktree bound at `/work`, and
+`PYTHONPATH=/ci/tool-artifacts/pytest_plugins:/work/src:/work`, through
+`.scratch/launch543.sh`.  `-p sage_extensions.testing.test_lint` is added where
+the row says so.  The trees: `ab2e435`, `main` as this round is built on;
+`d1ab7fc`, the tree the issue names; and the repair head, the last commit this
+evidence commit follows.
+
+| log | tree | result |
+| --- | --- | --- |
+| `543r2-red-at-ab2e435.log` | `ab2e435`, with this round's two test files | the two files: **1 failed, 22 passed in 12.01 s** — `test_the_rings_read_the_finite_cardinal_seven_as_seven`, at `PredicateSubrings().an_object()(cardinal(7))`, `TypeError: category() needs an argument` from `Category.__contains__` |
+| `543r2-red-at-d1ab7fc.log` | `d1ab7fc`, with this round's order file | `test_the_order_morphism_is_empty_exactly_when_its_source_exceeds_its_target.sage` alone: **4 failed in 3.84 s** — the issue's four rows, the new order row among them |
+| `543r2-green-both-files.log` | the repair head | the two files: **23 passed in 2.42 s** |
+| `543r2-alone-cardinal.log`, `543r2-alone-order.log`, `543r2-reverse-pair.log` | the repair head | each file alone (**19 passed in 2.69 s**, **4 passed in 1.49 s**) and the pair in the other order (**23 passed in 3.46 s**): the issue's acceptance clause, in the orders a process can be given here |
+| `543r2-lint-at-ab2e435.log`, `543r2-lint-at-head.log` | `ab2e435`, the repair head | the two files with the test lint: **4 passed, 19 errors in 3.81 s** and the same.  The finding sets are equal line for line; every finding is the base tree's own (TL08 `finite_ordered_set`, TL01 module imports, TL10 `len`, TL09, TL04, TL03), and this round's rows add none |
+| `543r2-probe-at-ab2e435.log`, `543r2-probe-at-head.log` | `ab2e435`, the repair head | `543r2-probe.py` on the same specimens: the 36 answers are identical but one — `PredicateSubrings().an_object()(cardinal(7))` is `7` at the head and `TypeError: category() needs an argument` at the base.  The probe also prints the parent of each kind of value it is given, the localization's readings and memberships, the constant-family sums, and both orders' answers |
+
+The order-independence row the earlier round deleted is replaced by
+`test_the_order_supplies_its_own_emptiness_after_any_earlier_construction`: it
+asks both orders, each through its own `Mor` and through the cached hom-set,
+after the other has answered, and asks that an undecided comparison decide
+nothing.  The hook's own answer is not asserted in a test: the lint's TL02
+refuses a private attribute in a test, so the hook is measured through
+`is_empty`, which is the public operation that reads it.  What that leaves
+unmeasured here is a full-suite run of the two files: no workflow in this
+repository dispatches one (the development-diagnostics job has never run) and
+this VM cannot run `tests/` inside a command.  The nearest selections a
+command here can take are the ones recorded above and, in the earlier round's
+rows, `tests/sets`, `tests/objects` and `tests/rings` prefixed to the file.
+
+### Correction, 2026-11-16: the `543-rings-head.log` row is not a completed row
+
+The row `543-rings-head.log` above (round 5's table, `tests/rings` and the file
+in one process) records **75 failed, 296 passed in 756.89 s**, and 756.89 s is
+beyond this round family's ten-minute bound for one command.  The row is left
+as it ran -- a dated audit event is not edited -- and it is withdrawn here as a
+completed evidence row: a selection that overruns the bound is not a row this
+round may claim, whatever it printed.  What the row was for (the head's FAILED
+ids are the base's minus the three rows that round repaired) is therefore not
+established by it.  That selection takes twelve minutes on a loaded host; it is
+a suite and belongs to CI, and it is not re-taken here.

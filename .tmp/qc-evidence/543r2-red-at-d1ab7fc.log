@@ -1,0 +1,112 @@
+FFFF                                                                     [100%]
+=================================== FAILURES ===================================
+________ test_a_cardinal_order_morphism_exists_exactly_below_its_target ________
+
+    def test_a_cardinal_order_morphism_exists_exactly_below_its_target() -> None:
+        cardinals = Cardinalities()
+    
+        below = cardinals.Mor(2, 3)
+        equal = cardinals.Mor(3, 3)
+        above = cardinals.Mor(3, 2)
+    
+>       assert below.is_empty() is False
+E       assert is_empty(Set of Morphisms from 2 to 3 in Card: cardinalities with a unique morphism kappa -> lambda exactly when kappa <= lambda) is False
+E        +  where is_empty(Set of Morphisms from 2 to 3 in Card: cardinalities with a unique morphism kappa -> lambda exactly when kappa <= lambda) = is_empty()
+E        +    where is_empty = Set of Morphisms from 2 to 3 in Card: cardinalities with a unique morphism kappa -> lambda exactly when kappa <= lambda.is_empty
+
+tests/sets/test_the_order_morphism_is_empty_exactly_when_its_source_exceeds_its_target.sage:31: AssertionError
+___ test_the_order_supplies_its_own_emptiness_after_any_earlier_construction ___
+
+    def test_the_order_supplies_its_own_emptiness_after_any_earlier_construction() -> None:
+        r"""Both thin orders decide the emptiness of their own hom-sets.
+    
+        ``Sets`` owns ``is_empty`` and reads what a construction supplies through
+        the protected hook ``_emptiness_decision``, which a level states on its own
+        class.  A thin order states it there, so its hom-set is answered by the
+        negation of the order's own comparison and not by whatever a class
+        resolution reached by an earlier construction selected.  The two orders are
+        asked here after each other, each through the order's own ``Mor`` and
+        through the cached hom-set, and every answer is the same decision.
+    
+        An undecided comparison decides nothing, and no order may answer ``False``
+        for a hom-set it has not decided: the set states the proposition
+        ``is_empty`` and ``ask`` answers ``Unknown``.
+        """
+        cardinals = Cardinalities()
+        ordinals = Ordinals()
+    
+>       assert ordinals.Mor(1, 2).is_empty() is False
+E       assert is_empty(Set of Morphisms from 1 to 2 in Ord: ordinals with a unique morphism alpha -> beta exactly when alpha <= beta) is False
+E        +  where is_empty(Set of Morphisms from 1 to 2 in Ord: ordinals with a unique morphism alpha -> beta exactly when alpha <= beta) = is_empty()
+E        +    where is_empty = Set of Morphisms from 1 to 2 in Ord: ordinals with a unique morphism alpha -> beta exactly when alpha <= beta.is_empty
+E        +      where Set of Morphisms from 1 to 2 in Ord: ordinals with a unique morphism alpha -> beta exactly when alpha <= beta = Mor(1, 2)
+E        +        where Mor = Ord: ordinals with a unique morphism alpha -> beta exactly when alpha <= beta.Mor
+E        +        and   1 = Integer(1)
+E        +        and   2 = Integer(2)
+
+tests/sets/test_the_order_morphism_is_empty_exactly_when_its_source_exceeds_its_target.sage:60: AssertionError
+_________ test_the_one_cardinal_arrow_composes_as_the_comparison_does __________
+
+    def test_the_one_cardinal_arrow_composes_as_the_comparison_does() -> None:
+        cardinals = Cardinalities()
+    
+>       two_three = cardinals.Mor(2, 3).unique_morphism()
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/sets/test_the_order_morphism_is_empty_exactly_when_its_source_exceeds_its_target.sage:75: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/misc/cachefunc.pyx:2328: in sage.misc.cachefunc.CachedMethodCallerNoArgs.__call__
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Set of Morphisms from 2 to 3 in Card: cardinalities with a unique morphism kappa -> lambda exactly when kappa <= lambda
+
+    @cached_method
+    def unique_morphism(self) -> CardinalityMorphism:
+        empty = self.is_empty()
+        if empty is True:
+            raise ValueError(
+                f"there is no morphism {self.domain()} -> {self.codomain()} of cardinals: "
+                f"{self.domain()} is not <= {self.codomain()}"
+            )
+>       assert empty is False, (
+               ^^^^^^^^^^^^^^
+            f"cannot give the morphism {self.domain()} -> {self.codomain()} of cardinals: it is "
+            f"undecided whether {self.domain()} <= {self.codomain()}"
+        )
+E       AssertionError: cannot give the morphism 2 -> 3 of cardinals: it is undecided whether 2 <= 3
+
+src/sage_extensions/categories/sets/cardinals.py:369: AssertionError
+________ test_an_ordinal_order_morphism_exists_exactly_below_its_target ________
+
+    def test_an_ordinal_order_morphism_exists_exactly_below_its_target() -> None:
+        ordinals = Ordinals()
+    
+        below = ordinals.Mor(1, 2)
+        equal = ordinals.Mor(2, 2)
+        above = ordinals.Mor(2, 1)
+    
+>       assert below.is_empty() is False
+E       assert is_empty(Set of Morphisms from 1 to 2 in Ord: ordinals with a unique morphism alpha -> beta exactly when alpha <= beta) is False
+E        +  where is_empty(Set of Morphisms from 1 to 2 in Ord: ordinals with a unique morphism alpha -> beta exactly when alpha <= beta) = is_empty()
+E        +    where is_empty = Set of Morphisms from 1 to 2 in Ord: ordinals with a unique morphism alpha -> beta exactly when alpha <= beta.is_empty
+
+tests/sets/test_the_order_morphism_is_empty_exactly_when_its_source_exceeds_its_target.sage:91: AssertionError
+=========================== short test summary info ============================
+FAILED tests/sets/test_the_order_morphism_is_empty_exactly_when_its_source_exceeds_its_target.sage::test_a_cardinal_order_morphism_exists_exactly_below_its_target
+FAILED tests/sets/test_the_order_morphism_is_empty_exactly_when_its_source_exceeds_its_target.sage::test_the_order_supplies_its_own_emptiness_after_any_earlier_construction
+FAILED tests/sets/test_the_order_morphism_is_empty_exactly_when_its_source_exceeds_its_target.sage::test_the_one_cardinal_arrow_composes_as_the_comparison_does
+FAILED tests/sets/test_the_order_morphism_is_empty_exactly_when_its_source_exceeds_its_target.sage::test_an_ordinal_order_morphism_exists_exactly_below_its_target
+4 failed in 3.84s
+[peakrss] red-hook-row: child waited=1 shell_code=1 samples=3
+[peakrss] peak tree RSS      : 285 MiB
+[peakrss] low-water MemAvail : 9110 MiB
+[peakrss] peak single VmHWM  : 285 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      274 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     4.0s procs=  3 rss=   285 MiB hwm=   285 MiB avail=  9110 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   203 MiB hwm=   203 MiB avail=  9502 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     5 MiB hwm=     5 MiB avail=  9581 MiB
+launcher exit: 1
