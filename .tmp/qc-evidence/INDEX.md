@@ -2582,6 +2582,7 @@ and `de9a1d1`.
 | --- | --- | --- |
 | `541r4-red-contract-base.log` | `897e7f7` | the new contract file, `test_a_presented_module_is_built_before_it_computes.sage`, red at the base: **2 failed, `assert 1 == 0`** twice -- constructing a cokernel materialized one relation matrix -- and the two primitivity tests passing beside it |
 | `541r4-red-sets-base.log` | `897e7f7` | `test_a_set_is_named_or_described_and_not_both` red at the base: **1 failed, `DID NOT RAISE ValueError`** |
+| `541r4-green-rebased.log` | `7eef5b5` | the same five files after the rebase onto `5589af3` (`#538`'s character work): **9 passed in 1.29 s** with the test lint loaded |
 | `541r4-green-contract.log` | `bb62b83` | the five changed and new test files with the test lint loaded: **8 passed in 2.19 s** |
 | `541r4-cokernel-base.log` | `897e7f7` | one plane of `T_Co`, 6 cold spans, at load **2.65**: `inclusion.cokernel()` median **5.400 ms** (4.856..26.277); the part-by-part rows are warm reads of the same construction |
 | `541r4-cokernel-repaired.log` | `bb62b83` | the same probe at load **2.65**: `inclusion.cokernel()` median **0.145 ms** (0.136..1.432) -- the construction stores the datum and computes nothing |
