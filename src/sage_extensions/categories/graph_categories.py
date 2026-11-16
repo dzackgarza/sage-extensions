@@ -67,16 +67,16 @@ class _FiniteDigraphEngine:
     def _cardinality_decision(self):
         return self.vertices().cardinality()
 
+    @cached_method
     def connected_component_vertex_sets(self):
         r"""The vertex sets of the connected components of the underlying undirected graph.
 
         An owned finite ordered set of owned finite ordered sets of vertices,
         each component in vertex order, and the components in the order of
-        their least vertex.  Private computation of the graph owner: Sage's
-        ``Graph`` computes the components on the vertex positions.  A loop
-        joins no two vertices, so it lies in the component of its own vertex
-        and in no other, and the components are read from the edges that are
-        not loops.
+        their least vertex.  Sage's ``Graph`` computes the components on the
+        vertex positions.  A loop is not an edge between two distinct vertices
+        (Diestel, *Graph Theory*, section 1.1), so the components are read from
+        the edges that are not loops.
         """
         from sage.graphs.graph import Graph
 
