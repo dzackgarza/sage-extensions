@@ -1,16 +1,22 @@
-=== worktree HEAD: 592f9836ce5d8eadee2721ae0ce95e3a963d32cc
-=== git grep -n -i -E 'issue[ _-]?[0-9]+' -- src
+=== worktree HEAD: 581264834c54215d644cfc7fcabc2f335d9a3b60
+
+=== git grep -n -i -E '#[0-9]+' -- src   (the issue spelling a number sign introduces)
 (no lines)
-=== git grep -n -i -E '#[0-9]+' -- src
+
+=== git grep -n -i -E 'issue[ _-]?[0-9]+' -- src   (the issue spelling that lives in a path)
 (no lines)
-=== git grep -n -i -E '\bissue' -- src
+
+=== git grep -n -i -E '\bissue' -- src   (any 'issue' word at all)
 (no lines)
-=== git grep -n -E '.tmp/<probe|measure|staged|qc-evidence>' -- src
+
+=== git grep -n -i -E '\.tmp/[a-z0-9_./-]*(probe|measure|staged|qc-evidence)' -- src   (a run log under .tmp)
 (no lines)
-=== git grep -n -E 'results/<name>.md' -- src
+
+=== git grep -n -i -E 'results/[a-z0-9-]+\.md' -- src   (a note under results/)
 (no lines)
-=== git grep -n -E '<history vocabulary>' -- src: what is left is the instrumental 'used to build' and the engine's 'may advertise', listed for the reader to check
-src/sage_extensions/categories/algebras/algebras.py:1952:                    "the centre inclusion used to retain an algebra action must end at this exact algebra"
+
+=== the history vocabulary, listed rather than counted, so each remaining line can be read: what is left is the instrumental 'used to build' and the engine's 'may advertise'
+src/sage_extensions/categories/algebras/algebras.py:1972:                    "the centre inclusion used to retain an algebra action must end at this exact algebra"
 src/sage_extensions/categories/coxeter_diagrams.py:497:            # already used to build the owned root-Gram tensor. Retain it so
 src/sage_extensions/categories/divisors/cartier_divisor_groups.py:429:    used to verify one finite-atlas lift.
 src/sage_extensions/categories/functors/algebra_scalar_change.py:113:    cases.  It does not advertise an unavailable general algebra tensor backend
@@ -37,11 +43,12 @@ src/sage_extensions/categories/sets/indexed_families.py:86:        a new tuple i
 src/sage_extensions/refine.py:552:    never changes ``obj.category()`` and therefore cannot be used to add
 src/sage_extensions/rings/real.py:326:    never used to decide owned real relations.
 src/sage_extensions/testing/coverage_gaps.py:17:listed as stale: its recorded line numbers no longer describe the file.
-=== base tree 6cb0b3f, the same three greps
+
+=== base tree 7f36d57 (the commit this round is rebased onto), counts only
+  '#[0-9]+': 0
   'issue[ _-]?[0-9]+': 17
-  '#[0-9]+': 0
   '\bissue': 18
-=== this tree 592f983, the same three greps, as counts
-  'issue[ _-]?[0-9]+': 0
+=== this tree 5812648, the same three
   '#[0-9]+': 0
+  'issue[ _-]?[0-9]+': 0
   '\bissue': 0
