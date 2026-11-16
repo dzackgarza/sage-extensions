@@ -402,6 +402,14 @@ def _lattice_by_name(name):
             return NamedLattices.Tco
         case "6JRS":
             return Lattices(ZZ)("U") + Lattices(ZZ)("U") + Lattices(ZZ)([[-2]])
+        case "U+U+<-4>":
+            return Lattices(ZZ)("U") + Lattices(ZZ)("U") + Lattices(ZZ)([[-4]])
+        case "U+U(2)+<-4>":
+            return (
+                Lattices(ZZ)("U")
+                + Lattices(ZZ)([[0, 2], [2, 0]])
+                + Lattices(ZZ)([[-4]])
+            )
         case "U+U(2)+<-2>":
             return (
                 Lattices(ZZ)("U")
@@ -426,7 +434,7 @@ def _scattone(k):
     )
 
 
-LATTICE_NAMES = ("Tco", "6JRS", "U+U(2)+<-2>", "6JRX", "6JRY")
+LATTICE_NAMES = ("Tco", "6JRS", "U+U+<-4>", "U+U(2)+<-2>", "U+U(2)+<-4>", "6JRX", "6JRY")
 
 
 def _trivial_image_row_agreement(lattice, rows):
