@@ -1618,8 +1618,41 @@ def _equip_action(module, group_or_action, action=None):
         }
     # The generic linear realization and the represented action are both
     # actual properties of this object. Neither placement implies the other.
+    # A finite free coefficient module of a finite group over a field carries
+    # the character family of its characteristic: the ordinary one in
+    # characteristic zero and the Brauer one in positive characteristic, each
+    # the trace of a group element on a finite free module (Serre, *Linear
+    # Representations of Finite Groups*, §2.1, §6.1 and §18.1).  The family is
+    # selected here, where the coefficient module and the group are both known,
+    # so that the trace character and the isotypic components are operations of
+    # the module rather than a refinement a caller has to ask for.
+    representation = ()
+    match (
+        group.is_finite() is True,
+        module in FinitelyGeneratedFreeModules(base_ring),
+    ):
+        case (True, True):
+            match base_ring.characteristic() == 0:
+                case True:
+                    family = OrdinaryCharacterRepresentations(group_algebra)
+                case False:
+                    family = (
+                        BrauerCharacterRepresentations(group_algebra)
+                        if base_ring in OwnedFields()
+                        else FiniteFreeGroupRepresentations(group_algebra)
+                    )
+            representation = (family,)
+        case _:
+            pass
     equipped = _object_of(
-        Cat().meet((GeneralModules(group_algebra), Modules(group_algebra), *extra_category)),
+        Cat().meet(
+            (
+                GeneralModules(group_algebra),
+                Modules(group_algebra),
+                *representation,
+                *extra_category,
+            )
+        ),
         _engine=(Modules(group_algebra), _CoefficientModuleEngine, None),
         base_ring=group_algebra,
         rho=scalar_action,
