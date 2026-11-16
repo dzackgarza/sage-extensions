@@ -3101,25 +3101,18 @@ class AdicCompletions(Category):
             r"""Return the completion map as an arrow of ``Mor_Ring(A, A^)``.
 
             Protected completion-realization contract under ``OWN-05``.  The
-            map is an arrow of the ring Mor, except where the completion is the
-            source itself, and there the construction places it in the core,
-            where it is the isomorphism and not a map that a ring-morphism
-            consumer can read.  Callers that need a ring homomorphism --
-            extension of an ideal along the completion, the local residue map,
-            the induced maps of completions, and the base changes in the
-            module, scheme and family owners -- ask here rather than branching
-            on the arrow's type.
+            ring map is retained by the construction that builds the arrow --
+            the same map the core isomorphism is a pair of, when a power of the
+            defining ideal is zero -- so a consumer that needs a ring
+            homomorphism reads that retained arrow, and no consumer asks what
+            kind of arrow the completion happens to have built.  Callers that
+            need a ring homomorphism -- extension of an ideal along the
+            completion, the local residue map, the induced maps of
+            completions, and the base changes in the module, scheme and family
+            owners -- ask here rather than branching on the arrow's type.
             """
-            from sage_extensions.categories.abstract_categories.mor_categories import (
-                CategoricalIsomorphism,
-            )
-
-            arrow = self.completion_map()
-            match arrow:
-                case CategoricalIsomorphism():
-                    return arrow.forward()
-                case _:
-                    return arrow
+            self.completion_map()
+            return self._adic_completion_ring_morphism
 
         def _completion_projection_lift(self):
             r"""Return the retained finite-stage lift used to realize adic projections.
@@ -3900,6 +3893,28 @@ class _AdicCompletionElement(_OwnedAlgebraElement):
         return refined.completion_map()(source_expression)
 
 
+def _defining_ideal_power_vanishes(defining_ideal, precision):
+    r"""Decide whether a power of the defining ideal is zero.
+
+    The construction fixes the ideal $I$ and the precision $n$ whose tiers
+    $A/I, \ldots, A/I^n$ it represents.  When $I^n = (0)$ the $I$-adic topology
+    on $A$ is discrete, so $A$ is already complete and separated for it: the
+    comparison map $A \to \lim_k A/I^k$ is injective because
+    $\bigcap_k I^k \subseteq I^n = (0)$, and surjective because a compatible
+    family is the image of its own $n$-th component.  Hence $A^\wedge = A$, the
+    completion map is an isomorphism, and $A^\wedge$ is free of rank one on the
+    unit over $A$.
+
+    The answer is read off the retained ideal and the precision.  It is the
+    datum the completion's own placements follow -- that the map is built as an
+    isomorphism, and that the source is a base of rank one -- so it is never
+    inferred from a computer-algebra engine two presentations share.
+    """
+    ring = defining_ideal.ring()
+    vanishing = defining_ideal.power(precision)
+    return (vanishing == ring.ideal(ring.zero())) is True
+
+
 class _AdicCompletionAlgebraParent(_OwnedAlgebraParent):
     r"""An engine-backed adic completion with its defining data fixed at construction."""
 
@@ -3960,13 +3975,24 @@ class _AdicCompletionAlgebraParent(_OwnedAlgebraParent):
                 completion_map_image,
                 selected_engine_map,
             )
-            if _engine_ring(source) is not engine:
+            # The ring map is retained by the construction, so a consumer that
+            # needs a ring homomorphism reads this arrow and never the Python
+            # type of the core arrow built below (``OWN-05``).
+            self._adic_completion_ring_morphism = forward
+            if not self.completion_defining_power_vanishes():
                 return forward
-            # The completion is presented on the source's own engine, so the
-            # ring's own element of the source is its element of the completion
-            # and the map is inverted by that identification: it is an
-            # isomorphism, and is built as one (``OWN-22``), not as a map that
-            # carries a boolean saying so.
+            # A power of the defining ideal is zero, so the source is its own
+            # completion and the map is an isomorphism: it is built as one
+            # (``OWN-22``), not as a map carrying a boolean saying so.  Its
+            # inverse is the identification with the source, which the
+            # construction realizes by presenting the completion on the
+            # source's own engine.
+            assert _engine_ring(source) is engine, (
+                f"the completion of {source} at {defining_ideal} is the source itself, because "
+                f"a power of {defining_ideal} is zero, so it is presented on the source's own "
+                f"engine; it is presented on {engine}"
+            )
+
             def inverse_map_image(element):
                 return _owned_engine_element(source, _engine_element(self, element))
 
@@ -3991,6 +4017,10 @@ class _AdicCompletionAlgebraParent(_OwnedAlgebraParent):
         self._adic_arithmetic_mode = arithmetic_mode
         self._adic_completion_map_kernel = completion_map_kernel
         self._adic_completion_map_factory = completion_map_factory
+        self._adic_completion_ring_morphism = None
+        self._adic_defining_power_vanishes = _defining_ideal_power_vanishes(
+            defining_ideal, int(precision)
+        )
         self._realized_completion_map = None
         match formal_parameter_labels:
             case None:
@@ -4139,6 +4169,16 @@ class _AdicCompletionAlgebraParent(_OwnedAlgebraParent):
 
     def completion_arithmetic_mode(self):
         return self._adic_arithmetic_mode
+
+    def completion_defining_power_vanishes(self):
+        r"""Return whether a power of the defining ideal is zero.
+
+        Retained at construction from the defining ideal and the precision.
+        It is the datum the completion map's placement as an isomorphism
+        follows, and the datum that makes the completion free of rank one on
+        the unit over its source.
+        """
+        return self._adic_defining_power_vanishes
 
     @cached_method
     def exact_value_field(self):
