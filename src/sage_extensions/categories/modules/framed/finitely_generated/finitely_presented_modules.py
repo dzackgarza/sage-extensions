@@ -256,15 +256,7 @@ def _fix_selected_module_presentation(module, base_ring, presentation, cokernel_
     module._selected_module_presentation = _SelectedModulePresentationBackend(cokernel_morphism)
 
 
-def _fix_lazy_selected_module_presentation(
-    module,
-    base_ring,
-    realization_factory,
-    *,
-    replace=False,
-    generating_set=None,
-    generator_function=None,
-) -> None:
+def _fix_lazy_selected_module_presentation(module, base_ring, realization_factory) -> None:
     r"""Fix one endpoint-determined finite presentation without realizing it.
 
     The factory is selected during construction but is not evaluated until the
@@ -272,12 +264,6 @@ def _fix_lazy_selected_module_presentation(
     morphism, generating set and generator morphism of that fixed
     presentation.  Thus the mathematical choice is made before exposure while
     its computational model remains lazy.
-
-    ``replace`` states the presentation over a degree-zero resolution already
-    registered for this module -- a construction that knew its generating
-    family before it knew its relations.  ``generating_set`` and
-    ``generator_function`` are the registration of that family, so reading the
-    module's generators does not realize the presentation either.
     """
     match module._selected_module_presentation:
         case None:
@@ -323,9 +309,6 @@ def _fix_lazy_selected_module_presentation(
         module,
         Modules(base_ring),
         selected_resolution,
-        replace=replace,
-        generating_set=generating_set,
-        generator_function=generator_function,
     )
 
 
