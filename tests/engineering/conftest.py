@@ -30,8 +30,10 @@ writes to the file ``--output`` names, required to exist so a view that refuses
 the tree fails the test that asked for its data; and ``declared_graph_figures``
 reads a view's printed figures back as numbers, because the answer ``shape`` and
 ``cells`` give is the reading they print, which ``CAT-25`` reads a change's
-category-graph delta off, and ``declared_graph_breadth`` is that reading's
-breadth rows, one count per category.
+category-graph delta off; ``declared_graph_breadth`` is that reading's breadth
+rows, one count per category; and ``declared_graph_reading`` is every other
+view's answer read back in the form it answers in, so a view is tested by what
+it says and not by its exit status.
 
 The acceptance drivers are instruments of the same kind: each takes one row of
 an orbit computation and reports what the row did.  ``incidence_row_outcome``
@@ -323,6 +325,72 @@ def _section(output: str, heading: str) -> str:
     return ""
 
 
+def declared_graph_reading(tree: dict[str, str], view: str, *arguments: str):
+    r"""The answer a view gives for a tree written for it, read back as data.
+
+    A view answers in its own form -- a table of rows with the supercategories
+    each states, a map from a supercategory to the categories claiming it, the
+    owned categories naming a Sage supercategory, the defects the audit finds,
+    the edges the drawing writes, the operations each category reports, the
+    figures a reading states, the category an operation is defined at -- and
+    this returns that form, so a test asserts what the view said rather than
+    that a process exited.  ``arguments`` are the recipe's parameters after the
+    view, so a view that takes one (``routes --operation NAME``) is asked the
+    question it is there to answer.
+    """
+    report = declared_graph_report(tree, view, *arguments)
+    assert report.exit_status == 0, f"the {view} view: {report.transcript}"
+    return _READINGS[view](report.output)
+
+
+def _table_reading(output: str) -> dict[str, tuple[str, ...]]:
+    r"""Each row the table writes: the category, and the supercategories it states."""
+    return {
+        row: tuple(stated.split(", "))
+        for row, stated in re.findall(r"(?m)^(\S+) {2,}(\S.*)$", output)
+    }
+
+
+def _claimants_reading(output: str) -> dict[str, tuple[str, ...]]:
+    r"""Each supercategory the grouped view lists, and the categories under it."""
+    groups: dict[str, tuple[str, ...]] = {}
+    head = ""
+    for line in output.splitlines():
+        if line.startswith("    ") and head:
+            groups[head] += (line.strip(),)
+        elif counted := re.fullmatch(r"(\S+)  \(\d+\)", line):
+            head = counted[1]
+            groups[head] = ()
+    return groups
+
+
+def _foreign_reading(output: str) -> dict[str, str]:
+    r"""Each category declaring a Sage supercategory, and what it declares."""
+    return dict(re.findall(r"(?m)^(\S+)\n    declares  (.+)\n", output))
+
+
+def _dot_reading(output: str) -> set[tuple[str, str]]:
+    r"""Each edge the drawing writes, as the two names it joins."""
+    return set(re.findall(r'(?m)^  "([^"]+)" -> "([^"]+)"', output))
+
+
+def _constructions_reading(output: str) -> dict[str, tuple[str, ...]]:
+    r"""Each category the view reports operations for, and the operations it lists."""
+    found: dict[str, tuple[str, ...]] = {}
+    for section in output.split("\n## ")[1:]:
+        heading = section.split("\n", 1)[0]
+        if matched := re.search(r" of (\S+)  \(", heading):
+            found[matched[1]] = tuple(re.findall(r"(?m)^  \w\.(\w+)\(", section))
+    return found
+
+
+def _routes_reading(output: str) -> dict[str, str]:
+    r"""Each operation the view reports, and the category the source defines it at."""
+    return dict(
+        re.findall(r"(?m)^## (\w+), (?:introduced by|defined at) (\S+) \(", output)
+    )
+
+
 _HEADER_FIGURES = (
     ("categories", r"categories (\d+)"),
     ("declarations", r"declarations (\d+)"),
@@ -355,6 +423,20 @@ def _figures(output: str) -> dict[str, int]:
     return figures
 
 
+_READINGS = {
+    "table": _table_reading,
+    "by-supercategory": _claimants_reading,
+    "foreign": _foreign_reading,
+    "audit": _figures,
+    "shape": _figures,
+    "cells": _figures,
+    "dot": _dot_reading,
+    "constructions": _constructions_reading,
+    "properties": _figures,
+    "routes": _routes_reading,
+}
+
+
 def pytest_configure(config) -> None:
     r"""Bind the abbreviation for this session, as the lint documents.
 
@@ -368,6 +450,7 @@ def pytest_configure(config) -> None:
     builtins.declared_graph_document = declared_graph_document
     builtins.declared_graph_figures = declared_graph_figures
     builtins.declared_graph_breadth = declared_graph_breadth
+    builtins.declared_graph_reading = declared_graph_reading
     builtins.probe_run = probe_run
     builtins.stage_records_of = stage_records_of
     builtins.kept_test_run = kept_test_run
@@ -384,6 +467,7 @@ def pytest_unconfigure(config) -> None:
     del builtins.declared_graph_document
     del builtins.declared_graph_figures
     del builtins.declared_graph_breadth
+    del builtins.declared_graph_reading
     del builtins.probe_run
     del builtins.stage_records_of
     del builtins.kept_test_run

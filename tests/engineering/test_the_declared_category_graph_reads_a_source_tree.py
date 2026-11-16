@@ -140,33 +140,112 @@ class Sliced(Objects):
 
 
 @pytest.mark.parametrize(
-    "view",
+    "view, arguments, reading",
     (
-        "table",
-        "by-supercategory",
-        "foreign",
-        "audit",
-        "shape",
-        "cells",
-        "json",
-        "dot",
-        "constructions",
-        "routes",
+        (
+            "table",
+            (),
+            {
+                "Aliased": ("SageSets()", "ConnectedFinitePaths()"),
+                "FiniteObjects": ("Objects()",),
+                "FinitePaths": ("Paths()", "FiniteObjects()"),
+                "Objects": ("Sets()",),
+                "Objects.Connected": ("Sets().Connected()",),
+                "Paths": ("Objects()",),
+                "Paths.Connected": ("<inherited>",),
+                "Sliced": ("Objects()",),
+                "Sliced(base)": ("base",),
+            },
+        ),
+        (
+            "by-supercategory",
+            (),
+            {
+                "Objects": ("FiniteObjects", "Paths", "Sliced"),
+                "Sets": ("Objects", "Objects.Connected"),
+                "SageSets": ("Aliased",),
+                "FiniteObjects": ("FinitePaths",),
+                "FinitePaths": ("Aliased",),
+                "Paths": ("FinitePaths",),
+                "base": ("Sliced(base)",),
+            },
+        ),
+        (
+            "foreign",
+            (),
+            {
+                "Aliased": "SageSets()",
+                "Objects": "Sets()",
+                "Objects.Connected": "Sets().Connected()",
+            },
+        ),
+        (
+            "audit",
+            (),
+            {
+                "Named as a supercategory, defined nowhere": 0,
+                "Declared from a local expression, so the edge is not stated": 1,
+                "Declared on its own name, with other data": 0,
+                "Cycles among distinct categories": 0,
+            },
+        ),
+        (
+            "dot",
+            (),
+            {
+                ("Aliased", "SageSets"),
+                ("Aliased", "FinitePaths.Connected"),
+                ("FiniteObjects", "Objects"),
+                ("FinitePaths", "Paths"),
+                ("FinitePaths", "FiniteObjects"),
+                ("Objects", "Sets"),
+                ("Objects.Connected", "Sets"),
+                ("Paths", "Objects"),
+                ("Sliced", "Objects"),
+                ("Sliced(base)", "base"),
+            },
+        ),
+        ("constructions", (), {"Objects": ("cardinality",)}),
+        (
+            "properties",
+            (),
+            {
+                "Categories under Objects.Connected": 4,
+                "Categories under FiniteObjects.Connected": 2,
+                "Categories under Paths.Connected": 2,
+                "Categories under FinitePaths.Connected": 1,
+                "Construction sites placing their result in Objects.Connected from a property of an input": 0,
+                "Construction sites placing their result in FiniteObjects.Connected from a property of an input": 0,
+                "Construction sites placing their result in Paths.Connected from a property of an input": 0,
+                "Construction sites placing their result in FinitePaths.Connected from a property of an input": 0,
+            },
+        ),
+        ("routes", ("--operation", "cardinality"), {"cardinality": "Objects"}),
     ),
 )
-def test_each_view_the_documentation_names_answers_on_a_tree_it_is_given(view):
-    r"""Every view reads the tree it is handed, so a change can be read against it.
+def test_each_view_states_the_answer_the_toy_trees_declarations_give(view, arguments, reading):
+    r"""Eight views, each with the fact about this graph that it exists to report.
 
-    ``AGENTS.md`` names the views ``by-supercategory``, ``foreign``, ``audit``,
-    ``shape``, ``cells``, ``constructions`` and ``routes``, and a view that
-    refuses the tree it is given cannot be read at all.  A view that answers is
-    not thereby right; the tests below say what it must answer with.  One view
-    per test, because each runs the tool as a process and the views that compute
-    homology or cycles load Sage's libraries first.
+    A view that answers is not thereby right, and an implementation that emits
+    nothing answers every one of them: what a view says is asserted here, in the
+    form it answers in.  The table writes each declaration's own expression and
+    marks an inheritance ``<inherited>``; the grouped view reads that table the
+    other way, ``Objects`` claimed by three categories and ``Sets`` by two;
+    three owned categories place their objects in a category this tree does not
+    define, and no other does; the audit finds one edge it cannot state, the
+    ``base`` of ``Sliced(base)``, and nothing else; the drawing writes the ten
+    declared edges with the two Sage names dashed; ``Objects`` is the one
+    category whose objects have a public operation, ``cardinality``; the four
+    axiom vertices are under the categories the joins put them under, and the
+    toy tree places no result by a property of its input anywhere; and asked for
+    ``cardinality``, the route view names ``Objects`` as where it is defined.
+
+    ``shape`` and ``cells`` are asserted by the tests above, as the figures they
+    state; ``json`` and ``slice`` by the three below, as the declarations and
+    edges they carry.  One view per test, because each run is a process and the
+    views that compute homology or cycles load Sage's libraries first.
     """
-    report = declared_graph_report(_toy_tree(), view)
-
-    assert report.exit_status == 0, f"the {view} view: {report.transcript}"
+    assert declared_graph_reading(_toy_tree(), view, *arguments) == reading
 
 
 def test_a_declaration_names_the_vertex_it_names_and_where_that_name_comes_from():
