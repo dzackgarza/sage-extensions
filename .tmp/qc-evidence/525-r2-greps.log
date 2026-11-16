@@ -1,15 +1,15 @@
-=== worktree HEAD: bf971a934c2ed18b9d16649ea10e4141c7b17d5a
-=== git grep -niE 'issue[ _-]?[0-9]+' src
+=== worktree HEAD: 592f9836ce5d8eadee2721ae0ce95e3a963d32cc
+=== git grep -n -i -E 'issue[ _-]?[0-9]+' -- src
 (no lines)
-=== git grep -nE '[[:space:]]#[0-9]+' src
+=== git grep -n -i -E '#[0-9]+' -- src
 (no lines)
-=== git grep -niE '\bissue' src
+=== git grep -n -i -E '\bissue' -- src
 (no lines)
-=== git grep -nE '.tmp/...probe|measure|staged|qc-evidence' src
+=== git grep -n -E '.tmp/<probe|measure|staged|qc-evidence>' -- src
 (no lines)
-=== git grep -nE 'results/....md' src
+=== git grep -n -E 'results/<name>.md' -- src
 (no lines)
-=== git grep -nE 'used to|no longer|advertis|did not (finish|return|complete)|earlier revision' src
+=== git grep -n -E '<history vocabulary>' -- src: what is left is the instrumental 'used to build' and the engine's 'may advertise', listed for the reader to check
 src/sage_extensions/categories/algebras/algebras.py:1952:                    "the centre inclusion used to retain an algebra action must end at this exact algebra"
 src/sage_extensions/categories/coxeter_diagrams.py:497:            # already used to build the owned root-Gram tensor. Retain it so
 src/sage_extensions/categories/divisors/cartier_divisor_groups.py:429:    used to verify one finite-atlas lift.
@@ -37,9 +37,11 @@ src/sage_extensions/categories/sets/indexed_families.py:86:        a new tuple i
 src/sage_extensions/refine.py:552:    never changes ``obj.category()`` and therefore cannot be used to add
 src/sage_extensions/rings/real.py:326:    never used to decide owned real relations.
 src/sage_extensions/testing/coverage_gaps.py:17:listed as stale: its recorded line numbers no longer describe the file.
-=== the base tree (e13a23c), the same greps, for the contrast
-issue-spelling lines: 17
-number-sign lines:    0
-=== this tree (bf971a9)
-issue-spelling lines: 0
-number-sign lines:    0
+=== base tree 6cb0b3f, the same three greps
+  'issue[ _-]?[0-9]+': 17
+  '#[0-9]+': 0
+  '\bissue': 18
+=== this tree 592f983, the same three greps, as counts
+  'issue[ _-]?[0-9]+': 0
+  '#[0-9]+': 0
+  '\bissue': 0

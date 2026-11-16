@@ -1,4 +1,4 @@
-=== worktree HEAD: bf971a934c2ed18b9d16649ea10e4141c7b17d5a
+=== worktree HEAD: 592f9836ce5d8eadee2721ae0ce95e3a963d32cc
 === files: tests/engineering   extra: --no-time-gates -p sage_extensions.testing.suite_budget
 ....FF........FFFFF.FFF                                                  [100%]
 =================================== FAILURES ===================================
@@ -588,8 +588,8 @@ _______________ test_a_run_keeps_the_files_its_own_options_name ________________
     
 >       assert run.probe.exit_status == 0
 E       AssertionError: assert 1 == 0
-E        +  where 1 = ProbeRun(exit_status=1, outcomes={'test_the_probe.py::test_the_probe': 'passed'}, messages=(), transcript='===========...\', \'rev-parse\', \'HEAD\')\' returned non-zero exit status 128.\n', log='', pid=2837146, launched=1794812137.7499413).exit_status
-E        +    where ProbeRun(exit_status=1, outcomes={'test_the_probe.py::test_the_probe': 'passed'}, messages=(), transcript='===========...\', \'rev-parse\', \'HEAD\')\' returned non-zero exit status 128.\n', log='', pid=2837146, launched=1794812137.7499413) = KeptRun(files=(), probe=ProbeRun(exit_status=1, outcomes={'test_the_probe.py::test_the_probe': 'passed'}, messages=(),...', \'rev-parse\', \'HEAD\')\' returned non-zero exit status 128.\n', log='', pid=2837146, launched=1794812137.7499413)).probe
+E        +  where 1 = ProbeRun(exit_status=1, outcomes={'test_the_probe.py::test_the_probe': 'passed'}, messages=(), transcript='===========...\', \'rev-parse\', \'HEAD\')\' returned non-zero exit status 128.\n', log='', pid=2850501, launched=1794812551.5954132).exit_status
+E        +    where ProbeRun(exit_status=1, outcomes={'test_the_probe.py::test_the_probe': 'passed'}, messages=(), transcript='===========...\', \'rev-parse\', \'HEAD\')\' returned non-zero exit status 128.\n', log='', pid=2850501, launched=1794812551.5954132) = KeptRun(files=(), probe=ProbeRun(exit_status=1, outcomes={'test_the_probe.py::test_the_probe': 'passed'}, messages=(),...', \'rev-parse\', \'HEAD\')\' returned non-zero exit status 128.\n', log='', pid=2850501, launched=1794812551.5954132)).probe
 
 tests/engineering/test_the_timing_record_names_each_stage.py:244: AssertionError
 _____________________ test_a_parallel_run_keeps_one_record _____________________
@@ -613,8 +613,8 @@ _____________________ test_a_parallel_run_keeps_one_record _____________________
     
 >       assert run.probe.exit_status == 0
 E       AssertionError: assert 1 == 0
-E        +  where 1 = ProbeRun(exit_status=1, outcomes={'test_the_probe.py::test_the_probe': 'passed'}, messages=(), transcript='===========...\', \'rev-parse\', \'HEAD\')\' returned non-zero exit status 128.\n', log='', pid=2837257, launched=1794812142.2310863).exit_status
-E        +    where ProbeRun(exit_status=1, outcomes={'test_the_probe.py::test_the_probe': 'passed'}, messages=(), transcript='===========...\', \'rev-parse\', \'HEAD\')\' returned non-zero exit status 128.\n', log='', pid=2837257, launched=1794812142.2310863) = KeptRun(files=(), probe=ProbeRun(exit_status=1, outcomes={'test_the_probe.py::test_the_probe': 'passed'}, messages=(),...', \'rev-parse\', \'HEAD\')\' returned non-zero exit status 128.\n', log='', pid=2837257, launched=1794812142.2310863)).probe
+E        +  where 1 = ProbeRun(exit_status=1, outcomes={'test_the_probe.py::test_the_probe': 'passed'}, messages=(), transcript='===========...\', \'rev-parse\', \'HEAD\')\' returned non-zero exit status 128.\n', log='', pid=2850656, launched=1794812555.1518707).exit_status
+E        +    where ProbeRun(exit_status=1, outcomes={'test_the_probe.py::test_the_probe': 'passed'}, messages=(), transcript='===========...\', \'rev-parse\', \'HEAD\')\' returned non-zero exit status 128.\n', log='', pid=2850656, launched=1794812555.1518707) = KeptRun(files=(), probe=ProbeRun(exit_status=1, outcomes={'test_the_probe.py::test_the_probe': 'passed'}, messages=(),...', \'rev-parse\', \'HEAD\')\' returned non-zero exit status 128.\n', log='', pid=2850656, launched=1794812555.1518707)).probe
 
 tests/engineering/test_the_timing_record_names_each_stage.py:269: AssertionError
 _______________ test_two_runs_started_together_keep_two_records ________________
@@ -641,7 +641,7 @@ E         Use -v to get more diff
 
 tests/engineering/test_the_timing_record_names_each_stage.py:288: AssertionError
 =============================== time-gate report ===============================
-session star import took 4.82 s; the measured ceiling is 3 s
+session star import took 4.47 s; the measured ceiling is 3 s
 =========================== short test summary info ============================
 FAILED tests/engineering/test_polyhedral_engine_routes.sage::test_the_hyperbolic_plane_is_isometric_to_its_negative_and_not_to_its_double
 FAILED tests/engineering/test_polyhedral_engine_routes.sage::test_the_orthogonal_group_of_the_hyperbolic_plane_is_the_klein_four_group
@@ -653,4 +653,4 @@ FAILED tests/engineering/test_the_timing_record_names_each_stage.py::test_the_vi
 FAILED tests/engineering/test_the_timing_record_names_each_stage.py::test_a_run_keeps_the_files_its_own_options_name
 FAILED tests/engineering/test_the_timing_record_names_each_stage.py::test_a_parallel_run_keeps_one_record
 FAILED tests/engineering/test_the_timing_record_names_each_stage.py::test_two_runs_started_together_keep_two_records
-10 failed, 13 passed in 100.49s (0:01:40)
+10 failed, 13 passed in 93.52s (0:01:33)
