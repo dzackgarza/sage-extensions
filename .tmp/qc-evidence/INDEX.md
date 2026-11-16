@@ -3191,3 +3191,14 @@ history rather than a pre-rebase one.
 | `issue521r4-green-rebased.log` | `5f014e0`, clean tree (the rebased head) | the two test files of this round: **6 passed in 5.84 s**, exit 0, `test_lint` loaded and reporting nothing |
 | `issue521r4-probe-session-rebased.log` | `5f014e0`, clean tree | the same probe: **678** public names, `__all__` is them, the dialect's vocabulary is that declaration, `QQ[t]` and `ZZ[x, y]` declare their generators, `Sets.Δ[aleph0]`, `Modules[ZZ]` and `Modules[k]` keep the subscript, `QQ[t]` is the ring with `t` its generator, and `Integer`, `RealNumber`, `matrix` answer as before |
 | `issue521r4-mypy-rebased.log` | `5f014e0`, clean tree | the mypy tier, diff-scoped to the two changed files: the same ten errors as `issue521r4-mypy-fix.log` and `issue521r4-mypy-base.log`, with `all.py`'s three at line 509 for the one added import |
+
+
+`main` moved three times while this round was finished, and the round was rebased
+each time; the ids in the two notes above are the ids of the `c9568ed`- and
+`cf6ba0b`-based histories.  The pushed history is `0003ad4` (the reds' test),
+`01c9949` (the repair), `76d3191` (the two restored rows), `69d9ae9` and
+`b107242` (the evidence).  The runs citing
+`27a1bba` and `5f014e0` measured trees whose four files are byte-identical to the
+pushed tip's -- `git diff --stat 5f014e0 b107242 -- src/sage_extensions/all.py
+src/sage_extensions/language_runtime.py tests/foundations` is empty -- so they
+cover the code this is pushed from.
