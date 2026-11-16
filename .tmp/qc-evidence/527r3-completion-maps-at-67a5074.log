@@ -1,0 +1,121 @@
+FF.FF                                                                    [100%]
+=================================== FAILURES ===================================
+__ test_completion_of_the_dual_numbers_at_their_nilpotent_ideal_is_injective ___
+sage/misc/cachefunc.pyx:1024: in sage.misc.cachefunc.CachedFunction.__call__
+    return self.cache[k]
+E   KeyError: ((Free module on {[1], [e]} over Fraction Field of Integer Ring, Finitely presented module on 1 module generators over Free module on {[1], [e]} over Fraction Field of Integer Ring, 3), ())
+
+During handling of the above exception, another exception occurred:
+tests/rings/test_completion_maps.sage:15: in test_completion_of_the_dual_numbers_at_their_nilpotent_ideal_is_injective
+    completion = dual.adic_completion(dual.ideal(ebar), precision=3)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/ring_foundation.py:4720: in adic_completion
+    result = self._adic_completion_construction(ideal, precision)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/ring_foundation.py:4223: in _adic_completion_construction
+    return AdicCompletions()(self, ideal, precision=precision)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/sage/.venv/lib/python3.14/site-packages/sage/categories/category.py:592: in __call__
+    return self._call_(x, *args, **opts)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/commutative_algebra.py:3025: in _call_
+    return _adic_completion_from_owned_data(
+sage/misc/cachefunc.pyx:1029: in sage.misc.cachefunc.CachedFunction.__call__
+    ???
+src/sage_extensions/categories/rings/commutative_algebra.py:5567: in _adic_completion_from_owned_data
+    defining_is_unit = defining == unit_ideal
+                       ^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/framed/finitely_generated/finitely_presented_modules.py:471: in __eq__
+    return CommutativeIdeals.ParentMethods.__eq__(self, other)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/commutative_ideals.py:319: in __eq__
+    return bool(self._engine_ideal() == other._engine_ideal())
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/structure/element.pyx:1099: in sage.structure.element.Element.__richcmp__
+    ???
+sage/structure/element.pyx:1103: in sage.structure.element.Element._richcmp_
+    ???
+/sage/.venv/lib/python3.14/site-packages/sage/rings/ideal.py:1426: in _richcmp_
+    return Ideal_generic._richcmp_(self, other, op)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/sage/.venv/lib/python3.14/site-packages/sage/rings/ideal.py:360: in _richcmp_
+    raise NotImplementedError(f'ideal comparison in {self.ring()} is not implemented')
+E   NotImplementedError: ideal comparison in Univariate Quotient Polynomial Ring in ebar over Rational Field with modulus e^2 is not implemented
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:444 General module over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:833 Elementwise module morphism Module over Fraction Field of Integer Ring on Classes in the multilinear tensor presentation -> Module over Fraction Field of Integer Ring on Fraction Field of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+_ test_completion_at_an_idempotent_ideal_is_the_quotient_and_is_not_separated __
+sage/misc/cachefunc.pyx:1024: in sage.misc.cachefunc.CachedFunction.__call__
+    return self.cache[k]
+E   KeyError: ((Free module on {[1], [e]} over Fraction Field of Integer Ring, Finitely presented module on 1 module generators over Free module on {[1], [e]} over Fraction Field of Integer Ring, 3), ())
+
+During handling of the above exception, another exception occurred:
+tests/rings/test_completion_maps.sage:33: in test_completion_at_an_idempotent_ideal_is_the_quotient_and_is_not_separated
+    completion = product.adic_completion(ideal, precision=3)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/ring_foundation.py:4720: in adic_completion
+    result = self._adic_completion_construction(ideal, precision)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/ring_foundation.py:4223: in _adic_completion_construction
+    return AdicCompletions()(self, ideal, precision=precision)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/sage/.venv/lib/python3.14/site-packages/sage/categories/category.py:592: in __call__
+    return self._call_(x, *args, **opts)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/commutative_algebra.py:3025: in _call_
+    return _adic_completion_from_owned_data(
+sage/misc/cachefunc.pyx:1029: in sage.misc.cachefunc.CachedFunction.__call__
+    w = self.f(*args, **kwds)
+src/sage_extensions/categories/rings/commutative_algebra.py:5567: in _adic_completion_from_owned_data
+    defining_is_unit = defining == unit_ideal
+                       ^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/framed/finitely_generated/finitely_presented_modules.py:471: in __eq__
+    return CommutativeIdeals.ParentMethods.__eq__(self, other)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/commutative_ideals.py:319: in __eq__
+    return bool(self._engine_ideal() == other._engine_ideal())
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/structure/element.pyx:1099: in sage.structure.element.Element.__richcmp__
+    ???
+sage/structure/element.pyx:1103: in sage.structure.element.Element._richcmp_
+    ???
+/sage/.venv/lib/python3.14/site-packages/sage/rings/ideal.py:1426: in _richcmp_
+    return Ideal_generic._richcmp_(self, other, op)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/sage/.venv/lib/python3.14/site-packages/sage/rings/ideal.py:360: in _richcmp_
+    raise NotImplementedError(f'ideal comparison in {self.ring()} is not implemented')
+E   NotImplementedError: ideal comparison in Univariate Quotient Polynomial Ring in ebar over Rational Field with modulus e^2 - e is not implemented
+____________________ test_artin_name_requires_finite_length ____________________
+tests/rings/test_completion_maps.sage:57: in test_artin_name_requires_finite_length
+    assert line_completion.adic_artin_truncation(3) in ArtinianRings()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/commutative_algebra.py:3250: in adic_artin_truncation
+    raise ValueError(
+E   ValueError: Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring / Ideal (x^3) of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring is not known to be Artinian, so it has not been shown to have finite length
+_ test_a_ring_map_carrying_the_ideal_into_the_ideal_induces_a_map_of_completions _
+tests/rings/test_completion_maps.sage:78: in test_a_ring_map_carrying_the_ideal_into_the_ideal_induces_a_map_of_completions
+    assert induced(1 - x_hat) * completion.completion_map()(1 + x**2) == completion.one() - x_hat**4
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/sets/set_categories.py:823: in __call__
+    image = function(point, *args, **kwargs)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/commutative_algebra.py:3372: in image
+    raise AssertionError(
+E   AssertionError: cannot evaluate the induced map of completions at element of Ring over Fraction Field of Integer Ring: it is not known as the image of an element of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring
+=========================== short test summary info ============================
+FAILED tests/rings/test_completion_maps.sage::test_completion_of_the_dual_numbers_at_their_nilpotent_ideal_is_injective
+FAILED tests/rings/test_completion_maps.sage::test_completion_at_an_idempotent_ideal_is_the_quotient_and_is_not_separated
+FAILED tests/rings/test_completion_maps.sage::test_artin_name_requires_finite_length
+FAILED tests/rings/test_completion_maps.sage::test_a_ring_map_carrying_the_ideal_into_the_ideal_induces_a_map_of_completions
+4 failed, 1 passed in 2.62s
+[peakrss] probe527r3: child waited=1 shell_code=1 samples=2
+[peakrss] peak tree RSS      : 308 MiB
+[peakrss] low-water MemAvail : 9805 MiB
+[peakrss] peak single VmHWM  : 308 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      297 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     2.0s procs=  3 rss=   308 MiB hwm=   308 MiB avail=  9805 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     3 MiB hwm=     3 MiB avail=  9882 MiB
+launcher exit: 1 

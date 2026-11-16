@@ -1,0 +1,13 @@
+........                                                                 [100%]
+8 passed in 1.82s
+[peakrss] probe527r3: child waited=0 shell_code=0 samples=2
+[peakrss] peak tree RSS      : 302 MiB
+[peakrss] low-water MemAvail : 9084 MiB
+[peakrss] peak single VmHWM  : 302 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      291 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     2.0s procs=  3 rss=   302 MiB hwm=   302 MiB avail=  9084 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     7 MiB hwm=     7 MiB avail=  9264 MiB
+launcher exit: 0 

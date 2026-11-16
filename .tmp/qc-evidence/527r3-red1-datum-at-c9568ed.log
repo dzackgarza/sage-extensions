@@ -1,0 +1,36 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+________ test_a_completion_states_whether_a_power_of_its_ideal_is_zero _________
+sage/structure/category_object.pyx:858: in sage.structure.category_object.CategoryObject.getattr_from_category
+    return self._cached_methods[name]
+E   KeyError: 'completion_defining_power_vanishes'
+
+During handling of the above exception, another exception occurred:
+tests/rings/test_the_adic_inverse_system_and_its_limit_cone.sage:183: in test_a_completion_states_whether_a_power_of_its_ideal_is_zero
+    assert completion.completion_defining_power_vanishes() is True
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    ???
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    ???
+sage/cpython/getattr.pyx:362: in sage.cpython.getattr.getattr_from_other_class
+    ???
+E   AttributeError: 'Owned_AdicCompletionAlgebraParent_with_category' object has no attribute 'completion_defining_power_vanishes'
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:444 General module over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:833 Elementwise module morphism Module over Fraction Field of Integer Ring on Classes in the multilinear tensor presentation -> Module over Fraction Field of Integer Ring on Fraction Field of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+=========================== short test summary info ============================
+FAILED tests/rings/test_the_adic_inverse_system_and_its_limit_cone.sage::test_a_completion_states_whether_a_power_of_its_ideal_is_zero
+1 failed, 6 deselected in 3.26s
+[peakrss] probe527r3: child waited=1 shell_code=1 samples=3
+[peakrss] peak tree RSS      : 331 MiB
+[peakrss] low-water MemAvail : 9149 MiB
+[peakrss] peak single VmHWM  : 331 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      320 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     4.0s procs=  3 rss=   331 MiB hwm=   331 MiB avail=  9149 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   269 MiB hwm=   269 MiB avail=  9159 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     0 MiB hwm=     0 MiB avail=  9391 MiB
+launcher exit: 1 

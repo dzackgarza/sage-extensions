@@ -3249,3 +3249,25 @@ source change; the green is measured at the `fix:` commit.
 | `527r3-consumers-at-6bfc56b.log` | `6bfc56b` | the consumers of the ring map, probed: `QQ(i)` at `(0)` (`_completion_map_as_ring_morphism`, `extended_ideal`, `completion_map_kernel`, `adic_projection(1)`, the arithmetic mode, and the constant inverse system), `QQ[x]` at `(x)` (the ring map, the extended ideal, the projection of `x`, and absence from the core) and `QQ[x]` at `(0)` (the ring map, the extended ideal, the projection of `x^2`): 13 answers, no failure |
 | `527r3-completion-maps-at-eb5baa8.log` | `eb5baa8`, the push base | `tests/rings/test_completion_maps.sage`, the consumer file this change touches most: **4 failed, 1 passed in 7.47 s**, the four ids filed in `results/issue-to-file-completion-maps-four-failures.md` |
 | `527r3-completion-maps-at-ace9f84.log` | `ace9f84`, this round's head | the same file: **4 failed, 1 passed in 10.86 s**, the same four `FAILED` ids — this round's two repairs change none of them |
+
+## `#527` round 3, re-taken: the same six commits and five runs, rebased onto `c9568ed` (2026-11-16)
+
+`main` advanced to `c9568ed` while this round's evidence was being written, so the six
+commits were rebased from `eb5baa8` onto it and their ids changed: `ec5fdc7` is the
+first test, `17238c6` its repair, `202f65c` the second test, `67a5074` its repair, and
+`2577ad4` and `55aecf2` the evidence.  Their content is the content of the commits the
+section above names (`git diff 6bfc56b 67a5074` over the two source files and the test
+file is empty), and the only file `main` gained in between that this round touches is
+none (`git diff eb5baa8 c9568ed` over those paths is empty).  The runs are taken again
+at the commits being pushed, by the same command shape; the previous section's logs stay
+as they were taken.
+
+| log | tree | result |
+| --- | --- | --- |
+| `527r3-red1-datum-at-c9568ed.log` | `c9568ed`, the push base, + the first test only | `-k states_whether`: **1 failed, 6 deselected in 3.26 s**, `AttributeError: ... has no attribute 'completion_defining_power_vanishes'` |
+| `527r3-green1-datum-at-17238c6.log` | `17238c6`, the repair, with the test lint | the same selection: **1 passed, 7 deselected in 1.69 s** |
+| `527r3-red2-rank-at-17238c6.log` | `17238c6` + the second test only | `-k rank_one`: **1 failed, 1 passed, 6 deselected in 4.95 s** — `QQ` at `(0)`, `ValueError: Rational Field has no chosen resolution ...`, while the `QQ(i)` row passes |
+| `527r3-green-at-67a5074.log` | `67a5074`, the repair, with the test lint | the whole file: **8 passed in 1.82 s** |
+| `527r3-consumers-at-67a5074.log` | `67a5074` | the consumer probe again: 13 answers, no failure |
+| `527r3-completion-maps-at-c9568ed.log` | `c9568ed`, the push base | `tests/rings/test_completion_maps.sage`: **4 failed, 1 passed in 3.55 s**, the four filed ids |
+| `527r3-completion-maps-at-67a5074.log` | `67a5074`, this round's head | the same file: **4 failed, 1 passed in 2.62 s**, the same four ids |
