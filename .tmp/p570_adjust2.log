@@ -1,0 +1,235 @@
+tree SHA: eead610cd07e9d32019420d4969c117ceac714b2 (modified paths: 0)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 0.76 1.24 1.78 2/484 3308340
+probe: .tmp/p570_adjust.py; inner 575 s
+[t=    2.13s]  Otilde(T_Co) and its quotient  rss=401 MiB
+[t=    4.58s]  the cusp's own line, row position 492  rss=413 MiB
+[t=   14.98s]  the parabolic family at the cusp's line: 96 generators in 10.40 s  rss=503 MiB
+[t=   35.27s]  the ambient witness carrying the plane's line to it: 20.28 s, found True  rss=567 MiB
+[t=   37.57s] . enter libgap.Subgroup  rss=578 MiB
+[t=   37.57s]  exit  libgap.Subgroup  0.00 s  rss=578 MiB
+[t=   37.57s]  the subgroup's condition S in the product: |S| = 1  rss=578 MiB
+[t=   37.57s]  the adjuster  rss=578 MiB
+[t=   37.67s] . enter libgap.IsomorphismPermGroup  rss=578 MiB
+[t=   37.69s]  exit  libgap.IsomorphismPermGroup  0.01 s  rss=578 MiB
+[t=   37.69s] . enter libgap.Range  rss=578 MiB
+[t=   37.69s]  exit  libgap.Range  0.00 s  rss=578 MiB
+[t=   37.69s] . enter libgap.Image  rss=578 MiB
+[t=   37.69s]  exit  libgap.Image  0.00 s  rss=578 MiB
+[t=   37.69s] . enter libgap.Image  rss=578 MiB
+[t=   37.69s]  exit  libgap.Image  0.00 s  rss=578 MiB
+[t=   37.78s] . enter libgap.Image  rss=578 MiB
+[t=   37.78s]  exit  libgap.Image  0.00 s  rss=578 MiB
+[t=   37.87s] . enter libgap.Image  rss=578 MiB
+[t=   37.87s]  exit  libgap.Image  0.00 s  rss=578 MiB
+[t=   37.96s] . enter libgap.Image  rss=578 MiB
+[t=   37.96s]  exit  libgap.Image  0.00 s  rss=578 MiB
+[t=   38.05s] . enter libgap.Image  rss=578 MiB
+[t=   38.05s]  exit  libgap.Image  0.00 s  rss=578 MiB
+[t=   38.14s] . enter libgap.Image  rss=578 MiB
+[t=   38.14s]  exit  libgap.Image  0.00 s  rss=578 MiB
+[t=   38.22s] . enter libgap.Image  rss=578 MiB
+[t=   38.23s]  exit  libgap.Image  0.00 s  rss=578 MiB
+[t=   38.30s] . enter libgap.Image  rss=578 MiB
+[t=   38.30s]  exit  libgap.Image  0.00 s  rss=578 MiB
+[t=   38.39s] . enter libgap.Image  rss=578 MiB
+[t=   38.39s]  exit  libgap.Image  0.00 s  rss=578 MiB
+[t=   38.48s] . enter libgap.Image  rss=578 MiB
+[t=   38.48s]  exit  libgap.Image  0.00 s  rss=578 MiB
+[t=   38.58s] . enter libgap.Image  rss=578 MiB
+[t=   38.58s]  exit  libgap.Image  0.00 s  rss=578 MiB
+[t=   38.67s] . enter libgap.Image  rss=578 MiB
+[t=   38.67s]  exit  libgap.Image  0.00 s  rss=578 MiB
+[t=   38.76s] . enter libgap.Image  rss=578 MiB
+[t=   38.76s]  exit  libgap.Image  0.00 s  rss=578 MiB
+[t=   38.83s] . enter libgap.Image  rss=578 MiB
+[t=   38.83s]  exit  libgap.Image  0.00 s  rss=578 MiB
+[t=   38.92s] . enter libgap.Image  rss=579 MiB
+[t=   38.92s]  exit  libgap.Image  0.00 s  rss=579 MiB
+[t=   39.02s] . enter libgap.Image  rss=579 MiB
+[t=   39.02s]  exit  libgap.Image  0.00 s  rss=579 MiB
+[t=   39.06s] . enter libgap.Image  rss=579 MiB
+[t=   39.07s]  exit  libgap.Image  0.00 s  rss=579 MiB
+[t=   39.15s] . enter libgap.Image  rss=579 MiB
+[t=   39.15s]  exit  libgap.Image  0.00 s  rss=579 MiB
+[t=   39.23s] . enter libgap.Image  rss=579 MiB
+[t=   39.23s]  exit  libgap.Image  0.00 s  rss=579 MiB
+[t=   39.32s] . enter libgap.Image  rss=579 MiB
+[t=   39.32s]  exit  libgap.Image  0.00 s  rss=579 MiB
+[t=   39.41s] . enter libgap.Image  rss=579 MiB
+[t=   39.41s]  exit  libgap.Image  0.00 s  rss=579 MiB
+[t=   39.50s] . enter libgap.Image  rss=579 MiB
+[t=   39.50s]  exit  libgap.Image  0.00 s  rss=579 MiB
+[t=   39.59s] . enter libgap.Image  rss=579 MiB
+[t=   39.59s]  exit  libgap.Image  0.00 s  rss=579 MiB
+[t=   39.68s] . enter libgap.Image  rss=579 MiB
+[t=   39.68s]  exit  libgap.Image  0.00 s  rss=579 MiB
+[t=   39.77s] . enter libgap.Image  rss=579 MiB
+[t=   39.77s]  exit  libgap.Image  0.00 s  rss=579 MiB
+[t=   39.86s] . enter libgap.Image  rss=579 MiB
+[t=   39.86s]  exit  libgap.Image  0.00 s  rss=579 MiB
+[t=   39.95s] . enter libgap.Image  rss=579 MiB
+[t=   39.95s]  exit  libgap.Image  0.00 s  rss=579 MiB
+[t=   40.04s] . enter libgap.Image  rss=579 MiB
+[t=   40.04s]  exit  libgap.Image  0.00 s  rss=579 MiB
+[t=   40.13s] . enter libgap.Image  rss=579 MiB
+[t=   40.13s]  exit  libgap.Image  0.00 s  rss=579 MiB
+[t=   40.22s] . enter libgap.Image  rss=579 MiB
+[t=   40.22s]  exit  libgap.Image  0.00 s  rss=579 MiB
+[t=   40.30s] . enter libgap.Image  rss=579 MiB
+[t=   40.30s]  exit  libgap.Image  0.00 s  rss=579 MiB
+[t=   40.39s] . enter libgap.Image  rss=579 MiB
+[t=   40.39s]  exit  libgap.Image  0.00 s  rss=579 MiB
+[t=   40.48s] . enter libgap.Image  rss=579 MiB
+[t=   40.48s]  exit  libgap.Image  0.00 s  rss=579 MiB
+[t=   40.57s] . enter libgap.Image  rss=579 MiB
+[t=   40.57s]  exit  libgap.Image  0.00 s  rss=579 MiB
+[t=   40.66s] . enter libgap.Image  rss=579 MiB
+[t=   40.66s]  exit  libgap.Image  0.00 s  rss=579 MiB
+[t=   40.75s] . enter libgap.Image  rss=579 MiB
+[t=   40.75s]  exit  libgap.Image  0.00 s  rss=579 MiB
+[t=   40.85s] . enter libgap.Image  rss=579 MiB
+[t=   40.85s]  exit  libgap.Image  0.00 s  rss=579 MiB
+[t=   40.94s] . enter libgap.Image  rss=579 MiB
+[t=   40.94s]  exit  libgap.Image  0.00 s  rss=579 MiB
+[t=   41.02s] . enter libgap.Image  rss=579 MiB
+[t=   41.02s]  exit  libgap.Image  0.00 s  rss=579 MiB
+[t=   41.05s] . enter libgap.Image  rss=579 MiB
+[t=   41.05s]  exit  libgap.Image  0.00 s  rss=579 MiB
+[t=   41.14s] . enter libgap.Image  rss=579 MiB
+[t=   41.15s]  exit  libgap.Image  0.00 s  rss=579 MiB
+[t=   41.24s] . enter libgap.Image  rss=579 MiB
+[t=   41.24s]  exit  libgap.Image  0.00 s  rss=579 MiB
+[t=   41.33s] . enter libgap.Image  rss=579 MiB
+[t=   41.33s]  exit  libgap.Image  0.00 s  rss=579 MiB
+[t=   41.42s] . enter libgap.Image  rss=579 MiB
+[t=   41.42s]  exit  libgap.Image  0.00 s  rss=579 MiB
+[t=   41.51s] . enter libgap.Image  rss=580 MiB
+[t=   41.51s]  exit  libgap.Image  0.00 s  rss=580 MiB
+[t=   41.60s] . enter libgap.Image  rss=580 MiB
+[t=   41.60s]  exit  libgap.Image  0.00 s  rss=580 MiB
+[t=   41.69s] . enter libgap.Image  rss=580 MiB
+[t=   41.69s]  exit  libgap.Image  0.00 s  rss=580 MiB
+[t=   41.78s] . enter libgap.Image  rss=580 MiB
+[t=   41.78s]  exit  libgap.Image  0.00 s  rss=580 MiB
+[t=   41.87s] . enter libgap.Image  rss=580 MiB
+[t=   41.87s]  exit  libgap.Image  0.00 s  rss=580 MiB
+[t=   41.95s] . enter libgap.Image  rss=580 MiB
+[t=   41.95s]  exit  libgap.Image  0.00 s  rss=580 MiB
+[t=   42.00s] . enter libgap.Image  rss=580 MiB
+[t=   42.00s]  exit  libgap.Image  0.00 s  rss=580 MiB
+[t=   42.09s] . enter libgap.Image  rss=580 MiB
+[t=   42.09s]  exit  libgap.Image  0.00 s  rss=580 MiB
+[t=   42.17s] . enter libgap.Image  rss=580 MiB
+[t=   42.17s]  exit  libgap.Image  0.00 s  rss=580 MiB
+[t=   42.26s] . enter libgap.Image  rss=580 MiB
+[t=   42.26s]  exit  libgap.Image  0.00 s  rss=580 MiB
+[t=   42.36s] . enter libgap.Image  rss=580 MiB
+[t=   42.36s]  exit  libgap.Image  0.00 s  rss=580 MiB
+[t=   42.45s] . enter libgap.Image  rss=580 MiB
+[t=   42.45s]  exit  libgap.Image  0.00 s  rss=580 MiB
+[t=   42.54s] . enter libgap.Image  rss=580 MiB
+[t=   42.54s]  exit  libgap.Image  0.00 s  rss=580 MiB
+[t=   42.62s] . enter libgap.Image  rss=580 MiB
+[t=   42.62s]  exit  libgap.Image  0.00 s  rss=580 MiB
+[t=   42.70s] . enter libgap.Image  rss=580 MiB
+[t=   42.70s]  exit  libgap.Image  0.00 s  rss=580 MiB
+[t=   42.80s] . enter libgap.Image  rss=580 MiB
+[t=   42.80s]  exit  libgap.Image  0.00 s  rss=580 MiB
+[t=   42.89s] . enter libgap.Image  rss=580 MiB
+[t=   42.89s]  exit  libgap.Image  0.00 s  rss=580 MiB
+[t=   42.98s] . enter libgap.Image  rss=580 MiB
+[t=   42.98s]  exit  libgap.Image  0.00 s  rss=580 MiB
+[t=   43.07s] . enter libgap.Image  rss=580 MiB
+[t=   43.07s]  exit  libgap.Image  0.00 s  rss=580 MiB
+[t=   43.16s] . enter libgap.Image  rss=580 MiB
+[t=   43.16s]  exit  libgap.Image  0.00 s  rss=580 MiB
+[t=   43.25s] . enter libgap.Image  rss=580 MiB
+[t=   43.25s]  exit  libgap.Image  0.00 s  rss=580 MiB
+[t=   43.34s] . enter libgap.Image  rss=580 MiB
+[t=   43.34s]  exit  libgap.Image  0.00 s  rss=580 MiB
+[t=   43.43s] . enter libgap.Image  rss=580 MiB
+[t=   43.43s]  exit  libgap.Image  0.00 s  rss=580 MiB
+[t=   43.52s] . enter libgap.Image  rss=580 MiB
+[t=   43.52s]  exit  libgap.Image  0.00 s  rss=580 MiB
+[t=   43.60s] . enter libgap.Image  rss=581 MiB
+[t=   43.60s]  exit  libgap.Image  0.00 s  rss=581 MiB
+[t=   43.69s] . enter libgap.Image  rss=581 MiB
+[t=   43.69s]  exit  libgap.Image  0.00 s  rss=581 MiB
+[t=   43.78s] . enter libgap.Image  rss=581 MiB
+[t=   43.78s]  exit  libgap.Image  0.00 s  rss=581 MiB
+[t=   43.87s] . enter libgap.Image  rss=581 MiB
+[t=   43.87s]  exit  libgap.Image  0.00 s  rss=581 MiB
+[t=   43.96s] . enter libgap.Image  rss=581 MiB
+[t=   43.96s]  exit  libgap.Image  0.00 s  rss=581 MiB
+[t=   44.05s] . enter libgap.Image  rss=581 MiB
+[t=   44.05s]  exit  libgap.Image  0.00 s  rss=581 MiB
+[t=   44.14s] . enter libgap.Image  rss=581 MiB
+[t=   44.14s]  exit  libgap.Image  0.00 s  rss=581 MiB
+[t=   44.23s] . enter libgap.Image  rss=581 MiB
+[t=   44.23s]  exit  libgap.Image  0.00 s  rss=581 MiB
+[t=   44.32s] . enter libgap.Image  rss=581 MiB
+[t=   44.32s]  exit  libgap.Image  0.00 s  rss=581 MiB
+[t=   44.41s] . enter libgap.Image  rss=581 MiB
+[t=   44.41s]  exit  libgap.Image  0.00 s  rss=581 MiB
+[t=   44.50s] . enter libgap.Image  rss=581 MiB
+[t=   44.50s]  exit  libgap.Image  0.00 s  rss=581 MiB
+[t=   44.59s] . enter libgap.Image  rss=581 MiB
+[t=   44.59s]  exit  libgap.Image  0.00 s  rss=581 MiB
+[t=   44.67s] . enter libgap.Image  rss=581 MiB
+[t=   44.67s]  exit  libgap.Image  0.00 s  rss=581 MiB
+[t=   44.76s] . enter libgap.Image  rss=581 MiB
+[t=   44.76s]  exit  libgap.Image  0.00 s  rss=581 MiB
+[t=   44.85s] . enter libgap.Image  rss=581 MiB
+[t=   44.85s]  exit  libgap.Image  0.00 s  rss=581 MiB
+[t=   44.94s] . enter libgap.Image  rss=581 MiB
+[t=   44.94s]  exit  libgap.Image  0.00 s  rss=581 MiB
+[t=   45.03s] . enter libgap.Image  rss=581 MiB
+[t=   45.03s]  exit  libgap.Image  0.00 s  rss=581 MiB
+[t=   45.13s] . enter libgap.Image  rss=581 MiB
+[t=   45.13s]  exit  libgap.Image  0.00 s  rss=581 MiB
+[t=   45.22s] . enter libgap.Image  rss=581 MiB
+[t=   45.22s]  exit  libgap.Image  0.00 s  rss=581 MiB
+[t=   45.31s] . enter libgap.Image  rss=581 MiB
+[t=   45.31s]  exit  libgap.Image  0.00 s  rss=581 MiB
+[t=   45.39s] . enter libgap.Image  rss=581 MiB
+[t=   45.39s]  exit  libgap.Image  0.00 s  rss=581 MiB
+[t=   45.49s] . enter libgap.Image  rss=581 MiB
+[t=   45.49s]  exit  libgap.Image  0.00 s  rss=581 MiB
+[t=   45.58s] . enter libgap.Image  rss=581 MiB
+[t=   45.58s]  exit  libgap.Image  0.00 s  rss=581 MiB
+[t=   45.67s] . enter libgap.Image  rss=582 MiB
+[t=   45.67s]  exit  libgap.Image  0.00 s  rss=582 MiB
+[t=   45.75s] . enter libgap.Image  rss=582 MiB
+[t=   45.75s]  exit  libgap.Image  0.00 s  rss=582 MiB
+[t=   45.84s] . enter libgap.Image  rss=582 MiB
+[t=   45.84s]  exit  libgap.Image  0.00 s  rss=582 MiB
+[t=   45.93s] . enter libgap.Image  rss=582 MiB
+[t=   45.93s]  exit  libgap.Image  0.00 s  rss=582 MiB
+[t=   46.02s] . enter libgap.Image  rss=582 MiB
+[t=   46.02s]  exit  libgap.Image  0.00 s  rss=582 MiB
+[t=   46.10s] . enter libgap.Image  rss=582 MiB
+[t=   46.10s]  exit  libgap.Image  0.00 s  rss=582 MiB
+[t=   46.10s] . enter libgap.Subgroup  rss=582 MiB
+[t=   46.11s]  exit  libgap.Subgroup  0.01 s  rss=582 MiB
+[t=   46.11s] . enter libgap.Image  rss=582 MiB
+[t=   46.36s]  exit  libgap.Image  0.25 s  rss=582 MiB
+[t=   46.36s] . enter libgap.Image  rss=582 MiB
+[t=   46.36s]  exit  libgap.Image  0.00 s  rss=582 MiB
+[t=   46.36s] . enter _double_coset_adjustment  rss=582 MiB
+[t=   46.36s] .. enter libgap.DoubleCoset  rss=582 MiB
+[t=   46.36s] . exit  libgap.DoubleCoset  0.00 s  rss=582 MiB
+[peakrss] probe570: child waited=124 shell_code=124 samples=288
+[peakrss] peak tree RSS      : 1743 MiB
+[peakrss] low-water MemAvail : 10284 MiB
+[peakrss] peak single VmHWM  : 1743 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     1732 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   490.3s procs=  3 rss=  1743 MiB hwm=  1743 MiB avail= 11312 MiB
+[peakrss]   t=   492.3s procs=  3 rss=  1743 MiB hwm=  1743 MiB avail= 11312 MiB
+[peakrss]   t=   494.3s procs=  3 rss=  1743 MiB hwm=  1743 MiB avail= 11312 MiB
+[peakrss]   t=   496.3s procs=  3 rss=  1743 MiB hwm=  1743 MiB avail= 11312 MiB
+[peakrss]   t=   498.3s procs=  3 rss=  1743 MiB hwm=  1743 MiB avail= 11312 MiB
+probe exit: 124

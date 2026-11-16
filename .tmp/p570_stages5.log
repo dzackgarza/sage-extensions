@@ -1,0 +1,55 @@
+tree SHA: eead610cd07e9d32019420d4969c117ceac714b2 (modified paths: 0)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 0.79 2.18 2.81 2/372 3295423
+probe: .tmp/p570_stages.py; inner 575 s
+[t=    0.70s |     0.70s] lattice Integral lattice of rank 11 and signature (2, 9) rank 11  rss=272 MiB
+[t=    1.91s |     1.22s] construction: Otilde(T_Co) = stable_orthogonal_group()  1.21 s  rss=290 MiB
+[t=    1.92s |     0.00s] construction: finite_character_quotient()  0.00 s  rss=290 MiB
+[t=    1.92s |     0.00s] quotient data has_discriminant=True det_kernel=False spinor_kernel=False  rss=290 MiB
+[t=    1.94s |     0.02s] construction: the plane  0.02 s  rss=293 MiB
+[t=    1.95s |     0.01s] construction: the plane line's divided class  0.01 s  rss=293 MiB
+[t=    4.58s |     2.62s] construction: the named row representative, from its recorded coordinates  2.62 s  rss=303 MiB
+[t=    4.58s |     0.00s] construction: that line  0.00 s  rss=303 MiB
+[t=    4.58s |     0.00s] the named specimen row position 492 of 527, divided class -18*[h] + 10*[fp] + 2*[a1] - 2*[a2] - 5*[a3] - 7*[a4] + 4*[a5] + 16*[a6] - 4*[a7], primitive True, equal to the plane's own line False  rss=303 MiB
+[t=   15.08s |    10.50s] computation: ambient.isotropic_stabilizer_generators(line)  10.50 s  rss=503 MiB
+[t=   15.08s |     0.00s] family 88 generators  rss=503 MiB
+[t=   67.17s |    52.09s] computation: _image_section()  52.09 s  rss=642 MiB
+[t=   67.19s |     0.02s] computation: _gap_image()  0.02 s  rss=642 MiB
+[t=   67.19s |     0.00s] computation: _gap_product()  0.00 s  rss=642 MiB
+[t=   67.19s |     0.00s] finite model factors=['discriminant'] product=GapElement  rss=642 MiB
+[t=   67.26s |     0.06s] discriminant image built  rss=642 MiB
+[t=   67.26s |     0.01s] divided class data D(W) has 2 classes  rss=642 MiB
+[t=   67.26s |     0.00s] image generators 4 generators  rss=642 MiB
+    the walk applied 2108 generator images
+[t=   67.28s |     0.02s] computation: the orbit of the divided data under rho(O(L))  0.02 s  rss=642 MiB
+[t=   67.28s |     0.00s] orbit |orbit|=527  rss=642 MiB
+[t=   67.28s |     0.00s] computation: Size(discriminant_image) = |rho(O(L))|  0.00 s  rss=642 MiB
+[t=   67.28s |     0.00s] orbit-stabilizer upper bound |image|=46998591897600 |image|/|orbit|=89181388800  rss=642 MiB
+[t=   83.87s |    16.59s] computation: line.stabilizer_discriminant_image()  16.59 s  rss=679 MiB
+[t=   83.95s |     0.08s] computation: its cardinality()  0.08 s  rss=679 MiB
+[t=   83.95s |     0.00s] the owned stabilizer image |rho(Stab(line))| = 89181388800  rss=679 MiB
+[t=   84.17s |     0.22s] computation: Stabilizer(discriminant_image, data)  0.22 s  rss=682 MiB
+[t=   84.17s |     0.00s] computation: PreImages(projection, Stabilizer)  0.00 s  rss=682 MiB
+[t=   84.17s |     0.00s] computation: Size(upper)  0.00 s  rss=682 MiB
+[t=   84.17s |     0.00s] the GAP upper bound |upper|=89181388800  rss=682 MiB
+[t=   91.86s |     7.69s] computation: Subgroup(product, images of the family)  7.69 s  rss=685 MiB
+[t=   91.88s |     0.02s] computation: Size(lower)  0.02 s  rss=685 MiB
+[t=   91.88s |     0.00s] the lower bound |lower|=89181388800  rss=685 MiB
+[t=   91.89s |     0.01s] computation: IsSubset(upper, lower)  0.01 s  rss=685 MiB
+[t=   91.89s |     0.00s] containment lower <= upper: True  rss=685 MiB
+[t=   91.89s |     0.00s] the loop not entered: |lower|=89181388800, |upper|=89181388800  rss=685 MiB
+total 91.9 s, rss 685 MiB
+[peakrss] probe570: child waited=0 shell_code=0 samples=48
+[peakrss] peak tree RSS      : 696 MiB
+[peakrss] low-water MemAvail : 12471 MiB
+[peakrss] peak single VmHWM  : 696 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      685 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    94.0s procs=  3 rss=   696 MiB hwm=   696 MiB avail= 12471 MiB
+[peakrss]   t=    92.0s procs=  3 rss=   695 MiB hwm=   695 MiB avail= 12471 MiB
+[peakrss]   t=    90.0s procs=  3 rss=   694 MiB hwm=   694 MiB avail= 12471 MiB
+[peakrss]   t=    86.0s procs=  3 rss=   693 MiB hwm=   693 MiB avail= 12471 MiB
+[peakrss]   t=    88.0s procs=  3 rss=   693 MiB hwm=   693 MiB avail= 12471 MiB
+probe exit: 0

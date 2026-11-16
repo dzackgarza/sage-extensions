@@ -1,0 +1,1032 @@
+tree SHA: eead610cd07e9d32019420d4969c117ceac714b2 (modified paths: 0)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 0.45 1.59 2.50 1/366 3295771
+probe: .tmp/p570_question.py; inner 575 s
+[t=    1.94s]  Otilde(T_Co)  rss=290 MiB
+[t=    1.98s]  the plane's own line, divided class 2*[h] + [a3] - [a4] + 2*[a8]  rss=293 MiB
+[t=    4.32s]  the cusp's own line: row position 492, distinct from the plane's line True  rss=302 MiB
+[t=    4.32s]  the cusp  rss=302 MiB
+[t=    4.32s]  the named question: cusp.transporter_witness(line)  rss=302 MiB
+[t=    4.32s] . enter invariant_separates_isotropic_orbits  rss=302 MiB
+[t=   59.84s]  exit  invariant_separates_isotropic_orbits  55.52 s  rss=597 MiB
+[t=   59.84s] . enter isotropic_lift_of  rss=597 MiB
+[t=   59.84s]  exit  isotropic_lift_of  0.00 s  rss=597 MiB
+[t=   59.84s] . enter isotropic_lift_of  rss=597 MiB
+[t=   59.84s]  exit  isotropic_lift_of  0.00 s  rss=597 MiB
+[t=   59.84s] . enter isotropic_equivalence_witness  rss=597 MiB
+[t=   80.39s]  exit  isotropic_equivalence_witness  20.55 s  rss=661 MiB
+[t=   80.49s] . enter separates_witness_orbits  rss=662 MiB
+[t=   80.50s]  exit  separates_witness_orbits  0.01 s  rss=662 MiB
+[t=   80.50s] . enter exact_isotropic_stabilizer_generators  rss=662 MiB
+[t=   80.50s] .. enter isotropic_stabilizer_generators  rss=662 MiB
+[t=   87.79s] . exit  isotropic_stabilizer_generators  7.29 s  rss=682 MiB
+[t=   87.80s] .. enter image  rss=682 MiB
+[t=   87.80s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.80s] .. enter image  rss=682 MiB
+[t=   87.80s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.80s] .. enter image  rss=682 MiB
+[t=   87.80s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.80s] .. enter image  rss=682 MiB
+[t=   87.80s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.80s] .. enter image  rss=682 MiB
+[t=   87.80s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.80s] .. enter image  rss=682 MiB
+[t=   87.80s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.80s] .. enter image  rss=682 MiB
+[t=   87.80s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.80s] .. enter image  rss=682 MiB
+[t=   87.80s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.80s] .. enter image  rss=682 MiB
+[t=   87.80s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.80s] .. enter image  rss=682 MiB
+[t=   87.80s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.80s] .. enter image  rss=682 MiB
+[t=   87.80s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.80s] .. enter image  rss=682 MiB
+[t=   87.80s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.80s] .. enter image  rss=682 MiB
+[t=   87.80s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.81s] .. enter image  rss=682 MiB
+[t=   87.81s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.81s] .. enter image  rss=682 MiB
+[t=   87.81s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.81s] .. enter image  rss=682 MiB
+[t=   87.81s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.81s] .. enter image  rss=682 MiB
+[t=   87.81s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.81s] .. enter image  rss=682 MiB
+[t=   87.81s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.81s] .. enter image  rss=682 MiB
+[t=   87.81s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.81s] .. enter image  rss=682 MiB
+[t=   87.81s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.81s] .. enter image  rss=682 MiB
+[t=   87.81s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.81s] .. enter image  rss=682 MiB
+[t=   87.81s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.81s] .. enter image  rss=682 MiB
+[t=   87.81s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.81s] .. enter image  rss=682 MiB
+[t=   87.81s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.81s] .. enter image  rss=682 MiB
+[t=   87.81s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.81s] .. enter image  rss=682 MiB
+[t=   87.81s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.81s] .. enter image  rss=682 MiB
+[t=   87.81s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.81s] .. enter image  rss=682 MiB
+[t=   87.81s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.81s] .. enter image  rss=682 MiB
+[t=   87.81s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.81s] .. enter image  rss=682 MiB
+[t=   87.81s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.81s] .. enter image  rss=682 MiB
+[t=   87.81s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.81s] .. enter image  rss=682 MiB
+[t=   87.81s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.81s] .. enter image  rss=682 MiB
+[t=   87.81s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.81s] .. enter image  rss=682 MiB
+[t=   87.81s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.81s] .. enter image  rss=682 MiB
+[t=   87.81s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.81s] .. enter image  rss=682 MiB
+[t=   87.81s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.81s] .. enter image  rss=682 MiB
+[t=   87.81s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.81s] .. enter image  rss=682 MiB
+[t=   87.81s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.81s] .. enter image  rss=682 MiB
+[t=   87.81s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.81s] .. enter image  rss=682 MiB
+[t=   87.81s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.81s] .. enter image  rss=682 MiB
+[t=   87.82s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.82s] .. enter image  rss=682 MiB
+[t=   87.82s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.82s] .. enter image  rss=682 MiB
+[t=   87.82s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.82s] .. enter image  rss=682 MiB
+[t=   87.82s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.82s] .. enter image  rss=682 MiB
+[t=   87.82s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.82s] .. enter image  rss=682 MiB
+[t=   87.82s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.82s] .. enter image  rss=682 MiB
+[t=   87.82s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.82s] .. enter image  rss=682 MiB
+[t=   87.82s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.82s] .. enter image  rss=682 MiB
+[t=   87.82s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.82s] .. enter image  rss=682 MiB
+[t=   87.82s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.82s] .. enter image  rss=682 MiB
+[t=   87.82s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.82s] .. enter image  rss=682 MiB
+[t=   87.82s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.82s] .. enter image  rss=682 MiB
+[t=   87.82s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.82s] .. enter image  rss=682 MiB
+[t=   87.82s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.82s] .. enter image  rss=682 MiB
+[t=   87.82s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.82s] .. enter image  rss=682 MiB
+[t=   87.82s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.82s] .. enter image  rss=682 MiB
+[t=   87.82s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.82s] .. enter image  rss=682 MiB
+[t=   87.82s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.82s] .. enter image  rss=682 MiB
+[t=   87.82s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.82s] .. enter image  rss=682 MiB
+[t=   87.82s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.82s] .. enter image  rss=682 MiB
+[t=   87.82s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.82s] .. enter image  rss=682 MiB
+[t=   87.82s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.82s] .. enter image  rss=682 MiB
+[t=   87.82s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.82s] .. enter image  rss=682 MiB
+[t=   87.82s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.82s] .. enter image  rss=682 MiB
+[t=   87.82s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.82s] .. enter image  rss=682 MiB
+[t=   87.82s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.82s] .. enter image  rss=682 MiB
+[t=   87.82s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.82s] .. enter image  rss=682 MiB
+[t=   87.82s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.83s] .. enter image  rss=682 MiB
+[t=   87.83s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.83s] .. enter image  rss=682 MiB
+[t=   87.83s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.83s] .. enter image  rss=682 MiB
+[t=   87.83s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.83s] .. enter image  rss=682 MiB
+[t=   87.83s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.83s] .. enter image  rss=682 MiB
+[t=   87.83s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.83s] .. enter image  rss=682 MiB
+[t=   87.83s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.83s] .. enter image  rss=682 MiB
+[t=   87.83s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.83s] .. enter image  rss=682 MiB
+[t=   87.83s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.83s] .. enter image  rss=682 MiB
+[t=   87.83s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.83s] .. enter image  rss=682 MiB
+[t=   87.83s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.83s] .. enter image  rss=682 MiB
+[t=   87.83s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.83s] .. enter image  rss=682 MiB
+[t=   87.83s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.83s] .. enter image  rss=682 MiB
+[t=   87.83s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.83s] .. enter image  rss=682 MiB
+[t=   87.83s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.83s] .. enter image  rss=682 MiB
+[t=   87.83s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.83s] .. enter image  rss=682 MiB
+[t=   87.83s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.83s] .. enter image  rss=682 MiB
+[t=   87.83s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.83s] .. enter image  rss=682 MiB
+[t=   87.83s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.83s] .. enter image  rss=682 MiB
+[t=   87.83s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.83s] .. enter image  rss=682 MiB
+[t=   87.83s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.83s] .. enter image  rss=682 MiB
+[t=   87.83s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.83s] .. enter image  rss=682 MiB
+[t=   87.83s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.83s] .. enter image  rss=682 MiB
+[t=   87.83s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.83s] .. enter image  rss=682 MiB
+[t=   87.83s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.83s] .. enter image  rss=682 MiB
+[t=   87.83s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.84s] .. enter image  rss=682 MiB
+[t=   87.84s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.84s] .. enter image  rss=682 MiB
+[t=   87.84s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.84s] .. enter image  rss=682 MiB
+[t=   87.84s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.84s] .. enter image  rss=682 MiB
+[t=   87.84s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.84s] .. enter image  rss=682 MiB
+[t=   87.84s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.84s] .. enter image  rss=682 MiB
+[t=   87.84s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.84s] .. enter image  rss=682 MiB
+[t=   87.84s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.84s] .. enter image  rss=682 MiB
+[t=   87.84s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.84s] .. enter image  rss=682 MiB
+[t=   87.84s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.84s] .. enter image  rss=682 MiB
+[t=   87.84s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.84s] .. enter image  rss=682 MiB
+[t=   87.84s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.84s] .. enter image  rss=682 MiB
+[t=   87.84s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.84s] .. enter image  rss=682 MiB
+[t=   87.84s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.84s] .. enter image  rss=682 MiB
+[t=   87.84s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.84s] .. enter image  rss=682 MiB
+[t=   87.84s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.84s] .. enter image  rss=682 MiB
+[t=   87.84s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.84s] .. enter image  rss=682 MiB
+[t=   87.84s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.84s] .. enter image  rss=682 MiB
+[t=   87.84s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.84s] .. enter image  rss=682 MiB
+[t=   87.84s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.84s] .. enter image  rss=682 MiB
+[t=   87.84s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.84s] .. enter image  rss=682 MiB
+[t=   87.84s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.84s] .. enter image  rss=682 MiB
+[t=   87.84s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.84s] .. enter image  rss=682 MiB
+[t=   87.84s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.84s] .. enter image  rss=682 MiB
+[t=   87.84s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.84s] .. enter image  rss=682 MiB
+[t=   87.84s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.84s] .. enter image  rss=682 MiB
+[t=   87.84s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.84s] .. enter image  rss=682 MiB
+[t=   87.84s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.84s] .. enter image  rss=682 MiB
+[t=   87.85s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.85s] .. enter image  rss=682 MiB
+[t=   87.85s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.85s] .. enter image  rss=682 MiB
+[t=   87.85s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.85s] .. enter image  rss=682 MiB
+[t=   87.85s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.85s] .. enter image  rss=682 MiB
+[t=   87.85s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.85s] .. enter image  rss=682 MiB
+[t=   87.85s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.85s] .. enter image  rss=682 MiB
+[t=   87.85s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.85s] .. enter image  rss=682 MiB
+[t=   87.85s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.85s] .. enter image  rss=682 MiB
+[t=   87.85s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.85s] .. enter image  rss=682 MiB
+[t=   87.85s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.85s] .. enter image  rss=682 MiB
+[t=   87.85s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.85s] .. enter image  rss=682 MiB
+[t=   87.85s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.85s] .. enter image  rss=682 MiB
+[t=   87.85s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.85s] .. enter image  rss=682 MiB
+[t=   87.85s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.85s] .. enter image  rss=682 MiB
+[t=   87.85s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.85s] .. enter image  rss=682 MiB
+[t=   87.85s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.85s] .. enter image  rss=682 MiB
+[t=   87.85s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.85s] .. enter image  rss=682 MiB
+[t=   87.85s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.85s] .. enter image  rss=682 MiB
+[t=   87.85s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.85s] .. enter image  rss=682 MiB
+[t=   87.85s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.85s] .. enter image  rss=682 MiB
+[t=   87.85s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.85s] .. enter image  rss=682 MiB
+[t=   87.85s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.85s] .. enter image  rss=682 MiB
+[t=   87.85s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.85s] .. enter image  rss=682 MiB
+[t=   87.85s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.85s] .. enter image  rss=682 MiB
+[t=   87.85s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.85s] .. enter image  rss=682 MiB
+[t=   87.85s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.86s] .. enter image  rss=682 MiB
+[t=   87.86s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.86s] .. enter image  rss=682 MiB
+[t=   87.86s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.86s] .. enter image  rss=682 MiB
+[t=   87.86s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.86s] .. enter image  rss=682 MiB
+[t=   87.86s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.86s] .. enter image  rss=682 MiB
+[t=   87.86s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.86s] .. enter image  rss=682 MiB
+[t=   87.86s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.86s] .. enter image  rss=682 MiB
+[t=   87.86s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.86s] .. enter image  rss=682 MiB
+[t=   87.86s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.86s] .. enter image  rss=682 MiB
+[t=   87.86s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.86s] .. enter image  rss=682 MiB
+[t=   87.86s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.86s] .. enter image  rss=682 MiB
+[t=   87.86s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.86s] .. enter image  rss=682 MiB
+[t=   87.86s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.86s] .. enter image  rss=682 MiB
+[t=   87.86s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.86s] .. enter image  rss=682 MiB
+[t=   87.86s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.86s] .. enter image  rss=682 MiB
+[t=   87.86s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.86s] .. enter image  rss=682 MiB
+[t=   87.86s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.86s] .. enter image  rss=682 MiB
+[t=   87.86s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.86s] .. enter image  rss=682 MiB
+[t=   87.86s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.86s] .. enter image  rss=682 MiB
+[t=   87.86s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.86s] .. enter image  rss=682 MiB
+[t=   87.86s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.86s] .. enter image  rss=682 MiB
+[t=   87.86s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.86s] .. enter image  rss=682 MiB
+[t=   87.86s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.86s] .. enter image  rss=682 MiB
+[t=   87.86s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.86s] .. enter image  rss=682 MiB
+[t=   87.86s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.86s] .. enter image  rss=682 MiB
+[t=   87.86s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.86s] .. enter image  rss=682 MiB
+[t=   87.87s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.87s] .. enter image  rss=682 MiB
+[t=   87.87s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.87s] .. enter image  rss=682 MiB
+[t=   87.87s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.87s] .. enter image  rss=682 MiB
+[t=   87.87s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.87s] .. enter image  rss=682 MiB
+[t=   87.87s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.87s] .. enter image  rss=682 MiB
+[t=   87.87s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.87s] .. enter image  rss=682 MiB
+[t=   87.87s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.87s] .. enter image  rss=682 MiB
+[t=   87.87s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.87s] .. enter image  rss=682 MiB
+[t=   87.87s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.87s] .. enter image  rss=682 MiB
+[t=   87.87s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.87s] .. enter image  rss=682 MiB
+[t=   87.87s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.87s] .. enter image  rss=682 MiB
+[t=   87.87s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.87s] .. enter image  rss=682 MiB
+[t=   87.87s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.87s] .. enter image  rss=682 MiB
+[t=   87.87s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.87s] .. enter image  rss=682 MiB
+[t=   87.87s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.87s] .. enter image  rss=682 MiB
+[t=   87.87s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.87s] .. enter image  rss=682 MiB
+[t=   87.87s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.87s] .. enter image  rss=682 MiB
+[t=   87.87s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.87s] .. enter image  rss=682 MiB
+[t=   87.87s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.87s] .. enter image  rss=682 MiB
+[t=   87.87s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.87s] .. enter image  rss=682 MiB
+[t=   87.87s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.87s] .. enter image  rss=682 MiB
+[t=   87.87s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.87s] .. enter image  rss=682 MiB
+[t=   87.87s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.87s] .. enter image  rss=682 MiB
+[t=   87.87s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.87s] .. enter image  rss=682 MiB
+[t=   87.87s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.87s] .. enter image  rss=682 MiB
+[t=   87.87s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.88s] .. enter image  rss=682 MiB
+[t=   87.88s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.88s] .. enter image  rss=682 MiB
+[t=   87.88s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.88s] .. enter image  rss=682 MiB
+[t=   87.88s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.88s] .. enter image  rss=682 MiB
+[t=   87.88s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.88s] .. enter image  rss=682 MiB
+[t=   87.88s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.88s] .. enter image  rss=682 MiB
+[t=   87.88s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.88s] .. enter image  rss=682 MiB
+[t=   87.88s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.88s] .. enter image  rss=682 MiB
+[t=   87.88s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.88s] .. enter image  rss=682 MiB
+[t=   87.88s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.88s] .. enter image  rss=682 MiB
+[t=   87.88s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.88s] .. enter image  rss=682 MiB
+[t=   87.88s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.88s] .. enter image  rss=682 MiB
+[t=   87.88s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.88s] .. enter image  rss=682 MiB
+[t=   87.88s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.88s] .. enter image  rss=682 MiB
+[t=   87.88s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.88s] .. enter image  rss=682 MiB
+[t=   87.88s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.88s] .. enter image  rss=682 MiB
+[t=   87.88s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.88s] .. enter image  rss=682 MiB
+[t=   87.88s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.88s] .. enter image  rss=682 MiB
+[t=   87.88s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.88s] .. enter image  rss=682 MiB
+[t=   87.88s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.88s] .. enter image  rss=682 MiB
+[t=   87.88s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.88s] .. enter image  rss=682 MiB
+[t=   87.88s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.88s] .. enter image  rss=682 MiB
+[t=   87.88s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.88s] .. enter image  rss=682 MiB
+[t=   87.88s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.88s] .. enter image  rss=682 MiB
+[t=   87.88s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.88s] .. enter image  rss=682 MiB
+[t=   87.88s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.89s] .. enter image  rss=682 MiB
+[t=   87.89s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.89s] .. enter image  rss=682 MiB
+[t=   87.89s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.89s] .. enter image  rss=682 MiB
+[t=   87.89s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.89s] .. enter image  rss=682 MiB
+[t=   87.89s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.89s] .. enter image  rss=682 MiB
+[t=   87.89s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.89s] .. enter image  rss=682 MiB
+[t=   87.89s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.89s] .. enter image  rss=682 MiB
+[t=   87.89s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.89s] .. enter image  rss=682 MiB
+[t=   87.89s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.89s] .. enter image  rss=682 MiB
+[t=   87.89s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.89s] .. enter image  rss=682 MiB
+[t=   87.89s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.89s] .. enter image  rss=682 MiB
+[t=   87.89s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.89s] .. enter image  rss=682 MiB
+[t=   87.89s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.89s] .. enter image  rss=682 MiB
+[t=   87.89s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.89s] .. enter image  rss=682 MiB
+[t=   87.89s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.89s] .. enter image  rss=682 MiB
+[t=   87.89s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.89s] .. enter image  rss=682 MiB
+[t=   87.89s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.89s] .. enter image  rss=682 MiB
+[t=   87.89s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.89s] .. enter image  rss=682 MiB
+[t=   87.89s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.89s] .. enter image  rss=682 MiB
+[t=   87.89s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.89s] .. enter image  rss=682 MiB
+[t=   87.89s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.89s] .. enter image  rss=682 MiB
+[t=   87.89s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.89s] .. enter image  rss=682 MiB
+[t=   87.89s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.89s] .. enter image  rss=682 MiB
+[t=   87.89s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.89s] .. enter image  rss=682 MiB
+[t=   87.89s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.89s] .. enter image  rss=682 MiB
+[t=   87.89s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.90s] .. enter image  rss=682 MiB
+[t=   87.90s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.90s] .. enter image  rss=682 MiB
+[t=   87.90s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.90s] .. enter image  rss=682 MiB
+[t=   87.90s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.90s] .. enter image  rss=682 MiB
+[t=   87.90s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.90s] .. enter image  rss=682 MiB
+[t=   87.90s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.90s] .. enter image  rss=682 MiB
+[t=   87.90s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.90s] .. enter image  rss=682 MiB
+[t=   87.90s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.90s] .. enter image  rss=682 MiB
+[t=   87.90s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.90s] .. enter image  rss=682 MiB
+[t=   87.90s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.90s] .. enter image  rss=682 MiB
+[t=   87.90s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.90s] .. enter image  rss=682 MiB
+[t=   87.90s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.90s] .. enter image  rss=682 MiB
+[t=   87.90s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.90s] .. enter image  rss=682 MiB
+[t=   87.90s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.90s] .. enter image  rss=682 MiB
+[t=   87.90s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.90s] .. enter image  rss=682 MiB
+[t=   87.90s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.90s] .. enter image  rss=682 MiB
+[t=   87.90s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.90s] .. enter image  rss=682 MiB
+[t=   87.90s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.90s] .. enter image  rss=682 MiB
+[t=   87.90s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.90s] .. enter image  rss=682 MiB
+[t=   87.90s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.90s] .. enter image  rss=682 MiB
+[t=   87.90s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.90s] .. enter image  rss=682 MiB
+[t=   87.90s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.90s] .. enter image  rss=682 MiB
+[t=   87.90s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.90s] .. enter image  rss=682 MiB
+[t=   87.90s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.90s] .. enter image  rss=682 MiB
+[t=   87.90s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.90s] .. enter image  rss=682 MiB
+[t=   87.90s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.90s] .. enter image  rss=682 MiB
+[t=   87.90s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.90s] .. enter image  rss=682 MiB
+[t=   87.91s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.91s] .. enter image  rss=682 MiB
+[t=   87.91s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.91s] .. enter image  rss=682 MiB
+[t=   87.91s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.91s] .. enter image  rss=682 MiB
+[t=   87.91s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.91s] .. enter image  rss=682 MiB
+[t=   87.91s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.91s] .. enter image  rss=682 MiB
+[t=   87.91s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.91s] .. enter image  rss=682 MiB
+[t=   87.91s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.91s] .. enter image  rss=682 MiB
+[t=   87.91s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.91s] .. enter image  rss=682 MiB
+[t=   87.91s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.91s] .. enter image  rss=682 MiB
+[t=   87.91s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.91s] .. enter image  rss=682 MiB
+[t=   87.91s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.91s] .. enter image  rss=682 MiB
+[t=   87.91s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.91s] .. enter image  rss=682 MiB
+[t=   87.91s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.91s] .. enter image  rss=682 MiB
+[t=   87.91s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.91s] .. enter image  rss=682 MiB
+[t=   87.91s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.91s] .. enter image  rss=682 MiB
+[t=   87.91s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.91s] .. enter image  rss=682 MiB
+[t=   87.91s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.91s] .. enter image  rss=682 MiB
+[t=   87.91s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.91s] .. enter image  rss=682 MiB
+[t=   87.91s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.91s] .. enter image  rss=682 MiB
+[t=   87.91s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.91s] .. enter image  rss=682 MiB
+[t=   87.91s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.91s] .. enter image  rss=682 MiB
+[t=   87.91s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.91s] .. enter image  rss=682 MiB
+[t=   87.91s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.91s] .. enter image  rss=682 MiB
+[t=   87.91s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.91s] .. enter image  rss=682 MiB
+[t=   87.91s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.91s] .. enter image  rss=682 MiB
+[t=   87.91s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.92s] .. enter image  rss=682 MiB
+[t=   87.92s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.92s] .. enter image  rss=682 MiB
+[t=   87.92s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.92s] .. enter image  rss=682 MiB
+[t=   87.92s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.92s] .. enter image  rss=682 MiB
+[t=   87.92s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.92s] .. enter image  rss=682 MiB
+[t=   87.92s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.92s] .. enter image  rss=682 MiB
+[t=   87.92s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.92s] .. enter image  rss=682 MiB
+[t=   87.92s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.92s] .. enter image  rss=682 MiB
+[t=   87.92s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.92s] .. enter image  rss=682 MiB
+[t=   87.92s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.92s] .. enter image  rss=682 MiB
+[t=   87.92s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.92s] .. enter image  rss=682 MiB
+[t=   87.92s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.92s] .. enter image  rss=682 MiB
+[t=   87.92s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.92s] .. enter image  rss=682 MiB
+[t=   87.92s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.92s] .. enter image  rss=682 MiB
+[t=   87.92s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.92s] .. enter image  rss=682 MiB
+[t=   87.92s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.92s] .. enter image  rss=682 MiB
+[t=   87.92s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.92s] .. enter image  rss=682 MiB
+[t=   87.92s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.92s] .. enter image  rss=682 MiB
+[t=   87.92s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.92s] .. enter image  rss=682 MiB
+[t=   87.92s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.92s] .. enter image  rss=682 MiB
+[t=   87.92s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.92s] .. enter image  rss=682 MiB
+[t=   87.92s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.92s] .. enter image  rss=682 MiB
+[t=   87.92s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.92s] .. enter image  rss=682 MiB
+[t=   87.92s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.92s] .. enter image  rss=682 MiB
+[t=   87.92s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.92s] .. enter image  rss=682 MiB
+[t=   87.92s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.92s] .. enter image  rss=682 MiB
+[t=   87.92s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.93s] .. enter image  rss=682 MiB
+[t=   87.93s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.93s] .. enter image  rss=682 MiB
+[t=   87.93s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.93s] .. enter image  rss=682 MiB
+[t=   87.93s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.93s] .. enter image  rss=682 MiB
+[t=   87.93s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.93s] .. enter image  rss=682 MiB
+[t=   87.93s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.93s] .. enter image  rss=682 MiB
+[t=   87.93s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.93s] .. enter image  rss=682 MiB
+[t=   87.93s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.93s] .. enter image  rss=682 MiB
+[t=   87.93s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.93s] .. enter image  rss=682 MiB
+[t=   87.93s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.93s] .. enter image  rss=682 MiB
+[t=   87.93s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.93s] .. enter image  rss=682 MiB
+[t=   87.93s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.93s] .. enter image  rss=682 MiB
+[t=   87.93s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.93s] .. enter image  rss=682 MiB
+[t=   87.93s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.93s] .. enter image  rss=682 MiB
+[t=   87.93s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.93s] .. enter image  rss=682 MiB
+[t=   87.93s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.93s] .. enter image  rss=682 MiB
+[t=   87.93s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.93s] .. enter image  rss=682 MiB
+[t=   87.93s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.93s] .. enter image  rss=682 MiB
+[t=   87.93s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.93s] .. enter image  rss=682 MiB
+[t=   87.93s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.93s] .. enter image  rss=682 MiB
+[t=   87.93s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.93s] .. enter image  rss=682 MiB
+[t=   87.93s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.93s] .. enter image  rss=682 MiB
+[t=   87.93s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.93s] .. enter image  rss=682 MiB
+[t=   87.93s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.93s] .. enter image  rss=682 MiB
+[t=   87.93s] . exit  image  0.00 s  rss=682 MiB
+[t=   87.94s] .. enter image  rss=682 MiB
+[t=   87.94s] . exit  image  0.00 s  rss=682 MiB
+[t=   88.25s] .. enter image  rss=684 MiB
+[t=   88.34s] . exit  image  0.09 s  rss=685 MiB
+[t=   88.34s] .. enter image  rss=685 MiB
+[t=   88.42s] . exit  image  0.08 s  rss=685 MiB
+[t=   88.42s] .. enter image  rss=685 MiB
+[t=   88.50s] . exit  image  0.08 s  rss=685 MiB
+[t=   88.50s] .. enter image  rss=685 MiB
+[t=   88.58s] . exit  image  0.08 s  rss=685 MiB
+[t=   88.58s] .. enter image  rss=685 MiB
+[t=   88.66s] . exit  image  0.08 s  rss=685 MiB
+[t=   88.66s] .. enter image  rss=685 MiB
+[t=   88.73s] . exit  image  0.07 s  rss=685 MiB
+[t=   88.73s] .. enter image  rss=685 MiB
+[t=   88.82s] . exit  image  0.09 s  rss=685 MiB
+[t=   88.82s] .. enter image  rss=685 MiB
+[t=   88.91s] . exit  image  0.09 s  rss=685 MiB
+[t=   88.91s] .. enter image  rss=685 MiB
+[t=   88.99s] . exit  image  0.09 s  rss=685 MiB
+[t=   89.00s] .. enter image  rss=685 MiB
+[t=   89.05s] . exit  image  0.05 s  rss=685 MiB
+[t=   89.05s] .. enter image  rss=685 MiB
+[t=   89.13s] . exit  image  0.09 s  rss=685 MiB
+[t=   89.13s] .. enter image  rss=685 MiB
+[t=   89.21s] . exit  image  0.08 s  rss=685 MiB
+[t=   89.21s] .. enter image  rss=685 MiB
+[t=   89.29s] . exit  image  0.08 s  rss=685 MiB
+[t=   89.29s] .. enter image  rss=685 MiB
+[t=   89.37s] . exit  image  0.08 s  rss=685 MiB
+[t=   89.37s] .. enter image  rss=685 MiB
+[t=   89.43s] . exit  image  0.06 s  rss=685 MiB
+[t=   89.43s] .. enter image  rss=685 MiB
+[t=   89.51s] . exit  image  0.08 s  rss=685 MiB
+[t=   89.51s] .. enter image  rss=685 MiB
+[t=   89.59s] . exit  image  0.08 s  rss=685 MiB
+[t=   89.59s] .. enter image  rss=685 MiB
+[t=   89.67s] . exit  image  0.08 s  rss=685 MiB
+[t=   89.67s] .. enter image  rss=685 MiB
+[t=   89.75s] . exit  image  0.08 s  rss=685 MiB
+[t=   89.75s] .. enter image  rss=685 MiB
+[t=   89.83s] . exit  image  0.08 s  rss=685 MiB
+[t=   89.83s] .. enter image  rss=685 MiB
+[t=   89.91s] . exit  image  0.08 s  rss=685 MiB
+[t=   89.91s] .. enter image  rss=685 MiB
+[t=   89.97s] . exit  image  0.06 s  rss=685 MiB
+[t=   89.97s] .. enter image  rss=685 MiB
+[t=   90.06s] . exit  image  0.09 s  rss=685 MiB
+[t=   90.06s] .. enter image  rss=685 MiB
+[t=   90.16s] . exit  image  0.09 s  rss=685 MiB
+[t=   90.16s] .. enter image  rss=685 MiB
+[t=   90.24s] . exit  image  0.08 s  rss=685 MiB
+[t=   90.24s] .. enter image  rss=685 MiB
+[t=   90.33s] . exit  image  0.09 s  rss=685 MiB
+[t=   90.33s] .. enter image  rss=685 MiB
+[t=   90.42s] . exit  image  0.09 s  rss=685 MiB
+[t=   90.42s] .. enter image  rss=685 MiB
+[t=   90.45s] . exit  image  0.03 s  rss=685 MiB
+[t=   90.45s] .. enter image  rss=685 MiB
+[t=   90.54s] . exit  image  0.09 s  rss=685 MiB
+[t=   90.54s] .. enter image  rss=685 MiB
+[t=   90.64s] . exit  image  0.09 s  rss=685 MiB
+[t=   90.64s] .. enter image  rss=685 MiB
+[t=   90.72s] . exit  image  0.09 s  rss=685 MiB
+[t=   90.72s] .. enter image  rss=685 MiB
+[t=   90.81s] . exit  image  0.09 s  rss=685 MiB
+[t=   90.81s] .. enter image  rss=685 MiB
+[t=   90.90s] . exit  image  0.09 s  rss=685 MiB
+[t=   90.90s] .. enter image  rss=685 MiB
+[t=   90.99s] . exit  image  0.09 s  rss=685 MiB
+[t=   90.99s] .. enter image  rss=685 MiB
+[t=   91.07s] . exit  image  0.09 s  rss=685 MiB
+[t=   91.07s] .. enter image  rss=685 MiB
+[t=   91.16s] . exit  image  0.09 s  rss=685 MiB
+[t=   91.16s] .. enter image  rss=685 MiB
+[t=   91.25s] . exit  image  0.09 s  rss=685 MiB
+[t=   91.25s] .. enter image  rss=685 MiB
+[t=   91.33s] . exit  image  0.09 s  rss=685 MiB
+[t=   91.33s] .. enter image  rss=685 MiB
+[t=   91.37s] . exit  image  0.04 s  rss=685 MiB
+[t=   91.38s] .. enter image  rss=685 MiB
+[t=   91.46s] . exit  image  0.09 s  rss=685 MiB
+[t=   91.46s] .. enter image  rss=685 MiB
+[t=   91.55s] . exit  image  0.09 s  rss=685 MiB
+[t=   91.55s] .. enter image  rss=685 MiB
+[t=   91.62s] . exit  image  0.08 s  rss=685 MiB
+[t=   91.62s] .. enter image  rss=685 MiB
+[t=   91.70s] . exit  image  0.08 s  rss=685 MiB
+[t=   91.70s] .. enter image  rss=685 MiB
+[t=   91.78s] . exit  image  0.08 s  rss=685 MiB
+[t=   91.78s] .. enter image  rss=685 MiB
+[t=   91.86s] . exit  image  0.08 s  rss=685 MiB
+[t=   91.86s] .. enter image  rss=685 MiB
+[t=   91.94s] . exit  image  0.08 s  rss=685 MiB
+[t=   91.94s] .. enter image  rss=685 MiB
+[t=   92.02s] . exit  image  0.09 s  rss=685 MiB
+[t=   92.02s] .. enter image  rss=685 MiB
+[t=   92.11s] . exit  image  0.09 s  rss=685 MiB
+[t=   92.11s] .. enter image  rss=685 MiB
+[t=   92.20s] . exit  image  0.09 s  rss=685 MiB
+[t=   92.20s] .. enter image  rss=685 MiB
+[t=   92.28s] . exit  image  0.09 s  rss=685 MiB
+[t=   92.28s] .. enter image  rss=685 MiB
+[t=   92.36s] . exit  image  0.08 s  rss=685 MiB
+[t=   92.36s] .. enter image  rss=685 MiB
+[t=   92.44s] . exit  image  0.08 s  rss=685 MiB
+[t=   92.44s] .. enter image  rss=685 MiB
+[t=   92.52s] . exit  image  0.08 s  rss=685 MiB
+[t=   92.52s] .. enter image  rss=685 MiB
+[t=   92.60s] . exit  image  0.08 s  rss=685 MiB
+[t=   92.60s] .. enter image  rss=685 MiB
+[t=   92.68s] . exit  image  0.08 s  rss=685 MiB
+[t=   92.68s] .. enter image  rss=685 MiB
+[t=   92.76s] . exit  image  0.08 s  rss=685 MiB
+[t=   92.76s] .. enter image  rss=685 MiB
+[t=   92.84s] . exit  image  0.08 s  rss=685 MiB
+[t=   92.84s] .. enter image  rss=685 MiB
+[t=   92.92s] . exit  image  0.08 s  rss=685 MiB
+[t=   92.92s] .. enter image  rss=685 MiB
+[t=   93.00s] . exit  image  0.08 s  rss=685 MiB
+[t=   93.00s] .. enter image  rss=685 MiB
+[t=   93.09s] . exit  image  0.09 s  rss=685 MiB
+[t=   93.09s] .. enter image  rss=685 MiB
+[t=   93.18s] . exit  image  0.09 s  rss=685 MiB
+[t=   93.18s] .. enter image  rss=685 MiB
+[t=   93.28s] . exit  image  0.09 s  rss=685 MiB
+[t=   93.28s] .. enter image  rss=685 MiB
+[t=   93.36s] . exit  image  0.08 s  rss=685 MiB
+[t=   93.36s] .. enter image  rss=685 MiB
+[t=   93.45s] . exit  image  0.09 s  rss=685 MiB
+[t=   93.45s] .. enter image  rss=685 MiB
+[t=   93.54s] . exit  image  0.09 s  rss=685 MiB
+[t=   93.54s] .. enter image  rss=685 MiB
+[t=   93.63s] . exit  image  0.09 s  rss=685 MiB
+[t=   93.63s] .. enter image  rss=685 MiB
+[t=   93.73s] . exit  image  0.09 s  rss=685 MiB
+[t=   93.73s] .. enter image  rss=685 MiB
+[t=   93.81s] . exit  image  0.09 s  rss=685 MiB
+[t=   93.81s] .. enter image  rss=685 MiB
+[t=   93.90s] . exit  image  0.09 s  rss=685 MiB
+[t=   93.90s] .. enter image  rss=685 MiB
+[t=   93.98s] . exit  image  0.09 s  rss=685 MiB
+[t=   93.99s] .. enter image  rss=685 MiB
+[t=   94.07s] . exit  image  0.09 s  rss=685 MiB
+[t=   94.07s] .. enter image  rss=685 MiB
+[t=   94.16s] . exit  image  0.09 s  rss=685 MiB
+[t=   94.16s] .. enter image  rss=685 MiB
+[t=   94.25s] . exit  image  0.09 s  rss=685 MiB
+[t=   94.27s]  exit  exact_isotropic_stabilizer_generators  13.78 s  rss=685 MiB
+[t=   94.27s] . enter adjust_witness_into_subgroup  rss=685 MiB
+[t=   94.28s] .. enter image  rss=685 MiB
+[t=   94.28s] . exit  image  0.00 s  rss=685 MiB
+[t=   94.29s] .. enter image  rss=685 MiB
+[t=   94.29s] . exit  image  0.00 s  rss=685 MiB
+[t=   94.29s] .. enter image  rss=685 MiB
+[t=   94.29s] . exit  image  0.00 s  rss=685 MiB
+[t=   94.29s] .. enter image  rss=685 MiB
+[t=   94.29s] . exit  image  0.00 s  rss=685 MiB
+[t=   94.29s] .. enter image  rss=685 MiB
+[t=   94.29s] . exit  image  0.00 s  rss=685 MiB
+[t=   94.29s] .. enter image  rss=685 MiB
+[t=   94.29s] . exit  image  0.00 s  rss=685 MiB
+[t=   94.29s] .. enter image  rss=685 MiB
+[t=   94.29s] . exit  image  0.00 s  rss=685 MiB
+[t=   94.29s] .. enter image  rss=685 MiB
+[t=   94.29s] . exit  image  0.00 s  rss=685 MiB
+[t=   94.29s] .. enter image  rss=685 MiB
+[t=   94.29s] . exit  image  0.00 s  rss=685 MiB
+[t=   94.29s] .. enter image  rss=685 MiB
+[t=   94.29s] . exit  image  0.00 s  rss=685 MiB
+[t=   94.29s] .. enter image  rss=685 MiB
+[t=   94.29s] . exit  image  0.00 s  rss=685 MiB
+[t=   94.29s] .. enter image  rss=685 MiB
+[t=   94.29s] . exit  image  0.00 s  rss=685 MiB
+[t=   94.29s] .. enter image  rss=685 MiB
+[t=   94.29s] . exit  image  0.00 s  rss=685 MiB
+[t=   94.29s] .. enter image  rss=685 MiB
+[t=   94.29s] . exit  image  0.00 s  rss=685 MiB
+[t=   94.29s] .. enter image  rss=685 MiB
+[t=   94.29s] . exit  image  0.00 s  rss=685 MiB
+[t=   94.29s] .. enter image  rss=685 MiB
+[t=   94.29s] . exit  image  0.00 s  rss=685 MiB
+[t=   94.29s] .. enter image  rss=685 MiB
+[t=   94.29s] . exit  image  0.00 s  rss=685 MiB
+[t=   94.29s] .. enter image  rss=685 MiB
+[t=   94.29s] . exit  image  0.00 s  rss=685 MiB
+[t=   94.29s] .. enter image  rss=685 MiB
+[t=   94.29s] . exit  image  0.00 s  rss=685 MiB
+[t=   94.29s] .. enter image  rss=685 MiB
+[t=   94.29s] . exit  image  0.00 s  rss=685 MiB
+[t=   94.29s] .. enter image  rss=685 MiB
+[t=   94.29s] . exit  image  0.00 s  rss=685 MiB
+[t=   94.29s] .. enter image  rss=685 MiB
+[t=   94.29s] . exit  image  0.00 s  rss=685 MiB
+[t=   94.30s] .. enter image  rss=685 MiB
+[t=   94.30s] . exit  image  0.00 s  rss=685 MiB
+[t=   94.30s] .. enter image  rss=685 MiB
+[t=   94.30s] . exit  image  0.00 s  rss=685 MiB
+[t=   94.30s] .. enter image  rss=685 MiB
+[t=   94.30s] . exit  image  0.00 s  rss=685 MiB
+[t=   94.30s] .. enter image  rss=685 MiB
+[t=   94.30s] . exit  image  0.00 s  rss=685 MiB
+[t=   94.30s] .. enter image  rss=685 MiB
+[t=   94.30s] . exit  image  0.00 s  rss=685 MiB
+[t=   94.30s] .. enter image  rss=685 MiB
+[t=   94.30s] . exit  image  0.00 s  rss=685 MiB
+[t=   94.30s] .. enter image  rss=685 MiB
+[t=   94.30s] . exit  image  0.00 s  rss=685 MiB
+[t=   94.30s] .. enter image  rss=685 MiB
+[t=   94.30s] . exit  image  0.00 s  rss=685 MiB
+[t=   94.30s] .. enter image  rss=685 MiB
+[t=   94.30s] . exit  image  0.00 s  rss=685 MiB
+[t=   94.30s] .. enter image  rss=685 MiB
+[t=   94.30s] . exit  image  0.00 s  rss=685 MiB
+[t=   94.30s] .. enter image  rss=685 MiB
+[t=   94.30s] . exit  image  0.00 s  rss=685 MiB
+[t=   94.30s] .. enter image  rss=685 MiB
+[t=   94.30s] . exit  image  0.00 s  rss=685 MiB
+[t=   94.30s] .. enter image  rss=685 MiB
+[t=   94.30s] . exit  image  0.00 s  rss=685 MiB
+[t=   94.30s] .. enter image  rss=685 MiB
+[t=   94.30s] . exit  image  0.00 s  rss=685 MiB
+[t=   94.30s] .. enter image  rss=685 MiB
+[t=   94.30s] . exit  image  0.00 s  rss=685 MiB
+[t=   94.30s] .. enter image  rss=685 MiB
+[t=   94.30s] . exit  image  0.00 s  rss=685 MiB
+[t=   94.30s] .. enter image  rss=685 MiB
+[t=   94.30s] . exit  image  0.00 s  rss=685 MiB
+[t=   94.30s] .. enter image  rss=685 MiB
+[t=   94.30s] . exit  image  0.00 s  rss=685 MiB
+[t=   94.30s] .. enter image  rss=685 MiB
+[t=   94.30s] . exit  image  0.00 s  rss=685 MiB
+[t=   94.30s] .. enter image  rss=685 MiB
+[t=   94.30s] . exit  image  0.00 s  rss=685 MiB
+[t=   94.30s] .. enter image  rss=685 MiB
+[t=   94.30s] . exit  image  0.00 s  rss=685 MiB
+[t=   94.30s] .. enter image  rss=685 MiB
+[t=   94.30s] . exit  image  0.00 s  rss=685 MiB
+[t=   94.30s] .. enter image  rss=685 MiB
+[t=   94.30s] . exit  image  0.00 s  rss=685 MiB
+[t=   94.30s] .. enter image  rss=685 MiB
+[t=   94.30s] . exit  image  0.00 s  rss=685 MiB
+[t=   94.30s] .. enter image  rss=685 MiB
+[t=   94.30s] . exit  image  0.00 s  rss=685 MiB
+[t=   94.30s] .. enter image  rss=685 MiB
+[t=   94.30s] . exit  image  0.00 s  rss=685 MiB
+[t=   94.31s] .. enter image  rss=685 MiB
+[t=   94.31s] . exit  image  0.00 s  rss=685 MiB
+[t=   94.31s] .. enter image  rss=685 MiB
+[t=   94.31s] . exit  image  0.00 s  rss=685 MiB
+[t=   94.31s] .. enter image  rss=685 MiB
+[t=   94.31s] . exit  image  0.00 s  rss=685 MiB
+[t=   94.31s] .. enter image  rss=685 MiB
+[t=   94.31s] . exit  image  0.00 s  rss=685 MiB
+[t=   94.31s] .. enter image  rss=685 MiB
+[t=   94.31s] . exit  image  0.00 s  rss=685 MiB
+[t=   94.31s] .. enter image  rss=685 MiB
+[t=   94.31s] . exit  image  0.00 s  rss=685 MiB
+[t=   94.31s] .. enter image  rss=685 MiB
+[t=   94.31s] . exit  image  0.00 s  rss=685 MiB
+[t=   94.31s] .. enter image  rss=685 MiB
+[t=   94.31s] . exit  image  0.00 s  rss=685 MiB
+[t=   94.31s] .. enter image  rss=685 MiB
+[t=   94.31s] . exit  image  0.00 s  rss=685 MiB
+[t=   94.31s] .. enter image  rss=685 MiB
+[t=   94.31s] . exit  image  0.00 s  rss=685 MiB
+[t=   94.31s] .. enter image  rss=685 MiB
+[t=   94.31s] . exit  image  0.00 s  rss=685 MiB
+[t=   94.31s] .. enter image  rss=685 MiB
+[t=   94.31s] . exit  image  0.00 s  rss=685 MiB
+[t=   94.31s] .. enter image  rss=685 MiB
+[t=   94.31s] . exit  image  0.00 s  rss=685 MiB
+[t=   94.31s] .. enter image  rss=685 MiB
+[t=   94.31s] . exit  image  0.00 s  rss=685 MiB
+[t=   94.31s] .. enter image  rss=685 MiB
+[t=   94.31s] . exit  image  0.00 s  rss=685 MiB
+[t=   94.31s] .. enter image  rss=685 MiB
+[t=   94.31s] . exit  image  0.00 s  rss=685 MiB
+[t=   94.31s] .. enter image  rss=685 MiB
+[t=   94.31s] . exit  image  0.00 s  rss=685 MiB
+[t=   94.31s] .. enter image  rss=685 MiB
+[t=   94.31s] . exit  image  0.00 s  rss=685 MiB
+[t=   94.31s] .. enter image  rss=685 MiB
+[t=   94.31s] . exit  image  0.00 s  rss=685 MiB
+[t=   94.31s] .. enter image  rss=685 MiB
+[t=   94.31s] . exit  image  0.00 s  rss=685 MiB
+[t=   94.31s] .. enter image  rss=685 MiB
+[t=   94.31s] . exit  image  0.00 s  rss=685 MiB
+[t=   94.31s] .. enter image  rss=685 MiB
+[t=   94.31s] . exit  image  0.00 s  rss=685 MiB
+[t=   94.31s] .. enter image  rss=685 MiB
+[t=   94.31s] . exit  image  0.00 s  rss=685 MiB
+[t=   94.31s] .. enter image  rss=685 MiB
+[t=   94.31s] . exit  image  0.00 s  rss=685 MiB
+[t=   94.31s] .. enter image  rss=685 MiB
+[t=   94.31s] . exit  image  0.00 s  rss=685 MiB
+[t=   94.31s] .. enter image  rss=685 MiB
+[t=   94.31s] . exit  image  0.00 s  rss=685 MiB
+[peakrss] probe570: child waited=124 shell_code=124 samples=288
+[peakrss] peak tree RSS      : 1948 MiB
+[peakrss] low-water MemAvail : 10013 MiB
+[peakrss] peak single VmHWM  : 1948 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     1936 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   548.4s procs=  3 rss=  1948 MiB hwm=  1948 MiB avail= 10053 MiB
+[peakrss]   t=   550.4s procs=  3 rss=  1948 MiB hwm=  1948 MiB avail= 10078 MiB
+[peakrss]   t=   552.4s procs=  3 rss=  1948 MiB hwm=  1948 MiB avail= 10013 MiB
+[peakrss]   t=   554.4s procs=  3 rss=  1948 MiB hwm=  1948 MiB avail= 11182 MiB
+[peakrss]   t=   556.4s procs=  3 rss=  1948 MiB hwm=  1948 MiB avail= 11188 MiB
+probe exit: 124
