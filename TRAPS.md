@@ -10,6 +10,22 @@ Write to it in the turn the measurement is made.
 
 ## Sage
 
+### Sage's `Polyhedron` reads its ambient dimension off the H-representation rows
+
+Measured 2026-11-16 in the adopted runtime (SageMath 11.0.beta5, Python 3.14): `Polyhedron(ieqs=[], eqns=[], base_ring=QQ)` is `A 0-dimensional polyhedron in QQ^0 defined as the convex hull of 1 vertex`, and the same call with `ambient_dim=2` is `A 2-dimensional polyhedron in QQ^2 defined as the convex hull of 1 vertex and 2 lines`.
+`sage/geometry/polyhedron/constructor.py` reads the dimension from `_common_length_of(ieqs, eqns)` and falls back to the `ambient_dim` argument only when no row is stated, raising `ValueError: ambient space dimension mismatch` when the two disagree, so the argument is redundant exactly when it is inferable and required exactly when it is not.
+A cone cut out by no covector states no row, so its owned engine answered for `QQ^0`: on `Lattices(ZZ)([[1, 0], [0, 1]])`, `reduction_cell(())` reported dimension 0 and `is_pointed()` True in 0.44 s, and `from_rays` of rays spanning the space did the same in 0.00 s.
+Route chosen: state the dimension at every crossing. `RationalPolyhedralCone.__init__` passes `ambient_dim=len(labels)` to its engine; `hilbert_basis` and `_engine_ray_triangulation` state the lattice of rank `len(labels)` on Sage's `Cone`. After, both calls give dimension 2, not pointed, with the whole plane as lineality, in 0.40 s and 0.02 s.
+Reproduce: `sage -c 'from sage.geometry.polyhedron.constructor import Polyhedron; from sage.rings.rational_field import QQ; print(Polyhedron(ieqs=[], eqns=[], base_ring=QQ)); print(Polyhedron(ieqs=[], eqns=[], base_ring=QQ, ambient_dim=2))'`.
+
+### Sage's `Cone` and `PointConfiguration` refuse an empty family of rays or points
+
+Measured 2026-11-16 in the adopted runtime (SageMath 11.0.beta5, Python 3.14): `Cone([])` raises `ValueError: lattice must be given explicitly if there are no rays!` from `sage/geometry/cone.py:434`, while `Cone([], lattice=FreeModule(ZZ, 2))` is the origin, `0-d cone in 2-d lattice`, whose `Hilbert_basis()` is the empty collection -- 0.00 s for each, the timer's 0.01 s resolution.
+The lattice to state is a free module over `ZZ`: `Cone(rows, lattice=FreeModule(QQ, 2))` raises `TypeError: lattice must be a free module over ZZ` out of `normalize_rays` as soon as `rows` is nonempty, and the empty family is the one case that does not reach `normalize_rays`.
+`PointConfiguration([])` builds `The pointless empty configuration` and its `triangulate()` raises `IndexError: list index out of range` (0.00 s).
+Route chosen: `hilbert_basis` states `FreeModule(ZZ, len(labels))`, so the zero cone's Hilbert basis is the empty family; `_engine_ray_triangulation` states the same lattice and answers a ray-free family with the one simplex of no rays, `PointConfiguration` not being asked. On four specimens in ranks 2 and 3 (the wedge (0,1),(2,1); the orthant; the rays e1,e2,e3,e1+e2+e3; the cone (1,0),(1,3)) the triangulations and the Hilbert bases are unchanged by stating the lattice, in 0.30 s for all eight computations.
+Reproduce: `sage -c 'from sage.geometry.cone import Cone; from sage.geometry.triangulation.point_configuration import PointConfiguration; from sage.modules.free_module import FreeModule; from sage.rings.integer_ring import ZZ; print(Cone([], lattice=FreeModule(ZZ, 2)).Hilbert_basis()); print(PointConfiguration([]).triangulate())'`.
+
 ### The brute-force orthogonal group does not return for a half-integral elementary two-primary form
 
 Measured 2026-11-11 in the adopted runtime (SageMath 11.0.beta5, Python 3.14):
