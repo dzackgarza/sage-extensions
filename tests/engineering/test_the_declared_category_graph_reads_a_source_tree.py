@@ -164,7 +164,7 @@ def test_each_view_the_documentation_names_answers_on_a_tree_it_is_given(view):
     per test, because each runs the tool as a process and the views that compute
     homology or cycles load Sage's libraries first.
     """
-    report = declared_graph_report(_toy_tree(), "--format", view)
+    report = declared_graph_report(_toy_tree(), view)
 
     assert report.exit_status == 0, f"the {view} view: {report.transcript}"
 
@@ -180,7 +180,7 @@ def test_a_declaration_names_the_vertex_it_names_and_where_that_name_comes_from(
     was given a parameter, and ``base`` there is a local expression that names
     no category: the reader records it rather than guessing where it lands.
     """
-    document = declared_graph_document(_toy_tree(), "--format", "json")
+    document = declared_graph_document(_toy_tree(), "json")
 
     assert {
         row["vertex"]: [
@@ -213,7 +213,7 @@ def test_an_axiom_vertex_declares_every_category_the_join_puts_it_under():
     axiom over a written edge would stop at ``Paths``.
     """
     document = declared_graph_document(
-        _toy_tree(), "--format", "slice", "--select", "*", "--direction", "self"
+        _toy_tree(), "slice", "--select", "*", "--direction", "self"
     )
 
     assert {tuple(edge) for edge in document["edges"]} == {
@@ -234,7 +234,25 @@ def test_an_axiom_vertex_declares_every_category_the_join_puts_it_under():
     }
 
 
-def test_a_slice_up_from_a_category_is_the_diamond_it_inherits_along():
+def test_a_category_nothing_declares_is_a_piece_of_the_graph():
+    r"""Eleven categories in two pieces, and ``Sliced(base)`` is the second piece.
+
+    ``AGENTS.md`` makes the declared graph a 0-cell per category and a 1-cell
+    per declaration, so a category the source declares is a cell whether or not
+    a declaration names it.  ``Sliced(base)`` declares only ``base``, an
+    expression the reader cannot place, so it carries no edge: eight written
+    declarations and the joins Sage supplies among the ten other vertices are
+    one piece, and this category is a piece of its own.  The complex therefore
+    has eleven 0-cells and two components, whose two free generators are H_0.
+    """
+    shape = declared_graph_figures(_toy_tree(), "shape")
+    assert shape["categories"] == 11
+    assert shape["pieces"] == 2
+
+    cells = declared_graph_figures(_toy_tree(), "cells")
+    assert cells["0-cells"] == 11
+    assert cells["H_0 rank"] == 2
+
     r"""Up from ``FinitePaths``: the two categories it declares, and their one parent.
 
     The axiom vertices are refinements of categories in the slice rather than
@@ -243,7 +261,7 @@ def test_a_slice_up_from_a_category_is_the_diamond_it_inherits_along():
     ``Sliced(base)``, which declares nothing, is outside it.
     """
     document = declared_graph_document(
-        _toy_tree(), "--format", "slice", "--select", "FinitePaths", "--direction", "up"
+        _toy_tree(), "slice", "--select", "FinitePaths", "--direction", "up"
     )
 
     assert set(document["vertices"]) == {

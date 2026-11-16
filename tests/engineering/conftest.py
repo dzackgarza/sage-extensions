@@ -22,11 +22,15 @@ builtins for the same reason: the lint admits exactly the names a directory's
 ``conftest.py`` binds.
 
 The declared category graph has the same shape of question, asked of a tree
-written for it: ``declared_graph_report`` runs the tool ``just category-graph``
-spells over a source tree the test supplies -- the module as a subprocess, its
-data read from the file ``--output`` writes and not from what it prints -- and
-``declared_graph_document`` is that report's document, required to exist so a
-view that refuses the tree fails the test that asked for its data.
+written for it: ``declared_graph_report`` runs ``just category-graph`` -- the
+recipe ``AGENTS.md`` names, not the module -- over a source tree the test
+supplies, so the recipe's argument forwarding and its choice of interpreter are
+what the tests exercise; ``declared_graph_document`` is the document the view
+writes to the file ``--output`` names, required to exist so a view that refuses
+the tree fails the test that asked for its data; and ``declared_graph_figures``
+reads a view's printed figures back as numbers, because the answer ``shape`` and
+``cells`` give is the reading they print, which ``CAT-25`` reads a change's
+category-graph delta off.
 
 The acceptance drivers are instruments of the same kind: each takes one row of
 an orbit computation and reports what the row did.  ``incidence_row_outcome``
@@ -194,85 +198,130 @@ GRAPH_ROOT = SOURCE_TREE / ".tmp" / "category-graph-probes"
 
 @dataclass(frozen=True)
 class GraphReport:
-    r"""What one run of the declared-category-graph tool reported.
+    r"""What one run of the declared-category-graph recipe said.
 
-    ``exit_status`` is the run's; ``written`` is the text the view wrote to the
-    file ``--output`` names, which is the tool's data for the views that answer
-    with one and is absent for a view that prints; ``transcript`` is the run's
-    own output, so a test that fails says what the tool said about the tree it
-    was given.
+    ``exit_status`` is the run's; ``output`` is what it wrote to standard
+    output, which is the view's own answer for the views that print one and
+    empty for a view whose data went to ``--output``; ``transcript`` is that
+    together with the diagnostics, so a test that fails says what the tool said
+    about the tree it was given.
     """
 
     exit_status: int
-    written: str | None
+    output: str
     transcript: str
 
 
-def _tool_environment() -> dict[str, str]:
-    r"""This process's environment with the checkout's ``src`` first on the path."""
-    return {
-        **os.environ,
-        "PYTHONPATH": os.pathsep.join(
-            (str(SOURCE_TREE / "src"), os.environ.get("PYTHONPATH", ""))
-        ),
-    }
-
-
-def declared_graph_report(tree: dict[str, str], *arguments: str) -> GraphReport:
-    r"""Run the declared-category-graph tool over a source tree written for it.
+def declared_graph_report(tree: dict[str, str], view: str, *arguments: str) -> GraphReport:
+    r"""Run ``just category-graph`` over a source tree written for it.
 
     ``tree`` maps a path inside the tree to that file's source, so the run reads
     declarations written for the test and no file of this checkout: a category
-    renamed here changes no assertion there.  ``arguments`` are the tool's own
-    -- the view as ``--format VIEW``, and the selection a view takes -- and the
-    command is the one ``just category-graph`` spells, so what a test reads is
-    what the recipe produces.  The tree is written under ``.tmp/`` and removed.
+    renamed here changes no assertion there.  ``view`` and ``arguments`` are the
+    recipe's own -- the view as its first parameter, then what that view takes
+    (``--operation``, ``--select``), and the tree last -- because the recipe is
+    the subject: it supplies ``--format`` from its view parameter and drops that
+    parameter before forwarding the rest, and it chooses the interpreter the
+    view needs, so a run of it here fails if either is wrong.  ``shape``,
+    ``cells``, ``audit`` and ``topology`` load Sage's graph library and the
+    recipe runs them under the Sage interpreter; the rest run under ``python3``.
+    The tree is written under ``.tmp/`` and removed.
     """
-    GRAPH_ROOT.mkdir(parents=True, exist_ok=True)
-    root = Path(tempfile.mkdtemp(prefix="declared-graph-", dir=GRAPH_ROOT))
+    root = _declared_graph_tree(tree)
     try:
-        for name, source in tree.items():
-            path = root / name
-            path.parent.mkdir(parents=True, exist_ok=True)
-            path.write_text(source)
-        document = root / "report.json"
-        finished = subprocess.run(
-            (
-                sys.executable,
-                "-m",
-                "sage_extensions.testing.category_graph",
-                *arguments,
-                "--output",
-                str(document),
-                str(root),
-            ),
-            capture_output=True,
-            text=True,
-            cwd=SOURCE_TREE,
-            env=_tool_environment(),
-        )
-        return GraphReport(
-            exit_status=finished.returncode,
-            written=document.read_text() if document.is_file() else None,
-            transcript=f"{finished.stdout}{finished.stderr}",
-        )
+        return _declared_graph_recipe(root, view, *arguments)
     finally:
         shutil.rmtree(root)
 
 
-def declared_graph_document(tree: dict[str, str], *arguments: str) -> dict:
+def _declared_graph_tree(tree: dict[str, str]) -> Path:
+    r"""A source tree on disk: the files the test wrote, under ``.tmp/``."""
+    GRAPH_ROOT.mkdir(parents=True, exist_ok=True)
+    root = Path(tempfile.mkdtemp(prefix="declared-graph-", dir=GRAPH_ROOT))
+    for name, source in tree.items():
+        path = root / name
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(source)
+    return root
+
+
+def _declared_graph_recipe(root: Path, view: str, *arguments: str) -> GraphReport:
+    r"""One run of the recipe the repository spells, from the checkout, over ``root``."""
+    finished = subprocess.run(
+        ("just", "category-graph", view, *arguments, str(root)),
+        capture_output=True,
+        text=True,
+        cwd=SOURCE_TREE,
+    )
+    return GraphReport(
+        exit_status=finished.returncode,
+        output=finished.stdout,
+        transcript=f"{finished.stdout}{finished.stderr}",
+    )
+
+
+def declared_graph_document(tree: dict[str, str], view: str, *arguments: str) -> dict:
     r"""The document one data view of the graph wrote for ``tree``.
 
-    A view that refuses the tree, or fails on it, leaves no document; the
-    assertion carries the run's exit status and its own words rather than
-    letting the caller read a missing file.
+    The document is the file ``--output`` names, not what the view printed, so a
+    view that answers by writing reads here as it reads in use.  A view that
+    refuses the tree, or fails on it, leaves no document; the assertion carries
+    the run's exit status and its own words rather than letting the caller read
+    a missing file.
     """
-    report = declared_graph_report(tree, *arguments)
-    assert report.written is not None, (
-        f"' {' '.join(arguments)}' wrote no report of the tree: exit status "
-        f"{report.exit_status}: {report.transcript}"
-    )
-    return json.loads(report.written)
+    root = _declared_graph_tree(tree)
+    try:
+        document = root / "report.json"
+        report = _declared_graph_recipe(root, view, *arguments, "--output", str(document))
+        assert report.exit_status == 0, f"the {view} view: {report.transcript}"
+        assert document.is_file(), (
+            f"the {view} view wrote no report of the tree: exit status "
+            f"{report.exit_status}: {report.transcript}"
+        )
+        return json.loads(document.read_text())
+    finally:
+        shutil.rmtree(root)
+
+
+def declared_graph_figures(tree: dict[str, str], view: str) -> dict[str, int]:
+    r"""The figures a view states, read back as numbers.
+
+    ``shape`` and ``cells`` answer with a reading rather than a document --
+    ``AGENTS.md`` ``CAT-25`` reads a change's category-graph delta off them -- so
+    the figures they print *are* the answer, and a test asserts the numbers the
+    tree's own declarations give.  Each is read from the answer: the header
+    figures by name, and each heading's own count from its ``## heading (n)``.
+    A view that states no such figure leaves it out, so a figure the answer
+    stops stating is a failure of the test that asked for it.
+    """
+    report = declared_graph_report(tree, view)
+    assert report.exit_status == 0, f"the {view} view: {report.transcript}"
+    return _figures(report.output)
+
+
+_HEADER_FIGURES = (
+    ("categories", r"categories (\d+)"),
+    ("declarations", r"declarations (\d+)"),
+    ("computed joins", r"computed joins (\d+)"),
+    ("pieces", r"pieces (\d+)"),
+    ("longest chain", r"longest chain of declarations and joins = (\d+)"),
+    ("0-cells", r"0-cells (\d+)"),
+    ("1-cells", r"1-cells (\d+)"),
+    ("2-cells", r"2-cells (\d+)"),
+    ("H_0 rank", r"H_0 = Z(?:\^(\d+))?"),
+)
+
+
+def _figures(output: str) -> dict[str, int]:
+    r"""The figures an answer states, by name, and each heading's count by heading."""
+    figures = {
+        name: int(found[1] or 1)
+        for name, pattern in _HEADER_FIGURES
+        if (found := re.search(pattern, output))
+    }
+    for heading, count in re.findall(r"(?m)^#+ (.+?) \((\d+)\)", output):
+        figures[heading] = int(count)
+    return figures
 
 
 def pytest_configure(config) -> None:
@@ -286,6 +335,7 @@ def pytest_configure(config) -> None:
     """
     builtins.declared_graph_report = declared_graph_report
     builtins.declared_graph_document = declared_graph_document
+    builtins.declared_graph_figures = declared_graph_figures
     builtins.probe_run = probe_run
     builtins.stage_records_of = stage_records_of
     builtins.kept_test_run = kept_test_run
@@ -300,6 +350,7 @@ def pytest_unconfigure(config) -> None:
     r"""Remove the session's abbreviation, leaving ``builtins`` as it was found."""
     del builtins.declared_graph_report
     del builtins.declared_graph_document
+    del builtins.declared_graph_figures
     del builtins.probe_run
     del builtins.stage_records_of
     del builtins.kept_test_run
