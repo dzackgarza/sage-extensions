@@ -3333,3 +3333,13 @@ these on the pushed history: the tests `f31a9d7` are `7423e36`, the repair
 pushed tip's, so the evidence covers the pushed code and not only the pre-rebase
 trees.  The `537r3-probe.log` of `9ee7e5e` is kept because its answers are what
 the pushed probe reproduces.
+
+Correction, 2026-11-16: the ids in the note above are the ones of the
+`c9568ed`/`fa61bf8` histories.  `main` moved five times while the round was
+being pushed, and the history that is pushed is `e0253f2` (the tests), `c3fcad7`
+and `5eccb81` (the repairs), rebased onto `c9568ed`, `0412861`, `fa61bf8`,
+`5064d72` and `1ec450f`; the two evidence commits are the ones above that.  The
+two `-final` runs are taken at `9cb47c6`, whose `src` and `tests` are the pushed
+tip's own, so they are the runs of the pushed code.
+| `537r3-green-tests-final.log` | `9cb47c6`, whose `src` and `tests` are the pushed tip's | the file: **15 passed in 6.66 s** |
+| `537r3-probe-final.log` | `9cb47c6`, the same tree | the same probe: byte-identical answers again, so the rebase onto `5064d72` and `1ec450f` changed none of this round's names, orders or counts |
