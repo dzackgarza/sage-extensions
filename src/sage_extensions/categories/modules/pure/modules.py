@@ -3539,54 +3539,31 @@ class Modules(OwnedCategoryOverBaseRing):
             class ParentMethods:
                 @validator
                 def validate_torsion_claim(self) -> None:
-                    r"""Refute this claimed torsion placement if its relation morphism leaves a free summand.
+                    r"""Refute this claimed torsion placement if the module is not torsion.
 
                     The claim is made by the construction that placed the module
                     here, ``Modules(R).FinitelyPresented().Torsion()(rho)``
                     (``CAT-04``); this validator is the claim's refutation and
                     belongs to the category the claim was made in, so a module
-                    that claims nothing carries none.  Over a principal ideal
-                    domain ``coker(rho)`` is torsion exactly when the relation
-                    morphism becomes surjective over the fraction field, and
-                    scalar extension preserves the rank of this exact relation
-                    matrix.
+                    that claims nothing carries none.  The torsion decision is
+                    the presented module owner's, ``_torsion_decision``: over a
+                    principal ideal domain it reads the invariant factors of the
+                    selected presentation.  Asking it here keeps the relation
+                    matrix at the owner that holds it (``OWN-05``, ``STY-03``).
 
                     This is a validator, not part of any computation: the claim's
                     construction passes its own ``check`` argument, which is
                     ``False`` by default, so the refutation runs only when a
-                    caller asks for it or under strict checking (``OWN-22``).  It
-                    reads the presentation, and therefore builds it when it runs.
+                    caller asks for it or under strict checking (``OWN-22``).
                     """
-                    from sage.matrix.constructor import matrix
-
-                    from sage_extensions.categories.modules.framed.finitely_generated.finitely_presented_modules import (
-                        _relation_images,
-                    )
-
-                    ring = self.base_ring()
-                    presentation = self.presentation()
-                    width = int(presentation.codomain().module_generating_set().cardinality())
-                    relation_images = _relation_images(self)
-                    field = ring.fraction_field_map().codomain()
-                    relations = matrix(
-                        _engine_ring(ring),
-                        len(relation_images),
-                        width,
-                        [
-                            _engine_element(ring, coefficient)
-                            for image in relation_images
-                            for coefficient in image
-                        ],
-                    )
-                    match int(relations.change_ring(_engine_ring(field)).rank()) == width:
-                        case True:
-                            pass
+                    match self._torsion_decision():
                         case False:
                             raise ValueError(
-                                f"{self} is claimed to be a torsion {ring}-module, but its relation matrix "
-                                "does not have full rank over the fraction field: the cokernel has a nonzero "
-                                "free summand"
+                                f"{self} is claimed to be a torsion {self.base_ring()}-module, but its "
+                                "torsion decision is negative: the cokernel has a nonzero free summand"
                             )
+                        case _:
+                            pass
 
                 def invariants(self):
                     r"""Return the invariant factors of this finite presented torsion module."""
