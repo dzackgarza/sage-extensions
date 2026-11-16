@@ -2542,6 +2542,7 @@ end
                 "discriminant representation is not characterized by its characters"
             )
         from sage_extensions.categories.group.groups import (
+            _named_by_its_own_words,
             _subgroup_from_gap,
         )
 
@@ -2549,8 +2550,10 @@ end
             return _subgroup_from_gap(
                 self._discriminant_group,
                 self._joint_discriminant_image_gap(),
-                f"the joint discriminant image of {self.subgroup} in "
-                f"{self._discriminant_group}",
+                lambda: (
+                    f"the joint discriminant image of "
+                    f"{_named_by_its_own_words(self.subgroup)} in {self._discriminant_group}"
+                ),
             )
         factors, _product, _embeddings, projections = self._gap_product()
         position = next(
@@ -2560,8 +2563,10 @@ end
         return _subgroup_from_gap(
             self._discriminant_group,
             projected,
-            f"the projected discriminant image of {self.subgroup} in "
-            f"{self._discriminant_group}",
+            lambda: (
+                f"the projected discriminant image of "
+                f"{_named_by_its_own_words(self.subgroup)} in {self._discriminant_group}"
+            ),
         )
 
     @cached_method
