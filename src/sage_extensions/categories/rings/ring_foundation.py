@@ -694,17 +694,25 @@ class RngMor(CategoricalMor):
 def _parent_of_an_element(value):
     r"""The parent of ``value``, when the value has one that holds elements.
 
-    ``SageObject.parent`` answers ``type(value)`` for a value that is itself a
-    parent (`sage/structure/sage_object.pyx`, ``SageObject.parent``), and an
-    owned object of a category is one: ``cardinal(7).parent()`` is the class
-    ``Cardinalities.parent_class``.  A class holds no elements: it has no
-    ``category()``, so ``class in SomeCategory()`` reaches Sage's
-    ``Category.__contains__`` and raises ``TypeError: category() needs an
-    argument`` instead of answering.  ``None`` states that the value names no
-    parent of elements, which is what every reader of the parent asks about.
+    ``sage.structure.element.parent`` answers ``x.parent()`` for an element and
+    ``type(x)`` for anything else; its docstring states the second half as
+    "the following are not considered to be elements, so the type is
+    returned".  Every object of an owned category is a parent, so
+    ``cardinal(7)`` arrives here as a value whose "parent" is
+    ``Cardinalities.parent_class``.  A class holds no elements, has no
+    ``category()`` of its own, and every containment statement about it raises
+    rather than answering: ``Category.__contains__`` asks ``x.category()`` and
+    the class answers the unbound method, so ``class in SomeCategory()`` is
+    ``TypeError: category() needs an argument``.  No category states that its
+    objects are the parents of elements, so the answer is turned away here,
+    once, at the boundary to Sage's coercion framework that this module is.
 
-    Private to this module's element ingresses; the predicates it feeds are
-    categorical membership tests on a parent, not on a class.
+    ``isinstance(..., Parent)`` is that framework's own statement and not a
+    reading of what a mathematical value carries: Sage's
+    ``sage.structure.parent.is_Parent`` is deprecated with the message "use
+    ``isinstance(..., Parent)`` instead" (trac #37922), and ``None`` here says
+    what every reader of the parent asks about -- this value names no parent
+    of elements.
     """
     parent = element_parent(value)
     return parent if isinstance(parent, Parent) else None
@@ -1090,15 +1098,13 @@ class PredicateSubrings(OwnedCategory):
             return answer
 
         def _element_constructor_(self, element):
-            from sage.structure.element import parent as element_parent
-
             from sage_extensions.categories.modules.pure.modules import Modules
 
-            source = element_parent(element)
+            source = _parent_of_an_element(element)
+            if source is not None and source is not self and source in Modules(self.base_ring()) and source.unformed_module() is self:
+                return source._element_of_unformed_module(element)
             if source is self:
                 return element
-            if source is not self and source in Modules(self.base_ring()) and source.unformed_module() is self:
-                return source._element_of_unformed_module(element)
             if element not in self._ambient_ring:
                 raise ValueError(
                     f"{element} is not in {self}: it is not even an element of the ring {self._ambient_ring} "
@@ -1835,11 +1841,11 @@ class LocalizationRings(OwnedCategory):
             """
             from sage_extensions.categories.modules.pure.modules import Modules
 
-            parent = element_parent(value)
+            parent = _parent_of_an_element(value)
             if parent is self:
                 return True
             if (
-                isinstance(parent, Parent)
+                parent is not None
                 and parent in Modules(self.base_ring())
                 and parent.unformed_module() is self
             ):
@@ -1857,7 +1863,7 @@ class LocalizationRings(OwnedCategory):
             source_status = source.is_parent_of(value)
             if source_status is True:
                 return True
-            if not isinstance(parent, Parent) or parent not in OwnedRings():
+            if parent is None or parent not in OwnedRings():
                 if source_status is False:
                     return False
                 return AtomicProposition("is_parent_of", self, value)
