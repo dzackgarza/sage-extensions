@@ -719,6 +719,25 @@ class RngMor(CategoricalMor):
         return f"Mor_Ring({self.domain()}, {self.codomain()})"
 
 
+def _parent_of_an_element(value):
+    r"""The parent of ``value``, when the value has one that holds elements.
+
+    ``SageObject.parent`` answers ``type(value)`` for a value that is itself a
+    parent (`sage/structure/sage_object.pyx`, ``SageObject.parent``), and an
+    owned object of a category is one: ``cardinal(7).parent()`` is the class
+    ``Cardinalities.parent_class``.  A class holds no elements: it has no
+    ``category()``, so ``class in SomeCategory()`` reaches Sage's
+    ``Category.__contains__`` and raises ``TypeError: category() needs an
+    argument`` instead of answering.  ``None`` states that the value names no
+    parent of elements, which is what every reader of the parent asks about.
+
+    Private to this module's element ingresses; the predicates it feeds are
+    categorical membership tests on a parent, not on a class.
+    """
+    parent = element_parent(value)
+    return parent if isinstance(parent, Parent) else None
+
+
 def _is_ring_map_into(candidate, target) -> bool:
     r"""Whether ``candidate`` is a ring morphism ending at ``target``.
 
@@ -1715,8 +1734,8 @@ class LocalizationRings(OwnedCategory):
                         value = underlying.to_vector()(0)
                     else:
                         value = underlying
-                value_parent = element_parent(value)
-                if value_parent in OwnedRings():
+                value_parent = _parent_of_an_element(value)
+                if value_parent is not None and value_parent in OwnedRings():
                     return source(value)
                 try:
                     native_value = _engine_ring(source)(value)
@@ -1757,8 +1776,8 @@ class LocalizationRings(OwnedCategory):
 
             from sage_extensions.categories.modules.pure.modules import Modules
 
-            source = element_parent(value)
-            if source is not self and source in Modules(self.base_ring()) and source.unformed_module() is self:
+            source = _parent_of_an_element(value)
+            if source is not None and source is not self and source in Modules(self.base_ring()) and source.unformed_module() is self:
                 return source._element_of_unformed_module(value)
             if source is self:
                 return value
@@ -1793,7 +1812,7 @@ class LocalizationRings(OwnedCategory):
                 # ("'QuotientRing_generic...element_class' object has no
                 # attribute 'numerator'").  The candidate's ring being a field is
                 # the premise this reading actually needs.
-                candidate_parent = element_parent(candidate)
+                candidate_parent = _parent_of_an_element(candidate)
                 if candidate_parent is None or candidate_parent in OwnedRings() and candidate_parent.is_field() is not True:
                     continue
                 numerator = getattr(candidate, "numerator", None)
@@ -1822,8 +1841,8 @@ class LocalizationRings(OwnedCategory):
             the fallback.  A value with no fraction-field realization, or with
             no numerator and denominator at all, contributes only what it states.
             """
-            value_parent = element_parent(value)
-            if value_parent in OwnedRings() and value_parent.is_field() is True:
+            value_parent = _parent_of_an_element(value)
+            if value_parent is not None and value_parent in OwnedRings() and value_parent.is_field() is True:
                 try:
                     yield _engine_element(value_parent, value)
                 except (TypeError, ValueError, AttributeError):
