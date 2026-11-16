@@ -3447,15 +3447,17 @@ def _center_algebra(algebra, submodule):
 
     This function owns both halves of Magmas' ``_center_construction``
     contract: the centre and its inclusion, an arrow of the unital algebra Mor
-    when the ambient algebra is associative and unital and of the root algebra
-    Mor otherwise.  The module inclusion is an algebra map *by construction* --
-    the product above is the ambient product read back along it and the unit is
-    its lift of ``1`` -- so its two laws are the definition of that
-    construction, retained as the arrow's premises (``OWN-22``) rather than
-    re-derived: deciding them on the centre's module generators costs one
-    coordinate solve per pair (25 class-sum pairs of ``QQ[S_4]``: 24.6 s,
-    against 0.216 s for the centre itself).  The unit law costs one comparison
-    and is stated as the element equality it is.
+    whenever the ambient algebra is unital -- associative or not, since that
+    category is where multiplicativity and the unit law are stated together --
+    and of the root algebra Mor when it has no unit.  The module inclusion is
+    an algebra map *by construction*: the product above is the ambient product
+    read back along the inclusion, and the unit is the inclusion's own lift of
+    ``1``, so ``f m_Z = m_A (f (x) f)`` and ``f(1_Z) = 1_A`` are the definition
+    of this pair rather than laws about it.  They are therefore recorded as the
+    arrow's premises (``OWN-22``) instead of being decided: deciding them would
+    re-derive the construction on the centre's module generators, one
+    coordinate solve per pair of generators, and would make building the
+    centre depend on comparing its unit with the ambient one.
     """
     ring = algebra.algebra_base_ring()
     inclusion = submodule.inclusion()
@@ -3493,24 +3495,26 @@ def _center_algebra(algebra, submodule):
             match algebra in associative_unital:
                 case True:
                     arrows = associative_unital.Mor(center, algebra)
-                    return center, arrows._from_constructed_element_map(
-                        included,
-                        linearity_premises=(inclusion,),
-                        equations=(
-                            # f m_Z = m_A (f (x) f): `multiplication` *is* the
-                            # ambient product read back along `inclusion`.
-                            True,
-                            # f(1_Z) = 1_A: `unit` is `inclusion`'s lift of 1_A.
-                            inclusion(unit) == algebra.one(),
-                        ),
-                    )
                 case False:
-                    # The ambient has a unit without being associative, so the
-                    # centre's product is judged by the root Mor alone.
-                    arrows = algebras.Mor(center, algebra)
-                    return center, arrows._from_constructed_element_map(
-                        included, linearity_premises=(inclusion,)
-                    )
+                    # The ambient has a unit without being associative.  The
+                    # inclusion is still a map of unital algebras -- the
+                    # product is the ambient product read back along it and
+                    # the unit is its lift of 1 -- and the unital Mor is where
+                    # those two laws are stated for algebras that need not be
+                    # associative.  The root Mor states multiplicativity alone,
+                    # so an arrow there would discard the unit law.
+                    arrows = algebras.Unital().Mor(center, algebra)
+            return center, arrows._from_constructed_element_map(
+                included,
+                linearity_premises=(inclusion,),
+                equations=(
+                    # f m_Z = m_A (f (x) f): `multiplication` *is* the ambient
+                    # product read back along `inclusion`.
+                    True,
+                    # f(1_Z) = 1_A: `unit` *is* `inclusion`'s lift of 1_A.
+                    True,
+                ),
+            )
         case _:
             center = _algebra_on_module(
                 submodule,

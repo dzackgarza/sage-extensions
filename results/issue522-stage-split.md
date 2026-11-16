@@ -127,29 +127,49 @@ of a deep layer it would be far more.
 
 ## 6. What the two repairs measure
 
-The enumeration, layer by layer, on `762126c` with the two repairs
-(`.scratch/probe522j_real.py`, `<tree>/.tmp/probe522j_real4.log`):
+Two parameterisations of the same layer were written and measured, both exact.
+
+**Integral coefficients with the cone bound as a lower bound.**  The enumeration
+keeps the coefficients `d` of the candidate along the cell's normals integral --
+so its equation (57) is the layer's and not a relaxation of it -- and takes (58)
+against the normals as a lower bound at each level:
+`d_i >= (beta_i + sum_{j != i} |G_ij| d_j)/G_ii`, with the chosen higher
+coefficients and the floors of the lower ones, which is necessary for any
+solution the level could reach.  On `762126c` with the two repairs
+(`<tree>/.tmp/pytest522h.log`):
 
 ```
-    layer    4: k=4 height=2  written= 9 constraints=0 candidates=     1 outside=0
-    layer    7: k=4 height=4  written= 9 constraints=0 candidates=     2 outside=0
-    layer    9: k=4 height=6  written=10 constraints=1 candidates=     0 outside=0
-    layer   11: k=4 height=8  written=10 constraints=1 candidates=     1 outside=0
-    layer   13: k=4 height=10 written=11 constraints=2 candidates=     0 outside=0
-    layer   16: k=4 height=12 written=11 constraints=2 candidates=     0 outside=0
-    layer   17: k=4 height=14 written=11 constraints=2 candidates=     0 outside=0
-    layer   20: k=4 height=16 written=11 constraints=2 candidates=     1 outside=0
-    layers 20, candidates 247, outside 0
-    layers 1.24 s, sifts 247 in 40.92 s
+227.43s  test_the_subgroup_cusp_chamber_at_the_first_cusp_has_the_card_wall_count
+206.54s  test_the_walk_at_the_first_cusp_writes_down_only_what_the_walls_allow
+  3.91s  test_the_full_chamber_of_the_cusp_lattice_completes
+  4.13s  test_the_dual_normals_are_the_adjugate_duals_of_the_cell_normals
+  0.37s  test_each_layers_cell_enumeration_is_its_whole_lattice_solutions_in_the_cell
+6 passed
 ```
 
-247 candidates for the whole walk, none of them outside a wall already
-written.  The same walk before the change enumerated 587 394 candidates in the
-layers this session saw (heights 0 to 14, `.scratch/probe522d_walk.py`) and was
-killed at 560 s without returning; the walk's own record of its earlier cost is
-1 855 003 candidates, 337.8 s of root test and 92.9 s of dependence check, in
-`_FilteredVinAl.IsNewRoot`.  What is left of the call is now the membership
-question and nothing else.  The figures
-above are at load average 20 on this four-CPU host, where one question costs
-0.17 s; the same question cost 0.12 s at load 4 (`§4`), so the sift figures are
-load-bound and the candidate counts are not.
+Against the base commit `a2d1490` on the same host: 404.53 s for the first,
+14.04 s for the third, 6.08 s for `the_root_filter_removes_a_wall_whose_reflection_it_refuses`.
+So the repair is worth 1.8x on the chamber the issue is about and 3.6x on the
+full chamber's walk, and it closes nothing: 227 s is still far outside the 20 s
+call ceiling.
+
+**Normal coordinates.**  Writing `u = -f`, `f >= 0`, the cone condition (58)
+against the normals is one-sided and the layer's equation becomes
+`u^t G^{-1} u = k - q(a) + c^t Gc`; the candidates come back as
+`a - sum_j c_j w_j - sum_i f_i sum_j (G^{-1})_ji w_j`, and the `f` whose vector
+is not integral are dropped.  That was tried and measured first:
+
+```
+ 51.46s  test_the_subgroup_cusp_chamber_at_the_first_cusp_has_the_card_wall_count
+  9.68s  test_the_walk_at_the_first_cusp_writes_down_only_what_the_walls_allow
+128.64s  test_the_full_chamber_of_the_cusp_lattice_completes
+```
+
+It is 4x to 20x better on the two walks whose layers are deep, which is where
+(58) binds, and 9x *worse* on the full chamber's walk, whose layers are shallow:
+there the dense `G^{-1}` and the `f` that do not name an integral `d` cost more
+than the relaxation the integral coefficients carry.  It was reverted rather than
+kept, because the test it makes red was green before; the route that should keep
+both is to enumerate the coset `beta + G Z^r` inside the orthant directly, so
+that the one-sided condition and the integrality are the same variable, and that
+is the unit #522 still needs.

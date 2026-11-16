@@ -120,14 +120,17 @@ class _ModuleScalarAction(Action):
         return self._module.scalar_multiple(scalar, element)
 
 
-def _register_module_scalar_action(module, scalar_parent=None) -> None:
+def _register_module_scalar_action(module, scalar_parent) -> None:
     r"""Register ordinary ``r*m``/``m*r`` syntax for an owned module parent.
 
-    The scalars are those of ``scalar_parent``, the module's base ring unless
-    the module retains a further ring acting through it; the registration is
-    this package's one declaration of that syntax for a module parent.
+    The scalars are those of ``scalar_parent``, named by the construction that
+    establishes them: a module over ``M`` registers its own base ring, and a
+    module over ``R[G]`` registers the group algebra and, beside it, the
+    coefficient ring ``R`` acting through ``R -> R[G]``.  The registration is
+    this package's one declaration of that syntax for a module parent, and it
+    takes the ring rather than reading one off the module, since which ring
+    acts is the datum being declared.
     """
-    scalar_parent = module.base_ring() if scalar_parent is None else scalar_parent
     module.register_action(_ModuleScalarAction(scalar_parent, module, True))
     if scalar_parent in OwnedRings().Commutative():
         module.register_action(_ModuleScalarAction(scalar_parent, module, False))
@@ -1699,6 +1702,14 @@ class Modules(OwnedCategoryOverBaseRing):
             $\ker 8 = 0$: every functional kills $1$ and hence everything, so
             $O_{\mathbf{Z}/8}(3) = (0)$.
 
+            That kernel is a matrix kernel over $R$, and the ring decides which
+            computation supplies it: a Smith form over a principal ideal domain,
+            a standard basis over a polynomial ring over a field or over the
+            integers, and a standard basis over a quotient of a polynomial ring
+            over a field.  Over a ring with none of those exact coefficient
+            presentations the kernel computation states that it has no route for
+            the ring, rather than reporting a presentation it did not compute.
+
             Where the dual does carry a generating family -- a finitely
             presented module, and above all one with a chosen finite basis --
             this level answers.  Where it does not, this level asserts, and a
@@ -1859,7 +1870,7 @@ class Modules(OwnedCategoryOverBaseRing):
             ring the preamble adopts alike, and neither has anything to state
             about its scalars afterwards.
             """
-            _register_module_scalar_action(self)
+            _register_module_scalar_action(self, self.base_ring())
 
         @object_level
         def Mono(self, codomain):
@@ -3146,7 +3157,17 @@ class Modules(OwnedCategoryOverBaseRing):
             assignment of a value to each generator that kills every relation,
             so ``Hom_R(M, R) = ker(A^t: R^n -> R^m)``.  At
             ``M = Z/8 = coker(8: Z -> Z)`` that kernel is ``0``, and the dual is
-            the zero module.
+            the zero module; at ``M = Z[x]/(x)`` it is ``ker(x: Z[x] -> Z[x])``,
+            also ``0``, and at ``M = Z[x]^2/(x e_1 + 2 e_2)`` it is the syzygy
+            module of ``(x, 2)``, which is free on ``(2, -x)``.
+
+            The kernel is computed where the ring's exact coefficient
+            presentations allow it: a Smith form over a principal ideal domain,
+            a standard basis over a polynomial ring over a field or over the
+            integers, a standard basis over a quotient of a polynomial ring over
+            a field.  Over any other ring the kernel computation states that it
+            has no route for the ring; it does not report a presentation it did
+            not compute.
 
             A free module on an infinite basis has the dual its module algebra
             gives it -- the product ``prod_S R``, which the library holds no
@@ -4691,21 +4712,31 @@ class ModulesWithChosenFinitePresentation(OwnedCategoryOverBaseRing):
             return self.presentation().cokernel().module_rank()
 
         def _torsion_decision(self):
-            r"""Over a PID a module with a chosen presentation is torsion exactly when its rank vanishes.
+            r"""Read torsion off the generic fibre of the chosen presentation.
 
-            ``K tensor_R M = K tensor_R coker(r)`` is the cokernel of ``r``
-            over the fraction field, and over a principal ideal domain every
-            submodule of a free module is free, so ``r`` is injective there and
-            the dimension of the fibre is ``rank_R F_0 - rank_R F_1 = rank_R M``.
-            A vanishing rank is therefore a torsion module, whatever its
-            relations look like.
+            Over an integral domain with fraction field ``K``, a finitely
+            generated module is torsion exactly when ``K \otimes_R M = 0``: the
+            torsion submodule is the kernel of ``M -> K \otimes_R M``
+            (Stacks, Definition 15.22.1 and Lemma 15.22.2, Tags 0536 and
+            0537), and the images of a generating family generate
+            ``K \otimes_R M``, so the kernel is everything exactly when the
+            fibre vanishes.
 
-            The generic-fibre route is for a module that has no presentation to
-            read; a module whose presentation is chosen here answers from it,
-            and over a base that is not a principal ideal domain it falls back
-            to that route.
+            The fibre is computed from the presentation as
+            ``K \otimes_R coker(r) = coker(r \otimes_R K)``, whose dimension is
+            ``rank_R F_0 - rank_K(r \otimes K)``.  That is ``rank_R M``, and it
+            is not ``rank_R F_0 - rank_R F_1``: the relations of a presentation
+            may be dependent, and then ``r`` is not injective after extending
+            scalars.  ``(8, 16) \colon \mathbf{Z}^2 \to \mathbf{Z}`` has rank one
+            over ``\mathbf{Q}`` and a kernel of rank one there, and its cokernel
+            ``\mathbf{Z}/8`` is torsion all the same.  A vanishing rank is a
+            torsion module whatever its relations look like.
+
+            A ring that is not an integral domain has no fraction field, so
+            this level answers through the decision above it, which states the
+            proposition as undecided where it has no decision.
             """
-            if self.base_ring() not in PrincipalIdealDomains():
+            if self.base_ring() not in IntegralDomains():
                 return super()._torsion_decision()
             return self.module_rank() == 0
 

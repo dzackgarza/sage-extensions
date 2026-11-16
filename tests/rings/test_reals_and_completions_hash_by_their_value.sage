@@ -70,6 +70,32 @@ def test_two_algebraic_presentations_of_one_irrational_real_are_one_point() -> N
     assert FiniteOrderedSets()((root, RR(2))).cardinality() == 2
 
 
+def test_a_real_written_transcendentally_hashes_as_the_value_it_equals() -> None:
+    r"""``cos(1)^2 + sin(1)^2 = 1``: one real, whatever the presentation's shape.
+
+    Equality decides this by normalizing the difference, and the normalization
+    places ``sin(1)^2 + cos(1)^2`` at the algebraic number ``1``.  The hash
+    answers the same question about the same value, so it reads the value
+    through that normalization too; a hash that read only the presentation's
+    shape would separate two reals it has already decided are one.
+    ``2 sin(1)^2 + 2 cos(1)^2`` is the same value with a coefficient in front
+    of it, and the same holds of ``log(2)`` written as an exponential.
+    """
+    one = RR(1)
+    trigonometric = one.sin() ** 2 + one.cos() ** 2
+    scaled = RR(2) * trigonometric
+    exponential = RR(2).log().exp()
+
+    assert trigonometric == one
+    assert hash(trigonometric) == hash(one)
+    assert FiniteOrderedSets()((one, trigonometric)).cardinality() == 1
+    assert scaled == RR(2)
+    assert hash(scaled) == hash(RR(2))
+    assert FiniteOrderedSets()((scaled, RR(2))).cardinality() == 1
+    assert exponential == RR(2)
+    assert hash(exponential) == hash(RR(2))
+
+
 def test_the_image_of_a_ring_element_hashes_as_that_ring_element() -> None:
     r"""``image(1)`` is the ring's own ``1``, so the two are one point.
 
@@ -90,6 +116,31 @@ def test_the_image_of_a_ring_element_hashes_as_that_ring_element() -> None:
     assert hash(image(x)) == hash(x)
     assert FiniteOrderedSets()((image(x), x)).cardinality() == 1
     assert hash(image(x + 1)) == hash(plane(x + 1))
+
+
+def test_a_completion_element_with_no_source_hashes_the_value_it_is() -> None:
+    r"""``(1 - x)^{-1} (1 - x) = 1`` in the completion, which keeps no source for it.
+
+    The completion decides this on its exact arithmetic, so the product is the
+    element ``1`` and the two presentations are one point of a finite ordered
+    set.  The product keeps no exact source expression: the inverse of ``1 - x``
+    is no polynomial in ``x`` and ``y``.  The value it is, though, is the
+    truncation the completion computes, read back in the source ring, and that
+    is what the hash reads -- the same datum the completion's own projection
+    reads, and the ring's ``1`` for this element.
+    """
+    plane = QQ.polynomial_ring(("x", "y"))
+    x = plane.algebra_generator("x")
+    completion = plane.adic_completion(plane.ideal(x), precision=3)
+    image = completion.completion_map()
+    unit = image(1 - x)
+    product = unit.inverse_of_unit() * unit
+
+    assert product.exact_source_expression() is None
+    assert product == image(1)
+    assert hash(product) == hash(image(1))
+    assert FiniteOrderedSets()((product, image(1))).cardinality() == 1
+    assert FiniteOrderedSets()((product, image(1), completion.one())).cardinality() == 1
 
 
 def test_two_presentations_of_one_completion_element_are_one_point() -> None:

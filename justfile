@@ -296,20 +296,52 @@ test-universe:
     fi
     echo "The proof surface stays inside the universe."
 
-# The category graph the tree declares, read out of the source with `ast`: every
-# category and what it declares, the placements each supercategory received, the
-# breadth and depth and shortcut declarations, the homology and the cycles that
-# owe a 2-cell. Views: categories (the default), by-supercategory, foreign,
-# shape, cells, audit, json, svg. AGENTS.md, "Reading the declarations".
+# The category graph the tree declares, read out of the source with `ast`, so it
+# answers on a tree that does not import.  The views that compute homology,
+# cycles or a complex load Sage's graph library; the rest read the source and run
+# under plain Python.  Views: table (the default), json, by-supercategory,
+# foreign, audit, shape, cells, routes, constructions, properties, slice,
+# topology, dot.  AGENTS.md, "Reading the declarations", and
+# docs/architecture-inspection.md, for what each answer says and what it cannot.
 [positional-arguments]
-category-graph view="categories" *arguments:
-    @PYTHONPATH="src${PYTHONPATH:+:$PYTHONPATH}" \
-        "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" \
-        -m sage_extensions.testing.category_graph {{view}} {{arguments}}
+category-graph view="table" *args:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    case "{{view}}" in
+        audit|shape|cells|topology)
+            inspection_python="$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" ;;
+        *) inspection_python=python3 ;;
+    esac
+    # just passes every parameter as a positional argument, the view among them;
+    # the tool reads the view from --format, so the rest is what follows it.
+    positional=("$@")
+    if [ "${#positional[@]}" -gt 0 ]; then positional=("${positional[@]:1}"); fi
+    PYTHONPATH="src${PYTHONPATH:+:$PYTHONPATH}" "$inspection_python" \
+        -m sage_extensions.testing.category_graph --format "{{view}}" "${positional[@]}"
 
 # The literal graph, drawn: .tmp/category-graph/declared-graph.dot and its SVG.
 category-graph-svg:
-    @just category-graph svg
+    #!/usr/bin/env bash
+    set -euo pipefail
+    directory=.tmp/category-graph
+    mkdir -p "$directory"
+    PYTHONPATH="src${PYTHONPATH:+:$PYTHONPATH}" python3 \
+        -m sage_extensions.testing.category_graph \
+        --format dot --output "$directory/declared-graph.dot"
+    dot -Tsvg "$directory/declared-graph.dot" -o "$directory/declared-graph.svg"
+    echo "wrote $directory/declared-graph.svg"
+
+# `just category-graph constructions` reads the placement of a result from the
+# source; this calls each category's example object first and adds the category
+# the returned value's class names, where the source builds nothing to follow.
+category-constructions *args:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    mkdir -p .tmp
+    PYTHONPATH="src${PYTHONPATH:+:$PYTHONPATH}" \
+        "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" \
+        -m sage_extensions.testing.category_inference -o .tmp/category-inference.json
+    just category-graph constructions --inferred .tmp/category-inference.json {{args}}
 
 # Lint the test tree against the session standard (sage_extensions.testing.test_lint).
 # With no paths it lints every test.

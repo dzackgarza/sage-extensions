@@ -3744,26 +3744,42 @@ class _AdicCompletionElement(_OwnedAlgebraElement):
         return negation(self._completion_equal(other))
 
     def __hash__(self) -> int:
-        r"""Hash a completion element by the source expression that names it.
+        r"""Hash a completion element by the value it is.
 
-        The completion map is a ring map, and this class retains the exact
-        source expression of every element arriving through it, so an image is
-        named by the ring element it came from and hashes as that element does:
-        ``image(1)`` and the source ring's ``1`` are one point of a finite
-        ordered set.  The name is a function of the element exactly when the
-        completion map is injective at the parent's defining ideal, which is
-        Krull's intersection theorem for a proper ideal of a Noetherian ring and
-        is the parent's own kernel decision.
+        This class's equality is decided on the completion's own arithmetic and,
+        where both sides retain an exact source expression, on the source
+        difference.  A hash therefore has to be a function of the element's
+        value: an element that retains no exact source -- the inverse of
+        ``1 - x`` in ``QQ[x, y]`` completed at ``(x)``, say, and any product of
+        it -- is decided equal to the images of the source ring's elements it
+        equals, and a hash read off one presentation of a pair and off the
+        parent of the other separates them.
 
-        An element retaining no exact source, or a completion whose retained
-        kernel is not trivial, hashes by its completion: finite series data does
-        not decide an equality here, and a kernel element names the same
-        element as zero, so nothing finer is owed.
+        An element that retains an exact source expression hashes that
+        expression, which is the source ring's own element it is the image of:
+        ``image(1)`` and the ring's ``1`` are one point of a finite ordered set.
+        That name is a function of the element exactly when the completion map
+        is injective at the parent's defining ideal, which is the parent's own
+        kernel decision (Krull's intersection theorem for a proper ideal of a
+        Noetherian ring).
+
+        Every other element hashes the truncation the parent computes for it,
+        read back in the source ring (:meth:`exact_value_source`): the value
+        the completion decides, at the parent's precision.  Where an exact
+        source is its own truncation -- the case in which the completion's own
+        projection reads that source unchanged -- this is the same hash the
+        image of that source has, which is why the two branches agree on every
+        pair the completion decides equal.  An element whose parent computes no
+        value, and one whose parent retains no finite-stage lift, hashes the
+        completion alone, which is the coarser invariant :class:`Sets` allows.
         """
         source_expression = self.exact_source_expression()
         if source_expression is not None and self.parent().is_completion_map_injective() is True:
             return hash(source_expression)
-        return hash(id(self.parent()))
+        value_source = self.parent().exact_value_source(self)
+        if value_source is None:
+            return hash(id(self.parent()))
+        return hash(value_source)
 
     def __bool__(self):
         return bool(negation(self._completion_equal(self.parent().zero())))
@@ -4048,6 +4064,34 @@ class _AdicCompletionAlgebraParent(_OwnedAlgebraParent):
 
     def completion_arithmetic_mode(self):
         return self._adic_arithmetic_mode
+
+    def exact_value_source(self, element):
+        r"""Return the source-ring element that names ``element``'s value, or ``None``.
+
+        A completion whose arithmetic is exact decides the value of an element,
+        and the finite datum it computes that value from is the truncation at
+        this completion's precision, read back in the source ring: the same
+        datum ``adic_projection`` reads, and a function of the element's value
+        rather than of the presentation it arrived in.  Every element is named
+        by that datum, including one that arrived through no exact source
+        expression, which is what ``_AdicCompletionElement.__hash__`` reads for
+        such an element.
+
+        A completion that computes at finite precision decides no value --
+        ``_completion_equal`` only decides inequality there, on the finite
+        approximation -- and a construction that supplies no finite-stage lift
+        names none; both return ``None``, and their elements are left to the
+        one coarse hash of the completion.
+        """
+        if self.completion_arithmetic_mode() == "finite_precision":
+            return None
+        projection_lift = self._completion_projection_lift()
+        if projection_lift is None:
+            return None
+        return projection_lift(
+            _engine_element(self, element),
+            self.computation_precision(),
+        )
 
     def _completion_element(self, value, *, source_expression=None):
         if element_parent(value) is not self._engine:

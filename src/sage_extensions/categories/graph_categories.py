@@ -174,9 +174,21 @@ class GraphMorphism:
         )
 
     def __eq__(self, other):
+        r"""Two graph morphisms of one hom-set agree at every vertex.
+
+        The domain's vertices are a finite ordered set, which is the enumeration
+        the graph engine keeps, so agreement is the conjunction of the values at
+        them.  Asking the retained set maps instead leaves the question to
+        :class:`Sets`, which decides a map only on a domain that is an
+        enumerated set: a graph is a facade set of its vertices and does not
+        declare that enumeration on the set level, so the weaker question is
+        undecided while this one is not.
+        """
         if element_parent(other) is not self.parent():
             return False
-        return other.underlying_set_morphism() == self.underlying_set_morphism()
+        if self is other:
+            return True
+        return conjunction(self(vertex) == other(vertex) for vertex in self.parent().domain())
 
     def __ne__(self, other):
         return negation(self == other)

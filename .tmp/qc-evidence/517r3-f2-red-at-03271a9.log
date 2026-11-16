@@ -1,0 +1,37 @@
+=== tree: 30cfb613cf28c99b36f010e8853836cc23215c79 (modified: 1 paths)
+=== port: 991b88b095a42a1e3679569ea42328c900c120f6
+=== files: tests/groups/test_the_orbit_of_a_seed_is_the_set_its_sweep_reached.sage
+=== start: 07:50:32
+F                                                                        [100%]
+=================================== FAILURES ===================================
+___________ test_the_orbit_of_the_seed_is_the_set_the_sweep_reached ____________
+
+    def test_the_orbit_of_the_seed_is_the_set_the_sweep_reached() -> None:
+        r"""``C(3)`` in its regular action: the orbit of the identity is the whole set.
+    
+        The sweep started at the identity reaches all three elements, so the orbit of
+        the identity is this ``G``-set itself, and the section it answers with is the
+        sweep's own words: each carries the base point to the point it belongs to,
+        which is what makes it a transversal of that orbit.
+        """
+        group = Groups.C(3)
+        one = group.one()
+        g_set = FiniteGSets(group).from_finite_orbits(
+            (one,), lambda element, point: element * point
+        )
+        assert g_set.cardinality() == cardinal(3)
+    
+        augmentation = group.selected_group_resolution().augmentation()
+        orbit, section = g_set.orbit_transversal_words(one)
+>       assert orbit is g_set
+E       assert {1, (1 2 3), (1 3 2)} with Cyclic group C_3 of order 3-action is {1, (1 2 3), (1 3 2)} with Cyclic group C_3 of order 3-action
+
+tests/groups/test_the_orbit_of_a_seed_is_the_set_its_sweep_reached.sage:32: AssertionError
+============================= slowest 5 durations ==============================
+0.04s call     tests/groups/test_the_orbit_of_a_seed_is_the_set_its_sweep_reached.sage::test_the_orbit_of_the_seed_is_the_set_the_sweep_reached
+
+(2 durations < 0.005s hidden.  Use -vv to show these durations.)
+=========================== short test summary info ============================
+FAILED tests/groups/test_the_orbit_of_a_seed_is_the_set_its_sweep_reached.sage::test_the_orbit_of_the_seed_is_the_set_the_sweep_reached
+1 failed in 3.80s
+=== exit: 1 at 07:50:38
