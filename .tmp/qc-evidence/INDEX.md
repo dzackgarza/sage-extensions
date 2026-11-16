@@ -3126,3 +3126,21 @@ after main advanced to `a38faef` and the branch was rebased onto it:
 | `issue381-gate-pushed-final.log` | the head this pushes, `3fe961c` on `ab2e435` | the same gate file: **2 passed in 69.14 s**, calls 33.36 s and 35.34 s over the 20 s gate |
 | `issue381-gate-eb5baa8.log` | the head this pushes, `33971c8` on `eb5baa8` | the same gate file, last run before the push: **2 passed in 103.73 s**, calls 48.71 s and 31.15 s over the 20 s gate |
 | `issue381-gate-final3.log` | the head this pushes, on `e65da01` | the same gate file, the run of the push: **2 passed in 37.26 s**, both calls under the 20 s gate |
+## 2026-11-16 (#521): the two `541r4` rows of `SHA256SUMS`
+
+The evidence commit of this issue's previous round (`d3b92a4`, "evidence: the
+round's rule change, measured at the commits that carry it (#521)") rewrote two
+rows that were already in the file, dropping the `.tmp/qc-evidence/` prefix from
+each path, where the rule is that such a round appends its own records and leaves
+the existing ones as they were written.  A dated row is not edited, so the two are
+restored to the text they were written with; their digests are unchanged and both
+files are the ones they name:
+
+```
+013f855bd0aef1a1c0ff2d535f1cc87a1f99e8a7d1798950954fde4cdc214067  .tmp/qc-evidence/541r4-green-rebased.log
+12363c1f3d00052c6074558c928766d9a280624ada7b88a1f3ea24101acb0ea7  .tmp/qc-evidence/541r4-green-final.log
+```
+
+The round that made the edit is recorded in this file as its own rows and is not
+otherwise altered; this note is the correction, dated today.
+
