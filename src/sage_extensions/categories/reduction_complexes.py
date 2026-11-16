@@ -184,7 +184,7 @@ class MarkedReductionCell(SageObject):
         transported_marks = finite_indexed_family(
             marks.index_set(),
             lambda label: isometry(marks[label]),
-            name=lambda self=self: f"Transported marks of {self}",
+            description=lambda self=self: f"Transported marks of {self}",
         )
         return MarkedReductionCell(
             self.cell().transport(isometry),
@@ -348,7 +348,7 @@ class RationalReductionComplexExploration(SageObject):
         return finite_indexed_family(
             adjacencies,
             lambda adjacency: adjacency.transporter(),
-            name=lambda self=self: f"Adjacency transporters of {self}",
+            description=lambda self=self: f"Adjacency transporters of {self}",
         )
 
     def generation_subgroup(self, group):

@@ -144,7 +144,7 @@ class DiscriminantModules(OwnedCategoryOverBaseRing):
             return indexed_family(
                 index,
                 lambda prime: components[prime],
-                name=lambda self=self: f"Primary components of {self}",
+                description=lambda self=self: f"Primary components of {self}",
             )
 
         def primary_part(self, prime):
@@ -891,7 +891,7 @@ def _isotropic_subgroups(ambient, quadratic):
         element_at,
         index_of=index_of,
         contains=lambda subgroup: index_of(subgroup) is not None,
-        name=f"isotropic subgroups of {ambient}",
+        description=lambda: f"isotropic subgroups of {ambient}",
     )
 
 

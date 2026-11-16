@@ -2785,7 +2785,7 @@ def _subgroup_vector_orbit_representatives(subgroup, square):
             NN,
             element_at,
             index_of=index_of,
-            name=f"Square-zero orbit representatives of {subgroup}",
+            description=lambda: f"Square-zero orbit representatives of {subgroup}",
         )
 
     def split_representatives():

@@ -1005,7 +1005,7 @@ class ConvexPolytopes(OwnedParameterizedCategory):
                 "n_boundary_points": self.n_boundary_points(),
             }
             return finite_indexed_family(
-                labels, values.__getitem__, name=lambda self=self: f"Integral invariants of {self}"
+                labels, values.__getitem__, description=lambda self=self: f"Integral invariants of {self}"
             )
 
         def is_compact(self) -> bool:

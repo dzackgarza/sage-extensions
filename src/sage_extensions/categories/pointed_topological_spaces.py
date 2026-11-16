@@ -96,7 +96,7 @@ class TopologicalSpaceCoslices(CosliceCategory):
                         return integers.free_module(finite_ordered_set(()))
 
             module = GradedModules(integers)(
-                indexed_family(integers, piece, name=lambda self=self: f"Homotopy groups pi_(*+1) of {self}")
+                indexed_family(integers, piece, description=lambda self=self: f"Homotopy groups pi_(*+1) of {self}")
             )
 
             def bracket_on_components(s, x, t, y):

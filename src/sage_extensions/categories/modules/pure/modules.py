@@ -4186,7 +4186,7 @@ class ModuleSubobjects(OwnedCategoryOverBaseRing):
             return finite_indexed_family(
                 labels,
                 lambda label: self.inclusion()(self.module_generator(label)),
-                name=lambda self=self: f"Embedded framing of {self}",
+                description=lambda self=self: f"Embedded framing of {self}",
             )
 
         def is_primitive(self) -> bool:
@@ -7354,7 +7354,7 @@ class MatrixSpaces(OwnedCategoryOverBaseRing):
                 return finite_indexed_family(
                     kernel_labels,
                     localized_kernel_element,
-                    name=lambda self=self: f"Localized kernel spanning family of {self}",
+                    description=lambda self=self: f"Localized kernel spanning family of {self}",
                 )
 
             from sage_extensions.rings.real import RR
@@ -7384,7 +7384,7 @@ class MatrixSpaces(OwnedCategoryOverBaseRing):
                 return finite_indexed_family(
                     positions,
                     kernel_vector,
-                    name=lambda self=self: f"Kernel spanning family of {self}",
+                    description=lambda self=self: f"Kernel spanning family of {self}",
                 )
 
             basis = (
@@ -7405,7 +7405,7 @@ class MatrixSpaces(OwnedCategoryOverBaseRing):
                 ),
                 # The name is read only when the family is printed; printing the
                 # matrix (its endpoints' signatures) per kernel is not paid here.
-                name=lambda: f"Kernel spanning family of {self}",
+                description=lambda: f"Kernel spanning family of {self}",
             )
 
         def symmetrized_right_multiplication(self):

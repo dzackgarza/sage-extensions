@@ -359,7 +359,7 @@ class _DiscreteTwoMorConstructions:
         return indexed_family(
             arrows,
             lambda arrow: arrow,
-            name=lambda self=self: f"Arrow objects of {self}",
+            description=lambda self=self: f"Arrow objects of {self}",
         )
 
     def _require_discrete_two_morphisms(self) -> None:
@@ -380,7 +380,7 @@ class _DiscreteTwoMorConstructions:
         return indexed_family(
             self.object_set(),
             lambda arrow: self.identity_2(objects.value(arrow)),
-            name=lambda self=self: f"2-morphisms of {self}",
+            description=lambda self=self: f"2-morphisms of {self}",
         )
 
     def product(self, factors):

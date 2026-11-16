@@ -117,7 +117,7 @@ def _shell(lattice, square, coordinate_rows):
         element_at,
         index_of=index_of,
         contains=lambda element: index_of(element) is not None,
-        name=f"vectors of square {square} in {lattice}",
+        description=lambda: f"vectors of square {square} in {lattice}",
     )
 
 
@@ -937,7 +937,7 @@ def _voronoi_facets(lattice):
     return finite_indexed_family(
         finite_ordered_set(tuple(facets)),
         lambda vector: facets[vector],
-        name=lambda lattice=lattice: f"Voronoi facets of {lattice}",
+        description=lambda lattice=lattice: f"Voronoi facets of {lattice}",
     )
 
 

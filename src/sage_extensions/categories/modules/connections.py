@@ -419,7 +419,7 @@ class Connection(Element):
         self._generator_images = indexed_family(
             labels,
             image,
-            name=lambda self=self: f"Connection generator values of {self.module()}",
+            description=lambda self=self: f"Connection generator values of {self.module()}",
         )
 
     def module(self):

@@ -5506,7 +5506,7 @@ class OwnedFactorization(SageObject):
         self._factors = owned_sets.finite_indexed_family(
             indices,
             multiplicities.__getitem__,
-            name=lambda parent=parent: f"Factor multiplicities in {parent}",
+            description=lambda parent=parent: f"Factor multiplicities in {parent}",
         )
 
     def parent_ring(self):
@@ -6117,7 +6117,7 @@ class _OwnedRingElement(RingElement):
         return owned_sets.finite_indexed_family(
             indices,
             multiplicities.__getitem__,
-            name=lambda self=self: f"Roots of {self}",
+            description=lambda self=self: f"Roots of {self}",
         )
 
     def discriminant(self):

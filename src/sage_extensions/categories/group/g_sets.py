@@ -678,7 +678,7 @@ class FiniteGSets(CategoryPacketMethods, OwnedParameterizedCategory):
             return finite_indexed_family(
                 orbits,
                 lambda orbit: self.stabilizer(orbit.representative()),
-                name=lambda self=self: f"Orbit stabilizers of {self}",
+                description=lambda self=self: f"Orbit stabilizers of {self}",
             )
 
         def is_transitive_action(self) -> bool:

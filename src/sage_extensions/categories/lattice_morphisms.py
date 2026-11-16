@@ -229,7 +229,7 @@ def _degenerate_null_orbits(lattice, content):
                 NN(int(vector.content())) if vector != lattice.zero() and vector.primitive_part() == primitive_vector
                 else NN(0) if vector == lattice.zero() else None
             ),
-            name=f"Square-zero orbit representatives of {lattice}",
+            description=lambda: f"Square-zero orbit representatives of {lattice}",
         )
     if content is not None:
         selected = ring(int(content))
@@ -240,7 +240,7 @@ def _degenerate_null_orbits(lattice, content):
                 None if vector == lattice.zero() or vector.content() != selected
                 else (lambda position: None if position is None else NN(position))(classes.index_of(vector.primitive_part()))
             ),
-            name=f"Square-zero orbit representatives of content {content} of {lattice}",
+            description=lambda: f"Square-zero orbit representatives of content {content} of {lattice}",
         )
 
     def element_at(index):
@@ -266,7 +266,12 @@ def _degenerate_null_orbits(lattice, content):
         diagonal = scale - 1 + position
         return NN(diagonal * (diagonal + 1) // 2 + scale)
 
-    return OrderedEnumeratedSets()(NN, element_at, index_of=index_of, name=f"Square-zero orbit representatives of {lattice}")
+    return OrderedEnumeratedSets()(
+        NN,
+        element_at,
+        index_of=index_of,
+        description=lambda: f"Square-zero orbit representatives of {lattice}",
+    )
 
 
 def _framing_tuple(element):
@@ -3830,7 +3835,7 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
         return finite_indexed_family(
             labels,
             lambda label: lifts[label],
-            name=lambda lattice=lattice: f"lifts along O(L) -> O(A_L) of the group generators of O(A_L), L = {lattice}",
+            description=lambda lattice=lattice: f"lifts along O(L) -> O(A_L) of the group generators of O(A_L), L = {lattice}",
         )
 
     def discriminant_factorization(self, isometry):
@@ -4714,7 +4719,7 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
         return FiniteOrderedSets().from_indexed(
             positions,
             lambda position: generators[int(position)],
-            name=f"Orthogonal-group generators of {lattice}",
+            description=lambda: f"Orthogonal-group generators of {lattice}",
         )
 
     def structure_description(self):
@@ -5179,7 +5184,7 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
                     NN,
                     element_at,
                     index_of=index_of,
-                    name=f"Square-zero orbit representatives of {lattice}",
+                    description=lambda: f"Square-zero orbit representatives of {lattice}",
                 )
             representatives = []
             for content in abs(square).divisors():

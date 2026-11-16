@@ -401,7 +401,7 @@ def _overlattice_inclusions(form):
         element_at,
         index_of=index_of,
         contains=lambda inclusion: index_of(inclusion) is not None,
-        name=f"overlattice inclusions of {form.source_lattice()}",
+        description=lambda: f"overlattice inclusions of {form.source_lattice()}",
     )
 
 
@@ -6516,7 +6516,9 @@ class Lattices(OwnedCategoryOverBaseRing):
                     )
                 ),
             )
-            return finite_family(numbers, name=f"Spinor-genus class numbers of {self}")
+            return finite_family(
+                numbers, description=lambda: f"Spinor-genus class numbers of {self}"
+            )
 
         def integral_hyperbolic_index(self):
             r"""Return the actual integral ``U``-summand index of this lattice.
@@ -10322,7 +10324,7 @@ class Lattices(OwnedCategoryOverBaseRing):
                 indexed_family(
                     Sets.Δ[count - 1],
                     lambda _position: self,
-                    name=lambda self=self: f"Orthogonal power summands of {self}",
+                    description=lambda self=self: f"Orthogonal power summands of {self}",
                 )
             )
 
@@ -11116,7 +11118,7 @@ class OrthogonalSumLattices(OwnedCategoryOverBaseRing):
                             )
                         )
                     ),
-                    name=lambda source=source: f"Blocks of an element of {source}",
+                    description=lambda source=source: f"Blocks of an element of {source}",
                 )
                 block_sum = self.from_coproduct_cocone(legs)
                 return self.O()(lambda label: block_sum(self.module_generator(label)))

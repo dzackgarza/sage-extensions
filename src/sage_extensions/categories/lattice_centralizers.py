@@ -478,7 +478,7 @@ class CyclotomicDecomposition(SageObject):
         self._summands = finite_indexed_family(
             self._divisors,
             lambda divisor: isometry.cyclotomic_summand(int(divisor)),
-            name=lambda isometry=isometry: f"Cyclotomic summands of {isometry}",
+            description=lambda isometry=isometry: f"Cyclotomic summands of {isometry}",
         )
         nonzero = tuple(divisor for divisor in self._divisors if int(self._summands[divisor].module_rank()) != 0)
         if not nonzero:
@@ -566,7 +566,7 @@ class CyclotomicDecomposition(SageObject):
         return finite_indexed_family(
             self.nonzero_divisors(),
             lambda divisor: _restrict_isometry(self.isometry(), self.summand(divisor)),
-            name=lambda self=self: f"Cyclotomic restrictions of {self.isometry()}",
+            description=lambda self=self: f"Cyclotomic restrictions of {self.isometry()}",
         )
 
     @cached_method
@@ -576,7 +576,7 @@ class CyclotomicDecomposition(SageObject):
         return finite_indexed_family(
             self.nonzero_divisors(),
             lambda divisor: self.summand(divisor).O().centralizer(restrictions[divisor]),
-            name=lambda self=self: f"Cyclotomic component centralizers of {self.isometry()}",
+            description=lambda self=self: f"Cyclotomic component centralizers of {self.isometry()}",
         )
 
     def centralizer_group(self):
@@ -621,7 +621,7 @@ class CyclotomicDecomposition(SageObject):
         return finite_indexed_family(
             self.nonzero_divisors(),
             restrict,
-            name=lambda self=self: f"Cyclotomic restrictions of an element of {self.centralizer_group()}",
+            description=lambda self=self: f"Cyclotomic restrictions of an element of {self.centralizer_group()}",
         )
 
     def _component_tuple(self, component_isometries):

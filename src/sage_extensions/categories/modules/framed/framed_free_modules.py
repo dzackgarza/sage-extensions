@@ -1129,7 +1129,7 @@ class FramedFreeModules(OwnedCategoryOverBaseRing):
                 generators = finite_indexed_family(
                     coordinate_generators.index_set(),
                     lambda index: transport(coordinate_generators[index]),
-                    name=lambda self=self: f"Kernel spanning family in {self}",
+                    description=lambda self=self: f"Kernel spanning family in {self}",
                 )
                 return self.subobject_on(generators)
 
@@ -1200,7 +1200,7 @@ class FramedFreeModules(OwnedCategoryOverBaseRing):
                 return finite_indexed_family(
                     labels,
                     coordinate_functional,
-                    name=lambda dual=dual: f"Dual basis of {dual}",
+                    description=lambda dual=dual: f"Dual basis of {dual}",
                 )
 
 

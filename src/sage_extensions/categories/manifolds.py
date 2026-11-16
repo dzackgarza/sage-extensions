@@ -637,7 +637,7 @@ class TopologicalManifolds(OwnedCategory):
                     if self._preamble_chart_provider is not None
                     else self._preamble_charts[label]
                 ),
-                name=lambda self=self: f"Atlas charts of {self}",
+                description=lambda self=self: f"Atlas charts of {self}",
             )
 
         def open_submanifold(self, open_inclusion):
@@ -740,7 +740,7 @@ class TopologicalManifolds(OwnedCategory):
             return finite_indexed_family(
                 index_set,
                 lambda pair: self._preamble_transitions[pair],
-                name=lambda self=self: f"Atlas transitions of {self}",
+                description=lambda self=self: f"Atlas transitions of {self}",
             )
 
         def _repr_(self):
