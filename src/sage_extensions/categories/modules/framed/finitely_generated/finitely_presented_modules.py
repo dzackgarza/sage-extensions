@@ -2003,25 +2003,18 @@ class _GeneralPresentedElement(ModuleElement):
 class _GeneralPresentedModule:
     r"""A presented module over a ring with no Smith engine.
 
-    ``free_module`` is the cover and ``relation_submodule`` the relation
-    module inside it: Sage objects over the engine ring when the base ring
-    has a Sage engine, else the owned free cover and ``None``.  Both are
-    private; the category states the mathematics.
-
-    A construction that holds one of them stores it now; one that does not
-    leaves the attribute to the class, which builds it from the selected
-    presentation on the first request that needs it, and keeps it.  Constructing
-    such a module therefore computes nothing (``AGENTS.md``, "Construction is
-    instant").  The three are separate requests because realizing the
-    presentation itself constructs a framing morphism, whose Mor category asks
-    this module for its zero element; the cover answers that without the
-    relation matrix.
+    The cover, the relation submodule inside it and the Smith engine are private
+    requests of this realization: Sage objects over the engine ring when the base
+    ring has a Sage engine, else the owned free cover and ``None``.  Each is built
+    from the selected presentation on the first request that needs it, and kept,
+    so constructing such a module computes nothing (``AGENTS.md``, "Construction
+    is instant").  They are separate requests because realizing the presentation
+    itself constructs a framing morphism, whose Mor category asks this module for
+    its zero element; the cover answers that without the relation matrix.
     """
 
     def __init__(
         self,
-        free_module=None,
-        relation_submodule=None,
         *,
         base_ring,
         module_generating_set,
@@ -2032,10 +2025,6 @@ class _GeneralPresentedModule:
     ) -> None:
         self._presented_framing_source = presentation.codomain() if framing_source is None else framing_source
         self._presented_module_generating_set = module_generating_set
-        if free_module is not None:
-            self._free_module = free_module
-        if relation_submodule is not None:
-            self._relation_submodule = relation_submodule
         self._lifted_relation_free_module = None
         self._lifted_relation_submodule = None
         super().__init__(
@@ -2070,11 +2059,7 @@ class _GeneralPresentedModule:
 
     @lazy_attribute
     def _free_module(self):
-        r"""The engine cover of the presentation, built on the first request.
-
-        A construction that supplied the cover stored it under this name, so the
-        class attribute answers only when nothing was supplied.
-        """
+        r"""The engine cover of the presentation, built on the first request."""
         return _engine_cover_of_presentation(self)
 
     @lazy_attribute
@@ -2449,21 +2434,14 @@ class _PresentedModule(_GeneralPresentedModule):
 
     def __init__(
         self,
-        engine=None,
         *,
-        free_module=None,
-        relation_submodule=None,
         base_ring,
         module_generating_set,
         presentation=None,
         cokernel_morphism=None,
         **rest,
     ) -> None:
-        if engine is not None:
-            self._pid_engine = engine
         super().__init__(
-            free_module,
-            relation_submodule,
             base_ring=base_ring,
             module_generating_set=module_generating_set,
             presentation=presentation,
@@ -2473,12 +2451,7 @@ class _PresentedModule(_GeneralPresentedModule):
 
     @lazy_attribute
     def _pid_engine(self):
-        r"""Sage's FGP module over the engine ring, built on the first request.
-
-        A construction that supplied the workspace stored it under this name;
-        otherwise the model is built here, from the presentation's relation
-        matrix.
-        """
+        r"""Sage's FGP module over the engine ring, built from the presentation."""
         return _smith_engine_of_presentation(self)
 
     def _smith_engine(self):
@@ -2599,13 +2572,10 @@ def _smith_engine_of_presentation(module):
 
 def _new_presented_module(
     *,
-    free_module=None,
-    relation_submodule=None,
     base_ring,
     module_generating_set,
     presentation=None,
     presentation_factory=None,
-    engine=None,
     framing_source=None,
     cokernel_morphism=None,
     subobject_ambient=None,
@@ -2621,16 +2591,12 @@ def _new_presented_module(
     if base_ring in OwnedFields():
         categories.append(VectorSpaces(base_ring))
     data = {
-        "free_module": free_module,
-        "relation_submodule": relation_submodule,
         "base_ring": base_ring,
         "module_generating_set": module_generating_set,
         "presentation": presentation,
         "presentation_factory": presentation_factory,
         "cokernel_morphism": cokernel_morphism,
     }
-    if engine is not None:
-        data["engine"] = engine
     if framing_source is not None:
         data["framing_source"] = framing_source
     if subobject_ambient is not None or subobject_inclusion_factory is not None:
