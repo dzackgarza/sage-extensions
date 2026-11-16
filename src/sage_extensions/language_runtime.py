@@ -7,6 +7,7 @@ the functions below and every backend value is crossed back before return.
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from typing import cast
 
 from sage.structure.element import parent as element_parent
@@ -131,13 +132,14 @@ _RUNTIME = {
 _IMPORTS = {
     name: f"from sage_extensions.language_runtime import {name}" for name in _RUNTIME
 }
-# The modules whose star import is the complete session.  A file that writes
-# ``from <module> import *`` binds the names that module publishes: names the
-# parse cannot see, which is why the lowering below declines to read a subscript
-# index as a name the file does not bind.  The session's own module is named here
-# rather than registered by itself, because a file can be lowered before anything
-# has imported the session, and its star import must be read the same way then.
+# The modules whose star import is the complete session, and the names such an
+# import binds.  A file that writes ``from <module> import *`` binds names the
+# parse cannot see, so the lowering below separates the two readings of
+# ``R = A[x]`` by whether ``x`` is one of them.  The module that publishes the
+# names declares them in its own body and registers that declaration here; this
+# module reads no namespace and imports no sibling to recover one.
 _SESSION_MODULES: set[str] = {"sage_extensions.all"}
+_SESSION_NAMES: frozenset[str] = frozenset()
 _RESEARCH_ASSIGNMENT = _RESEARCH_EXTENSION["assignment"]
 
 
@@ -161,31 +163,39 @@ def _has_session_star_import(node: Node, context: Context) -> bool:
     return False
 
 
+def _assignment_uses_session_name(node: Node, context: Context) -> bool:
+    r"""Whether this assignment's subscript is indexed by a name the session binds."""
+    right = node.child_by_field_name("right")
+    if right is None or right.type != "subscript":
+        return False
+    return any(
+        child.type == "identifier" and context.text(child) in _SESSION_NAMES
+        for child in right.children_by_field_name("subscript")
+    )
+
+
 def _lower_session_assignment(node: Node, context: Context) -> str | None:
-    r"""Decline the generator reading in a file that imports the session.
+    r"""Keep a subscript ordinary when its index is a name the session supplies.
 
     The upstream research dialect reads ``R = A[x]`` as a generator declaration
-    when the file binds ``x`` nowhere.  A star import contributes no identifier
-    node to that static scan, so in a file that writes
-    ``from sage_extensions.all import *`` the premise is not established: the
-    index may be a name the session supplies.  Which names those are is the
-    session's own declaration, and this module keeps no copy of it.  A copy would
-    be a second list of the session's exports to keep in step with the first, and
-    reading the session's namespace to recover the set would make the parser
-    depend on the module it is parsing, and on how far that module's import had
-    got when the parse ran.
+    when the file binds ``x`` nowhere.  A star import binds names at runtime and
+    contributes no identifier node to that static bound-name scan, so a file that
+    writes ``from sage_extensions.all import *`` cannot establish the premise by
+    itself.  The session states which names its star import binds, and this rule
+    reads that one fact.
 
-    So the lowering declines, and the assignment keeps the meaning it is written
-    with.  A name the file binds nowhere stays the ``NameError`` Sage's own
-    reading gives it.  A name the session supplies stays the object it names:
-    ``Sets.Δ[aleph0]`` is the set of cardinality ``aleph0``, where the reading
-    this replaces would have rebuilt ``aleph0`` as a generator of the set
-    construction.  Generators are declared where a file declares them --
+    An index the session supplies keeps the assignment the subscript it is
+    written as: ``Sets.Δ[aleph0]`` is the set of cardinality ``aleph0``.  Every
+    other assignment is delegated unchanged to the upstream research lowering,
+    which declares the generators of an index no statement of the file binds:
+    ``QQ[t]`` there is the polynomial ring over ``QQ`` in ``t``, and ``t`` is
+    bound to its generator.  A generator a file declares is unaffected --
     ``R.<x> = A[x]`` is a ``sage_generator_assignment``, not an assignment, so
-    this rule does not reach it.  Every other assignment is delegated unchanged
-    to the upstream research lowering.
+    this rule does not reach it.
     """
-    if _has_session_star_import(node, context):
+    if _has_session_star_import(node, context) and _assignment_uses_session_name(
+        node, context
+    ):
         return splice(node, context)
     return _RESEARCH_ASSIGNMENT(node, context)
 
@@ -210,4 +220,17 @@ def register_session_module(module: str) -> None:
     _SESSION_MODULES.add(module)
 
 
-__all__ = tuple(_RUNTIME) + ("register_session_module",)
+def register_session_names(names: Iterable[str]) -> None:
+    r"""Declare the names a star import of the session binds.
+
+    ``sage_extensions.all`` states its export list in its own body and registers
+    that statement here, so the vocabulary the lowering reads is the session's
+    declaration about itself rather than a reading of its namespace taken at
+    some moment of its import.  Until a session declares, the upstream research
+    reading stands unchanged.
+    """
+    global _SESSION_NAMES
+    _SESSION_NAMES = frozenset(names)
+
+
+__all__ = tuple(_RUNTIME) + ("register_session_module", "register_session_names")

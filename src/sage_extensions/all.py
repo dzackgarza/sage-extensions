@@ -530,3 +530,13 @@ _lazy_import(
 )
 _lazy_import("sage_extensions.coble", "Coble")
 _lazy_import("sage_extensions.sterk", "Sterk")
+
+
+# The names this module publishes are the names its own statements bind: the star
+# imports above, the assignments and the deferred re-exports here.  The
+# declaration is what ``from sage_extensions.all import *`` binds, and it is also
+# the vocabulary the dialect needs to tell a subscript of a session name from a
+# generator declaration, so the session states it once, at the end of its own
+# body, and registers that statement.
+__all__ = tuple(sorted(name for name in globals() if not name.startswith("_")))
+_language_runtime.register_session_names(__all__)
