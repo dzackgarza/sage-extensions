@@ -98,10 +98,11 @@ def test_a_chain_of_two_recorded_words_composes_in_the_order_its_steps_act() -> 
     of one chain -- the shape the incidence's registrations have when the word
     carrying an ambient flag's line is followed by the word carrying that line
     onto the flag's transported line.  Reading the chain at the far end
-    multiplies the second step by the first, in that order: the second acts
-    first, on the object the first placed.  Both words here carry one cusp onto
-    a different one, so both act, and only their product in the order they act
-    carries the chain's root onto the endpoint.
+    multiplies the second step by the first, in that order: the first step
+    acts first, on the root, and the second step acts on its image.  Both
+    words here carry one cusp onto a different one, so both act, and only
+    their product in the order they act carries the chain's root onto the
+    endpoint.
     """
     for subgroup in _kernel_rows():
         quotient = subgroup.finite_character_quotient()
