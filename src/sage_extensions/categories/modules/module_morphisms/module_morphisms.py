@@ -2547,7 +2547,9 @@ class ModuleMorphismMethods:
 
         from sage_extensions.categories.modules.pure.modules import Modules
 
-        extension = Modules(ring).scalar_extension(completion.completion_map())
+        extension = Modules(ring).scalar_extension(
+            completion._completion_map_as_ring_morphism()
+        )
         completed = extension(self)
         assert completed.domain() is source and completed.codomain() is target, (
             f"completion of {self.domain()} -> {self.codomain()}: the completed map should go {source} -> {target}, "

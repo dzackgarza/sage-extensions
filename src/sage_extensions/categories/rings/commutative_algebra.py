@@ -3039,7 +3039,7 @@ class AdicCompletions(Category):
             @cached_method
             def source_residue_map(self):
                 r"""Compose the retained completion map with the local residue map."""
-                return self.residue_map() * self.completion_map()
+                return self.residue_map() * self._completion_map_as_ring_morphism()
 
     class ParentMethods:
         def completion_source(self):
@@ -3074,6 +3074,15 @@ class AdicCompletions(Category):
             )
 
         def completion_map(self):
+            r"""Return the retained map ``A -> A^`` of the source into this completion.
+
+            At an ideal whose represented power is zero every tier is the ring,
+            so the completion is the source presented as complete and this map
+            is the isomorphism between the two presentations; it is built as
+            one, and answers ``is_surjective`` and ``is_injective`` by that
+            placement (``OWN-22``).  At every other ideal it is the ordinary
+            ring morphism into the completed ring.
+            """
             morphism = self._realized_completion_map
             if morphism is None:
                 morphism = self._adic_completion_map_factory()
@@ -3087,6 +3096,30 @@ class AdicCompletions(Category):
                     )
                 self._realized_completion_map = morphism
             return morphism
+
+        def _completion_map_as_ring_morphism(self):
+            r"""Return the completion map as an arrow of ``Mor_Ring(A, A^)``.
+
+            Protected completion-realization contract under ``OWN-05``.  The
+            map is an arrow of the ring Mor, except where the completion is the
+            source itself, and there the construction places it in the core,
+            where it is the isomorphism and not a map that a ring-morphism
+            consumer can read.  Callers that need a ring homomorphism --
+            extension of an ideal along the completion, the local residue map,
+            the induced maps of completions, and the base changes in the
+            module, scheme and family owners -- ask here rather than branching
+            on the arrow's type.
+            """
+            from sage_extensions.categories.abstract_categories.mor_categories import (
+                CategoricalIsomorphism,
+            )
+
+            arrow = self.completion_map()
+            match arrow:
+                case CategoricalIsomorphism():
+                    return arrow.forward()
+                case _:
+                    return arrow
 
         def _completion_projection_lift(self):
             r"""Return the retained finite-stage lift used to realize adic projections.
@@ -3106,7 +3139,7 @@ class AdicCompletions(Category):
             their extension stays lazy, at this existing algorithm boundary.
             """
             return IdealExtensionData(
-                self.completion_map(),
+                self._completion_map_as_ring_morphism(),
                 self.completion_ideal(),
             )
 
@@ -3314,7 +3347,9 @@ class AdicCompletions(Category):
                 and source_morphism.codomain() is target_completion.completion_source()
             ):
                 target_ideal = target_completion.completion_ideal()
-                into_target = target_completion.completion_map() * source_morphism
+                into_target = (
+                    target_completion._completion_map_as_ring_morphism() * source_morphism
+                )
             else:
                 raise ValueError(
                     f"cannot induce a map {self} -> {target_completion} from {source_morphism}: "
@@ -3385,7 +3420,7 @@ class AdicCompletions(Category):
             )
             forward = self.induced_map(local.localization_map(), local_completion)
             local_to_completion = local._induced_morphism_from_unit_images(
-                self.completion_map()
+                self._completion_map_as_ring_morphism()
             )
             inverse = local_completion.induced_map(local_to_completion, self)
             return MaximalAdicLocalizationCompletionComparison(
@@ -3792,7 +3827,6 @@ class _AdicCompletionAlgebraParent(_OwnedAlgebraParent):
         arithmetic_mode="finite_precision",
         completion_image=None,
         completion_map_kernel=None,
-        completion_map_is_onto=False,
         algebra_base=None,
         algebra_labels=None,
         formal_parameter_labels=None,
@@ -3800,12 +3834,11 @@ class _AdicCompletionAlgebraParent(_OwnedAlgebraParent):
     ) -> None:
         r"""Retain the completion's defining data on its private engine.
 
-        ``completion_map_kernel`` and ``completion_map_is_onto`` are the
-        construction's statements about its own completion map: the kernel
-        ideal of the source, and whether the map is onto.  A constructor that
+        ``completion_map_kernel`` is the construction's statement about its own
+        completion map: the kernel ideal of the source.  A constructor that
         realizes the completion on the source's own engine -- at an ideal whose
-        represented power is zero, so that every tier is the ring -- states
-        both; a finite approximation states neither.
+        represented power is zero, so that every tier is the ring -- states it;
+        a finite approximation states nothing.
         """
         selected_engine_map = engine_map
         if completion_image is None:
@@ -3830,12 +3863,34 @@ class _AdicCompletionAlgebraParent(_OwnedAlgebraParent):
                     source_expression=selected,
                 )
 
-            return _ring_morphism_with_engine(
+            forward = _ring_morphism_with_engine(
                 source,
                 self,
                 completion_map_image,
                 selected_engine_map,
-                surjectivity_premise=True if self._adic_completion_map_is_onto else None,
+            )
+            if _engine_ring(source) is not engine:
+                return forward
+            # The completion is presented on the source's own engine, so the
+            # ring's own element of the source is its element of the completion
+            # and the map is inverted by that identification: it is an
+            # isomorphism, and is built as one (``OWN-22``), not as a map that
+            # carries a boolean saying so.
+            def inverse_map_image(element):
+                return _owned_engine_element(source, _engine_element(self, element))
+
+            backward = _ring_morphism_with_engine(
+                self,
+                source,
+                inverse_map_image,
+                selected_engine_map,
+            )
+            from sage_extensions.categories.abstract_categories.arrow_categories import (
+                _isomorphism_from_known_inverse_pair,
+            )
+
+            return _isomorphism_from_known_inverse_pair(
+                forward, backward, base_category=OwnedRings()
             )
 
         self._adic_completion_source = source
@@ -3844,7 +3899,6 @@ class _AdicCompletionAlgebraParent(_OwnedAlgebraParent):
         self._adic_projection_lift = projection_lift
         self._adic_arithmetic_mode = arithmetic_mode
         self._adic_completion_map_kernel = completion_map_kernel
-        self._adic_completion_map_is_onto = bool(completion_map_is_onto)
         self._adic_completion_map_factory = completion_map_factory
         self._realized_completion_map = None
         match formal_parameter_labels:
@@ -3961,7 +4015,11 @@ class _AdicCompletionAlgebraParent(_OwnedAlgebraParent):
                     ),
                 )
             case (_, True):
-                maximal_ideal = completion_map.extension_of_ideal(defining_ideal)
+                maximal_ideal = (
+                    self._completion_map_as_ring_morphism().extension_of_ideal(
+                        defining_ideal
+                    )
+                )
                 residue = source.residue_field_at(defining_ideal)
 
                 def residue_map_factory():
@@ -3985,7 +4043,7 @@ class _AdicCompletionAlgebraParent(_OwnedAlgebraParent):
     def _selected_algebra_structure_morphism(self):
         r"""Supply the retained completion map when it is the scalar structure map."""
         if self.algebra_base_ring() is self.completion_source():
-            return self.completion_map()
+            return self._completion_map_as_ring_morphism()
         return None
 
     def completion_arithmetic_mode(self):
@@ -4151,7 +4209,9 @@ def _maximal_ideal_over_local_base(algebra, base, uniformizers):
             "the selected formal variables must retain their polynomial source expressions"
         )
         source_ideal = source.ideal(*base_maximal, *variables)
-        return algebra.completion_map().extension_of_ideal(source_ideal)
+        return algebra._completion_map_as_ring_morphism().extension_of_ideal(
+            source_ideal
+        )
     from sage_extensions.categories.rings.commutative_ideals import (
         _quotient_source_commutative_ideal,
     )
@@ -5147,15 +5207,19 @@ def _quotient_completion_comparison(source_quotient, source_ideal, *, precision=
         quotient_ideal,
         precision=precision,
     )
-    extended_defining_ideal = source_completion.completion_map().extension_of_ideal(
-        source_quotient.defining_ideal()
+    extended_defining_ideal = (
+        source_completion._completion_map_as_ring_morphism().extension_of_ideal(
+            source_quotient.defining_ideal()
+        )
     )
     quotient_after_completion = source_completion.quotient_ring(extended_defining_ideal)
     right_quotient_map = quotient_after_completion.quotient_map()
 
     def quotient_source_to_right(element):
         representative = _quotient_representative(source_quotient(element))
-        return right_quotient_map(source_completion.completion_map()(representative))
+        return right_quotient_map(
+            source_completion._completion_map_as_ring_morphism()(representative)
+        )
 
     source_to_right = source_quotient.Mor(quotient_after_completion)(
         quotient_source_to_right,
@@ -5352,7 +5416,7 @@ def _adic_completion_from_owned_data(source, defining, precision):
             precision=precision,
         )
         local_to_completion = source._induced_morphism_from_unit_images(
-            bottom_completion.completion_map()
+            bottom_completion._completion_map_as_ring_morphism()
         )
         completion_engine = _engine_ring(bottom_completion)
         bottom_projection_lift = bottom_completion._completion_projection_lift()
@@ -5462,7 +5526,8 @@ def _adic_completion_from_owned_data(source, defining, precision):
 
         # The zero ideal has every power zero, so every truncation is the ring
         # itself: the completion is the source on the source's own engine, and
-        # the completion map is an isomorphism onto it.
+        # the parent builds the completion map as the isomorphism that this
+        # presentation is.
         return _AdicCompletionAlgebraParent(
             engine,
             source,
@@ -5472,7 +5537,6 @@ def _adic_completion_from_owned_data(source, defining, precision):
             arithmetic_mode="exact_backend",
             completion_image=lambda element: _engine_element(source, source(element)),
             completion_map_kernel=zero_ideal,
-            completion_map_is_onto=True,
             **degenerate_formal_data,
         )
     if len(generators) == 1 and engine is SageZZ:
@@ -5677,7 +5741,9 @@ class FormalPowerSeriesRings(OwnedCategoryOverBaseRing):
             position = int(labels.ranking_map()(normalized))
             source = self.completion_source()
             source_label = source.algebra_generating_set()[position]
-            return self.completion_map()(source.algebra_generator(source_label))
+            return self._completion_map_as_ring_morphism()(
+                source.algebra_generator(source_label)
+            )
 
         def power_series_variable(self):
             labels = self.formal_parameter_set()

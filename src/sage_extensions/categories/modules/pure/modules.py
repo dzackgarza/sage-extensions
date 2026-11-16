@@ -4728,7 +4728,7 @@ class ModulesWithChosenFinitePresentation(OwnedCategoryOverBaseRing):
                     f"{completion.completion_source()}, not of the base ring {ring}"
                 )
             adjunction = Modules(ring).base_change_adjunction(
-                completion.completion_map()
+                completion._completion_map_as_ring_morphism()
             )
             return adjunction.left_adjoint()(self)
 
@@ -4746,7 +4746,7 @@ class ModulesWithChosenFinitePresentation(OwnedCategoryOverBaseRing):
                 )
             return (
                 Modules(ring)
-                .base_change_adjunction(completion.completion_map())
+                .base_change_adjunction(completion._completion_map_as_ring_morphism())
                 .unit(self)
             )
 
