@@ -56,6 +56,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from sage_extensions import timing as sage_timing
+from sage_extensions.testing.category_graph import read as read_category_graph
 
 SOURCE_TREE = Path(__file__).resolve().parents[2]
 PROBE_ROOT = SOURCE_TREE / ".tmp" / "plugin-probes"
@@ -188,6 +189,18 @@ def _outcomes(records: list[dict]) -> dict[str, str]:
     return {nodeid: "failed" if nodeid in failed else "passed" for nodeid in sorted(reported)}
 
 
+def declared_category_graph():
+    r"""The category graph this checkout declares, read out of its source.
+
+    ``just category-graph`` prints the same graph.  The reader parses the source
+    with ``ast`` and imports nothing of the preamble, so a test of it asks about
+    the declarations the tree writes rather than about the classes Sage joined
+    from them; the checkout it reads is this file's own, whether the run works
+    in a worktree or in the repository.
+    """
+    return read_category_graph(SOURCE_TREE)
+
+
 def pytest_configure(config) -> None:
     r"""Bind the abbreviation for this session, as the lint documents.
 
@@ -197,6 +210,7 @@ def pytest_configure(config) -> None:
     name is removed when the session ends, so the binding lasts exactly as long
     as the tests that name it.
     """
+    builtins.declared_category_graph = declared_category_graph
     builtins.probe_run = probe_run
     builtins.stage_records_of = stage_records_of
     builtins.kept_test_run = kept_test_run
@@ -208,6 +222,7 @@ def pytest_configure(config) -> None:
 
 def pytest_unconfigure(config) -> None:
     r"""Remove the session's abbreviation, leaving ``builtins`` as it was found."""
+    del builtins.declared_category_graph
     del builtins.probe_run
     del builtins.stage_records_of
     del builtins.kept_test_run
