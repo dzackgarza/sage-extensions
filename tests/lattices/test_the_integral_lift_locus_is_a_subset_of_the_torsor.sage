@@ -122,6 +122,24 @@ def test_a_zero_dimensional_parameter_space_has_the_one_integral_lift() -> None:
     assert locus.cardinality() == cardinal(1)
 
 
+def test_the_point_the_locus_admits_is_an_integral_lift() -> None:
+    r"""The locus' own point restricts to an isometry of the lattice.
+
+    The nonempty locus admits the lift the residue locus built for its first
+    passing representative, so the point it answers is a lift of the lattice's
+    isometries and not merely a point of ``T``.  Asking it for its integral
+    restriction is an independent check of the fact the construction read off
+    the residue locus: the base point of this torsor has no integral
+    restriction, and the admitted lift does.
+    """
+    lattice, marked, reduction, torsor = _non_integral_base_point_control()
+    locus = torsor.integral_lift_locus()
+
+    assert lattice.div(marked) == 2
+    assert torsor.base_point().integral_restriction(lattice, lattice) is None
+    assert locus.an_element().integral_restriction(lattice, lattice) in lattice.Isom(lattice)
+
+
 def test_the_locus_is_membership_in_the_residue_class() -> None:
     r"""A lift is in ``T_Z`` exactly when its parameter's class lies in the residue locus.
 
@@ -138,8 +156,8 @@ def test_the_locus_is_membership_in_the_residue_class() -> None:
     assert locus.is_parent_of(torsor.base_point()) is False
     for residue in classes:
         assert locus.is_parent_of(_lift_at_class(torsor, residue)) is True
-    # The lift the torsor answers with when asked for an integral point is a member, and
-    # admitting it into the locus is asking the same question once more.
+    # The lift the torsor answers with when asked for an integral point is the one the
+    # locus admits, so membership answers without asking the predicate again.
     answered = torsor.integral_base_point()
     assert locus.is_parent_of(answered) is True
     assert locus(answered) == answered

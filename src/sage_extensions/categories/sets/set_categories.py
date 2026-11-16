@@ -4307,7 +4307,12 @@ class _ConditionSetEngine:
         predicate admission, an additive-submonoid constructor's admitted
         zero or generators, and a protected subset inclusion applied to an
         admitted source point. The norm-fibre choice computation also supplies the
-        actual solution returned by its equation solver. This records
+        actual solution returned by its equation solver. A construction that
+        decides the predicate on the same data it builds the point from also
+        retains that point here: the integral lift locus admits the lift whose
+        parameter class the residue locus decided when it built it.
+
+        This records
         that point, not a decision of
         the defining predicate and not a rule for admitting arbitrary data.
         The record is read by ``__contains__``: an admitted point is a member
