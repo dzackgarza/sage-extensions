@@ -1915,18 +1915,17 @@ class LatticeIsometryMethods:
 
     @cached_method
     def __hash__(self) -> int:
-        r"""Hash the selected endpoints and the coordinate tensor's mathematical hash.
+        r"""Hash the selected endpoints and the coordinate tensor's engine matrix.
 
-        ``Tensor.__hash__`` is the maintained mathematical key of a finite
-        tensor ((valence, index ranks, coordinate components), each scalar
-        hashed by its own engine digest - measured 2.7 us against the 58.3 us
-        repr construction the previous ``tensor._cache_key()`` path payed at
-        every orbit step; `.scratch/measure_hash_paths.py`).  Sage's
-        ``cached_method`` keying on ``repr`` is the failure mode this must not
-        relapse into: every lattice isometry between fixed endpoints has the
-        same repr, so a hash error would return the first cached value for
-        every argument.  ``_cache_key`` stays available for Sage's own cache
-        protocol; it is not used for hashing here.
+        The key is the pair of endpoint identities together with the engine
+        matrix of the type-(1,1) coordinate tensor in the selected framings --
+        the value :meth:`__eq__` compares, so a hash and an equality test read
+        one engine value rather than evaluating every generator image.  That
+        value is not what ``repr`` states: every lattice isometry between one
+        pair of endpoints renders the same, so a ``cached_method`` keyed on
+        ``repr`` would answer every argument with the first cached value.
+        ``Tensor._cache_key()`` stays available for Sage's own cache protocol;
+        hashing does not read it.
         """
         return hash(
             (

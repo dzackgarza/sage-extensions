@@ -326,12 +326,13 @@ def _form_square_commutes(
         and module_morphism.linearity_decision() is True
         and value_morphism.linearity_decision() is True
     )
-    # The tensor branch is available exactly when both value objects read their
-    # elements as scalars of one ring: the two Gram tensors are then numerical
-    # over that ring and the square is one comparison of them.  Reading the
-    # extension itself as the ring asked the value object to be that ring, which
-    # a restriction of scalars is not, so a formed submodule over restricted
-    # scalars fell through to one :meth:`b` evaluation per pair of generators.
+    # The tensor branch is available when both value objects read their elements
+    # as scalars of one ring: the two Gram tensors are then numerical over that
+    # ring and the square is one comparison of them.  Each reading is the value
+    # object's own stated construction -- a ring's regular module, or a
+    # restriction of scalars from one, whose elements are the extension's
+    # scalars.  A value object with neither reading supplies no numerical Gram
+    # tensor, and the generator equations below decide the square.
     source_scalars = _scalar_value_identification(source_form.codomain())
     target_scalars = _scalar_value_identification(target_form.codomain())
     algebra_values = (

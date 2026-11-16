@@ -78,13 +78,12 @@ def test_a_finite_coset_space_still_reads_its_representatives_and_actions() -> N
 
 
 def test_rendering_a_coset_never_computes_a_representative() -> None:
-    r"""``repr`` of a coset point is cheap and infallible, so it cannot mask an error.
+    r"""``repr`` of a coset point names the position and the subgroup, and nothing else.
 
-    A coset's representative needs ``PreImagesRepresentative`` on the transversal.
-    When reporting an exception whose message names a coset, that computation ran
-    inside ``repr`` and replaced the real error — which is how a ``KeyError``
-    about an intersection subgroup was reported as an ``OverflowError``.  The
-    rendered form therefore names the position and the subgroup only, and a
+    A coset's representative needs ``PreImagesRepresentative`` on the
+    transversal, a real computation that can raise; running it inside ``repr``
+    would replace whatever error is being reported with its own.  The rendered
+    form therefore names the position and the subgroup only, and a
     representative that raises must not affect it.
     """
     group = Groups.S(3)
