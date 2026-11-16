@@ -2337,22 +2337,24 @@ end
         Retaining both data lets every consumer use the split's own witness and
         certificate instead of repeating an integral isometry or parabolic
         completeness computation.
+
+        The record is keyed by the plane's span, not by the plane object: a
+        split's consumers hold equal-but-distinct copies of a plane, and a
+        kernel row registers 189720 of them, so the span key is what makes the
+        lookup one dictionary hit instead of a scan of every plane recorded so
+        far.
         """
-        self.__dict__.setdefault("_isotropic_lift_registry", {})[plane] = (
-            lift,
-            tuple(parabolic_generators),
-        )
+        from sage_extensions.categories.isotropic_orbits import _span_key
+
+        self.__dict__.setdefault("_isotropic_lift_registry", {})[
+            _span_key(plane)
+        ] = (lift, tuple(parabolic_generators))
 
     def _registered_isotropic_split(self, plane):
         r"""The registered ``(lift, source parabolic generators)`` for ``plane``."""
-        from sage_extensions.categories.isotropic_orbits import _same_subobject
+        from sage_extensions.categories.isotropic_orbits import _span_key
 
-        for registered, record in self.__dict__.get(
-            "_isotropic_lift_registry", {}
-        ).items():
-            if _same_subobject(registered, plane):
-                return record
-        return None
+        return self.__dict__.get("_isotropic_lift_registry", {}).get(_span_key(plane))
 
     def isotropic_lift_of(self, plane):
         r"""The registered lift of a plane, matched by span equality.
@@ -2360,8 +2362,9 @@ end
         Two registered planes lie in one subgroup orbit exactly when the
         composite of one lift with the inverse of the other lies in the
         subgroup -- a question the finite character image decides.  The
-        matching is by span equality, so an equal-but-distinct object finds
-        its lift too.
+        matching is by span, so an equal-but-distinct object finds its lift too,
+        and the lookup is one keyed dictionary hit rather than a scan of the
+        registry.
         """
         record = self._registered_isotropic_split(plane)
         return None if record is None else record[0]

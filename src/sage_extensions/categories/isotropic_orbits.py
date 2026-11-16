@@ -1177,6 +1177,36 @@ def _same_subobject(left, right) -> bool:
     )
 
 
+def _span_key(subobject):
+    r"""The span of a subobject as a canonical key in its ambient lattice's basis.
+
+    Two subobjects of one ambient lattice span the same sublattice exactly when
+    the rows of their generators have the same integer row Hermite form there,
+    so that form is an exact key of the span: :func:`_same_subobject` decides
+    the same relation by two factorization questions, which is a search where a
+    keyed lookup answers.  The ambient lattice is part of the key, because two
+    lattices' spans are never one span.
+    """
+    inclusion = subobject.inclusion()
+    domain = inclusion.domain()
+    lattice = inclusion.codomain()
+    labels = tuple(lattice.module_generating_set())
+    coordinates = [
+        [
+            int(inclusion(domain.module_generator(label)).to_vector()(other))
+            for other in labels
+        ]
+        for label in domain.module_generating_set()
+    ]
+    return (
+        id(lattice),
+        tuple(
+            tuple(int(entry) for entry in row)
+            for row in matrix(SageZZ, coordinates).hermite_form()
+        ),
+    )
+
+
 def _zero_isotropic_shape(lattice, rank):
     r"""The rank-``rank`` zero-form lattice used as an isotropic marking shape."""
     from sage_extensions.categories.lattices import Lattices
