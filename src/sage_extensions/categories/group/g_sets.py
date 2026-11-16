@@ -794,8 +794,15 @@ class FiniteGSets(CategoryPacketMethods, OwnedParameterizedCategory):
                 for generator in augmentation.domain().group_generators()
             )
 
+        @cached_method(key=lambda self, point: self.ranking_map()(point))
         def orbit_schreier_morphism(self, point):
-            r"""Schreier's lemma on the orbit of ``point``: ``E -> G`` with image ``G_point``."""
+            r"""Schreier's lemma on the orbit of ``point``: ``E -> G`` with image ``G_point``.
+
+            The family is derived data of this ``G``-set at this point, so it is
+            computed on the first request and the later ones are answered from
+            the cache: the sections it realizes and the composites it forms are
+            not paid for twice.
+            """
             orbit, words, augmentation = self._orbit_of(point)
             ranking = orbit.ranking_map()
             word_section = Sets().Mor(orbit, augmentation.domain())(
@@ -821,6 +828,7 @@ class FiniteGSets(CategoryPacketMethods, OwnedParameterizedCategory):
             )
             return orbit, section
 
+        @cached_method(key=lambda self, point: self.ranking_map()(point))
         def orbit_schreier_factors(self, point):
             r"""Return the letters and transversals whose composites are the Schreier family.
 
@@ -833,6 +841,10 @@ class FiniteGSets(CategoryPacketMethods, OwnedParameterizedCategory):
             family uses: ``letters[j]`` is the ``j``-th letter and
             ``transversals[i]`` is ``t_p`` for the ``i``-th orbit point, the
             augmentation of that point's section word.
+
+            The pairs are derived data of this ``G``-set at this point, so they
+            are computed on the first request and later requests are answered
+            from the cache: realizing the transversals is not paid for twice.
 
             The composite law is the caller's to check: for the ``i``-th orbit
             point ``p`` and the ``j``-th letter ``s``, the family element is
@@ -1038,6 +1050,7 @@ class LeftCosetGSets(OwnedParameterizedCategory):
             self._coset_augmentation = coset_augmentation
             super().__init__(**rest)
 
+        @cached_method(key=lambda self, drop_trivial=False: bool(drop_trivial))
         def schreier_generating_morphism(self, *, drop_trivial=False):
             r"""Schreier's lemma: ``E ->> H`` from the section of ``G -> G/H``.
 
@@ -1048,6 +1061,12 @@ class LeftCosetGSets(OwnedParameterizedCategory):
             ``drop_trivial`` omits the generators whose image is the identity
             (``_orbit_schreier_morphism``), so the family presents the same
             subgroup without its trivial members.
+
+            The morphism is derived data of this coset space, so it is computed
+            on the first request for it and a later request for the same family
+            -- the whole one or the trimmed one, the default written out or not
+            -- is answered from the cache: the point-letter family is not built
+            a second time.
             """
             assert self._coset_word_section is not None, (
                 f"Schreier generators of {self.subgroup()} are read from a pointed coset space "
