@@ -76,7 +76,7 @@ class GroupAlgebras(OwnedCategoryOverBaseRing):
 
         @cached_method
         def _finite_group_algebra_center(self):
-            r"""The centre \(Z(R[G])\), the algebra on the span of the conjugacy-class sums.
+            r"""The pair of the centre \(Z(R[G])\) and its inclusion in \(R[G]\).
 
             An element \(\sum a_g g\) is central exactly when \(a\) is a class
             function, so the class sums \(\sum_{h\in C} h\) over the conjugacy
@@ -90,6 +90,9 @@ class GroupAlgebras(OwnedCategoryOverBaseRing):
             combination of the module's generators with coefficient one on the
             class (`Modules.linear_combination`), which is the operation the
             module owns for a finite family of generators.
+
+            The centre and its inclusion come from ``_center_algebra``, which
+            owns the product and the unit the inclusion is made by.
             """
             group = self.group()
             assert group in FiniteGroups(), (

@@ -63,3 +63,20 @@ def test_each_basis_element_of_the_centre_is_central() -> None:
         for class_sum in class_sums
         for group_element in group
     )
+
+
+def test_the_centre_inclusion_is_a_map_of_unital_algebras() -> None:
+    r"""\(Z(QQ[S_3])\hookrightarrow QQ[S_3]\) preserves the product and the unit.
+
+    The centre's product is the ambient product read back along the inclusion
+    and its unit is that inclusion's lift of \(1\), so the inclusion is an
+    algebra map by construction: it sends \(1\) to \(1\), and the product of
+    two basis elements to the product of their images (Isaacs, *Character
+    Theory of Finite Groups*, Theorem 2.4).
+    """
+    group, algebra, center = _symmetric_three()
+    inclusion = algebra.center_inclusion()
+    first, second = tuple(center.module_generators())[:2]
+
+    assert inclusion(center.one()) == algebra.one()
+    assert inclusion(first * second) == inclusion(first) * inclusion(second)

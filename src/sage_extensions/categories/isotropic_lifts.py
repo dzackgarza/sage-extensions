@@ -356,7 +356,19 @@ class IsotropicReductionLiftTorsors(OwnedCategoryOverBaseRing):
             multiplication = Modules(ring).Mor(parameter_lattice, parameter_lattice)(
                 lambda label: parameter_lattice.scalar_multiple(period, parameter_lattice.module_generator(label))
             )
-            return multiplication.cokernel_projection()
+            # The period is a positive integer, so every class of `P/mP` is killed by it:
+            # the quotient is a torsion module, and that is this construction's claim to
+            # make (`CAT-04`: the construction that states a placement makes it, and no
+            # rank is read to justify it).  The claim is also what places the quotient
+            # where its elements are enumerated, so a caller can walk `P/mP`.
+            quotient = Modules(ring).FinitelyPresented().Torsion()(multiplication)
+            # The quotient map sends each generator of `P` to the generator of the same
+            # name, which is the map `cokernel_projection` states; it is built here
+            # because the quotient above is constructed on this construction's own
+            # placement and retains no cokernel morphism of its own.
+            return Modules(ring).Mor(parameter_lattice, quotient)(
+                lambda label: quotient.module_generator(label)
+            )
 
         @cached_method
         def integral_parameter_period(self):

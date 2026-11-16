@@ -2682,3 +2682,15 @@ tree therefore names the commit before it.
 | `535-r3-heavy-stable-line.log` | the gate's fix commit | the two stable-line-orbit row files, `U(2) + <-6>` and `T_Co`: **2 passed in 1073.83 s (0:17:53)**. |
 | `535-r3-lint.log` | the gate's fix commit | the test lint on the five touched test files: **5 files, 0 findings**. |
 | `535-r3-docs.log` | the docs commit | the four files the round's docstrings name, after the docstring pass: **14 passed in 51.27 s**. |
+
+The same runs on the commit this round pushed (`main` at `39c2bed`), after the last
+rebase onto `8c4f5ba`:
+
+| log | result |
+| --- | --- |
+| `535-r3-main-consumers.log` | the ten consuming files: **42 passed, 2 failed in 71.95 s** |
+| `535-r3-main-owner-contracts.log` | `tests/lattices/test_lattice_database_owner_contracts.sage`: **11 passed, 1 failed in 119.95 s** |
+| `535-r3-main-lint.log` | the five touched test files: **5 files, 0 findings** |
+| `535-r3-main-heavy.log` | the two stable-line-orbit row files, `U(2) + <-6>` and `T_Co`: **2 passed in 1156.96 s (0:19:16)** |
+| `535-r3-main-base.log` | the three ids above on `8c4f5ba` without this branch's commits: **3 failed, 1 passed in 16.00 s**, the same ids |
+| `535-r3-main-docs.log` | `test_integral_hyperbolic_index_is_owned_by_the_lattice` after the docstring pass: **1 failed in 14.84 s**, the same pre-existing id |

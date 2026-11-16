@@ -320,6 +320,26 @@ class MultiplicativeAlgebraMor(CategoricalMor):
             )
         return self.element_class(self, datum)
 
+    def _from_constructed_element_map(self, evaluator, *, linearity_premises=()):
+        r"""Construct an algebra map from its defining callable.
+
+        The root algebra Mor's datum is the ``R``-linear map, and its one law --
+        multiplicativity -- is thereafter the equation between the two maps out
+        of the tensor square, asked of the module Mor and carried as the arrow's
+        stated hypothesis when that equation is not decided (``CON-16``,
+        ``CON-17``).  A construction supplies the callable and the linear maps
+        whose linearity it follows from, so the element is constructed here and
+        not as a whole module arrow rebuilt at a foreign site.
+        """
+        linearity_premises = tuple(linearity_premises)
+        linear = (
+            self.domain()
+            .module_category()
+            .Mor(self.domain(), self.codomain())
+            ._from_constructed_element_map(evaluator, premises=linearity_premises)
+        )
+        return self.element_class(self, linear)
+
     @object_level
     @cached_method
     def identity(self):
@@ -2225,7 +2245,11 @@ class Algebras(OwnedCategoryOverBaseRing):
             selected finite module centre; the richer computation above has
             precedence when that module datum is present.
 
-            This supplies Magmas' ``_center_construction`` contract. The
+            This supplies Magmas' ``_center_construction`` contract, whose pair
+            is the centre and its exact inclusion.  Each route returns its own
+            pair: the two module computations delegate to ``_center_algebra``,
+            which owns the centre's product, its unit and the inclusion that
+            makes both of them, so no route rebuilds that arrow here.  The
             bracket-zero centre of a Lie algebra is a different construction,
             available through ``lie_center``.
             """
@@ -2239,7 +2263,7 @@ class Algebras(OwnedCategoryOverBaseRing):
                 case _ if (
                     self in GroupAlgebras(ring) and self.group() in FiniteGroups()
                 ):
-                    center = self._finite_group_algebra_center()
+                    return self._finite_group_algebra_center()
                 case _ if (
                     self.has_selected_module_resolution()
                     and self.module_generating_set().cardinality().is_finite()
@@ -2301,7 +2325,7 @@ class Algebras(OwnedCategoryOverBaseRing):
                             itertools.product(labels, repeat=2),
                             submodule,
                         )
-                    center = _center_algebra(self, submodule)
+                    return _center_algebra(self, submodule)
                 case _ if (
                     self in Algebras(ring).Associative().Unital()
                     and self.is_framed_algebra()
@@ -2324,34 +2348,6 @@ class Algebras(OwnedCategoryOverBaseRing):
                         "an associative unital algebra can also use a finite chosen algebra "
                         "generating family for its predicate ring centre"
                     )
-            submodule = center.unformed_module()
-            inclusion = submodule.inclusion()
-            linear_inclusion = (
-                center.module_category()
-                .Mor(center, self)
-                ._from_constructed_element_map(
-                    lambda element: inclusion(submodule(element)),
-                    premises=(inclusion,),
-                )
-            )
-            # `_center_algebra` defines the centre's multiplication as the
-            # ambient product read back along `inclusion`, and its unit as
-            # `inclusion.lift(1)`, so that module inclusion is multiplicative
-            # and unit preserving by construction.  Those are the premises the
-            # arrow carries; a whole module arrow is not itself an arrow of an
-            # algebra Mor (CON-17), so the map enters at the algebra arrow type.
-            unital = Algebras(ring).Associative().Unital()
-            match (center in unital, self in unital):
-                case (True, True):
-                    arrows = unital.Mor(center, self)
-                    return center, arrows.element_class(
-                        arrows,
-                        linear_inclusion,
-                        _construction_premises=((inclusion,), (True, True)),
-                    )
-                case _:
-                    arrows = Algebras(ring).Mor(center, self)
-                    return center, arrows.element_class(arrows, linear_inclusion)
 
         def _quotient_by_algebra_elements(self, elements):
             r"""Return the quotient by the generated algebra ideal and its map.
@@ -3428,16 +3424,33 @@ def _algebra_on_module(
 
 
 def _center_algebra(algebra, submodule):
-    r"""Build the induced algebra on a submodule known to be the magma centre.
+    r"""Build the induced algebra on a submodule known to be the magma centre, with its inclusion.
 
     The commutant intersected with the nucleus is a commutative associative
     subalgebra, even when the ambient algebra is not associative, and it
     contains any two-sided unit. Its multiplication is the ambient product
     read back along the injective inclusion, so ``lift`` recovers each
     product. Associativity here follows from the centre's nucleus equations.
+
+    This function owns both halves of Magmas' ``_center_construction``
+    contract: the centre and its inclusion, an arrow of the unital algebra Mor
+    when the ambient algebra is associative and unital and of the root algebra
+    Mor otherwise.  The module inclusion is an algebra map *by construction* --
+    the product above is the ambient product read back along it and the unit is
+    its lift of ``1`` -- so its two laws are the definition of that
+    construction, retained as the arrow's premises (``OWN-22``) rather than
+    re-derived: deciding them on the centre's module generators costs one
+    coordinate solve per pair (25 class-sum pairs of ``QQ[S_4]``: 24.6 s,
+    against 0.216 s for the centre itself).  The unit law costs one comparison
+    and is stated as the element equality it is.
     """
     ring = algebra.algebra_base_ring()
     inclusion = submodule.inclusion()
+
+    def included(element):
+        r"""The element in the ambient algebra, along the submodule inclusion."""
+        return inclusion(submodule(element))
+
     multiplication = BilinearMap(
         submodule,
         submodule,
@@ -3452,22 +3465,49 @@ def _center_algebra(algebra, submodule):
         "associativity": True,
         "commutativity": True,
     }
+    associative_unital = algebras.Associative().Unital()
     match algebra:
         case _ if algebra in algebras.Unital():
             law_decisions["unit"] = algebra.unit_laws_decision()
-            return _algebra_on_module(
+            unit = inclusion.lift(algebra.one())
+            center = _algebra_on_module(
                 submodule,
                 multiplication,
                 placement=(algebras.Associative().Unital().Commutative(),),
-                unit=inclusion.lift(algebra.one()),
+                unit=unit,
                 law_decisions=law_decisions,
             )
+            match algebra in associative_unital:
+                case True:
+                    arrows = associative_unital.Mor(center, algebra)
+                    return center, arrows._from_constructed_element_map(
+                        included,
+                        linearity_premises=(inclusion,),
+                        equations=(
+                            # f m_Z = m_A (f (x) f): `multiplication` *is* the
+                            # ambient product read back along `inclusion`.
+                            True,
+                            # f(1_Z) = 1_A: `unit` is `inclusion`'s lift of 1_A.
+                            inclusion(unit) == algebra.one(),
+                        ),
+                    )
+                case False:
+                    # The ambient has a unit without being associative, so the
+                    # centre's product is judged by the root Mor alone.
+                    arrows = algebras.Mor(center, algebra)
+                    return center, arrows._from_constructed_element_map(
+                        included, linearity_premises=(inclusion,)
+                    )
         case _:
-            return _algebra_on_module(
+            center = _algebra_on_module(
                 submodule,
                 multiplication,
                 placement=(algebras.Associative(), algebras.Commutative()),
                 law_decisions=law_decisions,
+            )
+            arrows = algebras.Mor(center, algebra)
+            return center, arrows._from_constructed_element_map(
+                included, linearity_premises=(inclusion,)
             )
 
 

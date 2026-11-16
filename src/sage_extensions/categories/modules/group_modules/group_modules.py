@@ -403,6 +403,29 @@ class ModulesOverGroupAlgebra(Modules):
         return self.restriction_coextension_adjunction(Modules(self.coefficient_ring()[subgroup])._group_algebra_inclusion(self.acting_group()))
 
     class ParentMethods:
+        def __init_extra__(self) -> None:
+            r"""Register the actions of ``R[G]`` and of its coefficients on this module.
+
+            ``R[G]`` acts by its ring structure, and the coefficients of ``R``
+            act through the canonical morphism ``R -> R[G]``, ``r |-> r . 1``,
+            along which the scalars of a module over ``R[G]`` restrict to ``R``.
+            `scalar_multiple` reads a scalar of either ring, so both are
+            registered: without the second, ``r * m`` for a coefficient ``r``
+            would be the one reading of this module's scalar action that the
+            coercion model could not reach.
+            """
+            from sage_extensions.categories.modules.pure.modules import (
+                _register_module_scalar_action,
+            )
+
+            super().__init_extra__()
+            coefficient_ring = self.coefficient_ring()
+            match coefficient_ring is self.base_ring():
+                case True:
+                    pass
+                case False:
+                    _register_module_scalar_action(self, coefficient_ring)
+
         def scalar_multiple(self, scalar, element):
             r"""Apply the group-algebra action, including coefficient scalars.
 
@@ -1183,12 +1206,30 @@ class GroupModuleMor(_ModuleMorCommonMethods, CategoricalMor):
         )
         self._preamble_base_ring = scalar_ring
         self._preamble_algebra_base_ring = scalar_ring
+        from sage_extensions.categories.group.additive_mors import (
+            AdditiveEndomorphismRings,
+        )
+        from sage_extensions.owned_category import owned_category_join
+
+        placement = [LinearMorModules(scalar_ring)]
+        match domain is codomain:
+            case True:
+                # The equivariant endomorphisms are closed under composition
+                # and contain the identity, so the diagonal Hom is a ring under
+                # composition over the centre of the coefficient ring: the
+                # placement the module Mors declare for the same scalar ring.
+                # Without it `End_{R[G]}(M)` is a module and not a ring, and an
+                # invertible endomorphism cannot be read as an element of
+                # `Aut_{R[G]}(M)`, which is that ring's unit group.
+                placement.append(AdditiveEndomorphismRings(scalar_ring))
+            case False:
+                pass
         CategoricalMor.__init__(
             self,
             mor_family,
             domain,
             codomain,
-            category=LinearMorModules(scalar_ring),
+            category=owned_category_join(tuple(placement)),
         )
 
     def super_categories(self):
@@ -1595,8 +1636,41 @@ def _equip_action(module, group_or_action, action=None):
         }
     # The generic linear realization and the represented action are both
     # actual properties of this object. Neither placement implies the other.
+    # A finite free coefficient module of a finite group over a field carries
+    # the character family of its characteristic: the ordinary one in
+    # characteristic zero and the Brauer one in positive characteristic, each
+    # the trace of a group element on a finite free module (Serre, *Linear
+    # Representations of Finite Groups*, §2.1, §6.1 and §18.1).  The family is
+    # selected here, where the coefficient module and the group are both known,
+    # so that the trace character and the isotypic components are operations of
+    # the module rather than a refinement a caller has to ask for.
+    representation = ()
+    match (
+        group.is_finite() is True,
+        module in FinitelyGeneratedFreeModules(base_ring),
+    ):
+        case (True, True):
+            match base_ring.characteristic() == 0:
+                case True:
+                    family = OrdinaryCharacterRepresentations(group_algebra)
+                case False:
+                    family = (
+                        BrauerCharacterRepresentations(group_algebra)
+                        if base_ring in OwnedFields()
+                        else FiniteFreeGroupRepresentations(group_algebra)
+                    )
+            representation = (family,)
+        case _:
+            pass
     equipped = _object_of(
-        Cat().meet((GeneralModules(group_algebra), Modules(group_algebra), *extra_category)),
+        Cat().meet(
+            (
+                GeneralModules(group_algebra),
+                Modules(group_algebra),
+                *representation,
+                *extra_category,
+            )
+        ),
         _engine=(Modules(group_algebra), _CoefficientModuleEngine, None),
         base_ring=group_algebra,
         rho=scalar_action,

@@ -6587,12 +6587,12 @@ class Lattices(OwnedCategoryOverBaseRing):
             )
 
         def integral_hyperbolic_index(self):
-            r"""Return the actual integral ``U``-summand index of this lattice.
+            r"""Return the \(U\)-index of a \(\mathbf{Z}\)-lattice.
 
-            The earlier genus comparison decided whether a genus contains
-            ``U^m + M``. Genus equality alone did not supply an isometry
-            from that sum to this specified lattice. The constructive
-            embedding decision used here decides the required stronger fact.
+            This is :meth:`hyperbolic_index` restricted to the integers: the
+            largest \(m\) with \(L \cong U^m \oplus M\), decided by the
+            constructive embedding decision of this lattice and not by the
+            genus of the sum.
             """
             assert self.base_ring() is _owned_integers(), (
                 f"the integral hyperbolic index of {self} is computed over ZZ"

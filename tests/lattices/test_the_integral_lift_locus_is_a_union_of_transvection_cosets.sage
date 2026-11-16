@@ -205,6 +205,43 @@ def test_the_locus_of_a_divisibility_four_control_is_every_class_that_lifts() ->
     _assert_locus_is_the_integral_classes(lattice, _first_basis_vector(lattice), 4)
 
 
+def test_the_locus_of_a_section_with_unequal_smith_steps_is_a_proper_subset() -> None:
+    r"""On `U(2) + A2` at the marked line `e_0 - 2e_1 - 2e_2 - 2e_3` the steps are `(8, 4)`.
+
+    The section's coordinate matrix has steps `(8, 4)` over the period sixteen, so its
+    saturation is read through a `V` that is not the identity, and the kernel is a proper
+    subgroup of `P/mP`.  Sixteen of the 256 classes of `P/mP` lift, so this is the control
+    that states both directions of the comparison: a reading that loses a class of the
+    locus and a reading that admits a class whose own lift is not integral are both wrong
+    here.  The base point is integral, so the zero class is in the locus.
+    """
+    lattice = Lattices(ZZ)([[0, 2], [2, 0]]) + Lattices(ZZ)([[2, -1], [-1, 2]])
+    labels = tuple(lattice.module_generating_set())
+    marked = lattice.linear_combination({
+        label: ZZ(coefficient)
+        for label, coefficient in zip(labels, (1, -2, -2, -2), strict=True)
+    })
+    reduction = _reduction_at(lattice, marked)
+    torsor = _marked_line_lift_torsor(
+        reduction, reduction.Isom(reduction).identity()
+    )
+    quotient = torsor.integral_parameter_quotient()
+
+    assert lattice.div(marked) == 2
+    integral_classes = _classes_that_lift_integrally(lattice, torsor)
+    reported = set(torsor.integral_parameter_classes())
+
+    assert reported == integral_classes
+    # Neither side is empty and neither is the whole parameter quotient: the locus is a
+    # proper subset of `P/mP` here, so the comparison above decides both directions.
+    assert integral_classes
+    assert reported != set(quotient.codomain())
+    # The base point is integral, so the zero parameter -- its own parameter -- lifts.
+    zero = quotient.codomain().zero()
+    assert zero in integral_classes
+    assert zero in reported
+
+
 def test_the_locus_of_a_section_with_unequal_smith_steps_is_every_class_that_lifts() -> None:
     r"""On `U + A3(2)` at a marked line of divisibility two the section's steps are `(4, 2, 2)`.
 
