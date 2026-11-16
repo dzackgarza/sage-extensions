@@ -5439,15 +5439,13 @@ class Lattices(OwnedCategoryOverBaseRing):
         def _displayed_orthogonal_blocks(self):
             r"""Return the summands the displayed Gram matrix exhibits.
 
-            The Gram graph of the displayed basis joins two positions where the
-            pairing of their generators is nonzero
-            (:meth:`sage_extensions.tensors.tensor.Tensor.gram_graph`), and its
-            connected components are the blocks of the display that pair to
-            zero across blocks.  Each block is the span of its generators with
-            the restricted form, so it is a sublattice of this lattice and
-            carries its inclusion.  :meth:`is_decomposable` and
-            :meth:`indecomposable_summands` claim the blocks a display
-            exhibits through this one datum.
+            The components of the Gram graph of the displayed basis
+            (:meth:`sage_extensions.tensors.tensor.Tensor.gram_graph`) are the
+            largest blocks of the display that pair to zero across blocks.  A
+            block is returned as the span of its generators with the restricted
+            form, which is a sublattice carrying its inclusion.  This is the one
+            datum :meth:`is_decomposable` and :meth:`indecomposable_summands`
+            read.
             """
             rank = self.module_rank()
             if rank.is_finite() is not True:
@@ -5468,19 +5466,17 @@ class Lattices(OwnedCategoryOverBaseRing):
         def _definite_indecomposable_summands(self):
             r"""Return the indecomposable summands of a definite integral lattice, or ``None``.
 
-            Kneser's construction (Kneser, *Quadratische Formen*, section 27;
-            the decomposition is unique by Eichler's theorem): a minimal vector
-            of a definite lattice is not a sum of two nonzero orthogonal
-            vectors, so the minimal vectors lie in the summands, grouped along
-            the connected components of their nonorthogonality graph, and the
-            saturated span of a component splits off orthogonally.  The Gram is
-            LLL-reduced first because the minimal-vector enumeration runs on the
-            entries of the Gram it is given.
+            The decomposition is Kneser's (Kneser, *Quadratische Formen*, section
+            27) and is unique by Eichler's theorem;
+            :func:`sage_extensions.categories.lattice_morphisms._indecomposable_summands`
+            computes it.  The Gram is LLL-reduced before that call because its
+            minimal-vector enumeration is bounded by the entries of the Gram it
+            is given.
 
-            ``None`` means the construction did not split the lattice off
-            orthogonally, so nothing here decides the decomposition.  The
-            summands are the spans of the returned bases, hence sublattices of
-            this lattice and not new Gram presentations of it.
+            ``None`` means that construction did not split the lattice off
+            orthogonally, so nothing here decides the decomposition.  A summand
+            is the span of its returned basis, hence a sublattice of this
+            lattice and not a new Gram presentation of it.
             """
             from sage.libs.pari import pari
             from sage_extensions.categories.lattice_morphisms import (
@@ -9747,13 +9743,11 @@ class Lattices(OwnedCategoryOverBaseRing):
         def splits_two_hyperbolic_planes(self) -> bool:
             r"""Return whether this lattice is isometric to ``U + U + M``.
 
-            The \(U\)-index (:meth:`hyperbolic_index`) counts the largest number
-            of orthogonal hyperbolic planes, so this is whether that index is at
-            least two.  A witness is
-            :meth:`maximal_hyperbolic_index_splitting`, whose first factor is
-            \(U^m\) for that index \(m\).  The criterion's hypothesis adds that
-            the form is even, and :meth:`eichler_criterion_applies` states the
-            two halves together.
+            This is the \(U\)-index (:meth:`hyperbolic_index`) at least two.  A
+            witness is :meth:`maximal_hyperbolic_index_splitting`, whose first
+            factor is \(U^m\) for that index \(m\).  The criterion's hypothesis
+            adds that the form is even, and :meth:`eichler_criterion_applies`
+            states the two halves together.
             """
             return self.hyperbolic_index() >= 2
 
@@ -9765,11 +9759,12 @@ class Lattices(OwnedCategoryOverBaseRing):
             \(U\)-index of :meth:`hyperbolic_index`
             (Gritsenko--Hulek--Sankaran, *Moduli of K3 Surfaces and
             Irreducible Symplectic Manifolds*, Lemma 7.8, p. 503, as cited in
-            ``orthogonal_quotients.isotropic_line_stabilizer_image``).  Evenness
-            is not a decoration: the integral Eichler transvections
+            ``orthogonal_quotients.isotropic_line_stabilizer_image``).  The
+            hypothesis includes evenness: the integral Eichler transvections
             \(t(c,a)(v) = v - (a,v)c + (c,v)a - \tfrac12 (a,a)(c,v)c\) carry the
             halved norm of \(a\), so they are automorphisms of \(L\) only on an
-            even form.  This is the one predicate the criterion's routes ask.
+            even form (Gritsenko--Hulek--Sankaran, arXiv:1012.4155, eq. (49)).
+            This is the one predicate the criterion's routes ask.
             """
             return bool(self.is_even()) and self.splits_two_hyperbolic_planes()
 
