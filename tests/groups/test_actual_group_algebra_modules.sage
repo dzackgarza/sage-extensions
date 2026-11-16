@@ -102,6 +102,29 @@ def test_a_coefficient_scalar_acts_on_a_group_module_element() -> None:
     assert averaged + averaged + averaged == total
 
 
+def test_a_group_module_declares_the_actions_of_its_group_algebra_and_of_its_coefficients() -> None:
+    r"""$R[G]$ acts on a module over $R[G]$, and $R$ acts through $R\to R[G]$, $r\mapsto r\cdot 1$.
+
+    The two rings whose scalars act on a group module are the group algebra and
+    its coefficient ring: the first is the module's structure, the second the
+    restriction of scalars along the canonical morphism, and a coefficient
+    scalar acts exactly as the group-algebra element it maps to.  The
+    declaration of the second names its ring, since which ring acts is the
+    datum being declared and not something read off the module.
+    """
+    group, representation = _permutation_module_of_s3()
+    algebra = representation.base_ring()
+    total = sum(
+        representation.module_generator(label)
+        for label in representation.module_generating_set()
+    )
+    coefficient = QQ(1) / QQ(3)
+
+    assert representation.scalar_action().domain() is algebra
+    assert coefficient * total == (coefficient * algebra.one()) * total
+    assert coefficient * total != QQ.one() * total
+
+
 def test_the_character_of_a_finite_free_representation_is_the_trace_of_its_action() -> None:
     r"""The character of $\mathbb{Q}^3$ is the permutation character $3,1,0$.
 
