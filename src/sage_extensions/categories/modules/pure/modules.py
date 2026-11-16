@@ -56,6 +56,7 @@ from sage_extensions.categories.modules.module_morphisms.morphism_matrices impor
     _row_normal_form,
 )
 from sage_extensions.categories.rings.ring_foundation import (
+    CoordinateMatrixRings,
     IntegralDomains,
     LocalizationRings,
     LocalRings,
@@ -8228,10 +8229,8 @@ def _coordinate_images(morphism):
     come from ``f``.  Engine adapters that take a family of generating vectors
     lower a morphism of free modules through this.
     """
-    from sage.categories.rings import Rings as SageRings
-
     ring = morphism.domain().base_ring()
-    match _linear_algebra_ring(ring) in SageRings():
+    match ring in CoordinateMatrixRings():
         case True:
             return tuple(
                 tuple(_owned_engine_element(ring, entry) for entry in column)

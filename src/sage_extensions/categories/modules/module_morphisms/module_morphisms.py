@@ -28,6 +28,7 @@ from sage_extensions.categories.abstract_categories.arrow_categories import Core
 from sage_extensions.categories.group.magmas import AdditiveGroups
 from sage_extensions.categories.rings.ring_foundation import _engine_element, _owned_engine_element
 from sage_extensions.categories.rings.ring_foundation import (
+    CoordinateMatrixRings,
     LocalizationRings,
     LocalRings,
     PrincipalIdealDomains,
@@ -1949,13 +1950,31 @@ class ModuleMorphismMethods:
         quotient module.  Every other ring takes this map's cokernel and asks
         it: there the invariant factors are the presented owner's to read.
         """
-        match self._primitivity_by_invariant_factors():
-            case None:
-                if not self.is_injective():
-                    return False
-                return self.cokernel().is_torsion_free()
-            case answer:
+        if self._has_coordinate_matrix():
+            answer = self._primitivity_by_invariant_factors()
+            if answer is not None:
                 return answer
+        if not self.is_injective():
+            return False
+        return self.cokernel().is_torsion_free()
+
+    def _has_coordinate_matrix(self) -> bool:
+        r"""Whether this arrow's coordinate matrix is an engine matrix.
+
+        The hypotheses of the criterion are that both endpoints are finitely
+        framed free modules over a principal ideal domain, and that the ring is
+        an object of :class:`CoordinateMatrixRings`: its selected
+        linear-algebra parent is a Sage ring, so the matrix exists.  An owned
+        exact field whose engine is inexact is not such a ring, and its maps
+        answer by their definition (:meth:`is_primitive`, :meth:`saturation`).
+        """
+        ring = self.domain().base_ring()
+        return (
+            ring in PrincipalIdealDomains()
+            and ring in CoordinateMatrixRings()
+            and _has_finite_free_framing(self.domain())
+            and _has_finite_free_framing(self.codomain())
+        )
 
     def _primitivity_by_invariant_factors(self):
         r"""Return the criterion's answer from the retained matrix, or ``None`` without one.
@@ -2003,26 +2022,11 @@ class ModuleMorphismMethods:
         ring.  It states whether the matrix exists; :meth:`is_primitive` and
         :meth:`saturation` state what it is for.
         """
-        from sage.categories.rings import Rings as SageRings
-
         from sage_extensions.categories.modules.pure.modules import (
             _engine_matrix,
         )
-        from sage_extensions.categories.rings.ring_foundation import (
-            _linear_algebra_ring,
-        )
 
-        ring = self.domain().base_ring()
-        match (
-            ring in PrincipalIdealDomains()
-            and _has_finite_free_framing(self.domain())
-            and _has_finite_free_framing(self.codomain())
-            and _linear_algebra_ring(ring) in SageRings()
-        ):
-            case True:
-                return _engine_matrix(self)
-            case False:
-                return None
+        return _engine_matrix(self) if self._has_coordinate_matrix() else None
 
     is_saturated = is_primitive
 
@@ -2042,13 +2046,9 @@ class ModuleMorphismMethods:
             f"injective map, and this map has nonzero kernel"
         )
         ring = self.domain().base_ring()
-        match self._smith_coordinate_matrix():
-            case None:
-                quotient = self.cokernel()
-                projection = quotient.torsion_free_quotient_projection()
-                composite = projection * quotient.presentation_projection()
-                return composite.kernel()
-            case coordinate_matrix:
+        match self._has_coordinate_matrix():
+            case True:
+                coordinate_matrix = self._smith_coordinate_matrix()
                 from sage.modules.free_module import FreeModule
 
                 target_labels = tuple(self.codomain().module_generating_set())
@@ -2069,6 +2069,11 @@ class ModuleMorphismMethods:
                     for row in basis_rows
                 )
                 return self.codomain().subobject_on(generators)
+            case False:
+                quotient = self.cokernel()
+                projection = quotient.torsion_free_quotient_projection()
+                composite = projection * quotient.presentation_projection()
+                return composite.kernel()
 
     def index(self):
         r"""Return the cardinality of the cokernel."""
@@ -2803,14 +2808,12 @@ class ModuleMorphismMethods:
         whether or not its endpoints coincide; any other map is inverted by its
         kernel and its cokernel.
         """
-        from sage.categories.rings import Rings as SageRings
-
         self._require_established_linearity("module-morphism inversion")
         ring = self.parent().base_ring()
         if (
             _engine_matrix_mor(self.parent())
             and ring.is_commutative() is True
-            and _linear_algebra_ring(ring) in SageRings()
+            and ring in CoordinateMatrixRings()
         ):
             return self._inverse_in_the_ring()
         assert self.is_injective(), (

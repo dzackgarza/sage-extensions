@@ -3070,6 +3070,46 @@ def _install_local_ring_construction(ring, maximal_ideal, residue_field, residue
     return refine(ring, OwnedRings().Commutative().Local())
 
 
+class CoordinateMatrixRings(OwnedCategory):
+    r"""Rings with a chosen coordinate matrix representation.
+
+    A ring can support several representations of its finite matrices, so the
+    representation is a chosen datum.  Here the ring's selected linear-algebra
+    parent is a Sage ring, so ``M_{m,n}(R)`` has an engine matrix whose entries
+    are the coordinates of the matrix in that parent.  An owned exact field
+    whose engine is inexact selects the field itself as its linear-algebra
+    parent (:func:`_choose_linear_algebra_ring`), and is not an object of this
+    category: its matrices are preamble objects, but they retain no engine
+    matrix, and operations that need one are read by their definition
+    (``CAT-06``, ``STY-05``).
+
+    This is the capability ``Smith normal form``, the retained coordinate
+    matrix of a morphism, and the relation matrix of a presentation all ask
+    for.  They route on this category rather than probing the engine at each
+    site (``CAT-05``).
+    """
+
+    def an_object(self):
+        r"""The integers with their usual matrix representation."""
+        return _owned_integers()
+
+    def super_categories(self):
+        return [OwnedRings()]
+
+    def __contains__(self, candidate):
+        r"""Whether the ring selects a Sage linear-algebra parent.
+
+        The question is about the ring's chosen representation, so it is asked
+        here, at the category that states the capability, and not at each
+        construction that consumes it.
+        """
+        if candidate not in OwnedRings():
+            return False
+        from sage.categories.rings import Rings as SageRings
+
+        return _linear_algebra_ring(candidate) in SageRings()
+
+
 class OwnedRings(CategoryPacketMethods, OwnedCategory):
     """Unital rings whose notebook-facing ring interface is owned here."""
 
