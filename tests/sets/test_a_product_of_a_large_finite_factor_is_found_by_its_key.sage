@@ -125,6 +125,30 @@ def test_a_finite_ordered_set_of_given_points_holds_their_hash() -> None:
     assert cardinal(factor.cardinality()) == cardinal(_SIZE)
 
 
+def test_a_filtered_subset_holds_the_hash_of_the_points_it_selected() -> None:
+    r"""A subset that selected its points answers for their hash without hashing them again.
+
+    The universe is built from points that record every ask for their hash, so
+    the subset's own construction is visible here: it decides its predicate on
+    every point and keeps the ones it selected, and the hash of that selection is
+    the subset's hash.  A reader that asks for it -- the store of finite products
+    asks every factor -- reads it, and hashes no point again.
+    """
+    asked = []
+    universe = FiniteOrderedSets()(
+        tuple(_Point(number, asked) for number in range(_SIZE))
+    )
+    subset = universe.filtered(lambda point: True)
+    settled = tuple(asked)
+
+    hash(subset)
+    hash(subset)
+
+    assert tuple(asked) == settled
+    assert subset == universe
+    assert hash(subset) == hash(universe)
+
+
 def test_a_finite_ordered_set_presented_by_a_supplied_inverse_holds_its_hash() -> None:
     r"""A set built through an inverse holds the hash of the points it read there.
 
