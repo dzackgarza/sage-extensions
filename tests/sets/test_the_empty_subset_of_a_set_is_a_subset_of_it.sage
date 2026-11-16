@@ -1,35 +1,42 @@
-r"""The empty subset of a set is a subset of it, with the set's inclusion and no points.
+r"""The empty subset of a set is the least point of its power set.
 
-A subset of ``X`` is cut out of ``X``: it carries ``X``'s inclusion, and it admits the
-points of ``X`` its predicate selects.  The empty one selects nothing, and the construction
-states that, so its emptiness and its cardinality are decided by the construction rather
-than by a search of ``X`` -- which for an infinite ``X`` need not finish and would find
-nothing to report.  ``SET-05``: the empty subset is a set construction of the owner, and
-every set has one.
+A subset of ``X`` is a subobject of ``X`` -- it carries ``X``'s inclusion -- and the
+subsets of ``X`` are the points of ``P(X)``.  The empty one is the least of those points:
+``P(X).bottom()``, ``P(X)``'s own "empty subset, the least point of P(X)".  ``SET-05``:
+one construction, so an empty subset of ``X`` is that point and not a second object beside
+it.
+
+The construction supplies no point, so emptiness and cardinality zero are decided from it
+-- it enumerates nothing -- and not by a search of ``X``.  That is what makes the empty
+subset answerable when ``X`` is infinite, as ``NN`` is.
 """
 
 from sage_extensions.all import *  # noqa: F401,F403
 
 
-def test_the_empty_subset_of_an_infinite_set_admits_nothing() -> None:
-    r"""``NN``'s empty subset has ``NN``'s inclusion, no points, and cardinality zero."""
-    empty = NN.empty_subset()
+def test_the_empty_subset_of_an_infinite_set_is_the_least_point_of_its_power_set() -> None:
+    r"""``NN``'s empty subset is ``P(NN)``'s bottom, with ``NN``'s inclusion and no points."""
+    power = NN.power_set()
+    empty = power.bottom()
 
-    assert empty.universe() == NN
+    assert power.is_parent_of(empty) is True
     assert empty.inclusion().codomain() == NN
     assert empty.is_empty() is True
     assert empty.is_parent_of(NN(0)) is False
     assert empty.cardinality() == cardinal(0)
+    assert tuple(empty) == ()
 
 
-def test_the_empty_subset_of_a_finite_set_admits_nothing() -> None:
-    r"""A finite ``{"a", "b"}``'s empty subset is empty too, and counts zero."""
+def test_the_empty_subset_of_a_finite_set_is_the_least_point_of_its_power_set() -> None:
+    r"""A finite ``{"a", "b"}``'s empty subset is its power set's bottom, and counts zero."""
     points = FiniteOrderedSets()(("a", "b"))
-    empty = points.empty_subset()
+    power = points.power_set()
+    empty = power.bottom()
 
-    assert empty.universe() == points
+    assert power.is_parent_of(empty) is True
     assert empty.inclusion().codomain() == points
     assert empty.is_empty() is True
     assert empty.is_parent_of("a") is False
     assert empty.is_parent_of("b") is False
     assert empty.cardinality() == cardinal(0)
+    assert tuple(empty) == ()
