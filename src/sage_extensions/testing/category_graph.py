@@ -1,1343 +1,2235 @@
-r"""The category graph the source declares, read with ``ast``.
+"""The declared category graph, read from source without importing it.
 
-``AGENTS.md`` reads a change to a category's placement on the declared graph:
-the breadth of the node it lands under, the depth of a leaf, the declaration
-that is a shortcut, the cycles that owe a 2-cell, the size of the largest
-2-connected block.  A session cannot answer those questions.  Importing the
-preamble gives the categories Sage joined -- the classes that survived the
-dynamic construction, with computed supercategories already flattened -- while
-the rule is about the declaration a contributor wrote.
+This is the tool ``just category-graph`` runs, taken from where it was already
+maintained: ``src/dzack_research/utilities/category_graph.py`` of
+``dzackgarza/research`` at commit ``d62f344542``, whose ``_default_root``
+already read ``sage_extensions``.  It is ported, not rewritten -- the views,
+their names and their algorithms are that module's -- and
+``docs/architecture-inspection.md`` describes them here.
 
-So the declarations are read out of the source with ``ast``, and
-``sage_extensions`` is not imported at all: a tree that is mid-refactor and does
-not load still has its graph, and a declaration read wrongly here is a fact
-about the source rather than about an import.
+The live survey answers what a session *does*.  This module answers what the
+source *says*: which categories exist, and what each one declares as its
+supercategories.  It parses the tree with :mod:`ast`, so it reports on a
+preamble that does not currently import, which is exactly when the
+declarations most need reading.
 
-**What a declaration states.**  A ``super_categories`` (or
-``extra_super_categories``) return of ``[D(...)]`` in ``class C`` asserts the
-forgetful functor ``C -> D``, which is one edge of the complex.  The expressions
-a return may carry, and what each contributes:
-
-===============================  ===========================================
-written                          read as
-===============================  ===========================================
-``D()``, ``D(ring)``             the vertex ``D``; the parameter is recorded
-                                 as written, never evaluated
-``D().FinitelyGenerated()``      the vertex ``D`` refined by that name, which
-                                 is a vertex of its own declaring ``D``
-``D().Subobjects(X)``            ``D.Subobjects`` when the tree presents that
-                                 class, else the vertex ``D`` with the
-                                 construction named and its parameters
-                                 recorded as written
-===============================  ===========================================
-
-A step of the expression names a category when it takes no parameter -- the
-join Sage builds, ``Finite``, ``FinitelyGenerated``, ``Even`` -- and is a
-construction applied to the category when it takes one.  That is the same
-distinction the source writes: a refinement is a category an object of ``D``
-also belongs to, and a construction is a category built from ``D`` and
-something else.  A refined vertex declares each vertex with one refinement
-fewer, which is the node the refinement adjoins and where an object that drops
-it lands.
-
-A vertex is therefore the module that defines the class, the qualified class
-name, and the refinement set adjoined to it, sorted: ``Lattices().Even().
-Nondegenerate()`` and ``Lattices().Nondegenerate().Even()`` are one vertex,
-because the join is by set.
-
-**What it refuses to state.**  A return that is a local (``return categories``),
-a call to a helper of unknown result (``_distinct_supercategories(supers)``), or
-a category computed from the instance (``self.base_category()``) names no
-category in the source: the edge is not written down anywhere.  Such a return is
-recorded against the class with its expression as written and marked
-``computed``, and :func:`audit_rows` lists it.  Working out which category the
-expression will evaluate to would put an edge in the graph that nobody wrote,
-which is the one thing a reader of declarations must not do.
-
-**Vertices are classes, not names.**  Two modules may each write ``Objects``, and
-``Modules.Subobjects`` is not ``Modules``.  A vertex is identified by the module
-that defines the class, the qualified class name and the refinement set; the
-label is what a reader types, and :func:`declaration_rows` prints the owner
-where two vertices would otherwise read alike.  A name is resolved in the module
-that writes it -- a class or function or module-level value of that module, an
-import of that module followed to the module that defines it, then the tree --
-and a name that resolves to nothing is ``undefined``, an audit finding rather
-than a vertex invented for it.  A function the tree defines is read through its
-return, because ``FiniteSets()`` is ``Sets().Finite()`` written a second way.
-
-Run ``python -m sage_extensions.testing.category_graph VIEW``, or
-``just category-graph VIEW``.  The views are ``categories`` (the default),
-``by-supercategory``, ``foreign``, ``shape``, ``cells``, ``audit``, ``json`` and
-``svg``.
+A ``super_categories()`` return value is a mathematical claim -- that every
+object of this category is an object of those -- and this is the surface that
+makes each claim legible beside every other one.
 """
 
 from __future__ import annotations
 
+import importlib.util
 import argparse
 import ast
 import json
-import subprocess
-import sys
-from dataclasses import dataclass
+import re
+from dataclasses import dataclass, field
+from fnmatch import fnmatchcase
+from functools import cache
+from graphlib import TopologicalSorter
 from pathlib import Path
+from typing import TYPE_CHECKING
 
-SOURCE = Path("src") / "sage_extensions"
-RESPONSIBLE_FOR_DECLARATIONS = SOURCE / "categories"
-DECLARING_METHODS = ("super_categories", "extra_super_categories")
-METHOD_CONTAINERS = frozenset(
-    {"ParentMethods", "ElementMethods", "MorphismMethods", "SubcategoryMethods"}
+if TYPE_CHECKING:
+    from collections.abc import Hashable
+
+    from sage.graphs.digraph import DiGraph
+    from sage.graphs.graph import Graph
+
+CATEGORY_BASES: frozenset[str] = frozenset(
+    {
+        "Category",
+        "CategoryWithAxiom",
+        "CategoricalHomset",
+        "HomCategoryConstruction",
+        "OwnedCategory",
+        "OwnedCategoryBase",
+        "OwnedCategoryOverBaseRing",
+        "OwnedParameterizedCategory",
+    }
 )
-r"""The class bodies whose methods are not categories.
 
-A category's behaviour lives in nested ``ParentMethods``/``ElementMethods``
-containers, whose nested classes are method containers again; a category nested
-in a category is a subcategory or an axiom.  Walking a class body stops at these
-names, so a class written inside one is not read as a category.
-"""
-
-AXIOM_BASE = "CategoryWithAxiom"
-r"""The base a class derives from to be an axiom: ``CategoryWithAxiom`` and its variants."""
-
-STATED = ""
-r"""The tag of a declaration the source states in full: it names a vertex."""
-
-COMPUTED = "computed"
-r"""The tag of a declaration written as a local expression, so no edge is stated."""
-
-UNDEFINED = "undefined"
-r"""The tag of a declaration naming a name nothing in the tree defines."""
-
-AMBIGUOUS = "ambiguous"
-r"""The tag of a declaration naming a class the tree defines in several modules."""
+DECLARATIONS = ("super_categories", "extra_super_categories")
 
 
-@dataclass(frozen=True, order=True)
-class Category:
-    r"""One vertex of the declared graph.
+def _vertex(base: str, axioms: tuple[str, ...]) -> str:
+    """The graph vertex of a category with axioms: ``Base.Axiom1.Axiom2``, sorted.
 
-    ``owner`` is the repository-relative path of the module that defines the
-    class, ``sage`` for a category Sage defines, and ``unresolved`` for a name
-    the tree defines nowhere.  ``name`` is the qualified class name within that
-    module.  ``refinements`` is the refinement set adjoined to it, sorted: the
-    categories an object of it also belongs to, which the declaration states by
-    a chain of nullary steps.
+    Sage's ``Base().A().B()`` is the join of ``Base.A`` and ``Base.B``, one
+    category whichever order the axioms are applied in.
     """
+    return ".".join((base, *sorted(axioms)))
 
-    owner: str
+
+@dataclass(frozen=True)
+class Supercategory:
+    """One declared supercategory, and where its name comes from."""
+
+    expression: str
+    head: str
+    resolved: str  # the head with any import alias followed back to its name
+    origin: str  # "owned", "sage", or "expression"
+    axioms: tuple[str, ...] = ()
+    parameters: tuple[str, ...] = ()  # category-valued arguments, as vertices
+
+    @property
+    def vertex(self) -> str:
+        head = self.resolved
+        if self.parameters:
+            head = f"{head}({', '.join(self.parameters)})"
+        return _vertex(head, self.axioms)
+
+
+@dataclass(frozen=True)
+class CategoryDeclaration:
+    """One category class and the supercategories its source declares."""
+
     name: str
-    refinements: tuple[str, ...] = ()
-
-    @property
-    def label(self) -> str:
-        r"""The name a reader types: the class, then each refinement in turn."""
-        return "".join((self.name, *(f".{refinement}" for refinement in self.refinements)))
-
-    @property
-    def stated(self) -> bool:
-        r"""Whether the tree defines this vertex, rather than Sage or nothing."""
-        return self.owner not in ("sage", "unresolved")
-
-    def with_refinement(self, refinement: str) -> Category:
-        r"""This vertex with one more refinement: the node the refinement adjoins."""
-        return Category(self.owner, self.name, tuple(sorted({*self.refinements, refinement})))
-
-    def without_refinement(self, refinement: str) -> Category:
-        r"""This vertex with one refinement fewer: the node it declares."""
-        return Category(
-            self.owner, self.name,
-            tuple(name for name in self.refinements if name != refinement),
-        )
-
-
-@dataclass(frozen=True, order=True)
-class Declaration:
-    r"""One expression a category class returns as a supercategory.
-
-    ``declared`` is the vertex the expression names, and ``None`` when the
-    expression names no category statically; ``unresolved`` then says why
-    (:data:`COMPUTED`, :data:`UNDEFINED` or :data:`AMBIGUOUS`).  ``stated`` is
-    the expression as written, which is what a reader checks the edge against.
-    ``constructions`` are the steps after the head that take a parameter, so the
-    declaration is that construction applied to the head with the parameters
-    ``stated`` shows.  ``conditional`` says the return is one of several: the
-    class declares the edge on a condition the source states.
-    """
-
-    declaring: Category
-    declared: Category | None
-    stated: str
-    site: str
-    method: str
-    unresolved: str = STATED
-    constructions: tuple[str, ...] = ()
-    conditional: bool = False
-
-
-@dataclass(frozen=True)
-class _Class:
-    r"""A class body of the tree: where it is, what it derives from, how it nests."""
-
-    owner: str
-    qualname: str
-    lineno: int
+    qualified_name: str
+    path: str
+    line: int
     bases: tuple[str, ...]
-    nested: tuple[str, ...]
+    summary: str
+    declares: bool
+    abstract: bool
+    supercategories: tuple[Supercategory, ...] = field(default_factory=tuple)
+    axiom_of: str = ""  # for a nested axiom class, the category it refines
+    nested_in: str = ""  # for a nested construction such as ``_MorCategory``, the vertex enclosing it
+    parameter: str = ""  # source symbol distinguishing the optional-parameter branch
+    object_methods: tuple[
+        str, ...
+    ] = ()  # the methods its ``ParentMethods`` installs on objects
+
+    @property
+    def vertex(self) -> str:
+        if self.nested_in:
+            return f"{self.nested_in}::{self.name}"
+        if self.parameter:
+            return self.qualified_name
+        if not self.axiom_of:
+            return self.name
+        return _vertex(self.axiom_of, tuple(self.qualified_name.split(".")[1:]))
+
+    @property
+    def heads(self) -> tuple[str, ...]:
+        """The category names alone, with each declaration's arguments dropped."""
+        return tuple(declared.head for declared in self.supercategories)
+
+    @property
+    def sage_supercategories(self) -> tuple[Supercategory, ...]:
+        """The declared supercategories whose names are Sage's, not this tree's."""
+        return tuple(d for d in self.supercategories if d.origin == "sage")
 
 
-@dataclass(frozen=True)
-class _Function:
-    r"""A module-level function, read for the category it returns.
+def _head(expression: str) -> str:
+    """Return the name a supercategory expression applies or refers to."""
+    stripped = _without_axioms(expression).split("(", 1)[0]
+    return stripped.rsplit(".", 1)[-1].strip()
 
-    The returns and the names the body binds are all the reader keeps of it: a
-    declaration names the function and the reader follows it to the category, so
-    the body itself is not retained.  A tree of 250000 lines holds a hundred
-    thousand nodes per file, and keeping them alive to answer one question about
-    a return makes every garbage collection walk all of it.
+
+def _axiom_calls(expression: str) -> tuple[ast.expr, tuple[str, ...]]:
+    """Split ``Base(R).A().B()`` into the base expression and its axiom names.
+
+    An axiom is applied as a capitalised zero-argument method (Sage's
+    ``with_axiom`` accessors); anything else ends the chain.
     """
+    try:
+        node: ast.expr = ast.parse(expression, mode="eval").body
+    except SyntaxError:
+        return ast.Name(id=expression), ()
+    axioms: list[str] = []
+    while (
+        isinstance(node, ast.Call)
+        and not node.args
+        and not node.keywords
+        and isinstance(node.func, ast.Attribute)
+        and node.func.attr[:1].isupper()
+    ):
+        axioms.append(node.func.attr)
+        node = node.func.value
+    return node, tuple(reversed(axioms))
 
-    returns: tuple[ast.expr, ...]
-    local: frozenset[str]
+
+def _without_axioms(expression: str) -> str:
+    base, _ = _axiom_calls(expression)
+    return ast.unparse(base)
 
 
-@dataclass(frozen=True)
-class _Site:
-    r"""One ``super_categories`` or ``extra_super_categories`` return in a class body."""
-
-    qualname: str
-    method: str
-    elements: tuple[ast.expr, ...]
-    local: frozenset[str]
-    conditional: bool
+def _axioms(expression: str) -> tuple[str, ...]:
+    _, axioms = _axiom_calls(expression)
+    return axioms
 
 
-@dataclass(frozen=True)
-class _Module:
-    r"""What one module body binds, and the declarations its classes write.
+def _category_parameters(
+    expression: str, imported: dict[str, tuple[str, str]], known: set[str]
+) -> tuple[str, ...]:
+    """The arguments of a declaration that are themselves categories, as vertices.
 
-    The parsed tree is not kept: the classes, the functions' returns, the
-    module-level values, the imports and the declaration expressions are the
-    whole of what a later resolution can reach, and dropping the rest is what
-    keeps the read proportionate to the source rather than to its syntax.
+    ``GObjects(G, Sets())`` and ``DirectSumObjects(Lattices(R))`` are
+    constructions on a category (`CAT-20`): one category per parameter, each
+    declaring that parameter.  The parameter is the vertex of the argument,
+    with its axioms, so ``DirectSumObjects(Modules(R).FinitelyGenerated())``
+    is a vertex of its own.
     """
-
-    owner: str
-    classes: dict[str, _Class]
-    functions: dict[str, _Function]
-    values: dict[str, ast.expr]
-    imports: dict[str, tuple[str, str]]
-    modules: dict[str, str]
-    declarations: tuple[_Site, ...]
-
-
-def _parse(path: Path, owner: str) -> _Module:
-    r"""The syntax tree ``path`` holds, and the names its module body binds.
-
-    A category is named in four ways: a class the module defines, a function
-    returning one (``FiniteSets()`` is ``Sets().Finite()``), a module-level
-    assignment of one (``OwnedAbelianGroups = AbelianGroups``), and an import.
-    All four are read here, from the module body only, because that is where a
-    name a class body resolves has to be bound.
-
-    A package that publishes its names lazily binds them through the table its
-    ``__getattr__`` reads -- ``_EXPORTS = {"FiniteSets": ("...set_categories",
-    "FiniteSets")}`` -- which states the same binding an import states, so the
-    table is read as one.  Without it a declaration written through such a
-    package would read as naming nothing.
-    """
-    tree = ast.parse(path.read_text(), filename=str(path))
-    classes: dict[str, _Class] = {}
-    functions: dict[str, _Function] = {}
-    values: dict[str, ast.expr] = {}
-    imports: dict[str, tuple[str, str]] = {}
-    modules: dict[str, str] = {}
-    declarations: list[_Site] = []
-    for node in tree.body:
-        match node:
-            case ast.ImportFrom(module=module, names=names, level=0) if module is not None:
-                for alias in names:
-                    imports[alias.asname or alias.name] = (module, alias.name)
-            case ast.Import(names=names):
-                for alias in names:
-                    modules[alias.asname or alias.name.split(".")[0]] = (
-                        alias.name if alias.asname else alias.name.split(".")[0]
-                    )
-            case ast.ClassDef():
-                _collect(node, owner, "", classes, declarations)
-            case ast.FunctionDef():
-                functions[node.name] = _Function(_returns(node), _local_names(node))
-            case ast.Assign(targets=[ast.Name(id=name)], value=ast.Dict() as value):
-                bindings = _reexports(value)
-                if bindings is None:
-                    values[name] = value
-                else:
-                    imports.update(bindings)
-            case ast.Assign(targets=[ast.Name(id=name)], value=value):
-                values[name] = value
-            case ast.AnnAssign(target=ast.Name(id=name), value=value) if value is not None:
-                values[name] = value
-    return _Module(owner, classes, functions, values, imports, modules, tuple(declarations))
+    base, _ = _axiom_calls(expression)
+    if not isinstance(base, ast.Call):
+        return ()
+    parameters: list[str] = []
+    for argument in base.args:
+        text = ast.unparse(argument)
+        head = _resolved(_head(text), imported)
+        if head in known:
+            parameters.append(_vertex(head, _axioms(text)))
+    return tuple(parameters)
 
 
-def _reexports(table: ast.Dict) -> dict[str, tuple[str, str]] | None:
-    r"""The bindings a lazy export table states, or ``None`` when it is not one.
-
-    ``{"FiniteSets": ("sage_extensions...set_categories", "FiniteSets")}`` maps a
-    public name to the module and name it is resolved from, which is exactly what
-    an import of that module binds.  Every value has to be such a pair: a dict
-    that holds anything else is data, and the reader leaves it alone.
-    """
-    bindings: dict[str, tuple[str, str]] = {}
-    for key, value in zip(table.keys, table.values):
-        if not (isinstance(key, ast.Constant) and isinstance(key.value, str)):
-            return None
-        match value:
-            case ast.Tuple(elts=[ast.Constant(value=str() as module),
-                                 ast.Constant(value=str() as name)]):
-                bindings[key.value] = (module, name)
-            case _:
-                return None
-    return bindings or None
+def _summary(node: ast.ClassDef) -> str:
+    text = ast.get_docstring(node) or ""
+    return text.strip().split("\n", 1)[0]
 
 
-def _collect(
-    node: ast.ClassDef,
-    owner: str,
-    prefix: str,
-    classes: dict[str, _Class],
-    declarations: list[_Site],
-) -> None:
-    r"""Record ``node``, every category nested in it, and every declaration it writes.
-
-    A nested ``ParentMethods``/``ElementMethods``/``MorphismMethods`` container
-    is where behaviour lives, so the walk stops there: a class inside one is part
-    of a method, never a category.
-    """
-    qualname = f"{prefix}{node.name}"
-    nested = tuple(
-        child.name for child in node.body
-        if isinstance(child, ast.ClassDef) and child.name not in METHOD_CONTAINERS
-    )
-    classes[qualname] = _Class(owner, qualname, node.lineno, _base_names(node), nested)
-    for child in node.body:
-        if isinstance(child, ast.ClassDef) and child.name not in METHOD_CONTAINERS:
-            _collect(child, owner, f"{qualname}.", classes, declarations)
-        elif isinstance(child, ast.FunctionDef) and child.name in DECLARING_METHODS:
-            local = _local_names(child)
-            for returned, conditional in _method_returns(child):
-                declarations.append(
-                    _Site(qualname, child.name, _elements(returned), local, conditional)
-                )
+def _is_abstract(node: ast.FunctionDef) -> bool:
+    for decorator in node.decorator_list:
+        if _head(ast.unparse(decorator)) == "abstract_method":
+            return True
+    return False
 
 
-def _base_names(node: ast.ClassDef) -> tuple[str, ...]:
-    r"""The names a class derives from, as written: ``Category``, ``OwnedCategory``."""
-    names = []
-    for base in node.bases:
-        root = _root_name(base)
-        if root is not None:
-            names.append(root)
-    return tuple(names)
-
-
-def _root_name(node: ast.expr) -> str | None:
-    r"""The bare name an expression is built on, or ``None`` for a literal."""
-    while True:
-        match node:
-            case ast.Name(id=name):
-                return name
-            case ast.Call(func=inner) | ast.Attribute(value=inner) | ast.Subscript(value=inner):
-                node = inner
-            case _:
-                return None
-
-
-def _returns(function: ast.FunctionDef) -> tuple[ast.expr, ...]:
-    r"""Every expression ``function`` returns, in the order the source writes them."""
-    return tuple(
-        node.value for node in ast.walk(function)
-        if isinstance(node, ast.Return) and node.value is not None
-    )
-
-
-def _method_returns(method: ast.FunctionDef) -> tuple[tuple[ast.expr, bool], ...]:
-    r"""Each expression ``method`` returns, and whether it is one of several.
-
-    A method with more than one return declares its edge on a condition the
-    source states, which the reader keeps rather than resolving away.
-    """
-    returns = _returns(method)
-    return tuple((value, len(returns) > 1) for value in returns)
-
-
-def _local_names(method: ast.FunctionDef) -> frozenset[str]:
-    r"""The names ``method`` binds: parameters, assignment targets, nested definitions.
-
-    A declaration written as one of these is computed, so the class states no
-    edge; the reader records it and lists it under ``audit``.
-    """
-    bound = {argument.arg for argument in ast.walk(method) if isinstance(argument, ast.arg)}
-    bound.update(
-        target.id for node in ast.walk(method) if isinstance(node, ast.Assign)
-        for target in node.targets if isinstance(target, ast.Name)
-    )
-    bound.update(
-        node.target.id for node in ast.walk(method) if isinstance(node, ast.AnnAssign)
-        and isinstance(node.target, ast.Name)
-    )
-    bound.update(
-        node.name for node in ast.walk(method)
-        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef))
-    )
-    return frozenset(bound)
-
-
-def _chain(expr: ast.expr) -> tuple[ast.expr, tuple[tuple[str, bool], ...]]:
-    r"""An expression's head, and the steps applied to it with whether each takes a parameter.
-
-    ``Modules(self.base_ring()).FinitelyPresented().Torsion()`` gives the head
-    ``Modules`` and the steps ``(("FinitelyPresented", False), ("Torsion",
-    False))``; the head's own parameter is recorded as written instead of being
-    evaluated, because the vertex does not depend on the ring.
-    """
-    steps: list[tuple[str, bool]] = []
-    node = expr
-    while True:
-        match node:
-            case ast.Call(func=inner, args=args, keywords=keywords):
-                if isinstance(inner, ast.Attribute):
-                    steps.append((inner.attr, bool(args or keywords)))
-                    node = inner.value
-                    continue
-                node = inner
-            case ast.Attribute(value=inner, attr=attr):
-                steps.append((attr, False))
-                node = inner
-            case ast.Subscript(value=inner):
-                node = inner
-            case _:
-                return node, tuple(reversed(steps))
-
-
-@dataclass(frozen=True)
-class _Stated:
-    r"""What one declaration expression names: a vertex, or why it names none."""
-
-    category: Category | None
-    unresolved: str
-    constructions: tuple[str, ...]
-    stated: str
-
-
-def read(repository: Path) -> DeclaredGraph:
-    r"""The category graph ``repository`` declares, read from its source.
-
-    Every module under ``src/sage_extensions`` is parsed for the names it binds,
-    because a declaration may reach a category through a re-export; the
-    declarations themselves are read only from ``categories/``, which is where
-    the tree places them.
-
-    The vertices are the classes that declare and the categories they name.  A
-    category whose supercategories are Sage's own -- a class with no
-    ``super_categories`` of its own, placed by the join -- declares nothing the
-    source states, and the graph does not invent a vertex for it.
-    """
-    repository = Path(repository)
-    declarations: list[Declaration] = []
-    parsed: dict[str, _Module] = {}
-    for path in sorted((repository / SOURCE).rglob("*.py")):
-        owner = path.relative_to(repository).as_posix()
-        parsed[owner] = _parse(path, owner)
-    packages = {_dotted(owner): owner for owner in parsed}
-    parsed = _modules_apart(parsed, packages)
-    index = _class_index(parsed)
-    for owner, module in parsed.items():
-        if not Path(owner).is_relative_to(RESPONSIBLE_FOR_DECLARATIONS):
+def _returned_supercategories(node: ast.FunctionDef) -> tuple[str, ...]:
+    """Collect every expression this declaration returns as a supercategory."""
+    found: list[str] = []
+    for statement in ast.walk(node):
+        if not isinstance(statement, ast.Return) or statement.value is None:
             continue
-        declarations.extend(_declarations_of(module, parsed, packages, index))
-    return DeclaredGraph(*_categorised(tuple(declarations)))
+        found.extend(_return_expressions(statement.value))
+    return tuple(found)
 
 
-def _dotted(owner: str) -> str:
-    r"""The module name of a repository-relative path: ``a/b/c.py`` is ``a.b.c``."""
-    parts = owner.removesuffix(".py").split("/")
-    if parts[-1] == "__init__":
-        parts = parts[:-1]
-    return ".".join(parts[1:])
+def _return_expressions(value: ast.expr) -> tuple[str, ...]:
+    if isinstance(value, (ast.List, ast.Tuple, ast.Set)):
+        return tuple(ast.unparse(item) for item in value.elts)
+    return (ast.unparse(value),)
 
 
-def _modules_apart(
-    parsed: dict[str, _Module], packages: dict[str, str]
-) -> dict[str, _Module]:
-    r"""Separate the module aliases from the member imports.
+def _optional_parameter_supercategories(
+    node: ast.ClassDef, declaration: ast.FunctionDef
+) -> tuple[str, tuple[str, ...], tuple[str, ...]] | None:
+    """Separate supercategory declarations for absent and supplied parameters.
 
-    ``from sage_extensions.categories import sets as owned_sets`` binds a module
-    and reads in the declaration as ``owned_sets.FiniteSets()``, while
-    ``from ...sets import FiniteSets`` binds a name.  Only the tree's own modules
-    tell them apart, so the distinction is drawn once here, after every module
-    is known, rather than guessed from the import's spelling.
+    The source must explicitly branch on an optional constructor parameter
+    read from its accessor.  Other conditional returns retain the ordinary
+    source graph's union semantics.
     """
-    apart = {}
-    for owner, module in parsed.items():
-        modules = dict(module.modules)
-        imports = dict(module.imports)
-        for name, (from_module, original) in module.imports.items():
-            dotted = f"{from_module}.{original}"
-            if dotted in packages:
-                modules[name] = dotted
-                del imports[name]
-        apart[owner] = _Module(
-            owner, module.classes, module.functions, module.values, imports, modules,
-            module.declarations,
+    constructors = [
+        method
+        for method in node.body
+        if isinstance(method, ast.FunctionDef) and method.name == "__init__"
+    ]
+    body = [
+        statement for statement in declaration.body
+        if not (
+            isinstance(statement, ast.Expr)
+            and isinstance(statement.value, ast.Constant)
         )
-    return apart
-
-
-def _class_index(parsed: dict[str, _Module]) -> dict[str, tuple[str, ...]]:
-    r"""Each class name the tree defines at module level, and the modules that define it.
-
-    The index is what makes an ambiguous name visible: a declaration naming a
-    class two modules define resolves to no vertex until its own module's
-    imports say which one it means.
-    """
-    index: dict[str, set[str]] = {}
-    for owner, module in parsed.items():
-        for qualname in module.classes:
-            if "." not in qualname:
-                index.setdefault(qualname, set()).add(owner)
-    return {name: tuple(sorted(owners)) for name, owners in index.items()}
-
-
-def _declarations_of(
-    module: _Module,
-    parsed: dict[str, _Module],
-    packages: dict[str, str],
-    index: dict[str, tuple[str, ...]],
-) -> list[Declaration]:
-    r"""Every declaration the classes of ``module`` write down."""
-    found: list[Declaration] = []
-    for site in module.declarations:
-        declaring = _class_vertex(module, site.qualname)
-        for element in site.elements:
-            stated = _stated(
-                element, module, parsed, packages, index, site.local,
-                frozenset({(module.owner, site.qualname)}),
-            )
-            found.append(
-                Declaration(
-                    declaring=declaring,
-                    declared=stated.category,
-                    stated=stated.stated,
-                    site=f"{module.owner}:{element.lineno}",
-                    method=site.method,
-                    unresolved=stated.unresolved,
-                    constructions=stated.constructions,
-                    conditional=site.conditional,
+    ]
+    if len(constructors) != 1 or len(body) != 3:
+        return None
+    assignment, branch, parameterized_return = body
+    match assignment, branch, parameterized_return:
+        case (
+            ast.Assign(
+                targets=[ast.Name(id=parameter)],
+                value=ast.Call(
+                    func=ast.Attribute(value=ast.Name(id="self"), attr=accessor),
+                    args=[],
+                    keywords=[],
+                ),
+            ),
+            ast.If(
+                test=ast.Compare(
+                    left=ast.Name(id=condition),
+                    ops=[ast.Is()],
+                    comparators=[ast.Constant(value=None)],
+                ),
+                body=[ast.Return(value=unparameterized)],
+                orelse=[],
+            ),
+            ast.Return(value=parameterized),
+        ) if parameter == accessor == condition:
+            constructor = constructors[0]
+            defaults = dict(
+                zip(
+                    (
+                        arg.arg
+                        for arg in constructor.args.args[
+                            len(constructor.args.args) - len(constructor.args.defaults) :
+                        ]
+                    ),
+                    constructor.args.defaults,
+                    strict=True,
                 )
             )
+            default = defaults.get(parameter)
+            if not isinstance(default, ast.Constant) or default.value is not None:
+                return None
+            return parameter, _return_expressions(unparameterized), _return_expressions(parameterized)
+    return None
+
+
+def _imported_names(tree: ast.Module) -> dict[str, tuple[str, str]]:
+    """Map each imported name to the module and the name it was imported as.
+
+    A name bound by ``import X as Y`` is the same category as ``X``; resolving
+    ``Y`` back to ``X`` is what keeps an alias from reading as a category that
+    nothing defines.
+    """
+    origins: dict[str, tuple[str, str]] = {}
+    for node in ast.walk(tree):
+        if isinstance(node, ast.ImportFrom) and node.module:
+            for alias in node.names:
+                origins[alias.asname or alias.name] = (node.module, alias.name)
+        elif isinstance(node, ast.Import):
+            for alias in node.names:
+                bound = alias.asname or alias.name.split(".")[0]
+                origins[bound] = (alias.name, alias.name.split(".")[-1])
+    return origins
+
+
+def _module_level_names(tree: ast.Module) -> set[str]:
+    """Names a module binds besides its classes: factories and rebindings.
+
+    ``def FiniteSets()`` returning a category, and ``OwnedAbelianGroups =
+    AbelianGroups``, both define a category name as surely as a ``class``
+    statement does.
+    """
+    bound: set[str] = set()
+    for statement in tree.body:
+        if isinstance(statement, ast.FunctionDef):
+            bound.add(statement.name)
+        elif isinstance(statement, ast.Assign):
+            for target in statement.targets:
+                if isinstance(target, ast.Name):
+                    bound.add(target.id)
+    return bound
+
+
+def _declarations(node: ast.ClassDef) -> list[ast.FunctionDef]:
+    """The methods declaring supercategories: ``super_categories`` and, on an
+    axiom class, ``extra_super_categories`` (Sage adds the rest itself)."""
+    return [
+        statement
+        for statement in node.body
+        if isinstance(statement, ast.FunctionDef) and statement.name in DECLARATIONS
+    ]
+
+
+def _container_methods(node: ast.ClassDef, container: str) -> dict[str, ast.FunctionDef]:
+    """The methods a category installs through one of its ``*Methods`` classes."""
+    for statement in node.body:
+        if isinstance(statement, ast.ClassDef) and statement.name == container:
+            return {
+                method.name: method
+                for method in statement.body
+                if isinstance(method, ast.FunctionDef)
+            }
+    return {}
+
+
+def _object_methods(node: ast.ClassDef) -> dict[str, ast.FunctionDef]:
+    """The methods a category installs on its objects: its ``ParentMethods`` body."""
+    return _container_methods(node, "ParentMethods")
+
+
+def _factories(trees: list[ast.Module]) -> dict[str, str]:
+    """Module-level functions whose whole body returns one category expression.
+
+    ``def FiniteSets(): return Sets().Finite()`` names the category
+    ``Sets.Finite``; a declaration of ``FiniteSets()`` declares that vertex.
+    A name defined twice is left unresolved.
+    """
+    found: dict[str, list[str]] = {}
+    for tree in trees:
+        for statement in tree.body:
+            if not isinstance(statement, ast.FunctionDef) or statement.args.args:
+                continue
+            body = [
+                s
+                for s in statement.body
+                if not (isinstance(s, ast.Expr) and isinstance(s.value, ast.Constant))
+            ]
+            match body:
+                case [ast.Return(value=ast.Call() as value)]:
+                    found.setdefault(statement.name, []).append(ast.unparse(value))
+    return {
+        name: expressions[0]
+        for name, expressions in found.items()
+        if len(expressions) == 1
+    }
+
+
+def _unfold(
+    expression: str, factories: dict[str, str], imported: dict[str, tuple[str, str]]
+) -> str:
+    """The expression with a factory call replaced by the category it returns."""
+    base, axioms = _axiom_calls(expression)
+    match base:
+        case ast.Call(func=ast.Name(id=name), args=[], keywords=[]) if (
+            _resolved(name, imported) in factories
+        ):
+            return factories[_resolved(name, imported)] + "".join(
+                f".{axiom}()" for axiom in axioms
+            )
+    return expression
+
+
+def _protected(names: tuple[str, ...]) -> bool:
+    return any(name.startswith("_") for name in names)
+
+
+def _is_category(node: ast.ClassDef, known: set[str]) -> bool:
+    for base in node.bases:
+        if _head(ast.unparse(base)) in CATEGORY_BASES | known:
+            return True
+    return False
+
+
+def _resolved(head: str, imported: dict[str, tuple[str, str]]) -> str:
+    """Follow ``import X as Y`` back, so an alias names the category it aliases."""
+    binding = imported.get(head)
+    return binding[1] if binding is not None else head
+
+
+def _origin(head: str, imported: dict[str, tuple[str, str]], known: set[str]) -> str:
+    """Say where a declared supercategory's name comes from."""
+    binding = imported.get(head)
+    if binding is not None and binding[0].split(".")[0] == "sage":
+        return "sage"
+    if head in known or (binding is not None and binding[1] in known):
+        return "owned"
+    if binding is not None:
+        return "owned"
+    return "expression"
+
+
+def read_tree(root: Path) -> list[CategoryDeclaration]:
+    """Read every category declared under ``root``, in source order per file."""
+    sources = sorted(root.rglob("*.py"))
+    assert root.is_dir() and sources, f"No Python source tree at {root}"
+    parsed: list[tuple[Path, ast.Module]] = []
+    for path in sources:
+        parsed.append(
+            (path, ast.parse(path.read_text(encoding="utf-8"), filename=str(path)))
+        )
+
+    known: set[str] = set()
+    # Close the declared Python inheritance chain independently of file order.
+    previous: set[str] | None = None
+    while previous != known:
+        previous = known.copy()
+        for _, tree in parsed:
+            for node in ast.walk(tree):
+                if isinstance(node, ast.ClassDef) and _is_category(node, known):
+                    known.add(node.name)
+    category_classes = set(known)
+    # A category name is also bound by a factory function or a rebinding, so
+    # those count as defined when a declaration names them.
+    for _, tree in parsed:
+        known |= _module_level_names(tree)
+    factories = _factories([tree for _, tree in parsed])
+
+    declarations: list[CategoryDeclaration] = []
+    for path, tree in parsed:
+        imported = _imported_names(tree)
+        for scope, node in _classes(tree):
+            if not _is_category(node, known):
+                continue
+            declaring = _declarations(node)
+            split = (
+                _optional_parameter_supercategories(node, declaring[0])
+                if len(declaring) == 1 and declaring[0].name == "super_categories"
+                else None
+            )
+            variants = (
+                [("", split[1]), (split[0], split[2])]
+                if split is not None
+                else [
+                    (
+                        "",
+                        tuple(
+                            expression
+                            for declaration in declaring
+                            for expression in _returned_supercategories(declaration)
+                        ),
+                    )
+                ]
+            )
+            for parameter, expressions in variants:
+                declarations.append(
+                    CategoryDeclaration(
+                        name=node.name,
+                        qualified_name=".".join((*scope, node.name))
+                        + (f"({parameter})" if parameter else ""),
+                        path=str(path),
+                        line=node.lineno,
+                        bases=tuple(_head(ast.unparse(base)) for base in node.bases),
+                        summary=_summary(node),
+                        declares=bool(declaring),
+                        abstract=any(_is_abstract(d) for d in declaring),
+                        supercategories=tuple(
+                            Supercategory(
+                                expression=expression,
+                                head=_head(unfolded),
+                                resolved=_resolved(_head(unfolded), imported),
+                                origin=_origin(_head(unfolded), imported, known),
+                                axioms=_axioms(unfolded),
+                                parameters=_category_parameters(
+                                    unfolded, imported, category_classes
+                                ),
+                            )
+                            for expression in expressions
+                            for unfolded in (_unfold(expression, factories, imported),)
+                        ),
+                        # A class nested in a category is that category with the
+                        # axioms the nesting names; a protected nested class is a
+                        # construction on it, such as its Mor category, and refines
+                        # nothing.
+                        axiom_of=scope[0]
+                        if scope
+                        and scope[0] in known
+                        and not _protected((*scope[1:], node.name))
+                        else "",
+                        nested_in=_vertex(scope[0], scope[1:])
+                        if scope
+                        and scope[0] in known
+                        and _protected((*scope[1:], node.name))
+                        else "",
+                        parameter=parameter,
+                        object_methods=tuple(_object_methods(node)),
+                    )
+                )
+    return declarations
+
+
+def _classes(
+    tree: ast.Module,
+) -> list[tuple[tuple[str, ...], ast.ClassDef]]:
+    """Every class in the module, each with the class names enclosing it."""
+    found: list[tuple[tuple[str, ...], ast.ClassDef]] = []
+
+    def walk(body: list[ast.stmt], scope: tuple[str, ...]) -> None:
+        for statement in body:
+            if isinstance(statement, ast.ClassDef):
+                found.append((scope, statement))
+                walk(statement.body, (*scope, statement.name))
+
+    walk(tree.body, ())
     return found
 
 
-def _elements(returned: ast.expr) -> tuple[ast.expr, ...]:
-    r"""The declaration expressions a return carries.
-
-    A list or tuple carries one declaration per element -- a starred element is
-    a computed one, kept so ``audit`` can report it -- and any other expression
-    carries one declaration of its own, which :func:`_stated` refuses to name
-    when the source does not.
-    """
-    if isinstance(returned, (ast.List, ast.Tuple)):
-        return tuple(returned.elts)
-    return (returned,)
-
-
-def _class_vertex(module: _Module, qualname: str) -> Category:
-    r"""The vertex a class path names: the class, and the axioms it is written under.
-
-    A class nested in an axiom is an object of that axiom, and an axiom class is
-    the vertex its base already names with one more refinement: ``Lattices.Even``
-    is the vertex ``Lattices`` refined by ``Even``, which is the node Sage's join
-    builds and the one an axiom reduction walks down from.
-    """
-    parts = qualname.split(".")
-    for depth in range(1, len(parts) + 1):
-        declared = module.classes.get(".".join(parts[:depth]))
-        if declared is not None and any(
-            base.startswith(AXIOM_BASE) for base in declared.bases
-        ):
-            return Category(
-                module.owner, ".".join(parts[:depth - 1]), tuple(sorted(parts[depth - 1:]))
-            )
-    return Category(module.owner, qualname)
+def render_table(declarations: list[CategoryDeclaration]) -> str:
+    lines = [
+        f"{len(declarations)} categories declared under the parsed tree.",
+        "",
+        "Each row is what the source says: the category, and the supercategories",
+        "its `super_categories()` returns.  A row with no declaration inherits",
+        "one; a row marked `abstract` requires its subcategories to supply one.",
+        "",
+    ]
+    width = max((len(d.qualified_name) for d in declarations), default=0)
+    for declaration in sorted(declarations, key=lambda d: d.qualified_name):
+        if declaration.abstract:
+            stated = "<abstract>"
+        elif not declaration.declares:
+            stated = "<inherited>"
+        elif not declaration.supercategories:
+            stated = "<none returned>"
+        else:
+            stated = ", ".join(d.expression for d in declaration.supercategories)
+        lines.append(f"{declaration.qualified_name:<{width}}  {stated}")
+    return "\n".join(lines) + "\n"
 
 
-def _stated(
-    element: ast.expr,
-    module: _Module,
-    parsed: dict[str, _Module],
-    packages: dict[str, str],
-    index: dict[str, tuple[str, ...]],
-    local: frozenset[str],
-    seen: frozenset[tuple[str, str]],
-) -> _Stated:
-    r"""The vertex one declaration expression names, or why it names none."""
-    if isinstance(element, ast.Starred):
-        return _Stated(None, COMPUTED, (), ast.unparse(element))
-    written = ast.unparse(element)
-    head, steps = _chain(element)
-    if not isinstance(head, ast.Name) or head.id in local or head.id == "self":
-        return _Stated(None, COMPUTED, (), written)
-    if head.id in module.modules:
-        return _member(
-            module.modules[head.id], steps, written, parsed, packages, index,
-            seen | {(module.owner, head.id)},
-        )
-    named = _name(module, head.id, parsed, packages, index, seen)
-    if named.category is None:
-        return _Stated(None, named.unresolved, (), written)
-    refined = _refined(named.category, steps, parsed)
-    return _Stated(refined.category, STATED, named.constructions + refined.constructions, written)
-
-
-def _member(
-    dotted: str,
-    steps: tuple[tuple[str, bool], ...],
-    written: str,
-    parsed: dict[str, _Module],
-    packages: dict[str, str],
-    index: dict[str, tuple[str, ...]],
-    seen: frozenset[tuple[str, str]],
-) -> _Stated:
-    r"""A declaration written through a module: ``owned_sets.FiniteSets()``.
-
-    The first step names the member.  A module this reader did not parse is
-    Sage's, so the member is a Sage category; a module of the tree's is read the
-    same way any other name is.
-    """
-    if not steps:
-        return _Stated(None, COMPUTED, (), written)
-    owner = packages.get(dotted)
-    if owner is None:
-        return _Stated(Category("sage", steps[0][0]), STATED, (), written)
-    named = _name(parsed[owner], steps[0][0], parsed, packages, index, seen)
-    if named.category is None:
-        return _Stated(None, named.unresolved, (), written)
-    refined = _refined(named.category, steps[1:], parsed)
-    return _Stated(refined.category, STATED, named.constructions + refined.constructions, written)
-
-
-def _name(
-    module: _Module,
-    name: str,
-    parsed: dict[str, _Module],
-    packages: dict[str, str],
-    index: dict[str, tuple[str, ...]],
-    seen: frozenset[tuple[str, str]],
-) -> _Stated:
-    r"""The category ``name`` denotes in ``module``: a class, a function's result, a value, an import.
-
-    A function the tree defines is read through its one return, which is where
-    ``FiniteSets()`` is ``Sets().Finite()``; a module-level assignment is read
-    through its value, which is where ``OwnedAbelianGroups`` is ``AbelianGroups``.
-    The reader follows both because the declaration names the category all the
-    same, and a reader that stopped at the class would report an edge missing
-    where the source writes it in a second spelling.
-
-    A name nothing binds is undefined, and a name the tree defines in several
-    modules and this one does not import is ambiguous: both are findings, and
-    neither is a vertex invented for it.
-    """
-    if (module.owner, name) in seen:
-        return _Stated(None, COMPUTED, (), name)
-    declared = module.classes.get(name)
-    if declared is not None:
-        return _Stated(_class_vertex(module, declared.qualname), STATED, (), name)
-    function = module.functions.get(name)
-    if function is not None:
-        return _returned(
-            module, name, function, parsed, packages, index, seen | {(module.owner, name)}
-        )
-    value = module.values.get(name)
-    if value is not None:
-        return _stated(
-            value, module, parsed, packages, index, frozenset(),
-            seen | {(module.owner, name)},
-        )
-    imported = module.imports.get(name)
-    if imported is not None:
-        from_module, original = imported
-        if from_module.split(".")[0] == "sage":
-            return _Stated(Category("sage", original), STATED, (), name)
-        owner = packages.get(from_module)
-        if owner is None:
-            return _Stated(None, COMPUTED, (), name)
-        return _name(parsed[owner], original, parsed, packages, index, seen | {owner})
-    owners = index.get(name, ())
-    match owners:
-        case (only,):
-            return _Stated(Category(only, name), STATED, (), name)
-        case ():
-            return _Stated(None, UNDEFINED, (), name)
-        case _:
-            return _Stated(None, AMBIGUOUS, (), name)
-
-
-def _returned(
-    module: _Module,
-    name: str,
-    function: _Function,
-    parsed: dict[str, _Module],
-    packages: dict[str, str],
-    index: dict[str, tuple[str, ...]],
-    seen: frozenset[tuple[str, str]],
-) -> _Stated:
-    r"""The category a function returns.
-
-    One return is followed; a function returning a category from several
-    branches states no single edge, so the reader records it as computed.
-    """
-    if len(function.returns) != 1:
-        return _Stated(None, COMPUTED, (), name)
-    return _stated(function.returns[0], module, parsed, packages, index, function.local, seen)
-
-
-def _refined(
-    vertex: Category,
-    steps: tuple[tuple[str, bool], ...],
-    parsed: dict[str, _Module],
-) -> _Stated:
-    r"""Walk the steps after a category's head: a refinement, a nested class, or a construction.
-
-    A step that takes no parameter refines the vertex: ``FinitelyGenerated`` and
-    ``Even`` name categories an object of the head also belongs to.  A name the
-    tree presents as a class nested in the head is that class.  A step that takes
-    a parameter is a construction applied to the head -- ``Subobjects(X)``,
-    ``SliceOver(X)`` -- recorded as such, because the tree presents no category
-    class for the result and the reader will not guess where it lands.
-    """
-    constructions: list[str] = []
-    for step, parameterised in steps:
-        nested = _nested(parsed, vertex, step)
-        if nested is not None:
-            vertex = nested
-            continue
-        if parameterised:
-            constructions.append(step)
-            continue
-        vertex = vertex.with_refinement(step)
-    return _Stated(vertex, STATED, tuple(constructions), "")
-
-
-def _nested(
-    parsed: dict[str, _Module], vertex: Category, step: str
-) -> Category | None:
-    r"""The class ``step`` names inside ``vertex``, when the tree presents one."""
-    module = parsed.get(vertex.owner)
-    if module is None:
-        return None
-    qualname = f"{vertex.name}.{step}"
-    if qualname not in module.classes:
-        return None
-    return _class_vertex(module, qualname)
-
-
-def _categorised(
-    declarations: tuple[Declaration, ...]
-) -> tuple[tuple[Declaration, ...], tuple[Category, ...]]:
-    r"""The declarations, and every vertex they name or refine.
-
-    Each refined vertex declares every vertex with one refinement fewer, so the
-    vertex set is closed under dropping refinements: the walk down from
-    ``Lattices.FinitelyGenerated.Nondegenerate.Even`` passes through every
-    combination of the three, which is what makes two orders of the same
-    refinements one vertex and one path.
-    """
-    vertices: set[Category] = set()
+def render_by_supercategory(declarations: list[CategoryDeclaration]) -> str:
+    """Group the tree the other way round: each supercategory, and who claims it."""
+    claimants: dict[str, list[str]] = {}
     for declaration in declarations:
-        vertices.add(declaration.declaring)
-        if declaration.declared is not None:
-            vertices.add(declaration.declared)
-    pending = list(vertices)
+        for head in declaration.heads:
+            claimants.setdefault(head, []).append(declaration.qualified_name)
+    lines = [
+        "Every declared supercategory, and the categories declaring it.",
+        "",
+        "Read a large group as one mathematical claim made many times: each",
+        "member asserts that its objects are objects of the heading.",
+        "",
+    ]
+    for head in sorted(claimants, key=lambda h: (-len(claimants[h]), h)):
+        members = sorted(claimants[head])
+        lines.append(f"{head}  ({len(members)})")
+        for member in members:
+            lines.append(f"    {member}")
+        lines.append("")
+    return "\n".join(lines)
+
+
+def render_foreign(declarations: list[CategoryDeclaration]) -> str:
+    """Owned categories that declare a Sage category as a supercategory.
+
+    The preamble owns its categories outright, so each row places an owned
+    category's objects inside a category this tree does not define, and the
+    claim can only be read in Sage's source.
+    """
+    rows = [d for d in declarations if d.sage_supercategories]
+    lines = [
+        f"{len(rows)} owned categories declare a supercategory whose name is Sage's.",
+        "",
+    ]
+    for declaration in sorted(rows, key=lambda d: d.qualified_name):
+        foreign = ", ".join(s.expression for s in declaration.sage_supercategories)
+        lines.append(f"{declaration.qualified_name}")
+        lines.append(f"    declares  {foreign}")
+        lines.append(f"    at        {declaration.path}:{declaration.line}")
+        lines.append("")
+    return "\n".join(lines)
+
+
+def _defined_names(declarations: list[CategoryDeclaration]) -> set[str]:
+    """Every category name the parsed tree binds, aliases and factories included."""
+    roots = {Path(d.path).parent for d in declarations}
+    bound: set[str] = set()
+    for root in roots:
+        for path in root.glob("*.py"):
+            try:
+                tree = ast.parse(path.read_text(encoding="utf-8"))
+            except (SyntaxError, OSError):
+                continue
+            bound |= _module_level_names(tree)
+    return bound
+
+
+def render_audit(declarations: list[CategoryDeclaration]) -> str:
+    """The mechanically checkable defects in the declared graph.
+
+    None of these needs a reading of what the objects are.  A name declared as
+    a supercategory that nothing defines is a missing category; a declaration
+    computed from a local variable is an edge this graph cannot state; a cycle
+    is a contradiction outright.  What a declaration *means* is read by a
+    mathematician against the category's own definition, not decided here.
+    """
+    declared = (
+        {d.name for d in declarations}
+        | {d.qualified_name for d in declarations}
+        | _defined_names(declarations)
+    )
+
+    missing: dict[str, list[str]] = {}
+    unstated: dict[str, list[str]] = {}
+    for declaration in declarations:
+        for supercategory in declaration.supercategories:
+            if supercategory.origin == "expression":
+                if supercategory.resolved not in declared:
+                    unstated.setdefault(supercategory.expression, []).append(
+                        declaration.qualified_name
+                    )
+            elif (
+                supercategory.origin == "owned"
+                and supercategory.resolved not in declared
+            ):
+                missing.setdefault(supercategory.resolved, []).append(
+                    declaration.qualified_name
+                )
+
+    # A category declaring its own name over other data (`Modules(R)` declaring
+    # `Modules(S)`) is a restriction-of-scalars edge, ruled out on 2026-09-16
+    # because Sage applies every axiom along it; reported apart from cycles
+    # because it is a loop on the name, not on the objects.
+    recursive = sorted(
+        {d.name for d in declarations if not d.parameter and d.name in d.heads}
+    )
+    # A strongly connected component with more than one category is a set of
+    # categories each declared to lie under the others.
+    cycles = [
+        ", ".join(sorted(_name(vertex) for vertex in component))
+        for component in _digraph(
+            _declared_edges(declarations)
+        ).strongly_connected_components()
+        if len(component) > 1
+    ]
+
+    lines = [
+        "Mechanically checkable defects in the declared category graph.",
+        "",
+        f"## Named as a supercategory, defined nowhere ({len(missing)})",
+        "",
+    ]
+    for head in sorted(missing, key=lambda h: (-len(missing[h]), h)):
+        lines.append(f"{head}  <- {', '.join(sorted(missing[head]))}")
+    lines += [
+        "",
+        f"## Declared from a local expression, so the edge is not stated ({len(unstated)})",
+        "",
+    ]
+    for expression in sorted(unstated):
+        lines.append(f"{expression}  <- {', '.join(sorted(unstated[expression]))}")
+    lines += [
+        "",
+        f"## Declared on its own name, with other data ({len(recursive)})",
+        "",
+        "A restriction-of-scalars edge, which Sage applies every axiom along;",
+        "restriction is a functor, never a declaration (AGENTS.md, Red flags).",
+        "",
+    ]
+    lines.extend(recursive or ["none"])
+    lines += ["", f"## Cycles among distinct categories ({len(cycles)})", ""]
+    lines.extend(cycles or ["none"])
+    return "\n".join(lines) + "\n"
+
+
+def _declared_edges(
+    declarations: list[CategoryDeclaration],
+) -> set[tuple[str, str]]:
+    """Edges between categories this tree defines, class self-declarations dropped.
+
+    An axiom category ``Base.A.B`` is the join of ``Base.A`` and ``Base.B``
+    (Sage's axiom semantics), so every axiom vertex, declared or merely named,
+    also declares each vertex with one axiom fewer.
+    """
+    names = {d.name for d in declarations}
+    # A construction whose own declaration is its parameter (``return
+    # [self.base_category()]``) declares nothing the reader can name at the
+    # class; each instance ``H(P)`` declares ``P``.
+    parameterized = {
+        d.name
+        for d in declarations
+        if d.supercategories
+        and all(s.origin == "expression" for s in d.supercategories)
+    }
+    edges = {
+        (d.vertex, supercategory.vertex)
+        for d in declarations
+        for supercategory in d.supercategories
+        if supercategory.resolved in names and supercategory.vertex != d.vertex
+    }
+    edges |= {
+        (supercategory.vertex, parameter)
+        for d in declarations
+        for supercategory in d.supercategories
+        if supercategory.resolved in parameterized
+        for parameter in supercategory.parameters
+    }
+    return edges
+
+
+def _axiom_edges(
+    declarations: list[CategoryDeclaration], declared: set[tuple[str, str]]
+) -> set[tuple[str, str]]:
+    """The edges Sage's join supplies, computed rather than written.
+
+    Each axiom vertex declares every vertex with one axiom fewer, down to the
+    base; and for a written ``X.S -> Y.T``, ``X.S+U`` declares ``Y.T+V`` where
+    ``V`` is the part of ``U`` that ``Y`` or a category above it defines
+    (``CategoryWithAxiom.super_categories`` applies the axiom to every
+    supercategory of the base, and ``_with_axiom_as_tuple`` walks upward to
+    the nearest category defining it).  A written edge on a join class,
+    ``Schemes.QuasiAffine.FiniteType -> Schemes.QuasiProjective``, therefore
+    reaches every join that includes those axioms.
+    """
+    nested: dict[str, set[str]] = {}
+    for d in declarations:
+        if d.axiom_of:
+            nested.setdefault(d.axiom_of, set()).update(d.qualified_name.split(".")[1:])
+    above: dict[str, set[str]] = {}
+    written: dict[str, set[tuple[frozenset[str], str, frozenset[str]]]] = {}
+    for below, over in declared:
+        below_base, *below_axioms = below.split(".")
+        over_base, *over_axioms = over.split(".")
+        written.setdefault(below_base, set()).add(
+            (frozenset(below_axioms), over_base, frozenset(over_axioms))
+        )
+        if not below_axioms and not over_axioms:
+            above.setdefault(below, set()).add(over)
+
+    # Axioms a base can apply: its own nested ones and those of every category
+    # above it, closed by iteration until nothing changes.
+    defined: dict[str, set[str]] = {b: set(a) for b, a in nested.items()}
+    changed = True
+    while changed:
+        changed = False
+        for base, overs in above.items():
+            gathered = set(defined.get(base, set()))
+            for over in overs:
+                gathered |= defined.get(over, set())
+            if gathered != defined.get(base, set()):
+                defined[base] = gathered
+                changed = True
+
+    pending = {v for edge in declared for v in edge if "." in v} | {
+        d.vertex for d in declarations if d.axiom_of
+    }
+    edges: set[tuple[str, str]] = set()
     while pending:
         vertex = pending.pop()
-        for refinement in vertex.refinements:
-            fewer = vertex.without_refinement(refinement)
-            if fewer not in vertices:
-                vertices.add(fewer)
-                pending.append(fewer)
-    return declarations, tuple(sorted(vertices))
+        base, *axioms = vertex.split(".")
+        targets = [
+            _vertex(base, tuple(a for a in axioms if a != dropped))
+            for dropped in axioms
+        ]
+        for stated, over, written_over_axioms in written.get(base, ()):
+            if not stated <= set(axioms):
+                continue
+            carried = {
+                a for a in axioms if a not in stated and a in defined.get(over, ())
+            }
+            target_axioms = tuple(written_over_axioms | carried)
+            if target_axioms and (stated or carried):
+                targets.append(_vertex(over, target_axioms))
+        for target in targets:
+            if (vertex, target) not in edges:
+                edges.add((vertex, target))
+                if "." in target:
+                    pending.add(target)
+    return edges
+
+
+def _all_edges(declarations: list[CategoryDeclaration]) -> set[tuple[str, str]]:
+    declared = _declared_edges(declarations)
+    return declared | _axiom_edges(declarations, declared)
+
+
+def _base_of(vertex: str) -> str:
+    return vertex.split(".", 1)[0]
+
+
+def _graph(edges: set[tuple[str, str]]) -> Graph:
+    from sage.graphs.graph import Graph
+
+    return Graph(sorted(edges))
+
+
+def _name(vertex: Hashable) -> str:
+    """A vertex of a graph built here, which is a category name.
+
+    Sage types a vertex as any hashable object; ``_graph`` and ``_digraph``
+    build every graph on the strings of ``_all_edges``.
+    """
+    assert isinstance(vertex, str)
+    return vertex
+
+
+def _digraph(edges: set[tuple[str, str]]) -> DiGraph:
+    from sage.graphs.digraph import DiGraph
+
+    return DiGraph(sorted(edges))
+
+
+def _shortcuts(declarations: list[CategoryDeclaration]) -> list[tuple[str, str]]:
+    """Written declarations a longer path already gives.
+
+    The reduction runs over the written and the computed edges together, so a
+    computed edge parallel to a written path is never reported: Sage's join
+    drops it itself.
+    """
+    declared = _declared_edges(declarations)
+    reduction = set(
+        _digraph(_all_edges(declarations)).transitive_reduction().edges(labels=False)
+    )
+    return sorted(edge for edge in declared if edge not in reduction)
+
+
+def _chains_above(directed: DiGraph) -> dict[str, int]:
+    """The longest chain of declarations above each category.
+
+    ``level_sets()`` of the reversed graph puts a category in level ``k`` when
+    its longest path to a maximal category has ``k`` declarations (Sage's
+    ``DiGraph.level_sets``, linear time).  ``longest_path()`` is a MILP by
+    default; see sage-extensions ``TRAPS.md``.
+    """
+    return {
+        _name(vertex): level
+        for level, vertices in enumerate(directed.reverse().level_sets())
+        for vertex in vertices
+    }
+
+
+def _in_cyclic_order(graph: Graph, cycle: list[str]) -> list[str]:
+    """Order a cycle's vertices around it.
+
+    Sage's ``minimum_cycle_basis`` returns each cycle as a vertex set, not in
+    cyclic order (``sage.graphs.base.boost_graph.min_cycle_basis``).
+    """
+    induced = graph.subgraph(cycle).cycle_basis()
+    return (
+        [_name(vertex) for vertex in induced[0]] if len(induced) == 1 else sorted(cycle)
+    )
+
+
+def _minimum_cycle_basis(graph: Graph) -> list[list[str]]:
+    """Sage's default minimum cycle basis takes integer vertices only; relabel.
+
+    Wall time on the declared graph is in sage-extensions ``TRAPS.md``.
+    """
+    relabelled = graph.copy()
+    names = relabelled.relabel(return_map=True)
+    back = {integer: _name(name) for name, integer in names.items()}
+    return [
+        _in_cyclic_order(graph, [back[v] for v in cycle])
+        for cycle in relabelled.minimum_cycle_basis()
+    ]
+
+
+def _blocks(graph: Graph) -> list[list[str]]:
+    """The 2-connected blocks holding at least one cycle, largest first.
+
+    The cycle space is the direct sum of the blocks' cycle spaces, so every
+    generator lies inside one block.  A near-tree has only small blocks.
+    """
+    blocks, _ = graph.blocks_and_cut_vertices()
+    return sorted(
+        (sorted(_name(vertex) for vertex in b) for b in blocks if len(b) >= 3),
+        key=len,
+        reverse=True,
+    )
+
+
+def render_shape(declarations: list[CategoryDeclaration]) -> str:
+    """Breadth, depth and shortcuts.  The intended shape is deep and narrow."""
+    edges = _all_edges(declarations)
+    directed = _digraph(edges)
+    breadth = {
+        _name(vertex): d for vertex, d in directed.in_degree(labels=True).items()
+    }
+    depth = _chains_above(directed)
+
+    lines = [
+        "The declared graph as numbers.  Intended shape: near-tree, deep and narrow.",
+        "",
+        (
+            f"categories {directed.order()}   declarations {directed.size()}   pieces {_graph(edges).connected_components_number()}"
+        ),
+        f"longest chain of declarations = {max(depth.values(), default=0)}",
+        "",
+        "## Breadth: categories declared directly by the most others",
+        "",
+        "Each count is the number of unfactored declarations into that node,",
+        "unless every claimant's own definition places it one step below.",
+        "",
+    ]
+    for name in sorted(breadth, key=lambda n: (-breadth[n], n))[:15]:
+        if breadth[name]:
+            lines.append(f"{breadth[name]:5d}  {name}")
+
+    histogram: dict[int, int] = {}
+    for value in depth.values():
+        histogram[value] = histogram.get(value, 0) + 1
+    lines += ["", "## Depth: longest chain above each category", ""]
+    for value in sorted(histogram):
+        lines.append(f"  depth {value:2d}: {histogram[value]:4d} categories")
+
+    pieces = sorted(
+        (
+            [_name(vertex) for vertex in piece]
+            for piece in _graph(edges).connected_components(sort=True)
+        ),
+        key=len,
+        reverse=True,
+    )
+    lines += [
+        "",
+        f"## Pieces apart from the largest ({len(pieces) - 1})",
+        "",
+        "A category here declares nothing the tree defines, or only categories",
+        "that declare nothing the tree defines.",
+        "",
+    ]
+    lines.extend(f"{len(piece):5d}  {', '.join(piece)}" for piece in pieces[1:])
+
+    shortcuts = _shortcuts(declarations)
+    lines += [
+        "",
+        f"## Shortcut declarations, dropped by the transitive reduction ({len(shortcuts)})",
+        "",
+    ]
+    lines.extend(f"{below} -> {above}" for below, above in shortcuts)
+    return "\n".join(lines) + "\n"
+
+
+def render_cells(declarations: list[CategoryDeclaration]) -> str:
+    r"""Graph homology and cycle witnesses for inspection, not coherence verdicts."""
+    from sage.topology.simplicial_complex import SimplicialComplex
+
+    edges = _all_edges(declarations)
+    graph = _graph(edges)
+    homology = SimplicialComplex([list(edge) for edge in edges]).homology(reduced=False)
+    blocks = _blocks(graph)
+    shortcuts = _shortcuts(declarations)
+    dropped = {frozenset(edge) for edge in shortcuts}
+
+    def through_a_shortcut(cycle: list[str]) -> bool:
+        return any(
+            frozenset(pair) in dropped for pair in zip(cycle, cycle[1:] + cycle[:1])
+        )
+
+    written = {frozenset(edge) for edge in _declared_edges(declarations)}
+
+    def is_axiom_join(cycle: list[str]) -> bool:
+        # Inside one base every route is an inclusion of axiom subcategories,
+        # and a cycle with at most one written edge closes through edges Sage
+        # computes; either way the two routes are the same functor.
+        one_base = len({_base_of(v) for v in cycle}) == 1
+        written_edges = sum(
+            frozenset(pair) in written for pair in zip(cycle, cycle[1:] + cycle[:1])
+        )
+        return one_base or written_edges <= 1
+
+    lines = [
+        "Homology of the declaration graph.",
+        "This is the one-dimensional undirected complex, not the category nerve.",
+        "Cycles do not by themselves establish missing functors or failed coherence.",
+        "",
+        f"  0-cells {graph.order()}    1-cells {graph.size()}    2-cells 0",
+        f"  H_0 = {homology[0]}    H_1 = {homology[1]}    H_n = 0, n >= 2",
+        "",
+        f"## 2-connected blocks with a cycle ({len(blocks)}), by size",
+        "",
+        "Every generator lies inside one block.  A near-tree has only small",
+        "blocks; a large block is the region where declarations form a mesh.",
+        "",
+    ]
+    lines.extend(f"{len(block):5d}  {', '.join(block)}" for block in blocks)
+    lines += ["", f"## Killed by deleting one declaration ({len(shortcuts)})", ""]
+    lines.extend(f"{below} -> {above}" for below, above in shortcuts)
+
+    for block in blocks:
+        basis = _minimum_cycle_basis(graph.subgraph(block))
+        joins = [c for c in basis if is_axiom_join(c)]
+        remaining = [
+            c for c in basis if not is_axiom_join(c) and not through_a_shortcut(c)
+        ]
+        lines += [
+            "",
+            f"## Computed axiom joins, in the block of {len(block)} ({len(joins)})",
+            "",
+        ]
+        lines.extend(
+            " -> ".join(c + c[:1]) for c in sorted(joins, key=lambda c: (len(c), c))
+        )
+        lines += [
+            "",
+            f"## Other cycle witnesses for review, in the block of {len(block)} ({len(remaining)})",
+            "",
+        ]
+        lines.extend(
+            " -> ".join(c + c[:1]) for c in sorted(remaining, key=lambda c: (len(c), c))
+        )
+    return "\n".join(lines) + "\n"
+
+
+def render_dot(declarations: list[CategoryDeclaration]) -> str:
+    """The literal declared graph, one edge per declared supercategory."""
+    declared = {d.qualified_name for d in declarations} | {d.name for d in declarations}
+    lines = [
+        "digraph declared_categories {",
+        "  rankdir=BT;",
+        '  node [shape=box, fontname="Inter"];',
+    ]
+    for declaration in sorted(declarations, key=lambda d: d.qualified_name):
+        for supercategory in declaration.supercategories:
+            head = supercategory.head
+            style = "" if head in declared else ' [style=dashed, color="#b45309"]'
+            target = supercategory.vertex if head in declared else head
+            lines.append(f'  "{declaration.qualified_name}" -> "{target}"{style};')
+    lines.append("}")
+    return "\n".join(lines) + "\n"
+
+
+def render_json(declarations: list[CategoryDeclaration]) -> str:
+    payload = [
+        {
+            "name": d.name,
+            "qualified_name": d.qualified_name,
+            "vertex": d.vertex,
+            "parameter": d.parameter,
+            "axiom_of": d.axiom_of,
+            "source": f"{d.path}:{d.line}",
+            "bases": list(d.bases),
+            "summary": d.summary,
+            "declares": d.declares,
+            "abstract": d.abstract,
+            "supercategories": [
+                {
+                    "expression": s.expression,
+                    "head": s.head,
+                    "resolved": s.resolved,
+                    "origin": s.origin,
+                    "vertex": s.vertex,
+                    "axioms": list(s.axioms),
+                    "parameters": list(s.parameters),
+                }
+                for s in d.supercategories
+            ],
+            "heads": list(d.heads),
+        }
+        for d in sorted(declarations, key=lambda d: d.qualified_name)
+    ]
+    return json.dumps(payload, indent=1) + "\n"
 
 
 @dataclass(frozen=True)
-class DeclaredGraph:
-    r"""What the tree declares: the declarations, and the vertices they name.
+class Dispatch:
+    """How an object operation reaches an answer, read from its owner's body.
 
-    ``declarations`` carries each expression as written, in source order, so a
-    reader checks an edge against the line it came from.  Everything else is
-    derived from them: the stated edge set, the refinements that adjoin a vertex
-    to the one it declares, breadth, depth, the shortcut declarations, and the
-    cycle space.
+    ``hooks`` are the protected methods the body calls on ``self``; a category
+    below the owner that defines one, or the operation itself, supplies a
+    route.  ``branches`` are the memberships the body matches on, each a set of
+    vertices an object must lie under together; ``conditional`` marks a branch
+    whose guard also tests something other than membership.  ``asserts`` marks
+    a body that ends in an assertion when no hook or branch answers; a body
+    without one answers on every inheriting category.  An abstract operation
+    has neither: every inheriting category must define it.
     """
 
-    declarations: tuple[Declaration, ...]
-    categories: tuple[Category, ...]
-
-    def stated_edges(self) -> tuple[tuple[Category, Category], ...]:
-        r"""The edges the source writes down: one per declaration that names a category.
-
-        Repeated declarations of one edge are one edge here; the declarations
-        themselves stay in :attr:`declarations`, so the sites are not lost.
-        """
-        return tuple(sorted({
-            (declaration.declaring, declaration.declared)
-            for declaration in self.declarations
-            if declaration.declared is not None and declaration.declared != declaration.declaring
-        }))
-
-    def reduction_edges(self) -> tuple[tuple[Category, Category], ...]:
-        r"""The edges a refinement adds: each refined vertex declares one refinement fewer."""
-        return tuple(sorted({
-            (vertex, vertex.without_refinement(refinement))
-            for vertex in self.categories
-            for refinement in vertex.refinements
-        }))
-
-    def edges(self) -> tuple[tuple[Category, Category], ...]:
-        r"""Every edge of the complex: the stated ones, and the refinement reductions."""
-        return tuple(sorted({*self.stated_edges(), *self.reduction_edges()}))
-
-    def labelled(self, label: str) -> tuple[Category, ...]:
-        r"""The vertices that print as ``label``.
-
-        A label is what a reader types; a vertex is a class of one module.  Two
-        vertices sharing a label are returned side by side rather than merged, so
-        an assertion about one of them sees both.
-        """
-        return tuple(vertex for vertex in self.categories if vertex.label == label)
-
-    def declares(self, label: str) -> frozenset[str]:
-        r"""The labels the declarations of this category name.
-
-        A declaration that names no category statically -- a local expression --
-        contributes nothing here: :meth:`computed` reports those, because the
-        difference between "declares nothing" and "declares something the
-        reader will not guess" is the whole point of reading the source.
-        """
-        return frozenset(
-            declaration.declared.label
-            for declaration in self.declarations
-            if declaration.declaring.label == label and declaration.declared is not None
-            and declaration.declared != declaration.declaring
-        )
-
-    def supercategories_of(self, label: str) -> frozenset[str]:
-        r"""The labels one step below this category: what it declares, and what it refines.
-
-        Both are steps of the same complex.  A declaration states where an
-        object goes when the added structure is forgotten; a refinement states
-        the vertex an object of the refined category is also an object of, which
-        is the node that drops it.
-        """
-        return frozenset(
-            declared.label
-            for declaring, declared in self.edges()
-            if declaring.label == label
-        )
-
-    def computed(self) -> frozenset[str]:
-        r"""The categories whose declaration is a local expression, so no edge is stated."""
-        return frozenset(
-            declaration.declaring.label
-            for declaration in self.declarations
-            if declaration.unresolved == COMPUTED
-        )
-
-    def claimants(self, declared: Category) -> tuple[Declaration, ...]:
-        r"""The declarations that name ``declared``, in source order."""
-        return tuple(
-            declaration for declaration in self.declarations
-            if declaration.declared == declared
-        )
-
-    def breadth(self) -> dict[Category, int]:
-        r"""How many distinct categories declare each vertex directly.
-
-        Breadth counts statements a contributor made, not the refinements Sage's
-        join adds: a reduction is the node a refinement adjoins, not a claim
-        about where an object belongs.
-        """
-        counts: dict[Category, int] = {vertex: 0 for vertex in self.categories}
-        for declaring, declared in self.stated_edges():
-            counts[declared] = counts.get(declared, 0) + 1
-            counts.setdefault(declaring, counts.get(declaring, 0))
-        return counts
-
-    def roots(self) -> tuple[Category, ...]:
-        r"""The vertices that declare nothing: where a path of forgetful functors ends."""
-        declaring = {edge[0] for edge in self.edges()}
-        return tuple(vertex for vertex in self.categories if vertex not in declaring)
-
-    def depths(self) -> dict[Category, int]:
-        r"""Each vertex's fewest steps to a category that declares nothing.
-
-        A short path from a leaf to the root is the diagnostic: structure is
-        being restated at the leaf instead of inherited from the level that
-        carries it.
-        """
-        inward: dict[Category, list[Category]] = {vertex: [] for vertex in self.categories}
-        for declaring, declared in self.edges():
-            inward[declared].append(declaring)
-        depth = {root: 0 for root in self.roots()}
-        frontier = list(depth)
-        while frontier:
-            following = []
-            for vertex in frontier:
-                for claimant in inward[vertex]:
-                    if claimant not in depth:
-                        depth[claimant] = depth[vertex] + 1
-                        following.append(claimant)
-            frontier = following
-        return {vertex: depth.get(vertex, -1) for vertex in self.categories}
-
-    def shortcuts(self) -> tuple[tuple[Category, Category, tuple[Category, ...]], ...]:
-        r"""The declarations that state a path the graph already provides.
-
-        A declaration ``C -> D`` is a shortcut when ``D`` is reachable from ``C``
-        without it: two composites of forgetful functors the graph asserts are
-        equal, which is an edge carrying no reachability of its own.
-        """
-        outward: dict[Category, set[Category]] = {}
-        for declaring, declared in self.edges():
-            outward.setdefault(declaring, set()).add(declared)
-        return tuple(
-            (declaring, declared, path)
-            for declaring, declared in self.stated_edges()
-            for path in (_through(outward, declaring, declared),)
-            if path
-        )
-
-    def numbered(self) -> tuple[dict[Category, int], dict[int, Category]]:
-        r"""Each vertex's number in Sage's graph, and each number's vertex.
-
-        Sage's cycle routines hand their graph to a compiled implementation that
-        takes integers, so the drawing and the homology number the vertices and
-        the report prints the names back.
-        """
-        numbers = {vertex: index for index, vertex in enumerate(self.categories)}
-        return numbers, {index: vertex for vertex, index in numbers.items()}
-
-    def complex(self):
-        r"""Sage's graph of the complex: a vertex per category, an edge per declaration."""
-        from sage.all import Graph
-
-        numbers = self.numbered()[0]
-        graph = Graph(loops=False, multiedges=False)
-        graph.add_vertices(sorted(numbers.values()))
-        graph.add_edges((numbers[declaring], numbers[declared]) for declaring, declared in self.edges())
-        return graph
-
-    def cycle_rank(self) -> int:
-        r"""The rank of the cycle space: ``E - V + C`` of the declared complex.
-
-        The complex has a 0-cell per category and a 1-cell per declaration and no
-        2-cell, so its first homology is the whole cycle space and its
-        fundamental group is free of this rank.
-        """
-        graph = self.complex()
-        return graph.size() - graph.order() + graph.connected_components_number()
-
-    def generators(self) -> tuple[tuple[Category, ...], ...]:
-        r"""A minimum cycle basis: each generator a short closed path.
-
-        Sage's routine, not a spanning forest of this module's: the graph that
-        Sage itself traverses to join and linearize the preamble's categories is
-        the same object, and a cycle basis computed any other way answers a
-        different question about it.
-        """
-        vertices = self.numbered()[1]
-        return tuple(
-            tuple(vertices[number] for number in cycle)
-            for cycle in self.complex().minimum_cycle_basis()
-        )
-
-    def blocks(self) -> tuple[tuple[Category, ...], ...]:
-        r"""The 2-connected blocks, largest first: the coherence a change joins."""
-        vertices = self.numbered()[1]
-        return tuple(sorted(
-            (
-                tuple(sorted(vertices[number] for number in block))
-                for block in self.complex().biconnected_components()
-            ),
-            key=lambda block: (-len(block), block),
-        ))
+    operation: str
+    owner: str
+    source: str
+    abstract: bool
+    asserts: bool
+    hooks: tuple[str, ...]
+    branches: tuple[tuple[frozenset[str], bool], ...]
 
 
-def _through(
-    outward: dict[Category, set[Category]], source: Category, target: Category
-) -> tuple[Category, ...]:
-    r"""A shortest path from ``source`` to ``target`` other than the declaration stating it.
+@cache
+def _parsed(path: str) -> ast.Module:
+    return ast.parse(Path(path).read_text(encoding="utf-8"))
 
-    Leaving ``source`` by any other edge and never stepping onto ``target``
-    before arriving is what is left once the declaration itself is removed: the
-    second route, when one exists.
+
+def _construction_axioms(
+    declarations: list[CategoryDeclaration], axiom_names: set[str]
+) -> dict[str, tuple[str, ...]]:
+    """The constructions on a category or an object, and the property axioms each names.
+
+    A construction declares only categories computed from its parameters,
+    or another construction: a slice ``C/X`` declares ``C``.  An axiom it
+    names is one it can place on the objects it builds.
     """
-    parents: dict[Category, Category] = {}
-    frontier = [source]
-    seen = {source}
-    while frontier:
-        following = []
-        for vertex in frontier:
-            for neighbour in sorted(outward.get(vertex, ())):
-                if vertex == source and neighbour == target:
+    names: set[str] = set()
+    while True:
+        grown = names | {
+            d.name
+            for d in declarations
+            if d.supercategories
+            and all(
+                s.origin == "expression" or s.resolved in names
+                for s in d.supercategories
+            )
+        }
+        if grown == names:
+            break
+        names = grown
+    found: dict[str, tuple[str, ...]] = {}
+    for d in declarations:
+        if d.name not in names:
+            continue
+        node, _ = _class_at(d)
+        # Only the category's declared supercategories place properties on
+        # every object.  An unrelated object method referring to an affine
+        # scheme does not make an atlas or a divisor group an affine scheme.
+        placement_methods = tuple(
+            member for member in node.body
+            if isinstance(member, ast.FunctionDef)
+            and member.name in {"super_categories", "extra_super_categories"}
+        )
+        found[d.name] = tuple(
+            sorted(
+                {
+                    n.func.attr
+                    for method in placement_methods
+                    for n in ast.walk(method)
+                    if isinstance(n, ast.Call)
+                    and isinstance(n.func, ast.Attribute)
+                    and n.func.attr in axiom_names
+                }
+            )
+        )
+    return found
+
+
+def _class_at(
+    declaration: CategoryDeclaration,
+) -> tuple[ast.ClassDef, dict[str, tuple[str, str]]]:
+    tree = _parsed(declaration.path)
+    for node in ast.walk(tree):
+        if isinstance(node, ast.ClassDef) and node.lineno == declaration.line:
+            return node, _imported_names(tree)
+    raise AssertionError(f"no class at {declaration.path}:{declaration.line}")
+
+
+def _membership(
+    node: ast.expr, imported: dict[str, tuple[str, str]], factories: dict[str, str]
+) -> str | None:
+    """The vertex ``X`` of a guard ``self in X``, or nothing for any other test."""
+    match node:
+        case ast.Compare(
+            left=ast.Name(id="self"), ops=[ast.In()], comparators=[category]
+        ):
+            text = _unfold(ast.unparse(category), factories, imported)
+            return _vertex(_resolved(_head(text), imported), _axioms(text))
+    return None
+
+
+_THE_OBJECT = ast.Name(id="self")
+"""The guard of a body reached without a branch: it is about the object."""
+
+
+def _hook_called(node: ast.AST) -> str | None:
+    """The name ``_x`` when ``node`` is a call ``self._x(...)`` of a protected method of the object."""
+    match node:
+        case ast.Call(func=ast.Attribute(value=ast.Name(id="self"), attr=attr)) if (
+            attr.startswith("_") and not attr.startswith("__")
+        ):
+            return attr
+    return None
+
+
+def _about_the_object(test: ast.expr, hooked: set[str]) -> bool:
+    """Whether an assertion tests the object itself or what one of its hooks returned.
+
+    ``assert ring in IntegralDomains()`` states a hypothesis on a parameter,
+    not the absence of a route for the object.
+    """
+    names = {node.id for node in ast.walk(test) if isinstance(node, ast.Name)}
+    return "self" in names or bool(names & hooked)
+
+
+def _ends_in_assertion(
+    body: list[ast.stmt], hooked: set[str], guard: ast.expr = _THE_OBJECT
+) -> bool:
+    """Whether the statement reached when every earlier branch falls through asserts about the object.
+
+    A precondition such as ``assert other in Sets()`` opens a body and is not
+    this; the last statement, an assertion just before a final ``return``, the
+    last case of a final ``match`` and the ``else`` of a final ``if`` are.  A
+    ``raise`` is judged by the guard that reaches it, so the last case of
+    ``match ring:`` states a hypothesis on the ring.
+    """
+    match body[-2:]:
+        case [ast.Assert(test=test), ast.Return()]:
+            return _about_the_object(test, hooked)
+    match body[-1]:
+        case ast.Assert(test=test):
+            return _about_the_object(test, hooked)
+        case ast.Raise():
+            return _about_the_object(guard, hooked)
+        case ast.Match(subject=subject, cases=cases):
+            guards = [case.guard for case in cases if case.guard is not None]
+            return _ends_in_assertion(
+                cases[-1].body, hooked, ast.Tuple(elts=[subject, *guards])
+            )
+        case ast.If(test=test, orelse=orelse) if orelse:
+            return _ends_in_assertion(orelse, hooked, test)
+    return False
+
+
+def _dispatch(
+    declaration: CategoryDeclaration, operation: str, factories: dict[str, str]
+) -> Dispatch:
+    node, imported = _class_at(declaration)
+    method = _object_methods(node)[operation]
+    hooks = sorted(
+        {hook for node in ast.walk(method) if (hook := _hook_called(node)) is not None}
+    )
+    branches: list[tuple[frozenset[str], bool]] = []
+    consumed: set[int] = set()
+    for test in ast.walk(method):
+        if isinstance(test, ast.BoolOp) and isinstance(test.op, ast.And):
+            found = {
+                vertex
+                for value in test.values
+                if (vertex := _membership(value, imported, factories)) is not None
+            }
+            consumed.update(id(value) for value in test.values)
+            if found:
+                branches.append((frozenset(found), len(found) < len(test.values)))
+    for test in ast.walk(method):
+        if (
+            isinstance(test, ast.Compare)
+            and id(test) not in consumed
+            and (vertex := _membership(test, imported, factories)) is not None
+        ):
+            branches.append((frozenset({vertex}), False))
+    return Dispatch(
+        operation=operation,
+        owner=declaration.vertex,
+        source=f"{declaration.path}:{method.lineno}",
+        abstract=_is_abstract(method),
+        asserts=_ends_in_assertion(
+            method.body,
+            {
+                target.id
+                for assignment in ast.walk(method)
+                if isinstance(assignment, ast.Assign)
+                and any(
+                    _hook_called(node) is not None
+                    for node in ast.walk(assignment.value)
+                )
+                for target in assignment.targets
+                if isinstance(target, ast.Name)
+            },
+        ),
+        hooks=tuple(hooks),
+        branches=tuple(dict.fromkeys(branches)),
+    )
+
+
+def _up_sets(declarations: list[CategoryDeclaration]) -> dict[str, set[str]]:
+    """Every vertex above each vertex, strictly, along declared and axiom edges."""
+    edges = _all_edges(declarations)
+    vertices = {d.vertex for d in declarations} | {v for e in edges for v in e}
+    supers = {v: {b for a, b in edges if a == v} for v in vertices}
+    above: dict[str, set[str]] = {}
+    for vertex in TopologicalSorter(supers).static_order():
+        above[vertex] = set(supers[vertex])
+        for parent in supers[vertex]:
+            above[vertex].update(above[parent])
+    return above
+
+
+def _realization_methods(
+    declarations: list[CategoryDeclaration],
+) -> dict[str, list[str]]:
+    """Methods of the classes that are not categories, by method name."""
+    found: dict[str, list[str]] = {}
+    for path in sorted({Path(d.path) for d in declarations}):
+        tree = ast.parse(path.read_text(encoding="utf-8"))
+        categories = {d.line for d in declarations if Path(d.path) == path}
+        for node in ast.walk(tree):
+            if (
+                isinstance(node, ast.ClassDef)
+                and node.lineno not in categories
+                and node.name != "ParentMethods"
+            ):
+                for method in node.body:
+                    if isinstance(method, ast.FunctionDef):
+                        found.setdefault(method.name, []).append(
+                            f"{node.name} {path}:{method.lineno}"
+                        )
+    return found
+
+
+def render_routes(
+    declarations: list[CategoryDeclaration], operations: list[str]
+) -> str:
+    """Each category that inherits an object operation, and what answers it there.
+
+    An operation is placed where it is defined; whether it answers on the
+    objects of a category below is a separate fact.  The owner's body reaches
+    an answer through protected hooks, through branches on membership, or, for
+    an abstract operation, through an override.  A category below the owner
+    with none of these in its up-set inherits the operation with only the
+    owner's assertion.  Without ``--operation`` the view lists only operations
+    whose body asserts; an abstract operation is a contract on the classes
+    that realize objects, and is listed when it is named.
+    A construction declaring only its parameter (``SliceCategory(C, X)``
+    declares ``C``) inherits every operation of every category it is applied
+    to, so it is listed under every operation.
+
+    This is a source reading.  A realization class outside the category graph
+    may supply a hook for its own objects; those classes are listed, and they
+    route only the objects they construct.
+    """
+    above = _up_sets(declarations)
+    by_vertex = {d.vertex: d for d in declarations}
+    parameterized = {
+        d.vertex
+        for d in declarations
+        if d.supercategories
+        and all(s.origin == "expression" for s in d.supercategories)
+    }
+    on_parameter = {v for v in above if v in parameterized or above[v] & parameterized}
+    realizations = _realization_methods(declarations)
+    factories = _factories(
+        [
+            ast.parse(path.read_text(encoding="utf-8"))
+            for path in sorted({Path(d.path) for d in declarations})
+        ]
+    )
+
+    definers: dict[str, list[str]] = {}
+    for d in declarations:
+        for name in d.object_methods:
+            if not name.startswith("_"):
+                definers.setdefault(name, []).append(d.vertex)
+    selected = operations or sorted(definers)
+    unknown = [name for name in selected if name not in definers]
+    assert not unknown, f"no category defines the object operation(s) {unknown!r}"
+
+    reports: list[tuple[int, list[str]]] = []
+    for name in selected:
+        owners = [
+            v
+            for v in definers[name]
+            if not any(other in above.get(v, set()) for other in definers[name])
+        ]
+        for owner in sorted(owners):
+            dispatch = _dispatch(by_vertex[owner], name, factories)
+            if not (dispatch.abstract or dispatch.asserts):
+                if operations:
+                    reports.append(
+                        (
+                            0,
+                            [
+                                f"## {name}, introduced by {owner} ({dispatch.source})",
+                                "",
+                                "its body answers on every inheriting category; it ends in no assertion",
+                            ],
+                        )
+                    )
+                continue
+            if dispatch.abstract and not operations:
+                continue
+            supplies = {name, *dispatch.hooks}
+            inheritors = sorted(v for v in above if owner in above[v]) + sorted(
+                v for v in on_parameter if owner not in above[v] and v != owner
+            )
+            routes: dict[str, str] = {}
+            for vertex in inheritors:
+                reach = above[vertex] | {vertex}
+                providers = sorted(
+                    w
+                    for w in reach
+                    if w != owner
+                    and w in by_vertex
+                    and supplies & set(by_vertex[w].object_methods)
+                    and (owner in above[w] or w in on_parameter)
+                )
+                taken = [
+                    " and ".join(sorted(members))
+                    + (" (with a further condition)" if conditional else "")
+                    for members, conditional in dispatch.branches
+                    if members <= reach
+                ]
+                routes[vertex] = "; ".join(
+                    [
+                        *(f"defined at {w}" for w in providers),
+                        *(f"branch on {t}" for t in taken),
+                    ]
+                )
+            fallback = {vertex for vertex, route in routes.items() if not route}
+            topmost = sorted(
+                vertex for vertex in fallback if not (above[vertex] & fallback)
+            )
+            definitions = sorted(
+                {
+                    w
+                    for vertex in inheritors
+                    for w in [vertex]
+                    if w in by_vertex and supplies & set(by_vertex[w].object_methods)
+                }
+            )
+            lines = [
+                f"## {name}, defined at {owner} ({dispatch.source})",
+                "",
+                "abstract: every inheriting category must define it"
+                if dispatch.abstract
+                else f"its hooks: {', '.join(dispatch.hooks) or 'none'}",
+                f"its branches: {'; '.join(dict.fromkeys(' and '.join(sorted(m)) for m, _ in dispatch.branches)) or 'none'}",
+                f"categories below it that define {name} or a hook: {', '.join(definitions) or 'none'}",
+            ]
+            hooked = sorted(
+                {entry for hook in supplies for entry in realizations.get(hook, [])}
+            )
+            if hooked:
+                lines += [
+                    f"realization classes defining {name} or a hook, for the objects they construct:",
+                    *(f"  {entry}" for entry in hooked),
+                ]
+            lines += [
+                "",
+                f"### Topmost categories whose objects reach the fallback assertion ({len(topmost)})",
+                "",
+                "An override or a functor to an answering category at one of these covers the categories below it.",
+                "",
+            ]
+            lines += [
+                f"{vertex}{'  [a construction on its parameter category]' if vertex in on_parameter else ''}"
+                f"  ({sum(1 for other in fallback if vertex in above[other])} below it also reach it)"
+                for vertex in topmost
+            ] or ["none"]
+            if operations:
+                lines += [
+                    "",
+                    f"### Categories answered, and how ({len(routes) - len(fallback)})",
+                    "",
+                ]
+                lines += [
+                    f"{vertex}  <- {route}"
+                    for vertex, route in sorted(routes.items())
+                    if route
+                ] or ["none"]
+            reports.append((len(topmost), lines))
+    header = [
+        "Object operations whose definition ends in a fallback assertion, read from source.",
+        "Each section names where the operation is defined and overridden, then the",
+        "topmost categories whose objects reach that fallback: no override, hook",
+        "definition or case of the definition applies anywhere above them.",
+        "",
+    ]
+    body = [
+        line
+        for _, lines in sorted(reports, key=lambda r: -r[0])
+        for line in [*lines, ""]
+    ]
+    return "\n".join(header + body)
+
+
+def _construction_sites(
+    root: Path, factories: dict[str, str], trees: dict[Path, ast.Module] | None = None
+) -> list[tuple[str, str, list[tuple[str, str]]]]:
+    """Every function that builds an object with ``_object_of``, and what it places on that object.
+
+    Each site gives its location, the category it places the object in when
+    no guard applies, and the pairs (property of an input, category added to
+    the result) read from guards ``x in P`` whose branch places the result
+    in a further category.
+    """
+    sites = []
+    if trees is None:
+        trees = {
+            path: ast.parse(path.read_text(encoding="utf-8"))
+            for path in sorted(root.rglob("*.py"))
+        }
+    for path, tree in trees.items():
+        imported = _imported_names(tree)
+
+        def vertex_of(
+            node: ast.expr, imported: dict[str, tuple[str, str]] = imported
+        ) -> str:
+            text = _unfold(ast.unparse(node), factories, imported)
+            return _vertex(_resolved(_head(text), imported), _axioms(text))
+
+        def placed(statements: list[ast.stmt]) -> list[str]:
+            found = []
+            for statement in statements:
+                # A nested guard has its own hypotheses.  Its placement is
+                # not a consequence of an enclosing, weaker guard alone.
+                if isinstance(statement, (ast.If, ast.Match, ast.For, ast.While)):
                     continue
-                if neighbour == target:
-                    path = [target, vertex]
-                    while path[-1] != source:
-                        path.append(parents[path[-1]])
-                    return tuple(reversed(path))
-                if neighbour not in seen:
-                    seen.add(neighbour)
-                    parents[neighbour] = vertex
-                    following.append(neighbour)
-        frontier = following
-    return ()
+                for node in ast.walk(statement):
+                    match node:
+                        case ast.Call(
+                            func=ast.Attribute(
+                                value=ast.Name(id="placements"), attr="append"
+                            ),
+                            args=[category],
+                        ):
+                            found.append(vertex_of(category))
+                        case ast.Assign(
+                            targets=[ast.Name(id="placement")], value=category
+                        ):
+                            found.append(vertex_of(category))
+            return found
+
+        for function in ast.walk(tree):
+            if not isinstance(function, ast.FunctionDef):
+                continue
+            calls = [
+                node
+                for node in ast.walk(function)
+                if isinstance(node, ast.Call)
+                and isinstance(node.func, ast.Name)
+                and node.func.id == "_object_of"
+            ]
+            if not calls:
+                continue
+            guarded: list[tuple[ast.expr, list[ast.stmt]]] = []
+            for node in ast.walk(function):
+                match node:
+                    case ast.If(test=test, body=body):
+                        guarded.append((test, body))
+                    case ast.match_case(guard=guard, body=body) if guard is not None:
+                        guarded.append((guard, body))
+            pairs = []
+            for test, body in guarded:
+                # Do not turn one conjunct of a compound guard into a
+                # sufficient hypothesis (enumerated factors alone never
+                # make their Cartesian product finite).
+                inputs = (
+                    [vertex_of(test.comparators[0])]
+                    if isinstance(test, ast.Compare)
+                    and len(test.ops) == 1
+                    and isinstance(test.ops[0], ast.In)
+                    and isinstance(test.left, ast.Name)
+                    else []
+                )
+                for result in placed(body):
+                    pairs.extend((source, result) for source in inputs)
+            default = ", ".join(
+                sorted({ast.unparse(call.args[0]) for call in calls if call.args})
+            )
+            sites.append(
+                (
+                    f"{path}:{function.lineno} {function.name}",
+                    default,
+                    list(dict.fromkeys(pairs)),
+                )
+            )
+    return sites
 
 
-def _shown(categories) -> dict[Category, str]:
-    r"""What each vertex prints as: its label, and its owner when labels repeat.
+def render_properties(declarations: list[CategoryDeclaration], root: Path) -> str:
+    """For each property axiom: the categories under it, and the construction sites that place results under it.
 
-    Two modules may each write ``Objects``, and the reader keeps them apart as
-    vertices; the printed form does too, because a report that silently merged
-    them would read as one category with two declarations.
+    A viewer for auditing by hand. It lists what the source declares and places and
+    judges nothing: whether a result belongs under a property is for the reader.
     """
-    shares: dict[str, int] = {}
-    for vertex in categories:
-        shares[vertex.label] = shares.get(vertex.label, 0) + 1
-    return {
-        vertex: (
-            vertex.label if shares[vertex.label] == 1
-            else f"{vertex.label} ({vertex.owner})"
-        )
-        for vertex in categories
-    }
-
-
-def _rendered(rows: tuple[tuple[str, str], ...]) -> tuple[str, ...]:
-    r"""Two columns, the second aligned: the statement, and where it is written."""
-    if not rows:
-        return ()
-    width = max(len(left) for left, _ in rows)
-    return tuple(f"{left.ljust(width)}  {right}" if right else left for left, right in rows)
-
-
-def declaration_rows(graph: DeclaredGraph) -> tuple[str, ...]:
-    r"""Every category and what it declares: the default view.
-
-    One line per declaration expression, with the expression as written and the
-    site it came from, so a reader compares the edge against its source rather
-    than against a summary of it.
-    """
-    shown = _shown(graph.categories)
-    rows = []
-    for declaration in graph.declarations:
-        if declaration.declared is None:
-            target = f"({declaration.unresolved})"
-        else:
-            target = shown[declaration.declared]
-            if declaration.constructions:
-                target = f"{target} via {'.'.join(declaration.constructions)}"
-        right = "  ".join(part for part in (
-            declaration.stated,
-            "(conditional)" if declaration.conditional else "",
-            f"[{declaration.method} {declaration.site}]",
-        ) if part)
-        rows.append((f"{shown[declaration.declaring]} -> {target}", right))
-    return _rendered(tuple(rows))
-
-
-def supercategory_rows(graph: DeclaredGraph) -> tuple[str, ...]:
-    r"""Each supercategory, and who claims it: the audit surface for placement.
-
-    A large group under one heading is one mathematical claim made many times
-    over, and reading the members together is how a member that does not belong
-    becomes visible.
-    """
-    shown = _shown(graph.categories)
-    groups = []
-    for declared in graph.categories:
-        claimants = tuple(
-            declaration for declaration in graph.claimants(declared)
-            if declaration.declaring != declared
-        )
-        if claimants:
-            groups.append((-len(claimants), shown[declared], claimants))
-    lines: list[str] = []
-    for negative, label, claimants in sorted(groups, key=lambda group: (group[0], group[1])):
-        lines.append(f"{label}  <- {-negative} claimants")
-        lines.extend(
-            f"    {shown[declaration.declaring]}  {declaration.stated}  [{declaration.site}]"
-            for declaration in claimants
-        )
-    return tuple(lines)
-
-
-def foreign_rows(graph: DeclaredGraph) -> tuple[str, ...]:
-    r"""Owned categories declaring a Sage category.
-
-    The tree presents its own categories; a declaration that lands in Sage's is
-    a placement the tree does not own, and the reader lists each one so it can
-    be read rather than counted.
-    """
-    shown = _shown(graph.categories)
-    return _rendered(tuple(
-        (f"{shown[declaration.declaring]} -> {shown[declaration.declared]}",
-         f"{declaration.stated}  [{declaration.site}]")
-        for declaration in graph.declarations
-        if declaration.declared is not None and declaration.declared.owner == "sage"
-    ))
-
-
-def shape_rows(graph: DeclaredGraph) -> tuple[str, ...]:
-    r"""Breadth, depth, and the declarations that are shortcuts.
-
-    Breadth at a node is how many categories declare it directly, which counts
-    unfactored edges.  Depth is the fewest steps from a leaf to a category that
-    declares nothing, and a short path is the diagnostic that structure is being
-    restated at the leaf.  A shortcut is a declaration whose target the graph
-    already reaches without it.
-    """
-    stated = graph.stated_edges()
-    reductions = graph.reduction_edges()
-    shown = _shown(graph.categories)
-    lines = [
-        f"vertices {len(graph.categories)}  declarations {len(graph.declarations)}"
-        f"  stated edges {len(stated)}  refinement reductions {len(reductions)}"
-        f"  components {graph.complex().connected_components_number()}"
-        f"  rank H1 {graph.cycle_rank()}",
-        "",
-        "breadth (declarations received, most first):",
-    ]
-    lines.extend(
-        f"  {count:>4}  {label}"
-        for count, label in sorted(
-            ((count, shown[vertex]) for vertex, count in graph.breadth().items() if count),
-            key=lambda row: (-row[0], row[1]),
-        )
+    above = _up_sets(declarations)
+    by_vertex = {d.vertex: d for d in declarations}
+    factories = _factories(
+        [
+            ast.parse(path.read_text(encoding="utf-8"))
+            for path in sorted(root.rglob("*.py"))
+        ]
     )
-    lines.append("")
-    lines.append("depth (steps to a category that declares nothing, deepest first):")
-    lines.extend(
-        f"  {depth:>4}  {label}"
-        for depth, label in sorted(
-            ((depth, shown[vertex]) for vertex, depth in graph.depths().items()),
-            key=lambda row: (-row[0], row[1]),
-        )
+    sites = _construction_sites(root, factories)
+    axiom_vertices = sorted(
+        v
+        for v in above
+        if "." in v
+        and "::" not in v
+        and len(v.split(".")) == 2
+        and v.split(".")[0] in by_vertex
     )
-    shortcuts = graph.shortcuts()
-    lines.append("")
-    lines.append(f"shortcut declarations: {len(shortcuts)}")
-    for declaring, declared, path in shortcuts:
-        route = " -> ".join(shown[vertex] for vertex in path)
-        lines.append(f"  {shown[declaring]} -> {shown[declared]}   also as {route}")
-    return tuple(lines)
-
-
-def cell_rows(graph: DeclaredGraph) -> tuple[str, ...]:
-    r"""The homology, and the cycles that owe a 2-cell.
-
-    The complex has a 0-cell per category, a 1-cell per declaration and no
-    higher cells, so every generator of its first homology is a pair of
-    composites of forgetful functors the graph asserts are equal, and the 2-cell
-    that would fill it is that assertion's proof.  A minimum cycle basis prints
-    each generator as a short closed path, and the 2-connected blocks are the
-    groups a change joins.
-    """
-    complex_ = graph.complex()
-    generators = sorted(graph.generators(), key=lambda cycle: (len(cycle), cycle))
-    shown = _shown(graph.categories)
-    lines = [
-        f"vertices {complex_.order()}  edges {complex_.size()}"
-        f"  components {complex_.connected_components_number()}"
-        f"  rank H1 {graph.cycle_rank()}  generators {len(generators)}",
-        "",
-        "generators (a minimum cycle basis, shortest first):",
-    ]
-    for index, cycle in enumerate(generators, start=1):
-        route = " -> ".join(shown[vertex] for vertex in cycle)
-        lines.append(f"  {index:>3}: {route} -> {shown[cycle[0]]}")
-    blocks = graph.blocks()
-    lines.append("")
-    lines.append("blocks (2-connected, largest first):")
-    for block in blocks:
-        joined = "  ".join(sorted(shown[vertex] for vertex in block))
-        lines.append(f"  {len(block):>4}  {joined}")
-    return tuple(lines)
-
-
-def audit_rows(graph: DeclaredGraph) -> tuple[str, ...]:
-    r"""What needs no reading of the objects: the declarations that state no edge.
-
-    A name declared as a supercategory and defined nowhere, a declaration
-    computed from a local expression so the edge is not stated at all, a
-    category declaring its own name, and a declaration whose target the graph
-    already reaches: each is a finding the reader cannot settle by reading the
-    line, which is why it is listed rather than resolved.
-    """
-    shown = _shown(graph.categories)
-    lines: list[str] = []
-    for title, tag in (
-        ("declared and not defined at the site", (UNDEFINED, AMBIGUOUS)),
-        ("computed, so the edge is not written down", (COMPUTED,)),
-    ):
-        found = tuple(
-            declaration for declaration in graph.declarations
-            if declaration.unresolved in tag
-        )
-        lines.append(f"{title}: {len(found)}")
-        lines.extend(
-            f"  {shown[declaration.declaring]}  {declaration.stated}"
-            f"  [{declaration.site}]"
-            for declaration in found
-        )
-        lines.append("")
-    selves = tuple(
-        declaration for declaration in graph.declarations
-        if declaration.declared == declaration.declaring
-    )
-    lines.append(f"declaring their own name: {len(selves)}")
-    lines.extend(
-        f"  {shown[declaration.declaring]}  {declaration.stated}  [{declaration.site}]"
-        for declaration in selves
-    )
-    shortcuts = graph.shortcuts()
-    lines.append("")
-    lines.append(f"shortcut declarations: {len(shortcuts)}")
-    for declaring, declared, path in shortcuts:
-        route = " -> ".join(shown[vertex] for vertex in path)
-        lines.append(f"  {shown[declaring]} -> {shown[declared]}   also as {route}")
-    lines.append("")
-    lines.append(
-        f"vertices {len(graph.categories)}  declarations {len(graph.declarations)}"
-        f"  rank H1 {graph.cycle_rank()}"
-    )
-    return tuple(lines)
-
-
-def report(graph: DeclaredGraph) -> dict:
-    r"""The graph as data: what a query reads, answered from the same vertices the views print."""
-    shown = _shown(graph.categories)
-    breadth = graph.breadth()
-    depth = graph.depths()
-    return {
-        "vertices": [
+    reports: list[tuple[int, list[str]]] = []
+    for axiom_vertex in axiom_vertices:
+        below = sorted(v for v in above if axiom_vertex in above[v])
+        propagating = sorted(
             {
-                "label": vertex.label,
-                "owner": vertex.owner,
-                "name": vertex.name,
-                "refinements": list(vertex.refinements),
-                "breadth": breadth.get(vertex, 0),
-                "depth": depth.get(vertex, -1),
+                (site, source, result)
+                for site, _, pairs in sites
+                for source, result in pairs
+                if result == axiom_vertex
             }
-            for vertex in graph.categories
-        ],
-        "declarations": [
-            {
-                "declaring": shown[declaration.declaring],
-                "declared": (
-                    None if declaration.declared is None else shown[declaration.declared]
-                ),
-                "stated": declaration.stated,
-                "method": declaration.method,
-                "site": declaration.site,
-                "unresolved": declaration.unresolved,
-                "constructions": list(declaration.constructions),
-                "conditional": declaration.conditional,
-            }
-            for declaration in graph.declarations
-        ],
-        "cycle_rank": graph.cycle_rank(),
-        "generators": [
-            " -> ".join(shown[vertex] for vertex in cycle) for cycle in graph.generators()
-        ],
-        "blocks": [sorted(shown[vertex] for vertex in block) for block in graph.blocks()],
-        "shortcuts": [
-            [shown[declaring], shown[declared], [shown[vertex] for vertex in path]]
-            for declaring, declared, path in graph.shortcuts()
-        ],
-    }
+        )
+        lines = [
+            f"## {axiom_vertex}",
+            "",
+            f"### Categories under {axiom_vertex} ({len(below)})",
+            "",
+            ", ".join(below) or "none",
+        ]
+        lines += [
+            "",
+            f"### Construction sites placing their result in {axiom_vertex} from a property of an input ({len(propagating)})",
+            "",
+        ]
+        lines += [f"{site}: input in {source}" for site, source, _ in propagating] or [
+            "none"
+        ]
+        reports.append((len(below), lines))
+    axiom_names = {v.split(".")[1] for v in axiom_vertices}
+    construction_axioms = _construction_axioms(declarations, axiom_names)
+    constructions = [
+        f"{d.vertex}  ({d.path}:{d.line}) declares {', '.join(s.expression for s in d.supercategories)}; "
+        f"places {', '.join(construction_axioms[d.name]) or 'no property axiom'}"
+        for d in sorted(declarations, key=lambda d: d.vertex)
+        if d.name in construction_axioms
+    ]
+    constructions_section = [
+        "## Constructions on a category or an object, and the property axioms they place on their objects",
+        "",
+        "A slice, subobject or quotient of a finite object is finite. A construction that names",
+        "no property axiom puts every object it builds in the categories it declares, whatever",
+        "properties its base object has.",
+        "",
+        *constructions,
+        "",
+    ]
+    stating = {site for site, _, pairs in sites if pairs}
+    silent = [
+        f"{site}: places in {default or 'a computed category'}"
+        for site, default, pairs in sites
+        if site not in stating
+    ]
+    lines = [
+        "## Construction sites that place their result by no property of their input",
+        "",
+        "A subset, quotient, product or image of a finite set is finite; a site listed here",
+        "places what it builds in the same category whatever its inputs are.",
+        "",
+        *silent,
+    ]
+    header = [
+        "Property axioms, the categories under them, and the construction sites that place results under them, read from source.",
+        "",
+    ]
+    body = [
+        line
+        for _, lines_ in sorted(reports, key=lambda r: -r[0])
+        for line in [*lines_, ""]
+    ]
+    return "\n".join([*header, *body, *constructions_section, *lines, ""])
 
 
-def rendered_json(graph: DeclaredGraph) -> str:
-    r"""The graph as one JSON object, for a query rather than for reading."""
-    return json.dumps(report(graph), indent=2, sort_keys=True)
+def _returns(function: ast.FunctionDef) -> list[ast.expr]:
+    """The returned expressions of ``function``, not of the functions nested in it."""
+    found: list[ast.expr] = []
+    pending: list[ast.AST] = list(function.body)
+    while pending:
+        node = pending.pop()
+        match node:
+            case ast.FunctionDef() | ast.Lambda() | ast.ClassDef():
+                continue
+            case ast.Return(value=value) if value is not None:
+                found.append(value)
+        pending.extend(ast.iter_child_nodes(node))
+    return found
 
 
-DOT_DIRECTORY = Path(".tmp") / "category-graph"
-r"""Where ``svg`` writes the drawing: an artifact of a run, not a document of the tree."""
+def _signature(function: ast.FunctionDef) -> str:
+    names = [a.arg for a in function.args.args[1:]] + [
+        a.arg for a in function.args.kwonlyargs
+    ]
+    return ", ".join(names)
 
 
-def written_svg(graph: DeclaredGraph, directory: Path = DOT_DIRECTORY) -> tuple[str, ...]:
-    r"""Draw the literal graph, and report the two files it wrote.
+def render_constructions(
+    declarations: list[CategoryDeclaration],
+    root: Path,
+    selected: list[str],
+    inferred: dict[str, dict[str, dict[str, str]]],
+) -> str:
+    """Each operation on the objects of a category that builds an object, and where the result is placed.
 
-    Every vertex and every edge, refinement reductions dashed so the ones the
-    tree states are the solid lines: the drawing is what a reader looks at when
-    a block grew, and the dot file is what another tool redraws it from.
+    The route is followed through the source: a module function, a method of
+    the same object, a method of a category, an application of a category to
+    data, ``_object_of`` and ``_with_structure``.  The lines state what the
+    source places; whether that placement is the mathematics is for the
+    reader.  A subset of a finite set placed only in ``Sets/X`` reads as
+    wrong at sight, beside a subset placed in ``Sets.Finite`` when ``X`` is.
     """
-    shown = _shown(graph.categories)
-    identifiers = {vertex: f"n{index}" for index, vertex in enumerate(graph.categories)}
-    stated = set(graph.stated_edges())
-    lines = ["digraph declared {", "  rankdir=RL;", "  node [shape=box, fontsize=10];"]
-    lines.extend(
-        f'  {identifiers[vertex]} [label="{shown[vertex]}"];' for vertex in graph.categories
+    trees = {
+        path: ast.parse(path.read_text(encoding="utf-8"))
+        for path in sorted(root.rglob("*.py"))
+    }
+    factories = _factories(list(trees.values()))
+    # The import base is the first ancestor outside the package's
+    # __init__.py chain, which is src/ for src/sage_extensions; a root that is
+    # not a package is read two levels down from where it lies.
+    source_root = root.parent
+    while (source_root / "__init__.py").exists():
+        source_root = source_root.parent
+    if not (root / "__init__.py").exists():
+        source_root = root.parents[1]
+    module_paths = {
+        ".".join(path.relative_to(source_root).with_suffix("").parts): path
+        for path in trees
+    }
+    imports = {path: _imported_names(tree) for path, tree in trees.items()}
+    by_name = {d.name: d for d in declarations if not d.axiom_of and not d.nested_in}
+    classes = {name: _class_at(d)[0] for name, d in by_name.items()}
+    sites = {
+        site: (default, pairs)
+        for site, default, pairs in _construction_sites(root, factories, trees)
+    }
+    above = _up_sets(declarations)
+    construction_axioms = _construction_axioms(
+        declarations,
+        {v.split(".")[1] for v in above if v.count(".") == 1 and "::" not in v},
     )
-    for declaring, declared in graph.edges():
-        style = "" if (declaring, declared) in stated else " [style=dashed]"
-        lines.append(f"  {identifiers[declaring]} -> {identifiers[declared]}{style};")
-    lines.append("}")
-    directory.mkdir(parents=True, exist_ok=True)
-    dot = directory / "declared-graph.dot"
-    dot.write_text("\n".join(lines) + "\n")
-    drawing = directory / "declared-graph.svg"
-    subprocess.run(
-        ("dot", "-Tsvg", str(dot), "-o", str(drawing)),
-        check=True, capture_output=True, text=True,
+
+    def category_class(expression: ast.expr) -> str | None:
+        head = _head(ast.unparse(expression))
+        head = factories.get(head, head)
+        head = _head(head)
+        return head if head in classes else None
+
+    def class_method(name: str, method: str) -> ast.FunctionDef | None:
+        for statement in classes[name].body:
+            if isinstance(statement, ast.FunctionDef) and statement.name == method:
+                return statement
+        return None
+
+    def placed_by(expression: ast.expr) -> str:
+        r"""What applying the category ``expression`` places its result in, read from its class."""
+        match expression:
+            case ast.Call(func=ast.Attribute(value=owner, attr=method)) if (
+                name := category_class(owner)
+            ) and (found := class_method(name, method)):
+                returned = _returns(found)
+                if returned:
+                    return placed_by(returned[0])
+        name = category_class(expression)
+        if name is None:
+            return ast.unparse(expression)
+        d = by_name[name]
+        declared = ", ".join(s.expression for s in d.supercategories) or "nothing"
+        stated = f"{name}, which declares {declared}"
+        if name in construction_axioms:
+            axioms = construction_axioms[name]
+            stated += "; it places " + (
+                ", ".join(axioms)
+                if axioms
+                else "no property of its parameters or base object"
+            )
+        return stated
+
+    def module_function(name: str, path: Path) -> tuple[ast.FunctionDef, Path] | None:
+        r"""The module-level function ``name`` means in ``path``: defined there, or imported."""
+        for statement in trees[path].body:
+            if isinstance(statement, ast.FunctionDef) and statement.name == name:
+                return statement, path
+        if name in imports[path]:
+            module, original = imports[path][name]
+            target = module_paths.get(module)
+            if target is not None:
+                for statement in trees[target].body:
+                    if isinstance(statement, ast.FunctionDef) and statement.name == original:
+                        return statement, target
+        return None
+
+    def inherited_method(
+        owner: str, container: str, name: str
+    ) -> tuple[ast.FunctionDef, Path, str, dict[str, ast.FunctionDef]] | None:
+        r"""The method ``name`` that ``owner``'s objects inherit through ``container``."""
+        vertex = by_name[owner].vertex if owner in by_name else owner
+        for ancestor in sorted(above.get(vertex, set())):
+            if ancestor in classes:
+                found = _container_methods(classes[ancestor], container)
+                if name in found:
+                    return found[name], Path(by_name[ancestor].path), ancestor, found
+        return None
+
+    def assigned(function: ast.FunctionDef, variable: str) -> ast.expr | None:
+        r"""The last value bound to the local ``variable`` in ``function``'s own body."""
+        value: ast.expr | None = None
+        for node in ast.walk(function):
+            if isinstance(node, ast.Assign) and any(
+                isinstance(target, ast.Name) and target.id == variable
+                for target in node.targets
+            ):
+                value = node.value
+        return value
+
+    def trace(
+        function: ast.FunctionDef,
+        path: Path,
+        owner: str,
+        methods: dict[str, ast.FunctionDef],
+        depth: int,
+        container: str = "ParentMethods",
+    ) -> list[str]:
+        site = f"{path}:{function.lineno} {function.name}"
+        if site in sites:
+            default, pairs = sites[site]
+            stated = "; ".join(
+                f"{result} when an input is in {source}" for source, result in pairs
+            )
+            return [
+                f"placed in {default if default and not default.isidentifier() else 'a category computed in the body'}"
+                + (
+                    f"; {stated}"
+                    if stated
+                    else "; no property of an input changes the placement"
+                )
+            ]
+        outcomes: list[str] = []
+        pending = list(_returns(function))
+        seen_locals: set[str] = set()
+        while pending:
+            value = pending.pop(0)
+            match value:
+                case ast.Constant(value=bool()) | ast.Compare() | ast.UnaryOp(
+                    op=ast.Not()
+                ) | ast.BoolOp():
+                    outcomes.append("a truth value, not an object")
+                case ast.Constant(value=None):
+                    outcomes.append("None, not an object")
+                case ast.Name(id="self"):
+                    outcomes.append(f"the input itself, in {owner}")
+                case ast.Name(id=variable) if variable not in seen_locals and (
+                    bound := assigned(function, variable)
+                ) is not None:
+                    seen_locals.add(variable)
+                    pending.append(bound)
+                case ast.Call(
+                    func=ast.Attribute(attr="_with_structure"),
+                    args=[ast.Tuple(elts=elts), *_],
+                ):
+                    added = ", ".join(
+                        owner if ast.unparse(e) == "self" else ast.unparse(e)
+                        for e in elts
+                    )
+                    outcomes.append(
+                        f"the input object, placed also in {added}; no property of the input changes the placement"
+                    )
+                case (
+                    ast.Call(func=ast.Call() as category)
+                    | ast.Call(
+                        func=ast.Attribute(value=ast.Call() as category, attr="object")
+                    )
+                ) if category_class(category.func):
+                    outcomes.append(
+                        f"an object of {ast.unparse(category)}, that is of {placed_by(category)}"
+                    )
+                case ast.Call(func=ast.Name(id=name)) if depth and (
+                    callee := module_function(name, path)
+                ):
+                    outcomes.extend(
+                        trace(callee[0], callee[1], owner, methods, depth - 1, container)
+                    )
+                case ast.Call(
+                    func=ast.Attribute(value=ast.Name(id="self"), attr=name)
+                ) if depth and name in methods:
+                    outcomes.extend(
+                        trace(methods[name], path, owner, methods, depth - 1, container)
+                    )
+                case ast.Call(
+                    func=ast.Attribute(value=ast.Name(id="self"), attr=name)
+                ) if depth and (inherited := inherited_method(owner, container, name)):
+                    found, found_path, ancestor, found_methods = inherited
+                    outcomes.extend(
+                        trace(found, found_path, ancestor, found_methods, depth - 1, container)
+                    )
+                case ast.Call(func=ast.Attribute(value=receiver, attr=name)) if (
+                    depth
+                    and (cls := category_class(receiver))
+                    and (found := class_method(cls, name))
+                ):
+                    outcomes.extend(
+                        trace(found, Path(by_name[cls].path), cls, methods, depth - 1)
+                    )
+        return list(dict.fromkeys(outcomes))
+
+    lines = [
+        "Every public operation a category gives its objects, elements and morphisms, and the category the source places its result in.",
+        "",
+    ]
+    containers = (
+        ("ParentMethods", "Objects X", "X"),
+        ("ElementMethods", "Elements x of objects", "x"),
+        ("MorphismMethods", "Morphisms f", "f"),
     )
-    return (f"wrote {dot}", f"wrote {drawing}")
+    for d in sorted(by_name.values(), key=lambda d: d.name):
+        if selected and not any(fnmatchcase(d.name, p) for p in selected):
+            continue
+        node, _ = _class_at(d)
+        kind = (
+            " (a construction on a category or an object)"
+            if d.name in construction_axioms
+            else ""
+        )
+        for container, subject, symbol in containers:
+            methods = _container_methods(node, container)
+            rows = []
+            for name, method in methods.items():
+                if name.startswith("_"):
+                    continue
+                at_runtime = inferred.get(d.name, {}).get(container, {}).get(name)
+                outcomes = trace(method, Path(d.path), d.name, methods, 4, container) or [
+                    f"{at_runtime}, read from the returned value's class"
+                    if at_runtime
+                    else "not resolved from the source, and not inferred at runtime (it needs arguments or "
+                    "its category has no example object); it returns "
+                    + ("; ".join(ast.unparse(v) for v in _returns(method)) or "nothing")
+                ]
+                rows.append(
+                    f"  {symbol}.{name}({_signature(method)})  ->  " + "  |  ".join(outcomes)
+                )
+            if rows:
+                lines += [
+                    f"## {subject} of {d.name}{kind}  ({d.path}:{d.line})",
+                    "",
+                    *rows,
+                    "",
+                ]
+    return "\n".join(lines)
 
 
-VIEWS = {
-    "categories": declaration_rows,
-    "by-supercategory": supercategory_rows,
-    "foreign": foreign_rows,
-    "shape": shape_rows,
-    "cells": cell_rows,
-    "audit": audit_rows,
-}
-r"""The declaration views, each a function of the graph alone."""
+def _default_root() -> Path:
+    return Path(importlib.util.find_spec("sage_extensions").origin).parent
 
 
-def render(graph: DeclaredGraph, view: str, *, repository: Path = Path(".")) -> str:
-    r"""The text ``view`` prints for ``graph``: the views, ``json``'s object, or the drawing."""
-    if view == "json":
-        return rendered_json(graph)
-    if view == "svg":
-        return "\n".join(written_svg(graph, repository / DOT_DIRECTORY))
-    return "\n".join(VIEWS[view](graph))
+def select_vertices(
+    declarations: list[CategoryDeclaration],
+    patterns: list[str],
+    direction: str,
+    between: list[str],
+    remove: list[str],
+) -> tuple[set[str], set[tuple[str, str]]]:
+    """Slice declared reachability; conditional declarations remain a union.
+
+    Dynamic programming follows Python's dependency order, not a local graph
+    algorithm: https://docs.python.org/3/library/graphlib.html
+    A cyclic relation raises CycleError and cannot be presented as a poset.
+    """
+    edges = _all_edges(declarations)
+    vertices = {d.vertex for d in declarations} | {v for e in edges for v in e}
+    supers = {v: {b for a, b in edges if a == v} for v in vertices}
+    above: dict[str, set[str]] = {}
+    for vertex in TopologicalSorter(supers).static_order():
+        above[vertex] = set(supers[vertex])
+        for parent in supers[vertex]:
+            above[vertex].update(above[parent])
+    seeds = {v for v in vertices if any(fnmatchcase(v, p) for p in patterns)}
+    unmatched = [p for p in patterns if not any(fnmatchcase(v, p) for v in vertices)]
+    assert not unmatched, f"No declared vertices match {unmatched!r}"
+    assert not patterns or seeds, f"No declared vertices match {patterns!r}"
+    selected = set(vertices) if not patterns else seeds.copy()
+    if direction in {"up", "both"}:
+        selected.update(v for seed in seeds for v in above[seed])
+    if direction in {"down", "both"}:
+        selected.update(v for v in vertices if above[v] & seeds)
+    if between:
+        lower, upper = between
+        assert lower in above and upper in above, (
+            f"Unknown interval endpoints: {between!r}"
+        )
+        assert lower == upper or upper in above[lower], (
+            f"Endpoints are not ordered: {between!r}"
+        )
+        selected &= (above[lower] | {lower}) & {
+            v for v in vertices if v == upper or upper in above[v]
+        }
+    unmatched_removals = [
+        p for p in remove if not any(fnmatchcase(v, p) for v in selected)
+    ]
+    assert not unmatched_removals, (
+        f"No selected vertices match removal patterns {unmatched_removals!r}"
+    )
+    selected -= {v for v in selected if any(fnmatchcase(v, p) for p in remove)}
+    for vertex in selected:
+        declarations_of_vertex = [
+            f"{d.path}:{d.line}" for d in declarations if d.vertex == vertex
+        ]
+        assert len(declarations_of_vertex) <= 1, (
+            f"Ambiguous source vertex {vertex}: {declarations_of_vertex}; inspect raw declarations"
+        )
+    return selected, {(a, b) for a, b in edges if a in selected and b in selected}
 
 
-def main(argv: tuple[str, ...] = ()) -> int:
-    r"""Print one view of the declared graph of the checkout this runs in."""
+def _self_declarations(declarations: list[CategoryDeclaration]) -> list[str]:
+    """Categories declaring their own vertex, which the edge set drops; ``audit`` reports them."""
+    return sorted(
+        f"{d.vertex} {d.path}:{d.line}"
+        for d in declarations
+        if any(s.vertex == d.vertex for s in d.supercategories)
+    )
+
+
+def render_slice(
+    declarations: list[CategoryDeclaration],
+    vertices: set[str],
+    edges: set[tuple[str, str]],
+) -> str:
+    declared = _declared_edges(declarations)
+    return json.dumps(
+        {
+            "basis": "source declarations plus computed axiom edges; unresolved conditional branches are unioned",
+            "orientation": "subcategory -> supercategory",
+            "vertices": sorted(vertices),
+            "edges": sorted(edges),
+            "edge_evidence": [
+                {
+                    "from": a,
+                    "to": b,
+                    "kind": "declared or parameter projection"
+                    if (a, b) in declared
+                    else "computed axiom edge",
+                    "declaration_sources": [
+                        f"{d.path}:{d.line}" for d in declarations if d.vertex == a
+                    ],
+                }
+                for a, b in sorted(edges)
+            ],
+            "declarations": json.loads(
+                render_json([d for d in declarations if d.vertex in vertices])
+            ),
+            "self_declarations": _self_declarations(declarations),
+            "boundary": "Parameters, dynamic returns and aliases require source review; absent paths are not proofs of missing mathematics.",
+        },
+        indent=2,
+    )
+
+
+def render_topology(
+    vertices: set[str],
+    edges: set[tuple[str, str]],
+    complex_kind: str,
+    max_vertices: int,
+    fundamental_group: bool,
+) -> str:
+    """Delegate explicitly chosen complexes to Sage, retaining all isolated vertices.
+
+    References: Sage Graph.clique_complex, FinitePoset.order_complex, and
+    SimplicialComplex.homology/fundamental_group in the Sage reference manual.
+    """
+    from sage.combinat.posets.posets import Poset
+    from sage.graphs.digraph import DiGraph
+    from sage.graphs.graph import Graph
+    from sage.topology.simplicial_complex import SimplicialComplex
+
+    assert vertices, "Select a nonempty category slice"
+    assert len(vertices) <= max_vertices, (
+        f"Slice has {len(vertices)} vertices; narrow it or explicitly raise --max-vertices={max_vertices}"
+    )
+    graph = Graph([sorted(vertices), sorted(edges)], format="vertices_and_edges")
+    match complex_kind:
+        case "graph":
+            complex_ = SimplicialComplex(
+                [[v] for v in sorted(vertices)] + [list(e) for e in sorted(edges)]
+            )
+        case "flag":
+            complex_ = graph.clique_complex()
+        case "order":
+            directed = DiGraph(
+                [sorted(vertices), sorted(edges)], format="vertices_and_edges"
+            )
+            complex_ = Poset(directed, facade=True).order_complex()
+        case _:
+            raise ValueError(complex_kind)
+    lines = [
+        f"# {complex_kind} complex of the selected category relation",
+        "",
+        "These invariants describe this complex; they are not architecture scores.",
+        "A clique fills a simplex in the flag complex. An order complex uses chains.",
+        "A global top or bottom makes the order complex contractible; inspect proper intervals when appropriate.",
+        f"Vertices: {', '.join(sorted(vertices))}",
+        f"Facets: {complex_.facets()}",
+        f"f-vector: {complex_.f_vector()}",
+        f"Integral unreduced homology: {complex_.homology(reduced=False)}",
+        f"Connected components: {graph.connected_components(sort=True)}",
+    ]
+    if fundamental_group:
+        assert graph.is_connected(), (
+            "Select one connected component for the fundamental group"
+        )
+        lines.append(
+            f"Fundamental group presentation: {complex_.fundamental_group(simplify=False)}"
+        )
+    return "\n".join(lines) + "\n"
+
+
+def main() -> None:
     parser = argparse.ArgumentParser(
-        prog="python -m sage_extensions.testing.category_graph",
-        description="The category graph the source declares, and the views of it.",
+        description="List every declared category and its declared supercategories, without importing the tree."
+    )
+    parser.add_argument("root", nargs="?", type=Path, default=_default_root())
+    parser.add_argument(
+        "--format",
+        choices=(
+            "table",
+            "by-supercategory",
+            "foreign",
+            "audit",
+            "shape",
+            "cells",
+            "dot",
+            "json",
+            "slice",
+            "topology",
+            "routes",
+            "properties",
+            "constructions",
+        ),
+        default="table",
+    )
+    parser.add_argument("-o", "--output", type=Path)
+    parser.add_argument(
+        "--select", action="append", default=[], help="category vertex glob; repeatable"
     )
     parser.add_argument(
-        "view", nargs="?", default="categories", choices=tuple(VIEWS) + ("json", "svg"),
+        "--inferred",
+        type=Path,
+        help="JSON from sage_extensions.testing.category_inference: the categories of returned values, read at runtime",
     )
-    parser.add_argument("--repository", default=".", help="the checkout to read")
-    arguments = parser.parse_args(list(argv))
-    print(render(read(Path(arguments.repository)), arguments.view, repository=Path(arguments.repository)))
-    return 0
+    parser.add_argument(
+        "--direction", choices=("self", "up", "down", "both"), default="self"
+    )
+    parser.add_argument("--between", nargs=2, default=[], metavar=("LOWER", "UPPER"))
+    parser.add_argument(
+        "--remove",
+        action="append",
+        default=[],
+        help="remove vertex glob from the selected complex",
+    )
+    parser.add_argument(
+        "--complex", choices=("graph", "flag", "order"), default="order"
+    )
+    parser.add_argument(
+        "--max-vertices", type=int, default=40, help="explicit size bound for topology"
+    )
+    parser.add_argument("--fundamental-group", action="store_true")
+    parser.add_argument(
+        "--operation",
+        action="append",
+        default=[],
+        help="object operation for --format routes; repeatable",
+    )
+    arguments = parser.parse_args()
+
+    declarations = read_tree(arguments.root)
+    if arguments.format in {"slice", "topology"}:
+        vertices, edges = select_vertices(
+            declarations,
+            arguments.select,
+            arguments.direction,
+            arguments.between,
+            arguments.remove,
+        )
+        rendered = (
+            render_slice(declarations, vertices, edges)
+            if arguments.format == "slice"
+            else render_topology(
+                vertices,
+                edges,
+                arguments.complex,
+                arguments.max_vertices,
+                arguments.fundamental_group,
+            )
+        )
+        if arguments.output:
+            arguments.output.write_text(rendered, encoding="utf-8")
+        else:
+            print(rendered)
+        return
+    if arguments.format == "routes":
+        print(render_routes(declarations, arguments.operation), end="")
+        return
+    if arguments.format == "constructions":
+        print(
+            render_constructions(
+                declarations,
+                arguments.root,
+                arguments.select,
+                json.loads(arguments.inferred.read_text(encoding="utf-8"))
+                if arguments.inferred
+                else {},
+            ),
+            end="",
+        )
+        return
+    if arguments.format == "properties":
+        print(render_properties(declarations, arguments.root), end="")
+        return
+    if arguments.select or arguments.between or arguments.remove:
+        parser.error("selection options require --format slice or topology")
+    rendered = {
+        "table": render_table,
+        "by-supercategory": render_by_supercategory,
+        "foreign": render_foreign,
+        "audit": render_audit,
+        "shape": render_shape,
+        "cells": render_cells,
+        "dot": render_dot,
+        "json": render_json,
+    }[arguments.format](declarations)
+
+    if arguments.output:
+        arguments.output.parent.mkdir(parents=True, exist_ok=True)
+        arguments.output.write_text(rendered, encoding="utf-8")
+    else:
+        print(rendered, end="")
 
 
 if __name__ == "__main__":
-    sys.exit(main(tuple(sys.argv[1:])))
+    main()
