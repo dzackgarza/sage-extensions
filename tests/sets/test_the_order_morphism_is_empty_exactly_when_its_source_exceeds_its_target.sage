@@ -45,10 +45,12 @@ def test_the_one_cardinal_arrow_composes_as_the_comparison_does() -> None:
     cardinals = Cardinalities()
 
     two_three = cardinals.Mor(2, 3).unique_morphism()
+    three_five = cardinals.Mor(3, 5).unique_morphism()
     four_five = cardinals.Mor(4, 5).unique_morphism()
 
-    assert four_five * two_three == cardinals.Mor(2, 5).unique_morphism()
+    assert three_five * two_three == cardinals.Mor(2, 5).unique_morphism()
     assert cardinals.sum_morphism(two_three, four_five) == cardinals.Mor(6, 8).unique_morphism()
+    assert cardinals.product_morphism(two_three, four_five) == cardinals.Mor(8, 15).unique_morphism()
 
 
 def test_an_ordinal_order_morphism_exists_exactly_below_its_target() -> None:
