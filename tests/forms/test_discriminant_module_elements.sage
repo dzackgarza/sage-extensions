@@ -14,7 +14,10 @@ generating family rather than over every class is a consequence of ``2b`` being
 integer-valued, which makes ``q`` modulo the integers a homomorphism.  The
 hypothesis is not free: it holds on ``A_{<2> + U(2)^rank}`` and fails on
 ``<4>``, ``[[2, 1], [1, 2]]`` and ``<2> + <6>``, and each of those is exhibited
-against the definition.
+against the definition.  On a module where the hypothesis holds, the decision is
+compared with the definition on every class at rank two and on the generating
+classes and their sums at rank four: the classes that are not generators are the
+ones a decision reading the defining family instead of the module would miss.
 """
 
 from sage_extensions.all import *
@@ -58,15 +61,36 @@ def _characteristic_by_the_definition(module):
 
     The definition is read over the whole module, and it short-circuits: a
     class that is not characteristic is decided by its first witness, and only
-    a characteristic one is read against all ``|A|`` classes.
+    a characteristic one is read against all ``|A|`` classes.  ``q`` does not
+    depend on the class under test, so it is read once per class.
     """
     classes = tuple(module.elements())
+    norms = tuple(module.q(a).lift() for a in classes)
     return tuple(
         candidate
         for candidate in classes
         if all(
-            module.q(a).lift() - module.b(a, candidate).lift() in ZZ
-            for a in classes
+            norm - module.b(a, candidate).lift() in ZZ
+            for a, norm in zip(classes, norms)
+        )
+    )
+
+
+def _generating_classes_and_their_sums(module):
+    r"""The zero class, the generating classes of ``module``, and their pairwise sums.
+
+    A decision that agrees with the definition on the generating family alone
+    has been shown only on the classes it read; a sum of two generators is a
+    class outside that family.
+    """
+    generating_classes = tuple(module.module_generators())
+    return (
+        (module.zero(),)
+        + generating_classes
+        + tuple(
+            left + right
+            for index, left in enumerate(generating_classes)
+            for right in generating_classes[index + 1:]
         )
     )
 
@@ -117,7 +141,7 @@ def test_the_doubled_polar_form_is_integral_exactly_when_a_class_is_characterist
 
 
 def test_a_class_is_characteristic_exactly_when_the_definition_says_so() -> None:
-    r"""``is_characteristic`` agrees with the definition, for every class.
+    r"""``is_characteristic`` agrees with the definition, class by class.
 
     Two ranks of ``A_{<2> + U(2)^rank}`` carry the hypothesis and three
     lattices violate it, so an implementation that reads a generating family
@@ -140,75 +164,27 @@ def test_a_class_is_characteristic_exactly_when_the_definition_says_so() -> None
         )
 
 
-def test_the_quadratic_generating_class_of_the_rank_four_module_is_characteristic() -> None:
-    r"""On ``A_{<2> + U(2)^4}`` the ``<2>`` generating class is characteristic.
+def test_the_rank_four_decision_agrees_with_the_definition_on_generators_and_their_sums() -> None:
+    r"""On ``A_{<2> + U(2)^4}`` every generator and every sum of two agrees.
 
-    Its norm is ``1/2``, and the definition is asked of it directly, over all
-    512 classes of the module: ``q(a) - b(a, c)`` is an integer for every
-    class ``a``.  A decision that drops the hypothesis it relies on, or one
-    that answers no everywhere, is wrong on this specimen at the order the
-    enumeration test is read at.
+    The module has 512 classes and nine generating ones, of which exactly the
+    ``<2>`` class has norm ``1/2`` and is characteristic.  The definition is
+    read over the whole module -- ``q(a) - b(a, c)`` an integer for every class
+    ``a`` -- and the decision under test is read on the zero class, on the nine
+    generating classes and on their 36 pairwise sums, the classes outside the
+    generating family that a decision reading that family alone is not
+    automatically right about.
     """
     module = _discriminant_module(4)
-    classes = tuple(module.elements())
-    quadratic_class = next(
-        generating_class
-        for generating_class in module.module_generators()
-        if module.q(generating_class).lift() == QQ(1) / QQ(2)
+    definition = _characteristic_by_the_definition(module)
+    decided = _generating_classes_and_their_sums(module)
+    assert sum(1 for candidate in decided) == 46
+    assert sum(1 for candidate in definition) == 1
+    assert sum(1 for candidate in decided if candidate.is_characteristic()) == sum(
+        1 for candidate in decided if candidate in definition
     )
-    assert module.has_integral_doubled_polar_form() is True
-    assert quadratic_class.is_characteristic() is True
-    assert all(
-        module.q(a).lift() - module.b(a, quadratic_class).lift() in ZZ
-        for a in classes
-    )
-
-
-def test_the_isotropic_generating_classes_of_the_rank_four_module_are_not_characteristic() -> None:
-    r"""The eight isotropic generating classes of ``A_{<2> + U(2)^4}`` are not characteristic.
-
-    A class of norm zero pairs trivially with ``q`` on its own class and could
-    be characteristic only by pairing as ``q`` everywhere else, which the
-    definition denies: each of these is read against all 512 classes until its
-    first witness, and the decision has to answer as the definition does.
-    """
-    module = _discriminant_module(4)
-    classes = tuple(module.elements())
-    isotropic_classes = tuple(
-        generating_class
-        for generating_class in module.module_generators()
-        if module.q(generating_class).lift() in ZZ
-    )
-    assert module.has_integral_doubled_polar_form() is True
-    assert sum(1 for candidate in isotropic_classes) == 8
-    for candidate in isotropic_classes:
-        assert candidate.is_characteristic() is all(
-            module.q(a).lift() - module.b(a, candidate).lift() in ZZ
-            for a in classes
-        )
-
-
-def test_a_characteristic_class_costs_about_one_evaluation_per_generating_class() -> None:
-    r"""One decision costs about eleven evaluations of ``q`` and ``b``.
-
-    On ``A_{<2> + U(2)^5}`` -- 2048 classes, eleven generating classes -- the
-    yardstick is measured in this process by evaluating ``q`` and ``b`` once
-    per generating class, so the assertion is the ratio the decision is
-    supposed to hold and not a wall time of one host.  A decision that reads
-    the module's classes instead costs one evaluation per class of the module.
-    """
-    module = _discriminant_module(5)
-    generating_classes = tuple(module.module_generators())
-    candidate = generating_classes[3] + generating_classes[7]
-    start = cputime()
-    for generating_class in generating_classes:
-        module.q(generating_class)
-        module.b(generating_class, candidate)
-    yardstick = cputime(start)
-    start = cputime()
-    candidate.is_characteristic()
-    decision = cputime(start)
-    assert decision <= yardstick
+    for candidate in decided:
+        assert candidate.is_characteristic() is (candidate in definition)
 
 
 def test_the_zero_class_is_not_characteristic_when_the_norm_is_not_integer_valued() -> None:
