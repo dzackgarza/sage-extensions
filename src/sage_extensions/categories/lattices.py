@@ -5828,12 +5828,25 @@ class Lattices(OwnedCategoryOverBaseRing):
             the framing coordinates; its value is raised into the Gram's ring.
             """
             ring, labels, gram = self._engine_gram()
-            engine = gram.base_ring()
-            left_coordinates = left.to_vector()
-            right_coordinates = right.to_vector()
-            left_row = engine_vector(engine, [_engine_ring_value(ring, left_coordinates(label)) for label in labels])
-            right_row = engine_vector(engine, [_engine_ring_value(ring, right_coordinates(label)) for label in labels])
+            ambient = self._engine_coordinate_space()
+
+            def row(element):
+                coordinates = element.to_vector()
+                return ambient([_engine_ring_value(ring, coordinates(label)) for label in labels])
+
+            left_row = row(left)
+            right_row = left_row if right is left else row(right)
             return _owned_engine_element(ring, left_row * gram * right_row)
+
+        @cached_method
+        def _engine_coordinate_space(self):
+            r"""The engine free module of the Gram's coordinate rows, built once per lattice.
+
+            Sage's generic ``vector`` constructor infers a parent on every
+            call; the contraction reads its rows into this fixed space.
+            """
+            gram = self._engine_gram()[2]
+            return gram.base_ring() ** gram.nrows()
 
         def b(self, left, right):
             r"""Evaluate the finite lattice pairing from its retained Gram."""
