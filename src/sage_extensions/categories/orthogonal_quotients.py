@@ -207,6 +207,15 @@ def _double_coset_adjustment(subgroup_permutation, stabilizer_permutation, coset
     coset and exceeds the runtime's memory guard: at the ``Gamma_{Co,2}``
     row of ``T_Co`` the coset has ``|S| = 696729600`` elements.
 
+    **A trivial ``S`` makes the double coset the subgroup ``W``.**  Then the
+    question is ``W``'s own membership test and is decided as that, not asked
+    of GAP's ``DoubleCoset`` membership: the generic double-coset question is
+    a different computation from a subgroup question and does not reduce to it
+    inside the engine.  On ``T_Co``'s ``Otilde`` line stabilizer, where
+    ``S`` is trivial and ``|W| = 89181388800``, the generic membership did not
+    return in 528 s, while ``W``'s own membership answers at once -- the walk
+    below is a single node there.
+
     The exhibited element walks the right cosets of ``W`` under right
     multiplication by the generators of ``S`` and their inverses: ``t`` in
     ``S * W`` means ``W t^-1 = W s^-1`` for some ``s`` in ``S`` (from
@@ -220,6 +229,10 @@ def _double_coset_adjustment(subgroup_permutation, stabilizer_permutation, coset
     from sage.libs.gap.libgap import libgap
 
     one = libgap.One(permutation_product)
+    if int(libgap.Size(subgroup_permutation)) == 1:
+        # S is trivial, so S * 1 * W is the subgroup W: the element asked for is
+        # coset_point itself when it lies in W, and nothing otherwise.
+        return coset_point if bool(coset_point in stabilizer_permutation) else None
     if not bool(
         coset_point
         in libgap.DoubleCoset(subgroup_permutation, one, stabilizer_permutation)

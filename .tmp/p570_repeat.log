@@ -1,0 +1,26 @@
+tree SHA: eead610cd07e9d32019420d4969c117ceac714b2 (modified paths: 2)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 0.46 1.03 1.46 2/379 3316026
+probe: .tmp/p570_repeat.py; inner 575 s
+[t=    2.23s] the plane's own line  rss=293 MiB
+[t=    2.35s] 527 recorded row representatives  rss=294 MiB
+[t=    4.69s] the named cusp's positions: [492]  rss=309 MiB
+[t=    4.70s] the cusp at position 492  rss=309 MiB
+[t=  106.40s] first question: True in 101.70 s  rss=844 MiB
+[t=  150.62s] the same question again: True in 44.22 s  rss=937 MiB
+[t=  150.63s] the question at position 0: False in 0.01 s  rss=937 MiB
+[t=  150.64s] the question at position 1: False in 0.01 s  rss=937 MiB
+[peakrss] probe570: child waited=0 shell_code=0 samples=78
+[peakrss] peak tree RSS      : 947 MiB
+[peakrss] low-water MemAvail : 11624 MiB
+[peakrss] peak single VmHWM  : 948 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      937 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   144.1s procs=  3 rss=   947 MiB hwm=   947 MiB avail= 11694 MiB
+[peakrss]   t=   146.1s procs=  3 rss=   947 MiB hwm=   947 MiB avail= 11681 MiB
+[peakrss]   t=   148.1s procs=  3 rss=   947 MiB hwm=   947 MiB avail= 11683 MiB
+[peakrss]   t=   150.1s procs=  3 rss=   947 MiB hwm=   947 MiB avail= 11676 MiB
+[peakrss]   t=   142.1s procs=  3 rss=   946 MiB hwm=   946 MiB avail= 11709 MiB
+probe exit: 0
