@@ -3322,3 +3322,14 @@ probe through `.scratch/launch537r3.sh` on the same image.
 | `537r3-red-tests-rebased.log` | `c9568ed`, the commit this round was rebased onto (97 rounds later), plus the same test file | the same file: **4 failed, 11 passed in 20.52 s**.  The flag stabilizer is green here because a round that landed on main between the review and the rebase repaired that caller itself; the rebase keeps main's line, so this round's diff does not carry it.  The other four are the same failures as above |
 | `537r3-green-tests.log` | `9ee7e5e`, the round's head | the file: **15 passed in 12.45 s**, with the suite budget's star-import note (3.25 s against a 3 s ceiling) and no failure |
 | `537r3-probe.py`, `537r3-probe.log` | `9ee7e5e`, the round's head | the deciding inputs, one small object each: `rho(Otilde(A_2))` has order **1** where `O(A_A2)` has order **2**, and its name is "the joint discriminant image of the subgroup where rho_L(g) lies in a subgroup given by its own generators in ..."; the arithmetic cusp's stabilizer at the zero sublattice of `<6>` reads "the subgroup where g preserves Integral lattice of rank 0 and signature (0, 0)" and has order 2; the flag stabilizer of `GL_2(ZZ)` names its flag and contains the shear but not the swap; `f(H)` reads "the image of a subgroup given by its own generators under Generic morphism: ..." and has order 2; `B cap Gamma` asks its operand's condition **nothing** while its two generators are formed, and both lie in both operands; `SL_2(ZZ)` and `Sp_2(ZZ)` state their own names |
+| `537r3-green-tests-pushed.log` | `ebd84a7`, whose sources and tests are the pushed tip's | the file: **15 passed in 4.10 s** |
+| `537r3-probe-pushed.log` | `ebd84a7`, the same tree | the same probe: byte-identical answers to `537r3-probe.log` -- `rho(Otilde(A_2))` of order 1 against `O(A_A2)` of order 2, the cusp stabilizer's name and order, the flag stabilizer's name with the shear in it and the swap out, `f(H)`'s name and order 2, `B cap Gamma` asking its operand's condition nothing, and the two groups of integral points naming themselves |
+
+The round was rebased onto `c9568ed`, then `0412861`, then `fa61bf8` while it was
+being pushed, so the commits the table above names by their pre-rebase ids are
+these on the pushed history: the tests `f31a9d7` are `7423e36`, the repair
+`20323ac` is `1dcb3f9`, and the last clause `9ee7e5e` is `9bb0329`.  The two
+`-pushed` runs are taken on the rebased tree, whose `src` and `tests` are the
+pushed tip's, so the evidence covers the pushed code and not only the pre-rebase
+trees.  The `537r3-probe.log` of `9ee7e5e` is kept because its answers are what
+the pushed probe reproduces.
