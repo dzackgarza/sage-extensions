@@ -48,6 +48,7 @@ from sage_extensions.categories.group.groups import (
     GroupsWithChosenFinitePresentation,
     OwnedFiniteGroups,
     OwnedGroups,
+    _named_by_its_own_words,
     _owned_group,
 )
 from sage_extensions.categories.sets.set_categories import EnumeratedSets, FiniteSets, Sets
@@ -1724,7 +1725,7 @@ class GObjects(CategoryPacketMethods, OwnedCategory):
                 point,
                 self.action_functor(),
                 lambda group_element: self.act(group_element, point) == point,
-                description=f"stabilizer of {point} in {self}",
+                lambda: f"stabilizer of {_named_by_its_own_words(point)} in {self}",
                 generating_morphism=self._stabilizer_generating_morphism(point),
             )
 

@@ -1,0 +1,22 @@
+probe: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/probe552_r3_pytest.py
+tree SHA: ce20afc9ba1e4fce85745bf698c5e4200fe7a9b0 (modified paths: 1)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 14.73 18.09 21.15 20/799 2920852
+inner 900 s, outer 960 s, guard 4096 MiB, args '-p qc_sage_session tests/schemes/test_toric_divisor_classes.sage -k line_section_ring_is_the_free_semigroup_algebra'
+.                                                                        [100%]
+1 passed, 28 deselected in 7.32s
+pytest exit: 0
+[peakrss] f4552b: child waited=0 shell_code=0 samples=8
+[peakrss] peak tree RSS      : 342 MiB
+[peakrss] low-water MemAvail : 5307 MiB
+[peakrss] peak single VmHWM  : 342 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      331 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    12.0s procs=  3 rss=   342 MiB hwm=   342 MiB avail=  5577 MiB
+[peakrss]   t=    14.1s procs=  3 rss=   342 MiB hwm=   342 MiB avail=  5370 MiB
+[peakrss]   t=    10.0s procs=  3 rss=   341 MiB hwm=   341 MiB avail=  5757 MiB
+[peakrss]   t=     8.0s procs=  3 rss=   329 MiB hwm=   329 MiB avail=  5920 MiB
+[peakrss]   t=     6.0s procs=  3 rss=   275 MiB hwm=   275 MiB avail=  5802 MiB
+launcher exit: 0

@@ -22,6 +22,8 @@ neither zero nor \(q(a)\).
 
 from sage_extensions.all import *  # noqa: F401,F403
 
+import pytest
+
 
 def _control():
     r"""`U + <6>` over `QQ`: `e = e_0` isotropic, `f = e_1` its hyperbolic partner, `a = e_2` of square six.
@@ -73,7 +75,8 @@ def test_the_transvection_is_the_rank_two_update_of_the_identity() -> None:
     `(x)` is the outer product of a vector with a covector, `b` is the Gram
     tensor of the lattice -- symmetric, so the contraction `gram * v` is the
     covector `b(v,.)` -- and the identity is the Kronecker delta of the chosen
-    framing.  The left-hand side is the transvection's own tensor, so the
+    framing.  `e` and `a` enter as `tensor.coordinates`, their coordinate vectors
+    in that framing.  The left-hand side is the transvection's own tensor, so the
     equation is the matrix of `t(e,a)` entry for entry.
 
     The control's half coefficient is `q(a)/2 = 3`, so the last term is the
@@ -82,16 +85,10 @@ def test_the_transvection_is_the_rank_two_update_of_the_identity() -> None:
     """
     lattice, isotropic, _partner, orthogonal = _control()
     ring = lattice.base_ring()
-    labels = tuple(lattice.module_generating_set())
     gram = lattice.gram_tensor()
 
-    def coordinate(element):
-        return tensor.vector(
-            ring, tuple(element.to_vector()(label) for label in labels)
-        )
-
-    isotropic_vector = coordinate(isotropic)
-    orthogonal_vector = coordinate(orthogonal)
+    isotropic_vector = tensor.coordinates(isotropic)
+    orthogonal_vector = tensor.coordinates(orthogonal)
     half_norm = ring(orthogonal.q()) / ring(2)
 
     update = (
@@ -104,3 +101,40 @@ def test_the_transvection_is_the_rank_two_update_of_the_identity() -> None:
     assert tensor.from_morphism(
         lattice.eichler_transvection(isotropic, orthogonal)
     ) == update
+
+
+def test_a_transvection_that_does_not_preserve_the_lattice_is_refused() -> None:
+    r"""`U + <1>`: `q(a) = 1` is odd and `e = e_0` has divisibility one, so `t(e,a)` leaves `L`.
+
+    The update's half coefficient is `q(a) b(e, e_1)/2 = 1/2`, and
+    `t(e,a)(f) = f + a - (1/2)e` is not a vector of `L`.  `eichler_transvection`
+    refuses the pair, and the refusal is the construction's own: it names the
+    transvection, the lattice and the coefficient that lies outside the ring,
+    where the reading of the update over `ZZ` would refuse the same coefficient
+    as a rational it cannot convert and name none of them.
+
+    The second specimen is the same lattice with `e` replaced by `2e_0`.  Then
+    `b(e, x)` is even for every `x`, the half coefficient is an integer, and the
+    transvection is an isometry of `L`: `t(f) = f + 2a - 2e`.
+    """
+    lattice = Lattices(ZZ)([[0, 1, 0], [1, 0, 0], [0, 0, 1]])
+    labels = tuple(lattice.module_generating_set())
+    isotropic, partner, orthogonal = (
+        lattice.module_generator(label) for label in labels
+    )
+    assert isotropic.q() == ZZ.zero()
+    assert isotropic.b(orthogonal) == ZZ.zero()
+    assert isotropic.b(partner) == ZZ.one()
+    assert orthogonal.q() == ZZ.one()
+
+    with pytest.raises(ValueError):
+        lattice.eichler_transvection(isotropic, orthogonal)
+
+    doubled = lattice.scalar_multiple(2, isotropic)
+    transvection = lattice.eichler_transvection(doubled, orthogonal)
+    assert transvection(doubled) == doubled
+    assert transvection(partner) == (
+        partner
+        + lattice.scalar_multiple(2, orthogonal)
+        - lattice.scalar_multiple(2, isotropic)
+    )

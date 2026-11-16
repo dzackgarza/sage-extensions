@@ -234,9 +234,18 @@ class IsotropicReductionLiftTorsors(OwnedCategoryOverBaseRing):
             ``T_Z`` is empty exactly when ``C`` is, since ``r`` is onto and
             ``phi`` bijective, so emptiness is decided from ``C``.  ``C`` empty
             gives the empty subset of ``T``, the least point of ``T``'s power
-            set, decided empty by that construction; ``C`` nonempty supplies one
-            admitted point, which decides that the subset is not empty without
-            listing it.
+            set, decided empty by that construction.
+
+            A zero-dimensional parameter space has ``P = 0``, so ``P/mP`` is its
+            one class and ``0`` is the only parameter an integral lift has: the
+            locus is the base point ``phi(0)``, and it is presented as that
+            one-point subset, whose count and emptiness the set owner decides
+            from the point.  Otherwise the locus is cut out of ``T`` by the
+            residue predicate, and the lift the residue locus built for its
+            first passing representative is admitted into it: that lift's class
+            lies in ``C`` by the construction that built it, which is what
+            decides that the subset is not empty, and this construction lifts
+            no point of its own.
             """
             target = self.target_reduction().isotropic_embedding().codomain()
             integral_kernel = self.acting_group().predicate_subgroup(
@@ -260,17 +269,17 @@ class IsotropicReductionLiftTorsors(OwnedCategoryOverBaseRing):
                 no class of ``P/mP`` names: membership answers ``False`` for it.
                 """
                 parameter = parameter_of(locus_lift)
-                if lattice_inclusion.is_in_image(parameter) is False:
+                preimage = lattice_inclusion.preimage_or_none(parameter)
+                if preimage is None:
                     return False
-                return residue(lattice_inclusion.lift(parameter)) in classes
+                return residue(preimage) in classes
 
             if classes.is_empty() is True:
                 return integral_kernel, self.power_set().bottom()
-            locus = self.condition_set(in_residue)
-            # One admitted point decides that the subset is not empty.  Its
-            # parameter class lies in C by construction, so the lift costs one
-            # transvection and its integral restriction is already tested.
-            locus(self.integral_base_point())
+            if self.parameter_space().module_rank() == 0:
+                return integral_kernel, self.power_set()((self.base_point(),))
+            locus = self.power_set().from_predicate(in_residue)
+            locus._retain_admitted_member(self.integral_base_point())
             return integral_kernel, locus
 
         @cached_method
@@ -495,15 +504,19 @@ class IsotropicReductionLiftTorsors(OwnedCategoryOverBaseRing):
             **The test is the lift.**  Each representative's lift is built by
             :meth:`_lift_at` and asked for its own
             ``...LatticeIsometryMethods.integral_restriction``; nothing decides
-            integrality except that answer.
+            integrality except that answer.  A lift that passes is therefore one
+            the construction has already built, and the lifts that pass are
+            retained with the coordinates: they are the points of the integral
+            locus, one per passing class, and a consumer that needs one reads it
+            instead of lifting and testing again.
 
             Returns ``(passing, kernel, parameters)``: ``passing`` the finite ordered set
             of the classes of the representatives whose lift restricts to an isometry of
             the target, ``kernel`` the finite ordered set of the classes of ``K``, and
-            ``parameters`` the triple of coordinate tuples ``(representatives, kernel
-            generators, period generators)`` -- the coordinates of the passing
-            representatives, of the generators ``V(gcd(step_i, m) e_i)`` of ``K``, and
-            of the period's own generators.
+            ``parameters`` the quadruple ``(representatives, kernel generators, period
+            generators, lifts)`` -- the coordinates of the passing representatives, of the
+            generators ``V(gcd(step_i, m) e_i)`` of ``K``, of the period's own generators,
+            and the lift of each passing representative in the same order.
             """
             from sage.all import QQ, ZZ, gcd, lcm
             from sage.matrix.constructor import matrix
@@ -645,11 +658,15 @@ class IsotropicReductionLiftTorsors(OwnedCategoryOverBaseRing):
             tested = tuple(
                 coordinates_at(indices) for indices in parameters(coset_steps)
             )
-            passing_coordinates = tuple(
-                coordinates
-                for coordinates in tested
-                if self._lift_at(coordinates).integral_restriction(source, target) is not None
-            )
+            passing_coordinates = []
+            passing_lifts = []
+            for coordinates in tested:
+                lift = self._lift_at(coordinates)
+                if lift.integral_restriction(source, target) is None:
+                    continue
+                passing_coordinates.append(coordinates)
+                passing_lifts.append(lift)
+            passing_coordinates = tuple(passing_coordinates)
             passing = tuple(class_of(coordinates) for coordinates in passing_coordinates)
             kernel = tuple(
                 class_of(coordinates_at(tuple(
@@ -673,7 +690,12 @@ class IsotropicReductionLiftTorsors(OwnedCategoryOverBaseRing):
             return (
                 finite_ordered_set(passing),
                 finite_ordered_set(kernel),
-                (passing_coordinates, kernel_generators, period_generators),
+                (
+                    passing_coordinates,
+                    kernel_generators,
+                    period_generators,
+                    tuple(passing_lifts),
+                ),
             )
 
         @cached_method
@@ -752,7 +774,7 @@ class IsotropicReductionLiftTorsors(OwnedCategoryOverBaseRing):
             always has one.
             """
             _passing, _kernel, parameters = self._integral_parameter_cosets()
-            representatives, kernel_generators, period_generators = parameters
+            representatives, kernel_generators, period_generators, _lifts = parameters
             assert len(representatives) > 0, (
                 f"the integral lifts of {self.reduction_isometry()!r} form an empty set, so they "
                 f"determine no elements of the integral kernel: ask the identity marking of "
@@ -792,27 +814,23 @@ class IsotropicReductionLiftTorsors(OwnedCategoryOverBaseRing):
         def integral_base_point_or_none(self):
             r"""Decide existence and retain one integral lift, or ``None``.
 
-            An integral rational base point proves nonemptiness immediately.
-            Otherwise the integral residue locus decides it: its classes are the
-            cosets of the transvection kernel whose representative lifts
-            integrally (:meth:`integral_parameter_classes`), so the first of
-            them supplies a lift and an empty locus proves emptiness without
-            listing ``P/mP``.  The lift is asked for its integral restriction
-            once more, on that class alone, rather than assumed.
+            An integral rational base point is a lift and answers at once, and an
+            empty residue locus answers ``None``.  Otherwise the integral
+            residue locus has already built the lift of each of its
+            representatives and tested it (:meth:`_integral_parameter_cosets`,
+            which decides the classes by exactly that test), so one of those
+            lifts is a point of the locus and this answers it.  Lifting the first
+            class again, and asking that second lift for its integral
+            restriction, would decide a fact the residue locus has decided.
             """
             source = self.source_reduction().isotropic_embedding().codomain()
             target = self.target_reduction().isotropic_embedding().codomain()
             base = self.base_point()
             if base.integral_restriction(source, target) is not None:
                 return base
-            quotient = self.integral_parameter_quotient()
-            inclusion = quotient.domain().inclusion()
-            for residue in self.integral_parameter_classes():
-                parameter = inclusion(quotient.preimage(residue)).underlying_element()
-                lift = self.parameterization()(parameter)
-                if lift.integral_restriction(source, target) is not None:
-                    return lift
-            return None
+            _passing, _kernel, parameters = self._integral_parameter_cosets()
+            lifts = parameters[3]
+            return lifts[0] if lifts else None
 
         @cached_method
         def integral_base_point(self):

@@ -1,0 +1,37 @@
+provider SHA: c5a0c9eb4e4999557515ba1a400232ef1f76c76b
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+command: pytest -p sage_extensions.testing.test_lint --durations=0 tests/engineering/test_the_incidence_row_reports_a_broken_contract_apart_from_an_undecided_row.py
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: asyncio-1.5.0, xdist-3.8.0, reportlog-1.0.0, platformdirs-4.13.5, hypothesis-6.170.15, anyio-4.15.1, timeout-2.4.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 5 items
+
+tests/engineering/test_the_incidence_row_reports_a_broken_contract_apart_from_an_undecided_row.py . [ 20%]
+....                                                                     [100%]
+
+============================== slowest durations ===============================
+5.22s call     tests/engineering/test_the_incidence_row_reports_a_broken_contract_apart_from_an_undecided_row.py::test_a_row_whose_call_raised_is_not_an_undecided_row
+2.80s call     tests/engineering/test_the_incidence_row_reports_a_broken_contract_apart_from_an_undecided_row.py::test_a_row_of_a_lattice_with_no_isotropic_plane_decides_with_its_line_vertex
+1.35s call     tests/engineering/test_the_incidence_row_reports_a_broken_contract_apart_from_an_undecided_row.py::test_a_relation_that_leaves_a_vertex_without_an_edge_is_a_contract_violation
+0.76s call     tests/engineering/test_the_incidence_row_reports_a_broken_contract_apart_from_an_undecided_row.py::test_a_row_whose_cap_is_spent_is_undecided
+0.18s call     tests/engineering/test_the_incidence_row_reports_a_broken_contract_apart_from_an_undecided_row.py::test_a_line_that_pairs_nontrivially_with_the_plane_is_outside_it
+
+(10 durations < 0.005s hidden.  Use -vv to show these durations.)
+============================== 5 passed in 19.04s ==============================
+[peakrss] run: child waited=0 shell_code=0 samples=15
+[peakrss] peak tree RSS      : 495 MiB
+[peakrss] low-water MemAvail : 2419 MiB
+[peakrss] peak single VmHWM  : 498 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      487 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   run.sh                        2 MiB peak
+[peakrss]   t=    26.1s procs=  3 rss=   495 MiB hwm=   498 MiB avail=  4149 MiB
+[peakrss]   t=    28.1s procs=  3 rss=   495 MiB hwm=   498 MiB avail=  3978 MiB
+[peakrss]   t=    24.1s procs=  3 rss=   494 MiB hwm=   498 MiB avail=  4278 MiB
+[peakrss]   t=    22.1s procs=  3 rss=   482 MiB hwm=   484 MiB avail=  3963 MiB
+[peakrss]   t=    20.1s procs=  3 rss=   450 MiB hwm=   452 MiB avail=  4130 MiB

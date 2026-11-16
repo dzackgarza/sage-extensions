@@ -144,6 +144,25 @@ class AffineSemigroupAlgebras(OwnedCategoryOverBaseRing):
         )
 
 
+# Protected contract (``OWN-05``).  One affine semigroup presentation has one
+# algebra construction, and this function is it: it validates the lattice
+# generators, decides whether the toric ideal is zero, and reaches the
+# polynomial or presented-algebra owner accordingly.  Owner:
+# :class:`AffineSemigroupAlgebras`, whose ``_call_`` is one caller.  Permitted
+# callers are that constructor and the categories that construct their own
+# object through this presentation while naming themselves the ambient category
+# (``OWN-15``): :class:`SectionRings`, on both of its roads -- the semigroup
+# algebra of a line bundle's degree-one sections and the cone over a divisor
+# polytope.  Inputs are the semigroup-algebra category the presentation is
+# stated over, the lattice generators, the variable names, the categories the
+# result is placed in, the extra construction data those categories' levels
+# consume, and the asking category.  The result is the one algebra for that
+# presentation, recorded in ``constructing_category``, which is defining data:
+# two callers that name the same category and supply the same generators reach
+# the same algebra.  No public operation implements this responsibility: the
+# semigroup-algebra constructor can state only its own category as the ambient
+# one, and a stronger category that builds its ring here is not that
+# constructor's caller.
 def _affine_semigroup_algebra(
     category,
     generator_coordinates,
@@ -242,6 +261,7 @@ def _affine_semigroup_algebra(
     return _presented_algebra_quotient(
         presentation,
         relations,
+        base_ring=base,
         extra_categories=(category, *tuple(extra_categories)),
         extra_construction_data=construction_data,
         generating_module=None,

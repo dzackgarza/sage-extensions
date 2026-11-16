@@ -1,0 +1,23 @@
+tree SHA: bbb0dd62bb688f54dd70343c029de0713c636093
+ZZ.adic_completion(2):
+  RAISED AttributeError 'int' object has no attribute 'ring'
+ZZ.adic_completion(ZZ.ideal(2)):
+  RecursionError: maximum recursion depth exceeded
+which method: ModulesWithChosenFinitePresentation.ParentMethods.adic_completion sage_extensions.categories.modules.pure.modules
+ZZ in a module category: True
+ZZ as module over itself base: True
+the ideal's ring is ZZ: True
+[peakrss] probe527: child waited=0 shell_code=0 samples=5
+[peakrss] peak tree RSS      : 281 MiB
+[peakrss] low-water MemAvail : 2495 MiB
+[peakrss] peak single VmHWM  : 281 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      270 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     8.0s procs=  3 rss=   281 MiB hwm=   281 MiB avail=  3528 MiB
+[peakrss]   t=     6.0s procs=  3 rss=   242 MiB hwm=   242 MiB avail=  2525 MiB
+[peakrss]   t=     4.0s procs=  3 rss=   163 MiB hwm=   163 MiB avail=  2622 MiB
+[peakrss]   t=     2.0s procs=  3 rss=    86 MiB hwm=    86 MiB avail=  2495 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     4 MiB hwm=     4 MiB avail=  2720 MiB
+launcher exit: 0

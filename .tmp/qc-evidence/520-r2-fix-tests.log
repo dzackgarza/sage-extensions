@@ -1,0 +1,29 @@
+provider SHA: 659b4b6b9b8d2524f0630fd00e22df86248e32f3
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+command: pytest -p sage_extensions.testing.test_lint tests/engineering/test_the_incidence_row_reports_a_broken_contract_apart_from_an_undecided_row.py
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: asyncio-1.5.0, xdist-3.8.0, reportlog-1.0.0, platformdirs-4.13.5, hypothesis-6.170.15, anyio-4.15.1, timeout-2.4.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 3 items
+
+tests/engineering/test_the_incidence_row_reports_a_broken_contract_apart_from_an_undecided_row.py . [ 33%]
+..                                                                       [100%]
+
+============================== 3 passed in 6.85s ===============================
+[peakrss] run: child waited=0 shell_code=0 samples=6
+[peakrss] peak tree RSS      : 464 MiB
+[peakrss] low-water MemAvail : 6001 MiB
+[peakrss] peak single VmHWM  : 464 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      453 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   run.sh                        1 MiB peak
+[peakrss]   t=    10.0s procs=  3 rss=   464 MiB hwm=   464 MiB avail=  6452 MiB
+[peakrss]   t=     8.0s procs=  3 rss=   446 MiB hwm=   446 MiB avail=  6631 MiB
+[peakrss]   t=     6.0s procs=  3 rss=   297 MiB hwm=   297 MiB avail=  6634 MiB
+[peakrss]   t=     4.0s procs=  3 rss=   191 MiB hwm=   191 MiB avail=  6326 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   116 MiB hwm=   116 MiB avail=  6001 MiB

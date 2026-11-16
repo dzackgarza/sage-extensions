@@ -1805,10 +1805,25 @@ class ModuleMorphismMethods:
         element = element if element.parent() is codomain else codomain(element)
         if (element == codomain.zero()) is True:
             return domain.zero()
-        preimage = self._preimage_or_none(element)
+        preimage = self.preimage_or_none(element)
         if preimage is None:
             raise ValueError(f"{element} is outside the image of {self}")
         return preimage
+
+    def preimage_or_none(self, element):
+        r"""Return one preimage of ``element``, or ``None`` when it has none.
+
+        The two questions this morphism is asked about a codomain element --
+        whether it lies in the image, and which of its preimages is selected --
+        are one question, and this is its answer, so a caller that needs both
+        solves once.  ``None`` states that the image does not contain
+        ``element``.  A construction whose selected lift is not known to find
+        every preimage raises the same refusal here that :meth:`is_in_image` and
+        :meth:`lift` state, rather than answering that there is no preimage.
+        """
+        codomain = self.codomain()
+        element = element if element.parent() is codomain else codomain(element)
+        return self._preimage_or_none(element)
 
     def is_injective(self) -> bool:
         r"""Return whether ``ker(self)=0`` when the kernel is computable.
@@ -2042,8 +2057,10 @@ class ModuleMorphismMethods:
     def _preimage_or_none(self, element):
         r"""Return a selected preimage, or ``None`` outside the image.
 
-        Protected contract of module morphisms.  Its callers are :meth:`preimage`, :meth:`lift`,
-        :meth:`is_in_image` and :meth:`factor_through`.  A lift selected at
+        Protected contract of module morphisms.  Its public caller is
+        :meth:`preimage_or_none`, which :meth:`preimage`, :meth:`lift` and
+        :meth:`is_in_image` read; :meth:`is_surjective` and
+        :meth:`factor_through_or_none` ask it for the same one answer.  A lift selected at
         construction is such a function: it returns the preimage of an
         element of the image and ``None`` for any other element.  Otherwise,
         between finite free modules with chosen bases, the coordinates of
@@ -2123,14 +2140,18 @@ class ModuleMorphismMethods:
                 return codomain._framing_lift(codomain(element))
             case False:
                 pass
-        preimage = self._preimage_or_none(element)
+        preimage = self.preimage_or_none(element)
         if preimage is None:
             raise ValueError(f"{element} is not in the image of {self}")
         return preimage
 
     def is_in_image(self, element) -> bool:
-        r"""Return whether ``element`` has a preimage under this linear map."""
-        return self._preimage_or_none(element) is not None
+        r"""Return whether ``element`` has a preimage under this linear map.
+
+        Read off :meth:`preimage_or_none`: membership and the selected preimage
+        are one answer, and asking both asks the solver once.
+        """
+        return self.preimage_or_none(element) is not None
 
     def has_selected_lift(self) -> bool:
         r"""Return whether this map carries a selected lift callback."""
@@ -2547,7 +2568,9 @@ class ModuleMorphismMethods:
 
         from sage_extensions.categories.modules.pure.modules import Modules
 
-        extension = Modules(ring).scalar_extension(completion.completion_map())
+        extension = Modules(ring).scalar_extension(
+            completion._completion_map_as_ring_morphism()
+        )
         completed = extension(self)
         assert completed.domain() is source and completed.codomain() is target, (
             f"completion of {self.domain()} -> {self.codomain()}: the completed map should go {source} -> {target}, "

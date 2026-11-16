@@ -14,7 +14,10 @@ all-upper or all-lower two-index tensor.
 ``tensor.vector(...)``, ``tensor.covector(...)``, ``tensor.matrix(...)`` and
 ``tensor.identity(...)`` accept owned rings and explicit component data.  They
 do not reproduce Sage's matrix namespace: matrices as linear maps belong to the
-owned Mor objects.
+owned Mor objects.  ``tensor.coordinates(element)`` is the one operation that
+reads an element of a framed module: it is the type-``(1,0)`` tensor of the
+element's coefficients in the module's framing, so the element-to-coordinates
+convention is stated here rather than at each call site.
 
 Every route ends in one construction: ``TensorModule(R, ps, qs)`` is the
 object of ``Modules(R)`` built by that owner's entry from
@@ -1187,7 +1190,9 @@ def _engine_component_matrix(value):
             _linear_algebra_ring(ring),
             rows,
             columns,
-            [_linear_algebra_element(ring, value[i, j]) for i in range(rows) for j in range(columns)],
+            # The flat components are in tensor-index order, which for two
+            # indices is the row-major order of the matrix.
+            [_linear_algebra_element(ring, entry) for entry in value._flat_components()],
         )
         retained.set_immutable()
         value.__dict__["_engine_component_matrix"] = retained
@@ -1723,6 +1728,24 @@ def _engine_component_vector(value):
     )
 
 
+def _refuse_element_components(constructor, components):
+    r"""Refuse a module element where component data belongs.
+
+    An element of a module is not a family of components: its coordinates are
+    its coefficients in the module's chosen framing, which is a convention of
+    this package and is stated by :class:`_TensorCoordinatesConstructor`.  An
+    element that reached a component constructor would supply its components by
+    being iterated, which is the module's coordinate order chosen at the
+    constructor rather than the element's framing stated here.
+    """
+    if isinstance(components, ModuleElement):
+        raise TypeError(
+            f"{constructor}(R, components) takes component data, not the element "
+            f"{components!r} of {components.parent()}: the coordinates of an element "
+            f"in its framing are `tensor.coordinates(element)`"
+        )
+
+
 class _TensorVectorConstructor:
     r"""Construct a type-``(1,0)`` tensor from an owned ring and components."""
 
@@ -1740,6 +1763,7 @@ class _TensorVectorConstructor:
             raise TypeError(
                 f"tensor.vector(R, components) over {base_ring} was given no components"
             )
+        _refuse_element_components("tensor.vector", components)
         # Literal component data: a natural number is the rank of the zero
         # vector; a Python mapping gives the nonzero components by position;
         # anything else is the sequence of components in order.
@@ -1775,6 +1799,7 @@ class _TensorCovectorConstructor:
     """
 
     def __call__(self, base_ring, components=None, *args, **kwds):
+        _refuse_element_components("tensor.covector", components)
         contravariant = _TensorVectorConstructor()(
             base_ring, components, *args, **kwds
         )
@@ -1832,6 +1857,68 @@ class _TensorIdentityConstructor:
                 for column in range(length)
             ),
         )
+
+
+class _TensorCoordinatesConstructor:
+    r"""Construct the coordinate vector of an element of a framed module.
+
+    The coordinates of \(v=\sum_{i\in I} a_i e_i\) in the framing \((e_i)\) are
+    the coefficient family \(a\), and its type-\((1,0)\) tensor is one vector of
+    the free module on \(I\): `tensor.coordinates(v)`.  The framing is the
+    element's own (`module_generating_set`), so the order of the components is
+    this package's statement and not a choice made at each call site; an element
+    handed to a component constructor instead, which iterates it, is that choice
+    made again.
+
+    The element is read through its module's framing preimage, which is where
+    its coordinates are the module's own statement, and that preimage's retained
+    coefficient family is positioned by the framing's labels: an element
+    supported on a few basis vectors costs those coefficients and not one
+    evaluation per label.  An index of infinite rank has no finite component
+    array and is refused.
+
+    Reading them over a larger ring is `change_ring` on the result: the
+    coordinate vector is the element's own, over the ring it lives on.
+
+    EXAMPLES::
+
+        sage: from sage_extensions.categories.lattices import Lattices
+        sage: L = Lattices(ZZ)("U") + Lattices(ZZ)("A2")
+        sage: labels = tuple(L.module_generating_set())
+        sage: v = tensor.coordinates(L.module_generator(labels[2]))
+        sage: v.tensor_valence()
+        (1, 0)
+        sage: [v[position] for position in range(4)]
+        [0, 0, 1, 0]
+    """
+
+    def __call__(self, element, *args, **kwds):
+        if args or kwds:
+            raise TypeError(
+                f"tensor.coordinates(element) takes one element; got the extra "
+                f"arguments {args} and keywords {sorted(kwds)}"
+            )
+        if not isinstance(element, ModuleElement):
+            raise TypeError(
+                f"tensor.coordinates(element) needs an element of a framed module; "
+                f"{element!r} is not an element of a module"
+            )
+        lifted = element.parent()._framing_lift(element)
+        framing = lifted.parent()
+        label_set = framing.module_generating_set()
+        cardinality = cardinal(label_set.cardinality())
+        if not cardinality.is_finite():
+            raise ValueError(
+                f"tensor.coordinates({element!r}) needs a finite framing: the basis "
+                f"{label_set} of {framing} is not finite, so an element of it has no "
+                f"finite component vector"
+            )
+        labels = tuple(label_set)
+        positions = {label: index for index, label in enumerate(labels)}
+        values = [framing.base_ring().zero()] * len(labels)
+        for label, coefficient in framing._selected_module_coefficients(lifted).items():
+            values[positions[label]] = coefficient
+        return tensor(framing.base_ring(), (len(labels),), (), tuple(values))
 
 
 class _TensorMatrixConstructor:
@@ -2749,6 +2836,8 @@ class _TensorConstructor:
     conveniences over the main ``tensor(R, ps, qs, data)`` call.  They accept
     owned rings and mathematical component data only; Sage
     constructor/storage compatibility is not public API.
+    ``tensor.coordinates(element)`` takes an element of a framed module instead
+    of components and returns its coordinate vector in the module's framing.
 
     The main call is ``tensor(R, ps, qs, data)``.  ``ps`` lists upper-index
     dimensions and ``qs`` lower-index dimensions.  Hence vectors and covectors
@@ -2759,6 +2848,7 @@ class _TensorConstructor:
     covector = _TensorCovectorConstructor()
     matrix = _TensorMatrixConstructor()
     identity = _TensorIdentityConstructor()
+    coordinates = _TensorCoordinatesConstructor()
 
     def from_matrix(self, matrix):
         r"""Interpret a finite matrix Mor element as a type-``(1,1)`` tensor."""

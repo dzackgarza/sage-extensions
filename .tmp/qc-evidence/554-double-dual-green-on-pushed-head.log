@@ -1,0 +1,19 @@
+tree SHA: 67dd108edba8805f5ad2cbcc952b7476f1ac8027 (modified paths: 0)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 6.47 8.24 14.12 6/653 2939655
+files: tests/schemes/test_polytopes.sage
+inner 600 s
+.                                                                        [100%]
+1 passed, 5 deselected in 1.44s
+[peakrss] probe554tests: child waited=0 shell_code=0 samples=3
+[peakrss] peak tree RSS      : 323 MiB
+[peakrss] low-water MemAvail : 8146 MiB
+[peakrss] peak single VmHWM  : 323 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      312 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     4.0s procs=  3 rss=   323 MiB hwm=   323 MiB avail=  8146 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   224 MiB hwm=   224 MiB avail=  8481 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     4 MiB hwm=     4 MiB avail=  8780 MiB
+pytest exit: 0

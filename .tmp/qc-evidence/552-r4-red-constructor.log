@@ -1,0 +1,50 @@
+probe: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/probe552_r3_pytest.py
+tree SHA: 7f36d571b88c6ae3937d06cedfdafb8091f10892 (modified paths: 1)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 20.56 27.71 23.56 23/874 2901335
+inner 600 s, outer 660 s, guard 4096 MiB, args 'tests/test_native_ring_constructions.py -k presented_algebra_constructor_states_the_quotient'
+F                                                                        [100%]
+=================================== FAILURES ===================================
+__________ test_the_presented_algebra_constructor_states_the_quotient __________
+
+    def test_the_presented_algebra_constructor_states_the_quotient() -> None:
+        r"""``AlgebrasWithChosenFinitePresentation(R)(P, (x y,))`` is ``P/(x y)``, not ``P``.
+    
+        A free algebra with finitely many generators presents itself, so the
+        presentation ring is already an object of this category and Sage's generic
+        category call would return that argument unchanged, dropping the relation.
+        The relation is constructor data, not a candidate object, so the public
+        constructor of the quotient states it.
+        """
+        rationals = _owned_rationals()
+        polynomial = rationals.polynomial_ring(("x", "y"))
+        x = polynomial.algebra_generator("x")
+        y = polynomial.algebra_generator("y")
+        relation = x * y
+        category = AlgebrasWithChosenFinitePresentation(rationals)
+        quotient = category(polynomial, (relation,))
+>       assert quotient is not polynomial
+E       assert Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring is not Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring
+
+tests/test_native_ring_constructions.py:94: AssertionError
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:442 General module over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:833 Elementwise module morphism Module over Fraction Field of Integer Ring on Classes in the multilinear tensor presentation -> Module over Fraction Field of Integer Ring on Fraction Field of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+=========================== short test summary info ============================
+FAILED tests/test_native_ring_constructions.py::test_the_presented_algebra_constructor_states_the_quotient
+1 failed, 8 deselected in 10.31s
+pytest exit: 1
+[peakrss] red552f1: child waited=0 shell_code=0 samples=9
+[peakrss] peak tree RSS      : 280 MiB
+[peakrss] low-water MemAvail : 2562 MiB
+[peakrss] peak single VmHWM  : 280 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      269 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    16.1s procs=  3 rss=   280 MiB hwm=   280 MiB avail=  2562 MiB
+[peakrss]   t=    14.1s procs=  3 rss=   279 MiB hwm=   279 MiB avail=  2734 MiB
+[peakrss]   t=    12.1s procs=  3 rss=   272 MiB hwm=   272 MiB avail=  2933 MiB
+[peakrss]   t=    10.1s procs=  3 rss=   253 MiB hwm=   253 MiB avail=  3107 MiB
+[peakrss]   t=     8.1s procs=  3 rss=   211 MiB hwm=   211 MiB avail=  3070 MiB
+launcher exit: 0

@@ -1,0 +1,22 @@
+probe: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/probe552_r3_pytest.py
+tree SHA: 25031873831b89ddd2ac61e88f7ab05be84611ab (modified paths: 1)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 10.07 14.88 19.30 9/684 2928242
+inner 900 s, outer 960 s, guard 4096 MiB, args '-p qc_sage_session tests/test_native_ring_constructions.py tests/divisors/test_projective_section_rings.sage tests/schemes/test_toric_divisor_classes.sage -k 'presented_algebra_constructor_states_the_quotient or conic_section_ring_states or cox_ring_states or line_section_ring_is_the_free_semigroup_algebra''
+....                                                                     [100%]
+4 passed, 39 deselected in 5.49s
+pytest exit: 0
+[peakrss] r4head: child waited=0 shell_code=0 samples=5
+[peakrss] peak tree RSS      : 361 MiB
+[peakrss] low-water MemAvail : 6608 MiB
+[peakrss] peak single VmHWM  : 361 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      350 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     8.0s procs=  3 rss=   361 MiB hwm=   361 MiB avail=  6608 MiB
+[peakrss]   t=     6.0s procs=  3 rss=   334 MiB hwm=   334 MiB avail=  6832 MiB
+[peakrss]   t=     4.0s procs=  3 rss=   228 MiB hwm=   228 MiB avail=  6924 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   132 MiB hwm=   132 MiB avail=  6980 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     1 MiB hwm=     1 MiB avail=  6756 MiB
+launcher exit: 0

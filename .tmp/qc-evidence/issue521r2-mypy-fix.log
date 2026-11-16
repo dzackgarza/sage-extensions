@@ -1,0 +1,15 @@
+=== tree: f807dfd9817f2c42ead194ec8e2b857260e0c9b2 (modified: 1 paths)
+=== start: 07:17:40
+/sage/.venv/lib/python3.14/site-packages/sage/categories/category.py:1612: UserWarning: _RuntimeImplementationCategory.ParentMethods should not have a super class
+  warn("%s.%s should not have a super class" % (cls.__name__, method_provider))
+Detected IPython. Loading juliacall extension. See https://juliapy.github.io/PythonCall.jl/stable/compat/#IPython
+src/sage_extensions/language_runtime.py:48: error: Function is missing a type annotation  [no-untyped-def]
+src/sage_extensions/language_runtime.py:53: error: Function is missing a type annotation  [no-untyped-def]
+src/sage_extensions/language_runtime.py:69: error: Function is missing a type annotation  [no-untyped-def]
+src/sage_extensions/language_runtime.py:97: error: Function is missing a type annotation  [no-untyped-def]
+src/sage_extensions/language_runtime.py:104: error: Returning Any from function declared to return "_OwnedIntegerElement"  [no-any-return]
+src/sage_extensions/language_runtime.py:107: error: Function is missing a type annotation  [no-untyped-def]
+src/sage_extensions/language_runtime.py:116: error: Function is missing a type annotation  [no-untyped-def]
+/ci/tool-configs/mypy-sage.ini: note: unused section(s): [mypy-slop_detector.*], [mypy-fpylll.*], [mypy-setuptools.*], [mypy-wheel.*], [mypy-pytest.*], [mypy-tqdm.*]
+Found 7 errors in 1 file (checked 1 source file)
+=== exit: 1 at 07:20:23

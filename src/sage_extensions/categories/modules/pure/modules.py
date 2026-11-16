@@ -240,15 +240,24 @@ def _is_group_algebra(ring) -> bool:
     Read off the ring's own category: constructing ``GroupAlgebras(R)`` to
     ask would need ``Modules(R)``, which may be the category being built.
     """
-    from sage_extensions.categories.algebras.group_algebras import GroupAlgebras
-
     if ring not in OwnedRings():
         return False
-    # Sage realizes each category instance in a dynamic subclass, so the
-    # placement is recognized by its category class, not by identity.
+    return _is_group_algebra_category(ring.category())
+
+
+@functools.cache
+def _is_group_algebra_category(category) -> bool:
+    r"""Whether ``category`` lies in a ``GroupAlgebras`` placement, decided once per category.
+
+    Sage realizes each category instance in a dynamic subclass, so the
+    placement is recognized by its category class, not by identity.
+    Categories are unique objects, so the answer is a function of the category.
+    """
+    from sage_extensions.categories.algebras.group_algebras import GroupAlgebras
+
     return any(
         isinstance(placement, GroupAlgebras)
-        for placement in ring.category().all_super_categories(proper=False)
+        for placement in category.all_super_categories(proper=False)
     )
 
 
@@ -2696,9 +2705,10 @@ class Modules(OwnedCategoryOverBaseRing):
             r"""Read the coefficients of the chosen preimage of ``element`` under the framing.
 
             Protected contract of ``Modules(R)``. Permitted callers are
-            :meth:`_framing_lift` and module
-            coordinate-transport or morphism evaluation constructors already
-            holding an owned framing vector.
+            :meth:`_framing_lift`, the tensor package's coordinate-vector
+            constructor (``tensor.coordinates``, reading the framing preimage
+            it has just lifted) and module coordinate-transport or morphism
+            evaluation constructors already holding an owned framing vector.
             The localized-module equality predicate also reads the stored
             coordinates of an actual free source vector to test whether its
             finitely many coefficients vanish after localization.
@@ -2718,7 +2728,8 @@ class Modules(OwnedCategoryOverBaseRing):
 
             Protected contract of ``Modules(R)``.  Its callers are
             ``FramingMorphism.lift``, ``ModuleMorphism.lift`` along the framing, ``FramedFreeModules`` elements'
-            ``to_vector``, and ``ModuleMorphism._call_``, which
+            ``to_vector``, ``tensor.coordinates``, which states an element's
+            coordinate vector in the tensor layer, and ``ModuleMorphism._call_``, which
             evaluates ``f(v) = sum_s a(s) f(m_s)`` on this preimage ``a``:
             evaluation must not construct the framing morphism, whose Mor set
             evaluates morphisms while it is built.  On a basis the preimage is
@@ -4726,7 +4737,7 @@ class ModulesWithChosenFinitePresentation(OwnedCategoryOverBaseRing):
                     f"{completion.completion_source()}, not of the base ring {ring}"
                 )
             adjunction = Modules(ring).base_change_adjunction(
-                completion.completion_map()
+                completion._completion_map_as_ring_morphism()
             )
             return adjunction.left_adjoint()(self)
 
@@ -4744,7 +4755,7 @@ class ModulesWithChosenFinitePresentation(OwnedCategoryOverBaseRing):
                 )
             return (
                 Modules(ring)
-                .base_change_adjunction(completion.completion_map())
+                .base_change_adjunction(completion._completion_map_as_ring_morphism())
                 .unit(self)
             )
 

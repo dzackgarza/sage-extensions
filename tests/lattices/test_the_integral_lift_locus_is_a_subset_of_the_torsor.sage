@@ -84,6 +84,62 @@ def test_the_integral_locus_is_a_subset_of_its_torsor() -> None:
     assert locus.is_empty() is False
 
 
+def test_the_nonempty_locus_is_a_point_of_the_torsors_power_set() -> None:
+    r"""``T_Z`` is a subobject of ``T``: a point of ``P(T)``, as the empty locus is.
+
+    The subsets of a set are the points of its power set, so a subset of ``T``
+    lies in ``Sets().Subobjects(T)`` and is a member of ``T.power_set()``.  The
+    empty locus is ``P(T)``'s bottom; this one is the same kind of object, cut
+    out of ``T`` by the residue-class predicate, and the two cases owe the same.
+    """
+    lattice, marked, reduction, torsor = _non_integral_base_point_control()
+    locus = torsor.integral_lift_locus()
+
+    assert lattice.div(marked) == 2
+    assert locus.is_empty() is False
+    assert locus in Sets().Subobjects(torsor)
+    assert locus in torsor.power_set()
+
+
+def test_a_zero_dimensional_parameter_space_has_the_one_integral_lift() -> None:
+    r"""``U``'s marked null line reduces to rank zero, so ``T_Z`` is one lift.
+
+    The parameter lattice of a rank-zero reduction is zero, so ``P/mP`` is one
+    class and the only lift a parameter names is ``phi(0)``: the torsor's base
+    point.  The residue locus is either that class or empty, and here it is the
+    class, so the integral locus is the one-point subset of ``T`` on the base
+    point --- a finite set the set owner counts from its point.
+    """
+    U = Lattices(ZZ)("U")
+    reduction = _reduction_at(U, U.basis_vector(0))
+    torsor = _marked_line_lift_torsor(reduction, reduction.Isom(reduction).identity())
+    locus = torsor.integral_lift_locus()
+
+    assert torsor.parameter_space().module_rank() == 0
+    assert torsor.integral_parameter_classes().is_empty() is False
+    assert locus.is_parent_of(torsor.base_point()) is True
+    assert locus.is_empty() is False
+    assert locus.cardinality() == cardinal(1)
+
+
+def test_the_point_the_locus_admits_is_an_integral_lift() -> None:
+    r"""The locus' own point restricts to an isometry of the lattice.
+
+    The nonempty locus admits the lift the residue locus built for its first
+    passing representative, so the point it answers is a lift of the lattice's
+    isometries and not merely a point of ``T``.  Asking it for its integral
+    restriction is an independent check of the fact the construction read off
+    the residue locus: the base point of this torsor has no integral
+    restriction, and the admitted lift does.
+    """
+    lattice, marked, reduction, torsor = _non_integral_base_point_control()
+    locus = torsor.integral_lift_locus()
+
+    assert lattice.div(marked) == 2
+    assert torsor.base_point().integral_restriction(lattice, lattice) is None
+    assert locus.an_element().integral_restriction(lattice, lattice) in lattice.Isom(lattice)
+
+
 def test_the_locus_is_membership_in_the_residue_class() -> None:
     r"""A lift is in ``T_Z`` exactly when its parameter's class lies in the residue locus.
 
@@ -100,8 +156,8 @@ def test_the_locus_is_membership_in_the_residue_class() -> None:
     assert locus.is_parent_of(torsor.base_point()) is False
     for residue in classes:
         assert locus.is_parent_of(_lift_at_class(torsor, residue)) is True
-    # The lift the torsor answers with when asked for an integral point is a member, and
-    # admitting it into the locus is asking the same question once more.
+    # The lift the torsor answers with when asked for an integral point is the one the
+    # locus admits, so membership answers without asking the predicate again.
     answered = torsor.integral_base_point()
     assert locus.is_parent_of(answered) is True
     assert locus(answered) == answered

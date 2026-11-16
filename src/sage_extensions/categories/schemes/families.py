@@ -142,7 +142,9 @@ def _special_fiber_comparison(family):
     completion = base.adic_completion(base.maximal_ideal())
     category = family.scheme_category()
     direct = category.base_change_functor(base.residue_map())(family)
-    completed_total = category.base_change_functor(completion.completion_map())(family)
+    completed_total = category.base_change_functor(
+        completion._completion_map_as_ring_morphism()
+    )(family)
     completed_residue = completed_total.scheme_category().base_change_functor(
         completion.residue_map()
     )

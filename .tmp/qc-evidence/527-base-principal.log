@@ -1,0 +1,43 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_________ test_the_inverse_system_at_a_principal_ideal_is_not_constant _________
+tests/rings/test_the_adic_inverse_system_and_its_limit_cone.sage:93: in test_the_inverse_system_at_a_principal_ideal_is_not_constant
+    system = completion.adic_inverse_system()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:2328: in sage.misc.cachefunc.CachedMethodCallerNoArgs.__call__
+    ???
+src/sage_extensions/categories/rings/commutative_algebra.py:3201: in adic_inverse_system
+    return functor.system_category().object(functor)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: object() takes exactly 0 positional arguments (1 given)
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:833 Elementwise module morphism Module over Fraction Field of Integer Ring on Classes in the multilinear tensor presentation -> Module over Fraction Field of Integer Ring on Fraction Field of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+____ test_the_limit_cone_at_a_principal_ideal_commutes_with_the_transitions ____
+tests/rings/test_the_adic_inverse_system_and_its_limit_cone.sage:117: in test_the_limit_cone_at_a_principal_ideal_commutes_with_the_transitions
+    system = completion.adic_inverse_system()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:2328: in sage.misc.cachefunc.CachedMethodCallerNoArgs.__call__
+    ???
+src/sage_extensions/categories/rings/commutative_algebra.py:3201: in adic_inverse_system
+    return functor.system_category().object(functor)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: object() takes exactly 0 positional arguments (1 given)
+=========================== short test summary info ============================
+FAILED tests/rings/test_the_adic_inverse_system_and_its_limit_cone.sage::test_the_inverse_system_at_a_principal_ideal_is_not_constant
+FAILED tests/rings/test_the_adic_inverse_system_and_its_limit_cone.sage::test_the_limit_cone_at_a_principal_ideal_commutes_with_the_transitions
+2 failed, 3 deselected in 15.63s
+[peakrss] probe527: child waited=1 shell_code=1 samples=13
+[peakrss] peak tree RSS      : 291 MiB
+[peakrss] low-water MemAvail : 2269 MiB
+[peakrss] peak single VmHWM  : 294 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      283 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    14.1s procs=  3 rss=   291 MiB hwm=   294 MiB avail=  2269 MiB
+[peakrss]   t=    16.1s procs=  3 rss=   291 MiB hwm=   294 MiB avail=  2450 MiB
+[peakrss]   t=    12.1s procs=  3 rss=   287 MiB hwm=   290 MiB avail=  2488 MiB
+[peakrss]   t=    10.1s procs=  3 rss=   270 MiB hwm=   276 MiB avail=  2588 MiB
+[peakrss]   t=    18.1s procs=  3 rss=   256 MiB hwm=   294 MiB avail=  2733 MiB
+launcher exit: 1

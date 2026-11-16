@@ -1,0 +1,64 @@
+provider SHA: e7ac06ab4757980aa5193b4b2345cd3f707170b8
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+command: pytest -p sage_extensions.testing.test_lint tests/engineering/test_the_incidence_row_reports_a_broken_contract_apart_from_an_undecided_row.py
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: asyncio-1.5.0, xdist-3.8.0, reportlog-1.0.0, platformdirs-4.13.5, hypothesis-6.170.15, anyio-4.15.1, timeout-2.4.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 5 items
+
+tests/engineering/test_the_incidence_row_reports_a_broken_contract_apart_from_an_undecided_row.py . [ 20%]
+...F                                                                     [100%]
+
+=================================== FAILURES ===================================
+_ test_a_row_of_a_lattice_with_no_isotropic_plane_decides_with_its_line_vertex _
+
+    def test_a_row_of_a_lattice_with_no_isotropic_plane_decides_with_its_line_vertex():
+        r"""A row whose lattice has no isotropic plane has no edge, and it is decided, not broken.
+    
+        ``U + <-2>`` has signature ``(1, 2)``, so it carries no totally isotropic
+        plane -- a totally isotropic two-plane would force both indices of the form
+        to be at least two -- and its building has line vertices only.  Its row
+        therefore returns one line cusp, no plane cusp and no edge, and that is the
+        row's complete answer: the driver decides it, and reports no vertex of it
+        as left without an edge, because a row with no plane vertex has no edge for
+        a line vertex to carry.
+        """
+        lattice = Lattices(ZZ)("U") + Lattices(ZZ)([[-2]])
+        outcome = incidence_row_outcome(lattice, lattice.Aut(), "O(U + <-2>)", 3600)
+    
+>       assert outcome.status is RowStatus.DECIDED
+E       AssertionError: assert <RowStatus.CONTRACT_VIOLATION: ('contract violation', 2)> is <RowStatus.DECIDED: ('decided', 0)>
+E        +  where <RowStatus.CONTRACT_VIOLATION: ('contract violation', 2)> = RowOutcome(label='O(U + <-2>)', status=<RowStatus.CONTRACT_VIOLATION: ('contract violation', 2)>, detail='line cusp 0 carries no edge', counts=None).status
+E        +  and   <RowStatus.DECIDED: ('decided', 0)> = RowStatus.DECIDED
+
+tests/engineering/test_the_incidence_row_reports_a_broken_contract_apart_from_an_undecided_row.py:141: AssertionError
+----------------------------- Captured stdout call -----------------------------
+[O(U + <-2>)] the row's calls returned in 2.5 s
+[O(U + <-2>)] line cusp 0: ((1, 0, 0),)
+------------------------------ Captured log call -------------------------------
+INFO     sage_extensions.timing:timing.py:313 ambient O(L) row
+INFO     sage_extensions.timing:timing.py:313 ambient O(L) row
+INFO     sage_extensions.timing:timing.py:313 ambient O(L) row
+INFO     sage_extensions.timing:timing.py:313 ambient O(L) row
+INFO     sage_extensions.timing:timing.py:313 ambient O(L) row
+INFO     sage_extensions.timing:timing.py:313 ambient O(L) row
+INFO     sage_extensions.timing:timing.py:313 ambient O(L) row
+=========================== short test summary info ============================
+FAILED tests/engineering/test_the_incidence_row_reports_a_broken_contract_apart_from_an_undecided_row.py::test_a_row_of_a_lattice_with_no_isotropic_plane_decides_with_its_line_vertex
+========================= 1 failed, 4 passed in 20.46s =========================
+[peakrss] run: child waited=1 shell_code=1 samples=15
+[peakrss] peak tree RSS      : 504 MiB
+[peakrss] low-water MemAvail : 5098 MiB
+[peakrss] peak single VmHWM  : 504 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      493 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    26.1s procs=  3 rss=   504 MiB hwm=   504 MiB avail=  5217 MiB
+[peakrss]   t=    28.1s procs=  3 rss=   504 MiB hwm=   504 MiB avail=  5098 MiB
+[peakrss]   t=    24.1s procs=  3 rss=   503 MiB hwm=   504 MiB avail=  5443 MiB
+[peakrss]   t=    20.1s procs=  3 rss=   493 MiB hwm=   493 MiB avail=  5668 MiB
+[peakrss]   t=    22.1s procs=  3 rss=   493 MiB hwm=   493 MiB avail=  5631 MiB

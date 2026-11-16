@@ -1,0 +1,22 @@
+probe: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/probe552_r3_pytest.py
+tree SHA: cd4231130b21914935e2182954e7fae48a6e812d (modified paths: 3)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 18.25 25.24 23.05 19/864 2904368
+inner 600 s, outer 660 s, guard 4096 MiB, args 'tests/test_native_ring_constructions.py -k presented_algebra_constructor_states_the_quotient'
+.                                                                        [100%]
+1 passed, 8 deselected in 10.24s
+pytest exit: 0
+[peakrss] green552f1: child waited=0 shell_code=0 samples=10
+[peakrss] peak tree RSS      : 267 MiB
+[peakrss] low-water MemAvail : 1361 MiB
+[peakrss] peak single VmHWM  : 273 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      262 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    14.1s procs=  3 rss=   267 MiB hwm=   270 MiB avail=  1608 MiB
+[peakrss]   t=    12.1s procs=  3 rss=   266 MiB hwm=   266 MiB avail=  1762 MiB
+[peakrss]   t=    10.1s procs=  3 rss=   231 MiB hwm=   231 MiB avail=  1667 MiB
+[peakrss]   t=     8.1s procs=  3 rss=   204 MiB hwm=   205 MiB avail=  1837 MiB
+[peakrss]   t=    16.1s procs=  3 rss=   198 MiB hwm=   273 MiB avail=  1439 MiB
+launcher exit: 0

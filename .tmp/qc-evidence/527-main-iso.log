@@ -1,0 +1,33 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+__ test_the_completion_map_at_the_zero_ideal_is_an_isomorphism_onto_the_ring ___
+tests/rings/test_the_adic_inverse_system_and_its_limit_cone.sage:89: in test_the_completion_map_at_the_zero_ideal_is_an_isomorphism_onto_the_ring
+    assert completion_map in Rings().Core().Mor(field, completion)
+E   assert Generic morphism:\n  From: Free module on {1, a} over Fraction Field of Integer Ring\n  To:   Free module on {1} over Free module on {1, a} over Fraction Field of Integer Ring in Set of Morphisms from Free module on {1, a} over Fraction Field of Integer Ring to Free module on {1} over Free module on {1, a} over Fraction Field of Integer Ring in Core of Category of owned rings
+E    +  where Set of Morphisms from Free module on {1, a} over Fraction Field of Integer Ring to Free module on {1} over Free module on {1, a} over Fraction Field of Integer Ring in Core of Category of owned rings = Mor(Free module on {1, a} over Fraction Field of Integer Ring, Free module on {1} over Free module on {1, a} over Fraction Field of Integer Ring)
+E    +    where Mor = Core of Category of owned rings.Mor
+E    +      where Core of Category of owned rings = Core()
+E    +        where Core = Category of owned rings.Core
+E    +          where Category of owned rings = Rings()
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:442 General module over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:833 Elementwise module morphism Module over Fraction Field of Integer Ring on Classes in the multilinear tensor presentation -> Module over Fraction Field of Integer Ring on Fraction Field of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:442 General module over Free module on {1, a} over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:833 Elementwise module morphism Module over Free module on {1, a} over Fraction Field of Integer Ring on Classes in the multilinear tensor presentation -> Module over Free module on {1, a} over Fraction Field of Integer Ring on Free module on {1, a} over Fraction Field of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+=========================== short test summary info ============================
+FAILED tests/rings/test_the_adic_inverse_system_and_its_limit_cone.sage::test_the_completion_map_at_the_zero_ideal_is_an_isomorphism_onto_the_ring
+1 failed, 4 deselected in 11.18s
+[peakrss] probe527: child waited=1 shell_code=1 samples=10
+[peakrss] peak tree RSS      : 253 MiB
+[peakrss] low-water MemAvail : 1569 MiB
+[peakrss] peak single VmHWM  : 259 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      248 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    14.1s procs=  3 rss=   253 MiB hwm=   259 MiB avail=  2476 MiB
+[peakrss]   t=    18.1s procs=  3 rss=   240 MiB hwm=   258 MiB avail=  2982 MiB
+[peakrss]   t=    16.1s procs=  3 rss=   237 MiB hwm=   258 MiB avail=  3035 MiB
+[peakrss]   t=    12.1s procs=  3 rss=   213 MiB hwm=   219 MiB avail=  2644 MiB
+[peakrss]   t=    10.1s procs=  3 rss=   152 MiB hwm=   159 MiB avail=  2869 MiB
+launcher exit: 1

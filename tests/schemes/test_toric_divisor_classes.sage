@@ -267,7 +267,7 @@ def test_projective_plane_hyperplane_section_ring_has_the_expected_graded_pieces
 
 
 def test_the_line_section_ring_is_the_free_semigroup_algebra_on_three_monomials() -> None:
-    r"""``R(P^2, O(1)) = Q[s_0, s_1, s_2]``: ``gens()`` is ``chi^m`` at the three lattice points.
+    r"""``R(P^2, O(1)) = Q[s_0, s_1, s_2]``: each generator is the section ``chi^m`` at one lattice point.
 
     The characters ``chi^m`` for ``m`` a lattice point of ``P_{D_0}`` are a
     basis of the global sections (CLS Prop. 4.3.3, as this file's header
@@ -284,26 +284,53 @@ def test_the_line_section_ring_is_the_free_semigroup_algebra_on_three_monomials(
     line = plane.hyperplane_divisor()
     ring = plane.section_ring(line)
     coordinates = ring.section_semigroup_generators()
+    labels = tuple(ring.algebra_generating_set())
+    presentation = ring.presentation_ring()
 
     # The ring's generators are the acceptance surface: three monomials, in the
     # retained order, and nothing else.  This is the family Sage spells
     # ``gens()``; the session spells it ``algebra_generators()``, and the two are
     # the same tuple.
-    first, second, third = tuple(ring.algebra_generators())
-    monomials = (first, second, third)
-    assert all(ring.homogeneous_degree(monomial) == 1 for monomial in monomials)
-    # Each generator is the section at one lattice point of ``P_{D_0}``, lifted
-    # to height one in the cone over it.
-    points = tuple(
-        tuple(int(entry) for entry in coordinates[label])
-        for label in ring.algebra_generating_set()
-    )
-    assert frozenset(points) == frozenset({(0, 0, 1), (1, 0, 1), (0, 1, 1)})
+    assert ring.algebra_generating_set().cardinality() == 3
+    # Each generator is the section ``chi^m`` at one lattice point of
+    # ``P_{D_0}``, lifted to height one in the cone over it, and the element
+    # itself says which: its lift into the retained presentation is its own
+    # variable, and its degree is the height of its own point.
+    points = {}
+    for label in labels:
+        monomial = ring.algebra_generator(label)
+        point = tuple(int(entry) for entry in coordinates[label])
+        assert ring.lift_to_presentation(monomial) == presentation.algebra_generator(label)
+        assert int(ring.homogeneous_degree(monomial)) == point[-1]
+        points[label] = point
+    assert frozenset(points.values()) == frozenset({(0, 0, 1), (1, 0, 1), (0, 1, 1)})
     assert plane.divisor_section_characters(line).cardinality() == 3
     # Three generators and an empty relation family is the polynomial algebra.
     assert ring.relations().cardinality() == 0
-    assert monomials[0] * monomials[2] != monomials[1] * monomials[1]
-    assert monomials[0] * monomials[0] != monomials[1] * monomials[2]
+
+    # The product of two generators is the element at the sum of their points,
+    # so two products agree exactly when their points do.  That is the semigroup
+    # law, and it is what makes distinct monomials distinct elements: it is
+    # checked for every pair of pairs, not for two named products.
+    products = {
+        (left, right): ring.algebra_generator(left) * ring.algebra_generator(right)
+        for left in labels
+        for right in labels
+    }
+    sums = {
+        (left, right): tuple(
+            a + b for a, b in zip(points[left], points[right], strict=True)
+        )
+        for left in labels
+        for right in labels
+    }
+    for left in labels:
+        for right in labels:
+            for other in labels:
+                for remaining in labels:
+                    assert (products[left, right] == products[other, remaining]) == (
+                        sums[left, right] == sums[other, remaining]
+                    )
 
 
 def test_projective_plane_sections_are_actual_homogeneous_cox_polynomials() -> None:

@@ -5263,7 +5263,7 @@ class Lattices(OwnedCategoryOverBaseRing):
             """
             return _spinor_norm_kernel(
                 self.spinor_norm(field_map, form_multiplier),
-                "sn(g) = 1",
+                lambda: "sn(g) = 1",
             )
 
         @cached_method
@@ -5332,7 +5332,7 @@ class Lattices(OwnedCategoryOverBaseRing):
             real_spinor_norm = self.spinor_norm(real_place)
             return _spinor_norm_kernel(
                 real_spinor_norm.codomain().sign_isomorphism() * real_spinor_norm,
-                "sn_RR(g) = 1",
+                lambda: "sn_RR(g) = 1",
                 character_data={"spinor_kernel": True},
             )
 
@@ -8474,20 +8474,25 @@ class Lattices(OwnedCategoryOverBaseRing):
                      - \tfrac12 q(a)\,e\otimes b(e,\cdot) ,
             \]
 
-            one tensor expression on the framing of \(L\).  The contraction
-            `gram * v` of the Gram tensor with a vector is the covector
-            \(b(v,\cdot)\) -- the form is symmetric, so which of its two slots
-            the product halves is immaterial -- and `tensor.identity` is the
-            delta of that framing.  Entry \((i,j)\) of the result is the
-            coefficient of \(e_i\) in the image of \(e_j\), so the columns are
-            the images of the basis.
+            one tensor expression on the framing of \(L\).  The vectors \(e\)
+            and \(a\) enter as `tensor.coordinates`, their coordinate vectors
+            in that framing, so no coordinate is read one basis position at a
+            time here.  The contraction `gram * v` of the Gram tensor with a
+            vector is the covector \(b(v,\cdot)\) -- the form is symmetric,
+            so which of its two slots the product halves is immaterial -- and
+            `tensor.identity` is the delta of that framing.  Entry \((i,j)\) of
+            the result is the coefficient of \(e_i\) in the image of \(e_j\),
+            so the columns are the images of the basis.
 
             The expression is written over the fraction field, since
             \(\tfrac12 q(a)\) need not lie in the ring of \(L\), and read over
             that ring: \(t(e,a)\) preserves \(L\) exactly when every coefficient
             \(\tfrac12 q(a)b(e,e_j)\) is integral (equation (10) there, \(a\) of
-            even square), and a coefficient outside the ring has no reading
-            there.
+            even square).  That is one decision per generator, stated here before
+            the update is read: the coefficient outside the ring is refused with
+            the transvection, this lattice and the coefficient
+            \(q(a)b(e,e_j)/2\) named, where the reading of the update would
+            refuse the same coefficient as a rational it cannot convert.
 
             The formula's hypotheses -- that \(e\) and \(a\) are vectors of this
             lattice, that \(q(e)=0\) and that \(b(e,a)=0\) -- are asserted by
@@ -8500,20 +8505,25 @@ class Lattices(OwnedCategoryOverBaseRing):
             labels = tuple(self.module_generating_set())
             gram = self.gram_tensor().change_ring(fraction_field)
             half_norm = fraction_field(orthogonal.q()) / fraction_field(ring(2))
-            isotropic_vector = tensor.vector(
-                fraction_field,
-                tuple(
-                    fraction_field(isotropic.to_vector()(label)) for label in labels
-                ),
-            )
-            orthogonal_vector = tensor.vector(
-                fraction_field,
-                tuple(
-                    fraction_field(orthogonal.to_vector()(label)) for label in labels
-                ),
-            )
+            isotropic_vector = tensor.coordinates(isotropic).change_ring(fraction_field)
+            orthogonal_vector = tensor.coordinates(orthogonal).change_ring(fraction_field)
             pairing_with_isotropic = gram * isotropic_vector
             pairing_with_orthogonal = gram * orthogonal_vector
+            # Equation (10) there: `t(e,a)` preserves `L` exactly when every
+            # coefficient `q(a) b(e, e_j)/2` is integral, which is one decision
+            # per basis vector.  Reading the update over the ring refuses such a
+            # coefficient as well, but that refusal is the conversion's: it names
+            # a rational and not the transvection, the lattice or the generator
+            # whose coefficient it is.
+            for position, label in enumerate(labels):
+                coefficient = half_norm * pairing_with_isotropic[position]
+                if coefficient not in ring:
+                    raise ValueError(
+                        f"the Eichler transvection t(e, a) with e = {isotropic!r}, "
+                        f"a = {orthogonal!r} does not preserve {self!r}: "
+                        f"q(a) b(e, {self.module_generator(label)})/2 = {coefficient} "
+                        f"is not in {ring}"
+                    )
             update = (
                 tensor.identity(fraction_field, self.module_rank())
                 - isotropic_vector.tensor_product(pairing_with_orthogonal)
@@ -8637,9 +8647,11 @@ class Lattices(OwnedCategoryOverBaseRing):
             gram_values = [
                 [SageQQ(int(self.b(left, right))) for right in basis] for left in basis
             ]
-            isotropic_coordinates = [
-                SageQQ(int(isotropic.to_vector()(label))) for label in labels
-            ]
+            # The coordinates are the tensor layer's; the pairing below reads
+            # them as the rationals its integrality checks compare.
+            isotropic_coordinates = tuple(
+                SageQQ(int(entry)) for entry in tensor.coordinates(isotropic)
+            )
 
             def pairing(left_coordinates, right_coordinates):
                 return sum(
@@ -8713,9 +8725,11 @@ class Lattices(OwnedCategoryOverBaseRing):
             gram_values = [
                 [SageQQ(int(self.b(left, right))) for right in basis] for left in basis
             ]
-            isotropic_coordinates = [
-                SageQQ(int(isotropic.to_vector()(label))) for label in labels
-            ]
+            # The coordinates are the tensor layer's; the pairing below reads
+            # them as the rationals its integrality checks compare.
+            isotropic_coordinates = tuple(
+                SageQQ(int(entry)) for entry in tensor.coordinates(isotropic)
+            )
             parameter_coordinates = self._half_vector_coordinates(parameter)
 
             def pairing(left_coordinates, right_coordinates):
@@ -11393,12 +11407,17 @@ def _spinor_norm_multiplier(field, form_multiplier):
     return multiplier
 
 
-def _spinor_norm_kernel(spinor_norm, description, *, character_data=None):
-    r"""Return \(\ker\mathrm{sn}=\mathrm{sn}^{-1}(\{[1]\})\), retaining \(\mathrm{sn}\) as its preimage morphism."""
+def _spinor_norm_kernel(spinor_norm, stated_clause, *, character_data=None):
+    r"""Return \(\ker\mathrm{sn}=\mathrm{sn}^{-1}(\{[1]\})\), retaining \(\mathrm{sn}\) as its preimage morphism.
+
+    ``stated_clause`` is the caller's words for the condition (``sn_RR(g) =
+    1``), as a function of nothing: the preimage asks it when a record reads the
+    kernel's name, not here.
+    """
     return PreimageSubgroups(spinor_norm.domain())(
         spinor_norm,
         spinor_norm.codomain().subgroup(()),
-        description=description,
+        stated_clause=stated_clause,
         character_data=character_data,
     )
 
@@ -11512,7 +11531,7 @@ class SpinorNormSequence:
     @cached_method
     def kernel(self):
         r"""Return the \(K\)-spinor kernel \(K_{\mathrm{sn}_K}=\ker\mathrm{sn}_K\le O(L_K)\)."""
-        return _spinor_norm_kernel(self.morphism(), "sn_K(g) = 1")
+        return _spinor_norm_kernel(self.morphism(), lambda: "sn_K(g) = 1")
 
     def kernel_inclusion(self):
         r"""Return \(K_{\mathrm{sn}_K}\hookrightarrow O(L_K)\)."""

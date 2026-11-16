@@ -1,0 +1,37 @@
+tree SHA: 1488acfb5636b16c6836828e5f29208d610d3712 (modified paths: 8)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 7.17 11.75 17.48 9/662 2932643
+probe: .tmp/probe/p5.py; inner 240 s
+predicate on the primal: None
+predicate on the dual is the primal? True
+predicate on the double dual is the dual? True
+predicate on an endomorphism Mor module: None
+diamond frame is the dual? True
+doubled frame is the primal? True
+thrice frame is the dual? True
+doubled == square? True
+doubled is in ConvexPolytopes(lattice)? True
+diamond is in ConvexPolytopes(lattice)? False
+square in doubled? True
+doubled in square? True
+hash equal? True
+existing contract polar.polar_dual() == square? True
+thrice == diamond? True
+diamond in square? is_subset(Lattice Polygon of dimension 2 with 4 vertices, Lattice Polygon of dimension 2 with 4 vertices)
+square in diamond? is_subset(Lattice Polygon of dimension 2 with 4 vertices, Lattice Polygon of dimension 2 with 4 vertices)
+square == 1? False
+square == None? False
+square == ()? False
+diamond == moved? True | hash equal? True
+moved in diamond? True
+[peakrss] probe554: child waited=0 shell_code=0 samples=2
+[peakrss] peak tree RSS      : 298 MiB
+[peakrss] low-water MemAvail : 8765 MiB
+[peakrss] peak single VmHWM  : 298 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      287 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     2.0s procs=  3 rss=   298 MiB hwm=   298 MiB avail=  8765 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     7 MiB hwm=     7 MiB avail=  9104 MiB
+probe exit: 0

@@ -1,0 +1,33 @@
+=== tree: 90e33560c1321daa66af521584c299c72c3ff475 (modified: 5 paths)
+=== files: tests/foundations/test_a_session_file_binds_only_what_it_writes.sage tests/foundations/test_the_session_names_denote_their_objects.sage
+=== start: 07:15:45
+.F....                                                                   [100%]
+=================================== FAILURES ===================================
+___ test_a_subscript_of_a_name_the_file_does_not_bind_declares_no_generator ____
+
+    def test_a_subscript_of_a_name_the_file_does_not_bind_declares_no_generator() -> None:
+        r"""Loading a file whose subscript names nothing new reports the absent name.
+    
+        The file star-imports the session, so ``t`` may have been bound by that
+        import; the parse cannot know it is new, and a file is not the place to
+        invent a binding for it.  Sage's own reading of the subscript reports the
+        absent name, which is what the load raises.
+        """
+>       with pytest.raises(NameError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE NameError
+
+tests/foundations/test_a_session_file_binds_only_what_it_writes.sage:51: Failed
+=============================== time-gate report ===============================
+session star import took 8.95 s; the measured ceiling is 3 s
+============================= slowest 5 durations ==============================
+0.15s call     tests/foundations/test_a_session_file_binds_only_what_it_writes.sage::test_a_subscript_of_a_name_the_file_does_not_bind_declares_no_generator
+0.03s call     tests/foundations/test_the_session_names_denote_their_objects.sage::test_the_dialect_names_build_owned_elements
+0.02s call     tests/foundations/test_the_session_names_denote_their_objects.sage::test_every_scalar_ring_name_denotes_the_owned_ring_of_that_name
+0.01s call     tests/foundations/test_a_session_file_binds_only_what_it_writes.sage::test_a_subscript_of_a_session_name_builds_the_object_it_names
+
+(1 durations < 0.005s hidden.  Use -vv to show these durations.)
+=========================== short test summary info ============================
+FAILED tests/foundations/test_a_session_file_binds_only_what_it_writes.sage::test_a_subscript_of_a_name_the_file_does_not_bind_declares_no_generator
+1 failed, 5 passed in 4.10s
+=== exit: 1 at 07:16:14

@@ -133,18 +133,8 @@ class RngMorphism:
 class RingMorphism:
     r"""A unital ring morphism in the owned ring category."""
 
-    def __init__(
-        self, parent, function, *, engine_morphism=None, surjectivity_premise=None
-    ) -> None:
-        r"""Retain the map, its private engine realization, and any stated surjectivity.
-
-        ``surjectivity_premise`` is ``True`` or ``False`` when the construction
-        that built this map established that answer, and ``None`` when it
-        established nothing (``OWN-22``: a construction states what it knows and
-        proves nothing at its return).
-        """
+    def __init__(self, parent, function, *, engine_morphism=None) -> None:
         self._engine_morphism = engine_morphism
-        self._surjectivity_premise = surjectivity_premise
         self._preamble_is_identity = False
         super().__init__(parent, function)
 
@@ -382,7 +372,7 @@ class RingMorphism:
         if (
             codomain in AdicCompletions()
             and domain in OwnedRings().Noetherian()
-            and self is codomain.completion_map()
+            and self is codomain._completion_map_as_ring_morphism()
         ):
             from sage_extensions.categories.rings.commutative_ideals import (
                 _flat_extension_commutative_ideal,
@@ -543,24 +533,6 @@ class RingMorphism:
                 return codomain.characteristic().is_zero()
             case _:
                 return super().is_injective()
-
-    def is_surjective(self):
-        r"""Return whether ``f`` is onto, stated by its construction where it states it.
-
-        A ring map need not be inspected to know it is onto: a construction
-        that realizes ``S`` as the image of ``R`` -- the completion of ``R`` at
-        an ideal whose powers vanish, whose map is then ``R -> R`` -- proves it
-        while building the map.  ``surjectivity_premise`` is that proof, and it
-        is read here without a cokernel computation.  Otherwise the set-level
-        answer stands.
-        """
-        premise = self._surjectivity_premise
-        match premise:
-            case None:
-                return super().is_surjective()
-            case _:
-                return premise
-
 
 def _selected_engine_ring_morphism(morphism):
     r"""Return a retained private ring-map realization, or None.
@@ -788,7 +760,7 @@ def _ring_mor_category(domain, codomain) -> "RingMor":
     return RingMorCategoryConstruction(OwnedRings()).Of(domain, codomain)
 
 
-def _ring_morphism_with_engine(domain, codomain, function, engine_morphism, *, surjectivity_premise=None):
+def _ring_morphism_with_engine(domain, codomain, function, engine_morphism):
     r"""Construct an owned ring morphism retaining one private engine map.
 
     Protected ring-Mor construction contract under OWN-05--07. Permitted
@@ -796,13 +768,9 @@ def _ring_morphism_with_engine(domain, codomain, function, engine_morphism, *, s
     adapters that have already selected an exact engine map realizing the
     supplied owned element function. The raw map is retained by the ring-Mor
     owner and is never mathematical output.
-
-    ``surjectivity_premise`` is the caller's established answer to whether the
-    map is onto -- ``True`` for a completion realized as its own source --- and
-    is left ``None`` when the construction establishes nothing.
     """
     return domain.Mor(codomain, category=OwnedRings())._elementwise_with_engine(
-        function, engine_morphism, surjectivity_premise
+        function, engine_morphism
     )
 
 
@@ -1005,18 +973,11 @@ class RingMor(CategoricalMor):
             return self(function)
         return self.element_class(self, function)
 
-    def _elementwise_with_engine(self, function, engine_morphism, surjectivity_premise=None):
-        r"""Construct an elementwise map retaining one private engine realization.
-
-        ``surjectivity_premise`` states an answer the caller's construction
-        established about the map being onto, and is ``None`` when it
-        established none.
-        """
+    def _elementwise_with_engine(self, function, engine_morphism):
         return self.element_class(
             self,
             function,
             engine_morphism=engine_morphism,
-            surjectivity_premise=surjectivity_premise,
         )
 
     @object_level
@@ -6510,39 +6471,45 @@ class _OwnedRingParent(Parent):
                 )
 
                 coefficient_field = _engine_scalar_ring(engine)
-                match base:
-                    case _ if base is coefficient_field:
-                        # The defining polynomial divides with remainder over
-                        # the coefficient field, so its powers below the degree
-                        # are a basis there, and only there.
-                        degree = int(
-                            engine.defining_polynomial().degree()
-                            if engine.is_absolute()
-                            else engine.relative_polynomial().degree()
-                        )
-                        self._native_module_basis = _power_module_basis(
-                            base,
-                            degree,
-                            lambda exponent: _owned_engine_element(
-                                self, engine.gen() ** exponent
-                            ),
-                            lambda element: _engine_element(self, element).list(),
-                        )
-                    case _ if _engine_ring(base) is engine:
-                        # The base presents the same ring on the same engine,
-                        # so it is this ring: free of rank one on the unit, and
-                        # its coordinate is the element itself.
-                        self._native_module_basis = _power_module_basis(
-                            base,
-                            1,
-                            lambda _exponent: _owned_engine_element(self, engine.one()),
-                            lambda element: (_engine_element(self, element),),
-                        )
-                    case _:
-                        # No power basis of the defining polynomial is a basis
-                        # over this base, and no other is known: the module
-                        # keeps no chosen resolution rather than a false one.
-                        pass
+                if base is coefficient_field:
+                    # The defining polynomial divides with remainder over the
+                    # coefficient field, so its powers below the degree are a
+                    # basis there, and only there.
+                    degree = int(
+                        engine.defining_polynomial().degree()
+                        if engine.is_absolute()
+                        else engine.relative_polynomial().degree()
+                    )
+                    self._native_module_basis = _power_module_basis(
+                        base,
+                        degree,
+                        lambda exponent: _owned_engine_element(
+                            self, engine.gen() ** exponent
+                        ),
+                        lambda element: _engine_element(self, element).list(),
+                    )
+                elif _engine_ring(base) is engine:
+                    # The base presents the same ring on the same engine, so it
+                    # is this ring: free of rank one on the unit, and its
+                    # coordinate is the element itself.
+                    self._native_module_basis = _power_module_basis(
+                        base,
+                        1,
+                        lambda _exponent: _owned_engine_element(self, engine.one()),
+                        lambda element: (_engine_element(self, element),),
+                    )
+                else:
+                    # The defining polynomial's powers are a basis over its
+                    # coefficient field and over nothing else, so no basis is
+                    # known over this base; a parent that installed none would
+                    # read as free with no resolution at all, which is the
+                    # defect this block exists to avoid.
+                    raise TypeError(
+                        f"cannot install a module basis of {engine} over {base}: the powers of "
+                        f"the defining polynomial are a basis over its coefficient field "
+                        f"{coefficient_field}, and {base} is neither that field nor this ring "
+                        "presented on the same engine"
+                    )
             if isinstance(engine, SageNumberFieldOrder) and self is not _owned_integers():
                 # The integral basis is constructor data, but registering a
                 # selected resolution here is too early: Parent.__init__ has

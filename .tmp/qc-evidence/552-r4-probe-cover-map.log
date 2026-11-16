@@ -1,0 +1,30 @@
+probe: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/probe552_r3h.py
+tree SHA: 87c8d370b05364347c712b4c76192d0330649f7e (modified paths: 4)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 14.29 18.94 21.64 15/754 2918116
+inner 600 s, outer 660 s, guard 4096 MiB, args ''
+import over: 3.3 s
+nonmonic quotient: Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring/(2*x)
+nonmonic presentation ring: True
+nonmonic 2x is zero: True
+nonmonic x nonzero: True
+nonmonic cover map: x
+torsion symmetric algebra: Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring/(2*u)
+torsion presentation ring: True
+2u zero: True
+u nonzero: True
+total 4.4 s
+[peakrss] probe552r3h: child waited=0 shell_code=0 samples=4
+[peakrss] peak tree RSS      : 289 MiB
+[peakrss] low-water MemAvail : 6307 MiB
+[peakrss] peak single VmHWM  : 289 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      278 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   bash                          3 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     6.0s procs=  3 rss=   289 MiB hwm=   289 MiB avail=  6307 MiB
+[peakrss]   t=     4.0s procs=  3 rss=   273 MiB hwm=   273 MiB avail=  6443 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   201 MiB hwm=   202 MiB avail=  6593 MiB
+[peakrss]   t=     0.0s procs=  2 rss=    11 MiB hwm=    11 MiB avail=  6804 MiB
+launcher exit: 0
