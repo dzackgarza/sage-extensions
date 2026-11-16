@@ -1835,6 +1835,7 @@ such a case is a criterion smuggled in without its theorem.
 - Measure wall time and its growth with input size.
 - Use call counts only to locate repeated work.
 - Remove repeated derivation, needless enumeration, repeated verification, and overly general algorithms.
+- An owned operation costs its engine arithmetic plus a constant-time wrap: objects carry engine data, a search runs on that data, and its result is raised once (`OWN-22`, `OWN-24`).
 - Preserve code that shows the correct mathematical sequence, even when a faster form is less clear.
 - Start filesystem discovery at the requested path with a shallow query.
 - Expand the search only when the evidence requires it.

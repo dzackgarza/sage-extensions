@@ -1476,6 +1476,15 @@ of this specification.
   first request, cached on the object, and reused by every method that needs
   it.
 
+  An owned operation costs its engine arithmetic plus a constant-time wrap.
+  An object carries its engine data (rows, pairing table, Gram matrix) as
+  that cached datum, and an operation over it computes on the engine data and
+  raises its result once.  An owned element or morphism is never rebuilt per
+  step of a search: `L.O().stabilizer(family)` and
+  `L.O().transporter(family, other)` of `coloured_vector_families` search the
+  family rows and pairing tables on engine data and raise each returned
+  isometry once.
+
   A well-definedness condition is a validator method of the object.
   Construction calls the object's validators once, after the object exists,
   in the manner of a pydantic post-init validator, and each validator returns
@@ -1595,6 +1604,10 @@ of this specification.
   family contraction takes the pulled-back forms as inputs, not a
   manually assembled Gram array at the consumer. The value modules of
   the bilinear pairing and its quadratic refinement remain distinct.
+  A search over a family (a permutation backtrack, an integrality test of
+  each candidate) is such a private numerical realization: it runs on the
+  family's engine rows and pairing tables, and only its result is raised
+  into the preamble, once (`OWN-22`).
 
   **Mathematical transposition and coordinate transposition are different
   operations.** Determine the receiver's actual owning Mor and the source and
