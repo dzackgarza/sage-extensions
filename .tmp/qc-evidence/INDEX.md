@@ -2954,3 +2954,20 @@ parent the review names.
 | `524r2-stated-valueerror-absent-at-bf4388a.log` | `bf4388a` | the mechanism `a20a385` states, probed: `discriminant_group()` of `U(2) + <2>` built in 0.25 s, its module `is_torsion()` True, `_finitely_presented_torsion()` True, `twist(-1)` in 0.05 s — no `ValueError` |
 | `524r2-stated-valueerror-absent-at-3fae3b5.log` | `3fae3b5` | the same probe on `main`: the same answers, with the module in `Torsion()` |
 | `524r2-walk-green-at-82cad5b.log` | `82cad5b`, the rebased head this round is pushed from, clean tree | the same selection after `main` advanced to `4936110`: **1 passed, 3 deselected in 2.39 s** (load 19.91) |
+
+## `#523` round 3: the matrix inverse at any two endpoints, once, with its hypotheses (2026-11-16)
+
+One file per run, in the pinned runtime (Sage 11.0.beta5, port tree `991b88b0`),
+through `.scratch/launch523.sh`: `run.sh -w /work`,
+`PYTHONPATH=/repos/sage-extensions/src:/ci/tool-artifacts/pytest_plugins:/work/src:/work`,
+`/sage/.venv/bin/python -m pytest -o addopts= -p sage_extensions.testing.suite_budget
+-p sage_extensions.testing.test_lint -p qc_sage_session --no-time-gates --durations=0`.
+`5ce18d3` is the test commit, `63367f9` its repair, and the probe ran on that
+tree.  Both were rebased from `49361108d6` onto `ab2e435`; the three paths they
+touch are identical between the two commits, so the runs are the pushed tree's.
+
+| log | tree | result |
+| --- | --- | --- |
+| `523r4-red-at-5ce18d3.log` | `5ce18d3`, clean tree | `tests/rings/test_a_matrix_ring_divides_only_by_its_units.sage` alone: **2 failed, 7 passed in 1.92 s** — `f.inverse()` for a distinct-endpoint map over Z/4 raises `AssertionError: cannot compute the kernel` while `~f` answers, and `a.determinant() is a.determinant()` is False (`assert 1 is 1`) |
+| `523r4-green-at-63367f9.log` | `63367f9`, clean tree | the same file alone: **9 passed in 1.51 s** |
+| `523r4-probe-at-63367f9.log`, `523r4-probe.py` | `63367f9`, clean tree | the deciding expressions of the issue, one per line with its wall time: division by a unit and by a nonunit over ZZ, Z/4 and Z[x]; the distinct-endpoint inverse over Z/4 with both composites the identity; the empty and the rectangular matrix; `inverse() is inverse()`, `determinant() is determinant()` and `inverse_of_unit() is inverse()`; `A @ ~A` the identity over QQ and ZZ in ranks 2, 4, 6; the rank-one matrix space over the noncommutative M_2(ZZ), whose three spellings of the inverse all take the kernel route |

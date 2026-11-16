@@ -1,0 +1,42 @@
+tree SHA: 63367f905fc1f5f1817d44e89a3b8c85e499dd82 (modified paths: 0)
+tree: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/wt523r4
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 8.68 11.18 8.66 9/694 3012721
+probe:  files: tests/rings/test_a_matrix_ring_divides_only_by_its_units.sage extra: 
+inner 900 s, outer 960 s, guard 6144 MiB
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+time gates OFF (--no-time-gates): star import 1.28 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: asyncio-1.5.0, xdist-3.8.0, reportlog-1.0.0, platformdirs-4.13.5, hypothesis-6.170.15, anyio-4.15.1, timeout-2.4.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 9 items
+
+tests/rings/test_a_matrix_ring_divides_only_by_its_units.sage .........  [100%]
+
+============================== slowest durations ===============================
+0.26s call     tests/rings/test_a_matrix_ring_divides_only_by_its_units.sage::test_a_matrix_between_distinct_free_modules_inverts_by_its_determinant
+0.18s call     tests/rings/test_a_matrix_ring_divides_only_by_its_units.sage::test_a_matrix_over_a_polynomial_ring_inverts_by_its_unit_determinant
+0.18s call     tests/rings/test_a_matrix_ring_divides_only_by_its_units.sage::test_a_matrix_over_the_integers_mod_four_is_its_own_inverse
+0.03s call     tests/rings/test_a_matrix_ring_divides_only_by_its_units.sage::test_a_matrix_divides_by_the_unit_inverse_of_its_divisor
+0.02s call     tests/rings/test_a_matrix_ring_divides_only_by_its_units.sage::test_a_matrix_that_is_no_unit_of_the_ring_divides_nothing
+0.02s call     tests/rings/test_a_matrix_ring_divides_only_by_its_units.sage::test_a_matrix_over_the_integers_mod_four_whose_determinant_is_no_unit_is_refused
+0.01s call     tests/rings/test_a_matrix_ring_divides_only_by_its_units.sage::test_a_matrix_divides_by_the_unit_inverse_on_the_right
+0.01s call     tests/rings/test_a_matrix_ring_divides_only_by_its_units.sage::test_the_inverse_of_a_matrix_is_one_datum_of_the_matrix
+
+(19 durations < 0.005s hidden.  Use -vv to show these durations.)
+============================== 9 passed in 1.51s ===============================
+[peakrss] probe523: child waited=0 shell_code=0 samples=4
+[peakrss] peak tree RSS      : 322 MiB
+[peakrss] low-water MemAvail : 1936 MiB
+[peakrss] peak single VmHWM  : 322 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      311 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     6.0s procs=  3 rss=   322 MiB hwm=   322 MiB avail=  2251 MiB
+[peakrss]   t=     4.0s procs=  3 rss=   275 MiB hwm=   275 MiB avail=  1936 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   203 MiB hwm=   203 MiB avail=  2149 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     0 MiB hwm=     0 MiB avail=  2524 MiB
+launcher exit: 0
