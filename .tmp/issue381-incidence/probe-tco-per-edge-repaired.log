@@ -1,0 +1,44 @@
+# tree: 35ad93b4dd4b4c154fbbe43c5af0ecd4298d279d
+# tree status:  M src/sage_extensions/categories/group/predicate_subgroups.py  M tests/coble_gamma_co_2_incidence_rows.py ?? .git-msg-381-1.txt ?? .git-msg-381-2.txt ?? launch-381-test.sh ?? launch-381.sh ?? tests/lattices/test_the_coble_incidence_vertices_are_its_cusp_representatives.sage 
+# load: 1.10 2.03 1.93
+# program: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/wt-381/.tmp/probe-381-per-edge.py
+[rss] t=    0.0s rss=    97.0 MiB
+[rss] t=    5.0s rss=   422.0 MiB
+[rss] t=   10.2s rss=   472.9 MiB
+[rss] t=   15.2s rss=   506.0 MiB
+[rss] t=   20.2s rss=   526.0 MiB
+[rss] t=   25.2s rss=   543.1 MiB
+[rss] t=   30.2s rss=   550.1 MiB
+[rss] t=   35.2s rss=   564.2 MiB
+[rss] t=   40.2s rss=   576.6 MiB
+[rss] t=   45.2s rss=   580.3 MiB
+[rss] t=   50.2s rss=   584.0 MiB
+[rss] t=   55.2s rss=   587.4 MiB
+       56.63 s  Otilde and its quotient, index 46998591897600  rss   588.8 MiB
+[rss] t=   60.2s rss=   596.0 MiB
+[rss] t=   65.2s rss=   598.9 MiB
+        9.06 s  plane, parabolic, registration  rss   601.1 MiB
+[rss] t=   70.3s rss=   601.5 MiB
+[rss] t=  198.8s rss=  1217.4 MiB
+      136.30 s  the walk's first splitting lift arrived  rss  1261.3 MiB
+        0.00 s  one transported plane  rss  1261.3 MiB
+    one span key                                     0.959 ms per call
+    one span comparison (_same_subobject)            0.924 ms per call
+    one transport of a plane                         0.220 ms per call
+    one registry lookup                              0.958 ms per call
+    one registration                                 0.955 ms per call
+        0.41 s  the parts  rss  1261.3 MiB
+[peakrss] per-edge-cost: child waited=0 shell_code=0 samples=103
+[peakrss] peak tree RSS      : 1273 MiB
+[peakrss] low-water MemAvail : 11598 MiB
+[peakrss] peak single VmHWM  : 1273 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     1262 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   204.1s procs=  3 rss=  1273 MiB hwm=  1273 MiB avail= 11748 MiB
+[peakrss]   t=   202.1s procs=  3 rss=  1253 MiB hwm=  1253 MiB avail= 11768 MiB
+[peakrss]   t=   198.1s procs=  3 rss=  1129 MiB hwm=  1129 MiB avail= 11683 MiB
+[peakrss]   t=   200.1s procs=  3 rss=  1129 MiB hwm=  1129 MiB avail= 11886 MiB
+[peakrss]   t=   194.1s procs=  3 rss=  1122 MiB hwm=  1122 MiB avail= 11688 MiB
+# launcher exit: 0
