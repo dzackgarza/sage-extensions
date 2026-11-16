@@ -1,0 +1,31 @@
+=== tree: b63116e50d4210194decd51b7e152a9658bb6bc1 (modified: 1 paths)
+=== arg: tests/lattices/test_indecomposable_summands_decide_the_decomposition.sage
+=== start: 09:13:26
+..F                                                                      [100%]
+=================================== FAILURES ===================================
+____ test_the_definite_decomposition_is_the_owner_operation_on_the_lattice _____
+
+    def test_the_definite_decomposition_is_the_owner_operation_on_the_lattice() -> None:
+        r"""The definite decomposition is `definite_indecomposable_summands`' answer.
+    
+        Kneser's decomposition reads the reduction of the form and the
+        minimal-vector enumeration, so it is stated for a definite lattice and
+        returns that lattice's own summands: a family of sublattices, each carrying
+        the form as the pullback along its own inclusion.
+        """
+        lattice = _definite_sum_with_a_connected_display()
+        gram = lattice.gram_tensor()
+>       summands = definite_indecomposable_summands(lattice)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       NameError: name 'definite_indecomposable_summands' is not defined
+
+tests/lattices/test_indecomposable_summands_decide_the_decomposition.sage:113: NameError
+============================= slowest 10 durations =============================
+0.84s call     tests/lattices/test_indecomposable_summands_decide_the_decomposition.sage::test_the_family_reports_no_summands_where_the_decomposition_is_undecided
+0.45s call     tests/lattices/test_indecomposable_summands_decide_the_decomposition.sage::test_a_definite_sum_with_a_connected_display_is_decomposable
+
+(7 durations < 0.005s hidden.  Use -vv to show these durations.)
+=========================== short test summary info ============================
+FAILED tests/lattices/test_indecomposable_summands_decide_the_decomposition.sage::test_the_definite_decomposition_is_the_owner_operation_on_the_lattice
+1 failed, 2 passed in 3.41s
+=== exit: 1 at 09:13:32

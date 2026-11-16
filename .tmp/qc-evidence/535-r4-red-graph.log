@@ -1,0 +1,36 @@
+=== tree: 3fae3b5881fb53773d0ff08db050e89c05e1919c (modified: 1 paths)
+=== arg: tests/forms/test_gram_graph_blocks.sage
+=== start: 08:42:28
+....F                                                                    [100%]
+=================================== FAILURES ===================================
+______________ test_a_graphs_component_vertex_sets_are_one_datum _______________
+
+    def test_a_graphs_component_vertex_sets_are_one_datum() -> None:
+        r"""Asked twice, a graph's components are the datum it computed once.
+    
+        A component vertex set is derived object data of the graph, so the second
+        reader of one graph reads what the first computed.  The datum is still the
+        components themselves: each is a set of this graph's own vertices, and the
+        two of $A_2 \oplus A_1$ are $\{0,1\}$ and $\{2\}$.
+        """
+        graph = (Lattices(ZZ)("A2") + Lattices(ZZ)("A1")).gram_tensor().gram_graph()
+        components = graph.connected_component_vertex_sets()
+    
+>       assert graph.connected_component_vertex_sets() is components
+E       assert {{0, 1}, {2}} is {{0, 1}, {2}}
+E        +  where {{0, 1}, {2}} = connected_component_vertex_sets()
+E        +    where connected_component_vertex_sets = Gram graph on 3 framing positions.connected_component_vertex_sets
+
+tests/forms/test_gram_graph_blocks.sage:79: AssertionError
+============================= slowest 10 durations =============================
+0.32s call     tests/forms/test_gram_graph_blocks.sage::test_the_gram_graph_of_a2_plus_a1
+0.03s call     tests/forms/test_gram_graph_blocks.sage::test_interleaved_components_give_no_block_cut
+0.03s call     tests/forms/test_gram_graph_blocks.sage::test_the_component_vertex_sets_of_a_gram_graph_do_not_depend_on_its_diagonal
+0.02s call     tests/forms/test_gram_graph_blocks.sage::test_a_graphs_component_vertex_sets_are_one_datum
+0.02s call     tests/forms/test_gram_graph_blocks.sage::test_the_only_block_cut_of_a2_plus_a1_is_after_the_a2_block
+
+(5 durations < 0.005s hidden.  Use -vv to show these durations.)
+=========================== short test summary info ============================
+FAILED tests/forms/test_gram_graph_blocks.sage::test_a_graphs_component_vertex_sets_are_one_datum
+1 failed, 4 passed in 3.81s
+=== exit: 1 at 08:42:34

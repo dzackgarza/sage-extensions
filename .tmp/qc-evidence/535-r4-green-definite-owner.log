@@ -1,0 +1,12 @@
+=== tree: 85607a3e76ecd3a678a2cb7af9379e00a9bf3f75 (modified: 0 paths)
+=== arg: tests/lattices/test_indecomposable_summands_decide_the_decomposition.sage
+=== start: 09:13:46
+...                                                                      [100%]
+============================= slowest 10 durations =============================
+0.81s call     tests/lattices/test_indecomposable_summands_decide_the_decomposition.sage::test_the_family_reports_no_summands_where_the_decomposition_is_undecided
+0.41s call     tests/lattices/test_indecomposable_summands_decide_the_decomposition.sage::test_a_definite_sum_with_a_connected_display_is_decomposable
+0.01s call     tests/lattices/test_indecomposable_summands_decide_the_decomposition.sage::test_the_definite_decomposition_is_the_owner_operation_on_the_lattice
+
+(6 durations < 0.005s hidden.  Use -vv to show these durations.)
+3 passed in 4.04s
+=== exit: 0 at 09:13:53

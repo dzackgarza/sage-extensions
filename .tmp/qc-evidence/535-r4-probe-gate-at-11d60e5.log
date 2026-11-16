@@ -1,0 +1,54 @@
+=== tree: 11d60e574bda25a73905732ae300e1f3fa45a157 (modified: 0 paths)
+=== arg: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/r4/probe_gate2.py
+=== start: 08:37:13
+===== U+U+<1>
+   even: False   [0.00 s]
+   U-index: 2   [0.33 s]
+   eichler: False   [0.00 s]
+   O_plus: has_disc False det_k False spin_k True
+     image: NOSPLIT   [0.16 s]
+   Aut.disc(full): has_disc True det_k False spin_k False
+     image: NOSPLIT   [0.01 s]
+   Aut.disc(trivial): has_disc True det_k False spin_k False
+     image: NOSPLIT   [0.00 s]
+===== U+U+<3>
+   even: False   [0.00 s]
+   U-index: 2   [0.10 s]
+   eichler: False   [0.00 s]
+   O_plus: has_disc False det_k False spin_k True
+     image: NOSPLIT   [0.02 s]
+   Aut.disc(full): has_disc True det_k False spin_k False
+     image: NOSPLIT   [0.00 s]
+   Aut.disc(trivial): has_disc True det_k False spin_k False
+     image: NOSPLIT   [0.00 s]
+===== U+U+<-1>
+   even: False   [0.00 s]
+   U-index: 2   [0.20 s]
+   eichler: False   [0.00 s]
+   O_plus: has_disc False det_k False spin_k True
+     image: NOSPLIT   [0.02 s]
+   Aut.disc(full): has_disc True det_k False spin_k False
+     image: NOSPLIT   [0.00 s]
+   Aut.disc(trivial): has_disc True det_k False spin_k False
+     image: NOSPLIT   [0.00 s]
+===== U+U+<-3>
+   even: False   [0.00 s]
+   U-index: 2   [0.10 s]
+   eichler: False   [0.00 s]
+   O_plus: has_disc False det_k False spin_k True
+     image: NOSPLIT   [0.02 s]
+   Aut.disc(full): has_disc True det_k False spin_k False
+     image: NOSPLIT   [0.00 s]
+   Aut.disc(trivial): has_disc True det_k False spin_k False
+     image: NOSPLIT   [0.00 s]
+===== U+U+<3>+<5>
+   even: False   [0.00 s]
+   U-index: 2   [0.12 s]
+   eichler: False   [0.00 s]
+   O_plus: has_disc False det_k False spin_k True
+     image: NOSPLIT   [0.02 s]
+   Aut.disc(full): has_disc True det_k False spin_k False
+     image: NOSPLIT   [0.00 s]
+   Aut.disc(trivial): has_disc True det_k False spin_k False
+     image: NOSPLIT   [0.00 s]
+=== exit: 0 at 08:37:18

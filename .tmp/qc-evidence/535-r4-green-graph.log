@@ -1,0 +1,14 @@
+=== tree: 7f95638aee7b05ac56c4b4c26a1221f7b3b6733b (modified: 0 paths)
+=== arg: tests/forms/test_gram_graph_blocks.sage
+=== start: 09:13:40
+.....                                                                    [100%]
+============================= slowest 10 durations =============================
+0.52s call     tests/forms/test_gram_graph_blocks.sage::test_the_gram_graph_of_a2_plus_a1
+0.04s call     tests/forms/test_gram_graph_blocks.sage::test_interleaved_components_give_no_block_cut
+0.04s call     tests/forms/test_gram_graph_blocks.sage::test_the_component_vertex_sets_of_a_gram_graph_do_not_depend_on_its_diagonal
+0.02s call     tests/forms/test_gram_graph_blocks.sage::test_the_only_block_cut_of_a2_plus_a1_is_after_the_a2_block
+0.01s call     tests/forms/test_gram_graph_blocks.sage::test_a_graphs_component_vertex_sets_are_one_datum
+
+(5 durations < 0.005s hidden.  Use -vv to show these durations.)
+5 passed in 3.82s
+=== exit: 0 at 09:13:46

@@ -1,0 +1,11 @@
+=== tree: b63116e50d4210194decd51b7e152a9658bb6bc1 (modified: 0 paths)
+=== arg: tests/lattices/test_displayed_blocks_are_sublattices.sage
+=== start: 09:13:36
+..                                                                       [100%]
+============================= slowest 10 durations =============================
+0.73s call     tests/lattices/test_displayed_blocks_are_sublattices.sage::test_the_displayed_blocks_of_the_k3_gram_are_five_sublattices
+0.04s call     tests/lattices/test_displayed_blocks_are_sublattices.sage::test_a_display_whose_blocks_are_not_intervals_exhibits_them_anyway
+
+(4 durations < 0.005s hidden.  Use -vv to show these durations.)
+2 passed in 2.05s
+=== exit: 0 at 09:13:40

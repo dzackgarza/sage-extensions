@@ -1,0 +1,11 @@
+=== tree: 85607a3e76ecd3a678a2cb7af9379e00a9bf3f75 (modified: 0 paths)
+=== arg: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/r4/probe_automorphisms.py
+=== start: 09:13:53
+A1+A1 is_decomposable: True   [0.00 s]
+A1+A1 summands: 2   [0.23 s]
+A1+A1 Aut order: 8   [0.21 s]
+A1+A1 Aut generators: 2   [0.04 s]
+scrambled is A1^4: True   [1.44 s]
+scrambled is A1^3+A1?: False   [0.00 s]
+E8 definite summands: 1   [0.09 s]
+=== exit: 0 at 09:13:58

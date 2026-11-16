@@ -1,0 +1,13 @@
+=== tree: e3798e447c7d126be7149a356555bbbc01ba03cb (modified: 0 paths)
+=== arg: tests/lattices/test_line_stabilizer_image_requires_eichlers_hypothesis.sage
+=== start: 09:13:58
+....                                                                     [100%]
+============================= slowest 10 durations =============================
+2.32s call     tests/lattices/test_line_stabilizer_image_requires_eichlers_hypothesis.sage::test_the_line_stabilizer_image_refuses_where_the_criterion_does_not_apply
+0.30s call     tests/lattices/test_line_stabilizer_image_requires_eichlers_hypothesis.sage::test_the_criterion_route_is_not_taken_on_an_odd_lattice_with_two_hyperbolic_planes
+0.26s call     tests/lattices/test_line_stabilizer_image_requires_eichlers_hypothesis.sage::test_the_hyperbolic_plane_the_enlargement_adds_is_where_the_criterion_applies
+0.11s call     tests/lattices/test_line_stabilizer_image_requires_eichlers_hypothesis.sage::test_the_criterion_does_not_apply_to_an_odd_lattice_with_two_hyperbolic_planes
+
+(6 durations < 0.005s hidden.  Use -vv to show these durations.)
+4 passed in 4.47s
+=== exit: 0 at 09:14:04

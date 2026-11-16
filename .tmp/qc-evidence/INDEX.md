@@ -3377,3 +3377,49 @@ the runs cover: every file this round edits -- `categories/group`,
 between the tree the final runs cite (`b896a53`) and the pushed tip
 (`git diff --stat b896a53 <tip> -- <those paths>` is empty), so the green and the
 probe are runs of this round's files as they are pushed.
+
+## `#535` round 4: the review's findings, each at its owner (2026-11-16)
+
+Seven commits on `main` at `67c192c`, one per finding: the graph owner's
+component datum is cached, the definite decomposition is the definite owner's
+operation in typed transports, this round's test files state the contractions
+they check, the criterion's route gains the red state it owed, and four
+docstrings state their hypotheses instead of deriving them.
+
+Every row is one file in the pinned image through `.scratch/r4/run.sh`
+(`pytest -o addopts= -p qc_sage_session -q --no-header`, the worktree bound at
+`/repos/sage-extensions`, the port at `/work`), except the lint row, which is
+the same launcher running `sage_extensions.testing.test_lint`.  The tree column
+names the commit the run was made on, and that is the commit the log's own
+header names; a rebase before the push re-identified those commits without
+changing a tree, and the table after the rows gives each one's commit on the
+pushed `main`.  `+ the new test` means the run carried the test the next commit
+adds, which is that commit's red state.  Every command here ran under the
+brief's ten-minute limit; the launchers' caps are 300 s and each row's wall time
+is its log's last line.
+
+| log | tree | result |
+| --- | --- | --- |
+| `535-r4-red-graph.log` | `3fae3b5` + the new test | `tests/forms/test_gram_graph_blocks.sage`: **1 failed, 4 passed in 3.81 s** -- `graph.connected_component_vertex_sets() is graph.connected_component_vertex_sets()` is False, two calls building two finite ordered sets |
+| `535-r4-green-graph.log` | `7f95638` | the same file: **5 passed in 3.82 s** |
+| `535-r4-tests-family.log` | `b63116e` | `tests/lattices/test_indecomposable_summands_decide_the_decomposition.sage` with the Gram built by pullback and the four summands required to embed, pair to zero and fill the rank: **2 passed in 2.55 s** |
+| `535-r4-tests-blocks.log` | `b63116e` | `tests/lattices/test_displayed_blocks_are_sublattices.sage`, the two pairing loops replaced by the two pullbacks: **2 passed in 2.05 s** |
+| `535-r4-red-definite-owner.log` | `b63116e` + the new test | the family file with the owner test added: **1 failed, 2 passed in 3.41 s**, `NameError: name 'definite_indecomposable_summands' is not defined` -- the session names no such operation, and the decomposition is private to `lattice_morphisms` |
+| `535-r4-green-definite-owner.log` | `85607a3` | the same file: **3 passed in 4.04 s** |
+| `535-r4-red-gate.log` | `11d60e5` + the new test | the gate file on the fix's own parent: **1 failed, 3 passed in 10.45 s**, `assert 'NOSPLIT' is None` on `U + U + <3>` -- the criterion's route certifies the line stabilizer image where its hypothesis fails |
+| `535-r4-gate.log` | `e3798e4` | the gate file: **4 passed in 4.47 s** |
+| `535-r4-lint.log` | `cc44115` | the four touched test files under the test lint: **4 files, 0 findings** |
+| `535-r4-probe-gate-at-11d60e5.log`, `535-r4-probe-gate-at-3fae3b5.log` | `11d60e5` and `3fae3b5` | the smallest deciding input, before and after: on `U + U + <1>`, `U + U + <3>`, `U + U + <-3>` and `U + U + <3> + <5>` the quotient whose character data carries the discriminant factor -- `Aut().discriminant_preimage(O(A_L))` -- answers `NOSPLIT` on the parent and `None` on the repaired tree; `O^+`'s quotient answers `NOSPLIT` on both, because the single-sign-character certificate answers before either gate is read, and `U + U + <-1>` answers `NOSPLIT` on both.  The probe is why the red test above asks the discriminant-carrying quotient |
+| `535-r4-probe-automorphisms-at-11d60e5.log`, `535-r4-probe-automorphisms-at-85607a3.log` | `11d60e5` and `85607a3` | the moved decomposition's answers where the two Gram-level readers in `lattice_morphisms` use it: `A_1 + A_1` is decomposable with 2 summands, `\|Aut\| = 8` with 2 generators, the connected `A_1^4` presentation is isometric to `A_1^4` and not to `A_1^3 + A_2`, `E_8` is one summand -- identical on both trees |
+
+The rebase onto `0130d81` after those runs, by `git patch-id --stable`:
+
+| recorded in the rows and in the log headers | the commit on the pushed `main` |
+| --- | --- |
+| `6859d6a` | `1a543d4` |
+| `7f95638` | `6f7f160` |
+| `b63116e` | `388bbde` |
+| `abd3753` | `81d22b5` |
+| `85607a3` | `d5f3459` |
+| `e3798e4` | `b2a935f` |
+| `cc44115` | `5b9b4db` |
