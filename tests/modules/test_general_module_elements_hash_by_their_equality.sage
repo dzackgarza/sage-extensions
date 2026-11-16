@@ -48,6 +48,32 @@ def test_two_cartier_divisors_of_one_class_hash_alike() -> None:
     assert FiniteOrderedSets()((zero, negated)).cardinality() == 1
 
 
+def test_the_element_hashes_the_group_element_and_not_the_module() -> None:
+    r"""``hash(zero)`` is ``hash(zero's group element)``: one datum, not two.
+
+    A general module is its underlying group with a ring acting on it, so the
+    element of that group is what the module's element is and what its equality
+    compares.  A hash that mixed the module into the answer would read a
+    second datum that equality does not, and would refuse nothing when the
+    group element refuses a hash: the tensor quotient's zero class, the Cartier
+    zero divisor and the class of the zero function each hash exactly the
+    element of their group.
+    """
+    rationals = Modules(ZZ)(QQ)
+    product = Modules(ZZ).tensor_product((rationals, rationals))
+    zero = product.zero()
+    assert hash(zero) == hash(zero.underlying_element())
+
+    line = ProjectiveSpaces(QQ)(1)
+    divisors = CartierDivisorGroups().of_scheme(line)
+    divisor_zero = divisors.zero()
+    assert hash(divisor_zero) == hash(divisor_zero.underlying_element())
+
+    quotient = Lp(1, RR, RR).quotient_by_null_functions()
+    class_zero = quotient.zero()
+    assert hash(class_zero) == hash(class_zero.underlying_element())
+
+
 def test_the_zero_class_of_the_almost_everywhere_quotient_is_a_point() -> None:
     r"""The zero class of ``L^1(RR)`` modulo the null functions is one element.
 
