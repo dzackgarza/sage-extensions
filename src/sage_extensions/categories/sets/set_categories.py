@@ -656,6 +656,17 @@ def arrow_probe(domain):
     states only its endpoints, which is sound -- equal arrows still share it --
     and cannot distinguish arrows that the domain does not separate.
     """
+    held = getattr(domain, "__dict__", None)
+    if held is not None and "_arrow_hash_probe" in held:
+        return held["_arrow_hash_probe"]
+    probe = _domain_probe(domain)
+    if held is not None:
+        held["_arrow_hash_probe"] = probe
+    return probe
+
+
+def _domain_probe(domain):
+    r"""The probe :func:`arrow_probe` reads, computed once per domain object."""
     try:
         generating_set = domain.module_generating_set()
     except (AttributeError, TypeError, ValueError, NotImplementedError):

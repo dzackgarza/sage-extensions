@@ -1451,6 +1451,7 @@ def _ordered_fraction_field(ring):
     return _engine_ring(field)
 
 
+@cached_function
 def signature_pairs():
     r"""Return \(\mathbf{Card}\times\mathbf{Card}\), where a signature pair lives.
 
@@ -1462,6 +1463,7 @@ def signature_pairs():
     return Cat().product((Cardinalities(), Cardinalities()))
 
 
+@cached_function
 def signature_pair(positive, negative):
     r"""Return \((p,q)\) as an object of :func:`signature_pairs`."""
 

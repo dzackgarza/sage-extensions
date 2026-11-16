@@ -1149,8 +1149,12 @@ class ModuleMorphismMethods:
         # arrow, by the arrows' values on the domain.  Hash those values on the
         # domain's canonical finite probe, so distinct arrows -- in particular
         # the points of a dual module -- are distributed instead of collapsed
-        # into one bucket; ``arrow_hash`` keeps the endpoint fallback.
-        return arrow_hash(self)
+        # into one bucket; ``arrow_hash`` keeps the endpoint fallback.  An
+        # arrow's values are fixed, so the hash is computed on first request.
+        held = self.__dict__
+        if "_arrow_hash_value" not in held:
+            held["_arrow_hash_value"] = arrow_hash(self)
+        return held["_arrow_hash_value"]
 
     def __rmul__(self, actor):
         derivation = getattr(self, "_originating_derivation", None)

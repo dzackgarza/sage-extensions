@@ -4874,6 +4874,7 @@ class Lattices(OwnedCategoryOverBaseRing):
             hyperbolic = Lattices(self.base_ring())("U") ** (lower_index + 1)
             return hyperbolic.Emb(self)(images).orthogonal_splitting()
 
+        @cached_method
         def is_isotropic(self) -> bool | Predicate:
             r"""Return whether $L_K$ contains a nonzero isotropic vector.
 
