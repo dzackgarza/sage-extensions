@@ -109,12 +109,20 @@ def test_the_character_of_a_finite_free_representation_is_the_trace_of_its_actio
     representation is the trace of each group element (Serre, *Linear
     Representations of Finite Groups*, §2.1 and §6.1): the identity gives the
     rank, a transposition fixes one basis vector, and a three-cycle fixes none.
+
+    The module is placed where its construction puts it -- a module over
+    $\mathbb{Q}[S_3]$ on the retained three-dimensional module -- and the
+    character is a derived datum of that module, so a placement that asked the
+    coefficient field's characteristic and the group's cardinality to select a
+    category is not what is accepted here.
     """
     group, representation = _permutation_module_of_s3()
     transposition = next(g for g in group if g.order() == 2)
     three_cycle = next(g for g in group if g.order() == 3)
     character = representation.character()
 
+    assert representation in Modules(QQ[group])
+    assert representation not in OrdinaryCharacterRepresentations(QQ[group])
     assert character(group.one()) == 3
     assert character(transposition) == 1
     assert character(three_cycle) == 0
