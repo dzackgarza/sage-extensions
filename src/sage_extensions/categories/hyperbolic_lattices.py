@@ -746,16 +746,19 @@ def _filtered_vinal_class():
             same cell, so an enumeration restricted by a cell the walk has
             already cut would be cutting the cell by itself.
 
-            This walk therefore forgets the cell it holds before it starts, and
-            records the cone it writes as the cell's normals: :meth:`cell`
-            answers from that record and not from ``roots``, which the walk
-            keeps growing as the sequence is written down.
+            The cone written is the walk's datum: it is computed once and
+            recorded as the cell's normals, and a second call returns the record
+            rather than cutting the cell again.  :meth:`cell` answers from that
+            record and not from ``roots``, which the walk keeps growing as the
+            sequence is written down.  The record is a tuple and each call hands
+            out a fresh list, because ``VinAl.FindRoots`` assigns this return
+            value to ``roots`` and keeps appending to it.
             """
-            self._initial_cone = None
-            self._cell = _NO_CELL
+            if self._initial_cone is not None:
+                return list(self._initial_cone)
             roots = super().FundCone()
             self._initial_cone = tuple(roots)
-            return roots
+            return list(roots)
 
         def cell(self):
             r"""Return the cell at the controlling vector, or ``None`` when it does not span.
