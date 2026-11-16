@@ -3620,3 +3620,11 @@ command, over the ten-minute limit for one command.  The measurement it makes --
 that the per-row alarm reaches the call, and that the first row does not return
 inside it -- is made again in `520-r3-driver-process.log` with `--cap 60
 --budget 200`, in 62.4 s inside a 64.1 s command.
+
+**The merged tree's own run.**  Main advanced while this round ran, so the
+round's commits are pushed on a merge of it.  The merged tree is not one of the
+trees above, so it is run as well: `520-r3-merged-green.log` at
+`104828a11550f35da819b5fc620a4cf201ae2fc9`, tree
+`2c3b60395cffb6e668ad8a4a9ab0fffa82345ef6`, **8 passed
+in 6.15 s** -- the same eight tests of the round's last commit, on the tree the
+push actually carries.
