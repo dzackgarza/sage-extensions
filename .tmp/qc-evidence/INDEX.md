@@ -3090,10 +3090,10 @@ a suite and belongs to CI, and it is not re-taken here.
 
 ### `#543`, round 6: the same rows at the tree the round is pushed from, 2026-11-16
 
-Main advanced to `e65da01` under the branch, and the rows above were re-taken on
-the rebased tree, whose commits are `cc7438f` (test), `d730a45` and `ec30a34`
-(the repairs) and the evidence commit this note follows.  Same pinned image,
-same launcher, same `PYTHONPATH`.
+Main advanced under the branch while this round ran, and the rows above were
+re-taken on the rebased tree: the test commit, the two repairs and the evidence
+commit this note follows (a rebase re-identifies a commit, so the rows name the
+trees by what they are).  Same pinned image, same launcher, same `PYTHONPATH`.
 
 | log | tree | result |
 | --- | --- | --- |
