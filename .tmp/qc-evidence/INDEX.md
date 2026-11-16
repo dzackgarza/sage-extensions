@@ -3523,3 +3523,70 @@ The two remaining engine-matrix routings on the matrix owner state the same cate
 | --- | --- | --- |
 | `541r6-cards-at-dc25610.log` | `bdf238b` with the routing change | the four card files: **24 passed in 2.81 s** |
 | `541r6-probe-inverse.log` | `bdf238b` with the routing change | the swap of `ZZ^2` and `QQ^2` invert, `2 e_0, e_1` is a nonunit over `ZZ` and a unit over `QQ` |
+
+## `#520` round 3: the second review's repairs, and the tree each run names (2026-11-17)
+
+Three repairs of this driver, each with its red test in a `test:` commit before
+its `fix:`:
+
+* `row_contract` had deleted the line-vertex clause instead of conditioning it
+  on the row's plane vertices, so a relation covering every plane vertex and
+  omitting a line vertex was reported `DECIDED`.  A row with a plane vertex has
+  Witt index at least two, every isotropic line then extends to a totally
+  isotropic plane, and the flag the two make is one the route enumerates, so
+  the clause holds whenever the row has a plane vertex -- and only a row
+  without one may decide a line vertex with no edge.
+* The row step is now asked for its contract by a test of its own: `run_row` of
+  a row taken over a lattice its subgroup does not act on must report
+  `CONTRACT_VIOLATION`.  The previous file asked `row_contract` directly, so a
+  row step that ignored its contract and returned `DECIDED` for every relation
+  passed all of its tests.  The three tests that compared `RowOutcome.report()`
+  strings assert the fields instead.
+* The driver's own `--rows` default is `O,Gamma_{Co,2}`, and `Gamma_{Co,2}`
+  carries a comma: splitting the specification on commas read `Gamma_{Co`, so
+  every documented invocation exited on the error status before computing a
+  row.  The specification is now read against `ROW_LABELS`, longest first.
+
+The library half of the second review's first finding was written this round and
+then dropped: another round landed the same repair on main while this one ran
+(`d94c3d3`, #381: "the incidence records are points of a finite ordered set"),
+with a gate of its own at 6JRS and `U + U(2) + <-2>`.  This round's driver tests
+exercise the ambient route on `O(U + U)` and `O(U + U(2))` through that repair.
+
+Every log below was produced at the commit its `provider SHA` line names, and
+the row names the tree as well, with `provider tracked modifications: 0`; the
+two untracked paths one header counts are the launcher scripts, which live
+outside the tree the run is made on.  The tree is named beside the commit
+because main moved while this round ran and each rebase of these commits changes
+their ids and nothing else: a row's tree column is what
+`git rev-parse <that commit>^{tree}` answers.  The commit carrying these logs
+adds nothing under `src/` and nothing under `tests/`, so the pushed tree differs
+from the tested ones in no consumed source.  The Coble rows themselves were not
+re-run: they are the dispatched job's, and one row's call is minutes.
+
+| log | commit | tree | result |
+| --- | --- | --- | --- |
+| `520-r3-driver-red.log` | `2fef992` | `6ea588add3260eb9fd534366e5b8e7ce576f342a` | the seven driver tests: **1 failed, 6 passed in 7.73 s**; the failure is `dropped.status` reported `DECIDED` with counts `(1, 2, 1)` where the contract owes `CONTRACT_VIOLATION` |
+| `520-r3-spec-red.log` | `c189400` | `f6585d4e077b3d49f57455fbec3181a3fbe86739` | the eight tests of the file: **1 failed, 7 passed in 8.57 s**; the failure is `assert 4 != 4`, the error status the driver's own default row specification ends on |
+| `520-r3-driver-green.log` | `89b2df3` | `0482f5992535d9356c0e66ccaebf25e367f6ce8e` | the same eight: **8 passed in 6.72 s**, the test lint loaded, the slowest call 2.46 s (`O(U + U(2))` for the line-clause test) |
+| `520-r3-driver-process.log` | `89b2df3` | `0482f5992535d9356c0e66ccaebf25e367f6ce8e` | the driver as a process, on its own default rows: `--cap 0` exits 1 in 1.7 s printing `the rows ('O', 'Gamma_{Co,2}')` and `[O] undecided: its cap of 0 s is spent before the call`; `--cap 60 --budget 200` exits 1 in 62.4 s printing `[O] undecided: the row did not return inside its 60 s cap`; **64.1 s for the whole command**, peak tree RSS 673 MiB |
+| `520-r3-fixture-counts.log`, `520-r3-fixture-counts.py` | `89b2df3` | `0482f5992535d9356c0e66ccaebf25e367f6ce8e` | the counts the two driver fixtures are named for: `O(U + U)` **1 line, 1 plane, 1 edge** in 1.61 s; `O(U + U(2))` **2 lines, 1 plane, 2 edges** over the pairs `(0,0)` and `(1,0)` in 3.09 s; `SO(U + U)` refusing at `cusps(2)` with the coset walk's `ValueError`, so it is not a fixture of this file |
+
+**Correction of the three round-2 "tip" rows above (a new event, not an edit).**
+`520-r2-tip-tests.log` and `520-r2-tip-engineering.log` are labelled "the round's
+evidence commit, after the rebase onto the main it is pushed on", and that is not
+the tree they name: their headers read `provider SHA:
+dfc563c1a74904ce6c4c5ac1ddfd6ff9f633a398`, the round's pre-rebase tree, while the
+push carried `26bdef1b2f61dfac01edec4a28aa68bb24404548`.  The comparison base
+those rows call `fb74227` is not the pushed commit's parent either -- that is
+`9ddf7f584ff0c8329a70093a1a56a789cf16fc48` -- so the library sources the two
+runs consumed differ from the pushed tree's.  The rows are to be read as the
+tests of the round at `dfc563c1` against the tree
+`fb74227768f703768c27a5eca4460afd6f5d08ff`, and as nothing else.
+
+**Correction of `520-r2-driver-process.log` (a new event, not an edit).**  Its
+second invocation, `--cap 600 --budget 700`, took 613.5 s inside a 620.2 s
+command, over the ten-minute limit for one command.  The measurement it makes --
+that the per-row alarm reaches the call, and that the first row does not return
+inside it -- is made again in `520-r3-driver-process.log` with `--cap 60
+--budget 200`, in 62.4 s inside a 64.1 s command.

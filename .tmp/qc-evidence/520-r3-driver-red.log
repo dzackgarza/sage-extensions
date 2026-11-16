@@ -1,0 +1,47 @@
+provider SHA: 2fef992c2857837b4cb52cf51730aed06f6e3b27
+provider tracked modifications: 0
+provider untracked launcher paths: 0
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+command: pytest tests/engineering/test_the_incidence_row_reports_a_broken_contract_apart_from_an_undecided_row.py -q --tb=short -p sage_extensions.testing.test_lint
+...F...                                                                  [100%]
+=================================== FAILURES ===================================
+_______ test_a_line_vertex_of_a_row_with_a_plane_vertex_carries_an_edge ________
+tests/engineering/test_the_incidence_row_reports_a_broken_contract_apart_from_an_undecided_row.py:157: in test_a_line_vertex_of_a_row_with_a_plane_vertex_carries_an_edge
+    assert dropped.status is RowStatus.CONTRACT_VIOLATION
+E   AssertionError: assert <RowStatus.DECIDED: ('decided', 0)> is <RowStatus.CONTRACT_VIOLATION: ('contract violation', 2)>
+E    +  where <RowStatus.DECIDED: ('decided', 0)> = RowOutcome(label='row', status=<RowStatus.DECIDED: ('decided', 0)>, detail='1 edges over 2 line cusps and 1 plane cusps', counts=(1, 2, 1)).status
+E    +  and   <RowStatus.CONTRACT_VIOLATION: ('contract violation', 2)> = RowStatus.CONTRACT_VIOLATION
+----------------------------- Captured stdout call -----------------------------
+[row] line cusp 0: ((0, -1, 0, 0),)
+[row] line cusp 1: ((0, 0, 1, 0),)
+[row] plane cusp 0: ((0, 1, 0, 0), (0, 0, 1, 0))
+[row] edge 0: L0 < P0; line=((0, -1, 0, 0),); plane=((0, 1, 0, 0), (0, 0, 1, 0))
+[row] edge 1: L1 < P0; line=((0, 0, 1, 0),); plane=((0, 1, 0, 0), (0, 0, 1, 0))
+[row] line cusp 0: ((0, -1, 0, 0),)
+[row] line cusp 1: ((0, 0, 1, 0),)
+[row] plane cusp 0: ((0, 1, 0, 0), (0, 0, 1, 0))
+[row] edge 0: L1 < P0; line=((0, 0, 1, 0),); plane=((0, 1, 0, 0), (0, 0, 1, 0))
+------------------------------ Captured log call -------------------------------
+INFO     sage_extensions.timing:timing.py:313 ambient O(L) row
+INFO     sage_extensions.timing:timing.py:313 ambient O(L) row
+INFO     sage_extensions.timing:timing.py:313 ambient O(L) row
+INFO     sage_extensions.timing:timing.py:313 ambient O(L) row
+INFO     sage_extensions.timing:timing.py:313 ambient O(L) row
+INFO     sage_extensions.timing:timing.py:313 ambient O(L) row
+INFO     sage_extensions.timing:timing.py:313 ambient O(L) row
+=========================== short test summary info ============================
+FAILED tests/engineering/test_the_incidence_row_reports_a_broken_contract_apart_from_an_undecided_row.py::test_a_line_vertex_of_a_row_with_a_plane_vertex_carries_an_edge
+1 failed, 6 passed in 7.73s
+[peakrss] run: child waited=1 shell_code=1 samples=6
+[peakrss] peak tree RSS      : 548 MiB
+[peakrss] low-water MemAvail : 8007 MiB
+[peakrss] peak single VmHWM  : 548 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      537 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    10.0s procs=  3 rss=   548 MiB hwm=   548 MiB avail=  8007 MiB
+[peakrss]   t=     8.0s procs=  3 rss=   504 MiB hwm=   504 MiB avail=  8068 MiB
+[peakrss]   t=     6.0s procs=  3 rss=   489 MiB hwm=   489 MiB avail=  8289 MiB
+[peakrss]   t=     4.0s procs=  3 rss=   466 MiB hwm=   466 MiB avail=  8339 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   297 MiB hwm=   297 MiB avail=  8798 MiB

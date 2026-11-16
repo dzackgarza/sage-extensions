@@ -1,0 +1,35 @@
+provider SHA: 89b2df3d96f1f11895b223d26104fd959b1860eb
+provider tracked modifications: 0
+provider untracked launcher paths: 2
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+command: /repos/sage-extensions/.tmp/probe_driver_process.py
+=== args ['--cap', '0']: exit 1 in 1.7 s
+--- stdout:
+the lattice Integral lattice of rank 11 and signature (2, 9) of rank 11
+the rows ('O', 'Gamma_{Co,2}')
+[O] undecided: its cap of 0 s is spent before the call
+
+--- stderr (tail):
+
+=== args ['--cap', '60', '--budget', '200']: exit 1 in 62.4 s
+--- stdout:
+the lattice Integral lattice of rank 11 and signature (2, 9) of rank 11
+the rows ('O', 'Gamma_{Co,2}')
+[O] undecided: the row did not return inside its 60 s cap
+
+--- stderr (tail):
+
+total 64.1 s
+[peakrss] run: child waited=0 shell_code=0 samples=33
+[peakrss] peak tree RSS      : 673 MiB
+[peakrss] low-water MemAvail : 8015 MiB
+[peakrss] peak single VmHWM  : 674 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      566 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    62.0s procs=  4 rss=   673 MiB hwm=   673 MiB avail=  8483 MiB
+[peakrss]   t=    56.0s procs=  4 rss=   672 MiB hwm=   672 MiB avail=  8441 MiB
+[peakrss]   t=    58.0s procs=  4 rss=   672 MiB hwm=   672 MiB avail=  8449 MiB
+[peakrss]   t=    60.0s procs=  4 rss=   672 MiB hwm=   672 MiB avail=  8466 MiB
+[peakrss]   t=    64.0s procs=  4 rss=   672 MiB hwm=   674 MiB avail=  8489 MiB

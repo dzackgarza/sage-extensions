@@ -1,0 +1,32 @@
+provider SHA: c18940053af9df9a8aacb4c287529a41be5601e0
+provider tracked modifications: 0
+provider untracked launcher paths: 0
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+command: pytest tests/engineering/test_the_incidence_row_reports_a_broken_contract_apart_from_an_undecided_row.py -q --tb=short -p sage_extensions.testing.test_lint
+.......F                                                                 [100%]
+=================================== FAILURES ===================================
+______ test_the_run_reaches_the_rows_its_own_default_specification_names _______
+tests/engineering/test_the_incidence_row_reports_a_broken_contract_apart_from_an_undecided_row.py:248: in test_the_run_reaches_the_rows_its_own_default_specification_names
+    assert incidence_rows_exit(spent) != RowStatus.ERROR.exit_status
+E   AssertionError: assert 4 != 4
+E    +  where 4 = incidence_rows_exit(['--lattice', '6JRS', '--cap', '0'])
+E    +  and   4 = <RowStatus.ERROR: ('error', 4)>.exit_status
+E    +    where <RowStatus.ERROR: ('error', 4)> = RowStatus.ERROR
+----------------------------- Captured stdout call -----------------------------
+[run] error: Gamma_{Co is not a row of this driver, which has ('O', 'Gamma_{Co,2}', 'Otilde', 'Otilde+')
+=========================== short test summary info ============================
+FAILED tests/engineering/test_the_incidence_row_reports_a_broken_contract_apart_from_an_undecided_row.py::test_the_run_reaches_the_rows_its_own_default_specification_names
+1 failed, 7 passed in 8.57s
+[peakrss] run: child waited=1 shell_code=1 samples=6
+[peakrss] peak tree RSS      : 551 MiB
+[peakrss] low-water MemAvail : 8007 MiB
+[peakrss] peak single VmHWM  : 551 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      540 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    10.0s procs=  3 rss=   551 MiB hwm=   551 MiB avail=  8007 MiB
+[peakrss]   t=     8.0s procs=  3 rss=   504 MiB hwm=   504 MiB avail=  8068 MiB
+[peakrss]   t=     6.0s procs=  3 rss=   486 MiB hwm=   486 MiB avail=  8289 MiB
+[peakrss]   t=     4.0s procs=  3 rss=   465 MiB hwm=   465 MiB avail=  8339 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   298 MiB hwm=   298 MiB avail=  8798 MiB

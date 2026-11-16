@@ -1,0 +1,23 @@
+provider SHA: 89b2df3d96f1f11895b223d26104fd959b1860eb
+provider tracked modifications: 0
+provider untracked launcher paths: 2
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+command: /repos/sage-extensions/.tmp/probe_fixture_counts.py
+O(U+U): lines=1 planes=1 edges=1 pairs=[(0, 0)] t_lines=0.67 t_planes=0.73 t_all=1.61 both=(True,)
+SO(U+U): ValueError: the plane row of Integral lattice of rank 2 and signature (0, 0) under {g in Orthogonal group O(Integral lattice of rank 4 and signature (2, 2)) : det(g)=1} cannot be computed by the coset walk of the discriminant image: the subgroup cuts no discriminant condition, or both a determinant and a spinor kernel at once, and the walk's kernel-sign witness machinery lifts one sign coset only after 1.09 s
+O(U+U+<-2>): lines=1 planes=1 edges=1 pairs=[(0, 0)] t_lines=0.15 t_planes=0.27 t_all=2.82 both=()
+O(U+U+U): lines=1 planes=1 edges=1 pairs=[(0, 0)] t_lines=0.39 t_planes=0.73 t_all=2.65 both=()
+O(U+U(2)): lines=2 planes=1 edges=2 pairs=[(0, 0), (1, 0)] t_lines=1.01 t_planes=1.16 t_all=3.09 both=()
+[peakrss] run: child waited=0 shell_code=0 samples=8
+[peakrss] peak tree RSS      : 559 MiB
+[peakrss] low-water MemAvail : 8258 MiB
+[peakrss] peak single VmHWM  : 559 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      548 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    14.0s procs=  3 rss=   559 MiB hwm=   559 MiB avail=  8258 MiB
+[peakrss]   t=    12.0s procs=  3 rss=   555 MiB hwm=   555 MiB avail=  8279 MiB
+[peakrss]   t=    10.0s procs=  3 rss=   530 MiB hwm=   530 MiB avail=  8382 MiB
+[peakrss]   t=     8.0s procs=  3 rss=   513 MiB hwm=   513 MiB avail=  8589 MiB
+[peakrss]   t=     6.0s procs=  3 rss=   501 MiB hwm=   501 MiB avail=  8608 MiB
