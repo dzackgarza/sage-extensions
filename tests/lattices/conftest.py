@@ -100,6 +100,45 @@ def displays_rendered_by(lattice, action):
 builtins.displays_rendered_by = displays_rendered_by
 
 
+def built_without_display(named, action):
+    r"""Return ``action()`` with the display of ``named`` replaced by a refusal.
+
+    ``named`` is the object a construction states in the name it builds for its
+    result: the lattice a shell is cut out of, the discriminant module whose
+    isotropic subgroups are enumerated, the isometry whose fixed locus is taken.
+    Storing that name is the construction's; rendering it is the reader's, so a
+    construction that renders it has computed a display for nobody.  The refusal
+    raises where the display is asked for, which is how a test observes that the
+    construction asked, and the value of a construction that did not is returned.
+
+    The shadow is set on the named object's own class, so it is that object's
+    ``__repr__`` the construction would call -- ``_repr_`` is where the display
+    is written, and the inherited ``__repr__`` is what reaches it.
+
+    Sage's own hash is primed first and asked for nothing afterwards:
+    ``CategoryObject.__hash__`` is ``hash(repr(self))``, kept once computed, so
+    the first hash of an owned object renders it as the runtime's datum and not
+    the construction's.  Every display after that one is the construction's own.
+    A construction that keys a dictionary on the named object therefore passes,
+    and one that names the object in a string does not.
+    """
+    hash(named)
+    owner = named.__class__
+
+    def refuse(self):
+        raise AssertionError(
+            "the construction asked the object it names for its display"
+        )
+
+    with pytest.MonkeyPatch.context() as patch:
+        patch.setattr(owner, "__repr__", refuse)
+        value = action()
+    return value
+
+
+builtins.built_without_display = built_without_display
+
+
 def owned_ring_crossings(action):
     r"""Return ``action()`` and the number of owned-ring crossings it made.
 
