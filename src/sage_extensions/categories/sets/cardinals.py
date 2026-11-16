@@ -866,12 +866,34 @@ class Cardinalities(OwnedCategory):
     def indexed_sum(
         self,
         index_set: Parent,
-        summands: Callable[[IndexT], Cardinal | SupportsInt | AnInfinity],
+        summands: Cardinal | SupportsInt | AnInfinity | Callable[[IndexT], Cardinal | SupportsInt | AnInfinity],
     ) -> Cardinal:
+        r"""$\sum_{i \in I} \kappa_i$.
+
+        A constant family is named by the one cardinal it takes, and then the sum
+        is the product with the index cardinal:
+        $\sum_{i \in I} c = |\bigsqcup_{i \in I} c| = |I \times c| = |I| \cdot c$,
+        which is the product this category already states.  A family named by a
+        function is summed when the index set is finite.  Over an infinite index
+        set its values are not reachable, so nothing about their size is
+        available and the sum remains the term ``_IndexedSumCardinal``: neither
+        its finiteness nor its order is decided here.
+        """
         size = cardinal(index_set.cardinality())
-        if size.is_finite():
-            return self.sum(*(summands(index) for index in index_set))
-        return _cardinal_with_expression(_IndexedSumCardinal(index_set, summands))
+        match summands:
+            case _ if isinstance(summands, Parent) and summands in Cardinalities():
+                return self.product(size, summands)
+            case _ if summands is Infinity or _is_session_integer(summands):
+                return self.product(size, cardinal(summands))
+            case _ if callable(summands):
+                if size.is_finite():
+                    return self.sum(*(summands(index) for index in index_set))
+                return _cardinal_with_expression(_IndexedSumCardinal(index_set, summands))
+            case _:
+                raise TypeError(
+                    f"the summands of a cardinal sum are a cardinal-valued function, or the one "
+                    f"cardinal a constant family takes, but {summands!r} is neither"
+                )
 
     def indexed_product(
         self,
