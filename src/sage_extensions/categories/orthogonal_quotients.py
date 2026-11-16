@@ -3492,6 +3492,40 @@ def _isotropic_line_class_points(lattice, line):
     )
 
 
+def _isotropic_line_image_key(quotient, line):
+    r"""The key of a primitive isotropic line in the subgroup's finite image.
+
+    An element of ``Gamma`` carries one isotropic line onto another, and the
+    divided class of a primitive vector is carried by an isometry onto the
+    divided class of its image, so the ``rho(Gamma)``-orbit of the class pair
+    ``{c, -c}`` is an invariant of the ``Gamma``-orbits of lines: two lines of
+    one orbit share their key, and a cusp whose key differs from a line's
+    cannot contain it.  This is the equivariance
+    :meth:`OrthogonalCharacterQuotient.invariant_separates_isotropic_orbits`
+    reads as a question, read here as a key, so that a line row is indexed once
+    instead of searched at every line.
+
+    The key is the orbit itself, as the set of markers
+    :meth:`OrthogonalCharacterQuotient.isotropic_class_orbit` walks: two class
+    pairs with equal keys lie in one ``rho(Gamma)``-orbit and two with
+    different keys in different ones, which is exactly what a dictionary of a
+    row's cusps answers a line's own key with.  The direction a vertex needs is
+    the sound one -- equal orbits are the same orbit, so a key no cusp carries
+    is a line of no cusp -- while two cusps may still share a key where the
+    finite image is coarser than the cusps, and the line is then decided among
+    those cusps by the witness the certificate retains.  A quotient with no
+    discriminant image has no key and answers ``None``, which leaves the caller
+    its isometry route.
+    """
+    if not quotient._has_discriminant:
+        return None
+    return frozenset(
+        quotient.isotropic_class_orbit(
+            _isotropic_line_class_points(quotient.lattice, line)
+        )
+    )
+
+
 def _line_generator_in_plane(plane, line):
     r"""Return the line's generator and its coordinates, read in the plane's own domain.
 
