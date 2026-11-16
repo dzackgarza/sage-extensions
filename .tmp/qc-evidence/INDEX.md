@@ -2806,3 +2806,14 @@ and the launcher `launch552r3.sh`.
 | `552-r4-probe-cover-map.log` | `f5ea6f2` | probe: the auxiliary presentation cover this round moved to a parameter still lifts -- `Z[x]/(2x)` gives `2x = 0`, `x != 0`, and the integer-torsion symmetric algebra keeps its polynomial presentation. |
 | `552-r4-probe-contracts.log` | `7f36d57` | finding 2: every `ParentMethods.__init__` the presented and free constructors reach has a readable signature (no opaque level in the algebra, semigroup, free, section-ring, Cox and commutative-algebra modules), so the new refusal has no red test; the log is the record. |
 | `552-r4-test-generators.log` | `a8c60d2` | finding 4: `-k line_section_ring_is_the_free_semigroup_algebra` is **1 passed, 28 deselected in 7.32 s**; the row is green because the implementation already multiplies by the semigroup law. |
+
+The round's commits were rebased onto `dc5b828` before this push; the SHAs in the
+table above name the pre-rebase commits.  The same seven commits at the rebased
+head are `49e4412` (test, finding 1), `025f220` (fix, findings 1 and 3),
+`963dfc6` (test, finding 5), `224bf7c` (fix, finding 5), `7488912` (fix,
+finding 2), `55335d5` (test, finding 4) and `0dcf984` (round-4 evidence).
+
+| log | commit | result |
+| --- | --- | --- |
+| `552-r4-rebased-rows.log` | `0dcf984` | the four rows of this round on the rebased tree, one pytest process, `-p qc_sage_session`: **4 passed, 39 deselected in 8.63 s**. |
+| `552-r4-rebased-probe.log` | `0dcf984` | the consumer probe of the threading repair at the rebased head: the conic ring states its scheme, its divisor and pieces 6 and 15, the Cox ring states its scheme, the coproduct's factors and the pushout's span and maps are their own, and the plain, polynomial, tensor and semigroup constructions keep their ambient categories. |
