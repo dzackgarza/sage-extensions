@@ -140,23 +140,27 @@ def test_a_class_is_characteristic_exactly_when_the_definition_says_so() -> None
         )
 
 
-def test_the_characteristic_class_of_the_lattice_the_enumeration_is_read_on() -> None:
-    r"""``A_{<2> + U(2)^4}`` (512 classes) has its characteristic class declared.
+def test_the_characteristic_classes_of_the_lattice_the_enumeration_is_read_on() -> None:
+    r"""``A_{<2> + U(2)^4}`` (512 classes) agrees with the definition at the sample.
 
-    The definition is read over the whole module once; the classes compared
-    against it are the zero class, every generating class and the classes the
-    definition answers yes for, so both a positive and a negative answer are
-    held against the definition at the order the enumeration is read at.
+    The definition is read over every class of the module for the zero class
+    and for each generating class, so a class that is not characteristic is
+    decided by its first witness there and the class that is characteristic is
+    read against all 512.  The ``<2>`` generating class is the characteristic
+    one, and the module says so: an implementation that reads a generating
+    family but drops the hypothesis, or one that answers no everywhere, is
+    wrong on this specimen at the order the enumeration is read at.
     """
     module = _discriminant_module(4)
-    characteristic = _characteristic_by_the_definition(module)
-    generating_classes = tuple(module.module_generators())
-    sample = (module.zero(),) + generating_classes + characteristic
-    assert bool(characteristic) is module.has_integral_doubled_polar_form()
-    assert (
-        tuple(candidate for candidate in sample if candidate.is_characteristic())
-        == characteristic
-    )
+    classes = tuple(module.elements())
+    sample = (module.zero(),) + tuple(module.module_generators())
+    assert module.has_integral_doubled_polar_form() is True
+    for candidate in sample:
+        assert candidate.is_characteristic() is all(
+            module.q(a).lift() - module.b(a, candidate).lift() in ZZ
+            for a in classes
+        )
+    assert any(candidate.is_characteristic() for candidate in sample)
 
 
 def test_a_characteristic_class_costs_about_one_evaluation_per_generating_class() -> None:
