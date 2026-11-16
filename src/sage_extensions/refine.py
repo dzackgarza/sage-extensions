@@ -286,22 +286,27 @@ def owned_parent_class(
     ``__init__`` takes (``construction_parameters``), and a datum is consumed by
     the level that declares it; those levels precede the object's own
     ``__init__``, and the other levels are refined on afterwards.  A level whose
-    signature cannot be read declares nothing it is known to take, so it is not
-    in the chain.  ``category`` stays the object's placement either way.
+    signature cannot be read declares nothing readable, so whether it consumes
+    any of these data is undecided: the request is refused rather than answered
+    by leaving that level out of the chain.  ``category`` stays the object's
+    placement either way.
     """
     providers = _owned_mixins(category, "ParentMethods")
     if establishing:
         from sage_extensions.owned_category import construction_parameters
 
-        declared_by = {
-            provider: construction_parameters(provider) for provider in providers
-        }
-        providers = tuple(
-            provider
-            for provider, declared in declared_by.items()
-            if declared is not None
-            and establishing & {parameter.name for parameter in declared}
-        )
+        establishing_levels = []
+        for provider in providers:
+            declared = construction_parameters(provider)
+            if declared is None:
+                raise TypeError(
+                    f"cannot establish {sorted(establishing)} on an object of {category}: the "
+                    f"construction contract of {provider.__module__}.{provider.__qualname__} cannot "
+                    "be read, so whether it consumes any of those data is undecided"
+                )
+            if establishing & {parameter.name for parameter in declared}:
+                establishing_levels.append(provider)
+        providers = tuple(establishing_levels)
     if not providers:
         return implementation
     inherited = implementation.__dict__.get("_preamble_inherited", implementation)
