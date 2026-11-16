@@ -1363,6 +1363,46 @@ class ConstructionContract:
 
 
 @cached_function
+def construction_parameters(provider: type) -> tuple[ConstructionParameter, ...] | None:
+    r"""The construction data one implementation level declares, or ``None`` when unreadable.
+
+    A level declares a datum by naming it in its own ``__init__``: the keyword
+    is that datum's name in the construction data of the object being built, and
+    the level is the one that consumes it.  A level that declares no
+    ``__init__`` declares no data.  ``None`` records a level whose signature
+    cannot be inspected: it is opaque, and nothing may be read off it as data it
+    does not take.
+
+    This is the one discovery of construction data.  :class:`ConstructionContract`
+    assembles it over a whole implementation MRO, and a construction that has to
+    know which level consumes a datum it is holding asks the same function.
+    """
+    initializer = provider.__dict__.get("__init__")
+    if initializer is None:
+        return ()
+    try:
+        provider_signature = signature(initializer)
+    except (TypeError, ValueError):
+        return None
+    return tuple(
+        ConstructionParameter(
+            name=parameter.name,
+            provider=provider,
+            kind=parameter.kind.name,
+            required=parameter.default is Parameter.empty,
+            default=None if parameter.default is Parameter.empty else parameter.default,
+            annotation=(
+                None
+                if parameter.annotation is Parameter.empty
+                else parameter.annotation
+            ),
+        )
+        for parameter in provider_signature.parameters.values()
+        if parameter.name != "self"
+    )
+
+
+@cached_function
 def _construction_contract_from_type(
     owner,
     implementation_type: type,
@@ -1390,18 +1430,12 @@ def _construction_contract_from_type(
             continue
         if "__init_extra__" in provider.__dict__:
             hooks.append(provider)
-        initializer = provider.__dict__.get("__init__")
-        if initializer is None:
-            continue
-        try:
-            provider_signature = signature(initializer)
-        except (TypeError, ValueError):
+        discovered = construction_parameters(provider)
+        if discovered is None:
             opaque.append(provider)
             continue
-        for parameter in provider_signature.parameters.values():
-            if parameter.name == "self":
-                continue
-            if parameter.kind is Parameter.VAR_KEYWORD:
+        for parameter in discovered:
+            if parameter.kind == Parameter.VAR_KEYWORD.name:
                 if provider is OwnedParent:
                     # ``OwnedParent`` is the terminal host-runtime sink of the
                     # cooperative chain, not a mathematical constructor level.
@@ -1411,24 +1445,12 @@ def _construction_contract_from_type(
                     continue
                 variadic.append(provider)
                 continue
-            if parameter.kind is Parameter.VAR_POSITIONAL:
+            if parameter.kind == Parameter.VAR_POSITIONAL.name:
                 opaque.append(provider)
                 continue
             if parameter.name == "category":
                 continue
-            has_default = parameter.default is not Parameter.empty
-            annotation = None if parameter.annotation is Parameter.empty else parameter.annotation
-            default = parameter.default if has_default else None
-            parameters.append(
-                ConstructionParameter(
-                    name=parameter.name,
-                    provider=provider,
-                    kind=parameter.kind.name,
-                    required=not has_default,
-                    default=default,
-                    annotation=annotation,
-                )
-            )
+            parameters.append(parameter)
     return ConstructionContract(
         owner=owner,
         parameters=tuple(parameters),

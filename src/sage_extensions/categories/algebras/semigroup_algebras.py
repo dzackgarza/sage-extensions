@@ -127,86 +127,126 @@ class AffineSemigroupAlgebras(OwnedCategoryOverBaseRing):
         names=None,
         extra_categories=(),
         extra_construction_data=(),
-        constructing_category=None,
     ):
-        coordinates = tuple(
-            tuple(int(entry) for entry in row)
-            for row in generator_coordinates
-        )
-        if not coordinates:
-            raise ValueError("an affine semigroup needs at least one generator, but none was given")
-        ambient_rank = len(coordinates[0])
-        if any(len(row) != ambient_rank for row in coordinates):
-            raise ValueError(
-                f"the generators of an affine semigroup must lie in one lattice Z^{ambient_rank}, but their "
-                f"lengths are {tuple(len(row) for row in coordinates)}"
-            )
-        if names is None:
-            names = tuple(f"s{position}" for position in range(len(coordinates)))
-        else:
-            names = tuple(names)
-        if len(names) != len(coordinates):
-            raise ValueError(
-                f"an affine semigroup with {len(coordinates)} generators needs {len(coordinates)} variable "
-                f"names, but got {len(names)}"
-            )
+        r"""Construct ``R[S]`` from one selected finite lattice presentation.
 
-        base = self.base_ring()
-        presentation = base.polynomial_ring(names)
-        # ToricIdeal reads the semigroup generators from the columns of its matrix.
-        columns = _engine_column_matrix(SageZZ, coordinates)
-        construction_data = (
-            ("_affine_semigroup_presentation", _AffineSemigroupPresentation(coordinates)),
-            *tuple(extra_construction_data),
+        The algebra asked for here is an object of this category (``OWN-15``).
+        A stronger category that constructs its own object through the same
+        presentation names itself instead (``_affine_semigroup_algebra``).
+        """
+        return _affine_semigroup_algebra(
+            self,
+            generator_coordinates,
+            names=names,
+            extra_categories=extra_categories,
+            extra_construction_data=extra_construction_data,
+            constructing_category=self,
         )
-        # If the lattice generators are linearly independent over Q, the map
-        # N^r -> Z^n they define is injective. Thus distinct monomials have
-        # distinct semigroup degrees and the toric ideal is zero. Avoid asking
-        # ToricIdeal to rediscover this exact rank fact, and retain the selected
-        # polynomial algebra directly.
-        if columns.rank() == len(coordinates):
-            # The degree map is injective, so its toric ideal is zero. It is
-            # mathematically the polynomial algebra itself, not a quotient by
-            # the zero ideal: wrapping it in the presented-algebra constructor
-            # makes its selected resolution ask the presentation algebra for
-            # its own presentation, recursively, when its representation is
-            # requested (e.g. while hashing a chart in the gluing cache).
-            from sage_extensions.categories.algebras.algebras import (
-                _algebra_with_structure,
-            )
-            from sage_extensions.categories.algebras.free_algebras import (
-                FreeAlgebras,
-                GradedFreeAlgebras,
-                SymmetricAlgebras,
-            )
 
-            return _algebra_with_structure(
-                presentation,
-                base,
-                names,
-                FreeAlgebras(base),
-                GradedFreeAlgebras(base),
-                SymmetricAlgebras(base),
-                self,
-                *tuple(extra_categories),
-                construction_data=construction_data,
-                constructing_category=constructing_category,
-            )
-        else:
-            engine_presentation = _engine_ring(presentation)
-            engine_ideal = _SageToricIdeal(
-                columns,
-                names=names,
-                base_ring=_engine_ring(base),
-            )
-            relations = tuple(
-                _owned_engine_element(presentation, engine_presentation(relation))
-                for relation in engine_ideal.gens()
-            )
-        return (presentation).quotient_by_relations(relations,
-            _extra_categories=(self, *tuple(extra_categories)),
-            _extra_construction_data=construction_data,
+
+def _affine_semigroup_algebra(
+    category,
+    generator_coordinates,
+    *,
+    names,
+    extra_categories,
+    extra_construction_data,
+    constructing_category,
+):
+    r"""``R[S]`` from one selected finite lattice presentation, in ``constructing_category``.
+
+    ``category`` is the ``AffineSemigroupAlgebras(R)`` whose presentation this
+    is.  ``constructing_category`` is the category whose public constructor
+    asked for the algebra and is what the result records as its ambient category
+    (``OWN-15``): this semigroup-algebra category when it is asked for directly,
+    and a stronger category -- a section ring on a toric divisor, for instance --
+    when one of those constructs its own ring through this presentation.
+    """
+    base = category.base_ring()
+    coordinates = tuple(
+        tuple(int(entry) for entry in row)
+        for row in generator_coordinates
+    )
+    if not coordinates:
+        raise ValueError("an affine semigroup needs at least one generator, but none was given")
+    ambient_rank = len(coordinates[0])
+    if any(len(row) != ambient_rank for row in coordinates):
+        raise ValueError(
+            f"the generators of an affine semigroup must lie in one lattice Z^{ambient_rank}, but their "
+            f"lengths are {tuple(len(row) for row in coordinates)}"
         )
+    if names is None:
+        names = tuple(f"s{position}" for position in range(len(coordinates)))
+    else:
+        names = tuple(names)
+    if len(names) != len(coordinates):
+        raise ValueError(
+            f"an affine semigroup with {len(coordinates)} generators needs {len(coordinates)} variable "
+            f"names, but got {len(names)}"
+        )
+
+    presentation = base.polynomial_ring(names)
+    # ToricIdeal reads the semigroup generators from the columns of its matrix.
+    columns = _engine_column_matrix(SageZZ, coordinates)
+    construction_data = (
+        ("_affine_semigroup_presentation", _AffineSemigroupPresentation(coordinates)),
+        *tuple(extra_construction_data),
+    )
+    # If the lattice generators are linearly independent over Q, the map
+    # N^r -> Z^n they define is injective. Thus distinct monomials have
+    # distinct semigroup degrees and the toric ideal is zero. Avoid asking
+    # ToricIdeal to rediscover this exact rank fact, and retain the selected
+    # polynomial algebra directly.
+    if columns.rank() == len(coordinates):
+        # The degree map is injective, so its toric ideal is zero. It is
+        # mathematically the polynomial algebra itself, not a quotient by
+        # the zero ideal: wrapping it in the presented-algebra constructor
+        # makes its selected resolution ask the presentation algebra for
+        # its own presentation, recursively, when its representation is
+        # requested (e.g. while hashing a chart in the gluing cache).
+        from sage_extensions.categories.algebras.algebras import (
+            _algebra_with_structure,
+        )
+        from sage_extensions.categories.algebras.free_algebras import (
+            FreeAlgebras,
+            GradedFreeAlgebras,
+            SymmetricAlgebras,
+        )
+
+        return _algebra_with_structure(
+            presentation,
+            base,
+            names,
+            FreeAlgebras(base),
+            GradedFreeAlgebras(base),
+            SymmetricAlgebras(base),
+            category,
+            *tuple(extra_categories),
+            construction_data=construction_data,
+            constructing_category=constructing_category,
+        )
+    engine_presentation = _engine_ring(presentation)
+    engine_ideal = _SageToricIdeal(
+        columns,
+        names=names,
+        base_ring=_engine_ring(base),
+    )
+    relations = tuple(
+        _owned_engine_element(presentation, engine_presentation(relation))
+        for relation in engine_ideal.gens()
+    )
+    from sage_extensions.categories.algebras.algebras import (
+        _presented_algebra_quotient,
+    )
+
+    return _presented_algebra_quotient(
+        presentation,
+        relations,
+        extra_categories=(category, *tuple(extra_categories)),
+        extra_construction_data=construction_data,
+        generating_module=None,
+        constructing_category=constructing_category,
+    )
 
 
 __all__ = ["AffineSemigroupAlgebras"]

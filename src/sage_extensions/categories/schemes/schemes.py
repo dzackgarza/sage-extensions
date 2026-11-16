@@ -6223,7 +6223,10 @@ def _rational_functions_in_T():
     rationals = _owned_rationals()
     polynomial = rationals.polynomial_ring("T")
     rational_functions = _commutative_algebra_with_structure(
-        polynomial.fraction_field(), rationals, ("T",)
+        polynomial.fraction_field(),
+        rationals,
+        ("T",),
+        constructing_category=Algebras(rationals).Associative().Unital().Commutative(),
     )
     return rational_functions, rational_functions.algebra_generator("T")
 

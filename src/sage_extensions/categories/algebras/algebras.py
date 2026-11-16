@@ -1592,7 +1592,7 @@ class Algebras(OwnedCategoryOverBaseRing):
             labels,
             categories,
             construction_data,
-            constructing_category=None,
+            constructing_category,
         ):
             r"""Internal construction hook for a specialized algebra realization.
 
@@ -2477,12 +2477,15 @@ class Algebras(OwnedCategoryOverBaseRing):
                     or self in TensorAlgebras(ring)
                     or self in AlgebrasWithChosenFinitePresentation(ring)
                 ):
-                    return AlgebrasWithChosenFinitePresentation(ring)._call_(
+                    return _presented_algebra_quotient(
                         self,
                         relations,
                         extra_categories=_extra_categories,
                         extra_construction_data=_extra_construction_data,
                         generating_module=_generating_module,
+                        constructing_category=AlgebrasWithChosenFinitePresentation(
+                            ring
+                        ),
                     )
                 case _:
                     assert (
@@ -3565,6 +3568,35 @@ def _dual_numbers_example(base_ring):
     return presentation.quotient_by_relations(("x^2",))
 
 
+def _presented_algebra_quotient(
+    presentation_ring,
+    relations,
+    *,
+    extra_categories,
+    extra_construction_data,
+    generating_module,
+    constructing_category,
+):
+    r"""The quotient of a presentation ring, built in ``constructing_category``.
+
+    A quotient of a chosen finite presentation is one algebra with one
+    presentation, whatever category asked for it.  ``constructing_category`` is
+    that category: the one whose public constructor asked for the quotient, and
+    therefore the ambient category its result records (``OWN-15``).  The
+    presented-algebra owner decides the quotient itself, so every route that
+    asks for one reaches it here.
+    """
+    ring = presentation_ring.algebra_base_ring()
+    return AlgebrasWithChosenFinitePresentation(ring)._call_(
+        presentation_ring,
+        relations,
+        extra_categories=extra_categories,
+        extra_construction_data=extra_construction_data,
+        generating_module=generating_module,
+        constructing_category=constructing_category,
+    )
+
+
 class AlgebrasWithChosenFinitePresentation(OwnedCategoryOverBaseRing):
     r"""Associative unital algebras carrying one selected finite presentation.
 
@@ -3596,12 +3628,15 @@ class AlgebrasWithChosenFinitePresentation(OwnedCategoryOverBaseRing):
         extra_categories=(),
         extra_construction_data=None,
         generating_module=None,
+        constructing_category,
     ):
         r"""Construct an algebra from its selected finite associative presentation.
 
         Retain the exact tensor or polynomial source. The selected quotient
         computation states its own coefficient and relation hypotheses;
         finite presentation does not impose commutativity.
+        ``constructing_category`` is the category whose public constructor
+        asked for the quotient, which becomes its ambient category (``OWN-15``).
         """
         if presentation_ring.base_ring() is not self.base_ring():
             raise ValueError(
@@ -3623,7 +3658,7 @@ class AlgebrasWithChosenFinitePresentation(OwnedCategoryOverBaseRing):
             _extra_categories=tuple(extra_categories),
             _extra_construction_data=extra_construction_data,
             _generating_module=generating_module,
-            _constructing_category=self,
+            _constructing_category=constructing_category,
         )
 
     class ParentMethods:
@@ -5407,9 +5442,10 @@ class _OwnedAlgebraParent(_OwnedRingParent):
 
 
 @cached_function(
-    key=lambda algebra, base_ring, labels=None, categories=(), construction_data=(), law_decisions=(), ring_placement=(): (
+    key=lambda algebra, base_ring, constructing_category, labels=None, categories=(), construction_data=(), law_decisions=(), ring_placement=(): (
         algebra,
         base_ring,
+        id(constructing_category),
         None if labels is None else id(labels),
         tuple(map(id, categories)),
         tuple((name, id(value)) for name, value in construction_data),
@@ -5420,12 +5456,12 @@ class _OwnedAlgebraParent(_OwnedRingParent):
 def _owned_algebra_view(
     algebra,
     base_ring,
+    constructing_category,
     labels=None,
     categories=(),
     construction_data=(),
     law_decisions=(),
     ring_placement=(),
-    constructing_category=None,
 ):
     # A structure view retains its source algebra as defining data. The base
     # and labels alone do not determine that algebra or its multiplication.
@@ -5473,7 +5509,7 @@ def _algebra_with_structure(
     labels=None,
     *categories,
     construction_data=(),
-    constructing_category=None,
+    constructing_category,
 ):
     r"""Construct an owned algebra view with its selected categories present.
 
@@ -5484,9 +5520,8 @@ def _algebra_with_structure(
     native algebra constructor, without assuming a monomial basis.
 
     ``constructing_category`` is the category whose public constructor asked
-    for this algebra (``OWN-15``).  A realization that materializes a new
-    parent records it as its ambient category; a construction that names none
-    keeps the realization's own kind.
+    for this algebra (``OWN-15``): every realization that materializes a new
+    parent records it as that parent's ambient category.
     """
     base = _owned_ring(base_ring)
     # An optional abstract method that a parent does not implement is the
@@ -5513,10 +5548,10 @@ def _algebra_with_structure(
     return _owned_algebra_view(
         algebra,
         base,
+        constructing_category,
         labels,
         tuple(categories),
         tuple(construction_data),
-        constructing_category=constructing_category,
         ring_placement=ring_placement,
     )
 

@@ -89,6 +89,14 @@ from sage_extensions.owned_category_bases import CategoryWithAxiom
 from sage_extensions.refine import RealizationHook
 
 
+# The construction data a category-level constructor of a free algebra
+# declares, each naming one algebra kind.  A free realization is dispatched on
+# exactly one of these; see ``_native_free_algebra``.
+_NATIVE_FREE_ALGEBRA_CONSTRUCTION_DATA = frozenset(
+    {"_preamble_coproduct_factors", "_affine_semigroup_presentation"}
+)
+
+
 def _polynomial_monomial_exponents(engine, monomial) -> tuple[int, ...]:
     r"""Decode a polynomial monomial key at the private Sage boundary."""
     if isinstance(engine, PolynomialRing_generic):
@@ -200,7 +208,7 @@ class _NativeFreeAlgebraParent(_NativeMonomialEvaluation, _OwnedAlgebraParent):
         *,
         categories=(),
         construction_data=(),
-        constructing_category=None,
+        constructing_category,
     ) -> None:
         from sage_extensions.categories.group.magmas import AdditiveGroups
         from sage_extensions.categories.modules.framed.framed_free_modules import (
@@ -307,11 +315,7 @@ class _NativeFreeAlgebraParent(_NativeMonomialEvaluation, _OwnedAlgebraParent):
             algebra_generating_family=algebra_generators,
             algebra_framing_source=self,
             algebra_framing_owner=framing_owner,
-            constructing_category=(
-                algebra_category
-                if constructing_category is None
-                else constructing_category
-            ),
+            constructing_category=constructing_category,
             ring_placement=ring_placement,
         )
         # Algebras.ParentMethods.__init__, entered through the common parent
@@ -326,7 +330,7 @@ class _NativeFreeAlgebraParent(_NativeMonomialEvaluation, _OwnedAlgebraParent):
         labels,
         categories,
         construction_data,
-        constructing_category=None,
+        constructing_category,
     ):
         r"""Preserve this native free-algebra realization under common refinement."""
         if self.base_ring() is not base_ring:
@@ -342,15 +346,12 @@ class _NativeFreeAlgebraParent(_NativeMonomialEvaluation, _OwnedAlgebraParent):
         same_labels = selected_labels is current_labels
         generating = self.generating_module()
         if same_labels:
-            # An unchanged view keeps its recorded ambient category; a request
-            # for a different one is a construction datum of its own.
+            # An unchanged view keeps the ambient category it was built in; a
+            # request for another one is a construction datum of its own.
             if (
                 not construction_data
                 and all(self in category for category in categories)
-                and (
-                    constructing_category is None
-                    or constructing_category is self._constructing_category
-                )
+                and constructing_category is self._constructing_category
             ):
                 return self
         else:
@@ -369,9 +370,9 @@ class _NativeFreeAlgebraParent(_NativeMonomialEvaluation, _OwnedAlgebraParent):
     key=lambda engine,
     generating_module,
     flavor,
+    constructing_category,
     categories=(),
-    construction_data=(),
-    constructing_category=None: (
+    construction_data=(): (
         id(generating_module),
         flavor,
         tuple(map(id, categories)),
@@ -383,16 +384,18 @@ def _native_free_algebra(
     engine,
     generating_module,
     flavor,
-    *,
+    constructing_category,
     categories=(),
     construction_data=(),
-    constructing_category=None,
 ):
     r"""The native realization of the free functor on this exact module.
 
     Intern by the defining module and selected algebra data, never by the
     engine object supplied by a caller. Engine parents are realizations, not
-    identities of the free algebra.
+    identities of the free algebra. ``constructing_category`` is the category
+    whose public constructor asked for the algebra (``OWN-15``), so the same
+    module and data built by two different categories are two different views,
+    each recorded in the category that asked.
     """
     if not construction_data:
         return _NativeFreeAlgebraParent(
@@ -408,13 +411,20 @@ def _native_free_algebra(
     from sage_extensions.owned_category import owned_category_join
     from sage_extensions.refine import _owned_dynamic_class, owned_parent_class
 
-    if "_preamble_coproduct_factors" in data:
+    # A free realization states its algebra kind by one datum, and these are the
+    # two kinds a category-level constructor declares: a coproduct of algebras
+    # and an affine semigroup presentation.  The datum that selects the kind is
+    # matched exactly; data no constructor here declares (a section ring's
+    # scheme and divisor, for instance) are handed down the chain like any other
+    # datum and select nothing.
+    declared = frozenset(data) & _NATIVE_FREE_ALGEBRA_CONSTRUCTION_DATA
+    if declared == frozenset({"_preamble_coproduct_factors"}):
         implementation = _owned_dynamic_class(
             "NativeFreeAlgebraWithCoproductData",
             (CommutativeAlgebraCoproducts.ParentMethods, _NativeFreeAlgebraParent),
             _NativeFreeAlgebraParent,
         )
-    elif "_affine_semigroup_presentation" in data:
+    elif declared == frozenset({"_affine_semigroup_presentation"}):
         from sage_extensions.categories.algebras.semigroup_algebras import (
             AffineSemigroupAlgebras,
         )
@@ -429,9 +439,9 @@ def _native_free_algebra(
             f"no category-level free-algebra constructor declares {tuple(data)}"
         )
     if categories:
-        # Each datum in ``data`` names the level that establishes it.  Only
-        # those levels have to precede the object's own ``__init__``; the rest
-        # of the target category is refined on afterwards, as before.
+        # Each datum in ``data`` is consumed by the level whose constructor
+        # declares it.  Those levels precede the object's own ``__init__``; the
+        # rest of the target category is refined on afterwards.
         implementation = owned_parent_class(
             implementation,
             owned_category_join(tuple(categories)),
@@ -575,6 +585,7 @@ def _owned_laurent_polynomial_ring(base, labels, engine):
         base,
         labels,
         Algebras(base).Associative().Unital().Commutative(),
+        constructing_category=Algebras(base).Associative().Unital().Commutative(),
     )
     _set_owned_ring_display(
         algebra,
@@ -643,6 +654,7 @@ def _symmetric_algebra_of_free_module(generating):
         _polynomial_engine(engine_base, names),
         generating,
         "symmetric",
+        constructing_category=SymmetricAlgebras(base),
     )
     _set_owned_ring_display(algebra, f"{base}[{', '.join(names)}]", kind="polynomial")
     return algebra
@@ -682,7 +694,9 @@ def _tensor_algebra_on(base_ring, algebra_generating_set, *, source_module=None)
         return _sparse_tensor_algebra_of(generating)
     names = _variable_names(labels)
     algebra = _SageFreeAlgebra(engine_base, len(labels), names=names)
-    return _native_free_algebra(algebra, generating, "tensor")
+    return _native_free_algebra(
+        algebra, generating, "tensor", constructing_category=TensorAlgebras(base)
+    )
 
 
 def _relations_to_ideal(presentation_ring, relations):
@@ -2389,10 +2403,17 @@ def _commutative_algebra_coproduct_backend(left, right):
     ) + _transport_relations(right_presentation, right_relations, presentation, "right")
     construction_data = (("_preamble_coproduct_factors", (left, right)),)
     if relations:
-        return (presentation).quotient_by_relations(
+        from sage_extensions.categories.algebras.algebras import (
+            _presented_algebra_quotient,
+        )
+
+        return _presented_algebra_quotient(
+            presentation,
             relations,
-            _extra_categories=(CommutativeAlgebraCoproducts(base),),
-            _extra_construction_data=construction_data,
+            extra_categories=(CommutativeAlgebraCoproducts(base),),
+            extra_construction_data=construction_data,
+            generating_module=None,
+            constructing_category=CommutativeAlgebraCoproducts(base),
         )
     return _algebra_with_structure(
         presentation,
@@ -2403,6 +2424,7 @@ def _commutative_algebra_coproduct_backend(left, right):
         SymmetricAlgebras(base),
         CommutativeAlgebraCoproducts(base),
         construction_data=construction_data,
+        constructing_category=CommutativeAlgebraCoproducts(base),
     )
 
 
