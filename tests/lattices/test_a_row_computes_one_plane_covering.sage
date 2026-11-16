@@ -43,15 +43,22 @@ def _u_u_m2():
 
 
 def _line_cusp_of(line_cusps, line):
-    r"""The one line cusp of the row that contains ``line``, by its own transporter witness."""
-    for cusp in line_cusps:
-        if cusp.transporter_witness(line) is not None:
-            return cusp
-    raise ArithmeticError(
-        f"the line {line} of a plane of the incidence lies in no cusp of the line row "
-        f"{line_cusps}: a line of a plane that carries an edge lies in a plane of the row, "
-        f"and its own orbit is a cusp of the row"
+    r"""The line cusp of the row that contains ``line``, read from its own transporter witness."""
+    return next(
+        cusp for cusp in line_cusps if cusp.transporter_witness(line) is not None
     )
+
+
+def _retained_covering(quotient, source, plane_cusps):
+    r"""The row's one covering of ``source``, at the exactly one plane that computed it."""
+    coverings = [
+        quotient.isotropic_covering_of(cusp.representative(), source)
+        for cusp in plane_cusps
+    ]
+    # One plane of the row computed this family; the row's other planes are the
+    # same family carried there, so they answer for it nowhere.
+    assert sum(covering is not None for covering in coverings) == 1
+    return next(covering for covering in coverings if covering is not None)
 
 
 def _assert_one_covering_per_row(subgroup) -> None:
@@ -65,30 +72,22 @@ def _assert_one_covering_per_row(subgroup) -> None:
     # computed per plane is four and one computed per row is two.
     assert source_row.cardinality() == cardinal(2)
     assert subgroup.cusps(2).cardinality() == cardinal(2)
-    retained = []
-    for source, _flag in enumerate(source_row):
-        coverings = [
-            quotient.isotropic_covering_of(cusp.representative(), source)
-            for cusp in plane_cusps
-        ]
-        computed = sum(covering is not None for covering in coverings)
-        # One plane of the row computed this family; the row's other planes are
-        # the same family carried there, so they answer for it nowhere.
-        assert computed == 1
-        retained.extend(covering for covering in coverings if covering is not None)
+    retained = [
+        _retained_covering(quotient, source, plane_cusps)
+        for source, _flag in enumerate(source_row)
+    ]
     for cusp in plane_cusps:
         lift = quotient.isotropic_lift_of(cusp.representative())
-        carried = []
-        for reference_lift, reference_flags in retained:
-            carried.extend(
-                quotient.transport_covering(reference_lift, reference_flags, lift)
-            )
-        edges = tuple(
-            incidence for incidence in incidences if incidence.plane_cusp() == cusp
-        )
-        assert set(incidence.line_cusp() for incidence in edges) == set(
-            _line_cusp_of(line_cusps, flag.terms()[0]) for flag in carried
-        )
+        carried = [
+            flag
+            for reference_lift, reference_flags in retained
+            for flag in quotient.transport_covering(reference_lift, reference_flags, lift)
+        ]
+        assert set(
+            incidence.line_cusp()
+            for incidence in incidences
+            if incidence.plane_cusp() == cusp
+        ) == set(_line_cusp_of(line_cusps, flag.terms()[0]) for flag in carried)
     assert incidences.cardinality() == cardinal(4)
 
 

@@ -29,18 +29,22 @@ that makes the carry exact, and it is true for every kernel of a character --
 
 ## The measurement
 
-One retained plane in the `Otilde(T_Co)` row, then five other planes of the row
-carried from it.  The five are the retained plane's images under reflections of
-the lattice in five roots; each reflecting isometry is outside `Otilde`, so each
-image is a plane of a different `Otilde`-orbit and not a repeat of the retained
-one.  All five spans are distinct and none is the retained span.
+One retained plane in the `Otilde(T_Co)` row, then five other planes carried from
+it.  The five are the retained plane's images under reflections of the lattice in
+five roots, and what the probe checks about them is that their spans are five
+distinct sublattices, none of them the retained plane's span.  What it measures
+is the carry.  A reflecting isometry outside `Otilde` does not by itself put its
+image in a different `Otilde`-orbit -- an element of the subgroup could transport
+between the two planes -- and the probe asks no subgroup-equivalence question at
+all.  It needs none: the carry is a cost per plane and does not depend on which
+orbit the plane lies in.
 
 | stage | measured |
 | --- | ---: |
 | `Otilde(T_Co)` and its quotient, index 46998591897600 | 52.08 s |
 | the retained plane, its 112 certified parabolic generators, its lift | 3.82 s |
 | the row's one covering at that plane (three flags) | 8.46 s |
-| five distinct target planes, one registered lift each (72 candidates tried) | 0.12 s |
+| five planes of distinct span, one registered lift each (72 candidate isometries tried) | 0.12 s |
 | the carry, plane 1 / 2 / 3 / 4 / 5 | **13.25 / 13.45 / 13.57 / 13.41 / 13.46 ms** |
 | the same covering computed at plane 1 instead of carried | **8.06 s** |
 
