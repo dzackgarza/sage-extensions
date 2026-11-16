@@ -296,15 +296,17 @@ class _InvertibleSheafClass:
         return decision if op == op_EQ else negation(decision)
 
     def __hash__(self) -> int:
-        r"""Hash the class by its group and the sheaf that decides equality.
+        r"""Hash the class by its group, which is what decides its equality.
 
-        ``Pic(X).equal`` answers ``True`` exactly when the two classes retain
-        one sheaf, so the group and the identity of the retained representative
-        are the data equality compares.  The class retains that sheaf, so its
-        identity is stable while the class exists; two classes of one sheaf
-        hash alike, and a second sheaf hashes apart.
+        ``Pic(X).equal`` answers ``True`` when the two classes retain one sheaf
+        and, for two classes that retain different sheaves, answers the
+        proposition ``isomorphic(L, M)``: ``[L (x) O]`` and ``[L]`` are one class
+        although they retain different sheaves.  The retained sheaf is therefore
+        not an invariant of the class, and a hash that read it would separate
+        objects equality joins.  The group is the coarsest invariant, as it is
+        for a Cartier section class, and it is the rule of :class:`Sets`.
         """
-        return hash((id(self.parent()), id(self.representative())))
+        return hash(self.parent())
 
     def _repr_(self):
         return f"[{self.representative()}]"
