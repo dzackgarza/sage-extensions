@@ -2651,3 +2651,4 @@ is a namespace the test lint also reads.
 | `541rev-laziness-calibration.log` | `897e7f7` | the same file against the construction that computed: **2 failed in 7.91 s** at `assert 2 == 0` -- the instrument sees a construction that realizes its resolution, which the engine-matrix count alone did not | 
 | `541rev-presented-base.log` | `2e9b362` | nine presented-module, torsion, localization and contract files: **8 failed, 2 passed, 9 errors in 19.29 s** | 
 | `541rev-presented-fix.log` | the finding-4/5/6 commit | the same files: **8 failed, 7 passed, 9 errors in 38.28 s**; FAILED/ERROR id sets identical to the base's (`comm` both directions empty), the five extra passes are the new contract files | 
+| `541rev-laziness-ordering.log` | the ordering repair | the laziness file beside the lattice primitivity file and the torsion archive: **3 failed, 4 passed in 9.34 s**, the three failures the archive's two-adic ones and the laziness contract green | 
