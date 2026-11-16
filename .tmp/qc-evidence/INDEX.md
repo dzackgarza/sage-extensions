@@ -3271,3 +3271,19 @@ as they were taken.
 | `527r3-consumers-at-67a5074.log` | `67a5074` | the consumer probe again: 13 answers, no failure |
 | `527r3-completion-maps-at-c9568ed.log` | `c9568ed`, the push base | `tests/rings/test_completion_maps.sage`: **4 failed, 1 passed in 3.55 s**, the four filed ids |
 | `527r3-completion-maps-at-67a5074.log` | `67a5074`, this round's head | the same file: **4 failed, 1 passed in 2.62 s**, the same four ids |
+
+## `#527` round 3, re-taken again: the six commits rebased onto `cf6ba0b` (2026-11-16)
+
+`main` moved once more while this round waited for its push: `cf6ba0b`.  The six
+commits are rebased onto it and their ids are now `0b3c5f4` (test), `68a0154` (its
+repair), `ee2441e` (test), `2ef3d7b` (its repair), `5a47e7f`, `89a9aa4` and
+`e395856` (evidence).  The three paths they touch are identical at `c9568ed` and at
+`cf6ba0b` (`git diff --stat c9568ed cf6ba0b --` them is empty), and their content is
+unchanged again (`git diff 67a5074 2ef3d7b` over those paths is empty), so the runs in
+the two sections above are the same measurements of the same trees.  The whole file is
+taken once at this head, and no red needed re-taking because none of the runs' inputs
+changed.
+
+| log | tree | result |
+| --- | --- | --- |
+| `527r3-green-at-e395856.log` | `e395856`, this round's head, with the test lint | the whole file: **8 passed in 5.49 s**, no lint finding |
