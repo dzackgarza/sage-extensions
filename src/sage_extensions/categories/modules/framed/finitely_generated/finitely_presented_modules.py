@@ -2903,6 +2903,25 @@ def _pid_presentation_kernel(morphism):
     )
 
 
+def _singular_column_coordinates(coordinates, count, description):
+    r"""Return the ``count`` entries of one coordinate column as a tuple.
+
+    Singular's ``lift`` answers with one row per generator of the submodule and
+    one column per lifted vector, and its ``reduce`` with one vector per column
+    of its argument.  Both are a column of coordinates with one entry per
+    generator, and each is read here, once, so that no caller keeps the first
+    entry of a column and mistakes it for the column (``#532``).
+    """
+    match (coordinates.nrows(), coordinates.ncols()):
+        case (rows, 1) if rows == count:
+            return tuple(coordinates[row, 0] for row in range(count))
+        case (rows, columns):
+            raise ValueError(
+                f"{description} are a {rows} by {columns} matrix, not a column with one "
+                f"entry for each of the {count} generators"
+            )
+
+
 def _singular_module_lift(generators, column):
     r"""Express a column in a polynomial submodule, or return ``None``.
 
@@ -3383,7 +3402,18 @@ def _singular_presentation_kernel(morphism):
                 f"{morphism} is not well defined: the relation {tuple(relation.rows()[0])} of its "
                 f"domain does not map into the relations of its codomain"
             )
-            relation_columns.append(tuple(matrix(singular_ring, coordinates).rows()[0]))
+            # ``lift`` answers with one row per generator of the submodule and
+            # one column per lifted vector, so the coordinates of this relation
+            # in the kernel generators are that column: one relation of the
+            # domain is one relation of the kernel however many generators the
+            # kernel has.
+            relation_columns.append(
+                _singular_column_coordinates(
+                    matrix(singular_ring, coordinates),
+                    kernel_count,
+                    f"the relation {tuple(relation.rows()[0])} of {morphism}",
+                )
+            )
         if relation_columns:
             standard_relations = ff.std(
                 matrix(
@@ -3432,17 +3462,34 @@ def _singular_presentation_kernel(morphism):
         coefficients = _singular_module_lift(lifts, requested)
         if coefficients is None:
             return None
-        normal_form = matrix(singular_ring, coefficients)
+        values = _singular_column_coordinates(
+            matrix(singular_ring, coefficients),
+            kernel_count,
+            f"the coordinates of {element} in the kernel generators",
+        )
         if standard_relations is not None:
-            normal_form = matrix(ff.reduce(
-                normal_form,
+            # ``reduce`` answers one vector per column of its argument, and the
+            # reduced coordinates are the same generator coordinates modulo the
+            # relations of the kernel.  The class of the combination is the
+            # same either way; the reduction picks the representative.
+            reduced = tuple(ff.reduce(
+                matrix(singular_ring, kernel_count, 1, values),
                 standard_relations,
                 ring=singular_ring,
             ))
+            assert len(reduced) == 1, (
+                f"the reduced coordinates of {element} in the kernel generators are "
+                f"{len(reduced)} vectors, not one"
+            )
+            values = _singular_column_coordinates(
+                matrix(singular_ring, kernel_count, 1, tuple(reduced[0])),
+                kernel_count,
+                f"the reduced coordinates of {element} in the kernel generators",
+            )
         return kernel.linear_combination({
-            label: from_singular(normal_form[position, 0])
-            for position, label in enumerate(kernel_labels)
-            if normal_form[position, 0] != 0
+            label: from_singular(value)
+            for label, value in zip(kernel_labels, values, strict=True)
+            if value != 0
         })
 
     return _presented_module_from_morphism(

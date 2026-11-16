@@ -1693,10 +1693,14 @@ class Modules(OwnedCategoryOverBaseRing):
             \mathbf{N}$ and $R = \mathbf{Z}$ is uncountable -- no countable
             family generates it -- and not free (Baer--Specker).
 
-            For a finitely presented module the dual is presented, and this
-            level answers: $\operatorname{Hom}_R(\operatorname{coker}(A), R)$ is
-            the kernel of the transpose $A^t$, and the dual is presented on that
-            kernel the same way any finitely presented module is.  At
+            For a finitely presented $M = \operatorname{coker}(A \colon R^m \to
+            R^n)$ the dual is the kernel of the transpose $A^t$, and this level
+            answers whenever that kernel is a finitely presented module.  That
+            is a hypothesis on the ring and not on $M$: the kernel of a map of
+            finitely generated free modules over $R$ is finitely generated
+            exactly when $R$ is coherent, so over a coherent ring every finitely
+            presented module has a presented dual, and over a non-coherent ring
+            some do not (:meth:`dual_module` exhibits one).  At
             $M = \mathbf{Z}/8$ the presentation is $8 \colon \mathbf{Z} \to
             \mathbf{Z}$, its transpose is the same map, and
             $\ker 8 = 0$: every functional kills $1$ and hence everything, so
@@ -1955,6 +1959,7 @@ class Modules(OwnedCategoryOverBaseRing):
                     return _ModuleScalarAction(ring, self, True)
 
         def module_category(self):
+            _realize_pending_self_module_placement(self)
             return Modules(self.base_ring())
 
         def has_selected_module_resolution(self) -> bool:
@@ -3152,8 +3157,8 @@ class Modules(OwnedCategoryOverBaseRing):
             The construction is the internal Mor alone, and it names no basis:
             whatever presentation ``Hom_R(M, R)`` carries is the one its
             endpoints give it, through the module's own chosen resolution.  A
-            finitely presented ``M = coker(A: R^m -> R^n)`` therefore has its
-            dual presented, as the kernel of the transpose: a functional is the
+            finitely presented ``M = coker(A: R^m -> R^n)`` has its dual
+            identified with the kernel of the transpose: a functional is the
             assignment of a value to each generator that kills every relation,
             so ``Hom_R(M, R) = ker(A^t: R^n -> R^m)``.  At
             ``M = Z/8 = coker(8: Z -> Z)`` that kernel is ``0``, and the dual is
@@ -3161,13 +3166,33 @@ class Modules(OwnedCategoryOverBaseRing):
             also ``0``, and at ``M = Z[x]^2/(x e_1 + 2 e_2)`` it is the syzygy
             module of ``(x, 2)``, which is free on ``(2, -x)``.
 
+            Whether that kernel is itself finitely generated -- that is, whether
+            the dual of a finitely presented module is finitely presented -- is
+            a hypothesis on the ring, not on ``M``.  The kernel of a map of
+            finitely generated free ``R``-modules is finitely generated exactly
+            when every finitely generated ideal of ``R`` is finitely presented,
+            which is coherence of ``R``: over a coherent ring the dual of a
+            finitely presented module is finitely presented.  Over a
+            non-coherent ring it need not be.  Take
+            ``R = k[t, x_1, x_2, ...]/(t^2, t x_1, t x_2, ...)`` and
+            ``M = R/(t)``.  ``M`` is finitely presented, on one generator and
+            the one relation ``t``, and its dual is ``Ann_R(t) = (t, x_1, x_2,
+            ...)``, the maximal ideal: ``t`` kills ``t`` and every ``x_i``, and
+            a functional with a nonzero constant term would not kill ``t``.  The
+            image of that ideal in ``R/(t) = k[x_1, x_2, ...]`` is
+            ``(x_1, x_2, ...)``, which no finite set generates, so ``M^*`` is
+            not finitely generated and the kernel ``ker(t: R -> R)`` that
+            identifies it is not one either.
+
             The kernel is computed where the ring's exact coefficient
             presentations allow it: a Smith form over a principal ideal domain,
             a standard basis over a polynomial ring over a field or over the
             integers, a standard basis over a quotient of a polynomial ring over
             a field.  Over any other ring the kernel computation states that it
             has no route for the ring; it does not report a presentation it did
-            not compute.
+            not compute.  A kernel that is not finitely generated is refused by
+            the same computation, which asks for a finite presentation of a
+            module that has none, and not reported as a presentation.
 
             A free module on an infinite basis has the dual its module algebra
             gives it -- the product ``prod_S R``, which the library holds no
@@ -6309,8 +6334,38 @@ class TensorProductModules(OwnedCategoryOverBaseRing):
             return mor._from_bilinear_evaluation(bilinear)
 
 
+def _state_pending_self_module_placement(module, realize) -> None:
+    r"""State a module reading that is built on the first module read.
+
+    A construction that fixes *which* reading of an object is the selected one
+    -- a quotient's cyclic presentation over its cover, say -- states it here
+    instead of building it, because the placement, the frame and the free and
+    regular modules the reading is stated in are derived structure
+    (``AGENTS.md``, "Construction is instant").
+
+    :func:`_realize_pending_self_module_placement` builds it at the first
+    request: the module-category accessor, or the predicate that asks whether
+    the module carries a chosen finite presentation.
+    """
+    module.__dict__["_pending_self_module_placement"] = realize
+
+
+def _realize_pending_self_module_placement(module) -> None:
+    r"""Build a stated module reading, at the first module read.
+
+    The statement is consumed before it is built, so a reading whose
+    construction itself asks this module for its category does not re-enter.
+    """
+    pending = module.__dict__.get("_pending_self_module_placement")
+    if pending is None:
+        return
+    del module.__dict__["_pending_self_module_placement"]
+    pending()
+
+
 def _represented_finite_presentation(module) -> bool:
     r"""Return whether ``module`` carries selected finite presentation data."""
+    _realize_pending_self_module_placement(module)
     return module in ModulesWithChosenFinitePresentation(module.base_ring())
 
 

@@ -5144,6 +5144,26 @@ class CartesianProductsOfSets(OwnedCategory):
                     f"{components} is an element of {components.parent()}, not of the product {self}"
                 )
             if callable(components):
+                if (
+                    self.has_finite_index_set()
+                    and self.index_set() in EnumeratedSets()
+                ):
+                    # A point of a product has fixed components, so the
+                    # callable is read once here and not kept: a section that
+                    # closes over a loop variable would otherwise resolve to
+                    # different components depending on when it was read, and
+                    # two points of one product that were built from the same
+                    # variable would compare equal.
+                    indices = tuple(self.index_set())
+                    ranking = self.index_set().ranking_map()
+                    resolved = tuple(
+                        self.factor(index)(components(index)) for index in indices
+                    )
+                    return self.element_class(
+                        self,
+                        lambda index: resolved[int(ranking(index))],
+                        positional_components=resolved,
+                    )
                 return self.element_class(self, components)
             if (
                 not self.has_finite_index_set()

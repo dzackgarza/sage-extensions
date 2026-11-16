@@ -7553,7 +7553,7 @@ def _owned_ring_category(
 
 
 def _install_self_module_placement(ring) -> None:
-    r"""Place ``ring`` among the objects of its module category, with its frame.
+    r"""State ``ring``'s reading as a module over its base ring, with its frame.
 
     A ring is a module over its base ring: ``module_category()`` reports
     ``Modules(ring.base_ring())``.  For a quotient ``A = R[x]/I`` that reading is
@@ -7561,22 +7561,15 @@ def _install_self_module_placement(ring) -> None:
     ``1`` generates ``A`` over its cover — and it is **not** a basis: every
     element of ``I`` multiplies that class to zero, so the frame is a surjection
     ``R[x]^1 -> A`` and the relations are the generators of the ideal.  The
-    frame is registered under exactly the owner ``module_category()`` answers
-    with.
+    frame is stated under exactly the owner ``module_category()`` answers with.
 
-    The same reading is a finite presentation, and it is registered as one: the
-    relation map sends the ``i``-th relation to ``g_i`` times the class of the
-    unit, so ``R[x]^k --(g_i)--> R[x]^1 -> A`` is exact.  That is what makes
-    ``A`` an object of ``ModulesWithChosenFinitePresentation`` over its cover,
-    and hence what its dual is read from: ``Hom_cover(A, cover)`` is the kernel
-    of the transpose of this map.  That placement is one refinement of the ring's
-    category per quotient ring, at construction, and it is the price of the
-    reading: the alternative measured here -- stating the module category in the
-    quotient construction's category join, which is one class build instead of
-    two -- was 22-25 ms per ring against 9-16 ms, because a larger join costs
-    more to compile than a refinement does.  No freeness, projectivity or finite
-    presentation is inferred from the label count: ``ZZ/2`` is not projective
-    over ``ZZ``.
+    The same reading is a finite presentation: the relation map sends the
+    ``i``-th relation to ``g_i`` times the class of the unit, so
+    ``R[x]^k --(g_i)--> R[x]^1 -> A`` is exact.  That is what makes ``A`` an
+    object of ``ModulesWithChosenFinitePresentation`` over its cover, and hence
+    what its dual is read from: ``Hom_cover(A, cover)`` is the kernel of the
+    transpose of this map.  No freeness, projectivity or finite presentation is
+    inferred from the label count: ``ZZ/2`` is not projective over ``ZZ``.
 
     The generators of that relation map are the defining ideal's own chosen
     module presentation, not the scalar family it was written with: every ideal
@@ -7587,14 +7580,16 @@ def _install_self_module_placement(ring) -> None:
     The ring is placed among those modules as a *module over its cover* and not
     as its own presentation: a ring read as a module is still the ring, so no
     module level may take over what the ring is presented as (``OWN-10``).
+
+    The construction states this reading and builds none of it: the placement,
+    the frame and the free and regular modules it is stated in are derived
+    structure, and :func:`_realize_self_module_placement` builds them at the
+    first module read (``AGENTS.md``, "Construction is instant").  A ring that
+    is never read as a module pays for none of them.
     """
-    from sage_extensions.categories.modules.framed.finitely_generated.finitely_presented_modules import (
-        _fix_lazy_selected_module_presentation,
-    )
     from sage_extensions.categories.modules.pure.modules import (
         Modules,
-        ModulesWithChosenFinitePresentation,
-        _fix_selected_module_resolution,
+        _state_pending_self_module_placement,
     )
     from sage_extensions.categories.rings.commutative_algebra import QuotientRings
     from sage_extensions.refine import refine
@@ -7607,32 +7602,56 @@ def _install_self_module_placement(ring) -> None:
         # read over its source; the cyclic generating family is what a quotient
         # states over its cover.
         return
+    _state_pending_self_module_placement(
+        ring, lambda: _realize_self_module_placement(ring)
+    )
+
+
+def _realize_self_module_placement(ring) -> None:
+    r"""Build the module reading ``ring``'s construction stated, at its first read.
+
+    This is the construction half of :func:`_install_self_module_placement`: the
+    placement among the modules over the cover with a chosen finite
+    presentation, the frame of that reading, and the regular module's own
+    reading.  It runs once, when the reading is first asked for; the statement
+    it answers is spent before it runs, so a step of it that asks this ring for
+    its module category does not re-enter.
+    """
+    from sage_extensions.categories.modules.framed.finitely_generated.finitely_presented_modules import (
+        _fix_lazy_selected_module_presentation,
+    )
+    from sage_extensions.categories.modules.pure.modules import (
+        Modules,
+        ModulesWithChosenFinitePresentation,
+        _fix_selected_module_resolution,
+    )
+    from sage_extensions.refine import refine
+
+    base = ring.base_ring()
     if ring.has_selected_module_resolution():
         return
-    presented = ModulesWithChosenFinitePresentation(ring.base_ring())
+    presented = ModulesWithChosenFinitePresentation(base)
     if ring not in presented:
         refine(ring, presented)
-    base = ring.base_ring()
-    free = base.free_module(1)
-    labels = free.module_generating_set()
-    # The relations of that cyclic generating family are the covering map's
-    # kernel, which is the defining ideal: `R[x]^k --(g_i)--> R[x]^1 -> A` is
-    # exact at both slots.  Fixing them makes the reading a finite
-    # presentation, and the dual of `A` is then the kernel of their transpose.
-    # The generators of the ideal are its own chosen module presentation, not
-    # the scalar family it was written with: every ideal of this library is a
-    # module with chosen generators, and its scalar family is optional data
-    # that the placement may not depend on.  Both the family and the relation
-    # map are built on the first module-data read, so a ring that is never
-    # read as a module pays for neither.
-    defining_ideal = ring.defining_ideal()
-    regular = base.regular_module()
-    (regular_label,) = tuple(regular.module_generating_set())
 
     def selected_presentation_data():
+        r"""Read the cyclic presentation ``R[x]^k --(g_i)--> R[x]^1 -> A``.
+
+        The relations of that cyclic generating family are the covering map's
+        kernel, which is the defining ideal.  The generators of the relation map
+        are the ideal's own chosen module presentation, not the scalar family it
+        was written with: every ideal of this library is a module with chosen
+        generators, and its scalar family is optional data that the placement
+        may not depend on.
+        """
+        free = base.free_module(1)
+        labels = free.module_generating_set()
+        unit = free.module_generator(next(iter(labels)))
+        defining_ideal = ring.defining_ideal()
         relation_labels = defining_ideal.module_generating_set()
         relations = base.free_module(relation_labels)
-        unit = free.module_generator(next(iter(labels)))
+        regular = base.regular_module()
+        (regular_label,) = tuple(regular.module_generating_set())
         framing = regular.framing_morphism()
         relation = Modules(base).Mor(relations, free)(
             {

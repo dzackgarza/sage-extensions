@@ -106,3 +106,53 @@ def test_the_kernel_of_x_and_two_over_ZZx_is_the_koszul_syzygy() -> None:
     image = kernel.inclusion()(kernel.module_generator(kernel_label))
     assert row(image) == line.zero()
     assert image in (syzygy, -syzygy)
+
+
+def test_the_kernel_of_two_and_minus_x_over_ZZx_is_free_of_rank_two() -> None:
+    r"""$\ker(2, -x, 0, 0)$ over $M = \mathbf{Z}[x]^4/(x e_1 + 2 e_2)$ is free of rank two.
+
+    The relation $x e_1 + 2 e_2$ maps to $2x - 2x = 0$, so
+    $f(e_1) = 2$, $f(e_2) = -x$, $f(e_3) = f(e_4) = 0$ is a well defined map
+    $M \to \mathbf{Z}[x]$.  A quadruple $(a, b, c, d)$ of $\mathbf{Z}[x]^4$ is
+    killed by $f$ exactly when $2a = x b$, and $x$ does not divide $2$ in the
+    unique factorization domain $\mathbf{Z}[x]$: $a = xt$ and $b = 2t$.  So the
+    kernel in $\mathbf{Z}[x]^4$ is $\mathbf{Z}[x](x, 2, 0, 0) \oplus
+    \mathbf{Z}[x]e_3 \oplus \mathbf{Z}[x]e_4$, and the kernel in $M$ is that
+    module modulo the relation, which is the relation's own generator: it is
+    free of rank two, on the classes of $e_3$ and $e_4$.
+
+    The kernel therefore needs more than one generator over a domain that has a
+    relation of its own -- the shape in which the kernel of a presented map is
+    not a one-generator module, and the shape the previous round's specimens of
+    zero- and one-generator kernels did not reach.  It is computed over
+    $\mathbf{Z}[x]$, where a kernel is a syzygy module and not a Smith form.
+    """
+    ring = ZZ["x"]
+    x = ring.algebra_generator("x")
+    line = ring ** 1
+    space = ring ** 4
+    (line_label,) = tuple(line.module_generating_set())
+    (unit,) = tuple(line.module_generators())
+    first, second, _, _ = tuple(space.module_generators())
+    covering = space.module_category().Mor(line, space)(
+        {line_label: x * first + ring(2) * second}
+    )
+    module = covering.cokernel()
+    module_labels = tuple(module.module_generating_set())
+    row = module.module_category().Mor(module, line)(
+        {
+            module_labels[0]: ring(2) * unit,
+            module_labels[1]: -x * unit,
+            module_labels[2]: line.zero(),
+            module_labels[3]: line.zero(),
+        }
+    )
+
+    kernel = row.kernel()
+
+    assert kernel.module_rank() == 2
+    for kernel_label in kernel.module_generating_set():
+        assert row(kernel.inclusion()(kernel.module_generator(kernel_label))) == line.zero()
+    inclusion = kernel.inclusion()
+    for position in (2, 3):
+        assert inclusion.is_in_image(module.module_generator(module_labels[position]))
