@@ -1,0 +1,33 @@
+.F                                                                       [100%]
+=================================== FAILURES ===================================
+____ test_the_rank_one_basis_at_a_vanishing_power_is_not_read_off_an_engine ____
+tests/rings/test_the_adic_inverse_system_and_its_limit_cone.sage:202: in test_the_rank_one_basis_at_a_vanishing_power_is_not_read_off_an_engine
+    frame = completion.framing_morphism()
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:2328: in sage.misc.cachefunc.CachedMethodCallerNoArgs.__call__
+    ???
+src/sage_extensions/categories/modules/pure/modules.py:2044: in framing_morphism
+    return self.selected_module_resolution().augmentation()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/pure/modules.py:1964: in selected_module_resolution
+    return self.selected_resolution(self.module_category())
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/objects.py:379: in selected_resolution
+    raise ValueError(
+E   ValueError: Rational Field has no chosen resolution relative to Category of modules over Fraction Field of Integer Ring
+=========================== short test summary info ============================
+FAILED tests/rings/test_the_adic_inverse_system_and_its_limit_cone.sage::test_the_rank_one_basis_at_a_vanishing_power_is_not_read_off_an_engine
+1 failed, 1 passed, 6 deselected in 4.53s
+[peakrss] probe527r3: child waited=1 shell_code=1 samples=4
+[peakrss] peak tree RSS      : 337 MiB
+[peakrss] low-water MemAvail : 5487 MiB
+[peakrss] peak single VmHWM  : 342 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      331 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     6.0s procs=  3 rss=   337 MiB hwm=   342 MiB avail=  5487 MiB
+[peakrss]   t=     4.0s procs=  3 rss=   328 MiB hwm=   328 MiB avail=  5632 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   277 MiB hwm=   277 MiB avail=  5577 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     7 MiB hwm=     7 MiB avail=  5666 MiB
+launcher exit: 1 

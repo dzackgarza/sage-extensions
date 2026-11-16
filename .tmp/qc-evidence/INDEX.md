@@ -3221,3 +3221,29 @@ it did not measure.
 | `519r4-brauer-at-pushed.log` | the same head | `tests/groups/test_module_characters.sage`, lint on: **3 passed in 3.06 s** -- the Brauer value and the modular trace at the identity of the `F_2^2` specimen |
 | `519r4-scalar-at-pushed.log` | the same head | `tests/groups/test_actual_group_algebra_modules.sage`, lint on: **4 failed, 4 passed in 4.56 s**; the four ids are the file's on main `c9568ed` too (`4 failed, 3 passed in 2.19 s`), and the added test is among the passes |
 | `519r4-probe-at-pushed.log` | the same head | `519r4-probe.py`: the centre's inclusion for `QQ[S_3]`, for `Algebras(QQ).Unital()(QQ^3, m, 1)` (unital, not associative) and for `Algebras(QQ)(QQ^2, m)` (not unital) -- arrow parent is `center.Mor(algebra)` in all three, `preserves_unit` True in the two unital cases |
+## `#527` round 3: the review's four findings, repaired at their owners, 2026-11-16
+
+The region review of the round that pushed `fef5e49` refused it on four counts: the
+completion map's core placement and the rank-one module basis were both decided by
+`_engine_ring(source) is engine` (`OWN-10`), `_completion_map_as_ring_morphism`
+returned any arrow that was not a `CategoricalIsomorphism` as `Mor_Ring`, and the
+refusal that replaced the silent `pass` had no red test.  This round states the datum
+the placements follow -- some power of the defining ideal is zero
+(`completion_defining_power_vanishes`) -- retires both engine tests, returns the ring
+map the construction retained, and measures the defect the engine decisions produced:
+the same theorem gave a rank-one basis to `QQ(i)` and none to `QQ` or `GF(5)`.
+
+Every run below is one file in the pinned runtime (Sage 11.0.beta5, port tree
+`991b88b0`), through `.scratch/probe527r3/runpytest527.sh`: `run.sh -w /work`,
+`PYTHONPATH=/ci/tool-artifacts/pytest_plugins:/work/src:/work:/repos/sage-extensions/src`,
+`/sage/.venv/bin/python -m pytest -o addopts= -p qc_sage_session`.  The red of each
+`test:` commit is measured at its own parent, with that commit's test file and no
+source change; the green is measured at the `fix:` commit.
+
+| log | tree | result |
+| --- | --- | --- |
+| `527r3-red1-datum-at-eb5baa8.log` | `eb5baa8`, the push base, + the first test only | `-k states_whether`: **1 failed, 6 deselected in 3.23 s**, at `assert completion.completion_defining_power_vanishes() is True`: `AttributeError: 'Owned_AdicCompletionAlgebraParent_with_category' object has no attribute 'completion_defining_power_vanishes'` |
+| `527r3-green1-datum-at-1efc091.log` | `1efc091`, the repair, with the test lint | the same selection: **1 passed, 7 deselected in 4.65 s**, no lint finding |
+| `527r3-red2-rank-at-1efc091.log` | `1efc091` + the second test only | `-k rank_one`: **1 failed, 1 passed, 6 deselected in 4.53 s**.  `QQ` at `(0)`: `ValueError: Rational Field has no chosen resolution relative to Category of modules over Fraction Field of Integer Ring`; the `QQ(i)` row of the same selection passes, so the two answers differ only in the engine |
+| `527r3-green-at-6bfc56b.log` | `6bfc56b`, the repair, with the test lint | the whole file: **8 passed in 9.62 s**, no lint finding |
+| `527r3-consumers-at-6bfc56b.log` | `6bfc56b` | the consumers of the ring map, probed: `QQ(i)` at `(0)` (`_completion_map_as_ring_morphism`, `extended_ideal`, `completion_map_kernel`, `adic_projection(1)`, the arithmetic mode, and the constant inverse system), `QQ[x]` at `(x)` (the ring map, the extended ideal, the projection of `x`, and absence from the core) and `QQ[x]` at `(0)` (the ring map, the extended ideal, the projection of `x^2`): 13 answers, no failure |

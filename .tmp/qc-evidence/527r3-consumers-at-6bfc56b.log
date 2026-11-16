@@ -1,0 +1,43 @@
+=== QQ(i) at (0): the map is the core isomorphism
+ring map image of a: OK -> a
+
+extended ideal: OK -> Finitely presented module on 0 module generators over Free module on {1} over Free module on {1, a} over Fraction Field of Integer Ring
+
+kernel: OK -> True
+
+projection(1): OK -> a mod Ideal (0) of Free module on {1, a} over Fraction Field of Integer Ring
+
+arithmetic mode: OK -> exact_backend
+
+inverse system tiers equal: OK -> True
+
+=== QQ[x] at (x): the map is a ring homomorphism and not an isomorphism
+ring map image of x: OK -> element of Ring over Fraction Field of Integer Ring
+
+extended ideal: OK -> Finitely presented module on 1 module generators over Ring over Fraction Field of Integer Ring
+
+projection(1) of x: OK -> 0
+
+in core: OK -> False
+
+=== QQ[x] at (0): the map is the core isomorphism
+ring map image of x: OK -> x
+
+extended ideal: OK -> Finitely presented module on 0 module generators over Free module on {1} over Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring
+
+projection(2) of x^2: OK -> x^2 mod Ideal (0) of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring
+
+[peakrss] probe527: child waited=0 shell_code=0 samples=5
+[peakrss] peak tree RSS      : 301 MiB
+[peakrss] low-water MemAvail : 3439 MiB
+[peakrss] peak single VmHWM  : 301 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      290 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     8.0s procs=  3 rss=   301 MiB hwm=   301 MiB avail=  4321 MiB
+[peakrss]   t=     6.0s procs=  3 rss=   267 MiB hwm=   267 MiB avail=  4420 MiB
+[peakrss]   t=     4.0s procs=  3 rss=   183 MiB hwm=   183 MiB avail=  3439 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   107 MiB hwm=   107 MiB avail=  3618 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     7 MiB hwm=     7 MiB avail=  3797 MiB
+launcher exit: 0
