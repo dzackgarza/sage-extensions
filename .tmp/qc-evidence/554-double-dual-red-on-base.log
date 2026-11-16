@@ -1,0 +1,64 @@
+tree SHA: 9ddf7f584ff0c8329a70093a1a56a789cf16fc48 (modified paths: 1)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 6.96 8.84 14.86 8/695 2938401
+files: tests/schemes/test_polytopes.sage
+inner 600 s
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_________ test_the_square_and_its_double_polar_dual_contain_each_other _________
+
+    def test_the_square_and_its_double_polar_dual_contain_each_other() -> None:
+        r"""`Q^{**} = Q` in `Q`'s own lattice; the dual of that lattice is another space.
+    
+        `Q = [-1, 1]^2 = \operatorname{conv}\{(\pm 1, \pm 1)\}` is a subset of `M_QQ`
+        for its coordinate lattice `M = ZZ^2`, and its polar dual
+        `Q^\circ = \{y : \langle y, x\rangle \le 1 \text{ for all } x \in Q\}` is
+        `\operatorname{conv}\{\pm e_1, \pm e_2\}` in `M^*_QQ`: a point of the polar
+        is a functional on `M_QQ`, so the diamond is framed by the dual lattice and
+        its points are not points of `M_QQ`.
+    
+        The polar dual of the diamond is framed by the double dual `M^{**}`, which is
+        `M` and not a third space: evaluation `x \mapsto (f \mapsto f(x))` is an
+        isomorphism `M \to M^{**}` for a finite free `M` (Mathlib, `Module.evalEquiv`,
+        `Mathlib/LinearAlgebra/Dual/Defs.lean`), so `Q` and `Q^{**}` are two subsets
+        of one `M_QQ` and are compared there.  `Q^{**}` contains `Q` (Mathlib,
+        `LinearMap.subset_bipolar`, `Mathlib/Analysis/LocallyConvex/Polar.lean`) and
+        the second polar dual the library computes has `Q`'s four vertices, so `Q`
+        contains `Q^{**}` too: a convex set contains a convex hull exactly when it
+        contains the vertices (`convexHull_min`).  Both containments, equality and the
+        hash are therefore decided, and the triangle
+        `\operatorname{conv}\{(0,0), (3,0), (0,3)\}` is not `Q` in either direction,
+        the vertex `(3, 0)` lying outside `Q` and the vertex `(-1, -1)` of `Q` outside
+        the triangle.
+        """
+        lattice = ZZ.free_module(2)
+        square = ConvexPolytopes(lattice)(((-1, -1), (-1, 1), (1, 1), (1, -1)))
+        diamond = square.polar_dual()
+        doubled = diamond.polar_dual()
+        reaching_out = ConvexPolytopes(lattice)(((0, 0), (3, 0), (0, 3)))
+    
+        assert diamond.ambient_lattice() is lattice.dual_module()
+        assert diamond.ambient_lattice() is not lattice
+>       assert doubled.ambient_lattice() is lattice
+E       assert Free module on {Generic morphism:\n  From: Free module on {Generic morphism:\n  From: Free module on {[0], [1]} over Int... module on {[0], [1]} over Integer Ring\n  To:   Integer Ring} over Integer Ring\n  To:   Integer Ring} over Integer Ring is Free module on {[0], [1]} over Integer Ring
+E        +  where Free module on {Generic morphism:\n  From: Free module on {Generic morphism:\n  From: Free module on {[0], [1]} over Int... module on {[0], [1]} over Integer Ring\n  To:   Integer Ring} over Integer Ring\n  To:   Integer Ring} over Integer Ring = ambient_lattice()
+E        +    where ambient_lattice = Lattice Polygon of dimension 2 with 4 vertices.ambient_lattice
+
+tests/schemes/test_polytopes.sage:175: AssertionError
+=========================== short test summary info ============================
+FAILED tests/schemes/test_polytopes.sage::test_the_square_and_its_double_polar_dual_contain_each_other
+1 failed, 5 deselected in 3.41s
+[peakrss] probe554tests: child waited=1 shell_code=1 samples=5
+[peakrss] peak tree RSS      : 337 MiB
+[peakrss] low-water MemAvail : 6436 MiB
+[peakrss] peak single VmHWM  : 337 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      326 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     8.0s procs=  3 rss=   337 MiB hwm=   337 MiB avail=  6436 MiB
+[peakrss]   t=     6.0s procs=  3 rss=   332 MiB hwm=   332 MiB avail=  6569 MiB
+[peakrss]   t=     4.0s procs=  3 rss=   301 MiB hwm=   301 MiB avail=  6641 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   261 MiB hwm=   261 MiB avail=  6779 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     6 MiB hwm=     6 MiB avail=  6923 MiB
+pytest exit: 1

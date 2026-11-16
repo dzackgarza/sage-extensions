@@ -2896,3 +2896,13 @@ space a polytope lies in is `M tensor QQ`, and `M` is the lattice.
 | `554-double-dual-repair-probe.log` | `1488acf` + both commits of this round | the repaired contract: `_primal_lattice_of_a_dual` is `None` on `M`, `M` on `M^*`, `M^*` on `(M^*)^*` and `None` on the endomorphism Mor module (its target is not the regular module); the diamond is framed by `M^*`, the double dual by `M` and the third polar by `M^*` again; `square` and the double dual contain each other, are equal and have equal hashes; `polar.polar_dual() == square` **True**; `diamond` and the square answer each other the proposition `is_subset(...)`; `square == 1`, `== None` and `== ()` are **False**; inside `M^*` the four points `(1,0), (0,1), (-1,0), (0,-1)` are the diamond, equal to it, with its hash, and contained in it |
 | `554-double-dual-repair-probe.py` | -- | the probe: the predicate on the primal, the dual, the double dual and an endomorphism Mor module; each polar dual's frame; containment, equality, hash and the two operands that are not sets; and the relations inside the dual lattice |
 
+The round was rebased onto `9ddf7f5` before it was pushed, and the two rows below are the same
+selection on that base and on the rebased head.  `polytopes.py` and `tests/schemes/test_polytopes.sage`
+are byte-identical at `1488acf` and at `9ddf7f5` (`git diff --stat 1488acf 9ddf7f5 --` those two paths
+is empty), so the red above is the red of the base as well; the row at `9ddf7f5` re-runs it there.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `554-double-dual-red-on-base.log` | `9ddf7f5` (main, the push base) + this round's test only | the selection: **1 failed, 5 deselected in 3.41 s** at `assert doubled.ambient_lattice() is lattice` |
+| `554-double-dual-green-on-head.log` | the rebased head of this round, clean tree | the selection: **1 passed, 5 deselected in 1.03 s** |
+
