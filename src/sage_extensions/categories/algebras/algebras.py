@@ -1617,6 +1617,7 @@ class Algebras(OwnedCategoryOverBaseRing):
             algebra_generating_family=None,
             algebra_framing_source=None,
             algebra_framing_owner=None,
+            generating_module=None,
             _engine_product=None,
             _engine_scalar_action=None,
             _native_unit_factory=None,
@@ -1633,6 +1634,17 @@ class Algebras(OwnedCategoryOverBaseRing):
             )
             if algebra_law_decisions is not None:
                 self._retain_algebra_law_decisions(algebra_law_decisions)
+            match generating_module:
+                case None:
+                    pass
+                case module:
+                    # The construction states the module this algebra is built
+                    # on, as a graded free algebra states it: ``M`` for
+                    # ``Sym(M)`` or ``T(M)``, not the sum of its pieces.  A
+                    # realization assembled on the module it is stated on
+                    # retains it here, which is where the free algebras'
+                    # ``generating_module`` reads it back.
+                    self._generating_module = module
             match _engine_product:
                 case None:
                     assert unformed_module is not None and multiplication is not None, (
