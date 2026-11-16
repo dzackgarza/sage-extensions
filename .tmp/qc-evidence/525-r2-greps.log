@@ -1,0 +1,45 @@
+=== worktree HEAD: bf971a934c2ed18b9d16649ea10e4141c7b17d5a
+=== git grep -niE 'issue[ _-]?[0-9]+' src
+(no lines)
+=== git grep -nE '[[:space:]]#[0-9]+' src
+(no lines)
+=== git grep -niE '\bissue' src
+(no lines)
+=== git grep -nE '.tmp/...probe|measure|staged|qc-evidence' src
+(no lines)
+=== git grep -nE 'results/....md' src
+(no lines)
+=== git grep -nE 'used to|no longer|advertis|did not (finish|return|complete)|earlier revision' src
+src/sage_extensions/categories/algebras/algebras.py:1952:                    "the centre inclusion used to retain an algebra action must end at this exact algebra"
+src/sage_extensions/categories/coxeter_diagrams.py:497:            # already used to build the owned root-Gram tensor. Retain it so
+src/sage_extensions/categories/divisors/cartier_divisor_groups.py:429:    used to verify one finite-atlas lift.
+src/sage_extensions/categories/functors/algebra_scalar_change.py:113:    cases.  It does not advertise an unavailable general algebra tensor backend
+src/sage_extensions/categories/group/characters.py:143:            arguments used to evaluate the underlying class function remain
+src/sage_extensions/categories/group/cyclic_subgroups.py:160:                f"the powers of {generator} in {ambient} did not return to the identity within "
+src/sage_extensions/categories/group/g_sets.py:6:the engine used to compute equivariance, fixed points, orbits, and the
+src/sage_extensions/categories/group/g_sets.py:611:            r"""Return the finite set used to present the points of this ``G``-set."""
+src/sage_extensions/categories/group/groups.py:1437:            # particular Sage's Coxeter matrix groups may advertise finite
+src/sage_extensions/categories/group/groups.py:8577:    r"""Subgroups equipped with the selected family used to generate them.
+src/sage_extensions/categories/group/predicate_subgroups.py:1479:                # still a finite-index subgroup, even though it is no longer
+src/sage_extensions/categories/hyperbolic_lattices.py:1423:            On a search that did not complete, the group generated is a
+src/sage_extensions/categories/lattice_morphisms.py:2684:        retains the target isometries used to transport each gluing.
+src/sage_extensions/categories/modules/group_modules/group_lattices.py:317:            the associated ``R[G]``-module.  Its embedded basis is used to
+src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py:138:    No infinite set or point sample is used to infer equality.
+src/sage_extensions/categories/rings/commutative_algebra.py:3092:            r"""Return the retained finite-stage lift used to realize adic projections.
+src/sage_extensions/categories/rings/number_fields.py:810:            used to represent this linear map.  No separate matrix representation is
+src/sage_extensions/categories/rings/ring_foundation.py:2544:            enumeration or property of the target quotient is used to prove
+src/sage_extensions/categories/schemes/ade_surfaces.py:511:        # `surface` is the exact selected log-scheme object used to compute
+src/sage_extensions/categories/schemes/analytic_families.py:10:No formal power series is used to construct the disc.  Coherent GAGA is also
+src/sage_extensions/categories/schemes/analytic_families.py:289:    morphism used to exhibit the analytic family as a restriction.
+src/sage_extensions/categories/schemes/schemes.py:2454:    homogeneous sections; it is not advertised as ``Gamma(X, O_X)``.
+src/sage_extensions/categories/schemes/schemes.py:3693:            Glued schemes retain the atlas used to construct them.  Projective
+src/sage_extensions/categories/sets/indexed_families.py:86:        a new tuple is used to address the same point of its index set::
+src/sage_extensions/refine.py:552:    never changes ``obj.category()`` and therefore cannot be used to add
+src/sage_extensions/rings/real.py:326:    never used to decide owned real relations.
+src/sage_extensions/testing/coverage_gaps.py:17:listed as stale: its recorded line numbers no longer describe the file.
+=== the base tree (e13a23c), the same greps, for the contrast
+issue-spelling lines: 17
+number-sign lines:    0
+=== this tree (bf971a9)
+issue-spelling lines: 0
+number-sign lines:    0
