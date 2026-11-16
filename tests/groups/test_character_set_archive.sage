@@ -20,11 +20,11 @@ def test_s3_has_three_irreducible_characters_of_degrees_one_one_two() -> None:
 def test_a_character_equals_the_character_its_class_function_builds() -> None:
     r"""The character that a character's own class function builds is that character.
 
-    A character of $G$ is determined by its values on the conjugacy classes,
-    and its class function by its values on the classes' representatives; the
-    hash already reads those values.
+    A character of $G$ is a class function, so its values on the classes'
+    representatives fix it.
 
-    Source: Milne, *Group Theory*, v4.01, Proposition 7.44, p. 116.
+    Source: Milne, *Group Theory*, v4.01, Proposition 7.47, p. 117, and p. 115
+    on characters being class functions.
     """
     group = Groups.S(3)
 
@@ -40,7 +40,8 @@ def test_a_character_equals_the_character_its_class_function_builds() -> None:
 def test_characters_built_by_different_routes_with_equal_values_are_equal() -> None:
     r"""$S_3$'s trivial character and its character of degree $1$ that takes $1$ on a transposition are one character, $\chi_1 + \chi_2$ read back by ``character`` from its values is $\chi_1 + \chi_2$, and the two characters of degree $1$ are unequal since they differ on a transposition.
 
-    Source: Milne, *Group Theory*, v4.01, Proposition 7.44, p. 116.
+    Source: Milne, *Group Theory*, v4.01, Proposition 7.47, p. 117, and p. 115
+    on characters being class functions.
     """
     group = Groups.S(3)
     transposition = next(element for element in group if element.order() == 2)
