@@ -2830,3 +2830,4 @@ first lines record the tree SHA and the modified-path count it ran against.
 | log | commit | result |
 | --- | --- | --- |
 | `552-r4-head-rows.log` | the pushed head | the same four rows at the head this round pushes, one pytest process, `-p qc_sage_session`: **4 passed, 39 deselected in 5.49 s**. |
+| `552-r4-final-rows.log` | the head that was pushed, after the last rebase onto main | the same four rows again: **4 passed, 39 deselected in 2.98 s**. |
