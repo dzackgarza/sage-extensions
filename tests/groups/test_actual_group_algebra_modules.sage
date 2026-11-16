@@ -100,3 +100,21 @@ def test_a_coefficient_scalar_acts_on_a_group_module_element() -> None:
     assert representation.act(transposition, averaged) == averaged
     assert representation.act(three_cycle, averaged) == averaged
     assert averaged + averaged + averaged == total
+
+
+def test_the_character_of_a_finite_free_representation_is_the_trace_of_its_action() -> None:
+    r"""The character of $\mathbb{Q}^3$ is the permutation character $3,1,0$.
+
+    Over a characteristic-zero field the character of a finite free
+    representation is the trace of each group element (Serre, *Linear
+    Representations of Finite Groups*, §2.1 and §6.1): the identity gives the
+    rank, a transposition fixes one basis vector, and a three-cycle fixes none.
+    """
+    group, representation = _permutation_module_of_s3()
+    transposition = next(g for g in group if g.order() == 2)
+    three_cycle = next(g for g in group if g.order() == 3)
+    character = representation.character()
+
+    assert character(group.one()) == 3
+    assert character(transposition) == 1
+    assert character(three_cycle) == 0
