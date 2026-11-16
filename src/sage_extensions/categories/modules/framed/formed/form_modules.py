@@ -3050,7 +3050,18 @@ def _finite_form_metabolizer(form):
 
 class BilinearFormModules(OwnedCategoryOverBaseRing):
     def an_object(self):
-        r"""Return U over a declared commutative base, else the zero formed module."""
+        r"""Return U over a declared commutative base, else the zero formed module.
+
+        The picture is the one the axiom branches state, so it is placed
+        there: ``U`` has the Gram matrix ``[[0,1],[1,0]]``, whose diagonal is
+        zero, so it is symmetric and even, and the zero form of the degenerate
+        case is too.  A property is established by the construction that
+        supplies the datum, and the formed-module constructor places an object
+        in the categories it is asked for (:meth:`_call_`'s
+        ``_extra_categories``), so the branch's own constructor is not called
+        with the form: ``Symmetric().Even()`` states no construction, and
+        asking it for one would ask a property to build an object.
+        """
         ring = self.base_ring()
         if ring in OwnedRings().Commutative():
             module = ring.free_module(2)
@@ -3058,7 +3069,9 @@ class BilinearFormModules(OwnedCategoryOverBaseRing):
         else:
             module = ring.free_module(0)
             form = module.bilinear_forms(ring)(lambda left, right: ring.zero())
-        return BilinearFormModules(ring).Symmetric().Even()(form)
+        return BilinearFormModules(ring)(
+            form, _extra_categories=((BilinearFormModules(ring).Symmetric().Even()),)
+        )
 
     def _repr_object_names(self):
         return f"modules with a bilinear form over {self.base_ring()}"
