@@ -2968,7 +2968,12 @@ class IsotropicVectorReductionImage(SageObject):
         The initial cone at the controlling vector is enumerated by the
         engine's whole-lattice search on the way (the cell is cut by that
         very enumeration), so the cost of this call is one initial cone plus
-        the bounded prefix of layers.
+        the bounded prefix of layers.  The cell reported is the walk's own
+        (:meth:`_FilteredVinAl.cell`), which is the only statement of it that
+        the library makes: it answers ``None`` when the roots through the
+        point do not span \(v_0^\perp\) in the coordinates the enumeration
+        uses, and the call then refuses rather than report a coordinate
+        system the walk is not enumerating in.
         """
         from sage_extensions.categories.hyperbolic_lattices import (
             HyperbolicLattices,
@@ -3002,22 +3007,22 @@ class IsotropicVectorReductionImage(SageObject):
             return bool(admits_element(element(row)))
 
         walk = _filtered_vinal_class()(engine_gram, coordinates, admits_root=row_filter)
-        walk.roots = walk.FundCone()
-        engine_normals = tuple(
-            root for root in walk.roots if walk.v0.inner_product(root) == 0
-        )
+        walk.FundCone()
+        cell = walk.cell()
+        if cell is None:
+            raise ValueError(
+                f"the roots through the controlling vector of {self._reduction} cut no cell "
+                f"there -- there are too few of them, they are dependent, or they do not "
+                f"span v0^perp integrally in the coordinates the enumeration uses -- so its "
+                f"layers have no cell coordinates to be enumerated in"
+            )
+        engine_normals = tuple(cell[0])
         gram = matrix(
             [
                 [int(one.inner_product(other)) for other in engine_normals]
                 for one in engine_normals
             ]
         )
-        if engine_normals and int(gram.det()) == 0:
-            raise ValueError(
-                f"the cell at the controlling vector of {self._reduction} has linearly "
-                f"dependent normals, so its layers have no cell coordinates to be "
-                f"enumerated in"
-            )
         # The adjugate dual of the normals, in engine coordinates, with the
         # sign that makes the public pairing the positive multiple det(G)*u
         # of the candidate's normal coordinates.
