@@ -2052,6 +2052,72 @@ def _transported_subgroup(group, engine_subgroup, stated_description):
     return subgroup
 
 
+def _engine_conjugating_element(group, group_element):
+    r"""Return the engine element whose GAP conjugation is ``g H g^-1``.
+
+    GAP's ``ConjugateSubgroup(H, x)`` is ``x^-1 H x`` in GAP's own product, and
+    the owned product is composition of the maps a group's elements act as
+    (:func:`_law_reversed`).  A permutation, word or automorphism group
+    multiplies left to right, ``(g h)(x) = h(g(x))``, so the element whose GAP
+    conjugate is the owned one is ``g`` itself; where the engine's product is
+    already composition -- a matrix engine -- it is ``g^-1``.  The owned product
+    itself is composition on every engine, so this is the only place the
+    engine's own product order enters a conjugation.
+
+    Conjugating by the inverse in either case would answer ``<(1 3)>`` for the
+    conjugate of ``<(1 2)>`` by the three-cycle ``(1 2 3)`` of ``S_3``, which is
+    that element read the other way.
+    """
+    match _law_reversed(group):
+        case True:
+            return group_element
+        case False:
+            return group_element.inverse()
+
+
+def _engine_conjugate_of_subgroup(group, subgroup, conjugator):
+    r"""Return the engine subgroup modelling ``conjugator * subgroup * conjugator^-1``.
+
+    Protected engine contract (``OWN-05``, ``OWN-06``).  The groups owner
+    conjugates a subgroup through this adapter: constructing a conjugate
+    (:class:`ConjugateSubgroups`) is the only caller, with the conjugator it
+    composed and a subgroup of the same ambient group.
+
+    A permutation or GAP-encoded engine conjugates the subgroup's own engine
+    subgroup, so the conjugate's elements, order, membership and cosets are the
+    engine's exact answers; any other engine conjugates the generators of that
+    engine subgroup in its own product, which generates the same subgroup.
+    """
+    engine = _engine_group(group)
+    conjugating = _element_to_engine(
+        group, _engine_conjugating_element(group, conjugator)
+    )
+    match engine:
+        case PermutationGroup_generic() | ParentLibGAP():
+            return engine._subgroup_constructor(
+                libgap.ConjugateSubgroup(_gap_model(subgroup), conjugating)
+            )
+        case _:
+            inverse = conjugating**-1
+            return _engine_generated_subgroup(
+                engine,
+                tuple(
+                    inverse * generator * conjugating
+                    for generator in _engine_group(subgroup).gens()
+                ),
+            )
+
+
+def _conjugate_subgroup_of(group, subgroup, conjugator):
+    r"""Return ``conjugator subgroup conjugator^-1`` as the subgroup of ``group``.
+
+    The groups owner's construction of a conjugate (``OWN-02``, ``OWN-19``):
+    the answer is the object of :class:`ConjugateSubgroups` at the pair, so
+    every route to a conjugate builds the one subgroup that pair defines.
+    """
+    return ConjugateSubgroups(group)(subgroup, conjugator)
+
+
 def _integral_points_subgroup(group, engine_subgroup, ring, *, refinements=(), description=None):
     r"""The subgroup of integral points ``G(ring)`` of ``group``, computed by ``engine_subgroup``.
 
@@ -6659,38 +6725,67 @@ class OwnedGroups(CategoryPacketMethods, OwnedCategory):
             r"""Supply a selected ``g H g^-1`` construction, or None.
 
             Protected construction contract under OWN-05. Only
-            conjugate_subgroup calls this hook, with admitted ``g`` and
-            ``H``. A more specific category retains any defining data of
-            its conjugated subgroup; None selects the general predicate
-            construction. The public operation is owned by groups.
+            ``_conjugated_subgroup`` calls this hook, with the conjugator it
+            composed from the request and with the subgroup that conjugator is
+            applied to. A more specific category retains any defining data of
+            its conjugated subgroup, or answers the subgroup itself when its
+            realization decides that the element carries it to itself; None
+            selects the general construction of the pair.
             """
             return None
 
         def conjugate_subgroup(self, group_element, subgroup):
             r"""Return ``g H g^-1``, the image of ``H`` under conjugation by ``g``.
 
-            ``G`` acts on its subgroups by this formula, so an element that
-            carries ``H`` to itself fixes that point of the subgroup set: the
-            answer is ``subgroup`` itself, with the selected data and maps it
-            retains, and not another subgroup with the same elements.  Every
-            element of ``H`` does, the identity first among them, and a
-            realization that decides the equality of ``g H g^-1`` with ``H``
-            for the remaining elements supplies those through
-            ``_conjugate_subgroup_construction``.
+            ``G`` acts on its set of subgroups by this formula, so one element
+            and one subgroup name one subgroup: the pair (and the normal form
+            of a pair one of whose members is itself a conjugate) is
+            constructed once, and equal calls answer that subgroup rather than
+            a second one with the same elements.
+
+            The law of the action is the construction's.  A conjugate retains
+            the subgroup and the conjugating element it was built from
+            (:class:`ConjugateSubgroups`), so conjugating a conjugate composes
+            the elements -- ``g.(h.H) = (gh).H`` -- and the two sides of that
+            law are one construction of one pair.  An element that carries
+            ``H`` to itself therefore answers ``H`` with the selected data and
+            maps it retains: the identity, every element of ``H``, and each
+            further element a realization decides for
+            (``_conjugate_subgroup_construction``).
             """
             assert group_element in self, f"{group_element} is not an element of {self}"
             assert subgroup is self or subgroup in self.subgroups(), f"{subgroup} is not a subgroup of {self}"
-            if subgroup is self or group_element == self.one() or subgroup.is_parent_of(group_element) is True:
+            match subgroup:
+                case _ if subgroup in ConjugateSubgroups(self):
+                    # g.(h.H) = (g h).H. The conjugated subgroup retains the pair
+                    # it was constructed from, and conjugating composes with it.
+                    source = subgroup.conjugated_subgroup()
+                    conjugator = group_element * subgroup.conjugator()
+                case _:
+                    source, conjugator = subgroup, group_element
+            if source is self or conjugator == self.one() or source.is_parent_of(conjugator) is True:
                 # g H g^-1 = H for g in H, so this element fixes the point H.
-                return subgroup
-            selected = self._conjugate_subgroup_construction(group_element, subgroup)
+                return source
+            return self._conjugated_subgroup(source, conjugator)
+
+        @cached_method
+        def _conjugated_subgroup(self, subgroup, conjugator):
+            r"""Construct ``conjugator subgroup conjugator^-1`` once per normal form.
+
+            Protected construction contract (``OWN-05``).  ``conjugate_subgroup``
+            is the only caller, with the conjugator it composed; the cache is
+            keyed by that pair, so the answers to ``g.(h.H)`` and to
+            ``(gh).H`` are one object.
+
+            A realization that decides the element carries the subgroup to
+            itself supplies the subgroup (``_conjugate_subgroup_construction``);
+            otherwise the conjugate is the construction of the pair
+            (:func:`_conjugate_subgroup_of`).
+            """
+            selected = self._conjugate_subgroup_construction(conjugator, subgroup)
             if selected is not None:
                 return selected
-            inverse = group_element.inverse()
-            return self.predicate_subgroup(
-                lambda element: subgroup.is_parent_of(inverse * element * group_element),
-                description=f"conjugate of {subgroup} by {group_element}",
-            )
+            return _conjugate_subgroup_of(self, subgroup, conjugator)
 
         @RealizationHook
         def _subgroup_conjugacy_decision(self, left, right):
@@ -6973,33 +7068,31 @@ class OwnedGroups(CategoryPacketMethods, OwnedCategory):
 
             @RealizationHook
             def _conjugate_subgroup_construction(self, group_element, subgroup):
-                r"""Supply ``g H g^-1`` from GAP, which also decides when it is ``H`` again.
+                r"""Answer ``subgroup`` when GAP decides ``group_element`` carries it to itself.
 
-                Only ``conjugate_subgroup`` calls this, with the element and the
-                subgroup already admitted, and only after the identity and the
-                elements of ``subgroup`` itself have answered.
+                Only ``_conjugated_subgroup`` calls this, with the conjugator it
+                composed and the subgroup that conjugator is applied to.
 
-                GAP's ``ConjugateSubgroup(H, x)`` is ``x^-1 H x``, so the engine
-                element is the inverse.  An element outside ``H`` can still
-                carry ``H`` to itself -- ``(3 4)`` outside the subgroup
-                ``<(1 2)>`` of ``S_4`` -- and the engine decides that equality
-                exactly.  The answer is then the point ``H`` the element fixes,
-                not a second subgroup with the same elements.
+                An element outside ``H`` can still carry ``H`` to itself --
+                ``(3 4)`` outside the subgroup ``<(1 2)>`` of ``S_4`` -- and the
+                engine decides that equality exactly.  The answer is then the
+                point ``H`` the element fixes, not a second subgroup with the
+                same elements; any other conjugate is the general construction
+                of the pair, which retains it.
+
+                ``_engine_conjugating_element`` supplies the engine element whose
+                GAP conjugation is the owned one; conjugation by the inverse
+                instead would carry ``<(1 2)>`` to ``<(1 3)>`` for the
+                three-cycle ``(1 2 3)``.
                 """
                 model = _gap_model(subgroup)
                 image = libgap.ConjugateSubgroup(
                     model,
-                    _element_to_engine(self, group_element.inverse()),
-                )
-                if image == model:
-                    return subgroup
-                return _subgroup_from_gap(
-                    self,
-                    image,
-                    lambda: (
-                        f"the conjugate of {_named_by_its_own_words(subgroup)} by {group_element}"
+                    _element_to_engine(
+                        self, _engine_conjugating_element(self, group_element)
                     ),
                 )
+                return subgroup if image == model else None
 
             def _subgroup_conjugacy_decision(self, left, right) -> bool:
                 r"""GAP's ``IsConjugate`` decides conjugacy of subgroups of a finite group."""
@@ -8781,6 +8874,103 @@ class GeneratedSubgroups(OwnedParameterizedCategory):
             if self.is_finite() is True:
                 return _engine_subgroup_admits(self, candidate)
             return AtomicProposition("is_member", candidate, self)
+
+
+class ConjugateSubgroups(OwnedParameterizedCategory):
+    r"""Subgroups given as the conjugate of a subgroup by an element of its ambient group.
+
+    The defining datum is the pair: the subgroup ``H`` and the element ``g``
+    whose conjugate ``g H g^-1`` this is.  Nothing is enumerated by the
+    construction -- the subgroup's members, its order and its cosets are the
+    engine subgroup's, which the pair computes -- and what the construction
+    states is the pair, so a conjugate is one object for one pair.
+
+    Identity by that datum is the action law.  A conjugate retains the subgroup
+    and the element it was built from, so conjugating it again composes elements
+    instead of nesting pairs, and ``g.(h.H)`` and ``(gh).H`` are the same datum
+    and so the same subgroup.  An element that carries ``H`` to itself builds
+    no conjugate at all: the public operation answers ``H`` before reaching
+    here (:meth:`OwnedGroups.ParentMethods.conjugate_subgroup`).
+    """
+
+    @staticmethod
+    def __classcall__(cls, supergroup):
+        return OwnedParameterizedCategory.__classcall__(cls, _owned_group(supergroup))
+
+    def parameter_category(self):
+        return OwnedGroups()
+
+    def an_object(self):
+        group = self.base()
+        return self(group.subgroup(()), group.one())
+
+    def super_categories(self):
+        return [Subgroups(self.base())]
+
+    @classmethod
+    def _repr_object_names(cls):
+        return "conjugate subgroups"
+
+    def _call_(self, conjugated_subgroup, conjugator):
+        r"""Construct the conjugate ``conjugator conjugated_subgroup conjugator^-1``.
+
+        ``_conjugated_subgroup`` asks for the pair; the placement is read from
+        the engine subgroup the pair computes (:func:`_engine_conjugate_of_subgroup`),
+        and the name the record reads states the subgroup and the element
+        (:func:`_named_by_its_own_words` asks the subgroup for its own words
+        when the name is read, never while the conjugate is built).
+        """
+        group = self.base()
+        if conjugator not in group:
+            raise ValueError(
+                f"{conjugator} is not an element of {group}, so it conjugates no subgroup of it"
+            )
+        if not (conjugated_subgroup is group or conjugated_subgroup in Subgroups(group)):
+            raise ValueError(
+                f"{conjugated_subgroup} is not a subgroup of {group}, so it has no conjugate there"
+            )
+        engine_subgroup = _engine_conjugate_of_subgroup(
+            group, conjugated_subgroup, conjugator
+        )
+        subgroup = _object_of(
+            Cat().meet(
+                (
+                    _owned_group_category(engine_subgroup),
+                    self,
+                    *_finite_if_bounded_by(group),
+                    *((OwnedAbelianGroups(),) if group in OwnedAbelianGroups() else ()),
+                )
+            ),
+            _ambient=OwnedGroups(),
+            _engine=(OwnedGroups(), _GroupEngine, _GroupElement),
+            engine=engine_subgroup,
+            conjugator=conjugator,
+            conjugated_subgroup=conjugated_subgroup,
+            stated_description=lambda: (
+                f"the conjugate of {_named_by_its_own_words(conjugated_subgroup)} by {conjugator}"
+            ),
+            supergroup=group,
+        )
+        if _is_finitely_generated_witness(engine_subgroup):
+            _fix_selected_group_resolution_on(
+                subgroup,
+                lambda: _engine_generators(subgroup),
+            )
+        return subgroup
+
+    class ParentMethods:
+        def __init__(self, conjugator=None, conjugated_subgroup=None, **rest) -> None:
+            self._conjugator = conjugator
+            self._conjugated_subgroup = conjugated_subgroup
+            super().__init__(**rest)
+
+        def conjugator(self):
+            r"""Return the element this subgroup is conjugated by."""
+            return self._conjugator
+
+        def conjugated_subgroup(self):
+            r"""Return the subgroup this one is the conjugate of."""
+            return self._conjugated_subgroup
 
 
 def _coxeter_presentation(coxeter_matrix, names=None):
