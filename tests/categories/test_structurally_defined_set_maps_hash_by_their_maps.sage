@@ -89,10 +89,10 @@ def test_a_graph_morphism_hashes_its_vertex_map() -> None:
 
     The graph is symmetric, so the swap of ``0`` and ``1`` preserves the single
     adjacency ``(0, 1)``; the identity is another, and the two are distinct
-    morphisms of the one set of endomorphisms.  The graph's own equality of the
-    two swaps is undecided here, so the test states what is decided: the two
-    builds hash alike, and the hash of the morphism is the hash of its vertex
-    map.
+    morphisms of the one set of endomorphisms.  The graph's vertices are a
+    finite ordered set, so the two swaps are decided equal by their two values
+    and the identity is decided apart by the same values: equal morphisms hash
+    alike, and the hash of the morphism is the hash of its vertex map.
     """
     edge = Graphs().from_edges((0, 1), ((0, 1),))
     swap = Graphs().Mor(edge, edge)(lambda vertex: edge(1 - int(vertex)))
@@ -100,9 +100,12 @@ def test_a_graph_morphism_hashes_its_vertex_map() -> None:
 
     rebuilt = Graphs().Mor(edge, edge)(lambda vertex: edge(1 - int(vertex)))
 
+    assert swap == rebuilt
+    assert swap != identity
     assert hash(swap) == hash(rebuilt)
     assert hash(swap) == hash(swap.underlying_set_morphism())
-    assert FiniteOrderedSets()((identity,)).cardinality() == 1
+    assert FiniteOrderedSets()((swap, rebuilt)).cardinality() == 1
+    assert FiniteOrderedSets()((swap, identity)).cardinality() == 2
     assert swap(edge(0)) == edge(1)
 
 
@@ -122,7 +125,10 @@ def test_a_chamber_system_morphism_hashes_its_chamber_map() -> None:
     rebuilt = ChamberSystems().Mor(system, system)(lambda chamber: system(1 - int(chamber)))
 
     assert hash(identity) == hash(ChamberSystems().Mor(system, system).identity())
+    assert swap == rebuilt
+    assert swap != identity
     assert hash(swap) == hash(rebuilt)
     assert hash(swap) == hash(swap.underlying_set_morphism())
-    assert FiniteOrderedSets()((identity,)).cardinality() == 1
+    assert FiniteOrderedSets()((swap, rebuilt)).cardinality() == 1
+    assert FiniteOrderedSets()((swap, identity)).cardinality() == 2
     assert swap(system(0)) == system(1)
