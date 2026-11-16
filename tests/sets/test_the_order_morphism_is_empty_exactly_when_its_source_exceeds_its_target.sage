@@ -90,7 +90,7 @@ def test_the_two_orders_decide_the_same_before_and_after_the_other_set_construct
     )
 
     ordinal_three = Sets.Δ[2]
-    ordered = finite_ordered_set(("a", "b"))
+    ordinal_four = Sets.Δ[3]
     naturals = NN
     rationals = QQ
     integers = ZZ
@@ -111,7 +111,7 @@ def test_the_two_orders_decide_the_same_before_and_after_the_other_set_construct
     assert ordinals(3).Mor(first_infinite).is_empty() is False
     assert ordinals(first_infinite).Mor(3).is_empty() is True
     assert ordinal_three.cardinality() == cardinal(3)
-    assert ordered.cardinality() == cardinal(2)
+    assert ordinal_four.cardinality() == cardinal(4)
     assert naturals.cardinality() == aleph0
     assert rationals.cardinality() == aleph0
     assert integers.cardinality() == aleph0
