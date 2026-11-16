@@ -138,3 +138,39 @@ def test_triangles_with_one_vertex_set_are_one_polytope_with_one_hash() -> None:
     ]
     assert triangles[0] != triangles[1]
     assert cardinal(sum(1 for _ in {hash(each) for each in triangles})) == cardinal(5)
+
+
+def test_the_square_and_its_double_polar_dual_contain_each_other() -> None:
+    r"""`A \subseteq B` is decided in the ambient space, not in the lattice framing it.
+
+    `Q = [-1, 1]^2` is the square on `(\pm 1, \pm 1)`, and its polar dual is the
+    diamond `Q^\circ = \operatorname{conv}\{\pm e_1, \pm e_2\}`, framed by the dual
+    lattice.  The polar dual of the diamond is `Q` again, framed by the double
+    dual: a second lattice over the one ambient space `QQ^2`, presenting the same
+    points of it.  A convex set contains a convex hull exactly when it contains
+    the vertices (`convexHull_min`), so `Q` and `Q^{**}` contain each other, and
+    the two answers are decided rather than left as the proposition `is_subset`.
+
+    The diamond is contained in `Q` and does not contain it, and the triangle
+    `\operatorname{conv}\{(0,0), (3,0), (0,3)\}`, written in the double dual's
+    framing, reaches outside `Q` while `Q` does not lie in it: the vertex
+    `(3, 0)` is outside `Q`, and the vertex `(-1, -1)` of `Q` is outside the
+    triangle.
+    """
+    lattice = ZZ.free_module(2)
+    square = ConvexPolytopes(lattice)(((-1, -1), (-1, 1), (1, 1), (1, -1)))
+    diamond = square.polar_dual()
+    doubled = diamond.polar_dual()
+    reaching_out = ConvexPolytopes(doubled.ambient_lattice())(((0, 0), (3, 0), (0, 3)))
+
+    assert doubled.ambient_space() is square.ambient_space()
+    assert doubled.ambient_lattice() is not lattice
+    assert square.is_contained_in(doubled) is True
+    assert doubled.is_contained_in(square) is True
+    assert diamond.is_contained_in(square) is True
+    assert square.is_contained_in(diamond) is False
+    assert reaching_out.is_contained_in(square) is False
+    assert square.is_contained_in(reaching_out) is False
+    assert (square == doubled) is True
+    assert (square == diamond) is False
+    assert hash(square) == hash(doubled)
