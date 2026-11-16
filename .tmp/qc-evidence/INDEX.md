@@ -2593,3 +2593,22 @@ and `de9a1d1`.
 | `541r4-modules-subset-repaired.log` | the repair before the last two, kept for the record | the six files that the recursion and the dropped torsion placement broke in a first shape of the fix, after their repair: **6 failed, 30 passed**, every failure one of the base's own |
 | `541r4-lattices-base.log`, `541r4-lattices-repaired.log` | `897e7f7` / `a6e6a31` | the decision's consumers in `tests/lattices`: the two display/transport contract files and the primitivity file pass in both; `test_zero_isotropic_subobjects.sage` fails the same three ids in both. The repaired-tree run was killed inside `test_lattice_elements.sage` at the 260 s inner cap, at load 14 |
 | `541r4-lattice-elements-repaired.log` | `a6e6a31` | `test_lattice_elements.sage` (six tests, all passing) and `test_chosen_target_primitive_embeddings.sage`, which did not finish inside 260 s at load 21 -- the gap the commit body names |
+
+## `#547`: a finite product with a large finite factor, 2026-11-16
+
+`cb05527` is the main the red test is red at.  The two commits were rebased onto
+`2b9d2cf` (`#543`, which landed while they ran) and the fix is `6c9a308` there;
+the directory and consumer rows below are that rebased pair.  Load was not
+recorded for these runs: the probe rows are a shape in the factor's size, and the
+suite rows are compared by their FAILED id sets, not by their seconds.
+
+| log | tree | result |
+| --- | --- | --- |
+| `547-probe.py` | -- | the probe: one product per row, over a factor built through the enumeration it owns, which records every position its map is asked for |
+| `547-probe-base.log` | `cb05527` | the probe without a declared key, which that tree has none of: hashing a fresh factor **14.6 / 57.2 / 226.1 ms**, and placing its product **14.6 / 55.4 / 218.9 ms**, at 2048 / 8192 / 32768 points |
+| `547-probe-fix.log` | `6c9a308` | a declaring factor places its product in **1.03 / 0.21 / 0.21 / 0.24 ms reading 0 points** at 2048 / 8192 / 32768 / 131072 (the 2048 row is the first keyed construction in the process); a non-declaring factor in **13.4 / 52.6 / 208.4 / 891.1 ms reading all of them**; a second declaration of one datum at 32768 points **0.01 ms, 0 points** |
+| `547-red.log` | `cb05527` | the new test file with the test lint loaded: **3 failed in 0.48 s**, each at `FiniteOrderedSets.from_indexed() got an unexpected keyword argument 'key'` |
+| `547-green.log` | `6c9a308` | the same file with the test lint loaded: **3 passed in 0.26 s**, no finding |
+| `547-sets-base.log` | `2b9d2cf` | `tests/sets` as one directory: **24 failed, 162 passed in 7.74 s** |
+| `547-sets-fix.log` | `6c9a308` | the same directory: **24 failed, 165 passed in 8.08 s** -- the three new tests -- with FAILED id sets identical to the base's |
+| `547-consumers-base.log`, `547-consumers-fix.log` | `2b9d2cf`, `6c9a308` | the seven product and coproduct consumers outside `tests/sets` (`objects`, `categories`, `groups`): **20 failed, 31 passed** in 2.65 s and 3.46 s, FAILED id sets identical |

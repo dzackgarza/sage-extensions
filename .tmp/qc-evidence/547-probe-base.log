@@ -1,0 +1,16 @@
+tree: /repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py
+      n   hash fresh  product, fresh  product, hashed
+   2048       14.6ms          14.6ms           28.1ms
+   8192       57.2ms          55.4ms          114.4ms
+  32768      226.1ms         218.9ms          443.7ms
+[peakrss] probe547: child waited=0 shell_code=0 samples=2
+[peakrss] peak tree RSS      : 284 MiB
+[peakrss] low-water MemAvail : 11345 MiB
+[peakrss] peak single VmHWM  : 284 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      273 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     2.0s procs=  3 rss=   284 MiB hwm=   284 MiB avail= 11446 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     7 MiB hwm=     7 MiB avail= 11345 MiB
+launcher exit: 0
