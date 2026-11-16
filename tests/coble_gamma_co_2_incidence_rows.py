@@ -392,6 +392,40 @@ def run_row(lattice, subgroup, label, cap) -> RowOutcome:
 
 ROW_LABELS = ("O", "Gamma_{Co,2}", "Otilde", "Otilde+")
 
+# A label may carry a comma of its own, so a specification is read against the
+# labels and never split on commas blindly; the longest label that starts the
+# rest is the row it names.
+_LABELS_LONGEST_FIRST = tuple(sorted(ROW_LABELS, key=len, reverse=True))
+
+
+def selected_rows(specification) -> tuple[tuple[str, ...], str | None]:
+    r"""The rows a comma-separated specification names, and the rest it cannot read.
+
+    ``Gamma_{Co,2}`` carries a comma, so ``--rows O,Gamma_{Co,2}`` has three
+    comma-separated pieces and two rows.  The specification is therefore read
+    against ``ROW_LABELS`` from the longest label down: the longest label that
+    starts the unread rest is the row it names, a comma after it separates the
+    next name, and a rest that starts with no label is returned as the text the
+    run reports as not a row of this driver.
+    """
+    names = []
+    remaining = specification.strip()
+    while remaining:
+        label = next(
+            (
+                candidate for candidate in _LABELS_LONGEST_FIRST
+                if remaining.startswith(candidate)
+            ),
+            None,
+        )
+        if label is None:
+            return tuple(names), remaining
+        names.append(label)
+        remaining = remaining[len(label):].lstrip()
+        if remaining.startswith(","):
+            remaining = remaining[1:].lstrip()
+    return tuple(names), None
+
 
 def _row_subgroup(lattice, label):
     r"""The subgroup of one row, built when the row runs.
@@ -533,11 +567,10 @@ def main(argv):
     parser.add_argument("--lattice", default="Tco",
                         help=f"the lattice to run on, from {LATTICE_NAMES}")
     arguments = parser.parse_args(argv)
-    selected = [name.strip() for name in arguments.rows.split(",") if name.strip()]
-    for name in selected:
-        if name not in ROW_LABELS:
-            log(f"[run] {RowStatus.ERROR.words}: {name} is not a row of this driver, which has {ROW_LABELS}")
-            return RowStatus.ERROR.exit_status
+    selected, unread = selected_rows(arguments.rows)
+    if unread is not None:
+        log(f"[run] {RowStatus.ERROR.words}: {unread} is not a row of this driver, which has {ROW_LABELS}")
+        return RowStatus.ERROR.exit_status
     started = time.monotonic()
     lattice = _lattice_by_name(arguments.lattice)
     log(f"the lattice {lattice} of rank {lattice.module_rank()}")
