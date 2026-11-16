@@ -3303,3 +3303,4 @@ test lint loaded.
 | log | tree | result |
 | --- | --- | --- |
 | `527r3-green-at-dc6c692.log` | `dc6c692`, this round's head, with the test lint | the whole file: **8 passed in 4.34 s**, no lint finding |
+| `527r3-green-at-fb19bd3.log` | `fb19bd3`, the pushed head, with the test lint | the whole file: **8 passed in 3.15 s**, no lint finding.  Taken because `main` gained `#542`'s `ring_foundation.py` changes between the run at `dc6c692` and this head: `git diff --stat dc6c692 fb19bd3 --` that file is not empty, so that run is not this tree's |
