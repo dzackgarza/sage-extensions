@@ -798,23 +798,54 @@ class ConvexPolytopes(OwnedParameterizedCategory):
                 for vertex in self._engine_polyhedron().vertices()
             )
 
-        def is_contained_in(self, other):
-            r"""Whether this polytope lies in another polytope of the ambient space.
+        def _convex_subset_of_the_ambient_space(self, other) -> bool:
+            r"""Whether ``other`` is a convex subset of this polytope's ambient space.
 
-            A polytope is the convex hull of its vertices, and a polytope is
-            convex, so a convex hull lies in one exactly when its vertices do
-            (Mathlib, ``convexHull_min``, ``Mathlib/Analysis/Convex/Hull.lean``):
-            the vertices of this polytope against the halfspaces of ``other``
-            decide the subset relation, and a vertex that fails one of them is
-            a point of this polytope that is not a point of ``other``.  A
-            subset of the ambient space that is not a polytope has no
-            halfspace description to test, so the defining membership
-            condition of such a subset decides it.
+            ``ConvexPolytopes`` is parameterized by the coordinate lattice, so
+            two lattices that frame one ambient space -- ``M`` and its double
+            dual, for instance -- give two categories of polytopes over the same
+            ``M tensor QQ``, which :meth:`ambient_space` computes from the
+            lattice's generating set.  The space is what makes two polytopes
+            comparable, since containment is a relation on its points, so the
+            statement this relation needs is about the space and not about the
+            lattice.
+
+            The other's own category is the one its construction recorded
+            (`ARC-07`, :meth:`ambient_category`), and a category of convex
+            subsets of a space states that space's subobjects as its immediate
+            supercategory.  A subset of the space that carries no convex
+            structure is an object of the subobject category itself, whose own
+            supercategory is the slice over the space, so it is not one of
+            these; it keeps its defining membership condition and the inherited
+            proposition.
             """
-            match other in ConvexPolytopes(self.ambient_lattice()):
+            return (
+                Sets().Subobjects(self.ambient_space())
+                in other.ambient_category().super_categories()
+            )
+
+        def is_contained_in(self, other):
+            r"""Whether this polytope lies in another convex subset of the ambient space.
+
+            A polytope is the convex hull of its vertices, and a convex set
+            contains a convex hull exactly when it contains its vertices
+            (Mathlib, ``convexHull_min``, ``Mathlib/Analysis/Convex/Hull.lean``):
+            the vertices of this polytope against the membership of ``other``
+            decide the subset relation, and a vertex outside ``other`` is a
+            point of this polytope that is not a point of ``other``.  Both
+            polytopes are subsets of one ``M tensor QQ``, which
+            :meth:`_convex_subset_of_the_ambient_space` states for ``other``
+            whatever lattice frames it, and :meth:`rational_point` takes each
+            vertex of this one into that space before ``other`` decides it.  A
+            subset of the ambient space that is not convex has no halfspace
+            description to test, so the defining membership condition of such a
+            subset decides it.
+            """
+            match self._convex_subset_of_the_ambient_space(other):
                 case True:
                     return all(
-                        other.contains_point(vertex) for vertex in self.vertices()
+                        other.is_parent_of(self.rational_point(vertex))
+                        for vertex in self.vertices()
                     )
                 case False:
                     return super().is_contained_in(other)
@@ -822,48 +853,54 @@ class ConvexPolytopes(OwnedParameterizedCategory):
         def is_equal_to(self, other) -> bool:
             r"""Return whether the two polytopes are the same subset of the ambient space.
 
-            Two polytopes of one lattice are equal exactly when they have the
-            same vertices: a polytope is the convex hull of its vertex set, and
-            the vertices are the points of the polytope that are not a convex
-            combination of other points of it, so the subset determines them.
-            Containment agrees: :meth:`is_contained_in` tests the vertices of
-            one polytope against the halfspaces of the other, so each polytope
-            lies in the other exactly when their vertex sets are one set.
+            Two polytopes of one ambient space are equal exactly when they have
+            the same vertices: a polytope is the convex hull of its vertex set,
+            and the vertices are the points of the polytope that are not a
+            convex combination of other points of it, so the subset determines
+            them.  The lattices that frame the space need not be one:
+            :meth:`_vertex_coordinate_set` reads the vertices in the ambient
+            space, where a lattice vertex and the same point of it are one
+            point.  Containment agrees: :meth:`is_contained_in` tests the
+            vertices of one polytope against the membership of the other, so
+            each polytope lies in the other exactly when their vertex sets are
+            one set.
             """
             return (
-                other.ambient_lattice() is self.ambient_lattice()
+                self._convex_subset_of_the_ambient_space(other)
                 and self._vertex_coordinate_set() == other._vertex_coordinate_set()
             )
 
         def __eq__(self, other):
-            r"""Two polytopes of one lattice are equal when they have the same vertices.
+            r"""Two polytopes of one ambient space are equal when they have the same vertices.
 
             Equal sets are one factor of a product (`SET-05`), so equality
             reads the vertex set that :meth:`__hash__` hashes.  A polytope is
             its vertex set, which decides it, and which is the canonical form
             of the vertex and halfspace presentations that
-            :meth:`is_contained_in` compares.
+            :meth:`is_contained_in` compares, whether one lattice or two frame
+            the ambient space.
             """
             if self is other:
                 return True
-            if other in ConvexPolytopes(self.ambient_lattice()):
+            if self._convex_subset_of_the_ambient_space(other):
                 return self.is_equal_to(other)
             return super().__eq__(other)
 
         @cached_method
         def __hash__(self) -> int:
-            r"""Hash the lattice and the vertex set, which :meth:`__eq__` compares.
+            r"""Hash the ambient space and the vertex set, which :meth:`__eq__` compares.
 
             A polytope is determined by its vertices, so their coordinates in
             the ambient space's frame are a complete invariant of the subset:
             equal polytopes have equal hashes, and the coordinates do not
             depend on the order the private exact polyhedron enumerated the
-            vertices in.  The hash is cached: a polytope is a factor of the
-            interned finite products, whose store keys a family by its
-            factors' hashes (`SET-05`), and the vertex set is computed from
-            that polyhedron.
+            vertices in.  The space and not the lattice is hashed, since equal
+            subsets of one space may be framed by two lattices.  The hash is
+            cached: a polytope is a factor of the interned finite products,
+            whose store keys a family by its factors' hashes (`SET-05`), and
+            the vertex set is computed from that polyhedron.
             """
-            return hash((id(self.ambient_lattice()), self._vertex_coordinate_set()))
+            return hash((id(self.ambient_space()), self._vertex_coordinate_set()))
 
         def facets(self):
             r"""Return the codimension-one faces as owned polytopes."""
