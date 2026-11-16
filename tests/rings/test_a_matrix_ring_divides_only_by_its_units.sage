@@ -1,9 +1,9 @@
-r"""Division in a matrix ring $M_2(R)$: by its units, and refusal of everything else.
+r"""Division in a matrix ring $M_2(R)$ over a commutative $R$: by its units, and refusal of everything else.
 
 A matrix divides in $M_n(R)$ exactly by a unit of that ring: the quotient
-$AB^{-1}$ is a matrix over $R$ again only when $B$ has an inverse in the ring,
-and $B$ has one exactly when $\det B$ is a unit of $R$, since
-$B\operatorname{adj}(B) = \det(B)I$ and $\det$ is multiplicative.  Over
+$AB^{-1}$ is a matrix over $R$ again only when $B$ has one.  Over a commutative
+$R$ the units of $M_n(R)$ are the matrices of unit determinant, which is
+Mathlib's `Matrix.isUnit_iff_isUnit_det`.  So over
 $\mathbf{Z}$ the unit is
 $\begin{pmatrix}2&1\\1&1\end{pmatrix}^{-1}=\begin{pmatrix}1&-1\\-1&2\end{pmatrix}$,
 whose determinant is $1$, while $2I$ has determinant $4$ and its inverse
@@ -164,3 +164,45 @@ def test_the_public_inverse_of_2I_over_the_integers_is_refused_by_the_ring() -> 
     assert two.determinant() == 4
     with pytest.raises(ZeroDivisionError):
         two.inverse()
+
+
+def test_a_matrix_between_distinct_free_modules_inverts_by_its_determinant() -> None:
+    r"""$f: V \to W$ over $\mathbf{Z}/4$ with $\det f = 3$ has the inverse $\frac{1}{3}f$ as $W \to V$.
+
+    The endpoints are distinct free modules of rank two: the frame of $V$ is
+    the ordinal $\{0, 1\}$ and that of $W$ is $\{a, b\}$.  $f$ is still a
+    square matrix over the coefficient ring, and $3 \cdot 3 \equiv 1 \pmod 4$,
+    so it is inverted over $R$ by the same determinant and read back as a map
+    $W \to V$ -- not by a kernel, which this ring does not supply, and not
+    only for endomorphisms.
+    """
+    ring = ZZ.quotient_ring(ZZ.ideal(4))
+    source = ring ** 2
+    target = ring.free_module(("a", "b"))
+    f = source.Mor(target).from_rows([[3, 0], [0, 1]])
+    g = f.inverse()
+
+    assert source is not target
+    assert f.determinant() == ring(3)
+    assert g.domain() is target
+    assert g.codomain() is source
+    assert g @ f == source.End().one()
+    assert f @ g == target.End().one()
+    assert ~f == g
+
+
+def test_the_inverse_of_a_matrix_is_one_datum_of_the_matrix() -> None:
+    r"""The inverse and the determinant are answered once per matrix, not once per request.
+
+    $A = \begin{pmatrix}2&1\\1&1\end{pmatrix}$ is a unit of $M_2(\mathbf{Z})$
+    with $\det A = 1$.  The unit inverse asks the determinant through the unit
+    predicate and then reads it again on its way to the matrix inverse; both
+    reads are the same datum, and the second request for the inverse returns
+    the object the first one built.
+    """
+    matrices = ZZ.matrix_space(2)
+    a = matrices.from_rows([[2, 1], [1, 1]])
+
+    assert a.determinant() is a.determinant()
+    assert a.inverse() is a.inverse()
+    assert a.inverse_of_unit() is a.inverse()
