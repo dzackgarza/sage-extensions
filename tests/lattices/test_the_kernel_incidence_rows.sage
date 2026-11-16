@@ -52,9 +52,10 @@ lattice and per group so one costly row cannot hide another's result.
 ``U + U(2) + <-2>`` is not the second specimen although the driver runs it:
 in this session's ring its ambient flag row cannot be built at all --
 ``ModuleAutomorphismGroup.flag_stabilizer`` inverts its basis change at the
-rank-two zero-form reduction lattice, and the change is not inverted
-(``_inverse_in_the_ring`` on a ``Generic endomorphism`` of a rank-two
-signature-``(0, 0)`` lattice).  That is a defect of that route and not of this
+rank-two zero-form reduction lattice, and that change has determinant ``-2``,
+so it is no basis change and has no inverse in the integer ring (``Generic
+endomorphism of Integral lattice of rank 2 and signature (0, 0) has no
+inverse ...: its determinant -2 is not a unit of Integer Ring``).  That is a defect of that route and not of this
 row, and it is not repaired here; the driver's own run of the same lattice, in
 the image's plain interpreter, decides its two rows.
 
