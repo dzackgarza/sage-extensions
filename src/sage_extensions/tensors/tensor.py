@@ -11,9 +11,10 @@ data)`` are different objects with different parents, and a linear map
 ``tensor(R, (p,), (q,), data)`` from ``R^q`` to ``R^p`` is distinct from an
 all-upper or all-lower two-index tensor.
 
-``tensor.vector(...)``, ``tensor.covector(...)`` and ``tensor.matrix(...)``
-accept owned rings and explicit component data.  They do not reproduce Sage's
-matrix namespace: matrices as linear maps belong to the owned Mor objects.
+``tensor.vector(...)``, ``tensor.covector(...)``, ``tensor.matrix(...)`` and
+``tensor.identity(...)`` accept owned rings and explicit component data.  They
+do not reproduce Sage's matrix namespace: matrices as linear maps belong to the
+owned Mor objects.
 
 Every route ends in one construction: ``TensorModule(R, ps, qs)`` is the
 object of ``Modules(R)`` built by that owner's entry from
@@ -502,6 +503,8 @@ class Tensor:
 
     def change_ring(self, ring):
         r"""Change coefficients without changing tensor variance."""
+        if ring is self.base_ring():
+            return self
         return tensor(
             ring,
             self._upper_index_ranks(),
@@ -1783,6 +1786,54 @@ class _TensorCovectorConstructor:
         )
 
 
+class _TensorIdentityConstructor:
+    r"""Construct the type-``(1,1)`` identity tensor of a finite free module.
+
+    The Kronecker delta \(\delta^i{}_j\) is the tensor of the identity
+    endomorphism of the module on its own framing, so a linear map stated as a
+    rank-two update of the identity is one tensor expression.  An infinite
+    index has no component array and therefore no identity tensor.
+
+    EXAMPLES::
+
+        sage: from sage_extensions.tensors import tensor
+        sage: identity = tensor.identity(ZZ, 3)
+        sage: identity.tensor_valence()
+        (1, 1)
+        sage: [identity[i, j] for i in range(3) for j in range(3)]
+        [1, 0, 0, 0, 1, 0, 0, 0, 1]
+    """
+
+    def __call__(self, base_ring, rank, *args, **kwds):
+        if args or kwds:
+            raise TypeError(
+                f"tensor.identity(R, rank) takes a ring and one rank; "
+                f"got the extra arguments {args} and keywords {sorted(kwds)}"
+            )
+        if base_ring not in _Rings:
+            raise TypeError(
+                f"tensor.identity(R, rank) needs a ring R; {base_ring!r} is not a ring"
+            )
+        if rank is Infinity:
+            raise ValueError(
+                f"tensor.identity({base_ring}, rank) needs a finite rank: an index of "
+                f"infinite rank has no component array"
+            )
+        length = int(cardinal(rank).finite_value())
+        one = base_ring.one()
+        zero = base_ring.zero()
+        return _coordinate_tensor(
+            base_ring,
+            (length,),
+            (length,),
+            tuple(
+                one if row == column else zero
+                for row in range(length)
+                for column in range(length)
+            ),
+        )
+
+
 class _TensorMatrixConstructor:
     r"""Construct finite type-``(1,1)`` coordinate tensors.
 
@@ -2142,6 +2193,23 @@ class _CoordinateTensor(ModuleElement, Tensor):
             output_lower = lower[:-1]
             output_shape = output_upper + output_lower
             contracted_rank = lower[-1]
+            if (
+                self.tensor_order() == 2
+                and (ring is _owned_integers() or ring is _owned_rationals())
+            ):
+                # The row-major component matrix enumerates every index but
+                # the contracted one in the output's own order, so the pairings
+                # of the family are one engine matrix product -- the same
+                # exact arithmetic the two-vector evaluation of a pairing is.
+                product = _engine_component_matrix(self) * _engine_component_vector(
+                    other
+                )
+                entries = tuple(
+                    _owned_engine_element(ring, entry) for entry in product.list()
+                )
+                if not output_shape:
+                    return entries[0]
+                return tensor(ring, output_upper, output_lower, _nested(entries, output_shape))
             positions = tuple(
                 cartesian_product(*(range(rank) for rank in output_shape))
             ) if output_shape else ((),)
@@ -2676,11 +2744,11 @@ def _coordinate_tensor(
 class _TensorConstructor:
     r"""General tensor constructor with variance encoded in the rank vectors.
 
-    ``tensor.vector(R, data)``, ``tensor.covector(R, data)``, and
-    ``tensor.matrix(R, data)`` are small typed conveniences over the main
-    ``tensor(R, ps, qs, data)`` call.  They accept owned rings and mathematical
-    component data only; Sage constructor/storage compatibility is not public
-    API.
+    ``tensor.vector(R, data)``, ``tensor.covector(R, data)``,
+    ``tensor.matrix(R, data)`` and ``tensor.identity(R, rank)`` are small typed
+    conveniences over the main ``tensor(R, ps, qs, data)`` call.  They accept
+    owned rings and mathematical component data only; Sage
+    constructor/storage compatibility is not public API.
 
     The main call is ``tensor(R, ps, qs, data)``.  ``ps`` lists upper-index
     dimensions and ``qs`` lower-index dimensions.  Hence vectors and covectors
@@ -2690,6 +2758,7 @@ class _TensorConstructor:
     vector = _TensorVectorConstructor()
     covector = _TensorCovectorConstructor()
     matrix = _TensorMatrixConstructor()
+    identity = _TensorIdentityConstructor()
 
     def from_matrix(self, matrix):
         r"""Interpret a finite matrix Mor element as a type-``(1,1)`` tensor."""

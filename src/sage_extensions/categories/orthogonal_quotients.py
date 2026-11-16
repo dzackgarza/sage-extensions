@@ -1294,21 +1294,17 @@ class OrthogonalCharacterQuotient:
         Eichler's criterion (Gritsenko--Hulek--Sankaran, Lemma 7.8, p. 503) says that, in a
         lattice with two orthogonal hyperbolic planes, the ``\widetilde{SO}(L)``-orbit of a
         primitive vector is decided by its length and its normalized discriminant class.
+        The transvections the criterion is proved with carry the halved norm of the
+        vector along the isotropic line, so the lattice it is applied to must also be
+        even; both halves of the hypothesis are the lattice's own and
+        :meth:`sage_extensions.categories.lattices.Lattices.eichler_criterion_applies`
+        decides them.
 
-        **A lattice without two hyperbolic planes is refused.**  The criterion is a
-        statement about the lattice it is applied to: the two orthogonal hyperbolic
-        planes are its hypothesis *in* ``L`` (Gritsenko--Hulek--Sankaran, Lemma 7.8,
-        p. 503).  It is not inherited from an enlargement: on ``L + U`` it classifies
-        the ``\widetilde{SO}(L + U)``-orbits of ``L + U``, and the element it
-        produces need not preserve ``L``, so the two invariants it compares say
-        nothing about the ``O(L)``-orbits of ``L``.  What decides the ``O(L)``-orbit
-        of a primitive isotropic ``v`` is the isometry class of
-        ``v^\perp/\mathbb{Z} v`` (Conway--Sloane, *Sphere Packings, Lattices and
-        Groups*, ch. 16), which the discriminant group of a unimodular ``L`` cannot
-        see.  The hypothesis is decided by ``L``'s \(U\)-index, so a basis that
-        displays no isotropic direction does not remove it; where the index is
-        below two the call below returns ``None`` and the caller keeps its
-        exact integral route.
+        **A lattice where the criterion does not apply is refused.**  What decides
+        the ``O(L)``-orbit of a primitive isotropic ``v`` there is the isometry class
+        of ``v^\perp/\mathbb{Z} v`` (Conway--Sloane, *Sphere Packings, Lattices and
+        Groups*, ch. 16), so the call below returns ``None`` and the caller keeps
+        its exact integral route.
         Let ``gamma`` belong to ``Stab_{O(A_L)}(c)`` and choose ``g`` in ``O(L)`` above it
         (the character representation is computed by this quotient, so such a lift exists).
         Then ``g(v)`` has the same length and the same normalized class ``c`` as ``v``, so by
@@ -1350,12 +1346,10 @@ class OrthogonalCharacterQuotient:
                     continue
                 if lattice.reflection(root) not in self.subgroup:
                     return "NOSPLIT"
-        # The criterion's hypothesis is read on ``L`` itself (Gritsenko--Hulek--Sankaran,
-        # Lemma 7.8, p. 503): two orthogonal hyperbolic planes in ``L``, decided by the
-        # lattice's U-index and not by the retained basis.  It is not
-        # transferred from the enlargement ``L + U``, whose classification is of
-        # ``\widetilde{SO}(L + U)``-orbits and whose moving element need not preserve
-        # ``L``.  Without the hypothesis the parabolic route below applies instead:
+        # The criterion's hypothesis is the lattice's own -- two orthogonal hyperbolic
+        # planes and an even form (Gritsenko--Hulek--Sankaran, Lemma 7.8, p. 503) --
+        # and ``Lattices.eichler_criterion_applies`` is where it is decided.
+        # Without it the parabolic route below applies instead:
         # the split-signature witness -- an element of the stabilizer with trivial
         # discriminant image and real spinor norm ``-1``, the Levi part ``(1, -1)``
         # of Zemel's Proposition 1.10 (arXiv:1902.08264v2, p. 13) -- together with
@@ -1363,7 +1357,7 @@ class OrthogonalCharacterQuotient:
         # divisor-1 line is exactly the class-stabilizer equality.  Both are
         # computed, never asserted; a failure of either returns ``None`` and the
         # caller keeps its exact integral route.
-        if not _two_hyperbolic_planes(lattice):
+        if not lattice.eichler_criterion_applies():
             if _split_signature_witness(lattice, vector) is None:
                 return None
             if not _complement_discriminant_surjective(lattice, vector):
@@ -2898,8 +2892,8 @@ def _isotropic_line_representatives(lattice, quotient):
     r"""Representatives of primitive isotropic *line* classes, from ``A_L`` first.
 
     Eichler's criterion (Gritsenko--Hulek--Sankaran, Lemma 7.8, p. 503) classifies
-    primitive vectors of fixed length by norm and normalized discriminant class in a
-    lattice with two orthogonal hyperbolic planes.  For norm zero those are exactly the
+    primitive vectors of fixed length by norm and normalized discriminant class in an
+    even lattice with two orthogonal hyperbolic planes.  For norm zero those are exactly the
     *line* orbits, once ``v`` and ``-v`` are identified by the class set ``{c, -c}``:
     their normalized class is the whole invariant.  This function constructs one
     integral representative for *every* candidate class, before any integral orbit
@@ -2907,7 +2901,7 @@ def _isotropic_line_representatives(lattice, quotient):
     construction returns ``None`` and the caller falls back to its integral route --
     a partial finite family is never returned as if it were the line set.
     """
-    if not _two_hyperbolic_planes(lattice):
+    if not lattice.eichler_criterion_applies():
         return None
     from sage.libs.gap.libgap import libgap
     from sage_extensions.categories.sets.finite_ordered_sets import finite_ordered_set
@@ -3050,20 +3044,6 @@ def _isotropic_divided_class_set(lattice, term):
             scaled = scaled + divided_class
         classes.append(scaled)
     return tuple(classes)
-
-
-def _two_hyperbolic_planes(lattice):
-    r"""Whether the isometry class of ``lattice`` splits two orthogonal hyperbolic planes.
-
-    Eichler's criterion (Gritsenko--Hulek--Sankaran, *Moduli of K3 Surfaces and
-    Irreducible Symplectic Manifolds*, Lemma 7.8, p. 503) needs that hypothesis;
-    it is a property of the lattice, decided by its \(U\)-index, and not by
-    whether the retained basis happens to display two isotropic directions.
-    The owner of that count is
-    :meth:`sage_extensions.categories.lattices.Lattices.hyperbolic_plane_summand_count`,
-    so this asks it rather than reading the basis here.
-    """
-    return bool(lattice.splits_two_hyperbolic_planes())
 
 
 def _bezout_partner(row):

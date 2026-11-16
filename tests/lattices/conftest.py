@@ -12,10 +12,9 @@ This module binds the session's names as builtins, which is the mechanism the
 lint documents: a directory's ``conftest.py`` binds the abbreviations its tests
 use, and the lint reads the allowed names after the conftests have run.
 ``card`` is a row of the digest; ``spans_built_by`` and ``displays_rendered_by``
-count what one action built and rendered; ``owned_ring_crossings`` counts the
-constructions between the engine's data and the owned ring; ``vinberg_walk`` is
-the walk Vinberg's algorithm runs over one lattice, which the chamber call
-builds, runs and keeps none of.  Each instrument that patches does so with
+count what one action built and rendered; ``vinberg_walk`` is the walk Vinberg's
+algorithm runs over one lattice, which the chamber call builds, runs and keeps
+none of.  Each instrument that patches does so with
 ``pytest.MonkeyPatch.context()``, so a failing action leaves the process as it
 found it.
 """
@@ -137,39 +136,6 @@ def built_without_display(named, action):
 
 
 builtins.built_without_display = built_without_display
-
-
-def owned_ring_crossings(action):
-    r"""Return ``action()`` and the number of owned-ring crossings it made.
-
-    A crossing is one construction between the engine's data and the owned ring:
-    ``ring_foundation._owned_engine_element`` raises an engine value into the
-    owned ring, and it is what an arrangement that did a computation's own
-    arithmetic in the owned ring multiplies by the size of that computation.
-    A lattice test asks the number for one Eichler transvection, whose matrix
-    has ``rank^2`` entries but whose crossings are one decision per generator.
-
-    The name of that crossing is private, so a test may not write it (``TL01``,
-    ``TL02``): the patch lives here, beside the card reader.  A test asserts on
-    the number, which is a call count and never a time.
-    """
-    from sage_extensions.categories.rings import ring_foundation
-
-    counted = []
-    original = ring_foundation._owned_engine_element
-
-    def crossing(*arguments, **keywords):
-        counted.append(1)
-        return original(*arguments, **keywords)
-
-    with pytest.MonkeyPatch.context() as patch:
-        patch.setattr(ring_foundation, "_owned_engine_element", crossing)
-        value = action()
-    return value, len(counted)
-
-
-builtins.owned_ring_crossings = owned_ring_crossings
-
 
 def vinberg_walk(lattice, controlling_vector=None, *, admits_root=None):
     r"""Return the walk Vinberg's algorithm runs over ``lattice``.

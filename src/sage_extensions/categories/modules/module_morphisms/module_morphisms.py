@@ -1890,17 +1890,23 @@ class ModuleMorphismMethods:
 
         Over a principal ideal domain with both endpoints finitely generated and
         free, the cokernel is the quotient of the codomain's chosen frame by the
-        row lattice of this morphism's coordinate matrix \(A\).  The Smith
-        normal form \(A = UDV\) (H. J. S. Smith, *On systems of linear
-        indeterminate equations and congruences*, Phil. Trans. R. Soc. Lond.
-        151 (1861), 293--326; the module statement is the structure theorem for
-        finitely generated modules over a principal ideal domain) writes that
-        quotient as \(R^{n-r} \oplus \bigoplus_i R/(d_i)\), so the cokernel is
-        torsion-free exactly when every elementary divisor \(d_i\) is a unit.
+        row lattice of this morphism's coordinate matrix \(A\).  The structure
+        theorem for finitely generated modules over a principal ideal domain
+        (``Mathlib/Algebra/Module/PID.lean``, ``Module.equiv_free_prod_directSum``)
+        writes such a module as \((R^n, \bigoplus_i R/R p_i^{e_i})\), and the
+        half used here is the refinement beside it: a finitely generated
+        torsion-free module over a principal ideal domain has a basis
+        (``Module.free_iff_isTorsionFree`` in the same file).  So the cokernel of
+        \(A = UDV\) is free -- that is, the image of this monomorphism is
+        saturated -- exactly when no \(R/(d_i)\) summand survives, which is to
+        say every elementary divisor \(d_i\) of \(A\) is a unit.  The Smith
+        normal form itself is the matrix algorithm that reads those elementary
+        divisors (H. J. S. Smith, *On systems of linear indeterminate equations
+        and congruences*, Phil. Trans. R. Soc. Lond. 151 (1861), 293--326, which
+        treats integer matrices); it is not the statement above.
         That is the criterion of the invariant factors which
         :meth:`...FinitelyPresentedModules.ParentMethods._torsion_freeness_decision`
-        states of the presented quotient, and it holds over every principal
-        ideal domain, not over the integers alone.
+        states of the presented quotient.
 
         The decision reads the matrix this morphism already retains
         (:func:`...pure.modules._engine_matrix`), the same source

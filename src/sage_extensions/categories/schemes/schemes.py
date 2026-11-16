@@ -2297,23 +2297,18 @@ class SchemeMorphismMethods:
         return negation(self == other)
 
     def __hash__(self) -> int:
-        if (
-            self._toric_lattice_morphism is not None
-            or self._relative_projectivization_role
-            in (
-                "base_change_composite",
-                "base_change_total",
-                "base_change_base",
-                "base_projection",
-                "surjectivity_open_inclusion",
-                "surjectivity_induced_morphism",
-            )
-        ):
-            raise TypeError(f"unhashable type: {type(self).__name__}")
-        if self._relative_projectivization_source_sheaf is not None:
-            raise TypeError(f"unhashable type: {type(self).__name__}")
-        if self._gluing_role in ("chart_map", "finite_atlas", "glued_domain"):
-            raise TypeError(f"unhashable type: {type(self).__name__}")
+        r"""Hash the arrow by its endpoints, which every presentation shares.
+
+        Two scheme morphisms are equal when they are the same map of the
+        underlying spaces, and the class decides that extensional equality from
+        whichever defining datum it retains: a coordinate pullback, homogeneous
+        coordinates, a native morphism, a family of chart maps, or a toric
+        lattice morphism.  Equal arrows therefore have one source and one
+        target, and the endpoints are the invariant a hash reads -- the same
+        fallback ``arrow_hash`` states for an arrow with no finite probe.  An
+        open inclusion carries its position in the atlas, which is stable while
+        the arrow exists, so it hashes that as well.
+        """
         if self._gluing_role == "open_inclusion":
             position = (
                 self.gluing_datum().chart_index_set().ranking_map()(self.chart_index())

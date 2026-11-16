@@ -468,9 +468,12 @@ class ContinuousMap:
 
         Two continuous maps of one set of morphisms are equal exactly when their
         underlying set maps are, and a set map's own hash reads its values on
-        its domain, so equal maps hash alike.
+        its domain, so equal maps hash alike.  The set of morphisms is not read:
+        ``Sets`` states that an arrow's hash may not depend on its parent,
+        because two arrows of different Mor sets with the same endpoints can be
+        equal.
         """
-        return hash((id(self.parent()), self.underlying_set_morphism()))
+        return hash(self.underlying_set_morphism())
 
 
 class TopologicalSpaceMor(CategoricalMor):

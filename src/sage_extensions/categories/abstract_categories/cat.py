@@ -1632,6 +1632,27 @@ class _FunctorCategory(CategoricalMor):
 
     underlying_mor = arrow_set
 
+    def object(self, functor: Functor) -> Functor:
+        r"""Admit the actual functor as an object of $[C, D]$.
+
+        An object of a functor category is a functor, and a diagram is the
+        functor itself: ``Functor.object`` is that functor, and its cones,
+        cocones, spans and category of elements are read off it.  This is the
+        functor-category analogue of ``Cat.object``, which admits a category as
+        an object of ``Cat``, and it states the same admission -- the functor's
+        endpoints are this category's, and nothing else is asked.
+        """
+        if (
+            functor.domain() is not self.domain_category()
+            or functor.codomain() is not self.codomain_category()
+        ):
+            raise TypeError(
+                f"an object of {self} is a functor {self.domain_category()} -> "
+                f"{self.codomain_category()}, but {functor} is "
+                f"{functor.domain()} -> {functor.codomain()}"
+            )
+        return functor.object()
+
     def from_object_map(self, object_map):
         r"""Return the functor induced by an object-set map between discrete categories."""
         from sage_extensions.categories.abstract_categories.functors import (

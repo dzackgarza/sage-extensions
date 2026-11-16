@@ -1,0 +1,41 @@
+tree SHA: 8977addcc5f84d23bea3c623d187632db622f213 (modified paths: 1)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 19.99 21.70 20.22 17/754 2731050
+files: tests/rings/test_reals_and_completions_hash_by_their_value.sage
+inner 400 s, outer 960 s, guard 6144 MiB
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+time gates OFF (--no-time-gates): star import 1.60 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: asyncio-1.5.0, xdist-3.8.0, reportlog-1.0.0, platformdirs-4.13.5, hypothesis-6.170.15, anyio-4.15.1, timeout-2.4.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 4 items
+
+tests/rings/test_reals_and_completions_hash_by_their_value.sage ....     [100%]
+
+============================== slowest durations ===============================
+0.82s call     tests/rings/test_reals_and_completions_hash_by_their_value.sage::test_two_presentations_of_one_completion_element_are_one_point
+0.32s call     tests/rings/test_reals_and_completions_hash_by_their_value.sage::test_two_algebraic_presentations_of_one_irrational_real_are_one_point
+0.09s call     tests/rings/test_reals_and_completions_hash_by_their_value.sage::test_two_presentations_of_one_real_are_one_point_of_a_finite_ordered_set
+0.01s call     tests/rings/test_reals_and_completions_hash_by_their_value.sage::test_an_exact_real_hashes_as_the_number_it_equals
+0.01s setup    tests/rings/test_reals_and_completions_hash_by_their_value.sage::test_two_presentations_of_one_real_are_one_point_of_a_finite_ordered_set
+0.01s setup    tests/rings/test_reals_and_completions_hash_by_their_value.sage::test_two_algebraic_presentations_of_one_irrational_real_are_one_point
+0.01s setup    tests/rings/test_reals_and_completions_hash_by_their_value.sage::test_two_presentations_of_one_completion_element_are_one_point
+
+(5 durations < 0.005s hidden.  Use -vv to show these durations.)
+============================== 4 passed in 3.79s ===============================
+[peakrss] probe542r2tests: child waited=0 shell_code=0 samples=8
+[peakrss] peak tree RSS      : 321 MiB
+[peakrss] low-water MemAvail : 5427 MiB
+[peakrss] peak single VmHWM  : 321 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      310 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    14.1s procs=  3 rss=   321 MiB hwm=   321 MiB avail=  5427 MiB
+[peakrss]   t=    12.1s procs=  3 rss=   319 MiB hwm=   319 MiB avail=  5467 MiB
+[peakrss]   t=    10.1s procs=  3 rss=   300 MiB hwm=   300 MiB avail=  5552 MiB
+[peakrss]   t=     8.0s procs=  3 rss=   268 MiB hwm=   268 MiB avail=  5785 MiB
+[peakrss]   t=     6.0s procs=  3 rss=   198 MiB hwm=   198 MiB avail=  6097 MiB
+launcher exit: 0

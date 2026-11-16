@@ -1,0 +1,4 @@
+=== tree: 1db98e40295e893d7c9342028d6edfd2eaaa3b23
+=== files: tests/lattices/test_indecomposable_summands_decide_the_decomposition.sage tests/lattices/test_displayed_blocks_are_sublattices.sage tests/lattices/test_eichler_orbits.sage tests/lattices/test_line_stabilizer_image_requires_eichlers_hypothesis.sage tests/forms/test_gram_graph_blocks.sage
+5 files, 0 findings
+=== exit: 0

@@ -37,6 +37,29 @@ def test_two_monotone_maps_are_one_point_and_maps_of_two_orders_are_two() -> Non
     assert FiniteOrderedSets()((identity, collapse)).cardinality() == 2
 
 
+def test_the_identity_of_a_two_point_chain_hashes_as_the_set_map_it_is() -> None:
+    r"""One monotone map, named as a monotone map and as the set map it retains.
+
+    ``Sets`` states that an arrow's hash may not depend on the arrow's parent,
+    because equality of arrows is extensional across a stronger ``Mor`` with the
+    same endpoints.  The identity of the chain ``0 < 1`` is one map of one set
+    of points, so the monotone morphism, the same morphism built again, and the
+    set map it retains all hash alike, and a finite ordered set of them holds
+    one point.
+    """
+    points = Sets.Δ[2]
+    chain = PartiallyOrderedSets()(points, lambda left, right: int(left) <= int(right))
+    monotone = PartiallyOrderedSets().Mor(chain, chain).identity()
+    rebuilt = PartiallyOrderedSets().Mor(chain, chain).identity()
+    as_a_set_map = monotone.underlying_set_morphism()
+
+    assert monotone == rebuilt
+    assert as_a_set_map == Sets().Mor(chain, chain).identity()
+    assert hash(monotone) == hash(rebuilt)
+    assert hash(monotone) == hash(as_a_set_map)
+    assert FiniteOrderedSets()((monotone, rebuilt)).cardinality() == 1
+
+
 def test_two_continuous_maps_with_the_same_values_are_one_point() -> None:
     r"""The identity function on two points is one continuous map of the two topologies.
 
@@ -57,6 +80,7 @@ def test_two_continuous_maps_with_the_same_values_are_one_point() -> None:
 
     assert toward == rebuilt
     assert hash(toward) == hash(rebuilt)
+    assert hash(toward) == hash(toward.underlying_set_morphism())
     assert FiniteOrderedSets()((toward, rebuilt)).cardinality() == 1
 
 
@@ -65,13 +89,19 @@ def test_a_graph_morphism_hashes_its_vertex_map() -> None:
 
     The graph is symmetric, so the swap of ``0`` and ``1`` preserves the single
     adjacency ``(0, 1)``; the identity is another, and the two are distinct
-    morphisms of the one set of endomorphisms.
+    morphisms of the one set of endomorphisms.  The graph's own equality of the
+    two swaps is undecided here, so the test states what is decided: the two
+    builds hash alike, and the hash of the morphism is the hash of its vertex
+    map.
     """
     edge = Graphs().from_edges((0, 1), ((0, 1),))
     swap = Graphs().Mor(edge, edge)(lambda vertex: edge(1 - int(vertex)))
     identity = Graphs().Mor(edge, edge).identity()
 
-    assert hash(swap) == hash(Graphs().Mor(edge, edge)(lambda vertex: edge(1 - int(vertex))))
+    rebuilt = Graphs().Mor(edge, edge)(lambda vertex: edge(1 - int(vertex)))
+
+    assert hash(swap) == hash(rebuilt)
+    assert hash(swap) == hash(swap.underlying_set_morphism())
     assert FiniteOrderedSets()((identity,)).cardinality() == 1
     assert swap(edge(0)) == edge(1)
 
@@ -89,6 +119,10 @@ def test_a_chamber_system_morphism_hashes_its_chamber_map() -> None:
     identity = ChamberSystems().Mor(system, system).identity()
     swap = ChamberSystems().Mor(system, system)(lambda chamber: system(1 - int(chamber)))
 
+    rebuilt = ChamberSystems().Mor(system, system)(lambda chamber: system(1 - int(chamber)))
+
     assert hash(identity) == hash(ChamberSystems().Mor(system, system).identity())
+    assert hash(swap) == hash(rebuilt)
+    assert hash(swap) == hash(swap.underlying_set_morphism())
     assert FiniteOrderedSets()((identity,)).cardinality() == 1
     assert swap(system(0)) == system(1)

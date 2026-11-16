@@ -94,6 +94,24 @@ class GeneralModules(OwnedCategoryOverBaseRing):
                 return self.underlying_element() != other.underlying_element()
             return NotImplemented
 
+        def __hash__(self) -> int:
+            r"""Hash an element by the element of the underlying set it is.
+
+            A general module is an abelian group with a ring acting on it, so
+            two elements of one module are equal exactly when the underlying
+            elements are, and the module is retained beside that element: the
+            equal pairs of one module never cross into another, and the
+            underlying element is what equality reads.  A class whose
+            underlying equality is a decision may name no hashable datum --
+            a Cartier section presented by local equations, for instance --
+            and then the module alone is what a hash can read, which is the
+            coarser invariant :class:`Sets` allows.
+            """
+            try:
+                return hash((id(self.parent()), self.underlying_element()))
+            except TypeError:
+                return hash(id(self.parent()))
+
         def _repr_(self):
             return repr(self.underlying_element())
 

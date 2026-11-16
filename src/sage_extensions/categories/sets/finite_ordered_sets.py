@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import Callable, Hashable, Iterable
+from collections.abc import Callable, Iterable
 from itertools import chain, islice
 from typing import TYPE_CHECKING, TypeVar
 
@@ -48,11 +48,6 @@ class _PointsAreEqual:
 
 
 _DEFAULT_EQUIVALENCE = _PointsAreEqual()
-
-# The sets that declare the datum naming them, held once per datum.  A declared
-# key is defining data, so it is read at construction and never completed
-# afterwards (``OWN-17``), and the store keeps the one set that key names.
-_DECLARED_FINITE_ORDERED_SETS: dict[Hashable, ObjectOfCategory] = {}
 
 
 class OrderedEnumeratedSets(OwnedCategory):
@@ -128,7 +123,7 @@ class OrderedEnumeratedSets(OwnedCategory):
             equivalent: Callable[[PointT, PointT], bool] | None = None,
             name: str | None = None,
             description: Callable[[], str] | None = None,
-            key: Hashable | None = None,
+            selected_points: tuple[PointT, ...] | None = None,
             **rest,
         ) -> None:
             assert callable(element_at), (
@@ -151,39 +146,11 @@ class OrderedEnumeratedSets(OwnedCategory):
             self._equivalent_function = equivalent or _DEFAULT_EQUIVALENCE
             self._name = name
             self._description_function = description
-            self._key = key
+            self._selected_points = selected_points
             super().__init__(facade=True, **rest)
 
         def index_set(self) -> Sets().ObjectType:
             return self._index_set
-
-        def declared_key(self):
-            r"""The datum that names this set, or ``None`` when it declares none.
-
-            A set whose points are given by an enumeration it owns is often one
-            set for every caller who works from one datum -- a denominator, a
-            section, a period -- and that datum decides the sameness without
-            either caller reading a point.  Such a caller declares the datum at
-            construction (``FiniteOrderedSets.from_indexed(..., key=...)``), and
-            the set keeps it here.  Two sets that both declare a key are compared
-            by their keys (:meth:`__eq__`), and the store that keeps one product
-            and one coproduct per equal family keys a family by the keys its
-            factors declare (``set_categories._finite_family_key``), so finding
-            the construction reads no point of the factors (``SET-05``).
-
-            Declaring a key is a statement about the set, not a hint: equal keys
-            name one point sequence, and two keys name two sets.  The key hashes,
-            and its equality decides, because it labels a dictionary entry; a key
-            that refuses a hash is refused by the store, with the dictionary's
-            ``TypeError``, as a point that refuses one is refused by the inverse
-            of the enumeration.
-
-            The points are unchanged and the set is still compared extensionally
-            with a set that declares no key, so a key narrows no set: it only
-            makes the comparison and the interning of declaring sets cost nothing
-            in their points.
-            """
-            return self._key
 
         def enumeration(self) -> Callable[[IndexT], PointT]:
             r"""The chosen bijection from the index set onto this set."""
@@ -202,6 +169,10 @@ class OrderedEnumeratedSets(OwnedCategory):
             isomorphism is needed when the isomorphism itself is requested,
             not to read the enumeration it represents.
 
+            A construction that read the enumeration to build its inverse
+            table kept the objects it selected, in their order, so a set built
+            that way reads them back and runs no map at all.
+
             The standard finite ordinal is the one self-indexed construction:
             its index set is literally itself and its selected enumeration is
             the identity on ``0, ..., n-1``.  Read those positions from its
@@ -209,6 +180,9 @@ class OrderedEnumeratedSets(OwnedCategory):
             """
             element_at = self.enumeration()
             index_set = self.index_set()
+            selected = self._selected_points
+            if selected is not None:
+                return iter(selected)
             if index_set is self:
                 size = cardinal(self.cardinality())
                 assert size.is_finite(), (
@@ -352,12 +326,15 @@ class FiniteOrderedSets(OwnedCategory):
     hash table of the points refuse such a point, with the table's
     ``TypeError``.
 
-    A set whose points are given by an enumeration it owns may also declare the
-    datum that names it (:meth:`OrderedEnumeratedSets.ParentMethods.declared_key`).
-    The product and the coproduct of a family of sets are interned under the keys
-    its factors declare, and under the hashes of the factors that declare none, so
-    a family of declaring factors is placed without reading a point: the datum
-    costs what it costs as a datum, and nothing in the size of the set.
+    A set whose points its construction read is also keyed by that construction:
+    the hash of its point sequence is decided there, and a set presented by a
+    supplied enumeration decides it on the first ask.  The product and coproduct
+    of a family are interned under their index set and their factors' hashes
+    (``set_categories._finite_family_key``), so placing a family reads a value
+    each factor already holds and none of its points.  No caller supplies that
+    value: a datum other than the points cannot key a set, because two sets of
+    one point sequence would then be unequal while remaining equal to every set
+    of those points, and one family would have two constructions (`SET-05`).
     """
 
     def an_object(self) -> ObjectOfCategory:
@@ -440,7 +417,6 @@ class FiniteOrderedSets(OwnedCategory):
         equivalent: Callable[[PointT, PointT], bool] | None = None,
         name: str | None = None,
         description: Callable[[], str] | None = None,
-        key: Hashable | None = None,
     ) -> ObjectOfCategory:
         r"""Construct the finite ordered set enumerated by ``element_at`` on ``index_set``.
 
@@ -448,16 +424,12 @@ class FiniteOrderedSets(OwnedCategory):
         rule of :class:`FiniteOrderedSets`, and membership is that inverse's
         domain.
 
-        ``key`` declares the datum that names the set, which
-        :meth:`declared_key` states the force of: two declarations of one key are
-        one construction, returned before ``element_at`` is asked for anything,
-        and a set that declares a key is compared with another declaring set by
-        the two keys.  A caller whose set is one datum of its construction -- the
-        source it is cut out of, the marking and period it is enumerated by --
-        declares that datum here, and then neither hashing the set to place its
-        product nor presenting it a second time reads one of its points.  The key
-        hashes and its equality decides; a key that refuses a hash is refused by
-        the store, with the dictionary's ``TypeError``.
+        A construction that has to read the enumeration to build that table also
+        keeps the points it read, in order, as the set's own enumeration: the
+        defining map is not run again, and the set's hash is read from those
+        points.  A set presented by a supplied inverse keeps that map as its only
+        account of its points, and its hash is computed from that account on the
+        first ask.
         """
         assert cardinal(index_set.cardinality()).is_finite(), (
             f"a finite ordered set needs a finite index set, but {index_set} is not finite"
@@ -465,9 +437,17 @@ class FiniteOrderedSets(OwnedCategory):
         assert index_set in EnumeratedSets(), (
             f"a finite ordered set needs an enumerated index set, but {index_set} is not enumerated"
         )
+        selected_points = None
         if index_of is None:
             indices = tuple(index_set)
             points = tuple(element_at(index) for index in indices)
+            # The points are read here, so the set keeps them here: the objects
+            # this construction selected are its enumeration from now on, its
+            # hash of them is read from them when it is asked, and a consumer
+            # that keys a construction by this set -- the store of finite
+            # products keys each factor by its hash -- reads a value of the data
+            # the set already holds and never runs its map again.
+            selected_points = points
             # These retained objects already satisfy the chosen enumeration.
             # Their admission does not need equality with other points.
             identity_indices = {id(point): index for point, index in zip(points, indices, strict=True)}
@@ -513,26 +493,17 @@ class FiniteOrderedSets(OwnedCategory):
                 image = element_at(index_set(position))
                 return True if image is point else image == point
 
-        def build():
-            return _object_of(
-                self,
-                index_set=index_set,
-                element_at=element_at,
-                index_of=index_of,
-                contains=contains,
-                equivalent=equivalent,
-                name=name,
-                description=description,
-                key=key,
-            )
-
-        match key:
-            case None:
-                return build()
-            case _:
-                # The store answers before ``build`` runs, so a second declaration
-                # of one datum reads no point of the enumeration it supplies.
-                return _interned_by_declared_key(key, build)
+        return _object_of(
+            self,
+            index_set=index_set,
+            element_at=element_at,
+            index_of=index_of,
+            contains=contains,
+            equivalent=equivalent,
+            name=name,
+            description=description,
+            selected_points=selected_points,
+        )
 
     class ParentMethods:
         def random_element(self):
@@ -614,11 +585,13 @@ class FiniteOrderedSets(OwnedCategory):
         def __eq__(self, other) -> bool | Predicate:
             r"""Equal to a finite set with the same points; two finite ordered sets also agree in order.
 
-            Two sets that declare their defining datum (``declared_key``) are
-            compared by it, which is the comparison their declaration states and
-            which reads no point of either.  A set that declares no key is
-            compared by its points against every set, declaring or not, so
-            declaring one never narrows the sets it is equal to.
+            Equality is extensional and reads nothing but the points: a finite
+            ordered set is its point sequence, so two sets are equal exactly when
+            their points agree, position by position.  Nothing else about how
+            either set was constructed takes part, which is what makes ``==`` an
+            equivalence relation here -- two sets equal to a third are equal to
+            each other -- and what lets the hash, which is the hash of those
+            points, agree with it (``SET-05``).
             """
             from sage_extensions.logic import Predicate, conjunction
 
@@ -639,13 +612,6 @@ class FiniteOrderedSets(OwnedCategory):
                 case _ if other is self:
                     return True
                 case _ if other in FiniteOrderedSets():
-                    declared = other.declared_key()
-                    key = self.declared_key()
-                    if key is not None and declared is not None:
-                        # Two sets that declare their defining datum are compared
-                        # by it, which is what declaring one states and costs
-                        # nothing in the points of either.
-                        return key == declared
                     if self.cardinality() != other.cardinality():
                         return False
                     return conjunction(
@@ -665,50 +631,25 @@ class FiniteOrderedSets(OwnedCategory):
             r"""Return the hash of the tuple of the points, which :meth:`__eq__` compares.
 
             The points of a finite ordered set are values, so the set is fixed by
-            them and this hash does not change: it is computed on the first ask
-            and read after (``STY-55``).  A reader does ask repeatedly, because
-            the store that keeps one product per equal family keys a family by
-            the keys its factors declare, and by the hashes of the others
-            (``SET-05``), and a set whose points are reached through a map -- an
-            image, a product section -- would otherwise build all of them again
-            per ask.
-
-            This hash is the points' even for a set that declares the datum
-            naming it (``declared_key``): equality with a set that declares none
-            is extensional, so the two must hash alike, and the declared key is
-            what the store reads instead -- no point of the set, and no hash of
-            it, is asked for when the products of its family are found.
+            them and this hash does not change: a construction that read the
+            points to build its inverse table keeps them and hashes those, and
+            every other set hashes its enumeration on the first ask and answers
+            from then on (``STY-55``).  A reader does ask repeatedly, because the
+            store that keeps one product per equal family keys a family by its
+            factors' hashes (``SET-05``), so a factor's hash is a value the
+            factor already holds by the time a family is placed, and placing a
+            family runs no factor's map.
 
             The points hash and their hashes agree with their equality (the rule
             of :class:`FiniteOrderedSets`), so equal sets hash equally, and a set
             carrying a point that refuses a hash refuses one too: the computation
             raises before anything is cached.
             """
-            return hash(tuple(self))
+            selected = self._selected_points
+            return hash(tuple(self)) if selected is None else hash(selected)
 
         def _repr_(self) -> str:
             return "{" + ", ".join(repr(element) for element in self) + "}"
-
-
-def _interned_by_declared_key(key: Hashable, build: Callable[[], ObjectOfCategory]) -> ObjectOfCategory:
-    r"""The one set the declared key names, constructed by ``build`` the first time.
-
-    A key is the datum a caller declares at construction
-    (:meth:`FiniteOrderedSets.from_indexed`), so it is the set's identity: the
-    store answers with the construction of the first declaration and ``build`` is
-    not run again, which is why a second presentation of one datum asks its
-    enumeration for nothing.
-
-    The key must hash, as the points of a finite ordered set must, because the
-    store is a dictionary; a key that refuses a hash raises the dictionary's
-    ``TypeError``.
-    """
-    known = _DECLARED_FINITE_ORDERED_SETS.get(key)
-    if known is not None:
-        return known
-    constructed = build()
-    _DECLARED_FINITE_ORDERED_SETS[key] = constructed
-    return constructed
 
 
 def _filtered_ordered_set(

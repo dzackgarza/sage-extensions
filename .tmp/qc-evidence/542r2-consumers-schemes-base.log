@@ -1,0 +1,1252 @@
+tree SHA: 090a0d92c960a96d94909211161402471ee4248c (modified paths: 0)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 20.06 16.95 17.43 21/818 2802735
+files: tests/schemes/test_affine_schemes.sage tests/schemes/test_glued_morphisms_and_closed_subschemes.sage tests/schemes/test_glued_finite_affine_atlases.sage tests/schemes/test_glued_projective_line_from_two_lines.sage tests/schemes/test_projective_standard_charts.sage tests/schemes/test_relative_spec_general.sage tests/schemes/test_toric_schemes.sage tests/schemes/test_affine_pullback_and_direct_image.sage tests/schemes/test_glued_line_with_doubled_origin.sage
+inner 420 s, outer 460 s, guard 6144 MiB
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+time gates OFF (--no-time-gates): star import 1.99 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: asyncio-1.5.0, xdist-3.8.0, reportlog-1.0.0, platformdirs-4.13.5, hypothesis-6.170.15, anyio-4.15.1, timeout-2.4.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 51 items
+
+tests/schemes/test_affine_schemes.sage EEEEEE                            [ 11%]
+tests/schemes/test_glued_morphisms_and_closed_subschemes.sage ..FFF      [ 21%]
+tests/schemes/test_glued_finite_affine_atlases.sage F..FFF               [ 33%]
+tests/schemes/test_glued_projective_line_from_two_lines.sage ......      [ 45%]
+tests/schemes/test_projective_standard_charts.sage ..                    [ 49%]
+tests/schemes/test_relative_spec_general.sage FF                         [ 52%]
+tests/schemes/test_toric_schemes.sage EEEEEEEEEEEEEEEE                   [ 84%]
+tests/schemes/test_affine_pullback_and_direct_image.sage .F.             [ 90%]
+tests/schemes/test_glued_line_with_doubled_origin.sage ...FF             [100%]
+
+==================================== ERRORS ====================================
+_ ERROR at setup of test_global_functions_on_affine_space_are_polynomials_and_on_projective_space_are_constants _
+tests/schemes/test_affine_schemes.sage:4: TL01 from sage_extensions.categories.algebras.algebras import ...: take every name from the session
+_ ERROR at setup of test_the_product_of_two_fat_points_is_the_spectrum_of_the_tensor_product _
+tests/schemes/test_affine_schemes.sage:4: TL01 from sage_extensions.categories.algebras.algebras import ...: take every name from the session
+_ ERROR at setup of test_the_fiber_product_of_x_squared_and_y_cubed_is_the_cusp_with_its_normalization _
+tests/schemes/test_affine_schemes.sage:4: TL01 from sage_extensions.categories.algebras.algebras import ...: take every name from the session
+_ ERROR at setup of test_the_special_fiber_of_xy_equals_t_over_t_zero_is_the_node_xy_equals_zero _
+tests/schemes/test_affine_schemes.sage:4: TL01 from sage_extensions.categories.algebras.algebras import ...: take every name from the session
+_ ERROR at setup of test_xy_zero_fiber_has_represented_singular_closed_subscheme _
+tests/schemes/test_affine_schemes.sage:4: TL01 from sage_extensions.categories.algebras.algebras import ...: take every name from the session
+_ ERROR at setup of test_xy_equals_t_family_is_flat_with_relative_nonsmooth_node _
+tests/schemes/test_affine_schemes.sage:4: TL01 from sage_extensions.categories.algebras.algebras import ...: take every name from the session
+_ ERROR at setup of test_projective_toric_line_over_a_ring_with_zero_divisors __
+tests/schemes/test_toric_schemes.sage:85: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:85: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:86: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:88: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:98: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:123: TL01 from sage_extensions.categories.schemes.toric.toric_schemes import ...: take every name from the session
+tests/schemes/test_toric_schemes.sage:123: TL02 imports the private name _affine_chart
+tests/schemes/test_toric_schemes.sage:123: TL02 imports the private name _character_on_overlap
+tests/schemes/test_toric_schemes.sage:123: TL02 imports the private name _face_localization
+tests/schemes/test_toric_schemes.sage:146: TL04 try/except: expected failures are asserted with pytest.raises
+tests/schemes/test_toric_schemes.sage:149: TL07 compares a rendering: assert the mathematical object, not its display
+tests/schemes/test_toric_schemes.sage:149: TL07 str(): a representation, not a mathematical value
+tests/schemes/test_toric_schemes.sage:156: TL01 from sage_extensions.categories.schemes.toric.toric_schemes import ...: take every name from the session
+tests/schemes/test_toric_schemes.sage:156: TL02 imports the private name _character_on_overlap
+tests/schemes/test_toric_schemes.sage:156: TL02 imports the private name _face_localization
+tests/schemes/test_toric_schemes.sage:167: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:168: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:180: TL01 from sage_extensions.categories.schemes.toric.toric_schemes import ...: take every name from the session
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _affine_chart
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _character_on_overlap
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _face_localization
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _face_supporting_character_monomial
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _face_transition
+tests/schemes/test_toric_schemes.sage:187: TL01 from sage_extensions.categories.rings.ring_foundation import ...: take every name from the session
+tests/schemes/test_toric_schemes.sage:187: TL02 imports the private name _owned_integers
+tests/schemes/test_toric_schemes.sage:192: TL07 repr(): a representation, not a mathematical value
+tests/schemes/test_toric_schemes.sage:225: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:227: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:246: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:249: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:285: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:286: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:290: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:292: TL11 generators: write group_generators, module_generators or algebra_generators
+_ ERROR at setup of test_the_projective_plane_of_its_fan_is_a_smooth_complete_toric_surface _
+tests/schemes/test_toric_schemes.sage:85: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:85: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:86: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:88: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:98: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:123: TL01 from sage_extensions.categories.schemes.toric.toric_schemes import ...: take every name from the session
+tests/schemes/test_toric_schemes.sage:123: TL02 imports the private name _affine_chart
+tests/schemes/test_toric_schemes.sage:123: TL02 imports the private name _character_on_overlap
+tests/schemes/test_toric_schemes.sage:123: TL02 imports the private name _face_localization
+tests/schemes/test_toric_schemes.sage:146: TL04 try/except: expected failures are asserted with pytest.raises
+tests/schemes/test_toric_schemes.sage:149: TL07 compares a rendering: assert the mathematical object, not its display
+tests/schemes/test_toric_schemes.sage:149: TL07 str(): a representation, not a mathematical value
+tests/schemes/test_toric_schemes.sage:156: TL01 from sage_extensions.categories.schemes.toric.toric_schemes import ...: take every name from the session
+tests/schemes/test_toric_schemes.sage:156: TL02 imports the private name _character_on_overlap
+tests/schemes/test_toric_schemes.sage:156: TL02 imports the private name _face_localization
+tests/schemes/test_toric_schemes.sage:167: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:168: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:180: TL01 from sage_extensions.categories.schemes.toric.toric_schemes import ...: take every name from the session
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _affine_chart
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _character_on_overlap
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _face_localization
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _face_supporting_character_monomial
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _face_transition
+tests/schemes/test_toric_schemes.sage:187: TL01 from sage_extensions.categories.rings.ring_foundation import ...: take every name from the session
+tests/schemes/test_toric_schemes.sage:187: TL02 imports the private name _owned_integers
+tests/schemes/test_toric_schemes.sage:192: TL07 repr(): a representation, not a mathematical value
+tests/schemes/test_toric_schemes.sage:225: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:227: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:246: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:249: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:285: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:286: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:290: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:292: TL11 generators: write group_generators, module_generators or algebra_generators
+_ ERROR at setup of test_the_orbit_cone_correspondence_counts_the_orbits_of_each_dimension _
+tests/schemes/test_toric_schemes.sage:85: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:85: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:86: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:88: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:98: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:123: TL01 from sage_extensions.categories.schemes.toric.toric_schemes import ...: take every name from the session
+tests/schemes/test_toric_schemes.sage:123: TL02 imports the private name _affine_chart
+tests/schemes/test_toric_schemes.sage:123: TL02 imports the private name _character_on_overlap
+tests/schemes/test_toric_schemes.sage:123: TL02 imports the private name _face_localization
+tests/schemes/test_toric_schemes.sage:146: TL04 try/except: expected failures are asserted with pytest.raises
+tests/schemes/test_toric_schemes.sage:149: TL07 compares a rendering: assert the mathematical object, not its display
+tests/schemes/test_toric_schemes.sage:149: TL07 str(): a representation, not a mathematical value
+tests/schemes/test_toric_schemes.sage:156: TL01 from sage_extensions.categories.schemes.toric.toric_schemes import ...: take every name from the session
+tests/schemes/test_toric_schemes.sage:156: TL02 imports the private name _character_on_overlap
+tests/schemes/test_toric_schemes.sage:156: TL02 imports the private name _face_localization
+tests/schemes/test_toric_schemes.sage:167: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:168: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:180: TL01 from sage_extensions.categories.schemes.toric.toric_schemes import ...: take every name from the session
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _affine_chart
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _character_on_overlap
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _face_localization
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _face_supporting_character_monomial
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _face_transition
+tests/schemes/test_toric_schemes.sage:187: TL01 from sage_extensions.categories.rings.ring_foundation import ...: take every name from the session
+tests/schemes/test_toric_schemes.sage:187: TL02 imports the private name _owned_integers
+tests/schemes/test_toric_schemes.sage:192: TL07 repr(): a representation, not a mathematical value
+tests/schemes/test_toric_schemes.sage:225: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:227: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:246: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:249: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:285: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:286: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:290: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:292: TL11 generators: write group_generators, module_generators or algebra_generators
+____ ERROR at setup of test_the_chart_of_a_smooth_cone_is_the_affine_plane _____
+tests/schemes/test_toric_schemes.sage:85: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:85: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:86: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:88: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:98: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:123: TL01 from sage_extensions.categories.schemes.toric.toric_schemes import ...: take every name from the session
+tests/schemes/test_toric_schemes.sage:123: TL02 imports the private name _affine_chart
+tests/schemes/test_toric_schemes.sage:123: TL02 imports the private name _character_on_overlap
+tests/schemes/test_toric_schemes.sage:123: TL02 imports the private name _face_localization
+tests/schemes/test_toric_schemes.sage:146: TL04 try/except: expected failures are asserted with pytest.raises
+tests/schemes/test_toric_schemes.sage:149: TL07 compares a rendering: assert the mathematical object, not its display
+tests/schemes/test_toric_schemes.sage:149: TL07 str(): a representation, not a mathematical value
+tests/schemes/test_toric_schemes.sage:156: TL01 from sage_extensions.categories.schemes.toric.toric_schemes import ...: take every name from the session
+tests/schemes/test_toric_schemes.sage:156: TL02 imports the private name _character_on_overlap
+tests/schemes/test_toric_schemes.sage:156: TL02 imports the private name _face_localization
+tests/schemes/test_toric_schemes.sage:167: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:168: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:180: TL01 from sage_extensions.categories.schemes.toric.toric_schemes import ...: take every name from the session
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _affine_chart
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _character_on_overlap
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _face_localization
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _face_supporting_character_monomial
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _face_transition
+tests/schemes/test_toric_schemes.sage:187: TL01 from sage_extensions.categories.rings.ring_foundation import ...: take every name from the session
+tests/schemes/test_toric_schemes.sage:187: TL02 imports the private name _owned_integers
+tests/schemes/test_toric_schemes.sage:192: TL07 repr(): a representation, not a mathematical value
+tests/schemes/test_toric_schemes.sage:225: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:227: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:246: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:249: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:285: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:286: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:290: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:292: TL11 generators: write group_generators, module_generators or algebra_generators
+_ ERROR at setup of test_smooth_full_dimensional_cone_coefficients_are_dual_ray_pairings _
+tests/schemes/test_toric_schemes.sage:85: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:85: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:86: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:88: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:98: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:123: TL01 from sage_extensions.categories.schemes.toric.toric_schemes import ...: take every name from the session
+tests/schemes/test_toric_schemes.sage:123: TL02 imports the private name _affine_chart
+tests/schemes/test_toric_schemes.sage:123: TL02 imports the private name _character_on_overlap
+tests/schemes/test_toric_schemes.sage:123: TL02 imports the private name _face_localization
+tests/schemes/test_toric_schemes.sage:146: TL04 try/except: expected failures are asserted with pytest.raises
+tests/schemes/test_toric_schemes.sage:149: TL07 compares a rendering: assert the mathematical object, not its display
+tests/schemes/test_toric_schemes.sage:149: TL07 str(): a representation, not a mathematical value
+tests/schemes/test_toric_schemes.sage:156: TL01 from sage_extensions.categories.schemes.toric.toric_schemes import ...: take every name from the session
+tests/schemes/test_toric_schemes.sage:156: TL02 imports the private name _character_on_overlap
+tests/schemes/test_toric_schemes.sage:156: TL02 imports the private name _face_localization
+tests/schemes/test_toric_schemes.sage:167: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:168: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:180: TL01 from sage_extensions.categories.schemes.toric.toric_schemes import ...: take every name from the session
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _affine_chart
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _character_on_overlap
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _face_localization
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _face_supporting_character_monomial
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _face_transition
+tests/schemes/test_toric_schemes.sage:187: TL01 from sage_extensions.categories.rings.ring_foundation import ...: take every name from the session
+tests/schemes/test_toric_schemes.sage:187: TL02 imports the private name _owned_integers
+tests/schemes/test_toric_schemes.sage:192: TL07 repr(): a representation, not a mathematical value
+tests/schemes/test_toric_schemes.sage:225: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:227: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:246: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:249: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:285: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:286: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:290: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:292: TL11 generators: write group_generators, module_generators or algebra_generators
+_ ERROR at setup of test_character_cocharacter_value_is_the_owned_functional_evaluation _
+tests/schemes/test_toric_schemes.sage:85: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:85: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:86: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:88: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:98: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:123: TL01 from sage_extensions.categories.schemes.toric.toric_schemes import ...: take every name from the session
+tests/schemes/test_toric_schemes.sage:123: TL02 imports the private name _affine_chart
+tests/schemes/test_toric_schemes.sage:123: TL02 imports the private name _character_on_overlap
+tests/schemes/test_toric_schemes.sage:123: TL02 imports the private name _face_localization
+tests/schemes/test_toric_schemes.sage:146: TL04 try/except: expected failures are asserted with pytest.raises
+tests/schemes/test_toric_schemes.sage:149: TL07 compares a rendering: assert the mathematical object, not its display
+tests/schemes/test_toric_schemes.sage:149: TL07 str(): a representation, not a mathematical value
+tests/schemes/test_toric_schemes.sage:156: TL01 from sage_extensions.categories.schemes.toric.toric_schemes import ...: take every name from the session
+tests/schemes/test_toric_schemes.sage:156: TL02 imports the private name _character_on_overlap
+tests/schemes/test_toric_schemes.sage:156: TL02 imports the private name _face_localization
+tests/schemes/test_toric_schemes.sage:167: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:168: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:180: TL01 from sage_extensions.categories.schemes.toric.toric_schemes import ...: take every name from the session
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _affine_chart
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _character_on_overlap
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _face_localization
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _face_supporting_character_monomial
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _face_transition
+tests/schemes/test_toric_schemes.sage:187: TL01 from sage_extensions.categories.rings.ring_foundation import ...: take every name from the session
+tests/schemes/test_toric_schemes.sage:187: TL02 imports the private name _owned_integers
+tests/schemes/test_toric_schemes.sage:192: TL07 repr(): a representation, not a mathematical value
+tests/schemes/test_toric_schemes.sage:225: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:227: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:246: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:249: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:285: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:286: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:290: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:292: TL11 generators: write group_generators, module_generators or algebra_generators
+_ ERROR at setup of test_overlap_characters_stay_in_the_selected_face_localization _
+tests/schemes/test_toric_schemes.sage:85: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:85: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:86: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:88: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:98: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:123: TL01 from sage_extensions.categories.schemes.toric.toric_schemes import ...: take every name from the session
+tests/schemes/test_toric_schemes.sage:123: TL02 imports the private name _affine_chart
+tests/schemes/test_toric_schemes.sage:123: TL02 imports the private name _character_on_overlap
+tests/schemes/test_toric_schemes.sage:123: TL02 imports the private name _face_localization
+tests/schemes/test_toric_schemes.sage:146: TL04 try/except: expected failures are asserted with pytest.raises
+tests/schemes/test_toric_schemes.sage:149: TL07 compares a rendering: assert the mathematical object, not its display
+tests/schemes/test_toric_schemes.sage:149: TL07 str(): a representation, not a mathematical value
+tests/schemes/test_toric_schemes.sage:156: TL01 from sage_extensions.categories.schemes.toric.toric_schemes import ...: take every name from the session
+tests/schemes/test_toric_schemes.sage:156: TL02 imports the private name _character_on_overlap
+tests/schemes/test_toric_schemes.sage:156: TL02 imports the private name _face_localization
+tests/schemes/test_toric_schemes.sage:167: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:168: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:180: TL01 from sage_extensions.categories.schemes.toric.toric_schemes import ...: take every name from the session
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _affine_chart
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _character_on_overlap
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _face_localization
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _face_supporting_character_monomial
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _face_transition
+tests/schemes/test_toric_schemes.sage:187: TL01 from sage_extensions.categories.rings.ring_foundation import ...: take every name from the session
+tests/schemes/test_toric_schemes.sage:187: TL02 imports the private name _owned_integers
+tests/schemes/test_toric_schemes.sage:192: TL07 repr(): a representation, not a mathematical value
+tests/schemes/test_toric_schemes.sage:225: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:227: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:246: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:249: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:285: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:286: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:290: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:292: TL11 generators: write group_generators, module_generators or algebra_generators
+_ ERROR at setup of test_overlap_character_assignment_preserves_semigroup_addition _
+tests/schemes/test_toric_schemes.sage:85: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:85: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:86: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:88: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:98: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:123: TL01 from sage_extensions.categories.schemes.toric.toric_schemes import ...: take every name from the session
+tests/schemes/test_toric_schemes.sage:123: TL02 imports the private name _affine_chart
+tests/schemes/test_toric_schemes.sage:123: TL02 imports the private name _character_on_overlap
+tests/schemes/test_toric_schemes.sage:123: TL02 imports the private name _face_localization
+tests/schemes/test_toric_schemes.sage:146: TL04 try/except: expected failures are asserted with pytest.raises
+tests/schemes/test_toric_schemes.sage:149: TL07 compares a rendering: assert the mathematical object, not its display
+tests/schemes/test_toric_schemes.sage:149: TL07 str(): a representation, not a mathematical value
+tests/schemes/test_toric_schemes.sage:156: TL01 from sage_extensions.categories.schemes.toric.toric_schemes import ...: take every name from the session
+tests/schemes/test_toric_schemes.sage:156: TL02 imports the private name _character_on_overlap
+tests/schemes/test_toric_schemes.sage:156: TL02 imports the private name _face_localization
+tests/schemes/test_toric_schemes.sage:167: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:168: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:180: TL01 from sage_extensions.categories.schemes.toric.toric_schemes import ...: take every name from the session
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _affine_chart
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _character_on_overlap
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _face_localization
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _face_supporting_character_monomial
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _face_transition
+tests/schemes/test_toric_schemes.sage:187: TL01 from sage_extensions.categories.rings.ring_foundation import ...: take every name from the session
+tests/schemes/test_toric_schemes.sage:187: TL02 imports the private name _owned_integers
+tests/schemes/test_toric_schemes.sage:192: TL07 repr(): a representation, not a mathematical value
+tests/schemes/test_toric_schemes.sage:225: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:227: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:246: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:249: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:285: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:286: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:290: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:292: TL11 generators: write group_generators, module_generators or algebra_generators
+____ ERROR at setup of test_toric_face_transition_maps_are_mutual_inverses _____
+tests/schemes/test_toric_schemes.sage:85: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:85: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:86: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:88: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:98: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:123: TL01 from sage_extensions.categories.schemes.toric.toric_schemes import ...: take every name from the session
+tests/schemes/test_toric_schemes.sage:123: TL02 imports the private name _affine_chart
+tests/schemes/test_toric_schemes.sage:123: TL02 imports the private name _character_on_overlap
+tests/schemes/test_toric_schemes.sage:123: TL02 imports the private name _face_localization
+tests/schemes/test_toric_schemes.sage:146: TL04 try/except: expected failures are asserted with pytest.raises
+tests/schemes/test_toric_schemes.sage:149: TL07 compares a rendering: assert the mathematical object, not its display
+tests/schemes/test_toric_schemes.sage:149: TL07 str(): a representation, not a mathematical value
+tests/schemes/test_toric_schemes.sage:156: TL01 from sage_extensions.categories.schemes.toric.toric_schemes import ...: take every name from the session
+tests/schemes/test_toric_schemes.sage:156: TL02 imports the private name _character_on_overlap
+tests/schemes/test_toric_schemes.sage:156: TL02 imports the private name _face_localization
+tests/schemes/test_toric_schemes.sage:167: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:168: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:180: TL01 from sage_extensions.categories.schemes.toric.toric_schemes import ...: take every name from the session
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _affine_chart
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _character_on_overlap
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _face_localization
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _face_supporting_character_monomial
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _face_transition
+tests/schemes/test_toric_schemes.sage:187: TL01 from sage_extensions.categories.rings.ring_foundation import ...: take every name from the session
+tests/schemes/test_toric_schemes.sage:187: TL02 imports the private name _owned_integers
+tests/schemes/test_toric_schemes.sage:192: TL07 repr(): a representation, not a mathematical value
+tests/schemes/test_toric_schemes.sage:225: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:227: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:246: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:249: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:285: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:286: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:290: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:292: TL11 generators: write group_generators, module_generators or algebra_generators
+____ ERROR at setup of test_the_chart_of_the_a_one_cone_is_the_quadric_cone ____
+tests/schemes/test_toric_schemes.sage:85: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:85: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:86: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:88: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:98: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:123: TL01 from sage_extensions.categories.schemes.toric.toric_schemes import ...: take every name from the session
+tests/schemes/test_toric_schemes.sage:123: TL02 imports the private name _affine_chart
+tests/schemes/test_toric_schemes.sage:123: TL02 imports the private name _character_on_overlap
+tests/schemes/test_toric_schemes.sage:123: TL02 imports the private name _face_localization
+tests/schemes/test_toric_schemes.sage:146: TL04 try/except: expected failures are asserted with pytest.raises
+tests/schemes/test_toric_schemes.sage:149: TL07 compares a rendering: assert the mathematical object, not its display
+tests/schemes/test_toric_schemes.sage:149: TL07 str(): a representation, not a mathematical value
+tests/schemes/test_toric_schemes.sage:156: TL01 from sage_extensions.categories.schemes.toric.toric_schemes import ...: take every name from the session
+tests/schemes/test_toric_schemes.sage:156: TL02 imports the private name _character_on_overlap
+tests/schemes/test_toric_schemes.sage:156: TL02 imports the private name _face_localization
+tests/schemes/test_toric_schemes.sage:167: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:168: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:180: TL01 from sage_extensions.categories.schemes.toric.toric_schemes import ...: take every name from the session
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _affine_chart
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _character_on_overlap
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _face_localization
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _face_supporting_character_monomial
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _face_transition
+tests/schemes/test_toric_schemes.sage:187: TL01 from sage_extensions.categories.rings.ring_foundation import ...: take every name from the session
+tests/schemes/test_toric_schemes.sage:187: TL02 imports the private name _owned_integers
+tests/schemes/test_toric_schemes.sage:192: TL07 repr(): a representation, not a mathematical value
+tests/schemes/test_toric_schemes.sage:225: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:227: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:246: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:249: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:285: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:286: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:290: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:292: TL11 generators: write group_generators, module_generators or algebra_generators
+_ ERROR at setup of test_singular_rank_two_cone_coefficients_reconstruct_hilbert_generators _
+tests/schemes/test_toric_schemes.sage:85: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:85: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:86: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:88: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:98: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:123: TL01 from sage_extensions.categories.schemes.toric.toric_schemes import ...: take every name from the session
+tests/schemes/test_toric_schemes.sage:123: TL02 imports the private name _affine_chart
+tests/schemes/test_toric_schemes.sage:123: TL02 imports the private name _character_on_overlap
+tests/schemes/test_toric_schemes.sage:123: TL02 imports the private name _face_localization
+tests/schemes/test_toric_schemes.sage:146: TL04 try/except: expected failures are asserted with pytest.raises
+tests/schemes/test_toric_schemes.sage:149: TL07 compares a rendering: assert the mathematical object, not its display
+tests/schemes/test_toric_schemes.sage:149: TL07 str(): a representation, not a mathematical value
+tests/schemes/test_toric_schemes.sage:156: TL01 from sage_extensions.categories.schemes.toric.toric_schemes import ...: take every name from the session
+tests/schemes/test_toric_schemes.sage:156: TL02 imports the private name _character_on_overlap
+tests/schemes/test_toric_schemes.sage:156: TL02 imports the private name _face_localization
+tests/schemes/test_toric_schemes.sage:167: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:168: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:180: TL01 from sage_extensions.categories.schemes.toric.toric_schemes import ...: take every name from the session
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _affine_chart
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _character_on_overlap
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _face_localization
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _face_supporting_character_monomial
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _face_transition
+tests/schemes/test_toric_schemes.sage:187: TL01 from sage_extensions.categories.rings.ring_foundation import ...: take every name from the session
+tests/schemes/test_toric_schemes.sage:187: TL02 imports the private name _owned_integers
+tests/schemes/test_toric_schemes.sage:192: TL07 repr(): a representation, not a mathematical value
+tests/schemes/test_toric_schemes.sage:225: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:227: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:246: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:249: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:285: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:286: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:290: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:292: TL11 generators: write group_generators, module_generators or algebra_generators
+_ ERROR at setup of test_the_standard_identifications_are_decided_by_fan_isomorphism _
+tests/schemes/test_toric_schemes.sage:85: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:85: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:86: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:88: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:98: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:123: TL01 from sage_extensions.categories.schemes.toric.toric_schemes import ...: take every name from the session
+tests/schemes/test_toric_schemes.sage:123: TL02 imports the private name _affine_chart
+tests/schemes/test_toric_schemes.sage:123: TL02 imports the private name _character_on_overlap
+tests/schemes/test_toric_schemes.sage:123: TL02 imports the private name _face_localization
+tests/schemes/test_toric_schemes.sage:146: TL04 try/except: expected failures are asserted with pytest.raises
+tests/schemes/test_toric_schemes.sage:149: TL07 compares a rendering: assert the mathematical object, not its display
+tests/schemes/test_toric_schemes.sage:149: TL07 str(): a representation, not a mathematical value
+tests/schemes/test_toric_schemes.sage:156: TL01 from sage_extensions.categories.schemes.toric.toric_schemes import ...: take every name from the session
+tests/schemes/test_toric_schemes.sage:156: TL02 imports the private name _character_on_overlap
+tests/schemes/test_toric_schemes.sage:156: TL02 imports the private name _face_localization
+tests/schemes/test_toric_schemes.sage:167: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:168: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:180: TL01 from sage_extensions.categories.schemes.toric.toric_schemes import ...: take every name from the session
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _affine_chart
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _character_on_overlap
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _face_localization
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _face_supporting_character_monomial
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _face_transition
+tests/schemes/test_toric_schemes.sage:187: TL01 from sage_extensions.categories.rings.ring_foundation import ...: take every name from the session
+tests/schemes/test_toric_schemes.sage:187: TL02 imports the private name _owned_integers
+tests/schemes/test_toric_schemes.sage:192: TL07 repr(): a representation, not a mathematical value
+tests/schemes/test_toric_schemes.sage:225: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:227: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:246: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:249: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:285: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:286: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:290: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:292: TL11 generators: write group_generators, module_generators or algebra_generators
+____ ERROR at setup of test_the_normal_fan_of_a_polytope_uses_inner_normals ____
+tests/schemes/test_toric_schemes.sage:85: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:85: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:86: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:88: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:98: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:123: TL01 from sage_extensions.categories.schemes.toric.toric_schemes import ...: take every name from the session
+tests/schemes/test_toric_schemes.sage:123: TL02 imports the private name _affine_chart
+tests/schemes/test_toric_schemes.sage:123: TL02 imports the private name _character_on_overlap
+tests/schemes/test_toric_schemes.sage:123: TL02 imports the private name _face_localization
+tests/schemes/test_toric_schemes.sage:146: TL04 try/except: expected failures are asserted with pytest.raises
+tests/schemes/test_toric_schemes.sage:149: TL07 compares a rendering: assert the mathematical object, not its display
+tests/schemes/test_toric_schemes.sage:149: TL07 str(): a representation, not a mathematical value
+tests/schemes/test_toric_schemes.sage:156: TL01 from sage_extensions.categories.schemes.toric.toric_schemes import ...: take every name from the session
+tests/schemes/test_toric_schemes.sage:156: TL02 imports the private name _character_on_overlap
+tests/schemes/test_toric_schemes.sage:156: TL02 imports the private name _face_localization
+tests/schemes/test_toric_schemes.sage:167: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:168: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:180: TL01 from sage_extensions.categories.schemes.toric.toric_schemes import ...: take every name from the session
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _affine_chart
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _character_on_overlap
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _face_localization
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _face_supporting_character_monomial
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _face_transition
+tests/schemes/test_toric_schemes.sage:187: TL01 from sage_extensions.categories.rings.ring_foundation import ...: take every name from the session
+tests/schemes/test_toric_schemes.sage:187: TL02 imports the private name _owned_integers
+tests/schemes/test_toric_schemes.sage:192: TL07 repr(): a representation, not a mathematical value
+tests/schemes/test_toric_schemes.sage:225: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:227: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:246: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:249: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:285: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:286: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:290: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:292: TL11 generators: write group_generators, module_generators or algebra_generators
+_ ERROR at setup of test_the_toric_variety_of_the_standard_triangle_is_the_projective_plane _
+tests/schemes/test_toric_schemes.sage:85: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:85: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:86: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:88: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:98: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:123: TL01 from sage_extensions.categories.schemes.toric.toric_schemes import ...: take every name from the session
+tests/schemes/test_toric_schemes.sage:123: TL02 imports the private name _affine_chart
+tests/schemes/test_toric_schemes.sage:123: TL02 imports the private name _character_on_overlap
+tests/schemes/test_toric_schemes.sage:123: TL02 imports the private name _face_localization
+tests/schemes/test_toric_schemes.sage:146: TL04 try/except: expected failures are asserted with pytest.raises
+tests/schemes/test_toric_schemes.sage:149: TL07 compares a rendering: assert the mathematical object, not its display
+tests/schemes/test_toric_schemes.sage:149: TL07 str(): a representation, not a mathematical value
+tests/schemes/test_toric_schemes.sage:156: TL01 from sage_extensions.categories.schemes.toric.toric_schemes import ...: take every name from the session
+tests/schemes/test_toric_schemes.sage:156: TL02 imports the private name _character_on_overlap
+tests/schemes/test_toric_schemes.sage:156: TL02 imports the private name _face_localization
+tests/schemes/test_toric_schemes.sage:167: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:168: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:180: TL01 from sage_extensions.categories.schemes.toric.toric_schemes import ...: take every name from the session
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _affine_chart
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _character_on_overlap
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _face_localization
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _face_supporting_character_monomial
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _face_transition
+tests/schemes/test_toric_schemes.sage:187: TL01 from sage_extensions.categories.rings.ring_foundation import ...: take every name from the session
+tests/schemes/test_toric_schemes.sage:187: TL02 imports the private name _owned_integers
+tests/schemes/test_toric_schemes.sage:192: TL07 repr(): a representation, not a mathematical value
+tests/schemes/test_toric_schemes.sage:225: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:227: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:246: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:249: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:285: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:286: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:290: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:292: TL11 generators: write group_generators, module_generators or algebra_generators
+_ ERROR at setup of test_a_nonidentity_toric_morphism_retains_its_chart_pullback _
+tests/schemes/test_toric_schemes.sage:85: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:85: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:86: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:88: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:98: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:123: TL01 from sage_extensions.categories.schemes.toric.toric_schemes import ...: take every name from the session
+tests/schemes/test_toric_schemes.sage:123: TL02 imports the private name _affine_chart
+tests/schemes/test_toric_schemes.sage:123: TL02 imports the private name _character_on_overlap
+tests/schemes/test_toric_schemes.sage:123: TL02 imports the private name _face_localization
+tests/schemes/test_toric_schemes.sage:146: TL04 try/except: expected failures are asserted with pytest.raises
+tests/schemes/test_toric_schemes.sage:149: TL07 compares a rendering: assert the mathematical object, not its display
+tests/schemes/test_toric_schemes.sage:149: TL07 str(): a representation, not a mathematical value
+tests/schemes/test_toric_schemes.sage:156: TL01 from sage_extensions.categories.schemes.toric.toric_schemes import ...: take every name from the session
+tests/schemes/test_toric_schemes.sage:156: TL02 imports the private name _character_on_overlap
+tests/schemes/test_toric_schemes.sage:156: TL02 imports the private name _face_localization
+tests/schemes/test_toric_schemes.sage:167: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:168: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:180: TL01 from sage_extensions.categories.schemes.toric.toric_schemes import ...: take every name from the session
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _affine_chart
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _character_on_overlap
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _face_localization
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _face_supporting_character_monomial
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _face_transition
+tests/schemes/test_toric_schemes.sage:187: TL01 from sage_extensions.categories.rings.ring_foundation import ...: take every name from the session
+tests/schemes/test_toric_schemes.sage:187: TL02 imports the private name _owned_integers
+tests/schemes/test_toric_schemes.sage:192: TL07 repr(): a representation, not a mathematical value
+tests/schemes/test_toric_schemes.sage:225: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:227: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:246: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:249: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:285: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:286: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:290: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:292: TL11 generators: write group_generators, module_generators or algebra_generators
+_ ERROR at setup of test_an_incompatible_lattice_map_is_refused_rather_than_forced _
+tests/schemes/test_toric_schemes.sage:85: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:85: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:86: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:88: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:98: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:123: TL01 from sage_extensions.categories.schemes.toric.toric_schemes import ...: take every name from the session
+tests/schemes/test_toric_schemes.sage:123: TL02 imports the private name _affine_chart
+tests/schemes/test_toric_schemes.sage:123: TL02 imports the private name _character_on_overlap
+tests/schemes/test_toric_schemes.sage:123: TL02 imports the private name _face_localization
+tests/schemes/test_toric_schemes.sage:146: TL04 try/except: expected failures are asserted with pytest.raises
+tests/schemes/test_toric_schemes.sage:149: TL07 compares a rendering: assert the mathematical object, not its display
+tests/schemes/test_toric_schemes.sage:149: TL07 str(): a representation, not a mathematical value
+tests/schemes/test_toric_schemes.sage:156: TL01 from sage_extensions.categories.schemes.toric.toric_schemes import ...: take every name from the session
+tests/schemes/test_toric_schemes.sage:156: TL02 imports the private name _character_on_overlap
+tests/schemes/test_toric_schemes.sage:156: TL02 imports the private name _face_localization
+tests/schemes/test_toric_schemes.sage:167: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:168: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:180: TL01 from sage_extensions.categories.schemes.toric.toric_schemes import ...: take every name from the session
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _affine_chart
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _character_on_overlap
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _face_localization
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _face_supporting_character_monomial
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _face_transition
+tests/schemes/test_toric_schemes.sage:187: TL01 from sage_extensions.categories.rings.ring_foundation import ...: take every name from the session
+tests/schemes/test_toric_schemes.sage:187: TL02 imports the private name _owned_integers
+tests/schemes/test_toric_schemes.sage:192: TL07 repr(): a representation, not a mathematical value
+tests/schemes/test_toric_schemes.sage:225: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:227: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:246: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:249: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:285: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:286: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:290: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:292: TL11 generators: write group_generators, module_generators or algebra_generators
+=================================== FAILURES ===================================
+____________ test_the_origin_on_both_charts_is_two_rational_points _____________
+
+    def test_the_origin_on_both_charts_is_two_rational_points() -> None:
+        r"""``V(x)`` on both charts glues to the two origins: a closed subscheme of ``X`` of dimension 0 and degree 2."""
+        _ring, x, line, doubled = _doubled_origin()
+        origin = line.closed_subscheme(x)
+>       origins = doubled.chartwise_closed_subscheme((origin, origin))
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/schemes/test_glued_morphisms_and_closed_subschemes.sage:53: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/schemes/schemes.py:3887: in chartwise_closed_subscheme
+    return self._scheme_engine_realization.chartwise_closed_subscheme(
+src/sage_extensions/categories/schemes/gluing.py:727: in chartwise_closed_subscheme
+    return _chartwise_closed_subscheme(
+src/sage_extensions/categories/schemes/gluing.py:7677: in _chartwise_closed_subscheme
+    return _glued_chartwise_subscheme(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+datum = Two-chart scheme gluing datum for Spectrum of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fra...ing and Spectrum of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring
+local_closed = Affine pieces of Chartwise closed subscheme: [0 ↦ Closed subscheme of Spectrum of Free module on Coproduct of the fami...um of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring defined by x]
+placements = (Category of closed embeddings into Scheme over Fraction Field of Integer Ring glued from the affine charts Scheme glu.....} over Fraction Field of Integer Ring], Category of closed subschemes of schemes over Fraction Field of Integer Ring)
+_engine = None, construction_data = None
+
+    def _glued_chartwise_subscheme(
+        datum,
+        local_closed,
+        placements,
+        *,
+        _engine=None,
+        construction_data=None,
+    ):
+        r"""Glue closed subschemes ``Z_i <= U_i`` that agree through the atlas transitions.
+    
+        ``Z_i cap U_ij`` is the distinguished open of ``Z_i`` cut out by the
+        restriction of the overlap's defining element, and the transition of the
+        glued scheme, restricted to it, lands in ``Z_j cap U_ji``.  Those
+        restrictions are the gluing transitions of the ``Z_i``, and the inclusions
+        ``Z_i -> U_i -> X`` are the local maps of the inclusion of the glued
+        subscheme into ``X``.
+        """
+    
+        def local_overlap(source_index, target_index):
+            closed = local_closed[source_index]
+            element = datum.overlap(source_index, target_index).distinguished_open_element()
+            return closed.distinguished_open(
+                closed.inclusion().coordinate_algebra_morphism()(element)
+            )
+    
+        def local_transition(source_index, target_index):
+            source = local_overlap(source_index, target_index)
+            target = local_overlap(target_index, source_index)
+            into_source_chart = local_closed[source_index].inclusion() * source.inclusion()
+            into_source_overlap = datum.overlap(source_index, target_index).corestriction(
+                into_source_chart
+            )
+            across = (
+                datum.transition_between(source_index, target_index).forward()
+                * into_source_overlap
+            )
+            into_target_chart = (
+                datum.overlap(target_index, source_index).inclusion() * across
+            )
+            into_target_closed = local_closed[target_index].corestriction(into_target_chart)
+            return target.corestriction(into_target_closed)
+    
+        schemes = Schemes(datum.base_ring())
+        transitions = {}
+>       for left, right in datum.transition_index_set():
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: '_TwoChartSchemeGluingDatum' object has no attribute 'transition_index_set'
+
+src/sage_extensions/categories/schemes/gluing.py:8089: AttributeError
+_______________ test_a_point_away_from_the_origin_is_not_doubled _______________
+
+    def test_a_point_away_from_the_origin_is_not_doubled() -> None:
+        r"""``V(x - 1)`` on both charts is one rational point: ``x = 1`` lies in the identified overlap."""
+        ring, x, line, doubled = _doubled_origin()
+        one = line.closed_subscheme(x - ring.one())
+>       point = doubled.chartwise_closed_subscheme((one, one))
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/schemes/test_glued_morphisms_and_closed_subschemes.sage:64: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/schemes/schemes.py:3887: in chartwise_closed_subscheme
+    return self._scheme_engine_realization.chartwise_closed_subscheme(
+src/sage_extensions/categories/schemes/gluing.py:727: in chartwise_closed_subscheme
+    return _chartwise_closed_subscheme(
+src/sage_extensions/categories/schemes/gluing.py:7677: in _chartwise_closed_subscheme
+    return _glued_chartwise_subscheme(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+datum = Two-chart scheme gluing datum for Spectrum of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fra...ing and Spectrum of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring
+local_closed = Affine pieces of Chartwise closed subscheme: [0 ↦ Closed subscheme of Spectrum of Free module on Coproduct of the fami...f Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring defined by x - 1]
+placements = (Category of closed embeddings into Scheme over Fraction Field of Integer Ring glued from the affine charts Scheme glu.....} over Fraction Field of Integer Ring], Category of closed subschemes of schemes over Fraction Field of Integer Ring)
+_engine = None, construction_data = None
+
+    def _glued_chartwise_subscheme(
+        datum,
+        local_closed,
+        placements,
+        *,
+        _engine=None,
+        construction_data=None,
+    ):
+        r"""Glue closed subschemes ``Z_i <= U_i`` that agree through the atlas transitions.
+    
+        ``Z_i cap U_ij`` is the distinguished open of ``Z_i`` cut out by the
+        restriction of the overlap's defining element, and the transition of the
+        glued scheme, restricted to it, lands in ``Z_j cap U_ji``.  Those
+        restrictions are the gluing transitions of the ``Z_i``, and the inclusions
+        ``Z_i -> U_i -> X`` are the local maps of the inclusion of the glued
+        subscheme into ``X``.
+        """
+    
+        def local_overlap(source_index, target_index):
+            closed = local_closed[source_index]
+            element = datum.overlap(source_index, target_index).distinguished_open_element()
+            return closed.distinguished_open(
+                closed.inclusion().coordinate_algebra_morphism()(element)
+            )
+    
+        def local_transition(source_index, target_index):
+            source = local_overlap(source_index, target_index)
+            target = local_overlap(target_index, source_index)
+            into_source_chart = local_closed[source_index].inclusion() * source.inclusion()
+            into_source_overlap = datum.overlap(source_index, target_index).corestriction(
+                into_source_chart
+            )
+            across = (
+                datum.transition_between(source_index, target_index).forward()
+                * into_source_overlap
+            )
+            into_target_chart = (
+                datum.overlap(target_index, source_index).inclusion() * across
+            )
+            into_target_closed = local_closed[target_index].corestriction(into_target_chart)
+            return target.corestriction(into_target_closed)
+    
+        schemes = Schemes(datum.base_ring())
+        transitions = {}
+>       for left, right in datum.transition_index_set():
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: '_TwoChartSchemeGluingDatum' object has no attribute 'transition_index_set'
+
+src/sage_extensions/categories/schemes/gluing.py:8089: AttributeError
+___ test_the_fixed_locus_of_negation_on_the_doubled_line_is_the_two_origins ____
+
+    def test_the_fixed_locus_of_negation_on_the_doubled_line_is_the_two_origins() -> None:
+        r"""``x -> -x`` on both charts fixes exactly ``V(x)`` on each: the two origins, of degree 2."""
+        ring, x, line, doubled = _doubled_origin()
+        negation = line.Mor(line)(ring.Mor(ring)({"x": -x}))
+>       fixed = doubled.chartwise_fixed_subscheme((negation, negation))
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/schemes/test_glued_morphisms_and_closed_subschemes.sage:74: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/schemes/schemes.py:3900: in chartwise_fixed_subscheme
+    return self._scheme_engine_realization.chartwise_fixed_subscheme(
+src/sage_extensions/categories/schemes/gluing.py:737: in chartwise_fixed_subscheme
+    return _chartwise_fixed_subscheme(self.gluing_datum(), local_automorphisms)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/schemes/gluing.py:8038: in _chartwise_fixed_subscheme
+    return _glued_chartwise_subscheme(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+datum = Two-chart scheme gluing datum for Spectrum of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fra...ing and Spectrum of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring
+local_closed = Affine charts of the glued fixed subscheme: [0 ↦ Closed subscheme of Spectrum of Free module on Coproduct of the famil...of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring defined by -2*x]
+placements = (Category of closed embeddings into Scheme over Fraction Field of Integer Ring glued from the affine charts Scheme glu.....} over Fraction Field of Integer Ring], Category of closed subschemes of schemes over Fraction Field of Integer Ring)
+_engine = None, construction_data = None
+
+    def _glued_chartwise_subscheme(
+        datum,
+        local_closed,
+        placements,
+        *,
+        _engine=None,
+        construction_data=None,
+    ):
+        r"""Glue closed subschemes ``Z_i <= U_i`` that agree through the atlas transitions.
+    
+        ``Z_i cap U_ij`` is the distinguished open of ``Z_i`` cut out by the
+        restriction of the overlap's defining element, and the transition of the
+        glued scheme, restricted to it, lands in ``Z_j cap U_ji``.  Those
+        restrictions are the gluing transitions of the ``Z_i``, and the inclusions
+        ``Z_i -> U_i -> X`` are the local maps of the inclusion of the glued
+        subscheme into ``X``.
+        """
+    
+        def local_overlap(source_index, target_index):
+            closed = local_closed[source_index]
+            element = datum.overlap(source_index, target_index).distinguished_open_element()
+            return closed.distinguished_open(
+                closed.inclusion().coordinate_algebra_morphism()(element)
+            )
+    
+        def local_transition(source_index, target_index):
+            source = local_overlap(source_index, target_index)
+            target = local_overlap(target_index, source_index)
+            into_source_chart = local_closed[source_index].inclusion() * source.inclusion()
+            into_source_overlap = datum.overlap(source_index, target_index).corestriction(
+                into_source_chart
+            )
+            across = (
+                datum.transition_between(source_index, target_index).forward()
+                * into_source_overlap
+            )
+            into_target_chart = (
+                datum.overlap(target_index, source_index).inclusion() * across
+            )
+            into_target_closed = local_closed[target_index].corestriction(into_target_chart)
+            return target.corestriction(into_target_closed)
+    
+        schemes = Schemes(datum.base_ring())
+        transitions = {}
+>       for left, right in datum.transition_index_set():
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: '_TwoChartSchemeGluingDatum' object has no attribute 'transition_index_set'
+
+src/sage_extensions/categories/schemes/gluing.py:8089: AttributeError
+_____ test_the_line_with_a_tripled_origin_satisfies_the_cocycle_condition ______
+
+    def test_the_line_with_a_tripled_origin_satisfies_the_cocycle_condition() -> None:
+        r"""Three lines glued pairwise by the identity of ``D(x)``: the cocycle holds on ``D(x)``.
+    
+        The triple overlap ``U_01 cap U_02`` is ``D(x)`` and ``phi_12 o phi_01 = phi_02`` there.
+        The three open immersions are pairwise distinct, and the identity on every chart
+        glues to a fold onto the line.
+        """
+        _ring, line, punctured = _line_and_punctured_line()
+        gluing = _identity_gluing(punctured)
+        tripled = Schemes(QQ).glue_affine_atlas((line, line, line), (gluing, gluing, gluing))
+        atlas = tripled.gluing_datum()
+        identity = line.Mor(line).identity()
+        fold = tripled.Mor(line)((identity, identity, identity))
+    
+>       assert atlas.triple_overlap(0, 1, 2) is punctured
+E       assert Spectrum of Localization of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Int...erated by (x^2,) in Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring is Spectrum of Localization of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Int...enerated by (x,) in Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring
+E        +  where Spectrum of Localization of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Int...erated by (x^2,) in Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring = triple_overlap(0, 1, 2)
+E        +    where triple_overlap = Finite affine scheme gluing datum indexed by {0, 1, 2}.triple_overlap
+E        +    and   0 = Integer(0)
+E        +    and   1 = Integer(1)
+E        +    and   2 = Integer(2)
+
+tests/schemes/test_glued_finite_affine_atlases.sage:48: AssertionError
+__ test_global_functions_on_the_line_with_doubled_origin_are_the_polynomials ___
+
+    def test_global_functions_on_the_line_with_doubled_origin_are_the_polynomials() -> None:
+        r"""``Gamma(X, O) = {(f, g) in QQ[x]^2 : f = g in QQ[x, 1/x]} = QQ[x]``: restriction to a chart is bijective."""
+        _ring, line, punctured = _line_and_punctured_line()
+        doubled = Schemes(QQ).glue_affine_atlas((line, line), (_identity_gluing(punctured),))
+        atlas = doubled.finite_affine_atlas()
+    
+>       assert atlas.global_function_restriction(0).is_bijective()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/schemes/test_glued_finite_affine_atlases.sage:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/structure/element.pyx:494: in sage.structure.element.Element.__getattr__
+    ???
+sage/structure/element.pyx:507: in sage.structure.element.Element.getattr_from_category
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: 'OwnedUnitalMultiplicativeAlgebraMor_with_category_with_category.ArrowType' object has no attribute 'is_bijective'. Did you mean: 'is_injective'?
+
+sage/cpython/getattr.pyx:362: AttributeError
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Localization of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring at Submonoid generated by (x,) in Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:833 Elementwise module morphism Module over Localization of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring at Submonoid generated by (x,) in Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring on Classes in the multilinear tensor presentation -> Module over Localization of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring at Submonoid generated by (x,) in Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring on Localization of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring at Submonoid generated by (x,) in Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:833 Elementwise module morphism Module over Fraction Field of Integer Ring on Classes in the multilinear tensor presentation -> Module over Fraction Field of Integer Ring on Subset of Module over Fraction Field of Integer Ring on Product of the family over {0, 1} cut out by <function Sets.SubcategoryMethods._categorical_equalizer_construction.<locals>.<lambda> at 0x75a32444f3d0> accepted without exhaustive linearity verification; the source is not represented as finite
+_____ test_global_functions_on_the_glued_projective_line_are_the_constants _____
+
+    def test_global_functions_on_the_glued_projective_line_are_the_constants() -> None:
+        r"""``Gamma(P^1, O) = QQ[x] cap QQ[1/x] = QQ``, of rank one over ``QQ``."""
+        ring, line, punctured = _line_and_punctured_line()
+        projective = Schemes(QQ).glue_affine_atlas((line, line), (_reciprocal_gluing(ring, punctured),))
+    
+>       assert projective.finite_affine_atlas().global_function_algebra().module_rank() == 1
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/schemes/test_glued_finite_affine_atlases.sage:88: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Module over Fraction Field of Integer Ring on Module over Fraction Field of Integer Ring on Subset of Module over Frac...} cut out by <function Sets.SubcategoryMethods._categorical_equalizer_construction.<locals>.<lambda> at 0x75a324324d50>
+
+    def module_rank(self):
+        r"""Return ``rank_R(M)`` (Mathlib ``Module.rank``), a cardinal.
+    
+        Over a field ``k`` the rank is the dimension: the cardinality of a
+        basis.  A basis of cardinality ``n`` identifies ``M`` with ``k^n``
+        as a set, so when ``k`` and ``M`` are finite, ``|M| = |k|^n`` and
+        ``n`` is the exact logarithm of ``|M|`` to the base ``|k|``.  A
+        more specific category with a chosen basis or presentation answers
+        from that datum; any other module answers through
+        ``_rank_decision``.
+        """
+        ring = self.base_ring()
+        match self:
+            case _ if (
+                ring in OwnedFields()
+                and ring.is_finite() is True
+                and self.is_finite() is True
+            ):
+                return cardinal(
+                    SageZZ(int(self.cardinality())).exact_log(
+                        int(ring.cardinality())
+                    )
+                )
+            case _:
+                decided = self._rank_decision()
+>               assert decided is not None, (
+                       ^^^^^^^^^^^^^^^^^^^
+                    f"the rank of {self} over {ring} is computed over a finite field for a finite "
+                    f"module, or from a chosen basis or presentation, and {self} supplies none of these"
+                )
+E               AssertionError: the rank of Module over Fraction Field of Integer Ring on Module over Fraction Field of Integer Ring on Subset of Module over Fraction Field of Integer Ring on Product of the family over {0, 1} cut out by <function Sets.SubcategoryMethods._categorical_equalizer_construction.<locals>.<lambda> at 0x75a324324d50> over Fraction Field of Integer Ring is computed over a finite field for a finite module, or from a chosen basis or presentation, and Module over Fraction Field of Integer Ring on Module over Fraction Field of Integer Ring on Subset of Module over Fraction Field of Integer Ring on Product of the family over {0, 1} cut out by <function Sets.SubcategoryMethods._categorical_equalizer_construction.<locals>.<lambda> at 0x75a324324d50> supplies none of these
+
+src/sage_extensions/categories/modules/pure/modules.py:2546: AssertionError
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:833 Elementwise module morphism Module over Fraction Field of Integer Ring on Classes in the multilinear tensor presentation -> Module over Fraction Field of Integer Ring on Subset of Module over Fraction Field of Integer Ring on Product of the family over {0, 1} cut out by <function Sets.SubcategoryMethods._categorical_equalizer_construction.<locals>.<lambda> at 0x75a324324d50> accepted without exhaustive linearity verification; the source is not represented as finite
+______ test_the_projective_plane_is_glued_from_its_three_standard_charts _______
+
+    def test_the_projective_plane_is_glued_from_its_three_standard_charts() -> None:
+        r"""``P^2 = U_0 cup U_1 cup U_2`` with ``U_i = D_+(x_i)``: three charts, and the gluing is ``P^2``."""
+        plane = ProjectiveSpaces(QQ)(2)
+        glued = plane.glued_from_standard_charts()
+    
+        assert glued.gluing_datum().transition_index_set().cardinality() == 3
+>       assert glued.is_isomorphic(plane)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/schemes/test_glued_finite_affine_atlases.sage:97: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = is_isomorphic(Scheme over Fraction Field of Integer Ring glued from the affine charts Affine charts of a finite scheme..., 1, 2, ...} over Fraction Field of Integer Ring], Projective Space of dimension 2 over Fraction Field of Integer Ring)
+
+    def __bool__(self):
+>       raise TypeError(f"the proposition {self} has no Python truth value, because it may be undecided; call ask(...) on it to get True, False or Unknown")
+E       TypeError: the proposition is_isomorphic(Scheme over Fraction Field of Integer Ring glued from the affine charts Affine charts of a finite scheme gluing: [0 ↦ Spectrum of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring, 1 ↦ Spectrum of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring, 2 ↦ Spectrum of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring], Projective Space of dimension 2 over Fraction Field of Integer Ring) has no Python truth value, because it may be undecided; call ask(...) on it to get True, False or Unknown
+
+src/sage_extensions/logic.py:44: TypeError
+____ test_relative_spec_of_the_glued_polynomial_algebra_is_the_affine_plane ____
+
+    def test_relative_spec_of_the_glued_polynomial_algebra_is_the_affine_plane() -> None:
+        r"""Gluing `\mathcal{O}[z]` on `D(x) \cup D(1-x)` gives `\mathcal{O}_{\mathbb{A}^1}[z]`,
+        whose relative Spec is `\mathbb{A}^2 \to \mathbb{A}^1`, of relative dimension 1."""
+        ring = QQ.polynomial_ring("x")
+        x = ring.algebra_generator("x")
+        line = ring.affine_spectrum()
+        cover = line.distinguished_open_cover(x, 1 - x)
+    
+>       relative = _glued_polynomial_algebra(cover, "z").relative_spectrum()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/schemes/test_relative_spec_general.sage:22: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/schemes/test_relative_spec_general.sage:11: in _glued_polynomial_algebra
+    return cover.glue_algebras(local_algebras, {(0, 1): transition})
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/schemes/ringed_spaces.py:1519: in glue_algebras
+    return AlgebraGluingData(self)(local_algebras, transitions).sheaf()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/schemes/gluing.py:6209: in object
+    return _object_of(
+src/sage_extensions/owned_category.py:1675: in _object_of
+    return implementation(
+sage/misc/classcall_metaclass.pyx:331: in sage.misc.classcall_metaclass.ClasscallMetaclass.__call__
+    ???
+src/sage_extensions/categories/schemes/gluing.py:6243: in __init__
+    self._verify_pairwise_transitions()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Algebra gluing datum on Distinguished affine cover of Spectrum of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring by 2 opens
+
+    def _verify_pairwise_transitions(self) -> None:
+        for pair in self._transitions.index_set():
+            left, right = pair
+            transition = self._transitions[pair]
+            source = self.restricted_algebra(left, left, right)
+            target = self.restricted_algebra(right, left, right)
+            core = (
+                Algebras(source.algebra_base_ring()).Associative().Unital().Core()
+            )
+            if transition not in core.Mor(source, target):
+>               raise TypeError(
+                    f"cannot glue along {transition} on the overlap of charts {left} and {right}: it must be "
+                    f"an isomorphism of algebras {source} -> {target} between the restrictions of the two "
+                    "local algebras to the overlap"
+                )
+E               TypeError: cannot glue along Generic morphism:
+E                 From: Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Localization of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring at Submonoid generated by (-x^2 + x,) in Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring
+E                 To:   Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Localization of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring at Submonoid generated by (-x^2 + x,) in Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring on the overlap of charts 0 and 1: it must be an isomorphism of algebras Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Localization of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring at Submonoid generated by (-x^2 + x,) in Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring -> Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Localization of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring at Submonoid generated by (-x^2 + x,) in Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring between the restrictions of the two local algebras to the overlap
+
+src/sage_extensions/categories/schemes/gluing.py:6320: TypeError
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Localization of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring at Submonoid generated by (-x^2 + x,) in Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:833 Elementwise module morphism Module over Localization of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring at Submonoid generated by (-x^2 + x,) in Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring on Classes in the multilinear tensor presentation -> Module over Localization of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring at Submonoid generated by (-x^2 + x,) in Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring on Localization of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring at Submonoid generated by (-x^2 + x,) in Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+____ test_relative_spec_sends_z_to_w_squared_to_a_finite_map_of_degree_two _____
+
+    def test_relative_spec_sends_z_to_w_squared_to_a_finite_map_of_degree_two() -> None:
+        r"""The algebra map `\mathcal{O}[z] \to \mathcal{O}[w]`, `z \mapsto w^2`, induces
+        `\mathbb{A}^1_X \to \mathbb{A}^1_X`, `w \mapsto w^2`, finite of degree 2 over `X`."""
+        ring = QQ.polynomial_ring("x")
+        x = ring.algebra_generator("x")
+        line = ring.affine_spectrum()
+        cover = line.distinguished_open_cover(x, 1 - x)
+>       source = _glued_polynomial_algebra(cover, "z")
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/schemes/test_relative_spec_general.sage:36: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/schemes/test_relative_spec_general.sage:11: in _glued_polynomial_algebra
+    return cover.glue_algebras(local_algebras, {(0, 1): transition})
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/schemes/ringed_spaces.py:1519: in glue_algebras
+    return AlgebraGluingData(self)(local_algebras, transitions).sheaf()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/schemes/gluing.py:6209: in object
+    return _object_of(
+src/sage_extensions/owned_category.py:1675: in _object_of
+    return implementation(
+sage/misc/classcall_metaclass.pyx:331: in sage.misc.classcall_metaclass.ClasscallMetaclass.__call__
+    ???
+src/sage_extensions/categories/schemes/gluing.py:6243: in __init__
+    self._verify_pairwise_transitions()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Algebra gluing datum on Distinguished affine cover of Spectrum of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring by 2 opens
+
+    def _verify_pairwise_transitions(self) -> None:
+        for pair in self._transitions.index_set():
+            left, right = pair
+            transition = self._transitions[pair]
+            source = self.restricted_algebra(left, left, right)
+            target = self.restricted_algebra(right, left, right)
+            core = (
+                Algebras(source.algebra_base_ring()).Associative().Unital().Core()
+            )
+            if transition not in core.Mor(source, target):
+>               raise TypeError(
+                    f"cannot glue along {transition} on the overlap of charts {left} and {right}: it must be "
+                    f"an isomorphism of algebras {source} -> {target} between the restrictions of the two "
+                    "local algebras to the overlap"
+                )
+E               TypeError: cannot glue along Generic morphism:
+E                 From: Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Localization of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring at Submonoid generated by (-x^2 + x,) in Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring
+E                 To:   Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Localization of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring at Submonoid generated by (-x^2 + x,) in Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring on the overlap of charts 0 and 1: it must be an isomorphism of algebras Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Localization of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring at Submonoid generated by (-x^2 + x,) in Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring -> Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Localization of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring at Submonoid generated by (-x^2 + x,) in Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring between the restrictions of the two local algebras to the overlap
+
+src/sage_extensions/categories/schemes/gluing.py:6320: TypeError
+_ test_the_direct_image_of_the_structure_sheaf_is_the_ring_upstairs_over_the_ring_downstairs _
+
+    def test_the_direct_image_of_the_structure_sheaf_is_the_ring_upstairs_over_the_ring_downstairs() -> None:
+        r"""``Gamma(f_* O) = Q[s]`` as a ``Q[x]``-module, which is free of rank 2."""
+        x_ring, s_ring, target, source, squaring = _squaring()
+        structure = QuasiCoherentSheaves(source).associated_sheaf(s_ring.free_module(1))
+    
+        pushed = squaring.direct_image(structure)
+    
+        assert pushed in QuasiCoherentSheaves(target)
+        assert QuasiCoherentSheaves(target).global_sections(pushed).base_ring() == x_ring
+>       assert QuasiCoherentSheaves(target).global_sections(pushed).module_rank() == 2
+E       assert Unknown == 2
+E        +  where Unknown = module_rank()
+E        +    where module_rank = Free module on {[0]} over Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integ...nteger Ring\n  To:   Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring.module_rank
+E        +      where Free module on {[0]} over Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integ...nteger Ring\n  To:   Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring = global_sections(Affine module sheaf associated to Free module on {[0]} over Free module on Coproduct of the family over NN = {0, 1, 2,...Ring on Spectrum of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring)
+E        +        where global_sections = Category of quasi-coherent sheaves on Spectrum of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring.global_sections
+E        +          where Category of quasi-coherent sheaves on Spectrum of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring = QuasiCoherentSheaves(Spectrum of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring)
+E        +  and   2 = Integer(2)
+
+tests/schemes/test_affine_pullback_and_direct_image.sage:39: AssertionError
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:833 Elementwise module morphism Module over Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring on Classes in the multilinear tensor presentation -> Module over Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring on Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+______________ test_the_line_with_doubled_origin_is_not_separated ______________
+
+>   return self._cached_methods[name]
+E   KeyError: 'is_separated'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_the_line_with_doubled_origin_is_not_separated() -> None:
+        r"""Example II.4.0.1: the diagonal of ``X`` is not closed, so ``X`` is not separated."""
+        _line, _punctured, doubled = _doubled_origin()
+    
+>       assert not doubled.is_separated()
+                   ^^^^^^^^^^^^^^^^^^^^
+
+tests/schemes/test_glued_line_with_doubled_origin.sage:69: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    ???
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: 'Schemes.parent_class' object has no attribute 'is_separated'
+
+sage/cpython/getattr.pyx:357: AttributeError
+_______ test_the_line_with_doubled_origin_is_a_curve_that_is_not_affine ________
+
+    def test_the_line_with_doubled_origin_is_a_curve_that_is_not_affine() -> None:
+        r"""``X`` has dimension 1, and it is not affine: an affine scheme is separated."""
+        _line, _punctured, doubled = _doubled_origin()
+    
+        assert doubled.dimension() == 1
+>       assert not doubled.is_affine()
+               ^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/schemes/test_glued_line_with_doubled_origin.sage:77: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = is_affine(Scheme over Fraction Field of Integer Ring glued from the affine charts Scheme gluing charts: [0 ↦ Spectrum ..., 1 ↦ Spectrum of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring])
+
+    def __bool__(self):
+>       raise TypeError(f"the proposition {self} has no Python truth value, because it may be undecided; call ask(...) on it to get True, False or Unknown")
+E       TypeError: the proposition is_affine(Scheme over Fraction Field of Integer Ring glued from the affine charts Scheme gluing charts: [0 ↦ Spectrum of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring, 1 ↦ Spectrum of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring]) has no Python truth value, because it may be undecided; call ask(...) on it to get True, False or Unknown
+
+src/sage_extensions/logic.py:44: TypeError
+====================== test lint: 35 findings in 2 files =======================
+tests/schemes/test_affine_schemes.sage:4: TL01 from sage_extensions.categories.algebras.algebras import ...: take every name from the session
+tests/schemes/test_toric_schemes.sage:85: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:85: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:86: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:88: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:98: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:123: TL01 from sage_extensions.categories.schemes.toric.toric_schemes import ...: take every name from the session
+tests/schemes/test_toric_schemes.sage:123: TL02 imports the private name _affine_chart
+tests/schemes/test_toric_schemes.sage:123: TL02 imports the private name _character_on_overlap
+tests/schemes/test_toric_schemes.sage:123: TL02 imports the private name _face_localization
+tests/schemes/test_toric_schemes.sage:146: TL04 try/except: expected failures are asserted with pytest.raises
+tests/schemes/test_toric_schemes.sage:149: TL07 compares a rendering: assert the mathematical object, not its display
+tests/schemes/test_toric_schemes.sage:149: TL07 str(): a representation, not a mathematical value
+tests/schemes/test_toric_schemes.sage:156: TL01 from sage_extensions.categories.schemes.toric.toric_schemes import ...: take every name from the session
+tests/schemes/test_toric_schemes.sage:156: TL02 imports the private name _character_on_overlap
+tests/schemes/test_toric_schemes.sage:156: TL02 imports the private name _face_localization
+tests/schemes/test_toric_schemes.sage:167: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:168: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:180: TL01 from sage_extensions.categories.schemes.toric.toric_schemes import ...: take every name from the session
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _affine_chart
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _character_on_overlap
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _face_localization
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _face_supporting_character_monomial
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _face_transition
+tests/schemes/test_toric_schemes.sage:187: TL01 from sage_extensions.categories.rings.ring_foundation import ...: take every name from the session
+tests/schemes/test_toric_schemes.sage:187: TL02 imports the private name _owned_integers
+tests/schemes/test_toric_schemes.sage:192: TL07 repr(): a representation, not a mathematical value
+tests/schemes/test_toric_schemes.sage:225: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:227: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:246: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:249: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:285: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:286: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:290: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:292: TL11 generators: write group_generators, module_generators or algebra_generators
+=============================== time-gate report ===============================
+collection took 9.60 s; the measured ceiling is 6 s
+============================== slowest durations ===============================
+1.26s call     tests/schemes/test_glued_finite_affine_atlases.sage::test_global_functions_on_the_line_with_doubled_origin_are_the_polynomials
+1.24s call     tests/schemes/test_glued_finite_affine_atlases.sage::test_the_projective_plane_is_glued_from_its_three_standard_charts
+0.76s call     tests/schemes/test_relative_spec_general.sage::test_relative_spec_of_the_glued_polynomial_algebra_is_the_affine_plane
+0.46s call     tests/schemes/test_projective_standard_charts.sage::test_the_projective_line_transition_inverts_the_ratio
+0.42s call     tests/schemes/test_glued_finite_affine_atlases.sage::test_global_functions_on_the_glued_projective_line_are_the_constants
+0.41s call     tests/schemes/test_glued_morphisms_and_closed_subschemes.sage::test_the_identity_of_the_doubled_line_is_the_identity_on_each_chart
+0.39s call     tests/schemes/test_glued_projective_line_from_two_lines.sage::test_the_chart_at_infinity_is_the_chart_at_zero_through_x_to_one_over_x
+0.23s call     tests/schemes/test_glued_projective_line_from_two_lines.sage::test_x_to_one_over_x_is_an_involution_of_the_punctured_line
+0.19s call     tests/schemes/test_glued_projective_line_from_two_lines.sage::test_constant_maps_glue_to_a_map_from_the_projective_line_to_the_affine_line
+0.18s call     tests/schemes/test_glued_projective_line_from_two_lines.sage::test_the_glued_projective_line_is_the_projective_line
+0.17s call     tests/schemes/test_glued_projective_line_from_two_lines.sage::test_the_two_charts_of_the_projective_line_agree_through_the_gluing
+0.16s call     tests/schemes/test_affine_pullback_and_direct_image.sage::test_pullback_is_left_adjoint_to_direct_image
+0.13s call     tests/schemes/test_glued_projective_line_from_two_lines.sage::test_the_glued_projective_line_is_proper_and_not_affine
+0.13s call     tests/schemes/test_projective_standard_charts.sage::test_a_projective_plane_chart_change_divides_the_two_ratios
+0.11s call     tests/schemes/test_glued_morphisms_and_closed_subschemes.sage::test_a_point_away_from_the_origin_is_not_doubled
+0.11s call     tests/schemes/test_glued_morphisms_and_closed_subschemes.sage::test_the_origin_on_both_charts_is_two_rational_points
+0.10s call     tests/schemes/test_relative_spec_general.sage::test_relative_spec_sends_z_to_w_squared_to_a_finite_map_of_degree_two
+0.08s call     tests/schemes/test_affine_pullback_and_direct_image.sage::test_the_direct_image_of_the_structure_sheaf_is_the_ring_upstairs_over_the_ring_downstairs
+0.06s call     tests/schemes/test_glued_morphisms_and_closed_subschemes.sage::test_composing_the_fold_with_negation_restricts_to_negation_on_each_chart
+0.03s call     tests/schemes/test_glued_finite_affine_atlases.sage::test_the_line_with_a_tripled_origin_satisfies_the_cocycle_condition
+0.02s call     tests/schemes/test_glued_line_with_doubled_origin.sage::test_the_two_origins_are_two_open_immersions_that_agree_off_the_origin
+0.02s call     tests/schemes/test_glued_line_with_doubled_origin.sage::test_the_doubled_origin_folds_onto_the_line
+0.02s call     tests/schemes/test_glued_morphisms_and_closed_subschemes.sage::test_the_fixed_locus_of_negation_on_the_doubled_line_is_the_two_origins
+0.02s call     tests/schemes/test_glued_finite_affine_atlases.sage::test_the_fold_of_an_atlas_of_two_lines_restricts_to_the_identity_on_each_chart
+0.02s call     tests/schemes/test_glued_finite_affine_atlases.sage::test_an_atlas_of_two_lines_glued_by_the_identity_has_one_transition
+0.01s call     tests/schemes/test_glued_line_with_doubled_origin.sage::test_the_line_with_doubled_origin_is_a_curve_that_is_not_affine
+0.01s call     tests/schemes/test_glued_line_with_doubled_origin.sage::test_the_line_with_doubled_origin_is_not_separated
+0.01s call     tests/schemes/test_glued_line_with_doubled_origin.sage::test_the_doubled_origin_is_glued_from_two_charts
+0.01s teardown tests/schemes/test_relative_spec_general.sage::test_relative_spec_of_the_glued_polynomial_algebra_is_the_affine_plane
+0.01s setup    tests/schemes/test_glued_line_with_doubled_origin.sage::test_the_doubled_origin_folds_onto_the_line
+0.01s setup    tests/schemes/test_glued_projective_line_from_two_lines.sage::test_x_to_one_over_x_is_an_involution_of_the_punctured_line
+0.01s setup    tests/schemes/test_glued_projective_line_from_two_lines.sage::test_the_chart_at_infinity_is_the_chart_at_zero_through_x_to_one_over_x
+0.01s call     tests/schemes/test_affine_pullback_and_direct_image.sage::test_the_pullback_of_the_structure_sheaf_is_the_structure_sheaf
+
+(98 durations < 0.005s hidden.  Use -vv to show these durations.)
+=========================== short test summary info ============================
+FAILED tests/schemes/test_glued_morphisms_and_closed_subschemes.sage::test_the_origin_on_both_charts_is_two_rational_points
+FAILED tests/schemes/test_glued_morphisms_and_closed_subschemes.sage::test_a_point_away_from_the_origin_is_not_doubled
+FAILED tests/schemes/test_glued_morphisms_and_closed_subschemes.sage::test_the_fixed_locus_of_negation_on_the_doubled_line_is_the_two_origins
+FAILED tests/schemes/test_glued_finite_affine_atlases.sage::test_the_line_with_a_tripled_origin_satisfies_the_cocycle_condition
+FAILED tests/schemes/test_glued_finite_affine_atlases.sage::test_global_functions_on_the_line_with_doubled_origin_are_the_polynomials
+FAILED tests/schemes/test_glued_finite_affine_atlases.sage::test_global_functions_on_the_glued_projective_line_are_the_constants
+FAILED tests/schemes/test_glued_finite_affine_atlases.sage::test_the_projective_plane_is_glued_from_its_three_standard_charts
+FAILED tests/schemes/test_relative_spec_general.sage::test_relative_spec_of_the_glued_polynomial_algebra_is_the_affine_plane
+FAILED tests/schemes/test_relative_spec_general.sage::test_relative_spec_sends_z_to_w_squared_to_a_finite_map_of_degree_two
+FAILED tests/schemes/test_affine_pullback_and_direct_image.sage::test_the_direct_image_of_the_structure_sheaf_is_the_ring_upstairs_over_the_ring_downstairs
+FAILED tests/schemes/test_glued_line_with_doubled_origin.sage::test_the_line_with_doubled_origin_is_not_separated
+FAILED tests/schemes/test_glued_line_with_doubled_origin.sage::test_the_line_with_doubled_origin_is_a_curve_that_is_not_affine
+ERROR tests/schemes/test_affine_schemes.sage::test_global_functions_on_affine_space_are_polynomials_and_on_projective_space_are_constants
+ERROR tests/schemes/test_affine_schemes.sage::test_the_product_of_two_fat_points_is_the_spectrum_of_the_tensor_product
+ERROR tests/schemes/test_affine_schemes.sage::test_the_fiber_product_of_x_squared_and_y_cubed_is_the_cusp_with_its_normalization
+ERROR tests/schemes/test_affine_schemes.sage::test_the_special_fiber_of_xy_equals_t_over_t_zero_is_the_node_xy_equals_zero
+ERROR tests/schemes/test_affine_schemes.sage::test_xy_zero_fiber_has_represented_singular_closed_subscheme
+ERROR tests/schemes/test_affine_schemes.sage::test_xy_equals_t_family_is_flat_with_relative_nonsmooth_node
+ERROR tests/schemes/test_toric_schemes.sage::test_projective_toric_line_over_a_ring_with_zero_divisors
+ERROR tests/schemes/test_toric_schemes.sage::test_the_projective_plane_of_its_fan_is_a_smooth_complete_toric_surface
+ERROR tests/schemes/test_toric_schemes.sage::test_the_orbit_cone_correspondence_counts_the_orbits_of_each_dimension
+ERROR tests/schemes/test_toric_schemes.sage::test_the_chart_of_a_smooth_cone_is_the_affine_plane
+ERROR tests/schemes/test_toric_schemes.sage::test_smooth_full_dimensional_cone_coefficients_are_dual_ray_pairings
+ERROR tests/schemes/test_toric_schemes.sage::test_character_cocharacter_value_is_the_owned_functional_evaluation
+ERROR tests/schemes/test_toric_schemes.sage::test_overlap_characters_stay_in_the_selected_face_localization
+ERROR tests/schemes/test_toric_schemes.sage::test_overlap_character_assignment_preserves_semigroup_addition
+ERROR tests/schemes/test_toric_schemes.sage::test_toric_face_transition_maps_are_mutual_inverses
+ERROR tests/schemes/test_toric_schemes.sage::test_the_chart_of_the_a_one_cone_is_the_quadric_cone
+ERROR tests/schemes/test_toric_schemes.sage::test_singular_rank_two_cone_coefficients_reconstruct_hilbert_generators
+ERROR tests/schemes/test_toric_schemes.sage::test_the_standard_identifications_are_decided_by_fan_isomorphism
+ERROR tests/schemes/test_toric_schemes.sage::test_the_normal_fan_of_a_polytope_uses_inner_normals
+ERROR tests/schemes/test_toric_schemes.sage::test_the_toric_variety_of_the_standard_triangle_is_the_projective_plane
+ERROR tests/schemes/test_toric_schemes.sage::test_a_nonidentity_toric_morphism_retains_its_chart_pullback
+ERROR tests/schemes/test_toric_schemes.sage::test_an_incompatible_lattice_map_is_refused_rather_than_forced
+================== 12 failed, 17 passed, 22 errors in 24.73s ===================
+[peakrss] probe542r2tests: child waited=1 shell_code=1 samples=24
+[peakrss] peak tree RSS      : 384 MiB
+[peakrss] low-water MemAvail : 3397 MiB
+[peakrss] peak single VmHWM  : 390 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      379 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    38.1s procs=  3 rss=   384 MiB hwm=   390 MiB avail=  3891 MiB
+[peakrss]   t=    42.2s procs=  3 rss=   381 MiB hwm=   390 MiB avail=  3643 MiB
+[peakrss]   t=    44.2s procs=  3 rss=   381 MiB hwm=   390 MiB avail=  3525 MiB
+[peakrss]   t=    46.2s procs=  3 rss=   381 MiB hwm=   390 MiB avail=  3397 MiB
+[peakrss]   t=    30.1s procs=  3 rss=   380 MiB hwm=   380 MiB avail=  4370 MiB

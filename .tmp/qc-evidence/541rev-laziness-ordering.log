@@ -1,0 +1,241 @@
+tree SHA: e77cfbb72f12d06cb49b9d1dff8ed1ada4d43d27 (modified paths: 3)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 20.67 22.02 20.27 15/737 2729949
+files: tests/modules/test_a_presented_module_is_built_before_it_computes.sage tests/lattices/test_primitivity_is_the_torsion_freeness_of_the_inclusions_cokernel.sage tests/modules/test_torsion_modules_archive.sage
+inner 540 s, outer 600 s, guard 6144 MiB
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+time gates OFF (--no-time-gates): star import 1.62 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: asyncio-1.5.0, xdist-3.8.0, reportlog-1.0.0, platformdirs-4.13.5, hypothesis-6.170.15, anyio-4.15.1, timeout-2.4.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 7 items
+
+tests/modules/test_a_presented_module_is_built_before_it_computes.sage . [ 14%]
+.                                                                        [ 28%]
+tests/lattices/test_primitivity_is_the_torsion_freeness_of_the_inclusions_cokernel.sage . [ 42%]
+.                                                                        [ 57%]
+tests/modules/test_torsion_modules_archive.sage FFF                      [100%]
+
+=================================== FAILURES ===================================
+____ test_z2_mod_6_is_z2_mod_2_a_torsion_module_of_projective_dimension_one ____
+
+>   return self.cache[k]
+E   KeyError: (135393306678864, (2 + 2^2 + O(2^21),), None)
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_z2_mod_6_is_z2_mod_2_a_torsion_module_of_projective_dimension_one() -> None:
+>       R, M = two_adic_mod_6()
+               ^^^^^^^^^^^^^^^^
+
+tests/modules/test_torsion_modules_archive.sage:19: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/modules/test_torsion_modules_archive.sage:15: in two_adic_mod_6
+    return R, Modules(R)(R.quotient_ring(R.ideal(6)))
+                                         ^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/semirings.py:493: in ideal
+    result = self._ideal_generated_by(selected)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/ring_foundation.py:4132: in _ideal_generated_by
+    return _commutative_ideal(self, generators)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/commutative_ideals.py:1909: in _commutative_ideal
+    return _placed_commutative_ideal(source, generators, placement)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:1029: in sage.misc.cachefunc.CachedFunction.__call__
+    ???
+src/sage_extensions/categories/rings/commutative_ideals.py:2022: in _placed_commutative_ideal
+    syzygy_rows = _engine_ideal_syzygy_rows(source, backend, selected)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/commutative_ideals.py:1646: in _engine_ideal_syzygy_rows
+    return _polynomial_syzygy_rows(backend)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/commutative_ideals.py:1514: in _polynomial_syzygy_rows
+    return tuple(tuple(row) for row in morphism.kernel().gens())
+                                       ^^^^^^^^^^^^^^^^^
+/sage/.venv/lib/python3.14/site-packages/sage/modules/matrix_morphism.py:873: in kernel
+    V = self.matrix().left_kernel()
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/matrix/matrix2.pyx:5547: in sage.matrix.matrix2.Matrix.left_kernel
+    ???
+sage/matrix/matrix2.pyx:5383: in sage.matrix.matrix2.Matrix.right_kernel
+    ???
+sage/matrix/matrix2.pyx:4991: in sage.matrix.matrix2.Matrix.right_kernel_matrix
+    ???
+sage/matrix/matrix2.pyx:8603: in sage.matrix.matrix2.Matrix.echelonize
+    ???
+sage/structure/parent.pyx:899: in sage.structure.parent.Parent.__call__
+    ???
+sage/structure/coerce_maps.pyx:92: in sage.structure.coerce_maps.DefaultConvertMap_unique._call_
+    ???
+sage/structure/coerce_maps.pyx:87: in sage.structure.coerce_maps.DefaultConvertMap_unique._call_
+    ???
+/sage/.venv/lib/python3.14/site-packages/sage/categories/sets_cat.py:1012: in _element_constructor_from_element_class
+    return self.element_class(self, *args, **keywords)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   ValueError: negative valuation
+
+../src/sage/rings/padics/padic_template_element.pxi:186: ValueError
+_ test_in_z2_mod_6_the_generator_is_nonzero_killed_by_2_and_tor1_has_two_elements _
+
+>   return self.cache[k]
+E   KeyError: (135393306678864, (2 + 2^2 + O(2^21),), None)
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_in_z2_mod_6_the_generator_is_nonzero_killed_by_2_and_tor1_has_two_elements() -> None:
+>       R, M = two_adic_mod_6()
+               ^^^^^^^^^^^^^^^^
+
+tests/modules/test_torsion_modules_archive.sage:27: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/modules/test_torsion_modules_archive.sage:15: in two_adic_mod_6
+    return R, Modules(R)(R.quotient_ring(R.ideal(6)))
+                                         ^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/semirings.py:493: in ideal
+    result = self._ideal_generated_by(selected)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/ring_foundation.py:4132: in _ideal_generated_by
+    return _commutative_ideal(self, generators)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/commutative_ideals.py:1909: in _commutative_ideal
+    return _placed_commutative_ideal(source, generators, placement)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:1029: in sage.misc.cachefunc.CachedFunction.__call__
+    w = self.f(*args, **kwds)
+src/sage_extensions/categories/rings/commutative_ideals.py:2022: in _placed_commutative_ideal
+    syzygy_rows = _engine_ideal_syzygy_rows(source, backend, selected)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/commutative_ideals.py:1646: in _engine_ideal_syzygy_rows
+    return _polynomial_syzygy_rows(backend)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/commutative_ideals.py:1514: in _polynomial_syzygy_rows
+    return tuple(tuple(row) for row in morphism.kernel().gens())
+                                       ^^^^^^^^^^^^^^^^^
+/sage/.venv/lib/python3.14/site-packages/sage/modules/matrix_morphism.py:873: in kernel
+    V = self.matrix().left_kernel()
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/matrix/matrix2.pyx:5547: in sage.matrix.matrix2.Matrix.left_kernel
+    ???
+sage/matrix/matrix2.pyx:5383: in sage.matrix.matrix2.Matrix.right_kernel
+    ???
+sage/matrix/matrix2.pyx:4991: in sage.matrix.matrix2.Matrix.right_kernel_matrix
+    ???
+sage/matrix/matrix2.pyx:8603: in sage.matrix.matrix2.Matrix.echelonize
+    ???
+sage/structure/parent.pyx:899: in sage.structure.parent.Parent.__call__
+    ???
+sage/structure/coerce_maps.pyx:92: in sage.structure.coerce_maps.DefaultConvertMap_unique._call_
+    ???
+sage/structure/coerce_maps.pyx:87: in sage.structure.coerce_maps.DefaultConvertMap_unique._call_
+    ???
+/sage/.venv/lib/python3.14/site-packages/sage/categories/sets_cat.py:1012: in _element_constructor_from_element_class
+    return self.element_class(self, *args, **keywords)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   ValueError: negative valuation
+
+../src/sage/rings/padics/padic_template_element.pxi:186: ValueError
+___ test_z2_mod_6_has_a_length_one_resolution_and_ext1_into_z2_of_order_two ____
+
+>   return self.cache[k]
+E   KeyError: (135393306678864, (2 + 2^2 + O(2^21),), None)
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_z2_mod_6_has_a_length_one_resolution_and_ext1_into_z2_of_order_two() -> None:
+>       R, M = two_adic_mod_6()
+               ^^^^^^^^^^^^^^^^
+
+tests/modules/test_torsion_modules_archive.sage:37: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/modules/test_torsion_modules_archive.sage:15: in two_adic_mod_6
+    return R, Modules(R)(R.quotient_ring(R.ideal(6)))
+                                         ^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/semirings.py:493: in ideal
+    result = self._ideal_generated_by(selected)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/ring_foundation.py:4132: in _ideal_generated_by
+    return _commutative_ideal(self, generators)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/commutative_ideals.py:1909: in _commutative_ideal
+    return _placed_commutative_ideal(source, generators, placement)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:1029: in sage.misc.cachefunc.CachedFunction.__call__
+    w = self.f(*args, **kwds)
+src/sage_extensions/categories/rings/commutative_ideals.py:2022: in _placed_commutative_ideal
+    syzygy_rows = _engine_ideal_syzygy_rows(source, backend, selected)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/commutative_ideals.py:1646: in _engine_ideal_syzygy_rows
+    return _polynomial_syzygy_rows(backend)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/commutative_ideals.py:1514: in _polynomial_syzygy_rows
+    return tuple(tuple(row) for row in morphism.kernel().gens())
+                                       ^^^^^^^^^^^^^^^^^
+/sage/.venv/lib/python3.14/site-packages/sage/modules/matrix_morphism.py:873: in kernel
+    V = self.matrix().left_kernel()
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/matrix/matrix2.pyx:5547: in sage.matrix.matrix2.Matrix.left_kernel
+    ???
+sage/matrix/matrix2.pyx:5383: in sage.matrix.matrix2.Matrix.right_kernel
+    ???
+sage/matrix/matrix2.pyx:4991: in sage.matrix.matrix2.Matrix.right_kernel_matrix
+    ???
+sage/matrix/matrix2.pyx:8603: in sage.matrix.matrix2.Matrix.echelonize
+    ???
+sage/structure/parent.pyx:899: in sage.structure.parent.Parent.__call__
+    ???
+sage/structure/coerce_maps.pyx:92: in sage.structure.coerce_maps.DefaultConvertMap_unique._call_
+    ???
+sage/structure/coerce_maps.pyx:87: in sage.structure.coerce_maps.DefaultConvertMap_unique._call_
+    ???
+/sage/.venv/lib/python3.14/site-packages/sage/categories/sets_cat.py:1012: in _element_constructor_from_element_class
+    return self.element_class(self, *args, **keywords)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   ValueError: negative valuation
+
+../src/sage/rings/padics/padic_template_element.pxi:186: ValueError
+============================== slowest durations ===============================
+0.62s call     tests/modules/test_a_presented_module_is_built_before_it_computes.sage::test_constructing_a_cokernel_asks_the_engine_for_no_matrix
+0.22s call     tests/modules/test_torsion_modules_archive.sage::test_z2_mod_6_is_z2_mod_2_a_torsion_module_of_projective_dimension_one
+0.15s call     tests/modules/test_a_presented_module_is_built_before_it_computes.sage::test_a_plane_inclusions_quotient_is_built_before_it_is_asked
+0.10s call     tests/lattices/test_primitivity_is_the_torsion_freeness_of_the_inclusions_cokernel.sage::test_a_span_is_primitive_exactly_when_its_quotient_is_torsion_free
+0.04s call     tests/lattices/test_primitivity_is_the_torsion_freeness_of_the_inclusions_cokernel.sage::test_a_primitivity_decision_is_read_in_the_inclusions_own_codomain
+0.01s setup    tests/modules/test_torsion_modules_archive.sage::test_z2_mod_6_has_a_length_one_resolution_and_ext1_into_z2_of_order_two
+
+(15 durations < 0.005s hidden.  Use -vv to show these durations.)
+=========================== short test summary info ============================
+FAILED tests/modules/test_torsion_modules_archive.sage::test_z2_mod_6_is_z2_mod_2_a_torsion_module_of_projective_dimension_one
+FAILED tests/modules/test_torsion_modules_archive.sage::test_in_z2_mod_6_the_generator_is_nonzero_killed_by_2_and_tor1_has_two_elements
+FAILED tests/modules/test_torsion_modules_archive.sage::test_z2_mod_6_has_a_length_one_resolution_and_ext1_into_z2_of_order_two
+========================= 3 failed, 4 passed in 9.34s ==========================
+[peakrss] wt541revtests: child waited=1 shell_code=1 samples=11
+[peakrss] peak tree RSS      : 359 MiB
+[peakrss] low-water MemAvail : 5720 MiB
+[peakrss] peak single VmHWM  : 359 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      348 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   run.sh                        6 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    18.1s procs=  3 rss=   359 MiB hwm=   359 MiB avail=  5750 MiB
+[peakrss]   t=    20.1s procs=  3 rss=   359 MiB hwm=   359 MiB avail=  5720 MiB
+[peakrss]   t=    16.1s procs=  3 rss=   358 MiB hwm=   358 MiB avail=  6061 MiB
+[peakrss]   t=    14.1s procs=  3 rss=   357 MiB hwm=   357 MiB avail=  6306 MiB
+[peakrss]   t=    10.0s procs=  3 rss=   329 MiB hwm=   329 MiB avail=  6664 MiB

@@ -12,9 +12,10 @@ construction, so every plane pays for three checks a construction owes nobody
 
 ## Body
 
-`Lattices(ZZ).ParentMethods.primitive_isotropic_subobject` (`lattices.py:9348`, checks at
-`9367-9390` on `897e7f7`) builds the span and then, before it returns it, asserts three
-properties of it:
+`Lattices(ZZ).ParentMethods.primitive_isotropic_subobject` (`lattices.py:9348` at
+`897e7f7`, the commit every measurement below was made on, and `9409` on `main` when this
+was written; the checks are `9367-9390` at `897e7f7`) builds the span and then, before it
+returns it, asserts three properties of it:
 
 1. `subobject.is_primitive()` (`lattices.py:9367`) — one primitivity decision per plane;
 2. `all(self.b(embedded[left], embedded[right]) == zero for left in labels for right in
@@ -73,17 +74,28 @@ The three checks become what `AGENTS.md` says they are:
   span of the stated rank *is* the object the caller asked for — the span of it — and a
   caller who needs a basis asks `module_rank()`.
 
-Red first: a test that constructs a plane whose basis is **not** independent and asserts
-the object it gets (the span, of the rank the span has) rather than an `AssertionError`,
-and a test that counts the pairings one construction makes (the instrument beside
-`spans_built_by` in `tests/lattices/conftest.py`). Which of the three checks the owner
-keeps as a strict-mode validator is the reviewer's call; the acceptance is that nothing
-but the span is computed on the path.
+Red first, on what the construction returns rather than on how often it was called:
+
+- a family that is **dependent** — three vectors of a rank-two primitive isotropic
+  sublattice — and the object it gets is the span they span, of rank two;
+- a family that is primitive but whose span is **not** primitive, `2e_1` in `U`, which
+  gets the span rather than an `AssertionError`;
+- a family whose span is **not** isotropic, `e_1` and `f_1` in `U`, which gets the span
+  rather than an `AssertionError`;
+- and, on the object each of them returns, `is_primitive()` asked by the caller, which
+  answers `False` for the second and `True` for the first.
+
+None of the tests counts calls, patches an entry or reads an instrument: each says what
+the construction returns and what a caller can ask of it, so each of the three inline
+checks surviving turns one of them red.  Which of the three checks the owner keeps as a
+strict-mode validator is the reviewer's call; the acceptance is that nothing but the span
+is computed on the path.
 
 ## Evidence
 
 - `grep -n "primitive_isotropic_subobject" src/sage_extensions/categories/lattices.py`
-  → `9348` (definition; `9367-9390` on `897e7f7` are the three checks).
+  → `9348` at `897e7f7` and `9409` on `main` when this was written (the definition;
+  `9367-9390` at `897e7f7` are the three checks).
 - `.tmp/qc-evidence/541r3-plane-parts-base.log`, `541r3-plane-parts-repaired.log` — the
   per-plane attribution above, 8 cold spans of `T_Co`.
 - `.tmp/qc-evidence/541r3-row-repaired.log` — 26 506 planes by 516.6 s, 127.98 planes/s.

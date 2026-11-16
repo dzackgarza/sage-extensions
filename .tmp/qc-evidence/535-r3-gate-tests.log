@@ -1,0 +1,17 @@
+=== tree: 876c3f1484ff5c82773c277249348f4f45bae7e8 (modified: 2 paths)
+=== files: tests/lattices/test_eichler_orbits.sage tests/lattices/test_line_stabilizer_image_requires_eichlers_hypothesis.sage
+=== start: 05:53:17
+..........                                                               [100%]
+============================= slowest 10 durations =============================
+12.06s call     tests/lattices/test_eichler_orbits.sage::test_the_covering_list_holds_the_class_of_every_primitive_vector
+9.29s call     tests/lattices/test_eichler_orbits.sage::test_the_criterion_reads_its_hypothesis_off_the_isometry_class
+6.95s call     tests/lattices/test_line_stabilizer_image_requires_eichlers_hypothesis.sage::test_the_line_stabilizer_image_refuses_where_the_criterion_does_not_apply
+6.43s call     tests/lattices/test_eichler_orbits.sage::test_the_divided_discriminant_class_separates_two_elementary_vectors
+6.40s call     tests/lattices/test_eichler_orbits.sage::test_on_a_unimodular_lattice_the_square_decides
+2.48s call     tests/lattices/test_eichler_orbits.sage::test_a_basis_that_displays_no_isotropic_direction_keeps_the_hypothesis
+1.43s call     tests/lattices/test_line_stabilizer_image_requires_eichlers_hypothesis.sage::test_the_hyperbolic_plane_the_enlargement_adds_is_where_the_criterion_applies
+0.76s call     tests/lattices/test_eichler_orbits.sage::test_a_plane_presented_by_another_gram_is_a_second_hyperbolic_plane
+0.49s call     tests/lattices/test_line_stabilizer_image_requires_eichlers_hypothesis.sage::test_the_criterion_does_not_apply_to_an_odd_lattice_with_two_hyperbolic_planes
+0.02s call     tests/lattices/test_eichler_orbits.sage::test_a_vector_with_divisibility_one_has_a_trivial_divided_class
+10 passed in 54.30s
+=== exit: 0 at 05:54:18

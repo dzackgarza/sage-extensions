@@ -1,0 +1,42 @@
+tree SHA: 2ca6141bef8c755071bbe6c9abbab54eb1de9f28 (modified paths: 1)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 20.29 17.82 17.70 17/746 2804044
+files: tests/rings/test_completion_arithmetic.sage
+inner 400 s, outer 960 s, guard 6144 MiB
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+time gates OFF (--no-time-gates): star import 1.63 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: asyncio-1.5.0, xdist-3.8.0, reportlog-1.0.0, platformdirs-4.13.5, hypothesis-6.170.15, anyio-4.15.1, timeout-2.4.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 4 items
+
+tests/rings/test_completion_arithmetic.sage ....                         [100%]
+
+============================== slowest durations ===============================
+1.04s call     tests/rings/test_completion_arithmetic.sage::test_exact_polynomial_images_survive_beyond_a_low_adic_stage
+0.97s call     tests/rings/test_completion_arithmetic.sage::test_presented_completion_preserves_genuine_nilpotence_not_truncation_nilpotence
+0.33s call     tests/rings/test_completion_arithmetic.sage::test_finite_p_adic_products_retain_exact_source_expressions
+0.31s call     tests/rings/test_completion_arithmetic.sage::test_exact_zero_and_exact_lazy_inverse_are_decided_in_the_completion
+0.01s setup    tests/rings/test_completion_arithmetic.sage::test_exact_polynomial_images_survive_beyond_a_low_adic_stage
+0.01s setup    tests/rings/test_completion_arithmetic.sage::test_finite_p_adic_products_retain_exact_source_expressions
+0.01s setup    tests/rings/test_completion_arithmetic.sage::test_presented_completion_preserves_genuine_nilpotence_not_truncation_nilpotence
+
+(5 durations < 0.005s hidden.  Use -vv to show these durations.)
+============================== 4 passed in 5.20s ===============================
+[peakrss] probe542r2tests: child waited=0 shell_code=0 samples=10
+[peakrss] peak tree RSS      : 325 MiB
+[peakrss] low-water MemAvail : 3766 MiB
+[peakrss] peak single VmHWM  : 325 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      314 MiB peak
+[peakrss]   gap                          23 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    18.1s procs=  3 rss=   325 MiB hwm=   325 MiB avail=  4092 MiB
+[peakrss]   t=    16.1s procs=  3 rss=   324 MiB hwm=   324 MiB avail=  4234 MiB
+[peakrss]   t=    14.1s procs=  3 rss=   310 MiB hwm=   310 MiB avail=  4044 MiB
+[peakrss]   t=    12.1s procs=  3 rss=   298 MiB hwm=   298 MiB avail=  3845 MiB
+[peakrss]   t=    10.1s procs=  3 rss=   274 MiB hwm=   274 MiB avail=  3766 MiB
+launcher exit: 0

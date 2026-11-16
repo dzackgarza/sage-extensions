@@ -1,0 +1,62 @@
+tree SHA: 994c9887171c9f3fbb801adc38b91a4e70c78f62 (modified paths: 0)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 18.77 17.73 17.67 16/759 2804703
+files: tests/rings/test_reals_and_completions_hash_by_their_value.sage tests/rings/test_completion_arithmetic.sage tests/categories/test_structurally_defined_set_maps_hash_by_their_maps.sage tests/modules/test_general_module_elements_hash_by_their_equality.sage tests/divisors/test_divisor_classes_hash_by_their_equality.sage tests/schemes/test_a_glued_scheme_morphism_hashes_by_its_endpoints.sage
+inner 420 s, outer 460 s, guard 6144 MiB
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+time gates OFF (--no-time-gates): star import 4.53 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: asyncio-1.5.0, xdist-3.8.0, reportlog-1.0.0, platformdirs-4.13.5, hypothesis-6.170.15, anyio-4.15.1, timeout-2.4.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 21 items
+
+tests/rings/test_reals_and_completions_hash_by_their_value.sage .....    [ 23%]
+tests/rings/test_completion_arithmetic.sage ....                         [ 42%]
+tests/categories/test_structurally_defined_set_maps_hash_by_their_maps.sage . [ 47%]
+....                                                                     [ 66%]
+tests/modules/test_general_module_elements_hash_by_their_equality.sage . [ 71%]
+..                                                                       [ 80%]
+tests/divisors/test_divisor_classes_hash_by_their_equality.sage ...      [ 95%]
+tests/schemes/test_a_glued_scheme_morphism_hashes_by_its_endpoints.sage . [100%]
+
+=============================== time-gate report ===============================
+session star import took 4.53 s; the measured ceiling is 3 s
+============================== slowest durations ===============================
+0.96s call     tests/modules/test_general_module_elements_hash_by_their_equality.sage::test_two_cartier_divisors_of_one_class_hash_alike
+0.91s call     tests/rings/test_completion_arithmetic.sage::test_presented_completion_preserves_genuine_nilpotence_not_truncation_nilpotence
+0.39s call     tests/rings/test_reals_and_completions_hash_by_their_value.sage::test_the_image_of_a_ring_element_hashes_as_that_ring_element
+0.27s call     tests/rings/test_reals_and_completions_hash_by_their_value.sage::test_two_algebraic_presentations_of_one_irrational_real_are_one_point
+0.09s call     tests/categories/test_structurally_defined_set_maps_hash_by_their_maps.sage::test_a_chamber_system_morphism_hashes_its_chamber_map
+0.08s call     tests/categories/test_structurally_defined_set_maps_hash_by_their_maps.sage::test_two_continuous_maps_with_the_same_values_are_one_point
+0.08s call     tests/schemes/test_a_glued_scheme_morphism_hashes_by_its_endpoints.sage::test_the_fold_of_a_glued_pair_of_lines_is_a_point_of_a_finite_ordered_set
+0.08s call     tests/rings/test_completion_arithmetic.sage::test_exact_polynomial_images_survive_beyond_a_low_adic_stage
+0.06s call     tests/rings/test_completion_arithmetic.sage::test_finite_p_adic_products_retain_exact_source_expressions
+0.06s call     tests/rings/test_reals_and_completions_hash_by_their_value.sage::test_two_presentations_of_one_real_are_one_point_of_a_finite_ordered_set
+0.05s call     tests/rings/test_completion_arithmetic.sage::test_exact_zero_and_exact_lazy_inverse_are_decided_in_the_completion
+0.03s call     tests/categories/test_structurally_defined_set_maps_hash_by_their_maps.sage::test_two_monotone_maps_are_one_point_and_maps_of_two_orders_are_two
+0.02s call     tests/categories/test_structurally_defined_set_maps_hash_by_their_maps.sage::test_a_graph_morphism_hashes_its_vertex_map
+0.01s call     tests/divisors/test_divisor_classes_hash_by_their_equality.sage::test_two_classes_of_one_invertible_sheaf_are_one_point
+0.01s call     tests/rings/test_reals_and_completions_hash_by_their_value.sage::test_an_exact_real_hashes_as_the_number_it_equals
+0.01s setup    tests/categories/test_structurally_defined_set_maps_hash_by_their_maps.sage::test_two_monotone_maps_are_one_point_and_maps_of_two_orders_are_two
+0.01s setup    tests/modules/test_general_module_elements_hash_by_their_equality.sage::test_the_zero_class_of_a_tensor_quotient_is_a_point_of_a_finite_ordered_set
+0.01s setup    tests/rings/test_reals_and_completions_hash_by_their_value.sage::test_the_image_of_a_ring_element_hashes_as_that_ring_element
+0.01s call     tests/rings/test_reals_and_completions_hash_by_their_value.sage::test_two_presentations_of_one_completion_element_are_one_point
+
+(44 durations < 0.005s hidden.  Use -vv to show these durations.)
+============================== 21 passed in 6.71s ==============================
+[peakrss] probe542r2tests: child waited=0 shell_code=0 samples=11
+[peakrss] peak tree RSS      : 365 MiB
+[peakrss] low-water MemAvail : 2232 MiB
+[peakrss] peak single VmHWM  : 365 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      354 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    18.0s procs=  3 rss=   365 MiB hwm=   365 MiB avail=  2507 MiB
+[peakrss]   t=    16.0s procs=  3 rss=   352 MiB hwm=   352 MiB avail=  2590 MiB
+[peakrss]   t=    14.0s procs=  3 rss=   339 MiB hwm=   339 MiB avail=  2232 MiB
+[peakrss]   t=    12.0s procs=  3 rss=   326 MiB hwm=   326 MiB avail=  2264 MiB
+[peakrss]   t=    10.0s procs=  3 rss=   309 MiB hwm=   309 MiB avail=  2340 MiB
+launcher exit: 0

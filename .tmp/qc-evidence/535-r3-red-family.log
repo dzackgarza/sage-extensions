@@ -1,0 +1,40 @@
+=== tree: 2f8c801e73b3a4fd5dce7dfa7bfc1b97e68285f5 (modified: 3 paths)
+=== files: tests/lattices/test_indecomposable_summands_decide_the_decomposition.sage
+=== start: 05:44:35
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_________ test_a_definite_sum_with_a_connected_display_is_decomposable _________
+
+    def test_a_definite_sum_with_a_connected_display_is_decomposable() -> None:
+        lattice = _definite_sum_with_a_connected_display()
+        root_line = Lattices(ZZ)("A1")
+    
+>       assert lattice.is_decomposable() is True
+E       assert orthogonally decomposable(Integral lattice of rank 4 and signature (0, 4)) is True
+E        +  where orthogonally decomposable(Integral lattice of rank 4 and signature (0, 4)) = is_decomposable()
+E        +    where is_decomposable = Integral lattice of rank 4 and signature (0, 4).is_decomposable
+
+tests/lattices/test_indecomposable_summands_decide_the_decomposition.sage:43: AssertionError
+___ test_the_family_reports_no_summands_where_the_decomposition_is_undecided ___
+
+    def test_the_family_reports_no_summands_where_the_decomposition_is_undecided() -> None:
+        scrambled = _scrambled_k3()
+        decomposed = NamedLattices.U ** 3 + NamedLattices.E8 ** 2
+    
+        assert scrambled.is_isometric(decomposed)
+        assert decomposed.indecomposable_summands().cardinality() == 5
+>       with pytest.raises(ValueError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+tests/lattices/test_indecomposable_summands_decide_the_decomposition.sage:56: Failed
+============================= slowest 10 durations =============================
+1.97s call     tests/lattices/test_indecomposable_summands_decide_the_decomposition.sage::test_the_family_reports_no_summands_where_the_decomposition_is_undecided
+0.30s call     tests/lattices/test_indecomposable_summands_decide_the_decomposition.sage::test_a_definite_sum_with_a_connected_display_is_decomposable
+
+(4 durations < 0.005s hidden.  Use -vv to show these durations.)
+=========================== short test summary info ============================
+FAILED tests/lattices/test_indecomposable_summands_decide_the_decomposition.sage::test_a_definite_sum_with_a_connected_display_is_decomposable
+FAILED tests/lattices/test_indecomposable_summands_decide_the_decomposition.sage::test_the_family_reports_no_summands_where_the_decomposition_is_undecided
+2 failed in 13.99s
+=== exit: 1 at 05:44:54

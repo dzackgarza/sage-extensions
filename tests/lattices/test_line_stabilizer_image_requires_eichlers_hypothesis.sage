@@ -18,6 +18,8 @@ integral route.  What the orbit count of $L$ is belongs to a lattice-database ro
 this file states no number.
 """
 
+import pytest
+
 from sage_extensions.all import *  # noqa: F401,F403
 
 
@@ -32,7 +34,7 @@ def _specimen():
 def test_the_line_stabilizer_image_refuses_where_the_criterion_does_not_apply() -> None:
     r"""One hyperbolic plane in $L$: the quotient returns no class set for the line."""
     lattice, line = _specimen()
-    assert lattice.hyperbolic_plane_summand_count() == 1
+    assert lattice.hyperbolic_index() == 1
     assert not lattice.eichler_criterion_applies()
 
     quotient = lattice.O_plus().finite_character_quotient()
@@ -44,3 +46,25 @@ def test_the_hyperbolic_plane_the_enlargement_adds_is_where_the_criterion_applie
     lattice, _line = _specimen()
     assert not lattice.eichler_criterion_applies()
     assert (lattice + NamedLattices.U).eichler_criterion_applies()
+
+
+def test_the_criterion_does_not_apply_to_an_odd_lattice_with_two_hyperbolic_planes() -> None:
+    r"""$U \oplus U \oplus \langle 1 \rangle$ splits two planes and is odd.
+
+    Eichler's criterion is stated for an even lattice containing two orthogonal
+    copies of the hyperbolic plane: the integral transvections it is proved
+    with, $t(c,a)(v) = v - (a,v)c + (c,v)a - \tfrac12(a,a)(c,v)c$, carry the
+    halved norm of $a$, so they are automorphisms of $L$ only when the form is
+    even.  Splitting the two planes is therefore half of the hypothesis and not
+    all of it, and the orbit test refuses on this specimen.
+    """
+    lattice = Lattices(ZZ)("U") + Lattices(ZZ)("U") + Lattices(ZZ)([[1]])
+
+    assert lattice.is_even() is False
+    assert lattice.hyperbolic_index() == 2
+    assert lattice.splits_two_hyperbolic_planes() is True
+    assert lattice.eichler_criterion_applies() is False
+    with pytest.raises(AssertionError):
+        lattice.are_in_one_stable_orbit(
+            lattice.module_generator(0), lattice.module_generator(2)
+        )

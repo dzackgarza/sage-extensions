@@ -1,0 +1,64 @@
+tree SHA: 090a0d92c960a96d94909211161402471ee4248c (modified paths: 1)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 24.32 22.71 20.39 19/817 2728698
+files: tests/rings/test_reals_and_completions_hash_by_their_value.sage
+inner 400 s, outer 960 s, guard 6144 MiB
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+time gates OFF (--no-time-gates): star import 1.96 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: asyncio-1.5.0, xdist-3.8.0, reportlog-1.0.0, platformdirs-4.13.5, hypothesis-6.170.15, anyio-4.15.1, timeout-2.4.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 4 items
+
+tests/rings/test_reals_and_completions_hash_by_their_value.sage .F..     [100%]
+
+=================================== FAILURES ===================================
+______________ test_an_exact_real_hashes_as_the_number_it_equals _______________
+
+    def test_an_exact_real_hashes_as_the_number_it_equals() -> None:
+        r"""``RR(2) = 2`` and ``RR(1/2) = 1/2``: the real and the exact number it is.
+    
+        The integers and the rationals coerce into the exact reals, so ``RR(2)``
+        and ``2`` are one real and ``RR(1/2)`` and ``1/2`` are one real.  A finite
+        ordered set holds one point for each pair, and a dictionary finds the value
+        it was given by either name, which is the hash agreeing with that equality.
+    
+        ``sqrt(2)^2`` is the same real as ``2`` by the algebraic decision, so it
+        enters such a set as the integer's point too.
+        """
+        two = RR(2)
+        half = RR(QQ(1) / 2)
+    
+        assert two == ZZ(2)
+>       assert hash(two) == hash(ZZ(2))
+E       assert 93032432 == 2
+E        +  where 93032432 = hash(2)
+E        +  and   2 = hash(2)
+E        +    where 2 = ZZ(2)
+E        +      where 2 = Integer(2)
+
+tests/rings/test_reals_and_completions_hash_by_their_value.sage:48: AssertionError
+============================== slowest durations ===============================
+0.13s call     tests/rings/test_reals_and_completions_hash_by_their_value.sage::test_two_presentations_of_one_completion_element_are_one_point
+0.04s call     tests/rings/test_reals_and_completions_hash_by_their_value.sage::test_two_algebraic_presentations_of_one_irrational_real_are_one_point
+0.01s call     tests/rings/test_reals_and_completions_hash_by_their_value.sage::test_two_presentations_of_one_real_are_one_point_of_a_finite_ordered_set
+
+(9 durations < 0.005s hidden.  Use -vv to show these durations.)
+=========================== short test summary info ============================
+FAILED tests/rings/test_reals_and_completions_hash_by_their_value.sage::test_an_exact_real_hashes_as_the_number_it_equals
+========================= 1 failed, 3 passed in 1.99s ==========================
+[peakrss] probe542r2tests: child waited=1 shell_code=1 samples=9
+[peakrss] peak tree RSS      : 322 MiB
+[peakrss] low-water MemAvail : 4098 MiB
+[peakrss] peak single VmHWM  : 322 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      310 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    16.1s procs=  3 rss=   322 MiB hwm=   322 MiB avail=  4347 MiB
+[peakrss]   t=    14.1s procs=  3 rss=   320 MiB hwm=   320 MiB avail=  4408 MiB
+[peakrss]   t=    12.1s procs=  3 rss=   298 MiB hwm=   298 MiB avail=  4363 MiB
+[peakrss]   t=    10.1s procs=  3 rss=   266 MiB hwm=   266 MiB avail=  4397 MiB
+[peakrss]   t=     8.0s procs=  3 rss=   224 MiB hwm=   224 MiB avail=  4098 MiB

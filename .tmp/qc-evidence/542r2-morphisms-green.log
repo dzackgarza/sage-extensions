@@ -1,0 +1,40 @@
+tree SHA: deb82b68a00497991752719e743ffae904f91c43 (modified paths: 4)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 16.90 20.07 20.09 12/698 2744554
+files: tests/categories/test_structurally_defined_set_maps_hash_by_their_maps.sage
+inner 400 s, outer 960 s, guard 6144 MiB
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+time gates OFF (--no-time-gates): star import 1.95 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: asyncio-1.5.0, xdist-3.8.0, reportlog-1.0.0, platformdirs-4.13.5, hypothesis-6.170.15, anyio-4.15.1, timeout-2.4.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 5 items
+
+tests/categories/test_structurally_defined_set_maps_hash_by_their_maps.sage . [ 20%]
+....                                                                     [100%]
+
+============================== slowest durations ===============================
+0.08s call     tests/categories/test_structurally_defined_set_maps_hash_by_their_maps.sage::test_a_chamber_system_morphism_hashes_its_chamber_map
+0.05s call     tests/categories/test_structurally_defined_set_maps_hash_by_their_maps.sage::test_two_continuous_maps_with_the_same_values_are_one_point
+0.04s call     tests/categories/test_structurally_defined_set_maps_hash_by_their_maps.sage::test_two_monotone_maps_are_one_point_and_maps_of_two_orders_are_two
+0.02s call     tests/categories/test_structurally_defined_set_maps_hash_by_their_maps.sage::test_a_graph_morphism_hashes_its_vertex_map
+0.01s call     tests/categories/test_structurally_defined_set_maps_hash_by_their_maps.sage::test_the_identity_of_a_two_point_chain_hashes_as_the_set_map_it_is
+
+(10 durations < 0.005s hidden.  Use -vv to show these durations.)
+============================== 5 passed in 2.16s ===============================
+[peakrss] probe542r2tests: child waited=0 shell_code=0 samples=8
+[peakrss] peak tree RSS      : 311 MiB
+[peakrss] low-water MemAvail : 5848 MiB
+[peakrss] peak single VmHWM  : 311 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      300 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    12.0s procs=  3 rss=   311 MiB hwm=   311 MiB avail=  5899 MiB
+[peakrss]   t=    14.1s procs=  3 rss=   311 MiB hwm=   311 MiB avail=  5848 MiB
+[peakrss]   t=    10.0s procs=  3 rss=   303 MiB hwm=   303 MiB avail=  5938 MiB
+[peakrss]   t=     8.0s procs=  3 rss=   286 MiB hwm=   286 MiB avail=  6045 MiB
+[peakrss]   t=     6.0s procs=  3 rss=   225 MiB hwm=   225 MiB avail=  6299 MiB
+launcher exit: 0

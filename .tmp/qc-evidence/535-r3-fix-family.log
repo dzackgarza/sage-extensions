@@ -1,0 +1,17 @@
+=== tree: d7cf36d811a73515386f7fef92b931128bb8f04e (modified: 1 paths)
+=== files: tests/lattices/test_indecomposable_summands_decide_the_decomposition.sage tests/lattices/test_displayed_blocks_are_sublattices.sage tests/forms/test_gram_graph_blocks.sage
+=== start: 05:52:18
+........                                                                 [100%]
+============================= slowest 10 durations =============================
+2.39s call     tests/lattices/test_indecomposable_summands_decide_the_decomposition.sage::test_the_family_reports_no_summands_where_the_decomposition_is_undecided
+2.33s call     tests/lattices/test_displayed_blocks_are_sublattices.sage::test_the_displayed_blocks_of_the_k3_gram_are_five_sublattices
+1.37s call     tests/lattices/test_indecomposable_summands_decide_the_decomposition.sage::test_a_definite_sum_with_a_connected_display_is_decomposable
+0.19s call     tests/lattices/test_displayed_blocks_are_sublattices.sage::test_a_display_whose_blocks_are_not_intervals_exhibits_them_anyway
+0.05s call     tests/forms/test_gram_graph_blocks.sage::test_interleaved_components_give_no_block_cut
+0.05s call     tests/forms/test_gram_graph_blocks.sage::test_the_component_vertex_sets_of_a_gram_graph_do_not_depend_on_its_diagonal
+0.04s call     tests/forms/test_gram_graph_blocks.sage::test_the_gram_graph_of_a2_plus_a1
+0.04s call     tests/forms/test_gram_graph_blocks.sage::test_the_only_block_cut_of_a2_plus_a1_is_after_the_a2_block
+
+(2 durations < 0.005s hidden.  Use -vv to show these durations.)
+8 passed in 10.88s
+=== exit: 0 at 05:52:35

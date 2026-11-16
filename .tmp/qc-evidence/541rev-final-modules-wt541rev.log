@@ -1,0 +1,2477 @@
+tree SHA: 7be875327c5be2f119662c2eaa774e1cd75f8e4c (modified paths: 0)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 22.61 21.52 20.41 21/809 2739950
+files: tests/modules/test_polynomial_presentation_relation_membership.sage tests/modules/test_torsion_modules_archive.sage tests/modules/test_torsion_from_the_generic_fibre.sage tests/modules/test_module_completion_maps.sage tests/modules/test_cyclic_discriminant_torsion.sage tests/modules/test_pid_cokernel_rank.sage tests/modules/test_module_automorphisms_are_a_group.sage tests/modules/test_derived_functors.sage tests/modules/test_fitting_ideals_and_invariants_of_presented_abelian_groups.sage tests/modules/test_localization_constructor_convergence.sage tests/modules/test_finite_cokernel_constructor.sage tests/modules/test_hom_modules_between_cyclic_groups.sage tests/modules/test_finitely_presented_module_archive.sage tests/modules/test_polynomial_ideal_image_factorization.sage tests/modules/test_divided_square_of_an_elementary_two_group.sage tests/modules/test_presented_module_preimages.sage tests/modules/test_presented_module_submodule_images.sage tests/modules/test_cardinality_and_exponent_over_any_pid.sage tests/modules/test_free_resolutions.sage tests/modules/test_the_selected_relation_morphism_contract.sage tests/modules/test_a_presented_module_is_built_before_it_computes.sage tests/modules/test_fraction_field_base_change_archive.sage tests/modules/test_tensor_mor_adjunction.sage tests/modules/test_sections_and_retractions.sage tests/modules/test_cohomology_functors.sage tests/modules/test_bilinear_form_modules_a2_and_u.sage tests/modules/test_module_defining_action_constructors.sage tests/modules/test_torsion_from_abelian_group_archive.sage tests/modules/test_invariant_factor_framing.sage tests/modules/test_isotypic_direct_sum_construction.sage tests/modules/test_powers.sage tests/modules/test_finite_length_presented_modules.sage tests/modules/test_cap_complexes_zx.sage tests/modules/test_fraction_field_quotients_archive.sage tests/modules/test_mor_enrichment.sage tests/modules/test_integer_matrices_as_linear_maps.sage tests/modules/test_scalar_change_between_z_and_q.sage tests/modules/test_projectivity_from_fitting_ideals.sage tests/modules/test_the_permutation_module_of_c2.sage tests/modules/test_the_paired_module_readings_of_an_algebra.sage tests/modules/test_direct_sum_of_cyclics_accessor.sage tests/modules/test_cohomology_of_cyclic_groups.sage tests/modules/test_direct_local_exact_maps.sage tests/modules/test_the_dual_of_a_module_is_its_module_of_functionals.sage tests/modules/test_tor_and_ext_of_finite_cyclic_groups.sage tests/modules/test_rank_stratification_and_local_freeness.sage tests/modules/test_cochain_complexes.sage tests/modules/test_dual_point_hash.sage 
+inner 540 s, outer 600 s, guard 6144 MiB
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+time gates OFF (--no-time-gates): star import 3.25 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: asyncio-1.5.0, xdist-3.8.0, reportlog-1.0.0, platformdirs-4.13.5, hypothesis-6.170.15, anyio-4.15.1, timeout-2.4.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 173 items
+
+tests/modules/test_polynomial_presentation_relation_membership.sage .    [  0%]
+tests/modules/test_torsion_modules_archive.sage FFF                      [  2%]
+tests/modules/test_torsion_from_the_generic_fibre.sage FF                [  3%]
+tests/modules/test_module_completion_maps.sage EEEE                      [  5%]
+tests/modules/test_cyclic_discriminant_torsion.sage ...                  [  7%]
+tests/modules/test_pid_cokernel_rank.sage ..                             [  8%]
+tests/modules/test_module_automorphisms_are_a_group.sage F               [  9%]
+tests/modules/test_derived_functors.sage ....                            [ 11%]
+tests/modules/test_fitting_ideals_and_invariants_of_presented_abelian_groups.sage . [ 12%]
+.........                                                                [ 17%]
+tests/modules/test_localization_constructor_convergence.sage F           [ 17%]
+tests/modules/test_finite_cokernel_constructor.sage F                    [ 18%]
+tests/modules/test_hom_modules_between_cyclic_groups.sage .........      [ 23%]
+tests/modules/test_finitely_presented_module_archive.sage EE             [ 24%]
+tests/modules/test_polynomial_ideal_image_factorization.sage .F.         [ 26%]
+tests/modules/test_divided_square_of_an_elementary_two_group.sage .      [ 27%]
+tests/modules/test_presented_module_preimages.sage ...                   [ 28%]
+tests/modules/test_presented_module_submodule_images.sage .              [ 29%]
+tests/modules/test_cardinality_and_exponent_over_any_pid.sage EEE        [ 31%]
+tests/modules/test_free_resolutions.sage ..                              [ 32%]
+tests/modules/test_the_selected_relation_morphism_contract.sage EEEE     [ 34%]
+tests/modules/test_a_presented_module_is_built_before_it_computes.sage . [ 35%]
+.                                                                        [ 35%]
+tests/modules/test_fraction_field_base_change_archive.sage EE            [ 36%]
+tests/modules/test_tensor_mor_adjunction.sage FF                         [ 38%]
+tests/modules/test_sections_and_retractions.sage .                       [ 38%]
+tests/modules/test_cohomology_functors.sage EEE                          [ 40%]
+tests/modules/test_bilinear_form_modules_a2_and_u.sage ......FF...FF     [ 47%]
+tests/modules/test_module_defining_action_constructors.sage FFF          [ 49%]
+tests/modules/test_torsion_from_abelian_group_archive.sage FF            [ 50%]
+tests/modules/test_invariant_factor_framing.sage EEEEE                   [ 53%]
+tests/modules/test_isotypic_direct_sum_construction.sage .               [ 54%]
+tests/modules/test_powers.sage EEEEE                                     [ 57%]
+tests/modules/test_finite_length_presented_modules.sage ..               [ 58%]
+tests/modules/test_cap_complexes_zx.sage EEE                             [ 60%]
+tests/modules/test_fraction_field_quotients_archive.sage FFF             [ 61%]
+tests/modules/test_mor_enrichment.sage FF.                               [ 63%]
+tests/modules/test_integer_matrices_as_linear_maps.sage ...........      [ 69%]
+tests/modules/test_scalar_change_between_z_and_q.sage .......            [ 73%]
+tests/modules/test_projectivity_from_fitting_ideals.sage ..              [ 75%]
+tests/modules/test_the_permutation_module_of_c2.sage ....                [ 77%]
+tests/modules/test_the_paired_module_readings_of_an_algebra.sage EEEEEEE [ 81%]
+                                                                         [ 81%]
+tests/modules/test_direct_sum_of_cyclics_accessor.sage ....              [ 83%]
+tests/modules/test_cohomology_of_cyclic_groups.sage EEE                  [ 85%]
+tests/modules/test_direct_local_exact_maps.sage F                        [ 86%]
+tests/modules/test_the_dual_of_a_module_is_its_module_of_functionals.sage . [ 86%]
+.                                                                        [ 87%]
+tests/modules/test_tor_and_ext_of_finite_cyclic_groups.sage ........     [ 91%]
+tests/modules/test_rank_stratification_and_local_freeness.sage EEEEE     [ 94%]
+tests/modules/test_cochain_complexes.sage EE                             [ 95%]
+tests/modules/test_dual_point_hash.sage EEEEEEE                          [100%]
+
+==================================== ERRORS ====================================
+_ ERROR at setup of test_multiplication_by_x_on_q_x_stays_injective_on_q_x_completed _
+tests/modules/test_module_completion_maps.sage:10: TL01 from sage_extensions.categories.abstract_categories.mor_categories import ...: take every name from the session
+tests/modules/test_module_completion_maps.sage:76: TL03 isinstance(): introspection is not mathematics
+_ ERROR at setup of test_the_cokernel_of_x_on_q_x_completed_is_the_residue_field _
+tests/modules/test_module_completion_maps.sage:10: TL01 from sage_extensions.categories.abstract_categories.mor_categories import ...: take every name from the session
+tests/modules/test_module_completion_maps.sage:76: TL03 isinstance(): introspection is not mathematics
+_ ERROR at setup of test_multiplication_by_x_on_q_x_mod_x3_keeps_its_kernel_after_completion _
+tests/modules/test_module_completion_maps.sage:10: TL01 from sage_extensions.categories.abstract_categories.mor_categories import ...: take every name from the session
+tests/modules/test_module_completion_maps.sage:76: TL03 isinstance(): introspection is not mathematics
+_ ERROR at setup of test_q_x_mod_x4_is_already_x_adically_complete_and_projects_to_q_x_mod_x3 _
+tests/modules/test_module_completion_maps.sage:10: TL01 from sage_extensions.categories.abstract_categories.mor_categories import ...: take every name from the session
+tests/modules/test_module_completion_maps.sage:76: TL03 isinstance(): introspection is not mathematics
+_____ ERROR at setup of test_the_relations_2x_and_4x_have_hermite_form_2x ______
+tests/modules/test_finitely_presented_module_archive.sage:42: TL03 isinstance(): introspection is not mathematics
+tests/modules/test_finitely_presented_module_archive.sage:64: TL03 isinstance(): introspection is not mathematics
+________ ERROR at setup of test_z2_modulo_2x_plus_4y_is_z_mod_2_plus_z _________
+tests/modules/test_finitely_presented_module_archive.sage:42: TL03 isinstance(): introspection is not mathematics
+tests/modules/test_finitely_presented_module_archive.sage:64: TL03 isinstance(): introspection is not mathematics
+_ ERROR at setup of test_integer_residue_cubes_have_their_cartesian_cardinality _
+tests/modules/test_cardinality_and_exponent_over_any_pid.sage:44: TL10 len(): ask for a cardinality
+tests/modules/test_cardinality_and_exponent_over_any_pid.sage:45: TL10 len(): ask for a cardinality
+_ ERROR at setup of test_F5t_mod_t_squared_has_25_elements_and_exponent_t_squared _
+tests/modules/test_cardinality_and_exponent_over_any_pid.sage:44: TL10 len(): ask for a cardinality
+tests/modules/test_cardinality_and_exponent_over_any_pid.sage:45: TL10 len(): ask for a cardinality
+_ ERROR at setup of test_zz_presented_modules_use_exact_quotient_cardinalities _
+tests/modules/test_cardinality_and_exponent_over_any_pid.sage:44: TL10 len(): ask for a cardinality
+tests/modules/test_cardinality_and_exponent_over_any_pid.sage:45: TL10 len(): ask for a cardinality
+_ ERROR at setup of test_a_framed_free_module_states_the_empty_relation_family _
+tests/modules/test_the_selected_relation_morphism_contract.sage:19: TL01 from sage_extensions.categories.modules.pure.modules import ...: take every name from the session
+tests/modules/test_the_selected_relation_morphism_contract.sage:41: TL08 ModulesWithChosenFinitePresentation: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_the_selected_relation_morphism_contract.sage:42: TL02 private attribute ._selected_relation_morphism
+tests/modules/test_the_selected_relation_morphism_contract.sage:43: TL09 an assertion that holds of anything
+tests/modules/test_the_selected_relation_morphism_contract.sage:55: TL08 ModulesWithChosenFinitePresentation: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_the_selected_relation_morphism_contract.sage:56: TL02 private attribute ._selected_relation_morphism
+tests/modules/test_the_selected_relation_morphism_contract.sage:57: TL09 an assertion that holds of anything
+tests/modules/test_the_selected_relation_morphism_contract.sage:66: TL08 ModulesWithChosenFinitePresentation: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_the_selected_relation_morphism_contract.sage:67: TL02 private attribute ._selected_relation_morphism
+tests/modules/test_the_selected_relation_morphism_contract.sage:72: TL01 from sage_extensions.categories.modules.framed.finitely_generated.finitely_presented_modules import ...: take every name from the session
+tests/modules/test_the_selected_relation_morphism_contract.sage:72: TL02 imports the private name _relation_morphism
+tests/modules/test_the_selected_relation_morphism_contract.sage:77: TL02 private attribute ._selected_relation_morphism
+tests/modules/test_the_selected_relation_morphism_contract.sage:88: TL09 an assertion that holds of anything
+_ ERROR at setup of test_a_module_with_a_chosen_presentation_states_its_relations _
+tests/modules/test_the_selected_relation_morphism_contract.sage:19: TL01 from sage_extensions.categories.modules.pure.modules import ...: take every name from the session
+tests/modules/test_the_selected_relation_morphism_contract.sage:41: TL08 ModulesWithChosenFinitePresentation: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_the_selected_relation_morphism_contract.sage:42: TL02 private attribute ._selected_relation_morphism
+tests/modules/test_the_selected_relation_morphism_contract.sage:43: TL09 an assertion that holds of anything
+tests/modules/test_the_selected_relation_morphism_contract.sage:55: TL08 ModulesWithChosenFinitePresentation: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_the_selected_relation_morphism_contract.sage:56: TL02 private attribute ._selected_relation_morphism
+tests/modules/test_the_selected_relation_morphism_contract.sage:57: TL09 an assertion that holds of anything
+tests/modules/test_the_selected_relation_morphism_contract.sage:66: TL08 ModulesWithChosenFinitePresentation: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_the_selected_relation_morphism_contract.sage:67: TL02 private attribute ._selected_relation_morphism
+tests/modules/test_the_selected_relation_morphism_contract.sage:72: TL01 from sage_extensions.categories.modules.framed.finitely_generated.finitely_presented_modules import ...: take every name from the session
+tests/modules/test_the_selected_relation_morphism_contract.sage:72: TL02 imports the private name _relation_morphism
+tests/modules/test_the_selected_relation_morphism_contract.sage:77: TL02 private attribute ._selected_relation_morphism
+tests/modules/test_the_selected_relation_morphism_contract.sage:88: TL09 an assertion that holds of anything
+______ ERROR at setup of test_a_module_without_a_presentation_states_none ______
+tests/modules/test_the_selected_relation_morphism_contract.sage:19: TL01 from sage_extensions.categories.modules.pure.modules import ...: take every name from the session
+tests/modules/test_the_selected_relation_morphism_contract.sage:41: TL08 ModulesWithChosenFinitePresentation: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_the_selected_relation_morphism_contract.sage:42: TL02 private attribute ._selected_relation_morphism
+tests/modules/test_the_selected_relation_morphism_contract.sage:43: TL09 an assertion that holds of anything
+tests/modules/test_the_selected_relation_morphism_contract.sage:55: TL08 ModulesWithChosenFinitePresentation: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_the_selected_relation_morphism_contract.sage:56: TL02 private attribute ._selected_relation_morphism
+tests/modules/test_the_selected_relation_morphism_contract.sage:57: TL09 an assertion that holds of anything
+tests/modules/test_the_selected_relation_morphism_contract.sage:66: TL08 ModulesWithChosenFinitePresentation: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_the_selected_relation_morphism_contract.sage:67: TL02 private attribute ._selected_relation_morphism
+tests/modules/test_the_selected_relation_morphism_contract.sage:72: TL01 from sage_extensions.categories.modules.framed.finitely_generated.finitely_presented_modules import ...: take every name from the session
+tests/modules/test_the_selected_relation_morphism_contract.sage:72: TL02 imports the private name _relation_morphism
+tests/modules/test_the_selected_relation_morphism_contract.sage:77: TL02 private attribute ._selected_relation_morphism
+tests/modules/test_the_selected_relation_morphism_contract.sage:88: TL09 an assertion that holds of anything
+_____ ERROR at setup of test_the_hook_agrees_with_the_public_presentation ______
+tests/modules/test_the_selected_relation_morphism_contract.sage:19: TL01 from sage_extensions.categories.modules.pure.modules import ...: take every name from the session
+tests/modules/test_the_selected_relation_morphism_contract.sage:41: TL08 ModulesWithChosenFinitePresentation: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_the_selected_relation_morphism_contract.sage:42: TL02 private attribute ._selected_relation_morphism
+tests/modules/test_the_selected_relation_morphism_contract.sage:43: TL09 an assertion that holds of anything
+tests/modules/test_the_selected_relation_morphism_contract.sage:55: TL08 ModulesWithChosenFinitePresentation: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_the_selected_relation_morphism_contract.sage:56: TL02 private attribute ._selected_relation_morphism
+tests/modules/test_the_selected_relation_morphism_contract.sage:57: TL09 an assertion that holds of anything
+tests/modules/test_the_selected_relation_morphism_contract.sage:66: TL08 ModulesWithChosenFinitePresentation: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_the_selected_relation_morphism_contract.sage:67: TL02 private attribute ._selected_relation_morphism
+tests/modules/test_the_selected_relation_morphism_contract.sage:72: TL01 from sage_extensions.categories.modules.framed.finitely_generated.finitely_presented_modules import ...: take every name from the session
+tests/modules/test_the_selected_relation_morphism_contract.sage:72: TL02 imports the private name _relation_morphism
+tests/modules/test_the_selected_relation_morphism_contract.sage:77: TL02 private attribute ._selected_relation_morphism
+tests/modules/test_the_selected_relation_morphism_contract.sage:88: TL09 an assertion that holds of anything
+_ ERROR at setup of test_a_determinant_two_endomorphism_of_z2_becomes_invertible_over_q _
+tests/modules/test_fraction_field_base_change_archive.sage:4: TL01 from sage_extensions.categories.abstract_categories.mor_categories import ...: take every name from the session
+tests/modules/test_fraction_field_base_change_archive.sage:24: TL03 isinstance(): introspection is not mathematics
+_ ERROR at setup of test_the_unit_z2_to_q2_of_scalar_extension_is_injective_and_not_surjective _
+tests/modules/test_fraction_field_base_change_archive.sage:4: TL01 from sage_extensions.categories.abstract_categories.mor_categories import ...: take every name from the session
+tests/modules/test_fraction_field_base_change_archive.sage:24: TL03 isinstance(): introspection is not mathematics
+_ ERROR at setup of test_multiplication_by_three_induces_the_identity_on_H1_of_ZZ_times_two_ZZ _
+tests/modules/test_cohomology_functors.sage:4: TL01 from sage_extensions.categories.algebras.algebras import ...: take every name from the session
+tests/modules/test_cohomology_functors.sage:5: TL01 from sage_extensions.categories.modules.cochain_complexes import ...: take every name from the session
+_ ERROR at setup of test_x_dx_is_a_nonzero_de_rham_class_of_F2_dual_numbers_killed_by_x_to_zero _
+tests/modules/test_cohomology_functors.sage:4: TL01 from sage_extensions.categories.algebras.algebras import ...: take every name from the session
+tests/modules/test_cohomology_functors.sage:5: TL01 from sage_extensions.categories.modules.cochain_complexes import ...: take every name from the session
+_ ERROR at setup of test_de_rham_cohomology_of_F2_dual_numbers_is_a_ring_functor_under_x_to_zero _
+tests/modules/test_cohomology_functors.sage:4: TL01 from sage_extensions.categories.algebras.algebras import ...: take every name from the session
+tests/modules/test_cohomology_functors.sage:5: TL01 from sage_extensions.categories.modules.cochain_complexes import ...: take every name from the session
+_ ERROR at setup of test_z2_mod_x_is_free_of_rank_one_and_z2_mod_2x_is_not_projective _
+tests/modules/test_invariant_factor_framing.sage:4: TL01 from sage_extensions.categories.abstract_categories.mor_categories import ...: take every name from the session
+tests/modules/test_invariant_factor_framing.sage:24: TL03 isinstance(): introspection is not mathematics
+tests/modules/test_invariant_factor_framing.sage:26: TL03 isinstance(): introspection is not mathematics
+tests/modules/test_invariant_factor_framing.sage:52: TL03 isinstance(): introspection is not mathematics
+tests/modules/test_invariant_factor_framing.sage:67: TL03 isinstance(): introspection is not mathematics
+_ ERROR at setup of test_the_hyperbolic_plane_is_unimodular_so_its_discriminant_group_is_zero _
+tests/modules/test_invariant_factor_framing.sage:4: TL01 from sage_extensions.categories.abstract_categories.mor_categories import ...: take every name from the session
+tests/modules/test_invariant_factor_framing.sage:24: TL03 isinstance(): introspection is not mathematics
+tests/modules/test_invariant_factor_framing.sage:26: TL03 isinstance(): introspection is not mathematics
+tests/modules/test_invariant_factor_framing.sage:52: TL03 isinstance(): introspection is not mathematics
+tests/modules/test_invariant_factor_framing.sage:67: TL03 isinstance(): introspection is not mathematics
+_ ERROR at setup of test_u2_has_discriminant_group_z_mod_2_squared_generated_by_the_half_basis_classes _
+tests/modules/test_invariant_factor_framing.sage:4: TL01 from sage_extensions.categories.abstract_categories.mor_categories import ...: take every name from the session
+tests/modules/test_invariant_factor_framing.sage:24: TL03 isinstance(): introspection is not mathematics
+tests/modules/test_invariant_factor_framing.sage:26: TL03 isinstance(): introspection is not mathematics
+tests/modules/test_invariant_factor_framing.sage:52: TL03 isinstance(): introspection is not mathematics
+tests/modules/test_invariant_factor_framing.sage:67: TL03 isinstance(): introspection is not mathematics
+_ ERROR at setup of test_the_a2_discriminant_quadratic_form_lives_on_z_mod_3_and_normalization_preserves_q _
+tests/modules/test_invariant_factor_framing.sage:4: TL01 from sage_extensions.categories.abstract_categories.mor_categories import ...: take every name from the session
+tests/modules/test_invariant_factor_framing.sage:24: TL03 isinstance(): introspection is not mathematics
+tests/modules/test_invariant_factor_framing.sage:26: TL03 isinstance(): introspection is not mathematics
+tests/modules/test_invariant_factor_framing.sage:52: TL03 isinstance(): introspection is not mathematics
+tests/modules/test_invariant_factor_framing.sage:67: TL03 isinstance(): introspection is not mathematics
+_ ERROR at setup of test_the_odd_unimodular_lattice_i2_has_zero_discriminant_group _
+tests/modules/test_invariant_factor_framing.sage:4: TL01 from sage_extensions.categories.abstract_categories.mor_categories import ...: take every name from the session
+tests/modules/test_invariant_factor_framing.sage:24: TL03 isinstance(): introspection is not mathematics
+tests/modules/test_invariant_factor_framing.sage:26: TL03 isinstance(): introspection is not mathematics
+tests/modules/test_invariant_factor_framing.sage:52: TL03 isinstance(): introspection is not mathematics
+tests/modules/test_invariant_factor_framing.sage:67: TL03 isinstance(): introspection is not mathematics
+_______________ ERROR at setup of test_ranks_of_the_powers_of_z2 _______________
+tests/modules/test_powers.sage:11: TL01 from sage_extensions.categories.abstract_categories.mor_categories import ...: take every name from the session
+tests/modules/test_powers.sage:93: TL03 isinstance(): introspection is not mathematics
+_ ERROR at setup of test_power_modules_retain_the_source_and_degree_that_define_them _
+tests/modules/test_powers.sage:11: TL01 from sage_extensions.categories.abstract_categories.mor_categories import ...: take every name from the session
+tests/modules/test_powers.sage:93: TL03 isinstance(): introspection is not mathematics
+_ ERROR at setup of test_divided_powers_of_z_mod_2_differ_from_its_symmetric_powers _
+tests/modules/test_powers.sage:11: TL01 from sage_extensions.categories.abstract_categories.mor_categories import ...: take every name from the session
+tests/modules/test_powers.sage:93: TL03 isinstance(): introspection is not mathematics
+_ ERROR at setup of test_polarization_after_inclusion_is_d_factorial_and_inclusion_after_polarization_symmetrizes _
+tests/modules/test_powers.sage:11: TL01 from sage_extensions.categories.abstract_categories.mor_categories import ...: take every name from the session
+tests/modules/test_powers.sage:93: TL03 isinstance(): introspection is not mathematics
+_ ERROR at setup of test_symmetric_and_divided_squares_and_cubes_are_functors __
+tests/modules/test_powers.sage:11: TL01 from sage_extensions.categories.abstract_categories.mor_categories import ...: take every name from the session
+tests/modules/test_powers.sage:93: TL03 isinstance(): introspection is not mathematics
+_ ERROR at setup of test_the_kernel_of_two_x_on_ZZx_squared_is_free_on_the_koszul_syzygy _
+tests/modules/test_cap_complexes_zx.sage:4: TL01 from sage_extensions.categories.modules.cochain_complexes import ...: take every name from the session
+_ ERROR at setup of test_the_first_cohomology_of_two_x_is_ZZx_mod_two_x_which_is_F2 _
+tests/modules/test_cap_complexes_zx.sage:4: TL01 from sage_extensions.categories.modules.cochain_complexes import ...: take every name from the session
+_ ERROR at setup of test_the_kernel_of_ZZx_mod_2x_onto_ZZx_mod_2_is_generated_by_2a_and_killed_by_x _
+tests/modules/test_cap_complexes_zx.sage:4: TL01 from sage_extensions.categories.modules.cochain_complexes import ...: take every name from the session
+_ ERROR at setup of test_the_quotient_parent_is_unchanged_by_reading_it_over_the_coefficient_ring _
+tests/modules/test_the_paired_module_readings_of_an_algebra.sage:19: TL01 from sage_extensions.categories.algebras.algebras import ...: take every name from the session
+tests/modules/test_the_paired_module_readings_of_an_algebra.sage:23: TL01 from sage_extensions.categories.modules.framed.framed_free_modules import ...: take every name from the session
+tests/modules/test_the_paired_module_readings_of_an_algebra.sage:26: TL01 from sage_extensions.categories.modules.pure.modules import ...: take every name from the session
+tests/modules/test_the_paired_module_readings_of_an_algebra.sage:31: TL01 from sage_extensions.refine import ...: take every name from the session
+tests/modules/test_the_paired_module_readings_of_an_algebra.sage:71: TL08 ModulesWithChosenFinitePresentation: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_the_paired_module_readings_of_an_algebra.sage:92: TL08 ModulesWithChosenFinitePresentation: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_the_paired_module_readings_of_an_algebra.sage:93: TL08 ModulesWithChosenFinitePresentation: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_the_paired_module_readings_of_an_algebra.sage:108: TL08 FramedFreeModules: a chosen-datum or implementation construction; construct through the top-level category of the kind
+_ ERROR at setup of test_the_separate_scalar_reading_has_the_retained_frame_and_presentation _
+tests/modules/test_the_paired_module_readings_of_an_algebra.sage:19: TL01 from sage_extensions.categories.algebras.algebras import ...: take every name from the session
+tests/modules/test_the_paired_module_readings_of_an_algebra.sage:23: TL01 from sage_extensions.categories.modules.framed.framed_free_modules import ...: take every name from the session
+tests/modules/test_the_paired_module_readings_of_an_algebra.sage:26: TL01 from sage_extensions.categories.modules.pure.modules import ...: take every name from the session
+tests/modules/test_the_paired_module_readings_of_an_algebra.sage:31: TL01 from sage_extensions.refine import ...: take every name from the session
+tests/modules/test_the_paired_module_readings_of_an_algebra.sage:71: TL08 ModulesWithChosenFinitePresentation: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_the_paired_module_readings_of_an_algebra.sage:92: TL08 ModulesWithChosenFinitePresentation: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_the_paired_module_readings_of_an_algebra.sage:93: TL08 ModulesWithChosenFinitePresentation: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_the_paired_module_readings_of_an_algebra.sage:108: TL08 FramedFreeModules: a chosen-datum or implementation construction; construct through the top-level category of the kind
+_ ERROR at setup of test_the_reading_over_the_cover_is_cyclic_and_not_a_basis __
+tests/modules/test_the_paired_module_readings_of_an_algebra.sage:19: TL01 from sage_extensions.categories.algebras.algebras import ...: take every name from the session
+tests/modules/test_the_paired_module_readings_of_an_algebra.sage:23: TL01 from sage_extensions.categories.modules.framed.framed_free_modules import ...: take every name from the session
+tests/modules/test_the_paired_module_readings_of_an_algebra.sage:26: TL01 from sage_extensions.categories.modules.pure.modules import ...: take every name from the session
+tests/modules/test_the_paired_module_readings_of_an_algebra.sage:31: TL01 from sage_extensions.refine import ...: take every name from the session
+tests/modules/test_the_paired_module_readings_of_an_algebra.sage:71: TL08 ModulesWithChosenFinitePresentation: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_the_paired_module_readings_of_an_algebra.sage:92: TL08 ModulesWithChosenFinitePresentation: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_the_paired_module_readings_of_an_algebra.sage:93: TL08 ModulesWithChosenFinitePresentation: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_the_paired_module_readings_of_an_algebra.sage:108: TL08 FramedFreeModules: a chosen-datum or implementation construction; construct through the top-level category of the kind
+_______ ERROR at setup of test_the_two_readings_are_not_the_same_parent ________
+tests/modules/test_the_paired_module_readings_of_an_algebra.sage:19: TL01 from sage_extensions.categories.algebras.algebras import ...: take every name from the session
+tests/modules/test_the_paired_module_readings_of_an_algebra.sage:23: TL01 from sage_extensions.categories.modules.framed.framed_free_modules import ...: take every name from the session
+tests/modules/test_the_paired_module_readings_of_an_algebra.sage:26: TL01 from sage_extensions.categories.modules.pure.modules import ...: take every name from the session
+tests/modules/test_the_paired_module_readings_of_an_algebra.sage:31: TL01 from sage_extensions.refine import ...: take every name from the session
+tests/modules/test_the_paired_module_readings_of_an_algebra.sage:71: TL08 ModulesWithChosenFinitePresentation: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_the_paired_module_readings_of_an_algebra.sage:92: TL08 ModulesWithChosenFinitePresentation: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_the_paired_module_readings_of_an_algebra.sage:93: TL08 ModulesWithChosenFinitePresentation: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_the_paired_module_readings_of_an_algebra.sage:108: TL08 FramedFreeModules: a chosen-datum or implementation construction; construct through the top-level category of the kind
+_ ERROR at setup of test_one_generator_over_the_cover_still_does_not_make_the_quotient_projective _
+tests/modules/test_the_paired_module_readings_of_an_algebra.sage:19: TL01 from sage_extensions.categories.algebras.algebras import ...: take every name from the session
+tests/modules/test_the_paired_module_readings_of_an_algebra.sage:23: TL01 from sage_extensions.categories.modules.framed.framed_free_modules import ...: take every name from the session
+tests/modules/test_the_paired_module_readings_of_an_algebra.sage:26: TL01 from sage_extensions.categories.modules.pure.modules import ...: take every name from the session
+tests/modules/test_the_paired_module_readings_of_an_algebra.sage:31: TL01 from sage_extensions.refine import ...: take every name from the session
+tests/modules/test_the_paired_module_readings_of_an_algebra.sage:71: TL08 ModulesWithChosenFinitePresentation: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_the_paired_module_readings_of_an_algebra.sage:92: TL08 ModulesWithChosenFinitePresentation: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_the_paired_module_readings_of_an_algebra.sage:93: TL08 ModulesWithChosenFinitePresentation: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_the_paired_module_readings_of_an_algebra.sage:108: TL08 FramedFreeModules: a chosen-datum or implementation construction; construct through the top-level category of the kind
+_ ERROR at setup of test_the_restricted_frame_answers_its_pair_labelled_generators _
+tests/modules/test_the_paired_module_readings_of_an_algebra.sage:19: TL01 from sage_extensions.categories.algebras.algebras import ...: take every name from the session
+tests/modules/test_the_paired_module_readings_of_an_algebra.sage:23: TL01 from sage_extensions.categories.modules.framed.framed_free_modules import ...: take every name from the session
+tests/modules/test_the_paired_module_readings_of_an_algebra.sage:26: TL01 from sage_extensions.categories.modules.pure.modules import ...: take every name from the session
+tests/modules/test_the_paired_module_readings_of_an_algebra.sage:31: TL01 from sage_extensions.refine import ...: take every name from the session
+tests/modules/test_the_paired_module_readings_of_an_algebra.sage:71: TL08 ModulesWithChosenFinitePresentation: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_the_paired_module_readings_of_an_algebra.sage:92: TL08 ModulesWithChosenFinitePresentation: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_the_paired_module_readings_of_an_algebra.sage:93: TL08 ModulesWithChosenFinitePresentation: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_the_paired_module_readings_of_an_algebra.sage:108: TL08 FramedFreeModules: a chosen-datum or implementation construction; construct through the top-level category of the kind
+_ ERROR at setup of test_the_restricted_reading_has_the_zero_relation_morphism _
+tests/modules/test_the_paired_module_readings_of_an_algebra.sage:19: TL01 from sage_extensions.categories.algebras.algebras import ...: take every name from the session
+tests/modules/test_the_paired_module_readings_of_an_algebra.sage:23: TL01 from sage_extensions.categories.modules.framed.framed_free_modules import ...: take every name from the session
+tests/modules/test_the_paired_module_readings_of_an_algebra.sage:26: TL01 from sage_extensions.categories.modules.pure.modules import ...: take every name from the session
+tests/modules/test_the_paired_module_readings_of_an_algebra.sage:31: TL01 from sage_extensions.refine import ...: take every name from the session
+tests/modules/test_the_paired_module_readings_of_an_algebra.sage:71: TL08 ModulesWithChosenFinitePresentation: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_the_paired_module_readings_of_an_algebra.sage:92: TL08 ModulesWithChosenFinitePresentation: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_the_paired_module_readings_of_an_algebra.sage:93: TL08 ModulesWithChosenFinitePresentation: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_the_paired_module_readings_of_an_algebra.sage:108: TL08 FramedFreeModules: a chosen-datum or implementation construction; construct through the top-level category of the kind
+________ ERROR at setup of test_h0_of_c3_with_integer_coefficients_is_z ________
+tests/modules/test_cohomology_of_cyclic_groups.sage:13: TL01 from sage_extensions.categories.modules.cochain_complexes import ...: take every name from the session
+______ ERROR at setup of test_h1_of_c3_with_integer_coefficients_vanishes ______
+tests/modules/test_cohomology_of_cyclic_groups.sage:13: TL01 from sage_extensions.categories.modules.cochain_complexes import ...: take every name from the session
+_______ ERROR at setup of test_h2_of_c3_with_integer_coefficients_is_z3 ________
+tests/modules/test_cohomology_of_cyclic_groups.sage:13: TL01 from sage_extensions.categories.modules.cochain_complexes import ...: take every name from the session
+_ ERROR at setup of test_the_fibre_dimension_is_1_generically_and_2_at_the_origin _
+tests/modules/test_rank_stratification_and_local_freeness.sage:10: TL01 from sage_extensions.categories.abstract_categories.mor_categories import ...: take every name from the session
+tests/modules/test_rank_stratification_and_local_freeness.sage:54: TL03 isinstance(): introspection is not mathematics
+_ ERROR at setup of test_the_rank_strata_separate_the_generic_point_from_the_origin _
+tests/modules/test_rank_stratification_and_local_freeness.sage:10: TL01 from sage_extensions.categories.abstract_categories.mor_categories import ...: take every name from the session
+tests/modules/test_rank_stratification_and_local_freeness.sage:54: TL03 isinstance(): introspection is not mathematics
+_ ERROR at setup of test_the_module_is_locally_free_generically_and_not_at_the_origin _
+tests/modules/test_rank_stratification_and_local_freeness.sage:10: TL01 from sage_extensions.categories.abstract_categories.mor_categories import ...: take every name from the session
+tests/modules/test_rank_stratification_and_local_freeness.sage:54: TL03 isinstance(): introspection is not mathematics
+_ ERROR at setup of test_the_local_trivialization_at_the_generic_point_has_rank_one _
+tests/modules/test_rank_stratification_and_local_freeness.sage:10: TL01 from sage_extensions.categories.abstract_categories.mor_categories import ...: take every name from the session
+tests/modules/test_rank_stratification_and_local_freeness.sage:54: TL03 isinstance(): introspection is not mathematics
+_ ERROR at setup of test_the_annihilator_of_q_x_y_mod_x_plus_q_x_y_mod_y_is_xy _
+tests/modules/test_rank_stratification_and_local_freeness.sage:10: TL01 from sage_extensions.categories.abstract_categories.mor_categories import ...: take every name from the session
+tests/modules/test_rank_stratification_and_local_freeness.sage:54: TL03 isinstance(): introspection is not mathematics
+_ ERROR at setup of test_the_complex_ZZ_times_two_ZZ_has_H0_zero_and_H1_ZZ_mod_2 _
+tests/modules/test_cochain_complexes.sage:4: TL01 from sage_extensions.categories.modules.cochain_complexes import ...: take every name from the session
+_ ERROR at setup of test_the_complex_ZZ_mod_4_onto_ZZ_mod_2_has_H0_generated_by_2x_and_H1_zero _
+tests/modules/test_cochain_complexes.sage:4: TL01 from sage_extensions.categories.modules.cochain_complexes import ...: take every name from the session
+_______ ERROR at setup of test_distinct_dual_points_have_distinct_hashes _______
+tests/modules/test_dual_point_hash.sage:19: TL01 from sage_extensions.categories.polyhedral_cones import ...: take every name from the session
+tests/modules/test_dual_point_hash.sage:53: TL10 len(): ask for a cardinality
+tests/modules/test_dual_point_hash.sage:54: TL10 len(): ask for a cardinality
+tests/modules/test_dual_point_hash.sage:55: TL10 len(): ask for a cardinality
+tests/modules/test_dual_point_hash.sage:70: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_dual_point_hash.sage:72: TL10 len(): ask for a cardinality
+tests/modules/test_dual_point_hash.sage:109: TL10 len(): ask for a cardinality
+tests/modules/test_dual_point_hash.sage:110: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_dual_point_hash.sage:110: TL10 len(): ask for a cardinality
+tests/modules/test_dual_point_hash.sage:128: TL03 isinstance(): introspection is not mathematics
+tests/modules/test_dual_point_hash.sage:139: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/modules/test_dual_point_hash.sage:139: TL02 imports the private name _probe_prefix
+_ ERROR at setup of test_inserting_distinct_dual_points_does_not_compare_every_pair _
+tests/modules/test_dual_point_hash.sage:19: TL01 from sage_extensions.categories.polyhedral_cones import ...: take every name from the session
+tests/modules/test_dual_point_hash.sage:53: TL10 len(): ask for a cardinality
+tests/modules/test_dual_point_hash.sage:54: TL10 len(): ask for a cardinality
+tests/modules/test_dual_point_hash.sage:55: TL10 len(): ask for a cardinality
+tests/modules/test_dual_point_hash.sage:70: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_dual_point_hash.sage:72: TL10 len(): ask for a cardinality
+tests/modules/test_dual_point_hash.sage:109: TL10 len(): ask for a cardinality
+tests/modules/test_dual_point_hash.sage:110: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_dual_point_hash.sage:110: TL10 len(): ask for a cardinality
+tests/modules/test_dual_point_hash.sage:128: TL03 isinstance(): introspection is not mathematics
+tests/modules/test_dual_point_hash.sage:139: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/modules/test_dual_point_hash.sage:139: TL02 imports the private name _probe_prefix
+_ ERROR at setup of test_equal_dual_points_share_a_hash_whatever_presents_them _
+tests/modules/test_dual_point_hash.sage:19: TL01 from sage_extensions.categories.polyhedral_cones import ...: take every name from the session
+tests/modules/test_dual_point_hash.sage:53: TL10 len(): ask for a cardinality
+tests/modules/test_dual_point_hash.sage:54: TL10 len(): ask for a cardinality
+tests/modules/test_dual_point_hash.sage:55: TL10 len(): ask for a cardinality
+tests/modules/test_dual_point_hash.sage:70: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_dual_point_hash.sage:72: TL10 len(): ask for a cardinality
+tests/modules/test_dual_point_hash.sage:109: TL10 len(): ask for a cardinality
+tests/modules/test_dual_point_hash.sage:110: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_dual_point_hash.sage:110: TL10 len(): ask for a cardinality
+tests/modules/test_dual_point_hash.sage:128: TL03 isinstance(): introspection is not mathematics
+tests/modules/test_dual_point_hash.sage:139: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/modules/test_dual_point_hash.sage:139: TL02 imports the private name _probe_prefix
+____ ERROR at setup of test_the_zero_and_the_scalars_keep_their_own_hashes _____
+tests/modules/test_dual_point_hash.sage:19: TL01 from sage_extensions.categories.polyhedral_cones import ...: take every name from the session
+tests/modules/test_dual_point_hash.sage:53: TL10 len(): ask for a cardinality
+tests/modules/test_dual_point_hash.sage:54: TL10 len(): ask for a cardinality
+tests/modules/test_dual_point_hash.sage:55: TL10 len(): ask for a cardinality
+tests/modules/test_dual_point_hash.sage:70: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_dual_point_hash.sage:72: TL10 len(): ask for a cardinality
+tests/modules/test_dual_point_hash.sage:109: TL10 len(): ask for a cardinality
+tests/modules/test_dual_point_hash.sage:110: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_dual_point_hash.sage:110: TL10 len(): ask for a cardinality
+tests/modules/test_dual_point_hash.sage:128: TL03 isinstance(): introspection is not mathematics
+tests/modules/test_dual_point_hash.sage:139: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/modules/test_dual_point_hash.sage:139: TL02 imports the private name _probe_prefix
+_______ ERROR at setup of test_the_primal_points_keep_their_distribution _______
+tests/modules/test_dual_point_hash.sage:19: TL01 from sage_extensions.categories.polyhedral_cones import ...: take every name from the session
+tests/modules/test_dual_point_hash.sage:53: TL10 len(): ask for a cardinality
+tests/modules/test_dual_point_hash.sage:54: TL10 len(): ask for a cardinality
+tests/modules/test_dual_point_hash.sage:55: TL10 len(): ask for a cardinality
+tests/modules/test_dual_point_hash.sage:70: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_dual_point_hash.sage:72: TL10 len(): ask for a cardinality
+tests/modules/test_dual_point_hash.sage:109: TL10 len(): ask for a cardinality
+tests/modules/test_dual_point_hash.sage:110: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_dual_point_hash.sage:110: TL10 len(): ask for a cardinality
+tests/modules/test_dual_point_hash.sage:128: TL03 isinstance(): introspection is not mathematics
+tests/modules/test_dual_point_hash.sage:139: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/modules/test_dual_point_hash.sage:139: TL02 imports the private name _probe_prefix
+_ ERROR at setup of test_a_domain_without_a_finite_probe_falls_back_to_its_endpoints _
+tests/modules/test_dual_point_hash.sage:19: TL01 from sage_extensions.categories.polyhedral_cones import ...: take every name from the session
+tests/modules/test_dual_point_hash.sage:53: TL10 len(): ask for a cardinality
+tests/modules/test_dual_point_hash.sage:54: TL10 len(): ask for a cardinality
+tests/modules/test_dual_point_hash.sage:55: TL10 len(): ask for a cardinality
+tests/modules/test_dual_point_hash.sage:70: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_dual_point_hash.sage:72: TL10 len(): ask for a cardinality
+tests/modules/test_dual_point_hash.sage:109: TL10 len(): ask for a cardinality
+tests/modules/test_dual_point_hash.sage:110: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_dual_point_hash.sage:110: TL10 len(): ask for a cardinality
+tests/modules/test_dual_point_hash.sage:128: TL03 isinstance(): introspection is not mathematics
+tests/modules/test_dual_point_hash.sage:139: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/modules/test_dual_point_hash.sage:139: TL02 imports the private name _probe_prefix
+_ ERROR at setup of test_the_probe_reads_at_most_eight_elements_of_a_finite_family _
+tests/modules/test_dual_point_hash.sage:19: TL01 from sage_extensions.categories.polyhedral_cones import ...: take every name from the session
+tests/modules/test_dual_point_hash.sage:53: TL10 len(): ask for a cardinality
+tests/modules/test_dual_point_hash.sage:54: TL10 len(): ask for a cardinality
+tests/modules/test_dual_point_hash.sage:55: TL10 len(): ask for a cardinality
+tests/modules/test_dual_point_hash.sage:70: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_dual_point_hash.sage:72: TL10 len(): ask for a cardinality
+tests/modules/test_dual_point_hash.sage:109: TL10 len(): ask for a cardinality
+tests/modules/test_dual_point_hash.sage:110: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_dual_point_hash.sage:110: TL10 len(): ask for a cardinality
+tests/modules/test_dual_point_hash.sage:128: TL03 isinstance(): introspection is not mathematics
+tests/modules/test_dual_point_hash.sage:139: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/modules/test_dual_point_hash.sage:139: TL02 imports the private name _probe_prefix
+=================================== FAILURES ===================================
+____ test_z2_mod_6_is_z2_mod_2_a_torsion_module_of_projective_dimension_one ____
+
+>   return self.cache[k]
+E   KeyError: (131512159602768, (2 + 2^2 + O(2^21),), None)
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_z2_mod_6_is_z2_mod_2_a_torsion_module_of_projective_dimension_one() -> None:
+>       R, M = two_adic_mod_6()
+               ^^^^^^^^^^^^^^^^
+
+tests/modules/test_torsion_modules_archive.sage:19: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/modules/test_torsion_modules_archive.sage:15: in two_adic_mod_6
+    return R, Modules(R)(R.quotient_ring(R.ideal(6)))
+                                         ^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/semirings.py:493: in ideal
+    result = self._ideal_generated_by(selected)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/ring_foundation.py:4132: in _ideal_generated_by
+    return _commutative_ideal(self, generators)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/commutative_ideals.py:1909: in _commutative_ideal
+    return _placed_commutative_ideal(source, generators, placement)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:1029: in sage.misc.cachefunc.CachedFunction.__call__
+    ???
+src/sage_extensions/categories/rings/commutative_ideals.py:2022: in _placed_commutative_ideal
+    syzygy_rows = _engine_ideal_syzygy_rows(source, backend, selected)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/commutative_ideals.py:1646: in _engine_ideal_syzygy_rows
+    return _polynomial_syzygy_rows(backend)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/commutative_ideals.py:1514: in _polynomial_syzygy_rows
+    return tuple(tuple(row) for row in morphism.kernel().gens())
+                                       ^^^^^^^^^^^^^^^^^
+/sage/.venv/lib/python3.14/site-packages/sage/modules/matrix_morphism.py:873: in kernel
+    V = self.matrix().left_kernel()
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/matrix/matrix2.pyx:5547: in sage.matrix.matrix2.Matrix.left_kernel
+    ???
+sage/matrix/matrix2.pyx:5383: in sage.matrix.matrix2.Matrix.right_kernel
+    ???
+sage/matrix/matrix2.pyx:4991: in sage.matrix.matrix2.Matrix.right_kernel_matrix
+    ???
+sage/matrix/matrix2.pyx:8603: in sage.matrix.matrix2.Matrix.echelonize
+    ???
+sage/structure/parent.pyx:899: in sage.structure.parent.Parent.__call__
+    ???
+sage/structure/coerce_maps.pyx:92: in sage.structure.coerce_maps.DefaultConvertMap_unique._call_
+    ???
+sage/structure/coerce_maps.pyx:87: in sage.structure.coerce_maps.DefaultConvertMap_unique._call_
+    ???
+/sage/.venv/lib/python3.14/site-packages/sage/categories/sets_cat.py:1012: in _element_constructor_from_element_class
+    return self.element_class(self, *args, **keywords)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   ValueError: negative valuation
+
+../src/sage/rings/padics/padic_template_element.pxi:186: ValueError
+_ test_in_z2_mod_6_the_generator_is_nonzero_killed_by_2_and_tor1_has_two_elements _
+
+>   return self.cache[k]
+E   KeyError: (131512159602768, (2 + 2^2 + O(2^21),), None)
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_in_z2_mod_6_the_generator_is_nonzero_killed_by_2_and_tor1_has_two_elements() -> None:
+>       R, M = two_adic_mod_6()
+               ^^^^^^^^^^^^^^^^
+
+tests/modules/test_torsion_modules_archive.sage:27: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/modules/test_torsion_modules_archive.sage:15: in two_adic_mod_6
+    return R, Modules(R)(R.quotient_ring(R.ideal(6)))
+                                         ^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/semirings.py:493: in ideal
+    result = self._ideal_generated_by(selected)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/ring_foundation.py:4132: in _ideal_generated_by
+    return _commutative_ideal(self, generators)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/commutative_ideals.py:1909: in _commutative_ideal
+    return _placed_commutative_ideal(source, generators, placement)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:1029: in sage.misc.cachefunc.CachedFunction.__call__
+    w = self.f(*args, **kwds)
+src/sage_extensions/categories/rings/commutative_ideals.py:2022: in _placed_commutative_ideal
+    syzygy_rows = _engine_ideal_syzygy_rows(source, backend, selected)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/commutative_ideals.py:1646: in _engine_ideal_syzygy_rows
+    return _polynomial_syzygy_rows(backend)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/commutative_ideals.py:1514: in _polynomial_syzygy_rows
+    return tuple(tuple(row) for row in morphism.kernel().gens())
+                                       ^^^^^^^^^^^^^^^^^
+/sage/.venv/lib/python3.14/site-packages/sage/modules/matrix_morphism.py:873: in kernel
+    V = self.matrix().left_kernel()
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/matrix/matrix2.pyx:5547: in sage.matrix.matrix2.Matrix.left_kernel
+    ???
+sage/matrix/matrix2.pyx:5383: in sage.matrix.matrix2.Matrix.right_kernel
+    ???
+sage/matrix/matrix2.pyx:4991: in sage.matrix.matrix2.Matrix.right_kernel_matrix
+    ???
+sage/matrix/matrix2.pyx:8603: in sage.matrix.matrix2.Matrix.echelonize
+    ???
+sage/structure/parent.pyx:899: in sage.structure.parent.Parent.__call__
+    ???
+sage/structure/coerce_maps.pyx:92: in sage.structure.coerce_maps.DefaultConvertMap_unique._call_
+    ???
+sage/structure/coerce_maps.pyx:87: in sage.structure.coerce_maps.DefaultConvertMap_unique._call_
+    ???
+/sage/.venv/lib/python3.14/site-packages/sage/categories/sets_cat.py:1012: in _element_constructor_from_element_class
+    return self.element_class(self, *args, **keywords)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   ValueError: negative valuation
+
+../src/sage/rings/padics/padic_template_element.pxi:186: ValueError
+___ test_z2_mod_6_has_a_length_one_resolution_and_ext1_into_z2_of_order_two ____
+
+>   return self.cache[k]
+E   KeyError: (131512159602768, (2 + 2^2 + O(2^21),), None)
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_z2_mod_6_has_a_length_one_resolution_and_ext1_into_z2_of_order_two() -> None:
+>       R, M = two_adic_mod_6()
+               ^^^^^^^^^^^^^^^^
+
+tests/modules/test_torsion_modules_archive.sage:37: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/modules/test_torsion_modules_archive.sage:15: in two_adic_mod_6
+    return R, Modules(R)(R.quotient_ring(R.ideal(6)))
+                                         ^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/semirings.py:493: in ideal
+    result = self._ideal_generated_by(selected)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/ring_foundation.py:4132: in _ideal_generated_by
+    return _commutative_ideal(self, generators)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/commutative_ideals.py:1909: in _commutative_ideal
+    return _placed_commutative_ideal(source, generators, placement)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:1029: in sage.misc.cachefunc.CachedFunction.__call__
+    w = self.f(*args, **kwds)
+src/sage_extensions/categories/rings/commutative_ideals.py:2022: in _placed_commutative_ideal
+    syzygy_rows = _engine_ideal_syzygy_rows(source, backend, selected)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/commutative_ideals.py:1646: in _engine_ideal_syzygy_rows
+    return _polynomial_syzygy_rows(backend)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/commutative_ideals.py:1514: in _polynomial_syzygy_rows
+    return tuple(tuple(row) for row in morphism.kernel().gens())
+                                       ^^^^^^^^^^^^^^^^^
+/sage/.venv/lib/python3.14/site-packages/sage/modules/matrix_morphism.py:873: in kernel
+    V = self.matrix().left_kernel()
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/matrix/matrix2.pyx:5547: in sage.matrix.matrix2.Matrix.left_kernel
+    ???
+sage/matrix/matrix2.pyx:5383: in sage.matrix.matrix2.Matrix.right_kernel
+    ???
+sage/matrix/matrix2.pyx:4991: in sage.matrix.matrix2.Matrix.right_kernel_matrix
+    ???
+sage/matrix/matrix2.pyx:8603: in sage.matrix.matrix2.Matrix.echelonize
+    ???
+sage/structure/parent.pyx:899: in sage.structure.parent.Parent.__call__
+    ???
+sage/structure/coerce_maps.pyx:92: in sage.structure.coerce_maps.DefaultConvertMap_unique._call_
+    ???
+sage/structure/coerce_maps.pyx:87: in sage.structure.coerce_maps.DefaultConvertMap_unique._call_
+    ???
+/sage/.venv/lib/python3.14/site-packages/sage/categories/sets_cat.py:1012: in _element_constructor_from_element_class
+    return self.element_class(self, *args, **keywords)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   ValueError: negative valuation
+
+../src/sage/rings/padics/padic_template_element.pxi:186: ValueError
+_ test_z_mod_6_is_torsion_with_generic_rank_0_and_is_its_own_torsion_submodule _
+
+    def test_z_mod_6_is_torsion_with_generic_rank_0_and_is_its_own_torsion_submodule() -> None:
+        """Q (x) Z/6 = 0. Source: Atiyah–Macdonald, Introduction to Commutative Algebra, ex. 2.3 and 3.12."""
+        M = Modules(ZZ)(ZZ.quotient_ring(ZZ.ideal(6)))
+>       assert M.is_torsion()
+               ^^^^^^^^^^^^^^
+
+tests/modules/test_torsion_from_the_generic_fibre.sage:13: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = is_torsion(Integer Ring / Ideal (6) of Integer Ring)
+
+    def __bool__(self):
+>       raise TypeError(f"the proposition {self} has no Python truth value, because it may be undecided; call ask(...) on it to get True, False or Unknown")
+E       TypeError: the proposition is_torsion(Integer Ring / Ideal (6) of Integer Ring) has no Python truth value, because it may be undecided; call ask(...) on it to get True, False or Unknown
+
+src/sage_extensions/logic.py:44: TypeError
+_ test_z_mod_6_plus_z_has_generic_rank_1_and_is_neither_torsion_nor_torsion_free _
+
+>   return cache[k]
+E   KeyError: ((Point Ideal (0) of Integer Ring of Spec(Integer Ring),), ())
+
+sage/misc/cachefunc.pyx:1965: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_z_mod_6_plus_z_has_generic_rank_1_and_is_neither_torsion_nor_torsion_free() -> None:
+        """Q (x) (Z/6 + Z) = Q; the torsion submodule is Z/6."""
+        F = ZZ**2
+        M = F.subobject_on([6 * F.module_generator(0)]).inclusion().cokernel()
+>       assert M.generic_rank() == 1
+               ^^^^^^^^^^^^^^^^
+
+tests/modules/test_torsion_from_the_generic_fibre.sage:25: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/modules/pure/modules.py:3326: in generic_rank
+    return self.fiber_dimension(ring.spectrum().generic_point())
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/pure/modules.py:3260: in fiber_dimension
+    return self.fiber(point).dimension()
+           ^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:1970: in sage.misc.cachefunc.CachedMethodCaller.__call__
+    w = self._instance_call(*args, **kwds)
+sage/misc/cachefunc.pyx:1848: in sage.misc.cachefunc.CachedMethodCaller._instance_call
+    return self.f(self._instance, *args, **kwds)
+src/sage_extensions/categories/modules/pure/modules.py:3251: in fiber
+    fiber = localized.base_change(point.local_ring().residue_map())
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/pure/modules.py:4528: in base_change
+    changed_label: changed_image(relation_label)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/pure/modules.py:4521: in changed_image
+    changed_label: _base_change_scalar(ring_map, image(label))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/base_change.py:20: in _base_change_scalar
+    return source.Mor(target, category=OwnedRings())(ring_map)(scalar)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/sets/set_categories.py:812: in __call__
+    image = function(point, *args, **kwargs)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/ring_foundation.py:2683: in image
+    return morphism(fraction.numerator()) * morphism(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/sets/set_categories.py:812: in __call__
+    image = function(point, *args, **kwargs)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/ring_foundation.py:725: in function
+    return second(first(element))
+           ^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/sets/set_categories.py:812: in __call__
+    image = function(point, *args, **kwargs)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/commutative_algebra.py:791: in image
+    return _owned_engine_element(codomain, target_engine(value))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/ring_foundation.py:8055: in _owned_engine_element
+    return _own_ring(ring)._from_engine_element(engine_element)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/ring_foundation.py:1986: in _from_engine_element
+    _owned_engine_element(source, source_engine(represented.numerator())),
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/ring_foundation.py:8055: in _owned_engine_element
+    return _own_ring(ring)._from_engine_element(engine_element)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/commutative_algebra.py:1150: in _from_engine_element
+    return self._element_constructor_(engine(value))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/commutative_algebra.py:1117: in _element_constructor_
+    _engine_quotient_representative(quotient_engine, backend_value)
+src/sage_extensions/categories/rings/commutative_algebra.py:925: in _engine_quotient_representative
+    return backend_value.lift()
+           ^^^^^^^^^^^^^^^^^^
+sage/structure/element.pyx:494: in sage.structure.element.Element.__getattr__
+    ???
+sage/structure/element.pyx:507: in sage.structure.element.Element.getattr_from_category
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: 'sage.rings.integer.Integer' object has no attribute 'lift'. Did you mean: 'list'?
+
+sage/cpython/getattr.pyx:362: AttributeError
+______________ test_aut_z2_contains_the_swap_but_not_the_doubling ______________
+
+    def test_aut_z2_contains_the_swap_but_not_the_doubling() -> None:
+        r"""The swap has determinant $-1$, a unit; doubling has determinant $4$, so it is injective with
+        cokernel $(\mathbb Z/2)^2$ and not invertible.
+    
+        Source: Lang, Algebra, XIII.4 (an integer matrix is invertible over Z iff its determinant is ±1).
+        """
+        M = ZZ**2
+        a, b = M.module_generator(0), M.module_generator(1)
+        swap = M.End()({0: b, 1: a})
+        doubling = M.End()({0: 2 * a, 1: 2 * b})
+        automorphisms = M.Aut()
+    
+>       assert automorphisms == M.End().unit_group()
+E       assert Aut_Category ... Integer Ring) == Free module o...Integer Ring^×
+E         
+E         Use -v to get more diff
+
+tests/modules/test_module_automorphisms_are_a_group.sage:18: AssertionError
+_ test_a_determinant_three_endomorphism_of_z2_becomes_invertible_at_the_prime_2 _
+
+    def test_a_determinant_three_endomorphism_of_z2_becomes_invertible_at_the_prime_2() -> None:
+        r"""$f(e) = e + f'$, $f(f') = 3f'$ has $\operatorname{coker} f = \mathbb Z/3$; since localization is
+        exact, $f_{(2)}$ is an isomorphism ($3$ is a unit in $\mathbb Z_{(2)}$) while $f_{(3)}$ is not.
+    
+        Source: Atiyah–Macdonald, Introduction to Commutative Algebra, 3.3 and 3.8.
+        """
+        M = ZZ**2
+        e, f = M.module_generator(0), M.module_generator(1)
+        endomorphism = M.End()({0: e + f, 1: 3 * f})
+        cokernel = endomorphism.cokernel()
+        assert cokernel.cardinality() == 3
+        assert cokernel.localize_at_prime(ZZ.ideal(2)).is_zero()
+        assert not cokernel.localize_at_prime(ZZ.ideal(3)).is_zero()
+>       assert M.localize_at_prime(ZZ.ideal(2)).module_rank() == 2
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/modules/test_localization_constructor_convergence.sage:19: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/modules/framed/finitely_generated/finitely_presented_modules.py:1246: in module_rank
+    return cardinal(sum(1 for invariant in self._invariants_with_units() if invariant == 0))
+                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:2328: in sage.misc.cachefunc.CachedMethodCallerNoArgs.__call__
+    self.cache = f(self._instance)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Finitely presented module on 2 module generators over Localization of Integer Ring at Integer Ring \ Ideal (2) of Integer Ring
+
+    @cached_method
+    def _invariants_with_units(self):
+        r"""Read the invariant factors, retaining unit and free coordinates.
+    
+        The invariant factors are the diagonal ``D`` of the Smith form
+        ``D = U A V`` of the selected relation matrix, one per generator
+        of ``F_0``, with ``0`` past the diagonal.  They need neither basis
+        change, so they are read from ``D`` itself; the basis changes as
+        owned isomorphisms are ``invariant_factor_presentation``.
+        """
+        ring = self.base_ring()
+        smith = self._selected_presentation_smith_backend()
+>       assert smith is not None, (
+               ^^^^^^^^^^^^^^^^^
+            f"cannot compute the invariant factors of {self}: its selected presentation "
+            f"over {ring} supplies no exact Smith computation"
+        )
+E       AssertionError: cannot compute the invariant factors of Finitely presented module on 2 module generators over Localization of Integer Ring at Integer Ring \ Ideal (2) of Integer Ring: its selected presentation over Localization of Integer Ring at Integer Ring \ Ideal (2) of Integer Ring supplies no exact Smith computation
+
+src/sage_extensions/categories/modules/framed/finitely_generated/finitely_presented_modules.py:1212: AssertionError
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Localization of Integer Ring at Integer Ring \ Ideal (2) of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:833 Elementwise module morphism Module over Localization of Integer Ring at Integer Ring \ Ideal (2) of Integer Ring on Classes in the multilinear tensor presentation -> Module over Localization of Integer Ring at Integer Ring \ Ideal (2) of Integer Ring on Localization of Integer Ring at Integer Ring \ Ideal (2) of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Localization of Integer Ring at Integer Ring \ Ideal (3) of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:833 Elementwise module morphism Module over Localization of Integer Ring at Integer Ring \ Ideal (3) of Integer Ring on Classes in the multilinear tensor presentation -> Module over Localization of Integer Ring at Integer Ring \ Ideal (3) of Integer Ring on Localization of Integer Ring at Integer Ring \ Ideal (3) of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+_______ test_infinite_numerator_module_can_have_finite_zero_localization _______
+
+    def test_infinite_numerator_module_can_have_finite_zero_localization():
+        ring = ZZ.polynomial_ring(("x",))
+        x = ring.algebra_generator("x")
+        free = ring.free_module(1)
+        numerator = free.Mor(free)({0: x * free.module_generator(0)}).cokernel()
+        localized = ring.localization(x).localize_module(numerator)
+        assert localized in AdditiveGroups().AdditiveCommutative()
+>       assert localized.is_zero() is True
+E       assert inverted_submonoid_meets(Localization of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer ......} over Integer Ring, Ideal (x) of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring) is True
+E        +  where inverted_submonoid_meets(Localization of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer ......} over Integer Ring, Ideal (x) of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring) = is_zero()
+E        +    where is_zero = Finitely presented module on 1 module generators over Localization of Free module on Coproduct of the family over NN =...ing at Submonoid generated by (x,) in Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring.is_zero
+
+tests/modules/test_finite_cokernel_constructor.sage:14: AssertionError
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:833 Elementwise module morphism Module over Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring on Classes in the multilinear tensor presentation -> Module over Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring on Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Localization of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring at Submonoid generated by (x,) in Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:833 Elementwise module morphism Module over Localization of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring at Submonoid generated by (x,) in Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring on Classes in the multilinear tensor presentation -> Module over Localization of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring at Submonoid generated by (x,) in Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring on Localization of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring at Submonoid generated by (x,) in Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+__________ test_polynomial_map_kernel_is_exactly_the_principal_syzygy __________
+
+>   return SingularKernelFunction(name)
+
+sage/libs/singular/function.pyx:1747: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/libs/singular/function.pyx:1549: in sage.libs.singular.function.SingularKernelFunction.__init__
+    self.call_handler = self.get_call_handler()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   raise NameError("Singular kernel function {!r} is not defined".format(self._name))
+E   NameError: Singular kernel function 'mor_kernel' is not defined
+
+sage/libs/singular/function.pyx:1555: NameError
+
+During handling of the above exception, another exception occurred:
+
+self = <sage.libs.singular.function_factory.SingularFunctionFactory object at 0x779c01d1fc50>
+name = 'mor_kernel'
+
+    def __getattr__(self, name):
+        """
+        EXAMPLES::
+    
+            sage: import sage.libs.singular.function_factory
+            sage: groebner = sage.libs.singular.function_factory.ff.groebner
+            sage: groebner
+            groebner (singular function)
+    
+            sage: import sage.libs.singular.function_factory
+            sage: primdecSY = sage.libs.singular.function_factory.ff.primdec__lib.primdecSY
+            sage: primdecSY
+            primdecSY (singular function)
+        """
+        if name.startswith("_"):
+            raise AttributeError("Singular Function Factory has no attribute '%s'" % name)
+    
+        try:
+>           return singular_function(name)
+                   ^^^^^^^^^^^^^^^^^^^^^^^
+
+/sage/.venv/lib/python3.14/site-packages/sage/libs/singular/function_factory.py:40: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/libs/singular/function.pyx:1749: in sage.libs.singular.function.singular_function
+    return SingularLibraryFunction(name)
+sage/libs/singular/function.pyx:1502: in sage.libs.singular.function.SingularLibraryFunction.__init__
+    self.call_handler = self.get_call_handler()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   raise NameError("Singular library function {!r} is not defined".format(self._name))
+E   NameError: Singular library function 'mor_kernel' is not defined
+
+sage/libs/singular/function.pyx:1507: NameError
+
+During handling of the above exception, another exception occurred:
+
+    def test_polynomial_map_kernel_is_exactly_the_principal_syzygy() -> None:
+        ring, x, y, source, _target, a, b, morphism = _polynomial_linear_map()
+        syzygy = source.linear_combination({a: -y, b: x})
+>       kernel = morphism.kernel()
+                 ^^^^^^^^^^^^^^^^^
+
+tests/modules/test_polynomial_ideal_image_factorization.sage:49: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/misc/cachefunc.pyx:2328: in sage.misc.cachefunc.CachedMethodCallerNoArgs.__call__
+    self.cache = f(self._instance)
+src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py:1532: in kernel
+    represented = owner._represented_kernel_of_morphism(self)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/framed/framed_free_modules.py:1100: in _represented_kernel_of_morphism
+    return _selected_presentation_kernel(morphism)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/framed/finitely_generated/finitely_presented_modules.py:2819: in _selected_presentation_kernel
+    return _singular_presentation_kernel(morphism)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/framed/finitely_generated/finitely_presented_modules.py:3470: in _singular_presentation_kernel
+    kernel_presentation = ff.homolog__lib.mor_kernel(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <sage.libs.singular.function_factory.SingularFunctionFactory object at 0x779c01d1fc50>
+name = 'mor_kernel'
+
+    def __getattr__(self, name):
+        """
+        EXAMPLES::
+    
+            sage: import sage.libs.singular.function_factory
+            sage: groebner = sage.libs.singular.function_factory.ff.groebner
+            sage: groebner
+            groebner (singular function)
+    
+            sage: import sage.libs.singular.function_factory
+            sage: primdecSY = sage.libs.singular.function_factory.ff.primdec__lib.primdecSY
+            sage: primdecSY
+            primdecSY (singular function)
+        """
+        if name.startswith("_"):
+            raise AttributeError("Singular Function Factory has no attribute '%s'" % name)
+    
+        try:
+            return singular_function(name)
+        except NameError:
+            if name.endswith("__lib"):
+                name = name[:-5]
+                lib(name + ".lib")
+                return SingularFunctionFactory()
+>           raise NameError("function or package '%s' unknown." % (name))
+E           NameError: function or package 'mor_kernel' unknown.
+
+/sage/.venv/lib/python3.14/site-packages/sage/libs/singular/function_factory.py:46: NameError
+_____ test_z_mod_2_tensor_z_mod_4_is_z_mod_2_and_represents_bilinear_maps ______
+
+>   return self._cached_methods[name]
+E   KeyError: 'invariant_factors'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_z_mod_2_tensor_z_mod_4_is_z_mod_2_and_represents_bilinear_maps() -> None:
+        r"""$e \otimes f$ generates $\mathbb Z/2 \otimes \mathbb Z/4 = \mathbb Z/2$ and has order $2$; the bilinear map
+        $(e, f) \mapsto e$ into $\mathbb Z/2$ factors uniquely through it, while $(e, f) \mapsto f \in \mathbb Z/4$
+        is not bilinear on $\mathbb Z/2 \times \mathbb Z/4$ because $2e = 0$ and $2f \ne 0$.
+    
+        Source: Lang, Algebra, XVI.1; by hand.
+        """
+        left, right = cyclic(2), cyclic(4)
+        e, f = left.module_generator(0), right.module_generator(0)
+        tensor = left.tensor_product(right)
+        pure = tensor.pure_tensor(e, f)
+    
+>       assert tuple(tensor.invariant_factors()) == (2,)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/modules/test_tensor_mor_adjunction.sage:28: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    ???
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: 'OwnedJoinCategory.parent_class[_TensorQuotientModule].ObjectType' object has no attribute 'invariant_factors'
+
+sage/cpython/getattr.pyx:362: AttributeError
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Integer Ring retains its module laws as an undecided proposition
+_________ test_tensor_with_z_mod_4_is_left_adjoint_to_hom_from_z_mod_4 _________
+
+>   return self._cached_methods[name]
+E   KeyError: 'tensor_mor_adjunction'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_tensor_with_z_mod_4_is_left_adjoint_to_hom_from_z_mod_4() -> None:
+        r"""For $P = \mathbb Z/4$: the hom bijection $\operatorname{Hom}(M \otimes P, N) \cong
+        \operatorname{Hom}(M, \operatorname{Hom}(P, N))$ round-trips and curries, unit and counit are natural,
+        $- \otimes P$ is a functor, and both triangle identities hold.
+    
+        Source: Mac Lane, Categories for the Working Mathematician, IV.1 (adjunctions); Lang XVI.2.
+        """
+        P = cyclic(4)
+>       adjunction = P.tensor_mor_adjunction()
+                     ^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/modules/test_tensor_mor_adjunction.sage:50: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    return self.getattr_from_category(name)
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    attr = getattr_from_other_class(self, cls, name)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: 'OwnedOwnedJoinCategory.parent_class' object has no attribute 'tensor_mor_adjunction'
+
+sage/cpython/getattr.pyx:362: AttributeError
+_________ test_a_map_that_doubles_a_root_is_not_a_morphism_of_the_form _________
+
+    def test_a_map_that_doubles_a_root_is_not_a_morphism_of_the_form() -> None:
+        r"""$e_0 \mapsto 2e_0$, $e_1 \mapsto e_1$ sends $b(e_0, e_0) = 2$ to $8$, so it is no isometry."""
+        form = a2()
+        e0, e1 = form.module_generator(0), form.module_generator(1)
+    
+>       with pytest.raises(ValueError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+tests/modules/test_bilinear_form_modules_a2_and_u.sage:100: Failed
+_ test_the_identity_is_a_morphism_into_the_twist_along_multiplication_by_three _
+
+    def test_the_identity_is_a_morphism_into_the_twist_along_multiplication_by_three() -> None:
+        r"""$(\mathrm{id}, 3): (L, b) \to (L, 3b)$ is a morphism of formed modules: $3 b(x, y) = (3b)(x, y)$."""
+        form = a2()
+        twisted = form.twist(3)
+        values = form.value_module()
+>       tripling = values.Mor(values)({0: 3 * values.module_generator(0)})
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/modules/test_bilinear_form_modules_a2_and_u.sage:109: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/abstract_categories/mor_categories.py:1024: in __call__
+    return OwnedMor.__call__(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/mor_foundation.py:61: in __call__
+    return self._element_constructor_(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/embeddings.py:107: in _element_constructor_
+    return self.element_class(self, source_field.Mor(target_field)(field_embedding))
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/mor_categories.py:1024: in __call__
+    return OwnedMor.__call__(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/mor_foundation.py:61: in __call__
+    return self._element_constructor_(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/algebras/algebras.py:320: in _element_constructor_
+    return self.element_class(self, datum)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/classcall_metaclass.pyx:331: in sage.misc.classcall_metaclass.ClasscallMetaclass.__call__
+    ???
+src/sage_extensions/categories/algebras/algebras.py:434: in __init__
+    super().__init__(parent, underlying_morphism)
+src/sage_extensions/categories/algebras/algebras.py:145: in __init__
+    linear = domain.module_category().Mor(domain, codomain)(underlying_morphism)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py:3518: in __call__
+    return CategoricalMor.__call__(self, images)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/mor_categories.py:1024: in __call__
+    return OwnedMor.__call__(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/mor_foundation.py:61: in __call__
+    return self._element_constructor_(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/algebras/algebras.py:3259: in _element_constructor_
+    return super()._element_constructor_(value)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py:3275: in _element_constructor_
+    morphism = self.element_class(self, images)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/classcall_metaclass.pyx:331: in sage.misc.classcall_metaclass.ClasscallMetaclass.__call__
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Generic endomorphism of Fraction Field of Integer Ring
+parent = Mor(Fraction Field of Integer Ring, Fraction Field of Integer Ring)
+images = {0: 3}, elementwise = False, scalar_extension_of = None
+scalar_extension_functor = None, lift = None, linearity_premises = None
+projective_section_restriction_data = None, surjectivity_premise = None
+
+    def __init__(
+        self,
+        parent,
+        images,
+        *,
+        elementwise=False,
+        scalar_extension_of=None,
+        scalar_extension_functor=None,
+        lift=None,
+        linearity_premises=None,
+        projective_section_restriction_data=None,
+        surjectivity_premise=None,
+    ) -> None:
+        self._initialize_lower_arrow(parent)
+        assert (scalar_extension_of is None) == (scalar_extension_functor is None), (
+            f"cannot construct the base change {scalar_extension_of} along {scalar_extension_functor}: "
+            "a map S tensor_R f must be given together with both f and the scalar-extension functor"
+        )
+        self._scalar_extension_of = scalar_extension_of
+        self._scalar_extension_functor = scalar_extension_functor
+        self._lift_function = lift
+        self._linearity_premises = linearity_premises
+        self._projective_section_restriction_data = projective_section_restriction_data
+        self._surjectivity_premise = surjectivity_premise
+        self._source_module_morphism = None
+        self._element_function = None
+        domain = self.domain()
+        codomain = self.codomain()
+        match images:
+            case ModuleMorphismMethods() if (
+                not elementwise
+                and images.domain() is domain
+                and images.codomain() is codomain
+                and images.has_module_generator_images()
+            ):
+                # A linear map is its generator images: keep them rather than
+                # re-evaluating the map on every element (``OWN-22``).
+                images = images.module_generator_morphism()
+            case Morphism() | CategoricalArrow() if images.domain() is domain and images.codomain() is codomain:
+                source_morphism = images
+                if isinstance(source_morphism, ModuleMorphismMethods):
+                    self._source_module_morphism = source_morphism
+                images = lambda element: source_morphism(element)
+                elementwise = True
+            case _:
+                pass
+        if elementwise or not domain.has_selected_module_resolution():
+            if not callable(images):
+>               raise TypeError(f"cannot define a linear map {domain} -> {codomain} from {images!r}: {domain} has no chosen generators, so the map must be given as a function on elements")
+E               TypeError: cannot define a linear map Fraction Field of Integer Ring -> Fraction Field of Integer Ring from {0: 3}: Fraction Field of Integer Ring has no chosen generators, so the map must be given as a function on elements
+
+src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py:575: TypeError
+_____________________ test_a2_represents_two_and_not_four ______________________
+
+>   return self._cached_methods[name]
+E   KeyError: 'represents'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_a2_represents_two_and_not_four() -> None:
+        r"""The norms of $A_2$ are $2(a^2 + ab + b^2)$; $2 = b(e_0, e_0)$ and $4$ is not of this form
+        since $a^2 + ab + b^2 = 2$ has no integer solution."""
+        form = a2()
+    
+>       assert form.represents(2)
+               ^^^^^^^^^^^^^^^
+
+tests/modules/test_bilinear_form_modules_a2_and_u.sage:141: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    return self.getattr_from_category(name)
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    attr = getattr_from_other_class(self, cls, name)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: 'OwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType' object has no attribute 'represents'
+
+sage/cpython/getattr.pyx:362: AttributeError
+_______________ test_the_bilinear_form_of_a2_as_a_quadratic_form _______________
+
+>   return self._cached_methods[name]
+E   KeyError: 'to_quadratic_module'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_the_bilinear_form_of_a2_as_a_quadratic_form() -> None:
+        r"""$b$ is even, so $q(v) = b(v, v)/2$ is integral: $q(e_0) = 1$, $q(e_0 + e_1) = 3$."""
+>       quadratic = a2().to_quadratic_module()
+                    ^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/modules/test_bilinear_form_modules_a2_and_u.sage:147: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    return self.getattr_from_category(name)
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    attr = getattr_from_other_class(self, cls, name)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: 'OwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType' object has no attribute 'to_quadratic_module'
+
+sage/cpython/getattr.pyx:362: AttributeError
+______ test_a_map_z_plus_z6_to_z_plus_z3_lifts_to_a_map_of_presentations _______
+
+>   mor = <map.Map> self._convert_from_hash.get(R)
+
+sage/structure/parent.pyx:893: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   raise KeyError(k)
+E   KeyError: Free module on {[0], [1]} over Integer Ring
+
+sage/structure/coerce_dict.pyx:649: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self._convert_from_hash.get(S)
+
+sage/structure/parent.pyx:2487: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   raise KeyError(k)
+E   KeyError: Free module on {[0], [1]} over Integer Ring
+
+sage/structure/coerce_dict.pyx:649: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_a_map_z_plus_z6_to_z_plus_z3_lifts_to_a_map_of_presentations() -> None:
+        r"""$x \mapsto u$, $y \mapsto v$ is well defined $\mathbb Z \oplus \mathbb Z/6 \to \mathbb Z \oplus \mathbb Z/3$
+        since $6v = 0$; it lifts to a map of free presentations whose square commutes and whose projection
+        recovers the map (comparison theorem in degree 0).
+    
+        Source: Weibel, An Introduction to Homological Algebra, 2.2.6.
+        """
+        F = ZZ**2
+        x, y = F.module_generator(0), F.module_generator(1)
+        source = F.subobject_on([6 * y]).inclusion().cokernel()
+        G = ZZ**2
+        u, v = G.module_generator(0), G.module_generator(1)
+        target = G.subobject_on([3 * v]).inclusion().cokernel()
+    
+>       morphism = source.Mor(target)({0: target(u), 1: target(v)})
+                                                   ^^^^^^^^^
+
+tests/modules/test_module_defining_action_constructors.sage:20: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/modules/framed/finitely_generated/finitely_presented_modules.py:2437: in __call__
+    return self._element_constructor_(value)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/framed/finitely_generated/finitely_presented_modules.py:2452: in _element_constructor_
+    return self.element_class(self, value)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/classcall_metaclass.pyx:331: in sage.misc.classcall_metaclass.ClasscallMetaclass.__call__
+    ???
+src/sage_extensions/categories/modules/framed/finitely_generated/finitely_presented_modules.py:1908: in __init__
+    self._lift = parent._free_module(lift)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/structure/parent.pyx:895: in sage.structure.parent.Parent.__call__
+    ???
+sage/structure/parent.pyx:2489: in sage.structure.parent.Parent._internal_convert_map_from
+    ???
+sage/structure/parent.pyx:2528: in sage.structure.parent.Parent.discover_convert_map_from
+    ???
+sage/structure/parent.pyx:1963: in sage.structure.parent.Parent._generic_convert_map
+    ???
+sage/structure/coerce_maps.pyx:57: in sage.structure.coerce_maps.DefaultConvertMap_unique.__init__
+    ???
+sage/structure/parent.pyx:1338: in sage.structure.parent.Parent.Hom
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+X = Free module on {[0], [1]} over Integer Ring
+Y = Ambient free module of rank 2 over the principal ideal domain Integer Ring
+category = Category of sets with partial maps, check = True
+
+    def Hom[DomainElementT: Parent, CodomainElementT: Parent](
+        X: DomainElementT,
+        Y: CodomainElementT,
+        category: Category | None = None,
+        check: bool = True,
+    ) -> Homset[DomainElementT, CodomainElementT]:
+        """
+        Create the space of homomorphisms from X to Y in the category ``category``.
+    
+        INPUT:
+    
+        - ``X`` -- an object of a category
+    
+        - ``Y`` -- an object of a category
+    
+        - ``category`` -- a category in which the morphisms must be
+          (default: the meet of the categories of ``X`` and ``Y``);
+          both ``X`` and ``Y`` must belong to that category
+    
+        - ``check`` -- boolean (default: ``True``); whether to check the
+          input, and in particular that ``X`` and ``Y`` belong to
+          ``category``.
+    
+        OUTPUT: a homset in category
+    
+        EXAMPLES::
+    
+            sage: V = VectorSpace(QQ, 3)                                                    # needs sage.modules
+            sage: Hom(V, V)                                                                 # needs sage.modules
+            Set of Morphisms (Linear Transformations) from
+            Vector space of dimension 3 over Rational Field to
+            Vector space of dimension 3 over Rational Field
+            sage: G = AlternatingGroup(3)                                                   # needs sage.groups
+            sage: Hom(G, G)                                                                 # needs sage.groups
+            Set of Morphisms
+             from Alternating group of order 3!/2 as a permutation group
+               to Alternating group of order 3!/2 as a permutation group
+               in Category of finite enumerated permutation groups
+            sage: Hom(ZZ, QQ, Sets())
+            Set of Morphisms from Integer Ring to Rational Field in Category of sets
+    
+            sage: Hom(FreeModule(ZZ, 1), FreeModule(QQ, 1))                                 # needs sage.modules
+            Set of Morphisms
+             from Ambient free module of rank 1 over the principal ideal domain Integer Ring
+               to Vector space of dimension 1 over Rational Field
+               in Category of commutative additive groups
+            sage: Hom(FreeModule(QQ, 1), FreeModule(ZZ, 1))                                 # needs sage.modules
+            Set of Morphisms
+             from Vector space of dimension 1 over Rational Field
+               to Ambient free module of rank 1 over the principal ideal domain Integer Ring
+               in Category of commutative additive groups
+    
+        Here, we test against a memory leak that has been fixed at :issue:`11521` by
+        using a weak cache::
+    
+            sage: # needs sage.libs.pari
+            sage: for p in prime_range(10^3):
+            ....:  K = GF(p)
+            ....:  a = K(0)
+            sage: import gc
+            sage: gc.collect()       # random
+            624
+            sage: from sage.rings.finite_rings.finite_field_prime_modn import FiniteField_prime_modn as FF
+            sage: L = [x for x in gc.get_objects() if isinstance(x, FF)]
+            sage: len(L), L[0]
+            (1, Finite Field of size 997)
+    
+        To illustrate the choice of the category, we consider the
+        following parents as running examples::
+    
+            sage: X = ZZ; X
+            Integer Ring
+            sage: Y = SymmetricGroup(3); Y                                                  # needs sage.groups
+            Symmetric group of order 3! as a permutation group
+    
+        By default, the smallest category containing both ``X`` and ``Y``,
+        is used::
+    
+            sage: Hom(X, Y)                                                                 # needs sage.groups
+            Set of Morphisms from Integer Ring
+             to Symmetric group of order 3! as a permutation group
+             in Category of enumerated monoids
+    
+        Otherwise, if ``category`` is specified, then ``category`` is used,
+        after checking that ``X`` and ``Y`` are indeed in ``category``::
+    
+            sage: Hom(X, Y, Magmas())                                                       # needs sage.groups
+            Set of Morphisms
+             from Integer Ring
+             to Symmetric group of order 3! as a permutation group
+             in Category of magmas
+    
+            sage: Hom(X, Y, Groups())                                                       # needs sage.groups
+            Traceback (most recent call last):
+            ...
+            ValueError: Integer Ring is not in Category of groups
+    
+        A parent (or a parent class of a category) may specify how to
+        construct certain homsets by implementing a method ``_Hom_(self,
+        codomain, category)``. This method should either construct the
+        requested homset or raise a :exc:`TypeError`. This hook is currently
+        mostly used to create homsets in some specific subclass of
+        :class:`Homset` (e.g.
+        :class:`~sage.rings.homset.RingHomset_generic`)::
+    
+            sage: Hom(QQ,QQ).__class__
+            <class 'sage.rings.homset.RingHomset_generic_with_category'>
+    
+        Do not call this hook directly to create homsets, as it does not
+        handle unique representation::
+    
+            sage: Hom(QQ,QQ) == QQ._Hom_(QQ, category=QQ.category())
+            True
+            sage: Hom(QQ,QQ) is QQ._Hom_(QQ, category=QQ.category())
+            False
+    
+        TESTS:
+    
+        Homset are unique parents::
+    
+            sage: k = GF(5)
+            sage: H1 = Hom(k, k)
+            sage: H2 = Hom(k, k)
+            sage: H1 is H2
+            True
+    
+        Moreover, if no category is provided, then the result is identical
+        with the result for the meet of the categories of the domain and
+        the codomain::
+    
+            sage: Hom(QQ, ZZ) is Hom(QQ,ZZ, Category.meet([QQ.category(), ZZ.category()]))
+            True
+    
+        Some doc tests in ``sage.rings`` (need to) break the unique
+        parent assumption. But if domain or codomain are not unique
+        parents, then the homset will not fit. That is to say, the hom set
+        found in the cache will have a (co)domain that is equal to, but
+        not identical with, the given (co)domain.
+    
+        By :issue:`9138`, we abandon the uniqueness of homsets, if the
+        domain or codomain break uniqueness::
+    
+            sage: from sage.rings.polynomial.multi_polynomial_ring import MPolynomialRing_polydict_domain
+            sage: P.<x,y,z>=MPolynomialRing_polydict_domain(QQ, 3, order='degrevlex')
+            sage: Q.<x,y,z>=MPolynomialRing_polydict_domain(QQ, 3, order='degrevlex')
+            sage: P == Q
+            True
+            sage: P is Q
+            False
+    
+        Hence, ``P`` and ``Q`` are not unique parents. By consequence, the
+        following homsets aren't either::
+    
+            sage: H1 = Hom(QQ,P)
+            sage: H2 = Hom(QQ,Q)
+            sage: H1 == H2
+            True
+            sage: H1 is H2
+            False
+    
+        It is always the most recently constructed homset that remains in
+        the cache::
+    
+            sage: H2 is Hom(QQ,Q)
+            True
+    
+        Variation on the theme::
+    
+            sage: # needs sage.modules
+            sage: U1 = FreeModule(ZZ, 2)
+            sage: U2 = FreeModule(ZZ, 2, inner_product_matrix=matrix([[1,0], [0,-1]]))
+            sage: U1 == U2, U1 is U2
+            (False, False)
+            sage: V = ZZ^3
+            sage: H1 = Hom(U1, V); H2 = Hom(U2, V)
+            sage: H1 == H2, H1 is H2
+            (False, False)
+            sage: H1 = Hom(V, U1); H2 = Hom(V, U2)
+            sage: H1 == H2, H1 is H2
+            (False, False)
+    
+        Since :issue:`11900`, the meet of the categories of the given arguments is
+        used to determine the default category of the homset. This can also be a
+        join category, as in the following example::
+    
+            sage: PA = Parent(category=Algebras(QQ))
+            sage: PJ = Parent(category=Rings() & Modules(QQ))
+            sage: Hom(PA, PJ)
+            Set of Homomorphisms
+             from <sage.structure.parent.Parent object at ...>
+               to <sage.structure.parent.Parent object at ...>
+            sage: Hom(PA, PJ).category()
+            Category of homsets of
+             unital magmas and right modules over Rational Field
+              and left modules over Rational Field
+            sage: Hom(PA, PJ, Rngs())
+            Set of Morphisms
+             from <sage.structure.parent.Parent object at ...>
+               to <sage.structure.parent.Parent object at ...> in Category of rngs
+    
+        .. TODO::
+    
+            - Design decision: how much of the homset comes from the
+              category of ``X`` and ``Y``, and how much from the specific
+              ``X`` and ``Y``.  In particular, do we need several parent
+              classes depending on ``X`` and ``Y``, or does the difference
+              only lie in the elements (i.e.  the morphism), and of course
+              how the parent calls their constructors.
+            - Specify the protocol for the ``_Hom_`` hook in case of ambiguity
+              (e.g. if both a parent and some category thereof provide one).
+    
+        TESTS:
+    
+        Facade parents over plain Python types are supported::
+    
+            sage: from sage.sets.pythonclass import Set_PythonType
+            sage: R = Set_PythonType(int)
+            sage: S = Set_PythonType(float)
+            sage: Hom(R, S)
+            Set of Morphisms from Set of Python objects of class 'int'
+             to Set of Python objects of class 'float' in Category of infinite sets
+    
+        Checks that the domain and codomain are in the specified
+        category. Case of a non parent::
+    
+            sage: # needs sage.graphs
+            sage: S = SimplicialComplex([[1,2], [1,4]]); S.rename('S')
+            sage: Hom(S, S, SimplicialComplexes())
+            Set of Morphisms from S to S in Category of finite simplicial complexes
+            sage: Hom(Set(), S, Sets())
+            Set of Morphisms from {} to S in Category of sets
+            sage: Hom(S, Set(), Sets())
+            Set of Morphisms from S to {} in Category of sets
+            sage: H = Hom(S, S, ChainComplexes(QQ))
+            Traceback (most recent call last):
+            ...
+            ValueError: S is not in Category of chain complexes over Rational Field
+    
+        Those checks are done with the natural idiom ``X in category``,
+        and not ``X.category().is_subcategory(category)`` as it used to be
+        before :issue:`16275` (see :issue:`15801` for a real use case)::
+    
+            sage: # needs sage.graphs
+            sage: class PermissiveCategory(Category):
+            ....:     def super_categories(self): return [Objects()]
+            ....:     def __contains__(self, X): return True
+            sage: C = PermissiveCategory(); C.rename('Permissive category')
+            sage: S.category().is_subcategory(C)
+            False
+            sage: S in C
+            True
+            sage: Hom(S, S, C)
+            Set of Morphisms from S to S in Permissive category
+    
+        With ``check=False``, uninitialized parents, as can appear upon
+        unpickling, are supported. Case of a parent::
+    
+            sage: cls = type(Set())
+            sage: S = unpickle_newobj(cls, ())  # A non parent
+            sage: H = Hom(S, S, SimplicialComplexes(), check=False)
+            sage: H = Hom(S, S, Sets(),                check=False)
+            sage: H = Hom(S, S, ChainComplexes(QQ),    check=False)
+    
+        Case of a non parent::
+    
+            sage: # needs sage.graphs
+            sage: cls = type(SimplicialComplex([[1,2], [1,4]]))
+            sage: S = unpickle_newobj(cls, ())
+            sage: H = Hom(S, S, Sets(),                check=False)
+            sage: H = Hom(S, S, Groups(),              check=False)
+            sage: H = Hom(S, S, SimplicialComplexes(), check=False)
+    
+        Typical example where unpickling involves calling Hom on an
+        uninitialized parent::
+    
+            sage: P.<x,y> = QQ['x,y']
+            sage: Q = P.quotient([x^2 - 1, y^2 - 1])
+            sage: q = Q.an_element()                                                        # needs sage.libs.singular
+            sage: explain_pickle(dumps(Q))                                                  # needs sage.libs.singular
+            pg_...
+            ... = pg_dynamic_class('QuotientRing_generic_with_category', (pg_QuotientRing_generic, pg_getattr(..., 'parent_class')), None, None, pg_QuotientRing_generic)
+            si... = unpickle_newobj(..., ())
+            ...
+            si... = pg_unpickle_MPolynomialRing_libsingular(..., ('x', 'y'), ...)
+            si... = ... pg_Hom(si..., si..., ...) ...
+            sage: Q == loads(dumps(Q))
+            True
+    
+        Check that the ``_Hom_`` method of the ``category`` input is used::
+    
+            sage: from sage.categories.category_types import Category_over_base_ring
+            sage: class ModulesWithHom(Category_over_base_ring):
+            ....:     def super_categories(self):
+            ....:         return [Modules(self.base_ring())]
+            ....:     class ParentMethods:
+            ....:         def _Hom_(self, Y, category=None):
+            ....:             print("Modules")
+            ....:             raise TypeError
+            sage: class AlgebrasWithHom(Category_over_base_ring):
+            ....:     def super_categories(self):
+            ....:         return [Algebras(self.base_ring()), ModulesWithHom(self.base_ring())]
+            ....:     class ParentMethods:
+            ....:         def _Hom_(self, Y, category=None):
+            ....:             R = self.base_ring()
+            ....:             if category is not None and category.is_subcategory(Algebras(R)):
+            ....:                 print("Algebras")
+            ....:             raise TypeError
+            sage: from sage.structure.element import Element
+            sage: class Foo(Parent):
+            ....:     def _coerce_map_from_base_ring(self):
+            ....:         return self._generic_coerce_map(self.base_ring())
+            ....:     class Element(Element):
+            ....:         pass
+            sage: X = Foo(base=QQ, category=AlgebrasWithHom(QQ))
+            sage: H = Hom(X, X, ModulesWithHom(QQ))
+            Modules
+        """
+        # This should use cache_function instead
+        # However some special handling is currently needed for
+        # domains/codomains that break the unique parent condition. Also,
+        # at some point, it somehow broke the coercion (see e.g. sage -t
+        # sage.rings.real_mpfr). To be investigated.
+        key = (X, Y, category)
+        try:
+            H = _cache[key]
+        except KeyError:
+            H = None
+        if H is not None:
+            # Return H unless the domain or codomain breaks the unique parent condition
+            if H.domain() is X and H.codomain() is Y:
+                return H
+    
+        # Determines the category
+        if category is None:
+            category = X.category()._meet_(Y.category())
+            # Recurse to make sure that Hom(X, Y) and Hom(X, Y, category) are identical
+            # No need to check the input again
+            H = Hom(X, Y, category, check=False)
+        else:
+            if check:
+                if not isinstance(category, Category):
+                    raise TypeError("Argument category (= {}) must be a category.".format(category))
+                for O in [X, Y]:
+                    try:
+                        category_mismatch = O not in category
+                    except Exception:
+                        # An error should not happen, this here is just to be on
+                        # the safe side.
+                        category_mismatch = True
+                    # A category mismatch does not necessarily mean that an error
+                    # should be raised. Instead, it could be the case that we are
+                    # unpickling an old pickle (that doesn't set the "check"
+                    # argument to False). In this case, it could be that the
+                    # (co)domain is not properly initialised, which we are
+                    # checking now. See trac #16275 and #14793.
+                    if category_mismatch and O._is_category_initialized():
+                        # At this point, we can be rather sure that O is properly
+                        # initialised, and thus its string representation is
+                        # available for the following error message. It simply
+                        # belongs to the wrong category.
+>                       raise ValueError("{} is not in {}".format(O, category))
+E                       ValueError: Free module on {[0], [1]} over Integer Ring is not in Category of sets with partial maps
+
+/sage/.venv/lib/python3.14/site-packages/sage/categories/homset.py:449: ValueError
+______________ test_three_constructions_of_z_mod_6_are_isomorphic ______________
+
+>   return self._cached_methods[name]
+E   KeyError: 'is_isomorphic'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_three_constructions_of_z_mod_6_are_isomorphic() -> None:
+        r"""$\mathbb Z/(6)$, $\mathbb Z^2/(6x, c)$ and the ring $\mathbb Z/6$ regarded as a $\mathbb Z$-module agree.
+    
+        Source: by hand (the relation c kills a free summand).
+        """
+        F = ZZ**1
+        presented = F.subobject_on([6 * F.module_generator(0)]).inclusion().cokernel()
+        G = ZZ**2
+        stabilized = G.subobject_on([6 * G.module_generator(0), G.module_generator(1)]).inclusion().cokernel()
+        ring_as_module = Modules(ZZ)(ZZ.quotient_ring(ZZ.ideal(6)))
+    
+>       assert presented.is_isomorphic(ring_as_module)
+               ^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/modules/test_module_defining_action_constructors.sage:42: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    return self.getattr_from_category(name)
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    attr = getattr_from_other_class(self, cls, name)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: '_SelectedFinitePresentationModules.parent_class[_PresentedModule].ObjectType' object has no attribute 'is_isomorphic'
+
+sage/cpython/getattr.pyx:357: AttributeError
+________________ test_tensor_hom_and_exterior_square_of_z_mod_6 ________________
+
+    def test_tensor_hom_and_exterior_square_of_z_mod_6() -> None:
+        r"""$\mathbb Z/6 \otimes \mathbb Z = \mathbb Z/6$, $\operatorname{End}(\mathbb Z/6) = \mathbb Z/6$,
+        $(\mathbb Z/6)^{\otimes 2} = \operatorname{Sym}^2(\mathbb Z/6) = \mathbb Z/6$, $\Lambda^2(\mathbb Z/6) = 0$
+        (a cyclic module has vanishing exterior square), and $\operatorname{Hom}(\mathbb Z/6, \mathbb Z) = 0$.
+    
+        Source: Lang, Algebra, XVI.1 and XIX.1; by hand.
+        """
+        M = Modules(ZZ)(ZZ.quotient_ring(ZZ.ideal(6)))
+>       assert M.tensor_product(ZZ**1).cardinality() == 6
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/modules/test_module_defining_action_constructors.sage:56: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/sets/set_categories.py:2510: in cardinality
+    construction_cardinality = self._cardinality_decision()
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/general_modules.py:254: in _cardinality_decision
+    return self.underlying_set().cardinality()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Classes in the multilinear tensor presentation
+
+    def cardinality(self) -> Cardinalities.ObjectType:
+        r"""The cardinality ``|X|``, an object of ``Card``.
+    
+        Cardinality is total on sets (`CAT-01`), and this is its one
+        owner: no set construction restates it.  It is an isomorphism
+        invariant, so it is read off what the construction of ``X``
+        determines, by placement:
+    
+        - the finite ordinal ``n`` has the cardinality of its order
+          type ``n``;
+        - a set with a chosen enumeration from an index set is in
+          bijection with that index set;
+        - ``|P(X)| = 2^|X|``, since ``P(X)`` is in bijection with the
+          characteristic maps ``X -> 2``;
+        - ``|Y^X| = |Y|^|X|``, the definition of cardinal exponentiation;
+        - the ``k``-element subsets of ``X`` number ``binomial(|X|, k)``
+          for finite ``X``, one for ``k = 0``, and ``|X|`` for infinite
+          ``X`` and ``k >= 1``;
+        - the finite subsets of ``X`` number ``2^|X|`` for finite ``X``
+          and ``|X|`` for infinite ``X``;
+        - ``|prod_i X_i| = prod_i |X_i|`` and ``|coprod_i X_i| =
+          sum_i |X_i|``, the definitions of cardinal product and sum;
+        - any other finite set with a chosen enumeration is counted
+          through that enumeration, and any
+          other countably infinite set has cardinality ``aleph_0``.
+    
+        A realization whose construction determines a cardinality these
+        standard set cases do not reach supplies that theorem through the
+        protected ``_cardinality_decision`` hook.  The public operation
+        remains here.  A represented set outside all of these routes has a
+        cardinality that no exact computation here reaches, and the
+        assertion says so.
+        """
+        construction_cardinality = self._cardinality_decision()
+>       assert construction_cardinality is not None, (
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            f"cannot compute the cardinality of {self}: its construction supplies no exact value "
+            f"or decided finite enumeration (it is in {self.category()})"
+        )
+E       AssertionError: cannot compute the cardinality of Classes in the multilinear tensor presentation: its construction supplies no exact value or decided finite enumeration (it is in Category of sets)
+
+src/sage_extensions/categories/sets/set_categories.py:2511: AssertionError
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Integer Ring retains its module laws as an undecided proposition
+_____________ test_g2_and_g3_generate_the_cyclic_group_of_order_6 ______________
+
+>   return self._cached_methods[name]
+E   KeyError: 'subobject_on'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_g2_and_g3_generate_the_cyclic_group_of_order_6() -> None:
+        r"""$\gcd(2, 3) = 1$, so $\langle g^2, g^3 \rangle = \langle g \rangle = C_6$; as a $\mathbb Z$-module,
+        $\langle 2, 3 \rangle = \mathbb Z/6$ with invariant factor $6$.
+    
+        Source: by hand (Bezout: 1 = 3 - 2).
+        """
+        G = Groups.C(6)
+        g = G.group_generators()[0]
+        assert G.subgroup([g**2, g**3]).order() == 6
+        assert G.subgroup([g**2]).order() == 3
+    
+        M = Modules(ZZ)(ZZ.quotient_ring(ZZ.ideal(6)))
+        e = M.module_generator(0)
+>       generated = M.subobject_on([2 * e, 3 * e])
+                    ^^^^^^^^^^^^^^
+
+tests/modules/test_torsion_from_abelian_group_archive.sage:19: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    return self.getattr_from_category(name)
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    attr = getattr_from_other_class(self, cls, name)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: 'OwnedJoinCategory.parent_class' object has no attribute 'subobject_on'
+
+sage/cpython/getattr.pyx:357: AttributeError
+________________ test_z_mod_2_plus_z_mod_3_is_cyclic_of_order_6 ________________
+
+>   return self._cached_methods[name]
+E   KeyError: 'is_isomorphic'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_z_mod_2_plus_z_mod_3_is_cyclic_of_order_6() -> None:
+        r"""$\mathbb Z/2 \oplus \mathbb Z/3 \cong \mathbb Z/6$ by the Chinese remainder theorem; its invariant factors
+        are $(6)$ and its elementary divisors $2, 3$.
+    
+        Source: Lang, Algebra, I.8 and III.7.
+        """
+        F = ZZ**2
+        M = F.subobject_on([2 * F.module_generator(0), 3 * F.module_generator(1)]).inclusion().cokernel()
+        assert M.cardinality() == 6
+        assert tuple(M.invariant_factors()) == (6,)
+>       assert M.is_isomorphic(Modules(ZZ)(ZZ.quotient_ring(ZZ.ideal(6))))
+               ^^^^^^^^^^^^^^^
+
+tests/modules/test_torsion_from_abelian_group_archive.sage:34: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    return self.getattr_from_category(name)
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    attr = getattr_from_other_class(self, cls, name)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: '_SelectedFinitePresentationModules.parent_class[_PresentedModule].ObjectType' object has no attribute 'is_isomorphic'
+
+sage/cpython/getattr.pyx:357: AttributeError
+_ test_in_q_mod_6z_the_classes_of_3_and_2_generate_subgroups_of_orders_2_and_3 _
+
+>   return self._cached_methods[name]
+E   KeyError: 'subobject_on'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_in_q_mod_6z_the_classes_of_3_and_2_generate_subgroups_of_orders_2_and_3() -> None:
+        """3 * 2 = 6 and 2 * 3 = 6 lie in 6Z, and 3, 2 are not in 6Z; 4 = 2 * 2 in <2>.
+    
+        Source: by hand.
+        """
+>       T = rationals_modulo(6)
+            ^^^^^^^^^^^^^^^^^^^^
+
+tests/modules/test_fraction_field_quotients_archive.sage:21: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/modules/test_fraction_field_quotients_archive.sage:13: in rationals_modulo
+    return Q.subobject_on([Q(n)]).inclusion().cokernel()
+           ^^^^^^^^^^^^^^
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    return self.getattr_from_category(name)
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    attr = getattr_from_other_class(self, cls, name)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: 'OwnedJoinCategory.parent_class' object has no attribute 'subobject_on'
+
+sage/cpython/getattr.pyx:357: AttributeError
+_ test_in_q_mod_z_the_classes_of_1_4_and_1_6_generate_the_cyclic_group_of_order_12 _
+
+>   return self._cached_methods[name]
+E   KeyError: 'subobject_on'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_in_q_mod_z_the_classes_of_1_4_and_1_6_generate_the_cyclic_group_of_order_12() -> None:
+        """<1/4, 1/6> = <1/12> since 1/12 = 1/4 - 1/6 and lcm(4, 6) = 12; in Q/2Z, 4/3 and 2/3
+        generate the same subgroup of order 3.
+    
+        Source: by hand.
+        """
+>       T = rationals_modulo(1)
+            ^^^^^^^^^^^^^^^^^^^^
+
+tests/modules/test_fraction_field_quotients_archive.sage:39: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/modules/test_fraction_field_quotients_archive.sage:13: in rationals_modulo
+    return Q.subobject_on([Q(n)]).inclusion().cokernel()
+           ^^^^^^^^^^^^^^
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    return self.getattr_from_category(name)
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    attr = getattr_from_other_class(self, cls, name)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: 'OwnedJoinCategory.parent_class' object has no attribute 'subobject_on'
+
+sage/cpython/getattr.pyx:357: AttributeError
+__________ test_archived_a2_discriminant_scales_are_value_submodules ___________
+
+    def test_archived_a2_discriminant_scales_are_value_submodules() -> None:
+        bilinear = Lattices.A2.discriminant_bilinear_form()
+        bilinear_scale = bilinear.scale_submodule()
+        bilinear_generator = bilinear_scale.embedded_module_generators()[0]
+    
+        assert bilinear_scale.ambient_module() is bilinear.value_module()
+        assert bilinear_scale.cardinality() == 3
+        assert bilinear_generator == bilinear.value_module()(QQ(1) / 3)
+    
+        quadratic = Lattices.A2.discriminant_quadratic_form()
+>       quadratic_scale = quadratic.scale_submodule()
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/modules/test_fraction_field_quotients_archive.sage:61: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/misc/cachefunc.pyx:2328: in sage.misc.cachefunc.CachedMethodCallerNoArgs.__call__
+    self.cache = f(self._instance)
+src/sage_extensions/categories/modules/framed/formed/form_modules.py:3745: in scale_submodule
+    return self.value_module().subobject_on(values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Fraction Field of Integer Ring / (2)Integer Ring
+module_generators = ([0] in Fraction Field of Integer Ring / (2)Integer Ring, [(4)/(3)] in Fraction Field of Integer Ring / (2)Integer Ring, [(4)/(3)] in Fraction Field of Integer Ring / (2)Integer Ring)
+
+    def subobject_on(self, module_generators):
+        r"""Return the cyclic submodule generated by finitely many classes.
+    
+        For ``QQ / n ZZ`` with ``n != 0``, let ``x_1,...,x_r`` be the
+        selected lifts.  The subgroup of ``QQ`` generated by these lifts
+        and ``n`` is ``g ZZ`` for one positive rational ``g``.  Hence the
+        generated submodule is
+    
+        ``g ZZ / n ZZ ~= ZZ / (n/g) ZZ``.
+    
+        The source is returned as an actual module subobject carrying its
+        inclusion into this quotient.  This PID classification is the
+        reason the operation is exact despite the ambient module's
+        countable framing.
+        """
+        match self._engine:
+            case None:
+                raise TypeError(
+                    f"cannot classify the submodule of {self} generated by {tuple(module_generators)}: "
+                    "the selected gcd/divisibility classification is the QQ/nZZ computation and no "
+                    f"general submodule-classification algorithm for Frac({self.base_ring()})/a{self.base_ring()} "
+                    "has been selected"
+                )
+            case _:
+                pass
+        classes = tuple(self(element) for element in module_generators)
+        assert not self.modulus().is_zero(), (
+            f"cannot classify the submodule of {self} generated by {classes}: the "
+            "classification gZZ/nZZ ~= ZZ/(n/g)ZZ needs a nonzero modulus n, and here n = 0 "
+            "(a finitely generated submodule of QQ itself is free)"
+        )
+    
+        field = self.fraction_field()
+        values = tuple(self.lift(element) for element in classes) + (
+            self.modulus(),
+        )
+        denominator = lcm(tuple(int(value.denominator()) for value in values))
+        numerators = tuple(
+            SageZZ(_engine_element(field, value) * denominator)
+            for value in values
+        )
+        generator_numerator = abs(gcd(numerators))
+        generator = _owned_engine_element(field,
+            SageQQ(generator_numerator) / SageQQ(denominator)
+        )
+        # ``g`` divides every lift and the modulus, so ``n/g`` is integral.
+        order_in_field = self.modulus() / generator
+>       assert int(order_in_field.denominator()) == 1, (
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            f"the submodule of {self} generated by {classes} is gZZ/nZZ with g = {generator}, "
+            f"but g does not divide the modulus n = {self.modulus()}: n/g = {order_in_field} "
+            "is not an integer"
+        )
+E       AssertionError: the submodule of Fraction Field of Integer Ring / (2)Integer Ring generated by ([0] in Fraction Field of Integer Ring / (2)Integer Ring, [(4)/(3)] in Fraction Field of Integer Ring / (2)Integer Ring, [(4)/(3)] in Fraction Field of Integer Ring / (2)Integer Ring) is gZZ/nZZ with g = (2)/(3), but g does not divide the modulus n = 2: n/g = (6)/(2) is not an integer
+
+src/sage_extensions/categories/modules/framed/fraction_field_quotients.py:429: AssertionError
+__ test_the_kernel_of_y_x_on_the_coordinate_axes_is_generated_by_x_0_and_0_y ___
+
+>   return SingularKernelFunction(name)
+
+sage/libs/singular/function.pyx:1747: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/libs/singular/function.pyx:1549: in sage.libs.singular.function.SingularKernelFunction.__init__
+    self.call_handler = self.get_call_handler()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   raise NameError("Singular kernel function {!r} is not defined".format(self._name))
+E   NameError: Singular kernel function 'mor_kernel' is not defined
+
+sage/libs/singular/function.pyx:1555: NameError
+
+During handling of the above exception, another exception occurred:
+
+self = <sage.libs.singular.function_factory.SingularFunctionFactory object at 0x779c004dfce0>
+name = 'mor_kernel'
+
+    def __getattr__(self, name):
+        """
+        EXAMPLES::
+    
+            sage: import sage.libs.singular.function_factory
+            sage: groebner = sage.libs.singular.function_factory.ff.groebner
+            sage: groebner
+            groebner (singular function)
+    
+            sage: import sage.libs.singular.function_factory
+            sage: primdecSY = sage.libs.singular.function_factory.ff.primdec__lib.primdecSY
+            sage: primdecSY
+            primdecSY (singular function)
+        """
+        if name.startswith("_"):
+            raise AttributeError("Singular Function Factory has no attribute '%s'" % name)
+    
+        try:
+>           return singular_function(name)
+                   ^^^^^^^^^^^^^^^^^^^^^^^
+
+/sage/.venv/lib/python3.14/site-packages/sage/libs/singular/function_factory.py:40: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/libs/singular/function.pyx:1749: in sage.libs.singular.function.singular_function
+    return SingularLibraryFunction(name)
+sage/libs/singular/function.pyx:1502: in sage.libs.singular.function.SingularLibraryFunction.__init__
+    self.call_handler = self.get_call_handler()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   raise NameError("Singular library function {!r} is not defined".format(self._name))
+E   NameError: Singular library function 'mor_kernel' is not defined
+
+sage/libs/singular/function.pyx:1507: NameError
+
+During handling of the above exception, another exception occurred:
+
+    def test_the_kernel_of_y_x_on_the_coordinate_axes_is_generated_by_x_0_and_0_y() -> None:
+        r"""$\ker\big((y, x)\colon A^2 \to A\big) = A(x, 0) + A(0, y)$, minimally generated by two elements.
+    
+        Source: by hand from the normal form $c + x p(x) + y q(y)$.
+        """
+        A, x, y = coordinate_axes()
+        F = A**2
+        u, v = F.module_generator(0), F.module_generator(1)
+        G = A**1
+        w = G.module_generator(0)
+        morphism = F.Mor(G)({0: y * w, 1: x * w})
+    
+>       kernel = morphism.kernel()
+                 ^^^^^^^^^^^^^^^^^
+
+tests/modules/test_mor_enrichment.sage:29: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/misc/cachefunc.pyx:2328: in sage.misc.cachefunc.CachedMethodCallerNoArgs.__call__
+    self.cache = f(self._instance)
+src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py:1532: in kernel
+    represented = owner._represented_kernel_of_morphism(self)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/framed/framed_free_modules.py:1100: in _represented_kernel_of_morphism
+    return _selected_presentation_kernel(morphism)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/framed/finitely_generated/finitely_presented_modules.py:2819: in _selected_presentation_kernel
+    return _singular_presentation_kernel(morphism)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/framed/finitely_generated/finitely_presented_modules.py:3470: in _singular_presentation_kernel
+    kernel_presentation = ff.homolog__lib.mor_kernel(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <sage.libs.singular.function_factory.SingularFunctionFactory object at 0x779c004dfce0>
+name = 'mor_kernel'
+
+    def __getattr__(self, name):
+        """
+        EXAMPLES::
+    
+            sage: import sage.libs.singular.function_factory
+            sage: groebner = sage.libs.singular.function_factory.ff.groebner
+            sage: groebner
+            groebner (singular function)
+    
+            sage: import sage.libs.singular.function_factory
+            sage: primdecSY = sage.libs.singular.function_factory.ff.primdec__lib.primdecSY
+            sage: primdecSY
+            primdecSY (singular function)
+        """
+        if name.startswith("_"):
+            raise AttributeError("Singular Function Factory has no attribute '%s'" % name)
+    
+        try:
+            return singular_function(name)
+        except NameError:
+            if name.endswith("__lib"):
+                name = name[:-5]
+                lib(name + ".lib")
+                return SingularFunctionFactory()
+>           raise NameError("function or package '%s' unknown." % (name))
+E           NameError: function or package 'mor_kernel' unknown.
+
+/sage/.venv/lib/python3.14/site-packages/sage/libs/singular/function_factory.py:46: NameError
+_ test_the_kernel_of_x_on_the_coordinate_axes_is_yA_which_x_kills_and_is_not_free _
+
+>   return SingularKernelFunction(name)
+
+sage/libs/singular/function.pyx:1747: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/libs/singular/function.pyx:1549: in sage.libs.singular.function.SingularKernelFunction.__init__
+    self.call_handler = self.get_call_handler()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   raise NameError("Singular kernel function {!r} is not defined".format(self._name))
+E   NameError: Singular kernel function 'mor_kernel' is not defined
+
+sage/libs/singular/function.pyx:1555: NameError
+
+During handling of the above exception, another exception occurred:
+
+self = <sage.libs.singular.function_factory.SingularFunctionFactory object at 0x779c01451050>
+name = 'mor_kernel'
+
+    def __getattr__(self, name):
+        """
+        EXAMPLES::
+    
+            sage: import sage.libs.singular.function_factory
+            sage: groebner = sage.libs.singular.function_factory.ff.groebner
+            sage: groebner
+            groebner (singular function)
+    
+            sage: import sage.libs.singular.function_factory
+            sage: primdecSY = sage.libs.singular.function_factory.ff.primdec__lib.primdecSY
+            sage: primdecSY
+            primdecSY (singular function)
+        """
+        if name.startswith("_"):
+            raise AttributeError("Singular Function Factory has no attribute '%s'" % name)
+    
+        try:
+>           return singular_function(name)
+                   ^^^^^^^^^^^^^^^^^^^^^^^
+
+/sage/.venv/lib/python3.14/site-packages/sage/libs/singular/function_factory.py:40: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/libs/singular/function.pyx:1749: in sage.libs.singular.function.singular_function
+    return SingularLibraryFunction(name)
+sage/libs/singular/function.pyx:1502: in sage.libs.singular.function.SingularLibraryFunction.__init__
+    self.call_handler = self.get_call_handler()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   raise NameError("Singular library function {!r} is not defined".format(self._name))
+E   NameError: Singular library function 'mor_kernel' is not defined
+
+sage/libs/singular/function.pyx:1507: NameError
+
+During handling of the above exception, another exception occurred:
+
+    def test_the_kernel_of_x_on_the_coordinate_axes_is_yA_which_x_kills_and_is_not_free() -> None:
+        r"""$\ker(x\colon A \to A) = yA \cong A/(x)$: cyclic, generated by $y$, annihilated by $x$, not free.
+    
+        Source: by hand from the normal form $c + x p(x) + y q(y)$.
+        """
+        A, x, y = coordinate_axes()
+        M = A**1
+        e = M.module_generator(0)
+>       kernel = M.End()({0: x * e}).kernel()
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/modules/test_mor_enrichment.sage:48: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/misc/cachefunc.pyx:2328: in sage.misc.cachefunc.CachedMethodCallerNoArgs.__call__
+    self.cache = f(self._instance)
+src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py:1532: in kernel
+    represented = owner._represented_kernel_of_morphism(self)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/framed/framed_free_modules.py:1100: in _represented_kernel_of_morphism
+    return _selected_presentation_kernel(morphism)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/framed/finitely_generated/finitely_presented_modules.py:2819: in _selected_presentation_kernel
+    return _singular_presentation_kernel(morphism)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/framed/finitely_generated/finitely_presented_modules.py:3470: in _singular_presentation_kernel
+    kernel_presentation = ff.homolog__lib.mor_kernel(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <sage.libs.singular.function_factory.SingularFunctionFactory object at 0x779c01451050>
+name = 'mor_kernel'
+
+    def __getattr__(self, name):
+        """
+        EXAMPLES::
+    
+            sage: import sage.libs.singular.function_factory
+            sage: groebner = sage.libs.singular.function_factory.ff.groebner
+            sage: groebner
+            groebner (singular function)
+    
+            sage: import sage.libs.singular.function_factory
+            sage: primdecSY = sage.libs.singular.function_factory.ff.primdec__lib.primdecSY
+            sage: primdecSY
+            primdecSY (singular function)
+        """
+        if name.startswith("_"):
+            raise AttributeError("Singular Function Factory has no attribute '%s'" % name)
+    
+        try:
+            return singular_function(name)
+        except NameError:
+            if name.endswith("__lib"):
+                name = name[:-5]
+                lib(name + ".lib")
+                return SingularFunctionFactory()
+>           raise NameError("function or package '%s' unknown." % (name))
+E           NameError: function or package 'mor_kernel' unknown.
+
+/sage/.venv/lib/python3.14/site-packages/sage/libs/singular/function_factory.py:46: NameError
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring / Ideal (x*y) of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:833 Elementwise module morphism Module over Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring / Ideal (x*y) of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring on Classes in the multilinear tensor presentation -> Module over Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring / Ideal (x*y) of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring on Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring / Ideal (x*y) of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+_ test_the_cokernel_of_x_on_the_local_ring_at_the_origin_is_the_residue_field __
+
+>   y = x
+E   TypeError: Cannot convert DynamicMetaclass to sage.structure.category_object.CategoryObject
+
+sage/categories/category_singleton.pyx:74: TypeError
+
+During handling of the above exception, another exception occurred:
+
+    def test_the_cokernel_of_x_on_the_local_ring_at_the_origin_is_the_residue_field() -> None:
+        r"""For $A = \mathbb Q[x]_{(x)}$, $\operatorname{coker}(A \xrightarrow{x} A) = A/\mathfrak m = \mathbb Q$:
+        nonzero, cyclic, with annihilator $\mathfrak m = (x)$.
+    
+        Source: Atiyah–Macdonald, Introduction to Commutative Algebra, ch. 3 (localization); by hand.
+        """
+        R = QQ["x"]
+        x = R.gen()
+>       A = R.localization_at_prime(R.ideal(x))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/modules/test_direct_local_exact_maps.sage:14: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/modules/pure/modules.py:3214: in localize_at_prime
+    localization_ring = ring.spectrum()(prime).local_ring()
+                        ^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/commutative_algebra.py:542: in __call__
+    return self._element_constructor_(ideal)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/commutative_algebra.py:597: in _element_constructor_
+    candidate = _owned_ideal(self.ring(), ideal)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/commutative_algebra.py:772: in _owned_ideal
+    backend = _engine_ideal(source, ideal)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/commutative_algebra.py:755: in _engine_ideal
+    return engine.ideal(_engine_ring_value(ring, ideal))
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/ring_foundation.py:638: in _engine_ring_value
+    if value_parent is engine or value_parent in SageRings():
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   TypeError: category() needs an argument
+
+sage/categories/category_singleton.pyx:80: TypeError
+====================== test lint: 55 findings in 14 files ======================
+tests/modules/test_cap_complexes_zx.sage:4: TL01 from sage_extensions.categories.modules.cochain_complexes import ...: take every name from the session
+tests/modules/test_cardinality_and_exponent_over_any_pid.sage:44: TL10 len(): ask for a cardinality
+tests/modules/test_cardinality_and_exponent_over_any_pid.sage:45: TL10 len(): ask for a cardinality
+tests/modules/test_cochain_complexes.sage:4: TL01 from sage_extensions.categories.modules.cochain_complexes import ...: take every name from the session
+tests/modules/test_cohomology_functors.sage:4: TL01 from sage_extensions.categories.algebras.algebras import ...: take every name from the session
+tests/modules/test_cohomology_functors.sage:5: TL01 from sage_extensions.categories.modules.cochain_complexes import ...: take every name from the session
+tests/modules/test_cohomology_of_cyclic_groups.sage:13: TL01 from sage_extensions.categories.modules.cochain_complexes import ...: take every name from the session
+tests/modules/test_dual_point_hash.sage:19: TL01 from sage_extensions.categories.polyhedral_cones import ...: take every name from the session
+tests/modules/test_dual_point_hash.sage:53: TL10 len(): ask for a cardinality
+tests/modules/test_dual_point_hash.sage:54: TL10 len(): ask for a cardinality
+tests/modules/test_dual_point_hash.sage:55: TL10 len(): ask for a cardinality
+tests/modules/test_dual_point_hash.sage:70: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_dual_point_hash.sage:72: TL10 len(): ask for a cardinality
+tests/modules/test_dual_point_hash.sage:109: TL10 len(): ask for a cardinality
+tests/modules/test_dual_point_hash.sage:110: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_dual_point_hash.sage:110: TL10 len(): ask for a cardinality
+tests/modules/test_dual_point_hash.sage:128: TL03 isinstance(): introspection is not mathematics
+tests/modules/test_dual_point_hash.sage:139: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/modules/test_dual_point_hash.sage:139: TL02 imports the private name _probe_prefix
+tests/modules/test_finitely_presented_module_archive.sage:42: TL03 isinstance(): introspection is not mathematics
+tests/modules/test_finitely_presented_module_archive.sage:64: TL03 isinstance(): introspection is not mathematics
+tests/modules/test_fraction_field_base_change_archive.sage:4: TL01 from sage_extensions.categories.abstract_categories.mor_categories import ...: take every name from the session
+tests/modules/test_fraction_field_base_change_archive.sage:24: TL03 isinstance(): introspection is not mathematics
+tests/modules/test_invariant_factor_framing.sage:4: TL01 from sage_extensions.categories.abstract_categories.mor_categories import ...: take every name from the session
+tests/modules/test_invariant_factor_framing.sage:24: TL03 isinstance(): introspection is not mathematics
+tests/modules/test_invariant_factor_framing.sage:26: TL03 isinstance(): introspection is not mathematics
+tests/modules/test_invariant_factor_framing.sage:52: TL03 isinstance(): introspection is not mathematics
+tests/modules/test_invariant_factor_framing.sage:67: TL03 isinstance(): introspection is not mathematics
+tests/modules/test_module_completion_maps.sage:10: TL01 from sage_extensions.categories.abstract_categories.mor_categories import ...: take every name from the session
+tests/modules/test_module_completion_maps.sage:76: TL03 isinstance(): introspection is not mathematics
+tests/modules/test_powers.sage:11: TL01 from sage_extensions.categories.abstract_categories.mor_categories import ...: take every name from the session
+tests/modules/test_powers.sage:93: TL03 isinstance(): introspection is not mathematics
+tests/modules/test_rank_stratification_and_local_freeness.sage:10: TL01 from sage_extensions.categories.abstract_categories.mor_categories import ...: take every name from the session
+tests/modules/test_rank_stratification_and_local_freeness.sage:54: TL03 isinstance(): introspection is not mathematics
+tests/modules/test_the_paired_module_readings_of_an_algebra.sage:19: TL01 from sage_extensions.categories.algebras.algebras import ...: take every name from the session
+tests/modules/test_the_paired_module_readings_of_an_algebra.sage:23: TL01 from sage_extensions.categories.modules.framed.framed_free_modules import ...: take every name from the session
+tests/modules/test_the_paired_module_readings_of_an_algebra.sage:26: TL01 from sage_extensions.categories.modules.pure.modules import ...: take every name from the session
+tests/modules/test_the_paired_module_readings_of_an_algebra.sage:31: TL01 from sage_extensions.refine import ...: take every name from the session
+tests/modules/test_the_paired_module_readings_of_an_algebra.sage:71: TL08 ModulesWithChosenFinitePresentation: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_the_paired_module_readings_of_an_algebra.sage:92: TL08 ModulesWithChosenFinitePresentation: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_the_paired_module_readings_of_an_algebra.sage:93: TL08 ModulesWithChosenFinitePresentation: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_the_paired_module_readings_of_an_algebra.sage:108: TL08 FramedFreeModules: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_the_selected_relation_morphism_contract.sage:19: TL01 from sage_extensions.categories.modules.pure.modules import ...: take every name from the session
+tests/modules/test_the_selected_relation_morphism_contract.sage:41: TL08 ModulesWithChosenFinitePresentation: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_the_selected_relation_morphism_contract.sage:42: TL02 private attribute ._selected_relation_morphism
+tests/modules/test_the_selected_relation_morphism_contract.sage:43: TL09 an assertion that holds of anything
+tests/modules/test_the_selected_relation_morphism_contract.sage:55: TL08 ModulesWithChosenFinitePresentation: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_the_selected_relation_morphism_contract.sage:56: TL02 private attribute ._selected_relation_morphism
+tests/modules/test_the_selected_relation_morphism_contract.sage:57: TL09 an assertion that holds of anything
+tests/modules/test_the_selected_relation_morphism_contract.sage:66: TL08 ModulesWithChosenFinitePresentation: a chosen-datum or implementation construction; construct through the top-level category of the kind
+... and 5 more (just test-lint lists them)
+=============================== time-gate report ===============================
+session star import took 3.25 s; the measured ceiling is 3 s
+collection took 54.70 s; the measured ceiling is 6 s
+============================== slowest durations ===============================
+3.93s call     tests/modules/test_cyclic_discriminant_torsion.sage::test_a_cyclic_discriminant_module_has_its_torsion_submodule
+3.61s call     tests/modules/test_derived_functors.sage::test_tor_over_the_integers_is_the_gcd_and_vanishes_above_the_resolution
+3.59s call     tests/modules/test_divided_square_of_an_elementary_two_group.sage::test_the_divided_square_has_the_exact_cyclic_factors
+1.95s call     tests/modules/test_derived_functors.sage::test_tor_and_ext_of_cyclic_modules_over_a_polynomial_ring
+1.77s call     tests/modules/test_presented_module_preimages.sage::test_residue_submodules_at_modulus_six_have_their_exact_transporters
+1.56s call     tests/modules/test_isotypic_direct_sum_construction.sage::test_q2_with_c2_acting_by_diag_1_minus_1_splits_into_trivial_and_sign_lines
+1.43s call     tests/modules/test_presented_module_submodule_images.sage::test_nonuniform_residue_submodules_retain_the_full_quarter_turn_stabilizer
+1.40s call     tests/modules/test_derived_functors.sage::test_ext_over_the_integers
+1.37s call     tests/modules/test_polynomial_presentation_relation_membership.sage::test_multivariate_relation_membership_does_not_use_fraction_field_span
+1.12s call     tests/modules/test_pid_cokernel_rank.sage::test_a_cyclic_polynomial_quotient_has_its_exact_order_and_annihilator
+0.96s call     tests/modules/test_torsion_from_abelian_group_archive.sage::test_g2_and_g3_generate_the_cyclic_group_of_order_6
+0.75s call     tests/modules/test_tor_and_ext_of_finite_cyclic_groups.sage::test_hom_and_ext_one_of_z6_into_z4_are_z2
+0.58s call     tests/modules/test_derived_functors.sage::test_ext_one_into_the_integers_turns_the_quotient_z_mod_6_to_z_mod_3_into_an_injection
+0.57s call     tests/modules/test_localization_constructor_convergence.sage::test_a_determinant_three_endomorphism_of_z2_becomes_invertible_at_the_prime_2
+0.55s call     tests/modules/test_finite_cokernel_constructor.sage::test_infinite_numerator_module_can_have_finite_zero_localization
+0.50s call     tests/modules/test_torsion_modules_archive.sage::test_z2_mod_6_is_z2_mod_2_a_torsion_module_of_projective_dimension_one
+0.46s call     tests/modules/test_tor_and_ext_of_finite_cyclic_groups.sage::test_ext_two_vanishes_over_the_integers
+0.42s call     tests/modules/test_fraction_field_quotients_archive.sage::test_archived_a2_discriminant_scales_are_value_submodules
+0.37s call     tests/modules/test_tor_and_ext_of_finite_cyclic_groups.sage::test_tor_zero_of_z6_and_z4_is_their_tensor_product_z2
+0.37s call     tests/modules/test_tor_and_ext_of_finite_cyclic_groups.sage::test_multiplication_by_two_induces_zero_on_tor_one_of_z2_and_z2
+0.32s call     tests/modules/test_hom_modules_between_cyclic_groups.sage::test_the_orders_of_hom_modules_between_cyclic_groups
+0.28s call     tests/modules/test_free_resolutions.sage::test_z_mod_6_plus_z_has_the_length_one_resolution_z_to_z2_by_6_0
+0.28s call     tests/modules/test_polynomial_ideal_image_factorization.sage::test_polynomial_map_image_is_the_ideal_with_its_inclusion
+0.27s call     tests/modules/test_torsion_from_the_generic_fibre.sage::test_z_mod_6_plus_z_has_generic_rank_1_and_is_neither_torsion_nor_torsion_free
+0.26s call     tests/modules/test_tor_and_ext_of_finite_cyclic_groups.sage::test_tor_one_of_z6_and_z4_is_z2
+0.26s call     tests/modules/test_bilinear_form_modules_a2_and_u.sage::test_a2_modulo_three_is_degenerate
+0.25s call     tests/modules/test_tor_and_ext_of_finite_cyclic_groups.sage::test_tor_one_of_z6_and_z9_is_z3_and_of_z6_and_z_is_zero
+0.23s call     tests/modules/test_finite_length_presented_modules.sage::test_square_of_rational_origin_has_length_three
+0.22s call     tests/modules/test_hom_modules_between_cyclic_groups.sage::test_hom_from_z4_to_z6_is_z2
+0.22s call     tests/modules/test_mor_enrichment.sage::test_the_kernel_of_y_x_on_the_coordinate_axes_is_generated_by_x_0_and_0_y
+0.22s call     tests/modules/test_tor_and_ext_of_finite_cyclic_groups.sage::test_ext_one_of_z6_into_z_is_z6_and_hom_is_zero
+0.22s call     tests/modules/test_a_presented_module_is_built_before_it_computes.sage::test_a_plane_inclusions_quotient_is_built_before_it_is_asked
+0.22s call     tests/modules/test_hom_modules_between_cyclic_groups.sage::test_hom_from_z6_to_z4_is_z2_generated_by_one_to_two
+0.20s call     tests/modules/test_pid_cokernel_rank.sage::test_a_free_summand_preserves_the_polynomial_torsion_relation
+0.20s call     tests/modules/test_hom_modules_between_cyclic_groups.sage::test_the_endomorphisms_of_z6_and_the_homs_from_z_to_z6_are_z6
+0.19s call     tests/modules/test_the_permutation_module_of_c2.sage::test_the_invariants_of_the_permutation_module_have_rank_one
+0.17s call     tests/modules/test_polynomial_ideal_image_factorization.sage::test_polynomial_map_cokernel_is_the_quotient_by_xy
+0.16s call     tests/modules/test_finite_length_presented_modules.sage::test_nonrational_closed_point_divides_base_dimension_by_residue_degree
+0.15s call     tests/modules/test_the_permutation_module_of_c2.sage::test_the_swap_moves_a_to_b_and_fixes_a_plus_b
+0.15s call     tests/modules/test_presented_module_preimages.sage::test_preimages_in_z_mod_two_plus_z_have_even_free_coordinate
+0.15s call     tests/modules/test_presented_module_preimages.sage::test_named_framing_of_z_mod_two_plus_z_has_its_exact_shear_involution
+0.14s call     tests/modules/test_hom_modules_between_cyclic_groups.sage::test_hom_from_z6_to_z_is_zero
+0.13s call     tests/modules/test_sections_and_retractions.sage::test_z2_mod_g_is_free_and_z2_mod_6g_is_not
+0.13s call     tests/modules/test_mor_enrichment.sage::test_the_kernel_of_z_mod_4_onto_z_mod_2_is_z_mod_2_generated_by_2x
+0.12s call     tests/modules/test_bilinear_form_modules_a2_and_u.sage::test_raising_an_index_of_a2_needs_the_rational_inverse_gram_matrix
+0.11s call     tests/modules/test_cyclic_discriminant_torsion.sage::test_a_module_automorphism_retains_the_inverse_it_was_built_with
+0.11s call     tests/modules/test_free_resolutions.sage::test_the_noninjective_presentation_2x_4x_resolves_as_z_by_2_to_z
+0.10s call     tests/modules/test_bilinear_form_modules_a2_and_u.sage::test_the_values_of_the_a2_form
+0.10s call     tests/modules/test_mor_enrichment.sage::test_the_kernel_of_x_on_the_coordinate_axes_is_yA_which_x_kills_and_is_not_free
+0.10s call     tests/modules/test_the_permutation_module_of_c2.sage::test_the_coinvariants_of_the_permutation_module_are_free_of_rank_one
+0.09s call     tests/modules/test_bilinear_form_modules_a2_and_u.sage::test_the_identity_is_a_morphism_into_the_twist_along_multiplication_by_three
+0.09s call     tests/modules/test_hom_modules_between_cyclic_groups.sage::test_the_presentation_of_end_z6_is_the_first_differential_of_its_resolution
+0.09s call     tests/modules/test_bilinear_form_modules_a2_and_u.sage::test_the_correlation_of_a2_has_cokernel_of_order_three
+0.08s call     tests/modules/test_module_automorphisms_are_a_group.sage::test_aut_z2_contains_the_swap_but_not_the_doubling
+0.07s call     tests/modules/test_torsion_from_abelian_group_archive.sage::test_z_mod_2_plus_z_mod_3_is_cyclic_of_order_6
+0.07s call     tests/modules/test_polynomial_ideal_image_factorization.sage::test_polynomial_map_kernel_is_exactly_the_principal_syzygy
+0.07s call     tests/modules/test_projectivity_from_fitting_ideals.sage::test_z2_modulo_a_basis_vector_is_projective_with_fitting_ideals_0_and_z
+0.07s call     tests/modules/test_bilinear_form_modules_a2_and_u.sage::test_the_twist_by_three_triples_the_form
+0.06s call     tests/modules/test_bilinear_form_modules_a2_and_u.sage::test_the_hyperbolic_plane_has_isotropic_basis_vectors_and_raises_by_swapping
+0.05s call     tests/modules/test_integer_matrices_as_linear_maps.sage::test_the_invariant_factors_of_2_4_6_8_are_2_and_4
+0.05s call     tests/modules/test_integer_matrices_as_linear_maps.sage::test_the_smith_form_of_2_4_6_8_is_diag_2_4
+0.05s call     tests/modules/test_the_permutation_module_of_c2.sage::test_the_character_of_the_permutation_module
+0.05s call     tests/modules/test_bilinear_form_modules_a2_and_u.sage::test_the_swap_and_the_order_six_rotation_are_isometries_of_a2
+0.04s call     tests/modules/test_scalar_change_between_z_and_q.sage::test_a_form_over_a_restricted_ring_reads_the_ring_s_regular_module
+0.04s call     tests/modules/test_bilinear_form_modules_a2_and_u.sage::test_a2_over_the_rationals_keeps_its_determinant
+0.03s call     tests/modules/test_fitting_ideals_and_invariants_of_presented_abelian_groups.sage::test_the_ranks_of_z6_plus_z_and_z2_squared_are_one_and_zero
+0.03s call     tests/modules/test_integer_matrices_as_linear_maps.sage::test_the_orders_of_a_and_of_the_quarter_turn
+0.02s call     tests/modules/test_a_presented_module_is_built_before_it_computes.sage::test_constructing_a_cokernel_asks_the_engine_for_no_matrix
+0.02s call     tests/modules/test_bilinear_form_modules_a2_and_u.sage::test_a2_over_the_rationals_is_nondegenerate
+0.02s call     tests/modules/test_tor_and_ext_of_finite_cyclic_groups.sage::test_the_resolution_of_z6_has_length_one
+0.02s call     tests/modules/test_fitting_ideals_and_invariants_of_presented_abelian_groups.sage::test_the_cokernel_of_the_identity_is_zero
+0.02s call     tests/modules/test_module_defining_action_constructors.sage::test_three_constructions_of_z_mod_6_are_isomorphic
+0.02s call     tests/modules/test_hom_modules_between_cyclic_groups.sage::test_hom_between_free_modules_is_free_of_the_product_rank
+0.02s call     tests/modules/test_integer_matrices_as_linear_maps.sage::test_a_is_a_unit_and_diag_2_1_is_not
+0.02s call     tests/modules/test_fitting_ideals_and_invariants_of_presented_abelian_groups.sage::test_the_fitting_ideals_of_z6_plus_z_are_0_6_and_1
+0.02s call     tests/modules/test_fitting_ideals_and_invariants_of_presented_abelian_groups.sage::test_z2_squared_is_a_torsion_module_killed_by_two
+0.02s call     tests/modules/test_fitting_ideals_and_invariants_of_presented_abelian_groups.sage::test_z2_squared_has_four_elements
+0.02s call     tests/modules/test_fitting_ideals_and_invariants_of_presented_abelian_groups.sage::test_z6_plus_z_is_countably_infinite
+0.02s call     tests/modules/test_torsion_from_the_generic_fibre.sage::test_z_mod_6_is_torsion_with_generic_rank_0_and_is_its_own_torsion_submodule
+0.02s call     tests/modules/test_direct_local_exact_maps.sage::test_the_cokernel_of_x_on_the_local_ring_at_the_origin_is_the_residue_field
+0.02s call     tests/modules/test_direct_sum_of_cyclics_accessor.sage::test_the_two_spellings_reach_equal_modules
+0.02s call     tests/modules/test_fitting_ideals_and_invariants_of_presented_abelian_groups.sage::test_z6_plus_z_has_projective_dimension_one
+0.02s call     tests/modules/test_integer_matrices_as_linear_maps.sage::test_the_inverse_of_a_is_the_integer_matrix_1_minus_1_minus_1_2
+0.02s call     tests/modules/test_fitting_ideals_and_invariants_of_presented_abelian_groups.sage::test_z6_plus_z_has_annihilator_and_exponent_zero
+0.02s call     tests/modules/test_hom_modules_between_cyclic_groups.sage::test_precomposition_with_three_multiplies_by_three
+0.02s call     tests/modules/test_module_defining_action_constructors.sage::test_a_map_z_plus_z6_to_z_plus_z3_lifts_to_a_map_of_presentations
+0.01s call     tests/modules/test_direct_sum_of_cyclics_accessor.sage::test_the_orders_are_the_invariant_factors
+0.01s call     tests/modules/test_tensor_mor_adjunction.sage::test_z_mod_2_tensor_z_mod_4_is_z_mod_2_and_represents_bilinear_maps
+0.01s call     tests/modules/test_fitting_ideals_and_invariants_of_presented_abelian_groups.sage::test_z6_plus_z_is_neither_torsion_nor_projective
+0.01s teardown tests/modules/test_fitting_ideals_and_invariants_of_presented_abelian_groups.sage::test_the_cokernel_of_the_identity_is_zero
+0.01s call     tests/modules/test_direct_sum_of_cyclics_accessor.sage::test_units_contribute_nothing_and_no_order_gives_the_zero_module
+0.01s call     tests/modules/test_fitting_ideals_and_invariants_of_presented_abelian_groups.sage::test_the_fitting_ideals_of_z2_squared_are_4_2_and_1
+0.01s call     tests/modules/test_bilinear_form_modules_a2_and_u.sage::test_a_map_that_doubles_a_root_is_not_a_morphism_of_the_form
+0.01s setup    tests/modules/test_cap_complexes_zx.sage::test_the_kernel_of_two_x_on_ZZx_squared_is_free_on_the_koszul_syzygy
+0.01s call     tests/modules/test_integer_matrices_as_linear_maps.sage::test_constructing_matrices_from_entries_units_and_diagonals
+0.01s call     tests/modules/test_integer_matrices_as_linear_maps.sage::test_solving_a_x_equals_e0
+0.01s setup    tests/modules/test_cyclic_discriminant_torsion.sage::test_the_discriminant_form_normalization_retains_its_inverse
+0.01s setup    tests/modules/test_dual_point_hash.sage::test_inserting_distinct_dual_points_does_not_compare_every_pair
+0.01s setup    tests/modules/test_cohomology_functors.sage::test_de_rham_cohomology_of_F2_dual_numbers_is_a_ring_functor_under_x_to_zero
+0.01s setup    tests/modules/test_mor_enrichment.sage::test_the_kernel_of_z_mod_4_onto_z_mod_2_is_z_mod_2_generated_by_2x
+0.01s setup    tests/modules/test_the_paired_module_readings_of_an_algebra.sage::test_one_generator_over_the_cover_still_does_not_make_the_quotient_projective
+0.01s setup    tests/modules/test_derived_functors.sage::test_ext_over_the_integers
+0.01s setup    tests/modules/test_scalar_change_between_z_and_q.sage::test_the_restriction_of_q2_is_countable_torsion_free_and_flat
+0.01s setup    tests/modules/test_the_selected_relation_morphism_contract.sage::test_a_framed_free_module_states_the_empty_relation_family
+0.01s teardown tests/modules/test_tor_and_ext_of_finite_cyclic_groups.sage::test_ext_one_of_z6_into_z_is_z6_and_hom_is_zero
+0.01s call     tests/modules/test_integer_matrices_as_linear_maps.sage::test_determinant_trace_square_and_transpose
+0.01s setup    tests/modules/test_integer_matrices_as_linear_maps.sage::test_the_orders_of_a_and_of_the_quarter_turn
+0.01s setup    tests/modules/test_scalar_change_between_z_and_q.sage::test_restriction_to_the_integers_has_a_right_adjoint
+0.01s setup    tests/modules/test_dual_point_hash.sage::test_the_zero_and_the_scalars_keep_their_own_hashes
+0.01s setup    tests/modules/test_the_permutation_module_of_c2.sage::test_the_coinvariants_of_the_permutation_module_are_free_of_rank_one
+0.01s setup    tests/modules/test_the_permutation_module_of_c2.sage::test_the_character_of_the_permutation_module
+0.01s setup    tests/modules/test_module_defining_action_constructors.sage::test_a_map_z_plus_z6_to_z_plus_z3_lifts_to_a_map_of_presentations
+0.01s setup    tests/modules/test_projectivity_from_fitting_ideals.sage::test_z2_modulo_a_basis_vector_is_projective_with_fitting_ideals_0_and_z
+0.01s setup    tests/modules/test_module_completion_maps.sage::test_the_cokernel_of_x_on_q_x_completed_is_the_residue_field
+0.01s teardown tests/modules/test_integer_matrices_as_linear_maps.sage::test_reading_a_type_one_one_tensor_as_a_matrix
+0.01s setup    tests/modules/test_bilinear_form_modules_a2_and_u.sage::test_a_map_that_doubles_a_root_is_not_a_morphism_of_the_form
+0.01s setup    tests/modules/test_powers.sage::test_power_modules_retain_the_source_and_degree_that_define_them
+0.01s setup    tests/modules/test_dual_point_hash.sage::test_equal_dual_points_share_a_hash_whatever_presents_them
+0.01s setup    tests/modules/test_scalar_change_between_z_and_q.sage::test_the_unit_of_extension_and_restriction_sends_e0_to_one_tensor_e0
+0.01s call     tests/modules/test_cyclic_discriminant_torsion.sage::test_the_discriminant_form_normalization_retains_its_inverse
+0.01s setup    tests/modules/test_divided_square_of_an_elementary_two_group.sage::test_the_divided_square_has_the_exact_cyclic_factors
+0.01s setup    tests/modules/test_torsion_modules_archive.sage::test_in_z2_mod_6_the_generator_is_nonzero_killed_by_2_and_tor1_has_two_elements
+0.01s setup    tests/modules/test_powers.sage::test_ranks_of_the_powers_of_z2
+0.01s setup    tests/modules/test_bilinear_form_modules_a2_and_u.sage::test_a2_represents_two_and_not_four
+0.01s setup    tests/modules/test_tor_and_ext_of_finite_cyclic_groups.sage::test_multiplication_by_two_induces_zero_on_tor_one_of_z2_and_z2
+0.01s setup    tests/modules/test_free_resolutions.sage::test_the_noninjective_presentation_2x_4x_resolves_as_z_by_2_to_z
+0.01s setup    tests/modules/test_mor_enrichment.sage::test_the_kernel_of_x_on_the_coordinate_axes_is_yA_which_x_kills_and_is_not_free
+0.01s setup    tests/modules/test_pid_cokernel_rank.sage::test_a_cyclic_polynomial_quotient_has_its_exact_order_and_annihilator
+0.01s setup    tests/modules/test_integer_matrices_as_linear_maps.sage::test_square_matrices_commute_only_in_size_one
+
+(335 durations < 0.005s hidden.  Use -vv to show these durations.)
+=========================== short test summary info ============================
+FAILED tests/modules/test_torsion_modules_archive.sage::test_z2_mod_6_is_z2_mod_2_a_torsion_module_of_projective_dimension_one
+FAILED tests/modules/test_torsion_modules_archive.sage::test_in_z2_mod_6_the_generator_is_nonzero_killed_by_2_and_tor1_has_two_elements
+FAILED tests/modules/test_torsion_modules_archive.sage::test_z2_mod_6_has_a_length_one_resolution_and_ext1_into_z2_of_order_two
+FAILED tests/modules/test_torsion_from_the_generic_fibre.sage::test_z_mod_6_is_torsion_with_generic_rank_0_and_is_its_own_torsion_submodule
+FAILED tests/modules/test_torsion_from_the_generic_fibre.sage::test_z_mod_6_plus_z_has_generic_rank_1_and_is_neither_torsion_nor_torsion_free
+FAILED tests/modules/test_module_automorphisms_are_a_group.sage::test_aut_z2_contains_the_swap_but_not_the_doubling
+FAILED tests/modules/test_localization_constructor_convergence.sage::test_a_determinant_three_endomorphism_of_z2_becomes_invertible_at_the_prime_2
+FAILED tests/modules/test_finite_cokernel_constructor.sage::test_infinite_numerator_module_can_have_finite_zero_localization
+FAILED tests/modules/test_polynomial_ideal_image_factorization.sage::test_polynomial_map_kernel_is_exactly_the_principal_syzygy
+FAILED tests/modules/test_tensor_mor_adjunction.sage::test_z_mod_2_tensor_z_mod_4_is_z_mod_2_and_represents_bilinear_maps
+FAILED tests/modules/test_tensor_mor_adjunction.sage::test_tensor_with_z_mod_4_is_left_adjoint_to_hom_from_z_mod_4
+FAILED tests/modules/test_bilinear_form_modules_a2_and_u.sage::test_a_map_that_doubles_a_root_is_not_a_morphism_of_the_form
+FAILED tests/modules/test_bilinear_form_modules_a2_and_u.sage::test_the_identity_is_a_morphism_into_the_twist_along_multiplication_by_three
+FAILED tests/modules/test_bilinear_form_modules_a2_and_u.sage::test_a2_represents_two_and_not_four
+FAILED tests/modules/test_bilinear_form_modules_a2_and_u.sage::test_the_bilinear_form_of_a2_as_a_quadratic_form
+FAILED tests/modules/test_module_defining_action_constructors.sage::test_a_map_z_plus_z6_to_z_plus_z3_lifts_to_a_map_of_presentations
+FAILED tests/modules/test_module_defining_action_constructors.sage::test_three_constructions_of_z_mod_6_are_isomorphic
+FAILED tests/modules/test_module_defining_action_constructors.sage::test_tensor_hom_and_exterior_square_of_z_mod_6
+FAILED tests/modules/test_torsion_from_abelian_group_archive.sage::test_g2_and_g3_generate_the_cyclic_group_of_order_6
+FAILED tests/modules/test_torsion_from_abelian_group_archive.sage::test_z_mod_2_plus_z_mod_3_is_cyclic_of_order_6
+FAILED tests/modules/test_fraction_field_quotients_archive.sage::test_in_q_mod_6z_the_classes_of_3_and_2_generate_subgroups_of_orders_2_and_3
+FAILED tests/modules/test_fraction_field_quotients_archive.sage::test_in_q_mod_z_the_classes_of_1_4_and_1_6_generate_the_cyclic_group_of_order_12
+FAILED tests/modules/test_fraction_field_quotients_archive.sage::test_archived_a2_discriminant_scales_are_value_submodules
+FAILED tests/modules/test_mor_enrichment.sage::test_the_kernel_of_y_x_on_the_coordinate_axes_is_generated_by_x_0_and_0_y
+FAILED tests/modules/test_mor_enrichment.sage::test_the_kernel_of_x_on_the_coordinate_axes_is_yA_which_x_kills_and_is_not_free
+FAILED tests/modules/test_direct_local_exact_maps.sage::test_the_cokernel_of_x_on_the_local_ring_at_the_origin_is_the_residue_field
+ERROR tests/modules/test_module_completion_maps.sage::test_multiplication_by_x_on_q_x_stays_injective_on_q_x_completed
+ERROR tests/modules/test_module_completion_maps.sage::test_the_cokernel_of_x_on_q_x_completed_is_the_residue_field
+ERROR tests/modules/test_module_completion_maps.sage::test_multiplication_by_x_on_q_x_mod_x3_keeps_its_kernel_after_completion
+ERROR tests/modules/test_module_completion_maps.sage::test_q_x_mod_x4_is_already_x_adically_complete_and_projects_to_q_x_mod_x3
+ERROR tests/modules/test_finitely_presented_module_archive.sage::test_the_relations_2x_and_4x_have_hermite_form_2x
+ERROR tests/modules/test_finitely_presented_module_archive.sage::test_z2_modulo_2x_plus_4y_is_z_mod_2_plus_z
+ERROR tests/modules/test_cardinality_and_exponent_over_any_pid.sage::test_integer_residue_cubes_have_their_cartesian_cardinality
+ERROR tests/modules/test_cardinality_and_exponent_over_any_pid.sage::test_F5t_mod_t_squared_has_25_elements_and_exponent_t_squared
+ERROR tests/modules/test_cardinality_and_exponent_over_any_pid.sage::test_zz_presented_modules_use_exact_quotient_cardinalities
+ERROR tests/modules/test_the_selected_relation_morphism_contract.sage::test_a_framed_free_module_states_the_empty_relation_family
+ERROR tests/modules/test_the_selected_relation_morphism_contract.sage::test_a_module_with_a_chosen_presentation_states_its_relations
+ERROR tests/modules/test_the_selected_relation_morphism_contract.sage::test_a_module_without_a_presentation_states_none
+ERROR tests/modules/test_the_selected_relation_morphism_contract.sage::test_the_hook_agrees_with_the_public_presentation
+ERROR tests/modules/test_fraction_field_base_change_archive.sage::test_a_determinant_two_endomorphism_of_z2_becomes_invertible_over_q
+ERROR tests/modules/test_fraction_field_base_change_archive.sage::test_the_unit_z2_to_q2_of_scalar_extension_is_injective_and_not_surjective
+ERROR tests/modules/test_cohomology_functors.sage::test_multiplication_by_three_induces_the_identity_on_H1_of_ZZ_times_two_ZZ
+ERROR tests/modules/test_cohomology_functors.sage::test_x_dx_is_a_nonzero_de_rham_class_of_F2_dual_numbers_killed_by_x_to_zero
+ERROR tests/modules/test_cohomology_functors.sage::test_de_rham_cohomology_of_F2_dual_numbers_is_a_ring_functor_under_x_to_zero
+ERROR tests/modules/test_invariant_factor_framing.sage::test_z2_mod_x_is_free_of_rank_one_and_z2_mod_2x_is_not_projective
+ERROR tests/modules/test_invariant_factor_framing.sage::test_the_hyperbolic_plane_is_unimodular_so_its_discriminant_group_is_zero
+ERROR tests/modules/test_invariant_factor_framing.sage::test_u2_has_discriminant_group_z_mod_2_squared_generated_by_the_half_basis_classes
+ERROR tests/modules/test_invariant_factor_framing.sage::test_the_a2_discriminant_quadratic_form_lives_on_z_mod_3_and_normalization_preserves_q
+ERROR tests/modules/test_invariant_factor_framing.sage::test_the_odd_unimodular_lattice_i2_has_zero_discriminant_group
+ERROR tests/modules/test_powers.sage::test_ranks_of_the_powers_of_z2 - Failed...
+ERROR tests/modules/test_powers.sage::test_power_modules_retain_the_source_and_degree_that_define_them
+ERROR tests/modules/test_powers.sage::test_divided_powers_of_z_mod_2_differ_from_its_symmetric_powers
+ERROR tests/modules/test_powers.sage::test_polarization_after_inclusion_is_d_factorial_and_inclusion_after_polarization_symmetrizes
+ERROR tests/modules/test_powers.sage::test_symmetric_and_divided_squares_and_cubes_are_functors
+ERROR tests/modules/test_cap_complexes_zx.sage::test_the_kernel_of_two_x_on_ZZx_squared_is_free_on_the_koszul_syzygy
+ERROR tests/modules/test_cap_complexes_zx.sage::test_the_first_cohomology_of_two_x_is_ZZx_mod_two_x_which_is_F2
+ERROR tests/modules/test_cap_complexes_zx.sage::test_the_kernel_of_ZZx_mod_2x_onto_ZZx_mod_2_is_generated_by_2a_and_killed_by_x
+ERROR tests/modules/test_the_paired_module_readings_of_an_algebra.sage::test_the_quotient_parent_is_unchanged_by_reading_it_over_the_coefficient_ring
+ERROR tests/modules/test_the_paired_module_readings_of_an_algebra.sage::test_the_separate_scalar_reading_has_the_retained_frame_and_presentation
+ERROR tests/modules/test_the_paired_module_readings_of_an_algebra.sage::test_the_reading_over_the_cover_is_cyclic_and_not_a_basis
+ERROR tests/modules/test_the_paired_module_readings_of_an_algebra.sage::test_the_two_readings_are_not_the_same_parent
+ERROR tests/modules/test_the_paired_module_readings_of_an_algebra.sage::test_one_generator_over_the_cover_still_does_not_make_the_quotient_projective
+ERROR tests/modules/test_the_paired_module_readings_of_an_algebra.sage::test_the_restricted_frame_answers_its_pair_labelled_generators
+ERROR tests/modules/test_the_paired_module_readings_of_an_algebra.sage::test_the_restricted_reading_has_the_zero_relation_morphism
+ERROR tests/modules/test_cohomology_of_cyclic_groups.sage::test_h0_of_c3_with_integer_coefficients_is_z
+ERROR tests/modules/test_cohomology_of_cyclic_groups.sage::test_h1_of_c3_with_integer_coefficients_vanishes
+ERROR tests/modules/test_cohomology_of_cyclic_groups.sage::test_h2_of_c3_with_integer_coefficients_is_z3
+ERROR tests/modules/test_rank_stratification_and_local_freeness.sage::test_the_fibre_dimension_is_1_generically_and_2_at_the_origin
+ERROR tests/modules/test_rank_stratification_and_local_freeness.sage::test_the_rank_strata_separate_the_generic_point_from_the_origin
+ERROR tests/modules/test_rank_stratification_and_local_freeness.sage::test_the_module_is_locally_free_generically_and_not_at_the_origin
+ERROR tests/modules/test_rank_stratification_and_local_freeness.sage::test_the_local_trivialization_at_the_generic_point_has_rank_one
+ERROR tests/modules/test_rank_stratification_and_local_freeness.sage::test_the_annihilator_of_q_x_y_mod_x_plus_q_x_y_mod_y_is_xy
+ERROR tests/modules/test_cochain_complexes.sage::test_the_complex_ZZ_times_two_ZZ_has_H0_zero_and_H1_ZZ_mod_2
+ERROR tests/modules/test_cochain_complexes.sage::test_the_complex_ZZ_mod_4_onto_ZZ_mod_2_has_H0_generated_by_2x_and_H1_zero
+ERROR tests/modules/test_dual_point_hash.sage::test_distinct_dual_points_have_distinct_hashes
+ERROR tests/modules/test_dual_point_hash.sage::test_inserting_distinct_dual_points_does_not_compare_every_pair
+ERROR tests/modules/test_dual_point_hash.sage::test_equal_dual_points_share_a_hash_whatever_presents_them
+ERROR tests/modules/test_dual_point_hash.sage::test_the_zero_and_the_scalars_keep_their_own_hashes
+ERROR tests/modules/test_dual_point_hash.sage::test_the_primal_points_keep_their_distribution
+ERROR tests/modules/test_dual_point_hash.sage::test_a_domain_without_a_finite_probe_falls_back_to_its_endpoints
+ERROR tests/modules/test_dual_point_hash.sage::test_the_probe_reads_at_most_eight_elements_of_a_finite_family
+============= 26 failed, 92 passed, 55 errors in 112.67s (0:01:52) =============
+[peakrss] wt541revtests: child waited=1 shell_code=1 samples=74
+[peakrss] peak tree RSS      : 725 MiB
+[peakrss] low-water MemAvail : 2071 MiB
+[peakrss] peak single VmHWM  : 734 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      723 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   134.6s procs=  3 rss=   725 MiB hwm=   734 MiB avail=  3329 MiB
+[peakrss]   t=   124.5s procs=  3 rss=   724 MiB hwm=   734 MiB avail=  3808 MiB
+[peakrss]   t=   126.5s procs=  3 rss=   724 MiB hwm=   734 MiB avail=  3723 MiB
+[peakrss]   t=   128.5s procs=  3 rss=   724 MiB hwm=   734 MiB avail=  3468 MiB
+[peakrss]   t=   130.5s procs=  3 rss=   724 MiB hwm=   734 MiB avail=  3517 MiB

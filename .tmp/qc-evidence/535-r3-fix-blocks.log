@@ -1,0 +1,46 @@
+=== tree: cc7b4f86366a6fcf69510564a2af5b1851ea091d (modified: 2 paths)
+=== files: tests/lattices/test_displayed_blocks_are_sublattices.sage tests/forms/test_gram_graph_blocks.sage tests/lattices/test_indecomposable_summands_decide_the_decomposition.sage
+=== start: 05:51:36
+......FF                                                                 [100%]
+=================================== FAILURES ===================================
+_________ test_a_definite_sum_with_a_connected_display_is_decomposable _________
+
+    def test_a_definite_sum_with_a_connected_display_is_decomposable() -> None:
+        lattice = _definite_sum_with_a_connected_display()
+        root_line = Lattices(ZZ)("A1")
+    
+>       assert lattice.is_decomposable() is True
+E       assert orthogonally decomposable(Integral lattice of rank 4 and signature (0, 4)) is True
+E        +  where orthogonally decomposable(Integral lattice of rank 4 and signature (0, 4)) = is_decomposable()
+E        +    where is_decomposable = Integral lattice of rank 4 and signature (0, 4).is_decomposable
+
+tests/lattices/test_indecomposable_summands_decide_the_decomposition.sage:43: AssertionError
+___ test_the_family_reports_no_summands_where_the_decomposition_is_undecided ___
+
+    def test_the_family_reports_no_summands_where_the_decomposition_is_undecided() -> None:
+        scrambled = _scrambled_k3()
+        decomposed = NamedLattices.U ** 3 + NamedLattices.E8 ** 2
+    
+        assert scrambled.is_isometric(decomposed)
+        assert decomposed.indecomposable_summands().cardinality() == 5
+>       with pytest.raises(ValueError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+tests/lattices/test_indecomposable_summands_decide_the_decomposition.sage:56: Failed
+============================= slowest 10 durations =============================
+4.63s call     tests/lattices/test_displayed_blocks_are_sublattices.sage::test_the_displayed_blocks_of_the_k3_gram_are_five_sublattices
+3.69s call     tests/lattices/test_indecomposable_summands_decide_the_decomposition.sage::test_the_family_reports_no_summands_where_the_decomposition_is_undecided
+0.21s call     tests/lattices/test_displayed_blocks_are_sublattices.sage::test_a_display_whose_blocks_are_not_intervals_exhibits_them_anyway
+0.14s call     tests/lattices/test_indecomposable_summands_decide_the_decomposition.sage::test_a_definite_sum_with_a_connected_display_is_decomposable
+0.06s call     tests/forms/test_gram_graph_blocks.sage::test_the_gram_graph_of_a2_plus_a1
+0.05s call     tests/forms/test_gram_graph_blocks.sage::test_the_component_vertex_sets_of_a_gram_graph_do_not_depend_on_its_diagonal
+0.04s call     tests/forms/test_gram_graph_blocks.sage::test_interleaved_components_give_no_block_cut
+0.03s call     tests/forms/test_gram_graph_blocks.sage::test_the_only_block_cut_of_a2_plus_a1_is_after_the_a2_block
+
+(2 durations < 0.005s hidden.  Use -vv to show these durations.)
+=========================== short test summary info ============================
+FAILED tests/lattices/test_indecomposable_summands_decide_the_decomposition.sage::test_a_definite_sum_with_a_connected_display_is_decomposable
+FAILED tests/lattices/test_indecomposable_summands_decide_the_decomposition.sage::test_the_family_reports_no_summands_where_the_decomposition_is_undecided
+2 failed, 6 passed in 20.65s
+=== exit: 1 at 05:52:03

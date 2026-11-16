@@ -1,0 +1,51 @@
+tree SHA: ef24f245936578089ccccad1c1aca70ffb182899 (modified paths: 0)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 14.29 15.18 17.22 14/770 2778188
+files: tests/forms/test_a_torsion_cokernel_carries_its_torsion_forms.sage tests/modules/test_an_inexact_engine_field_has_coordinate_images.sage tests/modules/test_a_torsion_claim_is_refuted_when_asked.sage tests/modules/test_a_presented_module_is_built_before_it_computes.sage tests/lattices/test_primitivity_is_the_torsion_freeness_of_the_inclusions_cokernel.sage
+inner 540 s, outer 600 s, guard 6144 MiB
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+time gates OFF (--no-time-gates): star import 2.68 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: asyncio-1.5.0, xdist-3.8.0, reportlog-1.0.0, platformdirs-4.13.5, hypothesis-6.170.15, anyio-4.15.1, timeout-2.4.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 12 items
+
+tests/forms/test_a_torsion_cokernel_carries_its_torsion_forms.sage ...   [ 25%]
+tests/modules/test_an_inexact_engine_field_has_coordinate_images.sage .. [ 41%]
+                                                                         [ 41%]
+tests/modules/test_a_torsion_claim_is_refuted_when_asked.sage ...        [ 66%]
+tests/modules/test_a_presented_module_is_built_before_it_computes.sage . [ 75%]
+.                                                                        [ 83%]
+tests/lattices/test_primitivity_is_the_torsion_freeness_of_the_inclusions_cokernel.sage . [ 91%]
+.                                                                        [100%]
+
+============================== slowest durations ===============================
+0.76s call     tests/forms/test_a_torsion_cokernel_carries_its_torsion_forms.sage::test_the_one_third_form_on_z3_twists_by_a_negative_unit
+0.59s call     tests/forms/test_a_torsion_cokernel_carries_its_torsion_forms.sage::test_the_orthogonal_quotient_of_a_discriminant_form_is_a_torsion_form
+0.20s call     tests/forms/test_a_torsion_cokernel_carries_its_torsion_forms.sage::test_the_half_form_on_z2_has_its_two_primary_part
+0.05s call     tests/lattices/test_primitivity_is_the_torsion_freeness_of_the_inclusions_cokernel.sage::test_a_span_is_primitive_exactly_when_its_quotient_is_torsion_free
+0.05s call     tests/modules/test_a_presented_module_is_built_before_it_computes.sage::test_a_plane_inclusions_quotient_is_built_before_it_is_asked
+0.04s call     tests/modules/test_an_inexact_engine_field_has_coordinate_images.sage::test_the_images_of_a_real_endomorphism_are_read_in_its_own_frame
+0.02s call     tests/lattices/test_primitivity_is_the_torsion_freeness_of_the_inclusions_cokernel.sage::test_a_primitivity_decision_is_read_in_the_inclusions_own_codomain
+0.01s call     tests/modules/test_a_presented_module_is_built_before_it_computes.sage::test_constructing_a_cokernel_asks_the_engine_for_no_matrix
+0.01s call     tests/modules/test_a_torsion_claim_is_refuted_when_asked.sage::test_a_false_torsion_claim_is_refuted_when_the_caller_checks
+0.01s call     tests/modules/test_an_inexact_engine_field_has_coordinate_images.sage::test_a_free_module_over_the_real_field_has_no_relations
+
+(26 durations < 0.005s hidden.  Use -vv to show these durations.)
+============================== 12 passed in 6.53s ==============================
+[peakrss] wt541revtests: child waited=0 shell_code=0 samples=12
+[peakrss] peak tree RSS      : 358 MiB
+[peakrss] low-water MemAvail : 3795 MiB
+[peakrss] peak single VmHWM  : 358 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      347 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    18.1s procs=  3 rss=   358 MiB hwm=   358 MiB avail=  4053 MiB
+[peakrss]   t=    20.1s procs=  3 rss=   358 MiB hwm=   358 MiB avail=  3958 MiB
+[peakrss]   t=    22.1s procs=  3 rss=   358 MiB hwm=   358 MiB avail=  3795 MiB
+[peakrss]   t=    16.1s procs=  3 rss=   341 MiB hwm=   341 MiB avail=  4359 MiB
+[peakrss]   t=    14.1s procs=  3 rss=   326 MiB hwm=   326 MiB avail=  4515 MiB
+launcher exit: 0

@@ -2593,25 +2593,6 @@ and `de9a1d1`.
 | `541r4-modules-subset-repaired.log` | the repair before the last two, kept for the record | the six files that the recursion and the dropped torsion placement broke in a first shape of the fix, after their repair: **6 failed, 30 passed**, every failure one of the base's own |
 | `541r4-lattices-base.log`, `541r4-lattices-repaired.log` | `897e7f7` / `a6e6a31` | the decision's consumers in `tests/lattices`: the two display/transport contract files and the primitivity file pass in both; `test_zero_isotropic_subobjects.sage` fails the same three ids in both. The repaired-tree run was killed inside `test_lattice_elements.sage` at the 260 s inner cap, at load 14 |
 | `541r4-lattice-elements-repaired.log` | `a6e6a31` | `test_lattice_elements.sage` (six tests, all passing) and `test_chosen_target_primitive_embeddings.sage`, which did not finish inside 260 s at load 21 -- the gap the commit body names |
-
-## `#547`: a finite product with a large finite factor, 2026-11-16
-
-`cb05527` is the main the red test is red at.  The two commits were rebased onto
-`2b9d2cf` (`#543`, which landed while they ran) and the fix is `6c9a308` there;
-the directory and consumer rows below are that rebased pair.  Load was not
-recorded for these runs: the probe rows are a shape in the factor's size, and the
-suite rows are compared by their FAILED id sets, not by their seconds.
-
-| log | tree | result |
-| --- | --- | --- |
-| `547-probe.py` | -- | the probe: one product per row, over a factor built through the enumeration it owns, which records every position its map is asked for |
-| `547-probe-base.log` | `cb05527` | the probe without a declared key, which that tree has none of: hashing a fresh factor **14.6 / 57.2 / 226.1 ms**, and placing its product **14.6 / 55.4 / 218.9 ms**, at 2048 / 8192 / 32768 points |
-| `547-probe-fix.log` | `6c9a308` | a declaring factor places its product in **1.03 / 0.21 / 0.21 / 0.24 ms reading 0 points** at 2048 / 8192 / 32768 / 131072 (the 2048 row is the first keyed construction in the process); a non-declaring factor in **13.4 / 52.6 / 208.4 / 891.1 ms reading all of them**; a second declaration of one datum at 32768 points **0.01 ms, 0 points** |
-| `547-red.log` | `cb05527` | the new test file with the test lint loaded: **3 failed in 0.48 s**, each at `FiniteOrderedSets.from_indexed() got an unexpected keyword argument 'key'` |
-| `547-green.log` | `6c9a308` | the same file with the test lint loaded: **3 passed in 0.26 s**, no finding |
-| `547-sets-base.log` | `2b9d2cf` | `tests/sets` as one directory: **24 failed, 162 passed in 7.74 s** |
-| `547-sets-fix.log` | `6c9a308` | the same directory: **24 failed, 165 passed in 8.08 s** -- the three new tests -- with FAILED id sets identical to the base's |
-| `547-consumers-base.log`, `547-consumers-fix.log` | `2b9d2cf`, `6c9a308` | the seven product and coproduct consumers outside `tests/sets` (`objects`, `categories`, `groups`): **20 failed, 31 passed** in 2.65 s and 3.46 s, FAILED id sets identical |
 | `541rev-finding-1-red.log` | `961b68a` | the new contract file on that commit: **3 failed in 4.59 s**, each at the `from_module` torsion guard | 
 | `541rev-forms-base.log` | `9a04b45` | `tests/forms/test_torsion_forms.sage` and `tests/forms/test_discriminant_subgroups.sage`: **8 failed, 12 passed in 4.09 s** | 
 | `541rev-forms-240ce65.log` | `240ce65` | the same two files on the parent of the placement change: **5 failed, 15 passed in 4.51 s**; the three differences are the regression | 
@@ -2647,3 +2628,57 @@ is a namespace the test lint also reads.
 | `issue521-session.py`, `issue521-session-base.log`, `issue521-session-repair.log` | both | the sixteen scalar names against the ring package's exports (`identical=True` and `declared=True` for each here; six of them not on the package at all there) and the lowering of `M = Modules[ZZ]`, `R = ZZ[x]`, `T = Modules[k]`, which is the same text in both trees |
 | `issue521-load.py`, `issue521-load-base.log`, `issue521-load-repair.log` | both | the scope a `load` writes into, holding the session's names and polluted with `ZZ` and `Integers`: the session's `ZZ` back, `AA`/`RDF`/`GF` present, the engine spellings gone, and `41 + 1` an owned 42 -- the same lines in both trees |
 | `issue521-cpu.py`, `issue521-cpu-base-1.log`, `issue521-cpu-base-2.log`, `issue521-cpu-repair-1.log`, `issue521-cpu-repair-2.log` | both | CPU seconds to lower 200 assignments, five repetitions each: **0.0942 / 0.0832 s at the base against 0.0884 / 0.0817 s here**, so the per-assignment tree walk both trees run is the same work |
+| `541rev-laziness-green.log` | the finding-3 commit | the reworked laziness contract: **2 passed in 1.00 s**, the construction's count 0 and the first request's above it | 
+| `541rev-laziness-calibration.log` | `897e7f7` | the same file against the construction that computed: **2 failed in 7.91 s** at `assert 2 == 0` -- the instrument sees a construction that realizes its resolution, which the engine-matrix count alone did not | 
+| `541rev-presented-base.log` | `2e9b362` | nine presented-module, torsion, localization and contract files: **8 failed, 2 passed, 9 errors in 19.29 s** | 
+| `541rev-presented-fix.log` | the finding-4/5/6 commit | the same files: **8 failed, 7 passed, 9 errors in 38.28 s**; FAILED/ERROR id sets identical to the base's (`comm` both directions empty), the five extra passes are the new contract files | 
+| `541rev-laziness-ordering.log` | the ordering repair | the laziness file beside the lattice primitivity file and the torsion archive: **3 failed, 4 passed in 9.34 s**, the three failures the archive's two-adic ones and the laziness contract green | 
+| `541rev-consumers-after-citation.log` | the finding-8/9 commit | the primitivity, torsion-form, real-field and laziness contracts beside the selected-relation contract: **12 passed, 4 errors in 6.19 s**, the four errors the pre-existing test-lint findings in `test_the_selected_relation_morphism_contract.sage` | 
+| `541rev-torsion-validator.log` | the validator's contract commit | `validate_torsion_claim` asked and not asked: **3 passed in 2.99 s** | 
+| `541rev-final-forms-wt541rev.log`, `541rev-final-modules-wt541rev.log`, `541rev-final-lattices-wt541rev.log` | the last commit of this round | the three consumer suites on the repaired tree: **38 failed, 48 passed, 58 errors in 148.98 s** (`tests/forms`), **26 failed, 92 passed, 55 errors in 112.67 s** (the 48 `tests/modules` files that mention a cokernel, a presentation, an invariant factor or a torsion decision), and **1 failed, 9 passed, 4 errors in 289.95 s** (the primitivity, transport, content and chosen-target files) | 
+| `541rev-final-forms-wt541ctl2.log`, `541rev-final-modules-wt541ctl2.log`, `541rev-final-lattices-wt541ctl2.log` | `901ff18` | the same three suites on main: **38 failed, 48 passed, 58 errors in 78.41 s**, **26 failed, 92 passed, 55 errors in 61.23 s**, and a run killed at its 540 s cap inside `test_chosen_target_primitive_embeddings.sage`. The forms and modules FAILED/ERROR id sets are identical between the two trees (`comm` both directions empty) | 
+| `541rev-rebased-contracts.log` | the rebased tip before the push | the five contract files (torsion forms, inexact-engine coordinates, the torsion validator, laziness, lattice primitivity): **12 passed in 6.53 s** | 
+| `542r2-reals-red.log`, `542r2-reals-green.log` | the finding-1 test commit, then its fix | one file, `tests/rings/test_reals_and_completions_hash_by_their_value.sage`: **1 failed, 3 passed in 1.99 s** at `8977add` (`assert 93032432 == 2` at `hash(RR(2)) == hash(ZZ(2))`), **4 passed in 3.79 s** at `32d9bd7` |
+| `542r2-completion-red.log`, `542r2-completion-green.log` | the finding-2 test commit, then its fix | one file: **1 failed, 4 passed in 4.92 s** at `d6de023` (`assert 125752016330832 == 1`), **4 passed in 3.79 s** at `b7e9453` (the reals file), and the five completion files of this round: **5 failed, 8 passed, 4 errors in 13.53 s** |
+| `542r2-completion-base.log` | `090a0d9` | the same five completion files on the base: **5 failed, 5 passed, 4 errors in 8.32 s**; the FAILED and ERROR ids are identical to the repaired tree's, the three extra passes being the new tests |
+| `542r2-picard-red.log`, `542r2-picard-green.log` | the finding-3 test commit, then its fix | `tests/divisors/test_divisor_classes_hash_by_their_equality.sage`: **1 failed, 2 passed in 4.81 s** at `de0493a` (`hash(class of O)` -1793465262270530806 against the group's -2123201063562690755), **3 passed in 2.54 s** at `dfa197f` |
+| `542r2-morphisms-red.log`, `542r2-morphisms-green.log` | the finding-4 test commit, then its fix | `tests/categories/test_structurally_defined_set_maps_hash_by_their_maps.sage`: **4 failed, 1 passed in 3.48 s** at `deb82b6`, **5 passed in 2.16 s** at `5bfbf23` |
+| `542r2-modules-red.log`, `542r2-modules-green.log` | the finding-5a test commit, then its fix | `tests/modules/test_general_module_elements_hash_by_their_equality.sage`: **3 failed in 4.87 s** at `5b22e25` (three TypeErrors naming the three element classes), **3 passed in 3.47 s** at `ef6fc1f` |
+| `542r2-schemes-red.log`, `542r2-schemes-green.log`, `542r2-schemes-base.log` | the finding-5b test commit, then its fix, and `090a0d9` | `tests/schemes/test_a_glued_scheme_morphism_hashes_by_its_endpoints.sage` alone: **1 failed in 4.56 s** at `f956ddb` (TypeError on the fold's hash); beside `test_glued_finite_affine_atlases.sage`: **4 failed, 3 passed in 5.20 s** at `2ca6141` against **4 failed, 2 passed in 5.72 s** on the base, the four FAILED ids identical |
+| `542r2-lint.log` | the lint commit | `tests/rings/test_completion_arithmetic.sage` with the test lint: **4 passed in 5.20 s** at `3eebb4e`, where the file's TL01 at line 12 made it 4 setup errors |
+| `542r2-consumers-sets-categories-{mine,base}.log` | the round's tip, and `090a0d9` | `tests/sets tests/functions tests/topology tests/categories`: **86 failed, 147 passed, 150 errors in 95.93 s** here against **86 failed, 146 passed, 150 errors in 73.17 s** on the base; 236 FAILED/ERROR ids, `diff` empty both ways, the extra pass the new categories test |
+| `542r2-consumers-modules-divisors-{mine,base}.log` | the round's tip, and `090a0d9` | `tests/modules tests/divisors`: **104 failed, 220 passed, 69 errors in 103.66 s** here against **104 failed, 216 passed, 69 errors in 146.46 s** on the base; 173 FAILED/ERROR ids, `diff` empty both ways, the four extra passes the new tests |
+| `542r2-consumers-reals-{mine,base}.log` | the round's tip, and `090a0d9` | the exact-real consumers (the real-division, owned-rings, division and rational-real files, the graded Lebesgue file, `tests/objects`): **95 failed, 163 passed, 86 errors in 151.81 s** here against the same counts in 182.23 s on the base, 181 FAILED/ERROR ids, `diff` empty both ways |
+| `542r2-consumers-schemes-{mine,base}.log` | the round's tip, and `090a0d9` | nine scheme files that build morphisms (affine, the three gluing files, standard charts, relative spec, toric, pullback): **12 failed, 17 passed, 22 errors in 36.96 s** here against the same counts in 24.73 s on the base, 34 FAILED/ERROR ids, `diff` empty both ways |
+| `542r2-rebased.log` | the rebased tip before the push | the six test files this round adds or changes: **21 passed in 6.71 s** |
+| `542r2-probe-a.py` … `542r2-probe-l.py` | the base and the repair | the measurements behind the findings: `hash(RR(2))` against `hash(2)`, `hash(AA(2))` against `hash(2)`, the image of `1` in a completion against the ring's `1`, `FiniteOrderedSets` cardinalities, the two-point chain's four hash comparisons, the fold of the glued pair, and the specimens that do not build (`QuasiCoherentSheaves(scheme)(cover, …)`, the plane cubic's structure sheaf, the affine structure sheaf's `tensor_power`) |
+## `#535` round 3: the Eichler gate, the decomposition family, and the displayed blocks (2026-11-16)
+
+The round's two authorities for Eichler's hypothesis become one gate; the
+family of indecomposable summands is decided by the same datum as
+`is_decomposable` and refused where nothing decides it; the blocks of a
+displayed Gram matrix are the Gram graph's components, taken as sublattices.
+Runs are the launcher `.scratch/launch535r3test.sh` (`pytest -o addopts= -p
+qc_sage_session -q --no-header`, the checkout bound at `/repos/sage-extensions`
+with the shared `.git` bound at its host path, the port at `/work`) and
+`.scratch/launch535r3lint.sh` (the test lint, same binding).  The tree column
+names the commit the run was made on; a run made with the repair in the working
+tree therefore names the commit before it.
+
+| log | tree | result |
+| --- | --- | --- |
+| `535-r3-probe-gate.log` | `2f8c801` | the gate the round inherits: on `U + U + <1>`, `U + U + <3>`, `U + U + <-1>` `is_even` is False, `hyperbolic_index` is 2 and `eichler_criterion_applies` is False, while `_two_hyperbolic_planes` is True -- and each of the three takes the single-sign-character certificate before the criterion's gate, so both gates answer `NOSPLIT` on them. Primitive isotropic vectors of `U^2 + M` have divisibility one and trivial divided class, so no specimen at this scale reaches the class machinery. |
+| `535-r3-probe-family.log` | `2f8c801` | the family the round inherits: `LK3` is `is_decomposable` True with 5 summands named `('U','U','U',None,None)`, the scrambled K3 is an `AtomicProposition` with **cardinality 1** and names `(None,)`, and the Gram graph of `LK3` cuts at `(2, 4, 6, 14)`. |
+| `535-r3-red-family.log` | `2f8c801` | the new family contract: **2 failed in 13.99 s** -- `A_1^4` in the basis `e_1+e_2, e_2+e_3, e_3+e_4, e_4` has `is_decomposable` undecided, and the scrambled K3 does **not** raise (`DID NOT RAISE ValueError`). |
+| `535-r3-fix-family.log` | the family's test commit + the repair | the family contract and the graph file: **8 passed in 10.88 s**. |
+| `535-r3-red-graph.log` | `4089966` | the graph owner's components with a loop present: **1 failed, 3 passed in 11.56 s**, `ValueError: cannot add edge from 0 to 0 in graph without loops`. |
+| `535-r3-red-blocks.log` | `2f8c801` + the round's test commits | the displayed-blocks contract: **2 failed in 8.08 s**, `AttributeError: no attribute 'inclusion'` -- the summands are fresh Gram lattices. |
+| `535-r3-fix-blocks.log` | the blocks' test commits + the repair | the blocks contract and the graph file: **6 passed, 2 failed in 20.65 s**; the two failures are the family contract above, repaired in the next commit. |
+| `535-r3-gate-tests.log` | the family's fix commit | the gate contract's tests, which have **no red state** (see the commit body): **10 passed in 54.30 s**. |
+| `535-r3-consumers.log` | the gate's test commit + the repair | the ten files that consume the change: **42 passed, 2 failed in 97.02 s**. Both failures are pre-existing and touch no changed API. |
+| `535-r3-base-preexisting.log` | `2f8c801` + the round's test commits | the same two files without these changes: **2 failed, 1 passed in 9.42 s**, the same two FAILED ids -- `(a1+a1).orthogonal_decomposition()` wants an `embeddings` argument and `a2.basis()` is not a lattice method. |
+| `535-r3-owner-contracts.log` | the gate's test commit + the repair | `tests/lattices/test_lattice_database_owner_contracts.sage`: **11 passed, 1 failed in 152.05 s**; the failure is `hyperbolic_partner` on the odd binary lattice `[[1,0],[0,-1]]`, inside the presented module's iteration. |
+| `535-r3-base-hyperbolic-partner.log` | `2f8c801` + the round's test commits | that test alone without these changes: **1 failed in 16.07 s**, the same id and the same frame. |
+| `535-r3-heavy-stable-line.log` | the gate's fix commit | the two stable-line-orbit row files, `U(2) + <-6>` and `T_Co`: **2 passed in 1073.83 s (0:17:53)**. |
+| `535-r3-lint.log` | the gate's fix commit | the test lint on the five touched test files: **5 files, 0 findings**. |
+| `535-r3-docs.log` | the docs commit | the four files the round's docstrings name, after the docstring pass: **14 passed in 51.27 s**. |

@@ -1,0 +1,129 @@
+tree SHA: 456224081a94fb2aa0a3c0d69a24e78826f45181 (modified paths: 2)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 20.14 21.68 20.22 20/764 2731370
+files: tests/lattices/test_primitivity_is_the_torsion_freeness_of_the_inclusions_cokernel.sage tests/forms/test_a_torsion_cokernel_carries_its_torsion_forms.sage tests/modules/test_an_inexact_engine_field_has_coordinate_images.sage tests/modules/test_a_presented_module_is_built_before_it_computes.sage tests/modules/test_the_selected_relation_morphism_contract.sage tests/lattices/test_lattice_subobjects_archive.sage
+inner 540 s, outer 600 s, guard 6144 MiB
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+time gates OFF (--no-time-gates): star import 2.31 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: asyncio-1.5.0, xdist-3.8.0, reportlog-1.0.0, platformdirs-4.13.5, hypothesis-6.170.15, anyio-4.15.1, timeout-2.4.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 16 items
+
+tests/lattices/test_primitivity_is_the_torsion_freeness_of_the_inclusions_cokernel.sage . [  6%]
+.                                                                        [ 12%]
+tests/forms/test_a_torsion_cokernel_carries_its_torsion_forms.sage ...   [ 31%]
+tests/modules/test_an_inexact_engine_field_has_coordinate_images.sage .. [ 43%]
+                                                                         [ 43%]
+tests/modules/test_a_presented_module_is_built_before_it_computes.sage . [ 50%]
+.                                                                        [ 56%]
+tests/modules/test_the_selected_relation_morphism_contract.sage EEEE     [ 81%]
+tests/lattices/test_lattice_subobjects_archive.sage ...                  [100%]
+
+==================================== ERRORS ====================================
+_ ERROR at setup of test_a_framed_free_module_states_the_empty_relation_family _
+tests/modules/test_the_selected_relation_morphism_contract.sage:19: TL01 from sage_extensions.categories.modules.pure.modules import ...: take every name from the session
+tests/modules/test_the_selected_relation_morphism_contract.sage:41: TL08 ModulesWithChosenFinitePresentation: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_the_selected_relation_morphism_contract.sage:42: TL02 private attribute ._selected_relation_morphism
+tests/modules/test_the_selected_relation_morphism_contract.sage:43: TL09 an assertion that holds of anything
+tests/modules/test_the_selected_relation_morphism_contract.sage:55: TL08 ModulesWithChosenFinitePresentation: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_the_selected_relation_morphism_contract.sage:56: TL02 private attribute ._selected_relation_morphism
+tests/modules/test_the_selected_relation_morphism_contract.sage:57: TL09 an assertion that holds of anything
+tests/modules/test_the_selected_relation_morphism_contract.sage:66: TL08 ModulesWithChosenFinitePresentation: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_the_selected_relation_morphism_contract.sage:67: TL02 private attribute ._selected_relation_morphism
+tests/modules/test_the_selected_relation_morphism_contract.sage:72: TL01 from sage_extensions.categories.modules.framed.finitely_generated.finitely_presented_modules import ...: take every name from the session
+tests/modules/test_the_selected_relation_morphism_contract.sage:72: TL02 imports the private name _relation_morphism
+tests/modules/test_the_selected_relation_morphism_contract.sage:77: TL02 private attribute ._selected_relation_morphism
+tests/modules/test_the_selected_relation_morphism_contract.sage:88: TL09 an assertion that holds of anything
+_ ERROR at setup of test_a_module_with_a_chosen_presentation_states_its_relations _
+tests/modules/test_the_selected_relation_morphism_contract.sage:19: TL01 from sage_extensions.categories.modules.pure.modules import ...: take every name from the session
+tests/modules/test_the_selected_relation_morphism_contract.sage:41: TL08 ModulesWithChosenFinitePresentation: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_the_selected_relation_morphism_contract.sage:42: TL02 private attribute ._selected_relation_morphism
+tests/modules/test_the_selected_relation_morphism_contract.sage:43: TL09 an assertion that holds of anything
+tests/modules/test_the_selected_relation_morphism_contract.sage:55: TL08 ModulesWithChosenFinitePresentation: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_the_selected_relation_morphism_contract.sage:56: TL02 private attribute ._selected_relation_morphism
+tests/modules/test_the_selected_relation_morphism_contract.sage:57: TL09 an assertion that holds of anything
+tests/modules/test_the_selected_relation_morphism_contract.sage:66: TL08 ModulesWithChosenFinitePresentation: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_the_selected_relation_morphism_contract.sage:67: TL02 private attribute ._selected_relation_morphism
+tests/modules/test_the_selected_relation_morphism_contract.sage:72: TL01 from sage_extensions.categories.modules.framed.finitely_generated.finitely_presented_modules import ...: take every name from the session
+tests/modules/test_the_selected_relation_morphism_contract.sage:72: TL02 imports the private name _relation_morphism
+tests/modules/test_the_selected_relation_morphism_contract.sage:77: TL02 private attribute ._selected_relation_morphism
+tests/modules/test_the_selected_relation_morphism_contract.sage:88: TL09 an assertion that holds of anything
+______ ERROR at setup of test_a_module_without_a_presentation_states_none ______
+tests/modules/test_the_selected_relation_morphism_contract.sage:19: TL01 from sage_extensions.categories.modules.pure.modules import ...: take every name from the session
+tests/modules/test_the_selected_relation_morphism_contract.sage:41: TL08 ModulesWithChosenFinitePresentation: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_the_selected_relation_morphism_contract.sage:42: TL02 private attribute ._selected_relation_morphism
+tests/modules/test_the_selected_relation_morphism_contract.sage:43: TL09 an assertion that holds of anything
+tests/modules/test_the_selected_relation_morphism_contract.sage:55: TL08 ModulesWithChosenFinitePresentation: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_the_selected_relation_morphism_contract.sage:56: TL02 private attribute ._selected_relation_morphism
+tests/modules/test_the_selected_relation_morphism_contract.sage:57: TL09 an assertion that holds of anything
+tests/modules/test_the_selected_relation_morphism_contract.sage:66: TL08 ModulesWithChosenFinitePresentation: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_the_selected_relation_morphism_contract.sage:67: TL02 private attribute ._selected_relation_morphism
+tests/modules/test_the_selected_relation_morphism_contract.sage:72: TL01 from sage_extensions.categories.modules.framed.finitely_generated.finitely_presented_modules import ...: take every name from the session
+tests/modules/test_the_selected_relation_morphism_contract.sage:72: TL02 imports the private name _relation_morphism
+tests/modules/test_the_selected_relation_morphism_contract.sage:77: TL02 private attribute ._selected_relation_morphism
+tests/modules/test_the_selected_relation_morphism_contract.sage:88: TL09 an assertion that holds of anything
+_____ ERROR at setup of test_the_hook_agrees_with_the_public_presentation ______
+tests/modules/test_the_selected_relation_morphism_contract.sage:19: TL01 from sage_extensions.categories.modules.pure.modules import ...: take every name from the session
+tests/modules/test_the_selected_relation_morphism_contract.sage:41: TL08 ModulesWithChosenFinitePresentation: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_the_selected_relation_morphism_contract.sage:42: TL02 private attribute ._selected_relation_morphism
+tests/modules/test_the_selected_relation_morphism_contract.sage:43: TL09 an assertion that holds of anything
+tests/modules/test_the_selected_relation_morphism_contract.sage:55: TL08 ModulesWithChosenFinitePresentation: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_the_selected_relation_morphism_contract.sage:56: TL02 private attribute ._selected_relation_morphism
+tests/modules/test_the_selected_relation_morphism_contract.sage:57: TL09 an assertion that holds of anything
+tests/modules/test_the_selected_relation_morphism_contract.sage:66: TL08 ModulesWithChosenFinitePresentation: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_the_selected_relation_morphism_contract.sage:67: TL02 private attribute ._selected_relation_morphism
+tests/modules/test_the_selected_relation_morphism_contract.sage:72: TL01 from sage_extensions.categories.modules.framed.finitely_generated.finitely_presented_modules import ...: take every name from the session
+tests/modules/test_the_selected_relation_morphism_contract.sage:72: TL02 imports the private name _relation_morphism
+tests/modules/test_the_selected_relation_morphism_contract.sage:77: TL02 private attribute ._selected_relation_morphism
+tests/modules/test_the_selected_relation_morphism_contract.sage:88: TL09 an assertion that holds of anything
+====================== test lint: 13 findings in 1 files =======================
+tests/modules/test_the_selected_relation_morphism_contract.sage:19: TL01 from sage_extensions.categories.modules.pure.modules import ...: take every name from the session
+tests/modules/test_the_selected_relation_morphism_contract.sage:41: TL08 ModulesWithChosenFinitePresentation: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_the_selected_relation_morphism_contract.sage:42: TL02 private attribute ._selected_relation_morphism
+tests/modules/test_the_selected_relation_morphism_contract.sage:43: TL09 an assertion that holds of anything
+tests/modules/test_the_selected_relation_morphism_contract.sage:55: TL08 ModulesWithChosenFinitePresentation: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_the_selected_relation_morphism_contract.sage:56: TL02 private attribute ._selected_relation_morphism
+tests/modules/test_the_selected_relation_morphism_contract.sage:57: TL09 an assertion that holds of anything
+tests/modules/test_the_selected_relation_morphism_contract.sage:66: TL08 ModulesWithChosenFinitePresentation: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_the_selected_relation_morphism_contract.sage:67: TL02 private attribute ._selected_relation_morphism
+tests/modules/test_the_selected_relation_morphism_contract.sage:72: TL01 from sage_extensions.categories.modules.framed.finitely_generated.finitely_presented_modules import ...: take every name from the session
+tests/modules/test_the_selected_relation_morphism_contract.sage:72: TL02 imports the private name _relation_morphism
+tests/modules/test_the_selected_relation_morphism_contract.sage:77: TL02 private attribute ._selected_relation_morphism
+tests/modules/test_the_selected_relation_morphism_contract.sage:88: TL09 an assertion that holds of anything
+============================== slowest durations ===============================
+1.34s call     tests/forms/test_a_torsion_cokernel_carries_its_torsion_forms.sage::test_the_orthogonal_quotient_of_a_discriminant_form_is_a_torsion_form
+0.20s call     tests/lattices/test_lattice_subobjects_archive.sage::test_archived_sum_and_intersection_are_join_and_meet_of_embedded_subobjects
+0.13s call     tests/forms/test_a_torsion_cokernel_carries_its_torsion_forms.sage::test_the_one_third_form_on_z3_twists_by_a_negative_unit
+0.13s call     tests/forms/test_a_torsion_cokernel_carries_its_torsion_forms.sage::test_the_half_form_on_z2_has_its_two_primary_part
+0.11s call     tests/lattices/test_primitivity_is_the_torsion_freeness_of_the_inclusions_cokernel.sage::test_a_span_is_primitive_exactly_when_its_quotient_is_torsion_free
+0.11s call     tests/lattices/test_lattice_subobjects_archive.sage::test_archived_nonprimitive_subobject_saturates_inside_the_same_lattice
+0.07s call     tests/modules/test_an_inexact_engine_field_has_coordinate_images.sage::test_the_images_of_a_real_endomorphism_are_read_in_its_own_frame
+0.05s call     tests/lattices/test_lattice_subobjects_archive.sage::test_archived_orthogonal_complement_retains_the_actual_embedding
+0.02s call     tests/modules/test_a_presented_module_is_built_before_it_computes.sage::test_constructing_a_cokernel_asks_the_engine_for_no_matrix
+0.02s call     tests/modules/test_a_presented_module_is_built_before_it_computes.sage::test_a_plane_inclusions_quotient_is_built_before_it_is_asked
+0.02s call     tests/lattices/test_primitivity_is_the_torsion_freeness_of_the_inclusions_cokernel.sage::test_a_primitivity_decision_is_read_in_the_inclusions_own_codomain
+0.01s call     tests/modules/test_an_inexact_engine_field_has_coordinate_images.sage::test_a_free_module_over_the_real_field_has_no_relations
+
+(32 durations < 0.005s hidden.  Use -vv to show these durations.)
+=========================== short test summary info ============================
+ERROR tests/modules/test_the_selected_relation_morphism_contract.sage::test_a_framed_free_module_states_the_empty_relation_family
+ERROR tests/modules/test_the_selected_relation_morphism_contract.sage::test_a_module_with_a_chosen_presentation_states_its_relations
+ERROR tests/modules/test_the_selected_relation_morphism_contract.sage::test_a_module_without_a_presentation_states_none
+ERROR tests/modules/test_the_selected_relation_morphism_contract.sage::test_the_hook_agrees_with_the_public_presentation
+========================= 12 passed, 4 errors in 6.19s =========================
+[peakrss] wt541revtests: child waited=1 shell_code=1 samples=9
+[peakrss] peak tree RSS      : 358 MiB
+[peakrss] low-water MemAvail : 5415 MiB
+[peakrss] peak single VmHWM  : 358 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      347 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    14.1s procs=  3 rss=   358 MiB hwm=   358 MiB avail=  6659 MiB
+[peakrss]   t=    16.1s procs=  3 rss=   358 MiB hwm=   358 MiB avail=  6620 MiB
+[peakrss]   t=    12.0s procs=  3 rss=   357 MiB hwm=   357 MiB avail=  6184 MiB
+[peakrss]   t=    10.0s procs=  3 rss=   345 MiB hwm=   345 MiB avail=  5648 MiB
+[peakrss]   t=     8.0s procs=  3 rss=   302 MiB hwm=   302 MiB avail=  5713 MiB

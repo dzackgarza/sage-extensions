@@ -384,8 +384,8 @@ class IndexedFamily[IndexT, ValueT]:
 
         No consumer here keys on this hash.  The finite constructions of
         ``Sets().product`` and ``Sets().coproduct`` are interned under the index
-        set and, per factor, the datum that factor declares for itself or else its
-        hash (``set_categories._finite_family_key``), and compare the families of
+        set and, per factor, the factor's own hash
+        (``set_categories._finite_family_key``), and compare the families of
         one key by ``==``; this hash is what extensional equality owes Python's
         containers.
         """

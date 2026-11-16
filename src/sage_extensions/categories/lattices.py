@@ -5436,48 +5436,99 @@ class Lattices(OwnedCategoryOverBaseRing):
                 case False:
                     return None
 
+        @cached_method
         def _displayed_orthogonal_blocks(self):
-            r"""Return the blocks of the displayed basis that pair to zero across blocks.
+            r"""Return the summands the displayed Gram matrix exhibits.
 
-            A Gram entry \(b(g_i, g_j)\) is one pairing of two displayed
-            generators, so the graph on the displayed basis with an edge where
-            that pairing is nonzero has components whose spans pair to zero
-            across components: the lattice is the orthogonal sum of those
-            spans.  This is the sum a displayed Gram matrix exhibits, and
-            :meth:`is_decomposable` and :meth:`indecomposable_summands` read it
-            from here, so neither can claim a splitting the other denies.
+            The components of the Gram graph of the displayed basis
+            (:meth:`sage_extensions.tensors.tensor.Tensor.gram_graph`) are the
+            largest blocks of the display that pair to zero across blocks.  A
+            block is returned as the span of its generators with the restricted
+            form, which is a sublattice carrying its inclusion.  This is the one
+            datum :meth:`is_decomposable` and :meth:`indecomposable_summands`
+            read.
             """
             rank = self.module_rank()
             if rank.is_finite() is not True:
                 return None
-            n = int(rank)
-            gram = self.gram_tensor()
-            zero = self.base_ring().zero()
-            blocks = []
-            reached = set()
-            for start in range(n):
-                if start in reached:
-                    continue
-                reached.add(start)
-                block = [start]
-                frontier = [start]
-                while frontier:
-                    row = frontier.pop()
-                    for column in range(n):
-                        if column not in reached and gram[row, column] != zero:
-                            reached.add(column)
-                            block.append(column)
-                            frontier.append(column)
-                blocks.append(tuple(sorted(block)))
-            return tuple(blocks)
+            labels = tuple(self.module_generating_set())
+            components = self.gram_tensor().gram_graph().connected_component_vertex_sets()
+            return tuple(
+                self.subobject_on(
+                    tuple(
+                        self.module_generator(labels[int(position)])
+                        for position in component
+                    )
+                )
+                for component in components
+            )
+
+        @cached_method
+        def _definite_indecomposable_summands(self):
+            r"""Return the indecomposable summands of a definite integral lattice, or ``None``.
+
+            The decomposition is Kneser's (Kneser, *Quadratische Formen*, section
+            27) and is unique by Eichler's theorem;
+            :func:`sage_extensions.categories.lattice_morphisms._indecomposable_summands`
+            computes it.  The Gram is LLL-reduced before that call because its
+            minimal-vector enumeration is bounded by the entries of the Gram it
+            is given.
+
+            ``None`` means that construction did not split the lattice off
+            orthogonally, so nothing here decides the decomposition.  A summand
+            is the span of its returned basis, hence a sublattice of this
+            lattice and not a new Gram presentation of it.
+            """
+            from sage.libs.pari import pari
+            from sage_extensions.categories.lattice_morphisms import (
+                _indecomposable_summands,
+            )
+
+            if self.base_ring() is not _owned_integers() or self.module_rank().is_finite() is not True:
+                return None
+            if self.is_positive_definite() is True:
+                sign = 1
+            elif self.is_negative_definite() is True:
+                sign = -1
+            else:
+                return None
+            rank = int(self.module_rank())
+            if rank <= 1:
+                return (self,) if rank == 1 else ()
+            gram = sign * _engine_component_matrix(self.gram_tensor()).change_ring(SageZZ)
+            transformation = pari(gram).qflllgram().sage()
+            reduced = transformation.transpose() * gram * transformation
+            bases = _indecomposable_summands(reduced)
+            if bases is None:
+                return None
+            if tuple(int(basis.nrows()) for basis in bases) == (rank,):
+                return (self,)
+            labels = tuple(self.module_generating_set())
+            return tuple(
+                self.subobject_on(
+                    tuple(
+                        self.linear_combination(
+                            {
+                                label: int(entry)
+                                for label, entry in zip(labels, row)
+                                if entry
+                            }
+                        )
+                        for row in (basis * transformation.transpose()).rows()
+                    )
+                )
+                for basis in bases
+            )
 
         def is_decomposable(self):
             r"""Whether this lattice has a nontrivial integral orthogonal sum.
 
             An exhibited sum or an orthogonal partition of the displayed basis
-            proves decomposability.  Rank one and the rank-two determinant
-            obstruction decide some negative cases.  Otherwise the property
-            remains a proposition; a connected displayed Gram is not a proof.
+            proves decomposability, and a definite integral lattice is decided
+            outright by its own decomposition into indecomposables
+            (:meth:`_definite_indecomposable_summands`).  Rank one and the
+            rank-two determinant obstruction decide further negative cases.
+            Otherwise the property remains a proposition.
             """
             rank = self.module_rank()
             if not rank.is_finite():
@@ -5509,6 +5560,9 @@ class Lattices(OwnedCategoryOverBaseRing):
             if n == 2 and self.base_ring() is _owned_integers() and self.is_even() is True:
                 if self.determinant() % 4 != 0:
                     return False
+            summands = self._definite_indecomposable_summands()
+            if summands is not None:
+                return len(summands) > 1
             return AtomicProposition("orthogonally decomposable", self)
 
         def _binary_orthogonal_split(self):
@@ -5604,25 +5658,24 @@ class Lattices(OwnedCategoryOverBaseRing):
             indecomposable.
 
             A lattice presented by a Gram matrix carries no represented
-            decomposition, and two facts still exhibit one: an orthogonal
-            partition of the displayed basis, whose blocks are the summands in
-            the displayed order, and a definite binary splitting.  A lattice
-            that neither reads is returned as its own summand, which is the
-            statement that this family has nothing finer to report.
+            decomposition, and three facts still exhibit one: the blocks of a
+            displayed basis (:meth:`_displayed_orthogonal_blocks`), whose
+            summands are the blocks' own; a definite binary splitting; and a
+            definite lattice's own decomposition
+            (:meth:`_definite_indecomposable_summands`).  Where none of them
+            decides the decomposition, this family is refused: one summand
+            would state that the lattice is indecomposable, which is exactly
+            what is not decided.
             """
 
             if self.decomposition() is None:
                 blocks = self._displayed_orthogonal_blocks()
                 if blocks is not None and len(blocks) > 1:
-                    gram = self.gram_tensor()
-                    category = Lattices(self.base_ring())
                     return finite_family(
                         tuple(
                             summand
                             for block in blocks
-                            for summand in category(
-                                [[gram[row, column] for column in block] for row in block]
-                            ).indecomposable_summands()
+                            for summand in block.indecomposable_summands()
                         ),
                         name="Indecomposable summands",
                     )
@@ -5631,7 +5684,19 @@ class Lattices(OwnedCategoryOverBaseRing):
                     first, second, _, _ = split
                     category = Lattices(self.base_ring())
                     return finite_family((category([[first]]), category([[second]])), name="Indecomposable summands")
-                return finite_family((self,), name="Indecomposable summands")
+                definite = self._definite_indecomposable_summands()
+                if definite is not None:
+                    return finite_family(definite, name="Indecomposable summands")
+                answer = self.is_decomposable()
+                if answer is False:
+                    return finite_family((self,), name="Indecomposable summands")
+                if answer is True:
+                    raise ValueError(
+                        f"{self!r} is decided decomposable, but no summand of it is exhibited by a represented decomposition, by the blocks of its displayed Gram matrix, by a definite binary splitting, or by its own definite decomposition"
+                    )
+                raise ValueError(
+                    f"cannot list the indecomposable summands of {self!r}: whether it is orthogonally decomposable is not decided, so a family of one summand would claim it is indecomposable"
+                )
             summands = []
             for factor in self.biproduct_factors():
                 summands.extend(factor.indecomposable_summands())
@@ -8403,91 +8468,64 @@ class Lattices(OwnedCategoryOverBaseRing):
             which is equation (4) of V. Gritsenko, K. Hulek and G. Sankaran,
             *Abelianisation of orthogonal groups and the fundamental group of
             modular varieties*, arXiv:0810.1614, section 3.1, printed p. 8.
-            Entry \((i,j)\) of the returned matrix is the coefficient of
-            \(e_i\) in the image of \(e_j\), so the columns are the images of
-            the basis.
 
-            The arithmetic is the engine's and crossings into the owned ring are
-            the caller's: \(e\) and \(a\) are read once each and crossed once per
-            coordinate, the Gram pairing and the \(\mathrm{rank}^2\) entries are
-            engine operations, and the matrix returned is engine data, as
-            `eichler_transvection` needs it.  The one decision the owned ring
-            keeps is integrality of \(\tfrac12 q(a)b(e,e_j)\), asked once per
-            generator: it is the statement that \(t(e,a)\) preserves the
-            lattice (equation (10) there, \(a\) of even square).
+            Stated as the linear map it is, a rank-two update of the identity,
 
-            The formula's hypotheses -- that \(e\) and \(a\) are vectors of
-            this lattice, that \(q(e)=0\) and that \(b(e,a)=0\) -- are asserted
-            by the one public entry, :meth:`eichler_transvection`, before it
-            calls this method; deciding them again here would be the same
-            statement twice.
+            \[
+            t(e,a) = \mathrm{id} - e\otimes b(a,\cdot)
+                     + a\otimes b(e,\cdot)
+                     - \tfrac12 q(a)\,e\otimes b(e,\cdot) ,
+            \]
+
+            one tensor expression on the framing of \(L\).  The contraction
+            `gram * v` of the Gram tensor with a vector is the covector
+            \(b(v,\cdot)\) -- the form is symmetric, so which of its two slots
+            the product halves is immaterial -- and `tensor.identity` is the
+            delta of that framing.  Entry \((i,j)\) of the result is the
+            coefficient of \(e_i\) in the image of \(e_j\), so the columns are
+            the images of the basis.
+
+            The expression is written over the fraction field, since
+            \(\tfrac12 q(a)\) need not lie in the ring of \(L\), and read over
+            that ring: \(t(e,a)\) preserves \(L\) exactly when every coefficient
+            \(\tfrac12 q(a)b(e,e_j)\) is integral (equation (10) there, \(a\) of
+            even square), and a coefficient outside the ring has no reading
+            there.
+
+            The formula's hypotheses -- that \(e\) and \(a\) are vectors of this
+            lattice, that \(q(e)=0\) and that \(b(e,a)=0\) -- are asserted by
+            the one public entry, :meth:`eichler_transvection`, before it calls
+            this method; deciding them again here would be the same statement
+            twice.
             """
             ring = self.base_ring()
-            from sage.matrix.constructor import matrix
-
-            from sage_extensions.categories.rings.ring_foundation import (
-                _engine_element,
-                _engine_ring,
-                _owned_engine_element,
-            )
-
-            labels = tuple(self.module_generating_set())
-            engine = _engine_ring(ring)
             fraction_field = ring.fraction_field()
-            engine_fraction = _engine_ring(fraction_field)
-            half_norm = engine_fraction(
-                _engine_element(ring, orthogonal.q())
-            ) / engine_fraction(engine(2))
-            isotropic_values = isotropic.to_vector()
-            orthogonal_values = orthogonal.to_vector()
-            isotropic_coordinates = tuple(
-                _engine_element(ring, isotropic_values(label)) for label in labels
+            labels = tuple(self.module_generating_set())
+            gram = self.gram_tensor().change_ring(fraction_field)
+            half_norm = fraction_field(orthogonal.q()) / fraction_field(ring(2))
+            isotropic_vector = tensor.vector(
+                fraction_field,
+                tuple(
+                    fraction_field(isotropic.to_vector()(label)) for label in labels
+                ),
             )
-            orthogonal_coordinates = tuple(
-                _engine_element(ring, orthogonal_values(label)) for label in labels
+            orthogonal_vector = tensor.vector(
+                fraction_field,
+                tuple(
+                    fraction_field(orthogonal.to_vector()(label)) for label in labels
+                ),
             )
-            gram = _engine_component_matrix(self.gram_tensor())
-            pairings_with_isotropic = gram * matrix(
-                engine, len(labels), 1, isotropic_coordinates
-            )
-            pairings_with_orthogonal = gram * matrix(
-                engine, len(labels), 1, orthogonal_coordinates
-            )
-            engine_one = engine.one()
-            engine_zero = engine.zero()
-            coefficients = []
-            for source_position, label in enumerate(labels):
-                pairing_with_isotropic = pairings_with_isotropic[source_position, 0]
-                pairing_with_orthogonal = pairings_with_orthogonal[source_position, 0]
-                half_coefficient = half_norm * engine_fraction(pairing_with_isotropic)
-                assert _owned_engine_element(fraction_field, half_coefficient) in ring, (
-                    f"the Eichler transvection t(e, a) with e = {isotropic!r}, a = {orthogonal!r} does not preserve {self!r}: q(a) b(e, {self.module_generator(label)})/2 = {half_coefficient} is not in {ring}"
+            pairing_with_isotropic = gram * isotropic_vector
+            pairing_with_orthogonal = gram * orthogonal_vector
+            update = (
+                tensor.identity(fraction_field, self.module_rank())
+                - isotropic_vector.tensor_product(pairing_with_orthogonal)
+                + orthogonal_vector.tensor_product(pairing_with_isotropic)
+                - (half_norm * isotropic_vector).tensor_product(
+                    pairing_with_isotropic
                 )
-                coefficients.append(
-                    (
-                        pairing_with_isotropic,
-                        pairing_with_orthogonal,
-                        engine(half_coefficient),
-                    )
-                )
-            # The column matrix: entry (target, source) is the coefficient of
-            # the target generator in the image of the source generator.
-            return matrix(
-                engine,
-                [
-                    [
-                        (engine_one if target_position == source_position else engine_zero)
-                        - coefficients[source_position][1]
-                        * isotropic_coordinates[target_position]
-                        + coefficients[source_position][0]
-                        * orthogonal_coordinates[target_position]
-                        - coefficients[source_position][2]
-                        * isotropic_coordinates[target_position]
-                        for source_position in range(len(labels))
-                    ]
-                    for target_position in range(len(labels))
-                ],
             )
+            return _engine_component_matrix(update.change_ring(ring))
 
         def eichler_transvection(self, isotropic, orthogonal):
             r"""Return the Eichler transvection \(t(e,a)\in O(L)\).
@@ -8508,7 +8546,8 @@ class Lattices(OwnedCategoryOverBaseRing):
             modular varieties*, arXiv:0810.1614, section 3.1, printed p. 8.
             \(t(e,a)\) preserves \(L\) exactly when every coefficient
             \(\tfrac12 q(a)\,b(e,x)\) is integral, automatic on an even
-            lattice and asserted otherwise.
+            lattice; otherwise the update has a coefficient outside the ring
+            of \(L\), and reading it over that ring is what refuses it.
 
             EXAMPLES::
 
@@ -9702,43 +9741,31 @@ class Lattices(OwnedCategoryOverBaseRing):
                     )
             return finite_ordered_set(tuple(matches))
 
-        def hyperbolic_plane_summand_count(self):
-            r"""Return the number of orthogonal hyperbolic planes in this lattice's isometry class.
-
-            This is the \(U\)-index, the largest \(k\) with
-            \(L \cong U^k \oplus M\), which :meth:`hyperbolic_index` decides
-            (:meth:`integral_hyperbolic_index` is the same number stated for a
-            \(\mathbf{Z}\)-lattice).  It is a property of the isometry class: a
-            lattice presented by a Gram matrix in a basis that displays no
-            plane has the same number as one built as an orthogonal sum, and
-            whether a *particular* summand is the plane is not the question
-            (that is an isometry of the summand, :meth:`is_isometric`).
-            """
-            return self.hyperbolic_index()
-
         def splits_two_hyperbolic_planes(self) -> bool:
-            r"""Return whether the isometry class of this lattice splits ``U + U``.
+            r"""Return whether this lattice is isometric to ``U + U + M``.
 
-            The count is the \(U\)-index (:meth:`hyperbolic_plane_summand_count`),
-            so this answers the question about the lattice and not about the
-            basis its Gram matrix happens to be written in.  The witness is
-            :meth:`two_hyperbolic_plane_splitting`.  An index of two or more
-            already exhibits the two summands, so no separate decomposability
-            question is asked here.
+            This is the \(U\)-index (:meth:`hyperbolic_index`) at least two.  A
+            witness is :meth:`maximal_hyperbolic_index_splitting`, whose first
+            factor is \(U^m\) for that index \(m\).  The criterion's hypothesis
+            adds that the form is even, and :meth:`eichler_criterion_applies`
+            states the two halves together.
             """
-            return self.hyperbolic_plane_summand_count() >= 2
+            return self.hyperbolic_index() >= 2
 
         def eichler_criterion_applies(self) -> bool:
             r"""Return whether Eichler's criterion classifies primitive-vector orbits here.
 
-            The hypothesis is a property of the isometry class: an even lattice
-            with \(L \cong U \oplus U \oplus M\), the largest such \(k\) being
-            the \(U\)-index of :meth:`hyperbolic_plane_summand_count`
+            The hypothesis is the lattice's own: it is even, and
+            \(L \cong U \oplus U \oplus M\), the largest such \(k\) being the
+            \(U\)-index of :meth:`hyperbolic_index`
             (Gritsenko--Hulek--Sankaran, *Moduli of K3 Surfaces and
             Irreducible Symplectic Manifolds*, Lemma 7.8, p. 503, as cited in
-            ``orthogonal_quotients.isotropic_line_stabilizer_image``).  No basis
-            has to display the planes, and no enlargement of \(L\) supplies
-            them.
+            ``orthogonal_quotients.isotropic_line_stabilizer_image``).  The
+            hypothesis includes evenness: the integral Eichler transvections
+            \(t(c,a)(v) = v - (a,v)c + (c,v)a - \tfrac12 (a,a)(c,v)c\) carry the
+            halved norm of \(a\), so they are automorphisms of \(L\) only on an
+            even form (Gritsenko--Hulek--Sankaran, arXiv:1012.4155, eq. (49)).
+            This is the one predicate the criterion's routes ask.
             """
             return bool(self.is_even()) and self.splits_two_hyperbolic_planes()
 

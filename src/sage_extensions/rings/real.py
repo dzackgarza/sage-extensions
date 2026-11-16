@@ -356,16 +356,45 @@ class ExactRealNumber(FieldElement):
     r"""An exact, explicitly real number."""
 
     def __hash__(self) -> int:
-        r"""Hash the reals of one field alike: their equality is equality of values.
+        r"""Hash a real by the value it is, which is what its equality compares.
 
-        Two reals are equal when the difference of their retained expressions
-        is zero, which ``AA`` decides exactly: ``sqrt(2)^2`` and ``2`` are one
-        real.  No key read off a presentation therefore agrees with this
-        equality, and the field is the one invariant a hash can read without
-        deciding a value, which is the rule of :class:`Sets`.  Distinct reals
-        of one field collide here and are still told apart by equality.
+        Two reals are equal when the difference of their retained expressions is
+        zero, which ``AA`` decides exactly: ``sqrt(2)^2`` and ``2`` are one
+        real.  The integers and the rationals coerce into this field, so
+        ``RR(2)`` and ``2`` are one real as well, and a hash read off the field
+        or off a presentation would separate objects that equality joins.  The
+        value is read here the way equality reads it: an expression that ``AA``
+        places is that algebraic number, and a rational value hashes as the
+        rational, which is the hash the integers and the rationals it equals
+        already carry.  A real no algebraic decision places -- a transcendental
+        expression, or a general Cauchy computation -- hashes as one real of
+        this field, since equality does not place it either.
         """
-        return hash(id(self.parent()))
+        value = self._algebraic_value()
+        if value is None:
+            return hash((self.parent(), "real"))
+        try:
+            return hash(QQ(value))
+        except (TypeError, ValueError):
+            return hash(value)
+
+    def _algebraic_value(self):
+        r"""Return the algebraic number this real equals, or ``None``.
+
+        ``AA`` decides the algebraic expressions exactly and is also the field
+        whose coercion this real accepts, so its values are the ones a hash can
+        read without deciding a relation: a real that is not an algebraic
+        expression of its retained presentation is left to the coarse hash.
+        """
+        expression = self._expression
+        if not isinstance(expression, Expression):
+            return None
+        try:
+            if expression in AA:
+                return AA(expression)
+        except (TypeError, ValueError):
+            return None
+        return None
 
     def __init__(self, parent: ExactRealField, expression: Expression | LazyFieldElement) -> None:
         self._expression = expression
@@ -385,12 +414,13 @@ class ExactRealNumber(FieldElement):
         r"""Supply Sage's cache key for this immutable real presentation.
 
         Real equality remains partial, so this key may separate two
-        presentations of one value; the hash of the element itself is the
-        field's, which agrees with every decided equality.  Sage's cached
-        constructions can instead use the parent and the exact stored
-        expression, or a retained identity token for a lazy computation. Distinct presentations denoting the same real may
-        occupy separate cache entries; a cache hit establishes
-        neither a new equality decision nor a normal form for real values.
+        presentations of one value; the hash of the element itself reads the
+        value, and agrees with every decided equality.  Sage's cached
+        constructions can use the parent and the exact stored expression, or a
+        retained identity token for a lazy computation.  Distinct presentations
+        denoting the same real may occupy separate cache entries; a cache hit
+        establishes neither a new equality decision nor a normal form for real
+        values.
         """
         if isinstance(self._expression, Expression):
             return self.parent(), "symbolic", self._expression

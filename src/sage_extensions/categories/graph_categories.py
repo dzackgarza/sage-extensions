@@ -71,18 +71,32 @@ class _FiniteDigraphEngine:
         r"""The vertex sets of the connected components of the underlying undirected graph.
 
         An owned finite ordered set of owned finite ordered sets of vertices,
-        each in vertex order.  Private computation of the graph owner: Sage's
-        ``Graph`` computes the components on the vertex positions.
+        each component in vertex order, and the components in the order of
+        their least vertex.  Private computation of the graph owner: Sage's
+        ``Graph`` computes the components on the vertex positions.  A loop
+        joins no two vertices, so it lies in the component of its own vertex
+        and in no other, and the components are read from the edges that are
+        not loops.
         """
         from sage.graphs.graph import Graph
 
         vertices = tuple(self.vertices())
         rank = self.vertices().ranking_map()
-        graph = Graph([range(len(vertices)), [(int(rank(edge[0])), int(rank(edge[1]))) for edge in self.edges()]], format="vertices_and_edges")
+        graph = Graph(
+            [
+                range(len(vertices)),
+                [
+                    (int(rank(edge[0])), int(rank(edge[1])))
+                    for edge in self.edges()
+                    if edge[0] != edge[1]
+                ],
+            ],
+            format="vertices_and_edges",
+        )
         return finite_ordered_set(
             tuple(
                 finite_ordered_set(tuple(vertices[position] for position in sorted(component)))
-                for component in graph.connected_components(sort=False)
+                for component in sorted(graph.connected_components(sort=False), key=min)
             )
         )
 
@@ -172,9 +186,12 @@ class GraphMorphism:
 
         Two graph morphisms of one set of morphisms are equal exactly when their
         underlying set maps are, and a set map's own hash reads its values on
-        its domain, so equal morphisms hash alike.
+        its domain, so equal morphisms hash alike.  The set of morphisms is not
+        read: ``Sets`` states that an arrow's hash may not depend on its parent,
+        because two arrows of different Mor sets with the same endpoints can be
+        equal.
         """
-        return hash((id(self.parent()), self.underlying_set_morphism()))
+        return hash(self.underlying_set_morphism())
 
 
 class DigraphMor(CategoricalMor):

@@ -1,0 +1,39 @@
+tree SHA: 0ca12657e45a2d0534cf0021e980d2efaf282c5f (modified paths: 1)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 24.27 21.55 20.34 19/799 2738659
+files: tests/modules/test_a_torsion_claim_is_refuted_when_asked.sage
+inner 540 s, outer 600 s, guard 6144 MiB
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+time gates OFF (--no-time-gates): star import 2.70 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: asyncio-1.5.0, xdist-3.8.0, reportlog-1.0.0, platformdirs-4.13.5, hypothesis-6.170.15, anyio-4.15.1, timeout-2.4.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 3 items
+
+tests/modules/test_a_torsion_claim_is_refuted_when_asked.sage ...        [100%]
+
+============================== slowest durations ===============================
+0.29s call     tests/modules/test_a_torsion_claim_is_refuted_when_asked.sage::test_construction_does_not_refute_the_claim
+0.05s call     tests/modules/test_a_torsion_claim_is_refuted_when_asked.sage::test_a_false_torsion_claim_is_refuted_when_the_caller_checks
+0.04s call     tests/modules/test_a_torsion_claim_is_refuted_when_asked.sage::test_a_true_torsion_claim_survives_the_check
+0.01s setup    tests/modules/test_a_torsion_claim_is_refuted_when_asked.sage::test_a_false_torsion_claim_is_refuted_when_the_caller_checks
+0.01s teardown tests/modules/test_a_torsion_claim_is_refuted_when_asked.sage::test_construction_does_not_refute_the_claim
+
+(4 durations < 0.005s hidden.  Use -vv to show these durations.)
+============================== 3 passed in 2.99s ===============================
+[peakrss] wt541revtests: child waited=0 shell_code=0 samples=10
+[peakrss] peak tree RSS      : 311 MiB
+[peakrss] low-water MemAvail : 3409 MiB
+[peakrss] peak single VmHWM  : 311 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      300 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    16.1s procs=  3 rss=   311 MiB hwm=   311 MiB avail=  3409 MiB
+[peakrss]   t=    18.1s procs=  3 rss=   311 MiB hwm=   311 MiB avail=  3457 MiB
+[peakrss]   t=    14.1s procs=  3 rss=   310 MiB hwm=   310 MiB avail=  3561 MiB
+[peakrss]   t=    12.0s procs=  3 rss=   298 MiB hwm=   298 MiB avail=  3686 MiB
+[peakrss]   t=    10.0s procs=  3 rss=   282 MiB hwm=   282 MiB avail=  3866 MiB
+launcher exit: 0

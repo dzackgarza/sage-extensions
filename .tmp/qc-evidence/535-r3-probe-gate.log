@@ -1,0 +1,153 @@
+probe: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/probe535r3b.py
+tree SHA: 2f8c801e73b3a4fd5dce7dfa7bfc1b97e68285f5 (modified paths: 1)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 19.75 18.50 18.48 22/861 2719594
+inner 900 s, outer 960 s, guard 6144 MiB, args ''
+import over: 7.4 s
+==== odd U+U+<3> ====
+is_even: False   [0.00 s]
+rank: 5   [0.00 s]
+hyperbolic_index: 2   [3.30 s]
+O_plus quotient: <sage_extensions.categories.orthogonal_quotients.OrthogonalCharacterQuotient object at 0x78c76d64f380>   [0.38 s]
+_has_discriminant: False   [0.00 s]
+determinant_kernel: False   [0.00 s]
+spinor_kernel: True   [0.00 s]
+div-1 isotropic found: e_0   [0.00 s]
+line: Integral lattice of rank 1 and signature (0, 0)   [0.05 s]
+line stabilizer image: NOSPLIT   [1.80 s]
+==== odd U+U+<-1> ====
+is_even: False   [0.00 s]
+rank: 5   [0.00 s]
+hyperbolic_index: 2   [0.81 s]
+O_plus quotient: <sage_extensions.categories.orthogonal_quotients.OrthogonalCharacterQuotient object at 0x78c76d48a0d0>   [0.08 s]
+_has_discriminant: False   [0.00 s]
+determinant_kernel: False   [0.00 s]
+spinor_kernel: True   [0.00 s]
+div-1 isotropic found: e_0   [0.00 s]
+line: Integral lattice of rank 1 and signature (0, 0)   [0.05 s]
+line stabilizer image: NOSPLIT   [0.14 s]
+==== odd U+U+<1> ====
+is_even: False   [0.00 s]
+rank: 5   [0.00 s]
+hyperbolic_index: 2   [1.25 s]
+O_plus quotient: <sage_extensions.categories.orthogonal_quotients.OrthogonalCharacterQuotient object at 0x78c76d48bd90>   [0.08 s]
+_has_discriminant: False   [0.00 s]
+determinant_kernel: False   [0.00 s]
+spinor_kernel: True   [0.00 s]
+div-1 isotropic found: e_0   [0.00 s]
+line: Integral lattice of rank 1 and signature (0, 0)   [0.05 s]
+line stabilizer image: NOSPLIT   [0.22 s]
+==== kneser on definite blocks ====
+block gram positive sign matrix: Type (0, 2) tensor in ((Integer Ring^8)*)^{⊗2}
+[[2, 0, -1, 0, 0, 0, 0, 0], [0, 2, 0, -1, 0, 0, 0, 0], [-1, 0, 2, -1, 0, 0, 0, 0], [0, -1, -1, 2, -1, 0, 0, 0], [0, 0, 0, -1, 2, -1, 0, 0], [0, 0, 0, 0, -1, 2, -1, 0], [0, 0, 0, 0, 0, -1, 2, -1], [0, 0, 0, 0, 0, 0, -1, 2]]   [0.00 s]
+block gram engine matrix: Type (0, 2) tensor in ((Integer Ring^8)*)^{⊗2}
+[[-2, 0, 1, 0, 0, 0, 0, 0], [0, -2, 0, 1, 0, 0, 0, 0], [1, 0, -2, 1, 0, 0, 0, 0], [0, 1, 1, -2, 1, 0, 0, 0], [0, 0, 0, 1, -2, 1, 0, 0], [0, 0, 0, 0, 1, -2, 1, 0], [0, 0, 0, 0, 0, 1, -2, 1], [0, 0, 0, 0, 0, 0, 1, -2]]   [0.00 s]
+kneser on -block RAISED AttributeError: 'Modules.element_class[_CoordinateTensor]' object has no attribute 'nrows'   [0.00 s]
+Traceback (most recent call last):
+  File "/probe.py", line 11, in step
+    value = thunk()
+  File "/probe.py", line 57, in <lambda>
+    step("kneser on -block", lambda: _indecomposable_summands(gram))
+                                     ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py", line 3395, in _indecomposable_summands
+    rank = gram.nrows()
+           ^^^^^^^^^^
+  File "sage/structure/element.pyx", line 494, in sage.structure.element.Element.__getattr__
+    return self.getattr_from_category(name)
+  File "sage/structure/element.pyx", line 507, in sage.structure.element.Element.getattr_from_category
+    return getattr_from_other_class(self, cls, name)
+  File "sage/cpython/getattr.pyx", line 357, in sage.cpython.getattr.getattr_from_other_class
+    raise AttributeError(dummy_error_message)
+AttributeError: 'Modules.element_class[_CoordinateTensor]' object has no attribute 'nrows'
+kneser on E8 named RAISED AttributeError: 'Modules.element_class[_CoordinateTensor]' object has no attribute 'nrows'   [0.02 s]
+Traceback (most recent call last):
+  File "/probe.py", line 11, in step
+    value = thunk()
+  File "/probe.py", line 58, in <lambda>
+    step("kneser on E8 named", lambda: _indecomposable_summands(NamedLattices.E8.gram_tensor().change_ring(ZZ)))
+                                       ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py", line 3395, in _indecomposable_summands
+    rank = gram.nrows()
+           ^^^^^^^^^^
+  File "sage/structure/element.pyx", line 494, in sage.structure.element.Element.__getattr__
+    return self.getattr_from_category(name)
+  File "sage/structure/element.pyx", line 507, in sage.structure.element.Element.getattr_from_category
+    return getattr_from_other_class(self, cls, name)
+  File "sage/cpython/getattr.pyx", line 357, in sage.cpython.getattr.getattr_from_other_class
+    raise AttributeError(dummy_error_message)
+AttributeError: 'Modules.element_class[_CoordinateTensor]' object has no attribute 'nrows'
+kneser on A2 RAISED AttributeError: 'Modules.element_class[_CoordinateTensor]' object has no attribute 'nrows'   [0.02 s]
+Traceback (most recent call last):
+  File "/probe.py", line 11, in step
+    value = thunk()
+  File "/probe.py", line 59, in <lambda>
+    step("kneser on A2", lambda: _indecomposable_summands(C("A2").gram_tensor().change_ring(ZZ)))
+                                 ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py", line 3395, in _indecomposable_summands
+    rank = gram.nrows()
+           ^^^^^^^^^^
+  File "sage/structure/element.pyx", line 494, in sage.structure.element.Element.__getattr__
+    return self.getattr_from_category(name)
+  File "sage/structure/element.pyx", line 507, in sage.structure.element.Element.getattr_from_category
+    return getattr_from_other_class(self, cls, name)
+  File "sage/cpython/getattr.pyx", line 357, in sage.cpython.getattr.getattr_from_other_class
+    raise AttributeError(dummy_error_message)
+AttributeError: 'Modules.element_class[_CoordinateTensor]' object has no attribute 'nrows'
+kneser on A1+A1 skew RAISED AttributeError: 'Modules.element_class[_CoordinateTensor]' object has no attribute 'nrows'   [0.01 s]
+Traceback (most recent call last):
+  File "/probe.py", line 11, in step
+    value = thunk()
+  File "/probe.py", line 60, in <lambda>
+    step("kneser on A1+A1 skew", lambda: _indecomposable_summands(C([[-2, -2], [-2, -4]]).gram_tensor().change_ring(ZZ)))
+                                         ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py", line 3395, in _indecomposable_summands
+    rank = gram.nrows()
+           ^^^^^^^^^^
+  File "sage/structure/element.pyx", line 494, in sage.structure.element.Element.__getattr__
+    return self.getattr_from_category(name)
+  File "sage/structure/element.pyx", line 507, in sage.structure.element.Element.getattr_from_category
+    return getattr_from_other_class(self, cls, name)
+  File "sage/cpython/getattr.pyx", line 357, in sage.cpython.getattr.getattr_from_other_class
+    raise AttributeError(dummy_error_message)
+AttributeError: 'Modules.element_class[_CoordinateTensor]' object has no attribute 'nrows'
+kneser on E8+E8 scrambly RAISED AttributeError: 'Modules.element_class[_CoordinateTensor]' object has no attribute 'nrows'   [0.06 s]
+Traceback (most recent call last):
+  File "/probe.py", line 11, in step
+    value = thunk()
+  File "/probe.py", line 61, in <lambda>
+    step("kneser on E8+E8 scrambly", lambda: _indecomposable_summands((NamedLattices.E8 ** 2).gram_tensor().change_ring(ZZ)))
+                                             ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py", line 3395, in _indecomposable_summands
+    rank = gram.nrows()
+           ^^^^^^^^^^
+  File "sage/structure/element.pyx", line 494, in sage.structure.element.Element.__getattr__
+    return self.getattr_from_category(name)
+  File "sage/structure/element.pyx", line 507, in sage.structure.element.Element.getattr_from_category
+    return getattr_from_other_class(self, cls, name)
+  File "sage/cpython/getattr.pyx", line 357, in sage.cpython.getattr.getattr_from_other_class
+    raise AttributeError(dummy_error_message)
+AttributeError: 'Modules.element_class[_CoordinateTensor]' object has no attribute 'nrows'
+==== subobject_on coordinate rows ====
+AtomicProposition in namespace RAISED NameError: name 'AtomicProposition' is not defined   [0.00 s]
+Traceback (most recent call last):
+  File "/probe.py", line 11, in step
+    value = thunk()
+  File "/probe.py", line 65, in <lambda>
+    step("AtomicProposition in namespace", lambda: AtomicProposition)
+                                                   ^^^^^^^^^^^^^^^^^
+NameError: name 'AtomicProposition' is not defined
+total 17.4 s
+[peakrss] probe552: child waited=0 shell_code=0 samples=12
+[peakrss] peak tree RSS      : 425 MiB
+[peakrss] low-water MemAvail : 3239 MiB
+[peakrss] peak single VmHWM  : 425 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      414 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    20.2s procs=  3 rss=   425 MiB hwm=   425 MiB avail=  3483 MiB
+[peakrss]   t=    18.2s procs=  3 rss=   423 MiB hwm=   423 MiB avail=  3722 MiB
+[peakrss]   t=    22.2s procs=  3 rss=   423 MiB hwm=   425 MiB avail=  3239 MiB
+[peakrss]   t=    16.2s procs=  3 rss=   419 MiB hwm=   419 MiB avail=  3794 MiB
+[peakrss]   t=    14.1s procs=  3 rss=   322 MiB hwm=   322 MiB avail=  4208 MiB
+launcher exit: 0
