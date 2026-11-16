@@ -1,0 +1,7 @@
+# tree: 111e32f492d00dd1eebf9982d6fc1a3b156349f7
+# tree status:  M src/sage_extensions/categories/group/predicate_subgroups.py  M src/sage_extensions/categories/orthogonal_quotients.py 
+# load: 1.41 1.55 1.21
+# command: pytest -o addopts= -p qc_sage_session -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint -q tests/lattices/test_the_incidence_line_vertex_is_named_by_the_finite_image.sage
+...                                                                      [100%]
+3 passed in 38.83s
+# launcher exit: 0

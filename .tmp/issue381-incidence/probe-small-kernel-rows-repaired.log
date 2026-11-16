@@ -1,0 +1,51 @@
+# tree: 891fee04336bed6f9bbb6d14dd643266f3fd77b2
+# tree status:  M src/sage_extensions/categories/group/predicate_subgroups.py  M src/sage_extensions/categories/isotropic_orbits.py  M src/sage_extensions/categories/orthogonal_quotients.py  M tests/coble_gamma_co_2_incidence_rows.py ?? launch-381.sh ?? tests/lattices/test_the_coble_incidence_vertices_are_its_cusp_representatives.sage 
+# load: 1.99 1.89 1.68
+# program: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/wt-381/.tmp/probe-381-small.py
+[probe] argv ['--rows', 'Otilde,Otilde+', '--lattice', 'U+U(2)+<-2>', '--cap', '600', '--budget', '900']
+[rss] t=    0.0s rss=    96.9 MiB
+the lattice Integral lattice of rank 5 and signature (2, 3) of rank 5
+the rows ('Otilde', 'Otilde+')
+[rss] t=    5.0s rss=   472.0 MiB
+[rss] t=   10.0s rss=   495.3 MiB
+[Otilde] the row's calls returned in 13.0 s
+[Otilde] line cusp 0: ((0, 1, 0, 0, 0),)
+[Otilde] line cusp 1: ((0, 0, 1, 0, 0),)
+[Otilde] line cusp 2: ((0, 0, 0, 1, 0),)
+[Otilde] plane cusp 0: ((0, 1, 0, 0, 0), (0, 0, 0, 1, 0))
+[Otilde] plane cusp 1: ((0, 1, 0, 0, 0), (0, 0, 1, 0, 0))
+[Otilde] edge 0: L0 < P0; line=((0, 1, 0, 0, 0),); plane=((0, 1, 0, 0, 0), (0, 0, 0, 1, 0))
+[Otilde] edge 1: L2 < P0; line=((0, 0, 0, 1, 0),); plane=((0, 1, 0, 0, 0), (0, 0, 0, 1, 0))
+[Otilde] edge 2: L0 < P1; line=((0, 1, 0, 0, 0),); plane=((0, 1, 0, 0, 0), (0, 0, 1, 0, 0))
+[Otilde] edge 3: L1 < P1; line=((0, 0, 1, 0, 0),); plane=((0, 1, 0, 0, 0), (0, 0, 1, 0, 0))
+[Otilde] decided: 4 edges over 3 line cusps and 2 plane cusps
+[rss] t=   15.0s rss=   532.9 MiB
+[rss] t=   20.1s rss=   555.5 MiB
+[rss] t=   25.1s rss=   574.3 MiB
+[rss] t=   30.1s rss=   588.1 MiB
+[Otilde+] the row's calls returned in 17.7 s
+[Otilde+] line cusp 0: ((0, 1, 0, 0, 0),)
+[Otilde+] line cusp 1: ((0, 0, 1, 0, 0),)
+[Otilde+] line cusp 2: ((0, 0, 0, 1, 0),)
+[Otilde+] plane cusp 0: ((0, 1, 0, 0, 0), (0, 0, 0, 1, 0))
+[Otilde+] plane cusp 1: ((0, 1, 0, 0, 0), (0, 0, 1, 0, 0))
+[Otilde+] edge 0: L0 < P0; line=((0, 1, 0, 0, 0),); plane=((0, 1, 0, 0, 0), (0, 0, 0, 1, 0))
+[Otilde+] edge 1: L0 < P1; line=((0, 1, 0, 0, 0),); plane=((0, 1, 0, 0, 0), (0, 0, 1, 0, 0))
+[Otilde+] edge 2: L1 < P1; line=((0, 0, 1, 0, 0),); plane=((0, 1, 0, 0, 0), (0, 0, 1, 0, 0))
+[Otilde+] edge 3: L2 < P0; line=((0, 0, 0, 1, 0),); plane=((0, 1, 0, 0, 0), (0, 0, 0, 1, 0))
+[Otilde+] decided: 4 edges over 3 line cusps and 2 plane cusps
+recorded counts: Otilde 4 edges over 3 line and 2 plane cusps; Otilde+ 4 edges over 3 line and 2 plane cusps
+[peakrss] small-kernel-rows-fixed: child waited=0 shell_code=0 samples=18
+[peakrss] peak tree RSS      : 606 MiB
+[peakrss] low-water MemAvail : 4869 MiB
+[peakrss] peak single VmHWM  : 606 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      595 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    34.0s procs=  3 rss=   606 MiB hwm=   606 MiB avail=  5514 MiB
+[peakrss]   t=    32.0s procs=  3 rss=   604 MiB hwm=   604 MiB avail=  5515 MiB
+[peakrss]   t=    30.0s procs=  3 rss=   595 MiB hwm=   595 MiB avail=  5530 MiB
+[peakrss]   t=    28.0s procs=  3 rss=   592 MiB hwm=   592 MiB avail=  5542 MiB
+[peakrss]   t=    26.0s procs=  3 rss=   586 MiB hwm=   586 MiB avail=  5557 MiB
+# launcher exit: 0

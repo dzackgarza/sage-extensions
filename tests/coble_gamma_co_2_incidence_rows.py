@@ -217,12 +217,29 @@ def edge_violation(lattice, subgroup, incidence) -> str | None:
     return transport_violation(lattice, subgroup, incidence)
 
 
-def cusp_position(cusps, cusp) -> int | None:
-    r"""The position of ``cusp`` among ``cusps``, or ``None`` when it is not one of them."""
-    for position, candidate in enumerate(cusps):
-        if candidate is cusp or candidate == cusp:
-            return position
-    return None
+def cusp_positions(cusps):
+    r"""The position of every cusp of a row, by identity, for the relation to be read in one pass.
+
+    The relation of a kernel row has one edge per plane, and each edge names its
+    two vertices; scanning the vertex rows for each of them is one comparison
+    per vertex of the row at every edge, which a row of 189720 planes cannot
+    pay.  The cusps an edge names are the row's own retained objects, so
+    identity answers; a cusp that is not one of them is compared by the cusp's
+    own equivalence, which is a witness question and stays the slow path.
+    """
+    ordering = {id(cusp): position for position, cusp in enumerate(cusps)}
+    retained = tuple(cusps)
+
+    def position(cusp) -> int | None:
+        by_identity = ordering.get(id(cusp))
+        if by_identity is not None:
+            return by_identity
+        for candidate_position, candidate in enumerate(retained):
+            if candidate == cusp:
+                return candidate_position
+        return None
+
+    return position
 
 
 @dataclass(frozen=True)
@@ -297,10 +314,12 @@ def row_contract(lattice, subgroup, label, lines, planes, incidences) -> RowOutc
         log(f"[{label}] plane cusp {position}: {_coordinates(cusp.representative())}")
     line_vertices = set()
     plane_vertices = set()
-    retained_pairs = []
+    retained_pairs = set()
+    line_position = cusp_positions(lines)
+    plane_position = cusp_positions(planes)
     for position, incidence in enumerate(incidences):
-        line_id = cusp_position(lines, incidence.line_cusp())
-        plane_id = cusp_position(planes, incidence.plane_cusp())
+        line_id = line_position(incidence.line_cusp())
+        plane_id = plane_position(incidence.plane_cusp())
         if line_id is None or plane_id is None:
             which = "line" if line_id is None else "plane"
             return RowOutcome(
@@ -320,21 +339,21 @@ def row_contract(lattice, subgroup, label, lines, planes, incidences) -> RowOutc
                 RowStatus.CONTRACT_VIOLATION,
                 f"edge {position} of {len(incidences)}: {violation}",
             )
-        retained_pairs.append(pair)
-        line_vertices.add(incidence.line_cusp())
-        plane_vertices.add(incidence.plane_cusp())
+        retained_pairs.add(pair)
+        line_vertices.add(line_id)
+        plane_vertices.add(plane_id)
         log(
             f"[{label}] edge {position}: L{line_id} < P{plane_id}; "
             f"line={_coordinates(incidence.line())}; plane={_coordinates(incidence.plane())}"
         )
-    for position, cusp in enumerate(planes):
-        if cusp not in plane_vertices:
+    for position in range(len(planes)):
+        if position not in plane_vertices:
             return RowOutcome(
                 label, RowStatus.CONTRACT_VIOLATION, f"plane cusp {position} carries no edge"
             )
     if planes:
-        for position, cusp in enumerate(lines):
-            if cusp not in line_vertices:
+        for position in range(len(lines)):
+            if position not in line_vertices:
                 return RowOutcome(
                     label, RowStatus.CONTRACT_VIOLATION, f"line cusp {position} carries no edge"
                 )

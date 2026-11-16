@@ -2337,22 +2337,24 @@ end
         Retaining both data lets every consumer use the split's own witness and
         certificate instead of repeating an integral isometry or parabolic
         completeness computation.
+
+        The record is keyed by the plane's span, not by the plane object: a
+        split's consumers hold equal-but-distinct copies of a plane, and a
+        kernel row registers 189720 of them, so the span key is what makes the
+        lookup one dictionary hit instead of a scan of every plane recorded so
+        far.
         """
-        self.__dict__.setdefault("_isotropic_lift_registry", {})[plane] = (
-            lift,
-            tuple(parabolic_generators),
-        )
+        from sage_extensions.categories.isotropic_orbits import _span_key
+
+        self.__dict__.setdefault("_isotropic_lift_registry", {})[
+            _span_key(plane)
+        ] = (lift, tuple(parabolic_generators))
 
     def _registered_isotropic_split(self, plane):
         r"""The registered ``(lift, source parabolic generators)`` for ``plane``."""
-        from sage_extensions.categories.isotropic_orbits import _same_subobject
+        from sage_extensions.categories.isotropic_orbits import _span_key
 
-        for registered, record in self.__dict__.get(
-            "_isotropic_lift_registry", {}
-        ).items():
-            if _same_subobject(registered, plane):
-                return record
-        return None
+        return self.__dict__.get("_isotropic_lift_registry", {}).get(_span_key(plane))
 
     def isotropic_lift_of(self, plane):
         r"""The registered lift of a plane, matched by span equality.
@@ -2360,8 +2362,9 @@ end
         Two registered planes lie in one subgroup orbit exactly when the
         composite of one lift with the inverse of the other lies in the
         subgroup -- a question the finite character image decides.  The
-        matching is by span equality, so an equal-but-distinct object finds
-        its lift too.
+        matching is by span, so an equal-but-distinct object finds its lift too,
+        and the lookup is one keyed dictionary hit rather than a scan of the
+        registry.
         """
         record = self._registered_isotropic_split(plane)
         return None if record is None else record[0]
@@ -3486,6 +3489,40 @@ def _isotropic_line_class_points(lattice, line):
             finite_orthogonal._engine_abelian_element(discriminant_class),
             finite_orthogonal._engine_abelian_element(-discriminant_class),
         ]
+    )
+
+
+def _isotropic_line_image_key(quotient, line):
+    r"""The key of a primitive isotropic line in the subgroup's finite image.
+
+    An element of ``Gamma`` carries one isotropic line onto another, and the
+    divided class of a primitive vector is carried by an isometry onto the
+    divided class of its image, so the ``rho(Gamma)``-orbit of the class pair
+    ``{c, -c}`` is an invariant of the ``Gamma``-orbits of lines: two lines of
+    one orbit share their key, and a cusp whose key differs from a line's
+    cannot contain it.  This is the equivariance
+    :meth:`OrthogonalCharacterQuotient.invariant_separates_isotropic_orbits`
+    reads as a question, read here as a key, so that a line row is indexed once
+    instead of searched at every line.
+
+    The key is the orbit itself, as the set of markers
+    :meth:`OrthogonalCharacterQuotient.isotropic_class_orbit` walks: two class
+    pairs with equal keys lie in one ``rho(Gamma)``-orbit and two with
+    different keys in different ones, which is exactly what a dictionary of a
+    row's cusps answers a line's own key with.  The direction a vertex needs is
+    the sound one -- equal orbits are the same orbit, so a key no cusp carries
+    is a line of no cusp -- while two cusps may still share a key where the
+    finite image is coarser than the cusps, and the line is then decided among
+    those cusps by the witness the certificate retains.  A quotient with no
+    discriminant image has no key and answers ``None``, which leaves the caller
+    its isometry route.
+    """
+    if not quotient._has_discriminant:
+        return None
+    return frozenset(
+        quotient.isotropic_class_orbit(
+            _isotropic_line_class_points(quotient.lattice, line)
+        )
     )
 
 

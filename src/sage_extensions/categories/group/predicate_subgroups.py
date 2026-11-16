@@ -734,12 +734,33 @@ class PredicateSubgroups(OwnedParameterizedCategory):
             per flag orbit.  Each certificate retains actual subgroup
             transporters to its two cusp vertices rather than transporters
             inherited from the full orthogonal group.
+
+            The incidence is a relation between orbit vertices, so it is read
+            from the two cusp rows and not from a third enumeration of the
+            planes: the route visits each plane cusp's own representative, and
+            a vertex is identified by the span of the term -- a span that is a
+            cusp representative's is that cusp's, carried there by the
+            identity -- rather than by a witness question against every cusp of
+            the row.  The witness search remains for a term that is no
+            representative, which is what the flag route's planes are.
+
+            A line vertex is no representative either -- the lines of a plane
+            are not the line row's chosen ones -- so the line row is indexed by
+            the finite image instead: the ``rho(Gamma)``-orbit of the line's
+            divided class pair is an invariant of the line orbits the row was
+            split by, so a line's own key names the cusps that can contain it
+            and the witness is asked only of those.  A key no cusp carries is
+            answered exactly, being the invariant it is, and a key two cusps
+            share -- possible where the finite image is coarser than the row --
+            is decided between them by the witness each certificate retains.
             """
             from sage_extensions.categories.isotropic_orbits import (
                 ArithmeticCuspIncidence,
                 IsotropicFlag,
+                _span_key,
             )
             from sage_extensions.categories.orthogonal_quotients import (
+                _isotropic_line_image_key,
                 _plane_parabolic_incidence_flags,
             )
             from sage_extensions.categories.sets.finite_ordered_sets import (
@@ -760,6 +781,62 @@ class PredicateSubgroups(OwnedParameterizedCategory):
                         matches.append((cusp, witness))
                 return matches
 
+            # A cusp and the plane it is the orbit of are one span: the cusp
+            # rows are built from the orbit rows, so a term whose span is a
+            # cusp representative's is that cusp's, carried there by the
+            # identity -- an isometry of the lattice, hence an element of this
+            # subgroup.  Reading the vertex off the span is exact and costs one
+            # key; asking the cusp row instead costs one witness question per
+            # cusp, and a kernel row has 189720 plane cusps at every one of its
+            # 189720 planes.  A term that is no representative -- the flag
+            # route's planes are not transported from a retained one -- keeps
+            # the witness search, which is the only statement available there.
+            plane_cusp_by_span = {
+                _span_key(cusp.representative()): cusp for cusp in plane_cusps
+            }
+            line_cusp_by_span = {
+                _span_key(cusp.representative()): cusp for cusp in line_cusps
+            }
+            identity = self.supergroup().one()
+
+            # A line of a plane is no representative of the line row, so its
+            # span identifies no cusp and the witness search is what remains --
+            # one question per line cusp, at every line of every plane.  What
+            # does identify it is the finite image: the divided class pair
+            # ``{c, -c}`` of a line is carried by a subgroup element onto the
+            # pair of the image line, so the ``rho(Gamma)``-orbit of that pair
+            # is an invariant of the line orbits of this row (D. Dutour
+            # Sikirić and K. Hulek, arXiv:2302.01679v2, Lemma 3.6, printed
+            # p. 22, which is the reduction the row itself was split by).  The
+            # row is indexed by it once; a line's own key then names the cusps
+            # that can contain it, and the witness is asked only of those.
+            quotient = self.finite_character_quotient()
+            line_cusps_by_key = None
+            if quotient._has_discriminant:
+                line_cusps_by_key = {}
+                for cusp in line_cusps:
+                    key = _isotropic_line_image_key(quotient, cusp.representative())
+                    line_cusps_by_key.setdefault(key, []).append(cusp)
+
+            def line_vertex_candidates(term):
+                cusp = line_cusp_by_span.get(_span_key(term))
+                if cusp is not None:
+                    return [(cusp, identity)]
+                if line_cusps_by_key is not None:
+                    bucket = line_cusps_by_key.get(
+                        _isotropic_line_image_key(quotient, term)
+                    )
+                    # A key no cusp carries is a line of no cusp of this row:
+                    # the key is the invariant, so the empty answer is exact.
+                    return [] if bucket is None else matching_cusps(term, bucket)
+                return matching_cusps(term, line_cusps)
+
+            def plane_vertex_candidates(term):
+                cusp = plane_cusp_by_span.get(_span_key(term))
+                if cusp is not None:
+                    return [(cusp, identity)]
+                return matching_cusps(term, plane_cusps)
+
             # A covering of the incidence by flags: at each plane
             # representative cover the Stab_Gamma(P)-orbits of the lines of P
             # from the plane's own parabolic, and use the flag row wherever
@@ -772,7 +849,6 @@ class PredicateSubgroups(OwnedParameterizedCategory):
             # transported by it.
             orthogonal_group = self.supergroup()
             ambient_flags = tuple(orthogonal_group.isotropic_orbit_representatives(2, flag=True))
-            quotient = self.finite_character_quotient()
             # The ambient flag row need not choose the ambient plane row's
             # representative.  In that case there is no registered source lift
             # for its plane.  Normalize each such flag once to a registered
@@ -807,7 +883,15 @@ class PredicateSubgroups(OwnedParameterizedCategory):
                     ambient_sources.append((ambient_flag, None, None))
             sourced_flags = []
             parabolic_routed = True
-            for plane in self.isotropic_orbit_representatives(2):
+            # The planes of this row are the plane cusps of this row: a cusp's
+            # representative is the plane, so the incidence is computed at each
+            # cusp's own representative and its plane vertex is read from the
+            # cusp, never searched for among the cusps.  Walking the orbit row
+            # again here would also walk and register a second copy of every
+            # plane -- 189720 of them on T_Co.
+            for plane_cusp in plane_cusps:
+                plane = plane_cusp.representative()
+                target_lift = quotient.isotropic_lift_of(plane)
                 plane_orbit_flags = []
                 for ambient_flag, source_lift, source_witness in ambient_sources:
                     _ambient_line, ambient_plane = ambient_flag.terms()
@@ -815,7 +899,6 @@ class PredicateSubgroups(OwnedParameterizedCategory):
                     # plane.  Composing that normalization with the row's own
                     # lifts gives an exact ambient witness to each target plane,
                     # without an isometry search against the transported target.
-                    target_lift = quotient.isotropic_lift_of(plane)
                     if source_lift is not None and target_lift is not None:
                         witness = target_lift * ~source_lift
                         if source_witness is not None:
@@ -844,8 +927,8 @@ class PredicateSubgroups(OwnedParameterizedCategory):
             candidate_incidences = []
             for flag in sourced_flags:
                 line, plane = flag.terms()
-                line_vertices = matching_cusps(line, line_cusps)
-                plane_vertices = matching_cusps(plane, plane_cusps)
+                line_vertices = line_vertex_candidates(line)
+                plane_vertices = plane_vertex_candidates(plane)
                 if len(line_vertices) != 1 or len(plane_vertices) != 1:
                     raise ArithmeticError(
                         f"the isotropic flag {flag} of {lattice} lies in {len(line_vertices)} "
