@@ -9744,43 +9744,32 @@ class Lattices(OwnedCategoryOverBaseRing):
                     )
             return finite_ordered_set(tuple(matches))
 
-        def hyperbolic_plane_summand_count(self):
-            r"""Return the number of orthogonal hyperbolic planes in this lattice's isometry class.
-
-            This is the \(U\)-index, the largest \(k\) with
-            \(L \cong U^k \oplus M\), which :meth:`hyperbolic_index` decides
-            (:meth:`integral_hyperbolic_index` is the same number stated for a
-            \(\mathbf{Z}\)-lattice).  It is a property of the isometry class: a
-            lattice presented by a Gram matrix in a basis that displays no
-            plane has the same number as one built as an orthogonal sum, and
-            whether a *particular* summand is the plane is not the question
-            (that is an isometry of the summand, :meth:`is_isometric`).
-            """
-            return self.hyperbolic_index()
-
         def splits_two_hyperbolic_planes(self) -> bool:
-            r"""Return whether the isometry class of this lattice splits ``U + U``.
+            r"""Return whether this lattice is isometric to ``U + U + M``.
 
-            The count is the \(U\)-index (:meth:`hyperbolic_plane_summand_count`),
-            so this answers the question about the lattice and not about the
-            basis its Gram matrix happens to be written in.  The witness is
-            :meth:`two_hyperbolic_plane_splitting`.  An index of two or more
-            already exhibits the two summands, so no separate decomposability
-            question is asked here.
+            The \(U\)-index (:meth:`hyperbolic_index`) counts the largest number
+            of orthogonal hyperbolic planes, so this is whether that index is at
+            least two.  A witness is
+            :meth:`maximal_hyperbolic_index_splitting`, whose first factor is
+            \(U^m\) for that index \(m\).  The criterion's hypothesis adds that
+            the form is even, and :meth:`eichler_criterion_applies` states the
+            two halves together.
             """
-            return self.hyperbolic_plane_summand_count() >= 2
+            return self.hyperbolic_index() >= 2
 
         def eichler_criterion_applies(self) -> bool:
             r"""Return whether Eichler's criterion classifies primitive-vector orbits here.
 
-            The hypothesis is a property of the isometry class: an even lattice
-            with \(L \cong U \oplus U \oplus M\), the largest such \(k\) being
-            the \(U\)-index of :meth:`hyperbolic_plane_summand_count`
+            The hypothesis is the lattice's own: it is even, and
+            \(L \cong U \oplus U \oplus M\), the largest such \(k\) being the
+            \(U\)-index of :meth:`hyperbolic_index`
             (Gritsenko--Hulek--Sankaran, *Moduli of K3 Surfaces and
             Irreducible Symplectic Manifolds*, Lemma 7.8, p. 503, as cited in
-            ``orthogonal_quotients.isotropic_line_stabilizer_image``).  No basis
-            has to display the planes, and no enlargement of \(L\) supplies
-            them.
+            ``orthogonal_quotients.isotropic_line_stabilizer_image``).  Evenness
+            is not a decoration: the integral Eichler transvections
+            \(t(c,a)(v) = v - (a,v)c + (c,v)a - \tfrac12 (a,a)(c,v)c\) carry the
+            halved norm of \(a\), so they are automorphisms of \(L\) only on an
+            even form.  This is the one predicate the criterion's routes ask.
             """
             return bool(self.is_even()) and self.splits_two_hyperbolic_planes()
 
