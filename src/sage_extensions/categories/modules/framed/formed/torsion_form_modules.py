@@ -6,8 +6,11 @@ relation submodule in the appropriate sense; these constructors check that
 descent before equipping the module with the form.
 """
 
+from fractions import Fraction
+
 from sage.categories.map import Map
 from sage.categories.category import Category
+from sage.categories.morphism import Morphism
 from sage.misc.cachefunc import cached_method
 from sage.misc.classcall_metaclass import typecall
 from sage.matrix.constructor import matrix as _engine_matrix
@@ -107,6 +110,16 @@ def _coerced_gram(value_module, gram, rank):
     return tuple(tuple(value_module(entry) for entry in row) for row in _gram_rows(gram, rank))
 
 
+def _rational_value(value):
+    r"""Read a coefficient of a framing in \(\mathbf Q\), exactly.
+
+    The coefficients of a free module over the owned integers are owned
+    elements: they carry a numerator and a denominator and do not convert to
+    Sage's field by coercion, which is why the two are read separately.
+    """
+    return SageQQ(Fraction(int(value.numerator()), int(value.denominator())))
+
+
 def _linear_combination(value_module, coefficients, values):
     return sum(
         (coefficient * value for coefficient, value in zip(coefficients, values, strict=True) if coefficient),
@@ -160,10 +173,22 @@ class TorsionFormIsometry(CategoricalIsomorphism):
     def __init__(self, parent, forward, inverse, *, quadratic: bool, check: bool = False) -> None:
         r"""Store the mutually inverse module maps and the form flavour (``OWN-22``).
 
+        Either map may be given as a zero-argument computation of it.  That is
+        how a form automorphism whose datum is the engine's matrix is built:
+        its two presented maps are the transport of that matrix through the
+        normalization, so a construction that only needs the matrix -- a
+        membership test in a subgroup, say -- does not pay for them.
+
         ``check=True``, or strict checking, runs the validators
-        :meth:`validate_inverse` and :meth:`validate_form_preservation`.
+        :meth:`validate_inverse` and :meth:`validate_form_preservation`, which
+        ask for both maps.
         """
-        super().__init__(parent, forward, lambda: inverse, verify=False)
+        inverse_computation = (
+            inverse
+            if callable(inverse) and not isinstance(inverse, Morphism)
+            else lambda: inverse
+        )
+        super().__init__(parent, forward, inverse_computation, verify=False)
         self._quadratic = bool(quadratic)
         self.validate_inverse(check=check)
         self.validate_form_preservation(check=check)
@@ -2059,6 +2084,100 @@ class TorsionFormOrthogonalGroup(CategoricalMor):
             )
         return normalized_form.module_category().Mor(normalized_form, normalized_form)(images)
 
+    @cached_method
+    def _dual_action_conjugation(self):
+        r"""Return \(E\) and \(E^{-1}\): the form's dual frame in the engine's framing.
+
+        An isometry of the integral lattice \(L\) acts on a class of
+        \(A_L=L^\#/L\) by the dual action: with \(R\) the isometry's matrix in
+        the lattice's framing -- row \(i\) the image of the \(i\)-th framing
+        vector -- a class whose representative has dual coordinates \(x\) moves
+        to the class of \(x\,(R^{-1})^t\).  That is the map
+        :meth:`~..._discriminant_forward_morphism` states for the module route,
+        read in the dual basis instead of through the presented generators.
+
+        The two framings are fixed, so the passage between them is too.  \(D\)
+        is the matrix whose \(i\)-th row is the dual coordinates of the \(i\)-th
+        generator of this form, and \(P\) the matrix whose \(i\)-th row is the
+        coordinates of that generator's image under the normalization in the
+        normalized form's framing; a class with dual coordinates \(x\) has
+        \(xD^{-1}\) in this form's framing and \(xD^{-1}P\) in the engine's, so
+        the action in the engine's framing is \(E\,(R^{-1})^t\,E^{-1}\) with
+        \(E=P^{-1}D\).  Both matrices are read once, by the two lifts the module
+        route performs for every element it is asked about.
+        """
+        form = self.domain()
+        normalization = self.normalization_isometry()
+        normalized = normalization.codomain()
+        labels = tuple(form.module_generating_set())
+        dual_labels = tuple(form.dual_lattice().module_generating_set())
+        normalized_labels = tuple(normalized.module_generating_set())
+        dual_rows = []
+        image_rows = []
+        for label in labels:
+            generator = form.module_generator(label)
+            coordinates = form.dual_lattice_lift(generator).to_vector()
+            dual_rows.append([_rational_value(coordinates(other)) for other in dual_labels])
+            image = normalization.forward()(generator)
+            framing = normalized.framing_morphism().lift(image)
+            image_rows.append(
+                [_rational_value(framing(target)) for target in normalized_labels]
+            )
+        dual = _engine_matrix(
+            SageQQ,
+            len(dual_labels),
+            len(dual_labels),
+            [entry for row in dual_rows for entry in row],
+        )
+        images = _engine_matrix(
+            SageQQ,
+            len(normalized_labels),
+            len(normalized_labels),
+            [entry for row in image_rows for entry in row],
+        )
+        change = images.inverse() * dual
+        return change, change.inverse()
+
+    def from_dual_action(self, dual_action):
+        r"""Return the automorphism an integral isometry's matrix induces on this form.
+
+        ``dual_action`` is the isometry's matrix in the row convention of
+        :func:`sage_extensions.tensors.tensor._engine_row_action_matrix`: its
+        \(i\)-th row is the image of the \(i\)-th framing vector of the
+        lattice.  The element returned is the engine element of the dual action,
+        read in the engine's framing by :meth:`_dual_action_conjugation`, so
+        what it costs is one inverse and two products of ten-by-ten matrices and
+        not the presentation of the form's module maps.
+
+        The entries are reduced into the invariant factors, which is the range
+        the engine's matrices are read in; a non-integral entry would mean the
+        conjugation is not the action it claims to be, and is refused rather
+        than rounded.
+        """
+        change, inverse_change = self._dual_action_conjugation()
+        action = dual_action.change_ring(SageQQ)
+        conjugated = change * action.inverse().transpose() * inverse_change
+        module = self._engine_module()
+        invariants = tuple(int(value) for value in module.invariants())
+        size = conjugated.nrows()
+        if conjugated.ncols() != size or size != len(invariants):
+            raise ArithmeticError(
+                f"the dual action {dual_action} is a {conjugated.nrows()}-by-{conjugated.ncols()} "
+                f"matrix, but {self} is framed by {len(invariants)} generators"
+            )
+        entries = []
+        for row in range(size):
+            for column in range(size):
+                value = conjugated[row, column]
+                if int(value.denominator()) != 1:
+                    raise ArithmeticError(
+                        f"the dual action {dual_action} leaves the form's framing at the entry "
+                        f"({row}, {column}), which is {value}: an isometry of the lattice induces "
+                        f"an automorphism of {self} and not a fractional one"
+                    )
+                entries.append(int(value) % invariants[column])
+        return self._from_engine_matrix(_engine_matrix(SageZZ, size, size, entries))
+
     def _from_engine_matrix(self, engine_matrix):
         r"""Cross one private engine matrix to an owned form automorphism.
 
@@ -2096,10 +2215,15 @@ class TorsionFormOrthogonalGroup(CategoricalMor):
             raise ValueError("an owned form automorphism must be raised with both forward and inverse maps")
         if forward is not None:
             return self.element_class(self, forward, inverse, engine_automorphism)
+        # The two presented maps are the transport of the matrix through the
+        # normalization, which is the group's own change of basis: they are
+        # asked for on the first request, not at construction, so an element
+        # built to answer one question about the matrix costs what the matrix
+        # costs.
         return self.element_class(
             self,
-            self._transported_map(engine_automorphism),
-            self._transported_map(engine_automorphism.inverse()),
+            lambda: self._transported_map(engine_automorphism),
+            lambda: self._transported_map(engine_automorphism.inverse()),
             engine_automorphism,
         )
 

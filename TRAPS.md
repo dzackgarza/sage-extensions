@@ -10,6 +10,13 @@ Write to it in the turn the measurement is made.
 
 ## Sage
 
+### The owned rings do not coerce into Sage's fields
+
+Measured 2026-11-16 in the adopted runtime (SageMath 11.0.beta5, Python 3.14) on `HyperbolicLattices(ZZ)(NamedLattices.SEn)`: `SageQQ(z)` for `z` a coefficient of a framed module over the owned integers — `DiscriminantForm.dual_lattice_lift(c).to_vector()(label)`, or the coordinates `FormModule.framing_morphism().lift(x)` — raises `ValueError: Integer Ring is not in Category of sets with partial maps` out of `Parent.Hom`, because the owned ring is a custom parent whose category the coercion discovery cannot place, although both it and Sage's `ZZ` print as `Integer Ring`.
+Both kinds of element do carry `numerator()` and `denominator()`, so `Fraction(int(z.numerator()), int(z.denominator()))` reads either exactly, and `QQ(Fraction(...))` builds the engine rational. The same truncation trap is one line away: `Fraction(int(SageQQ_element))` silently truncates `5/2` to `2`, which is what made an `LDL^t` of a rational Gram find a non-positive pivot and report no factorisation.
+Route chosen: `_rational_of` in `hyperbolic_lattices.py` and `torsion_form_modules.py` reads numerator and denominator; `_ldl_factorisation` reads its matrix that way and factors rational Gram matrices as well as integral ones.
+Reproduce: `sage -c 'from sage_extensions.all import *; L = NamedLattices.SEn; f = HyperbolicLattices(ZZ)(L).discriminant_group(); c = f.dual_lattice_lift(f.module_generator(f.module_generating_set()[0])).to_vector()(f.dual_lattice().module_generating_set()[0]); print(c, c.numerator(), c.denominator())'` and then `QQ(c)`.
+
 ### Sage's `Polyhedron` reads its ambient dimension off the H-representation rows
 
 Measured 2026-11-16 in the adopted runtime (SageMath 11.0.beta5, Python 3.14): `Polyhedron(ieqs=[], eqns=[], base_ring=QQ)` is `A 0-dimensional polyhedron in QQ^0 defined as the convex hull of 1 vertex`, and the same call with `ambient_dim=2` is `A 2-dimensional polyhedron in QQ^2 defined as the convex hull of 1 vertex and 2 lines`.

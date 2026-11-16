@@ -2250,13 +2250,28 @@ class LatticeIsometryMethods:
 
     @cached_method
     def discriminant_morphism(self):
-        r"""Return ``Disc(self)`` parented by ``O(A_L)`` for an automorphism."""
+        r"""Return ``Disc(self)`` parented by ``O(A_L)`` for an automorphism.
+
+        The discriminant action of an isometry of an integral lattice is its
+        dual action on \(L^\#/L\), read in the dual basis: a class whose
+        representative has coordinates \(x\) moves to the class of
+        \(x\,(R^{-1})^t\), where \(R\) is the isometry's matrix in the
+        lattice's framing.  That is the isometry's own matrix and nothing else,
+        so the integral case writes the element out of it
+        (:meth:`TorsionFormOrthogonalGroup.from_dual_action`); the route
+        through the presented module maps, which presents two module morphisms
+        per element, is what the other base rings take, where the dual basis is
+        not the lattice's own.
+        """
         if self.domain() is not self.codomain():
             raise ValueError(
                 f"{self} induces no automorphism of a discriminant form: it is an isometry from {self.domain()} to {self.codomain()}, not an automorphism of one lattice"
             )
         form = self.domain().discriminant_group()
-        return form.orthogonal_group().from_morphism(self.discriminant_isometry())
+        group = form.orthogonal_group()
+        if _engine_ring(form.base_ring()) is SageZZ:
+            return group.from_dual_action(_engine_row_action_matrix(self))
+        return group.from_morphism(self.discriminant_isometry())
 
     def is_involution(self) -> bool:
         r"""Return whether this lattice automorphism satisfies ``self^2 = 1``."""

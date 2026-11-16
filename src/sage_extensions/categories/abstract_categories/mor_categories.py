@@ -1599,16 +1599,19 @@ class CategoricalIsomorphism(CategoricalArrow, CategoricalMor.ElementMethods):
     r"""An isomorphism represented by mutually inverse arrows.
 
     The defining datum is the forward arrow ``f: X -> Y``; the inverse
-    ``f^{-1}: Y -> X`` is determined by it.  It is supplied as a zero-argument
-    computation, asked on the first request and cached (``OWN-22``): a known
-    inverse is the constant computation, and a composite ``g f`` supplies
-    ``f^{-1} g^{-1}`` without composing it at construction.
+    ``f^{-1}: Y -> X`` is determined by it.  Either arrow may be supplied as a
+    zero-argument computation, asked on the first request and cached
+    (``OWN-22``): a known arrow is the constant computation, a composite
+    ``g f`` supplies ``f^{-1} g^{-1}`` without composing it at construction,
+    and an isomorphism whose datum is held in another form -- a finite form's
+    engine matrix, say -- does not pay for presenting its arrows until an
+    arrow is asked for.
     """
 
     def __init__(
         self,
         parent: Parent,
-        forward: Morphism,
+        forward: Morphism | Callable[[], Morphism],
         inverse_computation: Callable[[], Morphism],
         *,
         verify: bool = False,
@@ -1617,6 +1620,16 @@ class CategoricalIsomorphism(CategoricalArrow, CategoricalMor.ElementMethods):
         # Mor parent already fixes both endpoints; transport data for the
         # forward arrow are not arguments to the post-Map Element initializer.
         Morphism.__init__(self, parent)
+        self._forward_computation = forward
+        self._inverse_computation = inverse_computation
+        if isinstance(forward, Morphism):
+            # A supplied arrow is checked at construction, as it always was: a
+            # computation has no endpoints to read until it is asked.
+            self._checked_forward(forward)
+        self.validate_inverse_pair(check=verify)
+
+    def _checked_forward(self, forward: Morphism) -> Morphism:
+        r"""Return ``forward`` once its endpoints are this isomorphism's."""
         if (
             forward.domain() is not self.domain()
             or forward.codomain() is not self.codomain()
@@ -1625,12 +1638,15 @@ class CategoricalIsomorphism(CategoricalArrow, CategoricalMor.ElementMethods):
                 f"an isomorphism {self.domain()} -> {self.codomain()} needs a forward map "
                 f"{self.domain()} -> {self.codomain()}, but {forward} is a map {forward.domain()} -> {forward.codomain()}"
             )
-        self._forward = forward
-        self._inverse_computation = inverse_computation
-        self.validate_inverse_pair(check=verify)
+        return forward
 
+    @cached_method
     def forward(self) -> Morphism:
-        return self._forward
+        r"""The forward arrow, computed once when it was given as a computation."""
+        supplied = self._forward_computation
+        return self._checked_forward(
+            supplied if isinstance(supplied, Morphism) else supplied()
+        )
 
     @cached_method
     def _inverse_morphism(self) -> Morphism:
@@ -1662,7 +1678,7 @@ class CategoricalIsomorphism(CategoricalArrow, CategoricalMor.ElementMethods):
         )
 
         return _isomorphism_from_known_inverse_pair(
-            self._inverse_morphism(), self._forward
+            self._inverse_morphism(), self.forward()
         )
 
     def __invert__(self) -> CategoricalIsomorphism:
