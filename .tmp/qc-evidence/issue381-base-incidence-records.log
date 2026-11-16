@@ -1,0 +1,22 @@
+## issue381: the incidence records on the tree of e175cdb (the divided-class fix alone)
+## command: $SAGE_BIN -python .scratch/probe_incidence.py  (6JRS, stable_orthogonal_group().tits_building_incidence())
+6JRS: |O(A_L)| = 1
+Traceback (most recent call last):
+  File "/repos/sage-extensions/.scratch/probe_incidence.py", line 6, in <module>
+    incidences = subgroup.tits_building_incidence()
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 897, in tits_building_incidence
+    return finite_ordered_set(tuple(incidences))
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/finite_ordered_sets.py", line 922, in finite_ordered_set
+    return FiniteOrderedSets()(elements)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/sage/.venv/lib/python3.14/site-packages/sage/categories/category.py", line 592, in __call__
+    return self._call_(x, *args, **opts)
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/finite_ordered_sets.py", line 390, in _call_
+    return self._on_points(elements)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/finite_ordered_sets.py", line 427, in _on_points
+    distinct = tuple(dict.fromkeys(points))
+                     ~~~~~~~~~~~~~^^^^^^^^
+TypeError: cannot use 'sage_extensions.categories.isotropic_orbits.ArithmeticCuspIncidence' as a dict key (<class 'sage_extensions.categories.isotropic_orbits.ArithmeticCuspIncidence'> is not hashable)
+=== launcher exit: 1

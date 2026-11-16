@@ -1,0 +1,71 @@
+## issue381: the base tree c696bf9 (main before this push) on the same probe
+## command: $SAGE_BIN -python .scratch/probe1.py (stable_orthogonal_group().cusps(1), 6JRS then U+U(2)+<-2>)
+sage 11.0.beta5
+start 07:13:45
+== 6JRS = U+U+<-2> rank 5 det -2 sig (2, 3)
+  A_L order 2 O(q) order 1 2.4s
+  stable group built 2.4s
+  Otilde line cusps 1 2.9s
+  Otilde plane cusps 1 12.9s
+== U+U(2)+<-2> rank 5 det -8 sig (2, 3)
+  A_L order 8 O(q) order 2 1.3s
+  stable group built 1.3s
+Traceback (most recent call last):
+  File "sage/misc/cachefunc.pyx", line 1965, in sage.misc.cachefunc.CachedMethodCaller.__call__
+    return cache[k]
+KeyError: ((1,), ())
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/repos/sage-extensions/.scratch/probe1.py", line 26, in <module>
+    small("U+U(2)+<-2>", Lattices(ZZ)("U") + Lattices(ZZ)([[0, 2], [2, 0]]) + Lattices(ZZ)([[-2]]))
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/repos/sage-extensions/.scratch/probe1.py", line 20, in small
+    lines = stable.cusps(1)
+  File "sage/misc/cachefunc.pyx", line 1970, in sage.misc.cachefunc.CachedMethodCaller.__call__
+    w = self._instance_call(*args, **kwds)
+  File "sage/misc/cachefunc.pyx", line 1848, in sage.misc.cachefunc.CachedMethodCaller._instance_call
+    return self.f(self._instance, *args, **kwds)
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 697, in cusps
+    return finite_ordered_set(
+        tuple(
+    ...<2 lines>...
+        )
+    )
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/finite_ordered_sets.py", line 922, in finite_ordered_set
+    return FiniteOrderedSets()(elements)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/sage/.venv/lib/python3.14/site-packages/sage/categories/category.py", line 592, in __call__
+    return self._call_(x, *args, **opts)
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/finite_ordered_sets.py", line 390, in _call_
+    return self._on_points(elements)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/finite_ordered_sets.py", line 427, in _on_points
+    distinct = tuple(dict.fromkeys(points))
+                     ~~~~~~~~~~~~~^^^^^^^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/isotropic_orbits.py", line 849, in __eq__
+    return self.transporter_witness(other.representative()) is not None
+           ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/isotropic_orbits.py", line 891, in transporter_witness
+    return self.subgroup().isotropic_equivalence_witness(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        subobject,
+        ^^^^^^^^^^
+        self.representative(),
+        ^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 685, in isotropic_equivalence_witness
+    return _subgroup_isotropic_equivalence_witness(
+        self, left, right, flag=flag
+    )
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3725, in _subgroup_isotropic_equivalence_witness
+    if not flag and quotient.invariant_separates_isotropic_orbits(left, right):
+                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 2319, in invariant_separates_isotropic_orbits
+    source = _isotropic_line_class_points(lattice, left)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+NameError: name '_isotropic_line_class_points' is not defined
+=== launcher exit: 1

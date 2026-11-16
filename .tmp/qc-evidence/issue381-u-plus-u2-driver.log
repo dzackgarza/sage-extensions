@@ -1,0 +1,27 @@
+## issue381: the driver's small-lattice check, U + U(2) + <-2>
+## command: $SAGE_BIN -python tests/coble_gamma_co_2_incidence_rows.py --rows 'Otilde,Otilde+' --lattice 'U+U(2)+<-2>' --cap 400
+## tree: worktree of main c696bf9 with the #381 changes
+the lattice Integral lattice of rank 5 and signature (2, 3) of rank 5
+the rows ['Otilde', 'Otilde+']
+[Otilde] line cusp 0: ((0, -1, 1, 0, 0),)
+[Otilde] line cusp 1: ((2, 0, 0, 1, 0),)
+[Otilde] line cusp 2: ((2, 0, 1, 0, 0),)
+[Otilde] plane cusp 0: ((2, 0, 0, 1, 0), (0, 1, -1, 0, 0))
+[Otilde] plane cusp 1: ((2, 0, 1, 0, 0), (0, 1, 0, -1, 0))
+[Otilde] edge 0: L0 < P0; line=((0, -1, 1, 0, 0),); plane=((2, 0, 0, 1, 0), (0, 1, -1, 0, 0))
+[Otilde] edge 1: L1 < P0; line=((2, 2, -2, 1, 0),); plane=((2, 0, 0, 1, 0), (0, 1, -1, 0, 0))
+[Otilde] edge 2: L0 < P1; line=((0, -1, 0, 1, 0),); plane=((2, 0, 1, 0, 0), (0, 1, 0, -1, 0))
+[Otilde] edge 3: L2 < P1; line=((2, 2, 1, -2, 0),); plane=((2, 0, 1, 0, 0), (0, 1, 0, -1, 0))
+[Otilde] 4 edges over 3 line cusps and 2 plane cusps in 41.2 s
+[Otilde+] line cusp 0: ((0, -1, 1, 0, 0),)
+[Otilde+] line cusp 1: ((2, 0, 0, 1, 0),)
+[Otilde+] line cusp 2: ((2, 0, 1, 0, 0),)
+[Otilde+] plane cusp 0: ((2, 0, 0, 1, 0), (0, 1, -1, 0, 0))
+[Otilde+] plane cusp 1: ((2, 0, 1, 0, 0), (0, 1, 0, -1, 0))
+[Otilde+] edge 0: L0 < P0; line=((0, -1, 1, 0, 0),); plane=((2, 0, 0, 1, 0), (0, 1, -1, 0, 0))
+[Otilde+] edge 1: L0 < P1; line=((0, -1, 0, 1, 0),); plane=((2, 0, 1, 0, 0), (0, 1, 0, -1, 0))
+[Otilde+] edge 2: L1 < P0; line=((2, 0, 0, 1, 0),); plane=((1, 0, 0, 0, 0), (0, 0, 0, 1, 0))
+[Otilde+] edge 3: L2 < P1; line=((2, 0, 1, 0, 0),); plane=((1, 0, 0, 0, 0), (0, 0, 1, 0, 0))
+[Otilde+] 4 edges over 3 line cusps and 2 plane cusps in 63.8 s
+recorded counts: Otilde 4 edges over 3 line and 2 plane cusps; Otilde+ 4 edges over 3 line and 2 plane cusps
+=== launcher exit: 0

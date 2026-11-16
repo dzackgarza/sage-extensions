@@ -1,0 +1,17 @@
+## issue381: the driver's small-lattice check, 6JRS = U + U + <-2>
+## command: $SAGE_BIN -python tests/coble_gamma_co_2_incidence_rows.py --rows 'Otilde,Otilde+' --lattice 6JRS --cap 300
+## tree: worktree of main c696bf9 with the #381 changes
+the lattice Integral lattice of rank 5 and signature (2, 3) of rank 5
+the rows ['Otilde', 'Otilde+']
+[Otilde] line cusp 0: ((1, 0, 0, 0, 0),)
+[Otilde] plane cusp 0: ((1, 0, 0, 0, 0), (0, 0, 1, 0, 0))
+[Otilde] edge 0: L0 < P0; line=((1, 0, 0, 0, 0),); plane=((1, 0, 0, 0, 0), (0, 0, 1, 0, 0))
+[Otilde] 1 edges over 1 line cusps and 1 plane cusps in 13.7 s
+[Otilde+] line cusp 0: ((1, 0, 0, 0, 0),)
+[Otilde+] plane cusp 0: ((1, 0, 0, 0, 0), (0, 0, 1, 0, 0))
+[Otilde+] edge 0: L0 < P0; line=((1, 0, 0, 0, 0),); plane=((1, 0, 0, 0, 0), (0, 0, 1, 0, 0))
+[Otilde+] 1 edges over 1 line cusps and 1 plane cusps in 17.2 s
+the discriminant image of Integral lattice of rank 5 and signature (2, 3) is trivial, so each kernel row is its ambient row's; comparing the counts
+each kernel row agrees with the ambient row of Integral lattice of rank 5 and signature (2, 3)
+recorded counts: Otilde 1 edges over 1 line and 1 plane cusps; Otilde+ 1 edges over 1 line and 1 plane cusps
+=== launcher exit: 0

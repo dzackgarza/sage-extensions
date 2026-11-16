@@ -1,0 +1,22 @@
+## issue381: the #391 incidence gate file on the tree of this push, 2700 s inner limit
+## command: python -m pytest -p qc_sage_session -o addopts= -p suite_budget -p test_lint --no-time-gates tests/lattices/test_the_coble_incidence_of_line_and_plane_orbits.sage
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+time gates OFF (--no-time-gates): star import 0.79 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: asyncio-1.5.0, xdist-3.8.0, reportlog-1.0.0, platformdirs-4.13.5, hypothesis-6.170.15, anyio-4.15.1, timeout-2.4.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 2 items
+
+tests/lattices/test_the_coble_incidence_of_line_and_plane_orbits.sage .. [100%]
+
+========================== test-call performance gate ==========================
+tests/lattices/test_the_coble_incidence_of_line_and_plane_orbits.sage::test_the_coble_gamma_co_2_incidence_joins_lines_to_their_planes: 1685.31 s > 20 s
+============================== slowest durations ===============================
+1685.31s call     tests/lattices/test_the_coble_incidence_of_line_and_plane_orbits.sage::test_the_coble_gamma_co_2_incidence_joins_lines_to_their_planes
+10.11s call     tests/lattices/test_the_coble_incidence_of_line_and_plane_orbits.sage::test_the_coble_ambient_incidence_has_one_edge
+
+(4 durations < 0.005s hidden.  Use -vv to show these durations.)
+======================== 2 passed in 1696.37s (0:28:16) ========================
+=== launcher exit: 0
