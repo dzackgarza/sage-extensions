@@ -988,6 +988,35 @@ class CuspIncidence(SageObject):
     def stabilizer_generators(self):
         return self._stabilizer_generators
 
+    def __eq__(self, other) -> bool:
+        r"""Compare flag-orbit records by the flags they retain.
+
+        This class is the ambient flag-orbit certificate, and its own docstring
+        keeps two flag orbits over the same pair of cusp vertices apart, so
+        equality reads the flag's terms -- both of them, as subobjects of the
+        same lattice -- and never the endpoints alone.
+        """
+        if self is other:
+            return True
+        if not (isinstance(other, CuspIncidence) and other.lattice() is self.lattice()):
+            return False
+        return all(
+            int(left.module_rank()) == int(right.module_rank())
+            and _same_subobject(left, right)
+            for left, right in zip(self.flag().terms(), other.flag().terms())
+        )
+
+    def __ne__(self, other) -> bool:
+        return not self == other
+
+    def __hash__(self) -> int:
+        # A flag has no canonical representative and a subobject of a lattice,
+        # like the cusps of ``isotropic_orbits``, computes no cheap canonical
+        # hash, so the record hashes by its lattice alone: equal records of one
+        # lattice agree, and the category's own rule for a point whose owner
+        # computes no hash is a constant one (``FiniteOrderedSets``).
+        return hash((CuspIncidence, id(self.lattice())))
+
     def __repr__(self) -> str:
         return f"Tits-building incidence {self.line_cusp()} < {self.plane_cusp()}"
 
@@ -1086,6 +1115,38 @@ class ArithmeticCuspIncidence(SageObject):
             action,
             lambda element: element in line_stabilizer and element in plane_stabilizer,
         )
+
+    def __eq__(self, other) -> bool:
+        r"""Compare relation records by their endpoints.
+
+        This class is one certificate of the building's incidence *relation*:
+        ``tits_building_incidence`` retains one certificate per pair of
+        endpoints, and several flag orbits over one pair are one relation.  Two
+        records of the same subgroup with the same line and plane cusps are
+        therefore the same edge, whatever flag witnesses each retains.
+        """
+        if self is other:
+            return True
+        if not (
+            isinstance(other, ArithmeticCuspIncidence)
+            and other.subgroup() is self.subgroup()
+        ):
+            return False
+        return (
+            self.line_cusp() == other.line_cusp()
+            and self.plane_cusp() == other.plane_cusp()
+        )
+
+    def __ne__(self, other) -> bool:
+        return not self == other
+
+    def __hash__(self) -> int:
+        # A cusp has no canonical representative and its own hash is constant
+        # over its universe (``_ArithmeticCuspEngine.__hash__``), so the record
+        # hashes by its subgroup alone: equal records of one subgroup agree, and
+        # the category's rule for a point whose owner computes no cheap
+        # canonical hash is a constant one (``FiniteOrderedSets``).
+        return hash((ArithmeticCuspIncidence, id(self.subgroup())))
 
     def __repr__(self) -> str:
         return f"Arithmetic Tits-building incidence {self.line_cusp()} < {self.plane_cusp()}"
