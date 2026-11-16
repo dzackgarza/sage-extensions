@@ -66,3 +66,53 @@ def test_a_plane_inclusions_quotient_is_built_before_it_is_asked() -> None:
     assert requested > 0
     assert quotient.is_torsion_free() is True
     assert tuple(quotient.invariant_factors()) == (ZZ(0), ZZ(0))
+
+
+def test_a_localized_cokernels_construction_asks_the_engine_for_no_matrix() -> None:
+    r"""$S/3$ for $S = Z[1/2]$, built before anything is asked of it.
+
+    A presentation over a localization is a finite presentation over the source
+    ring once each relation row's denominators are cleared, and the quotient it
+    presents is the source quotient localized.  Those are the module's defining
+    data; building them at construction computes the presentation inside it.
+    """
+    ring = ZZ.localization(2)
+    free = ring.free_module(1)
+    generator = free.module_generator(0)
+    dilation = free.Mor(free)({0: ring(3) * generator})
+
+    quotient, constructed, requested = construction_work_of(
+        dilation.cokernel,
+        lambda module: module.cardinality(),
+    )
+
+    assert constructed == 0
+    assert requested > 0
+    assert int(quotient.cardinality()) == 3
+
+
+def test_a_restricted_scalars_module_is_built_before_it_is_asked() -> None:
+    r"""$A^1$ restricted along $F_2 \to A = F_2[x]/(x^2)$, before it is read.
+
+    The extension is free of rank two over the coefficient field, so the
+    restricted module's presentation is the extension's transported relation
+    morphism.  Construction selects it and computes nothing.
+    """
+    base = GF(2)
+    polynomial = base["x"]
+    x = polynomial.algebra_generator("x")
+    extension = polynomial.quotient_ring(polynomial.ideal(x**2))
+    restriction = Modules(extension).restriction_of_scalars(
+        base.Mor(extension)(lambda scalar: extension(scalar))
+    )
+    line = extension**1
+
+    module, constructed, requested = construction_work_of(
+        lambda: restriction(line),
+        lambda restricted: restricted.cardinality(),
+    )
+
+    assert constructed == 0
+    assert requested > 0
+    assert module.module_rank() == 2
+    assert module.cardinality() == 4
