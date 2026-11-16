@@ -3287,3 +3287,19 @@ changed.
 | log | tree | result |
 | --- | --- | --- |
 | `527r3-green-at-e395856.log` | `e395856`, this round's head, with the test lint | the whole file: **8 passed in 5.49 s**, no lint finding |
+
+## `#527` round 3, re-taken a third time: rebased onto `a38faef`, whole file green (2026-11-16)
+
+`main` advanced twice more while this round waited to push (`fa61bf8`, then `a38faef`), so
+the six commits are rebased onto `a38faef` and their ids are now `19b5e64` (test),
+`59375e0` (its repair), `6994e0f` (test), `2730f44` (its repair), `304aee5`, `07f7bcd`,
+`ff46a67` and `dc6c692` (evidence).  The rebase met one textual conflict, in
+`commutative_algebra.py` where `#542` added `exact_value_field` at the point this round
+adds `completion_defining_power_vanishes`; both statements are kept, side by side.
+`#542`'s completion-element hashing changes the elements this round's basis resolves, so
+the whole file is taken again here rather than carried: **8 passed in 4.34 s** with the
+test lint loaded.
+
+| log | tree | result |
+| --- | --- | --- |
+| `527r3-green-at-dc6c692.log` | `dc6c692`, this round's head, with the test lint | the whole file: **8 passed in 4.34 s**, no lint finding |
