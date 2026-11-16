@@ -75,4 +75,6 @@ def test_normalizer_retains_its_conjugation_action_functor() -> None:
     point = restricted.domain().an_object()
     for element in normalizer:
         arrow = restricted.domain().Mor(point, point)(element)
-        assert restricted(arrow)(subgroup) == subgroup
+        transported = restricted(arrow)(subgroup)
+        assert transported.order() == subgroup.order()
+        assert all(subgroup.is_parent_of(member) for member in transported)
