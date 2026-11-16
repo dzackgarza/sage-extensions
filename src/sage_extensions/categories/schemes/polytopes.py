@@ -788,6 +788,27 @@ class ConvexPolytopes(OwnedParameterizedCategory):
                 for vertex in self._engine_polyhedron().vertices()
             )
 
+        def is_contained_in(self, other):
+            r"""Whether this polytope lies in another polytope of the ambient space.
+
+            A polytope is the convex hull of its vertices, and a polytope is
+            convex, so a convex hull lies in one exactly when its vertices do
+            (Mathlib, ``convexHull_min``, ``Mathlib/Analysis/Convex/Hull.lean``):
+            the vertices of this polytope against the halfspaces of ``other``
+            decide the subset relation, and a vertex that fails one of them is
+            a point of this polytope that is not a point of ``other``.  A
+            subset of the ambient space that is not a polytope has no
+            halfspace description to test, so the defining membership
+            condition of such a subset decides it.
+            """
+            match other in ConvexPolytopes(self.ambient_lattice()):
+                case True:
+                    return all(
+                        other.contains_point(vertex) for vertex in self.vertices()
+                    )
+                case False:
+                    return super().is_contained_in(other)
+
         def is_equal_to(self, other) -> bool:
             r"""Return whether the two polytopes are the same subset of the ambient space.
 
@@ -795,6 +816,9 @@ class ConvexPolytopes(OwnedParameterizedCategory):
             same vertices: a polytope is the convex hull of its vertex set, and
             the vertices are the points of the polytope that are not a convex
             combination of other points of it, so the subset determines them.
+            Containment agrees: :meth:`is_contained_in` tests the vertices of
+            one polytope against the halfspaces of the other, so each polytope
+            lies in the other exactly when their vertex sets are one set.
             """
             return (
                 other.ambient_lattice() is self.ambient_lattice()
@@ -804,11 +828,11 @@ class ConvexPolytopes(OwnedParameterizedCategory):
         def __eq__(self, other):
             r"""Two polytopes of one lattice are equal when they have the same vertices.
 
-            Equal sets are one factor of a product (`SET-05`), and the subset
-            equality inherited from the ambient space states the containment of
-            two polytopes both ways as a proposition, which would put equal
-            polytopes in two products.  A polytope is its vertex set, which
-            decides it.
+            Equal sets are one factor of a product (`SET-05`), so equality
+            reads the vertex set that :meth:`__hash__` hashes.  A polytope is
+            its vertex set, which decides it, and which is the canonical form
+            of the vertex and halfspace presentations that
+            :meth:`is_contained_in` compares.
             """
             if self is other:
                 return True
