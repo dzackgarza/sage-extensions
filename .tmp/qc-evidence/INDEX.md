@@ -2761,3 +2761,31 @@ says so.
 | `543-mro-six-processes.log` | `d1ab7fc` | six fresh processes: `Cardinalities().Mor(2, 3)`'s MRO is `[OwnedCardinalityMor_with_category_with_category, Sets.ParentMethods, CardinalityMor...]` in all six, and `is_empty()` is the proposition in all six — the defect does not vary between runs |
 | `543-mro-predecessors.log` | `d1ab7fc` | twelve constructions before the hom-set (`Sets().Mor(Δ2,Δ2).is_empty`, `Ordinals().Mor(1,2).is_empty`, `cardinal(2).Mor(3).is_empty`, `Sets().Finite()`, `Δ2.cardinality()`, `QQ(3)`, `m.cardinality()`, `m.unique_morphism()`, `m.base_category()`, `m.mor_category()`, and the cached hom-set again), each followed by a fresh `Mor(2, 3)`: the class, the two MRO positions and the answer are identical at every step — no earlier construction decides it |
 | `543-baked-library-run.log` | `d1ab7fc`'s file, the image's own `sage_extensions` at `/repos/sage-extensions/src` (a copy at `cf656f8`) ahead of the tree's on `PYTHONPATH` | **4 failed, 14 passed in 12.10 s** — the same four rows, so importing the copy the image carries does not explain the reported pass either |
+
+## #527 round 2: the completion at the zero ideal, and the specimen that tells its maps apart
+
+Every row is `tests/rings/test_the_adic_inverse_system_and_its_limit_cone.sage`
+unless it names another path, in the pinned image `/sage/.venv/bin/python`,
+`-p qc_sage_session`, `addopts` blanked, the tree bound at
+`/repos/sage-extensions`.  `-p sage_extensions.testing.test_lint` is added
+where the row says so.  The two trees that are not the round's own are
+`ac4ff63`, the commit before #527's first repair, and `bbb0dd6`/`a88e5cc`,
+main as it stood while this round ran.
+
+| log | tree | result |
+| --- | --- | --- |
+| `527-base-principal.log` | `ac4ff63` | the two principal-ideal tests alone, `-k principal`: **2 failed, 3 deselected in 15.63 s**, both `TypeError: object() takes exactly 0 positional arguments (1 given)` from `adic_inverse_system` at `commutative_algebra.py:3201` |
+| `527-fix-principal.log` | the specimen's test commit | the file with the test lint loaded: **5 passed in 13.85 s**, no finding |
+| `527-main-iso.log` | `bbb0dd6` | the isomorphism test alone, `-k zero_ideal`: **1 failed, 4 deselected in 11.18 s**, at `assert completion_map in Rings().Core().Mor(field, completion)` |
+| `527-fix-iso.log` | the isomorphism's repair | the file with the test lint loaded: **5 passed in 11.26 s**, no finding |
+| `527-base-rank.log` | `ac4ff63` | the rank-one test alone, `-k rank_one`: **1 failed, 5 deselected in 12.99 s**, the frame being `Free module on {[0], [1]} over QQ(i)` |
+| `527-fix-rank.log` | the rank-one test commit | the file with the test lint loaded: **6 passed in 6.39 s**, no finding |
+| `527-test-file-final.log` | `a88e5cc` plus the round's six commits | the file with the test lint loaded: **6 passed in 8.05 s**, no finding |
+| `527-completion-probe.log` | the round's tree | `QQ(i)` at `(0)`: the map is a `CategoricalIsomorphism` in `Rings().Core().Mor`, both predicates `True`, `inverse()` round-trips `a`, `extended_ideal()` and `ideal_of_definition()` are the completion's zero ideal, and the system, the cone, the element constructor and `algebra_structure_morphism()` all return; at `QQ[x]` at `(x)` the map is a ring morphism and surjectivity stays undecided |
+| `527-consumers-head.log` | the isomorphism's repair | `tests/rings/test_completion_inverse_system.sage`, `test_completion_arithmetic.sage`, `test_local_completions.sage`: **1 failed, 6 passed in 18.98 s** |
+| `527-consumers-main.log` | `bbb0dd6`, same command | **1 failed, 6 passed in 18.08 s**, the same FAILED id (`test_completion_is_the_limit_of_the_truncations_by_powers_of_the_maximal_ideal`) |
+| `527-completion-maps-base.log` | `ac4ff63` | `tests/rings/test_completion_maps.sage`: **4 failed, 1 passed in 17.42 s** |
+| `527-completion-maps-main.log` | `bbb0dd6` | the same file: **4 failed, 1 passed in 12.94 s**, the same four FAILED ids |
+| `527-zz-adic-completion-main.log` | `bbb0dd6` | `ZZ.adic_completion(2)` raises `AttributeError: 'int' object has no attribute 'ring'`; `ZZ.adic_completion(ZZ.ideal(2))` raises `RecursionError`; the resolved method is `ModulesWithChosenFinitePresentation.ParentMethods.adic_completion` |
+| `527-zz-adic-completion-dispatch.log` | the round's tree | `ZZ` alone resolves the module owner's `adic_completion` (`QQ`, `QQ[x]`, `QQ(i)`, `Zp(5)` resolve the ring owner's), and `AdicCompletions().Local().an_object()` raises the `AttributeError` at `modules/pure/modules.py:4655` from `commutative_algebra.py:3036` |
+| `527-literal-subtraction.log` | the round's tree | `(1 - x_hat).exact_source_expression()` and `(x_hat - 1).exact_source_expression()` are `None`, `(completion.one() - x_hat)` is `-x + 1`, and the induced map evaluates at the latter |

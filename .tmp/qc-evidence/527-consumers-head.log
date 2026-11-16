@@ -1,0 +1,30 @@
+......F                                                                  [100%]
+=================================== FAILURES ===================================
+_ test_completion_is_the_limit_of_the_truncations_by_powers_of_the_maximal_ideal _
+tests/rings/test_local_completions.sage:40: in test_completion_is_the_limit_of_the_truncations_by_powers_of_the_maximal_ideal
+    assert transition * completion.adic_projection(4) == completion.adic_projection(2)
+src/sage_extensions/logic.py:44: in __bool__
+    raise TypeError(f"the proposition {self} has no Python truth value, because it may be undecided; call ask(...) on it to get True, False or Unknown")
+E   TypeError: the proposition equal(Generic morphism:
+E     From: Ring over Fraction Field of Integer Ring
+E     To:   Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring / Finitely presented module on 4 module generators over Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring, Generic morphism:
+E     From: Ring over Fraction Field of Integer Ring
+E     To:   Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring / Finitely presented module on 4 module generators over Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring) has no Python truth value, because it may be undecided; call ask(...) on it to get True, False or Unknown
+=========================== short test summary info ============================
+FAILED tests/rings/test_local_completions.sage::test_completion_is_the_limit_of_the_truncations_by_powers_of_the_maximal_ideal
+1 failed, 6 passed in 18.98s
+[peakrss] probe527: child waited=1 shell_code=1 samples=14
+[peakrss] peak tree RSS      : 337 MiB
+[peakrss] low-water MemAvail : 2563 MiB
+[peakrss] peak single VmHWM  : 338 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      326 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   bash                          0 MiB peak
+[peakrss]   t=    24.1s procs=  3 rss=   337 MiB hwm=   338 MiB avail=  3178 MiB
+[peakrss]   t=    26.1s procs=  3 rss=   337 MiB hwm=   338 MiB avail=  3093 MiB
+[peakrss]   t=    22.1s procs=  3 rss=   336 MiB hwm=   336 MiB avail=  3244 MiB
+[peakrss]   t=    18.1s procs=  3 rss=   329 MiB hwm=   329 MiB avail=  2563 MiB
+[peakrss]   t=    20.1s procs=  3 rss=   329 MiB hwm=   330 MiB avail=  3340 MiB
+launcher exit: 1

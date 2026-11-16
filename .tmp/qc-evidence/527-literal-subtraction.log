@@ -1,0 +1,19 @@
+tree SHA: 931c59d9a8e6b63604e7ec81f19db96a93341ae3
+1 - x_hat: None
+one() - x_hat: -x + 1
+x_hat - 1: None
+induced at one()-x_hat: element of Ring over Fraction Field of Integer Ring
+[peakrss] probe527: child waited=0 shell_code=0 samples=6
+[peakrss] peak tree RSS      : 286 MiB
+[peakrss] low-water MemAvail : 6033 MiB
+[peakrss] peak single VmHWM  : 286 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      275 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     8.0s procs=  3 rss=   286 MiB hwm=   286 MiB avail=  6363 MiB
+[peakrss]   t=    10.0s procs=  3 rss=   286 MiB hwm=   286 MiB avail=  6033 MiB
+[peakrss]   t=     6.0s procs=  3 rss=   256 MiB hwm=   256 MiB avail=  6583 MiB
+[peakrss]   t=     4.0s procs=  3 rss=   220 MiB hwm=   220 MiB avail=  6864 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   172 MiB hwm=   172 MiB avail=  6932 MiB
+launcher exit: 0
