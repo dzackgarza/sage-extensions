@@ -1,5 +1,5 @@
-r"""Lattice-point counts, Ehrhart data and polar duality of small lattice polygons,
-and the symmetry of the regular dodecahedron."""
+r"""Lattice-point counts, Ehrhart data, polar duality and containment of small lattice
+polygons, and the symmetry of the regular dodecahedron."""
 
 from sage_extensions.all import *
 
@@ -54,6 +54,40 @@ def test_dodecahedron_has_coxeter_diagram_h3_and_symmetry_group_of_order_120() -
     assert diagram.coxeter_entry(second, third) == 3
     assert diagram.coxeter_entry(first, third) == 2
     assert dodecahedron.symmetry_group().order() == 120
+
+
+def test_containment_of_a_triangle_is_decided_by_its_vertices() -> None:
+    r"""`A \subseteq B` exactly when every vertex of `A` satisfies the halfspaces of `B`.
+
+    `2\Delta = \operatorname{conv}\{(0,0),(2,0),(0,2)\}` is cut out by
+    `x \ge 0`, `y \ge 0` and `x + y \le 2`.  The triangle on `(0,0), (1,0), (0,1)`
+    lies in it, and so does `\operatorname{conv}\{(1,0),(2,0),(1,1)\}`, whose two
+    last vertices lie on the facet `x + y = 2`.
+    `\operatorname{conv}\{(0,0),(3,0),(0,1)\}` does not: its vertex `(3,0)` has
+    `x + y = 3`.  Nor does `2\Delta` lie in the first triangle, whose hyperplane
+    `x + y = 1` leaves the vertex `(2,0)` of `2\Delta` outside.  The halfspaces
+    give `2\Delta` its vertices, and the same two answers hold against that
+    presentation of it.
+    """
+    lattice = ZZ.free_module(2)
+    doubled = ConvexPolytopes(lattice)(((0, 0), (2, 0), (0, 2)))
+    cut = ConvexPolytopes(lattice).from_halfspaces(
+        ((0, (1, 0)), (0, (0, 1)), (2, (-1, -1)))
+    )
+    inner = ConvexPolytopes(lattice)(((0, 0), (1, 0), (0, 1)))
+    touching = ConvexPolytopes(lattice)(((1, 0), (2, 0), (1, 1)))
+    reaching_out = ConvexPolytopes(lattice)(((0, 0), (3, 0), (0, 1)))
+
+    assert inner.is_contained_in(doubled)
+    assert touching.is_contained_in(doubled)
+    assert not reaching_out.is_contained_in(doubled)
+    assert not doubled.is_contained_in(inner)
+    assert inner.is_contained_in(inner)
+
+    assert inner.is_contained_in(cut)
+    assert touching.is_contained_in(cut)
+    assert not reaching_out.is_contained_in(cut)
+    assert not cut.is_contained_in(inner)
 
 
 def test_triangles_with_one_vertex_set_are_one_polytope_with_one_hash() -> None:
