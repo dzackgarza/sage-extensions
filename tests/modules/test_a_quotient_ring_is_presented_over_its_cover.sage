@@ -49,3 +49,33 @@ def test_the_class_of_three_modulo_eight_is_presented_over_the_integers() -> Non
     assert ring.number_of_module_generators() == 1
     assert ring.dual_module().is_zero()
     assert ring(3).order_ideal() == ZZ.ideal(0)
+
+
+def test_the_quotient_construction_states_its_module_reading_without_building_it() -> None:
+    r"""Constructing a quotient states how it is read as a module; it builds nothing.
+
+    The construction's datum is the ring and its defining ideal, and that datum
+    already says which module the ring is: generated over its cover by the class
+    of $1$, with the ideal's generators as the relations.  The reading itself is
+    derived structure -- a category placement, a frame, a relation map and the
+    free and regular modules they are stated in -- so it is built on the first
+    request and not as a side effect of constructing the ring (``AGENTS.md``,
+    "Construction is instant").
+
+    Before that request the ring is therefore not yet an object of
+    $\operatorname{ModulesWithChosenFinitePresentation}(\text{cover})$, and it
+    still answers when it is asked: the first module read is the request.
+
+    The defining ideal is this test's own.  A ring's module reading, once built,
+    stays built, so a specimen that another test has already read as a module
+    cannot distinguish stating the reading from building it; the quotient by
+    $x^2 + x + 1$ is nobody else's.
+    """
+    ring = ZZ["x"]
+    x = ring.algebra_generator("x")
+    quotient = ring.quotient_ring(ring.ideal(x**2 + x + 1))
+
+    assert quotient not in ModulesWithChosenFinitePresentation(ring)
+    assert quotient.has_selected_module_resolution()
+    assert quotient in ModulesWithChosenFinitePresentation(ring)
+    assert quotient.number_of_module_generators() == 1
