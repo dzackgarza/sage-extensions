@@ -2777,21 +2777,20 @@ class ModuleMorphismMethods:
         isomorphism in ``R``-modules; that fraction-field inverse is a different
         construction and is never returned here.
 
-        An endomorphism of a framed finite free module whose scalars carry an
-        exact engine matrix is inverted through that matrix, in the ring: the
-        inverse is the matrix inverse the ring contains, and its determinant
-        says whether there is one.  The kernel and cokernel are what invert
-        every other map, and over a ring whose selected linear-algebra parent is
-        not a Sage ring -- the exact real and complex fields are their own --
-        they invert the matrix too, because no engine matrix exists there.
+        A square matrix over a commutative ring whose selected linear-algebra
+        parent is a Sage ring is inverted in that ring
+        (:meth:`...pure.modules.MatrixSpaces.ElementMethods._inverse_in_the_ring`),
+        whether or not its endpoints coincide; any other map is inverted by its
+        kernel and its cokernel.
         """
         from sage.categories.rings import Rings as SageRings
 
         self._require_established_linearity("module-morphism inversion")
+        ring = self.parent().base_ring()
         if (
-            self.domain() is self.codomain()
-            and _engine_matrix_mor(self.parent())
-            and _linear_algebra_ring(self.domain().base_ring()) in SageRings()
+            _engine_matrix_mor(self.parent())
+            and ring.is_commutative() is True
+            and _linear_algebra_ring(ring) in SageRings()
         ):
             return self._inverse_in_the_ring()
         assert self.is_injective(), (
