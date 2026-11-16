@@ -428,10 +428,9 @@ class _FiniteIntegralRepresentation(SageObject):
 
         The composite family is a datum of *this* subobject -- its lattice orbit,
         the letters, and the discriminants of the transports -- so it is
-        computed once per subobject and cached.  On the ``T_Co`` line it is 26 s
-        (`.tmp/p310b-probe1.log`), an order of magnitude more than the orbit
-        enumeration that consumes it, and the row asked for it once per
-        representative.
+        computed once per subobject and cached.  On the ``T_Co`` line it is 26 s,
+        an order of magnitude more than the orbit enumeration that consumes it,
+        so a row reads it once rather than once per representative.
         """
         action = self.action()
         inclusion = action.lattice_inclusion()

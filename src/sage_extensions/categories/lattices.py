@@ -2770,8 +2770,8 @@ class Lattices(OwnedCategoryOverBaseRing):
         printed pp. 33--34), which determine them whether or not the plane splits off
         the lattice.  The port's rank-two branch answers the same question by
         converting each rational generator of its integral-structure action to
-        an integral isometry, and on \(T_{\mathrm{En}}\) that conversion did not
-        return on the recorded runs (`TRAPS.md`).
+        an integral isometry, and on \(T_{\mathrm{En}}\) that conversion does not
+        return (`TRAPS.md`).
 
         A coslice marking asks for the pointwise stabilizer of the plane, and an
         oriented plane for the kernel of the determinant on the plane; both are
@@ -7268,8 +7268,8 @@ class Lattices(OwnedCategoryOverBaseRing):
             ``q(w)/(2 h)``, and for ``q(w) = 0`` by ``a b = 0``, where one coefficient
             vanishes and the other ranges over its class (``vanishing_pairs``).  The second
             case is the one every divisor-one loop meets, since its residue has no complement
-            part, and reading ``a b = 0`` as the single pair ``(0, 0)`` is what reported the
-            classes of `0016` and `026E` unrealized.  Fixing ``w`` at the residue's own
+            part, and reading ``a b = 0`` as the single pair ``(0, 0)`` loses every
+            divisor-one class.  Fixing ``w`` at the residue's own
             representative is likewise not enough: inside one residue class ``w -> w + d k``
             leaves the class unchanged while changing the divisor structure of ``q(w)``, so
             ``k`` runs over ``K/dK``.
@@ -7307,10 +7307,8 @@ class Lattices(OwnedCategoryOverBaseRing):
             # the first three factors *are* the residues of ``L/dL`` (the hyperbolic
             # pair's residue choice is inside them, not a second factor), and the
             # last is the translation that leaves the residue fixed.  So the count
-            # is ``residue_count * translation_count``, and an earlier form of this
-            # guard multiplied it by ``divisor * divisor`` again and refused lattices
-            # whose loop is ``divisor**2`` times smaller than it said -- ``T_Co`` at
-            # divisor 2 was refused at 4194304 for a loop of 1048576.
+            # is ``residue_count * translation_count``; that product is the loop's
+            # size, and it is what the budget below bounds.
             requested_residues = (
                 residue_count if classes is None else len(tuple(dict.fromkeys(classes)))
             )
@@ -7417,8 +7415,7 @@ class Lattices(OwnedCategoryOverBaseRing):
                 own class: ``(a, 0)`` keeps ``b``'s class only when ``b``'s residue is
                 zero, and ``(0, b)`` keeps ``a``'s only when ``a``'s is.  Offering
                 only ``(0, 0)`` there -- the zero vector, which is not primitive --
-                is what left the classes of `0016` and `026E` unrealized at divisor
-                one although ``e`` itself realizes them.
+                loses every divisor-one class, although ``e`` itself realizes them.
                 """
                 pairs = []
                 if right_residue == 0:
