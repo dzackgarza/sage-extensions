@@ -1756,6 +1756,26 @@ class ModuleMorphismMethods:
             return self
         return mor._from_constructed_element_map(self, premises=(self,))
 
+    def coordinate_images(self):
+        r"""Return the coordinates of each image of the domain's chosen generators.
+
+        For a map ``f: F(S) -> F(T)`` of finite framed free modules, the
+        coordinate vector of ``f(e_s)`` in the codomain's chosen generators
+        ``(e_t)_{t in T}`` is column ``s`` of ``f``'s matrix; these coordinates
+        are the definition, and a retained engine matrix is one way to read
+        them (:func:`...pure.modules._coordinate_images`).
+        """
+        assert _has_finite_free_framing(self.domain()) and _has_finite_free_framing(
+            self.codomain()
+        ), (
+            f"the coordinate images of {self} need finite framed free endpoints, but it is a map "
+            f"from {self.domain()} in {self.domain().category()} to {self.codomain()} in "
+            f"{self.codomain().category()}"
+        )
+        from sage_extensions.categories.modules.pure.modules import _coordinate_images
+
+        return _coordinate_images(self)
+
     def preimage(self, element):
         r"""Return one preimage of ``element`` when it lies in the represented image.
 
