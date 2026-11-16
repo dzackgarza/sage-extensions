@@ -1206,12 +1206,30 @@ class GroupModuleMor(_ModuleMorCommonMethods, CategoricalMor):
         )
         self._preamble_base_ring = scalar_ring
         self._preamble_algebra_base_ring = scalar_ring
+        from sage_extensions.categories.group.additive_mors import (
+            AdditiveEndomorphismRings,
+        )
+        from sage_extensions.owned_category import owned_category_join
+
+        placement = [LinearMorModules(scalar_ring)]
+        match domain is codomain:
+            case True:
+                # The equivariant endomorphisms are closed under composition
+                # and contain the identity, so the diagonal Hom is a ring under
+                # composition over the centre of the coefficient ring: the
+                # placement the module Mors declare for the same scalar ring.
+                # Without it `End_{R[G]}(M)` is a module and not a ring, and an
+                # invertible endomorphism cannot be read as an element of
+                # `Aut_{R[G]}(M)`, which is that ring's unit group.
+                placement.append(AdditiveEndomorphismRings(scalar_ring))
+            case False:
+                pass
         CategoricalMor.__init__(
             self,
             mor_family,
             domain,
             codomain,
-            category=LinearMorModules(scalar_ring),
+            category=owned_category_join(tuple(placement)),
         )
 
     def super_categories(self):
