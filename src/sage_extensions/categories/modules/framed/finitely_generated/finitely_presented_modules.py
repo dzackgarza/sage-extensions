@@ -214,8 +214,10 @@ class _SelectedModulePresentationBackend:
 def _fix_selected_module_presentation(module, base_ring, presentation, cokernel_morphism=None) -> None:
     r"""Promote the selected module resolution to the chosen finite presentation.
 
-    The relation morphism ``presentation: F_1 -> F_0`` is the datum: the
-    truncation-one resolution stored by ``Objects`` relative to ``R-Mod``.
+    A module outside the represented presented-module chain (a derivation
+    module) states its presentation datum at its own construction, so it fixes
+    the pair there.  The represented chain selects the same datum as a
+    construction and realizes it on the first request.
     """
     if module._selected_module_presentation is not None:
         raise ValueError(f"{module} already has chosen generators and relations; they are fixed once")
@@ -417,29 +419,27 @@ class _SelectedFinitePresentationModules(OwnedCategoryOverBaseRing):
         # it, ``ModulesWithChosenFinitePresentation``.
         def __init__(
             self,
-            presentation=None,
             cokernel_morphism=None,
             *,
-            presentation_factory=None,
+            presentation_factory,
             **rest,
         ) -> None:
+            r"""Fix this module's chosen finite presentation before it is exposed.
+
+            The one datum is the relation morphism ``F_1 -> F_0``, given as a
+            zero-argument construction.  It is selected now and realized by the
+            first request that needs it (``OWN-22``, ``OWN-23``).  There is no
+            second constructor that receives an already-built presentation; a
+            caller holding one states it as the construction that returns it.
+            """
             super().__init__(**rest)
-            match presentation_factory:
-                case None:
-                    _fix_selected_module_presentation(
-                        self,
-                        presentation.codomain().base_ring(),
-                        presentation,
-                        cokernel_morphism,
-                    )
-                case _:
-                    _fix_lazy_cokernel_presentation(
-                        self,
-                        rest["base_ring"],
-                        presentation_factory,
-                        rest["module_generating_set"],
-                        cokernel_morphism,
-                    )
+            _fix_lazy_cokernel_presentation(
+                self,
+                self.base_ring(),
+                presentation_factory,
+                self.selected_generating_set(),
+                cokernel_morphism,
+            )
 
         def _same_selected_presentation_as(self, other):
             r"""Return whether ``other`` is a module with the same selected presentation over this ring."""
@@ -2040,12 +2040,12 @@ class _GeneralPresentedModule:
         *,
         base_ring,
         module_generating_set,
-        presentation=None,
-        framing_source=None,
+        framing_source,
+        presentation_factory,
         cokernel_morphism=None,
         **rest,
     ) -> None:
-        self._presented_framing_source = presentation.codomain() if framing_source is None else framing_source
+        self._presented_framing_source = framing_source
         self._presented_module_generating_set = module_generating_set
         self._lifted_relation_free_module = None
         self._lifted_relation_submodule = None
@@ -2054,7 +2054,7 @@ class _GeneralPresentedModule:
             module_generating_set=module_generating_set,
             module_generator_function=lambda label: self._cover_generator(int(module_generating_set.ranking_map()(label))),
             framing_source=self._presented_framing_source,
-            presentation=presentation,
+            presentation_factory=presentation_factory,
             cokernel_morphism=cokernel_morphism,
             **rest,
         )
@@ -2459,14 +2459,16 @@ class _PresentedModule(_GeneralPresentedModule):
         *,
         base_ring,
         module_generating_set,
-        presentation=None,
+        framing_source,
+        presentation_factory,
         cokernel_morphism=None,
         **rest,
     ) -> None:
         super().__init__(
             base_ring=base_ring,
             module_generating_set=module_generating_set,
-            presentation=presentation,
+            framing_source=framing_source,
+            presentation_factory=presentation_factory,
             cokernel_morphism=cokernel_morphism,
             **rest,
         )
@@ -2596,8 +2598,7 @@ def _new_presented_module(
     *,
     base_ring,
     module_generating_set,
-    presentation=None,
-    presentation_factory=None,
+    presentation_factory,
     framing_source=None,
     cokernel_morphism=None,
     subobject_ambient=None,
@@ -2615,7 +2616,6 @@ def _new_presented_module(
     data = {
         "base_ring": base_ring,
         "module_generating_set": module_generating_set,
-        "presentation": presentation,
         "presentation_factory": presentation_factory,
         "cokernel_morphism": cokernel_morphism,
     }
@@ -3635,36 +3635,46 @@ def _presented_module_from_morphism(
 
     # A presentation written directly over a localization is still a finite
     # presentation over the source ring after clearing one unit denominator
-    # per relation row.  Build that source presentation first and then apply
-    # exact module localization.  This avoids using a fraction-field engine as
-    # though it were the local ring itself (which would make nonunits in the
-    # maximal ideal invertible and corrupt cokernels/equality).
+    # per relation row.  The source presentation is the datum that keeps the
+    # arithmetic exact; it is selected here and built by the first request for
+    # the module's presentation (``OWN-22``, ``OWN-23``).  Building the source
+    # quotient and localizing it now would compute the presentation, the
+    # quotient and the localization inside construction.
     if base_ring in LocalizationRings():
         from sage_extensions.categories.modules.localizations import _localized_module
 
-        selected_presentation = cokernel_presentation()
         source_ring = base_ring.localization_source()
-        source_relations = source_ring._fresh_free_module_on(selected_presentation.domain().module_generating_set())
         source_generators = source_ring._fresh_free_module_on(labels)
 
-        def cleared_image(relation_label):
-            # A relation r(e_i) = sum_j (a_j / s_j) e_j is multiplied by the
-            # unit prod_j s_j, which leaves the relation submodule unchanged.
-            image = selected_presentation(selected_presentation.domain().module_generator(relation_label)).to_vector()
-            fractions = tuple(base_ring.localization_fraction_data(image(label)) for label in labels)
-            denominators = tuple(denominator for _numerator, denominator in fractions)
-            cleared = {}
-            for position, (label, (numerator, _denominator)) in enumerate(zip(labels, fractions, strict=True)):
-                multiplier = source_ring.one()
-                for other_position, denominator in enumerate(denominators):
-                    if other_position != position:
-                        multiplier *= denominator
-                cleared[label] = numerator * multiplier
-            return source_generators.linear_combination(cleared)
+        def source_presentation_factory():
+            selected_presentation = cokernel_presentation()
+            source_relations = source_ring._fresh_free_module_on(
+                selected_presentation.domain().module_generating_set()
+            )
 
-        source_presentation = source_relations.module_category().Mor(source_relations, source_generators)(cleared_image)
-        source_quotient = source_presentation.cokernel()
-        localization = base_ring.localization_functor()
+            def cleared_image(relation_label):
+                # A relation r(e_i) = sum_j (a_j / s_j) e_j is multiplied by the
+                # unit prod_j s_j, which leaves the relation submodule unchanged.
+                image = selected_presentation(selected_presentation.domain().module_generator(relation_label)).to_vector()
+                fractions = tuple(base_ring.localization_fraction_data(image(label)) for label in labels)
+                denominators = tuple(denominator for _numerator, denominator in fractions)
+                cleared = {}
+                for position, (label, (numerator, _denominator)) in enumerate(zip(labels, fractions, strict=True)):
+                    multiplier = source_ring.one()
+                    for other_position, denominator in enumerate(denominators):
+                        if other_position != position:
+                            multiplier *= denominator
+                    cleared[label] = numerator * multiplier
+                return source_generators.linear_combination(cleared)
+
+            return source_relations.module_category().Mor(source_relations, source_generators)(cleared_image)
+
+        source_quotient = _new_presented_module(
+            base_ring=source_ring,
+            module_generating_set=labels,
+            presentation_factory=source_presentation_factory,
+            framing_source=source_generators,
+        )
         local_extra_categories = list(_extra_categories)
         local_extra_data = dict(_extra_construction_data or {})
         local_extra_data["cokernel_morphism"] = _cokernel_morphism
@@ -3672,12 +3682,14 @@ def _presented_module_from_morphism(
             local_extra_categories.append(BiproductModules(base_ring))
             local_extra_data["biproduct_factors"] = _biproduct_factors
 
+        localization = base_ring.localization_functor()
         localized = _localized_module(
             source_quotient,
             base_ring,
             localization,
             selected_presentation_data={
-                "presentation": selected_presentation,
+                "presentation_factory": cokernel_presentation,
+                "framing_source": _cover_free_module(codomain, labels),
             },
             subobject_ambient=_subobject_ambient,
             subobject_generator_images=_subobject_generator_images,

@@ -1849,6 +1849,7 @@ class Modules(OwnedCategoryOverBaseRing):
         ) -> None:
             ring = _owned_ring(base_ring)
             self._preamble_base_ring = ring
+            self._preamble_selected_generating_set = module_generating_set
             self._preamble_selected_framing_source = framing_source
             super().__init__(base=ring, **rest)
             match module_generating_set:
@@ -2053,6 +2054,14 @@ class Modules(OwnedCategoryOverBaseRing):
             (``OWN-22``, ``OWN-23``).
             """
             return self._preamble_selected_framing_source
+
+        def selected_generating_set(self):
+            r"""Return the finite generating set fixed when this module was framed.
+
+            The labels are the module's own datum; reading them does not
+            realize the resolution that presents the module on them.
+            """
+            return self._preamble_selected_generating_set
 
         @cached_method
         def framing_morphism(self):
@@ -5829,7 +5838,7 @@ class RestrictedScalarsModules(OwnedCategoryOverBaseRing):
 def _restricted_scalar_framing_labels(module, scalar_basis):
     r"""Return the framing labels ``I x J`` of ``Res_f(M)`` for ``Res_f(S)`` framed on ``I``, ``M`` on ``J``."""
     scalar_labels = scalar_basis.source().module_generating_set()
-    module_labels = module.module_generating_set()
+    module_labels = module.selected_generating_set()
     return Sets().product(
         indexed_family(
             Sets.Δ[1],
@@ -6046,17 +6055,21 @@ def _restricted_scalars_view(
                 or regular_relations is not None
             )
         ):
-            presentation = _restricted_scalar_presentation(
-                module,
-                ring_map,
-                _restricted_scalar_framing_labels(module, scalar_basis),
-                scalar_basis,
-                relations=regular_relations,
-            )
+            labels = _restricted_scalar_framing_labels(module, scalar_basis)
+
+            def presentation_factory():
+                return _restricted_scalar_presentation(
+                    module,
+                    ring_map,
+                    labels,
+                    scalar_basis,
+                    relations=regular_relations,
+                )
+
             placement.append(_SelectedFinitePresentationModules(base_ring))
             data.update(
-                presentation=presentation,
-                framing_source=presentation.codomain(),
+                presentation_factory=presentation_factory,
+                framing_source=base_ring._fresh_free_module_on(labels),
                 scalar_basis=scalar_basis,
             )
         case _ if framed_over_finite_free_scalars:
