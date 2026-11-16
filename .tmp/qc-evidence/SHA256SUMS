@@ -1534,3 +1534,6 @@ c70a8d24e923d7991929bc1ad16dac723b44ebd6edb94b227342ffdf64811bf1  520-r2-driver-
 744633c0ee4d0be54b7f3233734868e9ec7674cc58cef5e0134a4f0840787469  554-double-dual-red.log
 b5959769d984f2ac365ec0be6f6e961acf0df72f4a10a52379146c16fe2745ff  554-double-dual-main-probe.log
 e34de3bff01e7f67567fbbd4877971d1756a214cadcbb7f1643c8eee51411797  554-double-dual-main-probe.py
+81cbb39e72f5a51eacbfee4efaad00017e18a66ecc85d225ff373c9f4c48d33a  554-double-dual-green.log
+29a2dd4ffe0ec3943cd83c99c518bdaac55b55fc4cf900b01d8e5084a3e6821e  554-double-dual-repair-probe.log
+0b40b3fc5904b5bb5233b5a62d2d3d1973dcdbee425350efec06c6b18acce2c7  554-double-dual-repair-probe.py
