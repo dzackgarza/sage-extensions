@@ -1,0 +1,33 @@
+tree SHA: 901ff18395e9eed94c5816add55e4b4ce11507e8 (modified paths: 0)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 15.54 17.28 18.78 13/727 2754025
+files: tests/lattices/test_primitivity_is_the_torsion_freeness_of_the_inclusions_cokernel.sage tests/lattices/test_content_and_doubling.sage tests/lattices/test_a_plane_transport_builds_one_span.sage tests/lattices/test_lattice_elements.sage tests/lattices/test_chosen_target_primitive_embeddings.sage
+inner 540 s, outer 600 s, guard 6144 MiB
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+time gates OFF (--no-time-gates): star import 1.27 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: asyncio-1.5.0, xdist-3.8.0, reportlog-1.0.0, platformdirs-4.13.5, hypothesis-6.170.15, anyio-4.15.1, timeout-2.4.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 14 items
+
+tests/lattices/test_primitivity_is_the_torsion_freeness_of_the_inclusions_cokernel.sage . [  7%]
+.                                                                        [ 14%]
+tests/lattices/test_content_and_doubling.sage EEEE                       [ 42%]
+tests/lattices/test_a_plane_transport_builds_one_span.sage .             [ 50%]
+tests/lattices/test_lattice_elements.sage ......                         [ 92%]
+tests/lattices/test_chosen_target_primitive_embeddings.sage [peakrss] wt541revtests: child waited=124 shell_code=124 samples=242
+[peakrss] peak tree RSS      : 3362 MiB
+[peakrss] low-water MemAvail : 1002 MiB
+[peakrss] peak single VmHWM  : 3474 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   julia                      3128 MiB peak
+[peakrss]   python                      336 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   235.2s procs=  4 rss=  3362 MiB hwm=  3474 MiB avail=  1428 MiB
+[peakrss]   t=   233.2s procs=  4 rss=  3351 MiB hwm=  3459 MiB avail=  1210 MiB
+[peakrss]   t=   215.1s procs=  4 rss=  3282 MiB hwm=  3387 MiB avail=  1742 MiB
+[peakrss]   t=   290.3s procs=  4 rss=  3255 MiB hwm=  3474 MiB avail=  1299 MiB
+[peakrss]   t=   187.0s procs=  4 rss=  3248 MiB hwm=  3349 MiB avail=  2617 MiB

@@ -1,0 +1,2254 @@
+tree SHA: 0ca12657e45a2d0534cf0021e980d2efaf282c5f (modified paths: 0)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 16.45 19.58 19.62 16/778 2734930
+files: tests/forms/test_a_torsion_cokernel_carries_its_torsion_forms.sage tests/forms/test_all_ones_form_correlation.sage tests/forms/test_bilinear_form_descent.sage tests/forms/test_classifier_adjunctions.sage tests/forms/test_classifier_vocabulary.sage tests/forms/test_constructor_obligations_archive.sage tests/forms/test_degenerate_restrictions_and_subquotients.sage tests/forms/test_discriminant_convention_archive.sage tests/forms/test_discriminant_normal_forms_archive.sage tests/forms/test_discriminant_oracles_archive.sage tests/forms/test_discriminant_quadratic_archive_surface.sage tests/forms/test_discriminant_subgroups.sage tests/forms/test_even_bilinear_quadratic_conversion.sage tests/forms/test_extensional_forms.sage tests/forms/test_form_embedding_orthogonal_archive.sage tests/forms/test_form_forgetful_adjunction_archive.sage tests/forms/test_form_value_image_archive.sage tests/forms/test_formed_element_represents_archive.sage tests/forms/test_formed_radical_archive.sage tests/forms/test_formed_vector_space_archive.sage tests/forms/test_gram_graph_archive.sage tests/forms/test_gram_graph_blocks.sage tests/forms/test_infinite_form_duality.sage tests/forms/test_integer_valued_elementary_two_form_groups.sage tests/forms/test_isometry_between_torsion_forms.sage tests/forms/test_maximal_isotropic_archive.sage tests/forms/test_metabolizers_archive.sage tests/forms/test_normalization_of_a_core_isometry.sage tests/forms/test_orbit_and_profile_radical_isometry.sage tests/forms/test_paired_modules.sage tests/forms/test_polar_radical_criterion.sage tests/forms/test_quadratic_form_descent.sage tests/forms/test_rank_one_2adic_orthogonal_groups_archive.sage tests/forms/test_the_coble_anti_isometry.sage tests/forms/test_the_d4_discriminant_form_and_its_finite_action.sage tests/forms/test_the_isometry_decision_for_radical_forms.sage tests/forms/test_the_polar_radical_and_nondegenerate_quotient.sage tests/forms/test_torsion_form_subobjects_archive.sage tests/forms/test_torsion_form_twist_functor.sage tests/forms/test_torsion_forms.sage 
+inner 540 s, outer 600 s, guard 6144 MiB
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+time gates OFF (--no-time-gates): star import 1.43 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: asyncio-1.5.0, xdist-3.8.0, reportlog-1.0.0, platformdirs-4.13.5, hypothesis-6.170.15, anyio-4.15.1, timeout-2.4.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 144 items
+
+tests/forms/test_a_torsion_cokernel_carries_its_torsion_forms.sage ...   [  2%]
+tests/forms/test_all_ones_form_correlation.sage EE                       [  3%]
+tests/forms/test_bilinear_form_descent.sage FFFFF...                     [  9%]
+tests/forms/test_classifier_adjunctions.sage FFFF                        [ 11%]
+tests/forms/test_classifier_vocabulary.sage F                            [ 12%]
+tests/forms/test_constructor_obligations_archive.sage .                  [ 13%]
+tests/forms/test_degenerate_restrictions_and_subquotients.sage EE        [ 14%]
+tests/forms/test_discriminant_convention_archive.sage ..                 [ 15%]
+tests/forms/test_discriminant_normal_forms_archive.sage ..FF             [ 18%]
+tests/forms/test_discriminant_oracles_archive.sage F.FF                  [ 21%]
+tests/forms/test_discriminant_quadratic_archive_surface.sage F           [ 22%]
+tests/forms/test_discriminant_subgroups.sage ..F....FFF                  [ 29%]
+tests/forms/test_even_bilinear_quadratic_conversion.sage F               [ 29%]
+tests/forms/test_extensional_forms.sage FFFF.F                           [ 34%]
+tests/forms/test_form_embedding_orthogonal_archive.sage F                [ 34%]
+tests/forms/test_form_forgetful_adjunction_archive.sage ..               [ 36%]
+tests/forms/test_form_value_image_archive.sage F                         [ 36%]
+tests/forms/test_formed_element_represents_archive.sage F                [ 37%]
+tests/forms/test_formed_radical_archive.sage EEEEEEEEEEE                 [ 45%]
+tests/forms/test_formed_vector_space_archive.sage .                      [ 45%]
+tests/forms/test_gram_graph_archive.sage F                               [ 46%]
+tests/forms/test_gram_graph_blocks.sage ...                              [ 48%]
+tests/forms/test_infinite_form_duality.sage FF                           [ 50%]
+tests/forms/test_integer_valued_elementary_two_form_groups.sage ....     [ 52%]
+tests/forms/test_isometry_between_torsion_forms.sage EEEEEE              [ 56%]
+tests/forms/test_maximal_isotropic_archive.sage ..                       [ 58%]
+tests/forms/test_metabolizers_archive.sage ..                            [ 59%]
+tests/forms/test_normalization_of_a_core_isometry.sage .                 [ 60%]
+tests/forms/test_orbit_and_profile_radical_isometry.sage EEEEEE          [ 64%]
+tests/forms/test_paired_modules.sage FFF                                 [ 66%]
+tests/forms/test_polar_radical_criterion.sage EEEEEEEEE                  [ 72%]
+tests/forms/test_quadratic_form_descent.sage EEEE                        [ 75%]
+tests/forms/test_rank_one_2adic_orthogonal_groups_archive.sage F         [ 76%]
+tests/forms/test_the_coble_anti_isometry.sage EE                         [ 77%]
+tests/forms/test_the_d4_discriminant_form_and_its_finite_action.sage ... [ 79%]
+                                                                         [ 79%]
+tests/forms/test_the_isometry_decision_for_radical_forms.sage EEEEEEEEE  [ 86%]
+tests/forms/test_the_polar_radical_and_nondegenerate_quotient.sage EEEEE [ 89%]
+EE                                                                       [ 90%]
+tests/forms/test_torsion_form_subobjects_archive.sage ..                 [ 92%]
+tests/forms/test_torsion_form_twist_functor.sage F                       [ 93%]
+tests/forms/test_torsion_forms.sage .F........                           [100%]
+
+==================================== ERRORS ====================================
+_____ ERROR at setup of test_the_all_ones_form_row_is_the_constant_family ______
+tests/forms/test_all_ones_form_correlation.sage:13: TL01 from sage_extensions.categories._lattice import ...: take every name from the session
+tests/forms/test_all_ones_form_correlation.sage:13: TL02 imports the private name _DiagonalGram
+tests/forms/test_all_ones_form_correlation.sage:14: TL01 from sage_extensions.categories.modules.framed.formed.form_modules import ...: take every name from the session
+tests/forms/test_all_ones_form_correlation.sage:15: TL01 from sage_extensions.categories.modules.hodge import ...: take every name from the session
+tests/forms/test_all_ones_form_correlation.sage:15: TL02 imports the private name _attach_diagonal_correlation_witness
+tests/forms/test_all_ones_form_correlation.sage:18: TL01 from sage_extensions.categories.modules.pure.modules import ...: take every name from the session
+tests/forms/test_all_ones_form_correlation.sage:63: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_all_ones_form_correlation.sage:70: TL03 vars(): introspection is not mathematics
+tests/forms/test_all_ones_form_correlation.sage:76: TL03 vars(): introspection is not mathematics
+____ ERROR at setup of test_the_witness_is_attached_only_to_a_diagonal_gram ____
+tests/forms/test_all_ones_form_correlation.sage:13: TL01 from sage_extensions.categories._lattice import ...: take every name from the session
+tests/forms/test_all_ones_form_correlation.sage:13: TL02 imports the private name _DiagonalGram
+tests/forms/test_all_ones_form_correlation.sage:14: TL01 from sage_extensions.categories.modules.framed.formed.form_modules import ...: take every name from the session
+tests/forms/test_all_ones_form_correlation.sage:15: TL01 from sage_extensions.categories.modules.hodge import ...: take every name from the session
+tests/forms/test_all_ones_form_correlation.sage:15: TL02 imports the private name _attach_diagonal_correlation_witness
+tests/forms/test_all_ones_form_correlation.sage:18: TL01 from sage_extensions.categories.modules.pure.modules import ...: take every name from the session
+tests/forms/test_all_ones_form_correlation.sage:63: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_all_ones_form_correlation.sage:70: TL03 vars(): introspection is not mathematics
+tests/forms/test_all_ones_form_correlation.sage:76: TL03 vars(): introspection is not mathematics
+_______ ERROR at setup of test_the_maximal_subquotient_is_nondegenerate ________
+tests/forms/test_degenerate_restrictions_and_subquotients.sage:17: TL01 from itertools import ...: take every name from the session
+tests/forms/test_degenerate_restrictions_and_subquotients.sage:20: TL01 from sage_extensions.categories.modules.framed.formed.torsion_form_modules import ...: take every name from the session
+tests/forms/test_degenerate_restrictions_and_subquotients.sage:20: TL02 imports the private name _torsion_form_orthogonal_subobject
+tests/forms/test_degenerate_restrictions_and_subquotients.sage:20: TL02 imports the private name _torsion_form_subquotient
+tests/forms/test_degenerate_restrictions_and_subquotients.sage:26: TL01 from sage.matrix.constructor import ...: take every name from the session
+tests/forms/test_degenerate_restrictions_and_subquotients.sage:27: TL01 from sage.rings.integer_ring import ...: take every name from the session
+tests/forms/test_degenerate_restrictions_and_subquotients.sage:42: TL10 len(): ask for a cardinality
+tests/forms/test_degenerate_restrictions_and_subquotients.sage:42: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/forms/test_degenerate_restrictions_and_subquotients.sage:43: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/forms/test_degenerate_restrictions_and_subquotients.sage:99: TL03 isinstance(): introspection is not mathematics
+_ ERROR at setup of test_a_small_restriction_can_have_a_radical_and_is_then_reduced_and_decided _
+tests/forms/test_degenerate_restrictions_and_subquotients.sage:17: TL01 from itertools import ...: take every name from the session
+tests/forms/test_degenerate_restrictions_and_subquotients.sage:20: TL01 from sage_extensions.categories.modules.framed.formed.torsion_form_modules import ...: take every name from the session
+tests/forms/test_degenerate_restrictions_and_subquotients.sage:20: TL02 imports the private name _torsion_form_orthogonal_subobject
+tests/forms/test_degenerate_restrictions_and_subquotients.sage:20: TL02 imports the private name _torsion_form_subquotient
+tests/forms/test_degenerate_restrictions_and_subquotients.sage:26: TL01 from sage.matrix.constructor import ...: take every name from the session
+tests/forms/test_degenerate_restrictions_and_subquotients.sage:27: TL01 from sage.rings.integer_ring import ...: take every name from the session
+tests/forms/test_degenerate_restrictions_and_subquotients.sage:42: TL10 len(): ask for a cardinality
+tests/forms/test_degenerate_restrictions_and_subquotients.sage:42: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/forms/test_degenerate_restrictions_and_subquotients.sage:43: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/forms/test_degenerate_restrictions_and_subquotients.sage:99: TL03 isinstance(): introspection is not mathematics
+_ ERROR at setup of test_affine_A1_lattice_modulo_its_radical_is_the_A1_root_lattice _
+tests/forms/test_formed_radical_archive.sage:36: TL02 private attribute ._element_of_unformed_module
+tests/forms/test_formed_radical_archive.sage:68: TL07 pytest.raises(match=...): matches an error message
+tests/forms/test_formed_radical_archive.sage:146: TL02 private attribute ._preamble_radical_quotient_basis_map
+tests/forms/test_formed_radical_archive.sage:176: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/forms/test_formed_radical_archive.sage:201: TL02 private attribute ._preamble_radical_quotient_basis_map
+tests/forms/test_formed_radical_archive.sage:202: TL02 private attribute ._preamble_radical_quotient_cokernel_projection
+tests/forms/test_formed_radical_archive.sage:250: TL02 private attribute ._preamble_radical_quotient_basis_map
+tests/forms/test_formed_radical_archive.sage:251: TL02 private attribute ._preamble_radical_quotient_cokernel_projection
+tests/forms/test_formed_radical_archive.sage:278: TL08 FramedFreeModules: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/forms/test_formed_radical_archive.sage:287: TL02 private attribute ._preamble_radical_quotient_basis_map
+tests/forms/test_formed_radical_archive.sage:288: TL02 private attribute ._preamble_radical_quotient_cokernel_projection
+____ ERROR at setup of test_nondegenerate_hyperbolic_plane_has_zero_radical ____
+tests/forms/test_formed_radical_archive.sage:36: TL02 private attribute ._element_of_unformed_module
+tests/forms/test_formed_radical_archive.sage:68: TL07 pytest.raises(match=...): matches an error message
+tests/forms/test_formed_radical_archive.sage:146: TL02 private attribute ._preamble_radical_quotient_basis_map
+tests/forms/test_formed_radical_archive.sage:176: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/forms/test_formed_radical_archive.sage:201: TL02 private attribute ._preamble_radical_quotient_basis_map
+tests/forms/test_formed_radical_archive.sage:202: TL02 private attribute ._preamble_radical_quotient_cokernel_projection
+tests/forms/test_formed_radical_archive.sage:250: TL02 private attribute ._preamble_radical_quotient_basis_map
+tests/forms/test_formed_radical_archive.sage:251: TL02 private attribute ._preamble_radical_quotient_cokernel_projection
+tests/forms/test_formed_radical_archive.sage:278: TL08 FramedFreeModules: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/forms/test_formed_radical_archive.sage:287: TL02 private attribute ._preamble_radical_quotient_basis_map
+tests/forms/test_formed_radical_archive.sage:288: TL02 private attribute ._preamble_radical_quotient_cokernel_projection
+_ ERROR at setup of test_nonsymmetric_bilinear_form_does_not_descend_from_left_radical_alone _
+tests/forms/test_formed_radical_archive.sage:36: TL02 private attribute ._element_of_unformed_module
+tests/forms/test_formed_radical_archive.sage:68: TL07 pytest.raises(match=...): matches an error message
+tests/forms/test_formed_radical_archive.sage:146: TL02 private attribute ._preamble_radical_quotient_basis_map
+tests/forms/test_formed_radical_archive.sage:176: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/forms/test_formed_radical_archive.sage:201: TL02 private attribute ._preamble_radical_quotient_basis_map
+tests/forms/test_formed_radical_archive.sage:202: TL02 private attribute ._preamble_radical_quotient_cokernel_projection
+tests/forms/test_formed_radical_archive.sage:250: TL02 private attribute ._preamble_radical_quotient_basis_map
+tests/forms/test_formed_radical_archive.sage:251: TL02 private attribute ._preamble_radical_quotient_cokernel_projection
+tests/forms/test_formed_radical_archive.sage:278: TL08 FramedFreeModules: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/forms/test_formed_radical_archive.sage:287: TL02 private attribute ._preamble_radical_quotient_basis_map
+tests/forms/test_formed_radical_archive.sage:288: TL02 private attribute ._preamble_radical_quotient_cokernel_projection
+_ ERROR at setup of test_nonsymmetric_radical_quotient_kills_only_the_two_sided_radical _
+tests/forms/test_formed_radical_archive.sage:36: TL02 private attribute ._element_of_unformed_module
+tests/forms/test_formed_radical_archive.sage:68: TL07 pytest.raises(match=...): matches an error message
+tests/forms/test_formed_radical_archive.sage:146: TL02 private attribute ._preamble_radical_quotient_basis_map
+tests/forms/test_formed_radical_archive.sage:176: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/forms/test_formed_radical_archive.sage:201: TL02 private attribute ._preamble_radical_quotient_basis_map
+tests/forms/test_formed_radical_archive.sage:202: TL02 private attribute ._preamble_radical_quotient_cokernel_projection
+tests/forms/test_formed_radical_archive.sage:250: TL02 private attribute ._preamble_radical_quotient_basis_map
+tests/forms/test_formed_radical_archive.sage:251: TL02 private attribute ._preamble_radical_quotient_cokernel_projection
+tests/forms/test_formed_radical_archive.sage:278: TL08 FramedFreeModules: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/forms/test_formed_radical_archive.sage:287: TL02 private attribute ._preamble_radical_quotient_basis_map
+tests/forms/test_formed_radical_archive.sage:288: TL02 private attribute ._preamble_radical_quotient_cokernel_projection
+_ ERROR at setup of test_nonsymmetric_radical_quotient_drops_the_common_radical _
+tests/forms/test_formed_radical_archive.sage:36: TL02 private attribute ._element_of_unformed_module
+tests/forms/test_formed_radical_archive.sage:68: TL07 pytest.raises(match=...): matches an error message
+tests/forms/test_formed_radical_archive.sage:146: TL02 private attribute ._preamble_radical_quotient_basis_map
+tests/forms/test_formed_radical_archive.sage:176: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/forms/test_formed_radical_archive.sage:201: TL02 private attribute ._preamble_radical_quotient_basis_map
+tests/forms/test_formed_radical_archive.sage:202: TL02 private attribute ._preamble_radical_quotient_cokernel_projection
+tests/forms/test_formed_radical_archive.sage:250: TL02 private attribute ._preamble_radical_quotient_basis_map
+tests/forms/test_formed_radical_archive.sage:251: TL02 private attribute ._preamble_radical_quotient_cokernel_projection
+tests/forms/test_formed_radical_archive.sage:278: TL08 FramedFreeModules: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/forms/test_formed_radical_archive.sage:287: TL02 private attribute ._preamble_radical_quotient_basis_map
+tests/forms/test_formed_radical_archive.sage:288: TL02 private attribute ._preamble_radical_quotient_cokernel_projection
+_ ERROR at setup of test_rational_nondegenerate_form_uses_full_rank_quotient_basis _
+tests/forms/test_formed_radical_archive.sage:36: TL02 private attribute ._element_of_unformed_module
+tests/forms/test_formed_radical_archive.sage:68: TL07 pytest.raises(match=...): matches an error message
+tests/forms/test_formed_radical_archive.sage:146: TL02 private attribute ._preamble_radical_quotient_basis_map
+tests/forms/test_formed_radical_archive.sage:176: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/forms/test_formed_radical_archive.sage:201: TL02 private attribute ._preamble_radical_quotient_basis_map
+tests/forms/test_formed_radical_archive.sage:202: TL02 private attribute ._preamble_radical_quotient_cokernel_projection
+tests/forms/test_formed_radical_archive.sage:250: TL02 private attribute ._preamble_radical_quotient_basis_map
+tests/forms/test_formed_radical_archive.sage:251: TL02 private attribute ._preamble_radical_quotient_cokernel_projection
+tests/forms/test_formed_radical_archive.sage:278: TL08 FramedFreeModules: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/forms/test_formed_radical_archive.sage:287: TL02 private attribute ._preamble_radical_quotient_basis_map
+tests/forms/test_formed_radical_archive.sage:288: TL02 private attribute ._preamble_radical_quotient_cokernel_projection
+___ ERROR at setup of test_rational_zero_form_has_zero_rank_radical_quotient ___
+tests/forms/test_formed_radical_archive.sage:36: TL02 private attribute ._element_of_unformed_module
+tests/forms/test_formed_radical_archive.sage:68: TL07 pytest.raises(match=...): matches an error message
+tests/forms/test_formed_radical_archive.sage:146: TL02 private attribute ._preamble_radical_quotient_basis_map
+tests/forms/test_formed_radical_archive.sage:176: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/forms/test_formed_radical_archive.sage:201: TL02 private attribute ._preamble_radical_quotient_basis_map
+tests/forms/test_formed_radical_archive.sage:202: TL02 private attribute ._preamble_radical_quotient_cokernel_projection
+tests/forms/test_formed_radical_archive.sage:250: TL02 private attribute ._preamble_radical_quotient_basis_map
+tests/forms/test_formed_radical_archive.sage:251: TL02 private attribute ._preamble_radical_quotient_cokernel_projection
+tests/forms/test_formed_radical_archive.sage:278: TL08 FramedFreeModules: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/forms/test_formed_radical_archive.sage:287: TL02 private attribute ._preamble_radical_quotient_basis_map
+tests/forms/test_formed_radical_archive.sage:288: TL02 private attribute ._preamble_radical_quotient_cokernel_projection
+_ ERROR at setup of test_rational_radical_quotient_rank_subtracts_higher_radical_rank _
+tests/forms/test_formed_radical_archive.sage:36: TL02 private attribute ._element_of_unformed_module
+tests/forms/test_formed_radical_archive.sage:68: TL07 pytest.raises(match=...): matches an error message
+tests/forms/test_formed_radical_archive.sage:146: TL02 private attribute ._preamble_radical_quotient_basis_map
+tests/forms/test_formed_radical_archive.sage:176: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/forms/test_formed_radical_archive.sage:201: TL02 private attribute ._preamble_radical_quotient_basis_map
+tests/forms/test_formed_radical_archive.sage:202: TL02 private attribute ._preamble_radical_quotient_cokernel_projection
+tests/forms/test_formed_radical_archive.sage:250: TL02 private attribute ._preamble_radical_quotient_basis_map
+tests/forms/test_formed_radical_archive.sage:251: TL02 private attribute ._preamble_radical_quotient_cokernel_projection
+tests/forms/test_formed_radical_archive.sage:278: TL08 FramedFreeModules: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/forms/test_formed_radical_archive.sage:287: TL02 private attribute ._preamble_radical_quotient_basis_map
+tests/forms/test_formed_radical_archive.sage:288: TL02 private attribute ._preamble_radical_quotient_cokernel_projection
+_ ERROR at setup of test_module_valued_radical_quotient_uses_selected_free_basis _
+tests/forms/test_formed_radical_archive.sage:36: TL02 private attribute ._element_of_unformed_module
+tests/forms/test_formed_radical_archive.sage:68: TL07 pytest.raises(match=...): matches an error message
+tests/forms/test_formed_radical_archive.sage:146: TL02 private attribute ._preamble_radical_quotient_basis_map
+tests/forms/test_formed_radical_archive.sage:176: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/forms/test_formed_radical_archive.sage:201: TL02 private attribute ._preamble_radical_quotient_basis_map
+tests/forms/test_formed_radical_archive.sage:202: TL02 private attribute ._preamble_radical_quotient_cokernel_projection
+tests/forms/test_formed_radical_archive.sage:250: TL02 private attribute ._preamble_radical_quotient_basis_map
+tests/forms/test_formed_radical_archive.sage:251: TL02 private attribute ._preamble_radical_quotient_cokernel_projection
+tests/forms/test_formed_radical_archive.sage:278: TL08 FramedFreeModules: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/forms/test_formed_radical_archive.sage:287: TL02 private attribute ._preamble_radical_quotient_basis_map
+tests/forms/test_formed_radical_archive.sage:288: TL02 private attribute ._preamble_radical_quotient_cokernel_projection
+___ ERROR at setup of test_rational_radical_quotient_retains_its_projection ____
+tests/forms/test_formed_radical_archive.sage:36: TL02 private attribute ._element_of_unformed_module
+tests/forms/test_formed_radical_archive.sage:68: TL07 pytest.raises(match=...): matches an error message
+tests/forms/test_formed_radical_archive.sage:146: TL02 private attribute ._preamble_radical_quotient_basis_map
+tests/forms/test_formed_radical_archive.sage:176: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/forms/test_formed_radical_archive.sage:201: TL02 private attribute ._preamble_radical_quotient_basis_map
+tests/forms/test_formed_radical_archive.sage:202: TL02 private attribute ._preamble_radical_quotient_cokernel_projection
+tests/forms/test_formed_radical_archive.sage:250: TL02 private attribute ._preamble_radical_quotient_basis_map
+tests/forms/test_formed_radical_archive.sage:251: TL02 private attribute ._preamble_radical_quotient_cokernel_projection
+tests/forms/test_formed_radical_archive.sage:278: TL08 FramedFreeModules: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/forms/test_formed_radical_archive.sage:287: TL02 private attribute ._preamble_radical_quotient_basis_map
+tests/forms/test_formed_radical_archive.sage:288: TL02 private attribute ._preamble_radical_quotient_cokernel_projection
+_ ERROR at setup of test_rational_formed_module_radical_quotient_retains_its_projection _
+tests/forms/test_formed_radical_archive.sage:36: TL02 private attribute ._element_of_unformed_module
+tests/forms/test_formed_radical_archive.sage:68: TL07 pytest.raises(match=...): matches an error message
+tests/forms/test_formed_radical_archive.sage:146: TL02 private attribute ._preamble_radical_quotient_basis_map
+tests/forms/test_formed_radical_archive.sage:176: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/forms/test_formed_radical_archive.sage:201: TL02 private attribute ._preamble_radical_quotient_basis_map
+tests/forms/test_formed_radical_archive.sage:202: TL02 private attribute ._preamble_radical_quotient_cokernel_projection
+tests/forms/test_formed_radical_archive.sage:250: TL02 private attribute ._preamble_radical_quotient_basis_map
+tests/forms/test_formed_radical_archive.sage:251: TL02 private attribute ._preamble_radical_quotient_cokernel_projection
+tests/forms/test_formed_radical_archive.sage:278: TL08 FramedFreeModules: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/forms/test_formed_radical_archive.sage:287: TL02 private attribute ._preamble_radical_quotient_basis_map
+tests/forms/test_formed_radical_archive.sage:288: TL02 private attribute ._preamble_radical_quotient_cokernel_projection
+_ ERROR at setup of test_the_witness_is_a_verified_typed_isometry_between_the_two_forms _
+tests/forms/test_isometry_between_torsion_forms.sage:23: TL01 from sage_extensions.categories.modules.framed.formed import ...: take every name from the session
+tests/forms/test_isometry_between_torsion_forms.sage:27: TL01 from sage_extensions.categories.modules.framed.formed.torsion_form_modules import ...: take every name from the session
+tests/forms/test_isometry_between_torsion_forms.sage:30: TL01 from sage_extensions.categories.modules.framed.fraction_field_quotients import ...: take every name from the session
+tests/forms/test_isometry_between_torsion_forms.sage:59: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_isometry_between_torsion_forms.sage:95: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_isometry_between_torsion_forms.sage:109: TL09 an assertion that holds of anything
+tests/forms/test_isometry_between_torsion_forms.sage:124: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_isometry_between_torsion_forms.sage:155: TL03 isinstance(): introspection is not mathematics
+_____ ERROR at setup of test_a_form_that_is_not_isometric_gets_no_witness ______
+tests/forms/test_isometry_between_torsion_forms.sage:23: TL01 from sage_extensions.categories.modules.framed.formed import ...: take every name from the session
+tests/forms/test_isometry_between_torsion_forms.sage:27: TL01 from sage_extensions.categories.modules.framed.formed.torsion_form_modules import ...: take every name from the session
+tests/forms/test_isometry_between_torsion_forms.sage:30: TL01 from sage_extensions.categories.modules.framed.fraction_field_quotients import ...: take every name from the session
+tests/forms/test_isometry_between_torsion_forms.sage:59: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_isometry_between_torsion_forms.sage:95: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_isometry_between_torsion_forms.sage:109: TL09 an assertion that holds of anything
+tests/forms/test_isometry_between_torsion_forms.sage:124: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_isometry_between_torsion_forms.sage:155: TL03 isinstance(): introspection is not mathematics
+_ ERROR at setup of test_the_sign_of_the_quadratic_form_is_part_of_the_witness_test _
+tests/forms/test_isometry_between_torsion_forms.sage:23: TL01 from sage_extensions.categories.modules.framed.formed import ...: take every name from the session
+tests/forms/test_isometry_between_torsion_forms.sage:27: TL01 from sage_extensions.categories.modules.framed.formed.torsion_form_modules import ...: take every name from the session
+tests/forms/test_isometry_between_torsion_forms.sage:30: TL01 from sage_extensions.categories.modules.framed.fraction_field_quotients import ...: take every name from the session
+tests/forms/test_isometry_between_torsion_forms.sage:59: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_isometry_between_torsion_forms.sage:95: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_isometry_between_torsion_forms.sage:109: TL09 an assertion that holds of anything
+tests/forms/test_isometry_between_torsion_forms.sage:124: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_isometry_between_torsion_forms.sage:155: TL03 isinstance(): introspection is not mathematics
+_____ ERROR at setup of test_two_witnesses_compose_through_their_endpoints _____
+tests/forms/test_isometry_between_torsion_forms.sage:23: TL01 from sage_extensions.categories.modules.framed.formed import ...: take every name from the session
+tests/forms/test_isometry_between_torsion_forms.sage:27: TL01 from sage_extensions.categories.modules.framed.formed.torsion_form_modules import ...: take every name from the session
+tests/forms/test_isometry_between_torsion_forms.sage:30: TL01 from sage_extensions.categories.modules.framed.fraction_field_quotients import ...: take every name from the session
+tests/forms/test_isometry_between_torsion_forms.sage:59: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_isometry_between_torsion_forms.sage:95: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_isometry_between_torsion_forms.sage:109: TL09 an assertion that holds of anything
+tests/forms/test_isometry_between_torsion_forms.sage:124: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_isometry_between_torsion_forms.sage:155: TL03 isinstance(): introspection is not mathematics
+__ ERROR at setup of test_the_bilinear_flavour_has_the_same_witness_contract ___
+tests/forms/test_isometry_between_torsion_forms.sage:23: TL01 from sage_extensions.categories.modules.framed.formed import ...: take every name from the session
+tests/forms/test_isometry_between_torsion_forms.sage:27: TL01 from sage_extensions.categories.modules.framed.formed.torsion_form_modules import ...: take every name from the session
+tests/forms/test_isometry_between_torsion_forms.sage:30: TL01 from sage_extensions.categories.modules.framed.fraction_field_quotients import ...: take every name from the session
+tests/forms/test_isometry_between_torsion_forms.sage:59: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_isometry_between_torsion_forms.sage:95: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_isometry_between_torsion_forms.sage:109: TL09 an assertion that holds of anything
+tests/forms/test_isometry_between_torsion_forms.sage:124: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_isometry_between_torsion_forms.sage:155: TL03 isinstance(): introspection is not mathematics
+___ ERROR at setup of test_a_radical_polar_form_is_a_form_and_is_now_decided ___
+tests/forms/test_isometry_between_torsion_forms.sage:23: TL01 from sage_extensions.categories.modules.framed.formed import ...: take every name from the session
+tests/forms/test_isometry_between_torsion_forms.sage:27: TL01 from sage_extensions.categories.modules.framed.formed.torsion_form_modules import ...: take every name from the session
+tests/forms/test_isometry_between_torsion_forms.sage:30: TL01 from sage_extensions.categories.modules.framed.fraction_field_quotients import ...: take every name from the session
+tests/forms/test_isometry_between_torsion_forms.sage:59: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_isometry_between_torsion_forms.sage:95: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_isometry_between_torsion_forms.sage:109: TL09 an assertion that holds of anything
+tests/forms/test_isometry_between_torsion_forms.sage:124: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_isometry_between_torsion_forms.sage:155: TL03 isinstance(): introspection is not mathematics
+_ ERROR at setup of test_the_shear_between_diagonal_and_mixed_grams_on_four_squares_is_found _
+tests/forms/test_orbit_and_profile_radical_isometry.sage:25: TL01 from sage_extensions.categories.modules.framed.formed import ...: take every name from the session
+tests/forms/test_orbit_and_profile_radical_isometry.sage:29: TL01 from sage_extensions.categories.modules.framed.formed.torsion_form_modules import ...: take every name from the session
+tests/forms/test_orbit_and_profile_radical_isometry.sage:32: TL01 from sage_extensions.categories.modules.framed.fraction_field_quotients import ...: take every name from the session
+tests/forms/test_orbit_and_profile_radical_isometry.sage:66: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_orbit_and_profile_radical_isometry.sage:89: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_orbit_and_profile_radical_isometry.sage:116: TL05 test_a_refused_witness_is_undecided_never_false takes the monkeypatch fixture
+tests/forms/test_orbit_and_profile_radical_isometry.sage:128: TL01 from sage_extensions.categories.modules.framed.formed import ...: take every name from the session
+tests/forms/test_orbit_and_profile_radical_isometry.sage:143: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_orbit_and_profile_radical_isometry.sage:151: TL05 monkeypatch: mocks prove nothing about the real objects
+tests/forms/test_orbit_and_profile_radical_isometry.sage:154: TL07 pytest.raises(match=...): matches an error message
+tests/forms/test_orbit_and_profile_radical_isometry.sage:157: TL02 private attribute ._radical_isometry_decision
+tests/forms/test_orbit_and_profile_radical_isometry.sage:222: TL07 pytest.raises(match=...): matches an error message
+_ ERROR at setup of test_the_unit_twist_on_three_two_elementary_generators_is_isometric _
+tests/forms/test_orbit_and_profile_radical_isometry.sage:25: TL01 from sage_extensions.categories.modules.framed.formed import ...: take every name from the session
+tests/forms/test_orbit_and_profile_radical_isometry.sage:29: TL01 from sage_extensions.categories.modules.framed.formed.torsion_form_modules import ...: take every name from the session
+tests/forms/test_orbit_and_profile_radical_isometry.sage:32: TL01 from sage_extensions.categories.modules.framed.fraction_field_quotients import ...: take every name from the session
+tests/forms/test_orbit_and_profile_radical_isometry.sage:66: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_orbit_and_profile_radical_isometry.sage:89: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_orbit_and_profile_radical_isometry.sage:116: TL05 test_a_refused_witness_is_undecided_never_false takes the monkeypatch fixture
+tests/forms/test_orbit_and_profile_radical_isometry.sage:128: TL01 from sage_extensions.categories.modules.framed.formed import ...: take every name from the session
+tests/forms/test_orbit_and_profile_radical_isometry.sage:143: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_orbit_and_profile_radical_isometry.sage:151: TL05 monkeypatch: mocks prove nothing about the real objects
+tests/forms/test_orbit_and_profile_radical_isometry.sage:154: TL07 pytest.raises(match=...): matches an error message
+tests/forms/test_orbit_and_profile_radical_isometry.sage:157: TL02 private attribute ._radical_isometry_decision
+tests/forms/test_orbit_and_profile_radical_isometry.sage:222: TL07 pytest.raises(match=...): matches an error message
+_ ERROR at setup of test_the_nonsplit_obstruction_pair_is_decided_false_by_the_profile _
+tests/forms/test_orbit_and_profile_radical_isometry.sage:25: TL01 from sage_extensions.categories.modules.framed.formed import ...: take every name from the session
+tests/forms/test_orbit_and_profile_radical_isometry.sage:29: TL01 from sage_extensions.categories.modules.framed.formed.torsion_form_modules import ...: take every name from the session
+tests/forms/test_orbit_and_profile_radical_isometry.sage:32: TL01 from sage_extensions.categories.modules.framed.fraction_field_quotients import ...: take every name from the session
+tests/forms/test_orbit_and_profile_radical_isometry.sage:66: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_orbit_and_profile_radical_isometry.sage:89: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_orbit_and_profile_radical_isometry.sage:116: TL05 test_a_refused_witness_is_undecided_never_false takes the monkeypatch fixture
+tests/forms/test_orbit_and_profile_radical_isometry.sage:128: TL01 from sage_extensions.categories.modules.framed.formed import ...: take every name from the session
+tests/forms/test_orbit_and_profile_radical_isometry.sage:143: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_orbit_and_profile_radical_isometry.sage:151: TL05 monkeypatch: mocks prove nothing about the real objects
+tests/forms/test_orbit_and_profile_radical_isometry.sage:154: TL07 pytest.raises(match=...): matches an error message
+tests/forms/test_orbit_and_profile_radical_isometry.sage:157: TL02 private attribute ._radical_isometry_decision
+tests/forms/test_orbit_and_profile_radical_isometry.sage:222: TL07 pytest.raises(match=...): matches an error message
+______ ERROR at setup of test_a_refused_witness_is_undecided_never_false _______
+tests/forms/test_orbit_and_profile_radical_isometry.sage:25: TL01 from sage_extensions.categories.modules.framed.formed import ...: take every name from the session
+tests/forms/test_orbit_and_profile_radical_isometry.sage:29: TL01 from sage_extensions.categories.modules.framed.formed.torsion_form_modules import ...: take every name from the session
+tests/forms/test_orbit_and_profile_radical_isometry.sage:32: TL01 from sage_extensions.categories.modules.framed.fraction_field_quotients import ...: take every name from the session
+tests/forms/test_orbit_and_profile_radical_isometry.sage:66: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_orbit_and_profile_radical_isometry.sage:89: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_orbit_and_profile_radical_isometry.sage:116: TL05 test_a_refused_witness_is_undecided_never_false takes the monkeypatch fixture
+tests/forms/test_orbit_and_profile_radical_isometry.sage:128: TL01 from sage_extensions.categories.modules.framed.formed import ...: take every name from the session
+tests/forms/test_orbit_and_profile_radical_isometry.sage:143: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_orbit_and_profile_radical_isometry.sage:151: TL05 monkeypatch: mocks prove nothing about the real objects
+tests/forms/test_orbit_and_profile_radical_isometry.sage:154: TL07 pytest.raises(match=...): matches an error message
+tests/forms/test_orbit_and_profile_radical_isometry.sage:157: TL02 private attribute ._radical_isometry_decision
+tests/forms/test_orbit_and_profile_radical_isometry.sage:222: TL07 pytest.raises(match=...): matches an error message
+_ ERROR at setup of test_a_deep_regrading_past_the_search_budget_is_undecided_not_false _
+tests/forms/test_orbit_and_profile_radical_isometry.sage:25: TL01 from sage_extensions.categories.modules.framed.formed import ...: take every name from the session
+tests/forms/test_orbit_and_profile_radical_isometry.sage:29: TL01 from sage_extensions.categories.modules.framed.formed.torsion_form_modules import ...: take every name from the session
+tests/forms/test_orbit_and_profile_radical_isometry.sage:32: TL01 from sage_extensions.categories.modules.framed.fraction_field_quotients import ...: take every name from the session
+tests/forms/test_orbit_and_profile_radical_isometry.sage:66: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_orbit_and_profile_radical_isometry.sage:89: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_orbit_and_profile_radical_isometry.sage:116: TL05 test_a_refused_witness_is_undecided_never_false takes the monkeypatch fixture
+tests/forms/test_orbit_and_profile_radical_isometry.sage:128: TL01 from sage_extensions.categories.modules.framed.formed import ...: take every name from the session
+tests/forms/test_orbit_and_profile_radical_isometry.sage:143: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_orbit_and_profile_radical_isometry.sage:151: TL05 monkeypatch: mocks prove nothing about the real objects
+tests/forms/test_orbit_and_profile_radical_isometry.sage:154: TL07 pytest.raises(match=...): matches an error message
+tests/forms/test_orbit_and_profile_radical_isometry.sage:157: TL02 private attribute ._radical_isometry_decision
+tests/forms/test_orbit_and_profile_radical_isometry.sage:222: TL07 pytest.raises(match=...): matches an error message
+__ ERROR at setup of test_the_bilinear_flavour_keeps_the_profile_certificate ___
+tests/forms/test_orbit_and_profile_radical_isometry.sage:25: TL01 from sage_extensions.categories.modules.framed.formed import ...: take every name from the session
+tests/forms/test_orbit_and_profile_radical_isometry.sage:29: TL01 from sage_extensions.categories.modules.framed.formed.torsion_form_modules import ...: take every name from the session
+tests/forms/test_orbit_and_profile_radical_isometry.sage:32: TL01 from sage_extensions.categories.modules.framed.fraction_field_quotients import ...: take every name from the session
+tests/forms/test_orbit_and_profile_radical_isometry.sage:66: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_orbit_and_profile_radical_isometry.sage:89: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_orbit_and_profile_radical_isometry.sage:116: TL05 test_a_refused_witness_is_undecided_never_false takes the monkeypatch fixture
+tests/forms/test_orbit_and_profile_radical_isometry.sage:128: TL01 from sage_extensions.categories.modules.framed.formed import ...: take every name from the session
+tests/forms/test_orbit_and_profile_radical_isometry.sage:143: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_orbit_and_profile_radical_isometry.sage:151: TL05 monkeypatch: mocks prove nothing about the real objects
+tests/forms/test_orbit_and_profile_radical_isometry.sage:154: TL07 pytest.raises(match=...): matches an error message
+tests/forms/test_orbit_and_profile_radical_isometry.sage:157: TL02 private attribute ._radical_isometry_decision
+tests/forms/test_orbit_and_profile_radical_isometry.sage:222: TL07 pytest.raises(match=...): matches an error message
+__ ERROR at setup of test_an_invertible_gram_can_have_a_nonzero_polar_radical __
+tests/forms/test_polar_radical_criterion.sage:23: TL01 from sage_extensions.categories.modules.framed.formed import ...: take every name from the session
+tests/forms/test_polar_radical_criterion.sage:27: TL01 from sage_extensions.categories.modules.framed.formed.torsion_form_modules import ...: take every name from the session
+tests/forms/test_polar_radical_criterion.sage:27: TL02 imports the private name _polar_form_is_nondegenerate
+tests/forms/test_polar_radical_criterion.sage:30: TL01 from sage_extensions.categories.modules.framed.fraction_field_quotients import ...: take every name from the session
+tests/forms/test_polar_radical_criterion.sage:54: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/forms/test_polar_radical_criterion.sage:58: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/forms/test_polar_radical_criterion.sage:69: TL10 len(): ask for a cardinality
+tests/forms/test_polar_radical_criterion.sage:155: TL10 len(): ask for a cardinality
+tests/forms/test_polar_radical_criterion.sage:164: TL10 len(): ask for a cardinality
+tests/forms/test_polar_radical_criterion.sage:172: TL10 len(): ask for a cardinality
+tests/forms/test_polar_radical_criterion.sage:181: TL10 len(): ask for a cardinality
+_ ERROR at setup of test_a_two_torsion_form_with_the_same_gram_is_nondegenerate _
+tests/forms/test_polar_radical_criterion.sage:23: TL01 from sage_extensions.categories.modules.framed.formed import ...: take every name from the session
+tests/forms/test_polar_radical_criterion.sage:27: TL01 from sage_extensions.categories.modules.framed.formed.torsion_form_modules import ...: take every name from the session
+tests/forms/test_polar_radical_criterion.sage:27: TL02 imports the private name _polar_form_is_nondegenerate
+tests/forms/test_polar_radical_criterion.sage:30: TL01 from sage_extensions.categories.modules.framed.fraction_field_quotients import ...: take every name from the session
+tests/forms/test_polar_radical_criterion.sage:54: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/forms/test_polar_radical_criterion.sage:58: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/forms/test_polar_radical_criterion.sage:69: TL10 len(): ask for a cardinality
+tests/forms/test_polar_radical_criterion.sage:155: TL10 len(): ask for a cardinality
+tests/forms/test_polar_radical_criterion.sage:164: TL10 len(): ask for a cardinality
+tests/forms/test_polar_radical_criterion.sage:172: TL10 len(): ask for a cardinality
+tests/forms/test_polar_radical_criterion.sage:181: TL10 len(): ask for a cardinality
+_ ERROR at setup of test_the_verdict_is_invariant_under_an_equivalent_representative _
+tests/forms/test_polar_radical_criterion.sage:23: TL01 from sage_extensions.categories.modules.framed.formed import ...: take every name from the session
+tests/forms/test_polar_radical_criterion.sage:27: TL01 from sage_extensions.categories.modules.framed.formed.torsion_form_modules import ...: take every name from the session
+tests/forms/test_polar_radical_criterion.sage:27: TL02 imports the private name _polar_form_is_nondegenerate
+tests/forms/test_polar_radical_criterion.sage:30: TL01 from sage_extensions.categories.modules.framed.fraction_field_quotients import ...: take every name from the session
+tests/forms/test_polar_radical_criterion.sage:54: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/forms/test_polar_radical_criterion.sage:58: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/forms/test_polar_radical_criterion.sage:69: TL10 len(): ask for a cardinality
+tests/forms/test_polar_radical_criterion.sage:155: TL10 len(): ask for a cardinality
+tests/forms/test_polar_radical_criterion.sage:164: TL10 len(): ask for a cardinality
+tests/forms/test_polar_radical_criterion.sage:172: TL10 len(): ask for a cardinality
+tests/forms/test_polar_radical_criterion.sage:181: TL10 len(): ask for a cardinality
+___ ERROR at setup of test_the_verdict_is_invariant_under_a_generator_change ___
+tests/forms/test_polar_radical_criterion.sage:23: TL01 from sage_extensions.categories.modules.framed.formed import ...: take every name from the session
+tests/forms/test_polar_radical_criterion.sage:27: TL01 from sage_extensions.categories.modules.framed.formed.torsion_form_modules import ...: take every name from the session
+tests/forms/test_polar_radical_criterion.sage:27: TL02 imports the private name _polar_form_is_nondegenerate
+tests/forms/test_polar_radical_criterion.sage:30: TL01 from sage_extensions.categories.modules.framed.fraction_field_quotients import ...: take every name from the session
+tests/forms/test_polar_radical_criterion.sage:54: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/forms/test_polar_radical_criterion.sage:58: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/forms/test_polar_radical_criterion.sage:69: TL10 len(): ask for a cardinality
+tests/forms/test_polar_radical_criterion.sage:155: TL10 len(): ask for a cardinality
+tests/forms/test_polar_radical_criterion.sage:164: TL10 len(): ask for a cardinality
+tests/forms/test_polar_radical_criterion.sage:172: TL10 len(): ask for a cardinality
+tests/forms/test_polar_radical_criterion.sage:181: TL10 len(): ask for a cardinality
+_ ERROR at setup of test_the_bilinear_flavour_separates_the_two_torsion_orders _
+tests/forms/test_polar_radical_criterion.sage:23: TL01 from sage_extensions.categories.modules.framed.formed import ...: take every name from the session
+tests/forms/test_polar_radical_criterion.sage:27: TL01 from sage_extensions.categories.modules.framed.formed.torsion_form_modules import ...: take every name from the session
+tests/forms/test_polar_radical_criterion.sage:27: TL02 imports the private name _polar_form_is_nondegenerate
+tests/forms/test_polar_radical_criterion.sage:30: TL01 from sage_extensions.categories.modules.framed.fraction_field_quotients import ...: take every name from the session
+tests/forms/test_polar_radical_criterion.sage:54: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/forms/test_polar_radical_criterion.sage:58: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/forms/test_polar_radical_criterion.sage:69: TL10 len(): ask for a cardinality
+tests/forms/test_polar_radical_criterion.sage:155: TL10 len(): ask for a cardinality
+tests/forms/test_polar_radical_criterion.sage:164: TL10 len(): ask for a cardinality
+tests/forms/test_polar_radical_criterion.sage:172: TL10 len(): ask for a cardinality
+tests/forms/test_polar_radical_criterion.sage:181: TL10 len(): ask for a cardinality
+_______ ERROR at setup of test_a_mixed_order_perfect_pairing_is_accepted _______
+tests/forms/test_polar_radical_criterion.sage:23: TL01 from sage_extensions.categories.modules.framed.formed import ...: take every name from the session
+tests/forms/test_polar_radical_criterion.sage:27: TL01 from sage_extensions.categories.modules.framed.formed.torsion_form_modules import ...: take every name from the session
+tests/forms/test_polar_radical_criterion.sage:27: TL02 imports the private name _polar_form_is_nondegenerate
+tests/forms/test_polar_radical_criterion.sage:30: TL01 from sage_extensions.categories.modules.framed.fraction_field_quotients import ...: take every name from the session
+tests/forms/test_polar_radical_criterion.sage:54: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/forms/test_polar_radical_criterion.sage:58: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/forms/test_polar_radical_criterion.sage:69: TL10 len(): ask for a cardinality
+tests/forms/test_polar_radical_criterion.sage:155: TL10 len(): ask for a cardinality
+tests/forms/test_polar_radical_criterion.sage:164: TL10 len(): ask for a cardinality
+tests/forms/test_polar_radical_criterion.sage:172: TL10 len(): ask for a cardinality
+tests/forms/test_polar_radical_criterion.sage:181: TL10 len(): ask for a cardinality
+_ ERROR at setup of test_the_mixed_order_verdict_survives_a_generator_permutation _
+tests/forms/test_polar_radical_criterion.sage:23: TL01 from sage_extensions.categories.modules.framed.formed import ...: take every name from the session
+tests/forms/test_polar_radical_criterion.sage:27: TL01 from sage_extensions.categories.modules.framed.formed.torsion_form_modules import ...: take every name from the session
+tests/forms/test_polar_radical_criterion.sage:27: TL02 imports the private name _polar_form_is_nondegenerate
+tests/forms/test_polar_radical_criterion.sage:30: TL01 from sage_extensions.categories.modules.framed.fraction_field_quotients import ...: take every name from the session
+tests/forms/test_polar_radical_criterion.sage:54: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/forms/test_polar_radical_criterion.sage:58: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/forms/test_polar_radical_criterion.sage:69: TL10 len(): ask for a cardinality
+tests/forms/test_polar_radical_criterion.sage:155: TL10 len(): ask for a cardinality
+tests/forms/test_polar_radical_criterion.sage:164: TL10 len(): ask for a cardinality
+tests/forms/test_polar_radical_criterion.sage:172: TL10 len(): ask for a cardinality
+tests/forms/test_polar_radical_criterion.sage:181: TL10 len(): ask for a cardinality
+___ ERROR at setup of test_the_mixed_order_verdict_survives_a_unit_rescaling ___
+tests/forms/test_polar_radical_criterion.sage:23: TL01 from sage_extensions.categories.modules.framed.formed import ...: take every name from the session
+tests/forms/test_polar_radical_criterion.sage:27: TL01 from sage_extensions.categories.modules.framed.formed.torsion_form_modules import ...: take every name from the session
+tests/forms/test_polar_radical_criterion.sage:27: TL02 imports the private name _polar_form_is_nondegenerate
+tests/forms/test_polar_radical_criterion.sage:30: TL01 from sage_extensions.categories.modules.framed.fraction_field_quotients import ...: take every name from the session
+tests/forms/test_polar_radical_criterion.sage:54: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/forms/test_polar_radical_criterion.sage:58: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/forms/test_polar_radical_criterion.sage:69: TL10 len(): ask for a cardinality
+tests/forms/test_polar_radical_criterion.sage:155: TL10 len(): ask for a cardinality
+tests/forms/test_polar_radical_criterion.sage:164: TL10 len(): ask for a cardinality
+tests/forms/test_polar_radical_criterion.sage:172: TL10 len(): ask for a cardinality
+tests/forms/test_polar_radical_criterion.sage:181: TL10 len(): ask for a cardinality
+_ ERROR at setup of test_a_mixed_order_form_with_a_vanishing_block_is_still_refused _
+tests/forms/test_polar_radical_criterion.sage:23: TL01 from sage_extensions.categories.modules.framed.formed import ...: take every name from the session
+tests/forms/test_polar_radical_criterion.sage:27: TL01 from sage_extensions.categories.modules.framed.formed.torsion_form_modules import ...: take every name from the session
+tests/forms/test_polar_radical_criterion.sage:27: TL02 imports the private name _polar_form_is_nondegenerate
+tests/forms/test_polar_radical_criterion.sage:30: TL01 from sage_extensions.categories.modules.framed.fraction_field_quotients import ...: take every name from the session
+tests/forms/test_polar_radical_criterion.sage:54: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/forms/test_polar_radical_criterion.sage:58: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/forms/test_polar_radical_criterion.sage:69: TL10 len(): ask for a cardinality
+tests/forms/test_polar_radical_criterion.sage:155: TL10 len(): ask for a cardinality
+tests/forms/test_polar_radical_criterion.sage:164: TL10 len(): ask for a cardinality
+tests/forms/test_polar_radical_criterion.sage:172: TL10 len(): ask for a cardinality
+tests/forms/test_polar_radical_criterion.sage:181: TL10 len(): ask for a cardinality
+___ ERROR at setup of test_a_quadratic_form_that_does_not_descend_is_refused ___
+tests/forms/test_quadratic_form_descent.sage:21: TL01 from sage_extensions.categories.modules.framed.formed import ...: take every name from the session
+tests/forms/test_quadratic_form_descent.sage:25: TL01 from sage_extensions.categories.modules.framed.fraction_field_quotients import ...: take every name from the session
+tests/forms/test_quadratic_form_descent.sage:65: TL07 pytest.raises(match=...): matches an error message
+_ ERROR at setup of test_the_value_module_that_descends_makes_q_a_function_of_the_class _
+tests/forms/test_quadratic_form_descent.sage:21: TL01 from sage_extensions.categories.modules.framed.formed import ...: take every name from the session
+tests/forms/test_quadratic_form_descent.sage:25: TL01 from sage_extensions.categories.modules.framed.fraction_field_quotients import ...: take every name from the session
+tests/forms/test_quadratic_form_descent.sage:65: TL07 pytest.raises(match=...): matches an error message
+________ ERROR at setup of test_two_torsion_keeps_its_quadratic_values _________
+tests/forms/test_quadratic_form_descent.sage:21: TL01 from sage_extensions.categories.modules.framed.formed import ...: take every name from the session
+tests/forms/test_quadratic_form_descent.sage:25: TL01 from sage_extensions.categories.modules.framed.fraction_field_quotients import ...: take every name from the session
+tests/forms/test_quadratic_form_descent.sage:65: TL07 pytest.raises(match=...): matches an error message
+_ ERROR at setup of test_the_bilinear_law_is_a_different_condition_on_the_same_module _
+tests/forms/test_quadratic_form_descent.sage:21: TL01 from sage_extensions.categories.modules.framed.formed import ...: take every name from the session
+tests/forms/test_quadratic_form_descent.sage:25: TL01 from sage_extensions.categories.modules.framed.fraction_field_quotients import ...: take every name from the session
+tests/forms/test_quadratic_form_descent.sage:65: TL07 pytest.raises(match=...): matches an error message
+__ ERROR at setup of test_the_two_coble_discriminant_forms_are_anti_isometric __
+tests/forms/test_the_coble_anti_isometry.sage:24: TL01 from sage_extensions.categories.modules.framed.formed.torsion_form_modules import ...: take every name from the session
+tests/forms/test_the_coble_anti_isometry.sage:42: TL01 from sage.combinat.root_system.cartan_matrix import ...: take every name from the session
+tests/forms/test_the_coble_anti_isometry.sage:43: TL01 from sage.matrix.constructor import ...: take every name from the session
+tests/forms/test_the_coble_anti_isometry.sage:48: TL01 from sage.rings.integer_ring import ...: take every name from the session
+tests/forms/test_the_coble_anti_isometry.sage:89: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_the_coble_anti_isometry.sage:95: TL10 len(): ask for a cardinality
+tests/forms/test_the_coble_anti_isometry.sage:95: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/forms/test_the_coble_anti_isometry.sage:96: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/forms/test_the_coble_anti_isometry.sage:99: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/forms/test_the_coble_anti_isometry.sage:101: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/forms/test_the_coble_anti_isometry.sage:102: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/forms/test_the_coble_anti_isometry.sage:110: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/forms/test_the_coble_anti_isometry.sage:112: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/forms/test_the_coble_anti_isometry.sage:113: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/forms/test_the_coble_anti_isometry.sage:121: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/forms/test_the_coble_anti_isometry.sage:128: TL11 generators: write group_generators, module_generators or algebra_generators
+_ ERROR at setup of test_the_witness_is_a_typed_isometry_realizing_the_anti_isometry _
+tests/forms/test_the_coble_anti_isometry.sage:24: TL01 from sage_extensions.categories.modules.framed.formed.torsion_form_modules import ...: take every name from the session
+tests/forms/test_the_coble_anti_isometry.sage:42: TL01 from sage.combinat.root_system.cartan_matrix import ...: take every name from the session
+tests/forms/test_the_coble_anti_isometry.sage:43: TL01 from sage.matrix.constructor import ...: take every name from the session
+tests/forms/test_the_coble_anti_isometry.sage:48: TL01 from sage.rings.integer_ring import ...: take every name from the session
+tests/forms/test_the_coble_anti_isometry.sage:89: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_the_coble_anti_isometry.sage:95: TL10 len(): ask for a cardinality
+tests/forms/test_the_coble_anti_isometry.sage:95: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/forms/test_the_coble_anti_isometry.sage:96: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/forms/test_the_coble_anti_isometry.sage:99: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/forms/test_the_coble_anti_isometry.sage:101: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/forms/test_the_coble_anti_isometry.sage:102: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/forms/test_the_coble_anti_isometry.sage:110: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/forms/test_the_coble_anti_isometry.sage:112: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/forms/test_the_coble_anti_isometry.sage:113: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/forms/test_the_coble_anti_isometry.sage:121: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/forms/test_the_coble_anti_isometry.sage:128: TL11 generators: write group_generators, module_generators or algebra_generators
+_ ERROR at setup of test_a_degenerate_form_is_isometric_to_a_copy_with_a_typed_witness _
+tests/forms/test_the_isometry_decision_for_radical_forms.sage:25: TL01 from sage_extensions.categories.modules.framed.formed import ...: take every name from the session
+tests/forms/test_the_isometry_decision_for_radical_forms.sage:29: TL01 from sage_extensions.categories.modules.framed.formed.torsion_form_modules import ...: take every name from the session
+tests/forms/test_the_isometry_decision_for_radical_forms.sage:32: TL01 from sage_extensions.categories.modules.framed.fraction_field_quotients import ...: take every name from the session
+tests/forms/test_the_isometry_decision_for_radical_forms.sage:59: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_the_isometry_decision_for_radical_forms.sage:126: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_the_isometry_decision_for_radical_forms.sage:182: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_the_isometry_decision_for_radical_forms.sage:212: TL03 isinstance(): introspection is not mathematics
+_ ERROR at setup of test_the_radical_order_separates_a_form_from_its_zero_form _
+tests/forms/test_the_isometry_decision_for_radical_forms.sage:25: TL01 from sage_extensions.categories.modules.framed.formed import ...: take every name from the session
+tests/forms/test_the_isometry_decision_for_radical_forms.sage:29: TL01 from sage_extensions.categories.modules.framed.formed.torsion_form_modules import ...: take every name from the session
+tests/forms/test_the_isometry_decision_for_radical_forms.sage:32: TL01 from sage_extensions.categories.modules.framed.fraction_field_quotients import ...: take every name from the session
+tests/forms/test_the_isometry_decision_for_radical_forms.sage:59: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_the_isometry_decision_for_radical_forms.sage:126: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_the_isometry_decision_for_radical_forms.sage:182: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_the_isometry_decision_for_radical_forms.sage:212: TL03 isinstance(): introspection is not mathematics
+_____ ERROR at setup of test_differing_module_invariants_are_not_isometric _____
+tests/forms/test_the_isometry_decision_for_radical_forms.sage:25: TL01 from sage_extensions.categories.modules.framed.formed import ...: take every name from the session
+tests/forms/test_the_isometry_decision_for_radical_forms.sage:29: TL01 from sage_extensions.categories.modules.framed.formed.torsion_form_modules import ...: take every name from the session
+tests/forms/test_the_isometry_decision_for_radical_forms.sage:32: TL01 from sage_extensions.categories.modules.framed.fraction_field_quotients import ...: take every name from the session
+tests/forms/test_the_isometry_decision_for_radical_forms.sage:59: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_the_isometry_decision_for_radical_forms.sage:126: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_the_isometry_decision_for_radical_forms.sage:182: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_the_isometry_decision_for_radical_forms.sage:212: TL03 isinstance(): introspection is not mathematics
+____ ERROR at setup of test_the_quotient_form_separates_the_two_unit_twists ____
+tests/forms/test_the_isometry_decision_for_radical_forms.sage:25: TL01 from sage_extensions.categories.modules.framed.formed import ...: take every name from the session
+tests/forms/test_the_isometry_decision_for_radical_forms.sage:29: TL01 from sage_extensions.categories.modules.framed.formed.torsion_form_modules import ...: take every name from the session
+tests/forms/test_the_isometry_decision_for_radical_forms.sage:32: TL01 from sage_extensions.categories.modules.framed.fraction_field_quotients import ...: take every name from the session
+tests/forms/test_the_isometry_decision_for_radical_forms.sage:59: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_the_isometry_decision_for_radical_forms.sage:126: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_the_isometry_decision_for_radical_forms.sage:182: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_the_isometry_decision_for_radical_forms.sage:212: TL03 isinstance(): introspection is not mathematics
+_ ERROR at setup of test_two_forms_of_one_module_with_different_radicals_are_separated _
+tests/forms/test_the_isometry_decision_for_radical_forms.sage:25: TL01 from sage_extensions.categories.modules.framed.formed import ...: take every name from the session
+tests/forms/test_the_isometry_decision_for_radical_forms.sage:29: TL01 from sage_extensions.categories.modules.framed.formed.torsion_form_modules import ...: take every name from the session
+tests/forms/test_the_isometry_decision_for_radical_forms.sage:32: TL01 from sage_extensions.categories.modules.framed.fraction_field_quotients import ...: take every name from the session
+tests/forms/test_the_isometry_decision_for_radical_forms.sage:59: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_the_isometry_decision_for_radical_forms.sage:126: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_the_isometry_decision_for_radical_forms.sage:182: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_the_isometry_decision_for_radical_forms.sage:212: TL03 isinstance(): introspection is not mathematics
+______ ERROR at setup of test_a_degenerate_form_of_higher_rank_is_decided ______
+tests/forms/test_the_isometry_decision_for_radical_forms.sage:25: TL01 from sage_extensions.categories.modules.framed.formed import ...: take every name from the session
+tests/forms/test_the_isometry_decision_for_radical_forms.sage:29: TL01 from sage_extensions.categories.modules.framed.formed.torsion_form_modules import ...: take every name from the session
+tests/forms/test_the_isometry_decision_for_radical_forms.sage:32: TL01 from sage_extensions.categories.modules.framed.fraction_field_quotients import ...: take every name from the session
+tests/forms/test_the_isometry_decision_for_radical_forms.sage:59: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_the_isometry_decision_for_radical_forms.sage:126: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_the_isometry_decision_for_radical_forms.sage:182: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_the_isometry_decision_for_radical_forms.sage:212: TL03 isinstance(): introspection is not mathematics
+_ ERROR at setup of test_the_two_diagonal_forms_on_order_sixteen_cubes_are_decided _
+tests/forms/test_the_isometry_decision_for_radical_forms.sage:25: TL01 from sage_extensions.categories.modules.framed.formed import ...: take every name from the session
+tests/forms/test_the_isometry_decision_for_radical_forms.sage:29: TL01 from sage_extensions.categories.modules.framed.formed.torsion_form_modules import ...: take every name from the session
+tests/forms/test_the_isometry_decision_for_radical_forms.sage:32: TL01 from sage_extensions.categories.modules.framed.fraction_field_quotients import ...: take every name from the session
+tests/forms/test_the_isometry_decision_for_radical_forms.sage:59: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_the_isometry_decision_for_radical_forms.sage:126: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_the_isometry_decision_for_radical_forms.sage:182: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_the_isometry_decision_for_radical_forms.sage:212: TL03 isinstance(): introspection is not mathematics
+_ ERROR at setup of test_the_bilinear_flavour_reduces_and_decides_the_same_way _
+tests/forms/test_the_isometry_decision_for_radical_forms.sage:25: TL01 from sage_extensions.categories.modules.framed.formed import ...: take every name from the session
+tests/forms/test_the_isometry_decision_for_radical_forms.sage:29: TL01 from sage_extensions.categories.modules.framed.formed.torsion_form_modules import ...: take every name from the session
+tests/forms/test_the_isometry_decision_for_radical_forms.sage:32: TL01 from sage_extensions.categories.modules.framed.fraction_field_quotients import ...: take every name from the session
+tests/forms/test_the_isometry_decision_for_radical_forms.sage:59: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_the_isometry_decision_for_radical_forms.sage:126: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_the_isometry_decision_for_radical_forms.sage:182: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_the_isometry_decision_for_radical_forms.sage:212: TL03 isinstance(): introspection is not mathematics
+_ ERROR at setup of test_an_isometry_through_a_coordinate_transposition_is_found _
+tests/forms/test_the_isometry_decision_for_radical_forms.sage:25: TL01 from sage_extensions.categories.modules.framed.formed import ...: take every name from the session
+tests/forms/test_the_isometry_decision_for_radical_forms.sage:29: TL01 from sage_extensions.categories.modules.framed.formed.torsion_form_modules import ...: take every name from the session
+tests/forms/test_the_isometry_decision_for_radical_forms.sage:32: TL01 from sage_extensions.categories.modules.framed.fraction_field_quotients import ...: take every name from the session
+tests/forms/test_the_isometry_decision_for_radical_forms.sage:59: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_the_isometry_decision_for_radical_forms.sage:126: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_the_isometry_decision_for_radical_forms.sage:182: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_the_isometry_decision_for_radical_forms.sage:212: TL03 isinstance(): introspection is not mathematics
+_ ERROR at setup of test_the_radical_is_a_subobject_of_the_form_with_the_expected_order _
+tests/forms/test_the_polar_radical_and_nondegenerate_quotient.sage:18: TL01 from sage_extensions.categories.modules.framed.formed import ...: take every name from the session
+tests/forms/test_the_polar_radical_and_nondegenerate_quotient.sage:21: TL01 from sage_extensions.categories.modules.framed.formed.torsion_form_modules import ...: take every name from the session
+tests/forms/test_the_polar_radical_and_nondegenerate_quotient.sage:21: TL02 imports the private name _regenerate_form_on_generators
+tests/forms/test_the_polar_radical_and_nondegenerate_quotient.sage:21: TL02 imports the private name _torsion_form_orthogonal_subobject
+tests/forms/test_the_polar_radical_and_nondegenerate_quotient.sage:25: TL01 from sage_extensions.categories.modules.framed.fraction_field_quotients import ...: take every name from the session
+tests/forms/test_the_polar_radical_and_nondegenerate_quotient.sage:99: TL07 pytest.raises(match=...): matches an error message
+tests/forms/test_the_polar_radical_and_nondegenerate_quotient.sage:177: TL10 len(): ask for a cardinality
+_ ERROR at setup of test_the_nondegenerate_quotient_is_the_form_on_the_quotient _
+tests/forms/test_the_polar_radical_and_nondegenerate_quotient.sage:18: TL01 from sage_extensions.categories.modules.framed.formed import ...: take every name from the session
+tests/forms/test_the_polar_radical_and_nondegenerate_quotient.sage:21: TL01 from sage_extensions.categories.modules.framed.formed.torsion_form_modules import ...: take every name from the session
+tests/forms/test_the_polar_radical_and_nondegenerate_quotient.sage:21: TL02 imports the private name _regenerate_form_on_generators
+tests/forms/test_the_polar_radical_and_nondegenerate_quotient.sage:21: TL02 imports the private name _torsion_form_orthogonal_subobject
+tests/forms/test_the_polar_radical_and_nondegenerate_quotient.sage:25: TL01 from sage_extensions.categories.modules.framed.fraction_field_quotients import ...: take every name from the session
+tests/forms/test_the_polar_radical_and_nondegenerate_quotient.sage:99: TL07 pytest.raises(match=...): matches an error message
+tests/forms/test_the_polar_radical_and_nondegenerate_quotient.sage:177: TL10 len(): ask for a cardinality
+_ ERROR at setup of test_a_nondegenerate_form_has_trivial_radical_and_quotients_to_itself _
+tests/forms/test_the_polar_radical_and_nondegenerate_quotient.sage:18: TL01 from sage_extensions.categories.modules.framed.formed import ...: take every name from the session
+tests/forms/test_the_polar_radical_and_nondegenerate_quotient.sage:21: TL01 from sage_extensions.categories.modules.framed.formed.torsion_form_modules import ...: take every name from the session
+tests/forms/test_the_polar_radical_and_nondegenerate_quotient.sage:21: TL02 imports the private name _regenerate_form_on_generators
+tests/forms/test_the_polar_radical_and_nondegenerate_quotient.sage:21: TL02 imports the private name _torsion_form_orthogonal_subobject
+tests/forms/test_the_polar_radical_and_nondegenerate_quotient.sage:25: TL01 from sage_extensions.categories.modules.framed.fraction_field_quotients import ...: take every name from the session
+tests/forms/test_the_polar_radical_and_nondegenerate_quotient.sage:99: TL07 pytest.raises(match=...): matches an error message
+tests/forms/test_the_polar_radical_and_nondegenerate_quotient.sage:177: TL10 len(): ask for a cardinality
+_ ERROR at setup of test_the_reduction_is_refused_when_the_form_does_not_vanish_on_the_radical _
+tests/forms/test_the_polar_radical_and_nondegenerate_quotient.sage:18: TL01 from sage_extensions.categories.modules.framed.formed import ...: take every name from the session
+tests/forms/test_the_polar_radical_and_nondegenerate_quotient.sage:21: TL01 from sage_extensions.categories.modules.framed.formed.torsion_form_modules import ...: take every name from the session
+tests/forms/test_the_polar_radical_and_nondegenerate_quotient.sage:21: TL02 imports the private name _regenerate_form_on_generators
+tests/forms/test_the_polar_radical_and_nondegenerate_quotient.sage:21: TL02 imports the private name _torsion_form_orthogonal_subobject
+tests/forms/test_the_polar_radical_and_nondegenerate_quotient.sage:25: TL01 from sage_extensions.categories.modules.framed.fraction_field_quotients import ...: take every name from the session
+tests/forms/test_the_polar_radical_and_nondegenerate_quotient.sage:99: TL07 pytest.raises(match=...): matches an error message
+tests/forms/test_the_polar_radical_and_nondegenerate_quotient.sage:177: TL10 len(): ask for a cardinality
+_ ERROR at setup of test_the_quotient_gram_is_indexed_by_the_retained_projection_contract _
+tests/forms/test_the_polar_radical_and_nondegenerate_quotient.sage:18: TL01 from sage_extensions.categories.modules.framed.formed import ...: take every name from the session
+tests/forms/test_the_polar_radical_and_nondegenerate_quotient.sage:21: TL01 from sage_extensions.categories.modules.framed.formed.torsion_form_modules import ...: take every name from the session
+tests/forms/test_the_polar_radical_and_nondegenerate_quotient.sage:21: TL02 imports the private name _regenerate_form_on_generators
+tests/forms/test_the_polar_radical_and_nondegenerate_quotient.sage:21: TL02 imports the private name _torsion_form_orthogonal_subobject
+tests/forms/test_the_polar_radical_and_nondegenerate_quotient.sage:25: TL01 from sage_extensions.categories.modules.framed.fraction_field_quotients import ...: take every name from the session
+tests/forms/test_the_polar_radical_and_nondegenerate_quotient.sage:99: TL07 pytest.raises(match=...): matches an error message
+tests/forms/test_the_polar_radical_and_nondegenerate_quotient.sage:177: TL10 len(): ask for a cardinality
+_______ ERROR at setup of test_a_reframed_copy_has_an_isometric_quotient _______
+tests/forms/test_the_polar_radical_and_nondegenerate_quotient.sage:18: TL01 from sage_extensions.categories.modules.framed.formed import ...: take every name from the session
+tests/forms/test_the_polar_radical_and_nondegenerate_quotient.sage:21: TL01 from sage_extensions.categories.modules.framed.formed.torsion_form_modules import ...: take every name from the session
+tests/forms/test_the_polar_radical_and_nondegenerate_quotient.sage:21: TL02 imports the private name _regenerate_form_on_generators
+tests/forms/test_the_polar_radical_and_nondegenerate_quotient.sage:21: TL02 imports the private name _torsion_form_orthogonal_subobject
+tests/forms/test_the_polar_radical_and_nondegenerate_quotient.sage:25: TL01 from sage_extensions.categories.modules.framed.fraction_field_quotients import ...: take every name from the session
+tests/forms/test_the_polar_radical_and_nondegenerate_quotient.sage:99: TL07 pytest.raises(match=...): matches an error message
+tests/forms/test_the_polar_radical_and_nondegenerate_quotient.sage:177: TL10 len(): ask for a cardinality
+_ ERROR at setup of test_the_orthogonal_complement_is_the_same_kernel_not_an_enumeration _
+tests/forms/test_the_polar_radical_and_nondegenerate_quotient.sage:18: TL01 from sage_extensions.categories.modules.framed.formed import ...: take every name from the session
+tests/forms/test_the_polar_radical_and_nondegenerate_quotient.sage:21: TL01 from sage_extensions.categories.modules.framed.formed.torsion_form_modules import ...: take every name from the session
+tests/forms/test_the_polar_radical_and_nondegenerate_quotient.sage:21: TL02 imports the private name _regenerate_form_on_generators
+tests/forms/test_the_polar_radical_and_nondegenerate_quotient.sage:21: TL02 imports the private name _torsion_form_orthogonal_subobject
+tests/forms/test_the_polar_radical_and_nondegenerate_quotient.sage:25: TL01 from sage_extensions.categories.modules.framed.fraction_field_quotients import ...: take every name from the session
+tests/forms/test_the_polar_radical_and_nondegenerate_quotient.sage:99: TL07 pytest.raises(match=...): matches an error message
+tests/forms/test_the_polar_radical_and_nondegenerate_quotient.sage:177: TL10 len(): ask for a cardinality
+=================================== FAILURES ===================================
+_____ test_a_rational_valued_form_descends_to_the_quotient_by_its_radical ______
+
+    def test_a_rational_valued_form_descends_to_the_quotient_by_its_radical() -> None:
+        module = ZZ.free_module(2)
+        first, second = module.module_generators()
+        line = ZZ.free_module(1)
+        radical = line.Mor(module)((first - second,))
+>       form = module.bilinear_forms(QQ)([[1, 1], [1, 1]])
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/forms/test_bilinear_form_descent.sage:21: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/modules/pure/modules.py:2162: in bilinear_forms
+    return self.bilinear_hom_space(value_module)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/pure/modules.py:2178: in bilinear_hom_space
+    return _bilinear_forms(self, _regular_module_reading(value_module))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/forms/forms.py:917: in _bilinear_forms
+    return Modules(module.base_ring()).Mor(tensor_product, value_module)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Category of modules over Integer Ring
+domain = Free module on {[(0, 0)], [(0, 1)], [(1, 0)], [(1, 1)]} over Integer Ring
+codomain = Free module on {[0]} over Fraction Field of Integer Ring
+
+    def Mor(self, domain, codomain):
+        r"""Return the unique Mor object ``Hom_R(domain,codomain)``."""
+        domain = self._mor_endpoint(domain)
+        codomain = self._mor_endpoint(codomain)
+        if domain not in self or codomain not in self:
+>           raise TypeError(
+                f"Mor({domain}, {codomain}) is not defined in {self}: both endpoints must be "
+                f"{self.base_ring()}-modules"
+            )
+E           TypeError: Mor(Free module on {[(0, 0)], [(0, 1)], [(1, 0)], [(1, 1)]} over Integer Ring, Free module on {[0]} over Fraction Field of Integer Ring) is not defined in Category of modules over Integer Ring: both endpoints must be Integer Ring-modules
+
+src/sage_extensions/categories/modules/pure/modules.py:1540: TypeError
+_____ test_nonsymmetric_form_descends_when_relations_vanish_in_both_slots ______
+
+    def test_nonsymmetric_form_descends_when_relations_vanish_in_both_slots() -> None:
+        module = QQ ^ 3
+        relation_module = QQ ^ 1
+        labels = tuple(module.module_generating_set())
+        inclusion = relation_module.module_category().Mor(relation_module, module)(
+            lambda label: module.module_generator(labels[0])
+        )
+        form = module.bilinear_forms(QQ)(
+            [[0, 0, 0], [0, 1, 2], [0, 3, 4]]
+        )
+        identity = QQ.module_category().Mor(QQ, QQ).identity()
+    
+>       assert form.descends_along(inclusion, identity)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/forms/test_bilinear_form_descent.sage:44: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/forms/forms.py:111: in descends_along
+    return _bilinear_form_descends_along(self, morphism, value_projection)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+form = Generic morphism:
+  From: Free module on {[(0, 0)], [(0, 1)], [(0, 2)], [(1, 0)], [(1, 1)], [(1, 2)], [(2, 0)], [(2, 1)], [(2, 2)]} over Fraction Field of Integer Ring
+  To:   Free module on {[0]} over Fraction Field of Integer Ring
+morphism = Generic morphism:
+  From: Free module on {[0]} over Fraction Field of Integer Ring
+  To:   Free module on {[0], [1], [2]} over Fraction Field of Integer Ring
+value_projection = Generic endomorphism of Fraction Field of Integer Ring
+
+    def _bilinear_form_descends_along(form, morphism, value_projection) -> bool:
+        r"""Decide whether the projected pairing descends through a represented cokernel.
+    
+        Write ``i:N -> M`` for ``morphism`` and ``p:W -> V`` for
+        ``value_projection``. The induced pairing on ``coker(i)`` exists exactly
+        when ``p(b(i(n),m)) = p(b(m,i(n))) = 0`` for every ``n`` and ``m``:
+        changing either quotient lift then leaves the value unchanged. Since
+        ``b`` and ``p`` are linear in each relevant argument, it suffices to test
+        the selected finite generating families of ``N`` and ``M``. The framing
+        requirement is deliberate; this routine does not claim a decision
+        procedure for infinitely generated modules.
+        """
+        module = form.module()
+        if morphism.codomain() is not module:
+            raise ValueError(
+                f"the form {form} on {module} descends to a quotient only along a map into {module}, but "
+                f"{morphism} ends at {morphism.codomain()}"
+            )
+        if value_projection.domain() is not form.codomain():
+>           raise ValueError(
+                f"the values of {form} lie in {form.codomain()}, so the projection of values must start there, "
+                f"but {value_projection} starts at {value_projection.domain()}"
+            )
+E           ValueError: the values of Generic morphism:
+E             From: Free module on {[(0, 0)], [(0, 1)], [(0, 2)], [(1, 0)], [(1, 1)], [(1, 2)], [(2, 0)], [(2, 1)], [(2, 2)]} over Fraction Field of Integer Ring
+E             To:   Free module on {[0]} over Fraction Field of Integer Ring lie in Free module on {[0]} over Fraction Field of Integer Ring, so the projection of values must start there, but Generic endomorphism of Fraction Field of Integer Ring starts at Fraction Field of Integer Ring
+
+src/sage_extensions/categories/forms/forms.py:182: ValueError
+_ test_descent_does_not_identify_quotient_generator_labels_with_source_labels __
+
+    def test_descent_does_not_identify_quotient_generator_labels_with_source_labels() -> None:
+        module = QQ.free_module(("discarded", "retained"))
+        relation_module = QQ.free_module(("relation",))
+        discarded = module.module_generator("discarded")
+        inclusion = relation_module.module_category().Mor(relation_module, module)(
+            lambda label: discarded
+        )
+        form = module.bilinear_forms(QQ)([[0, 0], [0, 7]])
+        identity = QQ.module_category().Mor(QQ, QQ).identity()
+    
+>       descended = form.descend_along(inclusion, identity)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/forms/test_bilinear_form_descent.sage:63: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/forms/forms.py:119: in descend_along
+    return _descended_bilinear_form(self, morphism, value_projection)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/forms/forms.py:211: in _descended_bilinear_form
+    if not _bilinear_form_descends_along(form, morphism, value_projection):
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+form = Generic morphism:
+  From: Free module on {[('discarded', 'discarded')], [('discarded', 'retained')], [('retained', 'di...ed', 'retained')]} over Fraction Field of Integer Ring
+  To:   Free module on {[0]} over Fraction Field of Integer Ring
+morphism = Generic morphism:
+  From: Free module on {[relation]} over Fraction Field of Integer Ring
+  To:   Free module on {[discarded], [retained]} over Fraction Field of Integer Ring
+value_projection = Generic endomorphism of Fraction Field of Integer Ring
+
+    def _bilinear_form_descends_along(form, morphism, value_projection) -> bool:
+        r"""Decide whether the projected pairing descends through a represented cokernel.
+    
+        Write ``i:N -> M`` for ``morphism`` and ``p:W -> V`` for
+        ``value_projection``. The induced pairing on ``coker(i)`` exists exactly
+        when ``p(b(i(n),m)) = p(b(m,i(n))) = 0`` for every ``n`` and ``m``:
+        changing either quotient lift then leaves the value unchanged. Since
+        ``b`` and ``p`` are linear in each relevant argument, it suffices to test
+        the selected finite generating families of ``N`` and ``M``. The framing
+        requirement is deliberate; this routine does not claim a decision
+        procedure for infinitely generated modules.
+        """
+        module = form.module()
+        if morphism.codomain() is not module:
+            raise ValueError(
+                f"the form {form} on {module} descends to a quotient only along a map into {module}, but "
+                f"{morphism} ends at {morphism.codomain()}"
+            )
+        if value_projection.domain() is not form.codomain():
+>           raise ValueError(
+                f"the values of {form} lie in {form.codomain()}, so the projection of values must start there, "
+                f"but {value_projection} starts at {value_projection.domain()}"
+            )
+E           ValueError: the values of Generic morphism:
+E             From: Free module on {[('discarded', 'discarded')], [('discarded', 'retained')], [('retained', 'discarded')], [('retained', 'retained')]} over Fraction Field of Integer Ring
+E             To:   Free module on {[0]} over Fraction Field of Integer Ring lie in Free module on {[0]} over Fraction Field of Integer Ring, so the projection of values must start there, but Generic endomorphism of Fraction Field of Integer Ring starts at Fraction Field of Integer Ring
+
+src/sage_extensions/categories/forms/forms.py:182: ValueError
+__________ test_descent_checks_relations_after_projecting_form_values __________
+
+    def test_descent_checks_relations_after_projecting_form_values() -> None:
+        module = ZZ.free_module(2)
+        labels = tuple(module.module_generating_set())
+        relation_module = ZZ.free_module(1)
+        relation = module.module_generator(labels[0])
+        inclusion = relation_module.module_category().Mor(relation_module, module)(
+            lambda label: relation
+        )
+        form = module.bilinear_forms(ZZ)([[2, 2], [2, 1]])
+        values = ZZ.ideal(ZZ(2)).quotient_ring()
+        projection = ZZ.Mor(values)(lambda value: values(value))
+    
+        assert form(relation, relation) == 2
+        retained = module.module_generator(labels[1])
+        assert form(relation, retained) == form(retained, relation) == 2
+        assert projection(form(relation, retained)) == values.zero()
+        assert not form.descends_along(inclusion, ZZ.Mor(ZZ).identity())
+        assert form.descends_along(inclusion, projection)
+>       descended = form.descend_along(inclusion, projection)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/forms/test_bilinear_form_descent.sage:87: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/forms/forms.py:119: in descend_along
+    return _descended_bilinear_form(self, morphism, value_projection)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/forms/forms.py:223: in _descended_bilinear_form
+    return quotient.bilinear_forms(value_projection.codomain())(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/pure/modules.py:2162: in bilinear_forms
+    return self.bilinear_hom_space(value_module)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/pure/modules.py:2178: in bilinear_hom_space
+    return _bilinear_forms(self, _regular_module_reading(value_module))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/forms/forms.py:917: in _bilinear_forms
+    return Modules(module.base_ring()).Mor(tensor_product, value_module)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Category of modules over Integer Ring
+domain = Finitely presented module on 4 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 0]
+codomain = Free module on {(1modIdeal(2)ofIntegerRing)*[0]} over Integer Ring / Ideal (2) of Integer Ring
+
+    def Mor(self, domain, codomain):
+        r"""Return the unique Mor object ``Hom_R(domain,codomain)``."""
+        domain = self._mor_endpoint(domain)
+        codomain = self._mor_endpoint(codomain)
+        if domain not in self or codomain not in self:
+>           raise TypeError(
+                f"Mor({domain}, {codomain}) is not defined in {self}: both endpoints must be "
+                f"{self.base_ring()}-modules"
+            )
+E           TypeError: Mor(Finitely presented module on 4 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 0], Free module on {(1modIdeal(2)ofIntegerRing)*[0]} over Integer Ring / Ideal (2) of Integer Ring) is not defined in Category of modules over Integer Ring: both endpoints must be Integer Ring-modules
+
+src/sage_extensions/categories/modules/pure/modules.py:1540: TypeError
+____________ test_descent_pairing_is_defined_on_a_torsion_cokernel _____________
+
+    def test_descent_pairing_is_defined_on_a_torsion_cokernel() -> None:
+        module = ZZ.free_module(2)
+        first, second = module.module_generators()
+        relation_module = ZZ.free_module(1)
+        inclusion = relation_module.module_category().Mor(relation_module, module)(
+            lambda label: 2 * first
+        )
+        form = module.bilinear_forms(ZZ)([[1, 0], [0, 3]])
+        values = ZZ.ideal(ZZ(2)).quotient_ring()
+        projection = ZZ.Mor(values)(lambda value: values(value))
+    
+        assert form.descends_along(inclusion, projection)
+>       descended = form.descend_along(inclusion, projection)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/forms/test_bilinear_form_descent.sage:111: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/forms/forms.py:119: in descend_along
+    return _descended_bilinear_form(self, morphism, value_projection)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/forms/forms.py:223: in _descended_bilinear_form
+    return quotient.bilinear_forms(value_projection.codomain())(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/pure/modules.py:2162: in bilinear_forms
+    return self.bilinear_hom_space(value_module)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/pure/modules.py:2178: in bilinear_hom_space
+    return _bilinear_forms(self, _regular_module_reading(value_module))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/forms/forms.py:917: in _bilinear_forms
+    return Modules(module.base_ring()).Mor(tensor_product, value_module)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Category of modules over Integer Ring
+domain = Finitely presented module on 4 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 2, 1 ↦ 2, 2 ↦ 2, 3 ↦ 0]
+codomain = Free module on {(1modIdeal(2)ofIntegerRing)*[0]} over Integer Ring / Ideal (2) of Integer Ring
+
+    def Mor(self, domain, codomain):
+        r"""Return the unique Mor object ``Hom_R(domain,codomain)``."""
+        domain = self._mor_endpoint(domain)
+        codomain = self._mor_endpoint(codomain)
+        if domain not in self or codomain not in self:
+>           raise TypeError(
+                f"Mor({domain}, {codomain}) is not defined in {self}: both endpoints must be "
+                f"{self.base_ring()}-modules"
+            )
+E           TypeError: Mor(Finitely presented module on 4 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 2, 1 ↦ 2, 2 ↦ 2, 3 ↦ 0], Free module on {(1modIdeal(2)ofIntegerRing)*[0]} over Integer Ring / Ideal (2) of Integer Ring) is not defined in Category of modules over Integer Ring: both endpoints must be Integer Ring-modules
+
+src/sage_extensions/categories/modules/pure/modules.py:1540: TypeError
+_____________ test_divided_square_of_Z_mod_4_is_cyclic_of_order_8 ______________
+
+>   return self._cached_methods[name]
+E   KeyError: 'basis'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_divided_square_of_Z_mod_4_is_cyclic_of_order_8() -> None:
+        r"""``Gamma^2(Z/4) = Z/8`` on ``gamma(g)``, with ``gamma(2g) = 4 gamma(g)``.
+    
+        ``gamma(n g) = n^2 gamma(g)`` and ``gamma(4g) = 0`` give ``16 gamma(g) = 0``,
+        while ``gamma(g + g) = 2 gamma(g) + g.g`` and ``4 (g.g) = 0`` cut this to
+        order 8: ``Gamma^2(Z) = Z gamma(1)`` modulo ``gamma(4) = 16 gamma(1)`` and
+        ``4 . 1 = 8 gamma(1)`` is ``Z/8``.
+        """
+>       module, g = cyclic(4)
+                    ^^^^^^^^^^
+
+tests/forms/test_classifier_adjunctions.sage:24: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/forms/test_classifier_adjunctions.sage:11: in cyclic
+    (e,) = line.basis()
+           ^^^^^^^^^^
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    ???
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: 'OwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType' object has no attribute 'basis'. Did you mean: 'base'?
+
+sage/cpython/getattr.pyx:362: AttributeError
+___________________ test_tensor_square_of_Z_mod_4_is_Z_mod_4 ___________________
+
+>   return self._cached_methods[name]
+E   KeyError: 'basis'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_tensor_square_of_Z_mod_4_is_Z_mod_4() -> None:
+        r"""``Z/4 (x) Z/4 = Z/4`` on ``g (x) g``."""
+>       module, g = cyclic(4)
+                    ^^^^^^^^^^
+
+tests/forms/test_classifier_adjunctions.sage:36: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/forms/test_classifier_adjunctions.sage:11: in cyclic
+    (e,) = line.basis()
+           ^^^^^^^^^^
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    return self.getattr_from_category(name)
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    attr = getattr_from_other_class(self, cls, name)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: 'OwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType' object has no attribute 'basis'. Did you mean: 'base'?
+
+sage/cpython/getattr.pyx:362: AttributeError
+_ test_free_form_adjunctions_on_Z_mod_4_satisfy_the_triangle_identities[bilinear_free_form_adjunction-classifier_order0-quotient_classifier_order0] _
+
+>   return self._cached_methods[name]
+E   KeyError: 'basis'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+adjunction_name = 'bilinear_free_form_adjunction', classifier_order = 4
+quotient_classifier_order = 2
+
+    @pytest.mark.parametrize(
+        "adjunction_name, classifier_order, quotient_classifier_order",
+        [("bilinear_free_form_adjunction", 4, 2), ("quadratic_free_form_adjunction", 8, 4)],
+    )
+    def test_free_form_adjunctions_on_Z_mod_4_satisfy_the_triangle_identities(
+        adjunction_name, classifier_order, quotient_classifier_order
+    ) -> None:
+        r"""The free bilinear (quadratic) form on ``Z/4`` takes values in ``Z/4`` (``Z/8``); both triangle identities hold."""
+>       module, g = cyclic(4)
+                    ^^^^^^^^^^
+
+tests/forms/test_classifier_adjunctions.sage:51: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/forms/test_classifier_adjunctions.sage:11: in cyclic
+    (e,) = line.basis()
+           ^^^^^^^^^^
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    return self.getattr_from_category(name)
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    attr = getattr_from_other_class(self, cls, name)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: '_OwnedRingParent_with_category.element_class' object has no attribute '_SageObject__custom_name'. Did you mean: 'base'?
+
+sage/cpython/getattr.pyx:362: AttributeError
+_ test_free_form_adjunctions_on_Z_mod_4_satisfy_the_triangle_identities[quadratic_free_form_adjunction-classifier_order1-quotient_classifier_order1] _
+
+>   return self._cached_methods[name]
+E   KeyError: 'basis'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+adjunction_name = 'quadratic_free_form_adjunction', classifier_order = 8
+quotient_classifier_order = 4
+
+    @pytest.mark.parametrize(
+        "adjunction_name, classifier_order, quotient_classifier_order",
+        [("bilinear_free_form_adjunction", 4, 2), ("quadratic_free_form_adjunction", 8, 4)],
+    )
+    def test_free_form_adjunctions_on_Z_mod_4_satisfy_the_triangle_identities(
+        adjunction_name, classifier_order, quotient_classifier_order
+    ) -> None:
+        r"""The free bilinear (quadratic) form on ``Z/4`` takes values in ``Z/4`` (``Z/8``); both triangle identities hold."""
+>       module, g = cyclic(4)
+                    ^^^^^^^^^^
+
+tests/forms/test_classifier_adjunctions.sage:51: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/forms/test_classifier_adjunctions.sage:11: in cyclic
+    (e,) = line.basis()
+           ^^^^^^^^^^
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    return self.getattr_from_category(name)
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    attr = getattr_from_other_class(self, cls, name)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: '_OwnedRingParent_with_category.element_class' object has no attribute '_SageObject__custom_name'. Did you mean: 'base'?
+
+sage/cpython/getattr.pyx:362: AttributeError
+_ test_quadratic_map_is_recovered_from_its_classifying_morphism_on_the_divided_square _
+
+>   return self._cached_methods[name]
+E   KeyError: 'basis'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_quadratic_map_is_recovered_from_its_classifying_morphism_on_the_divided_square() -> None:
+        r"""``q(ax + by) = a^2 + 3ab + 2b^2`` corresponds to ``Gamma^2(Z^2) -> Z``: ``gamma(x) |-> 1``, ``gamma(y) |-> 2``, ``xy |-> 3``.
+    
+        ``Gamma^2(Z^2)`` is free of rank 3 on ``gamma(x), gamma(y), xy``; the
+        polar form has ``b(x, y) = q(x + y) - q(x) - q(y) = 6 - 1 - 2 = 3``, and
+        ``q(2x - y) = 4 - 6 + 2 = 0``.
+        """
+        module = Modules(ZZ)(ZZ**2)
+>       x, y = module.basis()
+               ^^^^^^^^^^^^
+
+tests/forms/test_classifier_vocabulary.sage:14: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    return self.getattr_from_category(name)
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    attr = getattr_from_other_class(self, cls, name)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: 'OwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType' object has no attribute 'basis'. Did you mean: 'base'?
+
+sage/cpython/getattr.pyx:362: AttributeError
+_ test_archived_correlation_matrix_is_the_gram_matrix_and_dual_form_is_inverse _
+
+    def test_archived_correlation_matrix_is_the_gram_matrix_and_dual_form_is_inverse() -> None:
+        for lattice in (Lattices.A2, Lattices.D4, Lattices.U_2):
+            correlation = lattice.correlation_morphism()
+            linear = correlation.domain().module_category().Mor(
+                correlation.domain(), correlation.codomain()
+            )(correlation)
+            gram = lattice.gram_matrix()
+    
+>           assert linear.matrix() == gram
+E           assert Generic morph...r Integer Ring == Generic endom...r Integer Ring
+E             
+E             Use -v to get more diff
+
+tests/forms/test_discriminant_normal_forms_archive.sage:45: AssertionError
+____ test_archived_discriminant_of_a_direct_sum_has_the_two_primary_factors ____
+
+    def test_archived_discriminant_of_a_direct_sum_has_the_two_primary_factors() -> None:
+        left = Lattices.A2
+>       right = Lattices.A3
+                ^^^^^^^^^^^
+E       AttributeError: type object 'Lattices' has no attribute 'A3'. Did you mean: 'A1'?
+
+tests/forms/test_discriminant_normal_forms_archive.sage:51: AttributeError
+__________ test_discriminant_group_order_is_absolute_gram_determinant __________
+
+    def test_discriminant_group_order_is_absolute_gram_determinant() -> None:
+        for lattice in (
+            Lattices.A2,
+>           Lattices.A3,
+            ^^^^^^^^^^^
+            Lattices.D4,
+            Lattices.D5,
+            Lattices.E6,
+            Lattices.E7,
+            Lattices.E8,
+            Lattices.U,
+            Lattices.U_2,
+            Lattices.TEn,
+            Lattices.LK3,
+        ):
+E       AttributeError: type object 'Lattices' has no attribute 'A3'. Did you mean: 'A1'?
+
+tests/forms/test_discriminant_oracles_archive.sage:31: AttributeError
+_______ test_discriminant_bilinear_form_is_inverse_gram_modulo_integers ________
+
+    def test_discriminant_bilinear_form_is_inverse_gram_modulo_integers() -> None:
+        for lattice in (Lattices.A2, Lattices.D4, Lattices.E7, Lattices.U_2):
+            # The Gram matrix of L^# in the dual basis is G^{-1}, and A_L is generated
+            # by the classes of that dual basis, so b_A([x], [y]) = b(x, y) mod ZZ there.
+            dual = lattice.dual_lattice()
+>           assert dual.gram_matrix() == lattice.gram_matrix().inverse()
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/forms/test_discriminant_oracles_archive.sage:64: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Generic endomorphism of Free module on {[0], [1]} over Integer Ring
+
+    def inverse(self):
+        r"""Return the two-sided inverse in the same module category.
+    
+        An inverse of ``f : M -> N`` in ``R``-modules is a morphism
+        ``N -> M`` over the same coefficient ring ``R``.  A coordinate matrix
+        may be invertible after scalar extension without ``f`` being an
+        isomorphism in ``R``-modules; that fraction-field inverse is a different
+        construction and is never returned here.
+        """
+        self._require_established_linearity("module-morphism inversion")
+        if self.domain() is self.codomain() and _has_finite_free_framing(self.domain()) and self.domain().base_ring().is_integral_domain() is False:
+            return self._inverse_over_a_ring_with_zero_divisors()
+        assert self.is_injective(), (
+            f"{self.domain()} -> {self.codomain()} has no inverse: it is not injective"
+        )
+>       assert self.is_surjective(), (
+               ^^^^^^^^^^^^^^^^^^^^
+            f"{self.domain()} -> {self.codomain()} has no inverse: it is not surjective"
+        )
+E       AssertionError: Free module on {[0], [1]} over Integer Ring -> Free module on {[0], [1]} over Integer Ring has no inverse: it is not surjective
+
+src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py:2759: AssertionError
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:833 Elementwise module morphism Module over Fraction Field of Integer Ring on Classes in the multilinear tensor presentation -> Module over Fraction Field of Integer Ring on Fraction Field of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+______ test_primary_components_have_the_prime_power_orders_and_exhaust_a5 ______
+
+    def test_primary_components_have_the_prime_power_orders_and_exhaust_a5() -> None:
+>       form = Lattices.A5.discriminant_group()
+               ^^^^^^^^^^^
+E       AttributeError: type object 'Lattices' has no attribute 'A5'. Did you mean: 'A1'?
+
+tests/forms/test_discriminant_oracles_archive.sage:74: AttributeError
+___ test_brown_invariant_of_the_D4_discriminant_form_is_its_signature_mod_8 ____
+
+    def test_brown_invariant_of_the_D4_discriminant_form_is_its_signature_mod_8() -> None:
+        r"""Milgram: ``Br(q_{D4}) = sign(D4) mod 8``; ``A_{D4} = (Z/2)^2`` is anisotropic.
+    
+        The three nonzero classes all have ``q = 1 mod 2Z``, so the Gauss sum is
+        ``(1 - 3)/2 = -1 = exp(2 pi i * 4/8)``, and ``sign(D4) = +-4``.
+        """
+        lattice = Lattices(ZZ)("D4")
+        form = lattice.discriminant_quadratic_form()
+        positive, negative = lattice.signature_pair()
+    
+        assert form.cardinality() == 4
+>       assert form.brown_invariant() == (int(positive) - int(negative)) % 8
+               ^^^^^^^^^^^^^^^^^^^^^^
+
+tests/forms/test_discriminant_quadratic_archive_surface.sage:17: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/misc/cachefunc.pyx:2328: in sage.misc.cachefunc.CachedMethodCallerNoArgs.__call__
+    ???
+src/sage_extensions/categories/modules/framed/formed/form_modules.py:3967: in brown_invariant
+    assert self.is_nondegenerate(), (
+           ^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/framed/formed/form_modules.py:2060: in is_nondegenerate
+    return self._nondegeneracy_decision()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:2328: in sage.misc.cachefunc.CachedMethodCallerNoArgs.__call__
+    ???
+src/sage_extensions/categories/modules/framed/formed/form_modules.py:2074: in _nondegeneracy_decision
+    (self.left_curry().is_injective(), self.right_curry().is_injective())
+     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py:1820: in is_injective
+    return self.kernel().is_zero()
+           ^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:2328: in sage.misc.cachefunc.CachedMethodCallerNoArgs.__call__
+    ???
+src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py:1528: in kernel
+    return self._kernel_through_generator_evaluation()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py:1579: in _kernel_through_generator_evaluation
+    pair: cyclic.framing_morphism().lift(cyclic.inclusion().lift(value))(cyclic_label)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Generic morphism:
+  From: Finitely presented module on 1 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 2]
+  To:   Fraction Field of Integer Ring / (1)Integer Ring
+element = [(1)/(2)] in Fraction Field of Integer Ring / (1)Integer Ring
+
+    def lift(self, element):
+        r"""Return a selected preimage of ``element``; reject an element outside the image with ``ValueError``.
+    
+        Along the codomain's own framing ``F(S) ->> M`` -- the augmentation of
+        its chosen resolution, the identity when ``M`` is its own framing
+        source -- the preimage is the one the codomain's construction chose,
+        read through its ``_framing_lift`` contract rather than solved for.
+        """
+        codomain = self.codomain()
+        match codomain.has_selected_module_resolution() and self is codomain.framing_morphism():
+            case True:
+                return codomain._framing_lift(codomain(element))
+            case False:
+                pass
+        preimage = self._preimage_or_none(element)
+        if preimage is None:
+>           raise ValueError(f"{element} is not in the image of {self}")
+E           ValueError: [(1)/(2)] in Fraction Field of Integer Ring / (1)Integer Ring is not in the image of Generic morphism:
+E             From: Finitely presented module on 1 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 2]
+E             To:   Fraction Field of Integer Ring / (1)Integer Ring
+
+src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py:2124: ValueError
+__________ test_a1_four_has_diagonal_lagrangian_and_primary_component __________
+
+    def test_a1_four_has_diagonal_lagrangian_and_primary_component() -> None:
+        a1 = Lattices(ZZ)("A1")
+        discriminant = (a1 + a1 + a1 + a1).discriminant_module()
+        diagonal = sum(discriminant.smith_form_module_generators(), discriminant.zero())
+        subgroup = discriminant.subgroup_on((diagonal,))
+    
+        assert subgroup.cardinality() == 2
+        assert subgroup.is_isotropic()
+        assert discriminant.orthogonal_subgroup(subgroup).cardinality() == 8
+        components = discriminant.primary_components()
+>       assert tuple(components) == (ZZ(2),)
+E       assert (Finitely pre... ↦ 2, 3 ↦ 2],) == (2,)
+E         
+E         At index 0 diff: Finitely presented module on 4 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 2, 1 ↦ 2, 2 ↦ 2, 3 ↦ 2] != 2
+E         Use -v to get more diff
+
+tests/forms/test_discriminant_subgroups.sage:35: AssertionError
+______________ test_brown_invariant_is_the_exact_gauss_sum_phase _______________
+
+    def test_brown_invariant_is_the_exact_gauss_sum_phase() -> None:
+        positive = Lattices(ZZ)([[2]]).discriminant_quadratic_form()
+        negative = Lattices(ZZ)([[-2]]).discriminant_quadratic_form()
+    
+>       assert positive.brown_invariant() == 1
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/forms/test_discriminant_subgroups.sage:109: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/misc/cachefunc.pyx:2328: in sage.misc.cachefunc.CachedMethodCallerNoArgs.__call__
+    ???
+src/sage_extensions/categories/modules/framed/formed/form_modules.py:3967: in brown_invariant
+    assert self.is_nondegenerate(), (
+           ^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/framed/formed/form_modules.py:2060: in is_nondegenerate
+    return self._nondegeneracy_decision()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:2328: in sage.misc.cachefunc.CachedMethodCallerNoArgs.__call__
+    ???
+src/sage_extensions/categories/modules/framed/formed/form_modules.py:2074: in _nondegeneracy_decision
+    (self.left_curry().is_injective(), self.right_curry().is_injective())
+     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py:1820: in is_injective
+    return self.kernel().is_zero()
+           ^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:2328: in sage.misc.cachefunc.CachedMethodCallerNoArgs.__call__
+    ???
+src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py:1528: in kernel
+    return self._kernel_through_generator_evaluation()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py:1579: in _kernel_through_generator_evaluation
+    pair: cyclic.framing_morphism().lift(cyclic.inclusion().lift(value))(cyclic_label)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Generic morphism:
+  From: Finitely presented module on 1 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 2]
+  To:   Fraction Field of Integer Ring / (1)Integer Ring
+element = [(1)/(2)] in Fraction Field of Integer Ring / (1)Integer Ring
+
+    def lift(self, element):
+        r"""Return a selected preimage of ``element``; reject an element outside the image with ``ValueError``.
+    
+        Along the codomain's own framing ``F(S) ->> M`` -- the augmentation of
+        its chosen resolution, the identity when ``M`` is its own framing
+        source -- the preimage is the one the codomain's construction chose,
+        read through its ``_framing_lift`` contract rather than solved for.
+        """
+        codomain = self.codomain()
+        match codomain.has_selected_module_resolution() and self is codomain.framing_morphism():
+            case True:
+                return codomain._framing_lift(codomain(element))
+            case False:
+                pass
+        preimage = self._preimage_or_none(element)
+        if preimage is None:
+>           raise ValueError(f"{element} is not in the image of {self}")
+E           ValueError: [(1)/(2)] in Fraction Field of Integer Ring / (1)Integer Ring is not in the image of Generic morphism:
+E             From: Finitely presented module on 1 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 2]
+E             To:   Fraction Field of Integer Ring / (1)Integer Ring
+
+src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py:2124: ValueError
+________ test_milgram_compatibility_on_even_lattice_discriminant_forms _________
+
+    def test_milgram_compatibility_on_even_lattice_discriminant_forms() -> None:
+        lattices = (
+            Lattices(ZZ)([[2]]),
+            Lattices(ZZ)([[-2]]),
+            Lattices(ZZ)([[0, 2], [2, 0]]),
+            Lattices(ZZ)("A2"),
+        )
+        for lattice in lattices:
+            signature = lattice.signature_pair()
+            positive, negative = signature.first(), signature.second()
+>           signature = int(positive - negative)
+                            ^^^^^^^^^^^^^^^^^^^
+E           TypeError: unsupported operand type(s) for -: 'Cardinalities.parent_class' and 'Cardinalities.parent_class'
+
+tests/forms/test_discriminant_subgroups.sage:123: TypeError
+_______________ test_elementary_two_adic_u_k_and_v_one_examples ________________
+
+>   return self._cached_methods[name]
+E   KeyError: 'invariantfactors'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_elementary_two_adic_u_k_and_v_one_examples() -> None:
+        for exponent in (1, 2, 3):
+            scale = 2**exponent
+            u_k = Lattices(ZZ)([[0, scale], [scale, 0]]).discriminant_quadratic_form()
+>           factors = u_k.invariantfactors()
+                      ^^^^^^^^^^^^^^^^^^^^
+
+tests/forms/test_discriminant_subgroups.sage:131: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    return self.getattr_from_category(name)
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    attr = getattr_from_other_class(self, cls, name)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: 'OwnedJoinCategory.parent_class[_PresentedModule].ObjectType' object has no attribute 'invariantfactors'. Did you mean: 'invariant_factors'?
+
+sage/cpython/getattr.pyx:362: AttributeError
+___________ test_even_a2_has_the_integral_half_norm_quadratic_module ___________
+
+>   return self._cached_methods[name]
+E   KeyError: 'basis'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_even_a2_has_the_integral_half_norm_quadratic_module() -> None:
+        r"""``A2`` is even; ``q(x) = b(x, x)/2`` is integral, ``-1`` on the roots, and polarizes back to ``b``.
+    
+        In the negative-definite convention ``b(e_i, e_i) = -2`` and
+        ``b(e1, e2) = 1``, so ``q(e1 + e2) = (-2 + 2 - 2)/2 = -1``.
+        """
+        lattice = Lattices(ZZ)("A2")
+>       e1, e2 = lattice.basis()
+                 ^^^^^^^^^^^^^
+
+tests/forms/test_even_bilinear_quadratic_conversion.sage:13: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    return self.getattr_from_category(name)
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    attr = getattr_from_other_class(self, cls, name)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: 'OwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType' object has no attribute 'basis'. Did you mean: 'base'?
+
+sage/cpython/getattr.pyx:362: AttributeError
+_______ test_a_bilinear_form_is_determined_by_its_values_on_basis_pairs ________
+
+    def test_a_bilinear_form_is_determined_by_its_values_on_basis_pairs() -> None:
+        module = ZZ.free_module(2)
+        first, second = module.module_generators()
+>       form = module.bilinear_forms(QQ)([[QQ(1) / 2, 1], [0, 3]])
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/forms/test_extensional_forms.sage:24: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/modules/pure/modules.py:2162: in bilinear_forms
+    return self.bilinear_hom_space(value_module)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/pure/modules.py:2178: in bilinear_hom_space
+    return _bilinear_forms(self, _regular_module_reading(value_module))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/forms/forms.py:917: in _bilinear_forms
+    return Modules(module.base_ring()).Mor(tensor_product, value_module)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Category of modules over Integer Ring
+domain = Free module on {[(0, 0)], [(0, 1)], [(1, 0)], [(1, 1)]} over Integer Ring
+codomain = Free module on {[0]} over Fraction Field of Integer Ring
+
+    def Mor(self, domain, codomain):
+        r"""Return the unique Mor object ``Hom_R(domain,codomain)``."""
+        domain = self._mor_endpoint(domain)
+        codomain = self._mor_endpoint(codomain)
+        if domain not in self or codomain not in self:
+>           raise TypeError(
+                f"Mor({domain}, {codomain}) is not defined in {self}: both endpoints must be "
+                f"{self.base_ring()}-modules"
+            )
+E           TypeError: Mor(Free module on {[(0, 0)], [(0, 1)], [(1, 0)], [(1, 1)]} over Integer Ring, Free module on {[0]} over Fraction Field of Integer Ring) is not defined in Category of modules over Integer Ring: both endpoints must be Integer Ring-modules
+
+src/sage_extensions/categories/modules/pure/modules.py:1540: TypeError
+_________________ test_extensional_equality_of_bilinear_forms __________________
+
+    def test_extensional_equality_of_bilinear_forms() -> None:
+        module = ZZ.free_module(2)
+>       forms = module.bilinear_forms(QQ)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/forms/test_extensional_forms.sage:42: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/modules/pure/modules.py:2162: in bilinear_forms
+    return self.bilinear_hom_space(value_module)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/pure/modules.py:2178: in bilinear_hom_space
+    return _bilinear_forms(self, _regular_module_reading(value_module))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/forms/forms.py:917: in _bilinear_forms
+    return Modules(module.base_ring()).Mor(tensor_product, value_module)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Category of modules over Integer Ring
+domain = Free module on {[(0, 0)], [(0, 1)], [(1, 0)], [(1, 1)]} over Integer Ring
+codomain = Free module on {[0]} over Fraction Field of Integer Ring
+
+    def Mor(self, domain, codomain):
+        r"""Return the unique Mor object ``Hom_R(domain,codomain)``."""
+        domain = self._mor_endpoint(domain)
+        codomain = self._mor_endpoint(codomain)
+        if domain not in self or codomain not in self:
+>           raise TypeError(
+                f"Mor({domain}, {codomain}) is not defined in {self}: both endpoints must be "
+                f"{self.base_ring()}-modules"
+            )
+E           TypeError: Mor(Free module on {[(0, 0)], [(0, 1)], [(1, 0)], [(1, 1)]} over Integer Ring, Free module on {[0]} over Fraction Field of Integer Ring) is not defined in Category of modules over Integer Ring: both endpoints must be Integer Ring-modules
+
+src/sage_extensions/categories/modules/pure/modules.py:1540: TypeError
+________ test_a_quadratic_form_from_a_symmetric_lift_and_its_polar_form ________
+
+    def test_a_quadratic_form_from_a_symmetric_lift_and_its_polar_form() -> None:
+        module = ZZ.free_module(2)
+        first, second = module.module_generators()
+        form = module.quadratic_forms(QQ)([[1, QQ(1) / 2], [QQ(1) / 2, 2]])
+    
+        assert form(first) == 1
+        assert form(second) == 2
+        assert form(first + second) == 4
+        assert form(2 * first) == 4 * form(first)
+        assert form.polar_form()(first, second) == 1
+>       assert form.lift_form()(first, second) == QQ(1) / 2
+               ^^^^^^^^^^^^^^
+
+tests/forms/test_extensional_forms.sage:59: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/structure/element.pyx:494: in sage.structure.element.Element.__getattr__
+    ???
+sage/structure/element.pyx:507: in sage.structure.element.Element.getattr_from_category
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: 'OwnedQuadraticModuleMor_with_category_with_category.ArrowType' object has no attribute 'lift_form'
+
+sage/cpython/getattr.pyx:362: AttributeError
+_________________ test_a_quadratic_form_needs_a_symmetric_lift _________________
+
+    def test_a_quadratic_form_needs_a_symmetric_lift() -> None:
+        module = ZZ.free_module(2)
+    
+>       with pytest.raises(ValueError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+tests/forms/test_extensional_forms.sage:66: Failed
+_______________ test_pulling_back_a_form_along_the_diagonal_line _______________
+
+    def test_pulling_back_a_form_along_the_diagonal_line() -> None:
+        module = ZZ.free_module(2)
+        first, second = module.module_generators()
+        line = ZZ.free_module(1)
+        (generator,) = line.module_generators()
+        diagonal = line.Mor(module)((first + second,))
+>       bilinear = module.bilinear_forms(QQ)([[QQ(1) / 2, 1], [0, 3]])
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/forms/test_extensional_forms.sage:85: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/modules/pure/modules.py:2162: in bilinear_forms
+    return self.bilinear_hom_space(value_module)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/pure/modules.py:2178: in bilinear_hom_space
+    return _bilinear_forms(self, _regular_module_reading(value_module))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/forms/forms.py:917: in _bilinear_forms
+    return Modules(module.base_ring()).Mor(tensor_product, value_module)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Category of modules over Integer Ring
+domain = Free module on {[(0, 0)], [(0, 1)], [(1, 0)], [(1, 1)]} over Integer Ring
+codomain = Free module on {[0]} over Fraction Field of Integer Ring
+
+    def Mor(self, domain, codomain):
+        r"""Return the unique Mor object ``Hom_R(domain,codomain)``."""
+        domain = self._mor_endpoint(domain)
+        codomain = self._mor_endpoint(codomain)
+        if domain not in self or codomain not in self:
+>           raise TypeError(
+                f"Mor({domain}, {codomain}) is not defined in {self}: both endpoints must be "
+                f"{self.base_ring()}-modules"
+            )
+E           TypeError: Mor(Free module on {[(0, 0)], [(0, 1)], [(1, 0)], [(1, 1)]} over Integer Ring, Free module on {[0]} over Fraction Field of Integer Ring) is not defined in Category of modules over Integer Ring: both endpoints must be Integer Ring-modules
+
+src/sage_extensions/categories/modules/pure/modules.py:1540: TypeError
+_________ test_orthogonal_complement_of_the_diagonal_in_U_is_minus_two _________
+
+>   return self._cached_methods[name]
+E   KeyError: 'basis'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_orthogonal_complement_of_the_diagonal_in_U_is_minus_two() -> None:
+        r"""``<2> -> U``, ``v |-> e + f``, has complement ``Z(e - f) = <-2>``; together they have index 2.
+    
+        ``b(e + f, e - f) = 0`` and ``(e - f)^2 = -2``; ``det(<2> + <-2>) = -4``
+        against ``det U = -1``.
+        """
+        u = Lattices(ZZ)("U")
+        line = Lattices(ZZ)([[2]])
+>       e, f = u.basis()
+               ^^^^^^^
+
+tests/forms/test_form_embedding_orthogonal_archive.sage:14: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    return self.getattr_from_category(name)
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    attr = getattr_from_other_class(self, cls, name)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: 'OwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType' object has no attribute 'basis'. Did you mean: 'base'?
+
+sage/cpython/getattr.pyx:362: AttributeError
+______________________ test_a2_has_scale_zz_and_norm_2zz _______________________
+
+>   return self._cached_methods[name]
+E   KeyError: 'norm_submodule'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_a2_has_scale_zz_and_norm_2zz() -> None:
+        r"""$\mathfrak{s}(A_2) = \mathbb{Z}$ and $\mathfrak{n}(A_2) = 2\mathbb{Z}$; $\mathfrak{s}(\langle 2\rangle) = 2\mathbb{Z}$.
+    
+        The scale is generated by all values $b(x, y)$, the norm by the values
+        $b(x, x)$.  $A_2$ has Gram matrix $\begin{psmallmatrix}-2&1\\1&-2\end{psmallmatrix}$,
+        so it pairs to $1$ while every $b(x, x)$ is even.  Source: O'Meara,
+        *Introduction to Quadratic Forms*, §82E.
+        """
+        a2 = Lattices(ZZ)("A2")
+        two = Lattices(ZZ)([[2]])
+    
+        assert ZZ.one() in a2.scale_submodule()
+>       assert ZZ.one() not in a2.norm_submodule()
+                               ^^^^^^^^^^^^^^^^^
+
+tests/forms/test_form_value_image_archive.sage:18: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    return self.getattr_from_category(name)
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    attr = getattr_from_other_class(self, cls, name)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: 'OwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType' object has no attribute 'norm_submodule'. Did you mean: 'scale_submodule'?
+
+sage/cpython/getattr.pyx:362: AttributeError
+__________ test_the_lattice_2_plus_3_represents_2_3_5_and_not_1_or_4 ___________
+
+>   return self._cached_methods[name]
+E   KeyError: 'basis'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_the_lattice_2_plus_3_represents_2_3_5_and_not_1_or_4() -> None:
+        r"""``2a^2 + 3b^2``: norm 2 at ``(+-1, 0)``, 3 at ``(0, +-1)``, 5 at ``(+-1, +-1)``; never 1 or 4.
+    
+        ``2a^2 + 3b^2 = 4`` forces ``b = 0``, ``a^2 = 2``, or ``|b| = 1``, ``2a^2 = 1``.
+        """
+        lattice = Lattices(ZZ)([[2, 0], [0, 3]])
+>       e, f = lattice.basis()
+               ^^^^^^^^^^^^^
+
+tests/forms/test_formed_element_represents_archive.sage:12: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    return self.getattr_from_category(name)
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    attr = getattr_from_other_class(self, cls, name)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: 'OwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType' object has no attribute 'basis'. Did you mean: 'base'?
+
+sage/cpython/getattr.pyx:362: AttributeError
+_______ test_a1_plus_a1_decomposes_orthogonally_but_a2_is_indecomposable _______
+
+    def test_a1_plus_a1_decomposes_orthogonally_but_a2_is_indecomposable() -> None:
+        r"""A definite lattice is uniquely an orthogonal sum of indecomposables.
+    
+        $A_1 \oplus A_1$ has two summands, each isometric to $A_1$; the root
+        lattice $A_2$ is indecomposable, although it contains $A_1$.  Source:
+        Kneser, *Quadratische Formen*, Satz 27.2 (Eichler).
+        """
+        a1 = Lattices(ZZ)("A1")
+        a2 = Lattices(ZZ)("A2")
+>       summands = (a1 + a1).orthogonal_decomposition()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: Lattices.ParentMethods.orthogonal_decomposition() missing 1 required positional argument: 'embeddings'
+
+tests/forms/test_gram_graph_archive.sage:15: TypeError
+_______ test_the_standard_form_on_a_countable_free_module_is_not_perfect _______
+
+    def test_the_standard_form_on_a_countable_free_module_is_not_perfect() -> None:
+        r"""On $V = \mathbb{Q}^{(\mathbb{N})}$ with $b(e_i, e_j) = \delta_{ij}$, $V \to V^*$ is injective, not surjective.
+    
+        The image of $v$ is the functional $b(v, -)$, which vanishes on all but
+        finitely many $e_i$; the functional sending every $e_i$ to $1$ is not of
+        that form.  Source: Jacobson, *Lectures in Abstract Algebra* II, IX.5.
+        """
+        module = QQ.free_module(NN)
+>       formed = module.equip_bilinear_form(QQ, lambda i, j: QQ.one() if i == j else QQ.zero())
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: Modules.ParentMethods.equip_bilinear_form() takes 2 positional arguments but 3 were given
+
+tests/forms/test_infinite_form_duality.sage:14: TypeError
+_________ test_u_is_unimodular_but_the_form_two_is_only_nondegenerate __________
+
+    def test_u_is_unimodular_but_the_form_two_is_only_nondegenerate() -> None:
+        r"""The correlation $L \to L^\vee$ of $U$ is an isomorphism; that of $\langle 2\rangle$ has cokernel of order $2$.
+    
+        The cokernel of the correlation has order $|\det L|$, and
+        $\det U = -1$, $\det\langle 2\rangle = 2$.
+        """
+        hyperbolic = Lattices(ZZ)("U")
+        two = Lattices(ZZ)([[2]])
+    
+>       assert hyperbolic.correlation_morphism().is_isomorphism()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/forms/test_infinite_form_duality.sage:35: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/structure/element.pyx:494: in sage.structure.element.Element.__getattr__
+    ???
+sage/structure/element.pyx:507: in sage.structure.element.Element.getattr_from_category
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: 'OwnedModuleMor_with_category_with_category.ArrowType' object has no attribute 'is_isomorphism'. Did you mean: 'as_isomorphism'?
+
+sage/cpython/getattr.pyx:362: AttributeError
+__ test_the_holder_pairing_of_the_gaussian_in_l1_and_linf_is_root_pi_over_two __
+
+>   return self.cache[k]
+E   KeyError: (('infinity',), 93068464, 93068464)
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_the_holder_pairing_of_the_gaussian_in_l1_and_linf_is_root_pi_over_two() -> None:
+        r"""$\int_{\mathbb{R}} e^{-x^2} e^{-x^2}\,dx = \int_{\mathbb{R}} e^{-2x^2}\,dx = \sqrt{\pi/2}$."""
+>       maps = C(oo, RR, RR)
+               ^^^^^^^^^^^^^
+
+tests/forms/test_paired_modules.sage:8: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/functions/real_functions.py:750: in __call__
+    return _differentiability_class(_regularity(k), domain, codomain)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:1029: in sage.misc.cachefunc.CachedFunction.__call__
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+regularity = +Infinity, domain = Real Field, codomain = Real Field
+
+    @cached_function(key=lambda regularity, domain, codomain: (_exponent_key(regularity), id(domain), id(codomain)))
+    def _differentiability_class(regularity, domain, codomain):
+        r"""Build \(C^k(X,Y)\) as a condition submodule of \(Y^X\); for \(Y=\mathbb R\), the algebra on it."""
+>       assert codomain in VectorSpaces(RR), (
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            f"C^k(X, Y) is a real vector space of maps, so Y must be a real vector space, but {codomain} is not"
+        )
+E       AssertionError: C^k(X, Y) is a real vector space of maps, so Y must be a real vector space, but Real Field is not
+
+src/sage_extensions/categories/functions/real_functions.py:708: AssertionError
+_________ test_the_l2_norm_squared_of_the_gaussian_is_root_pi_over_two _________
+
+>   return self.cache[k]
+E   KeyError: (('finite', 2), 93068464, 93068464)
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_the_l2_norm_squared_of_the_gaussian_is_root_pi_over_two() -> None:
+        r"""$\|e^{-x^2}\|_2^2 = \int_{\mathbb{R}} e^{-2x^2}\,dx = \sqrt{\pi/2}$, and $q(f) = b(f, f)$."""
+>       space = Lp(2, RR, RR)
+                ^^^^^^^^^^^^^^
+
+tests/forms/test_paired_modules.sage:18: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/functions/real_functions.py:894: in Lp
+    return _lebesgue_space(_integrability(p), domain, codomain)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:1029: in sage.misc.cachefunc.CachedFunction.__call__
+    w = self.f(*args, **kwds)
+src/sage_extensions/categories/functions/real_functions.py:889: in _lebesgue_space
+    return SymmetricBilinearFormModules(RR)(module.bilinear_forms(RR)(_l2_pairing))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/sage/.venv/lib/python3.14/site-packages/sage/categories/category.py:592: in __call__
+    return self._call_(x, *args, **opts)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Category of symmetric modules with a bilinear form over Real Field
+x = Generic morphism:
+  From: Module over Real Field on Classes in the multilinear tensor presentation
+  To:   Real Field
+
+    def _call_(self, x):
+        """
+        Construct an object in this category from the data in ``x``,
+        or throw :exc:`NotImplementedError`.
+    
+        EXAMPLES::
+    
+            sage: Semigroups()._call_(3)
+            Traceback (most recent call last):
+            ...
+            NotImplementedError
+        """
+>       raise NotImplementedError
+E       NotImplementedError
+
+/sage/.venv/lib/python3.14/site-packages/sage/categories/category.py:606: NotImplementedError
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Real Field retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Real Field retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:833 Elementwise module morphism Module over Real Field on Classes in the multilinear tensor presentation -> Real Field accepted without exhaustive linearity verification; the source is not represented as finite
+_ test_the_holder_pairing_of_a_geometric_sequence_with_the_constant_one_is_two _
+
+    def test_the_holder_pairing_of_a_geometric_sequence_with_the_constant_one_is_two() -> None:
+        r"""$\sum_{n \ge 0} 2^{-n} \cdot 1 = 2$ and $\sum_{n \ge 0} (2^{-n})^2 = 4/3$."""
+>       a(k) = 2^(-k)
+                      
+
+tests/forms/test_paired_modules.sage:29: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/structure/element.pyx:2048: in sage.structure.element.Element.__pow__
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   TypeError: unsupported operand parent(s) for ^: 'Integer Ring' and 'Symbolic Ring'
+
+sage/structure/coerce.pyx:1297: TypeError
+__ test_rank_one_2adic_quadratic_refinement_cuts_the_orthogonal_group_in_half __
+
+    def test_rank_one_2adic_quadratic_refinement_cuts_the_orthogonal_group_in_half() -> None:
+        lattice = Lattices(ZZ)([[ZZ(8)]])
+        quadratic = lattice.discriminant_group()
+        bilinear = quadratic.associated_bilinear_form()
+    
+        assert tuple(quadratic.invariants()) == (ZZ(8),)
+        assert tuple(bilinear.invariants()) == (ZZ(8),)
+>       assert quadratic.brown_invariant() == 1
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/forms/test_rank_one_2adic_orthogonal_groups_archive.sage:21: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/misc/cachefunc.pyx:2328: in sage.misc.cachefunc.CachedMethodCallerNoArgs.__call__
+    self.cache = f(self._instance)
+src/sage_extensions/categories/modules/framed/formed/form_modules.py:3967: in brown_invariant
+    assert self.is_nondegenerate(), (
+           ^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/framed/formed/form_modules.py:2060: in is_nondegenerate
+    return self._nondegeneracy_decision()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:2328: in sage.misc.cachefunc.CachedMethodCallerNoArgs.__call__
+    self.cache = f(self._instance)
+src/sage_extensions/categories/modules/framed/formed/form_modules.py:2074: in _nondegeneracy_decision
+    (self.left_curry().is_injective(), self.right_curry().is_injective())
+     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py:1820: in is_injective
+    return self.kernel().is_zero()
+           ^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:2328: in sage.misc.cachefunc.CachedMethodCallerNoArgs.__call__
+    self.cache = f(self._instance)
+src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py:1528: in kernel
+    return self._kernel_through_generator_evaluation()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py:1579: in _kernel_through_generator_evaluation
+    pair: cyclic.framing_morphism().lift(cyclic.inclusion().lift(value))(cyclic_label)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Generic morphism:
+  From: Finitely presented module on 1 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 8]
+  To:   Fraction Field of Integer Ring / (1)Integer Ring
+element = [(1)/(8)] in Fraction Field of Integer Ring / (1)Integer Ring
+
+    def lift(self, element):
+        r"""Return a selected preimage of ``element``; reject an element outside the image with ``ValueError``.
+    
+        Along the codomain's own framing ``F(S) ->> M`` -- the augmentation of
+        its chosen resolution, the identity when ``M`` is its own framing
+        source -- the preimage is the one the codomain's construction chose,
+        read through its ``_framing_lift`` contract rather than solved for.
+        """
+        codomain = self.codomain()
+        match codomain.has_selected_module_resolution() and self is codomain.framing_morphism():
+            case True:
+                return codomain._framing_lift(codomain(element))
+            case False:
+                pass
+        preimage = self._preimage_or_none(element)
+        if preimage is None:
+>           raise ValueError(f"{element} is not in the image of {self}")
+E           ValueError: [(1)/(8)] in Fraction Field of Integer Ring / (1)Integer Ring is not in the image of Generic morphism:
+E             From: Finitely presented module on 1 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 8]
+E             To:   Fraction Field of Integer Ring / (1)Integer Ring
+
+src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py:2124: ValueError
+_ test_the_negative_twist_of_the_a2_discriminant_form_negates_its_brown_invariant _
+
+    def test_the_negative_twist_of_the_a2_discriminant_form_negates_its_brown_invariant() -> None:
+        r"""$q_{A_2}$ on $\mathbb{Z}/3$ is $4/3 \bmod 2$; its $(-1)$-twist is $2/3 \bmod 2$, the form of $A_2(-1)$.
+    
+        $A_2$ is negative definite here, so by Milgram's formula its discriminant
+        form has Brown invariant $\operatorname{sign} = -2 \equiv 6 \pmod 8$, and
+        the twist has Brown invariant $2$.  Both orthogonal groups are $\{\pm 1\}$.
+        Source: Milnor–Husemoller, *Symmetric Bilinear Forms*, Appendix 4.
+        """
+        a2 = Lattices(ZZ)("A2")
+        form = a2.discriminant_quadratic_form()
+        twisted = form.twist(-1)
+        generator = form.module_generator(0)
+        values = form.value_module()
+    
+        assert form.cardinality() == 3
+        assert form.q(generator) == values(QQ(4) / 3)
+        assert twisted.q(twisted.module_generator(0)) == twisted.value_module()(QQ(2) / 3)
+>       assert form.brown_invariant() == 6
+               ^^^^^^^^^^^^^^^^^^^^^^
+
+tests/forms/test_torsion_form_twist_functor.sage:23: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/misc/cachefunc.pyx:2328: in sage.misc.cachefunc.CachedMethodCallerNoArgs.__call__
+    self.cache = f(self._instance)
+src/sage_extensions/categories/modules/framed/formed/form_modules.py:3967: in brown_invariant
+    assert self.is_nondegenerate(), (
+           ^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/framed/formed/form_modules.py:2060: in is_nondegenerate
+    return self._nondegeneracy_decision()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:2328: in sage.misc.cachefunc.CachedMethodCallerNoArgs.__call__
+    self.cache = f(self._instance)
+src/sage_extensions/categories/modules/framed/formed/form_modules.py:2074: in _nondegeneracy_decision
+    (self.left_curry().is_injective(), self.right_curry().is_injective())
+     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py:1820: in is_injective
+    return self.kernel().is_zero()
+           ^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:2328: in sage.misc.cachefunc.CachedMethodCallerNoArgs.__call__
+    self.cache = f(self._instance)
+src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py:1528: in kernel
+    return self._kernel_through_generator_evaluation()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py:1579: in _kernel_through_generator_evaluation
+    pair: cyclic.framing_morphism().lift(cyclic.inclusion().lift(value))(cyclic_label)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Generic morphism:
+  From: Finitely presented module on 1 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 3]
+  To:   Fraction Field of Integer Ring / (1)Integer Ring
+element = [(1)/(3)] in Fraction Field of Integer Ring / (1)Integer Ring
+
+    def lift(self, element):
+        r"""Return a selected preimage of ``element``; reject an element outside the image with ``ValueError``.
+    
+        Along the codomain's own framing ``F(S) ->> M`` -- the augmentation of
+        its chosen resolution, the identity when ``M`` is its own framing
+        source -- the preimage is the one the codomain's construction chose,
+        read through its ``_framing_lift`` contract rather than solved for.
+        """
+        codomain = self.codomain()
+        match codomain.has_selected_module_resolution() and self is codomain.framing_morphism():
+            case True:
+                return codomain._framing_lift(codomain(element))
+            case False:
+                pass
+        preimage = self._preimage_or_none(element)
+        if preimage is None:
+>           raise ValueError(f"{element} is not in the image of {self}")
+E           ValueError: [(1)/(3)] in Fraction Field of Integer Ring / (1)Integer Ring is not in the image of Generic morphism:
+E             From: Finitely presented module on 1 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 3]
+E             To:   Fraction Field of Integer Ring / (1)Integer Ring
+
+src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py:2124: ValueError
+____ test_the_discriminant_quadratic_form_of_two_plus_one_is_one_half_on_z2 ____
+
+    def test_the_discriminant_quadratic_form_of_two_plus_one_is_one_half_on_z2() -> None:
+        r"""$\langle 2\rangle \oplus \langle 1\rangle$ has discriminant quadratic form $q = 1/2 \bmod 2$ on $\mathbb{Z}/2$."""
+>       form = Lattices(ZZ)([[2, 0], [0, 1]]).discriminant_quadratic_form()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/forms/test_torsion_forms.sage:23: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/misc/cachefunc.pyx:2328: in sage.misc.cachefunc.CachedMethodCallerNoArgs.__call__
+    self.cache = f(self._instance)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Integral lattice of rank 2 and signature (2, 0)
+
+    @cached_method
+    def discriminant_quadratic_form(self):
+        r"""Return ``A_L`` with its ``K/2R``-valued quadratic form when ``L`` is even."""
+    
+        if not self.is_even():
+>           raise ValueError(
+                f"{self!r} has no discriminant quadratic form: q_L: A_L -> Q/2Z is defined only for an even lattice, and {self!r} is odd; use discriminant_bilinear_form"
+            )
+E           ValueError: Integral lattice of rank 2 and signature (2, 0) has no discriminant quadratic form: q_L: A_L -> Q/2Z is defined only for an even lattice, and Integral lattice of rank 2 and signature (2, 0) is odd; use discriminant_bilinear_form
+
+src/sage_extensions/categories/lattices.py:8099: ValueError
+====================== test lint: 94 findings in 10 files ======================
+tests/forms/test_all_ones_form_correlation.sage:13: TL01 from sage_extensions.categories._lattice import ...: take every name from the session
+tests/forms/test_all_ones_form_correlation.sage:13: TL02 imports the private name _DiagonalGram
+tests/forms/test_all_ones_form_correlation.sage:14: TL01 from sage_extensions.categories.modules.framed.formed.form_modules import ...: take every name from the session
+tests/forms/test_all_ones_form_correlation.sage:15: TL01 from sage_extensions.categories.modules.hodge import ...: take every name from the session
+tests/forms/test_all_ones_form_correlation.sage:15: TL02 imports the private name _attach_diagonal_correlation_witness
+tests/forms/test_all_ones_form_correlation.sage:18: TL01 from sage_extensions.categories.modules.pure.modules import ...: take every name from the session
+tests/forms/test_all_ones_form_correlation.sage:63: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_all_ones_form_correlation.sage:70: TL03 vars(): introspection is not mathematics
+tests/forms/test_all_ones_form_correlation.sage:76: TL03 vars(): introspection is not mathematics
+tests/forms/test_degenerate_restrictions_and_subquotients.sage:17: TL01 from itertools import ...: take every name from the session
+tests/forms/test_degenerate_restrictions_and_subquotients.sage:20: TL01 from sage_extensions.categories.modules.framed.formed.torsion_form_modules import ...: take every name from the session
+tests/forms/test_degenerate_restrictions_and_subquotients.sage:20: TL02 imports the private name _torsion_form_orthogonal_subobject
+tests/forms/test_degenerate_restrictions_and_subquotients.sage:20: TL02 imports the private name _torsion_form_subquotient
+tests/forms/test_degenerate_restrictions_and_subquotients.sage:26: TL01 from sage.matrix.constructor import ...: take every name from the session
+tests/forms/test_degenerate_restrictions_and_subquotients.sage:27: TL01 from sage.rings.integer_ring import ...: take every name from the session
+tests/forms/test_degenerate_restrictions_and_subquotients.sage:42: TL10 len(): ask for a cardinality
+tests/forms/test_degenerate_restrictions_and_subquotients.sage:42: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/forms/test_degenerate_restrictions_and_subquotients.sage:43: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/forms/test_degenerate_restrictions_and_subquotients.sage:99: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_formed_radical_archive.sage:36: TL02 private attribute ._element_of_unformed_module
+tests/forms/test_formed_radical_archive.sage:68: TL07 pytest.raises(match=...): matches an error message
+tests/forms/test_formed_radical_archive.sage:146: TL02 private attribute ._preamble_radical_quotient_basis_map
+tests/forms/test_formed_radical_archive.sage:176: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/forms/test_formed_radical_archive.sage:201: TL02 private attribute ._preamble_radical_quotient_basis_map
+tests/forms/test_formed_radical_archive.sage:202: TL02 private attribute ._preamble_radical_quotient_cokernel_projection
+tests/forms/test_formed_radical_archive.sage:250: TL02 private attribute ._preamble_radical_quotient_basis_map
+tests/forms/test_formed_radical_archive.sage:251: TL02 private attribute ._preamble_radical_quotient_cokernel_projection
+tests/forms/test_formed_radical_archive.sage:278: TL08 FramedFreeModules: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/forms/test_formed_radical_archive.sage:287: TL02 private attribute ._preamble_radical_quotient_basis_map
+tests/forms/test_formed_radical_archive.sage:288: TL02 private attribute ._preamble_radical_quotient_cokernel_projection
+tests/forms/test_isometry_between_torsion_forms.sage:23: TL01 from sage_extensions.categories.modules.framed.formed import ...: take every name from the session
+tests/forms/test_isometry_between_torsion_forms.sage:27: TL01 from sage_extensions.categories.modules.framed.formed.torsion_form_modules import ...: take every name from the session
+tests/forms/test_isometry_between_torsion_forms.sage:30: TL01 from sage_extensions.categories.modules.framed.fraction_field_quotients import ...: take every name from the session
+tests/forms/test_isometry_between_torsion_forms.sage:59: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_isometry_between_torsion_forms.sage:95: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_isometry_between_torsion_forms.sage:109: TL09 an assertion that holds of anything
+tests/forms/test_isometry_between_torsion_forms.sage:124: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_isometry_between_torsion_forms.sage:155: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_orbit_and_profile_radical_isometry.sage:25: TL01 from sage_extensions.categories.modules.framed.formed import ...: take every name from the session
+tests/forms/test_orbit_and_profile_radical_isometry.sage:29: TL01 from sage_extensions.categories.modules.framed.formed.torsion_form_modules import ...: take every name from the session
+tests/forms/test_orbit_and_profile_radical_isometry.sage:32: TL01 from sage_extensions.categories.modules.framed.fraction_field_quotients import ...: take every name from the session
+tests/forms/test_orbit_and_profile_radical_isometry.sage:66: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_orbit_and_profile_radical_isometry.sage:89: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_orbit_and_profile_radical_isometry.sage:116: TL05 test_a_refused_witness_is_undecided_never_false takes the monkeypatch fixture
+tests/forms/test_orbit_and_profile_radical_isometry.sage:128: TL01 from sage_extensions.categories.modules.framed.formed import ...: take every name from the session
+tests/forms/test_orbit_and_profile_radical_isometry.sage:143: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_orbit_and_profile_radical_isometry.sage:151: TL05 monkeypatch: mocks prove nothing about the real objects
+tests/forms/test_orbit_and_profile_radical_isometry.sage:154: TL07 pytest.raises(match=...): matches an error message
+tests/forms/test_orbit_and_profile_radical_isometry.sage:157: TL02 private attribute ._radical_isometry_decision
+tests/forms/test_orbit_and_profile_radical_isometry.sage:222: TL07 pytest.raises(match=...): matches an error message
+... and 44 more (just test-lint lists them)
+=============================== time-gate report ===============================
+collection took 52.78 s; the measured ceiling is 6 s
+============================== slowest durations ===============================
+9.29s call     tests/forms/test_a_torsion_cokernel_carries_its_torsion_forms.sage::test_the_orthogonal_quotient_of_a_discriminant_form_is_a_torsion_form
+8.02s call     tests/forms/test_discriminant_oracles_archive.sage::test_root_lattice_discriminant_groups_are_the_classical_ones
+4.73s call     tests/forms/test_integer_valued_elementary_two_form_groups.sage::test_the_actual_generated_group_preserves_the_complete_form[hyperbolic-plane]
+4.38s call     tests/forms/test_torsion_forms.sage::test_the_bilinear_discriminant_form_of_u2_is_metabolic_with_orthogonal_group_s3
+4.15s call     tests/forms/test_integer_valued_elementary_two_form_groups.sage::test_the_actual_generated_group_preserves_the_complete_form[minus-four]
+3.93s call     tests/forms/test_discriminant_normal_forms_archive.sage::test_archived_discriminant_normal_form_is_an_actual_form_isometry
+3.75s call     tests/forms/test_integer_valued_elementary_two_form_groups.sage::test_the_actual_generated_group_preserves_the_complete_form[plus-four]
+2.46s call     tests/forms/test_torsion_form_subobjects_archive.sage::test_the_bilinear_discriminant_form_of_u2_has_three_maximal_isotropic_subgroups
+2.43s call     tests/forms/test_a_torsion_cokernel_carries_its_torsion_forms.sage::test_the_half_form_on_z2_has_its_two_primary_part
+2.32s call     tests/forms/test_discriminant_subgroups.sage::test_orthogonal_quotient_and_overlattice_are_the_nikulin_pair
+2.03s call     tests/forms/test_maximal_isotropic_archive.sage::test_u2_bilinear_form_has_three_maximal_isotropic_lines
+1.86s call     tests/forms/test_torsion_forms.sage::test_the_bilinear_orthogonal_group_of_z8_is_larger_than_the_quadratic_one
+1.83s call     tests/forms/test_discriminant_subgroups.sage::test_a1_four_has_diagonal_lagrangian_and_primary_component
+1.77s call     tests/forms/test_torsion_form_subobjects_archive.sage::test_the_quadratic_discriminant_form_of_u2_has_two_maximal_isotropic_subgroups
+1.33s call     tests/forms/test_gram_graph_blocks.sage::test_the_gram_graph_of_a2_plus_a1
+1.24s call     tests/forms/test_discriminant_subgroups.sage::test_local_modification_is_exactly_p_primary_isotropic_glue
+1.01s call     tests/forms/test_torsion_forms.sage::test_mixed_prime_jordan_framing_is_distinct_and_has_an_explicit_isometry
+0.98s call     tests/forms/test_torsion_forms.sage::test_the_discriminant_bilinear_form_of_two_plus_one_is_cyclic_of_order_two
+0.97s call     tests/forms/test_discriminant_subgroups.sage::test_hyperbolic_discriminant_pair_has_lagrangian
+0.97s call     tests/forms/test_a_torsion_cokernel_carries_its_torsion_forms.sage::test_the_one_third_form_on_z3_twists_by_a_negative_unit
+0.94s call     tests/forms/test_integer_valued_elementary_two_form_groups.sage::test_the_actual_generated_group_preserves_the_complete_form[anisotropic-plane]
+0.78s call     tests/forms/test_normalization_of_a_core_isometry.sage::test_normalization_preserves_triality_and_its_inverse
+0.59s call     tests/forms/test_discriminant_quadratic_archive_surface.sage::test_brown_invariant_of_the_D4_discriminant_form_is_its_signature_mod_8
+0.58s call     tests/forms/test_metabolizers_archive.sage::test_u2_quadratic_and_bilinear_forms_have_actual_metabolizers
+0.50s call     tests/forms/test_discriminant_subgroups.sage::test_discriminant_pairing_identifies_the_group_with_its_pontryagin_dual
+0.46s call     tests/forms/test_maximal_isotropic_archive.sage::test_u2_quadratic_maximal_isotropic_subgroups_are_its_two_lagrangians
+0.44s call     tests/forms/test_torsion_forms.sage::test_the_orthogonal_group_of_the_discriminant_form_of_eight_has_order_two
+0.42s call     tests/forms/test_bilinear_form_descent.sage::test_a_rational_valued_form_descends_to_the_quotient_by_its_radical
+0.39s call     tests/forms/test_the_d4_discriminant_form_and_its_finite_action.sage::test_the_d4_discriminant_form_builds_and_its_polar_pairing_has_trivial_radical
+0.39s call     tests/forms/test_metabolizers_archive.sage::test_anisotropic_a1_discriminant_has_no_metabolizer
+0.39s call     tests/forms/test_discriminant_subgroups.sage::test_a2_discriminant_form_is_anisotropic_and_not_metabolic
+0.34s call     tests/forms/test_torsion_forms.sage::test_bilinear_jordan_form_preserves_the_pairing
+0.32s call     tests/forms/test_bilinear_form_descent.sage::test_descent_checks_relations_after_projecting_form_values
+0.31s call     tests/forms/test_bilinear_form_descent.sage::test_the_descended_form_of_a_degenerate_lattice
+0.30s call     tests/forms/test_discriminant_subgroups.sage::test_brown_invariant_is_the_exact_gauss_sum_phase
+0.27s call     tests/forms/test_discriminant_convention_archive.sage::test_peters_sterk_example_1_6_9_uses_nikulins_quadratic_convention
+0.26s call     tests/forms/test_torsion_form_twist_functor.sage::test_the_negative_twist_of_the_a2_discriminant_form_negates_its_brown_invariant
+0.23s call     tests/forms/test_rank_one_2adic_orthogonal_groups_archive.sage::test_rank_one_2adic_quadratic_refinement_cuts_the_orthogonal_group_in_half
+0.21s call     tests/forms/test_the_d4_discriminant_form_and_its_finite_action.sage::test_the_orthogonal_group_of_the_d4_discriminant_form_acts_on_its_classes
+0.21s call     tests/forms/test_torsion_forms.sage::test_the_form_one_third_on_z3_is_anti_isometric_only_to_its_negative
+0.21s call     tests/forms/test_discriminant_subgroups.sage::test_unimodular_even_lattice_uses_generic_quadratic_descent
+0.20s call     tests/forms/test_discriminant_oracles_archive.sage::test_discriminant_bilinear_form_is_inverse_gram_modulo_integers
+0.16s setup    tests/forms/test_a_torsion_cokernel_carries_its_torsion_forms.sage::test_the_half_form_on_z2_has_its_two_primary_part
+0.16s call     tests/forms/test_bilinear_form_descent.sage::test_descent_pairing_is_defined_on_a_torsion_cokernel
+0.15s call     tests/forms/test_formed_vector_space_archive.sage::test_rational_isotropy_of_a_binary_form_is_minus_the_determinant_being_a_square
+0.14s call     tests/forms/test_bilinear_form_descent.sage::test_nonsymmetric_form_descends_when_relations_vanish_in_both_slots
+0.13s call     tests/forms/test_form_forgetful_adjunction_archive.sage::test_the_free_quadratic_form_on_the_plane_takes_values_in_its_divided_square
+0.12s setup    tests/forms/test_a_torsion_cokernel_carries_its_torsion_forms.sage::test_the_orthogonal_quotient_of_a_discriminant_form_is_a_torsion_form
+0.10s call     tests/forms/test_constructor_obligations_archive.sage::test_archived_scale_submodule_is_the_ideal_generated_by_pairing_values
+0.09s call     tests/forms/test_form_forgetful_adjunction_archive.sage::test_the_free_bilinear_form_on_the_plane_takes_values_in_its_tensor_square
+0.08s call     tests/forms/test_bilinear_form_descent.sage::test_descent_does_not_identify_quotient_generator_labels_with_source_labels
+0.07s call     tests/forms/test_paired_modules.sage::test_the_l2_norm_squared_of_the_gaussian_is_root_pi_over_two
+0.07s call     tests/forms/test_gram_graph_blocks.sage::test_interleaved_components_give_no_block_cut
+0.07s call     tests/forms/test_discriminant_normal_forms_archive.sage::test_archived_invariant_factor_form_uses_a_minimal_framing_isometrically
+0.05s call     tests/forms/test_bilinear_form_descent.sage::test_the_pullback_of_a_lattice_form_along_the_diagonal
+0.05s call     tests/forms/test_infinite_form_duality.sage::test_u_is_unimodular_but_the_form_two_is_only_nondegenerate
+0.04s call     tests/forms/test_torsion_forms.sage::test_the_discriminant_forms_of_a1_are_one_half_mod_one_and_minus_one_half_mod_two
+0.04s call     tests/forms/test_discriminant_convention_archive.sage::test_quadratic_and_bilinear_values_obey_the_nikulin_polarization
+0.04s call     tests/forms/test_gram_graph_blocks.sage::test_the_only_block_cut_of_a2_plus_a1_is_after_the_a2_block
+0.04s call     tests/forms/test_discriminant_subgroups.sage::test_elementary_two_adic_u_k_and_v_one_examples
+0.03s call     tests/forms/test_discriminant_normal_forms_archive.sage::test_archived_correlation_matrix_is_the_gram_matrix_and_dual_form_is_inverse
+0.03s call     tests/forms/test_bilinear_form_descent.sage::test_the_form_of_a_degenerate_lattice_descends_only_along_its_radical
+0.02s call     tests/forms/test_extensional_forms.sage::test_a_quadratic_map_given_by_a_function
+0.02s call     tests/forms/test_the_d4_discriminant_form_and_its_finite_action.sage::test_the_scalar_structure_is_the_algebra_s_own_after_an_equal_copy
+0.02s call     tests/forms/test_extensional_forms.sage::test_a_quadratic_form_from_a_symmetric_lift_and_its_polar_form
+0.02s setup    tests/forms/test_all_ones_form_correlation.sage::test_the_witness_is_attached_only_to_a_diagonal_gram
+0.01s setup    tests/forms/test_the_isometry_decision_for_radical_forms.sage::test_a_degenerate_form_is_isometric_to_a_copy_with_a_typed_witness
+0.01s teardown tests/forms/test_normalization_of_a_core_isometry.sage::test_normalization_preserves_triality_and_its_inverse
+0.01s call     tests/forms/test_torsion_forms.sage::test_the_discriminant_quadratic_form_of_two_plus_one_is_one_half_on_z2
+0.01s setup    tests/forms/test_discriminant_normal_forms_archive.sage::test_archived_discriminant_normal_form_is_an_actual_form_isometry
+0.01s setup    tests/forms/test_the_isometry_decision_for_radical_forms.sage::test_two_forms_of_one_module_with_different_radicals_are_separated
+0.01s teardown tests/forms/test_discriminant_subgroups.sage::test_orthogonal_quotient_and_overlattice_are_the_nikulin_pair
+0.01s setup    tests/forms/test_bilinear_form_descent.sage::test_descent_pairing_is_defined_on_a_torsion_cokernel
+0.01s setup    tests/forms/test_bilinear_form_descent.sage::test_descent_checks_relations_after_projecting_form_values
+0.01s setup    tests/forms/test_metabolizers_archive.sage::test_anisotropic_a1_discriminant_has_no_metabolizer
+0.01s setup    tests/forms/test_formed_radical_archive.sage::test_nonsymmetric_radical_quotient_kills_only_the_two_sided_radical
+0.01s setup    tests/forms/test_torsion_form_subobjects_archive.sage::test_the_bilinear_discriminant_form_of_u2_has_three_maximal_isotropic_subgroups
+0.01s setup    tests/forms/test_torsion_form_twist_functor.sage::test_the_negative_twist_of_the_a2_discriminant_form_negates_its_brown_invariant
+0.01s call     tests/forms/test_form_embedding_orthogonal_archive.sage::test_orthogonal_complement_of_the_diagonal_in_U_is_minus_two
+0.01s setup    tests/forms/test_torsion_form_subobjects_archive.sage::test_the_quadratic_discriminant_form_of_u2_has_two_maximal_isotropic_subgroups
+0.01s setup    tests/forms/test_integer_valued_elementary_two_form_groups.sage::test_the_actual_generated_group_preserves_the_complete_form[anisotropic-plane]
+0.01s setup    tests/forms/test_the_d4_discriminant_form_and_its_finite_action.sage::test_the_scalar_structure_is_the_algebra_s_own_after_an_equal_copy
+0.01s setup    tests/forms/test_polar_radical_criterion.sage::test_a_mixed_order_form_with_a_vanishing_block_is_still_refused
+0.01s setup    tests/forms/test_all_ones_form_correlation.sage::test_the_all_ones_form_row_is_the_constant_family
+0.01s setup    tests/forms/test_integer_valued_elementary_two_form_groups.sage::test_the_actual_generated_group_preserves_the_complete_form[minus-four]
+0.01s setup    tests/forms/test_the_polar_radical_and_nondegenerate_quotient.sage::test_a_reframed_copy_has_an_isometric_quotient
+0.01s call     tests/forms/test_discriminant_subgroups.sage::test_milgram_compatibility_on_even_lattice_discriminant_forms
+0.01s setup    tests/forms/test_formed_radical_archive.sage::test_affine_A1_lattice_modulo_its_radical_is_the_A1_root_lattice
+0.01s call     tests/forms/test_extensional_forms.sage::test_extensional_equality_of_bilinear_forms
+
+(285 durations < 0.005s hidden.  Use -vv to show these durations.)
+=========================== short test summary info ============================
+FAILED tests/forms/test_bilinear_form_descent.sage::test_a_rational_valued_form_descends_to_the_quotient_by_its_radical
+FAILED tests/forms/test_bilinear_form_descent.sage::test_nonsymmetric_form_descends_when_relations_vanish_in_both_slots
+FAILED tests/forms/test_bilinear_form_descent.sage::test_descent_does_not_identify_quotient_generator_labels_with_source_labels
+FAILED tests/forms/test_bilinear_form_descent.sage::test_descent_checks_relations_after_projecting_form_values
+FAILED tests/forms/test_bilinear_form_descent.sage::test_descent_pairing_is_defined_on_a_torsion_cokernel
+FAILED tests/forms/test_classifier_adjunctions.sage::test_divided_square_of_Z_mod_4_is_cyclic_of_order_8
+FAILED tests/forms/test_classifier_adjunctions.sage::test_tensor_square_of_Z_mod_4_is_Z_mod_4
+FAILED tests/forms/test_classifier_adjunctions.sage::test_free_form_adjunctions_on_Z_mod_4_satisfy_the_triangle_identities[bilinear_free_form_adjunction-classifier_order0-quotient_classifier_order0]
+FAILED tests/forms/test_classifier_adjunctions.sage::test_free_form_adjunctions_on_Z_mod_4_satisfy_the_triangle_identities[quadratic_free_form_adjunction-classifier_order1-quotient_classifier_order1]
+FAILED tests/forms/test_classifier_vocabulary.sage::test_quadratic_map_is_recovered_from_its_classifying_morphism_on_the_divided_square
+FAILED tests/forms/test_discriminant_normal_forms_archive.sage::test_archived_correlation_matrix_is_the_gram_matrix_and_dual_form_is_inverse
+FAILED tests/forms/test_discriminant_normal_forms_archive.sage::test_archived_discriminant_of_a_direct_sum_has_the_two_primary_factors
+FAILED tests/forms/test_discriminant_oracles_archive.sage::test_discriminant_group_order_is_absolute_gram_determinant
+FAILED tests/forms/test_discriminant_oracles_archive.sage::test_discriminant_bilinear_form_is_inverse_gram_modulo_integers
+FAILED tests/forms/test_discriminant_oracles_archive.sage::test_primary_components_have_the_prime_power_orders_and_exhaust_a5
+FAILED tests/forms/test_discriminant_quadratic_archive_surface.sage::test_brown_invariant_of_the_D4_discriminant_form_is_its_signature_mod_8
+FAILED tests/forms/test_discriminant_subgroups.sage::test_a1_four_has_diagonal_lagrangian_and_primary_component
+FAILED tests/forms/test_discriminant_subgroups.sage::test_brown_invariant_is_the_exact_gauss_sum_phase
+FAILED tests/forms/test_discriminant_subgroups.sage::test_milgram_compatibility_on_even_lattice_discriminant_forms
+FAILED tests/forms/test_discriminant_subgroups.sage::test_elementary_two_adic_u_k_and_v_one_examples
+FAILED tests/forms/test_even_bilinear_quadratic_conversion.sage::test_even_a2_has_the_integral_half_norm_quadratic_module
+FAILED tests/forms/test_extensional_forms.sage::test_a_bilinear_form_is_determined_by_its_values_on_basis_pairs
+FAILED tests/forms/test_extensional_forms.sage::test_extensional_equality_of_bilinear_forms
+FAILED tests/forms/test_extensional_forms.sage::test_a_quadratic_form_from_a_symmetric_lift_and_its_polar_form
+FAILED tests/forms/test_extensional_forms.sage::test_a_quadratic_form_needs_a_symmetric_lift
+FAILED tests/forms/test_extensional_forms.sage::test_pulling_back_a_form_along_the_diagonal_line
+FAILED tests/forms/test_form_embedding_orthogonal_archive.sage::test_orthogonal_complement_of_the_diagonal_in_U_is_minus_two
+FAILED tests/forms/test_form_value_image_archive.sage::test_a2_has_scale_zz_and_norm_2zz
+FAILED tests/forms/test_formed_element_represents_archive.sage::test_the_lattice_2_plus_3_represents_2_3_5_and_not_1_or_4
+FAILED tests/forms/test_gram_graph_archive.sage::test_a1_plus_a1_decomposes_orthogonally_but_a2_is_indecomposable
+FAILED tests/forms/test_infinite_form_duality.sage::test_the_standard_form_on_a_countable_free_module_is_not_perfect
+FAILED tests/forms/test_infinite_form_duality.sage::test_u_is_unimodular_but_the_form_two_is_only_nondegenerate
+FAILED tests/forms/test_paired_modules.sage::test_the_holder_pairing_of_the_gaussian_in_l1_and_linf_is_root_pi_over_two
+FAILED tests/forms/test_paired_modules.sage::test_the_l2_norm_squared_of_the_gaussian_is_root_pi_over_two
+FAILED tests/forms/test_paired_modules.sage::test_the_holder_pairing_of_a_geometric_sequence_with_the_constant_one_is_two
+FAILED tests/forms/test_rank_one_2adic_orthogonal_groups_archive.sage::test_rank_one_2adic_quadratic_refinement_cuts_the_orthogonal_group_in_half
+FAILED tests/forms/test_torsion_form_twist_functor.sage::test_the_negative_twist_of_the_a2_discriminant_form_negates_its_brown_invariant
+FAILED tests/forms/test_torsion_forms.sage::test_the_discriminant_quadratic_form_of_two_plus_one_is_one_half_on_z2
+ERROR tests/forms/test_all_ones_form_correlation.sage::test_the_all_ones_form_row_is_the_constant_family
+ERROR tests/forms/test_all_ones_form_correlation.sage::test_the_witness_is_attached_only_to_a_diagonal_gram
+ERROR tests/forms/test_degenerate_restrictions_and_subquotients.sage::test_the_maximal_subquotient_is_nondegenerate
+ERROR tests/forms/test_degenerate_restrictions_and_subquotients.sage::test_a_small_restriction_can_have_a_radical_and_is_then_reduced_and_decided
+ERROR tests/forms/test_formed_radical_archive.sage::test_affine_A1_lattice_modulo_its_radical_is_the_A1_root_lattice
+ERROR tests/forms/test_formed_radical_archive.sage::test_nondegenerate_hyperbolic_plane_has_zero_radical
+ERROR tests/forms/test_formed_radical_archive.sage::test_nonsymmetric_bilinear_form_does_not_descend_from_left_radical_alone
+ERROR tests/forms/test_formed_radical_archive.sage::test_nonsymmetric_radical_quotient_kills_only_the_two_sided_radical
+ERROR tests/forms/test_formed_radical_archive.sage::test_nonsymmetric_radical_quotient_drops_the_common_radical
+ERROR tests/forms/test_formed_radical_archive.sage::test_rational_nondegenerate_form_uses_full_rank_quotient_basis
+ERROR tests/forms/test_formed_radical_archive.sage::test_rational_zero_form_has_zero_rank_radical_quotient
+ERROR tests/forms/test_formed_radical_archive.sage::test_rational_radical_quotient_rank_subtracts_higher_radical_rank
+ERROR tests/forms/test_formed_radical_archive.sage::test_module_valued_radical_quotient_uses_selected_free_basis
+ERROR tests/forms/test_formed_radical_archive.sage::test_rational_radical_quotient_retains_its_projection
+ERROR tests/forms/test_formed_radical_archive.sage::test_rational_formed_module_radical_quotient_retains_its_projection
+ERROR tests/forms/test_isometry_between_torsion_forms.sage::test_the_witness_is_a_verified_typed_isometry_between_the_two_forms
+ERROR tests/forms/test_isometry_between_torsion_forms.sage::test_a_form_that_is_not_isometric_gets_no_witness
+ERROR tests/forms/test_isometry_between_torsion_forms.sage::test_the_sign_of_the_quadratic_form_is_part_of_the_witness_test
+ERROR tests/forms/test_isometry_between_torsion_forms.sage::test_two_witnesses_compose_through_their_endpoints
+ERROR tests/forms/test_isometry_between_torsion_forms.sage::test_the_bilinear_flavour_has_the_same_witness_contract
+ERROR tests/forms/test_isometry_between_torsion_forms.sage::test_a_radical_polar_form_is_a_form_and_is_now_decided
+ERROR tests/forms/test_orbit_and_profile_radical_isometry.sage::test_the_shear_between_diagonal_and_mixed_grams_on_four_squares_is_found
+ERROR tests/forms/test_orbit_and_profile_radical_isometry.sage::test_the_unit_twist_on_three_two_elementary_generators_is_isometric
+ERROR tests/forms/test_orbit_and_profile_radical_isometry.sage::test_the_nonsplit_obstruction_pair_is_decided_false_by_the_profile
+ERROR tests/forms/test_orbit_and_profile_radical_isometry.sage::test_a_refused_witness_is_undecided_never_false
+ERROR tests/forms/test_orbit_and_profile_radical_isometry.sage::test_a_deep_regrading_past_the_search_budget_is_undecided_not_false
+ERROR tests/forms/test_orbit_and_profile_radical_isometry.sage::test_the_bilinear_flavour_keeps_the_profile_certificate
+ERROR tests/forms/test_polar_radical_criterion.sage::test_an_invertible_gram_can_have_a_nonzero_polar_radical
+ERROR tests/forms/test_polar_radical_criterion.sage::test_a_two_torsion_form_with_the_same_gram_is_nondegenerate
+ERROR tests/forms/test_polar_radical_criterion.sage::test_the_verdict_is_invariant_under_an_equivalent_representative
+ERROR tests/forms/test_polar_radical_criterion.sage::test_the_verdict_is_invariant_under_a_generator_change
+ERROR tests/forms/test_polar_radical_criterion.sage::test_the_bilinear_flavour_separates_the_two_torsion_orders
+ERROR tests/forms/test_polar_radical_criterion.sage::test_a_mixed_order_perfect_pairing_is_accepted
+ERROR tests/forms/test_polar_radical_criterion.sage::test_the_mixed_order_verdict_survives_a_generator_permutation
+ERROR tests/forms/test_polar_radical_criterion.sage::test_the_mixed_order_verdict_survives_a_unit_rescaling
+ERROR tests/forms/test_polar_radical_criterion.sage::test_a_mixed_order_form_with_a_vanishing_block_is_still_refused
+ERROR tests/forms/test_quadratic_form_descent.sage::test_a_quadratic_form_that_does_not_descend_is_refused
+ERROR tests/forms/test_quadratic_form_descent.sage::test_the_value_module_that_descends_makes_q_a_function_of_the_class
+ERROR tests/forms/test_quadratic_form_descent.sage::test_two_torsion_keeps_its_quadratic_values
+ERROR tests/forms/test_quadratic_form_descent.sage::test_the_bilinear_law_is_a_different_condition_on_the_same_module
+ERROR tests/forms/test_the_coble_anti_isometry.sage::test_the_two_coble_discriminant_forms_are_anti_isometric
+ERROR tests/forms/test_the_coble_anti_isometry.sage::test_the_witness_is_a_typed_isometry_realizing_the_anti_isometry
+ERROR tests/forms/test_the_isometry_decision_for_radical_forms.sage::test_a_degenerate_form_is_isometric_to_a_copy_with_a_typed_witness
+ERROR tests/forms/test_the_isometry_decision_for_radical_forms.sage::test_the_radical_order_separates_a_form_from_its_zero_form
+ERROR tests/forms/test_the_isometry_decision_for_radical_forms.sage::test_differing_module_invariants_are_not_isometric
+ERROR tests/forms/test_the_isometry_decision_for_radical_forms.sage::test_the_quotient_form_separates_the_two_unit_twists
+ERROR tests/forms/test_the_isometry_decision_for_radical_forms.sage::test_two_forms_of_one_module_with_different_radicals_are_separated
+ERROR tests/forms/test_the_isometry_decision_for_radical_forms.sage::test_a_degenerate_form_of_higher_rank_is_decided
+ERROR tests/forms/test_the_isometry_decision_for_radical_forms.sage::test_the_two_diagonal_forms_on_order_sixteen_cubes_are_decided
+ERROR tests/forms/test_the_isometry_decision_for_radical_forms.sage::test_the_bilinear_flavour_reduces_and_decides_the_same_way
+ERROR tests/forms/test_the_isometry_decision_for_radical_forms.sage::test_an_isometry_through_a_coordinate_transposition_is_found
+ERROR tests/forms/test_the_polar_radical_and_nondegenerate_quotient.sage::test_the_radical_is_a_subobject_of_the_form_with_the_expected_order
+ERROR tests/forms/test_the_polar_radical_and_nondegenerate_quotient.sage::test_the_nondegenerate_quotient_is_the_form_on_the_quotient
+ERROR tests/forms/test_the_polar_radical_and_nondegenerate_quotient.sage::test_a_nondegenerate_form_has_trivial_radical_and_quotients_to_itself
+ERROR tests/forms/test_the_polar_radical_and_nondegenerate_quotient.sage::test_the_reduction_is_refused_when_the_form_does_not_vanish_on_the_radical
+ERROR tests/forms/test_the_polar_radical_and_nondegenerate_quotient.sage::test_the_quotient_gram_is_indexed_by_the_retained_projection_contract
+ERROR tests/forms/test_the_polar_radical_and_nondegenerate_quotient.sage::test_a_reframed_copy_has_an_isometric_quotient
+ERROR tests/forms/test_the_polar_radical_and_nondegenerate_quotient.sage::test_the_orthogonal_complement_is_the_same_kernel_not_an_enumeration
+============= 38 failed, 48 passed, 58 errors in 148.98s (0:02:28) =============
+[peakrss] wt541revtests: child waited=1 shell_code=1 samples=92
+[peakrss] peak tree RSS      : 703 MiB
+[peakrss] low-water MemAvail : 2318 MiB
+[peakrss] peak single VmHWM  : 703 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      692 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   167.3s procs=  3 rss=   703 MiB hwm=   703 MiB avail=  3538 MiB
+[peakrss]   t=   169.3s procs=  3 rss=   703 MiB hwm=   703 MiB avail=  3336 MiB
+[peakrss]   t=   171.3s procs=  3 rss=   703 MiB hwm=   703 MiB avail=  3211 MiB
+[peakrss]   t=   173.4s procs=  3 rss=   703 MiB hwm=   703 MiB avail=  3086 MiB
+[peakrss]   t=   175.4s procs=  3 rss=   703 MiB hwm=   703 MiB avail=  3430 MiB
