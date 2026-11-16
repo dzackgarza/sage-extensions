@@ -4709,21 +4709,31 @@ class ModulesWithChosenFinitePresentation(OwnedCategoryOverBaseRing):
             return self.presentation().cokernel().module_rank()
 
         def _torsion_decision(self):
-            r"""Over a PID a module with a chosen presentation is torsion exactly when its rank vanishes.
+            r"""Read torsion off the generic fibre of the chosen presentation.
 
-            ``K tensor_R M = K tensor_R coker(r)`` is the cokernel of ``r``
-            over the fraction field, and over a principal ideal domain every
-            submodule of a free module is free, so ``r`` is injective there and
-            the dimension of the fibre is ``rank_R F_0 - rank_R F_1 = rank_R M``.
-            A vanishing rank is therefore a torsion module, whatever its
-            relations look like.
+            Over an integral domain with fraction field ``K``, a finitely
+            generated module is torsion exactly when ``K \otimes_R M = 0``: the
+            torsion submodule is the kernel of ``M -> K \otimes_R M``
+            (Stacks, Definition 15.22.1 and Lemma 15.22.2, Tags 0536 and
+            0537), and the images of a generating family generate
+            ``K \otimes_R M``, so the kernel is everything exactly when the
+            fibre vanishes.
 
-            The generic-fibre route is for a module that has no presentation to
-            read; a module whose presentation is chosen here answers from it,
-            and over a base that is not a principal ideal domain it falls back
-            to that route.
+            The fibre is computed from the presentation as
+            ``K \otimes_R coker(r) = coker(r \otimes_R K)``, whose dimension is
+            ``rank_R F_0 - rank_K(r \otimes K)``.  That is ``rank_R M``, and it
+            is not ``rank_R F_0 - rank_R F_1``: the relations of a presentation
+            may be dependent, and then ``r`` is not injective after extending
+            scalars.  ``(8, 16) \colon \mathbf{Z}^2 \to \mathbf{Z}`` has rank one
+            over ``\mathbf{Q}`` and a kernel of rank one there, and its cokernel
+            ``\mathbf{Z}/8`` is torsion all the same.  A vanishing rank is a
+            torsion module whatever its relations look like.
+
+            A ring that is not an integral domain has no fraction field, so
+            this level answers through the decision above it, which states the
+            proposition as undecided where it has no decision.
             """
-            if self.base_ring() not in PrincipalIdealDomains():
+            if self.base_ring() not in IntegralDomains():
                 return super()._torsion_decision()
             return self.module_rank() == 0
 

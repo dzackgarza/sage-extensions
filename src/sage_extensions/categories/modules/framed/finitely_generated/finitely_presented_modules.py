@@ -1270,18 +1270,36 @@ class _SelectedFinitePresentationModules(OwnedCategoryOverBaseRing):
             return cardinal(sum(1 for invariant in self._invariants_with_units() if invariant == 0))
 
         def _torsion_decision(self):
-            r"""Read torsion off the invariant factors over a PID, else take the generic fibre."""
+            r"""Read torsion off the invariant factors over a PID, else from the level above.
+
+            A principal ideal domain answers from the invariant factors, which
+            are the diagonal of the Smith form of the relation matrix, so the
+            module is torsion exactly when its rank vanishes.  Any other ring
+            has no invariant factors to read and answers through the decision
+            of the level above -- the generic fibre of an integral domain, and
+            the undecided proposition elsewhere.
+
+            The decision is the method that answers here; the public predicate
+            is the caller's, and re-entering it would ask this same decision
+            again.
+            """
             if self.base_ring() not in PrincipalIdealDomains():
-                return super().is_torsion()
+                return super()._torsion_decision()
             return self.module_rank() == 0
 
         def _torsion_freeness_decision(self):
-            r"""Over a PID ``M`` is torsion-free exactly when no invariant factor is a nonzero non-unit."""
+            r"""Over a PID ``M`` is torsion-free exactly when no invariant factor is a nonzero non-unit.
+
+            A field has no nonzero non-unit, so every module over one is
+            torsion-free.  Any other ring answers through the decision of the
+            level above, which states the proposition as undecided where it has
+            no decision.
+            """
             ring = self.base_ring()
             if ring in OwnedFields():
                 return True
             if ring not in PrincipalIdealDomains():
-                return super().is_torsion_free()
+                return super()._torsion_freeness_decision()
             return all(invariant == 0 or invariant.is_unit() for invariant in self._invariants_with_units())
 
         def _freeness_decision(self) -> bool:
@@ -1291,11 +1309,13 @@ class _SelectedFinitePresentationModules(OwnedCategoryOverBaseRing):
             torsion summand exactly when no invariant factor is a nonzero
             non-unit, and what is left is a sum of copies of ``R``.  So a
             presented module answers here rather than inheriting the default
-            for a module with no known basis.
+            for a module with no known basis -- over a PID.  Over any other
+            ring torsion-free does not imply free, so the level above decides,
+            or states the proposition as undecided.
             """
             if self.base_ring() not in PrincipalIdealDomains():
-                return super().is_free()
-            return self.is_torsion_free()
+                return super()._freeness_decision()
+            return self._torsion_freeness_decision()
 
         def is_zero(self):
             r"""Decide ``M = 0``.
