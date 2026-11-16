@@ -812,22 +812,20 @@ class IsotropicReductionLiftTorsors(OwnedCategoryOverBaseRing):
 
         @cached_method
         def integral_base_point_or_none(self):
-            r"""Decide existence and retain one integral lift, or ``None``.
+            r"""Answer one lift the residue locus built, or ``None`` when it has none.
 
-            An integral rational base point is a lift and answers at once, and an
-            empty residue locus answers ``None``.  Otherwise the integral
-            residue locus has already built the lift of each of its
-            representatives and tested it (:meth:`_integral_parameter_cosets`,
-            which decides the classes by exactly that test), so one of those
-            lifts is a point of the locus and this answers it.  Lifting the first
-            class again, and asking that second lift for its integral
-            restriction, would decide a fact the residue locus has decided.
+            The residue locus decides each of its classes by building the lift of
+            the representative of the class and asking that lift for its integral
+            restriction (:meth:`_integral_parameter_cosets`), so every class it
+            reports is a lift this torsor has already built and tested, and the
+            first of those lifts answers here.  An empty locus has no lift to
+            answer with.
+
+            No lift is built and no integral restriction is asked for here.  The
+            rational base point in particular is not tested: its parameter is the
+            zero class, and the residue locus reports that class exactly when the
+            base point is an integral lift.
             """
-            source = self.source_reduction().isotropic_embedding().codomain()
-            target = self.target_reduction().isotropic_embedding().codomain()
-            base = self.base_point()
-            if base.integral_restriction(source, target) is not None:
-                return base
             _passing, _kernel, parameters = self._integral_parameter_cosets()
             lifts = parameters[3]
             return lifts[0] if lifts else None
