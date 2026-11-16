@@ -33,6 +33,19 @@ def test_a_free_module_over_the_real_field_has_no_relations() -> None:
     assert plane.presentation().coordinate_images() == ()
 
 
+def test_the_coordinate_matrix_capability_is_a_ring_category() -> None:
+    r"""``Z`` and ``Q`` select a Sage matrix; the exact real field does not.
+
+    The capability is a chosen representation of the ring's finite matrices, so
+    it is stated by a category and the constructions that need a matrix route
+    on it.  ``RR`` is an owned exact field whose engine is inexact, and its
+    linear-algebra parent is the field itself, so no Sage matrix exists there.
+    """
+    assert ZZ in CoordinateMatrixRings()
+    assert QQ in CoordinateMatrixRings()
+    assert RR not in CoordinateMatrixRings()
+
+
 def test_an_injective_endomorphism_of_the_real_plane_is_primitive() -> None:
     r"""$e_0 \mapsto e_0$, $e_1 \mapsto e_0 + e_1$ is an isomorphism of $RR^2$."""
     plane = RR**2
