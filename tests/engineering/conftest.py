@@ -308,17 +308,24 @@ _HEADER_FIGURES = (
     ("0-cells", r"0-cells (\d+)"),
     ("1-cells", r"1-cells (\d+)"),
     ("2-cells", r"2-cells (\d+)"),
-    ("H_0 rank", r"H_0 = Z(?:\^(\d+))?"),
 )
 
 
 def _figures(output: str) -> dict[str, int]:
-    r"""The figures an answer states, by name, and each heading's count by heading."""
+    r"""The figures an answer states, by name, and each heading's count by heading.
+
+    ``H_0`` is stated as a group, which Sage writes ``Z``, ``Z^2`` or ``Z x Z``,
+    so its rank is the sum of the free summands.
+    """
     figures = {
         name: int(found[1] or 1)
         for name, pattern in _HEADER_FIGURES
         if (found := re.search(pattern, output))
     }
+    if zero := re.search(r"H_0 = ((?:Z(?:\^\d+)?)(?: x Z(?:\^\d+)?)*)", output):
+        figures["H_0 rank"] = sum(
+            int(power or 1) for power in re.findall(r"Z(?:\^(\d+))?", zero[1])
+        )
     for heading, count in re.findall(r"(?m)^#+ (.+?) \((\d+)\)", output):
         figures[heading] = int(count)
     return figures

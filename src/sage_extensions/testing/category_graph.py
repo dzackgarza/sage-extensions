@@ -649,10 +649,11 @@ def render_audit(declarations: list[CategoryDeclaration]) -> str:
     )
     # A strongly connected component with more than one category is a set of
     # categories each declared to lie under the others.
+    declared_edges = _declared_edges(declarations)
     cycles = [
         ", ".join(sorted(_name(vertex) for vertex in component))
         for component in _digraph(
-            _declared_edges(declarations)
+            _vertices(declarations, declared_edges), declared_edges
         ).strongly_connected_components()
         if len(component) > 1
     ]
@@ -801,26 +802,41 @@ def _base_of(vertex: str) -> str:
     return vertex.split(".", 1)[0]
 
 
-def _graph(edges: set[tuple[str, str]]) -> Graph:
+def _vertices(
+    declarations: list[CategoryDeclaration], edges: set[tuple[str, str]]
+) -> set[str]:
+    """The 0-cells of the graph: each declared category, and each name an edge reaches.
+
+    ``AGENTS.md`` makes the declared graph a 0-cell per category and a 1-cell
+    per declaration, so a cell does not depend on an edge.  Two kinds have none:
+    a declaration whose only supercategory is an expression the reader cannot
+    place (``Sliced(base)`` declares ``base``), and an axiom vertex a
+    declaration only names (``Aliased`` declares ``FinitePaths.Connected``).
+    Neither is an edge, and both are cells.
+    """
+    return {d.vertex for d in declarations} | {v for a, b in edges for v in (a, b)}
+
+
+def _graph(vertices: set[str], edges: set[tuple[str, str]]) -> Graph:
     from sage.graphs.graph import Graph
 
-    return Graph(sorted(edges))
+    return Graph([sorted(vertices), sorted(edges)], format="vertices_and_edges")
 
 
 def _name(vertex: Hashable) -> str:
     """A vertex of a graph built here, which is a category name.
 
     Sage types a vertex as any hashable object; ``_graph`` and ``_digraph``
-    build every graph on the strings of ``_all_edges``.
+    build every graph on the names ``_vertices`` and ``_all_edges`` give.
     """
     assert isinstance(vertex, str)
     return vertex
 
 
-def _digraph(edges: set[tuple[str, str]]) -> DiGraph:
+def _digraph(vertices: set[str], edges: set[tuple[str, str]]) -> DiGraph:
     from sage.graphs.digraph import DiGraph
 
-    return DiGraph(sorted(edges))
+    return DiGraph([sorted(vertices), sorted(edges)], format="vertices_and_edges")
 
 
 def _shortcuts(declarations: list[CategoryDeclaration]) -> list[tuple[str, str]]:
@@ -831,8 +847,11 @@ def _shortcuts(declarations: list[CategoryDeclaration]) -> list[tuple[str, str]]
     drops it itself.
     """
     declared = _declared_edges(declarations)
+    edges = _all_edges(declarations)
     reduction = set(
-        _digraph(_all_edges(declarations)).transitive_reduction().edges(labels=False)
+        _digraph(_vertices(declarations, edges), edges)
+        .transitive_reduction()
+        .edges(labels=False)
     )
     return sorted(edge for edge in declared if edge not in reduction)
 
@@ -895,7 +914,8 @@ def _blocks(graph: Graph) -> list[list[str]]:
 def render_shape(declarations: list[CategoryDeclaration]) -> str:
     """Breadth, depth and shortcuts.  The intended shape is deep and narrow."""
     edges = _all_edges(declarations)
-    directed = _digraph(edges)
+    vertices = _vertices(declarations, edges)
+    directed = _digraph(vertices, edges)
     breadth = {
         _name(vertex): d for vertex, d in directed.in_degree(labels=True).items()
     }
@@ -905,7 +925,7 @@ def render_shape(declarations: list[CategoryDeclaration]) -> str:
         "The declared graph as numbers.  Intended shape: near-tree, deep and narrow.",
         "",
         (
-            f"categories {directed.order()}   declarations {directed.size()}   pieces {_graph(edges).connected_components_number()}"
+            f"categories {directed.order()}   declarations {directed.size()}   pieces {_graph(vertices, edges).connected_components_number()}"
         ),
         f"longest chain of declarations = {max(depth.values(), default=0)}",
         "",
@@ -929,7 +949,7 @@ def render_shape(declarations: list[CategoryDeclaration]) -> str:
     pieces = sorted(
         (
             [_name(vertex) for vertex in piece]
-            for piece in _graph(edges).connected_components(sort=True)
+            for piece in _graph(vertices, edges).connected_components(sort=True)
         ),
         key=len,
         reverse=True,
@@ -959,8 +979,11 @@ def render_cells(declarations: list[CategoryDeclaration]) -> str:
     from sage.topology.simplicial_complex import SimplicialComplex
 
     edges = _all_edges(declarations)
-    graph = _graph(edges)
-    homology = SimplicialComplex([list(edge) for edge in edges]).homology(reduced=False)
+    vertices = _vertices(declarations, edges)
+    graph = _graph(vertices, edges)
+    homology = SimplicialComplex(
+        [[vertex] for vertex in sorted(vertices)] + [list(edge) for edge in sorted(edges)]
+    ).homology(reduced=False)
     blocks = _blocks(graph)
     shortcuts = _shortcuts(declarations)
     dropped = {frozenset(edge) for edge in shortcuts}
@@ -1284,7 +1307,7 @@ def _dispatch(
 def _up_sets(declarations: list[CategoryDeclaration]) -> dict[str, set[str]]:
     """Every vertex above each vertex, strictly, along declared and axiom edges."""
     edges = _all_edges(declarations)
-    vertices = {d.vertex for d in declarations} | {v for e in edges for v in e}
+    vertices = _vertices(declarations, edges)
     supers = {v: {b for a, b in edges if a == v} for v in vertices}
     above: dict[str, set[str]] = {}
     for vertex in TopologicalSorter(supers).static_order():
@@ -1963,7 +1986,7 @@ def select_vertices(
     A cyclic relation raises CycleError and cannot be presented as a poset.
     """
     edges = _all_edges(declarations)
-    vertices = {d.vertex for d in declarations} | {v for e in edges for v in e}
+    vertices = _vertices(declarations, edges)
     supers = {v: {b for a, b in edges if a == v} for v in vertices}
     above: dict[str, set[str]] = {}
     for vertex in TopologicalSorter(supers).static_order():
