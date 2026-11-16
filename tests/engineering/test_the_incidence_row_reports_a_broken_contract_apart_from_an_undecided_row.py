@@ -77,10 +77,11 @@ def test_a_relation_that_leaves_a_vertex_without_an_edge_is_a_contract_violation
 
     ``U + U`` has one isotropic line orbit and one isotropic plane orbit under
     ``O(U + U)``, so its row has a vertex of each kind and an edge between them.
-    A relation over those vertices with no edge in it leaves both without an
-    edge, which is the smallest relation that breaks the row's contract: the
-    driver reports it as a contract violation of the row and not as an
-    undecided row, and it returns no counts for it.
+    A relation over those vertices with no edge in it leaves the plane vertex
+    without the edge its lines give it, and a plane cusp of a row always carries
+    one; that is the smallest relation that breaks the row's contract, and the
+    driver reports it as a contract violation of the row and not as an undecided
+    row, returning no counts for it.
     """
     lattice = Lattices(ZZ)("U") + Lattices(ZZ)("U")
     subgroup = lattice.Aut()
@@ -131,9 +132,9 @@ def test_a_row_of_a_lattice_with_no_isotropic_plane_decides_with_its_line_vertex
     plane -- a totally isotropic two-plane would force both indices of the form
     to be at least two -- and its building has line vertices only.  Its row
     therefore returns one line cusp, no plane cusp and no edge, and that is the
-    row's complete answer: the driver decides it, and reports no vertex of it
-    as left without an edge, because a row with no plane vertex has no edge for
-    a line vertex to carry.
+    row's complete answer: an edge is a line vertex's incidence with a plane
+    vertex, and this row has no plane vertex to carry one, so the driver decides
+    it rather than reporting a vertex as left without an edge.
     """
     lattice = Lattices(ZZ)("U") + Lattices(ZZ)([[-2]])
     outcome = incidence_row_outcome(lattice, lattice.Aut(), "O(U + <-2>)", 3600)

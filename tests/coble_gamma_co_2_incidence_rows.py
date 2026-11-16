@@ -43,8 +43,13 @@ the cited construction guarantees for every output:
   line cusp representative into the selected plane cusp representative;
 * the incidence is a relation, not a flag-orbit count -- no two retained edges
   have the same line and plane cusp endpoints;
-* every line orbit and every plane orbit has an edge -- each cusp of the
-  line row and of the plane row appears as a vertex of some edge;
+* every plane orbit has an edge -- a plane of the row contains isotropic
+  lines, their orbits are line cusps of the row, and the flag it makes with
+  each of them is one of the flags the route enumerates.  A line orbit is not
+  required to carry one: a line vertex carries an edge exactly when the row's
+  group carries a line of it into a plane cusp of the row, which is what an
+  edge is, and a subgroup that fixes a plane has an orbit of lines outside it.
+  The row's counts pin the line orbits anyway;
 * the ``O(T_Co)`` incidence has one edge -- the ambient group is the whole of
   ``O(T_Co)``, so the left group of every double-coset computation is the
   parabolic's own image and each plane contributes its one transitive orbit
@@ -219,7 +224,14 @@ def row_contract(lattice, subgroup, label, lines, planes, incidences) -> RowOutc
     carries the line cusp representative into the plane cusp representative;
     each edge's two cusps are cusps of the row; no two edges share their line
     and plane cusp endpoints, so the relation is not a flag-orbit count; and
-    no cusp of either row is left without an edge.
+    every plane cusp carries an edge.  A plane cusp always does: a plane of the
+    row contains isotropic lines, their orbits are line cusps of the row, and
+    the flag each of them makes with the plane is one of the flags the route
+    enumerates.  A line cusp is not required to carry one, because a line vertex
+    carries an edge exactly when the row's group carries a line of it into a
+    plane cusp of the row -- which is what an edge is -- and that is not every
+    line: a subgroup that fixes a plane has an orbit of lines outside it, and a
+    lattice with no isotropic plane has no edge at all.
 
     The returned relation is the input, so the contract is a statement about
     the library's answer and not about how the row was obtained.
@@ -228,7 +240,6 @@ def row_contract(lattice, subgroup, label, lines, planes, incidences) -> RowOutc
         log(f"[{label}] line cusp {position}: {_coordinates(cusp.representative())}")
     for position, cusp in enumerate(planes):
         log(f"[{label}] plane cusp {position}: {_coordinates(cusp.representative())}")
-    line_vertices = set()
     plane_vertices = set()
     retained_pairs = []
     for position, incidence in enumerate(incidences):
@@ -254,17 +265,11 @@ def row_contract(lattice, subgroup, label, lines, planes, incidences) -> RowOutc
                 f"edge {position} of {len(incidences)}: {violation}",
             )
         retained_pairs.append(pair)
-        line_vertices.add(incidence.line_cusp())
         plane_vertices.add(incidence.plane_cusp())
         log(
             f"[{label}] edge {position}: L{line_id} < P{plane_id}; "
             f"line={_coordinates(incidence.line())}; plane={_coordinates(incidence.plane())}"
         )
-    for position, cusp in enumerate(lines):
-        if cusp not in line_vertices:
-            return RowOutcome(
-                label, RowStatus.CONTRACT_VIOLATION, f"line cusp {position} carries no edge"
-            )
     for position, cusp in enumerate(planes):
         if cusp not in plane_vertices:
             return RowOutcome(
