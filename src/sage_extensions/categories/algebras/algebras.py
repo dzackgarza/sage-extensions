@@ -1027,6 +1027,7 @@ def _fix_selected_algebra_presentation(
     lift_to_presentation,
     *,
     presentation_cover_map=None,
+    framing=None,
 ) -> None:
     r"""Promote a selected finite presentation in its actual algebra theory.
 
@@ -1037,26 +1038,57 @@ def _fix_selected_algebra_presentation(
     retains that stronger lifting property and its original augmentation.
     The supplying constructors fix a free presentation on these actual
     labels; projectivity alone would not justify this generator inclusion.
+
+    ``framing`` is the degree-zero data of a caller that has just fixed this
+    algebra's framing itself — its generating label set, its generator
+    morphism and the factory for its augmentation. Those are the facts the
+    checks below read, so supplying them keeps the presentation's data fixed at
+    construction while its realization stays delayed; a constructor that
+    realizes the framing to read them back builds the algebra's identity Mor
+    and its degree-zero resolution for an algebra that may never ask
+    (``OWN-23``).
+
+    The chosen labels are registered with the delayed presentation, so reading
+    the algebra's generating set does not realize the resolution: a free
+    algebra presents itself, and realizing it would ask that same algebra for
+    the generating set that is defining its replacement.
     """
     owner = algebra.algebra_framing_owner()
-    degree_zero = algebra.selected_algebra_resolution()
-    match degree_zero.truncation():
-        case 0:
-            pass
-        case _:
-            raise ValueError(
-                f"{algebra} already carries a selected algebra resolution through degree "
-                f"{degree_zero.truncation()}; its finite presentation cannot be fixed a second time"
-            )
-    match degree_zero.level(0) is presentation_ring:
-        case False:
-            raise ValueError(
-                f"the selected presentation of {algebra} is on {presentation_ring}, but its "
-                f"degree-zero free algebra is {degree_zero.level(0)}"
-            )
-        case True:
-            pass
-    labels = degree_zero.generating_set()
+    match framing:
+        case None:
+            degree_zero = algebra.selected_algebra_resolution()
+            match degree_zero.truncation():
+                case 0:
+                    pass
+                case _:
+                    raise ValueError(
+                        f"{algebra} already carries a selected algebra resolution through degree "
+                        f"{degree_zero.truncation()}; its finite presentation cannot be fixed a second time"
+                    )
+            match degree_zero.level(0) is presentation_ring:
+                case False:
+                    raise ValueError(
+                        f"the selected presentation of {algebra} is on {presentation_ring}, but its "
+                        f"degree-zero free algebra is {degree_zero.level(0)}"
+                    )
+                case True:
+                    pass
+            labels = degree_zero.generating_set()
+            presentation_generator_morphism = degree_zero.generator_morphism()
+
+            def presentation_augmentation():
+                return degree_zero.augmentation()
+
+        case (label_set, generator_morphism, augmentation):
+            # The caller states the degree-zero framing it has just retained:
+            # this label set, this generator morphism, and an augmentation it
+            # builds on request.  Nothing is realized here.
+            labels = label_set
+            presentation_generator_morphism = generator_morphism
+
+            def presentation_augmentation():
+                return augmentation(algebra)
+
     if labels.is_finite() is not True or relations.index_set().is_finite() is not True:
         raise NotImplementedError(
             f"the selected finite presentation of {algebra} needs proved finite "
@@ -1078,8 +1110,8 @@ def _fix_selected_algebra_presentation(
         ordinary = Algebras(base).Associative().Unital()
         if presentation_ring in ordinary.ProjectiveAsAlgebra():
             presentation_owner = ordinary
-            degree_one = base.free_module(degree_one_labels).tensor_algebra()
-            relation_source = base.free_module(relation_labels).tensor_algebra()
+            degree_one_factory = base.free_module(degree_one_labels).tensor_algebra
+            relation_factory = base.free_module(relation_labels).tensor_algebra
         elif presentation_ring in Cat().meet(
             (
                 SymmetricAlgebras(base),
@@ -1087,8 +1119,10 @@ def _fix_selected_algebra_presentation(
             )
         ):
             presentation_owner = ordinary.Commutative()
-            degree_one = base.free_module(degree_one_labels).symmetric_algebra()
-            relation_source = base.free_module(relation_labels).symmetric_algebra()
+            degree_one_factory = (
+                base.free_module(degree_one_labels).symmetric_algebra
+            )
+            relation_factory = base.free_module(relation_labels).symmetric_algebra
         else:
             raise NotImplementedError(
                 f"the retained presentation ring {presentation_ring} of {algebra} "
@@ -1096,34 +1130,56 @@ def _fix_selected_algebra_presentation(
                 "algebra theory before a selected projective presentation can be formed; "
                 "its defining ring, relations and augmentation are retained"
             )
+        relation_source = relation_factory()
+        match presentation_ring is algebra:
+            case True:
+                # An algebra presented on itself is free on the chosen
+                # generators, so its presentation has no relation to carry and
+                # its degree-one level is the algebra itself: the two faces and
+                # the degeneracy are the augmentation, which for a free algebra
+                # is its identity (``CAT-29``).  Tagging a second copy of the
+                # algebra on ``("generator", label)`` would build the algebra
+                # twice to state that it has no relations.
+                assert tuple(relation_labels) == (), (
+                    f"the presentation of {algebra} on itself has no relation level, "
+                    f"but it retains {relations}"
+                )
+                degree_one = algebra
+                first_face = second_face = degeneracy = presentation_augmentation()
+            case False:
+                degree_one = degree_one_factory()
 
-        def first_face_value(tagged):
-            match tagged[0]:
-                case "generator":
-                    return presentation_ring.algebra_generator(tagged[1])
-                case "relation":
-                    return presentation_ring.zero()
+                def first_face_value(tagged):
+                    match tagged[0]:
+                        case "generator":
+                            return presentation_ring.algebra_generator(tagged[1])
+                        case "relation":
+                            return presentation_ring.zero()
 
-        def second_face_value(tagged):
-            match tagged[0]:
-                case "generator":
-                    return presentation_ring.algebra_generator(tagged[1])
-                case "relation":
-                    return relations.value(tagged[1])
+                def second_face_value(tagged):
+                    match tagged[0]:
+                        case "generator":
+                            return presentation_ring.algebra_generator(tagged[1])
+                        case "relation":
+                            return relations.value(tagged[1])
 
-        degree_one_generating_set = degree_one.algebra_generating_set()
-        first_face = presentation_owner.Mor(degree_one, presentation_ring)(
-            Sets().Mor(degree_one_generating_set, presentation_ring)(first_face_value)
-        )
-        second_face = presentation_owner.Mor(degree_one, presentation_ring)(
-            Sets().Mor(degree_one_generating_set, presentation_ring)(second_face_value)
-        )
-        degeneracy = presentation_owner.Mor(presentation_ring, degree_one)(
-            Sets().Mor(
-                labels,
-                degree_one,
-            )(lambda label: degree_one.algebra_generator(("generator", label)))
-        )
+                degree_one_generating_set = degree_one.algebra_generating_set()
+                first_face = presentation_owner.Mor(degree_one, presentation_ring)(
+                    Sets().Mor(degree_one_generating_set, presentation_ring)(
+                        first_face_value
+                    )
+                )
+                second_face = presentation_owner.Mor(degree_one, presentation_ring)(
+                    Sets().Mor(degree_one_generating_set, presentation_ring)(
+                        second_face_value
+                    )
+                )
+                degeneracy = presentation_owner.Mor(presentation_ring, degree_one)(
+                    Sets().Mor(
+                        labels,
+                        degree_one,
+                    )(lambda label: degree_one.algebra_generator(("generator", label)))
+                )
         resolution_category = (
             presentation_owner.FinitelyPresentedAsAlgebra().resolution_category()
         )
@@ -1131,12 +1187,12 @@ def _fix_selected_algebra_presentation(
             algebra,
             presentation_ring,
             degree_one,
-            degree_zero.augmentation(),
+            presentation_augmentation(),
             first_face,
             second_face,
             degeneracy,
             generating_set=labels,
-            generator_morphism=degree_zero.generator_morphism(),
+            generator_morphism=presentation_generator_morphism,
             relation_source=relation_source,
             relations=relations,
         )
@@ -1146,6 +1202,8 @@ def _fix_selected_algebra_presentation(
         owner,
         selected_resolution,
         replace=True,
+        generating_set=labels,
+        generator_function=lambda label: presentation_generator_morphism(labels(label)),
     )
     algebra._selected_algebra_presentation_backend = (
         _SelectedFiniteAlgebraPresentationBackend(
@@ -2072,7 +2130,17 @@ class Algebras(OwnedCategoryOverBaseRing):
             return self.selected_algebra_resolution().generator_morphism()
 
         def algebra_generator(self, label):
-            return self.selected_algebra_resolution().generator(label)
+            r"""Return the element the chosen resolution assigns to one generator label.
+
+            The assignment is fixing data of the algebra's framing, retained
+            with the resolution when the framing is fixed, so reading it does
+            not realize the resolution: for a presented algebra that would
+            build the presentation's two levels to return one generator.  A
+            resolution that registered no assignment is realized here instead.
+            """
+            return self.selected_resolution_generator(
+                self.algebra_framing_owner(), label
+            )
 
         def algebra_generators(self):
             return self.selected_algebra_resolution().generators(
@@ -5284,6 +5352,19 @@ class _OwnedAlgebraParent(_OwnedRingParent):
         # Both selected framing and native module datum are now queryable by
         # the algebra realization hooks this placement introduces.
         refine(self, Cat().meet(tuple(placement)))
+        if algebra_framing_source is self:
+            # An algebra whose free source is itself is free on these
+            # generators, so this framing is also its chosen finite
+            # presentation: presented on itself, by them, with no relations.
+            # It is fixed here with the framing it is made of, in the
+            # constructor, and an accessor never installs it (``OWN-17``).
+            from sage_extensions.categories.algebras.free_algebras import (
+                _fix_free_algebra_presentation,
+            )
+
+            _fix_free_algebra_presentation(
+                self, selected_labels, generator_morphism, augmentation
+            )
 
 
 @cached_function(
