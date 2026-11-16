@@ -1,28 +1,50 @@
-r"""A product of a large finite factor is found by the factor's key, which is its points.
+r"""A product of a large finite factor is found by the key that factor holds.
 
 `SET-05`: two presentations of one family are one construction.  The store that
 keeps one product per equal family keys a family by its index set and by its
-factors' hashes (``set_categories._finite_family_key``), and a factor's hash is
-the hash of its point sequence.  A finite ordered set *is* its points, in order,
-so its hash is a function of the set, two equal sets supply one key, and the
-lookup finds one product however its family was presented.
+factors' hashes (``set_categories._finite_family_key``), and a finite ordered
+set's hash is the hash of its point sequence, which is the data its equality
+compares.  So one key names one family, and a lookup finds one product however
+its family was presented.
 
-The three claims are asserted together because they are one rule.  If equality
-answered by data other than the points -- the enumeration a set was built from,
-the universe a subset was cut out of -- then ``==`` would stop being transitive,
-a set being equal to each of two sets that are unequal to each other, and two
-equal families would be two products, which is what `SET-05` forbids.
+The cost claims below are stated as the asks a reader makes, not as a clock: a
+map records every position it is asked for, and a point records every ask for
+its hash, so the enumeration's own account says whether something read the
+points.  A finite ordered set is fixed by its points, so a construction that
+read them holds their hash: placing a family of such sets reads that value and
+runs no factor's map, however large the factor is (#547).  A set whose points a
+construction builds on demand -- an image under a map -- decides the same value
+when it is first asked, and not before.
 
-These tests assert the rule and not a way of reading it: no assertion counts a
-call, a point or a clock.  The factor of the last test is 4096 points, so a rule
-that read a factor's points when placing a family would read a large set; the cost
-of that reading is measured where it is repaired and not asserted here.
+Equality stays extensional.  Three sets of one point sequence are equal each to
+each whatever route built them, one family is one product, and equal sets hash
+equally; the key adds only that two equal sets hold one point sequence, so the
+confirmation a lookup makes is an identity test rather than a walk of the
+factors.
 """
 
 from sage_extensions.all import *  # noqa: F401,F403
 
 _SIZE = 4096
 _POSITIONS = (0, 1, 2)
+
+
+class _Point(int):
+    r"""The integer it counts, recording every ask for its hash.
+
+    It states which point it is and nothing else, so it is a point of a finite
+    ordered set; ``asked`` collects the numbers whose hash was computed, which is
+    how a reader sees whether something hashed the points of a set again.
+    """
+
+    def __new__(cls, number, asked):
+        point = int.__new__(cls, int(number))
+        point.asked = asked
+        return point
+
+    def __hash__(self):
+        self.asked.append(int(self))
+        return int.__hash__(self)
 
 
 def _points():
@@ -50,6 +72,123 @@ def _enumerated(points):
     return FiniteOrderedSets().from_indexed(
         Sets.Δ[2], point_at, index_of=position_of
     )
+
+
+def _recorded_factor(size, asked, first=0):
+    r"""The ordered points $\text{first},\dots,\text{first}+\text{size}-1$ through a supplied inverse.
+
+    The index set is the ordinal on ``size`` points, the forward map is the point
+    at a position and records every position it is asked for, and the inverse is
+    the position whose point equals the candidate, answering ``None`` off the
+    image.  This is the presentation a section, an image and a residue locus
+    reach their points through.
+
+    ``first`` names the point at position zero, so two tests that place a family
+    of one size place two families: the store of finite products keeps one
+    construction per equal family, and its answers outlive a test.
+    """
+
+    def point_at(index):
+        asked.append(int(index))
+        return ZZ(first + int(index))
+
+    def position_of(value):
+        for position in range(size):
+            if ZZ(first + position) == value:
+                return position
+        return None
+
+    return FiniteOrderedSets().from_indexed(
+        Sets.Δ[size - 1], point_at, index_of=position_of
+    )
+
+
+def test_a_finite_ordered_set_of_given_points_holds_their_hash() -> None:
+    r"""A set built from its points answers for its hash without hashing them again.
+
+    The points are read once, in the construction; the hash is the hash of the
+    sequence that construction selected, and a reader that asks for it -- the
+    store of finite products asks every factor for its hash -- reads a value the
+    set already holds.  Four thousand points is the factor size of the issue, and
+    a hash that walked them would ask for every one of them here.
+    """
+    asked = []
+    factor = FiniteOrderedSets()(
+        tuple(_Point(number, asked) for number in range(_SIZE))
+    )
+    settled = tuple(asked)
+
+    hash(factor)
+    hash(factor)
+
+    assert tuple(asked) == settled
+    assert cardinal(factor.cardinality()) == cardinal(_SIZE)
+
+
+def test_a_finite_ordered_set_presented_by_a_supplied_inverse_holds_its_hash() -> None:
+    r"""A set built through an inverse holds the hash of the points it read there.
+
+    The construction reads its points once, so that the set is its point
+    sequence and not a question it answers later by running the map again; the
+    first ask for the hash therefore asks the map for nothing.
+    """
+    asked = []
+    factor = _recorded_factor(_SIZE, asked)
+
+    assert tuple(asked) == tuple(range(_SIZE))
+
+    settled = tuple(asked)
+    hash(factor)
+
+    assert tuple(asked) == settled
+    assert cardinal(factor.cardinality()) == cardinal(_SIZE)
+
+
+def test_a_product_with_a_fresh_equal_large_factor_reads_no_point_of_it() -> None:
+    r"""The lookup of a family of large factors asks neither factor for a point.
+
+    The second factor is built separately, from the same points, and its own
+    construction reads them; placing its family then reads the key each factor
+    holds and finds the product of the first, confirming that the two equal
+    factors are one factor without walking either.
+    """
+    unit = Sets.Δ[0]
+    factor = _recorded_factor(_SIZE, [], first=_SIZE)
+    product = Sets().product((factor, unit))
+
+    asked = []
+    again = _recorded_factor(_SIZE, asked, first=_SIZE)
+    settled = tuple(asked)
+
+    assert Sets().product((again, unit)) is product
+    assert tuple(asked) == settled
+    assert product.factor(0) is factor
+    assert product.factor(1) is unit
+    assert cardinal(product.factor(0).cardinality()) == cardinal(_SIZE)
+
+
+def test_a_large_factor_is_found_and_the_sets_that_find_it_are_equal() -> None:
+    r"""One family, one product: a fresh equal factor of 4096 points finds it.
+
+    The two factors are built separately from their points and are equal sets,
+    so their hashes agree and the store answers the second family with the
+    product of the first.  The product's own factor is the first factor, which
+    is what "one family, one construction" says.
+    """
+    points = tuple(int(number) for number in range(2 * _SIZE, 3 * _SIZE))
+    factor = FiniteOrderedSets()(points)
+    unit = Sets.Δ[0]
+    product = Sets().product((factor, unit))
+
+    again = FiniteOrderedSets()(points)
+
+    assert Sets().product((again, unit)) is product
+    assert again == factor
+    assert again is not factor
+    assert hash(again) == hash(factor)
+    assert product.factor(0) is factor
+    assert product.factor(1) is unit
+    assert cardinal(product.factor(0).cardinality()) == cardinal(_SIZE)
 
 
 def test_equality_of_finite_ordered_sets_is_transitive_whatever_route_built_them() -> None:
@@ -93,27 +232,3 @@ def test_equal_sets_give_one_product_whatever_route_built_them() -> None:
     assert Sets().product((FiniteOrderedSets()(points), unit)) is product
     assert product.factor(0) is literal
     assert product.factor(1) is unit
-
-
-def test_a_product_with_a_fresh_equal_large_factor_is_one_construction() -> None:
-    r"""A 4096-point factor built twice is one family, so one product, and one key.
-
-    The two factors are built separately from their points and are equal sets, so
-    their hashes agree and the store finds the product of the first from the
-    family of the second.  The product's own factor is the first factor, and the
-    factor's cardinality is the 4096 points it was built from.
-    """
-    points = tuple(int(number) for number in range(_SIZE))
-    factor = FiniteOrderedSets()(points)
-    unit = Sets.Δ[0]
-    product = Sets().product((factor, unit))
-
-    again = FiniteOrderedSets()(points)
-
-    assert again == factor
-    assert again is not factor
-    assert hash(again) == hash(factor)
-    assert Sets().product((again, unit)) is product
-    assert product.factor(0) is factor
-    assert product.factor(1) is unit
-    assert cardinal(product.factor(0).cardinality()) == cardinal(_SIZE)
