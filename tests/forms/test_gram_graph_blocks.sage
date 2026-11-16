@@ -41,3 +41,25 @@ def test_interleaved_components_give_no_block_cut() -> None:
     assert graph.has_edge(0, 2)
     assert not (1 in cuts)
     assert not (2 in cuts)
+
+
+def test_the_component_vertex_sets_of_a_gram_graph_do_not_depend_on_its_diagonal() -> None:
+    r"""Every nonzero diagonal entry is a loop, and a loop joins no two vertices.
+
+    The components of $A_2 \oplus A_1$ are $\{0,1\}$ and $\{2\}$; those of the
+    Gram matrix with an interleaved block, $\{0,2\}$ and $\{1\}$, are not
+    intervals, so they are components without a cut.
+    """
+    lattice = Lattices(ZZ)("A2") + Lattices(ZZ)("A1")
+    interleaved = Lattices(ZZ)([[-2, 0, 1], [0, -2, 0], [1, 0, -2]])
+
+    components = lattice.gram_tensor().gram_graph().connected_component_vertex_sets()
+    assert {
+        frozenset(int(position) for position in component)
+        for component in components
+    } == {frozenset({0, 1}), frozenset({2})}
+    separate = interleaved.gram_tensor().gram_graph().connected_component_vertex_sets()
+    assert {
+        frozenset(int(position) for position in component)
+        for component in separate
+    } == {frozenset({0, 2}), frozenset({1})}
