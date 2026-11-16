@@ -140,27 +140,52 @@ def test_a_class_is_characteristic_exactly_when_the_definition_says_so() -> None
         )
 
 
-def test_the_characteristic_classes_of_the_lattice_the_enumeration_is_read_on() -> None:
-    r"""``A_{<2> + U(2)^4}`` (512 classes) agrees with the definition at the sample.
+def test_the_quadratic_generating_class_of_the_rank_four_module_is_characteristic() -> None:
+    r"""On ``A_{<2> + U(2)^4}`` the ``<2>`` generating class is characteristic.
 
-    The definition is read over every class of the module for the zero class
-    and for each generating class, so a class that is not characteristic is
-    decided by its first witness there and the class that is characteristic is
-    read against all 512.  The ``<2>`` generating class is the characteristic
-    one, and the module says so: an implementation that reads a generating
-    family but drops the hypothesis, or one that answers no everywhere, is
-    wrong on this specimen at the order the enumeration is read at.
+    Its norm is ``1/2``, and the definition is asked of it directly, over all
+    512 classes of the module: ``q(a) - b(a, c)`` is an integer for every
+    class ``a``.  A decision that drops the hypothesis it relies on, or one
+    that answers no everywhere, is wrong on this specimen at the order the
+    enumeration test is read at.
     """
     module = _discriminant_module(4)
     classes = tuple(module.elements())
-    sample = (module.zero(),) + tuple(module.module_generators())
+    quadratic_class = next(
+        generating_class
+        for generating_class in module.module_generators()
+        if module.q(generating_class).lift() == QQ(1) / QQ(2)
+    )
     assert module.has_integral_doubled_polar_form() is True
-    for candidate in sample:
+    assert quadratic_class.is_characteristic() is True
+    assert all(
+        module.q(a).lift() - module.b(a, quadratic_class).lift() in ZZ
+        for a in classes
+    )
+
+
+def test_the_isotropic_generating_classes_of_the_rank_four_module_are_not_characteristic() -> None:
+    r"""The eight isotropic generating classes of ``A_{<2> + U(2)^4}`` are not characteristic.
+
+    A class of norm zero pairs trivially with ``q`` on its own class and could
+    be characteristic only by pairing as ``q`` everywhere else, which the
+    definition denies: each of these is read against all 512 classes until its
+    first witness, and the decision has to answer as the definition does.
+    """
+    module = _discriminant_module(4)
+    classes = tuple(module.elements())
+    isotropic_classes = tuple(
+        generating_class
+        for generating_class in module.module_generators()
+        if module.q(generating_class).lift() in ZZ
+    )
+    assert module.has_integral_doubled_polar_form() is True
+    assert sum(1 for candidate in isotropic_classes) == 8
+    for candidate in isotropic_classes:
         assert candidate.is_characteristic() is all(
             module.q(a).lift() - module.b(a, candidate).lift() in ZZ
             for a in classes
         )
-    assert any(candidate.is_characteristic() for candidate in sample)
 
 
 def test_a_characteristic_class_costs_about_one_evaluation_per_generating_class() -> None:
