@@ -6626,12 +6626,21 @@ class OwnedGroups(CategoryPacketMethods, OwnedCategory):
             return None
 
         def conjugate_subgroup(self, group_element, subgroup):
-            r"""Return ``g H g^-1``, the image of ``H`` under conjugation by ``g``."""
+            r"""Return ``g H g^-1``, the image of ``H`` under conjugation by ``g``.
+
+            ``G`` acts on its subgroups by this formula, so an element that
+            carries ``H`` to itself fixes that point of the subgroup set: the
+            answer is ``subgroup`` itself, with the selected data and maps it
+            retains, and not another subgroup with the same elements.  Every
+            element of ``H`` does, the identity first among them, and a
+            realization that decides the equality of ``g H g^-1`` with ``H``
+            for the remaining elements supplies those through
+            ``_conjugate_subgroup_construction``.
+            """
             assert group_element in self, f"{group_element} is not an element of {self}"
             assert subgroup is self or subgroup in self.subgroups(), f"{subgroup} is not a subgroup of {self}"
-            if subgroup is self or group_element == self.one():
-                # Conjugation by 1 is literally the identity action on the
-                # represented subgroup, including its selected data and maps.
+            if subgroup is self or group_element == self.one() or subgroup.is_parent_of(group_element) is True:
+                # g H g^-1 = H for g in H, so this element fixes the point H.
                 return subgroup
             selected = self._conjugate_subgroup_construction(group_element, subgroup)
             if selected is not None:
@@ -6921,16 +6930,31 @@ class OwnedGroups(CategoryPacketMethods, OwnedCategory):
                     )
                 return self.selected_resolution(OwnedGroups())
 
-            def conjugate_subgroup(self, group_element, subgroup):
-                r"""Return ``g H g^-1``; GAP's ``ConjugateSubgroup(H, x)`` is ``x^-1 H x``."""
-                assert group_element in self, f"{group_element} is not an element of {self}"
-                assert subgroup in self.subgroups(), f"{subgroup} is not a subgroup of {self}"
+            @RealizationHook
+            def _conjugate_subgroup_construction(self, group_element, subgroup):
+                r"""Supply ``g H g^-1`` from GAP, which also decides when it is ``H`` again.
+
+                Only ``conjugate_subgroup`` calls this, with the element and the
+                subgroup already admitted, and only after the identity and the
+                elements of ``subgroup`` itself have answered.
+
+                GAP's ``ConjugateSubgroup(H, x)`` is ``x^-1 H x``, so the engine
+                element is the inverse.  An element outside ``H`` can still
+                carry ``H`` to itself -- ``(3 4)`` outside the subgroup
+                ``<(1 2)>`` of ``S_4`` -- and the engine decides that equality
+                exactly.  The answer is then the point ``H`` the element fixes,
+                not a second subgroup with the same elements.
+                """
+                model = _gap_model(subgroup)
+                image = libgap.ConjugateSubgroup(
+                    model,
+                    _element_to_engine(self, group_element.inverse()),
+                )
+                if image == model:
+                    return subgroup
                 return _subgroup_from_gap(
                     self,
-                    libgap.ConjugateSubgroup(
-                        _gap_model(subgroup),
-                        _element_to_engine(self, group_element.inverse()),
-                    ),
+                    image,
                     f"the conjugate of {subgroup} by {group_element}",
                 )
 
