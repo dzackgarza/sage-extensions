@@ -42,3 +42,26 @@ def test_a_three_cycle_conjugates_the_subgroup_of_a_transposition() -> None:
     assert conjugate.order() == 2
     assert group((2, 3)) in conjugate
     assert transposition not in conjugate
+
+
+def test_an_element_of_the_subgroup_conjugates_it_to_itself() -> None:
+    group = Groups.S(3)
+    transposition = group((1, 2))
+    subgroup = group.subgroup((transposition,))
+
+    assert group.conjugate_subgroup(transposition, subgroup) is subgroup
+
+
+def test_an_element_outside_the_subgroup_that_normalizes_it_fixes_it() -> None:
+    r"""$(3\,4)$ lies outside $\langle(1\,2)\rangle$ in $S_4$ and commutes with $(1\,2)$.
+
+    Its conjugation fixes the subgroup, so the point it names is the subgroup
+    itself and not a second subgroup with the same elements.
+    """
+    group = Groups.S(4)
+    transposition = group((1, 2))
+    subgroup = group.subgroup((transposition,))
+    outside = group((3, 4))
+
+    assert outside not in subgroup
+    assert group.conjugate_subgroup(outside, subgroup) is subgroup
