@@ -3464,6 +3464,31 @@ def _plane_orbit_from_parabolic_stabilizer(subgroup, representative):
     return tuple(representatives)
 
 
+def _isotropic_line_class_points(lattice, line):
+    r"""The engine set of the divided classes ``{c, -c}`` of a primitive isotropic line.
+
+    The line's generator ``v`` has a divisibility ``div(v)`` and a divided
+    class ``[v / div(v)]`` in ``A_L``; an unoriented line is the *set*
+    ``{v, -v}``, so the class datum of the line is the set ``{c, -c}`` -- the
+    same set :meth:`OrthogonalCharacterQuotient.isotropic_line_stabilizer_image`
+    builds for its stabilizer, read here for the equivariance alone.
+    """
+    from sage.libs.gap.libgap import libgap
+
+    inclusion = line.inclusion()
+    domain = inclusion.domain()
+    label = next(iter(domain.module_generating_set()))
+    vector = inclusion(domain.module_generator(label))
+    discriminant_class = lattice.divided_discriminant_class(vector)
+    finite_orthogonal = lattice.discriminant_group().orthogonal_group()
+    return libgap.Set(
+        [
+            finite_orthogonal._engine_abelian_element(discriminant_class),
+            finite_orthogonal._engine_abelian_element(-discriminant_class),
+        ]
+    )
+
+
 def _line_generator_in_plane(plane, line):
     r"""Return the line's generator and its coordinates, read in the plane's own domain.
 
