@@ -1,0 +1,21 @@
+tree SHA: 89d0b4bd078dc052a3fe8fa76353bd507af9225b (modified paths: 0)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 11.16 10.72 9.02 12/730 3023102
+files: tests/groups/test_conjugation_by_the_identity_fixes_a_subgroup.sage tests/groups/test_predicate_kernel_and_stabilizer_subgroups_of_s4.sage tests/groups/test_a_subgroup_built_from_a_subgroup_states_its_description.sage tests/groups/test_the_classifying_category_of_s3.sage tests/groups/test_transporter_from_a_finite_orbit.sage tests/groups/test_double_cosets_from_a_finite_orbit.sage tests/groups/test_a_subgroup_acts_through_its_inclusion.sage
+inner 900 s
+..........................                                               [100%]
+26 passed in 18.34s
+[peakrss] probe556one: child waited=0 shell_code=0 samples=14
+[peakrss] peak tree RSS      : 588 MiB
+[peakrss] low-water MemAvail : 3801 MiB
+[peakrss] peak single VmHWM  : 588 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      577 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    24.1s procs=  3 rss=   588 MiB hwm=   588 MiB avail=  3946 MiB
+[peakrss]   t=    26.1s procs=  3 rss=   588 MiB hwm=   588 MiB avail=  3801 MiB
+[peakrss]   t=    22.1s procs=  3 rss=   586 MiB hwm=   588 MiB avail=  4212 MiB
+[peakrss]   t=    20.1s procs=  3 rss=   575 MiB hwm=   575 MiB avail=  3865 MiB
+[peakrss]   t=    18.0s procs=  3 rss=   572 MiB hwm=   572 MiB avail=  4037 MiB
+pytest exit: 0

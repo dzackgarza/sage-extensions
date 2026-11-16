@@ -3017,3 +3017,20 @@ read at formation in the sentence where the probe reads it at the order.  On
 `3fae3b5` the same specimen reads **2** before anything is asked of the answer:
 the deleted hook's equality test and the construction each called
 `libgap.ConjugateSubgroup` once.
+
+The round was rebased onto `eb5baa8` before it was pushed, so the commits the
+table above names by their pre-rebase ids are these on the pushed history:
+`76c5251` (the repair) is `a06e035`, `76851e6` (the two tests the review's
+semantics supersede) is `555fae7`, and the two test commits keep their place
+before it (`3c20c57` is `3af3c4d`).  The rebase took in `main`'s own changes
+since `3fae3b5`; of the files this round edits, only `groups.py` differs
+between the pre-rebase tip and the pushed one, and only in the `_TransversalCoset`
+rendering docstring `main` rewrote, which no commit of this round touches.  The
+three runs below are the same selections and the same probe on the rebased tree,
+so the evidence covers the pushed code and not only the pre-rebase tree.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `556r2-green-nine-at-89d0b4b.log` | `89d0b4b`, clean tree (the rebased tip) | the four files of the subject: **9 passed in 2.61 s** |
+| `556r2-consumers-green-at-89d0b4b.log` | `89d0b4b`, clean tree | the seven consumer files: **26 passed in 18.34 s** |
+| `556r2-probe-six-at-89d0b4b.log` | `89d0b4b`, clean tree | the six findings' probe: the same answers as `556r2-probe-six-at-76851e6.log`, including 0 engine conjugations forming a conjugate and 1 on the first request for its order, and both construction data read as required |
