@@ -513,9 +513,21 @@ class DiscriminantQuadraticModules(OwnedCategoryOverBaseRing):
             ``b : A x A -> Q/Z`` (the sign convention of this module's
             quotient value modules), that ``an element x of A is called
             characteristic if b(x, a) = q(a) (mod 1) for all a of A``.
-            The quadratic and bilinear values live in
-            quotient value modules, so the comparison is made on their
-            selected rational lifts, and
+
+            The class is decided on a generating set of classes.  ``q`` is the
+            descended norm and ``b`` its polar pairing, so ``q(x + y) = q(x) +
+            q(y) + 2b(x, y)``: ``b(v, .)`` modulo ``1`` is a homomorphism
+            ``A -> Q/Z`` always, and ``q`` modulo ``1`` is one exactly when
+            ``2b`` is integer-valued.  Two homomorphisms agreeing on a
+            generating set agree everywhere, so a class of a module with
+            integer-valued ``2b`` is characteristic exactly when it pairs with
+            each generating class as ``q`` does.  When ``2b`` is not
+            integer-valued no class is characteristic: a characteristic ``v``
+            would make ``q`` modulo ``1`` equal the homomorphism ``b(v, .)``
+            modulo ``1``, which is integer-valued on the diagonal.
+
+            The quadratic and bilinear values live in quotient value modules,
+            so the comparison is made on their selected rational lifts, and
             the membership is asked of this module's own base ring: the lifts
             are elements of the owned rational field, and the owned integers
             coerce them, where the engine's own integer ring refuses a foreign
@@ -523,10 +535,18 @@ class DiscriminantQuadraticModules(OwnedCategoryOverBaseRing):
             """
             parent = self.parent()
             integers = parent.base_ring()
+            generating_classes = tuple(parent.module_generators())
+            if not all(
+                2 * parent.b(left, right).lift() in integers
+                for left in generating_classes
+                for right in generating_classes
+            ):
+                return False
             return all(
-                parent.q(element).lift() - parent.b(element, self).lift()
+                parent.q(generating_class).lift()
+                - parent.b(generating_class, self).lift()
                 in integers
-                for element in parent.elements()
+                for generating_class in generating_classes
             )
 
 

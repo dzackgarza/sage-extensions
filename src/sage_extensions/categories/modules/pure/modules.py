@@ -3468,7 +3468,16 @@ class Modules(OwnedCategoryOverBaseRing):
 
                 @cached_method
                 def elements(self):
-                    r"""Return all elements through the private finite Smith workspace."""
+                    r"""Return all elements through the private finite Smith workspace.
+
+                    The workspace is read once: its residues are crossed into
+                    this module by this module's own enumeration, exactly as
+                    ``__iter__`` crosses them, and the finite ordered set then
+                    selects by position from that enumeration.  Asking the
+                    workspace for its ``n``-th residue instead rebuilds its whole
+                    list of residues, so the enumeration would pay the order of
+                    the group once per element.
+                    """
 
                     assert _engine_ring(self.base_ring()) is SageZZ, (
                         f"the elements of the torsion module {self} are enumerated only over ZZ, not over {self.base_ring()}"
@@ -3483,12 +3492,10 @@ class Modules(OwnedCategoryOverBaseRing):
                     assert engine is not None, (
                         f"the elements of the finite abelian group {self} cannot be enumerated: its Smith normal form is not available"
                     )
-                    positions = Sets.Δ[int(engine.cardinality()) - 1]
+                    classes = tuple(self)
                     return FiniteOrderedSets().from_indexed(
-                        positions,
-                        lambda position: self._from_smith_engine_element(
-                            engine[int(position)]
-                        ),
+                        Sets.Δ[int(engine.cardinality()) - 1],
+                        lambda position: classes[int(position)],
                         name="Finite torsion elements",
                     )
 
