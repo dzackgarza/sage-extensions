@@ -2257,11 +2257,14 @@ class LatticeIsometryMethods:
         representative has coordinates \(x\) moves to the class of
         \(x\,(R^{-1})^t\), where \(R\) is the isometry's matrix in the
         lattice's framing.  That is the isometry's own matrix and nothing else,
-        so the integral case writes the element out of it
+        so an integral lattice whose frames differ by one change of basis
+        writes the element out of it
         (:meth:`TorsionFormOrthogonalGroup.from_dual_action`); the route
         through the presented module maps, which presents two module morphisms
         per element, is what the other base rings take, where the dual basis is
-        not the lattice's own.
+        not the lattice's own, and what a form takes whose presentation names
+        more generators than it has invariant factors
+        (:meth:`TorsionFormOrthogonalGroup.carries_the_dual_action`).
         """
         if self.domain() is not self.codomain():
             raise ValueError(
@@ -2269,7 +2272,7 @@ class LatticeIsometryMethods:
             )
         form = self.domain().discriminant_group()
         group = form.orthogonal_group()
-        if _engine_ring(form.base_ring()) is SageZZ:
+        if _engine_ring(form.base_ring()) is SageZZ and group.carries_the_dual_action():
             return group.from_dual_action(_engine_row_action_matrix(self))
         return group.from_morphism(self.discriminant_isometry())
 

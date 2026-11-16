@@ -2084,6 +2084,30 @@ class TorsionFormOrthogonalGroup(CategoricalMor):
             )
         return normalized_form.module_category().Mor(normalized_form, normalized_form)(images)
 
+    def carries_the_dual_action(self) -> bool:
+        r"""Whether this form's frames are one change of basis apart.
+
+        :meth:`from_dual_action` writes the engine matrix of an isometry out of
+        the isometry's own matrix, by conjugating the dual action from the
+        lattice's dual frame into the invariant-factor frame this group acts
+        on.  That is one matrix exactly when the three framings are read on the
+        same finite set of generators: the form's presentation, its metric
+        dual's, and its invariant-factor normal form's.  A presentation that
+        names more generators than the form has invariant factors -- the
+        reduction of `U + U + A1` at an isotropic vector has five conjugate
+        generators and a discriminant group of one -- normalizes through a map
+        with a kernel between two different framings, and the passage is a
+        module map and not a matrix; :meth:`from_morphism` presents it.
+        """
+        form = self.domain()
+        normalized = self.normalization_isometry().codomain()
+        labels = tuple(form.module_generating_set())
+        return (
+            tuple(form.framing_morphism().domain().module_generating_set()) == labels
+            and tuple(form.dual_lattice().module_generating_set()) == labels
+            and tuple(normalized.module_generating_set()) == labels
+        )
+
     @cached_method
     def _dual_action_conjugation(self):
         r"""Return \(E\) and \(E^{-1}\): the form's dual frame in the engine's framing.

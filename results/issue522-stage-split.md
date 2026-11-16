@@ -144,8 +144,12 @@ The enumeration, layer by layer, on `762126c` with the two repairs
 ```
 
 247 candidates for the whole walk, none of them outside a wall already
-written, against 1 855 003 candidates and 42 s of enumeration before it; the
-walk's own cost is now the membership question and nothing else.  The figures
+written.  The same walk before the change enumerated 587 394 candidates in the
+layers this session saw (heights 0 to 14, `.scratch/probe522d_walk.py`) and was
+killed at 560 s without returning; the walk's own record of its earlier cost is
+1 855 003 candidates, 337.8 s of root test and 92.9 s of dependence check, in
+`_FilteredVinAl.IsNewRoot`.  What is left of the call is now the membership
+question and nothing else.  The figures
 above are at load average 20 on this four-CPU host, where one question costs
 0.17 s; the same question cost 0.12 s at load 4 (`§4`), so the sift figures are
 load-bound and the candidate counts are not.
