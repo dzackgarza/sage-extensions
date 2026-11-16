@@ -1,0 +1,141 @@
+=== tree: 8c4f5ba088a4314e5cb953ffab667de41345d229 (modified: 0 paths)
+=== files: tests/forms/test_gram_graph_archive.sage tests/categories/test_lattice_parent_owned_meets.sage tests/lattices/test_lattice_database_owner_contracts.sage::test_integral_hyperbolic_index_is_owned_by_the_lattice
+=== start: 06:39:50
+FF.F                                                                     [100%]
+=================================== FAILURES ===================================
+_______ test_a1_plus_a1_decomposes_orthogonally_but_a2_is_indecomposable _______
+
+    def test_a1_plus_a1_decomposes_orthogonally_but_a2_is_indecomposable() -> None:
+        r"""A definite lattice is uniquely an orthogonal sum of indecomposables.
+    
+        $A_1 \oplus A_1$ has two summands, each isometric to $A_1$; the root
+        lattice $A_2$ is indecomposable, although it contains $A_1$.  Source:
+        Kneser, *Quadratische Formen*, Satz 27.2 (Eichler).
+        """
+        a1 = Lattices(ZZ)("A1")
+        a2 = Lattices(ZZ)("A2")
+>       summands = (a1 + a1).orthogonal_decomposition()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: Lattices.ParentMethods.orthogonal_decomposition() missing 1 required positional argument: 'embeddings'
+
+tests/forms/test_gram_graph_archive.sage:15: TypeError
+_ test_a_root_of_A2_and_its_orthogonal_complement_span_an_index_two_sublattice _
+
+>   return self._cached_methods[name]
+E   KeyError: 'basis'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_a_root_of_A2_and_its_orthogonal_complement_span_an_index_two_sublattice() -> None:
+        r"""For a root ``a1`` of ``A2``: ``(Z a1)^perp = Z(a1 + 2 a2)`` of norm ``+-6``.
+    
+        ``(a1 + 2 a2)^2 = 2 - 4 + 8 = 6`` up to the sign convention, so
+        ``A1 + <6>`` has determinant 12 and index 2 in ``A2`` (``det A2 = 3``).
+        """
+        a2 = Lattices(ZZ)("A2")
+>       a1, _ = a2.basis()
+                ^^^^^^^^
+
+tests/categories/test_lattice_parent_owned_meets.sage:13: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    ???
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: 'OwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType' object has no attribute 'basis'. Did you mean: 'base'?
+
+sage/cpython/getattr.pyx:362: AttributeError
+____________ test_integral_hyperbolic_index_is_owned_by_the_lattice ____________
+
+>   meth = super().__getitem__
+E   AttributeError: 'super' object has no attribute '__getitem__'. Did you mean: '__getstate__'?
+
+sage/structure/parent.pyx:1273: AttributeError
+
+During handling of the above exception, another exception occurred:
+
+>   return self._cached_methods[name]
+E   KeyError: '__getitem__'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   meth = self.getattr_from_category('__getitem__')
+
+sage/structure/parent.pyx:1277: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    attr = getattr_from_other_class(self, cls, name)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   raise AttributeError(dummy_error_message)
+E   AttributeError: '_SelectedFinitePresentationModules.parent_class[_PresentedModule].ObjectType' object has no attribute 'list'
+
+sage/cpython/getattr.pyx:357: AttributeError
+
+During handling of the above exception, another exception occurred:
+
+>   return self._cached_methods[name]
+E   KeyError: 'list'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_integral_hyperbolic_index_is_owned_by_the_lattice() -> None:
+        plane = Lattices(ZZ)("U")
+        e8 = Lattices(ZZ)("E8")
+    
+        assert (plane + plane + e8).integral_hyperbolic_index() == 2
+        assert (plane.twist(2) + Lattices(ZZ)([[-2]])).integral_hyperbolic_index() == 0
+>       assert Lattices(ZZ)([[1, 0], [0, -1]]).integral_hyperbolic_index() == 0
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/lattices/test_lattice_database_owner_contracts.sage:93: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/lattices.py:6534: in integral_hyperbolic_index
+    return self.hyperbolic_index()
+           ^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:2328: in sage.misc.cachefunc.CachedMethodCallerNoArgs.__call__
+    ???
+src/sage_extensions/categories/lattices.py:6663: in hyperbolic_index
+    direct_index, _direct_splitting = self._direct_hyperbolic_splitting()
+                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:2328: in sage.misc.cachefunc.CachedMethodCallerNoArgs.__call__
+    ???
+src/sage_extensions/categories/lattices.py:6556: in _direct_hyperbolic_splitting
+    partner = isotropic.hyperbolic_partner()
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/lattices.py:10649: in hyperbolic_partner
+    for residue in projection.codomain():
+                   ^^^^^^^^^^^^^^^^^^^^^
+sage/structure/parent.pyx:1279: in sage.structure.parent.Parent.__getitem__
+    ???
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    return self.getattr_from_category(name)
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    attr = getattr_from_other_class(self, cls, name)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: '_SelectedFinitePresentationModules.parent_class[_PresentedModule].ObjectType' object has no attribute 'list'
+
+sage/cpython/getattr.pyx:357: AttributeError
+============================= slowest 10 durations =============================
+1.60s call     tests/lattices/test_lattice_database_owner_contracts.sage::test_integral_hyperbolic_index_is_owned_by_the_lattice
+0.06s call     tests/forms/test_gram_graph_archive.sage::test_a1_plus_a1_decomposes_orthogonally_but_a2_is_indecomposable
+0.04s call     tests/categories/test_lattice_parent_owned_meets.sage::test_two_hyperbolic_planes_form_the_even_unimodular_lattice_of_signature_2_2
+
+(7 durations < 0.005s hidden.  Use -vv to show these durations.)
+=========================== short test summary info ============================
+FAILED tests/forms/test_gram_graph_archive.sage::test_a1_plus_a1_decomposes_orthogonally_but_a2_is_indecomposable
+FAILED tests/categories/test_lattice_parent_owned_meets.sage::test_a_root_of_A2_and_its_orthogonal_complement_span_an_index_two_sublattice
+FAILED tests/lattices/test_lattice_database_owner_contracts.sage::test_integral_hyperbolic_index_is_owned_by_the_lattice
+3 failed, 1 passed in 16.00s
+=== exit: 1 at 06:40:12

@@ -1,0 +1,97 @@
+=== tree: 39c2bed5497cefe34e25df7bd45827dcee9cdd07 (modified: 0 paths)
+=== files: tests/lattices/test_lattice_database_owner_contracts.sage
+=== start: 06:37:22
+......F.....                                                             [100%]
+=================================== FAILURES ===================================
+____________ test_integral_hyperbolic_index_is_owned_by_the_lattice ____________
+
+>   meth = super().__getitem__
+E   AttributeError: 'super' object has no attribute '__getitem__'. Did you mean: '__getstate__'?
+
+sage/structure/parent.pyx:1273: AttributeError
+
+During handling of the above exception, another exception occurred:
+
+>   return self._cached_methods[name]
+E   KeyError: '__getitem__'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   meth = self.getattr_from_category('__getitem__')
+
+sage/structure/parent.pyx:1277: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    attr = getattr_from_other_class(self, cls, name)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   raise AttributeError(dummy_error_message)
+E   AttributeError: '_SelectedFinitePresentationModules.parent_class[_PresentedModule].ObjectType' object has no attribute 'list'
+
+sage/cpython/getattr.pyx:357: AttributeError
+
+During handling of the above exception, another exception occurred:
+
+>   return self._cached_methods[name]
+E   KeyError: 'list'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_integral_hyperbolic_index_is_owned_by_the_lattice() -> None:
+        plane = Lattices(ZZ)("U")
+        e8 = Lattices(ZZ)("E8")
+    
+        assert (plane + plane + e8).integral_hyperbolic_index() == 2
+        assert (plane.twist(2) + Lattices(ZZ)([[-2]])).integral_hyperbolic_index() == 0
+>       assert Lattices(ZZ)([[1, 0], [0, -1]]).integral_hyperbolic_index() == 0
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/lattices/test_lattice_database_owner_contracts.sage:93: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/lattices.py:6599: in integral_hyperbolic_index
+    return self.hyperbolic_index()
+           ^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:2328: in sage.misc.cachefunc.CachedMethodCallerNoArgs.__call__
+    ???
+src/sage_extensions/categories/lattices.py:6728: in hyperbolic_index
+    direct_index, _direct_splitting = self._direct_hyperbolic_splitting()
+                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:2328: in sage.misc.cachefunc.CachedMethodCallerNoArgs.__call__
+    ???
+src/sage_extensions/categories/lattices.py:6621: in _direct_hyperbolic_splitting
+    partner = isotropic.hyperbolic_partner()
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/lattices.py:10702: in hyperbolic_partner
+    for residue in projection.codomain():
+                   ^^^^^^^^^^^^^^^^^^^^^
+sage/structure/parent.pyx:1279: in sage.structure.parent.Parent.__getitem__
+    ???
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    ???
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: '_SelectedFinitePresentationModules.parent_class[_PresentedModule].ObjectType' object has no attribute 'list'
+
+sage/cpython/getattr.pyx:357: AttributeError
+============================= slowest 10 durations =============================
+95.06s call     tests/lattices/test_lattice_database_owner_contracts.sage::test_primitive_orbit_series_counts_primitive_isotropic_lines
+8.53s call     tests/lattices/test_lattice_database_owner_contracts.sage::test_spinor_genus_counts_and_class_numbers_are_owned_by_the_lattice
+2.99s call     tests/lattices/test_lattice_database_owner_contracts.sage::test_positive_a2_genus_and_orthogonal_group_are_owned_by_the_lattice
+1.34s call     tests/lattices/test_lattice_database_owner_contracts.sage::test_integral_hyperbolic_index_is_owned_by_the_lattice
+0.58s call     tests/lattices/test_lattice_database_owner_contracts.sage::test_root_and_theta_catalogue_invariants_are_owned_by_the_lattice
+0.47s call     tests/lattices/test_lattice_database_owner_contracts.sage::test_discriminant_sequence_retains_a_nontrivial_pointed_coset_quotient
+0.37s call     tests/lattices/test_lattice_database_owner_contracts.sage::test_a2_orbit_and_discriminant_certification_data_are_owned_by_the_lattice
+0.24s call     tests/lattices/test_lattice_database_owner_contracts.sage::test_rational_definite_orthogonal_group_is_owned_by_the_lattice
+0.16s call     tests/lattices/test_lattice_database_owner_contracts.sage::test_balanced_even_unimodular_lattice_recognizes_its_hyperbolic_plane_power
+0.10s call     tests/lattices/test_lattice_database_owner_contracts.sage::test_discriminant_orbit_series_under_the_eichler_hypothesis_is_owned_by_the_lattice
+=========================== short test summary info ============================
+FAILED tests/lattices/test_lattice_database_owner_contracts.sage::test_integral_hyperbolic_index_is_owned_by_the_lattice
+1 failed, 11 passed in 119.95s (0:01:59)
+=== exit: 1 at 06:39:33
