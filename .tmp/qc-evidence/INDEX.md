@@ -3217,3 +3217,7 @@ The red's tree is `ba303ba`, which is in the pushed history, and the log names i
 The other logs name trees the rebases replaced; they hold the same four files as
 the tip, so every run covers the code that is pushed and none is claimed for a tree
 it did not measure.
+| `519r4-classsum-at-pushed.log` | the head this pushes, `5064d72` | `tests/algebras/test_group_algebra_class_sums.sage`, lint on: **5 passed in 5.06 s** -- the class-sum, refusal, centrality and inclusion tests |
+| `519r4-brauer-at-pushed.log` | the same head | `tests/groups/test_module_characters.sage`, lint on: **3 passed in 3.06 s** -- the Brauer value and the modular trace at the identity of the `F_2^2` specimen |
+| `519r4-scalar-at-pushed.log` | the same head | `tests/groups/test_actual_group_algebra_modules.sage`, lint on: **4 failed, 4 passed in 4.56 s**; the four ids are the file's on main `c9568ed` too (`4 failed, 3 passed in 2.19 s`), and the added test is among the passes |
+| `519r4-probe-at-pushed.log` | the same head | `519r4-probe.py`: the centre's inclusion for `QQ[S_3]`, for `Algebras(QQ).Unital()(QQ^3, m, 1)` (unital, not associative) and for `Algebras(QQ)(QQ^2, m)` (not unital) -- arrow parent is `center.Mor(algebra)` in all three, `preserves_unit` True in the two unital cases |
