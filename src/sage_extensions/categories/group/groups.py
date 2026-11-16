@@ -2305,7 +2305,7 @@ class _SubgroupCollection(Sets().ObjectType):
                     _subgroup_from_gap(
                         group,
                         subgroup,
-                        lambda: f"a subgroup of {group} that GAP lists",
+                        lambda: f"a subgroup of {_named_by_its_own_words(group)} that GAP lists",
                     )
                     for subgroup in _gap_model(group).AllSubgroups()
                 )
@@ -6839,7 +6839,7 @@ class OwnedGroups(CategoryPacketMethods, OwnedCategory):
                     center = _subgroup_from_gap(
                         self,
                         _gap_model(self).Center(),
-                        lambda: f"the centre of {self}",
+                        lambda: f"the centre of {_named_by_its_own_words(self)}",
                     )
                     return center, center.inclusion()
                 case _:
@@ -6856,7 +6856,7 @@ class OwnedGroups(CategoryPacketMethods, OwnedCategory):
                     return _subgroup_from_gap(
                         self,
                         _gap_model(self).DerivedSubgroup(),
-                        lambda: f"the derived subgroup of {self}",
+                        lambda: f"the derived subgroup of {_named_by_its_own_words(self)}",
                     )
                 case _:
                     assert False, (
