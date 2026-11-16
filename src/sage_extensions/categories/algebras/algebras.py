@@ -84,6 +84,7 @@ from sage_extensions.categories.sets.indexed_families import (
 )
 from sage_extensions.categories.sets.set_categories import (
     EnumeratedSets,
+    FiniteSets,
     OwnedSetMorphism,
     Sets,
 )
@@ -3830,6 +3831,15 @@ class AlgebrasWithChosenFinitePresentation(OwnedCategoryOverBaseRing):
             these algebras: this category and ``FramedFreeModules`` are
             incomparable, so which of the two declares the answer is the
             category order's to say rather than one being below the other.
+
+            An algebra over a finite coefficient ring is torsion-free for the
+            same reason, without being free.  A non-zero-divisor of a finite
+            ring is a unit: multiplication by it kills nothing, so it is an
+            injective endomorphism of the finite set ``R``, hence bijective,
+            hence invertible (Mathlib ``Finite.injective_iff_surjective``).  A
+            unit kills no nonzero element of any module, so no non-zero-divisor
+            does either.  $\\mathbf{Z}/4[x]/(2x)$ is one: it is not free --
+            $2x = 0$ with $2 \\neq 0$ -- and it is torsion-free.
             """
             from sage_extensions.categories.algebras.free_algebras import (
                 SymmetricAlgebras,
@@ -3840,6 +3850,8 @@ class AlgebrasWithChosenFinitePresentation(OwnedCategoryOverBaseRing):
             if base.is_field() is True:
                 return True
             if self in FramedFreeModules(base):
+                return True
+            if base in FiniteSets():
                 return True
             assert base in PrincipalIdealDomains(), (
                 f"torsion-freeness of {self} is decided here only over a principal ideal domain, but "
@@ -3867,12 +3879,20 @@ class AlgebrasWithChosenFinitePresentation(OwnedCategoryOverBaseRing):
         def _represented_relation_torsion_witness(self):
             r"""Return a retained relation's ``(scalar, element)`` torsion pair, or ``None``.
 
-            A defining relation that is one term ``c w`` with ``c`` a nonzero
-            non-unit of the coefficient ring and ``w`` a word whose class in
-            the algebra is nonzero is exactly a torsion element with its
-            annihilator: ``c * (w mod I) = 0`` in ``A`` while neither factor is
-            zero.  So ``Z[t]/(2t)`` is refuted by the relation ``2 t``, in
-            which ``2`` is not a unit and ``t`` is nonzero.
+            A defining relation that is one term ``c w`` with ``c`` a
+            non-zero-divisor of the coefficient ring that is not a unit, and
+            ``w`` a word whose class in the algebra is nonzero, is exactly a
+            torsion element with its annihilator: ``c * (w mod I) = 0`` in
+            ``A`` while neither factor is zero.  So ``Z[t]/(2t)`` is refuted by
+            the relation ``2 t``, in which ``2`` is not a unit and ``t`` is
+            nonzero.
+
+            The scalar has to be a non-zero-divisor, because that is what
+            torsion is: ``Z/4[x]/(2x)`` has the relation ``2 x``, whose scalar
+            is nonzero, is not a unit, and is a zero-divisor of ``Z/4`` since
+            ``2 * 2 = 0``.  It annihilates nothing that a non-zero-divisor also
+            annihilates, so that algebra retains no torsion relation and this
+            returns no witness for it.
 
             Both terms are read off the retained presentation: the word and
             coefficient come from the existing word-framing decode of its
@@ -3899,6 +3919,8 @@ class AlgebrasWithChosenFinitePresentation(OwnedCategoryOverBaseRing):
                     continue
                 ((label, scalar),) = terms.items()
                 if (scalar == base.zero()) is not False or scalar.is_unit() is not False:
+                    continue
+                if scalar.is_regular() is not True:
                     continue
                 element = self.algebra_presentation_morphism()(evaluate(label))
                 if (element == self.zero()) is not False:
