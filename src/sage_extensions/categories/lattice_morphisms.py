@@ -1748,51 +1748,20 @@ class LatticeIsometryMethods:
             # (measured on the rank-12 Enriques line: ~75 ms per conversion
             # inside twelve element preimages plus their solves, before the
             # wrapping - this pass computes the same data once).
-            target_labels = tuple(target.module_generating_set())
-            rows = []
-            forward_images = []
-            for label in tuple(source.module_generating_set()):
-                coordinates = self(rational_source.module_generator(label)).to_vector()
-                terms = {}
-                row = []
-                for target_label in target_labels:
-                    coefficient = coordinates(target_label)
-                    if coefficient not in ring:
-                        return None
-                    terms[target_label] = ring(coefficient)
-                    row.append(int(_own_ring(ring)._engine_element(coefficient)))
-                rows.append(row)
-                forward_images.append(target.linear_combination(terms))
-            forward = source.module_category().Mor(source, target)(tuple(forward_images))
-            coordinates = engine_matrix(SageZZ, rows)
+            # The framed matrix of the rational map is read in one engine
+            # call: column s is the coordinate vector of the image of e_s.
+            rational_matrix = _engine_matrix(_module_matrix(self))
+            if any(not entry.is_integer() for entry in rational_matrix.list()):
+                return None
+            coordinates = rational_matrix.change_ring(SageZZ)
             if int(coordinates.determinant()) not in (1, -1):
                 return None
-            inverse_matrix = coordinates.inverse()
-            source_generators = tuple(source.module_generators())
-            # ``coordinates`` carries the images in its *rows* (row ``i`` is the
-            # image of the ``i``-th source generator, a row vector acting on the
-            # right), so the backward map's images are the rows of the inverse:
-            # ``g(e_j) = sum_i inverse[j][i] e_i``.  Reading its columns instead
-            # builds ``(F^-1)^T``, which is the inverse only when ``F`` is
-            # symmetric — true of ``-id`` and of a root reflection, and false of
-            # the Enriques stabilizer generators, where it produced an isometry
-            # whose stored inverse is not its inverse.
-            backward = source.module_category().Mor(target, source)(
-                tuple(
-                    sum(
-                        (
-                            source.scalar_multiple(
-                                _owned_engine_element(ring, coefficient),
-                                generator,
-                            )
-                            for coefficient, generator in zip(
-                                row, source_generators, strict=True
-                            )
-                        ),
-                        source.zero(),
-                    )
-                    for row in inverse_matrix.rows()
-                )
+            # Both factors are raised from their framed matrices; the backward
+            # factor is the integral inverse matrix (columns are the images
+            # of the target generators).
+            forward = _morphism_from_engine_matrix(source.module_category().Mor(source, target), coordinates)
+            backward = _morphism_from_engine_matrix(
+                source.module_category().Mor(target, source), coordinates.inverse().change_ring(SageZZ)
             )
         else:
             linear = rational_source.module_category().Mor(rational_source, rational_target)(self)

@@ -353,8 +353,17 @@ class _ColouredFamilyRealization:
 
     @cached_method
     def family_morphism(self):
-        r"""The module morphism ``F(I) -> L``, ``e_i |-> v_i``, through which the Gram matrix is pulled back."""
-        return Modules(self._lattice.base_ring()).Mor(self.free_module(), self._lattice)(self.vector)
+        r"""The module morphism ``F(I) -> L``, ``e_i |-> v_i``, through which the Gram matrix is pulled back.
+
+        Column ``i`` of its framed matrix is the coordinate row of ``v_i``,
+        read once for the family matrix.
+        """
+        from sage_extensions.categories.modules.pure.modules import _morphism_from_engine_matrix
+
+        return _morphism_from_engine_matrix(
+            Modules(self._lattice.base_ring()).Mor(self.free_module(), self._lattice),
+            self._family_coordinate_matrix().transpose(),
+        )
 
     @cached_method
     def span(self):
@@ -399,9 +408,11 @@ class _ColouredFamilyRealization:
             return self._lattice.gram_tensor()
         return self._lattice.gram_tensor().pullback(self.family_morphism())
 
+    @cached_method
     def pairing_graph(self):
         # The graph is private computation data. Its returned index maps
         # retain the owned rankings, not these quadratic-size graph tables.
+        # One graph per realization, so its pairing tables are computed once.
         return _LabelledPairingGraph(
             self._indices, self._lattice.gram_tensor(), self.colouring(),
             self.family_morphism(),
@@ -594,14 +605,13 @@ class _ColouredFamilyRealization:
         r"""Rows of family vectors in the lattice framing, at the private engine boundary."""
         labels = tuple(self._lattice.module_generating_set())
         ring = self._lattice.base_ring()
+        # One coordinate vector per family vector; each row reads it at the labels.
+        coordinates = tuple(self.vector(index).to_vector() for index in self.indices())
         return engine_matrix(
             SageZZ,
             tuple(
-                tuple(
-                    _engine_element(ring, self.vector(index).to_vector()(label))
-                    for label in labels
-                )
-                for index in self.indices()
+                tuple(_engine_element(ring, vector(label)) for label in labels)
+                for vector in coordinates
             ),
         )
 
