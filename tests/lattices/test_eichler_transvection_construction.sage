@@ -73,7 +73,8 @@ def test_the_transvection_is_the_rank_two_update_of_the_identity() -> None:
     `(x)` is the outer product of a vector with a covector, `b` is the Gram
     tensor of the lattice -- symmetric, so the contraction `gram * v` is the
     covector `b(v,.)` -- and the identity is the Kronecker delta of the chosen
-    framing.  The left-hand side is the transvection's own tensor, so the
+    framing.  `e` and `a` enter as `tensor.coordinates`, their coordinate vectors
+    in that framing.  The left-hand side is the transvection's own tensor, so the
     equation is the matrix of `t(e,a)` entry for entry.
 
     The control's half coefficient is `q(a)/2 = 3`, so the last term is the
@@ -82,16 +83,10 @@ def test_the_transvection_is_the_rank_two_update_of_the_identity() -> None:
     """
     lattice, isotropic, _partner, orthogonal = _control()
     ring = lattice.base_ring()
-    labels = tuple(lattice.module_generating_set())
     gram = lattice.gram_tensor()
 
-    def coordinate(element):
-        return tensor.vector(
-            ring, tuple(element.to_vector()(label) for label in labels)
-        )
-
-    isotropic_vector = coordinate(isotropic)
-    orthogonal_vector = coordinate(orthogonal)
+    isotropic_vector = tensor.coordinates(isotropic)
+    orthogonal_vector = tensor.coordinates(orthogonal)
     half_norm = ring(orthogonal.q()) / ring(2)
 
     update = (
