@@ -1,0 +1,88 @@
+## issue381: the ambient flag row on main 3fae3b5 (before the clause repair of cb25e4b)
+## command: python -m pytest -p qc_sage_session -o addopts= -p suite_budget --no-time-gates tests/lattices/test_zz_diag.sage  (6JRS: lattice.Aut().isotropic_orbit_representatives(2, flag=True))
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+time gates OFF (--no-time-gates): star import 1.28 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: asyncio-1.5.0, xdist-3.8.0, reportlog-1.0.0, platformdirs-4.13.5, hypothesis-6.170.15, anyio-4.15.1, timeout-2.4.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 1 item
+
+tests/lattices/test_zz_diag.sage F                                       [100%]
+
+=================================== FAILURES ===================================
+__________________________ test_the_ambient_flag_row ___________________________
+
+    def test_the_ambient_flag_row() -> None:
+        lattice = Lattices(ZZ)("U") + Lattices(ZZ)("U") + Lattices(ZZ)([[-2]])
+>       flags = lattice.Aut().isotropic_orbit_representatives(2, flag=True)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/lattices/test_zz_diag.sage:5: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/lattice_morphisms.py:5242: in isotropic_orbit_representatives
+    return _isotropic_orbit_representatives(self, rank, flag=flag)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/timing.py:393: in timed
+    return function(*arguments, **keywords)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/isotropic_orbits.py:1649: in _isotropic_orbit_representatives
+    classes = primitive_marking_classes(category, shape, lattice)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../sage-indefinite-port/src/sage_indefinite_port/indefinite/marked_lattices.py:285: in primitive_marking_classes
+    classes = tuple(category(_flag_marking_from_basis(lattice, basis, dimensions)) for basis in INDUCTION.isotropic_flag_bases(lattice, dimensions))
+                                                                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../sage-indefinite-port/src/sage_indefinite_port/indefinite/isotropic_induction.py:488: in isotropic_flag_bases
+    for basis in self._reduced_isotropic_flag_bases(reduction.reduced, dimensions)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../sage-indefinite-port/src/sage_indefinite_port/indefinite/isotropic_induction.py:514: in _reduced_isotropic_flag_bases
+    basis, images = self.basis_flag_action(lattice, previous, previous_dimensions)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../sage-indefinite-port/src/sage_indefinite_port/indefinite/isotropic_induction.py:469: in basis_flag_action
+    return self.flag_action_data(space, terms)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../sage-indefinite-port/src/sage_indefinite_port/indefinite/isotropic_induction.py:713: in flag_action_data
+    group = domain.general_linear_group().flag_stabilizer(terms)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py:4279: in flag_stabilizer
+    return StabilizerSubgroups(self)(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Category of stabilizer subgroups, x = {}
+args = (Aut_Category of modules over Integer Ring(Integral lattice of rank 1 and signature (0, 0))-action functor on Integral...odules over Integer Ring, <function ModuleAutomorphismGroup.flag_stabilizer.<locals>.preserves_flag at 0x7f4a82153ab0>)
+opts = {'description': 'g preserves the flag {} of Integral lattice of rank 1 and signature (0, 0)', 'generating_morphism': G...nge': Morphism from Integral lattice of rank 1 and signature (0, 0) to Integral lattice of rank 1 and signature (0, 0)}
+
+    def __call__(self, x, *args, **opts):
+        """
+        Construct an object in this category from the data in ``x``,
+        or throw :exc:`TypeError` or :exc:`NotImplementedError`.
+    
+        If ``x`` is readily in ``self`` it is returned unchanged.
+        Categories wishing to extend this minimal behavior should
+        implement :meth:`._call_`.
+    
+        EXAMPLES::
+    
+            sage: Rings()(ZZ)
+            Integer Ring
+        """
+        if x in self:
+            return x
+>       return self._call_(x, *args, **opts)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: StabilizerSubgroups._call_() got an unexpected keyword argument 'description'
+
+/sage/.venv/lib/python3.14/site-packages/sage/categories/category.py:592: TypeError
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:444 General module over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:833 Elementwise module morphism Module over Fraction Field of Integer Ring on Classes in the multilinear tensor presentation -> Module over Fraction Field of Integer Ring on Fraction Field of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+INFO     sage_extensions.timing:timing.py:313 ambient O(L) row
+============================== slowest durations ===============================
+1.05s call     tests/lattices/test_zz_diag.sage::test_the_ambient_flag_row
+
+(2 durations < 0.005s hidden.  Use -vv to show these durations.)
+=========================== short test summary info ============================
+FAILED tests/lattices/test_zz_diag.sage::test_the_ambient_flag_row - TypeErro...
+============================== 1 failed in 1.96s ===============================
+=== launcher exit: 1

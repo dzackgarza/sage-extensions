@@ -1,0 +1,28 @@
+## issue381: the pushed driver on the rebased head 35231f0
+## command: $SAGE_BIN -python tests/coble_gamma_co_2_incidence_rows.py --rows Otilde,Otilde+ --lattice 'U+U(2)+<-2>' --cap 400
+the lattice Integral lattice of rank 5 and signature (2, 3) of rank 5
+the rows ['Otilde', 'Otilde+']
+[Otilde] the row's calls returned in 15.4 s
+[Otilde] line cusp 0: ((0, -1, 0, 0, 0),)
+[Otilde] line cusp 1: ((0, 0, 0, 1, 0),)
+[Otilde] line cusp 2: ((2, 0, 1, 0, 0),)
+[Otilde] plane cusp 0: ((0, 1, 0, 0, 0), (0, 0, 0, 1, 0))
+[Otilde] plane cusp 1: ((2, 0, 1, 0, 0), (0, 1, 0, -1, 0))
+[Otilde] edge 0: L0 < P0; line=((0, -1, 0, 0, 0),); plane=((0, 1, 0, 0, 0), (0, 0, 0, 1, 0))
+[Otilde] edge 1: L1 < P0; line=((0, 0, 0, 1, 0),); plane=((0, 1, 0, 0, 0), (0, 0, 0, 1, 0))
+[Otilde] edge 2: L0 < P1; line=((-2, -1, -1, 1, 0),); plane=((2, 0, 1, 0, 0), (0, 1, 0, -1, 0))
+[Otilde] edge 3: L2 < P1; line=((2, 0, 1, 0, 0),); plane=((2, 0, 1, 0, 0), (0, 1, 0, -1, 0))
+[Otilde] decided: 4 edges over 3 line cusps and 2 plane cusps
+[Otilde+] the row's calls returned in 24.2 s
+[Otilde+] line cusp 0: ((0, -1, 0, 0, 0),)
+[Otilde+] line cusp 1: ((0, 0, 0, 1, 0),)
+[Otilde+] line cusp 2: ((2, 0, 1, 0, 0),)
+[Otilde+] plane cusp 0: ((0, 1, 0, 0, 0), (0, 0, 0, 1, 0))
+[Otilde+] plane cusp 1: ((2, 0, 1, 0, 0), (0, 1, 0, -1, 0))
+[Otilde+] edge 0: L0 < P0; line=((0, -1, 0, 0, 0),); plane=((0, 1, 0, 0, 0), (0, 0, 0, 1, 0))
+[Otilde+] edge 1: L0 < P1; line=((-2, -1, -1, 1, 0),); plane=((2, 0, 1, 0, 0), (0, 1, 0, -1, 0))
+[Otilde+] edge 2: L1 < P0; line=((0, 0, 0, 1, 0),); plane=((0, 1, 0, 0, 0), (0, 0, 0, 1, 0))
+[Otilde+] edge 3: L2 < P1; line=((2, 0, 1, 0, 0),); plane=((2, 0, 1, 0, 0), (0, 1, 0, -1, 0))
+[Otilde+] decided: 4 edges over 3 line cusps and 2 plane cusps
+recorded counts: Otilde 4 edges over 3 line and 2 plane cusps; Otilde+ 4 edges over 3 line and 2 plane cusps
+=== launcher exit: 0

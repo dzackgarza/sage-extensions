@@ -1,0 +1,18 @@
+## issue381: the pushed driver on the rebased head 35231f0
+## command: $SAGE_BIN -python tests/coble_gamma_co_2_incidence_rows.py --rows Otilde,Otilde+ --lattice 6JRS --cap 300
+the lattice Integral lattice of rank 5 and signature (2, 3) of rank 5
+the rows ['Otilde', 'Otilde+']
+[Otilde] the row's calls returned in 4.1 s
+[Otilde] line cusp 0: ((1, 0, 0, 0, 0),)
+[Otilde] plane cusp 0: ((1, 0, 0, 0, 0), (0, 0, 1, 0, 0))
+[Otilde] edge 0: L0 < P0; line=((1, 0, 0, 0, 0),); plane=((1, 0, 0, 0, 0), (0, 0, 1, 0, 0))
+[Otilde] decided: 1 edges over 1 line cusps and 1 plane cusps
+[Otilde+] the row's calls returned in 7.3 s
+[Otilde+] line cusp 0: ((1, 0, 0, 0, 0),)
+[Otilde+] plane cusp 0: ((1, 0, 0, 0, 0), (0, 0, 1, 0, 0))
+[Otilde+] edge 0: L0 < P0; line=((1, 0, 0, 0, 0),); plane=((1, 0, 0, 0, 0), (0, 0, 1, 0, 0))
+[Otilde+] decided: 1 edges over 1 line cusps and 1 plane cusps
+the discriminant image of Integral lattice of rank 5 and signature (2, 3) is trivial, so each kernel row is its ambient row's; comparing the counts
+each kernel row agrees with the ambient row of Integral lattice of rank 5 and signature (2, 3)
+recorded counts: Otilde 1 edges over 1 line and 1 plane cusps; Otilde+ 1 edges over 1 line and 1 plane cusps
+=== launcher exit: 0
