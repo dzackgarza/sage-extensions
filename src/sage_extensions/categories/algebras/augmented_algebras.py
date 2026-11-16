@@ -492,23 +492,21 @@ def _augmented_algebra(
         raise ValueError("one scalar slice cannot retain two different augmentations")
     arrows[category] = selected
     data["slice_arrows"] = arrows
-    # A power algebra's defining input is M, not its whole graded module.
-    # Pass that exact datum through construction before cooperative init;
-    # the direct-sum realization retains the same graded-piece family.
+    # A power algebra's defining input is M, not its whole graded module; its
+    # own constructor consumes that exact datum and the flavor, and the
+    # direct-sum realization retains the same graded-piece family.
     if domain in AlternatingAlgebras(base):
         data["generating_module"] = domain.generating_module()
         data["power_flavor"] = "alternating"
     elif domain in DividedPowerAlgebras(base):
         data["generating_module"] = domain.generating_module()
         data["power_flavor"] = "divided"
-    elif domain in SymmetricAlgebras(base) or domain in TensorAlgebras(base):
-        data["generating_module"] = domain.generating_module()
     if domain.is_framed_algebra():
         framing_owner = domain.algebra_framing_owner()
         data["algebra_generating_family"] = domain.algebra_generators()
         data["algebra_framing_source"] = domain.algebra_framing_source()
         data["algebra_framing_owner"] = framing_owner
-    return _algebra_on_module(
+    augmented = _algebra_on_module(
         domain,
         domain.multiplication_morphism(),
         placement=(category, *tuple(placement)),
@@ -517,3 +515,11 @@ def _augmented_algebra(
         construction_data=data,
         law_decisions=law_decisions,
     )
+    if domain in SymmetricAlgebras(base) or domain in TensorAlgebras(base):
+        # ``Sym_R(M)`` and ``T_R(M)`` answer ``generating_module`` with the
+        # input ``M`` of their construction, which is not the module they are
+        # built on: that is the graded sum of their pieces.  No constructor in
+        # their chain consumes ``M``, so this construction, which states it,
+        # retains it on the augmented algebra it built.
+        augmented._retain_generating_module(domain.generating_module())
+    return augmented
