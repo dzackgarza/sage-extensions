@@ -3461,7 +3461,12 @@ def _center_algebra(algebra, submodule):
     contract: the centre and its inclusion, an arrow of the unital algebra Mor
     whenever the ambient algebra is unital -- associative or not, since that
     category is where multiplicativity and the unit law are stated together --
-    and of the root algebra Mor when it has no unit.  The module inclusion is
+    and of the root algebra Mor when it has no unit.  *Which* of those two Mors
+    the arrow belongs to is not decided here: an arrow between two objects is
+    an arrow of their own `Mor` (``OwnedRings.ParentMethods.Mor``), which
+    places it at the strongest category both endpoints lie in -- the unital
+    algebra Mor for a unital ambient, refined to the associative-unital Mor
+    when the ambient is associative as well.  The module inclusion is
     an algebra map *by construction*: the product above is the ambient product
     read back along the inclusion, and the unit is the inclusion's own lift of
     ``1``, so ``f m_Z = m_A (f (x) f)`` and ``f(1_Z) = 1_A`` are the definition
@@ -3492,7 +3497,6 @@ def _center_algebra(algebra, submodule):
         "associativity": True,
         "commutativity": True,
     }
-    associative_unital = algebras.Associative().Unital()
     match algebra:
         case _ if algebra in algebras.Unital():
             law_decisions["unit"] = algebra.unit_laws_decision()
@@ -3504,19 +3508,13 @@ def _center_algebra(algebra, submodule):
                 unit=unit,
                 law_decisions=law_decisions,
             )
-            match algebra in associative_unital:
-                case True:
-                    arrows = associative_unital.Mor(center, algebra)
-                case False:
-                    # The ambient has a unit without being associative.  The
-                    # inclusion is still a map of unital algebras -- the
-                    # product is the ambient product read back along it and
-                    # the unit is its lift of 1 -- and the unital Mor is where
-                    # those two laws are stated for algebras that need not be
-                    # associative.  The root Mor states multiplicativity alone,
-                    # so an arrow there would discard the unit law.
-                    arrows = algebras.Unital().Mor(center, algebra)
-            return center, arrows._from_constructed_element_map(
+            # The arrow's Mor is the endpoints' own: for a unital ambient that
+            # is the unital algebra Mor, where multiplicativity and the unit
+            # law are stated together, and it refines to the associative-unital
+            # Mor when the ambient is associative too.  The ambient being
+            # unital and not associative is therefore the same statement here
+            # as the ambient being both.
+            return center, center.Mor(algebra)._from_constructed_element_map(
                 included,
                 linearity_premises=(inclusion,),
                 equations=(
@@ -3534,8 +3532,7 @@ def _center_algebra(algebra, submodule):
                 placement=(algebras.Associative(), algebras.Commutative()),
                 law_decisions=law_decisions,
             )
-            arrows = algebras.Mor(center, algebra)
-            return center, arrows._from_constructed_element_map(
+            return center, center.Mor(algebra)._from_constructed_element_map(
                 included, linearity_premises=(inclusion,)
             )
 
