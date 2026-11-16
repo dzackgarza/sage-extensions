@@ -3899,6 +3899,12 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
         inclusion ``H -> O(A_L)``.  The preimage is cut out of ``O(L)`` by the
         one predicate ``rho_L(g) in H``.
 
+        The result's name states that condition and names ``H`` as ``H`` names
+        itself, through its own ``description()``: a preimage is a subgroup
+        built from a subgroup, so the subgroup is not rendered into the name,
+        and the sentence is formed when the name is read, not while the
+        preimage is built.
+
         With ``orbit_point`` --- a finite set of classes of ``A_L``, such as
         the four classes of a 2-dimensional subspace, whose stabilizer in
         ``O(A_L)`` is ``subgroup`` --- the returned subgroup also carries a
@@ -3929,6 +3935,8 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
         need not be appended to the family --- the trivial members are those
         the orbit search itself identifies.
         """
+        from sage_extensions.categories.group.groups import _named_by_its_own_words
+
         if self.domain() is not self.codomain():
             raise ValueError(f"the isometries {self.domain()} -> {self.codomain()} form no orthogonal group O(L), so {subgroup} has no preimage under O(L) -> O(A_L)")
         target = self.domain().discriminant_group().orthogonal_group()
@@ -3940,7 +3948,9 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
         if orbit_point is None:
             return self.discriminant_representation().preimage_subgroup(
                 subgroup,
-                description=f"rho_L(g) lies in {subgroup}",
+                stated_clause=lambda: (
+                    f"rho_L(g) lies in {_named_by_its_own_words(subgroup)}"
+                ),
                 character_data=character_data,
             )
         point = frozenset(orbit_point)
@@ -3959,7 +3969,9 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
                 )
         preimage = self.discriminant_representation().preimage_subgroup(
             subgroup,
-            description=f"rho_L(g) lies in {subgroup}",
+            stated_clause=lambda: (
+                f"rho_L(g) lies in {_named_by_its_own_words(subgroup)}"
+            ),
             character_data=character_data,
         )
         _fix_selected_generating_morphism(
@@ -4265,7 +4277,7 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
             subgroup,
             self.subgroup_conjugation_g_set().action_functor(),
             normalizes,
-            description=f"normalizer of {subgroup} in {self}",
+            lambda: f"normalizer of {_named_by_its_own_words(subgroup)} in {self}",
         )
         return normalizer.select_group_generators(
             lambda: finite_ordered_set(FiniteSubgroupNormalizer(lattice, generators).normalizer_generators())
@@ -4346,7 +4358,7 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
             target,
             self.natural_module_action_functor(),
             lambda automorphism: automorphism(target) == target,
-            description=f"g fixes {target}",
+            lambda: f"g fixes {_named_by_its_own_words(target)}",
         )
         return stabilizer.select_group_generators(
             lambda: self.vector_stabilizer_generators(target)
@@ -4455,7 +4467,7 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
             embedding,
             self.natural_module_action_functor(),
             lambda automorphism: all(automorphism(vector) == vector for vector in embedded),
-            description=f"g fixes {embedding} pointwise",
+            lambda: f"g fixes {_named_by_its_own_words(embedding)} pointwise",
             vector_witness=(
                 None
                 if isotropic is None
@@ -4507,7 +4519,7 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
             embedding,
             self.natural_module_action_functor(),
             preserves_image,
-            description=f"g(im({embedding}))=im({embedding})",
+            lambda: f"g(im({_named_by_its_own_words(embedding)}))=im({_named_by_its_own_words(embedding)})",
             vector_witness=(
                 None if isotropic is None else isotropic.vector_equivalence_witness
             ),

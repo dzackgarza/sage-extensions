@@ -5263,7 +5263,7 @@ class Lattices(OwnedCategoryOverBaseRing):
             """
             return _spinor_norm_kernel(
                 self.spinor_norm(field_map, form_multiplier),
-                "sn(g) = 1",
+                lambda: "sn(g) = 1",
             )
 
         @cached_method
@@ -5332,7 +5332,7 @@ class Lattices(OwnedCategoryOverBaseRing):
             real_spinor_norm = self.spinor_norm(real_place)
             return _spinor_norm_kernel(
                 real_spinor_norm.codomain().sign_isomorphism() * real_spinor_norm,
-                "sn_RR(g) = 1",
+                lambda: "sn_RR(g) = 1",
                 character_data={"spinor_kernel": True},
             )
 
@@ -11407,12 +11407,17 @@ def _spinor_norm_multiplier(field, form_multiplier):
     return multiplier
 
 
-def _spinor_norm_kernel(spinor_norm, description, *, character_data=None):
-    r"""Return \(\ker\mathrm{sn}=\mathrm{sn}^{-1}(\{[1]\})\), retaining \(\mathrm{sn}\) as its preimage morphism."""
+def _spinor_norm_kernel(spinor_norm, stated_clause, *, character_data=None):
+    r"""Return \(\ker\mathrm{sn}=\mathrm{sn}^{-1}(\{[1]\})\), retaining \(\mathrm{sn}\) as its preimage morphism.
+
+    ``stated_clause`` is the caller's words for the condition (``sn_RR(g) =
+    1``), as a function of nothing: the preimage asks it when a record reads the
+    kernel's name, not here.
+    """
     return PreimageSubgroups(spinor_norm.domain())(
         spinor_norm,
         spinor_norm.codomain().subgroup(()),
-        description=description,
+        stated_clause=stated_clause,
         character_data=character_data,
     )
 
@@ -11526,7 +11531,7 @@ class SpinorNormSequence:
     @cached_method
     def kernel(self):
         r"""Return the \(K\)-spinor kernel \(K_{\mathrm{sn}_K}=\ker\mathrm{sn}_K\le O(L_K)\)."""
-        return _spinor_norm_kernel(self.morphism(), "sn_K(g) = 1")
+        return _spinor_norm_kernel(self.morphism(), lambda: "sn_K(g) = 1")
 
     def kernel_inclusion(self):
         r"""Return \(K_{\mathrm{sn}_K}\hookrightarrow O(L_K)\)."""

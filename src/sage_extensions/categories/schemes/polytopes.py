@@ -798,54 +798,31 @@ class ConvexPolytopes(OwnedParameterizedCategory):
                 for vertex in self._engine_polyhedron().vertices()
             )
 
-        def _convex_subset_of_the_ambient_space(self, other) -> bool:
-            r"""Whether ``other`` is a convex subset of this polytope's ambient space.
-
-            ``ConvexPolytopes`` is parameterized by the coordinate lattice, so
-            two lattices that frame one ambient space -- ``M`` and its double
-            dual, for instance -- give two categories of polytopes over the same
-            ``M tensor QQ``, which :meth:`ambient_space` computes from the
-            lattice's generating set.  The space is what makes two polytopes
-            comparable, since containment is a relation on its points, so the
-            statement this relation needs is about the space and not about the
-            lattice.
-
-            The other's own category is the one its construction recorded
-            (`ARC-07`, :meth:`ambient_category`), and a category of convex
-            subsets of a space states that space's subobjects as its immediate
-            supercategory.  A subset of the space that carries no convex
-            structure is an object of the subobject category itself, whose own
-            supercategory is the slice over the space, so it is not one of
-            these; it keeps its defining membership condition and the inherited
-            proposition.
-            """
-            return (
-                Sets().Subobjects(self.ambient_space())
-                in other.ambient_category().super_categories()
-            )
-
         def is_contained_in(self, other):
-            r"""Whether this polytope lies in another convex subset of the ambient space.
+            r"""Whether this polytope lies in another polytope of the ambient space.
 
-            A polytope is the convex hull of its vertices, and a convex set
-            contains a convex hull exactly when it contains its vertices
+            A polytope is the convex hull of its vertices, and a polytope is
+            convex, so a convex hull lies in one exactly when its vertices do
             (Mathlib, ``convexHull_min``, ``Mathlib/Analysis/Convex/Hull.lean``):
-            the vertices of this polytope against the membership of ``other``
-            decide the subset relation, and a vertex outside ``other`` is a
-            point of this polytope that is not a point of ``other``.  Both
-            polytopes are subsets of one ``M tensor QQ``, which
-            :meth:`_convex_subset_of_the_ambient_space` states for ``other``
-            whatever lattice frames it, and :meth:`rational_point` takes each
-            vertex of this one into that space before ``other`` decides it.  A
-            subset of the ambient space that is not convex has no halfspace
-            description to test, so the defining membership condition of such a
-            subset decides it.
+            the vertices of this polytope against the halfspaces of ``other``
+            decide the subset relation, and a vertex that fails one of them is
+            a point of this polytope that is not a point of ``other``.
+
+            The polytopes are compared in the coordinate lattice that frames
+            them, which is the category's parameter and the module their
+            vertices are elements of, so ``other`` must be an object of this
+            polytope's own :class:`ConvexPolytopes`, tested as ``other in C``.
+            The polar dual is framed by the dual lattice, whose points are the
+            functionals on this one and not its points, and no duality
+            identifies the two spaces; a polytope of another lattice is
+            therefore not one of these.  A subset of the ambient space that is
+            not a polytope has no halfspace description to test, so the
+            defining membership condition of such a subset decides it.
             """
-            match self._convex_subset_of_the_ambient_space(other):
+            match other in ConvexPolytopes(self.ambient_lattice()):
                 case True:
                     return all(
-                        other.is_parent_of(self.rational_point(vertex))
-                        for vertex in self.vertices()
+                        other.contains_point(vertex) for vertex in self.vertices()
                     )
                 case False:
                     return super().is_contained_in(other)
@@ -853,54 +830,58 @@ class ConvexPolytopes(OwnedParameterizedCategory):
         def is_equal_to(self, other) -> bool:
             r"""Return whether the two polytopes are the same subset of the ambient space.
 
-            Two polytopes of one ambient space are equal exactly when they have
-            the same vertices: a polytope is the convex hull of its vertex set,
-            and the vertices are the points of the polytope that are not a
-            convex combination of other points of it, so the subset determines
-            them.  The lattices that frame the space need not be one:
-            :meth:`_vertex_coordinate_set` reads the vertices in the ambient
-            space, where a lattice vertex and the same point of it are one
-            point.  Containment agrees: :meth:`is_contained_in` tests the
-            vertices of one polytope against the membership of the other, so
-            each polytope lies in the other exactly when their vertex sets are
-            one set.
+            Two polytopes of one lattice are equal exactly when they have the
+            same vertices: a polytope is the convex hull of its vertex set, and
+            the vertices are the points of the polytope that are not a convex
+            combination of other points of it, so the subset determines them.
+            The lattice is read with the vertices, since they are elements of
+            it: :meth:`_vertex_coordinate_set` reads them in the ambient space
+            of that lattice, and a polytope framed by another lattice is
+            another subset.  Containment agrees: :meth:`is_contained_in` tests
+            the vertices of one polytope against the halfspaces of the other,
+            so each polytope lies in the other exactly when their vertex sets
+            are one set.
             """
             return (
-                self._convex_subset_of_the_ambient_space(other)
+                other.ambient_lattice() is self.ambient_lattice()
                 and self._vertex_coordinate_set() == other._vertex_coordinate_set()
             )
 
         def __eq__(self, other):
-            r"""Two polytopes of one ambient space are equal when they have the same vertices.
+            r"""Two polytopes of one lattice are equal when they have the same vertices.
 
             Equal sets are one factor of a product (`SET-05`), so equality
             reads the vertex set that :meth:`__hash__` hashes.  A polytope is
             its vertex set, which decides it, and which is the canonical form
             of the vertex and halfspace presentations that
-            :meth:`is_contained_in` compares, whether one lattice or two frame
-            the ambient space.
+            :meth:`is_contained_in` compares.  Membership in
+            :class:`ConvexPolytopes` at this polytope's own lattice recognizes
+            the other polytopes that are comparable; an operand of another kind
+            -- a number, a set that is not a polytope, a polytope of another
+            lattice -- is left to the inherited equality.
             """
             if self is other:
                 return True
-            if self._convex_subset_of_the_ambient_space(other):
+            if other in ConvexPolytopes(self.ambient_lattice()):
                 return self.is_equal_to(other)
             return super().__eq__(other)
 
         @cached_method
         def __hash__(self) -> int:
-            r"""Hash the ambient space and the vertex set, which :meth:`__eq__` compares.
+            r"""Hash the lattice and the vertex set, which :meth:`__eq__` compares.
 
             A polytope is determined by its vertices, so their coordinates in
-            the ambient space's frame are a complete invariant of the subset:
-            equal polytopes have equal hashes, and the coordinates do not
-            depend on the order the private exact polyhedron enumerated the
-            vertices in.  The space and not the lattice is hashed, since equal
-            subsets of one space may be framed by two lattices.  The hash is
-            cached: a polytope is a factor of the interned finite products,
-            whose store keys a family by its factors' hashes (`SET-05`), and
-            the vertex set is computed from that polyhedron.
+            the ambient space of its lattice are a complete invariant of the
+            subset: equal polytopes have equal hashes, and the coordinates do
+            not depend on the order the private exact polyhedron enumerated the
+            vertices in.  Equality compares two polytopes framed by one lattice
+            and hashes are equal only for equal polytopes, so the lattice is
+            hashed beside the vertex set.  The hash is cached: a polytope is a
+            factor of the interned finite products, whose store keys a family
+            by its factors' hashes (`SET-05`), and the vertex set is computed
+            from that polyhedron.
             """
-            return hash((id(self.ambient_space()), self._vertex_coordinate_set()))
+            return hash((id(self.ambient_lattice()), self._vertex_coordinate_set()))
 
         def facets(self):
             r"""Return the codimension-one faces as owned polytopes."""
@@ -1189,6 +1170,32 @@ class ConvexPolytopes(OwnedParameterizedCategory):
             )
 
         def polar_dual(self):
+            r"""Return the polar dual `P^\circ`, framed by the dual lattice.
+
+            `P` lies in `M_R` for its coordinate lattice `M`, so
+            `P^\circ = \{y \in M^*_R : \langle y, x\rangle \le 1
+            \text{ for all } x \in P\}` lies in the dual `M^*_R`: a point of the
+            polar is a functional on `M_R`, and the polar is a subset of
+            another space, not of `M_R`.
+
+            A lattice that is itself a dual has a primal, `M = L^*`, and then
+            the polar's frame `(L^*)^*` is that primal `L` and not a third
+            space: evaluation `x \mapsto (f \mapsto f(x))` is an isomorphism
+            `L \to (L^*)^*` for a finite free `L` (Mathlib, `Module.evalEquiv`,
+            `Mathlib/LinearAlgebra/Dual/Defs.lean`), which this library states
+            as `Modules(R).dualization().double_dual_morphism(L)`, and it
+            carries the basis of `L` into the dual basis of the dual basis,
+            labelled by `L`'s own labels.  The polar dual of a polar dual is
+            therefore a polytope of the primal lattice and is compared there;
+            it is the primal polytope, since `P` lies in `P^{\circ\circ}`
+            always (Mathlib, `LinearMap.subset_bipolar`,
+            `Mathlib/Analysis/LocallyConvex/Polar.lean`) and the engine's
+            second polar has `P`'s vertices.
+
+            A lattice that is not a dual is not identified with anything: the
+            polar dual is then framed by a new lattice, whose points are the
+            functionals on this one.
+            """
             assert int(self.dimension()) == int(
                 self._engine_polyhedron().ambient_dim()
             ), (
@@ -1202,7 +1209,36 @@ class ConvexPolytopes(OwnedParameterizedCategory):
                 f"but the origin is not in the interior of {self}"
             )
             polar = self._engine_polyhedron().polar()
-            return ConvexPolytopes(self.ambient_lattice().dual_module())(polar.vertices())
+            lattice = self.ambient_lattice()
+            primal = _primal_lattice_of_a_dual(lattice)
+            if primal is None:
+                return ConvexPolytopes(lattice.dual_module())(polar.vertices())
+            from sage_extensions.categories.modules.pure.modules import Modules
+
+            double_dual = lattice.dual_module()
+            evaluation = Modules(lattice.base_ring()).dualization().double_dual_morphism(
+                primal
+            )
+            assert evaluation.codomain() is double_dual, (
+                f"the double dual of {primal} is {evaluation.codomain()}, but the polar dual of "
+                f"{self} is framed by {double_dual}"
+            )
+            labels = tuple(primal.module_generating_set())
+            assert labels == tuple(double_dual.module_generating_set()), (
+                f"the evaluation isomorphism indexes the double dual {double_dual} by the labels "
+                f"{labels} of {primal}, but its generating set is "
+                f"{tuple(double_dual.module_generating_set())}"
+            )
+            assert all(
+                evaluation(primal.module_generator(label))
+                == double_dual.module_generator(label)
+                for label in labels
+            ), (
+                f"the evaluation isomorphism {evaluation} does not carry the basis of {primal} to "
+                f"the basis of {double_dual}, so the vertices of the polar dual are not read in "
+                f"{primal}'s coordinates"
+            )
+            return ConvexPolytopes(primal)(polar.vertices())
 
         def is_smooth(self) -> bool:
             if not self.is_lattice_polytope():
@@ -1465,6 +1501,48 @@ def _polytope_in(category, vertices, lattice):
         f"it is in {polytope.category()}"
     )
     return polytope
+
+
+def _primal_lattice_of_a_dual(lattice):
+    r"""Return the lattice ``lattice`` is the linear dual of, when it is one.
+
+    The dual of a lattice ``M`` is ``M^* = Hom(M, ZZ)``, which
+    :meth:`Module.ParentMethods.dual_module` builds as the internal Mor of
+    ``M`` into the regular module and places in ``LinearMorModules`` of the
+    base ring.  Such a module records the module it dualizes and the module it
+    takes values in, so ``M`` is recovered from ``M^*`` itself and not by
+    searching for a lattice whose dual this one happens to be.
+
+    ``None`` is returned when ``lattice`` is not a linear dual of this kind: the
+    polar dual is then framed by a new lattice, and there is no primal space
+    that the dual could be identified with.
+
+    The double dual is the primal only through evaluation, which is an
+    isomorphism for a finite free module and an injection otherwise, so the two
+    ranks are required to agree before the identification is offered: the dual
+    of a free module on an infinite basis is the product, which is not free
+    (Baer--Specker), and ``M \to M^{**}`` is then not onto.
+    """
+    from sage_extensions.categories.modules.pure.modules import LinearMorModules
+
+    ring = lattice.base_ring()
+    match lattice in LinearMorModules(ring):
+        case False:
+            return None
+        case True:
+            pass
+    match lattice.target_module() is ring.regular_module():
+        case False:
+            return None
+        case True:
+            pass
+    primal = lattice.source_module()
+    assert int(primal.module_rank()) == int(lattice.module_rank()), (
+        f"{lattice} is the dual of {primal}, but their ranks "
+        f"{lattice.module_rank()} and {primal.module_rank()} differ, so a free "
+        "presentation of the double dual is not the primal lattice"
+    )
+    return primal
 
 
 def _engine_vertices_are_integral(engine_polyhedron) -> bool:

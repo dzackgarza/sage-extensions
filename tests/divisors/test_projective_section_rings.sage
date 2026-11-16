@@ -50,6 +50,41 @@ def test_the_two_roads_of_the_section_ring_constructor_record_one_ambient_catego
     assert from_bundle.ambient_category() == from_divisor.ambient_category()
 
 
+def test_the_conic_section_ring_states_its_scheme_and_the_divisor_it_is_built_on() -> None:
+    r"""``R(P^2, O(2))`` records the plane and the conic ``2 D_0`` it is stated on.
+
+    The pieces are ``H^0(P^2, O(2n))``: rank 6 in degree one and 15 in degree
+    two (Hartshorne, Proposition II.5.13), and each is the character family at
+    the lattice points of the polytope of ``n * 2 D_0`` (CLS Prop. 4.3.3).
+    """
+    fans = RationalPolyhedralFans(ZZ.free_module(2))
+    plane = fans.projective_space_fan().toric_variety(QQ)
+    line = plane.hyperplane_divisor()
+    conic = ZZ(2) * line
+    ring = plane.section_ring(conic)
+
+    assert ring.ambient_category() == SectionRings(QQ)
+    assert ring.section_scheme() is plane
+    assert ring.section_divisor() == conic
+    assert ring.graded_piece(1).module_rank() == 6
+    assert ring.graded_piece(2).module_rank() == 15
+
+
+def test_the_projective_plane_cox_ring_states_the_scheme_it_is_the_cox_ring_of() -> None:
+    r"""``Cox(P^2) = Q[x_0, x_1, x_2]`` is graded by the divisor class group, over its scheme.
+
+    Each generator is the ray of the fan: three rays, so three generators, and
+    the grading monoid is ``Cl(P^2) = ZZ`` (CLS Thm. 4.1.3 and Prop. 4.2.6).
+    """
+    fans = RationalPolyhedralFans(ZZ.free_module(2))
+    plane = fans.projective_space_fan().toric_variety(QQ)
+    cox = plane.cox_ring()
+
+    assert cox.cox_scheme() is plane
+    assert cox.cox_rays().cardinality() == 3
+    assert cox.grading_monoid().module_rank() == 1
+
+
 def test_section_ring_of_O_1_1_on_P1_x_P1_is_the_coordinate_ring_of_the_segre_quadric() -> None:
     r"""``R(P^1 x P^1, O(1,1))`` has pieces of rank ``(d + 1)^2``: 4, 9.
 

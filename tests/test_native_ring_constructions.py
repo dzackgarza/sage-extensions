@@ -75,6 +75,28 @@ def test_presentations_retain_their_data_and_category() -> None:
     assert quotient.presentation_ring() is polynomial
 
 
+def test_the_presented_algebra_constructor_states_the_quotient() -> None:
+    r"""``AlgebrasWithChosenFinitePresentation(R)(P, (x y,))`` is ``P/(x y)``, not ``P``.
+
+    A free algebra with finitely many generators presents itself, so the
+    presentation ring is already an object of this category and Sage's generic
+    category call would return that argument unchanged, dropping the relation.
+    The relation is constructor data, not a candidate object, so the public
+    constructor of the quotient states it.
+    """
+    rationals = _owned_rationals()
+    polynomial = rationals.polynomial_ring(("x", "y"))
+    x = polynomial.algebra_generator("x")
+    y = polynomial.algebra_generator("y")
+    relation = x * y
+    category = AlgebrasWithChosenFinitePresentation(rationals)
+    quotient = category(polynomial, (relation,))
+    assert quotient is not polynomial
+    assert quotient.presentation_ring() is polynomial
+    assert quotient(relation) == quotient.zero()
+    assert quotient.ambient_category() is category
+
+
 def test_dual_numbers_retain_their_quotient() -> None:
     rationals = _owned_rationals()
     dual = rationals.dual_numbers("epsilon")

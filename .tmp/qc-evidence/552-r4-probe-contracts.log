@@ -1,0 +1,70 @@
+probe: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/probe552_r3d.py
+tree SHA: 7f36d571b88c6ae3937d06cedfdafb8091f10892 (modified paths: 0)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 28.82 24.50 19.57 15/872 2893857
+inner 600 s, outer 660 s, guard 4096 MiB, args ''
+import over: 23.4 s
+declares sage_extensions.categories.algebras.algebras Algebras (('unformed_module', None), ('multiplication', None), ('algebra_law_decisions', None), ('algebra_generating_family', None), ('algebra_framing_source', None), ('algebra_framing_owner', None), ('_engine_product', None), ('_engine_scalar_action', None), ('_native_unit_factory', None), 'rest')
+declares sage_extensions.categories.algebras.algebras Algebras.Unital (('unit', None), ('_engine_unit', None), 'rest')
+declares sage_extensions.categories.algebras.algebras CommutativeAlgebraCoproducts ('_preamble_coproduct_factors', 'rest')
+declares sage_extensions.categories.algebras.algebras Modules ('base_ring', ('module_generating_set', None), ('module_generator_function', None), ('framing_source', None), 'rest')
+declares sage_extensions.categories.algebras.algebras TensorProductModules ('tensor_factors', 'rest')
+declares sage_extensions.categories.algebras.semigroup_algebras AffineSemigroupAlgebras ('_affine_semigroup_presentation', 'rest')
+declares sage_extensions.categories.algebras.semigroup_algebras Algebras (('unformed_module', None), ('multiplication', None), ('algebra_law_decisions', None), ('algebra_generating_family', None), ('algebra_framing_source', None), ('algebra_framing_owner', None), ('_engine_product', None), ('_engine_scalar_action', None), ('_native_unit_factory', None), 'rest')
+declares sage_extensions.categories.algebras.free_algebras Algebras (('unformed_module', None), ('multiplication', None), ('algebra_law_decisions', None), ('algebra_generating_family', None), ('algebra_framing_source', None), ('algebra_framing_owner', None), ('_engine_product', None), ('_engine_scalar_action', None), ('_native_unit_factory', None), 'rest')
+declares sage_extensions.categories.algebras.free_algebras CommutativeAlgebraCoproducts ('_preamble_coproduct_factors', 'rest')
+declares sage_extensions.categories.algebras.free_algebras LocalizationRings ('source', 'submonoid', ('_engine_ring', None), ('_engine_source_decoder', None), ('_engine_source_encoder', None), ('algebra_source', None), 'rest')
+declares sage_extensions.categories.divisors.section_rings AffineSemigroupAlgebras ('_affine_semigroup_presentation', 'rest')
+declares sage_extensions.categories.divisors.section_rings SectionRings ('section_scheme', ('section_line_bundle', None), ('section_divisor', None), 'rest')
+declares sage_extensions.categories.divisors.cox_rings CoxRings ('cox_scheme', 'rest')
+declares sage_extensions.categories.rings.commutative_algebra Algebras (('unformed_module', None), ('multiplication', None), ('algebra_law_decisions', None), ('algebra_generating_family', None), ('algebra_framing_source', None), ('algebra_framing_owner', None), ('_engine_product', None), ('_engine_scalar_action', None), ('_native_unit_factory', None), 'rest')
+declares sage_extensions.categories.rings.commutative_algebra CommutativeIdeals (('ideal_generators', None), ('engine_ideal', None), ('localization_source_ideal', None), ('quotient_preimage_ideal', None), 'rest')
+declares sage_extensions.categories.rings.commutative_algebra DistinguishedOpenSubobjects ('function', 'rest')
+declares sage_extensions.categories.rings.commutative_algebra LocalizationRings ('source', 'submonoid', ('_engine_ring', None), ('_engine_source_decoder', None), ('_engine_source_encoder', None), ('algebra_source', None), 'rest')
+declares sage_extensions.categories.rings.commutative_algebra PosetCategory ('value', 'rest')
+declares sage_extensions.categories.rings.commutative_algebra PrimeLocalizations ('source', 'submonoid', ('engine_ring', None), 'rest')
+declares sage_extensions.categories.rings.commutative_algebra PrimeSpectra ('ring', 'rest')
+declares sage_extensions.categories.rings.commutative_algebra QuotientRings ('source', 'defining_ideal', ('_engine_ring', None), 'rest')
+declares sage_extensions.categories.rings.commutative_algebra TopologicalSpaces ('topology_data', 'rest')
+declares sage_extensions.categories.rings.commutative_algebra ZariskiClosedSubobjects ('defining_ideal', 'rest')
+polytope: Lattice Polygon of dimension 2 with 3 vertices
+integral points: (Generic morphism:
+  From: Free module on {[0], [1]} over Integer Ring
+  To:   Integer Ring, Generic morphism:
+  From: Free module on {[0], [1]} over Integer Ring
+  To:   Integer Ring, Generic morphism:
+  From: Free module on {[0], [1]} over Integer Ring
+  To:   Integer Ring)
+n_integral_points: 3
+vertices: (Generic morphism:
+  From: Free module on {[0], [1]} over Integer Ring
+  To:   Integer Ring, Generic morphism:
+  From: Free module on {[0], [1]} over Integer Ring
+  To:   Integer Ring, Generic morphism:
+  From: Free module on {[0], [1]} over Integer Ring
+  To:   Integer Ring)
+characters: (Generic morphism:
+  From: Free module on {[0], [1]} over Integer Ring
+  To:   Integer Ring, Generic morphism:
+  From: Free module on {[0], [1]} over Integer Ring
+  To:   Integer Ring, Generic morphism:
+  From: Free module on {[0], [1]} over Integer Ring
+  To:   Integer Ring)
+points per label: {'s0': (1, 0, 1), 's1': (0, 1, 1), 's2': (0, 0, 1)}
+lift equal to variable: (True, True, True)
+total 269.2 s
+[peakrss] probe552r3d: child waited=0 shell_code=0 samples=114
+[peakrss] peak tree RSS      : 237 MiB
+[peakrss] low-water MemAvail : 1005 MiB
+[peakrss] peak single VmHWM  : 243 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      232 MiB peak
+[peakrss]   gap                          25 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   274.1s procs=  3 rss=   237 MiB hwm=   243 MiB avail=  1988 MiB
+[peakrss]   t=   276.1s procs=  3 rss=   227 MiB hwm=   242 MiB avail=  1666 MiB
+[peakrss]   t=   123.1s procs=  3 rss=   206 MiB hwm=   214 MiB avail=  1091 MiB
+[peakrss]   t=   125.2s procs=  3 rss=   206 MiB hwm=   214 MiB avail=  1047 MiB
+[peakrss]   t=   127.2s procs=  3 rss=   203 MiB hwm=   214 MiB avail=  1037 MiB
+launcher exit: 0

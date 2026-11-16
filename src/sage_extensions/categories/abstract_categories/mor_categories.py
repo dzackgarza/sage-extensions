@@ -1721,6 +1721,35 @@ class CategoricalIsomorphism(CategoricalArrow, CategoricalMor.ElementMethods):
             )
         return decision
 
+    def is_injective(self):
+        r"""Return ``True``: an isomorphism is injective, by its left inverse.
+
+        ``OWN-22`` answers a predicate by placement: an element of
+        ``Mono_C(X, Y)`` answers ``is_injective()`` with ``True``, and the
+        arrows of the core are the isomorphisms, which are monic and epic in
+        every category.  For the arrows this core is used on -- the owned
+        rings, modules, sets and topological spaces -- the arrow is a map of
+        points, and the claim is the set-level one: with inverse ``g``, the
+        equation ``g f = 1`` gives ``x = g(f(x)) = g(f(y)) = y`` for
+        ``f(x) = f(y)``.  ``validate_inverse_pair`` is how the pair is
+        checked; ``is_surjective`` is the other half.
+        """
+        return True
+
+    def is_surjective(self):
+        r"""Return ``True``: an isomorphism is onto, by its right inverse.
+
+        Placement answers the predicate (``OWN-22``): this arrow is an element
+        of the core, and ``Epi_C(X, Y)`` holds every epic.  For a map of
+        points, with inverse ``g``, the equation ``f g = 1`` gives
+        ``y = f(g(y))`` for every point of the codomain, so every point is a
+        value of ``f``.  ``Map.is_surjective``, which this overrides, raises
+        ``NotImplementedError``, and ``OwnedSetMorphism.is_surjective`` decides
+        only between finite enumerated endpoints, which is the answer the
+        arrows of the core never need.
+        """
+        return True
+
     def __call__(self, element):
         return self.forward()(element)
 

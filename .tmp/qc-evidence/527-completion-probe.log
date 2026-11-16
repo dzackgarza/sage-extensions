@@ -1,0 +1,45 @@
+tree SHA: 7e4a28f2cb5226492b8c59397531b7d1ca6239bd
+=== QQ(i) at (0)
+type: CategoricalIsomorphism
+is CategoricalIsomorphism: True
+in core mor: True
+is_injective: True is_surjective: True
+m(a): a == completion(a): True
+inverse round trip: a
+print completion: Free module on {1} over Free module on {1, a} over Fraction Field of Integer Ring
+zero/one: 0 1
+kernel: Ideal (0) of Free module on {1, a} over Fraction Field of Integer Ring
+separated: True
+extended_ideal -> Finitely presented module on 0 module generators over Free module on {1} over Free module on {1, a} over Fraction Field of Integer Ring
+ideal_of_definition -> Finitely presented module on 0 module generators over Free module on {1} over Free module on {1, a} over Fraction Field of Integer Ring
+is_completion_map_injective -> True
+adsic system -> Functor: Opposite of Category of poset category -> Category of commutative rings
+cone -> Cone with apex Free module on {1} over Free module on {1, a} over Fraction Field of Integer Ring over Functor: Opposite of Category of poset category -> Category of commutative rings
+element constructor -> a + 1
+algebra structure map -> Generic morphism:
+  From: Free module on {1, a} over Fraction Field of Integer Ring
+  To:   Free module on {1} over Free module on {1, a} over Fraction Field of Integer Ring
+ring placement local -> False
+deep element -> -a - 1
+=== QQ[x] at (x)
+type: OwnedRingMor_with_category_with_category.ArrowType iso: False
+surjective: is_surjective(Generic morphism:
+  From: Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring
+  To:   Ring over Fraction Field of Integer Ring)
+x_hat: element of Ring over Fraction Field of Integer Ring pc(x): element of Ring over Fraction Field of Integer Ring
+extended ideal: Finitely presented module on 1 module generators over Ring over Fraction Field of Integer Ring
+print: Ring over Fraction Field of Integer Ring
+[peakrss] probe527: child waited=0 shell_code=0 samples=6
+[peakrss] peak tree RSS      : 297 MiB
+[peakrss] low-water MemAvail : 5636 MiB
+[peakrss] peak single VmHWM  : 297 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      285 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    10.0s procs=  3 rss=   297 MiB hwm=   297 MiB avail=  5847 MiB
+[peakrss]   t=     8.0s procs=  3 rss=   283 MiB hwm=   283 MiB avail=  5936 MiB
+[peakrss]   t=     6.0s procs=  3 rss=   238 MiB hwm=   238 MiB avail=  5887 MiB
+[peakrss]   t=     4.0s procs=  3 rss=   191 MiB hwm=   191 MiB avail=  5935 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   100 MiB hwm=   100 MiB avail=  5636 MiB
+launcher exit: 0

@@ -2761,3 +2761,149 @@ says so.
 | `543-mro-six-processes.log` | `d1ab7fc` | six fresh processes: `Cardinalities().Mor(2, 3)`'s MRO is `[OwnedCardinalityMor_with_category_with_category, Sets.ParentMethods, CardinalityMor...]` in all six, and `is_empty()` is the proposition in all six — the defect does not vary between runs |
 | `543-mro-predecessors.log` | `d1ab7fc` | twelve constructions before the hom-set (`Sets().Mor(Δ2,Δ2).is_empty`, `Ordinals().Mor(1,2).is_empty`, `cardinal(2).Mor(3).is_empty`, `Sets().Finite()`, `Δ2.cardinality()`, `QQ(3)`, `m.cardinality()`, `m.unique_morphism()`, `m.base_category()`, `m.mor_category()`, and the cached hom-set again), each followed by a fresh `Mor(2, 3)`: the class, the two MRO positions and the answer are identical at every step — no earlier construction decides it |
 | `543-baked-library-run.log` | `d1ab7fc`'s file, the image's own `sage_extensions` at `/repos/sage-extensions/src` (a copy at `cf656f8`) ahead of the tree's on `PYTHONPATH` | **4 failed, 14 passed in 12.10 s** — the same four rows, so importing the copy the image carries does not explain the reported pass either |
+
+## #527 round 2: the completion at the zero ideal, and the specimen that tells its maps apart
+
+Every row is `tests/rings/test_the_adic_inverse_system_and_its_limit_cone.sage`
+unless it names another path, in the pinned image `/sage/.venv/bin/python`,
+`-p qc_sage_session`, `addopts` blanked, the tree bound at
+`/repos/sage-extensions`.  `-p sage_extensions.testing.test_lint` is added
+where the row says so.  The two trees that are not the round's own are
+`ac4ff63`, the commit before #527's first repair, and `bbb0dd6`/`a88e5cc`,
+main as it stood while this round ran.
+
+| log | tree | result |
+| --- | --- | --- |
+| `527-base-principal.log` | `ac4ff63` | the two principal-ideal tests alone, `-k principal`: **2 failed, 3 deselected in 15.63 s**, both `TypeError: object() takes exactly 0 positional arguments (1 given)` from `adic_inverse_system` at `commutative_algebra.py:3201` |
+| `527-fix-principal.log` | the specimen's test commit | the file with the test lint loaded: **5 passed in 13.85 s**, no finding |
+| `527-main-iso.log` | `bbb0dd6` | the isomorphism test alone, `-k zero_ideal`: **1 failed, 4 deselected in 11.18 s**, at `assert completion_map in Rings().Core().Mor(field, completion)` |
+| `527-fix-iso.log` | the isomorphism's repair | the file with the test lint loaded: **5 passed in 11.26 s**, no finding |
+| `527-base-rank.log` | `ac4ff63` | the rank-one test alone, `-k rank_one`: **1 failed, 5 deselected in 12.99 s**, the frame being `Free module on {[0], [1]} over QQ(i)` |
+| `527-fix-rank.log` | the rank-one test commit | the file with the test lint loaded: **6 passed in 6.39 s**, no finding |
+| `527-test-file-final.log` | `a88e5cc` plus the round's six commits | the file with the test lint loaded: **6 passed in 8.05 s**, no finding |
+| `527-completion-probe.log` | the round's tree | `QQ(i)` at `(0)`: the map is a `CategoricalIsomorphism` in `Rings().Core().Mor`, both predicates `True`, `inverse()` round-trips `a`, `extended_ideal()` and `ideal_of_definition()` are the completion's zero ideal, and the system, the cone, the element constructor and `algebra_structure_morphism()` all return; at `QQ[x]` at `(x)` the map is a ring morphism and surjectivity stays undecided |
+| `527-consumers-head.log` | the isomorphism's repair | `tests/rings/test_completion_inverse_system.sage`, `test_completion_arithmetic.sage`, `test_local_completions.sage`: **1 failed, 6 passed in 18.98 s** |
+| `527-consumers-main.log` | `bbb0dd6`, same command | **1 failed, 6 passed in 18.08 s**, the same FAILED id (`test_completion_is_the_limit_of_the_truncations_by_powers_of_the_maximal_ideal`) |
+| `527-completion-maps-base.log` | `ac4ff63` | `tests/rings/test_completion_maps.sage`: **4 failed, 1 passed in 17.42 s** |
+| `527-completion-maps-main.log` | `bbb0dd6` | the same file: **4 failed, 1 passed in 12.94 s**, the same four FAILED ids |
+| `527-zz-adic-completion-main.log` | `bbb0dd6` | `ZZ.adic_completion(2)` raises `AttributeError: 'int' object has no attribute 'ring'`; `ZZ.adic_completion(ZZ.ideal(2))` raises `RecursionError`; the resolved method is `ModulesWithChosenFinitePresentation.ParentMethods.adic_completion` |
+| `527-zz-adic-completion-dispatch.log` | the round's tree | `ZZ` alone resolves the module owner's `adic_completion` (`QQ`, `QQ[x]`, `QQ(i)`, `Zp(5)` resolve the ring owner's), and `AdicCompletions().Local().an_object()` raises the `AttributeError` at `modules/pure/modules.py:4655` from `commutative_algebra.py:3036` |
+| `527-literal-subtraction.log` | the round's tree | `(1 - x_hat).exact_source_expression()` and `(x_hat - 1).exact_source_expression()` are `None`, `(completion.one() - x_hat)` is `-x + 1`, and the induced map evaluates at the latter |
+### #552, round 4: the third review's five findings
+
+Red states are on the commit named, green ones on the fix commit directly above
+the row.  Every run used one pytest process per file selection on the adopted
+runtime (Sage 11.0.beta5, `/sage/.venv/bin/python`), the port repo at `/work`,
+and the launcher `launch552r3.sh`.
+
+| log | commit | result |
+| --- | --- | --- |
+| `552-r4-red-constructor.log` | `cd42311` (test only) | finding 1: `pytest -o addopts= tests/test_native_ring_constructions.py -k presented_algebra_constructor_states_the_quotient` is **1 failed, 8 deselected in 10.31 s** -- `AlgebrasWithChosenFinitePresentation(QQ)(P, (x*y,))` returned `P`. |
+| `552-r4-fix-constructor.log` | `9a40378` | the same row: **1 passed, 8 deselected in 10.24 s**. |
+| `552-r4-red-section-data.log` | `87c8d37` (test only) | finding 5: `pytest -o addopts= -p qc_sage_session tests/divisors/test_projective_section_rings.sage -k 'conic_section_ring_states or cox_ring_states'` is **2 failed** -- `section_scheme()` called the stored scheme. |
+| `552-r4-fix-section-data.log` | `f5ea6f2` | the same rows: **2 passed, 3 deselected in 10.88 s**. |
+| `552-r4-probe-consumers.log` | `f5ea6f2` | probe: the conic ring states its scheme and divisor, pieces 6 and 15, cached, six relations; `cox_scheme()` is the plane with three rays and `Cl = ZZ`; the coproduct's factors and the pushout's span and maps are their own; a plain quotient and the polynomial, tensor and affine semigroup rings keep their ambient categories. |
+| `552-r4-probe-cover-map.log` | `f5ea6f2` | probe: the auxiliary presentation cover this round moved to a parameter still lifts -- `Z[x]/(2x)` gives `2x = 0`, `x != 0`, and the integer-torsion symmetric algebra keeps its polynomial presentation. |
+| `552-r4-probe-contracts.log` | `7f36d57` | finding 2: every `ParentMethods.__init__` the presented and free constructors reach has a readable signature (no opaque level in the algebra, semigroup, free, section-ring, Cox and commutative-algebra modules), so the new refusal has no red test; the log is the record. |
+| `552-r4-test-generators.log` | `a8c60d2` | finding 4: `-k line_section_ring_is_the_free_semigroup_algebra` is **1 passed, 28 deselected in 7.32 s**; the row is green because the implementation already multiplies by the semigroup law. |
+
+The round's commits are rebased onto main before the push, and main moved while
+the round ran, so the SHAs above name pre-rebase commits.  The rows below are
+the same seven commits by subject at the head that was pushed:
+
+- `test: the presented-algebra constructor states its relations (#552)`
+- `fix: the presented-algebra constructor states the quotient, and one construction declares its callers (#552)`
+- `test: the conic section ring records its scheme and its divisor (#552)`
+- `fix: a level's construction data reach that level's own constructor (#552)`
+- `fix: a level whose construction contract cannot be read refuses the datum (#552)`
+- `test: the line section ring's generators are tied to their own points (#552)`
+- `evidence: round 4's red and green runs (#552)` and this one
+
+The pushed head's own SHA is the one the round's report names, and each log's
+first lines record the tree SHA and the modified-path count it ran against.
+
+| log | commit | result |
+| --- | --- | --- |
+| `552-r4-rebased-rows.log` | the rebased head | the four rows of this round on the rebased tree, one pytest process, `-p qc_sage_session`: **4 passed, 39 deselected in 8.63 s**. |
+| `552-r4-rebased-probe.log` | the rebased head | the consumer probe of the threading repair at the rebased head: the conic ring states its scheme, its divisor and pieces 6 and 15, the Cox ring states its scheme, the coproduct's factors and the pushout's span and maps are their own, and the plain, polynomial, tensor and semigroup constructions keep their ambient categories. |
+
+| log | commit | result |
+| --- | --- | --- |
+| `552-r4-head-rows.log` | the pushed head | the same four rows at the head this round pushes, one pytest process, `-p qc_sage_session`: **4 passed, 39 deselected in 5.49 s**. |
+| `552-r4-final-rows.log` | the head that was pushed, after the last rebase onto main | the same four rows again: **4 passed, 39 deselected in 2.98 s**. |
+| `issue521r2-red-base90.log` | the round's test commit | its two files at base `90e3356`: **1 failed, 5 passed in 4.10 s**, the failure being `test_a_subscript_of_a_name_the_file_does_not_bind_declares_no_generator` (`DID NOT RAISE NameError`) — the dialect created the name the test says is absent |
+| `issue521r2-green.log` | the round's fix commit | the same two files on the repair head: **9 passed in 4.05 s** with the test lint loaded and no finding, where the nine are the two new files plus the two `tests/sets` files that write `Sets.Δ[aleph0]` |
+| `issue521r2-ids-diff.log` | base `81b7bbd` against the round's fix commit | `tests/foundations tests/sets tests/rings`, one pytest process per tree: **58 failed, 246 passed, 252 errors** at the base and **58 failed, 249 passed, 252 errors** on the repair; the FAILED/ERROR id sets are 310 each and *empty* in both directions, so the three extra passes are the three new tests and nothing else moved |
+| `issue521r2-corpus.py`, `issue521r2-corpus-diff.log` | base `81b7bbd` against the round's fix commit | one preparse per `.sage` file in the tree and a digest of the lowered text: 972 files at the base, 975 on the repair, and the diff is only the three files the round adds and the one it removes — no existing file's lowering changes |
+| `issue521r2-research-rule.py`, `issue521r2-research-rule.log` | the rule the round replaces, before it was replaced | 1,033 `.sage` files under the research repository with `dzack_research.preamble.all` registered as a session module: **0** files whose lowering depends on the vocabulary the runtime used to copy, comparing the session rule's reading with the upstream rule's for each file |
+| `issue521r2-mypy-base.log`, `issue521r2-mypy-fix.log` | base `81b7bbd`, the round's fix commit | `mypy --config-file /ci/tool-configs/mypy-sage.ini --no-incremental src/sage_extensions/language_runtime.py` inside the pinned image: **7 errors** in the file in both trees, the same seven (its untyped `Integer`, `RealNumber`, `matrix`, `factorial` and `ellipsis_*` definitions), reported at lines 50-118 and 48-116 |
+## `#520` round 2: the incidence driver's outcomes, asked of real rows (2026-11-16)
+
+The row step of `tests/coble_gamma_co_2_incidence_rows.py` answers with one
+value: its status, the clause, cap or exception that decided it, and its counts.
+The statuses of `tests/coble_row_status.py` carry their exit status (0 decided,
+1 undecided or the whole-run budget spent, 2 a returned edge or relation that
+breaks the contract, 3 a decided row whose counts differ, 4 the row step
+raised), and the row's contract is a function of the relation it returned.  The
+tree column names the round's tree by what it is: `base` is main at the round's
+start (`e13a23cd9336437e18f2bbc7afc8c5a34778c6f7`), and a numbered tree is the
+round's own commit at that position, with its repair in the working tree when
+the run was made on a tree it was about to commit.  Every run is the
+launcher `.scratch_pytest.sh` (`pytest -o addopts= -p qc_sage_session -p
+sage_extensions.testing.test_lint`, the checkout bound at `/repos/sage-extensions`
+with the shared `.git` bound at its host path, the port at `/work`) or
+`.scratch_launch.sh` for a probe script.
+
+| log | tree | result |
+| --- | --- | --- |
+| `520-r2-red-tests.log` | `base` | the round's first three tests: **3 failed in 25.91 s**. A cap of 0 s is `setitimer(ITIMER_REAL, 0)`, so the row is computed and reported `DECIDED`; `SO(U(2))`'s refusal escapes `run_row` as `ArithmeticError`; the module has no `row_contract`, so a relation cannot be handed to the contract. |
+| `520-r2-fix-tests.log` | tree 2 plus its repair | the same three on the repaired row step: **3 passed in 6.85 s**. |
+| `520-r2-driver-process.log` | tree 2 plus its repair | the driver as a process: `--cap 0` prints the lattice line and `[O(T_Co)] undecided: its cap of 0 s is spent before the call`, exit 1, in 6.6 s; `--cap 600 --budget 700` prints `[O(T_Co)] undecided: the row did not return inside its 600 s cap`, exit 1, in 613.5 s -- the first row's call starts and runs, and the alarm reaches it where Python holds control. |
+| `520-r2-red-coverage.log` | tree 2 | the coverage statement: **1 failed, 4 passed in 20.46 s**. The row of `U + <-2>` -- one line cusp, no isotropic plane, no edge -- is reported `CONTRACT_VIOLATION` with detail `line cusp 0 carries no edge`. |
+| `520-r2-fix-coverage.log` | tree 4 | the five tests of the file, durations printed: **5 passed in 19.04 s**, the slowest call 5.22 s. |
+| `520-r2-gate-engineering.log` | tree 4 | the directory that holds the test and its harness: **2 failed, 26 passed in 277.74 s**. |
+| `520-r2-base-engineering.log` | `base` | the same two files whose ids fail, without this round: **2 failed in 18.80 s**, the same FAILED ids (`test_polyhedral_engine_routes.sage`'s two, `AttributeError: ... no attribute 'basis'`). |
+| `520-r2-fixture-costs.log` | tree 4 | what each candidate fixture for the refusal costs: `[[0]]` degenerate 1.19 s (`AssertionError`, the Witt index of a degenerate form), `[[2]]` and `A1.SO` decided with no cusp in 0.14/0.11 s, `diag(1,-1).SO` 4.91 s, `(U+U).Aut` 6.61 s (`TypeError` from `finite_ordered_sets.py`, the unhashable `CuspIncidence`), `U(2).SO` 2.06 s (`ArithmeticError`, the stabilizer image not certified). `U(2).SO` is the fixture the test uses. |
+| `520-r2-tip-tests.log` | the round's evidence commit, after the rebase onto the main it is pushed on | the five tests of the file, durations printed: **5 passed in 14.83 s**, the slowest call 3.35 s. |
+| `520-r2-tip-engineering.log` | the round's evidence commit, after the rebase onto the main it is pushed on | the directory that holds the test and its harness, after the rebase: **2 failed, 24 passed in 94.49 s**, 26 collected -- the base's 21 passed plus this file's 5, which replace the two the previous round left there. |
+| `520-r2-base-engineering-rebased.log` | `fb74227`, the base the round is rebased onto | the same directory without this round: **2 failed, 21 passed in 95.74 s**, 23 collected, the same two FAILED ids. |
+## #554, the review of `8e7ba2613e`/`08322dee5d`: the double dual is the primal lattice, the dual is not
+
+`08322dee5d` decided containment, equality and the hash of two polytopes by asking whether the other's
+category has `Sets().Subobjects(self.ambient_space())` among its immediate supercategories.
+`ConvexPolytopes.ambient_space()` is `QQ.free_module(lattice.module_generating_set())`
+(`polytopes.py:542`), so the space is keyed by the *labels* of the lattice and not by the lattice: `M`,
+its dual `M^*` and every rank-2 lattice on the labels `{0, 1}` share one space, and the square of `M`
+was thereby compared with the diamond of `M^*`, a subset of another space. The repair lands the one
+identification that is canonical, at its owner: `polar_dual` of a polytope framed by a dual lattice
+frames its result by the primal, through the evaluation isomorphism
+`Modules(ZZ).dualization().double_dual_morphism(M)`, and the relations route again on the category of
+the lattice (`other in ConvexPolytopes(self.ambient_lattice())`), so an operand of another kind is not
+asked for its `ambient_category()` and two lattices are not identified with each other.
+
+Still to be filed by the owner, and not repaired here: `ConvexPolytopes.ambient_space()`
+(`polytopes.py:542`) and `RationalPolyhedralCones.ambient_space()` (`polyhedral_cones.py:231-233`) key
+the rational space on the lattice's generating-set labels, so two lattices with the same labels share
+one space. With the three relations no longer routed on the space that is latent, but it is wrong: the
+space a polytope lies in is `M tensor QQ`, and `M` is the lattice.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `554-double-dual-red.log` | `1488acf` + the test commit of this round | `tests/schemes/test_polytopes.sage -k double_polar_dual`: **1 failed, 5 deselected in 2.55 s** (test lint loaded, no finding), at `assert doubled.ambient_lattice() is lattice`: the double polar dual's frame is the dual of the dual, `(M^*)^*`, not `M` |
+| `554-double-dual-main-probe.log` | `1488acf` | the defect on main: `doubled.ambient_lattice() is M` **False**; `diamond.is_contained_in(square)` **True** and `doubled == square` **True** (the two spaces identified, so the vertex test and the equality ran across them); `square == 1` **raises** `AttributeError: 'int' object has no attribute 'ambient_category'`, and `square == None` likewise; `polar` and the double polar's engine vertices `(±1, 0)`/`(0, ±1)` and `(±1, ±1)` |
+| `554-double-dual-main-probe.py` | -- | the probe: the lattice, the dual, the double dual and their labels; `double_dual_morphism`'s codomain and its images of the basis; the four relations and the two equality operands that are not sets |
+| `554-double-dual-green.log` | `1488acf` + both commits of this round | the same selection with the repair: **1 passed, 5 deselected in 1.86 s** (test lint loaded, no finding) |
+| `554-double-dual-repair-probe.log` | `1488acf` + both commits of this round | the repaired contract: `_primal_lattice_of_a_dual` is `None` on `M`, `M` on `M^*`, `M^*` on `(M^*)^*` and `None` on the endomorphism Mor module (its target is not the regular module); the diamond is framed by `M^*`, the double dual by `M` and the third polar by `M^*` again; `square` and the double dual contain each other, are equal and have equal hashes; `polar.polar_dual() == square` **True**; `diamond` and the square answer each other the proposition `is_subset(...)`; `square == 1`, `== None` and `== ()` are **False**; inside `M^*` the four points `(1,0), (0,1), (-1,0), (0,-1)` are the diamond, equal to it, with its hash, and contained in it |
+| `554-double-dual-repair-probe.py` | -- | the probe: the predicate on the primal, the dual, the double dual and an endomorphism Mor module; each polar dual's frame; containment, equality, hash and the two operands that are not sets; and the relations inside the dual lattice |
+
+The round was rebased onto `9ddf7f5` before it was pushed, and the two rows below are the same
+selection on that base and on the rebased head.  `polytopes.py` and `tests/schemes/test_polytopes.sage`
+are byte-identical at `1488acf` and at `9ddf7f5` (`git diff --stat 1488acf 9ddf7f5 --` those two paths
+is empty), so the red above is the red of the base as well; the row at `9ddf7f5` re-runs it there.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `554-double-dual-red-on-base.log` | `9ddf7f5` (main, the push base) + this round's test only | the selection: **1 failed, 5 deselected in 3.41 s** at `assert doubled.ambient_lattice() is lattice` |
+| `554-double-dual-green-on-head.log` | the rebased head of this round, clean tree | the selection: **1 passed, 5 deselected in 1.03 s** |
+| `554-double-dual-green-on-pushed-head.log` | `67dd108`, the head this round was pushed from, clean tree | the same selection after main advanced to `26bdef1`: **1 passed, 5 deselected in 1.44 s**; neither `polytopes.py` nor the test file differs between `1488acf`, `9ddf7f5` and `26bdef1` |
+

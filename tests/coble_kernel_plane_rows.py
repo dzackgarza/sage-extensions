@@ -71,13 +71,7 @@ import time
 
 from sage_extensions.all import *  # noqa: F401,F403
 
-from coble_row_status import (
-    EXIT_COUNT_MISMATCH,
-    EXIT_DECIDED,
-    EXIT_UNDECIDED,
-    RowStatus,
-    exit_status,
-)
+from coble_row_status import RowStatus
 
 
 class RowUndecided(Exception):
@@ -283,18 +277,18 @@ def main(argv):
     ):
         if arguments.budget and time.monotonic() - started > arguments.budget:
             log("the whole-run budget is spent")
-            return EXIT_UNDECIDED
+            return RowStatus.UNDECIDED.exit_status
         count, status = run_row(subgroup, label, arguments.cap)
         if status is not RowStatus.DECIDED:
-            return exit_status(status)
+            return status.exit_status
         if not check_row_count(lattice, subgroup, label, count):
-            return EXIT_COUNT_MISMATCH
+            return RowStatus.COUNT_MISMATCH.exit_status
         counts[label] = count
     if counts["Otilde+"] < counts["Otilde"]:
         log("the Otilde+ row has fewer planes than the Otilde row")
-        return EXIT_COUNT_MISMATCH
+        return RowStatus.COUNT_MISMATCH.exit_status
     log(f"the Otilde count is {counts['Otilde']} and the Otilde+ count is {counts['Otilde+']}")
-    return EXIT_DECIDED
+    return RowStatus.DECIDED.exit_status
 
 
 if __name__ == "__main__":

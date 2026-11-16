@@ -1775,7 +1775,25 @@ class SetSubobjectCategory(SliceCategory):
     The slice ``Set/X`` constructs a subset through the set owner on the
     data of the received ``A`` (``OWN-16``), so its points, membership and
     cardinality are those of ``A``.  This level adds the subobject lattice.
+
+    The category is keyed by the base *set*, as the power set is, and for the
+    same reason: two sets built from the same points are equal, ``P(X)`` of
+    either is one parent, and its points are the subsets of that one set
+    (``SET-05``).  A subobject of ``X`` is therefore an object of
+    ``Subobjects(X)`` for every equal copy of ``X``; the base object the
+    category answers with is the copy ``P(X)`` keeps.
     """
+
+    @staticmethod
+    @cached_function(
+        key=lambda cls, base_category, base_object: (cls, id(base_category), base_object)
+    )
+    def __classcall__(cls, base_category: Category, base_object: Parent):
+        r"""Construct one category per base set, on the set's value."""
+        match cls:
+            case DynamicMetaclass():
+                return cls.__base__(base_category, base_object)
+        return typecall(cls, base_category, base_object)
 
     def super_categories(self):
         r"""A subset ``(A, i)`` of ``X`` is an object of ``Set/X`` whose arrow is monic.

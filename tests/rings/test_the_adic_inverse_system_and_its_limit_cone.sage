@@ -16,6 +16,13 @@ def _the_gaussian_rationals_at_the_zero_ideal():
     return field, field.adic_completion(field.ideal(field.zero()))
 
 
+def _the_rational_line_at_the_origin():
+    r"""$QQ[x]$ completed at $(x)$, with its variable."""
+    line = QQ["x"]
+    x = line.algebra_generator("x")
+    return line, x, line.adic_completion(line.ideal(x))
+
+
 def _the_first_two_tiers(system):
     r"""The objects of the index category at $n = 0$ and $n = 1$, and the arrow between them.
 
@@ -64,12 +71,96 @@ def test_the_limit_cone_of_the_completion_projects_onto_every_tier() -> None:
 
 
 def test_the_completion_map_at_the_zero_ideal_is_an_isomorphism_onto_the_ring() -> None:
-    r"""$A \to A^\wedge$ is injective and surjective: $A^\wedge = A$ at $I = (0)$."""
+    r"""$A \to A^\wedge$ is an arrow of the core: $A^\wedge = A$ at $I = (0)$.
+
+    Every power of the zero ideal is the zero ideal, so every tier is $A$ and
+    the completion is $A$ itself presented as complete.  The map is therefore
+    an isomorphism between the two presentations, and the construction builds
+    it as one: it lies in the core, its inverse is an arrow back, and the two
+    inverse equations hold.  Injectivity and surjectivity are answered by that
+    placement, not by a claim the map carries.
+    """
     field, completion = _the_gaussian_rationals_at_the_zero_ideal()
     completion_map = completion.completion_map()
+    a = field.algebra_generator("a")
 
     assert completion_map.domain() is field
     assert completion_map.codomain() is completion
+    assert completion_map in Rings().Core().Mor(field, completion)
     assert completion_map.is_injective() is True
     assert completion_map.is_surjective() is True
     assert completion_map(field.one()) == completion.one()
+    assert completion_map.inverse()(completion_map(a)) == a
+    assert completion_map(completion_map.inverse()(completion(a))) == completion(a)
+    assert completion_map.inverse().inverse() == completion_map
+
+
+def test_the_inverse_system_at_a_principal_ideal_is_not_constant() -> None:
+    r"""At $I = (x)$ the tiers differ, and the transition $A/I^2 \to A/I$ is not the identity.
+
+    $x$ is already zero in $QQ[x]/(x)$, while it is not zero in $QQ[x]/(x^2)$:
+    a transition map that dropped the quotient would pass on the zero ideal,
+    where every tier is the ring and every transition is its identity.
+    """
+    _, x, completion = _the_rational_line_at_the_origin()
+    system = completion.adic_inverse_system()
+    first, second, arrow = _the_first_two_tiers(system)
+    first_tier = system(first)
+    second_tier = system(second)
+    transition = system(arrow)
+
+    assert first_tier is completion.adic_truncation(1)
+    assert second_tier is completion.adic_truncation(2)
+    assert first_tier is not second_tier
+    assert transition.domain() is second_tier
+    assert transition.codomain() is first_tier
+    assert transition(second_tier.quotient_map()(x)).is_zero()
+    assert transition(second_tier.quotient_map()(x**2)).is_zero()
+    assert not second_tier.quotient_map()(x).is_zero()
+
+
+def test_the_limit_cone_at_a_principal_ideal_commutes_with_the_transitions() -> None:
+    r"""The leg at $n+1$ followed by the transition is the leg at $n$, at $I = (x)$.
+
+    The cone's legs are the canonical projections, so they carry $x$ to $x$ at
+    the second tier and to zero at the first, and $\hat x^2 \ne 0$ in
+    $QQ[[x]]$ while its image in $QQ[x]/(x^2)$ is zero.
+    """
+    _, x, completion = _the_rational_line_at_the_origin()
+    system = completion.adic_inverse_system()
+    cone = completion.adic_limit_cone()
+    first, second, arrow = _the_first_two_tiers(system)
+    image = completion.completion_map()(x)
+    projected_second = cone.structure_morphism(second)(image)
+    projected_first = cone.structure_morphism(first)(image)
+
+    assert cone.apex() is completion
+    assert cone.diagram() is system
+    assert projected_first.is_zero()
+    assert not projected_second.is_zero()
+    assert (projected_second**2).is_zero()
+    assert not (image**2).is_zero()
+    assert system(arrow)(projected_second) == projected_first
+    assert projected_second == completion.adic_projection(2)(image)
+    assert projected_first == completion.adic_projection(1)(image)
+
+
+
+def test_the_completion_at_the_zero_ideal_is_free_of_rank_one_over_the_ring() -> None:
+    r"""$A^\wedge = A$ is free of rank one over $A$, framed on the unit.
+
+    The completion of a field at its zero ideal is the field again, so read as
+    an algebra over its source it is the free module on one generator, and its
+    frame is $A^1 \to A^\wedge$ carrying the generator to $1$.  The defining
+    polynomial's power basis is a basis over the coefficient field and over no
+    other base, and it is not this rank.
+    """
+    field, completion = _the_gaussian_rationals_at_the_zero_ideal()
+    frame = completion.framing_morphism()
+    labels = frame.domain().module_generating_set()
+
+    assert completion.base_ring() is field
+    assert frame.domain() is field.free_module(1)
+    assert labels.cardinality() == 1
+    assert frame(frame.domain().module_generator(NN(0))) == completion.one()
+    assert completion.module_generating_set().cardinality() == 1

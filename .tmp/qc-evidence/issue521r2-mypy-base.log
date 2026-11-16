@@ -1,0 +1,12 @@
+=== tree: 90e33560c1321daa66af521584c299c72c3ff475 (modified: 5 paths)
+=== start: 07:20:30
+src/sage_extensions/language_runtime.py:50: error: Function is missing a type annotation  [no-untyped-def]
+src/sage_extensions/language_runtime.py:55: error: Function is missing a type annotation  [no-untyped-def]
+src/sage_extensions/language_runtime.py:71: error: Function is missing a type annotation  [no-untyped-def]
+src/sage_extensions/language_runtime.py:99: error: Function is missing a type annotation  [no-untyped-def]
+src/sage_extensions/language_runtime.py:106: error: Returning Any from function declared to return "_OwnedIntegerElement"  [no-any-return]
+src/sage_extensions/language_runtime.py:109: error: Function is missing a type annotation  [no-untyped-def]
+src/sage_extensions/language_runtime.py:118: error: Function is missing a type annotation  [no-untyped-def]
+/ci/tool-configs/mypy-sage.ini: note: unused section(s): [mypy-slop_detector.*], [mypy-fpylll.*], [mypy-setuptools.*], [mypy-wheel.*], [mypy-pytest.*], [mypy-tqdm.*]
+Found 7 errors in 1 file (checked 1 source file)
+=== exit: 1 at 07:21:51

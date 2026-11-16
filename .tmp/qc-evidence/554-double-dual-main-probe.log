@@ -1,0 +1,41 @@
+tree SHA: 1488acfb5636b16c6836828e5f29208d610d3712 (modified paths: 3)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 15.97 17.59 20.70 18/817 2923400
+probe: .tmp/probe/p3.py; inner 240 s
+regular module: Integer Ring | is ring? True
+N target module is regular? True
+N source module is lattice? True
+N in LinearMorModules? True
+N in InternalMorModules? True
+lattice in LinearMorModules? False
+lattice in InternalMorModules? False
+NN in LinearMorModules? True
+End(M) target is regular? False
+End(M) source is lattice? True
+End(M) in LinearMorModules? True
+biduality codomain is lattice.dual_module().dual_module()? True
+labels lattice / N / NN: (0, 1) (0, 1) (0, 1)
+  label 0 | biduality(e) is double dual generator? False | equal? True
+  label 1 | biduality(e) is double dual generator? False | equal? True
+doubled lattice is M? False
+  square in doubled -> True
+  doubled in square -> True
+  diamond in square -> True
+  square == doubled -> True
+  square == diamond -> False
+  square == 1 raised AttributeError 'int' object has no attribute 'ambient_category'
+  square == None raised AttributeError 'NoneType' object has no attribute 'ambient_category'
+polar vertices: (A vertex at (-1, 0), A vertex at (0, -1), A vertex at (0, 1), A vertex at (1, 0))
+double polar engine vertices: (A vertex at (-1, -1), A vertex at (-1, 1), A vertex at (1, -1), A vertex at (1, 1))
+[peakrss] probe554: child waited=0 shell_code=0 samples=2
+[peakrss] peak tree RSS      : 285 MiB
+[peakrss] low-water MemAvail : 4737 MiB
+[peakrss] peak single VmHWM  : 285 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      274 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   bash                          3 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     2.0s procs=  3 rss=   285 MiB hwm=   285 MiB avail=  4737 MiB
+[peakrss]   t=     0.0s procs=  2 rss=    10 MiB hwm=    10 MiB avail=  4793 MiB
+probe exit: 0

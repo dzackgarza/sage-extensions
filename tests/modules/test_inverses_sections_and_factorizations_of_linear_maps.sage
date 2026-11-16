@@ -36,6 +36,30 @@ def test_the_preimage_of_e0_under_a_determinant_one_map_is_e0_minus_e1() -> None
     assert f.preimage(x) == x - y
 
 
+def test_one_preimage_answers_membership_and_the_lift() -> None:
+    r"""A preimage or ``None`` is one answer to the two questions an element asks.
+
+    ``is_in_image(w)`` and ``lift(w)`` are the same question --- does ``w`` have
+    a preimage, and which one --- so the preimage is the answer to both, and
+    ``preimage_or_none`` is that answer: a preimage of ``w`` when it has one and
+    ``None`` when it has none.  For $e \mapsto x$, the image is $\mathbb{Q}x$:
+    $x$ and $3x$ lift to $e$ and $3e$, and $y$, $x + y$ do not lift at all.
+    """
+    line, plane = QQ**1, QQ**2
+    e = line.module_generator(0)
+    x, y = plane.module_generator(0), plane.module_generator(1)
+    inclusion = line.Mor(plane)({0: x})
+
+    assert inclusion.preimage_or_none(x) == e
+    assert inclusion.preimage_or_none(3 * x) == 3 * e
+    assert inclusion.preimage_or_none(y) is None
+    assert inclusion.preimage_or_none(x + y) is None
+    for point in (x, 3 * x):
+        assert inclusion(inclusion.preimage_or_none(point)) == point
+        assert inclusion.preimage_or_none(point) == inclusion.lift(point)
+    assert inclusion.preimage_or_none(plane.zero()) == line.zero()
+
+
 def test_the_image_of_a_rational_line_in_the_plane_has_no_transverse_preimage() -> None:
     r"""For e -> x, the image is QQ*x: multiples of x lift and y does not."""
     line, plane = QQ**1, QQ**2

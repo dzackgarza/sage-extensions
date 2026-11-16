@@ -9528,7 +9528,9 @@ class SchemesOverLocalRings(OwnedCategoryOverBaseRing):
         def base_change_to_completion(self):
             base = self.scheme_base_ring()
             return self.base_change(
-                base.adic_completion(base.maximal_ideal()).completion_map()
+                base.adic_completion(
+                    base.maximal_ideal()
+                )._completion_map_as_ring_morphism()
             )
 
         def special_fiber_comparison(self):

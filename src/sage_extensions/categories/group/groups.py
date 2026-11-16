@@ -1982,15 +1982,16 @@ def _own_group(
             return owned
 
 
-def _named_by_its_own_words(group) -> str:
-    r"""``group``'s name in a sentence another construction states about it.
+def _named_by_its_own_words(value) -> str:
+    r"""``value``'s name in a sentence another construction states about it.
 
     A subgroup states words for itself
     (:meth:`Subgroups.ParentMethods.description`): the sentence its own
     construction wrote for it.  A whole group states none of that kind -- it is
     not a subgroup of anything -- and keeps its rendering, which is the group's
     own public words (:meth:`OwnedGroups._repr_`, the realization's
-    ``_description``).
+    ``_description``); so does anything that is not a group at all, such as the
+    plane or the point a stabilizer fixes.
 
     A subgroup's *rendering* is not usable in that sentence.  It reads
     ``Subgroup of <supergroup>``, which names the pair and says nothing about
@@ -2003,11 +2004,9 @@ def _named_by_its_own_words(group) -> str:
     The caller asks this from inside the function it states, so the sentence is
     formed when the description is read.
     """
-    match group:
-        case _ if group.supergroup() is group:
-            return f"{group}"
-        case _:
-            return group.description()
+    if value in OwnedGroups() and value.supergroup() is not value:
+        return value.description()
+    return f"{value}"
 
 
 def _transported_subgroup(group, engine_subgroup, stated_description):
@@ -2118,19 +2117,20 @@ def _conjugate_subgroup_of(group, subgroup, conjugator):
     return ConjugateSubgroups(group)(subgroup, conjugator)
 
 
-def _integral_points_subgroup(group, engine_subgroup, ring, *, refinements=(), description=None):
+def _integral_points_subgroup(group, engine_subgroup, ring, *, stated_description, refinements=()):
     r"""The subgroup of integral points ``G(ring)`` of ``group``, computed by ``engine_subgroup``.
 
     The construction records ``ring`` as its datum: a subgroup built here is
     the group of ``ring``-points of its ambient, which is what makes it
     arithmetic (``Subgroups.ParentMethods.is_arithmetic_group``).
 
-    ``description`` is the name the construction gives the group of points
-    (``SL_2(ZZ)``), and it is passed under both names a subgroup carries: the
-    rendering (``description``, which the realization prints) and the record's
-    words (``stated_description``, a function returning that name, so that
-    reading the description is what forms it,
-    :meth:`Subgroups.ParentMethods.description`).
+    ``stated_description`` is the name the constructing operator states for the
+    group of points (``SL_2(ZZ)``), as a function of nothing: it is asked when
+    the subgroup's description is read
+    (:meth:`Subgroups.ParentMethods.description`) and never here, so building
+    the subgroup forms no name.  No rendering is passed either, so the subgroup
+    renders as the realization's own (``Subgroup of ...``); a rendering is not a
+    name.
     """
     return _object_of(
         Cat().meet(
@@ -2143,8 +2143,7 @@ def _integral_points_subgroup(group, engine_subgroup, ring, *, refinements=(), d
         _ambient=OwnedGroups(),
         _engine=(OwnedGroups(), _GroupEngine, _GroupElement),
         engine=engine_subgroup,
-        description=description,
-        stated_description=None if description is None else lambda: description,
+        stated_description=stated_description,
         supergroup=group,
         integral_points_ring=ring,
     )
@@ -2153,7 +2152,6 @@ def _integral_points_subgroup(group, engine_subgroup, ring, *, refinements=(), d
 def _generated_subgroup(
     group,
     generators,
-    description=None,
     refinements=(),
     cardinality_decision=None,
 ):
@@ -2161,14 +2159,13 @@ def _generated_subgroup(
 
     ``refinements`` are the placements the calling construction has proved
     about the subgroup, such as ``_finite_if_image_of`` for an image.
-    ``description`` is the sentence the caller wrote, and it is passed under
-    both names a subgroup carries: the rendering (``description``, which the
-    realization prints, and which the caller has already written) and the
-    record's words (``stated_description``, a function returning that sentence,
-    so that reading the subgroup's description is what forms it,
-    :meth:`Subgroups.ParentMethods.description`); a caller that wrote none has
-    the generated subgroup say it is given by its generators
-    (:meth:`GeneratedSubgroups.ParentMethods.description`).
+
+    The construction states no name of its own beyond the generators the caller
+    supplied, and those are the subgroup's selected data, so the record reads
+    them off :meth:`GeneratedSubgroups.ParentMethods.description`.  Nothing is
+    rendered here and no sentence is formed: a generated subgroup is named by
+    the family it was given, and a caller that wants other words for it states
+    them in the construction that produced the family.
     """
     return _object_of(
         Cat().meet(
@@ -2187,8 +2184,6 @@ def _generated_subgroup(
         supergroup=group,
         selected_subgroup_generators=generators,
         cardinality_decision=cardinality_decision,
-        description=description,
-        stated_description=None if description is None else lambda: description,
     )
 
 
@@ -2265,11 +2260,10 @@ def _record_generators_in_supergroup(group, generators):
 def _engine_subgroup(
     group,
     generators,
-    description=None,
     refinements=(),
     cardinality_decision=None,
 ):
-    r"""Return the subgroup of ``group`` generated by ``generators``, named ``description`` when given.
+    r"""Return the subgroup of ``group`` generated by ``generators``.
 
     ``refinements`` are placements proved by the calling construction
     (``_generated_subgroup``).  Each generator is read as an element of ``group`` by
@@ -2280,7 +2274,6 @@ def _engine_subgroup(
     return _generated_subgroup(
         group,
         selected,
-        description,
         refinements,
         cardinality_decision,
     )
@@ -2702,7 +2695,7 @@ def _SL(degree, ring, var="a"):
             engine,
             _owned_ring(ring),
             refinements=(OwnedGroups().FinitelyGeneratedAsMagma(),),
-            description=f"SL_{int(degree)}(ZZ)",
+            stated_description=lambda: f"SL_{int(degree)}(ZZ)",
         )
         return group.select_group_generators(
             lambda: finite_ordered_set(
@@ -2750,7 +2743,7 @@ def _Sp(degree, ring, var="a", invariant_form=None):
             Sp(2 * genus, _engine_ring(ZZ), var=var, invariant_form=form),
             _owned_ring(ring),
             refinements=(OwnedGroups().FinitelyGeneratedAsMagma(),),
-            description=f"Sp_{2 * genus}(ZZ)",
+            stated_description=lambda: f"Sp_{2 * genus}(ZZ)",
         )
         translations = tuple(
             block(
@@ -3771,12 +3764,20 @@ class GroupMorphism:
         subgroup,
         *,
         predicate=None,
-        description=None,
+        stated_clause=None,
         character_data=None,
         character_data_complete=None,
         generating_morphism=None,
     ):
         r"""Return the inverse image of ``subgroup`` under this group morphism.
+
+        ``stated_clause`` is the constructing owner's condition for the record,
+        as a function of nothing (``rho_L(g) lies in ...``), asked when the
+        preimage's name is read.  With none, the preimage states ``this
+        morphism(g) lies in <subgroup's own description>``, also when read, so
+        ``subgroup`` is named as it names itself and nothing is rendered while
+        the preimage is built
+        (:meth:`PreimageSubgroups.ParentMethods._predicate_clause`).
 
         ``generating_morphism`` supplies, when the caller's construction has
         one, the free generating morphism onto the preimage; otherwise the
@@ -3790,7 +3791,7 @@ class GroupMorphism:
             self,
             subgroup,
             predicate=predicate,
-            description=description,
+            stated_clause=stated_clause,
             character_data=character_data,
             character_data_complete=character_data_complete,
             generating_morphism=generating_morphism,
@@ -3870,13 +3871,13 @@ class GroupMorphism:
     def image(self):
         r"""``f(G) <= H`` as a subgroup of the codomain.
 
-        A selected finite source generating set determines the image by its
-        mapped generators. A selected section on the image also supplies
-        exact membership through its domain. The GAP image computation remains available for
-        other represented source maps.  The image of a morphism out of a
-        finite group is placed finite at construction (``_image_subgroup``),
-        with no order computed; the GAP route below is reached only by a
-        source not placed finite.
+        Every route reads a generating family of the source: its selected
+        finite generating set, its subgroup generators, its elements when it is
+        finite, or the section selected on the image.  The image of a finite
+        group is placed finite at construction (``_image_subgroup``), with no
+        order computed.  A source with no selected family is refused rather
+        than read through the engine's own image computation, which no public
+        route reaches and which named the source by its rendering.
         """
         if self._subgroup_premise:
             return self.domain()
@@ -3968,10 +3969,12 @@ class GroupMorphism:
             f"the image of {source} under {self} is computed from generators of {source}, but none were "
             f"selected: {source} is cut out by a predicate; supply its generators with select_group_resolution"
         )
-        return _subgroup_from_gap(
-            codomain,
-            self._gap_morphism_crossing().Image(),
-            lambda: f"the image of {_named_by_its_own_words(source)} in {codomain}",
+        raise ValueError(
+            f"cannot compute the image of the morphism {self} out of {source}: every route to an "
+            f"image reads a generating family of the source, and {source} has none selected. "
+            f"The source's selected generators give the image as the subgroup they generate, its "
+            f"subgroup generators give it the same way, and its elements give it when it is finite; "
+            f"select a generating family with {source}.select_group_resolution(generators=...)"
         )
 
     @cached_method
@@ -6542,8 +6545,8 @@ class OwnedGroups(CategoryPacketMethods, OwnedCategory):
                 lambda value: lifts[image_set(value)]
             )
 
-        def subgroup(self, generators, description=None, *, cardinality_decision=None):
-            r"""Return the subgroup of ``self`` generated by ``generators``, named ``description`` when given.
+        def subgroup(self, generators, *, cardinality_decision=None):
+            r"""Return the subgroup of ``self`` generated by ``generators``.
 
             A subgroup ``H <= G`` of a finite group is finite by Lagrange's
             theorem, ``|G| = |H| [G : H]``, so the subgroup is placed in finite
@@ -6551,11 +6554,15 @@ class OwnedGroups(CategoryPacketMethods, OwnedCategory):
             computed (``_finite_if_bounded_by``, ``CON-07``).  A generated
             subgroup of a group that is not known finite makes no finiteness
             claim here: its own finiteness is decided by its engine when asked.
+
+            The subgroup's record name is the generating family it was given
+            (:meth:`GeneratedSubgroups.ParentMethods.description`); a
+            construction that wants other words for a subgroup it generates
+            states them in its own operation, where it knows what it computed.
             """
             return _engine_subgroup(
                 self,
                 generators,
-                description,
                 refinements=_finite_if_bounded_by(self),
                 cardinality_decision=cardinality_decision,
             )
@@ -6661,7 +6668,7 @@ class OwnedGroups(CategoryPacketMethods, OwnedCategory):
                 subgroup,
                 self.subgroup_conjugation_g_set().action_functor(),
                 normalizes,
-                description=f"normalizer of {subgroup} in {self}",
+                lambda: f"normalizer of {_named_by_its_own_words(subgroup)} in {self}",
             )
 
         @RealizationHook
@@ -8724,26 +8731,23 @@ class GeneratedSubgroups(OwnedParameterizedCategory):
                 self._selected_subgroup_generators = self.group_generators()
             return self._selected_subgroup_generators
 
-        @cached_method
         def description(self) -> str:
-            r"""Return this generated subgroup's own name: what its construction stated.
+            r"""Return this generated subgroup's own name: the family it was given.
 
-            A generated subgroup's defining data is its selected generator family
-            and the sentence the caller wrote beside it, so this level states
-            both cases: the caller's own description from
-            :meth:`OwnedGroups.ParentMethods.subgroup` or from the construction
-            that generated the subgroup, asked here because the construction
-            retained it as a function, and, where the caller wrote none, the one
-            thing that construction did say -- that the subgroup is given by
-            those generators.
+            A generated subgroup's defining datum is its selected generator
+            family, and the one thing its construction says about it is that the
+            subgroup is given by those generators.  The family is the subgroup's
+            own selected data (:meth:`selected_subgroup_generators`), so this
+            states no sentence about any other group and forms none: what the
+            subgroup was built from is already stored here.
+
+            A construction that computes a subgroup and knows more about it --
+            a transport, a preimage, a conjugate -- states that in its own
+            construction, not through this one.
 
             Read by :func:`sage_extensions.categories._lattice._group_label`.
             """
-            match self._stated_description:
-                case None:
-                    return "a subgroup given by its own generators"
-                case stated:
-                    return stated()
+            return "a subgroup given by its own generators"
 
         def _admit_generator(self, generator):
             r"""A selected generator as a member: it is the one-letter word of its own generating set.

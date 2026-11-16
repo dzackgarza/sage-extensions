@@ -30,6 +30,7 @@ from sage_extensions.categories.group.groups import (
     SymmetricGroups,
     _GroupMorRealizationMixin,
     _encodes_elements_in_gap,
+    _named_by_its_own_words,
     _engine_group,
     _engine_left_coset_positions,
     _engine_point,
@@ -723,7 +724,7 @@ class FiniteGSets(CategoryPacketMethods, OwnedParameterizedCategory):
                 start,
                 orbit.action_functor(),
                 lambda group_element: orbit.act(group_element, start) == start,
-                description=f"setwise stabilizer of {subset} in {self.acting_group()}",
+                lambda: f"setwise stabilizer of {_named_by_its_own_words(subset)} in {self.acting_group()}",
                 generating_morphism=generating_morphism,
             )
 

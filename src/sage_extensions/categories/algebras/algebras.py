@@ -2466,6 +2466,7 @@ class Algebras(OwnedCategoryOverBaseRing):
                     return _presented_algebra_quotient(
                         self,
                         relations,
+                        base_ring=ring,
                         extra_categories=_extra_categories,
                         extra_construction_data=_extra_construction_data,
                         generating_module=_generating_module,
@@ -3598,16 +3599,37 @@ def _dual_numbers_example(base_ring):
     return presentation.quotient_by_relations(("x^2",))
 
 
+# Protected contract (``OWN-05``).  One selected finite presentation has one
+# quotient construction, and this function is it: it validates the presentation
+# against the coefficient ring the asking category states, and computes the
+# quotient through the presented-algebra owner.  Owner:
+# :class:`AlgebrasWithChosenFinitePresentation`, whose ``_call_`` is one caller.
+# Permitted callers are that constructor and the categories that construct their
+# own object through a chosen finite presentation while naming themselves the
+# ambient category (``OWN-15``): the presented road of an affine semigroup
+# algebra (:func:`_affine_semigroup_algebra`), the commutative coproduct of two
+# presented algebras, and ``Algebras.ParentMethods.quotient_by_relations``.
+# Inputs are an associative unital presentation algebra over ``base_ring``, its
+# relations, the categories the result is placed in, the extra construction data
+# those categories' levels consume, a generating module when the relations are
+# linear in it, and the asking category.  The result is the one quotient for that
+# datum, recorded in ``constructing_category``; two callers that name the same
+# category and supply the same data reach the same algebra.  No public operation
+# implements this responsibility: the public constructor of
+# ``AlgebrasWithChosenFinitePresentation`` can state only its own category as the
+# ambient one, and a stronger category that builds its object here is not that
+# constructor's caller.
 def _presented_algebra_quotient(
     presentation_ring,
     relations,
     *,
+    base_ring,
     extra_categories,
     extra_construction_data,
     generating_module,
     constructing_category,
 ):
-    r"""The quotient of a presentation ring, built in ``constructing_category``.
+    r"""The quotient of a presentation ring over ``base_ring``, in ``constructing_category``.
 
     A quotient of a chosen finite presentation is one algebra with one
     presentation, whatever category asked for it.  ``constructing_category`` is
@@ -3616,14 +3638,27 @@ def _presented_algebra_quotient(
     presented-algebra owner decides the quotient itself, so every route that
     asks for one reaches it here.
     """
-    ring = presentation_ring.algebra_base_ring()
-    return AlgebrasWithChosenFinitePresentation(ring)._call_(
+    if presentation_ring.base_ring() is not base_ring:
+        raise ValueError(
+            f"an algebra over {base_ring} given by generators and relations needs a presentation algebra "
+            f"over {base_ring}, but {presentation_ring} is over {presentation_ring.base_ring()}"
+        )
+    if presentation_ring not in Algebras(base_ring).Associative().Unital():
+        raise TypeError(
+            f"a finite associative unital presentation over {base_ring} "
+            f"needs an associative unital presentation algebra, but got {presentation_ring}"
+        )
+    from sage_extensions.categories.algebras.free_algebras import (
+        _finitely_presented_algebra_from_data,
+    )
+
+    return _finitely_presented_algebra_from_data(
         presentation_ring,
         relations,
-        extra_categories=extra_categories,
-        extra_construction_data=extra_construction_data,
-        generating_module=generating_module,
-        constructing_category=constructing_category,
+        _extra_categories=tuple(extra_categories),
+        _extra_construction_data=extra_construction_data,
+        _generating_module=generating_module,
+        _constructing_category=constructing_category,
     )
 
 
@@ -3650,6 +3685,19 @@ class AlgebrasWithChosenFinitePresentation(OwnedCategoryOverBaseRing):
             .FinitelyPresentedAsAlgebra(),
         ]
 
+    def __call__(self, presentation_ring, relations, *args, **options):
+        r"""Construct the quotient even when ``presentation_ring`` is already an object here.
+
+        Sage's generic category call returns its first argument unchanged when
+        that argument is already an object of the category.  A free algebra with
+        finitely many generators presents itself, so a presentation ring is one,
+        and that rule would return the ring and drop the relations
+        (``ModulesWithChosenFinitePresentation`` states the same exception).  The
+        ring is constructor data, not a candidate quotient, so the call always
+        constructs.
+        """
+        return self._call_(presentation_ring, relations, *args, **options)
+
     def _call_(
         self,
         presentation_ring,
@@ -3658,37 +3706,24 @@ class AlgebrasWithChosenFinitePresentation(OwnedCategoryOverBaseRing):
         extra_categories=(),
         extra_construction_data=None,
         generating_module=None,
-        constructing_category,
     ):
         r"""Construct an algebra from its selected finite associative presentation.
 
         Retain the exact tensor or polynomial source. The selected quotient
         computation states its own coefficient and relation hypotheses;
-        finite presentation does not impose commutativity.
-        ``constructing_category`` is the category whose public constructor
-        asked for the quotient, which becomes its ambient category (``OWN-15``).
+        finite presentation does not impose commutativity.  This category asked
+        for the quotient, so it is the ambient category its result records
+        (``OWN-15``); a stronger category that constructs its own object through
+        this presentation names itself at :func:`_presented_algebra_quotient`.
         """
-        if presentation_ring.base_ring() is not self.base_ring():
-            raise ValueError(
-                f"an algebra over {self.base_ring()} given by generators and relations needs a presentation algebra "
-                f"over {self.base_ring()}, but {presentation_ring} is over {presentation_ring.base_ring()}"
-            )
-        if presentation_ring not in Algebras(self.base_ring()).Associative().Unital():
-            raise TypeError(
-                f"a finite associative unital presentation over {self.base_ring()} "
-                f"needs an associative unital presentation algebra, but got {presentation_ring}"
-            )
-        from sage_extensions.categories.algebras.free_algebras import (
-            _finitely_presented_algebra_from_data,
-        )
-
-        return _finitely_presented_algebra_from_data(
+        return _presented_algebra_quotient(
             presentation_ring,
             relations,
-            _extra_categories=tuple(extra_categories),
-            _extra_construction_data=extra_construction_data,
-            _generating_module=generating_module,
-            _constructing_category=constructing_category,
+            base_ring=self.base_ring(),
+            extra_categories=extra_categories,
+            extra_construction_data=extra_construction_data,
+            generating_module=generating_module,
+            constructing_category=self,
         )
 
     class ParentMethods:
@@ -4275,6 +4310,16 @@ class CommutativeAlgebraPushouts(OwnedCategoryOverBaseRing):
         return [Algebras(self.base_ring()).Associative().Unital().Commutative()]
 
     class ParentMethods:
+        def __init__(
+            self,
+            _preamble_pushout_span,
+            _preamble_pushout_coproduct,
+            **rest,
+        ) -> None:
+            self._preamble_pushout_span = _preamble_pushout_span
+            self._preamble_pushout_coproduct = _preamble_pushout_coproduct
+            super().__init__(**rest)
+
         def pushout_span(self):
             return self._preamble_pushout_span
 

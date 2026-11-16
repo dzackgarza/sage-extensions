@@ -1,0 +1,33 @@
+tree SHA: 931c59d9a8e6b63604e7ec81f19db96a93341ae3
+ZZ adic_completion from ModulesWithChosenFinitePresentation.ParentMethods.adic_completion in sage_extensions.categories.modules.pure.modules
+QQ adic_completion from OwnedRings.ParentMethods.adic_completion in sage_extensions.categories.rings.ring_foundation
+QQ[x] adic_completion from OwnedRings.ParentMethods.adic_completion in sage_extensions.categories.rings.ring_foundation
+QQ(i) adic_completion from OwnedRings.ParentMethods.adic_completion in sage_extensions.categories.rings.ring_foundation
+AdicCompletions().Local().an_object():
+Traceback (most recent call last):
+  File "/probe.py", line 9, in <module>
+    print(" ", AdicCompletions().Local().an_object())
+               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/rings/commutative_algebra.py", line 3036, in an_object
+    return _owned_integers().adic_completion(2)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/pure/modules.py", line 4655, in adic_completion
+    if ideal.ring() is not ring:
+       ^^^^^^^^^^
+AttributeError: 'int' object has no attribute 'ring'
+Zp(5) adic_completion from OwnedRings.ParentMethods.adic_completion
+[peakrss] probe527: child waited=0 shell_code=0 samples=5
+[peakrss] peak tree RSS      : 262 MiB
+[peakrss] low-water MemAvail : 4050 MiB
+[peakrss] peak single VmHWM  : 262 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      251 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   bash                          3 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     8.0s procs=  3 rss=   262 MiB hwm=   262 MiB avail=  4214 MiB
+[peakrss]   t=     6.0s procs=  3 rss=   229 MiB hwm=   229 MiB avail=  4050 MiB
+[peakrss]   t=     4.0s procs=  3 rss=   192 MiB hwm=   192 MiB avail=  4268 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   130 MiB hwm=   130 MiB avail=  4426 MiB
+[peakrss]   t=     0.0s procs=  2 rss=    11 MiB hwm=    11 MiB avail=  4616 MiB
+launcher exit: 0

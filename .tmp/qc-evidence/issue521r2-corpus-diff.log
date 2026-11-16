@@ -1,0 +1,13 @@
+=== per-file lowered-source digests, base 81b7bbd against the repair
+=== command: issue521r2-corpus.py, one preparse per .sage file in the tree, digest of the lowered text
+=== base 81b7bbd:    files: 972
+=== repair tree:     files: 975
+=== diff of the two digest listings (every line is a file one tree has and the other does not):
+170a171,173
+> /repos/sage-extensions/tests/foundations/session_files/a_countable_set.sage e068680286556a476082e2ef7bc79ea310a0d57e76cded14f2ee764a58407631
+> /repos/sage-extensions/tests/foundations/session_files/a_subscript_of_an_unwritten_name.sage 6a63b8538f7ec6fffcdd5ef486bc83ba4ec1d47d5b1b95f02935d4b02262e39f
+> /repos/sage-extensions/tests/foundations/test_a_session_file_binds_only_what_it_writes.sage b80a9a4af130c375caa97f850548eb1f14c885d89740ee7b0725016886617a02
+177c180
+< /repos/sage-extensions/tests/foundations/test_the_session_binds_its_own_names.sage 08c17de040f07d6a7ef7afa054a3e40123b36c3c61456e7788121fc1b93cf6c1
+---
+> /repos/sage-extensions/tests/foundations/test_the_session_names_denote_their_objects.sage 8f151296c50b37f704b408ee79224e1e5d9245d1ebb331e095a962f351444bfe

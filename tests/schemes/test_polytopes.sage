@@ -141,36 +141,46 @@ def test_triangles_with_one_vertex_set_are_one_polytope_with_one_hash() -> None:
 
 
 def test_the_square_and_its_double_polar_dual_contain_each_other() -> None:
-    r"""`A \subseteq B` is decided in the ambient space, not in the lattice framing it.
+    r"""`Q^{**} = Q` in `Q`'s own lattice; the dual of that lattice is another space.
 
-    `Q = [-1, 1]^2` is the square on `(\pm 1, \pm 1)`, and its polar dual is the
-    diamond `Q^\circ = \operatorname{conv}\{\pm e_1, \pm e_2\}`, framed by the dual
-    lattice.  The polar dual of the diamond is `Q` again, framed by the double
-    dual: a second lattice over the one ambient space `QQ^2`, presenting the same
-    points of it.  A convex set contains a convex hull exactly when it contains
-    the vertices (`convexHull_min`), so `Q` and `Q^{**}` contain each other, and
-    the two answers are decided rather than left as the proposition `is_subset`.
+    `Q = [-1, 1]^2 = \operatorname{conv}\{(\pm 1, \pm 1)\}` is a subset of `M_QQ`
+    for its coordinate lattice `M = ZZ^2`, and its polar dual
+    `Q^\circ = \{y : \langle y, x\rangle \le 1 \text{ for all } x \in Q\}` is
+    `\operatorname{conv}\{\pm e_1, \pm e_2\}` in `M^*_QQ`: a point of the polar
+    is a functional on `M_QQ`, so the diamond is framed by the dual lattice and
+    its points are not points of `M_QQ`.
 
-    The diamond is contained in `Q` and does not contain it, and the triangle
-    `\operatorname{conv}\{(0,0), (3,0), (0,3)\}`, written in the double dual's
-    framing, reaches outside `Q` while `Q` does not lie in it: the vertex
-    `(3, 0)` is outside `Q`, and the vertex `(-1, -1)` of `Q` is outside the
-    triangle.
+    The polar dual of the diamond is framed by the double dual `M^{**}`, which is
+    `M` and not a third space: evaluation `x \mapsto (f \mapsto f(x))` is an
+    isomorphism `M \to M^{**}` for a finite free `M` (Mathlib, `Module.evalEquiv`,
+    `Mathlib/LinearAlgebra/Dual/Defs.lean`), so `Q` and `Q^{**}` are two subsets
+    of one `M_QQ` and are compared there.  `Q^{**}` contains `Q` (Mathlib,
+    `LinearMap.subset_bipolar`, `Mathlib/Analysis/LocallyConvex/Polar.lean`) and
+    the second polar dual the library computes has `Q`'s four vertices, so `Q`
+    contains `Q^{**}` too: a convex set contains a convex hull exactly when it
+    contains the vertices (`convexHull_min`).  Both containments, equality and the
+    hash are therefore decided, and the triangle
+    `\operatorname{conv}\{(0,0), (3,0), (0,3)\}` is not `Q` in either direction,
+    the vertex `(3, 0)` lying outside `Q` and the vertex `(-1, -1)` of `Q` outside
+    the triangle.
     """
     lattice = ZZ.free_module(2)
     square = ConvexPolytopes(lattice)(((-1, -1), (-1, 1), (1, 1), (1, -1)))
     diamond = square.polar_dual()
     doubled = diamond.polar_dual()
-    reaching_out = ConvexPolytopes(doubled.ambient_lattice())(((0, 0), (3, 0), (0, 3)))
+    reaching_out = ConvexPolytopes(lattice)(((0, 0), (3, 0), (0, 3)))
 
-    assert doubled.ambient_space() is square.ambient_space()
-    assert doubled.ambient_lattice() is not lattice
-    assert square.is_contained_in(doubled) is True
+    assert diamond.ambient_lattice() is lattice.dual_module()
+    assert diamond.ambient_lattice() is not lattice
+    assert doubled.ambient_lattice() is lattice
+    assert doubled.polar_dual().ambient_lattice() is lattice.dual_module()
     assert doubled.is_contained_in(square) is True
-    assert diamond.is_contained_in(square) is True
-    assert square.is_contained_in(diamond) is False
-    assert reaching_out.is_contained_in(square) is False
-    assert square.is_contained_in(reaching_out) is False
+    assert square.is_contained_in(doubled) is True
     assert (square == doubled) is True
-    assert (square == diamond) is False
     assert hash(square) == hash(doubled)
+    assert square.is_contained_in(reaching_out) is False
+    assert reaching_out.is_contained_in(doubled) is False
+    assert (square == reaching_out) is False
+    assert (diamond.is_contained_in(square)) is not True
+    assert (square == 1) is False
+    assert (square == None) is False
