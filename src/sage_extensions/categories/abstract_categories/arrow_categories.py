@@ -36,6 +36,7 @@ from sage_extensions.categories.abstract_categories.cat import (
     NaturalTransformationMorphism,
     _FunctorCategory,
     _apex_isomorphism_in_subgroup,
+    _functor_object,
 )
 from sage_extensions.categories.abstract_categories.mor_categories import (
     CategoricalMor,
@@ -401,6 +402,24 @@ class _WalkingArrowFunctorCategory(_FunctorCategory):
     """
 
     _MorCategory = ArrowMorCategoryConstruction
+
+    def _mor_endpoint(self, obj: Parent | Category | Functor):
+        r"""The endpoint of a square is the functor object its Mor retains.
+
+        A square's endpoints are arrow objects of ``Ar(C)``, and an arrow
+        object is represented by the ``_FunctorObject`` of the functor it
+        determines (``_FunctorCategory.Mor``).  The family interns its objects
+        by the endpoints its result holds, so the same two arrows have to reach
+        it as the same two functor objects: otherwise every ``Of`` builds a
+        square category of its own, and an identity computed through one of
+        them belongs to a Mor nobody else has.
+        """
+        endpoint = super()._mor_endpoint(obj)
+        match endpoint:
+            case Functor():
+                return _functor_object(endpoint)
+            case _:
+                return endpoint
 
     class ParentMethods:
         r"""A functor ``[1] -> C``, read as the arrow of ``C`` it picks out."""
