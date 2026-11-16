@@ -264,6 +264,11 @@ class _SparseFreeModuleElement(ModuleElement):
         return equal if op == op_EQ else negation(equal)
 
     def __hash__(self):
+        # The coefficients are fixed at construction, so the hash is a datum
+        # of the element, computed on the first request.
+        cached = self.__dict__.get("_hash_value")
+        if cached is not None:
+            return cached
         zero = self.parent().base_ring().zero()
         if any(
             (coefficient == zero) is not False
@@ -272,7 +277,8 @@ class _SparseFreeModuleElement(ModuleElement):
             raise TypeError(
                 "a sparse vector with undecided zero coefficients has no selected canonical hash"
             )
-        return hash((id(self.parent()), frozenset(self._coefficients.items())))
+        self._hash_value = hash((id(self.parent()), frozenset(self._coefficients.items())))
+        return self._hash_value
 
     def _repr_(self):
         zero = self.parent().base_ring().zero()
