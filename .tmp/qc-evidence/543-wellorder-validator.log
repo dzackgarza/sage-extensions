@@ -1,0 +1,15 @@
+...................                                                      [100%]
+19 passed in 7.74s
+[peakrss] 543-wellorder-validator: child waited=0 shell_code=0 samples=7
+[peakrss] peak tree RSS      : 298 MiB
+[peakrss] low-water MemAvail : 3605 MiB
+[peakrss] peak single VmHWM  : 302 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      291 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     8.0s procs=  3 rss=   298 MiB hwm=   298 MiB avail=  3781 MiB
+[peakrss]   t=    12.1s procs=  3 rss=   297 MiB hwm=   302 MiB avail=  3653 MiB
+[peakrss]   t=    10.1s procs=  3 rss=   294 MiB hwm=   302 MiB avail=  3605 MiB
+[peakrss]   t=     6.0s procs=  3 rss=   255 MiB hwm=   255 MiB avail=  3940 MiB
+[peakrss]   t=     4.0s procs=  3 rss=   177 MiB hwm=   177 MiB avail=  4180 MiB

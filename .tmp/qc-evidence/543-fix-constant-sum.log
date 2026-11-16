@@ -1,0 +1,87 @@
+...F.....F........                                                       [100%]
+=================================== FAILURES ===================================
+____________ test_a_finite_cardinal_is_the_natural_number_it_counts ____________
+
+    def test_a_finite_cardinal_is_the_natural_number_it_counts() -> None:
+        r"""$|\{0, 1, 2\}| = 3$, and the finite cardinal $7$ read in $\mathbb{Z}$ and $\mathbb{Q}$ is $7$."""
+        assert cardinal(3) == 3
+        assert Sets.Δ[2].cardinality() == 3
+        assert ZZ(cardinal(7)) == 7
+>       assert QQ(cardinal(7)) == 7
+               ^^^^^^^^^^^^^^^^^^^^^
+
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:57: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/rings/ring_foundation.py:1834: in __call__
+    return self._element_constructor_(value)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/ring_foundation.py:1761: in _element_constructor_
+    if source is not self and source in Modules(self.base_ring()) and source.unformed_module() is self:
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/objects.py:172: in __contains__
+    return super().__contains__(value)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Category of modules over Integer Ring
+x = <class 'sage_extensions.categories.sets.cardinals.Cardinalities.parent_class'>
+
+    def __contains__(self, x) -> bool:
+        """
+        Membership testing.
+    
+        Returns whether ``x`` is an object in this category, that is
+        if the category of ``x`` is a subcategory of ``self``.
+    
+        EXAMPLES::
+    
+            sage: ZZ in Sets()
+            True
+        """
+        try:
+>           c = x.category()
+                ^^^^^^^^^^^^
+E           TypeError: category() needs an argument
+
+/sage/.venv/lib/python3.14/site-packages/sage/categories/category.py:706: TypeError
+________ test_nonidentity_well_order_maps_compose_with_exact_endpoints _________
+
+    def test_nonidentity_well_order_maps_compose_with_exact_endpoints() -> None:
+        well_orders = WellOrderedSets()
+        source = Sets.Δ[1]
+        target = Sets.Δ[2]
+        inclusion = well_orders.Mor(source, target)(lambda point: target(int(point) + 1))
+        shift = well_orders.Mor(target, target)(lambda point: target(min(2, int(point) + 1)))
+        composite = shift * inclusion
+        assert composite.parent() is well_orders.Mor(source, target)
+        assert composite.underlying_set_morphism().domain() is source
+        assert composite.underlying_set_morphism().codomain() is target
+        assert tuple(int(composite(point)) for point in source) == (2, 2)
+        try:
+            well_orders.Mor(target, target)(lambda point: target(2 - int(point)))
+        except ValueError:
+            pass
+        else:
+>           raise AssertionError("an order-reversing map was admitted to well-ordered Mor")
+E           AssertionError: an order-reversing map was admitted to well-ordered Mor
+
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:156: AssertionError
+=========================== short test summary info ============================
+FAILED tests/sets/test_cardinal_and_ordinal_order_morphisms.sage::test_a_finite_cardinal_is_the_natural_number_it_counts
+FAILED tests/sets/test_cardinal_and_ordinal_order_morphisms.sage::test_nonidentity_well_order_maps_compose_with_exact_endpoints
+2 failed, 16 passed in 10.77s
+[peakrss] 543-fix-constant-sum: child waited=1 shell_code=1 samples=9
+[peakrss] peak tree RSS      : 316 MiB
+[peakrss] low-water MemAvail : 4106 MiB
+[peakrss] peak single VmHWM  : 323 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      312 MiB peak
+[peakrss]   gap                          10 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    12.0s procs=  3 rss=   316 MiB hwm=   323 MiB avail=  4197 MiB
+[peakrss]   t=    14.0s procs=  3 rss=   304 MiB hwm=   323 MiB avail=  4258 MiB
+[peakrss]   t=    10.0s procs=  3 rss=   301 MiB hwm=   301 MiB avail=  4339 MiB
+[peakrss]   t=    16.1s procs=  3 rss=   279 MiB hwm=   323 MiB avail=  4512 MiB
+[peakrss]   t=     8.0s procs=  3 rss=   271 MiB hwm=   271 MiB avail=  4188 MiB
+launcher exit: 1

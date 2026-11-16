@@ -1,0 +1,20 @@
+card Mor(2,3) decided: hook=bool(False)  is_empty=bool  ask→False
+card Mor(3,2) decided: hook=bool(True)  is_empty=bool  ask→True
+card Mor(2^aleph0, aleph1) undecided: hook=Negation(not le((2)^(ℵ_0), ℵ_1))  is_empty=AtomicProposition  ask→Unknown
+ord  Mor(1,2) decided: hook=bool(False)  is_empty=bool  ask→False
+ord  Mor(2,1) decided: hook=bool(True)  is_empty=bool  ask→True
+answer types: {}
+[peakrss] run: child waited=0 shell_code=0 samples=5
+[peakrss] peak tree RSS      : 231 MiB
+[peakrss] low-water MemAvail : 2358 MiB
+[peakrss] peak single VmHWM  : 237 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      226 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   bash                          3 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     8.1s procs=  3 rss=   231 MiB hwm=   237 MiB avail=  3733 MiB
+[peakrss]   t=     6.1s procs=  3 rss=   186 MiB hwm=   211 MiB avail=  2496 MiB
+[peakrss]   t=     4.1s procs=  3 rss=   171 MiB hwm=   177 MiB avail=  2358 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   109 MiB hwm=   109 MiB avail=  2518 MiB
+[peakrss]   t=     0.0s procs=  2 rss=    11 MiB hwm=    11 MiB avail=  2644 MiB

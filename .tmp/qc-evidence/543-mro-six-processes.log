@@ -1,0 +1,43 @@
+=== run 0 rc 0
+MIXINS ['Sets.ParentMethods']
+MROHEAD ['OwnedCardinalityMor_with_category_with_category', 'Sets.ParentMethods', 'CardinalityMor_with_category_with_category', 'CardinalityMor_with_category']
+ISEMPTY AtomicProposition is_empty(Set of Morphisms from 2 to 3 in Card: cardinalities with a unique morphism kappa -> lambda exactly when kappa <= lambda)
+UNIQUE RAISED AssertionError
+=== run 1 rc 0
+MIXINS ['Sets.ParentMethods']
+MROHEAD ['OwnedCardinalityMor_with_category_with_category', 'Sets.ParentMethods', 'CardinalityMor_with_category_with_category', 'CardinalityMor_with_category']
+ISEMPTY AtomicProposition is_empty(Set of Morphisms from 2 to 3 in Card: cardinalities with a unique morphism kappa -> lambda exactly when kappa <= lambda)
+UNIQUE RAISED AssertionError
+=== run 2 rc 0
+MIXINS ['Sets.ParentMethods']
+MROHEAD ['OwnedCardinalityMor_with_category_with_category', 'Sets.ParentMethods', 'CardinalityMor_with_category_with_category', 'CardinalityMor_with_category']
+ISEMPTY AtomicProposition is_empty(Set of Morphisms from 2 to 3 in Card: cardinalities with a unique morphism kappa -> lambda exactly when kappa <= lambda)
+UNIQUE RAISED AssertionError
+=== run 3 rc 0
+MIXINS ['Sets.ParentMethods']
+MROHEAD ['OwnedCardinalityMor_with_category_with_category', 'Sets.ParentMethods', 'CardinalityMor_with_category_with_category', 'CardinalityMor_with_category']
+ISEMPTY AtomicProposition is_empty(Set of Morphisms from 2 to 3 in Card: cardinalities with a unique morphism kappa -> lambda exactly when kappa <= lambda)
+UNIQUE RAISED AssertionError
+=== run 4 rc 0
+MIXINS ['Sets.ParentMethods']
+MROHEAD ['OwnedCardinalityMor_with_category_with_category', 'Sets.ParentMethods', 'CardinalityMor_with_category_with_category', 'CardinalityMor_with_category']
+ISEMPTY AtomicProposition is_empty(Set of Morphisms from 2 to 3 in Card: cardinalities with a unique morphism kappa -> lambda exactly when kappa <= lambda)
+UNIQUE RAISED AssertionError
+=== run 5 rc 0
+MIXINS ['Sets.ParentMethods']
+MROHEAD ['OwnedCardinalityMor_with_category_with_category', 'Sets.ParentMethods', 'CardinalityMor_with_category_with_category', 'CardinalityMor_with_category']
+ISEMPTY AtomicProposition is_empty(Set of Morphisms from 2 to 3 in Card: cardinalities with a unique morphism kappa -> lambda exactly when kappa <= lambda)
+UNIQUE RAISED AssertionError
+[peakrss] run: child waited=0 shell_code=0 samples=43
+[peakrss] peak tree RSS      : 376 MiB
+[peakrss] low-water MemAvail : 1638 MiB
+[peakrss] peak single VmHWM  : 377 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      269 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    30.2s procs=  4 rss=   376 MiB hwm=   376 MiB avail=  3424 MiB
+[peakrss]   t=    32.2s procs=  4 rss=   376 MiB hwm=   377 MiB avail=  3502 MiB
+[peakrss]   t=    14.1s procs=  4 rss=   374 MiB hwm=   374 MiB avail=  3988 MiB
+[peakrss]   t=    46.3s procs=  4 rss=   368 MiB hwm=   373 MiB avail=  2764 MiB
+[peakrss]   t=    48.3s procs=  4 rss=   368 MiB hwm=   373 MiB avail=  2582 MiB

@@ -1,0 +1,84 @@
+....F.....F........                                                      [100%]
+=================================== FAILURES ===================================
+____________ test_the_rings_read_the_finite_cardinal_seven_as_seven ____________
+
+    def test_the_rings_read_the_finite_cardinal_seven_as_seven() -> None:
+        r"""The finite cardinal $7$ read in $\mathbb{Z}$ and $\mathbb{Q}$ is $7$."""
+        assert ZZ(cardinal(7)) == 7
+>       assert QQ(cardinal(7)) == 7
+               ^^^^^^^^^^^^^^^^^^^^^
+
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:61: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/rings/ring_foundation.py:1834: in __call__
+    return self._element_constructor_(value)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/ring_foundation.py:1761: in _element_constructor_
+    if source is not self and source in Modules(self.base_ring()) and source.unformed_module() is self:
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/objects.py:172: in __contains__
+    return super().__contains__(value)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Category of modules over Integer Ring
+x = <class 'sage_extensions.categories.sets.cardinals.Cardinalities.parent_class'>
+
+    def __contains__(self, x) -> bool:
+        """
+        Membership testing.
+    
+        Returns whether ``x`` is an object in this category, that is
+        if the category of ``x`` is a subcategory of ``self``.
+    
+        EXAMPLES::
+    
+            sage: ZZ in Sets()
+            True
+        """
+        try:
+>           c = x.category()
+                ^^^^^^^^^^^^
+E           TypeError: category() needs an argument
+
+/sage/.venv/lib/python3.14/site-packages/sage/categories/category.py:706: TypeError
+________ test_nonidentity_well_order_maps_compose_with_exact_endpoints _________
+
+    def test_nonidentity_well_order_maps_compose_with_exact_endpoints() -> None:
+        well_orders = WellOrderedSets()
+        source = Sets.Δ[1]
+        target = Sets.Δ[2]
+        inclusion = well_orders.Mor(source, target)(lambda point: target(int(point) + 1))
+        shift = well_orders.Mor(target, target)(lambda point: target(min(2, int(point) + 1)))
+        composite = shift * inclusion
+        assert composite.parent() is well_orders.Mor(source, target)
+        assert composite.underlying_set_morphism().domain() is source
+        assert composite.underlying_set_morphism().codomain() is target
+        assert tuple(int(composite(point)) for point in source) == (2, 2)
+        try:
+            well_orders.Mor(target, target)(lambda point: target(2 - int(point)))
+        except ValueError:
+            pass
+        else:
+>           raise AssertionError("an order-reversing map was admitted to well-ordered Mor")
+E           AssertionError: an order-reversing map was admitted to well-ordered Mor
+
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:160: AssertionError
+=========================== short test summary info ============================
+FAILED tests/sets/test_cardinal_and_ordinal_order_morphisms.sage::test_the_rings_read_the_finite_cardinal_seven_as_seven
+FAILED tests/sets/test_cardinal_and_ordinal_order_morphisms.sage::test_nonidentity_well_order_maps_compose_with_exact_endpoints
+2 failed, 17 passed in 9.01s
+[peakrss] 543-red-ring-ingress: child waited=1 shell_code=1 samples=8
+[peakrss] peak tree RSS      : 259 MiB
+[peakrss] low-water MemAvail : 4117 MiB
+[peakrss] peak single VmHWM  : 261 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      251 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    14.1s procs=  3 rss=   259 MiB hwm=   261 MiB avail=  4117 MiB
+[peakrss]   t=    12.1s procs=  3 rss=   256 MiB hwm=   261 MiB avail=  4155 MiB
+[peakrss]   t=     8.0s procs=  3 rss=   246 MiB hwm=   250 MiB avail=  4254 MiB
+[peakrss]   t=    10.0s procs=  3 rss=   236 MiB hwm=   250 MiB avail=  4211 MiB
+[peakrss]   t=     6.0s procs=  3 rss=   223 MiB hwm=   225 MiB avail=  4382 MiB
+launcher exit: 1

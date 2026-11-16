@@ -1,0 +1,41 @@
+..........F........                                                      [100%]
+=================================== FAILURES ===================================
+________ test_nonidentity_well_order_maps_compose_with_exact_endpoints _________
+
+    def test_nonidentity_well_order_maps_compose_with_exact_endpoints() -> None:
+        well_orders = WellOrderedSets()
+        source = Sets.Δ[1]
+        target = Sets.Δ[2]
+        inclusion = well_orders.Mor(source, target)(lambda point: target(int(point) + 1))
+        shift = well_orders.Mor(target, target)(lambda point: target(min(2, int(point) + 1)))
+        composite = shift * inclusion
+        assert composite.parent() is well_orders.Mor(source, target)
+        assert composite.underlying_set_morphism().domain() is source
+        assert composite.underlying_set_morphism().codomain() is target
+        assert tuple(int(composite(point)) for point in source) == (2, 2)
+        try:
+            well_orders.Mor(target, target)(lambda point: target(2 - int(point)))
+        except ValueError:
+            pass
+        else:
+>           raise AssertionError("an order-reversing map was admitted to well-ordered Mor")
+E           AssertionError: an order-reversing map was admitted to well-ordered Mor
+
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:160: AssertionError
+=========================== short test summary info ============================
+FAILED tests/sets/test_cardinal_and_ordinal_order_morphisms.sage::test_nonidentity_well_order_maps_compose_with_exact_endpoints
+1 failed, 18 passed in 5.54s
+[peakrss] 543-fix-ring-ingress: child waited=1 shell_code=1 samples=5
+[peakrss] peak tree RSS      : 309 MiB
+[peakrss] low-water MemAvail : 4429 MiB
+[peakrss] peak single VmHWM  : 309 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      299 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     8.0s procs=  3 rss=   309 MiB hwm=   309 MiB avail=  4473 MiB
+[peakrss]   t=     6.0s procs=  3 rss=   303 MiB hwm=   303 MiB avail=  4429 MiB
+[peakrss]   t=     4.0s procs=  3 rss=   248 MiB hwm=   248 MiB avail=  4629 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   115 MiB hwm=   115 MiB avail=  4512 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     3 MiB hwm=     3 MiB avail=  4451 MiB
+launcher exit: 1

@@ -2719,3 +2719,45 @@ each log, and every one was made in the adopted runtime with the worktree at
 | `541r5-probe-presented-construction.log` | the round's fix commits | cokernels over `ZZ` and `QQ`, a lattice plane quotient, a claimed torsion module with its elements, and `direct_sum_of_cyclics((2,3))` after the dead constructor parameters were deleted |
 | `541r5-probe-matrix-space-containment.log` | the round's fix commits | a lattice inclusion's homset is **not** in `MatrixSpaces(ZZ)` while it does retain a coordinate matrix, so `MatrixSpaces` containment is not the discriminator finding F asks for |
 | `541r5-rebased.log` | the same five files after the rebase onto `bbb0dd6`; the tree SHA it ran on is the first line of the log | **15 passed in 93.95 s** |
+
+## `#543`: the cardinal and ordinal order-morphism rows, 2026-11-16
+
+Seven repair commits on the base tree `e13a23c`, then this commit, which adds
+nothing but these files.  A rebase re-identifies a commit — this branch was
+rebased four times while main moved under it — so the rows name the trees they
+ran on: the base tree, the branch's test commit of the row they belong to, its
+repair, or the repair head (the last repair commit, the one this commit
+follows).  Only the base carries a SHA, because only the base stays put.
+
+Main advanced from `e13a23c` to `a2d1490` under the branch.  Of those rounds,
+only two things touch a path a row below reads: eleven lines of arrow-hash
+memoisation and a docstring in `set_categories.py`, which no order row reaches,
+and a new `tests/rings/test_a_matrix_ring_divides_only_by_its_units.sage`.  The
+`tests/rings` rows were taken before that file arrived and are a FAILED-id
+comparison between the two trees they name, not a count on today's main.
+
+Every row is `tests/sets/test_cardinal_and_ordinal_order_morphisms.sage` unless
+it names another path, in the pinned image with `-p qc_sage_session -o addopts=`,
+`PYTHONPATH=/ci/tool-artifacts/pytest_plugins:/work/src:/work`, the worktree
+bound at `/work`.  `-p sage_extensions.testing.test_lint` is added where the row
+says so.
+
+| log | tree | result |
+| --- | --- | --- |
+| `543-base-d1ab7fc-acceptance.log` | `d1ab7fc`, the tree the issue names | the file alone: **4 failed, 14 passed in 7.65 s** — the four rows the issue reports |
+| `543-red-constant-sum.log` | the constant-sum test commit | the file with the constant-family row: **3 failed, 15 passed in 10.15 s**, at `assert ... indexed_sum(NN, cardinal(1)) == aleph0` |
+| `543-fix-constant-sum.log` | its repair | the same file: **2 failed, 16 passed in 10.77 s** — the sum row green |
+| `543-red-ring-ingress.log` | the ring test commit | the file with the split ring row: **2 failed, 17 passed in 9.01 s**, at `QQ(cardinal(7))` -> `TypeError: category() needs an argument`, `ring_foundation.py:1719` |
+| `543-fix-ring-ingress.log` | its repair | the same file: **1 failed, 18 passed in 5.54 s** — the ring row green |
+| `543-order-rows-lint.log` | the order-rows test commit | `test_the_order_morphism_is_empty_exactly_when_its_source_exceeds_its_target.sage` with the test lint loaded: **3 passed in 4.06 s**, no finding |
+| `543-wellorder-validator.log` | the well-order test commit | the file: **19 passed in 7.74 s** |
+| `543-hook-before.log` | the well-order test commit | the hook probe: the undecided cardinal comparison answers `Negation(not le((2)^(ℵ_0), ℵ_1))`, where the ordinal order answers `None` |
+| `543-hook-after.log` | the repair head | the same probe: `None`, with `is_empty()` still the proposition and `ask` still `Unknown` |
+| `543-acceptance-alone.log` | the repair head | the file alone: **19 passed in 12.11 s** |
+| `543-both-files-alone.log` | the repair head | both order files: **22 passed in 9.76 s** |
+| `543-sets-base.log`, `543-sets-head.log` | `e13a23c`, the repair head | `tests/sets` as one directory: **24 failed, 165 passed in 60.80 s** and **21 failed, 168 passed in 173.25 s**; the head's FAILED ids are the base's minus the three rows this round repaired, and nothing else |
+| `543-objects-base.log`, `543-objects-head.log` | `e13a23c`, the repair head | `tests/objects` then the file in one process: **116 failed, 228 passed in 152.72 s** and **113 failed, 232 passed in 144.88 s**; the same difference and nothing else, so the file's rows pass after that prefix |
+| `543-rings-base.log`, `543-rings-head.log` | `e13a23c`, the repair head before main's #541 round | `tests/rings` then the file: **78 failed, 292 passed in 275.38 s** and **75 failed, 296 passed in 756.89 s**; the same difference and nothing else.  The head's run took 12 min 37 s on a loaded host where the same selection had taken 175 s, overran the ten-minute bound, is recorded as it ran, and was not repeated |
+| `543-mro-six-processes.log` | `d1ab7fc` | six fresh processes: `Cardinalities().Mor(2, 3)`'s MRO is `[OwnedCardinalityMor_with_category_with_category, Sets.ParentMethods, CardinalityMor...]` in all six, and `is_empty()` is the proposition in all six — the defect does not vary between runs |
+| `543-mro-predecessors.log` | `d1ab7fc` | twelve constructions before the hom-set (`Sets().Mor(Δ2,Δ2).is_empty`, `Ordinals().Mor(1,2).is_empty`, `cardinal(2).Mor(3).is_empty`, `Sets().Finite()`, `Δ2.cardinality()`, `QQ(3)`, `m.cardinality()`, `m.unique_morphism()`, `m.base_category()`, `m.mor_category()`, and the cached hom-set again), each followed by a fresh `Mor(2, 3)`: the class, the two MRO positions and the answer are identical at every step — no earlier construction decides it |
+| `543-baked-library-run.log` | `d1ab7fc`'s file, the image's own `sage_extensions` at `/repos/sage-extensions/src` (a copy at `cf656f8`) ahead of the tree's on `PYTHONPATH` | **4 failed, 14 passed in 12.10 s** — the same four rows, so importing the copy the image carries does not explain the reported pass either |
