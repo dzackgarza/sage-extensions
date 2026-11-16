@@ -902,10 +902,10 @@ class Cardinalities(OwnedCategory):
         """
         size = cardinal(index_set.cardinality())
         match summands:
-            case _ if isinstance(summands, Parent) and summands in Cardinalities():
-                return self.product(size, summands)
             case _ if summands is Infinity or _is_session_integer(summands):
                 return self.product(size, cardinal(summands))
+            case _ if summands in Cardinalities():
+                return self.product(size, summands)
             case _ if callable(summands):
                 if size.is_finite():
                     return self.sum(*(summands(index) for index in index_set))
