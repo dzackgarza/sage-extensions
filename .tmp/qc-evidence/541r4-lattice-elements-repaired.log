@@ -1,0 +1,29 @@
+tree SHA: 90d57a1e3d2ec24e6698d4fe6c387e16309dde88 (modified paths: 4)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 11.43 12.70 15.33 10/603 2576274
+files: tests/lattices/test_lattice_elements.sage tests/lattices/test_chosen_target_primitive_embeddings.sage
+inner 260 s, outer 320 s, guard 6144 MiB
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+time gates OFF (--no-time-gates): star import 1.13 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: asyncio-1.5.0, xdist-3.8.0, reportlog-1.0.0, platformdirs-4.13.5, hypothesis-6.170.15, anyio-4.15.1, timeout-2.4.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 7 items
+
+tests/lattices/test_lattice_elements.sage ......                         [ 85%]
+tests/lattices/test_chosen_target_primitive_embeddings.sage [peakrss] probe541r4tests: child waited=124 shell_code=124 samples=119
+[peakrss] peak tree RSS      : 2378 MiB
+[peakrss] low-water MemAvail : 973 MiB
+[peakrss] peak single VmHWM  : 2481 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   julia                      2148 MiB peak
+[peakrss]   python                      322 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    68.1s procs=  4 rss=  2378 MiB hwm=  2481 MiB avail=  1576 MiB
+[peakrss]   t=    62.1s procs=  4 rss=  2348 MiB hwm=  2415 MiB avail=  1957 MiB
+[peakrss]   t=    66.1s procs=  4 rss=  2344 MiB hwm=  2457 MiB avail=  1793 MiB
+[peakrss]   t=    64.1s procs=  4 rss=  2311 MiB hwm=  2457 MiB avail=  1861 MiB
+[peakrss]   t=    70.1s procs=  4 rss=  2301 MiB hwm=  2481 MiB avail=  1519 MiB

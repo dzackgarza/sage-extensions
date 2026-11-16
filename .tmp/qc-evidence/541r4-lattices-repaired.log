@@ -1,0 +1,35 @@
+tree SHA: 90d57a1e3d2ec24e6698d4fe6c387e16309dde88 (modified paths: 4)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 14.08 13.88 16.49 10/570 2572759
+files: tests/lattices/test_a_plane_transport_builds_one_span.sage tests/lattices/test_a_subobject_asks_the_ambient_lattice_for_no_display.sage tests/lattices/test_primitivity_is_the_torsion_freeness_of_the_inclusions_cokernel.sage tests/lattices/test_zero_isotropic_subobjects.sage tests/lattices/test_lattice_elements.sage tests/lattices/test_chosen_target_primitive_embeddings.sage
+inner 260 s, outer 320 s, guard 6144 MiB
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+time gates OFF (--no-time-gates): star import 1.11 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: asyncio-1.5.0, xdist-3.8.0, reportlog-1.0.0, platformdirs-4.13.5, hypothesis-6.170.15, anyio-4.15.1, timeout-2.4.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 15 items
+
+tests/lattices/test_a_plane_transport_builds_one_span.sage .             [  6%]
+tests/lattices/test_a_subobject_asks_the_ambient_lattice_for_no_display.sage . [ 13%]
+                                                                         [ 13%]
+tests/lattices/test_primitivity_is_the_torsion_freeness_of_the_inclusions_cokernel.sage . [ 20%]
+.                                                                        [ 26%]
+tests/lattices/test_zero_isotropic_subobjects.sage FF.F                  [ 53%]
+tests/lattices/test_lattice_elements.sage ......                         [ 93%]
+tests/lattices/test_chosen_target_primitive_embeddings.sage [peakrss] probe541r4tests: child waited=124 shell_code=124 samples=130
+[peakrss] peak tree RSS      : 4885 MiB
+[peakrss] low-water MemAvail : 1635 MiB
+[peakrss] peak single VmHWM  : 4906 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   julia                      4429 MiB peak
+[peakrss]   python                      466 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   238.5s procs=  4 rss=  4885 MiB hwm=  4906 MiB avail=  2443 MiB
+[peakrss]   t=   240.5s procs=  4 rss=  4885 MiB hwm=  4906 MiB avail=  2402 MiB
+[peakrss]   t=   242.5s procs=  4 rss=  4885 MiB hwm=  4906 MiB avail=  2220 MiB
+[peakrss]   t=   232.5s procs=  4 rss=  4884 MiB hwm=  4906 MiB avail=  2237 MiB
+[peakrss]   t=   234.5s procs=  4 rss=  4884 MiB hwm=  4906 MiB avail=  2474 MiB

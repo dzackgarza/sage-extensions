@@ -1,0 +1,81 @@
+tree SHA: 897e7f7fd45e4d4f4cfcb29b266672e9232d25ab (modified paths: 7)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 9.60 5.44 3.24 12/493 2528329
+files: tests/modules/test_a_presented_module_is_built_before_it_computes.sage tests/lattices/test_primitivity_is_the_torsion_freeness_of_the_inclusions_cokernel.sage
+inner 600 s, outer 660 s, guard 6144 MiB
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+time gates OFF (--no-time-gates): star import 4.43 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: asyncio-1.5.0, xdist-3.8.0, reportlog-1.0.0, platformdirs-4.13.5, hypothesis-6.170.15, anyio-4.15.1, timeout-2.4.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 4 items
+
+tests/modules/test_a_presented_module_is_built_before_it_computes.sage F [ 25%]
+F                                                                        [ 50%]
+tests/lattices/test_primitivity_is_the_torsion_freeness_of_the_inclusions_cokernel.sage . [ 75%]
+.                                                                        [100%]
+
+=================================== FAILURES ===================================
+__________ test_constructing_a_cokernel_asks_the_engine_for_no_matrix __________
+
+    def test_constructing_a_cokernel_asks_the_engine_for_no_matrix() -> None:
+        r"""$\operatorname{coker}(2 \cdot 1_{Z^2})$, built before anything is asked of it."""
+        free = ZZ.free_module(2)
+        first, second = free.module_generators()
+        dilation = free.Mor(free)({0: ZZ(2) * first, 1: ZZ(2) * second})
+    
+        quotient, materialized = matrices_materialized_by(dilation.cokernel)
+    
+>       assert materialized == 0
+E       assert 1 == 0
+E        +  where 0 = Integer(0)
+
+tests/modules/test_a_presented_module_is_built_before_it_computes.sage:26: AssertionError
+_________ test_a_plane_inclusions_quotient_is_built_before_it_is_asked _________
+
+    def test_a_plane_inclusions_quotient_is_built_before_it_is_asked() -> None:
+        r"""The cokernel of a primitive plane's inclusion, built before it is read.
+    
+        $U \oplus U$ has basis $e_1, f_1, e_2, f_2$ with $b(e_i, f_i) = 1$, and the
+        span of $e_1$ and $f_2$ is saturated, so its quotient is free of rank two:
+        every invariant factor is $0$.
+        """
+        lattice = Lattices(ZZ)("U") + Lattices(ZZ)("U")
+        e1, f1, e2, f2 = lattice.module_generators()
+        inclusion = lattice.subobject_on((e1, f2)).inclusion()
+    
+        quotient, materialized = matrices_materialized_by(inclusion.cokernel)
+    
+>       assert materialized == 0
+E       assert 1 == 0
+E        +  where 0 = Integer(0)
+
+tests/modules/test_a_presented_module_is_built_before_it_computes.sage:47: AssertionError
+=============================== time-gate report ===============================
+session star import took 4.43 s; the measured ceiling is 3 s
+============================== slowest durations ===============================
+0.16s call     tests/modules/test_a_presented_module_is_built_before_it_computes.sage::test_a_plane_inclusions_quotient_is_built_before_it_is_asked
+0.11s call     tests/lattices/test_primitivity_is_the_torsion_freeness_of_the_inclusions_cokernel.sage::test_a_span_is_primitive_exactly_when_its_quotient_is_torsion_free
+0.06s call     tests/modules/test_a_presented_module_is_built_before_it_computes.sage::test_constructing_a_cokernel_asks_the_engine_for_no_matrix
+0.04s call     tests/lattices/test_primitivity_is_the_torsion_freeness_of_the_inclusions_cokernel.sage::test_a_primitivity_decision_is_read_in_the_inclusions_own_codomain
+
+(8 durations < 0.005s hidden.  Use -vv to show these durations.)
+=========================== short test summary info ============================
+FAILED tests/modules/test_a_presented_module_is_built_before_it_computes.sage::test_constructing_a_cokernel_asks_the_engine_for_no_matrix
+FAILED tests/modules/test_a_presented_module_is_built_before_it_computes.sage::test_a_plane_inclusions_quotient_is_built_before_it_is_asked
+========================= 2 failed, 2 passed in 3.35s ==========================
+[peakrss] probe541r4tests: child waited=1 shell_code=1 samples=7
+[peakrss] peak tree RSS      : 330 MiB
+[peakrss] low-water MemAvail : 11329 MiB
+[peakrss] peak single VmHWM  : 330 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      319 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    12.0s procs=  3 rss=   330 MiB hwm=   330 MiB avail= 11636 MiB
+[peakrss]   t=    10.0s procs=  3 rss=   323 MiB hwm=   323 MiB avail= 11674 MiB
+[peakrss]   t=     8.0s procs=  3 rss=   307 MiB hwm=   307 MiB avail= 11930 MiB
+[peakrss]   t=     6.0s procs=  3 rss=   280 MiB hwm=   280 MiB avail= 11329 MiB
+[peakrss]   t=     4.0s procs=  3 rss=   261 MiB hwm=   261 MiB avail= 11465 MiB

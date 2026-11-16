@@ -1,0 +1,471 @@
+tree SHA: 90d57a1e3d2ec24e6698d4fe6c387e16309dde88 (modified paths: 4)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 28.10 24.17 14.72 26/793 2549601
+files: tests/modules/test_free_resolutions.sage tests/modules/test_hom_modules_between_cyclic_groups.sage tests/modules/test_derived_functors.sage tests/modules/test_bilinear_form_modules_a2_and_u.sage tests/modules/test_polynomial_ideal_image_factorization.sage tests/modules/test_presented_module_preimages.sage tests/modules/test_a_presented_module_is_built_before_it_computes.sage
+inner 520 s, outer 580 s, guard 6144 MiB
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+time gates OFF (--no-time-gates): star import 2.98 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: asyncio-1.5.0, xdist-3.8.0, reportlog-1.0.0, platformdirs-4.13.5, hypothesis-6.170.15, anyio-4.15.1, timeout-2.4.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 36 items
+
+tests/modules/test_free_resolutions.sage ..                              [  5%]
+tests/modules/test_hom_modules_between_cyclic_groups.sage .......F.      [ 30%]
+tests/modules/test_derived_functors.sage ....                            [ 41%]
+tests/modules/test_bilinear_form_modules_a2_and_u.sage ......FF...FF     [ 77%]
+tests/modules/test_polynomial_ideal_image_factorization.sage .F.         [ 86%]
+tests/modules/test_presented_module_preimages.sage ...                   [ 94%]
+tests/modules/test_a_presented_module_is_built_before_it_computes.sage . [ 97%]
+.                                                                        [100%]
+
+=================================== FAILURES ===================================
+______________ test_hom_from_z2_to_z_is_countable_and_not_torsion ______________
+
+>   return cache[k]
+E   KeyError: ((Point Ideal (0) of Integer Ring of Spec(Integer Ring),), ())
+
+sage/misc/cachefunc.pyx:1965: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_hom_from_z2_to_z_is_countable_and_not_torsion() -> None:
+        r"""$\operatorname{Hom}(\mathbb Z^2, \mathbb Z) \cong \mathbb Z^2$ is countably infinite and torsion-free."""
+        homs = (ZZ ^ 2).Mor(ZZ ^ 1)
+    
+        assert homs.cardinality() == ZZ.cardinality()
+>       assert not homs.is_torsion()
+                   ^^^^^^^^^^^^^^^^^
+
+tests/modules/test_hom_modules_between_cyclic_groups.sage:84: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/modules/pure/modules.py:2455: in is_torsion
+    return self._torsion_decision()
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/pure/modules.py:3335: in _torsion_decision
+    return self.generic_rank() == 0
+           ^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/pure/modules.py:3326: in generic_rank
+    return self.fiber_dimension(ring.spectrum().generic_point())
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/pure/modules.py:3260: in fiber_dimension
+    return self.fiber(point).dimension()
+           ^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:1970: in sage.misc.cachefunc.CachedMethodCaller.__call__
+    ???
+sage/misc/cachefunc.pyx:1848: in sage.misc.cachefunc.CachedMethodCaller._instance_call
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Free module on {Generic morphism:
+  From: Free module on {[0], [1]} over Integer Ring
+  To:   Free module on {[0]} ove...:
+  From: Free module on {[0], [1]} over Integer Ring
+  To:   Free module on {[0]} over Integer Ring} over Integer Ring
+point = Point Ideal (0) of Integer Ring of Spec(Integer Ring)
+
+    @cached_method
+    def fiber(self, point):
+        r"""Return ``M(p)=M tensor_R kappa(p)`` at ``p in Spec(R)``."""
+        ring = self.base_ring()
+        if point.parent().ring() is not ring:
+            raise ValueError(
+                f"the fibre of {self} at {point} is not defined: {point} must be a point of "
+                f"Spec({ring}), but it is a point of Spec({point.parent().ring()})"
+            )
+        localized = self.localize_at_prime(point)
+        fiber = localized.base_change(point.local_ring().residue_map())
+        residue = point.residue_field()
+>       assert fiber in VectorSpaces(residue), (
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            f"the fibre {fiber} of {self} at {point} is not a vector space over the residue field {residue}"
+        )
+E       AssertionError: the fibre Finitely presented module on 2 module generators over Fraction Field of Integer Ring / Ideal (0) of Integer Ring of Free module on {Generic morphism:
+E         From: Free module on {[0], [1]} over Integer Ring
+E         To:   Free module on {[0]} over Integer Ring, Generic morphism:
+E         From: Free module on {[0], [1]} over Integer Ring
+E         To:   Free module on {[0]} over Integer Ring} over Integer Ring at Point Ideal (0) of Integer Ring of Spec(Integer Ring) is not a vector space over the residue field Fraction Field of Integer Ring / Ideal (0) of Integer Ring
+
+src/sage_extensions/categories/modules/pure/modules.py:3253: AssertionError
+_________ test_a_map_that_doubles_a_root_is_not_a_morphism_of_the_form _________
+
+    def test_a_map_that_doubles_a_root_is_not_a_morphism_of_the_form() -> None:
+        r"""$e_0 \mapsto 2e_0$, $e_1 \mapsto e_1$ sends $b(e_0, e_0) = 2$ to $8$, so it is no isometry."""
+        form = a2()
+        e0, e1 = form.module_generator(0), form.module_generator(1)
+    
+>       with pytest.raises(ValueError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+tests/modules/test_bilinear_form_modules_a2_and_u.sage:100: Failed
+_ test_the_identity_is_a_morphism_into_the_twist_along_multiplication_by_three _
+
+    def test_the_identity_is_a_morphism_into_the_twist_along_multiplication_by_three() -> None:
+        r"""$(\mathrm{id}, 3): (L, b) \to (L, 3b)$ is a morphism of formed modules: $3 b(x, y) = (3b)(x, y)$."""
+        form = a2()
+        twisted = form.twist(3)
+        values = form.value_module()
+>       tripling = values.Mor(values)({0: 3 * values.module_generator(0)})
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/modules/test_bilinear_form_modules_a2_and_u.sage:109: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/abstract_categories/mor_categories.py:1024: in __call__
+    return OwnedMor.__call__(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/mor_foundation.py:61: in __call__
+    return self._element_constructor_(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/embeddings.py:107: in _element_constructor_
+    return self.element_class(self, source_field.Mor(target_field)(field_embedding))
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/mor_categories.py:1024: in __call__
+    return OwnedMor.__call__(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/mor_foundation.py:61: in __call__
+    return self._element_constructor_(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/algebras/algebras.py:320: in _element_constructor_
+    return self.element_class(self, datum)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/classcall_metaclass.pyx:331: in sage.misc.classcall_metaclass.ClasscallMetaclass.__call__
+    ???
+src/sage_extensions/categories/algebras/algebras.py:434: in __init__
+    super().__init__(parent, underlying_morphism)
+src/sage_extensions/categories/algebras/algebras.py:145: in __init__
+    linear = domain.module_category().Mor(domain, codomain)(underlying_morphism)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py:3464: in __call__
+    return CategoricalMor.__call__(self, images)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/mor_categories.py:1024: in __call__
+    return OwnedMor.__call__(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/mor_foundation.py:61: in __call__
+    return self._element_constructor_(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/algebras/algebras.py:3171: in _element_constructor_
+    return super()._element_constructor_(value)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py:3221: in _element_constructor_
+    morphism = self.element_class(self, images)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/classcall_metaclass.pyx:331: in sage.misc.classcall_metaclass.ClasscallMetaclass.__call__
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Generic endomorphism of Fraction Field of Integer Ring
+parent = Mor(Fraction Field of Integer Ring, Fraction Field of Integer Ring)
+images = {0: 3}, elementwise = False, scalar_extension_of = None
+scalar_extension_functor = None, lift = None, linearity_premises = None
+projective_section_restriction_data = None, surjectivity_premise = None
+
+    def __init__(
+        self,
+        parent,
+        images,
+        *,
+        elementwise=False,
+        scalar_extension_of=None,
+        scalar_extension_functor=None,
+        lift=None,
+        linearity_premises=None,
+        projective_section_restriction_data=None,
+        surjectivity_premise=None,
+    ) -> None:
+        self._initialize_lower_arrow(parent)
+        assert (scalar_extension_of is None) == (scalar_extension_functor is None), (
+            f"cannot construct the base change {scalar_extension_of} along {scalar_extension_functor}: "
+            "a map S tensor_R f must be given together with both f and the scalar-extension functor"
+        )
+        self._scalar_extension_of = scalar_extension_of
+        self._scalar_extension_functor = scalar_extension_functor
+        self._lift_function = lift
+        self._linearity_premises = linearity_premises
+        self._projective_section_restriction_data = projective_section_restriction_data
+        self._surjectivity_premise = surjectivity_premise
+        self._source_module_morphism = None
+        self._element_function = None
+        domain = self.domain()
+        codomain = self.codomain()
+        match images:
+            case ModuleMorphismMethods() if (
+                not elementwise
+                and images.domain() is domain
+                and images.codomain() is codomain
+                and images.has_module_generator_images()
+            ):
+                # A linear map is its generator images: keep them rather than
+                # re-evaluating the map on every element (``OWN-22``).
+                images = images.module_generator_morphism()
+            case Morphism() | CategoricalArrow() if images.domain() is domain and images.codomain() is codomain:
+                source_morphism = images
+                if isinstance(source_morphism, ModuleMorphismMethods):
+                    self._source_module_morphism = source_morphism
+                images = lambda element: source_morphism(element)
+                elementwise = True
+            case _:
+                pass
+        if elementwise or not domain.has_selected_module_resolution():
+            if not callable(images):
+>               raise TypeError(f"cannot define a linear map {domain} -> {codomain} from {images!r}: {domain} has no chosen generators, so the map must be given as a function on elements")
+E               TypeError: cannot define a linear map Fraction Field of Integer Ring -> Fraction Field of Integer Ring from {0: 3}: Fraction Field of Integer Ring has no chosen generators, so the map must be given as a function on elements
+
+src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py:575: TypeError
+_____________________ test_a2_represents_two_and_not_four ______________________
+
+>   return self._cached_methods[name]
+E   KeyError: 'represents'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_a2_represents_two_and_not_four() -> None:
+        r"""The norms of $A_2$ are $2(a^2 + ab + b^2)$; $2 = b(e_0, e_0)$ and $4$ is not of this form
+        since $a^2 + ab + b^2 = 2$ has no integer solution."""
+        form = a2()
+    
+>       assert form.represents(2)
+               ^^^^^^^^^^^^^^^
+
+tests/modules/test_bilinear_form_modules_a2_and_u.sage:141: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    ???
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: 'OwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType' object has no attribute 'represents'
+
+sage/cpython/getattr.pyx:362: AttributeError
+_______________ test_the_bilinear_form_of_a2_as_a_quadratic_form _______________
+
+>   return self._cached_methods[name]
+E   KeyError: 'to_quadratic_module'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_the_bilinear_form_of_a2_as_a_quadratic_form() -> None:
+        r"""$b$ is even, so $q(v) = b(v, v)/2$ is integral: $q(e_0) = 1$, $q(e_0 + e_1) = 3$."""
+>       quadratic = a2().to_quadratic_module()
+                    ^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/modules/test_bilinear_form_modules_a2_and_u.sage:147: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    return self.getattr_from_category(name)
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    attr = getattr_from_other_class(self, cls, name)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: 'OwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType' object has no attribute 'to_quadratic_module'
+
+sage/cpython/getattr.pyx:362: AttributeError
+__________ test_polynomial_map_kernel_is_exactly_the_principal_syzygy __________
+
+>   return SingularKernelFunction(name)
+
+sage/libs/singular/function.pyx:1747: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/libs/singular/function.pyx:1549: in sage.libs.singular.function.SingularKernelFunction.__init__
+    self.call_handler = self.get_call_handler()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   raise NameError("Singular kernel function {!r} is not defined".format(self._name))
+E   NameError: Singular kernel function 'mor_kernel' is not defined
+
+sage/libs/singular/function.pyx:1555: NameError
+
+During handling of the above exception, another exception occurred:
+
+self = <sage.libs.singular.function_factory.SingularFunctionFactory object at 0x72469a465d10>
+name = 'mor_kernel'
+
+    def __getattr__(self, name):
+        """
+        EXAMPLES::
+    
+            sage: import sage.libs.singular.function_factory
+            sage: groebner = sage.libs.singular.function_factory.ff.groebner
+            sage: groebner
+            groebner (singular function)
+    
+            sage: import sage.libs.singular.function_factory
+            sage: primdecSY = sage.libs.singular.function_factory.ff.primdec__lib.primdecSY
+            sage: primdecSY
+            primdecSY (singular function)
+        """
+        if name.startswith("_"):
+            raise AttributeError("Singular Function Factory has no attribute '%s'" % name)
+    
+        try:
+>           return singular_function(name)
+                   ^^^^^^^^^^^^^^^^^^^^^^^
+
+/sage/.venv/lib/python3.14/site-packages/sage/libs/singular/function_factory.py:40: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/libs/singular/function.pyx:1749: in sage.libs.singular.function.singular_function
+    return SingularLibraryFunction(name)
+sage/libs/singular/function.pyx:1502: in sage.libs.singular.function.SingularLibraryFunction.__init__
+    self.call_handler = self.get_call_handler()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   raise NameError("Singular library function {!r} is not defined".format(self._name))
+E   NameError: Singular library function 'mor_kernel' is not defined
+
+sage/libs/singular/function.pyx:1507: NameError
+
+During handling of the above exception, another exception occurred:
+
+    def test_polynomial_map_kernel_is_exactly_the_principal_syzygy() -> None:
+        ring, x, y, source, _target, a, b, morphism = _polynomial_linear_map()
+        syzygy = source.linear_combination({a: -y, b: x})
+>       kernel = morphism.kernel()
+                 ^^^^^^^^^^^^^^^^^
+
+tests/modules/test_polynomial_ideal_image_factorization.sage:49: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/misc/cachefunc.pyx:2328: in sage.misc.cachefunc.CachedMethodCallerNoArgs.__call__
+    self.cache = f(self._instance)
+src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py:1529: in kernel
+    represented = owner._represented_kernel_of_morphism(self)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/framed/framed_free_modules.py:1088: in _represented_kernel_of_morphism
+    return _selected_presentation_kernel(morphism)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/framed/finitely_generated/finitely_presented_modules.py:2776: in _selected_presentation_kernel
+    return _singular_presentation_kernel(morphism)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/framed/finitely_generated/finitely_presented_modules.py:3427: in _singular_presentation_kernel
+    kernel_presentation = ff.homolog__lib.mor_kernel(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <sage.libs.singular.function_factory.SingularFunctionFactory object at 0x72469a465d10>
+name = 'mor_kernel'
+
+    def __getattr__(self, name):
+        """
+        EXAMPLES::
+    
+            sage: import sage.libs.singular.function_factory
+            sage: groebner = sage.libs.singular.function_factory.ff.groebner
+            sage: groebner
+            groebner (singular function)
+    
+            sage: import sage.libs.singular.function_factory
+            sage: primdecSY = sage.libs.singular.function_factory.ff.primdec__lib.primdecSY
+            sage: primdecSY
+            primdecSY (singular function)
+        """
+        if name.startswith("_"):
+            raise AttributeError("Singular Function Factory has no attribute '%s'" % name)
+    
+        try:
+            return singular_function(name)
+        except NameError:
+            if name.endswith("__lib"):
+                name = name[:-5]
+                lib(name + ".lib")
+                return SingularFunctionFactory()
+>           raise NameError("function or package '%s' unknown." % (name))
+E           NameError: function or package 'mor_kernel' unknown.
+
+/sage/.venv/lib/python3.14/site-packages/sage/libs/singular/function_factory.py:46: NameError
+=============================== time-gate report ===============================
+collection took 16.64 s; the measured ceiling is 6 s
+============================== slowest durations ===============================
+6.27s call     tests/modules/test_derived_functors.sage::test_tor_and_ext_of_cyclic_modules_over_a_polynomial_ring
+4.10s call     tests/modules/test_presented_module_preimages.sage::test_residue_submodules_at_modulus_six_have_their_exact_transporters
+3.89s call     tests/modules/test_derived_functors.sage::test_ext_over_the_integers
+3.30s call     tests/modules/test_derived_functors.sage::test_ext_one_into_the_integers_turns_the_quotient_z_mod_6_to_z_mod_3_into_an_injection
+2.68s call     tests/modules/test_derived_functors.sage::test_tor_over_the_integers_is_the_gcd_and_vanishes_above_the_resolution
+2.55s call     tests/modules/test_free_resolutions.sage::test_z_mod_6_plus_z_has_the_length_one_resolution_z_to_z2_by_6_0
+2.27s call     tests/modules/test_polynomial_ideal_image_factorization.sage::test_polynomial_map_image_is_the_ideal_with_its_inclusion
+1.20s call     tests/modules/test_polynomial_ideal_image_factorization.sage::test_polynomial_map_cokernel_is_the_quotient_by_xy
+1.03s call     tests/modules/test_bilinear_form_modules_a2_and_u.sage::test_a2_modulo_three_is_degenerate
+0.80s call     tests/modules/test_hom_modules_between_cyclic_groups.sage::test_hom_from_z2_to_z_is_countable_and_not_torsion
+0.79s call     tests/modules/test_bilinear_form_modules_a2_and_u.sage::test_the_values_of_the_a2_form
+0.61s call     tests/modules/test_bilinear_form_modules_a2_and_u.sage::test_raising_an_index_of_a2_needs_the_rational_inverse_gram_matrix
+0.55s call     tests/modules/test_a_presented_module_is_built_before_it_computes.sage::test_a_plane_inclusions_quotient_is_built_before_it_is_asked
+0.55s call     tests/modules/test_hom_modules_between_cyclic_groups.sage::test_hom_from_z6_to_z4_is_z2_generated_by_one_to_two
+0.52s call     tests/modules/test_hom_modules_between_cyclic_groups.sage::test_the_endomorphisms_of_z6_and_the_homs_from_z_to_z6_are_z6
+0.49s call     tests/modules/test_bilinear_form_modules_a2_and_u.sage::test_the_correlation_of_a2_has_cokernel_of_order_three
+0.49s call     tests/modules/test_presented_module_preimages.sage::test_named_framing_of_z_mod_two_plus_z_has_its_exact_shear_involution
+0.48s call     tests/modules/test_presented_module_preimages.sage::test_preimages_in_z_mod_two_plus_z_have_even_free_coordinate
+0.40s call     tests/modules/test_bilinear_form_modules_a2_and_u.sage::test_the_swap_and_the_order_six_rotation_are_isometries_of_a2
+0.38s call     tests/modules/test_hom_modules_between_cyclic_groups.sage::test_hom_from_z4_to_z6_is_z2
+0.26s call     tests/modules/test_bilinear_form_modules_a2_and_u.sage::test_the_hyperbolic_plane_has_isotropic_basis_vectors_and_raises_by_swapping
+0.25s call     tests/modules/test_bilinear_form_modules_a2_and_u.sage::test_a2_over_the_rationals_keeps_its_determinant
+0.25s call     tests/modules/test_hom_modules_between_cyclic_groups.sage::test_the_presentation_of_end_z6_is_the_first_differential_of_its_resolution
+0.22s call     tests/modules/test_bilinear_form_modules_a2_and_u.sage::test_the_identity_is_a_morphism_into_the_twist_along_multiplication_by_three
+0.20s call     tests/modules/test_bilinear_form_modules_a2_and_u.sage::test_the_twist_by_three_triples_the_form
+0.17s call     tests/modules/test_polynomial_ideal_image_factorization.sage::test_polynomial_map_kernel_is_exactly_the_principal_syzygy
+0.15s setup    tests/modules/test_polynomial_ideal_image_factorization.sage::test_polynomial_map_cokernel_is_the_quotient_by_xy
+0.12s call     tests/modules/test_free_resolutions.sage::test_the_noninjective_presentation_2x_4x_resolves_as_z_by_2_to_z
+0.12s call     tests/modules/test_bilinear_form_modules_a2_and_u.sage::test_a_map_that_doubles_a_root_is_not_a_morphism_of_the_form
+0.08s call     tests/modules/test_bilinear_form_modules_a2_and_u.sage::test_a2_over_the_rationals_is_nondegenerate
+0.08s call     tests/modules/test_hom_modules_between_cyclic_groups.sage::test_the_orders_of_hom_modules_between_cyclic_groups
+0.07s call     tests/modules/test_a_presented_module_is_built_before_it_computes.sage::test_constructing_a_cokernel_asks_the_engine_for_no_matrix
+0.04s setup    tests/modules/test_presented_module_preimages.sage::test_preimages_in_z_mod_two_plus_z_have_even_free_coordinate
+0.03s setup    tests/modules/test_bilinear_form_modules_a2_and_u.sage::test_the_identity_is_a_morphism_into_the_twist_along_multiplication_by_three
+0.02s call     tests/modules/test_hom_modules_between_cyclic_groups.sage::test_hom_from_z6_to_z_is_zero
+0.02s call     tests/modules/test_bilinear_form_modules_a2_and_u.sage::test_the_bilinear_form_of_a2_as_a_quadratic_form
+0.02s setup    tests/modules/test_hom_modules_between_cyclic_groups.sage::test_hom_from_z6_to_z4_is_z2_generated_by_one_to_two
+0.02s call     tests/modules/test_hom_modules_between_cyclic_groups.sage::test_precomposition_with_three_multiplies_by_three
+0.02s teardown tests/modules/test_derived_functors.sage::test_ext_over_the_integers
+0.02s setup    tests/modules/test_bilinear_form_modules_a2_and_u.sage::test_the_bilinear_form_of_a2_as_a_quadratic_form
+0.02s teardown tests/modules/test_polynomial_ideal_image_factorization.sage::test_polynomial_map_image_is_the_ideal_with_its_inclusion
+0.02s teardown tests/modules/test_polynomial_ideal_image_factorization.sage::test_polynomial_map_kernel_is_exactly_the_principal_syzygy
+0.01s setup    tests/modules/test_presented_module_preimages.sage::test_residue_submodules_at_modulus_six_have_their_exact_transporters
+0.01s setup    tests/modules/test_bilinear_form_modules_a2_and_u.sage::test_the_hyperbolic_plane_has_isotropic_basis_vectors_and_raises_by_swapping
+0.01s teardown tests/modules/test_bilinear_form_modules_a2_and_u.sage::test_a_map_that_doubles_a_root_is_not_a_morphism_of_the_form
+0.01s setup    tests/modules/test_a_presented_module_is_built_before_it_computes.sage::test_a_plane_inclusions_quotient_is_built_before_it_is_asked
+0.01s setup    tests/modules/test_derived_functors.sage::test_ext_one_into_the_integers_turns_the_quotient_z_mod_6_to_z_mod_3_into_an_injection
+0.01s call     tests/modules/test_bilinear_form_modules_a2_and_u.sage::test_a2_represents_two_and_not_four
+0.01s setup    tests/modules/test_derived_functors.sage::test_tor_over_the_integers_is_the_gcd_and_vanishes_above_the_resolution
+0.01s teardown tests/modules/test_hom_modules_between_cyclic_groups.sage::test_hom_from_z2_to_z_is_countable_and_not_torsion
+0.01s setup    tests/modules/test_free_resolutions.sage::test_z_mod_6_plus_z_has_the_length_one_resolution_z_to_z2_by_6_0
+0.01s teardown tests/modules/test_hom_modules_between_cyclic_groups.sage::test_the_endomorphisms_of_z6_and_the_homs_from_z_to_z6_are_z6
+0.01s setup    tests/modules/test_polynomial_ideal_image_factorization.sage::test_polynomial_map_image_is_the_ideal_with_its_inclusion
+0.01s teardown tests/modules/test_a_presented_module_is_built_before_it_computes.sage::test_a_plane_inclusions_quotient_is_built_before_it_is_asked
+0.01s setup    tests/modules/test_presented_module_preimages.sage::test_named_framing_of_z_mod_two_plus_z_has_its_exact_shear_involution
+0.01s call     tests/modules/test_hom_modules_between_cyclic_groups.sage::test_hom_between_free_modules_is_free_of_the_product_rank
+0.01s setup    tests/modules/test_hom_modules_between_cyclic_groups.sage::test_precomposition_with_three_multiplies_by_three
+0.01s setup    tests/modules/test_a_presented_module_is_built_before_it_computes.sage::test_constructing_a_cokernel_asks_the_engine_for_no_matrix
+0.01s teardown tests/modules/test_bilinear_form_modules_a2_and_u.sage::test_the_hyperbolic_plane_has_isotropic_basis_vectors_and_raises_by_swapping
+0.01s setup    tests/modules/test_hom_modules_between_cyclic_groups.sage::test_the_presentation_of_end_z6_is_the_first_differential_of_its_resolution
+0.01s teardown tests/modules/test_bilinear_form_modules_a2_and_u.sage::test_the_bilinear_form_of_a2_as_a_quadratic_form
+0.01s teardown tests/modules/test_bilinear_form_modules_a2_and_u.sage::test_raising_an_index_of_a2_needs_the_rational_inverse_gram_matrix
+
+(46 durations < 0.005s hidden.  Use -vv to show these durations.)
+=========================== short test summary info ============================
+FAILED tests/modules/test_hom_modules_between_cyclic_groups.sage::test_hom_from_z2_to_z_is_countable_and_not_torsion
+FAILED tests/modules/test_bilinear_form_modules_a2_and_u.sage::test_a_map_that_doubles_a_root_is_not_a_morphism_of_the_form
+FAILED tests/modules/test_bilinear_form_modules_a2_and_u.sage::test_the_identity_is_a_morphism_into_the_twist_along_multiplication_by_three
+FAILED tests/modules/test_bilinear_form_modules_a2_and_u.sage::test_a2_represents_two_and_not_four
+FAILED tests/modules/test_bilinear_form_modules_a2_and_u.sage::test_the_bilinear_form_of_a2_as_a_quadratic_form
+FAILED tests/modules/test_polynomial_ideal_image_factorization.sage::test_polynomial_map_kernel_is_exactly_the_principal_syzygy
+=================== 6 failed, 30 passed in 67.53s (0:01:07) ====================
+[peakrss] probe541r4tests: child waited=1 shell_code=1 samples=52
+[peakrss] peak tree RSS      : 294 MiB
+[peakrss] low-water MemAvail : 1063 MiB
+[peakrss] peak single VmHWM  : 302 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      291 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    76.7s procs=  3 rss=   294 MiB hwm=   301 MiB avail=  1552 MiB
+[peakrss]   t=    72.7s procs=  3 rss=   291 MiB hwm=   298 MiB avail=  1201 MiB
+[peakrss]   t=    78.7s procs=  3 rss=   289 MiB hwm=   302 MiB avail=  1477 MiB
+[peakrss]   t=    74.7s procs=  3 rss=   288 MiB hwm=   301 MiB avail=  1226 MiB
+[peakrss]   t=    80.7s procs=  3 rss=   288 MiB hwm=   302 MiB avail=  1164 MiB

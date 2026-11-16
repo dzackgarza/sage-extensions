@@ -1,0 +1,51 @@
+tree SHA: 897e7f7fd45e4d4f4cfcb29b266672e9232d25ab (modified paths: 7)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 9.87 6.09 3.57 10/524 2529671
+files: tests/sets/test_a_description_is_asked_for_when_it_is_read.sage
+inner 300 s, outer 360 s, guard 6144 MiB
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+time gates OFF (--no-time-gates): star import 1.15 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: asyncio-1.5.0, xdist-3.8.0, reportlog-1.0.0, platformdirs-4.13.5, hypothesis-6.170.15, anyio-4.15.1, timeout-2.4.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 3 items
+
+tests/sets/test_a_description_is_asked_for_when_it_is_read.sage ..F      [100%]
+
+=================================== FAILURES ===================================
+________________ test_a_set_is_named_or_described_and_not_both _________________
+
+    def test_a_set_is_named_or_described_and_not_both() -> None:
+        r"""A construction that states a name and a description is refused.
+    
+        The two keywords answer the same question -- what this set is called when it
+        is read -- so a set given both would silently lose one of them.
+        """
+>       with pytest.raises(ValueError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+tests/sets/test_a_description_is_asked_for_when_it_is_read.sage:70: Failed
+============================== slowest durations ===============================
+0.01s call     tests/sets/test_a_description_is_asked_for_when_it_is_read.sage::test_a_description_is_asked_for_when_it_is_read
+
+(8 durations < 0.005s hidden.  Use -vv to show these durations.)
+=========================== short test summary info ============================
+FAILED tests/sets/test_a_description_is_asked_for_when_it_is_read.sage::test_a_set_is_named_or_described_and_not_both
+========================= 1 failed, 2 passed in 1.82s ==========================
+[peakrss] probe541r4tests: child waited=1 shell_code=1 samples=5
+[peakrss] peak tree RSS      : 307 MiB
+[peakrss] low-water MemAvail : 11011 MiB
+[peakrss] peak single VmHWM  : 307 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      296 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   run.sh                        7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     8.0s procs=  3 rss=   307 MiB hwm=   307 MiB avail= 11011 MiB
+[peakrss]   t=     6.0s procs=  3 rss=   291 MiB hwm=   291 MiB avail= 11014 MiB
+[peakrss]   t=     4.0s procs=  3 rss=   218 MiB hwm=   218 MiB avail= 11159 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   141 MiB hwm=   141 MiB avail= 11158 MiB
+[peakrss]   t=     0.0s procs=  2 rss=    14 MiB hwm=    14 MiB avail= 11279 MiB

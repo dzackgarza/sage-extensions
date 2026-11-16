@@ -83,7 +83,7 @@ but the span is computed on the path.
 ## Evidence
 
 - `grep -n "primitive_isotropic_subobject" src/sage_extensions/categories/lattices.py`
-  → `5348` (definition; `9367-9390` on `897e7f7` are the three checks).
+  → `9348` (definition; `9367-9390` on `897e7f7` are the three checks).
 - `.tmp/qc-evidence/541r3-plane-parts-base.log`, `541r3-plane-parts-repaired.log` — the
   per-plane attribution above, 8 cold spans of `T_Co`.
 - `.tmp/qc-evidence/541r3-row-repaired.log` — 26 506 planes by 516.6 s, 127.98 planes/s.
