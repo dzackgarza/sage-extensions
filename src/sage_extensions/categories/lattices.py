@@ -8402,91 +8402,64 @@ class Lattices(OwnedCategoryOverBaseRing):
             which is equation (4) of V. Gritsenko, K. Hulek and G. Sankaran,
             *Abelianisation of orthogonal groups and the fundamental group of
             modular varieties*, arXiv:0810.1614, section 3.1, printed p. 8.
-            Entry \((i,j)\) of the returned matrix is the coefficient of
-            \(e_i\) in the image of \(e_j\), so the columns are the images of
-            the basis.
 
-            The arithmetic is the engine's and crossings into the owned ring are
-            the caller's: \(e\) and \(a\) are read once each and crossed once per
-            coordinate, the Gram pairing and the \(\mathrm{rank}^2\) entries are
-            engine operations, and the matrix returned is engine data, as
-            `eichler_transvection` needs it.  The one decision the owned ring
-            keeps is integrality of \(\tfrac12 q(a)b(e,e_j)\), asked once per
-            generator: it is the statement that \(t(e,a)\) preserves the
-            lattice (equation (10) there, \(a\) of even square).
+            Stated as the linear map it is, a rank-two update of the identity,
 
-            The formula's hypotheses -- that \(e\) and \(a\) are vectors of
-            this lattice, that \(q(e)=0\) and that \(b(e,a)=0\) -- are asserted
-            by the one public entry, :meth:`eichler_transvection`, before it
-            calls this method; deciding them again here would be the same
-            statement twice.
+            \[
+            t(e,a) = \mathrm{id} - e\otimes b(a,\cdot)
+                     + a\otimes b(e,\cdot)
+                     - \tfrac12 q(a)\,e\otimes b(e,\cdot) ,
+            \]
+
+            one tensor expression on the framing of \(L\).  The contraction
+            `gram * v` of the Gram tensor with a vector is the covector
+            \(b(v,\cdot)\) -- the form is symmetric, so which of its two slots
+            the product halves is immaterial -- and `tensor.identity` is the
+            delta of that framing.  Entry \((i,j)\) of the result is the
+            coefficient of \(e_i\) in the image of \(e_j\), so the columns are
+            the images of the basis.
+
+            The expression is written over the fraction field, since
+            \(\tfrac12 q(a)\) need not lie in the ring of \(L\), and read over
+            that ring: \(t(e,a)\) preserves \(L\) exactly when every coefficient
+            \(\tfrac12 q(a)b(e,e_j)\) is integral (equation (10) there, \(a\) of
+            even square), and a coefficient outside the ring has no reading
+            there.
+
+            The formula's hypotheses -- that \(e\) and \(a\) are vectors of this
+            lattice, that \(q(e)=0\) and that \(b(e,a)=0\) -- are asserted by
+            the one public entry, :meth:`eichler_transvection`, before it calls
+            this method; deciding them again here would be the same statement
+            twice.
             """
             ring = self.base_ring()
-            from sage.matrix.constructor import matrix
-
-            from sage_extensions.categories.rings.ring_foundation import (
-                _engine_element,
-                _engine_ring,
-                _owned_engine_element,
-            )
-
-            labels = tuple(self.module_generating_set())
-            engine = _engine_ring(ring)
             fraction_field = ring.fraction_field()
-            engine_fraction = _engine_ring(fraction_field)
-            half_norm = engine_fraction(
-                _engine_element(ring, orthogonal.q())
-            ) / engine_fraction(engine(2))
-            isotropic_values = isotropic.to_vector()
-            orthogonal_values = orthogonal.to_vector()
-            isotropic_coordinates = tuple(
-                _engine_element(ring, isotropic_values(label)) for label in labels
+            labels = tuple(self.module_generating_set())
+            gram = self.gram_tensor().change_ring(fraction_field)
+            half_norm = fraction_field(orthogonal.q()) / fraction_field(ring(2))
+            isotropic_vector = tensor.vector(
+                fraction_field,
+                tuple(
+                    fraction_field(isotropic.to_vector()(label)) for label in labels
+                ),
             )
-            orthogonal_coordinates = tuple(
-                _engine_element(ring, orthogonal_values(label)) for label in labels
+            orthogonal_vector = tensor.vector(
+                fraction_field,
+                tuple(
+                    fraction_field(orthogonal.to_vector()(label)) for label in labels
+                ),
             )
-            gram = _engine_component_matrix(self.gram_tensor())
-            pairings_with_isotropic = gram * matrix(
-                engine, len(labels), 1, isotropic_coordinates
-            )
-            pairings_with_orthogonal = gram * matrix(
-                engine, len(labels), 1, orthogonal_coordinates
-            )
-            engine_one = engine.one()
-            engine_zero = engine.zero()
-            coefficients = []
-            for source_position, label in enumerate(labels):
-                pairing_with_isotropic = pairings_with_isotropic[source_position, 0]
-                pairing_with_orthogonal = pairings_with_orthogonal[source_position, 0]
-                half_coefficient = half_norm * engine_fraction(pairing_with_isotropic)
-                assert _owned_engine_element(fraction_field, half_coefficient) in ring, (
-                    f"the Eichler transvection t(e, a) with e = {isotropic!r}, a = {orthogonal!r} does not preserve {self!r}: q(a) b(e, {self.module_generator(label)})/2 = {half_coefficient} is not in {ring}"
+            pairing_with_isotropic = gram * isotropic_vector
+            pairing_with_orthogonal = gram * orthogonal_vector
+            update = (
+                tensor.identity(fraction_field, self.module_rank())
+                - isotropic_vector.tensor_product(pairing_with_orthogonal)
+                + orthogonal_vector.tensor_product(pairing_with_isotropic)
+                - (half_norm * isotropic_vector).tensor_product(
+                    pairing_with_isotropic
                 )
-                coefficients.append(
-                    (
-                        pairing_with_isotropic,
-                        pairing_with_orthogonal,
-                        engine(half_coefficient),
-                    )
-                )
-            # The column matrix: entry (target, source) is the coefficient of
-            # the target generator in the image of the source generator.
-            return matrix(
-                engine,
-                [
-                    [
-                        (engine_one if target_position == source_position else engine_zero)
-                        - coefficients[source_position][1]
-                        * isotropic_coordinates[target_position]
-                        + coefficients[source_position][0]
-                        * orthogonal_coordinates[target_position]
-                        - coefficients[source_position][2]
-                        * isotropic_coordinates[target_position]
-                        for source_position in range(len(labels))
-                    ]
-                    for target_position in range(len(labels))
-                ],
             )
+            return _engine_component_matrix(update.change_ring(ring))
 
         def eichler_transvection(self, isotropic, orthogonal):
             r"""Return the Eichler transvection \(t(e,a)\in O(L)\).
@@ -8507,7 +8480,8 @@ class Lattices(OwnedCategoryOverBaseRing):
             modular varieties*, arXiv:0810.1614, section 3.1, printed p. 8.
             \(t(e,a)\) preserves \(L\) exactly when every coefficient
             \(\tfrac12 q(a)\,b(e,x)\) is integral, automatic on an even
-            lattice and asserted otherwise.
+            lattice; otherwise the update has a coefficient outside the ring
+            of \(L\), and reading it over that ring is what refuses it.
 
             EXAMPLES::
 
