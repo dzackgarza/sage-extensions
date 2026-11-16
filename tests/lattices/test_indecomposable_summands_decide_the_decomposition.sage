@@ -98,3 +98,24 @@ def test_the_family_reports_no_summands_where_the_decomposition_is_undecided() -
     assert decomposed.indecomposable_summands().cardinality() == 5
     with pytest.raises(ValueError):
         scrambled.indecomposable_summands()
+
+
+def test_the_definite_decomposition_is_the_owner_operation_on_the_lattice() -> None:
+    r"""The definite decomposition is `definite_indecomposable_summands`' answer.
+
+    Kneser's decomposition reads the reduction of the form and the
+    minimal-vector enumeration, so it is stated for a definite lattice and
+    returns that lattice's own summands: a family of sublattices, each carrying
+    the form as the pullback along its own inclusion.
+    """
+    lattice = _definite_sum_with_a_connected_display()
+    gram = lattice.gram_tensor()
+    summands = definite_indecomposable_summands(lattice)
+
+    assert summands.cardinality() == 4
+    assert all(summand.inclusion().codomain() is lattice for summand in summands)
+    assert all(
+        summand.gram_tensor() == gram.pullback(summand.inclusion(), summand.inclusion())
+        for summand in summands
+    )
+    assert sum(int(summand.module_rank()) for summand in summands) == int(lattice.module_rank())
