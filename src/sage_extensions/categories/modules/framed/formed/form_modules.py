@@ -4566,6 +4566,11 @@ def _form_module_categories(module, *, bilinear, extra_categories):
         categories.append(FreeFormModules(base_ring))
     if is_presented:
         categories.append(FormModules(base_ring).FinitelyPresented())
+    if module in Modules(base_ring).FinitelyPresented().Torsion():
+        # The module's construction placed it in the torsion refinement; that
+        # placement is the claim, and equipping the same module with a form
+        # keeps it (CAT-04).  No invariant factor is read here.
+        categories.append(FormModules(base_ring).FinitelyPresented().Torsion())
     if module in FramedFreeModules(base_ring).FinitelyGenerated():
         categories.append(FreeFormModules(base_ring).FinitelyGenerated())
     if bilinear:
