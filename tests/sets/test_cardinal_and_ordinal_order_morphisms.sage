@@ -40,7 +40,13 @@ def test_finite_indexed_sums_suprema_and_comparisons_of_cardinals() -> None:
 
 
 def test_the_countable_sum_of_ones_is_aleph_zero() -> None:
-    assert Cardinalities().indexed_sum(NN, lambda _index: cardinal(1)) == aleph0
+    r"""$\sum_{i \in \mathbb{N}} 1 = |\mathbb{N}| \cdot 1 = \aleph_0$.
+
+    The family of ones is constant, and a constant family is named by the
+    cardinal it takes.  A family named by a function is summed only where its
+    values are reachable, which an infinite index set never is.
+    """
+    assert Cardinalities().indexed_sum(NN, cardinal(1)) == aleph0
 
 
 def test_a_finite_cardinal_is_the_natural_number_it_counts() -> None:
