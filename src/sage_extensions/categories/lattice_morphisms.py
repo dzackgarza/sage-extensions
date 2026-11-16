@@ -203,7 +203,7 @@ def _primitive_pointed_classes(lattice, square):
 
 
 def _degenerate_null_orbits(lattice, content):
-    r"""Return the square-zero orbits of a degenerate lattice, indexed lazily (#41).
+    r"""Return the square-zero orbits of a degenerate lattice, indexed lazily.
 
     Without ``content`` the zero vector comes first, followed by the pairs
     ``(c, p)`` of a content and a primitive class on successive antidiagonals.
@@ -2352,7 +2352,7 @@ class LatticeIsometryMethods:
 
 
 def _hermitian_miranda_morrison_image(isometry, action):
-    r"""``rho_L(Z_{O(L)}(f))`` by native hermitian Miranda--Morrison theory ([BH23, Sec. 6, Thm 6.15]; research#410).
+    r"""``rho_L(Z_{O(L)}(f))`` by native hermitian Miranda--Morrison theory ([BH23, Sec. 6, Thm 6.15]).
 
     The case is OSCAR ``image_centralizer_in_Oq``'s hermitian branch for
     indefinite lattices: ``L`` even, ``minpoly(f)`` a cyclotomic polynomial of
@@ -3247,8 +3247,7 @@ def _orthogonal_group_is_finite_by_theorem(lattice) -> bool:
       ``O(L) -> {1, -1}`` is a group morphism with kernel ``SO(L)``, so
       ``[O(L) : SO(L)] <= 2`` and ``O(L)`` has order at most 4; for the
       hyperbolic plane ``U``, ``O(U) = {1, -1, swap, -swap}``.  The
-      ``lean-categories`` statement is requested (research issue #584, *Finiteness
-      of O(L) for split binary lattices is not formalized*).
+      ``lean-categories`` statement is not yet formalized.
 
     Definite lattices over ``QQ`` are not routed: ``O(x^2 + y^2)`` over ``QQ``
     contains the rotation with cosine ``3/5`` and sine ``4/5``, of infinite
@@ -4210,7 +4209,7 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
         ``GL_n(ZZ)`` (Minkowski), so a subgroup whose closure exceeds
         ``|GL_n(F_3)|`` elements is infinite and selects the general route.
         The generators of ``N(H)`` come from the twisted transporters of
-        ``sage-indefinite-port`` (#50).
+        ``sage-indefinite-port``.
         """
         lattice = self.lattice()
         if lattice.is_definite() or subgroup is self or not subgroup.has_selected_finite_group_generating_set():
@@ -4774,7 +4773,7 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
 
         The set may be infinite. It iterates one vector per orbit by height, with exact
         equivalence and transporters, and makes no finiteness claim. The orbit set is
-        the port's :class:`sage_indefinite_port.indefinite.pairing_slices.SubgroupVectorOrbits` (#53).
+        the port's :class:`sage_indefinite_port.indefinite.pairing_slices.SubgroupVectorOrbits`.
         """
         from sage_indefinite_port.indefinite.pairing_slices import SubgroupVectorOrbits
 
@@ -4825,7 +4824,7 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
         ``L`` over ``ZZ`` it is a subgroup of the finite ``O(L)``, reduced to
         generators here.  For indefinite ``L`` the generators are the apex
         isometries that the lattice category's marked-diagram decision
-        supplies (``sage-indefinite-port``, #403); they are untrusted engine
+        supplies (``sage-indefinite-port``); they are untrusted engine
         output.
         """
         lattice = self.lattice()
@@ -4961,7 +4960,7 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
             and subgroup.supergroup() is self
             and subgroup.preimage_morphism().codomain().is_finite() is True
         ):
-            # H \\ G / P = K \\ F / rho(P): #43, using the finite image F of rho.
+            # H \\ G / P = K \\ F / rho(P), using the finite image F of rho.
             representation = subgroup.preimage_morphism()
             image = representation.codomain()
             stabilizer_image = image.subgroup(tuple(
@@ -5023,7 +5022,7 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
         return self.isotropic_equivalence_witness(left, right, flag=flag) is not None
 
     def isotropic_orbit_iterator(self, rank, *, height_bound=None):
-        r"""Yield the first primitive isotropic subobject of each ``O(L)``-orbit in Hermite-form order (#62)."""
+        r"""Yield the first primitive isotropic subobject of each ``O(L)``-orbit in Hermite-form order."""
         from sage_extensions.categories.isotropic_orbits import _isotropic_orbit_iterator
 
         return _isotropic_orbit_iterator(self, self.domain(), rank, height_bound)
@@ -5070,7 +5069,7 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
         return result
 
     def commuting_involutions_centralizer_generators(self, involutions):
-        r"""Return generators of ``C_{O(L)}(f_1,...,f_s)`` for pairwise commuting involutions (#49).
+        r"""Return generators of ``C_{O(L)}(f_1,...,f_s)`` for pairwise commuting involutions.
 
         A centralizing isometry preserves each ``L_chi``, and a tuple in
         the product of their orthogonal groups extends to ``L`` exactly when

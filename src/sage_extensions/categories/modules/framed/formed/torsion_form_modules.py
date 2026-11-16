@@ -2258,7 +2258,7 @@ class TorsionFormOrthogonalGroup(CategoricalMor):
         r"""Return the orbit of ``element`` through the owned G-set action.
 
         The element orbit is spelled apart from :meth:`orbit`, which is the orbit of
-        a *submodule* (``#296``): one spelling for each of the two acted-on sorts, so
+        a *submodule*: one spelling for each of the two acted-on sorts, so
         neither shadows the other.  ``orbit_cardinality`` and
         ``stabilizer_generators`` are this action's, as ``stabilizer_of_element`` is.
         """

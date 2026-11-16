@@ -729,7 +729,7 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             return self._stabilizer_representation().stabilizer_schreier_factors()
 
         def orbit_lattice_records(self):
-            r"""Return one record per lattice-orbit point, with its maps (#286).
+            r"""Return one record per lattice-orbit point, with its maps.
 
             See ``_FiniteIntegralRepresentation.orbit_lattice_records``: each record
             states the orbit lattice, the module image and its own generating
@@ -739,7 +739,7 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             return self._stabilizer_representation().orbit_lattice_records()
 
         def middle_transport(self, position, letter):
-            r"""Return ``letter`` as an isometry between two orbit lattices (#286).
+            r"""Return ``letter`` as an isometry between two orbit lattices.
 
             The domain is the orbit lattice at ``position``, whose generators are
             the image module's own canonical basis; the transported source basis is
@@ -748,7 +748,7 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             return self._stabilizer_representation().middle_transport(position, letter)
 
         def stabilizer_discriminant_image(self):
-            r"""Return rho(P_I) as a subgroup of O(A_L) by the action-groupoid construction (#310).
+            r"""Return rho(P_I) as a subgroup of O(A_L) by the action-groupoid construction.
 
             The stabilizer is presented by the action's own orbit data, and each
             Schreier factor is converted through discriminant transports between
@@ -1919,7 +1919,7 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             the plane pointwise.  :meth:`unipotent_radical_generators` returns that
             subfamily and this method returns all of them.  At Sterk's `P_2` of
             \(T_{\mathrm{En}}\) the difference is measured: 21 transvections are
-            returned here and 14 of them lie in the radical (#337).
+            returned here and 14 of them lie in the radical.
 
             Eichler's criterion takes exactly this family, one parameter per basis
             vector of \(p^\perp\): Dutour Sikirić--Hulek, arXiv:2302.01679v2,
@@ -1974,8 +1974,8 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
 
             What is measured at Sterk's `P_2` of \(T_{\mathrm{En}}\): all fourteen
             transvections fix the plane pointwise and act trivially on
-            \(I^\perp/I\), so all fourteen lie in \(U_I\) (#337 does not reproduce
-            there) -- but their translations span only \(12\) of the \(16\)
+            \(I^\perp/I\), so all fourteen lie in \(U_I\) -- but their translations
+            span only \(12\) of the \(16\)
             dimensions of \(\operatorname{Hom}(I^\perp/I, I)\)
             (:meth:`unipotent_translation_rank`), so they alone generate a subgroup
             of infinite index.  The block generators are what closes that: their
@@ -1984,7 +1984,7 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             rank \(17 = 16 + 1\) (:meth:`unipotent_radical_index`).  No transvection
             generation statement is used, so Scattone's Proposition 3.7.3 and its
             hypothesis -- two orthogonal hyperbolic planes, which \(T_{\mathrm{En}}\)
-            does not have -- are not needed (#331, #353, #365).
+            does not have -- are not needed.
             """
             return tuple(
                 transvection
@@ -3155,11 +3155,11 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
 
             At Sterk's `P_2` of \(T_{\mathrm{En}}\) both factors are `1`: the returned
             family's parameters span the whole parameter lattice (`16` of `16`, the
-            lattice of #365's exact decision) and the central generator is one of its
+            lattice of the exact decision) and the central generator is one of its
             members, so the returned family generates the radical, of rank
             `17 = 16 + 1`, and this returns `1`
-            (`.tmp/qc-evidence/issue365-parameters.log`).  What #353 could not show is
-            why the fourteen transvections alone are not enough: their translations
+            (`.tmp/qc-evidence/issue365-parameters.log`).  Why the fourteen transvections
+            alone are not enough: their translations reach rank `12` of the `16`.
             reach rank `12` of the `16`.
             """
             from sage.arith.misc import gcd
@@ -3573,7 +3573,7 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             multiple of the denominators of `K (P_1J)^{-t}` to `s` adds an integral
             matrix to `P_2`, and nothing smaller does.  That multiple is the period
             returned here, and searching `s` over it is a complete residue system --
-            the exact criterion, where #336 found a range.
+            the exact criterion.
 
             The period divides `|\det J|`: `(P_1J)^{-t} = J^{-t} Q_1` with
             `J^{-t} = \mathrm{adj}(J)^t/\det J` and `Q_1` the integral plane action,
@@ -4447,7 +4447,7 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             this predicate and :meth:`is_parabolic_complete` answer different
             questions: the second is about `G_P`, the first about `\rho(G_P)`.
 
-            `\rho(G_P)` is the object the plane-orbit call of #286 consumes, so
+            `\rho(G_P)` is the object the plane-orbit call consumes, so
             a caller that needs only the image can accept an incomplete family
             of `G_P` exactly when this returns ``True``.
             """
@@ -4720,14 +4720,14 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
               ``True``, by the block equations themselves: with `K = b(U, K) = 0` the third
               equation reads `0 = P_3 A Q_3^t`, so `P_3 = 0` for *every* quotient action and
               the admissible pairs are the whole product `A \times O(I^\perp/I)`.  This is
-              the case #295 closed.
+              the split case.
             * **Not split**: the three factors of the previous paragraph are computed, and
               the answer is ``True`` exactly when all three are `1` -- the radical generated,
               the plane actions of the members trivial on `I^\perp/I` filling `\GL(I)`, and
               the quotient actions of the members fixing `I` pointwise filling
               `O(I^\perp/I)`.  At Sterk's `P_2` of \(T_{\mathrm{En}}\) all three hold
               (`.tmp/qc-evidence/issue366-completeness.log`), so the parabolic there is
-              generated: the radical by #365's parameter lattice, the two Levi factors by the
+              generated: the radical by the parameter lattice, the two Levi factors by the
               `\Gamma(2)` certificate and by computed orders.
             """
             return self.parabolic_completeness_decision()[0]

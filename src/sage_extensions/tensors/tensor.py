@@ -1914,7 +1914,7 @@ class _CoordinateTensor(ModuleElement, Tensor):
         This is the tensor's stored datum, returned as data rather than as another
         tensor: a caller that has to persist or rebuild the tensor reads the
         components here and hands the same tuple back to the tensor module's
-        element constructor (issue #20).  Nothing is recomputed and no coordinate
+        element constructor.  Nothing is recomputed and no coordinate
         convention is introduced at this boundary -- the array order is the one
         ``_CoordinateTensor`` was constructed with.
         """

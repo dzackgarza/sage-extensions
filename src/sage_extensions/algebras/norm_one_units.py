@@ -5,8 +5,9 @@ Let ``Lambda`` be an order of degree ``d`` over ``K`` with ``C = (Lambda meet K)
 ``nrd`` in the finite group ``O_K^x / C^d``. Each generator ``h`` of ``H`` is written
 ``k c`` with ``c`` in ``C``, ``c^d = nrd(h)`` and ``nrd(k) = 1``. The ``k`` together
 with the ``c`` in ``C`` satisfying ``c^d = 1`` generate ``Lambda^1``. The method and its
-proof are in sage-indefinite-port issue #57, section B; the unit group input comes from
-Braun, Coulangeon, Nebe and Schoennenbeck, J. Algebra 435 (2015).
+proof are ``sage_indefinite_port``'s norm-one-units construction, section B; the unit
+group input comes from Braun, Coulangeon, Nebe and Schoennenbeck, J. Algebra 435
+(2015).
 """
 
 from sage.matrix.constructor import matrix

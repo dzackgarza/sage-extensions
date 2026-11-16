@@ -421,8 +421,8 @@ class _OrdinalPointAtPosition:
     r"""The point at a position in the finite ordinal ``[n]``.
 
     ``[n]`` retains its enumeration on the parent, and a parent must survive a
-    pickle round trip, so the map is a module-level object rather than a closure
-    (issue #20).  It carries no state: position ``k`` is the point ``k``.
+    pickle round trip, so the map is a module-level object rather than a closure.
+    It carries no state: position ``k`` is the point ``k``.
     """
 
     def __call__(self, position):

@@ -392,7 +392,7 @@ def _rebuild_lattice(ring, rank, entries, names):
     the tensor's own accessor.  They are plain owned ring elements, so they
     persist; the arguments that a direct :func:`_lattice_on_gram` call would need
     -- the module and the Gram tensor itself -- are lattice-owned and cannot be
-    pickled without re-entering the lattice (issue #20).  Rebuilding through
+    pickled without re-entering the lattice.  Rebuilding through
     ``Lattices(ring)(rows)`` builds the same interned module and an equal Gram,
     so the construction cache returns the lattice that was persisted.
     """
@@ -416,7 +416,7 @@ class _DeferredFormOfGram:
 
     A lattice parent retains this computation as its defining form datum, and a
     parent must survive a pickle round trip, so it is a module-level object
-    carrying the module and the Gram rather than a closure over them (issue #20).
+    carrying the module and the Gram rather than a closure over them.
     """
 
     def __init__(self, module, gram) -> None:

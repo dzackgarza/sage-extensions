@@ -3734,7 +3734,7 @@ class TensorProductModuleMorphismMethods:
             # One reading of the values as scalars, taken at its owner: a value
             # object that is a ring's regular module, or a restriction of
             # scalars from one, has the ring as its scalar ring, and its
-            # identification is that datum, not a second reading (#307, #320).
+            # identification is that datum, not a second reading.
             scalar_identification = _scalar_value_identification(
                 values, left.base_ring()
             )
@@ -4206,10 +4206,9 @@ class ModuleAutomorphismGroup(CoreMor):
         ``basis_change()``), ``B`` is block upper triangular; it is generated
         by the block ``GL(n_i, R)`` (Sage's generators) and the elementary
         automorphisms ``b_k |-> b_k + b_j`` for ``j`` in an earlier block
-        than ``k`` (Levi decomposition ``B = L U``; unverified: no source was
-        opened, recorded in research issue #398, *Generators of parabolic subgroups
-        of GL(M) over a PID*; untrusted computation).  The result is the
-        stabilizer subgroup of the flag under the natural module action,
+        than ``k`` (Levi decomposition ``B = L U``; the generators are unverified,
+        no source for them was opened, so the computation is untrusted).  The result
+        is the stabilizer subgroup of the flag under the natural module action,
         with that generating morphism.
         """
         from sage_extensions.categories.group.predicate_subgroups import StabilizerSubgroups

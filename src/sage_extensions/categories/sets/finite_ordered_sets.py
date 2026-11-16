@@ -37,7 +37,7 @@ class _PointsAreEqual:
 
     An ordered set retains its equivalence on the parent, and a parent must survive
     a pickle round trip, so the default is a module-level object rather than a
-    closure (issue #20).  It carries no state.
+    closure.  It carries no state.
     """
 
     def __call__(self, left, right):

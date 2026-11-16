@@ -524,7 +524,7 @@ class PredicateSubgroups(OwnedParameterizedCategory):
             )
 
         def isotropic_vector_reduction_image(self, representative):
-            r"""Return the group that ``Stab_Gamma(v)`` induces on ``v^perp/<v>`` (#312).
+            r"""Return the group that ``Stab_Gamma(v)`` induces on ``v^perp/<v>``.
 
             ``v`` is a primitive isotropic vector of the ambient lattice and
             ``Gamma = self`` is a subgroup of its orthogonal group cut out by a
@@ -551,8 +551,8 @@ class PredicateSubgroups(OwnedParameterizedCategory):
             Math. Z. 207 (1991), 4.3.5--4.3.9) are diagrams of the reflection
             subgroup of ``G_v`` for ``Gamma_{En,2}`` on ``T_{En}``
             (Proposition 2.7, p. 6 for the group; Proposition 4.2.3 with
-            Remark 4.2.4, p. 16 for its five cusps), which is research#654; the
-            output is the subgroup input of #297, the chamber anchored at the cusp.
+            Remark 4.2.4, p. 16 for its five cusps); the output is the subgroup
+            input of the chamber anchored at the cusp.
             """
             from sage_extensions.categories.isotropic_orbits import (
                 IsotropicVectorReductionImage,
@@ -635,7 +635,7 @@ class PredicateSubgroups(OwnedParameterizedCategory):
             isotropic plane by integer linear algebra from the block equations
             of the parabolic (Dutour Sikirić--Hulek, Theorem 4.9, printed
             p. 22), and ``is_parabolic_complete()`` decides on three computed
-            indices whether they are the whole stabilizer (#331, #366).  That
+            indices whether they are the whole stabilizer.  That
             route needs neither the lattice to be ``N`` nor the two indices
             above to agree, because with ``\rho(G_x)`` in hand the orbits are
             the double cosets ``\rho(\Gamma) \backslash \rho(O(L)) /
@@ -668,7 +668,7 @@ class PredicateSubgroups(OwnedParameterizedCategory):
             )
 
         def isotropic_orbit_iterator(self, rank, *, height_bound=None):
-            r"""Yield the first primitive isotropic subobject of each orbit of this subgroup (#62)."""
+            r"""Yield the first primitive isotropic subobject of each orbit of this subgroup."""
             from sage_extensions.categories.isotropic_orbits import _isotropic_orbit_iterator
 
             return _isotropic_orbit_iterator(self, self.supergroup().domain(), rank, height_bound)
@@ -713,8 +713,8 @@ class PredicateSubgroups(OwnedParameterizedCategory):
             ``Stab_Gamma(P)``-orbit.  Where the plane's parabolic is complete
             a covering of those orbits is supplied by it, so the incidence
             never reaches the indefinite port's generic stabilizer enumeration
-            (:func:`...orthogonal_quotients._plane_parabolic_incidence_flags`,
-            #391); where it is not, the flag row keeps its own route.  Distinct
+            (:func:`...orthogonal_quotients._plane_parabolic_incidence_flags`);
+            where it is not, the flag row keeps its own route.  Distinct
             flag orbits may have the same two cusp endpoints, so the returned
             relation retains one certificate per endpoint pair, not one edge
             per flag orbit.  Each certificate retains actual subgroup

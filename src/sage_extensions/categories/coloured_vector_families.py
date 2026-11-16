@@ -21,8 +21,7 @@ symmetric groups on the sets ``{i : (v_i, c_i) = (x, col)}``; it is trivial
 exactly when the coloured family is injective, and then
 ``sigma = (v, c)^-1 o (g x id) o (v, c)`` is determined by ``g``
 (``L.O().index_action(family)``).  The product of the infinite group ``O(L)``
-with ``Sym_C(I)`` is not represented (research issue #428, *Products of infinite
-groups are not represented*), so pairs ``(g, sigma)`` are not built and
+with ``Sym_C(I)`` is not represented, so pairs ``(g, sigma)`` are not built and
 ``K_v`` is stated, not constructed.
 
 A family enters as the set map it is: an element of ``Sets().Mor(I, L)`` (one

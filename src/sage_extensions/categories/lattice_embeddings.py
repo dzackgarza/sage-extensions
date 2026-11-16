@@ -72,7 +72,7 @@ def _block_isometry(total, source_inclusion, complement_inclusion, source_part, 
 def _nondegenerate_marking_stabilizer_generators(embedding, *, pointwise):
     r"""Generators of the setwise or pointwise stabilizer of a primitive nondegenerate sublattice.
 
-    #47: an element of ``O(L)`` preserving ``S`` is a pair in ``O(S) x O(K)``
+    An element of ``O(L)`` preserving ``S`` is a pair in ``O(S) x O(K)``
     preserving the glue ``L/(S+K)``. The extended subgroup of ``O(M)`` is the
     stabilizer of that glue in the actual image on ``A_M``.
     """

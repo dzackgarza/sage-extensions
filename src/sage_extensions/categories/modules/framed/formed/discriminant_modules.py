@@ -519,8 +519,7 @@ class DiscriminantQuadraticModules(OwnedCategoryOverBaseRing):
             the membership is asked of this module's own base ring: the lifts
             are elements of the owned rational field, and the owned integers
             coerce them, where the engine's own integer ring refuses a foreign
-            element outright and decides every class non-characteristic
-            (#348).
+            element outright and decides every class non-characteristic.
             """
             parent = self.parent()
             integers = parent.base_ring()

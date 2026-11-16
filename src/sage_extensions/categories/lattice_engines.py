@@ -38,8 +38,8 @@ from sage_extensions.validation import validator
 # running gp session, just use default as usual").  The ceiling is the
 # eight-gigabyte maximum the Sage image already sets (c052225, from
 # dzackgarza/sage c2c314e), so this owner never lowers it: it covers the
-# library's heaviest measured need, the rank-17 genus enumeration (#317),
-# and the automorphism count of <18> + E8 (#377).
+# library's heaviest measured need, the rank-17 genus enumeration,
+# and the automorphism count of <18> + E8.
 pari.default("parisizemax", "8G")
 
 
@@ -496,7 +496,7 @@ def _rational_isotropy_decision(lattice):
       definition of positive definiteness, and the negative case is `-q`.
     * An **indefinite form of rank at least five** is isotropic -- Meyer's
       theorem (Serre, *A Course in Arithmetic*, Ch. IV, §3.2, Cor. 2, printed
-      p. 43, as sage-extensions#371 cites it).  Nothing is solved: the answer is
+      p. 43).  Nothing is solved: the answer is
       the theorem's.
     * **Otherwise** the rank is at most four, and Hasse--Minkowski decides the
       question by the local invariants -- a rational form represents zero iff it

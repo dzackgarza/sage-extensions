@@ -1728,7 +1728,7 @@ class LocalizationRings(OwnedCategory):
             # and not a coercion of the whole value into the source.  Without
             # this split the value reaches the source as a numerator and the
             # source's own conversion refuses it with a message that names a
-            # coercion to an integer (#347).
+            # coercion to an integer.
             if isinstance(value, Fraction):
                 return self.fraction(value.numerator, value.denominator)
             # An element of a fraction field denotes the fraction of its own
@@ -5126,7 +5126,7 @@ class OwnedOrderedRings(OwnedCategory):
             rather than on one realization's element base: every owned ordered ring's
             element class inherits them, which is what makes $\mathbb Q$'s fractions
             comparable at all -- the localization realization does not derive from the
-            integer realization whose element class used to carry them (#307).  The
+            integer realization, so it inherits no element base to carry them.  The
             value is decided by the retained engine of the parent, the same crossing the
             arithmetic uses, never by a second order written here.
             """
@@ -6266,7 +6266,7 @@ class _NativeRingProduct:
 
     A ring parent retains this callable as part of its algebra datum, so it is a
     module-level object rather than a closure: a parent must survive a pickle
-    round trip, and a local lambda on it cannot (issue #20).  It carries no
+    round trip, and a local lambda on it cannot.  It carries no
     state, so it pickles by reference and the datum it supplies is the native
     product ``left * right`` unchanged.
     """
@@ -6288,7 +6288,7 @@ def _rebuild_owned_ring_parent(cls):
     and installs the ``__dict__`` the constructor produced.  A parent built from
     an engine does not use this -- it rebuilds through :func:`_own_ring`, which
     returns the same owned parent -- but a parent whose construction this method
-    cannot yet name keeps the state-based route (issue #20).
+    cannot yet name keeps the state-based route.
     """
 
     return cls.__new__(cls)
@@ -6312,7 +6312,7 @@ class _OwnedRingParent(Parent):
         ``_preamble_algebra_unit``, ``_selected_data_registry``,
         ``fraction_field_localization`` and ``nonzero_multiplicative_submonoid``,
         and unpickling any of those needs a parent whose constructor has already
-        run (issue #20).  So this names the one adapter that builds this parent
+        run.  So this names the one adapter that builds this parent
         from its engine, whose single cached entry returns *this* parent when the
         engine is the one it was built from: the round-tripped object is the same
         owned parent, which is the acceptance's requirement.

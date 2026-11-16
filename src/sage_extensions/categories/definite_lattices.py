@@ -350,8 +350,8 @@ def _roots_of_square(lattice, square):
     sign, positive_gram = _positive_gram(lattice)
     # ``square`` is the lattice ring's element, so its image under the sign is one
     # too: the shell's target is an exact integer of that ring, and the enumeration
-    # below reads its parent to cross into the engine.  A Python ``int`` here lost
-    # that ring and the crossing raised (#291).
+    # below reads its parent to cross into the engine.  A Python ``int`` here would
+    # lose that ring, and the crossing would read no parent.
     target = sign * square
     if target <= 0:
         return finite_ordered_set(())

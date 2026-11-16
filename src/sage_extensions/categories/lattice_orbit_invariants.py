@@ -350,7 +350,7 @@ def discriminant_sequence_data(lattice):
     # Infinitude is a property of the lattice, not of its indefiniteness: ``U + U`` has
     # infinite ``O(L)`` while the hyperbolic plane ``U`` is indefinite with ``|O(U)| = 4``.
     # When ``O(L)`` is infinite the kernel's cardinality is a cardinal, not an integer, and
-    # the conversion to ``int`` refused it (#309).  A finite ``O(L)`` keeps the integer
+    # the conversion to ``int`` is not taken.  A finite ``O(L)`` keeps the integer
     # quotient, so finite discriminant data is unchanged.
     kernel_order = (
         int(orthogonal_cardinality) // image_order

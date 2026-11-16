@@ -1225,9 +1225,8 @@ def _spinor_generating_primes(genus, *, proper):
     accumulated subgroup, so after the first accepted prime the subgroup is
     the whole quotient and the call returns at most one prime for every genus.
     Counting that list reports two spinor genera for every genus with four.
-    #330 (`bfc9bcb871`) owns the count.  The loop below is the one that call
-    intends; it is what the genus enumeration and
-    :meth:`_Genus.spinor_genus_count` consult.
+    The count belongs to :meth:`_Genus.spinor_genus_count`, and the loop below is
+    the walk it takes; it is what the genus enumeration and that method consult.
     """
     from sage.sets.primes import Primes
 
@@ -2302,7 +2301,7 @@ class _MarkedLatticeMethods:
 
         ``source`` is the shape of the marking: ``<n>`` for a pointed lattice,
         a totally isotropic lattice for a sublattice, a chain for a flag.  The
-        classes are decided by ``sage_indefinite_port`` (#403).
+        classes are decided by ``sage_indefinite_port``.
         """
         from sage_indefinite_port.indefinite.marked_lattices import primitive_marking_classes
 
@@ -2731,7 +2730,7 @@ class Lattices(OwnedCategoryOverBaseRing):
         ``CoreMor.group_generators`` reads a selected resolution first and
         asks this only without one.  The generators are those of the
         lattice realization: Sage's for definite ``L``, and for indefinite
-        ``L`` the port's ``automorphism_group_generators`` (#403), the
+        ``L`` the port's ``automorphism_group_generators``, the
         port's own algorithm for ``O(L)`` (``_computed_group_generators``).
         """
         lattice = core_mor.domain()
@@ -2745,7 +2744,7 @@ class Lattices(OwnedCategoryOverBaseRing):
         r"""Implementer side of ``_FunctorCategory``'s protected marked-diagram contract.
 
         The apex isometry of an isomorphism of marked lattices, or ``None``,
-        from ``sage-indefinite-port``'s marked-lattice entry (#403).  The
+        from ``sage-indefinite-port``'s marked-lattice entry.  The
         answer is untrusted engine output.
         """
         from sage_indefinite_port.indefinite.marked_lattices import isometry
@@ -2753,7 +2752,7 @@ class Lattices(OwnedCategoryOverBaseRing):
         return isometry(diagram_category, source, target)
 
     def _marked_automorphism_generators(self, diagram_category, marked):
-        r"""Implementer side of the marked-diagram contract: apex isometries generating ``Aut`` of the marking (#403).
+        r"""Implementer side of the marked-diagram contract: apex isometries generating ``Aut`` of the marking.
 
         Callers: ``CoreMor`` through the marking category, as declared at
         ``_FunctorCategory``, and ``LatticeIsometryMor``, whose orbit
@@ -2772,7 +2771,7 @@ class Lattices(OwnedCategoryOverBaseRing):
         the lattice.  The port's rank-two branch answers the same question by
         converting each rational generator of its integral-structure action to
         an integral isometry, and on \(T_{\mathrm{En}}\) that conversion did not
-        return on the recorded runs (#295, #326, `TRAPS.md`).
+        return on the recorded runs (`TRAPS.md`).
 
         A coslice marking asks for the pointwise stabilizer of the plane, and an
         oriented plane for the kernel of the determinant on the plane; both are
@@ -3977,7 +3976,7 @@ class Lattices(OwnedCategoryOverBaseRing):
             persists the Gram's *components* -- plain owned ring elements read
             through :meth:`Tensor.entries` -- and rebuilds through the public
             constructor, which builds the same interned module and an equal Gram
-            and therefore reaches the same cached lattice (issue #20).
+            and therefore reaches the same cached lattice.
             """
             from sage_extensions.categories._lattice import _rebuild_lattice
 
@@ -7202,7 +7201,7 @@ class Lattices(OwnedCategoryOverBaseRing):
             vanishes and the other ranges over its class (``vanishing_pairs``).  The second
             case is the one every divisor-one loop meets, since its residue has no complement
             part, and reading ``a b = 0`` as the single pair ``(0, 0)`` is what reported the
-            classes of `0016` and `026E` unrealized (#345).  Fixing ``w`` at the residue's own
+            classes of `0016` and `026E` unrealized.  Fixing ``w`` at the residue's own
             representative is likewise not enough: inside one residue class ``w -> w + d k``
             leaves the class unchanged while changing the divisor structure of ``q(w)``, so
             ``k`` runs over ``K/dK``.
@@ -7351,7 +7350,7 @@ class Lattices(OwnedCategoryOverBaseRing):
                 zero, and ``(0, b)`` keeps ``a``'s only when ``a``'s is.  Offering
                 only ``(0, 0)`` there -- the zero vector, which is not primitive --
                 is what left the classes of `0016` and `026E` unrealized at divisor
-                one although ``e`` itself realizes them (#345).
+                one although ``e`` itself realizes them.
                 """
                 pairs = []
                 if right_residue == 0:
@@ -10838,8 +10837,8 @@ class Lattices(OwnedCategoryOverBaseRing):
         def is_root(self) -> bool:
             r"""Return whether this vector lies in ``R(L) = {v : v primitive, s_v in O(L)}``.
 
-            A root is a primitive integral reflection vector (owner ruling,
-            #406; requested from ``lean-categories``, see research issue #406).
+            A root is a primitive integral reflection vector (owner ruling;
+            ``lean-categories`` does not formalize the notion).
             ``s_{2r} = s_r``, so integrality alone admits non-primitive
             multiples; :meth:`is_integral_reflection_vector` is that weaker
             predicate.
@@ -12560,7 +12559,7 @@ class IsotropicReductions(OwnedCategoryOverBaseRing):
               :meth:`...unipotent_radical_generators` presents, and the
               completeness claim travels with it: a parameter outside that
               lattice is a missing generator, which is what is open at
-              Sterk's `P_2` of \(T_{\mathrm{En}}\) (#364).
+              Sterk's `P_2` of \(T_{\mathrm{En}}\).
 
             The line case also needs the splitting hypothesis: a complement
             \(U\) of \(I^\perp\) pairing trivially with \(K_I\) is what makes

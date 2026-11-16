@@ -542,7 +542,7 @@ class Sterk:
         `2` and span different lines, but they are two representatives of one cusp: their reductions
         are isometric (`tests/lattices/test_cusp_lattices.sage` asserts it for all five cusps).  A
         reduction read at either is the cusp's; a chamber is at the second.  This is the disagreement
-        filed as `dzackgarza/lattice-database` #44, closed by storing the chamber's vector on the row.
+        the card's row settles by storing the chamber's vector there.
         """
         TEn = NamedLattices.TEn
         b = _named_generators(TEn)
@@ -731,8 +731,8 @@ class Sterk:
         * ``Sterk_5`` (4.3.9, p. 24): :meth:`sterk5_in_U_E8_2`'s fourteen vectors, printed in the
           model `U + E8(-2)` and carried in by
           :attr:`sage_extensions.catalogue.Embeddings.U_E8_2_into_TEn`, whose image lies in
-          `eta^\perp` and keeps the pairings; that the model *is* `K_J` is the isometry decision of
-          sage-extensions#298, asserted here.
+          `eta^\perp` and keeps the pairings; that the model *is* `K_J` is an isometry
+          decision, asserted here.
 
         So a caller gets the same vectors in every session, and the classes of `K_J` they give are the
         same too.  The cusp vector for ``Sterk_4`` is :meth:`sterk4_cusp_vector`'s, the one that
