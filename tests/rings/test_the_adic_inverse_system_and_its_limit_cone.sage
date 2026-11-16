@@ -144,3 +144,23 @@ def test_the_limit_cone_at_a_principal_ideal_commutes_with_the_transitions() -> 
     assert projected_second == completion.adic_projection(2)(image)
     assert projected_first == completion.adic_projection(1)(image)
 
+
+
+def test_the_completion_at_the_zero_ideal_is_free_of_rank_one_over_the_ring() -> None:
+    r"""$A^\wedge = A$ is free of rank one over $A$, framed on the unit.
+
+    The completion of a field at its zero ideal is the field again, so read as
+    an algebra over its source it is the free module on one generator, and its
+    frame is $A^1 \to A^\wedge$ carrying the generator to $1$.  The defining
+    polynomial's power basis is a basis over the coefficient field and over no
+    other base, and it is not this rank.
+    """
+    field, completion = _the_gaussian_rationals_at_the_zero_ideal()
+    frame = completion.framing_morphism()
+    labels = frame.domain().module_generating_set()
+
+    assert completion.base_ring() is field
+    assert frame.domain() is field.free_module(1)
+    assert labels.cardinality() == 1
+    assert frame(frame.domain().module_generator(NN(0))) == completion.one()
+    assert completion.module_generating_set().cardinality() == 1
