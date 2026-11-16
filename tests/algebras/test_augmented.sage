@@ -37,3 +37,25 @@ def test_the_witness_augmented_algebra_is_the_polynomial_algebra_at_zero() -> No
     assert x**2 in augmented
     assert augmented.generating_module() is ZZ.free_module(("x",))
     assert augmented.is_augmented() is True
+
+
+def test_the_identity_of_an_augmented_algebra_is_the_identity_map() -> None:
+    r"""The identity of ``Gamma(Z[x])`` as an augmented algebra is its identity map.
+
+    An arrow of ``AugmentedAlgebras(Z)`` is an algebra map that preserves the
+    chosen augmentation, so the identity arrow is the identity of the
+    underlying algebra, it fixes every element, and it belongs to the Mor it
+    was asked of: the commuting square it is defined by is one that Mor holds.
+    """
+    generating_module = ZZ.free_module(("x",))
+    gamma = DividedPowerAlgebras(ZZ)(generating_module)
+    mor = AugmentedAlgebras(ZZ).Mor(gamma, gamma)
+    identity = mor.identity()
+    generator = gamma.algebra_generator("x")
+
+    assert identity.parent() is mor
+    assert identity in mor
+    assert identity(generator) == generator
+    assert identity.underlying_arrow() == (
+        Algebras(ZZ).Associative().Unital().Mor(gamma, gamma).identity()
+    )
