@@ -2700,3 +2700,4 @@ tree therefore names the commit before it.
 | `535-r3-base-hyperbolic-partner.log` | `2f8c801` + the round's test commits | that test alone without these changes: **1 failed in 16.07 s**, the same id and the same frame. |
 | `535-r3-heavy-stable-line.log` | the gate's fix commit | the two stable-line-orbit row files, `U(2) + <-6>` and `T_Co`: **2 passed in 1073.83 s (0:17:53)**. |
 | `535-r3-lint.log` | the gate's fix commit | the test lint on the five touched test files: **5 files, 0 findings**. |
+| `535-r3-docs.log` | the docs commit | the four files the round's docstrings name, after the docstring pass: **14 passed in 51.27 s**. |

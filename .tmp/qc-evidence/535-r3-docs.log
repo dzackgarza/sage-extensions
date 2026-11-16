@@ -1,0 +1,17 @@
+=== tree: 1db98e40295e893d7c9342028d6edfd2eaaa3b23 (modified: 1 paths)
+=== files: tests/lattices/test_indecomposable_summands_decide_the_decomposition.sage tests/lattices/test_displayed_blocks_are_sublattices.sage tests/lattices/test_eichler_orbits.sage tests/lattices/test_line_stabilizer_image_requires_eichlers_hypothesis.sage
+=== start: 06:09:58
+..............                                                           [100%]
+============================= slowest 10 durations =============================
+8.63s call     tests/lattices/test_eichler_orbits.sage::test_the_covering_list_holds_the_class_of_every_primitive_vector
+6.07s call     tests/lattices/test_eichler_orbits.sage::test_on_a_unimodular_lattice_the_square_decides
+5.83s call     tests/lattices/test_eichler_orbits.sage::test_the_divided_discriminant_class_separates_two_elementary_vectors
+5.65s call     tests/lattices/test_eichler_orbits.sage::test_the_criterion_reads_its_hypothesis_off_the_isometry_class
+4.08s call     tests/lattices/test_indecomposable_summands_decide_the_decomposition.sage::test_the_family_reports_no_summands_where_the_decomposition_is_undecided
+3.01s call     tests/lattices/test_eichler_orbits.sage::test_a_basis_that_displays_no_isotropic_direction_keeps_the_hypothesis
+2.44s call     tests/lattices/test_displayed_blocks_are_sublattices.sage::test_the_displayed_blocks_of_the_k3_gram_are_five_sublattices
+2.32s call     tests/lattices/test_line_stabilizer_image_requires_eichlers_hypothesis.sage::test_the_line_stabilizer_image_refuses_where_the_criterion_does_not_apply
+1.26s call     tests/lattices/test_indecomposable_summands_decide_the_decomposition.sage::test_a_definite_sum_with_a_connected_display_is_decomposable
+0.64s call     tests/lattices/test_eichler_orbits.sage::test_a_plane_presented_by_another_gram_is_a_second_hyperbolic_plane
+14 passed in 51.27s
+=== exit: 0 at 06:10:59
