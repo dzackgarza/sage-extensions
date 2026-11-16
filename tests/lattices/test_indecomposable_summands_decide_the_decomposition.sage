@@ -20,12 +20,30 @@ from sage_extensions.all import *
 import pytest
 
 
+def _presented_in_the_basis(standard, changed):
+    r"""The form of ``standard`` written in the basis ``changed``, as a fresh presentation.
+
+    A Gram matrix in a new basis is the pullback of the retained form along the
+    change of basis, so the transport is the tensor owner's and no pairing is
+    written here.
+    """
+    ring = standard.base_ring()
+    labels = tuple(standard.module_generating_set())
+    change = Modules(ring).Mor(standard, standard)(
+        {
+            label: element
+            for label, element in zip(labels, changed, strict=True)
+        }
+    )
+    return Lattices(ring)(standard.gram_tensor().pullback(change, change))
+
+
 def _definite_sum_with_a_connected_display():
     r"""$A_1^4$ in the basis $e_1 + e_2$, $e_2 + e_3$, $e_3 + e_4$, $e_4$."""
     standard = Lattices(ZZ)("A1") ** 4
     basis = tuple(standard.module_generators())
     changed = tuple(basis[position] + basis[position + 1] for position in range(3)) + (basis[3],)
-    return Lattices(ZZ)(tuple(tuple(standard.b(x, y) for y in changed) for x in changed))
+    return _presented_in_the_basis(standard, changed)
 
 
 def _scrambled_k3():
@@ -33,18 +51,43 @@ def _scrambled_k3():
     decomposed = NamedLattices.U ** 3 + NamedLattices.E8 ** 2
     basis = tuple(decomposed.module_generators())
     changed = tuple(basis[position] + basis[position + 1] for position in range(21)) + (basis[21],)
-    return Lattices(ZZ)(tuple(tuple(decomposed.b(x, y) for y in changed) for x in changed))
+    return _presented_in_the_basis(decomposed, changed)
 
 
 def test_a_definite_sum_with_a_connected_display_is_decomposable() -> None:
+    r"""The four summands embed in the lattice, pair to zero, and fill it.
+
+    Each summand is a sublattice of the lattice with an inclusion into it, so
+    four unrelated or repeated copies of $A_1$ would not pass: the inclusion's
+    codomain is the lattice itself, the pairing of two different summands --
+    the pullback of the form along their two inclusions -- is the zero tensor,
+    and the ranks sum to the rank of the nondegenerate lattice, so the sum of
+    the summands is direct and full.
+    """
     lattice = _definite_sum_with_a_connected_display()
     root_line = Lattices(ZZ)("A1")
+    rank = lattice.module_rank()
+    gram = lattice.gram_tensor()
+    ring = lattice.base_ring()
 
     assert lattice.is_decomposable() is True
     summands = lattice.indecomposable_summands()
     assert summands.cardinality() == 4
     assert all(summand.is_indecomposable() is True for summand in summands)
     assert all(summand.is_isometric_to(root_line) for summand in summands)
+    assert all(summand.inclusion().codomain() is lattice for summand in summands)
+    assert sum(int(summand.module_rank()) for summand in summands) == int(rank)
+    for left in range(summands.cardinality()):
+        for right in range(left + 1, summands.cardinality()):
+            pairing = gram.pullback(
+                summands[left].inclusion(), summands[right].inclusion()
+            )
+            rows, columns = (int(extent) for extent in pairing.tensor_shape())
+            assert all(
+                pairing[i, j] == ring.zero()
+                for i in range(rows)
+                for j in range(columns)
+            )
 
 
 def test_the_family_reports_no_summands_where_the_decomposition_is_undecided() -> None:

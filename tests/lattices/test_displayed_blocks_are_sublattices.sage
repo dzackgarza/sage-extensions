@@ -17,7 +17,15 @@ from sage_extensions.all import *
 
 
 def test_the_displayed_blocks_of_the_k3_gram_are_five_sublattices() -> None:
+    r"""Five sublattices whose forms are the form's pullbacks and which pair to zero.
+
+    A summand's Gram tensor is the pullback of the lattice's form along its
+    inclusion, and the pairing of two different summands -- the form pulled
+    back along their two inclusions -- is the zero tensor.
+    """
     lattice = NamedLattices.LK3
+    gram = lattice.gram_tensor()
+    ring = lattice.base_ring()
     summands = lattice.indecomposable_summands()
     ranks = tuple(int(summand.module_rank()) for summand in summands)
 
@@ -25,18 +33,19 @@ def test_the_displayed_blocks_of_the_k3_gram_are_five_sublattices() -> None:
     assert sum(ranks) == int(lattice.module_rank())
     assert all(summand.inclusion().codomain() is lattice for summand in summands)
     for summand in summands:
-        for x in summand.module_generators():
-            for y in summand.module_generators():
-                assert summand.b(x, y) == lattice.b(summand.inclusion()(x), summand.inclusion()(y))
+        inclusion = summand.inclusion()
+        assert summand.gram_tensor() == gram.pullback(inclusion, inclusion)
     for left in range(summands.cardinality()):
-        for right in range(summands.cardinality()):
-            if left == right:
-                continue
-            for x in summands[left].module_generators():
-                for y in summands[right].module_generators():
-                    assert lattice.b(
-                        summands[left].inclusion()(x), summands[right].inclusion()(y)
-                    ) == 0
+        for right in range(left + 1, summands.cardinality()):
+            pairing = gram.pullback(
+                summands[left].inclusion(), summands[right].inclusion()
+            )
+            rows, columns = (int(extent) for extent in pairing.tensor_shape())
+            assert all(
+                pairing[i, j] == ring.zero()
+                for i in range(rows)
+                for j in range(columns)
+            )
     assert all(
         summands[position].is_isometric_to(NamedLattices.U)
         for position in range(3)
