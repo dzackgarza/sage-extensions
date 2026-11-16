@@ -1,0 +1,32 @@
+provider SHA: 3fae3b5881fb53773d0ff08db050e89c05e1919c
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+probe SHA256: a58eca94375c4d5ac80a6b6ea0d8b6343f3e25addd93a3b3c0007c1d06c74ce8
+== U+U+A1: engine rank 3, rank of v0^perp 2
+   (-6, -6, -5) square 22: cone 1, 1 through v0 [(-1, 1, 0)], cell None=False
+   (-6, -6, -3) square 54: cone 2, 2 through v0 [(0, 1, 1), (-1, 0, -1)], cell None=False
+   (-6, -5, -4) square 28: cone 0, 0 through v0 [], cell None=True
+   scanned 452 points in 34.4 s; states [(0, True, 0), (1, False, 1), (2, False, 2)]
+== U+U+A1+A1: engine rank 4, rank of v0^perp 3
+   (-3, -3, -2, -2) square 2: cone 3, 3 through v0 [(2, 2, 2, 1), (2, 2, 1, 2), (-1, 1, 0, 0)], cell None=False
+   (-3, -3, -2, -1) square 8: cone 2, 2 through v0 [(1, 1, 1, 1), (-1, 1, 0, 0)], cell None=False
+   (-3, -3, -1, -1) square 14: cone 1, 1 through v0 [(-1, 1, 0, 0)], cell None=True
+   scanned 210 points in 66.4 s; states [(1, True, 1), (2, False, 2), (3, False, 3)]
+== U+U+A2: engine rank 4, rank of v0^perp 3
+   (-3, -3, -3, -2) square 4: cone 2, 2 through v0 [(2, 1, 2, 1), (-1, 1, 0, 0)], cell None=False
+   (-3, -3, -2, -2) square 10: cone 1, 1 through v0 [(-1, 1, 0, 0)], cell None=True
+   (-3, -3, -2, -1) square 12: cone 3, 3 through v0 [(1, 0, 1, 1), (0, 1, 1, 0), (-1, 0, -1, 0)], cell None=False
+   scanned 222 points in 62.4 s; states [(1, True, 1), (2, False, 2), (3, False, 3)]
+[peakrss] probe536: child waited=0 shell_code=0 samples=85
+[peakrss] peak tree RSS      : 521 MiB
+[peakrss] low-water MemAvail : 3607 MiB
+[peakrss] peak single VmHWM  : 521 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      510 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   168.3s procs=  3 rss=   521 MiB hwm=   521 MiB avail=  3607 MiB
+[peakrss]   t=   164.3s procs=  3 rss=   520 MiB hwm=   520 MiB avail=  4684 MiB
+[peakrss]   t=   166.3s procs=  3 rss=   520 MiB hwm=   520 MiB avail=  4165 MiB
+[peakrss]   t=   156.3s procs=  3 rss=   519 MiB hwm=   519 MiB avail=  5115 MiB
+[peakrss]   t=   158.3s procs=  3 rss=   519 MiB hwm=   519 MiB avail=  5015 MiB
+launcher exit: 0

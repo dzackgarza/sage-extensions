@@ -75,7 +75,11 @@ from sage_extensions.categories.sets.finite_ordered_sets import (
 from sage_extensions.logic import AtomicProposition
 from sage_extensions.refine import refine
 from sage_extensions.timing import stage
-from sage_extensions.tensors.tensor import _engine_component_matrix, tensor
+from sage_extensions.tensors.tensor import (
+    _engine_component_matrix,
+    _engine_row_family_gram,
+    tensor,
+)
 
 _VINBERG_NF_PROJECT = Path(__file__).resolve().parents[4] / "src.bak" / "backends" / "external" / "vinbergs_algorithm" / "references" / "VinbergsAlgorithmNF"
 
@@ -746,16 +750,19 @@ def _filtered_vinal_class():
             same cell, so an enumeration restricted by a cell the walk has
             already cut would be cutting the cell by itself.
 
-            This walk therefore forgets the cell it holds before it starts, and
-            records the cone it writes as the cell's normals: :meth:`cell`
-            answers from that record and not from ``roots``, which the walk
-            keeps growing as the sequence is written down.
+            The cone written is the walk's datum: it is computed once and
+            recorded as the cell's normals, and a second call returns the record
+            rather than cutting the cell again.  :meth:`cell` answers from that
+            record and not from ``roots``, which the walk keeps growing as the
+            sequence is written down.  The record is a tuple and each call hands
+            out a fresh list, because ``VinAl.FindRoots`` assigns this return
+            value to ``roots`` and keeps appending to it.
             """
-            self._initial_cone = None
-            self._cell = _NO_CELL
+            if self._initial_cone is not None:
+                return list(self._initial_cone)
             roots = super().FundCone()
             self._initial_cone = tuple(roots)
-            return roots
+            return list(roots)
 
         def cell(self):
             r"""Return the cell at the controlling vector, or ``None`` when it does not span.
@@ -877,7 +884,7 @@ def _filtered_vinal_class():
             return self._cell
 
         def Roots_decomposed_into(self, a, k):
-            r"""Return the candidates of one layer whose normal coordinates are nonpositive.
+            r"""Return the candidates of one layer that conditions (58) admit.
 
             Vinberg, *On the groups of unit elements of certain quadratic
             forms*, Math. USSR Sb. 16 (1972), §4.1, p. 30: "Construction of
@@ -885,57 +892,49 @@ def _filtered_vinal_class():
             the Diophantine equation (57) that satisfy conditions (58) in
             increasing order of the quantity (59), and in checking conditions
             (49) for each solution as it is written down."  Conditions (58)
-            are the inequalities \(b_0\le0,\dots,b_n\le0\) against the normals
-            already accepted — the cone conditions — and (49) is the height
-            comparison, which :meth:`IsNewRoot` makes of every solution.
+            are \(b(v,w_i)\le0\) against the normals already written — the
+            cone conditions — and (49) is the height comparison, which
+            :meth:`IsNewRoot` makes of every candidate.
 
-            This method writes down the solutions of the layer's equation
-            (57) that satisfy (58) — and not the larger set of solutions
-            inside a relaxation of it, which is what the cost of the walk is
-            made of.  The candidate is \(v=a+v_1\) with \(v_1\) in
-            \(v_0^\perp\), the normals of the cell at the controlling vector
-            are \(w_1,\dots,w_r\), and \(u\), the coordinates of \(v\)
-            along the normals, pair as \(b(v,w_i)=\sum_jg_{ij}u_j\), so (58)
-            says \(Gu\le0\).  Enumerating the coefficients \(d=-u\) of the
-            candidate along the normals from below — \(d\ge c\), \(c\) the
-            offset's own normal coordinates — is *not* the same condition:
-            the Gram of a cell is a Stieltjes matrix, so \(G^{-1}\ge0\) and
-            \(u\le0\) does imply \(d\ge c\), but the converse fails, and
-            the relaxation is not a small one.  At Sterk's first Enriques cusp
-            the layer at height 8 has 18 780 solutions with \(d\ge c\), of
-            which exactly one has \(u\le0\).  The enumeration therefore runs
-            in \(u\) itself.
+            The cell at the controlling vector is the intersection of the
+            mirrors of its normals \(w_1,\dots,w_r\), and a candidate of the
+            layer is \(v=a-\sum_jd_jw_j\) with \(d\in\mathbf Z^r\), so
+            \(b(v,w_i)=\beta_i-(Gd)_i\) for the Gram \(G\) of the normals and
+            \(\beta_i=b(a,w_i)\): conditions (58) against the normals are the
+            system \(Gd\ge\beta\).  The orthant \(d\ge c\), \(c=G^{-1}\beta\),
+            is a relaxation of that system and not the same set: \(G^{-1}\ge0\)
+            makes \(Gd\ge\beta\) imply \(d\ge c\), and
+            \(G=\begin{pmatrix}2&-1\\-1&2\end{pmatrix}\) with \(\beta=0\)
+            admits \(d=(0,2)\), whose \(Gd=(-2,4)\) is not \(\ge0\).  The
+            enumeration therefore keeps the coefficients \(d\) integral and
+            asks the system itself: its \(j\)-th row reads
+            \(G_{jj}d_j\ge\beta_j+\sum_{k\ne j}\lvert G_{jk}\rvert d_k\), so
+            once \(d_j\) is chosen that row bounds every coefficient still to
+            be chosen, and :meth:`_cone_combinations` installs it as one.  The
+            walls written after the cell add the upper bounds of
+            :meth:`_layer_constraints`.
 
-            The enumeration keeps the coefficients \(d\) integral, which is
-            what makes its equation (57) the layer's and not a relaxation of
-            it, and it takes (58) against the normals as the lower bound of
-            that recursion level by level
-            (:meth:`_cone_combinations`\'s ``cone_bound``): the level's own
-            cone condition reads \(d_i\ge(\beta_i+\sum_{j\ne
-            i}\lvert G_{ij}\rvert d_j)/G_{ii}\) because the Gram of a cell
-            has no positive entry off the diagonal, the higher coefficients are
-            the ones already chosen and the lower ones are at least their
-            floor, so the bound is necessary for anything the level could reach.
-            Writing \(d\) for the coefficients and \(a'\) for the offset with
-            its normal coordinates cancelled, the norm equation (57) is
-            \(d^tGd=k-q(a')\), enumerated by completion of squares along the
-            factor of \(G\); the walls written *after* the cell add the upper
-            bounds of :meth:`_layer_constraints`.
+            The layer's equation (57) is
+            \(d^tGd=k-q(a)+\beta^tG^{-1}\beta\), enumerated by completion of
+            squares along the factor of \(G\): the higher coefficients are the
+            ones already chosen, the residual bounds the current one from both
+            sides, and the last one is pinned to an exact square.
 
-            A cell with one lineality direction enumerates the layer
-            in the same coordinates with the lineality coordinate added.
-            Every vector of \(v_0^\perp\) is, for exactly one coset
-            representative \(s\) of \(\langle w_1,\dots,w_r,m\rangle\) in
-            \(v_0^\perp\), the vector \(s-\sum d_iw_i+tm\) with
-            \(d\in\mathbf Z^r\) and \(t\in\mathbf Z\); the frame
-            \((w_1,\dots,w_r,m,v_0)\) has block-diagonal Gram, because
-            \(m\) is orthogonal to the normals and to \(v_0\), so with
-            \(a+s=\sum x_iw_i+\alpha m+\gamma v_0\) the norm equation (57)
-            reads \(d^tGd+q(m)(\alpha+t)^2=k-\gamma^2q(v_0)\): the integer
-            \(t\) is bounded on both sides by that equation,
-            \(q(m)(\alpha+t)^2\le k-\gamma^2q(v_0)\), and each bounded
-            \(t\) leaves the same positive-definite equation in
-            \(d\ge0\).
+            A cell with one lineality direction enumerates the layer in the
+            same coordinates with the lineality coordinate added.  Every
+            vector of \(v_0^\perp\) is, for exactly one coset representative
+            \(s\) of \(\langle w_1,\dots,w_r,m\rangle\) in \(v_0^\perp\), the
+            vector \(s-\sum_id_iw_i+tm\) with \(d\in\mathbf Z^r\) and
+            \(t\in\mathbf Z\); the frame \((w_1,\dots,w_r,m,v_0)\) has
+            block-diagonal Gram, because \(m\) is orthogonal to the normals and
+            to \(v_0\), so with \(a+s=\sum x_iw_i+\alpha m+\gamma v_0\) the
+            norm equation (57) reads
+            \(d^tGd+q(m)(\alpha+t)^2=k-\gamma^2q(v_0)\): the integer \(t\) is
+            bounded on both sides by that equation,
+            \(q(m)(\alpha+t)^2\le k-\gamma^2q(v_0)\), and each bounded \(t\)
+            leaves the same positive-definite equation in \(d\).  The cone
+            conditions are the same ones, because \(m\) pairs zero with every
+            normal.
 
             Layers whose cell is not available — the initial cone's own
             enumeration, and a controlling vector whose cell spans
@@ -946,10 +945,11 @@ def _filtered_vinal_class():
             if cell is None:
                 return super().Roots_decomposed_into(a, k)
             normals, gram, factor, lineality = cell
+            size = len(normals)
+            cone = (gram, tuple(int(a.inner_product(normal)) for normal in normals))
             if lineality is None:
                 squares, triangular = factor
-                size = len(normals)
-                beta = [Fraction(int(a.inner_product(normal))) for normal in normals]
+                beta = [Fraction(value) for value in cone[1]]
                 center = [
                     Fraction(int(value.numerator()), int(value.denominator()))
                     for value in gram.solve_right(engine_vector(SageQQ, beta))
@@ -963,7 +963,7 @@ def _filtered_vinal_class():
                 )
                 if remaining < 0:
                     return []
-                candidates = self._cone_combinations(
+                combinations = self._cone_combinations(
                     normals,
                     factor,
                     offsets,
@@ -973,11 +973,11 @@ def _filtered_vinal_class():
                         (row, rhs)
                         for row, rhs, _tilt in self._layer_constraints(normals, a)
                     ),
-                    (gram, beta, center),
+                    cone,
                 )
                 found = [
-                    a + self.V([int(value) for value in combination])
-                    for combination in candidates
+                    a - self.V(list(vector))
+                    for vector in self._combination_vectors(normals, combinations)
                 ]
                 for candidate in found:
                     if int(candidate.inner_product(candidate)) != int(k):
@@ -1026,25 +1026,22 @@ def _filtered_vinal_class():
                 while m_square_fraction * (alpha + low - 1) ** 2 <= remaining:
                     low -= 1
                 written = self._layer_constraints(normals, offset, m)
+                cone = (gram, tuple(int(offset.inner_product(normal)) for normal in normals))
                 for t in range(low, high + 1):
                     square = remaining - m_square_fraction * (alpha + t) ** 2
-                    for combination in self._cone_combinations(
+                    combinations = self._cone_combinations(
                         normals,
                         factor,
                         offsets,
                         square,
                         x,
                         tuple((row, rhs + t * tilt) for row, rhs, tilt in written),
-                    ):
-                        if any(value.denominator != 1 for value in combination):
-                            raise ArithmeticError(
-                                f"the layer enumeration at {offset} returned the combination "
-                                f"{combination}, which is not integral although the cell's "
-                                f"normals and m are"
-                            )
-                        found.append(
-                            offset + self.V([int(value) for value in combination]) + t * m
-                        )
+                        cone,
+                    )
+                    found.extend(
+                        offset - self.V(list(vector)) + t * m
+                        for vector in self._combination_vectors(normals, combinations)
+                    )
             for candidate in found:
                 if int(candidate.inner_product(candidate)) != int(k):
                     raise ArithmeticError(
@@ -1052,6 +1049,31 @@ def _filtered_vinal_class():
                         f"{candidate.inner_product(candidate)}, not the layer's {k}"
                     )
             return found
+
+        @staticmethod
+        def _combination_vectors(normals, combinations):
+            r"""Return \(\sum_jd_jw_j\) for every coefficient row, in one contraction.
+
+            The candidate of a layer is \(a-\sum_jd_jw_j\), so the layer's
+            vectors are the offset minus the rows of the product of the
+            coefficient matrix with the matrix whose rows are the normals.
+            """
+            if not combinations:
+                return ()
+            size = len(normals)
+            coefficients = engine_matrix(
+                SageZZ,
+                len(combinations),
+                size,
+                [int(value) for row in combinations for value in row],
+            )
+            frame = engine_matrix(
+                SageZZ,
+                size,
+                int(normals[0].degree()),
+                [int(entry) for normal in normals for entry in normal],
+            )
+            return tuple(tuple(int(entry) for entry in row) for row in coefficients * frame)
 
         def _layer_constraints(self, normals, offset, lineality=None):
             r"""Return conditions (58) of the walls already written, in the cell's coordinates.
@@ -1065,27 +1087,56 @@ def _filtered_vinal_class():
             is the lineality direction when the cell has one, so the condition
             against a written wall \(e\) reads
 
-            \[
-              \sum_jd_j\,\bigl(-b(w_j,e)\bigr)\ \le\ -b(a,e)-t\,b(m,e).
-            \]
+            \[\sum_jd_j\,\bigl(-b(w_j,e)\bigr)\ \le\ -b(a,e)-t\,b(m,e).\]
 
-            The coefficient \(-b(w_j,e)\) is nonnegative, and that is not a
-            coincidence to be checked at run time: :meth:`IsNewRoot` accepts a
-            wall only when it pairs nonpositively with every wall already
-            written, and the normals of the cell are among them.  What is
-            returned is one triple per written wall that is not already one of
-            the normals — the row of coefficients, the right-hand side at
-            \(t=0\), and the coefficient of \(t\).  The normals are left out
-            because their own inequalities are not a bound on the enumeration
-            at all: they are exactly the orthant ``floors`` its caller passes,
-            which is what the cell's coordinates are chosen for.
+            The coefficient \(-b(w_j,e)\) is nonnegative because
+            :meth:`IsNewRoot` accepts a wall only when it pairs nonpositively
+            with every wall already written, and the normals of the cell are
+            among them; a negative one is refused here rather than accepted as
+            a bound.  The pairings of every written wall with every normal are
+            one contraction, and what is returned is one triple per written
+            wall that is not itself a normal of the cell — the row of
+            coefficients, the right-hand side at \(t=0\), and the coefficient
+            of \(t\).  The normals' own inequalities are not among them: those
+            are the cone conditions \(Gd\ge\beta\), which
+            :meth:`Roots_decomposed_into` passes to the enumeration as its
+            ``cone`` and which no written wall can replace.
             """
             written = tuple(tuple(int(entry) for entry in normal) for normal in normals)
+            walls = tuple(
+                wall
+                for wall in self.roots
+                if tuple(int(entry) for entry in wall) not in written
+            )
+            if not walls:
+                return ()
+            # One family -- the walls, the normals, the offset and the
+            # lineality direction -- and its Gram matrix is the whole of the
+            # pairings this method reads: the wall-by-normal block is the rows
+            # of the constraints, and the last two columns are their
+            # right-hand sides.
+            family = (
+                tuple(walls)
+                + tuple(normals)
+                + (offset,)
+                + (() if lineality is None else (lineality,))
+            )
+            pairings = _engine_row_family_gram(
+                self.M,
+                engine_matrix(
+                    SageZZ,
+                    len(family),
+                    int(self.n),
+                    [int(entry) for member in family for entry in member],
+                ),
+            )
+            offset_column = len(walls) + len(normals)
             constraints = []
-            for wall in self.roots:
-                if tuple(int(entry) for entry in wall) in written:
-                    continue
-                row = tuple(-int(wall.inner_product(normal)) for normal in normals)
+            for index, wall in enumerate(walls):
+                row = tuple(
+                    -int(pairings[index, len(walls) + position])
+                    for position in range(len(normals))
+                )
                 if not any(row):
                     continue
                 if any(coefficient < 0 for coefficient in row):
@@ -1097,114 +1148,125 @@ def _filtered_vinal_class():
                 constraints.append(
                     (
                         row,
-                        -int(offset.inner_product(wall)),
-                        0 if lineality is None else -int(lineality.inner_product(wall)),
+                        -int(pairings[index, offset_column]),
+                        0 if lineality is None else -int(pairings[index, offset_column + 1]),
                     )
                 )
             return tuple(constraints)
 
         @staticmethod
-        def _cone_combinations(normals, factor, offsets, square, floors=None, constraints=(), cell=None):
-            r"""Return \(-d_1w_1-\dots-d_nw_n\) for integral \(d\) with \(d^tGd=\) ``square``.
+        def _cone_combinations(normals, factor, offsets, square, floors, constraints, cone):
+            r"""Return the integral \(d\) with \(d^tGd=\text{square}\) inside conditions (58).
 
             ``factor`` is the pair \((D,L)\) of :func:`_ldl_factorisation`, so
             \(d^tGd=\sum_iD_i(L^td)_i^2\) and the \(i\)-th entry
             \((L^td)_i=d_i+\sum_{j>i}L_{ji}d_j\) depends on \(d_i,\dots,d_n\)
             only.  Descending from \(d_n\), the value
-            \(s-\sum_{j>i}D_j(L^td)_j^2\) bounds \(d_i\) from both sides, and the
-            last coefficient is pinned to an exact square.
+            \(s-\sum_{j>i}D_j(L^td)_j^2\) bounds \(d_i\) from both sides, and
+            the last coefficient is pinned to an exact square.
 
-            The coefficients are those of the candidate written in the
-            cell's frame, so the orthant \(u\le0\) of conditions (58)
-            (\(u\) the candidate's normal coordinates) is a lower bound on
-            them: ``floors`` is that bound, the normal coordinates of the
-            layer's offset, and it is zero only when the offset has no
-            component along the normals — the whole-lattice offset of the
-            fourth Enriques cusp has negative ones.  Each level's range is
-            the integers that satisfy both the bound and the exact residual
-            inequality \(D_i(L^td)_i^2\le s\): the square-root bound is a
-            floor, so each end of the range is extended while the exact
-            inequality still holds.
+            ``floors`` is the offset's own normal coordinates, the bound every
+            coefficient has to stay above for the candidate to lie in the
+            cell, and ``cone`` is the cell's Gram matrix with the offset's
+            pairing \(\beta\) against the normals.  Conditions (58) against
+            the normals are \(Gd\ge\beta\), and each of their rows is a bound
+            on the coefficients once its own diagonal coefficient is chosen:
+            row \(j\) reads
+            \(G_{jj}d_j\ge\beta_j+\sum_{k\ne j}\lvert G_{jk}\rvert d_k\), so
+            the chosen \(d_j\) fixes the right-hand side and the row becomes an
+            upper bound on the coefficients still to be chosen.  A level whose
+            remaining coefficients at their floors already violate a row is
+            cut, and a complete tuple is accepted only when every row of the
+            system holds of the coefficients themselves — the tuple is checked
+            against the system and not against the relaxation.
 
-            ``cell`` is the cell's Gram matrix with the offset's pairing
-            \(\beta\) against the normals and the floors, and it adds the cone
-            conditions (58) *against the normals themselves* as the lower
-            bound of the recursion at each level: \(d\ge c\) is their
-            relaxation and not their equivalent, so a coefficient below the
-            bound is one \(Gu\le0\) refuses already.
-
-            ``constraints`` are the walls already written that are not
-            normals of the cell, as the rows and right-hand sides of the
-            inequalities of :meth:`_layer_constraints`: \(c^td\le r\) with
-            \(c\ge0\).  They bound each level's coefficient from above by what
-            the levels above leave of \(r\) and what the levels below take at
-            their own smallest admissible value, so a coefficient tuple that
-            violates one of them is never reached.  Every such tuple already
-            violates (58) against a wall that :meth:`IsNewRoot` would have
-            refused it for, so the solutions returned are the same ones.
+            ``constraints`` are the walls already written that are not normals
+            of the cell, as the rows and right-hand sides of the inequalities
+            of :meth:`_layer_constraints`: \(c^td\le r\) with \(c\ge0\).  They
+            are the same shape as the cone rows — an upper bound with
+            nonnegative coefficients — and are cut the same way.
             """
             size = len(normals)
             squares, triangular = factor
-            bounds = (
-                [Fraction(0)] * size
-                if floors is None
-                else [Fraction(value) for value in floors]
-            )
-            constraints = tuple(constraints)
-            lowest = [int(value.__ceil__()) for value in bounds]
-            tails = [
+            gram_rows, beta = cone
+            gram = [[int(gram_rows[i, j]) for j in range(size)] for i in range(size)]
+            for left in range(size):
+                for right in range(size):
+                    if left != right and gram[left][right] > 0:
+                        raise ArithmeticError(
+                            f"the Gram matrix of the cell has the positive entry {gram[left][right]} "
+                            f"off the diagonal at ({left}, {right}): conditions (58) against the "
+                            f"normals are then not a system this enumeration can bound, and the "
+                            f"cell is not acute-angled"
+                        )
+            lowest = [int(Fraction(value).__ceil__()) for value in floors]
+            # Every cut the enumeration keeps is one of these rows, with its
+            # right-hand side and the two running sums that make it a bound on
+            # the current level: what the coefficients already chosen spend of
+            # it, and what the ones below the current level spend at their
+            # floors.
+            cuts = [
                 [
-                    sum((row[j] * lowest[j] for j in range(level)), 0)
-                    for level in range(size + 1)
+                    tuple(int(value) for value in row),
+                    int(rhs),
+                    0,
+                    sum(row[k] * lowest[k] for k in range(size - 1)),
                 ]
-                for row, _rhs in constraints
+                for row, rhs in constraints
             ]
-            partials = [0] * len(constraints)
             coefficients = [0] * size
             found = []
-            gram_rows = beta = None
-            if cell is not None:
-                gram_rows, beta, _centre = cell
 
             def cone_bound(level):
-                r"""The smallest \(d_{level}\) the cell's cone conditions allow here.
+                r"""The smallest \(d_{level}\) conditions (58) against the normals allow.
 
-                Conditions (58) against the normals of the cell are
-                \(u=\beta-Gd\le0\), i.e. \(Gd\ge\beta\).  The \(level\)-th
-                of them reads, because \(G_{ij}\le0\) off the diagonal,
-
-                \[
-                  d_{level}\ \ge\ \Bigl(\beta_{level}
-                  +\sum_{j>level}\lvert G_{level,j}\rvert d_j
-                  +\sum_{j<level}\lvert G_{level,j}\rvert c_j\Bigr)\Big/ G_{level,level},
-                \]
-
-                with \(c\) the floors this enumeration already keeps its
-                coefficients above: the higher coefficients are the ones
-                chosen, the lower ones are at least their floor, so the bound
-                is necessary for any solution the recursion could reach and
-                pruning below it loses nothing.  It is the cone condition as a
-                one-sided bound in the integral coefficients, which is what
-                keeps the enumeration from writing down the candidates the
-                orthant \(d\ge c\) admits and (58) refuses.
+                Row \(level\) of \(Gd\ge\beta\) is
+                \(G_{level,level}d_{level}\ge\beta_{level}
+                +\sum_{k\ne level}\lvert G_{level,k}\rvert d_k\), and its
+                right-hand side is at least what the coefficients already
+                chosen spend plus what the ones below spend at their floors, so
+                the bound is necessary for anything the recursion can reach.
                 """
                 required = beta[level]
                 for position in range(size):
                     if position == level:
                         continue
-                    coefficient = _rational_of(gram_rows[level, position])
-                    if coefficient > 0:
-                        raise ArithmeticError(
-                            f"the Gram matrix of the cell at {self.v0} has a positive entry "
-                            f"off the diagonal at ({level}, {position}): {coefficient}.  Its "
-                            f"cone conditions are then not an upper-triangular system this "
-                            f"enumeration can bound, and the cell is not acute-angled"
-                        )
-                    required += (-coefficient) * (
+                    required += (-gram[level][position]) * (
                         coefficients[position] if position > level else lowest[position]
                     )
-                diagonal = _rational_of(gram_rows[level, level])
-                return int((required / diagonal).__ceil__())
+                return -((-required) // gram[level][level])
+
+            def cut(level):
+                r"""Return whether a cut is spent already, and the largest \(d_{level}\) they allow."""
+                ceiling = None
+                for row, rhs, spent, below in cuts:
+                    left = spent + below
+                    if left > rhs:
+                        return True, None
+                    if row[level] > 0:
+                        allowed = (rhs - left) // row[level]
+                        ceiling = allowed if ceiling is None else min(ceiling, allowed)
+                return False, ceiling
+
+            def install(level):
+                r"""Install row ``level`` of \(Gd\ge\beta\) as a cut on the levels below it.
+
+                Returns whether a cut was installed, so that the descent removes
+                exactly what it added.
+                """
+                row = tuple(-gram[level][k] if k < level else 0 for k in range(size))
+                if not any(row):
+                    return
+                higher = sum(gram[level][k] * coefficients[k] for k in range(level + 1, size))
+                cuts.append(
+                    [
+                        row,
+                        gram[level][level] * coefficients[level] - beta[level] + higher,
+                        0,
+                        sum(row[k] * lowest[k] for k in range(level - 1)),
+                    ]
+                )
+                return True
 
             def descend(level, remaining):
                 shift = sum(
@@ -1217,24 +1279,19 @@ def _filtered_vinal_class():
                         return
                     for sign in ((1,) if root == 0 else (1, -1)):
                         value = sign * root - shift
-                        if value.denominator != 1 or value < bounds[0]:
+                        if value.denominator != 1:
                             continue
-                        if any(
-                            partial + row[0] * int(value) > rhs
-                            for (row, rhs), partial in zip(constraints, partials)
+                        candidate = int(value)
+                        if candidate < lowest[0]:
+                            continue
+                        coefficients[0] = candidate
+                        if all(
+                            entry[2] + entry[0][0] * candidate <= entry[1] for entry in cuts
+                        ) and all(
+                            sum(gram[row][k] * coefficients[k] for k in range(size)) >= beta[row]
+                            for row in range(size)
                         ):
-                            continue
-                        coefficients[0] = int(value)
-                        combination = [Fraction(0)] * int(normals[0].degree())
-                        for position, coefficient in enumerate(coefficients):
-                            if coefficient:
-                                combination = [
-                                    entry
-                                    - coefficient
-                                    * Fraction(int(other.numerator()), int(other.denominator()))
-                                    for entry, other in zip(combination, normals[position])
-                                ]
-                        found.append(tuple(combination))
+                            found.append(tuple(coefficients))
                     coefficients[0] = 0
                     return
                 bound = _square_root_bound(remaining / squares[level])
@@ -1246,25 +1303,26 @@ def _filtered_vinal_class():
                 low = int((-bound - shift).__ceil__())
                 while squares[level] * (low - 1 + shift) ** 2 <= remaining:
                     low -= 1
-                for position, (row, rhs) in enumerate(constraints):
-                    if row[level] > 0:
-                        high = min(
-                            high,
-                            (rhs - tails[position][level] - partials[position]) // row[level],
-                        )
-                head = max(lowest[level], low)
-                if cell is not None:
-                    head = max(head, cone_bound(level))
-                if head > high:
+                dead, allowed = cut(level)
+                if dead:
                     return
+                if allowed is not None:
+                    high = min(high, allowed)
+                head = max(lowest[level], low, cone_bound(level))
                 for value in range(head, high + 1):
                     coefficients[level] = value
-                    entry = value + shift
-                    for position, (row, _rhs) in enumerate(constraints):
-                        partials[position] += row[level] * value
-                    descend(level - 1, remaining - squares[level] * entry * entry)
-                    for position, (row, _rhs) in enumerate(constraints):
-                        partials[position] -= row[level] * value
+                    for entry in cuts:
+                        entry[2] += entry[0][level] * value
+                        if level:
+                            entry[3] -= entry[0][level - 1] * lowest[level - 1]
+                    installed = install(level)
+                    descend(level - 1, remaining - squares[level] * (value + shift) ** 2)
+                    if installed:
+                        cuts.pop()
+                    for entry in cuts:
+                        entry[2] -= entry[0][level] * value
+                        if level:
+                            entry[3] += entry[0][level - 1] * lowest[level - 1]
                 coefficients[level] = 0
 
             descend(size - 1, Fraction(square))
@@ -1727,7 +1785,14 @@ class HyperbolicLattices(OwnedCategoryOverBaseRing):
             from sage.geometry.cone import Cone
 
             engine_gram, negated = self._engine_gram_of_signature_n_1()
-            _complete, roots = self._vinberg_search(None, None, None)
+            # The full group's chamber is the restricted walk with the filter
+            # that admits every root: the enumeration of §4.1 in the cell's own
+            # coordinates, and the candidate test of :meth:`_FilteredVinAl.
+            # IsNewRoot`, are the same questions the engine answers, and both
+            # answer them for the walls listed here.
+            _complete, roots = self._vinberg_search(
+                None, None, None, admits_root=lambda row: True
+            )
             wall_coordinates = [engine_vector(_framing_coordinates(root)) for root in roots]
             wall_normals = [coordinate * engine_gram for coordinate in wall_coordinates]
             chamber = Cone(wall_normals).dual()
@@ -1923,15 +1988,19 @@ class HyperbolicLattices(OwnedCategoryOverBaseRing):
 
             **The chamber does not depend on the point the walk measures from.**
             The controlling vector is a vertex of the chamber of the full
-            reflection group \(W(L)\) of this lattice, selected among the
+            reflection group \(W(L)\) of this lattice, taken among the
             vertices of positive square whose through-walls are a
-            \(\mathbf Z\)-basis of the vertex's orthogonal complement by how
-            many of its walls the subgroup filter admits: every vertex of that
+            \(\mathbf Z\)-basis of the vertex's orthogonal complement: the one
+            of largest square at which the subgroup filter admits enough of the
+            walls through it for the walk to have a cell.  Every vertex of that
             chamber lies in the chamber of every reflection subgroup of
             \(W(L)\) — a group generated by fewer reflections cuts out a bigger
             polyhedron — so the search anchored there computes the subgroup's
             own chamber by the three statements of Vinberg 1972 §3.2 quoted
-            above, and no separate certificate is needed.
+            above, and no separate certificate is needed.  The choice of vertex
+            is free and changes only the cost, which the layer heights state:
+            they are an arithmetic progression whose step is the vertex's own
+            square.
 
             Where it is needed.  H. Sterk,
             *Compactifications of the period space of Enriques surfaces, Part I*,
@@ -1974,9 +2043,26 @@ class HyperbolicLattices(OwnedCategoryOverBaseRing):
                     decided[key] = bool(rho(self.reflection(root)) in subgroup)
                 return decided[key]
 
-            # The anchor: the vertex of the full chamber admitting most walls.
+            # The anchor: the vertex of the full chamber furthest from the light
+            # cone at which the subgroup still leaves a cell.  The layers of the
+            # walk are indexed by the height \(b(a,v_0)\), and with
+            # \(a=W+mv_0\) that height runs over \(b(W,v_0)+m\,q(v_0)\): an
+            # arithmetic progression whose step is the controlling vector's own
+            # square, so a vertex of larger square resolves the same height
+            # range in fewer layers, and each layer's candidates grow with the
+            # height it is at.  A vertex whose cell does not span leaves the walk
+            # without coordinates to enumerate in, so the vertex taken is the
+            # first, in decreasing square, at which the subgroup admits at least
+            # \(\operatorname{rank}(v_0^\perp)-1\) of the walls through it; if
+            # there is none, the one admitting most.  Every vertex of the full
+            # chamber is a valid controlling vector (Vinberg 1972, §3.2, the
+            # construction after Proposition 3, p. 27), so the choice changes
+            # only the cost.
+            rank = int(self.module_rank()) - 1
             best = None
-            for coordinates, square, through, basis in self._full_chamber_vertices():
+            for coordinates, square, through, basis in sorted(
+                self._full_chamber_vertices(), key=lambda entry: -entry[1]
+            ):
                 if square <= 0 or not basis:
                     # An ideal vertex is not a point of the hyperbolic space, and
                     # a vertex whose walls are not a Z-basis of its orthogonal
@@ -1985,6 +2071,8 @@ class HyperbolicLattices(OwnedCategoryOverBaseRing):
                 admitted = sum(1 for root in through if admits_root(root))
                 if best is None or admitted > best[0]:
                     best = (admitted, coordinates)
+                if admitted >= rank - 1:
+                    break
             if best is None:
                 raise ValueError(
                     f"no vertex of the chamber of the full reflection group of {self} is a "

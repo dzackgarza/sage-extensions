@@ -2386,6 +2386,10 @@ class CuspLayerEnumeration(SageObject):
     it pairs nonpositively with every dual normal.  The enumeration of a
     layer is correct when its candidates are exactly the whole-lattice
     candidates that lie in the cell.
+
+    A walk that cut no cell has no coordinates to report: the record then
+    carries no normals and no duals, and the two candidate lists are the one
+    whole-lattice search the walk runs in that state.
     """
 
     def __init__(
@@ -3036,8 +3040,11 @@ class IsotropicVectorReductionImage(SageObject):
         (:meth:`_FilteredVinAl.cell`), which is the only statement of it that
         the library makes: it answers ``None`` when the roots through the
         point do not span \(v_0^\perp\) in the coordinates the enumeration
-        uses, and the call then refuses rather than report a coordinate
-        system the walk is not enumerating in.
+        uses, and the walk then enumerates the layers by the engine's
+        whole-lattice search.  A record of that state therefore carries an
+        empty cell -- no normals and no duals, since there is no coordinate
+        system to state them in -- and its two candidate lists are that one
+        search; the call reports the layers either way.
         """
         from sage_extensions.categories.hyperbolic_lattices import (
             HyperbolicLattices,
@@ -3073,26 +3080,28 @@ class IsotropicVectorReductionImage(SageObject):
         walk = _filtered_vinal_class()(engine_gram, coordinates, admits_root=row_filter)
         walk.FundCone()
         cell = walk.cell()
-        if cell is None:
-            raise ValueError(
-                f"the roots through the controlling vector of {self._reduction} cut no cell "
-                f"there -- there are too few of them, they are dependent, or they do not "
-                f"span v0^perp integrally in the coordinates the enumeration uses -- so its "
-                f"layers have no cell coordinates to be enumerated in"
-            )
-        engine_normals = tuple(cell[0])
-        gram = matrix(
-            [
-                [int(one.inner_product(other)) for other in engine_normals]
-                for one in engine_normals
-            ]
-        )
-        # The adjugate dual of the normals, in engine coordinates, with the
-        # sign that makes the public pairing the positive multiple det(G)*u
-        # of the candidate's normal coordinates.
-        dual_rows = (gram.adjugate() * matrix([list(normal) for normal in engine_normals])).rows()
-        duals = tuple(element(-row if negated else row) for row in dual_rows)
+        # A walk that cut no cell enumerates its layers by the engine's
+        # whole-lattice search, which ``_FilteredVinAl.Roots_decomposed_into``
+        # keeps for that state: the record then carries no normals and no duals,
+        # because there is no cell coordinate system to carry, and both of its
+        # candidate lists are that one search.
+        engine_normals = () if cell is None else tuple(cell[0])
         normals = tuple(element(normal) for normal in engine_normals)
+        duals = ()
+        if engine_normals:
+            gram = matrix(
+                [
+                    [int(one.inner_product(other)) for other in engine_normals]
+                    for one in engine_normals
+                ]
+            )
+            # The adjugate dual of the normals, in engine coordinates, with the
+            # sign that makes the public pairing the positive multiple det(G)*u
+            # of the candidate's normal coordinates.
+            dual_rows = (
+                gram.adjugate() * matrix([list(normal) for normal in engine_normals])
+            ).rows()
+            duals = tuple(element(-row if negated else row) for row in dual_rows)
         records = []
         examined = 0
         for offset, engine_square in walk.IterateRootDecompositions():

@@ -1,0 +1,21 @@
+provider SHA: 4c13fb5999f2e1da6ab033d431ed58e5b0ad1d75
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+probe SHA256: 5e5075cc2f3f4b8409dc7ad8f409651d1ecaf0cdb8f8b8aa5f0b850647867e25
+first FundCone 2.303 s: [(0, 0, 1), (-1, 1, 0)]
+second FundCone 0.000 s: [(0, 0, 1), (-1, 1, 0)]
+same roots True
+distinct lists True
+cell normals [(0, 0, 1), (-1, 1, 0)]
+cell cached True
+[peakrss] probe536: child waited=0 shell_code=0 samples=3
+[peakrss] peak tree RSS      : 475 MiB
+[peakrss] low-water MemAvail : 9691 MiB
+[peakrss] peak single VmHWM  : 475 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      464 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     4.0s procs=  3 rss=   475 MiB hwm=   475 MiB avail=  9691 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   332 MiB hwm=   332 MiB avail=  9867 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     0 MiB hwm=     0 MiB avail=  9776 MiB
+launcher exit: 0
