@@ -1,0 +1,23 @@
+# tree: 5f6abb81d8bac1e491e6cf5f36b19b05529e236c
+# status:  M results/coble-kernel-incidence-rows.yml  M tests/coble_gamma_co_2_incidence_rows.py ?? results/issue-body-the-plane-rows-representatives-are-a-constructed-subobject.md 
+# port: 991b88b095a42a1e3679569ea42328c900c120f6
+# load: 1.35 1.40 1.41
+# program: /repos/sage-extensions/.scratch/381/probe-class-check.py PROBE_PLANES=120 PROBE_WALK=unset PYTHONHASHSEED=unset
+[   193.0 s] the split's first lift
+[   193.7 s] 120 planes registered
+[   202.0 s] the covering: 3 flags
+[RESULT] planes=119 comparisons=357 agreements=357 wall=204.9 s rss=1337.5 MiB
+[peakrss] probe-class-check: child waited=0 shell_code=0 samples=104
+[peakrss] peak tree RSS      : 1341 MiB
+[peakrss] low-water MemAvail : 12243 MiB
+[peakrss] peak single VmHWM  : 1341 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     1338 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   run.sh                        2 MiB peak
+[peakrss]   t=   206.1s procs=  2 rss=  1341 MiB hwm=  1341 MiB avail= 13243 MiB
+[peakrss]   t=   204.1s procs=  2 rss=  1328 MiB hwm=  1328 MiB avail= 13251 MiB
+[peakrss]   t=   200.1s procs=  2 rss=  1312 MiB hwm=  1312 MiB avail= 13264 MiB
+[peakrss]   t=   202.1s procs=  2 rss=  1312 MiB hwm=  1312 MiB avail= 13263 MiB
+[peakrss]   t=   198.1s procs=  2 rss=  1311 MiB hwm=  1311 MiB avail= 12882 MiB
+# launcher exit: 0
