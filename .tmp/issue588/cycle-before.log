@@ -1,0 +1,44 @@
+# tree: 1c6b7b71e470ad78e23ebd9a4be09cab6297a9be
+# status: ?? results/issue588-the-tower-and-where-the-retention-is.md 
+# port: 991b88b095a42a1e3679569ea42328c900c120f6
+# load: 0.52 0.87 0.72
+# program: .scratch/588/probe-588-cycle.py PROBE_PLANES=unset PROBE_PHASE=unset PYTHONHASHSEED=0
+[probe] a rank-one lattice: tracked {'a rank-one lattice': True, 'module_generating_set': True} alive after the drop True (gc.collect() found 226)
+  [probe] its type (<class 'sage_extensions.categories.modules.framed.framed_free_modules.OwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType'>, <class 'sage_extensions.categories.modules.framed.framed_free_modules.OwnedJoinCategory.parent_class[_SparseFreeModuleParent]'>, <class 'sage_extensions.categories.modules.framed.formed.form_modules.FreeFormModules.FinitelyGenerated.ParentMethods'>, <class 'sage_extensions.categories.lattices.Lattices.ParentMethods'>)
+[probe] U: tracked {'U': True, 'module_generating_set': True} alive after the drop True (gc.collect() found 147)
+  [probe] its type (<class 'sage_extensions.categories.modules.framed.framed_free_modules.OwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType'>, <class 'sage_extensions.categories.modules.framed.framed_free_modules.OwnedJoinCategory.parent_class[_SparseFreeModuleParent]'>, <class 'sage_extensions.categories.lattices.EvenTwoElementaryLattices.ParentMethods'>, <class 'sage_extensions.categories.modules.framed.formed.form_modules.FreeFormModules.FinitelyGenerated.ParentMethods'>)
+[probe] a plane of T_Co: tracked {'a plane of T_Co': True, 'inclusion': True, 'module_generating_set': True} alive after the drop True (gc.collect() found 297)
+  [probe] its type (<class 'sage_extensions.categories.modules.framed.framed_free_modules.OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType'>, <class 'sage_extensions.categories.isotropic_parabolics.PrimitiveIsotropicSubobjects.ParentMethods'>, <class 'sage_extensions.categories.modules.framed.framed_free_modules.OwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType'>, <class 'sage_extensions.categories.modules.framed.framed_free_modules.OwnedJoinCategory.parent_class[_SparseFreeModuleParent]'>)
+[probe] the plane's bare module subobject: tracked {"the plane's bare module subobject": True, 'inclusion': True, 'module_generating_set': True} alive after the drop True (gc.collect() found 118)
+  [probe] its type (<class 'sage_extensions.categories.modules.framed.framed_free_modules.OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType'>, <class 'sage_extensions.categories.isotropic_parabolics.PrimitiveIsotropicSubobjects.ParentMethods'>, <class 'sage_extensions.categories.modules.framed.framed_free_modules.OwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType'>, <class 'sage_extensions.categories.modules.framed.framed_free_modules.OwnedJoinCategory.parent_class[_SparseFreeModuleParent]'>)
+Traceback (most recent call last):
+  File "sage/structure/category_object.pyx", line 858, in sage.structure.category_object.CategoryObject.getattr_from_category
+    return self._cached_methods[name]
+KeyError: 'gram'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/repos/sage-extensions/.scratch/588/probe-588-cycle.py", line 50, in <module>
+    specimen(lambda: holder.primary_form_tensor() if hasattr(holder, "primary_form_tensor") else holder.gram(), "T_Co's Gram")
+    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/repos/sage-extensions/.scratch/588/probe-588-cycle.py", line 16, in specimen
+    built = build()
+  File "/repos/sage-extensions/.scratch/588/probe-588-cycle.py", line 50, in <lambda>
+    specimen(lambda: holder.primary_form_tensor() if hasattr(holder, "primary_form_tensor") else holder.gram(), "T_Co's Gram")
+                                                                                                 ^^^^^^^^^^^
+  File "sage/structure/category_object.pyx", line 852, in sage.structure.category_object.CategoryObject.__getattr__
+    return self.getattr_from_category(name)
+  File "sage/structure/category_object.pyx", line 867, in sage.structure.category_object.CategoryObject.getattr_from_category
+    attr = getattr_from_other_class(self, cls, name)
+  File "sage/cpython/getattr.pyx", line 362, in sage.cpython.getattr.getattr_from_other_class
+    raise AttributeError(dummy_error_message)
+AttributeError: 'OwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType' object has no attribute 'gram'
+[peakrss] cycle-before: child waited=1 shell_code=1 samples=1
+[peakrss] peak tree RSS      : 1 MiB
+[peakrss] low-water MemAvail : 13842 MiB
+[peakrss] peak single VmHWM  : 1 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   run.sh                        1 MiB peak
+[peakrss]   t=     0.0s procs=  1 rss=     1 MiB hwm=     1 MiB avail= 13842 MiB
+# launcher exit: 1

@@ -1,0 +1,24 @@
+# tree: 6b8f2822869633f55ad8692f0225b344b6b75991
+# status:  M src/sage_extensions/categories/_lattice.py  M src/sage_extensions/categories/abstract_categories/mor_categories.py  M src/sage_extensions/categories/group/predicate_subgroups.py  M src/sage_extensions/categories/isotropic_orbits.py  M src/sage_extensions/categories/lattice_morphisms.py  M src/sage_extensions/categories/lattices.py ?? cycle.log ?? holders.log ?? launch.sh ?? life-after.log ?? probe-588-cycle.py ?? probe-588-holders.py ?? probe-588-life.py ?? probe-588-registries.py ?? probe-588-roots.py ?? registries-after.log ?? registries-deep.log ?? registries-deep2.log ?? registries-lattice.log ?? registries.log ?? roots-after.log 
+# port: 991b88b095a42a1e3679569ea42328c900c120f6
+# load: 1.44 0.65 0.55
+# program: probe-588-registries.py PROBE_PLANES=unset PROBE_PHASE=unset PYTHONHASHSEED=0
+[probe] the plane is alive after the drop: True
+[probe] its inclusion is alive after the drop: True
+
+[probe] registries holding the plane:
+  [holds] cached_function sage_extensions.categories._lattice._lattice_on_gram (cache CachedWeakValueDictionary): 4 entries, key 6 parts ['int', 'int', 'Modules.element_class[_CoordinateTensor]', 'NoneType', 'NoneType', 'NoneType']
+
+[probe] registries holding the plane's inclusion arrow:
+  [holds] cached_function sage_extensions.categories._lattice._lattice_on_gram (cache CachedWeakValueDictionary): 4 entries, key 6 parts ['int', 'int', 'Modules.element_class[_CoordinateTensor]', 'NoneType', 'NoneType', 'NoneType']
+[peakrss] registries-lattice: child waited=0 shell_code=0 samples=2
+[peakrss] peak tree RSS      : 277 MiB
+[peakrss] low-water MemAvail : 13673 MiB
+[peakrss] peak single VmHWM  : 277 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      273 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   run.sh                        2 MiB peak
+[peakrss]   t=     2.0s procs=  2 rss=   277 MiB hwm=   277 MiB avail= 13673 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     2 MiB hwm=     2 MiB avail= 13855 MiB
+# launcher exit: 0

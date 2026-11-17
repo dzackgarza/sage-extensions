@@ -1,0 +1,22 @@
+# tree: 6b8f2822869633f55ad8692f0225b344b6b75991
+# status:  M src/sage_extensions/categories/_lattice.py  M src/sage_extensions/categories/abstract_categories/mor_categories.py  M src/sage_extensions/categories/group/predicate_subgroups.py  M src/sage_extensions/categories/isotropic_orbits.py  M src/sage_extensions/categories/lattice_morphisms.py  M src/sage_extensions/categories/lattices.py ?? cycle.log ?? external-plane.log ?? holders.log ?? keyhold-lattice.log ?? launch.sh ?? life-after.log ?? probe-588-cycle.py ?? probe-588-external.py ?? probe-588-holders.py ?? probe-588-keyhold.py ?? probe-588-life.py ?? probe-588-registries.py ?? probe-588-roots.py ?? registries-after.log ?? registries-deep.log ?? registries-deep2.log ?? registries-lattice.log ?? registries.log ?? roots-after.log 
+# port: 991b88b095a42a1e3679569ea42328c900c120f6
+# load: 0.86 0.60 0.53
+# program: probe-588-keyhold.py PROBE_PLANES=unset PROBE_PHASE=unset PYTHONHASHSEED=0
+[probe] a rank-one lattice: alive after the drop True
+
+[probe] a rank-one lattice:
+  [reg] _lattice_on_gram: 4 entries, cache CachedWeakValueDictionary, specimen as key component 0, reachable from a key 0, as value 1
+  [reg] _lattice_subobject_spanning: 0 entries, cache CachedWeakValueDictionary, specimen as key component 0, reachable from a key 0, as value 0
+  [reg] _primitive_isotropic_subobject: 0 entries, cache CachedWeakValueDictionary, specimen as key component 0, reachable from a key 0, as value 0
+  [reg] _lattice_mor: 0 entries, cache CachedWeakValueDictionary, specimen as key component 0, reachable from a key 0, as value 0
+  [reg] _lattice_embedding_mor: 0 entries, cache CachedWeakValueDictionary, specimen as key component 0, reachable from a key 0, as value 0
+  [reg] _lattice_isometry_mor: 0 entries, cache CachedWeakValueDictionary, specimen as key component 0, reachable from a key 0, as value 0
+[peakrss] keyhold-lattice: child waited=0 shell_code=0 samples=1
+[peakrss] peak tree RSS      : 1 MiB
+[peakrss] low-water MemAvail : 13837 MiB
+[peakrss] peak single VmHWM  : 1 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   run.sh                        1 MiB peak
+[peakrss]   t=     0.0s procs=  1 rss=     1 MiB hwm=     1 MiB avail= 13837 MiB
+# launcher exit: 0

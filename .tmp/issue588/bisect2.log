@@ -1,0 +1,24 @@
+# tree: 6b8f2822869633f55ad8692f0225b344b6b75991
+# status:  M src/sage_extensions/categories/_lattice.py  M src/sage_extensions/categories/abstract_categories/mor_categories.py  M src/sage_extensions/categories/group/predicate_subgroups.py  M src/sage_extensions/categories/isotropic_orbits.py  M src/sage_extensions/categories/lattice_morphisms.py  M src/sage_extensions/categories/lattices.py  M src/sage_extensions/categories/orthogonal_quotients.py ?? bisect1.log ?? bisect2.log ?? cycle.log ?? cycle2.log ?? external-plane.log ?? holders.log ?? keyhold-lattice.log ?? launch.sh ?? life-after.log ?? life-before.log ?? probe-588-cycle.py ?? probe-588-external.py ?? probe-588-holders.py ?? probe-588-keyhold.py ?? probe-588-life.py ?? probe-588-registries.py ?? probe-588-repro.py ?? probe-588-roots.py ?? probe-588-smoke-git.py ?? registries-after.log ?? registries-deep.log ?? registries-deep2.log ?? registries-lattice.log ?? registries.log ?? repro.log ?? roots-after.log ?? smoke-git.log 
+# port: 991b88b095a42a1e3679569ea42328c900c120f6
+# load: 0.54 0.47 0.48
+# program: probe-588-repro.py PROBE_PLANES=unset PROBE_PHASE=unset PYTHONHASHSEED=0
+[probe] the T_Co planes are dropped
+[probe] the ambient group's selected generators are decided: True
+[probe] generators: 302
+[probe] line cusps: 3
+[probe] plane cusps: 2
+[peakrss] bisect2: child waited=0 shell_code=0 samples=8
+[peakrss] peak tree RSS      : 529 MiB
+[peakrss] low-water MemAvail : 13431 MiB
+[peakrss] peak single VmHWM  : 529 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      525 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   run.sh                        2 MiB peak
+[peakrss]   t=    14.0s procs=  2 rss=   529 MiB hwm=   529 MiB avail= 13431 MiB
+[peakrss]   t=    12.0s procs=  2 rss=   517 MiB hwm=   517 MiB avail= 13438 MiB
+[peakrss]   t=    10.0s procs=  2 rss=   497 MiB hwm=   497 MiB avail= 13457 MiB
+[peakrss]   t=     8.0s procs=  2 rss=   486 MiB hwm=   486 MiB avail= 13462 MiB
+[peakrss]   t=     6.0s procs=  2 rss=   473 MiB hwm=   473 MiB avail= 13474 MiB
+# launcher exit: 0

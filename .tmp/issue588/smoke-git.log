@@ -1,0 +1,16 @@
+# tree: 6b8f2822869633f55ad8692f0225b344b6b75991
+# status:  M src/sage_extensions/categories/_lattice.py  M src/sage_extensions/categories/abstract_categories/mor_categories.py  M src/sage_extensions/categories/group/predicate_subgroups.py  M src/sage_extensions/categories/isotropic_orbits.py  M src/sage_extensions/categories/lattice_morphisms.py  M src/sage_extensions/categories/lattices.py  M src/sage_extensions/categories/orthogonal_quotients.py ?? cycle.log ?? cycle2.log ?? external-plane.log ?? holders.log ?? keyhold-lattice.log ?? launch.sh ?? life-after.log ?? probe-588-cycle.py ?? probe-588-external.py ?? probe-588-holders.py ?? probe-588-keyhold.py ?? probe-588-life.py ?? probe-588-registries.py ?? probe-588-roots.py ?? probe-588-smoke-git.py ?? registries-after.log ?? registries-deep.log ?? registries-deep2.log ?? registries-lattice.log ?? registries.log ?? roots-after.log ?? smoke-git.log 
+# port: 991b88b095a42a1e3679569ea42328c900c120f6
+# load: 0.24 0.45 0.49
+# program: probe-588-smoke-git.py PROBE_PLANES=unset PROBE_PHASE=unset PYTHONHASHSEED=0
+[smoke] module /repos/sage-extensions/src/sage_extensions/__init__.py
+CompletedProcess(args=('git', '-C', '/repos/sage-extensions', 'rev-parse', 'HEAD'), returncode=0, stdout='6b8f2822869633f55ad8692f0225b344b6b75991\n', stderr='')
+[smoke] current_commit 6b8f2822869633f55ad8692f0225b344b6b75991
+[peakrss] smoke-git: child waited=0 shell_code=0 samples=1
+[peakrss] peak tree RSS      : 1 MiB
+[peakrss] low-water MemAvail : 13861 MiB
+[peakrss] peak single VmHWM  : 1 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   run.sh                        2 MiB peak
+[peakrss]   t=     0.0s procs=  1 rss=     1 MiB hwm=     1 MiB avail= 13861 MiB
+# launcher exit: 0

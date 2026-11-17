@@ -1,0 +1,65 @@
+# tree: 6b8f2822869633f55ad8692f0225b344b6b75991
+# status:  M src/sage_extensions/categories/_lattice.py  M src/sage_extensions/categories/abstract_categories/mor_categories.py  M src/sage_extensions/categories/group/predicate_subgroups.py  M src/sage_extensions/categories/isotropic_orbits.py  M src/sage_extensions/categories/lattice_morphisms.py  M src/sage_extensions/categories/lattices.py ?? holders.log ?? launch.sh ?? life-after.log ?? probe-588-holders.py ?? probe-588-life.py ?? probe-588-registries.py ?? probe-588-roots.py ?? registries-after.log ?? registries.log ?? roots-after.log 
+# port: 991b88b095a42a1e3679569ea42328c900c120f6
+# load: 0.31 0.30 0.43
+# program: probe-588-roots.py PROBE_PLANES=unset PROBE_PHASE=unset PYTHONHASHSEED=0
+[probe] alive after the drop: True
+[probe]   plane: <- tuple(16) owned by ['?']
+[probe]   plane: <- tuple(16) owned by ['?']
+[probe]   plane: <- dict(15) attrs=['_preamble_gram_tensor', '_module_generating_set', '_preamble_form'] keys=[] owned by ['OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent]']
+[probe]   plane: <- method: '<bound method _SparseFreeModuleParent._element_constructor_ '
+[probe]   plane:   <- OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType: 'Integral lattice of rank 2 and signature (0, 0)'
+[probe]   plane: <- _ModuleScalarAction: 'Left action by Integer Ring on Integral lattice of rank 2 an'
+[probe]   plane: <- _ModuleScalarAction: 'Right action by Integer Ring on Integral lattice of rank 2 a'
+[probe]   plane: <- CachedMethodCallerNoArgs: 'Cached version of <function Objects.ParentMethods._selected_'
+[probe]   plane: <- CachedMethodCallerNoArgs: 'Cached version of <function ModuleSubobjects.ParentMethods.i'
+[probe]   plane: <- dict(16) attrs=['_family', '_end_family', '_aut_family'] keys=[] owned by ['OwnedLatticeEmbeddingMor_with_category_with_category']
+[probe]   plane: <- tuple(3) owned by ['?']
+[probe]   plane: <- cell: '<cell at 0x7d2ae2cf22c0: OwnedOwnedJoinCategory.parent_class'
+[probe]   plane:   <- tuple(2) owned by ['function']
+[probe]   plane:   <- tuple(5) owned by ['function']
+[probe]   plane:   <- tuple(4) owned by ['function']
+[probe]   plane: <- method: '<bound method _SparseFreeModuleParent._basis_element of Inte'
+[probe]   plane:   <- cell: '<cell at 0x7d2ae2bba8f0: method object at 0x7d2ae2c1b140>'
+[probe]   plane: <- cell: '<cell at 0x7d2ae2cf2620: OwnedOwnedJoinCategory.parent_class'
+[probe]   plane:   <- tuple(1) owned by ['function']
+[probe]   plane: <- dict(8) attrs=['_family', '_end_family', '_aut_family'] keys=[] owned by ['FixedRestrictedMorCategory_with_category']
+[probe]   plane: <- dict(8) attrs=['_family', '_end_family', '_aut_family'] keys=[] owned by ['FixedRestrictedMorCategory_with_category']
+[probe]   plane: <- tuple(3) owned by ['?']
+[probe]   plane: <- tuple(3) owned by ['?']
+[probe]   plane: <- ConstantFunction: 'The constant function (...) -> Integral lattice of rank 2 an'
+[probe]   plane:   <- OwnedModuleMor_with_category_with_category.ArrowType: 'Generic morphism:\n  From: Integral lattice of rank 2 and sig'
+[probe]   plane: <- ConstantFunction: 'The constant function (...) -> Integral lattice of rank 2 an'
+[probe]   plane:   <- OwnedLatticeEmbeddingMor_with_category_with_category.ArrowType: 'Generic morphism:\n  From: Integral lattice of rank 2 and sig'
+[probe]   plane: <- ConstantFunction: 'The constant function (...) -> Integral lattice of rank 2 an'
+[probe]   plane:   <- OwnedModuleMor_with_category_with_category.ArrowType: 'Generic morphism:\n  From: Integral lattice of rank 2 and sig'
+[probe]   plane: <- CachedMethodCallerNoArgs: 'Cached version of <function ModuleSubobjects.ParentMethods.e'
+[probe]   plane: <- dict(13) attrs=['_family', '_end_family', '_aut_family'] keys=[] owned by ['OwnedLatticeMor_with_category_with_category']
+[probe]   plane: <- dict(18) attrs=['_selected_data_registry', '_preamble_base_ring', '_family'] keys=[] owned by ['OwnedModuleMor_with_category_with_category']
+[probe]   plane: <- tuple(3) owned by ['?']
+[probe]   plane: <- tuple(3) owned by ['?']
+[probe]   plane: <- tuple(1) owned by ['function']
+[probe]   plane: <- cell: '<cell at 0x7d2ae2bb8760: OwnedOwnedJoinCategory.parent_class'
+[probe]   plane:   <- tuple(1) owned by ['function']
+[probe]   plane: <- dict(13) attrs=['_family', '_end_family', '_aut_family'] keys=[] owned by ['OwnedFormedModuleMor_with_category_with_category']
+[probe]   plane: <- dict(13) attrs=['_family', '_end_family', '_aut_family'] keys=[] owned by ['OwnedSemilinearModuleMor_with_category_with_category']
+[probe]   plane: <- tuple(3) owned by ['?']
+[probe]   plane: <- tuple(3) owned by ['?']
+[probe]   plane: <- dict(15) attrs=['_preamble_base_ring', '_integer_action', '_family'] keys=[] owned by ['OwnedAdditiveMor_with_category_with_category']
+[probe]   plane: <- tuple(3) owned by ['?']
+[probe]   plane: <- dict(13) attrs=['_family', '_end_family', '_aut_family'] keys=[] owned by ['OwnedAdditiveMagmaMor_with_category_with_category']
+[probe]   plane: <- dict(13) attrs=['_family', '_end_family', '_aut_family'] keys=[] owned by ['OwnedAdditiveMonoidMor_with_category_with_category']
+[probe]   plane: <- tuple(3) owned by ['?']
+[probe]   plane: <- tuple(3) owned by ['?']
+[probe]   plane: <- dict(13) attrs=['_family', '_end_family', '_aut_family'] keys=[] owned by ['OwnedSetMorCategory_with_category_with_category']
+[probe]   plane: <- tuple(3) owned by ['?']
+[probe]   plane: <- dict(8) attrs=['_family', '_end_family', '_aut_family'] keys=[] owned by ['FixedMorCategory_with_category']
+[probe]   plane: <- tuple(3) owned by ['?']
+[peakrss] roots-after: child waited=0 shell_code=0 samples=1
+[peakrss] peak tree RSS      : 1 MiB
+[peakrss] low-water MemAvail : 13724 MiB
+[peakrss] peak single VmHWM  : 1 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   run.sh                        1 MiB peak
+[peakrss]   t=     0.0s procs=  1 rss=     1 MiB hwm=     1 MiB avail= 13724 MiB
+# launcher exit: 0

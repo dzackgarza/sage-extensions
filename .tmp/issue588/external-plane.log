@@ -1,0 +1,71 @@
+# tree: 6b8f2822869633f55ad8692f0225b344b6b75991
+# status:  M src/sage_extensions/categories/_lattice.py  M src/sage_extensions/categories/abstract_categories/mor_categories.py  M src/sage_extensions/categories/group/predicate_subgroups.py  M src/sage_extensions/categories/isotropic_orbits.py  M src/sage_extensions/categories/lattice_morphisms.py  M src/sage_extensions/categories/lattices.py ?? cycle.log ?? external-plane.log ?? holders.log ?? launch.sh ?? life-after.log ?? probe-588-cycle.py ?? probe-588-external.py ?? probe-588-holders.py ?? probe-588-life.py ?? probe-588-registries.py ?? probe-588-roots.py ?? registries-after.log ?? registries-deep.log ?? registries-deep2.log ?? registries-lattice.log ?? registries.log ?? roots-after.log 
+# port: 991b88b095a42a1e3679569ea42328c900c120f6
+# load: 1.12 0.62 0.54
+# program: probe-588-external.py PROBE_PLANES=unset PROBE_PHASE=unset PYTHONHASHSEED=0
+[probe] a plane of T_Co: alive after the drop True
+[probe] a plane of T_Co: its own closure holds 490585 objects
+[probe] a plane of T_Co: external objects the collector sees pointing in: 17450
+Traceback (most recent call last):
+  File "sage/matrix/matrix0.pyx", line 1891, in sage.matrix.matrix0.Matrix.change_ring
+    return self._change_ring(ring)
+  File "sage/matrix/matrix_integer_dense.pyx", line 5821, in sage.matrix.matrix_integer_dense.Matrix_integer_dense._change_ring
+    raise NotImplementedError
+NotImplementedError
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "sage/misc/cachefunc.pyx", line 1024, in sage.misc.cachefunc.CachedFunction.__call__
+    return self.cache[k]
+  File "sage/misc/weak_dict.pyx", line 699, in sage.misc.weak_dict.WeakValueDictionary.__getitem__
+    raise KeyError(k)
+KeyError: ((<class 'sage.matrix.matrix_space.MatrixSpace'>, Rational Field, 2, 2, False, <class 'sage.matrix.matrix_rational_dense.Matrix_rational_dense'>), ())
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/repos/sage-extensions/probe-588-external.py", line 79, in <module>
+    external_roots(survivor, label)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/repos/sage-extensions/probe-588-external.py", line 57, in external_roots
+    target = [describe(referent) for referent in gc.get_referents(obj) if id(referent) in inside][:2]
+              ~~~~~~~~^^^^^^^^^^
+  File "/repos/sage-extensions/probe-588-external.py", line 41, in describe
+    return f"{type(obj).__name__[:50]} of {module[:40]}: {str(obj)[:50]!r}"
+                                                          ~~~^^^^^
+  File "sage/structure/sage_object.pyx", line 220, in sage.structure.sage_object.SageObject.__repr__
+    return reprfunc()
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattices.py", line 10418, in _repr_
+    _signature = _signature_pair_of_gram(self.gram_tensor())
+  File "/repos/sage-extensions/src/sage_extensions/categories/_lattice.py", line 1773, in _signature_pair_of_gram
+    return _sylvester(gram)
+  File "/repos/sage-extensions/src/sage_extensions/categories/_lattice.py", line 1709, in _sylvester
+    engine_gram = _engine_component_matrix(gram).change_ring(field)
+  File "sage/matrix/matrix0.pyx", line 1893, in sage.matrix.matrix0.Matrix.change_ring
+    M = sage.matrix.matrix_space.MatrixSpace(ring, self._nrows, self._ncols, sparse=self.is_sparse())
+  File "sage/misc/classcall_metaclass.pyx", line 328, in sage.misc.classcall_metaclass.ClasscallMetaclass.__call__
+    return cls.classcall(cls, *args, **kwds)
+  File "/sage/.venv/lib/python3.14/site-packages/sage/matrix/matrix_space.py", line 851, in __classcall__
+    return super().__classcall__(cls, base_ring, nrows,
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+                                 ncols, sparse, matrix_cls, **kwds)
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "sage/misc/cachefunc.pyx", line 1030, in sage.misc.cachefunc.CachedFunction.__call__
+    self.cache[k] = w
+  File "sage/misc/weak_dict.pyx", line 539, in sage.misc.weak_dict.WeakValueDictionary.__setitem__
+    self._set_item(k, v)
+  File "sage/misc/weak_dict.pyx", line 1185, in sage.misc.weak_dict.CachedWeakValueDictionary._set_item
+    PyTuple_SetItem(<PyObject*>self.cache, self.cache_index, <PyObject*>v)
+SystemError: Objects/tupleobject.c:123: bad argument to internal function
+[peakrss] external-plane: child waited=1 shell_code=1 samples=2
+[peakrss] peak tree RSS      : 295 MiB
+[peakrss] low-water MemAvail : 13612 MiB
+[peakrss] peak single VmHWM  : 345 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      341 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   run.sh                        2 MiB peak
+[peakrss]   t=     2.0s procs=  2 rss=   295 MiB hwm=   345 MiB avail= 13612 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     1 MiB hwm=     1 MiB avail= 13860 MiB
+# launcher exit: 1

@@ -1,0 +1,48 @@
+# tree: 6b8f2822869633f55ad8692f0225b344b6b75991
+# status: ?? holders.log ?? launch.sh ?? probe-588-holders.py ?? probe-588-registries.py ?? registries.log 
+# port: 991b88b095a42a1e3679569ea42328c900c120f6
+# load: 0.56 0.58 0.56
+# program: probe-588-registries.py PROBE_PLANES=unset PROBE_PHASE=unset PYTHONHASHSEED=0
+[probe] the plane is alive after the drop: True
+[probe] its inclusion is alive after the drop: True
+
+[probe] registries holding the plane:
+  [holds] cached_function sage_extensions.categories._lattice._lattice_on_gram (cache NonpicklingDict): 3 entries, key 6 parts ['int', 'int', 'Modules.element_class[_CoordinateTensor]', 'NoneType', 'NoneType', 'NoneType']
+  [holds] cached_function sage_extensions.categories.lattice_morphisms._lattice_embedding_mor (cache NonpicklingDict): 1 entries, key 2 parts ['int', 'int']
+  [holds] cached_function sage_extensions.categories.lattices._lattice_subobject_spanning (cache NonpicklingDict): 1 entries, key 3 parts ['int', 'FiniteOrderedSets.parent_class', 'NoneType']
+  [holds] cached_function sage_extensions.categories.lattices.Lattices.ParentMethods.primitive_isotropic_subobject (cache NonpicklingDict): 1 entries, key 2 parts ['tuple', 'tuple']
+  [holds] category store SetMorCategoryConstruction_with_category._objects: 8 entries
+  [holds] category store _MorCategoryOf_with_category._objects: 6 entries
+  [holds] cached_method _cache__primitive_isotropic_subobject on OwnedJoinCategory.parent_class[_SparseFreeMo: 1 entries, key 2 parts ['tuple', 'tuple']
+  [holds] category store ModuleMorCategoryConstruction_with_category._objects: 3 entries
+  [holds] category store SemilinearModuleMorCategoryConstruction_with._objects: 3 entries
+  [holds] category store AdditiveGroups.AdditiveCommutative._MorCateg._objects: 3 entries
+  [holds] category store AdditiveGroups._MorCategory_with_category._objects: 3 entries
+  [holds] category store _MorCategoryOf_with_category._objects: 3 entries
+  [holds] category store AdditiveMagmas._MorCategory_with_category._objects: 3 entries
+  [holds] category store AdditiveMonoids._MorCategory_with_category._objects: 3 entries
+  [holds] category store AdditiveSemigroups._MorCategory_with_categor._objects: 3 entries
+  [holds] category store LatticeMonoCategoryConstruction_with_categor._objects: 1 entries
+  [holds] category store _MonoCategoryOf_with_category._objects: 1 entries
+  [holds] category store _MonoCategoryOf_with_category._objects: 1 entries
+  [holds] category store _MonoCategoryOf_with_category._objects: 1 entries
+  [holds] category store _MorCategoryOf_with_category._objects: 1 entries
+  [holds] category store FormedModuleMorCategoryConstruction_with_cat._objects: 1 entries
+  [holds] category store _MorCategoryOf_with_category._objects: 1 entries
+  [holds] category store _MorCategoryOf_with_category._objects: 1 entries
+  [holds] category store _MorCategoryOf_with_category._objects: 1 entries
+  [holds] category store _MorCategoryOf_with_category._objects: 1 entries
+  [holds] category store _MorCategoryOf_with_category._objects: 1 entries
+  [holds] category store FormedModuleMorCategoryConstruction_with_cat._objects: 1 entries
+  [holds] category store LatticeMorCategoryConstruction_with_category._objects: 1 entries
+
+[probe] registries holding the plane's inclusion arrow:
+  [none]
+[peakrss] registries: child waited=0 shell_code=0 samples=1
+[peakrss] peak tree RSS      : 0 MiB
+[peakrss] low-water MemAvail : 13419 MiB
+[peakrss] peak single VmHWM  : 0 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   run.sh                        0 MiB peak
+[peakrss]   t=     0.0s procs=  1 rss=     0 MiB hwm=     0 MiB avail= 13419 MiB
+# launcher exit: 0

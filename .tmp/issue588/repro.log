@@ -1,0 +1,109 @@
+# tree: 6b8f2822869633f55ad8692f0225b344b6b75991
+# status:  M src/sage_extensions/categories/_lattice.py  M src/sage_extensions/categories/abstract_categories/mor_categories.py  M src/sage_extensions/categories/group/predicate_subgroups.py  M src/sage_extensions/categories/isotropic_orbits.py  M src/sage_extensions/categories/lattice_morphisms.py  M src/sage_extensions/categories/lattices.py  M src/sage_extensions/categories/orthogonal_quotients.py ?? cycle.log ?? cycle2.log ?? external-plane.log ?? holders.log ?? keyhold-lattice.log ?? launch.sh ?? life-after.log ?? life-before.log ?? probe-588-cycle.py ?? probe-588-external.py ?? probe-588-holders.py ?? probe-588-keyhold.py ?? probe-588-life.py ?? probe-588-registries.py ?? probe-588-repro.py ?? probe-588-roots.py ?? probe-588-smoke-git.py ?? registries-after.log ?? registries-deep.log ?? registries-deep2.log ?? registries-lattice.log ?? registries.log ?? repro.log ?? roots-after.log ?? smoke-git.log 
+# port: 991b88b095a42a1e3679569ea42328c900c120f6
+# load: 0.30 0.42 0.47
+# program: probe-588-repro.py PROBE_PLANES=unset PROBE_PHASE=unset PYTHONHASHSEED=0
+[probe] the T_Co planes are dropped
+Traceback (most recent call last):
+  File "/repos/sage-extensions/probe-588-repro.py", line 30, in <module>
+    decision = group.has_selected_finite_group_generating_set()
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/groups.py", line 6025, in has_selected_finite_group_generating_set
+    self.selected_group_resolution()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 1682, in selected_group_resolution
+    return super().selected_group_resolution()
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/groups.py", line 6036, in selected_group_resolution
+    return self.selected_resolution(OwnedGroups())
+           ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/objects.py", line 383, in selected_resolution
+    resolution = selected.realize()
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/objects.py", line 116, in realize
+    return self._resolution_factory()
+           ~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 54, in resolution
+    augmentation = generating_morphism(subgroup)
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 1624, in <lambda>
+    self, lambda preimage: preimage.schreier_generating_morphism()
+                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 1652, in schreier_generating_morphism
+    return self.coset_space(generators=generators).schreier_generating_morphism()
+           ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 1642, in coset_space
+    return _preimage_coset_space(
+        self, self.preimage_morphism(), self.target_subgroup(), generators
+    )
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 78, in _preimage_coset_space
+    subgroup, morphism, target, _free_cover(subgroup.supergroup(), generators),
+                                ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 69, in _free_cover
+    return ambient.selected_group_resolution().augmentation()
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/groups.py", line 6036, in selected_group_resolution
+    return self.selected_resolution(OwnedGroups())
+           ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/objects.py", line 383, in selected_resolution
+    resolution = selected.realize()
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/objects.py", line 116, in realize
+    return self._resolution_factory()
+           ~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/groups.py", line 1198, in selected_resolution
+    generators = generating_set()
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/arrow_categories.py", line 2475, in <lambda>
+    lambda: self.core_category().base_category()._core_automorphism_generators(self)
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattices.py", line 2812, in _core_automorphism_generators
+    return core_mor._computed_group_generators()
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "sage/misc/cachefunc.pyx", line 2328, in sage.misc.cachefunc.CachedMethodCallerNoArgs.__call__
+    self.cache = f(self._instance)
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py", line 4712, in _computed_group_generators
+    for generator in automorphism_group_generators(category, lattice)
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "/work/src/sage_indefinite_port/indefinite/marked_lattices.py", line 111, in automorphism_group_generators
+    generators = RECURSION.orthogonal_group_generators(marked)
+  File "/work/src/sage_indefinite_port/indefinite/recursive.py", line 834, in orthogonal_group_generators
+    generators = self._generation_step(profile.signed_view)
+  File "/work/src/sage_indefinite_port/indefinite/recursive.py", line 849, in _generation_step
+    transporters = tuple(
+                   ^^^^^
+  File "/work/src/sage_indefinite_port/indefinite/recursive.py", line 850, in <genexpr>
+    isometry for candidate in model.covering_vectors(int(vector.q()), int(vector.content())) if (isometry := self.pointed_isometry(vector, candidate)) is not None
+                                                                                                             ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "/work/src/sage_indefinite_port/indefinite/recursive.py", line 1603, in pointed_isometry
+    rational_transport = reduced.extension_across(source, target)
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py", line 1455, in extension_across
+    target_embedding = target_inclusion.base_change(fraction_map)
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/framed/formed/form_modules.py", line 552, in base_change
+    return FormModules(ring_map.codomain()).Mor(changed_source, changed_target)(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        (module_map, value_map)
+        ^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py", line 1075, in __call__
+    return OwnedMor.__call__(self, *args, **kwargs)
+           ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_foundation.py", line 61, in __call__
+    return self._element_constructor_(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/framed/formed/form_modules.py", line 962, in _element_constructor_
+    morphism = self.element_class(self, module_morphism, value_morphism)
+  File "sage/misc/classcall_metaclass.pyx", line 331, in sage.misc.classcall_metaclass.ClasscallMetaclass.__call__
+    return (<PyTypeObject*>type).tp_call(cls, args, kwds)
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/framed/formed/form_modules.py", line 443, in __init__
+    raise ValueError(
+    ...<2 lines>...
+    )
+ValueError: the value map Generic endomorphism of Integer Ring must end at the value module Free module on {[0]} over Fraction Field of Integer Ring of Lattice of rank 5 and signature (2, 3), but ends at Integer Ring
+[peakrss] repro: child waited=1 shell_code=1 samples=2
+[peakrss] peak tree RSS      : 420 MiB
+[peakrss] low-water MemAvail : 13522 MiB
+[peakrss] peak single VmHWM  : 420 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      417 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   run.sh                        2 MiB peak
+[peakrss]   t=     2.0s procs=  2 rss=   420 MiB hwm=   420 MiB avail= 13522 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     1 MiB hwm=     1 MiB avail= 13852 MiB
+# launcher exit: 1

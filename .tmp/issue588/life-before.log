@@ -1,0 +1,40 @@
+# tree: 1c6b7b71e470ad78e23ebd9a4be09cab6297a9be
+# status: 
+# port: 991b88b095a42a1e3679569ea42328c900c120f6
+# load: 0.21 0.42 0.48
+# program: .scratch/588/probe-588-life.py PROBE_PLANES=unset PROBE_PHASE=unset PYTHONHASHSEED=0
+[probe] the cusp's rank: 2
+[probe] the cusp exposes span(): False
+[probe] the rebuilt representative is the same subobject: True
+[probe] its span key equals the plane's: True
+[probe] the rebuilt representative is primitive: True
+[probe] the rebuilt representative is totally isotropic: True
+[probe] its rank: 2
+[probe] one named plane is alive after the drop: True
+[probe] planes alive after being named by a cusp and dropped: 20 of 20
+
+[probe] U+U(2)+<-2>: line cusps 3, plane cusps 2
+  [plane cusp 0] span (127844237288528, ((0, 1, 0, 0, 0), (0, 0, 0, 1, 0))) primitive True totally isotropic True rank 2
+  [plane cusp 1] span (127844237288528, ((0, 1, 0, 0, 0), (0, 0, 1, 0, 0))) primitive True totally isotropic True rank 2
+  [line cusp 0] span (127844237288528, ((0, 1, 0, 0, 0),)) primitive True totally isotropic True
+  [line cusp 1] span (127844237288528, ((0, 0, 1, 0, 0),)) primitive True totally isotropic True
+  [line cusp 2] span (127844237288528, ((0, 0, 0, 1, 0),)) primitive True totally isotropic True
+[probe] the incidence holds 4 certificates
+  [edge] line (127844237288528, ((0, 1, 0, 0, 0),)) plane (127844237288528, ((0, 1, 0, 0, 0), (0, 0, 0, 1, 0)))
+  [edge] line (127844237288528, ((0, 0, 0, 1, 0),)) plane (127844237288528, ((0, 1, 0, 0, 0), (0, 0, 0, 1, 0)))
+  [edge] line (127844237288528, ((0, 1, 0, 0, 0),)) plane (127844237288528, ((0, 1, 0, 0, 0), (0, 0, 1, 0, 0)))
+  [edge] line (127844237288528, ((0, 0, 1, 0, 0),)) plane (127844237288528, ((0, 1, 0, 0, 0), (0, 0, 1, 0, 0)))
+[peakrss] life-before: child waited=0 shell_code=0 samples=7
+[peakrss] peak tree RSS      : 533 MiB
+[peakrss] low-water MemAvail : 13435 MiB
+[peakrss] peak single VmHWM  : 533 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      530 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   run.sh                        1 MiB peak
+[peakrss]   t=    12.0s procs=  2 rss=   533 MiB hwm=   533 MiB avail= 13435 MiB
+[peakrss]   t=    10.0s procs=  2 rss=   509 MiB hwm=   509 MiB avail= 13456 MiB
+[peakrss]   t=     8.0s procs=  2 rss=   495 MiB hwm=   495 MiB avail= 13467 MiB
+[peakrss]   t=     6.0s procs=  2 rss=   487 MiB hwm=   487 MiB avail= 13475 MiB
+[peakrss]   t=     4.0s procs=  2 rss=   478 MiB hwm=   478 MiB avail= 13483 MiB
+# launcher exit: 0

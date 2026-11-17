@@ -1,0 +1,178 @@
+# tree: 6b8f2822869633f55ad8692f0225b344b6b75991
+# status: ?? holders.log ?? launch.sh ?? probe-588-holders.py 
+# port: 991b88b095a42a1e3679569ea42328c900c120f6
+# load: 0.39 0.60 0.56
+# program: probe-588-holders.py PROBE_PLANES=unset PROBE_PHASE=unset PYTHONHASHSEED=0
+[probe] module: /repos/sage-extensions/src/sage_extensions/__init__.py
+[probe] registries before:
+  [reg] sage_extensions.categories._lattice._lattice_on_gram: 0
+  [reg] sage_extensions.categories.lattices._lattice_subobject_spanning: 0
+  [reg] sage_extensions.categories.lattices._lattice_subobject_on_basis: no .cache
+  [reg] sage_extensions.categories.lattice_morphisms._lattice_mor: 0
+  [reg] sage_extensions.categories.lattice_morphisms._lattice_embedding_mor: 0
+  [reg] sage_extensions.categories.lattice_morphisms._lattice_isometry_mor: 0
+  [reg] sage_extensions.categories.abstract_categories.mor_categories._category_packet: 4
+
+[probe] a rank-one lattice: alive after the drop and a collection: True
+[probe] a rank-one lattice <- dict of 1 keys ['(132139181355088, 132137791941200, Type (0, 2) tensor in ((I']: CachedFunction
+[probe] a rank-one lattice <- dict of 12 keys ['_preamble_gram_tensor', '_module_generating_set']: OwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType
+[probe] a rank-one lattice <- OwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType
+[probe] a rank-one lattice <- no owner found
+[probe] a rank-one lattice <- no owner found
+[probe] a rank-one lattice <- no owner found
+[probe] a rank-one lattice <- no owner found
+[probe] a rank-one lattice <- cell
+[probe] a rank-one lattice <- no owner found
+
+[probe] an element of T_Co: alive after the drop and a collection: True
+
+[probe] a plane of T_Co: alive after the drop and a collection: True
+[probe] a plane of T_Co <- dict of 1 keys ['(132139180152912, {2*e_h - e_a1 - e_a2 - 2*e_a3 - 2*e_a4 - 2']: CachedFunction
+[probe] a plane of T_Co <- dict of 1 keys ['((2*e_h - e_a1 - e_a2 - 2*e_a3 - 2*e_a4 - 2*e_a5 - 2*e_a6 - ']: registry ? on OwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType
+[probe] a plane of T_Co <- dict of 15 keys ['_preamble_gram_tensor', '_module_generating_set']: OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType
+[probe] a plane of T_Co <- OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType
+[probe] a plane of T_Co <- no owner found
+[probe] a plane of T_Co <- no owner found
+[probe] a plane of T_Co <- no owner found
+[probe] a plane of T_Co <- no owner found
+[probe] a plane of T_Co <- dict of 16 keys ['_family', '_end_family']: OwnedLatticeEmbeddingMor_with_category_with_category
+[probe] a plane of T_Co <- dict of 18 keys ['_selected_data_registry', '_preamble_base_ring']: OwnedModuleMor_with_category_with_category
+[probe] a plane of T_Co <- dict of 13 keys ['_family', '_end_family']: OwnedSemilinearModuleMor_with_category_with_category
+[probe] a plane of T_Co <- dict of 15 keys ['_preamble_base_ring', '_integer_action']: OwnedAdditiveMor_with_category_with_category
+[probe] a plane of T_Co <- dict of 13 keys ['_family', '_end_family']: OwnedAdditiveMonoidMor_with_category_with_category
+[probe] a plane of T_Co <- dict of 13 keys ['_family', '_end_family']: OwnedAdditiveMagmaMor_with_category_with_category
+[probe] a plane of T_Co <- dict of 13 keys ['_family', '_end_family']: OwnedSetMorCategory_with_category_with_category
+[probe] a plane of T_Co <- 3-tuple: no owner found
+[probe] a plane of T_Co <- 3-tuple: no owner found
+[probe] a plane of T_Co <- 3-tuple: no owner found
+[probe] a plane of T_Co <- 3-tuple: no owner found
+[probe] a plane of T_Co <- 3-tuple: no owner found
+[probe] a plane of T_Co <- 3-tuple: no owner found
+[probe] a plane of T_Co <- no owner found
+[probe] a plane of T_Co <- cell
+[probe] a plane of T_Co <- no owner found
+[probe] a plane of T_Co <- dict of 8 keys ['_family', '_end_family']: FixedMorCategory_with_category
+[probe] a plane of T_Co <- dict of 8 keys ['_family', '_end_family']: FixedRestrictedMorCategory_with_category
+[probe] a plane of T_Co <- dict of 8 keys ['_family', '_end_family']: FixedRestrictedMorCategory_with_category
+[probe] a plane of T_Co <- OwnedModuleMor_with_category_with_category.ArrowType
+[probe] a plane of T_Co <- OwnedLatticeEmbeddingMor_with_category_with_category.ArrowType
+[probe] a plane of T_Co <- OwnedModuleMor_with_category_with_category.ArrowType
+[probe] a plane of T_Co <- 3-tuple: no owner found
+[probe] a plane of T_Co <- 3-tuple: no owner found
+[probe] a plane of T_Co <- 3-tuple: no owner found
+[probe] a plane of T_Co <- no owner found
+[probe] a plane of T_Co <- 3-tuple: no owner found
+[probe] a plane of T_Co <- dict of 13 keys ['_family', '_end_family']: OwnedFormedModuleMor_with_category_with_category
+[probe] a plane of T_Co <- dict of 13 keys ['_family', '_end_family']: OwnedLatticeMor_with_category_with_category
+[probe] a plane of T_Co <- 3-tuple: no owner found
+[probe] a plane of T_Co <- 3-tuple: no owner found
+[probe] a plane of T_Co <- 1-tuple: function
+[probe] a plane of T_Co <- no owner found
+[probe] a plane of T_Co: its inclusion survives too: True
+[probe] a plane of T_Co.inclusion <- no owner found
+[probe] a plane of T_Co.inclusion <- no owner found
+[probe] a plane of T_Co.inclusion <- no owner found
+[probe] a plane of T_Co.inclusion <- dict of 19 keys ['_scalar_map', '_restricted_codomain']: OwnedModuleMor_with_category_with_category.ArrowType
+[probe] a plane of T_Co.inclusion <- 1-tuple: no owner found
+[probe] a plane of T_Co.inclusion <- no owner found
+
+[probe] a line of T_Co: alive after the drop and a collection: True
+[probe] a line of T_Co <- dict of 2 keys ['(132139180152912, {2*e_h - e_a1 - e_a2 - 2*e_a3 - 2*e_a4 - 2', '(132139180152912, {2*e_h - e_a1 - e_a2 - 2*e_a3 - 2*e_a4 - 2']: CachedFunction
+[probe] a line of T_Co <- dict of 2 keys ['((2*e_h - e_a1 - e_a2 - 2*e_a3 - 2*e_a4 - 2*e_a5 - 2*e_a6 - ', '((2*e_h - e_a1 - e_a2 - 2*e_a3 - 2*e_a4 - 2*e_a5 - 2*e_a6 - ']: registry ? on OwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType
+[probe] a line of T_Co <- dict of 15 keys ['_preamble_gram_tensor', '_module_generating_set']: OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType
+[probe] a line of T_Co <- OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType
+[probe] a line of T_Co <- no owner found
+[probe] a line of T_Co <- no owner found
+[probe] a line of T_Co <- no owner found
+[probe] a line of T_Co <- no owner found
+[probe] a line of T_Co <- dict of 15 keys ['_family', '_end_family']: OwnedLatticeEmbeddingMor_with_category_with_category
+[probe] a line of T_Co <- dict of 17 keys ['_selected_data_registry', '_preamble_base_ring']: OwnedModuleMor_with_category_with_category
+[probe] a line of T_Co <- OwnedModuleMor_with_category_with_category.ArrowType
+[probe] a line of T_Co <- OwnedLatticeEmbeddingMor_with_category_with_category.ArrowType
+[probe] a line of T_Co <- OwnedModuleMor_with_category_with_category.ArrowType
+[probe] a line of T_Co <- no owner found
+[probe] a line of T_Co <- 3-tuple: no owner found
+[probe] a line of T_Co <- 3-tuple: no owner found
+[probe] a line of T_Co <- 1-tuple: function
+[probe] a line of T_Co <- no owner found
+[probe] a line of T_Co <- no owner found
+[probe] a line of T_Co <- cell
+[probe] a line of T_Co <- no owner found
+[probe] a line of T_Co: its inclusion survives too: True
+[probe] a line of T_Co.inclusion <- no owner found
+[probe] a line of T_Co.inclusion <- no owner found
+[probe] a line of T_Co.inclusion <- no owner found
+[probe] a line of T_Co.inclusion <- dict of 19 keys ['_scalar_map', '_restricted_codomain']: OwnedModuleMor_with_category_with_category.ArrowType
+[probe] a line of T_Co.inclusion <- 1-tuple: no owner found
+[probe] a line of T_Co.inclusion <- no owner found
+
+[probe] registries after:
+  [reg] sage_extensions.categories._lattice._lattice_on_gram: 4
+  [reg] sage_extensions.categories.lattices._lattice_subobject_spanning: 2
+  [reg] sage_extensions.categories.lattices._lattice_subobject_on_basis: no .cache
+  [reg] sage_extensions.categories.lattice_morphisms._lattice_mor: 0
+  [reg] sage_extensions.categories.lattice_morphisms._lattice_embedding_mor: 2
+  [reg] sage_extensions.categories.lattice_morphisms._lattice_isometry_mor: 0
+  [reg] sage_extensions.categories.abstract_categories.mor_categories._category_packet: 29
+
+[probe] _MorCategoryOf._objects of every live family:
+  [family] base Sets_with_category role None _objects 13 _resolved_endpoint_categories 13
+  [family] base Objects_with_category role None _objects 7 _resolved_endpoint_categories 7
+  [family] base Cat_with_category role None _objects 1 _resolved_endpoint_categories 0
+  [family] base _CoreCategory_with_category role None _objects 5 _resolved_endpoint_categories 5
+  [family] base Modules_with_category role None _objects 5 _resolved_endpoint_categories 5
+  [family] base ModulesOverCommutativeRings_with_category role None _objects 3 _resolved_endpoint_categories 3
+  [family] base AdditiveGroups.AdditiveCommutative_with_category role None _objects 3 _resolved_endpoint_categories 3
+  [family] base AdditiveGroups_with_category role None _objects 3 _resolved_endpoint_categories 3
+  [family] base AdditiveMagmas.AdditiveCommutative_with_category role None _objects 3 _resolved_endpoint_categories 3
+  [family] base AdditiveMagmas_with_category role None _objects 3 _resolved_endpoint_categories 3
+  [family] base AdditiveMonoids_with_category role None _objects 3 _resolved_endpoint_categories 3
+  [family] base AdditiveSemigroups_with_category role None _objects 3 _resolved_endpoint_categories 3
+  [family] base OwnedRings_with_category role None _objects 1 _resolved_endpoint_categories 1
+  [family] base OwnedSemirings_with_category role None _objects 1 _resolved_endpoint_categories 1
+  [family] base OwnedRngs_with_category role None _objects 1 _resolved_endpoint_categories 1
+  [family] base OwnedNonUnitalSemirings_with_category role None _objects 1 _resolved_endpoint_categories 1
+  [family] base Semigroups_with_category role None _objects 1 _resolved_endpoint_categories 1
+  [family] base OwnedJoinCategory_with_category role None _objects 1 _resolved_endpoint_categories 1
+  [family] base Magmas_with_category role None _objects 1 _resolved_endpoint_categories 1
+  [family] base Monoids_with_category role None _objects 1 _resolved_endpoint_categories 1
+  [family] base Magmas.Unital_with_category role None _objects 1 _resolved_endpoint_categories 1
+  [family] base Lattices_with_category role None _objects 2 _resolved_endpoint_categories 2
+  [family] base FreeFormModules_with_category role None _objects 1 _resolved_endpoint_categories 1
+  [family] base BilinearFormModules.Symmetric_with_category role None _objects 1 _resolved_endpoint_categories 1
+  [family] base BilinearFormModules_with_category role None _objects 1 _resolved_endpoint_categories 1
+  [family] base FormModules_with_category role None _objects 0 _resolved_endpoint_categories 0
+  [family] base Modules_with_category role None _objects 0 _resolved_endpoint_categories 0
+  [family] base PairingObjects_with_category role None _objects 0 _resolved_endpoint_categories 0
+  [family] base ModulesOverCommutativeRings_with_category role None _objects 0 _resolved_endpoint_categories 0
+  [family] base AdditiveGroups.AdditiveCommutative_with_category role None _objects 0 _resolved_endpoint_categories 0
+  [family] base AdditiveGroups_with_category role None _objects 0 _resolved_endpoint_categories 0
+  [family] base AdditiveMagmas.AdditiveCommutative_with_category role None _objects 0 _resolved_endpoint_categories 0
+  [family] base AdditiveMagmas_with_category role None _objects 0 _resolved_endpoint_categories 0
+  [family] base Sets_with_category role None _objects 0 _resolved_endpoint_categories 0
+  [family] base Objects_with_category role None _objects 0 _resolved_endpoint_categories 0
+  [family] base AdditiveMonoids_with_category role None _objects 0 _resolved_endpoint_categories 0
+  [family] base AdditiveSemigroups_with_category role None _objects 0 _resolved_endpoint_categories 0
+  [family] base FramedFreeModules_with_category role None _objects 0 _resolved_endpoint_categories 0
+  [family] base Modules.Free_with_category role None _objects 0 _resolved_endpoint_categories 0
+  [family] base Modules.Projective_with_category role None _objects 0 _resolved_endpoint_categories 0
+  [family] base FreeFormModules_with_category role None _objects 1 _resolved_endpoint_categories 1
+  [family] base FormModules_with_category role None _objects 1 _resolved_endpoint_categories 1
+  [family] base PairingObjects_with_category role None _objects 1 _resolved_endpoint_categories 1
+  [family] base FramedFreeModules_with_category role None _objects 1 _resolved_endpoint_categories 1
+  [family] base Modules.Free_with_category role None _objects 1 _resolved_endpoint_categories 1
+  [family] base Modules.Projective_with_category role None _objects 1 _resolved_endpoint_categories 1
+  [family] base BilinearFormModules.Symmetric_with_category role None _objects 1 _resolved_endpoint_categories 1
+  [family] base BilinearFormModules_with_category role None _objects 1 _resolved_endpoint_categories 1
+  [family] base Lattices_with_category role None _objects 1 _resolved_endpoint_categories 1
+[peakrss] holders: child waited=0 shell_code=0 samples=2
+[peakrss] peak tree RSS      : 297 MiB
+[peakrss] low-water MemAvail : 13406 MiB
+[peakrss] peak single VmHWM  : 297 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      294 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   run.sh                        2 MiB peak
+[peakrss]   t=     2.0s procs=  2 rss=   297 MiB hwm=   297 MiB avail= 13406 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     2 MiB hwm=     2 MiB avail= 13860 MiB
+# launcher exit: 0

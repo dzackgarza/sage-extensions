@@ -1,0 +1,607 @@
+diff --git a/src/sage_extensions/categories/_lattice.py b/src/sage_extensions/categories/_lattice.py
+index 662d7b3..836dbd3 100644
+--- a/src/sage_extensions/categories/_lattice.py
++++ b/src/sage_extensions/categories/_lattice.py
+@@ -30,7 +30,7 @@ from operator import index
+ 
+ from sage.arith.misc import factor
+ from sage.combinat.root_system.cartan_type import CartanType, CartanType_abstract
+-from sage.misc.cachefunc import cached_function, cached_method
++from sage.misc.cachefunc import cached_function, cached_method, weak_cached_function
+ from sage.misc.latex import latex
+ from sage.quadratic_forms.quadratic_form import QuadraticForm
+ from sage.rings.integer import Integer
+@@ -509,7 +509,8 @@ def _lattice_object(
+     )
+ 
+ 
+-@cached_function(
++@weak_cached_function(
++    cache=0,
+     key=lambda category, module, gram, names, root_system_type_name, axiom_categories=None: (
+         id(category),
+         id(module),
+diff --git a/src/sage_extensions/categories/abstract_categories/mor_categories.py b/src/sage_extensions/categories/abstract_categories/mor_categories.py
+index 3c74e81..0e49ad3 100644
+--- a/src/sage_extensions/categories/abstract_categories/mor_categories.py
++++ b/src/sage_extensions/categories/abstract_categories/mor_categories.py
+@@ -54,6 +54,7 @@ def _compose_operation_preserving_mor(left, right, fallback):
+ 
+ from types import NotImplementedType
+ from typing import TYPE_CHECKING, Any
++import weakref
+ 
+ from sage.categories.category import Category
+ from sage.categories.category import JoinCategory as SageJoinCategory
+@@ -2178,6 +2179,12 @@ class _MorCategoryOf(OwnedCategoryBase):
+         # Mor parent class from the endpoints.  Keep that endpoint cache on
+         # the common family object rather than relying on Sage category
+         # internals for it.
++        #
++        # The identity record is keyed by the endpoints' ``id``, and the Mor it
++        # names retains both endpoints: this is the record that makes one datum
++        # one object for the process.  The resolution record beside it is not
++        # part of that contract -- it only says why a construction was reused --
++        # so it holds its Mor weakly (see ``_record_resolution``).
+         self._objects = {}
+         self._resolved_endpoint_categories = {}
+         # The arrow types of this family's Mor objects, keyed by what they
+@@ -2260,6 +2267,42 @@ class _MorCategoryOf(OwnedCategoryBase):
+         self._objects[id(domain), id(codomain)] = value
+         return value
+ 
++    def _record_resolution(
++        self,
++        domain,
++        codomain,
++        result,
++        endpoint_categories,
++        declared_supers,
++        runtime_classes,
++    ):
++        r"""Record why ``result`` is this family's fixed Mor of these endpoints, weakly.
++
++        The record is what lets a second question at the same pair answer from
++        the first construction instead of repeating it, and it is kept here
++        beside the identity record rather than on the Mor: several families
++        select one Mor, and each family reads its own base category's
++        supercategories and its own endpoint types.
++
++        ``result`` is held only weakly, because it retains both endpoints -- so
++        an entry must not be what keeps a dropped endpoint pair alive.  The
++        endpoints are still named by the ``id`` pair, which is why a dead entry
++        has to be swept rather than left to accumulate: an entry whose result
++        is gone names nothing, and a later object at that address would read a
++        record that is not its own.
++        """
++        store = self._resolved_endpoint_categories
++        store[id(domain), id(codomain)] = (
++            *endpoint_categories,
++            declared_supers,
++            runtime_classes,
++            weakref.ref(result),
++        )
++        if len(store) > 2 * len(self._objects) + 32:
++            for key, record in list(store.items()):
++                if record[-1]() is None:
++                    del store[key]
++
+     def an_object(self) -> Category:
+         r"""The Mor of the base category's witness to itself."""
+         witness = self.base_category().an_object()
+@@ -2334,10 +2377,12 @@ class _MorCategoryOf(OwnedCategoryBase):
+                 previous_codomain,
+                 previous_supers,
+                 previous_runtime_classes,
+-                previous_result,
++                previous_reference,
+             ) = resolved
++            previous_result = previous_reference()
+             if (
+-                previous_domain is endpoint_categories[0]
++                previous_result is not None
++                and previous_domain is endpoint_categories[0]
+                 and previous_codomain is endpoint_categories[1]
+                 and previous_supers is declared_supers
+                 and previous_runtime_classes == runtime_classes
+@@ -2373,11 +2418,13 @@ class _MorCategoryOf(OwnedCategoryBase):
+                 else fixed_class(self, domain, codomain)
+             )
+             self._remember_between(domain, codomain, result)
+-            self._resolved_endpoint_categories[id(domain), id(codomain)] = (
+-                *endpoint_categories,
++            self._record_resolution(
++                domain,
++                codomain,
++                result,
++                endpoint_categories,
+                 declared_supers,
+                 runtime_classes,
+-                result,
+             )
+             return result
+         # What decides whether this category needs a Mor parent of its own is
+@@ -2449,11 +2496,13 @@ class _MorCategoryOf(OwnedCategoryBase):
+         self._remember_between(domain, codomain, result)
+         # Store the categories read before construction: if construction
+         # refined an endpoint, the next call must resolve the new declaration.
+-        self._resolved_endpoint_categories[id(domain), id(codomain)] = (
+-            *endpoint_categories,
++        self._record_resolution(
++            domain,
++            codomain,
++            result,
++            endpoint_categories,
+             declared_supers,
+             runtime_classes,
+-            result,
+         )
+         return result
+ 
+diff --git a/src/sage_extensions/categories/group/predicate_subgroups.py b/src/sage_extensions/categories/group/predicate_subgroups.py
+index 91e5a82..413b490 100644
+--- a/src/sage_extensions/categories/group/predicate_subgroups.py
++++ b/src/sage_extensions/categories/group/predicate_subgroups.py
+@@ -749,8 +749,19 @@ class PredicateSubgroups(OwnedParameterizedCategory):
+ 
+         @cached_method
+         def cusps(self, rank=1):
+-            r"""Return the retained primitive-isotropic cusp orbits of this subgroup and rank."""
++            r"""Return the retained primitive-isotropic cusp orbits of this subgroup and rank.
++
++            A cusp is named by its representative's span and its rank, so the
++            row reads the yielded orbit row rather than the gathered one: the
++            representative a cusp was built from is dropped before the next is
++            drawn, and what the row keeps per orbit is a span and not a
++            constructed subobject.  The row's count, its order and each cusp's
++            span are the orbit row's own.
++            """
+             from sage_extensions.categories.isotropic_orbits import _arithmetic_cusp
++            from sage_extensions.categories.orthogonal_quotients import (
++                _yield_subgroup_isotropic_orbit_representatives,
++            )
+             from sage_extensions.categories.sets.finite_ordered_sets import (
+                 finite_ordered_set,
+             )
+@@ -758,7 +769,9 @@ class PredicateSubgroups(OwnedParameterizedCategory):
+             return finite_ordered_set(
+                 tuple(
+                     _arithmetic_cusp(self, representative)
+-                    for representative in self.isotropic_orbit_representatives(rank)
++                    for representative in _yield_subgroup_isotropic_orbit_representatives(
++                        self, rank
++                    )
+                 )
+             )
+ 
+@@ -871,12 +884,8 @@ class PredicateSubgroups(OwnedParameterizedCategory):
+             # 189720 planes.  A term that is no representative -- the flag
+             # route's planes are not transported from a retained one -- keeps
+             # the witness search, which is the only statement available there.
+-            plane_cusp_by_span = {
+-                _span_key(cusp.representative()): cusp for cusp in plane_cusps
+-            }
+-            line_cusp_by_span = {
+-                _span_key(cusp.representative()): cusp for cusp in line_cusps
+-            }
++            plane_cusp_by_span = {cusp.span(): cusp for cusp in plane_cusps}
++            line_cusp_by_span = {cusp.span(): cusp for cusp in line_cusps}
+             identity = self.supergroup().one()
+ 
+             # A line of a plane is no representative of the line row, so its
+diff --git a/src/sage_extensions/categories/isotropic_orbits.py b/src/sage_extensions/categories/isotropic_orbits.py
+index d879dd0..67de132 100644
+--- a/src/sage_extensions/categories/isotropic_orbits.py
++++ b/src/sage_extensions/categories/isotropic_orbits.py
+@@ -822,15 +822,29 @@ class _ArithmeticCuspEngine:
+     The subgroup is part of the object.  Its stabilizer is therefore the
+     actual intersection ``Gamma cap P_I``, not the full parabolic in
+     ``O(L)``.  Membership retains an explicit transporter lying in ``Gamma``.
++
++    The orbit is named by its representative's *span*, not by a constructed
++    representative: a subobject of this library is a parent with its module,
++    its Gram, its category machinery and its inclusion, so a row that kept one
++    per orbit would keep a constructed parent per orbit for the process, and
++    ``T_{Co}``'s kernel plane row has 189720 orbits.  The span is the exact
++    name of the sublattice -- two subobjects of one ambient lattice span the
++    same sublattice exactly when their row Hermite forms there agree
++    (:func:`_span_key`) -- so two cusps are identified exactly when the
++    subobjects they name are equal, and no coarser invariant stands in for it.
++    :meth:`representative` builds the subobject from the span when a reader
++    asks, and what it builds is retained only while the reader retains it.
+     """
+ 
+-    def __init__(self, subgroup, representative, **rest) -> None:
+-        if subgroup.supergroup().domain() is not representative.ambient_lattice():
++    def __init__(self, subgroup, span, subobject_rank, **rest) -> None:
++        lattice = subgroup.supergroup().domain()
++        if span[0] != id(lattice):
+             raise ValueError(
+-                f"{representative} cannot represent a cusp of {subgroup}: the group acts on {subgroup.supergroup().domain()}, but {representative} lies in {representative.ambient_lattice()}"
++                f"the span {span!r} cannot represent a cusp of {subgroup}: the group acts on {lattice}, and the span's ambient lattice is another"
+             )
+         self._subgroup = subgroup
+-        self._representative = representative
++        self._span = span
++        self._subobject_rank = subobject_rank
+         super().__init__(facade=True, **rest)
+ 
+     def universe(self):
+@@ -846,10 +860,24 @@ class _ArithmeticCuspEngine:
+         return self.subgroup().supergroup().domain()
+ 
+     def module_rank(self):
+-        return self.representative().module_rank()
++        return self._subobject_rank
++
++    def span(self):
++        r"""Return the cusp's span: its ambient lattice's ``id`` and its Hermite rows.
++
++        This is the cusp's whole name, read without building the subobject it
++        names; a reader that wants the subobject asks :meth:`representative`.
++        """
++        return self._span
+ 
+     def representative(self):
+-        return self._representative
++        r"""Return the primitive isotropic subobject this cusp names, built from its span.
++
++        The subobject is built here and not retained: the cusp's own datum is
++        the span, so this costs one construction a call and leaves nothing
++        behind once the caller drops the answer.
++        """
++        return _subobject_of_span(self.lattice(), self._span)
+ 
+     def __eq__(self, other) -> bool:
+         r"""Compare orbits of this subgroup using its exact transporter."""
+@@ -861,7 +889,7 @@ class _ArithmeticCuspEngine:
+             and other.module_rank() == self.module_rank()
+         ):
+             return False
+-        if _same_subobject(self.representative(), other.representative()):
++        if other._span == self._span:
+             return True
+         return self.transporter_witness(other.representative()) is not None
+ 
+@@ -935,12 +963,50 @@ def _cusp(representative):
+     )
+ 
+ 
++def _subobject_of_span(lattice, span):
++    r"""The primitive totally isotropic subobject of ``lattice`` whose span is ``span``.
++
++    :func:`_span_key` names a subobject by the row Hermite form of its
++    generator coordinates in the ambient lattice, and the rows of that form
++    span the same lattice of coordinates as the rows it was taken from, so
++    reading them back as vectors of ``lattice`` names the same sublattice.  The
++    subobject is then built by the constructor that verifies primitivity,
++    isotropy and independence.
++    """
++    if span[0] != id(lattice):
++        raise ValueError(
++            f"the span {span!r} is not a span of {lattice}: its first entry is the id of another lattice"
++        )
++    labels = tuple(lattice.module_generating_set())
++    vectors = tuple(
++        lattice.linear_combination(
++            {
++                label: int(entry)
++                for label, entry in zip(labels, row, strict=True)
++                if int(entry) != 0
++            }
++        )
++        for row in span[1]
++    )
++    return lattice.primitive_isotropic_subobject(*vectors)
++
++
+ def _arithmetic_cusp(subgroup, representative):
++    r"""The cusp of ``representative``'s orbit, named by the representative's span.
++
++    The span and the rank are what a cusp row keeps a cusp by: the span is the
++    exact name of the subobject (:func:`_subobject_of_span` reads it back), and
++    the rank answers without building it.  The subobject itself is not kept,
++    because a constructed subobject of this library is retained for the process
++    by its own construction registries, and a kernel plane row of ``T_{Co}``
++    holds 189720 cusps.
++    """
+     return _object_of(
+         Sets(),
+         _engine=(Sets(), _ArithmeticCuspEngine, None),
+         subgroup=subgroup,
+-        representative=representative,
++        span=_span_key(representative),
++        subobject_rank=representative.module_rank(),
+     )
+ 
+ 
+diff --git a/src/sage_extensions/categories/lattice_morphisms.py b/src/sage_extensions/categories/lattice_morphisms.py
+index 53332ea..e8a07a3 100644
+--- a/src/sage_extensions/categories/lattice_morphisms.py
++++ b/src/sage_extensions/categories/lattice_morphisms.py
+@@ -11,7 +11,7 @@ from sage.categories.morphism import Morphism
+ from sage.matrix.constructor import matrix as engine_matrix
+ from sage.libs.pari import pari
+ from sage.matrix.special import identity_matrix
+-from sage.misc.cachefunc import cached_function, cached_method
++from sage.misc.cachefunc import cached_function, cached_method, weak_cached_function
+ from sage.misc.mrange import cantor_product as _engine_cantor_product
+ from sage.quadratic_forms.binary_qf import BinaryQF
+ from sage.rings.integer_ring import ZZ as SageZZ
+@@ -6094,7 +6094,7 @@ class _LatticeCore(_CoreCategory):
+         return _lattice_isometry_mor(domain, codomain)
+ 
+ 
+-@cached_function(key=lambda domain, codomain: (id(domain), id(codomain)))
++@weak_cached_function(cache=0, key=lambda domain, codomain: (id(domain), id(codomain)))
+ def _lattice_mor(domain, codomain) -> LatticeMor:
+     ring = domain.base_ring()
+     if codomain.base_ring() != ring:
+@@ -6102,7 +6102,7 @@ def _lattice_mor(domain, codomain) -> LatticeMor:
+     return domain.lattice_category().Mor(domain, codomain)
+ 
+ 
+-@cached_function(key=lambda domain, codomain: (id(domain), id(codomain)))
++@weak_cached_function(cache=0, key=lambda domain, codomain: (id(domain), id(codomain)))
+ def _lattice_embedding_mor(domain, codomain) -> LatticeEmbeddingMor:
+     ring = domain.base_ring()
+     if codomain.base_ring() != ring:
+@@ -6110,7 +6110,7 @@ def _lattice_embedding_mor(domain, codomain) -> LatticeEmbeddingMor:
+     return domain.lattice_category().Mono(domain, codomain)
+ 
+ 
+-@cached_function(key=lambda domain, codomain: (id(domain), id(codomain)))
++@weak_cached_function(cache=0, key=lambda domain, codomain: (id(domain), id(codomain)))
+ def _lattice_isometry_mor(domain, codomain) -> LatticeIsometryMor:
+     ring = domain.base_ring()
+     if codomain.base_ring() != ring:
+diff --git a/src/sage_extensions/categories/lattices.py b/src/sage_extensions/categories/lattices.py
+index 1725e85..f2ccbff 100644
+--- a/src/sage_extensions/categories/lattices.py
++++ b/src/sage_extensions/categories/lattices.py
+@@ -31,7 +31,7 @@ from sage.arith.misc import gcd
+ from sage.categories.category_with_axiom import all_axioms
+ from sage.misc.abstract_method import abstract_method
+ from sage.combinat.root_system.cartan_type import CartanType
+-from sage.misc.cachefunc import cached_function, cached_method
++from sage.misc.cachefunc import cached_function, cached_method, weak_cached_function
+ from sage.misc.latex import latex
+ from sage.misc.repr import repr_lincomb
+ from sage.rings.integer_ring import ZZ as SageZZ
+@@ -405,7 +405,8 @@ def _overlattice_inclusions(form):
+     )
+ 
+ 
+-@cached_function(
++@weak_cached_function(
++    cache=0,
+     key=lambda module, basis, root_system_type_name=None: (
+         id(module),
+         basis,
+@@ -430,6 +431,54 @@ def _lattice_subobject_spanning(module, basis, root_system_type_name=None):
+             )
+ 
+ 
++@weak_cached_function(cache=0)
++def _primitive_isotropic_subobject(lattice, *basis):
++    r"""The primitive totally isotropic sublattice of ``lattice`` spanned by ``basis``.
++
++    The body of :meth:`Lattices.ParentMethods.primitive_isotropic_subobject`, in
++    a record that holds its value weakly: the subobject retains the ambient
++    lattice, its own category machinery and its inclusion, and a cusp row names
++    one span per plane, so a record that kept every subobject it had built would
++    cost a constructed parent a plane for the process.  The arguments are the
++    method's own, so the key is the one its cache used; a span is a finite
++    family of elements of ``lattice``, which the key retains and which in turn
++    retain ``lattice``, so a live entry cannot name a reused address.
++    """
++    from sage_extensions.categories.isotropic_parabolics import (
++        PrimitiveIsotropicSubobjects,
++    )
++
++    elements = tuple(
++        element if element_parent(element) is lattice else lattice(element)
++        for element in basis
++    )
++    subobject = lattice.subobject_on(elements)
++    assert subobject.is_primitive(), (
++        f"the span of {elements!r} in {lattice!r} is not primitive: its inclusion has a "
++        f"cokernel with torsion, so it is not a primitive isotropic sublattice; saturate it first"
++    )
++    zero = lattice.base_ring().zero()
++    embedded = subobject.embedded_module_generators()
++    labels = subobject.module_generating_set()
++    assert all(
++        lattice.b(embedded[left], embedded[right]) == zero
++        for left in labels
++        for right in labels
++    ), (
++        f"the span of {elements!r} in {lattice!r} is not totally isotropic: b(x, y) is nonzero for some pair of these vectors"
++    )
++    subobject = refine(
++        subobject,
++        PrimitiveIsotropicSubobjects(lattice.base_ring()),
++    )
++    assert (
++        subobject.module_rank() == finite_ordered_set(elements).cardinality()
++    ), (
++        f"the vectors {elements!r} in {lattice!r} are linearly dependent: they span a sublattice of rank {subobject.module_rank()}, so they are not a basis of it"
++    )
++    return subobject
++
++
+ def _lattice_subobject_on_basis(module, basis, extra_categories, construction_data):
+     r"""The lattice subobject framed by ``basis``, placed also in ``extra_categories``.
+ 
+@@ -9458,7 +9507,6 @@ class Lattices(OwnedCategoryOverBaseRing):
+ 
+             return _stable_complement_root_reflections(self, element)
+ 
+-        @cached_method
+         def primitive_isotropic_subobject(self, *basis):
+             r"""Return the primitive totally isotropic sublattice spanned by ``basis``.
+ 
+@@ -9466,42 +9514,13 @@ class Lattices(OwnedCategoryOverBaseRing):
+             before refining the represented subobject, so a refused span leaves
+             no wrongly placed object behind. The stated family must be
+             independent; the empty family spans the zero sublattice.
+-            One subobject per spanning family, so
+-            its cached isotropic reduction (and parabolic) is shared.
++            One subobject per spanning family while that subobject is in use,
++            so its cached isotropic reduction (and parabolic) is shared; the
++            record holds the subobject weakly, because a subobject retains its
++            ambient lattice and a row that names one span per plane must not be
++            what keeps every plane it has named.
+             """
+-            from sage_extensions.categories.isotropic_parabolics import (
+-                PrimitiveIsotropicSubobjects,
+-            )
+-
+-            elements = tuple(
+-                element if element_parent(element) is self else self(element)
+-                for element in basis
+-            )
+-            subobject = self.subobject_on(elements)
+-            assert subobject.is_primitive(), (
+-                f"the span of {elements!r} in {self!r} is not primitive: its inclusion has a "
+-                f"cokernel with torsion, so it is not a primitive isotropic sublattice; saturate it first"
+-            )
+-            zero = self.base_ring().zero()
+-            embedded = subobject.embedded_module_generators()
+-            labels = subobject.module_generating_set()
+-            assert all(
+-                self.b(embedded[left], embedded[right]) == zero
+-                for left in labels
+-                for right in labels
+-            ), (
+-                f"the span of {elements!r} in {self!r} is not totally isotropic: b(x, y) is nonzero for some pair of these vectors"
+-            )
+-            subobject = refine(
+-                subobject,
+-                PrimitiveIsotropicSubobjects(self.base_ring()),
+-            )
+-            assert (
+-                subobject.module_rank() == finite_ordered_set(elements).cardinality()
+-            ), (
+-                f"the vectors {elements!r} in {self!r} are linearly dependent: they span a sublattice of rank {subobject.module_rank()}, so they are not a basis of it"
+-            )
+-            return subobject
++            return _primitive_isotropic_subobject(self, *basis)
+ 
+         def vectors_of_square_with_complement(self, square, complement):
+             r"""Yield one primitive ``delta`` per ``O(T)``-orbit with ``delta^2 = square`` and ``delta^perp`` isometric to ``complement``.
+diff --git a/src/sage_extensions/categories/orthogonal_quotients.py b/src/sage_extensions/categories/orthogonal_quotients.py
+index cbb9b66..02f4f6e 100644
+--- a/src/sage_extensions/categories/orthogonal_quotients.py
++++ b/src/sage_extensions/categories/orthogonal_quotients.py
+@@ -4106,17 +4106,14 @@ def _plane_parabolic_incidence_flags(subgroup, plane, flag):
+     return tuple(flags)
+ 
+ 
+-@timed_stage(
+-    "isotropic orbit representatives",
+-    input=lambda subgroup, rank, *, flag=False: orbit_row_record_name(
+-        rank,
+-        flag=flag,
+-        lattice=subgroup.supergroup().domain(),
+-        subgroup=subgroup,
+-    ),
+-)
+-def _subgroup_isotropic_orbit_representatives(subgroup, rank, *, flag=False):
+-    r"""Return the subgroup's orbits of primitive isotropic subobjects, as one timed row.
++def _yield_subgroup_isotropic_orbit_representatives(subgroup, rank, *, flag=False):
++    r"""Yield the subgroup's orbits of primitive isotropic subobjects one at a time.
++
++    This is the row :func:`_subgroup_isotropic_orbit_representatives` collects,
++    yielded rather than gathered.  A caller whose own datum is smaller than a
++    representative -- the cusp row, which keeps a span a cusp -- must not have
++    to hold every representative to reach the last one: a kernel plane row of
++    ``T_{Co}`` has 189720 of them, and each is a constructed parent.
+ 
+     The row is the ambient ``O(L)``-orbits, split under the subgroup: the
+     character quotient's image (:mod:`sage_extensions.timing` records it as the
+@@ -4127,14 +4124,14 @@ def _subgroup_isotropic_orbit_representatives(subgroup, rank, *, flag=False):
+     single one of them.
+     """
+     if not flag and index(rank) == 0:
+-        return subgroup.supergroup().isotropic_orbit_representatives(0)
++        yield from subgroup.supergroup().isotropic_orbit_representatives(0)
++        return
+     lattice = subgroup.supergroup().domain()
+     row = orbit_row_record_name(rank, flag=flag, lattice=lattice, subgroup=subgroup)
+     with stage("discriminant image", row):
+         _assert_isotropic_splitting_has_character_data(subgroup)
+         quotient = subgroup.finite_character_quotient()
+     orthogonal_group = subgroup.supergroup()
+-    representatives = []
+     # The ambient classes always come from the port's classification: the
+     # in-repo discriminant-class route exhibits its representatives by an
+     # integral-point enumeration that does not return on the Enriques lattice
+@@ -4150,7 +4147,7 @@ def _subgroup_isotropic_orbit_representatives(subgroup, rank, *, flag=False):
+             )
+             if line_image == "NOSPLIT":
+                 # The sign witness (or trivial quotient) proves G_0 = G Stab(x) for its index.
+-                representatives.append(representative)
++                yield representative
+                 continue
+             if line_image is not None:
+                 # The coset walk's words are retained with the lines they
+@@ -4161,22 +4158,22 @@ def _subgroup_isotropic_orbit_representatives(subgroup, rank, *, flag=False):
+                     quotient.register_isotropic_transport(
+                         transported, representative, splitting
+                     )
+-                    representatives.append(transported)
++                    yield transported
+                 continue
+             if not flag and index(rank) == 1:
+                 from_divided_classes = _line_orbit_from_divided_classes(subgroup, representative)
+                 if from_divided_classes is not None:
+-                    representatives.extend(from_divided_classes)
++                    yield from from_divided_classes
+                     continue
+             if not flag and rank == 2:
+                 from_planes = _plane_orbit_from_odd_stabilizer(subgroup, representative)
+                 if from_planes is not None:
+-                    representatives.extend(from_planes)
++                    yield from from_planes
+                     continue
+             if not flag and rank == 2:
+                 from_parabolic = _plane_orbit_from_parabolic_stabilizer(subgroup, representative)
+                 if from_parabolic is not None:
+-                    representatives.extend(from_parabolic)
++                    yield from from_parabolic
+                     continue
+             stabilizer = quotient.exact_isotropic_stabilizer_generators(
+                 representative, flag=flag
+@@ -4192,8 +4189,29 @@ def _subgroup_isotropic_orbit_representatives(subgroup, rank, *, flag=False):
+                     strict=True,
+                 ):
+                     quotient.register_isotropic_transport(moved, source, splitting)
+-                representatives.append(transported)
+-    return finite_ordered_set(tuple(representatives))
++                yield transported
++
++
++@timed_stage(
++    "isotropic orbit representatives",
++    input=lambda subgroup, rank, *, flag=False: orbit_row_record_name(
++        rank,
++        flag=flag,
++        lattice=subgroup.supergroup().domain(),
++        subgroup=subgroup,
++    ),
++)
++def _subgroup_isotropic_orbit_representatives(subgroup, rank, *, flag=False):
++    r"""Return the subgroup's orbits of primitive isotropic subobjects, as one timed row.
++
++    The row :func:`_yield_subgroup_isotropic_orbit_representatives` yields,
++    gathered into the set it is.  A caller that keeps its own datum per orbit --
++    the cusp row keeps a span -- takes the yielded row instead, so that the
++    representatives it has finished with are dropped as it goes.
++    """
++    return finite_ordered_set(
++        tuple(_yield_subgroup_isotropic_orbit_representatives(subgroup, rank, flag=flag))
++    )
+ 
+ 
+ def _subgroup_isotropic_equivalence_witness(subgroup, left, right, *, flag=False):
