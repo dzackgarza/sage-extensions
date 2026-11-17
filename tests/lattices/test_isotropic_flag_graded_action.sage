@@ -43,3 +43,11 @@ def test_line_flag_in_two_hyperbolic_planes_under_a_congruence_preimage_has_imag
     action = flag.graded_quotient_action(gamma)
     assert all(generator in gamma for generator in action.domain().group_generators())
     assert action.image().cardinality() == cardinal(2)
+
+
+def test_partial_rank_one_three_flag_graded_image_respects_actual_so_subgroup():
+    ambient = Lattices(ZZ)("U") + Lattices(ZZ)("U") + Lattices(ZZ)("U")
+    flag = IsotropicFlag(ambient, tuple(ambient.module_generators())[::2], flag_type=FlagType((1, 3)))
+    action = flag.graded_quotient_action(ambient.SO())
+    assert all(generator in ambient.SO() for generator in action.domain().group_generators())
+    assert all(action(generator) in action.codomain() for generator in action.domain().group_generators())
