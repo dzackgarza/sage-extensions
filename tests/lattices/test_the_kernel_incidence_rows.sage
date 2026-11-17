@@ -51,15 +51,12 @@ either (lattice-database#13), and none holds a ``T_Co`` row
 specimens are split per lattice so one costly row cannot hide another's.
 
 The ``U + U(2) + <2k>`` family is not among them although the driver runs two
-of its members: in this session's ring its ambient flag row cannot be built at
-all.  ``ModuleAutomorphismGroup.flag_stabilizer`` inverts a basis change of the
-rank-two zero-form reduction lattice, and that change has determinant ``2``
-(or ``-2``), so it is no basis change of that lattice and has no inverse in the
-integer ring (``ZeroDivisionError: Generic endomorphism of Integral lattice of
-rank 2 and signature (0, 0) has no inverse ...: its determinant 2 is not a unit
-of Integer Ring``).  It reproduces on ``main`` `4936110` without this file and
-is not repaired here; the driver's own runs of those lattices, in the image's
-plain interpreter, decide their two rows.
+of its members: its rows are the driver's, in the image's plain interpreter, and
+the relation this file gates is already read on ``6JRS`` and on ``U + U + <-4>``.
+A plane of that family is a rank-two module carrying the zero form, so every
+primitive vector of one of them spans a null line in it, and the basis
+``ModuleAutomorphismGroup.flag_stabilizer`` adapts to such a line is gated by
+``tests/lattices/test_an_adapted_basis_of_a_null_flag_is_a_basis.sage``.
 
 The counts these rows return are recorded in the commit body of the push that
 lands this file -- one edge over one line and one plane cusp for each kernel
