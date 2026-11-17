@@ -1,0 +1,40 @@
+# tree: 8f2f1586ca5e27fae2b973f5f47de7b906fdb0a2
+# status:  M src/sage_extensions/categories/_lattice.py  M src/sage_extensions/categories/abstract_categories/mor_categories.py  M src/sage_extensions/categories/group/predicate_subgroups.py  M src/sage_extensions/categories/isotropic_orbits.py  M src/sage_extensions/categories/lattice_morphisms.py  M src/sage_extensions/categories/lattices.py  M src/sage_extensions/categories/modules/framed/formed/form_modules.py  M src/sage_extensions/categories/orthogonal_quotients.py  M src/sage_extensions/utilities.py 
+# port: 991b88b095a42a1e3679569ea42328c900c120f6
+# load: 0.43 0.36 0.37
+# program: .scratch/588/probe-pilot-row.py PROBE_PLANES=200 PROBE_PHASE=unset PYTHONHASHSEED=0
+[     1.1 s rss    282.5 MiB] T_Co rank 11, Otilde(T_Co), its character quotient
+[     3.7 s rss    305.6 MiB] the plane's certified parabolic: 112 generators
+[   210.1 s rss   1332.5 MiB] the split's first lift (the finite image's whole coset walk)
+  [plane      2/200] rss   1332.5 MiB
+  [plane      3/200] rss   1332.5 MiB
+  [plane     25/200] rss   1332.5 MiB
+  [plane     50/200] rss   1332.6 MiB
+  [plane     75/200] rss   1333.1 MiB
+  [plane    100/200] rss   1334.1 MiB
+  [plane    125/200] rss   1335.5 MiB
+  [plane    150/200] rss   1336.9 MiB
+  [plane    175/200] rss   1338.4 MiB
+  [plane    200/200] rss   1340.1 MiB
+[   214.2 s rss   1340.1 MiB] the row's first 200 entries, shape representatives
+
+[slope] over the checkpoints
+  planes      1..    10:       0.4 KiB a plane
+  planes     10..   100:      17.8 KiB a plane
+  planes    100..   200:      62.1 KiB a plane
+
+[RESULT] shape=representatives planes=200 wall=214.9 s rss_end=1340.1 MiB planes_alive_beside_the_source=199 lifts_retained=200
+[peakrss] pilot-row-after: child waited=0 shell_code=0 samples=109
+[peakrss] peak tree RSS      : 1347 MiB
+[peakrss] low-water MemAvail : 12456 MiB
+[peakrss] peak single VmHWM  : 1355 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     1351 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   run.sh                        1 MiB peak
+[peakrss]   t=   216.1s procs=  2 rss=  1347 MiB hwm=  1355 MiB avail= 12456 MiB
+[peakrss]   t=   214.1s procs=  2 rss=  1341 MiB hwm=  1341 MiB avail= 12669 MiB
+[peakrss]   t=   212.1s procs=  2 rss=  1336 MiB hwm=  1336 MiB avail= 12849 MiB
+[peakrss]   t=   210.1s procs=  2 rss=  1315 MiB hwm=  1315 MiB avail= 12748 MiB
+[peakrss]   t=   208.1s procs=  2 rss=  1243 MiB hwm=  1243 MiB avail= 12920 MiB
+# launcher exit: 0

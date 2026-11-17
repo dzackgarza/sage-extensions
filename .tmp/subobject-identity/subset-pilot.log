@@ -1,0 +1,49 @@
+# tree: f4aa8057a2ecdaad0e6c40683209684dee3b70f7
+# status:  M src/sage_extensions/categories/_lattice.py  M src/sage_extensions/categories/abstract_categories/mor_categories.py  M src/sage_extensions/categories/group/predicate_subgroups.py  M src/sage_extensions/categories/isotropic_orbits.py  M src/sage_extensions/categories/lattice_morphisms.py  M src/sage_extensions/categories/lattices.py  M src/sage_extensions/categories/modules/framed/formed/form_modules.py  M src/sage_extensions/categories/orthogonal_quotients.py  M src/sage_extensions/utilities.py ?? tests/lattices/test_a_cusp_names_its_plane_by_span.sage ?? tests/lattices/test_the_orthogonal_group_of_a_null_plane_has_isometry_generators.sage 
+# load: 1.15 0.89 0.74
+# pytest: tests/lattices/test_a_transported_line_keeps_the_word_that_placed_it.sage tests/lattices/test_a_row_computes_one_plane_covering.sage tests/lattices/test_a_plane_transport_builds_one_span.sage tests/lattices/test_the_stable_plane_rows_equal_their_double_coset_counts.sage tests/lattices/test_isotropic_routes_small_examples.sage
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+time gates on: star import 0.25 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: asyncio-1.5.0, xdist-3.8.0, reportlog-1.0.0, platformdirs-4.13.5, hypothesis-6.170.15, anyio-4.15.1, timeout-2.4.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 13 items
+
+tests/lattices/test_a_transported_line_keeps_the_word_that_placed_it.sage . [  7%]
+...                                                                      [ 30%]
+tests/lattices/test_a_row_computes_one_plane_covering.sage ..            [ 46%]
+tests/lattices/test_a_plane_transport_builds_one_span.sage .             [ 53%]
+tests/lattices/test_the_stable_plane_rows_equal_their_double_coset_counts.sage . [ 61%]
+..                                                                       [ 76%]
+tests/lattices/test_isotropic_routes_small_examples.sage EEE             [100%]
+
+==================================== ERRORS ====================================
+__________ ERROR at setup of test_spacelike_lorentzian_vector_orbits ___________
+tests/lattices/test_isotropic_routes_small_examples.sage:29: TL10 len(): ask for a cardinality
+_____ ERROR at setup of test_rank_three_null_planes_with_proper_levi_image _____
+tests/lattices/test_isotropic_routes_small_examples.sage:29: TL10 len(): ask for a cardinality
+____ ERROR at setup of test_partial_flags_of_type_one_three_split_under_so _____
+tests/lattices/test_isotropic_routes_small_examples.sage:29: TL10 len(): ask for a cardinality
+======================= test lint: 1 findings in 1 files =======================
+tests/lattices/test_isotropic_routes_small_examples.sage:29: TL10 len(): ask for a cardinality
+============================== slowest durations ===============================
+16.76s call     tests/lattices/test_a_transported_line_keeps_the_word_that_placed_it.sage::test_every_transported_line_of_a_kernel_row_keeps_its_word
+9.74s call     tests/lattices/test_a_transported_line_keeps_the_word_that_placed_it.sage::test_the_exact_stabilizer_is_one_datum_for_each_span
+9.69s call     tests/lattices/test_a_row_computes_one_plane_covering.sage::test_the_otilde_plus_row_computes_one_plane_covering
+8.58s call     tests/lattices/test_the_stable_plane_rows_equal_their_double_coset_counts.sage::test_the_kernel_plane_rows_of_u_plus_u2_plus_root_equal_their_double_coset_counts
+8.48s call     tests/lattices/test_a_transported_line_keeps_the_word_that_placed_it.sage::test_a_chain_of_two_recorded_words_composes_in_the_order_its_steps_act
+6.77s call     tests/lattices/test_a_transported_line_keeps_the_word_that_placed_it.sage::test_the_composite_of_two_words_is_a_transporter
+3.34s call     tests/lattices/test_the_stable_plane_rows_equal_their_double_coset_counts.sage::test_the_kernel_plane_rows_of_6jrs_equal_their_double_coset_counts
+2.25s call     tests/lattices/test_a_row_computes_one_plane_covering.sage::test_the_otilde_row_computes_one_plane_covering
+2.25s call     tests/lattices/test_the_stable_plane_rows_equal_their_double_coset_counts.sage::test_the_kernel_plane_rows_of_the_unimodular_plane_sum_equal_their_double_coset_counts
+0.02s call     tests/lattices/test_a_plane_transport_builds_one_span.sage::test_transporting_a_plane_builds_its_span_once
+
+(26 durations < 0.005s hidden.  Use -vv to show these durations.)
+=========================== short test summary info ============================
+ERROR tests/lattices/test_isotropic_routes_small_examples.sage::test_spacelike_lorentzian_vector_orbits
+ERROR tests/lattices/test_isotropic_routes_small_examples.sage::test_rank_three_null_planes_with_proper_levi_image
+ERROR tests/lattices/test_isotropic_routes_small_examples.sage::test_partial_flags_of_type_one_three_split_under_so
+=================== 10 passed, 3 errors in 68.47s (0:01:08) ====================
+# runner exit: 1

@@ -1,0 +1,40 @@
+# tree: 8f2f1586ca5e27fae2b973f5f47de7b906fdb0a2
+# status:  M tests/lattices/conftest.py ?? tests/lattices/test_a_cusp_names_its_plane_by_span.sage ?? tests/lattices/test_a_dropped_plane_is_collected.sage ?? tests/lattices/test_the_orthogonal_group_of_a_null_plane_has_isometry_generators.sage 
+# port: 991b88b095a42a1e3679569ea42328c900c120f6
+# load: 0.86 0.64 0.64
+# program: .scratch/588/probe-588-life.py PROBE_PLANES=unset PROBE_PHASE=unset PYTHONHASHSEED=0
+[probe] the cusp's rank: 2
+[probe] the cusp exposes span(): False
+[probe] the rebuilt representative is the same subobject: True
+[probe] its span key equals the plane's: True
+[probe] the rebuilt representative is primitive: True
+[probe] the rebuilt representative is totally isotropic: True
+[probe] its rank: 2
+[probe] one named plane is alive after the drop: True
+[probe] planes alive after being named by a cusp and dropped: 20 of 20
+
+[probe] U+U(2)+<-2>: line cusps 3, plane cusps 2
+  [plane cusp 0] span (136838800533072, ((0, 1, 0, 0, 0), (0, 0, 0, 1, 0))) primitive True totally isotropic True rank 2
+  [plane cusp 1] span (136838800533072, ((0, 1, 0, 0, 0), (0, 0, 1, 0, 0))) primitive True totally isotropic True rank 2
+  [line cusp 0] span (136838800533072, ((0, 1, 0, 0, 0),)) primitive True totally isotropic True
+  [line cusp 1] span (136838800533072, ((0, 0, 0, 1, 0),)) primitive True totally isotropic True
+  [line cusp 2] span (136838800533072, ((0, 0, 1, 0, 0),)) primitive True totally isotropic True
+[probe] the incidence holds 4 certificates
+  [edge] line (136838800533072, ((0, 1, 0, 0, 0),)) plane (136838800533072, ((0, 1, 0, 0, 0), (0, 0, 0, 1, 0)))
+  [edge] line (136838800533072, ((0, 0, 0, 1, 0),)) plane (136838800533072, ((0, 1, 0, 0, 0), (0, 0, 0, 1, 0)))
+  [edge] line (136838800533072, ((0, 1, 0, 0, 0),)) plane (136838800533072, ((0, 1, 0, 0, 0), (0, 0, 1, 0, 0)))
+  [edge] line (136838800533072, ((0, 0, 1, 0, 0),)) plane (136838800533072, ((0, 1, 0, 0, 0), (0, 0, 1, 0, 0)))
+[peakrss] life-base: child waited=0 shell_code=0 samples=7
+[peakrss] peak tree RSS      : 531 MiB
+[peakrss] low-water MemAvail : 11480 MiB
+[peakrss] peak single VmHWM  : 531 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      527 MiB peak
+[peakrss]   run.sh                        4 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    12.0s procs=  2 rss=   531 MiB hwm=   531 MiB avail= 13357 MiB
+[peakrss]   t=    10.0s procs=  2 rss=   509 MiB hwm=   509 MiB avail= 13368 MiB
+[peakrss]   t=     8.0s procs=  2 rss=   495 MiB hwm=   495 MiB avail= 13360 MiB
+[peakrss]   t=     6.0s procs=  2 rss=   487 MiB hwm=   487 MiB avail= 13352 MiB
+[peakrss]   t=     4.0s procs=  2 rss=   476 MiB hwm=   476 MiB avail= 13352 MiB
+# launcher exit: 0

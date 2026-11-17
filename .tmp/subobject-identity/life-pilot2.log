@@ -1,0 +1,41 @@
+# tree: f4aa8057a2ecdaad0e6c40683209684dee3b70f7
+# status:  M src/sage_extensions/categories/_lattice.py  M src/sage_extensions/categories/abstract_categories/mor_categories.py  M src/sage_extensions/categories/group/predicate_subgroups.py  M src/sage_extensions/categories/isotropic_orbits.py  M src/sage_extensions/categories/lattice_morphisms.py  M src/sage_extensions/categories/lattices.py  M src/sage_extensions/categories/modules/framed/formed/form_modules.py  M src/sage_extensions/categories/orthogonal_quotients.py  M src/sage_extensions/utilities.py ?? tests/lattices/test_a_cusp_names_its_plane_by_span.sage ?? tests/lattices/test_the_orthogonal_group_of_a_null_plane_has_isometry_generators.sage 
+# port: 991b88b095a42a1e3679569ea42328c900c120f6
+# load: 1.22 1.18 0.92
+# program: .tmp/issue588/probe-588-life.py PROBE_PLANES=unset PROBE_PHASE=unset PYTHONHASHSEED=0
+[probe] the cusp's rank: 2
+[probe] the cusp exposes span(): True
+[probe] cusp.span() equals _span_key(plane): True
+[probe] the rebuilt representative is the same subobject: True
+[probe] its span key equals the plane's: True
+[probe] the rebuilt representative is primitive: True
+[probe] the rebuilt representative is totally isotropic: True
+[probe] its rank: 2
+[probe] one named plane is alive after the drop: False
+[probe] planes alive after being named by a cusp and dropped: 0 of 20
+
+[probe] U+U(2)+<-2>: line cusps 3, plane cusps 2
+  [plane cusp 0] span (132272654554192, ((2, 0, 0, 1, 0), (0, 1, -1, 0, 0))) primitive True totally isotropic True rank 2
+  [plane cusp 1] span (132272654554192, ((2, 0, -1, 0, 0), (0, 1, 0, 1, 0))) primitive True totally isotropic True rank 2
+  [line cusp 0] span (132272654554192, ((0, 1, -1, 0, 0),)) primitive True totally isotropic True
+  [line cusp 1] span (132272654554192, ((0, 0, 1, 0, 0),)) primitive True totally isotropic True
+  [line cusp 2] span (132272654554192, ((0, 2, 0, 1, 0),)) primitive True totally isotropic True
+[probe] the incidence holds 4 certificates
+  [edge] line (132272654554192, ((0, 1, -1, 0, 0),)) plane (132272654554192, ((2, 0, 0, 1, 0), (0, 1, -1, 0, 0)))
+  [edge] line (132272654554192, ((0, 2, 0, 1, 0),)) plane (132272654554192, ((2, 0, 0, 1, 0), (0, 1, -1, 0, 0)))
+  [edge] line (132272654554192, ((0, 1, -1, 0, 0),)) plane (132272654554192, ((2, 0, -1, 0, 0), (0, 1, 0, 1, 0)))
+  [edge] line (132272654554192, ((0, 0, 1, 0, 0),)) plane (132272654554192, ((2, 0, -1, 0, 0), (0, 1, 0, 1, 0)))
+[peakrss] life-pilot2: child waited=0 shell_code=0 samples=9
+[peakrss] peak tree RSS      : 534 MiB
+[peakrss] low-water MemAvail : 13195 MiB
+[peakrss] peak single VmHWM  : 534 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      531 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   run.sh                        2 MiB peak
+[peakrss]   t=    16.0s procs=  2 rss=   534 MiB hwm=   534 MiB avail= 13195 MiB
+[peakrss]   t=    14.0s procs=  2 rss=   524 MiB hwm=   524 MiB avail= 13203 MiB
+[peakrss]   t=    12.0s procs=  2 rss=   509 MiB hwm=   509 MiB avail= 13218 MiB
+[peakrss]   t=    10.0s procs=  2 rss=   495 MiB hwm=   495 MiB avail= 13225 MiB
+[peakrss]   t=     8.0s procs=  2 rss=   486 MiB hwm=   486 MiB avail= 13241 MiB
+# launcher exit: 0

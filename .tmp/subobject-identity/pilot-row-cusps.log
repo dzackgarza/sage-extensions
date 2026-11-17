@@ -1,0 +1,40 @@
+# tree: 8f2f1586ca5e27fae2b973f5f47de7b906fdb0a2
+# status:  M src/sage_extensions/categories/_lattice.py  M src/sage_extensions/categories/abstract_categories/mor_categories.py  M src/sage_extensions/categories/group/predicate_subgroups.py  M src/sage_extensions/categories/isotropic_orbits.py  M src/sage_extensions/categories/lattice_morphisms.py  M src/sage_extensions/categories/lattices.py  M src/sage_extensions/categories/modules/framed/formed/form_modules.py  M src/sage_extensions/categories/orthogonal_quotients.py  M src/sage_extensions/utilities.py  M tests/lattices/conftest.py ?? tests/lattices/test_a_cusp_names_its_plane_by_span.sage ?? tests/lattices/test_a_dropped_plane_is_collected.sage ?? tests/lattices/test_the_orthogonal_group_of_a_null_plane_has_isometry_generators.sage 
+# port: 991b88b095a42a1e3679569ea42328c900c120f6
+# load: 1.47 1.17 0.73
+# program: .scratch/588/probe-pilot-row.py PROBE_PLANES=200 PROBE_PHASE=unset PYTHONHASHSEED=0
+[     0.9 s rss    282.4 MiB] T_Co rank 11, Otilde(T_Co), its character quotient
+[     3.5 s rss    305.2 MiB] the plane's certified parabolic: 112 generators
+[   202.2 s rss   1376.3 MiB] the split's first lift (the finite image's whole coset walk)
+  [plane      2/200] rss   1376.3 MiB
+  [plane      3/200] rss   1376.3 MiB
+  [plane     25/200] rss   1376.3 MiB
+  [plane     50/200] rss   1376.3 MiB
+  [plane     75/200] rss   1376.3 MiB
+  [plane    100/200] rss   1376.3 MiB
+  [plane    125/200] rss   1376.3 MiB
+  [plane    150/200] rss   1376.3 MiB
+  [plane    175/200] rss   1376.4 MiB
+  [plane    200/200] rss   1376.4 MiB
+[   206.2 s rss   1376.4 MiB] the row's first 200 entries, shape cusps
+
+[slope] over the checkpoints
+  planes      1..    10:       0.4 KiB a plane
+  planes     10..   100:       0.2 KiB a plane
+  planes    100..   200:       1.2 KiB a plane
+
+[RESULT] shape=cusps planes=200 wall=206.7 s rss_end=1376.4 MiB planes_alive_beside_the_source=0 lifts_retained=200
+[peakrss] pilot-row-cusps: child waited=0 shell_code=0 samples=105
+[peakrss] peak tree RSS      : 1379 MiB
+[peakrss] low-water MemAvail : 12821 MiB
+[peakrss] peak single VmHWM  : 1391 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     1388 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   run.sh                        2 MiB peak
+[peakrss]   t=   204.1s procs=  2 rss=  1379 MiB hwm=  1379 MiB avail= 12829 MiB
+[peakrss]   t=   206.1s procs=  2 rss=  1379 MiB hwm=  1379 MiB avail= 12829 MiB
+[peakrss]   t=   208.1s procs=  2 rss=  1374 MiB hwm=  1391 MiB avail= 12821 MiB
+[peakrss]   t=   202.1s procs=  2 rss=  1359 MiB hwm=  1359 MiB avail= 12853 MiB
+[peakrss]   t=   200.1s procs=  2 rss=  1269 MiB hwm=  1269 MiB avail= 12939 MiB
+# launcher exit: 0

@@ -1,0 +1,47 @@
+# tree: 8f2f1586ca5e27fae2b973f5f47de7b906fdb0a2
+# status:  M src/sage_extensions/categories/_lattice.py  M src/sage_extensions/categories/abstract_categories/mor_categories.py  M src/sage_extensions/categories/group/predicate_subgroups.py  M src/sage_extensions/categories/isotropic_orbits.py  M src/sage_extensions/categories/lattice_morphisms.py  M src/sage_extensions/categories/lattices.py  M src/sage_extensions/categories/modules/framed/formed/form_modules.py  M src/sage_extensions/categories/orthogonal_quotients.py  M src/sage_extensions/utilities.py  M tests/lattices/conftest.py ?? tests/lattices/test_a_cusp_names_its_plane_by_span.sage ?? tests/lattices/test_a_dropped_plane_is_collected.sage ?? tests/lattices/test_the_orthogonal_group_of_a_null_plane_has_isometry_generators.sage 
+# load: 0.43 0.56 0.61
+# pytest: tests/lattices/test_a_dropped_plane_is_collected.sage
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+time gates OFF (--no-time-gates): star import 0.26 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: asyncio-1.5.0, xdist-3.8.0, reportlog-1.0.0, platformdirs-4.13.5, hypothesis-6.170.15, anyio-4.15.1, timeout-2.4.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 1 item
+
+tests/lattices/test_a_dropped_plane_is_collected.sage F                  [100%]
+
+=================================== FAILURES ===================================
+______________________ test_a_dropped_plane_is_collected _______________________
+
+    def test_a_dropped_plane_is_collected() -> None:
+        r"""A plane and its inclusion are collected, and the span still names one plane.
+    
+        \(U \oplus U\) has basis \(e_1, f_1, e_2, f_2\) with \(b(e_i, f_i) = 1\) and
+        \(q(e_i) = q(f_i) = 0\), so \(\langle e_1, f_2 \rangle\) is a primitive
+        totally isotropic plane and \(e_2\) lies in it for no choice of generators.
+        """
+        lattice = Lattices(ZZ)("U") + Lattices(ZZ)("U")
+        e1, _f1, e2, f2 = lattice.module_generators()
+        plane = lattice.primitive_isotropic_subobject(e1, f2)
+        plane_reference = weakref.ref(plane)
+        inclusion_reference = weakref.ref(plane.inclusion())
+    
+        del plane
+        gc.collect()
+    
+>       assert plane_reference() is None
+E       AssertionError: assert Integral lattice of rank 2 and signature (0, 0) is None
+E        +  where Integral lattice of rank 2 and signature (0, 0) = <weakref at 0x7f849a971d50; to 'sage_extensions.categories.modules.framed.framed_free_modules.OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType' at 0x7f849aaafa50>()
+
+tests/lattices/test_a_dropped_plane_is_collected.sage:30: AssertionError
+============================== slowest durations ===============================
+0.16s call     tests/lattices/test_a_dropped_plane_is_collected.sage::test_a_dropped_plane_is_collected
+
+(2 durations < 0.005s hidden.  Use -vv to show these durations.)
+=========================== short test summary info ============================
+FAILED tests/lattices/test_a_dropped_plane_is_collected.sage::test_a_dropped_plane_is_collected
+============================== 1 failed in 1.44s ===============================
+# runner exit: 1

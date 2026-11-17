@@ -1,0 +1,21 @@
+# tree: 8f2f1586ca5e27fae2b973f5f47de7b906fdb0a2
+# status:  M tests/lattices/conftest.py ?? tests/lattices/test_a_cusp_names_its_plane_by_span.sage ?? tests/lattices/test_a_dropped_plane_is_collected.sage ?? tests/lattices/test_the_orthogonal_group_of_a_null_plane_has_isometry_generators.sage 
+# port: 991b88b095a42a1e3679569ea42328c900c120f6
+# load: 0.42 0.55 0.61
+# program: .scratch/588/probe-containment.py PROBE_PLANES=unset PROBE_PHASE=unset PYTHONHASHSEED=0
+[probe] Of twice is one object: True
+[probe] the end of a point is that Mor: True
+[probe] the arrows of the monos are that Mor: True
+[probe] Mor in MorCategories(): True
+[probe] the family contains its own Mor: True
+[probe] a constant is in Mor, monos, epis: (True, False, False)
+[probe] a swap is in monos and epis: (True, True)
+[probe] the end of the swap is that Mor: True
+[peakrss] containment-base: child waited=0 shell_code=0 samples=1
+[peakrss] peak tree RSS      : 1 MiB
+[peakrss] low-water MemAvail : 13523 MiB
+[peakrss] peak single VmHWM  : 1 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   run.sh                        1 MiB peak
+[peakrss]   t=     0.0s procs=  1 rss=     1 MiB hwm=     1 MiB avail= 13523 MiB
+# launcher exit: 0
