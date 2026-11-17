@@ -1664,6 +1664,23 @@ def _isotropic_plane_orbit_representatives(orthogonal_group):
     to the plane classes.
     """
     lattice = orthogonal_group.domain()
+    # Sterk, Math. Z. 207 (1991), Proposition 4.6: the Enriques period
+    # lattice U + U(2) + E8(-2) has exactly these two O(L)-plane classes.
+    # They are actual primitive isotropic subobjects, not finite class-set
+    # placeholders. The exact named owner is essential: an isometric but
+    # differently presented lattice needs an exhibited integral transport.
+    from sage_extensions.catalogue import NamedLattices
+
+    if lattice is NamedLattices.TEn:
+        basis = tuple(lattice.module_generators())
+        root = basis[4] + basis[5]
+        assert root.q() == -8
+        first = lattice.primitive_isotropic_subobject(basis[0], basis[2])
+        second = lattice.primitive_isotropic_subobject(
+            2 * basis[0] + 2 * basis[1] + root, basis[2]
+        )
+        assert first.is_primitive() and second.is_primitive()
+        return finite_ordered_set((first, second))
     candidates = []
     for line in _isotropic_orbit_representatives(orthogonal_group, 1):
         completion = _hyperbolic_completion(lattice, line)
