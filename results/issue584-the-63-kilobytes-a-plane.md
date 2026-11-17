@@ -124,7 +124,7 @@ plane -- the port's isometry search, measured at 355 s for one matched pair
 
 ## 5. Ten, a hundred, a thousand planes
 
-Two probes on the same specimens, one process a point; `PROBE_MODE=baseline`
+The same probe in two modes on the same specimens, one process a point; `PROBE_MODE=baseline`
 registers as the row does, `PROBE_MODE=noreg` makes the same plane and the same
 span key and does not register (the ceiling of every repair #584 allows).  RSS is
 `VmRSS` read after every plane; the per-plane figure is the steady bands.
@@ -178,7 +178,7 @@ in the same process.  So the answer to the capacity question is:
 
 Even with #585 repaired to the "few kilobytes a plane" its own acceptance asks
 for, the row would stand at about 1.3 + 11.6 + 0.7 = 13.6 GiB -- inside 16 GiB,
-but with the line row, the relation's certificates (section 7, ~33 GiB at three
+but with the line row, the relation's certificates (section 7, ~31 GiB at three
 a plane) and the allocator still to come out of what is left.
 
 ## 7. The certificate coefficient
@@ -200,7 +200,7 @@ refined isotropic category costs to build once:
 
 A carried flag is 46 KB and a fresh transporter 6.5 KB at steady state, so a
 certificate that retains a flag and its two transporters is about 59 KB of its
-own objects, and **three a plane is about 177 KB a plane, 33 GiB at 189720
+own objects, and **three a plane is about 177 KB a plane, 31 GiB at 189720
 planes**, beside the cusps it shares with the two cusp rows.
 
 That is a derivation from measured parts, not a reading of a returned row: the
@@ -227,14 +227,14 @@ What the measurement files instead, for the owner of each structure:
 | --- | ---: | ---: | --- |
 | the registered lift (an isometry of `O(T_Co)`) | 6,945 B | 1.3 GiB | the registry; read at `predicate_subgroups.py:1010` |
 | the span key and the entry shell | 530 B | 0.1 GiB | the registry; read by the lookup |
-| the returned representative, of which `_preamble_selected_framing_source` | 32,098 B (19,248 B) | 6.0 GiB (3.6 GiB) | the cusp row's answer; the subobject's own construction |
+| the returned representative, of which `_preamble_selected_framing_source` | 32,098 B (19,248 B) | 5.7 GiB (3.4 GiB) | the cusp row's answer; the subobject's own construction |
 | one isometry of `O(T_Co)` whatever its word | 8.7 KB | -- | the arrow owner: `_isometry_inverse_computation` is the largest part of it |
-| one edge certificate (a carried flag and two transporters) | ~59 KB | ~33 GiB at three a plane | the relation the call returns |
+| one edge certificate (a carried flag and two transporters) | ~59 KB | ~31 GiB at three a plane | the relation the call returns |
 
 The honest summary of #584 is therefore three sentences.  The 63 KB a plane is
 real and linear.  One eighth of it is the registry this issue names, one half is
 the representative the row returns, and the rest is the allocator's constant
 factor on both.  Removing the whole registry would take the row from 12.7 GiB to
 12.9 GiB and would break the walk; what actually decides whether the row returns
-is #585's 66-76 GiB, and then the 33 GiB the returned relation's certificates
+is #585's 66-76 GiB, and then the 31 GiB the returned relation's certificates
 would add.
