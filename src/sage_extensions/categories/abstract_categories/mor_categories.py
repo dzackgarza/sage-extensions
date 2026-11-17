@@ -96,6 +96,7 @@ from sage_extensions.refine import (
     run_construction_hooks,
 )
 from sage_extensions.validation import validator
+from sage_extensions.utilities import _address_registry
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -2115,7 +2116,7 @@ def _declared_family(category, declaration_name, default):
     return (default if construction is None else construction)(category)
 
 
-@cached_function(key=lambda category: id(category))
+@_address_registry
 def _category_packet(category: Category) -> CategoryPacket:
     r"""The packet attached to this exact category object.
 

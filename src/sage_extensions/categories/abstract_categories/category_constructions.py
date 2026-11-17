@@ -21,6 +21,7 @@ from sage_extensions.categories.abstract_categories.objects import Objects, Owne
 from sage_extensions.lexicon.category_theory import ObjectOfCategory
 from sage_extensions.owned_category import _object_of
 from sage_extensions.categories.abstract_categories.mor_foundation import object_level
+from sage_extensions.utilities import _instance_address_registry
 
 if TYPE_CHECKING:
     from sage_extensions.logic import Predicate
@@ -179,7 +180,7 @@ class _OppositeCategory(OwnedCategory):
             case supers:
                 return [supercategory.opposite() for supercategory in supers]
 
-    @cached_method(key=lambda self, underlying_object: id(underlying_object))
+    @_instance_address_registry
     def object(self, underlying_object: Parent) -> ObjectOfCategory:
         if underlying_object not in self.base_category():
             raise TypeError(
@@ -439,7 +440,7 @@ class _ProductCategory(OwnedCategory):
     def super_categories(self):
         return [Objects()]
 
-    @cached_method(key=lambda self, first, second: (id(first), id(second)))
+    @_instance_address_registry
     def pair(self, first: Parent, second: Parent) -> ObjectOfCategory:
         if first not in self.first_category() or second not in self.second_category():
             raise TypeError(

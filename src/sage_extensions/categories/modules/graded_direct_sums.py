@@ -1,6 +1,6 @@
 r"""Finite-support direct sums of a represented family of graded modules."""
 
-from sage.misc.cachefunc import cached_function, cached_method
+from sage.misc.cachefunc import cached_method
 from sage.structure.element import ModuleElement, parent as element_parent
 from sage.structure.richcmp import op_EQ, op_NE
 
@@ -19,6 +19,7 @@ from sage_extensions.categories.sets.indexed_families import finite_indexed_fami
 from sage_extensions.categories.sets.set_categories import Sets
 from sage_extensions.logic import conjunction, negation
 from sage_extensions.owned_category import _object_of
+from sage_extensions.utilities import _address_registry
 
 
 class GradedDirectSumElement(ModuleElement):
@@ -249,7 +250,7 @@ class _DirectSumOfModules:
         return f"Direct sum over {self.degree_index_set()}"
 
 
-@cached_function(key=lambda ring, pieces: (id(ring), id(pieces)))
+@_address_registry
 def _direct_sum_framing_source(ring, pieces):
     r"""The one chosen free source of the summed framings of this family."""
     labels = Sets().coproduct(pieces.map(lambda piece: piece.module_generating_set()))

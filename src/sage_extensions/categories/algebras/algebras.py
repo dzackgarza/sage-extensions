@@ -93,6 +93,7 @@ from sage_extensions.owned_category import owned_category_join
 from sage_extensions.owned_category_bases import CategoryWithAxiom
 from sage_extensions.refine import RealizationHook, refine
 from sage_extensions.validation import validator
+from sage_extensions.utilities import _address_registry
 
 if TYPE_CHECKING:
     from sage.categories.category import Category
@@ -902,7 +903,7 @@ class _AlgebraTensorSquareFunctor(Functor):
         return f"Tensor-square endofunctor on {self.domain()}"
 
 
-@cached_function(key=lambda base_ring: id(_owned_ring(base_ring)))
+@cached_function(key=lambda base_ring: _owned_ring(base_ring))
 def _algebra_tensor_square_functor(base_ring):
     ring = _owned_ring(base_ring)
     assert ring in OwnedRings().Commutative(), (
@@ -5776,7 +5777,7 @@ def _scalar_algebra_engine(engine):
     return dynamic_class(engine.__name__, (engine, _ScalarAlgebraEngine))
 
 
-@cached_function(key=lambda ring, structure_map: (id(ring), id(structure_map)))
+@_address_registry
 def _algebra_structure_view(ring, structure_map):
     r"""The R-algebra defined by the central ring map ``R -> ring``, once for each map."""
     return _algebra_structure_on(ring, structure_map)

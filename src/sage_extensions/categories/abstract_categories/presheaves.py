@@ -88,6 +88,7 @@ from sage_extensions.lexicon.category_theory import ObjectOfCategory
 from sage_extensions.owned_category import _object_of
 from sage_extensions.owned_category_bases import Category as OwnedCategoryBase
 from sage_extensions.categories.abstract_categories.mor_foundation import object_level
+from sage_extensions.utilities import _address_registry, _instance_address_registry
 
 
 class _OppositeFunctor(Functor):
@@ -1003,7 +1004,7 @@ class TrivialCoveringFamilies(OwnedCategoryBase):
     def super_categories(self):
         return [CoveringFamilies(self.site_category())]
 
-    @cached_method(key=lambda self, target: id(target))
+    @_instance_address_registry
     def family(self, target: Parent):
         r"""The singleton identity cover of ``target``, one for each target."""
         if target not in self.site_category():
@@ -1095,7 +1096,7 @@ class OpenCoveringFamilies(OwnedCategoryBase):
 
     terminal_site_object = whole_open
 
-    @cached_method(key=lambda self, target: id(target))
+    @_instance_address_registry
     def family(self, target: Parent):
         r"""The singleton identity cover ``{U -> U}`` of an open ``U``."""
         identity = _category_mor_parent(self.site_category(), target, target).identity()
@@ -1195,7 +1196,7 @@ class DescentDataOnCover(OwnedCategoryBase):
         return f"Descent data on {self.covering_family()}"
 
 
-@cached_function(key=lambda site_category: id(site_category))
+@_address_registry
 def trivial_coverage(site_category: Category) -> Category:
     r"""Return the trivial coverage consisting only of identity singleton covers."""
 
@@ -1606,7 +1607,7 @@ class DescentData(SageObject):
     def value_category(self) -> Category:
         return self.presheaf().codomain()
 
-    @cached_method(key=lambda self, covering_family: id(covering_family))
+    @_instance_address_registry
     def comparison(self, covering_family: Parent) -> DescentEqualizerComparison:
         if covering_family not in self.coverage():
             raise TypeError(
@@ -1765,7 +1766,7 @@ class Sheaves(OwnedCategoryBase):
             )
         return self._object_on(functor, descent_data)
 
-    @cached_method(key=lambda self, functor, descent_data: (id(functor), id(descent_data)))
+    @_instance_address_registry
     def _object_on(self, functor: Functor, descent_data: DescentData):
         return functor._with_structure(
             (self,),

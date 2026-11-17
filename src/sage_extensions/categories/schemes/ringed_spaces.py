@@ -39,6 +39,7 @@ from sage_extensions.logic import AtomicProposition, conjunction, negation
 from sage_extensions.owned_category import _object_of, owned_category_join
 from sage_extensions.owned_category_bases import CategoryWithAxiom
 from sage_extensions.validation import validator
+from sage_extensions.utilities import _address_registry, _instance_address_registry
 
 if "Invertible" not in all_axioms:
     all_axioms.add("Invertible")
@@ -602,7 +603,7 @@ class _StructureSheafEngine:
         r"""The ring-valued sections functor underlying ``O_X`` on its open site."""
         return self.functor()
 
-    @cached_method(key=lambda self, cover: id(cover))
+    @_instance_address_registry
     def module_descent_datum(self, cover):
         r"""The rank-one module descent presentation of ``O_X`` on ``cover``."""
         if cover.ambient_scheme() is not self.ringed_space():
@@ -817,7 +818,7 @@ class _AffineStructurePresheaf(Functor):
         return f"Affine structure presheaf of {self.scheme()}"
 
 
-@cached_function(key=lambda scheme: id(scheme))
+@_address_registry
 def _affine_de_rham_complex(scheme):
     r"""``Ω^•_{X/R}`` on the distinguished affine basis of an affine ``X``.
 
@@ -1170,7 +1171,7 @@ class ZariskiCoveringFamilies(OwnedParameterizedCategory):
         return f"finite Zariski covering families of {self.scheme()}"
 
 
-@cached_function(key=lambda scheme: id(scheme))
+@_address_registry
 def zariski_coverage(scheme) -> Category:
     r"""The represented finite Zariski coverage of ``Sch_R/X``."""
 
@@ -1567,7 +1568,7 @@ class DistinguishedAffineCovers(OwnedCategory):
             return f"Distinguished affine cover of {self.ambient_scheme()} by {self.atlas().cardinality()} opens"
 
 
-@cached_function(key=lambda scheme: id(scheme))
+@_address_registry
 def distinguished_affine_coverage(scheme) -> Category:
     r"""The distinguished-open coverage in ``AffSch_R/X``."""
 
@@ -2170,7 +2171,7 @@ class QuasiCoherentSheaves(CategoryPacketMethods, OwnedParameterizedCategory):
         )
         return Modules(scheme.coordinate_algebra())
 
-    @cached_method(key=lambda self, module: id(module))
+    @_instance_address_registry
     def associated_sheaf(self, module):
         r"""``M |-> M~``, the equivalence out of ``Modules(A)``."""
         assert module in self.module_category(), (

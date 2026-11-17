@@ -232,6 +232,8 @@ from sage_extensions.tensors.tensor import (
     tensor,
 )
 
+from sage_extensions.utilities import _instance_address_registry
+
 
 def nikulin_invariants(rank, discriminant_length, delta):
     r"""Return \((r,a,\delta)\) as a point of \(\mathbb N^3\)."""
@@ -2498,7 +2500,7 @@ class OrientedIsotropicFlags(_MarkedLatticeMethods, _FiniteSequenceFunctorCatego
 
     object = __call__
 
-    @cached_method(key=lambda self, oriented: id(oriented))
+    @_instance_address_registry
     def _object_on(self, oriented):
         return OrientedFlagDiagram(oriented)
 
@@ -4580,7 +4582,7 @@ class Lattices(OwnedCategoryOverBaseRing):
         def SO(self, *args, **kwargs):
             return self.special_orthogonal_group(*args, **kwargs)
 
-        @cached_method(key=lambda self, ring_map: id(ring_map))
+        @_instance_address_registry
         def base_change(self, ring_map) -> Lattices.ParentMethods:
             r"""Return \(L\otimes_R S\) along ``ring_map`` \(\varphi\colon R\to S\), a lattice over \(S\).
 

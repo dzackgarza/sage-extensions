@@ -25,6 +25,7 @@ from sage.structure.parent import Parent
 
 from sage_extensions.categories.abstract_categories.mor_foundation import CategoricalArrow
 from sage_extensions.lexicon.category_theory import ObjectOfCategory
+from sage_extensions.utilities import _instance_address_registry
 
 if TYPE_CHECKING:
     from sage_extensions.logic import Predicate
@@ -686,7 +687,7 @@ class NaturalTransformation:
     def target(self) -> Functor:
         return self._target
 
-    @cached_method(key=lambda self, obj: id(obj))
+    @_instance_address_registry
     def component(self, obj: Parent) -> Morphism:
         r"""The component ``eta_X``, an arrow of ``Hom_D(F(X), G(X))``.
 

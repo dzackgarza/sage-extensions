@@ -87,6 +87,7 @@ from sage_extensions.categories.topological_spaces import TopologicalSpaces
 from sage_extensions.logic import AtomicProposition, conjunction, negation
 from sage_extensions.owned_category import _object_of, owned_category_join
 from sage_extensions.validation import validator
+from sage_extensions.utilities import _instance_address_registry
 
 
 def _ordered_transition_images(datum, transition_data, source_index, target_index):
@@ -1317,7 +1318,7 @@ class _FiniteAffineAtlasEngine:
     def chart_embedding(self, index):
         return self.member(self.normalize_chart_index(index)).domain().arrow()
 
-    @cached_method(key=lambda self, morphism: id(morphism))
+    @_instance_address_registry
     def pullback(self, morphism):
         r"""Pull this atlas back along a represented affine morphism.
 
@@ -1738,7 +1739,7 @@ class FiniteAtlasRefinementMethods:
 
         return _algebra_mor(source, target)._from_constructed_element_map(image)
 
-    @cached_method(key=lambda self, descent: id(descent))
+    @_instance_address_registry
     def global_section_pullback(self, descent):
         r"""The map from coarse sections to fine sections with scalars restricted.
 
@@ -7374,7 +7375,7 @@ class _FiniteAtlasInverseImageModuleSheaves(OwnedCategory):
     def an_object(self):
         return self(self.source_category().an_object())
 
-    @cached_method(key=lambda self, sheaf: id(sheaf))
+    @_instance_address_registry
     def object(self, sheaf):
         if sheaf not in self.source_category():
             raise TypeError(

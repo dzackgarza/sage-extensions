@@ -10,7 +10,7 @@ from sage.categories.category import Category
 from sage.categories.map import Map
 from sage.categories.morphism import Morphism
 from sage.misc.abstract_method import abstract_method
-from sage.misc.cachefunc import cached_function, cached_method
+from sage.misc.cachefunc import cached_method
 from sage.misc.classcall_metaclass import typecall
 from sage.structure.dynamic_class import DynamicMetaclass
 from sage.structure.element import parent
@@ -37,6 +37,7 @@ from sage_extensions.categories.functors.core import (
     NaturalTransformation,
 )
 from sage_extensions.lexicon.category_theory import ObjectOfCategory
+from sage_extensions.utilities import _address_registry, _instance_address_registry
 
 if TYPE_CHECKING:
     from sage_extensions.categories.sets.indexed_families import IndexedFamily
@@ -187,12 +188,7 @@ class Cat(CategoryPacketMethods, Category):
 
     _mor_endpoint = object
 
-    @cached_method(
-        key=lambda self, domain, codomain: (
-            id(self.object(domain)),
-            id(self.object(codomain)),
-        )
-    )
+    @cached_method(key=lambda self, domain, codomain: (self.object(domain), self.object(codomain)))
     def functor_mor(
         self,
         domain: Category,
@@ -1451,7 +1447,7 @@ class _FunctorObject(Parent):
         return f"Functor object for {self._functor}"
 
 
-@cached_function(key=lambda functor: id(functor))
+@_address_registry
 def _functor_object(functor: Functor) -> _FunctorObject:
     r"""The canonical Sage Parent endpoint representing this literal functor."""
     if isinstance(functor, _FunctorObject):
@@ -1659,7 +1655,7 @@ class _FunctorCategory(CategoricalMor):
             value,
         )
 
-    @cached_method(key=lambda self, index: id(index))
+    @_instance_address_registry
     def evaluation(self, index):
         r"""Return evaluation at ``index``, the functor ``[C, D] -> D``, ``F |-> F(index)``."""
         return _EvaluationFunctor(self, index)

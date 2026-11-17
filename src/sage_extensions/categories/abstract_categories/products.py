@@ -38,6 +38,7 @@ from sage_extensions.lexicon.category_theory import ObjectOfCategory
 from sage_extensions.owned_category import _object_of
 from sage_extensions.owned_category_bases import Category as OwnedCategoryBase
 from sage_extensions.categories.abstract_categories.mor_foundation import object_level
+from sage_extensions.utilities import _address_registry, _instance_address_registry
 
 if TYPE_CHECKING:
     from sage_extensions.logic import Predicate
@@ -737,7 +738,7 @@ class ParallelPairDiagram(Functor):
         raise ValueError(f"{morphism} is not an arrow of the walking parallel pair")
 
 
-@cached_function(key=lambda left, right, target_category: (id(left), id(right), id(target_category)))
+@_address_registry
 def _parallel_pair_diagram(left: Morphism, right: Morphism, target_category: Category) -> ParallelPairDiagram:
     r"""Return the selected diagram object for one represented parallel pair.
 
@@ -997,7 +998,7 @@ class ParallelFamilyDiagram(Functor):
                 )
 
 
-@cached_function(key=lambda morphisms, target_category: (id(morphisms), id(target_category)))
+@_address_registry
 def _parallel_family_diagram(
     morphisms: IndexedFamily,
     target_category: Category,
@@ -1755,7 +1756,7 @@ class _LimitsOfCategory(OwnedCategoryBase):
                 return candidate, selected
         return None
 
-    @cached_method(key=lambda self, diagram: id(diagram))
+    @_instance_address_registry
     def construction(self, diagram):
         r"""Return the ordinary categorical limit on a finite represented shape.
 
@@ -1862,7 +1863,7 @@ class _LimitsOfCategory(OwnedCategoryBase):
 
 
 class _ColimitsOfCategory(_LimitsOfCategory):
-    @cached_method(key=lambda self, diagram: id(diagram))
+    @_instance_address_registry
     def construction(self, diagram):
         r"""Return the selected colimit, using coproducts and a coequalizer on finite shapes."""
         object_set, objects, arrows = self._finite_shape_data(diagram)

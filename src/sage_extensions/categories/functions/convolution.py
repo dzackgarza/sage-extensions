@@ -20,6 +20,7 @@ from sage_extensions.categories.modules.pure.modules import Modules
 from sage_extensions.categories.sets.indexed_families import indexed_family
 from sage_extensions.rings.real import RR, _owned_real_from_engine_expression
 from sage_extensions.rings.unit_interval import UnitInterval
+from sage_extensions.utilities import _address_registry
 
 
 def _holder_degree(space):
@@ -33,7 +34,7 @@ def _space_at_degree(degree):
     return Lp(exponent, RR, RR).quotient_by_null_functions()
 
 
-@cached_function(key=lambda left, right: (id(left), id(right)))
+@_address_registry
 def _symbolic_convolution(left, right):
     r"""Private SymPy integral of the existing representative formulas.
 
@@ -130,7 +131,7 @@ def _convolution_representative(space, left, right):
     return space(evaluate if formula is None else formula)
 
 
-@cached_function(key=lambda left, right: (id(left), id(right)))
+@_address_registry
 def _convolution_pairing(left, right):
     r"""The linear classifier Lp tensor_R Lq -> Lr on a Young-admissible pair."""
     s, t = _holder_degree(left), _holder_degree(right)

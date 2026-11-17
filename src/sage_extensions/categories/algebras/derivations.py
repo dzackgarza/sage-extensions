@@ -59,6 +59,7 @@ from sage_extensions.categories.sets.indexed_families import (
 )
 from sage_extensions.logic import AtomicProposition, Propositions, conjunction
 from sage_extensions.validation import validator
+from sage_extensions.utilities import _address_registry
 
 
 def _presented_ring(algebra):
@@ -756,7 +757,7 @@ class DerivationCategoryConstruction(_RestrictedMorCategoryOf):
         return self._accepts_by_placement(arrow)
 
 
-@cached_function(key=lambda algebra, target_module: (id(algebra), id(target_module)))
+@_address_registry
 def _derivations(algebra, target_module) -> DerivationSpace:
     if target_module.base_ring() is not algebra:
         raise TypeError(

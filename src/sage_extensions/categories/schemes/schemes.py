@@ -143,6 +143,7 @@ from sage_extensions.logic import AtomicProposition, conjunction, negation
 from sage_extensions.owned_category import _object_of, owned_category_join
 from sage_extensions.owned_category_bases import CategoryWithAxiom
 from sage_extensions.refine import RealizationHook
+from sage_extensions.utilities import _address_registry, _instance_address_registry
 
 for _scheme_axiom in (
     "Affine",
@@ -2114,7 +2115,7 @@ class SchemeMorphismMethods:
         r"""``f_* N~ = (Res_{f^#} N)~`` for affine ``f: Spec B -> Spec A`` (Stacks, Tag 01I9)."""
         return self.direct_image_functor().on_object(sheaf)
 
-    @cached_method(key=lambda self, sheaf: id(sheaf))
+    @_instance_address_registry
     def module_pullback(self, sheaf):
         r"""Return the represented object ``f^*F``.
 
@@ -2439,7 +2440,7 @@ def _constant_sections_ring(source):
     return _engine_polynomial_algebra(ambient.coordinate_ring(), base)
 
 
-@cached_function(key=lambda scheme, ring: (id(scheme), id(ring)))
+@_address_registry
 def _projective_section_restriction(scheme, ring):
     r"""Read coordinate polynomials modulo the equations on the stated source.
 
@@ -3120,7 +3121,7 @@ def _affine_scheme(algebra, base, placements=(), **level_data):
     )
 
 
-@cached_function(key=lambda algebra, base: (id(algebra), id(base)))
+@_address_registry
 def _affine_spectrum_over(algebra, base):
     r"""The selected ``Spec A`` over ``Spec R``, one object for each ``(A, R)``."""
     return _affine_scheme(algebra, base)

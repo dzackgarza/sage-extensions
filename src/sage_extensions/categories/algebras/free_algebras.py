@@ -87,6 +87,7 @@ from sage_extensions.categories.sets.set_categories import (
 from sage_extensions.logic import AtomicProposition, conjunction, negation
 from sage_extensions.owned_category_bases import CategoryWithAxiom
 from sage_extensions.refine import RealizationHook
+from sage_extensions.utilities import _address_registry
 
 
 # The construction data a category-level constructor of a free algebra
@@ -625,7 +626,7 @@ def _symmetric_algebra_on(base_ring, algebra_generating_set, *, source_module=No
     return _symmetric_algebra_of_free_module(generating)
 
 
-@cached_function(key=lambda generating: id(generating))
+@_address_registry
 def _symmetric_algebra_of_free_module(generating):
     r"""``Sym_R(F)`` for the free module ``F = F_R(S)``: one object per ``F``, which is the cache key.
 

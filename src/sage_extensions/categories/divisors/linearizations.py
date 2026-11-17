@@ -16,7 +16,7 @@ space is constructed as the existing module over the group algebra, so
 invariants and isotypic components are those of the common group-module owner.
 """
 
-from sage.misc.cachefunc import cached_function, cached_method
+from sage.misc.cachefunc import cached_method
 
 from sage_extensions.categories.functors.group_actions import GroupActionFunctor
 from sage_extensions.categories.group.g_objects import GObjects
@@ -34,6 +34,8 @@ from sage_extensions.categories.sets.indexed_families import (
     finite_indexed_family,
     indexed_family,
 )
+
+from sage_extensions.utilities import _address_registry
 
 
 class _ProjectiveActionFunctor(GroupActionFunctor):
@@ -650,12 +652,7 @@ class _ProductProjectiveLineBundleLinearization(_ProjectiveLineBundleLinearizati
         return self.section_group_module()
 
 
-@cached_function(
-    key=lambda projective_product, group=None: (
-        id(projective_product),
-        id(OwnedGroups().C(2) if group is None else group),
-    )
-)
+@_address_registry
 def _c2_diagonal_product_projective_action(projective_product, group=None):
     r"""Return the diagonal sign action ``[x0:x1] |-> [x0:-x1]`` on every P1 factor."""
     base = projective_product.scheme_base_ring()
@@ -743,7 +740,7 @@ def _c2_diagonal_product_projective_action(projective_product, group=None):
 
 
 
-@cached_function(key=lambda projective_line, group=None: (id(projective_line), id(OwnedGroups().C(2) if group is None else group)))
+@_address_registry
 def _projective_line_coordinate_swap_action(projective_line, group=None):
     r"""Return the ``C2`` action on ``P^1`` interchanging its two coordinates."""
     base = projective_line.scheme_base_ring()

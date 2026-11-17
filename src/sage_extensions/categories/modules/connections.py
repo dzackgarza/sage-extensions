@@ -4,7 +4,7 @@ from collections.abc import Mapping
 
 from sage.categories.category import Category
 from sage.categories.category_with_axiom import all_axioms
-from sage.misc.cachefunc import cached_function, cached_method
+from sage.misc.cachefunc import cached_method
 from sage.rings.integer_ring import ZZ as SageZZ
 from sage.structure.element import Element
 from sage.structure.element import parent as element_parent
@@ -47,6 +47,7 @@ from sage_extensions.categories.rings.ring_foundation import (
 from sage_extensions.logic import AtomicProposition, ask, conjunction
 from sage_extensions.owned_category_bases import CategoryWithAxiom
 from sage_extensions.validation import validator
+from sage_extensions.utilities import _address_registry
 
 # ``Integrable`` is the property that the curvature of the selected connection
 # vanishes.  ``Flat`` already names the flat-module axiom of ``Modules(R)``, so
@@ -717,7 +718,7 @@ class ConnectionCategoryConstruction(_RestrictedMorCategoryOf):
         return connections is not None and connections.inclusion_image_contains(arrow)
 
 
-@cached_function(key=lambda module: id(module))
+@_address_registry
 def _connections(module) -> ConnectionSpace:
     algebra = module.base_ring()
     if algebra not in Algebras(algebra.base_ring()).Associative().Unital().Commutative():

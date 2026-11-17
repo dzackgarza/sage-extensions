@@ -64,6 +64,7 @@ from sage_extensions.logic import AtomicProposition, conjunction, negation
 from sage_extensions.owned_category import _object_of
 from sage_extensions.owned_category_bases import CategoryWithAxiom
 from sage_extensions.refine import RealizationHook
+from sage_extensions.utilities import _address_registry, _instance_address_registry
 
 
 def _finitely_generated_free_placement(ring, module_generating_set):
@@ -820,12 +821,7 @@ class FramedFreeModules(OwnedCategoryOverBaseRing):
             return cardinal(size).is_finite()
 
         # Arrow equality is a proposition, so the cache is keyed by the given map.
-        @cached_method(
-            key=lambda self, ring_map, _extra_construction_data=None: (
-                id(ring_map),
-                id(_extra_construction_data),
-            )
-        )
+        @_instance_address_registry
         def base_change(self, ring_map, *, _extra_construction_data=None):
             r"""Return ``S tensor_R M`` along the specified ring map ``R -> S``."""
             return _framed_free_base_change(self, ring_map, _extra_construction_data)
@@ -1072,12 +1068,7 @@ class FramedFreeModules(OwnedCategoryOverBaseRing):
                         return selected.differential(1)
 
             # Arrow equality is a proposition, so the cache is keyed by the given map.
-            @cached_method(
-                key=lambda self, ring_map, _extra_construction_data=None: (
-                    id(ring_map),
-                    id(_extra_construction_data),
-                )
-            )
+            @_instance_address_registry
             def base_change(self, ring_map, *, _extra_construction_data=None):
                 r"""Return ``S tensor_R R^(S) = S^(S)`` on the same basis labels.
 
@@ -1742,9 +1733,7 @@ def _module_generating_set(labels):
     return Sets.Δ[rank - 1]
 
 
-@cached_function(
-    key=lambda ring, module_generating_set: (id(ring), id(module_generating_set))
-)
+@_address_registry
 def _owned_free_module_on(ring, module_generating_set):
     r"""Return ``F_R(S)`` for this literal ring and selected label-set object.
 

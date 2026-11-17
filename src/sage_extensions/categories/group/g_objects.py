@@ -58,6 +58,7 @@ from sage_extensions.owned_category_bases import CategoryWithAxiom
 from sage_extensions.refine import RealizationHook
 from sage_extensions.validation import validator
 from sage_extensions.categories.abstract_categories.mor_foundation import object_level
+from sage_extensions.utilities import _instance_address_registry
 
 if "ProperlyDiscontinuous" not in all_axioms:
     all_axioms.add("ProperlyDiscontinuous")
@@ -1118,7 +1119,7 @@ class GObjects(CategoryPacketMethods, OwnedCategory):
             raise TypeError(f"{acted} is not an action in {self}")
         return _action_functor_of(acted, self.acting_group(), category)
 
-    @cached_method(key=lambda self, acted: id(acted))
+    @_instance_address_registry
     def _affine_invariant_action(self, acted):
         r"""Select the existing affine invariant computation on the same action.
 
@@ -1191,7 +1192,7 @@ class GObjects(CategoryPacketMethods, OwnedCategory):
         r"""Lift an invariant global section through the retained inclusion."""
         return self._affine_invariant_action(acted)._invariant_algebra_element(element)
 
-    @cached_method(key=lambda self, acted: id(acted))
+    @_instance_address_registry
     def affine_quotient(self, acted):
         r"""Return Spec(Gamma(U(acted), O)^G), universal for affine targets.
 
@@ -1200,7 +1201,7 @@ class GObjects(CategoryPacketMethods, OwnedCategory):
         algebra = self.invariant_algebra(acted)
         return algebra.affine_spectrum(base_ring=self.underlying_category().base_ring())
 
-    @cached_method(key=lambda self, acted: id(acted))
+    @_instance_address_registry
     def quotient_morphism(self, acted):
         r"""Return the invariant map from the exact carrier to its affine quotient."""
         from sage_extensions.categories.schemes.schemes import (

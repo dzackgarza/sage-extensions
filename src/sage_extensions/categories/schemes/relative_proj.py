@@ -18,7 +18,7 @@ The normalization is the quotient convention of Stacks Project, Tag 01OA:
 ``pi^* F -> O(1)``.
 """
 
-from sage.misc.cachefunc import cached_function, cached_method
+from sage.misc.cachefunc import cached_method
 from sage.categories.morphism import Morphism
 from sage.structure.sage_object import SageObject
 
@@ -57,6 +57,7 @@ from sage_extensions.categories.sets.finite_ordered_sets import (
 )
 from sage_extensions.owned_category import _object_of
 from sage_extensions.categories.abstract_categories.mor_foundation import object_level
+from sage_extensions.utilities import _address_registry, _instance_address_registry
 
 
 def _relative_projectivization_projection(parent, source_sheaf):
@@ -634,7 +635,7 @@ class RelativeProjectivizations(OwnedCategoryOverBaseRing):
                 line,
             )(self)
 
-        @cached_method(key=lambda self, ring_map: id(ring_map))
+        @_instance_address_registry
         def projectivization_base_change(self, ring_map):
             source_scheme = self.projectivization_source_sheaf().scheme()
             match source_scheme in Schemes(source_scheme.scheme_base_ring()).Affine():
@@ -1298,7 +1299,7 @@ class _AffineProjectivizationSchemeEngine:
             )
         return QuasiCoherentSheaves(self).Mor(pulled, line)(local_maps)
 
-    @cached_method(key=lambda self, ring_map: id(ring_map))
+    @_instance_address_registry
     def projectivization_base_change(self, ring_map):
         r"""Return the represented affine base-change comparison along ``ring_map``."""
         return AffineProjectivizationBaseChangeComparison(self, ring_map)
@@ -2518,7 +2519,7 @@ class _FiniteAtlasProjectivizationSchemeEngine:
             )
         return QuasiCoherentSheaves(self).Mor(pulled, line)(local_maps)
 
-    @cached_method(key=lambda self, ring_map: id(ring_map))
+    @_instance_address_registry
     def projectivization_base_change(self, ring_map):
         r"""Return the represented finite-atlas scalar base-change comparison."""
         return FiniteAtlasProjectivizationBaseChangeComparison(self, ring_map)
@@ -2779,7 +2780,7 @@ def _exact_relative_projectivization(sheaf):
     )
 
 
-@cached_function(key=lambda sheaf: id(sheaf))
+@_address_registry
 def _finite_atlas_projectivization(sheaf):
     r"""Construct ``Proj_X(Sym(F))`` from one finite-atlas QCoh presentation."""
     module_datum = _finite_atlas_module_datum(sheaf)
@@ -2821,7 +2822,7 @@ def _finite_atlas_projectivization(sheaf):
     )
 
 
-@cached_function(key=lambda sheaf: id(sheaf))
+@_address_registry
 def _affine_projectivization(sheaf):
     r"""Construct ``P_X(F) -> X`` for an affine represented quasi-coherent sheaf."""
     scheme = sheaf.scheme()

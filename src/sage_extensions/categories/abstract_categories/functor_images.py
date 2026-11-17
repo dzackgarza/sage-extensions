@@ -26,6 +26,7 @@ from sage_extensions.categories.abstract_categories.objects import Objects, Owne
 from sage_extensions.categories.functors.core import Functor
 from sage_extensions.owned_category import _object_of
 from sage_extensions.categories.abstract_categories.mor_foundation import object_level
+from sage_extensions.utilities import _instance_address_registry
 
 
 class FunctorImageMorphism(CategoricalMor.ElementMethods):
@@ -168,7 +169,7 @@ class ImageOfFunctor(OwnedCategory):
     def an_object(self):
         return self.object(self.functor().domain().an_object())
 
-    @cached_method(key=lambda self, preimage: id(preimage))
+    @_instance_address_registry
     def object(self, preimage):
         r"""``F(X)`` presented by ``X``: this category's one entry, one object per preimage."""
         if preimage not in self.functor().domain():

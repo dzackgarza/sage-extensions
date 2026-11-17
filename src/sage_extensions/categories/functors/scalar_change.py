@@ -8,7 +8,7 @@ Exercise 2.3.6).  Induction, restriction and coinduction along a subgroup
 realization lives in ``group_induction``.
 """
 
-from sage.misc.cachefunc import cached_function, cached_method
+from sage.misc.cachefunc import cached_method
 
 from sage_extensions.categories.algebras.group_algebras import GroupAlgebras
 from sage_extensions.categories.functors.core import Adjunction, Functor
@@ -24,6 +24,8 @@ from sage_extensions.categories.rings.ring_foundation import (
     _engine_ring,
     _owned_ring,
 )
+
+from sage_extensions.utilities import _address_registry, _instance_address_registry
 
 
 def _scalar_extension_comparison(source, direct, iterated):
@@ -138,7 +140,7 @@ class _ScalarExtensionFunctor(Functor):
                     f"scalar extension along the identity {self.ring_map()} sent {module} to a different module"
                 )
 
-    @cached_method(key=lambda self, second_ring_map: id(second_ring_map))
+    @_instance_address_registry
     def composite_ring_map(self, second_ring_map):
         r"""Return the selected composite ``R -> S -> T`` for this extension."""
         match second_ring_map.domain() is self.ring_map().codomain():
@@ -470,11 +472,11 @@ class _RestrictionCoextensionAdjunction(Adjunction):
         return f"Restriction/coextension adjunction along {self._ring_map}"
 
 
-@cached_function(key=lambda ring_map: id(ring_map))
+@_address_registry
 def _base_change_adjunction(ring_map) -> _BaseChangeAdjunction:
     return _BaseChangeAdjunction(ring_map)
 
 
-@cached_function(key=lambda ring_map: id(ring_map))
+@_address_registry
 def _restriction_coextension_adjunction(ring_map) -> _RestrictionCoextensionAdjunction:
     return _RestrictionCoextensionAdjunction(ring_map)

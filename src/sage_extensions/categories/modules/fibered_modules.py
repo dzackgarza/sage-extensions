@@ -42,6 +42,7 @@ from sage_extensions.categories.rings.ring_foundation import (
 )
 from sage_extensions.logic import AtomicProposition, conjunction, negation
 from sage_extensions.categories.abstract_categories.mor_foundation import object_level
+from sage_extensions.utilities import _instance_address_registry
 
 
 class SemilinearModuleMorphism:
@@ -257,7 +258,7 @@ class SemilinearModuleMor(CategoricalMor):
                 f"rings {source_ring} -> {target_ring}, but {scalar_map} is not one"
             )
 
-    @cached_method(key=lambda self, scalar_map: id(scalar_map))
+    @_instance_address_registry
     def base_change_adjunction(self, scalar_map):
         r"""Return the one scalar-extension/restriction adjunction for ``scalar_map``."""
         self._validate_scalar_map(scalar_map)

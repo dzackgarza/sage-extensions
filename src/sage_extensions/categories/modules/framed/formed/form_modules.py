@@ -1584,7 +1584,7 @@ def _base_changed_scalar_gram(source, ring_map):
     )
 
 
-@cached_function(key=lambda source, ring_map: (id(source), id(ring_map)))
+@_address_registry
 def _formed_module_base_change(self, ring_map):
     r"""Base-change a scalar-valued finite free form along ``R -> S``."""
 

@@ -1,5 +1,5 @@
 r"""The algebraic de Rham functor, its degree-zero adjunction, and de Rham cohomology of smooth schemes."""
-from sage.misc.cachefunc import cached_function, cached_method
+from sage.misc.cachefunc import cached_function
 
 from sage_extensions.categories.algebras.algebras import (
     Algebras,
@@ -14,6 +14,7 @@ from sage_extensions.categories.rings.ring_foundation import LocalizationRings, 
 
 
 from sage_extensions.categories.modules.powers import _exterior_word
+from sage_extensions.utilities import _instance_address_registry
 
 
 def _extend_degree_zero_map(source_dga, target_dga, algebra_morphism):
@@ -133,7 +134,7 @@ class _DegreeZeroDGAFunctor(Functor):
     def base_ring(self):
         return self._base_ring
 
-    @cached_method(key=lambda self, dga: id(dga))
+    @_instance_address_registry
     def _degree_zero_data(self, dga):
         r"""The exact algebra ``B^0``, its module inclusion, and its degree-zero lift.
 

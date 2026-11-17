@@ -77,7 +77,7 @@ from sage.graphs.graph import Graph
 from sage.graphs.bliss import canonical_form
 from sage.groups.perm_gps.permgroup_named import SymmetricGroup
 from sage.matrix.constructor import matrix as engine_matrix
-from sage.misc.cachefunc import cached_method, weak_cached_function
+from sage.misc.cachefunc import cached_method
 from sage.rings.integer_ring import ZZ as SageZZ
 from sage.rings.rational_field import QQ as SageQQ
 
@@ -90,6 +90,7 @@ from sage_extensions.categories.rings.ring_foundation import (
 from sage_extensions.categories.sets.cardinals import cardinal
 from sage_extensions.categories.sets.finite_ordered_sets import finite_ordered_set
 from sage_extensions.categories.sets.set_categories import Sets
+from sage_extensions.utilities import _weak_address_registry
 
 
 class _LabelledPairingGraph:
@@ -1046,7 +1047,7 @@ class _ColouredFamilyRealization:
         return exponent, containing
 
 
-@weak_cached_function(cache=0, key=lambda lattice, family: (id(lattice), id(family)))
+@_weak_address_registry
 def _realization(lattice, family):
     return _ColouredFamilyRealization(lattice, family)
 

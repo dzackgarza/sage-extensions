@@ -95,6 +95,7 @@ from sage_extensions.logic import AtomicProposition, Predicate, Propositions, co
 from sage_extensions.owned_category_bases import CategoryWithAxiom
 from sage_extensions.refine import RealizationHook, realize_owned_category, refine
 from sage_extensions.categories.abstract_categories.mor_foundation import object_level
+from sage_extensions.utilities import _instance_address_registry
 
 
 class _OwnedRingBootstrapParent(metaclass=ABCMeta):
@@ -2412,7 +2413,7 @@ class LocalizationRings(OwnedCategory):
                     )
             return inverted[0]
 
-        @cached_method(key=lambda self, source_ring: id(source_ring))
+        @_instance_address_registry
         def principal_localization_comparison(self, source_ring):
             r"""Compare a finite localization tower with ``source_ring[1/f]``.
 
@@ -4093,7 +4094,7 @@ class OwnedRings(CategoryPacketMethods, OwnedCategory):
                 )
                 return _engine_krull_dimension(self)
 
-            @cached_method(key=lambda self, base_ring: id(_own_ring(base_ring)))
+            @cached_method(key=lambda self, base_ring: _own_ring(base_ring))
             def as_algebra_over(self, base_ring):
                 r"""Read this ring through its selected canonical coefficient map.
 
@@ -5425,7 +5426,7 @@ class OwnedOrders(CategoryPacketMethods, OwnedCategory):
 
         return _order_number_field_adjunction()
 
-    @cached_method(key=lambda self, domain, codomain: (id(domain), id(codomain)))
+    @_instance_address_registry
     def Mor(self, domain, codomain):
         r"""Return the exact embedding Mor between two represented orders."""
         if domain not in self or codomain not in self:

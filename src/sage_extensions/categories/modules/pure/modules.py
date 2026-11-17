@@ -100,6 +100,7 @@ from sage_extensions.logic import (
 from sage_extensions.owned_category_bases import CategoryWithAxiom
 from sage_extensions.refine import RealizationHook
 from sage_extensions.validation import validator
+from sage_extensions.utilities import _instance_address_registry
 
 if TYPE_CHECKING:
     from sage_extensions.lexicon.category_theory import ObjectOfCategory
@@ -546,7 +547,7 @@ class Modules(OwnedCategoryOverBaseRing):
     # ``S tensor_R - -| Res_f -| Hom_R(S, -)``, each functor spelled on its
     # domain category and each adjunction on its left adjoint's domain.
 
-    @cached_method(key=lambda self, ring_map: id(ring_map))
+    @_instance_address_registry
     def scalar_extension(self, ring_map):
         r"""``S tensor_R - : Modules(R) -> Modules(S)`` along ``ring_map: R -> S``."""
         from sage_extensions.categories.functors.scalar_change import (

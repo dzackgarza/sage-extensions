@@ -11,6 +11,7 @@ from sage_extensions.categories.algebras.restricted_graded_algebras import (
     _restricted_graded_algebra,
 )
 from sage_extensions.categories.rings.ring_foundation import OwnedCategoryOverBaseRing
+from sage_extensions.utilities import _address_registry
 
 
 class _DeRhamAlgebra:
@@ -237,7 +238,7 @@ def _coefficient_algebra(algebra, base):
     return algebra.as_algebra_over(base)
 
 
-@cached_function(key=lambda algebra: id(algebra))
+@_address_registry
 def _de_rham_algebra_from_source(algebra):
     from sage_extensions.categories.algebras.derivations import (
         _algebra_coefficient_ring,

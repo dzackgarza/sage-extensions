@@ -2,7 +2,7 @@
 
 from sage.categories.map import Map
 from sage.misc.abstract_method import abstract_method
-from sage.misc.cachefunc import cached_function, cached_method
+from sage.misc.cachefunc import cached_method
 
 from sage_extensions.categories.abstract_categories.mor_categories import (
     CategoricalMor,
@@ -18,6 +18,7 @@ from sage_extensions.categories.functors.core import Functor
 from sage_extensions.owned_category_bases import CategoryWithAxiom
 from sage_extensions.refine import RealizationHook
 from sage_extensions.validation import validator
+from sage_extensions.utilities import _address_registry
 
 
 class MagmaMorphism:
@@ -984,7 +985,7 @@ class MonoidMor(CategoricalMor):
         return self(lambda element: element)
 
 
-@cached_function(key=lambda monoid: id(monoid))
+@_address_registry
 def _unit_group(monoid):
     r"""Return the existing predicate submonoid of two-sided units of ``monoid``.
 

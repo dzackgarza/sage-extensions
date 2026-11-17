@@ -18,6 +18,7 @@ from sage_extensions.categories.algebras.lie_algebras import (
 )
 from sage_extensions.categories.functors.core import Functor
 from sage_extensions.categories.rings.ring_foundation import _owned_ring
+from sage_extensions.utilities import _address_registry
 
 
 class CommutatorLieAlgebraFunctor(Functor):
@@ -60,7 +61,7 @@ class CommutatorLieAlgebraFunctor(Functor):
         return f"Commutator Lie-algebra functor on associative {self.base_ring()}-algebras"
 
 
-@cached_function(key=lambda algebra: id(algebra))
+@_address_registry
 def _commutator_lie_algebra(algebra):
     r"""``A^-``: the algebra on ``A`` with bracket ``[x, y] = xy - yx``, one object per ``A``.
 

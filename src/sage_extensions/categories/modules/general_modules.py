@@ -13,7 +13,7 @@ without being restated at this level.
 import logging
 import operator
 
-from sage.misc.cachefunc import cached_function, cached_method
+from sage.misc.cachefunc import cached_method
 from sage.structure.element import ModuleElement
 from sage.structure.element import parent as element_parent
 from sage.structure.richcmp import op_EQ, op_NE
@@ -33,6 +33,7 @@ from sage_extensions.categories.sets.set_categories import (
 from sage_extensions.logic import AtomicProposition
 from sage_extensions.owned_category import _object_of
 from sage_extensions.validation import validator
+from sage_extensions.utilities import _address_registry
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -616,7 +617,7 @@ class _FunctionModule:
         return f"Module over {self.base_ring()} of maps {self.domain()} -> {self.codomain()}"
 
 
-@cached_function(key=lambda module, domain: (id(module), id(domain)))
+@_address_registry
 def _function_module(module, domain):
     r"""Construct ``B^A`` on ``Sets().Mor(A, B)``; the route of ``Modules.ParentMethods.function_module``."""
     from sage_extensions.categories.modules.pure.modules import (

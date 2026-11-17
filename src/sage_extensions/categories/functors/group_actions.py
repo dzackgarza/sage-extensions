@@ -27,6 +27,7 @@ from sage_extensions.categories.functors.scalar_change import (
 )
 from sage_extensions.categories.rings.ring_foundation import OwnedRings, _owned_ring
 from sage_extensions.categories.sets.set_categories import Sets
+from sage_extensions.utilities import _address_registry
 
 
 class GroupActionFunctor(Functor):
@@ -180,7 +181,7 @@ class TransportGroupActionFunctor(Functor):
         return f"Transport of {self.group()}-actions through {self.transport_functor()}"
 
 
-@cached_function(key=lambda algebra: id(algebra))
+@_address_registry
 def _group_algebra_augmentation_ring_map(algebra):
     r"""Return the canonical augmentation with literal ring target ``R``.
 

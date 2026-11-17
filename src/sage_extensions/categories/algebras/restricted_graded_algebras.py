@@ -18,6 +18,7 @@ from sage_extensions.categories.modules.graded_direct_sums import (
 from sage_extensions.categories.modules.pure.modules import Modules
 from sage_extensions.categories.sets.indexed_families import indexed_family
 from sage_extensions.categories.sets.set_categories import Sets
+from sage_extensions.utilities import _address_registry
 
 
 class _DegreeZeroAlgebraMultiplication(Action):
@@ -203,7 +204,7 @@ def _restricted_graded_algebra(algebra, ring_map, *, extra_categories=(), constr
     )
 
 
-@cached_function(key=lambda algebra, ring_map: (id(algebra), id(ring_map)))
+@_address_registry
 def _restrict_graded_algebra_scalars(algebra, ring_map):
     return _restricted_graded_algebra(algebra, ring_map)
 

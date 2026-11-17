@@ -2,7 +2,7 @@ r"""Kähler differentials of represented commutative algebras."""
 
 from sage.categories.category import Category
 
-from sage.misc.cachefunc import cached_function, cached_method
+from sage.misc.cachefunc import cached_method
 
 from sage_extensions.categories.algebras.derivations import (
     Derivation,
@@ -18,6 +18,7 @@ from sage_extensions.categories.rings.ring_foundation import (
 )
 from sage_extensions.categories.sets.finite_ordered_sets import finite_ordered_set
 from sage_extensions.owned_category import owned_category_join
+from sage_extensions.utilities import _address_registry
 
 
 class KahlerDifferentialModules(OwnedCategoryOverBaseRing):
@@ -305,7 +306,7 @@ def _presentation_cover_map(algebra, presentation):
     return algebra.algebra_presentation_morphism()
 
 
-@cached_function(key=lambda algebra: id(algebra))
+@_address_registry
 def _cached_kahler_differentials(algebra):
     return _construct_kahler_differentials(algebra)
 

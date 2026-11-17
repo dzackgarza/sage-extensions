@@ -36,6 +36,7 @@ from sage_extensions.lexicon.set_theory import SetObject
 from sage_extensions.logic import AtomicProposition, conjunction
 from sage_extensions.validation import validator
 from sage_extensions.categories.abstract_categories.mor_foundation import object_level
+from sage_extensions.utilities import _address_registry
 
 
 def _normalize_grading_monoid(monoid: Parent | None) -> SetObject:
@@ -74,7 +75,7 @@ class _ParityKey:
         return self._morphism
 
 
-@cached_function(key=lambda parity: id(parity))
+@_address_registry
 def _parity_key(parity):
     return _ParityKey(parity)
 

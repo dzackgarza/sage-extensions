@@ -36,6 +36,7 @@ from sage_extensions.categories.rings.ring_foundation import (
     _owned_ring,
 )
 from sage_extensions.categories.sets.set_categories import Sets
+from sage_extensions.utilities import _address_registry
 
 
 def _engine_ring_map(ring_map):
@@ -425,7 +426,7 @@ class _AlgebraLocalizationAdjunction(_AlgebraBaseChangeAdjunction):
         )._from_constructed_element_map(evaluate)
 
 
-@cached_function(key=lambda ring_map: id(ring_map))
+@_address_registry
 def _algebra_base_change_adjunction(ring_map) -> _AlgebraBaseChangeAdjunction:
     target = ring_map.codomain()
     if target in LocalizationRings() and ring_map is target.localization_map():

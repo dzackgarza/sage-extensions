@@ -111,6 +111,7 @@ from sage_extensions.categories.topological_spaces import TopologicalSpaces
 from sage_extensions.logic import AtomicProposition, conjunction, negation
 from sage_extensions.owned_category import _object_of, owned_category_join
 from sage_extensions.owned_category_bases import Category, CategoryWithAxiom
+from sage_extensions.utilities import _address_registry
 
 
 def _commutative_algebra_with_structure(
@@ -5581,7 +5582,7 @@ def _prime_localization_from_input(source, prime):
     return _prime_localization(source, prime_ideal)
 
 
-@cached_function(key=lambda source, prime_ideal: (id(source), id(prime_ideal)))
+@_address_registry
 def _prime_localization(source, prime_ideal):
     r"""Return ``R_p`` retaining this exact source and selected prime ideal.
 

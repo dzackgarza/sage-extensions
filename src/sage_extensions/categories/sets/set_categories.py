@@ -54,6 +54,7 @@ from sage_extensions.owned_category import OwnedParent, _object_of, owned_catego
 from sage_extensions.owned_category_bases import CategoryWithAxiom
 from sage_extensions.refine import RealizationHook
 from sage_extensions.validation import validator
+from sage_extensions.utilities import _address_registry
 
 if TYPE_CHECKING:
     from sage_extensions.categories.sets.cardinals import (
@@ -4805,7 +4806,7 @@ class _ImageSetEngine:
                 return f"Image of {source} under {self.image_map()}"
 
 
-@cached_function(key=lambda family: id(family))
+@_address_registry
 def _cartesian_product_of(family: IndexedFamily) -> Sets().ObjectType:
     r"""Build the product of the family of sets ``family`` in the category its factors decide.
 
@@ -6568,7 +6569,7 @@ def _coproduct_of_finite_family(family: IndexedFamily) -> Sets().ObjectType:
     return _interned_by_equality(family, _FINITE_COPRODUCTS, _coproduct_of_indexed_family)
 
 
-@cached_function(key=lambda family: id(family))
+@_address_registry
 def _coproduct_of_indexed_family(family: IndexedFamily) -> Sets().ObjectType:
     r"""Build the coproduct of the family of sets ``family`` in the category its summands decide.
 

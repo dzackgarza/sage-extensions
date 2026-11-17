@@ -175,7 +175,7 @@ def _glued_relative_spectrum(
     return glued.scheme_category().SliceOver(base_scheme)(structure)
 
 
-@cached_function(key=lambda datum: id(datum))
+@cached_function(key=lambda datum, *, _engine=None, construction_data=None: (datum, _engine))
 def _relative_spectrum(datum, *, _engine=None, construction_data=None):
     r"""``Spec_X(A)`` for algebra data on a distinguished affine cover."""
     cover = datum.cover()
@@ -190,7 +190,7 @@ def _relative_spectrum(datum, *, _engine=None, construction_data=None):
     )
 
 
-@cached_function(key=lambda datum: id(datum))
+@cached_function(key=lambda datum, *, _engine=None, construction_data=None: (datum, _engine))
 def _finite_atlas_relative_spectrum(datum, *, _engine=None, construction_data=None):
     r"""``Spec_X(A)`` for algebra data on a finite affine atlas of any scheme."""
     atlas = datum.gluing_datum()

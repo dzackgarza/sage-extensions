@@ -26,6 +26,7 @@ from sage_extensions.categories.rings.ring_foundation import (
     _owned_ring,
 )
 from sage_extensions.categories.sets.set_categories import Sets
+from sage_extensions.utilities import _address_registry
 
 
 def _native_fgp_morphism(morphism):
@@ -50,7 +51,7 @@ def _native_fgp_morphism(morphism):
     return FGP_Morphism(FGP_Homset(domain_engine, codomain_engine), native_linear)
 
 
-@cached_function(key=lambda source, target: (id(source), id(target)))
+@_address_registry
 def _internal_mor_model_data_from_endpoints(source, target):
     r"""Compute the endpoint-determined finite presentation of ``Hom_R(source,target)``.
 

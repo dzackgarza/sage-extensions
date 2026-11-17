@@ -74,6 +74,7 @@ from sage_extensions.logic import conjunction
 from sage_extensions.tensors.tensor import tensor
 from sage_extensions.validation import validator
 from sage_extensions.owned_category import owned_category_join
+from sage_extensions.utilities import _address_registry
 
 
 def _exterior_word(label, degree):
@@ -877,7 +878,7 @@ def _presented_degree_power(
     )
 
 
-@cached_function(key=lambda module: id(module))
+@_address_registry
 def _divided_square(module):
     r"""Return ``Gamma^2_R(M)``, the universal target for quadratic maps."""
     return _presented_degree_power(

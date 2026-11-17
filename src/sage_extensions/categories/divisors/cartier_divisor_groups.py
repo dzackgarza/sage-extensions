@@ -12,7 +12,7 @@ every overlap.  Those lifts are presentations of elements of ``CDiv(X)``;
 they are not a second kind of Cartier-divisor object.
 """
 
-from sage.misc.cachefunc import cached_function, cached_method
+from sage.misc.cachefunc import cached_method
 from sage.rings.integer_ring import ZZ as SageZZ
 from sage.structure.element import parent as element_parent
 from sage.structure.richcmp import op_EQ, op_NE
@@ -42,6 +42,7 @@ from sage_extensions.categories.sets.set_categories import Sets
 from sage_extensions.logic import AtomicProposition, conjunction, negation
 from sage_extensions.owned_category import _object_of, owned_category_join
 from sage_extensions.owned_category_bases import Category
+from sage_extensions.utilities import _address_registry
 
 
 def _integers():
@@ -357,7 +358,7 @@ class _CartierDivisorSectionsPresheaf(Functor):
         return self.codomain().Mor(source, target)._from_constructed_element_map(restrict)
 
 
-@cached_function(key=lambda scheme: id(scheme))
+@_address_registry
 def _total_quotient_sheaf(scheme):
     sheaves = SheafObjects(scheme)
     fibre, presheaf_data = _open_sheaf_placement(
@@ -372,7 +373,7 @@ def _total_quotient_sheaf(scheme):
     )
 
 
-@cached_function(key=lambda ring_sheaf: id(ring_sheaf))
+@_address_registry
 def _unit_sheaf(ring_sheaf):
     sheaves = SheafObjects(ring_sheaf.scheme())
     fibre, presheaf_data = _open_sheaf_placement(
@@ -387,7 +388,7 @@ def _unit_sheaf(ring_sheaf):
     )
 
 
-@cached_function(key=lambda scheme: id(scheme))
+@_address_registry
 def _regular_unit_sheaf(scheme):
     sheaves = SheafObjects(scheme)
     fibre, presheaf_data = _open_sheaf_placement(
@@ -402,7 +403,7 @@ def _regular_unit_sheaf(scheme):
     )
 
 
-@cached_function(key=lambda scheme: id(scheme))
+@_address_registry
 def _cartier_divisor_quotient_sheaf(scheme):
     r"""Return the represented quotient sheaf ``K_X^*/O_X^*``."""
     sheaves = SheafObjects(scheme)
@@ -966,7 +967,7 @@ class _CartierSectionClasses:
         return f"Global sections of {self.quotient_sheaf()}"
 
 
-@cached_function(key=lambda quotient_sheaf: id(quotient_sheaf))
+@_address_registry
 def _cartier_section_classes(quotient_sheaf):
     return _object_of(
         Sets(),

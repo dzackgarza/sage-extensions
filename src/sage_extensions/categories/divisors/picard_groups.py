@@ -10,7 +10,7 @@ takes its values.  The value at one scheme is that scheme's ``picard_group()``.
 """
 
 from sage.categories.map import Map
-from sage.misc.cachefunc import cached_function, cached_method
+from sage.misc.cachefunc import cached_method
 from sage.structure.element import parent as element_parent
 from sage.structure.parent import Parent
 from sage.structure.richcmp import op_EQ, op_NE
@@ -28,6 +28,7 @@ from sage_extensions.lexicon.category_theory import ObjectOfCategory
 from sage_extensions.logic import AtomicProposition, negation
 from sage_extensions.owned_category import _object_of, owned_category_join
 from sage_extensions.owned_category_bases import Category
+from sage_extensions.utilities import _address_registry
 
 
 class PicardGroups(Category):
@@ -402,7 +403,7 @@ class _PicardGroupEngine:
         return f"Pic({self.picard_scheme()})"
 
 
-@cached_function(key=lambda scheme, unit_sheaf: id(scheme))
+@_address_registry
 def _invertible_sheaf_class_group(scheme, unit_sheaf):
     r"""``Pic(X)``, the isomorphism classes of invertible ``O_X``-modules under tensor product.
 

@@ -11,7 +11,7 @@ from sage.categories.morphism import Morphism
 from sage.matrix.constructor import matrix as engine_matrix
 from sage.libs.pari import pari
 from sage.matrix.special import identity_matrix
-from sage.misc.cachefunc import cached_function, cached_method, weak_cached_function
+from sage.misc.cachefunc import cached_function, cached_method
 from sage.misc.mrange import cantor_product as _engine_cantor_product
 from sage.quadratic_forms.binary_qf import BinaryQF
 from sage.rings.integer_ring import ZZ as SageZZ
@@ -98,6 +98,7 @@ from sage_extensions.tensors.tensor import (
     tensor,
 )
 from sage_extensions.categories.abstract_categories.mor_foundation import object_level
+from sage_extensions.utilities import _instance_address_registry, _weak_address_registry
 
 if TYPE_CHECKING:
     from sage_extensions.categories.lattices import Lattices
@@ -4330,7 +4331,7 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
             lambda: self.vector_stabilizer_generators(target)
         )
 
-    @cached_method(key=lambda self, family: id(family))
+    @_instance_address_registry
     def _family_stabilizer(self, family):
         r"""``O(L)_[v]`` for a finite (coloured) family of vectors, with its computed group generators.
 
@@ -6094,7 +6095,7 @@ class _LatticeCore(_CoreCategory):
         return _lattice_isometry_mor(domain, codomain)
 
 
-@weak_cached_function(cache=0, key=lambda domain, codomain: (id(domain), id(codomain)))
+@_weak_address_registry
 def _lattice_mor(domain, codomain) -> LatticeMor:
     ring = domain.base_ring()
     if codomain.base_ring() != ring:
@@ -6102,7 +6103,7 @@ def _lattice_mor(domain, codomain) -> LatticeMor:
     return domain.lattice_category().Mor(domain, codomain)
 
 
-@weak_cached_function(cache=0, key=lambda domain, codomain: (id(domain), id(codomain)))
+@_weak_address_registry
 def _lattice_embedding_mor(domain, codomain) -> LatticeEmbeddingMor:
     ring = domain.base_ring()
     if codomain.base_ring() != ring:
@@ -6110,7 +6111,7 @@ def _lattice_embedding_mor(domain, codomain) -> LatticeEmbeddingMor:
     return domain.lattice_category().Mono(domain, codomain)
 
 
-@weak_cached_function(cache=0, key=lambda domain, codomain: (id(domain), id(codomain)))
+@_weak_address_registry
 def _lattice_isometry_mor(domain, codomain) -> LatticeIsometryMor:
     ring = domain.base_ring()
     if codomain.base_ring() != ring:

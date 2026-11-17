@@ -2,7 +2,7 @@ r"""Real affine spaces as torsors over a selected real vector space."""
 
 from sage.categories.category import Category
 from sage.categories.morphism import Morphism
-from sage.misc.cachefunc import cached_function, cached_method
+from sage.misc.cachefunc import cached_method
 
 from sage_extensions.categories.abstract_categories.mor_categories import (
     CategoricalMor,
@@ -23,9 +23,10 @@ from sage_extensions.categories.rings.ring_foundation import _owned_integers
 from sage_extensions.categories.sets.set_categories import Sets
 from sage_extensions.owned_category import _object_of
 from sage_extensions.rings.real import RR
+from sage_extensions.utilities import _address_registry
 
 
-@cached_function(key=lambda vector_space: id(vector_space))
+@_address_registry
 def _canonically_based_affine_space(vector_space):
     r"""The affine space on a real vector space, whose points are its own vectors.
 

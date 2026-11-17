@@ -31,6 +31,7 @@ from sage_extensions.categories.schemes.ringed_spaces import (
     _is_empty_open,
 )
 from sage_extensions.categories.abstract_categories.mor_foundation import object_level
+from sage_extensions.utilities import _instance_address_registry
 
 
 def _homogeneous_section_identity_comparison(sections):
@@ -310,7 +311,7 @@ class _FiniteAtlasLineBundleOpenPresheaf(Functor):
         module = bundle.module_descent_datum().basis_module(index, chart_open)
         return module.restrict_scalars(scalar_map)
 
-    @cached_method(key=lambda self, open_object: id(open_object))
+    @_instance_address_registry
     def _whole_to_basis(self, open_object):
         bundle = self._line_bundle()
         source = self._whole_module()

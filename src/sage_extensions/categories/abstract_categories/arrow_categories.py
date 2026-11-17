@@ -59,6 +59,7 @@ from sage_extensions.owned_category import _object_of
 from sage_extensions.owned_category_bases import Category as OwnedCategoryBase
 from sage_extensions.validation import validator
 from sage_extensions.categories.abstract_categories.mor_foundation import object_level
+from sage_extensions.utilities import _address_registry, _instance_address_registry
 
 if TYPE_CHECKING:
     from sage_extensions.logic import Predicate
@@ -104,7 +105,7 @@ class _ArrowAsFunctor(Functor):
         raise ValueError(f"the walking arrow 0 -> 1 has no morphism {left} -> {right}")
 
 
-@cached_function(key=lambda category, arrow: (id(category), id(arrow)))
+@_address_registry
 def _walking_arrow_functor(category: Category, arrow: Morphism) -> _ArrowAsFunctor:
     r"""The functor ``[1] -> category`` picking out ``arrow``, one for each arrow.
 
@@ -549,7 +550,7 @@ class _SubcategoryOfArrows(OwnedCategory):
 
     __call__ = object
 
-    @cached_method(key=lambda self, functor: id(functor))
+    @_instance_address_registry
     def _object_on(self, functor: Functor):
         return self.base_category().ArrowCategory()(functor)
 
@@ -988,7 +989,7 @@ class SliceCategory(_SubcategoryOfArrows):
 
     __call__ = object
 
-    @cached_method(key=lambda self, arrow: id(arrow))
+    @_instance_address_registry
     def _object_on(self, arrow: Morphism):
         return self._construct_on(arrow, (), None, None)
 
@@ -1225,7 +1226,7 @@ class CosliceCategory(_SubcategoryOfArrows):
 
     __call__ = object
 
-    @cached_method(key=lambda self, arrow: id(arrow))
+    @_instance_address_registry
     def _object_on(self, arrow: Morphism):
         return self._construct_on(arrow, None, None)
 
@@ -1746,7 +1747,7 @@ class SubobjectCategory(OwnedCategoryBase):
         r"""Return the monomorphism subcategory of the arrow category of ``C``."""
         return self.base_category().MonomorphismArrowCategory()
 
-    @cached_method(key=lambda self, subobject: id(subobject))
+    @_instance_address_registry
     def as_slice_object(self, subobject: Parent) -> ObjectOfCategory:
         if subobject not in self:
             raise TypeError(f"{subobject} is not a subobject in {self}")

@@ -4,7 +4,7 @@ from typing import cast
 
 from sage.categories.finite_fields import FiniteFields
 from sage.categories.number_fields import NumberFields
-from sage.misc.cachefunc import cached_function, cached_method
+from sage.misc.cachefunc import cached_method
 from sage.misc.unknown import Unknown
 from sage.rings.integer_ring import ZZ
 from sage.rings.rational_field import QQ as SageQQ
@@ -53,6 +53,7 @@ from sage_extensions.categories.sets.set_categories import Sets
 from sage_extensions.logic import AtomicProposition, Predicate, conjunction, negation
 from sage_extensions.owned_category import _object_of
 from sage_extensions.validation import validator
+from sage_extensions.utilities import _address_registry
 
 
 class AbsoluteGaloisGroupElement(Element):
@@ -903,7 +904,7 @@ def _realized_absolute_galois_group(
     )
 
 
-@cached_function(key=lambda field: id(field))
+@_address_registry
 def _canonical_absolute_galois_group(field):
     return _realized_absolute_galois_group(field)
 

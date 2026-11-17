@@ -38,6 +38,7 @@ from sage_extensions.categories.sets.indexed_families import (
 from sage_extensions.categories.sets.set_categories import NN
 from sage_extensions.categories.topological_spaces import TopologicalSpaces
 from sage_extensions.owned_category import _object_of
+from sage_extensions.utilities import _address_registry
 
 
 class ToricWeightCohomologyComplexes(OwnedCategoryOverBaseRing):
@@ -222,7 +223,7 @@ def _affine_geometric_cohomology_complex(sheaf, cover=None):
     )
 
 
-@cached_function(key=lambda sheaf: id(sheaf))
+@_address_registry
 def _projective_space_line_bundle_derived_global_sections(sheaf):
     r"""``RΓ(P^n_R, O(d))`` for the standard line bundle ``O(d)`` on ``P^n_R``, ``n >= 1``.
 
@@ -261,7 +262,7 @@ def _projective_space_line_bundle_derived_global_sections(sheaf):
     return CochainComplexes(base).localization_at_quasi_isomorphisms()(complex_)
 
 
-@cached_function(key=lambda space: id(space))
+@_address_registry
 def _projective_space_de_rham_hypercohomology(space):
     r"""``RΓ(P^n_R, Ω^•_{P^n_R/R})``, an object of ``DerivedCategory(R)``.
 
@@ -1251,7 +1252,7 @@ class _ComplexRealizationEngine:
         return f"Complex points of {self.scheme()} along {self.scalar_embedding()}"
 
 
-@cached_function(key=lambda scheme, scalar_embedding: (id(scheme), id(scalar_embedding)))
+@_address_registry
 def _complex_realization(scheme, scalar_embedding):
     return _object_of(
         TopologicalSpaces(),

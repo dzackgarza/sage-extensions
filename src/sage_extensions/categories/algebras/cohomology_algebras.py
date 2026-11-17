@@ -39,6 +39,7 @@ from sage_extensions.categories.rings.ring_foundation import (
     OwnedCategoryOverBaseRing,
 )
 from sage_extensions.categories.abstract_categories.mor_foundation import object_level
+from sage_extensions.utilities import _address_registry
 
 
 class CohomologyAlgebraMorCategoryConstruction(MorCategoryConstruction):
@@ -212,7 +213,7 @@ class CohomologyAlgebraMor(CategoricalMor):
         )
 
 
-@cached_function(key=lambda dga: id(dga))
+@_address_registry
 def _cohomology_algebra_from_dga(dga):
     r"""Construct the graded cycle quotient, then its descended product.
 
