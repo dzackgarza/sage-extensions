@@ -373,7 +373,11 @@ def _glue_compatible_integral_extensions(source_arrow, target_arrow, source_acti
             target_frame = matrix(SageQQ, [[int(point.to_vector()(label)) for label in target_labels]
                 for point in images])
             action = inverse * target_frame
-            if not all(coefficient in SageZZ for coefficient in action.list()):
+            # An integral rational isometry need not be onto the target
+            # lattice: its image may have nontrivial finite index.  The
+            # determinant condition is essential when the ambient forms
+            # differ (or have different discriminants).
+            if abs(action.det()) != 1 or not all(coefficient in SageZZ for coefficient in action.list()):
                 continue
             integral = action.change_ring(SageZZ)
             def image(label, rows=integral):
