@@ -720,6 +720,92 @@ class ToricSchemes(OwnedCategoryOverBaseRing):
                 name="Affine toric charts",
             )
 
+        def vertex_normal_cone(self, vertex):
+            r"""The normal cone of a vertex of the polarizing lattice polytope.
+
+            A vertex of a full-dimensional polytope is the intersection of the facets through it,
+            so its normal cone is spanned by their primitive inner normals (CLS Def. 2.3.2):
+
+            .. math:: \sigma(v) = \operatorname{cone}\{\,u_\rho : v\in D_\rho\,\}.
+
+            The supporting normals are decided by the polytope's own pairing, so this asks which
+            primitive generators of the normal fan are minimized at ``vertex`` rather than reading
+            a face list, and the answer is the cone of this variety's fan that they span.  A vertex
+            of a full-dimensional polytope has a full-dimensional normal cone, so that cone is one
+            of the fan's maximal cones and its chart is one chart of :meth:`affine_cover`.
+
+            EXAMPLES::
+
+                sage: from sage_extensions.all import ConvexPolytopes, QQ, ZZ
+                sage: polygon = ConvexPolytopes(ZZ.free_module(2))(((0, 0), (2, 0), (0, 1)))
+                sage: variety = polygon.toric_variety(QQ)
+                sage: vertex = variety.polarizing_polytope().ambient_lattice()((0, 1))
+                sage: variety.vertex_normal_cone(vertex).is_smooth()
+                False
+            """
+            assert self.is_polarized(), (
+                f"{self} was constructed from a fan, not from a lattice polytope, so its vertices "
+                "have no normal cones of their own; construct it from a lattice polytope to have "
+                "them"
+            )
+            polytope = self.polarizing_polytope()
+            fan = self.fan()
+            vertex = polytope.ambient_lattice()(vertex)
+            assert vertex in polytope.vertices(), (
+                f"the normal cone of {vertex} is taken at a vertex of {polytope}, and this is not "
+                "one of its vertices"
+            )
+            supporting = tuple(
+                ray for ray in fan.rays() if polytope.normal_supports_point(ray, vertex)
+            )
+            assert supporting, (
+                f"no primitive generator of the normal fan {fan} is minimized at {vertex}, so it "
+                "spans no normal cone there"
+            )
+            containing = tuple(
+                cone
+                for cone in fan.maximal_cones()
+                if all(cone.contains(normal) for normal in supporting)
+            )
+            assert len(containing) == 1, (
+                f"the {len(supporting)} inner normals supporting the vertex {vertex} lie in "
+                f"{len(containing)} maximal cones of {fan}, so they do not span one cone of it"
+            )
+            cone = containing[0]
+            assert cone.dimension() == fan.dimension(), (
+                f"the inner normals supporting the vertex {vertex} span a cone of dimension "
+                f"{cone.dimension()}, but a vertex of the full-dimensional polytope {polytope} has "
+                f"a normal cone of dimension {fan.dimension()}"
+            )
+            cone_rays = tuple(cone.rays())
+            assert len(cone_rays) == len(supporting) and all(
+                any(ray == normal for normal in supporting) for ray in cone_rays
+            ), (
+                f"the cone {cone} of {fan} containing the inner normals supporting {vertex} is not "
+                f"spanned by exactly those normals: its rays are {cone_rays}"
+            )
+            return cone
+
+        def vertex_chart(self, vertex):
+            r"""The affine chart of the normal cone at a vertex of the polarizing polytope.
+
+            The chart is :meth:`affine_chart` of :meth:`vertex_normal_cone`, a cone of this
+            variety's fan, so it is the entry of :meth:`affine_cover` at that cone and not a chart
+            rebuilt from the vertex: the atlas enumerates its charts by the maximal cones, and the
+            cone of the vertex is one of them.
+
+            EXAMPLES::
+
+                sage: from sage_extensions.all import ConvexPolytopes, QQ, ZZ
+                sage: polygon = ConvexPolytopes(ZZ.free_module(2))(((0, 0), (2, 0), (0, 1)))
+                sage: variety = polygon.toric_variety(QQ)
+                sage: lattice = variety.polarizing_polytope().ambient_lattice()
+                sage: chart = variety.vertex_chart(lattice((0, 0)))
+                sage: chart.coordinate_algebra().algebra_generating_set().cardinality()
+                2
+            """
+            return self.affine_chart(self.vertex_normal_cone(vertex))
+
         def face_localization(self, face, cone):
             r"""The open immersion ``U_tau -> U_sigma`` of a face inclusion.
 

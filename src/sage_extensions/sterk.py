@@ -5,6 +5,8 @@ from functools import cache
 from sage.matrix.constructor import matrix as sage_matrix
 from sage.rings.rational_field import QQ
 
+from sage_extensions.categories.rings.ring_foundation import _owned_engine_element
+from sage_extensions.categories.schemes.polytopes import LatticePolygons
 from sage_extensions.categories.sets.indexed_families import finite_indexed_family_from_values
 from sage_extensions.catalogue import NamedLattices
 from sage_extensions.categories.coxeter_diagrams import CoxeterDiagrams
@@ -134,6 +136,85 @@ _STERK_DIAGRAM_LAYOUTS = {
 }
 
 
+_STERK2_BOUNDARY_DIRECTIONS = (
+    ("v_2", (0, 1)),
+    ("v_3", (-1, 4)),
+    ("v_4", (-1, 3)),
+    ("v_5", (-2, 5)),
+    ("v_6", (-1, 2)),
+    ("v_7", (-2, 3)),
+    ("v_8", (-1, 1)),
+    ("v_9", (-2, 1)),
+    ("v_10", (-1, 0)),
+    ("v_11", (-2, -1)),
+    ("v_12", (-1, -1)),
+    ("v_13", (-2, -3)),
+    ("v_14", (-1, -2)),
+    ("v_15", (-2, -5)),
+    ("v_16", (-1, -3)),
+    ("v_17", (-1, -4)),
+    ("v_18", (0, -1)),
+)
+r"""The seventeen boundary-path directions of Sterk's `II_{18,0,0}` cusp, in source order.
+
+The research notebooks' `Sterk IAS Plotting.ipynb` cell 7 (`IAS_18_0_0`) prints this dictionary
+between the two surgery directions `v_1` and `v_19`, and cell 6 (`IAS_Holder.get_polygon_points`)
+walks it from the origin to obtain the cusp polygon's boundary path.  The directions are the plotted
+path's steps in order, not the polygon's edges cyclically: their `x` coordinates are nonpositive and
+mostly negative, so the path is open and its convex hull closes it with the side from `v_18`'s
+endpoint back to the origin.
+"""
+
+_STERK2_SURGERY_DIRECTIONS = (("v_1", (-1, 2)), ("v_19", (1, 2)))
+r"""The two surgery directions of the same cusp, which are not boundary-path steps.
+
+Cell 7 places them on boundary-path edges with zero-based indices 2 and 14, and cell 8
+(`Sterk2.place_surgery_triangle`) builds a triangle on each.  They carry the same source labels as
+the boundary path and one of them, `(-1, 2)`, also occurs as the boundary direction `v_6`; the roles
+are distinct, so neither direction is deduplicated out of the position it holds here.
+"""
+
+_STERK2_DIRECTION_COEFFICIENT_WEIGHTS = (
+    ("v_1", ((1, 1, 2),)),
+    ("v_2", ((2, 1, 1),)),
+    ("v_3", ((3, 1, 2),)),
+    ("v_4", ((1, 1, 2), (4, 1, 1))),
+    ("v_5", ((5, 1, 2),)),
+    ("v_6", ((6, 1, 1),)),
+    ("v_7", ((7, 1, 2),)),
+    ("v_8", ((8, 1, 1),)),
+    ("v_9", ((9, 1, 2),)),
+    ("v_10", ((10, 1, 1),)),
+    ("v_11", ((11, 1, 2),)),
+    ("v_12", ((12, 1, 1),)),
+    ("v_13", ((13, 1, 2),)),
+    ("v_14", ((14, 1, 1),)),
+    ("v_15", ((15, 1, 2),)),
+    ("v_16", ((16, 1, 1), (19, 1, 2))),
+    ("v_17", ((17, 1, 2),)),
+    ("v_18", ((18, 1, 1),)),
+    ("v_19", ((19, 1, 2),)),
+)
+r"""The multiple of each printed direction, as the source's `M_18_0_0` gives it.
+
+Cell 7 builds `M_18_0_0` column by column: the coefficient of `v_2, v_6, v_8, v_10, v_12, v_14,
+v_18` is the length `l_j` of the same index, that of `v_3, v_5, v_7, v_9, v_11, v_13, v_15, v_17`
+is `l_j/2`, that of `v_4` is `l_4 + l_1/2`, and that of `v_16` is `l_16 + l_19/2`.  The two surgery
+directions are multiplied by `l_1/2` and `l_19/2`.  A length is therefore not uniformly the lattice
+length of the direction it multiplies.  Each entry here is one column of that matrix, as (index of
+the length, numerator, denominator).
+"""
+
+_STERK2_STORED_LENGTHS = (4, 1, 2, 1, 2, 1, 2, 1, 2, 0, 2, 1, 2, 1, 2, 1, 2, 1, 4)
+r"""The lengths ``ell`` of the Sterk2 specimen the plotting notebook stores.
+
+`Sterk IAS Plotting.ipynb` cell 12 fixes them beside the parameter vector ``a`` and plots that one
+cusp; they are the source's stored sample, not a claim about which lengths the moduli space admits.
+The tenth length vanishes, so the tenth boundary step has length zero and two consecutive path
+points coincide.
+"""
+
+
 _STERK_FIG10_VERTEX_ORDER = (10, 7, 6, 5, 4, 3, 2, 0, 9, 8, 1)
 r"""The `II_{18,2}` vertex of Sterk's Fig. 10 (p. 23) carrying each printed label, in the order
 ``a₂, a₃, …, a₈, a₉, a₁₀, a₁₁, a₁₂`` of `Sterk._sterk4_in_TEn_cached`.
@@ -166,6 +247,30 @@ only such vector for which the eleven printed vectors have the pairings Fig. 10 
 `Sterk._sterk4_in_TEn_cached` checks against the diagram this library already realizes for that
 figure; it is a `(-4)`-vector, and card `029J`'s 4.3.8 row stores the resulting walls.
 """
+
+
+def _sterk2_engine_direction_coefficients(lengths):
+    r"""The source's `M_18_0_0` applied to the lengths, in exact rationals.
+
+    Every coefficient is a rational combination of lengths with nonnegative integer weights, so the
+    arithmetic stays in the exact rational field until a lattice placement asks whether the
+    resulting point is integral.
+    """
+    lengths = tuple(lengths)
+    assert len(lengths) == 19, (
+        f"the ``18_0_0`` cusp is printed with nineteen lengths, one for each of its nineteen "
+        f"directions, but {len(lengths)} were given"
+    )
+    return {
+        label: sum(
+            (
+                QQ(lengths[index - 1]) * (QQ(numerator) / QQ(denominator))
+                for index, numerator, denominator in weights
+            ),
+            QQ.zero(),
+        )
+        for label, weights in _STERK2_DIRECTION_COEFFICIENT_WEIGHTS
+    }
 
 
 class Sterk:
@@ -767,6 +872,130 @@ class Sterk:
     def diagram_layouts():
         r"""Return copies of the optional exact presentation coordinates."""
         return {name: dict(positions) for name, positions in _STERK_DIAGRAM_LAYOUTS.items()}
+
+    @staticmethod
+    def sterk2_boundary_directions():
+        r"""Return the seventeen boundary-path directions of Sterk's `II_{18,0,0}` cusp.
+
+        Each is given under the source's own label, in the order the plotting notebook walks them:
+
+        EXAMPLES::
+
+            sage: from sage_extensions.sterk import Sterk
+            sage: Sterk.sterk2_boundary_directions()["v_10"]
+            (-1, 0)
+            sage: Sterk.sterk2_boundary_directions()["v_18"]
+            (0, -1)
+        """
+        return dict(_STERK2_BOUNDARY_DIRECTIONS)
+
+    @staticmethod
+    def sterk2_surgery_directions():
+        r"""Return the two surgery directions, which are not boundary-path steps.
+
+        They sit on boundary-path edges and carry the same source labels as the path; the direction
+        `(-1, 2)` also occurs as the boundary direction `v_6`, and the two uses are distinct.
+
+        EXAMPLES::
+
+            sage: from sage_extensions.sterk import Sterk
+            sage: Sterk.sterk2_surgery_directions()
+            {'v_1': (-1, 2), 'v_19': (1, 2)}
+        """
+        return dict(_STERK2_SURGERY_DIRECTIONS)
+
+    @staticmethod
+    def sterk2_stored_lengths():
+        r"""Return the nineteen lengths of the specimen the plotting notebook stores.
+
+        EXAMPLES::
+
+            sage: from sage_extensions.sterk import Sterk
+            sage: Sterk.sterk2_stored_lengths()[9]
+            0
+        """
+        return _STERK2_STORED_LENGTHS
+
+    @staticmethod
+    def sterk2_direction_coefficients(lengths):
+        r"""Return the multiple of each of the nineteen printed directions.
+
+        This is the source's `M_18_0_0` applied to the lengths: the exact coefficient of every
+        direction, the two surgery directions included.  The half weights and the two `l_1/2` and
+        `l_19/2` offsets are the source's, so the coefficients are rational and only a later lattice
+        placement decides integrality.
+
+        EXAMPLES::
+
+            sage: from sage_extensions.sterk import Sterk
+            sage: lengths = Sterk.sterk2_stored_lengths()
+            sage: coefficients = Sterk.sterk2_direction_coefficients(lengths)
+            sage: coefficients["v_4"] == lengths[3] + coefficients["v_1"]
+            True
+        """
+        return {
+            label: _owned_engine_element(QQ, coefficient)
+            for label, coefficient in _sterk2_engine_direction_coefficients(lengths).items()
+        }
+
+    @classmethod
+    def sterk2_boundary_path(cls, lengths):
+        r"""Return the eighteen points of the cusp's boundary path, from the origin on.
+
+        The source walks the seventeen boundary directions from the origin, adding the multiple of
+        each; the result is ``p_0`` at the origin through ``p_17`` at the end of the path.  A zero
+        length makes a step of zero, so consecutive points can coincide and the path is not a list
+        of distinct vertices.
+
+        EXAMPLES::
+
+            sage: from sage_extensions.sterk import Sterk
+            sage: path = Sterk.sterk2_boundary_path(Sterk.sterk2_stored_lengths())
+            sage: path["p_8"] == path["p_9"]
+            True
+            sage: path["p_17"][1] == 0
+            True
+        """
+        coefficients = _sterk2_engine_direction_coefficients(lengths)
+        origin = QQ.zero()
+        position = [origin, origin]
+        points = {"p_0": (origin, origin)}
+        for step, (label, direction) in enumerate(_STERK2_BOUNDARY_DIRECTIONS, start=1):
+            coefficient = coefficients[label]
+            position = [
+                position[0] + coefficient * direction[0],
+                position[1] + coefficient * direction[1],
+            ]
+            points[f"p_{step}"] = (position[0], position[1])
+        return {
+            label: tuple(_owned_engine_element(QQ, coordinate) for coordinate in point)
+            for label, point in points.items()
+        }
+
+    @classmethod
+    def sterk2_polygon(cls, lattice, lengths=_STERK2_STORED_LENGTHS):
+        r"""Return the Sterk2 cusp polygon of one length vector, in the stated lattice.
+
+        The plotters' polygon is the convex hull of the boundary path, with the closing side the
+        hull supplies: a path point that lies on that hull is not a vertex of it, and no direction
+        of the path is read as a cyclic edge.  The two surgery directions do not enter the polygon;
+        their triangles are built on its edges afterwards.  The stored specimen's polygon is a
+        lattice polygon of normalized area 820.
+
+        EXAMPLES::
+
+            sage: from sage_extensions.all import ZZ
+            sage: from sage_extensions.sterk import Sterk
+            sage: polygon = Sterk.sterk2_polygon(ZZ.free_module(2))
+            sage: polygon.is_lattice_polytope()
+            True
+        """
+        lengths = tuple(lengths)
+        assert len(lengths) == 19, (
+            f"a Sterk2 polygon is cut out by nineteen lengths, but {len(lengths)} were given"
+        )
+        path = cls.sterk2_boundary_path(lengths)
+        return LatticePolygons(lattice)(tuple(path.values()))
 
 
 __all__ = ["Sterk"]
