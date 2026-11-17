@@ -93,6 +93,15 @@ class ManifoldAtlasChart(SageObject):
     def label(self):
         return self._label
 
+    def __hash__(self):
+        r"""A chart is identified by the manifold it charts and the label it is registered under.
+
+        No two charts of one manifold share a label (``_register_chart``
+        refuses the second one), so the pair identifies the chart and a family
+        of charts, such as an atlas, can be indexed by the chart itself.
+        """
+        return hash((id(self._manifold), self._label))
+
     def domain(self):
         r"""The open subset of the manifold the chart is defined on."""
         return self._domain
