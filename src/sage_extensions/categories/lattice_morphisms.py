@@ -3341,6 +3341,21 @@ def _summandwise_isometry(source, target):
     return target_change * source_change.inverse()
 
 
+def _minimal_shell(gram):
+    r"""The minimum and the number of minimal vectors of the positive definite ``gram``.
+
+    An isometry carries the minimal vectors of one form onto those of the
+    other, so two forms with different pairs are not isometric. PARI's
+    ``qfminim`` with ``m = 0`` counts the minimal vectors without storing
+    them (The PARI Group, *PARI/GP*, ``qfminim``). The count is the cheap
+    separation of one genus that ``qfisom`` does not make first: on
+    ``E_8 + <26>`` against a class of its genus with fewer roots, ``qfisom``
+    enumerates every ``E_8`` vector up to norm 26 and overflows an 8 GB stack.
+    """
+    count, minimum, _vectors = pari(gram).qfminim(None, 0)
+    return int(minimum), int(count)
+
+
 @cached_function
 def _definite_isometry_matrix(domain_gram, codomain_gram, sign):
     r"""The column-action isometry ``W`` with ``W~ codomain W == domain``, or ``False``.
@@ -3378,6 +3393,8 @@ def _definite_isometry_matrix(domain_gram, codomain_gram, sign):
     reduced_target = (target_transformation.mattranspose() * target_pari * target_transformation).sage()
     if reduced_source == reduced_target:
         transformation = target_transformation.sage() * source_transformation.sage().inverse()
+    elif _minimal_shell(reduced_source) != _minimal_shell(reduced_target):
+        transformation = False
     else:
         transformation = _summandwise_isometry(reduced_source, reduced_target)
         if transformation is None:
