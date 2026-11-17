@@ -5293,6 +5293,15 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
         extension = total.Emb(lattice)(lambda label: sum_inclusion(total.module_generator(label)))
         return tuple(extension.extended_subgroup(total.O().subgroup(generators)).group_generators())
 
+    def exact_primitive_isotropic_line_orbit_iterator(self):
+        r"""Fair moving-line orbit stream, identifying primitive null vectors up to sign.
+
+        This is an exact, potentially nonterminating iterator; it does not
+        claim that a finite complete set of line orbits has been produced.
+        """
+        from sage_indefinite_port.indefinite.marked_lattices import iter_primitive_isotropic_line_classes
+        return iter_primitive_isotropic_line_classes(self.lattice())
+
     def exact_vector_orbit_iterator(self, square, *, primitive_only=False):
         r"""Fair fixed-square orbit stream with exact pointed-isometry deduplication.
 

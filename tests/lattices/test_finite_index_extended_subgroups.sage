@@ -69,3 +69,13 @@ def test_public_low_witt_fixed_norm_orbit_stream_returns_primitive_exact_vector(
     representative = next(lattice.O().exact_vector_orbit_iterator(2, primitive_only=True))
     assert representative.q() == ZZ(2)
     assert representative.content() == ZZ(1)
+
+
+def test_public_witt_one_primitive_isotropic_line_orbit_stream():
+    lattice = Lattices(ZZ)("U") + Lattices(ZZ)([[2, 0], [0, -4]])
+    representative = next(lattice.O().exact_primitive_isotropic_line_orbit_iterator())
+    inclusion = representative.arrow()
+    point = inclusion(next(iter(inclusion.domain().module_generators())))
+    assert point.q() == ZZ(0)
+    assert point.content() == ZZ(1)
+    assert inclusion.is_primitive()
