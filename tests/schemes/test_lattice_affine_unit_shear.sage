@@ -137,3 +137,16 @@ def test_the_shear_is_the_linear_part_of_the_transition_of_a_two_chart_atlas() -
     assert (atlas.transition_map(sheared_chart, identity_chart) * transition)(
         space(model((3, -3)))
     ) == model((3, -3))
+
+
+def test_the_polygons_vertices_are_placed_in_the_model_by_the_lattices_inclusion() -> None:
+    r"""The moment polygon's four vertices, read in the integral basis and carried into the model by the lattice's own inclusion, are the printed ones: the polygon is placed in the model the affine space is on, by the arrow that lattice is selected by."""
+    lattice, lattice_basis, model, basis, inclusion, affine, space = _plane_on_a_lattice()
+    polygon = ConvexPolytopes(lattice)(((0, 0), (3, -3), (5, -1), (2, 2)))
+    placed = tuple(inclusion(vertex.to_vector()) for vertex in polygon.vertices())
+
+    assert space.affine_lattice() is lattice
+    assert space.lattice_inclusion() is inclusion
+    assert polygon.n_vertices() == 4
+    for vector in ((0, 0), (3, -3), (5, -1), (2, 2)):
+        assert model(vector) in placed
