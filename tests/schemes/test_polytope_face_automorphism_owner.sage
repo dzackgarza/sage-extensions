@@ -203,11 +203,17 @@ def test_the_stored_sterk2_polygon_answers_its_face_action() -> None:
     assert geometric.order() < abstract.order()
     assert induced.domain() is geometric
     assert induced.codomain() is abstract
+    assert abstract is face_poset.Aut()
     assert induced(geometric.one()) == abstract.one()
     assert all(
         induced(left * right) == induced(left) * induced(right)
         for left in tuple(geometric)
         for right in tuple(geometric)
+    )
+    assert all(
+        induced(element).forward().parent()
+        is FiniteGradedPosets().Mor(face_poset, face_poset)
+        for element in tuple(geometric)
     )
     assert induced.is_injective() is True
     assert induced.is_surjective() is False
