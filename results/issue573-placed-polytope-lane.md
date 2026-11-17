@@ -68,3 +68,47 @@ The whole file: 4 passed in 4.86 s.  With
    conversion that admits a lattice point is now one function
    (`_ambient_point_on`), used by `rational_point` and by membership.
 4. The Sterk rank and dimension questions remain at parent #256.
+
+## Round 4: the placed category's own structure
+
+The six operations are implemented for the lattice lane and are exercised on the
+three specimens by `tests/schemes/test_placed_polytope_structure.sage` (3 passed in
+3.38 s: 1.47 s the Sterk2 hull, 0.98 s the square, 0.28 s the quadrangle; with the
+three earlier files, 23 passed in 11.77 s).
+
+The decision, and it is stated in the module docstring of
+`src/sage_extensions/categories/schemes/polytopes.py`: **a face of a placed
+polytope is a placed polytope.**  The geometric automorphisms act on the faces with
+the parent's ambient map, so a face must be an object of the same placed category,
+carrying the parent's placement restricted to it.  The cost is stated with it: a
+face whose vertices do not affinely span the ambient space (a vertex, or an edge in
+a three-dimensional ambient) carries its placement but determines no ambient affine
+map of its own, so the frame refuses it and nothing is chosen on a complement the
+face does not meet; its inclusion and the lift of a parent automorphism to it stay
+defined, because neither reads an ambient map back from the face's vertices.
+
+| operation | signature | specimen fact |
+| --- | --- | --- |
+| `faces` | `faces(self, dimension)` | square 4 vertices, 4 edges, itself, and the empty face at `-1` |
+| `face_inclusion` | `face_inclusion(self, face)` | identity ambient map; fixes the face's points; top face's inclusion is the polytope's identity |
+| `boundary` | `boundary(self)` | the codimension-one faces; empty for a point |
+| `boundary_inclusion` | `boundary_inclusion(self)` | family of the boundary faces' inclusions, one arrow per face |
+| `triangulate` | `triangulate(self)` | square two triangles of normalized volume 4 each; Sterk2 fifteen; cells on the parent's placed vertices |
+| `geometric_lifts_of_face_automorphism` | `geometric_lifts_of_face_automorphism(self, geometric_automorphism, face)` | `Aut(F)`, or `None` when the parent's automorphism moves the face |
+
+The square's vertical reflection keeps the bottom and top edges -- its lift's
+lattice part is diag(-1, 1) -- and exchanges the left and right edges, where the
+lift is `None`.
+
+Two repairs were needed at their owners: `PlacedPolytopeMor.__mul__` now composes
+with an isomorphism's forward arrow when the right factor is an element of
+`Aut(P)`, and equality of graded-poset morphisms compares through the isomorphism's
+forward arrow rather than by its parent.
+
+Still open, and not this lane's: #580 (the isometry decision at the metric owner)
+and #581 (a polytope's ingress at a lattice point).  Also open here: the *unplaced*
+convex polytope's `face_inclusion`, `facet_inclusion`, `boundary` and
+`boundary_inclusion` (`src/sage_extensions/categories/schemes/polytopes.py`, in
+`ConvexPolytopes.ParentMethods`), and `ChosenTriangulations.on` /
+`_from_engine_triangulation` (`src/sage_extensions/categories/triangulations.py`),
+which is what `triangulations()` would hand the cells to.
