@@ -1092,6 +1092,49 @@ def finite_ordered_set[PointT](
     return FiniteOrderedSets()(elements)
 
 
+def _distinct_finite_ordered_set[PointT](
+    points: Iterable[PointT],
+) -> FiniteOrderedSets().ObjectType:
+    r"""The finite ordered set on points the caller states are pairwise distinct.
+
+    The literal ingress (:meth:`FiniteOrderedSets._on_points`) identifies
+    repeated points through a table of them, and
+    :meth:`FiniteOrderedSets.from_indexed`'s default inverse builds that table
+    a second time.  For a point whose hash is constant over its universe --
+    one that has no cheap canonical key, as an orbit of an arithmetic group
+    does not -- every admission compares the point against every point already
+    admitted, so a caller whose own construction yields one point per class
+    pays ``n(n-1)/2`` equality questions for an answer it already holds.
+
+    Here the points are admitted as they are produced, and their identity is
+    the enumeration's inverse on its image.  A candidate that is no point of
+    the enumeration is still placed by the points' own equality, so ranking
+    and membership answer for a point rebuilt from the row's own data as the
+    table would have answered; that question is asked when it is put, not once
+    per pair at admission.
+
+    The obligation is the caller's: two equal points of ``points`` leave the
+    enumeration non-injective and the set's count one too high per repetition.
+    """
+    admitted = tuple(points)
+    positions = {id(point): position for position, point in enumerate(admitted)}
+
+    def index_of(candidate):
+        position = positions.get(id(candidate))
+        if position is not None:
+            return position
+        for position, point in enumerate(admitted):
+            if point == candidate:
+                return position
+        return None
+
+    return FiniteOrderedSets().from_indexed(
+        finite_ordinal_set(len(admitted)),
+        lambda position: admitted[int(position)],
+        index_of=index_of,
+    )
+
+
 @cached_function(key=lambda labels: labels)
 def interned_finite_ordered_set(labels):
     r"""The one finite ordered set an ordered tuple of labels names.

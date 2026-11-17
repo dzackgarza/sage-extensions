@@ -5425,10 +5425,24 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
         return _isotropic_orbit_representatives(self, rank, flag=flag)
 
     def cusps(self, rank=1):
-        r"""Return the ``O(L)``-orbits of primitive isotropic rank-``rank`` subobjects."""
-        from sage_extensions.categories.isotropic_orbits import _cusp
+        r"""Return the ``O(L)``-orbits of primitive isotropic rank-``rank`` subobjects.
 
-        return finite_ordered_set(tuple(_cusp(representative) for representative in self.isotropic_orbit_representatives(rank)))
+        The orbits are pairwise distinct -- ``isotropic_orbit_representatives``
+        yields one representative an orbit -- so the row's points are admitted
+        as they are produced rather than through a table of them: a cusp's hash
+        is constant over its universe (``_CuspEngine.__hash__``: representatives
+        are not canonical), so that table asks a transporter question for every
+        pair of the row.
+        """
+        from sage_extensions.categories.isotropic_orbits import _cusp
+        from sage_extensions.categories.sets.finite_ordered_sets import (
+            _distinct_finite_ordered_set,
+        )
+
+        return _distinct_finite_ordered_set(
+            _cusp(representative)
+            for representative in self.isotropic_orbit_representatives(rank)
+        )
 
     def tits_building_incidence(self):
         r"""Return the line/plane incidence in the full orthogonal-group quotient building."""

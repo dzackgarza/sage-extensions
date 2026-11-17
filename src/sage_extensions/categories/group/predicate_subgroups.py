@@ -757,21 +757,32 @@ class PredicateSubgroups(OwnedParameterizedCategory):
             drawn, and what the row keeps per orbit is a span, not a
             constructed subobject.  The row's count, its order and each cusp's
             span are the orbit row's own.
+
+            The row's enumeration is its points in the order the walk draws
+            them.  The walk yields one representative per orbit, so the cusps
+            it names are pairwise distinct and there is no repetition to
+            identify; they are admitted as they are produced
+            (:func:`...finite_ordered_sets._distinct_finite_ordered_set`)
+            rather than through a table of them, because a cusp's hash is
+            constant over its universe -- a cusp has no cheap canonical key,
+            since two cusps of one orbit need not share a span -- so a table
+            asks a transporter question for every pair of a row that is
+            189720 cusps long.  Ranking and membership still answer for a cusp
+            that is equal to a point of this row without being one, by the
+            cusps' own equality, asked when it is put.
             """
             from sage_extensions.categories.isotropic_orbits import _arithmetic_cusp
             from sage_extensions.categories.orthogonal_quotients import (
                 _yield_subgroup_isotropic_orbit_representatives,
             )
             from sage_extensions.categories.sets.finite_ordered_sets import (
-                finite_ordered_set,
+                _distinct_finite_ordered_set,
             )
 
-            return finite_ordered_set(
-                tuple(
-                    _arithmetic_cusp(self, representative)
-                    for representative in _yield_subgroup_isotropic_orbit_representatives(
-                        self, rank
-                    )
+            return _distinct_finite_ordered_set(
+                _arithmetic_cusp(self, representative)
+                for representative in _yield_subgroup_isotropic_orbit_representatives(
+                    self, rank
                 )
             )
 
