@@ -76,8 +76,9 @@ the value of a tower of `@cached_function` registries keyed by `id(...)`:
 
 ## 4. The measurement that decides it: a constructed Parent of this library is not released
 
-Four specimens, each built and dropped by its only caller, `gc.collect()` after
-(`probe-585-parentlife.py`):
+Six specimens, each built and dropped by its only caller, `gc.collect()` after
+(`probe-585-parentlife.py`); the element is the control, since an element is
+released:
 
 | specimen | alive after the drop |
 | --- | --- |
