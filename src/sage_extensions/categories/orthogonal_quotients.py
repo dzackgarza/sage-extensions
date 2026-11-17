@@ -2607,15 +2607,22 @@ end
         return self._transported_isotropic_objects.get(_span_key(subobject))
 
     def retained_isotropic_transport_count(self):
-        r"""How many transport data this quotient retains.
+        r"""How many carried-object transport datums this quotient retains.
 
+        The number is the size of ``_transported_isotropic_objects``: one datum
+        for each transported isotropic object still registered, keyed by the
+        object's span, each holding the object, the source it was carried from
+        and the isometry that placed it (:meth:`register_isotropic_transport`).
         A row transports the representatives it produces and keeps the isometry
         that placed each one, because a transporter between two transported
         objects is the composite of their words rather than an isometry search
-        (:meth:`transported_from_root`).  What the quotient retains is therefore
-        the row's own footprint, and this is the number that says so: the row's
-        coverings, its planes' lifts, and whatever a consumer has not released
-        (:meth:`release_isotropic_transports`).
+        (:meth:`transported_from_root`), so the registry holds the row's carried
+        data until a consumer releases it (:meth:`release_isotropic_transports`).
+
+        The quotient's other retained structures are not counted: the rows'
+        coverings are in ``_isotropic_covering_registry``, the planes' lifts in
+        ``_isotropic_lift_registry``, and the witnesses between chain roots in
+        ``_isotropic_root_bridges``.
         """
         return cardinal(len(self._transported_isotropic_objects))
 
