@@ -2606,6 +2606,41 @@ end
 
         return self._transported_isotropic_objects.get(_span_key(subobject))
 
+    def retained_isotropic_transport_count(self):
+        r"""How many transport data this quotient retains.
+
+        A row transports the representatives it produces and keeps the isometry
+        that placed each one, because a transporter between two transported
+        objects is the composite of their words rather than an isometry search
+        (:meth:`transported_from_root`).  What the quotient retains is therefore
+        the row's own footprint, and this is the number that says so: the row's
+        coverings, its planes' lifts, and whatever a consumer has not released
+        (:meth:`release_isotropic_transports`).
+        """
+        return cardinal(len(self._transported_isotropic_objects))
+
+    def release_isotropic_transports(self, subobjects) -> None:
+        r"""Drop the retained transport data of ``subobjects``, which the caller has spent.
+
+        A datum is read while a consumer makes the object's certificate and not
+        afterwards: a certificate retains its own transporter, so the registry's
+        copy is a cache with the consumer's lifetime.  The incidence carries one
+        covering to every plane of a 189720-plane row and reads the carried lines
+        of a plane while it makes that plane's edge certificates; kept, those data
+        are one isometry, one subobject and one span key per line per plane, which
+        is growth with the plane count and not with the row.
+
+        A released datum costs a later reader a bridge between roots it can still
+        find (:meth:`isotropic_transport_between` searches for the one ambient
+        witness between two roots and retains it), never a wrong transporter: the
+        chain a reader walks is shortened, not falsified.
+        """
+        from sage_extensions.categories.isotropic_orbits import _span_key
+
+        registry = self._transported_isotropic_objects
+        for subobject in subobjects:
+            registry.pop(_span_key(subobject), None)
+
     def transported_from_root(self, subobject):
         r"""``(root, g)`` with ``g`` carrying the registered chain's ``root`` onto ``subobject``.
 
