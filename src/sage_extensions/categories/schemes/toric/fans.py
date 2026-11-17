@@ -43,8 +43,18 @@ def _integers():
 
 
 def _engine_lattice(module):
-    r"""Sage's toric lattice of the same rank, the engine coordinate space."""
-    return _SageToricLattice(int(module.module_rank()), "N")
+    r"""Sage's toric lattice of the same rank, the engine coordinate space.
+
+    The name is left to the factory.  Its default is "N" for the lattice and
+    "M" for the dual, which is the same pair of names an explicit ``"N"``
+    gives, but the factory keys the two requests separately: a point built on
+    one is in *another* lattice than a cone built on the other, and the
+    engine's membership test answers ``False`` to a cone's own ray when the
+    two meet.  Sage's own fan constructors (``normalize_rays``, ``Fan``,
+    ``Fan2d``, ``NormalFan``) ask for the unnamed lattice, so a fan adopted
+    from the engine has to lower points into that same one.
+    """
+    return _SageToricLattice(int(module.module_rank()))
 
 
 def _engine_vector(module, element):
