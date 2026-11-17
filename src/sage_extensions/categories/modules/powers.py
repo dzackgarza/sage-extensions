@@ -331,6 +331,10 @@ class QuadraticModuleMorphism:
         module = self.module()
         if parent is not module:
             element = module(element)
+        # The selected lift defines q(x) = G(x, x).  Its evaluation does
+        # not need the coordinates of gamma_2(x) in the divided square.
+        if self.has_selected_bilinear_lift():
+            return self.lift_pairing(element, element)
         return self._call_(self.domain().quadratic(element))
 
     def classifying_morphism(self):

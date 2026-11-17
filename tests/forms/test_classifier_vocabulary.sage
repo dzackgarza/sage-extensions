@@ -11,7 +11,7 @@ def test_quadratic_map_is_recovered_from_its_classifying_morphism_on_the_divided
     ``q(2x - y) = 4 - 6 + 2 = 0``.
     """
     module = Modules(ZZ)(ZZ**2)
-    x, y = module.basis()
+    x, y = module.module_generators()
 
     def quadratic_value(value):
         a, b = value.to_vector()
