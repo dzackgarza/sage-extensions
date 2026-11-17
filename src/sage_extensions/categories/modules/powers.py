@@ -756,28 +756,49 @@ def _divided_product_coefficient(left, right):
     )
 
 
-def _divided_relations(relation_coordinates, source_labels, degree: int, generators):
-    r"""Return the relations ``gamma_j(r(e_k)) m`` of ``Gamma^d``, for ``m`` of degree ``d - j``."""
-    if degree == 0:
-        return ()
+def _divided_relations(presentation, source_labels, degree: int, generators):
+    r"""The relation morphism ``e_(j,k,m) |-> gamma_j(r(e_k)) m`` of ``Gamma^d``.
+
+    Its source is fixed by the presentation of ``M`` and the complementary
+    monomials of degree ``d-j``.  Each image is computed when the morphism
+    is evaluated, so constructing a quadratic form does not expand all the
+    relations of its universal target.  Zero images remain relations of the
+    same cokernel.
+    """
     ring = generators.base_ring()
-    relations = []
-    for relation in relation_coordinates:
-        for divided_degree in range(1, degree + 1):
-            divided_labels = _free_degree_labels(source_labels, divided_degree, "divided")
-            complementary_labels = _free_degree_labels(source_labels, degree - divided_degree, "divided")
-            for monomial in complementary_labels:
-                coefficients = {}
-                for exponent in divided_labels:
-                    coefficient = ring.one()
-                    for source_label in exponent.support():
-                        coefficient *= ring(relation(source_label)) ** exponent.multiplicity(source_label)
-                    if (coefficient == ring.zero()) is True:
-                        continue
-                    target = exponent.merged_with(monomial)
-                    coefficients[target] = coefficients.get(target, ring.zero()) + coefficient * _divided_product_coefficient(exponent, monomial)
-                relations.append(generators.linear_combination(coefficients))
-    return tuple(relation for relation in relations if (relation == generators.zero()) is not True)
+    degrees = finite_ordered_set(range(1, degree + 1))
+    labels = Sets().coproduct(
+        indexed_family(
+            degrees,
+            lambda divided_degree: Sets().product(
+                (
+                    presentation.domain().module_generating_set(),
+                    _free_degree_labels(source_labels, degree - divided_degree, "divided"),
+                )
+            ),
+        )
+    )
+    relation_source = ring._fresh_free_module_on(labels)
+
+    def relation_image(label):
+        divided_degree = int(label.summand_index())
+        pair = label.summand_element()
+        relation = presentation(
+            presentation.domain().module_generator(pair.component(0))
+        ).to_vector()
+        monomial = pair.component(1)
+        coefficients = {}
+        for exponent in _free_degree_labels(source_labels, divided_degree, "divided"):
+            coefficient = ring.one()
+            for source_label in exponent.support():
+                coefficient *= ring(relation(source_label)) ** exponent.multiplicity(source_label)
+            if (coefficient == ring.zero()) is True:
+                continue
+            target = exponent.merged_with(monomial)
+            coefficients[target] = coefficients.get(target, ring.zero()) + coefficient * _divided_product_coefficient(exponent, monomial)
+        return generators.linear_combination(coefficients)
+
+    return relation_source.module_category().Mor(relation_source, generators)(relation_image)
 
 
 def _presented_degree_power(
@@ -833,20 +854,22 @@ def _presented_degree_power(
             f"{source_labels} is not finite"
         )
 
-    relation_coordinates = _relation_coordinates(_relation_morphism(module))
     generators = ring._fresh_free_module_on(labels)
     if flavor == "symmetric":
+        relation_coordinates = _relation_coordinates(_relation_morphism(module))
         relations = _symmetric_relations(relation_coordinates, source_labels, degree, generators)
+        presentation = _morphism_on_elements(generators, relations)
     elif flavor == "alternating":
+        relation_coordinates = _relation_coordinates(_relation_morphism(module))
         relations = _alternating_relations(relation_coordinates, source_labels, degree, generators)
+        presentation = _morphism_on_elements(generators, relations)
     elif flavor == "divided":
-        relations = _divided_relations(relation_coordinates, source_labels, degree, generators)
+        presentation = _divided_relations(_relation_morphism(module), source_labels, degree, generators)
     else:
         raise ValueError(
             f"{flavor!r} is not a kind of power: expected 'symmetric', 'alternating' or 'divided'"
         )
 
-    presentation = _morphism_on_elements(generators, relations)
     return ModulesWithChosenFinitePresentation(ring)(
         presentation,
         category=owned_category_join(extra_categories) if extra_categories else None,
