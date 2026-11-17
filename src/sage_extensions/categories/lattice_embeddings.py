@@ -333,60 +333,6 @@ def _primitive_embedding_class_representatives(embeddings, classification):
     return finite_ordered_set(tuple(representatives))
 
 
-def _glue_compatible_integral_extensions(source_arrow, target_arrow, source_actions, complement_actions):
-    r"""Extend supplied orthogonal-factor maps exactly across finite lattice glue.
-
-    The two primitive nondegenerate embeddings determine finite-index
-    inclusions ``S+S^perp <= L`` and ``T+T^perp <= M``.  A supplied pair
-    extends if and only if its rational direct-sum action maps every
-    integral basis vector of L into M.  The result is a tuple of actual
-    represented integral isometries L -> M, not a matrix or glue predicate.
-    The arithmetic caller supplies the factor isometries and their actual
-    finite orbit; this owner supplies only the extension construction.
-    """
-    from sage.all import QQ as SageQQ, ZZ as SageZZ, matrix
-
-    source_lattice, target_lattice = source_arrow.codomain(), target_arrow.codomain()
-    source_sub = source_lattice.subobject_on(tuple(source_arrow(x) for x in source_arrow.domain().module_generators()))
-    target_sub = target_lattice.subobject_on(tuple(target_arrow(x) for x in target_arrow.domain().module_generators()))
-    if not source_sub.inclusion().is_primitive() or not target_sub.inclusion().is_primitive():
-        raise ValueError("glue extension requires primitive sublattice embeddings")
-    source_complement = source_lattice.orthogonal_complement(source_sub)
-    target_complement = target_lattice.orthogonal_complement(target_sub)
-    source_labels = tuple(source_lattice.module_generating_set())
-    target_labels = tuple(target_lattice.module_generating_set())
-    source_points = (
-        *(source_arrow(x) for x in source_arrow.domain().module_generators()),
-        *(source_complement.inclusion()(x) for x in source_complement.module_generators()),
-    )
-    frame = matrix(SageQQ, [[int(point.to_vector()(label)) for label in source_labels]
-        for point in source_points])
-    inverse = frame.inverse()
-    extensions = []
-    for source_action in source_actions:
-        for complement_action in complement_actions:
-            images = (
-                *(target_arrow(source_action(x)) for x in source_arrow.domain().module_generators()),
-                *(target_complement.inclusion()(complement_action(x))
-                    for x in source_complement.module_generators()),
-            )
-            target_frame = matrix(SageQQ, [[int(point.to_vector()(label)) for label in target_labels]
-                for point in images])
-            action = inverse * target_frame
-            # An integral rational isometry need not be onto the target
-            # lattice: its image may have nontrivial finite index.  The
-            # determinant condition is essential when the ambient forms
-            # differ (or have different discriminants).
-            if abs(action.det()) != 1 or not all(coefficient in SageZZ for coefficient in action.list()):
-                continue
-            integral = action.change_ring(SageZZ)
-            def image(label, rows=integral):
-                return target_lattice.linear_combination({target_label: target_lattice.base_ring()(int(value))
-                    for target_label, value in zip(target_labels, rows.row(source_labels.index(label)), strict=True) if value})
-            extensions.append(source_lattice.Isom(target_lattice)(image))
-    return tuple(extensions)
-
-
 def _finite_overlattice_isometry_extension(source_inclusion, target_inclusion, isometry):
     r"""Extend an isometry of finite-index sublattices across two overlattices.
 
