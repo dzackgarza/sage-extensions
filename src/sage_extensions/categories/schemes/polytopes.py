@@ -1,5 +1,6 @@
 r"""Convex polytopes and integral lattice polytopes."""
 
+import weakref
 from math import atan2, factorial
 
 from sage.categories.category import Category
@@ -1980,6 +1981,21 @@ def _engine_vertices_are_integral(engine_polyhedron) -> bool:
     )
 
 
+_constructed_polytopes = weakref.WeakValueDictionary()
+r"""The polytopes this session has built, by the datum that decides equality.
+
+A polytope is its vertex set in its lattice (``__eq__`` and ``__hash__`` read
+exactly that), so two constructions of one subset of one lattice give one
+object while it is alive.  That is what keeps a polytope the same polytope
+everywhere it is obtained again -- as its own top face, as a face another
+polyhedron presents, as the datum a consumer rebuilds -- and it is what
+:func:`_convex_polytope`'s "constructed once" states.  The store holds the
+objects weakly, so it retains nothing that no reader holds, and the key carries
+the lattice by identity beside the coordinates, since the same coordinates in
+another lattice are another subset.
+"""
+
+
 def _convex_polytope(
     vertices=None,
     lattice=None,
@@ -1994,6 +2010,13 @@ def _convex_polytope(
     rather than recognized.  Integrality of the vertices and affine dimension
     two are the two axioms the finer categories state, so they are decided on
     the polyhedron and the object is constructed in the category they select.
+
+    Two constructions of one subset of one lattice are one object: the store
+    above is keyed by the same datum :meth:`...__eq__` compares, so the second
+    construction returns the first polytope with its retained presentation
+    rather than a copy of it.  A face's own presentation names vertices, and an
+    equal polytope built from a halfspace description keeps that description,
+    which is a presentation of the very same subset.
     """
     integers = _owned_integers()
     rationals = _owned_rationals()
@@ -2034,6 +2057,16 @@ def _convex_polytope(
         f"the vertices have {ambient_dimension} coordinates, but the lattice {lattice} has rank "
         f"{lattice.module_rank()}"
     )
+    key = (
+        id(lattice),
+        frozenset(
+            tuple(SageQQ(coordinate) for coordinate in vertex)
+            for vertex in polyhedron.vertices()
+        ),
+    )
+    constructed = _constructed_polytopes.get(key)
+    if constructed is not None:
+        return constructed
 
     placement = ConvexPolytopes(lattice)
     if _engine_vertices_are_integral(polyhedron):
@@ -2052,7 +2085,7 @@ def _convex_polytope(
         return bool(polyhedron.contains(coordinates))
 
     subset = ambient.condition_set(contains)
-    return Sets().Subobjects(ambient).object(
+    polytope = Sets().Subobjects(ambient).object(
         subset.inclusion(),
         categories=(placement,),
         construction_data={
@@ -2061,6 +2094,8 @@ def _convex_polytope(
             "defining_data": defining_data,
         },
     )
+    _constructed_polytopes[key] = polytope
+    return polytope
 
 
 __all__ = [
