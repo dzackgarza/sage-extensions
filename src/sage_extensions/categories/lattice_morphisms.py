@@ -5041,6 +5041,47 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
             ),
         )
 
+    def congruence_vector_stabilizer(self, modulus, vector):
+        r"""The exact stabilizer of ``vector mod m L`` under ``O(L)``.
+
+        For the actual reduction ``rho_m: O(L) -> im(O(L)) <= Aut(L/mL)``
+        and ``v in L``, this is ``rho_m^-1(Stab_im(rho_m)(v mod mL))``.
+        The finite target action calculates its stabilizer with Schreier
+        generators; the generic group-preimage construction lifts those
+        generators and the full kernel to integral automorphisms. No
+        replacement by the full ``GL(L/mL)`` stabilizer is justified.
+
+        The residue is an element of the module ``L/mL`` itself, not a tuple
+        of coordinates or a backend vector, and the resulting group remains
+        an actual subgroup of ``O(L)``. Composite moduli are supported.
+        """
+        from sage_extensions.categories.group.g_sets import FiniteGSets
+        from sage_extensions.categories.sets.finite_ordered_sets import finite_ordered_set
+
+        lattice = self.lattice()
+        if element_parent(vector) is not lattice:
+            raise ValueError(f"{vector} is not a vector of {lattice}")
+        representation = self.congruence_representation(modulus)
+        image = representation.codomain()
+        reduced_lattice = image.supergroup().domain()
+        source_labels = tuple(lattice.module_generating_set())
+        residue_labels = tuple(reduced_lattice.module_generating_set())
+        coefficients = vector.to_vector()
+        residue = reduced_lattice.linear_combination({
+            residue_label: reduced_lattice.base_ring()(coefficients(source_label))
+            for source_label, residue_label in zip(source_labels, residue_labels, strict=True)
+        })
+        # The finite module may not have a chosen enumeration as a *set*.
+        # Supply the finite set of its actual owned elements to the general
+        # finite G-set construction, without discarding its module action.
+        points = finite_ordered_set(tuple(reduced_lattice))
+        action = FiniteGSets(image)(points, lambda isometry, point: isometry(point))
+        stabilizer = action.stabilizer(residue)
+        return representation.preimage_subgroup(
+            stabilizer,
+            stated_clause=lambda: f"g fixes the residue of {vector} modulo {modulus} L",
+        )
+
     def nonprimitive_sublattice_classes(self, saturated, divisors):
         r"""Return one inclusion per ``Stab(S)``-class of ``J <= S`` with the given elementary divisors."""
         from sage_indefinite_port.indefinite.marked_lattices import nonprimitive_sublattice_classes
