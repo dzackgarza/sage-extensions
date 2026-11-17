@@ -1,0 +1,28 @@
+# tree: bf92710bfce1328de9de36c636dd0632d1a82704
+# status:  M .tmp/issue585/INDEX.md  M src/sage_extensions/all.py  M src/sage_extensions/categories/group/predicate_subgroups.py  M src/sage_extensions/categories/isotropic_orbits.py  M src/sage_extensions/categories/orthogonal_quotients.py ?? results/issue585-the-incidence-decided-by-divided-classes.md ?? tests/lattices/test_the_incidence_decided_by_divided_classes.sage 
+# load: 1.61 3.91 4.09
+# program: probe-585-recordsize.py  PROBE_PLANES=1 PROBE_PHASE=row
+[probe] Integral lattice of rank 5 and signature (2, 3); line cusps 3, plane cusps 2
+[probe] the class route's relation: 4 edges
+[probe] the certificate route's relation: 4 edges
+    Divided-class Tits-building incidence Rank-1 cusp of {g in Orthogonal group O(Integral lattice of rank 5 and signature (2, 3)) : rho_L(g) lies in a subgroup given by its own generators} in Integral lattice of rank 5 and signature (2, 3) < Rank-2 cusp of {g in Orthogonal group O(Integral lattice of rank 5 and signature (2, 3)) : rho_L(g) lies in a subgroup given by its own generators} in Integral lattice of rank 5 and signature (2, 3)
+    Divided-class Tits-building incidence Rank-1 cusp of {g in Orthogonal group O(Integral lattice of rank 5 and signature (2, 3)) : rho_L(g) lies in a subgroup given by its own generators} in Integral lattice of rank 5 and signature (2, 3) < Rank-2 cusp of {g in Orthogonal group O(Integral lattice of rank 5 and signature (2, 3)) : rho_L(g) lies in a subgroup given by its own generators} in Integral lattice of rank 5 and signature (2, 3)
+    Divided-class Tits-building incidence Rank-1 cusp of {g in Orthogonal group O(Integral lattice of rank 5 and signature (2, 3)) : rho_L(g) lies in a subgroup given by its own generators} in Integral lattice of rank 5 and signature (2, 3) < Rank-2 cusp of {g in Orthogonal group O(Integral lattice of rank 5 and signature (2, 3)) : rho_L(g) lies in a subgroup given by its own generators} in Integral lattice of rank 5 and signature (2, 3)
+    Divided-class Tits-building incidence Rank-1 cusp of {g in Orthogonal group O(Integral lattice of rank 5 and signature (2, 3)) : rho_L(g) lies in a subgroup given by its own generators} in Integral lattice of rank 5 and signature (2, 3) < Rank-2 cusp of {g in Orthogonal group O(Integral lattice of rank 5 and signature (2, 3)) : rho_L(g) lies in a subgroup given by its own generators} in Integral lattice of rank 5 and signature (2, 3)
+[probe] one comparison of two distinct edges: 3348.6 us
+[probe] the ingress on 4 edges: literal 57.198 ms, supplied inverse 0.040 ms; both cardinalities 4 and 4
+[probe] RESULT copies=200000 bytes_a_record=0.1 rss_before=529.7 MiB rss_after=552.8 MiB wall=14.4 s
+[peakrss] recordsize: child waited=0 shell_code=0 samples=8
+[peakrss] peak tree RSS      : 548 MiB
+[peakrss] low-water MemAvail : 13307 MiB
+[peakrss] peak single VmHWM  : 548 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      545 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   run.sh                        1 MiB peak
+[peakrss]   t=    14.0s procs=  2 rss=   548 MiB hwm=   548 MiB avail= 13307 MiB
+[peakrss]   t=    12.0s procs=  2 rss=   526 MiB hwm=   526 MiB avail= 13333 MiB
+[peakrss]   t=    10.0s procs=  2 rss=   505 MiB hwm=   505 MiB avail= 13353 MiB
+[peakrss]   t=     8.0s procs=  2 rss=   493 MiB hwm=   493 MiB avail= 13362 MiB
+[peakrss]   t=     6.0s procs=  2 rss=   485 MiB hwm=   485 MiB avail= 13370 MiB
+# launcher exit: 0

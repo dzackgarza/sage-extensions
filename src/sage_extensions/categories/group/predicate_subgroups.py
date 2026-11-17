@@ -79,6 +79,53 @@ def _preimage_coset_space(subgroup, morphism, target, generators):
     )
 
 
+def _incidence_ambient_sources(subgroup, quotient):
+    r"""The ambient flag row, with one registered source plane named for each flag.
+
+    The incidence covers the ``Stab_Gamma(P)``-orbits of the lines of a plane by
+    the ambient flag row carried to that plane: for each ambient flag orbit a
+    source plane is registered in the quotient (``register_isotropic_lift``), so
+    the element carrying it to a target plane is the composite of two registered
+    lifts and no isometry search is run per plane.
+
+    The ambient flag row need not choose the ambient plane row's representative,
+    and then there is no registered source lift for its plane.  Each such flag is
+    normalized once to a registered ambient representative, rather than starting
+    a fresh isometry search against every much larger transported target plane;
+    the third component is that source normalization, when one is needed.
+
+    Returns one ``(ambient_flag, source_lift, source_witness)`` per ambient flag
+    orbit, in the ambient row's order, which is the position that names the
+    covering in the quotient's covering registry.
+    """
+    orthogonal_group = subgroup.supergroup()
+    ambient_sources = []
+    ambient_plane_representatives = None
+    for ambient_flag in orthogonal_group.isotropic_orbit_representatives(2, flag=True):
+        _ambient_line, ambient_plane = ambient_flag.terms()
+        source_lift = quotient.isotropic_lift_of(ambient_plane)
+        if source_lift is not None:
+            ambient_sources.append((ambient_flag, source_lift, None))
+            continue
+        if ambient_plane_representatives is None:
+            ambient_plane_representatives = tuple(
+                orthogonal_group.isotropic_orbit_representatives(2)
+            )
+        for source_plane in ambient_plane_representatives:
+            source_lift = quotient.isotropic_lift_of(source_plane)
+            if source_lift is None:
+                continue
+            source_witness = orthogonal_group.isotropic_equivalence_witness(
+                ambient_plane, source_plane
+            )
+            if source_witness is not None:
+                ambient_sources.append((ambient_flag, source_lift, source_witness))
+                break
+        else:
+            ambient_sources.append((ambient_flag, None, None))
+    return tuple(ambient_sources)
+
+
 def _predicate_subgroup_category(category):
     r"""The category a predicate subgroup of ``category.base()`` is constructed in.
 
@@ -902,39 +949,7 @@ class PredicateSubgroups(OwnedParameterizedCategory):
             # flags whose plane term is carried to P by an ambient isometry,
             # transported by it.
             orthogonal_group = self.supergroup()
-            ambient_flags = tuple(orthogonal_group.isotropic_orbit_representatives(2, flag=True))
-            # The ambient flag row need not choose the ambient plane row's
-            # representative.  In that case there is no registered source lift
-            # for its plane.  Normalize each such flag once to a registered
-            # ambient representative, rather than starting a fresh isometry
-            # search against every much larger transported target plane.  The
-            # third component is that source normalization, when one is needed.
-            ambient_sources = []
-            ambient_plane_representatives = None
-            for ambient_flag in ambient_flags:
-                _ambient_line, ambient_plane = ambient_flag.terms()
-                source_lift = quotient.isotropic_lift_of(ambient_plane)
-                if source_lift is not None:
-                    ambient_sources.append((ambient_flag, source_lift, None))
-                    continue
-                if ambient_plane_representatives is None:
-                    ambient_plane_representatives = tuple(
-                        orthogonal_group.isotropic_orbit_representatives(2)
-                    )
-                for source_plane in ambient_plane_representatives:
-                    source_lift = quotient.isotropic_lift_of(source_plane)
-                    if source_lift is None:
-                        continue
-                    source_witness = orthogonal_group.isotropic_equivalence_witness(
-                        ambient_plane, source_plane
-                    )
-                    if source_witness is not None:
-                        ambient_sources.append(
-                            (ambient_flag, source_lift, source_witness)
-                        )
-                        break
-                else:
-                    ambient_sources.append((ambient_flag, None, None))
+            ambient_sources = _incidence_ambient_sources(self, quotient)
             # The building incidence is a relation between two orbit vertices, not
             # the quotient's set of flag orbits.  Several flags can witness the
             # same relation, and the parabolic covering can repeat one of its
@@ -1109,6 +1124,242 @@ class PredicateSubgroups(OwnedParameterizedCategory):
                                 f"{first.plane_cusp()}: the flag orbits are over-split"
                             )
             return finite_ordered_set(tuple(incidences))
+
+        def tits_building_incidence_by_divided_classes(self):
+            r"""Return this subgroup's line/plane building incidence, decided by divided classes.
+
+            The relation :meth:`tits_building_incidence` returns, computed from
+            the data an edge is decided by instead of from flags and
+            transporters: an edge joins a line cusp to a plane cusp, and which
+            line cusp a line of a plane lies in is named by the
+            ``rho(Gamma)``-orbit of the line's divided class pair.
+
+            **What one plane needs.**  A primitive isotropic line ``x = <v>``
+            has divided class ``c = [v / div(v)]`` in ``A_L = L^\#/L``, and an
+            isometry carries ``c`` to the divided class of its image because an
+            isometry preserves primitivity and divisibility
+            (:func:`...orthogonal_quotients._isotropic_line_class_points`).
+            So, for ``P_0`` the plane the row's one covering was computed at,
+
+            * the plane's registered lift ``s_P``, which carries ``P_0`` onto
+              ``P`` -- one span-keyed lookup, no construction;
+            * the composite ``s_P s_{P_0}^{-1}``, as its action ``rho`` on
+              ``A_L`` -- one element of ``O(A_L)``, the quotient's own finite
+              datum;
+            * the covering's line class pairs ``{c, -c}``, three of them at
+              ``P_0`` and the same three for every plane, carried by that action
+              (:func:`...orthogonal_quotients._carried_divided_classes`);
+            * the line cusp row indexed by that orbit, once for the row.
+
+            The edge at ``P`` is the pair (that cusp, the cusp of ``P``).  The
+            containment ``c(g x)`` in the divided classes of ``g P`` -- which
+            also holds, since an isometry carries a line of ``P_0`` to a line of
+            ``P`` -- is necessary rather than sufficient for incidence, and the
+            vertices are separated by the orbit, not by containment: what names
+            the line cusp is the invariant the row's own reduction is stated in
+            (D. Dutour Sikirić and K. Hulek, arXiv:2302.01679v2, Lemma 3.6,
+            printed p. 22).
+
+            **What it does not construct.**  No ``IsotropicFlag``, no
+            ``PrimitiveIsotropic`` subobject and no certificate per plane: the
+            classes are sets of classes of ``A_L`` and the elements are elements
+            of the finite character image.  A constructed parent of this library
+            is retained for the process (``_lattice_on_gram``'s construction
+            cache, and the morphism and category-packet caches above it), so
+            three carried flags a plane is 350-400 KB a plane and 63-72 GiB at
+            the kernel rows' 189720 planes.  A flag is built in two places only:
+            the row's covering, at the plane it is computed at, and once at the
+            first plane that is not that one, to check that the carried class
+            pair is the class pair of the carried line.
+
+            **What it refuses.**  The route decides an edge only where the
+            row's own key separates the line cusps: where two line cusps share
+            one finite image the class data names both, and a lattice witness is
+            what tells them apart, so the call raises naming the plane and the
+            cusps instead of choosing one.  It also refuses a subgroup that is
+            not invariant under conjugation by the ambient group, because then
+            each plane's covering has to be computed at that plane -- the
+            certificate route's work, and its per-plane parents with it.  In
+            both cases :meth:`tits_building_incidence` remains the route that
+            answers.
+
+            The returned relation is a set of
+            :class:`...isotropic_orbits.DividedClassCuspIncidence` records: one
+            per endpoint pair, carrying the two vertices and the class pair that
+            decided it, and no transporter.  A reader who wants a transporter in
+            hand asks :meth:`tits_building_incidence`.
+            """
+            from sage_extensions.categories.isotropic_orbits import (
+                DividedClassCuspIncidence,
+            )
+            from sage_extensions.categories.orthogonal_quotients import (
+                _carried_divided_classes,
+                _divided_class_action,
+                _isotropic_line_class_points,
+                _isotropic_line_image_key,
+                _plane_parabolic_incidence_flags,
+            )
+            from sage_extensions.categories.sets.finite_ordered_sets import (
+                FiniteOrderedSets,
+                finite_ordinal_set,
+            )
+
+            lattice = self.supergroup().domain()
+            quotient = self.finite_character_quotient()
+            if not quotient._has_discriminant:
+                raise ValueError(
+                    f"the building incidence of {self} cannot be decided by divided classes: the "
+                    "subgroup cuts no discriminant condition, so a line carries no class data that "
+                    "names its cusp, and tits_building_incidence is the route that decides the edges"
+                )
+            if not quotient.preserves_conjugation():
+                raise ValueError(
+                    f"the building incidence of {self} cannot be carried from one plane to another: "
+                    "the subgroup is not invariant under conjugation by an isometry of its ambient "
+                    "group, so every plane's covering has to be computed at that plane, which is the "
+                    "certificate route's work; tits_building_incidence is that route"
+                )
+            orthogonal_group = self.supergroup()
+            line_cusps = self.cusps(1)
+            plane_cusps = self.cusps(2)
+            # The line vertices, indexed once by the invariant the row was split
+            # by: a key no cusp carries is a line of no cusp, and a key two
+            # cusps share leaves the class data unable to choose between them.
+            line_cusps_by_key = {}
+            for cusp in line_cusps:
+                key = _isotropic_line_image_key(quotient, cusp.representative())
+                entry = line_cusps_by_key.setdefault(key, (key, []))
+                entry[1].append(cusp)
+            # One covering per ambient flag orbit, computed once at the first
+            # plane of the row that has a registered lift for that source, and
+            # kept as its line class pairs: the classes are what is carried from
+            # then on, and the flags are not read again.
+            sources = _incidence_ambient_sources(self, quotient)
+            coverings = {}
+            for plane_cusp in plane_cusps:
+                if len(coverings) == len(sources):
+                    break
+                plane = plane_cusp.representative()
+                lift = quotient.isotropic_lift_of(plane)
+                if lift is None:
+                    continue
+                for position, (ambient_flag, source_lift, source_witness) in enumerate(sources):
+                    if position in coverings:
+                        continue
+                    if source_lift is not None:
+                        witness = lift * ~source_lift
+                        if source_witness is not None:
+                            witness = witness * source_witness
+                    else:
+                        witness = orthogonal_group.isotropic_equivalence_witness(
+                            ambient_flag.terms()[1], plane
+                        )
+                    if witness is None:
+                        continue
+                    seeded = witness.transport_isotropic_object(ambient_flag)
+                    covering = _plane_parabolic_incidence_flags(self, plane, seeded)
+                    if covering is None:
+                        raise ArithmeticError(
+                            f"the incidence of {self} has no covering at {plane}: the plane's "
+                            "parabolic does not cover the stabilizer's orbits on its lines, so the "
+                            "edges at this row's planes are decided by the certificate route"
+                        )
+                    quotient.register_isotropic_covering(plane, position, lift, covering)
+                    coverings[position] = (
+                        plane,
+                        lift,
+                        covering,
+                        tuple(
+                            _isotropic_line_class_points(lattice, flag.terms()[0])
+                            for flag in covering
+                        ),
+                    )
+            if len(coverings) != len(sources):
+                raise ArithmeticError(
+                    f"the incidence of {self} needs one covering per ambient flag orbit and "
+                    f"{len(coverings)} of {len(sources)} were computed: no plane of the row carries a "
+                    "registered lift for the others, so their covering cannot be carried to the row"
+                )
+            incidences = []
+            endpoint_pairs = set()
+            transport_checked = set()
+            for plane_cusp in plane_cusps:
+                plane = plane_cusp.representative()
+                target_lift = quotient.isotropic_lift_of(plane)
+                if target_lift is None:
+                    raise ArithmeticError(
+                        f"the plane {plane} of the cusp {plane_cusp} of {self} has no registered lift, "
+                        "so no covering of the row can be carried onto it: the class data of its lines "
+                        "is what the lift carries, and without it the edges at this plane are undecided"
+                    )
+                for position, (
+                    reference_plane,
+                    reference_lift,
+                    covering,
+                    reference_classes,
+                ) in coverings.items():
+                    move = target_lift * ~reference_lift
+                    action = _divided_class_action(quotient, move)
+                    for flag, classes in zip(covering, reference_classes, strict=True):
+                        carried = _carried_divided_classes(classes, action)
+                        if position not in transport_checked and plane is not reference_plane:
+                            # The carried class is the class of the carried line:
+                            # the one plane of the row that builds a flag's worth
+                            # of work, to check the finite image's action on
+                            # ``A_L`` against the lattice's own image of the
+                            # carried line.  The reference plane's own move is the
+                            # identity, so the check is made at the first plane
+                            # that is a different one.
+                            image_line = move.transport_isotropic_object(flag).terms()[0]
+                            if str(_isotropic_line_class_points(lattice, image_line)) != str(carried):
+                                raise ArithmeticError(
+                                    f"the divided classes of the line of {flag} carried to {plane} by "
+                                    f"the finite image are not the classes of the carried line: the "
+                                    "action of the image on A_L and the induced action of the isometry "
+                                    "on the lattice disagree, so no edge is read from the classes"
+                                )
+                        entry = line_cusps_by_key.get(
+                            frozenset(quotient.isotropic_class_orbit(carried))
+                        )
+                        key, candidates = entry if entry is not None else (None, ())
+                        if len(candidates) != 1:
+                            named = ", ".join(str(cusp) for cusp in candidates) or "none"
+                            raise ArithmeticError(
+                                f"the line of the covering flag {flag} carried to {plane} lies in "
+                                f"{len(candidates)} line cusps of {self} ({named}): the finite image "
+                                "does not separate this line's cusp from the others, and no edge is "
+                                "read from class data that names more than one vertex; "
+                                "tits_building_incidence decides it with a transporter"
+                            )
+                        endpoints = (id(candidates[0]), id(plane_cusp))
+                        if endpoints in endpoint_pairs:
+                            continue
+                        endpoint_pairs.add(endpoints)
+                        incidences.append(
+                            DividedClassCuspIncidence(
+                                self, candidates[0], plane_cusp, key
+                            )
+                        )
+                    if plane is not reference_plane:
+                        transport_checked.add(position)
+            # The relation is a finite ordered set whose inverse is the walk's
+            # own identity index.  A cusp's hash is constant over its universe
+            # (``_ArithmeticCuspEngine.__hash__``: a cusp has no cheap canonical
+            # key, so its hash is the constant the category's rule prescribes),
+            # and the literal ingress :func:`finite_ordered_set` identifies
+            # repeated points through a dictionary of them, which for constant
+            # hashes compares every point with every other -- at the certificate
+            # route's one certificate a plane that is ``n(n-1)/2`` comparisons of
+            # two cusps, each a transporter search.  Supplying the inverse the
+            # walk already used keeps the ingress linear, and the points are
+            # distinct objects because the walk admitted one per endpoint pair.
+            points = tuple(incidences)
+            positions = {id(point): position for position, point in enumerate(points)}
+            return FiniteOrderedSets().from_indexed(
+                finite_ordinal_set(len(points)),
+                lambda position: points[int(position)],
+                index_of=lambda point: positions.get(id(point)),
+            )
 
         def _predicate_clause(self) -> str:
             r"""Return the condition that cuts this subgroup out, asked where it is read.

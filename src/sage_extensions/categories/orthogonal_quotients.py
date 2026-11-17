@@ -3859,6 +3859,52 @@ def _isotropic_line_image_key(quotient, line):
     )
 
 
+_SETWISE_DIVIDED_CLASS_ACTION = None
+
+
+def _setwise_divided_class_action():
+    r"""GAP's setwise action on a set of divided classes, read once per session."""
+    global _SETWISE_DIVIDED_CLASS_ACTION
+    if _SETWISE_DIVIDED_CLASS_ACTION is None:
+        from sage.libs.gap.libgap import libgap
+
+        _SETWISE_DIVIDED_CLASS_ACTION = libgap.function_factory(
+            "function(x, g) return Set(List(x, y -> ImageElm(g, y))); end"
+        )
+    return _SETWISE_DIVIDED_CLASS_ACTION
+
+
+def _divided_class_action(quotient, isometry):
+    r"""The action of ``isometry`` on ``A_L``, as one element of the ``O(A_L)`` engine.
+
+    ``rho_L`` is the lattice's discriminant representation, and the image of an
+    isometry under it is its discriminant morphism -- the very component
+    :meth:`OrthogonalCharacterQuotient.image` reads for a character key, so this
+    is the quotient's own datum and not a second implementation of it.  The sign
+    components are not read: a divided class is carried by the discriminant
+    action alone.
+
+    The element returned is read in the model the classes are built in (the
+    quotient's own ``O(A_L)``), which is what makes the carried classes
+    comparable with a line's own pair.
+    """
+    from sage_extensions.categories.group.groups import _element_to_engine
+
+    return _element_to_engine(
+        quotient._discriminant_group, isometry.discriminant_morphism()
+    )
+
+
+def _carried_divided_classes(classes, action):
+    r"""The divided classes ``classes`` carried by ``action``, an automorphism of ``A_L``.
+
+    A line's datum is the *set* ``{c, -c}``, so the carried datum is the set of
+    carried classes and the pair moves as one pair.  The image is GAP's own
+    action of a group element on the classes, applied setwise.
+    """
+    return _setwise_divided_class_action()(classes, action)
+
+
 def _line_generator_in_plane(plane, line):
     r"""Return the line's generator and its coordinates, read in the plane's own domain.
 

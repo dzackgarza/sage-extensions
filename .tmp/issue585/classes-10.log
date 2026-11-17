@@ -1,0 +1,57 @@
+# tree: bf92710bfce1328de9de36c636dd0632d1a82704
+# status: 
+# load: 0.66 0.32 0.21
+# program: probe-585-classes.py  PROBE_PLANES=10 PROBE_PHASE=row
+         1.12 s  T_Co and the row's plane  rss    402.6 MiB
+         0.10 s  Otilde and its character quotient  rss    406.6 MiB
+[probe] A_L = Finitely presented module on 11 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 2, 1 ↦ 2, 2 ↦ 2, 3 ↦ 2, 4 ↦ 2, 5 ↦ 2, 6 ↦ 2, 7 ↦ 2, 8 ↦ 2, 9 ↦ 2, 10 ↦ 2]
+[probe] the plane's class set size: 4
+         2.67 s  the plane's parabolic: 112 generators  rss    422.7 MiB
+       209.35 s  the split's first lift  rss   1330.3 MiB
+         0.05 s  10 planes of the row, one registered lift each  rss   1330.6 MiB
+[probe] the covering at the first plane: 3 flags
+         8.21 s  the row's one covering, computed at the first plane  rss   1336.6 MiB
+[probe] the covering's class data: ['[ f6*f7 ]', '[ f3*f6*f7 ]', '[ f3 ]']
+         0.01 s  the covering's class pairs  rss   1336.6 MiB
+  [plane 1 line 0] class agrees: True  key agrees: True  old    3.290 ms new    0.003 ms  key size 1
+  [plane 1 line 1] class agrees: True  key agrees: True  old    3.511 ms new    0.004 ms  key size 1
+  [plane 1 line 2] class agrees: True  key agrees: True  old    2.611 ms new    0.003 ms  key size 1
+  [plane 2 line 0] class agrees: True  key agrees: True  old    3.801 ms new    0.003 ms  key size 1
+  [plane 2 line 1] class agrees: True  key agrees: True  old    4.066 ms new    0.003 ms  key size 1
+  [plane 2 line 2] class agrees: True  key agrees: True  old    2.619 ms new    0.002 ms  key size 1
+  [plane 3 line 0] class agrees: True  key agrees: True  old    3.818 ms new    0.003 ms  key size 1
+  [plane 3 line 1] class agrees: True  key agrees: True  old    4.114 ms new    0.003 ms  key size 1
+  [plane 3 line 2] class agrees: True  key agrees: True  old    2.731 ms new    0.003 ms  key size 1
+  [plane 4 line 0] class agrees: True  key agrees: True  old    4.320 ms new    0.003 ms  key size 1
+  [plane 4 line 1] class agrees: True  key agrees: True  old    4.565 ms new    0.003 ms  key size 1
+  [plane 4 line 2] class agrees: True  key agrees: True  old    2.626 ms new    0.003 ms  key size 1
+  [plane 5 line 0] class agrees: True  key agrees: True  old    4.531 ms new    0.003 ms  key size 1
+  [plane 5 line 1] class agrees: True  key agrees: True  old    4.638 ms new    0.003 ms  key size 1
+  [plane 5 line 2] class agrees: True  key agrees: True  old    2.567 ms new    0.002 ms  key size 1
+  [plane 6 line 0] class agrees: True  key agrees: True  old    3.838 ms new    0.003 ms  key size 1
+  [plane 6 line 1] class agrees: True  key agrees: True  old    4.036 ms new    0.003 ms  key size 1
+  [plane 6 line 2] class agrees: True  key agrees: True  old    2.581 ms new    0.003 ms  key size 1
+  [plane 7 line 0] class agrees: True  key agrees: True  old    5.168 ms new    0.003 ms  key size 1
+  [plane 7 line 1] class agrees: True  key agrees: True  old    5.077 ms new    0.003 ms  key size 1
+  [plane 7 line 2] class agrees: True  key agrees: True  old    4.304 ms new    0.003 ms  key size 1
+  [plane 8 line 0] class agrees: True  key agrees: True  old    3.879 ms new    0.003 ms  key size 1
+  [plane 8 line 1] class agrees: True  key agrees: True  old    4.356 ms new    0.003 ms  key size 1
+  [plane 8 line 2] class agrees: True  key agrees: True  old    3.822 ms new    0.003 ms  key size 1
+  [plane 9 line 0] class agrees: True  key agrees: True  old    3.475 ms new    0.003 ms  key size 1
+  [plane 9 line 1] class agrees: True  key agrees: True  old    4.886 ms new    0.003 ms  key size 1
+  [plane 9 line 2] class agrees: True  key agrees: True  old    4.617 ms new    0.003 ms  key size 1
+[probe] RESULT planes=10 span_lookup_ms=0.805 rho_direct_ms=41.509 rho_via_image_ms=0.120 engine_ms=0.007 pair_carry_us=16.1 plane_classes_ms=7.239 wall=222.3 s rss=1340.2 MiB
+[peakrss] classes-10: child waited=0 shell_code=0 samples=113
+[peakrss] peak tree RSS      : 1340 MiB
+[peakrss] low-water MemAvail : 11850 MiB
+[peakrss] peak single VmHWM  : 1344 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     1340 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   run.sh                        2 MiB peak
+[peakrss]   t=   222.1s procs=  2 rss=  1340 MiB hwm=  1340 MiB avail= 13220 MiB
+[peakrss]   t=   220.1s procs=  2 rss=  1339 MiB hwm=  1339 MiB avail= 13221 MiB
+[peakrss]   t=   218.1s procs=  2 rss=  1338 MiB hwm=  1338 MiB avail= 12757 MiB
+[peakrss]   t=   216.1s procs=  2 rss=  1336 MiB hwm=  1336 MiB avail= 12757 MiB
+[peakrss]   t=   214.1s procs=  2 rss=  1335 MiB hwm=  1335 MiB avail= 12766 MiB
+# launcher exit: 0

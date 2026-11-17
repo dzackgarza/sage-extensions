@@ -1,0 +1,44 @@
+# tree: bf92710bfce1328de9de36c636dd0632d1a82704
+# status:  M .tmp/issue585/INDEX.md  M src/sage_extensions/all.py  M src/sage_extensions/categories/group/predicate_subgroups.py  M src/sage_extensions/categories/isotropic_orbits.py  M src/sage_extensions/categories/orthogonal_quotients.py ?? results/issue585-the-incidence-decided-by-divided-classes.md ?? tests/lattices/test_the_incidence_decided_by_divided_classes.sage 
+# load: 1.39 4.68 4.14
+# program: probe-585-walk.py  PROBE_PLANES=1000 PROBE_PHASE=check
+         0.84 s  T_Co, Otilde and its character quotient  rss    282.6 MiB
+         2.46 s  the plane's parabolic: 112 generators  rss    305.8 MiB
+       180.42 s  the split's first lift  rss   1287.2 MiB
+         5.97 s  1000 planes of the row, one registered lift each  rss   1353.0 MiB
+         8.67 s  the row's one covering (3 flags) and its class pairs  rss   1359.2 MiB
+  [walk plane      2/1000]     0.070 s   38.301 ms a plane  rss   1359.4 MiB  keys 3  edges 3  old  31.586 ms
+  [walk plane      3/1000]     0.070 s   36.749 ms a plane  rss   1359.7 MiB  keys 3  edges 6  old  32.841 ms
+  [walk plane      4/1000]     0.071 s   36.923 ms a plane  rss   1360.0 MiB  keys 3  edges 9  old  33.198 ms
+  [walk plane      5/1000]     0.078 s   38.202 ms a plane  rss   1360.4 MiB  keys 5  edges 12  old  33.890 ms
+  [walk plane      6/1000]     0.078 s   39.044 ms a plane  rss   1360.7 MiB  keys 7  edges 15  old  34.240 ms
+  [walk plane      7/1000]     0.079 s   39.562 ms a plane  rss   1360.9 MiB  keys 9  edges 18  old  34.697 ms
+  [walk plane      8/1000]     0.105 s   42.773 ms a plane  rss   1361.2 MiB  keys 11  edges 21  old  35.890 ms
+  [walk plane      9/1000]     0.082 s   42.284 ms a plane  rss   1361.6 MiB  keys 12  edges 24  old  36.708 ms
+  [walk plane     10/1000]     0.092 s   42.888 ms a plane  rss   1362.1 MiB  keys 14  edges 27  old  37.484 ms
+  [walk plane    100/1000]     8.231 s   51.708 ms a plane  rss   1388.6 MiB  keys 50  edges 297  old  38.732 ms
+  [walk plane    200/1000]     5.674 s   56.733 ms a plane  rss   1389.9 MiB  keys 95  edges 597  old  38.732 ms
+  [walk plane    300/1000]     6.217 s   62.163 ms a plane  rss   1390.6 MiB  keys 128  edges 897  old  38.732 ms
+  [walk plane    400/1000]     6.547 s   65.462 ms a plane  rss   1391.2 MiB  keys 128  edges 1197  old  38.732 ms
+  [walk plane    500/1000]     6.145 s   61.445 ms a plane  rss   1391.9 MiB  keys 128  edges 1497  old  38.732 ms
+  [walk plane    600/1000]     6.296 s   62.958 ms a plane  rss   1392.6 MiB  keys 165  edges 1797  old  38.732 ms
+  [walk plane    700/1000]     6.593 s   65.930 ms a plane  rss   1393.4 MiB  keys 192  edges 2097  old  38.732 ms
+  [walk plane    800/1000]     6.458 s   64.579 ms a plane  rss   1394.1 MiB  keys 216  edges 2397  old  38.732 ms
+  [walk plane    900/1000]    10.524 s  105.237 ms a plane  rss   1394.8 MiB  keys 241  edges 2697  old  38.732 ms
+  [walk plane   1000/1000]    12.078 s  120.771 ms a plane  rss   1395.6 MiB  keys 274  edges 2997  old  38.732 ms
+        75.49 s  the walk over 999 planes  rss   1395.6 MiB
+[probe] RESULT phase=check planes=1000 walk_ms=71.7187 keys=274 edges=2997 comparisons=297 agreements=297 old_ms=38.732 bands=[(2, 1359.4), (3, 1359.7), (4, 1360.0), (5, 1360.4), (6, 1360.7), (7, 1360.9), (8, 1361.2), (9, 1361.6), (10, 1362.1), (100, 1388.6), (200, 1389.9), (300, 1390.6), (400, 1391.2), (500, 1391.9), (600, 1392.6), (700, 1393.4), (800, 1394.1), (900, 1394.8), (1000, 1395.6)] wall=273.8 s rss=1395.6 MiB
+[peakrss] walk-row-1000: child waited=0 shell_code=0 samples=141
+[peakrss] peak tree RSS      : 1399 MiB
+[peakrss] low-water MemAvail : 11038 MiB
+[peakrss] peak single VmHWM  : 1399 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     1396 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   run.sh                        2 MiB peak
+[peakrss]   t=   276.2s procs=  2 rss=  1399 MiB hwm=  1399 MiB avail= 11163 MiB
+[peakrss]   t=   262.1s procs=  2 rss=  1398 MiB hwm=  1398 MiB avail= 11285 MiB
+[peakrss]   t=   264.1s procs=  2 rss=  1398 MiB hwm=  1398 MiB avail= 11167 MiB
+[peakrss]   t=   266.1s procs=  2 rss=  1398 MiB hwm=  1398 MiB avail= 11112 MiB
+[peakrss]   t=   268.1s procs=  2 rss=  1398 MiB hwm=  1398 MiB avail= 11125 MiB
+# launcher exit: 0

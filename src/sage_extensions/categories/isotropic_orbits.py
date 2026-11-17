@@ -1155,6 +1155,100 @@ class ArithmeticCuspIncidence(SageObject):
         return f"Arithmetic Tits-building incidence {self.line_cusp()} < {self.plane_cusp()}"
 
 
+class DividedClassCuspIncidence(SageObject):
+    r"""One incident pair of cusp orbits, decided by the divided class of its line.
+
+    An edge of the Tits building's incidence is a relation between two orbit
+    vertices, a line cusp and a plane cusp, and the datum that decides it is the
+    divided class of the line: for a primitive isotropic line ``x = <v>`` with
+    divided class ``c = [v / div(v)]`` in ``A_L`` an isometry ``g`` carries
+    ``c`` to the divided class of ``g v``, so the ``rho(Gamma)``-orbit of the
+    class pair ``{c, -c}`` is an invariant of the ``Gamma``-orbits of lines and
+    names the line cusp the line lies in (D. Dutour Sikirić and K. Hulek,
+    arXiv:2302.01679v2, Lemma 3.6, printed p. 22, is the reduction the row is
+    split by and :mod:`...orthogonal_quotients`' ``_isotropic_line_image_key``
+    is that invariant as a key).
+
+    This record retains the two vertices and the class pair the edge was
+    decided by, and nothing of the lattice: no flag, no subobject and no
+    transporter.  What states the incidence is the route that computed it
+    (``PredicateSubgroups.ParentMethods.tits_building_incidence_by_divided_classes``);
+    a reader who wants a transporter in hand asks the certificate route
+    (``...tits_building_incidence``), whose records keep one per edge.
+
+    Two records of one subgroup with the same two cusps are one edge whatever
+    class pairs witnessed them -- the relation is between vertices -- which is
+    the equality :class:`ArithmeticCuspIncidence` states for its own records.
+    """
+
+    def __init__(self, subgroup, line_cusp, plane_cusp, divided_classes) -> None:
+        if line_cusp.subgroup() is not subgroup or plane_cusp.subgroup() is not subgroup:
+            raise ValueError(
+                f"the cusps {line_cusp} and {plane_cusp} cannot both be vertices of an incidence of "
+                f"{subgroup}: each must be a cusp of {subgroup}"
+            )
+        if int(line_cusp.module_rank()) != 1 or int(plane_cusp.module_rank()) != 2:
+            raise ValueError(
+                f"the cusps {line_cusp} and {plane_cusp} cannot be the line and plane vertices of one "
+                f"incidence: their ranks are {line_cusp.module_rank()} and {plane_cusp.module_rank()}, "
+                f"not one and two"
+            )
+        self._subgroup = subgroup
+        self._line_cusp = line_cusp
+        self._plane_cusp = plane_cusp
+        self._divided_classes = divided_classes
+
+    def subgroup(self):
+        return self._subgroup
+
+    def lattice(self):
+        return self.subgroup().supergroup().domain()
+
+    def line_cusp(self):
+        return self._line_cusp
+
+    def plane_cusp(self):
+        return self._plane_cusp
+
+    def divided_classes(self):
+        r"""Return the ``rho(Gamma)``-orbit of the line's divided class pair that decided the edge.
+
+        This is the row's own index key: the orbit is what the line row is
+        indexed by, so an edge says which orbit named its line vertex.  It is
+        the orbit of the set ``{c, -c}`` of classes of ``A_L``, and it is the
+        same object as the one the row's index holds, not a copy per edge.
+        """
+        return self._divided_classes
+
+    def __eq__(self, other) -> bool:
+        r"""Compare relation records by their endpoints, as the certificate route does."""
+        if self is other:
+            return True
+        if not (
+            isinstance(other, DividedClassCuspIncidence)
+            and other.subgroup() is self.subgroup()
+        ):
+            return False
+        return (
+            self.line_cusp() == other.line_cusp()
+            and self.plane_cusp() == other.plane_cusp()
+        )
+
+    def __ne__(self, other) -> bool:
+        return not self == other
+
+    def __hash__(self) -> int:
+        # A cusp's own hash is constant over its universe
+        # (``_ArithmeticCuspEngine.__hash__``), so the record hashes by its
+        # subgroup alone: equal records of one subgroup agree, and the
+        # category's rule for a point whose owner computes no cheap canonical
+        # hash is a constant one (``FiniteOrderedSets``).
+        return hash((DividedClassCuspIncidence, id(self.subgroup())))
+
+    def __repr__(self) -> str:
+        return f"Divided-class Tits-building incidence {self.line_cusp()} < {self.plane_cusp()}"
+
+
 def _terms(obj, flag):
     match flag:
         case True:
@@ -3606,6 +3700,7 @@ class IsotropicVectorReductionImage(SageObject):
 __all__ = [
     "ArithmeticCuspIncidence",
     "CuspIncidence",
+    "DividedClassCuspIncidence",
     "FlagType",
     "IsotropicFlag",
     "IsotropicPlaneOrbit",

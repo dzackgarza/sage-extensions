@@ -1,0 +1,39 @@
+# tree: bf92710bfce1328de9de36c636dd0632d1a82704
+# status:  M .tmp/issue585/INDEX.md  M src/sage_extensions/all.py  M src/sage_extensions/categories/group/predicate_subgroups.py  M src/sage_extensions/categories/isotropic_orbits.py  M src/sage_extensions/categories/orthogonal_quotients.py ?? results/issue585-the-incidence-decided-by-divided-classes.md ?? tests/lattices/test_the_incidence_decided_by_divided_classes.sage 
+# load: 1.03 3.12 3.79
+# program: probe-585-small-row.py  PROBE_PLANES=1 PROBE_PHASE=row
+[Otilde] line cusps 3, plane cusps 2
+[Otilde] class route      [(0, 0), (0, 1), (1, 1), (2, 0)]
+[Otilde] certificate route [(0, 0), (0, 1), (1, 1), (2, 0)]
+[Otilde] flag row: 4 flags
+[Otilde]   flag -> line cusps [0] plane cusps [0]
+[Otilde]   flag -> line cusps [0] plane cusps [1]
+[Otilde]   flag -> line cusps [1] plane cusps [1]
+[Otilde]   flag -> line cusps [2] plane cusps [0]
+[Otilde] flag row        [(0, 0), (0, 1), (1, 1), (2, 0)]
+[Otilde] agrees: class==certificate True, class==flags True
+[Otilde+] line cusps 3, plane cusps 2
+[Otilde+] class route      [(0, 0), (0, 1), (1, 1), (2, 0)]
+[Otilde+] certificate route [(0, 0), (0, 1), (1, 1), (2, 0)]
+[Otilde+] flag row: 4 flags
+[Otilde+]   flag -> line cusps [0] plane cusps [0]
+[Otilde+]   flag -> line cusps [0] plane cusps [1]
+[Otilde+]   flag -> line cusps [1] plane cusps [1]
+[Otilde+]   flag -> line cusps [2] plane cusps [0]
+[Otilde+] flag row        [(0, 0), (0, 1), (1, 1), (2, 0)]
+[Otilde+] agrees: class==certificate True, class==flags True
+[probe] wall 33.2 s
+[peakrss] small-row: child waited=0 shell_code=0 samples=18
+[peakrss] peak tree RSS      : 620 MiB
+[peakrss] low-water MemAvail : 13208 MiB
+[peakrss] peak single VmHWM  : 620 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      617 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   run.sh                        1 MiB peak
+[peakrss]   t=    34.0s procs=  2 rss=   620 MiB hwm=   620 MiB avail= 13208 MiB
+[peakrss]   t=    32.0s procs=  2 rss=   615 MiB hwm=   615 MiB avail= 13216 MiB
+[peakrss]   t=    30.0s procs=  2 rss=   608 MiB hwm=   608 MiB avail= 13224 MiB
+[peakrss]   t=    28.0s procs=  2 rss=   599 MiB hwm=   599 MiB avail= 13232 MiB
+[peakrss]   t=    26.0s procs=  2 rss=   591 MiB hwm=   591 MiB avail= 13240 MiB
+# launcher exit: 0
