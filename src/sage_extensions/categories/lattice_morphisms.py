@@ -3346,14 +3346,16 @@ def _minimal_shell(gram):
 
     An isometry carries the minimal vectors of one form onto those of the
     other, so two forms with different pairs are not isometric. PARI's
-    ``qfminim`` with ``m = 0`` counts the minimal vectors without storing
-    them (The PARI Group, *PARI/GP*, ``qfminim``). The count is the cheap
-    separation of one genus that ``qfisom`` does not make first: on
-    ``E_8 + <26>`` against a class of its genus with fewer roots, ``qfisom``
-    enumerates every ``E_8`` vector up to norm 26 and overflows an 8 GB stack.
+    ``qfminim`` counts every minimal vector while storing at most one
+    opposite pair. Flag 2 supports large integral entries; its returned
+    minimum is floating point, so evaluate the retained vector exactly
+    instead (The PARI Group, *PARI/GP*, ``qfminim``). This separates
+    nonisometric forms before ``qfisom`` enumerates all vectors up to the
+    largest diagonal entry.
     """
-    count, minimum, _vectors = pari(gram).qfminim(None, 0)
-    return int(minimum), int(count)
+    count, _minimum, vectors = pari(gram).qfminim(None, 1, 2)
+    vector = vectors.sage().column(0)
+    return vector * gram * vector, int(count)
 
 
 @cached_function
@@ -3432,6 +3434,9 @@ def _definite_automorphisms(gram):
     """
     from sage.arith.misc import factorial
 
+    # M^t (c G) M = c G is equivalent to M^t G M = G for c != 0.
+    # Remove the scalar content before PARI converts entries to machine integers.
+    gram = (gram / gram.gcd()).change_ring(SageZZ)
     summands = indecomposable_summand_bases(gram)
     if summands is None or len(summands) == 1:
         order_and_generators = pari(gram).qfauto()

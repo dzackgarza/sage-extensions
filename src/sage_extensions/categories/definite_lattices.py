@@ -238,7 +238,9 @@ def indecomposable_summand_bases(gram):
     rank = gram.nrows()
     if rank == 1:
         return (identity_matrix(SageZZ, 1),)
-    vectors = engine_matrix(SageZZ, pari(gram).qfminim()[2].sage()).columns()
+    # PARI's flag 0 is restricted to small integral entries; flag 2
+    # supports the full integral Gram domain (PARI/GP manual, qfminim).
+    vectors = engine_matrix(SageZZ, pari(gram).qfminim(None, None, 2)[2].sage()).columns()
     unseen = set(range(len(vectors)))
     components = []
     while unseen:

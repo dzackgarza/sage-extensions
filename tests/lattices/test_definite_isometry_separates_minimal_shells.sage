@@ -58,3 +58,22 @@ def test_large_integral_forms_with_different_minima_are_not_isometric() -> None:
     second = Lattices(ZZ)(((4 * scale, scale), (scale, 6 * scale)))
     assert first.genus() == second.genus()
     assert first.is_isometric_to(second) is False
+
+
+def test_complements_of_two_square_twenty_six_vector_orbits_in_e10_are_not_isometric() -> None:
+    r"""The degree-26 complements have root systems E8 and E7 + A1.
+
+    Replace the marked vectors above by (-1, -13, 0, ..., 0) and
+    (-2, -7, -1, 1, 1, -2, -2, -2, 2, -1). Their positive definite
+    complements have the same matrices except for the final diagonal
+    entries, 26 and 8 respectively. The different root counts obstruct
+    an isometry, despite equal genera.
+    """
+    first_gram = [row[:] for row in E8_PLUS_10]
+    second_gram = [row[:] for row in E7_PLUS_A1_GLUED]
+    first_gram[8][8] = 26
+    second_gram[8][8] = 8
+    first = Lattices(ZZ)(first_gram)
+    second = Lattices(ZZ)(second_gram)
+    assert first.genus() == second.genus()
+    assert first.is_isometric_to(second) is False
