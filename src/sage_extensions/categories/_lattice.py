@@ -26,6 +26,7 @@ import re
 from bisect import bisect_right
 from itertools import accumulate, product
 from math import prod as product_value
+from operator import index
 
 from sage.arith.misc import factor
 from sage.combinat.root_system.cartan_type import CartanType, CartanType_abstract
@@ -1616,13 +1617,13 @@ def _group_label(group) -> str:
 
 
 def orbit_row_record_name(rank, *, flag, lattice, subgroup) -> str:
-    r"""Name one orbit row in a timing record: its rank, its lattice and its group.
+    r"""Name one orbit row by its dimensions, lattice and group.
 
     The rows of one lattice differ by the rank of the isotropic subobjects and by
     the subgroup they are taken under, so both are written; the lattice and the
     subgroup are named by their own descriptions (:func:`_lattice_label`,
-    :func:`_group_label`).  Written once, here, because four call sites name this
-    row.
+    :func:`_group_label`).  A flag retains every term's dimension; an integer
+    flag rank denotes the complete flag, as in the orbit computation itself.
 
     EXAMPLES::
 
@@ -1632,9 +1633,15 @@ def orbit_row_record_name(rank, *, flag, lattice, subgroup) -> str:
         sage: orbit_row_record_name(1, flag=False, lattice=lattice, subgroup=lattice.Aut())
         'the rank-1 subobject row of the rank-4 lattice over Integer Ring of Gram [[0, 1, 0, 0], [1, 0, 0, 0], [0, 0, 0, 1], [0, 0, 1, 0]] under O(L)'
     """
-    kind = "flag" if flag else "subobject"
+    if flag:
+        from sage_extensions.categories.isotropic_orbits import FlagType
+
+        flag_type = rank if isinstance(rank, FlagType) else FlagType.complete(index(rank))
+        row = f"the flag row with dimensions {flag_type.dimensions}"
+    else:
+        row = f"the rank-{index(rank)} subobject row"
     return (
-        f"the rank-{int(rank)} {kind} row of {_lattice_label(lattice)} "
+        f"{row} of {_lattice_label(lattice)} "
         f"under {_group_label(subgroup)}"
     )
 
