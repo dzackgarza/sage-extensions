@@ -134,7 +134,7 @@ def _nondegenerate_marking_transporter(left, right, *, pointwise):
     if target_glue not in seen:
         return None
     source_part, complement_part = seen[target_glue]
-    ambient = left.codomain()
+    source_ambient, target_ambient = left.codomain(), right.codomain()
     source_images = {point: right(source_part(point)) for point in source.module_generators()}
     complement_images = {
         point: right_complement.inclusion()(complement_part(point)) for point in left_complement.module_generators()
@@ -143,21 +143,38 @@ def _nondegenerate_marking_transporter(left, right, *, pointwise):
         *(left(point) for point in source.module_generators()),
         *(left_complement.inclusion()(point) for point in left_complement.module_generators()),
     ]
-    split_images = [*(source_images[point] for point in source.module_generators()), *(complement_images[point] for point in left_complement.module_generators())]
+    split_images = [
+        *(source_images[point] for point in source.module_generators()),
+        *(complement_images[point] for point in left_complement.module_generators()),
+    ]
     from sage.matrix.constructor import matrix
     from sage.rings.rational_field import QQ as SageQQ
 
-    labels = tuple(ambient.module_generating_set())
-    def rows(points):
+    # The two rational coordinate frames live in different ambient modules.
+    # For split bases B (source) and B' (target), the unique linear map
+    # satisfying B -> B' has row matrix B^-1 B', with the columns of B and
+    # B' expressed in their *respective* integral bases. The glue-orbit
+    # check establishes this map preserves the overlattice, so every entry
+    # must be integral. Do not force the result into O(source_ambient): that
+    # would change a transporter L -> L' into an endomorphism of L.
+    source_labels = tuple(source_ambient.module_generating_set())
+    target_labels = tuple(target_ambient.module_generating_set())
+
+    def rows(points, labels):
         return matrix(SageQQ, [[int(point.to_vector()(label)) for label in labels] for point in points])
 
-    change = ~rows(split_points)
-    images = change * rows(split_images)
-    return ambient.O()(lambda label: ambient.linear_combination({
-        other: ambient.base_ring()(int(images[labels.index(label), position]))
-        for position, other in enumerate(labels)
-        if images[labels.index(label), position]
-    }))
+    images = ~rows(split_points, source_labels) * rows(split_images, target_labels)
+    if any(entry.denominator() != 1 for entry in images.list()):
+        raise ArithmeticError("a primitive-glue transporter did not extend integrally to the ambient lattice")
+    by_label = {
+        source_label: target_ambient.linear_combination({
+            target_label: target_ambient.base_ring()(int(images[index, column]))
+            for column, target_label in enumerate(target_labels)
+            if images[index, column]
+        })
+        for index, source_label in enumerate(source_labels)
+    }
+    return source_ambient.Isom(target_ambient)(lambda label: by_label[label])
 
 
 def _primitive_embeddings_equivalent(left, right, classification):
