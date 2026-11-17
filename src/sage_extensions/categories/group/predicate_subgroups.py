@@ -1142,10 +1142,13 @@ class PredicateSubgroups(OwnedParameterizedCategory):
             So, for ``P_0`` the plane the row's one covering was computed at,
 
             * the plane's registered lift ``s_P``, which carries ``P_0`` onto
-              ``P`` -- one span-keyed lookup, no construction;
-            * the composite ``s_P s_{P_0}^{-1}``, as its action ``rho`` on
-              ``A_L`` -- one element of ``O(A_L)``, the quotient's own finite
-              datum;
+              ``P``, and the finite element ``rho(s_P)`` registered beside it --
+              one span-keyed lookup, no construction;
+            * the composite ``s_P s_{P_0}^{-1}``, as its action
+              ``rho(s_P) rho(s_{P_0})^{-1}`` on ``A_L`` -- one product and one
+              inversion of elements of ``O(A_L)``, so that no plane's action
+              costs the dual action of an integral matrix
+              (:func:`...orthogonal_quotients._composite_divided_class_action`);
             * the covering's line class pairs ``{c, -c}``, three of them at
               ``P_0`` and the same three for every plane, carried by that action
               (:func:`...orthogonal_quotients._carried_divided_classes`);
@@ -1194,7 +1197,7 @@ class PredicateSubgroups(OwnedParameterizedCategory):
             )
             from sage_extensions.categories.orthogonal_quotients import (
                 _carried_divided_classes,
-                _divided_class_action,
+                _composite_divided_class_action,
                 _isotropic_line_class_points,
                 _isotropic_line_image_key,
                 _plane_parabolic_incidence_flags,
@@ -1240,9 +1243,10 @@ class PredicateSubgroups(OwnedParameterizedCategory):
                 if len(coverings) == len(sources):
                     break
                 plane = plane_cusp.representative()
-                lift = quotient.isotropic_lift_of(plane)
-                if lift is None:
+                registered = quotient.registered_isotropic_lift(plane)
+                if registered is None:
                     continue
+                lift, lift_discriminant = registered
                 for position, (ambient_flag, source_lift, source_witness) in enumerate(sources):
                     if position in coverings:
                         continue
@@ -1268,6 +1272,7 @@ class PredicateSubgroups(OwnedParameterizedCategory):
                     coverings[position] = (
                         plane,
                         lift,
+                        lift_discriminant,
                         covering,
                         tuple(
                             _isotropic_line_class_points(lattice, flag.terms()[0])
@@ -1285,21 +1290,25 @@ class PredicateSubgroups(OwnedParameterizedCategory):
             transport_checked = set()
             for plane_cusp in plane_cusps:
                 plane = plane_cusp.representative()
-                target_lift = quotient.isotropic_lift_of(plane)
-                if target_lift is None:
+                registered = quotient.registered_isotropic_lift(plane)
+                if registered is None:
                     raise ArithmeticError(
                         f"the plane {plane} of the cusp {plane_cusp} of {self} has no registered lift, "
                         "so no covering of the row can be carried onto it: the class data of its lines "
                         "is what the lift carries, and without it the edges at this plane are undecided"
                     )
+                target_lift, target_discriminant = registered
                 for position, (
                     reference_plane,
                     reference_lift,
+                    reference_discriminant,
                     covering,
                     reference_classes,
                 ) in coverings.items():
                     move = target_lift * ~reference_lift
-                    action = _divided_class_action(quotient, move)
+                    action = _composite_divided_class_action(
+                        quotient, target_discriminant, reference_discriminant
+                    )
                     for flag, classes in zip(covering, reference_classes, strict=True):
                         carried = _carried_divided_classes(classes, action)
                         if position not in transport_checked and plane is not reference_plane:

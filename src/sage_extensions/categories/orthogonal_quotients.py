@@ -1607,16 +1607,21 @@ class OrthogonalCharacterQuotient:
         ``im rho`` is the right-hand group of the double cosets that split the ambient
         line orbit, and those double cosets are computed as the ``rho(Gamma)``-orbits
         on the ``im rho``-orbit of the class set -- the orbit--double-coset bijection
-        stated in :meth:`_splitting_isometries_in_im_rho_from_image` -- so the
+        stated in :meth:`_iter_splitting_isometries_in_im_rho_from_image` -- so the
         stabilizer itself is never formed.
 
         This is the entry point of :meth:`isotropic_line_stabilizer_image`'s argument:
         it transports by representatives of the cosets of the class stabilizer instead
         of asking for the integral stabilizer's generators.  Every lift is still
-        checked against the character map.
+        checked against the character map, and the checked image is what
+        :meth:`_iter_splitting_isometries_in_im_rho_from_image` yields beside the lift;
+        a caller that transports by the lift takes the lift alone.
         """
-        return self._splitting_isometries_in_im_rho_from_image(
-            (), stab_sign_flip, point=class_points
+        return (
+            lift
+            for lift, _discriminant_image in self._iter_splitting_isometries_in_im_rho_from_image(
+                (), stab_sign_flip, point=class_points
+            )
         )
 
     @cached_method(key=_exact_stabilizer_span_key)
@@ -1749,7 +1754,7 @@ class OrthogonalCharacterQuotient:
         space is a single point, and the identity lift is its representative.
         That is the same computation's answer read rather than enumerated,
         which matters because -- as
-        :meth:`_splitting_isometries_in_im_rho_from_image` records -- the
+        :meth:`_iter_splitting_isometries_in_im_rho_from_image` records -- the
         enumeration does not return inside a group of order ``|Q|``.
         """
         if self.index() == 1:
@@ -1810,7 +1815,12 @@ class OrthogonalCharacterQuotient:
     def _splitting_isometries_in_im_rho(self, stabilizer_generators):
         r"""Double cosets computed inside ``im rho``: from retained integral generators."""
         return finite_ordered_set(
-            tuple(self._iter_splitting_isometries_in_im_rho(stabilizer_generators))
+            tuple(
+                lift
+                for lift, _discriminant_image in self._iter_splitting_isometries_in_im_rho(
+                    stabilizer_generators
+                )
+            )
         )
 
     def _iter_splitting_isometries_in_im_rho(self, stabilizer_generators):
@@ -1911,31 +1921,16 @@ class OrthogonalCharacterQuotient:
                 return reflection
         return None
 
-    def _splitting_isometries_in_im_rho_from_image(
-        self, discriminant_image_generators, stab_sign_flip, *, point=None,
-    ):
-        r"""Splitting lifts computed inside ``im rho`` (the ``O(A_L)`` engine); see
-        :meth:`splitting_isometries` for the exact sign bookkeeping.
-
-        This is :meth:`_iter_splitting_isometries_in_im_rho_from_image`
-        materialized: every lift is retained.  Callers that transport each
-        lift as it arrives -- the kernel plane rows, whose 189720 lifts and
-        189720 transported planes would otherwise be held at once -- consume
-        the iterator directly.
-        """
-        return finite_ordered_set(
-            tuple(
-                self._iter_splitting_isometries_in_im_rho_from_image(
-                    discriminant_image_generators, stab_sign_flip, point=point
-                )
-            )
-        )
-
     def _iter_splitting_isometries_in_im_rho_from_image(
         self, discriminant_image_generators, stab_sign_flip, *, point=None,
     ):
         r"""Yield the splitting lifts of
-        :meth:`_splitting_isometries_in_im_rho_from_image` one at a time.
+        :meth:`_iter_splitting_isometries_in_im_rho_from_image`, one ``(lift, image)`` at a time.
+
+        ``image`` is the lift's discriminant image, the element of ``O(A_L)`` it
+        acts by on ``A_L = L^\#/L``: the character map evaluated on the lift
+        where the route evaluates it, and the same product of the split's own
+        ``rho``-images where the route spells the lifts.
 
         ``discriminant_image_generators`` are *already lowered* to the engine by the
         caller (``_splitting_isometries_in_im_rho`` applies ``rho`` and the crossing
@@ -2075,7 +2070,7 @@ class OrthogonalCharacterQuotient:
                         raise ArithmeticError(
                             "splitting lift's discriminant image disagrees with the word section"
                         )
-                    yield lift
+                    yield lift, image_of_lift["discriminant"]
             return
         # The coset-walk route, for callers that hold the integral stabilizer
         # generators (or their images) and no point of the finite set.  The
@@ -2198,15 +2193,31 @@ end
         # reversal the free-group route applies.  A point whose children
         # have all been spelled releases its value, so the tree the kernel
         # rows spell holds only the open frontier, not every lift at once.
+        #
+        # The lift's discriminant image is spelled beside it, one element of
+        # ``O(A_L)`` per reached point: ``rho`` is a homomorphism of the owned
+        # laws, so the very expression that composes the lift's generators
+        # composes their ``rho``-images to ``rho`` of the lift.  The images are
+        # the split's own evaluation of ``rho`` on the ambient family, crossed
+        # back to the owned model once per walk generator rather than once per
+        # lift -- reading ``rho`` off a lift's matrix is the row's dominant
+        # per-plane cost, and a kernel row spells 189720 lifts.
         reversed_law = _law_reversed(self._discriminant_group)
         ambient_subset = [ambient[index] for index in small_indices]
+        from sage_extensions.categories.group.groups import _element_from_engine
+
+        image_subset = [
+            _element_from_engine(self._discriminant_group, rho_images[index])
+            for index in small_indices
+        ]
         values = [None] * (degree + 1)
         values[base] = self.supergroup.one()
+        images = [None] * (degree + 1)
+        images[base] = self._discriminant_group.one()
         remaining_children = [0] * (degree + 1)
         for point in queue:
             remaining_children[parents[point - 1]] += 1
-        first_lift = None
-        first_point = None
+        checked = False
         for point in representative_points:
             chain = []
             walker = point
@@ -2214,17 +2225,29 @@ end
                 chain.append(walker)
                 walker = parents[walker - 1]
             for reached in reversed(chain):
+                edge = edge_numbers[reached - 1] - 1
+                parent = parents[reached - 1]
                 if reversed_law:
-                    values[reached] = (
-                        ambient_subset[edge_numbers[reached - 1] - 1]
-                        * values[parents[reached - 1]]
-                    )
+                    values[reached] = ambient_subset[edge] * values[parent]
+                    images[reached] = image_subset[edge] * images[parent]
                 else:
-                    values[reached] = (
-                        values[parents[reached - 1]]
-                        * ambient_subset[edge_numbers[reached - 1] - 1]
-                    )
+                    values[reached] = values[parent] * ambient_subset[edge]
+                    images[reached] = images[parent] * image_subset[edge]
             value = values[point]
+            if point != base and not checked:
+                # The spelled element against the character map, on a lift whose
+                # word is not empty: one evaluation of ``rho`` per row, so a
+                # spelling that has left the homomorphism property is loud
+                # rather than a row of lifts whose classes are carried by a
+                # product that is not the lift's image.
+                if images[point] != self.image(value)["discriminant"]:
+                    raise ArithmeticError(
+                        "the discriminant image spelled beside a tree-spelled lift is not "
+                        "the lift's own image: the spelling does not compose the split's "
+                        "rho-images to rho of the lift, so no lift of this row may be "
+                        "registered with the element it was spelled with"
+                    )
+                checked = True
             flipped = (
                 flip_element * value
                 if j >= 1
@@ -2233,44 +2256,17 @@ end
                 and flip_element is not None
                 else None
             )
-            if first_lift is None:
-                first_lift = value
-                first_point = point
-            yield value
+            yield value, images[point]
             if flipped is not None:
-                yield flipped
+                # The sign sheet's lift is a kernel element times the lift, so
+                # it acts on the classes exactly as the lift does.
+                yield flipped, images[point]
             parent = parents[point - 1]
             if parent:
                 remaining_children[parent] -= 1
                 if not remaining_children[parent]:
                     values[parent] = None
-        if first_lift is not None:
-            # The homomorphism property of the discriminant representation
-            # (rho(gh) = rho(g) rho(h), the functoriality of the induced map
-            # on the cokernel of L in L^#) warrants every tree-spelled lift:
-            # the family-level sweep `ambient_discriminant_images` computes
-            # each generator's image, and the product along the tree maps to
-            # the product of the images.  The first lift is still checked
-            # against the character map -- one evaluation, not one per coset
-            # -- against the engine element its word names, so a
-            # parent-keeping error of the walk is loud.
-            word = []
-            walker = first_point
-            while walker != base:
-                word.append(edge_numbers[walker - 1])
-                walker = parents[walker - 1]
-            perm_product = libgap.One(im_rho_perm)
-            for letter in reversed(word):
-                perm_product = perm_product * edges[letter - 1]
-            key_disc = self._discriminant_group._from_engine(
-                libgap.PreImagesRepresentative(to_perm, perm_product)
-            )
-            if self.image(first_lift)["discriminant"] != key_disc:
-                raise ArithmeticError(
-                    "the first tree-spelled lift's discriminant image disagrees with "
-                    "the engine element its word names: the walk's parent bookkeeping "
-                    "is inconsistent with the discriminant representation"
-                )
+                    images[parent] = None
 
     def witness_meets_subgroup(self, witness, stabilizer_generators) -> bool:
         return self.adjust_witness_into_subgroup(witness, stabilizer_generators) is not None
@@ -2530,7 +2526,9 @@ end
             )
         return carried
 
-    def register_isotropic_lift(self, plane, lift, parabolic_generators):
+    def register_isotropic_lift(
+        self, plane, lift, parabolic_generators, discriminant_image
+    ):
         r"""Record one representative of the parabolic split and its certified data.
 
         ``lift`` carries the source plane, whose complete parabolic is generated
@@ -2539,6 +2537,18 @@ end
         Retaining both data lets every consumer use the split's own witness and
         certificate instead of repeating an integral isometry or parabolic
         completeness computation.
+
+        ``discriminant_image`` is the lift's character image in the
+        discriminant factor -- the element of ``O(A_L)`` the lift acts by on
+        ``A_L = L^\#/L``.  It is the split's own evaluation of ``rho`` on the
+        lift, retained so that a consumer of the row who wants the lift's action
+        on the divided classes composes finite elements instead of inverting the
+        lift's matrix to read its dual action: a lift of a kernel row is a word
+        in the ambient generators whose entries grow with the plane it reaches,
+        and the dual action of such a word is the row's dominant per-plane cost.
+        Both the element and the inverse of it are one product in ``O(A_L)``,
+        a group whose order is the lattice's finite datum rather than the
+        plane's matrix.
 
         The record is keyed by the plane's span, not by the plane object: a
         split's consumers hold equal-but-distinct copies of a plane, and a
@@ -2550,13 +2560,30 @@ end
 
         self.__dict__.setdefault("_isotropic_lift_registry", {})[
             _span_key(plane)
-        ] = (lift, tuple(parabolic_generators))
+        ] = (lift, tuple(parabolic_generators), discriminant_image)
 
     def _registered_isotropic_split(self, plane):
-        r"""The registered ``(lift, source parabolic generators)`` for ``plane``."""
+        r"""The registered ``(lift, source parabolic generators, image)`` of ``plane``."""
         from sage_extensions.categories.isotropic_orbits import _span_key
 
         return self.__dict__.get("_isotropic_lift_registry", {}).get(_span_key(plane))
+
+    def registered_isotropic_lift(self, plane):
+        r"""``(lift, discriminant image)``: a plane's registered lift and its finite element.
+
+        The two are one datum: the lift carries the source plane onto ``plane``,
+        and its discriminant image is what it does to the classes of
+        ``A_L = L^\#/L``.  A consumer that needs both -- the building
+        incidence's walk, whose every plane moves a covering's classes by the
+        composite of two registered lifts -- reads them in one span-keyed
+        lookup rather than two.  The matching is by span, so an equal-but-distinct
+        copy of the plane finds it.  ``None`` where the plane carries no
+        registered lift.
+        """
+        record = self._registered_isotropic_split(plane)
+        if record is None:
+            return None
+        return record[0], record[2]
 
     def isotropic_lift_of(self, plane):
         r"""The registered lift of a plane, matched by span equality.
@@ -2570,6 +2597,17 @@ end
         """
         record = self._registered_isotropic_split(plane)
         return None if record is None else record[0]
+
+    def isotropic_lift_discriminant_of(self, plane):
+        r"""The discriminant image of a plane's registered lift, or ``None``.
+
+        This is the finite element ``rho(s_P)`` in ``O(A_L)``, registered beside
+        the lift by :meth:`register_isotropic_lift`; it is the datum an action
+        on the divided classes is composed from, and it is read without
+        touching the lift's matrix.
+        """
+        record = self._registered_isotropic_split(plane)
+        return None if record is None else record[2]
 
     def register_isotropic_transport(self, subobject, source, transport):
         r"""Record the datum that ``transport`` carries ``source`` onto ``subobject``.
@@ -2716,7 +2754,7 @@ end
         """
         record = self._registered_isotropic_split(plane)
         if record is not None:
-            lift, source_family = record
+            lift, source_family, _discriminant_image = record
             return tuple(lift * generator * ~lift for generator in source_family)
         if plane.is_parabolic_complete() is not True:
             return None
@@ -3769,7 +3807,10 @@ def _plane_orbit_from_parabolic_stabilizer(subgroup, representative):
         # rather than walked.  This is the full-group plane row of the Scattone
         # cards, and the walk would re-derive the same one orbit.
         quotient.register_isotropic_lift(
-            representative, quotient.supergroup.one(), family
+            representative,
+            quotient.supergroup.one(),
+            family,
+            quotient._discriminant_group.one(),
         )
         return (representative,)
     if not quotient._has_discriminant or (
@@ -3783,19 +3824,25 @@ def _plane_orbit_from_parabolic_stabilizer(subgroup, representative):
         )
     # The lifts are consumed as they arrive: a kernel row numbers 189720 of
     # them, and holding every lift beside every transported plane doubles the
-    # row's footprint for no mathematical content.  The split's own lifts and
+    # row's footprint for no mathematical content.  The split's own lifts, the
+    # finite element each of them acts on the discriminant group by, and the
     # complete source family are retained with the representatives they
     # produced: the consumers of the row never search for a witness or
     # re-certify a transported parabolic (the search reaches the
     # port's generic enumeration, and the recomputation reaches PARI's
     # qfauto overflow on this lattice).
     quotient.register_isotropic_lift(
-        representative, quotient.supergroup.one(), family
+        representative,
+        quotient.supergroup.one(),
+        family,
+        quotient._discriminant_group.one(),
     )
     representatives = []
-    for splitting in quotient._iter_splitting_isometries_in_im_rho(family):
+    for splitting, discriminant_image in quotient._iter_splitting_isometries_in_im_rho(family):
         transported = splitting.transport_isotropic_object(representative)
-        quotient.register_isotropic_lift(transported, splitting, family)
+        quotient.register_isotropic_lift(
+            transported, splitting, family, discriminant_image
+        )
         representatives.append(transported)
     return tuple(representatives)
 
@@ -3874,15 +3921,18 @@ def _setwise_divided_class_action():
     return _SETWISE_DIVIDED_CLASS_ACTION
 
 
-def _divided_class_action(quotient, isometry):
-    r"""The action of ``isometry`` on ``A_L``, as one element of the ``O(A_L)`` engine.
+def _composite_divided_class_action(quotient, target_image, reference_image):
+    r"""The action of the composite ``s_P s_{P_0}^{-1}`` on ``A_L``, from the two images.
 
-    ``rho_L`` is the lattice's discriminant representation, and the image of an
-    isometry under it is its discriminant morphism -- the very component
-    :meth:`OrthogonalCharacterQuotient.image` reads for a character key, so this
-    is the quotient's own datum and not a second implementation of it.  The sign
-    components are not read: a divided class is carried by the discriminant
-    action alone.
+    ``target_image`` and ``reference_image`` are the registered finite elements
+    of the two planes' lifts -- elements of ``O(A_L)``, one per plane, kept in
+    the lift registry beside the lifts they belong to
+    (:meth:`OrthogonalCharacterQuotient.register_isotropic_lift`).  The
+    composite carries the reference plane to the target plane, and ``rho`` is a
+    homomorphism of the owned laws, so its action on ``A_L = L^\#/L`` is
+    ``rho(s_P) rho(s_{P_0})^{-1}``: one product and one inversion in a finite
+    group, instead of the dual action of the composite's matrix, which inverts
+    an integral isometry whose entries grow with the plane.
 
     The element returned is read in the model the classes are built in (the
     quotient's own ``O(A_L)``), which is what makes the carried classes
@@ -3891,7 +3941,7 @@ def _divided_class_action(quotient, isometry):
     from sage_extensions.categories.group.groups import _element_to_engine
 
     return _element_to_engine(
-        quotient._discriminant_group, isometry.discriminant_morphism()
+        quotient._discriminant_group, target_image * ~reference_image
     )
 
 
