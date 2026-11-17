@@ -2,7 +2,7 @@ r"""Real affine spaces as torsors over a selected real vector space."""
 
 from sage.categories.category import Category
 from sage.categories.morphism import Morphism
-from sage.misc.cachefunc import cached_method
+from sage.misc.cachefunc import cached_function, cached_method
 
 from sage_extensions.categories.abstract_categories.mor_categories import (
     CategoricalMor,
@@ -25,6 +25,33 @@ from sage_extensions.owned_category import _object_of
 from sage_extensions.rings.real import RR
 
 
+@cached_function(key=lambda vector_space: id(vector_space))
+def _canonically_based_affine_space(vector_space):
+    r"""The affine space on a real vector space, whose points are its own vectors.
+
+    A real vector space is an affine space over itself: its vectors are the
+    points, the addition of the model space is the translation action, and the
+    difference of two points is the vector between them.  That is the choice of
+    a base point at the origin, which is what "canonically based" states, and it
+    is the affine space a polytope of that vector space is placed in.
+
+    One affine space per vector space: two placements of one polytope in one
+    ambient are its placements in one space, so the affine space is retained on
+    the vector space it is built on and read again from there.
+    """
+    assert vector_space in VectorSpaces(RR), (
+        f"the affine space on a vector space in which differences are vectors needs a real "
+        f"vector space, but {vector_space} is not one"
+    )
+    return RealAffineSpaces().on(
+        vector_space,
+        vector_space,
+        lambda left, right: left + right,
+        lambda left, right: left - right,
+        vector_space.zero(),
+    )
+
+
 class _CanonicalAffineSpaceFunctor(Functor):
     r"""Use a real vector space as its canonically based affine space."""
 
@@ -32,10 +59,23 @@ class _CanonicalAffineSpaceFunctor(Functor):
         super().__init__(RealVectorSpaces(dimension), RealAffineSpaces())
 
     def _apply_object(self, vector_space):
-        pass
+        return _canonically_based_affine_space(vector_space)
 
     def _apply_morphism(self, linear_map):
-        pass
+        r"""The affine map of a linear map, on the affine spaces of its endpoints.
+
+        A linear map fixes the origin, so the point map it induces is the map
+        itself: the affine map whose linear part is that map and whose point map
+        is the same map read on the points of the based affine spaces.
+        """
+        domain = _canonically_based_affine_space(linear_map.domain())
+        codomain = _canonically_based_affine_space(linear_map.codomain())
+        return RealAffineSpaces().Mor(domain, codomain)(
+            linear_map,
+            Sets().Mor(linear_map.domain(), linear_map.codomain())(
+                lambda point: linear_map(point)
+            ),
+        )
 
 
 class RealVectorSpaces(OwnedParameterizedCategory):
@@ -58,7 +98,8 @@ class RealVectorSpaces(OwnedParameterizedCategory):
         return f"real vector spaces of dimension {self.dimension()}"
 
     def an_object(self):
-        pass
+        r"""The standard real vector space of this dimension, on the first labels."""
+        return RR.free_module(self.dimension())
 
     def __contains__(self, vector_space):
         return vector_space in VectorSpaces(RR) and vector_space.dimension() == self.dimension()
@@ -243,7 +284,9 @@ class RealAffineSpaces(OwnedCategory):
         return "real affine spaces"
 
     def an_object(self):
-        pass
+        r"""The one-point affine space, which is the affine space on the zero space."""
+        zero_dimensional = RealVectorSpaces(0)
+        return zero_dimensional.affinization()(zero_dimensional.an_object())
 
     def on(self, model_vector_space, point_set, translation_action, difference, point):
         r"""Select an affine torsor with its difference map and nonempty witness.
@@ -392,10 +435,9 @@ class AffineSpaceWithLatticeMor(CategoricalMor):
     def identity(self):
         r"""The identity: the identities of the underlying affine space and of the selected lattice."""
         space = self.domain()
+        underlying = space.underlying_affine_space()
         return self(
-            space.underlying_affine_space()
-            .Mor(space.underlying_affine_space())
-            .identity(),
+            RealAffineSpaces().Mor(underlying, underlying).identity(),
             space.affine_lattice().Mor(space.affine_lattice()).identity(),
         )
 
@@ -443,7 +485,14 @@ class AffineSpacesWithLattice(OwnedCategory):
         return "real affine spaces with a selected lattice"
 
     def an_object(self):
-        pass
+        r"""The affine space of rank zero with its zero lattice: the origin and its translations."""
+        affine_space = RealAffineSpaces().an_object()
+        model = affine_space.model_vector_space()
+        lattice = _owned_integers().free_module(0)
+        return self.on(
+            affine_space,
+            Sets().Mor(lattice, model)(lambda vector: model.zero()),
+        )
 
     def on(self, affine_space, lattice_inclusion):
         r"""Select a full integral lattice in the model of ``affine_space``.
