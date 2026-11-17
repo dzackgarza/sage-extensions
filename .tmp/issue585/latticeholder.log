@@ -1,0 +1,24 @@
+# tree: 901d11b2f19a9bd750851af53849a19ff93d6003
+# status:  M src/sage_extensions/categories/abstract_categories/mor_categories.py  M src/sage_extensions/categories/lattice_morphisms.py  M src/sage_extensions/categories/lattices.py  M tests/lattices/conftest.py ?? results/issue585-the-walks-per-plane-retainer.md ?? tests/lattices/test_a_released_isotropic_subobject_is_not_retained.sage 
+# load: 0.32 0.58 0.87
+# program: probe-585-latticeholder.py  PROBE_PLANES=unset PROBE_PHASE=row
+[probe] a rank-one lattice is alive after the drop: True
+[probe] a dict holds it, keys ['(130696353215056, 130694961207376, Type (0, 2) tensor in ((Integer Rin']
+    held by CachedFunction: Cached version of <function _lattice_on_gram at 0x76ddcaccc460>
+[probe] a dict holds it, keys ['_preamble_gram_tensor', '_module_generating_set', '_preamble_form']
+    held by OwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType: Integral lattice of rank 1 and signature (1, 0)
+[probe] held by method: <bound method _SparseFreeModuleParent._element_constructor_ of Integral lattice of rank 1 
+[probe] held by _ModuleScalarAction: Left action by Integer Ring on Integral lattice of rank 1 and signature (1, 0)
+[probe] held by _ModuleScalarAction: Right action by Integer Ring on Integral lattice of rank 1 and signature (1, 0)
+[probe] held by cached method ? on OwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType
+[probe] held by cell: <cell at 0x76de1dc55bd0: OwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectTyp
+[probe] held by method: <bound method _SparseFreeModuleParent._basis_element of Integral lattice of rank 1 and sig
+[probe] held by cell: <cell at 0x76ddccd5b520: OwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectTyp
+[peakrss] latticeholder: child waited=0 shell_code=0 samples=1
+[peakrss] peak tree RSS      : 0 MiB
+[peakrss] low-water MemAvail : 13742 MiB
+[peakrss] peak single VmHWM  : 0 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   run.sh                        0 MiB peak
+[peakrss]   t=     0.0s procs=  1 rss=     0 MiB hwm=     0 MiB avail= 13742 MiB
+# launcher exit: 0

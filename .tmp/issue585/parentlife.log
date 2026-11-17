@@ -1,0 +1,18 @@
+# tree: 901d11b2f19a9bd750851af53849a19ff93d6003
+# status:  M src/sage_extensions/categories/lattice_morphisms.py  M src/sage_extensions/categories/lattices.py  M tests/lattices/conftest.py ?? results/issue585-the-walks-per-plane-retainer.md ?? tests/lattices/test_a_released_isotropic_subobject_is_not_retained.sage 
+# load: 0.32 0.70 0.94
+# program: probe-585-parentlife.py  PROBE_PLANES=unset PROBE_PHASE=row
+[probe] a lattice nothing else names: OwnedJoinCategory.parent_class[_SparseFreeModuleParent].Obje is alive after the drop: True
+[probe] another lattice nothing else names: OwnedJoinCategory.parent_class[_SparseFreeModuleParent].Obje is alive after the drop: True
+[probe] a vector of the held lattice: OwnedJoinCategory.element_class[_SparseFreeModuleElement] is alive after the drop: False
+[probe] a plane of the held lattice: OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent] is alive after the drop: True
+[probe] a line of the held lattice: OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent] is alive after the drop: True
+[probe] the zero subobject: OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent] is alive after the drop: True
+[peakrss] parentlife: child waited=0 shell_code=0 samples=1
+[peakrss] peak tree RSS      : 1 MiB
+[peakrss] low-water MemAvail : 13755 MiB
+[peakrss] peak single VmHWM  : 1 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   run.sh                        1 MiB peak
+[peakrss]   t=     0.0s procs=  1 rss=     1 MiB hwm=     1 MiB avail= 13755 MiB
+# launcher exit: 0

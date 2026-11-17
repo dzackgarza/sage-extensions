@@ -1,0 +1,260 @@
+# tree: 901d11b2f19a9bd750851af53849a19ff93d6003
+# status: 
+# load: 0.32 0.66 1.20
+# program: probe-585-instrument.py  PROBE_PLANES=1000 PROBE_PHASE=row
+[probe] the walk's per-plane work over 1000 planes of the row
+         0.07 s  T_Co and the row's plane  rss    292.0 MiB
+         0.10 s  Otilde and its character quotient  rss    296.1 MiB
+[probe] the plane is parabolic complete: True
+         3.84 s  the plane's parabolic: 112 generators  rss    426.5 MiB
+[rss] t=   10.0s rss=   432.2 MiB
+[rss] t=   20.0s rss=   505.7 MiB
+[rss] t=   30.1s rss=   544.2 MiB
+[rss] t=   40.1s rss=   588.2 MiB
+[rss] t=   50.1s rss=   597.9 MiB
+[rss] t=   60.1s rss=   604.0 MiB
+[rss] t=  218.9s rss=  1328.2 MiB
+       218.95 s  the split's first lift  rss   1426.8 MiB
+         5.74 s  1000 planes of the row, one registered lift each  rss   1490.9 MiB
+[rss] t=  232.5s rss=  1494.5 MiB
+[probe] the covering at the first plane: 3 flags
+         8.36 s  the row's one covering, computed at the first plane  rss   1496.9 MiB
+[account after the covering] quotient holds 5 containers,     677.5 KiB in all
+        660.4 KiB      1000  dict      _isotropic_lift_registry
+         15.5 KiB         1  NonpicklingDict _cache__certified_parabolic_generators
+          1.2 KiB         3  dict      _transported_isotropic_objects
+          0.3 KiB         1  tuple     discriminant_preimages
+          0.1 KiB         0  dict      _isotropic_root_bridges
+[trace] started at plane 1, current      0.0 MiB traced
+  [carry plane      2/1000]    0.1322 s over 1 steps  carry   59.844 ms and   65.010 ms of keys a plane  rss   1499.5 MiB   1800.0 KiB a plane since the covering  transports 2  traced      0.4 MiB
+      rss by phase since plane 1: carry      0.9 MiB, keys      0.9 MiB, release      0.0 MiB
+[account plane 2] quotient holds 6 containers,     678.7 KiB in all
+        660.4 KiB      1000  dict      _isotropic_lift_registry
+         15.5 KiB         1  NonpicklingDict _cache__certified_parabolic_generators
+          1.6 KiB         3  NonpicklingDict _cache__isotropic_class_orbit
+          0.9 KiB         2  dict      _transported_isotropic_objects
+          0.3 KiB         1  tuple     discriminant_preimages
+          0.1 KiB         0  dict      _isotropic_root_bridges
+  [carry plane      3/1000]    0.1672 s over 1 steps  carry   61.544 ms and   49.516 ms of keys a plane  rss   1500.9 MiB   1620.0 KiB a plane since the covering  transports 2  traced      0.7 MiB
+      rss by phase since plane 1: carry      0.9 MiB, keys      0.9 MiB, release      0.0 MiB
+[account plane 3] quotient holds 6 containers,     679.6 KiB in all
+        660.4 KiB      1000  dict      _isotropic_lift_registry
+         15.5 KiB         1  NonpicklingDict _cache__certified_parabolic_generators
+          2.5 KiB         5  NonpicklingDict _cache__isotropic_class_orbit
+          0.9 KiB         2  dict      _transported_isotropic_objects
+          0.3 KiB         1  tuple     discriminant_preimages
+          0.1 KiB         0  dict      _isotropic_root_bridges
+  [carry plane      4/1000]    0.1980 s over 2 steps  carry   63.309 ms and   62.321 ms of keys a plane  rss   1501.7 MiB   1361.3 KiB a plane since the covering  transports 2  traced      0.9 MiB
+      rss by phase since plane 1: carry      0.9 MiB, keys      0.9 MiB, release      0.0 MiB
+[account plane 4] quotient holds 6 containers,     680.6 KiB in all
+        660.4 KiB      1000  dict      _isotropic_lift_registry
+         15.5 KiB         1  NonpicklingDict _cache__certified_parabolic_generators
+          3.5 KiB         7  NonpicklingDict _cache__isotropic_class_orbit
+          0.9 KiB         2  dict      _transported_isotropic_objects
+          0.3 KiB         1  tuple     discriminant_preimages
+          0.1 KiB         0  dict      _isotropic_root_bridges
+  [carry plane      5/1000]    0.2331 s over 3 steps  carry   68.763 ms and   73.558 ms of keys a plane  rss   1502.9 MiB   1332.0 KiB a plane since the covering  transports 2  traced      1.4 MiB
+      rss by phase since plane 1: carry      1.0 MiB, keys      1.0 MiB, release      0.0 MiB
+[account plane 5] quotient holds 6 containers,     682.0 KiB in all
+        660.4 KiB      1000  dict      _isotropic_lift_registry
+         15.5 KiB         1  NonpicklingDict _cache__certified_parabolic_generators
+          4.8 KiB        10  NonpicklingDict _cache__isotropic_class_orbit
+          0.9 KiB         2  dict      _transported_isotropic_objects
+          0.3 KiB         1  tuple     discriminant_preimages
+          0.1 KiB         0  dict      _isotropic_root_bridges
+  [carry plane      6/1000]    0.2221 s over 4 steps  carry   72.082 ms and   75.703 ms of keys a plane  rss   1503.5 MiB   1183.2 KiB a plane since the covering  transports 2  traced      1.7 MiB
+      rss by phase since plane 1: carry      1.1 MiB, keys      1.0 MiB, release      0.0 MiB
+[account plane 6] quotient holds 6 containers,     683.6 KiB in all
+        660.4 KiB      1000  dict      _isotropic_lift_registry
+         15.5 KiB         1  NonpicklingDict _cache__certified_parabolic_generators
+          6.5 KiB        13  NonpicklingDict _cache__isotropic_class_orbit
+          0.9 KiB         2  dict      _transported_isotropic_objects
+          0.3 KiB         1  tuple     discriminant_preimages
+          0.1 KiB         0  dict      _isotropic_root_bridges
+  [carry plane      7/1000]    0.2376 s over 5 steps  carry   74.138 ms and   79.981 ms of keys a plane  rss   1504.3 MiB   1122.7 KiB a plane since the covering  transports 2  traced      2.0 MiB
+      rss by phase since plane 1: carry      1.1 MiB, keys      1.1 MiB, release      0.0 MiB
+[account plane 7] quotient holds 6 containers,     684.5 KiB in all
+        660.4 KiB      1000  dict      _isotropic_lift_registry
+         15.5 KiB         1  NonpicklingDict _cache__certified_parabolic_generators
+          7.4 KiB        15  NonpicklingDict _cache__isotropic_class_orbit
+          0.9 KiB         2  dict      _transported_isotropic_objects
+          0.3 KiB         1  tuple     discriminant_preimages
+          0.1 KiB         0  dict      _isotropic_root_bridges
+  [carry plane      8/1000]    0.2020 s over 6 steps  carry   73.943 ms and   78.208 ms of keys a plane  rss   1504.9 MiB   1049.7 KiB a plane since the covering  transports 2  traced      2.3 MiB
+      rss by phase since plane 1: carry      1.1 MiB, keys      1.1 MiB, release      0.0 MiB
+[account plane 8] quotient holds 6 containers,     685.4 KiB in all
+        660.4 KiB      1000  dict      _isotropic_lift_registry
+         15.5 KiB         1  NonpicklingDict _cache__certified_parabolic_generators
+          8.3 KiB        17  NonpicklingDict _cache__isotropic_class_orbit
+          0.9 KiB         2  dict      _transported_isotropic_objects
+          0.3 KiB         1  tuple     discriminant_preimages
+          0.1 KiB         0  dict      _isotropic_root_bridges
+  [carry plane      9/1000]    0.2168 s over 7 steps  carry   73.896 ms and   78.812 ms of keys a plane  rss   1506.2 MiB   1087.5 KiB a plane since the covering  transports 2  traced      2.6 MiB
+      rss by phase since plane 1: carry      1.2 MiB, keys      1.1 MiB, release      0.0 MiB
+[account plane 9] quotient holds 6 containers,     686.3 KiB in all
+        660.4 KiB      1000  dict      _isotropic_lift_registry
+         15.5 KiB         1  NonpicklingDict _cache__certified_parabolic_generators
+          9.1 KiB        19  NonpicklingDict _cache__isotropic_class_orbit
+          0.9 KiB         2  dict      _transported_isotropic_objects
+          0.3 KiB         1  tuple     discriminant_preimages
+          0.1 KiB         0  dict      _isotropic_root_bridges
+  [carry plane     10/1000]    0.2151 s over 8 steps  carry   73.835 ms and   79.176 ms of keys a plane  rss   1507.0 MiB   1055.6 KiB a plane since the covering  transports 2  traced      2.9 MiB
+      rss by phase since plane 1: carry      1.2 MiB, keys      1.2 MiB, release      0.0 MiB
+[account plane 10] quotient holds 6 containers,     687.2 KiB in all
+        660.4 KiB      1000  dict      _isotropic_lift_registry
+         15.5 KiB         1  NonpicklingDict _cache__certified_parabolic_generators
+         10.0 KiB        21  NonpicklingDict _cache__isotropic_class_orbit
+          0.9 KiB         2  dict      _transported_isotropic_objects
+          0.3 KiB         1  tuple     discriminant_preimages
+          0.1 KiB         0  dict      _isotropic_root_bridges
+[rss] t=  242.6s rss=  1516.9 MiB
+[rss] t=  252.6s rss=  1560.2 MiB
+  [carry plane    100/1000]   16.1564 s over 98 steps  carry   78.491 ms and   90.697 ms of keys a plane  rss   1570.9 MiB    756.3 KiB a plane since the covering  transports 1  traced     28.7 MiB
+      rss by phase since plane 1: carry     49.6 MiB, keys     16.1 MiB, release      0.2 MiB
+[account plane 100] quotient holds 6 containers,     717.2 KiB in all
+        660.4 KiB      1000  dict      _isotropic_lift_registry
+         40.4 KiB        85  NonpicklingDict _cache__isotropic_class_orbit
+         15.5 KiB         1  NonpicklingDict _cache__certified_parabolic_generators
+          0.5 KiB         1  dict      _transported_isotropic_objects
+          0.3 KiB         1  tuple     discriminant_preimages
+          0.1 KiB         0  dict      _isotropic_root_bridges
+[rss] t=  262.6s rss=  1641.6 MiB
+[rss] t=  272.7s rss=  1667.7 MiB
+  [carry plane    200/1000]   19.7499 s over 100 steps  carry   85.772 ms and  102.269 ms of keys a plane  rss   1679.4 MiB    934.9 KiB a plane since the covering  transports 1  traced     59.7 MiB
+      rss by phase since plane 1: carry     82.3 MiB, keys     31.9 MiB, release      0.3 MiB
+[account plane 200] quotient holds 6 containers,     745.2 KiB in all
+        660.4 KiB      1000  dict      _isotropic_lift_registry
+         68.4 KiB       142  NonpicklingDict _cache__isotropic_class_orbit
+         15.5 KiB         1  NonpicklingDict _cache__certified_parabolic_generators
+          0.5 KiB         1  dict      _transported_isotropic_objects
+          0.3 KiB         1  tuple     discriminant_preimages
+          0.1 KiB         0  dict      _isotropic_root_bridges
+[rss] t=  282.7s rss=  1704.0 MiB
+[rss] t=  292.7s rss=  1755.3 MiB
+  [carry plane    300/1000]   17.9047 s over 100 steps  carry   72.420 ms and   97.698 ms of keys a plane  rss   1758.8 MiB    894.0 KiB a plane since the covering  transports 1  traced     87.7 MiB
+      rss by phase since plane 1: carry    147.7 MiB, keys     44.1 MiB, release      0.6 MiB
+[account plane 300] quotient holds 6 containers,     762.7 KiB in all
+        660.4 KiB      1000  dict      _isotropic_lift_registry
+         85.9 KiB       171  NonpicklingDict _cache__isotropic_class_orbit
+         15.5 KiB         1  NonpicklingDict _cache__certified_parabolic_generators
+          0.5 KiB         1  dict      _transported_isotropic_objects
+          0.3 KiB         1  tuple     discriminant_preimages
+          0.1 KiB         0  dict      _isotropic_root_bridges
+[rss] t=  302.7s rss=  1789.8 MiB
+  [carry plane    400/1000]   18.6654 s over 100 steps  carry   78.452 ms and   99.440 ms of keys a plane  rss   1820.8 MiB    829.2 KiB a plane since the covering  transports 1  traced    115.2 MiB
+      rss by phase since plane 1: carry    195.6 MiB, keys     56.6 MiB, release      0.9 MiB
+[account plane 400] quotient holds 6 containers,     762.7 KiB in all
+        660.4 KiB      1000  dict      _isotropic_lift_registry
+         85.9 KiB       171  NonpicklingDict _cache__isotropic_class_orbit
+         15.5 KiB         1  NonpicklingDict _cache__certified_parabolic_generators
+          0.5 KiB         1  dict      _transported_isotropic_objects
+          0.3 KiB         1  tuple     discriminant_preimages
+          0.1 KiB         0  dict      _isotropic_root_bridges
+[rss] t=  312.8s rss=  1822.4 MiB
+[rss] t=  322.8s rss=  1857.4 MiB
+  [carry plane    500/1000]   18.2340 s over 100 steps  carry   72.470 ms and  101.247 ms of keys a plane  rss   1885.7 MiB    796.2 KiB a plane since the covering  transports 1  traced    144.0 MiB
+      rss by phase since plane 1: carry    246.5 MiB, keys     69.1 MiB, release      1.1 MiB
+[account plane 500] quotient holds 6 containers,     765.4 KiB in all
+        660.4 KiB      1000  dict      _isotropic_lift_registry
+         88.6 KiB       177  NonpicklingDict _cache__isotropic_class_orbit
+         15.5 KiB         1  NonpicklingDict _cache__certified_parabolic_generators
+          0.5 KiB         1  dict      _transported_isotropic_objects
+          0.3 KiB         1  tuple     discriminant_preimages
+          0.1 KiB         0  dict      _isotropic_root_bridges
+[rss] t=  332.8s rss=  1893.4 MiB
+[rss] t=  342.9s rss=  1929.1 MiB
+  [carry plane    600/1000]   18.5753 s over 100 steps  carry   75.017 ms and  102.322 ms of keys a plane  rss   1984.7 MiB    832.6 KiB a plane since the covering  transports 1  traced    173.6 MiB
+      rss by phase since plane 1: carry    330.8 MiB, keys     82.1 MiB, release      1.4 MiB
+[account plane 600] quotient holds 6 containers,     774.9 KiB in all
+        660.4 KiB      1000  dict      _isotropic_lift_registry
+         98.1 KiB       198  NonpicklingDict _cache__isotropic_class_orbit
+         15.5 KiB         1  NonpicklingDict _cache__certified_parabolic_generators
+          0.5 KiB         1  dict      _transported_isotropic_objects
+          0.3 KiB         1  tuple     discriminant_preimages
+          0.1 KiB         0  dict      _isotropic_root_bridges
+[rss] t=  352.9s rss=  1999.1 MiB
+[rss] t=  362.9s rss=  2032.3 MiB
+  [carry plane    700/1000]   20.0781 s over 100 steps  carry   89.733 ms and  102.602 ms of keys a plane  rss   2056.0 MiB    817.9 KiB a plane since the covering  transports 1  traced    205.7 MiB
+      rss by phase since plane 1: carry    385.7 MiB, keys     96.8 MiB, release      1.7 MiB
+[account plane 700] quotient holds 6 containers,     782.5 KiB in all
+        660.4 KiB      1000  dict      _isotropic_lift_registry
+        105.7 KiB       215  NonpicklingDict _cache__isotropic_class_orbit
+         15.5 KiB         1  NonpicklingDict _cache__certified_parabolic_generators
+          0.5 KiB         1  dict      _transported_isotropic_objects
+          0.3 KiB         1  tuple     discriminant_preimages
+          0.1 KiB         0  dict      _isotropic_root_bridges
+[rss] t=  372.9s rss=  2069.6 MiB
+[rss] t=  383.0s rss=  2106.9 MiB
+  [carry plane    800/1000]   19.3085 s over 100 steps  carry   80.000 ms and  104.497 ms of keys a plane  rss   2126.8 MiB    806.2 KiB a plane since the covering  transports 1  traced    237.2 MiB
+      rss by phase since plane 1: carry    441.0 MiB, keys    110.7 MiB, release      1.9 MiB
+[account plane 800] quotient holds 6 containers,     793.7 KiB in all
+        660.4 KiB      1000  dict      _isotropic_lift_registry
+        116.9 KiB       240  NonpicklingDict _cache__isotropic_class_orbit
+         15.5 KiB         1  NonpicklingDict _cache__certified_parabolic_generators
+          0.5 KiB         1  dict      _transported_isotropic_objects
+          0.3 KiB         1  tuple     discriminant_preimages
+          0.1 KiB         0  dict      _isotropic_root_bridges
+[rss] t=  393.0s rss=  2142.3 MiB
+[rss] t=  403.0s rss=  2177.3 MiB
+  [carry plane    900/1000]   18.3955 s over 100 steps  carry   73.553 ms and  101.591 ms of keys a plane  rss   2191.4 MiB    790.1 KiB a plane since the covering  transports 1  traced    265.7 MiB
+      rss by phase since plane 1: carry    491.3 MiB, keys    123.3 MiB, release      2.2 MiB
+[account plane 900] quotient holds 6 containers,     800.0 KiB in all
+        660.4 KiB      1000  dict      _isotropic_lift_registry
+        123.2 KiB       254  NonpicklingDict _cache__isotropic_class_orbit
+         15.5 KiB         1  NonpicklingDict _cache__certified_parabolic_generators
+          0.5 KiB         1  dict      _transported_isotropic_objects
+          0.3 KiB         1  tuple     discriminant_preimages
+          0.1 KiB         0  dict      _isotropic_root_bridges
+[rss] t=  413.1s rss=  2212.5 MiB
+[rss] t=  423.1s rss=  2242.9 MiB
+  [carry plane   1000/1000]   19.5957 s over 100 steps  carry   84.773 ms and  102.397 ms of keys a plane  rss   2256.4 MiB    777.7 KiB a plane since the covering  transports 1  traced    295.1 MiB
+      rss by phase since plane 1: carry    542.3 MiB, keys    135.7 MiB, release      2.5 MiB
+[account plane 1000] quotient holds 6 containers,     808.6 KiB in all
+        660.4 KiB      1000  dict      _isotropic_lift_registry
+        131.8 KiB       273  NonpicklingDict _cache__isotropic_class_orbit
+         15.5 KiB         1  NonpicklingDict _cache__certified_parabolic_generators
+          0.5 KiB         1  dict      _transported_isotropic_objects
+          0.3 KiB         1  tuple     discriminant_preimages
+          0.1 KiB         0  dict      _isotropic_root_bridges
+       189.33 s  the carry over 999 planes  rss   2887.8 MiB
+[trace] the growth from plane 100 to the last plane, by allocating line
+[rss] t=  433.1s rss=  2887.9 MiB
+[rss] t=  443.1s rss=  2887.9 MiB
+    /sage/.venv/lib/python3.14/site-packages/sage/categories/homset.py:694: size=39.1 MiB (+35.3 MiB), count=647005 (+583237), average=63 B
+    /repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py:969: size=33.5 MiB (+30.2 MiB), count=277651 (+250272), average=126 B
+    /repos/sage-extensions/src/sage_extensions/owned_category.py:1774: size=23.3 MiB (+21.0 MiB), count=384567 (+347457), average=63 B
+    /repos/sage-extensions/src/sage_extensions/owned_category.py:1697: size=17.6 MiB (+15.9 MiB), count=139732 (+126215), average=132 B
+    /repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py:2376: size=11.8 MiB (+10.6 MiB), count=184904 (+166850), average=67 B
+    /repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:6746: size=11.2 MiB (+10.2 MiB), count=122554 (+111814), average=96 B
+    /repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py:511: size=10.5 MiB (+9696 KiB), count=92550 (+83424), average=119 B
+    /repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py:2260: size=8060 KiB (+7268 KiB), count=138629 (+125138), average=60 B
+    /repos/sage-extensions/src/sage_extensions/categories/sets/finite_ordered_sets.py:586: size=5462 KiB (+4975 KiB), count=78152 (+71024), average=72 B
+    /repos/sage-extensions/src/sage_extensions/categories/lattices.py:6890: size=4814 KiB (+4370 KiB), count=55952 (+50856), average=88 B
+    /repos/sage-extensions/src/sage_extensions/refine.py:377: size=4015 KiB (+3628 KiB), count=27946 (+25243), average=147 B
+    /repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py:2323: size=3977 KiB (+3585 KiB), count=46275 (+41712), average=88 B
+    /repos/sage-extensions/src/sage_extensions/categories/sets/finite_ordered_sets.py:629: size=3757 KiB (+3388 KiB), count=28290 (+25512), average=136 B
+    /repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py:1269: size=3660 KiB (+3301 KiB), count=22311 (+20121), average=168 B
+    /repos/sage-extensions/src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py:2005: size=3538 KiB (+3242 KiB), count=75439 (+69143), average=48 B
+[trace] the same, by traceback
+[rss] t=  453.2s rss=  2888.0 MiB
+       18705.5 KiB    301929 allocs  /repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py:969
+       14034.8 KiB    226551 allocs  /repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py:969
+       11058.2 KiB    178517 allocs  /repos/sage-extensions/src/sage_extensions/categories/sets/finite_ordered_sets.py:507
+        7972.5 KiB     63780 allocs  /repos/sage-extensions/src/sage_extensions/categories/sets/finite_ordered_sets.py:1092
+        6011.7 KiB     48600 allocs  /repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py:395
+        6011.7 KiB     48600 allocs  /repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py:1693
+[probe] RESULT phase=carry planes=1000 carries=999 carry_ms=79.050 keys_ms=100.460 wall=460.5 s rss=2888.2 MiB traced=295.4 MiB phase_rss_carry=542.3 phase_rss_keys=135.7 phase_rss_release=2.5
+[peakrss] attrib-1000: child waited=0 shell_code=0 samples=235
+[peakrss] peak tree RSS      : 2892 MiB
+[peakrss] low-water MemAvail : 11728 MiB
+[peakrss] peak single VmHWM  : 2954 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     2951 MiB peak
+[peakrss]   run.sh                        4 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   462.2s procs=  2 rss=  2892 MiB hwm=  2954 MiB avail= 11732 MiB
+[peakrss]   t=   428.2s procs=  2 rss=  2891 MiB hwm=  2954 MiB avail= 11728 MiB
+[peakrss]   t=   430.2s procs=  2 rss=  2891 MiB hwm=  2954 MiB avail= 11729 MiB
+[peakrss]   t=   432.2s procs=  2 rss=  2891 MiB hwm=  2954 MiB avail= 11729 MiB
+[peakrss]   t=   434.2s procs=  2 rss=  2891 MiB hwm=  2954 MiB avail= 11729 MiB
+# launcher exit: 0
