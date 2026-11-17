@@ -44,3 +44,17 @@ def test_complements_of_two_square_ten_vector_orbits_in_e10_are_not_isometric() 
     assert first.genus() == second.genus()
 
     assert first.is_isometric_to(second) is False
+
+
+def test_large_integral_forms_with_different_minima_are_not_isometric() -> None:
+    r"""Scaling preserves the distinct minima of two forms of determinant 23.
+
+    The forms 2x²+2xy+12y² and 4x²+2xy+6y² have the same genus but
+    minima two and four, as documented in test_definite_isometry_witnesses.
+    Multiplying both forms by 2^60 preserves both facts.
+    """
+    scale = ZZ(2) ** 60
+    first = Lattices(ZZ)(((2 * scale, scale), (scale, 12 * scale)))
+    second = Lattices(ZZ)(((4 * scale, scale), (scale, 6 * scale)))
+    assert first.genus() == second.genus()
+    assert first.is_isometric_to(second) is False
