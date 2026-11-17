@@ -4409,28 +4409,70 @@ class Lattices(OwnedCategoryOverBaseRing):
             from the lattice's own generators; the discriminant image of each
             constructed element is asserted trivial here, so the family is
             certifiably inside \(\tilde O(L)\).
+
+            **Every other lattice is refused, not asserted at.**  The hypotheses
+            above are checked on the lattice in hand, and a lattice that fails one
+            is refused with a ``ValueError`` naming the failing hypothesis and its
+            value: the rank, the signature and \(|A_L|\) for Allcock's statement,
+            \(\operatorname{rank}_2(L) \ge 6\) for Kneser's theorem, and
+            \(\operatorname{rank}_2(L) \ge 2\), which a hyperbolic plane forces,
+            for Gritsenko--Hulek--Sankaran's proposition 3.4 (:meth:`rank_p` reads
+            that invariant from the Gram matrix).  No further case is added: a
+            rank-eleven even 2-elementary lattice such as
+            \(T_{\mathrm{Co}} = \langle 2\rangle \oplus U(2) \oplus E_8(-2)\)
+            has \(\operatorname{rank}_2 = 0\), so it contains no hyperbolic plane and no
+            theorem of transvections or reflections reaches \(\tilde O(L)\); its
+            \(|A_L| = 2^{11}\) also makes \(L = 2L^{\#}\), so \(\tilde O(L)\) is
+            the level-two congruence subgroup \(\ker(O(L)\to O(L/2L))\), and no
+            level-two generation statement is published for \(\operatorname{rank}_2 = 0\).
             """
             from sage_extensions.categories.hyperbolic_lattices import HyperbolicLattices
 
             ring = self.base_ring()
             rank = self.module_rank()
             signature = self.signature_pair()
-            assert (
+            cardinality = self.discriminant_group().cardinality()
+            covered = (
                 ring is _owned_integers()
                 and rank == 10
                 and int(signature.first()) == 1
                 and int(signature.second()) == 9
                 and self.is_even() is True
                 and self.is_p_elementary(ring(2)) is True
-                and int(self.discriminant_group().cardinality()) == 1024
-            ), (
-                f"the Bertini-involution generation statement covers only L = Lambda(2) "
-                f"with Lambda = E8 + U, the even 2-elementary lattice of rank 10 and "
-                f"signature (1,9) with |A_L| = 1024 (card 0125), but {self!r} has rank "
-                f"{rank}, signature {signature}, even {self.is_even()}, "
-                f"p-elementary {self.is_p_elementary(ring(2))} and "
-                f"|A_L| = {self.discriminant_group().cardinality()}"
+                and int(cardinality) == 1024
             )
+            if not covered:
+                if ring is _owned_integers():
+                    measured = (
+                        f"this lattice has rank {rank}, signature {signature}, even "
+                        f"{self.is_even()}, 2-elementary {self.is_p_elementary(ring(2))}, "
+                        f"|A_L| = {cardinality}, rank_2 = {self.rank_p(ring(2))} and "
+                        f"rank_3 = {self.rank_p(ring(3))}"
+                    )
+                else:
+                    measured = (
+                        f"this lattice has rank {rank} and signature {signature}, and its "
+                        f"base ring {ring} is not ZZ, so the discriminant and rank_p "
+                        f"invariants the published statements are stated in are outside "
+                        f"what is computed here"
+                    )
+                raise ValueError(
+                    f"no published generation statement gives a finite generating set of "
+                    f"the stable orthogonal group of {self!r}.  Allcock's theorem 1.1 "
+                    f"(J. London Math. Soc. (2) 98 (2018), p. 2, proof p. 6) generates the "
+                    f"level-two congruence subgroup W237(2) by the Bertini involutions, one "
+                    f"per decomposition Lambda = E8 + U, an infinite family, and the lattice "
+                    f"it is stated for is Lambda(2) = U(2) + E8(-2), rank 10, signature "
+                    f"(1,9), |A_L| = 1024 (card 0125); {measured}.  Kneser's generation "
+                    f"theorem (as quoted by Gritsenko-Hulek-Sankaran, arXiv:0810.1614, "
+                    f"theorem 1.1) needs rank_2 >= 6, and Gritsenko-Hulek-Sankaran's "
+                    f"proposition 3.4 (same source) needs two hyperbolic planes, a "
+                    f"hyperbolic plane being a rank-2 sublattice of determinant -1.  The "
+                    f"remaining route the library can state is the Schreier family over a "
+                    f"transversal of O(A_L): one member per coset of ker(rho_L) in O(L), "
+                    f"which is one member per element of the finite group O(A_L) that the "
+                    f"index is the order of"
+                )
 
             roots = tuple(HyperbolicLattices(ring)(self).vinberg_simple_roots())
             assert len(roots) == 10, (
@@ -8283,6 +8325,56 @@ class Lattices(OwnedCategoryOverBaseRing):
                 return True
             denominator = _owned_engine_element(ring, self._integral_gram_inverse().denominator())
             return denominator == ring.one() or denominator == prime
+
+        @cached_method
+        def rank_p(self, prime):
+            r"""Return Gritsenko--Hulek--Sankaran's `\(\operatorname{rank}_p(L)\)`, the rank of the Gram matrix mod `p`.
+
+            `\(\operatorname{rank}_p(L)\)` is "the maximal rank of the sublattices `M` in `L` such
+            that `\(\det(M)\)` is coprime to `p`" (V. Gritsenko, K. Hulek, G. K.
+            Sankaran, *Abelianisation of orthogonal groups and the fundamental
+            group of modular varieties*, J. Algebra 322 (2009), 463--478,
+            arXiv:0810.1614, §1).  A finite-rank sublattice `M` has `\(\det(M)\)`
+            coprime to `p` exactly when its Gram matrix is invertible mod `p`,
+            so the largest such rank is the rank of `G_L` reduced mod `p`, which
+            is the number of Smith invariants of `G_L` that `p` does not
+            divide: a sublattice attaining it is spanned by vectors whose
+            pairings form an invertible mod-`p` matrix, and no larger one can be
+            invertible mod `p`.
+
+            The invariant is what the published generation theorems for
+            orthogonal groups of even lattices are stated in:
+            `\(\operatorname{rank}_2(L) \ge 6\)` is Kneser's hypothesis, and a hyperbolic plane is a
+            rank-two sublattice of determinant `-1`, so a lattice containing one
+            has `\(\operatorname{rank}_2(L) \ge 2\)`.
+
+            EXAMPLES::
+
+                sage: from sage_extensions.all import NamedLattices
+                sage: L = NamedLattices.Tco
+                sage: int(L.rank_p(L.base_ring()(2))), int(L.rank_p(L.base_ring()(3)))
+                (0, 11)
+                sage: U = NamedLattices.U
+                sage: int(U.rank_p(U.base_ring()(2)))
+                2
+            """
+            if _engine_ring(self.base_ring()) is not SageZZ:
+                raise TypeError(
+                    f"cannot compute rank_p of {self!r}: it is implemented only for lattices over ZZ, and this lattice is over {self.base_ring()}"
+                )
+            ring = self.base_ring()
+            prime = ring(prime)
+            if not prime.is_prime():
+                raise ValueError(
+                    f"cannot compute rank_p of {self!r} for p = {prime}: {prime} is not prime"
+                )
+            assert self.module_rank().is_finite(), (
+                f"cannot compute rank_p of {self!r}: it is read from the Gram matrix on a basis, and a Gram matrix needs finite rank"
+            )
+            gram = _engine_component_matrix(self.gram_tensor()).change_ring(SageZZ)
+            return ring(
+                sum(1 for divisor in gram.elementary_divisors() if divisor % int(prime) != 0)
+            )
 
         def is_coeven(self) -> bool:
             r"""Return whether the discriminant quadratic form is integer-valued.
