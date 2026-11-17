@@ -89,3 +89,18 @@ def test_vector_residue_stabilizer_splits_public_isotropic_line_classes():
     representatives = tuple(orbit_set)
     first, second = representatives
     assert arrows.Core().Mor(first, second).an_element_in(gamma) is None
+
+
+def test_zero_residue_stabilizer_uses_only_its_one_point_orbit():
+    r"""At composite level 1001 the module U/1001U has 1,002,001 points.
+
+    Zero is fixed by every integral isometry, so its orbit is the singleton
+    {0} regardless of that module's cardinality. The public stabilizer is
+    exactly O(U). It must not enumerate all of U/1001U to recover it.
+    """
+    group, e, _f, negative, swap = _hyperbolic_data()
+    zero = e - e
+    gamma = group.congruence_vector_stabilizer(1001, zero)
+    assert gamma.cardinality() == cardinal(4)
+    assert group.one() in gamma and negative in gamma and swap in gamma
+    assert all(generator in gamma for generator in group.group_generators())

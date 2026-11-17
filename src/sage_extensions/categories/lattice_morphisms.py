@@ -5056,7 +5056,6 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
         an actual subgroup of ``O(L)``. Composite moduli are supported.
         """
         from sage_extensions.categories.group.g_sets import FiniteGSets
-        from sage_extensions.categories.sets.finite_ordered_sets import finite_ordered_set
 
         lattice = self.lattice()
         if element_parent(vector) is not lattice:
@@ -5071,11 +5070,15 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
             residue_label: reduced_lattice.base_ring()(coefficients(source_label))
             for source_label, residue_label in zip(source_labels, residue_labels, strict=True)
         })
-        # The finite module may not have a chosen enumeration as a *set*.
-        # Supply the finite set of its actual owned elements to the general
-        # finite G-set construction, without discarding its module action.
-        points = finite_ordered_set(tuple(reduced_lattice))
-        action = FiniteGSets(image)(points, lambda isometry, point: isometry(point))
+        # The stabilizer depends only on the orbit of this residue, not on
+        # every element of the finite module.  In particular the zero
+        # residue has a one-point orbit even when |L/mL| = m^rank(L) is
+        # enormous.  from_finite_orbits traverses exactly that orbit using
+        # the actual generators of im(rho_m) and retains their permutation
+        # action and exact group stabilizer, including the full image kernel.
+        action = FiniteGSets(image).from_finite_orbits(
+            (residue,), lambda isometry, point: isometry(point)
+        )
         stabilizer = action.stabilizer(residue)
         return representation.preimage_subgroup(
             stabilizer,
