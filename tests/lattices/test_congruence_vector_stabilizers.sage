@@ -69,3 +69,23 @@ def test_infinite_two_u_residue_stabilizer_contains_full_integral_unipotent():
     gamma = group.congruence_vector_stabilizer(2, e)
     assert shear in gamma and negative in gamma and exchange not in gamma
     assert all((shear**n)(u) == u + n*e for n in (1, 2, 3))
+
+
+def test_vector_residue_stabilizer_splits_public_isotropic_line_classes():
+    r"""Gamma_e(2)={+/-I} splits O(U)'s moving-line orbit into Ze and Zf.
+
+    An element carrying Ze onto Zf must exchange the two null axes.
+    Such an element sends the reduction of e to f and is not in Gamma_e(2),
+    so the two line classes remain inequivalent in the requested subgroup.
+    """
+    plane = Lattices(ZZ)("U")
+    group = plane.O()
+    e, _f = tuple(plane.module_generators())
+    gamma = group.congruence_vector_stabilizer(2, e)
+    arrows = Cat().Mor(FiniteOrdinalCategory(2), Lattices(ZZ))
+    marked = arrows.object(plane.primitive_isotropic_subobject(e).inclusion())
+    orbit_set = group.split_orbit(marked, gamma)
+    assert orbit_set.cardinality() == cardinal(2)
+    representatives = tuple(orbit_set)
+    first, second = representatives
+    assert arrows.Core().Mor(first, second).an_element_in(gamma) is None
