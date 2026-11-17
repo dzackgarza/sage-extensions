@@ -1,0 +1,43 @@
+# tree: 42b7cf1a1b32fe1c2fae0743a597894dd8a47d30
+# status: ?? results/issue381-kernel-row-runner-kill.md 
+# load: 3.75 3.85 4.18
+# program: probe-381-slice.py  PROBE_PLANES=10 PROBE_PHASE=row
+[probe] 10 planes of the row; the slicing plane ((2, 0, 0, -1, -1, -2, -2, -2, -2, -2, -2), (0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0))
+         0.08 s  T_Co and the row's plane  rss    276.4 MiB
+         0.11 s  Otilde and its character quotient  rss    282.4 MiB
+[probe] the slicing plane is parabolic complete: True
+         4.11 s  the plane's parabolic: 112 generators  rss    421.2 MiB
+[rss] t=   10.0s rss=   427.5 MiB  at groups.py:3457:__call__ <- torsion_form_modules.py:2326:_normalized_form_automorphism <- fqf_orthogonal.py:263:_element_constructor_ <- abelian_aut.py:290:_element_constructor_
+[rss] t=   20.0s rss=   514.3 MiB  at ring_foundation.py:8209:_linear_algebra_element <- ring_foundation.py:8256:_engine_element <- ring_foundation.py:2046:_engine_element <- ring_foundation.py:1152:denominator
+[rss] t=   30.2s rss=   554.0 MiB  at modules.py:427:__classcall__ <- modules.py:247:_is_group_algebra <- objects.py:172:__contains__ <- category.py:693:__contains__
+[rss] t=   40.2s rss=   582.6 MiB  at fqf_orthogonal.py:267:_element_constructor_ <- fqf_orthogonal.py:294:_preserves_form <- torsion_quadratic_module.py:149:_mul_ <- matrix_space.py:1194:_element_constructor_
+[rss] t=   50.2s rss=   587.3 MiB  at fqf_orthogonal.py:267:_element_constructor_ <- fqf_orthogonal.py:294:_preserves_form <- torsion_quadratic_module.py:149:_mul_ <- qmodnz.py:156:_element_constructor_
+[rss] t=   60.2s rss=   593.5 MiB  at framed_free_modules.py:385:_element_constructor_ <- ring_foundation.py:5875:__add__ <- ring_foundation.py:5869:_operator_operand <- ring_foundation.py:5802:_operand_in_ring
+[rss] t=  215.3s rss=  1262.5 MiB  at probe-381-slice.py:149:<module> <- orthogonal_quotients.py:2101:_iter_splitting_isometries_in_im_rho_from_image
+       215.40 s  the split's first lift  rss   1360.4 MiB
+  [split plane      1/10]    0.0018 s over 1 steps  (   1.794 ms a plane)  rss   1360.4 MiB  lifts 1
+  [split plane      2/10]    0.0072 s over 1 steps  (   7.231 ms a plane)  rss   1360.4 MiB  lifts 2
+  [split plane      3/10]    0.0061 s over 1 steps  (   6.056 ms a plane)  rss   1360.4 MiB  lifts 3
+  [split plane      4/10]    0.0067 s over 1 steps  (   6.716 ms a plane)  rss   1360.4 MiB  lifts 4
+  [split plane      5/10]    0.0056 s over 1 steps  (   5.604 ms a plane)  rss   1360.5 MiB  lifts 5
+  [split plane      6/10]    0.0059 s over 1 steps  (   5.905 ms a plane)  rss   1360.5 MiB  lifts 6
+  [split plane      7/10]    0.0056 s over 1 steps  (   5.590 ms a plane)  rss   1360.5 MiB  lifts 7
+  [split plane      8/10]    0.0053 s over 1 steps  (   5.304 ms a plane)  rss   1360.6 MiB  lifts 8
+  [split plane      9/10]    0.0052 s over 1 steps  (   5.237 ms a plane)  rss   1360.6 MiB  lifts 9
+  [split plane     10/10]    0.0056 s over 1 steps  (   5.583 ms a plane)  rss   1360.7 MiB  lifts 10
+         0.06 s  the plane row's first 10 planes  rss   1360.7 MiB
+[probe] RESULT phase=row planes=10 wall=220.5 s rss=1360.7 MiB lifts=10
+[peakrss] row-10: child waited=0 shell_code=0 samples=112
+[peakrss] peak tree RSS      : 1365 MiB
+[peakrss] low-water MemAvail : 10482 MiB
+[peakrss] peak single VmHWM  : 1365 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     1361 MiB peak
+[peakrss]   run.sh                        5 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   222.1s procs=  2 rss=  1365 MiB hwm=  1365 MiB avail= 10854 MiB
+[peakrss]   t=   220.1s procs=  2 rss=  1344 MiB hwm=  1344 MiB avail= 10886 MiB
+[peakrss]   t=   218.1s procs=  2 rss=  1259 MiB hwm=  1259 MiB avail= 10986 MiB
+[peakrss]   t=   216.1s procs=  2 rss=  1157 MiB hwm=  1157 MiB avail= 11101 MiB
+[peakrss]   t=   214.1s procs=  2 rss=  1152 MiB hwm=  1152 MiB avail= 10910 MiB
+# launcher exit: 0
