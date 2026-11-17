@@ -1,0 +1,41 @@
+# tree: a75373b6a2ed92d3d8d8ddc2eb37f6456e355fb4
+# status: 
+# port: 991b88b095a42a1e3679569ea42328c900c120f6
+# load: 1.28 1.14 0.73
+# program: .tmp/subobject-identity/probe-pilot-row.py PROBE_PLANES=400 PROBE_PHASE=unset PYTHONHASHSEED=0
+[     1.0 s rss    282.6 MiB] T_Co rank 11, Otilde(T_Co), its character quotient
+[     3.5 s rss    305.5 MiB] the plane's certified parabolic: 112 generators
+[   197.0 s rss   1311.4 MiB] the split's first lift (the finite image's whole coset walk)
+  [plane      2/400] rss   1311.4 MiB
+  [plane      3/400] rss   1311.4 MiB
+  [plane     50/400] rss   1311.9 MiB
+  [plane    100/400] rss   1312.5 MiB
+  [plane    150/400] rss   1313.2 MiB
+  [plane    200/400] rss   1313.9 MiB
+  [plane    250/400] rss   1314.6 MiB
+  [plane    300/400] rss   1315.4 MiB
+  [plane    350/400] rss   1316.1 MiB
+  [plane    400/400] rss   1317.0 MiB
+[   204.6 s rss   1317.0 MiB] the row's first 400 entries, shape cusps
+
+[slope] over the checkpoints
+  planes      1..    10:       3.6 KiB a plane
+  planes     10..   100:      12.0 KiB a plane
+  planes    100..   200:      14.3 KiB a plane
+  planes    200..   400:      15.8 KiB a plane
+
+[RESULT] shape=cusps planes=400 wall=205.1 s rss_end=1317.0 MiB planes_alive_beside_the_source=0 lifts_retained=400
+[peakrss] row2-base: child waited=0 shell_code=0 samples=104
+[peakrss] peak tree RSS      : 1324 MiB
+[peakrss] low-water MemAvail : 12682 MiB
+[peakrss] peak single VmHWM  : 1330 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     1327 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   run.sh                        1 MiB peak
+[peakrss]   t=   206.1s procs=  2 rss=  1324 MiB hwm=  1330 MiB avail= 12682 MiB
+[peakrss]   t=   204.1s procs=  2 rss=  1319 MiB hwm=  1319 MiB avail= 12692 MiB
+[peakrss]   t=   202.1s procs=  2 rss=  1317 MiB hwm=  1317 MiB avail= 12700 MiB
+[peakrss]   t=   200.1s procs=  2 rss=  1316 MiB hwm=  1316 MiB avail= 12700 MiB
+[peakrss]   t=   198.1s procs=  2 rss=  1314 MiB hwm=  1314 MiB avail= 12701 MiB
+# launcher exit: 0

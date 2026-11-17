@@ -1,0 +1,40 @@
+# tree: a75373b6a2ed92d3d8d8ddc2eb37f6456e355fb4
+# status:  M src/sage_extensions/categories/abstract_categories/arrow_categories.py  M src/sage_extensions/categories/abstract_categories/cat.py  M src/sage_extensions/categories/abstract_categories/category_constructions.py  M src/sage_extensions/categories/abstract_categories/functor_images.py  M src/sage_extensions/categories/abstract_categories/mor_categories.py  M src/sage_extensions/categories/abstract_categories/presheaves.py  M src/sage_extensions/categories/abstract_categories/products.py  M src/sage_extensions/categories/algebras/algebras.py  M src/sage_extensions/categories/algebras/cohomology_algebras.py  M src/sage_extensions/categories/algebras/de_rham_algebras.py  M src/sage_extensions/categories/algebras/derivations.py  M src/sage_extensions/categories/algebras/free_algebras.py  M src/sage_extensions/categories/algebras/kahler_differentials.py  M src/sage_extensions/categories/algebras/restricted_graded_algebras.py  M src/sage_extensions/categories/coloured_vector_families.py  M src/sage_extensions/categories/divisors/cartier_divisor_groups.py  M src/sage_extensions/categories/divisors/invertible_sheaves.py  M src/sage_extensions/categories/divisors/linearizations.py  M src/sage_extensions/categories/divisors/picard_groups.py  M src/sage_extensions/categories/functions/convolution.py  M src/sage_extensions/categories/functors/algebra_scalar_change.py  M src/sage_extensions/categories/functors/commutator_lie_algebras.py  M src/sage_extensions/categories/functors/core.py  M src/sage_extensions/categories/functors/de_rham.py  M src/sage_extensions/categories/functors/group_actions.py  M src/sage_extensions/categories/functors/scalar_change.py  M src/sage_extensions/categories/group/g_objects.py  M src/sage_extensions/categories/group/magmas.py  M src/sage_extensions/categories/group/profinite/absolute_galois_group.py  M src/sage_extensions/categories/lattice_morphisms.py  M src/sage_extensions/categories/lattices.py  M src/sage_extensions/categories/modules/connections.py  M src/sage_extensions/categories/modules/fibered_modules.py  M src/sage_extensions/categories/modules/framed/formed/form_modules.py  M src/sage_extensions/categories/modules/framed/framed_free_modules.py  M src/sage_extensions/categories/modules/general_modules.py  M src/sage_extensions/categories/modules/graded_direct_sums.py  M src/sage_extensions/categories/modules/graded_modules.py  M src/sage_extensions/categories/modules/internal_mor.py  M src/sage_extensions/categories/modules/powers.py  M src/sage_extensions/categories/modules/pure/modules.py  M src/sage_extensions/categories/real_affine_spaces.py  M src/sage_extensions/categories/rings/commutative_algebra.py  M src/sage_extensions/categories/rings/ring_foundation.py  M src/sage_extensions/categories/schemes/geometric_cohomology.py  M src/sage_extensions/categories/schemes/gluing.py  M src/sage_extensions/categories/schemes/relative_proj.py  M src/sage_extensions/categories/schemes/relative_spec.py  M src/sage_extensions/categories/schemes/ringed_spaces.py  M src/sage_extensions/categories/schemes/schemes.py  M src/sage_extensions/categories/sets/set_categories.py  M src/sage_extensions/utilities.py ?? results/address-keyed-caches.md 
+# port: 991b88b095a42a1e3679569ea42328c900c120f6
+# load: 1.01 0.81 0.50
+# program: .tmp/subobject-identity/probe-pilot-row.py PROBE_PLANES=200 PROBE_PHASE=unset PYTHONHASHSEED=0
+[     1.0 s rss    282.5 MiB] T_Co rank 11, Otilde(T_Co), its character quotient
+[     3.5 s rss    305.4 MiB] the plane's certified parabolic: 112 generators
+[   211.6 s rss   1398.4 MiB] the split's first lift (the finite image's whole coset walk)
+  [plane      2/200] rss   1398.4 MiB
+  [plane      3/200] rss   1398.4 MiB
+  [plane     25/200] rss   1398.5 MiB
+  [plane     50/200] rss   1398.6 MiB
+  [plane     75/200] rss   1398.7 MiB
+  [plane    100/200] rss   1398.9 MiB
+  [plane    125/200] rss   1399.0 MiB
+  [plane    150/200] rss   1399.2 MiB
+  [plane    175/200] rss   1399.5 MiB
+  [plane    200/200] rss   1399.8 MiB
+[   215.7 s rss   1399.8 MiB] the row's first 200 entries, shape cusps
+
+[slope] over the checkpoints
+  planes      1..    10:       2.7 KiB a plane
+  planes     10..   100:       5.3 KiB a plane
+  planes    100..   200:       9.8 KiB a plane
+
+[RESULT] shape=cusps planes=200 wall=216.2 s rss_end=1399.8 MiB planes_alive_beside_the_source=0 lifts_retained=200
+[peakrss] row-new: child waited=0 shell_code=0 samples=110
+[peakrss] peak tree RSS      : 1402 MiB
+[peakrss] low-water MemAvail : 12360 MiB
+[peakrss] peak single VmHWM  : 1414 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     1411 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   run.sh                        2 MiB peak
+[peakrss]   t=   214.1s procs=  2 rss=  1402 MiB hwm=  1402 MiB avail= 12667 MiB
+[peakrss]   t=   216.1s procs=  2 rss=  1402 MiB hwm=  1402 MiB avail= 12667 MiB
+[peakrss]   t=   212.1s procs=  2 rss=  1401 MiB hwm=  1401 MiB avail= 12667 MiB
+[peakrss]   t=   218.1s procs=  2 rss=  1398 MiB hwm=  1414 MiB avail= 12643 MiB
+[peakrss]   t=   210.1s procs=  2 rss=  1291 MiB hwm=  1291 MiB avail= 12777 MiB
+# launcher exit: 0

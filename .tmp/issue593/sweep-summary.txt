@@ -1,0 +1,6 @@
+# base tree a75373b (clone .scratch/593base2)
+=========== 211 failed, 519 passed, 1 warning, 299 errors in 58.99s ============
+# converted tree
+====== 211 failed, 519 passed, 1 warning, 299 errors in 60.08s (0:01:00) =======
+# the two id lists are byte-identical:
+identical, 510 ids

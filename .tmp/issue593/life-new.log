@@ -1,0 +1,41 @@
+# tree: a75373b6a2ed92d3d8d8ddc2eb37f6456e355fb4
+# status:  M src/sage_extensions/categories/abstract_categories/arrow_categories.py  M src/sage_extensions/categories/abstract_categories/cat.py  M src/sage_extensions/categories/abstract_categories/category_constructions.py  M src/sage_extensions/categories/abstract_categories/functor_images.py  M src/sage_extensions/categories/abstract_categories/mor_categories.py  M src/sage_extensions/categories/abstract_categories/presheaves.py  M src/sage_extensions/categories/abstract_categories/products.py  M src/sage_extensions/categories/algebras/algebras.py  M src/sage_extensions/categories/algebras/cohomology_algebras.py  M src/sage_extensions/categories/algebras/de_rham_algebras.py  M src/sage_extensions/categories/algebras/derivations.py  M src/sage_extensions/categories/algebras/free_algebras.py  M src/sage_extensions/categories/algebras/kahler_differentials.py  M src/sage_extensions/categories/algebras/restricted_graded_algebras.py  M src/sage_extensions/categories/coloured_vector_families.py  M src/sage_extensions/categories/divisors/cartier_divisor_groups.py  M src/sage_extensions/categories/divisors/invertible_sheaves.py  M src/sage_extensions/categories/divisors/linearizations.py  M src/sage_extensions/categories/divisors/picard_groups.py  M src/sage_extensions/categories/functions/convolution.py  M src/sage_extensions/categories/functors/algebra_scalar_change.py  M src/sage_extensions/categories/functors/commutator_lie_algebras.py  M src/sage_extensions/categories/functors/core.py  M src/sage_extensions/categories/functors/de_rham.py  M src/sage_extensions/categories/functors/group_actions.py  M src/sage_extensions/categories/functors/scalar_change.py  M src/sage_extensions/categories/group/g_objects.py  M src/sage_extensions/categories/group/magmas.py  M src/sage_extensions/categories/group/profinite/absolute_galois_group.py  M src/sage_extensions/categories/lattice_morphisms.py  M src/sage_extensions/categories/lattices.py  M src/sage_extensions/categories/modules/connections.py  M src/sage_extensions/categories/modules/fibered_modules.py  M src/sage_extensions/categories/modules/framed/formed/form_modules.py  M src/sage_extensions/categories/modules/framed/framed_free_modules.py  M src/sage_extensions/categories/modules/general_modules.py  M src/sage_extensions/categories/modules/graded_direct_sums.py  M src/sage_extensions/categories/modules/graded_modules.py  M src/sage_extensions/categories/modules/internal_mor.py  M src/sage_extensions/categories/modules/powers.py  M src/sage_extensions/categories/modules/pure/modules.py  M src/sage_extensions/categories/real_affine_spaces.py  M src/sage_extensions/categories/rings/commutative_algebra.py  M src/sage_extensions/categories/rings/ring_foundation.py  M src/sage_extensions/categories/schemes/geometric_cohomology.py  M src/sage_extensions/categories/schemes/gluing.py  M src/sage_extensions/categories/schemes/relative_proj.py  M src/sage_extensions/categories/schemes/relative_spec.py  M src/sage_extensions/categories/schemes/ringed_spaces.py  M src/sage_extensions/categories/schemes/schemes.py  M src/sage_extensions/categories/sets/set_categories.py  M src/sage_extensions/utilities.py ?? results/address-keyed-caches.md 
+# port: 991b88b095a42a1e3679569ea42328c900c120f6
+# load: 1.27 1.13 0.72
+# program: .tmp/subobject-identity/probe-588-life.py PROBE_PLANES=unset PROBE_PHASE=unset PYTHONHASHSEED=0
+[probe] the cusp's rank: 2
+[probe] the cusp exposes span(): True
+[probe] cusp.span() equals _span_key(plane): True
+[probe] the rebuilt representative is the same subobject: True
+[probe] its span key equals the plane's: True
+[probe] the rebuilt representative is primitive: True
+[probe] the rebuilt representative is totally isotropic: True
+[probe] its rank: 2
+[probe] one named plane is alive after the drop: False
+[probe] planes alive after being named by a cusp and dropped: 0 of 20
+
+[probe] U+U(2)+<-2>: line cusps 3, plane cusps 2
+  [plane cusp 0] span (124270384108112, ((0, 1, 0, 0, 0), (0, 0, 0, 1, 0))) primitive True totally isotropic True rank 2
+  [plane cusp 1] span (124270384108112, ((0, 1, 0, 0, 0), (0, 0, 1, 0, 0))) primitive True totally isotropic True rank 2
+  [line cusp 0] span (124270384108112, ((0, 1, 0, 0, 0),)) primitive True totally isotropic True
+  [line cusp 1] span (124270384108112, ((0, 0, 1, 0, 0),)) primitive True totally isotropic True
+  [line cusp 2] span (124270384108112, ((0, 0, 0, 1, 0),)) primitive True totally isotropic True
+[probe] the incidence holds 4 certificates
+  [edge] line (124270384108112, ((0, 1, 0, 0, 0),)) plane (124270384108112, ((0, 1, 0, 0, 0), (0, 0, 0, 1, 0)))
+  [edge] line (124270384108112, ((0, 0, 0, 1, 0),)) plane (124270384108112, ((0, 1, 0, 0, 0), (0, 0, 0, 1, 0)))
+  [edge] line (124270384108112, ((0, 1, 0, 0, 0),)) plane (124270384108112, ((0, 1, 0, 0, 0), (0, 0, 1, 0, 0)))
+  [edge] line (124270384108112, ((0, 0, 1, 0, 0),)) plane (124270384108112, ((0, 1, 0, 0, 0), (0, 0, 1, 0, 0)))
+[peakrss] life-new: child waited=0 shell_code=0 samples=7
+[peakrss] peak tree RSS      : 514 MiB
+[peakrss] low-water MemAvail : 12913 MiB
+[peakrss] peak single VmHWM  : 514 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      510 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   run.sh                        2 MiB peak
+[peakrss]   t=    12.0s procs=  2 rss=   514 MiB hwm=   514 MiB avail= 13255 MiB
+[peakrss]   t=    10.0s procs=  2 rss=   495 MiB hwm=   495 MiB avail= 13271 MiB
+[peakrss]   t=     8.0s procs=  2 rss=   486 MiB hwm=   486 MiB avail= 12913 MiB
+[peakrss]   t=     6.0s procs=  2 rss=   481 MiB hwm=   481 MiB avail= 13174 MiB
+[peakrss]   t=     4.0s procs=  2 rss=   474 MiB hwm=   474 MiB avail= 13284 MiB
+# launcher exit: 0

@@ -1,0 +1,101 @@
+100
+src/sage_extensions/categories/abstract_categories/arrow_categories.py:108|cached_function|_walking_arrow_functor|cached_function(key=lambda category, arrow: (id(category), id(arrow)))|category,arrow
+src/sage_extensions/categories/abstract_categories/arrow_categories.py:553|cached_method|_object_on|cached_method(key=lambda self, functor: id(functor))|self,functor
+src/sage_extensions/categories/abstract_categories/arrow_categories.py:992|cached_method|_object_on|cached_method(key=lambda self, arrow: id(arrow))|self,arrow
+src/sage_extensions/categories/abstract_categories/arrow_categories.py:1229|cached_method|_object_on|cached_method(key=lambda self, arrow: id(arrow))|self,arrow
+src/sage_extensions/categories/abstract_categories/arrow_categories.py:1750|cached_method|as_slice_object|cached_method(key=lambda self, subobject: id(subobject))|self,subobject
+src/sage_extensions/categories/abstract_categories/cat.py:1455|cached_function|_functor_object|cached_function(key=lambda functor: id(functor))|functor
+src/sage_extensions/categories/abstract_categories/cat.py:196|cached_method|functor_mor|cached_method(         key=lambda self, domain, codomain: (             id(self.object(domain)),             id(self.object(codomain)),         )     )|self,domain,codomain
+src/sage_extensions/categories/abstract_categories/cat.py:1663|cached_method|evaluation|cached_method(key=lambda self, index: id(index))|self,index
+src/sage_extensions/categories/abstract_categories/category_constructions.py:183|cached_method|object|cached_method(key=lambda self, underlying_object: id(underlying_object))|self,underlying_object
+src/sage_extensions/categories/abstract_categories/category_constructions.py:443|cached_method|pair|cached_method(key=lambda self, first, second: (id(first), id(second)))|self,first,second
+src/sage_extensions/categories/abstract_categories/functor_images.py:172|cached_method|object|cached_method(key=lambda self, preimage: id(preimage))|self,preimage
+src/sage_extensions/categories/abstract_categories/mor_categories.py:2119|cached_function|_category_packet|cached_function(key=lambda category: id(category))|category
+src/sage_extensions/categories/abstract_categories/presheaves.py:1199|cached_function|trivial_coverage|cached_function(key=lambda site_category: id(site_category))|site_category
+src/sage_extensions/categories/abstract_categories/presheaves.py:1007|cached_method|family|cached_method(key=lambda self, target: id(target))|self,target
+src/sage_extensions/categories/abstract_categories/presheaves.py:1099|cached_method|family|cached_method(key=lambda self, target: id(target))|self,target
+src/sage_extensions/categories/abstract_categories/presheaves.py:1610|cached_method|comparison|cached_method(key=lambda self, covering_family: id(covering_family))|self,covering_family
+src/sage_extensions/categories/abstract_categories/presheaves.py:1769|cached_method|_object_on|cached_method(key=lambda self, functor, descent_data: (id(functor), id(descent_data)))|self,functor,descent_data
+src/sage_extensions/categories/abstract_categories/products.py:741|cached_function|_parallel_pair_diagram|cached_function(key=lambda left, right, target_category: (id(left), id(right), id(target_category)))|left,right,target_category
+src/sage_extensions/categories/abstract_categories/products.py:1001|cached_function|_parallel_family_diagram|cached_function(key=lambda morphisms, target_category: (id(morphisms), id(target_category)))|morphisms,target_category
+src/sage_extensions/categories/abstract_categories/products.py:1759|cached_method|construction|cached_method(key=lambda self, diagram: id(diagram))|self,diagram
+src/sage_extensions/categories/abstract_categories/products.py:1866|cached_method|construction|cached_method(key=lambda self, diagram: id(diagram))|self,diagram
+src/sage_extensions/categories/algebras/algebras.py:906|cached_function|_algebra_tensor_square_functor|cached_function(key=lambda base_ring: id(_owned_ring(base_ring)))|base_ring
+src/sage_extensions/categories/algebras/algebras.py:5780|cached_function|_algebra_structure_view|cached_function(key=lambda ring, structure_map: (id(ring), id(structure_map)))|ring,structure_map
+src/sage_extensions/categories/algebras/cohomology_algebras.py:216|cached_function|_cohomology_algebra_from_dga|cached_function(key=lambda dga: id(dga))|dga
+src/sage_extensions/categories/algebras/de_rham_algebras.py:241|cached_function|_de_rham_algebra_from_source|cached_function(key=lambda algebra: id(algebra))|algebra
+src/sage_extensions/categories/algebras/derivations.py:760|cached_function|_derivations|cached_function(key=lambda algebra, target_module: (id(algebra), id(target_module)))|algebra,target_module
+src/sage_extensions/categories/algebras/free_algebras.py:629|cached_function|_symmetric_algebra_of_free_module|cached_function(key=lambda generating: id(generating))|generating
+src/sage_extensions/categories/algebras/kahler_differentials.py:309|cached_function|_cached_kahler_differentials|cached_function(key=lambda algebra: id(algebra))|algebra
+src/sage_extensions/categories/algebras/restricted_graded_algebras.py:207|cached_function|_restrict_graded_algebra_scalars|cached_function(key=lambda algebra, ring_map: (id(algebra), id(ring_map)))|algebra,ring_map
+src/sage_extensions/categories/coloured_vector_families.py:1050|weak_cached_function|_realization|weak_cached_function(cache=0, key=lambda lattice, family: (id(lattice), id(family)))|lattice,family
+src/sage_extensions/categories/divisors/cartier_divisor_groups.py:361|cached_function|_total_quotient_sheaf|cached_function(key=lambda scheme: id(scheme))|scheme
+src/sage_extensions/categories/divisors/cartier_divisor_groups.py:376|cached_function|_unit_sheaf|cached_function(key=lambda ring_sheaf: id(ring_sheaf))|ring_sheaf
+src/sage_extensions/categories/divisors/cartier_divisor_groups.py:391|cached_function|_regular_unit_sheaf|cached_function(key=lambda scheme: id(scheme))|scheme
+src/sage_extensions/categories/divisors/cartier_divisor_groups.py:406|cached_function|_cartier_divisor_quotient_sheaf|cached_function(key=lambda scheme: id(scheme))|scheme
+src/sage_extensions/categories/divisors/cartier_divisor_groups.py:970|cached_function|_cartier_section_classes|cached_function(key=lambda quotient_sheaf: id(quotient_sheaf))|quotient_sheaf
+src/sage_extensions/categories/divisors/invertible_sheaves.py:314|cached_method|_whole_to_basis|cached_method(key=lambda self, open_object: id(open_object))|self,open_object
+src/sage_extensions/categories/divisors/linearizations.py:659|cached_function|_c2_diagonal_product_projective_action|cached_function(     key=lambda projective_product, group=None: (         id(projective_product),         id(OwnedGroups().C(2) if group is None else group),     ) )|projective_product,group
+src/sage_extensions/categories/divisors/linearizations.py:747|cached_function|_projective_line_coordinate_swap_action|cached_function(key=lambda projective_line, group=None: (id(projective_line), id(OwnedGroups().C(2) if group is None else group)))|projective_line,group
+src/sage_extensions/categories/divisors/picard_groups.py:406|cached_function|_invertible_sheaf_class_group|cached_function(key=lambda scheme, unit_sheaf: id(scheme))|scheme,unit_sheaf
+src/sage_extensions/categories/functions/convolution.py:37|cached_function|_symbolic_convolution|cached_function(key=lambda left, right: (id(left), id(right)))|left,right
+src/sage_extensions/categories/functions/convolution.py:134|cached_function|_convolution_pairing|cached_function(key=lambda left, right: (id(left), id(right)))|left,right
+src/sage_extensions/categories/functors/algebra_scalar_change.py:429|cached_function|_algebra_base_change_adjunction|cached_function(key=lambda ring_map: id(ring_map))|ring_map
+src/sage_extensions/categories/functors/commutator_lie_algebras.py:64|cached_function|_commutator_lie_algebra|cached_function(key=lambda algebra: id(algebra))|algebra
+src/sage_extensions/categories/functors/core.py:690|cached_method|component|cached_method(key=lambda self, obj: id(obj))|self,obj
+src/sage_extensions/categories/functors/de_rham.py:137|cached_method|_degree_zero_data|cached_method(key=lambda self, dga: id(dga))|self,dga
+src/sage_extensions/categories/functors/group_actions.py:184|cached_function|_group_algebra_augmentation_ring_map|cached_function(key=lambda algebra: id(algebra))|algebra
+src/sage_extensions/categories/functors/scalar_change.py:474|cached_function|_base_change_adjunction|cached_function(key=lambda ring_map: id(ring_map))|ring_map
+src/sage_extensions/categories/functors/scalar_change.py:479|cached_function|_restriction_coextension_adjunction|cached_function(key=lambda ring_map: id(ring_map))|ring_map
+src/sage_extensions/categories/functors/scalar_change.py:142|cached_method|composite_ring_map|cached_method(key=lambda self, second_ring_map: id(second_ring_map))|self,second_ring_map
+src/sage_extensions/categories/group/g_objects.py:1122|cached_method|_affine_invariant_action|cached_method(key=lambda self, acted: id(acted))|self,acted
+src/sage_extensions/categories/group/g_objects.py:1195|cached_method|affine_quotient|cached_method(key=lambda self, acted: id(acted))|self,acted
+src/sage_extensions/categories/group/g_objects.py:1204|cached_method|quotient_morphism|cached_method(key=lambda self, acted: id(acted))|self,acted
+src/sage_extensions/categories/group/magmas.py:988|cached_function|_unit_group|cached_function(key=lambda monoid: id(monoid))|monoid
+src/sage_extensions/categories/group/profinite/absolute_galois_group.py:907|cached_function|_canonical_absolute_galois_group|cached_function(key=lambda field: id(field))|field
+src/sage_extensions/categories/lattice_morphisms.py:6098|weak_cached_function|_lattice_mor|weak_cached_function(cache=0, key=lambda domain, codomain: (id(domain), id(codomain)))|domain,codomain
+src/sage_extensions/categories/lattice_morphisms.py:6106|weak_cached_function|_lattice_embedding_mor|weak_cached_function(cache=0, key=lambda domain, codomain: (id(domain), id(codomain)))|domain,codomain
+src/sage_extensions/categories/lattice_morphisms.py:6114|weak_cached_function|_lattice_isometry_mor|weak_cached_function(cache=0, key=lambda domain, codomain: (id(domain), id(codomain)))|domain,codomain
+src/sage_extensions/categories/lattice_morphisms.py:4334|cached_method|_family_stabilizer|cached_method(key=lambda self, family: id(family))|self,family
+src/sage_extensions/categories/lattices.py:2502|cached_method|_object_on|cached_method(key=lambda self, oriented: id(oriented))|self,oriented
+src/sage_extensions/categories/lattices.py:4584|cached_method|base_change|cached_method(key=lambda self, ring_map: id(ring_map))|self,ring_map
+src/sage_extensions/categories/modules/connections.py:721|cached_function|_connections|cached_function(key=lambda module: id(module))|module
+src/sage_extensions/categories/modules/fibered_modules.py:261|cached_method|base_change_adjunction|cached_method(key=lambda self, scalar_map: id(scalar_map))|self,scalar_map
+src/sage_extensions/categories/modules/framed/formed/form_modules.py:1588|cached_function|_formed_module_base_change|cached_function(key=lambda source, ring_map: (id(source), id(ring_map)))|self,ring_map
+src/sage_extensions/categories/modules/framed/framed_free_modules.py:1748|cached_function|_owned_free_module_on|cached_function(     key=lambda ring, module_generating_set: (id(ring), id(module_generating_set)) )|ring,module_generating_set
+src/sage_extensions/categories/modules/framed/framed_free_modules.py:829|cached_method|base_change|cached_method(             key=lambda self, ring_map, _extra_construction_data=None: (                 id(ring_map),                 id(_extra_construction_data),             )         )|self,ring_map
+src/sage_extensions/categories/modules/framed/framed_free_modules.py:1081|cached_method|base_change|cached_method(                 key=lambda self, ring_map, _extra_construction_data=None: (                     id(ring_map),                     id(_extra_construction_data),                 )             )|self,ring_map
+src/sage_extensions/categories/modules/general_modules.py:620|cached_function|_function_module|cached_function(key=lambda module, domain: (id(module), id(domain)))|module,domain
+src/sage_extensions/categories/modules/graded_direct_sums.py:253|cached_function|_direct_sum_framing_source|cached_function(key=lambda ring, pieces: (id(ring), id(pieces)))|ring,pieces
+src/sage_extensions/categories/modules/graded_modules.py:78|cached_function|_parity_key|cached_function(key=lambda parity: id(parity))|parity
+src/sage_extensions/categories/modules/internal_mor.py:54|cached_function|_internal_mor_model_data_from_endpoints|cached_function(key=lambda source, target: (id(source), id(target)))|source,target
+src/sage_extensions/categories/modules/powers.py:881|cached_function|_divided_square|cached_function(key=lambda module: id(module))|module
+src/sage_extensions/categories/modules/pure/modules.py:550|cached_method|scalar_extension|cached_method(key=lambda self, ring_map: id(ring_map))|self,ring_map
+src/sage_extensions/categories/real_affine_spaces.py:29|cached_function|_canonically_based_affine_space|cached_function(key=lambda vector_space: id(vector_space))|vector_space
+src/sage_extensions/categories/rings/commutative_algebra.py:5585|cached_function|_prime_localization|cached_function(key=lambda source, prime_ideal: (id(source), id(prime_ideal)))|source,prime_ideal
+src/sage_extensions/categories/rings/ring_foundation.py:5429|cached_method|Mor|cached_method(key=lambda self, domain, codomain: (id(domain), id(codomain)))|self,domain,codomain
+src/sage_extensions/categories/rings/ring_foundation.py:2416|cached_method|principal_localization_comparison|cached_method(key=lambda self, source_ring: id(source_ring))|self,source_ring
+src/sage_extensions/categories/rings/ring_foundation.py:4097|cached_method|as_algebra_over|cached_method(key=lambda self, base_ring: id(_own_ring(base_ring)))|self,base_ring
+src/sage_extensions/categories/schemes/geometric_cohomology.py:226|cached_function|_projective_space_line_bundle_derived_global_sections|cached_function(key=lambda sheaf: id(sheaf))|sheaf
+src/sage_extensions/categories/schemes/geometric_cohomology.py:265|cached_function|_projective_space_de_rham_hypercohomology|cached_function(key=lambda space: id(space))|space
+src/sage_extensions/categories/schemes/geometric_cohomology.py:1255|cached_function|_complex_realization|cached_function(key=lambda scheme, scalar_embedding: (id(scheme), id(scalar_embedding)))|scheme,scalar_embedding
+src/sage_extensions/categories/schemes/gluing.py:1321|cached_method|pullback|cached_method(key=lambda self, morphism: id(morphism))|self,morphism
+src/sage_extensions/categories/schemes/gluing.py:1742|cached_method|global_section_pullback|cached_method(key=lambda self, descent: id(descent))|self,descent
+src/sage_extensions/categories/schemes/gluing.py:7378|cached_method|object|cached_method(key=lambda self, sheaf: id(sheaf))|self,sheaf
+src/sage_extensions/categories/schemes/relative_proj.py:2783|cached_function|_finite_atlas_projectivization|cached_function(key=lambda sheaf: id(sheaf))|sheaf
+src/sage_extensions/categories/schemes/relative_proj.py:2825|cached_function|_affine_projectivization|cached_function(key=lambda sheaf: id(sheaf))|sheaf
+src/sage_extensions/categories/schemes/relative_proj.py:1302|cached_method|projectivization_base_change|cached_method(key=lambda self, ring_map: id(ring_map))|self,ring_map
+src/sage_extensions/categories/schemes/relative_proj.py:2522|cached_method|projectivization_base_change|cached_method(key=lambda self, ring_map: id(ring_map))|self,ring_map
+src/sage_extensions/categories/schemes/relative_proj.py:638|cached_method|projectivization_base_change|cached_method(key=lambda self, ring_map: id(ring_map))|self,ring_map
+src/sage_extensions/categories/schemes/relative_spec.py:179|cached_function|_relative_spectrum|cached_function(key=lambda datum: id(datum))|datum
+src/sage_extensions/categories/schemes/relative_spec.py:194|cached_function|_finite_atlas_relative_spectrum|cached_function(key=lambda datum: id(datum))|datum
+src/sage_extensions/categories/schemes/ringed_spaces.py:821|cached_function|_affine_de_rham_complex|cached_function(key=lambda scheme: id(scheme))|scheme
+src/sage_extensions/categories/schemes/ringed_spaces.py:1174|cached_function|zariski_coverage|cached_function(key=lambda scheme: id(scheme))|scheme
+src/sage_extensions/categories/schemes/ringed_spaces.py:1571|cached_function|distinguished_affine_coverage|cached_function(key=lambda scheme: id(scheme))|scheme
+src/sage_extensions/categories/schemes/ringed_spaces.py:606|cached_method|module_descent_datum|cached_method(key=lambda self, cover: id(cover))|self,cover
+src/sage_extensions/categories/schemes/ringed_spaces.py:2174|cached_method|associated_sheaf|cached_method(key=lambda self, module: id(module))|self,module
+src/sage_extensions/categories/schemes/schemes.py:2443|cached_function|_projective_section_restriction|cached_function(key=lambda scheme, ring: (id(scheme), id(ring)))|scheme,ring
+src/sage_extensions/categories/schemes/schemes.py:3124|cached_function|_affine_spectrum_over|cached_function(key=lambda algebra, base: (id(algebra), id(base)))|algebra,base
+src/sage_extensions/categories/schemes/schemes.py:2118|cached_method|module_pullback|cached_method(key=lambda self, sheaf: id(sheaf))|self,sheaf
+src/sage_extensions/categories/sets/set_categories.py:4809|cached_function|_cartesian_product_of|cached_function(key=lambda family: id(family))|family
+src/sage_extensions/categories/sets/set_categories.py:6572|cached_function|_coproduct_of_indexed_family|cached_function(key=lambda family: id(family))|family

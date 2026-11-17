@@ -1,0 +1,41 @@
+# tree: a75373b6a2ed92d3d8d8ddc2eb37f6456e355fb4
+# status: 
+# port: 991b88b095a42a1e3679569ea42328c900c120f6
+# load: 1.22 1.10 0.70
+# program: .tmp/subobject-identity/probe-588-life.py PROBE_PLANES=unset PROBE_PHASE=unset PYTHONHASHSEED=0
+[probe] the cusp's rank: 2
+[probe] the cusp exposes span(): True
+[probe] cusp.span() equals _span_key(plane): True
+[probe] the rebuilt representative is the same subobject: True
+[probe] its span key equals the plane's: True
+[probe] the rebuilt representative is primitive: True
+[probe] the rebuilt representative is totally isotropic: True
+[probe] its rank: 2
+[probe] one named plane is alive after the drop: False
+[probe] planes alive after being named by a cusp and dropped: 0 of 20
+
+[probe] U+U(2)+<-2>: line cusps 3, plane cusps 2
+  [plane cusp 0] span (137573869097552, ((0, 1, 0, 0, 0), (0, 0, 0, 1, 0))) primitive True totally isotropic True rank 2
+  [plane cusp 1] span (137573869097552, ((0, 1, 0, 0, 0), (0, 0, 1, 0, 0))) primitive True totally isotropic True rank 2
+  [line cusp 0] span (137573869097552, ((0, 1, 0, 0, 0),)) primitive True totally isotropic True
+  [line cusp 1] span (137573869097552, ((0, 0, 0, 1, 0),)) primitive True totally isotropic True
+  [line cusp 2] span (137573869097552, ((0, 0, 1, 0, 0),)) primitive True totally isotropic True
+[probe] the incidence holds 4 certificates
+  [edge] line (137573869097552, ((0, 1, 0, 0, 0),)) plane (137573869097552, ((0, 1, 0, 0, 0), (0, 0, 0, 1, 0)))
+  [edge] line (137573869097552, ((0, 0, 0, 1, 0),)) plane (137573869097552, ((0, 1, 0, 0, 0), (0, 0, 0, 1, 0)))
+  [edge] line (137573869097552, ((0, 1, 0, 0, 0),)) plane (137573869097552, ((0, 1, 0, 0, 0), (0, 0, 1, 0, 0)))
+  [edge] line (137573869097552, ((0, 0, 1, 0, 0),)) plane (137573869097552, ((0, 1, 0, 0, 0), (0, 0, 1, 0, 0)))
+[peakrss] life-base: child waited=0 shell_code=0 samples=8
+[peakrss] peak tree RSS      : 520 MiB
+[peakrss] low-water MemAvail : 13258 MiB
+[peakrss] peak single VmHWM  : 520 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      516 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   run.sh                        1 MiB peak
+[peakrss]   t=    14.0s procs=  2 rss=   520 MiB hwm=   520 MiB avail= 13258 MiB
+[peakrss]   t=    12.0s procs=  2 rss=   510 MiB hwm=   510 MiB avail= 13267 MiB
+[peakrss]   t=    10.0s procs=  2 rss=   495 MiB hwm=   495 MiB avail= 13273 MiB
+[peakrss]   t=     8.0s procs=  2 rss=   485 MiB hwm=   485 MiB avail= 13283 MiB
+[peakrss]   t=     6.0s procs=  2 rss=   480 MiB hwm=   480 MiB avail= 13280 MiB
+# launcher exit: 0

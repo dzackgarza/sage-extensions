@@ -1,0 +1,24 @@
+# tree: a75373b6a2ed92d3d8d8ddc2eb37f6456e355fb4
+# status:  M src/sage_extensions/categories/abstract_categories/arrow_categories.py  M src/sage_extensions/categories/abstract_categories/cat.py  M src/sage_extensions/categories/abstract_categories/category_constructions.py  M src/sage_extensions/categories/abstract_categories/functor_images.py  M src/sage_extensions/categories/abstract_categories/mor_categories.py  M src/sage_extensions/categories/abstract_categories/presheaves.py  M src/sage_extensions/categories/abstract_categories/products.py  M src/sage_extensions/categories/algebras/algebras.py  M src/sage_extensions/categories/algebras/cohomology_algebras.py  M src/sage_extensions/categories/algebras/de_rham_algebras.py  M src/sage_extensions/categories/algebras/derivations.py  M src/sage_extensions/categories/algebras/free_algebras.py  M src/sage_extensions/categories/algebras/kahler_differentials.py  M src/sage_extensions/categories/algebras/restricted_graded_algebras.py  M src/sage_extensions/categories/coloured_vector_families.py  M src/sage_extensions/categories/divisors/cartier_divisor_groups.py  M src/sage_extensions/categories/divisors/invertible_sheaves.py  M src/sage_extensions/categories/divisors/linearizations.py  M src/sage_extensions/categories/divisors/picard_groups.py  M src/sage_extensions/categories/functions/convolution.py  M src/sage_extensions/categories/functors/algebra_scalar_change.py  M src/sage_extensions/categories/functors/commutator_lie_algebras.py  M src/sage_extensions/categories/functors/core.py  M src/sage_extensions/categories/functors/de_rham.py  M src/sage_extensions/categories/functors/group_actions.py  M src/sage_extensions/categories/functors/scalar_change.py  M src/sage_extensions/categories/group/g_objects.py  M src/sage_extensions/categories/group/magmas.py  M src/sage_extensions/categories/group/profinite/absolute_galois_group.py  M src/sage_extensions/categories/lattice_morphisms.py  M src/sage_extensions/categories/lattices.py  M src/sage_extensions/categories/modules/connections.py  M src/sage_extensions/categories/modules/fibered_modules.py  M src/sage_extensions/categories/modules/framed/formed/form_modules.py  M src/sage_extensions/categories/modules/framed/framed_free_modules.py  M src/sage_extensions/categories/modules/general_modules.py  M src/sage_extensions/categories/modules/graded_direct_sums.py  M src/sage_extensions/categories/modules/graded_modules.py  M src/sage_extensions/categories/modules/internal_mor.py  M src/sage_extensions/categories/modules/powers.py  M src/sage_extensions/categories/modules/pure/modules.py  M src/sage_extensions/categories/real_affine_spaces.py  M src/sage_extensions/categories/rings/commutative_algebra.py  M src/sage_extensions/categories/rings/ring_foundation.py  M src/sage_extensions/categories/schemes/geometric_cohomology.py  M src/sage_extensions/categories/schemes/gluing.py  M src/sage_extensions/categories/schemes/relative_proj.py  M src/sage_extensions/categories/schemes/relative_spec.py  M src/sage_extensions/categories/schemes/ringed_spaces.py  M src/sage_extensions/categories/schemes/schemes.py  M src/sage_extensions/categories/sets/set_categories.py  M src/sage_extensions/utilities.py ?? results/address-keyed-caches.md 
+# load: 1.61 1.25 0.79
+# pytest: tests/lattices/test_a_cusp_names_its_plane_by_span.sage tests/lattices/test_a_dropped_plane_is_collected.sage
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+time gates on: star import 0.31 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: asyncio-1.5.0, xdist-3.8.0, reportlog-1.0.0, platformdirs-4.13.5, hypothesis-6.170.15, anyio-4.15.1, timeout-2.4.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 3 items
+
+tests/lattices/test_a_cusp_names_its_plane_by_span.sage ..               [ 66%]
+tests/lattices/test_a_dropped_plane_is_collected.sage .                  [100%]
+
+============================== slowest durations ===============================
+10.13s call     tests/lattices/test_a_cusp_names_its_plane_by_span.sage::test_a_cusp_of_a_null_plane_builds_its_plane_from_its_span
+2.06s call     tests/lattices/test_a_cusp_names_its_plane_by_span.sage::test_each_incidence_certificate_carries_its_terms_to_its_cusps
+0.30s call     tests/lattices/test_a_dropped_plane_is_collected.sage::test_a_dropped_plane_is_collected
+
+(6 durations < 0.005s hidden.  Use -vv to show these durations.)
+============================== 3 passed in 13.15s ==============================
+# runner exit: 0
