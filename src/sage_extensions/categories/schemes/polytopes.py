@@ -90,22 +90,86 @@ class AbstractPolytopes(OwnedCategory):
         return "abstract polytopes"
 
     def an_object(self):
-        pass
+        r"""The face poset of a zero-dimensional polytope.
 
-    def from_face_poset(self, face_poset):
-        r"""Construct from the exact finite graded poset of faces."""
-        pass
+        Such a polytope has two faces: the empty face, of dimension ``-1``, and
+        its single vertex, of dimension ``0``, which covers it.  The finite
+        graded poset of those two grades is the whole face poset, so no
+        polyhedral computation is asked for it.
+        """
+        return self.from_face_poset(FiniteGradedPosets().an_object())
+
+    def from_face_poset(self, face_poset, *, automorphism_realization=None):
+        r"""Construct from the exact finite graded poset of faces.
+
+        The carrier of ``face_poset`` is the family of faces and its grading is
+        the affine dimension of each face, with the empty face of dimension
+        ``-1``.
+
+        ``automorphism_realization`` is the computation of this polytope's
+        automorphism group when the constructing owner has one: a function of
+        nothing, asked when the group is asked for, as a selected realization of
+        an operation is.  The group it returns is the automorphism group of
+        ``face_poset`` -- its rank-preserving monotone self-isomorphisms --
+        retained in an action on the faces.  A face poset presented without one
+        has no selected realization of that group, and asking for the group then
+        states that, rather than substituting a permutation group of the
+        carrier for the automorphisms of the poset.
+        """
+        assert face_poset in FiniteGradedPosets(), (
+            f"an abstract polytope is a finite graded poset of faces, but {face_poset} lies in "
+            f"{face_poset.category()}"
+        )
+        return _object_of(
+            self,
+            underlying_poset=face_poset.underlying_poset(),
+            grading_map=face_poset.grading_map(),
+            face_poset=face_poset,
+            automorphism_realization=automorphism_realization,
+        )
 
     class ParentMethods:
+        def __init__(self, face_poset, automorphism_realization=None, **rest) -> None:
+            self._face_poset = face_poset
+            self._automorphism_realization = automorphism_realization
+            super().__init__(**rest)
+
+        def underlying_graded_poset(self):
+            r"""Return the exact finite graded poset of faces, graded by dimension."""
+            return self._face_poset
+
         def faces(self, dimension):
             r"""Faces of the selected rank, as elements of this face poset."""
-            pass
+            selected = int(dimension)
+            return finite_ordered_set(
+                tuple(face for face in self if int(self.grade(face)) == selected)
+            )
 
         def face_poset(self):
             return self
 
+        def _repr_(self):
+            return f"Abstract polytope with {sum(1 for _face in self)} faces"
+
         def abstract_automorphisms(self):
-            return self.Aut()
+            r"""Return the automorphism group of the face poset.
+
+            The automorphisms of an abstract polytope are the rank-preserving
+            monotone self-isomorphisms of its face poset
+            (``lean-categories/LeanCategories/Orders/FiniteGradedPoset.lean``:
+            ``Hom`` is an ``OrderHom`` with ``grade_eq``, and ``Aut`` is the
+            generic ``Iso`` on the diagonal), so a realization of the group is
+            exactly a realization of that ``Aut``, which the constructing owner
+            of the face poset supplies.  The group acts on the faces of this
+            polytope: an element applied to a face is the image of that face.
+            """
+            assert self._automorphism_realization is not None, (
+                f"{self} is presented as a finite graded poset of faces alone, with no selected "
+                "realization of its automorphism group: its automorphisms are the rank-preserving "
+                "monotone self-isomorphisms of that poset, and no group realization of that Aut "
+                "family is selected here"
+            )
+            return self._automorphism_realization()
 
 
 class PlacedPolytopeMor(CategoricalMor):
@@ -895,17 +959,202 @@ class ConvexPolytopes(OwnedParameterizedCategory):
                 )
             )
 
+        @cached_method
+        def _engine_face_lattice(self):
+            r"""Return the faces of the private exact polyhedron, the empty face first.
+
+            A face of a polyhedron is the set of points where a family of the
+            defining inequalities is saturated; the face lattice orders them by
+            inclusion, its bottom element is the empty face of dimension ``-1``
+            and its top element is the whole polyhedron.  The faces are read off
+            the exact polyhedron, which is the selected polyhedral computation
+            (``sage.geometry.polyhedron.base4``, ``face_lattice``).
+            """
+            return tuple(self._engine_polyhedron().face_lattice())
+
+        @cached_method
+        def _engine_face_vertex_indices(self):
+            r"""The ambient V-representation indices of each face, in face-lattice order.
+
+            A face of a polytope is the convex hull of its vertices, so the set
+            of vertices on a face identifies that face among the faces of this
+            polytope, and the empty face is the face with no vertices.  The
+            indices are those of the polyhedron's own V-representation, which is
+            the order :meth:`_engine_vertex_coordinates` reads.
+            """
+            return tuple(
+                frozenset(face.ambient_V_indices())
+                for face in self._engine_face_lattice()
+            )
+
+        @cached_method
+        def _engine_face_rank_by_vertex_indices(self):
+            r"""The face-lattice position of the face spanned by each set of vertices."""
+            return {
+                vertices: rank
+                for rank, vertices in enumerate(self._engine_face_vertex_indices())
+            }
+
+        @cached_method
+        def _engine_vertex_coordinates(self):
+            r"""The private coordinates of the ambient V-representation entries, in their order."""
+            return tuple(
+                tuple(SageQQ(coordinate) for coordinate in representation.vector())
+                for representation in self._engine_polyhedron().Vrepresentation()
+            )
+
+        @cached_method
+        def _embedded_vertex_coordinates(self):
+            r"""The private coordinates of the owned vertices, in :meth:`vertices` order.
+
+            A point of the ambient space and a lattice vertex are one point of
+            it, so these are the coordinates of the very points :meth:`vertices`
+            enumerates, read in the frame of :meth:`ambient_space`.
+            """
+            return tuple(
+                tuple(SageQQ(coordinate) for coordinate in self._engine_coordinates(vertex))
+                for vertex in self.vertices()
+            )
+
+        @cached_method
+        def _engine_vertex_rank_in_vertices(self):
+            r"""The rank in :meth:`vertices` of each ambient V-representation entry.
+
+            The private polyhedron indexes its V-representation by its own order
+            and the owned vertex set ranks the same points in its own order;
+            this is the correspondence between the two, computed by coordinates
+            rather than by position, so a polytope presented by halfspaces and
+            one presented by its vertices agree on it.
+            """
+            owned = self._embedded_vertex_coordinates()
+            ranks = []
+            for representation, point in zip(
+                self._engine_polyhedron().Vrepresentation(),
+                self._engine_vertex_coordinates(),
+                strict=True,
+            ):
+                assert representation.is_vertex(), (
+                    f"the ambient V-representation of {self} holds the non-vertex {representation}, so its "
+                    "entries are not the vertices of this polytope"
+                )
+                assert point in owned, (
+                    f"the V-representation entry {representation} of {self} is at the private coordinates "
+                    f"{point}, which are not the coordinates of an owned vertex; the owned vertices are at "
+                    f"{owned}"
+                )
+                ranks.append(owned.index(point))
+            return tuple(ranks)
+
+        @cached_method
+        def _owned_vertices_in_engine_order(self):
+            r"""The owned vertices, in the private V-representation order."""
+            vertices = tuple(self.vertices())
+            return tuple(
+                vertices[rank] for rank in self._engine_vertex_rank_in_vertices()
+            )
+
+        @cached_method
+        def _engine_face_by_vertex_indices(self):
+            r"""The private face on each set of ambient vertex indices."""
+            return dict(
+                zip(
+                    self._engine_face_vertex_indices(),
+                    self._engine_face_lattice(),
+                    strict=True,
+                )
+            )
+
+        @cached_method
+        def _owned_face(self, vertices):
+            r"""The owned polytope on the face with these ambient vertex indices.
+
+            A face is a polytope in the same ambient lattice as this one; the
+            private exact polyhedron's own face is what presents it, and no
+            coordinate is read from any other space.
+            """
+            assert vertices in self._engine_face_by_vertex_indices(), (
+                f"{set(vertices)} is not the vertex set of a face of {self}; the faces are spanned by "
+                f"{tuple(sorted(self._engine_face_by_vertex_indices(), key=sorted))}"
+            )
+            return _convex_polytope(
+                engine_polyhedron=self._engine_face_by_vertex_indices()[vertices].as_polyhedron(),
+                lattice=self.ambient_lattice(),
+            )
+
+        @cached_method
+        def _owned_faces(self):
+            r"""The faces of this polytope as polytopes, the empty face first.
+
+            The top face is the face spanned by all the vertices, which is this
+            polytope, so the face poset retains the supplied polytope itself
+            rather than an equal copy of it.
+            """
+            everything = frozenset(range(len(self._engine_vertex_coordinates())))
+            return tuple(
+                self if vertices == everything else self._owned_face(vertices)
+                for vertices in self._engine_face_vertex_indices()
+            )
+
+        @cached_method
+        def _face_poset_carrier(self):
+            r"""The family of faces this polytope's face poset is carried by, in face-lattice order."""
+            return finite_ordered_set(self._owned_faces())
+
         def faces(self, dimension):
-            r"""The faces of the selected dimension, with their common ambient."""
-            pass
+            r"""The faces of the selected dimension, with their common ambient.
+
+            Dimensions run from ``-1``, the empty face, to the dimension of this
+            polytope.  A face of a polytope is again a polytope of the same
+            ambient lattice, and the faces of one dimension are those the face
+            lattice grades by it.
+            """
+            selected = int(dimension)
+            return finite_ordered_set(
+                tuple(
+                    face
+                    for face in self._owned_faces()
+                    if int(face.dimension()) == selected
+                )
+            )
 
         def face_inclusion(self, face):
             r"""The selected face arrow from ``face`` into this polytope."""
             pass
 
+        @cached_method
         def face_poset(self):
-            r"""The graded poset of faces and their inclusion relations."""
-            pass
+            r"""The exact finite graded poset of the faces of this polytope.
+
+            The carrier is the family of faces as polytopes of this polytope's
+            ambient lattice, the grading is the affine dimension of a face, the
+            empty face being of dimension ``-1``, and the order is face
+            inclusion.  A face is the convex hull of its vertices and a polytope
+            is convex, so one face lies in another exactly when its vertices are
+            among the other's, which is the incidence the face lattice records.
+
+            This is the object an abstract polytope is
+            (:class:`AbstractPolytopes`): the polytopes of one dimension are the
+            faces of that rank, and the rank-preserving monotone self-maps of it
+            are the polytope's combinatorial automorphisms.  Its automorphism
+            group is realized by :meth:`abstract_automorphisms`, which this
+            polytope's own exact face lattice computes.
+            """
+            vertices_of = dict(
+                zip(
+                    self._owned_faces(),
+                    self._engine_face_vertex_indices(),
+                    strict=True,
+                )
+            )
+            order = PartiallyOrderedSets()(
+                self._face_poset_carrier(),
+                lambda face, other: vertices_of[face] <= vertices_of[other],
+            )
+            graded = FiniteGradedPosets().on(order, lambda face: face.dimension())
+            return AbstractPolytopes().from_face_poset(
+                graded,
+                automorphism_realization=self._transported_combinatorial_face_permutations,
+            )
 
         def facet_inclusion(self, facet):
             r"""The selected face arrow from ``facet`` into this polytope."""
@@ -917,14 +1166,245 @@ class ConvexPolytopes(OwnedParameterizedCategory):
         def boundary_inclusion(self):
             pass
 
+        @cached_method
+        def _combinatorial_vertex_permutations(self):
+            r"""The combinatorial automorphism generators, as permutations of the vertices.
+
+            The combinatorial automorphism group of a polytope is computed as
+            the automorphism group of the vertex-facet graph: the bipartite
+            graph with one node per vertex and one per facet, and an edge
+            between a vertex and a facet exactly when the vertex lies on the
+            facet.  Its automorphisms are the incidence-preserving permutations
+            of the vertices and facets, and that group is isomorphic to the
+            automorphism group of the face lattice (Klee--Kleinschmidt,
+            *Convex polytopes and related complexes*, Handbook of Combinatorics
+            Vol. 1, Ch. 18, 1995, pp. 877--878, and Sage's
+            ``combinatorial_automorphism_group``).  The vertex-edge graph alone
+            does not determine the face lattice, so the incidence with the
+            facets is what is read here.
+
+            Each returned permutation is written on the vertices in the private
+            V-representation order, and each of them is the vertex part of one
+            generator of that group.  A face is the convex hull of its vertices
+            and the incidence preserves which vertex sets span faces, so these
+            permutations determine, and are determined by, the automorphisms of
+            the face poset.
+            """
+            polyhedron = self._engine_polyhedron()
+            representations = tuple(polyhedron.Vrepresentation())
+            position = {
+                representation: index
+                for index, representation in enumerate(representations)
+            }
+
+            def images(generator):
+                images_of_vertex = []
+                for representation in representations:
+                    image = generator(representation)
+                    assert image in position, (
+                        f"the combinatorial automorphism {generator} carries the vertex {representation} "
+                        f"to {image}, which is not a vertex of {self}; the automorphisms of the "
+                        "vertex-facet graph preserve its two kinds of node"
+                    )
+                    images_of_vertex.append(position[image])
+                return tuple(images_of_vertex)
+
+            return tuple(
+                images(generator)
+                for generator in polyhedron.combinatorial_automorphism_group().gens()
+            )
+
+        @cached_method
+        def _restricted_vertex_permutations(self):
+            r"""The restricted affine automorphism generators, as permutations of the vertices.
+
+            The restricted automorphism group of a polytope is the subgroup of
+            its affine automorphism group generated by permutations of the
+            V-representation objects of one type; it is a subgroup of the
+            combinatorial automorphism group, and it is generally smaller
+            (Bremner--Dutour Sikiric--Schuermann, *Polyhedral representation
+            conversion up to symmetries*, AMS/CRM Lecture Notes 48 (2009),
+            45--71, arXiv:math/0702239; Sage's
+            ``restricted_automorphism_group``).
+
+            What is read here is that group's permutation action on the
+            vertices, in the private V-representation order.  On a polytope of
+            lower dimension than its ambient space, the affine realization the
+            private engine also offers is an affine map that acts as the
+            identity on a complement of the polytope's affine span; that
+            complement is a choice, so the action on the vertices -- which span
+            the polytope -- is what this polytope retains, and no action on an
+            unused complement is claimed.
+            """
+            polyhedron = self._engine_polyhedron()
+            indices = tuple(range(len(self._engine_vertex_coordinates())))
+            return tuple(
+                tuple(int(generator(index)) for index in indices)
+                for generator in polyhedron.restricted_automorphism_group(
+                    output="permutation"
+                ).gens()
+            )
+
+        def _face_permutation_of_a_vertex_permutation(self, vertex_permutation):
+            r"""The face each face goes to under a permutation of the vertices.
+
+            A permutation of the vertices carries a face to the face spanned by
+            the images of its vertices.  That image is a face exactly when the
+            permutation preserves the incidence of the vertices with the
+            facets, which is what a combinatorial automorphism does; a
+            permutation that does not is refused here rather than sent to a
+            chosen face.
+            """
+            ranks = self._engine_face_rank_by_vertex_indices()
+            images = []
+            for vertices in self._engine_face_vertex_indices():
+                image = frozenset(vertex_permutation[index] for index in vertices)
+                assert image in ranks, (
+                    f"the vertex permutation {vertex_permutation} carries the face on the vertices "
+                    f"{tuple(sorted(vertices))} to the vertices {tuple(sorted(image))}, which span no face of "
+                    f"{self}, so it is not a combinatorial automorphism of this polytope"
+                )
+                images.append(ranks[image])
+            return tuple(images)
+
+        @cached_method
+        def _face_carrier_symmetric_group(self):
+            r"""``Sym`` of the face carrier: the permutations of this polytope's faces."""
+            from sage_extensions.categories.group.groups import SymmetricGroups
+
+            return SymmetricGroups()(self._face_poset_carrier())
+
+        def _face_permutation_of_owned_vertex_permutation(self, element):
+            r"""The faces' permutation induced by an element acting on the owned vertices."""
+            index_of = self.vertices().ranking_map()
+            engine_vertices = self._owned_vertices_in_engine_order()
+            vertex_permutation = tuple(
+                int(index_of(element(vertex))) for vertex in engine_vertices
+            )
+            return self._face_permutation_of_a_vertex_permutation(vertex_permutation)
+
+        @cached_method
+        def _transported_combinatorial_face_permutations(self):
+            r"""The automorphism group of the face poset, acting on its faces.
+
+            This is the group :meth:`abstract_automorphisms` returns: the
+            automorphisms of the finite graded face poset, generated by the
+            images of the combinatorial automorphism group's generators under
+            the transport that carries a permutation of the vertices to the
+            permutation of the faces it induces.
+            """
+            group = self._face_carrier_symmetric_group()
+            generators = tuple(
+                group(
+                    [
+                        rank + 1
+                        for rank in self._face_permutation_of_a_vertex_permutation(
+                            permutation
+                        )
+                    ]
+                )
+                for permutation in self._combinatorial_vertex_permutations()
+            )
+            return group.subgroup(generators or (group.one(),))
+
+        @cached_method
         def abstract_automorphisms(self):
-            pass
+            r"""The automorphism group of this polytope's face poset, acting on its faces.
 
+            An abstract automorphism of a polytope is an automorphism of its
+            face lattice: a rank-preserving monotone self-isomorphism of the
+            finite graded poset of its faces
+            (``lean-categories/LeanCategories/Orders/FiniteGradedPoset.lean``).
+            The faces are retained as the polytopes they are, and an element of
+            this group applied to a face is that face's image.
+
+            The group is realized in its action on the faces.  Forgetting the
+            rank and the order is a faithful functor from finite graded posets
+            to sets, so a self-isomorphism of the face poset is determined by,
+            and is here retained as, the permutation of the faces it induces;
+            that is the action of the generic ``Aut`` of the graded poset, which
+            has no group realization of its own.
+            """
+            return self.face_poset().abstract_automorphisms()
+
+        @cached_method
         def geometric_automorphisms(self):
-            pass
+            r"""The restricted affine automorphisms of this polytope, acting on its vertices.
 
+            A geometric automorphism of a polytope is an affine automorphism of
+            the ambient space carrying the polytope onto itself.  The group
+            retained here is the restricted one: the subgroup generated by
+            permutations of the V-representation objects of one type, which is
+            how the private engine computes the affine automorphism group of a
+            polytope exactly (Bremner--Dutour Sikiric--Schuermann, AMS/CRM
+            Lecture Notes 48 (2009), 45--71).
+
+            The action is on the vertices, in the polytope's own vertex set.  An
+            affine map carrying a polytope onto itself is determined by its
+            values on the vertices, and the vertices span the polytope, so this
+            action is faithful; a matrix the private engine may also return for
+            a polytope of lower dimension than its ambient space acts as the
+            identity on a chosen complement, and that choice is not part of what
+            this group states.
+            """
+            from sage_extensions.categories.group.groups import SymmetricGroups
+
+            group = SymmetricGroups()(self.vertices())
+            ranks = self._engine_vertex_rank_in_vertices()
+            engine_index = [0] * len(ranks)
+            for index, rank in enumerate(ranks):
+                engine_index[rank] = index
+            generators = tuple(
+                group(
+                    [
+                        ranks[permutation[engine_index[rank]]] + 1
+                        for rank in range(len(ranks))
+                    ]
+                )
+                for permutation in self._restricted_vertex_permutations()
+            )
+            return group.subgroup(generators or (group.one(),))
+
+        @cached_method
         def geometric_to_abstract_automorphisms(self):
-            pass
+            r"""The group map from the geometric to the abstract automorphisms.
+
+            A geometric automorphism of this polytope is an affine automorphism
+            of the ambient space carrying it onto itself, and it carries faces
+            to faces: the image of the convex hull of a set of vertices is the
+            convex hull of the images of those vertices, and an affine
+            automorphism of the polytope permutes its vertices.  That induced
+            permutation of the faces preserves the rank and the incidence of the
+            face poset, so it is an abstract automorphism, and the assignment is
+            a homomorphism because composing two affine maps composes the
+            permutations they induce.
+
+            The map is an owned group morphism between the two owned groups, and
+            its values on the source's generators are checked to satisfy the
+            source's relations, so a group whose induced permutations do not
+            satisfy them is refused here rather than represented.
+            """
+            from sage_extensions.categories.group.groups import OwnedGroups
+
+            geometric = self.geometric_automorphisms()
+            abstract = self.abstract_automorphisms()
+            carrier = self._face_carrier_symmetric_group()
+            return OwnedGroups().Mor(geometric, abstract)(
+                {
+                    generator: abstract(
+                        carrier(
+                            [
+                                rank + 1
+                                for rank in self._face_permutation_of_owned_vertex_permutation(
+                                    generator
+                                )
+                            ]
+                        )
+                    )
+                    for generator in geometric.selected_subgroup_generators()
+                },
+                check=True,
+            )
 
         def geometric_lifts_of_face_automorphism(self, face_automorphism):
             pass
