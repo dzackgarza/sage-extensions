@@ -1,0 +1,34 @@
+evidence: the cusp rows' ingress before and after, at 100 to 100000 planes
+
+`results/issue598-the-cusp-rows-ingress-is-linear.md` is the report:
+what the literal ingress costs a cusp row, the linear form and how it differs
+from the one `tits_building_incidence` uses, the element-by-element comparison of
+the two admissions over one list of 100 plane cusps of `Otilde(T_Co)`, the curve
+at 1 000 / 10 000 / 100 000 planes, and why a red test for the timing cannot fit
+the call ceiling.
+
+`.tmp/issue598-ingress/` holds every probe, launcher and log.  The numbers on
+this host (adopted runtime Sage 11.0.beta5, port `991b88b0`):
+
+- one list of 100 plane cusps, both admissions: 249.986 s against under a
+  millisecond, with the two rows the same point by point, the same spans, the
+  same inverse `0..99`, and 100 distinct spans among the 100 cusps;
+- 1 000 / 10 000 / 100 000 planes: 1.77 / 2.11 / 2.11 us a plane at admission on
+  a flat per-plane build (6.86 / 6.47 / 6.79 ms);
+- 527 line cusps of the same subgroup: 245.2 s of walk, the old ingress 11.1--12.0
+  ms a pair on top of it;
+- the rows of four small lattices, 16 rows over {O(L), Otilde(L)} x {rank 1,
+  rank 2}, identical counts before and after; and the same speculation that the
+  row is not a sequence across processes -- two runs of one tree differ in the
+  order of the orbits and in which representative each retains -- which is why
+  the element-by-element comparison is made on one list in one process.
+
+`tests/lattices/test_scattone_plane_orbits.sage` measured 85.37, 32.22 and 26.72
+s for three of its five tests against the 20 s ceiling on the parent tree, which
+is recorded because it is pre-existing and because it rules those lattices out as
+specimens for a new gate test.
+
+Not measured: the row's own 189720 planes (the transversal plus 1288 s of planes
+plus the admission is 25 minutes, and the build was measured to 100000); the
+line row's full admission, which was not run because 139351 pairs at 11.4 ms is
+26 minutes on top of the 245 s walk.

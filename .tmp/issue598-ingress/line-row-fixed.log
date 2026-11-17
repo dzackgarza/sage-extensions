@@ -1,0 +1,27 @@
+# tree: 61b3fa157046d96f00630015e8165ebfa5a89574
+# status:  M src/sage_extensions/categories/group/predicate_subgroups.py  M src/sage_extensions/categories/lattice_morphisms.py  M src/sage_extensions/categories/sets/finite_ordered_sets.py 
+# port: 991b88b095a42a1e3679569ea42328c900c120f6
+# load: 1.62 1.72 1.89
+# program: .tmp/issue598-ingress/probe-line-row.py PROBE_PLANES=unset PROBE_BAND=unset PYTHONHASHSEED=0
+[     0.9 s rss   279.5 MiB] Otilde(T_Co)
+[   246.1 s rss  1085.1 MiB] cusps(1) = 527 in 245.242 s
+[   246.1 s rss  1085.1 MiB] the row read out: 527 cusps
+[   246.1 s rss  1085.1 MiB] one inequality question between two line cusps: 9.699 ms, equal=False
+[   248.4 s rss  1085.9 MiB] the literal ingress over 20 cusps: 2.282 s  (12008.2 us a comparison), 20 distinct
+[   257.3 s rss  1086.5 MiB] the literal ingress over 40 cusps: 8.946 s  (11468.8 us a comparison), 40 distinct
+[   292.5 s rss  1088.5 MiB] the literal ingress over 80 cusps: 35.177 s  (11132.0 us a comparison), 80 distinct
+[   292.5 s rss  1088.5 MiB] done
+[peakrss] line-row-fixed: child waited=0 shell_code=0 samples=149
+[peakrss] peak tree RSS      : 1092 MiB
+[peakrss] low-water MemAvail : 12790 MiB
+[peakrss] peak single VmHWM  : 1092 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     1089 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   run.sh                        2 MiB peak
+[peakrss]   t=   294.1s procs=  2 rss=  1092 MiB hwm=  1092 MiB avail= 12938 MiB
+[peakrss]   t=   296.1s procs=  2 rss=  1092 MiB hwm=  1092 MiB avail= 12938 MiB
+[peakrss]   t=   282.1s procs=  2 rss=  1091 MiB hwm=  1091 MiB avail= 12938 MiB
+[peakrss]   t=   284.1s procs=  2 rss=  1091 MiB hwm=  1091 MiB avail= 12938 MiB
+[peakrss]   t=   286.1s procs=  2 rss=  1091 MiB hwm=  1091 MiB avail= 12938 MiB
+# launcher exit: 0

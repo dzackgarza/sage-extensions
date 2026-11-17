@@ -1,0 +1,24 @@
+# tree: 61b3fa157046d96f00630015e8165ebfa5a89574
+# status: 
+# port: 991b88b095a42a1e3679569ea42328c900c120f6
+# load: 0.70 0.32 0.63
+# program: .tmp/issue598-ingress/probe-candidates.py PROBE_PLANES=unset PROBE_BAND=unset PYTHONHASHSEED=0
+[     0.8 s rss   270.3 MiB] --- 6JRS = U+U+<-2>: rank 5
+[     0.9 s rss   278.7 MiB]     the full orthogonal group of 6JRS = U+U+<-2>
+[     1.3 s rss   413.9 MiB]     cusps(1) = 1 in 0.384 s
+[     3.0 s rss   464.0 MiB]     cusps(2) = 1 in 1.756 s
+[     3.0 s rss   464.1 MiB] --- U+U(2)+<-2>: rank 5
+[     3.0 s rss   464.3 MiB]     the full orthogonal group of U+U(2)+<-2>
+[    11.1 s rss   505.2 MiB]     cusps(1) = 3 in 8.018 s
+[    11.1 s rss   505.2 MiB]     one equality question between two rank-1 cusps: 3.031 ms, equal=False
+[    11.8 s rss   508.1 MiB]     cusps(2) = 2 in 0.780 s
+[    11.8 s rss   508.1 MiB]     one equality question between two rank-2 cusps: 7.975 ms, equal=False
+[    11.9 s rss   508.1 MiB] --- U+U(2)+<-4>: rank 5
+[    11.9 s rss   508.1 MiB]     the full orthogonal group of U+U(2)+<-4>
+[    20.3 s rss   548.6 MiB]     cusps(1) = 4 in 8.449 s
+[    20.3 s rss   548.6 MiB]     one equality question between two rank-1 cusps: 3.391 ms, equal=False
+[    20.9 s rss   551.3 MiB]     cusps(2) = 3 in 0.570 s
+[    20.9 s rss   551.3 MiB]     one equality question between two rank-2 cusps: 8.710 ms, equal=False
+[    20.9 s rss   551.3 MiB] --- TEn = U+E8(-2): rank 12
+[    20.9 s rss   551.8 MiB]     the full orthogonal group of TEn = U+E8(-2)
+# launcher exit: 124

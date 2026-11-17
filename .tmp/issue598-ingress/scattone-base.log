@@ -1,0 +1,41 @@
+# tree: dc0d4d8c787111a60c790ed1dc94340029caaed1
+# status: ?? .timings/ ?? .tmp/ ?? src/sage_extensions/__pycache__/ ?? src/sage_extensions/categories/__pycache__/ ?? src/sage_extensions/categories/abstract_categories/__pycache__/ ?? src/sage_extensions/categories/algebras/__pycache__/ ?? src/sage_extensions/categories/divisors/__pycache__/ ?? src/sage_extensions/categories/forms/__pycache__/ ?? src/sage_extensions/categories/functions/__pycache__/ ?? src/sage_extensions/categories/functors/__pycache__/ ?? src/sage_extensions/categories/group/__pycache__/ ?? src/sage_extensions/categories/group/profinite/__pycache__/ ?? src/sage_extensions/categories/modules/__pycache__/ ?? src/sage_extensions/categories/modules/framed/__pycache__/ ?? src/sage_extensions/categories/modules/framed/finitely_generated/__pycache__/ ?? src/sage_extensions/categories/modules/framed/formed/__pycache__/ ?? src/sage_extensions/categories/modules/group_modules/__pycache__/ ?? src/sage_extensions/categories/modules/module_morphisms/__pycache__/ ?? src/sage_extensions/categories/modules/pure/__pycache__/ ?? src/sage_extensions/categories/modules/pure/finitely_generated/__pycache__/ ?? src/sage_extensions/categories/rings/__pycache__/ ?? src/sage_extensions/categories/schemes/__pycache__/ ?? src/sage_extensions/categories/schemes/toric/__pycache__/ ?? src/sage_extensions/categories/sets/__pycache__/ ?? src/sage_extensions/categories/sets/enumerated/__pycache__/ ?? src/sage_extensions/groups/__pycache__/ ?? src/sage_extensions/lexicon/__pycache__/ ?? src/sage_extensions/rings/__pycache__/ ?? src/sage_extensions/schemes/__pycache__/ ?? src/sage_extensions/static_types/__pycache__/ ?? src/sage_extensions/tensors/__pycache__/ 
+# port: 991b88b095a42a1e3679569ea42328c900c120f6
+# load: 0.30 1.37 1.82
+# program: .tmp/issue598-ingress/probe-scattone-cusps.py PROBE_PLANES=unset PROBE_BAND=unset PYTHONHASHSEED=0
+[      0.9 s rss    272.8 MiB] --- 6JRX: rank 21, the card's O plane row
+[     88.7 s rss    699.8 MiB]     isotropic_orbit_representatives(2) = 4 in 87.865 s
+[     99.8 s rss    703.8 MiB]     cusps(2) = 4 in 11.039 s  (the admission: -76.826 s)
+[     99.8 s rss    703.8 MiB]     one inequality question: 14.409 ms, equal=False; the ingress's 6 of them: 0.1 s
+[     99.8 s rss    703.8 MiB]     cusp 0: rank 2 primitive True isotropic True in its cusp True at 0
+[     99.8 s rss    703.8 MiB]     cusp 1: rank 2 primitive True isotropic True in its cusp True at 1
+[     99.8 s rss    703.8 MiB]     cusp 2: rank 2 primitive True isotropic True in its cusp True at 2
+[     99.8 s rss    703.8 MiB]     cusp 3: rank 2 primitive True isotropic True in its cusp True at 3
+[     99.8 s rss    703.8 MiB] --- 6JRY: rank 21, the card's O plane row
+[    133.3 s rss    826.6 MiB]     isotropic_orbit_representatives(2) = 9 in 33.531 s
+[    160.0 s rss    831.4 MiB]     cusps(2) = 9 in 26.635 s  (the admission: -6.896 s)
+[    160.0 s rss    831.4 MiB]     one inequality question: 14.025 ms, equal=False; the ingress's 36 of them: 0.5 s
+[    160.0 s rss    831.4 MiB]     cusp 0: rank 2 primitive True isotropic True in its cusp True at 0
+[    160.0 s rss    831.4 MiB]     cusp 1: rank 2 primitive True isotropic True in its cusp True at 1
+[    160.0 s rss    831.4 MiB]     cusp 2: rank 2 primitive True isotropic True in its cusp True at 2
+[    160.0 s rss    831.4 MiB]     cusp 3: rank 2 primitive True isotropic True in its cusp True at 3
+[    160.0 s rss    831.4 MiB]     cusp 4: rank 2 primitive True isotropic True in its cusp True at 4
+[    160.0 s rss    831.4 MiB]     cusp 5: rank 2 primitive True isotropic True in its cusp True at 5
+[    160.0 s rss    831.4 MiB]     cusp 6: rank 2 primitive True isotropic True in its cusp True at 6
+[    160.0 s rss    831.4 MiB]     cusp 7: rank 2 primitive True isotropic True in its cusp True at 7
+[    160.0 s rss    831.4 MiB]     cusp 8: rank 2 primitive True isotropic True in its cusp True at 8
+[    160.0 s rss    831.4 MiB] done
+[peakrss] scattone-base: child waited=0 shell_code=0 samples=81
+[peakrss] peak tree RSS      : 834 MiB
+[peakrss] low-water MemAvail : 9255 MiB
+[peakrss] peak single VmHWM  : 834 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      831 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   run.sh                        1 MiB peak
+[peakrss]   t=   140.1s procs=  2 rss=   834 MiB hwm=   834 MiB avail= 10564 MiB
+[peakrss]   t=   142.1s procs=  2 rss=   834 MiB hwm=   834 MiB avail=  9562 MiB
+[peakrss]   t=   144.1s procs=  2 rss=   834 MiB hwm=   834 MiB avail=  9559 MiB
+[peakrss]   t=   146.1s procs=  2 rss=   834 MiB hwm=   834 MiB avail=  9564 MiB
+[peakrss]   t=   148.1s procs=  2 rss=   834 MiB hwm=   834 MiB avail=  9461 MiB
+# launcher exit: 0

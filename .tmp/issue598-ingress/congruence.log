@@ -1,0 +1,51 @@
+# tree: 61b3fa157046d96f00630015e8165ebfa5a89574
+# status: 
+# port: 991b88b095a42a1e3679569ea42328c900c120f6
+# load: 0.59 0.76 0.76
+# program: .tmp/issue598-ingress/probe-congruence.py PROBE_PLANES=unset PROBE_BAND=unset PYTHONHASHSEED=0
+[     0.9 s rss   271.6 MiB] --- 2U, Gamma(3)
+[     2.4 s rss   451.4 MiB]     the congruence subgroup
+Traceback (most recent call last):
+  File "sage/misc/cachefunc.pyx", line 1965, in sage.misc.cachefunc.CachedMethodCaller.__call__
+    return cache[k]
+KeyError: ((1,), ())
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/repos/sage-extensions/.tmp/issue598-ingress/probe-congruence.py", line 39, in <module>
+    row = gamma.cusps(rank)
+  File "sage/misc/cachefunc.pyx", line 1970, in sage.misc.cachefunc.CachedMethodCaller.__call__
+    w = self._instance_call(*args, **kwds)
+  File "sage/misc/cachefunc.pyx", line 1848, in sage.misc.cachefunc.CachedMethodCaller._instance_call
+    return self.f(self._instance, *args, **kwds)
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 770, in cusps
+    tuple(
+    ^^^^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 772, in <genexpr>
+    for representative in _yield_subgroup_isotropic_orbit_representatives(
+                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self, rank
+        ^^^^^^^^^^
+    )
+    ^
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 4159, in _yield_subgroup_isotropic_orbit_representatives
+    _assert_isotropic_splitting_has_character_data(subgroup)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3286, in _assert_isotropic_splitting_has_character_data
+    assert subgroup.contains_character_kernel(), (
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+AssertionError: {g in Orthogonal group O(Integral lattice of rank 4 and signature (2, 2)) : Generic morphism:
+  From: Orthogonal group O(Integral lattice of rank 4 and signature (2, 2))
+  To:   Subgroup of Aut_Category of modules over Integer Ring / Ideal (3) of Integer Ring(Lattice of rank 4 over Integer Ring / Ideal (3) of Integer Ring)(g) lies in a subgroup given by its own generators} is cut out by a predicate that is not a character kernel, so no finite character quotient describes it, and the subgroup itself cannot be listed instead: that listing is finite only for a definite lattice, which has no isotropic vector.  Over an indefinite lattice L, O(L) is an infinite arithmetic group and no generating set of this subgroup is known.  The missing operation is a generating set for an arithmetic subgroup of O(L), which belongs in lattice_engines.py
+[peakrss] congruence: child waited=1 shell_code=1 samples=2
+[peakrss] peak tree RSS      : 417 MiB
+[peakrss] low-water MemAvail : 13312 MiB
+[peakrss] peak single VmHWM  : 417 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      414 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   run.sh                        1 MiB peak
+[peakrss]   t=     2.0s procs=  2 rss=   417 MiB hwm=   417 MiB avail= 13312 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     1 MiB hwm=     1 MiB avail= 13622 MiB
+# launcher exit: 1

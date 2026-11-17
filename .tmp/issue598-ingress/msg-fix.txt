@@ -1,0 +1,53 @@
+fix: a cusp row is admitted as its orbits, not by comparing them
+
+Both rows over cusps ended in the literal ingress, which identifies repeated
+points through a table of them; a cusp's hash is constant over its universe --
+two cusps of one orbit need not share a span, so a cusp has no cheap canonical
+key -- so every cusp of the row was compared with every other, and each
+comparison is a transporter question through the divided-class invariant.  The
+arithmetic subgroup's row and the full orthogonal group's row are the two sites,
+the second over its own cusp engine, which has the same constant hash and whose
+equality is a port transporter search.
+
+The linear form is the one `tits_building_incidence` already used three hundred
+lines below: supply `from_indexed`'s inverse and skip the dedup, which also skips
+the second table the construction builds for itself.  It is named once, at the
+owner of the ingress, as `_distinct_finite_ordered_set`, whose docstring states
+the caller's obligation -- two equal points leave the enumeration
+non-injective.  The cusps' own equality still answers for a candidate that is
+not one of the retained objects, so membership and ranking off the image are
+what they were; that question is asked when it is put, not once per pair while
+the row is built.
+
+Measured on `Otilde(T_Co)` (`T_Co = <2> + U(2) + E8(-2)`, adopted runtime, port
+`991b88b0`):
+
+- 100 plane cusps: the old ingress 249.986 s, the repaired admission under a
+  millisecond.  Element by element the two rows are one row: 100 of 100 points
+  retained in their own positions, no position whose span differs, the inverse
+  `0..99` on both, a cusp rebuilt from a member's span placed at 0 by both and a
+  cusp of the subgroup's other rank by neither, and 100 distinct spans among the
+  100 cusps -- so the dedup never dropped a point.
+- 1 000 / 10 000 / 100 000 planes: 1.77 / 2.11 / 2.11 us a plane at admission,
+  against a per-plane build of 6.86 / 6.47 / 6.79 ms (first band against last
+  7.71 -> 6.25, 6.78 -> 6.28, 6.37 -> 6.25) and a row built in 206.3 / 277.5 /
+  886.2 s.  Flat to 5% over a factor of 100 in the row's length.  At the row's
+  own 189720 planes that is 1288 s of planes, a 207 s transversal and 0.40 s of
+  admission, 25 minutes, where the ingress alone was 14.4 years a pass.
+- 527 line cusps of the same subgroup: 245.2 s of walk, and the old ingress's
+  11.1-12.0 ms a pair was about 1600 s on top of it.
+
+The row's contents do not change: the walk yields one representative per orbit,
+so the table could only ever answer "not equal", and the new test asserts that
+pairwise distinctness as the obligation the admission now carries.  A red test
+for the timing is not possible inside the call ceiling and is argued, with these
+measurements, in `results/issue598-the-cusp-rows-ingress-is-linear.md`.
+
+Runs: the new test file 5 passed in 21.32 s; its consumers
+`test_a_cusp_names_its_plane_by_span.sage`,
+`test_the_coble_incidence_vertices_are_its_cusp_representatives.sage`,
+`test_the_incidence_line_vertex_is_the_cusp_of_its_line.sage`,
+`test_the_lift_registry_carries_the_finite_element.sage` and
+`tests/groups/test_a_subgroup_built_from_a_subgroup_states_its_description.sage`
+29 passed in 46.68 s, slowest call 11.90 s.  Not run: the whole suite, the
+remaining incidence files, and the ast-grep gates, which are not installed here.

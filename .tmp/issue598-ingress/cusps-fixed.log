@@ -1,0 +1,46 @@
+# tree: 61b3fa157046d96f00630015e8165ebfa5a89574
+# status:  M src/sage_extensions/categories/group/predicate_subgroups.py  M src/sage_extensions/categories/lattice_morphisms.py  M src/sage_extensions/categories/sets/finite_ordered_sets.py ?? tests/lattices/test_a_cusp_row_admits_its_orbits.sage 
+# port: 991b88b095a42a1e3679569ea42328c900c120f6
+# load: 0.56 1.09 1.55
+# pytest: tests/lattices/test_a_cusp_row_admits_its_orbits.sage tests/lattices/test_a_cusp_names_its_plane_by_span.sage tests/lattices/test_the_coble_incidence_vertices_are_its_cusp_representatives.sage tests/lattices/test_the_incidence_line_vertex_is_the_cusp_of_its_line.sage tests/lattices/test_the_lift_registry_carries_the_finite_element.sage tests/groups/test_a_subgroup_built_from_a_subgroup_states_its_description.sage --durations=0 -q
+.............................                                            [100%]
+============================== slowest durations ===============================
+11.90s call     tests/lattices/test_the_incidence_line_vertex_is_the_cusp_of_its_line.sage::test_a_kernel_row_incidence_names_its_line_and_plane_vertices
+9.27s call     tests/lattices/test_a_cusp_row_admits_its_orbits.sage::test_the_cusps_of_the_next_lattice_of_the_family_are_distinct_orbits
+9.04s call     tests/lattices/test_a_cusp_row_admits_its_orbits.sage::test_the_plane_cusps_of_a_kernel_row_are_distinct_orbits
+3.49s call     tests/lattices/test_the_coble_incidence_vertices_are_its_cusp_representatives.sage::test_the_kernel_incidence_vertices_of_u_u_m4_are_its_cusp_rows
+3.25s call     tests/lattices/test_a_cusp_names_its_plane_by_span.sage::test_each_incidence_certificate_carries_its_terms_to_its_cusps
+3.07s call     tests/lattices/test_the_coble_incidence_vertices_are_its_cusp_representatives.sage::test_the_kernel_incidence_vertices_of_6jrs_are_its_cusp_rows
+1.47s call     tests/lattices/test_the_lift_registry_carries_the_finite_element.sage::test_the_otilde_plus_row_registers_the_finite_element_beside_the_lift
+1.33s call     tests/lattices/test_the_coble_incidence_vertices_are_its_cusp_representatives.sage::test_the_plus_kernel_incidence_vertices_of_6jrs_are_its_cusp_rows
+1.18s call     tests/lattices/test_the_coble_incidence_vertices_are_its_cusp_representatives.sage::test_the_plus_kernel_incidence_vertices_of_u_u_m4_are_its_cusp_rows
+0.66s call     tests/lattices/test_a_cusp_row_admits_its_orbits.sage::test_an_empty_plane_row_is_admitted_with_no_points
+0.45s call     tests/lattices/test_the_coble_incidence_vertices_are_its_cusp_representatives.sage::test_the_sign_kernel_incidence_of_6jrs_is_its_cusp_rows
+0.36s call     tests/lattices/test_a_cusp_row_admits_its_orbits.sage::test_the_line_cusps_of_a_kernel_row_are_distinct_orbits
+0.12s call     tests/groups/test_a_subgroup_built_from_a_subgroup_states_its_description.sage::test_a_projected_discriminant_image_names_the_intersection_it_projects_by_its_description
+0.08s call     tests/lattices/test_a_cusp_names_its_plane_by_span.sage::test_a_cusp_of_a_null_plane_builds_its_plane_from_its_span
+0.07s call     tests/groups/test_a_subgroup_built_from_a_subgroup_states_its_description.sage::test_a_discriminant_image_is_named_by_the_subgroup_it_is_the_image_of
+0.07s call     tests/groups/test_a_subgroup_built_from_a_subgroup_states_its_description.sage::test_a_restricted_character_intersection_forms_no_sentence_about_the_character_subgroup
+0.06s call     tests/groups/test_a_subgroup_built_from_a_subgroup_states_its_description.sage::test_a_cusp_stabilizer_names_the_subobject_it_fixes
+0.06s call     tests/lattices/test_the_lift_registry_carries_the_finite_element.sage::test_the_otilde_row_registers_the_finite_element_beside_the_lift
+0.01s call     tests/groups/test_a_subgroup_built_from_a_subgroup_states_its_description.sage::test_a_flag_stabilizer_names_the_flag_it_preserves
+0.01s call     tests/groups/test_a_subgroup_built_from_a_subgroup_states_its_description.sage::test_a_normalizer_names_the_subgroup_it_normalizes_by_that_subgroups_description
+0.01s call     tests/groups/test_a_subgroup_built_from_a_subgroup_states_its_description.sage::test_a_conjugate_names_the_subgroup_it_conjugates_by_that_subgroups_description
+0.01s call     tests/groups/test_a_subgroup_built_from_a_subgroup_states_its_description.sage::test_an_image_names_the_subgroup_it_is_the_image_of_by_its_description
+
+(65 durations < 0.005s hidden.  Use -vv to show these durations.)
+29 passed in 46.68s
+[peakrss] cusps-fixed: child waited=0 shell_code=0 samples=27
+[peakrss] peak tree RSS      : 733 MiB
+[peakrss] low-water MemAvail : 13130 MiB
+[peakrss] peak single VmHWM  : 733 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      730 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   run.sh                        1 MiB peak
+[peakrss]   t=    50.0s procs=  2 rss=   733 MiB hwm=   733 MiB avail= 13130 MiB
+[peakrss]   t=    52.0s procs=  2 rss=   733 MiB hwm=   733 MiB avail= 13130 MiB
+[peakrss]   t=    48.0s procs=  2 rss=   724 MiB hwm=   724 MiB avail= 13130 MiB
+[peakrss]   t=    44.0s procs=  2 rss=   719 MiB hwm=   719 MiB avail= 13138 MiB
+[peakrss]   t=    46.0s procs=  2 rss=   719 MiB hwm=   719 MiB avail= 13138 MiB
+# launcher exit: 0

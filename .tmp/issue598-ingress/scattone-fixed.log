@@ -1,0 +1,33 @@
+# tree: 61b3fa157046d96f00630015e8165ebfa5a89574
+# status:  M src/sage_extensions/categories/group/predicate_subgroups.py  M src/sage_extensions/categories/lattice_morphisms.py  M src/sage_extensions/categories/sets/finite_ordered_sets.py ?? tests/lattices/test_a_cusp_row_admits_its_orbits.sage 
+# port: 991b88b095a42a1e3679569ea42328c900c120f6
+# load: 0.68 1.04 1.51
+# pytest: tests/lattices/test_scattone_plane_orbits.sage --durations=0 -q
+.....                                                                    [100%]
+========================== test-call performance gate ==========================
+tests/lattices/test_scattone_plane_orbits.sage::test_6jrx_has_the_cards_plane_orbits_under_o: 85.37 s > 20 s
+tests/lattices/test_scattone_plane_orbits.sage::test_6jry_has_the_cards_plane_orbits_under_o: 32.22 s > 20 s
+tests/lattices/test_scattone_plane_orbits.sage::test_6jry_has_the_cards_plane_orbits_under_o_plus: 26.72 s > 20 s
+============================== slowest durations ===============================
+85.37s call     tests/lattices/test_scattone_plane_orbits.sage::test_6jrx_has_the_cards_plane_orbits_under_o
+32.22s call     tests/lattices/test_scattone_plane_orbits.sage::test_6jry_has_the_cards_plane_orbits_under_o
+26.72s call     tests/lattices/test_scattone_plane_orbits.sage::test_6jry_has_the_cards_plane_orbits_under_o_plus
+11.67s call     tests/lattices/test_scattone_plane_orbits.sage::test_6jrx_has_the_cards_plane_orbits_under_o_plus
+0.07s call     tests/lattices/test_scattone_plane_orbits.sage::test_the_card_inputs_are_the_published_rank_21_lattices
+
+(10 durations < 0.005s hidden.  Use -vv to show these durations.)
+5 passed in 156.61s (0:02:36)
+[peakrss] scattone-fixed: child waited=1 shell_code=1 samples=80
+[peakrss] peak tree RSS      : 901 MiB
+[peakrss] low-water MemAvail : 13000 MiB
+[peakrss] peak single VmHWM  : 901 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      898 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   run.sh                        2 MiB peak
+[peakrss]   t=   158.1s procs=  2 rss=   901 MiB hwm=   901 MiB avail= 13000 MiB
+[peakrss]   t=   156.1s procs=  2 rss=   894 MiB hwm=   894 MiB avail= 13008 MiB
+[peakrss]   t=   142.1s procs=  2 rss=   893 MiB hwm=   893 MiB avail= 13008 MiB
+[peakrss]   t=   144.1s procs=  2 rss=   893 MiB hwm=   893 MiB avail= 13008 MiB
+[peakrss]   t=   146.1s procs=  2 rss=   893 MiB hwm=   893 MiB avail= 13008 MiB
+# launcher exit: 1

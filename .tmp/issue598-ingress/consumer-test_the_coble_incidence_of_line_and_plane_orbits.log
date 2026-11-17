@@ -1,0 +1,5 @@
+# tree: 61b3fa157046d96f00630015e8165ebfa5a89574
+# status:  M src/sage_extensions/categories/group/predicate_subgroups.py  M src/sage_extensions/categories/lattice_morphisms.py  M src/sage_extensions/categories/sets/finite_ordered_sets.py ?? tests/lattices/test_a_cusp_row_admits_its_orbits.sage 
+# port: 991b88b095a42a1e3679569ea42328c900c120f6
+# load: 0.85 0.97 1.11
+# pytest: tests/lattices/test_the_coble_incidence_of_line_and_plane_orbits.sage --durations=0 -q

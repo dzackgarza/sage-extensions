@@ -1,0 +1,32 @@
+test: a cusp row is its orbits, admitted as the walk draws them
+
+`cusps` yields one representative per orbit, so its row holds distinct orbits
+and its enumeration needs no table of its points: the row is admitted as it is
+produced, its inverse is the cusps' own identity, and the cusps' equality
+answers for a candidate that is not one of them.  This gates the two statements
+that admission rests on, on the four specimens a test call can afford: the
+kernel plane and line rows of `U + U(2) + <-2>` (two and three cusps) and of
+`U + U(2) + <-4>` (three and four), the full orthogonal group's line row of the
+second lattice (two), and `E10`'s empty kernel plane row.
+
+The pairwise distinctness is the obligation the admission takes on: it no longer
+identifies a repetition, so a walk that yielded one orbit twice would leave it
+standing in the row twice, and that is what this asserts absent, one question a
+pair.  The rest is the inverse: each cusp answers its own position, is admitted
+by the row, and names a primitive totally isotropic rank-`rank` sublattice whose
+own membership in the cusp holds.
+
+Inert for the timing defect that row's ingress carries, said here rather than
+manufactured red.  A test that failed without the repair would have to be red by
+time on a row where the ingress dominates the build, and such a row is at least
+29 plane cusps against the 20 s ceiling and 49 against the 60 s hang bound, at
+50.6 ms a pair, while the rows a test call can afford are 1-9 cusps whose
+ingress is 0.1-0.5 s of a 33-88 s build; a red by counting is not available
+either, the test lint banning mocks, `id`, and the bypass constructors, which is
+where the ingress lives.  The measurements are in
+`results/issue598-the-cusp-rows-ingress-is-linear.md`.
+
+Runs: this file on the repaired tree, 5 passed in 21.32 s, slowest call 10.64 s
+(the kernel plane row of `U + U(2) + <-2>`, which is the subgroup construction);
+on the parent `61b3fa1`, 5 passed in 20.49 s -- so the file does not see the
+defect, it sees the contract.

@@ -1,0 +1,8 @@
+# tree: 61b3fa157046d96f00630015e8165ebfa5a89574
+# status: 
+# port: 991b88b095a42a1e3679569ea42328c900c120f6
+# load: 0.36 0.69 0.73
+# program: .tmp/issue598-ingress/probe-family.py PROBE_PLANES=unset PROBE_BAND=unset PYTHONHASHSEED=0
+[     0.9 s rss   291.7 MiB] --- <2> + U(2) + E7(-2): rank 10, |A_L| = 2048
+[     1.0 s rss   292.9 MiB]     the stable orthogonal group
+# launcher exit: 124

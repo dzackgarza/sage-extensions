@@ -1,0 +1,64 @@
+# tree: 61b3fa157046d96f00630015e8165ebfa5a89574
+# status:  M src/sage_extensions/categories/group/predicate_subgroups.py  M src/sage_extensions/categories/lattice_morphisms.py  M src/sage_extensions/categories/sets/finite_ordered_sets.py 
+# port: 991b88b095a42a1e3679569ea42328c900c120f6
+# load: 1.66 2.10 1.89
+# program: .tmp/issue598-ingress/probe-ingress-growth.py PROBE_PLANES=100000 PROBE_BAND=10000 PYTHONHASHSEED=0
+[      3.6 s rss    305.9 MiB] T_Co rank 11, Otilde(T_Co), 112 parabolic generators
+[    217.4 s rss   1267.6 MiB] the split's first lift (the finite image's whole coset walk) 207.4 s
+[    217.4 s rss   1267.6 MiB] the source plane's own cusp 1.532 ms
+[    217.5 s rss   1267.6 MiB] plane 2/100000
+[    217.5 s rss   1267.6 MiB] plane 3/100000
+[    281.2 s rss   1431.5 MiB] plane 10000/100000
+[    343.7 s rss   1587.6 MiB] plane 20000/100000
+[    412.1 s rss   1762.8 MiB] plane 30000/100000
+[    484.3 s rss   1909.7 MiB] plane 40000/100000
+[    553.5 s rss   2076.6 MiB] plane 50000/100000
+[    630.2 s rss   2237.2 MiB] plane 60000/100000
+[    699.9 s rss   2423.8 MiB] plane 70000/100000
+[    766.8 s rss   2575.3 MiB] plane 80000/100000
+[    833.9 s rss   2733.6 MiB] plane 90000/100000
+[    896.4 s rss   2921.7 MiB] plane 100000/100000
+[    896.4 s rss   2921.7 MiB] the row's 100000 planes, shape cusps
+
+[per-plane stages]
+  the split's walk         first   10000:     0.887 ms a plane   last   10000:     0.944 ms a plane   all:     1.000 ms
+  transport and lift reg   first   10000:     4.484 ms a plane   last   10000:     4.238 ms a plane   all:     4.683 ms
+  the cusp (span key)      first   10000:     0.705 ms a plane   last   10000:     0.696 ms a plane   all:     0.710 ms
+  the finite action        first   10000:     0.297 ms a plane   last   10000:     0.369 ms a plane   all:     0.394 ms
+  the plane, all stages    first   10000:     6.373 ms a plane   last   10000:     6.247 ms a plane   all:     6.787 ms
+[    896.4 s rss   2925.7 MiB] the row built: 886.2 s (8862 us a plane, the walk included)
+
+[the admission the row ends with: _distinct_finite_ordered_set]
+[    896.6 s rss   2948.8 MiB] admitted 100000 cusps in 0.211 s  (2.11 us a plane)
+Traceback (most recent call last):
+  File "sage/structure/category_object.pyx", line 858, in sage.structure.category_object.CategoryObject.getattr_from_category
+    return self._cached_methods[name]
+KeyError: 'index_of'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/repos/sage-extensions/.tmp/issue598-ingress/probe-ingress-growth.py", line 125, in <module>
+    positions = [admitted.index_of(cusp) for cusp in row]
+                 ^^^^^^^^^^^^^^^^^
+  File "sage/structure/category_object.pyx", line 852, in sage.structure.category_object.CategoryObject.__getattr__
+    return self.getattr_from_category(name)
+  File "sage/structure/category_object.pyx", line 867, in sage.structure.category_object.CategoryObject.getattr_from_category
+    attr = getattr_from_other_class(self, cls, name)
+  File "sage/cpython/getattr.pyx", line 362, in sage.cpython.getattr.getattr_from_other_class
+    raise AttributeError(dummy_error_message)
+AttributeError: 'FiniteOrderedSets.parent_class' object has no attribute 'index_of'. Did you mean: 'index_set'?
+[peakrss] growth-100000: child waited=1 shell_code=1 samples=461
+[peakrss] peak tree RSS      : 2953 MiB
+[peakrss] low-water MemAvail : 7966 MiB
+[peakrss] peak single VmHWM  : 2974 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     2970 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   run.sh                        2 MiB peak
+[peakrss]   t=   898.5s procs=  2 rss=  2953 MiB hwm=  2974 MiB avail= 11464 MiB
+[peakrss]   t=   900.5s procs=  2 rss=  2953 MiB hwm=  2974 MiB avail= 11464 MiB
+[peakrss]   t=   902.5s procs=  2 rss=  2953 MiB hwm=  2974 MiB avail= 11464 MiB
+[peakrss]   t=   904.5s procs=  2 rss=  2953 MiB hwm=  2974 MiB avail= 11471 MiB
+[peakrss]   t=   906.5s procs=  2 rss=  2953 MiB hwm=  2974 MiB avail= 11478 MiB
+# launcher exit: 1

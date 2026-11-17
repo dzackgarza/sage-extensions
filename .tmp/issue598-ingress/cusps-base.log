@@ -1,0 +1,29 @@
+# tree: dc0d4d8c787111a60c790ed1dc94340029caaed1
+# status: ?? .timings/ ?? .tmp/ ?? src/sage_extensions/__pycache__/ ?? src/sage_extensions/categories/__pycache__/ ?? src/sage_extensions/categories/abstract_categories/__pycache__/ ?? src/sage_extensions/categories/algebras/__pycache__/ ?? src/sage_extensions/categories/divisors/__pycache__/ ?? src/sage_extensions/categories/forms/__pycache__/ ?? src/sage_extensions/categories/functions/__pycache__/ ?? src/sage_extensions/categories/functors/__pycache__/ ?? src/sage_extensions/categories/group/__pycache__/ ?? src/sage_extensions/categories/group/profinite/__pycache__/ ?? src/sage_extensions/categories/modules/__pycache__/ ?? src/sage_extensions/categories/modules/framed/__pycache__/ ?? src/sage_extensions/categories/modules/framed/finitely_generated/__pycache__/ ?? src/sage_extensions/categories/modules/framed/formed/__pycache__/ ?? src/sage_extensions/categories/modules/group_modules/__pycache__/ ?? src/sage_extensions/categories/modules/module_morphisms/__pycache__/ ?? src/sage_extensions/categories/modules/pure/__pycache__/ ?? src/sage_extensions/categories/modules/pure/finitely_generated/__pycache__/ ?? src/sage_extensions/categories/rings/__pycache__/ ?? src/sage_extensions/categories/schemes/__pycache__/ ?? src/sage_extensions/categories/schemes/toric/__pycache__/ ?? src/sage_extensions/categories/sets/__pycache__/ ?? src/sage_extensions/categories/sets/enumerated/__pycache__/ ?? src/sage_extensions/groups/__pycache__/ ?? src/sage_extensions/lexicon/__pycache__/ ?? src/sage_extensions/rings/__pycache__/ ?? src/sage_extensions/schemes/__pycache__/ ?? src/sage_extensions/static_types/__pycache__/ ?? src/sage_extensions/tensors/__pycache__/ ?? tests/ 
+# port: 991b88b095a42a1e3679569ea42328c900c120f6
+# load: 1.01 1.03 1.40
+# pytest: tests/lattices/test_a_cusp_row_admits_its_orbits.sage --durations=0 -q
+.....                                                                    [100%]
+============================== slowest durations ===============================
+9.27s call     tests/lattices/test_a_cusp_row_admits_its_orbits.sage::test_the_plane_cusps_of_a_kernel_row_are_distinct_orbits
+9.15s call     tests/lattices/test_a_cusp_row_admits_its_orbits.sage::test_the_cusps_of_the_next_lattice_of_the_family_are_distinct_orbits
+1.01s call     tests/lattices/test_a_cusp_row_admits_its_orbits.sage::test_an_empty_plane_row_is_admitted_with_no_points
+0.62s call     tests/lattices/test_a_cusp_row_admits_its_orbits.sage::test_the_line_cusps_of_a_kernel_row_are_distinct_orbits
+0.02s call     tests/lattices/test_a_cusp_row_admits_its_orbits.sage::test_the_ambient_line_cusps_of_a_lattice_are_distinct_orbits
+
+(10 durations < 0.005s hidden.  Use -vv to show these durations.)
+5 passed in 20.49s
+[peakrss] cusps-base: child waited=0 shell_code=0 samples=13
+[peakrss] peak tree RSS      : 611 MiB
+[peakrss] low-water MemAvail : 13269 MiB
+[peakrss] peak single VmHWM  : 611 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      608 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   run.sh                        1 MiB peak
+[peakrss]   t=    24.0s procs=  2 rss=   611 MiB hwm=   611 MiB avail= 13269 MiB
+[peakrss]   t=    22.0s procs=  2 rss=   610 MiB hwm=   610 MiB avail= 13269 MiB
+[peakrss]   t=    20.0s procs=  2 rss=   596 MiB hwm=   596 MiB avail= 13285 MiB
+[peakrss]   t=    18.0s procs=  2 rss=   588 MiB hwm=   588 MiB avail= 13293 MiB
+[peakrss]   t=    16.0s procs=  2 rss=   576 MiB hwm=   576 MiB avail= 13302 MiB
+# launcher exit: 0

@@ -1,0 +1,29 @@
+# tree: 61b3fa157046d96f00630015e8165ebfa5a89574
+# status:  M src/sage_extensions/categories/group/predicate_subgroups.py  M src/sage_extensions/categories/lattice_morphisms.py  M src/sage_extensions/categories/sets/finite_ordered_sets.py ?? tests/lattices/test_a_cusp_row_admits_its_orbits.sage 
+# port: 991b88b095a42a1e3679569ea42328c900c120f6
+# load: 0.80 0.98 1.40
+# pytest: tests/lattices/test_a_cusp_row_admits_its_orbits.sage --durations=0 -q
+.....                                                                    [100%]
+============================== slowest durations ===============================
+10.64s call     tests/lattices/test_a_cusp_row_admits_its_orbits.sage::test_the_plane_cusps_of_a_kernel_row_are_distinct_orbits
+9.23s call     tests/lattices/test_a_cusp_row_admits_its_orbits.sage::test_the_cusps_of_the_next_lattice_of_the_family_are_distinct_orbits
+0.65s call     tests/lattices/test_a_cusp_row_admits_its_orbits.sage::test_an_empty_plane_row_is_admitted_with_no_points
+0.36s call     tests/lattices/test_a_cusp_row_admits_its_orbits.sage::test_the_line_cusps_of_a_kernel_row_are_distinct_orbits
+0.01s call     tests/lattices/test_a_cusp_row_admits_its_orbits.sage::test_the_ambient_line_cusps_of_a_lattice_are_distinct_orbits
+
+(10 durations < 0.005s hidden.  Use -vv to show these durations.)
+5 passed in 21.32s
+[peakrss] cusps-fixed2: child waited=0 shell_code=0 samples=13
+[peakrss] peak tree RSS      : 625 MiB
+[peakrss] low-water MemAvail : 13253 MiB
+[peakrss] peak single VmHWM  : 625 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      622 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   run.sh                        1 MiB peak
+[peakrss]   t=    24.0s procs=  2 rss=   625 MiB hwm=   625 MiB avail= 13253 MiB
+[peakrss]   t=    22.0s procs=  2 rss=   612 MiB hwm=   612 MiB avail= 13265 MiB
+[peakrss]   t=    20.0s procs=  2 rss=   607 MiB hwm=   607 MiB avail= 13265 MiB
+[peakrss]   t=    18.0s procs=  2 rss=   594 MiB hwm=   594 MiB avail= 13280 MiB
+[peakrss]   t=    16.0s procs=  2 rss=   585 MiB hwm=   585 MiB avail= 13288 MiB
+# launcher exit: 0

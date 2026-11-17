@@ -1,0 +1,39 @@
+# tree: 61b3fa157046d96f00630015e8165ebfa5a89574
+# status:  M src/sage_extensions/categories/group/predicate_subgroups.py  M src/sage_extensions/categories/lattice_morphisms.py  M src/sage_extensions/categories/sets/finite_ordered_sets.py 
+# port: 991b88b095a42a1e3679569ea42328c900c120f6
+# load: 1.79 1.68 1.47
+# program: .tmp/issue598-ingress/probe-slice.py PROBE_PLANES=100 PROBE_BAND=unset PYTHONHASHSEED=0
+[    210.0 s rss   1266.7 MiB] the split's first lift (the whole coset walk) 198.7 s
+[    210.2 s rss   1267.3 MiB] plane 25/100
+[    210.4 s rss   1267.7 MiB] plane 50/100
+[    210.5 s rss   1268.2 MiB] plane 75/100
+[    210.7 s rss   1268.7 MiB] plane 100/100
+[    210.7 s rss   1268.8 MiB] 100 plane cusps of Otilde(T_Co) drawn
+[    460.7 s rss   1287.2 MiB] the old ingress, finite_ordered_set(tuple(points)): 249.986 s
+[    460.7 s rss   1287.2 MiB] the repaired admission, _distinct_finite_ordered_set(points): 0.000 s
+
+[cardinality] old 100  new 100
+[counts] old 100  new 100  drawn 100
+[the objects] every retained cusp is the one drawn, in its own position: old True  new True
+[the planes, position by position] positions whose span differs: []
+[the planes] distinct span keys among the 100 cusps drawn: 100
+[the inverse] old [0, 1, 2, 3, 4] ... [98, 99]  new [0, 1, 2, 3, 4] ... [98, 99]  equal at every position: True
+[membership] every drawn cusp in its row: old True  new True
+[a cusp rebuilt from a member's span] same span: True  equal to the member: True  old places it at 0  new places it at 0  old admits it: True  new admits it: True
+[the subgroup's cusp of another rank, which no plane row holds] rank 1  old places it at None  new places it at None
+
+[RESULT] cusps=100 old_ingress=249.986 s repaired=0.000 s ratio=1155458 per_comparison=50502.2 us
+[peakrss] slice: child waited=0 shell_code=0 samples=232
+[peakrss] peak tree RSS      : 1290 MiB
+[peakrss] low-water MemAvail : 8342 MiB
+[peakrss] peak single VmHWM  : 1290 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     1287 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   run.sh                        1 MiB peak
+[peakrss]   t=   384.2s procs=  2 rss=  1290 MiB hwm=  1290 MiB avail= 10539 MiB
+[peakrss]   t=   386.2s procs=  2 rss=  1290 MiB hwm=  1290 MiB avail= 10541 MiB
+[peakrss]   t=   388.2s procs=  2 rss=  1290 MiB hwm=  1290 MiB avail= 10541 MiB
+[peakrss]   t=   390.2s procs=  2 rss=  1290 MiB hwm=  1290 MiB avail= 10541 MiB
+[peakrss]   t=   392.2s procs=  2 rss=  1290 MiB hwm=  1290 MiB avail= 10541 MiB
+# launcher exit: 0

@@ -1,0 +1,100 @@
+# tree: dc0d4d8c787111a60c790ed1dc94340029caaed1
+# status: ?? .timings/ ?? .tmp/ ?? src/sage_extensions/__pycache__/ ?? src/sage_extensions/categories/__pycache__/ ?? src/sage_extensions/categories/abstract_categories/__pycache__/ ?? src/sage_extensions/categories/algebras/__pycache__/ ?? src/sage_extensions/categories/divisors/__pycache__/ ?? src/sage_extensions/categories/forms/__pycache__/ ?? src/sage_extensions/categories/functions/__pycache__/ ?? src/sage_extensions/categories/functors/__pycache__/ ?? src/sage_extensions/categories/group/__pycache__/ ?? src/sage_extensions/categories/group/profinite/__pycache__/ ?? src/sage_extensions/categories/modules/__pycache__/ ?? src/sage_extensions/categories/modules/framed/__pycache__/ ?? src/sage_extensions/categories/modules/framed/finitely_generated/__pycache__/ ?? src/sage_extensions/categories/modules/framed/formed/__pycache__/ ?? src/sage_extensions/categories/modules/group_modules/__pycache__/ ?? src/sage_extensions/categories/modules/module_morphisms/__pycache__/ ?? src/sage_extensions/categories/modules/pure/__pycache__/ ?? src/sage_extensions/categories/modules/pure/finitely_generated/__pycache__/ ?? src/sage_extensions/categories/rings/__pycache__/ ?? src/sage_extensions/categories/schemes/__pycache__/ ?? src/sage_extensions/categories/schemes/toric/__pycache__/ ?? src/sage_extensions/categories/sets/__pycache__/ ?? src/sage_extensions/categories/sets/enumerated/__pycache__/ ?? src/sage_extensions/groups/__pycache__/ ?? src/sage_extensions/lexicon/__pycache__/ ?? src/sage_extensions/rings/__pycache__/ ?? src/sage_extensions/schemes/__pycache__/ ?? src/sage_extensions/static_types/__pycache__/ ?? src/sage_extensions/tensors/__pycache__/ 
+# port: 991b88b095a42a1e3679569ea42328c900c120f6
+# load: 1.08 1.44 1.27
+# program: .tmp/issue598-ingress/probe-rows.py PROBE_PLANES=unset PROBE_BAND=unset PYTHONHASHSEED=0
+[     0.9 s rss   279.8 MiB] --- 6JRS: O(L)
+[     1.3 s rss   414.6 MiB]     cusps(1) = 1 in 0.393 s
+    O(L) rank 1 cusp 0: ((1, 0, 0, 0, 0),)
+    O(L) rank 1 positions: [0]
+    O(L) rank 1 membership: [True]  membership_of_rank
+[     1.7 s rss   449.1 MiB]     cusps(2) = 1 in 0.335 s
+    O(L) rank 2 cusp 0: ((1, 0, 0, 0, 0), (0, 0, 1, 0, 0))
+    O(L) rank 2 positions: [0]
+    O(L) rank 2 membership: [True]  membership_of_rank
+[     1.7 s rss   449.1 MiB] --- 6JRS: Otilde(L)
+[     1.7 s rss   449.4 MiB]     cusps(1) = 1 in 0.013 s
+    Otilde(L) rank 1 cusp 0: ((1, 0, 0, 0, 0),)
+    Otilde(L) rank 1 positions: [0]
+    Otilde(L) rank 1 membership: [True]  membership_of_rank
+[     3.2 s rss   464.4 MiB]     cusps(2) = 1 in 1.572 s
+    Otilde(L) rank 2 cusp 0: ((1, 0, 0, 0, 0), (0, 0, 1, 0, 0))
+    Otilde(L) rank 2 positions: [0]
+    Otilde(L) rank 2 membership: [True]  membership_of_rank
+[     3.3 s rss   464.7 MiB] --- U+U(2)+<-2>: O(L)
+[     4.5 s rss   473.8 MiB]     cusps(1) = 2 in 1.240 s
+    O(L) rank 1 cusp 0: ((0, 1, 0, 0, 0),)
+    O(L) rank 1 cusp 1: ((0, 0, 1, 0, 0),)
+    O(L) rank 1 positions: [0, 1]
+    O(L) rank 1 membership: [True, True]  membership_of_rank
+[     4.7 s rss   476.5 MiB]     cusps(2) = 1 in 0.216 s
+    O(L) rank 2 cusp 0: ((0, 1, 0, 0, 0), (0, 0, 0, 1, 0))
+    O(L) rank 2 positions: [0]
+    O(L) rank 2 membership: [True]  membership_of_rank
+[     4.7 s rss   476.5 MiB] --- U+U(2)+<-2>: Otilde(L)
+[    13.4 s rss   509.2 MiB]     cusps(1) = 3 in 8.699 s
+    Otilde(L) rank 1 cusp 0: ((0, 1, 0, 0, 0),)
+    Otilde(L) rank 1 cusp 1: ((0, 0, 1, 0, 0),)
+    Otilde(L) rank 1 cusp 2: ((2, 0, 2, 1, -2),)
+    Otilde(L) rank 1 positions: [0, 1, 2]
+    Otilde(L) rank 1 membership: [True, True, True]  membership_of_rank
+[    13.9 s rss   509.2 MiB]     cusps(2) = 2 in 0.506 s
+    Otilde(L) rank 2 cusp 0: ((0, 1, 0, 0, 0), (0, 0, 0, 1, 0))
+    Otilde(L) rank 2 cusp 1: ((2, 0, 1, 2, -2), (0, 1, 0, -1, 0))
+    Otilde(L) rank 2 positions: [0, 1]
+    Otilde(L) rank 2 membership: [True, True]  membership_of_rank
+[    14.0 s rss   509.2 MiB] --- U+U(2)+<-4>: O(L)
+[    14.9 s rss   516.0 MiB]     cusps(1) = 2 in 0.909 s
+    O(L) rank 1 cusp 0: ((0, 1, 0, 0, 0),)
+    O(L) rank 1 cusp 1: ((0, 0, 0, 1, 0),)
+    O(L) rank 1 positions: [0, 1]
+    O(L) rank 1 membership: [True, True]  membership_of_rank
+[    15.1 s rss   518.3 MiB]     cusps(2) = 1 in 0.234 s
+    O(L) rank 2 cusp 0: ((0, 1, 0, 0, 0), (0, 0, 1, 0, 0))
+    O(L) rank 2 positions: [0]
+    O(L) rank 2 membership: [True]  membership_of_rank
+[    15.1 s rss   518.3 MiB] --- U+U(2)+<-4>: Otilde(L)
+[    24.1 s rss   553.5 MiB]     cusps(1) = 4 in 8.991 s
+    Otilde(L) rank 1 cusp 0: ((1, 0, 0, 0, 0),)
+    Otilde(L) rank 1 cusp 1: ((2, 0, 0, 1, 0),)
+    Otilde(L) rank 1 cusp 2: ((2, 0, 1, 0, 0),)
+    Otilde(L) rank 1 cusp 3: ((2, 0, 1, 1, 1),)
+    Otilde(L) rank 1 positions: [0, 1, 2, 3]
+    Otilde(L) rank 1 membership: [True, True, True, True]  membership_of_rank
+[    24.7 s rss   554.9 MiB]     cusps(2) = 3 in 0.556 s
+    Otilde(L) rank 2 cusp 0: ((0, 1, 0, 0, 0), (0, 0, 1, 0, 0))
+    Otilde(L) rank 2 cusp 1: ((0, 1, 0, 0, 0), (0, 0, 4, 1, -2))
+    Otilde(L) rank 2 cusp 2: ((2, 4, 3, -1, -1), (0, 5, 4, 1, -2))
+    Otilde(L) rank 2 positions: [0, 1, 2]
+    Otilde(L) rank 2 membership: [True, True, True]  membership_of_rank
+[    24.7 s rss   555.1 MiB] --- E10: O(L)
+[    25.7 s rss   562.2 MiB]     cusps(1) = 1 in 1.001 s
+    O(L) rank 1 cusp 0: ((1, 2, -4, -5, -7, -10, -8, -6, -4, -2),)
+    O(L) rank 1 positions: [0]
+    O(L) rank 1 membership: [True]  membership_of_rank
+[    25.8 s rss   562.2 MiB]     cusps(2) = 0 in 0.161 s
+    O(L) rank 2 positions: []
+    O(L) rank 2 membership: []  membership_of_rank
+[    25.8 s rss   562.2 MiB] --- E10: Otilde(L)
+[    27.8 s rss   569.2 MiB]     cusps(1) = 1 in 1.926 s
+    Otilde(L) rank 1 cusp 0: ((1, 0, 0, 0, 0, 0, 0, 0, 0, 0),)
+    Otilde(L) rank 1 positions: [0]
+    Otilde(L) rank 1 membership: [True]  membership_of_rank
+[    27.8 s rss   569.3 MiB]     cusps(2) = 0 in 0.043 s
+    Otilde(L) rank 2 positions: []
+    Otilde(L) rank 2 membership: []  membership_of_rank
+[    27.8 s rss   569.3 MiB] done
+[peakrss] rows-base2: child waited=0 shell_code=0 samples=16
+[peakrss] peak tree RSS      : 573 MiB
+[peakrss] low-water MemAvail : 12012 MiB
+[peakrss] peak single VmHWM  : 573 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      570 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   run.sh                        2 MiB peak
+[peakrss]   t=    30.0s procs=  2 rss=   573 MiB hwm=   573 MiB avail= 12064 MiB
+[peakrss]   t=    28.0s procs=  2 rss=   571 MiB hwm=   571 MiB avail= 12012 MiB
+[peakrss]   t=    26.0s procs=  2 rss=   564 MiB hwm=   564 MiB avail= 12370 MiB
+[peakrss]   t=    24.0s procs=  2 rss=   556 MiB hwm=   556 MiB avail= 12487 MiB
+[peakrss]   t=    22.0s procs=  2 rss=   550 MiB hwm=   550 MiB avail= 12510 MiB
+# launcher exit: 0

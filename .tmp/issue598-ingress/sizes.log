@@ -1,0 +1,44 @@
+# tree: 61b3fa157046d96f00630015e8165ebfa5a89574
+# status: 
+# port: 991b88b095a42a1e3679569ea42328c900c120f6
+# load: 0.60 0.75 0.74
+# program: .tmp/issue598-ingress/probe-sizes.py PROBE_PLANES=unset PROBE_BAND=unset PYTHONHASHSEED=0
+[     1.0 s rss   271.8 MiB] --- U+U2+<-2,-2>: rank 6
+[     1.2 s rss   289.4 MiB]     |A_L| = 16  (order 16)
+[     1.2 s rss   289.8 MiB]     the full orthogonal group O(L)
+[     1.2 s rss   290.4 MiB]     the kernel of the discriminant representation
+[    29.6 s rss   542.8 MiB]     the kernel's cusps(2) = 3 in 28.404 s
+[    30.0 s rss   542.8 MiB]     O(L)'s cusps(2) = 1 in 0.384 s
+[    30.0 s rss   542.8 MiB] --- U+U+<-2,-2>: rank 6
+[    30.0 s rss   542.8 MiB]     |A_L| = 4  (order 4)
+[    30.0 s rss   542.8 MiB]     the full orthogonal group O(L)
+[    30.0 s rss   542.8 MiB]     the kernel of the discriminant representation
+[    32.7 s rss   543.7 MiB]     the kernel's cusps(2) = 1 in 2.722 s
+[    32.7 s rss   543.7 MiB]     O(L)'s cusps(2) = 1 in 0.013 s
+[    32.7 s rss   543.7 MiB] --- U+U2+<-2,-2,-2>: rank 7
+[    32.7 s rss   543.8 MiB]     |A_L| = 32  (order 32)
+[    32.7 s rss   543.8 MiB]     the full orthogonal group O(L)
+[    32.7 s rss   543.8 MiB]     the kernel of the discriminant representation
+[    54.7 s rss   658.3 MiB]     the kernel's cusps(2) = 5 in 21.925 s
+[    55.2 s rss   660.5 MiB]     O(L)'s cusps(2) = 1 in 0.512 s
+[    55.2 s rss   660.5 MiB] --- U+U+<-2,-2,-2>: rank 7
+[    55.2 s rss   660.5 MiB]     |A_L| = 8  (order 8)
+[    55.2 s rss   660.5 MiB]     the full orthogonal group O(L)
+[    55.2 s rss   660.6 MiB]     the kernel of the discriminant representation
+[   123.9 s rss   970.6 MiB]     the kernel's cusps(2) = 1 in 68.697 s
+[   123.9 s rss   970.7 MiB]     O(L)'s cusps(2) = 1 in 0.017 s
+[   123.9 s rss   970.7 MiB] done
+[peakrss] sizes: child waited=0 shell_code=0 samples=65
+[peakrss] peak tree RSS      : 974 MiB
+[peakrss] low-water MemAvail : 12783 MiB
+[peakrss] peak single VmHWM  : 974 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      971 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   run.sh                        1 MiB peak
+[peakrss]   t=   126.0s procs=  2 rss=   974 MiB hwm=   974 MiB avail= 12783 MiB
+[peakrss]   t=   124.0s procs=  2 rss=   973 MiB hwm=   973 MiB avail= 12783 MiB
+[peakrss]   t=   122.0s procs=  2 rss=   967 MiB hwm=   967 MiB avail= 12783 MiB
+[peakrss]   t=   120.0s procs=  2 rss=   962 MiB hwm=   962 MiB avail= 12791 MiB
+[peakrss]   t=   118.0s procs=  2 rss=   957 MiB hwm=   957 MiB avail= 12799 MiB
+# launcher exit: 0

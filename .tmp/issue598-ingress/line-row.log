@@ -1,0 +1,6 @@
+# tree: 61b3fa157046d96f00630015e8165ebfa5a89574
+# status: 
+# port: 991b88b095a42a1e3679569ea42328c900c120f6
+# load: 1.36 1.59 1.21
+# program: .tmp/issue598-ingress/probe-line-row.py PROBE_PLANES=unset PROBE_BAND=unset PYTHONHASHSEED=0
+[     1.2 s rss   279.8 MiB] Otilde(T_Co)
