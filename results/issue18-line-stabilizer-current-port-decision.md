@@ -96,6 +96,9 @@ are `+-e` (`1291-1292`), and the shears over the frame (`1293-1295`).  A shear
 kills `N` and has image in `J`, inside `N`, so `T^2 = 0` (`1300-1304`).  The
 port extends each image family by the Witt operation and adds the
 pointwise-perpendicular kernel (`1309-1319`); the group they generate is `G`.
+The port states the same structure of `Aut(N)` at `recursive.py:1229-1236`;
+what is decided here is that the integral intersection of its group with
+`O(L)` is the setwise line stabilizer.
 
 **The extension is unique for rank one.**  The extension is
 `_extend_perpendicular_isometry` (`recursive.py:325-346`, source
@@ -128,13 +131,14 @@ Therefore
 
     Stab_{O(L)}(J) = {g in G : g(L) = L} = G ∩ O(L).
 
-That is the set `IntegralStructureAction.stabilizer()` answers: its contract is
-`{g in G : g(L)=L}` (`rational_integral_stabilizers.py:760-761`), and the action
-it belongs to is the one `_stabilizer_action()` documents as "the
-integral-structure action whose stabilizer is ``Stab_{O(L)}(I)``"
-(`isotropic_parabolics.py:691-710`, where the radical action for a line is
-`GL_1(ZZ) = {+-1}`).  So the family the certificate calls complete is a
-generating family of `Stab_{O(L)}(J)`.  The equality is an intersection with
+That is the set `IntegralStructureAction.stabilizer()` answers, by its own
+contract `{g in G : g(L)=L}` (`rational_integral_stabilizers.py:760-761`):
+composing that contract with the equality above gives
+`{g in G : g(L)=L} = Stab_{O(L)}(J)`.  The action is the one built by
+`_stabilizer_action()` (`isotropic_parabolics.py:691-710`, the port's
+`isotropic_stabilizer_action` at `recursive.py:1218`), whose radical action for
+a line is `GL_1(ZZ) = {+-1}`.  So the family the certificate calls complete is
+a generating family of `Stab_{O(L)}(J)`.  The equality is an intersection with
 `O(L)`; nothing above asserts that `G` is the whole rational stabilizer of the
 line in `O(L_Q)`, and the argument does not use that stronger statement.
 
