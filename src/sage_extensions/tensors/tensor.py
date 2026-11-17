@@ -1253,32 +1253,68 @@ def _engine_component_matrix(value):
 # code never receives them.
 
 
+def _engine_row_hermite_form(rows):
+    r"""The integer row Hermite form of a span's coordinate rows.
+
+    Row operations by a unimodular integer matrix preserve the row lattice, and
+    the Hermite form is the unique matrix in that orbit, so two listings of one
+    span -- the same sublattice presented by different generators, or by the
+    same generators in another order -- reach one matrix here.
+    """
+    return rows.hermite_form()
+
+
+def _engine_row_relation(rows, adapted, engine_ring):
+    r"""The integer coefficients ``C`` with ``C rows = adapted``, or ``None`` when there are none.
+
+    ``rows`` is a basis of ``T_i`` and ``adapted`` of a smaller span.  Sage's
+    ``solve_left`` answers in the fraction field even for integer matrices, and
+    a Smith form taken there has its unimodular factor only over that field: for
+    the row ``(2, 1)`` it returns ``V = ((1, -1/2), (0, 1))``, whose inverse is
+    not a basis change of the integer row lattice.  The relation is therefore
+    accepted only when every coefficient is in ``engine_ring``; when one is not,
+    the smaller span is not contained in the larger one's row lattice.
+    """
+    coefficients = rows.solve_left(adapted)
+    if not all(entry in engine_ring for entry in coefficients.list()):
+        return None
+    return _sage_matrix(engine_ring, [[engine_ring(entry) for entry in row] for row in coefficients.rows()])
+
+
 def _engine_flag_adapted_rows(spans, engine_ring):
     r"""Private engine adapter: coordinate rows of a basis adapted to a chain of row spans over a PID.
 
-    ``spans`` lists coordinate-row bases of ``T_1 < ... < T_k < M``.  For the
-    adapted rows ``A`` of ``T_(i-1)`` and a basis ``S`` of ``T_i``, write
-    ``A = C S``; the Smith form ``U C V = D`` gives the basis ``V^-1 S`` of
-    ``T_i`` whose first rows span ``T_(i-1)`` exactly when every diagonal
-    entry of ``D`` is a unit, i.e. ``T_(i-1)`` is saturated in ``T_i``.
+    ``spans`` lists coordinate-row bases of ``T_1 < ... < T_k < M``.  Each span
+    enters in its row Hermite form, so the rows computed here are a function of
+    the spans and not of the order their generators were listed in.  For the
+    adapted rows ``A`` of ``T_(i-1)`` and the Hermite form ``S`` of ``T_i``,
+    write ``A = C S`` over the ring; the Smith form ``U C V = D`` gives the basis
+    ``V^-1 S`` of ``T_i`` whose first rows span ``T_(i-1)`` exactly when every
+    diagonal entry of ``D`` is a unit, i.e. ``T_(i-1)`` is saturated in ``T_i``.
     Returns the adapted rows, the block sizes and the first step that is
     not saturated (``None`` when all are).
     """
     adapted = None
     sizes = []
     for step, span in enumerate(spans):
-        rows = _sage_matrix(engine_ring, span)
+        rows = _engine_row_hermite_form(_sage_matrix(engine_ring, span))
         if adapted is None:
             adapted = rows
             sizes.append(rows.nrows())
             continue
-        coefficients = rows.solve_left(adapted)
-        diagonal, _left, right = coefficients.smith_form()
+        relation = _engine_row_relation(rows, adapted, engine_ring)
+        if relation is None:
+            return None, None, step
+        diagonal, _left, right = relation.smith_form()
         if not all(diagonal[i, i].is_unit() for i in range(adapted.nrows())):
             return None, None, step
         rebased = right.inverse() * rows
         adapted = adapted.stack(rebased.matrix_from_rows(range(adapted.nrows(), rebased.nrows())))
         sizes.append(rebased.nrows() - sum(sizes))
+    assert adapted is not None and adapted.det().is_unit(), (
+        f"the rows adapted to the spans {spans} are not a basis of the module they span: their determinant "
+        f"{adapted.det() if adapted is not None else None} is not a unit of {engine_ring}"
+    )
     return adapted.rows(), tuple(size for size in sizes if size), None
 
 
