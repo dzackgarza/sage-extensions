@@ -15,3 +15,17 @@ def test_the_divided_square_has_the_exact_cyclic_factors() -> None:
 
     assert tuple(square.invariant_factors()) == (ZZ(2),) * 45 + (ZZ(4),) * 10
     assert square.cardinality() == cardinal(2**65)
+
+
+def test_divided_powers_of_z_mod_two_have_the_roby_orders() -> None:
+    r"""``Gamma^d(Z/2)`` has order ``gcd(2^j binomial(d,j): 1 <= j <= d)``.
+
+    Roby's divided-power relations give orders 4, 2 and 8 in degrees
+    2, 3 and 4.  These include complementary monomials beyond the
+    quadratic classifier.  The degree-zero divided power is Z.
+    """
+    module = FinitelyPresentedTorsionModules(ZZ).direct_sum_of_cyclics((2,))
+
+    assert module.divided_power_module(0).module_rank() == 1
+    for degree, order in ((2, 4), (3, 2), (4, 8)):
+        assert tuple(module.divided_power_module(degree).invariant_factors()) == (ZZ(order),)
