@@ -8,6 +8,10 @@ measured.  The lattice is `T_Co = <2> + U(2) + E8(-2)` (D. Dolgachev and
 S. Kondō, Izv. Math. 77:3 (2013), §3 equation (3.6), printed p. 513), in the
 kernel row `Otilde(T_Co) = ker rho`.
 
+The samples below are the pre-repair ones.  They are kept as what they are, facts
+about the code as it stood at that commit; no number in this document
+re-measures them, and none of them is a statement about the mathematics.
+
 ## Why a probe, and what it is a probe of
 
 The two kernel rows were dispatched (`results/coble-kernel-incidence-rows.yml`,
@@ -27,8 +31,9 @@ isometry is an isometry of `T_Co` (a power, or a short word, in the ambient
 orthogonal group's own generating family), so the registry entries and the
 carries are the row's own functions on the row's own objects. What the probe does
 not use is #390's coset walk: it feeds the same registration and the same carry
-with planes it makes itself, because the row that walk enumerates does not return
-inside one command.
+with planes it makes itself, because at the time the row that walk enumerates did
+not return inside one command.  That row has since returned both its
+189720-plane rows (#390, run 43798731423 at `897e7f7fd4`).
 
 ## The stages, and the coefficient each one gives
 
@@ -64,26 +69,33 @@ and each retains its own line and plane subobjects.
 
 ## What the coefficients say
 
-* **The row's own record: 63.0 KB a plane.**  The plane's subobject, the
-  registered lift that produced it and the span key the registry is keyed by —
-  that is what `register_isotropic_lift` retains, one per plane, and it is
-  #390's row.  At 189720 planes that is **11.4 GiB**, before a cusp object or an
-  edge exists.  It is not this round's repair: the row returns one representative
-  per orbit, so shrinking it is a change to what the row returns.
+* **What the row returns: 63.0 KB a plane.**  The plane subobject the row keeps as
+  its representative, the registered lift that produced it and the span key the
+  lift registry is keyed by — that is what `register_isotropic_lift` retains, one
+  per plane, and it is #390's row.  It is the row's answer, one representative per
+  orbit, not an auxiliary structure: at 189720 planes the arithmetic on the sample
+  is **11.4 GiB** of retained representatives.  Storage of the outputs the row is
+  asked for is not a per-element cost — it says nothing about the time or the
+  resident memory of computing one representative — and it is no statement about
+  the mathematics.
 * **The carried covering: 287.4 KB a plane.**  The three flags of the plane and
   the three line transports `transport_covering` registers for them, held in the
   incidence's `sourced_flags` list and the quotient's transport registry.  At
-  189720 planes that is **52.0 GiB**.  Nothing reads either after the plane's
-  edge certificates exist, and this is what this round repairs.
+  189720 planes the arithmetic on the pre-repair sample is **52.0 GiB**.  Nothing
+  reads either after the plane's edge certificates exist; this is the auxiliary
+  retention the repair removes, and it is not part of what the call returns.
 * **The row's covering: 128 MiB, once per source family.**  One covering is the
   parabolic's 112 generators, its image in the character product, the word
   section and the double cosets.  It is a constant of the row, not a coefficient.
 
-So the two kernel rows of `T_Co` cannot return as the code stood, at either
-coefficient: a 6 GiB cap is passed after about 21000 carried planes at the second
-coefficient alone, and the row's 11.4 GiB is passed before the incidence starts.
-Which of the two killed the image runs is not settled here and is not claimed:
-neither printed a row, and a memory question has no run record to read.
+What the second coefficient supports is narrower than what the sample was first
+read as supporting.  At the pre-repair auxiliary coefficient a 6 GiB cap is passed
+after about 21000 carried planes, so that structure alone cannot be held across a
+189720-plane walk under that cap, and it is why the repair drops it.  Which of the
+two structures killed the image runs is not settled here and is not claimed:
+neither printed a row, and a memory question has no run record to read.  The 63 KB
+a plane is the returned answer and not a bar to the row returning, as #390's
+returned rows show.
 
 ## What the repair changes, and what was not measured
 
@@ -91,7 +103,8 @@ The incidence no longer holds either per-plane structure.  Each plane's edge
 certificates are made while the row holds the plane, and the plane's flags and
 the transport data of its carried lines are dropped there
 (`OrthogonalCharacterQuotient.release_isotropic_transports`), so what the call
-retains while it walks is its coverings and the relation it returns.  The
+retains while it walks is its coverings, its planes' registered lifts and the
+relation it returns.  The
 contract — a carried line keeps no transport datum, and the edges that keep one
 are at most as many as the coverings' flags — is
 `tests/lattices/test_the_row_retains_no_transport_for_a_carried_line.sage`.
@@ -101,22 +114,41 @@ are at most as many as the coverings' flags — is
 * the edge certificates' own coefficient.  The probe's fourth stage runs the
   public call over the same planes, and it did not reach them inside its command:
   the row's 527 line cusps alone took over two minutes of it under the contention
-  of a second container, and the stage was cut.  The relation's size is known
-  without it — `E = 189720 k` certificates with `k = 3`
-  (`results/issue381-the-walk-and-the-intersection.md`), so 569160 certificates,
-  each retaining a flag and two transporters.
+  of a second container, and the stage was cut.  The size the relation must have,
+  if its vertices are the two cusp rows, is arithmetic on those rows and on the
+  finite image — `E = 189720 k` certificates with `k = 3`
+  (`results/issue381-the-walk-and-the-intersection.md`), 569160 certificates,
+  each retaining a flag and its two transporters.  That is derived, not read off a
+  returned row: the call has not yet returned the kernel relation on `T_Co`.
 * the post-repair coefficient of the same stages.  The repair removes the two
   structures stage C measures, and the contract test shows that it does; the
-  bytes it saves on `T_Co` are the 287.4 KB a plane of stage C, extrapolated as
-  above and not re-measured.
+  bytes it saves on `T_Co` are the 287.4 KB a plane of stage C, arithmetic on the
+  pre-repair sample and not re-measured.
 
-## What is left, and it is the larger half
+## What is owed, and where each row stands
 
-The relation the call returns is the row's answer and not a leak, so its 569160
-certificates are a floor on the call's footprint; and the row's own 63 KB a plane
-is 11.4 GiB before the incidence starts.  Those two are the next units — the
-relation as vertex positions rather than retained certificates, and a plane row
-that realises its representatives instead of retaining them — and the image run
-should not be dispatched again until at least the second is repaired.  This
-round repairs neither, and says so rather than dispatching a run that would be
-killed the same way.
+Returned: `O(T_Co)` one edge, and `Gamma_{Co,2}` 13 edges over four line cusps
+and seven plane cusps (image run 43556671111 at `3147ea330f`); and the two
+189720-plane rows of #390 (run 43798731423 at `897e7f7fd4`).
+
+Unresolved: the two kernel incidence rows of `T_Co`, `Otilde` and `Otilde+`.
+They are dispatched asynchronously, without being waited on here, as
+https://github.com/dzackgarza/sage-extensions/actions/runs/44012568639 on `main`
+`921dcf6ed7b921ff78479cd4eb067008e2eff42a`, with the workflow's own inputs
+`rows=Otilde,Otilde+`, `lattice=Tco`, `cap=10800`, `budget=28800`.  This document
+reports no result for them.  Their counts are compared with nothing: no
+lattice-database card holds a `T_Co` incidence value (lattice-database#7), and the
+one comparison that does hold is between the two rows, `Otilde+` being a subgroup
+of `Otilde` and so having at least as many cusps.
+
+What the repair does not change is the public certificate semantics.  Each
+returned edge retains its two cusp vertices and the subgroup transporters that
+carry the one representative into the other, and the relation carries one
+certificate per endpoint pair.  Those certificates are the call's answer, and
+their number and size are the size of the answer rather than growth in the cost of
+an element.
+
+The original full-family result of #381 — the primitive isotropic plane orbit
+rows, the cusp rows, and the line/plane incidence for `Otilde(T_Co)`,
+`Otilde+(T_Co)` and `Gamma_{Co,2}`, with actual representatives and subgroup
+witnesses — remains owed, and the issue stays open.

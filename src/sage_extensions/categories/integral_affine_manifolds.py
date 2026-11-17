@@ -28,6 +28,7 @@ from sage_extensions.categories.manifolds_with_boundary import (
 )
 from sage_extensions.categories.topological_spaces import TopologicalSpaces
 from sage_extensions.categories.rings.ring_foundation import _owned_integers
+from sage_extensions.owned_category import _object_of
 from sage_extensions.owned_category_bases import CategoryWithAxiom
 
 
@@ -143,8 +144,43 @@ class IntegralAffineManifolds(OwnedCategory):
         pass
 
     def on(self, smooth_manifold, affine_atlas):
-        r"""Equip the exact smooth manifold with a selected integral-affine atlas."""
-        pass
+        r"""Equip the exact smooth manifold with a selected integral-affine atlas.
+
+        An integral-affine manifold is a smooth manifold whose charts are
+        integral-affine, i.e. whose transition maps lie in ``SL(2,Z) ⋉ R^2``
+        (Alexeev--Engel, *The birational geometry of moduli of Enriques
+        surfaces*, arXiv:2208.10383v2, Definition 6.11, p. 30).  The added
+        datum is the atlas, whose own construction is
+        :meth:`IntegralAffineAtlases.on`; the manifold retains that atlas and
+        the smooth manifold it is an atlas of, and introduces no further
+        structure (``OWN-15``, ``OWN-19``).
+
+        The atlas must be an atlas of this manifold: an integral-affine
+        structure is added to the manifold the charts are selected on, so
+        passing another manifold, even an equal one, would give the object two
+        authorities for what it forgets to (``OWN-15``).
+        """
+        from sage_extensions.categories.integral_affine_atlases import IntegralAffineAtlases
+
+        assert smooth_manifold in SmoothManifolds(), (
+            f"an integral-affine manifold is a smooth manifold with a selected "
+            f"integral-affine atlas, and {smooth_manifold} is in "
+            f"{smooth_manifold.category()}"
+        )
+        assert affine_atlas in IntegralAffineAtlases(), (
+            f"the added structure of an integral-affine manifold is an integral-affine "
+            f"atlas, and {affine_atlas} is in {affine_atlas.category()}"
+        )
+        assert affine_atlas.underlying_smooth_manifold() is smooth_manifold, (
+            f"the atlas {affine_atlas} is an atlas of "
+            f"{affine_atlas.underlying_smooth_manifold()}, not of {smooth_manifold}: an "
+            f"integral-affine structure is added to the manifold that atlas is selected on"
+        )
+        return _object_of(
+            self,
+            smooth_manifold=smooth_manifold,
+            affine_atlas=affine_atlas,
+        )
 
     @cached_method
     def local_isomorphisms(self):
