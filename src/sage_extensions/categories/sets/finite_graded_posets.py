@@ -52,11 +52,17 @@ class FiniteGradedPosetMorphism(CategoricalMor.ElementMethods):
         """
         from sage_extensions.logic import conjunction
 
-        if element_parent(other) is not self.parent():
+        # An isomorphism of graded posets is an arrow of the base Mor too, so the
+        # map it carries is its forward arrow's: comparing a map with an
+        # isomorphism compares it with that map, whichever side is which.
+        forward = (
+            other.forward() if isinstance(other, CategoricalIsomorphism) else other
+        )
+        if element_parent(forward) is not self.parent():
             return False
-        if self is other:
+        if forward is self:
             return True
-        return conjunction(self(point) == other(point) for point in self.domain())
+        return conjunction(self(point) == forward(point) for point in self.domain())
 
     def __ne__(self, other):
         from sage_extensions.logic import negation
