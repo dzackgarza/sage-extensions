@@ -1,0 +1,53 @@
+# tree: ecfbea143675b37aeee67ac4a902a1e9e7948757
+# status: 
+# load: 1.16 0.83 1.34
+# program: probe-584-stageA.py  PROBE_PLANES=1000
+[4.5 s] row objects, 112 generators, mode baseline, rss 305.7 MiB
+  meter seeded over 86095 shared objects
+  348 ambient generators, 5440 candidate isometries
+  [   100/1000] rss    618.9 MiB (   82.3 KB a plane)  marginal   40196 B
+  [   200/1000] rss    630.2 MiB (   97.7 KB a plane)  marginal   39280 B
+  [   300/1000] rss    637.2 MiB (   88.4 KB a plane)  marginal   39140 B
+  [   400/1000] rss    644.6 MiB (   84.9 KB a plane)  marginal   38992 B
+  [   500/1000] rss    660.1 MiB (   98.8 KB a plane)  marginal   40744 B
+  [   600/1000] rss    667.7 MiB (   95.0 KB a plane)  marginal   32580 B
+  [   700/1000] rss    675.3 MiB (   92.3 KB a plane)  marginal   39936 B
+  [   800/1000] rss    682.9 MiB (   90.3 KB a plane)  marginal   39352 B
+  [   900/1000] rss    690.4 MiB (   88.6 KB a plane)  marginal   40160 B
+  [  1000/1000] rss    698.0 MiB (   87.3 KB a plane)  marginal   40852 B
+
+[attribution] marginal bytes by structure over 1000 planes
+  family tuple                      0 B over   1000 objects =       0.0 B a plane
+  lift                              0 B over   1000 objects =       0.0 B a plane
+  registry entry key           689220 B over   1000 objects =     689.2 B a plane
+  registry entry shell        5936087 B over   1000 objects =    5936.1 B a plane
+  transported plane          33012764 B over   1000 objects =   33012.8 B a plane
+  total                      39638071 B = 39638.1 B a plane
+
+[slope] every band
+  planes      0..   100:  -790.9 KB a plane rss;     41815 B marginal
+  planes    100..   200:   113.0 KB a plane rss;     40027 B marginal
+  planes    200..   300:    69.8 KB a plane rss;     39138 B marginal
+  planes    300..   400:    74.4 KB a plane rss;     39078 B marginal
+  planes    400..   500:   154.6 KB a plane rss;     38658 B marginal
+  planes    500..   600:    76.0 KB a plane rss;     39179 B marginal
+  planes    600..   700:    75.9 KB a plane rss;     39600 B marginal
+  planes    700..   800:    76.2 KB a plane rss;     39701 B marginal
+  planes    800..   900:    75.3 KB a plane rss;     39650 B marginal
+  planes    900..  1000:    75.7 KB a plane rss;     39535 B marginal
+
+[probe] RESULT mode=baseline planes=1000 candidates_used=2323 wall=40.7 s rss=698.0 MiB base_rss=610.7 MiB growth_per_plane_bytes=91562 marginal_per_plane_bytes=39638 lifts_retained=1001
+[peakrss] stageA-base-1000: child waited=0 shell_code=0 samples=22
+[peakrss] peak tree RSS      : 702 MiB
+[peakrss] low-water MemAvail : 12363 MiB
+[peakrss] peak single VmHWM  : 702 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      699 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   run.sh                        2 MiB peak
+[peakrss]   t=    42.0s procs=  2 rss=   702 MiB hwm=   702 MiB avail= 13104 MiB
+[peakrss]   t=    40.0s procs=  2 rss=   685 MiB hwm=   685 MiB avail= 13120 MiB
+[peakrss]   t=    38.0s procs=  2 rss=   653 MiB hwm=   653 MiB avail= 13150 MiB
+[peakrss]   t=    36.0s procs=  2 rss=   632 MiB hwm=   633 MiB avail= 13174 MiB
+[peakrss]   t=    34.0s procs=  2 rss=   614 MiB hwm=   614 MiB avail= 13188 MiB
+# launcher exit: 0

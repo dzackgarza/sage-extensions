@@ -1,0 +1,122 @@
+# tree: ecfbea143675b37aeee67ac4a902a1e9e7948757
+# status: 
+# load: 0.42 0.48 1.49
+# program: probe-584-shapes.py  PROBE_PLANES=unset
+[start] rss 269.8 MiB
+[0.9s] row objects, rss 282.8 MiB
+  plane is parabolic complete: True
+[4.7s] the family: 112 generators, rss 421.3 MiB
+  ambient group: sage_extensions.categories.lattice_morphisms.OwnedLatticeIsometryMor_with_category_with_category
+  identity: sage_extensions.categories.lattice_morphisms.OwnedLatticeIsometryMor_with_category_with_category.ArrowType
+  one ambient generator: sage_extensions.categories.lattice_morphisms.OwnedLatticeIsometryMor_with_category_with_category.ArrowType
+  one transported plane: sage_extensions.categories.modules.framed.framed_free_modules.OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType
+  span key: tuple of 2 entries: (138565831689808, ((4, 0, 0, -5, -5, -10, -12, -10, -8, -6, -4), (0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0)))
+
+[1] the family tuple
+  getsizeof(tuple) = 944; items shared with the plane's own family: True
+    family[0] (one generator): sage_extensions.categories.lattice_morphisms.OwnedLatticeIsometryMor_with_category_with_category.ArrowType getsizeof=128 marginal=5031549 B
+      ._isometry_inverse_computation: NoneType getsizeof=16 deep~16
+      ._underlying_module_isomorphism: OwnedModuleAutomorphismGroup_with_category_with_category.ArrowType getsizeof=128 deep~128
+      ._form_module_morphism: OwnedModuleMor_with_category_with_category.ArrowType getsizeof=128 deep~128
+      ._value_morphism: OwnedModuleMor_with_category_with_category.ArrowType getsizeof=128 deep~128
+      ._scalar_map: OwnedRingMor_with_category_with_category.ArrowType getsizeof=128 deep~128
+      ._restricted_codomain: NoneType getsizeof=16 deep~16
+      ._restricted_morphism: NoneType getsizeof=16 deep~16
+      ._function: method getsizeof=64 deep~64
+      ._composition_factors: NoneType getsizeof=16 deep~16
+      ._owned_function: method getsizeof=64 deep~64
+      ._scalar_extension_of: NoneType getsizeof=16 deep~16
+      ._scalar_extension_functor: NoneType getsizeof=16 deep~16
+      ._lift_function: NoneType getsizeof=16 deep~16
+      ._linearity_premises: tuple getsizeof=56 deep~0
+      ._projective_section_restriction_data: NoneType getsizeof=16 deep~16
+      ._surjectivity_premise: NoneType getsizeof=16 deep~16
+      ._source_module_morphism: NoneType getsizeof=16 deep~16
+      ._element_function: function getsizeof=168 deep~168
+      ._generator_image: NoneType getsizeof=16 deep~16
+      ._generator_morphism: NoneType getsizeof=16 deep~16
+      ._forward_computation: OwnedModuleMor_with_category_with_category.ArrowType getsizeof=128 deep~128
+      ._inverse_computation: function getsizeof=168 deep~168
+      .forward: CachedMethodCallerNoArgs getsizeof=120 deep~120
+
+[2] the lift element
+    lift: sage_extensions.categories.lattice_morphisms.OwnedLatticeIsometryMor_with_category_with_category.ArrowType getsizeof=128 marginal=6718380 B
+      ._isometry_inverse_computation: function getsizeof=168 deep~168
+      ._underlying_module_isomorphism: NoneType getsizeof=16 deep~16
+      ._form_module_morphism: OwnedModuleMor_with_category_with_category.ArrowType getsizeof=128 deep~128
+      ._value_morphism: OwnedModuleMor_with_category_with_category.ArrowType getsizeof=128 deep~128
+      ._scalar_map: OwnedRingMor_with_category_with_category.ArrowType getsizeof=128 deep~128
+      ._restricted_codomain: NoneType getsizeof=16 deep~16
+      ._restricted_morphism: NoneType getsizeof=16 deep~16
+      ._function: method getsizeof=64 deep~64
+      ._composition_factors: NoneType getsizeof=16 deep~16
+      ._owned_function: method getsizeof=64 deep~64
+      ._scalar_extension_of: NoneType getsizeof=16 deep~16
+      ._scalar_extension_functor: NoneType getsizeof=16 deep~16
+      ._lift_function: NoneType getsizeof=16 deep~16
+      ._linearity_premises: tuple getsizeof=56 deep~0
+      ._projective_section_restriction_data: NoneType getsizeof=16 deep~16
+      ._surjectivity_premise: NoneType getsizeof=16 deep~16
+      ._source_module_morphism: NoneType getsizeof=16 deep~16
+      ._element_function: function getsizeof=168 deep~168
+      ._generator_image: NoneType getsizeof=16 deep~16
+      ._generator_morphism: NoneType getsizeof=16 deep~16
+      ._forward_computation: OwnedModuleMor_with_category_with_category.ArrowType getsizeof=128 deep~128
+      ._inverse_computation: function getsizeof=168 deep~168
+      .__hash__: CachedMethodCallerNoArgs getsizeof=120 deep~120
+      .forward: CachedMethodCallerNoArgs getsizeof=120 deep~120
+
+[3] the transported plane
+    transported: sage_extensions.categories.modules.framed.framed_free_modules.OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType getsizeof=232 marginal=2312910 B
+      ._preamble_gram_tensor: Modules.element_class[_CoordinateTensor] getsizeof=64 deep~64
+      ._module_generating_set: AugmentedSimplexCategory.parent_class getsizeof=232 deep~232
+      ._preamble_form: NoneType getsizeof=16 deep~16
+      ._preamble_form_computation: _DeferredFormOfGram getsizeof=48 deep~48
+      ._preamble_radical_quotient_cokernel_projection: NoneType getsizeof=16 deep~16
+      ._preamble_radical_quotient_basis_map: NoneType getsizeof=16 deep~16
+      ._module_subobject_construction: ModuleSubobjectConstruction getsizeof=48 deep~48
+      ._preamble_base_ring: _OwnedRingParent_with_category getsizeof=232 deep~232
+      ._preamble_selected_generating_set: AugmentedSimplexCategory.parent_class getsizeof=232 deep~232
+      ._preamble_selected_framing_source: OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType getsizeof=232 deep~232
+      ._defining_construction: tuple getsizeof=72 deep~0
+      ._constructing_category: OwnedJoinCategory_with_category getsizeof=48 deep~48
+      ._selected_data_registry: CachedMethodCallerNoArgs getsizeof=120 deep~120
+      .inclusion: CachedMethodCallerNoArgs getsizeof=120 deep~120
+      .embedded_module_generators: CachedMethodCallerNoArgs getsizeof=120 deep~120
+
+[4] the registry entry
+  registry: 1 entries, getsizeof 224
+  key getsizeof 64; value getsizeof 64; value[0] OwnedLatticeIsometryMor_with_category_with_category.ArrowType; value[1] tuple of 112
+
+[5] the quotient's whole __dict__ after one registration
+  subgroup: PreimageSubgroups.parent_class
+  supergroup: OwnedLatticeIsometryMor_with_category_with_category
+  lattice: OwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType
+  discriminant_preimages: tuple of 1
+  determinant_kernel: bool
+  spinor_kernel: bool
+  _has_discriminant: bool
+  _discriminant_group: OwnedTorsionFormOrthogonalGroup_with_category_with_category
+  _image_labels: FiniteOrderedSets.parent_class
+  _image_space: OwnedJoinCategory.parent_class
+  _transported_isotropic_objects: dict of 0
+  _isotropic_root_bridges: dict of 0
+  _isotropic_lift_registry: dict of 1
+
+[6] caches: cached_method attributes on the quotient
+
+[done] rss 574.8 MiB, wall 30.9 s
+[peakrss] shapes: child waited=0 shell_code=0 samples=17
+[peakrss] peak tree RSS      : 579 MiB
+[peakrss] low-water MemAvail : 13233 MiB
+[peakrss] peak single VmHWM  : 580 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      577 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   run.sh                        2 MiB peak
+[peakrss]   t=    32.0s procs=  2 rss=   579 MiB hwm=   580 MiB avail= 13233 MiB
+[peakrss]   t=    30.0s procs=  2 rss=   567 MiB hwm=   567 MiB avail= 13249 MiB
+[peakrss]   t=    28.0s procs=  2 rss=   559 MiB hwm=   559 MiB avail= 13257 MiB
+[peakrss]   t=    26.0s procs=  2 rss=   545 MiB hwm=   545 MiB avail= 13271 MiB
+[peakrss]   t=    24.0s procs=  2 rss=   541 MiB hwm=   541 MiB avail= 13272 MiB
+# launcher exit: 0

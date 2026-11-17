@@ -1,0 +1,50 @@
+# tree: ecfbea143675b37aeee67ac4a902a1e9e7948757
+# status: 
+# load: 1.49 1.61 1.55
+# program: probe-584-retention.py  PROBE_PLANES=100 PROBE_MODE=baseline
+  [     1.19 s] T_Co, Otilde(T_Co), its quotient: mode baseline, meter every 0   rss    282.3 MiB
+[probe] the slicing plane is parabolic complete: True
+  [     5.12 s] the plane's certified parabolic: 112 generators   rss    420.9 MiB
+[probe] tuple(family) is family: True
+  [   213.49 s] the split's first lift (the finite image's whole coset walk)   rss   1232.1 MiB
+  [plane      1/100] rss   1232.1 MiB
+  [plane      2/100] rss   1232.1 MiB
+  [plane      3/100] rss   1232.1 MiB
+  [plane     10/100] rss   1232.4 MiB
+  [plane     20/100] rss   1232.9 MiB
+  [plane     30/100] rss   1233.4 MiB
+  [plane     40/100] rss   1234.1 MiB
+  [plane     50/100] rss   1234.8 MiB
+  [plane     60/100] rss   1235.4 MiB
+  [plane     70/100] rss   1236.0 MiB
+  [plane     80/100] rss   1236.7 MiB
+  [plane     90/100] rss   1237.4 MiB
+  [plane    100/100] rss   1238.0 MiB
+  [   214.20 s] the plane row's first 100 planes   rss   1238.0 MiB
+
+[slope] rss, per band of planes
+  planes      1..    10:   -560.5 KB a plane
+  planes     11..    20:     44.1 KB a plane
+  planes     21..    30:     55.9 KB a plane
+  planes     31..    40:     66.4 KB a plane
+  planes     41..    50:     67.6 KB a plane
+  planes     51..    60:     64.8 KB a plane
+  planes     61..    70:     62.5 KB a plane
+  planes     71..    80:     64.1 KB a plane
+  planes     81..    90:     69.9 KB a plane
+  planes     91..   100:     65.2 KB a plane
+
+[probe] RESULT mode=baseline planes=100 wall=214.2 s rss=1238.0 MiB after_first_lift=1232.1 MiB last_rss=1238.0 MiB growth_per_plane_bytes=63095 lifts_retained=100
+[peakrss] meter-base-100: child waited=0 shell_code=0 samples=109
+[peakrss] peak tree RSS      : 1236 MiB
+[peakrss] low-water MemAvail : 10446 MiB
+[peakrss] peak single VmHWM  : 1241 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     1238 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   run.sh                        1 MiB peak
+[peakrss]   t=   214.1s procs=  2 rss=  1236 MiB hwm=  1236 MiB avail= 11292 MiB
+[peakrss]   t=   216.1s procs=  2 rss=  1233 MiB hwm=  1241 MiB avail= 11292 MiB
+[peakrss]   t=   212.1s procs=  2 rss=  1216 MiB hwm=  1216 MiB avail= 11284 MiB
+[peakrss]   t=   208.1s procs=  2 rss=  1124 MiB hwm=  1124 MiB avail= 11541 MiB
+[peakrss]   t=   210.1s procs=  2 rss=  1124 MiB hwm=  1124 MiB avail= 11393 MiB

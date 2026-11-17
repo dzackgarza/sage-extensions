@@ -1,0 +1,26 @@
+# tree: ecfbea143675b37aeee67ac4a902a1e9e7948757
+# status: ?? results/issue584-the-63-kilobytes-a-plane.md 
+# load: 3.21 2.51 1.93
+# program: probe-584-carried-flag.py  PROBE_PLANES=unset PROBE_MODE=baseline PROBE_METER_EVERY=0
+[32.0 s] row objects, 338 ambient generators, rss 566.9 MiB
+  the plane's own flag: terms (1, 2)
+  seeded 87638 shared objects
+  one generator     : transporter       0 B; the flag it carries  229912 B (plane term 0 B, line term 0 B)
+  a product of two  : transporter    8663 B; the flag it carries   66480 B (plane term 0 B, line term 0 B)
+  a product of five : transporter    6496 B; the flag it carries   46020 B (plane term 0 B, line term 0 B)
+
+[probe] one certificate retains a carried flag and two transporters; three a plane.
+[peakrss] carried-flag2: child waited=0 shell_code=0 samples=17
+[peakrss] peak tree RSS      : 568 MiB
+[peakrss] low-water MemAvail : 12164 MiB
+[peakrss] peak single VmHWM  : 568 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      565 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   run.sh                        1 MiB peak
+[peakrss]   t=    32.0s procs=  2 rss=   568 MiB hwm=   568 MiB avail= 12921 MiB
+[peakrss]   t=    30.0s procs=  2 rss=   560 MiB hwm=   560 MiB avail= 13031 MiB
+[peakrss]   t=    28.0s procs=  2 rss=   553 MiB hwm=   553 MiB avail= 12796 MiB
+[peakrss]   t=    26.0s procs=  2 rss=   552 MiB hwm=   552 MiB avail= 13254 MiB
+[peakrss]   t=    24.0s procs=  2 rss=   549 MiB hwm=   549 MiB avail= 13234 MiB
+# launcher exit: 0

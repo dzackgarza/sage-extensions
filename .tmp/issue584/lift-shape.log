@@ -1,0 +1,95 @@
+# tree: ecfbea143675b37aeee67ac4a902a1e9e7948757
+# status: 
+# load: 2.32 1.54 1.51
+# program: probe-584-lift-shape.py  PROBE_PLANES=unset PROBE_MODE=baseline
+[34.0 s] ambient group, 314 generators, rss 559.5 MiB
+  seeded 84155 shared objects
+
+one generator: marginal 0 B; getsizeof 128
+    .__hash__                                      0 B
+    ._composition_factors                          0 B
+    ._element_function                             0 B
+    ._form_module_morphism                         0 B
+    ._forward_computation                          0 B
+    ._function                                     0 B
+    ._generator_image                              0 B
+    ._generator_morphism                           0 B
+    ._inverse_computation                          0 B
+    ._isometry_inverse_computation                 0 B
+    ._lift_function                                0 B
+    ._linearity_premises                           0 B
+    ._owned_function                               0 B
+    ._projective_section_restriction_data          0 B
+    ._restricted_codomain                          0 B
+    ._restricted_morphism                          0 B
+    ._scalar_extension_functor                     0 B
+    ._scalar_extension_of                          0 B
+    ._scalar_map                                   0 B
+    ._source_module_morphism                       0 B
+    ._surjectivity_premise                         0 B
+    ._underlying_module_isomorphism                0 B
+    ._value_morphism                               0 B
+
+a product of two: marginal 8663 B; getsizeof 128
+    ._composition_factors                          0 B
+    ._element_function                             0 B
+    ._form_module_morphism                         0 B
+    ._forward_computation                          0 B
+    ._function                                     0 B
+    ._generator_image                              0 B
+    ._generator_morphism                           0 B
+    ._inverse_computation                          0 B
+    ._isometry_inverse_computation                 0 B
+    ._lift_function                                0 B
+    ._linearity_premises                           0 B
+    ._owned_function                               0 B
+    ._projective_section_restriction_data          0 B
+    ._restricted_codomain                          0 B
+    ._restricted_morphism                          0 B
+    ._scalar_extension_functor                     0 B
+    ._scalar_extension_of                          0 B
+    ._scalar_map                                   0 B
+    ._source_module_morphism                       0 B
+    ._surjectivity_premise                         0 B
+    ._underlying_module_isomorphism                0 B
+    ._value_morphism                               0 B
+
+a product of five: marginal 8663 B; getsizeof 128
+    ._composition_factors                          0 B
+    ._element_function                             0 B
+    ._form_module_morphism                         0 B
+    ._forward_computation                          0 B
+    ._function                                     0 B
+    ._generator_image                              0 B
+    ._generator_morphism                           0 B
+    ._inverse_computation                          0 B
+    ._isometry_inverse_computation                 0 B
+    ._lift_function                                0 B
+    ._linearity_premises                           0 B
+    ._owned_function                               0 B
+    ._projective_section_restriction_data          0 B
+    ._restricted_codomain                          0 B
+    ._restricted_morphism                          0 B
+    ._scalar_extension_functor                     0 B
+    ._scalar_extension_of                          0 B
+    ._scalar_map                                   0 B
+    ._source_module_morphism                       0 B
+    ._surjectivity_premise                         0 B
+    ._underlying_module_isomorphism                0 B
+    ._value_morphism                               0 B
+
+[done] rss 569.0 MiB
+[peakrss] lift-shape: child waited=0 shell_code=0 samples=19
+[peakrss] peak tree RSS      : 569 MiB
+[peakrss] low-water MemAvail : 11573 MiB
+[peakrss] peak single VmHWM  : 573 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      569 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   run.sh                        1 MiB peak
+[peakrss]   t=    36.0s procs=  2 rss=   569 MiB hwm=   573 MiB avail= 11573 MiB
+[peakrss]   t=    34.0s procs=  2 rss=   561 MiB hwm=   561 MiB avail= 11589 MiB
+[peakrss]   t=    32.0s procs=  2 rss=   554 MiB hwm=   554 MiB avail= 11609 MiB
+[peakrss]   t=    30.0s procs=  2 rss=   553 MiB hwm=   553 MiB avail= 11624 MiB
+[peakrss]   t=    28.0s procs=  2 rss=   551 MiB hwm=   551 MiB avail= 11635 MiB
+# launcher exit: 0
