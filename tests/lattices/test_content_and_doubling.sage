@@ -33,6 +33,32 @@ def test_content_strata_of_square_eight_in_u():
     assert isometry(category, marked_v, category.object(marked_v.arrow().domain().hom([w], codomain=ambient))) is None
 
 
+def test_primitive_orbits_of_both_signs_and_zero_in_u():
+    r"""Primitive vectors of square 12 or -12 in U have two orbits; square zero has one.
+
+    Write v = x e + y f, so q(v) = 2xy and primitivity means gcd(x,y) = 1.
+    Every isometry permutes the primitive null lines Ze and Zf. Preserving
+    b(e,f) = 1 then leaves only simultaneous sign and coordinate exchange.
+    For xy = 6 or -6, the unordered absolute coordinate pairs are {1,6}
+    and {2,3}; each is one orbit. For xy = 0, primitivity leaves only
+    the four vectors e, -e, f, -f, which form one orbit.
+    """
+    ambient = Lattices(ZZ)("U")
+    e, f = tuple(ambient.module_generators())
+    for square, coordinate_pairs in (
+        (12, {frozenset((1, 6)), frozenset((2, 3))}),
+        (-12, {frozenset((1, 6)), frozenset((2, 3))}),
+        (0, {frozenset((0, 1))}),
+    ):
+        representatives = tuple(ambient.O().vector_orbit_representatives(square, content=1))
+        assert len(representatives) == len(coordinate_pairs)
+        assert all(point.q() == square and point.content() == 1 for point in representatives)
+        assert {
+            frozenset((abs(int(ambient.b(point, e))), abs(int(ambient.b(point, f)))))
+            for point in representatives
+        } == coordinate_pairs
+
+
 def test_null_vectors_of_different_content_are_inequivalent():
     ambient = Lattices(ZZ)("U")
     e, f = tuple(ambient.module_generators())
