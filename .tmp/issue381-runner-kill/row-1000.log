@@ -1,0 +1,52 @@
+# tree: 829e0c1465a872e0921a43466ee66f2d3519cc41
+# status: 
+# load: 2.61 3.13 3.75
+# program: probe-381-slice.py  PROBE_PLANES=1000 PROBE_PHASE=row
+[probe] 1000 planes of the row; the slicing plane ((2, 0, 0, -1, -1, -2, -2, -2, -2, -2, -2), (0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0))
+         0.08 s  T_Co and the row's plane  rss    276.5 MiB
+         0.10 s  Otilde and its character quotient  rss    282.5 MiB
+[probe] the slicing plane is parabolic complete: True
+         3.99 s  the plane's parabolic: 112 generators  rss    421.1 MiB
+[rss] t=   10.0s rss=   427.5 MiB  at fqf_orthogonal.py:486:_act_ <- fgp_module.py:648:linear_combination_of_smith_form_gens <- free_module.py:7855:linear_combination_of_basis <- matrix_space.py:851:__classcall__
+[rss] t=   20.2s rss=   512.0 MiB  at lorentzian_cells.py:1979:cell_transporter <- lattice_morphisms.py:3695:transporter <- coloured_vector_families.py:1141:_transporter <- coloured_vector_families.py:295:isomorphism
+[rss] t=   30.3s rss=   548.1 MiB  at sageinspect.py:2493:sage_getsourcelines <- inspect.py:1151:getsourcelines <- inspect.py:969:findsource <- linecache.py:98:checkcache
+[rss] t=   40.4s rss=   577.3 MiB  at framed_free_modules.py:359:__call__ <- framed_free_modules.py:378:_element_constructor_ <- finite_ordered_sets.py:349:__contains__ <- finite_ordered_sets.py:608:contains
+[rss] t=   50.6s rss=   587.4 MiB  at set_categories.py:551:__call__ <- set_categories.py:6884:__call__ <- set_categories.py:6859:_element_constructor_ <- set_categories.py:6877:_point
+[rss] t=   61.0s rss=   593.8 MiB  at probe-381-slice.py:149:<module> <- orthogonal_quotients.py:2094:_iter_splitting_isometries_in_im_rho_from_image
+       183.72 s  the split's first lift  rss   1290.3 MiB
+  [split plane      1/1000]    0.0016 s over 1 steps  (   1.629 ms a plane)  rss   1290.3 MiB  lifts 1
+  [split plane      2/1000]    0.0092 s over 1 steps  (   9.155 ms a plane)  rss   1290.3 MiB  lifts 2
+  [split plane      3/1000]    0.0058 s over 2 steps  (   2.893 ms a plane)  rss   1290.4 MiB  lifts 3
+  [split plane      4/1000]    0.0054 s over 3 steps  (   1.798 ms a plane)  rss   1290.4 MiB  lifts 4
+  [split plane      5/1000]    0.0049 s over 4 steps  (   1.225 ms a plane)  rss   1290.4 MiB  lifts 5
+  [split plane      6/1000]    0.0051 s over 5 steps  (   1.026 ms a plane)  rss   1290.4 MiB  lifts 6
+  [split plane      7/1000]    0.0051 s over 6 steps  (   0.851 ms a plane)  rss   1290.5 MiB  lifts 7
+  [split plane      8/1000]    0.0056 s over 7 steps  (   0.804 ms a plane)  rss   1290.5 MiB  lifts 8
+  [split plane      9/1000]    0.0055 s over 8 steps  (   0.688 ms a plane)  rss   1290.5 MiB  lifts 9
+  [split plane     10/1000]    0.0053 s over 9 steps  (   0.584 ms a plane)  rss   1290.6 MiB  lifts 10
+  [split plane    100/1000]    0.4619 s over 99 steps  (   4.665 ms a plane)  rss   1296.2 MiB  lifts 100
+  [split plane    200/1000]    0.9379 s over 100 steps  (   9.379 ms a plane)  rss   1301.9 MiB  lifts 200
+  [split plane    300/1000]    0.5069 s over 100 steps  (   5.069 ms a plane)  rss   1308.0 MiB  lifts 300
+  [split plane    400/1000]    0.4985 s over 100 steps  (   4.985 ms a plane)  rss   1314.7 MiB  lifts 400
+  [split plane    500/1000]    0.5032 s over 100 steps  (   5.032 ms a plane)  rss   1321.2 MiB  lifts 500
+  [split plane    600/1000]    0.4985 s over 100 steps  (   4.985 ms a plane)  rss   1327.9 MiB  lifts 600
+  [split plane    700/1000]    0.4872 s over 100 steps  (   4.872 ms a plane)  rss   1334.7 MiB  lifts 700
+  [split plane    800/1000]    0.4841 s over 100 steps  (   4.841 ms a plane)  rss   1341.5 MiB  lifts 800
+  [split plane    900/1000]    0.9779 s over 100 steps  (   9.779 ms a plane)  rss   1348.0 MiB  lifts 900
+  [split plane   1000/1000]    0.4970 s over 100 steps  (   4.970 ms a plane)  rss   1354.7 MiB  lifts 1000
+         5.91 s  the plane row's first 1000 planes  rss   1354.7 MiB
+[probe] RESULT phase=row planes=1000 wall=194.8 s rss=1354.7 MiB lifts=1000
+[peakrss] row-1000: child waited=0 shell_code=0 samples=99
+[peakrss] peak tree RSS      : 1359 MiB
+[peakrss] low-water MemAvail : 11749 MiB
+[peakrss] peak single VmHWM  : 1359 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     1355 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   run.sh                        2 MiB peak
+[peakrss]   t=   196.1s procs=  2 rss=  1359 MiB hwm=  1359 MiB avail= 12437 MiB
+[peakrss]   t=   194.1s procs=  2 rss=  1348 MiB hwm=  1348 MiB avail= 12430 MiB
+[peakrss]   t=   192.1s procs=  2 rss=  1321 MiB hwm=  1321 MiB avail= 12434 MiB
+[peakrss]   t=   190.1s procs=  2 rss=  1302 MiB hwm=  1302 MiB avail= 12502 MiB
+[peakrss]   t=   188.1s procs=  2 rss=  1274 MiB hwm=  1274 MiB avail= 12492 MiB
+# launcher exit: 0

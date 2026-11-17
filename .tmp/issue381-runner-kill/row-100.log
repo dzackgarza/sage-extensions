@@ -1,0 +1,51 @@
+# tree: 42b7cf1a1b32fe1c2fae0743a597894dd8a47d30
+# status: ?? results/issue381-kernel-row-runner-kill.md 
+# load: 3.37 3.70 4.05
+# program: probe-381-slice.py  PROBE_PLANES=100 PROBE_PHASE=row
+[probe] 100 planes of the row; the slicing plane ((2, 0, 0, -1, -1, -2, -2, -2, -2, -2, -2), (0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0))
+         0.08 s  T_Co and the row's plane  rss    276.3 MiB
+         0.10 s  Otilde and its character quotient  rss    282.3 MiB
+[probe] the slicing plane is parabolic complete: True
+         3.93 s  the plane's parabolic: 112 generators  rss    420.8 MiB
+[rss] t=   10.0s rss=   427.1 MiB  at module_morphisms.py:1220:<genexpr> <- modules.py:3154:scalar_multiple <- set_categories.py:819:__call__ <- owned_category.py:1116:is_subcategory
+[rss] t=   20.2s rss=   512.8 MiB  at modules.py:8081:_morphism_from_engine_matrix <- ring_foundation.py:5972:__ne__ <- ring_foundation.py:5969:__eq__ <- ring_foundation.py:5855:_backend
+[rss] t=   30.3s rss=   552.7 MiB  at set_categories.py:823:__call__ <- module_morphisms.py:1234:_call_ <- module_morphisms.py:1280:_engine_image <- sequence.py:76:Sequence
+[rss] t=   40.5s rss=   581.4 MiB  at framed_free_modules.py:134:__call__ <- finite_ordered_sets.py:371:__call__ <- finite_ordered_sets.py:386:_element_constructor_ <- finite_ordered_sets.py:602:index_of
+[rss] t=   50.6s rss=   587.0 MiB  at set_categories.py:823:__call__ <- set_categories.py:386:<lambda> <- finite_ordered_sets.py:343:position_of <- set_categories.py:6749:__int__
+[rss] t=  196.1s rss=  1266.4 MiB  at probe-381-slice.py:149:<module> <- orthogonal_quotients.py:2101:_iter_splitting_isometries_in_im_rho_from_image
+       195.91 s  the split's first lift  rss   1285.4 MiB
+  [split plane      1/100]    0.0017 s over 1 steps  (   1.721 ms a plane)  rss   1285.4 MiB  lifts 1
+  [split plane      2/100]    0.0070 s over 1 steps  (   7.027 ms a plane)  rss   1285.5 MiB  lifts 2
+  [split plane      3/100]    0.0058 s over 2 steps  (   2.917 ms a plane)  rss   1285.5 MiB  lifts 3
+  [split plane      4/100]    0.0088 s over 3 steps  (   2.919 ms a plane)  rss   1285.5 MiB  lifts 4
+  [split plane      5/100]    0.0059 s over 4 steps  (   1.482 ms a plane)  rss   1285.5 MiB  lifts 5
+  [split plane      6/100]    0.0059 s over 5 steps  (   1.174 ms a plane)  rss   1285.6 MiB  lifts 6
+  [split plane      7/100]    0.0057 s over 6 steps  (   0.947 ms a plane)  rss   1285.6 MiB  lifts 7
+  [split plane      8/100]    0.0055 s over 7 steps  (   0.790 ms a plane)  rss   1285.6 MiB  lifts 8
+  [split plane      9/100]    0.0051 s over 8 steps  (   0.642 ms a plane)  rss   1285.6 MiB  lifts 9
+  [split plane     10/100]    0.0055 s over 9 steps  (   0.611 ms a plane)  rss   1285.7 MiB  lifts 10
+  [split plane     20/100]    0.0539 s over 10 steps  (   5.390 ms a plane)  rss   1286.1 MiB  lifts 20
+  [split plane     30/100]    0.0540 s over 10 steps  (   5.401 ms a plane)  rss   1286.8 MiB  lifts 30
+  [split plane     40/100]    0.0538 s over 10 steps  (   5.384 ms a plane)  rss   1287.4 MiB  lifts 40
+  [split plane     50/100]    0.0544 s over 10 steps  (   5.442 ms a plane)  rss   1288.0 MiB  lifts 50
+  [split plane     60/100]    0.0516 s over 10 steps  (   5.157 ms a plane)  rss   1288.6 MiB  lifts 60
+  [split plane     70/100]    0.0519 s over 10 steps  (   5.194 ms a plane)  rss   1289.3 MiB  lifts 70
+  [split plane     80/100]    0.0523 s over 10 steps  (   5.227 ms a plane)  rss   1289.9 MiB  lifts 80
+  [split plane     90/100]    0.0533 s over 10 steps  (   5.330 ms a plane)  rss   1290.5 MiB  lifts 90
+  [split plane    100/100]    0.0516 s over 10 steps  (   5.159 ms a plane)  rss   1291.2 MiB  lifts 100
+         0.53 s  the plane row's first 100 planes  rss   1291.2 MiB
+[probe] RESULT phase=row planes=100 wall=201.6 s rss=1291.2 MiB lifts=100
+[peakrss] row-100: child waited=0 shell_code=0 samples=102
+[peakrss] peak tree RSS      : 1295 MiB
+[peakrss] low-water MemAvail : 11678 MiB
+[peakrss] peak single VmHWM  : 1295 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     1292 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   run.sh                        2 MiB peak
+[peakrss]   t=   202.1s procs=  2 rss=  1295 MiB hwm=  1295 MiB avail= 11998 MiB
+[peakrss]   t=   200.1s procs=  2 rss=  1269 MiB hwm=  1269 MiB avail= 12020 MiB
+[peakrss]   t=   198.1s procs=  2 rss=  1189 MiB hwm=  1189 MiB avail= 11973 MiB
+[peakrss]   t=   194.1s procs=  2 rss=  1140 MiB hwm=  1140 MiB avail= 11798 MiB
+[peakrss]   t=   196.1s procs=  2 rss=  1140 MiB hwm=  1140 MiB avail= 11800 MiB
+# launcher exit: 0
