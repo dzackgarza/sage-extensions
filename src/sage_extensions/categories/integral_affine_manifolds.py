@@ -147,9 +147,12 @@ class IntegralAffineManifolds(OwnedCategory):
         r"""Equip the exact smooth manifold with a selected integral-affine atlas.
 
         An integral-affine manifold is a smooth manifold whose charts are
-        integral-affine, i.e. whose transition maps lie in ``SL(2,Z) ⋉ R^2``
-        (Alexeev--Engel, *The birational geometry of moduli of Enriques
-        surfaces*, arXiv:2208.10383v2, Definition 6.11, p. 30).  The added
+        integral-affine, i.e. whose transition maps lie in ``GL(2,Z) ⋉ R^2``:
+        they preserve the selected lattice, and determinant one -- the
+        orientation-preserving case -- is the axiom ``Oriented``.  Alexeev--Engel
+        state the oriented case, on a real oriented surface (Alexeev--Engel,
+        *Compactifications of moduli spaces of K3 surfaces with a nonsymplectic
+        involution*, arXiv:2208.10383v2, Definition 6.11, p. 30).  The added
         datum is the atlas, whose own construction is
         :meth:`IntegralAffineAtlases.on`; the manifold retains that atlas and
         the smooth manifold it is an atlas of, and introduces no further
