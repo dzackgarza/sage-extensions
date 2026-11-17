@@ -5041,114 +5041,141 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
             ),
         )
 
-    def congruence_marking_stabilizer(self, modulus, *, vectors=(), sublattices=()):
-        r"""The exact integral stabilizer of simultaneous residue markings.
+    def congruence_multilevel_stabilizer(self, levels):
+        r"""The exact joint integral stabilizer of marked reductions at several levels.
 
-        Let ``rho_m: O(L) ->> F <= Aut(L/mL)`` be the actual finite image.
-        The marking comprises ordered (thus individually fixed) residue
-        vectors ``v_i mod mL`` and submodules ``(S_j+mL)/mL`` preserved
-        individually, not pointwise on their generators. The stabilizer is
+        ``levels`` is a finite family of triples ``(m, vectors, sublattices)``:
+        at level ``m``, each listed vector is fixed modulo ``mL`` and each
+        listed sublattice's image in ``L/mL`` is preserved *setwise*.
+        Ordered positions are labelled, so their stabilizers intersect;
+        no permutation of the markings is silently allowed.
 
-        ``rho_m^-1(Stab_F((v_i mod mL)_i, ((S_j+mL)/mL)_j))``.
+        Let ``M=lcm(m_i)`` and ``rho_M: O(L) ->> F`` be the actual image.
+        Since ``m_i | M``, every element of ``ker(rho_M)`` acts trivially
+        on ``L/m_i L``. Consequently the simultaneous marks form a finite
+        ``F``-set, and their integral stabilizer is exactly the preimage of
+        the point stabilizer in that *one* actual finite image. The
+        generic finite-G-set and preimage/Schreier constructions provide
+        exact generators, membership and integral lifts. There is no
+        intersection of independently enumerated coset systems.
 
-        A submodule of ``L/mL`` need not be free when ``m`` is composite.
-        Its complete invariant is the integral lattice ``S_j+mL <= L``:
-        represent it by the row Hermite normal form of its generators
-        together with ``m I``. The HNF is independent of the chosen
-        submodule generators. Sage retains trailing zero rows of rectangular
-        HNFs, so discard those rows to make the invariant canonical and to
-        ensure the finite orbit's key is invariant under re-presentation.
+        Residue vectors are identified by their coordinates modulo ``m_i``.
+        Residue submodules are represented by the *integral* sublattice
+        ``S_i+m_i L`` in row Hermite normal form, including ``m_i I`` among
+        the generators. This is canonical under a change of generators
+        even for nonprimitive sublattices and composite moduli, where
+        residue submodules need not be free over ``ZZ/m_i``. Rectangular
+        HNFs' zero rows must be discarded: they are not part of the lattice
+        and otherwise cause a false, nonterminating orbit of tuple keys.
 
-        The generic finite-G-set construction walks only the orbit of the
-        *joint* marking under the genuine arithmetic image; its stabilizer
-        computes exact Schreier generators. The generic group-preimage
-        construction then returns the full integral subgroup, including the
-        kernel of ``rho_m``. It does not intersect independently computed
-        Schreier families or enumerate all ``m^rank(L)`` residue vectors.
-
-        The markings must lie in this lattice; ``vectors`` and
-        ``sublattices`` are finite families. For an empty marking or
-        modulus one, every isometry fixes the marking.
+        We act on each residue using any integral lift into ``L/M L``.
+        The result modulo ``m_i`` is independent of that choice because
+        every automorphism of ``L/M L`` preserves ``m_i(L/M L)``.
         """
+        from math import lcm
         from sage.matrix.constructor import matrix
         from sage.rings.integer_ring import ZZ as SageZZ
         from sage_extensions.categories.group.g_sets import FiniteGSets
         from sage_extensions.categories.rings.ring_foundation import _engine_element
 
         lattice = self.lattice()
-        vectors = tuple(vectors)
-        sublattices = tuple(sublattices)
-        for vector in vectors:
-            if element_parent(vector) is not lattice:
-                raise ValueError(f"{vector} is not a vector of {lattice}")
-        for sublattice in sublattices:
-            if sublattice.codomain() is not lattice:
-                raise ValueError(
-                    f"{sublattice} is not an inclusion into {lattice}"
-                )
-        m = abs(int(modulus))
-        if not m or m != abs(modulus):
-            raise ValueError("the finite-level congruence modulus must be a nonzero integer")
-        if m == 1 or (not vectors and not sublattices):
+        prepared = []
+        for modulus, vectors, sublattices in levels:
+            modulus_integer = abs(int(modulus))
+            if not modulus_integer or modulus_integer != abs(modulus):
+                raise ValueError("each finite-level modulus must be a nonzero integer")
+            vectors, sublattices = tuple(vectors), tuple(sublattices)
+            for vector in vectors:
+                if element_parent(vector) is not lattice:
+                    raise ValueError(f"{vector} is not a vector of {lattice}")
+            for sublattice in sublattices:
+                if sublattice.codomain() is not lattice:
+                    raise ValueError(f"{sublattice} is not an inclusion into {lattice}")
+            if modulus_integer != 1 and (vectors or sublattices):
+                prepared.append((modulus_integer, vectors, sublattices))
+        if not prepared:
             return self
 
-        representation = self.congruence_representation(modulus)
+        common_modulus = lcm(*(entry[0] for entry in prepared))
+        representation = self.congruence_representation(common_modulus)
         image = representation.codomain()
         residue_module = image.supergroup().domain()
-        source_labels = tuple(lattice.module_generating_set())
+        ambient_labels = tuple(lattice.module_generating_set())
         residue_labels = tuple(residue_module.module_generating_set())
         residue_ring = residue_module.base_ring()
-        dimension = len(source_labels)
+        dimension = len(ambient_labels)
 
-        def reduce(vector):
-            coefficients = vector.to_vector()
-            return residue_module.linear_combination({
-                residue_label: residue_ring(coefficients(source_label))
-                for source_label, residue_label in zip(source_labels, residue_labels, strict=True)
-            })
+        def integer_rows(points):
+            return tuple(
+                tuple(int(point.to_vector()(label)) for label in ambient_labels)
+                for point in points
+            )
 
-        def row_lattice_key(residue_vectors):
-            lifts = [
-                [int(_engine_element(residue_ring, residue_vector.to_vector()(label)))
-                 for label in residue_labels]
-                for residue_vector in residue_vectors
-            ]
-            lifts.extend([m if i == j else 0 for j in range(dimension)] for i in range(dimension))
+        def hnf(rows, modulus):
+            lifts = [list(row) for row in rows]
+            lifts.extend([modulus if i == j else 0 for j in range(dimension)]
+                         for i in range(dimension))
             hermite = matrix(SageZZ, lifts).hermite_form()
             return tuple(tuple(int(entry) for entry in row) for row in hermite.rows() if any(row))
 
-        def from_hnf_row(row):
+        state = tuple(
+            (
+                modulus,
+                tuple(tuple(entry % modulus for entry in row)
+                      for row in integer_rows(vectors)),
+                tuple(
+                    hnf(integer_rows(
+                        sublattice(point) for point in sublattice.domain().module_generators()
+                    ), modulus)
+                    for sublattice in sublattices
+                ),
+            )
+            for modulus, vectors, sublattices in prepared
+        )
+
+        def lift_row(row):
             return residue_module.linear_combination({
                 label: residue_ring(value)
                 for label, value in zip(residue_labels, row, strict=True) if value
             })
 
-        state = (
-            tuple(reduce(vector) for vector in vectors),
-            tuple(
-                row_lattice_key(reduce(sublattice(point)) for point in sublattice.domain().module_generators())
-                for sublattice in sublattices
-            ),
-        )
+        def reduced_row(isometry, row, modulus):
+            coordinates = isometry(lift_row(row)).to_vector()
+            return tuple(
+                int(_engine_element(residue_ring, coordinates(label))) % modulus
+                for label in residue_labels
+            )
 
         def action(isometry, marking):
-            residue_vectors, submodule_keys = marking
-            return (
-                tuple(isometry(vector) for vector in residue_vectors),
-                tuple(
-                    row_lattice_key(isometry(from_hnf_row(row)) for row in key)
-                    for key in submodule_keys
-                ),
+            return tuple(
+                (
+                    modulus,
+                    tuple(reduced_row(isometry, row, modulus) for row in vector_rows),
+                    tuple(
+                        hnf((reduced_row(isometry, row, modulus) for row in submodule), modulus)
+                        for submodule in submodule_keys
+                    ),
+                )
+                for modulus, vector_rows, submodule_keys in marking
             )
 
         finite_action = FiniteGSets(image).from_finite_orbits((state,), action)
         stabilizer = finite_action.stabilizer(state)
         return representation.preimage_subgroup(
             stabilizer,
-            stated_clause=lambda: (
-                f"g fixes the selected residue vectors and submodules of {lattice}/{modulus}{lattice}"
-            ),
+            stated_clause=lambda: "g fixes the specified vectors and submodules at their selected levels",
         )
+
+    def congruence_marking_stabilizer(self, modulus, *, vectors=(), sublattices=()):
+        r"""Simultaneous vector and submodule congruence stabilizer at one level.
+
+        Specialized from the single finite-image construction
+        :meth:`congruence_multilevel_stabilizer`; unlike separately formed
+        intersections, this retains one joint actual image, section and
+        Schreier subgroup. Vectors are fixed individually and submodules
+        setwise, irrespective of their generating bases.
+        """
+        return self.congruence_multilevel_stabilizer(((modulus, vectors, sublattices),))
 
     def congruence_vector_stabilizer(self, modulus, vector):
         r"""Exact integral stabilizer of ``vector mod mL`` through the actual finite image.
