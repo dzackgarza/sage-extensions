@@ -35,9 +35,9 @@ def test_gamma_three_splits_the_two_null_lines_of_the_hyperbolic_plane():
     e, _f = tuple(ambient.module_generators())
     arrows = Cat().Mor(FiniteOrdinalCategory(2), Lattices(ZZ))
     marked = arrows.object(ambient.primitive_isotropic_subobject(e).inclusion())
-    orbits = tuple(group.split_orbit(marked, gamma))
-    assert len(orbits) == 2
-    first, second = orbits[0], orbits[1]
+    orbits = group.split_orbit(marked, gamma)
+    assert orbits.cardinality() == cardinal(2)
+    first, second = tuple(orbits)
     assert arrows.Core().Mor(first, second).an_element_in(gamma) is None
-    assert arrows.Core().Mor(first, first).an_element_in(gamma) is not None
+    assert arrows.Core().Mor(first, first).an_element_in(gamma).forward().right() in gamma
 
