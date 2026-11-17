@@ -103,7 +103,8 @@ The incidence no longer holds either per-plane structure.  Each plane's edge
 certificates are made while the row holds the plane, and the plane's flags and
 the transport data of its carried lines are dropped there
 (`OrthogonalCharacterQuotient.release_isotropic_transports`), so what the call
-retains while it walks is its coverings and the relation it returns.  The
+retains while it walks is its coverings, its planes' registered lifts and the
+relation it returns.  The
 contract — a carried line keeps no transport datum, and the edges that keep one
 are at most as many as the coverings' flags — is
 `tests/lattices/test_the_row_retains_no_transport_for_a_carried_line.sage`.
@@ -139,8 +140,6 @@ reports no result for them.  Their counts are compared with nothing: no
 lattice-database card holds a `T_Co` incidence value (lattice-database#7), and the
 one comparison that does hold is between the two rows, `Otilde+` being a subgroup
 of `Otilde` and so having at least as many cusps.
-
-Also unmeasured: the post-repair resident total of a row.
 
 What the repair does not change is the public certificate semantics.  Each
 returned edge retains its two cusp vertices and the subgroup transporters that
