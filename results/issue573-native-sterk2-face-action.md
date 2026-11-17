@@ -96,3 +96,12 @@ Corrected 2026-11-17: the two placed-polytope stubs in
 numbers were read before this round's edits to the same file.  The
 `real_affine_spaces.py` line numbers above are as read on this round's base and
 are unchanged by it.
+
+Superseded 2026-11-17 (round 3): the placed lane is no longer blocked.  The real
+affine space is constructible here -- `RealVectorSpaces(n).an_object()`, its
+affinization, `RealAffineSpaces().an_object()` and
+`AffineSpacesWithLattice().an_object()` were the missing constructors, and the
+placed polytope, its face object's two automorphism groups and the map between
+them are implemented on top of them.  See `results/issue573-placed-polytope-lane.md`
+for what holds and what is left; the `real_affine_spaces.py` line numbers above
+were correct for the code they described and are unchanged by that round.
