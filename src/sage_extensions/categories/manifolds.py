@@ -14,7 +14,7 @@ from sage.combinat.root_system.coxeter_group import CoxeterGroup
 from sage.combinat.root_system.coxeter_matrix import CoxeterMatrix
 from sage.matrix.constructor import matrix as _engine_matrix
 from sage.matrix.special import identity_matrix as _engine_identity_matrix
-from sage.misc.cachefunc import cached_function, cached_method
+from sage.misc.cachefunc import cached_method
 from sage.misc.lazy_import import lazy_import
 from sage.rings.infinity import Infinity
 from sage.rings.qqbar import QQbar as SageQQbar
@@ -35,11 +35,9 @@ from sage_extensions.categories.functors.core import Functor
 from sage_extensions.categories.rings.ring_foundation import (
     _engine_element,
     _engine_ring,
-    _own_ring,
     _owned_complex_field,
     _owned_engine_element,
     _owned_integers,
-    _set_owned_ring_display,
 )
 from sage_extensions.categories.sets.finite_families import finite_family
 from sage_extensions.categories.sets.finite_ordered_sets import (
@@ -65,14 +63,27 @@ for _manifold_axiom in ("GloballySymmetric", "BoundedSymmetric"):
 
 
 class ManifoldAtlasChart(SageObject):
-    r"""One labelled chart of an owned manifold."""
+    r"""One labelled chart of an owned manifold.
 
-    def __init__(self, manifold, label, engine_chart) -> None:
+    A chart ``phi : U -> RR^n`` is a homeomorphism of an open subset ``U`` of
+    the manifold onto an open subset of ``RR^n`` (Lee, *Introduction to Smooth
+    Manifolds*, 2nd ed., Ch. 1).  Its coordinates are therefore real-valued
+    functions on ``U``: each is retained as a section of the ring of functions
+    the manifold assigns to that domain, and evaluating one at a point of the
+    domain gives the point's coordinate, an element of the coordinate field.
+    """
+
+    def __init__(self, manifold, label, engine_chart, domain) -> None:
         self._manifold = manifold
         self._label = label
         self._engine = engine_chart
-        self._coordinates = _raise_manifold_expression_family(
-            engine_chart[:],
+        self._domain = domain
+        self._function_ring = _manifold_function_ring(domain, manifold)
+        self._coordinates = finite_family(
+            tuple(
+                self._function_ring(_ChartCoordinate(engine_chart, index))
+                for index in range(int(manifold.dimension()))
+            ),
             name=f"Coordinates of chart {label}",
         )
 
@@ -82,12 +93,35 @@ class ManifoldAtlasChart(SageObject):
     def label(self):
         return self._label
 
+    def domain(self):
+        r"""The open subset of the manifold the chart is defined on."""
+        return self._domain
+
+    def function_ring(self):
+        r"""The owned ring of real-valued functions on the chart's domain.
+
+        A chart coordinate is a section of this ring, and the ring's elements
+        are the functions on the chart's domain the manifold assigns there.
+        """
+        return self._function_ring
+
     def coordinates(self):
         return self._coordinates
 
     def coordinate(self, index):
         position = self.coordinates().index_set()[int(index)]
         return self.coordinates()[position]
+
+    def __call__(self, point):
+        r"""The coordinates of ``point`` in this chart, one element of the coordinate field per dimension."""
+        selected = self.manifold()(point)
+        return finite_family(
+            tuple(
+                self.coordinate(index)(selected)
+                for index in range(int(self.manifold().dimension()))
+            ),
+            name=f"Coordinates of a point of {self.manifold()} in the chart {self.label()}",
+        )
 
     def _engine_chart(self):
         return self._engine
@@ -217,35 +251,120 @@ def _engine_manifold_chart(chart):
     return chart._engine_chart()
 
 
-@cached_function
-def _manifold_expression_ring():
-    r"""Return the owned facade of Sage's exact symbolic-expression ring.
+def _manifold_function_ring(domain, manifold):
+    r"""The owned ring of real-valued functions on ``domain``, at the manifold's regularity.
 
-    Its elements are chart formulas, and print as Sage prints the expression.
+    A chart coordinate is a section of this ring: the functions a manifold
+    assigns to the chart's domain are the maps there of the manifold's
+    differentiability class, and they form a ring under the pointwise product.
+    A topological chart has continuous coordinates, the ``C^0`` case.
     """
-    return _set_owned_ring_display(SR, "Symbolic Ring", kind="symbolic")
+    from sage_extensions.categories.functions.real_functions import C
+
+    degree = manifold._preamble_differentiability_degree
+    return C(NN(0) if degree is None else degree, domain, RR)
+
+
+class _ChartCoordinate:
+    r"""One coordinate of a chart, as the function it is.
+
+    Private computation class (``OWN-06``).  The ``index``-th coordinate of a
+    chart is the function ``U -> RR`` sending a point of the chart's domain to
+    its ``index``-th coordinate.  The engine's own symbol for that coordinate
+    is retained here because the chart, transition and point adapters speak
+    about a coordinate by it; the symbolic engine is not an owned object, and
+    this symbol is a private representation, never a parent of one.
+    """
+
+    def __init__(self, engine_chart, index) -> None:
+        self._engine_chart = engine_chart
+        self._index = int(index)
+        self._engine_expression = tuple(engine_chart[:])[self._index]
+
+    def engine_expression(self):
+        r"""The engine's symbol for this coordinate (private adapter)."""
+        return self._engine_expression
+
+    def __call__(self, point):
+        r"""The ``index``-th coordinate of ``point``, in the coordinate field."""
+        coordinates = self._engine_chart(_engine_manifold_point(point))
+        return RR(coordinates[self._index])
+
+
+def _manifold_function_definition(value):
+    r"""The map ``U -> RR`` a section of a manifold's function ring is defined by.
+
+    Private adapter (``OWN-06``) of this module.  A section is an element of
+    ``C^k(U, RR)``, the algebra on the condition submodule cut out of ``RR^U``;
+    the element, the module element and the map its defining function is are
+    the three levels read here, the chain the function spaces' own formula
+    adapter reads.
+    """
+    return value.underlying_element().underlying_element()._defining_function()
+
+
+def _retained_chart_expression(value):
+    r"""The engine symbol a chart coordinate retains, or ``None`` for any other value."""
+    section = value
+    for _level in range(2):
+        underlying = getattr(section, "underlying_element", None)
+        if underlying is None:
+            return None
+        section = underlying
+    definition = getattr(section, "_defining_function", None)
+    match definition:
+        case _ChartCoordinate():
+            return definition.engine_expression()
+        case _:
+            return None
 
 
 def _raise_manifold_expression(value):
-    r"""Raise one private symbolic engine expression into the owned expression ring."""
-    return _owned_engine_element(_manifold_expression_ring(), value)
+    r"""State that a symbolic chart formula has no owned presentation yet.
+
+    A chart formula is a section of the owned ring of real-valued functions on
+    the chart's domain (:meth:`ManifoldAtlasChart.function_ring`), and a chart's
+    coordinates are such sections.  A transition's, an overlap's and a
+    holomorphic map's coordinate formula are not expressed there yet, and the
+    engine's symbolic ring is not an owned ring, so this route states its
+    frontier instead of presenting the engine's ring as an owned one.
+    """
+    raise NotImplementedError(
+        "a chart formula is a section of the owned ring of real-valued functions on its "
+        "chart's domain, and only chart coordinates are expressed there so far; the "
+        f"symbolic expression {value!r} cannot be raised into an owned ring"
+    )
 
 
 def _admit_manifold_expression(value):
-    r"""Admit public literal/owned formula data, rejecting raw Sage expressions."""
-    return _manifold_expression_ring()(value)
+    r"""State that a symbolic chart formula cannot be admitted as an owned value yet.
+
+    See :func:`_raise_manifold_expression`: the same frontier, read in the
+    other direction.  An owned value of a chart's coordinate field is admitted
+    by the ring it belongs to, not here.
+    """
+    raise NotImplementedError(
+        "a chart formula is a section of the owned ring of real-valued functions on its "
+        "chart's domain, and only chart coordinates are expressed there so far; the value "
+        f"{value!r} cannot be admitted as one"
+    )
 
 
 def _engine_manifold_expression(value):
-    r"""Lower one owned chart/formula expression for a SageManifolds adapter.
+    r"""Lower one owned manifold value to the engine's expression.
 
-    Protected manifold-expression contract under OWN-05--OWN-07.  Permitted
-    callers are atlas/map/open-submanifold adapters in this module and the
-    affine-analytification adapter, all of which consume the raw expression
-    immediately and return owned manifold/formula data.
+    Protected manifold-expression contract under ``OWN-05``--``OWN-07``.
+    Permitted callers are atlas/map/open-submanifold adapters in this module and
+    the affine-analytification adapter.  A chart coordinate is the function it
+    is, and the engine's symbol retained by :class:`_ChartCoordinate` is how the
+    engine speaks about it; any other owned value is a number in the coordinate
+    field, lowered as its engine element.
     """
-    expression = _admit_manifold_expression(value)
-    return _engine_element(_manifold_expression_ring(), expression)
+    match _retained_chart_expression(value):
+        case None:
+            return _engine_element(RR, RR(value))
+        case expression:
+            return expression
 
 
 def _upper_triangle(n):
@@ -584,14 +703,21 @@ class TopologicalManifolds(OwnedCategory):
         def chart(self, label, coordinates):
             return self._register_chart(label, self._engine_manifold_realization().chart(coordinates))
 
-        def _register_chart(self, label, engine_chart):
-            r"""Record the chart ``engine_chart`` of this manifold's engine under ``label``."""
+        def _register_chart(self, label, engine_chart, domain=None):
+            r"""Record the chart ``engine_chart`` of this manifold's engine under ``label``.
+
+            The chart is defined on ``domain``, an open subset of this manifold;
+            a chart handed over without one is defined on the whole manifold,
+            which is the open subset the engine's own chart registers on.
+            """
             if label in self._preamble_charts:
                 raise ValueError(
                     f"cannot add a chart labelled {label!r} to {self}: its atlas already "
                     f"has a chart with that label"
                 )
-            chart = ManifoldAtlasChart(self, label, engine_chart)
+            chart = ManifoldAtlasChart(
+                self, label, engine_chart, self if domain is None else domain
+            )
             self._preamble_charts[label] = chart
             return chart
 
@@ -599,8 +725,15 @@ class TopologicalManifolds(OwnedCategory):
             r"""Construct a point through the owned element construction directly."""
             return self._element_constructor_(*args, **kwargs)
 
-        def _element_constructor_(self, datum, chart_label="standard"):
-            r"""Return the point with coordinates ``datum`` in the chart ``chart_label``, or ``datum`` if it is a point of this manifold."""
+        def _element_constructor_(self, datum, chart_label=None):
+            r"""Return the point with coordinates ``datum`` in the chart ``chart_label``, or ``datum`` if it is a point of this manifold.
+
+            A point of a manifold of positive dimension is given by its
+            coordinates in a chart.  A chart that is not named is the chart the
+            atlas presents first: the atlas' chart labels are a selected finite
+            ordered family, so the first of them is a chart of this manifold and
+            not a guess among them.
+            """
             match datum:
                 case _ if element_parent(datum) is self:
                     return datum
@@ -612,9 +745,25 @@ class TopologicalManifolds(OwnedCategory):
                             f"point of a manifold of dimension {self.dimension()} has "
                             f"{self.dimension()} coordinates, not {len(coordinates)}"
                         )
-                    return self.element_class(self, coordinates, chart_label)
+                    return self.element_class(
+                        self, coordinates, self._presented_chart_label(chart_label)
+                    )
 
-        def point(self, coordinates, chart_label="standard"):
+        def _presented_chart_label(self, chart_label):
+            r"""The chart label a point's coordinates are read in, defaulting to the atlas' first chart."""
+            match chart_label:
+                case None:
+                    labels = tuple(self.chart_labels())
+                    if not labels:
+                        raise ValueError(
+                            f"cannot give a point of {self} by its coordinates: the manifold has "
+                            f"no chart to read them in"
+                        )
+                    return labels[0]
+                case _:
+                    return chart_label
+
+        def point(self, coordinates, chart_label=None):
             return self(coordinates, chart_label)
 
         def chart_labels(self):
