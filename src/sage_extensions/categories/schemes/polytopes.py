@@ -3,6 +3,10 @@ r"""Convex polytopes and integral lattice polytopes."""
 import weakref
 from math import atan2, factorial
 
+from sage.combinat.permutation import Permutation
+from sage.groups.perm_gps.permgroup import PermutationGroup
+from sage.matrix.constructor import matrix as engine_matrix
+
 from sage.categories.category import Category
 from sage.categories.category_with_axiom import all_axioms
 from sage.categories.morphism import Morphism
@@ -12,8 +16,14 @@ from sage.rings.integer_ring import ZZ as SageZZ
 from sage.rings.rational_field import QQ as SageQQ
 from sage.structure.element import parent as engine_parent
 
+from sage_extensions.categories.abstract_categories.arrow_categories import (
+    CoreMor,
+    _CoreCategory,
+)
 from sage_extensions.categories.abstract_categories.mor_categories import (
+    CategoricalIsomorphism,
     CategoricalMor,
+    IsoCategoryConstruction,
     MorCategoryConstruction,
 )
 from sage_extensions.categories.abstract_categories.mor_foundation import object_level
@@ -54,11 +64,35 @@ from sage_extensions.categories.sets.finite_graded_posets import FiniteGradedPos
 from sage_extensions.categories.sets.set_categories import PartiallyOrderedSets, Sets
 from sage_extensions.categories.triangulations import ChosenTriangulations
 from sage_extensions.owned_category import _object_of
+from sage_extensions.rings.real import RR as RRRealField
 from sage_extensions.owned_category_bases import CategoryWithAxiom
 
 for _axiom in ("Integral", "Polygon"):
     if _axiom not in all_axioms:
         all_axioms.add(_axiom)
+
+
+def _ambient_point_on(ambient, lattice, point):
+    r"""Return ``point``, of the lattice or of the ambient space, as a point of ``ambient``.
+
+    The lattice includes into the ambient space (``M -> M tensor QQ``) by
+    ``m |-> m tensor 1``, which keeps the coordinates of ``m`` in the shared
+    frame, so a lattice point and the ambient point at the same coordinates are
+    one point of the ambient space: that is the point this returns.  A value that
+    is neither is left to the ambient space's own ingress, which refuses it.
+    """
+    match engine_parent(point):
+        case parent if parent is lattice:
+            rationals = _owned_rationals()
+            coordinates = point.to_vector()
+            return ambient.linear_combination(
+                {
+                    label: rationals(coordinates(label))
+                    for label in coordinates.support().domain()
+                }
+            )
+        case _:
+            return ambient(point)
 
 
 def _owned_rational(coordinate):
@@ -158,7 +192,7 @@ class AbstractPolytopes(OwnedCategory):
 class PlacedPolytopeMor(CategoricalMor):
     r"""Ambient maps taking faces to faces and commuting with placements."""
 
-    class ElementMethods:
+    class ElementMethods(CategoricalMor.ElementMethods):
         def __init__(self, parent, ambient_map, face_poset_map):
             Morphism.__init__(self, parent)
             self._ambient_map = ambient_map
@@ -171,24 +205,327 @@ class PlacedPolytopeMor(CategoricalMor):
             return self._face_poset_map
 
         def underlying_polytope_morphism(self):
-            pass
+            r"""Return the affine map of the underlying polytopes this arrow induces.
+
+            The ambient map carries the source's vertices to the target's, and a
+            placement's vertices span its coordinate space, so it induces one affine
+            map of the coordinate spaces: the map those correspondences determine,
+            read in exact rationals.  It is the composite of the target's placement,
+            this arrow and the inverse of the source's, written in coordinates.
+            """
+            source = self.domain()
+            target = self.codomain()
+            linear, image_origin, origin = source._coordinate_affine_map(
+                source._vertex_positions_of(self.ambient_map())
+            )
+            rank = int(linear.nrows())
+            ambient = target.underlying_polytope().ambient_space()
+
+            def image_of_coordinates(point):
+                coordinates = tuple(
+                    SageQQ(value)
+                    for value in source.underlying_polytope()._engine_coordinates(point)
+                )
+                return ambient(
+                    tuple(
+                        _owned_rational(
+                            image_origin[row]
+                            + sum(
+                                (
+                                    linear[row, column]
+                                    * (coordinates[column] - origin[column])
+                                    for column in range(rank)
+                                ),
+                                SageQQ.zero(),
+                            )
+                        )
+                        for row in range(rank)
+                    )
+                )
+
+            return Sets().Mor(
+                source.underlying_polytope(), target.underlying_polytope()
+            )(image_of_coordinates)
 
         def _call_(self, point):
             return self._ambient_map(point)
 
+        def __call__(self, point):
+            r"""Apply the ambient map to a point, without coercing the point first.
+
+            An arrow of placed polytopes acts on the points of the ambient space;
+            Sage's ``Map`` call would first coerce its argument through the
+            polytope, which is not where these points live.
+            """
+            return self._call_(point)
+
+        def __eq__(self, other):
+            r"""Two such arrows are equal when they act alike on the vertices and on the faces.
+
+            A placed polytope's vertices span its ambient space, so an ambient
+            affine map is determined by where it carries them: the arrow's action
+            on the vertices, together with the map it induces on the faces, is a
+            complete invariant of it, and this is what equality reads.  Comparing
+            the ambient maps themselves would compare maps of an infinite point
+            set, which is not decided at all.
+
+            An arrow of another Mor is another arrow: the endpoints and the family
+            are part of what it is.
+            """
+            from sage_extensions.logic import conjunction
+
+            if engine_parent(other) is not self.parent():
+                return False
+            if self is other:
+                return True
+            return conjunction(
+                (
+                    self.domain()._vertex_positions_of(self.ambient_map())
+                    == other.domain()._vertex_positions_of(other.ambient_map()),
+                    self.face_poset_map() == other.face_poset_map(),
+                )
+            )
+
+        def __ne__(self, other):
+            from sage_extensions.logic import negation
+
+            return negation(self == other)
+
+        def __hash__(self) -> int:
+            r"""Hash the vertex action and the faces' map, which :meth:`__eq__` compares."""
+            return hash(
+                (
+                    id(self.parent()),
+                    self.domain()._vertex_positions_of(self.ambient_map()),
+                    self.face_poset_map(),
+                )
+            )
+
         def __mul__(self, other):
-            pass
+            r"""Compose the two components of the two arrows.
+
+            An ambient map composed with an ambient map is the ambient map of the
+            composite, and the faces' map of the composite is the composite of the
+            faces' maps: both are the arrows' own components, so the composite is
+            built from them and nothing is recomputed.
+            """
+            if other.codomain() is not self.domain():
+                return NotImplemented
+            family = self.parent().base_category()
+            return family.Mor(other.domain(), self.codomain())(
+                self.ambient_map() * other.ambient_map(),
+                self.face_poset_map() * other.face_poset_map(),
+            )
 
     def _element_constructor_(self, ambient_map, face_poset_map):
-        pass
+        r"""Construct the arrow from its ambient map and its induced faces' map.
+
+        The two components are the arrow's defining datum: the ambient map is an
+        arrow of the ambient space from the source's to the target's, and the
+        faces' map is an automorphism of the face object the source delegates to,
+        landing in the target's.  Either component of another endpoint is
+        refused here rather than stored and found later.
+        """
+        if (
+            ambient_map.domain() is not self.domain().ambient_space()
+            or ambient_map.codomain() is not self.codomain().ambient_space()
+        ):
+            raise ValueError(
+                f"the ambient map of an arrow {self.domain()} -> {self.codomain()} carries the "
+                f"ambient space {self.domain().ambient_space()} into "
+                f"{self.codomain().ambient_space()}, but {ambient_map} carries "
+                f"{ambient_map.domain()} into {ambient_map.codomain()}"
+            )
+        if (
+            face_poset_map.domain() is not self.domain().face_poset()
+            or face_poset_map.codomain() is not self.codomain().face_poset()
+        ):
+            raise ValueError(
+                f"the faces' map of an arrow {self.domain()} -> {self.codomain()} carries the face "
+                f"object {self.domain().face_poset()} into {self.codomain().face_poset()}, but "
+                f"{face_poset_map} carries {face_poset_map.domain()} into "
+                f"{face_poset_map.codomain()}"
+            )
+        return self.element_class(self, ambient_map, face_poset_map)
 
     @object_level
     def identity(self):
-        pass
+        r"""The identity arrow: the identities of the ambient space and of the faces."""
+        polytope = self.domain()
+        ambient = polytope.ambient_space()
+        return self(
+            ambient.category().Mor(ambient, ambient).identity(),
+            polytope.face_poset().Aut().one(),
+        )
 
 
 class PlacedPolytopeMorCategoryConstruction(MorCategoryConstruction):
     FixedCategoryClass = PlacedPolytopeMor
+
+class PlacedPolytopeIsomorphism(CategoricalIsomorphism):
+    r"""An isomorphism of placed polytopes, as mutually inverse ambient and face maps.
+
+    The defining datum is the pair this lane's arrows carry -- the ambient map and
+    the faces' map -- with the inverse pair of each; an element applied to a face
+    is that face's image, and its ambient map is the affine map of the ambient
+    space the polytope is placed in.
+    """
+
+    def ambient_map(self):
+        return self.forward().ambient_map()
+
+    def face_poset_map(self):
+        return self.forward().face_poset_map()
+
+    def underlying_polytope_morphism(self):
+        return self.forward().underlying_polytope_morphism()
+
+    def _vertex_positions(self):
+        r"""The positions the ambient map sends the placed vertices to."""
+        return self.domain()._vertex_positions_of(self.ambient_map())
+
+    def __mul__(self, other):
+        r"""Compose the two components of two composable placed isomorphisms.
+
+        The product's ambient map is the composition of the ambient maps and its
+        faces' map is the composition of the faces' maps, in that order; the
+        inverse of the product is the reversed product of the inverses.
+        """
+        match other:
+            case PlacedPolytopeIsomorphism() if other.codomain() is self.domain():
+                pass
+            case _:
+                return super().__mul__(other)
+        return self.parent().core_category().Mor(other.domain(), self.codomain())._from_known_inverse_pair(
+            self.forward() * other.forward(),
+            other.inverse().forward() * self.inverse().forward(),
+        )
+
+
+class PlacedPolytopeIsomorphismMor(CoreMor):
+    r"""``Iso`` of placed polytopes: an inverse pair of placed arrows.
+
+    On the diagonal these arrows are the geometric automorphisms of a placed
+    polytope and ``Aut(P)`` is their group, the core's vertex group.  Its
+    computation is the restricted affine group of the polytope the placement
+    places -- the group the core owner of that polytope already answers -- read in
+    its action on the placed polytope's vertices.  A restricted affine
+    automorphism of the placed polytope is determined by that action exactly when
+    the placement is full dimensional in its ambient space, and only then is an
+    ambient affine map read back from an engine permutation: no map is chosen on a
+    complement the polytope does not meet.
+    """
+
+    ElementMethods = PlacedPolytopeIsomorphism
+
+    def __init__(self, mor_family, domain, codomain) -> None:
+        from sage_extensions.categories.group.groups import OwnedFiniteGroups
+
+        CoreMor.__init__(
+            self,
+            mor_family,
+            domain,
+            codomain,
+            category=OwnedFiniteGroups() if domain is codomain else None,
+        )
+
+    def core_category(self) -> _CoreCategory:
+        r"""The core of this placed category, whose arrows are these isomorphisms."""
+        return self.domain().category().Core()
+
+    def _require_the_automorphism_group(self) -> None:
+        assert self.domain() is self.codomain(), (
+            f"the engine of a placed polytope is its automorphism group Aut(P), but {self} is "
+            f"the isomorphisms {self.domain()} -> {self.codomain()}"
+        )
+
+    def _engine_group(self):
+        r"""The engine permutation group: the restricted affine group on the placed vertices."""
+        self._require_the_automorphism_group()
+        from sage.combinat.permutation import Permutation
+        from sage.groups.perm_gps.permgroup import PermutationGroup
+
+        return PermutationGroup(
+            [
+                Permutation([position + 1 for position in permutation])
+                for permutation in self.domain()._restricted_affine_vertex_permutations()
+            ]
+        )
+
+    def _engine_size(self):
+        return len(self.domain().vertices())
+
+    def _engine_permutation(self, positions):
+        from sage.combinat.permutation import Permutation
+
+        return self._engine_group()(
+            Permutation([int(position) + 1 for position in positions])
+        )
+
+    def _to_engine(self, isomorphism):
+        return self._engine_permutation(isomorphism._vertex_positions())
+
+    def _from_engine(self, engine_element):
+        r"""The isomorphism of the placed polytope a permutation of its vertices represents."""
+        domain = self.domain()
+        size = self._engine_size()
+        positions = tuple(int(engine_element(position + 1)) - 1 for position in range(size))
+        inverted = [0] * size
+        for position, image in enumerate(positions):
+            inverted[image] = position
+        return self._from_known_inverse_pair(
+            domain._placed_arrow_of_vertex_positions(positions),
+            domain._placed_arrow_of_vertex_positions(inverted),
+        )
+
+    def _engine_subgroup_from_generators(self, generators):
+        return self._engine_group().subgroup(
+            tuple(self._engine_permutation(generator._vertex_positions()) for generator in generators)
+        )
+
+    def _to_subgroup_engine(self, element, engine_subgroup):
+        return engine_subgroup(self._engine_permutation(element._vertex_positions()))
+
+    def _engine_subgroup_contains(self, element, engine_subgroup):
+        return self._engine_permutation(element._vertex_positions()) in engine_subgroup
+
+    def _from_subgroup_engine(self, engine_element):
+        return self._from_engine(engine_element)
+
+    def __iter__(self):
+        r"""Enumerate the automorphisms of the placed polytope, in the engine's order."""
+        self._require_the_automorphism_group()
+        return (self._from_engine(element) for element in self._engine_group())
+
+
+class PlacedPolytopeIsoCategoryConstruction(IsoCategoryConstruction):
+    r"""The isomorphisms of placed polytopes."""
+
+    def fixed_category_class(self):
+        return PlacedPolytopeIsomorphismMor
+
+
+class _PlacedPolytopeCore(_CoreCategory):
+    r"""The core of a placed category: its objects and its isomorphisms.
+
+    Its Mor at two objects is the isomorphism Mor of that placed category, so
+    ``Aut(P)`` -- the vertex group of this core -- is the very object
+    :meth:`Isom` returns, and products and inverses of automorphisms stay in it.
+    """
+
+    def Mor(self, domain, codomain):
+        return _placed_polytope_isomorphism_mor(domain, codomain)
+
+
+def _placed_polytope_isomorphism_mor(domain, codomain):
+    r"""The isomorphism Mor of placed polytopes at these endpoints.
+
+    On the diagonal it is the automorphism group ``Aut(P)``, the same object
+    whether it is asked as ``Isom(P, P)``, as ``Aut(P)`` or as a vertex group of
+    the placed core.
+    """
+    category = domain.category()
+    return category.Aut(domain) if domain is codomain else category.Iso(domain, codomain)
 
 
 class MetricPolytopeMor(PlacedPolytopeMor):
@@ -199,7 +536,18 @@ class MetricPolytopeMor(PlacedPolytopeMor):
             return self.ambient_map()
 
     def _element_constructor_(self, ambient_isometric_embedding, face_poset_map):
-        pass
+        r"""Refuse: an ambient embedding of a Euclidean polytope must be an isometry.
+
+        This category states that its arrows are induced by ambient isometric
+        embeddings, and this owner has no decided isometry predicate for the
+        ambient metric space to check one with.  An arrow is refused here rather
+        than admitted as a metric polytope's while its ambient map is only
+        affine.
+        """
+        assert False, (
+            f"an arrow of {self} is induced by an ambient isometric embedding, but the ambient "
+            "metric space states no isometry decision for it, so none is admitted here"
+        )
 
 
 class MetricPolytopeMorCategoryConstruction(MorCategoryConstruction):
@@ -207,11 +555,14 @@ class MetricPolytopeMorCategoryConstruction(MorCategoryConstruction):
 
 
 class _PlacedPolytopeFacePosetFunctor(Functor):
+    r"""Send a placed polytope to the face object it delegates to, and an arrow to
+    the map it induces on the faces."""
+
     def __init__(self, source):
         super().__init__(source, AbstractPolytopes())
 
     def _apply_object(self, polytope):
-        pass
+        return polytope.face_poset()
 
     def _apply_morphism(self, morphism):
         return morphism.face_poset_map()
@@ -221,6 +572,7 @@ class _PlacedPolytopeCategory(OwnedParameterizedCategory):
     r"""Polytopes whose selected inclusion has one fixed geometric ambient."""
 
     _MorCategory = PlacedPolytopeMorCategoryConstruction
+    _IsoCategory = PlacedPolytopeIsoCategoryConstruction
 
     def ambient_space(self):
         return self.parameter()
@@ -232,10 +584,64 @@ class _PlacedPolytopeCategory(OwnedParameterizedCategory):
         return [Objects()]
 
     def an_object(self):
-        pass
+        r"""The one-point polytope, placed at the ambient space's own selected point."""
+        space = self.placement_space()
+        coordinates = _owned_integers().free_module(
+            space.model_vector_space().dimension()
+        )
+        underlying = ConvexPolytopes(coordinates)(
+            (tuple(0 for _label in coordinates.module_generating_set()),)
+        )
+        origin = space.an_element()
+        return self.on(
+            ("vertices", underlying.vertices()),
+            Sets().Mor(underlying, space.point_set())(lambda point: origin),
+        )
 
     def on(self, defining_data, ambient_inclusion):
-        pass
+        r"""Place a polytope in this category's ambient space by a supplied inclusion.
+
+        ``ambient_inclusion`` is the map of a convex polytope's points into the
+        points of this category's placement space: its domain is the polytope that
+        is placed, and the placed polytope retains that map and the presentation
+        ``defining_data``.  An inclusion that is not affine with this category's
+        selected translations does not place a polytope of it, and is refused
+        here rather than retained.
+
+        The inclusion is the placement, so the placed polytope's points are the
+        images of the underlying polytope's: the same polytope, placed.
+        """
+        core = ambient_inclusion.domain()
+        assert core in ConvexPolytopes(core.ambient_lattice()), (
+            f"a placed polytope is a convex polytope placed in an ambient space, but {core} is not "
+            "an object of a category of convex polytopes"
+        )
+        space = self.placement_space()
+        assert ambient_inclusion.codomain() is space.point_set(), (
+            f"the placement of a polytope of {self} lands in the points {space.point_set()} of "
+            f"{space}, but {ambient_inclusion} lands in {ambient_inclusion.codomain()}"
+        )
+        return _object_of(
+            self, defining_data=defining_data, ambient_inclusion=ambient_inclusion
+        )
+
+    @cached_method
+    def Core(self) -> _CoreCategory:
+        r"""The core of this placed category: its objects and its isomorphisms."""
+        return _PlacedPolytopeCore(self)
+
+    def _core_isomorphism_witness(self, core_mor):
+        r"""Implementer side of ``CoreMor``'s core contract: one isomorphism, or ``None``."""
+        if core_mor.domain() is core_mor.codomain():
+            return core_mor.one()
+        return None
+
+    def _core_automorphism_generators(self, core_mor):
+        r"""Implementer side of ``CoreMor``'s core contract: generators of ``Aut(P)``."""
+        engine = core_mor._engine_group()
+        return finite_ordered_set(
+            tuple(core_mor._from_engine(generator) for generator in engine.gens())
+        )
 
     @cached_method
     def face_posets(self):
@@ -259,26 +665,288 @@ class _PlacedPolytopeCategory(OwnedParameterizedCategory):
         def underlying_polytope(self):
             return self._ambient_inclusion.domain()
 
+        def placement_space(self):
+            r"""The affine space the placement lands in."""
+            return self.category().placement_space()
+
+        @cached_method
         def vertices(self):
-            pass
+            r"""The placed vertices: the images of the underlying polytope's vertices.
 
-        def faces(self, dimension):
-            pass
+            The placement is a map of the underlying polytope's points, so the
+            vertices of the placed polytope are their images, in the underlying
+            polytope's own vertex order.
+            """
+            inclusion = self.ambient_inclusion()
+            underlying = self.underlying_polytope()
+            return finite_ordered_set(
+                tuple(
+                    inclusion(underlying.rational_point(vertex))
+                    for vertex in underlying.vertices()
+                )
+            )
 
-        def face_inclusion(self, face):
-            pass
+        def _vertex_positions_of(self, ambient_map):
+            r"""The positions an ambient map carries the placed vertices to."""
+            position_of = self.vertices().ranking_map()
+            return tuple(int(position_of(ambient_map(point))) for point in self.vertices())
+
+        @cached_method
+        def _coordinate_frame(self):
+            r"""The vertex coordinates and the affine frame they span.
+
+            The placement's vertices are the underlying polytope's, read in the
+            ambient space; the underlying coordinates are what an affine map of
+            the coordinate space acts on, and they span that space exactly when
+            the placement is full dimensional in the ambient one.  The frame is
+            the first vertex as origin, the differences of the next ones as a
+            basis, and that basis inverted, so that reading an affine map from a
+            permutation and back are one computation.
+            """
+            underlying = self.underlying_polytope()
+            vertices = tuple(underlying.vertices())
+            coordinates = tuple(
+                tuple(SageQQ(value) for value in underlying._engine_coordinates(vertex))
+                for vertex in vertices
+            )
+            rank = len(coordinates[0])
+            assert int(underlying.ambient_lattice().module_rank()) == rank, (
+                f"the vertices of {underlying} have {rank} coordinates, but its lattice has rank "
+                f"{underlying.ambient_lattice().module_rank()}"
+            )
+            assert len(coordinates) >= rank + 1, (
+                f"a full-dimensional placement needs at least {rank + 1} vertices, but "
+                f"{underlying} has {len(coordinates)}"
+            )
+            origin = coordinates[0]
+            basis = engine_matrix(
+                SageQQ,
+                rank,
+                rank,
+                [
+                    [
+                        coordinates[position][row] - origin[row]
+                        for position in range(1, rank + 1)
+                    ]
+                    for row in range(rank)
+                ],
+            )
+            assert basis.rank() == rank, (
+                f"the vertices of {underlying} do not affinely span their coordinate space of rank "
+                f"{rank}, so this placement is not full dimensional in the ambient space and no "
+                "ambient affine map is determined by its action on the vertices"
+            )
+            return coordinates, origin, basis, basis.inverse()
+
+        def _coordinate_affine_map(self, positions):
+            r"""The affine map of the coordinate space carrying each vertex to a position.
+
+            A map carrying the first vertex to the vertex at ``positions[0]`` and
+            the differences of the basis to the differences of the images is
+            linear in those differences, and the frame's inverse is what reads its
+            matrix: the linear part and the image of the origin are exact
+            rationals, and the map is the affine map they define.
+            """
+            coordinates, origin, basis, inverse = self._coordinate_frame()
+            rank = int(basis.nrows())
+            image_origin = coordinates[positions[0]]
+            image_basis = engine_matrix(
+                SageQQ,
+                rank,
+                rank,
+                [
+                    [
+                        coordinates[positions[position]][row] - image_origin[row]
+                        for position in range(1, rank + 1)
+                    ]
+                    for row in range(rank)
+                ],
+            )
+            return image_basis * inverse, image_origin, origin
+
+        def _restricted_affine_vertex_permutations(self):
+            r"""The restricted affine group of the underlying polytope, on the placed vertices.
+
+            The group is the one the polytope's own core owner computes -- its
+            restricted affine automorphisms, read on its vertices -- and a placement
+            is injective on vertices, so each of them is a permutation of the placed
+            vertices in the same order.  This is a computation of the group, not its
+            definition: the automorphisms are the arrows :meth:`Aut` retains.
+            """
+            underlying = self.underlying_polytope()
+            position_of = underlying.vertices().ranking_map()
+            return tuple(
+                tuple(
+                    int(position_of(element(vertex)))
+                    for vertex in underlying.vertices()
+                )
+                for element in underlying.geometric_automorphisms().selected_subgroup_generators()
+            )
+
+        def _ambient_map_of_positions(self, positions):
+            r"""The ambient automorphism carrying each placed vertex to a position.
+
+            The linear part is the coordinate map read on the ambient model's
+            generators, and the point map is that linear part applied to the
+            difference from the first vertex, translated to the image of that
+            vertex.  On a lattice placement the same matrix is the lattice map, so
+            the ambient automorphism is an arrow of the lattice-compatible affine
+            space and not of the affine space alone.
+            """
+            linear_part, image_origin, origin = self._coordinate_affine_map(positions)
+            space = self.placement_space()
+            model = space.model_vector_space()
+            labels = tuple(model.module_generating_set())
+            rank = int(linear_part.nrows())
+            assert len(labels) == rank, (
+                f"the ambient model {model} has {len(labels)} generators, but the polytope's "
+                f"coordinates have rank {rank}"
+            )
+            ring = model.base_ring()
+
+            def coordinate_image(column):
+                return sum(
+                    (
+                        ring(_owned_rational(linear_part[row, column]))
+                        * model.module_generator(labels[row])
+                        for row in range(rank)
+                        if linear_part[row, column]
+                    ),
+                    model.zero(),
+                )
+
+            linear_map = model.Mor(model)(
+                lambda label: coordinate_image(labels.index(label))
+            )
+            placed_vertices = tuple(self.vertices())
+            placed_origin = placed_vertices[0]
+            placed_image_origin = placed_vertices[positions[0]]
+
+            def point_map(point):
+                return space.translation_action()(
+                    linear_map(space.difference(point, placed_origin)),
+                    placed_image_origin,
+                )
+
+            affine_map = RealAffineSpaces().Mor(space, space)(
+                linear_map,
+                Sets().Mor(space.point_set(), space.point_set())(point_map),
+            )
+            ambient_space = self.ambient_space()
+            match ambient_space in AffineSpacesWithLattice():
+                case True:
+                    lattice = ambient_space.affine_lattice()
+                    lattice_labels = tuple(lattice.module_generating_set())
+                    assert lattice_labels == labels
+                    assert all(
+                        entry in SageZZ for entry in linear_part.list()
+                    ), (
+                        "a lattice-compatible ambient automorphism of the placed polytope "
+                        f"{self} acts on the selected lattice by the matrix {linear_part}, which "
+                        "is not integral, so it is no automorphism of that lattice"
+                    )
+                    integral = linear_part.change_ring(SageZZ)
+                    lattice_map = lattice.Mor(lattice)(
+                        lambda label: sum(
+                            (
+                                _owned_engine_element(
+                                    SageZZ, integral[row, lattice_labels.index(label)]
+                                )
+                                * lattice.module_generator(lattice_labels[row])
+                                for row in range(rank)
+                                if integral[row, lattice_labels.index(label)]
+                            ),
+                            lattice.zero(),
+                        )
+                    )
+                    return AffineSpacesWithLattice().Mor(ambient_space, ambient_space)(
+                        affine_map, lattice_map
+                    )
+                case False:
+                    return affine_map
+
+        def _face_poset_map_of_positions(self, positions):
+            r"""The face object's automorphism induced by a permutation of the vertices."""
+            underlying = self.underlying_polytope()
+            ranks = underlying._engine_vertex_rank_in_vertices()
+            engine_index_of = [0] * len(ranks)
+            for engine_index, owned_position in enumerate(ranks):
+                engine_index_of[owned_position] = engine_index
+            engine_positions = [
+                engine_index_of[positions[ranks[engine_index]]]
+                for engine_index in range(len(ranks))
+            ]
+            return underlying.face_poset().automorphism_from_positions(
+                underlying._face_permutation_of_a_vertex_permutation(
+                    tuple(engine_positions)
+                )
+            )
+
+        def _placed_arrow_of_vertex_positions(self, positions):
+            r"""The placed arrow carrying each vertex to the vertex at a position."""
+            family = self.category().Mor(self, self)
+            return family(
+                self._ambient_map_of_positions(positions),
+                self._face_poset_map_of_positions(positions),
+            )
+
+        def Isom(self, codomain):
+            r"""Return the isomorphisms of placed polytopes from this one to ``codomain``."""
+            return _placed_polytope_isomorphism_mor(self, codomain)
+
+        @object_level
+        def Aut(self):
+            r"""Return ``Isom(P, P)``, the geometric automorphisms of this placed polytope.
+
+            An element is a pair of mutually inverse placed arrows: an ambient
+            affine automorphism of the space the polytope is placed in together
+            with the automorphism of the face object it induces.
+            """
+            return self.Isom(self)
 
         def face_poset(self):
-            pass
+            r"""The face object this polytope delegates to: its underlying polytope's.
+
+            The faces of the placed polytope are the images of the faces of the
+            polytope it places, and the face object retained is the one that
+            polytope itself answers, so the top face is that polytope and not a
+            copy of it.
+            """
+            return self.underlying_polytope().face_poset()
 
         def abstract_automorphisms(self):
-            pass
+            r"""The abstract automorphisms: ``Aut`` of the delegated face object."""
+            return self.face_poset().abstract_automorphisms()
 
         def geometric_automorphisms(self):
+            r"""The geometric automorphisms, as ``Aut`` of this placed polytope.
+
+            Their affine and lattice requirements are those of the placed category:
+            an element is an ambient affine automorphism of the space the polytope
+            is placed in, and on a lattice placement its linear part is an
+            automorphism of the selected lattice.
+            """
             return self.Aut()
 
         def geometric_to_abstract_automorphisms(self):
-            pass
+            r"""The group map from the geometric to the abstract automorphisms.
+
+            A geometric automorphism of a placed polytope carries the face object's
+            faces to faces, and that induced automorphism is the arrow's own
+            ``face_poset_map()``: reading it needs no second transport, and the
+            target is the very group :meth:`abstract_automorphisms` answers.
+            """
+            from sage_extensions.categories.group.groups import OwnedGroups
+
+            geometric = self.geometric_automorphisms()
+            abstract = self.abstract_automorphisms()
+            return OwnedGroups().Mor(geometric, abstract)(
+                {
+                    generator: generator.face_poset_map()
+                    for generator in geometric.group_generators()
+                },
+                check=True,
+            )
 
         def geometric_lifts_of_face_automorphism(self, face_automorphism):
             pass
@@ -321,7 +989,22 @@ class LatticePolytopeMor(PlacedPolytopeMor):
             pass
 
     def _element_constructor_(self, ambient_lattice_map, face_poset_map):
-        pass
+        r"""Construct the arrow from its lattice-compatible ambient map and its faces' map.
+
+        The ambient component is required to be an arrow of the affine space with
+        the selected lattice, so its linear part acts on that lattice: a geometric
+        arrow of placed lattice polytopes preserves the lattice the category
+        states, and a map of sets, or an affine map that does not, is refused here
+        rather than retained.
+        """
+        ambient_category = ambient_lattice_map.parent().base_category()
+        assert ambient_category.is_subcategory(AffineSpacesWithLattice()), (
+            f"an arrow of {self} acts on the ambient space with its selected lattice, but "
+            f"{ambient_lattice_map} is an arrow of {ambient_category}"
+        )
+        return PlacedPolytopeMor._element_constructor_(
+            self, ambient_lattice_map, face_poset_map
+        )
 
 
 class LatticePolytopeMorCategoryConstruction(MorCategoryConstruction):
@@ -349,6 +1032,79 @@ class LatticePolytopesIn(_PlacedPolytopeCategory):
 
     def placement_space(self):
         return self.ambient_space().underlying_affine_space()
+
+    def translation_inclusion(self):
+        r"""The selected lattice's inclusion in the space the placement translates by."""
+        return self.ambient_space().lattice_inclusion()
+
+    def placement_lattice(self):
+        r"""The lattice the placed polytope's coordinates are points of."""
+        return self.ambient_space().affine_lattice()
+
+    def on(self, defining_data, ambient_inclusion):
+        r"""Place a polytope with vertices in the selected affine lattice.
+
+        This category states that the placed vertices are points of the selected
+        lattice, so the placement is required to be the lattice affine embedding it
+        claims: every placed vertex differs from the first by the lattice
+        translation of the corresponding difference of coordinates.  A placement
+        that is not one is refused here, rather than retained as a lattice
+        polytope whose automorphisms would not act on the lattice.
+        """
+        placed = super().on(defining_data, ambient_inclusion)
+        space = self.placement_space()
+        underlying = placed.underlying_polytope()
+        coordinates = tuple(underlying.vertices())
+        images = tuple(
+            ambient_inclusion(underlying.rational_point(vertex)) for vertex in coordinates
+        )
+        origin = coordinates[0]
+        placed_origin = images[0]
+        for vertex, image in zip(coordinates, images, strict=True):
+            assert space.difference(image, placed_origin) == self.translation_inclusion()(
+                vertex - origin
+            ), (
+                f"the vertex {vertex} is placed at {image}, whose difference from the placed "
+                f"origin {placed_origin} is not the selected lattice's translation of "
+                f"{vertex - origin}: this placement does not put the polytope's vertices on the "
+                "points of the chosen affine lattice"
+            )
+        return placed
+
+    def canonical_placement(self, polytope):
+        r"""The placement of a polytope's coordinates by the selected lattice.
+
+        The coordinates are points of the polytope's own lattice, the translations
+        carrying them into the ambient space are the selected lattice inclusion,
+        and the ambient space's selected point is where the origin is placed: the
+        placed points are that point translated by the lattice image of each
+        coordinate, which is the affine embedding preserving the lattice.
+        """
+        space = self.placement_space()
+        model = space.model_vector_space()
+        origin = space.an_element()
+        return Sets().Mor(polytope, space.point_set())(
+            lambda point: space.translation_action()(
+                model(
+                    tuple(
+                        RRRealField(coordinate)
+                        for coordinate in polytope._engine_coordinates(point)
+                    )
+                ),
+                origin,
+            )
+        )
+
+    def an_object(self):
+        r"""The one-point polytope at the ambient space's selected point, by the lattice."""
+        lattice = self.placement_lattice()
+        underlying = ConvexPolytopes(lattice)(
+            (tuple(0 for _label in lattice.module_generating_set()),)
+        )
+        return self.on(
+            ("vertices", underlying.vertices()),
+            self.canonical_placement(underlying),
+        )
 
     @classmethod
     def _repr_object_names(cls):
@@ -743,20 +1499,9 @@ class ConvexPolytopes(OwnedParameterizedCategory):
             through the ambient space's own ingress.  Any other value is left to
             that ingress too, which refuses what is not a point of it.
             """
-            ambient = self.ambient_space()
-            lattice = self.ambient_lattice()
-            match engine_parent(point):
-                case parent if parent is lattice:
-                    rationals = _owned_rationals()
-                    coordinates = point.to_vector()
-                    return ambient.linear_combination(
-                        {
-                            label: rationals(coordinates(label))
-                            for label in coordinates.support().domain()
-                        }
-                    )
-                case _:
-                    return ambient(point)
+            return _ambient_point_on(
+                self.ambient_space(), self.ambient_lattice(), point
+            )
 
         def _engine_coordinates(self, point):
             rationals = _owned_rationals()
@@ -2077,7 +2822,7 @@ def _convex_polytope(
     labels = tuple(ambient.module_generating_set())
 
     def contains(point):
-        point_coordinates = ambient(point).to_vector()
+        point_coordinates = _ambient_point_on(ambient, lattice, point).to_vector()
         coordinates = tuple(
             _engine_element(rationals, point_coordinates(label))
             for label in labels
