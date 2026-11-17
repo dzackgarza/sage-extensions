@@ -1,9 +1,13 @@
 #name: Coble kernel incidence rows (#381)
 ## The Tits-building incidence of the two kernel rows of #381: the edges
 ## between the Otilde(T_Co)-orbits and the Otilde+(T_Co)-orbits of primitive
-## isotropic lines and planes of T_Co, through the public
-## tits_building_incidence().  Each edge is asserted to join a line that lies
-## in its plane, and the edge count of each row is recorded per group.
+## isotropic lines and planes of T_Co, through the public incidence call the
+## `route` input names: `divided-class`, which decides each edge from the
+## divided class of the carried line, `certificate`, which carries the covering
+## as flags and keeps a transporter per edge, or `auto` (the default), which
+## takes the class route wherever it applies and says which route and why at
+## every row.  Each edge carries the clause its route's record can state, and
+## the edge count of each row is recorded per group.
 ##
 ## The two plane rows are 189720 planes each (#390), so the incident sets are
 ## the same size: this is the job that reports later, never the per-test gate.
@@ -46,6 +50,11 @@ on:
         required: false
         default: "Tco"
         type: string
+      route:
+        description: "the incidence route: auto, divided-class, certificate"
+        required: false
+        default: "auto"
+        type: string
 permissions:
   contents: read
 concurrency:
@@ -71,13 +80,14 @@ jobs:
           COBLE_ROW_BUDGET: ${{ inputs.budget || '28800' }}
           COBLE_ROWS: ${{ inputs.rows || 'Otilde,Otilde+' }}
           COBLE_LATTICE: ${{ inputs.lattice || 'Tco' }}
+          COBLE_ROUTE: ${{ inputs.route || 'auto' }}
         run: |-
           set -o pipefail
           "$SAGE_BIN" --version
           git rev-parse HEAD
           sage_python="$("$SAGE_BIN" -c "import sys; print(sys.executable)")"
           "$sage_python" tests/coble_gamma_co_2_incidence_rows.py \
-            --rows "$COBLE_ROWS" --lattice "$COBLE_LATTICE" \
+            --rows "$COBLE_ROWS" --lattice "$COBLE_LATTICE" --route "$COBLE_ROUTE" \
             --cap "$COBLE_CALL_CAP" --budget "$COBLE_ROW_BUDGET"
         shell: bash
       # The run's own timing record (CONTRIBUTING.md ENV-03): the test run's
