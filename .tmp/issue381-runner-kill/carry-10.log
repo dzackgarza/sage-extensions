@@ -1,0 +1,44 @@
+# tree: 829e0c1465a872e0921a43466ee66f2d3519cc41
+# status: 
+# load: 2.08 2.64 3.43
+# program: probe-381-carry.py  PROBE_PLANES=10 PROBE_PHASE=row
+[probe] the walk's per-plane work over 10 planes of the row
+         0.08 s  T_Co and the row's plane  rss    276.3 MiB
+         0.10 s  Otilde and its character quotient  rss    282.3 MiB
+[probe] the plane is parabolic complete: True
+         3.91 s  the plane's parabolic: 112 generators  rss    421.0 MiB
+[rss] t=   10.0s rss=   427.8 MiB
+[rss] t=   20.0s rss=   510.4 MiB
+[rss] t=   30.0s rss=   554.3 MiB
+[rss] t=   40.1s rss=   575.6 MiB
+[rss] t=   50.1s rss=   583.0 MiB
+[rss] t=  163.8s rss=  1221.4 MiB
+       163.13 s  the split's first lift  rss   1240.7 MiB
+         0.05 s  10 planes of the row, one registered lift each  rss   1241.0 MiB
+[probe] the covering at the first plane: 3 flags
+         8.23 s  the row's one covering, computed at the first plane  rss   1246.7 MiB
+  [carry plane      2/10]    0.0310 s over 1 steps  carry   15.097 ms and   14.827 ms of keys a plane  rss   1246.9 MiB  transports 3
+  [carry plane      3/10]    0.0284 s over 1 steps  carry   12.584 ms and   14.534 ms of keys a plane  rss   1247.3 MiB  transports 2
+  [carry plane      4/10]    0.0270 s over 1 steps  carry   12.398 ms and   13.313 ms of keys a plane  rss   1247.7 MiB  transports 1
+  [carry plane      5/10]    0.0285 s over 1 steps  carry   12.176 ms and   15.089 ms of keys a plane  rss   1248.0 MiB  transports 1
+  [carry plane      6/10]    0.0316 s over 1 steps  carry   14.687 ms and   15.752 ms of keys a plane  rss   1248.5 MiB  transports 1
+  [carry plane      7/10]    0.0278 s over 1 steps  carry   12.223 ms and   14.311 ms of keys a plane  rss   1248.8 MiB  transports 1
+  [carry plane      8/10]    0.0280 s over 1 steps  carry   12.387 ms and   14.307 ms of keys a plane  rss   1249.2 MiB  transports 1
+  [carry plane      9/10]    0.0309 s over 1 steps  carry   14.496 ms and   15.221 ms of keys a plane  rss   1249.5 MiB  transports 1
+  [carry plane     10/10]    0.0295 s over 1 steps  carry   12.314 ms and   16.051 ms of keys a plane  rss   1249.9 MiB  transports 1
+         0.26 s  the carry over 9 planes  rss   1249.9 MiB
+[probe] RESULT phase=carry planes=10 carries=9 carry_ms=13.151 keys_ms=14.823 wall=176.6 s rss=1249.9 MiB
+[peakrss] carry-10: child waited=0 shell_code=0 samples=90
+[peakrss] peak tree RSS      : 1249 MiB
+[peakrss] low-water MemAvail : 12427 MiB
+[peakrss] peak single VmHWM  : 1254 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     1250 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   run.sh                        2 MiB peak
+[peakrss]   t=   174.1s procs=  2 rss=  1249 MiB hwm=  1249 MiB avail= 12728 MiB
+[peakrss]   t=   176.1s procs=  2 rss=  1249 MiB hwm=  1249 MiB avail= 12937 MiB
+[peakrss]   t=   172.1s procs=  2 rss=  1248 MiB hwm=  1248 MiB avail= 12727 MiB
+[peakrss]   t=   170.1s procs=  2 rss=  1246 MiB hwm=  1246 MiB avail= 12735 MiB
+[peakrss]   t=   178.1s procs=  2 rss=  1244 MiB hwm=  1254 MiB avail= 12948 MiB
+# launcher exit: 0
