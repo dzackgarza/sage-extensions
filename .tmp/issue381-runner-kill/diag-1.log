@@ -1,0 +1,63 @@
+# tree: 42b7cf1a1b32fe1c2fae0743a597894dd8a47d30
+# status: ?? results/issue381-kernel-row-runner-kill.md 
+# load: 2.81 3.38 4.57
+# program: probe-381-slice.py  PROBE_PLANES=1
+[probe] 1 planes of the row; the slicing plane ((2, 0, 0, -1, -1, -2, -2, -2, -2, -2, -2), (0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0))
+         0.09 s  T_Co and the row's plane  rss    276.5 MiB
+[rss] t=   10.0s rss=   494.5 MiB  at indefinite_reduction.py:391:_nondegenerate_reduction <- indefinite_reduction.py:137:_compute_indefinite_reduction <- indefinite_reduction.py:89:_indefinite_lll <- indefinite_reduction.py:66:_indefinite_gram_schmidt
+[rss] t=   20.2s rss=   535.8 MiB  at ring_foundation.py:1273:equality_status <- ring_foundation.py:2258:_fraction_equality_status <- ring_foundation.py:5253:OwnedIntegralDomains <- category_with_axiom.py:2090:__classget__
+[rss] t=   30.4s rss=   569.7 MiB  at edgewalk_scalars.py:12:_rational <- ring_foundation.py:6266:denominator <- ring_foundation.py:8270:_owned_engine_element <- ring_foundation.py:6746:_from_engine_element
+[rss] t=   40.5s rss=   587.5 MiB  at mor_categories.py:1754:__call__ <- set_categories.py:822:__call__ <- set_categories.py:549:__call__ <- set_categories.py:535:__contains__
+[rss] t=   50.6s rss=   591.5 MiB  at mor_categories.py:138:_category_mor <- mor_foundation.py:437:operation <- mor_foundation.py:385:_asked_of_the_category <- mor_foundation.py:385:<genexpr>
+        57.14 s  Otilde and its character quotient, index 46998591897600  rss    596.9 MiB
+[rss] t=   60.7s rss=   601.8 MiB  at sageinspect.py:2493:sage_getsourcelines <- inspect.py:1151:getsourcelines <- inspect.py:969:findsource <- linecache.py:98:checkcache
+[rss] t=   70.9s rss=   630.9 MiB  at ring_foundation.py:1273:equality_status <- ring_foundation.py:2256:_fraction_equality_status <- ring_foundation.py:6888:zero <- ring_foundation.py:6746:_from_engine_element
+[rss] t=   80.9s rss=   678.4 MiB  at ring_foundation.py:5896:_mul_ <- ring_foundation.py:8270:_owned_engine_element <- ring_foundation.py:6746:_from_engine_element <- ring_foundation.py:5851:__init__
+[rss] t=   91.0s rss=   681.3 MiB  at ring_foundation.py:1233:_neg_ <- ring_foundation.py:1716:fraction <- ring_foundation.py:1672:_valid_denominator <- submonoids.py:240:_structure_data
+[rss] t=  101.2s rss=   718.0 MiB  at module_morphisms.py:541:__init__ <- module_morphisms.py:437:_initialize_lower_arrow <- fibered_modules.py:113:__init__ <- additive_mors.py:418:__init__
+[rss] t=  111.4s rss=   751.1 MiB  at lattices.py:8579:eichler_transvection <- lattices.py:8516:_eichler_transvection_column_matrix <- tensor.py:830:tensor_product <- ring_foundation.py:2131:zero
+[rss] t=  121.4s rss=   756.8 MiB  at tensor.py:2593:_element_constructor_ <- tensor.py:2593:<genexpr> <- tensor.py:2458:_owned_coordinate_component <- <frozen abc>:119:__instancecheck__
+[rss] t=  131.5s rss=   787.9 MiB  at ring_foundation.py:1186:_add_ <- ring_foundation.py:5878:__add__ <- ring_foundation.py:5872:_add_ <- ring_foundation.py:8259:_owned_engine_element
+[rss] t=  141.6s rss=   816.5 MiB  at ring_foundation.py:5878:__add__ <- ring_foundation.py:5872:_add_ <- ring_foundation.py:8270:_owned_engine_element <- ring_foundation.py:6746:_from_engine_element
+[rss] t=  151.7s rss=   820.8 MiB  at algebras.py:1577:__sub__ <- ring_foundation.py:1233:_neg_ <- ring_foundation.py:1697:fraction <- ring_foundation.py:2322:localization_source
+[rss] t=  161.8s rss=   877.7 MiB  at framed_free_modules.py:216:_add_ <- algebras.py:1569:__add__ <- ring_foundation.py:1185:_add_ <- ring_foundation.py:1739:_fraction_with_admitted_denominator
+[rss] t=  171.9s rss=   879.2 MiB  at ring_foundation.py:5872:_add_ <- ring_foundation.py:8270:_owned_engine_element <- ring_foundation.py:6746:_from_engine_element <- ring_foundation.py:5851:__init__
+[rss] t=  185.3s rss=  1090.8 MiB  at fqf_orthogonal.py:288:<genexpr> <- fqf_orthogonal.py:484:_act_ <- abelian_aut.py:203:matrix <- abelian_group_gap.py:158:exponents
+[rss] t=  195.4s rss=   966.3 MiB  at modules.py:8112:_linear_arrow_from_engine_matrix <- module_morphisms.py:676:__init__ <- indexed_families.py:484:indexed_family <- owned_category.py:1694:_object_of
+[rss] t=  205.5s rss=   970.0 MiB  at finite_ordered_sets.py:592:<lambda> <- mor_categories.py:1754:__call__ <- set_categories.py:825:__call__ <- category.py:3128:is_subcategory
+[rss] t=  215.5s rss=   975.3 MiB  at sageinspect.py:2493:sage_getsourcelines <- inspect.py:1151:getsourcelines <- inspect.py:969:findsource <- linecache.py:98:checkcache
+[rss] t=  225.6s rss=   980.3 MiB  at fqf_orthogonal.py:267:_element_constructor_ <- fqf_orthogonal.py:294:_preserves_form <- torsion_quadratic_module.py:149:_mul_ <- matrix_space.py:743:__classcall__
+[rss] t=  235.7s rss=   985.7 MiB  at mor_categories.py:197:_arrow_is_inherited_from_subcategory <- mor_categories.py:244:_declared_category_reaches <- lattice_morphisms.py:3603:super_categories <- mor_categories.py:2005:Ends
+[rss] t=  245.8s rss=   997.8 MiB  at lattices.py:4020:subobject_on <- lattices.py:426:_lattice_subobject_spanning <- lattices.py:453:_lattice_subobject_on_basis <- matrix_space.py:1194:_element_constructor_
+[rss] t=  255.8s rss=  1020.1 MiB  at finite_ordered_sets.py:592:<lambda> <- mor_categories.py:1754:__call__ <- set_categories.py:829:__call__ <- set_categories.py:541:__call__
+[rss] t=  265.9s rss=  1051.7 MiB  at set_categories.py:3548:_from_finite_members <- arrow_categories.py:1830:object <- set_categories.py:2787:FiniteSets <- category_with_axiom.py:2090:__classget__
+[rss] t=  276.0s rss=  1082.2 MiB  at fgp_element.py:333:vector <- fgp_module.py:1308:coordinate_vector <- free_module.py:7957:coordinate_vector <- free_module.py:7807:echelon_coordinate_vector
+[rss] t=  287.3s rss=  1115.3 MiB  at orthogonal_quotients.py:3818:_isotropic_line_class_points <- lattices.py:7167:divided_discriminant_class <- lattices.py:6930:div <- lattices.py:6890:generator_pairings
+[rss] t=  297.3s rss=  1146.3 MiB  at set_categories.py:551:__call__ <- set_categories.py:6884:__call__ <- set_categories.py:6859:_element_constructor_ <- set_categories.py:6877:_point
+[rss] t=  307.4s rss=  1176.8 MiB  at framed_free_modules.py:149:support <- set_categories.py:4005:__call__ <- set_categories.py:4008:_element_constructor_ <- set_categories.py:2630:power_set
+[rss] t=  317.5s rss=  1207.3 MiB  at resolutions.py:703:generator <- finite_ordered_sets.py:371:__call__ <- finite_ordered_sets.py:392:_element_constructor_ <- set_categories.py:551:__call__
+[rss] t=  327.6s rss=  1234.2 MiB  at mor_foundation.py:437:operation <- mor_foundation.py:384:_asked_of_the_category <- cat.py:172:__contains__ <- owned_category.py:1931:category
+[rss] t=  337.7s rss=  1265.3 MiB  at indexed_families.py:94:value <- finite_ordered_sets.py:371:__call__ <- finite_ordered_sets.py:392:_element_constructor_ <- finite_ordered_sets.py:592:<lambda>
+[rss] t=  347.8s rss=  1295.6 MiB  at module_morphisms.py:2165:lift <- modules.py:2803:_framing_lift <- modules.py:2047:framing_source <- resolutions.py:663:level
+[rss] t=  357.9s rss=  1326.4 MiB  at module_morphisms.py:1220:<genexpr> <- modules.py:3154:scalar_multiple <- set_categories.py:819:__call__ <- owned_category.py:1116:is_subcategory
+[rss] t=  368.0s rss=  1341.0 MiB  at torsion_form_modules.py:2733:_engine_abelian_element <- abelian_group_gap.py:355:_element_constructor_ <- sequence.py:310:Sequence <- sequence.py:484:__init__
+[rss] t=  378.1s rss=  1364.5 MiB  at arrow_categories.py:1877:inclusion <- arrow_categories.py:1029:arrow <- arrow_categories.py:789:_chosen_arrow <- arrow_categories.py:789:<genexpr>
+[rss] t=  388.1s rss=  1390.7 MiB  at finite_ordered_sets.py:392:_element_constructor_ <- finite_ordered_sets.py:592:<lambda> <- mor_categories.py:1754:__call__ <- set_categories.py:829:__call__
+[rss] t=  398.2s rss=  1307.5 MiB  at mor_categories.py:1754:__call__ <- set_categories.py:822:__call__ <- set_categories.py:551:__call__ <- set_categories.py:6749:__int__
+[rss] t=  408.3s rss=  1331.8 MiB  at module_morphisms.py:2136:_preimage_or_none <- finitely_presented_modules.py:3250:_singular_presentation_preimage <- finitely_presented_modules.py:3011:_singular_coefficient_presentation <- ring_foundation.py:5114:_has_selected_exact_coefficient_presentation
+[rss] t=  418.4s rss=  1356.4 MiB  at mor_categories.py:1754:__call__ <- set_categories.py:825:__call__ <- category.py:3140:is_subcategory <- owned_category.py:857:_subcategory_hook_
+[rss] t=  428.4s rss=  1381.3 MiB  at mor_foundation.py:438:operation <- mor_foundation.py:307:Mor <- mor_categories.py:2311:Of <- mor_categories.py:2191:base_category
+[rss] t=  438.5s rss=  1405.2 MiB  at mor_categories.py:1754:__call__ <- set_categories.py:823:__call__ <- set_categories.py:386:<lambda> <- set_categories.py:6882:__call__
+[rss] t=  448.6s rss=  1430.2 MiB  at orthogonal_quotients.py:4114:_subgroup_isotropic_equivalence_witness <- orthogonal_quotients.py:2408:invariant_separates_isotropic_orbits <- orthogonal_quotients.py:3822:_isotropic_line_class_points <- torsion_form_modules.py:2731:_engine_abelian_element
+[rss] t=  458.6s rss=  1453.9 MiB  at module_morphisms.py:1220:<genexpr> <- modules.py:3154:scalar_multiple <- modules.py:3087:scalar_action <- category_with_axiom.py:2090:__classget__
+[rss] t=  468.7s rss=  1480.3 MiB  at arrow_categories.py:996:_construct_on <- objects.py:335:_with_structure <- owned_category.py:1680:_object_of <- owned_category.py:845:is_subcategory
+[rss] t=  478.8s rss=  1506.5 MiB  at set_categories.py:823:__call__ <- set_categories.py:386:<lambda> <- set_categories.py:522:position_of <- set_categories.py:6749:__int__
+[rss] t=  488.9s rss=  1525.5 MiB  at mor_foundation.py:437:operation <- mor_foundation.py:384:_asked_of_the_category <- cat.py:172:__contains__ <- owned_category.py:1934:category
+[rss] t=  499.0s rss=  1553.8 MiB  at orthogonal_quotients.py:3818:_isotropic_line_class_points <- lattices.py:7167:divided_discriminant_class <- lattices.py:6936:div <- ring_foundation.py:6121:gcd
+[rss] t=  509.1s rss=  1581.0 MiB  at mor_categories.py:1754:__call__ <- set_categories.py:825:__call__ <- category.py:3140:is_subcategory <- owned_category.py:857:_subcategory_hook_
+[rss] t=  519.2s rss=  1605.6 MiB  at framed_free_modules.py:274:__hash__ <- framed_free_modules.py:275:<genexpr> <- ring_foundation.py:5969:__eq__ <- ring_foundation.py:5855:_backend
+[rss] t=  529.2s rss=  1632.7 MiB  at finite_ordered_sets.py:392:_element_constructor_ <- set_categories.py:549:__call__ <- set_categories.py:535:__contains__ <- set_categories.py:6749:__int__
+[rss] t=  539.3s rss=  1660.1 MiB  at finite_ordered_sets.py:904:<genexpr> <- finite_ordered_sets.py:592:<lambda> <- mor_categories.py:1754:__call__ <- set_categories.py:817:__call__
+[rss] t=  549.4s rss=  1687.7 MiB  at finite_ordered_sets.py:592:<lambda> <- mor_categories.py:1754:__call__ <- set_categories.py:825:__call__ <- category.py:436:__classcall__
+[rss] t=  559.5s rss=  1717.5 MiB  at lattices.py:6930:div <- lattices.py:6890:generator_pairings <- framed_free_modules.py:260:_richcmp_ <- ring_foundation.py:6888:zero
+[rss] t=  569.6s rss=  1746.2 MiB  at indexed_families.py:94:value <- finite_ordered_sets.py:371:__call__ <- finite_ordered_sets.py:389:_element_constructor_ <- finite_ordered_sets.py:259:index_set
