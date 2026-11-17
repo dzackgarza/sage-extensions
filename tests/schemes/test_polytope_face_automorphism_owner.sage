@@ -217,3 +217,20 @@ def test_the_stored_sterk2_polygon_answers_its_face_action() -> None:
     )
     assert induced.is_injective() is True
     assert induced.is_surjective() is False
+
+
+def test_a_polytope_is_one_object_wherever_it_is_obtained_again() -> None:
+    r"""One square built twice is one polytope, so its face poset's top face is it.
+
+    A polytope is its vertex set in its lattice, which is the datum its equality
+    and its hash read, so the square the face poset of another construction of it
+    is asked for has to be that same object; the top face of the face poset is
+    the supplied polytope and not an equal copy of it.
+    """
+    first = _square()
+    second = _square()
+
+    assert second is first
+    assert tuple(second.face_poset().faces(2))[0] is second
+    assert tuple(first.face_poset().faces(2))[0] is first
+    assert tuple(second.face_poset().faces(1))[0] in first.face_poset().faces(1)
