@@ -1,0 +1,76 @@
+# tree: 0516a0f726e64020fe36a566a66e42bde61ffee1
+# status: 
+# port: 991b88b095a42a1e3679569ea42328c900c120f6
+# load: 0.93 1.42 2.17
+# program: .scratch/381-growth/probe-row-growth.py PROBE_PLANES=12 PROBE_BAND=6 PROBE_INGRESS=unset PROBE_PREFIXES=4,8 PYTHONHASHSEED=0
+[      3.6 s rss    305.7 MiB] T_Co rank 11, Otilde(T_Co), its character quotient, 112 parabolic generators
+[    200.8 s rss   1339.1 MiB] the split's first lift (the finite image's whole coset walk) 191.0 s
+  [plane       2/12] rss   1339.2 MiB
+  [plane       3/12] rss   1339.2 MiB
+  [plane       4/12] rss   1339.2 MiB
+  [plane       5/12] rss   1339.2 MiB
+  [plane       6/12] rss   1339.3 MiB
+  [plane       7/12] rss   1339.3 MiB
+  [plane       8/12] rss   1339.3 MiB
+  [plane       9/12] rss   1339.3 MiB
+  [plane      10/12] rss   1339.3 MiB
+  [plane      11/12] rss   1339.3 MiB
+  [plane      12/12] rss   1339.3 MiB
+[    201.0 s rss   1339.3 MiB] the row's first 12 planes, shape cusps
+
+[per-plane stages]
+  the split's walk       first      5:     8.736 ms a plane   last      5:     0.866 ms a plane   all:     4.440 ms
+  transport and lift reg first      5:     4.839 ms a plane   last      5:     4.486 ms a plane   all:     4.672 ms
+  the cusp (span key)    first      5:     0.837 ms a plane   last      5:     0.794 ms a plane   all:     0.817 ms
+  the finite action      first      5:     6.106 ms a plane   last      5:     0.244 ms a plane   all:     2.911 ms
+  the plane, all stages  first      5:    20.518 ms a plane   last      5:     6.390 ms a plane   all:    12.840 ms
+  the source plane's own cusp: 1.305 ms
+
+[ingress: the library's own first statement, tuple(dict.fromkeys(...))]
+        4 points:     0.303 s    50496.3 us a comparison   4 distinct
+        8 points:     1.287 s    45979.7 us a comparison   8 distinct
+
+[one unequal pair of cusps, each timed]
+  pair   0/2:    54.144 ms   equal=False
+  pair   1/2:    56.247 ms   equal=False
+
+[profile] dict.fromkeys over 8 cusps: 3.072 s
+         8252477 function calls (8181316 primitive calls) in 3.072 seconds
+
+   Ordered by: cumulative time
+   List reduced from 1033 to 14 due to restriction <14>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+    285/1    0.000    0.000    3.072    3.072 {built-in method fromkeys}
+       46    0.000    0.000    3.072    0.067 /repos/sage-extensions/src/sage_extensions/categories/isotropic_orbits.py:882(__eq__)
+       46    0.000    0.000    3.036    0.066 /repos/sage-extensions/src/sage_extensions/categories/isotropic_orbits.py:935(transporter_witness)
+       46    0.000    0.000    3.001    0.065 /repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py:741(isotropic_equivalence_witness)
+       46    0.000    0.000    3.000    0.065 /repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py:4244(_subgroup_isotropic_equivalence_witness)
+       46    0.001    0.000    2.100    0.046 /repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py:2411(invariant_separates_isotropic_orbits)
+67215/24147    0.246    0.000    1.693    0.000 /repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py:791(__call__)
+       92    0.001    0.000    1.584    0.017 /repos/sage-extensions/src/sage_extensions/categories/isotropic_orbits.py:2021(_divided_discriminant_classes)
+      276    0.001    0.000    1.563    0.006 /repos/sage-extensions/src/sage_extensions/categories/lattices.py:7212(divided_discriminant_class)
+51743/37278    0.025    0.000    0.993    0.000 /repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py:1755(__call__)
+    39269    0.062    0.000    0.968    0.000 /repos/sage-extensions/src/sage_extensions/categories/sets/finite_ordered_sets.py:373(_element_constructor_)
+      883    0.004    0.000    0.888    0.001 {built-in method builtins.sum}
+    35070    0.009    0.000    0.878    0.000 /repos/sage-extensions/src/sage_extensions/categories/sets/finite_ordered_sets.py:370(__call__)
+      552    0.004    0.000    0.867    0.002 /repos/sage-extensions/src/sage_extensions/categories/lattices.py:6969(div)
+
+
+
+[RESULT] planes=12 walk=191.0 s rss_end=1342.2 MiB wall=206.1 s lanes=
+[BANDS] first=18.214 ms last=6.442 ms a plane
+[peakrss] profile-12: child waited=0 shell_code=0 samples=104
+[peakrss] peak tree RSS      : 1344 MiB
+[peakrss] low-water MemAvail : 12427 MiB
+[peakrss] peak single VmHWM  : 1344 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     1340 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   run.sh                        1 MiB peak
+[peakrss]   t=   206.1s procs=  2 rss=  1344 MiB hwm=  1344 MiB avail= 12596 MiB
+[peakrss]   t=   202.1s procs=  2 rss=  1343 MiB hwm=  1343 MiB avail= 12549 MiB
+[peakrss]   t=   204.1s procs=  2 rss=  1343 MiB hwm=  1343 MiB avail= 12574 MiB
+[peakrss]   t=   200.1s procs=  2 rss=  1321 MiB hwm=  1321 MiB avail= 12545 MiB
+[peakrss]   t=   198.1s procs=  2 rss=  1156 MiB hwm=  1156 MiB avail= 12694 MiB
+# launcher exit: 0

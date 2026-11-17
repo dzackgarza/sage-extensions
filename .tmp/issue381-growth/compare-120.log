@@ -1,0 +1,45 @@
+# tree: 0516a0f726e64020fe36a566a66e42bde61ffee1
+# status: 
+# port: 991b88b095a42a1e3679569ea42328c900c120f6
+# load: 3.04 3.34 3.02
+# program: .scratch/381-growth/probe-row-growth.py PROBE_PLANES=120 PROBE_BAND=60 PROBE_INGRESS=unset PROBE_PREFIXES=20,40,80,120 PYTHONHASHSEED=0
+[      4.1 s rss    305.6 MiB] T_Co rank 11, Otilde(T_Co), its character quotient, 112 parabolic generators
+[    204.2 s rss   1241.0 MiB] the split's first lift (the finite image's whole coset walk) 193.5 s
+  [plane       2/120] rss   1241.0 MiB
+  [plane       3/120] rss   1241.0 MiB
+  [plane      12/120] rss   1241.3 MiB
+  [plane      24/120] rss   1241.4 MiB
+  [plane      36/120] rss   1241.6 MiB
+  [plane      48/120] rss   1242.0 MiB
+  [plane      60/120] rss   1242.2 MiB
+  [plane      72/120] rss   1242.3 MiB
+  [plane      84/120] rss   1242.5 MiB
+  [plane      96/120] rss   1242.9 MiB
+  [plane     108/120] rss   1243.0 MiB
+  [plane     120/120] rss   1243.1 MiB
+[    205.0 s rss   1243.1 MiB] the row's first 120 planes, shape cusps
+
+[per-plane stages]
+  the split's walk       first     59:     1.722 ms a plane   last     59:     0.818 ms a plane   all:     1.266 ms
+  transport and lift reg first     59:     4.518 ms a plane   last     59:     4.349 ms a plane   all:     4.433 ms
+  the cusp (span key)    first     59:     0.769 ms a plane   last     59:     0.744 ms a plane   all:     0.756 ms
+  the finite action      first     59:     0.839 ms a plane   last     59:     0.283 ms a plane   all:     0.559 ms
+  the plane, all stages  first     59:     7.848 ms a plane   last     59:     6.194 ms a plane   all:     7.014 ms
+  the source plane's own cusp: 1.349 ms
+
+[ingress: the library's own first statement, tuple(dict.fromkeys(...))]
+       20 points:     6.052 s    31855.0 us a comparison   20 distinct
+       40 points:    20.552 s    26349.1 us a comparison   40 distinct
+       80 points:    81.276 s    25720.2 us a comparison   80 distinct
+      120 points:   175.996 s    24649.4 us a comparison   120 distinct
+
+[one unequal pair of cusps, each timed]
+  pair   0/8:    18.298 ms   equal=False
+  pair   1/8:    19.631 ms   equal=False
+  pair   2/8:    17.804 ms   equal=False
+  pair   3/8:    23.330 ms   equal=False
+  pair   4/8:    25.276 ms   equal=False
+  pair   5/8:    20.904 ms   equal=False
+  pair   6/8:    22.367 ms   equal=False
+  pair   7/8:    21.173 ms   equal=False
+# launcher exit: 124

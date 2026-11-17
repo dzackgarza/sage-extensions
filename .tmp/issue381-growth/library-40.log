@@ -1,0 +1,50 @@
+# tree: 0516a0f726e64020fe36a566a66e42bde61ffee1
+# status: 
+# port: 991b88b095a42a1e3679569ea42328c900c120f6
+# load: 0.85 0.97 1.14
+# program: .scratch/381-growth/probe-row-growth.py PROBE_PLANES=40 PROBE_BAND=20 PROBE_INGRESS=unset PROBE_PREFIXES=20,40 PYTHONHASHSEED=0
+[      3.8 s rss    305.6 MiB] T_Co rank 11, Otilde(T_Co), its character quotient, 112 parabolic generators
+[    184.5 s rss   1248.7 MiB] the split's first lift (the finite image's whole coset walk) 174.5 s
+  [plane       2/40] rss   1248.8 MiB
+  [plane       3/40] rss   1248.8 MiB
+  [plane       4/40] rss   1248.8 MiB
+  [plane       8/40] rss   1248.9 MiB
+  [plane      12/40] rss   1248.9 MiB
+  [plane      16/40] rss   1249.0 MiB
+  [plane      20/40] rss   1249.1 MiB
+  [plane      24/40] rss   1249.2 MiB
+  [plane      28/40] rss   1249.4 MiB
+  [plane      32/40] rss   1249.5 MiB
+  [plane      36/40] rss   1249.5 MiB
+  [plane      40/40] rss   1249.5 MiB
+[    184.8 s rss   1249.5 MiB] the row's first 40 planes, shape cusps
+
+[per-plane stages]
+  the split's walk       first     19:     3.160 ms a plane   last     19:     0.852 ms a plane   all:     1.976 ms
+  transport and lift reg first     19:     4.686 ms a plane   last     19:     4.670 ms a plane   all:     4.673 ms
+  the cusp (span key)    first     19:     0.788 ms a plane   last     19:     0.788 ms a plane   all:     0.788 ms
+  the finite action      first     19:     2.050 ms a plane   last     19:     0.266 ms a plane   all:     1.136 ms
+  the plane, all stages  first     19:    10.684 ms a plane   last     19:     6.577 ms a plane   all:     8.573 ms
+  the source plane's own cusp: 1.379 ms
+
+[ingress: the library's own first statement, tuple(dict.fromkeys(...))]
+       20 points:     4.748 s    24988.1 us a comparison   20 distinct
+       40 points:    19.232 s    24656.6 us a comparison   40 distinct
+  finite_ordered_set over 40 points:    35.976 s  (cardinality 40)
+
+[RESULT] planes=40 walk=174.5 s rss_end=1251.7 MiB wall=245.2 s lanes=
+[BANDS] first=10.469 ms last=6.567 ms a plane
+[peakrss] library-40: child waited=0 shell_code=0 samples=124
+[peakrss] peak tree RSS      : 1255 MiB
+[peakrss] low-water MemAvail : 12741 MiB
+[peakrss] peak single VmHWM  : 1255 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     1252 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   run.sh                        1 MiB peak
+[peakrss]   t=   246.1s procs=  2 rss=  1255 MiB hwm=  1255 MiB avail= 12774 MiB
+[peakrss]   t=   188.1s procs=  2 rss=  1254 MiB hwm=  1254 MiB avail= 12782 MiB
+[peakrss]   t=   190.1s procs=  2 rss=  1254 MiB hwm=  1254 MiB avail= 12774 MiB
+[peakrss]   t=   192.1s procs=  2 rss=  1254 MiB hwm=  1254 MiB avail= 12774 MiB
+[peakrss]   t=   194.1s procs=  2 rss=  1254 MiB hwm=  1254 MiB avail= 12774 MiB
+# launcher exit: 0

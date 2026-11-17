@@ -1,0 +1,31 @@
+# tree: ba51bdf98511dda3c2f2e9cadc9e5853736f60ae
+# status: 
+# port: 991b88b095a42a1e3679569ea42328c900c120f6
+# load: 1.91 3.13 2.72
+# program: .scratch/381-growth/probe-row-growth.py PROBE_PLANES=800 PROBE_BAND=100 PROBE_INGRESS=unset PROBE_PREFIXES=200,400,800 PYTHONHASHSEED=0
+[      3.5 s rss    305.9 MiB] T_Co rank 11, Otilde(T_Co), its character quotient, 112 parabolic generators
+[    199.0 s rss   1302.3 MiB] the split's first lift (the finite image's whole coset walk) 189.2 s
+  [plane       2/800] rss   1302.3 MiB
+  [plane       3/800] rss   1302.4 MiB
+  [plane      80/800] rss   1303.9 MiB
+  [plane     160/800] rss   1305.4 MiB
+  [plane     240/800] rss   1306.2 MiB
+  [plane     320/800] rss   1306.2 MiB
+  [plane     400/800] rss   1306.3 MiB
+  [plane     480/800] rss   1306.3 MiB
+  [plane     560/800] rss   1306.5 MiB
+  [plane     640/800] rss   1306.9 MiB
+  [plane     720/800] rss   1307.6 MiB
+  [plane     800/800] rss   1308.5 MiB
+[    205.7 s rss   1308.5 MiB] the row's first 800 planes, shape cusps
+
+[per-plane stages]
+  the split's walk       first    100:     1.220 ms a plane   last    100:     0.853 ms a plane   all:     0.907 ms
+  transport and lift reg first    100:     4.564 ms a plane   last    100:     4.422 ms a plane   all:     5.010 ms
+  the cusp (span key)    first    100:     0.767 ms a plane   last    100:     0.724 ms a plane   all:     0.736 ms
+  the finite action      first    100:     0.556 ms a plane   last    100:     0.308 ms a plane   all:     0.343 ms
+  the plane, all stages  first    100:     7.107 ms a plane   last    100:     6.308 ms a plane   all:     6.995 ms
+  the source plane's own cusp: 1.404 ms
+
+[ingress: the library's own first statement, tuple(dict.fromkeys(...))]
+# launcher exit: 124

@@ -1,0 +1,45 @@
+# tree: 0516a0f726e64020fe36a566a66e42bde61ffee1
+# status: 
+# port: 991b88b095a42a1e3679569ea42328c900c120f6
+# load: 0.78 1.04 1.39
+# program: .scratch/381-growth/probe-row-growth.py PROBE_PLANES=10000 PROBE_BAND=500 PROBE_INGRESS=0 PROBE_PREFIXES=unset PYTHONHASHSEED=0
+[      3.5 s rss    305.7 MiB] T_Co rank 11, Otilde(T_Co), its character quotient, 112 parabolic generators
+[    192.4 s rss   1315.6 MiB] the split's first lift (the finite image's whole coset walk) 182.7 s
+  [plane       2/10000] rss   1315.7 MiB
+  [plane       3/10000] rss   1315.7 MiB
+  [plane    1000/10000] rss   1328.5 MiB
+  [plane    2000/10000] rss   1347.7 MiB
+  [plane    3000/10000] rss   1361.5 MiB
+  [plane    4000/10000] rss   1380.4 MiB
+  [plane    5000/10000] rss   1395.1 MiB
+  [plane    6000/10000] rss   1411.8 MiB
+  [plane    7000/10000] rss   1431.2 MiB
+  [plane    8000/10000] rss   1443.9 MiB
+  [plane    9000/10000] rss   1460.9 MiB
+  [plane   10000/10000] rss   1480.8 MiB
+[    255.1 s rss   1480.8 MiB] the row's first 10000 planes, shape cusps
+
+[per-plane stages]
+  the split's walk       first    500:     0.950 ms a plane   last    500:     0.869 ms a plane   all:     0.857 ms
+  transport and lift reg first    500:     5.163 ms a plane   last    500:     4.254 ms a plane   all:     4.426 ms
+  the cusp (span key)    first    500:     0.733 ms a plane   last    500:     0.703 ms a plane   all:     0.702 ms
+  the finite action      first    500:     0.330 ms a plane   last    500:     0.273 ms a plane   all:     0.283 ms
+  the plane, all stages  first    500:     7.176 ms a plane   last    500:     6.099 ms a plane   all:     6.268 ms
+  the source plane's own cusp: 1.349 ms
+
+[RESULT] planes=10000 walk=182.7 s rss_end=1481.1 MiB wall=255.9 s lanes=
+[BANDS] first=7.176 ms last=6.099 ms a plane
+[peakrss] planes-10000b: child waited=0 shell_code=0 samples=130
+[peakrss] peak tree RSS      : 1484 MiB
+[peakrss] low-water MemAvail : 12497 MiB
+[peakrss] peak single VmHWM  : 1485 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     1481 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   run.sh                        2 MiB peak
+[peakrss]   t=   256.1s procs=  2 rss=  1484 MiB hwm=  1484 MiB avail= 12497 MiB
+[peakrss]   t=   254.1s procs=  2 rss=  1479 MiB hwm=  1479 MiB avail= 12505 MiB
+[peakrss]   t=   258.1s procs=  2 rss=  1475 MiB hwm=  1485 MiB avail= 12505 MiB
+[peakrss]   t=   252.1s procs=  2 rss=  1472 MiB hwm=  1472 MiB avail= 12513 MiB
+[peakrss]   t=   250.1s procs=  2 rss=  1466 MiB hwm=  1466 MiB avail= 12521 MiB
+# launcher exit: 0
