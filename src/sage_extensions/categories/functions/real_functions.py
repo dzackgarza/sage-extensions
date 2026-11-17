@@ -489,9 +489,34 @@ def _pointwise_product(left, right):
     return lambda point: left(point) * right(point)
 
 
+def _engine_formula_value(value):
+    r"""The engine's expression for ``value``, or ``None`` when it has none.
+
+    The symbolic engine writes a session integer, a rational number and an
+    engine real as a formula in one variable.  It writes no owned value: an
+    owned ring is not the engine's, and the engine is not an owned ring.
+    """
+    try:
+        return SR(value)
+    except TypeError:
+        return None
+
+
 def _constant_map(value):
-    r"""The defining function of the constant map with value ``value``."""
-    return _formula_map(SR(value), SR.var("t"))
+    r"""The defining function of the constant map with value ``value``.
+
+    A value the engine writes as a formula keeps one, so the operations that
+    read a formula in one variable -- derivative, integral, Taylor series, the
+    pairings -- work on a constant function too.  An owned value has no engine
+    formula, so the constant map is the value itself; an operation that needs a
+    formula then states that frontier, as it does for any other map given by a
+    callable.
+    """
+    match _engine_formula_value(value):
+        case None:
+            return lambda point: value
+        case expression:
+            return _formula_map(expression, SR.var("t"))
 
 
 # ---------------------------------------------------------------------------
@@ -705,8 +730,9 @@ class _DifferentiabilityClass(_FunctionSpace):
 @cached_function(key=lambda regularity, domain, codomain: (_exponent_key(regularity), id(domain), id(codomain)))
 def _differentiability_class(regularity, domain, codomain):
     r"""Build \(C^k(X,Y)\) as a condition submodule of \(Y^X\); for \(Y=\mathbb R\), the algebra on it."""
-    assert codomain in VectorSpaces(RR), (
-        f"C^k(X, Y) is a real vector space of maps, so Y must be a real vector space, but {codomain} is not"
+    assert codomain is RR or codomain in VectorSpaces(RR), (
+        f"C^k(X, Y) is a real vector space of maps, so Y must be a real vector "
+        f"space or the real field RR itself, but {codomain} is not"
     )
     module = _condition_submodule(
         codomain.function_module(domain),
