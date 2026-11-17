@@ -94,9 +94,9 @@ because `phi` vanishes on its own image.  Those three families generate
 `Aut(N)`.  `recursive.py:1288-1296` builds exactly them: the quotient
 generators with the isotropic family held fixed (`1289-1290`), the radical
 images, which for a line are `+-e` (`1291-1292`), and the shears, which move
-one frame lift by the isotropic vector and leave `J` fixed (`1293-1295`).  A
-shear does not kill `N`: it fixes `J` pointwise, sends `N` into `N`, and its
-image lies in `J`, inside `N`.
+one frame lift by the isotropic vector and leave `J` fixed (`1293-1295`).  The
+shear `1 + phi` fixes `J` pointwise and is an automorphism of `N`; `phi` has
+image in `J`.
 
 A second family is added rather than read off `Aut(N)`: the
 pointwise-perpendicular kernel (`1309-1318`), whose rational generators are
