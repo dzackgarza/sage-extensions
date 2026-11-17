@@ -89,3 +89,10 @@ unit does not edit it.
    fails on `RegularPolytopes`' missing `f_vector`, which is that owner's stub
    and not this work unit's; it fails identically at the base commit.
 3. The Sterk rank/dimension questions remain at parent #256.
+
+Corrected 2026-11-17: the two placed-polytope stubs in
+`src/sage_extensions/categories/schemes/polytopes.py` are at line 234
+(`_PlacedPolytopeCategory.an_object`) and line 237 (`.on`), not 233 and 236; those
+numbers were read before this round's edits to the same file.  The
+`real_affine_spaces.py` line numbers above are as read on this round's base and
+are unchanged by it.
