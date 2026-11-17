@@ -19,6 +19,18 @@ vertices refuses such a face, and nothing is chosen on a complement the face doe
 not meet.  What stays defined is what does not need that frame: the face's
 inclusion, its position in the parent's face object, and the lift of a parent
 automorphism to it, whose ambient map is the parent's own and is not read back.
+
+**The unplaced polytope is the one that knows its own face object**, and the placed
+category delegates to it.  A face of an unplaced polytope is a polytope of its own
+ambient lattice, its boundary is its faces of codimension one, a triangulation cuts
+it into cells on its own vertices, and the lift of one of its geometric
+automorphisms is read from that automorphism's action on the vertices -- none of
+which mentions a placement.  The placed category states the placement and nothing
+else: its faces are those faces placed, its boundary is that boundary placed, its
+triangulation is that triangulation placed, and the faces' map of a face's
+inclusion is the inclusion of the face object, which the polytope placed here
+answers.  What the two owners answer differently is one thing -- what a face is --
+and it is stated once, in `faces`.
 """
 
 import weakref
@@ -128,6 +140,55 @@ def _owned_rational(coordinate):
     if engine_parent(coordinate) in (SageZZ, SageQQ):
         return _owned_engine_element(SageQQ, SageQQ(coordinate))
     return _owned_rationals()(coordinate)
+
+
+class _PolytopeFaceStructureMethods:
+    r"""The operations a polytope reads off its own face object.
+
+    ``faces`` is the one face operation the two owners answer differently: a face
+    of an unplaced polytope is a polytope of its own ambient lattice, and a face
+    of a placed one is a placed polytope.  What a boundary is does not depend on
+    that: the facets are the faces of codimension one, and the boundary's
+    inclusion is the family of their inclusions.  Those are read from ``faces``,
+    ``dimension`` and ``face_inclusion`` -- which each owner states in its own
+    arrows -- so they are written once here and neither owner restates them.
+    """
+
+    @cached_method
+    def boundary(self):
+        r"""The proper faces of codimension one, as a family of faces.
+
+        The boundary of a polytope is the union of its facets, which are its faces
+        of codimension one; a polytope is the union of its facets, so the facets
+        are exactly those faces and this reads them off the face object rather
+        than recounting them.  A point has no proper face at all, so its boundary
+        is empty and this answers the empty family for it.
+        """
+        dimension = int(self.dimension())
+        if dimension < 1:
+            return finite_ordered_set(())
+        return self.faces(dimension - 1)
+
+    @cached_method
+    def boundary_inclusion(self):
+        r"""The boundary's inclusion into the polytope: one arrow per boundary face.
+
+        The boundary is a union of faces and not itself an object of the category
+        the polytope lies in, so its inclusion into the polytope is the family of
+        its faces' inclusions: an indexed family with one arrow per boundary face,
+        the arrow at a position being that face's own ``face_inclusion``.
+        """
+        faces = tuple(self.boundary())
+        positions = finite_ordinal_set(len(faces))
+
+        def inclusion_at(position):
+            return self.face_inclusion(faces[int(position)])
+
+        return finite_indexed_family(
+            positions,
+            inclusion_at,
+            description=lambda self=self: f"Boundary inclusion of {self}",
+        )
 
 
 class AbstractPolytopes(OwnedCategory):
@@ -677,7 +738,7 @@ class _PlacedPolytopeCategory(OwnedParameterizedCategory):
     def face_posets(self):
         return _PlacedPolytopeFacePosetFunctor(self)
 
-    class ParentMethods:
+    class ParentMethods(_PolytopeFaceStructureMethods):
         def __init__(self, defining_data, ambient_inclusion, **rest):
             self._defining_data = defining_data
             self._ambient_inclusion = ambient_inclusion
@@ -957,129 +1018,54 @@ class _PlacedPolytopeCategory(OwnedParameterizedCategory):
                 )
             )
 
-        @cached_method
-        def _parent_face_by_coordinates(self):
-            r"""The parent's faces by the coordinates of their vertices.
-
-            A face of this polytope and the face of the polytope placed inside it
-            that has the same vertices are one subset, and their coordinates name
-            them both: this is what carries a face object's face into the parent's.
-            """
-            underlying = self.underlying_polytope()
-            return {
-                frozenset(
-                    tuple(
-                        SageQQ(value)
-                        for value in underlying._engine_coordinates(vertex)
-                    )
-                    for vertex in face.vertices()
-                ): face
-                for face in underlying.face_poset()
-            }
-
         def face_inclusion(self, face):
             r"""The arrow of this category from ``face`` into this polytope.
 
             The ambient map is the identity of the ambient space: the face is
-            already where the parent places it, so the inclusion moves no point, and
-            the faces' map carries each of the face's faces to the parent's face with
-            the same vertices.  The top face's inclusion is the polytope's identity.
+            already where the parent places it, so the inclusion moves no point.
+
+            The faces' map is the inclusion of the face's face object into this
+            polytope's, which the polytope placed here answers: the faces of the
+            placed polytope are the faces of the polytope it places, so the map
+            carries a face of the face to the parent's face on the same vertices and
+            neither component is computed in this category.  The top face's
+            inclusion is the polytope's identity.
             """
-            underlying_face = face.underlying_polytope()
-            assert underlying_face in self.face_poset(), (
-                f"{face} is not a face of {self}: its underlying polytope is not one of this "
-                "polytope's faces"
-            )
-            by_coordinates = self._parent_face_by_coordinates()
+            underlying = self.underlying_polytope()
             ambient = self.ambient_space()
-
-            def parent_face(inner):
-                key = frozenset(
-                    tuple(
-                        SageQQ(value)
-                        for value in underlying_face._engine_coordinates(vertex)
-                    )
-                    for vertex in inner.vertices()
-                )
-                assert key in by_coordinates, (
-                    f"the face {inner} of {face} has no face of {self} with the same vertices, so "
-                    "this face is not a sub-face of that polytope"
-                )
-                return by_coordinates[key]
-
             return self.category().Mor(face, self)(
                 ambient.category().Mor(ambient, ambient).identity(),
-                FiniteGradedPosets().Mor(face.face_poset(), self.face_poset())(parent_face),
+                underlying.face_poset_inclusion(face.underlying_polytope()),
             )
 
-        @cached_method
-        def boundary(self):
-            r"""The placed proper faces of codimension one.
+        def dimension(self):
+            r"""The affine dimension of this polytope: the dimension of the one it places.
 
-            The boundary of a polytope is the union of its facets, which are its
-            faces of codimension one; a point has no proper face of that dimension,
-            so its boundary is empty and this returns the empty family for it.
+            A placement is an affine map of one space into another, so it preserves
+            the affine dimension, and the faces of the placed polytope are the faces
+            of the polytope it places: this reads the dimension at the owner of the
+            face object rather than off the placed vertices.
             """
-            dimension = int(self.underlying_polytope().dimension())
-            if dimension < 1:
-                return finite_ordered_set(())
-            return self.faces(dimension - 1)
+            return self.underlying_polytope().dimension()
 
         @cached_method
-        def boundary_inclusion(self):
-            r"""The boundary's inclusion into the polytope, one arrow per boundary face.
-
-            The boundary is a union of faces and not itself an object of this
-            category, so its inclusion into the polytope is the family of its
-            faces' inclusions: an arrow of this category for each boundary face,
-            each of them carrying the ambient space's identity.
-            """
-            faces = tuple(self.boundary())
-            positions = finite_ordinal_set(len(faces))
-
-            def inclusion_at(position):
-                return self.face_inclusion(faces[int(position)])
-
-            return finite_indexed_family(
-                positions,
-                inclusion_at,
-                description=lambda self=self: f"Boundary inclusion of {self}",
-            )
-
-        @cached_method
-        def triangulate(self):
+        def triangulate(self, engine="auto"):
             r"""The cells of one triangulation of this polytope, as placed polytopes.
 
             A triangulation writes the polytope as a finite union of simplices whose
             vertices are vertices of the polytope and whose interiors are disjoint.
-            The cells are the private polyhedral engine's triangulation of the
-            polytope placed here -- each simplex read as the ambient V-representation
-            indices of its vertices, which is the order the engine numbers them --
-            and each is placed where those vertices are placed, so a cell is an
-            object of this category with the parent's placement and the parent's
-            vertices.
+            Which simplices those are is a property of the polytope and not of the
+            placement, so the cells are the ones the polytope placed here answers,
+            for the algorithm ``engine`` names -- the default being the polytope's
+            own, which this category states and does not choose -- and each is
+            placed where those vertices are placed: a cell is then an object of this
+            category with the parent's placement and the parent's vertices.
             """
-            underlying = self.underlying_polytope()
-            lattice = underlying.ambient_lattice()
-            labels = tuple(lattice.module_generating_set())
-            engine_vertices = underlying._owned_vertices_in_engine_order()
-            triangulation = underlying._engine_polyhedron().triangulate()
-
-            def cell_of(simplex):
-                vertices = tuple(engine_vertices[index] for index in sorted(simplex))
-                return self._placed_subpolytope(
-                    ConvexPolytopes(lattice)(
-                        tuple(
-                            tuple(
-                                int(vertex.to_vector()(label)) for label in labels
-                            )
-                            for vertex in vertices
-                        )
-                    )
-                )
-
             return finite_ordered_set(
-                tuple(cell_of(simplex) for simplex in tuple(triangulation))
+                tuple(
+                    self._placed_subpolytope(cell)
+                    for cell in self.underlying_polytope().triangulate(engine)
+                )
             )
 
         def geometric_lifts_of_face_automorphism(self, geometric_automorphism, face):
@@ -1668,7 +1654,7 @@ class ConvexPolytopes(OwnedParameterizedCategory):
             r"""Return this category with the axiom that the affine dimension is two."""
             return self._with_axiom("Polygon")
 
-    class ParentMethods:
+    class ParentMethods(_PolytopeFaceStructureMethods):
         def __init__(self, engine_polyhedron, ambient_lattice, defining_data, **rest) -> None:
             r"""Retain the selected presentation and its private exact polyhedron.
 
@@ -2080,8 +2066,50 @@ class ConvexPolytopes(OwnedParameterizedCategory):
             )
 
         def face_inclusion(self, face):
-            r"""The selected face arrow from ``face`` into this polytope."""
-            pass
+            r"""The inclusion of ``face`` into this polytope.
+
+            A face is a subobject of the polytope it is a face of: every point of
+            the face is a point of the polytope, and both are subsets of this
+            polytope's ambient space.  The inclusion is therefore the map of sets
+            that sends a point of the face to that same point of the ambient
+            space, and it is injective with the face itself as its image, which is
+            the subobject ``Sets().Mono`` presents.  The top face's inclusion is
+            the polytope's own identity.
+
+            The points are points of the ambient space.  A face's own vertices are
+            lattice points, which this polytope's ingress does not admit, so they
+            are read here through :meth:`rational_point`, the conversion that
+            carries a lattice point to the ambient space point at its coordinates.
+            """
+            assert face in self.face_poset(), (
+                f"{face} is not a face of {self}: it is not one of the polytopes of this "
+                "polytope's face object"
+            )
+            return Sets().Mono(face, self)._from_subset_inclusion()
+
+        def face_poset_inclusion(self, face):
+            r"""The inclusion of ``face``'s face object into this polytope's.
+
+            A face of a face is a face of this polytope, and both face objects are
+            read off this polytope: the carrier of ``face``'s face object is a
+            subfamily of this polytope's carrier, so the inclusion carries a face
+            of ``face`` to itself, read as the face of this polytope.  The top face
+            of ``face`` is the face ``face`` itself, which is the face of this
+            polytope on the same vertices.
+
+            It is a map of finite graded posets and not only a map of sets: the
+            grade of a face is its affine dimension, which does not depend on which
+            of the two carriers it is read in, and one face lies in another in the
+            small carrier exactly when it does in the large one, since a face is
+            the convex hull of its vertices in both.
+            """
+            assert face in self.face_poset(), (
+                f"{face} is not a face of {self}: it is not one of the polytopes of this "
+                "polytope's face object"
+            )
+            return FiniteGradedPosets().Mor(face.face_poset(), self.face_poset())(
+                lambda inner: inner
+            )
 
         @cached_method
         def face_poset(self):
@@ -2116,14 +2144,24 @@ class ConvexPolytopes(OwnedParameterizedCategory):
             return AbstractPolytopes().from_face_poset(graded)
 
         def facet_inclusion(self, facet):
-            r"""The selected face arrow from ``facet`` into this polytope."""
-            pass
+            r"""The inclusion of one facet into this polytope.
 
-        def boundary(self):
-            pass
-
-        def boundary_inclusion(self):
-            pass
+            A facet is a face of codimension one, and the inclusion of a face is
+            :meth:`face_inclusion`; the dimension is decided here, before the
+            inclusion is read, so that a face which is not a facet is refused
+            instead of being included as though it were one.
+            """
+            assert facet in self.face_poset(), (
+                f"{facet} is not a face of {self}: it is not one of the polytopes of this "
+                "polytope's face object"
+            )
+            dimension = int(self.dimension())
+            assert int(facet.dimension()) == dimension - 1, (
+                f"{facet} is not a facet of {self}: it has dimension "
+                f"{int(facet.dimension())}, and the facets of a polytope of dimension "
+                f"{dimension} are its faces of dimension {dimension - 1}"
+            )
+            return self.face_inclusion(facet)
 
         @cached_method
         def _combinatorial_vertex_permutations(self):
@@ -2325,14 +2363,85 @@ class ConvexPolytopes(OwnedParameterizedCategory):
                 check=True,
             )
 
-        def geometric_lifts_of_face_automorphism(self, face_automorphism):
-            pass
+        def geometric_lifts_of_face_automorphism(self, geometric_automorphism, face):
+            r"""The restriction of a geometric automorphism to a face it preserves.
+
+            For an element ``g`` of this polytope's geometric automorphisms and a
+            face ``F``, the lift is the element of ``F``'s own geometric
+            automorphism group whose action on ``F``'s vertices is ``g``'s.  It
+            exists exactly when ``g`` carries ``F`` onto itself: an affine
+            automorphism of the polytope carries a face to the face on the images
+            of its vertices, and a face is the convex hull of its vertices, so
+            ``g`` keeps ``F`` exactly when it permutes ``F``'s vertices among
+            themselves.  A face it moves is an isomorphism of the face onto a
+            different one and no automorphism of it, so that case answers ``None``
+            and the operation's type is ``Aut(F) | None``.
+
+            The automorphisms retained here are this polytope's own, which
+            :meth:`geometric_automorphisms` answers as their action on the
+            vertices; the lift is read from that action alone, so no affine map is
+            read back from the face's vertices and a vertex, whose vertex spans
+            nothing, is lifted like any other face.  An element of this polytope's
+            group that keeps a face restricts to an element of that face's group;
+            the face's own group is where a restriction that were not one is
+            refused rather than answered.
+            """
+            assert geometric_automorphism in self.geometric_automorphisms(), (
+                f"the lift to a face of {self} is taken from this polytope's geometric "
+                f"automorphisms, but {geometric_automorphism} is not one of them"
+            )
+            assert face in self.face_poset(), (
+                f"{face} is not a face of {self}: it is not one of the polytopes of this "
+                "polytope's face object"
+            )
+            vertices = tuple(face.vertices())
+            images = tuple(geometric_automorphism(vertex) for vertex in vertices)
+            if frozenset(images) != frozenset(vertices):
+                return None
+            positions = face.vertices().ranking_map()
+            return face.geometric_automorphisms()(
+                [int(positions(image)) + 1 for image in images]
+            )
 
         def triangulations(self):
             return ChosenTriangulations(self)
 
-        def triangulate(self):
-            pass
+        @cached_method
+        def triangulate(self, engine="auto"):
+            r"""The cells of one triangulation of this polytope, as polytopes.
+
+            A triangulation writes the polytope as a finite union of simplices
+            whose vertices are vertices of this polytope and whose interiors are
+            disjoint.  A polytope of dimension two or more has many of them, so
+            which one is answered is stated and not hidden: ``engine`` is the
+            algorithm the private polyhedral computation triangulates with, and its
+            default ``"auto"`` is that computation's own default, which it reads as
+            topcom when a topcom executable is installed and as its exact internal
+            routine otherwise.  Every engine's answer is a triangulation of this
+            polytope; the choice is which simplices those are.
+
+            Each simplex is read as the ambient V-representation indices of its
+            vertices, which is the order the private computation numbers them, and
+            the cell is the convex hull of those vertices in this polytope's own
+            ambient lattice.  So a cell's vertices are vertices of this polytope,
+            and a cell is a polytope of the same lattice as this one.
+            """
+            labels = tuple(self.ambient_space().module_generating_set())
+            ambient_vertices = self._owned_vertices_in_engine_order()
+            triangulation = self._engine_polyhedron().triangulate(engine=engine)
+
+            def cell_of(simplex):
+                chosen = tuple(ambient_vertices[index] for index in sorted(simplex))
+                return ConvexPolytopes(self.ambient_lattice())(
+                    tuple(
+                        tuple(vertex.to_vector()(label) for label in labels)
+                        for vertex in chosen
+                    )
+                )
+
+            return finite_ordered_set(
+                tuple(cell_of(simplex) for simplex in tuple(triangulation))
+            )
 
         def _engine_point_configuration(self):
             r"""Lower the owned vertices to a private Sage point configuration."""
