@@ -1,8 +1,10 @@
 # Does the current public line stabilizer return the whole setwise stabilizer?
 
 Measured answer, on the two smallest nontrivial framed lines: **yes**.  The
-call, the values and the certificate are below, with the one step that rests on
-a citation named as such.
+call, the values and the certificate are below.  The completeness step is
+decided here rather than cited: the rank-one argument in its own section
+identifies the action's integral stabilizer with the setwise stabilizer of the
+line.
 
 ## The call and the loaded revisions
 
@@ -37,6 +39,9 @@ source was changed; the only thing done to the port repository was a fetch.
 
 Both are the full lattice rank (3 and 4) with signature `(1,2)` and `(2,2)`; the
 timings are the whole public call, including the finite orbit and the reduction.
+The last column records, per specimen, the letter lengths of the words that
+recover its distinct family elements and, where one is named, the longest of
+those words.  The words themselves are not all reproduced in this note.
 
 ## The certificate, four steps, each decided here
 
@@ -50,7 +55,9 @@ generated subgroups, never of tuples.
   provider's complete integral Schreier family
   (`IntegralStructureAction.stabilizer().group_generators()`, converted) is
   recovered from the returned generators by exact integer matrix products of at
-  most three letters: 6/6 and 16/16 distinct elements, words pasted above.
+  most three letters: 6/6 and 16/16 distinct elements.  The retained table gives
+  the letter lengths of those products, and for `U + U(2)` the longest one,
+  `g0*g1*g4`; it does not list all of the words.
 - **(C) the returned family lies in the complete family.**  Each returned
   generator *is* one of that family's elements, by exact integer matrix
   equality: 3/3 and 5/5.  With (B): the two families generate one subgroup.
@@ -60,17 +67,86 @@ generated subgroups, never of tuples.
 
 `(A)`–`(C)` give `<returned> = <complete family>`, and the sign-reversing
 element in each family is the one acting as `-1` on the line, so what is
-returned is the *setwise* stabilizer, not the pointwise one.
+returned is the *setwise* stabilizer, not the pointwise one.  The step from
+"the stabilizer of `L` inside the action's rational group" to "the setwise
+stabilizer of the line in `O(L)`" is the rank-one argument below.
 
-## The step that is a citation, and the measurement that shows why
+## The completeness step: rank one
 
-The complete family generates the stabilizer of `L` in the action's rational
-group by Schreier's lemma (its own contract).  That this rational group is the
-*full* rational stabilizer of the isotropic line is the port's structure
-statement, read from `IndefiniteForms.g:1710-1723`: the extended perpendicular
-isometries, the radical images, the kernel generators.  It is not computed
-here — and at this revision it cannot be checked against an independent family,
-because the in-repo block construction refuses a line:
+`L` is a nondegenerate lattice, `J = Z e` is a primitive isotropic line of rank
+one, `N = J^perp`, and `G` is the rational group the port's action is generated
+by.  Two facts about `N` are used, both read from the current source:
+
+- `J` lies inside `N` because `b(e, e) = 0`, and `rad(N) = J`: over the
+  fraction field `N^perp = J`, so `N ∩ N^perp = J`, and `K_I = N/J` is the
+  nondegenerate quotient.
+- `coordinate_frame()` returns the chosen lifts of the framing of `K_I` into
+  `I^perp` (`lattices.py:12013-12015`; `quotient_lattice()` is `K_I` itself at
+  `12028-12030`, and `projection()` at `12032-12057`).  That is a module
+  section `s: K_I -> N`, hence a module splitting `N = J + s(K_I)`.  It is a
+  splitting of the perpendicular by its radical, not an orthogonal splitting of
+  `L`: `J` is isotropic and is a subspace of `N`, and the lifts live in `N`.
+
+**The generators of `G`.**  An isometry of `N` carries `rad(N) = J` to itself,
+so it is a sign on `J`, an isometry of `K_I`, and a shear `x -> x + phi(x)`
+with `phi in Hom(K_I, J)`; those three families generate `Aut(N)`.
+`recursive.py:1288-1296` builds exactly them: the quotient generators with the
+isotropic family held fixed (`1289-1290`), the radical images, which for a line
+are `+-e` (`1291-1292`), and the shears over the frame (`1293-1295`).  A shear
+kills `N` and has image in `J`, inside `N`, so `T^2 = 0` (`1300-1304`).  The
+port extends each image family by the Witt operation and adds the
+pointwise-perpendicular kernel (`1309-1319`); the group they generate is `G`.
+The port states the same structure of `Aut(N)` at `recursive.py:1229-1236`;
+what is decided here is that the integral intersection of its group with
+`O(L)` is the setwise line stabilizer.
+
+**The extension is unique for rank one.**  The extension is
+`_extend_perpendicular_isometry` (`recursive.py:325-346`, source
+`Lorentzian.g:4-48`), and `recursive.py:342-345` states the uniqueness: an
+isometry fixing the hyperplane `v^perp` pointwise, in a nondegenerate space
+with isotropic normal `v`, is trivial.  The preamble's homogeneous part says
+the same thing.  The kernel of `get_kernel_generating_set`
+(`Lorentzian.g:225-244`) is the solution space of `B = X A + A^T X^T`, solved at
+`Lorentzian.g:53-105`, with `A = LambdaMat` the pairing of the isotropic normal
+with the chosen complement (`Lorentzian.g:171-185`).  For a rank-one isotropic
+space the ambient has one dimension outside `N`, so `A` is `1 x 1`, its single
+entry is `b(e, v)`, nonzero (`Lorentzian.g:29-33` checks exactly this entry),
+and `X A + A^T X^T = 0` reads `2 b(e, v) x = 0`.  The alternating `1 x 1`
+space is zero over `Q`, so there is no homogeneous freedom: the extension of an
+isometry of `N` to one of `L_Q` fixing `J` is unique.  The provider's own
+parameter module for its pointwise kernel is the same equation,
+`b(N f_a, f_b) + b(f_a, N f_b) = 0` (`lattices.py:12117-12131`), solved at
+`12167-12195`; at a line it is one `1 x 1` block.
+
+**The equality.**  (i) Every generator of `G` fixes `J` setwise: the three
+families map the isotropic family to itself or to a radical image, and the
+kernel family fixes all of `N` pointwise, `J` included.  (ii) The restriction
+`Stab_{O(L_Q)}(J) -> Aut(N_Q)` is injective: an isometry fixing `N` pointwise
+sends a partner `v` of `J` to `v + phi` with `phi in J` and `(v, phi) = 0`,
+hence `phi = 0`.  (iii) Let `g` be in `Stab_{O(L)}(J)`.  Its restriction to `N`
+is an isometry of `N` (the sign on `J` is `+-1` because `g` is a lattice
+automorphism), hence a word `h` in the three families; the same word of
+extensions is an element `w` of `G` with `w|_N = g|_N`, and by (ii) `w = g`.
+Therefore
+
+    Stab_{O(L)}(J) = {g in G : g(L) = L} = G ∩ O(L).
+
+That is the set `IntegralStructureAction.stabilizer()` answers, by its own
+contract `{g in G : g(L)=L}` (`rational_integral_stabilizers.py:760-761`):
+composing that contract with the equality above gives
+`{g in G : g(L)=L} = Stab_{O(L)}(J)`.  The action is the one built by
+`_stabilizer_action()` (`isotropic_parabolics.py:691-710`, the port's
+`isotropic_stabilizer_action` at `recursive.py:1218`), whose radical action for
+a line is `GL_1(ZZ) = {+-1}`.  So the family the certificate calls complete is
+a generating family of `Stab_{O(L)}(J)`.  The equality is an intersection with
+`O(L)`; nothing above asserts that `G` is the whole rational stabilizer of the
+line in `O(L_Q)`, and the argument does not use that stronger statement.
+
+### Why the reference family is the Schreier family
+
+The in-repo block construction cannot supply a reference at a line, and that
+refusal is a fact about the rank-two construction rather than a gap in the
+argument above:
 
 ```
 in-repo block family REFUSED: the parabolic construction here is stated for a
@@ -80,9 +156,11 @@ has rank 1
 
 `parabolic_stabilizer_generators()` is the k = 2 case of the published block
 decomposition (Dutour Sikirić–Hulek, arXiv:2302.01679v2, Theorem
-`theorem_isotropic_k_planes`), and it is what makes a plane parabolic a
-computation in this repository.  A line has no such family, so a line
-stabilizer has no independent reference.
+`theorem_isotropic_k_planes`); its `plane_basis()` refuses every rank other than
+two (`isotropic_parabolics.py:1828-1840`, the guard at `1835`).  The
+certificate's reference is therefore the complete Schreier family from
+`_stabilizer_action().stabilizer()` (`isotropic_parabolics.py:691`), a
+different code path from the parabolic family.
 
 **One consequence worth recording.**  At this revision the provider's line
 marking delegates to the port: `_marked_automorphism_generators` asks
@@ -98,22 +176,15 @@ U + <-6>, line e1: port family 3, parabolic family 3, same elements True, same o
 U + U(2), line e1: port family 5, parabolic family 5, same elements True, same order True
 ```
 
-The reference used above is therefore the complete Schreier family from
-`_stabilizer_action().stabilizer()`, a different code path.
-
 ## What remains
 
-1. **This stage's acceptance is not measured here.**  It is the Enriques
+1. **The result obligation is not measured here.**  It is the Enriques
    `N = U + U(2) + E8(-2)` observation: `line_automorphism_generators(N, e1)`
    returning the full stabilizer on `I_1_1` (`Z e1`) and `I_1_2` (`Z e3`), and
-   the port's case_3 counts 5/10/19 passing in its acceptance run.  Both are
-   full-size image runs and are not started here.
-2. **The mathematical requirement that remains at this size** is the k = 1 case
-   of the block decomposition: an in-repo family for the parabolic at an
-   isotropic *line*, so that a line stabilizer's completeness is a computation
-   rather than a citation.  `parabolic_stabilizer_generators()` refuses rank
-   one today (`plane_basis()` guards `module_rank() == 2`,
-`isotropic_parabolics.py:1835`), and every stated
-   prerequisite of the k = 2 construction — the splitting `L = P ⊥ U ⊥ K`,
-   `is_parabolic_complete()`, `parabolic_obstruction() = None` — already holds on
-   both specimens above (`True`, `None`).
+   the port's case_3 line/plane/flag counts 5/10/19 passing in its acceptance
+   run.  Both are full-size image runs and are not started here.  The obligation
+   stands on this repository's #18 and on the port's acceptance table, issue #64
+   of `dzackgarza/sage-indefinite-port`.
+
+The port remains paused for work; no port source is changed by this note, and
+consumers may use the already-published port revision `54d12c2`.
