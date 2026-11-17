@@ -1,0 +1,47 @@
+# tree: ecfbea143675b37aeee67ac4a902a1e9e7948757
+# status: 
+# load: 1.69 1.66 1.57
+# program: probe-584-retention.py  PROBE_PLANES=10 PROBE_MODE=baseline
+  [     0.87 s] T_Co, Otilde(T_Co), its quotient: mode baseline, meter every 0   rss    282.5 MiB
+[probe] the slicing plane is parabolic complete: True
+  [     4.75 s] the plane's certified parabolic: 112 generators   rss    421.2 MiB
+[probe] tuple(family) is family: True
+  [   225.15 s] the split's first lift (the finite image's whole coset walk)   rss   1291.9 MiB
+  [plane      1/10] rss   1291.9 MiB
+  [plane      2/10] rss   1292.0 MiB
+  [plane      3/10] rss   1292.0 MiB
+  [plane      4/10] rss   1292.0 MiB
+  [plane      5/10] rss   1292.1 MiB
+  [plane      6/10] rss   1292.1 MiB
+  [plane      7/10] rss   1292.1 MiB
+  [plane      8/10] rss   1292.1 MiB
+  [plane      9/10] rss   1292.2 MiB
+  [plane     10/10] rss   1292.2 MiB
+  [   225.22 s] the plane row's first 10 planes   rss   1292.2 MiB
+
+[slope] rss, per band of planes
+  planes      1..     1:   -261.7 KB a plane
+  planes      2..     2:     35.2 KB a plane
+  planes      3..     3:     31.2 KB a plane
+  planes      4..     4:     27.3 KB a plane
+  planes      5..     5:     39.1 KB a plane
+  planes      6..     6:     11.7 KB a plane
+  planes      7..     7:     27.3 KB a plane
+  planes      8..     8:     43.0 KB a plane
+  planes      9..     9:      7.8 KB a plane
+  planes     10..    10:     39.1 KB a plane
+
+[probe] RESULT mode=baseline planes=10 wall=225.2 s rss=1292.2 MiB after_first_lift=1291.9 MiB last_rss=1292.2 MiB growth_per_plane_bytes=30492 lifts_retained=10
+[peakrss] bare-base-10: child waited=0 shell_code=0 samples=115
+[peakrss] peak tree RSS      : 1296 MiB
+[peakrss] low-water MemAvail : 10483 MiB
+[peakrss] peak single VmHWM  : 1296 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     1293 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   run.sh                        2 MiB peak
+[peakrss]   t=   226.1s procs=  2 rss=  1296 MiB hwm=  1296 MiB avail= 10523 MiB
+[peakrss]   t=   228.1s procs=  2 rss=  1282 MiB hwm=  1296 MiB avail= 10483 MiB
+[peakrss]   t=   224.1s procs=  2 rss=  1276 MiB hwm=  1276 MiB avail= 10570 MiB
+[peakrss]   t=   220.1s procs=  2 rss=  1212 MiB hwm=  1212 MiB avail= 10590 MiB
+[peakrss]   t=   222.1s procs=  2 rss=  1212 MiB hwm=  1212 MiB avail= 10539 MiB

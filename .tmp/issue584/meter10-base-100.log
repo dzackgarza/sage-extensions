@@ -1,0 +1,64 @@
+# tree: ecfbea143675b37aeee67ac4a902a1e9e7948757
+# status: 
+# load: 1.78 1.67 1.58
+# program: probe-584-retention.py  PROBE_PLANES=100 PROBE_MODE=baseline PROBE_METER_EVERY=10
+  [     0.99 s] T_Co, Otilde(T_Co), its quotient: mode baseline, meter every 10   rss    282.4 MiB
+[probe] the slicing plane is parabolic complete: True
+  [     4.89 s] the plane's certified parabolic: 112 generators   rss    421.2 MiB
+[probe] tuple(family) is family: True
+  [     4.91 s] meter seeded over the row's shared objects (30839 objects, 0.0 s)   rss    424.2 MiB
+  [   207.01 s] the split's first lift (the finite image's whole coset walk)   rss   1229.2 MiB
+  [plane      1/100] rss   1229.2 MiB  marginal   14366 B  (transported plane 0, span key 432, registry entry key 432, family tuple 0, lift 13438, registry entry shell 64)
+  [plane      2/100] rss   1229.2 MiB
+  [plane      3/100] rss   1229.2 MiB
+  [plane     10/100] rss   1229.5 MiB
+  [plane     20/100] rss   1230.1 MiB
+  [plane     30/100] rss   1230.7 MiB
+  [plane     40/100] rss   1231.3 MiB
+  [plane     50/100] rss   1232.0 MiB
+  [plane     60/100] rss   1232.6 MiB
+  [plane     70/100] rss   1233.3 MiB
+  [plane     80/100] rss   1234.0 MiB
+  [plane     90/100] rss   1234.6 MiB
+  [plane    100/100] rss   1235.3 MiB
+  [   207.62 s] the plane row's first 100 planes   rss   1235.3 MiB
+
+[attribution] marginal bytes by structure over the metered planes
+  family tuple                      0 B over    10 objects =       0.0 B a metered plane
+  lift                          69454 B over    10 objects =    6945.4 B a metered plane
+  registry entry key             4656 B over    10 objects =     465.6 B a metered plane
+  registry entry shell            640 B over    10 objects =      64.0 B a metered plane
+  span key                       4656 B over    10 objects =     465.6 B a metered plane
+  transported plane            320979 B over    10 objects =   32097.9 B a metered plane
+  total                        400385 B = 40038.5 B a plane
+  the transported plane's marginal, by its own attribute: (the object itself) 0, _constructing_category 0, _defining_construction 0, _module_generating_set 0, _module_subobject_construction 11352, _preamble_base_ring 0, _preamble_form 0, _preamble_form_computation 3960, _preamble_gram_tensor 592, _preamble_radical_quotient_basis_map 0, _preamble_radical_quotient_cokernel_projection 0, _preamble_selected_framing_source 19248, _preamble_selected_generating_set 0, _selected_data_registry 0, embedded_module_generators 0, inclusion 0
+  the lift's marginal, by its own attribute: (the object itself) 0, _composition_factors 0, _element_function 0, _form_module_morphism 0, _forward_computation 0, _function 968, _generator_image 0, _generator_morphism 0, _inverse_computation 0, _isometry_inverse_computation 4880, _lift_function 0, _linearity_premises 0, _owned_function 0, _projective_section_restriction_data 0, _restricted_codomain 0, _restricted_morphism 0, _scalar_extension_functor 0, _scalar_extension_of 0, _scalar_map 376, _source_module_morphism 0, _surjectivity_premise 0, _underlying_module_isomorphism 0, _value_morphism 0, forward 0
+      inventory at the end: quotient has 17 attributes: _discriminant_group (OwnedTorsionFormOrthogonalGroup_with_category_with_category), _has_discriminant (bool), _im_rho_engine_and_section (CachedMethodCallerNoArgs), _image_labels (FiniteOrderedSets.parent_class), _image_space (OwnedJoinCategory.parent_class), _isotropic_lift_registry (dict of 100, 4688 B), _isotropic_root_bridges (dict of 0, 64 B), _joint_discriminant_image_gap (CachedMethodCallerNoArgs), _sign_descent_rank (CachedMethodCallerNoArgs), _transported_isotropic_objects (dict of 0, 64 B), ambient_discriminant_images (CachedMethodCallerNoArgs), determinant_kernel (bool), discriminant_preimages (tuple of 1), lattice (OwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType), spinor_kernel (bool), subgroup (PreimageSubgroups.parent_class), supergroup (OwnedLatticeIsometryMor_with_category_with_category)
+
+[slope] rss, per band of planes
+  planes      1..    10:   -581.6 KB a plane
+  planes     11..    20:     58.2 KB a plane
+  planes     21..    30:     60.5 KB a plane
+  planes     31..    40:     65.6 KB a plane
+  planes     41..    50:     65.2 KB a plane
+  planes     51..    60:     64.8 KB a plane
+  planes     61..    70:     66.0 KB a plane
+  planes     71..    80:     65.6 KB a plane
+  planes     81..    90:     68.8 KB a plane
+  planes     91..   100:     66.8 KB a plane
+
+[probe] RESULT mode=baseline planes=100 wall=207.6 s rss=1235.3 MiB after_first_lift=1229.2 MiB last_rss=1235.3 MiB growth_per_plane_bytes=64874 lifts_retained=100
+[peakrss] meter10-base-100: child waited=0 shell_code=0 samples=105
+[peakrss] peak tree RSS      : 1239 MiB
+[peakrss] low-water MemAvail : 10492 MiB
+[peakrss] peak single VmHWM  : 1239 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     1236 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   run.sh                        0 MiB peak
+[peakrss]   t=   208.1s procs=  2 rss=  1239 MiB hwm=  1239 MiB avail= 12490 MiB
+[peakrss]   t=   206.1s procs=  2 rss=  1213 MiB hwm=  1213 MiB avail= 12592 MiB
+[peakrss]   t=   202.1s procs=  2 rss=  1119 MiB hwm=  1119 MiB avail= 12429 MiB
+[peakrss]   t=   204.1s procs=  2 rss=  1119 MiB hwm=  1119 MiB avail= 12599 MiB
+[peakrss]   t=   198.1s procs=  2 rss=  1104 MiB hwm=  1104 MiB avail= 12486 MiB
+# launcher exit: 0

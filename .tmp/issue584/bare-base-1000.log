@@ -1,0 +1,51 @@
+# tree: ecfbea143675b37aeee67ac4a902a1e9e7948757
+# status: ?? results/issue584-the-63-kilobytes-a-plane.md 
+# load: 2.72 2.45 1.93
+# program: probe-584-retention.py  PROBE_PLANES=1000 PROBE_MODE=baseline PROBE_METER_EVERY=0
+  [     0.98 s] T_Co, Otilde(T_Co), its quotient: mode baseline, meter every 0   rss    282.7 MiB
+[probe] the slicing plane is parabolic complete: True
+  [     4.76 s] the plane's certified parabolic: 112 generators   rss    421.5 MiB
+[probe] tuple(family) is family: True
+  [   206.66 s] the split's first lift (the finite image's whole coset walk)   rss   1379.0 MiB
+  [plane      1/1000] rss   1379.0 MiB
+  [plane      2/1000] rss   1379.1 MiB
+  [plane      3/1000] rss   1379.1 MiB
+  [plane    100/1000] rss   1382.2 MiB
+  [plane    200/1000] rss   1388.1 MiB
+  [plane    300/1000] rss   1394.7 MiB
+  [plane    400/1000] rss   1401.4 MiB
+  [plane    500/1000] rss   1408.2 MiB
+  [plane    600/1000] rss   1415.0 MiB
+  [plane    700/1000] rss   1421.7 MiB
+  [plane    800/1000] rss   1428.5 MiB
+  [plane    900/1000] rss   1435.3 MiB
+  [plane   1000/1000] rss   1442.1 MiB
+  [   213.80 s] the plane row's first 1000 planes   rss   1442.1 MiB
+
+[slope] rss, per band of planes
+  planes      1..   100:   -598.7 KB a plane
+  planes    101..   200:     58.6 KB a plane
+  planes    201..   300:     66.3 KB a plane
+  planes    301..   400:     67.2 KB a plane
+  planes    401..   500:     67.5 KB a plane
+  planes    501..   600:     67.9 KB a plane
+  planes    601..   700:     67.7 KB a plane
+  planes    701..   800:     67.5 KB a plane
+  planes    801..   900:     67.7 KB a plane
+  planes    901..  1000:     68.3 KB a plane
+
+[probe] RESULT mode=baseline planes=1000 wall=213.8 s rss=1442.1 MiB after_first_lift=1379.0 MiB last_rss=1442.1 MiB growth_per_plane_bytes=66192 lifts_retained=1000
+[peakrss] bare-base-1000: child waited=0 shell_code=0 samples=109
+[peakrss] peak tree RSS      : 1443 MiB
+[peakrss] low-water MemAvail : 11758 MiB
+[peakrss] peak single VmHWM  : 1446 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     1442 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   run.sh                        2 MiB peak
+[peakrss]   t=   214.1s procs=  2 rss=  1443 MiB hwm=  1443 MiB avail= 12039 MiB
+[peakrss]   t=   216.1s procs=  2 rss=  1436 MiB hwm=  1446 MiB avail= 12049 MiB
+[peakrss]   t=   212.1s procs=  2 rss=  1425 MiB hwm=  1425 MiB avail= 12045 MiB
+[peakrss]   t=   210.1s procs=  2 rss=  1403 MiB hwm=  1403 MiB avail= 11758 MiB
+[peakrss]   t=   208.1s procs=  2 rss=  1384 MiB hwm=  1384 MiB avail= 12148 MiB
+# launcher exit: 0
