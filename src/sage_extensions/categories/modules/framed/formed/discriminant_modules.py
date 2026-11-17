@@ -986,6 +986,37 @@ def _all_discriminant_subgroups(ambient):
     )
 
 
+def _discriminant_gram_on(form, generators, *, quadratic):
+    r"""Restrict the dual pairing to lifts of a finite family of classes.
+
+    The free module on the family maps to the metric dual by the selected
+    representatives.  Pullback of its defining tensor computes all pairings
+    at once.  Only the diagonal retains its value modulo 2R; off-diagonal
+    entries use the selected lift of the value modulo R.
+    """
+    generators = tuple(generators)
+    ring = form.base_ring()
+    source = ring.free_module(len(generators))
+    dual = form.dual_lattice()
+    family = source.module_category().Mor(source, dual)(
+        {label: form.dual_lattice_lift(generator)
+         for label, generator in zip(source.module_generating_set(), generators, strict=True)}
+    )
+    gram = dual.gram_tensor().pullback(family)
+    bilinear_values = form.bilinear_value_module()
+    if not quadratic:
+        return tuple(
+            tuple(bilinear_values(gram[i, j]) for j in range(len(generators)))
+            for i in range(len(generators))
+        )
+    quadratic_values = form.quadratic_value_module()
+    return tuple(
+        tuple(quadratic_values(gram[i, j] if i == j else bilinear_values(gram[i, j]).lift())
+              for j in range(len(generators)))
+        for i in range(len(generators))
+    )
+
+
 def _descended_bilinear_gram(dual_lattice, labels, bilinear_values):
     r"""Return ``b`` on the classes of the selected dual basis, in ``K/R``.
 

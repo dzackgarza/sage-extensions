@@ -878,6 +878,13 @@ def _form_gram_on(form, generators, *, quadratic: bool):
     valued in ``K/R``.  Which one is asked for is a fact about the
     mathematics of the caller, never about the family.
     """
+    from sage_extensions.categories.modules.framed.formed.discriminant_modules import (
+        DiscriminantBilinearModules,
+        _discriminant_gram_on,
+    )
+
+    if form in DiscriminantBilinearModules(form.base_ring()):
+        return _discriminant_gram_on(form, generators, quadratic=quadratic)
     if quadratic:
         return _quadratic_gram_on(form, generators)
     return tuple(
