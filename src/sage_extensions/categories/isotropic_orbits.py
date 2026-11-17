@@ -457,6 +457,22 @@ class IsotropicFlag:
 
         return INDUCTION.flag_invariant(self._lattice, self._basis, self.flag_type().dimensions)
 
+    def stabilizer(self, group, *, pointwise=False):
+        r"""Actual arithmetic subgroup stabilizer of this flag.
+
+        The group may be O(L) or an explicitly supplied subgroup.  The
+        intersection is taken *after* constructing the full exact flag
+        stabilizer; neither its generators nor its induced quotient image
+        are replaced by those of O(L) when a proper group is supplied.
+        """
+        ambient = self._lattice.O()
+        full = ambient.stabilizer(self, action="pointwise" if pointwise else "setwise")
+        if group is ambient:
+            return full
+        if group.supergroup() is not ambient:
+            raise ValueError(f"{group} is not a subgroup of {ambient}")
+        return group.intersection(full)
+
     def graded_quotient_action(self, group):
         r"""Return the action ``Stab_G(F) -> GL(gr F + I_t^perp/I_t)`` on successive quotients.
 
