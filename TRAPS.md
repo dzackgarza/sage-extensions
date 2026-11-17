@@ -113,10 +113,15 @@ with a PARI stack overflow. Set the stack limit **after** importing
 
 The owner checks also exercise large integral coefficients and isometry
 witnesses for both definite signs. PARI's
-[`qfminim` flag 0](https://pari.math.u-bordeaux.fr/dochtml/html-stable/Vectors__matrices__linear_algebra_and_sets.html#qfminim)
-is restricted to small integral entries. The adapters use flag 2; the shell
-comparison retains one minimal vector and evaluates its norm exactly because
-flag 2 returns a floating-point minimum. The automorphism adapter divides
+[`qfminim`](https://pari.math.u-bordeaux.fr/dochtml/html-stable/Vectors__matrices__linear_algebra_and_sets.html#qfminim)
+uses floating-point enumeration; evaluating returned vectors exactly does
+not certify completeness. The minimal-shell and decomposition adapters use
+GAP's [`ShortestVectors`](https://docs.gap-system.org/doc/ref/chap25.html),
+whose rational enumeration certifies all opposite pairs through an integral
+bound. A reduced basis supplies an exact upper bound for the minimum, and
+the returned vectors are transported to the original basis. Integer content
+is removed before enumeration; the shell norm is evaluated against the
+original Gram matrix. The automorphism adapter divides
 the Gram matrix by its integer content before `qfauto`: nonzero scalar
 multiplication preserves the orthogonal group, while an unnecessary scalar
 can exceed PARI's machine-integer input range.

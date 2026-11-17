@@ -3345,17 +3345,17 @@ def _minimal_shell(gram):
     r"""The minimum and the number of minimal vectors of the positive definite ``gram``.
 
     An isometry carries the minimal vectors of one form onto those of the
-    other, so two forms with different pairs are not isometric. PARI's
-    ``qfminim`` counts every minimal vector while storing at most one
-    opposite pair. Flag 2 supports large integral entries; its returned
-    minimum is floating point, so evaluate the retained vector exactly
-    instead (The PARI Group, *PARI/GP*, ``qfminim``). This separates
+    other, so two forms with different pairs are not isometric. The
+    definite-lattice engine enumerates the minimal opposite pairs with
+    exact rational arithmetic. This separates
     nonisometric forms before ``qfisom`` enumerates all vectors up to the
     largest diagonal entry.
     """
-    count, _minimum, vectors = pari(gram).qfminim(None, 1, 2)
-    vector = vectors.sage().column(0)
-    return vector * gram * vector, int(count)
+    from sage_extensions.categories.definite_lattices import _minimal_vectors
+
+    vectors = _minimal_vectors(gram)
+    vector = vectors[0]
+    return vector * gram * vector, 2 * len(vectors)
 
 
 @cached_function

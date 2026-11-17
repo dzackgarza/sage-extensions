@@ -221,6 +221,34 @@ def _lll_basis(basis, gram):
     return reduction.transpose() * basis
 
 
+def _minimal_vectors(gram):
+    r"""One vector from each minimal opposite pair, in the coordinates of ``gram``.
+
+    For a nonzero positive definite integral Gram matrix, GAP's
+    ``ShortestVectors`` enumerates all opposite pairs through an integral
+    bound using rational Gram--Schmidt coefficients and squared comparisons
+    (GAP Reference Manual, section 25.6-2; ``lib/zlattice.gi``).
+    The minimum diagonal of a reduced Gram is the norm of an actual basis
+    vector, hence an upper bound for the minimum. Reduction only supplies
+    this bound and a change of basis; the exact enumeration certifies the
+    minimum and the completeness of its shell.
+    """
+    from sage.libs.gap.libgap import libgap
+
+    primitive = (gram / gram.gcd()).change_ring(SageZZ)
+    transformation = pari(primitive).qflllgram().sage()
+    reduced = transformation.transpose() * primitive * transformation
+    bound = min(reduced.diagonal())
+    shell = libgap.ShortestVectors(reduced, bound)
+    norms = shell["norms"].sage()
+    minimum = min(norms)
+    return tuple(
+        transformation * engine_vector(SageZZ, coordinates)
+        for coordinates, norm in zip(shell["vectors"].sage(), norms, strict=True)
+        if norm == minimum
+    )
+
+
 def indecomposable_summand_bases(gram):
     r"""Row bases of the indecomposable orthogonal summands of a positive definite ``gram``, or ``None``.
 
@@ -238,9 +266,7 @@ def indecomposable_summand_bases(gram):
     rank = gram.nrows()
     if rank == 1:
         return (identity_matrix(SageZZ, 1),)
-    # PARI's flag 0 is restricted to small integral entries; flag 2
-    # supports the full integral Gram domain (PARI/GP manual, qfminim).
-    vectors = engine_matrix(SageZZ, pari(gram).qfminim(None, None, 2)[2].sage()).columns()
+    vectors = _minimal_vectors(gram)
     unseen = set(range(len(vectors)))
     components = []
     while unseen:
