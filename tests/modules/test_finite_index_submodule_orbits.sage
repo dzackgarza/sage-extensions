@@ -16,3 +16,12 @@ def test_trivial_action_keeps_all_three_index_two_submodules():
     orbits = module.finite_index_submodule_orbits((1, 2), ())
     assert orbits.cardinality() == cardinal(3)
     assert all(arrow.cokernel().cardinality() == cardinal(2) for arrow in orbits)
+
+
+def test_rank_three_index_two_orbits_distinguish_trivial_and_full_gl_actions():
+    module = Lattices(ZZ)([[0, 0, 0], [0, 0, 0], [0, 0, 0]])
+    full = module.finite_index_submodule_orbits((1, 1, 2), module.general_linear_group().group_generators())
+    trivial = module.finite_index_submodule_orbits((1, 1, 2), ())
+    assert full.cardinality() == cardinal(1)
+    assert trivial.cardinality() == cardinal(7)
+    assert all(arrow.cokernel().cardinality() == cardinal(2) for arrow in trivial)
