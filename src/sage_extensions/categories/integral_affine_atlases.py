@@ -14,6 +14,7 @@ from sage_extensions.categories.functors.core import Functor
 from sage_extensions.categories.integral_affine_manifolds import IntegralAffineManifolds
 from sage_extensions.categories.manifolds import SmoothManifolds
 from sage_extensions.categories.real_ck_atlases import RealCkAtlases
+from sage_extensions.owned_category import _object_of
 from sage_extensions.owned_category_bases import CategoryWithAxiom
 
 
@@ -118,8 +119,41 @@ class IntegralAffineAtlases(OwnedCategory):
         overlap_inclusions,
         transition_maps,
     ):
-        r"""Select charts and affine transitions on the exact smooth manifold."""
-        pass
+        r"""Select charts, their integral-affine maps and their transitions on the exact manifold.
+
+        An integral-affine structure on a real surface is a family of charts
+        into one affine model whose transition maps lie in
+        ``SL(2,Z) ⋉ R^2`` (Alexeev--Engel, *The birational geometry of moduli
+        of Enriques surfaces*, arXiv:2208.10383v2, Definition 6.11, p. 30).
+        Each chart has an open submanifold ``U`` of ``smooth_manifold``, carried
+        into it by ``U -> smooth_manifold``; its affine chart ``U -> affine_model``
+        identifies it with a subset of the model; and on the overlap
+        ``U_s cap U_t`` the overlap's inclusion into ``U_s`` and the transition
+        ``tau_{st}: U_s cap U_t -> affine_model`` are carried in that same
+        model, so the two charts agree there.
+
+        The four families of maps are indexed by the chart domains.  The
+        construction retains them and computes nothing from them: whether the
+        transitions are integral-affine and whether the domains cover the
+        manifold are decisions the atlas answers
+        (:meth:`ParentMethods.transitions_are_integral_affine`,
+        :meth:`ParentMethods.chart_domains_cover`), never conditions a caller
+        is charged for at construction (``OWN-22``).
+        """
+        assert smooth_manifold in SmoothManifolds(), (
+            f"an integral-affine atlas is a family of charts on a smooth manifold, and "
+            f"{smooth_manifold} is in {smooth_manifold.category()}"
+        )
+        return _object_of(
+            self,
+            smooth_manifold=smooth_manifold,
+            affine_model=affine_model,
+            chart_domains=chart_domains,
+            chart_domain_inclusions=chart_domain_inclusions,
+            affine_charts=affine_charts,
+            overlap_inclusions=overlap_inclusions,
+            transition_maps=transition_maps,
+        )
 
     def transition_is_integral_affine(self, affine_model, transition_map):
         r"""Decide whether the transition preserves the model's selected lattice."""
@@ -225,7 +259,15 @@ class IntegralAffineAtlases(OwnedCategory):
 
         @cached_method
         def integral_affine_manifold(self):
-            pass
+            r"""Return the integral-affine manifold this atlas presents.
+
+            The manifold is the exact smooth manifold the atlas is selected on,
+            carrying this atlas (``OWN-15``): the atlas is the structure added
+            to that manifold, so the presentation is built through
+            ``IntegralAffineManifolds.on`` rather than as a second copy of the
+            manifold (``OWN-02``, ``OWN-19``).
+            """
+            return IntegralAffineManifolds().on(self.underlying_smooth_manifold(), self)
 
     class Oriented(CategoryWithAxiom):
         r"""Atlases with determinant-one integral linear transitions."""
