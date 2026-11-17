@@ -2461,9 +2461,11 @@ class _DividedClassPlaneOrbitDecomposition:
         inclusion = plane.inclusion()
         domain = inclusion.domain()
         vectors = [inclusion(domain.module_generator(label)) for label in domain.module_generating_set()]
-        for label, exponent in word:
-            isometry = self._ambient[label - 1]
-            if exponent != 1:
+        # _FiniteImageWordSection.letters_of returns signed integer indices,
+        # not (generator, exponent) pairs. Negative indices select inverses.
+        for signed_index in word:
+            isometry = self._ambient[abs(signed_index) - 1]
+            if signed_index < 0:
                 isometry = isometry.inverse()
             vectors = [isometry(vector) for vector in vectors]
         try:
