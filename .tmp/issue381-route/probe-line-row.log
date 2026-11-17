@@ -1,0 +1,7 @@
+# tree: 5f6abb81d8bac1e491e6cf5f36b19b05529e236c
+# status: 
+# port: 991b88b095a42a1e3679569ea42328c900c120f6
+# load: 0.95 0.89 0.82
+# program: /repos/sage-extensions/.scratch/381/probe-line-row.py PROBE_PLANES=1 PROBE_WALK=unset PYTHONHASHSEED=unset
+[     1.1 s rss    279.6 MiB] T_Co and Otilde(T_Co)
+# launcher exit: 124

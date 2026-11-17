@@ -1,0 +1,24 @@
+# tree: 5f6abb81d8bac1e491e6cf5f36b19b05529e236c
+# status:  M results/coble-kernel-incidence-rows.yml  M tests/coble_gamma_co_2_incidence_rows.py ?? results/issue-body-the-plane-rows-representatives-are-a-constructed-subobject.md 
+# port: 991b88b095a42a1e3679569ea42328c900c120f6
+# load: 1.01 1.34 1.40
+# program: /repos/sage-extensions/.scratch/381/probe-decision-cost.py PROBE_PLANES=1 PROBE_WALK=unset PYTHONHASHSEED=unset
+[     0.1 s] Otilde(T_Co)
+[     0.0 s] its character quotient
+[    47.4 s] subgroup_image_order = 1
+[     0.0 s] preserves_conjugation (first) = True
+[     0.0 s] preserves_conjugation (second) = True
+[peakrss] probe-decision-cost: child waited=0 shell_code=0 samples=26
+[peakrss] peak tree RSS      : 587 MiB
+[peakrss] low-water MemAvail : 12240 MiB
+[peakrss] peak single VmHWM  : 587 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      584 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   run.sh                        2 MiB peak
+[peakrss]   t=    50.0s procs=  2 rss=   587 MiB hwm=   587 MiB avail= 12240 MiB
+[peakrss]   t=    48.0s procs=  2 rss=   586 MiB hwm=   586 MiB avail= 12243 MiB
+[peakrss]   t=    46.0s procs=  2 rss=   584 MiB hwm=   584 MiB avail= 12264 MiB
+[peakrss]   t=    44.0s procs=  2 rss=   583 MiB hwm=   583 MiB avail= 12289 MiB
+[peakrss]   t=    42.0s procs=  2 rss=   582 MiB hwm=   582 MiB avail= 12318 MiB
+# launcher exit: 0

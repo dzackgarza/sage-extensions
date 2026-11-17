@@ -1,0 +1,73 @@
+# tree: 5f6abb81d8bac1e491e6cf5f36b19b05529e236c
+# status: 
+# port: 991b88b095a42a1e3679569ea42328c900c120f6
+# load: 0.33 0.77 0.75
+# program: /repos/sage-extensions/.scratch/381/probe-plane-row.py PROBE_PLANES=200 PROBE_WALK=40 PYTHONHASHSEED=unset
+[     0.8 s rss    282.8 MiB] T_Co rank 11, Otilde(T_Co), its character quotient
+[probe] the slicing plane is parabolic complete: True
+[     4.3 s rss    421.4 MiB] the plane's certified parabolic: 112 generators
+[   172.5 s rss   1253.7 MiB] the split's first lift (the finite image's whole coset walk)
+[probe] the split yields (lift, element): OwnedLatticeIsometryMor_with_category_with_category.ArrowType, OwnedTorsionFormOrthogonalGroup_with_category_with_category.element_class
+  [plane      1/200]      2.8 ms  rss   1253.7 MiB
+  [plane      2/200]     48.7 ms  rss   1253.7 MiB
+  [plane      3/200]      6.1 ms  rss   1253.8 MiB
+  [plane     25/200]      6.2 ms  rss   1254.9 MiB
+  [plane     50/200]      6.1 ms  rss   1256.6 MiB
+  [plane     75/200]      5.8 ms  rss   1258.3 MiB
+  [plane    100/200]      6.1 ms  rss   1260.0 MiB
+  [plane    125/200]      5.9 ms  rss   1261.7 MiB
+  [plane    150/200]      5.7 ms  rss   1263.4 MiB
+  [plane    175/200]      6.0 ms  rss   1265.2 MiB
+  [plane    200/200]      5.9 ms  rss   1266.9 MiB
+[   173.8 s rss   1266.9 MiB] the plane row's first 200 planes
+
+[slope] the plane row, per band of planes
+  planes      1..    25:     7.84 ms a plane,   -480.0 KB a plane
+  planes     26..    50:     6.07 ms a plane,     67.5 KB a plane
+  planes     51..    75:     6.03 ms a plane,     68.8 KB a plane
+  planes     76..   100:     6.17 ms a plane,     67.7 KB a plane
+  planes    101..   125:     5.96 ms a plane,     67.0 KB a plane
+  planes    126..   150:     5.83 ms a plane,     70.5 KB a plane
+  planes    151..   175:     5.85 ms a plane,     70.2 KB a plane
+  planes    176..   200:     5.98 ms a plane,     68.4 KB a plane
+
+[RESULT-A] planes=200 wall=173.8 s mean_per_plane_ms=6.22 tail_per_plane_ms=5.98 rss_start=1253.7 MiB rss_end=1266.9 MiB growth_per_plane_bytes=69570 lifts_retained=200 at_189720_planes_s=1179 at_189720_planes_GiB=12.29
+[   173.8 s rss   1266.9 MiB] a flag over the slicing plane, from its own basis
+[   182.3 s rss   1272.1 MiB] the covering at the first plane: 3 flags
+  [carry      1/40]     13.4 ms  rss   1272.2 MiB
+  [carry      2/40]     13.4 ms  rss   1272.4 MiB
+  [carry      5/40]     13.8 ms  rss   1272.9 MiB
+  [carry     10/40]     13.6 ms  rss   1274.1 MiB
+  [carry     15/40]     15.5 ms  rss   1275.3 MiB
+  [carry     20/40]     13.4 ms  rss   1276.6 MiB
+  [carry     25/40]     13.5 ms  rss   1277.8 MiB
+  [carry     30/40]     13.5 ms  rss   1279.0 MiB
+  [carry     35/40]     13.5 ms  rss   1280.2 MiB
+  [carry     40/40]     13.2 ms  rss   1281.4 MiB
+[   182.9 s rss   1281.4 MiB] the covering carried to 40 planes
+
+[slope] the certificate walk's carry, per band of planes
+  planes      1..     5:    13.77 ms a plane,  -1707.0 KB a plane
+  planes      6..    10:    13.41 ms a plane,    235.2 KB a plane
+  planes     11..    15:    14.18 ms a plane,    245.3 KB a plane
+  planes     16..    20:    13.73 ms a plane,    256.2 KB a plane
+  planes     21..    25:    13.56 ms a plane,    240.6 KB a plane
+  planes     26..    30:    13.52 ms a plane,    237.5 KB a plane
+  planes     31..    35:    13.52 ms a plane,    239.8 KB a plane
+  planes     36..    40:    13.72 ms a plane,    252.3 KB a plane
+
+[RESULT-B] planes=40 mean_per_plane_ms=13.68 growth_per_plane_bytes=249016 carried_flags_a_plane=3 at_189720_planes_s=2595 at_189720_planes_GiB=44.00 total_wall=182.9 s rss=1281.4 MiB
+[peakrss] probe-plane-row: child waited=0 shell_code=0 samples=93
+[peakrss] peak tree RSS      : 1285 MiB
+[peakrss] low-water MemAvail : 12859 MiB
+[peakrss] peak single VmHWM  : 1285 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     1282 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   run.sh                        1 MiB peak
+[peakrss]   t=   184.1s procs=  2 rss=  1285 MiB hwm=  1285 MiB avail= 13247 MiB
+[peakrss]   t=   180.1s procs=  2 rss=  1275 MiB hwm=  1275 MiB avail= 13037 MiB
+[peakrss]   t=   182.1s procs=  2 rss=  1275 MiB hwm=  1275 MiB avail= 13255 MiB
+[peakrss]   t=   178.1s procs=  2 rss=  1273 MiB hwm=  1273 MiB avail= 13037 MiB
+[peakrss]   t=   176.1s procs=  2 rss=  1272 MiB hwm=  1272 MiB avail= 13044 MiB
+# launcher exit: 0

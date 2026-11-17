@@ -35,6 +35,27 @@ parabolic's family is certified complete (``is_parabolic_complete``, #331,
 #366), so the stabilizer never reaches the indefinite port's generic
 enumeration, which is killed at the memory guard on this lattice.
 
+**Two routes, one relation.**  Two public calls decide that relation.
+``tits_building_incidence()`` carries a covering of the plane's lines to each
+plane as flags, and keeps one certificate per endpoint pair -- the flag, the
+two cusps and one transporter to each.  A carried flag is a constructed parent,
+and this library retains every constructed parent for the process, so that
+route's records cost a flag and two transporters a plane: 249 016 B and 13.68
+ms a plane on ``T_Co``'s ``Otilde`` row.
+``tits_building_incidence_by_divided_classes()`` decides the same edges from
+the divided class of each carried line; its records are
+``DividedClassCuspIncidence`` -- two cusps and the ``rho(Gamma)``-orbit that
+named the line vertex, no flag, no subobject, no transporter -- at 1 427 B and
+1.65 ms a plane on the same row.  ``--route`` chooses between them:
+``divided-class``, ``certificate``, or ``auto`` (the default), which takes the
+class route wherever it applies and the certificate route only where the class
+route states it cannot decide the row -- a subgroup cutting no discriminant
+condition, and a subgroup that is not invariant under conjugation -- and logs
+which route it took and why at every row.  The two are one relation and not two
+answers: ``tests/lattices/test_the_incidence_decided_by_divided_classes.sage``
+compares both routes' relations, as endpoint pairs, with the subgroup's own
+flag row, which is a third computation of it.
+
 **The kernel rows.**  ``Otilde`` and ``Otilde+`` cut the discriminant image
 instead of forcing it: ``chi(Otilde)`` is trivial and ``chi(Otilde+)`` is
 trivial, so the double cosets at a plane are the plain cosets of
@@ -53,7 +74,13 @@ any lattice whose rows return through this route:
 
 * each edge joins a line that lies in its plane -- the edge's line term is
   contained in its plane term, and one subgroup element carries the selected
-  line cusp representative into the selected plane cusp representative;
+  line cusp representative into the selected plane cusp representative.  This
+  is the certificate route's clause, and the only route whose records carry
+  those terms: a ``DividedClassCuspIncidence`` has no line term and no
+  transporter, so the clause its own record carries is that the edge's
+  divided-class orbit is the one its line cusp is indexed by, read here from
+  the row's cusps and not from the datum; containment for a class route's edge
+  is the statement the gate makes where the two routes are compared;
 * the incidence is a relation, not a flag-orbit count -- no two retained edges
   have the same line and plane cusp endpoints;
 * every plane orbit has an edge -- a plane of the row contains isotropic
@@ -103,11 +130,14 @@ reported as undecided, never as failed: the cap is the caller's budget, not a
 mathematical statement.  A row that returns an edge, or a relation over its
 vertices, which fails its check is reported apart from that, as a contract
 violation, because it is a statement about the library's answer and not about
-the budget: each returned edge's line must lie in its plane and one subgroup
-element must carry the line cusp representative into the plane cusp
-representative, and the edges together must be a relation -- no two sharing
-their line and plane cusp endpoints, every plane vertex carrying an edge, and
-every line vertex carrying one whenever the row has a plane vertex.  The
+the budget: each returned edge carries the clause its route's record can state
+-- on the certificate route, that its line lies in its plane and that one
+subgroup element carries the line cusp representative into the plane cusp
+representative; on the class route, that the divided-class orbit it names is
+the orbit its line cusp is indexed by -- and the edges together must be a
+relation -- no two sharing their line and plane cusp endpoints, every plane
+vertex carrying an edge, and every line vertex carrying one whenever the row
+has a plane vertex.  The
 relation is the input of the contract and not something the contract reaches
 for, so the contract is asked of a relation the row returned.
 A row step that raises is reported as an error, neither of the two: the
@@ -126,6 +156,8 @@ kernel-plane-rows driver.
         --rows 'Otilde,Otilde+' --lattice Tco                     # the #381 rows
     sage -python tests/coble_gamma_co_2_incidence_rows.py \
         --rows 'Otilde,Otilde+' --lattice 6JRS                    # the small-lattice check
+    sage -python tests/coble_gamma_co_2_incidence_rows.py \
+        --rows 'Otilde,Otilde+' --lattice Tco --route certificate # the flag-carrying route
 """
 
 import argparse
@@ -217,6 +249,92 @@ def edge_violation(lattice, subgroup, incidence) -> str | None:
     return transport_violation(lattice, subgroup, incidence)
 
 
+def line_datum_key(quotient, cusp):
+    r"""The divided-class datum the row indexes one of its line cusps by.
+
+    This is the invariant the class route decides an edge with, read here from
+    the cusp's own representative: the ``rho(Gamma)``-orbit of the divided
+    class pair ``{c, -c}`` of a primitive isotropic line, which an element of
+    the subgroup carries to the pair of the image line (Dutour Sikirić--Hulek,
+    arXiv:2302.01679v2, Lemma 3.6, printed p. 22).  Two lines share it exactly
+    when they lie in one orbit of the row's subgroup, which is what makes it
+    the row's own index.
+    """
+    from sage_extensions.categories.orthogonal_quotients import (
+        _isotropic_line_image_key,
+    )
+
+    return _isotropic_line_image_key(quotient, cusp.representative())
+
+
+def divided_class_violation(incidence, keys) -> str | None:
+    r"""Why a class route's edge breaks its own clause, or ``None``.
+
+    A ``DividedClassCuspIncidence`` retains no flag, no subobject and no
+    transporter: what it states is that its line vertex is the cusp whose
+    divided-class orbit is the one it carries.  The clause is therefore read
+    against the row's cusps -- each cusp's own key, computed here and not taken
+    from the record -- so a record whose datum is not its line cusp's is a
+    relation the class data does not state.
+    """
+    cusp = id(incidence.line_cusp())
+    if cusp not in keys:
+        return "its line cusp carries no divided-class datum of the row"
+    if keys[cusp] != incidence.divided_classes():
+        return (
+            "its divided-class orbit is not the orbit its line cusp is indexed by, so the "
+            "class data does not state this edge"
+        )
+    return None
+
+
+ROW_ROUTES = ("auto", "divided-class", "certificate")
+
+
+def chosen_route(subgroup, route):
+    r"""The incidence route one row takes, and why when ``auto`` chose it.
+
+    ``divided-class`` and ``certificate`` are the caller's own choice and carry
+    no reason of ours.  ``auto`` prefers the class route and takes the
+    certificate route exactly where the class route states it cannot decide the
+    row: a group that retains no character quotient at all -- the ambient
+    ``O(L)``, which the class route is not defined for -- a subgroup that cuts
+    no discriminant condition, whose lines carry no class datum naming a cusp,
+    and a subgroup that is not invariant under conjugation, which has no one
+    covering to carry from plane to plane.  Each is the class route's own
+    refusal, read here from the same fact, so the route a row takes is the
+    driver's decision and is logged before the row runs.
+    """
+    if route != "auto":
+        return route, ""
+    characteristic = getattr(subgroup, "finite_character_quotient", None)
+    if characteristic is None:
+        return "certificate", (
+            "it is the ambient orthogonal group, which retains no character quotient and so "
+            "carries no divided-class datum"
+        )
+    quotient = characteristic()
+    if not quotient.discriminant_preimages:
+        return "certificate", (
+            "it cuts no discriminant condition, so a line carries no class datum that names its cusp"
+        )
+    if not quotient.preserves_conjugation():
+        return "certificate", (
+            "it is not invariant under conjugation, so every plane's covering would have to be "
+            "computed at that plane"
+        )
+    return "divided-class", (
+        "its lines carry divided classes and its covering is carried from one plane to the others"
+    )
+
+
+def row_relation(subgroup, route):
+    r"""The relation one row's route computes, from the call that route names."""
+    if route == "divided-class":
+        return subgroup.tits_building_incidence_by_divided_classes()
+    return subgroup.tits_building_incidence()
+
+
 def cusp_positions(cusps):
     r"""The position of every cusp of a row, by identity, for the relation to be read in one pass.
 
@@ -278,16 +396,23 @@ def _coordinates(term):
     )
 
 
-def row_contract(lattice, subgroup, label, lines, planes, incidences) -> RowOutcome:
+def row_contract(lattice, subgroup, label, lines, planes, incidences, route) -> RowOutcome:
     r"""What the row's returned relation says: a decided row, or the clause that broke.
 
-    The clauses are the row's statement about the relation it returned.  Every
+    The clauses are the row's statement about the relation it returned, and the
+    first of them is the one its route's records carry.  The certificate route's
     edge joins a line that lies in its plane, and one element of the subgroup
-    carries the line cusp representative into the plane cusp representative;
-    each edge's two cusps are cusps of the row; no two edges share their line
-    and plane cusp endpoints, so the relation is not a flag-orbit count; every
-    plane cusp carries an edge; and, when the row has a plane cusp, every line
-    cusp carries one too.
+    carries the line cusp representative into the plane cusp representative; a
+    class route's edge has no line term and no transporter, and its clause is
+    that the divided-class orbit it names is the orbit its line cusp is indexed
+    by.  Containment for a class route's edge is the gate's statement, made
+    where the two routes' relations are compared with the subgroup's own flag
+    row.
+
+    What both routes' edges state is read here: each edge's two cusps are cusps
+    of the row; no two edges share their line and plane cusp endpoints, so the
+    relation is not a flag-orbit count; every plane cusp carries an edge; and,
+    when the row has a plane cusp, every line cusp carries one too.
 
     A plane cusp always carries an edge: a plane of the row contains isotropic
     lines, their orbits are line cusps of the row, and the flag each of them
@@ -312,6 +437,10 @@ def row_contract(lattice, subgroup, label, lines, planes, incidences) -> RowOutc
         log(f"[{label}] line cusp {position}: {_coordinates(cusp.representative())}")
     for position, cusp in enumerate(planes):
         log(f"[{label}] plane cusp {position}: {_coordinates(cusp.representative())}")
+    keys = {}
+    if route == "divided-class":
+        quotient = subgroup.finite_character_quotient()
+        keys = {id(cusp): line_datum_key(quotient, cusp) for cusp in lines}
     line_vertices = set()
     plane_vertices = set()
     retained_pairs = set()
@@ -328,7 +457,10 @@ def row_contract(lattice, subgroup, label, lines, planes, incidences) -> RowOutc
                 f"edge {position} of {len(incidences)}: its {which} cusp is not a cusp of the row",
             )
         pair = (line_id, plane_id)
-        violation = edge_violation(lattice, subgroup, incidence)
+        if route == "divided-class":
+            violation = divided_class_violation(incidence, keys)
+        else:
+            violation = edge_violation(lattice, subgroup, incidence)
         if violation is None and pair in retained_pairs:
             violation = (
                 f"two edges share the line and plane cusp endpoints L{line_id} and P{plane_id}"
@@ -342,10 +474,13 @@ def row_contract(lattice, subgroup, label, lines, planes, incidences) -> RowOutc
         retained_pairs.add(pair)
         line_vertices.add(line_id)
         plane_vertices.add(plane_id)
-        log(
-            f"[{label}] edge {position}: L{line_id} < P{plane_id}; "
-            f"line={_coordinates(incidence.line())}; plane={_coordinates(incidence.plane())}"
-        )
+        if route == "divided-class":
+            log(f"[{label}] edge {position}: L{line_id} < P{plane_id}")
+        else:
+            log(
+                f"[{label}] edge {position}: L{line_id} < P{plane_id}; "
+                f"line={_coordinates(incidence.line())}; plane={_coordinates(incidence.plane())}"
+            )
     for position in range(len(planes)):
         if position not in plane_vertices:
             return RowOutcome(
@@ -365,16 +500,19 @@ def row_contract(lattice, subgroup, label, lines, planes, incidences) -> RowOutc
     )
 
 
-def run_row(lattice, subgroup, label, cap) -> RowOutcome:
+def run_row(lattice, subgroup, label, cap, route="auto") -> RowOutcome:
     r"""What one incidence row of ``subgroup`` did, within its ``cap``.
 
-    The row step is the public call ``tits_building_incidence()`` with the row's
-    cusps, under the per-row cap, and then the row's contract on the relation
-    the call returned.  The cap is the caller's budget: a cap of no seconds
-    leaves no time for the call and the row is undecided without the call being
-    made, and the alarm it sets reaches the call where Python holds control --
-    a call that does not hand control back to Python is not interrupted by it,
-    so the cap is the budget of a row and not a promise about where it stops.
+    The row step is the public call the row's route names --
+    ``tits_building_incidence_by_divided_classes()`` or
+    ``tits_building_incidence()``, resolved by :func:`chosen_route` and logged
+    with the reason before the call -- with the row's cusps, under the per-row
+    cap, and then the row's contract on the relation the call returned.  The
+    cap is the caller's budget: a cap of no seconds leaves no time for the call
+    and the row is undecided without the call being made, and the alarm it sets
+    reaches the call where Python holds control -- a call that does not hand
+    control back to Python is not interrupted by it, so the cap is the budget
+    of a row and not a promise about where it stops.
 
     The row step raising is neither an undecided row nor a broken contract: the
     traceback is printed and the status says the step raised, so a failed call
@@ -387,9 +525,16 @@ def run_row(lattice, subgroup, label, cap) -> RowOutcome:
     start = time.monotonic()
     previous_handler = signal.signal(signal.SIGALRM, _alarm)
     try:
+        deciding = time.monotonic()
+        taken, reason = chosen_route(subgroup, route)
+        log(
+            f"[{label}] the row's route: {taken}"
+            + (f", taken because {reason}" if reason else ", as the run asked")
+            + f" (decided in {time.monotonic() - deciding:.1f} s)"
+        )
         signal.setitimer(signal.ITIMER_REAL, cap)
         try:
-            incidences = tuple(subgroup.tits_building_incidence())
+            incidences = tuple(row_relation(subgroup, taken))
             lines = tuple(subgroup.cusps(1))
             planes = tuple(subgroup.cusps(2))
         finally:
@@ -403,7 +548,7 @@ def run_row(lattice, subgroup, label, cap) -> RowOutcome:
             "isometry that placed it -- not the row's coverings and not its planes' lifts, "
             "which are retained separately"
         )
-        return row_contract(lattice, subgroup, label, lines, planes, incidences)
+        return row_contract(lattice, subgroup, label, lines, planes, incidences, taken)
     except RowUndecided:
         return RowOutcome(
             label, RowStatus.UNDECIDED, f"the row did not return inside its {cap:g} s cap"
@@ -525,7 +670,7 @@ def _scattone(k):
 LATTICE_NAMES = ("Tco", "6JRS", "U+U+<-4>", "U+U(2)+<-2>", "U+U(2)+<-4>", "6JRX", "6JRY")
 
 
-def _trivial_image_row_agreement(lattice, rows):
+def _trivial_image_row_agreement(lattice, rows, route="auto"):
     r"""Why a kernel row differs from its ambient row where ``rho`` is trivial, or ``None``.
 
     ``Otilde`` is the kernel of the discriminant representation, so where
@@ -533,11 +678,13 @@ def _trivial_image_row_agreement(lattice, rows):
     out of ``Otilde`` is then the whole of the index-two subgroup
     ``lattice.O_plus()``, so both kernel rows are the ambient rows and their
     counts are not free -- they are the ambient counts, computed here through
-    the ambient group objects.  That is the one place the driver compares a
-    counted number with another, and it makes the small-lattice run
-    self-checking; on a lattice with a non-trivial discriminant image the
-    function returns ``None`` -- there is nothing to compare, and the rows are
-    recorded only.
+    the ambient group objects, on the route the row itself took where the
+    ambient group takes it (``rho`` trivial cuts no discriminant condition, so
+    ``auto`` gives the ambient rows the certificate route).  That is the one
+    place the driver compares a counted number with another, and it makes the
+    small-lattice run self-checking; on a lattice with a non-trivial
+    discriminant image the function returns ``None`` -- there is nothing to
+    compare, and the rows are recorded only.
     """
     target = lattice.discriminant_group().orthogonal_group()
     if target.cardinality() != cardinal(1):
@@ -559,7 +706,7 @@ def _trivial_image_row_agreement(lattice, rows):
                 f"but the discriminant image of {lattice} is trivial, so its rows are "
                 f"the ambient ones: {other_lines} line and {other_planes} plane cusps"
             )
-        other_edges = int(other.tits_building_incidence().cardinality())
+        other_edges = int(row_relation(other, chosen_route(other, route)[0]).cardinality())
         if edges != other_edges:
             return (
                 f"the {label} row has {edges} edges, but the discriminant image of "
@@ -583,6 +730,12 @@ def main(argv):
     by their ambient rows instead (:func:`_trivial_image_row_agreement`), and on
     any other lattice the rows are recorded, with ``Otilde+``'s two vertex counts
     at least ``Otilde``'s.
+
+    ``--route`` chooses the call each row makes (:func:`chosen_route`): the
+    divided-class route, the certificate route, or ``auto``, which prefers the
+    class route and takes the certificate route only where the class route
+    states it cannot decide the row.  Every row logs the route it took and the
+    reason, so a run's relation is never one whose route is unstated.
     """
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--cap", type=float, default=10800,
@@ -593,6 +746,10 @@ def main(argv):
                         help=f"comma-separated rows to run, from {ROW_LABELS}")
     parser.add_argument("--lattice", default="Tco",
                         help=f"the lattice to run on, from {LATTICE_NAMES}")
+    parser.add_argument("--route", default="auto", choices=ROW_ROUTES,
+                        help="the incidence route: 'divided-class' (the class route), "
+                             "'certificate' (the flag-carrying route), or 'auto' (the class "
+                             "route wherever it applies, the certificate route where it does not)")
     arguments = parser.parse_args(argv)
     selected, unread = selected_rows(arguments.rows)
     if unread is not None:
@@ -607,7 +764,9 @@ def main(argv):
         if arguments.budget and time.monotonic() - started > arguments.budget:
             log(f"[run] {RowStatus.UNDECIDED.words}: the whole-run budget is spent")
             return RowStatus.UNDECIDED.exit_status
-        outcome = run_row(lattice, _row_subgroup(lattice, label), label, arguments.cap)
+        outcome = run_row(
+            lattice, _row_subgroup(lattice, label), label, arguments.cap, arguments.route
+        )
         log(outcome.report())
         if outcome.status is not RowStatus.DECIDED:
             return outcome.status.exit_status
@@ -619,7 +778,7 @@ def main(argv):
         if "Gamma_{Co,2}" in counts and counts["Gamma_{Co,2}"] != (13, 4, 7):
             log("the Gamma_{Co,2} incidence is not the decided 13-edge relation over 4 line and 7 plane cusps")
             return RowStatus.COUNT_MISMATCH.exit_status
-    disagreement = _trivial_image_row_agreement(lattice, counts)
+    disagreement = _trivial_image_row_agreement(lattice, counts, arguments.route)
     if disagreement is not None:
         log(f"[run] {RowStatus.COUNT_MISMATCH.words}: {disagreement}")
         return RowStatus.COUNT_MISMATCH.exit_status

@@ -1,0 +1,117 @@
+# tree: 5f6abb81d8bac1e491e6cf5f36b19b05529e236c
+# status:  M results/coble-kernel-incidence-rows.yml  M tests/coble_gamma_co_2_incidence_rows.py ?? results/issue-body-the-plane-rows-representatives-are-a-constructed-subobject.md 
+# load: 1.07 1.53 1.46
+# command: sh .scratch/381/verify.sh
+=== the route each T_Co row takes ===
+[probe] the routes: ('auto', 'divided-class', 'certificate')
+[probe] O        auto -> ('certificate', 'it is the ambient orthogonal group, which retains no character quotient and so carries no divided-class datum')
+[probe] O        asked divided-class -> ('divided-class', '')
+[probe] O        asked certificate   -> ('certificate', '')
+[probe] Otilde   auto -> ('divided-class', 'its lines carry divided classes and its covering is carried from one plane to the others')
+[probe] Otilde   asked divided-class -> ('divided-class', '')
+[probe] Otilde   asked certificate   -> ('certificate', '')
+check-routes exit=0
+=== driver, U+U(2)+<-2>, auto (divided-class) ===
+the lattice Integral lattice of rank 5 and signature (2, 3) of rank 5
+the rows ('Otilde', 'Otilde+')
+[Otilde] the row's route: divided-class, taken because its lines carry divided classes and its covering is carried from one plane to the others (decided in 6.7 s)
+[Otilde] the row's calls returned in 10.5 s
+[Otilde] the quotient retains 4 carried-object transport datums: one for each carried isotropic object still registered, keyed by its span, each holding the object, its source and the isometry that placed it -- not the row's coverings and not its planes' lifts, which are retained separately
+[Otilde] line cusp 0: ((1, 0, 0, 0, 0),)
+[Otilde] line cusp 1: ((0, 0, -1, 0, 0),)
+[Otilde] line cusp 2: ((0, 2, 0, -1, 0),)
+[Otilde] plane cusp 0: ((1, 0, 0, 0, 0), (0, 0, 0, 1, 0))
+[Otilde] plane cusp 1: ((1, 0, 0, -1, 0), (0, 2, 1, 0, 0))
+[Otilde] edge 0: L0 < P0
+[Otilde] edge 1: L2 < P0
+[Otilde] edge 2: L0 < P1
+[Otilde] edge 3: L1 < P1
+[Otilde] decided: 4 edges over 3 line cusps and 2 plane cusps
+[Otilde+] the row's route: divided-class, taken because its lines carry divided classes and its covering is carried from one plane to the others (decided in 5.7 s)
+[Otilde+] the row's calls returned in 9.0 s
+[Otilde+] the quotient retains 4 carried-object transport datums: one for each carried isotropic object still registered, keyed by its span, each holding the object, its source and the isometry that placed it -- not the row's coverings and not its planes' lifts, which are retained separately
+[Otilde+] line cusp 0: ((1, 0, 0, 0, 0),)
+[Otilde+] line cusp 1: ((0, 0, -1, 0, 0),)
+[Otilde+] line cusp 2: ((0, 2, 0, -1, 0),)
+[Otilde+] plane cusp 0: ((1, 0, 0, 0, 0), (0, 0, 0, 1, 0))
+[Otilde+] plane cusp 1: ((1, 0, 0, -1, 0), (0, 2, 1, 0, 0))
+[Otilde+] edge 0: L0 < P0
+[Otilde+] edge 1: L2 < P0
+[Otilde+] edge 2: L0 < P1
+[Otilde+] edge 3: L1 < P1
+[Otilde+] decided: 4 edges over 3 line cusps and 2 plane cusps
+recorded counts: Otilde 4 edges over 3 line and 2 plane cusps; Otilde+ 4 edges over 3 line and 2 plane cusps
+driver auto exit=0
+=== driver, U+U(2)+<-2>, certificate ===
+the lattice Integral lattice of rank 5 and signature (2, 3) of rank 5
+the rows ('Otilde', 'Otilde+')
+[Otilde] the row's route: certificate, as the run asked (decided in 0.0 s)
+[Otilde] the row's calls returned in 11.3 s
+[Otilde] the quotient retains 1 carried-object transport datums: one for each carried isotropic object still registered, keyed by its span, each holding the object, its source and the isometry that placed it -- not the row's coverings and not its planes' lifts, which are retained separately
+[Otilde] line cusp 0: ((0, 1, 0, -1, 0),)
+[Otilde] line cusp 1: ((0, 0, 0, -1, 0),)
+[Otilde] line cusp 2: ((-2, 0, -1, 0, 0),)
+[Otilde] plane cusp 0: ((2, 0, 1, 0, 0), (0, 1, 0, -1, 0))
+[Otilde] plane cusp 1: ((0, 1, 0, 0, 0), (0, 0, 0, 1, 0))
+[Otilde] edge 0: L0 < P0; line=((0, 1, 0, -1, 0),); plane=((2, 0, 1, 0, 0), (0, 1, 0, -1, 0))
+[Otilde] edge 1: L2 < P0; line=((-2, 0, -1, 0, 0),); plane=((2, 0, 1, 0, 0), (0, 1, 0, -1, 0))
+[Otilde] edge 2: L0 < P1; line=((0, 1, 0, -1, 0),); plane=((0, 1, 0, 0, 0), (0, 0, 0, 1, 0))
+[Otilde] edge 3: L1 < P1; line=((0, 0, 0, -1, 0),); plane=((0, 1, 0, 0, 0), (0, 0, 0, 1, 0))
+[Otilde] decided: 4 edges over 3 line cusps and 2 plane cusps
+[Otilde+] the row's route: certificate, as the run asked (decided in 0.0 s)
+[Otilde+] the row's calls returned in 9.0 s
+[Otilde+] the quotient retains 1 carried-object transport datums: one for each carried isotropic object still registered, keyed by its span, each holding the object, its source and the isometry that placed it -- not the row's coverings and not its planes' lifts, which are retained separately
+[Otilde+] line cusp 0: ((0, 1, 0, -1, 0),)
+[Otilde+] line cusp 1: ((0, 0, 0, -1, 0),)
+[Otilde+] line cusp 2: ((-2, 0, -1, 0, 0),)
+[Otilde+] plane cusp 0: ((2, 0, 1, 0, 0), (0, 1, 0, -1, 0))
+[Otilde+] plane cusp 1: ((0, 1, 0, 0, 0), (0, 0, 0, 1, 0))
+[Otilde+] edge 0: L0 < P0; line=((0, 1, 0, -1, 0),); plane=((2, 0, 1, 0, 0), (0, 1, 0, -1, 0))
+[Otilde+] edge 1: L2 < P0; line=((-2, 0, -1, 0, 0),); plane=((2, 0, 1, 0, 0), (0, 1, 0, -1, 0))
+[Otilde+] edge 2: L0 < P1; line=((0, 1, 0, -1, 0),); plane=((0, 1, 0, 0, 0), (0, 0, 0, 1, 0))
+[Otilde+] edge 3: L1 < P1; line=((0, 0, 0, -1, 0),); plane=((0, 1, 0, 0, 0), (0, 0, 0, 1, 0))
+[Otilde+] decided: 4 edges over 3 line cusps and 2 plane cusps
+recorded counts: Otilde 4 edges over 3 line and 2 plane cusps; Otilde+ 4 edges over 3 line and 2 plane cusps
+driver certificate exit=0
+=== driver, 6JRS, auto (certificate, rho trivial) ===
+the lattice Integral lattice of rank 5 and signature (2, 3) of rank 5
+the rows ('Otilde', 'Otilde+')
+[Otilde] the row's route: divided-class, taken because its lines carry divided classes and its covering is carried from one plane to the others (decided in 1.7 s)
+[Otilde] the row's calls returned in 3.1 s
+[Otilde] the quotient retains 1 carried-object transport datums: one for each carried isotropic object still registered, keyed by its span, each holding the object, its source and the isometry that placed it -- not the row's coverings and not its planes' lifts, which are retained separately
+[Otilde] line cusp 0: ((1, 0, 0, 0, 0),)
+[Otilde] plane cusp 0: ((1, 0, 0, 0, 0), (0, 0, 1, 0, 0))
+[Otilde] edge 0: L0 < P0
+[Otilde] decided: 1 edges over 1 line cusps and 1 plane cusps
+[Otilde+] the row's route: divided-class, taken because its lines carry divided classes and its covering is carried from one plane to the others (decided in 0.8 s)
+[Otilde+] the row's calls returned in 1.8 s
+[Otilde+] the quotient retains 1 carried-object transport datums: one for each carried isotropic object still registered, keyed by its span, each holding the object, its source and the isometry that placed it -- not the row's coverings and not its planes' lifts, which are retained separately
+[Otilde+] line cusp 0: ((1, 0, 0, 0, 0),)
+[Otilde+] plane cusp 0: ((1, 0, 0, 0, 0), (0, 0, 1, 0, 0))
+[Otilde+] edge 0: L0 < P0
+[Otilde+] decided: 1 edges over 1 line cusps and 1 plane cusps
+the discriminant image of Integral lattice of rank 5 and signature (2, 3) is trivial, so each kernel row is its ambient row's; comparing the counts
+each kernel row agrees with the ambient row of Integral lattice of rank 5 and signature (2, 3)
+recorded counts: Otilde 1 edges over 1 line and 1 plane cusps; Otilde+ 1 edges over 1 line and 1 plane cusps
+driver 6JRS exit=0
+=== the gate: both routes and the flag row, on the small lattices ===
+...                                                                      [100%]
+========================== test-call performance gate ==========================
+tests/lattices/test_the_incidence_decided_by_divided_classes.sage::test_the_class_route_decides_the_rows_of_u_u_m4: 32.49 s > 20 s
+3 passed in 68.72s (0:01:08)
+pytest exit=0
+[peakrss] verify: child waited=0 shell_code=0 samples=91
+[peakrss] peak tree RSS      : 828 MiB
+[peakrss] low-water MemAvail : 12240 MiB
+[peakrss] peak single VmHWM  : 828 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      821 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   run.sh                        1 MiB peak
+[peakrss]   sh                            1 MiB peak
+[peakrss]   t=   178.1s procs=  4 rss=   828 MiB hwm=   828 MiB avail= 12240 MiB
+[peakrss]   t=   180.1s procs=  4 rss=   828 MiB hwm=   828 MiB avail= 12695 MiB
+[peakrss]   t=   176.1s procs=  4 rss=   827 MiB hwm=   827 MiB avail= 12243 MiB
+[peakrss]   t=   174.1s procs=  4 rss=   819 MiB hwm=   819 MiB avail= 12263 MiB
+[peakrss]   t=   172.1s procs=  4 rss=   808 MiB hwm=   808 MiB avail= 12289 MiB
+# launcher exit: 0
