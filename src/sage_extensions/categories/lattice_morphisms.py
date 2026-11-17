@@ -5293,6 +5293,19 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
         extension = total.Emb(lattice)(lambda label: sum_inclusion(total.module_generator(label)))
         return tuple(extension.extended_subgroup(total.O().subgroup(generators)).group_generators())
 
+    def exact_isometry_iterator(self):
+        r"""Fairly enumerate actual integral isometries, without claiming finite generation.
+
+        This is an exact, potentially nonterminating stream of O(L) elements.
+        It is not a replacement for ``group_generators()``: even a long
+        finite prefix gives no completeness certificate for an infinite
+        arithmetic group.
+        """
+        from sage_indefinite_port.indefinite.recursive import (
+            iter_exact_integral_orthogonal_isometries,
+        )
+        return iter_exact_integral_orthogonal_isometries(self.lattice())
+
     def vector_orbit_representatives(self, square, *, content=None):
         r"""Return one representative of each ``O(L)``-orbit of square ``square``.
 

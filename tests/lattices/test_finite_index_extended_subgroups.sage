@@ -51,3 +51,14 @@ def test_minus_one_on_U2_extends_to_minus_one_on_U() -> None:
     assert extension(e) == -e and extension(f) == -f
     signs = scaled.O().subgroup(Set((negation,)))
     assert inclusion.extended_subgroup(signs).cardinality() == 2
+
+
+def test_public_orthogonal_group_exact_isometry_iterator_is_not_a_generator_claim():
+    lattice = Lattices(ZZ)([[2, 0, 0, 0], [0, 2, 0, 0], [0, 0, -6, 0], [0, 0, 0, -6]])
+    stream = lattice.O().exact_isometry_iterator()
+    elements = (next(stream), next(stream), next(stream))
+    assert elements[0] != elements[1] and elements[0] != elements[2] and elements[1] != elements[2]
+    for element in elements:
+        assert element in lattice.O()
+        assert all(lattice.b(element(x), element(y)) == lattice.b(x, y)
+                   for x in lattice.module_generators() for y in lattice.module_generators())
