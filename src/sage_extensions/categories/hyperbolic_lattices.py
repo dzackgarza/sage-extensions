@@ -2207,16 +2207,8 @@ class HyperbolicLattices(OwnedCategoryOverBaseRing):
             return finite_ordered_set(tuple(isotropic))
 
         @cached_method
-        def _edgewalk(self):
+        def _edgewalk(self, *, option_norms="all", early_termination=True, initial_vertex=None):
             r"""Walk the reflection chamber through the port's owned lattice API.
-
-            The pinned port's entry point is
-            ``sage_indefinite_port.indefinite.edgewalk.edgewalk_fundamental_domain``,
-            whose signature is ``(lattice)`` alone at revision ``991b88b0`` and at
-            the checkout the image carries: it prescribes no start vertex, no root
-            filter and no termination switch, and it publishes no isometry route.
-            So the walk is asked with the lattice and nothing else, and this method
-            takes no start vertex, no root filter and no termination switch.
 
             The port's entry uses signature ``(n,1)``. For ``(1,n)``, use the
             existing lattice twist functor and transport its report back to this
@@ -2233,13 +2225,31 @@ class HyperbolicLattices(OwnedCategoryOverBaseRing):
             )
 
             if (self.signature_pair().second() == cardinal(1)) is True:
-                return edgewalk_fundamental_domain(self)
+                return edgewalk_fundamental_domain(
+                    self, option_norms=option_norms,
+                    early_termination=early_termination, initial_vertex=initial_vertex,
+                )
             twist = Lattices(self.base_ring()).twist_functor(-1)
             working = HyperbolicLattices(self.base_ring())(twist(self))
             identification = self.module_category().Mor(working, self)(
                 self.module_generator
             )
-            report = edgewalk_fundamental_domain(working)
+            if initial_vertex is not None:
+                to_working = self.module_category().Mor(self, working)(
+                    working.module_generator
+                )
+                if isinstance(initial_vertex, tuple):
+                    generator, roots = initial_vertex
+                    initial_vertex = (
+                        to_working(generator),
+                        tuple(-to_working(root) for root in roots),
+                    )
+                else:
+                    initial_vertex = to_working(initial_vertex)
+            report = edgewalk_fundamental_domain(
+                working, option_norms=option_norms,
+                early_termination=early_termination, initial_vertex=initial_vertex,
+            )
             cones = RationalPolyhedralCones(self)
             return AllcockEdgewalkReport(
                 self,
@@ -2263,17 +2273,43 @@ class HyperbolicLattices(OwnedCategoryOverBaseRing):
                 reason_non_reflective=report.reason_non_reflective(),
             )
 
-        def allcock_edgewalk(self):
+        def allcock_edgewalk(self, *, option_norms="all", early_termination=True, initial_vertex=None):
             r"""Return Allcock's owned fundamental-domain report.
 
-            The walk is the pinned port's own: one call with this lattice, at
-            ``sage_indefinite_port.indefinite.edgewalk.edgewalk_fundamental_domain(lattice)``.
-            It decides reflectivity, the simple roots of the chamber found, the
-            vertex orbits, and the polyhedron's isometry generators; it takes no
-            start vertex, no root filter and no termination switch, so this method
-            has no parameters either.
+            ``option_norms="all"`` uses every reflective root length;
+            ``"K3"`` uses roots of square 2 in signature ``(n,1)`` and
+            square -2 in signature ``(1,n)``. Setting ``early_termination``
+            false continues after nonreflectivity is detected to enumerate
+            every vertex orbit. ``initial_vertex`` supplies a vertex vector,
+            or a pair consisting of that vector and its simple wall roots,
+            as elements of this lattice. These are the pinned edgewalk's
+            OptionNorms, EarlyTerminationIfNotReflective, FileVertex and
+            FileVertexRoots parameters (``edgewalk.h:55-67,2100-2126``).
             """
-            return self._edgewalk()
+            return self._edgewalk(
+                option_norms=option_norms, early_termination=early_termination,
+                initial_vertex=initial_vertex,
+            )
+
+        def edgewalk_isometry(self, other):
+            r"""Return an integral isometry to ``other`` from Allcock's walk, or ``None``.
+
+            The pinned ``LORENTZ_RunEdgewalkAlgorithm_Isomorphism`` compares
+            vertex configurations along the complete walk (``edgewalk.h:1796-1832``).
+            Twisting both forms by -1 preserves the same isometry and supplies
+            the port's ``(n,1)`` convention when these lattices have signature
+            ``(1,n)``.
+            """
+            from sage_indefinite_port.indefinite.edgewalk import edgewalk_isometry
+
+            if self.signature_pair() != other.signature_pair():
+                return None
+            if (self.signature_pair().second() == cardinal(1)) is True:
+                return edgewalk_isometry(self, other)
+            twist = Lattices(self.base_ring()).twist_functor(-1)
+            category = HyperbolicLattices(self.base_ring())
+            witness = edgewalk_isometry(category(twist(self)), category(twist(other)))
+            return None if witness is None else twist(witness)
 
         def edgewalk_is_reflective(self) -> bool:
             r"""Return whether \(W(L)\) has finite index in \(O(L)\).

@@ -1,10 +1,8 @@
 r"""The edgewalk's verdict on card 0026's lattice, read by tag.
 
-`sage-indefinite-port` is paused at `991b88b0`, and its entry point is
-`sage_indefinite_port.indefinite.edgewalk.edgewalk_fundamental_domain(lattice)`:
-one lattice, no start vertex, no root-norm filter, no termination switch, and no
-isometry route.  ``allcock_edgewalk`` on a hyperbolic lattice is the owning public
-call for that walk (#344), and this module asks it one question on one lattice.
+``allcock_edgewalk`` on a hyperbolic lattice is the owning public call for
+the port's walk. Its options and prescribed data use the lattice's own
+sign convention.
 
 The expected verdict is not typed here.  Card `0026` of
 `dzackgarza/lattice-database` is ``U + A1(-1)`` with Gram
@@ -46,3 +44,34 @@ def test_the_walk_returns_the_reflective_verdict_card_0026_certifies() -> None:
         int(entry) for entry in stated["signature"]
     ]
     assert lattice.allcock_edgewalk().is_reflective() is bool(stated["reflective"])
+
+
+def test_prescribed_k3_vertices_and_isometry_use_the_negative_sign_lattice():
+    r"""Twisting U+A1(-1) preserves rays and reverses its wall normals.
+
+    Its K3 walls have square -2. Supplying a reported vertex, either alone
+    or with its wall normals, starts the walk at that same ray. The
+    edgewalk isometry of the lattice to itself preserves its negative-sign
+    form and has an inverse on every basis vector.
+    """
+    stated = card("hyperbolic_reflectivity", "0026")
+    lattice = HyperbolicLattices(ZZ)(Lattices(ZZ)(stated["gram"]))
+    report = lattice.allcock_edgewalk(option_norms="K3")
+    assert report.is_reflective()
+    assert tuple(report.simple_roots())
+    assert all(root.q() == -2 for root in report.simple_roots())
+    cone = next(iter(report.vertices()))
+    (generator,) = tuple(cone.primitive_rays())
+    for initial in (generator, (generator, tuple(cone.wall_roots()))):
+        prescribed = lattice.allcock_edgewalk(option_norms="K3", initial_vertex=initial)
+        assert prescribed.is_reflective()
+        first = next(iter(prescribed.vertices()))
+        assert tuple(first.primitive_rays()) == (generator,)
+        assert all(root.q() == -2 for root in prescribed.simple_roots())
+    witness = lattice.edgewalk_isometry(lattice)
+    assert witness is not None
+    basis = tuple(lattice.module_generators())
+    for left in basis:
+        assert witness.inverse()(witness(left)) == left
+        for right in basis:
+            assert lattice.b(witness(left), witness(right)) == lattice.b(left, right)
