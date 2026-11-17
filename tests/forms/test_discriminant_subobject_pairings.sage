@@ -28,3 +28,16 @@ def test_a_cyclic_subobject_keeps_the_one_third_bilinear_pairing() -> None:
 
     assert subobject.cardinality() == 3
     assert x.b(x).lift() == QQ(1) / 3
+
+
+def test_an_odd_discriminant_form_retains_its_off_diagonal_pairing() -> None:
+    r"""The inverse of [[3,1],[1,2]] is (1/5)[[2,-1],[-1,3]]."""
+    form = Lattices(ZZ)([[3, 1], [1, 2]]).discriminant_bilinear_form()
+    e, f = tuple(form.module_generators())
+    normalized = form.invariant_factor_form()
+    x, y = normalized(e), normalized(f)
+
+    assert normalized.codomain().cardinality() == 5
+    assert x.b(x).lift() == QQ(2) / 5
+    assert x.b(y).lift() == QQ(4) / 5
+    assert y.b(y).lift() == QQ(3) / 5

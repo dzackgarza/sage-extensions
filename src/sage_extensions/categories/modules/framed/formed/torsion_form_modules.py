@@ -1763,15 +1763,11 @@ def _polar_form_is_nondegenerate(form, *, quadratic: bool) -> bool:
             f"the invariant-factor framing of {form} has {rank} invariants but "
             f"{len(generators)} generators; the radical criterion needs one generator per invariant"
         )
-    def lifted_pairing(left, right):
-        value = form.b(left, right).lift()
-        return value.parent()._engine_element(value)
-
-    gram = _engine_matrix(
-        SageQQ,
-        rank,
-        rank,
-        [lifted_pairing(left, right) for left in generators for right in generators],
+    # For q valued in K/2R, the selected symmetric lift G represents b
+    # modulo R.  Changing its entries by elements of R leaves the radical
+    # congruences unchanged, so the adapter's retained Gram suffices here.
+    gram = _engine_component_matrix(
+        _representative_gram(form, quadratic=quadratic)
     )
     if quadratic:
         value_modulus = SageQQ(1)

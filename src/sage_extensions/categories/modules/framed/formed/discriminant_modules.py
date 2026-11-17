@@ -1024,15 +1024,11 @@ def _descended_bilinear_gram(dual_lattice, labels, bilinear_values):
     entry at ``(i,j)`` is the value ``L^#`` already pairs those two
     generators to, read in the quotient.
     """
+    gram = dual_lattice.gram_tensor()
+    positions = {label: position for position, label in enumerate(dual_lattice.module_generating_set())}
     return tuple(
         tuple(
-            bilinear_values(_fraction_field_value(
-                # The dual pairing can lie in R or Res(K); both map into K/R.
-                dual_lattice.b(
-                    dual_lattice.module_generator(left),
-                    dual_lattice.module_generator(right),
-                )
-            ))
+            bilinear_values(gram[positions[left], positions[right]])
             for right in labels
         )
         for left in labels
@@ -1048,18 +1044,15 @@ def _descended_quadratic_gram(dual_lattice, labels, bilinear_values, quadratic_v
     ``2R`` exactly when the lattice is even, which is the hypothesis under
     which this is reached.
     """
+    gram = dual_lattice.gram_tensor()
+    positions = {label: position for position, label in enumerate(dual_lattice.module_generating_set())}
     return tuple(
         tuple(
             quadratic_values(
-                _fraction_field_value(dual_lattice.norm(dual_lattice.module_generator(left)))
+                gram[positions[left], positions[right]]
                 if left == right
                 else bilinear_values.lift(
-                    bilinear_values(_fraction_field_value(
-                        dual_lattice.b(
-                            dual_lattice.module_generator(left),
-                            dual_lattice.module_generator(right),
-                        )
-                    ))
+                    bilinear_values(gram[positions[left], positions[right]])
                 )
             )
             for right in labels
