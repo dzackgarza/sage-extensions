@@ -62,3 +62,10 @@ def test_public_orthogonal_group_exact_isometry_iterator_is_not_a_generator_clai
         assert element in lattice.O()
         assert all(lattice.b(element(x), element(y)) == lattice.b(x, y)
                    for x in lattice.module_generators() for y in lattice.module_generators())
+
+
+def test_public_low_witt_fixed_norm_orbit_stream_returns_primitive_exact_vector():
+    lattice = Lattices(ZZ)([[2, 0, 0, 0], [0, 2, 0, 0], [0, 0, -6, 0], [0, 0, 0, -6]])
+    representative = next(lattice.O().exact_vector_orbit_iterator(2, primitive_only=True))
+    assert representative.q() == ZZ(2)
+    assert representative.content() == ZZ(1)

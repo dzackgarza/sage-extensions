@@ -5293,6 +5293,18 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
         extension = total.Emb(lattice)(lambda label: sum_inclusion(total.module_generator(label)))
         return tuple(extension.extended_subgroup(total.O().subgroup(generators)).group_generators())
 
+    def exact_vector_orbit_iterator(self, square, *, primitive_only=False):
+        r"""Fair fixed-square orbit stream with exact pointed-isometry deduplication.
+
+        The iterator makes no finite-class or termination claim.  Every
+        returned value is an actual lattice vector; comparisons use the
+        port's exact pointed-isometry operation.
+        """
+        from sage_indefinite_port.indefinite.marked_lattices import RECURSION
+        return RECURSION.exact_vector_orbit_iterator(
+            self.lattice(), int(square), primitive_only=primitive_only
+        )
+
     def exact_isometry_iterator(self):
         r"""Fairly enumerate actual integral isometries, without claiming finite generation.
 
