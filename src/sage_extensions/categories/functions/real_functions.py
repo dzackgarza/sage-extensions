@@ -84,6 +84,7 @@ from sage_extensions.categories.modules.pure.modules import (
 )
 from sage_extensions.categories.rings.ring_foundation import _owned_engine_element
 from sage_extensions.categories.rings.ring_foundation import (
+    Fields,
     _own_ring,
     _owned_integers,
 )
@@ -461,9 +462,50 @@ def _function_formula(function):
             return None
 
 
+def _defining_function_of(element):
+    r"""The private map an element of a function space is defined by, or ``None``.
+
+    Private computation adapter (``OWN-06``) of this module.  A section of a
+    function space is an element of the condition submodule, so its chain is
+    the section, the module element and the map it is defined by; an operand of
+    a pointwise operation on sections is already that module element, one level
+    shorter, and is read here too.
+    """
+    section = element
+    for _level in range(2):
+        underlying = getattr(section, "underlying_element", None)
+        if underlying is None:
+            break
+        section = underlying() if callable(underlying) else underlying
+    definition = getattr(section, "_defining_function", None)
+    return None if definition is None else definition()
+
+
 def _map_formula(element):
     r"""The formula ``(body, variable)`` of an element of a function space, or ``None``."""
-    return _function_formula(element.underlying_element().underlying_element()._defining_function())
+    return _function_formula(_defining_function_of(element))
+
+
+def _pointwise_derivation(element):
+    r"""The pointwise operation an element of a function space was built by, with its operands, or ``None``.
+
+    Private computation adapter (``OWN-06``) of this module.  The pointwise law
+    of a module of maps builds a sum, a negative, the zero and a scalar
+    multiple from the operands it records, which is how
+    :func:`_function_formula` recomposes their formula.  An operand may have no
+    formula of its own -- the coordinates of a manifold chart are functions
+    without one -- and then the caller supplies what the operand is.  Its
+    callers are the chart expression adapters of ``categories.manifolds``,
+    which translate a section built out of chart coordinates back into the
+    engine's formula in the chart's coordinates by translating the operands and
+    rebuilding the recorded operation.  The operation is returned as recorded,
+    so that a caller applies the law's own operator and not a copy of it.
+    """
+    match _defining_function_of(element):
+        case _PointwiseValues() as values:
+            return values.operation(), tuple(values.operands())
+        case _:
+            return None
 
 
 def _required_formula(element, operation):
@@ -727,32 +769,47 @@ class _DifferentiabilityClass(_FunctionSpace):
         return rf"C^{{{_parameter_latex(self.differentiability())}}}({_space_latex(self.domain())}, {_space_latex(self.codomain())})"
 
 
+def _function_base_field(codomain):
+    r"""The field the maps \(X\to Y\) form a vector space over: \(Y\) itself when \(Y\) is a field, else \(RR\).
+
+    A map into a field \(K\) is added and scaled pointwise in \(K\), and its
+    constant maps are the \(K\)-multiples of the constant one, so the space of
+    such maps is a \(K\)-vector space and, under the pointwise product, a
+    \(K\)-algebra.  A map into a real vector space \(V\) is added and scaled in
+    \(V\), over \(RR\).  The space of maps therefore inherits the field its
+    values are taken in, and \(C^k(U,\mathbb C)\) is a complex algebra rather
+    than a real one with a complex shadow.
+    """
+    return codomain if codomain in Fields() else RR
+
+
 @cached_function(key=lambda regularity, domain, codomain: (_exponent_key(regularity), id(domain), id(codomain)))
 def _differentiability_class(regularity, domain, codomain):
-    r"""Build \(C^k(X,Y)\) as a condition submodule of \(Y^X\); for \(Y=\mathbb R\), the algebra on it."""
-    assert codomain is RR or codomain in VectorSpaces(RR), (
-        f"C^k(X, Y) is a real vector space of maps, so Y must be a real vector "
-        f"space or the real field RR itself, but {codomain} is not"
+    r"""Build \(C^k(X,Y)\) as a condition submodule of \(Y^X\); for \(Y\) a field, the algebra on it."""
+    field = _function_base_field(codomain)
+    assert codomain is field or codomain in VectorSpaces(field), (
+        f"C^k(X, Y) is a vector space of maps over the field of its values, so Y must be a "
+        f"vector space over {field}, or that field itself, but {codomain} is not"
     )
     module = _condition_submodule(
         codomain.function_module(domain),
         _differentiability_condition(regularity, domain),
         engine=(_DifferentiabilityClass, _DifferentiableMap),
         engine_data={"regularity": regularity},
-        categories=(VectorSpaces(RR),),
+        categories=(VectorSpaces(field),),
     )
-    if codomain is not RR:
+    if codomain is not field:
         return module
-    # C^k(X, RR) is closed under the pointwise product, which is bilinear,
-    # associative and commutative with the constant one as unit.
-    tensor = Modules(RR).tensor_product((module, module))
+    # C^k(X, K) is closed under the pointwise product, which is K-bilinear,
+    # associative, commutative and has the constant one as unit.
+    tensor = Modules(field).tensor_product((module, module))
     multiplication = tensor.from_bilinear_map(
         module, lambda left, right: module(_pointwise_product(left, right))
     )
     return _algebra_on_module(
         module,
         multiplication,
-        placement=(Algebras(RR).Associative().Unital().Commutative(),),
+        placement=(Algebras(field).Associative().Unital().Commutative(),),
         unit=module.one(),
         law_decisions={"associativity": True, "unit": True, "commutativity": True},
     )

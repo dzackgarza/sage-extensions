@@ -79,9 +79,10 @@ class ManifoldAtlasChart(SageObject):
         self._engine = engine_chart
         self._domain = domain
         self._function_ring = _manifold_function_ring(domain, manifold)
+        field = manifold.coordinate_field()
         self._coordinates = finite_family(
             tuple(
-                self._function_ring(_ChartCoordinate(engine_chart, index))
+                self._function_ring(_ChartCoordinate(engine_chart, index, field))
                 for index in range(int(manifold.dimension()))
             ),
             name=f"Coordinates of chart {label}",
@@ -165,14 +166,24 @@ class ManifoldAtlasTransition(SageObject):
         self._engine = engine_transition
         self._forward = _admit_manifold_expression_family(
             forward_expressions,
+            source,
             name=f"Coordinate change {source.label()} to {target.label()}",
         )
         self._inverse_expressions = _admit_manifold_expression_family(
             inverse_expressions,
+            target,
             name=f"Coordinate change {target.label()} to {source.label()}",
         )
-        self._source_overlap = source_overlap
-        self._target_overlap = target_overlap
+        self._source_overlap = _admit_manifold_expression_family(
+            source_overlap,
+            source,
+            name=f"Overlap of {source.label()} with {target.label()} in {source.label()}",
+        )
+        self._target_overlap = _admit_manifold_expression_family(
+            target_overlap,
+            target,
+            name=f"Overlap of {target.label()} with {source.label()} in {target.label()}",
+        )
         self._inverse_transition = None
 
     def source(self):
@@ -222,12 +233,35 @@ class ManifoldAtlasTransition(SageObject):
         return self._inverse_transition
 
     def __call__(self, *coordinates):
-        image = self._engine(
-            *(_engine_manifold_expression(coordinate) for coordinate in coordinates)
+        r"""The coordinates in the target chart of the point of the overlap with these source coordinates.
+
+        The coordinate change is ``phi_t o phi_s^{-1}`` on
+        ``phi_s(U_s cap U_t)``: the point of the source chart with the given
+        coordinates must lie in the overlap, which the overlap functions
+        decide, and its ``k``-th coordinate in the target chart is the value
+        there of the ``k``-th forward expression, an element of the coordinate
+        field.  The inverse coordinate change is the transition's
+        ``inverse()``.  Nothing here reads or produces a symbolic expression:
+        the value is the value of an owned section at an owned point.
+        """
+        source = self.source()
+        field = self.manifold().coordinate_field()
+        point = self.manifold()(coordinates, chart_label=source.label())
+        decisions = tuple(
+            ask(section(point) != field.zero()) for section in tuple(self.source_overlap())
         )
-        return _raise_manifold_expression_family(
-            image,
-            name=f"Coordinates after {self.source().label()} to {self.target().label()}",
+        assert all(decision is True for decision in decisions), (
+            f"cannot read the coordinates of {point} in the chart {self.target().label()}: the "
+            f"coordinate change from the chart {source.label()} is defined on the overlap of the "
+            f"two charts, and its overlapping functions do not all take a decided nonzero value "
+            f"there, so the point is outside the overlap or its membership is undecided"
+        )
+        return finite_family(
+            tuple(expression(point) for expression in self.forward_expressions()),
+            name=(
+                f"Coordinates of a point of the chart {source.label()} in the chart "
+                f"{self.target().label()}"
+            ),
         )
 
     def _repr_(self):
@@ -261,102 +295,208 @@ def _engine_manifold_chart(chart):
 
 
 def _manifold_function_ring(domain, manifold):
-    r"""The owned ring of real-valued functions on ``domain``, at the manifold's regularity.
+    r"""The owned ring of functions on ``domain`` valued in the manifold's coordinate field.
 
     A chart coordinate is a section of this ring: the functions a manifold
     assigns to the chart's domain are the maps there of the manifold's
-    differentiability class, and they form a ring under the pointwise product.
-    A topological chart has continuous coordinates, the ``C^0`` case.
+    differentiability class, valued in the field its coordinates lie in, and
+    they form a ring under the pointwise product.  A topological chart has
+    continuous coordinates, the ``C^0`` case; a chart of a complex manifold is
+    ``CC``-valued, and ``CC`` is its coordinate field.
     """
     from sage_extensions.categories.functions.real_functions import C
 
     degree = manifold._preamble_differentiability_degree
-    return C(NN(0) if degree is None else degree, domain, RR)
+    return C(NN(0) if degree is None else degree, domain, manifold.coordinate_field())
 
 
-class _ChartCoordinate:
+class _ChartExpression:
+    r"""An engine formula in a chart's coordinates, as the function on the chart's domain it is.
+
+    Private computation class (``OWN-06``).  A formula written in the
+    coordinates of a chart ``phi : U -> K^n`` defines the function
+    ``p |-> formula(phi(p))`` on ``U``, valued in the coordinate field ``K``.
+    The engine's formula is retained here because the chart, transition and
+    map adapters speak about the function by it; the symbolic engine is not an
+    owned object, and this formula is a private representation, never a parent
+    of one.
+    """
+
+    def __init__(self, engine_chart, engine_formula, field) -> None:
+        self._engine_chart = engine_chart
+        self._engine_formula = engine_formula
+        self._field = field
+
+    def engine_expression(self):
+        r"""The engine's formula for this function (private adapter)."""
+        return self._engine_formula
+
+    def __call__(self, point):
+        r"""The value of the formula at ``point``, in the coordinate field."""
+        coordinates = tuple(self._engine_chart(_engine_manifold_point(point)))
+        substitutions = dict(zip(tuple(self._engine_chart[:]), coordinates, strict=True))
+        return self._field(self._engine_formula.subs(substitutions))
+
+
+class _ChartCoordinate(_ChartExpression):
     r"""One coordinate of a chart, as the function it is.
 
     Private computation class (``OWN-06``).  The ``index``-th coordinate of a
-    chart is the function ``U -> RR`` sending a point of the chart's domain to
+    chart is the function ``U -> K`` sending a point of the chart's domain to
     its ``index``-th coordinate.  The engine's own symbol for that coordinate
     is retained here because the chart, transition and point adapters speak
     about a coordinate by it; the symbolic engine is not an owned object, and
     this symbol is a private representation, never a parent of one.
     """
 
-    def __init__(self, engine_chart, index) -> None:
-        self._engine_chart = engine_chart
+    def __init__(self, engine_chart, index, field) -> None:
         self._index = int(index)
-        self._engine_expression = tuple(engine_chart[:])[self._index]
-
-    def engine_expression(self):
-        r"""The engine's symbol for this coordinate (private adapter)."""
-        return self._engine_expression
-
-    def __call__(self, point):
-        r"""The ``index``-th coordinate of ``point``, in the coordinate field."""
-        coordinates = self._engine_chart(_engine_manifold_point(point))
-        return RR(coordinates[self._index])
+        super().__init__(engine_chart, tuple(engine_chart[:])[self._index], field)
 
 
 def _manifold_function_definition(value):
-    r"""The map ``U -> RR`` a section of a manifold's function ring is defined by.
+    r"""The private map a value of a manifold's function ring is defined by, or ``None``.
 
     Private adapter (``OWN-06``) of this module.  A section is an element of
-    ``C^k(U, RR)``, the algebra on the condition submodule cut out of ``RR^U``;
-    the element, the module element and the map its defining function is are
-    the three levels read here, the chain the function spaces' own formula
-    adapter reads.
+    ``C^k(U, K)``, the algebra on the condition submodule cut out of ``K^U``,
+    so its chain is the section, the module element and the map it is defined
+    by; an operand of a pointwise operation on sections is already that module
+    element, one level shorter, and is read here too.  Both are values the
+    chart adapters translate back into an engine formula.
     """
-    return value.underlying_element().underlying_element()._defining_function()
-
-
-def _retained_chart_expression(value):
-    r"""The engine symbol a chart coordinate retains, or ``None`` for any other value."""
     section = value
     for _level in range(2):
         underlying = getattr(section, "underlying_element", None)
         if underlying is None:
-            return None
-        section = underlying
+            break
+        section = underlying() if callable(underlying) else underlying
     definition = getattr(section, "_defining_function", None)
-    match definition:
-        case _ChartCoordinate():
-            return definition.engine_expression()
+    return None if definition is None else definition()
+
+
+def _retained_chart_expression(value):
+    r"""The engine formula a chart section retains, or ``None`` for any other value.
+
+    A section's defining function is read through the chain the function
+    spaces' own formula adapter reads, and it is called: what a section retains
+    is the result of that call, the private definition of the function, not the
+    accessor for it.
+    """
+    match _manifold_function_definition(value):
+        case _ChartExpression() as expression:
+            return expression.engine_expression()
         case _:
             return None
 
 
-def _raise_manifold_expression(value):
-    r"""State that a symbolic chart formula has no owned presentation yet.
+def _raise_manifold_expression(engine_formula, chart):
+    r"""The section of a chart's function ring that an engine formula in its coordinates defines.
 
-    A chart formula is a section of the owned ring of real-valued functions on
-    the chart's domain (:meth:`ManifoldAtlasChart.function_ring`), and a chart's
-    coordinates are such sections.  A transition's, an overlap's and a
-    holomorphic map's coordinate formula are not expressed there yet, and the
-    engine's symbolic ring is not an owned ring, so this route states its
-    frontier instead of presenting the engine's ring as an owned one.
+    A formula written in the coordinates of the chart ``phi : U -> K^n`` states
+    the function ``p |-> formula(phi(p))`` on ``U``, an element of
+    ``C^k(U, K)``, the ring of functions the manifold assigns to the chart's
+    domain (:meth:`ManifoldAtlasChart.function_ring`).  The engine's formula is
+    retained as the private representation of that function and is never a
+    parent: the section is the owned object, and the formula is how the engine
+    and the private chart adapters speak about it.
     """
-    raise NotImplementedError(
-        "a chart formula is a section of the owned ring of real-valued functions on its "
-        "chart's domain, and only chart coordinates are expressed there so far; the "
-        f"symbolic expression {value!r} cannot be raised into an owned ring"
+    return chart.function_ring()(
+        _ChartExpression(
+            _engine_manifold_chart(chart),
+            engine_formula,
+            chart.manifold().coordinate_field(),
+        )
     )
 
 
-def _admit_manifold_expression(value):
-    r"""State that a symbolic chart formula cannot be admitted as an owned value yet.
+def _admit_manifold_expression(value, chart):
+    r"""The section of a chart's function ring that ``value`` is, or a statement that it is none.
 
-    See :func:`_raise_manifold_expression`: the same frontier, read in the
-    other direction.  An owned value of a chart's coordinate field is admitted
-    by the ring it belongs to, not here.
+    A chart formula on ``U`` is an element of the ring of functions the
+    manifold assigns to ``U``; nothing else is a formula there.  Admission is
+    by the ring's own element type (``OWN-01``): the ring is the owner of what
+    a function on the chart's domain is, and this adapter only reads it.
     """
-    raise NotImplementedError(
-        "a chart formula is a section of the owned ring of real-valued functions on its "
-        "chart's domain, and only chart coordinates are expressed there so far; the value "
-        f"{value!r} cannot be admitted as one"
+    ring = chart.function_ring()
+    assert element_parent(value) is ring, (
+        f"a chart formula on the chart {chart.label()} is a section of {ring}, the ring of "
+        f"functions the manifold assigns to that chart's domain, and {value!r} is an element "
+        f"of {element_parent(value)}"
     )
+    return value
+
+
+def _engine_formula_of_pointwise_section(value):
+    r"""The engine formula of a section built out of chart formulas by the pointwise law, or ``None``.
+
+    Private computation adapter (``OWN-06``) of this module.  The pointwise law
+    of a module of maps builds a sum, a negative, the zero and a scalar
+    multiple of its operands and records which
+    (``categories.functions.real_functions._pointwise_derivation``); a chart
+    formula is one such operand.  Rebuilding the recorded operation on the
+    operands' engine formulas is what makes an expression written with the
+    owned ring's own operations -- ``x + y``, ``-y``, ``2 * x`` -- a formula the
+    engine can speak about, without the ring of functions ever being the
+    engine's ring.
+    """
+    from functools import partial
+
+    from sage_extensions.categories.functions.real_functions import (
+        _pointwise_derivation,
+    )
+    from sage_extensions.categories.modules.pure.modules import (
+        _pointwise_negative,
+        _pointwise_scalar_multiple,
+        _pointwise_sum,
+        _pointwise_zero,
+    )
+
+    derivation = _pointwise_derivation(value)
+    if derivation is None:
+        return None
+    operation, operands = derivation
+    formulas = tuple(_engine_manifold_expression(operand) for operand in operands)
+    match operation:
+        case _ if operation is _pointwise_sum:
+            return formulas[0] + formulas[1]
+        case _ if operation is _pointwise_negative:
+            return -formulas[0]
+        case _ if operation is _pointwise_zero:
+            return SR.zero()
+        case partial() if operation.func is _pointwise_scalar_multiple:
+            return _engine_scalar(operation.args[0]) * formulas[0]
+        case _:
+            return None
+
+
+def _engine_scalar(value):
+    r"""The engine's symbolic constant for a scalar of a pointwise operation."""
+    match element_parent(value):
+        case field if field is RR or field is _owned_complex_field():
+            return value.expression()
+        case _:
+            return SR(value)
+
+
+def _engine_owned_number(value):
+    r"""The engine's element for an owned number, in the field the number belongs to.
+
+    Only a number is lowered here.  A section of a ring of functions that is
+    neither a chart formula nor a pointwise operation on chart formulas has no
+    engine formula, and saying so is this adapter's frontier rather than a
+    coercion error deeper in the engine.
+    """
+    assert not callable(value), (
+        f"cannot lower {value!r} to an engine expression: it is a section of "
+        f"{element_parent(value)} that is written neither as a chart formula nor as a "
+        f"pointwise sum, negative, zero or scalar multiple of chart formulas, and the engine "
+        f"has no formula for it"
+    )
+    match element_parent(value):
+        case field if field is RR or field is _owned_complex_field():
+            return _engine_element(field, value)
+        case _:
+            return _engine_element(RR, RR(value))
 
 
 def _engine_manifold_expression(value):
@@ -364,14 +504,19 @@ def _engine_manifold_expression(value):
 
     Protected manifold-expression contract under ``OWN-05``--``OWN-07``.
     Permitted callers are atlas/map/open-submanifold adapters in this module and
-    the affine-analytification adapter.  A chart coordinate is the function it
-    is, and the engine's symbol retained by :class:`_ChartCoordinate` is how the
-    engine speaks about it; any other owned value is a number in the coordinate
-    field, lowered as its engine element.
+    the affine-analytification adapter.  A chart formula is the function it is,
+    and the engine's formula retained by :class:`_ChartExpression` is how the
+    engine speaks about it; a formula written with the owned ring's pointwise
+    operations is rebuilt from its operands; any other owned value is a number
+    in the coordinate field, lowered as its engine element.
     """
     match _retained_chart_expression(value):
         case None:
-            return _engine_element(RR, RR(value))
+            match _engine_formula_of_pointwise_section(value):
+                case None:
+                    return _engine_owned_number(value)
+                case formula:
+                    return formula
         case expression:
             return expression
 
@@ -453,9 +598,9 @@ def _symmetric_space_rank_and_dimension(satake_diagram):
     )
 
 
-def _admit_manifold_expression_family(values, *, name):
+def _admit_manifold_expression_family(values, chart, *, name):
     return finite_family(
-        tuple(_admit_manifold_expression(value) for value in values),
+        tuple(_admit_manifold_expression(value, chart) for value in values),
         name=name,
     )
 
@@ -470,9 +615,9 @@ def _engine_nonvanishing_conditions(functions):
     return conditions or None
 
 
-def _raise_manifold_expression_family(values, *, name):
+def _raise_manifold_expression_family(values, chart, *, name):
     return finite_family(
-        tuple(_raise_manifold_expression(value) for value in values),
+        tuple(_raise_manifold_expression(value, chart) for value in values),
         name=name,
     )
 
@@ -517,6 +662,59 @@ class _ManifoldTopologyData(SageObject):
                     f"openness is decided only for the empty set, the whole manifold, "
                     f"and open submanifolds constructed as such"
                 )
+
+
+class _ChartDomainRealization:
+    r"""An open submanifold of a manifold, realized as the domain of one of its charts; a realization, not a category.
+
+    A chart ``phi : U -> K^n`` is defined on an open subset ``U`` of the
+    manifold (Lee, *Introduction to Smooth Manifolds*, 2nd ed., Ch. 1), and an
+    open subset of a manifold, with the restricted atlas, is a manifold of the
+    same dimension and class (Lee, Example 1.4).  The chart that the open
+    subset is the domain of is registered on it, so the open subset retains the
+    chart that presents it and the ambient manifold it is open in.
+    """
+
+    def __init__(self, containing_manifold, chart_label, engine_chart, **rest) -> None:
+        self._containing_manifold = containing_manifold
+        self._chart_label = chart_label
+        super().__init__(**rest)
+        self._register_chart(chart_label, engine_chart)
+
+    def containing_manifold(self):
+        r"""The manifold this open subset is open in."""
+        return self._containing_manifold
+
+    def _element_constructor_(self, datum, chart_label=None):
+        r"""The point of this open submanifold that a point of the ambient manifold in it is.
+
+        The points of an open submanifold are the points of the manifold that
+        lie in it, so a point of the ambient manifold is a point here, read in
+        the one chart this open subset carries, the chart it is the domain of.
+        A point outside the open subset has no coordinates in that chart, which
+        the engine's restricted chart refuses.  Any other datum is a point given
+        by coordinates, as on any manifold.
+        """
+        match element_parent(datum):
+            case parent if parent is not self.containing_manifold():
+                return super()._element_constructor_(datum, chart_label)
+            case _:
+                field = self.coordinate_field()
+                label = self._chart_label
+                engine_chart = _engine_manifold_chart(self.atlas()[label])
+                return self._element_constructor_(
+                    tuple(
+                        field(value)
+                        for value in engine_chart(_engine_manifold_point(datum))
+                    ),
+                    label,
+                )
+
+    def _repr_(self):
+        return (
+            f"{self.dimension()}-dimensional open submanifold {self.manifold_name()} of "
+            f"{self.containing_manifold()}, the domain of its chart {self._chart_label}"
+        )
 
 
 class TopologicalManifolds(OwnedCategory):
@@ -712,23 +910,76 @@ class TopologicalManifolds(OwnedCategory):
         def chart(self, label, coordinates):
             return self._register_chart(label, self._engine_manifold_realization().chart(coordinates))
 
+        def chart_on_open_subset(self, label, coordinates, source_label, nonvanishing):
+            r"""Register the chart ``coordinates`` on the open subset where the given sections do not vanish.
+
+            The sections are read in the chart ``source_label`` of this
+            manifold, and the open subset they cut out is
+            ``{p : f(p) != 0 for every f in nonvanishing}``, open because every
+            ``f`` is continuous and nonvanishing at each of its points.  The new
+            chart is a chart of this manifold on that subset: its domain is the
+            subset, an open submanifold
+            (:meth:`ManifoldAtlasChart.domain`), not the whole manifold.  It is
+            a chart of the same manifold as the chart that states the
+            condition, so a transition map is asked of this manifold.
+            """
+            source = self.atlas()[source_label]
+            conditions = tuple(
+                _engine_manifold_expression(section) for section in nonvanishing
+            )
+            assert conditions, (
+                f"cannot register the chart {label!r} on the open subset of {self} where no "
+                f"function is required to be nonzero: that subset is the whole chart "
+                f"{source_label!r}, and chart() registers the chart of the whole manifold"
+            )
+            engine_open = self._engine_manifold_realization().open_subset(
+                str(label),
+                coord_def={_engine_manifold_chart(source): conditions},
+            )
+            return self._register_chart(label, engine_open.chart(coordinates))
+
         def _register_chart(self, label, engine_chart, domain=None):
             r"""Record the chart ``engine_chart`` of this manifold's engine under ``label``.
 
-            The chart is defined on ``domain``, an open subset of this manifold;
-            a chart handed over without one is defined on the whole manifold,
-            which is the open subset the engine's own chart registers on.
+            The chart is defined on ``domain``, an open subset of this manifold.
+            A chart handed over without one is defined on the open subset the
+            engine's chart is registered on: on this manifold when that chart is
+            a chart of the whole manifold, and otherwise on the open submanifold
+            the chart's domain is (:meth:`_chart_domain`).  A chart's domain is
+            therefore never a claim larger than the set the chart exists on.
             """
             if label in self._preamble_charts:
                 raise ValueError(
                     f"cannot add a chart labelled {label!r} to {self}: its atlas already "
                     f"has a chart with that label"
                 )
-            chart = ManifoldAtlasChart(
-                self, label, engine_chart, self if domain is None else domain
-            )
+            if domain is None:
+                domain = (
+                    self
+                    if engine_chart.domain() is self._engine_manifold_realization()
+                    else self._chart_domain(label, engine_chart)
+                )
+            chart = ManifoldAtlasChart(self, label, engine_chart, domain)
             self._preamble_charts[label] = chart
             return chart
+
+        def _chart_domain(self, label, engine_chart):
+            r"""The open submanifold of this manifold that a chart on a proper open subset is defined on."""
+            engine_domain = engine_chart.domain()
+            return _object_of(
+                self.category(),
+                _engine=(self.category(), _ChartDomainRealization, None),
+                topology_data=_ManifoldTopologyData(engine_domain),
+                engine_manifold=engine_domain,
+                manifold_dimension=self.dimension(),
+                manifold_name=str(label),
+                manifold_structure=self.manifold_structure(),
+                differentiability_degree=self._preamble_differentiability_degree,
+                manifold_field=self._preamble_manifold_field,
+                containing_manifold=self,
+                chart_label=label,
+                engine_chart=engine_chart,
+            )
 
         def __call__(self, *args, **kwargs):
             r"""Construct a point through the owned element construction directly."""
@@ -830,18 +1081,22 @@ class TopologicalManifolds(OwnedCategory):
             target = self.atlas()[target_label]
             forward_expressions = _admit_manifold_expression_family(
                 forward_expressions,
+                source,
                 name=f"Coordinate change {source_label} to {target_label}",
             )
             inverse_expressions = _admit_manifold_expression_family(
                 inverse_expressions,
+                target,
                 name=f"Coordinate change {target_label} to {source_label}",
             )
             source_overlap = _admit_manifold_expression_family(
                 source_overlap,
+                source,
                 name=f"Overlap of {source_label} with {target_label} in {source_label}",
             )
             target_overlap = _admit_manifold_expression_family(
                 target_overlap,
+                target,
                 name=f"Overlap of {source_label} with {target_label} in {target_label}",
             )
             if int(forward_expressions.cardinality()) != self.dimension():
@@ -1607,16 +1862,18 @@ class HolomorphicMapPresentation:
     its domain functions; the empty family is all of ``U_s``.
     """
 
-    def __init__(self, engine_map, representations) -> None:
+    def __init__(self, engine_map, representations, source) -> None:
         self._engine_map = engine_map
         self._representations = {
             pair: (
                 _admit_manifold_expression_family(
                     expressions,
+                    source.atlas()[pair[0]],
                     name=f"Coordinate representation {pair[0]} to {pair[1]}",
                 ),
                 _admit_manifold_expression_family(
                     domain,
+                    source.atlas()[pair[0]],
                     name=f"Domain of the coordinate representation {pair[0]} to {pair[1]}",
                 ),
             )
@@ -1649,25 +1906,31 @@ def _engine_holomorphic_map(morphism):
 
 
 def _substitute_chart_coordinates(expressions, chart, values):
-    r"""Substitute ``values`` for the coordinates of ``chart`` in each expression."""
+    r"""Substitute ``values`` for the coordinates of ``chart`` in each expression, as sections of its ring."""
     substitutions = {
         _engine_manifold_expression(variable): _engine_manifold_expression(value)
         for variable, value in zip(chart.coordinates(), values, strict=True)
     }
     return tuple(
-        _raise_manifold_expression(_engine_manifold_expression(expression).subs(substitutions))
+        _raise_manifold_expression(
+            _engine_manifold_expression(expression).subs(substitutions), chart
+        )
         for expression in expressions
     )
 
 
-
-def _is_zero_rational_function(expression):
-    r"""Whether a rational chart expression is the zero function.
+def _is_zero_chart_formula(formula):
+    r"""Whether an engine chart formula is the zero function.
 
     Engine adapter: the numerator of the normalized symbolic expression is
     read as a polynomial with exact coefficients in ``QQbar``.
     """
-    return _engine_manifold_expression(expression).numerator().polynomial(SageQQbar).is_zero()
+    return formula.numerator().polynomial(SageQQbar).is_zero()
+
+
+def _is_zero_rational_function(section):
+    r"""Whether a chart section is the zero function."""
+    return _is_zero_chart_formula(_engine_manifold_expression(section))
 
 
 def _representations_agree(first_map, first_pair, second_map, second_pair):
@@ -1715,10 +1978,8 @@ def _representations_agree(first_map, first_pair, second_map, second_pair):
     if any(_is_zero_rational_function(condition) for condition in conditions):
         return True
     return all(
-        _is_zero_rational_function(
-            _raise_manifold_expression(
-                _engine_manifold_expression(left) - _engine_manifold_expression(right)
-            )
+        _is_zero_chart_formula(
+            _engine_manifold_expression(left) - _engine_manifold_expression(right)
         )
         for left, right in zip(first, second, strict=True)
     )
@@ -1873,6 +2134,7 @@ class ComplexManifoldMor(CategoricalMor):
         target = self._unique_chart(self.codomain())
         expressions = _admit_manifold_expression_family(
             coordinate_expressions,
+            source,
             name="Holomorphic-map coordinate expressions",
         )
         if int(expressions.cardinality()) != self.codomain().dimension():
@@ -1934,7 +2196,9 @@ class ComplexManifoldMor(CategoricalMor):
 
     def _from_engine_map(self, engine, representations):
         r"""Raise a private Sage map with its coordinate representations into this Mor object."""
-        return self.element_class(self, HolomorphicMapPresentation(engine, representations))
+        return self.element_class(
+            self, HolomorphicMapPresentation(engine, representations, self.domain())
+        )
 
     @object_level
     @cached_method
@@ -2103,11 +2367,12 @@ class ComplexManifolds(OwnedCategory):
             )
             for i in indices
         }
-        one = _manifold_expression_ring().one()
+        one = SR.one()
 
         def homogeneous(i):
-            # Homogeneous coordinates of a point of U_i, normalized by x_i = 1.
-            affine = iter(charts[i].coordinates())
+            # The engine's symbols for the homogeneous coordinates of a point of
+            # U_i, normalized by x_i = 1.
+            affine = iter(tuple(_engine_manifold_chart(charts[i])[:]))
             return {k: one if k == i else next(affine) for k in indices}
 
         for i, j in combinations(indices, 2):
@@ -2116,10 +2381,26 @@ class ComplexManifolds(OwnedCategory):
             manifold.transition_map(
                 f"U{i}",
                 f"U{j}",
-                tuple(on_i[k] / on_i[j] for k in indices if k != j),
-                tuple(on_j[k] / on_j[i] for k in indices if k != i),
-                source_overlap=(on_i[j],),
-                target_overlap=(on_j[i],),
+                _raise_manifold_expression_family(
+                    tuple(on_i[k] / on_i[j] for k in indices if k != j),
+                    charts[i],
+                    name=f"Coordinate change U{i} to U{j}",
+                ),
+                _raise_manifold_expression_family(
+                    tuple(on_j[k] / on_j[i] for k in indices if k != i),
+                    charts[j],
+                    name=f"Coordinate change U{j} to U{i}",
+                ),
+                source_overlap=_raise_manifold_expression_family(
+                    (on_i[j],),
+                    charts[i],
+                    name=f"Overlap of U{i} with U{j} in U{i}",
+                ),
+                target_overlap=_raise_manifold_expression_family(
+                    (on_j[i],),
+                    charts[j],
+                    name=f"Overlap of U{i} with U{j} in U{j}",
+                ),
             )
         engine.declare_union(engine.subsets())
         return manifold
@@ -2201,7 +2482,27 @@ class ComplexManifolds(OwnedCategory):
             **self._open_submanifold_data(containing_manifold, name, restriction),
         )
 
-    class ParentMethods:
+    class ElementMethods(TopologicalManifolds.ElementMethods):
+        r"""A point of a complex manifold, given by its coordinates in a labelled chart.
+
+        A point of a complex manifold is a point of a manifold, with its
+        coordinates taken in ``CC`` (:meth:`coordinate_field`); the element is
+        the manifold point it is, inherited rather than written again.
+        """
+
+    class ParentMethods(TopologicalManifolds.ParentMethods):
+        r"""A complex manifold is a manifold whose charts take values in ``CC``.
+
+        A holomorphic chart ``phi : U -> CC^n`` is a homeomorphism onto an open
+        subset of ``CC^n``, so the chart, atlas, point, transition and open
+        subset operations of a manifold are this object's operations, and the
+        only datum that changes is the field the coordinates lie in
+        (:meth:`coordinate_field`).  They are inherited from the manifold
+        parent methods rather than written again here; what a complex manifold
+        adds is its complex dimension, the holomorphic maps between them
+        (:class:`ComplexManifoldMor`) and the holomorphic open subsets.
+        """
+
         def underlying_smooth_manifold(self):
             pass
 
