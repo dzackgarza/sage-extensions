@@ -124,7 +124,7 @@ def _polynomial_chart_expression(algebra, polynomial, chart, scalar_embedding):
             if power:
                 term *= variable**power
         result += term
-    return _raise_manifold_expression(result)
+    return _raise_manifold_expression(result, chart)
 
 
 class _AffineSpaceAnalytificationFunctor(Functor):
