@@ -13,9 +13,8 @@ from sage_extensions.all import *
 
 def _marked(ambient, vector):
     source = Lattices(ZZ)([[vector.q()]])
-    from sage_extensions.categories.abstract_categories.arrow_categories import CosliceCategory
 
-    category = CosliceCategory(Lattices(ZZ), source)
+    category = Lattices(ZZ).CosliceUnder(source)
     return category, category.object(source.hom([vector], codomain=ambient))
 
 
@@ -26,11 +25,10 @@ def test_content_strata_of_square_eight_in_u():
     assert group.vector_orbit_representatives(7, content=2).cardinality() == cardinal(0)
     stratum = tuple(group.vector_orbit_representatives(8, content=2))
     assert stratum and all(point.content() == 2 and ambient.q(point) == 8 for point in stratum)
-    from sage_indefinite_port.indefinite.marked_lattices import isometry
 
     v, w = e + 4*f, 2*(e + f)
     category, marked_v = _marked(ambient, v)
-    assert isometry(category, marked_v, category.object(marked_v.arrow().domain().hom([w], codomain=ambient))) is None
+    assert category.Core().Mor(marked_v, category.object(marked_v.arrow().domain().hom([w], codomain=ambient))).is_empty() is True
 
 
 def test_primitive_orbits_of_both_signs_and_zero_in_u():
@@ -45,13 +43,14 @@ def test_primitive_orbits_of_both_signs_and_zero_in_u():
     """
     ambient = Lattices(ZZ)("U")
     e, f = tuple(ambient.module_generators())
-    for square, coordinate_pairs in (
-        (12, {frozenset((1, 6)), frozenset((2, 3))}),
-        (-12, {frozenset((1, 6)), frozenset((2, 3))}),
-        (0, {frozenset((0, 1))}),
+    for square, expected_count, coordinate_pairs in (
+        (12, 2, {frozenset((1, 6)), frozenset((2, 3))}),
+        (-12, 2, {frozenset((1, 6)), frozenset((2, 3))}),
+        (0, 1, {frozenset((0, 1))}),
     ):
-        representatives = tuple(ambient.O().vector_orbit_representatives(square, content=1))
-        assert len(representatives) == len(coordinate_pairs)
+        orbit_set = ambient.O().vector_orbit_representatives(square, content=1)
+        representatives = tuple(orbit_set)
+        assert orbit_set.cardinality() == cardinal(expected_count)
         assert all(point.q() == square and point.content() == 1 for point in representatives)
         assert {
             frozenset((abs(int(ambient.b(point, e))), abs(int(ambient.b(point, f)))))
@@ -62,15 +61,13 @@ def test_primitive_orbits_of_both_signs_and_zero_in_u():
 def test_null_vectors_of_different_content_are_inequivalent():
     ambient = Lattices(ZZ)("U")
     e, f = tuple(ambient.module_generators())
-    from sage_indefinite_port.indefinite.marked_lattices import isometry
 
     source = Lattices(ZZ)([[0]])
-    from sage_extensions.categories.abstract_categories.arrow_categories import CosliceCategory
 
-    category = CosliceCategory(Lattices(ZZ), source)
+    category = Lattices(ZZ).CosliceUnder(source)
     first = category.object(source.hom([2*e], codomain=ambient))
     second = category.object(source.hom([4*e], codomain=ambient))
-    assert isometry(category, first, second) is None
+    assert category.Core().Mor(first, second).is_empty() is True
     assert ambient.O().vector_orbit_representatives(0, content=3).cardinality() > cardinal(0)
 
 
