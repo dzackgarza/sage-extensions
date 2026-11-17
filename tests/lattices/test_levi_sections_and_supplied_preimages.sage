@@ -48,9 +48,8 @@ def test_the_split_two_plane_preimage_uses_the_supplied_kernel_and_cosets():
     )
     levi = parabolic.Mor(quotient)(lambda value: reduction.levi_action()(value))
     levi.select_section(Sets().Mor(quotient, parabolic)(reduction.levi_action().lift))
+    levi.select_kernel_generators(lambda: Set(tuple(parabolic(value) for value in kernel_family)))
     kernel = levi.kernel()
-    kernel.select_group_resolution(generators=Set(tuple(kernel(value) for value in kernel_family)))
-    parabolic.select_group_resolution(generators=Set(supplied_family))
     quotient_family = tuple(quotient.group_generators())
     image = levi.image()
     point = Sets.Δ[0](0)
@@ -60,6 +59,14 @@ def test_the_split_two_plane_preimage_uses_the_supplied_kernel_and_cosets():
         target, stated_clause=lambda: "the Levi action(g) lies in the supplied family"
     )
 
+    supplied_augmentation = preimage.schreier_generating_morphism(generators=Set(supplied_family))
+    supplied_generators = tuple(supplied_augmentation(letter) for letter in supplied_augmentation.domain().group_generators())
+    assert all(value in preimage for value in supplied_generators)
+    assert all(
+        any(preimage.inclusion()(value) == parabolic(expected) for value in supplied_generators)
+        for expected in kernel_family
+    )
+    assert target.subgroup(tuple(target(levi(preimage.inclusion()(value))) for value in supplied_generators)).cardinality() == quotient.cardinality()
     augmentation = preimage.kernel_image_generating_morphism()
     family = tuple(augmentation(letter) for letter in augmentation.domain().group_generators())
 
