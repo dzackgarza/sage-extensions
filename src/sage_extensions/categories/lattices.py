@@ -12484,7 +12484,7 @@ class IsotropicReductions(OwnedCategoryOverBaseRing):
             parabolic = self.parabolic_subgroup()
             fixing, reversing = self._levi_fibres(self.Aut().one())
             transvections = (
-                parabolic(lattice.integral_isometry(transvection))
+                parabolic(transvection)
                 for transvection in fixing.integral_kernel_group_generators()
             )
             reversal = (
