@@ -157,12 +157,29 @@ test *args:
 readme:
     #!/usr/bin/env bash
     set -euo pipefail
-    # The interpreter is `_sage-python`'s answer, as in `test`: SAGE_BIN may name
-    # the image's own launcher, whose `sys.executable` is a path inside that
-    # image and not one this host can run.
-    PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" \
-        "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" \
-        -m pytest --doctest-glob=README.md README.md
+    # The interpreter is the one the named launcher runs, asked of the launcher
+    # itself: on a runner SAGE_BIN is the image's own /sage/.venv/bin/sage, and
+    # there is no host layout to read an interpreter out of.  SAGE_PYTHON_BIN
+    # names an interpreter outright, for a launcher that enters the image.
+    if [ -z "${SAGE_PYTHON_BIN:-}" ]; then
+        if [ -z "${SAGE_BIN:-}" ]; then
+            echo "readme: set SAGE_BIN to the Sage launcher; the README example workflow names the" \
+                "image's own /sage/.venv/bin/sage." >&2
+            exit 1
+        fi
+        if [ ! -x "$SAGE_BIN" ]; then
+            echo "readme: SAGE_BIN is not executable: $SAGE_BIN" >&2
+            exit 1
+        fi
+        SAGE_PYTHON_BIN="$("$SAGE_BIN" -c 'import sys; print(sys.executable)')"
+    fi
+    if [ ! -x "$SAGE_PYTHON_BIN" ]; then
+        echo "readme: the launcher runs $SAGE_PYTHON_BIN, which this host cannot execute: it enters" \
+            "another filesystem.  Run this recipe there, or set SAGE_PYTHON_BIN to this host's own" \
+            "entry point for that interpreter." >&2
+        exit 1
+    fi
+    "$SAGE_PYTHON_BIN" -m pytest --doctest-glob=README.md README.md
 
 # The suite runs in parallel, one Sage process per worker, and records which
 # test ran each line; only lines a passing test ran count as covered.

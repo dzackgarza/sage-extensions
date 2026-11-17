@@ -26,14 +26,17 @@ True
 
 The block runs on every push, under the repository's own pytest configuration,
 in the [README example workflow](.github/workflows/readme.yml), so the run keeps
-its timing record (`CONTRIBUTING.md` ENV-03). Locally, `SAGE_BIN` names the
-launcher this host runs — inside the image that is
-`/sage/.venv/bin/sage`, and on the host it is the wrapper that enters the
-image, `~/ai-review-ci/scripts/sage-docker`:
+its timing record (`CONTRIBUTING.md` ENV-03). The recipe runs the interpreter
+that `SAGE_BIN`'s launcher reports for itself, so one command covers the image
+on a runner and an image entered from a checkout:
 
 ```bash
-SAGE_BIN="$HOME/ai-review-ci/scripts/sage-docker" just readme
+SAGE_BIN=/sage/.venv/bin/sage just readme
 ```
+
+A launcher that enters the image from outside reports an interpreter inside it,
+which this host cannot run: name the host's own entry point for that
+interpreter with `SAGE_PYTHON_BIN`.
 
 ## Read next
 
