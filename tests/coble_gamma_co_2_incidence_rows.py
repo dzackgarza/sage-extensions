@@ -396,9 +396,12 @@ def run_row(lattice, subgroup, label, cap) -> RowOutcome:
             signal.setitimer(signal.ITIMER_REAL, 0)
         log(f"[{label}] the row's calls returned in {time.monotonic() - start:.1f} s")
         log(
-            f"[{label}] the row retains "
+            f"[{label}] the quotient retains "
             f"{subgroup.finite_character_quotient().retained_isotropic_transport_count()} "
-            "transport data: its coverings, its planes' lifts, and nothing per carried line"
+            "carried-object transport datums: one for each carried isotropic object still "
+            "registered, keyed by its span, each holding the object, its source and the "
+            "isometry that placed it -- not the row's coverings and not its planes' lifts, "
+            "which are retained separately"
         )
         return row_contract(lattice, subgroup, label, lines, planes, incidences)
     except RowUndecided:
