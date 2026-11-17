@@ -51,3 +51,12 @@ def test_partial_rank_one_three_flag_graded_image_respects_actual_so_subgroup():
     action = flag.graded_quotient_action(ambient.SO())
     assert all(generator in ambient.SO() for generator in action.domain().group_generators())
     assert all(action(generator) in action.codomain() for generator in action.domain().group_generators())
+
+
+def test_public_partial_rank_one_three_flag_pointwise_stabilizer_generators():
+    ambient = Lattices(ZZ)("U") + Lattices(ZZ)("U") + Lattices(ZZ)("U")
+    basis = tuple(ambient.module_generators())[::2]
+    flag = IsotropicFlag(ambient, basis, flag_type=FlagType((1, 3)))
+    family = tuple(ambient.O().isotropic_stabilizer_generators(flag, flag=True, pointwise=True))
+    assert family
+    assert all(g(point) == point for g in family for point in basis)

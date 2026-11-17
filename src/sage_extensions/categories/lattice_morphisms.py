@@ -5496,8 +5496,16 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
 
         return _oriented_isotropic_stabilizer_generators(self, oriented)
 
-    def isotropic_stabilizer_generators(self, obj, *, flag=False):
-
+    def isotropic_stabilizer_generators(self, obj, *, flag=False, pointwise=False):
+        r"""Integral isotropic stabilizer generators, setwise or pointwise on the top term."""
+        if pointwise:
+            if not flag:
+                raise ValueError("pointwise=True requires an isotropic flag; use pointwise_stabilizer for a sublattice")
+            from sage_extensions.categories.isotropic_orbits import IsotropicFlag
+            if not isinstance(obj, IsotropicFlag):
+                raise ValueError("pointwise flag stabilizers require an IsotropicFlag object")
+            from sage_indefinite_port.indefinite.marked_lattices import INDUCTION
+            return INDUCTION.flag_pointwise_automorphism_generators(obj)
         return _isotropic_stabilizer_generators(self, obj, flag=flag)
 
     def compose(self, second, first):
