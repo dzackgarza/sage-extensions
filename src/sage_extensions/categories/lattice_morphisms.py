@@ -4731,7 +4731,31 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
         return str(self._engine_group().structure_description())
 
     def __iter__(self):
-        r"""Enumerate the finite group ``O(L)`` of a definite lattice over ``ZZ``."""
+        r"""Enumerate the elements of ``O(L)`` for the supported integral cases.
+
+        A definite lattice has finite ``O(L)`` and uses Sage's exact finite
+        group.  For higher-real-index integral lattices of rational Witt index
+        zero or one (#40), the indefinite port supplies a fair exhaustive
+        enumeration by integral coordinate height. Every returned isometry is
+        an element of *this* owned orthogonal group, and each element occurs
+        after finitely many predecessors. It is an infinite, lazy enumeration,
+        **not** a finite generating family or an emptiness decision.
+
+        The low-Witt arithmetic group-generator algorithm remains a separate
+        obligation; access to its elements does not pretend to solve it.
+        """
+        lattice = self.lattice()
+        if (
+            lattice.base_ring() is _owned_integers()
+            and lattice.module_rank().is_finite()
+            and lattice.is_nondegenerate()
+            and not lattice.is_definite()
+            and min(int(lattice.signature_pair().first()), int(lattice.signature_pair().second())) >= 2
+            and int(lattice.witt_index()) < 2
+        ):
+            from sage_indefinite_port.indefinite.low_witt import fair_orthogonal_group_elements
+
+            return (self(isometry) for isometry in fair_orthogonal_group_elements(lattice))
         self._assert_definite_over_integers("enumerate")
         return (self._from_engine(element) for element in self._engine_group())
 
