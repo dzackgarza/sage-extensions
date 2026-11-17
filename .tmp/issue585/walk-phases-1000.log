@@ -1,0 +1,44 @@
+# tree: bf92710bfce1328de9de36c636dd0632d1a82704
+# status:  M .tmp/issue585/INDEX.md  M src/sage_extensions/all.py  M src/sage_extensions/categories/group/predicate_subgroups.py  M src/sage_extensions/categories/isotropic_orbits.py  M src/sage_extensions/categories/orthogonal_quotients.py ?? results/issue585-the-incidence-decided-by-divided-classes.md ?? tests/lattices/test_the_incidence_decided_by_divided_classes.sage 
+# load: 5.03 3.98 3.92
+# program: probe-585-walk.py  PROBE_PLANES=1000 PROBE_PHASE=row
+         1.92 s  T_Co, Otilde and its character quotient  rss    282.5 MiB
+         4.85 s  the plane's parabolic: 112 generators  rss    305.7 MiB
+       273.21 s  the split's first lift  rss   1349.8 MiB
+         6.90 s  1000 planes of the row, one registered lift each  rss   1413.4 MiB
+         9.68 s  the row's one covering (3 flags) and its class pairs  rss   1419.7 MiB
+  [walk plane      2/1000]     0.044 s   43.554 ms a plane  rss   1419.8 MiB  keys 3  edges 3  [product 0.78 span 0.84 morphism 41.70 carry 0.13 keys 0.10 ms]
+  [walk plane      3/1000]     0.050 s   46.902 ms a plane  rss   1419.9 MiB  keys 5  edges 6  [product 0.86 span 0.94 morphism 44.92 carry 0.11 keys 0.08 ms]
+  [walk plane      4/1000]     0.054 s   49.145 ms a plane  rss   1420.0 MiB  keys 7  edges 9  [product 0.89 span 0.99 morphism 47.10 carry 0.10 keys 0.08 ms]
+  [walk plane      5/1000]     0.050 s   49.276 ms a plane  rss   1420.0 MiB  keys 9  edges 12  [product 0.89 span 1.01 morphism 47.21 carry 0.09 keys 0.07 ms]
+  [walk plane      6/1000]     0.083 s   55.897 ms a plane  rss   1420.1 MiB  keys 12  edges 15  [product 0.88 span 0.99 morphism 53.87 carry 0.09 keys 0.06 ms]
+  [walk plane      7/1000]     0.044 s   53.845 ms a plane  rss   1420.1 MiB  keys 15  edges 18  [product 0.88 span 0.98 morphism 51.85 carry 0.08 keys 0.06 ms]
+  [walk plane      8/1000]     0.049 s   53.088 ms a plane  rss   1420.2 MiB  keys 17  edges 21  [product 0.88 span 0.99 morphism 51.06 carry 0.09 keys 0.06 ms]
+  [walk plane      9/1000]     0.052 s   52.955 ms a plane  rss   1420.2 MiB  keys 19  edges 24  [product 0.88 span 1.00 morphism 50.93 carry 0.09 keys 0.06 ms]
+  [walk plane     10/1000]     0.058 s   53.451 ms a plane  rss   1420.2 MiB  keys 19  edges 27  [product 0.87 span 1.00 morphism 51.44 carry 0.09 keys 0.05 ms]
+  [walk plane    100/1000]     5.390 s   59.299 ms a plane  rss   1421.1 MiB  keys 134  edges 297  [product 0.82 span 0.98 morphism 57.38 carry 0.07 keys 0.04 ms]
+  [walk plane    200/1000]     5.964 s   59.633 ms a plane  rss   1421.8 MiB  keys 227  edges 597  [product 0.71 span 0.87 morphism 57.96 carry 0.06 keys 0.03 ms]
+  [walk plane    300/1000]     5.916 s   59.154 ms a plane  rss   1422.6 MiB  keys 273  edges 897  [product 0.59 span 0.79 morphism 57.70 carry 0.06 keys 0.02 ms]
+  [walk plane    400/1000]     5.900 s   58.997 ms a plane  rss   1423.2 MiB  keys 306  edges 1197  [product 0.62 span 0.80 morphism 57.51 carry 0.05 keys 0.02 ms]
+  [walk plane    500/1000]     6.725 s   67.244 ms a plane  rss   1424.1 MiB  keys 333  edges 1497  [product 0.68 span 0.80 morphism 65.69 carry 0.05 keys 0.02 ms]
+  [walk plane    600/1000]     6.439 s   64.383 ms a plane  rss   1425.0 MiB  keys 367  edges 1797  [product 0.65 span 0.91 morphism 62.74 carry 0.06 keys 0.02 ms]
+  [walk plane    700/1000]     6.120 s   61.199 ms a plane  rss   1425.7 MiB  keys 390  edges 2097  [product 0.60 span 0.81 morphism 59.71 carry 0.06 keys 0.02 ms]
+  [walk plane    800/1000]     6.876 s   68.753 ms a plane  rss   1426.7 MiB  keys 413  edges 2397  [product 0.61 span 0.78 morphism 67.30 carry 0.05 keys 0.02 ms]
+  [walk plane    900/1000]     6.132 s   61.319 ms a plane  rss   1427.3 MiB  keys 419  edges 2697  [product 0.60 span 0.80 morphism 59.85 carry 0.05 keys 0.02 ms]
+  [walk plane   1000/1000]     6.612 s   66.119 ms a plane  rss   1428.2 MiB  keys 423  edges 2997  [product 0.61 span 0.79 morphism 64.65 carry 0.05 keys 0.02 ms]
+        62.56 s  the walk over 999 planes  rss   1428.2 MiB
+[probe] RESULT phase=row planes=1000 walk_ms=62.6134 keys=423 edges=2997 comparisons=0 agreements=0 old_ms=0.000 bands=[(2, 1419.8), (3, 1419.9), (4, 1420.0), (5, 1420.0), (6, 1420.1), (7, 1420.1), (8, 1420.2), (9, 1420.2), (10, 1420.2), (100, 1421.1), (200, 1421.8), (300, 1422.6), (400, 1423.2), (500, 1424.1), (600, 1425.0), (700, 1425.7), (800, 1426.7), (900, 1427.3), (1000, 1428.2)] wall=359.1 s rss=1428.2 MiB
+[peakrss] walk-phases-1000: child waited=0 shell_code=0 samples=182
+[peakrss] peak tree RSS      : 1432 MiB
+[peakrss] low-water MemAvail : 11383 MiB
+[peakrss] peak single VmHWM  : 1432 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     1429 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   bash                          0 MiB peak
+[peakrss]   t=   360.4s procs=  2 rss=  1432 MiB hwm=  1432 MiB avail= 13109 MiB
+[peakrss]   t=   358.4s procs=  2 rss=  1431 MiB hwm=  1431 MiB avail= 13109 MiB
+[peakrss]   t=   348.4s procs=  2 rss=  1430 MiB hwm=  1430 MiB avail= 13099 MiB
+[peakrss]   t=   350.4s procs=  2 rss=  1430 MiB hwm=  1430 MiB avail= 13098 MiB
+[peakrss]   t=   352.4s procs=  2 rss=  1430 MiB hwm=  1430 MiB avail= 13098 MiB
+# launcher exit: 0

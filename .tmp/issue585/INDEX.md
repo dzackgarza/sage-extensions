@@ -27,3 +27,19 @@ The command of one probe, from the repository root:
 cd <repo>/.scratch/585
 PROBE_PLANES=1000 WALL=600 ./launch-585.sh where-1000 probe-585-where.py
 ```
+
+## Appended 2026-11-17: the probes of the divided-class route
+
+The four probes of the repair `results/issue585-the-incidence-decided-by-divided-classes.md`
+measures.  They are on the same runtime and the same launcher, and each log's
+header names the tree it ran at.
+
+| file | what it is |
+| --- | --- |
+| `probe-585-classes.py` | the class route's per-plane steps priced separately, and at every line of ten planes the carried class pair compared with the carried line's own pair and the two keys with each other |
+| `probe-585-walk.py` | the class route's walk over the row's planes: per-band RSS and wall at 10, 100 and 1000 planes; `PROBE_PHASE=check` runs the certificate route beside it and compares the deciding data line by line |
+| `probe-585-recordsize.py` | one record of the relation, priced by holding 200000 copies of a real one on `U + U(2) + <-2>` (its log prints the figure in KiB, 0.1 KiB = 121 B), and the literal ingress of the relation against a supplied inverse |
+| `probe-585-linerow.py` | whether `Otilde(T_Co)`'s line cusp row returns at all, which is what an edge-set comparison on `T_Co` itself would need |
+| `probe-585-small-row.py` | the two incidence routes and the flag row side by side on `U + U(2) + <-2>`, for both kernel groups |
+| `diag_hashes.sage` | the run that names the trap: a `{...}` display in a session file is `Owned_FiniteLiteralSet`, not a `set()` |
+| `classes-10.log`, `linerow.log`, `walk-phases-1000.log`, `walk-row-1000.log`, `recordsize.log`, `small-row.log` | their outputs |

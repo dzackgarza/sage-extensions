@@ -1,0 +1,62 @@
+# tree: bf92710bfce1328de9de36c636dd0632d1a82704
+# status:  M src/sage_extensions/all.py  M src/sage_extensions/categories/group/predicate_subgroups.py  M src/sage_extensions/categories/isotropic_orbits.py  M src/sage_extensions/categories/orthogonal_quotients.py ?? tests/lattices/test_the_incidence_decided_by_divided_classes.sage 
+# load: 1.30 0.99 0.53
+# program: probe-585-linerow.py  PROBE_PLANES=1 PROBE_PHASE=row
+         0.14 s  Otilde(T_Co)  rss    279.9 MiB
+         0.00 s  its character quotient  rss    280.0 MiB
+[rss] t=   10.0s rss=   477.2 MiB
+[rss] t=   20.2s rss=   520.2 MiB
+[rss] t=   30.2s rss=   540.6 MiB
+[rss] t=   40.3s rss=   567.6 MiB
+[rss] t=   50.3s rss=   597.7 MiB
+[rss] t=   60.3s rss=   604.9 MiB
+[rss] t=   70.3s rss=   629.4 MiB
+[rss] t=   80.4s rss=   662.6 MiB
+[rss] t=   90.4s rss=   666.9 MiB
+[rss] t=  100.4s rss=   723.8 MiB
+[rss] t=  110.4s rss=   724.7 MiB
+[rss] t=  120.4s rss=   725.8 MiB
+[rss] t=  130.4s rss=   757.2 MiB
+[rss] t=  140.4s rss=   787.3 MiB
+[rss] t=  150.4s rss=   791.5 MiB
+[rss] t=  160.4s rss=   844.0 MiB
+[rss] t=  170.4s rss=   850.1 MiB
+[rss] t=  180.4s rss=   897.8 MiB
+[rss] t=  190.4s rss=   921.2 MiB
+[rss] t=  200.5s rss=   954.2 MiB
+[rss] t=  210.5s rss=   959.9 MiB
+[rss] t=  220.5s rss=   966.0 MiB
+[rss] t=  231.2s rss=  1163.3 MiB
+[rss] t=  241.2s rss=  1169.1 MiB
+[rss] t=  251.2s rss=  1174.6 MiB
+[rss] t=  261.3s rss=  1180.4 MiB
+[rss] t=  271.3s rss=  1184.1 MiB
+[rss] t=  281.3s rss=  1184.2 MiB
+[rss] t=  291.4s rss=  1186.5 MiB
+[rss] t=  301.4s rss=  1234.8 MiB
+[rss] t=  311.4s rss=  1265.5 MiB
+[rss] t=  321.4s rss=  1296.1 MiB
+[rss] t=  331.4s rss=  1321.5 MiB
+[rss] t=  341.5s rss=  1352.1 MiB
+[rss] t=  351.5s rss=  1383.5 MiB
+[rss] t=  361.5s rss=  1414.9 MiB
+[rss] t=  371.5s rss=  1447.1 MiB
+[rss] t=  381.7s rss=  1474.8 MiB
+[rss] t=  391.7s rss=  1359.5 MiB
+[rss] t=  401.7s rss=  1373.4 MiB
+[rss] t=  411.7s rss=  1386.2 MiB
+[rss] t=  421.7s rss=  1399.6 MiB
+[rss] t=  431.7s rss=  1412.9 MiB
+[rss] t=  441.8s rss=  1427.7 MiB
+[rss] t=  451.8s rss=  1439.9 MiB
+[rss] t=  461.8s rss=  1449.2 MiB
+[rss] t=  471.8s rss=  1477.0 MiB
+[rss] t=  481.8s rss=  1505.0 MiB
+[rss] t=  491.8s rss=  1530.4 MiB
+[rss] t=  501.8s rss=  1534.2 MiB
+[rss] t=  511.8s rss=  1541.0 MiB
+[rss] t=  521.9s rss=  1545.5 MiB
+[rss] t=  531.9s rss=  1548.9 MiB
+[rss] t=  541.9s rss=  1499.4 MiB
+[rss] t=  552.0s rss=  1508.9 MiB
+# launcher exit: 124
