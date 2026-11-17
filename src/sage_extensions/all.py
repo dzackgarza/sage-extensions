@@ -138,6 +138,7 @@ from sage_extensions.categories.integral_affine_stratified_atlases import (  # n
     IntegralAffineCornerAtlases,
 )
 from sage_extensions.categories.isotropic_orbits import (  # noqa: F401
+    DividedClassCuspIncidence,
     FlagType,
     IsotropicFlag,
     OrientedIsotropicFlag,
