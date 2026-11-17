@@ -15,6 +15,7 @@ process a slice.
 | `row-1000.log` | the 1000-plane slice: wall 194.8 s, peak 1359 MiB, 66 KB a plane |
 | `carry-10.log` | the walk's per-plane work at 10 planes: carry 13.15 ms, keys 14.82 ms, ~400 KB a plane |
 | `carry-100.log` | the same at 100 planes: carry 12.95 ms, keys 11.1-14.9 ms, 350 KB a plane |
+| `carry-1000.log` | the same at 1000 planes: carry 12.7-14.7 ms steady, keys ~15.6 ms, 375 KB a plane over planes 100 to 1000 |
 | `diag-1.log` | the stack-sampled diagnostic that measured the line row: still inside `_isotropic_line_class_points` at 559.5 s, RSS 1717.5 MiB |
 
 The command of one slice, from the repository root:

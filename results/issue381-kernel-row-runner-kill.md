@@ -159,12 +159,14 @@ The walk's own per-plane work, on the row's own objects
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
 | `carry-10` | 176.6 s | 1249 MiB | 8.23 s | 13.15 ms | 14.82 ms | ~400 KB |
 | `carry-100` | 203.9 s | 1400 MiB | 8.28 s | 12.95 ms | 18.53 ms mean | 350 KB |
+| `carry-1000` | 243.9 s | 1612 MiB | 8.3 s | 15.24 ms mean, 12.7-14.7 ms in its steady bands | 15.58 ms mean | 375 KB |
 
 The keys' mean over `carry-100` is pulled up by one band at 123.8 ms a plane; its
 steady bands are 11.1-14.9 ms.  The carried transports are released every plane
 -- the registry reads 1 to 2 datums at every sample -- so the 350 KB a plane is
-not the transport registry.  `carry-1000` had not returned when this was
-written; nothing below rests on it.
+not the transport registry.  The three carry slices are three separate
+processes, and the 1000-plane one's retention is taken over planes 100 to 1000
+(RSS 1278.9 to 1608.3 MiB), the allocator returning pages early in that run.
 
 ## 4. Growth, extrapolation, and whether the row is reachable at all
 
@@ -248,10 +250,11 @@ and a second coefficient; it is measured in section 4 and is not #584's unit.
   rows and the finite image, not a returned row.
 * The line row's own cost is measured only as "more than 580 s on this VM": the
   diagnostic was cut by its own command, not by the operation.
-* `carry-1000` had not returned when this was written, so the walk's per-plane
-  retention is measured at two sizes (10 and 100 planes), not three.  Both give
-  the same constant, 350-400 KB a plane, and neither shows a trend across its own
-  bands.
+* The walk's per-plane retention is measured at 10, 100 and 1000 planes, and all
+  three give the same constant, 350-400 KB a plane, with no trend across their
+  bands; the 1000-plane figure is 375 KB over planes 100 to 1000.  The ``carry``
+  slice's mean carry and key times are pulled up by load spikes and by the
+  allocator's page returns, so the steady bands are what is quoted.
 * A segfault seen while preparing the slices, filed separately: `quotient.index()`
   on `Otilde(T_Co)` (`orthogonal_quotients.py:943`) reached
   `_ambient_generators` (`:607`), the port's
