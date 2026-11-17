@@ -20,7 +20,9 @@ it found it.
 from __future__ import annotations
 
 import builtins
+import gc
 import json
+import weakref
 from pathlib import Path
 
 import pytest
@@ -41,6 +43,13 @@ def card(section: str, tag: str) -> dict:
 
 
 builtins.card = card
+
+# A released object is observable only through a weak reference: identity and
+# value say nothing about whether something still holds it.  ``weakref`` and
+# ``gc`` are not session names, so they are bound here rather than imported by
+# each test that observes a lifetime (``TL01``, ``TL13``).
+builtins.weakref = weakref
+builtins.gc = gc
 
 
 def spans_built_by(action):
