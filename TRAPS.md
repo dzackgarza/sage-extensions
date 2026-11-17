@@ -88,48 +88,38 @@ build plus group 7.0 s, of which 4.1 s is the discriminant form.
 
 ### PARI overflows on groups and isometry witnesses for a line plus E8
 
-On SageMath 11.0.beta1 with Python 3.14, the orthogonal group of the positive
-definite lattice `<18> + E8` reaches PARI `qfauto` and raises a stack overflow
-at its 1 GiB limit. The independent mathematical example is
-`tests/lattices/test_orthogonal_group_semantic_api.sage::test_e8_with_a_norm_eighteen_line_has_the_product_orthogonal_group`.
-Its expected order is twice the E8 Weyl-group order: the norm-two vectors
-span the characteristic E8 summand, and the perpendicular line permits two
-signs. The selected test failed in 36.99 seconds on 2026-10-26; that includes
-test setup and is one data point.
-
 The [PARI qfisominit contract](https://pari.math.u-bordeaux.fr/dochtml/html-stable/Vectors,_matrices,_linear_algebra_and_sets.html#qfisominit)
-requires all vectors up to the largest diagonal entry. The norm-18 basis
-vector therefore forces enumeration of long E8 shells as well.
-[OSCAR 1.8.2 isometry_group](https://github.com/oscar-system/Oscar.jl/blob/v1.8.2/src/Groups/matrices/isometry_group.jl)
-supplies a complete computation by decomposition into invariant sublattices.
-On Julia 1.12.5 it returned the required order. Julia's timing report
-attributes almost all of the first call to compilation.
+requires all vectors up to the largest diagonal entry. A long perpendicular
+line therefore forces enumeration of long E8 shells as well. The definite
+group and isometry adapters in `categories/lattice_morphisms.py` use the
+indecomposable orthogonal summands when that decomposition is available.
+An isometry decision also compares the minimum and the number of minimal
+vectors before the search. Different pairs exclude an isometry; equal pairs
+still require the isometry search.
 
-| Direct OSCAR call on `<18> + E8` | Observed value |
-| --- | ---: |
-| Group order | 1393459200 |
-| First `isometry_group` call, excluding `using Oscar` | 267.750760 s |
-| Compilation share | 99.89% |
+The public degree-26 complement example in
+`tests/lattices/test_definite_isometry_separates_minimal_shells.sage` reaches
+the whole-form search at `bcad374a`: one complement is E8 plus a line,
+while the other has root system E7 plus A1 and the same genus. It fails
+with a PARI stack overflow. Set the stack limit **after** importing
+`sage_extensions.categories.lattice_engines`, since that module initializes
+`parisizemax`. The following observations used a 200003584-byte limit:
 
-Reproduce in the bridge's Julia project with `using Oscar`,
-`G = diagonal_matrix(matrix(QQ,1,1,[18]), gram_matrix(root_lattice(:E,8)))`,
-`L = integer_lattice(; gram=G)`, `@time A = isometry_group(L)`, and
-`order(A)`. This is a cold-call data point, not a throughput comparison.
-The owned group-order and generator checks above also verify the adapter's
-basis transport.
+| Check | Source revision | Result | Call time |
+| --- | --- | --- | --- |
+| Degree-26 complement isometry decision | `bcad374a`, regression `5ca822d8` | PARI stack overflow | 14.84 s |
+| Degree-26 complement isometry decision | `9459fbfd` | Not isometric | 0.29 s, after the degree-10 case in the same process |
+| Frozen `test_published_representatives_are_one_per_orbit[26]` | port `0d5fc91`, provider `9459fbfd` | Passed | 54.74 s |
 
-The definite witness operation has the same enumeration limit. The unchanged
-port degree-18 vector-orbit and reflected-vector `r_0` consumers overflow
-in `QuadraticForm.is_globally_equivalent_to`, which calls PARI `qfisom`.
-The owner test
-`tests/lattices/test_lattice_isometry_semantic_api.sage::test_e8_with_a_norm_eighteen_line_has_integral_change_of_basis_witnesses`
-reproduces the overflow on `<18> + E8` and the unimodular shear with
-`change[0,1] = 1`. Its red run took 35.82 seconds, including setup, on
-2026-10-26 with the same Sage runtime and 1 GiB PARI limit.
-OSCAR's `is_isometric_with_isometry` uses invariant-sublattice decomposition
-in the same source file, lines 645-844. The adapter transposes its row-action
-witness to the owned column-image convention. Its mathematical verification
-must cover both definite signs and an empty isometry set.
+The owner checks also exercise large integral coefficients and isometry
+witnesses for both definite signs. PARI's
+[`qfminim` flag 0](https://pari.math.u-bordeaux.fr/dochtml/html-stable/Vectors__matrices__linear_algebra_and_sets.html#qfminim)
+is restricted to small integral entries. The adapters use flag 2; the shell
+comparison retains one minimal vector and evaluates its norm exactly because
+flag 2 returns a floating-point minimum. The automorphism adapter divides
+the Gram matrix by its integer content before `qfauto`: nonzero scalar
+multiplication preserves the orthogonal group, while an unnecessary scalar
+can exceed PARI's machine-integer input range.
 
 ### Algebraic-real `QuadraticForm.rational_diagonal_form` rejects even a diagonal plane
 
