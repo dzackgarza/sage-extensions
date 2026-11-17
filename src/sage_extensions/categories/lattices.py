@@ -31,7 +31,7 @@ from sage.arith.misc import gcd
 from sage.categories.category_with_axiom import all_axioms
 from sage.misc.abstract_method import abstract_method
 from sage.combinat.root_system.cartan_type import CartanType
-from sage.misc.cachefunc import cached_function, cached_method
+from sage.misc.cachefunc import cached_function, cached_method, weak_cached_function
 from sage.misc.latex import latex
 from sage.misc.repr import repr_lincomb
 from sage.rings.integer_ring import ZZ as SageZZ
@@ -405,7 +405,8 @@ def _overlattice_inclusions(form):
     )
 
 
-@cached_function(
+@weak_cached_function(
+    cache=0,
     key=lambda module, basis, root_system_type_name=None: (
         id(module),
         basis,
@@ -428,6 +429,54 @@ def _lattice_subobject_spanning(module, basis, root_system_type_name=None):
             return _lattice_subobject_on_basis(
                 module, basis, (RootLattices(),), {"root_system_type_name": root_system_type_name}
             )
+
+
+@weak_cached_function(cache=0)
+def _primitive_isotropic_subobject(lattice, *basis):
+    r"""The primitive totally isotropic sublattice of ``lattice`` spanned by ``basis``.
+
+    The body of :meth:`Lattices.ParentMethods.primitive_isotropic_subobject`, in
+    a record that holds its value weakly: the subobject retains the ambient
+    lattice, its own category machinery and its inclusion, and a cusp row names
+    one span per plane, so a record that kept every subobject it had built would
+    cost a constructed parent a plane for the process.  The arguments are the
+    method's own, so the key is the one its cache used; a span is a finite
+    family of elements of ``lattice``, which the key retains and which in turn
+    retain ``lattice``, so a live entry cannot name a reused address.
+    """
+    from sage_extensions.categories.isotropic_parabolics import (
+        PrimitiveIsotropicSubobjects,
+    )
+
+    elements = tuple(
+        element if element_parent(element) is lattice else lattice(element)
+        for element in basis
+    )
+    subobject = lattice.subobject_on(elements)
+    assert subobject.is_primitive(), (
+        f"the span of {elements!r} in {lattice!r} is not primitive: its inclusion has a "
+        f"cokernel with torsion, so it is not a primitive isotropic sublattice; saturate it first"
+    )
+    zero = lattice.base_ring().zero()
+    embedded = subobject.embedded_module_generators()
+    labels = subobject.module_generating_set()
+    assert all(
+        lattice.b(embedded[left], embedded[right]) == zero
+        for left in labels
+        for right in labels
+    ), (
+        f"the span of {elements!r} in {lattice!r} is not totally isotropic: b(x, y) is nonzero for some pair of these vectors"
+    )
+    subobject = refine(
+        subobject,
+        PrimitiveIsotropicSubobjects(lattice.base_ring()),
+    )
+    assert (
+        subobject.module_rank() == finite_ordered_set(elements).cardinality()
+    ), (
+        f"the vectors {elements!r} in {lattice!r} are linearly dependent: they span a sublattice of rank {subobject.module_rank()}, so they are not a basis of it"
+    )
+    return subobject
 
 
 def _lattice_subobject_on_basis(module, basis, extra_categories, construction_data):
@@ -9458,7 +9507,6 @@ class Lattices(OwnedCategoryOverBaseRing):
 
             return _stable_complement_root_reflections(self, element)
 
-        @cached_method
         def primitive_isotropic_subobject(self, *basis):
             r"""Return the primitive totally isotropic sublattice spanned by ``basis``.
 
@@ -9466,42 +9514,13 @@ class Lattices(OwnedCategoryOverBaseRing):
             before refining the represented subobject, so a refused span leaves
             no wrongly placed object behind. The stated family must be
             independent; the empty family spans the zero sublattice.
-            One subobject per spanning family, so
-            its cached isotropic reduction (and parabolic) is shared.
+            One subobject per spanning family while that subobject is in use,
+            so its cached isotropic reduction (and parabolic) is shared; the
+            record holds the subobject weakly, because a subobject retains its
+            ambient lattice and a row that names one span per plane must not be
+            what keeps every plane it has named.
             """
-            from sage_extensions.categories.isotropic_parabolics import (
-                PrimitiveIsotropicSubobjects,
-            )
-
-            elements = tuple(
-                element if element_parent(element) is self else self(element)
-                for element in basis
-            )
-            subobject = self.subobject_on(elements)
-            assert subobject.is_primitive(), (
-                f"the span of {elements!r} in {self!r} is not primitive: its inclusion has a "
-                f"cokernel with torsion, so it is not a primitive isotropic sublattice; saturate it first"
-            )
-            zero = self.base_ring().zero()
-            embedded = subobject.embedded_module_generators()
-            labels = subobject.module_generating_set()
-            assert all(
-                self.b(embedded[left], embedded[right]) == zero
-                for left in labels
-                for right in labels
-            ), (
-                f"the span of {elements!r} in {self!r} is not totally isotropic: b(x, y) is nonzero for some pair of these vectors"
-            )
-            subobject = refine(
-                subobject,
-                PrimitiveIsotropicSubobjects(self.base_ring()),
-            )
-            assert (
-                subobject.module_rank() == finite_ordered_set(elements).cardinality()
-            ), (
-                f"the vectors {elements!r} in {self!r} are linearly dependent: they span a sublattice of rank {subobject.module_rank()}, so they are not a basis of it"
-            )
-            return subobject
+            return _primitive_isotropic_subobject(self, *basis)
 
         def vectors_of_square_with_complement(self, square, complement):
             r"""Yield one primitive ``delta`` per ``O(T)``-orbit with ``delta^2 = square`` and ``delta^perp`` isometric to ``complement``.

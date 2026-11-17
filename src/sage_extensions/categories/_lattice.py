@@ -30,7 +30,7 @@ from operator import index
 
 from sage.arith.misc import factor
 from sage.combinat.root_system.cartan_type import CartanType, CartanType_abstract
-from sage.misc.cachefunc import cached_function, cached_method
+from sage.misc.cachefunc import cached_function, cached_method, weak_cached_function
 from sage.misc.latex import latex
 from sage.quadratic_forms.quadratic_form import QuadraticForm
 from sage.rings.integer import Integer
@@ -509,7 +509,8 @@ def _lattice_object(
     )
 
 
-@cached_function(
+@weak_cached_function(
+    cache=0,
     key=lambda category, module, gram, names, root_system_type_name, axiom_categories=None: (
         id(category),
         id(module),

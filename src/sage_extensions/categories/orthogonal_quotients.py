@@ -4106,17 +4106,14 @@ def _plane_parabolic_incidence_flags(subgroup, plane, flag):
     return tuple(flags)
 
 
-@timed_stage(
-    "isotropic orbit representatives",
-    input=lambda subgroup, rank, *, flag=False: orbit_row_record_name(
-        rank,
-        flag=flag,
-        lattice=subgroup.supergroup().domain(),
-        subgroup=subgroup,
-    ),
-)
-def _subgroup_isotropic_orbit_representatives(subgroup, rank, *, flag=False):
-    r"""Return the subgroup's orbits of primitive isotropic subobjects, as one timed row.
+def _yield_subgroup_isotropic_orbit_representatives(subgroup, rank, *, flag=False):
+    r"""Yield the subgroup's orbits of primitive isotropic subobjects one at a time.
+
+    This is the row :func:`_subgroup_isotropic_orbit_representatives` collects,
+    yielded rather than gathered.  A caller whose own datum is smaller than a
+    representative -- the cusp row, which keeps a span a cusp -- must not have
+    to hold every representative to reach the last one: a kernel plane row of
+    ``T_{Co}`` has 189720 of them, and each is a constructed parent.
 
     The row is the ambient ``O(L)``-orbits, split under the subgroup: the
     character quotient's image (:mod:`sage_extensions.timing` records it as the
@@ -4127,14 +4124,14 @@ def _subgroup_isotropic_orbit_representatives(subgroup, rank, *, flag=False):
     single one of them.
     """
     if not flag and index(rank) == 0:
-        return subgroup.supergroup().isotropic_orbit_representatives(0)
+        yield from subgroup.supergroup().isotropic_orbit_representatives(0)
+        return
     lattice = subgroup.supergroup().domain()
     row = orbit_row_record_name(rank, flag=flag, lattice=lattice, subgroup=subgroup)
     with stage("discriminant image", row):
         _assert_isotropic_splitting_has_character_data(subgroup)
         quotient = subgroup.finite_character_quotient()
     orthogonal_group = subgroup.supergroup()
-    representatives = []
     # The ambient classes always come from the port's classification: the
     # in-repo discriminant-class route exhibits its representatives by an
     # integral-point enumeration that does not return on the Enriques lattice
@@ -4150,7 +4147,7 @@ def _subgroup_isotropic_orbit_representatives(subgroup, rank, *, flag=False):
             )
             if line_image == "NOSPLIT":
                 # The sign witness (or trivial quotient) proves G_0 = G Stab(x) for its index.
-                representatives.append(representative)
+                yield representative
                 continue
             if line_image is not None:
                 # The coset walk's words are retained with the lines they
@@ -4161,22 +4158,22 @@ def _subgroup_isotropic_orbit_representatives(subgroup, rank, *, flag=False):
                     quotient.register_isotropic_transport(
                         transported, representative, splitting
                     )
-                    representatives.append(transported)
+                    yield transported
                 continue
             if not flag and index(rank) == 1:
                 from_divided_classes = _line_orbit_from_divided_classes(subgroup, representative)
                 if from_divided_classes is not None:
-                    representatives.extend(from_divided_classes)
+                    yield from from_divided_classes
                     continue
             if not flag and rank == 2:
                 from_planes = _plane_orbit_from_odd_stabilizer(subgroup, representative)
                 if from_planes is not None:
-                    representatives.extend(from_planes)
+                    yield from from_planes
                     continue
             if not flag and rank == 2:
                 from_parabolic = _plane_orbit_from_parabolic_stabilizer(subgroup, representative)
                 if from_parabolic is not None:
-                    representatives.extend(from_parabolic)
+                    yield from from_parabolic
                     continue
             stabilizer = quotient.exact_isotropic_stabilizer_generators(
                 representative, flag=flag
@@ -4192,8 +4189,29 @@ def _subgroup_isotropic_orbit_representatives(subgroup, rank, *, flag=False):
                     strict=True,
                 ):
                     quotient.register_isotropic_transport(moved, source, splitting)
-                representatives.append(transported)
-    return finite_ordered_set(tuple(representatives))
+                yield transported
+
+
+@timed_stage(
+    "isotropic orbit representatives",
+    input=lambda subgroup, rank, *, flag=False: orbit_row_record_name(
+        rank,
+        flag=flag,
+        lattice=subgroup.supergroup().domain(),
+        subgroup=subgroup,
+    ),
+)
+def _subgroup_isotropic_orbit_representatives(subgroup, rank, *, flag=False):
+    r"""Return the subgroup's orbits of primitive isotropic subobjects, as one timed row.
+
+    The row :func:`_yield_subgroup_isotropic_orbit_representatives` yields,
+    gathered into the set it is.  A caller that keeps its own datum per orbit --
+    the cusp row keeps a span -- takes the yielded row instead, so that the
+    representatives it has finished with are dropped as it goes.
+    """
+    return finite_ordered_set(
+        tuple(_yield_subgroup_isotropic_orbit_representatives(subgroup, rank, flag=flag))
+    )
 
 
 def _subgroup_isotropic_equivalence_witness(subgroup, left, right, *, flag=False):

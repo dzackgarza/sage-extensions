@@ -749,8 +749,19 @@ class PredicateSubgroups(OwnedParameterizedCategory):
 
         @cached_method
         def cusps(self, rank=1):
-            r"""Return the retained primitive-isotropic cusp orbits of this subgroup and rank."""
+            r"""Return the retained primitive-isotropic cusp orbits of this subgroup and rank.
+
+            A cusp is named by its representative's span and its rank, so the
+            row reads the yielded orbit row rather than the gathered one: the
+            representative a cusp was built from is dropped before the next is
+            drawn, and what the row keeps per orbit is a span, not a
+            constructed subobject.  The row's count, its order and each cusp's
+            span are the orbit row's own.
+            """
             from sage_extensions.categories.isotropic_orbits import _arithmetic_cusp
+            from sage_extensions.categories.orthogonal_quotients import (
+                _yield_subgroup_isotropic_orbit_representatives,
+            )
             from sage_extensions.categories.sets.finite_ordered_sets import (
                 finite_ordered_set,
             )
@@ -758,7 +769,9 @@ class PredicateSubgroups(OwnedParameterizedCategory):
             return finite_ordered_set(
                 tuple(
                     _arithmetic_cusp(self, representative)
-                    for representative in self.isotropic_orbit_representatives(rank)
+                    for representative in _yield_subgroup_isotropic_orbit_representatives(
+                        self, rank
+                    )
                 )
             )
 
@@ -871,12 +884,8 @@ class PredicateSubgroups(OwnedParameterizedCategory):
             # 189720 planes.  A term that is no representative -- the flag
             # route's planes are not transported from a retained one -- keeps
             # the witness search, which is the only statement available there.
-            plane_cusp_by_span = {
-                _span_key(cusp.representative()): cusp for cusp in plane_cusps
-            }
-            line_cusp_by_span = {
-                _span_key(cusp.representative()): cusp for cusp in line_cusps
-            }
+            plane_cusp_by_span = {cusp.span(): cusp for cusp in plane_cusps}
+            line_cusp_by_span = {cusp.span(): cusp for cusp in line_cusps}
             identity = self.supergroup().one()
 
             # A line of a plane is no representative of the line row, so its

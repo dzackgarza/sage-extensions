@@ -113,6 +113,7 @@ from sage_extensions.categories.sets.set_categories import Sets as OwnedSets
 from sage_extensions.logic import AtomicProposition, Predicate, conjunction, negation
 from sage_extensions.owned_category_bases import CategoryWithAxiom
 from sage_extensions.tensors.tensor import tensor
+from sage_extensions.utilities import _address_registry
 from sage_extensions.validation import validator
 
 if TYPE_CHECKING:
@@ -171,13 +172,21 @@ def _relation_morphism(ring, relation_rows):
     )
 
 
-@cached_function(key=lambda formed_module: id(formed_module))
+@_address_registry
 def _represented_value_module(formed_module):
-    r"""Return the actual module object underlying a form's public value object."""
+    r"""Return the actual module object underlying a form's public value object.
+
+    The answer is one object per formed module for as long as the formed module
+    is the object at its address: a formed module's value module is what its
+    value maps must start and end at, and the constructors of this module
+    compare those endpoints by identity.  A formed module that has been
+    collected leaves no answer behind -- the question is then asked of the
+    module actually supplied, not of whatever object now occupies the address.
+    """
     return _represented_module(formed_module.value_module(), formed_module.base_ring())
 
 
-@cached_function(key=lambda value, ring: (id(value), id(ring)))
+@_address_registry
 def _represented_module(value, ring):
     r"""Return the ``ring``-module underlying the value object ``value`` of a pairing.
 

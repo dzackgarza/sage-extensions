@@ -822,15 +822,29 @@ class _ArithmeticCuspEngine:
     The subgroup is part of the object.  Its stabilizer is therefore the
     actual intersection ``Gamma cap P_I``, not the full parabolic in
     ``O(L)``.  Membership retains an explicit transporter lying in ``Gamma``.
+
+    The orbit is named by its representative's *span*, not by a constructed
+    representative: a subobject of this library is a parent with its module,
+    its Gram, its category machinery and its inclusion, so a row that kept one
+    per orbit would keep a constructed parent per orbit while the row lives,
+    and ``T_{Co}``'s kernel plane row has 189720 orbits.  The span is the exact
+    name of the sublattice -- two subobjects of one ambient lattice span the
+    same sublattice exactly when their row Hermite forms there agree
+    (:func:`_span_key`) -- so two cusps are identified exactly when the
+    subobjects they name are equal, and no coarser invariant stands in for it.
+    :meth:`representative` builds the subobject from the span when a reader
+    asks, and what it builds is retained only while the reader retains it.
     """
 
-    def __init__(self, subgroup, representative, **rest) -> None:
-        if subgroup.supergroup().domain() is not representative.ambient_lattice():
+    def __init__(self, subgroup, span, subobject_rank, **rest) -> None:
+        lattice = subgroup.supergroup().domain()
+        if span[0] != id(lattice):
             raise ValueError(
-                f"{representative} cannot represent a cusp of {subgroup}: the group acts on {subgroup.supergroup().domain()}, but {representative} lies in {representative.ambient_lattice()}"
+                f"the span {span!r} cannot represent a cusp of {subgroup}: the group acts on {lattice}, and the span's ambient lattice is another"
             )
         self._subgroup = subgroup
-        self._representative = representative
+        self._span = span
+        self._subobject_rank = subobject_rank
         super().__init__(facade=True, **rest)
 
     def universe(self):
@@ -846,10 +860,24 @@ class _ArithmeticCuspEngine:
         return self.subgroup().supergroup().domain()
 
     def module_rank(self):
-        return self.representative().module_rank()
+        return self._subobject_rank
+
+    def span(self):
+        r"""Return the cusp's span: its ambient lattice's ``id`` and its Hermite rows.
+
+        This is the cusp's whole name, read without building the subobject it
+        names; a reader that wants the subobject asks :meth:`representative`.
+        """
+        return self._span
 
     def representative(self):
-        return self._representative
+        r"""Return the primitive isotropic subobject this cusp names, built from its span.
+
+        The subobject is built here and not retained: the cusp's own datum is
+        the span, so this costs one construction a call and leaves nothing
+        behind once the caller drops the answer.
+        """
+        return _subobject_of_span(self.lattice(), self._span)
 
     def __eq__(self, other) -> bool:
         r"""Compare orbits of this subgroup using its exact transporter."""
@@ -861,7 +889,7 @@ class _ArithmeticCuspEngine:
             and other.module_rank() == self.module_rank()
         ):
             return False
-        if _same_subobject(self.representative(), other.representative()):
+        if other._span == self._span:
             return True
         return self.transporter_witness(other.representative()) is not None
 
@@ -935,12 +963,49 @@ def _cusp(representative):
     )
 
 
+def _subobject_of_span(lattice, span):
+    r"""The primitive totally isotropic subobject of ``lattice`` whose span is ``span``.
+
+    :func:`_span_key` names a subobject by the row Hermite form of its
+    generator coordinates in the ambient lattice, and the rows of that form
+    span the same lattice of coordinates as the rows it was taken from, so
+    reading them back as vectors of ``lattice`` names the same sublattice.  The
+    subobject is then built by the constructor that verifies primitivity,
+    isotropy and independence.
+    """
+    if span[0] != id(lattice):
+        raise ValueError(
+            f"the span {span!r} is not a span of {lattice}: its first entry is the id of another lattice"
+        )
+    labels = tuple(lattice.module_generating_set())
+    vectors = tuple(
+        lattice.linear_combination(
+            {
+                label: int(entry)
+                for label, entry in zip(labels, row, strict=True)
+                if int(entry) != 0
+            }
+        )
+        for row in span[1]
+    )
+    return lattice.primitive_isotropic_subobject(*vectors)
+
+
 def _arithmetic_cusp(subgroup, representative):
+    r"""The cusp of ``representative``'s orbit, named by the representative's span.
+
+    The span and the rank are what a cusp row keeps a cusp by: the span is the
+    exact name of the subobject (:func:`_subobject_of_span` reads it back), and
+    the rank answers without building it.  The subobject is not kept, so a row
+    of 189720 cusps -- ``T_{Co}``'s kernel plane row -- is a row of spans, and
+    the planes it names live exactly as long as a reader holds one.
+    """
     return _object_of(
         Sets(),
         _engine=(Sets(), _ArithmeticCuspEngine, None),
         subgroup=subgroup,
-        representative=representative,
+        span=_span_key(representative),
+        subobject_rank=representative.module_rank(),
     )
 
 

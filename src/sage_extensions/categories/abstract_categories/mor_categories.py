@@ -54,6 +54,7 @@ def _compose_operation_preserving_mor(left, right, fallback):
 
 from types import NotImplementedType
 from typing import TYPE_CHECKING, Any
+import weakref
 
 from sage.categories.category import Category
 from sage.categories.category import JoinCategory as SageJoinCategory
@@ -2178,7 +2179,15 @@ class _MorCategoryOf(OwnedCategoryBase):
         # Mor parent class from the endpoints.  Keep that endpoint cache on
         # the common family object rather than relying on Sage category
         # internals for it.
-        self._objects = {}
+        #
+        # Both records hold their Mor weakly, because a Mor retains its two
+        # endpoints: a record that held one strongly would keep alive every
+        # object any Mor of this family was ever built for.  What the records
+        # promise is that one pair of objects has one Mor *while that pair is
+        # alive*; a pair that has been collected leaves an entry no question
+        # can reach, since every lookup verifies the endpoints of what it finds
+        # (``_cached_between``) and returns nothing when the pair is gone.
+        self._objects = weakref.WeakValueDictionary()
         self._resolved_endpoint_categories = {}
         # The arrow types of this family's Mor objects, keyed by what they
         # depend on (``CategoricalMor._generated_arrow_type``).
@@ -2236,6 +2245,11 @@ class _MorCategoryOf(OwnedCategoryBase):
         endpoints is deliberately irrelevant here and can itself re-enter Mor
         construction, so every Mor-family specialization shares this one
         identity-sensitive lookup.
+
+        The record holds its Mor weakly and is keyed by the endpoints'
+        addresses, so a hit names this pair only when the object found really
+        has these two endpoints; every other entry is one this pair cannot
+        reach, and the answer is that this family has selected nothing for it.
         """
         cached = self._objects.get((id(domain), id(codomain)))
         if cached is None:
@@ -2256,9 +2270,53 @@ class _MorCategoryOf(OwnedCategoryBase):
         attachments use this same record when an inherited family constructs
         their shared object first.  Containment only reads the record; it
         neither populates it nor infers a different family from the endpoints.
+
+        What is remembered is that this family selected ``value`` for the pair
+        ``(domain, codomain)``, for as long as that pair is alive: the entry is
+        keyed by the pair's addresses and holds ``value`` weakly, so it names
+        the pair exactly while the pair is the object at those addresses.  A
+        Mor's identity is its endpoints' identity, so a rebuilt endpoint is a
+        different pair with a Mor of its own, and no reader may take the record
+        as a promise that a Mor outlives the objects it was built between.
         """
         self._objects[id(domain), id(codomain)] = value
         return value
+
+    def _record_resolution(
+        self,
+        domain,
+        codomain,
+        result,
+        endpoint_categories,
+        declared_supers,
+        runtime_classes,
+    ):
+        r"""Record why ``result`` is this family's fixed Mor of these endpoints, weakly.
+
+        The record is what lets a second question at the same pair answer from
+        the first construction instead of repeating it, and it is kept here
+        beside the identity record rather than on the Mor: several families
+        select one Mor, and each family reads its own base category's
+        supercategories and its own endpoint types.
+
+        ``result`` is held only weakly, because it retains both endpoints -- so
+        an entry must not be what keeps a dropped endpoint pair alive.  The
+        endpoints are still named by the ``id`` pair, which is why a dead entry
+        has to be swept rather than left to accumulate: an entry whose result
+        is gone names nothing, and a later object at that address would read a
+        record that is not its own.
+        """
+        store = self._resolved_endpoint_categories
+        store[id(domain), id(codomain)] = (
+            *endpoint_categories,
+            declared_supers,
+            runtime_classes,
+            weakref.ref(result),
+        )
+        if len(store) > 2 * len(self._objects) + 32:
+            for key, record in list(store.items()):
+                if record[-1]() is None:
+                    del store[key]
 
     def an_object(self) -> Category:
         r"""The Mor of the base category's witness to itself."""
@@ -2334,10 +2392,12 @@ class _MorCategoryOf(OwnedCategoryBase):
                 previous_codomain,
                 previous_supers,
                 previous_runtime_classes,
-                previous_result,
+                previous_reference,
             ) = resolved
+            previous_result = previous_reference()
             if (
-                previous_domain is endpoint_categories[0]
+                previous_result is not None
+                and previous_domain is endpoint_categories[0]
                 and previous_codomain is endpoint_categories[1]
                 and previous_supers is declared_supers
                 and previous_runtime_classes == runtime_classes
@@ -2373,11 +2433,13 @@ class _MorCategoryOf(OwnedCategoryBase):
                 else fixed_class(self, domain, codomain)
             )
             self._remember_between(domain, codomain, result)
-            self._resolved_endpoint_categories[id(domain), id(codomain)] = (
-                *endpoint_categories,
+            self._record_resolution(
+                domain,
+                codomain,
+                result,
+                endpoint_categories,
                 declared_supers,
                 runtime_classes,
-                result,
             )
             return result
         # What decides whether this category needs a Mor parent of its own is
@@ -2449,11 +2511,13 @@ class _MorCategoryOf(OwnedCategoryBase):
         self._remember_between(domain, codomain, result)
         # Store the categories read before construction: if construction
         # refined an endpoint, the next call must resolve the new declaration.
-        self._resolved_endpoint_categories[id(domain), id(codomain)] = (
-            *endpoint_categories,
+        self._record_resolution(
+            domain,
+            codomain,
+            result,
+            endpoint_categories,
             declared_supers,
             runtime_classes,
-            result,
         )
         return result
 
