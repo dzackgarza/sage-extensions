@@ -1,0 +1,42 @@
+# tree: 901d11b2f19a9bd750851af53849a19ff93d6003
+# status:  M src/sage_extensions/categories/lattice_morphisms.py  M src/sage_extensions/categories/lattices.py  M tests/lattices/conftest.py ?? results/issue585-the-walks-per-plane-retainer.md ?? tests/lattices/test_a_released_isotropic_subobject_is_not_retained.sage 
+# load: 0.39 0.86 1.01
+# pytest: tests/lattices/test_a_released_isotropic_subobject_is_not_retained.sage
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+time gates OFF (--no-time-gates): star import 0.26 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: asyncio-1.5.0, xdist-3.8.0, reportlog-1.0.0, platformdirs-4.13.5, hypothesis-6.170.15, anyio-4.15.1, timeout-2.4.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 2 items
+
+tests/lattices/test_a_released_isotropic_subobject_is_not_retained.sage . [ 50%]
+F                                                                        [100%]
+
+=================================== FAILURES ===================================
+____________________ test_a_released_plane_is_not_retained _____________________
+
+    def test_a_released_plane_is_not_retained() -> None:
+        r"""Released, a plane is collected: the lattice holds no subobject its holder dropped."""
+        lattice = _u_u_m2()
+        plane = _a_plane(lattice)
+        reference = weakref.ref(plane)
+        del plane
+    
+        gc.collect()
+    
+>       assert reference() is None
+E       AssertionError: assert Integral lattice of rank 2 and signature (0, 0) is None
+E        +  where Integral lattice of rank 2 and signature (0, 0) = <weakref at 0x76d684c05c10; to 'sage_extensions.categories.modules.framed.framed_free_modules.OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType' at 0x76d684b9ac50>()
+
+tests/lattices/test_a_released_isotropic_subobject_is_not_retained.sage:61: AssertionError
+============================== slowest durations ===============================
+0.13s call     tests/lattices/test_a_released_isotropic_subobject_is_not_retained.sage::test_one_family_answers_one_subobject
+0.09s call     tests/lattices/test_a_released_isotropic_subobject_is_not_retained.sage::test_a_released_plane_is_not_retained
+
+(4 durations < 0.005s hidden.  Use -vv to show these durations.)
+=========================== short test summary info ============================
+FAILED tests/lattices/test_a_released_isotropic_subobject_is_not_retained.sage::test_a_released_plane_is_not_retained
+========================= 1 failed, 1 passed in 0.90s ==========================
+# runner exit: 1

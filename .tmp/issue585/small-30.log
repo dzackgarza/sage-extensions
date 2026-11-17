@@ -1,0 +1,69 @@
+# tree: 901d11b2f19a9bd750851af53849a19ff93d6003
+# status: ?? results/issue585-the-walks-per-plane-retainer.md ?? tests/lattices/test_a_released_isotropic_subobject_is_not_retained.sage 
+# load: 1.01 0.94 1.06
+# program: probe-585-small.py  PROBE_PLANES=unset PROBE_PHASE=row
+[probe] Integral lattice of rank 5 and signature (2, 3), rank 5
+[probe] the adapted Gram matrix: [[0, 1, 0, 0, 0], [1, 0, 0, 0, 0], [0, 0, 0, 2, 0], [0, 0, 2, 0, 0], [0, 0, 0, 0, -2]]
+[probe] squares 0 and 0, pairing 0
+[probe] the plane: rank 2, retained (1, 0.6171875)
+[probe] two basis vectors of one position agree: True; the same objects: False; equal hashes: True
+[probe] an equal family built independently answers the same object: True; retained before (1, 0.6171875) after (1, 0.6171875)
+[probe] a dropped subobject with no other holder is alive: True; retained (1, 0.6171875)
+[probe] after a collection: alive True, retained (1, 0.6171875)
+[probe] O(L) generators: 290
+[probe] the flag's terms retain (2, 1.0078125)
+  [transport     1] retained      4 subobjects,       1.8 KiB  rss    491.4 MiB      0.79 KiB a transport
+  [transport     2] retained      4 subobjects,       1.8 KiB  rss    491.4 MiB      0.39 KiB a transport
+  [transport     3] retained      4 subobjects,       1.8 KiB  rss    491.4 MiB      0.26 KiB a transport
+  [transport     4] retained      4 subobjects,       1.8 KiB  rss    491.4 MiB      0.20 KiB a transport
+  [transport     5] retained      4 subobjects,       1.8 KiB  rss    491.4 MiB      0.16 KiB a transport
+  [transport     6] retained      4 subobjects,       1.8 KiB  rss    491.4 MiB      0.13 KiB a transport
+  [transport     7] retained      4 subobjects,       1.8 KiB  rss    491.4 MiB      0.11 KiB a transport
+  [transport     8] retained      4 subobjects,       1.8 KiB  rss    491.4 MiB      0.10 KiB a transport
+  [transport     9] retained      4 subobjects,       1.8 KiB  rss    491.4 MiB      0.09 KiB a transport
+  [transport    10] retained      4 subobjects,       1.8 KiB  rss    491.4 MiB      0.08 KiB a transport
+  [transport    11] retained      4 subobjects,       1.8 KiB  rss    491.5 MiB      0.07 KiB a transport
+  [transport    12] retained      4 subobjects,       1.8 KiB  rss    491.5 MiB      0.07 KiB a transport
+  [transport    13] retained      4 subobjects,       1.8 KiB  rss    491.5 MiB      0.06 KiB a transport
+  [transport    14] retained      4 subobjects,       1.8 KiB  rss    491.5 MiB      0.06 KiB a transport
+  [transport    15] retained      4 subobjects,       1.8 KiB  rss    491.5 MiB      0.05 KiB a transport
+  [transport    16] retained      4 subobjects,       1.8 KiB  rss    491.5 MiB      0.05 KiB a transport
+  [transport    17] retained      4 subobjects,       1.8 KiB  rss    491.5 MiB      0.05 KiB a transport
+  [transport    18] retained      4 subobjects,       1.8 KiB  rss    491.5 MiB      0.04 KiB a transport
+  [transport    19] retained      4 subobjects,       1.8 KiB  rss    491.5 MiB      0.04 KiB a transport
+  [transport    20] retained      4 subobjects,       1.8 KiB  rss    491.5 MiB      0.04 KiB a transport
+  [transport    21] retained      4 subobjects,       1.8 KiB  rss    491.5 MiB      0.04 KiB a transport
+  [transport    22] retained      4 subobjects,       1.8 KiB  rss    491.5 MiB      0.04 KiB a transport
+  [transport    23] retained      4 subobjects,       1.8 KiB  rss    491.5 MiB      0.03 KiB a transport
+  [transport    24] retained      4 subobjects,       1.8 KiB  rss    491.5 MiB      0.03 KiB a transport
+  [transport    25] retained      4 subobjects,       1.8 KiB  rss    491.5 MiB      0.03 KiB a transport
+  [transport    26] retained      4 subobjects,       1.8 KiB  rss    491.5 MiB      0.03 KiB a transport
+  [transport    27] retained      4 subobjects,       1.8 KiB  rss    491.5 MiB      0.03 KiB a transport
+  [transport    28] retained      4 subobjects,       1.8 KiB  rss    491.5 MiB      0.03 KiB a transport
+  [transport    29] retained      4 subobjects,       1.8 KiB  rss    491.5 MiB      0.03 KiB a transport
+  [transport    30] retained      4 subobjects,       1.8 KiB  rss    491.5 MiB      0.03 KiB a transport
+  [transport    31] retained      4 subobjects,       1.8 KiB  rss    491.5 MiB      0.03 KiB a transport
+  [transport    32] retained      4 subobjects,       1.8 KiB  rss    491.5 MiB      0.02 KiB a transport
+  [transport    33] retained      4 subobjects,       1.8 KiB  rss    491.5 MiB      0.02 KiB a transport
+  [transport    34] retained      4 subobjects,       1.8 KiB  rss    491.5 MiB      0.02 KiB a transport
+  [transport    35] retained      4 subobjects,       1.8 KiB  rss    491.5 MiB      0.02 KiB a transport
+  [transport    36] retained      4 subobjects,       1.8 KiB  rss    491.5 MiB      0.02 KiB a transport
+  [transport    37] retained      4 subobjects,       1.8 KiB  rss    491.5 MiB      0.02 KiB a transport
+  [transport    38] retained      4 subobjects,       1.8 KiB  rss    491.5 MiB      0.02 KiB a transport
+  [transport    39] retained      4 subobjects,       1.8 KiB  rss    491.6 MiB      0.02 KiB a transport
+  [transport    40] retained      4 subobjects,       1.8 KiB  rss    491.6 MiB      0.02 KiB a transport
+[probe] RESULT transports=40 retained 2 -> 4 subobjects, 1.0 -> 1.8 KiB, rss 491.4 -> 491.6 MiB, wall 11.5 s
+[peakrss] small-30: child waited=0 shell_code=0 samples=7
+[peakrss] peak tree RSS      : 495 MiB
+[peakrss] low-water MemAvail : 12437 MiB
+[peakrss] peak single VmHWM  : 495 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      492 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   run.sh                        2 MiB peak
+[peakrss]   t=    12.0s procs=  2 rss=   495 MiB hwm=   495 MiB avail= 12443 MiB
+[peakrss]   t=    10.0s procs=  2 rss=   487 MiB hwm=   487 MiB avail= 12437 MiB
+[peakrss]   t=     8.0s procs=  2 rss=   474 MiB hwm=   474 MiB avail= 12479 MiB
+[peakrss]   t=     6.0s procs=  2 rss=   465 MiB hwm=   465 MiB avail= 12503 MiB
+[peakrss]   t=     4.0s procs=  2 rss=   460 MiB hwm=   460 MiB avail= 12515 MiB
+# launcher exit: 0

@@ -1,0 +1,66 @@
+# tree: 901d11b2f19a9bd750851af53849a19ff93d6003
+# status:  M src/sage_extensions/categories/lattice_morphisms.py  M src/sage_extensions/categories/lattices.py  M tests/lattices/conftest.py ?? results/issue585-the-walks-per-plane-retainer.md ?? tests/lattices/test_a_released_isotropic_subobject_is_not_retained.sage 
+# load: 0.35 0.70 0.93
+# program: probe-585-zeroholders.py  PROBE_PLANES=unset PROBE_PHASE=row
+[probe] the zero subobject is alive after the drop: True
+[probe] its class: OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType
+[probe] a dict holds it, keys ['_family', '_end_family', '_aut_family']
+    held by OwnedSemilinearModuleMor_with_category_with_category: Set of Morphisms from Integral lattice of rank 0 and signature (0, 0) to Integral lattice 
+[probe] a dict holds it, keys ['_family', '_end_family', '_aut_family']
+    held by OwnedSetMorCategory_with_category_with_category: Mor_Set(Integral lattice of rank 0 and signature (0, 0), Integral lattice of rank 5 and si
+[probe] a dict holds it, keys ['_family', '_end_family', '_aut_family']
+    held by FixedMorCategory_with_category: Mor_Category of represented mathematical objects(Integral lattice of rank 0 and signature 
+[probe] a dict holds it, keys ['_family', '_end_family', '_aut_family']
+    held by FixedRestrictedMorCategory_with_category: Mor_Category of free form modules over Integer Ring(Integral lattice of rank 0 and signatu
+[probe] a dict holds it, keys ['_family', '_end_family', '_aut_family']
+    held by FixedRestrictedMorCategory_with_category: Mor_Category of modules with a bilinear form over Integer Ring(Integral lattice of rank 0 
+[probe] held by tuple: (Mor-category packet of Category of modules over commutative rings, Integral lattice of ra
+[probe] held by tuple: (Mor-category packet of Category of sets, Integral lattice of rank 0 and signature (0, 0),
+[probe] held by tuple: (Mor-category packet of Category of represented mathematical objects, Integral lattice of 
+[probe] held by tuple: (Mor-category packet of Category of free form modules over Integer Ring, Integral lattice 
+[probe] held by tuple: (Mor-category packet of Category of modules with a bilinear form over Integer Ring, Integr
+[probe] a dict holds it, keys ['_family', '_end_family', '_aut_family']
+    held by OwnedLatticeEmbeddingMor_with_category_with_category: Emb(Integral lattice of rank 0 and signature (0, 0), Integral lattice of rank 5 and signat
+[probe] a dict holds it, keys ['_family', '_end_family', '_aut_family']
+    held by OwnedFormedModuleMor_with_category_with_category: Set of Morphisms from Integral lattice of rank 0 and signature (0, 0) to Integral lattice 
+[probe] a dict holds it, keys ['_selected_data_registry', '_preamble_base_ring', '_family']
+    held by OwnedModuleMor_with_category_with_category: Free module on {} over Integer Ring
+[probe] a dict holds it, keys ['_preamble_gram_tensor', '_module_generating_set', '_preamble_form']
+    held by OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType: Integral lattice of rank 0 and signature (0, 0)
+[probe] held by method: <bound method _SparseFreeModuleParent._element_constructor_ of Integral lattice of rank 0 
+[probe] a dict holds it, keys ['_preamble_base_ring', '_integer_action', '_family']
+    held by OwnedAdditiveMor_with_category_with_category: Set of Morphisms from Integral lattice of rank 0 and signature (0, 0) to Integral lattice 
+[probe] a dict holds it, keys ['_family', '_end_family', '_aut_family']
+    held by OwnedAdditiveMonoidMor_with_category_with_category: Set of Morphisms from Integral lattice of rank 0 and signature (0, 0) to Integral lattice 
+[probe] a dict holds it, keys ['_family', '_end_family', '_aut_family']
+    held by OwnedAdditiveMagmaMor_with_category_with_category: Set of Morphisms from Integral lattice of rank 0 and signature (0, 0) to Integral lattice 
+[probe] a dict holds it, keys ['_family', '_end_family', '_aut_family']
+    held by OwnedLatticeMor_with_category_with_category: LatticeMor(Integral lattice of rank 0 and signature (0, 0), Integral lattice of rank 5 and
+[probe] held by cached method ? on OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType
+[probe] held by cached method ? on OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType
+[probe] held by cached method ? on OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType
+[probe] held by _ModuleScalarAction: Right action by Integer Ring on Integral lattice of rank 0 and signature (0, 0)
+[probe] held by _ModuleScalarAction: Left action by Integer Ring on Integral lattice of rank 0 and signature (0, 0)
+[probe] held by tuple: (Mor-category packet of Lattices(Integer Ring), Integral lattice of rank 0 and signature (
+[probe] held by tuple: (Mor-category packet of Category of form modules over Integer Ring, Integral lattice of ra
+[probe] held by tuple: (Mor-category packet of Category of modules over Integer Ring, Integral lattice of rank 0 
+[probe] held by tuple: (Mor-category packet of Category of commutative additive groups, Integral lattice of rank 
+[probe] held by tuple: (Mor-category packet of Category of additive monoids, Integral lattice of rank 0 and signa
+[probe] held by tuple: (Mor-category packet of Category of additive magmas, Integral lattice of rank 0 and signat
+[probe] held by tuple: (Mor-category packet of Lattices(Integer Ring), Integral lattice of rank 0 and signature (
+[probe] held by ConstantFunction: The constant function (...) -> Integral lattice of rank 0 and signature (0, 0)
+[probe] held by ConstantFunction: The constant function (...) -> Integral lattice of rank 0 and signature (0, 0)
+[probe] held by ConstantFunction: The constant function (...) -> Integral lattice of rank 0 and signature (0, 0)
+[probe] held by tuple: (Integral lattice of rank 0 and signature (0, 0),)
+[probe] held by cell: <cell at 0x7dec60f9eec0: OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].Obje
+[probe] held by cell: <cell at 0x7decb1acece0: OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].Obje
+[probe] held by method: <bound method _SparseFreeModuleParent._basis_element of Integral lattice of rank 0 and sig
+[probe] held by cell: <cell at 0x7decb1acded0: OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].Obje
+[peakrss] zeroholders: child waited=0 shell_code=0 samples=1
+[peakrss] peak tree RSS      : 1 MiB
+[peakrss] low-water MemAvail : 13762 MiB
+[peakrss] peak single VmHWM  : 1 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   run.sh                        1 MiB peak
+[peakrss]   t=     0.0s procs=  1 rss=     1 MiB hwm=     1 MiB avail= 13762 MiB
+# launcher exit: 0
