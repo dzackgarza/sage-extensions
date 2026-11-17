@@ -596,6 +596,19 @@ class FramedFreeModules(OwnedCategoryOverBaseRing):
             return self.parent()._framing_lift(self)
 
     class ParentMethods:
+        def finite_index_submodule_orbits(self, divisors, automorphisms):
+            r"""Finite-index submodules of specified Smith type modulo a supplied action.
+
+            ``automorphisms`` are actual integral automorphisms of this
+            framed free ZZ-module.  No larger ambient group action is
+            inferred.  The result retains represented subobject inclusions.
+            """
+            from sage_extensions.categories.modules.finite_index_submodule_orbits import (
+                _finite_index_submodule_orbits,
+            )
+
+            return finite_ordered_set(_finite_index_submodule_orbits(self, divisors, automorphisms))
+
         def _repr_(self):
             r"""Name the basis by its elements, printed as the basis vectors ``[i]`` print."""
             # A number-field order is also a finite free ZZ-module, but its
