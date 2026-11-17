@@ -1839,6 +1839,43 @@ class ConvexPolytopes(OwnedParameterizedCategory):
                 case False:
                     return super().is_contained_in(other)
 
+        def intersection(self, other):
+            r"""Return the intersection of this polytope with another of its lattice.
+
+            The intersection of two convex polytopes is a convex polytope, and
+            it is the subset of the ambient space on which both halfspace
+            presentations hold at once: this reads it from the private exact
+            computation, which intersects the two presentations, and frames the
+            result by this polytope's own lattice, the lattice both are
+            presented in.  Its vertices are points of that lattice when the two
+            polytopes are lattice polytopes there, so its normalized volume is
+            then an integer, and a face of either polytope is recovered as
+            itself: two constructions of one subset of one lattice are one
+            object.
+
+            The two polytopes must be framed by one lattice.  Two polytopes of
+            different lattices are subsets of different spaces, and their
+            intersection is a subset of one of them only after a chosen
+            identification of those spaces, which no duality supplies.  Two
+            polytopes with no common point meet in the empty polytope, which is
+            the empty face of each.
+            """
+            match other in ConvexPolytopes(self.ambient_lattice()):
+                case True:
+                    pass
+                case False:
+                    raise AssertionError(
+                        f"the intersection of {self} with {other} is taken in one lattice, "
+                        f"but {other} is an object of {other.category()} and not of "
+                        f"{ConvexPolytopes(self.ambient_lattice())}"
+                    )
+            return _convex_polytope(
+                engine_polyhedron=self._engine_polyhedron().intersection(
+                    other._engine_polyhedron()
+                ),
+                lattice=self.ambient_lattice(),
+            )
+
         def is_equal_to(self, other) -> bool:
             r"""Return whether the two polytopes are the same subset of the ambient space.
 
