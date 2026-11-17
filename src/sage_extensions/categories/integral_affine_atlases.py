@@ -123,19 +123,33 @@ class IntegralAffineAtlases(OwnedCategory):
 
         An integral-affine structure on a real surface is a family of charts
         into one affine model whose transition maps lie in
-        ``SL(2,Z) ⋉ R^2`` (Alexeev--Engel, *The birational geometry of moduli
-        of Enriques surfaces*, arXiv:2208.10383v2, Definition 6.11, p. 30).
-        Each chart has an open submanifold ``U`` of ``smooth_manifold``, carried
-        into it by ``U -> smooth_manifold``; its affine chart ``U -> affine_model``
-        identifies it with a subset of the model; and on the overlap
-        ``U_s cap U_t`` the overlap's inclusion into ``U_s`` and the transition
-        ``tau_{st}: U_s cap U_t -> affine_model`` are carried in that same
-        model, so the two charts agree there.
+        ``GL(2,Z) ⋉ R^2``: they preserve the selected lattice and may reverse
+        orientation.  Determinant one is the oriented structure, which is the
+        case Alexeev--Engel state, on a real *oriented* surface (Alexeev--Engel,
+        *Compactifications of moduli spaces of K3 surfaces with a nonsymplectic
+        involution*, arXiv:2208.10383v2, Definition 6.11, p. 30); the
+        reflection ``(x, y) |-> (x, -y)`` is a transition of the first kind and
+        not of the second.
 
-        The four families of maps are indexed by the chart domains.  The
-        construction retains them and computes nothing from them: whether the
-        transitions are integral-affine and whether the domains cover the
-        manifold are decisions the atlas answers
+        Each chart has an open submanifold ``U_s`` of ``smooth_manifold``,
+        carried into it by ``U_s -> smooth_manifold``, and an affine chart
+        ``phi_s : U_s -> affine_model`` identifying it with a subset of the
+        model.  The model overlap of ``U_s`` and ``U_t`` is ``phi_s(U_s cap
+        U_t)``, and the transition is the coordinate change read in the model,
+
+            ``tau_{st} = phi_t o phi_s^{-1} : phi_s(U_s cap U_t) -> phi_t(U_s cap U_t)``,
+
+        with ``overlap_inclusions[s, t]`` the inclusion of that model overlap in
+        the model.  So a transition is a map of the model, not a chart of the
+        manifold restricted to an overlap, and the pair ``(s, t)`` names its
+        direction.  On a triple overlap the gluings compose:
+
+            ``tau_{tu} o tau_{st} = tau_{su}``.
+
+        The four families of maps are indexed by the charts.  The construction
+        retains them and computes nothing from them: whether the transitions
+        are integral-affine and whether the domains cover the manifold are
+        decisions the atlas answers
         (:meth:`ParentMethods.transitions_are_integral_affine`,
         :meth:`ParentMethods.chart_domains_cover`), never conditions a caller
         is charged for at construction (``OWN-22``).
@@ -222,15 +236,25 @@ class IntegralAffineAtlases(OwnedCategory):
             return self._transition_maps
 
         def overlap_inclusion(self, source_chart, target_chart):
-            r"""Return the overlap's inclusion into the source chart domain."""
+            r"""Return the inclusion of the model overlap ``phi_s(U_s cap U_t)`` in the model."""
             return self._overlap_inclusions[source_chart, target_chart]
 
         def transition_map(self, source_chart, target_chart):
-            r"""Return the integral-affine map on the specified overlap."""
+            r"""Return the coordinate change ``tau_{st} = phi_t o phi_s^{-1}`` on the model overlap.
+
+            Its domain is ``phi_s(U_s cap U_t)`` and its codomain
+            ``phi_t(U_s cap U_t)``; the direction is the pair's.
+            """
             return self._transition_maps[source_chart, target_chart]
 
         def transition_linear_part(self, source_chart, target_chart):
-            r"""Return the transition's induced map of the selected lattice."""
+            r"""Return the transition's linear part on the model.
+
+            A transition that preserves the selected lattice has a linear part
+            carrying the lattice into itself, and that lattice map is the one
+            its own map reports beside it (:meth:`linear_part` here is the map
+            of the model).
+            """
             return self.transition_map(source_chart, target_chart).linear_part()
 
         def chart_domains_cover(self):
