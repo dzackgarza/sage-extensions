@@ -1219,6 +1219,26 @@ def _fix_selected_algebra_presentation(
 # ---------------------------------------------------------------------------
 
 
+def _module_element_datum(element):
+    r"""The datum of the underlying set an element of a module is made of, or ``None``.
+
+    ``GeneralModules`` realizes a module on an owned underlying set, and an
+    element of it is a point of that set
+    (``GeneralModules.ElementMethods.underlying_element``); a module realized
+    on its own data has no such datum, and nothing is claimed here about it.
+
+    The algebra level reads the module it retains at that datum: this algebra
+    and the module are realized on one underlying set, so the point is what the
+    two have in common, and it is what an element crosses between them as.  It
+    is not a reading of the element in the other object, which is why the pair
+    :meth:`Algebras.ParentMethods._element_of_unformed_module` and
+    :meth:`Algebras.ParentMethods._element_from_unformed_module` state it here
+    and do not call the other object's element constructor with an element.
+    """
+    underlying = getattr(element, "underlying_element", None)
+    return None if underlying is None else underlying()
+
+
 def _product_on(multiplication):
     r"""``(x, y) |-> m(x, y)`` for ``m`` in ``M.bilinear_forms(M)``.
 
@@ -1842,8 +1862,15 @@ class Algebras(OwnedCategoryOverBaseRing):
 
             ``Algebras(R)(M, m)`` builds on the framing of ``M`` when ``M``
             has one, so an element reads there with the same coefficients;
-            otherwise it builds on the underlying additive group of ``M``, and
-            an element reads there as its underlying additive element.
+            otherwise an element reads there as the datum it is made of
+            (:func:`_module_element_datum`), and only a module whose elements
+            carry no such datum reads as the underlying additive element.
+
+            The reading is a data crossing, not a second reading of ``element``
+            in ``M``: it enters ``M`` at the datum, never at an element of this
+            algebra.  The element constructor of ``M`` asks this algebra for
+            exactly this reading (``GeneralModules.ParentMethods``), so
+            entering it with the element would ask for the same reading again.
             """
             module = self.unformed_module()
             match self:
@@ -1853,10 +1880,24 @@ class Algebras(OwnedCategoryOverBaseRing):
                         coordinates.parent()._selected_module_coefficients(coordinates)
                     )
                 case _:
-                    return module(self._underlying_additive_element(element))
+                    datum = _module_element_datum(element)
+                    match datum is None:
+                        case False:
+                            return module(datum)
+                        case True:
+                            return module(self._underlying_additive_element(element))
 
         def _element_from_unformed_module(self, element):
-            r"""The element of this algebra on the data of an element of :meth:`unformed_module`."""
+            r"""The element of this algebra on the data of an element of :meth:`unformed_module`.
+
+            The inverse half of :meth:`_element_of_unformed_module`, read at
+            the same datum.  An element of the module this algebra retains is
+            the point of the underlying set it is made of, and this algebra is
+            built on that same set, so the element of this algebra on the data
+            is the one built at that datum; reading it through the public
+            constructor instead would take the element of ``M`` for the map it
+            is not (``_module_element_datum``).
+            """
             module = self.unformed_module()
             match self:
                 case _ if self.has_selected_module_resolution():
@@ -1865,7 +1906,12 @@ class Algebras(OwnedCategoryOverBaseRing):
                         coordinates.parent()._selected_module_coefficients(coordinates)
                     )
                 case _:
-                    return self(module._underlying_additive_element(element))
+                    datum = _module_element_datum(module(element))
+                    match datum is None:
+                        case False:
+                            return self(datum)
+                        case True:
+                            return self(module._underlying_additive_element(element))
 
         def multiplication(self):
             r"""The multiplication ``m: M (x)_R M -> M`` this algebra was stated with, an element of ``M.bilinear_forms(M)``.

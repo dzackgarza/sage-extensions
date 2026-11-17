@@ -18,9 +18,9 @@ from sage_extensions.categories.algebras.graded_algebras import GradedAlgebras
 from sage_extensions.categories.functions.real_functions import (
     Lp,
     _constant_map,
-    _pointwise_product,
     _integrability,
     _is_lebesgue_space,
+    _product_of_sections,
 )
 from sage_extensions.categories.modules.graded_direct_sums import (
     GradedDirectSumElement,
@@ -64,7 +64,7 @@ def _lebesgue_exponent(degree):
 
 def _pointwise_piece_product(left, right, degree):
     r"""The pointwise product, in the Lebesgue space of the sum of the Hölder degrees."""
-    return Lp(_lebesgue_exponent(degree), RR, RR)(_pointwise_product(left, right))
+    return Lp(_lebesgue_exponent(degree), RR, RR)(_product_of_sections(left, right))
 
 
 def _compose_morphisms(left, right):

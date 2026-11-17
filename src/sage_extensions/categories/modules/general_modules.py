@@ -295,13 +295,21 @@ class GeneralModules(OwnedCategoryOverBaseRing):
 
             A value of the underlying set is taken as it is; any other value is
             converted by the underlying set, which rejects what it does not
-            contain.
+            contain.  An element of a module this one is realized on, or of a
+            structured object realized on that module, is a reading of one
+            datum, and is crossed at that datum by the pair
+            ``_element_of_unformed_module`` and ``_element_from_unformed_module``
+            of the level that retains the module -- this module, or the
+            structured object that retains it.
             """
             source = element_parent(value)
             if source is self:
                 return value
-            if source in Modules(self.base_ring()) and source.unformed_module() is self:
-                return source._element_of_unformed_module(value)
+            if source in Modules(self.base_ring()):
+                if source.unformed_module() is self:
+                    return source._element_of_unformed_module(value)
+                if self.unformed_module() is source:
+                    return self._element_from_unformed_module(value)
             if isinstance(value, self.category().ElementType):
                 if value.parent() is self:
                     return value

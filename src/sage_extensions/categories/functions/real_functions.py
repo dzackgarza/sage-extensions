@@ -454,6 +454,8 @@ def _function_formula(function):
                     return -bodies[0], variable
                 case _ if operation is _pointwise_zero:
                     return SR.zero(), variable
+                case _ if operation is _pointwise_product:
+                    return bodies[0] * bodies[1], variable
                 case functools.partial() if operation.func is _pointwise_scalar_multiple:
                     return SR(operation.args[0]) * bodies[0], variable
                 case _:
@@ -462,14 +464,16 @@ def _function_formula(function):
             return None
 
 
-def _defining_function_of(element):
-    r"""The private map an element of a function space is defined by, or ``None``.
+def _defining_map(element):
+    r"""The map of ``Sets().Mor(A, B)`` a section of a function space is, or ``None``.
 
     Private computation adapter (``OWN-06``) of this module.  A section of a
     function space is an element of the condition submodule, so its chain is
     the section, the module element and the map it is defined by; an operand of
     a pointwise operation on sections is already that module element, one level
-    shorter, and is read here too.
+    shorter, and is read here too.  The map is what a consumer of a section
+    reads when it needs the operative object rather than the value: a pointwise
+    operation records its operands as the maps they are.
     """
     section = element
     for _level in range(2):
@@ -478,7 +482,17 @@ def _defining_function_of(element):
             break
         section = underlying() if callable(underlying) else underlying
     definition = getattr(section, "_defining_function", None)
-    return None if definition is None else definition()
+    return None if definition is None else section
+
+
+def _defining_function_of(element):
+    r"""The private map an element of a function space is defined by, or ``None``.
+
+    Private computation adapter (``OWN-06``) of this module; the definition of
+    the map :func:`_defining_map` reads.
+    """
+    map_of_section = _defining_map(element)
+    return None if map_of_section is None else map_of_section._defining_function()
 
 
 def _map_formula(element):
@@ -522,13 +536,34 @@ def _formula_map(body, variable):
     return SR(body).function(variable)
 
 
-def _pointwise_product(left, right):
-    r"""The defining function of ``t |-> left(t) right(t)``, keeping a formula when both have one."""
-    left_formula, right_formula = _map_formula(left), _map_formula(right)
-    if left_formula is not None and right_formula is not None:
-        variable = left_formula[1]
-        return _formula_map(left_formula[0] * right_formula[0].subs({right_formula[1]: variable}), variable)
-    return lambda point: left(point) * right(point)
+def _pointwise_product(codomain, left, right):
+    r"""\(f(p)g(p)\): the product of two values of the codomain ``codomain``.
+
+    The operation a pointwise product of sections records, in the vocabulary of
+    the pointwise module law (``_pointwise_module_operations``): the operands
+    are read at the point and their values are multiplied in the codomain,
+    which is a ring.  This is the value-level product, not the section-level
+    one; a record names it so that the adapters that read an assembled section
+    back can rebuild the product rather than being handed an opaque callable.
+    """
+    return codomain(left * right)
+
+
+def _product_of_sections(left, right):
+    r"""The defining function of the section \(p\mapsto left(p)right(p)\).
+
+    The section retains the operation that built it -- the multiplication of
+    the values and its two factors -- exactly as a sum, a negative, the zero
+    and a scalar multiple of sections do (``_PointwiseValues``).  The operands
+    are the maps the two sections are, so an evaluation multiplies values in
+    the value field instead of substituting in an engine, and a consumer that
+    recomposes formulas from operands (``_function_formula``, and the chart
+    adapters built on it) reads the product it was given.
+    """
+    operands = (_defining_map(left), _defining_map(right))
+    if any(operand is None for operand in operands):
+        return lambda point: left(point) * right(point)
+    return _PointwiseValues(left.parent().codomain(), _pointwise_product, operands)
 
 
 def _engine_formula_value(value):
@@ -804,7 +839,7 @@ def _differentiability_class(regularity, domain, codomain):
     # associative, commutative and has the constant one as unit.
     tensor = Modules(field).tensor_product((module, module))
     multiplication = tensor.from_bilinear_map(
-        module, lambda left, right: module(_pointwise_product(left, right))
+        module, lambda left, right: module(_product_of_sections(left, right))
     )
     return _algebra_on_module(
         module,

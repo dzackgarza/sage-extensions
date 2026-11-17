@@ -431,18 +431,20 @@ def _engine_formula_of_pointwise_section(value):
 
     Private computation adapter (``OWN-06``) of this module.  The pointwise law
     of a module of maps builds a sum, a negative, the zero and a scalar
-    multiple of its operands and records which
+    multiple of its operands, and the pointwise product of the algebra on those
+    maps builds a product, and each records which
     (``categories.functions.real_functions._pointwise_derivation``); a chart
     formula is one such operand.  Rebuilding the recorded operation on the
     operands' engine formulas is what makes an expression written with the
-    owned ring's own operations -- ``x + y``, ``-y``, ``2 * x`` -- a formula the
-    engine can speak about, without the ring of functions ever being the
-    engine's ring.
+    owned ring's own operations -- ``x + y``, ``-y``, ``2 * x``, ``x * y`` --
+    a formula the engine can speak about, without the ring of functions ever
+    being the engine's ring.
     """
     from functools import partial
 
     from sage_extensions.categories.functions.real_functions import (
         _pointwise_derivation,
+        _pointwise_product,
     )
     from sage_extensions.categories.modules.pure.modules import (
         _pointwise_negative,
@@ -463,6 +465,8 @@ def _engine_formula_of_pointwise_section(value):
             return -formulas[0]
         case _ if operation is _pointwise_zero:
             return SR.zero()
+        case _ if operation is _pointwise_product:
+            return formulas[0] * formulas[1]
         case partial() if operation.func is _pointwise_scalar_multiple:
             return _engine_scalar(operation.args[0]) * formulas[0]
         case _:
