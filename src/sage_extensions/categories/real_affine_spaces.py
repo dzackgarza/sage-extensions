@@ -21,6 +21,7 @@ from sage_extensions.categories.modules.pure.modules import (
 )
 from sage_extensions.categories.rings.ring_foundation import _owned_integers
 from sage_extensions.categories.sets.set_categories import Sets
+from sage_extensions.owned_category import _object_of
 from sage_extensions.rings.real import RR
 
 
@@ -92,15 +93,58 @@ class RealAffineSpaceMor(CategoricalMor):
             return self._point_map(point)
 
         def __mul__(self, other):
-            pass
+            if other.codomain() is not self.domain():
+                raise ValueError(
+                    f"cannot compose {self} after {other}: the codomain "
+                    f"{other.codomain()} of the second map is not the domain "
+                    f"{self.domain()} of the first"
+                )
+            # A linear map is its images on the model's selected generating
+            # set, so the composite's linear part is the composite's values
+            # there; the point maps compose as maps of sets.
+            model = self.codomain().model_vector_space()
+            composite_linear = model.Mor(model)(
+                lambda label: self.linear_part()(
+                    other.linear_part()(model.module_generator(label))
+                )
+            )
+            return RealAffineSpaces().Mor(other.domain(), self.codomain())(
+                composite_linear,
+                self.point_map() * other.point_map(),
+            )
 
     def _element_constructor_(self, linear_part, point_map):
-        pass
+        r"""Construct the affine map with this linear part and point map."""
+        if (
+            linear_part.domain() is not self.domain().model_vector_space()
+            or linear_part.codomain() is not self.codomain().model_vector_space()
+        ):
+            raise ValueError(
+                f"the linear part of an affine map {self.domain()} -> {self.codomain()} "
+                f"carries {self.domain().model_vector_space()} into "
+                f"{self.codomain().model_vector_space()}, but {linear_part} carries "
+                f"{linear_part.domain()} into {linear_part.codomain()}"
+            )
+        if (
+            point_map.domain() is not self.domain().point_set()
+            or point_map.codomain() is not self.codomain().point_set()
+        ):
+            raise ValueError(
+                f"the point map of an affine map {self.domain()} -> {self.codomain()} "
+                f"carries {self.domain().point_set()} into {self.codomain().point_set()}, "
+                f"but {point_map} carries {point_map.domain()} into {point_map.codomain()}"
+            )
+        return self.element_class(self, linear_part, point_map)
 
     @object_level
     @cached_method
     def identity(self):
-        pass
+        r"""The identity affine map: the identities of the model space and of the point set."""
+        space = self.domain()
+        return self(
+            space.model_vector_space().Mor(space.model_vector_space()).identity(),
+            Sets().Mor(space.point_set(), space.point_set()).identity(),
+        )
 
 
 class RealAffineSpaceMorCategoryConstruction(MorCategoryConstruction):
@@ -148,6 +192,44 @@ class _RealAffineAtlasFunctor(Functor):
         pass
 
 
+class _AffineTorsor:
+    r"""An affine space as the torsor it is: a nonempty set under the model's translations.
+
+    Private computation class (``OWN-06``).  Its data are the four the affine
+    space is selected by -- the acted set, the translation action of the model
+    vectors on it, the difference map, and a point witnessing nonemptiness --
+    held as the torsor the affine space is realized on.  These are the fields
+    of an additive torsor (Mathlib, ``Mathlib/Algebra/Torsor/Defs.lean``):
+    ``difference p q`` is the unique vector ``v`` with ``v + q = p``.
+    """
+
+    def __init__(
+        self, model_vector_space, point_set, translation_action, difference, selected_point
+    ) -> None:
+        self._model_vector_space = model_vector_space
+        self._point_set = point_set
+        self._translation_action = translation_action
+        self._difference = difference
+        self._selected_point = selected_point
+
+    def model_vector_space(self):
+        return self._model_vector_space
+
+    def point_set(self):
+        return self._point_set
+
+    def action(self):
+        r"""The translation action, a map of two arguments: a vector and a point."""
+        return self._translation_action
+
+    def difference(self, left, right):
+        r"""The model vector carrying ``right`` to ``left``."""
+        return self._difference(left, right)
+
+    def an_element(self):
+        return self._selected_point
+
+
 class RealAffineSpaces(OwnedCategory):
     r"""Torsors for additive real vector spaces, with affine maps."""
 
@@ -164,12 +246,35 @@ class RealAffineSpaces(OwnedCategory):
         pass
 
     def on(self, model_vector_space, point_set, translation_action, difference, point):
-        r"""Select an affine torsor with its difference map and nonempty witness."""
-        pass
+        r"""Select an affine torsor with its difference map and nonempty witness.
+
+        The model space is the space of translations, ``point_set`` is the set
+        they act on, ``translation_action`` is that action read as a map of two
+        arguments, ``difference`` is the vector carrying one point to another,
+        and ``point`` witnesses that the acted set is nonempty.  Nothing is
+        computed from them: which points a chart sends where is what the maps
+        built on this space answer.
+        """
+        assert model_vector_space in VectorSpaces(RR), (
+            f"an affine space is a torsor under the translations of a real vector space, "
+            f"but {model_vector_space} is not a real vector space"
+        )
+        assert point_set in Sets(), (
+            f"the translations of {model_vector_space} must act on a set, but {point_set} "
+            f"is not in the category of sets"
+        )
+        return self.from_torsor(
+            model_vector_space,
+            _AffineTorsor(
+                model_vector_space, point_set, translation_action, difference, point
+            ),
+        )
 
     def from_torsor(self, model_vector_space, torsor):
         r"""Place the selected torsor under the model space's additive group."""
-        pass
+        return _object_of(
+            self, model_vector_space=model_vector_space, torsor=torsor
+        )
 
     @cached_method
     def forget(self):
@@ -248,15 +353,51 @@ class AffineSpaceWithLatticeMor(CategoricalMor):
             return self._affine_map(point)
 
         def __mul__(self, other):
-            pass
+            if other.codomain() is not self.domain():
+                raise ValueError(
+                    f"cannot compose {self} after {other}: the codomain "
+                    f"{other.codomain()} of the second map is not the domain "
+                    f"{self.domain()} of the first"
+                )
+            return AffineSpacesWithLattice().Mor(other.domain(), self.codomain())(
+                self.affine_map() * other.affine_map(),
+                self.lattice_map() * other.lattice_map(),
+            )
 
     def _element_constructor_(self, affine_map, lattice_map):
-        pass
+        r"""Construct the lattice-compatible affine map from its two parts."""
+        if (
+            affine_map.domain() is not self.domain().underlying_affine_space()
+            or affine_map.codomain() is not self.codomain().underlying_affine_space()
+        ):
+            raise ValueError(
+                f"the affine part of a map {self.domain()} -> {self.codomain()} is an affine "
+                f"map {self.domain().underlying_affine_space()} -> "
+                f"{self.codomain().underlying_affine_space()}, but {affine_map} is an affine "
+                f"map {affine_map.domain()} -> {affine_map.codomain()}"
+            )
+        if (
+            lattice_map.domain() is not self.domain().affine_lattice()
+            or lattice_map.codomain() is not self.codomain().affine_lattice()
+        ):
+            raise ValueError(
+                f"the lattice part of a map {self.domain()} -> {self.codomain()} is a map "
+                f"{self.domain().affine_lattice()} -> {self.codomain().affine_lattice()}, but "
+                f"{lattice_map} is a map {lattice_map.domain()} -> {lattice_map.codomain()}"
+            )
+        return self.element_class(self, affine_map, lattice_map)
 
     @object_level
     @cached_method
     def identity(self):
-        pass
+        r"""The identity: the identities of the underlying affine space and of the selected lattice."""
+        space = self.domain()
+        return self(
+            space.underlying_affine_space()
+            .Mor(space.underlying_affine_space())
+            .identity(),
+            space.affine_lattice().Mor(space.affine_lattice()).identity(),
+        )
 
 
 class AffineSpaceWithLatticeMorCategoryConstruction(MorCategoryConstruction):
@@ -305,8 +446,34 @@ class AffineSpacesWithLattice(OwnedCategory):
         pass
 
     def on(self, affine_space, lattice_inclusion):
-        r"""Select a full integral lattice in the model of ``affine_space``."""
-        pass
+        r"""Select a full integral lattice in the model of ``affine_space``.
+
+        The lattice is the domain of ``lattice_inclusion``, and that map is the
+        inclusion of the lattice in the real model space the affine space's
+        translations live in.  The lattice is the tangent lattice: its vectors
+        are translations, and its points are the points of the model space it
+        is a full sublattice of, not a second copy of the affine space.
+        """
+        assert affine_space in RealAffineSpaces(), (
+            f"an affine space with a selected lattice is an affine space with a full "
+            f"integral lattice in its model, but {affine_space} is in "
+            f"{affine_space.category()}"
+        )
+        assert lattice_inclusion.codomain() is affine_space.model_vector_space(), (
+            f"the selected lattice must lie in the model space "
+            f"{affine_space.model_vector_space()} of {affine_space}, but "
+            f"{lattice_inclusion} lands in {lattice_inclusion.codomain()}"
+        )
+        lattice = lattice_inclusion.domain()
+        assert lattice.module_rank() == affine_space.model_vector_space().dimension(), (
+            f"the selected lattice must be a full lattice in "
+            f"{affine_space.model_vector_space()}, of rank "
+            f"{affine_space.model_vector_space().dimension()}, but {lattice} has rank "
+            f"{lattice.module_rank()}"
+        )
+        return _object_of(
+            self, affine_space=affine_space, lattice_inclusion=lattice_inclusion
+        )
 
     @cached_method
     def forget(self):
@@ -320,7 +487,7 @@ class AffineSpacesWithLattice(OwnedCategory):
         def __init__(self, affine_space, lattice_inclusion, **rest):
             self._affine_space = affine_space
             self._lattice_inclusion = lattice_inclusion
-            super().__init__(**rest)
+            super().__init__(facade=affine_space.point_set(), **rest)
 
         def underlying_affine_space(self):
             return self._affine_space
@@ -330,6 +497,19 @@ class AffineSpacesWithLattice(OwnedCategory):
 
         def affine_lattice(self):
             return self._lattice_inclusion.domain()
+
+        def point_set(self):
+            r"""The points of the underlying affine space: the lattice is selected in the model, not on the points."""
+            return self.underlying_affine_space().point_set()
+
+        def __contains__(self, point):
+            return point in self.point_set()
+
+        def _element_constructor_(self, point):
+            return self.point_set()(point)
+
+        def an_element(self):
+            return self.underlying_affine_space().an_element()
 
         def chart_at(self, origin):
             r"""The origin-based affine chart with its selected lattice embedding."""
