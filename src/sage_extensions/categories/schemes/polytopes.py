@@ -99,22 +99,12 @@ class AbstractPolytopes(OwnedCategory):
         """
         return self.from_face_poset(FiniteGradedPosets().an_object())
 
-    def from_face_poset(self, face_poset, *, automorphism_realization=None):
+    def from_face_poset(self, face_poset):
         r"""Construct from the exact finite graded poset of faces.
 
         The carrier of ``face_poset`` is the family of faces and its grading is
         the affine dimension of each face, with the empty face of dimension
         ``-1``.
-
-        ``automorphism_realization`` is the computation of this polytope's
-        automorphism group when the constructing owner has one: a function of
-        nothing, asked when the group is asked for, as a selected realization of
-        an operation is.  The group it returns is the automorphism group of
-        ``face_poset`` -- its rank-preserving monotone self-isomorphisms --
-        retained in an action on the faces.  A face poset presented without one
-        has no selected realization of that group, and asking for the group then
-        states that, rather than substituting a permutation group of the
-        carrier for the automorphisms of the poset.
         """
         assert face_poset in FiniteGradedPosets(), (
             f"an abstract polytope is a finite graded poset of faces, but {face_poset} lies in "
@@ -125,13 +115,11 @@ class AbstractPolytopes(OwnedCategory):
             underlying_poset=face_poset.underlying_poset(),
             grading_map=face_poset.grading_map(),
             face_poset=face_poset,
-            automorphism_realization=automorphism_realization,
         )
 
     class ParentMethods:
-        def __init__(self, face_poset, automorphism_realization=None, **rest) -> None:
+        def __init__(self, face_poset, **rest) -> None:
             self._face_poset = face_poset
-            self._automorphism_realization = automorphism_realization
             super().__init__(**rest)
 
         def underlying_graded_poset(self):
@@ -152,24 +140,18 @@ class AbstractPolytopes(OwnedCategory):
             return f"Abstract polytope with {sum(1 for _face in self)} faces"
 
         def abstract_automorphisms(self):
-            r"""Return the automorphism group of the face poset.
+            r"""Return ``Aut`` of the face poset: the abstract automorphisms.
 
             The automorphisms of an abstract polytope are the rank-preserving
-            monotone self-isomorphisms of its face poset
+            monotone self-isomorphisms of its finite graded face poset
             (``lean-categories/LeanCategories/Orders/FiniteGradedPoset.lean``:
             ``Hom`` is an ``OrderHom`` with ``grade_eq``, and ``Aut`` is the
-            generic ``Iso`` on the diagonal), so a realization of the group is
-            exactly a realization of that ``Aut``, which the constructing owner
-            of the face poset supplies.  The group acts on the faces of this
-            polytope: an element applied to a face is the image of that face.
+            generic ``Iso`` on the diagonal).  This is that group itself, read on
+            the retained face object: an element is a forward and an inverse
+            rank-preserving order map of the faces, and applying it to a face is
+            that face's image.
             """
-            assert self._automorphism_realization is not None, (
-                f"{self} is presented as a finite graded poset of faces alone, with no selected "
-                "realization of its automorphism group: its automorphisms are the rank-preserving "
-                "monotone self-isomorphisms of that poset, and no group realization of that Aut "
-                "family is selected here"
-            )
-            return self._automorphism_realization()
+            return self.Aut()
 
 
 class PlacedPolytopeMor(CategoricalMor):
@@ -752,10 +734,17 @@ class ConvexPolytopes(OwnedParameterizedCategory):
 
             ``M`` includes into ``M_QQ`` by ``m |-> m tensor 1``, which keeps
             the coordinates of ``m`` in the shared frame.
+
+            A point may also be written by its coordinates: a lattice vertex and
+            the point of the ambient space at the same coordinates are one point
+            of ``M_QQ``, and the polyhedra of this category are presented in
+            coordinates throughout, so a sequence of ambient coordinates is read
+            through the ambient space's own ingress.  Any other value is left to
+            that ingress too, which refuses what is not a point of it.
             """
             ambient = self.ambient_space()
             lattice = self.ambient_lattice()
-            match point.parent():
+            match engine_parent(point):
                 case parent if parent is lattice:
                     rationals = _owned_rationals()
                     coordinates = point.to_vector()
@@ -1151,10 +1140,7 @@ class ConvexPolytopes(OwnedParameterizedCategory):
                 lambda face, other: vertices_of[face] <= vertices_of[other],
             )
             graded = FiniteGradedPosets().on(order, lambda face: face.dimension())
-            return AbstractPolytopes().from_face_poset(
-                graded,
-                automorphism_realization=self._transported_combinatorial_face_permutations,
-            )
+            return AbstractPolytopes().from_face_poset(graded)
 
         def facet_inclusion(self, facet):
             r"""The selected face arrow from ``facet`` into this polytope."""
@@ -1267,13 +1253,6 @@ class ConvexPolytopes(OwnedParameterizedCategory):
                 images.append(ranks[image])
             return tuple(images)
 
-        @cached_method
-        def _face_carrier_symmetric_group(self):
-            r"""``Sym`` of the face carrier: the permutations of this polytope's faces."""
-            from sage_extensions.categories.group.groups import SymmetricGroups
-
-            return SymmetricGroups()(self._face_poset_carrier())
-
         def _face_permutation_of_owned_vertex_permutation(self, element):
             r"""The faces' permutation induced by an element acting on the owned vertices."""
             index_of = self.vertices().ranking_map()
@@ -1284,30 +1263,6 @@ class ConvexPolytopes(OwnedParameterizedCategory):
             return self._face_permutation_of_a_vertex_permutation(vertex_permutation)
 
         @cached_method
-        def _transported_combinatorial_face_permutations(self):
-            r"""The automorphism group of the face poset, acting on its faces.
-
-            This is the group :meth:`abstract_automorphisms` returns: the
-            automorphisms of the finite graded face poset, generated by the
-            images of the combinatorial automorphism group's generators under
-            the transport that carries a permutation of the vertices to the
-            permutation of the faces it induces.
-            """
-            group = self._face_carrier_symmetric_group()
-            generators = tuple(
-                group(
-                    [
-                        rank + 1
-                        for rank in self._face_permutation_of_a_vertex_permutation(
-                            permutation
-                        )
-                    ]
-                )
-                for permutation in self._combinatorial_vertex_permutations()
-            )
-            return group.subgroup(generators or (group.one(),))
-
-        @cached_method
         def abstract_automorphisms(self):
             r"""The automorphism group of this polytope's face poset, acting on its faces.
 
@@ -1315,15 +1270,10 @@ class ConvexPolytopes(OwnedParameterizedCategory):
             face lattice: a rank-preserving monotone self-isomorphism of the
             finite graded poset of its faces
             (``lean-categories/LeanCategories/Orders/FiniteGradedPoset.lean``).
-            The faces are retained as the polytopes they are, and an element of
-            this group applied to a face is that face's image.
-
-            The group is realized in its action on the faces.  Forgetting the
-            rank and the order is a faithful functor from finite graded posets
-            to sets, so a self-isomorphism of the face poset is determined by,
-            and is here retained as, the permutation of the faces it induces;
-            that is the action of the generic ``Aut`` of the graded poset, which
-            has no group realization of its own.
+            The faces are retained as the polytopes they are, so this is the
+            ``Aut`` of the face poset itself, computed by that owner: an element
+            is a forward and an inverse rank-preserving order map of the faces,
+            and applying it to a face is that face's image.
             """
             return self.face_poset().abstract_automorphisms()
 
@@ -1379,27 +1329,23 @@ class ConvexPolytopes(OwnedParameterizedCategory):
             a homomorphism because composing two affine maps composes the
             permutations they induce.
 
-            The map is an owned group morphism between the two owned groups, and
-            its values on the source's generators are checked to satisfy the
-            source's relations, so a group whose induced permutations do not
-            satisfy them is refused here rather than represented.
+            Its target is the ``Aut`` of the face poset itself, so a value is an
+            automorphism of the faces -- a forward rank-preserving order map and
+            its inverse -- and not a permutation of them recorded beside the
+            poset.  The map is an owned group morphism between the two owned
+            groups, and its values on the source's generators are checked to
+            satisfy the source's relations, so a group whose induced face maps do
+            not satisfy them is refused here rather than represented.
             """
             from sage_extensions.categories.group.groups import OwnedGroups
 
             geometric = self.geometric_automorphisms()
             abstract = self.abstract_automorphisms()
-            carrier = self._face_carrier_symmetric_group()
+            face_poset = self.face_poset()
             return OwnedGroups().Mor(geometric, abstract)(
                 {
-                    generator: abstract(
-                        carrier(
-                            [
-                                rank + 1
-                                for rank in self._face_permutation_of_owned_vertex_permutation(
-                                    generator
-                                )
-                            ]
-                        )
+                    generator: face_poset.automorphism_from_positions(
+                        self._face_permutation_of_owned_vertex_permutation(generator)
                     )
                     for generator in geometric.selected_subgroup_generators()
                 },
