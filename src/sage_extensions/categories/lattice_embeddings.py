@@ -385,3 +385,33 @@ def _glue_compatible_integral_extensions(source_arrow, target_arrow, source_acti
                     for target_label, value in zip(target_labels, rows.row(source_labels.index(label)), strict=True) if value})
             extensions.append(source_lattice.Isom(target_lattice)(image))
     return tuple(extensions)
+
+
+def _finite_overlattice_isometry_extension(source_inclusion, target_inclusion, isometry):
+    r"""Extend an isometry of finite-index sublattices across two overlattices.
+
+    If ``j:M -> L`` and ``k:N -> P`` have finite index and ``h:M -> N``
+    is an isometry, the unique rational extension is integral exactly when
+    ``k h j_Q^-1`` maps every basis vector of L into P and its inverse is
+    integral.  The determinant-one condition certifies the latter once the
+    forward matrix is integral and the ambient determinants agree.
+    """
+    from sage.all import QQ as SageQQ, ZZ as SageZZ, matrix
+
+    source, target = source_inclusion.codomain(), target_inclusion.codomain()
+    if isometry.domain() is not source_inclusion.domain() or isometry.codomain() is not target_inclusion.domain():
+        raise ValueError("the factor isometry must connect the two embedded sublattices")
+    source_labels = tuple(source.module_generating_set())
+    target_labels = tuple(target.module_generating_set())
+    source_frame = matrix(SageQQ, [[int(source_inclusion(x).to_vector()(label)) for label in source_labels]
+        for x in source_inclusion.domain().module_generators()])
+    target_frame = matrix(SageQQ, [[int(target_inclusion(isometry(x)).to_vector()(label)) for label in target_labels]
+        for x in source_inclusion.domain().module_generators()])
+    action = source_frame.inverse() * target_frame
+    if abs(action.det()) != 1 or not all(value in SageZZ for value in action.list()):
+        return None
+    rows = action.change_ring(SageZZ)
+    def image(label):
+        return target.linear_combination({key: target.base_ring()(int(value))
+            for key, value in zip(target_labels, rows.row(source_labels.index(label)), strict=True) if value})
+    return source.Isom(target)(image)

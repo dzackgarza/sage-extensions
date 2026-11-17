@@ -93,3 +93,11 @@ def test_s3_has_one_endomorphism_category() -> None:
     assert group.End() is endomorphisms
     assert identity * identity == identity
     assert identity.domain() is group
+
+
+def test_finite_setwise_transporter_retains_actual_group_witness():
+    group = s3()
+    natural = FiniteGSets(group)((1, 2, 3), lambda g, x: g(x))
+    witness = natural.setwise_transporter_witness((1, 2), (2, 3))
+    assert {witness(1), witness(2)} == {2, 3}
+    assert natural.setwise_transporter_witness((1,), (1, 2)) is None

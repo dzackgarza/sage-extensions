@@ -722,6 +722,41 @@ class FiniteGSets(CategoryPacketMethods, OwnedParameterizedCategory):
                 augmentation=augmentation,
             )
 
+        def setwise_transporter_witness(self, source_subset, target_subset):
+            r"""One actual group element carrying a finite subset onto another.
+
+            Sweep only the finite orbit of the source subset under the
+            supplied action; retain its free-word section.  Return ``None``
+            precisely when the target subset is absent from that orbit.
+            The action may come from an infinite group with finite image.
+            """
+            points = self.point_set()
+            power = points.power_set()
+            source_subset = power(source_subset)
+            target_subset = power(target_subset)
+            ranking = points.ranking_map()
+
+            def members(subobject):
+                inclusion = subobject.inclusion()
+                return tuple(inclusion(member) for member in inclusion.domain())
+
+            def key(subobject):
+                return frozenset(int(ranking(member)) for member in members(subobject))
+
+            def action(element, subobject):
+                return power(tuple(self.act(element, member) for member in members(subobject)))
+
+            category = FiniteGSets(self.acting_group())
+            augmentation = self.acting_group().selected_group_resolution().augmentation()
+            orbit_points, words = category._orbit_words(
+                (source_subset,), action, augmentation, point_key=key,
+            )
+            target_key = key(target_subset)
+            for point, word in zip(orbit_points, words, strict=True):
+                if key(point) == target_key:
+                    return augmentation(word)
+            return None
+
         def setwise_stabilizer(self, subset):
             r"""Return ``{g : g.S = S}`` by the finite orbit of ``S``.
 
