@@ -863,10 +863,13 @@ class OrthogonalCharacterQuotient:
         separate marginals: ``K_0`` is one object, its rho-image is one
         subgroup pushed through ``rho`` from ``K_0``'s retained generating
         family, and the meet is one ``Intersection`` of small generated
-        subgroups of ``O(A_L)``.  With more than one sign factor and
-        supergroup-family requirements the joint ``K_0`` family is not formed
-        here, and the product-model branch below answers; in that case this
-        statement does not claim computation.
+        subgroups of ``O(A_L)``.  With more than one sign factor the joint
+        ``K_0`` family is not formed here.  ``T_tot`` is contained in the meet of
+        the preimage targets, so that meet is the whole answer whenever it is
+        trivial -- the case of every kernel row whose discriminant target is
+        trivial -- and the call refuses (``NotImplementedError``) only for a
+        nontrivial meet together with two sign factors, where the product-model
+        branch answers instead.
         """
         from sage_extensions.categories.group.groups import (
             _element_to_engine,
@@ -885,6 +888,18 @@ class OrthogonalCharacterQuotient:
                     ],
                 )
             )
+        if not pieces:
+            raise ValueError(
+                f"{self.subgroup} retains no discriminant preimage: its joint "
+                "discriminant image is not characterized by its characters"
+            )
+        target_meet = libgap.Intersection(*pieces) if len(pieces) > 1 else pieces[0]
+        # ``pi_1(Q cap S)`` is contained in the meet of the preimage targets, so a
+        # trivial meet of the targets is already the whole answer and no sign kernel
+        # can make it smaller.  Every kernel row whose preimage targets are trivial --
+        # ``Otilde``, ``SOtilde``, ``Otilde^+`` and ``SOtilde^+`` -- is this case.
+        if int(libgap.Size(target_meet)) == 1:
+            return target_meet
         if self.determinant_kernel and self.spinor_kernel:
             raise NotImplementedError(
                 "the joint intersection of two sign kernels inside O(L) is not "
@@ -912,11 +927,6 @@ class OrthogonalCharacterQuotient:
                 for g in kernel_selection.group_generators()
             ]
         pieces.append(libgap.Subgroup(og_engine, kernel_images))
-        if not pieces:
-            raise ValueError(
-                f"{self.subgroup} retains no discriminant preimage: its joint "
-                "discriminant image is not characterized by its characters"
-            )
         return libgap.Intersection(*pieces) if len(pieces) > 1 else pieces[0]
 
     def subgroup_image_order(self) -> int:
@@ -1366,8 +1376,113 @@ class OrthogonalCharacterQuotient:
                 return lift
         return None
 
+    def line_stabilizer_sign_patterns(self, vector):
+        r"""The sign patterns the exhibited elements of a line stabilizer realize.
+
+        ``vector`` generates a primitive isotropic line \(x\).  Every element
+        exhibited here fixes \(x\) as a set, and each contributes one pattern:
+        the value of every sign character of this quotient on it, in the
+        quotient's own label order, as a vector over \(\mathbb F_2\).
+
+        * the negation \(-1\), which carries \(v\) to \(-v\);
+        * the Levi part \(1_{\mathrm{plane}} + (-1)_{\mathrm{complement}}\) of
+          the parabolic at \(x\), built by :func:`_split_signature_witness`
+          (S. Zemel, arXiv:1902.08264v2, Proposition 1.10, p. 13);
+        * the integral reflections in the basis vectors orthogonal to \(v\) and in
+          their pairwise sums and differences.
+
+        The square-\(2\) fibre of an indefinite lattice is infinite, so
+        ``Lattices.vectors_of_square_and_divisibility`` is not enumerated here: the
+        family is the finite list above, and a lattice whose patterns are not all
+        presented by it is refused rather than searched further.
+
+        **What these patterns bound.**  The line stabilizer's image can
+        correlate its signs with its discriminant image -- an element with
+        nontrivial discriminant image and nontrivial sign is a graph character
+        -- so a sign product on such an element proves nothing about the signs
+        realized inside \(\ker\rho\).  Where this quotient has a discriminant
+        factor the family is therefore restricted to the elements whose
+        discriminant image is trivial, and the patterns bound the sign space of
+        \(\operatorname{Stab}_{O(L)}(x)\cap\ker\rho\); where it has none there
+        is no \(\rho\) to restrict to, and the patterns bound the sign space of
+        the whole stabilizer.  Either bound is from below: every pattern is
+        exhibited by an element checked here -- an isometry carrying \(v\) to
+        \(\pm v\), with the required discriminant image -- and a candidate that
+        fails a check contributes nothing.
+
+        The enumeration stops once the exhibited patterns span the sign space
+        of \(\ker\rho\), which :meth:`_sign_descent_rank` measures, so the
+        reflection enumeration is reached only where the negation and the Levi
+        part do not already span it.
+        """
+        from itertools import chain, combinations
+
+        lattice = self.lattice
+        ring = lattice.base_ring()
+        zero = ring.zero()
+        sign_space_rank, sign_labels = self._sign_descent_rank()
+        if not sign_labels or sign_space_rank == 0:
+            return ()
+        # The signs inside ker rho are the ones a discriminant factor cannot see.
+        in_discriminant_kernel = self._has_discriminant
+        rho = lattice.discriminant_representation() if in_discriminant_kernel else None
+        trivial_discriminant = (
+            self._discriminant_group.one() if in_discriminant_kernel else None
+        )
+        group = self.supergroup
+
+        def pattern(element):
+            values = []
+            for label in sign_labels:
+                if label == "spinor":
+                    values.append(0 if self._real_spinor_norm(element).is_one() else 1)
+                else:
+                    values.append(0 if ring(element.determinant()) == ring.one() else 1)
+            return tuple(values)
+
+        def fixes_the_line(element) -> bool:
+            image = element(vector)
+            return image == vector or image == -vector
+
+        def candidates():
+            labels = tuple(lattice.module_generating_set())
+            negation = group({label: -lattice.module_generator(label) for label in labels})
+            assert negation * negation == group.one(), (
+                f"the negation of {lattice} built from its module generators is not an "
+                f"involution: it is not an element of the line stabilizer"
+            )
+            yield negation
+            levi = _split_signature_witness(lattice, vector)
+            if levi is not None:
+                yield levi
+            basis = tuple(lattice.module_generators())
+            for root in chain(
+                basis,
+                (
+                    first + sign * second
+                    for first, second in combinations(basis, 2)
+                    for sign in (1, -1)
+                ),
+            ):
+                if root.q() == zero or lattice.b(root, vector) != zero:
+                    continue
+                if not root.is_integral_reflection_vector():
+                    continue
+                yield lattice.reflection(root)
+
+        patterns = []
+        for element in candidates():
+            if not fixes_the_line(element):
+                continue
+            if in_discriminant_kernel and rho(element) != trivial_discriminant:
+                continue
+            patterns.append(pattern(element))
+            if _f2_rank(patterns, len(sign_labels)) == sign_space_rank:
+                break
+        return tuple(patterns)
+
     def isotropic_line_stabilizer_image(self, representative):
-        r"""Return ``(discriminant image, whether a sign factor is covered)`` for an isotropic line.
+        r"""Return the datum splitting the ambient line orbit, or ``None`` where it is not certified.
 
         For a single determinant or component character, an integral reflection
         fixing the line and changing that character proves ``G = Gamma Stab(line)``.
@@ -1399,12 +1514,16 @@ class OrthogonalCharacterQuotient:
         ``kg`` fixes ``v``, and ``kg`` has the same discriminant image ``gamma``.  That is
         surjectivity of the line stabilizer onto the finite class stabilizer.
 
-        A norm ``-2`` root reflection is *not* used for the sign factor: its discriminant
-        image is trivial, so it would be declared a stabilizer member for the wrong reason.
-        The sign factor is a separate character and is decided by the subgroup's own
-        membership test on a reflection in ``u perpendicular to v`` with ``u.u = 2``; if no
-        such witness is exhibited there is no claim about that factor and the caller keeps
-        its integral route.  Nothing below returns a partial discriminant image.
+        The sign characters are separate and are decided by the pattern space of the
+        stabilizer's own exhibited elements
+        (:meth:`line_stabilizer_sign_patterns`): the split of the ambient orbit needs
+        ``chi(Stab(x))`` to be the whole preimage of the class stabilizer, so the
+        patterns have to span the sign space that ``ker rho`` realizes
+        (:meth:`_sign_descent_rank`), and a pattern space of smaller rank leaves a
+        coset whose membership in ``chi(Stab(x))`` no exhibited element decides.  The
+        caller then keeps its exact integral route rather than reading a smaller
+        stabilizer image as the whole one.  Nothing below returns a partial
+        discriminant image.
         """
         lattice = self.lattice
         inclusion = representative.inclusion()
@@ -1450,87 +1569,31 @@ class OrthogonalCharacterQuotient:
             if not _complement_discriminant_surjective(lattice, vector):
                 return None
         discriminant_class = lattice.divided_discriminant_class(vector)
-        if discriminant_class == lattice.discriminant_group().zero():
-            # Double cosets Gamma \\ im rho / im rho are one coset, *provided* no sign
-            # factor remains to be lifted: Stab_{im rho}(0) = im rho, and
-            # Eichler's lifting argument takes place inside that image.  The remaining
-            # factor is independent: it is met only when no sign label remains or a
-            # kernel-sign witness is exhibited.  A full discriminant stabilizer alone
-            # would not supply this, so the joint condition below is kept explicit.
-            # The factor labels are retained data; do not evaluate _sign_descent_rank
-            # here, because that builds im rho through ambient generators again.  Two
-            # nontrivial sign factors are beyond the single witness this shortcut proves:
-            # one flip covers one sign coset, not a joint two-character image.
-            sign_labels = [
-                label
-                for label, present in (
-                    ("determinant", self.determinant_kernel),
-                    ("spinor", self.spinor_kernel),
-                )
-                if present
-            ]
-            if not sign_labels:
-                return "NOSPLIT"
-            if len(sign_labels) > 1:
-                return None
-            # A norm +2 integral root reflection needs no rho evaluation to certify its
-            # kernel membership: on a dual class x -> x - b(x,u)u the correction b(x,u)u
-            # is a lattice vector, so the class is unchanged.  lattice.reflection has
-            # already checked the integral-reflection-vector condition; the remaining
-            # sign factor is the only character left to test.
-            # The split-signature witness is tried FIRST: the reflection
-            # enumerations below are a slow route for an indefinite lattice,
-            # and the witness -- the Levi part ``(1, -1)`` of the parabolic
-            # (Zemel, arXiv:1902.08264v2, Proposition 1.10, p. 13), an
-            # element of the stabilizer with trivial discriminant image and
-            # real spinor norm ``-1``, computed by the four checks of
-            # ``_split_signature_witness`` -- certifies the same conclusion.
-            witness = _split_signature_witness(lattice, vector)
-            if witness is not None and witness not in self.subgroup:
-                return "NOSPLIT"
-            basis = tuple(lattice.module_generators())
-            for index, first in enumerate(basis):
-                for second in basis[index + 1 :]:
-                    candidate = first + second
-                    if candidate.q() != lattice.base_ring()(2):
-                        continue
-                    if lattice.b(candidate, vector) != lattice.base_ring().zero():
-                        continue
-                    if lattice.reflection(candidate) not in self.subgroup:
-                        return "NOSPLIT"
-            for root in lattice.vectors_of_square_and_divisibility(
-                lattice.base_ring()(2), lattice.base_ring().one()
-            ):
-                if lattice.b(root, vector) != lattice.base_ring().zero():
-                    continue
-                if lattice.reflection(root) not in self.subgroup:
-                    return "NOSPLIT"
+        zero_class = lattice.discriminant_group().zero()
+        sign_space_rank, sign_labels = self._sign_descent_rank()
+        # The sign cosets the stabilizer presents, as the patterns its exhibited
+        # elements realize.  A pattern space of smaller rank than the one ker rho
+        # realizes leaves a coset of the character image outside chi(Stab(x)), and
+        # then neither the class-stabilizer equality below nor its sign factors are
+        # certified: the caller keeps its exact integral route.
+        if (
+            _f2_rank(self.line_stabilizer_sign_patterns(vector), len(sign_labels))
+            < sign_space_rank
+        ):
             return None
-        # A joint determinant *and* spinor sign quotient is not certified by one
-        # nontrivial reflection: that witness covers one sign coset only, and the
-        # remaining coset need not be generated.  Keep the integral joint-character
-        # splitting there, with its double cosets in the full joint image, rather than
-        # promoting the single flip to a complete stabilizer image.  This is checked
-        # before _sign_descent_rank can ask for the ambient engine.
-        if self.determinant_kernel and self.spinor_kernel:
-            return None
+        if discriminant_class == zero_class:
+            # Double cosets Gamma \\ im rho / im rho are one coset: Stab_{im rho}(0)
+            # is all of im rho, and Eichler's lifting argument takes place inside
+            # that image.  The sign factors are presented by the stabilizer's own
+            # exhibited patterns, which the test above has just certified to span
+            # the sign space of ker rho, so no sign coset is left to lift.
+            return "NOSPLIT"
         if not self._has_discriminant:
-            # A sign-only character quotient has no im rho at all. This case cannot
-            # use the discriminant-stabilizer image, but the same index-two principle
-            # applies: one kernel-sign witness certifies that the orbit does not split,
-            # so the integral stabilizer is not needed either.
-            _rank, sign_labels = self._sign_descent_rank()
-            if not sign_labels:
-                return "NOSPLIT"
-            for root in lattice.vectors_of_square_and_divisibility(
-                lattice.base_ring()(2), lattice.base_ring().one()
-            ):
-                if lattice.b(root, vector) != lattice.base_ring().zero():
-                    continue
-                if lattice.reflection(root) not in self.subgroup:
-                    return "NOSPLIT"
-            return None
-        discriminant_class = lattice.divided_discriminant_class(vector)
+            # A sign-only character quotient has no im rho at all.  The same
+            # principle applies: the stabilizer's patterns span every sign character,
+            # so the signs it presents are the whole sign image of O(L) and the
+            # ambient orbit does not split.
+            return "NOSPLIT"
         finite_orthogonal = self._discriminant_group
         # An unoriented line is a *set*: its stabilizer may interchange v and -v, so
         # the discriminant image is the stabilizer of the class set {c, -c}, not of c
@@ -1555,48 +1618,11 @@ class OrthogonalCharacterQuotient:
             ]
         )
         engine, im_rho, _section, ambient = self._im_rho_engine_and_section()
-        _rank, sign_labels = self._sign_descent_rank()
-        if not sign_labels:
-            return class_points, False
-        # A kernel-sign witness is what certifies splitting here: a reflection in a norm
-        # ``+2`` vector orthogonal to the line fixes it, acts trivially on ``A_L``, and has
-        # spinor class ``[2] * [-1/2] = [-1]``, outside ``O+``.  That is exactly the missing
-        # piece of the sign character when it is *not* lifted; a generator with nontrivial
-        # sign and nontrivial discriminant image would only supply a graph, not this witness.
-        flip = False
-        rho = lattice.discriminant_representation()
-        square_two = lattice.base_ring()(2)
-        trivial_discriminant = self._discriminant_group.one()
-        zero_scalar = lattice.base_ring().zero()
-        # The split-signature witness is tried FIRST: the reflection
-        # enumeration below is a slow route for an indefinite lattice, and the
-        # witness -- the Levi part ``(1, -1)`` of the parabolic (Zemel,
-        # arXiv:1902.08264v2, Proposition 1.10, p. 13), an element of the
-        # stabilizer with trivial discriminant image and real spinor norm
-        # ``-1``, computed by the four checks of
-        # ``_split_signature_witness`` -- certifies the same flip.
-        witness = _split_signature_witness(lattice, vector)
-        if witness is not None and witness not in self.subgroup:
-            flip = True
-        if not flip:
-            for root in lattice.vectors_of_square_and_divisibility(
-                square_two, lattice.base_ring().one()
-            ):
-                if lattice.b(root, vector) != zero_scalar:
-                    continue
-                reflection = lattice.reflection(root)
-                if (
-                    rho(reflection) == trivial_discriminant
-                    and reflection not in self.subgroup
-                ):
-                    flip = True
-                    break
-        if not flip:
-            # No kernel-sign witness is exhibited, so this cannot certify that the sign
-            # factor is included in the stabilizer's image: the double-coset machinery
-            # needs the integral stabilizer instead of a partial character image.
-            return None
-        return class_points, flip
+        # Every sign coset is presented by the stabilizer: the patterns collected
+        # above span the sign space of ker rho, so the double cosets inside im rho
+        # are the double cosets of the whole character image and one lift per class
+        # orbit carries each Gamma-orbit.
+        return class_points, bool(sign_labels)
 
     def splitting_isometries_from_line_class(self, class_points, stab_sign_flip):
         r"""Splitting lifts from the rho(Gamma)-orbits on the isotropic class pairs.
@@ -1968,15 +1994,16 @@ class OrthogonalCharacterQuotient:
         rho_images = self.ambient_discriminant_images()
 
         flip_element = None
-        if j >= 1 and sign_labels:
-            # A sign character that does not descend to im rho is lifted by one explicit
-            # element of ker rho, exhibited below; Otilde(L)'s generating family is neither
-            # needed nor known.
+        if j >= 1 and sign_labels and not stab_sign_flip:
+            # The stabilizer leaves a sign coset to lift, and one explicit element of
+            # ker rho exhibits it; Otilde(L)'s generating family is neither needed nor
+            # known.  Where the stabilizer does present every sign coset there is
+            # nothing to lift, and no kernel element is searched for.
             for label in sign_labels:
                 flip_element = self._kernel_sign_flip(label)
                 if flip_element is not None:
                     break
-            if len(sign_labels) == 1 and not stab_sign_flip and flip_element is None:
+            if len(sign_labels) == 1 and flip_element is None:
                 raise ValueError(
                     f"the stabilizer's discriminant image leaves a sign coset to lift, and no "
                     f"kernel element with nontrivial {sign_labels[0]} is available to lift it: "
