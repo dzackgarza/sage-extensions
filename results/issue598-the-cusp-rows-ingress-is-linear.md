@@ -216,14 +216,28 @@ consumers `test_a_cusp_names_its_plane_by_span.sage`,
 `test_scattone_plane_orbits.sage` (5 passed in 156.61 s, three calls over the
 ceiling as recorded above).
 
-Not run: `tests/lattices/test_the_coble_incidence_of_line_and_plane_orbits.sage`,
+Not run to completion: the heavy consumers.  They were attempted twice -- once as
+one six-file `pytest` call, killed at the command's 900 s bound with no report,
+and once one file a process (`.tmp/issue598-ingress/run-consumers.sh`, 1500 s a
+file), whose first file
+`tests/lattices/test_the_coble_incidence_of_line_and_plane_orbits.sage` was still
+running after twelve minutes when this note was written; its log is
+`.tmp/issue598-ingress/consumer-test_the_coble_incidence_of_line_and_plane_orbits.log`.
+That file builds `Otilde(T_Co)`'s cusp rows and their incidence -- the line row
+this note measures at 245 s of walk, and a `Gamma_{Co,2}` plane row that #381's
+note priced at 245.9--351.3 s -- so it does not fit a ten-minute command and its
+outcome is not known here.  The same holds for
 `test_the_incidence_decided_by_divided_classes.sage`,
 `test_a_row_computes_one_plane_covering.sage`,
 `test_the_row_retains_no_transport_for_a_carried_line.sage`,
 `test_the_incidence_line_vertex_is_named_by_the_finite_image.sage`,
 `test_special_orthogonal_split_building.sage`, `test_orbit_milestones.sage`,
 `test_the_kernel_incidence_rows.sage` and
-`tests/engineering/test_the_incidence_row_reports_a_broken_contract_apart_from_an_undecided_row.py`
-were dispatched one file a process and did not finish inside a ten-minute
-command; the whole suite; and the ast-grep gates, which are not installed on
-this host.
+`tests/engineering/test_the_incidence_row_reports_a_broken_contract_apart_from_an_undecided_row.py`,
+which the same driver dispatches after it.  Also not run: the whole suite; and the
+ast-grep gates, which are not installed on this host.
+
+The Scattone measurement above was taken on the repaired tree (base `61b3fa1`),
+not on the parent; that file reads `isotropic_orbit_representatives`, which this
+change does not touch, so the numbers are the parent's own, but the run was not
+made there.
