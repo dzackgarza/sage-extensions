@@ -11,13 +11,26 @@ from sage_extensions.all import *  # noqa: F401,F403
 
 
 def _projective_plane():
+    r"""The fan with rays ``e_1, e_2, -e_1 - e_2`` and maximal cones the consecutive pairs."""
     fans = RationalPolyhedralFans(ZZ.free_module(2))
-    return fans(((1, 0), (0, 1), (-1, -1)), ((0, 1), (1, 2), (2, 0))).toric_variety(QQ)
+    rays = ((1, 0), (0, 1), (-1, -1))
+    return fans(
+        ((rays[0], rays[1]), (rays[1], rays[2]), (rays[2], rays[0]))
+    ).toric_variety(QQ)
 
 
 def _p1_times_p1():
+    r"""The fan with rays ``±e_1, ±e_2`` and maximal cones the consecutive pairs."""
     fans = RationalPolyhedralFans(ZZ.free_module(2))
-    return fans(((1, 0), (0, 1), (-1, 0), (0, -1)), ((0, 1), (1, 2), (2, 3), (3, 0))).toric_variety(QQ)
+    rays = ((1, 0), (0, 1), (-1, 0), (0, -1))
+    return fans(
+        (
+            (rays[0], rays[1]),
+            (rays[1], rays[2]),
+            (rays[2], rays[3]),
+            (rays[3], rays[0]),
+        )
+    ).toric_variety(QQ)
 
 
 def test_the_weight_zero_piece_of_sections_of_a_torus_invariant_line_on_p2_is_one_dimensional() -> None:
