@@ -280,3 +280,44 @@ def test_the_metric_lane_counts_the_isometries_and_not_the_affine_candidates() -
     assert all(element(corner) in corners for element in elements for corner in corners)
     assert half_turn(corners[0]) in corners
     assert (half_turn * half_turn)(corners[0]) == corners[0]
+
+
+def test_a_face_of_a_placed_euclidean_polytope_answers_its_own_group() -> None:
+    r"""Faces of the placed square: an edge has two moves, a vertex one.
+
+    A face that does not span the ambient plane determines no ambient affine map
+    of its own, so the plane's isometry decision is not asked about it, and its
+    group is the polytope's own affine group read on the face's vertices: the
+    identity and one swap for an edge, the identity alone for a vertex.  The
+    reflection lifts to the edge it fixes -- the bottom one -- and to no other,
+    the left edge going to the right one.
+    """
+    vector_space, space = _plane()
+    category = EuclideanPolytopesIn(space)
+    polygon = _square()
+    placed = category.on(
+        ("vertices", polygon.vertices()), _placement(polygon, space, vector_space)
+    )
+    lower_left = vector_space((-1, -1))
+    lower_right = vector_space((1, -1))
+    upper_left = vector_space((-1, 1))
+    upper_right = vector_space((1, 1))
+    edges = tuple(placed.faces(1))
+    vertices = tuple(placed.faces(0))
+    reflection = next(
+        element
+        for element in tuple(placed.geometric_automorphisms())
+        if element(lower_left) == lower_right and element(upper_left) == upper_right
+    )
+    bottom = _edge_spanning(polygon, ((-1, -1), (1, -1)))
+    left = _edge_spanning(polygon, ((-1, -1), (-1, 1)))
+    placed_bottom = next(face for face in edges if face.underlying_polytope() is bottom)
+    placed_left = next(face for face in edges if face.underlying_polytope() is left)
+
+    lift = placed.geometric_lifts_of_face_automorphism(reflection, placed_bottom)
+
+    assert all(edge.Aut().order() == 2 for edge in edges)
+    assert all(vertex.Aut().order() == 1 for vertex in vertices)
+    assert lift.ambient_map()(lower_left) == lower_right
+    assert lift.ambient_map()(lower_right) == lower_left
+    assert placed.geometric_lifts_of_face_automorphism(reflection, placed_left) is None
