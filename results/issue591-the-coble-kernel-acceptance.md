@@ -394,3 +394,12 @@ class modulo two lies outside the 54-space, or prove no such `Y` exists. Two fac
 it and are worth recording with the search: every level-four class is alternating (the
 55-dimensional bound), and every reflection product so far — commutators, two-fold words,
 four-fold words, and all ten conjugates — lies in the same 54.
+
+## The run of the level-eight script
+
+`python3 results/coble-kernel-level-eight.py` completes from the repository root and
+reproduces every number above: the reflection span `54` from `1540` commutators, the
+two-fold and four-fold products inside it, and the conjugation stage reporting
+`isometries outside Gamma that move a level-four class out of the span: 0` for all ten
+isometries. Measured at load 35: `exit 0`, 8 min 37 s wall; the arithmetic is exact
+integers and no engine is loaded.
