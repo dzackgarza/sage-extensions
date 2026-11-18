@@ -2852,17 +2852,23 @@ class Lattices(OwnedCategoryOverBaseRing):
         member of the integral-structure action's orbit Schreier family to an
         integral isometry, one conversion per `(orbit point, letter)` pair.
 
-        A coslice marking asks for the pointwise stabilizer of the plane, and an
-        oriented plane for the kernel of the determinant on the plane; both are
-        proper subgroups of the parabolic, so they keep the port's route.
+        A coslice marking at a primitive *vector* asks for the pointwise
+        stabilizer of that vector, which is the kernel of the sign of the action
+        on it inside the rank-one parabolic; it is built here too
+        (:meth:`_pointed_vector_stabilizer_generators`).  An oriented plane asks
+        for the kernel of the determinant on the plane, and a coslice at a
+        sublattice of higher rank or at a non-isotropic vector for a pointwise
+        stabilizer whose construction is not owned here: those keep the port's
+        route.
         """
-        parabolic = (
-            None
-            if isinstance(diagram_category, (CosliceCategory, OrientedIsotropicFlags))
-            else self._isotropic_parabolic_generators(marked)
-        )
-        if parabolic is not None:
-            return parabolic
+        if isinstance(diagram_category, CosliceCategory):
+            pointed = self._pointed_vector_stabilizer_generators(marked)
+        elif isinstance(diagram_category, OrientedIsotropicFlags):
+            pointed = None
+        else:
+            pointed = self._isotropic_parabolic_generators(marked)
+        if pointed is not None:
+            return pointed
         from sage_indefinite_port.indefinite.marked_lattices import (
             automorphism_group_generators,
         )
@@ -2897,12 +2903,9 @@ class Lattices(OwnedCategoryOverBaseRing):
         the elementary generators are the reflections in the norm-``\pm 1``
         vectors instead.
         """
-        arrow_member = getattr(marked, "arrow", None)
-        if arrow_member is None:
+        arrow = self._marked_arrow(marked)
+        if arrow is None:
             return None
-        # The marking category exposes the arrow as a method, and a category that
-        # stores it as data exposes it as the arrow itself.
-        arrow = arrow_member() if callable(arrow_member) else arrow_member
         codomain = arrow.codomain()
         if not hasattr(codomain, "lattice_category") or codomain.base_ring() is not _owned_integers():
             return None
@@ -3001,6 +3004,101 @@ class Lattices(OwnedCategoryOverBaseRing):
             lifts.append(lift)
         kernel = tuple(reduction.levi_action().kernel().group_generators())
         return finite_ordered_set(tuple(lifts) + kernel)
+
+    def _marked_arrow(self, marked):
+        r"""The arrow an arrow marking carries, or ``None`` for any other marking.
+
+        The marking categories expose the arrow as a method and a category that
+        stores it as data exposes it as the arrow itself.
+        """
+        arrow_member = getattr(marked, "arrow", None)
+        if arrow_member is None:
+            return None
+        return arrow_member() if callable(arrow_member) else arrow_member
+
+    def _pointed_vector_stabilizer_generators(self, marked):
+        r"""Generators of the stabilizer of a primitive *vector*, or ``None``.
+
+        The marking must be an arrow whose source is a rank-one lattice
+        ``<q(v)>`` and whose image is a primitive isotropic vector `v` of an
+        indefinite even lattice over `ZZ`; every other marking is answered with
+        ``None`` and the caller keeps its own route.
+
+        The pointed stabilizer is ``P_I^1 = {g in P_I : g(v) = v}`` for
+        `I = \mathbf Z v`.  Its setwise companion `P_I` is the rank-one
+        parabolic, whose generators are constructed by
+        :meth:`_isotropic_line_stabilizer_generators` -- one integral lift of
+        each generator of `O(K_I)`, `K_I = I^\perp/I`, together with the
+        selected generators of the kernel -- and the sign of the action on `v`,
+        ``sgn: P_I -> O(I) = {\pm 1}``, cuts `P_I^1` out of it.  The family
+        returned is the sign-decorated one: the members of the setwise family
+        that fix `v`, together with `g_0 g` for one fixed reversing member `g_0`
+        and every reversing `g`.  Every member fixes `v` and the whole of
+        `P_I^1` is generated, because a word in the setwise family with an even
+        number of reversing letters is a product of those `g_0 g` and `g_0^2`,
+        and `g_1 g_2 = (g_1 g_0)(g_0 g_0)(g_0 g_2)` for reversing `g_1, g_2`.
+
+        At `K_I = 0` the perpendicular is the line itself, so ``P_I^1`` is the
+        pointwise perpendicular kernel
+        (:meth:`...IsotropicReductions.ParentMethods.pointwise_perpendicular_kernel`),
+        whose generators are the integral parameter module's -- integer linear
+        algebra, with no isometry search.  This is the rank at which the setwise
+        construction declines, so it is answered here rather than left to the
+        port: on `U` the pointed stabilizer is trivial and the kernel family is
+        empty, as it must be.
+
+        A non-isotropic `v` has no reduction `v^\perp/\mathbf Z v`: the stabilizer
+        is the isometries of ``v^\perp \cap L`` preserving the glue with
+        `\mathbf Z v`, and that gluing construction is not owned here, so such a
+        marking is answered with ``None``.
+        """
+        arrow = self._marked_arrow(marked)
+        if arrow is None:
+            return None
+        domain = arrow.domain()
+        labels = tuple(domain.module_generating_set())
+        if int(domain.module_rank()) != 1 or len(labels) != 1:
+            return None
+        vector = arrow(domain.module_generator(labels[0]))
+        codomain = arrow.codomain()
+        if codomain.base_ring() is not _owned_integers():
+            return None
+        if codomain.is_definite() is not False or codomain.is_even() is not True:
+            return None
+        if vector.q() != codomain.base_ring().zero() or vector.is_primitive() is not True:
+            return None
+        subobject = codomain.primitive_isotropic_subobject(vector)
+        reduction = subobject.isotropic_reduction()
+        if int(reduction.quotient_lattice().module_rank()) == 0:
+            return finite_ordered_set(
+                tuple(reduction.pointwise_perpendicular_kernel().group_generators())
+            )
+        setwise = self._isotropic_line_stabilizer_generators(marked)
+        if setwise is None:
+            return None
+        fixing, reversing = [], []
+        for generator in setwise:
+            image = generator(vector)
+            if image == vector:
+                fixing.append(generator)
+            elif image == -vector:
+                reversing.append(generator)
+            else:
+                raise ValueError(
+                    f"the setwise parabolic family at {vector} contains {generator}, which carries "
+                    f"the primitive vector to {image}: a stabilizer of the line carries its primitive "
+                    f"generator to +-v"
+                )
+        family = tuple(fixing)
+        if reversing:
+            anchor = reversing[0]
+            family = family + tuple(anchor * generator for generator in reversing)
+        if not all(generator(vector) == vector for generator in family):
+            raise ValueError(
+                f"the pointed family built at {vector} contains an element that does not fix it; "
+                f"the sign of the action on v was read from the setwise family it was built from"
+            )
+        return finite_ordered_set(family)
 
     def _marking_component(self, source_marking, target_marking, apex):
         r"""Implementer side of the marked-diagram contract: ``alpha`` with ``kappa alpha = g iota``.

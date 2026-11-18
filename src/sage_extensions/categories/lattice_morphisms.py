@@ -4882,11 +4882,13 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
         The apex stabilizer is read from the category only where it is the
         answer: for definite ``L`` over ``ZZ`` it is a subgroup of the finite
         ``O(L)`` and :meth:`_marking_stabilizer_generators` reduces it.  For
-        indefinite ``L`` the generators are the marked-diagram decision's own
-        (``sage-indefinite-port``), and the apex stabilizer is discarded, so it
-        is not constructed: forming it costs a pointwise stabilizer of the
-        pointed marking's arrow, and an indefinite lattice has no finite
-        ``O(L)`` to list that stabilizer in.
+        indefinite ``L`` the apex stabilizer is discarded and the generators are
+        the marked-diagram decision's: the lattice category constructs them
+        itself for a primitive isotropic vector
+        (:meth:`...Lattices._pointed_vector_stabilizer_generators`) and for a
+        primitive isotropic line or plane, and hands every other marking -- a
+        non-isotropic vector, a sublattice of higher rank, another base ring --
+        to ``sage-indefinite-port``.
         """
         lattice = self.domain()
         element = element if element_parent(element) is lattice else lattice(element)
