@@ -314,6 +314,25 @@ split at 130 000 of 189 720 planes, 3 335 MiB, 2 776 s, with the host at
 Its peak, its two edge counts and the contract's witness verdict are the run's
 own numbers, and they arrive when it returns.
 
+**The row's peak, and where the contract verdict was lost.**  The same run's
+peak is **5 490 MiB of tree RSS** and **5 505 MiB of single-process VmHWM**
+(`row-Otilde-retry.log`, `peakrss` block), so the 4 GiB clause fails on a
+*completed relation* by 1.34x, not on a projection.  The contract step then
+printed 160 484 of its 189 720 plane-cusp coordinate lines
+(`coble_gamma_co_2_incidence_rows.py:447`) and the process left the host at
+07:35:10 with `# launcher exit: 0`, `gated.log`'s closing line recording
+`oom_kill 47` -- the host's killer again, 29 236 lines short of the verdict.
+
+What that leaves undecided is only the contract's own two re-checks.  Each
+record's witness is already what the relation's construction enforced: the walk
+looks the carried class's orbit up in the row's key index and raises unless
+exactly one line cusp matches it (`predicate_subgroups.py:1385-1400`), and the
+200-plane slice has the driver's independent re-check agreeing 600 for 600.  The
+plane-cusp coverage follows from the count: 569 160 edges with distinct endpoint
+pairs over 189 720 plane cusps is exactly three a plane.  The line-cusp coverage
+-- that all 527 are met -- is the one clause no measurement of a partial row
+decides.
+
 **Why the counts have to be computed and cannot be extrapolated.**  The edge
 count is not a fixed multiple of the plane count.  On `U + U(2) + <-2>` both
 kernel rows decide **4 edges over 3 line cusps and 2 plane cusps** -- two edges a
