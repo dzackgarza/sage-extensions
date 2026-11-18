@@ -277,6 +277,101 @@ class ManifoldAtlasTransition(SageObject):
             self._inverse_transition = inverse
         return self._inverse_transition
 
+    def then(self, other):
+        r"""``other o self``: the coordinate change through the chart both changes go through.
+
+        For ``self`` a change ``U_s -> U_c`` and ``other`` one ``U_c -> U_t``, the
+        change ``U_s -> U_t`` through ``U_c`` is
+        ``(phi_t o phi_c^{-1}) o (phi_c o phi_s^{-1})`` (Lee, *Introduction to
+        Smooth Manifolds*, 2nd ed., Ch. 1): its forward expressions are the
+        second's read in the first's source coordinates, and its inverse is the
+        first's read in the second's target coordinates.  It is defined where both
+        are, so its overlap is its source leg's overlap together with the other
+        leg's overlap read through the first, and likewise at the target end.
+        """
+        from sage.symbolic.ring import SR as _SR
+
+        assert self.target() is other.source(), (
+            f"cannot compose {self} with {other}: the first ends at {self.target()} and the "
+            f"second starts at {other.source()}, so they go through no common chart"
+        )
+        source = self.source()
+        middle = self.target()
+        target = other.target()
+        middle_symbols = tuple(_engine_manifold_chart(middle)[:])
+        forward_of_self = tuple(
+            _SR(_engine_manifold_expression(expression))
+            for expression in self.forward_expressions()
+        )
+        inverse_of_other = tuple(
+            _SR(_engine_manifold_expression(expression))
+            for expression in other.inverse_expressions()
+        )
+        forward = tuple(
+            _SR(_engine_manifold_expression(expression)).subs(
+                dict(zip(middle_symbols, forward_of_self, strict=True))
+            )
+            for expression in other.forward_expressions()
+        )
+        inverse = tuple(
+            _SR(_engine_manifold_expression(expression)).subs(
+                dict(zip(middle_symbols, inverse_of_other, strict=True))
+            )
+            for expression in self.inverse_expressions()
+        )
+        source_overlap = tuple(
+            _SR(_engine_manifold_expression(expression))
+            for expression in self.source_overlap()
+        ) + tuple(
+            _SR(_engine_manifold_expression(expression)).subs(
+                dict(zip(middle_symbols, forward_of_self, strict=True))
+            )
+            for expression in other.source_overlap()
+        )
+        target_overlap = tuple(
+            _SR(_engine_manifold_expression(expression))
+            for expression in other.target_overlap()
+        ) + tuple(
+            _SR(_engine_manifold_expression(expression)).subs(
+                dict(zip(middle_symbols, inverse_of_other, strict=True))
+            )
+            for expression in self.target_overlap()
+        )
+        forward_owned = _raise_manifold_expression_family(
+            forward,
+            source,
+            name=f"Coordinate change {source.label()} to {target.label()}",
+        )
+        inverse_owned = _raise_manifold_expression_family(
+            inverse,
+            target,
+            name=f"Coordinate change {target.label()} to {source.label()}",
+        )
+        source_overlap_owned = _raise_manifold_expression_family(
+            source_overlap,
+            source,
+            name=f"Overlap of {source.label()} with {target.label()} in {source.label()}",
+        )
+        target_overlap_owned = _raise_manifold_expression_family(
+            target_overlap,
+            target,
+            name=f"Overlap of {source.label()} with {target.label()} in {target.label()}",
+        )
+        return ManifoldAtlasTransition(
+            source,
+            target,
+            _engine_manifold_chart(source).transition_map(
+                _engine_manifold_chart(target),
+                forward,
+                restrictions1=_engine_nonvanishing_conditions(source_overlap_owned),
+                restrictions2=_engine_nonvanishing_conditions(target_overlap_owned),
+            ),
+            forward_owned,
+            inverse_owned,
+            source_overlap_owned,
+            target_overlap_owned,
+        )
+
     def __call__(self, *coordinates):
         r"""The coordinates in the target chart of the point of the overlap with these source coordinates.
 
@@ -650,6 +745,30 @@ def _engine_section_expression(value):
     if formula is not None:
         return formula
     return _engine_owned_number(value)
+
+
+def _composed_ambient_transition(manifold, source_label, target_label):
+    r"""The change from ``source_label`` to ``target_label``, stated directly or through one chart.
+
+    A manifold states the changes between the charts it has them for, and two charts
+    of one atlas are related by composing changes through a third
+    (:meth:`ManifoldAtlasTransition.then`).  A chart another construction registered
+    may meet a chart whose change to it was never stated, and the composition is the
+    change the atlas has; ``None`` says there is none through one chart either.
+    """
+    if (source_label, target_label) in manifold._preamble_transitions:
+        return manifold.transition(source_label, target_label)
+    for middle_label in manifold.chart_labels():
+        if middle_label in (source_label, target_label):
+            continue
+        if (source_label, middle_label) not in manifold._preamble_transitions:
+            continue
+        if (middle_label, target_label) not in manifold._preamble_transitions:
+            continue
+        return manifold.transition(source_label, middle_label).then(
+            manifold.transition(middle_label, target_label)
+        )
+    return None
 
 
 def _chart_family_covers(manifold, labels):
@@ -1730,9 +1849,11 @@ class TopologicalManifolds(OwnedCategory):
                         continue
                     if (source_label, target_label) in domain._preamble_transitions:
                         continue
-                    if (source_label, target_label) not in self._preamble_transitions:
+                    ambient = _composed_ambient_transition(
+                        self, source_label, target_label
+                    )
+                    if ambient is None:
                         continue
-                    ambient = self.transition(source_label, target_label)
                     source_chart = domain.atlas()[source_label]
                     target_chart = domain.atlas()[target_label]
                     # A chart whose domain is already the intersection states the
