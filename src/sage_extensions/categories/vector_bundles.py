@@ -39,6 +39,8 @@ from sage_extensions.categories.abstract_categories.objects import (
 )
 from sage_extensions.categories.manifolds import (
     SmoothManifolds,
+    _chart_family_covers,
+    _engine_manifold_chart,
     _admit_manifold_expression,
     _chartwise_family_agrees,
     _chartwise_formulas,
@@ -463,7 +465,16 @@ class SmoothSectionModules(OwnedParameterizedCategory):
             """
             if element_parent(other) is not self.parent():
                 return False
-            for label, component in self._components.items():
+            shared = tuple(
+                label for label in self._components if label in other.components()
+            )
+            assert shared, (
+                f"cannot decide whether {self} and {other} are equal: they are stated on "
+                f"disjoint families of charts, {tuple(self._components)} and "
+                f"{tuple(other.components())}"
+            )
+            for label in shared:
+                component = self._components[label]
                 other_component = other.components()[label]
                 for left, right in zip(component, other_component, strict=True):
                     residual = SR(
@@ -587,16 +598,16 @@ class SmoothSectionModules(OwnedParameterizedCategory):
                 f"one is read in the bundle's trivializations on a cover of the target, which "
                 f"this owner does not retain; pullback_of states the sections that are"
             )
-            labels = tuple(manifold.chart_labels())
-            missing = tuple(label for label in labels if label not in components)
-            extra = tuple(label for label in components if label not in labels)
-            assert not missing, (
-                f"a section of {self._vector_bundle} is stated on every chart of {manifold}, "
-                f"and no component is given for the charts {missing}"
-            )
+            labels = tuple(components)
+            extra = tuple(label for label in labels if label not in manifold.chart_labels())
             assert not extra, (
                 f"a section of {self._vector_bundle} is stated on the charts of {manifold}, "
                 f"and the components given for {extra} are on charts it does not have"
+            )
+            assert _chart_family_covers(manifold, labels), (
+                f"a section of {self._vector_bundle} is stated on a cover of {manifold}, and the "
+                f"charts {labels} do not cover it: a chart of the atlas lies inside none of them, "
+                f"so its points would have no component"
             )
             admitted = {}
             for label in labels:
@@ -649,8 +660,16 @@ class SmoothSectionModules(OwnedParameterizedCategory):
                     for entry in range(rank)
                 )
             }
+            stated = tuple(pair for pair in manifold.transitions().index_set())
+            given_domain = _engine_manifold_chart(chart).domain()
             for label in labels:
                 if label == chart.label():
+                    continue
+                if (chart.label(), label) not in stated:
+                    continue
+                if _engine_manifold_chart(manifold.atlas()[label]).domain().is_subset(
+                    given_domain
+                ):
                     continue
                 forward_transition = manifold.transition(chart.label(), label)
                 variables = tuple(_engine_manifold_chart(forward_transition.source())[:])
@@ -831,7 +850,13 @@ class SmoothSectionModules(OwnedParameterizedCategory):
                     f"{element_parent(section)}"
                 )
             manifold = self.base_manifold()
-            for label in manifold.chart_labels():
+            stated = tuple(family[0].components())
+            assert _chart_family_covers(manifold, stated), (
+                f"a frame of {self._vector_bundle} is a basis at every point, and the charts "
+                f"{stated} it is stated on do not cover {manifold}: a chart of the atlas lies "
+                f"inside none of them, so the fibres over its points would be undecided"
+            )
+            for label in stated:
                 chart = manifold.atlas()[label]
                 entries = tuple(
                     SR(_engine_manifold_expression(entry))
@@ -961,7 +986,7 @@ class SmoothVectorBundleTrivialization(SageObject):
                     )
                     for entry in range(rank)
                 )
-                for label in manifold.chart_labels()
+                for label in self._frame[0].components()
             }
         )
 
@@ -988,9 +1013,16 @@ class SmoothVectorBundleTrivialization(SageObject):
         components = tuple(entry.components() for entry in self._frame)
         section_components = section.components()
         coordinates = []
+        labels = tuple(section_components)
+        undecided = tuple(label for label in labels if label not in components[0])
+        assert not undecided, (
+            f"cannot read {section} in the frame of {self._bundle}: the frame is stated on the "
+            f"charts {tuple(components[0])} and the section on {labels}, so its components on "
+            f"{undecided} are not in the frame"
+        )
         for index in range(rank):
             per_chart = {}
-            for label in manifold.chart_labels():
+            for label in labels:
                 chart = manifold.atlas()[label]
                 entries = tuple(
                     SR(_engine_manifold_expression(components[basis][label][entry]))

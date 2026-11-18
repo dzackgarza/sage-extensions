@@ -652,6 +652,27 @@ def _engine_section_expression(value):
     return _engine_owned_number(value)
 
 
+def _chart_family_covers(manifold, labels):
+    r"""Whether the charts ``labels`` cover ``manifold``, decided by containment.
+
+    A family of charts covers the manifold when every point of the manifold is a
+    point of one of them; the decision here is the one the atlas can make from
+    its own chart domains -- every chart the manifold carries lies inside one of
+    the charts given ``(Lee, *Introduction to Smooth Manifolds*, 2nd ed., Ch. 1,
+    for a chart's domain)``.  That is a sufficient condition, not a necessary
+    one: a family that covers by meeting instead of by containment is not decided
+    here, and a caller is told so rather than being told its family covers.
+    """
+    given = tuple(_engine_manifold_chart(manifold.atlas()[label]) for label in labels)
+    for label in manifold.chart_labels():
+        if label in labels:
+            continue
+        domain = _engine_manifold_chart(manifold.atlas()[label]).domain()
+        if not any(domain.is_subset(chart.domain()) for chart in given):
+            return False
+    return True
+
+
 def _upper_triangle(n):
     r"""The index pairs ``(i, j)``, ``i <= j < n``, of the entries of an ``n x n`` symmetric matrix."""
     return tuple((row, column) for row in range(int(n)) for column in range(row, int(n)))
@@ -851,13 +872,27 @@ class _ChartwiseFunction:
         return self._formulas
 
     def __call__(self, point):
-        r"""The value of the function at ``point``, in the manifold's coordinate field."""
+        r"""The value of the function at ``point``, in the manifold's coordinate field.
+
+        A function is written on a cover of the manifold, and a point may be given
+        in a chart outside that cover: the point's coordinates are then read in a
+        chart of the cover through the coordinate change the atlas states between
+        them (Lee, *Introduction to Smooth Manifolds*, 2nd ed., Ch. 1).
+        """
         manifold = self._manifold
         label = point.chart().label()
-        assert label in self._formulas, (
-            f"the function is written on the charts {tuple(self._formulas)} of {manifold} and "
-            f"{point} is given in the chart {label}"
-        )
+        if label not in self._formulas:
+            stated = tuple(self._formulas)
+            stated_pairs = tuple(pair for pair in manifold.transitions().index_set())
+            reachable = tuple(
+                other for other in stated if (label, other) in stated_pairs
+            )
+            assert reachable, (
+                f"the function is written on the charts {stated} of {manifold} and {point} is "
+                f"given in the chart {label}: the atlas states no coordinate change from that "
+                f"chart to any chart the function is written on"
+            )
+            label = reachable[0]
         chart = _engine_manifold_chart(manifold.atlas()[label])
         coordinates = tuple(chart(_engine_manifold_point(point)))
         substitutions = dict(zip(tuple(chart[:]), coordinates, strict=True))
@@ -959,9 +994,14 @@ def _chartwise_family_agrees(manifold, expressions, order) -> None:
     Nothing is enumerated: the residuals are rational expressions in the
     charts' coordinates, and their vanishing is decided exactly.
     """
-    labels = tuple(manifold.chart_labels())
+    labels = tuple(expressions)
     dimension = int(manifold.dimension())
     for source_label, target_label in combinations(labels, 2):
+        assert (source_label, target_label) in manifold._preamble_transitions, (
+            f"cannot decide whether the chart-wise family states one object on {manifold}: the "
+            f"charts {source_label} and {target_label} are both given, and the atlas states no "
+            f"coordinate change between them"
+        )
         for transition in (
             manifold.transition(source_label, target_label),
             manifold.transition(target_label, source_label),
@@ -2417,17 +2457,17 @@ class SmoothManifolds(OwnedCategory):
             sections is stated where its denominator does not vanish
             (:meth:`ManifoldAtlasChart.section_ratio`).
             """
-            labels = tuple(self.chart_labels())
             atlas = self.atlas()
-            missing = tuple(label for label in labels if label not in expressions)
-            extra = tuple(label for label in expressions if label not in labels)
-            assert not missing, (
-                f"a smooth function on {self} is stated on every chart of the manifold, and no "
-                f"expression is given for the charts {missing}"
-            )
+            labels = tuple(expressions)
+            extra = tuple(label for label in labels if label not in self.chart_labels())
             assert not extra, (
                 f"a smooth function on {self} is stated on the charts of the manifold, and the "
                 f"expressions given for {extra} are on charts it does not have"
+            )
+            assert _chart_family_covers(self, labels), (
+                f"a smooth function on {self} is stated on a cover of the manifold, and the "
+                f"charts {labels} do not cover it: a chart of the atlas lies inside none of them, "
+                f"so its points would have no value"
             )
             admitted = {
                 label: _admit_manifold_expression(expressions[label], atlas[label])
