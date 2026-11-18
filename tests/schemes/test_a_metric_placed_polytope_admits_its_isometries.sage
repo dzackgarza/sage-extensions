@@ -682,3 +682,57 @@ def test_the_placed_hyperbolic_polygon_admits_its_isometry() -> None:
     assert space(corners[0]) is corners[0]
     assert arrow(corners[0]) == corners[3]
     assert (arrow * arrow)(corners[0]) == corners[0]
+
+
+def test_a_placed_isomorphism_derives_the_faces_of_two_polytopes() -> None:
+    r"""The square onto its translate: one isomorphism from its two ambient maps.
+
+    Two placed polytopes have two *different* face objects, and the faces' map an
+    isomorphism between them needs is read off the vertex permutation the ambient
+    map induces rather than supplied by the caller: each face goes to the other
+    polytope's face on the images of its vertices.  The pair is admitted -- the
+    metric decision admits each of the two ambient maps -- the inverse carries a
+    point back, and the top face goes to the other polytope.  A map that does not
+    carry the vertices onto the other polytope's is refused, since it determines no
+    correspondence of their faces.
+    """
+    vector_space, space = _plane()
+    category = EuclideanPolytopesIn(space)
+    (first_direction, second_direction) = vector_space.module_generators()
+    square = _square()
+    shifted = LatticePolygons(ZZ.free_module(2))(((1, 1), (1, 3), (3, 3), (3, 1)))
+    first = category.on(
+        ("vertices", square.vertices()), _placement(square, space, vector_space)
+    )
+    second = category.on(
+        ("vertices", shifted.vertices()), _placement(shifted, space, vector_space)
+    )
+    there = _euclidean_arrow(
+        space,
+        vector_space,
+        (first_direction, second_direction),
+        offset=vector_space((2, 2)),
+    )
+    back = _euclidean_arrow(
+        space,
+        vector_space,
+        (first_direction, second_direction),
+        offset=vector_space((-2, -2)),
+    )
+    dilation = _euclidean_arrow(
+        space,
+        vector_space,
+        (first_direction + first_direction, second_direction + second_direction),
+    )
+    corners = tuple(first.vertices())
+    other_corners = tuple(second.vertices())
+    isomorphism = first.Isom(second)((there, back))
+
+    assert space.is_an_isometry(there) is True
+    assert isomorphism(corners[0]) == other_corners[0]
+    assert (~isomorphism)(other_corners[0]) == corners[0]
+    assert isomorphism.face_poset_map()(square) == shifted
+    assert (~isomorphism).face_poset_map()(shifted) == square
+
+    with pytest.raises(AssertionError):
+        first.Isom(second)((dilation, back))

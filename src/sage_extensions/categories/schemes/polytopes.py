@@ -493,6 +493,59 @@ class PlacedPolytopeIsomorphism(CategoricalIsomorphism):
         )
 
 
+def _vertex_correspondence(domain, codomain, ambient_map):
+    r"""The permutation of vertex positions an ambient map between two placed polytopes induces.
+
+    ``ambient_map`` carries the domain's placed vertices into the ambient space,
+    and the codomain's placed vertices are the positions: a placement is injective
+    on vertices, so a map carrying each of the first onto one of the second is one
+    permutation of them, and a map that does not is refused here rather than read
+    as a correspondence it is not.
+    """
+    placed_vertices = tuple(domain.vertices())
+    codomain_vertices = codomain.vertices()
+    ranking = codomain_vertices.ranking_map()
+    images = tuple(ambient_map(point) for point in placed_vertices)
+    assert all(image in codomain_vertices for image in images), (
+        f"{ambient_map} induces no isomorphism {domain} -> {codomain}: it does not carry this "
+        f"polytope's placed vertices onto that one's, so it determines no correspondence of their "
+        f"vertices and no faces' map"
+    )
+    positions = tuple(int(ranking(image)) for image in images)
+    assert sorted(positions) == list(range(len(placed_vertices))), (
+        f"{ambient_map} induces no isomorphism {domain} -> {codomain}: it carries two of this "
+        f"polytope's vertices to one of that one's, so it is no bijection of them"
+    )
+    return positions
+
+
+def _placed_face_correspondence(domain, codomain, positions):
+    r"""The faces' map a vertex correspondence of two placed polytopes induces.
+
+    A face is determined by the vertices it contains, so the face carrying each
+    of the domain's vertices at position ``i`` to the codomain's at
+    ``positions[i]`` is the codomain's face whose vertex set is that image: the
+    correspondence is read off the two face objects and the one permutation, and
+    the top and empty faces go to the top and empty faces.
+    """
+    domain_vertices = tuple(domain.underlying_polytope().vertices())
+    codomain_vertices = tuple(codomain.underlying_polytope().vertices())
+
+    def image_of(face):
+        signature = tuple(bool(face.contains_point(vertex)) for vertex in domain_vertices)
+        return next(
+            candidate
+            for candidate in codomain.face_poset()
+            if tuple(
+                bool(candidate.contains_point(codomain_vertices[position]))
+                for position in positions
+            )
+            == signature
+        )
+
+    return FiniteGradedPosets().Mor(domain.face_poset(), codomain.face_poset())(image_of)
+
+
 class PlacedPolytopeIsomorphismMor(CoreMor):
     r"""``Iso`` of placed polytopes: an inverse pair of placed arrows.
 
@@ -523,6 +576,42 @@ class PlacedPolytopeIsomorphismMor(CoreMor):
     def core_category(self) -> _CoreCategory:
         r"""The core of this placed category, whose arrows are these isomorphisms."""
         return self.domain().category().Core()
+
+    def _element_constructor_(self, ambient_maps):
+        r"""Construct the isomorphism from the two ambient maps that induce it.
+
+        An isomorphism of placed polytopes is an inverse pair of arrows, and the
+        pair of ambient maps -- a map and its inverse, which the ambient owner
+        states and this owner does not invert for it -- determines both arrows: a
+        map carries the domain's placed vertices onto the codomain's, and a
+        placement is injective on vertices, so that correspondence is one
+        permutation of the vertex positions, and each arrow's faces' map is the
+        correspondence the same permutation induces
+        (:func:`_placed_face_correspondence`).  Each arrow of the pair is then
+        admitted by the category's own constructor, so on a metric placement it is
+        the ambient space's isometry decision that accepts or refuses the pair.
+
+        An ambient map that does not carry the domain's vertices onto the
+        codomain's determines no correspondence of their faces, and is refused here
+        rather than stored.
+        """
+        domain = self.domain()
+        codomain = self.codomain()
+        category = domain.category()
+        forward_ambient, backward_ambient = ambient_maps
+        forward = category.Mor(domain, codomain)(
+            forward_ambient,
+            _placed_face_correspondence(
+                domain, codomain, _vertex_correspondence(domain, codomain, forward_ambient)
+            ),
+        )
+        backward = category.Mor(codomain, domain)(
+            backward_ambient,
+            _placed_face_correspondence(
+                codomain, domain, _vertex_correspondence(codomain, domain, backward_ambient)
+            ),
+        )
+        return self._from_known_inverse_pair(forward, backward)
 
     def _require_the_automorphism_group(self) -> None:
         assert self.domain() is self.codomain(), (
