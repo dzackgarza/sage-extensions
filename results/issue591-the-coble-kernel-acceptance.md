@@ -613,3 +613,26 @@ the digest omits the card because `refresh_lattice_database_enriques.py` reads a
 So item 5 waits on **lattice-database#7** for the field's content. Adding the card to this
 repository's digest before that field exists would put `None` under a key the acceptance names,
 which is not certification and is not done here.
+
+## Item 5 is met at the database, and this note is corrected
+
+`dzackgarza/lattice-database` at `main` now carries the field. The arithmetic-group card
+`otilde-t-co` stores
+
+```
+data:
+  index_in_orthogonal_group: 46998591897600
+  generator_morphisms: [Otilde(T_Co) generator 1, ..., Otilde(T_Co) generator 56]
+```
+
+and lattice card `6JRR` carries the source hashes that certify them,
+`arithmetic-group.otilde-t-co.index_in_orthogonal_group` (`682c595c...`) and
+`arithmetic-group.otilde-t-co.generator_morphisms` (`3b6b6031...`), beside the same pair for
+`otilde-plus-t-co`, whose family is 95 Schreier generators. The card states the two values are
+certified independently on that card and that the historical 46-trillion-coset enumeration is
+unnecessary for the explicit family.
+
+So the statement above — that item 5 is blocked on `lattice-database#7` — is withdrawn. The
+field returns and certifies there. This repository's digest is pinned at `1e1cadc`, which
+predates the field, and its refresh script reads a fixed set of 87 `gamma-h-*` cards; that is a
+snapshot of an older database ref, not a gap in the acceptance.
