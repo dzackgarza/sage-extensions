@@ -17,9 +17,12 @@ log, and do two runs started together keep two — so ``stage_records_of`` reads
 one call's records back out of the record file, ``kept_test_run`` reports the
 files a probe run kept and what that run exited with, ``simultaneous_test_runs``
 starts one probe per tree before waiting on any of them, and ``probe_run``
-reports the log a run's own logging configuration filled.  All are bound as
-builtins for the same reason: the lint admits exactly the names a directory's
-``conftest.py`` binds.
+reports the log a run's own logging configuration filled.  ``installed_wheel_record``
+asks the same question of an installation that is not a checkout: it builds a
+wheel of this checkout, installs it outside the tree and reports the timed call
+that wheel makes and the record it writes.  All are bound as builtins for the
+same reason: the lint admits exactly the names a directory's ``conftest.py``
+binds.
 
 The declared category graph has the same shape of question, asked of a tree
 written for it: ``declared_graph_report`` runs ``just category-graph`` -- the
@@ -53,6 +56,7 @@ from __future__ import annotations
 import builtins
 import importlib.util
 import json
+import os
 import re
 import shutil
 import subprocess
@@ -455,6 +459,7 @@ def pytest_configure(config) -> None:
     builtins.stage_records_of = stage_records_of
     builtins.kept_test_run = kept_test_run
     builtins.simultaneous_test_runs = simultaneous_test_runs
+    builtins.installed_wheel_record = installed_wheel_record
     builtins.incidence_row_outcome = incidence_row_outcome
     builtins.incidence_row_contract = incidence_row_contract
     builtins.incidence_edge_containment = incidence_edge_containment
@@ -473,6 +478,7 @@ def pytest_unconfigure(config) -> None:
     del builtins.stage_records_of
     del builtins.kept_test_run
     del builtins.simultaneous_test_runs
+    del builtins.installed_wheel_record
     del builtins.incidence_row_outcome
     del builtins.incidence_row_contract
     del builtins.incidence_edge_containment
@@ -682,6 +688,215 @@ def simultaneous_test_runs(*trees: dict[str, str]) -> tuple[tuple[RecordFile, ..
     finally:
         for root in roots:
             shutil.rmtree(root)
+
+
+# The installed package's timing record --------------------------------------
+#
+# A timing record is written by the library, from wherever it is installed:
+# this checkout, or a wheel a consumer installed.  A wheel has no source tree
+# and no git, so the two facts a record states about its origin -- which
+# revision produced it, and where it is written -- are asked of an installation
+# that is not a checkout, which is what `installed_wheel_record` builds.
+
+WHEEL_ROOT = SOURCE_TREE / ".tmp" / "installed-wheels"
+
+INSTALLED_CALL = """\
+import json
+
+from sage.all import ZZ
+from sage_extensions.all import Lattices
+import sage_extensions
+
+lattice = Lattices(ZZ)("U") + Lattices(ZZ)("U") + Lattices(ZZ)([[-2]])
+rows = lattice.stable_orthogonal_group().isotropic_orbit_representatives(1)
+print(json.dumps({
+    "package": sage_extensions.__file__,
+    "cardinality": int(rows.cardinality()),
+}))
+"""
+r"""The timed public orbit call one installed wheel makes, and what it answered.
+
+One stage-timed row on ``L_1 = U + U + <-2>``, whose line orbits are one under
+the discriminant kernel.  The run reports the file the library it imported is a
+file of, so the reader below can refuse a run that reached this checkout
+instead of the installed wheel, and the cardinality the call returned, which is
+what the call is for.
+"""
+
+_CONSUMER_IDENTITY = ("-c", "user.name=consumer", "-c", "user.email=consumer@example.invalid")
+
+_INSTALLED_WHEEL: tuple[Path, Path, str] | None = None
+r"""The installed wheel's directory, the consumer tree it was installed into, and that tree's commit."""
+
+
+def _installed_wheel() -> tuple[Path, Path, str]:
+    r"""A wheel of this checkout, installed into a consumer's own project tree.
+
+    One installation per session, because a wheel is what a consumer installs and
+    building it costs the whole tree: ``pip install --target vendor`` builds the
+    wheel of this checkout's working tree, ``setup.py``'s ``build_py`` writes the
+    revision it was built from into it, and pip puts it where a consumer keeps it.
+
+    The tree around it is a consumer's, not this checkout's: it holds its own
+    ``pyproject.toml`` and its own git repository with a commit of its own, one
+    directory above the ``vendor`` directory the package was installed into.  So
+    the run below has everything that could be mistaken for this library's source
+    -- a project file, a revision, a directory of the library's own name -- and
+    none of it is this library's.
+    """
+    global _INSTALLED_WHEEL
+    if _INSTALLED_WHEEL is not None and _INSTALLED_WHEEL[0].is_dir():
+        return _INSTALLED_WHEEL
+    WHEEL_ROOT.mkdir(parents=True, exist_ok=True)
+    tree = Path(tempfile.mkdtemp(prefix="wheel-", dir=WHEEL_ROOT))
+    installed = tree / "vendor"
+    placed = subprocess.run(
+        (
+            sys.executable, "-m", "pip", "install",
+            "--no-deps", "--no-build-isolation", "--quiet",
+            "--target", str(installed), str(SOURCE_TREE),
+        ),
+        capture_output=True,
+        text=True,
+    )
+    assert placed.returncode == 0, (
+        f"installing a wheel of {SOURCE_TREE} into {installed} failed: {placed.stdout}{placed.stderr}"
+    )
+    _INSTALLED_WHEEL = (installed, tree, _consumer_commit(tree))
+    return _INSTALLED_WHEEL
+
+
+def _consumer_commit(tree: Path) -> str:
+    r"""Give ``tree`` a project file and a git commit of its own, and answer the commit.
+
+    The commit is the revision a record could be misattributed to: the consumer's
+    own, whose code produced none of the wall times.
+    """
+    (tree / "pyproject.toml").write_text('[project]\nname = "consumer"\nversion = "0.0.0"\n')
+    for command in (("init", "--quiet"), ("commit", "--quiet", "--allow-empty", "-m", "the consumer's tree")):
+        completed = subprocess.run(
+            ("git", "-C", str(tree), *_CONSUMER_IDENTITY, *command),
+            capture_output=True,
+            text=True,
+        )
+        assert completed.returncode == 0, (
+            f"preparing the consumer tree at {tree} failed: {completed.stdout}{completed.stderr}"
+        )
+    resolved = subprocess.run(
+        ("git", "-C", str(tree), "rev-parse", "HEAD"), capture_output=True, text=True, check=True
+    )
+    return resolved.stdout.strip()
+
+
+def _records_under(root: Path, pid: int) -> tuple[Path, ...]:
+    r"""The record files under ``root`` that the process ``pid`` wrote, by their own names.
+
+    A record's name ends with the pid of the process that wrote it, so a run's
+    own file is found without reading a line or being told where to look -- which
+    is how a run that wrote outside the directory it was supposed to use is
+    reported rather than passed over.
+    """
+    return tuple(
+        path
+        for path in sorted(root.rglob("*"))
+        if RECORD_NAME.fullmatch(path.name) is not None
+        and _stamp_of(path.name)[1] == str(pid)
+    )
+
+
+@dataclass(frozen=True)
+class InstalledWheelRecord:
+    r"""What one timed call from an installed wheel wrote, and where.
+
+    ``revision`` is this checkout's commit, read here by git so the record is
+    checked against a reader that does not ask the library, and ``consumer`` is
+    the commit of the tree the wheel was installed into, which is the revision a
+    record could be misattributed to; ``commit`` is the revision the record
+    itself names; ``directory`` is the directory the record was found in and
+    ``directory_parts`` its path below the home directory the run was given, so
+    a reader asks whether the record is where its owner keeps its state;
+    ``package`` is the file the run imported the library from, which is the
+    installed wheel's and not this checkout's; ``cardinality`` is what the call
+    returned, and ``records`` are the lines the call appended.
+    """
+
+    revision: str
+    consumer: str
+    commit: str
+    directory: str
+    directory_parts: tuple[str, ...]
+    package: str
+    cardinality: int
+    records: tuple[dict, ...]
+    transcript: str
+
+
+def installed_wheel_record() -> InstalledWheelRecord:
+    r"""One timed public orbit call from a wheel installed out of this checkout.
+
+    The run's environment states nothing about where a record goes: its home
+    directory is a fresh one, so the library resolves the record directory from
+    the home of the user running it -- the process's own owner -- and the record
+    is looked for exactly where that rule puts it,
+    ``<home>/.local/state/sage-extensions/timings``, by the pid of the process
+    that wrote it.  Nothing of this checkout is reachable from the run: its
+    ``PYTHONPATH`` is the installed directory alone, and it is started in the
+    consumer's tree, which holds a ``pyproject.toml`` and a revision of its own
+    that are not this library's.
+    """
+    installed, tree, consumer = _installed_wheel()
+    root = Path(tempfile.mkdtemp(prefix="installed-call-", dir=WHEEL_ROOT))
+    try:
+        home = root / "home"
+        directory = home / ".local" / "state" / "sage-extensions" / "timings"
+        environment = {
+            key: value
+            for key, value in os.environ.items()
+            if key not in ("PYTHONPATH", "PYTHONHOME", "XDG_STATE_HOME")
+        }
+        environment["HOME"] = str(home)
+        environment["PYTHONPATH"] = str(installed)
+        process = subprocess.Popen(
+            (sys.executable, "-c", INSTALLED_CALL),
+            cwd=tree,
+            env=environment,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+        )
+        output, _ = process.communicate()
+        assert process.returncode == 0, (
+            f"the timed orbit call from the installed wheel at {installed} failed: {output}"
+        )
+        answer = json.loads(output.strip().splitlines()[-1])
+        assert Path(answer["package"]).parent.parent == installed, (
+            f"the run imported the library from {answer['package']}, which is not the installed "
+            f"wheel at {installed}: the record read below would be this checkout's, not a wheel's"
+        )
+        assert directory.is_dir(), (
+            f"the call wrote no record directory at {directory}, which is where the record of a "
+            f"package that is not a checkout is kept; what it left instead is "
+            f"{_records_under(tree, process.pid)}: {output}"
+        )
+        written = _records_under(directory, process.pid)
+        assert len(written) == 1, (
+            f"the call left {len(written)} record files in {directory}, whose process was "
+            f"{process.pid}: {output}"
+        )
+        records = sage_timing.read_stage_records(written[0])
+        return InstalledWheelRecord(
+            revision=_head_commit(),
+            consumer=consumer,
+            commit=records[0]["commit"],
+            directory=str(directory),
+            directory_parts=directory.relative_to(home).parts,
+            package=answer["package"],
+            cardinality=answer["cardinality"],
+            records=records,
+            transcript=output,
+        )
+    finally:
+        shutil.rmtree(root)
 
 
 # The Coble acceptance drivers ------------------------------------------------
