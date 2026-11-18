@@ -333,6 +333,25 @@ pairs over 189 720 plane cusps is exactly three a plane.  The line-cusp coverage
 -- that all 527 are met -- is the one clause no measurement of a partial row
 decides.
 
+**The two coverage clauses are read before the printing that kills the run.**
+`row_contract` prints every cusp's coordinates first
+(`coble_gamma_co_2_incidence_rows.py:445-448`) and only then walks the edges for
+its clauses, so on a kernel-sized row the host's killer takes the verdict before
+it is computed.  The probe now reads the two clauses itself, with the driver's own
+position maps (`cusp_positions`, `coble_gamma_co_2_incidence_rows.py:347`),
+immediately after the relation returns:
+
+```
+the coverage: 1 of 1 line cusps and 1 of 1 plane cusps carry an edge, 0 edges name a cusp outside the row
+the line-cusp coverage clause: HOLDS (1 of 1)
+the plane-cusp coverage clause: HOLDS (1 of 1)
+[Otilde] decided: 1 edges over 1 line cusps and 1 plane cusps
+```
+
+on `6JRS`, where the driver's own verdict agrees (`coverage-6jrs.log`).  The
+kernel rows are read the same way on the next run, so the line-cusp clause no
+longer waits on 800 s of printing.
+
 **Why the counts have to be computed and cannot be extrapolated.**  The edge
 count is not a fixed multiple of the plane count.  On `U + U(2) + <-2>` both
 kernel rows decide **4 edges over 3 line cusps and 2 plane cusps** -- two edges a
