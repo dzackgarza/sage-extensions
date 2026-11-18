@@ -429,3 +429,19 @@ strong approximation for `\operatorname{Spin}(I_{2,9})` with its hypotheses and 
 page, in the form that gives surjectivity onto the level-four quotient. Every other step of
 the fork is decided here; that citation is not, and without it the 54-versus-55 question
 stays open by exactly this much.
+
+The citation this needs, and how far a search got. The theorem is Kneser's strong
+approximation (`[Kne66]`, *Starke Approximation in algebraischen Gruppen*, J. Reine Angew.
+Math.), which is applied to lattices in exactly this way in the opening pages of
+G. Chenevier, *Statistics for Kneser p-neighbours*, arXiv:2104.06846, where the reduction
+is stated as: strong approximation plus a single spinor genus in the genus gives the
+transitivity of the isometry class under the local data, and the paper notes that its
+Theorem 7.10 covers odd unimodular lattices as well. For `M = I_{2,9}` the genus is a single
+class (odd unimodular lattices are determined by rank and signature), so the spinor genus
+is one too.
+
+What is still missing is not the reference but the statement in the form used here:
+surjectivity of `O(M)(Z)` onto `O(M)(Z_2)` modulo the level-eight subgroup, i.e. through the
+double cover `\operatorname{Spin}(M)\to O(M)` with the component group accounted for. That
+is the one input this repository does not carry, and the level-four 54-versus-55 question
+waits on it.
