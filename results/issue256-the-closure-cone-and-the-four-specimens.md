@@ -510,3 +510,31 @@ left for `surgery`, `symington_surgery` and `basis_triangle_surgery` is their bo
 with `subspace` on the complement named by `from_predicate`, glue with the coproduct and the
 coequalizer, read the singular locus off the identified boundary, and restrict the two
 atlases along the regluing.
+
+## 17. The surgery's result has no specimen: a real surface has no points
+
+§16 left the three bodies as construction.  Writing `surgery` showed that the construction
+cannot be *decided*, because its result cannot be built at all on this tree:
+
+```
+$ sage -c "from sage_extensions.categories.manifolds import SmoothManifolds; ...
+           SmoothManifolds()(2, 'R^2')((1, 2))"
+ValueError: cannot give a point of 2-dimensional smooth manifold R^2 by its coordinates:
+            the manifold has no chart to read them in
+```
+
+A smooth manifold built by `SmoothManifolds()(dimension, name)` has no chart, so it has no
+points.  Every step of a surgery needs them: the cut `X - int(region)` is a subspace, and
+`TopologicalSpaces.subspace` (§12) is stated on a finite enumerated set of points; the
+coequalizer of the coproduct (`topological_spaces.py:680`, `:683`) is computed on point
+sets; and the singular locus of the result is the image of the identified boundary, which is
+a set of points of the surface.  The integral-affine side is the same: an atlas records
+chart domains and chart maps and never evaluates them, so a specimen can be *stated* without
+points, but a surgery cannot be *run* without them.
+
+So the three methods are named, once more and at the level that blocks them: **a point of a
+smooth manifold**.  The failing expression is above; the owner is `categories/manifolds.py`,
+whose manifolds are built without a chart and therefore without an element constructor for
+their points.  The atlas test that this issue's vertex work rests on already records the
+same limit for chart values ("a point of a real smooth manifold cannot be built in this
+tree"), and landings since then -- including #97 -- have not removed it.
