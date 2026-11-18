@@ -119,3 +119,19 @@ def test_the_hodge_diamond_of_p2_is_diagonal() -> None:
 def test_p1_times_p1_has_h11_equal_to_two() -> None:
     r"""``h^{1,1}(P^1 x P^1) = b_2 = 2`` by Künneth."""
     assert _p1_times_p1().hodge_structure().hodge_number(1, 1) == 2
+
+
+def test_the_rays_and_maximal_cones_of_the_projective_plane_are_the_projective_space_fan() -> None:
+    r"""``e_1, e_2, -e_1 - e_2`` with the consecutive pairs as maximal cones is the fan of ``P^2`` (Cox--Little--Schenck, Example 3.1.10)."""
+    plane = _projective_plane()
+    fans = RationalPolyhedralFans(ZZ.free_module(2))
+
+    assert plane.fan().is_isomorphic(fans.projective_space_fan())
+
+
+def test_the_rays_and_maximal_cones_of_p1_times_p1_are_the_hirzebruch_surface_fan_of_twist_zero() -> None:
+    r"""``±e_1, ±e_2`` with the consecutive pairs as maximal cones is the fan of ``F_0 = P^1 x P^1`` (Cox--Little--Schenck, Example 3.1.16)."""
+    quadric = _p1_times_p1()
+    fans = RationalPolyhedralFans(ZZ.free_module(2))
+
+    assert quadric.fan().is_isomorphic(fans.hirzebruch_surface_fan(0))
