@@ -74,7 +74,31 @@ generator.
   the registry's record per span:    EQUAL
 ```
 
-(`slice-200b.log`.)  Through the driver on `U + U(2) + <-2>` the two trees print
+(`slice-200b.log`.)  Both rows then go through the library's own
+`tits_building_incidence_by_divided_classes` -- the subgroup's `cusps(2)` cache
+is cleared and seeded with the slice, and the seed is checked -- and the two
+relations are compared edge by edge, by the pair of cusp positions each names
+(positions resolved by span, since the two rows are equal spans and not shared
+objects) and by the divided-class witness each record carries (`slice-wt2.log`,
+`d89dc76`, clean tree):
+
+```
+  edges: gathered 600, streamed 600
+  unresolved vertices: gathered 0, streamed 0
+  the two relations' endpoint pairs: EQUAL
+  the two relations' witnesses:      EQUAL
+  distinct endpoint pairs: 600 of 600
+  plane cusps carrying an edge: 200 of 200
+  line cusps carrying an edge:  202 of 527
+```
+
+Three edges a plane, as the row's one covering has three lines; every plane cusp
+of the slice carries an edge; 202 of the row's 527 line cusps are met by these
+200 planes (the whole row must meet all 527, which is the contract's own clause
+and is what the 189720-plane run checks).  The two relations are one relation,
+down to the witnesses, so the streamed row is the row the gathered one was.
+
+Through the driver on `U + U(2) + <-2>` the two trees print
 the same relation: `Otilde` and `Otilde+` each 4 edges over 3 line and 2 plane
 cusps, and the four endpoint pairs `L0 < P0`, `L2 < P0`, `L0 < P1`, `L1 < P1`
 line for line (`smoke-parent-1.log`, `smoke-new.log`).  The cusp *coordinates*
@@ -99,6 +123,11 @@ the carried set is the divided class of a line and `A_L = (Z/2)^11` on `T_Co`
 has 2048 classes, so the whole row asks about at most 2048 distinct class sets.
 The answer is now recorded under the rendering the walk already compares by
 (`str`), which turns 569160 walks into at most 2048.
+
+On the 200-plane slice the record holds **527 class sets after each relation**,
+which is the number of line cusps the relation indexes -- the two relations
+together added no walk to those.  The rows' own relation times are the measure
+of what the record is worth at length, and they are in the logs of section 5.
 
 ## 5. What was run, and what was not
 
