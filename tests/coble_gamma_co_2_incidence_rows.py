@@ -259,10 +259,15 @@ def edge_violation(lattice, subgroup, incidence, *, include_coordinates=False):
             return violation, line_coordinates, plane_coordinates
         return transport_violation(lattice, subgroup, incidence), line_coordinates, plane_coordinates
     finally:
-        # A certificate keeps its checked basis and exact transporters.
-        # Inspecting all 569160 Coble kernel edges must not retain one
-        # reconstructed flag/subobject-parent graph per inspected edge.
-        incidence.release_flag()
+        # A certificate that reconstructs its flag from a retained basis
+        # releases the reconstruction here; inspecting all 569160 Coble
+        # kernel edges must not retain one rebuilt flag/subobject-parent
+        # graph per inspected edge.  A certificate that holds the flag it was
+        # built with (`CuspIncidence`, the ambient group's) has nothing to
+        # release and keeps it.
+        release = getattr(incidence, "release_flag", None)
+        if release is not None:
+            release()
 
 
 def line_datum_key(quotient, cusp):
