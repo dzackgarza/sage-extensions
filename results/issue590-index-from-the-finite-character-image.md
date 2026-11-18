@@ -40,10 +40,15 @@ coset count there.
 $ python -m pytest -o addopts= -p qc_sage_session -p sage_extensions.testing.suite_budget \
     -p sage_extensions.testing.test_lint --durations=0 \
     tests/lattices/test_the_index_of_a_finite_character_subgroup.sage
-5 passed in 20.14s
- 9.49s the Coble index   2.07s A_2   0.60s the generic subgroups
- 0.51s U(2)              0.20s the four hypotheses
+5 passed in 13.32s
+ 9.13s the Coble index   0.40s U(2)   0.26s A_2
+ 0.05s the generic subgroups   0.01s the four hypotheses
 ```
+
+That run is on the tree this file is committed on.  The same file ran at 20.14 s
+on the tree two rebases back (`8e84152` plus these commits), with the same five
+passes and the same order of costs; the whole-machine load differs run by run.
+The consumer files below were compared at `8e84152`.
 
 The consumer files were run on this tree and on a clean worktree at the same
 base commit `8e84152`, to compare failure sets rather than counts.  Both runs
