@@ -435,6 +435,19 @@ clauses, and its own projection was 5 156 MiB at the end: the host's ceiling sit
 between the two, so the row's projection is now the tight bound that decides
 completion rather than the row's own cost.
 
+**The one change that would cut the peak is in a loop another session is
+editing today.**  Releasing a plane's lift as the walk passes it would take the
+relation's rise off the peak -- the registry is >=1.67 GiB of the row and the
+relation adds ~900 MiB on top of the split's end -- bringing the projection from
+5 156 MiB to about 3.5 GiB, under both the 4 GiB clause and this host's ceiling.
+The release belongs at the end of the edge loop's per-plane body
+(`predicate_subgroups.py:1422`), and that loop has been rewritten twice today by
+another issue's work: `bebcacc` at 07:38 ("expose certified Coble stable kernel
+generating resolutions") and `4b43ef5` at 09:56 ("the plane row reads its lift by
+the span its cusp holds", which replaced the loop's object comparison with
+`span != reference_span`).  Writing into it now would collide with a change in
+flight, so it is named here rather than landed.
+
 **Why the counts have to be computed and cannot be extrapolated.**  The edge
 count is not a fixed multiple of the plane count.  On `U + U(2) + <-2>` both
 kernel rows decide **4 edges over 3 line cusps and 2 plane cusps** -- two edges a
