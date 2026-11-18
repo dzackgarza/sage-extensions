@@ -151,6 +151,12 @@ def test_a_stored_sterk2_polygon_vertex_indexes_its_chart() -> None:
     assert polygon.dimension() == 2
     assert polygon.normalized_volume() == 820
 
+    # The path has eighteen labelled points and the hull seventeen vertices: the
+    # repeated point is one point of the path that is not a vertex of its own,
+    # so the hull, not the path, decides which points index charts.
+    assert tuple(path) == tuple(f"p_{step}" for step in range(18))
+    assert polygon.n_vertices() == 17
+
     end = lattice((-24, 0))
     apex = lattice((-12, 26))
     assert end in polygon.vertices()
@@ -179,3 +185,13 @@ def test_a_stored_sterk2_polygon_vertex_indexes_its_chart() -> None:
     assert apex_chart in AffineSchemes(QQ)
     assert apex_chart.coordinate_algebra() not in SymmetricAlgebras(QQ)
     assert apex_chart.coordinate_algebra().algebra_generating_set().cardinality() == 5
+
+    # The chart of a vertex is the atlas entry at that vertex's cone, on this
+    # variety too: the cone the supporting normals span is a cone of this
+    # variety's fan and its chart is the chart the atlas enumerates there.
+    cover = variety.affine_cover()
+    for vertex, cone in ((end, end_cone), (apex, apex_cone)):
+        chart = variety.vertex_chart(vertex)
+        assert cone in variety.fan()
+        assert cover.enumeration()(cone) is chart
+        assert cover.enumeration_inverse()(chart) == cone
