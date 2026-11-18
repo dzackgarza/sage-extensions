@@ -29,6 +29,14 @@ def _hyperbolic_line():
     return lattice, HyperbolicSpaces(1)(component), root
 
 
+def _hyperbolic_plane():
+    r"""Return ``I_{1,2}``, its hyperboloid ``HH^2`` through ``e_0``, and the root ``e_1``."""
+    lattice = Lattices.IPQ(1, 2)
+    timelike, root, _second = lattice.module_generators()
+    component = PositiveConeComponents(lattice).component_through(timelike)
+    return lattice, HyperbolicSpaces(2)(component), root
+
+
 def test_an_arrow_of_hyperbolic_spaces_is_built_from_an_integral_isometry_of_their_lattice() -> None:
     r"""The reflection in the root is an isometry of the lattice, and it is an arrow of ``Mor(HH^1, HH^1)``."""
     lattice, space, root = _hyperbolic_line()
@@ -68,6 +76,28 @@ def test_a_hyperbolic_arrow_moves_a_point_by_the_isometry_that_induces_it() -> N
 
     assert reflection(point) == space((-half,))
     assert reflection(reflection(point)) == point
+
+
+def test_a_hyperbolic_arrow_of_a_higher_dimensional_space_negates_one_coordinate() -> None:
+    r"""On ``HH^2`` of ``I_{1,2}``, the reflection in ``e_1`` sends ``(y_1, y_2)`` to ``(-y_1, y_2)``.
+
+    The chart ``hyperboloid`` writes a point of ``HH^2`` as ``x = s e_0 + y_1 e_1
+    + y_2 e_2`` with ``s = sqrt(1 + y_1^2 + y_2^2)``, since ``e_0`` is the
+    timelike vector of the component and ``e_1, e_2`` an orthogonal basis of its
+    perpendicular.  The reflection in the root ``e_1`` fixes ``e_0`` and ``e_2``
+    and negates ``e_1``, so it leaves ``s`` and ``y_2`` alone and negates
+    ``y_1`` -- and because the vector it produces still pairs positively with
+    ``e_0``, no sign is taken.
+    """
+    lattice, space, root = _hyperbolic_plane()
+    reflection = space.category().Mor(space, space)(lattice.reflection(root))
+    third = RR(1) / RR(3)
+    fifth = RR(1) / RR(5)
+    point = space((third, fifth))
+
+    assert reflection(point) == space((-third, fifth))
+    assert reflection(reflection(point)) == point
+    assert space.dimension() == 2
 
 
 def test_an_arrow_of_hyperbolic_spaces_may_have_a_different_codomain() -> None:
