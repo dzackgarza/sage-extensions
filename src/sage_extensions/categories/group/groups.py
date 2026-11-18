@@ -2980,6 +2980,239 @@ def _coxeter_catalogue(data, base_ring=None):
     return _coxeter_group(_coxeter_matrix_datum(data), base_ring=base_ring)
 
 
+def _coxeter_integer_rows(coxeter_matrix):
+    r"""The rows of an owned Coxeter matrix as integers, \(\aleph_0\) written ``None``.
+
+    The vertices are the first coordinates of the family's pairs, in the order
+    the family lists them, so a row position is a vertex of the matrix.
+    \(m_{vw}\) is the order of \(s_vs_w\): a positive integer, or
+    \(\aleph_0\) for a pair of infinite order.
+    """
+    values = {(pair[0], pair[1]): value for pair, value in coxeter_matrix.items()}
+    vertices = tuple(dict.fromkeys(left for left, _right in values))
+    return tuple(
+        tuple(
+            None if values[left, right].is_countably_infinite() else int(values[left, right])
+            for right in vertices
+        )
+        for left in vertices
+    )
+
+
+def _coxeter_bond_orders(rows):
+    r"""The orders \(m_{vw}>1\) of the pairs of distinct vertices of ``rows``."""
+    return tuple(m for row in rows for m in row if m is not None and m > 1)
+
+
+def _coxeter_representation(rows, field_order):
+    r"""The Gram matrix and the simple reflections of ``rows`` over \(\mathbb{Q}(\zeta_L)\).
+
+    \(B(e_v,e_v)=1\) and \(B(e_v,e_w)=-\cos(\pi/m_{vw})\), and the simple
+    reflection is \(s_v\colon x\mapsto x-2B(x,e_v)e_v\), so \(s_v(e_v)=-e_v\)
+    and \(s_v(e_w)=e_w-2B(e_v,e_w)e_v\).  That is the geometric representation
+    of the Coxeter system (Humphreys, *Reflection groups and Coxeter groups*,
+    §5.3).  \(L\) is a multiple of every \(2m_{vw}\), so
+    \(\cos(\pi/m_{vw})=(\zeta_L^{L/2m}+\zeta_L^{-L/2m})/2\) is exact in
+    \(\mathbb{Q}(\zeta_L)\).  An infinite bond has the parallel boundary value
+    \(\cos(\pi/\aleph_0)=-1\), which is the normalization
+    ``CoxeterDiagrams.schlafli_tensor`` also uses for a bond without a root
+    Gram.
+    """
+    from sage.all import CyclotomicField, matrix as sage_matrix
+
+    field = CyclotomicField(field_order)
+    zeta = field.gen()
+    size = len(rows)
+    gram = sage_matrix(field, size, size)
+    for left in range(size):
+        gram[left, left] = field(1)
+        for right in range(size):
+            if left == right:
+                continue
+            m = rows[left][right]
+            cosine = (
+                field(1)
+                if m is None
+                else (zeta ** (field_order // (2 * m)) + zeta ** (-(field_order // (2 * m)))) / 2
+            )
+            gram[left, right] = -cosine
+    reflections = []
+    for left in range(size):
+        reflection = sage_matrix(field, size, size, lambda row, column: 1 if row == column else 0)
+        for right in range(size):
+            reflection[left, right] = -2 * gram[left, right]
+        reflection[left, left] = -1
+        reflections.append(reflection)
+    return gram, tuple(reflections)
+
+
+def _matrix_multiplicative_order(matrix):
+    r"""The order of a matrix known to have finite order.
+
+    The caller has already decided that the subsystem is finite, where the
+    Coxeter element has finite order (Bourbaki, *Groupes et algèbres de Lie*
+    V, §6.2, Thm. 1 (ii): the Coxeter element is of order the Coxeter number).
+    """
+    identity = matrix**0
+    power = identity
+    order = 1
+    while True:
+        power = power * matrix
+        if power == identity:
+            return order
+        order += 1
+
+
+def _coxeter_degrees(rows):
+    r"""The degrees \(d_1,\dots,d_n\) of a finite Coxeter group of the matrix ``rows``.
+
+    The eigenvalues of the Coxeter element \(c=s_{v_1}\cdots s_{v_n}\) on the
+    reflection representation are \(\zeta_h^{m_i}\) for the exponents
+    \(m_1,\dots,m_n\), and the degrees are \(d_i=m_i+1\), the sum
+    \(\sum_i(d_i-1)\) being the number of positive roots; \(h\) is the order
+    of \(c\) and the largest degree (Bourbaki, *Groupes et algèbres de Lie* V,
+    §6.2, Thm. 1; Humphreys, *Reflection groups and Coxeter groups*, §3.19).
+    The exponents are read from the power sums
+    \(\operatorname{tr}(c^k)=\sum_i\zeta_h^{m_ik}\) by the discrete Fourier
+    transform on \(\mathbb{Z}/h\), so the degrees of a subgroup whose Coxeter
+    matrix is not of finite type cannot be read off this way: its Coxeter
+    element has infinite order.
+    """
+    from math import lcm
+
+    size = len(rows)
+    if size == 0:
+        return ()
+    bond_orders = _coxeter_bond_orders(rows)
+    field_order = lcm(*(2 * m for m in bond_orders), 1)
+    _gram, reflections = _coxeter_representation(rows, field_order)
+    coxeter_element = reflections[0]**0
+    for reflection in reflections:
+        coxeter_element = reflection * coxeter_element
+    coxeter_number = _matrix_multiplicative_order(coxeter_element)
+    extended = lcm(field_order, coxeter_number)
+    if extended != field_order:
+        _gram, reflections = _coxeter_representation(rows, extended)
+        coxeter_element = reflections[0]**0
+        for reflection in reflections:
+            coxeter_element = reflection * coxeter_element
+    field = coxeter_element.parent().base_ring()
+    zeta_of_order = field.gen() ** (extended // coxeter_number)
+    power = coxeter_element**0
+    traces = []
+    for _exponent in range(coxeter_number):
+        traces.append(power.trace())
+        power = power * coxeter_element
+    degrees = []
+    for exponent in range(coxeter_number):
+        total = sum(
+            (traces[k] * zeta_of_order ** (-exponent * k) for k in range(coxeter_number)),
+            field(0),
+        )
+        multiplicity = QQ(total / coxeter_number)
+        assert multiplicity.denominator() == 1 and multiplicity >= 0, (
+            f"{multiplicity} is not a multiplicity of an eigenvalue of the Coxeter element of the "
+            f"Coxeter matrix {rows}: the eigenvalues are roots of unity only for a matrix of finite type"
+        )
+        count = int(multiplicity)
+        assert exponent != 0 or count == 0, (
+            f"the Coxeter element of the Coxeter matrix {rows} has the eigenvalue 1, so this is not "
+            f"the reflection representation of a finite Coxeter group with degrees"
+        )
+        degrees.extend([exponent + 1] * count)
+    assert len(degrees) == size, (
+        f"the Coxeter element of {rows} has {len(degrees)} eigenvalues, not the {size} of its "
+        f"reflection representation: {sorted(degrees)}"
+    )
+    return tuple(sorted(degrees))
+
+
+def _coxeter_parabolic_is_finite(rows, positions):
+    r"""Whether the standard parabolic subsystem of ``rows`` on ``positions`` is finite.
+
+    \(W_J\) is finite exactly when the induced subdiagram is elliptic, that is
+    when the Schläfli form of the subdiagram is positive definite
+    (``CoxeterDiagrams.is_elliptic``); the empty subset is the trivial group.
+    """
+    if not positions:
+        return True
+    from sage.rings.infinity import Infinity
+
+    from sage_extensions.categories.coxeter_diagrams import CoxeterDiagrams
+
+    subdiagram_rows = [
+        [Infinity if rows[left][right] is None else rows[left][right] for right in positions]
+        for left in positions
+    ]
+    return bool(CoxeterDiagrams()(subdiagram_rows).is_elliptic())
+
+
+def _coxeter_spherical_subsets(rows):
+    r"""The nerve of ``rows``: the position subsets whose parabolic subgroup is finite.
+
+    The nerve is a simplicial complex on the vertices, so the subsets are
+    listed smallest first, together with the empty subset.
+    """
+    size = len(rows)
+    return tuple(
+        subset
+        for cardinality in range(size + 1)
+        for subset in combinations(range(size), cardinality)
+        if _coxeter_parabolic_is_finite(rows, subset)
+    )
+
+
+def _coxeter_growth_series_polynomials(rows):
+    r"""The numerator and denominator of the growth series \(W(t)=\sum_w t^{l(w)}\).
+
+    Steinberg's formula writes the reciprocal of the growth series as a sum over
+    the nerve \(N\) of the finite parabolic subsystems,
+    \(\frac{1}{W(t)}=\sum_{J\in N}\frac{(-1)^{|J|}\,t^{l(w_0^J)}}{W_J(t)}\),
+    where \(w_0^J\) is the longest element of the finite parabolic \(W_J\) and
+    \(W_J(t)\) is its Poincaré polynomial (Steinberg, *Endomorphisms of linear
+    algebraic groups*, Mem. Amer. Math. Soc. 80 (1968), Cor. 1.29, and
+    Charney–Davis, *Reciprocity of growth functions of Coxeter groups*,
+    Geom. Dedicata 39 (1991) 373–378, Lemma 1 and formula (4) of Lemma 2).
+    Solomon's product writes \(W_J(t)=\prod_i\frac{1-t^{d_i}}{1-t}\) over the
+    degrees \(d_i\) of \(W_J\), the Poincaré polynomial of a finite Coxeter
+    group (Solomon, *The orders of the finite Chevalley groups*, J. Algebra 3
+    (1966) 376–402); the exponent \(l(w_0^J)=\sum_i(d_i-1)\) is the number of
+    positive roots of \(W_J\) (Bourbaki, *Groupes et algèbres de Lie* V, §6.2).
+    """
+    from sage.all import FractionField, PolynomialRing as sage_polynomial_ring
+
+    presentation = sage_polynomial_ring(ZZ, "t")
+    series_field = FractionField(presentation)
+    t = presentation.gen()
+    reciprocal = series_field.zero()
+    for subset in _coxeter_spherical_subsets(rows):
+        subdiagram_rows = [[rows[left][right] for right in subset] for left in subset]
+        degrees = _coxeter_degrees(subdiagram_rows)
+        longest = sum(degree - 1 for degree in degrees)
+        term = series_field(t**longest * (1 - t) ** len(subset))
+        for degree in degrees:
+            term /= 1 - t**degree
+        reciprocal += (-1) ** len(subset) * term
+    series = reciprocal**-1
+    return series.numerator(), series.denominator()
+
+
+def _owned_integer_polynomial(presentation, variable, polynomial):
+    r"""The owned polynomial of an engine polynomial's integer coefficients.
+
+    A private engine polynomial is not an owned object, so its coefficients are
+    read once here and raised through the owned polynomial ring.
+    """
+    result = presentation.zero()
+    for degree, coefficient in enumerate(polynomial.coefficients(sparse=False)):
+        assert QQ(coefficient).denominator() == 1, (
+            f"{polynomial} has the non-integral coefficient {coefficient}, so it is not the "
+            f"numerator or denominator of a growth series"
+        )
+        if coefficient:
+            result += presentation(int(coefficient)) * variable**degree
+    return result
+
 
 # --------------------------------------------------------------------------
 # Subgroup inclusions and the Mor packet.
@@ -8077,6 +8310,276 @@ class CoxeterGroups(OwnedCategory):
         def coxeter_matrix(self):
             r"""The Coxeter matrix ``m: V x V -> Card`` this group was built from."""
             return self._selected_coxeter_matrix
+
+        def _cayley_layers(self, target=None):
+            r"""Breadth-first search of the Cayley graph of the simple system from the identity.
+
+            The result maps each element reached to its length and to the pair
+            (predecessor, generating position) by which it was reached.  With
+            ``target`` the search stops when the target is reached, and without
+            it the search exhausts the group, which is what a finite group
+            allows.  Each layer is the set of elements of one length, so the
+            search decides the word length of every element it reaches.
+            """
+            generators = tuple(self.group_generators())
+            identity = self.one()
+            reached = {identity: (0, None)}
+            if target is not None and target == identity:
+                return reached
+            frontier = [identity]
+            length = 0
+            while frontier:
+                length += 1
+                following = []
+                for element in frontier:
+                    for position, generator in enumerate(generators):
+                        image = generator * element
+                        if image in reached:
+                            continue
+                        reached[image] = (length, (element, position))
+                        following.append(image)
+                        if target is not None and image == target:
+                            return reached
+                frontier = following
+            return reached
+
+        def word_length(self, element):
+            r"""Return the length of ``element`` as a word in the simple system.
+
+            The length is the least number of simple reflections whose product
+            is the element, which the breadth-first search of the Cayley graph
+            of the simple system decides: every element of one layer of that
+            search is of one length and no element is reached twice.
+
+            EXAMPLES::
+
+                sage: W = Groups.Coxeter(["A", 2])
+                sage: s, t = tuple(W.group_generators())
+                sage: W.word_length(s * t * s)
+                3
+                sage: W.word_length(W.one())
+                0
+            """
+            from sage_extensions.categories.sets.cardinals import cardinal
+
+            assert element_parent(element) is self, (
+                f"the word length of {element} in the simple system of {self} is defined only for "
+                f"an element of {self}"
+            )
+            reached = self._cayley_layers(element)
+            assert element in reached, (
+                f"{element} is not reached by the Cayley graph search of {self}"
+            )
+            return cardinal(reached[element][0])
+
+        def reduced_word(self, element):
+            r"""Return one reduced word of ``element``, as a finite family of simple reflections.
+
+            A reduced word is a sequence of simple reflections of the length of
+            the element whose product is the element.  The sequence is read off
+            the layer in which the Cayley graph search first reached
+            ``element``, so its length is :meth:`word_length` and its product
+            is ``element``.
+
+            EXAMPLES::
+
+                sage: W = Groups.Coxeter(["A", 2])
+                sage: s, t = tuple(W.group_generators())
+                sage: a, b, c = tuple(W.reduced_word(s * t * s))
+                sage: a * b * c == s * t * s
+                True
+            """
+            from sage_extensions.categories.sets.indexed_families import (
+                finite_indexed_family_from_values,
+            )
+
+            assert element_parent(element) is self, (
+                f"a reduced word of {element} in the simple system of {self} is defined only for an "
+                f"element of {self}"
+            )
+            generators = tuple(self.group_generators())
+            reached = self._cayley_layers(element)
+            assert element in reached, (
+                f"{element} is not reached by the Cayley graph search of {self}"
+            )
+            letters = []
+            node = element
+            while reached[node][1] is not None:
+                previous, position = reached[node][1]
+                letters.append(generators[position])
+                node = previous
+            letters.reverse()
+            return finite_indexed_family_from_values(None, tuple(letters))
+
+        def longest_element(self):
+            r"""Return the longest element \(w_0\) of a finite Coxeter group.
+
+            Every finite Coxeter group has exactly one element of greatest
+            length, and that length is the number of positive roots
+            \(\sum_i(d_i-1)\) of :meth:`degrees`; \(w_0\) sends every simple
+            reflection to a simple reflection, so \(w_0s_vw_0\) is again a
+            simple reflection.  The search is over the elements of the group.
+
+            EXAMPLES::
+
+                sage: W = Groups.Coxeter(["A", 2])
+                sage: W.word_length(W.longest_element())
+                3
+            """
+            if self not in OwnedFiniteGroups():
+                raise ValueError(
+                    f"a longest element exists in a finite Coxeter group, and {self} is not known to "
+                    f"be finite"
+                )
+            reached = self._cayley_layers()
+            longest = max(length for length, _step in reached.values())
+            elements = [element for element, (length, _step) in reached.items() if length == longest]
+            assert len(elements) == 1, (
+                f"{self} has {len(elements)} elements of length {longest}, but a finite Coxeter group "
+                f"has one longest element"
+            )
+            return elements[0]
+
+        @cached_method
+        def _growth_series_polynomials(self):
+            r"""The numerator and denominator of the growth series, as engine polynomials over the integers."""
+            return _coxeter_growth_series_polynomials(self._integer_rows())
+
+        def _integer_rows(self):
+            r"""The rows of the retained Coxeter matrix, in the order of its vertices, \(\aleph_0\) as ``None``."""
+            return _coxeter_integer_rows(self.coxeter_matrix())
+
+        def degrees(self):
+            r"""Return the degrees of the invariant ring of a finite Coxeter group.
+
+            The ring of invariants \(k[V]^W\) of the reflection representation is
+            a polynomial ring on \(n\) homogeneous generators, of degrees
+            \(d_1,\dots,d_n\) (Chevalley, *Invariants of finite groups generated
+            by reflections*, Amer. J. Math. 77 (1955); Shephard–Todd, *Finite
+            unitary reflection groups*, Canad. J. Math. 6 (1954)).  Their
+            product is \(|W|\) and \(\sum_i(d_i-1)\) is the number of positive
+            roots, so the multiset repeats degrees for a product of isometric
+            factors.  They are read off the eigenvalues of the Coxeter element
+            of the retained Coxeter matrix, which is why the group must be
+            finite.
+
+            EXAMPLES::
+
+                sage: Groups.Coxeter(["A", 2]).degrees()
+                (2, 3)
+                sage: Groups.Coxeter(["H", 3]).degrees()
+                (2, 6, 10)
+            """
+            from sage_extensions.categories.sets.cardinals import cardinal
+
+            rows = self._integer_rows()
+            if not _coxeter_parabolic_is_finite(rows, tuple(range(len(rows)))):
+                raise ValueError(
+                    f"the degrees are those of the polynomial ring k[V]^W, which exists for a finite "
+                    f"Coxeter group, and the Coxeter diagram of {self} is not elliptic: {self} is "
+                    f"infinite"
+                )
+            return tuple(cardinal(degree) for degree in _coxeter_degrees(rows))
+
+        def poincare_series(self):
+            r"""Return the Poincaré (growth) series \(\sum_w t^{l(w)}\) as a rational function.
+
+            The series is a rational function of \(t\), and Steinberg's formula
+            gives its reciprocal as the alternating sum over the finite
+            parabolic subsystems of the nerve (see
+            :func:`_coxeter_growth_series_polynomials`); for finite \(W\) the
+            sum is Solomon's product \(\prod_i\frac{1-t^{d_i}}{1-t}\), so the
+            series is a polynomial with \(W(1)=|W|\).
+
+            EXAMPLES::
+
+                sage: W = Groups.Coxeter(["A", 2])
+                sage: W.poincare_series().numerator()
+                t^3 + 2*t^2 + 2*t + 1
+                sage: W.poincare_series().denominator()
+                1
+                sage: Groups.Coxeter([[1, -1], [-1, 1]]).poincare_series().denominator()
+                -t + 1
+            """
+            from sage_extensions.categories.rings.ring_foundation import _owned_integers
+
+            presentation = _owned_integers().polynomial_ring("t")
+            variable = presentation.algebra_generator("t")
+            field = presentation.fraction_field()
+            numerator, denominator = self._growth_series_polynomials()
+            return field(_owned_integer_polynomial(presentation, variable, numerator)) / field(
+                _owned_integer_polynomial(presentation, variable, denominator)
+            )
+
+        def euler_characteristic(self):
+            r"""Return \(\chi(W)=1/W(1)\), the value of the reciprocal growth series at \(1\).
+
+            \(\frac{1}{W(t)}=\sum_{J}\frac{(-1)^{|J|}t^{l(w_0^J)}}{W_J(t)}\) at
+            \(t=1\) is \(\sum_J(-1)^{|J|}/|W_J|\), the orbihedral Euler
+            characteristic of the chamber complex of the Coxeter system, the
+            alternating sum of the cells of the quotient by their stabilizers.
+            For a finite group it is \(1/|W|\) (Charney–Davis, *Reciprocity of
+            growth functions of Coxeter groups*, Geom. Dedicata 39 (1991)
+            373–378, Lemma 2 and formula (7), after Serre, *Cohomologie des
+            groupes discrets*, in Prospects in Mathematics, Ann. of Math.
+            Studies 70, Princeton Univ. Press, 1971, Prop. 17).
+
+            EXAMPLES::
+
+                sage: Groups.Coxeter(["A", 2]).euler_characteristic()
+                1/6
+                sage: Groups.Coxeter([[1, -1], [-1, 1]]).euler_characteristic()
+                0
+            """
+            numerator, denominator = self._growth_series_polynomials()
+            value = numerator(ZZ(1))
+            if value == 0:
+                raise ValueError(
+                    f"the growth series of {self} vanishes at t = 1, so its reciprocal has no value "
+                    f"there"
+                )
+            return _owned_engine_element(QQ, QQ(denominator(ZZ(1))) / QQ(value))
+
+        def growth_rate(self):
+            r"""Return the growth rate of the simple system, the reciprocal of the radius of convergence.
+
+            The growth series has nonnegative coefficients, so by Pringsheim's
+            theorem its radius of convergence \(R\) is a positive real pole of
+            it, and the growth rate is \(1/R\), the least positive real root of
+            the denominator of the series.  A finite group has growth rate
+            \(1\) and an affine one \(1\), while a cocompact hyperbolic Coxeter
+            group has a growth rate that is a Salem number (Parry, *Growth
+            series of Coxeter groups and Salem numbers*, 1990, as quoted by
+            Kellerhals–Kolpakov, *The minimal growth rate of cocompact Coxeter
+            groups in hyperbolic 3-space*, Canad. J. Math. 66 (2014) 354–372).
+
+            EXAMPLES::
+
+                sage: Groups.Coxeter(["A", 2]).growth_rate()
+                1
+                sage: Groups.Coxeter([[1, 3], [3, 1]]).growth_rate() > 1
+                True
+            """
+            from sage.rings.qqbar import AA as engine_real_algebraics
+
+            from sage_extensions.categories.rings.ring_foundation import (
+                _owned_real_algebraic_numbers,
+            )
+
+            real_algebraics = _owned_real_algebraic_numbers()
+            _numerator, denominator = self._growth_series_polynomials()
+            if denominator.degree() == 0:
+                return _owned_engine_element(real_algebraics, engine_real_algebraics(1))
+            positive_poles = sorted(
+                root for root, _multiplicity in denominator.roots(engine_real_algebraics) if root > 0
+            )
+            if not positive_poles:
+                raise ValueError(
+                    f"the growth series of {self} is rational with nonnegative coefficients and is not "
+                    f"a polynomial, so it has a positive real pole (Pringsheim), but {denominator} has "
+                    f"none"
+                )
+            return _owned_engine_element(real_algebraics, 1 / positive_poles[0])
 
 
 class _InducedPresentationMap:
