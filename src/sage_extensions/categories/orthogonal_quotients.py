@@ -1767,6 +1767,21 @@ class OrthogonalCharacterQuotient:
         operation that owns it, so every caller reads the one family its span
         has instead of recomputing it per question.
         """
+        # Retain only line stabilizers: there are 527 line cusps on T_Co,
+        # while there are 189720 plane cusps and 569160 flag certificates.
+        # The same line is queried at every incident plane, and the exact
+        # family is determined by its span.  Without this lookup the caller
+        # reconstructs the ambient stabilizer and its enormous finite image
+        # on every incidence edge, despite the retention contract above.
+        key = (
+            _exact_stabilizer_span_key(self, representative)
+            if not flag and int(representative.module_rank()) == 1
+            else None
+        )
+        families = self.__dict__.setdefault("_exact_isotropic_stabilizer_families", {})
+        if key is not None and key in families:
+            return families[key]
+
         # A line row retains the ambient isometry that placed every split
         # representative.  Its stabilizer is the conjugate of the source
         # stabilizer, including its entire character image.  Compute the
@@ -1778,10 +1793,13 @@ class OrthogonalCharacterQuotient:
             root, transport = self.transported_from_root(representative)
             if _span_key(root) != _span_key(representative):
                 inverse = ~transport
-                return tuple(
+                result = tuple(
                     transport * generator * inverse
                     for generator in self.exact_isotropic_stabilizer_generators(root)
                 )
+                if key is not None:
+                    families[key] = result
+                return result
 
         ambient = self.supergroup
         generators = list(ambient.isotropic_stabilizer_generators(representative, flag=flag))
@@ -1848,7 +1866,10 @@ class OrthogonalCharacterQuotient:
                     f"data has order {target}; no exhibited stabilizer element closes the index "
                     f"{target // before}, so the exact image chi(Stab) is not certified"
                 )
-        return tuple(generators)
+        result = tuple(generators)
+        if key is not None:
+            families[key] = result
+        return result
 
     def splitting_isometries(self, stabilizer_generators):
         r"""Return one lift ``g`` per double coset ``Gamma g Stab`` of ``O(L)``.

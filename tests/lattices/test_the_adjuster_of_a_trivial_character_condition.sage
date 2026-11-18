@@ -85,6 +85,7 @@ def test_repeated_line_adjustment_reuses_its_exact_stabilizer_section() -> None:
     label = tuple(lattice.module_generating_set())[0]
     line = lattice.primitive_isotropic_subobject(lattice.module_generator(label))
     stabilizer = quotient.exact_isotropic_stabilizer_generators(line)
+    assert stabilizer is quotient.exact_isotropic_stabilizer_generators(line)
     witness = next(g for g in group.group_generators()
                    if g.determinant() == 1 and g not in kernel)
     transported = witness.transport_isotropic_object(line)
@@ -97,3 +98,4 @@ def test_repeated_line_adjustment_reuses_its_exact_stabilizer_section() -> None:
     assert first in kernel and second in kernel
     assert first == second
     assert len(quotient._stabilizer_adjustment_sections) == 1
+    assert len(quotient._exact_isotropic_stabilizer_families) == 1
