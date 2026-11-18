@@ -78,10 +78,14 @@ def test_the_cycle_class_of_a_line_generates_h2_of_p2() -> None:
     """
     plane = _projective_plane()
     cycle_class = plane.cycle_class_isomorphism(1)
-    line = plane.chow_group(1)(plane.hyperplane_divisor())
-    c = cycle_class.forward()(line)
+    cycles = plane.torus_invariant_cycle_group(1)
+    ray = tuple(cycles.module_generating_set())[0]
+    c = cycle_class.forward()(
+        plane.torus_invariant_cycle_class_map(1)(cycles.module_generator(ray))
+    )
 
-    assert cycle_class.forward().is_bijective()
+    assert cycle_class.forward().is_injective()
+    assert cycle_class.forward().is_surjective()
     assert plane.middle_cohomology_form().b(c, c) == 1
 
 
