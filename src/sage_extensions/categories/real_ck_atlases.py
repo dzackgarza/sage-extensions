@@ -17,6 +17,7 @@ from sage_extensions.categories.functors.core import Functor
 from sage_extensions.categories.manifolds import TopologicalManifolds
 from sage_extensions.categories.topological_atlases import TopologicalAtlases
 from sage_extensions.categories.real_ck_manifolds import RealCkManifolds, _real_ck_degree
+from sage_extensions.owned_category import _object_of
 
 
 class RealCkAtlasMor(CategoricalMor):
@@ -131,7 +132,38 @@ class RealCkAtlases(OwnedParameterizedCategory):
         overlap_inclusions,
         transition_maps,
     ):
-        pass
+        r"""Select ``C^k`` charts and their transitions on the exact manifold.
+
+        A ``C^k`` chart is a chart whose transition maps are ``C^k``, so a
+        ``C^k`` atlas is a family of charts on one topological manifold
+        (Lee, *Introduction to Smooth Manifolds*, 2nd ed., Ch. 1).  Each chart
+        ``s`` has an open submanifold ``U_s`` of ``topological_manifold``,
+        carried into it by ``chart_domain_inclusions[s] : U_s -> X``, and a
+        chart ``charts[s]`` out of ``U_s``; the transition
+        ``tau_{st} = phi_t o phi_s^{-1}`` changes coordinates on the overlap,
+        with ``overlap_inclusions[s, t]`` the inclusion of the overlap in the
+        chart domains.  The pair ``(s, t)`` names the direction, and a family of
+        one chart has no pair and so no overlap and no transition.
+
+        The four families of maps are indexed by the charts.  The construction
+        retains them and computes nothing from them: the differentiability of
+        every transition, the cocycle on triple overlaps and whether the chart
+        domains cover the manifold are decisions the atlas answers, never
+        conditions a caller is charged for at construction (``OWN-22``).
+        """
+        assert topological_manifold in TopologicalManifolds(), (
+            f"a C^{self.degree()} atlas is a family of charts on a topological manifold, and "
+            f"{topological_manifold} is in {topological_manifold.category()}"
+        )
+        return _object_of(
+            self,
+            topological_manifold=topological_manifold,
+            chart_domains=chart_domains,
+            chart_domain_inclusions=chart_domain_inclusions,
+            charts=charts,
+            overlap_inclusions=overlap_inclusions,
+            transition_maps=transition_maps,
+        )
 
     def refinement(self, finer_atlas, coarser_atlas, chartwise_maps):
         pass

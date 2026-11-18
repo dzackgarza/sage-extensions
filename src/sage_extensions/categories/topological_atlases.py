@@ -12,6 +12,7 @@ from sage_extensions.categories.abstract_categories.objects import Objects, Owne
 from sage_extensions.categories.functors.core import Functor
 from sage_extensions.categories.manifolds import TopologicalManifolds
 from sage_extensions.categories.topological_spaces import TopologicalSpaces
+from sage_extensions.owned_category import _object_of
 
 
 class TopologicalAtlasMor(CategoricalMor):
@@ -93,7 +94,41 @@ class TopologicalAtlases(OwnedCategory):
         overlap_inclusions,
         transition_maps,
     ):
-        pass
+        r"""Select charts, their homeomorphisms and their transitions on the exact space.
+
+        A chart of a topological manifold is a homeomorphism ``phi_s : U_s -> V_s``
+        of an open subset ``U_s`` of the space onto an open subset ``V_s`` of
+        ``R^n`` (Lee, *Introduction to Smooth Manifolds*, 2nd ed., Ch. 1).  Each
+        chart ``s`` has an open submanifold ``U_s`` of ``topological_space``,
+        carried into it by ``chart_domain_inclusions[s] : U_s -> X``, and a
+        homeomorphism ``charts[s]`` out of ``U_s``.  The transition
+        ``tau_{st} = phi_t o phi_s^{-1}`` changes coordinates on the overlap,
+        with ``overlap_inclusions[s, t]`` the inclusion of the overlap in the
+        chart domains; the pair ``(s, t)`` names its direction, and a family of
+        one chart has no pair and so no overlap and no transition.
+
+        The four families of maps are indexed by the charts.  The construction
+        retains them and computes nothing from them: whether the transitions are
+        homeomorphisms, satisfy the cocycle on triple overlaps and whether the
+        chart domains cover the space are decisions the atlas answers
+        (:meth:`ParentMethods.transitions_are_homeomorphisms`,
+        :meth:`ParentMethods.transition_cocycle_holds`,
+        :meth:`ParentMethods.chart_domains_cover`), never conditions a caller is
+        charged for at construction (``OWN-22``).
+        """
+        assert topological_space in TopologicalSpaces(), (
+            f"a topological atlas is a family of charts on a topological space, and "
+            f"{topological_space} is in {topological_space.category()}"
+        )
+        return _object_of(
+            self,
+            topological_space=topological_space,
+            chart_domains=chart_domains,
+            chart_domain_inclusions=chart_domain_inclusions,
+            charts=charts,
+            overlap_inclusions=overlap_inclusions,
+            transition_maps=transition_maps,
+        )
 
     def refinement(self, finer_atlas, coarser_atlas, chartwise_maps):
         pass
