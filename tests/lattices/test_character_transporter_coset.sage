@@ -32,6 +32,9 @@ def test_nonnormal_character_transporter_has_the_exact_positive_and_negative_dec
     # homomorphism as the old product-then-permutation path, including
     # the nonnormal discriminant target and the determinant sign factor.
     to_permutation = quotient._character_permutation_model()
+    assert quotient._permutation_character_target() == libgap.Image(
+        to_permutation, quotient._gap_character_target()
+    )
     for element in (group.one(), cycle, exchange, known):
         key = quotient.image(element)
         assert quotient._permutation_of_key(key) == libgap.Image(
