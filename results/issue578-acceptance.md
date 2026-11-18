@@ -342,3 +342,27 @@ the rebase and the sixth is at `:150-193`, where the third pass already puts it.
 The library lines quoted inside the red transcripts (`manifolds.py:1362` in the
 first section, `:1372` and `:1422` in the second and third) are the lines the
 failure was raised on in those trees, and are not rewritten.
+
+### CI's verdict on this work
+
+The repository runs its workflows on every push
+(`.github/workflows/development.yml:3`, `push: {}`), and that workflow's
+concurrency is `group: ${{ github.workflow }}-${{ github.ref }}` with
+`cancel-in-progress: true` (`development.yml:16-18`).  Pushes to `main` arrive
+every 30-90 s from concurrent sessions, so each run is cancelled by the next one
+before a runner is assigned.  Read from the public Actions API (no token: the
+repository reports `"private": false`):
+
+* every head this work pushed is `cancelled` — `0ae8ecd` (run 1442),
+  `2be6b8e` (1457), `cd58a62` (1469), `6a6f0c5` (1470), and the README example
+  runs beside each;
+* the job of `6a6f0c5`, `qc-ci / qc` (job 134602728029), ended `cancelled` with
+  no runner assigned and no steps (`runner_id: 0`, `steps: []`), 59 s after it
+  was queued and in the same second that the run for `1042213c` was created;
+* of the runs on `main`, 807 concluded `success`, 785 `failure` and 886
+  `cancelled`, so the workflows do run; it is these heads that never got a slot.
+
+So there is no CI verdict on the code in this work: the run for its head was
+superseded, not failed.  A verdict would need a re-run of that workflow (a write
+on the repository, itself subject to the same cancellation) or a push whose run
+stays newest long enough to be picked up.  No local re-run substitutes for it.
