@@ -635,3 +635,13 @@ the test lint cannot start here, and the two specimen tests whose model is `RR.f
 (`test_the_singular_integral_affine_space_selection`, `test_the_integral_affine_collar_selection`)
 ran with the rational field in the model's place, which decides the objects they assert and
 not the model's base ring.
+
+### Why the placement cannot be filled from outside, in one more line
+
+The point class settles it: `Manifolds`' `point` element
+(`manifolds.py:1000`) builds its value as
+`_engine_manifold(parent)(tuple(_engine_manifold_expression(c) for c in coordinates),
+chart=_engine_manifold_chart(parent.atlas()[chart_label]))`.  A point of a manifold *is* a
+point of the engine manifold, so the engine realization is not decoration around the atlas
+-- it is what a point is.  Any `on(underlying_space, atlas)` must therefore construct one,
+and constructing one for a space that already exists is the manifold layer's decision.
