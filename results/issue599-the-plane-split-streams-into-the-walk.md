@@ -262,6 +262,17 @@ they read the registry after the class route (`predicate_subgroups.py:1066`,
 `tests/lattices/test_the_incidence_decided_by_divided_classes.sage:163` runs the
 two routes on one quotient.
 
+**The host's killer is not taking my rows for their size.**  The `Otilde+`
+retry was killed at **1698 MiB** tree RSS after 40 000 planes, with low-water
+MemAvail 1 076 MiB (`row-Otilde+-retry.log`, `# launcher exit: 0` at
+2026-11-18T05:51:48Z), and `/proc/vmstat`'s `oom_kill` stands at **43**.  A row a
+quarter the size of the one that died at 4 982 MiB died the same way, on a host
+whose other tenants hold 13.6 GiB under `full avg10=23.50` memory-stall pressure,
+so whatever is largest is killed and the row's own footprint is not what decides
+it.  This also disposes of the one-pass redesign as a remedy for the *evidence*:
+it would lower the peak from ~5 GiB to ~1.5 GiB and would still have been killed
+here.
+
 **Why the counts have to be computed and cannot be extrapolated.**  The edge
 count is not a fixed multiple of the plane count.  On `U + U(2) + <-2>` both
 kernel rows decide **4 edges over 3 line cusps and 2 plane cusps** -- two edges a
