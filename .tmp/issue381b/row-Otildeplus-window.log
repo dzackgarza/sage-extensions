@@ -1,0 +1,43 @@
+# tree: 8c094f85c5dda5d43789bb5502cf17f098bd2458
+# status: 
+# port: 991b88b095a42a1e3679569ea42328c900c120f6
+# load: 5.53 4.77 4.40
+# free: 9043 MiB available
+# started: 2026-11-18T11:48:54Z
+# program: .tmp/issue381b/probe-row.py  PROBE_PLANES=unset PROBE_BAND=unset PYTHONHASHSEED=0
+[      0.0 s rss    270.0 MiB] Otilde+: the driver's own row
+the lattice Integral lattice of rank 11 and signature (2, 9) of rank 11
+the rows ('Otilde+',)
+[Otilde+] the row's route: divided-class, as the run asked (decided in 0.0 s)
+[    489.6 s rss   1727.5 MiB] the split: 10000 planes registered
+[    607.5 s rss   1856.3 MiB] the split: 20000 planes registered
+[    769.0 s rss   2005.7 MiB] the split: 30000 planes registered
+[    985.7 s rss   1513.9 MiB] the split: 40000 planes registered
+[   1095.4 s rss   1664.5 MiB] the split: 50000 planes registered
+[   1212.8 s rss   1807.6 MiB] the split: 60000 planes registered
+[   1330.1 s rss   1978.1 MiB] the split: 70000 planes registered
+[   1538.5 s rss   2141.9 MiB] the split: 80000 planes registered
+[   1610.6 s rss   2298.2 MiB] the split: 90000 planes registered
+[   1699.7 s rss   2380.5 MiB] the split: 100000 planes registered
+[   1779.2 s rss   2555.5 MiB] the split: 110000 planes registered
+[   1851.9 s rss   2714.8 MiB] the split: 120000 planes registered
+[   1932.2 s rss   2790.9 MiB] the split: 130000 planes registered
+[   2019.9 s rss   3023.1 MiB] the split: 140000 planes registered
+[   2100.7 s rss   3051.7 MiB] the split: 150000 planes registered
+[   2189.1 s rss   3284.9 MiB] the split: 160000 planes registered
+[   2266.2 s rss   3308.1 MiB] the split: 170000 planes registered
+[   2377.5 s rss   3579.7 MiB] the split: 180000 planes registered
+[peakrss] row-Otildeplus-window: child waited=0 shell_code=0 samples=2169
+[peakrss] peak tree RSS      : 4127 MiB
+[peakrss] low-water MemAvail : 984 MiB
+[peakrss] peak single VmHWM  : 4130 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     4127 MiB peak
+[peakrss]   run.sh                        6 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=  4133.7s procs=  2 rss=  4127 MiB hwm=  4130 MiB avail=  3487 MiB
+[peakrss]   t=  4135.7s procs=  2 rss=  4127 MiB hwm=  4130 MiB avail=  3491 MiB
+[peakrss]   t=  4137.7s procs=  2 rss=  4127 MiB hwm=  4130 MiB avail=  3499 MiB
+[peakrss]   t=  4139.7s procs=  2 rss=  4127 MiB hwm=  4130 MiB avail=  3502 MiB
+[peakrss]   t=  4141.7s procs=  2 rss=  4127 MiB hwm=  4130 MiB avail=  3507 MiB
+# launcher exit: 0  ended: 2026-11-18T13:02:00Z

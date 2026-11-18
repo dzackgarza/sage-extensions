@@ -321,7 +321,31 @@ process, the driver's own caps (10800 s a row, 28800 s a run), launched at
 The row that five attempts could not finish now finishes in 35 minutes inside a
 3.6 GiB footprint.  `Otilde+` is the row still to return.
 
-## 11. Provenance
+## 11. `Otilde+`: killed in its tail
+
+The second row ran on the same gate and the same tree (`8c094f8`), launched
+11:48:54 on 9 051 MiB, and did not return (`row-Otildeplus-window.log`):
+
+| mark | wall | resident |
+| --- | ---: | ---: |
+| 10 000 planes | 489.6 s | 1 727.5 MiB |
+| 100 000 planes | 1 699.7 s | 2 380.5 MiB |
+| 180 000 planes | 2 377.5 s | 3 579.7 MiB |
+| after | 4 141.7 s | 4 127 MiB peak, killed |
+
+It reached 180 000 of its 189 720 planes in 2 377.5 s, then spent over 25
+minutes in the last 9 720 at 88% CPU with its resident set flat at ~4.1 GiB --
+the walk's deepest planes, where `transport_isotropic_object` applies a lift whose
+integer entries grow with the double coset, which is the one per-plane cost the
+registry repair does not touch -- and the host's killer took it at 13:02:00 with
+`MemAvailable` at 984 MiB and `/proc/vmstat`'s `oom_kill` 56 -> 59 (two other
+processes went with it).  No verdict line: its count and its coverage clauses are
+unmeasured.
+
+What that says: `Otilde`'s row is a returned row (section 10); `Otilde+`'s is a
+row that reaches its last ten thousand planes inside 4.1 GiB and needs the host
+to stay above ~1 GiB of `MemAvailable` for another ~25 minutes of *tail*, which
+is what the two kills took.  The peak is not its problem; the tail's length is.
 
 `main` `3998bd8`; adopted runtime Sage 11.0.beta5; port `991b88b0` (the `T_Co`
 construction: D. Dolgachev and S. Kondō, Izv. Math. 77:3 (2013), §3, eq. (3.6),
