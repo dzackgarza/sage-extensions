@@ -210,3 +210,73 @@ def test_the_placed_square_refuses_the_shear_the_affine_lane_admits() -> None:
     )
     assert admitted(vector_space((-1, -1))) == vector_space((-1, -2))
     assert space.is_an_isometry(shear) is False
+
+
+def test_the_placed_square_answers_its_geometric_automorphisms() -> None:
+    r"""``Aut(P)`` on the Euclidean lane: eight arrows, each admitted by the metric owner.
+
+    The square's isometry group is the dihedral group of order eight, and every
+    one of its eight moves is an arrow of the placed Euclidean square: the place
+    the arrows are admitted is ``MetricPolytopeMor``, which asks the Euclidean
+    space whether the ambient map preserves `dx^2 + dy^2`.  The eight arrows are
+    eight different isometries, and the reflection among them is the one no
+    other isometry agrees with on the four corners.
+    """
+    vector_space, space = _plane()
+    category = EuclideanPolytopesIn(space)
+    polygon = _square()
+    placed = category.on(
+        ("vertices", polygon.vertices()), _placement(polygon, space, vector_space)
+    )
+    geometric = placed.geometric_automorphisms()
+    lower_left = vector_space((-1, -1))
+    lower_right = vector_space((1, -1))
+    upper_left = vector_space((-1, 1))
+    upper_right = vector_space((1, 1))
+    elements = tuple(geometric)
+    reflection = next(
+        element
+        for element in elements
+        if element(lower_left) == lower_right
+        and element(lower_right) == lower_left
+        and element(upper_left) == upper_right
+        and element(upper_right) == upper_left
+    )
+
+    assert geometric.order() == 8
+    assert placed.abstract_automorphisms().order() == 8
+    assert all(space.is_an_isometry(element.ambient_map()) is True for element in elements)
+    assert reflection(lower_left) == lower_right
+    assert (reflection * reflection)(lower_left) == lower_left
+    assert reflection(lower_left) != lower_left
+
+
+def test_the_metric_lane_counts_the_isometries_and_not_the_affine_candidates() -> None:
+    r"""A sheared square: its affine group has eight moves and its isometry group two.
+
+    `\operatorname{conv}\{(0,0),(1,0),(2,1),(1,1)\}` is the unit square carried
+    by the shear `(x,y) \mapsto (x+y,y)`.  A parallelogram has eight affine
+    automorphisms, which is what the polytope's own lattice group answers, and
+    its isometries are the identity and the half-turn: the shear conjugated
+    moves of the square are not isometries of the plane.  The metric lane counts
+    the two, since the six the ambient space refuses are not arrows of it.
+    """
+    vector_space, space = _plane()
+    category = EuclideanPolytopesIn(space)
+    polygon = LatticePolygons(ZZ.free_module(2))(((0, 0), (1, 0), (2, 1), (1, 1)))
+    placed = category.on(
+        ("vertices", polygon.vertices()), _placement(polygon, space, vector_space)
+    )
+    corners = tuple(placed.vertices())
+    geometric = placed.geometric_automorphisms()
+
+    assert polygon.geometric_automorphisms().order() == 8
+    assert geometric.order() == 2
+
+    elements = tuple(geometric)
+    (half_turn,) = tuple(
+        element for element in elements if element(corners[0]) != corners[0]
+    )
+    assert all(element(corner) in corners for element in elements for corner in corners)
+    assert half_turn(corners[0]) in corners
+    assert (half_turn * half_turn)(corners[0]) == corners[0]
