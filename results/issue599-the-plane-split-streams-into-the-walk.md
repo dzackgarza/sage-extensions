@@ -278,7 +278,36 @@ it.  This also disposes of the one-pass redesign as a remedy for the *evidence*:
 it would lower the peak from ~5 GiB to ~1.5 GiB and would still have been killed
 here.
 
-**The host opened, and the row is running.**  The gated retry started at
+**The row ran to its counts.**  The gated retry started at 06:03:11 with
+6 267 MiB of MemAvailable (`gated.log`, attempt 484) and printed, in
+`row-Otilde-retry.log`:
+
+```
+[  1595.2 s rss  1853.5 MiB] the split: 10000 planes registered
+[  1874.8 s rss  2001.4 MiB] the split: 50000 planes registered
+[  2565.0 s rss  2837.8 MiB] the split: 100000 planes registered
+[  3116.6 s rss  4320.1 MiB] the split: 180000 planes registered
+[  3241.8 s rss  4637.6 MiB] the relation: 10000 records
+[  3331.8 s rss  4710.8 MiB] the relation: 50000 records
+[  3442.1 s rss  4846.8 MiB] the relation: 100000 records
+[  4369.0 s rss  5406.7 MiB] the relation: 569160 edges in 3014.9 s
+[  4369.0 s rss  5408.2 MiB] the plane row: 189720 plane cusps, 189721 planes registered
+```
+
+So `Otilde(T_Co)`'s relation is **569 160 edges over 189 720 plane cusps and a
+527-cusp line row**: three edges a plane with no collision and no missed plane,
+which is the count the acceptance asks for, and the class route's own.  At the
+three record counts of clause 3 its resident set is 4 637.6, 4 710.8 and
+4 846.8 MiB -- flat to within 210 MiB over 90 000 records, 2.3 KB a record
+against the 394.5 B record measured statically.
+
+The 4 GiB clause is therefore **answered no on a completed relation**: 5 408 MiB
+at the relation's end, still rising, before the contract step.  The split's own
+marks are those of the failed run (10 KB->50 KB->100 KB: 1 853.5, 2 001.4,
+2 837.8 MiB, ~18 KB a plane at the end), so the row's resident set is neither
+flat nor under 4 GiB, and the term is the one measured in section 5.
+
+  The gated retry started at
 06:03:11 with 6 267 MiB of MemAvailable (`gated.log`, attempt 484) and is in its
 split at 130 000 of 189 720 planes, 3 335 MiB, 2 776 s, with the host at
 7 170 MiB available and the line row done in 315.6 s (`row-Otilde-retry.log`).
