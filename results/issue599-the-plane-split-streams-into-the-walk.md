@@ -17,7 +17,7 @@ issue; probes, launchers and logs under `.tmp/issue599/` of that worktree.
 | the relation's records are what a row keeps | **holds for this issue's term**: 394.5 B an edge, 0.21 GiB at 189720; the row keeps more (section 2 and section 5) | `record-size.log` |
 | measured at 10 000, 50 000 and 100 000 planes as a flat resident set rather than a rising one | **flat for the relation** (4 379.0, 4 491.3, 4 448.1 MiB); **rising for the split** (`Otilde`: 1 297.3, 1 644.7, 2 536.7 MiB, ~18 KB a plane), and the rising term is the lift registry, #584's | `row-Otilde.log` |
 | the row's edges equal the gathered route's on a slice both can still do | **holds exactly**: endpoint pairs and witnesses equal, 600 of 600 | `slice-wt2.log` |
-| the two edge counts and witnesses per group at 189720 planes under 4 GiB | see section 5: `Otilde` decided; `Otilde+` lost to the kernel's OOM killer and restarted | `row-Otilde.log`, `row-Otilde+.log`, `chain.log` |
+| the two edge counts and witnesses per group at 189720 planes under 4 GiB | **the 4 GiB clause fails by measurement** (4982 MiB at 550 000 of 569 160 records); **the counts are not obtained**: both rows were killed by this host's OOM killer, and are queued to run again one at a time (section 5) | `row-Otilde.log`, `row-Otilde+.log`, `chain.log`, `gated.log` |
 
 ## 1. The gather
 
@@ -227,22 +227,35 @@ The relation's rate is what the record of walked class sets buys: 520 000
 records in 1 480 s, **2.6 ms a record** and so ~7.8 ms a plane, where the same
 relation measured 66-81 ms a plane before the record was added.
 
-**The 4 GiB clause is already answered, and the answer is no.**  At 520 000 of
-its 569 160 records the row stands at **5 092 MiB** resident (VmRSS 5 092 124 KiB
-at 04:12), with 49 160 records and the whole contract step still to come, against
-the 4 GiB the acceptance names and the 6 144 MiB guard this project runs under.
-The terms are the two measured above: ~3.3 GiB of lift registry (the split's
-18 KB a plane, #584's) and 0.21 GiB of relation.
+**The 4 GiB clause is answered, and the answer is no.**  The row's peak was
+**4 982 MiB of tree RSS** and **4 990 MiB of single-process VmHWM** at 550 000 of
+its 569 160 records, with 19 160 records and the whole contract step still to
+come -- 1.2x the 4 GiB the acceptance names, and inside this project's 6 144 MiB
+guard.  The terms are the two measured above: ~3.3 GiB of lift registry (the
+split's 18 KB a plane, #584's) and 0.21 GiB of relation.
 
-**`Otilde+` did not return.**  Its process left the host at
+**Neither row returned.  Both were killed by this host's OOM killer.**
+
+`Otilde`, after 2 h 10 min and 550 000 of its 569 160 records: `row-Otilde.log`
+ends `# launcher exit: 0  ended: 2026-11-18T04:36:46Z` with `peak tree RSS 4982
+MiB`, `low-water MemAvail 1059 MiB`, no traceback and no
+`STOPPED_AT_MEMORY_LIMIT`.  `/proc/vmstat`'s `oom_kill` went **37 -> 38** across
+that minute (read at 04:09 and 04:37) and no process of mine left the host in
+it except this one, so the reading is the kernel's killer taking the tracee and
+proot reporting 0.
+
+**`Otilde+` did not return either.**  Its process left the host at
 `row-Otilde+.log`'s last line, `# launcher exit: 0  ended: 2026-11-18T03:36:26Z`,
 after 130 000 planes at 3 299 MiB and a low-water MemAvail of 1 111 MiB, with no
 traceback and no `STOPPED_AT_MEMORY_LIMIT`.  This host's kernel has killed 37
 processes (`/proc/vmstat`, `oom_kill 37`) and its memory pressure stands at
 `full avg10=41.37` (`/proc/pressure/memory`), so the reading is that the OOM
-killer took the tracee and proot reported 0.  The second row is queued behind the
-first (`chain-otildeplus.sh`, `chain.log`): one row on the host at a time is the
-dispatch shape #599 asks for, and two at once is what the host could not carry.
+killer took the tracee and proot reported 0.  Both rows are queued to run again one at a
+time and only on a host that can carry one: `chain-otildeplus.sh` (`chain.log`,
+started 04:36:56) and `chain-otilde-gated.sh` (`gated.log`, gated on 6 GiB of
+`MemAvailable` and no other row running).  One row on the host at a time is the
+dispatch shape #599 itself asks for; two at once is what this host could not
+carry, and neither could one, on a host whose other projects held 10-14 GiB.
 
 ## 6. What was run, and what was not
 
