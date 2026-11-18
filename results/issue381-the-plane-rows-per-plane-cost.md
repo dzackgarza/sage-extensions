@@ -189,6 +189,7 @@ reason is two numbers, not a preference:
 | --- | ---: | --- |
 | `Otilde`/`Otilde+` after both repairs | **~3.4 GiB** | projected from the measured per-plane terms: 0.71 GiB standing, ~0.8 GiB of GAP walk workspace, ~9 KB a plane of cusp row (1.7 GiB at 189720), 0.2 GiB of relation records. No run of it has returned yet to confirm the total. |
 | the stage-1 cusp computation (`p12_plane_cusps`) | **5.8 GiB** | that job's own measurement, on its own chat |
+| the stage-1 `Õ` plane row, while it runs (observed) | **8 144 MiB and rising** at 18 min 30 s | `ps` on this VM: `/probes/p16_otilde_plane_row.py`, alone on the host, `MemAvailable` 2 895 MiB.  Not that chat's own peak -- an observation of it while I waited. |
 
 Together that is 9.2 GiB of row on a machine whose other tenants hold 5–10 GiB,
 so the kernel's killer — which fires at about 1 GiB of `MemAvail` — takes
