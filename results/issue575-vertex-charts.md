@@ -157,3 +157,33 @@ ceiling, and an over-ceiling run after this change has not been measured --
 `44.22 s` and `61.03 s` are pre-change measurements under heavy co-tenancy, and
 the `18.49 s` post-change run was at moderate load.
 
+## Round 3, 2026-11-18: the specimen's algebra assertion is its Hilbert basis
+
+The acceptance asks for true assertions about the chart's coordinate algebra
+"rather than just ... count stored fields", and on the specimen that clause was
+met by `algebra_generating_set().cardinality() == 5` -- a count and a negative
+category membership, where the triangle's chart got its actual relation.  The
+specimen now gets the same treatment:
+
+* the apex cone's dual has the Hilbert basis `(-2,-1), (-1,-1), (0,-1),
+  (1,-1), (2,-1)` in its own character frame, and the chart's algebra has one
+  generator per point (probe: `semigroup_generators()` in the character frame is
+  exactly that set, and `affine_semigroup_generator_positions()` agrees);
+* the cone imposes `(-2,-1) + (2,-1) == 2*(0,-1)` and `(-1,-1) + (1,-1) ==
+  2*(0,-1)`, and the chart's monomials satisfy `z_left * z_right == z_base**2`
+  for both pairs (probe: relations `True`, distinct monomials `5`);
+* the test asserts the five points, both character relations and both monomial
+  relations, with the outer and inner left monomials distinct.
+
+The added block costs `0.03 s` on a loaded host (five characters `0.020 s`,
+`semigroup_generators` `0.000 s`, membership `0.000 s`, character relations
+`0.001 s`, five monomials `0.012 s`, one product relation `0.001 s`), so it does
+not move the call.
+
+The call-phase gate remains a property of the host, and this round measured it
+three ways on the same file: `7.26 s` on an idle host (before this block),
+`21.85 s` at load average 16.5, and `95.56 s` at load average 18.65 with `2.4 GB`
+available.  The variety's eager gluing is `3-5 s` idle and `21.7 s` at load
+average 18, so under co-tenancy the call is over the ceiling whatever this test
+does; on a host that is not co-tenanted it is well under.
+
