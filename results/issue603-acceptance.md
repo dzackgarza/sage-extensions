@@ -8,6 +8,35 @@ card comparison.  Numbers are from runs on the adopted runtime in a worktree of
 `main = a6f2dfe` (tree bound at `/repos/sage-extensions`, the port at `/work`,
 time gates on).
 
+
+## 0. Third round, after the review of `879f13ff`
+
+Two corrections, both from that review:
+
+* the non-isotropic orbit was over **generating sets** of `H`, not subgroups, so
+  the family generated the stabilizer of a chosen generating set -- a proper
+  subgroup of `Stab(H)` in general.  Points are now the closure of the classes
+  in `\oplus Z/d_i`; on `U^2 + <-2>` at `e_1 + e_2 + x` the family is 112 members
+  instead of 170, and the small specimens whose stabilizer is finite show the
+  same group either way, which is why the defect is invisible there.
+* the construction uses only the **bilinear form**, so the evenness gate is gone:
+  `<1> + <-1>`, `<-1> + <-2>`, `<3> + <-1>` are answered here and not by the port.
+
+What is owned is the *structure* -- the gluing subgroup and the Schreier family
+over its orbit -- and **not** the ambient `O(K)`: for an indefinite complement
+that family is the port's, exactly as the line and plane constructions take
+`O(K_I)`'s.  Item 1 below is therefore met for the isotropic and non-isotropic
+cases with that qualification, and not for a base ring other than `ZZ` or a
+pointwise stabilizer of a sublattice of rank two and up.
+
+**The red for the pointed call: none is landed, and none was manufactured.**  The
+port's *pointed* families are correct on every specimen inside the suite's call
+ceiling -- including `U` at `e+f`, whose pointed family was already the exchange
+at `41f21a69`.  The one red in the tree is the *setwise* route, where the port
+refuses the marking outright.  The incompleteness this round repairs is
+observable only on `U^2 + <-2>` at `e_1+e_2+x`, whose construction takes 40 s and
+is therefore recorded here rather than asserted in a test.
+
 ## 1. What changed in this round
 
 **The generation argument was false, and is replaced.**  `b580e31` paired the
