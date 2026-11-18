@@ -2870,8 +2870,14 @@ end
         # exact stabilizer family and finite word section depend on the span,
         # not on the source line or its witness.  Reuse the section for that
         # span instead of constructing a GAP word problem per incidence edge.
-        key = (_exact_stabilizer_span_key(self, stabilizer_reference, flag)
-               if stabilizer_reference is not None else None)
+        # The repeated hot loop is over line cusps.  Do not retain a GAP
+        # section for every plane of a large plane row (189720 on T_Co).
+        key = (
+            _exact_stabilizer_span_key(self, stabilizer_reference)
+            if stabilizer_reference is not None and not flag
+            and int(stabilizer_reference.module_rank()) == 1
+            else None
+        )
         sections = self.__dict__.setdefault("_stabilizer_adjustment_sections", {})
         retained = sections.get(key) if key is not None else None
         if retained is not None and retained[0] is stabilizer_generators:
