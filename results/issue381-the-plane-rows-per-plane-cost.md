@@ -146,6 +146,18 @@ hour to say so.  Its counts are the independent integral certificate's
 `(569160, 527, 189720)`, which the driver checks and which this note does not
 re-derive.
 
+Five attempts of that row are on `main` already: killed at 3400, 3956, 4803,
+4982 and 5490 MiB, every one with `MemAvail` at about 1 GiB and `/proc/vmstat`'s
+`oom_kill` 43 -> 50 across them; the fifth reached 180 000 of 189 720 planes at
+2003 s and 3908 MiB, so the split's own term is the one measured above and the
+row's own length was never the question
+(`results/issue599-the-plane-split-streams-into-the-walk.md`).  **One `Otilde`
+row is started off this change as a job that reports later**
+(`.tmp/issue381b/probe-row.py`, one process, the driver's own caps 10800/28800,
+the 6144 MiB guard, launched on 9.2 GiB of `MemAvailable`); its count, its
+coverage clauses and its peak are the run's own numbers, and they are appended
+here when it returns.
+
 ## Provenance
 
 `main` `3998bd8`; adopted runtime Sage 11.0.beta5; port `991b88b0` (the `T_Co`
