@@ -98,7 +98,7 @@ def test_the_frame_trivializes_the_bundle_and_its_two_maps_are_inverse() -> None
     assert trivialized.vector_bundle() is sections.vector_bundle()
     assert trivialized.module_rank() == 1
     assert trivialized.basis() == (frame,)
-    assert trivialization.frame() is frame
+    assert trivialization.frame() == (frame,)
 
     a = circle.smooth_function(
         {
