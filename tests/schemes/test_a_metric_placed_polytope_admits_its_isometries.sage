@@ -486,3 +486,27 @@ def test_the_zero_sphere_states_an_inhabitant_and_decides_its_isometries() -> No
     assert sphere.is_an_isometry(shift) is False
     assert swap(minus_one) == one
     assert (swap * swap)(one) == one
+
+
+def test_the_placed_euclidean_category_states_an_inhabitant() -> None:
+    r"""The one-point polytope at the plane's origin: one vertex, one automorphism.
+
+    A placed category states one of its objects without being handed one: the
+    point at the Euclidean plane's own selected point.  Its only vertex is that
+    point, its placement lands in the plane, and its geometric automorphism group
+    is the identity alone.  That one element is not read back as an ambient map:
+    a point does not affinely span the plane, so it determines none, and the frame
+    refuses rather than choosing a map on a complement the point does not meet.
+    """
+    vector_space, space = _plane()
+    category = EuclideanPolytopesIn(space)
+    pointed = category.an_object()
+    origin = space.an_element()
+    geometric = pointed.geometric_automorphisms()
+
+    assert pointed.ambient_space() is space
+    assert tuple(pointed.vertices()) == (origin,)
+    assert geometric.order() == 1
+
+    with pytest.raises(AssertionError):
+        tuple(geometric)[0]
