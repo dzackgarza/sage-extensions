@@ -2600,6 +2600,50 @@ class ConvexPolytopes(OwnedParameterizedCategory):
                 )
             )
 
+        def _ambient_point_or_none(self, point):
+            r"""``point`` read as a point of the ambient space, or ``None`` when it is not one.
+
+            The conversion is :meth:`rational_point`, the one operation that
+            admits a point of the lattice at the coordinates of an ambient point
+            and hands everything else to the ambient space's own ingress.  A
+            value that ingress refuses is no point of the ambient space, which is
+            what ``None`` reports; exceptions other than that refusal are not
+            caught.
+            """
+            try:
+                return self.rational_point(point)
+            except (TypeError, ValueError):
+                return None
+
+        def __contains__(self, point) -> bool:
+            r"""Whether ``point`` names a point of this polytope.
+
+            A polytope is a subset of its ambient space, and its members are the
+            points of that space which :meth:`contains_point` admits.  The
+            candidate is read by the conversion that operation applies, so the
+            ordinary subset test and the named one are one answer, for a lattice
+            point as for a point already written in the ambient space.  A value
+            that is no point of the ambient space is not a member.
+            """
+            converted = self._ambient_point_or_none(point)
+            return converted is not None and self.contains_point(converted)
+
+        is_parent_of = __contains__
+
+        def _element_constructor_(self, point):
+            r"""Return ``point`` as the point of the ambient space that lies in this polytope.
+
+            The result is a point of ``M tensor QQ``: a lattice point and the
+            ambient point at its coordinates are one point there, so the lattice
+            point is admitted as that point and not as itself.  A point outside
+            the polytope, and a value that is no point of the ambient space, are
+            refused.
+            """
+            converted = self._ambient_point_or_none(point)
+            if converted is None or not self.contains_point(converted):
+                raise ValueError(f"{point!r} is not in {self}")
+            return super()._element_constructor_(converted)
+
         def normal_value(self, normal, point):
             r"""Return ``<point, normal>`` in the owned rational coordinate frame.
 
