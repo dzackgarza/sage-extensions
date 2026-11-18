@@ -655,3 +655,62 @@ So the call the database certifies against no longer enters the 4.7*10^13-coset 
 returns the 56 in half a second within a fifth of the memory the earlier attempt reached before
 dying. What remains for acceptance item 5 is the database's own certify re-run of `6JRR`, which
 is `dzackgarza/lattice-database#7`, not work in this repository.
+
+## What the database's own certifier does with this field, on this tree
+
+The two sections above state that the field returns and certifies and that the path costs
+319 MiB. Neither was measured on the object the certifier builds: `latticedb.sage_genus`
+constructs `Lattices(ZZ)(card["gram_tensor"])`, and the dispatch in
+`stable_orthogonal_group`/`stable_orthogonal_group_generators` at `62743b1` was
+`self is NamedLattices.Tco`, which that lattice is not (`same object: False`). So on
+`62743b1` the certifier's lattice kept the Schreier family of the finite image's
+46 998 591 897 600 cosets.
+
+Measured with the database's worker itself, one request
+(`{"tag": "6JRR", "gram": <6JRR's gram_tensor>, "integral": true,
+"fields": ["arithmetic-group.otilde-t-co.generator_morphisms"],
+"arithmetic_groups": [{"slug": "otilde-t-co", "standard_name": "Otilde"}]}`) fed to
+`python -m latticedb.sage_genus` in the pinned runtime, under `peakrss.py` with the
+database's own floor of 1 675 943 526 bytes:
+
+```
+62743b1                       started, then killed at the 1598 MiB floor after 206 s
+                              peak tree RSS 1600 MiB, exit 137
+this tree                     6 s, 56 matrices emitted, peak tree RSS 291 MiB
+```
+
+The input hash of that computation on this tree is
+`835e87dc1e3a87479bc8a0df960b89c8b784d51c402ba78e88834ad5beb3b7e3`, which is the
+`hash` of the `exceeded.yaml` entry below, so the record and this request are one
+computation. The certification hash of the value the worker returned is
+`3b6b6031c32ba7c16a3fa5176792bd37a4b1ded62342aa0930f954882996b20e`; running the
+database's own `store_arithmetic_group` on a copy of the two cards writes
+`data.generator_morphisms` with 56 names on `otilde-t-co` and the 56 `scale: 1` morphisms
+on `6JRR`, and those names resolve through `certified_value` to the same matrices and the
+same hash. That is the field returning and certifying within the budget.
+
+## Correction of this note's earlier claim about the database
+
+The section "`dzackgarza/lattice-database` at `main` now carries the field" is withdrawn.
+At database `main` (`aaf614dba1`) the arithmetic-group card's data block is
+
+```yaml
+data:
+  abstract_structure: the kernel of O(T_Co) -> O(A_T_Co)
+  cardinality: aleph0
+  index_in_orthogonal_group: 46998591897600
+```
+
+with no `generator_morphisms`, and its prose says the field is absent and the generation
+clause of lattice-database#7 is not supplied. `exceeded.yaml:1174-1180` at the same ref
+still records this computation as `lost: true`, `killed_by: memory`, `peak_bytes:
+14382555136` against `limit_bytes: 1675943526`. The `3b6b6031...` hash quoted above is
+what a tree carrying this repair computes, not a value the database stores.
+
+What remains on the database's side is bookkeeping that this connection cannot push: its
+`certify` reads a `lost` entry as a computation in progress, recovers it into the failures
+ledger and does not request it (`exceeded.was_lost`; `genus.requests`), so the entry has
+to be released with `latticedb retry-computation 6JRR
+arithmetic-group.otilde-t-co.generator_morphisms --note ...` before a certify run of
+`6JRR` will ask for the field again. That release, the resulting card write and the
+certificate hash on `6JRR` are commits in `dzackgarza/lattice-database`.
