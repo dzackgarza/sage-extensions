@@ -14,7 +14,11 @@ def test_a_chart_on_a_proper_open_subset_is_a_riemannian_open_submanifold() -> N
     The restriction is stated in the charts the ambient metric is stated in,
     which restrict to the open subset, so ``U`` is not among its labels.
     """
-    space = HyperbolicSpaces(2).an_object()
+    reference = HyperbolicSpaces(2).an_object()
+    opposite = PositiveConeComponents(reference.lattice()).component_through(
+        -reference.positive_cone_component().timelike_vector()
+    )
+    space = HyperbolicSpaces(2)(opposite)
     chart = space.atlas()["hyperboloid"]
     domain = space.chart_on_open_subset("U", "y0 y1", "hyperboloid", (chart.coordinate(0),)).domain()
 
