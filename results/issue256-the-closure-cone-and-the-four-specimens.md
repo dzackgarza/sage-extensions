@@ -201,7 +201,7 @@ be an invention rather than a construction:
 
 | missing owner | where | needed by |
 | --- | --- | --- |
-| `TopologicalSpaces.mapping_cylinder` | `topological_spaces.py:643` | the glued space a surgery returns |
+| ~~`TopologicalSpaces.mapping_cylinder`~~ | `topological_spaces.py:643` | **not** needed: see §9, the pushout is available through the coequalizer |
 | `TopologicalSpaces.subspace` | `:647` | the cut region's own topology |
 | `IntegralAffineCollars.on` | `integral_affine_collars.py:89` | every `affine_collars` argument |
 | `IntegralAffineCollars.comparison` | `:93` | the regluing's collar agreement |
@@ -258,3 +258,49 @@ failures: 0
 Not run: the pytest suite, the test lint, and every import of the geometry layer.  The two
 test files were not collected and the lint was not applied, because neither can start on
 this host.
+
+## 9. This round's probe: what is actually behind the surgery, and one correction
+
+The three surgery stubs are the first item §6 leaves open, so this round probed it.
+Result: they are behind the runtime of §0 and nothing else in the tree.
+
+```
+topological_spaces           OK
+manifolds                    ValueError: base must be a subring of this ring
+```
+
+`integral_affine_manifolds` imports `manifolds`, so the module that holds `surgery`,
+`symington_surgery` and `basis_triangle_surgery` cannot be imported here, and a test of
+them cannot start.  The failing call is the same one: `RR = ExactRealField()` at
+`rings/real.py:1189`.
+
+**Correction to §6.**  The glued space does not need `TopologicalSpaces.mapping_cylinder`,
+which is a `pass` body.  `TopologicalSpaces._categorical_coequalizer` (`:680`) and
+`_categorical_coproduct_construction` are implemented, so the pushout
+`X |-> (X - region) glued along the boundary isomorphism` is constructible from them: the
+coproduct of the cut space and the replacement, coequalized by the two embeddings of the
+common boundary.  Of §6's five rows, only `IntegralAffineCollars.on` (`:89`),
+`IntegralAffineCollars.comparison` (`:93`) and `SingularIntegralAffineSpaces.on` (`:600`,
+and its three repeats at `:762`, `:772`, `:782`) remain, and all four are assembly rather
+than new mathematics.  The surgery item is therefore one runtime away from being
+implementable, not one construction away.
+
+**Why the runtime is not repaired here.**  The owned `free_module` is reachable for some
+rings and not for the real field:
+
+```
+ZZ OK OwnedRings.ParentMethods.free_module -> Free module on {[0]} over Integer Ring
+QQ OK OwnedRings.ParentMethods.free_module -> Free module on {[0]} over Fraction Field of Integer Ring
+```
+
+so the call `free_module(1)` in `native_modules.py:227` is this library's own convention and
+is right; what fails is that the dynamically generated parent class of `ExactRealField`
+resolves Sage's `Ring.free_module` instead of `OwnedRings.ParentMethods.free_module`.  That
+class is built from `ExactRealField.__init__`'s category meet, and the difference from `QQ`
+is the meet: `OwnedFields`, `OwnedOrderedRings`, `UncountableSets`, the regular algebra and
+`FinitelyGeneratedFreeModules(RR)` together.  No issue in this repository owns it --
+`#38` (`Modules(R)(S)` is the free module) and `#37` (group-algebra modules) are the only
+issues that mention `free_module`, and neither is this -- and whether the meet should be
+repaired or the pinned image restored is a decision, not a measurement: the pinned runtime
+is Sage 11.0.beta5 and this host is Sage 10.8, so a meet that is correct on one is not
+established on the other by anything measurable here.
