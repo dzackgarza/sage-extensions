@@ -137,10 +137,20 @@ def test_p2_is_simply_connected() -> None:
 
 
 def test_the_hodge_diamond_of_p2_is_diagonal() -> None:
-    r"""``h^{p,q}(P^2) = 1`` for ``p = q ≤ 2`` and ``0`` otherwise; ``h^{2,0} = h^0(K) = 0``."""
+    r"""``h^{p,q}(P^2) = 1`` for ``p = q ≤ 2`` and ``0`` otherwise; ``h^{2,0} = h^0(K) = 0``.
+
+    ``H^*(P^2)`` is not of one weight: its weight filtration has ``Gr^W_0 = H^0``,
+    ``Gr^W_2 = H^2`` and ``Gr^W_4 = H^4``, and each of the three is pure by
+    Jurkiewicz--Danilov.  What is diagonal is the Hodge bigrading, ``h^{p,q} = 0``
+    for ``p != q``: the structure is Hodge--Tate.
+    """
     hodge = _projective_plane().hodge_structure()
 
-    assert hodge.is_pure()
+    assert hodge.is_hodge_tate()
+    assert hodge.weight_support().cardinality() == 3
+    assert all(
+        hodge.weight_graded_piece(weight).is_pure() for weight in hodge.weight_support()
+    )
     assert hodge.hodge_number(0, 0) == 1
     assert hodge.hodge_number(1, 1) == 1
     assert hodge.hodge_number(2, 2) == 1

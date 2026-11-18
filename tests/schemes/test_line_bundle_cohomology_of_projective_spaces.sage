@@ -71,7 +71,11 @@ def test_the_hodge_numbers_of_the_projective_plane_are_those_of_its_cohomology_r
     plane, line = _toric_projective_space(2)
     hodge = plane.hodge_structure()
 
-    assert hodge.is_pure()
+    assert hodge.is_hodge_tate()
+    assert hodge.weight_support().cardinality() == 3
+    assert all(
+        hodge.weight_graded_piece(weight).is_pure() for weight in hodge.weight_support()
+    )
     assert hodge.hodge_number(1, 0) == 0
     assert hodge.hodge_number(2, 0) == 0
     assert hodge.hodge_number(0, 0) == 1
