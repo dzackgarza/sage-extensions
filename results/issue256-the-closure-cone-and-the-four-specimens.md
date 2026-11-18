@@ -363,42 +363,18 @@ or on the pinned Sage 11.0.beta5 image, and nothing in this issue can move them.
 independent repairs have now been measured and refused, so a later round does not need to
 try them again: the meet's ordering, Sage's method, and the class body.
 
-## 11. #97 landed the importable manifold layer; what the surgery still lacks
+### What still does not import, measured at `92188cb`
 
-`dzackgarza/sage-extensions#97` closed, and its work changed the chain: the manifold layer
-no longer constructs the exact real field at import, so `integral_affine_manifolds` now
-imports here and the surgery's own module can be read and run.
+The Sterk4-rank test would be the other acceptance item with a decidable number in it, so
+its route was measured too:
 
 ```
-manifolds                      OK
-integral_affine_manifolds      OK
+categories.schemes.polytopes   ValueError: base must be a subring of this ring
+sterk                          (imports polytopes, so the same)
 ```
 
-**Landed this round.** `SingularIntegralAffineSpaces.on` (`integral_affine_manifolds.py:600`)
-is implemented: it selects the space, the singular locus in it, the regular part's inclusion
-and the integral-affine manifold on that part, refusing a locus selected into another space
-and a regular part that is not the affine manifold's own underlying manifold.  Its test is
-`tests/schemes/test_the_singular_integral_affine_space_selection.sage`: the two-point
-Sierpinski space whose singular locus is a point and whose regular part is the plane, plus
-the two refusals.
-
-**Still missing, by call.** The three surgery methods need three operations that do not
-exist, and this is what each returns today:
-
-| call | where | what it answers now |
-| --- | --- | --- |
-| `TopologicalSpaces().subspace(region_inclusion)` | `topological_spaces.py:647`, body `pass` | `None` -- so a surgery has no cut region to glue along |
-| `TopologicalSpaces().complement(...)` | no such name anywhere in `topological_spaces.py` | nothing -- the space `X - int(region)` a replacement is glued into is not constructible; the file offers a coproduct (`:683`) and a coequalizer (`:680`) and nothing that removes a subspace |
-| `IntegralAffineCollars().on(piece, face_inclusion, neighborhood_inclusion, chart)` | `integral_affine_collars.py:89`, body `pass` | `None` -- so every `affine_collars` argument of the three methods is unbuildable |
-
-`symington_surgery` and `basis_triangle_surgery` are stated in terms of the same cut, so they
-wait on the same two topological operations; none of the three is implementable without them,
-and writing the coproduct-coequalizer pushout in their place would glue the replacement *over*
-the region instead of *into* it, which is a different surgery.
-
-**And the specimen.** `RR = ExactRealField()` still fails on this host
-(`rings/real.py:1261` -> `native_modules.py:227`, the `Rings.parent_class` resolution of
-§10), so the test's model `RR.free_module(...)` cannot be built here.  The assertions of the
-new test were executed with the owned rational field in the model's place, which decides the
-four retained objects it asserts and not the base ring of the model; the file itself uses
-`RR`, as the sibling atlas test does, and so runs only on the pinned image.
+`manifolds` and `integral_affine_manifolds` import because #97 made them defer the exact
+real field; `polytopes` still constructs it at import, so `Sterk.roots_18_2_0()` -- the
+named roots the rank is derived from -- cannot be reached here.  The rank itself is
+settled (twelve, eighteen, two, ten, two, in §4 and §11's terms); what is missing is only a
+test that can call the library's own roots.
