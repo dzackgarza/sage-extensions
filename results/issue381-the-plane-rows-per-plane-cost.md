@@ -206,7 +206,10 @@ Run for section 6, on the tree carrying both repairs:
   38.96 s**;
 * the driver on `U + U(2) + <-2>`, both kernel rows: 4 edges each, the digest
   `47249bbc…` that the tree before this change prints;
-* the two-route gate on the same tree, run again after the rebase.
+* the two-route gate on the same tree, run again after the rebase:
+  **5 passed in 172.01 s** -- the divided-class relation, the certificate
+  relation and the subgroup's own flag row are one relation on the tree both
+  repairs are published on.
 
 Not run, and not reported: **either kernel row at 189720 planes.**  The host
 cannot carry one now: the completed relation needs ~5.4 GiB against 4-6 GiB of
