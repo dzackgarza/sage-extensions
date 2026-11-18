@@ -347,6 +347,39 @@ row that reaches its last ten thousand planes inside 4.1 GiB and needs the host
 to stay above ~1 GiB of `MemAvailable` for another ~25 minutes of *tail*, which
 is what the two kills took.  The peak is not its problem; the tail's length is.
 
-`main` `3998bd8`; adopted runtime Sage 11.0.beta5; port `991b88b0` (the `T_Co`
+## 12. `Otilde+`, third attempt: killed at ~178 000 planes, and what the reduction must carry
+
+`row-Otildeplus-window2` ran on the lease gate (8 099 MiB of headroom against a
+4.9 GiB claim) from 13:14:36 and was killed at 13:48:10 -- 2 014 s, peak
+3 666 MiB, low-water `MemAvailable` **984 MiB**, `oom_kill` 63 -> 64
+(`row-Otildeplus-window2.log`):
+
+| mark | wall | resident |
+| --- | ---: | ---: |
+| 130 000 planes | 1 345.9 s | 2 641.6 MiB |
+| 160 000 planes | 1 807.0 s | 3 369.7 MiB |
+| 170 000 planes | 1 933.9 s | 3 446.2 MiB |
+| killed | 2 014 s | 3 666 MiB peak |
+
+**This death is not the tail.**  The predecessor spent 25 minutes on its last
+9 720 planes; this one was killed 80 s after the 170 000-plane mark, still moving
+at ~10 ms a plane with ~178 000 of 189 720 done.  The killer fired because other
+tenants took the host back inside the run -- the cause of the first five deaths --
+and neither row's own footprint was the largest thing on the machine.
+
+**What the reduction must carry, measured.**  A checkpoint of the cusp spans and
+the registry's words is *not* enough to resume: the last planes are the last
+cosets the walk reaches, so the run also needs the walk's own tree
+(`queue`, `parents`, `edge_numbers`, `small_indices`) and the **frontier lifts**
+it has spelled and not yet released.  Without the frontier the resume re-spells
+every remaining word from the base, which costs what the walk cost.  With it, a
+resume skips the 1 934 s the first 170 000 planes took and pays the rest --
+about 25 minutes of tail at the measured 150 ms a plane, not the 5 % the
+reduction assumes, because the tail's cost is word depth a plane and not plane
+count.
+
+## 13. Provenance
+
+`main` `79d4f7c`; adopted runtime Sage 11.0.beta5; port `991b88b0` (the `T_Co`
 construction: D. Dolgachev and S. Kondō, Izv. Math. 77:3 (2013), §3, eq. (3.6),
 printed p. 513).  Probes, launchers and logs: `.tmp/issue381b/`.
