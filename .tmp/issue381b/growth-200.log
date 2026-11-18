@@ -1,0 +1,48 @@
+# tree: 3998bd87a5945db69e03da7dec5f915c6f5f094c
+# status: 
+# port: 991b88b095a42a1e3679569ea42328c900c120f6
+# load: 5.54 4.31 5.31
+# free: 5851 MiB available
+# started: 2026-11-18T09:36:09Z
+# program: .tmp/issue381b/probe-growth.py  PROBE_PLANES=200 PROBE_BAND=20 PYTHONHASHSEED=0
+[      0.3 s rss    279.9 MiB] T_Co and the Otilde row's subgroup
+[     91.4 s rss    562.3 MiB] the ambient plane row: 1 plane(s), parabolic complete (True,)
+[     93.0 s rss    564.1 MiB] a carried class set, from a line of the ambient plane
+[    350.1 s rss   1449.4 MiB] the walk: 200 planes drawn in 257.1 s
+[    350.1 s rss   1440.4 MiB] drawn: 199 transport intervals recorded, rss after the planes are dropped
+[    350.1 s rss   1440.4 MiB] the reference plane's lift
+[    350.7 s rss   1440.5 MiB] the replay: 50 planes, rss 1440.5 MiB
+[    351.1 s rss   1440.5 MiB] the replay: 100 planes, rss 1440.5 MiB
+[    351.6 s rss   1440.5 MiB] the replay: 150 planes, rss 1440.5 MiB
+[    352.0 s rss   1440.5 MiB] the replay: 200 planes, rss 1440.5 MiB
+
+the relation's per-plane body, replayed on 200 drawn planes of Otilde(T_Co)
+  step                  first   middle     last
+  rebuild               6.284    5.589    4.182  (ms a plane)
+  span key              0.892    0.927    0.791  (ms a plane)
+  registry              1.642    1.024    0.787  (ms a plane)
+  inverse reference     0.059    0.002    0.002  (ms a plane)
+  integral move         1.328    0.965    0.783  (ms a plane)
+  finite action         2.360    0.571    0.485  (ms a plane)
+  carried classes       0.035    0.024    0.025  (ms a plane)
+  class orbit           0.038    0.017    0.029  (ms a plane)
+  sum                   9.268
+
+the split's own per-plane interval, drawn planes 1..N:
+  transport + cusp     14.693    9.266   13.173  (ms a plane)
+  resident after the last plane: 1449.4 MiB
+[    352.0 s rss   1440.5 MiB] done
+[peakrss] growth-200: child waited=0 shell_code=0 samples=181
+[peakrss] peak tree RSS      : 1449 MiB
+[peakrss] low-water MemAvail : 4339 MiB
+[peakrss] peak single VmHWM  : 1452 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     1449 MiB peak
+[peakrss]   run.sh                        4 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   354.4s procs=  2 rss=  1449 MiB hwm=  1451 MiB avail=  4343 MiB
+[peakrss]   t=   358.4s procs=  2 rss=  1443 MiB hwm=  1452 MiB avail=  4339 MiB
+[peakrss]   t=   352.4s procs=  2 rss=  1442 MiB hwm=  1444 MiB avail=  4441 MiB
+[peakrss]   t=   360.4s procs=  2 rss=  1442 MiB hwm=  1452 MiB avail=  4350 MiB
+[peakrss]   t=   356.4s procs=  2 rss=  1441 MiB hwm=  1452 MiB avail=  4376 MiB
+# launcher exit: 0  ended: 2026-11-18T09:42:12Z
