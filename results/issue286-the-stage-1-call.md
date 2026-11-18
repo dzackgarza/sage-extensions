@@ -224,7 +224,7 @@ the run's: the port's generator search is not deterministic (330, 331, 335, 343,
 | 2 | the group rows by their constructions, `R_{Γ^K_En} = O(T_Co)` | indices `1` and `2·|O(q)|`, the page's |
 | 3 | the call on `T_Co` under `O(T_Co)`, with incidence | 1 line orbit, 1 plane orbit, 1 edge |
 | 4 | the known-answer comparisons | all ten rows are the cards' |
-| 5 | the kernel rows on `T_Co` | line rows **527** each; the plane rows **189 720 cusps** each (36.2 min at 3 476 MiB and 30.2 min at 3 554 MiB) |
+| 5 | the kernel rows on `T_Co` | line rows **527** each; the plane rows **189 720 cusps** each (36.2 min at 3 476 MiB, 30.2 min at 3 554 MiB); the kernel *incidence* relation does not return inside 90 min — see below |
 | 6 | `O(T_Co)` generators | return, 359 in 27.0 s, port `991b88b0` |
 
 ### The index over each finite class
@@ -332,3 +332,25 @@ So the item is a **cost item**, not a host accident: the row's peak is the
 per-plane representative, 26.3 KiB of which survives the caller dropping the
 plane.  That retained term is `#594`'s subject; the 42.1 KiB term is the
 gathered return of the public call.
+
+## The kernel incidence relation
+
+The last item of the call is the relation between the kernel rows' line and
+plane orbits.  `tests/coble_gamma_co_2_incidence_rows.py --rows Otilde+
+--lattice Tco --cap 5400 --budget 6000` at `main` `b501886`, port `991b88b0`,
+run alone under the lease, took the divided-class route (decided in 1.6 s) and
+was killed at the end of its 90-minute cap with no row line printed:
+
+```
+[Otilde+] the row's route: divided-class, taken because its lines carry divided
+         classes and its covering is carried from one plane to the others
+Killed
+```
+
+Its resident memory stood at 4.17 GiB when the cap fired, so the kill is the
+budget's and not the host's: the relation is 569 160 edges over the 189 720
+plane cusps, and at the rates `results/issue381-plane-row-route.md` measures
+that is hours, not minutes.  The venue the library names for it is the workflow
+`results/coble-kernel-incidence-rows.yml` (`--cap 10800 --budget 28800`, a
+16 GiB runner), which this connection cannot install: `.github/workflows/` is
+outside its scope.
