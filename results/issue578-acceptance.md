@@ -5,6 +5,11 @@ Pushed on `main` at `0ae8ecd0692d46160753d68dfd475a56370784e0`
 Independently verified: `git ls-remote https://github.com/dzackgarza/sage-extensions.git refs/heads/main`
 answers `0ae8ecd0692d46160753d68dfd475a56370784e0`.
 
+The line numbers of the first section are those of the tree it measured
+(`c71a004`); that tree was rewritten by the repair in the second pass below,
+which re-decided every item on the tree pushed after it and gives the current
+numbers.
+
 Runtime: `~/sage-image/run.sh`, image `dzackgarza/sage@sha256:332aebe9b1361210466d7d5a6ac2df855f5795c9e8a1f013ecd9379b72323698`
 (revision `6301b4e4`), Python 3.14.10. Every run below is
 
@@ -48,7 +53,7 @@ The third is the smooth map constructor itself: at `f4e467f`,
 ## 2. The owned smooth inclusion, with its source and its target
 
 `SmoothManifolds.ParentMethods.open_submanifold_inclusion`
-(`src/sage_extensions/categories/manifolds.py:1673`) finds the chart that has
+(`src/sage_extensions/categories/manifolds.py:1738`) finds the chart that has
 the open submanifold as its domain and builds the arrow through the smooth
 morphisms' own Mor, `open_manifold.Mor(self)` (`manifolds.py:1701`).
 
@@ -88,7 +93,7 @@ point.
   (`manifolds.py:1431`), each admitted by the source chart's ring of functions
   (`manifolds.py:1461` through `_admit_manifold_expression_family`,
   `manifolds.py:714`).  The map of points is derived from those sections
-  (`manifolds.py:1349-1354`), so an unconstrained callable or a private engine
+  (`manifolds.py:1353-1354`), so an unconstrained callable or a private engine
   map is not a datum this owner accepts.
 
 ## 5. Composition and chart restriction through the existing owners
@@ -144,3 +149,90 @@ smooth map, are still stubs (`manifolds.py:1400`, `manifolds.py:1403`); this
 issue is the smooth inclusion, not the `C^k` functor.  The whole-tree session
 plugin path `/ci/tool-artifacts` is not installed in the image and was bound
 from `~/ai-review-ci` for these runs.
+
+## Second pass: every acceptance item decided again, on one turn's tree
+
+Rebased onto `fd029ab`, where the hyperbolic arrow now holds the smooth
+morphism its coordinate sections define (that round builds on
+`SmoothManifoldMor._element_constructor_`), the two commits of this pass are
+`dd29434` (test) and `deead84` (fix), and this note is the head.
+
+1. **Public red proof of the missing map constructor.** Decided on `f4e467f`
+   in a tree of its own: `3 failed in 10.36 s`, the rows at
+   `tests/objects/test_the_proper_chart_domain_includes_smoothly.sage:46` and
+   `:65` (`assert None in Set of Morphisms from 2-dimensional open submanifold
+   U of 2-dimensional smooth manifold R^2, ... to ... R^2 in Category of smooth
+   manifolds`) and the constructor itself at
+   `categories/abstract_categories/mor_foundation.py:61`,
+   `TypeError: SmoothManifoldMor._element_constructor_() missing 1 required
+   positional argument: 'chart_maps'`, from the `pass` stub at
+   `manifolds.py:1362` (and the operation's own stub at `manifolds.py:2821`).
+
+2. **The owned inclusion, source and target.** Probed on this tree:
+   `inclusion in domain.Mor(plane)` True, `inclusion.parent() is
+   domain.Mor(plane)` True, `inclusion.domain() is domain` True,
+   `inclusion.codomain() is plane` True, `chart.domain() is domain` True,
+   `domain.containing_manifold() is plane` True — the last is the relation the
+   issue says is not the morphism.  Source:
+   `SmoothManifolds.ParentMethods.open_submanifold_inclusion`,
+   `src/sage_extensions/categories/manifolds.py:1738`;
+   `SmoothManifoldMor._element_constructor_`, `manifolds.py:1496`.
+
+3. **Point values are the same intrinsic point of the ambient manifold.**
+   `inclusion(inner) == point` True for `inner` given in the chart `U` of the
+   domain and `point = plane((3, -1), "base")`; the image's coordinates in the
+   ambient chart `U` are `(3, -1)`; the two coordinate sections are sections of
+   `domain.atlas()["U"].function_ring()` and take `(3, -1)` there.
+   `_evaluate_point`, `manifolds.py:1440`; the point equality is
+   `manifolds.py:919`.
+
+4. **Restriction and composition through the existing owners.** Two halves,
+   both decided.
+   * Composition with a map written on the open subset's chart: green
+     (`(x, y) |-> (x, y^2)` composed with the inclusion carries `(3, -1)` to
+     `(3, 1)`), `__mul__` at `manifolds.py:1466`.
+   * Restriction of a map of the plane: at `c71a004` refused —
+     `tests/objects/test_the_proper_chart_domain_includes_smoothly.sage:118`,
+     `AssertionError: cannot read Generic endomorphism ... on the chart 'U'`,
+     `manifolds.py:1372`, `1 failed, 4 passed in 8.08 s`.  Now green by
+     `SmoothManifoldMor.ElementMethods._representation_written_on`
+     (`manifolds.py:1392`), which restates the outer map on the chart the inner
+     map states its values in through
+     `ManifoldAtlasTransition.forward_expressions` and the source chart's ring:
+     `doubling * inclusion` is a map `U -> R^2` carrying `(3, -1)` to
+     `(3, -2)`, with sections on `("U", "base")`
+     (`...includes_smoothly.sage:98-127`).  With no change of coordinates
+     stated the composition is refused and names the missing transition
+     (`:130-147`), rather than the two charts being assumed to agree.  The
+     restatement is used only where the atlas states the change on the whole
+     chart (empty `source_overlap`): no representation here records the subset a
+     formula holds on, so a change defined on a proper subset is refused.
+
+5. **The proper domain is preserved; no global chart, no engine map.** The
+   point `(0, 1)` on `x = 0` is refused by the inclusion
+   (`ValueError: the point does not belong to the domain of Chart (U, (x, y))`,
+   `...includes_smoothly.sage:60-68`); the map's only representation is on the
+   open subset's own chart (`(('U', 'U'),)`); the constructor's one datum is
+   the coordinate sections, each admitted by the source chart's ring
+   (`manifolds.py:1496` and `:1526`), and the map of points is derived from
+   them (`manifolds.py:1353-1354`), so a bare callable or a private engine map
+   is not accepted.
+
+6. **Scope.** The public additions are the two methods above; the neighbouring
+   stage stubs are untouched: `weaken_to` (`manifolds.py:1460`),
+   `as_ck_morphism` (`manifolds.py:1463`), `SmoothManifolds.ParentMethods`'
+   `as_ck_manifold`, `underlying_topological_manifold` and `tangent_bundle`
+   (`manifolds.py:1768-1774`), and no sphere or general manifold feature is
+   added.
+
+Runs on this turn's tree, time gates on:
+
+    5 passed in 10.79s   tests/objects/test_the_proper_chart_domain_includes_smoothly.sage
+    15 passed in 21.68s  that file, the hyperbolic arrow file and
+                         test_the_standard_hyperbolic_plane_is_a_smooth_manifold.sage
+                         together, after the rebase onto fd029ab
+
+and the seven smooth-manifold consumer files earlier in this pass,
+`25 passed in 219.96 s`, with the one pre-existing call-gate overrun
+(`test_a_coordinate_of_a_complex_chart_is_a_section_valued_in_the_complex_field`,
+200.29 s here, 194.14 s on the parent tree) named rather than fixed.
