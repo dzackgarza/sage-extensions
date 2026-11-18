@@ -22,9 +22,16 @@ fill two cache entries.  So a method under ``cached_method`` opens
 ``with stage(...)`` on its first statement, and :func:`timed_stage` is only for
 functions no cache reads a signature from.
 
-**Where the record goes.**  :func:`timing_directory` is ``.timings/`` in the
-source tree this module is a file of, which ``.gitignore`` keeps out of git and
-``CONTRIBUTING.md`` ENV-03 states, and which the call creates and asserts.  One
+**Where the record goes.**  :func:`timing_directory` is ``.timings/`` at the
+root of the source checkout this module is a file of, which ``.gitignore`` keeps
+out of git and ``CONTRIBUTING.md`` ENV-03 states; and, for a package installed
+from a wheel, which has no checkout, the running user's own state directory:
+``$XDG_STATE_HOME/sage-extensions/timings``, or
+``~/.local/state/sage-extensions/timings`` when that variable is unset.  The
+directory has an owner either way -- the checkout's, at its root, or the user's,
+in the place the XDG Base Directory Specification sets aside for a program's
+state -- so a run writes where its own owner keeps its records, never into the
+directory it was started from, and the directory is created and asserted.  One
 file per process, named by the resolved commit, the process's start time to the
 microsecond and its pid, so two runs of the same commit never overwrite each
 other's records — two runs started in the same second are two processes, and two
@@ -78,6 +85,7 @@ from __future__ import annotations
 import json
 import logging
 import os
+import re
 import subprocess
 import threading
 import time
@@ -103,7 +111,19 @@ LOGGER_NAME = "sage_extensions.timing"
 r"""The name of the one logger this module owns, a child of the package's own."""
 
 RECORD_DIRECTORY_NAME = ".timings"
-r"""The durable record directory at the source tree's root, stated in ``CONTRIBUTING.md`` ENV-03."""
+r"""The durable record directory at a checkout's root, stated in ``CONTRIBUTING.md`` ENV-03."""
+
+STATE_DIRECTORY_PARTS = ("sage-extensions", "timings")
+r"""The record directory of an installed package, below the user's state directory."""
+
+STATE_HOME_VARIABLE = "XDG_STATE_HOME"
+r"""The variable that states the running user's state directory, per the XDG Base Directory Specification."""
+
+SOURCE_REVISION_FILE_NAME = "source_revision"
+r"""The file a build writes the revision it built from into, beside this module (``setup.py``)."""
+
+_COMMIT_ID = re.compile(r"[0-9a-f]{40}")
+r"""What a revision is: forty lowercase hexadecimal characters, and nothing else is one."""
 
 logger = logging.getLogger(LOGGER_NAME)
 r"""The logger every stage record is emitted through."""
@@ -197,37 +217,70 @@ class _JSONLineHandler(logging.Handler):
 
 
 @lru_cache(maxsize=1)
-def _source_tree() -> Path:
-    r"""The ``sage_extensions`` source tree this module is a file of.
-
-    The package's file is ``<tree>/src/sage_extensions/timing.py``, so the tree
-    is two directories up from the package here, and the assertion that its
-    ``pyproject.toml`` is there is what makes the location a fact rather than a
-    guess: an installation that is not a checkout has no source tree, and this
-    says so instead of writing somewhere else.
-    """
+def _package_directory() -> Path:
+    r"""The installed ``sage_extensions`` package directory this module is a file of."""
     package = Path(__file__).resolve().parent
     assert package.name == "sage_extensions", (
         f"this module is a file of {package}, which is not the sage_extensions package directory"
     )
+    return package
+
+
+@lru_cache(maxsize=1)
+def _checkout_root() -> Path | None:
+    r"""The source checkout this module is a file of, and ``None`` for an installed package.
+
+    A checkout keeps the package at ``<tree>/src/sage_extensions`` and states the
+    tree at its root with a ``pyproject.toml``.  An installed package keeps it one
+    directory of ``site-packages``: its parent is the ``site-packages``, or the
+    ``--target`` directory a consumer installed it into, whose own parent may
+    well hold a ``pyproject.toml`` of that consumer's project.  So both the
+    ``src`` directory the package sits in and the tree's ``pyproject.toml`` are
+    read here, and nothing is inferred from a name.
+    """
+    package = _package_directory()
+    if package.parent.name != "src":
+        return None
     tree = package.parents[1]
-    assert (tree / "pyproject.toml").is_file(), (
-        f"the source tree of {package} is {tree}, which holds no pyproject.toml: the timing record "
-        "has no checkout to be written into"
-    )
-    return tree
+    return tree if (tree / "pyproject.toml").is_file() else None
+
+
+@lru_cache(maxsize=1)
+def _built_revision() -> str | None:
+    r"""The revision this installation was built from, and ``None`` if it recorded none.
+
+    ``setup.py``'s ``build_py`` writes the source checkout's commit beside this
+    module as ``source_revision`` at the moment the wheel is built, which is the
+    only moment at which the revision the wheel's code came from is known: once
+    the wheel is installed there is no checkout to ask, and an environment
+    variable would name whatever the process was told -- in a consumer's job,
+    the commit of a different repository.
+    """
+    recorded = _package_directory() / SOURCE_REVISION_FILE_NAME
+    if not recorded.is_file():
+        return None
+    return recorded.read_text(encoding="utf-8").strip() or None
 
 
 @lru_cache(maxsize=1)
 def timing_directory() -> Path:
-    r"""``.timings/`` in the source tree, created if it is not there, and asserted.
+    r"""The record directory, created if it is not there, and asserted.
 
-    One location, for every run of this checkout: the library's stage records
-    and the test runs' report logs are kept together, and a directory that
-    cannot be made is an error at the first stage rather than a record silently
-    not written.
+    ``.timings/`` at the root of the source checkout this module is a file of,
+    so the library's stage records and the test runs' report logs are kept
+    together there (``CONTRIBUTING.md`` ENV-03); and, for a package installed
+    from a wheel, the running user's state directory as the XDG Base Directory
+    Specification states it, ``$XDG_STATE_HOME`` or ``~/.local/state``, under
+    ``sage-extensions/timings``.  A directory that cannot be made is an error at
+    the first stage rather than a record silently not written.
     """
-    directory = _source_tree() / RECORD_DIRECTORY_NAME
+    checkout = _checkout_root()
+    if checkout is not None:
+        directory = checkout / RECORD_DIRECTORY_NAME
+    else:
+        named = os.environ.get(STATE_HOME_VARIABLE)
+        state = Path(named).expanduser() if named else Path.home() / ".local" / "state"
+        directory = state.joinpath(*STATE_DIRECTORY_PARTS)
     directory.mkdir(parents=True, exist_ok=True)
     assert directory.is_dir(), (
         f"the timing record's directory {directory} is not a directory after it was made"
@@ -237,22 +290,36 @@ def timing_directory() -> Path:
 
 @lru_cache(maxsize=1)
 def current_commit() -> str:
-    r"""The commit of the source tree this library is, resolved once per process.
+    r"""The revision of this library's source, resolved once per process.
 
-    From that tree's own git and from nothing else: an environment variable
-    names whatever the process was told, which in a consumer job is the commit
-    of a different repository.  A tree that git cannot read raises, which is a
-    record refusing to be attributable to a commit it does not know.
+    From the checkout when this module is a file of one: that tree's own git,
+    and nothing else, because an environment variable names whatever the process
+    was told.  From the build when it is a file of an installed package: the
+    revision its build recorded beside it (:func:`_built_revision`), which is
+    the revision the installed code came from.  An installation that recorded
+    none raises: a record attributed to a commit nothing resolved would be a
+    claim about code that did not produce it.
     """
-    completed = subprocess.run(
-        ("git", "-C", str(_source_tree()), "rev-parse", "HEAD"),
-        capture_output=True,
-        text=True,
-        check=True,
-    )
-    resolved = completed.stdout.strip()
-    assert len(resolved) == 40, (
-        f"git rev-parse HEAD in {_source_tree()} returned {resolved!r}, which is not a commit id"
+    checkout = _checkout_root()
+    if checkout is not None:
+        completed = subprocess.run(
+            ("git", "-C", str(checkout), "rev-parse", "HEAD"),
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        resolved = completed.stdout.strip()
+        source = f"git rev-parse HEAD in {checkout}"
+    else:
+        resolved = _built_revision()
+        assert resolved is not None, (
+            f"{_package_directory()} is not a source checkout and carries no "
+            f"{SOURCE_REVISION_FILE_NAME}: this installation was not built from a git checkout, so "
+            "it knows no revision to attribute its timing records to"
+        )
+        source = f"the build revision recorded in {_package_directory() / SOURCE_REVISION_FILE_NAME}"
+    assert _COMMIT_ID.fullmatch(resolved) is not None, (
+        f"{source} returned {resolved!r}, which is not a commit id"
     )
     return resolved
 
