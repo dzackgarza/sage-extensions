@@ -602,6 +602,21 @@ class _ConstantMap:
         return self._value
 
 
+def _constant_section(space, value):
+    r"""``value``, a value of the maps' codomain, as the constant section of ``space`` it denotes.
+
+    A section of a space of maps is a map ``X -> Y``, and a value ``y`` of ``Y``
+    is the map constant at ``y``; the space's own element constructor reads that
+    map, and the value reaches it through the codomain's coercion.  This is the
+    coercion every space of maps states from its field of values, and from the
+    owned rings that map into it, so that the coercion model can meet a section
+    and a numeral in one parent and the space need not state an operator per
+    numeral.  A callable coercion is called with its codomain first
+    (``sage.structure.coerce_maps.CallableConvertMap``).
+    """
+    return space(_constant_map(space.codomain()(value)))
+
+
 def _constant_map(value):
     r"""The defining function of the constant map with value ``value``.
 
@@ -697,6 +712,63 @@ def _summability_condition(exponent, domain):
 
 class _FunctionSpaceMap(_ConditionSubmoduleElement):
     r"""A map ``X -> Y`` in a function space: an element of ``Y^X`` admitted by the space's condition."""
+
+    def _constant_section_operand(self, value):
+        r"""The constant section the scalar ``value`` denotes, or ``None`` when it denotes none.
+
+        A map of a function space is a function ``X -> Y``, and a value ``y`` of
+        ``Y`` is the constant map at ``y``; the space's own element constructor
+        reads it (``_constant_map``).  The values' field is a scalar for its
+        space, and so is an element of an owned ring that maps into it -- a
+        session numeral is the owned integers' -- so ``1 + x^2`` and
+        ``2 * x`` are sums and multiples in the ring of functions (Lee,
+        *Introduction to Smooth Manifolds*, 2nd ed., Ch. 2, for the algebra of
+        smooth functions over ``R``).  A value that is a map already, or a
+        number of no owned ring, is no scalar operand and is answered ``None``.
+        """
+        from sage.structure.element import parent as element_parent
+        from sage.structure.parent import Parent
+
+        codomain = self.parent().codomain()
+        source = element_parent(value)
+        if source is codomain or source is int:
+            return _constant_section(self.parent(), value)
+        if isinstance(source, Parent):
+            from sage_extensions.categories.rings.ring_foundation import OwnedRings
+
+            if source in OwnedRings() and codomain.has_coerce_map_from(source):
+                return _constant_section(self.parent(), value)
+        return None
+
+    def __add__(self, other):
+        r"""The pointwise sum, reading a scalar operand as the constant section it is."""
+        constant = self._constant_section_operand(other)
+        return super().__add__(other if constant is None else constant)
+
+    def __mul__(self, other):
+        r"""The pointwise product, reading a scalar operand as the constant section it is."""
+        constant = self._constant_section_operand(other)
+        return super().__mul__(other if constant is None else constant)
+
+    def _add_(self, other):
+        r"""The pointwise sum, reading a scalar operand as the constant section it is."""
+        constant = self._constant_section_operand(other)
+        return super()._add_(other if constant is None else constant)
+
+    def __radd__(self, other):
+        r"""The pointwise sum with a scalar on the left, read as the constant section it is."""
+        constant = self._constant_section_operand(other)
+        return NotImplemented if constant is None else constant + self
+
+    def _mul_(self, other):
+        r"""The pointwise product, reading a scalar operand as the constant section it is."""
+        constant = self._constant_section_operand(other)
+        return super()._mul_(other if constant is None else constant)
+
+    def __rmul__(self, other):
+        r"""The pointwise product with a scalar on the left, read as the constant section it is."""
+        constant = self._constant_section_operand(other)
+        return NotImplemented if constant is None else constant * self
 
     def __call__(self, point):
         r"""The value at ``point``."""
