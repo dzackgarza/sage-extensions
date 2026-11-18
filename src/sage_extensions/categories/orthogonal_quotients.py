@@ -1690,6 +1690,22 @@ class OrthogonalCharacterQuotient:
         operation that owns it, so every caller reads the one family its span
         has instead of recomputing it per question.
         """
+        # A line row retains the ambient isometry that placed every split
+        # representative.  Its stabilizer is the conjugate of the source
+        # stabilizer, including its entire character image.  Compute the
+        # exact source family once instead of independently closing the
+        # stabilizer image at every transported cusp (527 on T_Co).
+        if not flag:
+            from sage_extensions.categories.isotropic_orbits import _span_key
+
+            root, transport = self.transported_from_root(representative)
+            if _span_key(root) != _span_key(representative):
+                inverse = ~transport
+                return tuple(
+                    transport * generator * inverse
+                    for generator in self.exact_isotropic_stabilizer_generators(root)
+                )
+
         ambient = self.supergroup
         generators = list(ambient.isotropic_stabilizer_generators(representative, flag=flag))
         _section_generators, _images, section = self._image_section()

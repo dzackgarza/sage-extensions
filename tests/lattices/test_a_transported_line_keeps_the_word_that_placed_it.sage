@@ -184,3 +184,20 @@ def test_the_exact_stabilizer_is_one_datum_for_each_span() -> None:
         assert other is not family
         for generator in other:
             assert _carries(generator, second, second)
+
+
+def test_transported_line_stabilizer_is_the_exact_conjugate() -> None:
+    r"""A split line's complete stabilizer family is transported from its root."""
+    for subgroup in _kernel_rows():
+        quotient = subgroup.finite_character_quotient()
+        row = tuple(subgroup.isotropic_orbit_representatives(1))
+        transported = [line for line in row
+                       if quotient.isotropic_transport_of(line) is not None]
+        assert transported
+        for line in transported:
+            root, move = quotient.transported_from_root(line)
+            assert not _spans_agree(root, line)
+            root_family = quotient.exact_isotropic_stabilizer_generators(root)
+            family = quotient.exact_isotropic_stabilizer_generators(line)
+            assert tuple(move * g * ~move for g in root_family) == family
+            assert all(_carries(g, line, line) for g in family)
