@@ -34,6 +34,7 @@ and it is stated once, in `faces`.
 """
 
 import weakref
+from itertools import permutations
 from math import atan2, factorial
 
 from sage.combinat.permutation import Permutation
@@ -878,6 +879,126 @@ class _PlacedPolytopeCategory(OwnedParameterizedCategory):
                 )
             )
 
+        @cached_method
+        def _placed_rays(self):
+            r"""The placed vertices of a hyperbolic placement, as lattice vectors.
+
+            A point of a hyperboloid model is the ray of a positive rational vector
+            of its component, so each placed vertex has one representative in the
+            ambient lattice, and it is that vector an isometry of the lattice acts
+            on.  The rays are read in the lattice's own coordinates, in the order of
+            :meth:`vertices`.
+            """
+            lattice = self.ambient_space().lattice()
+            labels = tuple(lattice.module_generating_set())
+            return tuple(
+                tuple(SageQQ(int(point.representative().to_vector()(label))) for label in labels)
+                for point in self.vertices()
+            )
+
+        def _hyperbolic_isometry_of_positions(self, positions):
+            r"""The lattice isometry carrying the placed rays to a permutation of them, if one exists.
+
+            A hyperbolic point is a ray, so an isometry of the lattice carries one
+            placed ray to another only up to a positive scale, and the scales are
+            fixed by the form: on rays that span the lattice's space,
+            `q(r_i) = lambda_i^2 q(r_{sigma(i)})` and the pairings fix the signs of
+            the scales.  So the isometry a permutation determines is *solved* for
+            rather than looked up among the lattice's isometries: `O(I_{1,n})` is
+            infinite and nothing here enumerates it.  The answer is the matrix in
+            the lattice's coordinates, or ``None`` when the permutation admits none.
+            """
+            from itertools import product
+
+            lattice = self.ambient_space().lattice()
+            labels = tuple(lattice.module_generating_set())
+            generators = tuple(lattice.module_generator(label) for label in labels)
+            rank = len(generators)
+            form = engine_matrix(
+                SageQQ,
+                rank,
+                rank,
+                [
+                    [SageQQ(int(lattice.b(generator, other))) for other in generators]
+                    for generator in generators
+                ],
+            )
+            rays = tuple(
+                engine_matrix(SageQQ, rank, 1, list(ray)) for ray in self._placed_rays()
+            )
+
+            def quadratic(vector):
+                return (vector.transpose() * form * vector)[0, 0]
+
+            def rational_root(ratio):
+                numerator, denominator = SageQQ(ratio).numerator(), SageQQ(ratio).denominator()
+                top, bottom = SageZZ(numerator).sqrt(), SageZZ(denominator).sqrt()
+                match top * top == SageZZ(numerator) and bottom * bottom == SageZZ(denominator):
+                    case True:
+                        return SageQQ(top) / SageQQ(bottom)
+                    case False:
+                        return None
+
+            def proportional(left, right):
+                return all(
+                    left[row, 0] * right[(row + 1) % rank, 0]
+                    - left[(row + 1) % rank, 0] * right[row, 0]
+                    == 0
+                    for row in range(rank)
+                )
+
+            basis_positions = tuple(range(rank))
+            basis = engine_matrix(
+                SageQQ,
+                rank,
+                rank,
+                [rays[position].list() for position in basis_positions],
+            ).transpose()
+            if basis.rank() != rank:
+                return None
+            scales = []
+            for position in basis_positions:
+                ratio = quadratic(rays[position]) / quadratic(rays[positions[position]])
+                if ratio <= 0:
+                    return None
+                root = rational_root(ratio)
+                if root is None:
+                    return None
+                scales.append(root)
+            images = tuple(
+                engine_matrix(
+                    SageQQ,
+                    rank,
+                    1,
+                    [
+                        scales[position] * value
+                        for value in rays[positions[position]].list()
+                    ],
+                )
+                for position in basis_positions
+            )
+            for signs in product((1, -1), repeat=rank):
+                signature = engine_matrix(
+                    SageQQ,
+                    rank,
+                    rank,
+                    [
+                        [signs[position] * value for value in images[position].list()]
+                        for position in range(rank)
+                    ],
+                ).transpose()
+                matrix = signature * basis.inverse()
+                if any(entry.denominator() != 1 for entry in matrix.list()):
+                    continue
+                if (matrix.transpose() * form * matrix) != form:
+                    continue
+                if all(
+                    proportional(matrix * rays[position], rays[positions[position]])
+                    for position in range(rank, len(rays))
+                ):
+                    return matrix
+            return None
+
         def _vertex_positions_of(self, ambient_map):
             r"""The positions an ambient map carries the placed vertices to."""
             position_of = self.vertices().ranking_map()
@@ -990,6 +1111,21 @@ class _PlacedPolytopeCategory(OwnedParameterizedCategory):
                 for element in underlying.geometric_automorphisms().selected_subgroup_generators()
             )
             space = self.ambient_space()
+            match isinstance(space, HyperbolicSpaces.ParentMethods):
+                case True:
+                    # A hyperbolic placement has no affine frame: its points are
+                    # rays, and an isometry of them is solved for from the vertex
+                    # permutation rather than read back from one.  The candidates
+                    # are the permutations of the placed vertices themselves.
+                    return tuple(
+                        permutation
+                        for permutation in permutations(
+                            range(len(tuple(self.vertices())))
+                        )
+                        if self._hyperbolic_isometry_of_positions(permutation) is not None
+                    )
+                case False:
+                    pass
             metric = space in EuclideanSpaces() or space in SphericalSpaces()
             full_dimensional = metric and int(self.dimension()) == int(
                 space.underlying_affine_space().model_vector_space().dimension()
@@ -1032,6 +1168,38 @@ class _PlacedPolytopeCategory(OwnedParameterizedCategory):
             underlying affine space together with the ambient owner's decision
             whether it preserves the metric.
             """
+            ambient_space = self.ambient_space()
+            match isinstance(ambient_space, HyperbolicSpaces.ParentMethods):
+                case True:
+                    # A hyperbolic point is a ray, so this arrow is the lattice
+                    # isometry the vertex permutation determines: no affine frame
+                    # takes part in it, and `O(I_{1,n})` is never enumerated.
+                    column = self._hyperbolic_isometry_of_positions(positions)
+                    assert column is not None, (
+                        f"{positions} is no permutation of the placed rays of {self} by an isometry "
+                        "of the ambient lattice, so no ambient map determines it"
+                    )
+                    lattice = ambient_space.lattice()
+                    labels = tuple(lattice.module_generating_set())
+                    integral = column.change_ring(SageZZ)
+                    rows = int(integral.nrows())
+                    return ambient_space.category().Mor(ambient_space, ambient_space)(
+                        lattice.Mor(lattice)(
+                            lambda label: sum(
+                                (
+                                    _owned_engine_element(
+                                        SageZZ, integral[row, labels.index(label)]
+                                    )
+                                    * lattice.module_generator(labels[row])
+                                    for row in range(rows)
+                                    if integral[row, labels.index(label)]
+                                ),
+                                lattice.zero(),
+                            )
+                        )
+                    )
+                case False:
+                    pass
             linear_part, image_origin, origin = self._coordinate_affine_map(positions)
             space = self.placement_space()
             affine_space = (

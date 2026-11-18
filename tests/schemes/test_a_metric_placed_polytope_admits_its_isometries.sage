@@ -629,6 +629,14 @@ def test_the_placed_hyperbolic_polygon_admits_its_isometry() -> None:
     vectors -- so the space takes it as it is, and the arrow carries a ray to the
     ray of its representative's image without a chart: the antipodal map sends the
     first placed corner to the third and is its own inverse.
+
+    The polygon's geometric automorphisms are the integral isometries of the
+    lattice carrying its four rays among themselves.  `O(I_{1,2})` is infinite and
+    nothing enumerates it: each permutation of the four rays is *solved* for -- a
+    hyperbolic point is a ray, so an isometry carries one to another up to a
+    positive scale, three of the rays span, and the form fixes the scales -- and
+    the answer is the square's own dihedral group of order eight, the number the
+    Euclidean and spherical placements of the same square answer.
     """
     space = HyperbolicSpaces(2).an_object()
     lattice = space.lattice()
@@ -682,6 +690,15 @@ def test_the_placed_hyperbolic_polygon_admits_its_isometry() -> None:
     assert space(corners[0]) is corners[0]
     assert arrow(corners[0]) == corners[3]
     assert (arrow * arrow)(corners[0]) == corners[0]
+
+    geometric = placed.geometric_automorphisms()
+    elements = tuple(geometric)
+    antipodal = next(element for element in elements if element(corners[0]) == corners[3])
+
+    assert geometric.order() == 8
+    assert antipodal(corners[0]) == corners[3]
+    assert (antipodal * antipodal)(corners[0]) == corners[0]
+    assert sum(1 for element in elements if element(corners[0]) == corners[0]) == 2
 
 
 def test_a_placed_isomorphism_derives_the_faces_of_two_polytopes() -> None:
