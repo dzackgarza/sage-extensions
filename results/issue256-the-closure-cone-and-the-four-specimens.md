@@ -378,3 +378,29 @@ real field; `polytopes` still constructs it at import, so `Sterk.roots_18_2_0()`
 named roots the rank is derived from -- cannot be reached here.  The rank itself is
 settled (twelve, eighteen, two, ten, two, in §4 and §11's terms); what is missing is only a
 test that can call the library's own roots.
+
+## 12. The first of the surgery's missing calls is implemented: `subspace`
+
+`TopologicalSpaces.subspace` (`topological_spaces.py:647`) was a `pass` body returning
+`None`.  It now returns ``(space, inclusion)``: the selected subset with the initial
+topology along its inclusion, and the continuous map that is the identity on points from the
+first into the second.
+
+A subset ``V`` of the subspace is open exactly when it is ``f^{-1}(U)`` for an open ``U`` of
+the ambient space (Mathlib, ``TopologicalSpace.induced``).  The inclusion is injective, so
+``V = f^{-1}(f(V))`` and the largest candidate is ``f(V)`` together with everything outside
+the image of the subspace, which no preimage can see; the ambient space's own openness
+decision then answers.  The opens are enumerated for a finite enumerated set of points, and
+anything else is refused rather than guessed.
+
+Test: `tests/topology/test_the_induced_topology_of_a_subspace.sage`, both bodies pass
+(2 passed, 0 failures) -- the Sierpinski space ``{0,1,2}`` with opens ``{}, {2}, {1}, {1,2},
+{0,1,2}`` and the subset ``{0,1}``, whose opens come out as ``{}, {1}, {0,1}``, and a
+one-point subspace.
+
+**Correction to the previous section.**  The cut space's *set* does not need a new
+operation: the power set's `from_predicate` names the complement of the region in one line,
+so with `subspace` in place `X - int(region)` is constructible.  What the three surgery
+methods still lack is only the collar: `IntegralAffineCollars.on`
+(`integral_affine_collars.py:89`) is still a `pass` body, so every `affine_collars` argument
+is unbuildable.  That is the next call to implement.

@@ -645,8 +645,72 @@ class TopologicalSpaces(OwnedCategory):
         pass
 
     def subspace(self, subset_inclusion):
-        r"""Give the selected subset its induced topology and inclusion into its exact space."""
-        pass
+        r"""Give the selected subset its induced topology and inclusion into its exact space.
+
+        The induced topology is the initial topology along the inclusion: a subset
+        of the subspace is open exactly when it is the preimage of an open set of
+        the ambient space (Mathlib, ``TopologicalSpace.induced``; its opens are
+        ``{u | inclusion^{-1}(u) open}``).  For an injective inclusion the preimage
+        of a subset is that subset's image, so the opens are read by asking the
+        ambient space about the image, which is what a finite subspace enumerates.
+
+        The answer is the pair ``(space, inclusion)``: the selected subset with
+        its induced topology, and the continuous map that is the identity on
+        points from the first into the second.  Handing back the space alone would
+        lose which selection it is, and handing back the map alone would hide the
+        space it is a selection of.
+
+        A subspace is constructed here for a finite enumerated set of points,
+        which is what the tree's finite spaces are built on; the initial topology
+        of a subset of any other space is asked of that space's own openness
+        decision and is not enumerated.
+        """
+        ambient = subset_inclusion.codomain()
+        domain = subset_inclusion.domain()
+        assert ambient in self, (
+            f"a subspace is a subset of a topological space, and {ambient} is in "
+            f"{ambient.category()}"
+        )
+        point_set = domain.unstructured_set()
+        assert Sets().is_provably_finite(point_set) and point_set in EnumeratedSets(), (
+            f"the induced topology is enumerated here for a finite enumerated set of "
+            f"points, and the points of {domain} are {point_set}, which is in "
+            f"{point_set.category()}"
+        )
+        members = tuple(point_set)
+        ambient_power = ambient.power_set()
+
+        image_of_the_subset = frozenset(
+            subset_inclusion(domain(member)) for member in members
+        )
+
+        def open_witness(selected):
+            r"""The largest open candidate whose preimage is ``selected``.
+
+            A subset ``V`` of the subspace is open exactly when it is ``f^{-1}(U)``
+            for an open ``U`` of the ambient space.  The inclusion is injective, so
+            ``V = f^{-1}(f(V))`` and the largest such ``U`` is ``f(V)`` together
+            with everything outside the image of the subspace, which the preimage
+            cannot see.
+            """
+            inside = frozenset(subset_inclusion(domain(member)) for member in selected)
+            return ambient_power.from_predicate(
+                lambda point: point in inside or point not in image_of_the_subset
+            )
+
+        opens = tuple(
+            selected
+            for size in range(len(members) + 1)
+            for selected in combinations(members, size)
+            if ambient.is_open_subset(open_witness(selected)) is True
+        )
+        space = self(point_set, opens)
+        inclusion = self.Mor(space, ambient)._from_continuous_set_map(
+            Sets().Mor(space, ambient)(
+                lambda point: ambient(subset_inclusion(domain(members[point.index()])))
+            )
+        )
+        return space, inclusion
 
     @cached_method
     def fundamental_groupoid_functor(self):
