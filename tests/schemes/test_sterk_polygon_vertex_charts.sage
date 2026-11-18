@@ -186,6 +186,33 @@ def test_a_stored_sterk2_polygon_vertex_indexes_its_chart() -> None:
     assert apex_chart.coordinate_algebra() not in SymmetricAlgebras(QQ)
     assert apex_chart.coordinate_algebra().algebra_generating_set().cardinality() == 5
 
+    # The five generators are the Hilbert basis of the cone's dual, these
+    # lattice points, and the chart's algebra carries the relations the cone
+    # imposes on them: each pair symmetric about (0,-1) multiplies to the same
+    # square, so the chart is not a polynomial ring.
+    characters = apex_cone.character_lattice()
+    ray_one, ray_two = tuple(characters.module_generating_set())
+
+    def character(first, second):
+        return characters.linear_combination({ray_one: ZZ(first), ray_two: ZZ(second)})
+
+    outer_left, inner_left, base = character(-2, -1), character(-1, -1), character(0, -1)
+    inner_right, outer_right = character(1, -1), character(2, -1)
+    hilbert = tuple(apex_cone.semigroup_generators())
+    assert all(
+        any(point == generator for generator in hilbert)
+        for point in (outer_left, outer_right, inner_left, base, inner_right)
+    )
+    assert outer_left + outer_right == 2 * base
+    assert inner_left + inner_right == 2 * base
+    outer_left_monomial, inner_left_monomial, base_monomial, inner_right_monomial, outer_right_monomial = (
+        _character_monomial(apex_cone, apex_chart, point)
+        for point in (outer_left, inner_left, base, inner_right, outer_right)
+    )
+    assert outer_left_monomial * outer_right_monomial == base_monomial ** 2
+    assert inner_left_monomial * inner_right_monomial == base_monomial ** 2
+    assert outer_left_monomial != inner_left_monomial
+
     # The chart of a vertex is the atlas entry at that vertex's cone, on this
     # variety too: the cone the supporting normals span is a cone of this
     # variety's fan and its chart is the chart the atlas enumerates there.
