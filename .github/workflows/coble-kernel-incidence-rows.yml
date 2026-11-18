@@ -62,10 +62,14 @@ concurrency:
   cancel-in-progress: false
 jobs:
   kernel-incidence-rows:
-    name: Each kernel incidence row against the public incidence call
+    name: Public incidence row ${{ matrix.row }}
     runs-on: ubuntu-latest
     container: ghcr.io/dzackgarza/sage:develop
     timeout-minutes: 350
+    strategy:
+      fail-fast: false
+      matrix:
+        row: ${{ fromJSON(inputs.rows == 'Otilde,Otilde+' && '["Otilde","Otilde+"]' || format('["{0}"]', inputs.rows || 'Otilde,Otilde+')) }}
     steps:
       - name: Check out the commit under test
         uses: actions/checkout@v4
@@ -78,7 +82,7 @@ jobs:
           PYTHONPATH: src
           COBLE_CALL_CAP: ${{ inputs.cap || '10800' }}
           COBLE_ROW_BUDGET: ${{ inputs.budget || '28800' }}
-          COBLE_ROWS: ${{ inputs.rows || 'Otilde,Otilde+' }}
+          COBLE_ROWS: ${{ matrix.row }}
           COBLE_LATTICE: ${{ inputs.lattice || 'Tco' }}
           COBLE_ROUTE: ${{ inputs.route || 'auto' }}
         run: |-
@@ -86,6 +90,10 @@ jobs:
           "$SAGE_BIN" --version
           git rev-parse HEAD
           sage_python="$("$SAGE_BIN" -c "import sys; print(sys.executable)")"
+          # The two full T_Co kernel rows each retain 189720 plane lifts.
+          # A matrix job gives each row its own process, memory budget and
+          # full per-row cap; the driver checks the exact independent count
+          # (569160, 527, 189720) for each, so both jobs must succeed.
           "$sage_python" tests/coble_gamma_co_2_incidence_rows.py \
             --rows "$COBLE_ROWS" --lattice "$COBLE_LATTICE" --route "$COBLE_ROUTE" \
             --cap "$COBLE_CALL_CAP" --budget "$COBLE_ROW_BUDGET"
