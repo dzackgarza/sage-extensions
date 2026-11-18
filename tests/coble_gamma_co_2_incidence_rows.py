@@ -627,7 +627,7 @@ def _row_subgroup(lattice, label):
         case "Otilde":
             return lattice.stable_orthogonal_group()
         case "Otilde+":
-            return lattice.stable_orthogonal_group().intersection(lattice.O_plus())
+            return lattice.stable_positive_orthogonal_group()
     raise ValueError(f"{label} is not a row of the incidence driver, which has {ROW_LABELS}")
 
 

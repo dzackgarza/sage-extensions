@@ -1354,13 +1354,17 @@ class PredicateSubgroups(OwnedParameterizedCategory):
                     covering,
                     reference_classes,
                 ) in coverings.items():
-                    move = target_lift * ~reference_lift
                     action = _composite_divided_class_action(
                         quotient, target_discriminant, reference_discriminant
                     )
+                    check_move = (
+                        target_lift * ~reference_lift
+                        if position not in transport_checked and plane is not reference_plane
+                        else None
+                    )
                     for flag, classes in zip(covering, reference_classes, strict=True):
                         carried = _carried_divided_classes(classes, action)
-                        if position not in transport_checked and plane is not reference_plane:
+                        if check_move is not None:
                             # The carried class is the class of the carried line:
                             # the one plane of the row that builds a flag's worth
                             # of work, to check the finite image's action on
@@ -1368,7 +1372,13 @@ class PredicateSubgroups(OwnedParameterizedCategory):
                             # carried line.  The reference plane's own move is the
                             # identity, so the check is made at the first plane
                             # that is a different one.
-                            image_line = move.transport_isotropic_object(flag).terms()[0]
+                            # The lattice transport is needed only for this
+                            # one independent comparison of the finite action
+                            # with an actual carried line.  Constructing the
+                            # 11x11 composite at all 189720 Coble planes was
+                            # otherwise wasted: the remaining edges are read
+                            # directly from the certified finite action.
+                            image_line = check_move.transport_isotropic_object(flag).terms()[0]
                             if str(_isotropic_line_class_points(lattice, image_line)) != str(carried):
                                 raise ArithmeticError(
                                     f"the divided classes of the line of {flag} carried to {plane} by "

@@ -18,7 +18,7 @@ build-backend = "setuptools.build_meta"
 where = ["src"]
 
 [tool.setuptools.package-data]
-sage_extensions = ["py.typed", "categories/*.gp"]
+sage_extensions = ["py.typed", "categories/*.gp", "certificates/*.json"]
 
 # The category packages sage-mypy-category-plugin projects for the Sage QC
 # tier's mypy run: these categories, built through Sage's runtime.
