@@ -164,6 +164,33 @@ def test_the_glue_of_the_hyperbolic_plane_keeps_only_the_exchange() -> None:
     assert any(generator(first) == second for generator in family)
 
 
+def test_the_pointed_family_reaches_the_stabilizers_own_discriminant_image() -> None:
+    r"""The family is complete in the finite quotient, against a route that never asks for its generators.
+
+    `stabilizer_discriminant_image` is the library's own computation of
+    `rho(Stab_{O(L)}(v))` -- the differential criterion of the isotropic line, not
+    the family's images -- so comparing the two is a certificate of the family's
+    completeness modulo `ker rho`: a family with a smaller image would split one
+    orbit into several, while the elements of `ker rho` that it generates are the
+    argument's business (Schreier over the two cosets) and not a measurement.  The
+    image is a subgroup of the finite orthogonal group of the discriminant form,
+    so the comparison is an order and a membership.
+    """
+    lattice = _lattice(RANK_SEVEN)
+    labels = tuple(lattice.module_generating_set())
+    vector = lattice.module_generator(labels[0])
+    subobject = lattice.primitive_isotropic_subobject(vector)
+    discriminant = lattice.discriminant_representation()
+
+    stated = subobject.stabilizer_discriminant_image()
+    images = tuple(discriminant(generator) for generator in _pointed_generators(lattice, vector))
+    assert images
+    computed = discriminant.codomain().subgroup(images)
+
+    assert all(image in stated for image in images)
+    assert computed.cardinality() == stated.cardinality()
+
+
 def test_the_pointed_family_fixes_its_vector_and_the_setwise_one_does_not() -> None:
     r"""Every member of the isotropic pointed family fixes `v`; the setwise family has one that negates it.
 
