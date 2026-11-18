@@ -856,6 +856,20 @@ class TopologicalManifolds(OwnedCategory):
             chart_provider=None,
             **rest,
         ) -> None:
+            r"""Record the manifold this object realizes and its smooth structure.
+
+            ``engine_manifold`` is the engine realization ``M`` of this manifold
+            (:meth:`_engine_manifold_realization`): every chart of the atlas is
+            a chart of ``M``, and ``M``'s charts are the ones the transition
+            maps are read from.  ``manifold_dimension`` is ``dim(M)``,
+            ``manifold_name`` the label the manifold is written by,
+            ``manifold_structure`` the kind of atlas it carries,
+            ``differentiability_degree`` the ``k`` of that atlas' ``C^k``
+            maps (``None`` for a topological manifold and ``Infinity`` for a
+            smooth one, Lee, *Introduction to Smooth Manifolds*, 2nd ed.,
+            Ch. 1), and ``manifold_field`` the field the charts take values
+            in, read back by :meth:`coordinate_field`.
+            """
             self._preamble_engine_manifold = engine_manifold
             self._preamble_manifold_dimension = NN(int(manifold_dimension))
             self._preamble_manifold_name = str(manifold_name)
@@ -1673,8 +1687,14 @@ class RiemannianManifolds(OwnedCategory):
     a local isometry.  ``isometry_group()`` is the automorphism group of
     ``(M, g)`` in this map category.
 
-    A Riemannian manifold is the Riemannian orbifold whose charts have
-    trivial group, so ``RiemannianOrbifolds()`` is its supercategory.
+    A Riemannian manifold is a smooth manifold, so ``SmoothManifolds()`` is a
+    supercategory and the smooth structure's construction data — the engine
+    manifold ``M`` and its dimension, name, structure, differentiability
+    degree and coordinate field — is read by
+    ``TopologicalManifolds.ParentMethods``.  It is also the Riemannian
+    orbifold whose charts have trivial group, so ``RiemannianOrbifolds()`` is
+    its other supercategory; an orbifold with a chart of nontrivial group is
+    not a manifold and declares only the orbifold category.
     """
 
     _MorCategory = RiemannianManifoldMorCategoryConstruction
@@ -1682,7 +1702,7 @@ class RiemannianManifolds(OwnedCategory):
     def super_categories(self):
         from sage_extensions.categories.orbifolds import RiemannianOrbifolds
 
-        return [RiemannianOrbifolds()]
+        return [SmoothManifolds(), RiemannianOrbifolds()]
 
     @classmethod
     def _repr_object_names(cls):
