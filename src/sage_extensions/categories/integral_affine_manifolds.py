@@ -671,7 +671,103 @@ class SingularIntegralAffineSpaces(OwnedCategory):
         boundary_isomorphism,
         affine_collars,
     ):
-        pass
+        r"""Glue the replacement into the ambient space along the boundary of the region.
+
+        The region is the part of the ambient integral-affine surface that survives the
+        cut, selected by ``region_inclusion``: the inclusion of an open submanifold
+        ``V`` of the ambient smooth manifold ``X``.  Cutting the region out and sewing
+        the replacement in along its boundary does not change ``X`` as a smooth
+        manifold or as a topological space -- the base of a Symington surgery is the
+        surface it was cut from -- so the result's underlying space is ``X`` itself,
+        its singular locus is the replacement's, and its regular locus is the region.
+
+        The integral-affine structure of the result is ``X``'s, restricted to the
+        region (``IntegralAffineAtlases.restrict``) and reglued by the collar charts:
+        the two collars of ``affine_collars`` are the source and the target of the
+        gluing, ``boundary_isomorphism`` identifies their faces, and each collar's
+        chart is a chart of the result on its neighbourhood, into the same affine
+        model.  The chartwise affine gluing of the two collars is what makes the result
+        integral-affine rather than only topological (Alexeev--Engel, *Compactifications
+        of moduli spaces of K3 surfaces with a nonsymplectic involution*,
+        arXiv:2208.10383v2, Construction 6.16, pp. 31--32).
+
+        The replacement supplies the singular locus and the ambient affine structure;
+        it is a singular integral-affine space on ``X``, whose regular affine manifold
+        is the structure this surgery restricts.  Nothing is rebuilt: the result
+        retains the replacement's singular inclusion, the region's inclusion, and the
+        restricted structure's own charts (``OWN-15``).
+        """
+        ambient = region_inclusion.codomain()
+        assert region_inclusion.domain() in SmoothManifolds(), (
+            f"the region {region_inclusion.domain()} is an open submanifold of the ambient "
+            f"surface, and it is in {region_inclusion.domain().category()}"
+        )
+        assert replacement in SingularIntegralAffineSpaces(), (
+            f"a surgery glues a singular integral-affine space along the region's "
+            f"boundary, and {replacement} is in {replacement.category()}"
+        )
+        assert replacement.underlying_topological_space() is ambient, (
+            f"the replacement is glued into the ambient surface: its underlying space is "
+            f"{replacement.underlying_topological_space()}, not {ambient}"
+        )
+        from sage_extensions.categories.integral_affine_atlases import IntegralAffineAtlases
+        from sage_extensions.categories.integral_affine_collars import IntegralAffineCollars
+        from sage_extensions.categories.sets.set_categories import Sets
+
+        source_collar, target_collar = affine_collars
+        for collar in (source_collar, target_collar):
+            assert collar in IntegralAffineCollars(), (
+                f"a surgery's regluing is read through its collars, and {collar} is in "
+                f"{collar.category()}"
+            )
+        assert boundary_isomorphism.domain() is source_collar.face(), (
+            f"the boundary isomorphism starts at {boundary_isomorphism.domain()}, not at "
+            f"the source collar's face {source_collar.face()}"
+        )
+        assert boundary_isomorphism.codomain() is target_collar.face(), (
+            f"the boundary isomorphism ends at {boundary_isomorphism.codomain()}, not at "
+            f"the target collar's face {target_collar.face()}"
+        )
+        restricted = replacement.regular_affine_manifold().affine_atlas().restrict(
+            region_inclusion
+        )
+        model = restricted.affine_model()
+        chart_domains = dict(restricted.chart_domains())
+        chart_domain_inclusions = {
+            chart: restricted.chart_domain_inclusion(chart) for chart in chart_domains
+        }
+        affine_charts = {
+            chart: restricted.affine_chart(chart) for chart in chart_domains
+        }
+        for collar in (source_collar, target_collar):
+            collar_chart = collar.collar_chart()
+            assert collar_chart.codomain() is model, (
+                f"the collar chart {collar_chart} is read in {collar_chart.codomain()}, not "
+                f"in the affine model {model} of the surface the surgery reglues"
+            )
+            neighbourhood = collar_chart.domain()
+            chart_domains[collar] = neighbourhood
+            chart_domain_inclusions[collar] = (
+                Sets().Mor(neighbourhood, region_inclusion.domain()).identity()
+                if neighbourhood is region_inclusion.domain()
+                else region_inclusion.domain().open_submanifold_inclusion(neighbourhood)
+            )
+            affine_charts[collar] = collar_chart
+        reglued = IntegralAffineAtlases().on(
+            region_inclusion.domain(),
+            model,
+            chart_domains,
+            chart_domain_inclusions,
+            affine_charts,
+            {},
+            {},
+        )
+        return self.on(
+            ambient,
+            replacement.singular_locus_inclusion(),
+            region_inclusion,
+            reglued.integral_affine_manifold(),
+        )
 
     def symington_surgery(self, cut_inclusion, size, affine_regluing, affine_collars):
         r"""Select a cut, size, and affine regluing through the surgery construction."""
