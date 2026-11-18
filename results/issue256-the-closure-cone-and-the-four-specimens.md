@@ -456,3 +456,27 @@ Without an arrow of integral-affine atlases the collars of §13 have no codomain
 be compared in, so `surgery`, `symington_surgery` and `basis_triangle_surgery` cannot be
 written past their argument checks: the operation they perform is that arrow.  The missing
 call is the atlas morphism constructor, not a topological one.
+
+## 15. The atlas morphism constructor needs a contract nobody has stated
+
+§14 named the call.  Implementing it needs one thing that is not in the tree: what the
+`chartwise_affine_maps` argument *is*.  It appears in exactly two places, both `pass` bodies
+-- `integral_affine_atlases.py:26` and `integral_affine_stratified_atlases.py:39` -- and
+there is no other reference to it anywhere in `src/` or `tests/`:
+
+```
+$ rg -n "IntegralAffineAtlasMor|IntegralAffineAtlases\(\)\.Mor|chartwise_affine" src tests
+src/sage_extensions/categories/integral_affine_stratified_atlases.py:39,42,48,49,63
+```
+
+No caller, no docstring and no test says whether it is keyed by a chart, by a pair of
+charts, or is a map of affine maps; and `integral_affine_morphism(source, target)` -- its
+reader, `:39` -- does not constrain it either, being a `pass` body itself.  The constructor
+`_element_constructor_` is four lines once that is decided (`self.element_class(self,
+smooth_map, chartwise_affine_maps)`, with the two underlying-manifold checks), and the
+three element methods follow from it; what cannot be written without a decision is the
+contract the surgery's regluing is expressed in.
+
+So the item is named once more, at the level that actually blocks it: **the keying and
+meaning of an integral-affine atlas morphism's chartwise data is an open design decision of
+the atlas layer**, and no issue here states it.
