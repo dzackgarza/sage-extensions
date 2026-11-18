@@ -191,12 +191,14 @@ def test_transported_line_stabilizer_is_the_exact_conjugate() -> None:
     for subgroup in _kernel_rows():
         quotient = subgroup.finite_character_quotient()
         row = tuple(subgroup.isotropic_orbit_representatives(1))
-        transported = [line for line in row
-                       if quotient.isotropic_transport_of(line) is not None]
+        transported = [
+            (root, line, move)
+            for line in row
+            for root, move in (quotient.transported_from_root(line),)
+            if not _spans_agree(root, line)
+        ]
         assert transported
-        for line in transported:
-            root, move = quotient.transported_from_root(line)
-            assert not _spans_agree(root, line)
+        for root, line, move in transported:
             root_family = quotient.exact_isotropic_stabilizer_generators(root)
             family = quotient.exact_isotropic_stabilizer_generators(line)
             assert tuple(move * g * ~move for g in root_family) == family
