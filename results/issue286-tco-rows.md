@@ -19,6 +19,11 @@ Rows are appended as they return; wall times are load-inflated (three foreign he
 on the 4-CPU VM during the runs below; the peakrss headers of the logs record the
 available memory at the time).
 
+*The two kernel incidence rows recorded below as not returning are decided: image run
+44392429173 on `main` `0bbf022b6b` returns both, 569160 edges over 527 line and 189720
+plane cusps each — `results/issue286-the-stage-1-call.md`, "The two kernel incidence rows,
+decided".*
+
 ## `O(T_Co)` (`R_{Γ^K_En}`, page (2) states this row is `O(T_Co)`)
 
 The call `Tco.Aut().isotropic_orbit_representatives(1)`, the row of

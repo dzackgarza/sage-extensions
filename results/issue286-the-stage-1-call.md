@@ -227,6 +227,9 @@ the run's: the port's generator search is not deterministic (330, 331, 335, 343,
 | 5 | the kernel rows on `T_Co` | line rows **527** each; the plane rows **189 720 cusps** each (36.2 min at 3 476 MiB, 30.2 min at 3 554 MiB); the kernel *incidence* relation does not return inside 90 min — see below |
 | 6 | `O(T_Co)` generators | return, 359 in 27.0 s, port `991b88b0` |
 
+*Item 5's incidence clause is superseded: the two kernel incidence rows returned
+in image run 44392429173, below.*
+
 ### The index over each finite class
 
 The splitting family of a line is
@@ -354,3 +357,93 @@ that is hours, not minutes.  The venue the library names for it is the workflow
 `results/coble-kernel-incidence-rows.yml` (`--cap 10800 --budget 28800`, a
 16 GiB runner), which this connection cannot install: `.github/workflows/` is
 outside its scope.
+
+## The two kernel incidence rows, decided (2026-11-18, run 44392429173 on `main` `0bbf022b6b`)
+
+Image run **44392429173** of `.github/workflows/coble-kernel-incidence-rows.yml`
+on `main` `0bbf022b6b`, inputs `rows=Otilde,Otilde+` (the matrix gives each row its
+own job), `lattice=Tco`, `route=divided-class`, `cap=10800`, `budget=28800`,
+timing artifact **14480045589**.  Both rows ran the public call
+`PredicateSubgroups.tits_building_incidence()` -- the relation the acceptance
+asks for -- and both were reported **decided**:
+
+| row | distinct edges | line cusps | plane cusps | wall | ordered endpoint SHA-256 |
+| --- | ---: | ---: | ---: | ---: | --- |
+| `Otilde(T_Co) = ker rho` | **569160** | 527 | 189720 | 7973.4 s | `f4241b86…a78a` |
+| `Otilde+(T_Co) = ker(rho, sn_RR)` | **569160** | 527 | 189720 | 6132.2 s | `702e1e8d…7a05` |
+
+The digests above are quoted as the run's message gives them, truncated; the
+full 64 hex digits are the two `audited … distinct edges; ordered endpoint
+SHA-256:` lines of the job log, which this session could not read (§ "What this
+record does not carry").
+
+**The relation.**  A row is decided only when the whole degree sequence holds,
+not its cardinality: `tests/coble_gamma_co_2_incidence_rows.py` asserts of every
+line cusp of the two kernel rows of `T_Co` that its degree is 1080 and of every
+plane cusp that its degree is 3, that both of an edge's endpoints are cusps of
+the row, that no two edges share their line and plane cusp endpoints, that every
+cusp of either row carries an edge, and, per edge, the clause its chosen route
+can state.  These rows took the `divided-class` route, whose clause is the
+divided-class datum: the driver recomputes each line cusp's own orbit key from
+the row's cusps and refuses an edge whose retained orbit is not its line cusp's
+(`divided_class_violation`).  (The certificate route's clause is the stronger
+one -- the line term lies in the plane term and one subgroup element carries the
+line cusp's representative to the plane cusp's.)  Both rows pass all of it, and
+the counts close: `527 * 1080 = 189720 * 3 = 569160`.
+
+**The index over every finite class.**  Each kernel row returns 527 line cusps
+over the 527 nonzero isotropic classes of `A_{T_Co}` (item 1: 528 isotropic
+classes, 527 nonzero), so `[Stab_{O(q)}(v̄) : ρ(Stab_Γ(v))]` is 1 over every
+class for `Γ = Õ` and for `Γ = Õ⁺`.  That is the page's
+`sec-cusp-lifting` statement (research `3077f6789c`), which states 527 orbits
+with index 1 over every class; the rows agree with it.  The plane rows are one
+`O(B)`-orbit of planes with `K_P ≅ I_{0,7}` and no page number, so nothing is
+compared there.
+
+**Agreement with the research archive.**  The independent 569160-edge integral
+archive (research Actions **44170494099**, cited at
+`tests/coble_gamma_co_2_incidence_rows.py`) states 527 line classes each
+incident with exactly 1080 plane classes, 189720 plane classes each incident
+with exactly three line classes, and 569160 flags.  Both rows agree with it on
+all four numbers and on the whole degree sequence, which is what the driver
+checks against that archive rather than a bare edge count.  The two ordered
+endpoint digests are the rows' own: the archive's labeling of the classes is
+not the row's, so neither digest is compared with an external one.  What they
+are is the reproducibility datum: a rerun of the same row on the same code
+orders the same endpoint pairs and reproduces its digest.  The two rows' digests
+differ from each other because their vertices are different subobjects -- Õ⁺ is
+an index-two subgroup of Õ -- although both relations have the same bipartition
+sizes and the same degree sequence.
+
+**What this supersedes, and why it returned.**  Item 5 and "The kernel plane
+rows" below record the incidence as not returning inside 90 minutes on the tree
+of that round.  The stop was `_plane_parabolic_incidence_flags` mapping elements
+of the character *product* through a homomorphism of that product: `Image` of an
+element sifts it through the source's stabilizer chain, and the product of the
+discriminant group with a sign factor -- Õ⁺'s -- is a direct product of order
+9.4×10¹³ with no chain GAP can build, which is where the two dispatched runs of
+that time were killed at their caps.  The repair is `12b57de` on this line
+(`results/issue286-otilde-plus-model.md`): the covering takes the parabolic's
+image, the condition subgroup's meet with it and the right group inside the
+permutation target, from the certified family's own character keys, and no
+element of the product is mapped.  The covering then costs 20.6 s once per row
+on the adopted runtime, where it had not returned in 60 s.
+
+**What this record does not carry.**  The job log and the timing artifact: `gh`
+in this VM is not authenticated, and this project's GitHub connection answers
+`403` on job logs and exposes no Actions endpoint, so the two digests stand
+truncated here and the stage breakdown is the artifact's alone.  The
+`sage-indefinite-port` revision bound by the dispatched image is the one its
+container pins, not one this record reads.
+
+**Acceptance, item by item (`#286` body).**
+
+| the body's item | state after this run |
+| --- | --- |
+| the call returns on `T_Co` under `O(T_Co)`: counts, representatives, index, incidence | met: 1 line orbit, 1 plane orbit, 1 edge, index 1 (this file, item 3) |
+| under `Õ(T_Co)`: counts, representatives, index per finite class, incidence | met: 527 lines, 189720 planes, index 1 over every class, 569160 edges (this run) |
+| under `Õ⁺(T_Co)`: same | met: 527 lines, 189720 planes, index 1 over every class, 569160 edges (this run) |
+| the restricted stabilizers `R_Γ` (`R_{Γ^K_En} = O(T_Co)`, `R_{Γ_En} = Õ⁺`) and `Γ_{Co,2} = R_{Γ_{En,2}}` | met: `R_{Γ^K_En} = O(T_Co)` checked on the stabilizer's 339 generators, and the `Γ_{Co,2}` row returns 4 line cusps, 7 plane cusps and 13 edges (`tests/lattices/test_the_coble_gamma_co_2_plane_row_and_the_building_incidence.sage`, image run 43556671111) |
+| a test records each `T_Co` value and compares it with the page's statement, without asserting the page's number | met by this file's numbers and by the two drivers: `tests/coble_gamma_co_2_incidence_rows.py` for the incidence (dispatched, not in the per-test gate) and `tests/lattices/test_the_coble_lattice_otilde_and_otilde_plus_line_rows.sage` for the line rows, which asserts each kernel count equal to the nonzero isotropic classes of `A_{T_Co}` counted in the file |
+| a value that disagrees with a page-proof-only row is a defect filed on research the same day | no disagreement: the kernel line rows are 527 with index 1, which is the page's row |
+| the card values for `T_Co` (`lattice-database#7`) take the values only after the known-family comparisons agree | open, and outside this repository: the card does not exist yet |
