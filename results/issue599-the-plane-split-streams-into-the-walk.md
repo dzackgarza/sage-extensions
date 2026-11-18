@@ -425,6 +425,16 @@ The 188 planes a minute quoted for the 20 000-plane mark is the *slowest* band o
 this attempt (2 676 a minute at the 10 000 -> 20 000 mark under load) and is not
 the rate the attempt spends its window at; the steady band is 30 times that.
 
+**The sixth attempt got to 470 000 of 569 160 records before the host took it.**
+Started 09:59:56 on 7 497 MiB of MemAvailable, it closed the split and ran the
+relation to **470 000 records at 4 921 MiB**, then left the host at 11:01:30 with
+`# launcher exit: 0`, peak tree RSS **4 922 MiB**, low-water MemAvail
+**1 017 MiB**, `oom_kill` 53 against 51 at its start (`fresh3.log`).  Ninety-nine
+thousand records -- about three and a half minutes -- short of the two coverage
+clauses, and its own projection was 5 156 MiB at the end: the host's ceiling sits
+between the two, so the row's projection is now the tight bound that decides
+completion rather than the row's own cost.
+
 **Why the counts have to be computed and cannot be extrapolated.**  The edge
 count is not a fixed multiple of the plane count.  On `U + U(2) + <-2>` both
 kernel rows decide **4 edges over 3 line cusps and 2 plane cusps** -- two edges a
