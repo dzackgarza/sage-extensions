@@ -26,6 +26,17 @@ def test_nonnormal_character_transporter_has_the_exact_positive_and_negative_dec
     assert all(element(h) == h for element in stabilizer)
     assert rho(cycle) * rho(exchange) * ~rho(cycle) not in target
     quotient = subgroup.finite_character_quotient()
+    from sage.libs.gap.libgap import libgap
+
+    # The direct factorwise permutation map must be exactly the same
+    # homomorphism as the old product-then-permutation path, including
+    # the nonnormal discriminant target and the determinant sign factor.
+    to_permutation = quotient._character_permutation_model()
+    for element in (group.one(), cycle, exchange, known):
+        key = quotient.image(element)
+        assert quotient._permutation_of_key(key) == libgap.Image(
+            to_permutation, quotient._gap_of_key(key)
+        )
     witness = quotient.adjust_witness_into_subgroup(cycle, stabilizer)
     assert witness in subgroup
     assert witness(f) == h
