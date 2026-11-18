@@ -28,6 +28,7 @@ frames an engine happens to know.
 """
 
 from sage.misc.cachefunc import cached_method
+from sage.rings.rational_field import QQ
 from sage.structure.element import Element
 from sage.structure.element import parent as element_parent
 from sage.structure.sage_object import SageObject
@@ -74,6 +75,49 @@ def _engine_vector_field(manifold, components):
             _engine_manifold_expression(entry) for entry in component
         ]
     return field
+
+
+def _rational_polynomial(expression):
+    r"""``expression``, a polynomial in one variable over the rationals, as that polynomial.
+
+    A real polynomial with no real root is never zero, and the roots are found
+    in the real algebraic numbers: the coefficients are the chart formulas'
+    rational numbers, and an expression whose coefficients are not rational has
+    no polynomial reading here and is refused by the caller.
+    """
+    return SR(expression).polynomial(QQ)
+
+
+def _decided_nowhere_vanishing(expression, variables):
+    r"""Whether the real function ``expression`` of ``variables`` is decided to take no zero.
+
+    A component of a frame is a real-valued function on a chart's domain, and the
+    charts of a manifold take values in the real coordinates, so the component
+    vanishes nowhere when its numerator -- it is read as a fraction of
+    polynomials, as every chart expression of this tree is -- takes no real zero
+    at any point: a real polynomial with no real root is never zero, and a
+    constant is decided by the exact reals.  ``True`` and ``False`` are
+    decisions, and ``None`` is the statement that this owner does not decide the
+    question for the expression it was given.
+
+    A denominator is not decided here: a chart expression that divides is stated
+    where its denominator does not vanish (``ManifoldAtlasChart.section_ratio``),
+    and that nonvanishing is the overlap the chart's own transition states.
+    """
+    from sage.rings.qqbar import AA
+
+    from sage_extensions.categories.functions.real_functions import _decided_nonzero
+
+    formula = SR(expression)
+    numerator = SR(formula.numerator())
+    free = tuple(numerator.variables())
+    if not free:
+        return _decided_nonzero(numerator)
+    match len(tuple(variables)):
+        case 1 if numerator.is_polynomial(tuple(variables)[0]):
+            return not tuple(_rational_polynomial(numerator).roots(AA))
+        case _:
+            return None
 
 
 class SmoothVectorBundles(OwnedParameterizedCategory):
@@ -452,39 +496,68 @@ class SmoothSectionModules(OwnedParameterizedCategory):
                 f"the module of sections of {self._vector_bundle} has no known basis: a basis is "
                 f"a global frame, and no frame is retained here"
             )
-            return (self._retained_frame,)
+            return tuple(self._retained_frame)
 
         def trivialized_by(self, frame):
             r"""These sections read through the stated global frame.
 
-            ``frame`` is one section when the rank is one.  A rank-one bundle is
-            trivialized by a section that vanishes nowhere: that section is a
-            basis of every fibre, and ``(p, a) |-> a frame(p)`` is then an
-            isomorphism ``M x R -> E`` whose inverse reads a section's
-            component against the frame's (Lee, *Introduction to Smooth
-            Manifolds*, 2nd ed., Ch. 10).  The result is a module for the same
-            bundle that retains the frame and answers its rank and basis; this
-            one is unchanged.
+            A frame is a family of as many sections as the rank, a basis of
+            every fibre (Lee, *Introduction to Smooth Manifolds*, 2nd ed.,
+            Ch. 10); one section states the rank-one case.  The frame is
+            decided to be one: in every chart the determinant of its components
+            is decided to take no zero, which is what makes the family a basis
+            of each fibre (:func:`_decided_nowhere_vanishing`), and a family
+            whose determinant vanishes somewhere, or whose vanishing is not
+            decided, is refused.  The result is a module for the same bundle
+            that retains the frame and answers its rank and basis; this one is
+            unchanged.
             """
+            from sage.matrix.constructor import matrix as _engine_matrix
+
             assert self._retained_frame is None, (
                 f"the module of sections of {self._vector_bundle} already retains the frame "
                 f"{self._retained_frame}; a second frame states another trivialization, and "
                 f"these sections are not re-read through one"
             )
-            assert int(self._vector_bundle.rank()) == 1, (
-                f"the frame of the rank-{self._vector_bundle.rank()} bundle "
-                f"{self._vector_bundle} is a family of {self._vector_bundle.rank()} sections, and "
-                f"the section read as a frame here states the rank-one case"
+            rank = int(self._vector_bundle.rank())
+            family = (
+                (frame,) if element_parent(frame) is self else tuple(frame)
             )
-            assert element_parent(frame) is self, (
-                f"{frame} is not a section of {self._vector_bundle}: its parent is "
-                f"{element_parent(frame)}"
+            assert len(family) == rank, (
+                f"a frame of the rank-{rank} bundle {self._vector_bundle} is a family of "
+                f"{rank} sections, and {(len(family))} were given"
             )
+            for section in family:
+                assert element_parent(section) is self, (
+                    f"{section} is not a section of {self._vector_bundle}: its parent is "
+                    f"{element_parent(section)}"
+                )
+            manifold = self.base_manifold()
+            for label in manifold.chart_labels():
+                chart = manifold.atlas()[label]
+                entries = tuple(
+                    SR(_engine_manifold_expression(entry))
+                    for section in family
+                    for entry in section.components()[label]
+                )
+                determinant = _engine_matrix(SR, rank, rank, entries).det()
+                verdict = _decided_nowhere_vanishing(
+                    determinant, tuple(_engine_manifold_chart(chart)[:])
+                )
+                assert verdict is True, (
+                    f"the family {family} does not trivialize {self._vector_bundle}: its "
+                    f"components on the chart {label} have determinant {determinant}, and "
+                    + (
+                        "that determinant takes the value zero at a point of the chart"
+                        if verdict is False
+                        else "this owner does not decide that it vanishes nowhere there"
+                    )
+                )
             return _object_of(
                 self.category(),
                 vector_bundle=self._vector_bundle,
                 base_ring=self.base_ring(),
-                retained_frame=frame,
+                retained_frame=family,
             )
 
         def trivialization(self):
@@ -500,7 +573,14 @@ class SmoothSectionModules(OwnedParameterizedCategory):
                 f"the module of sections of {self._vector_bundle} retains no frame, and a "
                 f"trivialization of a bundle is read in a frame"
             )
-            return SmoothVectorBundleTrivialization(self._vector_bundle, self._retained_frame)
+            assert int(self._vector_bundle.rank()) == 1, (
+                f"the trivialization of the rank-{self._vector_bundle.rank()} bundle "
+                f"{self._vector_bundle} is a matrix of functions per chart; this owner reads the "
+                f"rank-one case, whose trivialization is the frame's own section"
+            )
+            return SmoothVectorBundleTrivialization(
+                self._vector_bundle, self._retained_frame[0]
+            )
 
         def _repr_(self):
             return f"smooth sections of {self._vector_bundle}"
