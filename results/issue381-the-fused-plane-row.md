@@ -52,6 +52,24 @@ the row name their cusps differently, not because the rows differ: the counts,
 the endpoint pairs and the contract's verdict agree, as
 `results/issue381-the-kernel-row-checkpoint.md` records for the two-process run.
 
+## The other per-plane retainer the row might have had, and does not
+
+The walk registers two data a plane: the lift the relation reads, and the
+transport datum that says which plane placed which.  The second is the term this
+change expected to leave standing, so it was measured: after `U + U(2) + <-2>`'s
+plane row is built, `retained_isotropic_transport_count()` is **0**
+(`transport-keys.log`) -- the construction spends those datums itself, so a fused
+row has nothing there to release and no change was made for it.
+
+In one other presentation, `U + <-2> + U(2)`, the same row leaves **4** transport
+datums retained, and releasing them at a cusp's rebuilt plane
+(`release_isotropic_transports((cusp.representative(),))`) removes none of them:
+the datum is registered under the span of the plane the walk built, and a plane
+rebuilt from the cusp's span is not that key.  That is recorded here as an
+observation and not repaired: it is a question about the transport registry's
+key, it does not bear on `T_Co`'s row, and it is a second issue's business if it
+bears on anything.
+
 ## What is not measured
 
 `T_Co`'s own peak under the fused row, and this is now a two-term question rather

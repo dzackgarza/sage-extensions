@@ -1,0 +1,29 @@
+# tree: 05b80d9df422de4c7892e0b4ea30cc2adf7c6879
+# status:  M .tmp/issue381b/probe-fused-row.py  M tests/lattices/test_the_divided_class_relation_is_decided_one_plane_at_a_time.sage 
+# port: 991b88b095a42a1e3679569ea42328c900c120f6
+# load: 4.50 3.47 3.55
+# free: 5522 MiB available
+# started: 2026-11-18T16:13:38Z
+# program: .tmp/issue381b/probe-transport-keys.py  PROBE_LATTICE=unset PROBE_ROW=unset
+retained transports after the row: 0
+  cusp 0 rebuilds rows ((2, 0, 0, -1, 0), (0, 1, 1, 0, 0)) lattice id 130494488740432
+    found by key: False
+    after release: 0
+  cusp 1 rebuilds rows ((2, 0, -1, 0, 0), (0, 1, 0, 1, 0)) lattice id 130494488740432
+    found by key: False
+    after release: 0
+[peakrss] transport-keys: child waited=0 shell_code=0 samples=10
+[peakrss] peak tree RSS      : 495 MiB
+[peakrss] low-water MemAvail : 5219 MiB
+[peakrss] peak single VmHWM  : 495 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      491 MiB peak
+[peakrss]   gap                          22 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   run.sh                        1 MiB peak
+[peakrss]   t=    18.0s procs=  2 rss=   495 MiB hwm=   495 MiB avail=  5655 MiB
+[peakrss]   t=    16.0s procs=  2 rss=   492 MiB hwm=   492 MiB avail=  5516 MiB
+[peakrss]   t=    14.0s procs=  2 rss=   491 MiB hwm=   491 MiB avail=  5641 MiB
+[peakrss]   t=    12.0s procs=  2 rss=   483 MiB hwm=   483 MiB avail=  5770 MiB
+[peakrss]   t=    10.0s procs=  2 rss=   477 MiB hwm=   477 MiB avail=  5678 MiB
+# launcher exit: 0  ended: 2026-11-18T16:13:58Z
