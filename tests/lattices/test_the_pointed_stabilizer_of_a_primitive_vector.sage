@@ -122,6 +122,48 @@ def test_a_summands_generator_keeps_its_complements_isometries() -> None:
     assert any(generator(hyperbola) != hyperbola for generator in family)
 
 
+def test_a_nonsingular_vector_in_an_odd_lattice_is_answered_here() -> None:
+    r"""`<1> + <-1>` at `e`: the complement `<-1>` is the whole stabilizer there.
+
+    The lattice is indefinite and odd, so no evenness hypothesis is available and
+    the construction uses only the bilinear form.  `g(e) = e` forces `g` to be
+    `+1` or `-1` on the complement, so the stabilizer has order two.
+    """
+    lattice = Lattices(ZZ)([[1]]) + Lattices(ZZ)([[-1]])
+    labels = tuple(lattice.module_generating_set())
+    vector = lattice.module_generator(labels[0])
+    assert lattice.is_even() is False
+    assert lattice.is_definite() is False
+    assert lattice.b(vector, vector) == ZZ(1)
+    assert vector.is_primitive() is True
+
+    family = _pointed_generators(lattice, vector)
+    assert family
+    assert all(generator(vector) == vector for generator in family)
+    assert lattice.Aut().subgroup(family).cardinality() == cardinal(2)
+
+
+def test_the_glue_of_the_hyperbolic_plane_keeps_only_the_exchange() -> None:
+    r"""`U` at `e+f`: the gluing subgroup is `(Z/2)^2` and its orbit is over subgroups.
+
+    `A_{L_0} = A_{Zv} + A_K` is `(Z/2)^2` with `v = e+f` and `K = Z(e-f)`, so the
+    point the orbit runs over is a *subgroup* of it and not a chosen generating
+    set: an isometry of the complement that preserves `H` may carry one generating
+    set to another, and a point keyed by generators would split `H` and generate
+    only the stabilizer of that set.  `O(K) = {+-1}`, and `-1` on the complement
+    is the exchange `e <-> f`: the pointed family is that one element and the
+    group it generates has order two.
+    """
+    lattice = _lattice(HYPERBOLIC_PLANE)
+    first, second = tuple(lattice.module_generators())
+    vector = first + second
+
+    family = _pointed_generators(lattice, vector)
+    assert all(generator(vector) == vector for generator in family)
+    assert lattice.Aut().subgroup(family).cardinality() == cardinal(2)
+    assert any(generator(first) == second for generator in family)
+
+
 def test_the_pointed_family_fixes_its_vector_and_the_setwise_one_does_not() -> None:
     r"""Every member of the isotropic pointed family fixes `v`; the setwise family has one that negates it.
 
