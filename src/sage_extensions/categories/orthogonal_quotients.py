@@ -2834,7 +2834,9 @@ end
             ],
         )
 
-    def adjust_witness_into_subgroup(self, witness, target_stabilizer_generators):
+    def adjust_witness_into_subgroup(
+        self, witness, target_stabilizer_generators, *, stabilizer_reference=None, flag=False
+    ):
         r"""Left-adjust ``witness`` by the target stabilizer until it lies in the subgroup.
 
         If ``witness(x)=y`` and ``t`` stabilizes ``y``, then ``t*witness`` still
@@ -2864,11 +2866,23 @@ end
         permutation_product = libgap.Range(to_permutation)
         point = libgap.Image(to_permutation, self._gap_of_key(self.image(witness)))
         stabilizer_generators = tuple(target_stabilizer_generators)
-        stabilizer_gaps = [
-            self._gap_of_key(self.image(generator)) for generator in stabilizer_generators
-        ]
-        stabilizer_gap = libgap.Subgroup(product, stabilizer_gaps)
-        stabilizer_permutation = libgap.Image(to_permutation, stabilizer_gap)
+        # The same target cusp is queried for many transported lines.  Its
+        # exact stabilizer family and finite word section depend on the span,
+        # not on the source line or its witness.  Reuse the section for that
+        # span instead of constructing a GAP word problem per incidence edge.
+        key = (_exact_stabilizer_span_key(self, stabilizer_reference, flag)
+               if stabilizer_reference is not None else None)
+        sections = self.__dict__.setdefault("_stabilizer_adjustment_sections", {})
+        retained = sections.get(key) if key is not None else None
+        if retained is not None and retained[0] is stabilizer_generators:
+            stabilizer_permutation, stabilizer_section = retained[1:]
+        else:
+            stabilizer_gaps = [
+                self._gap_of_key(self.image(generator)) for generator in stabilizer_generators
+            ]
+            stabilizer_gap = libgap.Subgroup(product, stabilizer_gaps)
+            stabilizer_permutation = libgap.Image(to_permutation, stabilizer_gap)
+            stabilizer_section = None
         subgroup_permutation = libgap.Image(to_permutation, self._gap_character_target())
         reversed_product = _law_reversed(self._model_factors()[0][1])
         # The element of the stabilizer image inside the subgroup's coset is
@@ -2888,10 +2902,13 @@ end
             chosen = chosen ** -1
         # Factor the chosen stabilizer image over the stabilizer's own
         # generators, so the adjustment is a live element of the stabilizer.
-        stabilizer_section = _GapWordSection(
-            [libgap.Image(to_permutation, element) for element in stabilizer_gaps],
-            parent=permutation_product,
-        )
+        if stabilizer_section is None:
+            stabilizer_section = _GapWordSection(
+                [libgap.Image(to_permutation, element) for element in stabilizer_gaps],
+                parent=permutation_product,
+            )
+            if key is not None:
+                sections[key] = (stabilizer_generators, stabilizer_permutation, stabilizer_section)
         letters = stabilizer_section.letters_of_permutation(chosen)
         letters = _letters_in_owned_order(self._model_factors(), letters)
         adjustment = self.supergroup.one()
@@ -4307,7 +4324,9 @@ def _subgroup_isotropic_equivalence_witness(subgroup, left, right, *, flag=False
     if not flag and quotient.separates_witness_orbits(witness, left):
         return None
     stabilizer = quotient.exact_isotropic_stabilizer_generators(right, flag=flag)
-    return quotient.adjust_witness_into_subgroup(witness, stabilizer)
+    return quotient.adjust_witness_into_subgroup(
+        witness, stabilizer, stabilizer_reference=right, flag=flag
+    )
 
 
 __all__ = ["OrthogonalCharacterQuotient"]

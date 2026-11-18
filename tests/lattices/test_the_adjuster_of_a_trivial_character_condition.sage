@@ -74,3 +74,26 @@ def test_joint_discriminant_and_real_spinor_adjustment() -> None:
     adjusted = quotient.adjust_witness_into_subgroup(outside, ambient)
     assert adjusted in kernel
     assert adjusted != outside
+
+
+def test_repeated_line_adjustment_reuses_its_exact_stabilizer_section() -> None:
+    r"""The same cusp's repeated exact witnesses share one finite word section."""
+    lattice = Lattices(ZZ)([[0, 2], [2, 0]])
+    group = lattice.O()
+    kernel = lattice.stable_orthogonal_group().intersection(lattice.O_plus())
+    quotient = kernel.finite_character_quotient()
+    label = tuple(lattice.module_generating_set())[0]
+    line = lattice.primitive_isotropic_subobject(lattice.module_generator(label))
+    stabilizer = quotient.exact_isotropic_stabilizer_generators(line)
+    witness = next(g for g in group.group_generators()
+                   if g.determinant() == 1 and g not in kernel)
+    transported = witness.transport_isotropic_object(line)
+    transported.inclusion().factor_through(line.inclusion())
+    line.inclusion().factor_through(transported.inclusion())
+    first = quotient.adjust_witness_into_subgroup(
+        witness, stabilizer, stabilizer_reference=line)
+    second = quotient.adjust_witness_into_subgroup(
+        witness, stabilizer, stabilizer_reference=line)
+    assert first in kernel and second in kernel
+    assert first == second
+    assert len(quotient._stabilizer_adjustment_sections) == 1
