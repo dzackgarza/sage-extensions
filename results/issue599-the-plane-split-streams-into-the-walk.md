@@ -234,6 +234,19 @@ come -- 1.2x the 4 GiB the acceptance names, and inside this project's 6 144 MiB
 guard.  The terms are the two measured above: ~3.3 GiB of lift registry (the
 split's 18 KB a plane, #584's) and 0.21 GiB of relation.
 
+**Why the counts have to be computed and cannot be extrapolated.**  The edge
+count is not a fixed multiple of the plane count.  On `U + U(2) + <-2>` both
+kernel rows decide **4 edges over 3 line cusps and 2 plane cusps** -- two edges a
+plane, because the covering's three lines fall into two line cusps there -- while
+the 200-plane slice of `Otilde(T_Co)` gives three a plane.  So nothing short of
+the row's own relation answers the clause, and the record of the row is not a
+count that a smaller row predicts.  That run, at the pushed head, is also the
+witness clause decided for a pair of groups: a `DECIDED` outcome is the driver's
+statement that every edge's divided-class witness is the orbit its line cusp is
+indexed by, that every plane cusp carries an edge and that every line cusp does
+(`divided_class_violation`, `coble_gamma_co_2_incidence_rows.py:279`, and the
+coverage clauses at `:496` and `:502`).
+
 **Neither row returned.  Both were killed by this host's OOM killer.**
 
 `Otilde`, after 2 h 10 min and 550 000 of its 569 160 records: `row-Otilde.log`
