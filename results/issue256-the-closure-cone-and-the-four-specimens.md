@@ -432,3 +432,27 @@ cut, using `subspace` (§12) on the complement named by `from_predicate`; glue, 
 coproduct (`topological_spaces.py:683`) and the coequalizer (`:680`); and read the singular
 locus off the identified boundary.  That is the next piece of work, and it is construction
 rather than a missing operation.
+
+## 14. What the surgery body itself needs: an atlas morphism
+
+§13 left the three methods as construction.  Writing `surgery` showed the next missing
+call, and it is not topological: the regluing *is* an integral-affine map of the two collar
+charts, so the result's atlas is built by restricting a chartwise affine map along the
+boundary isomorphism.  That map cannot be constructed:
+
+```
+$ sage -c "... IntegralAffineAtlases().Mor(atlas, atlas)(Sets().Mor(plane, plane).identity(), {})"
+atlas morphism: None
+```
+
+`IntegralAffineAtlases().Mor(...)(smooth_map, chartwise_affine_maps)` answers `None`:
+`IntegralAffineAtlasMor._element_constructor_` is a `pass` body
+(`integral_affine_atlases.py:48`), and so are the three element methods a regluing would
+read it through -- `integral_affine_morphism` (`:39`), `smooth_atlas_morphism` (`:42`) and
+`__mul__` (`:45`), which is what composing the cut's chart with the regluing and the
+replacement's chart would need.
+
+Without an arrow of integral-affine atlases the collars of §13 have no codomain object to
+be compared in, so `surgery`, `symington_surgery` and `basis_triangle_surgery` cannot be
+written past their argument checks: the operation they perform is that arrow.  The missing
+call is the atlas morphism constructor, not a topological one.
