@@ -31,3 +31,33 @@ does.
 This needs an issue of its own — the start of the sage-julia bridge at the
 first `CC` operation — which the GitHub connection that pushed this cannot
 create.  Nothing in it is a defect of this repository's chart or manifold code.
+
+## Which operation starts it
+
+Located on `main` `fbf2911` by wrapping `sage_julia_bridge.interface.Julia.call`
+and recording the first caller's stack; every timing is in one fresh process:
+
+```
+CC(1)           0.00 s   no bridge call at all
+CC(2*I)        64.64 s   the first bridge call
+CC(2*I) == 2*I  0.22 s   bridge already up, one round trip
+```
+
+and the first call's stack is
+
+```
+sage_extensions/rings/complex.py:370  _neg_
+sage_extensions/rings/complex.py:350  __mul__
+sage_extensions/rings/complex.py:353  __rmul__
+```
+
+So `2*I` as an element of `CC` is built by a multiplication and a negation that
+both route through calcium, and the first of them pays the bridge's start.
+`CC(1)` does not. The 0.22 s equality after it is the pipe round trip the
+profiler counts at `sage_julia_bridge/interface.py:581(call)`.
+
+The repair is a decision about which arithmetic route answers an exact element
+of `CC` — whether an algebraic element is decided in `qqbar`, which the same
+module already converts to calcium at `complex.py:105`/`:128`, or in calcium —
+and it belongs to the owned complex field, not to this issue. It is one issue,
+with the lines above as its starting point.
