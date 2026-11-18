@@ -2439,16 +2439,29 @@ end
         the subgroup orbits (see :meth:`separates_witness_orbits`); the walk
         is bounded by the orbit of the class data, at most the number of
         classes of ``A_L``.
+
+        The orbit of a class set is a function of that set's value, and a
+        kernel row asks it at 569160 carried sets drawn from the 2048 classes
+        of ``A_L``, so the answer is recorded by the rendering the walk's own
+        frontier already compares by: a second ask at one class set is a
+        dictionary hit rather than another walk over the image's generators.
+        The recorded answer is a frozen set, because every ask at that class
+        set is answered with the one walk.
         """
         from sage.libs.gap.libgap import libgap
 
+        rendering = str(point)
+        recorded = self.__dict__.setdefault("_isotropic_class_orbit_recorded", {})
+        answer = recorded.get(rendering)
+        if answer is not None:
+            return answer
         generators = list(
             libgap.GeneratorsOfGroup(self._joint_discriminant_image_gap())
         )
         setwise_action = libgap.function_factory(
             "function(x, g) return Set(List(x, y -> ImageElm(g, y))); end"
         )
-        seen = {str(point)}
+        seen = {rendering}
         frontier = [point]
         while frontier:
             following = []
@@ -2461,7 +2474,9 @@ end
                     seen.add(marker)
                     following.append(image)
             frontier = following
-        return seen
+        answer = frozenset(seen)
+        recorded[rendering] = answer
+        return answer
 
     def invariant_separates_isotropic_orbits(self, left, right) -> bool:
         r"""Whether the equivariant class data of two primitive isotropic subobjects lies in different ``rho(Gamma)``-orbits.
