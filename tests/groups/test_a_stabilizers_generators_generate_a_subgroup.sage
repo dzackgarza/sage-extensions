@@ -38,7 +38,6 @@ of `G` that `G` does not contain.
 """
 
 from sage_extensions.all import *  # noqa: F401,F403
-from sage_extensions.categories.rational_integral_stabilizers import IntegralStructureAction
 
 import pytest
 
@@ -68,13 +67,13 @@ def _euclid_specimen():
 def test_a_generated_groups_line_stabilizer_generates_a_subgroup():
     r"""`G.subgroup(S.group_generators())` is constructed, `S` the stabilizer of a lattice in `G`."""
     ambient, group, stabilizer = _euclid_specimen()
-    generators = tuple(stabilizer.group_generators())
+    family = tuple(stabilizer.group_generators())
 
-    generated = group.subgroup(generators)
+    generated = group.subgroup(family)
 
     assert generated.supergroup() is group
-    assert frozenset(generated.group_generators()) == frozenset(generators)
-    assert all(generator.parent() is ambient for generator in generators)
+    assert frozenset(generated.group_generators()) == frozenset(family)
+    assert all(generator.parent() is ambient for generator in family)
 
 
 def test_the_enriques_orthogonal_groups_line_stabilizer_generates_a_subgroup():
@@ -84,12 +83,12 @@ def test_the_enriques_orthogonal_groups_line_stabilizer_generates_a_subgroup():
     e = lattice.module_generator(next(iter(lattice.module_generating_set())))
     line = lattice.primitive_isotropic_subobject(e)
     stabilizer = group.stabilizer(line, action="setwise")
-    generators = tuple(stabilizer.group_generators())
+    family = tuple(stabilizer.group_generators())
 
-    generated = group.subgroup(generators)
+    generated = group.subgroup(family)
 
     assert generated.supergroup() is group
-    assert frozenset(generated.group_generators()) == frozenset(generators)
+    assert frozenset(generated.group_generators()) == frozenset(family)
 
 
 def _hyperbolic_plane_specimen():
