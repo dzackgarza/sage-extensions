@@ -48,7 +48,6 @@ from sage_extensions.categories.manifolds import (
 )
 from sage_extensions.categories.modules.pure.modules import Modules
 from sage_extensions.categories.sets.set_categories import Sets
-from sage_extensions.logic import AtomicProposition
 from sage_extensions.owned_category import _object_of
 
 
