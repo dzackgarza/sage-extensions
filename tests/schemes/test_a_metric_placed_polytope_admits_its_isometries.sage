@@ -625,8 +625,10 @@ def test_the_placed_hyperbolic_polygon_admits_its_isometry() -> None:
     hyperbolic space, and it carries those four points among themselves -- it is
     the antipodal map of the disc -- so it is an arrow of the placed polygon,
     admitted by the space's own decision.  A placed vertex is a point of the
-    space's own point set, so the space takes it as it is; coordinates, which
-    arrive with a chart, are the other ingress and are untouched.
+    space's own point set -- the rays of the component's positive rational
+    vectors -- so the space takes it as it is, and the arrow carries a ray to the
+    ray of its representative's image without a chart: the antipodal map sends the
+    first placed corner to the third and is its own inverse.
     """
     space = HyperbolicSpaces(2).an_object()
     lattice = space.lattice()
@@ -673,6 +675,10 @@ def test_the_placed_hyperbolic_polygon_admits_its_isometry() -> None:
 
     assert placed.dimension() == 2
     assert placed.face_poset().faces(0).cardinality() == 4
+    corners = tuple(placed.vertices())
+
     assert space.is_an_isometry(sign_flip) is True
     assert arrow.ambient_map() is sign_flip
-    assert space(tuple(placed.vertices())[0]) is tuple(placed.vertices())[0]
+    assert space(corners[0]) is corners[0]
+    assert arrow(corners[0]) == corners[3]
+    assert (arrow * arrow)(corners[0]) == corners[0]

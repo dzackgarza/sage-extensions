@@ -322,6 +322,20 @@ def _isometry_image_of_point(domain, codomain, isometry, point):
         f"comes from an isometry of {lattice}, and {isometry} is a map "
         f"{isometry.domain()} -> {isometry.codomain()}"
     )
+    match element_parent(point) is domain.point_set():
+        case True:
+            # A point of the model is the ray of a positive rational vector, and
+            # the lattice isometry acts on that vector; the sign restoring the
+            # image to the codomain's own component is the one pairing positively
+            # with its timelike vector, since a point here is a ray.
+            vector = isometry(point.representative())
+            match codomain.positive_cone_component().contains(vector):
+                case True:
+                    return codomain.rational_point(vector)
+                case False:
+                    return codomain.rational_point(-vector)
+        case False:
+            pass
     match point.chart().label():
         case label if label == HYPERBOLOID_CHART:
             pass
@@ -421,6 +435,26 @@ class HyperbolicManifoldMor(RiemannianManifoldMor):
         def lattice_isometry(self):
             r"""Return the integral isometry of the endpoints' lattice that induces this arrow."""
             return self._isometry
+
+        def __call__(self, point):
+            r"""Return the image of ``point``, each presentation of a point read by its own datum.
+
+            This owner states two presentations of the points of a hyperboloid
+            model: the chart points of the chart ``hyperboloid``, and the rational
+            points, which are the rays of the component's positive rational
+            vectors.  A chart point is evaluated by the represented smooth morphism
+            the constructor states, section by section; a ray is carried to the ray
+            of its representative's image at :func:`_isometry_image_of_point`,
+            which needs no chart because a ray has none and the lattice isometry
+            acts on the vector itself.
+            """
+            match element_parent(point) is self.domain().point_set():
+                case True:
+                    return _isometry_image_of_point(
+                        self.domain(), self.codomain(), self._isometry, point
+                    )
+                case False:
+                    return self._smooth_morphism(point)
 
         def underlying_smooth_morphism(self):
             r"""Return the smooth morphism of the two hyperboloid models this arrow is.
