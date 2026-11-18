@@ -2853,13 +2853,16 @@ class Lattices(OwnedCategoryOverBaseRing):
         integral isometry, one conversion per `(orbit point, letter)` pair.
 
         A coslice marking at a primitive *vector* asks for the pointwise
-        stabilizer of that vector, which is the kernel of the sign of the action
-        on it inside the rank-one parabolic; it is built here too
-        (:meth:`_pointed_vector_stabilizer_generators`).  An oriented plane asks
-        for the kernel of the determinant on the plane, and a coslice at a
-        sublattice of higher rank or at a non-isotropic vector for a pointwise
-        stabilizer whose construction is not owned here: those keep the port's
-        route.
+        stabilizer of that vector: for an isotropic vector it is the kernel of
+        the sign of the action on it inside the rank-one parabolic
+        (:meth:`_pointed_vector_stabilizer_generators`), and for a non-isotropic
+        one the complement-and-glue construction of
+        :meth:`_nonisotropic_pointed_stabilizer_generators`.  An arrow marking at
+        a primitive non-isotropic vector asks for the setwise stabilizer of its
+        line, which is the same gluing construction with the sign on the line
+        allowed.  An oriented plane asks for the kernel of the determinant on the
+        plane, and a pointwise stabilizer of a sublattice of rank two and up is
+        not owned here: those keep the port's route.
         """
         if isinstance(diagram_category, CosliceCategory):
             pointed = self._pointed_vector_stabilizer_generators(marked)
@@ -2867,6 +2870,10 @@ class Lattices(OwnedCategoryOverBaseRing):
             pointed = None
         else:
             pointed = self._isotropic_parabolic_generators(marked)
+            if pointed is None:
+                pointed = self._nonisotropic_pointed_stabilizer_generators(
+                    marked, setwise=True
+                )
         if pointed is not None:
             return pointed
         from sage_indefinite_port.indefinite.marked_lattices import (
@@ -3030,13 +3037,27 @@ class Lattices(OwnedCategoryOverBaseRing):
         :meth:`_isotropic_line_stabilizer_generators` -- one integral lift of
         each generator of `O(K_I)`, `K_I = I^\perp/I`, together with the
         selected generators of the kernel -- and the sign of the action on `v`,
-        ``sgn: P_I -> O(I) = {\pm 1}``, cuts `P_I^1` out of it.  The family
-        returned is the sign-decorated one: the members of the setwise family
-        that fix `v`, together with `g_0 g` for one fixed reversing member `g_0`
-        and every reversing `g`.  Every member fixes `v` and the whole of
-        `P_I^1` is generated, because a word in the setwise family with an even
-        number of reversing letters is a product of those `g_0 g` and `g_0^2`,
-        and `g_1 g_2 = (g_1 g_0)(g_0 g_0)(g_0 g_2)` for reversing `g_1, g_2`.
+        ``sgn: P_I -> O(I) = {\pm 1}``, cuts `P_I^1 = ker sgn` out of it.
+
+        **The family, and why it generates.**  `ker sgn` has index two in `P_I`,
+        so its left cosets are `K = ker sgn` and `a K` for any one reversing
+        member `a`.  Take the transversal `{1, a}` and, for a generating family
+        `S` of `P_I` made symmetric by adding the inverses, the family
+
+            `w_{tP}^{-1} t w_P`  for every coset `P` and every `t` in `S`,
+
+        where `w_K = 1` and `w_{aK} = a`.  Each of these lies in `K`, because it
+        fixes the coset `P`: `w_{tP}^{-1} t w_P (P) = w_{tP}^{-1}(tP) = K`.  And
+        they generate `K`: an element of `K` is a word in `S`, and reading the
+        word left to right, `w_{tP}^{-1} t w_P` is the correction that keeps the
+        running product in the coset the word has reached, so the word is their
+        product.  That is Schreier's lemma in its transversal form, and it is
+        why the family below has `2 |S|` members per coset and not the pairing
+        `a t` for reversing `t` alone: pairing drops the conjugates
+        `a^{-1} t a` of the members that already fix `v`, and those conjugates
+        are needed -- for `f = (12)(34)` even and `r = (02)` odd in `S_4` the
+        group `\langle f, r\rangle` has `ker sgn` of order six, while `f` and
+        `r^2 = 1` generate only `\langle f\rangle`.
 
         At `K_I = 0` the perpendicular is the line itself, so ``P_I^1`` is the
         pointwise perpendicular kernel
@@ -3047,10 +3068,8 @@ class Lattices(OwnedCategoryOverBaseRing):
         port: on `U` the pointed stabilizer is trivial and the kernel family is
         empty, as it must be.
 
-        A non-isotropic `v` has no reduction `v^\perp/\mathbf Z v`: the stabilizer
-        is the isometries of ``v^\perp \cap L`` preserving the glue with
-        `\mathbf Z v`, and that gluing construction is not owned here, so such a
-        marking is answered with ``None``.
+        A non-isotropic `v` is answered by
+        :meth:`_nonisotropic_pointed_stabilizer_generators`.
         """
         arrow = self._marked_arrow(marked)
         if arrow is None:
@@ -3065,8 +3084,10 @@ class Lattices(OwnedCategoryOverBaseRing):
             return None
         if codomain.is_definite() is not False or codomain.is_even() is not True:
             return None
-        if vector.q() != codomain.base_ring().zero() or vector.is_primitive() is not True:
+        if vector.is_primitive() is not True:
             return None
+        if vector.q() != codomain.base_ring().zero():
+            return self._nonisotropic_pointed_stabilizer_generators(marked, setwise=False)
         subobject = codomain.primitive_isotropic_subobject(vector)
         reduction = subobject.isotropic_reduction()
         if int(reduction.quotient_lattice().module_rank()) == 0:
@@ -3089,16 +3110,303 @@ class Lattices(OwnedCategoryOverBaseRing):
                     f"the primitive vector to {image}: a stabilizer of the line carries its primitive "
                     f"generator to +-v"
                 )
-        family = tuple(fixing)
-        if reversing:
-            anchor = reversing[0]
-            family = family + tuple(anchor * generator for generator in reversing)
+        if not reversing:
+            return finite_ordered_set(tuple(fixing))
+        symmetric = tuple(setwise) + tuple(generator.inverse() for generator in setwise)
+        anchor = reversing[0]
+        anchor_inverse = anchor.inverse()
+        family = []
+        for generator in symmetric:
+            if generator(vector) == vector:
+                family.append(generator)
+                family.append(anchor_inverse * generator * anchor)
+            else:
+                family.append(anchor_inverse * generator)
+                family.append(generator * anchor)
+        family = tuple(family)
         if not all(generator(vector) == vector for generator in family):
             raise ValueError(
                 f"the pointed family built at {vector} contains an element that does not fix it; "
                 f"the sign of the action on v was read from the setwise family it was built from"
             )
         return finite_ordered_set(family)
+
+    def _nonisotropic_pointed_stabilizer_generators(self, marked, *, setwise=False):
+        r"""Generators of the stabilizer of a primitive *non-isotropic* vector, or ``None``.
+
+        The marking must be an arrow whose source is a rank-one lattice
+        ``<q(v)>`` and whose image is a primitive vector `v` of an indefinite
+        even lattice over `ZZ` with `b(v,v) != 0`; every other marking is
+        answered with ``None`` and the caller keeps its own route.
+
+        **Complement and glue.**  `K = v^\perp \cap L` is a primitive sublattice
+        of rank `n-1`, and `L_0 = \mathbf Z v \perp K` is a sublattice of finite
+        index.  An isometry `\sigma` of `K` extends to `L` fixing `v` exactly
+        when the isometry `1 \oplus \sigma` of `L_0` carries `L` onto itself,
+        and `L` is determined by its gluing subgroup `H = L/L_0` of the
+        discriminant group `A_{L_0} = A_{\mathbf Z v} \oplus A_K`: overlattices
+        of `L_0` correspond bijectively to the isotropic subgroups of
+        `A_{L_0}` (Nikulin, *Integral symmetric bilinear forms and some of their
+        applications*, Math. USSR Izv. 14 (1980), Proposition 1.4.1).  So
+        `\mathrm{Stab}_{O(L)}(v) = \{\sigma \in O(K) : (1 \oplus \sigma)(H) = H\}`,
+        and with `setwise=True` the setwise stabilizer of the line
+        `\{\sigma : (\epsilon \oplus \sigma)(H) = H` for `\epsilon = \pm 1\}`
+        is built by the same construction with `-1` on the line allowed.
+
+        **Why the family generates.**  The group `O(K)` acts on the finite set of
+        subgroups of `A_{L_0}` by `\sigma . H = (1 \oplus \sigma)(H)`, and the
+        stabilizer of a point under a group action is generated by the Schreier
+        family of a spanning tree of its orbit: with `w_P` an isometry carrying
+        `H` to the orbit point `P`, the words `w_{tP}^{-1} t w_P` lie in the
+        stabilizer -- each fixes the coset it is applied to -- and they generate
+        it, because every stabilizer element is a word in the generators and the
+        correction `w_{tP}^{-1} t w_P` is what keeps a running product in the
+        coset it has reached.  The family below is that one, extended to `L` by
+        `x \mapsto \epsilon (b(x,v)/b(v,v)) v + \sigma(x - (b(x,v)/b(v,v)) v)`,
+        which is integral precisely for the isometries that preserve `H`.
+
+        **What it costs.**  One isometry of `L` per orbit point and generator, so
+        `|orbit| * |generators of O(K)|` of them; the orbit is the orbit of `H`
+        in the finite group `A_{L_0}`, and `O(K)`'s own generators are the
+        recursion this shares with the line and plane constructions.
+        """
+        from sage.matrix.constructor import matrix as engine_matrix
+        from sage.rings.rational_field import QQ as SageQQ
+
+        arrow = self._marked_arrow(marked)
+        if arrow is None:
+            return None
+        labels = tuple(arrow.domain().module_generating_set())
+        if int(arrow.domain().module_rank()) != 1 or len(labels) != 1:
+            return None
+        vector = arrow(arrow.domain().module_generator(labels[0]))
+        lattice = arrow.codomain()
+        ring = lattice.base_ring()
+        if ring is not _owned_integers():
+            return None
+        if lattice.is_definite() is not False or lattice.is_even() is not True:
+            return None
+        if vector.is_primitive() is not True:
+            return None
+        square = SageZZ(int(lattice.b(vector, vector)))
+        if square == SageZZ.zero():
+            return None
+
+        framing = tuple(lattice.module_generating_set())
+        gram = _engine_component_matrix(lattice.gram_tensor()).change_ring(SageQQ)
+        inverse_gram = gram.inverse()
+
+        def coordinates(element):
+            r"""The coordinates of a vector in the framing, over ``QQ``."""
+            pairings = engine_vector(
+                SageQQ,
+                [
+                    SageQQ(int(lattice.b(element, lattice.module_generator(label))))
+                    for label in framing
+                ],
+            )
+            return engine_matrix(
+                SageQQ, 1, len(framing), [SageQQ(entry) for entry in (pairings * inverse_gram).list()]
+            )
+
+        complement = vector.orthogonal_complement()
+        quotient_labels = tuple(complement.module_generating_set())
+        complement_rank = len(quotient_labels)
+        inclusion = complement.inclusion()
+        complement_basis = tuple(
+            inclusion(complement.module_generator(label)) for label in quotient_labels
+        )
+        complement_coordinates = engine_matrix(
+            SageQQ, [coordinates(element).list() for element in complement_basis]
+        )
+        complement_gram = complement_coordinates * gram * complement_coordinates.transpose()
+        inverse_complement_gram = complement_gram.inverse()
+        vector_coordinates = coordinates(vector)
+        square_rational = SageQQ(square)
+
+        def quotient_coordinates(element):
+            pairings = engine_vector(
+                SageQQ,
+                [
+                    SageQQ(int(complement.b(element, complement.module_generator(label))))
+                    for label in quotient_labels
+                ],
+            )
+            return engine_matrix(
+                SageQQ,
+                1,
+                complement_rank,
+                [SageQQ(entry) for entry in (pairings * inverse_complement_gram).list()],
+            )
+
+        def isometry_matrix(isometry):
+            return engine_matrix(
+                SageQQ,
+                [
+                    quotient_coordinates(isometry(complement.module_generator(label))).list()
+                    for label in quotient_labels
+                ],
+            )
+
+        def split(element_coordinates):
+            coefficient = (
+                element_coordinates * gram * vector_coordinates.transpose()
+            )[0, 0] / square_rational
+            return coefficient, element_coordinates - coefficient * vector_coordinates
+
+        def applied(entry, element_coordinates):
+            sign, matrix = entry
+            coefficient, perpendicular = split(element_coordinates)
+            moved = (
+                perpendicular
+                * gram
+                * complement_coordinates.transpose()
+                * inverse_complement_gram
+            )
+            return sign * coefficient * vector_coordinates + (
+                moved * matrix * complement_coordinates
+            )
+
+        glue_gram = engine_matrix(SageZZ, len(framing), len(framing))
+        glue_gram[0, 0] = SageZZ(square)
+        for row in range(complement_rank):
+            for column in range(complement_rank):
+                entry = complement_gram[row, column]
+                assert SageQQ(entry).denominator() == 1, (
+                    f"the orthogonal complement {complement} of {vector} has a non-integral Gram "
+                    f"entry {entry}, so no gluing subgroup is formed here"
+                )
+                glue_gram[1 + row, 1 + column] = SageZZ(entry)
+        diagonal, left, _right = glue_gram.smith_form()
+        modules = tuple(int(diagonal[index, index]) for index in range(len(framing)))
+        glue_basis = engine_matrix(
+            SageQQ,
+            [vector_coordinates.list()] + [list(row) for row in complement_coordinates.rows()],
+        )
+
+        def invariant(element_coordinates):
+            r"""The class of a vector of `L_0^\vee` in `A_{L_0}`, as a tuple."""
+            pairings = element_coordinates * gram * glue_basis.transpose()
+            transformed = pairings * left.transpose()
+            return tuple(
+                int(transformed[0, index]) % modules[index]
+                for index in range(len(framing))
+            )
+
+        zero = tuple(0 for _ in modules)
+
+        def moved_point(entry, pairs):
+            moved = []
+            seen = set()
+            for value, representative in pairs:
+                new_representative = applied(entry, representative)
+                new_value = invariant(new_representative)
+                if new_value == zero and len(pairs) > 1:
+                    continue
+                if new_value not in seen:
+                    seen.add(new_value)
+                    moved.append((new_value, new_representative))
+            return tuple(moved), frozenset(seen)
+
+        generators = tuple(complement.Aut().group_generators())
+        entries = tuple((1, isometry_matrix(generator)) for generator in generators) + tuple(
+            (1, isometry_matrix(generator).inverse()) for generator in generators
+        )
+        if setwise:
+            identity = engine_matrix(
+                SageQQ,
+                complement_rank,
+                complement_rank,
+                lambda row, column: SageQQ(1) if row == column else SageQQ(0),
+            )
+            entries = entries + ((-1, identity),)
+
+        initial = []
+        initial_values = set()
+        for label in framing:
+            representative = coordinates(lattice.module_generator(label))
+            value = invariant(representative)
+            if value not in initial_values:
+                initial_values.add(value)
+                initial.append((value, representative))
+        identity_entry = (
+            1,
+            engine_matrix(
+                SageQQ,
+                complement_rank,
+                complement_rank,
+                lambda row, column: SageQQ(1) if row == column else SageQQ(0),
+            ),
+        )
+        pending = [(tuple(initial), frozenset(initial_values))]
+        words = {frozenset(initial_values): identity_entry}
+        stabilizers = []
+        while pending:
+            pairs, key = pending.pop()
+            word = words[key]
+            for entry in entries:
+                neighbour_pairs, neighbour_key = moved_point(entry, pairs)
+                composited = (entry[0] * word[0], word[1] * entry[1])
+                if neighbour_key not in words:
+                    words[neighbour_key] = composited
+                    pending.append((neighbour_pairs, neighbour_key))
+                    continue
+                # w_{t P}^{-1} t w_P: the correction that keeps a word in the
+                # coset it has reached, hence an element of the stabilizer.
+                target = words[neighbour_key]
+                stabilizers.append(
+                    (composited[0] * target[0], composited[1] * target[1].inverse())
+                )
+        family = tuple(
+            self._gluing_extension(lattice, entry, applied, coordinates, framing, ring)
+            for entry in stabilizers
+        )
+        if not setwise:
+            if not all(generator(vector) == vector for generator in family):
+                raise ValueError(
+                    f"the complement-and-glue family built at {vector} contains an element that "
+                    f"does not fix it, so the extension formula and the gluing subgroup disagree"
+                )
+        return finite_ordered_set(family)
+
+    def _gluing_extension(self, lattice, entry, applied, coordinates, framing, ring):
+        r"""The isometry of ``lattice`` that ``entry`` induces: fix `v` up to its sign, act on the complement.
+
+        ``entry`` is a pair of the sign of the action on `v` and the matrix of
+        the action on the complement's coordinates; ``applied`` is the same
+        action read on a vector of the framing.  An isometry of the complement
+        that preserves the gluing subgroup carries the lattice into itself, so
+        the images of the framing are integral; a non-integral image is a
+        disagreement between the two and raises rather than being rounded.
+        """
+        sign, matrix = entry
+
+        def images(entry_to_read):
+            moves = {}
+            for label in framing:
+                moved = applied(entry_to_read, coordinates(lattice.module_generator(label)))
+                coefficients = {}
+                for position, framing_label in enumerate(framing):
+                    value = moved[0, position]
+                    if value == 0:
+                        continue
+                    if value.denominator() != 1:
+                        raise ValueError(
+                            f"the complement isometry {entry_to_read!r} does not glue to an "
+                            f"isometry of {lattice}: the generator {framing_label} is carried to "
+                            f"{value}, which is not integral"
+                        )
+                    coefficients[framing_label] = _owned_engine_element(ring, SageZZ(int(value)))
+                moves[label] = lattice.linear_combination(coefficients)
+            return moves
+
+        forward = lattice.Mor(lattice)(images(entry))
+        return lattice.Isom(lattice)._from_inverse_computation(
+            forward,
+            lambda: self._gluing_extension(
+                lattice, (sign, matrix.inverse()), applied, coordinates, framing, ring
+            ),
+        )
 
     def _marking_component(self, source_marking, target_marking, apex):
         r"""Implementer side of the marked-diagram contract: ``alpha`` with ``kappa alpha = g iota``.
