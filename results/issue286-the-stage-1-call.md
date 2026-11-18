@@ -224,7 +224,7 @@ the run's: the port's generator search is not deterministic (330, 331, 335, 343,
 | 2 | the group rows by their constructions, `R_{Γ^K_En} = O(T_Co)` | indices `1` and `2·|O(q)|`, the page's |
 | 3 | the call on `T_Co` under `O(T_Co)`, with incidence | 1 line orbit, 1 plane orbit, 1 edge |
 | 4 | the known-answer comparisons | all ten rows are the cards' |
-| 5 | the kernel rows on `T_Co` | line rows **527** each; the `Õ` plane row **189 720 cusps** (36.2 min, 3 476 MiB); the `Õ⁺` plane row is running |
+| 5 | the kernel rows on `T_Co` | line rows **527** each; the `Õ` plane row **189 720 cusps** (36.2 min, 3 476 MiB); the `Õ⁺` plane row is the one still open (killed at 3 330 MiB under another chat's 3.2 GiB row) |
 | 6 | `O(T_Co)` generators | return, 359 in 27.0 s, port `991b88b0` |
 
 ### The index over each finite class
@@ -273,7 +273,13 @@ The `Õ(T_Co)` row, on the cusp instrument and alone on the host, **returns**:
 [Otilde cusps] a cusp's representative: rank 2, primitive True
 ```
 
-189 720 cusps in 36.2 minutes at a 3 476 MiB peak, each cusp answering
+The same row for `Õ⁺(T_Co) = ker(ρ, sn_RR)` was launched under the same lease and
+killed at **3 330 MiB, exit 137, 2 124 s in**, while another chat's row held
+3 211 MiB beside it and two more tenants held 1 826 and 1 113 MiB: the headroom
+at that moment was about 730 MiB against the 5 120 MiB the row needs.  It is a
+re-run away, not a different answer, and it is the one item still open.
+
+The `Õ` row's numbers: 189 720 cusps in 36.2 minutes at a 3 476 MiB peak, each cusp answering
 `representative()` with a rank-two primitive isotropic plane of `T_Co` — the
 count `#390` returned, now measured here on the cusp form of the same row, and
 the index over the single `O(T_Co)`-class is 189 720.
