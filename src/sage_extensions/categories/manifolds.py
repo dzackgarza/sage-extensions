@@ -1662,11 +1662,11 @@ class RiemannianManifoldMorCategoryConstruction(MorCategoryConstruction):
 class _RiemannianSmoothFunctor(Functor):
     r"""Forget the selected metric on objects and local isometries."""
 
-    def __init__(self):
-        super().__init__(RiemannianManifolds(), SmoothManifolds())
+    def __init__(self, source):
+        super().__init__(source, SmoothManifolds())
 
     def _apply_object(self, manifold):
-        pass
+        return manifold.underlying_smooth_manifold()
 
     def _apply_morphism(self, morphism):
         return morphism.underlying_smooth_morphism()
@@ -1709,16 +1709,110 @@ class RiemannianManifolds(OwnedCategory):
         return "Riemannian manifolds"
 
     def an_object(self):
-        r"""The Euclidean line ``(R, dx^2)``."""
-        pass
+        r"""The Euclidean line ``(R, dx^2)``.
+
+        The space is the smooth line ``R`` with its one global chart ``x``: a
+        smooth structure is ``SmoothManifolds()``'s data and not this
+        category's, so it is taken from there.  The metric is ``dx (x) dx``,
+        carried in that chart's coordinates as the single Gram entry ``1``,
+        the constant section of ``C^inf(R, RR)`` the formula ``g(d/dx, d/dx)``
+        reads.
+        """
+        line = SmoothManifolds()(1, "R")
+        line.chart("x", "x")
+        charts = line.chart_labels()
+        metric = indexed_family(
+            charts,
+            lambda label: ((line.atlas()[label].function_ring().one(),),),
+            name="Gram matrix of dx (x) dx in each chart of the line",
+        )
+        return self(line, metric)
 
     def _call_(self, manifold, metric):
-        r"""Select ``(M, g)`` from a smooth manifold and its positive definite metric."""
-        pass
+        r"""Select ``(M, g)`` from a smooth manifold ``M`` and the metric's coordinates.
+
+        ``metric`` is a finite indexed family over the chart labels of ``M``
+        whose value at a label is the matrix ``(g(d/dx_i, d/dx_j))`` of the
+        pairings of that chart's coordinate vector fields.  A Riemannian metric
+        is a smooth section of ``Sym^2 T^*M``, and on the domain of a chart its
+        two arguments are coordinate vector fields, so those entries are
+        functions on that domain and they determine ``g`` there.  The metric is
+        chosen data — a smooth manifold admits many, none canonical — and it is
+        read from the caller and not computed here, as the inner product of a
+        ``EuclideanSpaces()`` space is.
+
+        What is checked is what the data are: that ``M`` is a smooth manifold,
+        that the family is indexed by exactly the charts of ``M`` (a metric is
+        stated in every chart of the atlas, so no chart is left without one),
+        and that each matrix is square of ``dim M``, symmetric, with entries in
+        the ring of functions the manifold assigns to that chart's domain.
+        Positive definiteness — ``g_p(v, v) > 0`` at every point ``p`` and for
+        every ``v != 0`` — is a statement about the entries as functions on an
+        open subset, not about finitely many of their values, and is the
+        hypothesis the caller states by handing the metric over.  So is the
+        agreement of the matrices on overlaps of charts, which says that the
+        chart transitions are isometries.
+        """
+        assert manifold in SmoothManifolds(), (
+            f"cannot select a Riemannian metric on {manifold}: a Riemannian manifold is a "
+            f"smooth manifold with a metric, and {manifold} is an object of "
+            f"{manifold.category()}"
+        )
+        charts = manifold.chart_labels()
+        assert tuple(metric.index_set()) == tuple(charts), (
+            f"the metric selected on {manifold} is stated in the charts "
+            f"{tuple(metric.index_set())}, but a metric on a manifold is stated in every "
+            f"chart of its atlas, and the charts of {manifold} are {tuple(charts)}"
+        )
+        dimension = int(manifold.dimension())
+        for label in charts:
+            entries = tuple(tuple(row) for row in metric[label])
+            ring = manifold.atlas()[label].function_ring()
+            assert len(entries) == dimension, (
+                f"the metric selected on {manifold} gives {len(entries)} rows in the chart "
+                f"{label!r}, but the Gram matrix of that chart's coordinate vector fields "
+                f"has one row per dimension, {dimension}"
+            )
+            for index, row in enumerate(entries):
+                assert len(row) == dimension, (
+                    f"the metric selected on {manifold} gives {len(row)} entries in row "
+                    f"{index} of the chart {label!r}, but the Gram matrix of that chart's "
+                    f"coordinate vector fields is square of size {dimension}"
+                )
+                for column, entry in enumerate(row):
+                    assert entry in ring, (
+                        f"the metric selected on {manifold} gives the entry "
+                        f"{index},{column} of the chart {label!r} as {entry}, which is not "
+                        f"a function on that chart's domain: a Gram entry "
+                        f"g(d/dx_{index}, d/dx_{column}) is a section of {ring}"
+                    )
+            for index in range(dimension):
+                for column in range(index + 1, dimension):
+                    assert entries[index][column] == entries[column][index], (
+                        f"the metric selected on {manifold} is not symmetric in the chart "
+                        f"{label!r}: the entries {index},{column} and {column},{index} are "
+                        f"{entries[index][column]} and {entries[column][index]}, and a "
+                        f"Gram matrix is symmetric"
+                    )
+        space = manifold._with_structure(
+            (self,),
+            {"underlying_smooth_manifold": manifold, "metric": metric},
+        )
+        for label in charts:
+            space._register_chart(label, _engine_manifold_chart(manifold.atlas()[label]))
+        return space
 
     @cached_method
     def forget_metric(self):
-        return _RiemannianSmoothFunctor()
+        r"""Forget the selected metric on objects and on their arrows.
+
+        An object ``(M, g)`` becomes the smooth manifold ``M`` it was selected
+        on, and a local isometry becomes the smooth map under it: the arrow
+        keeps its map and loses the statement ``f^* h = g``.  The globally
+        symmetric axiom keeps a metric too, so ``GloballySymmetric()`` declares
+        this same functor with itself as its source.
+        """
+        return _RiemannianSmoothFunctor(self)
 
     class SubcategoryMethods:
         def GloballySymmetric(self):
@@ -1733,12 +1827,57 @@ class RiemannianManifolds(OwnedCategory):
             return self._with_axiom("GloballySymmetric")
 
     class ParentMethods:
+        def __init__(
+            self,
+            metric=None,
+            underlying_smooth_manifold=None,
+            **rest,
+        ) -> None:
+            r"""Record the selected metric and the smooth manifold it is selected on.
+
+            ``metric`` is the family ``chart label |-> (g(d/dx_i, d/dx_j))`` of
+            :meth:`RiemannianManifolds._call_`: the metric's Gram matrix in
+            each chart of the atlas, whose entries are sections of the ring of
+            functions on that chart's domain.  ``underlying_smooth_manifold``
+            is the smooth manifold ``M`` the metric was selected on, which is
+            what :meth:`forget_metric` returns.
+
+            Neither is read off the object: a metric is chosen data of the
+            object, and an object constructed without one — the symmetric
+            space ``noncompact_type`` states, whose ``G``-invariant metric it
+            does not construct — carries ``None`` and refuses to answer for it.
+            """
+            self._preamble_metric = metric
+            self._preamble_underlying_smooth_manifold = underlying_smooth_manifold
+            super().__init__(**rest)
+
         def underlying_smooth_manifold(self):
-            pass
+            r"""Return ``M``, the smooth manifold this object selects its metric on."""
+            match self._preamble_underlying_smooth_manifold:
+                case None:
+                    raise ValueError(
+                        f"{self} has no underlying smooth manifold: it was constructed "
+                        f"from a manifold's own data and not from an object of "
+                        f"SmoothManifolds(), so no one object is the manifold to forget "
+                        f"the metric to"
+                    )
+                case manifold:
+                    return manifold
 
         def riemannian_metric(self):
-            r"""Return the chosen metric ``g``, a positive definite section of ``Sym^2 T^*M``."""
-            pass
+            r"""Return the chosen metric ``g``, a positive definite section of ``Sym^2 T^*M``.
+
+            It is returned as it was stated: the family of its Gram matrices in
+            the charts of the atlas, ``chart label |-> (g(d/dx_i, d/dx_j))``.
+            """
+            match self._preamble_metric:
+                case None:
+                    raise ValueError(
+                        f"{self} has no chosen metric: a Riemannian manifold's metric is "
+                        f"chosen data, and this object was constructed without it"
+                    )
+                case metric:
+                    return metric
 
         def isometry_group(self):
             r"""Return ``I(M, g)``, the group of isometries ``f: M -> M`` with ``f^* g = g``.
@@ -1759,6 +1898,25 @@ class RiemannianManifolds(OwnedCategory):
         is an isolated fixed point of an involutive isometry ``s_p``, the
         geodesic symmetry at ``p``.
         """
+
+        @cached_method
+        def forget_metric(self):
+            r"""Forget the selected metric: the map from this category to ``SmoothManifolds()``.
+
+            A globally symmetric space is a Riemannian manifold, so this is the
+            base category's forgetting functor with this category as its
+            source: an object becomes its smooth manifold and an arrow its
+            smooth map, and the symmetric structure is not what is forgotten.
+
+            It is declared here as well as on ``RiemannianManifolds`` because an
+            axiom category's runtime class carries the base category's
+            ``SubcategoryMethods`` and ``subcategory_class``, not the base
+            category class: ``an_object`` and ``_call_`` of
+            ``RiemannianManifolds`` are not reachable from this category
+            either.  A construction stated here is the axiom category's own,
+            and its source is this category.
+            """
+            return _RiemannianSmoothFunctor(self)
 
         @cached_method
         def noncompact_type(self, satake_diagram):
