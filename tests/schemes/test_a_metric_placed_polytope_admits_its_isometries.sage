@@ -624,7 +624,9 @@ def test_the_placed_hyperbolic_polygon_admits_its_isometry() -> None:
     the timelike generator is an isometry of the lattice, so it is an arrow of the
     hyperbolic space, and it carries those four points among themselves -- it is
     the antipodal map of the disc -- so it is an arrow of the placed polygon,
-    admitted by the space's own decision.
+    admitted by the space's own decision.  A placed vertex is a point of the
+    space's own point set, so the space takes it as it is; coordinates, which
+    arrive with a chart, are the other ingress and are untouched.
     """
     space = HyperbolicSpaces(2).an_object()
     lattice = space.lattice()
@@ -673,3 +675,4 @@ def test_the_placed_hyperbolic_polygon_admits_its_isometry() -> None:
     assert placed.face_poset().faces(0).cardinality() == 4
     assert space.is_an_isometry(sign_flip) is True
     assert arrow.ambient_map() is sign_flip
+    assert space(tuple(placed.vertices())[0]) is tuple(placed.vertices())[0]

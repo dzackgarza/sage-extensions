@@ -670,6 +670,24 @@ class HyperbolicSpaces(OwnedParameterizedCategory):
             """
             return self.rational_points()
 
+        def _element_constructor_(self, datum, chart_label=None):
+            r"""Return the point: a point of this space's own point set is a point of this space.
+
+            An element of a hyperboloid model is the ray of a positive rational
+            vector of its component, so a point of :meth:`point_set` is one of this
+            space's points already, and it is returned as it is.  Coordinates
+            arrive with a chart and stay with the manifold levels that build a
+            point from them: a ray is not a tuple of coordinates, and reading one as
+            coordinates is what those levels would otherwise do with it.
+            """
+            match datum:
+                case _ if (
+                    chart_label is None and element_parent(datum) is self.point_set()
+                ):
+                    return datum
+                case _:
+                    return super()._element_constructor_(datum, chart_label)
+
         def rational_point(self, vector):
             r"""Return the rational point on the ray of ``vector``, a positive vector of the component."""
             return self.rational_points()(vector)
