@@ -1,0 +1,24 @@
+# tree: f0119c450855e7f40ea3e086fcce30cf0930d6c9
+# status:  M results/issue381-the-plane-rows-per-plane-cost.md  M src/sage_extensions/categories/group/predicate_subgroups.py  M src/sage_extensions/categories/orthogonal_quotients.py 
+# port: 991b88b095a42a1e3679569ea42328c900c120f6
+# load: 8.83 7.70 6.63
+# free: 2340 MiB available
+# started: 2026-11-18T10:13:32Z
+# program: .tmp/issue381b/probe-spelling.py  PROBE_PLANES=unset PROBE_BAND=unset PYTHONHASHSEED=0
+Otilde: 2 plane cusps answer a spelled lift, 0 registry entries are a sign sheet's
+Otilde+: 2 plane cusps answer a spelled lift, 0 registry entries are a sign sheet's
+done
+[peakrss] spelling-small: child waited=0 shell_code=0 samples=26
+[peakrss] peak tree RSS      : 389 MiB
+[peakrss] low-water MemAvail : 1713 MiB
+[peakrss] peak single VmHWM  : 395 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      392 MiB peak
+[peakrss]   run.sh                        6 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    44.1s procs=  2 rss=   389 MiB hwm=   395 MiB avail=  1919 MiB
+[peakrss]   t=    48.1s procs=  2 rss=   386 MiB hwm=   395 MiB avail=  1885 MiB
+[peakrss]   t=    50.1s procs=  2 rss=   386 MiB hwm=   395 MiB avail=  1899 MiB
+[peakrss]   t=    46.1s procs=  2 rss=   382 MiB hwm=   395 MiB avail=  1912 MiB
+[peakrss]   t=    34.1s procs=  2 rss=   377 MiB hwm=   392 MiB avail=  1732 MiB
+# launcher exit: 0  ended: 2026-11-18T10:14:24Z

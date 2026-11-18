@@ -1,0 +1,54 @@
+fix: the lift registry keeps the word that spells a plane, not the product
+
+A kernel plane row registers one lift a plane, and a lift of that row is a word
+in the ambient group's selected generating family: the walk composes one
+generator per edge of its own tree and the double coset is spelled by the word
+section.  The registry kept the *product*, whose integer entries grow with the
+double coset the plane sits at, so the row's peak grew with the planes already
+processed: 9.2 KiB an entry where the row starts and ~18 KB a plane in its tail
+bands, >=1.67 GiB at 189720 planes on a 0.71 GiB standing row, which is the term
+the host's killer has taken five times (3400 .. 5490 MiB, `MemAvail` ~1 GiB).
+
+`_LiftSpelling` is a lift as its word -- signed one-based letters into the
+ambient family in left-to-right product order, and the kernel witness a sign
+sheet's lift is multiplied by -- and `register_isotropic_lift` takes it
+(`spelling=`) and keeps it in place of the product.
+`_registered_isotropic_split_of_span` spells the product on demand
+(`_spelled_lift`), so every reader that wants the isometry still gets it.
+`registered_isotropic_discriminant_of_span` and a span-keyed
+`isotropic_lift_discriminant_of` read the finite element without spelling
+anything, and the divided-class relation reads that at every plane: the integral
+lift there is needed at the planes that make the `check_move` comparison and at
+no other.
+
+The walk yields the word beside the lift only where it is asked
+(`spellings=True`), records it along the same tree it records the values on, and
+releases it when it releases them.  It also checks the word once per row on each
+sheet -- the unflipped sheet against the character map and the product, the
+sign sheet against `flip_element * word` -- and raises rather than registering a
+word whose product carries the source plane elsewhere.
+
+Measured, `.tmp/issue381b/probe-registry.py`, the same lattice and the same 200
+planes `#599` priced the product with: **150 B a plane** in the words the
+registry keeps (30032 B over 200 entries), against 9.2 KiB an entry for the
+product; 28.5 MB at 189720 planes against 1.67 GiB.  The word is one letter an
+edge, eight bytes a letter, so it grows with the walk's depth and not with the
+product's entries.  The drop-and-read measure frees nothing measurable here
+(-8 B a plane: the entries are small and the allocator does not return their
+pages), so the number is taken from what the registry holds.
+
+No `test:` commit, and said rather than manufactured: the assertions that decide
+this repair are already landed (`5960a40`) and fail if a word spells anything
+other than its lift -- the spelled lift's character image is the finite element
+registered beside it, and the composite s_2 s_1^-1 carries the first cusp's
+plane into the second -- and the parent cannot be red because it has no word to
+check.  The sign sheet's half is not exercised by any lattice a test can afford
+(`U + U(2) + <-2>`, `U + U(2) + <-4>`, `6JRS`, `U + U + <-4>`: 0 such entries
+each); it is `Otilde+`'s row on `T_Co`, and the walk checks it there.
+
+Runs, on the tree carrying this and the span repair: the file above 3 passed in
+46.78 s; the driver on `U + U(2) + <-2>` decides both kernel rows at 4 edges
+over 3 line and 2 plane cusps with the ordered endpoint digest `47249bbc...`,
+the digest the tree before this change prints; the two-route gate
+`test_the_incidence_decided_by_divided_classes` with
+`test_a_row_computes_one_plane_covering` 5 passed in 260.44 s.

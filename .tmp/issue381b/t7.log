@@ -1,0 +1,41 @@
+# tree: f0119c450855e7f40ea3e086fcce30cf0930d6c9
+# status:  M results/issue381-the-plane-rows-per-plane-cost.md  M src/sage_extensions/categories/group/predicate_subgroups.py  M src/sage_extensions/categories/orthogonal_quotients.py 
+# port: 991b88b095a42a1e3679569ea42328c900c120f6
+# load: 9.06 8.92 7.46
+# free: 2615 MiB available
+# started: 2026-11-18T10:18:14Z
+# program: pytest tests/lattices/test_a_cusp_names_its_plane_by_span.sage
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+time gates OFF (--no-time-gates): star import 1.18 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: asyncio-1.5.0, xdist-3.8.0, reportlog-1.0.0, platformdirs-4.13.5, hypothesis-6.170.15, anyio-4.15.1, timeout-2.4.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 3 items
+
+tests/lattices/test_a_cusp_names_its_plane_by_span.sage ...              [100%]
+
+========================== test-call performance gate ==========================
+tests/lattices/test_a_cusp_names_its_plane_by_span.sage::test_a_cusp_of_a_null_plane_builds_its_plane_from_its_span: 31.30 s > 20 s
+============================== slowest durations ===============================
+31.30s call     tests/lattices/test_a_cusp_names_its_plane_by_span.sage::test_a_cusp_of_a_null_plane_builds_its_plane_from_its_span
+12.00s call     tests/lattices/test_a_cusp_names_its_plane_by_span.sage::test_each_incidence_certificate_carries_its_terms_to_its_cusps
+0.24s call     tests/lattices/test_a_cusp_names_its_plane_by_span.sage::test_a_plane_cusp_answers_the_lift_its_row_registered_for_it
+
+(6 durations < 0.005s hidden.  Use -vv to show these durations.)
+============================== 3 passed in 46.78s ==============================
+[peakrss] t7: child waited=0 shell_code=0 samples=30
+[peakrss] peak tree RSS      : 462 MiB
+[peakrss] low-water MemAvail : 1808 MiB
+[peakrss] peak single VmHWM  : 471 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      467 MiB peak
+[peakrss]   run.sh                        6 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    54.1s procs=  2 rss=   462 MiB hwm=   471 MiB avail=  1921 MiB
+[peakrss]   t=    52.1s procs=  2 rss=   461 MiB hwm=   463 MiB avail=  1979 MiB
+[peakrss]   t=    56.1s procs=  2 rss=   458 MiB hwm=   471 MiB avail=  1857 MiB
+[peakrss]   t=    58.1s procs=  2 rss=   458 MiB hwm=   471 MiB avail=  1808 MiB
+[peakrss]   t=    46.1s procs=  2 rss=   456 MiB hwm=   459 MiB avail=  1946 MiB
+# launcher exit: 0  ended: 2026-11-18T10:19:14Z

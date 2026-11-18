@@ -1,0 +1,27 @@
+# tree: f0119c450855e7f40ea3e086fcce30cf0930d6c9
+# status:  M src/sage_extensions/categories/group/predicate_subgroups.py  M src/sage_extensions/categories/orthogonal_quotients.py 
+# port: 991b88b095a42a1e3679569ea42328c900c120f6
+# load: 5.03 4.73 5.27
+# free: 6081 MiB available
+# started: 2026-11-18T10:02:25Z
+# program: .tmp/issue381b/probe-registry.py  PROBE_PLANES=200 PROBE_BAND=unset PYTHONHASHSEED=0
+[      0.3 s rss    280.8 MiB] T_Co and the Otilde row's subgroup
+[    472.9 s rss   1295.1 MiB] the split: 200 planes drawn in 472.7 s
+[    473.0 s rss   1295.3 MiB] the registry holds 200 entries
+  the words the registry keeps: 150 B a plane (30032 B over 200 entries), beside 200 finite elements
+  resident before dropping the registry 1295.3 MiB, after gc 1298.7 MiB, after dropping it 1296.9 MiB: -8 B a plane freed
+[    476.6 s rss   1296.9 MiB] done
+[peakrss] registry-200: child waited=0 shell_code=0 samples=244
+[peakrss] peak tree RSS      : 1313 MiB
+[peakrss] low-water MemAvail : 2360 MiB
+[peakrss] peak single VmHWM  : 1316 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     1313 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   run.sh                        2 MiB peak
+[peakrss]   t=   472.8s procs=  2 rss=  1313 MiB hwm=  1316 MiB avail=  2481 MiB
+[peakrss]   t=   474.8s procs=  2 rss=  1311 MiB hwm=  1316 MiB avail=  2429 MiB
+[peakrss]   t=   470.8s procs=  2 rss=  1301 MiB hwm=  1303 MiB avail=  2539 MiB
+[peakrss]   t=   480.8s procs=  2 rss=  1300 MiB hwm=  1316 MiB avail=  2467 MiB
+[peakrss]   t=   476.8s procs=  2 rss=  1299 MiB hwm=  1316 MiB avail=  2589 MiB
+# launcher exit: 0  ended: 2026-11-18T10:10:34Z

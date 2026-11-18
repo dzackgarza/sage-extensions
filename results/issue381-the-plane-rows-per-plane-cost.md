@@ -97,13 +97,11 @@ That removes **5.0-7.9 ms of the 8.3 ms a plane** the row's relation pays --
 relation's path.
 
 **It does not lower the peak.**  The peak is section 2's registry, and its
-repair is a different change at the same owner: the walk spells each lift as a
-word in the ambient family, so the registry could retain **the word** (a tuple
-of edge letters, hundreds of bytes) and the finite element, and spell the
-integral lift where a consumer asks for one -- the relation asks at no plane but
-the `check_move` plane, and the coverings at theirs.  That changes the walk's
-protocol and every registration site, and it has to be verified on a row of the
-row's own length; it is not in this change.
+repair is a different change at the same owner, landed after this note was
+first written: the walk spells each lift as a word in the ambient family, so the
+registry now keeps **the word** and the finite element, and spells the integral
+lift where a consumer asks for one -- the relation asks at no plane but the
+`check_move` plane, and the coverings at theirs.  Section 6 is that change.
 
 ## 4. The contract the read rests on, and why it is not a red
 
@@ -122,7 +120,67 @@ and not a wrong answer.  The red that would exist -- the span-keyed call is
 absent at the parent -- is an `AttributeError` for the missing fix, which is
 not a red.
 
-## 5. What was run, and what was not
+## 6. The peak's repair: the registry keeps the word, not the product
+
+The walk that reaches a double coset composes one ambient generator per edge of
+its own tree, and the double coset is spelled by the word section, so every lift
+it yields is *already* a word: the product's integer entries grow with the plane
+only because the product is taken.  A registry that keeps the product costs
+9.2 KiB an entry where a row starts and ~18 KB a plane in its tail bands; the
+word costs what a tuple of small integers costs, and the isometry is spelled
+where something is transported by it.
+
+`register_isotropic_lift` therefore takes the lift's `spelling`
+(`_LiftSpelling`: the signed one-based letters into the ambient generating
+family, in left-to-right product order, and the sign sheet's kernel witness
+where the lift is that sheet's), and `_registered_isotropic_split_of_span`
+spells the product on demand (`_spelled_lift`).  The walk yields the word beside
+the lift only when asked (`spellings=True`), records it along its own tree, and
+releases it with the values it already releases.  The divided-class relation
+reads the **finite element** a plane
+(`registered_isotropic_discriminant_of_span`) and spells an integral lift only at
+the planes that make the `check_move` comparison; `isotropic_lift_discriminant_of`
+gained the same read.
+
+**Measured** (`.tmp/issue381b/probe-registry.py`, `registry-200.log`, the same
+lattice, the same 200 planes, the same process shape as `#599`'s drop
+measurement):
+
+| what the registry keeps a plane | bytes |
+| --- | ---: |
+| the word (`_LiftSpelling` with its letters) | **150 B** |
+| the product, as `#599` measured it | 9 200 B |
+| at 189720 planes | **28.5 MB** against **1.67 GiB** |
+
+The word grows one letter an edge of the walk's tree -- eight bytes a letter --
+so a plane at depth `d` costs about `60 + 8d` bytes against a product whose
+entries grow multiplicatively with the same `d`.  The drop-and-read measure that
+priced the product frees nothing measurable here (-8 B a plane over 200 entries:
+the entries are small and the allocator does not return the pages), so 150 B is
+the number, taken directly from what the registry holds.
+
+**What decides it.**  Two assertions in
+`tests/lattices/test_a_cusp_names_its_plane_by_span.sage` fail if a word spells
+something other than its lift: the character image of the spelled lift is the
+finite element registered beside it (`quotient.image(lift)["discriminant"]`),
+and the composite `s_2 s_1^{-1}` of two planes' spelled lifts carries the first
+cusp's plane into the second.  The walk also checks, once per row, that the word
+it hands the registry spells the very lift it yields, and raises instead of
+registering a word whose product carries the source plane elsewhere.  On
+`U + U(2) + <-2>` both kernel rows still decide 4 edges over 3 line and 2 plane
+cusps with the ordered endpoint digest `47249bbc…`, unchanged.
+
+**The sign sheet's half of a spelling is not exercised here.**  A spelling
+carries the kernel witness a sign sheet's lift is multiplied by, and none of the
+lattices a test or a short probe can afford registers one: `U + U(2) + <-2>`,
+`U + U(2) + <-4>`, `6JRS` and `U + U + <-4>` each register 0 such entries
+(`probe-spelling.py`, `spelling-small.log`, `spelling-uu24.log`).  That row is
+`Otilde+`'s on `T_Co` and on the Scattone lattices, which are the rows this
+issue is about.  The walk therefore checks that sheet too, once per row, against
+the lift it yields -- and says so where it does -- so a registry of `Otilde+`
+words never silently holds a witness on the wrong side.
+
+## 7. What was run, and what was not
 
 Run, off a worktree of `3998bd8` carrying only this change:
 
@@ -132,11 +190,23 @@ Run, off a worktree of `3998bd8` carrying only this change:
 * the driver on `U + U(2) + <-2>`, both kernel rows: **`Otilde` and `Otilde+`
   each 4 edges over 3 line cusps and 2 plane cusps**, the four endpoint pairs
   `L0 < P0`, `L2 < P0`, `L0 < P1`, `L1 < P1` and the ordered endpoint digest
-  `04c17f79…` -- the small-lattice value #381 records, unchanged by the repair;
+  `47249bbc…` -- the small-lattice value #381 records, unchanged by either
+  repair;
 * the two-route gate, `test_the_incidence_decided_by_divided_classes.sage` with
   `test_a_row_computes_one_plane_covering.sage`: **5 passed in 185.17 s** -- the
   divided-class relation, the certificate relation and the subgroup's own flag
   row are one relation on this tree as they were on the parent.
+
+Run for section 6, on the tree carrying both repairs:
+
+* `probe-registry.py`: **150 B a plane** in the registry's words over the first
+  200 planes of `Otilde(T_Co)`'s split (`registry-200.log`, 200 planes drawn in
+  472.7 s, 1295 MiB), the same probe shape `#599` priced the product with;
+* `tests/lattices/test_a_cusp_names_its_plane_by_span.sage`: **3 passed in
+  38.96 s**;
+* the driver on `U + U(2) + <-2>`, both kernel rows: 4 edges each, the digest
+  `47249bbc…` that the tree before this change prints;
+* the two-route gate on the same tree, run again after the rebase.
 
 Not run, and not reported: **either kernel row at 189720 planes.**  The host
 cannot carry one now: the completed relation needs ~5.4 GiB against 4-6 GiB of

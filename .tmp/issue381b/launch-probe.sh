@@ -23,5 +23,5 @@ PEAKRSS_LABEL=$NAME PEAKRSS_LIMIT_MIB=${PEAKRSS_LIMIT_MIB:-6144} timeout -s KILL
     -b /workspace/nucleus/work/home/ai-review-ci:/ci \
     -b "$TREE:/repos/sage-extensions" \
     -b "$REPO/.git:$REPO/.git" \
-    -- /bin/sh -c "export PYTHONPATH=/ci/tool-artifacts/pytest_plugins:/repos/sage-extensions/src:/work/src:/work SAGE_BIN=/sage/.venv/bin/python PYTHONHASHSEED=0 PROBE_PLANES=${PROBE_PLANES:-300} PROBE_BAND=${PROBE_BAND:-25} PROBE_ROW=${PROBE_ROW:-Otilde}; cd /repos/sage-extensions; exec /sage/.venv/bin/python -u $SCRIPT" >> "$LOG" 2>&1
+    -- /bin/sh -c "export PYTHONPATH=/ci/tool-artifacts/pytest_plugins:/repos/sage-extensions/src:/work/src:/work SAGE_BIN=/sage/.venv/bin/python PYTHONHASHSEED=0 PROBE_PLANES=${PROBE_PLANES:-300} PROBE_BAND=${PROBE_BAND:-25} PROBE_ROW=${PROBE_ROW:-Otilde} PROBE_LATTICE='${PROBE_LATTICE:-unset}'; cd /repos/sage-extensions; exec /sage/.venv/bin/python -u $SCRIPT" >> "$LOG" 2>&1
 echo "# launcher exit: $?  ended: $(date -u +%FT%TZ)" >> "$LOG"
