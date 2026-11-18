@@ -3165,10 +3165,19 @@ class Lattices(OwnedCategoryOverBaseRing):
         `x \mapsto \epsilon (b(x,v)/b(v,v)) v + \sigma(x - (b(x,v)/b(v,v)) v)`,
         which is integral precisely for the isometries that preserve `H`.
 
-        **What it costs.**  One isometry of `L` per orbit point and generator, so
-        `|orbit| * |generators of O(K)|` of them; the orbit is the orbit of `H`
-        in the finite group `A_{L_0}`, and `O(K)`'s own generators are the
-        recursion this shares with the line and plane constructions.
+        **Only the bilinear form is used**, so the lattice need not be even: the
+        overlattice correspondence is between overlattices of `L_0` and the
+        subgroups of `A_{L_0}` on which the form is integral, and `H` is `L/L_0`
+        read as such a subgroup.  The base ring is `ZZ`, where the classes are
+        integer tuples of the Smith form.
+
+        **What it costs, and what it recurses into.**  One isometry of `L` per
+        orbit point and generator, so `|orbit| * |generators of O(K)|` of them.
+        The complement `O(K)`'s own generating family is this construction's
+        input, exactly as the line and plane constructions take `O(K_I)`'s: for an
+        indefinite `K` that family is the indefinite port's, so what is owned here
+        is the *structure* -- the gluing subgroup and the Schreier family over its
+        orbit -- and not the generation of the ambient complement's group.
         """
         from sage.matrix.constructor import matrix as engine_matrix
         from sage.rings.rational_field import QQ as SageQQ
@@ -3184,7 +3193,7 @@ class Lattices(OwnedCategoryOverBaseRing):
         ring = lattice.base_ring()
         if ring is not _owned_integers():
             return None
-        if lattice.is_definite() is not False or lattice.is_even() is not True:
+        if lattice.is_definite() is not False:
             return None
         if vector.is_primitive() is not True:
             return None
@@ -3295,18 +3304,43 @@ class Lattices(OwnedCategoryOverBaseRing):
 
         zero = tuple(0 for _ in modules)
 
+        def closed(values):
+            r"""The subgroup a family of classes generates, as a set of classes.
+
+            The orbit is over *subgroups* of `A_{L_0}`, not over generating sets:
+            an isometry preserving `H` may carry one generating set of it to a
+            different one, so a point keyed by its generators would split `H`
+            into several points and the Schreier family below would generate the
+            stabilizer of a chosen generating set -- a proper subgroup of the
+            stabilizer of `H` in general.  Closure is by addition in the finite
+            group `\oplus Z/d_i` the Smith form presents `A_{L_0}` in.
+            """
+            closure = {zero}
+            frontier = [zero]
+            generators_of_closure = tuple(value for value in values if value != zero)
+            while frontier:
+                current = frontier.pop()
+                for generator in generators_of_closure:
+                    following = tuple(
+                        (current[index] + generator[index]) % modules[index]
+                        for index in range(len(modules))
+                    )
+                    if following not in closure:
+                        closure.add(following)
+                        frontier.append(following)
+            return frozenset(closure)
+
         def moved_point(entry, pairs):
             moved = []
             seen = set()
             for value, representative in pairs:
                 new_representative = applied(entry, representative)
                 new_value = invariant(new_representative)
-                if new_value == zero and len(pairs) > 1:
+                if new_value == zero or new_value in seen:
                     continue
-                if new_value not in seen:
-                    seen.add(new_value)
-                    moved.append((new_value, new_representative))
-            return tuple(moved), frozenset(seen)
+                seen.add(new_value)
+                moved.append((new_value, new_representative))
+            return tuple(moved), closed(seen)
 
         generators = tuple(complement.Aut().group_generators())
         entries = tuple((1, isometry_matrix(generator)) for generator in generators) + tuple(
@@ -3326,9 +3360,11 @@ class Lattices(OwnedCategoryOverBaseRing):
         for label in framing:
             representative = coordinates(lattice.module_generator(label))
             value = invariant(representative)
-            if value not in initial_values:
-                initial_values.add(value)
-                initial.append((value, representative))
+            if value == zero or value in initial_values:
+                continue
+            initial_values.add(value)
+            initial.append((value, representative))
+        initial_key = closed(initial_values)
         identity_entry = (
             1,
             engine_matrix(
@@ -3338,8 +3374,8 @@ class Lattices(OwnedCategoryOverBaseRing):
                 lambda row, column: SageQQ(1) if row == column else SageQQ(0),
             ),
         )
-        pending = [(tuple(initial), frozenset(initial_values))]
-        words = {frozenset(initial_values): identity_entry}
+        pending = [(tuple(initial), initial_key)]
+        words = {initial_key: identity_entry}
         stabilizers = []
         while pending:
             pairs, key = pending.pop()
