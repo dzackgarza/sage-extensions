@@ -1179,6 +1179,44 @@ class LeftCosetGSets(OwnedParameterizedCategory):
             )
             return schreier._corestrict_to_subgroup(self.subgroup())
 
+        def schreier_family_members(self):
+            r"""Yield the members of the complete Schreier family, one at a time, in its order.
+
+            :meth:`schreier_generating_morphism` presents the family as the free
+            group on its ``|letters| * |orbit|`` pairs, which is what a caller
+            that wants the whole family asks for.  A caller that *selects* a
+            subfamily stops after a few members, and realizing the family to hand
+            it over costs one group element per pair whether or not they are
+            used.  This reads the same words, in the same order, from the
+            retained section and free cover, one at a time, so such a caller pays
+            for the members it reaches.
+
+            The members are yielded without ``drop_trivial``: a trivial member is
+            the pair whose word first reaches its point
+            (Holt--Eick--O'Brien, *Handbook of Computational Group Theory*,
+            Chapman & Hall/CRC, 2005, Section 4.1, p. 79), and deciding which
+            members those are is a pass over the whole family -- the cost this
+            reader exists to avoid.  A selection skips them on its own, since
+            their image is the identity and no subgroup fails to contain it.
+            """
+            assert self._coset_word_section is not None, (
+                f"Schreier generators of {self.subgroup()} are read from a pointed coset space "
+                f"with a word section through a free cover, which {self} was not built with"
+            )
+            free = self._coset_augmentation.domain()
+            augmentation = self._coset_augmentation
+            section = self._coset_word_section
+            letter_words = tuple(free.group_generators())
+            representation = self.permutation_representation()
+            permutations = tuple(representation(augmentation(letter)) for letter in letter_words)
+            points = tuple(self)
+            for position, point in enumerate(points):
+                for letter_position, letter_word in enumerate(letter_words):
+                    moved = permutations[letter_position](point)
+                    yield augmentation(
+                        (~section(moved)) * letter_word * section(points[position])
+                    )
+
         @cached_method
         def right_coset_projection(self):
             r"""``G -> H\\G``, presented on ``G/H`` by ``Hx |-> x^-1 H``: the set map ``x |-> x^-1 H``."""

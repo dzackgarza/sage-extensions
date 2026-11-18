@@ -4018,7 +4018,11 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
 
         This is the form the lattice database can store: the Schreier family
         of the orbit has ``|S| * |orbit|`` members, and a card row needs a
-        generating set of ``P``'s preimage part, not that family.
+        generating set of ``P``'s preimage part, not that family.  The family is
+        therefore read one member at a time, in its own order
+        (``_discriminant_point_stabilizer_members``): realizing it in order to
+        select from it would cost ``|S| * |orbit|`` group elements whether or not
+        the selection reaches them.
         """
         from sage.libs.gap.libgap import libgap
         from sage_extensions.categories.group.groups import _element_to_engine, _gap_model
@@ -4038,14 +4042,18 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
             )
         target_order = order // orbit_size
         preimage = self.discriminant_point_stabilizer(point)
-        family = preimage.group_generators()
         image_of = preimage.preimage_morphism()
         ambient = _gap_model(orthogonal)
+        one = self.one()
         selected = []
         images = []
         subgroup = None
-        for label in range(int(family.cardinality())):
-            candidate = family.value(label)
+        for candidate in self._discriminant_point_stabilizer_members(preimage, point):
+            if candidate == one:
+                # The pair whose word first reaches its point: its image is the
+                # identity, which is what ``drop_trivial`` leaves out of the
+                # presented family, and no subgroup fails to contain it.
+                continue
             image = _element_to_engine(orthogonal, image_of(candidate))
             if subgroup is not None and image in subgroup:
                 continue
@@ -4127,6 +4135,28 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
             )
 
         return action
+
+    def _discriminant_point_stabilizer_members(self, preimage, point):
+        r"""Yield the members of the Schreier family that presents ``preimage``, in its order.
+
+        ``preimage`` is ``rho_L^{-1}(H)`` for ``H`` the stabilizer of the finite
+        set ``point`` of classes of ``A_L``, and the family presenting it is the
+        Schreier family of the point's orbit
+        (:meth:`_discriminant_point_stabilizer_morphism`).  A consumer that
+        selects a subfamily of that family stops after a few members, so the
+        members are read from the same pointed coset space one at a time
+        (``LeftCosetGSets.schreier_family_members``) rather than realized.
+
+        The order is the family's: orbit position outer, the free cover's letters
+        inner.  Trivial members -- the pairs whose word first reaches their point
+        -- are yielded too, and the selection skips them by their image.
+        """
+        from sage_extensions.categories.group.g_sets import FiniteGSets
+
+        coset_space = FiniteGSets(self).pointed_orbit(
+            preimage, point, self._discriminant_class_action()
+        )
+        return coset_space.schreier_family_members()
 
     def _discriminant_point_stabilizer_morphism(self, preimage, point):
         r"""The Schreier generating morphism of ``rho_L^{-1}(H)`` as the stabilizer of ``point``.
