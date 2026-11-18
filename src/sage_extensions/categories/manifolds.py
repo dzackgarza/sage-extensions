@@ -810,10 +810,20 @@ class _ManifoldTopologyData(SageObject):
     pretending that arbitrary subsets of an infinite manifold are enumerable.
     Exact arbitrary-subset openness is assertion-gated until a represented
     subset is carried by a native open-submanifold construction.
+
+    An open submanifold carries the initial topology along its inclusion: a
+    subset of it is open exactly when its image is open in the ambient manifold
+    (Mathlib, ``TopologicalSpace.induced`` -- the coarsest topology making the
+    inclusion continuous).  That is retained here as a predicate, ``induced_from``
+    naming the ambient manifold: the submanifold's decision is asked of the
+    ambient manifold on the image of the subset, and no subset of either
+    manifold is enumerated.  The ambient manifold decides what it can decide --
+    the empty set and itself -- and refuses the rest rather than guessing.
     """
 
-    def __init__(self, engine_manifold) -> None:
+    def __init__(self, engine_manifold, induced_from=None) -> None:
         self._engine_manifold = engine_manifold
+        self._induced_from = induced_from
 
     def _engine_manifold_realization(self):
         engine = self._engine_manifold
@@ -831,17 +841,36 @@ class _ManifoldTopologyData(SageObject):
     def is_open_subset(self, space, subset) -> bool:
         power = space.power_set()
         selected = power(subset)
-        match selected:
-            case _ if selected == power.bottom():
-                return True
-            case _ if selected == power.top():
-                return True
-            case _:
-                assert False, (
-                    f"cannot decide whether {selected} is open in the manifold {space}: "
-                    f"openness is decided only for the empty set, the whole manifold, "
-                    f"and open submanifolds constructed as such"
-                )
+        if selected is power.bottom() or ask(selected == power.bottom()) is True:
+            return True
+        if selected is power.top() or ask(selected == power.top()) is True:
+            return True
+        ambient = self._induced_from
+        if ambient is not None:
+            image = ambient.power_set().from_predicate(
+                lambda point: self._is_selected_on(space, selected, point)
+            )
+            return ambient.is_open_subset(image)
+        assert False, (
+            f"cannot decide whether {selected} is open in the manifold {space}: "
+            f"openness is decided only for the empty set, the whole manifold, "
+            f"and open submanifolds constructed as such"
+        )
+
+    def _is_selected_on(self, space, selected, point):
+        r"""Whether ``point`` of the ambient manifold is the image of a point of the subset.
+
+        The submanifold's points are the ambient manifold's points that lie in it
+        (Lee, *Introduction to Smooth Manifolds*, 2nd ed., Example 1.4), so the
+        image of a subset is the subset itself read on the ambient manifold.  A
+        point outside the submanifold has no image to be in the subset, which the
+        submanifold's own point construction refuses.
+        """
+        try:
+            inner = space(point)
+        except (TypeError, ValueError):
+            return False
+        return inner in selected
 
 
 class _ChartDomainRealization:
@@ -1261,7 +1290,7 @@ class TopologicalManifolds(OwnedCategory):
             return _object_of(
                 self.category(),
                 _engine=(self.category(), _ChartDomainRealization, None),
-                topology_data=_ManifoldTopologyData(engine_domain),
+                topology_data=_ManifoldTopologyData(engine_domain, induced_from=self),
                 engine_manifold=engine_domain,
                 manifold_dimension=self.dimension(),
                 manifold_name=str(label),
@@ -1371,7 +1400,48 @@ class TopologicalManifolds(OwnedCategory):
             )
 
         def open_submanifold(self, open_inclusion):
-            pass
+            r"""Return the open submanifold of this manifold that the inclusion selects.
+
+            An open subset of a manifold, with the restricted atlas, is a manifold of
+            the same dimension and class (Lee, *Introduction to Smooth Manifolds*,
+            2nd ed., Example 1.4), and the inclusion is its presentation: the domain
+            of the inclusion is the open submanifold, and the inclusion selects it in
+            this manifold.  Nothing is rebuilt -- a second manifold on the same points
+            would be a second authority for the same subset (``OWN-15``) -- so the
+            object returned is the inclusion's domain.
+
+            The charts of this manifold restrict to charts of the submanifold: a chart
+            read on the intersection of its domain with the submanifold is a chart
+            there, and it is registered under the label it has here.  A chart whose
+            domain is already a chart of the submanifold is the same chart and is not
+            registered again.  Its topology is the initial one along the inclusion,
+            retained as the predicate that a subset is open exactly when its image is
+            (``_ManifoldTopologyData``); nothing about either manifold is enumerated.
+            """
+            domain = open_inclusion.domain()
+            assert open_inclusion.codomain() is self, (
+                f"{open_inclusion} ends at {open_inclusion.codomain()}, not at {self}: an "
+                f"open submanifold of {self} is selected by an inclusion into {self}"
+            )
+            assert domain in self.category(), (
+                f"an open submanifold of {self} is a manifold of its dimension and class, "
+                f"and {domain} is in {domain.category()}"
+            )
+            engine_subset = _engine_manifold(domain)
+            assert engine_subset.is_open() and engine_subset.is_subset(
+                _engine_manifold(self)
+            ), (
+                f"cannot select {domain} as an open submanifold of {self}: {domain} is not "
+                f"an open subset of the points of {self}"
+            )
+            present = tuple(domain.chart_labels())
+            for label in self.chart_labels():
+                if label in present:
+                    continue
+                engine_chart = _engine_manifold_chart(self.atlas()[label])
+                overlap = engine_chart.domain().intersection(engine_subset)
+                domain._register_chart(label, engine_chart.restrict(overlap))
+            return domain
 
         def open_submanifold_inclusion(self, open_manifold):
             pass
