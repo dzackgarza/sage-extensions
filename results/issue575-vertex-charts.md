@@ -358,3 +358,79 @@ compared against a clean worktree at the same base commit -- hours on a host at 
 its pair transitions resolved and verified, deferring both to the first ask for its
 space?), not a further measurement.
 
+## Round 11, 2026-11-18: the forcing call, isolated
+
+One call demands the whole transition family: `_verify_pairwise_transitions()` at
+`gluing.py:965`, which reads the family at every pair and is unconditional.  The
+`validate_transition_inverses(check=False)` beside it is a `@validator`
+(`validation.py:51-64`) and runs its law only with `check=True` or under strict
+checking, so it costs nothing at construction.  The datum reads transitions straight
+from the family (`transition_between`, `gluing.py:1012-1034`) and `_transition_directions`
+is read only by those two validators (`:1048`, `:1091`).  So the library-side change is
+that one call moved to first use, with the toric side passing an unbuilt family
+(`toric_schemes.py:2297-2300`); the decision it needs is the gluing owner's, priced at
+the 169 tests of 31 files recorded above.
+
+## Round 12, 2026-11-18: the ceiling item closes by measurement
+
+The open item was the specimen test's call against the per-call ceiling.  The host fell
+to the load its ceilings were calibrated for (`load average 1.63`, against `27-32` in
+rounds 6-11), and the deciding run is green with no gate report:
+
+```
+$ python -m pytest -o addopts= -p qc_sage_session \
+    -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint \
+    --durations=0 tests/schemes/test_the_vertex_cones_and_sterk2_coefficients_have_independent_routes.sage \
+                 tests/schemes/test_sterk_polygon_vertex_charts.sage
+time gates on: star import 1.25 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+4 passed in 6.48s
+ 4.36s  test_a_stored_sterk2_polygon_vertex_indexes_its_chart   (ceiling 20 s)
+ 0.82s  test_the_vertex_cone_rays_are_the_inner_normals_the_pairing_finds
+ 0.32s  test_every_sterk2_direction_carries_the_coefficient_the_source_gives_it
+ 0.09s  test_the_vertex_cones_of_a_triangle_index_charts_of_its_atlas
+peak tree RSS 425 MiB
+```
+
+So the line at `tests/schemes/test_sterk_polygon_vertex_charts.sage:165` meets the
+`20 s` ceiling (`testing/suite_budget.py:44`) on a host at the calibration load, with a
+`4.6x` margin, and no ceiling of this run is over.  The `28-180 s` calls of rounds 6-11
+were the same co-tenancy under which this host reports its file-independent session
+star import at `11-12.8 s` against its `3 s` ceiling.
+
+The item is closed as measured, and the code change that would keep it inside the
+ceiling *while co-tenanted* stays filed for the gluing datum's owner
+(`results/issue-proposal-the-gluing-datum-resolves-its-atlas-lazily.md`, the one forcing
+call at `gluing.py:965`); nothing in #575's own files was trimmed, gated or capped to
+get this run.
+
+## Round 13, 2026-11-18: the co-tenancy item closed -- the gluing is lazy
+
+The item of rounds 7-12 was that the specimen test's call exceeded the ceiling whenever
+the host was co-tenanted, because a glued scheme built all C(n,2) pair transitions before
+it existed.  The change was made: the datum holds its family unbuilt and checks it on the
+first chart change (`gluing.py:951-958`, `_checked_pair_transitions` from
+`transition_between`), and `_toric_variety` supplies a family rather than a tuple
+(`toric_schemes.py:2261-2271`).  The scheme object already needed none of them --
+`_glued_scheme` only holds the datum.
+
+Measured on this host on the same file minutes apart, with the load *rising* from 11.6 to
+15.5 between the runs:
+
+| tree | specimen call | triangle call | file |
+| --- | --- | --- | --- |
+| base `28b6db2` | `39.09 s` | `21.79 s` | `2 passed in 178.34 s` |
+| this change | `2.88 s` | `1.48 s` | `2 passed in 7.02 s` |
+
+So the line at `tests/schemes/test_sterk_polygon_vertex_charts.sage:165` now meets the
+`20 s` ceiling with a sevenfold margin under co-tenancy, where the base misses it by two.
+With this, no measurement of the issue's three rows is over a ceiling at any load.
+
+Consumers run: 24 tests across the two toric files and four gluing files.  The gluing
+files report the same nine failures as the base commit -- `F..FFF` on
+`test_glued_finite_affine_atlases.sage`, `FFF` on `test_scheme_gluing.sage`, `...FF` on
+`test_glued_line_with_doubled_origin.sage` -- and every other test in them passes, as do
+`test_glued_projective_line_from_two_lines.sage` and both toric files.  Not run: the other
+25 of the 31 files that construct a glued scheme or read its datum, whose failure sets are
+left to CI.  The consequence stated in the commit: a malformed atlas is now refused when
+its first chart change is asked for, not when the datum is built.
+

@@ -947,23 +947,18 @@ class _FiniteSchemeGluingDatum(SageObject):
             name="Pair transitions of a finite scheme gluing",
             noun="finite scheme-gluing transition data",
         )
-        # The same selected forward and inverse maps are needed by both the
-        # endpoint/open checks and the inverse-composition validator below.
-        # Resolve them once from the selected transition family, preserving
-        # their exact domains and codomains for both proofs.
-        self._transition_directions = {
-            pair: (
-                self._transitions[pair].forward(),
-                self._transitions[pair].inverse().forward(),
-            )
-            for pair in pair_indices
-        }
+        # The forward and inverse maps of each pair are needed by the endpoint/open
+        # checks and by the inverse-composition validator, not by the scheme itself:
+        # `_glued_scheme` only holds this datum.  They are therefore resolved when
+        # the datum is first asked for a chart change, in
+        # `_checked_pair_transitions`, rather than here -- an atlas of n charts
+        # otherwise builds and checks all C(n,2) isomorphisms before anything asks
+        # for one, and a consumer that only needs the charts pays for none of them.
+        self._transition_directions = {}
         self._reverse_transitions = []
         self._triple_overlaps = []
         self._triple_transition_maps = []
 
-        self._verify_pairwise_transitions()
-        self.validate_transition_inverses(check=False)
         self._scheme = _glued_scheme(
             self, placements, {} if level_data is None else level_data
         )
@@ -1010,6 +1005,7 @@ class _FiniteSchemeGluingDatum(SageObject):
         return right_index, left_index
 
     def transition_between(self, source_index, target_index):
+        self._checked_pair_transitions()
         source_index = self.normalize_chart_index(source_index)
         target_index = self.normalize_chart_index(target_index)
         pair = self._ordered_pair(source_index, target_index)
@@ -1037,7 +1033,29 @@ class _FiniteSchemeGluingDatum(SageObject):
     def overlap(self, source_index, target_index):
         return self.transition_between(source_index, target_index).forward().domain()
 
+    @cached_method
+    def _checked_pair_transitions(self) -> None:
+        r"""Resolve and check every pair's two directions, once, on first use.
+
+        The endpoint/open checks and the inverse-composition law are the gluing
+        datum's own obligations (Hartshorne, *Algebraic Geometry*, Exercise
+        II.2.12), and they are what this datum answers before it serves a chart
+        change.  Running them here rather than at construction is what lets a
+        scheme be built from an atlas without building the atlas's transitions:
+        construction holds them unbuilt, and the first ask pays.
+        """
+        self._verify_pairwise_transitions()
+        self.validate_transition_inverses(check=False)
+
     def _verify_pairwise_transitions(self) -> None:
+        if not self._transition_directions:
+            self._transition_directions = {
+                pair: (
+                    self.transitions()[pair].forward(),
+                    self.transitions()[pair].inverse().forward(),
+                )
+                for pair in self.transition_index_set()
+            }
         for source_index, target_index in self.transition_index_set():
             transition = self.transitions()[source_index, target_index]
             if transition not in _scheme_core_mor(transition):

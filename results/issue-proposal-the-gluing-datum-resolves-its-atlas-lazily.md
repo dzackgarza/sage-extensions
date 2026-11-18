@@ -15,7 +15,7 @@ Body:
 
 ```
 `_toric_variety` supplies a family of `_face_transition` for every pair of maximal
-cones (`categories/schemes/toric/toric_schemes.py:2295-2300`).
+cones (`categories/schemes/toric/toric_schemes.py:2259-2264`).
 `_FiniteSchemeGluingDatum.__init__` resolves both directions of every pair
 (`categories/schemes/gluing.py:954-957`) and verifies them (`:965-966`) before
 `_glued_scheme` (`:967`) builds the scheme.  For a fan with n maximal cones that is
@@ -23,7 +23,7 @@ cones (`categories/schemes/toric/toric_schemes.py:2295-2300`).
 
 Where the time actually is, measured by timing the three layers separately (same tree
 and host): the tuple of `_face_transition` calls that `_toric_variety` builds at
-`toric_schemes.py:2297-2300` is **10.20 s**; entering `glue_affine_atlas` -- the
+`toric_schemes.py:2261-2264` is **10.20 s**; entering `glue_affine_atlas` -- the
 datum's own `_transition_directions` dict at `gluing.py:954-957`, its two validators at
 `:965-966`, and `_glued_scheme` at `:967` -- is **0.18 s**; the charts are `1.73 s`.
 So the construction of the 272 localization isomorphisms is the cost, not their
@@ -94,4 +94,36 @@ glued scheme be *constructed* without its pair transitions resolved and verified
 both deferred to the first ask for its underlying space?  The alternative shape -- keep
 construction verifying, and accept the cost -- leaves the Sterk2 specimen test over the
 call ceiling only when the host is co-tenanted, which is where it stands today.
+
+## The forcing call is one line
+
+`_FiniteSchemeGluingDatum.__init__` makes two calls that could touch the transitions:
+
+* `self._verify_pairwise_transitions()` (`gluing.py:965`) -- it reads
+  `self.transitions()[source, target]` for every pair, which is what forces the whole
+  family, and it is unconditional;
+* `self.validate_transition_inverses(check=False)` (`:966`) -- a `@validator`
+  (`validation.py:51-64`) runs its law only with `check=True` or under strict checking,
+  so at construction it is a no-op and costs nothing.
+
+So the C(n,2) construction cost is demanded by that one call at `:965`.  Deferring it to
+the first ask for a chart change is the whole library-side change; the toric side would
+then pass a family that is not built up front (`toric_schemes.py:2261-2264`).  The datum
+already reads transitions directly from the family (`transition_between`, `:1012-1034`),
+and `_transition_directions` is read only by the two validators (`:1048`, `:1091`), so
+nothing else depends on when they run.
+
+The decision this needs from the gluing owner is therefore exactly: may the pairwise
+verification run on first use instead of at construction?  Its price is the 169 tests of
+31 files named above.
+
+## Citations re-checked on `76059b7`
+
+Every line this proposal names was re-read on `76059b7`: the forcing call
+`_verify_pairwise_transitions()` at `gluing.py:965`, the no-op
+`validate_transition_inverses(check=False)` at `:966`, the family-serving
+`transition_between` at `:1012-1034`, the two readers of `_transition_directions` at
+`:1048` and `:1091`, `validation.py:51`, the 31 files and 169 tests.  Only the toric
+call site had moved, from `toric_schemes.py:2297-2300` to `:2261-2264`, and is corrected
+here; the finding is unchanged.
 

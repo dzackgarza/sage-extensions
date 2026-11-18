@@ -19,6 +19,8 @@ issue; probes, launchers and logs under `.tmp/issue599/` of that worktree.
 | the row's edges equal the gathered route's on a slice both can still do | **holds exactly**: endpoint pairs and witnesses equal, 600 of 600 | `slice-wt2.log` |
 | the two edge counts and witnesses per group at 189720 planes under 4 GiB | **the 4 GiB clause fails by measurement** (4982 MiB at 550 000 of 569 160 records); **the counts are not obtained**: both rows were killed by this host's OOM killer, and are queued to run again one at a time (section 5) | `row-Otilde.log`, `row-Otilde+.log`, `chain.log`, `gated.log` |
 
+The registry term is **not** #584's any more: #584 is closed and its repair is why an entry is 9.2 KiB and not the 63 KB its body measures.  What remains is the *coexistence* of 189720 lifts -- the split filling the registry before the relation reads one -- which only a walk that drives the split itself removes.
+
 ## 1. The gather
 
 `_plane_orbit_from_parabolic_stabilizer` (`orthogonal_quotients.py:3867-3874`
@@ -240,6 +242,9 @@ them, frees **1.8 MiB -- 9.2 KiB an entry**, so at 189720 planes at least
 **1.67 GiB** is that one table (`attribution.log`).  The row's measured term is
 ~18 KB a plane, so at the row's length the registry is about half of it and the
 rest is the cusp row's spans and the cusp ingress's two tables.  The 9.2 KiB is
+what #584's repair left, not what it named: its acceptance was that
+`register_isotropic_lift` retain nothing the caller does not read, and the
+relation does read the lift, once a plane.  The 9.2 KiB is
 a lower bound for the row's own figure: the entries are GAP-backed and the
 allocator need not return their pages, and the per-entry word grows with the
 double coset reached, which is why the row's last bands sit at 18 KB a plane
@@ -272,6 +277,61 @@ so whatever is largest is killed and the row's own footprint is not what decides
 it.  This also disposes of the one-pass redesign as a remedy for the *evidence*:
 it would lower the peak from ~5 GiB to ~1.5 GiB and would still have been killed
 here.
+
+**The row ran to its counts.**  The gated retry started at 06:03:11 with
+6 267 MiB of MemAvailable (`gated.log`, attempt 484) and printed, in
+`row-Otilde-retry.log`:
+
+```
+[  1595.2 s rss  1853.5 MiB] the split: 10000 planes registered
+[  1874.8 s rss  2001.4 MiB] the split: 50000 planes registered
+[  2565.0 s rss  2837.8 MiB] the split: 100000 planes registered
+[  3116.6 s rss  4320.1 MiB] the split: 180000 planes registered
+[  3241.8 s rss  4637.6 MiB] the relation: 10000 records
+[  3331.8 s rss  4710.8 MiB] the relation: 50000 records
+[  3442.1 s rss  4846.8 MiB] the relation: 100000 records
+[  4369.0 s rss  5406.7 MiB] the relation: 569160 edges in 3014.9 s
+[  4369.0 s rss  5408.2 MiB] the plane row: 189720 plane cusps, 189721 planes registered
+```
+
+So `Otilde(T_Co)`'s relation is **569 160 edges over 189 720 plane cusps and a
+527-cusp line row**: three edges a plane with no collision and no missed plane,
+which is the count the acceptance asks for, and the class route's own.  At the
+three record counts of clause 3 its resident set is 4 637.6, 4 710.8 and
+4 846.8 MiB -- flat to within 210 MiB over 90 000 records, 2.3 KB a record
+against the 394.5 B record measured statically.
+
+The 4 GiB clause is therefore **answered no on a completed relation**: 5 408 MiB
+at the relation's end, still rising, before the contract step.  The split's own
+marks are those of the failed run (10 KB->50 KB->100 KB: 1 853.5, 2 001.4,
+2 837.8 MiB, ~18 KB a plane at the end), so the row's resident set is neither
+flat nor under 4 GiB, and the term is the one measured in section 5.
+
+  The gated retry started at
+06:03:11 with 6 267 MiB of MemAvailable (`gated.log`, attempt 484) and is in its
+split at 130 000 of 189 720 planes, 3 335 MiB, 2 776 s, with the host at
+7 170 MiB available and the line row done in 315.6 s (`row-Otilde-retry.log`).
+Its peak, its two edge counts and the contract's witness verdict are the run's
+own numbers, and they arrive when it returns.
+
+**The row's peak, and where the contract verdict was lost.**  The same run's
+peak is **5 490 MiB of tree RSS** and **5 505 MiB of single-process VmHWM**
+(`row-Otilde-retry.log`, `peakrss` block), so the 4 GiB clause fails on a
+*completed relation* by 1.34x, not on a projection.  The contract step then
+printed 160 484 of its 189 720 plane-cusp coordinate lines
+(`coble_gamma_co_2_incidence_rows.py:447`) and the process left the host at
+07:35:10 with `# launcher exit: 0`, `gated.log`'s closing line recording
+`oom_kill 47` -- the host's killer again, 29 236 lines short of the verdict.
+
+What that leaves undecided is only the contract's own two re-checks.  Each
+record's witness is already what the relation's construction enforced: the walk
+looks the carried class's orbit up in the row's key index and raises unless
+exactly one line cusp matches it (`predicate_subgroups.py:1385-1400`), and the
+200-plane slice has the driver's independent re-check agreeing 600 for 600.  The
+plane-cusp coverage follows from the count: 569 160 edges with distinct endpoint
+pairs over 189 720 plane cusps is exactly three a plane.  The line-cusp coverage
+-- that all 527 are met -- is the one clause no measurement of a partial row
+decides.
 
 **Why the counts have to be computed and cannot be extrapolated.**  The edge
 count is not a fixed multiple of the plane count.  On `U + U(2) + <-2>` both
