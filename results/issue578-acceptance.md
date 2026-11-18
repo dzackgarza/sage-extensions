@@ -366,3 +366,20 @@ So there is no CI verdict on the code in this work: the run for its head was
 superseded, not failed.  A verdict would need a re-run of that workflow (a write
 on the repository, itself subject to the same cancellation) or a push whose run
 stays newest long enough to be picked up.  No local re-run substitutes for it.
+
+**Corrected, 07:21 UTC, by the completed run.**  The paragraph above said no CI
+verdict existed because every run for this work had been superseded.  The storm
+paused at 06:52:51 and the run for the head that carried the work to `main`
+finished:
+
+* `Development diagnostics` run **#1500**, id `44254608087`, head
+  `078e49748b6171b24398a8f9da742f61104ec738` — which contains this work's last
+  push `cdb77ec` — concluded **`success`**, started 06:52:51;
+* its job `qc-ci / qc` ran 06:53:44 to 07:14:03 on a GitHub runner and
+  concluded `success`, with step 20, `Run QC tier`, `success`;
+* `README example` run #941 on the same head concluded `success` as well.
+
+So the verdict on a tree containing this change is a pass of the QC tier, not a
+cancellation.  The mechanism the paragraph above describes is still what
+cancelled every earlier attempt; what it needed was a run that stayed newest
+long enough to be picked up, and that is the one this records.
