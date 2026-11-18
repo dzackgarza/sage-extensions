@@ -11475,9 +11475,22 @@ class Lattices(OwnedCategoryOverBaseRing):
                     )
                     + (kernel.inclusion().lift(self),)
                 )
-                projection = relations.inclusion().cokernel_projection()
-                for residue in projection.codomain():
-                    lifted = partner + kernel.inclusion()(projection.preimage(residue))
+                # ``modulus*v`` lies among the relations for every ``v`` of the
+                # kernel, so every class of ``K/(ZZ*self + modulus*K)`` is killed
+                # by ``modulus``.  This construction states that torsion
+                # placement, and the placement is what enumerates the classes;
+                # the quotient map sends the generator of each name to the
+                # generator of the same name.
+                residues = Modules(ring).FinitelyPresented().Torsion()(
+                    relations.inclusion()
+                )
+                residue_projection = Modules(ring).Mor(kernel, residues)(
+                    lambda label: residues.module_generator(label)
+                )
+                for residue in residues:
+                    lifted = partner + kernel.inclusion()(
+                        residue_projection.preimage(residue)
+                    )
                     quotient, residue_square = lifted.q().quo_rem(modulus)
                     if residue_square == ring.zero():
                         partner, correction = lifted, quotient
