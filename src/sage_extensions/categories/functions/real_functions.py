@@ -740,15 +740,34 @@ class _FunctionSpaceMap(_ConditionSubmoduleElement):
                 return _constant_section(self.parent(), value)
         return None
 
+    def _is_a_function_operand(self, value) -> bool:
+        r"""Whether ``value`` is a section of a space of functions, which this algebra's own law acts on.
+
+        The pointwise sum and product are stated between the sections of one
+        algebra of functions; a value of another kind -- a section of a vector
+        bundle, say -- is no operand of this algebra, and the operation says so by
+        answering ``None``, so that the other operand's own reading is used: the
+        functions scale a bundle's sections by the module structure of those
+        sections (``SmoothSectionModules.scalar_multiple``), not by the algebra's
+        pointwise product.
+        """
+        from sage.structure.element import parent as element_parent
+
+        return isinstance(element_parent(value), _FunctionSpace)
+
     def __add__(self, other):
         r"""The pointwise sum, reading a scalar operand as the constant section it is."""
         constant = self._constant_section_operand(other)
-        return super().__add__(other if constant is None else constant)
+        if constant is not None:
+            return super().__add__(constant)
+        return super().__add__(other) if self._is_a_function_operand(other) else NotImplemented
 
     def __mul__(self, other):
         r"""The pointwise product, reading a scalar operand as the constant section it is."""
         constant = self._constant_section_operand(other)
-        return super().__mul__(other if constant is None else constant)
+        if constant is not None:
+            return super().__mul__(constant)
+        return super().__mul__(other) if self._is_a_function_operand(other) else NotImplemented
 
     def _add_(self, other):
         r"""The pointwise sum, reading a scalar operand as the constant section it is."""
