@@ -573,3 +573,18 @@ gave 55; it is superseded and should not be cited. What remains true and is unaf
 level-four quotient is 56-dimensional and spanned by the reflections; the reflection and
 parabolic families both reach 54 at level eight; and the generic Schreier route over
 `46998591897600` cosets is not available.
+
+## The database field's blocker, measured
+
+Acceptance item 5 asks that `generator_morphisms` return and certify. The digest this
+repository reads carries **no Coble arithmetic-group card at all**: `tests/cards/lattice-database-enriques.json`
+holds 87 `arithmetic_groups` entries under `_provenance.cards.arithmetic_group`
+(`arithmetic-groups/{slug}.md`), and none of them is the Coble group — the slugs are
+`gamma-h-1` to `gamma-h-87`, and `arithmetic-groups/gamma-otilde-t-co.md` does not exist at the
+pinned ref `1e1cadcfdca4dba2c0084a0bdc095b2d691126a8` (the fetch 404s). So item 5 is not a
+missing row in a present card; the card itself is absent upstream, and `refresh_lattice_database_enriques.py`
+has no `data.generator_morphisms` read because there is nothing to read it from.
+
+That places item 5 with the database repository's owner: **lattice-database#7**, which asks for
+the card and the field in the first place. Nothing in this repository can close it, and nothing
+here should be edited to fake it.
