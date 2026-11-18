@@ -4485,9 +4485,7 @@ class Lattices(OwnedCategoryOverBaseRing):
             target = self.discriminant_group().orthogonal_group()
             trivial = target.subgroup_on(())
             subgroup = self.Aut().discriminant_preimage(trivial)
-            from sage_extensions.catalogue import NamedLattices
-
-            if self is NamedLattices.Tco:
+            if self._presents_the_coble_form():
                 from sage_extensions.categories.group.predicate_subgroups import (
                     _fix_selected_generating_morphism,
                 )
@@ -4501,27 +4499,67 @@ class Lattices(OwnedCategoryOverBaseRing):
                 )
             return subgroup
 
+        @cached_method
+        def _presents_the_coble_form(self) -> bool:
+            r"""Whether the module generators present \(T_{\mathrm{Co}}\) in the basis its kernel certificate is stated in.
+
+            The certificate of :meth:`stable_orthogonal_group_generators` is a
+            list of integral matrices, so it names isometries of the lattice
+            whose Gram matrix is the Coble one, in that order of the module
+            generators.  This reads the Gram matrix off the lattice in hand and
+            compares it entrywise with
+            \(T_{\mathrm{Co}} = \langle 2\rangle \oplus U(2) \oplus E_8(-2)\):
+            the matrices need no transport under such a comparison, and a
+            rescaling, a permuted basis or any other lattice is not this lattice.
+            A construction that rebuilds the lattice from its Gram tensor, as a
+            catalogue card's certifier does, is admitted on the same grounds as
+            the named lattice.
+            """
+            from sage_extensions.catalogue import NamedLattices
+
+            if self.base_ring() is not _owned_integers():
+                return False
+            coble = NamedLattices.Tco
+            if int(self.module_rank()) != int(coble.module_rank()):
+                return False
+            labels = tuple(self.module_generating_set())
+            coble_labels = tuple(coble.module_generating_set())
+            return all(
+                int(self.b(self.module_generator(left), self.module_generator(right)))
+                == int(
+                    coble.b(
+                        coble.module_generator(coble_left),
+                        coble.module_generator(coble_right),
+                    )
+                )
+                for left, coble_left in zip(labels, coble_labels, strict=True)
+                for right, coble_right in zip(labels, coble_labels, strict=True)
+            )
+
         def stable_orthogonal_group_generators(self):
             r"""Return a finite proved family of generators of the stable orthogonal group.
 
             The canonical Coble lattice ``T_Co = <2> + U(2) + E8(-2)`` has
             56 explicit ordinary integral kernel generators, proved complete
             in dzackgarza/research, theorem
-            ``thm:coble-fifty-six-ordinary-full-kernel-generation``
-            (research commit 99f7680924). The exact standard-basis matrices
-            are retained as a source-hashed package certificate. Their Gram
-            identities and mod-two congruences are checked when constructed.
-            The complete mathematical proof uses the canonical even neighbor
+            ``thm:coble-fifty-six-ordinary-full-kernel-generation``. The exact
+            standard-basis matrices are retained as a source-hashed package
+            certificate, and :meth:`Coble.kernel_generators` checks each one's
+            Gram identity and mod-two congruence when it constructs it. The
+            complete mathematical proof uses the canonical even neighbor
             ``U^2 + D7(-1)``, Eichler transvections and the spin congruence
             subgroup property, rather than applying Kneser's theorem to the
             scaled lattice, whose ``rank_2`` is zero.
 
+            The case is decided by the lattice's own Gram matrix
+            (:meth:`_presents_the_coble_form`), not by which catalogue name
+            built it: the matrices are isometries of a lattice with that Gram
+            matrix, so a lattice rebuilt from the Gram tensor --- as a
+            catalogue card's certifier does --- is the same case.
+
             The rank-ten Enriques lattice ``Lambda(2)`` remains a distinct
             case: Allcock's Bertini family proves a normal-generation result,
             not a finite ordinary generating set returned by this method.
-            The congruence calculations for the Coble lattice and their
-            limitation are superseded here by the cited full generation theorem.
-
             """
             from sage_extensions.categories.hyperbolic_lattices import HyperbolicLattices
 
@@ -4529,44 +4567,10 @@ class Lattices(OwnedCategoryOverBaseRing):
             rank = self.module_rank()
             signature = self.signature_pair()
             cardinality = self.discriminant_group().cardinality()
-            # The exact 56-element ordinary generating theorem for the Coble
-            # level-two kernel is proved in dzackgarza/research, theorem
-            # thm:coble-fifty-six-ordinary-full-kernel-generation (99f7680924).
-            # Its source-hashed integral matrices are a *certificate*, not a
-            # substitute algorithm for general stable orthogonal groups.
-            if ring is _owned_integers() and int(rank) == 11:
-                import hashlib
-                import json
-                from importlib.resources import files
+            if self._presents_the_coble_form():
+                from sage_extensions.coble import Coble
 
-                certificate_path = files("sage_extensions").joinpath(
-                    "certificates/coble_kernel_fifty_six_congruence_generators.json"
-                )
-                assert hashlib.sha256(certificate_path.read_bytes()).hexdigest() == (
-                    "9708165fc7b7e0d5fa27c613260030935bd63146e5e1257d2dca78063886ace1"
-                )
-                certificate = json.loads(certificate_path.read_text())
-                labels = tuple(self.module_generating_set())
-                # The certificate records isometries, not the lattice Gram;
-                # identify the exact canonical basis via its Coble form.
-                from sage_extensions.catalogue import NamedLattices
-
-                if self is NamedLattices.Tco:
-                    assert len(labels) == 11
-                    assert certificate["generator_count"] == 56
-                    group = self.O()
-                    family = []
-                    for item in certificate["generators"]:
-                        entries = item["matrix_standard"]
-                        assert len(entries) == 11 and all(len(row) == 11 for row in entries)
-                        assert all(int(entries[i][j]) % 2 == int(i == j)
-                                   for i in range(11) for j in range(11))
-                        family.append(group({
-                            label: self.linear_combination({
-                                labels[j]: ring(int(entries[j][i])) for j in range(11)
-                            }) for i, label in enumerate(labels)
-                        }))
-                    return tuple(family)
+                return Coble.kernel_generators(self)
             covered = (
                 ring is _owned_integers()
                 and rank == 10

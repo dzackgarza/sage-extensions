@@ -1,9 +1,62 @@
-r"""Coble lattice cusp candidates and a rank-ten Coxeter configuration."""
+r"""Coble lattice cusp candidates, its kernel's generator certificate, and a rank-ten Coxeter configuration."""
+
+from sage.misc.cachefunc import cached_function
 
 from sage_extensions.categories.sets.finite_ordered_sets import finite_ordered_set
 from sage_extensions.categories.sets.indexed_families import finite_indexed_family_from_values
 from sage_extensions.catalogue import Embeddings, NamedLattices
 from sage_extensions.categories.coxeter_diagrams import CoxeterDiagrams
+
+_KERNEL_GENERATOR_CERTIFICATE = "certificates/coble_kernel_fifty_six_congruence_generators.json"
+_KERNEL_GENERATOR_CERTIFICATE_SHA256 = (
+    "9708165fc7b7e0d5fa27c613260030935bd63146e5e1257d2dca78063886ace1"
+)
+
+
+@cached_function
+def _kernel_generator_matrices():
+    r"""The retained integral matrices of the Coble kernel's generator certificate, one tuple of rows each.
+
+    The file is a package certificate: the digest above is checked before the
+    matrices are read, so a changed or truncated file is refused rather than
+    partially read.  Each entry's ``matrix_standard`` is the matrix of the
+    isometry in the standard basis of
+    \(T_{\mathrm{Co}} = \langle 2\rangle \oplus U(2) \oplus E_8(-2)\), whose
+    columns are the images of the module generators.
+    """
+    from hashlib import sha256
+    from importlib.resources import files
+    from json import loads
+
+    retained = files("sage_extensions").joinpath(_KERNEL_GENERATOR_CERTIFICATE).read_bytes()
+    assert sha256(retained).hexdigest() == _KERNEL_GENERATOR_CERTIFICATE_SHA256, (
+        f"the Coble kernel generator certificate {_KERNEL_GENERATOR_CERTIFICATE} does not "
+        f"have the digest it is retained with"
+    )
+    certificate = loads(retained)
+    assert certificate["generator_count"] == 56, (
+        f"the Coble kernel generator certificate states {certificate['generator_count']} "
+        f"generators, not the 56 its theorem states"
+    )
+    return tuple(
+        tuple(tuple(int(entry) for entry in row) for row in item["matrix_standard"])
+        for item in certificate["generators"]
+    )
+
+
+def _preserves_the_gram(gram, matrix) -> bool:
+    r"""Whether the integral matrix ``matrix`` satisfies \(M^{\mathsf T} G M = G\) for ``gram`` \(= G\)."""
+    order = len(gram)
+    return all(
+        sum(
+            matrix[middle][left] * gram[middle][other] * matrix[other][right]
+            for middle in range(order)
+            for other in range(order)
+        )
+        == gram[left][right]
+        for left in range(order)
+        for right in range(order)
+    )
 
 
 def _named_generators(lattice):
@@ -72,6 +125,55 @@ class Coble:
         roots = tuple(sum((coefficient * generator for coefficient, generator in zip(row, generators, strict=True)), lattice.zero()) for row in rows)
         assert all(root.q() in (-2, -4) for root in roots)
         return lattice, roots
+
+    @staticmethod
+    def kernel_generators(lattice):
+        r"""Return the certified ordinary integral generators of the discriminant kernel of ``lattice``.
+
+        ``lattice`` is \(T_{\mathrm{Co}} = \langle 2\rangle \oplus U(2) \oplus
+        E_8(-2)\) presented in the standard basis, which the caller establishes
+        by comparing its Gram matrix (:meth:`Lattices._presents_the_coble_form`).
+        The returned isometries generate
+        \(\widetilde O(T_{\mathrm{Co}}) = \ker(O(T_{\mathrm{Co}}) \to
+        O(A_{T_{\mathrm{Co}}}))\) as an ordinary group --- the completeness
+        statement of ``thm:coble-fifty-six-ordinary-full-kernel-generation`` in
+        `dzackgarza/research` --- and this call certifies of each one what a
+        single element decides: that it preserves the Gram matrix of ``lattice``
+        (an integral isometry), and that it is the identity modulo two, which is
+        trivial action on the discriminant group here because
+        \(T_{\mathrm{Co}} = 2L^{\#}\) identifies \(A_L\) with \(L/2L\).
+        """
+        ring = lattice.base_ring()
+        labels = tuple(lattice.module_generating_set())
+        gram = tuple(
+            tuple(
+                int(lattice.b(lattice.module_generator(left), lattice.module_generator(right)))
+                for right in labels
+            )
+            for left in labels
+        )
+        order = len(gram)
+        isometries = lattice.O()
+        family = []
+        for matrix in _kernel_generator_matrices():
+            assert _preserves_the_gram(gram, matrix), (
+                f"the retained kernel generator {matrix} does not satisfy M^T G M = G for "
+                f"the Gram matrix of {lattice}: it is not an isometry of this lattice"
+            )
+            assert all(int(matrix[left][right]) % 2 == int(left == right)
+                       for left in range(order) for right in range(order)), (
+                f"the retained kernel generator {matrix} is not the identity modulo two, so "
+                f"it does not act trivially on the discriminant group of {lattice}"
+            )
+            family.append(
+                isometries({
+                    label: lattice.linear_combination({
+                        labels[right]: ring(int(matrix[right][left])) for right in range(order)
+                    })
+                    for left, label in enumerate(labels)
+                })
+            )
+        return tuple(family)
 
     @staticmethod
     def rank_ten_diagram():
