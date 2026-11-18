@@ -12,6 +12,7 @@ from sage_extensions.categories.abstract_categories.objects import Objects, Owne
 from sage_extensions.categories.functors.core import Functor
 from sage_extensions.categories.manifolds import TopologicalManifolds
 from sage_extensions.categories.topological_spaces import TopologicalSpaces
+from sage_extensions.logic import AtomicProposition
 from sage_extensions.owned_category import _object_of
 
 
@@ -182,15 +183,54 @@ class TopologicalAtlases(OwnedCategory):
             return self._transition_maps[source_chart, target_chart]
 
         def chart_domains_cover(self):
-            r"""Decide whether the selected chart domains cover the space."""
-            pass
+            r"""Decide whether the selected chart domains cover the space.
+
+            A chart domain is an open subset of the space, carried into it by
+            ``chart_domain_inclusion``, so the domains cover the space exactly
+            when every point of the space lies in one of them.  A chart whose
+            domain *is* the space covers it, and that is decided here.  Whether
+            proper open subsets cover an infinite space is not a question the
+            retained maps decide, so the proposition states it.
+            """
+            space = self.underlying_topological_space()
+            match any(
+                self._chart_domains[chart] is space for chart in self._charts
+            ):
+                case True:
+                    return True
+                case False:
+                    return AtomicProposition("chart_domains_cover", self)
 
         def transitions_are_homeomorphisms(self):
-            r"""Decide whether every overlap map is a homeomorphism."""
-            pass
+            r"""Decide whether every overlap map is a homeomorphism.
+
+            A coordinate change is read between two charts, so an atlas of one
+            chart has no overlap map, and nothing of it could fail to be a
+            homeomorphism: it answers ``True``.  From two charts on, the
+            recorded maps are arrows of the category of sets, and whether one is
+            a homeomorphism is not decided by the arrow, so the proposition
+            states it.
+            """
+            match tuple(self._charts)[1:]:
+                case ():
+                    return True
+                case _:
+                    return AtomicProposition("transitions_are_homeomorphisms", self)
 
         def transition_cocycle_holds(self):
-            pass
+            r"""Decide whether the coordinate changes compose: ``tau_tu o tau_st = tau_su``.
+
+            An atlas of one chart has no coordinate change at all, so the
+            cocycle has no instance on it and the atlas answers ``True``.  From
+            two charts on the composite and its equality are questions about
+            maps the atlas retains but does not compute, so the proposition
+            states them.
+            """
+            match tuple(self._charts)[1:]:
+                case ():
+                    return True
+                case _:
+                    return AtomicProposition("transition_cocycle_holds", self)
 
         def restrict(self, open_inclusion):
             pass

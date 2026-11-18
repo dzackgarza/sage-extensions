@@ -18,6 +18,7 @@ from sage_extensions.categories.manifolds import TopologicalManifolds
 from sage_extensions.categories.topological_atlases import TopologicalAtlases
 from sage_extensions.categories.real_ck_manifolds import RealCkManifolds, _real_ck_degree
 from sage_extensions.owned_category import _object_of
+from sage_extensions.logic import AtomicProposition
 
 
 class RealCkAtlasMor(CategoricalMor):
@@ -228,8 +229,23 @@ class RealCkAtlases(OwnedParameterizedCategory):
             return self._transition_maps[source_chart, target_chart]
 
         def chart_domains_cover(self):
-            r"""Decide whether the selected chart domains cover the manifold."""
-            pass
+            r"""Decide whether the selected chart domains cover the manifold.
+
+            A chart domain is an open submanifold, carried into the manifold by
+            ``chart_domain_inclusion``, so the domains cover the manifold exactly
+            when every point of it lies in one of them.  A chart whose domain
+            *is* the manifold covers it, and that is decided here.  Whether
+            proper open submanifolds cover an infinite manifold is not a
+            question the retained maps decide, so the proposition states it.
+            """
+            manifold = self.underlying_topological_manifold()
+            match any(
+                self._chart_domains[chart] is manifold for chart in self._charts
+            ):
+                case True:
+                    return True
+                case False:
+                    return AtomicProposition("chart_domains_cover", self)
 
         def _repr_(self):
             r"""A C^k atlas is named by the charts it selects, their class and the manifold they chart."""
@@ -239,11 +255,34 @@ class RealCkAtlases(OwnedParameterizedCategory):
             )
 
         def transitions_are_ck(self):
-            r"""Decide whether overlap maps are ``C^k`` diffeomorphisms."""
-            pass
+            r"""Decide whether overlap maps are ``C^k`` diffeomorphisms.
+
+            A coordinate change is read between two charts, so an atlas of one
+            chart has no overlap map, and nothing of it could fail to be a
+            ``C^k`` diffeomorphism: it answers ``True``.  From two charts on, the
+            recorded maps are arrows of the category of sets, and their class is
+            not decided by the arrow, so the proposition states it.
+            """
+            match tuple(self._charts)[1:]:
+                case ():
+                    return True
+                case _:
+                    return AtomicProposition("transitions_are_ck", self)
 
         def transition_cocycle_holds(self):
-            pass
+            r"""Decide whether the coordinate changes compose: ``tau_tu o tau_st = tau_su``.
+
+            An atlas of one chart has no coordinate change at all, so the
+            cocycle has no instance on it and the atlas answers ``True``.  From
+            two charts on the composite and its equality are questions about
+            maps the atlas retains but does not compute, so the proposition
+            states them.
+            """
+            match tuple(self._charts)[1:]:
+                case ():
+                    return True
+                case _:
+                    return AtomicProposition("transition_cocycle_holds", self)
 
         def restrict(self, open_inclusion):
             pass
