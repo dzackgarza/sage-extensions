@@ -604,3 +604,34 @@ the manifold layer's, not this issue's.
 Until it is made, `SmoothManifolds()(2, "R^2")` has no chart, its points raise
 `cannot give a point of 2-dimensional smooth manifold R^2 by its coordinates: the manifold
 has no chart to read them in`, and the three surgery bodies of this issue have no specimen.
+
+## 20. State of the leaf, in one table
+
+Everything this issue can decide from its own files is decided.  What is open is open on
+operations in three other layers, each named by call and by file, and none of them is a
+choice this issue can make.
+
+| acceptance item | state | what carries it |
+| --- | --- | --- |
+| two polytope stubs implemented | met | `polytopes.py:2314`, `:2367` (#573, #582) |
+| three surgery stubs implemented | open | bodies need `TopologicalManifolds.on` (`manifolds.py:959`, `pass`); its eight data and the one real decision are in §19 |
+| the object a surgery returns | met | `SingularIntegralAffineSpaces.on`, §11, tested |
+| the cut a surgery makes | met | `TopologicalSpaces.subspace`, §12, tested; the complement is `from_predicate`, §12 |
+| the collars a surgery glues with | met | `IntegralAffineCollars.on`, §13, tested |
+| the regluing arrow | met | `IntegralAffineAtlasMor`, §16, tested |
+| Sterk2 closure-cone test | met | dimension 16, 65 rays, the two antipodal pairs, the stored lengths, §2, tested |
+| Sterk4 ranks asserted in a test | open | ranks settled (12, 18, 2, 10, 2), §4; test needs `Sterk.roots_18_2_0()`, and `categories.schemes.polytopes` still constructs `ExactRealField()` at import |
+| source questions settled mathematically | met | §2--§5 |
+| the exploration uses only these operations | open | it is #260's deliverable |
+
+Six `pass` bodies were implemented and tested on the way: `RationalPolyhedralCones.has_a_nonzero_point`
+and `has_a_strictly_positive_point` (§1), `SingularIntegralAffineSpaces.on` (§11),
+`TopologicalSpaces.subspace` (§12), `IntegralAffineCollars.on` (§13), and
+`IntegralAffineAtlasMor`'s constructor with its four element methods (§16).
+
+Every test named above had its body executed on this host with the session's
+`from sage_extensions.all import *` replaced by the names the file uses; the pytest suite and
+the test lint cannot start here, and the two specimen tests whose model is `RR.free_module`
+(`test_the_singular_integral_affine_space_selection`, `test_the_integral_affine_collar_selection`)
+ran with the rational field in the model's place, which decides the objects they assert and
+not the model's base ring.
