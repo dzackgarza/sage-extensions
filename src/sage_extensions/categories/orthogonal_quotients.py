@@ -656,6 +656,57 @@ class OrthogonalCharacterQuotient:
         return self._image_section()[2].gap_group
 
     @cached_method
+    def _character_permutation_factors(self):
+        r"""The shared faithful factor models and their target embeddings.
+
+        A character key can be mapped to this model without constructing its
+        element in the enormous intermediate GAP direct product.  The model
+        is shared with ``_character_permutation_model`` so the resulting
+        permutations belong to exactly the same GAP parent.
+        """
+        from sage_extensions.categories.group.groups import _gap_model
+
+        factors = self._model_factors()
+        models = tuple(
+            libgap.IsomorphismPermGroup(_gap_model(group)) for _label, group in factors
+        )
+        ranges = tuple(libgap.Range(model) for model in models)
+        if len(ranges) == 1:
+            target = ranges[0]
+            embeddings = (libgap.IdentityMapping(target),)
+        else:
+            target = libgap.DirectProduct(*ranges)
+            embeddings = tuple(
+                libgap.Embedding(target, position + 1)
+                for position in range(len(ranges))
+            )
+        return factors, models, target, embeddings
+
+    def _permutation_of_key(self, key):
+        r"""Faithful finite-character permutation, without GAP product membership.
+
+        ``Image(Embedding(product,i), component)`` can require an expensive
+        word problem in the 4.7e13-element discriminant direct product.
+        Embed each component only *after* its small faithful permutation
+        representation has been computed; the result is the same homomorphism
+        as ``_character_permutation_model`` by construction.
+        """
+        from sage_extensions.categories.group.groups import _element_to_engine
+
+        factors, models, target, embeddings = self._character_permutation_factors()
+        result = libgap.One(target)
+        for position, (label, group) in enumerate(factors):
+            component = (
+                _element_to_engine(group, key[label])
+                if label == "discriminant"
+                else _element_to_engine(group, self._c2_of_sign(key[label]))
+            )
+            result = result * libgap.Image(
+                embeddings[position], libgap.Image(models[position], component)
+            )
+        return result
+
+    @cached_method
     def _character_permutation_model(self):
         r"""A faithful permutation model of the whole character product, factor by factor.
 
@@ -678,22 +729,9 @@ class OrthogonalCharacterQuotient:
         from functools import reduce
         from operator import mul
 
-        from sage_extensions.categories.group.groups import _gap_model
-
         factors, product, _embeddings, projections = self._gap_product()
-        models = tuple(
-            libgap.IsomorphismPermGroup(_gap_model(group)) for _label, group in factors
-        )
+        _factors, models, target, target_embeddings = self._character_permutation_factors()
         ranges = tuple(libgap.Range(model) for model in models)
-        if len(ranges) == 1:
-            target = ranges[0]
-            target_embeddings = (libgap.IdentityMapping(target),)
-        else:
-            target = libgap.DirectProduct(*ranges)
-            target_embeddings = tuple(
-                libgap.Embedding(target, position + 1)
-                for position in range(len(ranges))
-            )
         generators = libgap.GeneratorsOfGroup(product)
         images = [
             reduce(
@@ -2918,7 +2956,7 @@ end
         # use the cached faithful factorwise model instead.
         to_permutation = self._character_permutation_model()
         permutation_product = libgap.Range(to_permutation)
-        point = libgap.Image(to_permutation, self._gap_of_key(self.image(witness)))
+        point = self._permutation_of_key(self.image(witness))
         stabilizer_generators = tuple(target_stabilizer_generators)
         # The same target cusp is queried for many transported lines.  Its
         # exact stabilizer family and finite word section depend on the span,
@@ -2938,10 +2976,10 @@ end
             stabilizer_permutation, stabilizer_section = retained[1:]
         else:
             stabilizer_gaps = [
-                self._gap_of_key(self.image(generator)) for generator in stabilizer_generators
+                self._permutation_of_key(self.image(generator))
+                for generator in stabilizer_generators
             ]
-            stabilizer_gap = libgap.Subgroup(product, stabilizer_gaps)
-            stabilizer_permutation = libgap.Image(to_permutation, stabilizer_gap)
+            stabilizer_permutation = libgap.Subgroup(permutation_product, stabilizer_gaps)
             stabilizer_section = None
         subgroup_permutation = libgap.Image(to_permutation, self._gap_character_target())
         reversed_product = _law_reversed(self._model_factors()[0][1])
@@ -2964,7 +3002,7 @@ end
         # generators, so the adjustment is a live element of the stabilizer.
         if stabilizer_section is None:
             stabilizer_section = _GapWordSection(
-                [libgap.Image(to_permutation, element) for element in stabilizer_gaps],
+                stabilizer_gaps,
                 parent=permutation_product,
             )
             if key is not None:
@@ -2983,14 +3021,12 @@ end
         # letter evaluation would surface as a silent "no adjustment found"
         # (``None``) instead of an engine inconsistency (referee's residual
         # finding; the same warrant ``_checked_lift`` gives the transversals).
-        expected = self._key_of_gap(
-            libgap.PreImagesRepresentative(to_permutation, chosen)
-        )
-        if self.image(adjustment) != expected:
+        actual = self._permutation_of_key(self.image(adjustment))
+        if actual != chosen:
             raise ArithmeticError(
                 f"the stabilizer word-section of {self.subgroup} was checked against the "
-                f"character map: the evaluation induces {self.image(adjustment)} where the "
-                f"chosen quotient element is {expected}, so the retained word section is "
+                f"character map: the evaluation induces permutation {actual} where the "
+                f"chosen quotient element is {chosen}, so the retained word section is "
                 "inconsistent"
             )
         if candidate not in self.subgroup:
