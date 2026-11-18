@@ -234,6 +234,17 @@ come -- 1.2x the 4 GiB the acceptance names, and inside this project's 6 144 MiB
 guard.  The terms are the two measured above: ~3.3 GiB of lift registry (the
 split's 18 KB a plane, #584's) and 0.21 GiB of relation.
 
+**Which term the 4 GiB clause fails on.**  Dropping the lift registry alone,
+after 200 planes of `Otilde(T_Co)`'s split have been built the way the row builds
+them, frees **1.8 MiB -- 9.2 KiB an entry**, so at 189720 planes at least
+**1.67 GiB** is that one table (`attribution.log`).  The row's measured term is
+~18 KB a plane, so at the row's length the registry is about half of it and the
+rest is the cusp row's spans and the cusp ingress's two tables.  The 9.2 KiB is
+a lower bound for the row's own figure: the entries are GAP-backed and the
+allocator need not return their pages, and the per-entry word grows with the
+double coset reached, which is why the row's last bands sit at 18 KB a plane
+while the first 200 planes' registry is 9.2.
+
 **Why the counts have to be computed and cannot be extrapolated.**  The edge
 count is not a fixed multiple of the plane count.  On `U + U(2) + <-2>` both
 kernel rows decide **4 edges over 3 line cusps and 2 plane cusps** -- two edges a
