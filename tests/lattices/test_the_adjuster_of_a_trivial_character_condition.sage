@@ -58,3 +58,19 @@ def test_a_trivial_stabilizer_image_adjusts_nothing() -> None:
     # An element of the subgroup is its own adjustment and is returned unchanged.
     inside = next(generator for generator in ambient if generator in kernel)
     assert quotient.adjust_witness_into_subgroup(inside, (group.one(),)) is inside
+
+
+def test_joint_discriminant_and_real_spinor_adjustment() -> None:
+    r"""The factorwise permutation model also adjusts a two-character kernel."""
+    lattice = Lattices(ZZ)([[0, 2], [2, 0]])
+    group = lattice.O()
+    kernel = lattice.stable_orthogonal_group().intersection(lattice.O_plus())
+    quotient = kernel.finite_character_quotient()
+    assert group.cardinality() == cardinal(4)
+    assert kernel.cardinality() == cardinal(1)
+    assert quotient.index() == 4
+    ambient = tuple(group.group_generators())
+    outside = next(generator for generator in ambient if generator not in kernel)
+    adjusted = quotient.adjust_witness_into_subgroup(outside, ambient)
+    assert adjusted in kernel
+    assert adjusted != outside
