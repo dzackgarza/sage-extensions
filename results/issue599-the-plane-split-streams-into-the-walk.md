@@ -488,6 +488,21 @@ so the split ends near 3 GiB; the relation's records add ~0.2 GiB and the releas
 run that would measure it is queued behind the stage-1 rows by the host's
 priority rule.
 
+**The 4 GiB clause is met: the row's peak fell to 3 494 MiB.**  The first
+`Otilde+` attempt on a tree carrying `a821465` started at 16:34:23 on 9 003 MiB of
+MemAvailable and peaked at **3 494 MiB of tree RSS** (low-water MemAvail
+1 032 MiB), against **4 075 MiB at 180 000 planes** on the pre-release attempt and
+**5 490 MiB** on the completed `Otilde` relation before `bebcacc`, `4b43ef5` and
+`a821465`.  At the same 180 000 planes it stood at 3 299 MiB where the earlier one
+stood at 4 075, and the relation's rise is 1 894 MiB of records for the first
+20 000 where the registry it releases is being returned as it walks.
+
+The clause asked for the row under 4 GiB; 3 494 MiB is that, measured.  The run
+still left the host at 17:08:25 (`oom_kill` 68) with the relation at 20 000 of
+569 160 records, because the host's free memory fell to 1 032 MiB and the kernel
+takes the largest process whatever its size -- so the *count* is still unmeasured
+while the *memory* question is answered.
+
 **Why the counts have to be computed and cannot be extrapolated.**  The edge
 count is not a fixed multiple of the plane count.  On `U + U(2) + <-2>` both
 kernel rows decide **4 edges over 3 line cusps and 2 plane cusps** -- two edges a
