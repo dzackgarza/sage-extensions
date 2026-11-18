@@ -242,7 +242,22 @@ class TopologicalAtlases(OwnedCategory):
             pass
 
         def topological_manifold(self):
-            pass
+            r"""The manifold these charts present: the space itself, when it is one.
+
+            The charts are homeomorphisms of open subsets of the space, so they
+            present it as a topological manifold.  When the space already is one,
+            the manifold they present is that space and not a second object
+            carrying the same structure (``OWN-15``, ``OWN-19``).  A space that
+            is not a manifold is made into one by ``TopologicalManifolds.on``,
+            which this tree does not construct, and the refusal names it.
+            """
+            space = self.underlying_topological_space()
+            assert space in TopologicalManifolds(), (
+                f"the charts of this atlas present {space} as a topological manifold, and it is "
+                f"in {space.category()}: a space that is not one is made into one by "
+                f"TopologicalManifolds().on, which this tree does not construct"
+            )
+            return space
 
         def _repr_(self):
             r"""An atlas is named by the charts it selects and the space they chart."""

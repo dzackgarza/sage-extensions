@@ -17,6 +17,9 @@ from sage_extensions.categories.functors.core import Functor
 from sage_extensions.categories.manifolds import TopologicalManifolds
 from sage_extensions.categories.topological_atlases import TopologicalAtlases
 from sage_extensions.categories.real_ck_manifolds import RealCkManifolds, _real_ck_degree
+from sage.rings.infinity import Infinity
+
+from sage_extensions.categories.manifolds import DifferentiableManifolds
 from sage_extensions.owned_category import _object_of
 from sage_extensions.logic import AtomicProposition
 
@@ -295,7 +298,37 @@ class RealCkAtlases(OwnedParameterizedCategory):
 
         @cached_method
         def real_ck_manifold(self):
-            pass
+            r"""The ``C^k`` manifold these charts present: the manifold itself, when it is one.
+
+            The charts are ``C^k`` charts of the manifold, so they present it as a
+            ``C^k`` manifold; when it already is one of at least this class, the
+            manifold they present is the manifold itself, not a second object
+            carrying the same structure (``OWN-15``, ``OWN-19``).  A manifold
+            whose class is lower than the atlas' is not presented by it, and the
+            refusal says which degrees are.
+
+            A class of at least ``C^k`` is asked of the manifold's own
+            differentiability degree, so a smooth manifold answers every finite
+            degree (Lee, *Introduction to Smooth Manifolds*, 2nd ed., Ch. 1).
+            """
+            manifold = self.underlying_topological_manifold()
+            degree = self.category().degree()
+            match degree is Infinity:
+                case True:
+                    assert manifold.is_smooth(), (
+                        f"a C^oo atlas presents a smooth manifold, and {manifold} is of class "
+                        f"C^{manifold.differentiability_degree()}"
+                    )
+                case False:
+                    assert manifold in DifferentiableManifolds(), (
+                        f"a C^{degree} atlas presents a differentiable manifold, and {manifold} "
+                        f"is in {manifold.category()}"
+                    )
+                    assert manifold.is_smooth() or manifold.differentiability_degree() >= degree, (
+                        f"a C^{degree} atlas does not present a C^{manifold.differentiability_degree()} "
+                        f"manifold: {manifold} is not of class C^{degree} or higher"
+                    )
+            return manifold
 
         def topological_atlas(self):
             pass
