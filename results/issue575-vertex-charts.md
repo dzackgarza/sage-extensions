@@ -134,3 +134,26 @@ and the call exceeds the ceiling again under heavy co-tenancy, where this file
 needed about `1.6x` its quiet time at load average 21.5 on four CPUs.  Deferring
 that gluing remains a change to the scheme gluing datum
 (`categories/schemes/gluing.py:929-967`), not to this operation.
+
+### The pushed tree on an idle host, and what the margin really is
+
+The table above calls the `18.49 s` run quiet; it was not idle (`1.92 s` to import
+the session).  Re-run on the pushed tree with the host idle (`0.93 s` to import):
+
+```
+$ python -m pytest -o addopts= -p qc_sage_session \
+    -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint \
+    --durations=0 tests/schemes/test_sterk_polygon_vertex_charts.sage
+2 passed in 10.60s
+ 7.26s test_a_stored_sterk2_polygon_vertex_indexes_its_chart
+ 1.58s test_the_vertex_cones_of_a_triangle_index_charts_of_its_atlas
+```
+
+So the specimen call is `7.26 s` against the `20 s` ceiling on an idle host, and
+the gluing this row pays for is `3-5 s` there rather than the `13.9-23.4 s` the
+same code costs under co-tenancy.  Two corrections to the paragraph above: the
+margin on an idle host is not eight percent but nearly three quarters of the
+ceiling, and an over-ceiling run after this change has not been measured --
+`44.22 s` and `61.03 s` are pre-change measurements under heavy co-tenancy, and
+the `18.49 s` post-change run was at moderate load.
+
