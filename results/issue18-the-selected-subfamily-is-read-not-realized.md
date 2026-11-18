@@ -81,3 +81,53 @@ pytest exit 0
 run: it builds the announced family (944 385 members at `0125`) and that build
 alone did not finish in 500 s here, so the file is over the ten-minute limit on
 this host independently of this change.
+
+## The `T_Co` walk: one orbit search, no transition table
+
+On `T_Co` (`|A_L| = 2048`, the same 67 456-point orbit, `O(L)`'s ambient family
+342 letters) the call was killed at 900 s twice after the family was no longer
+built, and the selection's own search was the stage it sat in.  Two walks of the
+same orbit were being made, and each one built a table with one entry per
+(point, letter) pair -- `342 * 67 456 = 2.3e7` entries:
+
+- `discriminant_point_orbit(point)`, for the orbit's cardinality alone, realized
+  the orbit as a `G`-set from a complete transition table;
+- `pointed_orbit(...)`, for the section, searched the orbit again.
+
+The staged probe, on the pushed head before this change:
+
+```
+point built, |A_L| = 2048                      3.2 s
+O(A_L) engine / |O(A_L)| = 46998591897600      2.5 s
+stabilizer_of_classes                        106.9 s
+P generators 3                                 0.2 s
+O(L) ambient family 342                       42.8 s
+class action                                  54.0 s
+discriminant_point_orbit           did not finish in the 600 s cap (155 s in a quiet window)
+```
+
+Repair: `_discriminant_point_orbit_and_section` walks the orbit **once** with
+`FiniteGSets._orbit_words(..., retain_transitions=False)`, which returns the
+points and one transversal word per point and no table, and
+`_discriminant_point_stabilizer_members` composes each family member from those
+words, evaluating one action per member (`s.p`) instead of every letter at every
+point.  The selection no longer builds the orbit `G`-set at all: it needs the
+orbit's cardinality and its section, not the action of every letter.
+
+After the repair, same specimen, the same call:
+
+```
+orbit and section 67 456 points in 148.0 s
+selection returned 10 in 335.7 s
+image order of the selection 696 729 600 = |O(A_L)| / 67 456
+done at 485.0 s (the probe walks the orbit once for itself as well)
+```
+
+So the call returns on `T_Co` in **335.7 s** where it was killed at 900 s (two
+runs) and at 2 662 s in the consumer's record, and it returns the index-stabilizer
+order exactly.  The suite cannot hold this: 335.7 s is far over the 20 s call
+ceiling, so the deciding evidence is the probe and the `0125` measurement above.
+
+Regression, the same three files, time gates on: `8 passed in 23.93s`, the
+subfamily contract `6.47 s` -- which is what says the section the selection reads
+is still the announced family's.

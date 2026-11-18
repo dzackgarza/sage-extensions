@@ -4031,8 +4031,8 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
         form = self.domain().discriminant_group()
         orthogonal = form.orthogonal_group()
         point = frozenset(point)
-        orbit = self.discriminant_point_orbit(point)
-        orbit_size = int(orbit.cardinality())
+        orbit_points, orbit_words, augmentation = self._discriminant_point_orbit_and_section(point)
+        orbit_size = int(len(orbit_points))
         order = int(orthogonal.cardinality())
         if order % orbit_size != 0:
             raise ArithmeticError(
@@ -4048,7 +4048,9 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
         selected = []
         images = []
         subgroup = None
-        for candidate in self._discriminant_point_stabilizer_members(preimage, point):
+        for candidate in self._discriminant_point_stabilizer_members(
+            preimage, orbit_points, orbit_words, augmentation
+        ):
             if candidate == one:
                 # The pair whose word first reaches its point: its image is the
                 # identity, which is what ``drop_trivial`` leaves out of the
@@ -4136,27 +4138,58 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
 
         return action
 
-    def _discriminant_point_stabilizer_members(self, preimage, point):
-        r"""Yield the members of the Schreier family that presents ``preimage``, in its order.
+    def _discriminant_point_orbit_and_section(self, point):
+        r"""Return the orbit of ``point``, one transversal word per point, and the free cover.
 
-        ``preimage`` is ``rho_L^{-1}(H)`` for ``H`` the stabilizer of the finite
-        set ``point`` of classes of ``A_L``, and the family presenting it is the
-        Schreier family of the point's orbit
-        (:meth:`_discriminant_point_stabilizer_morphism`).  A consumer that
-        selects a subfamily of that family stops after a few members, so the
-        members are read from the same pointed coset space one at a time
-        (``LeftCosetGSets.schreier_family_members``) rather than realized.
+        ``point`` is a finite set of classes of ``A_L``, and the walk is the group
+        layer's one orbit search (``FiniteGSets._orbit_words``) in the ``F_2``
+        model's action (:meth:`_discriminant_class_action`).  It records each
+        reached point's word in the selected free cover and, without a transition
+        table, nothing else.
 
-        The order is the family's: orbit position outer, the free cover's letters
-        inner.  Trivial members -- the pairs whose word first reaches their point
-        -- are yielded too, and the selection skips them by their image.
+        The table is what this leaves out, and it is the expensive part: one
+        entry per (point, letter) pair, ``342 * 67 456 = 2.3e7`` of them on
+        ``T_{Co}``.  A caller that reads a prefix of the Schreier family needs the
+        points and their words; a letter's image at a point is evaluated when a
+        member asks for it (:meth:`_discriminant_point_stabilizer_members`).
         """
         from sage_extensions.categories.group.g_sets import FiniteGSets
 
-        coset_space = FiniteGSets(self).pointed_orbit(
-            preimage, point, self._discriminant_class_action()
+        augmentation = self.selected_group_resolution().augmentation()
+        points, words = FiniteGSets(self)._orbit_words(
+            (point,), self._discriminant_class_action(), augmentation
         )
-        return coset_space.schreier_family_members()
+        return tuple(points), tuple(words), augmentation
+
+    def _discriminant_point_stabilizer_members(
+        self, preimage, orbit_points, orbit_words, augmentation
+    ):
+        r"""Yield the members of the Schreier family that presents ``preimage``, in its order.
+
+        ``preimage`` is ``rho_L^{-1}(H)`` for ``H`` the stabilizer of a finite set
+        of classes of ``A_L``, ``orbit_points`` and ``orbit_words`` its orbit and
+        the transversal ``p |-> t_p`` of each point
+        (:meth:`_discriminant_point_orbit_and_section`), and the family presenting
+        it is the Schreier family ``t_(s.p)^-1 s t_p`` of that orbit.
+
+        The order is the family's: orbit position outer, the free cover's letters
+        inner.  Each member evaluates one action -- ``s.p``, which the section
+        word is then read at -- so a consumer that selects a subfamily pays only
+        for the members it reaches.  Trivial members, the pairs whose word first
+        reaches their point, are yielded too: the selection skips them by their
+        image.
+        """
+        free = augmentation.domain()
+        letter_words = tuple(free.group_generators())
+        letters = tuple(augmentation(letter) for letter in letter_words)
+        action = self._discriminant_class_action()
+        word_of = dict(zip(orbit_points, orbit_words))
+        for position, current in enumerate(orbit_points):
+            for letter_word, letter in zip(letter_words, letters):
+                moved = action(letter, current)
+                yield augmentation(
+                    (~word_of[moved]) * letter_word * orbit_words[position]
+                )
 
     def _discriminant_point_stabilizer_morphism(self, preimage, point):
         r"""The Schreier generating morphism of ``rho_L^{-1}(H)`` as the stabilizer of ``point``.
