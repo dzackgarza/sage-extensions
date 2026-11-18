@@ -383,3 +383,27 @@ So the verdict on a tree containing this change is a pass of the QC tier, not a
 cancellation.  The mechanism the paragraph above describes is still what
 cancelled every earlier attempt; what it needed was a run that stayed newest
 long enough to be picked up, and that is the one this records.
+
+### The reopening's ground, answered
+
+The issue was reopened on the reading that "6 held" names an unmet item and that
+no CI run has completed since the work landed.  Both parts are answerable from
+the record:
+
+* **Item 6 is the scope clause, and it is met.**  The change adds
+  `SmoothManifolds.ParentMethods.open_submanifold_inclusion` and the smooth
+  morphism owner's element constructor, its two accessors, its composition and
+  the representation domains those need; it adds no general manifold feature and
+  no sphere, and the neighbouring stage stubs (`weaken_to`, `as_ck_morphism`,
+  `as_ck_manifold`, `underlying_topological_manifold`, `tangent_bundle`) are
+  untouched.  "Held" in the turn's report meant "the clause is held to", not
+  "withheld"; the wording was ambiguous and this states it plainly.
+* **The CI verdict exists.**  `Development diagnostics` #1500, id
+  `44254608087`, on head `078e49748b6171b24398a8f9da742f61104ec738` — which
+  contains this work's last code push `cdb77ec` — concluded **`success`** at
+  07:14:04, with step 20 `Run QC tier` successful.  The files that run verified
+  are byte-identical to the ones on `main` (blob `80126d4` for
+  `categories/manifolds.py`, `fb76053` for the test file).
+
+What the cancellations describe is real but concerns the *later* heads, which
+carry documentation only; it is not an unverified change, and it is not item 6.
