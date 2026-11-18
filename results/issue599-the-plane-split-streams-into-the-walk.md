@@ -62,6 +62,48 @@ which is spans -- and the rebuild is the 3.564 ms a plane that
 `results/issue381-the-kernel-plane-row-does-not-stream.md`).  Nothing has to be
 retained for an index to resolve.
 
+### One draw costs one plane, on the smallest input that decides it
+
+`U + U(2) + <-2>` has two plane cusps under `Otilde`, so its yielded orbit row
+has two planes to give, and the split's lift registry holds the planes it has
+built so far: the source it seeds, and one per drawn plane.  Drawing them one at
+a time from `_yield_subgroup_isotropic_orbit_representatives`
+(`orthogonal_quotients.py:4249`), which is the row `cusps(2)` consumes
+(`predicate_subgroups.py:772`):
+
+| draw | parent `f2c519c` | this tree |
+| --- | ---: | ---: |
+| before the row | 0 | 0 |
+| after the first plane | **2** | **1** |
+| after the second plane | 2 | 2 |
+
+The parent's first draw bought both planes -- `return tuple(representatives)` at
+`orthogonal_quotients.py:3874` of the parent is what a draw cost -- and this
+tree's first draw buys one (`_iter_transported_planes`,
+`orthogonal_quotients.py:3966-3987`, drawn by `yield from from_parabolic` at
+`orthogonal_quotients.py:4316`).  `yield-parent.log`, `yield-new.log`.
+
+### What a record of the relation costs a row
+
+`DividedClassCuspIncidence` (`isotropic_orbits.py:1263`) retains two cusps --
+which the row keeps anyway -- and the class pair that decided the edge.  On the
+same lattice, whose two kernel rows are four edges each, one record measured
+through the group's own relation (`predicate_subgroups.py:1177`) is:
+
+| part | bytes |
+| --- | ---: |
+| the record itself | 48.0 |
+| its divided-class set | 216.0 |
+| the strings of that set | 54.5 |
+| its slot in `points` and the relation's identity index | 76.0 |
+| **one edge** | **394.5** |
+
+Three edges a plane, as the covering has three lines: **0.21 GiB** at 189720
+planes.  The issue's 1427 B a record would make that 0.76 GiB and #585's 121 B
+a record 0.07 GiB; the difference is what each counted -- 394.5 B is the record
+with its set, its strings and its slot in the row's own two tables.
+`record-size.log`.
+
 ## 3. The two shapes are one row
 
 One walk of `Otilde(T_Co)`, its first 200 double cosets, produced the row in
