@@ -1,0 +1,11 @@
+# tree: da742b333b1686e358c04bf94155d5a3bcf6fc05
+# status: 
+# port: 991b88b095a42a1e3679569ea42328c900c120f6
+# load: 2.23 1.99 1.62
+# free: 11436 MiB available
+# started: 2026-11-17T23:50:10Z
+# program: tests/coble_gamma_co_2_incidence_rows.py --rows Otilde --lattice Tco --route divided-class  PYTHONHASHSEED=0
+the lattice Integral lattice of rank 11 and signature (2, 9) of rank 11
+the rows ('Otilde',)
+[Otilde] the row's route: divided-class, as the run asked (decided in 0.0 s)
+[peakrss] STOPPED_AT_MEMORY_LIMIT: tree RSS 6162 MiB exceeded 6144 MiB

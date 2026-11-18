@@ -1,0 +1,58 @@
+# tree: da742b333b1686e358c04bf94155d5a3bcf6fc05
+# status: 
+# port: 991b88b095a42a1e3679569ea42328c900c120f6
+# load: 1.00 0.97 1.19
+# started: 2026-11-18T00:24:26Z
+# program: .tmp/issue381-rows/probe-terms.py  PROBE_PLANES=unset PROBE_BAND=unset PROBE_EVERY=unset PYTHONHASHSEED=0
+[      2.6 s rss    305.8 MiB] T_Co, Otilde(T_Co), 112 parabolic generators, mode contract
+[    189.0 s rss   1266.0 MiB] the transversal (the finite image's whole coset walk) 180.4 s
+[    189.6 s rss   1268.0 MiB] contract 100/1000: 20.5 KiB a plane so far
+[    190.2 s rss   1269.9 MiB] contract 200/1000: 19.6 KiB a plane so far
+[    190.8 s rss   1271.5 MiB] contract 300/1000: 18.8 KiB a plane so far
+[    191.8 s rss   1272.2 MiB] contract 400/1000: 15.9 KiB a plane so far
+[    192.4 s rss   1272.3 MiB] contract 500/1000: 12.9 KiB a plane so far
+[    193.0 s rss   1272.6 MiB] contract 600/1000: 11.2 KiB a plane so far
+[    193.5 s rss   1273.6 MiB] contract 700/1000: 11.1 KiB a plane so far
+[    194.2 s rss   1274.8 MiB] contract 800/1000: 11.2 KiB a plane so far
+[    194.8 s rss   1276.4 MiB] contract 900/1000: 11.8 KiB a plane so far
+[    195.4 s rss   1278.2 MiB] contract: 1000 planes and cusps, 0 planes held
+
+[contract], 1000 planes
+  the split's step and the transport: 5.644 ms a plane
+  the cusp (span key):                0.747 ms a plane
+  both: 6.391 ms a plane
+  first 100: 6.490 ms   last 100: 5.828 ms a plane
+  resident: 1266.0 MiB -> 1278.2 MiB, 12.5 KiB a plane
+  at 189720 planes: 2.26 GiB on top of 1.24 GiB, 0.34 h of planes
+[    195.8 s rss   1278.8 MiB] contract 100/1000: 5.4 KiB a plane so far
+[    196.2 s rss   1279.0 MiB] contract 200/1000: 3.8 KiB a plane so far
+[    196.7 s rss   1279.3 MiB] contract 300/1000: 3.6 KiB a plane so far
+[    197.1 s rss   1279.7 MiB] contract 400/1000: 3.6 KiB a plane so far
+[    197.5 s rss   1280.0 MiB] contract 500/1000: 3.6 KiB a plane so far
+[    197.9 s rss   1280.3 MiB] contract 600/1000: 3.5 KiB a plane so far
+[    198.3 s rss   1280.6 MiB] contract 700/1000: 3.5 KiB a plane so far
+[    198.8 s rss   1281.0 MiB] contract 800/1000: 3.5 KiB a plane so far
+[    199.2 s rss   1281.3 MiB] contract 900/1000: 3.5 KiB a plane so far
+
+[the contract step], 1000 plane cusps
+  rebuild representative(): 3.564 ms a plane
+  read _coordinates():      0.658 ms a plane
+  both:                     4.223 ms a plane
+  first 100: 4.329 ms   last 100: 4.198 ms a plane
+  resident: 1278.3 MiB -> 1281.7 MiB, 3.6 KiB a plane
+  at 189720 cusps: 801 s and 0.64 GiB
+[    199.6 s rss   1281.8 MiB] done
+[peakrss] term-contract: child waited=0 shell_code=0 samples=102
+[peakrss] peak tree RSS      : 1284 MiB
+[peakrss] low-water MemAvail : 12919 MiB
+[peakrss] peak single VmHWM  : 1285 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     1282 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   run.sh                        1 MiB peak
+[peakrss]   t=   200.1s procs=  2 rss=  1284 MiB hwm=  1284 MiB avail= 12946 MiB
+[peakrss]   t=   198.1s procs=  2 rss=  1282 MiB hwm=  1282 MiB avail= 12938 MiB
+[peakrss]   t=   196.1s procs=  2 rss=  1279 MiB hwm=  1279 MiB avail= 12946 MiB
+[peakrss]   t=   202.1s procs=  2 rss=  1277 MiB hwm=  1285 MiB avail= 12946 MiB
+[peakrss]   t=   192.1s procs=  2 rss=  1275 MiB hwm=  1275 MiB avail= 12946 MiB
+# launcher exit: 0  ended: 2026-11-18T00:27:50Z

@@ -1,0 +1,33 @@
+evidence: the kernel plane row gathers its split, and the contract step is priced (#381)
+
+`tests/coble_gamma_co_2_incidence_rows.py --rows Otilde --lattice Tco --route
+divided-class` is run at `main` `da742b3`, one process, the driver's own caps
+(`--cap 10800`, `--budget 28800`), and it does not return: the 6144 MiB guard of
+this project's heavy runs stops it at 6162 MiB after 783 s, no row line printed.
+At the measured rates its calls need ~1680 s, so the cap was never in question.
+
+The term is the plane row.  `_plane_orbit_from_parabolic_stabilizer`
+(`orthogonal_quotients.py:3867-3874`) appends every transported plane of the
+split to a list and returns the tuple, so all 189720 planes are built and held
+before the first cusp exists -- against its own docstring, which says the planes
+are consumed as they arrive.  Measured on the same split in two shapes, one
+process an arm, 1000 planes each: gathered 6.785 ms and 74.4 KB a plane (13.47
+GiB at the row's length, the band rising 69.6 to 74.3 KB); released, as a cusp
+row needs it, 6.086 ms and 12.8 KB a plane (2.31 GiB).  The row is the gathered
+shape; `#598`'s 16.5 KB a plane priced a re-implementation that released each
+plane, which is why it read affordable.
+
+The contract step -- `row_contract`'s `_coordinates(cusp.representative())` for
+every plane cusp, previously unmeasured -- is 4.223 ms a plane (3.564 ms the
+rebuild, 0.658 ms the read) and 3.6 KB a plane, flat over 1000 cusps: 801 s and
+0.64 GiB at 189720 cusps, and it is outside the row's cap because `run_row`
+cancels the timer before calling it.
+
+The same driver on the same route on `U+U(2)+<-2>` decides both kernel rows in
+24 s at 536 MiB, 4 edges over 3 line and 2 plane cusps each -- the small-lattice
+value the issue records -- so the failure on `T_Co` is capacity, not wiring.  The
+edge counts and witnesses of the two kernel rows are not reportable until the
+split streams at its owner; one row a job is necessary and not sufficient.
+
+`results/issue381-the-kernel-plane-row-does-not-stream.md` is the report.
+Probes, launchers and logs: `.tmp/issue381-rows/`.

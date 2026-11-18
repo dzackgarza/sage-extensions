@@ -1,0 +1,40 @@
+# tree: da742b333b1686e358c04bf94155d5a3bcf6fc05
+# status: 
+# port: 991b88b095a42a1e3679569ea42328c900c120f6
+# load: 1.36 2.04 2.00
+# started: 2026-11-18T00:03:33Z
+# program: .tmp/issue381-rows/probe-phases.py  PROBE_PLANES=unset PROBE_BAND=unset PROBE_EVERY=5000 PYTHONHASHSEED=0
+[      0.0 s rss    269.3 MiB] T_Co, Otilde(T_Co)
+[      0.1 s rss    279.6 MiB] the subgroup
+[      0.1 s rss    279.6 MiB] the character quotient
+[    200.7 s rss    978.4 MiB] the line row: 527 cusps in 200.5 s
+[    341.0 s rss   1484.7 MiB] probe-phases.py:41 sampler | orthogonal_quotients.py:2123 _iter_splitting_isometries_in_im_rho_from_image
+[    371.2 s rss   1823.0 MiB] probe-phases.py:41 sampler | weakref.py:110 remove
+[    401.2 s rss   2188.0 MiB] probe-phases.py:41 sampler | magmas.py:468 is_unit
+[    431.4 s rss   2515.3 MiB] probe-phases.py:41 sampler | module_morphisms.py:1217 _linear_combination_of_generator_images
+[    461.6 s rss   2853.3 MiB] probe-phases.py:41 sampler | ring_foundation.py:6905 is_exact
+[    495.1 s rss   3227.9 MiB] probe-phases.py:41 sampler | weakref.py:110 remove
+[    525.2 s rss   3613.6 MiB] probe-phases.py:41 sampler | modules.py:1574 _mor_endpoint
+[    555.3 s rss   3925.7 MiB] probe-phases.py:41 sampler | refine.py:488 _rebuild_element_class
+[    585.4 s rss   4308.7 MiB] probe-phases.py:41 sampler | utilities.py:69 _swept_out
+[    615.5 s rss   4609.4 MiB] probe-phases.py:41 sampler | owned_category.py:1116 is_subcategory
+[    645.6 s rss   4991.3 MiB] probe-phases.py:41 sampler | ring_foundation.py:5854 __init__
+[    675.6 s rss   5254.9 MiB] probe-phases.py:41 sampler | cardinals.py:116 is_finite
+[    705.7 s rss   5625.6 MiB] probe-phases.py:41 sampler | ring_foundation.py:5873 _add_
+[    735.8 s rss   5993.3 MiB] probe-phases.py:41 sampler | set_categories.py:6751 __int__
+[peakrss] STOPPED_AT_MEMORY_LIMIT: tree RSS 6155 MiB exceeded 6144 MiB
+[    765.8 s rss   6221.9 MiB] probe-phases.py:41 sampler | weakref.py:139 __setitem__
+[peakrss] phases: child waited=-9 shell_code=137 samples=376
+[peakrss] peak tree RSS      : 6155 MiB
+[peakrss] low-water MemAvail : 8382 MiB
+[peakrss] peak single VmHWM  : 6155 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     6152 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   run.sh                        1 MiB peak
+[peakrss]   t=   750.3s procs=  2 rss=  6155 MiB hwm=  6155 MiB avail=  8382 MiB
+[peakrss]   t=   748.3s procs=  2 rss=  6131 MiB hwm=  6131 MiB avail=  8405 MiB
+[peakrss]   t=   746.3s procs=  2 rss=  6108 MiB hwm=  6108 MiB avail=  8429 MiB
+[peakrss]   t=   744.3s procs=  2 rss=  6084 MiB hwm=  6084 MiB avail=  8453 MiB
+[peakrss]   t=   742.3s procs=  2 rss=  6061 MiB hwm=  6061 MiB avail=  8476 MiB
+# launcher exit: 137  ended: 2026-11-18T00:16:23Z

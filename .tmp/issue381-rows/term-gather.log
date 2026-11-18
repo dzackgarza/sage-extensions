@@ -1,0 +1,41 @@
+# tree: da742b333b1686e358c04bf94155d5a3bcf6fc05
+# status: 
+# port: 991b88b095a42a1e3679569ea42328c900c120f6
+# load: 0.34 0.89 1.34
+# started: 2026-11-18T00:17:23Z
+# program: .tmp/issue381-rows/probe-terms.py  PROBE_PLANES=unset PROBE_BAND=unset PROBE_EVERY=unset PYTHONHASHSEED=0
+[      2.8 s rss    305.8 MiB] T_Co, Otilde(T_Co), 112 parabolic generators, mode gather
+[    194.2 s rss   1278.2 MiB] the transversal (the finite image's whole coset walk) 185.2 s
+[    194.9 s rss   1285.0 MiB] gather 100/1000: 69.6 KiB a plane so far
+[    195.8 s rss   1291.3 MiB] gather 200/1000: 67.5 KiB a plane so far
+[    196.4 s rss   1298.7 MiB] gather 300/1000: 70.1 KiB a plane so far
+[    197.1 s rss   1306.1 MiB] gather 400/1000: 71.6 KiB a plane so far
+[    197.7 s rss   1313.5 MiB] gather 500/1000: 72.4 KiB a plane so far
+[    198.3 s rss   1321.0 MiB] gather 600/1000: 73.1 KiB a plane so far
+[    199.3 s rss   1328.6 MiB] gather 700/1000: 73.7 KiB a plane so far
+[    199.9 s rss   1336.0 MiB] gather 800/1000: 74.0 KiB a plane so far
+[    200.5 s rss   1343.5 MiB] gather 900/1000: 74.3 KiB a plane so far
+[    201.0 s rss   1350.9 MiB] gather: 1000 planes and cusps, 1000 planes held
+
+[gather], 1000 planes
+  the split's step and the transport: 6.050 ms a plane
+  the cusp (span key):                0.735 ms a plane
+  both: 6.785 ms a plane
+  first 100: 6.348 ms   last 100: 5.771 ms a plane
+  resident: 1278.2 MiB -> 1350.8 MiB, 74.4 KiB a plane
+  at 189720 planes: 13.47 GiB on top of 1.25 GiB, 0.36 h of planes
+[    201.0 s rss   1350.9 MiB] done
+[peakrss] term-gather: child waited=0 shell_code=0 samples=103
+[peakrss] peak tree RSS      : 1349 MiB
+[peakrss] low-water MemAvail : 12789 MiB
+[peakrss] peak single VmHWM  : 1354 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     1351 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   run.sh                        1 MiB peak
+[peakrss]   t=   202.1s procs=  2 rss=  1349 MiB hwm=  1349 MiB avail= 12797 MiB
+[peakrss]   t=   204.1s procs=  2 rss=  1345 MiB hwm=  1354 MiB avail= 12789 MiB
+[peakrss]   t=   200.1s procs=  2 rss=  1327 MiB hwm=  1327 MiB avail= 12812 MiB
+[peakrss]   t=   198.1s procs=  2 rss=  1303 MiB hwm=  1303 MiB avail= 12836 MiB
+[peakrss]   t=   196.1s procs=  2 rss=  1285 MiB hwm=  1285 MiB avail= 12856 MiB
+# launcher exit: 0  ended: 2026-11-18T00:20:50Z
