@@ -140,6 +140,38 @@ def _decided_nowhere_vanishing(expression, variables, excluded=()):
             return None
 
 
+def _is_an_open_inclusion(mapping, domain, manifold) -> bool:
+    r"""Whether ``mapping`` is the inclusion of an open submanifold of ``manifold``, read in the charts both carry.
+
+    The inclusion of an open submanifold reads the same coordinates on the
+    charts it shares with the manifold (``SmoothManifolds.open_submanifold``),
+    so its coordinate representations are the identity: on each shared label the
+    ``i``-th coordinate of the target is the ``i``-th coordinate of the source
+    (Lee, *Introduction to Smooth Manifolds*, 2nd ed., Example 1.4).  A map whose
+    representations are not the identity is no inclusion, and the pullback of the
+    tangent bundle along it is not the tangent bundle of its domain.
+    """
+    if int(domain.dimension()) != int(manifold.dimension()):
+        return False
+    shared = tuple(
+        label for label in domain.chart_labels() if label in manifold.chart_labels()
+    )
+    if not shared:
+        return False
+    index_set = mapping.chart_maps().index_set()
+    for label in shared:
+        if (label, label) not in index_set:
+            return False
+        expressions = tuple(mapping.chart_map(label, label))
+        symbols = tuple(_engine_manifold_chart(domain.atlas()[label])[:])
+        if len(expressions) != len(symbols):
+            return False
+        for expression, symbol in zip(expressions, symbols, strict=True):
+            if SR(_engine_manifold_expression(expression) - symbol).simplify_rational() != 0:
+                return False
+    return True
+
+
 class SmoothVectorBundles(OwnedParameterizedCategory):
     r"""Smooth real vector bundles on one smooth manifold.
 
@@ -197,12 +229,16 @@ class SmoothVectorBundles(OwnedParameterizedCategory):
             bundle_rank,
             engine_bundle,
             bundle_tangent_manifold=None,
+            bundle_underlying=None,
+            bundle_mapping=None,
             **rest,
         ) -> None:
             self._bundle_base_manifold = bundle_base_manifold
             self._bundle_rank = bundle_rank
             self._engine_bundle = engine_bundle
             self._bundle_tangent_manifold = bundle_tangent_manifold
+            self._bundle_underlying = bundle_underlying
+            self._bundle_mapping = bundle_mapping
             super().__init__(**rest)
 
         def base_manifold(self):
@@ -230,40 +266,63 @@ class SmoothVectorBundles(OwnedParameterizedCategory):
                 retained_frame=None,
             )
 
-        def pullback_along(self, inclusion):
-            r"""The bundle pulled back along an open inclusion into this bundle's base.
+        def pullback_along(self, mapping):
+            r"""The bundle pulled back along a smooth map into this bundle's base.
 
-            For an open submanifold ``j: U -> M`` the differential of the
-            inclusion is an isomorphism at every point (Lee, *Introduction to
-            Smooth Manifolds*, 2nd ed., Ch. 3), so the pullback of the tangent
-            bundle is the tangent bundle of ``U`` and the two are the same
-            bundle read on the smaller base.  The pullback of a general bundle,
-            and a pullback along a map that is not an open inclusion, needs the
-            transition functions of the bundle on a cover of the target and is
-            not represented here.
+            A section of the pullback ``f^*E`` over ``N`` is a map into the fibres
+            over the image, ``q |-> s(f(q))`` (Lee, *Introduction to Smooth
+            Manifolds*, 2nd ed., Ch. 10, where the pullback of a vector bundle is
+            the bundle whose fibre at ``q`` is the fibre of ``E`` at ``f(q)``).
+            For an open inclusion the differential is an isomorphism at every
+            point, so the pullback of the tangent bundle is the tangent bundle of
+            the inclusion's domain, and that is what is returned there.  Along
+            any other smooth map the pullback is its own bundle over the map's
+            domain: its sections are the pullbacks of the bundle's sections
+            (:meth:`SmoothSectionModules.ParentMethods.pullback_of`), and a
+            section of it that is not the pullback of one needs the bundle's
+            transition functions on a cover of the target, which this owner does
+            not retain.
             """
             manifold = self.base_manifold()
-            assert self._bundle_tangent_manifold is not None, (
-                f"the pullback of {self} is not represented: a bundle is pulled back "
-                f"through its transition functions on a cover of the target, and only the "
-                f"tangent bundle -- whose differential along an open inclusion is an "
-                f"isomorphism -- is stated here"
+            assert mapping.codomain() is manifold, (
+                f"cannot pull {self} back along {mapping}: it ends at "
+                f"{mapping.codomain()}, not at the bundle's base {manifold}"
             )
-            assert inclusion.codomain() is manifold, (
-                f"cannot pull {self} back along {inclusion}: it ends at "
-                f"{inclusion.codomain()}, not at the bundle's base {manifold}"
+            domain = mapping.domain()
+            assert domain in SmoothManifolds(), (
+                f"cannot pull {self} back along {mapping}: its domain {domain} is not a smooth "
+                f"manifold"
             )
-            domain = inclusion.domain()
-            assert domain in SmoothManifolds() and int(domain.dimension()) == int(
-                manifold.dimension()
-            ), (
-                f"cannot pull {self} back along {inclusion}: an open submanifold of "
-                f"{manifold} has its dimension, and {domain} is not a smooth manifold of "
-                f"dimension {manifold.dimension()}"
+            if self._bundle_tangent_manifold is not None and _is_an_open_inclusion(
+                mapping, domain, manifold
+            ):
+                return domain.tangent_bundle()
+            return _object_of(
+                self.category(),
+                bundle_base_manifold=domain,
+                bundle_rank=self.rank(),
+                engine_bundle=self._engine_bundle,
+                bundle_underlying=self,
+                bundle_mapping=mapping,
             )
-            return domain.tangent_bundle()
+
+        def underlying_bundle(self):
+            r"""The bundle this one is pulled back from, or ``None`` for a bundle read on its own base."""
+            return self._bundle_underlying
+
+        def mapping(self):
+            r"""The smooth map this bundle is pulled back along, or ``None``."""
+            return self._bundle_mapping
+
+        def is_pullback(self) -> bool:
+            r"""Whether this bundle is a pullback, stated by the bundle and the map it retains."""
+            return self._bundle_underlying is not None
 
         def _repr_(self):
+            if self._bundle_underlying is not None:
+                return (
+                    f"the pullback of {self._bundle_underlying} along {self._bundle_mapping}"
+                )
             return (
                 f"rank-{self.rank()} smooth real vector bundle on {self.base_manifold()}"
             )
@@ -330,6 +389,11 @@ class SmoothSectionModules(OwnedParameterizedCategory):
             a smooth function chart by chart.
             """
             manifold = self.parent().base_manifold()
+            assert self.parent().vector_bundle()._bundle_tangent_manifold is not None, (
+                f"the sections of {self.parent().vector_bundle()} are not vector fields: a "
+                f"derivation of C^oo is a section of the tangent bundle, and this bundle is "
+                f"not the tangent bundle of its base"
+            )
             assert element_parent(function) is manifold.smooth_functions(), (
                 f"{function} is not a smooth function on {manifold}: a section of "
                 f"{self.parent().vector_bundle()} is a derivation of "
@@ -364,7 +428,7 @@ class SmoothSectionModules(OwnedParameterizedCategory):
             r"""``V + W``: the section whose value at ``p`` is ``V(p) + W(p)``."""
             components = self.components()
             other_components = other.components()
-            return self.parent().section(
+            return self.parent()._construct(
                 {
                     label: tuple(
                         left + right
@@ -378,7 +442,7 @@ class SmoothSectionModules(OwnedParameterizedCategory):
 
         def _neg_(self):
             r"""``-V``: the section whose value at ``p`` is ``-V(p)``."""
-            return self.parent().section(
+            return self.parent()._construct(
                 {
                     label: tuple(-entry for entry in component)
                     for label, component in self.components().items()
@@ -437,6 +501,20 @@ class SmoothSectionModules(OwnedParameterizedCategory):
             r"""``C^oo(M)``, the algebra the sections are a module over."""
             return self._base_ring
 
+        def _construct(self, components):
+            r"""The section with these components, built without re-deciding that they state one object.
+
+            The callers are this module's own operations -- the sum, the negative,
+            the scalar multiple -- and the pullback of a section, which produce
+            components that agree on the overlaps because their operands do;
+            :meth:`section` is where a caller's own components are decided.
+            """
+            return self.element_class(
+                self,
+                components,
+                _engine_vector_field(self.base_manifold(), components),
+            )
+
         def zero(self):
             r"""The zero section: the component zero in every chart's coordinate frame."""
             manifold = self.base_manifold()
@@ -476,7 +554,7 @@ class SmoothSectionModules(OwnedParameterizedCategory):
                 f"both are written by"
             )
             components = element.components()
-            return self.section(
+            return self._construct(
                 {
                     label: tuple(
                         _raise_manifold_expression(
@@ -504,6 +582,11 @@ class SmoothSectionModules(OwnedParameterizedCategory):
             """
             manifold = self.base_manifold()
             atlas = manifold.atlas()
+            assert self._vector_bundle.underlying_bundle() is None, (
+                f"a section of the pullback {self._vector_bundle} that is not the pullback of "
+                f"one is read in the bundle's trivializations on a cover of the target, which "
+                f"this owner does not retain; pullback_of states the sections that are"
+            )
             labels = tuple(manifold.chart_labels())
             missing = tuple(label for label in labels if label not in components)
             extra = tuple(label for label in components if label not in labels)
@@ -634,6 +717,61 @@ class SmoothSectionModules(OwnedParameterizedCategory):
                     )
                     for label in labels
                 }
+            )
+
+        def pullback_of(self, section):
+            r"""The section ``q |-> s(f(q))`` of the pullback that ``section`` states.
+
+            A section of the pullback over ``N`` along ``f: N -> M`` is a map into
+            the fibres of ``E`` over the image, so a section of ``E`` gives one:
+            in a chart ``W`` of ``N`` and the chart ``U`` of ``M`` the map is
+            stated in, the pullback's component is the section's component on
+            ``U`` composed with the coordinate representation of ``f``, and the
+            result is raised to a section of the pulled-back bundle's charts
+            (Lee, *Introduction to Smooth Manifolds*, 2nd ed., Ch. 10).
+            """
+            bundle = self._vector_bundle
+            underlying = bundle.underlying_bundle()
+            assert underlying is not None, (
+                f"the sections of {bundle} are not the sections of a pullback: this bundle is "
+                f"read on its own base, and a section there is stated by its components"
+            )
+            assert element_parent(section) is underlying.sections(), (
+                f"{section} is not a section of {underlying}: its parent is "
+                f"{element_parent(section)}"
+            )
+            mapping = bundle.mapping()
+            domain = bundle.base_manifold()
+            base = underlying.base_manifold()
+            stated = section.components()
+            index_set = mapping.chart_maps().index_set()
+            components = {}
+            for label in domain.chart_labels():
+                chart = domain.atlas()[label]
+                pairs = tuple(pair for pair in index_set if pair[0] == label)
+                assert pairs, (
+                    f"cannot pull {section} back to {domain}: the map {mapping} is stated in no "
+                    f"chart of the target on the chart {label}"
+                )
+                source_label, target_label = pairs[0]
+                assert target_label in stated, (
+                    f"cannot read {section} on the chart {target_label} of {base}, which is the "
+                    f"chart the map {mapping} carries the chart {label} into"
+                )
+                expressions = tuple(
+                    SR(_engine_manifold_expression(expression))
+                    for expression in mapping.chart_map(source_label, target_label)
+                )
+                symbols = tuple(_engine_manifold_chart(base.atlas()[target_label])[:])
+                substitution = dict(zip(symbols, expressions, strict=True))
+                components[label] = tuple(
+                    _raise_manifold_expression(
+                        SR(_engine_manifold_expression(entry)).subs(substitution), chart
+                    )
+                    for entry in stated[target_label]
+                )
+            return self.element_class(
+                self, components, _engine_vector_field(domain, components)
             )
 
         def module_rank(self):
