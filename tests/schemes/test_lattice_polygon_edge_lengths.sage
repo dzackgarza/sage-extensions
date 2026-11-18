@@ -132,59 +132,146 @@ def test_edge_directions_with_no_positive_relation_close_no_polygon() -> None:
 def test_the_sterk2_boundary_path_closes_with_the_horizontal_side() -> None:
     r"""The Sterk2 cusp's polygon has eighteen cyclic edges, not nineteen.
 
-    Coble cell 59 lists nineteen vectors labelled ``Sterk2Vectors``, and Sterk cells 7--8
-    give the two roles they have: ``v_1 = (-1,2)`` and ``v_19 = (1,2)`` are the surgery
-    triangles' side directions, and ``v_2`` through ``v_18`` are the seventeen steps of a
-    boundary path walked from the origin.  Every one of those seventeen has a nonpositive
-    x-coordinate, so the path cannot close on itself: it ends at ``(-24, 0)`` for the
-    stored lengths, and the closing side runs back along ``(1,0)``, which is the side the
-    plotter's convex hull supplies.  The polygon's edge directions are therefore ``v_2``
-    through ``v_18`` followed by ``(1,0)``.
+    Coble cell 59 lists nineteen vectors labelled ``Sterk2Vectors``; Sterk cells 7--8 give
+    them two roles.  ``v_1 = (-1,2)`` and ``v_19 = (1,2)`` are the side directions of the
+    surgery triangles, and ``v_2`` through ``v_18`` are the seventeen steps of a boundary
+    path walked from the origin.  Each step has a nonpositive x-coordinate, so the path
+    does not close on itself.  Read with the source's own coefficients (``M_18_0_0``
+    halves the odd-labelled lengths and adds ``l_1/2`` to ``v_4`` and ``l_19/2`` to
+    ``v_16``), it ends on the x-axis at negative x, and the plotter's convex hull supplies
+    one closing side running back along ``(1,0)``.  The polygon's edge directions are
+    therefore ``v_2`` through ``v_18`` followed by ``(1,0)``, and the surgery directions
+    are not edges of it even though ``v_1`` and ``v_6`` are the same vector.
 
-    The stored lengths are not the lattice lengths: the source's ``M_18_0_0`` halves the
-    odd-labelled ones and adds ``l_1/2`` to ``v_4`` and ``l_19/2`` to ``v_16``.  Read
-    through that matrix the seventeen boundary coefficients are
-    ``1, 1, 3, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 3, 1, 1``, so one prescribed direction has
-    length zero in this specimen and the closing side has length ``24``.  The closure cone
-    of the eighteen directions is sixteen-dimensional with sixty-five primitive rays, and
-    exactly two of those rays have a two-element support: the two antipodal pairs
-    ``{(0,1), (0,-1)}`` and ``{(-1,0), (1,0)}``.
+    The dimension and the rays are read off that construction, not from a saved output.
+    The eighteen directions span the plane, so the relations among them form an
+    ``18 - 2`` dimensional space; multiplying the unit length vector by two makes every
+    source coefficient a positive integer and the path still ends on the x-axis, so the
+    closure cone meets the open positive orthant and fills that space.  An extreme ray of
+    ``{l >= 0 : sum_i l_i v_i = 0}`` has minimal support, and a positive dependence on a
+    set of directions says those directions are not contained in an open half-plane;
+    triangulating their convex hull then exhibits a smaller such set unless only two
+    directions (an antipodal pair) or three are involved.  Enumerating the antipodal pairs
+    and the positively dependent triples of the recovered directions, and clearing each
+    dependence's common factor, gives exactly the primitive rays of the cone.
     """
     plane = ZZ.free_module(2)
-    directions = (
-        (0, 1), (-1, 4), (-1, 3), (-2, 5), (-1, 2), (-2, 3), (-1, 1), (-2, 1), (-1, 0),
-        (-2, -1), (-1, -1), (-2, -3), (-1, -2), (-2, -5), (-1, -3), (-1, -4), (0, -1),
-        (1, 0),
-    )
     weights = ZZ.free_module(18)
+    edge_count = int(weights.module_rank())
+    boundary = Sterk.sterk2_boundary_directions()
+    surgery = Sterk.sterk2_surgery_directions()
+    labels = tuple(boundary)
+    steps = tuple(boundary[label] for label in labels)
+
+    assert tuple(surgery) == ("v_1", "v_19")
+    assert surgery["v_1"] == boundary["v_6"]
+    assert surgery["v_19"] not in steps
+
+    doubled = tuple(2 for _ in range(19))
+    path = Sterk.sterk2_boundary_path(doubled)
+    points = tuple(path[f"p_{index}"] for index in range(edge_count))
+    walks = tuple(
+        (
+            points[index + 1][0] - points[index][0],
+            points[index + 1][1] - points[index][1],
+        )
+        for index in range(edge_count - 1)
+    )
+    for index, direction in enumerate(steps):
+        assert walks[index][0] <= 0
+        assert walks[index][0].denominator() == 1
+        assert walks[index][1].denominator() == 1
+        assert walks[index][0] * direction[1] == walks[index][1] * direction[0]
+        assert walks[index][0] * direction[0] + walks[index][1] * direction[1] > 0
+    end = points[edge_count - 1]
+    assert end[1] == 0
+    assert end[0] < 0
+    closing_length = -end[0]
+
+    directions = steps + ((1, 0),)
+    assert (
+        sum(
+            plane((walk[0].numerator(), walk[1].numerator())) for walk in walks
+        )
+        + closing_length.numerator() * plane((1, 0))
+        == plane.zero()
+    )
+
     edge_directions = weights.Mor(plane)(
         {index: plane(direction) for index, direction in enumerate(directions)}
     )
     lengths = RationalPolyhedralCones(weights).from_nonnegative_solutions(edge_directions)
 
-    boundary_coefficients = (1, 1, 3, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 3, 1, 1)
-    closing_length = 24
-    closure = sum(
-        coefficient * plane(direction)
-        for coefficient, direction in zip(boundary_coefficients, directions[:-1])
-    ) + closing_length * plane((1, 0))
-    assert closure == plane.zero()
+    coefficients = Sterk.sterk2_direction_coefficients(doubled)
+    assert all(coefficients[label].denominator() == 1 for label in labels)
+    strictly_positive = weights(
+        tuple(coefficients[label].numerator() for label in labels)
+        + (closing_length.numerator(),)
+    )
+    assert all(coordinate > 0 for coordinate in strictly_positive.to_vector())
+    assert lengths.contains(strictly_positive)
 
-    assert lengths.dimension() == 16
+    assert lengths.dimension() == edge_count - int(plane.module_rank())
     assert lengths.is_pointed()
-    assert lengths.primitive_rays().cardinality() == 65
-    assert lengths.has_a_nonzero_point()
-    assert lengths.has_a_strictly_positive_point()
 
-    stored = weights(boundary_coefficients + (closing_length,))
-    assert lengths.contains(stored)
+    def primitive_dependence(entries):
+        divisor = ZZ(0)
+        for entry in entries:
+            divisor = ZZ(entry).gcd(divisor)
+        return tuple(int(entry // divisor) for entry in entries)
 
-    two_element_rays = tuple(
+    computed = set()
+    for first in range(edge_count):
+        for second in range(first + 1, edge_count):
+            if directions[second] == tuple(-coordinate for coordinate in directions[first]):
+                entries = [0] * edge_count
+                entries[first] = 1
+                entries[second] = 1
+                computed.add(tuple(entries))
+    for first in range(edge_count):
+        for second in range(first + 1, edge_count):
+            for third in range(second + 1, edge_count):
+                left, middle, right = (
+                    directions[first], directions[second], directions[third],
+                )
+                opposite_left = middle[0] * right[1] - middle[1] * right[0]
+                opposite_middle = right[0] * left[1] - right[1] * left[0]
+                opposite_right = left[0] * middle[1] - left[1] * middle[0]
+                if (
+                    opposite_left > 0
+                    and opposite_middle > 0
+                    and opposite_right > 0
+                ):
+                    entries = [0] * edge_count
+                    entries[first] = opposite_left
+                    entries[second] = opposite_middle
+                    entries[third] = opposite_right
+                    computed.add(primitive_dependence(entries))
+                elif (
+                    opposite_left < 0
+                    and opposite_middle < 0
+                    and opposite_right < 0
+                ):
+                    entries = [0] * edge_count
+                    entries[first] = -opposite_left
+                    entries[second] = -opposite_middle
+                    entries[third] = -opposite_right
+                    computed.add(primitive_dependence(entries))
+
+    library_rays = sorted(
         tuple(int(coordinate) for coordinate in ray.to_vector())
         for ray in lengths.primitive_rays()
-        if sum(1 for coordinate in ray.to_vector() if coordinate != 0) == 2
     )
-    assert two_element_rays == (
-        (0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1),
-        (1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0),
+    assert sorted(computed) == library_rays
+
+    stored = Sterk.sterk2_stored_lengths()
+    stored_coefficients = Sterk.sterk2_direction_coefficients(stored)
+    stored_path = Sterk.sterk2_boundary_path(stored)
+    assert all(stored_coefficients[label].denominator() == 1 for label in labels)
+    assert stored_path["p_17"][1] == 0
+    assert lengths.contains(
+        weights(
+            tuple(stored_coefficients[label].numerator() for label in labels)
+            + ((-stored_path["p_17"][0]).numerator(),)
+        )
     )
