@@ -265,22 +265,31 @@ a reader asks for `representative()`, and
 `#588`'s retention repair (`#592`, `#593`) is stated on the first: the span row
 falls from 12.29 GiB to 2.0 GiB at that length.
 
-Four attempts on this host, none of which returns a count:
+The row, run alone on an otherwise idle host (the same call, sampled every
+30 s): **killed at 9 538 MiB peak, exit 137, 1 365 s in**, with RSS still
+rising at about 1.2 GiB a minute and the walk roughly two thirds done.  Its
+arithmetic is 1.5 GiB of coset tables once, plus 189 720 planes at 68.4 KiB
+each: about 13.9 GiB, which no host of this size will give it.
 
-| attempt | row | what it reached |
-| --- | --- | --- |
-| `tests/coble_kernel_plane_rows.py --cap 2400 --budget 5000` | both | ambient rows 76.7 s and 78.1 s, `is_parabolic_complete` 4.3 s, then killed (exit 137) 12 min into the walk |
-| `Õ⁺.isotropic_orbit_representatives(2)` | the materialized row | 3.2 GiB at 12 min 49 s, stopped |
-| `Õ⁺.cusps(2)` | the span row | killed by the host (exit 137) at 27.9 min, ~2 GiB |
-| `Õ.cusps(2)` | the span row | still building at 37 min, 3.2 GiB, stopped |
+The two coefficients, measured on the same tree by drawing 400 planes from the
+row and sampling RSS across them:
 
-The row is not refused and not wrong; it does not finish here.  The library's
-own records give its decided value — 189 720 planes per kernel group, from
-`#390`'s returned row — and `#588`'s acceptance states the span row at 2.0 GiB
-and 1 179 s on a runner that is not shared with other projects' jobs.  The venue
-for the run is `results/coble-kernel-plane-rows.yml`, the workflow this
-connection cannot install (`.github/workflows/` is outside its scope).
+| the 400 planes | KiB a plane | what it says |
+| --- | ---: | --- |
+| held | **68.4** | the returned representative and the record that keeps it |
+| dropped as they arrive, their spans kept | **26.3** | the identity registries keep the plane after the caller lets it go |
 
-So the item is **blocked on the host**, not decided here: three of the four
-attempts were killed by this VM, and the one instrument that carries the count,
-`tests/coble_kernel_plane_rows.py`, needs a job of its own.
+So the peak is not the walk and not the incidence: it is the per-plane
+representative.  Of that 68.4 KiB, 42.1 KiB goes when the caller drops the
+plane and **26.3 KiB does not** — the `@cached_method` keyed by the span by
+value on the ambient lattice, `_lattice_subobject_spanning`, `_lattice_mor` and
+`_lattice_on_gram`, the registries `#588` enumerated and `#594` has not yet
+converted.  The remaining 42.1 KiB is the public call's own contract: it
+returns a tuple of 189 720 constructed planes, and a tuple holds them.  The
+second row's own datum is the two generators' strings, about 160 B a plane, so
+it does not account for the 26.3 KiB.
+
+So the item is a **cost item**, not a host accident: the row's peak is the
+per-plane representative, 26.3 KiB of which survives the caller dropping the
+plane.  That retained term is `#594`'s subject; the 42.1 KiB term is the
+gathered return of the public call.
