@@ -721,6 +721,45 @@ class HyperbolicSpaces(OwnedParameterizedCategory):
                 construction_data={"space": self, "cone": cone},
             )
 
+        def is_an_isometry(self, ambient_map) -> bool:
+            r"""Decide whether a map of this hyperbolic space is an isometry of it.
+
+            An arrow of a hyperbolic space is the map of the hyperboloid induced
+            by an isometry of its lattice (:class:`HyperbolicManifoldMor`), so the
+            decision reads that datum and not the map's values on points: the
+            lattice map must preserve the pairing on the lattice's chosen
+            generating set, which decides it for the whole lattice because the
+            pairing is bilinear, and the sign that puts an image back in the
+            selected component is the one pairing positively with its timelike
+            vector -- the convention :func:`_isometry_image_of_point` writes, and
+            one a hyperbolic point, being a ray, does not distinguish.
+
+            A map of this space that carries no isometry of this space's lattice --
+            a map of the point set, say -- is refused here: this space states no
+            decision about such a map, and none is guessed.
+            """
+            if ambient_map.domain() is not self or ambient_map.codomain() is not self:
+                raise ValueError(
+                    f"the isometry decision of {self} is a decision about its own maps, but "
+                    f"{ambient_map} carries {ambient_map.domain()} into {ambient_map.codomain()}"
+                )
+            if not ambient_map.parent().base_category().is_subcategory(self.category()):
+                raise ValueError(
+                    f"the isometry decision of {self} reads the isometry of the lattice "
+                    f"{self.lattice()} that an arrow of this space carries, and {ambient_map} is "
+                    f"an arrow of {ambient_map.parent().base_category()}, which carries none"
+                )
+            lattice = self.lattice()
+            labels = tuple(lattice.module_generating_set())
+            generators = tuple(lattice.module_generator(label) for label in labels)
+            isometry = ambient_map.lattice_isometry()
+            images = tuple(isometry(generator) for generator in generators)
+            return all(
+                lattice.b(image, other_image) == lattice.b(generator, other_generator)
+                for generator, image in zip(generators, images, strict=True)
+                for other_generator, other_image in zip(generators, images, strict=True)
+            )
+
         def isometric_action(self, group):
             r"""Return the ``Gamma``-space ``(HH(C^+), rho)`` of a group ``Gamma`` of isometries of ``L``.
 

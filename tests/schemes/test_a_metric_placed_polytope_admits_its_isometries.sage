@@ -582,3 +582,33 @@ def test_an_isometry_between_two_placed_euclidean_polytopes_is_an_arrow() -> Non
     assert space.is_an_isometry(dilation) is False
     with pytest.raises(ValueError):
         category.Mor(first, second)(dilation, faces)
+
+
+def test_the_hyperbolic_owner_decides_an_isometry() -> None:
+    r"""`HH^1`: the lattice's isometries are the hyperboloid's, a map of points is not one.
+
+    An arrow of a hyperbolic space is induced by an isometry of its lattice, and
+    the space decides that from the arrow's own datum: the identity of the lattice
+    and the sign change of the timelike generator both preserve the pairing, so
+    both are admitted.  A map of the point set carries no lattice isometry at all,
+    so the decision refuses it rather than answering.
+    """
+    space = HyperbolicSpaces(1).an_object()
+    lattice = space.lattice()
+    labels = tuple(lattice.module_generating_set())
+    family = space.category().Mor(space, space)
+    identity = family.identity()
+    images = {
+        labels[0]: -lattice.module_generator(labels[0]),
+        labels[1]: lattice.module_generator(labels[1]),
+    }
+    reflection = family(lattice.Mor(lattice)(lambda label: images[label]))
+
+    assert space.is_an_isometry(identity) is True
+    assert space.is_an_isometry(reflection) is True
+    assert reflection.lattice_isometry()(
+        lattice.module_generator(labels[0])
+    ) == -lattice.module_generator(labels[0])
+
+    with pytest.raises(ValueError):
+        space.is_an_isometry(Sets().Mor(space, space)(lambda point: point))
