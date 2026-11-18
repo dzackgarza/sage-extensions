@@ -52,7 +52,7 @@ from sage_extensions.categories.topological_spaces import TopologicalSpaces
 from sage_extensions.logic import ask
 from sage_extensions.owned_category import _object_of
 from sage_extensions.owned_category_bases import CategoryWithAxiom
-from sage_extensions.rings.real import RR
+lazy_import("sage_extensions.rings.real", "RR")
 from sage_extensions.categories.abstract_categories.mor_foundation import object_level
 
 lazy_import("sage.manifolds.manifold", "Manifold", as_="_SageManifold")
@@ -778,6 +778,30 @@ def _coordinates_of_a_point_in(manifold, value):
     )
 
 
+class _DeferredEngineRealization:
+    r"""A manifold's private engine, built the first time a reader asks for it.
+
+    A manifold built by this category's constructor is handed its engine ready
+    made.  The exact real line is placed in the category by the field's own
+    construction, which states its engine as one of these: the engine and the
+    charts drawn from it are built when a chart, a point or the topology first
+    reads one, and are built once.
+    """
+
+    def __init__(self, engine_factory) -> None:
+        assert callable(engine_factory), (
+            f"a deferred engine realization is a zero-argument construction, but "
+            f"{engine_factory!r} is not callable"
+        )
+        self._engine_factory = engine_factory
+        self._engine = None
+
+    def realize(self):
+        if self._engine is None:
+            self._engine = self._engine_factory()
+        return self._engine
+
+
 class _ManifoldTopologyData(SageObject):
     r"""Private topology realization supplied by SageManifolds.
 
@@ -792,7 +816,12 @@ class _ManifoldTopologyData(SageObject):
         self._engine_manifold = engine_manifold
 
     def _engine_manifold_realization(self):
-        return self._engine_manifold
+        engine = self._engine_manifold
+        match engine:
+            case _DeferredEngineRealization():
+                return engine.realize()
+            case _:
+                return engine
 
     def open_subsets(self, space):
         return space.power_set().condition_set(
@@ -868,6 +897,42 @@ class _ChartDomainRealization:
         )
 
 
+def _real_line_engine():
+    r"""The private Sage realization of the real line: one smooth 1-manifold, chart named ``x``."""
+    return _SageManifold(1, "RR", structure="smooth", unique_tag=object())
+
+
+def _real_line_smooth_structure(field):
+    r"""Establish the smooth structure of the real line on the exact field itself.
+
+    The real line is a one-dimensional smooth manifold whose charts are the
+    identity ``x: R -> R`` read on the whole space, and the topology it carries
+    is the one that chart presents (Lee, *Introduction to Smooth Manifolds*,
+    2nd ed., Example 1.2).  The field's own construction places it in
+    ``SmoothManifolds()``, so the manifold level's datum is recorded on the
+    field together with the topology that datum presents: the object placed in
+    the category is the field, and no manifold is built beside it, since a
+    second real line would be equal to ``RR`` in nothing (``CAT-15``,
+    ``CAT-23``).
+
+    The engine and the chart are stated as constructions rather than made here,
+    so constructing the field does not build a chart of it; the field's
+    ``_standard_charts`` states the chart, and the atlas read registers it.
+    """
+    engine = _DeferredEngineRealization(_real_line_engine)
+    TopologicalSpaces.ParentMethods._retain_topology(field, _ManifoldTopologyData(engine))
+    TopologicalManifolds.ParentMethods._retain_manifold_structure(
+        field,
+        engine,
+        1,
+        "RR",
+        "smooth",
+        Infinity,
+        "real",
+    )
+    return field
+
+
 class TopologicalManifolds(OwnedCategory):
     r"""Owned finite-dimensional topological manifolds."""
 
@@ -926,6 +991,12 @@ class TopologicalManifolds(OwnedCategory):
         coordinates of a point are elements of the coordinate field ``K``.
         """
 
+        # A point built here keeps the engine point its coordinates name.  An
+        # element that is the manifold's own element -- a real number is a
+        # point of the real line -- was not built here and keeps none: the
+        # chart it presents reads it through the coordinates it states.
+        _engine_point = None
+
         def __init__(self, parent: Parent, coordinates, chart_label) -> None:
             Element.__init__(self, parent)
             field = parent.coordinate_field()
@@ -952,7 +1023,26 @@ class TopologicalManifolds(OwnedCategory):
             return self.parent().atlas()[self._chart_label]
 
         def _engine_manifold_point(self):
-            return self._engine_point
+            r"""The private engine point of this point.
+
+            A point built by this class keeps the engine point its coordinates
+            name.  An element that is the manifold's own element -- a real number
+            is a point of the real line -- keeps none, and is read here in the
+            chart it presents, at the one coordinate it states.
+            """
+            engine_point = self._engine_point
+            match engine_point:
+                case None:
+                    manifold = self.manifold()
+                    return _engine_manifold(manifold)(
+                        tuple(
+                            _engine_manifold_expression(coordinate)
+                            for coordinate in self.coordinates()
+                        ),
+                        chart=_engine_manifold_chart(self.chart()),
+                    )
+                case _:
+                    return engine_point
 
         def __eq__(self, other) -> bool:
             r"""Two points of one manifold are equal when they are the same point, in whichever charts they were given.
@@ -1017,6 +1107,38 @@ class TopologicalManifolds(OwnedCategory):
             Ch. 1), and ``manifold_field`` the field the charts take values
             in, read back by :meth:`coordinate_field`.
             """
+            self._retain_manifold_structure(
+                engine_manifold,
+                manifold_dimension,
+                manifold_name,
+                manifold_structure,
+                differentiability_degree,
+                manifold_field,
+                chart_index_set,
+                chart_provider,
+            )
+            super().__init__(**rest)
+
+        def _retain_manifold_structure(
+            self,
+            engine_manifold,
+            manifold_dimension,
+            manifold_name,
+            manifold_structure,
+            differentiability_degree,
+            manifold_field="real",
+            chart_index_set=None,
+            chart_provider=None,
+        ) -> None:
+            r"""Record this level's construction data on the object it is placed on.
+
+            What the data are is stated by the constructor
+            (:meth:`__init__`).  The constructor passes its keywords here, and
+            an object whose own construction places it in the category states
+            the same data from that construction -- the exact real line is the
+            field ``RR`` itself -- so the level records it in one place either
+            way.
+            """
             self._preamble_engine_manifold = engine_manifold
             self._preamble_manifold_dimension = NN(int(manifold_dimension))
             self._preamble_manifold_name = str(manifold_name)
@@ -1031,7 +1153,6 @@ class TopologicalManifolds(OwnedCategory):
             self._preamble_chart_index_set = chart_index_set
             self._preamble_chart_provider = chart_provider
             self._preamble_transitions = {}
-            super().__init__(**rest)
 
         def dimension(self):
             return self._preamble_manifold_dimension
@@ -1070,7 +1191,12 @@ class TopologicalManifolds(OwnedCategory):
             return self._preamble_differentiability_degree == Infinity
 
         def _engine_manifold_realization(self):
-            return self._preamble_engine_manifold
+            engine = self._preamble_engine_manifold
+            match engine:
+                case _DeferredEngineRealization():
+                    return engine.realize()
+                case _:
+                    return engine
 
         def chart(self, label, coordinates):
             return self._register_chart(label, self._engine_manifold_realization().chart(coordinates))
@@ -1211,9 +1337,20 @@ class TopologicalManifolds(OwnedCategory):
             return self(coordinates, chart_label)
 
         def chart_labels(self):
+            self._standard_charts()
             if self._preamble_chart_index_set is not None:
                 return self._preamble_chart_index_set
             return self.selected_finite_chart_labels()
+
+        def _standard_charts(self):
+            r"""Register the charts this manifold's own construction states for it.
+
+            A manifold built by this category's constructor presents the charts its
+            caller registers.  A manifold placed in the category by its own
+            construction states its charts here, and they are registered when the
+            atlas is first read; a manifold that states none -- every manifold the
+            constructor builds -- is unaffected.
+            """
 
         def selected_finite_chart_labels(self):
             r"""Labels in the currently registered finite chart realization."""

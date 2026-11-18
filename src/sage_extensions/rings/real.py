@@ -517,6 +517,20 @@ class ExactRealNumber(FieldElement):
     def is_real(self) -> bool:
         return True
 
+    def chart(self):
+        r"""The chart this number is read in as a point of the real line: the identity chart."""
+        return self.parent().identity_chart()
+
+    def coordinates(self):
+        r"""The coordinates of this number as the point of the real line it is: itself.
+
+        The real line's chart is the identity, so the one coordinate of the
+        point ``x`` in it is ``x``.
+        """
+        from sage_extensions.categories.sets.finite_families import finite_family
+
+        return finite_family((self,), name=f"Coordinates of the real number {self}")
+
     def is_unit(self) -> bool | Predicate:
         r"""Return the field's nonzero predicate, without forcing a decision.
 
@@ -864,12 +878,19 @@ class ExactRealField(UniqueRepresentation, Field):
 
     def __init__(self) -> None:
         from sage_extensions.categories.algebras.algebras import Algebras
+        from sage_extensions.categories.manifolds import (
+            SmoothManifolds,
+            _real_line_smooth_structure,
+        )
         from sage_extensions.categories.modules.pure.modules import (
             FinitelyGeneratedFreeModules,
         )
 
         # The constructing category is construction data (OWN-15): a field is
-        # built by the ring route, as every owned ring is.
+        # built by the ring route, as every owned ring is.  The real line is
+        # this field, and the field's own construction places it in the smooth
+        # manifolds, so the placement is a membership of the field rather than a
+        # manifold built beside it (CAT-15, CAT-23).
         self._constructing_category = OwnedRings()
         regular_algebra = Algebras(self).Associative().Unital().Commutative()
         Field.__init__(
@@ -882,10 +903,12 @@ class ExactRealField(UniqueRepresentation, Field):
                     UncountableSets(),
                     regular_algebra,
                     FinitelyGeneratedFreeModules(self),
+                    SmoothManifolds(),
                 )
             ),
         )
         realize_owned_category(self)
+        _real_line_smooth_structure(self)
         from sage_extensions.categories.algebras.algebras import _algebra_from_native_ring
 
         _algebra_from_native_ring(self, lambda left, right: ExactRealNumber._mul_(left, right),
@@ -1152,9 +1175,24 @@ class ExactRealField(UniqueRepresentation, Field):
         r"""Supply the cardinality of the real numbers at the set owner."""
         return continuum
 
+    def _standard_charts(self):
+        r"""Register the identity chart of the real line, when the atlas is first read.
+
+        The real line's charts are the identity ``x: R -> R`` on the whole
+        space.  This field is that space, so its one chart is the identity, and
+        it is registered the first time the atlas is read: a point of the field
+        is a point of the line, and its coordinate in this chart is itself.
+        """
+        if not self._preamble_charts:
+            self.chart("identity", "x")
+
     def identity_chart(self):
-        r"""The coordinate chart of the real line on this exact field."""
-        pass
+        r"""The coordinate chart of the real line on this exact field.
+
+        The identity ``x: R -> R`` on the whole space, which is the one chart
+        of the smooth structure the field's construction places on it.
+        """
+        return self.atlas()["identity"]
 
     def standard_topological_atlas(self):
         r"""The real-line atlas on this exact underlying set."""

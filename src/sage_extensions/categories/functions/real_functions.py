@@ -841,10 +841,43 @@ def _function_base_field(codomain):
     return codomain if codomain in Fields() else RR
 
 
+def _manifolds_of_class(regularity):
+    r"""The category a \(C^k\) map's domain is an object of.
+
+    A \(C^k\) map is defined on a manifold of class \(C^k\): a smooth manifold
+    for \(k=\infty\), a \(C^k\) manifold for finite \(k\ge 1\), and a
+    topological manifold for \(k=0\) (Lee, *Introduction to Smooth Manifolds*,
+    2nd ed., Ch. 1).  A complex manifold is smooth as the real manifold its
+    realification forgets to, which is the class its charts' functions are
+    taken in.
+    """
+    from sage_extensions.categories.manifolds import (
+        ComplexManifolds,
+        DifferentiableManifolds,
+        SmoothManifolds,
+        TopologicalManifolds,
+    )
+
+    match regularity:
+        case _ if regularity is Infinity:
+            return (
+                SmoothManifolds(),
+                ComplexManifolds(),
+            )
+        case _ if regularity == 0:
+            return (TopologicalManifolds(),)
+        case _:
+            return (DifferentiableManifolds(),)
+
+
 @cached_function(key=lambda regularity, domain, codomain: (_exponent_key(regularity), id(domain), id(codomain)))
 def _differentiability_class(regularity, domain, codomain):
     r"""Build \(C^k(X,Y)\) as a condition submodule of \(Y^X\); for \(Y\) a field, the algebra on it."""
     field = _function_base_field(codomain)
+    assert any(domain in manifolds for manifolds in _manifolds_of_class(regularity)), (
+        f"C^k(X, Y) is the space of maps of class C^{_parameter_name(regularity)} on a "
+        f"manifold of that class, and {domain} is in {domain.category()}"
+    )
     assert codomain is field or codomain in VectorSpaces(field), (
         f"C^k(X, Y) is a vector space of maps over the field of its values, so Y must be a "
         f"vector space over {field}, or that field itself, but {codomain} is not"

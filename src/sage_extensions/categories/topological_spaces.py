@@ -856,8 +856,19 @@ class TopologicalSpaces(OwnedCategory):
 
     class ParentMethods:
         def __init__(self, topology_data, **rest) -> None:
-            self._represented_topology_data = topology_data
+            self._retain_topology(topology_data)
             super().__init__(**rest)
+
+        def _retain_topology(self, topology_data) -> None:
+            r"""Record the topology this space is placed in.
+
+            This category's constructor passes its topology datum here.  A
+            space whose own construction places it in the category states the
+            same datum from that construction -- the exact real line is the
+            field ``RR`` itself -- and the level records it in one place either
+            way.
+            """
+            self._represented_topology_data = topology_data
 
 
         def _topology_data(self):
