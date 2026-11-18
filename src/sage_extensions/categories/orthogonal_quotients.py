@@ -3882,6 +3882,9 @@ def _plane_orbit_from_parabolic_stabilizer(subgroup, representative):
     whole of `H`.  Where the parabolic is not established to be
     complete, ``None`` is returned and the caller keeps its own route.
 
+    Otherwise the answer is the double cosets' transported planes, one at a
+    time (:func:`_iter_transported_planes`).
+
     Each returned representative is the transported plane of one double
     coset, so the count of the row is the count of the double cosets
     themselves -- computed by
@@ -3930,14 +3933,11 @@ def _plane_orbit_from_parabolic_stabilizer(subgroup, representative):
             "condition, or both a determinant and a spinor kernel at once, and the "
             "walk's kernel-sign witness machinery lifts one sign coset only"
         )
-    # The lifts are consumed as they arrive: a kernel row numbers 189720 of
-    # them, and holding every lift beside every transported plane doubles the
-    # row's footprint for no mathematical content.  The split's own lifts, the
-    # finite element each of them acts on the discriminant group by, and the
-    # complete source family are retained with the representatives they
-    # produced: the consumers of the row never search for a witness or
-    # re-certify a transported parabolic (the search reaches the
-    # port's generic enumeration, and the recomputation reaches PARI's
+    # The split's own lifts, the finite element each of them acts on the
+    # discriminant group by, and the complete source family are retained with
+    # the representatives they produced: the consumers of the row never search
+    # for a witness or re-certify a transported parabolic (the search reaches
+    # the port's generic enumeration, and the recomputation reaches PARI's
     # qfauto overflow on this lattice).
     quotient.register_isotropic_lift(
         representative,
@@ -3945,14 +3945,31 @@ def _plane_orbit_from_parabolic_stabilizer(subgroup, representative):
         family,
         quotient._discriminant_group.one(),
     )
-    representatives = []
-    for splitting, discriminant_image in quotient._iter_splitting_isometries_in_im_rho(family):
+    return _iter_transported_planes(quotient, representative, family)
+
+
+def _iter_transported_planes(quotient, representative, family):
+    r"""Yield the double cosets' transported planes of one plane's parabolic split.
+
+    A kernel row numbers 189720 of them, and each one is a constructed parent of
+    this library, kept for the process by the construction caches above it: a
+    caller that materialises the row holds every plane of the row at once,
+    which is 74 KB a plane and 13.47 GiB at the row's length.  The walk under
+    the split is already lazy -- it yields one lift and its finite element at a
+    time -- so the row is yielded here as well and the plane is the caller's to
+    drop once its own datum (the cusp's span) exists.  What is retained per
+    plane is the lift registry's `(lift, source family, discriminant image)`,
+    keyed by the plane's span, which is what a consumer of the row reads: the
+    plane itself is not looked up again.
+    """
+    for splitting, discriminant_image in quotient._iter_splitting_isometries_in_im_rho(
+        family
+    ):
         transported = splitting.transport_isotropic_object(representative)
         quotient.register_isotropic_lift(
             transported, splitting, family, discriminant_image
         )
-        representatives.append(transported)
-    return tuple(representatives)
+        yield transported
 
 
 def _isotropic_line_class_points(lattice, line):
