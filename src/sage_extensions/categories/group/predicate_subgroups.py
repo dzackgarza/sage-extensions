@@ -889,7 +889,7 @@ class PredicateSubgroups(OwnedParameterizedCategory):
                 _plane_parabolic_incidence_flags,
             )
             from sage_extensions.categories.sets.finite_ordered_sets import (
-                finite_ordered_set,
+                _distinct_finite_ordered_set,
             )
 
             lattice = self.supergroup().domain()
@@ -1164,7 +1164,15 @@ class PredicateSubgroups(OwnedParameterizedCategory):
                                 f"over the line cusp {first.line_cusp()} and the plane cusp "
                                 f"{first.plane_cusp()}: the flag orbits are over-split"
                             )
-            return finite_ordered_set(tuple(incidences))
+            # retain_flag admitted exactly one certificate per pair of cusp
+            # *identities*, and the two cusp rows contain distinct orbits.
+            # Thus these edges are pairwise distinct by construction.  Their
+            # hash is intentionally constant for one subgroup, so the literal
+            # finite_ordered_set ingress would compare every pair of the
+            # 569160 Coble kernel edges (quadratic time).  The distinct-point
+            # ingress retains that already-proved injectivity and ranks by
+            # identity without a second equality search.
+            return _distinct_finite_ordered_set(incidences)
 
         def tits_building_incidence_by_divided_classes(self):
             r"""Return this subgroup's line/plane building incidence, decided by divided classes.
