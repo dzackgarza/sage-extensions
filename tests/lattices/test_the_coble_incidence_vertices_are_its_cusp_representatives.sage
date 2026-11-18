@@ -120,6 +120,27 @@ def test_incidence_reconstructs_its_verified_flag_on_demand() -> None:
     assert reconstructed_ref() is None
 
 
+def test_kernel_incidence_refuses_a_missing_independent_edge() -> None:
+    r"""A self-consistent relation with 569159 edges fails the external count."""
+    import sys
+    from unittest.mock import patch
+
+    sys.path.insert(0, "tests")
+    import coble_gamma_co_2_incidence_rows as driver
+    from coble_row_status import RowStatus
+
+    for label in ("Otilde", "Otilde+"):
+        outcome = driver.RowOutcome(
+            label, RowStatus.DECIDED, "synthetic count specimen", (569159, 527, 189720)
+        )
+        with (patch.object(driver, "run_row", return_value=outcome),
+              patch.object(driver, "_row_subgroup", return_value=None),
+              patch.object(driver, "_trivial_image_row_agreement", return_value=None)):
+            assert driver.main(["--rows", label, "--lattice", "Tco", "--cap", "1"]) == (
+                RowStatus.COUNT_MISMATCH.exit_status
+            )
+
+
 def test_the_plus_kernel_incidence_vertices_of_6jrs_are_its_cusp_rows() -> None:
     r"""``6JRS``: ``Otilde+`` is ``O^+(L)`` there, and its vertices are its own cusps."""
     lattice = _6jrs()
