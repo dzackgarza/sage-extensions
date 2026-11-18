@@ -627,17 +627,29 @@ class MetricPolytopeMor(PlacedPolytopeMor):
             return self.ambient_map()
 
     def _element_constructor_(self, ambient_isometric_embedding, face_poset_map):
-        r"""Refuse: an ambient embedding of a Euclidean polytope must be an isometry.
+        r"""Construct the arrow from an ambient isometry and the faces' map it induces.
 
-        This category states that its arrows are induced by ambient isometric
-        embeddings, and this owner has no decided isometry predicate for the
-        ambient metric space to check one with.  An arrow is refused here rather
-        than admitted as a metric polytope's while its ambient map is only
-        affine.
+        This category states that its ambient maps are isometric embeddings, and
+        whether one is is decided by the ambient metric space: this asks the
+        space, through its own ``is_an_isometry``, and retains the arrow only
+        when the space answers that the map preserves its metric.  A map the
+        space answers ``False`` for is refused here, and a map the space states
+        no decision for is refused by that decision's own message, which names
+        the datum the arrow is missing.  Neither is admitted as an arrow of this
+        category's while it is only affine.
         """
-        assert False, (
-            f"an arrow of {self} is induced by an ambient isometric embedding, but the ambient "
-            "metric space states no isometry decision for it, so none is admitted here"
+        space = self.domain().ambient_space()
+        match space.is_an_isometry(ambient_isometric_embedding):
+            case True:
+                pass
+            case False:
+                raise ValueError(
+                    f"an arrow of {self} is induced by an isometric embedding of the ambient "
+                    f"space {space}, but {ambient_isometric_embedding} is not an isometry of it: "
+                    f"{space} decides that it does not preserve its metric"
+                )
+        return PlacedPolytopeMor._element_constructor_(
+            self, ambient_isometric_embedding, face_poset_map
         )
 
 

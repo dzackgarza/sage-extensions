@@ -1,0 +1,212 @@
+r"""A placed Euclidean polytope admits exactly the ambient maps that are isometries.
+
+A Euclidean space is a real affine space with a chosen inner product, and its
+arrows are affine isometries: an affine map `x \mapsto A x + t` is one exactly
+when `A` preserves the form, since a translation is an isometry of every
+Euclidean space.  That decision is the metric space's own, and a placed
+Euclidean polytope reads it: the reflection `(x,y) \mapsto (-x,y)` of the square
+`\operatorname{conv}\{(\pm 1,\pm 1)\}` is an arrow of the placed square, of order
+two, while the shear `(x,y) \mapsto (x+y,y)` is not one, although that very shear
+is an arrow of the affine space the square is placed in.
+
+The square's isometry group is the dihedral group of order eight, four
+reflections and four rotations, known without asking this library; the two maps
+below are named on the corners, and every assertion about them is an assertion
+about where they carry a corner or an edge.
+"""
+
+import pytest
+
+from sage_extensions.all import *
+
+
+def _plane():
+    r"""The Euclidean plane `\mathbf{R}^2` with `dx^2 + dy^2`, and its model space."""
+    vector_space = RealVectorSpaces(2).an_object()
+    affine_space = RealVectorSpaces(2).affinization()(vector_space)
+    one, zero = RR.one(), RR.zero()
+    inner_product = vector_space.bilinear_forms(RR)([[one, zero], [zero, one]])
+    return vector_space, EuclideanSpaces().on(affine_space, inner_product)
+
+
+def _square():
+    return LatticePolygons(ZZ.free_module(2))(((-1, -1), (-1, 1), (1, 1), (1, -1)))
+
+
+def _placement(polytope, space, vector_space):
+    r"""Place ``polytope``'s points at the points of ``space`` with their coordinates."""
+    labels = tuple(vector_space.module_generating_set())
+    return Sets().Mor(polytope, space.point_set())(
+        lambda point: vector_space(
+            tuple(RR(point.to_vector()(label)) for label in labels)
+        )
+    )
+
+
+def _euclidean_arrow(space, vector_space, images):
+    r"""The arrow of ``space`` whose linear part carries the ``i``-th generator to ``images[i]``.
+
+    The affine space is canonically based, so a linear map of the model is the
+    affine map fixing the origin, and the isometry is that linear map and the
+    point map it induces.
+    """
+    labels = tuple(vector_space.module_generating_set())
+    linear_part = vector_space.Mor(vector_space)(
+        lambda label: images[labels.index(label)]
+    )
+    affine_space = space.underlying_affine_space()
+    return EuclideanSpaces().Mor(space, space)(
+        RealAffineSpaces().Mor(affine_space, affine_space)(
+            linear_part,
+            Sets().Mor(space.point_set(), space.point_set())(
+                lambda point: linear_part(point)
+            ),
+        )
+    )
+
+
+def _edge_spanning(polytope, corners):
+    r"""The edge of ``polytope``'s face object whose vertices are exactly ``corners``."""
+    coordinates = tuple(polytope.ambient_space()(corner) for corner in corners)
+    return next(
+        face
+        for face in polytope.face_poset().faces(1)
+        if all(
+            (polytope.rational_point(vertex) in coordinates) == face.contains_point(vertex)
+            for vertex in polytope.vertices()
+        )
+    )
+
+
+def test_the_euclidean_owner_decides_an_isometry_from_its_inner_product() -> None:
+    r"""The metric owner answers on a reflection, a shear and a dilation.
+
+    The reflection in the `y`-axis and the shear `(x,y) \mapsto (x+y,y)` are
+    both affine automorphisms of the plane, and only the first preserves
+    `dx^2 + dy^2`: `b(e_0 + e_1, e_0 + e_1) = 2` while `b(e_0, e_0) = 1`.  The
+    dilation by two moves every norm, so it is not an isometry either.
+    """
+    vector_space, space = _plane()
+    (first, second) = vector_space.module_generators()
+
+    assert space.is_an_isometry(
+        _euclidean_arrow(space, vector_space, (-first, second))
+    ) is True
+    assert space.is_an_isometry(_euclidean_arrow(space, vector_space, (first + second, second))) is False
+    assert space.is_an_isometry(_euclidean_arrow(space, vector_space, (first + first, second))) is False
+
+
+def test_the_euclidean_owner_states_an_inhabitant_and_refuses_a_foreign_arrow() -> None:
+    r"""The owner names one of its spaces, and decides only about its own arrows.
+
+    The line `(\mathbf{R}, dx^2)` is a Euclidean space: one-dimensional, with the
+    unit generator of norm one.  The decision at the plane is a decision about
+    the plane's own arrows, so an arrow of the plane's underlying affine space
+    is refused there rather than answered: the affine space states no metric and
+    the plane's metric is not the form of a map of it.
+    """
+    vector_space, space = _plane()
+    line = EuclideanSpaces().an_object()
+    (generator,) = line.model_vector_space().module_generators()
+
+    assert line in EuclideanSpaces()
+    assert line.model_vector_space().dimension() == 1
+    assert line.model_inner_product()(generator, generator) == RR.one()
+
+    affine_space = space.underlying_affine_space()
+    (first, second) = vector_space.module_generators()
+    linear_part = vector_space.Mor(vector_space)(lambda label: -first if label == 0 else second)
+    affine_reflection = RealAffineSpaces().Mor(affine_space, affine_space)(
+        linear_part,
+        Sets().Mor(space.point_set(), space.point_set())(lambda point: linear_part(point)),
+    )
+    with pytest.raises(ValueError):
+        space.is_an_isometry(affine_reflection)
+
+
+def test_the_placed_square_admits_its_reflection_and_it_has_order_two() -> None:
+    r"""The reflection in the `y`-axis is an arrow of the placed square, of order two.
+
+    It carries the corner `(-1,-1)` to `(1,-1)` and `(-1,1)` to `(1,1)`, so the
+    left edge goes to the right one and back, and the bottom and top edges stay.
+    Being its own inverse it is of order two, and not of order one: it moves a
+    corner of the square.
+    """
+    vector_space, space = _plane()
+    category = EuclideanPolytopesIn(space)
+    polygon = _square()
+    placed = category.on(
+        ("vertices", polygon.vertices()), _placement(polygon, space, vector_space)
+    )
+    (first, second) = vector_space.module_generators()
+    reflection = _euclidean_arrow(space, vector_space, (-first, second))
+    lower_left = vector_space((-1, -1))
+    lower_right = vector_space((1, -1))
+    upper_left = vector_space((-1, 1))
+    upper_right = vector_space((1, 1))
+    left_edge = _edge_spanning(polygon, ((-1, -1), (-1, 1)))
+    right_edge = _edge_spanning(polygon, ((1, -1), (1, 1)))
+    bottom_edge = _edge_spanning(polygon, ((-1, -1), (1, -1)))
+    top_edge = _edge_spanning(polygon, ((-1, 1), (1, 1)))
+    faces = tuple(placed.abstract_automorphisms())
+    face_map = next(
+        candidate
+        for candidate in faces
+        if candidate(left_edge) == right_edge
+        and candidate(right_edge) == left_edge
+        and candidate(bottom_edge) == bottom_edge
+    )
+
+    arrow = category.Mor(placed, placed)(reflection, face_map)
+
+    assert arrow.ambient_isometric_embedding()(lower_left) == lower_right
+    assert arrow(lower_left) == lower_right
+    assert arrow(upper_left) == upper_right
+    assert arrow(lower_right) == lower_left
+    assert (arrow * arrow)(lower_left) == lower_left
+    assert (arrow * arrow)(upper_right) == upper_right
+    assert arrow.face_poset_map()(left_edge) == right_edge
+    assert arrow.face_poset_map()(bottom_edge) == bottom_edge
+    assert arrow.face_poset_map()(top_edge) == top_edge
+
+
+def test_the_placed_square_refuses_the_shear_the_affine_lane_admits() -> None:
+    r"""The shear is no isometry, and the affine lane's answer is not the metric one.
+
+    `(x,y) \mapsto (x+y,y)` is an affine automorphism of the plane and not an
+    isometry of `dx^2 + dy^2`, so the placed Euclidean square refuses it.  The
+    same map, forgotten to the affine space the square is placed in, is an arrow
+    of the placed affine polytope on the same vertices and with the same faces'
+    map: the refusal is the metric decision and not the affine one.
+    """
+    vector_space, space = _plane()
+    category = EuclideanPolytopesIn(space)
+    polygon = _square()
+    placed = category.on(
+        ("vertices", polygon.vertices()), _placement(polygon, space, vector_space)
+    )
+    affine_space = space.underlying_affine_space()
+    affine_category = ConvexPolytopesIn(affine_space)
+    affine_placed = affine_category.on(
+        ("vertices", polygon.vertices()),
+        _placement(polygon, affine_space, vector_space),
+    )
+    (first, second) = vector_space.module_generators()
+    shear = _euclidean_arrow(space, vector_space, (first + second, second))
+    faces = tuple(placed.abstract_automorphisms())
+    left_edge = _edge_spanning(polygon, ((-1, -1), (-1, 1)))
+    right_edge = _edge_spanning(polygon, ((1, -1), (1, 1)))
+    face_map = next(
+        candidate
+        for candidate in faces
+        if candidate(left_edge) == right_edge and candidate(right_edge) == left_edge
+    )
+
+    with pytest.raises(ValueError):
+        category.Mor(placed, placed)(shear, face_map)
+
+    admitted = affine_category.Mor(affine_placed, affine_placed)(
+        space.category().forget_metric()(shear), face_map
+    )
+    assert admitted(vector_space((-1, -1))) == vector_space((-1, -2))
+    assert space.is_an_isometry(shear) is False
