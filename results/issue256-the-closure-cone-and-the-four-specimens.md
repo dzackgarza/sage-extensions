@@ -578,3 +578,29 @@ integral_affine_manifolds        OK
 while the manifold and integral-affine layers import and their four stubs closed here
 (`SingularIntegralAffineSpaces.on`, `subspace`, `IntegralAffineCollars.on`, the atlas
 morphism arrow) are exercised by tests that run.
+
+## 19. What the missing placement has to supply, read off the manifold class
+
+§18 named `TopologicalManifolds.on(underlying_space, atlas)` (`manifolds.py:959`, `pass`) as
+the last link.  It is not a body that can be filled from outside, and this records why, so
+that whoever owns the manifold layer does not have to re-derive it.
+
+`Manifolds`' `ParentMethods.__init__` (`manifolds.py:1084`) takes exactly these data:
+`engine_manifold` (the engine realization whose charts the atlas' charts are),
+`manifold_dimension`, `manifold_name`, `manifold_structure`, `differentiability_degree`
+(`None` for a topological manifold, `Infinity` for a smooth one), `manifold_field`,
+`chart_index_set` and `chart_provider`.  `_retain_manifold_structure` (`:1118`) records all
+eight and clears `_preamble_charts` and `_preamble_transitions`, which the atlas is what
+fills.
+
+So `on`'s job is to turn an exact space plus a chart atlas into those eight: the dimension
+and the structure from the atlas, the chart index set from `chart_labels()`, the provider
+from the atlas, and an engine realization *of the given space* -- which is the part that is
+not a matter of copying data across, since every existing constructor builds the engine from
+a dimension and a name (`_SageManifold(dimension, name, structure=...)`).  Filling it means
+deciding what the engine realization of a space that already exists is, and that decision is
+the manifold layer's, not this issue's.
+
+Until it is made, `SmoothManifolds()(2, "R^2")` has no chart, its points raise
+`cannot give a point of 2-dimensional smooth manifold R^2 by its coordinates: the manifold
+has no chart to read them in`, and the three surgery bodies of this issue have no specimen.
