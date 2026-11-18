@@ -875,16 +875,48 @@ class _PlacedPolytopeCategory(OwnedParameterizedCategory):
             is injective on vertices, so each of them is a permutation of the placed
             vertices in the same order.  This is a computation of the group, not its
             definition: the automorphisms are the arrows :meth:`Aut` retains.
+
+            When the ambient space publishes an isometry decision, the group
+            counted here is the isometric subgroup of that candidate group: a
+            candidate whose ambient map the space refuses is not an arrow of a
+            metric placed category, so it is not one of the arrows :meth:`Aut`
+            retains and not one of the moves whose number that group states.  The
+            candidates are enumerated rather than filtered on their generators,
+            because the isometries among a generating set of a group need not
+            generate its isometries.
             """
             underlying = self.underlying_polytope()
             position_of = underlying.vertices().ranking_map()
-            return tuple(
+            generators = tuple(
                 tuple(
                     int(position_of(element(vertex)))
                     for vertex in underlying.vertices()
                 )
                 for element in underlying.geometric_automorphisms().selected_subgroup_generators()
             )
+            space = self.ambient_space()
+            match space in EuclideanSpaces():
+                case False:
+                    return generators
+                case True:
+                    size = len(tuple(self.vertices()))
+                    candidate = PermutationGroup(
+                        [
+                            Permutation([position + 1 for position in generator])
+                            for generator in generators
+                        ]
+                    )
+                    return tuple(
+                        permutation
+                        for permutation in (
+                            tuple(
+                                int(element(position + 1)) - 1 for position in range(size)
+                            )
+                            for element in candidate
+                        )
+                        if space.is_an_isometry(self._ambient_map_of_positions(permutation))
+                        is True
+                    )
 
         def _ambient_map_of_positions(self, positions):
             r"""The ambient automorphism carrying each placed vertex to a position.
@@ -892,13 +924,20 @@ class _PlacedPolytopeCategory(OwnedParameterizedCategory):
             The linear part is the coordinate map read on the ambient model's
             generators, and the point map is that linear part applied to the
             difference from the first vertex, translated to the image of that
-            vertex.  On a lattice placement the same matrix is the lattice map, so
-            the ambient automorphism is an arrow of the lattice-compatible affine
-            space and not of the affine space alone.
+            vertex.  The arrow is built in the ambient space's own category: on a
+            lattice placement the same matrix is the lattice map, so the ambient
+            automorphism is an arrow of the lattice-compatible affine space and
+            not of the affine space alone; on a Euclidean placement it is an
+            arrow of the Euclidean space, which is an affine map of the
+            underlying affine space together with the ambient owner's decision
+            whether it preserves the metric.
             """
             linear_part, image_origin, origin = self._coordinate_affine_map(positions)
             space = self.placement_space()
-            model = space.model_vector_space()
+            affine_space = (
+                space if space in RealAffineSpaces() else space.underlying_affine_space()
+            )
+            model = affine_space.model_vector_space()
             labels = tuple(model.module_generating_set())
             rank = int(linear_part.nrows())
             assert len(labels) == rank, (
@@ -926,18 +965,18 @@ class _PlacedPolytopeCategory(OwnedParameterizedCategory):
             placed_image_origin = placed_vertices[positions[0]]
 
             def point_map(point):
-                return space.translation_action()(
-                    linear_map(space.difference(point, placed_origin)),
+                return affine_space.translation_action()(
+                    linear_map(affine_space.difference(point, placed_origin)),
                     placed_image_origin,
                 )
 
-            affine_map = RealAffineSpaces().Mor(space, space)(
+            affine_map = RealAffineSpaces().Mor(affine_space, affine_space)(
                 linear_map,
-                Sets().Mor(space.point_set(), space.point_set())(point_map),
+                Sets().Mor(affine_space.point_set(), affine_space.point_set())(point_map),
             )
             ambient_space = self.ambient_space()
-            match ambient_space in AffineSpacesWithLattice():
-                case True:
+            match ambient_space in AffineSpacesWithLattice(), ambient_space in EuclideanSpaces():
+                case (True, _):
                     lattice = ambient_space.affine_lattice()
                     lattice_labels = tuple(lattice.module_generating_set())
                     assert lattice_labels == labels
@@ -965,7 +1004,9 @@ class _PlacedPolytopeCategory(OwnedParameterizedCategory):
                     return AffineSpacesWithLattice().Mor(ambient_space, ambient_space)(
                         affine_map, lattice_map
                     )
-                case False:
+                case (False, True):
+                    return EuclideanSpaces().Mor(ambient_space, ambient_space)(affine_map)
+                case (False, False):
                     return affine_map
 
         def _face_poset_map_of_positions(self, positions):
