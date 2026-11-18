@@ -349,8 +349,10 @@ the plane-cusp coverage clause: HOLDS (1 of 1)
 ```
 
 on `6JRS`, where the driver's own verdict agrees (`coverage-6jrs.log`).  The
-kernel rows are read the same way on the next run, so the line-cusp clause no
-longer waits on 800 s of printing.
+kernel row now reading it is `Otilde+`, started at 08:06:14 with 7 582 MiB of
+MemAvailable (`fresh.log`, `row-Otilde+-coverage.log`): its coverage clauses
+print a minute after its relation, so the clause no longer waits on the 800 s of
+printing that the host's killer has taken every previous attempt inside.
 
 **Why the counts have to be computed and cannot be extrapolated.**  The edge
 count is not a fixed multiple of the plane count.  On `U + U(2) + <-2>` both
