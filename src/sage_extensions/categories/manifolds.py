@@ -1403,8 +1403,9 @@ class SmoothManifoldMor(CategoricalMor):
     """
 
     class ElementMethods:
-        def __init__(self, parent, representations):
+        def __init__(self, parent, representations, domains):
             self._representations = representations
+            self._representation_domains = domains
             self._map_of_points = Sets().Mor(parent.domain(), parent.codomain())(
                 lambda point: self._evaluate_point(point)
             )
@@ -1421,8 +1422,19 @@ class SmoothManifoldMor(CategoricalMor):
             r"""The coordinates of the target chart ``target_label``, as sections on the source chart ``source_label``."""
             return self._representations[source_label, target_label]
 
+        def chart_map_domain(self, source_label, target_label):
+            r"""The sections on the source chart whose common nonvanishing locus is where the representation holds.
+
+            A coordinate representation need not hold on the whole of its
+            source chart: the map it states is defined where the sections it was
+            obtained from do not vanish -- a change of coordinates is defined on
+            the overlap of two charts, and the representation restated through it
+            holds there.  The empty family is the whole chart.
+            """
+            return self._representation_domains[source_label, target_label]
+
         def _representation_at(self, source_label):
-            r"""The target chart and the representation on the source chart ``source_label``, or ``None`` when the map is written on another chart."""
+            r"""The target chart, the representation and its domain on the source chart ``source_label``, or ``None`` when the map is written on another chart."""
             pairs = tuple(
                 pair for pair in self._representations.keys() if pair[0] == source_label
             )
@@ -1434,10 +1446,14 @@ class SmoothManifoldMor(CategoricalMor):
             if not pairs:
                 return None
             written_source, target_label = pairs[0]
-            return target_label, self.chart_map(written_source, target_label)
+            return (
+                target_label,
+                self.chart_map(written_source, target_label),
+                self.chart_map_domain(written_source, target_label),
+            )
 
         def _representation_on(self, source_label):
-            r"""The target chart and the representation the map has on the source chart ``source_label``."""
+            r"""The target chart, the representation and its domain that the map has on the source chart ``source_label``."""
             representation = self._representation_at(source_label)
             assert representation is not None, (
                 f"cannot read {self} on the chart {source_label!r}: the map has no coordinate "
@@ -1452,12 +1468,11 @@ class SmoothManifoldMor(CategoricalMor):
             A map written on the chart ``m'`` of its domain is the same map read in
             the chart ``m``, wherever the coordinate change ``m -> m'`` is defined:
             ``f_{mt} = f_{m't} o (phi_{m'} o phi_m^{-1})``, and the change is the
-            atlas transition from ``m`` to ``m'``.  The restatement is a
-            coordinate representation on a whole chart only where that change is
-            defined on the whole of ``m``, which the atlas states by an empty
-            overlap; a change defined on a proper subset is not used here,
-            because a representation states a map on a whole chart and nothing
-            records the subset it would hold on.
+            atlas transition from ``m`` to ``m'``.  The restated representation
+            holds where that change does, which the atlas states by the
+            transition's source overlap, and where the representation on ``m'``
+            already held, read through the same change; both are carried as the
+            restated representation's domain.
             """
             written = self._representation_at(source_label)
             if written is not None:
@@ -1474,24 +1489,23 @@ class SmoothManifoldMor(CategoricalMor):
                 f"chart {source_label!r} to one of them"
             )
             alternative_label = changes[0][1]
-            target_label, expressions = self._representation_on(alternative_label)
+            target_label, expressions, domain = self._representation_on(alternative_label)
             change = self.domain().transition(source_label, alternative_label)
-            assert not tuple(change.source_overlap()), (
-                f"cannot restate {self} on the chart {source_label!r}: its change of "
-                f"coordinates to the chart {alternative_label!r} is defined only where "
-                f"{tuple(change.source_overlap())} do not vanish, and a coordinate "
-                f"representation here states a map on a whole chart"
-            )
-            return target_label, tuple(
-                _raise_manifold_expression(
-                    _engine_manifold_expression(section),
-                    self.domain().atlas()[source_label],
+            source = self.domain().atlas()[source_label]
+            alternative = self.domain().atlas()[alternative_label]
+
+            def restated(sections):
+                return tuple(
+                    _raise_manifold_expression(_engine_manifold_expression(section), source)
+                    for section in _substitute_chart_coordinates(
+                        sections, alternative, change.forward_expressions()
+                    )
                 )
-                for section in _substitute_chart_coordinates(
-                    expressions,
-                    self.domain().atlas()[alternative_label],
-                    change.forward_expressions(),
-                )
+
+            return (
+                target_label,
+                restated(expressions),
+                tuple(change.source_overlap()) + restated(domain),
             )
 
         def _evaluate_point(self, point):
@@ -1505,8 +1519,14 @@ class SmoothManifoldMor(CategoricalMor):
             target chart.
             """
             source_point = self.domain()(point)
-            target_label, representation = self._representation_on(
-                source_point.chart().label()
+            label = source_point.chart().label()
+            target_label, representation, where = self._representation_on(label)
+            field = self.domain().coordinate_field()
+            decisions = tuple(ask(section(source_point) != field.zero()) for section in where)
+            assert all(decision is True for decision in decisions), (
+                f"cannot evaluate {self} at {source_point}: its representation on the chart "
+                f"{label!r} is stated where {tuple(where)} do not vanish, and one of them "
+                f"vanishes there or its value is undecided"
             )
             values = tuple(section(source_point) for section in representation)
             return self.codomain().point(values, target_label)
@@ -1539,18 +1559,31 @@ class SmoothManifoldMor(CategoricalMor):
                 f"first map is not the domain {self.domain()} of the second"
             )
             representations = {}
+            domains = {}
             for source_label, middle_label in other.chart_maps().keys():
                 inner = other.chart_map(source_label, middle_label)
-                target_label, outer = self._representation_written_on(middle_label)
+                inner_domain = other.chart_map_domain(source_label, middle_label)
+                target_label, outer, outer_domain = self._representation_written_on(
+                    middle_label
+                )
                 source = other.domain().atlas()[source_label]
                 middle = self.domain().atlas()[middle_label]
-                representations[source_label, target_label] = tuple(
-                    _raise_manifold_expression(_engine_manifold_expression(section), source)
-                    for section in _substitute_chart_coordinates(outer, middle, inner)
-                )
-            return other.domain().Mor(self.codomain())(representations)
 
-    def _element_constructor_(self, representations):
+                def written(sections):
+                    return tuple(
+                        _raise_manifold_expression(
+                            _engine_manifold_expression(section), source
+                        )
+                        for section in _substitute_chart_coordinates(sections, middle, inner)
+                    )
+
+                representations[source_label, target_label] = written(outer)
+                domains[source_label, target_label] = tuple(inner_domain) + written(
+                    outer_domain
+                )
+            return other.domain().Mor(self.codomain())(representations, domains=domains)
+
+    def _element_constructor_(self, representations, *, domains=None):
         r"""Return the smooth map whose coordinate representations are ``representations``.
 
         ``representations`` maps a pair ``(s, t)`` of chart labels to the tuple
@@ -1561,10 +1594,21 @@ class SmoothManifoldMor(CategoricalMor):
         off the representation on the chart the point is given in.  The caller
         states that the source charts cover the domain: no finite set of charts
         is decided to cover a manifold here.
+
+        ``domains`` maps a pair to the sections of that same source chart whose
+        common nonvanishing locus is where the representation holds; a pair it
+        omits holds on the whole chart.
         """
         domain = self.domain()
         codomain = self.codomain()
+        domains = {} if domains is None else dict(domains)
+        assert set(domains) <= set(representations), (
+            f"cannot give the domain of a coordinate representation of a map "
+            f"{domain} -> {codomain} that is not stated: {tuple(domains)} are not among "
+            f"the chart pairs {tuple(representations)}"
+        )
         admitted = {}
+        admitted_domains = {}
         for pair, expressions in representations.items():
             source_label, target_label = pair
             assert source_label in tuple(domain.chart_labels()), (
@@ -1595,6 +1639,14 @@ class SmoothManifoldMor(CategoricalMor):
                 f"were given"
             )
             admitted[pair] = values
+            admitted_domains[pair] = _admit_manifold_expression_family(
+                domains.get(pair, ()),
+                domain.atlas()[source_label],
+                name=(
+                    f"Domain of the coordinate representation {source_label} to "
+                    f"{target_label} of a smooth map to {codomain}"
+                ),
+            )
         assert admitted, (
             f"cannot construct a smooth map {domain} -> {codomain} that states no "
             f"coordinate representation: its value at every point would be unstated"
@@ -1606,6 +1658,12 @@ class SmoothManifoldMor(CategoricalMor):
                 pairs,
                 lambda pair: admitted[pair],
                 name=f"Coordinate representations of a smooth map {domain} -> {codomain}",
+            ),
+            indexed_family(
+                pairs,
+                lambda pair: admitted_domains[pair],
+                name=f"Domains of the coordinate representations of a smooth map "
+                f"{domain} -> {codomain}",
             ),
         )
 
