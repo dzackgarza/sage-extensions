@@ -783,6 +783,12 @@ class OrthogonalCharacterQuotient:
         parent-bound chains are instant at the Enriques size, while the direct
         product's own chain is the bottleneck.  No image element is listed; no
         ambient-order substitution.
+
+        With the discriminant factor alone the whole question is the order of
+        ``rho(O(L))`` itself, and that one fact is asked of the lattice
+        (:meth:`discriminant_image_order`), which answers it from the finite
+        discriminant form when a theorem states the image and so asks for no
+        generating family of ``O(L)``.
         """
         from itertools import product as _product_tuples
 
@@ -795,6 +801,8 @@ class OrthogonalCharacterQuotient:
         sign_labels = [
             label for label in self._image_labels if label != "discriminant"
         ]
+        if self._has_discriminant and not sign_labels:
+            return self.discriminant_image_order()
         ambient = self._ambient_generators()
         if not self._has_discriminant:
             # Sign-only quotient: the joint image lives in C2^m itself; build it
@@ -826,8 +834,6 @@ class OrthogonalCharacterQuotient:
         rho_images = list(self.ambient_discriminant_images())
         im_rho = libgap.Subgroup(engine, rho_images)
         ambient_order = int(libgap.Order(im_rho))
-        if not sign_labels:
-            return ambient_order
         # sign value (+1/-1) of each ambient generator per sign factor
         ring = self.lattice.base_ring()
         factor_values = []
@@ -845,6 +851,30 @@ class OrthogonalCharacterQuotient:
             factor_values.append(values)
         j, _labels = self._sign_descent_rank()
         return ambient_order * (1 << j)
+
+    @cached_method
+    def discriminant_image_order(self) -> int:
+        r"""``|rho(O(L))|``: the finite group's own order when a theorem states the image.
+
+        Nikulin, *Integral symmetric bilinear forms and some of their
+        applications*, Math. USSR-Izv. 14 (1980), Theorem 3.6.3, makes ``rho``
+        surjective for an even, indefinite, nondegenerate 2-elementary lattice,
+        and then the order of the image is the order of ``O(A_L, q_L)`` itself,
+        which the discriminant form supplies.  The certificate is the
+        lattice's own
+        (:meth:`sage_extensions.categories.lattices.Lattices.ParentMethods.discriminant_representation_is_surjective_by_theorem`),
+        and it is what makes this order readable without a generating family of
+        ``O(L)``.  Every other lattice keeps the generated-image route: ``rho``
+        on the selected generating family of ``O(L)``, and the order of the
+        subgroup those images generate.
+        """
+        if self.lattice.discriminant_representation_is_surjective_by_theorem() is True:
+            return int(self._discriminant_group.cardinality())
+        from sage_extensions.categories.group.groups import _gap_model
+
+        engine = _gap_model(self._discriminant_group)
+        images = list(self.ambient_discriminant_images())
+        return int(libgap.Order(libgap.Subgroup(engine, images)))
 
     @cached_method
     def _joint_discriminant_image_gap(self):
@@ -899,6 +929,15 @@ class OrthogonalCharacterQuotient:
         # can make it smaller.  Every kernel row whose preimage targets are trivial --
         # ``Otilde``, ``SOtilde``, ``Otilde^+`` and ``SOtilde^+`` -- is this case.
         if int(libgap.Size(target_meet)) == 1:
+            return target_meet
+        if not (self.determinant_kernel or self.spinor_kernel) and (
+            self.lattice.discriminant_representation_is_surjective_by_theorem() is True
+        ):
+            # No sign factor: ``K_0`` is the whole of ``O(L)``, and ``rho`` is
+            # onto by the lattice's certificate, so ``rho(K_0)`` is the whole of
+            # ``O(A_L)`` and the meet with it changes nothing.  The targets'
+            # meet is already ``T_tot``, and no ambient generator image is read
+            # for it.
             return target_meet
         if self.determinant_kernel and self.spinor_kernel:
             raise NotImplementedError(

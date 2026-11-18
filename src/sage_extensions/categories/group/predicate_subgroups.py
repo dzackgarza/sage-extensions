@@ -513,6 +513,27 @@ class PredicateSubgroups(OwnedParameterizedCategory):
                 )
             return OrthogonalCharacterQuotient(self)
 
+        def index(self):
+            r"""``[G : self]`` from the finite character image, when the characters cut ``self`` out.
+
+            Complete finite-character data state ``self = chi^-1(S)`` for the
+            joint character map ``chi = (rho, det, sn)`` into a finite product,
+            so the cosets of ``self`` in ``G`` are in bijection with the cosets
+            of ``S`` in ``chi(G)`` and the index is the quotient of the two
+            finite orders that the retained character data supply
+            (``OrthogonalCharacterQuotient.index``).  Neither order enumerates
+            an element of the image, so this route answers for a subgroup whose
+            coset space is far beyond enumeration -- the discriminant kernel of
+            ``T_Co`` has ``46998591897600`` cosets.
+
+            A subgroup with no such certificate keeps the generic route
+            (``Subgroups.ParentMethods.index``), which realizes ``G/self`` as a
+            coset space and counts it.
+            """
+            if self.contains_character_kernel():
+                return self.finite_character_quotient().index()
+            return super().index()
+
         @cached_method
         def discriminant_image(self):
             r"""``rho(self)`` in ``O(A_L)``, exactly, from the retained character data.

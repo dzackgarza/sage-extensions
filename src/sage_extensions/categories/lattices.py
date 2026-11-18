@@ -4334,6 +4334,41 @@ class Lattices(OwnedCategoryOverBaseRing):
             )
 
         @cached_method
+        def discriminant_representation_is_surjective_by_theorem(self):
+            r"""Whether :math:`\rho_L\colon O(L)\to O(A_L,q_L)` is onto, from a theorem on :math:`L`.
+
+            Nikulin, *Integral symmetric bilinear forms and some of their
+            applications*, Math. USSR-Izv. 14 (1980), 103--167,
+            Theorem 3.6.3: for an even, indefinite, nondegenerate
+            2-elementary lattice the quadratic discriminant representation is
+            surjective.  The four hypotheses are decided from the Gram matrix
+            alone -- evenness (:meth:`is_even`), the inertia (:meth:`definiteness`),
+            the nonvanishing of the Gram determinant (:meth:`is_nondegenerate`)
+            and the exponent two of :math:`A_L` (:meth:`is_p_elementary`) -- so
+            on this class the order of the discriminant image is the order of
+            the finite group :math:`O(A_L,q_L)` itself, read from the
+            discriminant form, and no generating family of :math:`O(L)` is
+            asked for.
+
+            ``True`` is that certificate; every other lattice answers the
+            undecided proposition.  A lattice outside the class need not have a
+            non-surjective representation -- :math:`A_2` is outside it and onto
+            -- so the negative is not decided here, and a caller that needs the
+            negative keeps the computed route of
+            :meth:`discriminant_representation_is_surjective`.
+            """
+            proposition = AtomicProposition(
+                "discriminant_representation_is_surjective_by_theorem", self
+            )
+            if self.is_even() is not True or self.is_nondegenerate() is not True:
+                return proposition
+            if self.is_p_elementary(self.base_ring()(2)) is not True:
+                return proposition
+            if self.definiteness() != "indefinite":
+                return proposition
+            return True
+
+        @cached_method
         def stable_orthogonal_group(self):
             r"""Return \(\tilde O(L)=\ker(O(L)\to O(A_L))\), the stable orthogonal group.
 
