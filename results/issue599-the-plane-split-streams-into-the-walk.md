@@ -401,6 +401,30 @@ may therefore be pooled across them: `Otilde+`'s count has to be measured on the
 current tree, which is what the last two attempts were doing when the host took
 them.
 
+**The sixth attempt's rate and the peak it projects.**  Read off its own marks
+(`row-Otilde+-coverage3.log`, split marks every 10 000 planes and relation marks
+every 10 000 records):
+
+| band | planes a minute | KB a plane |
+| --- | ---: | ---: |
+| 20 000 -> 30 000 | 2 963 | 20.0 |
+| 50 000 -> 60 000 | 4 584 | 18.7 |
+| 90 000 -> 100 000 | 7 026 | 19.4 |
+| 130 000 -> 140 000 | 4 743 | 10.5 |
+| 160 000 -> 170 000 | 6 912 | 20.9 |
+| **20 000 -> 180 000** | **5 852** | **19.0** |
+
+so the split is **5 852 planes a minute and 19.0 KB a plane** over its steady band,
+and the relation **524 records a second and 1.48 KB a record** (10 000 -> 150 000
+records).  Projected to the row: split ends at **4 255 MiB** at 189 720 planes,
+relation ends at **5 156 MiB** at 569 160 records, so one attempt wants about
+**50 minutes of unbroken host and ~5.2 GiB** -- 1.3x the 4 GiB clause, and inside
+the 3 400-5 490 MiB band in which this host has killed the five earlier attempts.
+
+The 188 planes a minute quoted for the 20 000-plane mark is the *slowest* band of
+this attempt (2 676 a minute at the 10 000 -> 20 000 mark under load) and is not
+the rate the attempt spends its window at; the steady band is 30 times that.
+
 **Why the counts have to be computed and cannot be extrapolated.**  The edge
 count is not a fixed multiple of the plane count.  On `U + U(2) + <-2>` both
 kernel rows decide **4 edges over 3 line cusps and 2 plane cusps** -- two edges a
