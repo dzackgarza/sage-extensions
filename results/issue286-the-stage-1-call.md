@@ -224,7 +224,7 @@ the run's: the port's generator search is not deterministic (330, 331, 335, 343,
 | 2 | the group rows by their constructions, `R_{Γ^K_En} = O(T_Co)` | indices `1` and `2·|O(q)|`, the page's |
 | 3 | the call on `T_Co` under `O(T_Co)`, with incidence | 1 line orbit, 1 plane orbit, 1 edge |
 | 4 | the known-answer comparisons | all ten rows are the cards' |
-| 5 | the kernel rows on `T_Co` | both line rows **527**; the plane rows are 189 720 planes each and are **blocked on the host** — see the section below |
+| 5 | the kernel rows on `T_Co` | line rows **527** each; the `Õ` plane row **189 720 cusps** (36.2 min, 3 476 MiB); the `Õ⁺` plane row is running |
 | 6 | `O(T_Co)` generators | return, 359 in 27.0 s, port `991b88b0` |
 
 ### The index over each finite class
@@ -265,8 +265,20 @@ a reader asks for `representative()`, and
 `#588`'s retention repair (`#592`, `#593`) is stated on the first: the span row
 falls from 12.29 GiB to 2.0 GiB at that length.
 
-Both instruments were then run on this host, each sampled every 30 s, and the
-host killed both:
+The `Õ(T_Co)` row, on the cusp instrument and alone on the host, **returns**:
+
+```
+[Otilde cusps] built in 2171.0 s, peak 3476.4 MiB
+[Otilde cusps] counted 189720 cusps in 0.0 s, peak 3476.4 MiB
+[Otilde cusps] a cusp's representative: rank 2, primitive True
+```
+
+189 720 cusps in 36.2 minutes at a 3 476 MiB peak, each cusp answering
+`representative()` with a rank-two primitive isotropic plane of `T_Co` — the
+count `#390` returned, now measured here on the cusp form of the same row, and
+the index over the single `O(T_Co)`-class is 189 720.
+
+Earlier attempts, each sampled every 30 s, show where the host's limit sits:
 
 | row | peak | wall | outcome |
 | --- | ---: | ---: | --- |
