@@ -242,12 +242,18 @@ def transport_violation(lattice, subgroup, incidence) -> str | None:
     return containment_violation(lattice, moved, incidence.plane_cusp().representative())
 
 
-def edge_violation(lattice, subgroup, incidence) -> tuple[str | None, tuple, tuple]:
-    r"""Audit an edge, retaining its coordinates but not its flag."""
+def edge_violation(lattice, subgroup, incidence, *, include_coordinates=False):
+    r"""Audit an edge, retaining coordinates only for a requested log sample.
+
+    The full kernel relation contains 569160 edges.  Computing the coordinates
+    of every certified flag is unnecessary to test its exact containment and
+    subgroup transporters; only sampled flags need those coordinates printed.
+    The complete mathematical checks and release of each flag are unchanged.
+    """
     try:
         line, plane = incidence.flag().terms()
-        line_coordinates = _coordinates(line)
-        plane_coordinates = _coordinates(plane)
+        line_coordinates = _coordinates(line) if include_coordinates else None
+        plane_coordinates = _coordinates(plane) if include_coordinates else None
         violation = containment_violation(lattice, line, plane)
         if violation is not None:
             return violation, line_coordinates, plane_coordinates
@@ -476,7 +482,8 @@ def row_contract(lattice, subgroup, label, lines, planes, incidences, route) -> 
             violation = divided_class_violation(incidence, keys)
         else:
             violation, line_coordinates, plane_coordinates = edge_violation(
-                lattice, subgroup, incidence
+                lattice, subgroup, incidence,
+                include_coordinates=(position < 3 or position >= len(incidences) - 3),
             )
         if violation is None and pair in retained_pairs:
             violation = (
