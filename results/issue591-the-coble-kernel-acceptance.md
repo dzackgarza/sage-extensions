@@ -403,3 +403,13 @@ two-fold and four-fold products inside it, and the conjugation stage reporting
 `isometries outside Gamma that move a level-four class out of the span: 0` for all ten
 isometries. Measured at load 35: `exit 0`, 8 min 37 s wall; the arithmetic is exact
 integers and no engine is loaded.
+
+Why no reflection word escapes the 54, as an argument rather than a sample. The classes of
+the 56 reflections are a basis of the level-two class space, so a word in reflections lies
+in `\Gamma(4)` exactly when its class sum vanishes; modulo `\Gamma(8)` such a word reduces to
+a product of commutators and squares of the generators, and squares of reflections are the
+identity. Hence every reflection word's level-four class is a sum of commutators of the
+basis classes, which is the 54-dimensional span computed above — reached by 1540
+commutators, and not exceeded by two-fold words, four-fold words, ten conjugations, or the
+3182 unit vectors across 56 classes that were searched for a vanishing three-fold class sum
+(none exists: a sum of two distinct basis classes is not a reflection class).
