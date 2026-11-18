@@ -43,25 +43,45 @@ def _placement(polytope, space, vector_space):
     )
 
 
-def _euclidean_arrow(space, vector_space, images):
+def _euclidean_arrow(space, vector_space, images, offset=None):
     r"""The arrow of ``space`` whose linear part carries the ``i``-th generator to ``images[i]``.
 
     The affine space is canonically based, so a linear map of the model is the
     affine map fixing the origin, and the isometry is that linear map and the
-    point map it induces.
+    point map it induces; ``offset`` translates that point map, so the map is
+    `x \\mapsto A x + t` with `t` the offset.
     """
     labels = tuple(vector_space.module_generating_set())
     linear_part = vector_space.Mor(vector_space)(
         lambda label: images[labels.index(label)]
     )
     affine_space = space.underlying_affine_space()
+    if offset is None:
+        point_map = lambda point: linear_part(point)
+    else:
+        point_map = lambda point: space.translation_action()(linear_part(point), offset)
     return EuclideanSpaces().Mor(space, space)(
         RealAffineSpaces().Mor(affine_space, affine_space)(
             linear_part,
-            Sets().Mor(space.point_set(), space.point_set())(
-                lambda point: linear_part(point)
-            ),
+            Sets().Mor(space.point_set(), space.point_set())(point_map),
         )
+    )
+
+
+def _circle(space, center, radius):
+    r"""The round circle of ``space`` with this centre and radius, as a selected sphere."""
+    inner_product = space.model_inner_product()
+    points = space.point_set()
+    return SphericalSpaces().in_space(
+        space,
+        center,
+        radius,
+        points.condition_set(
+            lambda point: inner_product(
+                space.difference(point, center), space.difference(point, center)
+            )
+            == radius * radius
+        ).inclusion(),
     )
 
 
@@ -321,3 +341,93 @@ def test_a_face_of_a_placed_euclidean_polytope_answers_its_own_group() -> None:
     assert lift.ambient_map()(lower_left) == lower_right
     assert lift.ambient_map()(lower_right) == lower_left
     assert placed.geometric_lifts_of_face_automorphism(reflection, placed_left) is None
+
+
+def test_the_spherical_owner_decides_an_isometry_both_ways() -> None:
+    r"""The round circle's decision is the circle's, and not the plane's.
+
+    A half-turn about the centre is an isometry of the circle.  A half-turn about
+    the point `(1,0)` is a Euclidean isometry which carries the circle to another
+    one, so the plane admits it and the circle refuses it: that is the check no
+    affine or Euclidean decision stands in for.  The shear is neither.
+    """
+    vector_space, space = _plane()
+    (first, second) = vector_space.module_generators()
+    centre = space.an_element()
+    circle = _circle(space, centre, RR.one())
+    about_centre = SphericalSpaces().Mor(circle, circle)(
+        _euclidean_arrow(space, vector_space, (-first, -second))
+    )
+    about_one = SphericalSpaces().Mor(circle, circle)(
+        _euclidean_arrow(
+            space, vector_space, (-first, -second), offset=vector_space((2, 0))
+        )
+    )
+    shear = SphericalSpaces().Mor(circle, circle)(
+        _euclidean_arrow(space, vector_space, (first + second, second))
+    )
+
+    assert circle.radius() == RR.one()
+    assert circle.center() == centre
+    assert circle.point_set()(vector_space((1, 0))) in circle.point_set()
+    assert circle.is_an_isometry(about_centre) is True
+    assert space.is_an_isometry(about_one.ambient_isometry()) is True
+    assert circle.is_an_isometry(about_one) is False
+    assert circle.is_an_isometry(shear) is False
+
+
+def test_the_placed_circle_diamond_answers_its_eight_isometries() -> None:
+    r"""The diamond on the unit circle: the dihedral group of order eight.
+
+    `\operatorname{conv}\{(1,0),(0,1),(-1,0),(0,-1)\}` placed on the unit circle
+    has the four reflections and the four rotations of the square as its
+    isometries, and each of the eight is an arrow of the placed spherical
+    polytope, admitted by the circle's decision.  The reflection in the `x`-axis
+    is one of them and is of order two; the shear is no isometry of the circle
+    and is refused there, though it is an affine automorphism of the plane.
+    """
+    vector_space, space = _plane()
+    (first, second) = vector_space.module_generators()
+    centre = space.an_element()
+    circle = _circle(space, centre, RR.one())
+    category = SphericalGeodesicPolytopesIn(circle)
+    diamond = LatticePolygons(ZZ.free_module(2))(
+        ((1, 0), (0, 1), (-1, 0), (0, -1))
+    )
+    placed = category.on(
+        ("vertices", diamond.vertices()),
+        Sets().Mor(diamond, circle.point_set())(
+            lambda point: circle.point_set()(
+                vector_space(
+                    tuple(
+                        RR(point.to_vector()(label))
+                        for label in vector_space.module_generating_set()
+                    )
+                )
+            )
+        ),
+    )
+    east = vector_space((1, 0))
+    north = vector_space((0, 1))
+    south = vector_space((0, -1))
+    geometric = placed.geometric_automorphisms()
+    elements = tuple(geometric)
+    reflection = next(
+        element
+        for element in elements
+        if element(east) == east and element(north) == south and element(south) == north
+    )
+
+    assert geometric.order() == 8
+    assert all(circle.is_an_isometry(element.ambient_map()) is True for element in elements)
+    assert (reflection * reflection)(east) == east
+    assert reflection(north) == south
+    assert reflection(east) == east
+
+    with pytest.raises(ValueError):
+        category.Mor(placed, placed)(
+            SphericalSpaces().Mor(circle, circle)(
+                _euclidean_arrow(space, vector_space, (first + second, second))
+            ),
+            placed.face_poset().Aut().one(),
+        )
