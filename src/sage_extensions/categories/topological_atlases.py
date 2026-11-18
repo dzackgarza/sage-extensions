@@ -203,3 +203,10 @@ class TopologicalAtlases(OwnedCategory):
 
         def topological_manifold(self):
             pass
+
+        def _repr_(self):
+            r"""An atlas is named by the charts it selects and the space they chart."""
+            return (
+                f"Topological atlas of the charts {tuple(self._charts)} on "
+                f"{self.underlying_topological_space()}"
+            )

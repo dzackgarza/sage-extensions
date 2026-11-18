@@ -231,6 +231,13 @@ class RealCkAtlases(OwnedParameterizedCategory):
             r"""Decide whether the selected chart domains cover the manifold."""
             pass
 
+        def _repr_(self):
+            r"""A C^k atlas is named by the charts it selects, their class and the manifold they chart."""
+            return (
+                f"C^{self.category().degree()} atlas of the charts {tuple(self._charts)} on "
+                f"{self.underlying_topological_manifold()}"
+            )
+
         def transitions_are_ck(self):
             r"""Decide whether overlap maps are ``C^k`` diffeomorphisms."""
             pass
