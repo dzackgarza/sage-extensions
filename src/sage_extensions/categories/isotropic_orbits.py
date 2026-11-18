@@ -575,8 +575,14 @@ class RationalIsotropicFlagComplex:
         raise ArithmeticError(f"the face {face} lies in no listed orbit of {self._group}")
 
     def stabilizer_generators(self, flag):
-        r"""Return generators of the setwise stabilizer of a simplex."""
-        return self._group.isotropic_stabilizer_generators(flag, flag=True)
+        r"""Generators of the stabilizer of this simplex in the *given* group.
+
+        The generic group action owns Stab_Gamma(flag), including an
+        arithmetic subgroup Gamma specified as a finite preimage. Calling
+        O(L).isotropic_stabilizer_generators instead would return the
+        larger ambient stabilizer and lose the quotient's subgroup.
+        """
+        return self._group.stabilizer(flag).group_generators()
 
     def face_stabilizer_image(self, flag, index):
         r"""Return the image of the stabilizer of ``flag`` in the stabilizer of its face.

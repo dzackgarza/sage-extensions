@@ -23,6 +23,11 @@ def test_congruence_three_splits_primitive_null_line_flags():
     assert all(gamma.isotropic_equivalence_witness(flag, flag, flag=True) in gamma for flag in flags)
     assert gamma.isotropic_equivalence_witness(flags[0], flags[1], flag=True) is None
     assert gamma.isotropic_equivalence_witness(flags[1], flags[0], flag=True) is None
+    for flag in flags:
+        stabilizer = tuple(complex_.stabilizer_generators(flag))
+        assert all(g in gamma and
+                   flag.top().inclusion().is_in_image(g(flag.isotropic_basis()[0]))
+                   for g in stabilizer)
     line_keys = {
         tuple(abs(int(v.to_vector()(label))) for label in lattice.module_generating_set())
         for flag in flags for v in flag.isotropic_basis()
