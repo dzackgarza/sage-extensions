@@ -386,6 +386,21 @@ gone inside 35-45 minutes whatever the attempt's own size.  That is the input
 this clause is waiting on, and it is a host rather than a change of mine -- the
 one-pass walk would cut the row to ~1.5 GiB but not to under an hour.
 
+**The `Otilde+` row was restated under the attempts.**  Commit `bebcacc`
+("expose certified Coble stable kernel generating resolutions", another issue's
+work, on `main` at 07:38) changed the incidence driver's `Otilde+` row from
+`stable_orthogonal_group().intersection(O_plus())` to
+`stable_positive_orthogonal_group()`, and changed
+`stable_orthogonal_group_generators()` to return 56 certified parabolic
+generators.  The subgroup is the same group --
+`stable_positive_orthogonal_group()` is that same intersection plus a supplied
+generating family (`lattices.py:4619-4641`) -- so the row's mathematics and its
+189 720 planes are unchanged, but its *route* can differ, and the first three of
+the five killed attempts above ran against the pre-`bebcacc` family.  No count
+may therefore be pooled across them: `Otilde+`'s count has to be measured on the
+current tree, which is what the last two attempts were doing when the host took
+them.
+
 **Why the counts have to be computed and cannot be extrapolated.**  The edge
 count is not a fixed multiple of the plane count.  On `U + U(2) + <-2>` both
 kernel rows decide **4 edges over 3 line cusps and 2 plane cusps** -- two edges a
