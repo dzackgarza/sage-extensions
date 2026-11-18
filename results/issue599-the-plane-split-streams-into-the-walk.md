@@ -245,6 +245,23 @@ allocator need not return their pages, and the per-entry word grows with the
 double coset reached, which is why the row's last bands sit at 18 KB a plane
 while the first 200 planes' registry is 9.2.
 
+**A release inside the relation cannot lower the peak, and the 4 GiB clause
+therefore needs the split fused into the walk.**  The row's peak is reached at the
+*end of the split*, before the relation reads a single plane: every one of the
+189 720 lifts has to exist at once for the walk to compose each plane's action
+(`registered_isotropic_lift`, `predicate_subgroups.py:1295` and `:1342`), so
+dropping a plane's lift after its edges are made reclaims memory that has already
+been paid, not the peak.  Lowering the peak is the one-pass shape -- the walk
+drawing the split as it goes, holding one lift at a time -- and that is a
+redesign of `tits_building_incidence_by_divided_classes`
+(`predicate_subgroups.py:1177-1420`), not a release at
+`predicate_subgroups.py:1344`.  It is also why the certificate route and the
+witness machinery make a *consumer-side* release unsound rather than merely slow:
+they read the registry after the class route (`predicate_subgroups.py:1066`,
+`orthogonal_quotients.py:4373-4374`), and
+`tests/lattices/test_the_incidence_decided_by_divided_classes.sage:163` runs the
+two routes on one quotient.
+
 **Why the counts have to be computed and cannot be extrapolated.**  The edge
 count is not a fixed multiple of the plane count.  On `U + U(2) + <-2>` both
 kernel rows decide **4 edges over 3 line cusps and 2 plane cusps** -- two edges a
