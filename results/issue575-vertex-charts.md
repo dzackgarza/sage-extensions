@@ -290,3 +290,38 @@ Run, gates on, on this tree: `4 passed in 57.47 s` -- the two oracles at
 `40.86 s` at load average `31.9` on four CPUs.  The call ceiling is over for the
 specimen test again; that is the environmental line of round 4, unchanged.
 
+## Round 7, 2026-11-18: the call ceiling, named blocked
+
+The one open line is the specimen test's call at
+`tests/schemes/test_sterk_polygon_vertex_charts.sage:165` against
+`src/sage_extensions/testing/suite_budget.py:44` (`7.26 s` idle, `28-180 s` under
+co-tenancy).  This round pinned what it would take, and it is not this issue's
+to take.
+
+The cost is not an eager verification pass that could be deferred: the glued
+scheme's overlaps *are* the pair transitions.  `overlap(source, target)` is
+`transition_between(source, target).forward().domain()`
+(`categories/schemes/gluing.py:1037-1038`), `transition_between` reads
+`self._transitions[pair]` from the family `_toric_variety` supplies
+(`categories/schemes/toric/toric_schemes.py:2259-2264`), and the datum resolves
+both directions of every pair at `gluing.py:954-957` before it verifies them at
+`:965-966`.  So a seventeen-chart atlas costs its 136 pair isomorphisms to be
+*built*, not merely checked, and dropping that cost means changing what a glued
+scheme resolves at construction -- a decision in `gluing.py`, a file this issue
+does not own (its recorded history names #593, #541 and #592, and none of them
+owns this).
+
+Named, not substituted: the input this needs is that owner's decision on whether
+a glued scheme may resolve its atlas after construction.  No proxy was made --
+the test was not trimmed, no `--no-time-gates` was used, and the ceiling was not
+raised.
+
+### The acceptance, as it stands
+
+* item 1, the vertex-to-cone-to-atlas join: met.
+* item 2, the Sterk2 polygon from the native lengths: met.
+* item 3, the specimen through that constructor: met.
+
+The open line above is outside those three items: it is the host's ceiling on
+one test's call, not a claim of the acceptance.
+
