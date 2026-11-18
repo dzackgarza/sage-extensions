@@ -52,6 +52,30 @@ def test_a_hyperbolic_arrow_moves_a_point_by_the_isometry_that_induces_it() -> N
     assert reflection(reflection(point)) == point
 
 
+def test_an_arrow_of_hyperbolic_spaces_may_have_a_different_codomain() -> None:
+    r"""An arrow ``HH(C^+) -> HH(-C^+)`` is read in the codomain's own frame.
+
+    The two components of ``{q > 0}`` are different hyperbolic spaces, and the
+    chart of the second is written from its own timelike vector ``-t``: the same
+    hyperboloid vector has the coordinate ``y`` in the first and ``-y`` in the
+    second.  So the reflection, which is an isometry of the lattice and fixes
+    ``e_0``, is an arrow between the two spaces whose image of the point of
+    coordinate ``1/2`` is the point of the codomain of coordinate ``-1/2``.
+    """
+    lattice, space, root = _hyperbolic_line()
+    opposite = HyperbolicSpaces(1)(
+        PositiveConeComponents(lattice).component_through(
+            -space.positive_cone_component().timelike_vector()
+        )
+    )
+    reflection = space.category().Mor(space, opposite)(lattice.reflection(root))
+    half = RR(1) / RR(2)
+
+    assert reflection.domain() is space
+    assert reflection.codomain() is opposite
+    assert reflection(space((half,))) == opposite((-half,))
+
+
 def test_the_identity_arrow_of_hyperbolic_spaces_is_the_identity_isometry() -> None:
     r"""The identity arrow fixes every point and is induced by the identity of ``O(L)``."""
     lattice, space, _root = _hyperbolic_line()
