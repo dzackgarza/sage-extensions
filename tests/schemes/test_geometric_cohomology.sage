@@ -90,13 +90,24 @@ def test_the_cycle_class_of_a_line_generates_h2_of_p2() -> None:
 
 
 def test_the_intersection_form_on_h2_of_p2_is_the_unimodular_form_1() -> None:
-    r"""On ``H^2(P^2, ZZ) = ZZ h``, ``h · h = 1``: two lines meet in one point."""
+    r"""On ``H^2(P^2, ZZ) = ZZ h``, ``h · h = 1``: two lines meet in one point.
+
+    The form is read on the cohomology module's selected generator, so the Gram
+    matrix is ``[[1]]``: symmetric, odd, positive definite of rank one, and
+    unimodular with determinant ``1``.  ``is_unimodular`` is an undecided
+    proposition here because a presented module selects generators and no
+    basis, and the values on the generators are what decide the form.
+    """
     plane = _projective_plane()
     formed = plane.middle_cohomology_form()
+    (generator,) = tuple(formed.module_generators())
 
-    assert formed.rank() == 1
-    assert formed.determinant() == 1
-    assert formed.is_unimodular()
+    assert formed.is_symmetric()
+    assert formed.unformed_module().module_rank() == 1
+    assert formed.b(generator, generator) == 1
+    assert formed.is_even() is False
+    assert formed.signature_pair().first() == 1
+    assert formed.signature_pair().second() == 0
 
 
 def test_the_intersection_form_on_h2_of_p1_times_p1_is_the_hyperbolic_plane() -> None:
@@ -105,12 +116,16 @@ def test_the_intersection_form_on_h2_of_p1_times_p1_is_the_hyperbolic_plane() ->
     Derivation: fibre classes ``f_1, f_2`` with ``f_i^2 = 0`` and ``f_1 f_2 = 1``.
     """
     formed = _p1_times_p1().middle_cohomology_form()
+    first, second = tuple(formed.module_generators())
 
-    assert formed.rank() == 2
-    assert formed.is_unimodular()
-    assert formed.determinant() == -1
-    assert formed.is_even()
-    assert formed.signature_pair() == (1, 1)
+    assert formed.unformed_module().module_rank() == 2
+    assert formed.b(first, first) == 0
+    assert formed.b(first, second) == 1
+    assert formed.b(second, second) == 0
+    assert formed.is_symmetric()
+    assert formed.is_even() is True
+    assert formed.signature_pair().first() == 1
+    assert formed.signature_pair().second() == 1
 
 
 def test_p2_is_simply_connected() -> None:
