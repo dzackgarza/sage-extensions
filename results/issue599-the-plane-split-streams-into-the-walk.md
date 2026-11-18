@@ -19,6 +19,8 @@ issue; probes, launchers and logs under `.tmp/issue599/` of that worktree.
 | the row's edges equal the gathered route's on a slice both can still do | **holds exactly**: endpoint pairs and witnesses equal, 600 of 600 | `slice-wt2.log` |
 | the two edge counts and witnesses per group at 189720 planes under 4 GiB | **the 4 GiB clause fails by measurement** (4982 MiB at 550 000 of 569 160 records); **the counts are not obtained**: both rows were killed by this host's OOM killer, and are queued to run again one at a time (section 5) | `row-Otilde.log`, `row-Otilde+.log`, `chain.log`, `gated.log` |
 
+The registry term is **not** #584's any more: #584 is closed and its repair is why an entry is 9.2 KiB and not the 63 KB its body measures.  What remains is the *coexistence* of 189720 lifts -- the split filling the registry before the relation reads one -- which only a walk that drives the split itself removes.
+
 ## 1. The gather
 
 `_plane_orbit_from_parabolic_stabilizer` (`orthogonal_quotients.py:3867-3874`
@@ -240,6 +242,9 @@ them, frees **1.8 MiB -- 9.2 KiB an entry**, so at 189720 planes at least
 **1.67 GiB** is that one table (`attribution.log`).  The row's measured term is
 ~18 KB a plane, so at the row's length the registry is about half of it and the
 rest is the cusp row's spans and the cusp ingress's two tables.  The 9.2 KiB is
+what #584's repair left, not what it named: its acceptance was that
+`register_isotropic_lift` retain nothing the caller does not read, and the
+relation does read the lift, once a plane.  The 9.2 KiB is
 a lower bound for the row's own figure: the entries are GAP-backed and the
 allocator need not return their pages, and the per-entry word grows with the
 double coset reached, which is why the row's last bands sit at 18 KB a plane
