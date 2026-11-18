@@ -604,8 +604,61 @@ class SingularIntegralAffineSpaces(OwnedCategory):
         regular_locus_inclusion,
         regular_affine_manifold,
     ):
-        r"""Select the singular subobject and affine structure on its exact complement."""
-        pass
+        r"""Select the singular subobject and affine structure on its exact complement.
+
+        A singular integral-affine space is one topological space with two selected
+        parts: a singular locus, and the integral-affine structure of the exact
+        complement of that locus.  The four stated data are exactly that selection --
+        the space, one inclusion per part, and the affine manifold on the regular
+        part -- and nothing is reconstructed from them (``OWN-15``).
+
+        Each inclusion is a selection into *this* space, and the regular part's
+        inclusion is a selection of the manifold the affine structure is added to:
+        passing a map into another space, even an equal one, would give the object
+        two authorities for what it is a selection into, and passing a regular part
+        that is not the affine manifold's own underlying manifold would give the
+        affine structure a domain it is not selected on.  Whether the two parts
+        exhaust the space and meet only in the singular locus is a question about
+        the space, answered by the reader of the topology, and it is not re-decided
+        here.
+        """
+        assert topological_space in TopologicalSpaces(), (
+            f"a singular integral-affine space is a topological space with a selected "
+            f"singular locus, and {topological_space} is in "
+            f"{topological_space.category()}"
+        )
+        for inclusion in (singular_locus_inclusion, regular_locus_inclusion):
+            assert inclusion.codomain() is topological_space, (
+                f"{inclusion} selects into {inclusion.codomain()}, not into "
+                f"{topological_space}: a singular integral-affine space's parts are "
+                f"selected in the space itself"
+            )
+        assert singular_locus_inclusion.domain() is not regular_locus_inclusion.domain(), (
+            f"the singular locus {singular_locus_inclusion.domain()} and the regular "
+            f"locus {regular_locus_inclusion.domain()} are one object; an integral-affine "
+            f"structure on the complement of the singular locus is not added to the "
+            f"singular locus"
+        )
+        assert regular_affine_manifold in IntegralAffineManifolds(), (
+            f"the regular locus of a singular integral-affine space carries an "
+            f"integral-affine manifold, and {regular_affine_manifold} is in "
+            f"{regular_affine_manifold.category()}"
+        )
+        assert (
+            regular_locus_inclusion.domain()
+            is regular_affine_manifold.underlying_smooth_manifold()
+        ), (
+            f"the affine structure is selected on "
+            f"{regular_affine_manifold.underlying_smooth_manifold()}, but the regular "
+            f"locus of {topological_space} is {regular_locus_inclusion.domain()}"
+        )
+        return _object_of(
+            self,
+            topological_space=topological_space,
+            singular_locus_inclusion=singular_locus_inclusion,
+            regular_locus_inclusion=regular_locus_inclusion,
+            regular_affine_manifold=regular_affine_manifold,
+        )
 
     def from_face_gluing(self, gluing_cocone, singular_locus_inclusion, affine_collars):
         r"""Select an affine structure from a complex quotient and collar data."""
