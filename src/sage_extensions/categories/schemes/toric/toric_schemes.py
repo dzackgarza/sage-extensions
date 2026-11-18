@@ -2292,12 +2292,20 @@ def _toric_variety(fan, base_ring, polarizing_polytope=None, placements=(), **le
         else None
     )
     cones = fan.maximal_cones()
+    # The atlas's pair transitions are a family on the pairs of maximal cones,
+    # not a tuple: the charts are what every consumer of the variety reads, and a
+    # fan of n maximal cones otherwise builds C(n,2) chart changes that a chart,
+    # a vertex cone or an atlas entry never asks for.  The gluing datum resolves
+    # them when it is first asked for one.
+    pairs = finite_ordered_set(tuple(combinations(tuple(cones), 2)))
+    transitions = finite_indexed_family(
+        pairs,
+        lambda pair: _face_transition(pair[0], pair[1], base),
+        name="Pair transitions of a toric atlas",
+    )
     return Schemes(base).glue_affine_atlas(
         {cone: _affine_chart(cone, base) for cone in cones},
-        tuple(
-            _face_transition(source_cone, target_cone, base)
-            for source_cone, target_cone in combinations(cones, 2)
-        ),
+        transitions,
         placements=(*decided, *placements),
         scheme_engine=native,
         toric_fan=fan,
