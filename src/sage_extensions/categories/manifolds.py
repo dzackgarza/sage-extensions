@@ -122,6 +122,33 @@ class ManifoldAtlasChart(SageObject):
         position = self.coordinates().index_set()[int(index)]
         return self.coordinates()[position]
 
+    def section_ratio(self, numerator, denominator):
+        r"""The quotient of two sections of this chart's function ring, on the open subset where the denominator does not vanish.
+
+        The ring of functions on the chart's domain has no inverse for a
+        section that vanishes somewhere, and a chart change can divide by one:
+        the stereographic coordinate change ``y = x/|x|^2`` divides by the
+        squared norm, which vanishes at the pole the chart projects from.  The
+        quotient ``g/f`` is the function ``p |-> g(p)/f(p)`` on the open subset
+        ``{f != 0}`` (Lee, *Introduction to Smooth Manifolds*, 2nd ed., Ch. 1),
+        and ``f`` is what an atlas transition states as its overlap on this
+        chart (:meth:`transition_map`): the quotient is read where its
+        denominator does not vanish and nowhere else.
+        """
+        ring = self.function_ring()
+        misplaced = tuple(
+            operand
+            for operand in (numerator, denominator)
+            if element_parent(operand) is not ring
+        )
+        assert not misplaced, (
+            f"a quotient of sections of the chart {self.label()} is written with two "
+            f"sections of {ring}, the ring of functions the manifold assigns to that chart's "
+            f"domain, and {(numerator, denominator)!r} is written with the elements "
+            f"{tuple(str(element_parent(operand)) for operand in misplaced)}"
+        )
+        return _SectionRatio(numerator, denominator)
+
     def __call__(self, point):
         r"""The coordinates of ``point`` in this chart, one element of the coordinate field per dimension."""
         selected = self.manifold()(point)
@@ -354,6 +381,45 @@ class _ChartCoordinate(_ChartExpression):
         super().__init__(engine_chart, tuple(engine_chart[:])[self._index], field)
 
 
+class _SectionRatio:
+    r"""The quotient ``numerator / denominator`` of two sections of a chart's function ring, where it is defined.
+
+    A chart's function ring is a ring of functions on the chart's domain, and a
+    section that vanishes somewhere has no inverse in it: the quotient ``g/f``
+    of two sections is the function ``p |-> g(p)/f(p)`` on the open subset
+    ``{f != 0}``, and that open subset is where a chart change with denominator
+    ``f`` is read (:meth:`ManifoldAtlasChart.section_ratio`).  Both operands are
+    owned sections and the quotient is the function they define there; the
+    engine's formula for it is private, as it is for every other chart
+    expression of this module.
+    """
+
+    def __init__(self, numerator, denominator) -> None:
+        self._numerator = numerator
+        self._denominator = denominator
+
+    def numerator(self):
+        r"""The section divided."""
+        return self._numerator
+
+    def denominator(self):
+        r"""The section divided by, which does not vanish where the quotient is read."""
+        return self._denominator
+
+    def __call__(self, point):
+        r"""The quotient of the two values at ``point``, in the coordinate field."""
+        value = self._denominator(point)
+        assert ask(value != element_parent(value).zero()) is True, (
+            f"the quotient {self} is not defined at {point}: its denominator "
+            f"{self._denominator} takes the value {value} there, and the quotient is a "
+            f"function only on the open subset where the denominator does not vanish"
+        )
+        return self._numerator(point) / value
+
+    def _repr_(self):
+        return f"({self._numerator}) / ({self._denominator})"
+
+
 def _manifold_function_definition(value):
     r"""The private map a value of a manifold's function ring is defined by, or ``None``.
 
@@ -389,6 +455,25 @@ def _retained_chart_expression(value):
             return None
 
 
+def _constant_section_value(value):
+    r"""The value a constant section of a manifold's function ring takes, or ``None``.
+
+    The unit of the ring of functions on a chart's domain is the constant map
+    with value one, and the zero is the constant map with value zero, so a
+    section can be a constant map with no chart formula at all
+    (``categories.functions.real_functions._ConstantMap``).  Its value is what
+    states it, and the engine's formula for the constants of a chart's
+    coordinates is that value.
+    """
+    from sage_extensions.categories.functions.real_functions import _ConstantMap
+
+    match _manifold_function_definition(value):
+        case _ConstantMap() as constant:
+            return constant.value()
+        case _:
+            return None
+
+
 def _raise_manifold_expression(engine_formula, chart):
     r"""The section of a chart's function ring that an engine formula in its coordinates defines.
 
@@ -413,15 +498,26 @@ def _admit_manifold_expression(value, chart):
     r"""The section of a chart's function ring that ``value`` is, or a statement that it is none.
 
     A chart formula on ``U`` is an element of the ring of functions the
-    manifold assigns to ``U``; nothing else is a formula there.  Admission is
-    by the ring's own element type (``OWN-01``): the ring is the owner of what
-    a function on the chart's domain is, and this adapter only reads it.
+    manifold assigns to ``U``; nothing else is a formula there, except the
+    quotient of two such sections, which is a function on the open subset where
+    its denominator does not vanish and is stated as one
+    (:class:`_SectionRatio`).  Admission is by the ring's own element type
+    (``OWN-01``): the ring is the owner of what a function on the chart's
+    domain is, and this adapter only reads it.
     """
     ring = chart.function_ring()
-    assert element_parent(value) is ring, (
+    match value:
+        case _SectionRatio() as ratio:
+            operands = (ratio.numerator(), ratio.denominator())
+        case _:
+            operands = (value,)
+    misplaced = tuple(
+        operand for operand in operands if element_parent(operand) is not ring
+    )
+    assert not misplaced, (
         f"a chart formula on the chart {chart.label()} is a section of {ring}, the ring of "
-        f"functions the manifold assigns to that chart's domain, and {value!r} is an element "
-        f"of {element_parent(value)}"
+        f"functions the manifold assigns to that chart's domain, and {value!r} is written "
+        f"with the sections {tuple(str(element_parent(operand)) for operand in misplaced)}"
     )
     return value
 
@@ -510,19 +606,32 @@ def _engine_manifold_expression(value):
     Permitted callers are atlas/map/open-submanifold adapters in this module and
     the affine-analytification adapter.  A chart formula is the function it is,
     and the engine's formula retained by :class:`_ChartExpression` is how the
-    engine speaks about it; a formula written with the owned ring's pointwise
-    operations is rebuilt from its operands; any other owned value is a number
-    in the coordinate field, lowered as its engine element.
+    engine speaks about it; a quotient of sections is the quotient of their
+    formulas, a constant section is its value, a formula written with the owned
+    ring's pointwise operations is rebuilt from its operands; any other owned
+    value is a number in the coordinate field, lowered as its engine element.
     """
-    match _retained_chart_expression(value):
-        case None:
-            match _engine_formula_of_pointwise_section(value):
-                case None:
-                    return _engine_owned_number(value)
-                case formula:
-                    return formula
-        case expression:
-            return expression
+    match value:
+        case _SectionRatio() as ratio:
+            return _engine_manifold_expression(
+                ratio.numerator()
+            ) / _engine_manifold_expression(ratio.denominator())
+        case _:
+            return _engine_section_expression(value)
+
+
+def _engine_section_expression(value):
+    r"""Lower a section of a chart's function ring to the engine's expression for it."""
+    retained = _retained_chart_expression(value)
+    if retained is not None:
+        return retained
+    constant = _constant_section_value(value)
+    if constant is not None:
+        return _engine_scalar(constant)
+    formula = _engine_formula_of_pointwise_section(value)
+    if formula is not None:
+        return formula
+    return _engine_owned_number(value)
 
 
 def _upper_triangle(n):
@@ -1516,9 +1625,24 @@ class SmoothManifolds(OwnedCategory):
         )
 
         def inversion(chart):
+            r"""The coordinate change ``y = x/|x|^2`` in the coordinates of ``chart``, and its squared norm.
+
+            The squared norm ``|x|^2`` is the pointwise sum of the squares of
+            the coordinates, a section of the chart's function ring, and it is
+            the function the change is defined away from: the quotient
+            ``x_k/|x|^2`` is a section on the open subset where the norm does
+            not vanish (:meth:`ManifoldAtlasChart.section_ratio`), which is the
+            overlap of the two stereographic charts.
+            """
             coordinates = chart.coordinates()
             norm_squared = sum(coordinate**2 for coordinate in coordinates)
-            return tuple(coordinate / norm_squared for coordinate in coordinates), norm_squared
+            return (
+                tuple(
+                    chart.section_ratio(coordinate, norm_squared)
+                    for coordinate in coordinates
+                ),
+                norm_squared,
+            )
 
         forward, north_overlap = inversion(north)
         inverse, south_overlap = inversion(south)
