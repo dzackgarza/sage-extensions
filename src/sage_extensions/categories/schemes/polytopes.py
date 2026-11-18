@@ -876,8 +876,9 @@ class _PlacedPolytopeCategory(OwnedParameterizedCategory):
             vertices in the same order.  This is a computation of the group, not its
             definition: the automorphisms are the arrows :meth:`Aut` retains.
 
-            When the ambient space publishes an isometry decision and the
-            placement is full dimensional, the group counted here is the
+            When the ambient space publishes an isometry decision -- a Euclidean
+            space and a round sphere do -- and the placement is full dimensional,
+            the group counted here is the
             isometric subgroup of that candidate group: a candidate whose ambient
             map the space refuses is not an arrow of a metric placed category, so
             it is not one of the arrows :meth:`Aut` retains and not one of the
@@ -900,13 +901,14 @@ class _PlacedPolytopeCategory(OwnedParameterizedCategory):
                 for element in underlying.geometric_automorphisms().selected_subgroup_generators()
             )
             space = self.ambient_space()
-            full_dimensional = int(self.dimension()) == int(
-                space.model_vector_space().dimension()
-            ) if space in EuclideanSpaces() else False
-            match space in EuclideanSpaces(), full_dimensional:
-                case (False, _) | (True, False):
+            metric = space in EuclideanSpaces() or space in SphericalSpaces()
+            full_dimensional = metric and int(self.dimension()) == int(
+                space.underlying_affine_space().model_vector_space().dimension()
+            )
+            match full_dimensional:
+                case False:
                     return generators
-                case (True, True):
+                case True:
                     size = len(tuple(self.vertices()))
                     candidate = PermutationGroup(
                         [
@@ -936,7 +938,8 @@ class _PlacedPolytopeCategory(OwnedParameterizedCategory):
             lattice placement the same matrix is the lattice map, so the ambient
             automorphism is an arrow of the lattice-compatible affine space and
             not of the affine space alone; on a Euclidean placement it is an
-            arrow of the Euclidean space, which is an affine map of the
+            arrow of the Euclidean space, and on a spherical one the Euclidean
+            isometry of the space the sphere lies in, each an affine map of the
             underlying affine space together with the ambient owner's decision
             whether it preserves the metric.
             """
@@ -983,8 +986,12 @@ class _PlacedPolytopeCategory(OwnedParameterizedCategory):
                 Sets().Mor(affine_space.point_set(), affine_space.point_set())(point_map),
             )
             ambient_space = self.ambient_space()
-            match ambient_space in AffineSpacesWithLattice(), ambient_space in EuclideanSpaces():
-                case (True, _):
+            match (
+                ambient_space in AffineSpacesWithLattice(),
+                ambient_space in EuclideanSpaces(),
+                ambient_space in SphericalSpaces(),
+            ):
+                case (True, _, _):
                     lattice = ambient_space.affine_lattice()
                     lattice_labels = tuple(lattice.module_generating_set())
                     assert lattice_labels == labels
@@ -1012,9 +1019,14 @@ class _PlacedPolytopeCategory(OwnedParameterizedCategory):
                     return AffineSpacesWithLattice().Mor(ambient_space, ambient_space)(
                         affine_map, lattice_map
                     )
-                case (False, True):
+                case (False, True, _):
                     return EuclideanSpaces().Mor(ambient_space, ambient_space)(affine_map)
-                case (False, False):
+                case (False, False, True):
+                    euclidean = ambient_space.euclidean_space()
+                    return SphericalSpaces().Mor(ambient_space, ambient_space)(
+                        EuclideanSpaces().Mor(euclidean, euclidean)(affine_map)
+                    )
+                case (False, False, False):
                     return affine_map
 
         def _face_poset_map_of_positions(self, positions):
