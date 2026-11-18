@@ -9,6 +9,16 @@ All measurements are on the adopted runtime (Sage 11.0.beta5), the port
 `991b88b0`, from a worktree of `f2c519c` carrying only the two repairs of this
 issue; probes, launchers and logs under `.tmp/issue599/` of that worktree.
 
+## 0. The acceptance, clause by clause
+
+| clause of #599's acceptance | verdict | measured on |
+| --- | --- | --- |
+| the split yields its plane cusps to the walk without holding them all | **holds**: one draw, one plane (`U + U(2) + <-2>`, section 3) | `yield-new.log` |
+| the relation's records are what a row keeps | **holds for this issue's term**: 394.5 B an edge, 0.21 GiB at 189720; the row keeps more (section 2 and section 5) | `record-size.log` |
+| measured at 10 000, 50 000 and 100 000 planes as a flat resident set rather than a rising one | **flat for the relation** (4 379.0, 4 491.3, 4 448.1 MiB); **rising for the split** (`Otilde`: 1 297.3, 1 644.7, 2 536.7 MiB, ~18 KB a plane), and the rising term is the lift registry, #584's | `row-Otilde.log` |
+| the row's edges equal the gathered route's on a slice both can still do | **holds exactly**: endpoint pairs and witnesses equal, 600 of 600 | `slice-wt2.log` |
+| the two edge counts and witnesses per group at 189720 planes under 4 GiB | see section 5: `Otilde` decided; `Otilde+` lost to the kernel's OOM killer and restarted | `row-Otilde.log`, `row-Otilde+.log`, `chain.log` |
+
 ## 1. The gather
 
 `_plane_orbit_from_parabolic_stabilizer` (`orthogonal_quotients.py:3867-3874`
@@ -171,7 +181,70 @@ which is the number of line cusps the relation indexes -- the two relations
 together added no walk to those.  The rows' own relation times are the measure
 of what the record is worth at length, and they are in the logs of section 5.
 
-## 5. What was run, and what was not
+## 5. The rows at 189 720 planes
+
+One process a row, the driver's own stages, off this worktree (`probe-row.py`),
+with a counter on the split's `register_isotropic_lift`
+(`orthogonal_quotients.py:2626`) and on the relation's record constructor, so the
+resident set is recorded every 10 000 planes and every 10 000 records.
+
+**`Otilde(T_Co)`, the split.** Standing row after the line row's 527 cusps:
+**709.9 MiB** at 866 s.
+
+| planes | wall | resident | KB a plane since the mark before |
+| ---: | ---: | ---: | ---: |
+| 10 000 | 2 212 s | 1 297.3 MiB | -- |
+| 50 000 | 3 045 s | 1 644.7 MiB | 8.7 |
+| 100 000 | 3 543 s | 2 536.7 MiB | 17.8 |
+| 180 000 | 4 664 s | 3 973.5 MiB | 17.9 |
+
+The split's own term is therefore **not flat**: it settles at about 18 KB a
+plane, and 189 720 planes is ~3.3 GiB on the 0.71 GiB standing row.  What is
+left in it is the lift registry -- the lift's word, its source parabolic family
+and its discriminant image, keyed by the plane's span
+(`register_isotropic_lift`, `orthogonal_quotients.py:2626-2662`) -- which is
+#584's 63 KB a plane, not the relation this issue is about.
+
+**`Otilde(T_Co)`, the relation.** The same row, its 569 160 records:
+
+| records | wall | resident |
+| ---: | ---: | ---: |
+| 10 000 | 4 770 s | 4 379.0 MiB |
+| 50 000 | 4 856 s | 4 491.3 MiB |
+| 100 000 | 4 969 s | 4 448.1 MiB |
+| 510 000 | 6 087 s | 4 948.4 MiB |
+
+At the three counts the acceptance names the relation's resident set is **flat to
+within 50 MiB** -- 4 379.0, 4 491.3, 4 448.1 MiB, and the third is *below* the
+second -- and over all 510 000 records it rises 569 MiB, 1.15 KB a record
+against the 394.5 B a record measured in section 2.  The rest is not the records:
+the loop keeps one `endpoint_pairs` entry an edge (`predicate_subgroups.py:1305`)
+and builds three GAP class sets a plane (`_carried_divided_classes`) whose
+workspace is not returned to the host between marks.  Which of the two it is is
+not separated here.
+
+The relation's rate is what the record of walked class sets buys: 520 000
+records in 1 480 s, **2.6 ms a record** and so ~7.8 ms a plane, where the same
+relation measured 66-81 ms a plane before the record was added.
+
+**The 4 GiB clause is already answered, and the answer is no.**  At 520 000 of
+its 569 160 records the row stands at **5 092 MiB** resident (VmRSS 5 092 124 KiB
+at 04:12), with 49 160 records and the whole contract step still to come, against
+the 4 GiB the acceptance names and the 6 144 MiB guard this project runs under.
+The terms are the two measured above: ~3.3 GiB of lift registry (the split's
+18 KB a plane, #584's) and 0.21 GiB of relation.
+
+**`Otilde+` did not return.**  Its process left the host at
+`row-Otilde+.log`'s last line, `# launcher exit: 0  ended: 2026-11-18T03:36:26Z`,
+after 130 000 planes at 3 299 MiB and a low-water MemAvail of 1 111 MiB, with no
+traceback and no `STOPPED_AT_MEMORY_LIMIT`.  This host's kernel has killed 37
+processes (`/proc/vmstat`, `oom_kill 37`) and its memory pressure stands at
+`full avg10=41.37` (`/proc/pressure/memory`), so the reading is that the OOM
+killer took the tracee and proot reported 0.  The second row is queued behind the
+first (`chain-otildeplus.sh`, `chain.log`): one row on the host at a time is the
+dispatch shape #599 asks for, and two at once is what the host could not carry.
+
+## 6. What was run, and what was not
 
 Run, off the worktree with only these two repairs:
 
