@@ -1,0 +1,51 @@
+# tree: a6885ce6278ab0ec61c15c068b08238fc98d5583
+# status: 
+# port: 991b88b095a42a1e3679569ea42328c900c120f6
+# free: 5789 MiB available
+# started: 2026-11-18T15:02:33Z
+# program: tests/coble_gamma_co_2_incidence_rows.py --rows Otilde\,Otilde+ --lattice U+U\(2\)+\<-2\> --route divided-class --cap 300 --budget 600
+the lattice Integral lattice of rank 5 and signature (2, 3) of rank 5
+the rows ('Otilde', 'Otilde+')
+[Otilde] the row's route: divided-class, as the run asked (decided in 0.0 s)
+[Otilde] the row's calls returned in 20.7 s
+[Otilde] the quotient retains 3 carried-object transport datums: one for each carried isotropic object still registered, keyed by its span, each holding the object, its source and the isometry that placed it -- not the row's coverings and not its planes' lifts, which are retained separately
+[Otilde] line cusp 0: ((0, 1, 0, 0, 0),)
+[Otilde] line cusp 1: ((0, 0, 1, 0, 0),)
+[Otilde] line cusp 2: ((0, 0, 0, 1, 0),)
+[Otilde] plane cusp 0: ((0, 1, 0, 0, 0), (0, 0, 0, 1, 0))
+[Otilde] plane cusp 1: ((0, 1, 0, 0, 0), (0, 0, 1, 0, 0))
+[Otilde] edge 0: L0 < P0
+[Otilde] edge 1: L2 < P0
+[Otilde] edge 2: L0 < P1
+[Otilde] edge 3: L1 < P1
+[Otilde] audited 4 distinct edges; ordered endpoint SHA-256: 04c17f79b45ca82ac8fdb82e60dcf96f510b89d8c7c7d03748c27e67ff587dc2
+[Otilde] decided: 4 edges over 3 line cusps and 2 plane cusps
+[Otilde+] the row's route: divided-class, as the run asked (decided in 0.0 s)
+[Otilde+] the row's calls returned in 6.7 s
+[Otilde+] the quotient retains 3 carried-object transport datums: one for each carried isotropic object still registered, keyed by its span, each holding the object, its source and the isometry that placed it -- not the row's coverings and not its planes' lifts, which are retained separately
+[Otilde+] line cusp 0: ((0, 1, 0, 0, 0),)
+[Otilde+] line cusp 1: ((0, 0, 1, 0, 0),)
+[Otilde+] line cusp 2: ((0, 0, 0, 1, 0),)
+[Otilde+] plane cusp 0: ((0, 1, 0, 0, 0), (0, 0, 0, 1, 0))
+[Otilde+] plane cusp 1: ((0, 1, 0, 0, 0), (0, 0, 1, 0, 0))
+[Otilde+] edge 0: L0 < P0
+[Otilde+] edge 1: L2 < P0
+[Otilde+] edge 2: L0 < P1
+[Otilde+] edge 3: L1 < P1
+[Otilde+] audited 4 distinct edges; ordered endpoint SHA-256: 04c17f79b45ca82ac8fdb82e60dcf96f510b89d8c7c7d03748c27e67ff587dc2
+[Otilde+] decided: 4 edges over 3 line cusps and 2 plane cusps
+recorded counts: Otilde 4 edges over 3 line and 2 plane cusps; Otilde+ 4 edges over 3 line and 2 plane cusps
+[peakrss] rebased-singlepass: child waited=0 shell_code=0 samples=17
+[peakrss] peak tree RSS      : 529 MiB
+[peakrss] low-water MemAvail : 5440 MiB
+[peakrss] peak single VmHWM  : 529 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      526 MiB peak
+[peakrss]   run.sh                        3 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    32.1s procs=  2 rss=   529 MiB hwm=   529 MiB avail=  5652 MiB
+[peakrss]   t=    30.0s procs=  2 rss=   528 MiB hwm=   528 MiB avail=  5677 MiB
+[peakrss]   t=    28.0s procs=  2 rss=   526 MiB hwm=   526 MiB avail=  5758 MiB
+[peakrss]   t=    26.0s procs=  2 rss=   524 MiB hwm=   524 MiB avail=  5801 MiB
+[peakrss]   t=    24.0s procs=  2 rss=   519 MiB hwm=   519 MiB avail=  5957 MiB
+# launcher exit: 0  ended: 2026-11-18T15:03:08Z

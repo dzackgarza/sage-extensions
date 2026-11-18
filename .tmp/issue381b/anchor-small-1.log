@@ -1,0 +1,80 @@
+# tree: db266282e98374f8dd72c620ff6b7bfb5fc47a9f
+# status:  M src/sage_extensions/categories/orthogonal_quotients.py 
+# port: 991b88b095a42a1e3679569ea42328c900c120f6
+# load: 5.37 4.98 4.43
+# free: 6041 MiB available
+# started: 2026-11-18T14:52:33Z
+# program: .tmp/issue381b/probe-anchor.py  PROBE_LATTICE=unset PROBE_ROW=unset
+row Otilde of U+U(2)+<-2>; subgroup {g in Orthogonal group O(Integral lattice of rank 5 and signature (2, 3)) : rho_L(g) lies in a subgroup given by its own generators}
+plane orbit representatives: 1
+  representative 0 span rows: ((1, 0, 0, 0, 0), (0, 0, 0, 1, 0))
+the source's parabolic family: 27 generators
+  (no matrix: AttributeError)
+  (no matrix: AttributeError)
+  (no matrix: AttributeError)
+  (no matrix: AttributeError)
+  (no matrix: AttributeError)
+  (no matrix: AttributeError)
+  (no matrix: AttributeError)
+  (no matrix: AttributeError)
+  (no matrix: AttributeError)
+  (no matrix: AttributeError)
+  (no matrix: AttributeError)
+  (no matrix: AttributeError)
+  (no matrix: AttributeError)
+  (no matrix: AttributeError)
+  (no matrix: AttributeError)
+  (no matrix: AttributeError)
+  (no matrix: AttributeError)
+  (no matrix: AttributeError)
+  (no matrix: AttributeError)
+  (no matrix: AttributeError)
+  (no matrix: AttributeError)
+  (no matrix: AttributeError)
+  (no matrix: AttributeError)
+  (no matrix: AttributeError)
+  (no matrix: AttributeError)
+  (no matrix: AttributeError)
+  (no matrix: AttributeError)
+family digest, in the walk's order: 9adcdd041ecfb8e7
+family digest, sorted         : 1099df65a4f29c5b
+  generator 0: be9671cedddbf8a6
+  generator 1: be9671cedddbf8a6
+  generator 2: be9671cedddbf8a6
+  generator 3: be9671cedddbf8a6
+  generator 4: be9671cedddbf8a6
+  generator 5: be9671cedddbf8a6
+  generator 6: be9671cedddbf8a6
+  generator 7: be9671cedddbf8a6
+  generator 8: be9671cedddbf8a6
+  generator 9: be9671cedddbf8a6
+  generator 10: be9671cedddbf8a6
+  generator 11: be9671cedddbf8a6
+  generator 12: be9671cedddbf8a6
+  generator 13: be9671cedddbf8a6
+  generator 14: be9671cedddbf8a6
+  generator 15: be9671cedddbf8a6
+  generator 16: be9671cedddbf8a6
+  generator 17: be9671cedddbf8a6
+  generator 18: be9671cedddbf8a6
+  generator 19: be9671cedddbf8a6
+  generator 20: be9671cedddbf8a6
+  generator 21: be9671cedddbf8a6
+  generator 22: be9671cedddbf8a6
+  generator 23: be9671cedddbf8a6
+  generator 24: be9671cedddbf8a6
+  generator 25: be9671cedddbf8a6
+  generator 26: be9671cedddbf8a6
+[peakrss] anchor-small-1: child waited=0 shell_code=0 samples=4
+[peakrss] peak tree RSS      : 468 MiB
+[peakrss] low-water MemAvail : 6004 MiB
+[peakrss] peak single VmHWM  : 468 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      465 MiB peak
+[peakrss]   run.sh                        3 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     6.0s procs=  2 rss=   468 MiB hwm=   468 MiB avail=  6497 MiB
+[peakrss]   t=     4.0s procs=  2 rss=   419 MiB hwm=   419 MiB avail=  6618 MiB
+[peakrss]   t=     2.0s procs=  2 rss=   176 MiB hwm=   176 MiB avail=  6004 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     3 MiB hwm=     3 MiB avail=  6044 MiB
+# launcher exit: 0  ended: 2026-11-18T14:52:41Z

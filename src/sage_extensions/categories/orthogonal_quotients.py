@@ -4197,7 +4197,7 @@ def _plane_orbit_from_parabolic_stabilizer(subgroup, representative):
     return _iter_transported_planes(quotient, representative, family)
 
 
-def _iter_transported_planes(quotient, representative, family):
+def _iter_transported_planes(quotient, representative, family, *, resume_after=0):
     r"""Yield the double cosets' transported planes of one plane's parabolic split.
 
     A kernel row numbers 189720 of them, and each one is a constructed parent of
@@ -4213,10 +4213,25 @@ def _iter_transported_planes(quotient, representative, family):
     consumer of the row reads the finite element a plane and spells the isometry
     only where it transports something
     (:meth:`...OrthogonalCharacterQuotient.register_isotropic_lift`).
+
+    ``resume_after`` is the number of double cosets a caller already holds: it
+    skips them before their transport and their cusp, so a run that kept the
+    first ``k`` planes' registrations, spans and finite elements resumes at the
+    ``k``-th and pays neither.  The skip counts steps of the walk *from the
+    representative and family given here*, so a caller resuming another run's
+    mark has to pin both: the drawn representative is not reproduced by a
+    second process, and a family at another copy of the plane is another
+    generating set, so the mark counts the planes of the anchor it was made
+    on.  What a resume cannot save is the walk's own spelling, which is a
+    product an edge and has to reach the same nodes.
     """
-    for splitting, discriminant_image, spelling in quotient._iter_splitting_isometries_in_im_rho(
-        family, spellings=True
-    ):
+    for position, (
+        splitting,
+        discriminant_image,
+        spelling,
+    ) in enumerate(quotient._iter_splitting_isometries_in_im_rho(family, spellings=True)):
+        if position < resume_after:
+            continue
         transported = splitting.transport_isotropic_object(representative)
         quotient.register_isotropic_lift(
             transported, splitting, family, discriminant_image, spelling=spelling

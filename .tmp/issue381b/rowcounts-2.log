@@ -1,0 +1,25 @@
+# tree: db266282e98374f8dd72c620ff6b7bfb5fc47a9f
+# status:  M src/sage_extensions/categories/orthogonal_quotients.py 
+# port: 991b88b095a42a1e3679569ea42328c900c120f6
+# load: 6.43 5.78 4.90
+# free: 2450 MiB available
+# started: 2026-11-18T14:58:10Z
+# program: .tmp/issue381b/probe-rowcounts.py  PROBE_LATTICE=U+U(2)+<-2> PROBE_ROW=Otilde
+subgroup: {g in Orthogonal group O(Integral lattice of rank 5 and signature (2, 3)) : rho_L(g) lies in a subgroup given by its own generators}
+quotient: <sage_extensions.categories.orthogonal_quotients.OrthogonalCharacterQuotient object at 0x71ff2608aba0>
+line cusps 3: [((1, 0, 0, 0, 0),), ((0, 0, 1, 0, 0),), ((0, 2, 0, -1, 0),)]
+plane cusps 2: [((1, 0, 0, 0, 0), (0, 0, 0, 1, 0)), ((1, 0, 0, -1, 0), (0, 2, 1, 0, 0))]
+[peakrss] rowcounts-2: child waited=0 shell_code=0 samples=30
+[peakrss] peak tree RSS      : 414 MiB
+[peakrss] low-water MemAvail : 1001 MiB
+[peakrss] peak single VmHWM  : 419 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      416 MiB peak
+[peakrss]   run.sh                        6 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    65.8s procs=  2 rss=   414 MiB hwm=   416 MiB avail=  2488 MiB
+[peakrss]   t=    67.8s procs=  2 rss=   401 MiB hwm=   419 MiB avail=  2758 MiB
+[peakrss]   t=    22.1s procs=  2 rss=   373 MiB hwm=   381 MiB avail=  1309 MiB
+[peakrss]   t=    18.1s procs=  2 rss=   372 MiB hwm=   381 MiB avail=  1699 MiB
+[peakrss]   t=    20.1s procs=  2 rss=   371 MiB hwm=   381 MiB avail=  1624 MiB
+# launcher exit: 0  ended: 2026-11-18T14:59:20Z

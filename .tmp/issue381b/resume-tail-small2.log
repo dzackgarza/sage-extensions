@@ -1,0 +1,41 @@
+# tree: db266282e98374f8dd72c620ff6b7bfb5fc47a9f
+# status:  M src/sage_extensions/categories/orthogonal_quotients.py 
+# port: 991b88b095a42a1e3679569ea42328c900c120f6
+# load: 5.38 4.92 4.50
+# free: 4341 MiB available
+# started: 2026-11-18T14:56:01Z
+# program: .tmp/issue381b/probe-resume.py  PROBE_LATTICE=U+U(2)+<-2> PROBE_ROW=Otilde
+[      6.7 s rss    458.1 MiB] U+U(2)+<-2>, the Otilde row, source span ((0, 1, 0, 0, 0), (0, 0, 0, 1, 0)), 27 parabolic generators
+[      6.7 s rss    458.2 MiB] checkpoint read: 1 planes
+[     21.8 s rss    388.1 MiB] the registry restored: 1 entries in 15.1 s
+[     21.8 s rss    388.2 MiB] the restored planes cusped: 1 in 0.0 s
+[     25.9 s rss    391.8 MiB] the walk continued: 2 plane cusps in all
+[     26.2 s rss    393.7 MiB] the cusp row seeded: 2 plane cusps
+[     26.2 s rss    393.7 MiB] the line row: 2 line cusps
+[     26.2 s rss    393.7 MiB] the row's route: divided-class
+Traceback (most recent call last):
+  File "/repos/sage-extensions/.tmp/issue381b/probe-resume.py", line 159, in <module>
+    incidences = tuple(row_relation(subgroup, taken))
+                       ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/repos/sage-extensions/tests/coble_gamma_co_2_incidence_rows.py", line 355, in row_relation
+    return subgroup.tits_building_incidence_by_divided_classes()
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 1406, in tits_building_incidence_by_divided_classes
+    raise ArithmeticError(
+    ...<5 lines>...
+    )
+ArithmeticError: the line of the covering flag Primitive totally isotropic flag of length 2 in Integral lattice of rank 5 and signature (2, 3) carried to Rank-2 cusp of {g in Orthogonal group O(Integral lattice of rank 5 and signature (2, 3)) : rho_L(g) lies in a subgroup given by its own generators} in Integral lattice of rank 5 and signature (2, 3) lies in 2 line cusps of {g in Orthogonal group O(Integral lattice of rank 5 and signature (2, 3)) : rho_L(g) lies in a subgroup given by its own generators} (Rank-2 cusp of {g in Orthogonal group O(Integral lattice of rank 5 and signature (2, 3)) : rho_L(g) lies in a subgroup given by its own generators} in Integral lattice of rank 5 and signature (2, 3), Rank-2 cusp of {g in Orthogonal group O(Integral lattice of rank 5 and signature (2, 3)) : rho_L(g) lies in a subgroup given by its own generators} in Integral lattice of rank 5 and signature (2, 3)): the finite image does not separate this line's cusp from the others, and no edge is read from class data that names more than one vertex; tits_building_incidence decides it with a transporter
+[peakrss] resume-tail-small2: child waited=1 shell_code=1 samples=21
+[peakrss] peak tree RSS      : 466 MiB
+[peakrss] low-water MemAvail : 3434 MiB
+[peakrss] peak single VmHWM  : 469 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      466 MiB peak
+[peakrss]   run.sh                        6 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    14.0s procs=  2 rss=   466 MiB hwm=   466 MiB avail=  3702 MiB
+[peakrss]   t=    16.1s procs=  2 rss=   463 MiB hwm=   469 MiB avail=  3680 MiB
+[peakrss]   t=    12.0s procs=  2 rss=   448 MiB hwm=   448 MiB avail=  3764 MiB
+[peakrss]   t=    18.1s procs=  2 rss=   441 MiB hwm=   469 MiB avail=  3594 MiB
+[peakrss]   t=    20.1s procs=  2 rss=   433 MiB hwm=   469 MiB avail=  3841 MiB
+# launcher exit: 1  ended: 2026-11-18T14:56:43Z

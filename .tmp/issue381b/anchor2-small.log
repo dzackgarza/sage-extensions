@@ -1,0 +1,66 @@
+# tree: db266282e98374f8dd72c620ff6b7bfb5fc47a9f
+# status:  M src/sage_extensions/categories/orthogonal_quotients.py 
+# port: 991b88b095a42a1e3679569ea42328c900c120f6
+# load: 4.13 4.71 4.39
+# free: 6313 MiB available
+# started: 2026-11-18T14:54:02Z
+# program: .tmp/issue381b/probe-anchor2.py  PROBE_LATTICE=unset PROBE_ROW=unset
+source span rows: ((0, 1, 0, 0, 0), (0, 0, 0, 1, 0))
+family at the source as drawn: 27
+the copy rebuilt from that span: rows ((0, 1, 0, 0, 0), (0, 0, 0, 1, 0))
+family at the rebuilt copy: 27
+family at a second rebuilt copy: 27
+the same set of generators (repr, sorted): True
+the same order of generators (repr): [repr(g) for g in family] == [repr(g) for g in rebuilt_family]
+planes drawn for the entry measurement: 2
+Traceback (most recent call last):
+  File "/repos/sage-extensions/.tmp/issue381b/probe-anchor2.py", line 76, in <module>
+    as_read = pickle.dumps((plane_span[1], image))
+_pickle.PicklingError: __reduce__ must return a string or tuple, not NoneType
+when serializing sage_extensions.owned_category._OwnedDynamicMetaclass object
+when serializing tuple item 1
+when serializing tuple item 1
+when serializing tuple item 1
+when serializing sage_extensions.categories.abstract_categories.arrow_categories.SubobjectCategory_with_category reconstructor arguments
+when serializing sage_extensions.categories.abstract_categories.arrow_categories.SubobjectCategory_with_category object
+when serializing tuple item 0
+when serializing sage_extensions.owned_category._OwnedDynamicMetaclass reconstructor arguments
+when serializing sage_extensions.owned_category._OwnedDynamicMetaclass object
+when serializing tuple item 0
+when serializing sage_extensions.owned_category._OwnedDynamicMetaclass reconstructor arguments
+when serializing sage_extensions.owned_category._OwnedDynamicMetaclass object
+when serializing sage_extensions.categories.group.submonoids.SubobjectCategory.parent_class[_SubmonoidEngine].ObjectType class
+when serializing sage_extensions.categories.group.submonoids.SubobjectCategory.parent_class[_SubmonoidEngine].ObjectType object
+when serializing dict item '_localization_submonoid'
+when serializing sage_extensions.owned_category.OwnedJoinCategory.parent_class state
+when serializing sage_extensions.owned_category.OwnedJoinCategory.parent_class object
+when serializing tuple item 0
+when serializing sage_extensions.owned_category.OwnedJoinCategory.element_class state
+when serializing sage_extensions.owned_category.OwnedJoinCategory.element_class object
+when serializing dict item '_fraction_field_modulus'
+when serializing sage_extensions.owned_category.OwnedJoinCategory.parent_class state
+when serializing sage_extensions.owned_category.OwnedJoinCategory.parent_class object
+when serializing dict item '_preamble_quadratic_value_module'
+when serializing sage_extensions.categories.modules.framed.finitely_generated.finitely_presented_modules.OwnedJoinCategory.parent_class[_PresentedModule].ObjectType state
+when serializing sage_extensions.categories.modules.framed.finitely_generated.finitely_presented_modules.OwnedJoinCategory.parent_class[_PresentedModule].ObjectType object
+when serializing tuple item 0
+when serializing sage_extensions.categories.modules.framed.formed.torsion_form_modules.OwnedTorsionFormOrthogonalGroup_with_category_with_category reconstructor arguments
+when serializing sage_extensions.categories.modules.framed.formed.torsion_form_modules.OwnedTorsionFormOrthogonalGroup_with_category_with_category object
+when serializing tuple item 1
+when serializing sage_extensions.categories.modules.framed.formed.torsion_form_modules.OwnedTorsionFormOrthogonalGroup_with_category_with_category.element_class reconstructor arguments
+when serializing sage_extensions.categories.modules.framed.formed.torsion_form_modules.OwnedTorsionFormOrthogonalGroup_with_category_with_category.element_class object
+when serializing tuple item 1
+[peakrss] anchor2-small: child waited=1 shell_code=1 samples=8
+[peakrss] peak tree RSS      : 563 MiB
+[peakrss] low-water MemAvail : 6001 MiB
+[peakrss] peak single VmHWM  : 563 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      494 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   bash                          0 MiB peak
+[peakrss]   t=     2.0s procs=  3 rss=   563 MiB hwm=   563 MiB avail=  6396 MiB
+[peakrss]   t=    14.0s procs=  2 rss=   497 MiB hwm=   497 MiB avail=  6001 MiB
+[peakrss]   t=    12.0s procs=  2 rss=   494 MiB hwm=   494 MiB avail=  6040 MiB
+[peakrss]   t=    10.0s procs=  2 rss=   490 MiB hwm=   490 MiB avail=  6072 MiB
+[peakrss]   t=     8.0s procs=  2 rss=   485 MiB hwm=   485 MiB avail=  6211 MiB
+# launcher exit: 1  ended: 2026-11-18T14:54:18Z

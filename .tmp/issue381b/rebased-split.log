@@ -1,0 +1,23 @@
+# tree: a6885ce6278ab0ec61c15c068b08238fc98d5583
+# status: 
+# port: 991b88b095a42a1e3679569ea42328c900c120f6
+# load: 5.60 5.92 5.28
+# free: 6047 MiB available
+# started: 2026-11-18T15:03:08Z
+# program: .tmp/issue381b/probe-resume.py  PROBE_LATTICE=U+U(2)+<-2> PROBE_ROW=Otilde
+[      3.3 s rss    464.8 MiB] U+U(2)+<-2>, the Otilde row, source span ((0, 1, 0, 0, 0), (0, 0, 0, 1, 0)), 27 parabolic generators
+[     12.3 s rss    492.4 MiB] checkpoint written: 1 planes, 136 bytes
+[peakrss] rebased-split: child waited=0 shell_code=0 samples=8
+[peakrss] peak tree RSS      : 494 MiB
+[peakrss] low-water MemAvail : 5459 MiB
+[peakrss] peak single VmHWM  : 494 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      491 MiB peak
+[peakrss]   run.sh                        6 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    14.0s procs=  2 rss=   494 MiB hwm=   494 MiB avail=  5459 MiB
+[peakrss]   t=    12.0s procs=  2 rss=   491 MiB hwm=   491 MiB avail=  5459 MiB
+[peakrss]   t=    10.0s procs=  2 rss=   485 MiB hwm=   485 MiB avail=  5554 MiB
+[peakrss]   t=     8.0s procs=  2 rss=   480 MiB hwm=   480 MiB avail=  5571 MiB
+[peakrss]   t=     6.0s procs=  2 rss=   471 MiB hwm=   471 MiB avail=  5608 MiB
+# launcher exit: 0  ended: 2026-11-18T15:03:24Z

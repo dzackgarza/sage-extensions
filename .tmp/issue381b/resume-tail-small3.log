@@ -1,0 +1,41 @@
+# tree: db266282e98374f8dd72c620ff6b7bfb5fc47a9f
+# status:  M src/sage_extensions/categories/orthogonal_quotients.py 
+# port: 991b88b095a42a1e3679569ea42328c900c120f6
+# load: 8.29 6.87 5.40
+# free: 5791 MiB available
+# started: 2026-11-18T14:59:53Z
+# program: .tmp/issue381b/probe-resume.py  PROBE_LATTICE=U+U(2)+<-2> PROBE_ROW=Otilde
+[      2.7 s rss    465.1 MiB] U+U(2)+<-2>, the Otilde row, source span ((0, 1, 0, 0, 0), (0, 0, 0, 1, 0)), 27 parabolic generators
+[      2.7 s rss    465.1 MiB] checkpoint read: 1 planes
+[      9.2 s rss    492.5 MiB] the registry restored: 1 entries in 6.6 s
+[      9.2 s rss    492.5 MiB] the restored planes cusped: 1 in 0.0 s
+[     11.2 s rss    498.3 MiB] the walk continued: 2 plane cusps in all
+[     11.2 s rss    498.3 MiB] the cusp row seeded: 2 plane cusps
+[     11.6 s rss    502.5 MiB] the line row: 3 line cusps
+[     11.6 s rss    502.5 MiB] the row's route: divided-class
+[     14.1 s rss    517.1 MiB] the relation: 4 edges in 2.5 s
+[Otilde] line cusp 0: ((0, 1, 0, 0, 0),)
+[Otilde] line cusp 1: ((0, 0, 1, 0, 0),)
+[Otilde] line cusp 2: ((2, 0, 2, 1, 2),)
+[Otilde] plane cusp 0: ((0, 1, 0, 0, 0), (0, 0, 0, 1, 0))
+[Otilde] plane cusp 1: ((2, 0, 1, 2, 2), (0, 1, 0, -1, 0))
+[Otilde] edge 0: L0 < P0
+[Otilde] edge 1: L2 < P0
+[Otilde] edge 2: L0 < P1
+[Otilde] edge 3: L1 < P1
+[Otilde] audited 4 distinct edges; ordered endpoint SHA-256: 04c17f79b45ca82ac8fdb82e60dcf96f510b89d8c7c7d03748c27e67ff587dc2
+[     14.1 s rss    517.1 MiB] the verdict: [Otilde] decided: 4 edges over 3 line cusps and 2 plane cusps
+[peakrss] resume-tail-small3: child waited=0 shell_code=0 samples=9
+[peakrss] peak tree RSS      : 521 MiB
+[peakrss] low-water MemAvail : 5548 MiB
+[peakrss] peak single VmHWM  : 521 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      518 MiB peak
+[peakrss]   run.sh                        3 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    16.0s procs=  2 rss=   521 MiB hwm=   521 MiB avail=  5666 MiB
+[peakrss]   t=    14.0s procs=  2 rss=   512 MiB hwm=   512 MiB avail=  5672 MiB
+[peakrss]   t=    12.0s procs=  2 rss=   498 MiB hwm=   498 MiB avail=  5694 MiB
+[peakrss]   t=    10.0s procs=  2 rss=   489 MiB hwm=   489 MiB avail=  5705 MiB
+[peakrss]   t=     8.0s procs=  2 rss=   483 MiB hwm=   483 MiB avail=  5706 MiB
+# launcher exit: 0  ended: 2026-11-18T15:00:11Z
