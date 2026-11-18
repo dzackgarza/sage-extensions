@@ -67,6 +67,30 @@ def test_a_hyperbolic_arrow_is_an_arrow_of_the_manifolds_it_is_between() -> None
     assert reflection in TopologicalManifolds().Mor(space, space)
 
 
+def test_a_hyperbolic_arrow_states_its_coordinate_sections() -> None:
+    r"""The arrow is a smooth morphism of the two models, on their one pair of charts.
+
+    A hyperboloid model has the one chart ``hyperboloid``, so the arrow's
+    representation is one tuple of sections on the pair
+    ``(hyperboloid, hyperboloid)``, one section per chart coordinate of the
+    codomain, and the value of the ``i``-th at a point is the ``i``-th
+    coordinate of the arrow's image there.  The smooth owner's own evaluation of
+    that tuple is the arrow's value, so the arrow's action is its coordinate
+    representation and not a computation beside it.
+    """
+    lattice, space, root = _hyperbolic_line()
+    reflection = space.category().Mor(space, space)(lattice.reflection(root))
+    label = tuple(space.chart_labels())[0]
+    half = RR(1) / RR(2)
+    point = space((half,))
+    image = reflection(point)
+    sections = reflection.chart_maps()[label, label]
+
+    assert tuple(reflection.chart_maps().keys()) == ((label, label),)
+    assert sections[0](point) == image.coordinates()[0]
+    assert reflection.underlying_smooth_morphism()(point) == image
+
+
 def test_a_hyperbolic_arrow_moves_a_point_by_the_isometry_that_induces_it() -> None:
     r"""The reflection negates the hyperboloid coordinate, and its square is the identity."""
     lattice, space, root = _hyperbolic_line()
