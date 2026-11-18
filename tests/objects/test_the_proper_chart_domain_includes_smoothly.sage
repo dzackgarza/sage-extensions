@@ -145,3 +145,49 @@ def test_a_map_of_the_plane_is_not_restated_on_the_open_subsets_chart_by_assumpt
     assert tuple(plane.transitions().keys()) == ()
     with pytest.raises(AssertionError):
         doubling * inclusion
+
+
+def test_a_map_on_another_proper_chart_restricts_through_the_charts_overlap() -> None:
+    r"""A map of the plane written on ``{x + y != 0}`` restricts to ``{x != 0}`` where the two charts overlap, and is refused where they do not.
+
+    The plane's atlas states the change of coordinates between the chart ``U``
+    of ``{x != 0}`` and the chart ``V`` of ``{x + y != 0}`` on their overlap,
+    where ``x`` and ``x + y`` do not vanish.  The composite carries ``(3, -1)``
+    to the point whose ``V``-coordinates are ``(2, -2)``, its domain functions
+    are ``x`` and ``x + y``, and the point ``(1, -1)``, on ``x + y = 0``, is
+    outside that overlap and is refused.
+    """
+    plane, chart, domain = _the_plane_on_its_nonvanishing_open_subset()
+    base = plane.atlas()["base"]
+    other = plane.chart_on_open_subset(
+        "V", "u v", "base", (base.coordinate(0) + base.coordinate(1),)
+    )
+    point = plane((3, -1), "base")
+    inner = domain(point)
+    inclusion = plane.open_submanifold_inclusion(domain)
+    change = plane.transition_map(
+        "U",
+        "V",
+        (chart.coordinate(0) + chart.coordinate(1), chart.coordinate(1)),
+        (other.coordinate(0) - other.coordinate(1), other.coordinate(1)),
+        source_overlap=(chart.coordinate(0), chart.coordinate(0) + chart.coordinate(1)),
+        target_overlap=(other.coordinate(0), other.coordinate(0) - other.coordinate(1)),
+    )
+    doubling = plane.Mor(plane)(
+        {("V", "V"): (other.coordinate(0), other.coordinate(1) + other.coordinate(1))}
+    )
+    restriction = doubling * inclusion
+
+    assert change.manifold() is plane
+    assert restriction in domain.Mor(plane)
+    assert restriction(inner) == plane((2, -2), "V")
+    assert tuple(section(inner) for section in restriction.chart_map("U", "V")) == (
+        RR(2),
+        RR(-2),
+    )
+    assert tuple(section(inner) for section in restriction.chart_map_domain("U", "V")) == (
+        RR(3),
+        RR(2),
+    )
+    with pytest.raises(AssertionError):
+        restriction(domain(plane((1, -1), "base")))
