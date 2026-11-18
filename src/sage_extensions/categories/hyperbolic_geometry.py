@@ -20,6 +20,7 @@ from sage_extensions.categories.abstract_categories.objects import OwnedParamete
 from sage_extensions.categories.manifolds import (
     RiemannianManifoldMor,
     RiemannianManifolds,
+    SmoothManifolds,
 )
 from sage_extensions.categories.rings.ring_foundation import (
     _own_ring,
@@ -376,54 +377,72 @@ class HyperbolicManifoldMor(RiemannianManifoldMor):
 
     class ElementMethods(RiemannianManifoldMor.ElementMethods):
         def __init__(self, parent, isometry):
+            r"""Record the isometry, and the smooth map of the two hyperboloid models it induces.
+
+            The arrow's action is a map of the two smooth manifolds, and it is
+            built at the smooth owner from its coordinate representation: the
+            two hyperboloid models have the one chart ``hyperboloid``, and on
+            that pair of charts the isometry is the tuple of sections
+            ``y |-> (eps g x(y))_i``, one per chart coordinate of the codomain,
+            where ``x(y)`` is the hyperboloid vector the chart names and ``eps``
+            the sign that puts its image in the codomain's component.  So this
+            arrow's values are a represented smooth morphism's values, and its
+            coordinate sections are stated, rather than the values being computed
+            on the side of the smooth owner.
+            """
             self._isometry = isometry
-            self._map_of_points = Sets().Mor(parent.domain(), parent.codomain())(
-                lambda point: _isometry_image_of_point(
-                    parent.domain(), parent.codomain(), isometry, point
-                )
+            domain = parent.domain()
+            codomain = parent.codomain()
+            labels = (HYPERBOLOID_CHART, HYPERBOLOID_CHART)
+            assert (
+                tuple(domain.chart_labels()) == (HYPERBOLOID_CHART,)
+                and tuple(codomain.chart_labels()) == (HYPERBOLOID_CHART,)
+            ), (
+                f"there is no arrow {domain} -> {codomain} stated by this constructor: its "
+                f"coordinate representation is written on the chart {HYPERBOLOID_CHART}, and "
+                f"the endpoints' charts are {tuple(domain.chart_labels())} and "
+                f"{tuple(codomain.chart_labels())}"
             )
-            OwnedSetMorphism.__init__(self, parent, self._map_of_points)
+            ring = domain.atlas()[HYPERBOLOID_CHART].function_ring()
+            self._smooth_morphism = SmoothManifolds().Mor(domain, codomain)(
+                {
+                    labels: tuple(
+                        ring(
+                            lambda point, index=index: _isometry_image_of_point(
+                                domain, codomain, isometry, point
+                            ).coordinates()[index]
+                        )
+                        for index in range(int(codomain.dimension()))
+                    )
+                }
+            )
+            OwnedSetMorphism.__init__(self, parent, self._smooth_morphism)
 
         def lattice_isometry(self):
             r"""Return the integral isometry of the endpoints' lattice that induces this arrow."""
             return self._isometry
 
         def underlying_smooth_morphism(self):
-            r"""Return the map of points, as the owned set map of the two spaces.
+            r"""Return the smooth morphism of the two hyperboloid models this arrow is.
 
-            Those are the arrow's values on points.  A smooth morphism between
-            the two hyperboloid models is not a represented arrow of
-            ``SmoothManifolds()`` here -- that owner's constructor admits a map
-            only by its coordinate sections on a covering pair of charts
-            (``SmoothManifoldMor._element_constructor_``, ``manifolds.py``),
-            and this arrow states none -- so this returns the map of points the
-            action is computed by rather than a smooth morphism built by
-            assumption.
+            Its domain and codomain are this arrow's, its values on points are
+            this arrow's values, and its coordinate sections on the pair of
+            charts ``hyperboloid`` are the ones the constructor stated.
             """
-            return self._map_of_points
+            return self._smooth_morphism
 
         def underlying_topological_morphism(self):
-            r"""Return the map of points of the underlying topological spaces.
-
-            It is the same map as :meth:`underlying_smooth_morphism`, and it is
-            the owned set map of the two spaces for the same reason.
-            """
-            return self._map_of_points
+            r"""Return the same map as a map of the underlying topological spaces."""
+            return self._smooth_morphism
 
         def chart_maps(self):
-            r"""Refuse: this arrow is written by its lattice isometry, not by chart formulas.
+            r"""Return the coordinate sections of this arrow, on the chart pair ``hyperboloid``.
 
-            A chartwise representation would be one coordinate expression per
-            pair of charts, and the form the isometry takes in the chart
-            ``hyperboloid`` involves ``sqrt((1 - q(y)) / q(t))``.  What the
-            constructor is given is the isometry of the lattice, and no
-            coordinate representation is derived from it here.
+            One section per chart coordinate of the codomain, in the ring of
+            functions on the chart of the domain: the value of the ``i``-th at a
+            point is the ``i``-th coordinate of the image point.
             """
-            raise NotImplementedError(
-                f"{self} is induced by an isometry of {self.domain().lattice()}, and no "
-                f"chartwise coordinate representation of it is stated: it acts on the "
-                f"hyperboloid vectors"
-            )
+            return self._smooth_morphism.chart_maps()
 
         def degree(self):
             r"""Return ``Infinity``: an isometry of smooth manifolds is ``C^infinity``."""
