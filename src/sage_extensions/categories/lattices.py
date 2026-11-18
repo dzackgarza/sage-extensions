@@ -4452,14 +4452,28 @@ class Lattices(OwnedCategoryOverBaseRing):
             \(\operatorname{rank}_2(L) \ge 6\) for Kneser's theorem, and
             \(\operatorname{rank}_2(L) \ge 2\), which a hyperbolic plane forces,
             for Gritsenko--Hulek--Sankaran's proposition 3.4 (:meth:`rank_p` reads
-            that invariant from the Gram matrix).  No further case is added: a
-            rank-eleven even 2-elementary lattice such as
-            \(T_{\mathrm{Co}} = \langle 2\rangle \oplus U(2) \oplus E_8(-2)\)
-            has \(\operatorname{rank}_2 = 0\), so it contains no hyperbolic plane and no
-            theorem of transvections or reflections reaches \(\tilde O(L)\); its
-            \(|A_L| = 2^{11}\) also makes \(L = 2L^{\#}\), so \(\tilde O(L)\) is
-            the level-two congruence subgroup \(\ker(O(L)\to O(L/2L))\), and no
-            level-two generation statement is published for \(\operatorname{rank}_2 = 0\).
+            that invariant from the Gram matrix).  No further case is added.
+
+            **A rank-eleven even 2-elementary lattice, and what rank_2 measures
+            there.**  \(T_{\mathrm{Co}} = \langle 2\rangle \oplus U(2) \oplus
+            E_8(-2)\) has \(\operatorname{rank}_2 = 0\) in its own basis and
+            \(|A_L| = 2^{11}\), which makes \(L = 2L^{\#}\) and
+            \(\tilde O(L)\) the level-two congruence subgroup
+            \(\ker(O(L)\to O(L/2L))\).  \(\operatorname{rank}_2\) is read from a
+            Gram matrix, so it is not an invariant of the group: half of the Gram
+            matrix of \(L\) is the odd unimodular
+            \(M = \langle 1\rangle \oplus U \oplus E_8(-1)\), an integral matrix
+            \(X\) satisfies \(X^{\mathsf T} G_L X = G_L\) exactly when
+            \(X^{\mathsf T} G_M X = G_M\), so \(O(L) = O(M)\) and \(M\) --- the
+            same group --- has \(\operatorname{rank}_2 = 11\), signature
+            \((2,9)\) and two hyperbolic planes.  What the statements cited
+            above lack there is evenness, and no rescaling of the form supplies
+            it: the Gram matrices of the form are \(c\,G_M\), so
+            \(\operatorname{rank}_2(c\,G_M) = 0\) exactly when \(c\) is even,
+            while \(c\) odd leaves the \(\langle 1\rangle\) summand odd.  Evenness
+            and \(\operatorname{rank}_2 \ge 6\) are therefore mutually exclusive
+            among the rescalings of this form, and no cited statement generates
+            the level-two kernel of an odd unimodular lattice.
             """
             from sage_extensions.categories.hyperbolic_lattices import HyperbolicLattices
 
