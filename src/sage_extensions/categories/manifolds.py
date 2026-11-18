@@ -1364,18 +1364,78 @@ class SmoothManifoldMor(CategoricalMor):
             r"""The coordinates of the target chart ``target_label``, as sections on the source chart ``source_label``."""
             return self._representations[source_label, target_label]
 
-        def _representation_on(self, source_label):
-            r"""The target chart and the representation the map has on the source chart ``source_label``."""
+        def _representation_at(self, source_label):
+            r"""The target chart and the representation on the source chart ``source_label``, or ``None`` when the map is written on another chart."""
             pairs = tuple(
                 pair for pair in self._representations.keys() if pair[0] == source_label
             )
-            assert len(pairs) == 1, (
+            assert len(pairs) <= 1, (
                 f"cannot read {self} on the chart {source_label!r}: the map has "
                 f"{len(pairs)} coordinate representations whose source chart it is, and the "
                 f"value of a point is read off the one on the chart the point is given in"
             )
-            source_label, target_label = pairs[0]
-            return target_label, self.chart_map(source_label, target_label)
+            if not pairs:
+                return None
+            written_source, target_label = pairs[0]
+            return target_label, self.chart_map(written_source, target_label)
+
+        def _representation_on(self, source_label):
+            r"""The target chart and the representation the map has on the source chart ``source_label``."""
+            representation = self._representation_at(source_label)
+            assert representation is not None, (
+                f"cannot read {self} on the chart {source_label!r}: the map has no coordinate "
+                f"representation whose source chart it is, and the value of a point is read off "
+                f"the one on the chart the point is given in"
+            )
+            return representation
+
+        def _representation_written_on(self, source_label):
+            r"""The representation on the chart ``source_label``, restated there through the atlas change of coordinates when the map is written on another chart.
+
+            A map written on the chart ``m'`` of its domain is the same map read in
+            the chart ``m``, wherever the coordinate change ``m -> m'`` is defined:
+            ``f_{mt} = f_{m't} o (phi_{m'} o phi_m^{-1})``, and the change is the
+            atlas transition from ``m`` to ``m'``.  The restatement is a
+            coordinate representation on a whole chart only where that change is
+            defined on the whole of ``m``, which the atlas states by an empty
+            overlap; a change defined on a proper subset is not used here,
+            because a representation states a map on a whole chart and nothing
+            records the subset it would hold on.
+            """
+            written = self._representation_at(source_label)
+            if written is not None:
+                return written
+            changes = tuple(
+                pair
+                for pair in self.domain().transitions().keys()
+                if pair[0] == source_label and self._representation_at(pair[1]) is not None
+            )
+            assert len(changes) == 1, (
+                f"cannot restate {self} on the chart {source_label!r}: the map is written on "
+                f"the source charts {tuple(pair[0] for pair in self._representations.keys())}, "
+                f"and {self.domain()} states {len(changes)} changes of coordinates from the "
+                f"chart {source_label!r} to one of them"
+            )
+            alternative_label = changes[0][1]
+            target_label, expressions = self._representation_on(alternative_label)
+            change = self.domain().transition(source_label, alternative_label)
+            assert not tuple(change.source_overlap()), (
+                f"cannot restate {self} on the chart {source_label!r}: its change of "
+                f"coordinates to the chart {alternative_label!r} is defined only where "
+                f"{tuple(change.source_overlap())} do not vanish, and a coordinate "
+                f"representation here states a map on a whole chart"
+            )
+            return target_label, tuple(
+                _raise_manifold_expression(
+                    _engine_manifold_expression(section),
+                    self.domain().atlas()[source_label],
+                )
+                for section in _substitute_chart_coordinates(
+                    expressions,
+                    self.domain().atlas()[alternative_label],
+                    change.forward_expressions(),
+                )
+            )
 
         def _evaluate_point(self, point):
             r"""The point of the codomain that a point of the domain maps to.
@@ -1410,7 +1470,12 @@ class SmoothManifoldMor(CategoricalMor):
             coordinates of the middle manifold ``X``; substituting those for the
             coordinates of ``self``'s representation on that same chart states
             the coordinates of the composite's target, so the composite is the
-            map those substituted sections determine.
+            map those substituted sections determine.  When ``self`` is written
+            on another chart of that middle manifold, it is first restated on
+            the chart ``other`` states its values in, through the atlas change
+            of coordinates (:meth:`_representation_written_on`), which is what
+            restricts a map of a manifold to the open submanifold its chart is
+            the domain of.
             """
             assert other.codomain() is self.domain(), (
                 f"cannot compose {self} with {other}: the codomain {other.codomain()} of the "
@@ -1419,7 +1484,7 @@ class SmoothManifoldMor(CategoricalMor):
             representations = {}
             for source_label, middle_label in other.chart_maps().keys():
                 inner = other.chart_map(source_label, middle_label)
-                target_label, outer = self._representation_on(middle_label)
+                target_label, outer = self._representation_written_on(middle_label)
                 source = other.domain().atlas()[source_label]
                 middle = self.domain().atlas()[middle_label]
                 representations[source_label, target_label] = tuple(
