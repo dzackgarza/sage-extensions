@@ -117,5 +117,55 @@ sphere acceptance are untouched: the files changed for this issue are
 `src/sage_extensions/categories/functions/real_functions.py` and the two test
 files named above.
 
-The `ast-grep` gates do not run on this host (`ast-grep` is not installed), so
-they are neither green nor red here.
+## 8. The ast-grep gates
+
+`ast-grep` is not installed on this host and `npm` is not either, so the gate
+was provisioned the way the `_ci-tensor-tools` recipe provisions it, at the
+version that recipe pins, from the Python packaging of the same binary:
+
+    python3 -m pip download --no-deps --dest .scratch/577/tools ast-grep-cli==0.41.0
+    python3 -m zipfile -e <whl> .scratch/577/tools/extract
+    cp .scratch/577/tools/extract/ast_grep_cli-0.41.0.data/scripts/ast-grep .scratch/577/tools/bin/
+    .scratch/577/tools/bin/ast-grep --version      # ast-grep 0.41.0
+
+`@ast-grep/cli@0.41.0` is what the recipe installs, and this is that release's
+binary.  With `.scratch/577/tools/bin` first on `PATH`, in the tree of this
+file:
+
+    $ just tensor-boundary
+     179  $X.transpose()
+       0  $X.T
+       0  $X.matrix_action_right($$$A)
+       0  $X.matrix_action_left($$$A)
+       0  $X.einsum($$$A)
+       0  einsum($$$A)
+       0  $X.matmul($$$A)
+       0  matmul($$$A)
+       0  $X.dot($$$A)
+       0  $X @ $Y
+    179 suspected coordinate operations outside sage_extensions/tensors/: state the owned pullback, contraction, composition, inverse or application instead.
+    error: recipe `tensor-boundary` failed with exit code 1
+
+The gate is therefore run and red on the whole tree, and the red predates this
+issue: the same command on `7f33f66`, the tree the first repair of this issue
+was pushed onto, prints the same 179.  None of the 179 is in a file this issue
+changed -- the ten patterns above over
+`categories/manifolds.py`, `categories/algebras/algebras.py` and
+`categories/functions/real_functions.py` find 0 -- and all 179 are the one
+pattern `$X.transpose()`, in `algebras/order_hermitian_modules.py`,
+`algebras/isometry_commutant.py`, `categories/coloured_vector_families.py` and
+their neighbours, which is the burndown `tensor-boundary` exists to report.
+
+    $ just test-universe
+    Checking 20 mathematical test files.
+    DEV-37    41  extraction constructor: ask the object, not a Python container
+    DEV-37    38  len() where cardinality() is the mathematical operation
+    DEV-37     4  compared against a Python tuple or list display
+    DEV-40     0  extraction accessor: state the claim about the owned elements
+    83 findings.  Extraction is strictly weaker than comparing the
+    objects: it passes whether or not their own equality is implemented.
+    error: recipe `test-universe` failed with exit code 1
+
+This gate reads `git ls-files 'tests/*.py' 'tests/**/*.py'`, so the `.sage`
+tests of this repository are outside it by construction -- the two test files
+this issue added are `.sage` -- and no finding is in a path this issue touched.
