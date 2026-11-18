@@ -20,6 +20,8 @@ so the reflection in the root ``e_1`` -- which fixes ``e_0`` and negates
 
 from sage_extensions.all import *
 
+import pytest
+
 
 def _hyperbolic_line():
     r"""Return the Lorentz plane, its hyperboloid ``HH^1``, and the root of its reflection."""
@@ -89,6 +91,35 @@ def test_a_hyperbolic_arrow_states_its_coordinate_sections() -> None:
     assert tuple(reflection.chart_maps().keys()) == ((label, label),)
     assert sections[0](point) == image.coordinates()[0]
     assert reflection.underlying_smooth_morphism()(point) == image
+
+
+def test_the_isometry_decision_of_a_hyperbolic_space_reads_this_arrow() -> None:
+    r"""The space's ``is_an_isometry`` answers from the lattice isometry the arrow carries.
+
+    An arrow of ``HyperbolicSpaces(n)`` carries the isometry of its lattice that
+    induces it, so a hyperbolic space decides a map of itself by that datum: the
+    reflection and the identity are isometries of it, while a smooth map of the
+    point set that carries no isometry of the lattice is refused -- the space
+    states no decision about such a map, and neither admitting it nor calling it
+    a non-isometry is available there.
+    """
+    lattice, space, root = _hyperbolic_line()
+    isometries = space.category().Mor(space, space)
+    label = tuple(space.chart_labels())[0]
+    smooth = SmoothManifolds().Mor(space, space)(
+        {
+            (label, label): (
+                space.atlas()[label].function_ring()(
+                    lambda point: point.coordinates()[0]
+                ),
+            )
+        }
+    )
+
+    assert space.is_an_isometry(isometries(lattice.reflection(root))) is True
+    assert space.is_an_isometry(isometries.identity()) is True
+    with pytest.raises(ValueError):
+        space.is_an_isometry(smooth)
 
 
 def test_a_hyperbolic_arrow_moves_a_point_by_the_isometry_that_induces_it() -> None:
