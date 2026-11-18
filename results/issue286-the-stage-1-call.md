@@ -265,9 +265,22 @@ a reader asks for `representative()`, and
 `#588`'s retention repair (`#592`, `#593`) is stated on the first: the span row
 falls from 12.29 GiB to 2.0 GiB at that length.
 
-The row, run alone on an otherwise idle host (the same call, sampled every
-30 s): **killed at 9 538 MiB peak, exit 137, 1 365 s in**, with RSS still
-rising at about 1.2 GiB a minute and the walk roughly two thirds done.  Its
+Both instruments were then run on this host, each sampled every 30 s, and the
+host killed both:
+
+| row | peak | wall | outcome |
+| --- | ---: | ---: | --- |
+| `isotropic_orbit_representatives(2)` (the gathered row) | **9 538 MiB** | 1 365 s | exit 137, RSS still rising at ~1.2 GiB a minute |
+| `cusps(2)` (the span row, `#588`'s instrument) | **3 190 MiB** | 2 081 s | exit 137, still building |
+
+The span row is the smaller one and it too was killed, at 3 190 MiB, with the
+host's available memory down to 3 GiB because other chats' jobs were running
+beside it; the kill follows the host, not the row's own size, which is the
+pattern `9dceec9` recorded.
+
+The gathered row, alone on a quieter host, was **killed at 9 538 MiB peak,
+exit 137, 1 365 s in**, with RSS still rising at about 1.2 GiB a minute and the
+walk roughly two thirds done.  Its
 arithmetic is 1.5 GiB of coset tables once, plus 189 720 planes at 68.4 KiB
 each: about 13.9 GiB, which no host of this size will give it.
 
