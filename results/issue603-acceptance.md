@@ -37,6 +37,30 @@ refuses the marking outright.  The incompleteness this round repairs is
 observable only on `U^2 + <-2>` at `e_1+e_2+x`, whose construction takes 40 s and
 is therefore recorded here rather than asserted in a test.
 
+
+## 0b. Fourth round: the pointed call's red, in the rows tier
+
+The red the earlier rounds lacked is
+`tests/lattices/the_enriques_pointed_stabilizer_row.py`, and its **tier is the
+rows tier**: the file is not collected (its name does not begin with `test_`),
+because the call it makes runs in 12 to 23 s against the 20 s per-test gate.  No
+gate was weakened and no ceiling raised.
+
+* at `41f21a69` the call does not return -- the pointed marking at an isotropic
+  vector went to `sage-indefinite-port`, still inside the stabilizer computation
+  when stopped at 400 s;
+* on this head it prints
+  `pointed family at e_1: 36 generators in 12.1 s` and
+  `index of the line stabilizer's discriminant image in O(A_N): 1`, the index the
+  card `029J` cites for `L_1 = Ze_1`.
+
+Three smaller lattices were measured first: `U + U(2)`, `U(2) + U(2)`,
+`U(2) + D4(-1)` and `U + E8(-2)` answer correctly in 0.6--2.8 s (12.8 s at `U +
+E8(-2)`'s norm-4 vector), so the defect begins at card `0125`
+(`U(2) + E8(-2)`, rank 10) where the call takes 72.4 s and 105.5 s at its two
+hyperbolic generators -- further above the gate than the 029J row, which is the
+smallest specimen carrying the defect *and* a card value.
+
 ## 1. What changed in this round
 
 **The generation argument was false, and is replaced.**  `b580e31` paired the
