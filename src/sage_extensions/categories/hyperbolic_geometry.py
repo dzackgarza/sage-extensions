@@ -26,6 +26,7 @@ from sage_extensions.categories.rings.ring_foundation import (
     _owned_integers,
 )
 from sage_extensions.categories.sets.finite_ordered_sets import finite_ordered_set
+from sage_extensions.categories.sets.indexed_families import indexed_family
 from sage_extensions.categories.sets.set_categories import OwnedSetMorphism, Sets
 from sage_extensions.categories.topological_spaces import TopologicalSpaces
 from sage_extensions.owned_category import _object_of
@@ -543,10 +544,13 @@ class HyperbolicSpaces(OwnedParameterizedCategory):
 
     def _call_(self, component):
         r"""Return the hyperboloid model ``HH(C^+)`` of a positive-cone component of rank ``n + 1``."""
-        assert component.lattice().module_rank() == self.dimension() + 1, (
-            f"{component} spans a hyperbolic space of dimension "
-            f"{component.lattice().module_rank() - 1}, not {self.dimension()}"
-        )
+        rank = int(component.lattice().module_rank())
+        dimension = int(self.dimension())
+        if rank != dimension + 1:
+            raise ValueError(
+                f"cannot place {component} in {self}: the component spans a hyperbolic space of "
+                f"dimension {rank - 1}, not {dimension}"
+            )
         return component.projectivization()
 
     class ParentMethods:
@@ -561,8 +565,53 @@ class HyperbolicSpaces(OwnedParameterizedCategory):
             return self._component.lattice()
 
         def riemannian_metric(self):
-            r"""Return the metric ``-b`` restricted to each tangent space ``x^perp`` of the hyperboloid."""
-            pass
+            r"""Return the metric ``-b`` of the hyperboloid, in the charts of its atlas.
+
+            ``b`` is negative definite on ``t^perp`` for ``t`` the timelike
+            vector of the component, so ``-b`` is positive definite on each
+            tangent space ``x^perp`` of the hyperboloid, and the differential of
+            the chart ``hyperboloid`` carries ``t^perp`` onto ``T_x``.  What is
+            returned is that section as it is stated in coordinates: the family
+            ``chart label |-> (g(d/dy_i, d/dy_j))`` of
+            :meth:`RiemannianManifolds.riemannian_metric`, whose entries are
+            functions on the chart's domain
+            (:meth:`_HyperboloidFrame.metric_matrix` is their value).
+            """
+            return indexed_family(
+                self.chart_labels(),
+                self._metric_matrix_in_chart,
+                name=f"Gram matrix of the metric of {self} in each chart",
+            )
+
+        def _metric_matrix_in_chart(self, label):
+            r"""The Gram matrix of ``-b`` in the chart ``label``, as functions on its domain.
+
+            The formula is read in the coordinates of the chart
+            ``hyperboloid``, which is the one chart the hyperboloid model comes
+            with; a chart that does not carry it is refused rather than given a
+            matrix the chart's coordinates do not state.
+            """
+            if label != HYPERBOLOID_CHART:
+                raise ValueError(
+                    f"cannot state the metric of {self} in the chart {label!r}: the metric "
+                    f"``-b`` of the hyperboloid is stated in the coordinates of "
+                    f"{HYPERBOLOID_CHART!r}, and no other chart of {self} carries that formula"
+                )
+            chart = self.atlas()[label]
+            ring = chart.function_ring()
+            frame = self._hyperboloid_frame()
+            dimension = int(self.dimension())
+
+            def entry(row, column):
+                def value(point):
+                    return frame.metric_matrix(tuple(chart(point)))[row][column]
+
+                return value
+
+            return tuple(
+                tuple(ring(entry(row, column)) for column in range(dimension))
+                for row in range(dimension)
+            )
 
         @cached_method
         def rational_points(self):
@@ -590,11 +639,23 @@ class HyperbolicSpaces(OwnedParameterizedCategory):
 
             lattice = self.lattice()
             vector = lattice(vector)
-            assert lattice.q(vector) == 0 and self._component.closure_contains(vector) and vector != lattice.zero(), (
-                f"{vector} does not define an ideal point of {self}: an ideal point is the "
-                f"ray of a nonzero isotropic vector in the closure of {self._component}, "
-                f"and {vector} has square {lattice.q(vector)}"
-            )
+            if vector == lattice.zero():
+                raise ValueError(
+                    f"the zero vector of {lattice} defines no ideal point of {self}: an ideal "
+                    f"point is the ray of a nonzero vector"
+                )
+            if lattice.q(vector) != lattice.base_ring().zero():
+                raise ValueError(
+                    f"{vector} does not define an ideal point of {self}: an ideal point is the "
+                    f"ray of an isotropic vector, and {vector} has square {lattice.q(vector)}"
+                )
+            if not self._component.closure_contains(vector):
+                raise ValueError(
+                    f"{vector} does not define an ideal point of {self}: it is isotropic, but "
+                    f"its ray is not in the closure of {self._component}, whose pairing with "
+                    f"the timelike vector {self._component.timelike_vector()} is "
+                    f"{lattice.b(vector, self._component.timelike_vector())}"
+                )
             primitive = _primitive_on_selected_ray(
                 lattice, vector, self._component.timelike_vector()
             )
@@ -935,6 +996,68 @@ class _HyperboloidFrame(SageObject):
         ratio = self.pairing(vector, self.timelike) / self.pairing(self.timelike, self.timelike)
         projection = tuple(vector[index] - ratio * self.timelike[index] for index in range(self.rank))
         return tuple(projection[index] / self.timelike_pairings[self.pivot] for index in self.others)
+
+    def tangent_basis(self):
+        r"""The basis ``u_1, ..., u_n`` of ``t^perp`` the chart's coordinates are read in.
+
+        It is the coefficient of the chart coordinate ``y_j`` in
+        ``x = s t + sum_j y_j u_j``, so ``u_j = w_k e_j - w_j e_k`` for the
+        pivot ``k`` and ``w = (b(t, e_0), ..., b(t, e_{n}))``.
+        """
+        pivot = self.pivot
+        basis = []
+        for index in self.others:
+            vector = [RR.zero()] * self.rank
+            vector[index] = self.timelike_pairings[pivot]
+            vector[pivot] = -self.timelike_pairings[index]
+            basis.append(tuple(vector))
+        return tuple(basis)
+
+    def metric_matrix(self, chart_coordinates):
+        r"""The Gram matrix ``(g(d/dy_i, d/dy_j))`` of ``-b`` in the chart ``hyperboloid``.
+
+        The chart sends ``y`` to ``x = s t + sum_p y_p u_p`` with
+        ``s = sqrt((1 - q(y))/q(t))``, so the chart's coordinate vector fields
+        are ``dx(u) = ds(u) t + u`` and ``s ds(u) = -b(y, u)/q(t)``, read off
+        ``2 s ds = -dq/q(t)``.  Since ``x` lies on the hyperboloid the metric is
+        ``-b``, and ``b(t, u) = 0``, so
+
+        .. math::
+
+            g_{ij}(y) = -b(u_i, u_j)
+                        - \frac{b(y, u_i)\, b(y, u_j)}{1 - q(y)},
+
+        where ``q(y) = sum_{p r} y_p y_r b(u_p, u_r)``.  The denominator is
+        ``q(t) s^2``, which is positive on the chart's domain, so the chart's
+        differential carries ``t^perp`` onto each tangent space and the entries
+        are functions there.
+        """
+        basis = self.tangent_basis()
+        coordinates = tuple(RR(value) for value in chart_coordinates)
+        pairings = tuple(tuple(self.pairing(left, right) for right in basis) for left in basis)
+        heights = tuple(
+            sum(
+                (coordinates[position] * pairings[position][column] for position in range(len(basis))),
+                RR.zero(),
+            )
+            for column in range(len(basis))
+        )
+        square = sum(
+            (
+                coordinates[left] * coordinates[right] * pairings[left][right]
+                for left in range(len(basis))
+                for right in range(len(basis))
+            ),
+            RR.zero(),
+        )
+        denominator = RR.one() - square
+        return tuple(
+            tuple(
+                -pairings[row][column] - heights[row] * heights[column] / denominator
+                for column in range(len(basis))
+            )
+            for row in range(len(basis))
+        )
 
 
 def _hyperbolic_space(component):
