@@ -588,3 +588,28 @@ has no `data.generator_morphisms` read because there is nothing to read it from.
 That places item 5 with the database repository's owner: **lattice-database#7**, which asks for
 the card and the field in the first place. Nothing in this repository can close it, and nothing
 here should be edited to fake it.
+
+### Correction to the section above
+
+The card is **not** absent upstream: the slug is `otilde-t-co`, not `gamma-otilde-t-co`, and
+`arithmetic-groups/otilde-t-co.md` exists at the pinned ref `1e1cadc`. At that ref its front
+matter is
+
+```
+slug: otilde-t-co
+name: Otilde(T_Co)
+lattice: 6JRR
+data:
+  abstract_structure: the kernel of O(T_Co) -> O(A_T_Co)
+  cardinality: aleph0
+```
+
+with no `generator_morphisms` field, and its body says the index, the generators and the
+orbits "are absent until a computation certifies them". The earlier conclusion in the section
+above — that the card itself does not exist — is wrong and is withdrawn; what holds is that
+the digest omits the card because `refresh_lattice_database_enriques.py` reads a fixed set of
+87 `gamma-h-*` cards, and that the field is missing at its source.
+
+So item 5 waits on **lattice-database#7** for the field's content. Adding the card to this
+repository's digest before that field exists would put `None` under a key the acceptance names,
+which is not certification and is not done here.
