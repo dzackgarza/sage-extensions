@@ -66,7 +66,7 @@ def test_the_integral_cohomology_of_p2_has_ranks_1_0_1_0_1() -> None:
     r"""``H^*(P^2(CC), ZZ) = ZZ[h]/(h^3)`` with ``deg h = 2`` (Hatcher, *Algebraic Topology*, Thm. 3.12)."""
     plane = _projective_plane()
 
-    assert [plane.integral_singular_cohomology(k).rank() for k in range(5)] == [1, 0, 1, 0, 1]
+    assert [plane.integral_singular_cohomology(k).module_rank() for k in range(5)] == [1, 0, 1, 0, 1]
     assert all(plane.integral_singular_cohomology(k).is_torsion_free() for k in range(5))
 
 
