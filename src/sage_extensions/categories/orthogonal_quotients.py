@@ -1006,6 +1006,18 @@ class OrthogonalCharacterQuotient:
         pieces.append(libgap.Subgroup(og_engine, kernel_images))
         return libgap.Intersection(*pieces) if len(pieces) > 1 else pieces[0]
 
+    @cached_method
+    def _permutation_character_target(self):
+        r"""The exact condition subgroup in the shared faithful permutation model.
+
+        Every incidence adjustment uses the same target subgroup.  Its image
+        under the GAP homomorphism is computed once, rather than once per
+        witness (up to 569160 witnesses in a Coble kernel incidence row).
+        """
+        return libgap.Image(
+            self._character_permutation_model(), self._gap_character_target()
+        )
+
     def subgroup_image_order(self) -> int:
         r"""``|chi(self.subgroup)|``, from the generated image; no image element is listed.
 
@@ -2987,7 +2999,7 @@ end
             ]
             stabilizer_permutation = libgap.Subgroup(permutation_product, stabilizer_gaps)
             stabilizer_section = None
-        subgroup_permutation = libgap.Image(to_permutation, self._gap_character_target())
+        subgroup_permutation = self._permutation_character_target()
         reversed_product = _law_reversed(self._model_factors()[0][1])
         # The element of the stabilizer image inside the subgroup's coset is
         # exhibited by a double-coset membership and a canonical coset walk,
