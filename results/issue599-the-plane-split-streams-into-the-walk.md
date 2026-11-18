@@ -365,6 +365,27 @@ and at 4 982 MiB, `Otilde+` at 4 803 MiB and 1 698 MiB -- the killer takes
 whatever is largest when MemAvail reaches about 1 GiB, and the row's own size is
 no longer the discriminator.
 
+**The fifth attempt, and what the five bound.**  The gated retry of 09:13:01
+started on 9 448 MiB of MemAvailable, reached 180 000 of 189 720 planes at
+2 003 s / 3 908 MiB, and left the host at 09:47:20 with `# launcher exit: 0`,
+peak tree RSS **3 956 MiB**, low-water MemAvail **1 025 MiB**; `fresh2.log` closes
+with `oom_kill 50` against 49 at its start.  Five kernel-row attempts now:
+
+| attempt | peak | died at |
+| --- | ---: | --- |
+| `Otilde` 04:09 | 3 400 MiB | 130 000 planes |
+| `Otilde` 04:36 | 4 982 MiB | 550 000 records |
+| `Otilde` 06:03 | 5 490 MiB | closing the contract's printing |
+| `Otilde+` 08:06 | 4 803 MiB | 210 000 records |
+| `Otilde+` 09:13 | 3 956 MiB | 180 000 planes |
+
+each with MemAvail at about 1 GiB when it died, and `oom_kill` rising 43 -> 50
+across them.  A row needs about 1.5 h and ~5 GiB on this host, and the host has
+supplied neither continuously: the free memory it started each attempt with is
+gone inside 35-45 minutes whatever the attempt's own size.  That is the input
+this clause is waiting on, and it is a host rather than a change of mine -- the
+one-pass walk would cut the row to ~1.5 GiB but not to under an hour.
+
 **Why the counts have to be computed and cannot be extrapolated.**  The edge
 count is not a fixed multiple of the plane count.  On `U + U(2) + <-2>` both
 kernel rows decide **4 edges over 3 line cusps and 2 plane cusps** -- two edges a
