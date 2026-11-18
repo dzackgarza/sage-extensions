@@ -1,0 +1,260 @@
+# The integral-affine sphere of a Sterk cusp (#256): the closure cone, the four
+# specimens, and where the leaf stops
+
+One round.  What landed, what each specimen question answers with what value, and
+the exact failure where an item is not done.
+
+## 0. The runtime: this VM cannot import the library
+
+Every geometry module of `sage_extensions` fails to import here, at one line, before
+any test can be collected:
+
+```
+$ PYTHONPATH=src sage -c "import sage_extensions.categories.schemes.polytopes"
+  File ".../src/sage_extensions/categories/modules/native_modules.py", line 227, in construct
+    free = self.base_ring().free_module(1)
+  File "/opt/math/lib/python3.12/site-packages/sage/categories/rings.py", line 1710, in free_module
+    raise ValueError("base must be a subring of this ring")
+ValueError: base must be a subring of this ring
+```
+
+`RR = ExactRealField()` runs `_algebra_from_native_ring`, which asks the owned ring for
+`free_module(1)`; the owned `Rings.ParentMethods.free_module(rank_or_index_set)`
+(`ring_foundation.py:4699`) is not the method the class resolves, so Sage's
+`Ring.free_module(base=1)` is called instead.
+
+The host is Sage **10.8** (`sage --version` -> `10.8`) at `/opt/math/bin/sage`.  The
+adopted runtime (`sage-image/rootfs`, Sage 11.0.beta5) is not present on this VM, and
+`sageparse` -- which `sage_extensions/all.py` and `language_runtime.py` import -- exists
+nowhere on this filesystem (`find / -name "sageparse*"` is empty, and it is not on PyPI),
+so `from sage_extensions.all import *`, every `.sage` test file, and `qc_sage_session`
+cannot run at all.  Nothing in this round was measured on the pinned image.
+
+Two consequences, stated once and applied throughout: modules that do not touch
+`rings.real` **do** run (`ring_foundation`, `polyhedral_cones`), and everything in the
+geometry layer (`polytopes`, `sterk`, `catalogue`, `integral_affine_manifolds`) does not.
+The specimen answers below were therefore computed from the source's own data with
+Sage's exact linear algebra and polyhedra, and the assertions of the tests written here
+were executed through their two library names rather than through `all`.
+
+## 1. The closure cone and its combinatorics -- landed, and the three conditions
+
+The operation itself already existed: `RationalPolyhedralCones.from_nonnegative_solutions`
+(`polyhedral_cones.py:284`, landed as `4a33efc` for this issue) is the cone
+`{ l in Z_{>=0}^n : sum_i l_i v_i = 0 }` of a morphism `Z^n -> L`.  What the issue's trap
+asks for -- that the three conditions be kept apart in the API and not only in the prose
+-- was not there, and is now:
+
+| operation | where | what it decides |
+| --- | --- | --- |
+| `has_a_nonzero_point()` | `polyhedral_cones.py:513` | the cone is not `{0}`, i.e. a closed polygon exists at all |
+| `has_a_strictly_positive_point()` | `polyhedral_cones.py:535` | the cone meets the open positive orthant, i.e. a polygon exists with **every** prescribed edge present |
+
+Both are decided on the retained exact polyhedron: the second by intersecting it with the
+orthant translated to `x_i >= 1` and asking emptiness, which is exact because the cone is
+closed under positive scaling.  The third condition -- the polygon is nondegenerate -- is
+not a property of the cone but the rank of the direction family, and the docstring says so
+rather than folding it in.
+
+The distinction is one specimen: `(1,0), (-1,0), (0,1)` has the closure cone
+`l_1 = l_2, l_3 = 0`, one-dimensional with the single ray `(1,1,0)`.  It has nonzero points
+and no strictly positive one, so *a closed polygon exists and none uses all three edges*.
+The independent pair `(1,0), (0,1)` answers `False` to both.
+
+Tests: `tests/lattices/test_rational_polyhedral_cones.sage` gains
+`test_a_nonzero_point_and_a_strictly_positive_point_are_two_decisions` and
+`test_the_open_orthant_and_the_cone_meet_exactly_when_a_positive_relation_exists`.
+No red was possible: the two names did not exist at the parent, so a "red" would have been
+an `AttributeError` for the missing fix, which is not a red.
+
+## 2. Specimen question 1 -- the complete Sterk2 polygon, roles preserved
+
+Decided.  The nineteen vectors of Coble cell 59 are **not** nineteen cyclic edges.  With
+the source's roles:
+
+* `v_2 .. v_18` are seventeen path steps walked from `p_0 = (0,0)`;
+* `v_1 = (-1,2)` and `v_19 = (1,2)` are the surgery triangles' side directions, placed on
+  the path's edges at zero-based positions 2 and 14, and are not edges of the polygon;
+* the path's total vertical displacement is zero (the source's `constraint` row is exactly
+  that) and its total horizontal displacement is negative, so **the closing side runs along
+  `(1,0)` from `p_17` back to `p_0`**.  That is the side the plotter's convex hull supplies.
+
+So the polygon has **eighteen** cyclic edge directions, `v_2 .. v_18` followed by `(1,0)`,
+and its closure cone is sixteen-dimensional.  For the stored specimen
+(`l = 4,1,2,1,2,1,2,1,2,0,2,1,2,1,2,1,2,1,4`) the source's `M_18_0_0` gives the seventeen
+boundary coefficients `1,1,3,1,1,1,1,1,0,1,1,1,1,1,3,1,1`, so one prescribed direction is
+absent, the path ends at `(-24, 0)`, and the closing side has length `24`.
+
+Computed through the library's own cone:
+
+```
+sterk2: dim 16 rays 65 nonzero True positive True
+rays of two-element support 2
+   (0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1)      support {(-1,0), (1,0)}
+   (1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0)      support {(0,1), (0,-1)}
+stored specimen in the cone: True
+```
+
+The two two-element rays are exactly the two antipodal pairs of the eighteen directions;
+there is no third.  The stored lengths, read as the eighteen lattice lengths
+`1,1,3,1,1,1,1,1,0,1,1,1,1,1,3,1,1,24`, lie in the cone.  Test:
+`test_the_sterk2_boundary_path_closes_with_the_horizontal_side`.
+
+The polygon itself (raw Sage, the source's own `Polyhedron` on the walked points): `17`
+vertices -- the zero coefficient merges two of them -- ambient area `410`, i.e. normalized
+area `820`, which is the number `sterk.py` states.
+
+## 3. Specimen question 2 -- the admissible parameter space is ten-dimensional
+
+Decided, and the eleven-parameter statement is false for this construction.
+
+Cell 8's `Sterk2.__init__` builds `A` from **ten** rows: one constraint and nine symmetry
+relations `l_i - l_{20-i}`.  Computed:
+
+```
+A dimensions (10, 19) rank 9
+kernel dim 10
+constraint in symmetry span: True sym rank 9
+P dims (19, 10) rank 10
+```
+
+The constraint row `(3/2, 1, 2, 3, 5/2, 2, 3/2, 1, 1/2, 0, -1/2, -1, -3/2, -2, -5/2, -3,
+-2, -1, -3/2)` is exactly `sum_{i=1}^{9} c_i (e_i - e_{20-i})` with
+`c = (3/2, 1, 2, 3, 5/2, 2, 3/2, 1, 1/2)`, so it adds nothing to the symmetry rows: the
+"vertical constraint" *is* the symmetry, and the kernel is the space of symmetric length
+vectors, of dimension `19 - 9 = 10`.
+
+The half weights and offsets are the source's `M_18_0_0`, not a statement about the raw
+directions: it halves the odd-labelled lengths and adds `l_1/2` to `v_4` and `l_19/2` to
+`v_16`.  The parity vector `[2,1,2,1,...]` scales the ten kernel *basis columns* so that
+`soln_projection_18_0_0` is integral; that matrix is `19 x 10` of rank `10`, and `a_to_ell`
+therefore takes ten parameters because the kernel has ten, not because a parity convention
+fixes eleven to ten.
+
+## 4. Specimen question 3 -- the Sterk4 maps and ranks
+
+Decided from the named roots, the permutation and the projection, and the stored
+`(20,12) 11` is **not** reproduced.
+
+The objects: `L_20_2_0 = U (+) U(2) (+) E8 (+) E8` with `U = H`, `U(2) = H.twist(2)` and
+`E8 = IntegralLattice("E8").twist(-1)` (Coble cells 6, 70), the twenty-two vectors
+`v_1 .. v_22` of cell 4 read through the dual basis `G^{-1}`, the order
+`W = v_13, v_12, ..., v_1, v_16, v_15, v_14, v_20, v_19, v_18, v_17, v_22, v_21`, and the
+permutation `F4 = [12,11,10,9,8,7,6,5,4,3,2,1,0,15,14,13,19,18,17,16,21,20]` of the
+formal root basis.  The construction is pinned by the relations the source itself prints:
+with Sage's own E8 Cartan ordering the twenty-two vectors have exactly the four printed
+relations and no others, and no pair of them is linearly dependent otherwise.
+
+```
+norms [-4, -2] V rank 18
+printed relation space inside my kernel: True dims 4 4
+Sterk4 (cell 20): |Fix| 12 (source says 12); image dims (20, 12) rank 10 kernel 2
+dim(Fix) = 12  dim(Rel) = 4  dim(Fix ∩ Rel) = 2
+```
+
+The +1 eigenspace of `F4` is twelve-dimensional, as the cell states.  The twenty-two named
+roots span eighteen dimensions, so the projection `W: Q^22 -> Q^20` has a four-dimensional
+kernel `Rel`; the fixed space meets it in two dimensions; hence the projection restricted to
+the fixed space has rank `12 - 2 = 10` and a two-dimensional kernel.
+
+That identity fixes the answer independently of the basis chosen: the rank is
+`dim(Fix) - dim(Fix ∩ Rel)`, both terms identified.  The stored `(20,12) 11` would require
+the fixed space to meet the relation space in one dimension, and with the source's own
+printed relations it meets it in two.  The later Sterk3-labelled cells 29--31 compute
+`A = R(P-I)`, a different map on a different permutation: `rank 8` there is
+`22 - 14` and says nothing about this one.
+
+## 5. Specimen question 4 -- the polygons of cells 11--13 and their groups
+
+Decided for the three specimens.  Each is the convex hull of the walked path of the
+`18_2_0` family (`v_0 .. v_15` through `M_18_2_0`), with the source's own lengths:
+
+| cell | cusp | lengths `l_0 .. l_19` | coefficients | vertices | normalized area | `Aut` |
+| --- | --- | --- | --- | --- | --- | --- |
+| 11 | Sterk1 | `1,2,1,2,1,0,1,2,1,2,1,2,1,0,1,2,6,6,6,6` | `4,1,1,1,4,0,1,1,4,1,1,1,4,0,1,1` | 14 | 236 | `C2`, generator `diag(-1,-1)` |
+| 12 | Sterk2 | `4,1,2,1,2,1,2,1,2,0,2,1,2,1,2,1,2,1,4` | `1,1,3,1,1,1,1,1,0,1,1,1,1,1,3,1,1` | 17 | 820 | `C2`, generator `diag(-1,1)` |
+| 13 | Sterk3 | `2,2,2,2,2,2,2,4,2,4,2,2,2,2,2,2,24,6,30,6` | `14,1,2,1,5,1,2,2,17,2,2,1,5,1,2,1` | 16 | 1141 | `C2`, generator `[[0,1],[1,0]]` |
+
+The printed generators are exactly the saved outputs of the three cells: `diag(-1,-1)` for
+Sterk1, `diag(-1,1)` for Sterk2 and the transposition matrix for Sterk3.  Cell 11's path
+closes on itself (its coefficients sum to zero) and cell 13's ends at `(-6,6)`, so only
+Sterk2's needs the hull's closing side in the same sense as §2.
+
+These are three specimens.  Each claimed group is established for its own length choice;
+nothing here says `Aut(P)` is `C2` for every Sterk length vector, and the issue says it
+does not.
+
+The two polytope operations the issue lists as `pass` are **not** `pass` at this parent:
+`ConvexPolytopes...abstract_automorphisms` (`polytopes.py:2314`) delegates to the face
+poset's own `Aut`, and `geometric_to_abstract_automorphisms` (`:2367`) builds the group map
+from the vertices' face permutation.  They landed under #573/#582.  What was not done here
+is running them: the specimens above were computed with `restricted_automorphism_group`,
+not through the library, because of §0.  The one `pass` body left under the names the issue
+cites is `RegularPolytopes...abstract_automorphisms` (`:1518`), a different owner.
+
+## 6. The three surgery stubs -- not implemented, and why
+
+`SingularIntegralAffineSpaces.surgery`, `symington_surgery` and `basis_triangle_surgery`
+(`integral_affine_manifolds.py:614`, `:623`, `:627`) still have `pass` bodies.  They are not
+implemented because their ingredients are themselves `pass`, so any body written now would
+be an invention rather than a construction:
+
+| missing owner | where | needed by |
+| --- | --- | --- |
+| `TopologicalSpaces.mapping_cylinder` | `topological_spaces.py:643` | the glued space a surgery returns |
+| `TopologicalSpaces.subspace` | `:647` | the cut region's own topology |
+| `IntegralAffineCollars.on` | `integral_affine_collars.py:89` | every `affine_collars` argument |
+| `IntegralAffineCollars.comparison` | `:93` | the regluing's collar agreement |
+| `SingularIntegralAffineSpaces.on` | `:600` | the object the three of them return |
+
+and `SingularIntegralAffineSpacesOfDimension` repeats three of them at its own owner
+(`:762` `on`, `:772` `from_face_gluing`, `:782` `surgery`), so the parameterized category is
+stubbed too.
+
+`on` is pure assembly and is the one of these that could be written blind; the other four
+need either the topological pushout or a decision about what a collar *is* in this tree, and
+the runtime of §0 cannot run a single line of either.  So the acceptance item "no `pass`
+body remains on these methods" is **not** met: the honest state is five stubs, three of them
+the issue's.
+
+## 7. The edge-length space and the sigma-invariant root space -- dimension only
+
+Not proven.  What is established: the two spaces have the same dimension, from the same
+source.  Cell 8's symmetry relations are nine pairings of nineteen roots, and
+`Sterk._sterk_roots_cached()["Sterk_2"]` is the ten orbit sums
+`w1+w17, w2+w16, w3+w15, w4+w14, w5+w13, w6+w12, w7+w11, w8+w10, w9, w18+w19`, which span
+the sigma-invariant root space.  Ten orbit sums, ten lengths `a_0 .. a_9`.
+
+That is a dimension agreement and a natural basis correspondence, not an isomorphism of the
+objects built here: no map has been constructed that carries the edge-length lattice and
+its cone to the invariant root lattice and its cone, and naming one on the strength of the
+dimensions would be a guess.  The exact failure is therefore: *the correspondence is
+established on dimensions and on the orbit basis, and not as a map of integral-affine
+objects*; the operation that would carry it (`LatticeMorphisms.invariant_lattice`, and the
+`Sterk_2` orbit data) cannot be run here at all under §0.
+
+## 8. What was run
+
+* `PYTHONPATH=src sage .scratch/probe_predicates.py` -> the cone numbers of §2 and §1.
+* `PYTHONPATH=src sage .scratch/specimen_cell12.py` -> the Sterk2 specimen of §2.
+* `PYTHONPATH=src sage .scratch/specimen_cells11_13.py` -> the table of §5.
+* `PYTHONPATH=src sage .scratch/sterk4_rank.py` -> the ranks of §4.
+* `PYTHONPATH=src sage .scratch/run_test_bodies.py` -> the seven test bodies of
+  `tests/lattices/test_rational_polyhedral_cones.sage` and
+  `tests/schemes/test_lattice_polygon_edge_lengths.sage` (the four that were there and the
+  three added), executed with `sage_extensions.all` replaced by the two names they use:
+
+```
+PASS test_a_nonzero_point_and_a_strictly_positive_point_are_two_decisions
+PASS test_the_open_orthant_and_the_cone_meet_exactly_when_a_positive_relation_exists
+PASS test_the_polygon_of_example_4_13_closes_with_two_free_edge_lengths
+PASS test_the_polygon_of_example_4_14_closes_with_two_free_edge_lengths
+PASS test_the_polygon_of_example_4_15_closes_with_the_alternating_lengths
+PASS test_edge_directions_with_no_positive_relation_close_no_polygon
+PASS test_the_sterk2_boundary_path_closes_with_the_horizontal_side
+failures: 0
+```
+
+Not run: the pytest suite, the test lint, and every import of the geometry layer.  The two
+test files were not collected and the lint was not applied, because neither can start on
+this host.
