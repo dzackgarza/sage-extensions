@@ -167,6 +167,7 @@ class SmoothVectorBundles(OwnedParameterizedCategory):
             bundle_base_manifold=manifold,
             bundle_rank=manifold.dimension(),
             engine_bundle=_engine_tangent_bundle(manifold),
+            bundle_tangent_manifold=manifold,
         )
 
     class ParentMethods:
@@ -175,11 +176,13 @@ class SmoothVectorBundles(OwnedParameterizedCategory):
             bundle_base_manifold,
             bundle_rank,
             engine_bundle,
+            bundle_tangent_manifold=None,
             **rest,
         ) -> None:
             self._bundle_base_manifold = bundle_base_manifold
             self._bundle_rank = bundle_rank
             self._engine_bundle = engine_bundle
+            self._bundle_tangent_manifold = bundle_tangent_manifold
             super().__init__(**rest)
 
         def base_manifold(self):
@@ -206,6 +209,39 @@ class SmoothVectorBundles(OwnedParameterizedCategory):
                 base_ring=self.base_manifold().smooth_functions(),
                 retained_frame=None,
             )
+
+        def pullback_along(self, inclusion):
+            r"""The bundle pulled back along an open inclusion into this bundle's base.
+
+            For an open submanifold ``j: U -> M`` the differential of the
+            inclusion is an isomorphism at every point (Lee, *Introduction to
+            Smooth Manifolds*, 2nd ed., Ch. 3), so the pullback of the tangent
+            bundle is the tangent bundle of ``U`` and the two are the same
+            bundle read on the smaller base.  The pullback of a general bundle,
+            and a pullback along a map that is not an open inclusion, needs the
+            transition functions of the bundle on a cover of the target and is
+            not represented here.
+            """
+            manifold = self.base_manifold()
+            assert self._bundle_tangent_manifold is not None, (
+                f"the pullback of {self} is not represented: a bundle is pulled back "
+                f"through its transition functions on a cover of the target, and only the "
+                f"tangent bundle -- whose differential along an open inclusion is an "
+                f"isomorphism -- is stated here"
+            )
+            assert inclusion.codomain() is manifold, (
+                f"cannot pull {self} back along {inclusion}: it ends at "
+                f"{inclusion.codomain()}, not at the bundle's base {manifold}"
+            )
+            domain = inclusion.domain()
+            assert domain in SmoothManifolds() and int(domain.dimension()) == int(
+                manifold.dimension()
+            ), (
+                f"cannot pull {self} back along {inclusion}: an open submanifold of "
+                f"{manifold} has its dimension, and {domain} is not a smooth manifold of "
+                f"dimension {manifold.dimension()}"
+            )
+            return domain.tangent_bundle()
 
         def _repr_(self):
             return (
@@ -474,6 +510,110 @@ class SmoothSectionModules(OwnedParameterizedCategory):
             _chartwise_family_agrees(manifold, admitted, 1)
             return self.element_class(
                 self, admitted, _engine_vector_field(manifold, admitted)
+            )
+
+        def coordinate_vector_field(self, chart, index):
+            r"""The ``index``-th coordinate vector field of a chart, as a section of this bundle.
+
+            The coordinates of a chart ``phi: U -> R^n`` are functions on ``U``,
+            and ``d/dx_i`` is the vector field that differentiates along the
+            ``i``-th of them, a basis of the tangent space at every point of the
+            chart (Lee, *Introduction to Smooth Manifolds*, 2nd ed., Ch. 3).  It
+            is stated in every chart of the atlas: on its own chart its
+            components are the ``index``-th unit vector, and on any other chart
+            they are the derivative of the coordinate change -- writing ``y``
+            for the other chart's coordinates, the components are
+            ``dy_j/dx_index``, read back in the other chart's coordinates.
+            """
+            from sage.symbolic.ring import SR as _SR
+
+            manifold = self.base_manifold()
+            labels = tuple(manifold.chart_labels())
+            assert any(chart is present for present in manifold.atlas().values()), (
+                f"{chart} is not a chart of {manifold}: its charts are "
+                f"{tuple(manifold.chart_labels())}"
+            )
+            rank = int(self._vector_bundle.rank())
+            position = int(index)
+            assert 0 <= position < rank, (
+                f"the chart {chart.label()} has {rank} coordinates, and there is no "
+                f"coordinate {position}"
+            )
+            ring = chart.function_ring()
+            components = {
+                chart.label(): tuple(
+                    ring.one() if entry == position else ring.zero()
+                    for entry in range(rank)
+                )
+            }
+            for label in labels:
+                if label == chart.label():
+                    continue
+                forward_transition = manifold.transition(chart.label(), label)
+                variables = tuple(_engine_manifold_chart(forward_transition.source())[:])
+                forward = tuple(
+                    _SR(_engine_manifold_expression(expression))
+                    for expression in forward_transition.forward_expressions()
+                )
+                column = tuple(
+                    expression.diff(variables[position]) for expression in forward
+                )
+                backward = tuple(
+                    _SR(_engine_manifold_expression(expression))
+                    for expression in manifold.transition(
+                        label, chart.label()
+                    ).forward_expressions()
+                )
+                in_the_chart = tuple(
+                    _SR(entry).subs(dict(zip(variables, backward, strict=True)))
+                    for entry in column
+                )
+                components[label] = tuple(
+                    _raise_manifold_expression(entry, manifold.atlas()[label])
+                    for entry in in_the_chart
+                )
+            return self.section(components)
+
+        def restrict(self, section, inclusion):
+            r"""The section of the pulled-back bundle that ``section`` restricts to.
+
+            A section is a map into the fibres, so its composite with an open
+            inclusion is a section of the pulled-back bundle, and on the charts
+            of the open submanifold -- which are the ambient charts read there
+            (``SmoothManifolds.open_submanifold``) -- its components are the
+            section's own (Lee, *Introduction to Smooth Manifolds*, 2nd ed.,
+            Ch. 8, where vector fields restrict to open submanifolds).  Nothing
+            is extended the other way: a section of the restriction need not
+            come from one of the manifold.
+            """
+            manifold = self.base_manifold()
+            assert inclusion.codomain() is manifold, (
+                f"cannot restrict {section} along {inclusion}: it ends at "
+                f"{inclusion.codomain()}, not at {manifold}"
+            )
+            assert element_parent(section) is self, (
+                f"{section} is not a section of {self._vector_bundle}: its parent is "
+                f"{element_parent(section)}"
+            )
+            domain = inclusion.domain()
+            target = self._vector_bundle.pullback_along(inclusion).sections()
+            labels = tuple(domain.chart_labels())
+            components = section.components()
+            missing = tuple(label for label in labels if label not in components)
+            assert not missing, (
+                f"cannot restrict {section} to {domain}: the restriction is stated on the "
+                f"charts of the open submanifold, and the section says nothing on {missing}"
+            )
+            return target.section(
+                {
+                    label: tuple(
+                        _raise_manifold_expression(
+                            _engine_manifold_expression(entry), domain.atlas()[label]
+                        )
+                        for entry in components[label]
+                    )
+                    for label in labels
+                }
             )
 
         def module_rank(self):

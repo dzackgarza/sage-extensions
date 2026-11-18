@@ -1454,7 +1454,19 @@ class TopologicalManifolds(OwnedCategory):
                 str(label),
                 coord_def={engine_chart: conditions},
             )
-            return self._register_chart(label, engine_open.chart(coordinates))
+            chart = self._register_chart(label, engine_open.chart(coordinates))
+            # The chart cut on the subset reads the same coordinates there, so the
+            # coordinate change to the chart it was cut from is the identity; it is
+            # defined on the whole of the cut chart, which is the subset of the chart
+            # it was cut from that its conditions select.
+            self.transition_map(
+                label,
+                source_label,
+                chart.coordinates(),
+                source.coordinates(),
+                target_overlap=tuple(nonvanishing),
+            )
+            return chart
 
         def _register_chart(self, label, engine_chart, domain=None):
             r"""Record the chart ``engine_chart`` of this manifold's engine under ``label``.
