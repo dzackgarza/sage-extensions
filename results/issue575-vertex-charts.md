@@ -348,3 +348,13 @@ reads them only when its space is asked for (`_chart_space_coproduct`,
 `gluing.py:579-626`).  The minimal owner-side change is therefore in the datum: resolve
 on first use, and let the first ask for the space pay.
 
+## Round 10, 2026-11-18: what the owner's decision costs to take
+
+The proposal now states the validation the change carries: 31 test files and 169
+`test_` functions construct a glued scheme or read its datum on this tree
+(`tests/schemes/` and `tests/divisors/`), so their failure sets would have to be
+compared against a clean worktree at the same base commit -- hours on a host at load
+20-30.  The input is therefore a decision (may a glued scheme be constructed without
+its pair transitions resolved and verified, deferring both to the first ask for its
+space?), not a further measurement.
+

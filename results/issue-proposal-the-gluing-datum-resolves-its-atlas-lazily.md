@@ -78,3 +78,20 @@ gh issue create --repo dzackgarza/sage-extensions \
   --title "a glued scheme pays all C(n,2) pair transitions to exist, 10.2 s of a 12.9 s seventeen-chart variety" \
   --body-file results/issue-proposal-the-gluing-datum-resolves-its-atlas-lazily.md
 ```
+
+## What the change costs to validate, and the decision it needs
+
+The change is not local to a test file: every scheme built from an affine atlas goes
+through the datum.  On this tree, 31 test files construct a glued scheme or read its
+datum -- `tests/schemes/` and `tests/divisors/` together, 169 `test_` functions, the
+largest being `test_toric_divisor_classes.sage` (29), `test_toric_schemes.sage` (16),
+`test_toric_cartier_data_and_linear_systems.sage` and `test_geometric_cohomology.sage`
+(10 each).  Their failure sets would have to be compared against a clean worktree at the
+same base commit, which is hours on a host at load 20-30.
+
+So the input this proposal needs from its owner is a decision, not a measurement: may a
+glued scheme be *constructed* without its pair transitions resolved and verified, with
+both deferred to the first ask for its underlying space?  The alternative shape -- keep
+construction verifying, and accept the cost -- leaves the Sterk2 specimen test over the
+call ceiling only when the host is co-tenanted, which is where it stands today.
+
