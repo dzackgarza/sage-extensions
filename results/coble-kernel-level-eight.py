@@ -61,6 +61,15 @@ def reflection(vector):
     return [[(1 if i == j else 0) - 2 * norm * vector[i] * image[j] for j in range(N)] for i in range(N)]
 
 
+def reflection_in(vector):
+    """`s_v(x) = x - 2 b(x, v)/q(v) v`, exact fractions: integral for the squares that occur here."""
+    import fractions
+    image = pairing(vector)
+    norm = square(vector)
+    return [[fractions.Fraction(1 if i == j else 0) - fractions.Fraction(2 * vector[i] * image[j], norm)
+             for j in range(N)] for i in range(N)]
+
+
 def displaced(matrix, vector):
     return [sum(matrix[i][j] * vector[j] for j in range(N)) for i in range(N)]
 
@@ -176,5 +185,54 @@ def main():
     print("level-eight complete and the missing step is one level deeper.")
 
 
+def conjugates():
+    """Conjugate the reflection span by isometries of M outside Gamma, and look for an escape.
+
+    A conjugate of a level-four element by any isometry of M is again level-four (that
+    subgroup is normal), so a class outside the reflection span would prove the level-four
+    class space strictly larger than the reflections reach.
+    """
+    import fractions
+    candidates = [reflection(list(vector)) for vector in roots()]
+    inverses = [inverse(matrix) for matrix in candidates]
+    words = []
+    for i in range(len(candidates)):
+        for j in range(i + 1, len(candidates)):
+            word = product(product(product(candidates[i], candidates[j]), inverses[i]), inverses[j])
+            if is_congruent(word, 2):
+                words.append(word)
+    span = rank_of([class_of(word, 2) for word in words])
+    print(f"conjugation stage: reflection span {span} from {len(words)} commutators")
+
+    def unit(index):
+        vector = [0] * N
+        vector[index] = 1
+        return vector
+
+    trials = {}
+    for index in range(3, N):
+        trials[f"E8 coordinate {index - 2} reflection"] = reflection_in(unit(index))
+    swap = [[1 if i == j else 0 for j in range(N)] for i in range(N)]
+    swap[1][1] = swap[2][2] = 0
+    swap[1][2] = swap[2][1] = 1
+    trials["hyperbolic swap"] = swap
+    trials["swap times the E8 coordinate 1 reflection"] = product(swap, reflection_in(unit(3)))
+
+    escapes = 0
+    for name, matrix in trials.items():
+        integral = [[int(entry) for entry in row] for row in matrix]
+        conjugate = [[int(fractions.Fraction(entry)) for entry in row] for row in inverse(integral)]
+        rank = rank_of([class_of(word, 2) for word in words]
+                       + [class_of(product(product(integral, word), conjugate), 2) for word in words])
+        in_gamma = is_congruent(integral, 1)
+        if rank > span:
+            escapes += 1
+        print(f"  {name}: in Gamma {in_gamma}; span with its conjugate {rank}")
+    print(f"  isometries outside Gamma that move a level-four class out of the span: {escapes}")
+    return escapes
+
+
 if __name__ == "__main__":
     main()
+    print()
+    conjugates()

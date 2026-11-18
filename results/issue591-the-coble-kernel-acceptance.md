@@ -375,3 +375,22 @@ claimed.
 What this settles for the acceptance: the reflection family, which is the only family the
 literature supplies for this lattice, is capped at level eight by a 54-versus-55 count. The
 database field stays absent either way, and nothing is stored as a generating set.
+
+## 8. Conjugating the level-four span by isometries outside the kernel
+
+The reflection span at level four is normalised by nothing on its face: a conjugate of a
+level-four element by *any* isometry of `M` is again level four, so an isometry outside
+`\Gamma` could carry a class out of the 54-dimensional span and settle the 54-versus-55
+question in the negative. Ten such isometries were tried, each checked to be an integral
+isometry of `M` with a nontrivial image modulo two: the eight reflections in the `E_8`
+coordinate vectors of square `-2`, the swap of the two hyperbolic coordinates, and the
+product of the swap with one of the `E_8` reflections. Every one of the 1540 commutator
+classes was conjugated by each, and the span stays **54** in all ten cases: no class left
+the span.
+
+So the conjugation mechanism does not produce the missing dimension. What remains is the
+lifting congruence itself: find `Y` integral with `Y^T G_M + G_M Y + 4Y^T G_M Y = 0` whose
+class modulo two lies outside the 54-space, or prove no such `Y` exists. Two facts bound
+it and are worth recording with the search: every level-four class is alternating (the
+55-dimensional bound), and every reflection product so far — commutators, two-fold words,
+four-fold words, and all ten conjugates — lies in the same 54.
