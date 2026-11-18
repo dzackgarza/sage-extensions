@@ -110,6 +110,14 @@ def test_incidence_reconstructs_its_verified_flag_on_demand() -> None:
     assert reconstructed is not flag
     assert _spans_one_another(reconstructed.terms()[0], line)
     assert _spans_one_another(reconstructed.terms()[1], plane)
+    import gc
+    import weakref
+
+    reconstructed_ref = weakref.ref(reconstructed)
+    edge.release_flag()
+    del reconstructed
+    gc.collect()
+    assert reconstructed_ref() is None
 
 
 def test_the_plus_kernel_incidence_vertices_of_6jrs_are_its_cusp_rows() -> None:
