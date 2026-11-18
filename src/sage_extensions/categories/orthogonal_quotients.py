@@ -3149,6 +3149,70 @@ end
             return None
         return tuple(plane.parabolic_stabilizer_generators())
 
+    def plane_class_index(self, plane):
+        r"""``(J, |Stab_{O(q)}(J)|, |rho(Stab_Gamma(P))|, their quotient)`` at one plane.
+
+        ``J = [P/2]`` is the order-four totally isotropic subgroup of ``A_L``
+        that the plane's divided classes span
+        (:func:`...isotropic_orbits._divided_discriminant_classes`), and the
+        quantity the plane rows of ``T_Co`` are indexed by is
+
+        .. math:: [\mathrm{Stab}_{O(q)}(J) : \rho(\mathrm{Stab}_\Gamma(P))],
+
+        the plane analogue of the line index
+        ``[Stab_{O(q)}(v̄) : ρ(Stab_Γ(v))]``.
+
+        The right-hand order is read in the finite image: ``U = Pi cap ker chi``
+        is normal in ``Pi`` and lies in ``Gamma`` because the subgroup is a
+        preimage, so ``Pi -> Pi/U`` is ``chi`` on ``Pi`` and
+        ``chi(Stab_Gamma(P)) = chi(Gamma) cap chi(Pi)`` (D. Dutour Sikirić and
+        K. Hulek, arXiv:2302.01679v2, Lemma 3.6, printed p. 22).  That meet is
+        taken in the faithful permutation model, from the certified parabolic's
+        own character keys and the quotient's retained condition subgroup -- the
+        two groups the covering is computed from.  The left-hand order is the
+        stabilizer of the class set in ``O(q)``, asked of the finite group's own
+        action on the classes of ``A_L``.
+
+        Both orders and the quotient are returned, and nothing here decides what
+        the quotient should be: a caller compares it with the value a page
+        states, and a disagreement is a defect filed on research.
+        """
+        from sage.libs.gap.libgap import libgap
+        from sage_extensions.categories.isotropic_orbits import (
+            _divided_discriminant_classes,
+        )
+
+        family = self.certified_parabolic_generators(plane)
+        if not family:
+            raise ValueError(
+                f"the plane {plane} carries no certified parabolic in {self.subgroup}, so "
+                f"rho(Stab_Gamma(P)) cannot be read and the plane class index is not defined here"
+            )
+        _factors, _models, permutation_target, _embeddings = (
+            self._character_permutation_factors()
+        )
+        permutations = tuple(
+            self._permutation_of_key(self.image(generator)) for generator in family
+        )
+        parabolic = libgap.Subgroup(permutation_target, permutations)
+        image_order = int(
+            libgap.Size(
+                libgap.Intersection(self._permutation_character_target(), parabolic)
+            )
+        )
+        classes = frozenset(
+            _divided_discriminant_classes(self.lattice, plane)
+        )
+        stabilizer_order = int(self._discriminant_group.stabilizer_of_classes(classes).cardinality())
+        index, remainder = divmod(stabilizer_order, image_order)
+        if remainder:
+            raise ArithmeticError(
+                f"the image of the parabolic at {plane} has order {image_order}, which does not "
+                f"divide the order {stabilizer_order} of the stabilizer of its class set J: the "
+                f"retained character data are inconsistent with a subgroup of O(q)"
+            )
+        return classes, stabilizer_order, image_order, index
+
     @cached_method
     def parabolic_image_subgroup(self, plane):
         r"""The discriminant image of a complete plane's parabolic, as a GAP subgroup of ``O(A_L)``.

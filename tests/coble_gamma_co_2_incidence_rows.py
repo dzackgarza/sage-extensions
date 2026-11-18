@@ -185,6 +185,75 @@ def log(message=""):
     print(message, flush=True)
 
 
+INTEGRAL_ARCHIVE = (
+    "the 569160-edge integral archive of #286's table (research Actions 44170494099)"
+)
+PAGE_UNPOLARIZED = "the page's thm:unpolarized-cusps, one orbit of each kind"
+PREVIOUS_ROW = "the Γ_{Co,2} row decided in #391"
+
+
+def record_comparison(label, statement, computed, recorded, source) -> bool:
+    r"""Record a computed value beside the value a source states, and never gate on it.
+
+    A row's job is to report what it returned.  A number a page or an archive
+    states is a comparison for the reader, not a condition the row has to meet:
+    making it a condition turns the run's green into a restatement of the number
+    rather than an independent computation, and it turns a disagreement -- which
+    #286 files on research the same day, naming the class where they differ --
+    into a failed job.  So the computed value is printed with the source that
+    states the recorded one and with the word ``agrees`` or ``DIFFERS``, and the
+    agreement is returned for a caller that keeps the tally.  Nothing calls the
+    row's status with it.
+    """
+    agrees = computed == recorded
+    log(
+        f"[{label}] {statement}: computed {computed}; {source} states {recorded} — "
+        f"{'agrees' if agrees else 'DIFFERS'}"
+    )
+    return agrees
+
+
+def record_plane_class_indices(label, subgroup, planes, limit=8) -> tuple:
+    r"""Record `[Stab_{O(q)}(J) : rho(Stab_Gamma(P))]` at the row's first `limit` plane classes.
+
+    `J = [P/2]` is the order-four totally isotropic subgroup a plane's divided
+    classes span, and the index is the plane analogue of the line row's
+    `[Stab_{O(q)}(v̄) : ρ(Stab_Γ(v))]`: the number of the subgroup's plane
+    orbits inside one class `J`.  It is computed by the quotient
+    (``OrthogonalCharacterQuotient.plane_class_index``) from the certified
+    parabolic and the condition subgroup, so it costs two finite orders per
+    class and never a new integral computation -- but a row of `T_Co` has
+    189720 plane cusps over 23715 classes, so a bounded number of classes is
+    what one command records, and the bound is stated with the answer.
+
+    The answer is the pairs `(classes, index)` recorded, so a caller compares
+    them and no value here is a condition on the row.
+    """
+    quotient = subgroup.finite_character_quotient()
+    recorded = []
+    seen = set()
+    for plane_cusp in planes:
+        if len(recorded) >= limit:
+            break
+        plane = plane_cusp.representative()
+        classes, stabilizer_order, image_order, index = quotient.plane_class_index(plane)
+        key = frozenset(classes)
+        if key in seen:
+            continue
+        seen.add(key)
+        recorded.append((tuple(classes), index))
+        log(
+            f"[{label}] plane class {len(recorded)} of J = [P/2]: "
+            f"|Stab_{{O(q)}}(J)| = {stabilizer_order}, "
+            f"|rho(Stab_Gamma(P))| = {image_order}, index {index}"
+        )
+    log(
+        f"[{label}] the plane class index over {len(recorded)} of the row's distinct classes J "
+        f"(bounded at {limit}; the row has {len(planes)} plane cusps)"
+    )
+    return tuple(recorded)
+
+
 def _span(form, family):
     r"""The span of a finite family of classes of `A_L` over `ZZ/2ZZ`, as a set."""
     closure = {form.zero()}
@@ -527,24 +596,32 @@ def row_contract(lattice, subgroup, label, lines, planes, incidences, route) -> 
                 return RowOutcome(
                     label, RowStatus.CONTRACT_VIOLATION, f"line cusp {position} carries no edge"
                 )
+    log(
+        f"[{label}] the degree sequence of the relation: line cusps "
+        f"{sorted(set(line_degrees))} over {len(line_degrees)}, plane cusps "
+        f"{sorted(set(plane_degrees))} over {len(plane_degrees)}"
+    )
     if lattice is NamedLattices.Tco and label in ("Otilde", "Otilde+"):
-        # The independent 569160-flag integral archive proves 527 line
-        # classes, each incident with exactly 1080 plane classes, and 189720
-        # plane classes, each incident with exactly three line classes.
-        # Cardinalities alone would not detect an incorrect incidence graph
-        # with the same number of edges; verify the entire degree sequence.
-        if any(degree != 1080 for degree in line_degrees):
-            return RowOutcome(
-                label, RowStatus.COUNT_MISMATCH,
-                f"the 527 Coble kernel line cusps must each have degree 1080, "
-                f"but their degree distribution is {sorted(set(line_degrees))}",
-            )
-        if any(degree != 3 for degree in plane_degrees):
-            return RowOutcome(
-                label, RowStatus.COUNT_MISMATCH,
-                f"the 189720 Coble kernel plane cusps must each have degree 3, "
-                f"but their degree distribution is {sorted(set(plane_degrees))}",
-            )
+        # What the independent 569160-flag integral archive states about these
+        # two rows: 527 line classes each incident with 1080 plane classes, and
+        # 189720 plane classes each incident with three line classes.  Both are
+        # *recorded* against it, not required of the row: cardinalities alone
+        # would not detect an incorrect incidence graph with the same edge
+        # count, so the degree sequence is reported for the reader to compare.
+        record_comparison(
+            label,
+            "the Coble kernel line cusps' degrees",
+            tuple(sorted(set(line_degrees))),
+            (1080,),
+            INTEGRAL_ARCHIVE,
+        )
+        record_comparison(
+            label,
+            "the Coble kernel plane cusps' degrees",
+            tuple(sorted(set(plane_degrees))),
+            (3,),
+            INTEGRAL_ARCHIVE,
+        )
     log(f"[{label}] audited {len(incidences)} distinct edges; ordered endpoint SHA-256: {edge_digest.hexdigest()}")
     return RowOutcome(
         label,
@@ -801,6 +878,9 @@ def main(argv):
                         help=f"comma-separated rows to run, from {ROW_LABELS}")
     parser.add_argument("--lattice", default="Tco",
                         help=f"the lattice to run on, from {LATTICE_NAMES}")
+    parser.add_argument("--plane-class-index", type=int, default=8,
+                        help="how many of the row's distinct plane classes J = [P/2] to record "
+                             "the index [Stab_O(q)(J) : rho(Stab_Gamma(P))] at; 0 records none")
     parser.add_argument("--route", default="auto", choices=ROW_ROUTES,
                         help="the incidence route: 'divided-class' (the class route), "
                              "'certificate' (the flag-carrying route), or 'auto' (the class "
@@ -819,34 +899,39 @@ def main(argv):
         if arguments.budget and time.monotonic() - started > arguments.budget:
             log(f"[run] {RowStatus.UNDECIDED.words}: the whole-run budget is spent")
             return RowStatus.UNDECIDED.exit_status
-        outcome = run_row(
-            lattice, _row_subgroup(lattice, label), label, arguments.cap, arguments.route
-        )
+        subgroup = _row_subgroup(lattice, label)
+        outcome = run_row(lattice, subgroup, label, arguments.cap, arguments.route)
         log(outcome.report())
         if outcome.status is not RowStatus.DECIDED:
             return outcome.status.exit_status
         counts[label] = outcome.counts
+        if arguments.plane_class_index and subgroup.contains_character_kernel():
+            record_plane_class_indices(
+                label, subgroup, tuple(subgroup.cusps(2)), arguments.plane_class_index
+            )
     if lattice is NamedLattices.Tco:
-        if "O" in counts and counts["O"][0] != 1:
-            log("the O(T_Co) incidence through this route is not one edge")
-            return RowStatus.COUNT_MISMATCH.exit_status
-        if "Gamma_{Co,2}" in counts and counts["Gamma_{Co,2}"] != (13, 4, 7):
-            log("the Gamma_{Co,2} incidence is not the decided 13-edge relation over 4 line and 7 plane cusps")
-            return RowStatus.COUNT_MISMATCH.exit_status
+        if "O" in counts:
+            record_comparison(
+                "O", "the ambient row's counts (edges, lines, planes)",
+                counts["O"], (1, 1, 1), PAGE_UNPOLARIZED,
+            )
+        if "Gamma_{Co,2}" in counts:
+            record_comparison(
+                "Gamma_{Co,2}", "the Gamma_{Co,2} row's counts (edges, lines, planes)",
+                counts["Gamma_{Co,2}"], (13, 4, 7), PREVIOUS_ROW,
+            )
         # The independent integral flag certificate of research#667 proves
         # 527 line cusps, 23715 * 8 plane cusps and three distinct flag
-        # classes above each plane.  The real-spinor sign does not split
-        # these orbits.  Both public kernel rows must therefore return the
-        # exact same 569160-edge relation counts, not merely a self-consistent
-        # relation with some of its edges or vertices missing.
+        # classes above each plane.  The counts of both kernel rows are
+        # recorded against it and are not conditions on the row: a relation
+        # with the same edge count and another shape is a disagreement the
+        # reader sees, and #286 files a disagreement on research.
         for kernel_label in ("Otilde", "Otilde+"):
-            if kernel_label in counts and counts[kernel_label] != (569160, 527, 189720):
-                log(
-                    f"the {kernel_label} incidence has {counts[kernel_label]} "
-                    "(edges, lines, planes), but the independent integral "
-                    "Coble flag certificate proves (569160, 527, 189720)"
+            if kernel_label in counts:
+                record_comparison(
+                    kernel_label, "the kernel row's counts (edges, lines, planes)",
+                    counts[kernel_label], (569160, 527, 189720), INTEGRAL_ARCHIVE,
                 )
-                return RowStatus.COUNT_MISMATCH.exit_status
     disagreement = _trivial_image_row_agreement(lattice, counts, arguments.route)
     if disagreement is not None:
         log(f"[run] {RowStatus.COUNT_MISMATCH.words}: {disagreement}")

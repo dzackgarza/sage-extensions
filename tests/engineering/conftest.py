@@ -464,6 +464,7 @@ def pytest_configure(config) -> None:
     builtins.incidence_row_contract = incidence_row_contract
     builtins.incidence_edge_containment = incidence_edge_containment
     builtins.incidence_rows_exit = incidence_rows_exit
+    builtins.incidence_page_comparison = incidence_page_comparison
     builtins.RowStatus = _script("coble_row_status").RowStatus
 
 
@@ -483,6 +484,7 @@ def pytest_unconfigure(config) -> None:
     del builtins.incidence_row_contract
     del builtins.incidence_edge_containment
     del builtins.incidence_rows_exit
+    del builtins.incidence_page_comparison
     del builtins.RowStatus
 
 
@@ -964,6 +966,20 @@ def incidence_rows_exit(argv):
     asks it what it reports rather than re-deriving the selection it makes.
     """
     return _incidence_row_driver().main(argv)
+
+
+def incidence_page_comparison(label, statement, computed, recorded, source) -> bool:
+    r"""The Γ_{Co,2} driver's recording of a computed value beside a stated one.
+
+    The driver prints the value, the source that states the other value, and the
+    word ``agrees`` or ``DIFFERS``; the answer is that agreement, and the row's
+    status is not reached with it.  A test asks this question directly, which is
+    how "recorded, never asserted" is a property of the driver rather than of a
+    run's green.
+    """
+    return _incidence_row_driver().record_comparison(
+        label, statement, computed, recorded, source
+    )
 
 
 def incidence_row_contract(lattice, subgroup, lines, planes, incidences):
