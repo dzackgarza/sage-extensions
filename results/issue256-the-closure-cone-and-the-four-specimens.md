@@ -480,3 +480,33 @@ contract the surgery's regluing is expressed in.
 So the item is named once more, at the level that actually blocks it: **the keying and
 meaning of an integral-affine atlas morphism's chartwise data is an open design decision of
 the atlas layer**, and no issue here states it.
+
+## 16. The atlas morphism constructor is in, and its keying was forced, not chosen
+
+§15 called the keying of the chartwise data an open decision.  It is not: the reader's own
+signature fixes it.  `integral_affine_morphism(source, target)` takes the two charts as two
+arguments, so the retained data are indexed by the pair, and no other keying can answer that
+call.  With that, the whole arrow is writable:
+
+- `IntegralAffineAtlasMor._element_constructor_(smooth_map, chartwise_affine_maps)`
+  (`integral_affine_atlases.py:48`) builds the arrow, refusing a smooth map whose endpoints
+  are not the manifolds the two atlases are atlases of;
+- `integral_affine_morphism(source, target)` (`:39`) answers the map of that pair, and
+  refuses a pair the arrow is not affine in rather than answering an identity;
+- `smooth_atlas_morphism` (`:42`) answers the smooth map the atlases are on;
+- `__mul__` (`:45`) composes, keeping the endpoints and composing the chartwise maps
+  through the middle chart;
+- `identity()` composes the plane's identity with the model's identity at each chart's own
+  pair.
+
+Test: `tests/schemes/test_the_integral_affine_atlas_morphism.sage`, three bodies, 3 passed,
+0 failures -- the identity's chartwise map, the composite of an arrow with itself, and the
+refusal of a smooth map between other manifolds.
+
+**That closes the last `pass` on the surgery's route that the surgery itself needs.**  A
+regluing is now an arrow of integral-affine atlases: the cut's chart composed with the
+chartwise affine identification of the collar charts and the replacement's chart.  What is
+left for `surgery`, `symington_surgery` and `basis_triangle_surgery` is their bodies: cut
+with `subspace` on the complement named by `from_predicate`, glue with the coproduct and the
+coequalizer, read the singular locus off the identified boundary, and restrict the two
+atlases along the regluing.

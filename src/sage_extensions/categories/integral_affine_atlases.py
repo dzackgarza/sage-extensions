@@ -3,6 +3,7 @@ r"""Selected presentations of integral-affine atlases on smooth manifolds."""
 from sage.misc.cachefunc import cached_method
 from sage.categories.morphism import Morphism
 from sage.rings.infinity import Infinity
+from sage.structure.element import parent as element_parent
 
 from sage_extensions.categories.abstract_categories.mor_categories import (
     CategoricalMor,
@@ -14,6 +15,7 @@ from sage_extensions.categories.functors.core import Functor
 from sage_extensions.categories.integral_affine_manifolds import IntegralAffineManifolds
 from sage_extensions.categories.manifolds import SmoothManifolds
 from sage_extensions.categories.real_ck_atlases import RealCkAtlases
+from sage_extensions.categories.sets.set_categories import Sets
 from sage_extensions.owned_category import _object_of
 from sage_extensions.owned_category_bases import CategoryWithAxiom
 
@@ -37,20 +39,96 @@ class IntegralAffineAtlasMor(CategoricalMor):
             return self._smooth_map(point)
 
         def integral_affine_morphism(self, source, target):
-            pass
+            r"""The affine map of the charts ``source`` and ``target``.
+
+            The retained data are the chartwise affine maps, indexed by the pair of
+            charts they are written in: the source chart of this arrow's domain
+            atlas and the target chart of its codomain atlas.  A pair that is not
+            retained is an error rather than a silent identity, because a map that
+            is not affine in a pair of charts is not an integral-affine map of the
+            atlases.
+            """
+            chartwise = self.chartwise_affine_maps()
+            assert (source, target) in chartwise, (
+                f"{self} retains no affine map of the charts {source} and {target}: its "
+                f"chartwise maps are indexed by the pairs it is affine in, and this is "
+                f"not one of them"
+            )
+            return chartwise[(source, target)]
 
         def smooth_atlas_morphism(self):
-            pass
+            r"""The arrow of smooth manifolds these two atlases are atlases of.
+
+            An integral-affine atlas morphism is a smooth map together with its
+            chartwise affine maps, so the smooth arrow is the map itself, which is
+            also what :meth:`underlying_smooth_morphism` answers.
+            """
+            return self.underlying_smooth_morphism()
 
         def __mul__(self, other):
-            pass
+            r"""The composite, when ``other`` ends where this arrow starts.
+
+            The composite is the composite of the two smooth maps, with the chart
+            ``U`` of ``other``'s domain to the chart ``W`` of this arrow's codomain
+            affine by the composite through every chart ``V`` that both arrows are
+            written in.
+            """
+            if not isinstance(other, IntegralAffineAtlasMor.ElementMethods):
+                return NotImplemented
+            if other.codomain() is not self.domain():
+                raise ValueError(
+                    f"{other} ends at {other.codomain()} and {self} starts at "
+                    f"{self.domain()}; these arrows do not compose"
+                )
+            composite = {}
+            for (source, middle), left in other.chartwise_affine_maps().items():
+                for (start, target), right in self.chartwise_affine_maps().items():
+                    if start is not middle:
+                        continue
+                    composite[(source, target)] = right * left
+            return self.parent()(self.underlying_smooth_morphism() * other.underlying_smooth_morphism(), composite)
 
     def _element_constructor_(self, smooth_map, chartwise_affine_maps):
-        pass
+        r"""Build the integral-affine atlas morphism these data state.
+
+        The smooth map must be one between the manifolds the two atlases are
+        atlases of: an integral-affine atlas morphism is added to a smooth map of
+        that pair, and a map of another pair would give the arrow two authorities
+        for its endpoints (``OWN-15``).  The chartwise affine maps are retained as
+        given; what they are indexed by is stated by
+        :meth:`IntegralAffineAtlasMor.ElementMethods.integral_affine_morphism`,
+        which reads them by the pair of charts they are affine in.
+        """
+        if element_parent(smooth_map) is self:
+            return smooth_map
+        assert smooth_map.domain() is self.domain().underlying_smooth_manifold(), (
+            f"{smooth_map} starts at {smooth_map.domain()}, not at the manifold "
+            f"{self.domain()} is an atlas of"
+        )
+        assert smooth_map.codomain() is self.codomain().underlying_smooth_manifold(), (
+            f"{smooth_map} ends at {smooth_map.codomain()}, not at the manifold "
+            f"{self.codomain()} is an atlas of"
+        )
+        return self.element_class(self, smooth_map, chartwise_affine_maps)
 
     @object_level
+    @cached_method
     def identity(self):
-        pass
+        r"""The identity arrow of this atlas: the identity map, affine in each chart.
+
+        The smooth map is the manifold's identity and the chartwise data are the
+        identity of the affine model at each chart's own pair, so the arrow answers
+        :meth:`IntegralAffineAtlasMor.ElementMethods.integral_affine_morphism` at
+        every chart of the atlas.
+        """
+        atlas = self.domain()
+        manifold = atlas.underlying_smooth_manifold()
+        model = atlas.affine_model()
+        affine_identity = Sets().Mor(model, model).identity()
+        return self(
+            Sets().Mor(manifold, manifold).identity(),
+            {(chart, chart): affine_identity for chart in atlas.affine_charts()},
+        )
 
 
 class IntegralAffineAtlasMorCategoryConstruction(MorCategoryConstruction):
