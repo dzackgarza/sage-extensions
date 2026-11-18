@@ -2734,7 +2734,33 @@ end
         r"""The registered ``(lift, source parabolic generators, image)`` of ``plane``."""
         from sage_extensions.categories.isotropic_orbits import _span_key
 
-        return self.__dict__.get("_isotropic_lift_registry", {}).get(_span_key(plane))
+        return self._registered_isotropic_split_of_span(_span_key(plane))
+
+    def _registered_isotropic_split_of_span(self, span):
+        r"""The registered ``(lift, source parabolic generators, image)`` of the plane ``span`` names.
+
+        The registry is keyed by the span (:meth:`register_isotropic_lift`), so a
+        reader that already holds one -- a cusp of the row, whose whole datum is
+        its span -- asks here.  The plane-keyed read above is this one with the
+        span derived from the plane.
+        """
+        return self.__dict__.get("_isotropic_lift_registry", {}).get(span)
+
+    def registered_isotropic_lift_of_span(self, span):
+        r"""``(lift, discriminant image)`` of the plane ``span`` names, or ``None``.
+
+        A row keeps a span a cusp, not a plane (:class:`..._ArithmeticCuspEngine`),
+        and the registry is keyed by the span, so this is the read that costs the
+        span the caller holds and no construction.  Asking
+        :meth:`registered_isotropic_lift` instead derives the same span from a
+        plane, which means building the plane first: on ``T_{Co}``'s kernel plane
+        row that is one constructed parent a plane for an answer the cusp already
+        names its key by.
+        """
+        record = self._registered_isotropic_split_of_span(span)
+        if record is None:
+            return None
+        return record[0], record[2]
 
     def registered_isotropic_lift(self, plane):
         r"""``(lift, discriminant image)``: a plane's registered lift and its finite element.

@@ -112,8 +112,13 @@ def test_a_plane_cusp_answers_the_lift_its_row_registered_for_it() -> None:
 
     registered = []
     for cusp in plane_cusps:
+        by_span = quotient.registered_isotropic_lift_of_span(cusp.span())
         by_plane = quotient.registered_isotropic_lift(cusp.representative())
-        lift, finite_element = by_plane
+        # One datum, two keys: the registry is keyed by the span the cusp holds,
+        # so the span-keyed read and the read of the plane rebuilt from that span
+        # are the same lift and the same finite element.
+        assert by_span == by_plane
+        lift, finite_element = by_span
         # The lift is an isometry of the row's lattice, and the finite element
         # beside it is its own character image: the two halves of one datum.
         assert lift.domain() is lattice

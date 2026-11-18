@@ -1319,7 +1319,7 @@ class PredicateSubgroups(OwnedParameterizedCategory):
                         )
                     quotient.register_isotropic_covering(plane, position, lift, covering)
                     coverings[position] = (
-                        plane,
+                        plane_cusp.span(),
                         lift,
                         lift_discriminant,
                         covering,
@@ -1338,17 +1338,22 @@ class PredicateSubgroups(OwnedParameterizedCategory):
             endpoint_pairs = set()
             transport_checked = set()
             for plane_cusp in plane_cusps:
-                plane = plane_cusp.representative()
-                registered = quotient.registered_isotropic_lift(plane)
+                # The plane is named by the span the cusp already holds, and the
+                # registry is keyed by that span: the row reads its lift here
+                # without constructing the plane, which nothing at this plane is
+                # read for.  The one comparison that does need a lattice element
+                # -- the carried line's own classes, below -- builds it there.
+                span = plane_cusp.span()
+                registered = quotient.registered_isotropic_lift_of_span(span)
                 if registered is None:
                     raise ArithmeticError(
-                        f"the plane {plane} of the cusp {plane_cusp} of {self} has no registered lift, "
+                        f"the plane cusp {plane_cusp} of {self} has no registered lift, "
                         "so no covering of the row can be carried onto it: the class data of its lines "
                         "is what the lift carries, and without it the edges at this plane are undecided"
                     )
                 target_lift, target_discriminant = registered
                 for position, (
-                    reference_plane,
+                    reference_span,
                     reference_lift,
                     reference_discriminant,
                     covering,
@@ -1359,7 +1364,7 @@ class PredicateSubgroups(OwnedParameterizedCategory):
                     )
                     check_move = (
                         target_lift * ~reference_lift
-                        if position not in transport_checked and plane is not reference_plane
+                        if position not in transport_checked and span != reference_span
                         else None
                     )
                     for flag, classes in zip(covering, reference_classes, strict=True):
@@ -1381,7 +1386,7 @@ class PredicateSubgroups(OwnedParameterizedCategory):
                             image_line = check_move.transport_isotropic_object(flag).terms()[0]
                             if str(_isotropic_line_class_points(lattice, image_line)) != str(carried):
                                 raise ArithmeticError(
-                                    f"the divided classes of the line of {flag} carried to {plane} by "
+                                    f"the divided classes of the line of {flag} carried to {plane_cusp} by "
                                     f"the finite image are not the classes of the carried line: the "
                                     "action of the image on A_L and the induced action of the isometry "
                                     "on the lattice disagree, so no edge is read from the classes"
@@ -1393,7 +1398,7 @@ class PredicateSubgroups(OwnedParameterizedCategory):
                         if len(candidates) != 1:
                             named = ", ".join(str(cusp) for cusp in candidates) or "none"
                             raise ArithmeticError(
-                                f"the line of the covering flag {flag} carried to {plane} lies in "
+                                f"the line of the covering flag {flag} carried to {plane_cusp} lies in "
                                 f"{len(candidates)} line cusps of {self} ({named}): the finite image "
                                 "does not separate this line's cusp from the others, and no edge is "
                                 "read from class data that names more than one vertex; "
@@ -1408,7 +1413,7 @@ class PredicateSubgroups(OwnedParameterizedCategory):
                                 self, candidates[0], plane_cusp, key
                             )
                         )
-                    if plane is not reference_plane:
+                    if span != reference_span:
                         transport_checked.add(position)
             # The relation is a finite ordered set whose inverse is the walk's
             # own identity index.  A cusp's hash is constant over its universe
