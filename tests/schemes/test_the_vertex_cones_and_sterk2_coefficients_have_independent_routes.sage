@@ -14,6 +14,8 @@ boundary walk is re-run from the boundary directions alone, so the two surgery
 directions are shown not to be steps of the path.
 """
 
+import pytest
+
 from sage_extensions.all import *
 
 
@@ -113,6 +115,17 @@ def test_the_vertex_cone_rays_are_the_inner_normals_the_pairing_finds() -> None:
     assert variety.vertex_normal_cone(lattice((0, 0))).is_smooth()
     assert variety.vertex_normal_cone(lattice((2, 0))).is_smooth()
     assert not variety.vertex_normal_cone(lattice((0, 1))).is_smooth()
+
+    # The cone is asked at a vertex of the retained polytope: the midpoint of
+    # the closing edge is a point of the polygon and is not one of its vertices.
+    with pytest.raises(AssertionError):
+        variety.vertex_normal_cone(lattice((1, 0)))
+    # And it is asked of a variety built from a polytope: the same fan built
+    # without one retains no polytope, so it has no vertex cones of its own.
+    fan_variety = variety.fan().toric_variety(QQ)
+    assert not fan_variety.is_polarized()
+    with pytest.raises(AssertionError):
+        fan_variety.vertex_normal_cone(lattice((0, 0)))
 
 
 def test_every_sterk2_direction_carries_the_coefficient_the_source_gives_it() -> None:
