@@ -74,12 +74,16 @@ class ManifoldAtlasChart(SageObject):
     domain gives the point's coordinate, an element of the coordinate field.
     """
 
-    def __init__(self, manifold, label, engine_chart, domain) -> None:
+    def __init__(self, manifold, label, engine_chart, domain, nonvanishing=()) -> None:
         self._manifold = manifold
         self._label = label
         self._engine = engine_chart
         self._domain = domain
         self._function_ring = _manifold_function_ring(domain, manifold)
+        self._nonvanishing = tuple(
+            _raise_manifold_expression(_engine_manifold_expression(condition), self)
+            for condition in nonvanishing
+        )
         field = manifold.coordinate_field()
         self._coordinates = finite_family(
             tuple(
@@ -107,6 +111,19 @@ class ManifoldAtlasChart(SageObject):
     def domain(self):
         r"""The open subset of the manifold the chart is defined on."""
         return self._domain
+
+    def nonvanishing(self):
+        r"""The functions on this chart whose common nonvanishing locus is its domain.
+
+        A chart read on a proper open subset of the manifold -- a chart cut by
+        conditions, or an ambient chart restricted to an open submanifold -- is
+        stated there where these functions do not vanish, and the subset they cut
+        out in this chart's coordinates is exactly the chart's domain (Lee,
+        *Introduction to Smooth Manifolds*, 2nd ed., Ch. 1, for the chart's open
+        set).  An empty family states that the chart is read on the whole set its
+        coordinates reach; it does not state the opposite.
+        """
+        return self._nonvanishing
 
     def function_ring(self):
         r"""The owned ring of real-valued functions on the chart's domain.
@@ -990,7 +1007,7 @@ def _chartwise_family_agrees(manifold, expressions, order) -> None:
             for position, (left, right) in enumerate(
                 zip(transported, pulled, strict=True)
             ):
-                residual = SR(left - right).simplify_full()
+                residual = SR(left - right).simplify_rational()
                 assert residual == 0, (
                     f"the chart-wise family on {manifold} does not state one object: on the "
                     f"chart {source.label()} the component {position} is {transported[position]}, "
@@ -1454,7 +1471,9 @@ class TopologicalManifolds(OwnedCategory):
                 str(label),
                 coord_def={engine_chart: conditions},
             )
-            chart = self._register_chart(label, engine_open.chart(coordinates))
+            chart = self._register_chart(
+                label, engine_open.chart(coordinates), nonvanishing=nonvanishing
+            )
             # The chart cut on the subset reads the same coordinates there, so the
             # coordinate change to the chart it was cut from is the identity; it is
             # defined on the whole of the cut chart, which is the subset of the chart
@@ -1468,7 +1487,7 @@ class TopologicalManifolds(OwnedCategory):
             )
             return chart
 
-        def _register_chart(self, label, engine_chart, domain=None):
+        def _register_chart(self, label, engine_chart, domain=None, nonvanishing=()):
             r"""Record the chart ``engine_chart`` of this manifold's engine under ``label``.
 
             The chart is defined on ``domain``, an open subset of this manifold.
@@ -1489,7 +1508,9 @@ class TopologicalManifolds(OwnedCategory):
                     if engine_chart.domain() is self._engine_manifold_realization()
                     else self._chart_domain(label, engine_chart)
                 )
-            chart = ManifoldAtlasChart(self, label, engine_chart, domain)
+            chart = ManifoldAtlasChart(
+                self, label, engine_chart, domain, nonvanishing=nonvanishing
+            )
             self._preamble_charts[label] = chart
             return chart
 
@@ -1644,12 +1665,75 @@ class TopologicalManifolds(OwnedCategory):
                 f"an open subset of the points of {self}"
             )
             present = tuple(domain.chart_labels())
+            bases = tuple(
+                label
+                for label in self.chart_labels()
+                if self.atlas()[label].domain() is domain
+            )
             for label in self.chart_labels():
                 if label in present:
                     continue
                 engine_chart = _engine_manifold_chart(self.atlas()[label])
                 overlap = engine_chart.domain().intersection(engine_subset)
-                domain._register_chart(label, engine_chart.restrict(overlap))
+                domain._register_chart(
+                    label,
+                    engine_chart.restrict(overlap),
+                    nonvanishing=tuple(
+                        condition
+                        for base in bases
+                        for condition in self.transition(base, label).target_overlap()
+                    ),
+                )
+            for source_label in tuple(domain.chart_labels()):
+                for target_label in tuple(domain.chart_labels()):
+                    if source_label == target_label:
+                        continue
+                    if (source_label, target_label) in domain._preamble_transitions:
+                        continue
+                    if (source_label, target_label) not in self._preamble_transitions:
+                        continue
+                    ambient = self.transition(source_label, target_label)
+                    source_chart = domain.atlas()[source_label]
+                    target_chart = domain.atlas()[target_label]
+                    # A chart whose domain is already the intersection states the
+                    # overlap as the whole of itself; a chart read on the whole
+                    # submanifold keeps the ambient overlap, read in its own ring.
+                    domain.transition_map(
+                        source_label,
+                        target_label,
+                        tuple(
+                            _raise_manifold_expression(
+                                _engine_manifold_expression(expression), source_chart
+                            )
+                            for expression in ambient.forward_expressions()
+                        ),
+                        tuple(
+                            _raise_manifold_expression(
+                                _engine_manifold_expression(expression), target_chart
+                            )
+                            for expression in ambient.inverse_expressions()
+                        ),
+                        source_overlap=tuple(
+                            _raise_manifold_expression(
+                                _engine_manifold_expression(expression), source_chart
+                            )
+                            for expression in (
+                                ambient.source_overlap()
+                                if source_chart.domain() is domain
+                                else ()
+                            )
+                        ),
+                        target_overlap=tuple(
+                            _raise_manifold_expression(
+                                _engine_manifold_expression(expression), target_chart
+                            )
+                            for expression in (
+                                ambient.target_overlap()
+                                if target_chart.domain() is domain
+                                else ()
+                            )
+                        ),
+                    )
             return domain
 
         def open_submanifold_inclusion(self, open_manifold):

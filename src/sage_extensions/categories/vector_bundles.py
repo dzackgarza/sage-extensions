@@ -88,7 +88,7 @@ def _rational_polynomial(expression):
     return SR(expression).polynomial(QQ)
 
 
-def _decided_nowhere_vanishing(expression, variables):
+def _decided_nowhere_vanishing(expression, variables, excluded=()):
     r"""Whether the real function ``expression`` of ``variables`` is decided to take no zero.
 
     A component of a frame is a real-valued function on a chart's domain, and the
@@ -100,6 +100,16 @@ def _decided_nowhere_vanishing(expression, variables):
     decisions, and ``None`` is the statement that this owner does not decide the
     question for the expression it was given.
 
+    ``excluded`` are the functions whose common nonvanishing locus is the
+    chart's domain (:meth:`ManifoldAtlasChart.nonvanishing`): the question is
+    asked on that domain, so the exact powers of those functions are divided out
+    of the numerator first, and the remainder has to vanish nowhere at all.  A
+    chart read on a proper open subset therefore decides what a chart of the whole
+    manifold cannot: on the south chart of $S^2$, the north chart's coordinate
+    frame has determinant $-\lvert y\rvert^4$, whose only zero is the pole the
+    chart excludes by $\lvert y\rvert^2 \ne 0$, so the remainder after dividing
+    twice is $-1$.
+
     A denominator is not decided here: a chart expression that divides is stated
     where its denominator does not vanish (``ManifoldAtlasChart.section_ratio``),
     and that nonvanishing is the overlap the chart's own transition states.
@@ -108,8 +118,18 @@ def _decided_nowhere_vanishing(expression, variables):
 
     from sage_extensions.categories.functions.real_functions import _decided_nonzero
 
-    formula = SR(expression)
-    numerator = SR(formula.numerator())
+    numerator = SR(SR(expression).simplify_rational().numerator())
+    for condition in tuple(excluded):
+        factor = SR(SR(condition).simplify_rational())
+        if not factor.variables():
+            continue
+        for _factor_power in range(8):
+            quotient = SR(numerator / factor).simplify_rational()
+            if SR(quotient.denominator()).simplify_rational() != 1:
+                break
+            if SR(quotient * factor - numerator).simplify_rational() != 0:
+                break
+            numerator = quotient
     free = tuple(numerator.variables())
     if not free:
         return _decided_nonzero(numerator)
@@ -682,7 +702,12 @@ class SmoothSectionModules(OwnedParameterizedCategory):
                 )
                 determinant = _engine_matrix(SR, rank, rank, entries).det()
                 verdict = _decided_nowhere_vanishing(
-                    determinant, tuple(_engine_manifold_chart(chart)[:])
+                    determinant,
+                    tuple(_engine_manifold_chart(chart)[:]),
+                    tuple(
+                        _engine_manifold_expression(condition)
+                        for condition in chart.nonvanishing()
+                    ),
                 )
                 assert verdict is True, (
                     f"the family {family} does not trivialize {self._vector_bundle}: its "
