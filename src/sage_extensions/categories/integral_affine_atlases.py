@@ -348,7 +348,72 @@ class IntegralAffineAtlases(OwnedCategory):
             pass
 
         def restrict(self, open_inclusion):
-            pass
+            r"""Return this atlas restricted to the open submanifold the inclusion selects.
+
+            An integral-affine structure is a family of charts into one affine
+            model whose transitions preserve the model's lattice.  On an open
+            submanifold the same family restricts: a chart of this atlas read on the
+            part of its domain that lies in the submanifold is a chart there, into
+            the same model, and the transitions between the restricted charts are
+            the transitions of this atlas on the smaller overlaps, so they preserve
+            the same lattice.  The model is not reconstructed (``OWN-15``): the
+            restricted atlas retains the exact affine model of this one.
+
+            The restriction is read through ``SmoothManifolds.open_submanifold``,
+            which selects the submanifold and registers on it the ambient charts
+            restricted; a chart of this atlas is restricted along the label of the
+            chart its domain is.  A chart on the whole manifold restricts to a chart
+            on the whole submanifold, and its affine map is this chart's composed
+            with the inclusion.
+            """
+            manifold = self.underlying_smooth_manifold()
+            submanifold = manifold.open_submanifold(open_inclusion)
+            chart_domains = {}
+            chart_domain_inclusions = {}
+            affine_charts = {}
+            for chart in self.affine_charts():
+                domain = self.chart_domains()[chart]
+                match domain is manifold:
+                    case True:
+                        restricted_domain = submanifold
+                        into_submanifold = Sets().Mor(submanifold, submanifold).identity()
+                    case False:
+                        labels = tuple(
+                            label
+                            for label in manifold.chart_labels()
+                            if manifold.atlas()[label].domain() is domain
+                        )
+                        assert len(labels) == 1, (
+                            f"cannot restrict the chart {chart} of this atlas to "
+                            f"{submanifold}: its domain {domain} is the domain of "
+                            f"{len(labels)} charts of {manifold}, and a restriction is read "
+                            f"along the label of the one chart it is"
+                        )
+                        restricted_domain = submanifold.atlas()[labels[0]].domain()
+                        into_submanifold = (
+                            Sets().Mor(restricted_domain, submanifold).identity()
+                            if restricted_domain is submanifold
+                            else submanifold.open_submanifold_inclusion(restricted_domain)
+                        )
+                ambient_chart = self.affine_chart(chart)
+                chart_domains[restricted_domain] = restricted_domain
+                chart_domain_inclusions[restricted_domain] = into_submanifold
+                affine_charts[restricted_domain] = Sets().Mor(
+                    restricted_domain, self.affine_model()
+                )(
+                    lambda point: ambient_chart(
+                        open_inclusion(into_submanifold(point))
+                    )
+                )
+            return IntegralAffineAtlases().on(
+                submanifold,
+                self.affine_model(),
+                chart_domains,
+                chart_domain_inclusions,
+                affine_charts,
+                {},
+                {},
+            )
 
         def restriction_morphism(self, restricted_atlas):
             pass
