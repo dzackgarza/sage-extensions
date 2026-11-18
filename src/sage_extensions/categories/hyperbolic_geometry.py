@@ -5,22 +5,33 @@ from math import gcd
 
 from sage.categories.category import Category
 from sage.misc.cachefunc import cached_method
+from sage.rings.infinity import Infinity
 from sage.rings.integer_ring import ZZ as SageZZ
 from sage.structure.element import Element
 from sage.structure.element import parent as element_parent
 from sage.structure.parent import Parent
 from sage.structure.sage_object import SageObject
 
+from sage_extensions.categories.abstract_categories.mor_categories import (
+    MorCategoryConstruction,
+)
+from sage_extensions.categories.abstract_categories.mor_foundation import object_level
 from sage_extensions.categories.abstract_categories.objects import OwnedParameterizedCategory
+from sage_extensions.categories.manifolds import (
+    RiemannianManifoldMor,
+    RiemannianManifolds,
+)
 from sage_extensions.categories.rings.ring_foundation import (
     _own_ring,
     _owned_integers,
 )
 from sage_extensions.categories.sets.finite_ordered_sets import finite_ordered_set
-from sage_extensions.categories.sets.set_categories import Sets
+from sage_extensions.categories.sets.set_categories import OwnedSetMorphism, Sets
 from sage_extensions.categories.topological_spaces import TopologicalSpaces
 from sage_extensions.owned_category import _object_of
 from sage_extensions.rings.real import RR
+
+HYPERBOLOID_CHART = "hyperboloid"
 
 
 def _real_ambient_vector(lattice, ambient, vector):
@@ -287,6 +298,203 @@ class PositiveConeComponents(OwnedParameterizedCategory):
             return f"Positive-cone component of {self.lattice()} ⊗ RR containing {self.timelike_vector()}"
 
 
+def _isometry_image_of_point(domain, codomain, isometry, point):
+    r"""Return the point of ``codomain`` that the lattice isometry ``isometry`` carries ``point`` to.
+
+    ``point`` is a point of the hyperboloid model ``domain``, given in the
+    chart ``hyperboloid``: ``x = s t + y`` with ``t`` the timelike vector of the
+    domain's component and ``y`` the coordinates in a basis of ``t^perp``.  The
+    isometry is read there, in the lattice coordinates of its own images of the
+    domain's generators, and the image is written in the codomain's frame,
+    ``s' t' + y'``, whose timelike vector ``t'`` may be another one.  Since the
+    hyperboloid is cut out by ``q = 1`` and ``-b`` is the metric, an isometry of
+    the lattice whose two endpoints are one lattice carries the hyperboloid of
+    the domain's component into that of one of the codomain's two, and the sign
+    that puts the image in the codomain's own component is the one pairing
+    positively with ``t'``: a hyperbolic point is a ray, so the sign is no part
+    of it.
+    """
+    lattice = domain.lattice()
+    assert isometry.domain() is lattice and isometry.codomain() is lattice, (
+        f"{isometry} does not act on {domain}: an isometry of the hyperboloid of {lattice} "
+        f"comes from an isometry of {lattice}, and {isometry} is a map "
+        f"{isometry.domain()} -> {isometry.codomain()}"
+    )
+    match point.chart().label():
+        case label if label == HYPERBOLOID_CHART:
+            pass
+        case label:
+            raise ValueError(
+                f"cannot move {point} by {isometry}: the image is read in the chart "
+                f"{HYPERBOLOID_CHART}, where a point is the hyperboloid vector itself, and {point} "
+                f"is given in the chart {label}"
+            )
+    source = domain._hyperboloid_frame()
+    target = codomain._hyperboloid_frame()
+    vector = source.vector(tuple(point.coordinates()))
+    images = tuple(
+        source.coordinates(isometry(generator)) for generator in source.generators
+    )
+    image = tuple(
+        sum(
+            (
+                vector[position] * images[position][coordinate]
+                for position in range(source.rank)
+            ),
+            RR.zero(),
+        )
+        for coordinate in range(source.rank)
+    )
+    match target.pairing(image, target.timelike) > RR.zero():
+        case True:
+            return codomain.point(target.chart(image), HYPERBOLOID_CHART)
+        case False:
+            return codomain.point(
+                target.chart(tuple(-entry for entry in image)), HYPERBOLOID_CHART
+            )
+
+
+class HyperbolicManifoldMor(RiemannianManifoldMor):
+    r"""Isometries of hyperbolic spaces induced by integral isometries of their lattice.
+
+    An arrow ``HH(C^+) -> HH(D^+)`` of ``HyperbolicSpaces(n)`` is the smooth map
+    ``[x] |-> [g x]`` induced by an isometry ``g`` of the lattice the two spaces
+    are hyperboloid models of.  Such a ``g`` preserves the pairing, so it
+    preserves ``q``, hence the positive cone and its two components, and it
+    commutes with the projection to rays; the map it induces preserves ``-b`` on
+    every tangent space, so it is a local isometry, and a local isometry of a
+    complete connected hyperbolic space is its global isometry.
+
+    The isometry group of ``HH^n`` is the projective orthogonal group
+    ``PO(L_RR) = O(L_RR)/{+-1}`` of the ambient real space, which is much larger
+    than the image of the integral ``O(L)``.  A real isometry given only by its
+    values is not decided here, so this constructor states the arrows it does
+    decide -- those induced by an integral isometry of the endpoints' own
+    lattice -- and refuses anything else rather than admitting it by assumption.
+    """
+
+    class ElementMethods(RiemannianManifoldMor.ElementMethods):
+        def __init__(self, parent, isometry):
+            self._isometry = isometry
+            self._map_of_points = Sets().Mor(parent.domain(), parent.codomain())(
+                lambda point: _isometry_image_of_point(
+                    parent.domain(), parent.codomain(), isometry, point
+                )
+            )
+            OwnedSetMorphism.__init__(self, parent, self._map_of_points)
+
+        def lattice_isometry(self):
+            r"""Return the integral isometry of the endpoints' lattice that induces this arrow."""
+            return self._isometry
+
+        def underlying_smooth_morphism(self):
+            r"""Return the map of points, as the owned set map of the two spaces.
+
+            Those are the arrow's values on points.  A smooth morphism between
+            the two hyperboloid models is not a represented arrow of
+            ``SmoothManifolds()`` here -- that owner's constructor admits none
+            (``SmoothManifoldMor._element_constructor_``, ``manifolds.py``) --
+            so this returns the map of points the action is computed by rather
+            than a smooth morphism built by assumption.
+            """
+            return self._map_of_points
+
+        def underlying_topological_morphism(self):
+            r"""Return the map of points of the underlying topological spaces.
+
+            It is the same map as :meth:`underlying_smooth_morphism`, and it is
+            the owned set map of the two spaces for the same reason.
+            """
+            return self._map_of_points
+
+        def chart_maps(self):
+            r"""Refuse: this arrow is written by its lattice isometry, not by chart formulas.
+
+            A chartwise representation would be one coordinate expression per
+            pair of charts, and the form the isometry takes in the chart
+            ``hyperboloid`` involves ``sqrt((1 - q(y)) / q(t))``.  What the
+            constructor is given is the isometry of the lattice, and no
+            coordinate representation is derived from it here.
+            """
+            raise NotImplementedError(
+                f"{self} is induced by an isometry of {self.domain().lattice()}, and no "
+                f"chartwise coordinate representation of it is stated: it acts on the "
+                f"hyperboloid vectors"
+            )
+
+        def degree(self):
+            r"""Return ``Infinity``: an isometry of smooth manifolds is ``C^infinity``."""
+            return Infinity
+
+        def __mul__(self, other):
+            r"""Return the composite of two composable hyperbolic arrows.
+
+            The composite of the isometries induces the composite of the maps,
+            so the product is written from the lattice isometries' own product
+            and belongs to the Mor of the composite's endpoints.
+            """
+            match other:
+                case _ if not isinstance(other, HyperbolicManifoldMor.ElementMethods):
+                    return NotImplemented
+                case _ if other.codomain() is not self.domain():
+                    return NotImplemented
+                case _:
+                    return self.parent().mor_family().Of(
+                        other.domain(), self.codomain()
+                    )(self._isometry * other._isometry)
+
+    def _element_constructor_(self, isometry):
+        r"""Return the arrow induced by the isometry ``isometry`` of the endpoints' lattice.
+
+        ``isometry`` is a map of the endpoints' lattice to itself, and it is
+        admitted exactly when it preserves the pairing: checked on the
+        lattice's chosen generating set, which decides it for the whole lattice
+        because the pairing is bilinear.  A form-preserving endomorphism of a
+        nondegenerate finite-rank lattice is an automorphism, so nothing weaker
+        than an isometry is admitted as one.
+        """
+        domain = self.domain()
+        codomain = self.codomain()
+        lattice = domain.lattice()
+        assert codomain.lattice() is lattice, (
+            f"there is no arrow {domain} -> {codomain} induced by an isometry of one lattice: "
+            f"{domain} is a model of {lattice} and {codomain} of {codomain.lattice()}, and an "
+            f"isometry of the first induces no map of the second's points"
+        )
+        labels = tuple(lattice.module_generating_set())
+        generators = tuple(lattice.module_generator(label) for label in labels)
+        images = tuple(isometry(generator) for generator in generators)
+        for position, (generator, image) in enumerate(zip(generators, images)):
+            for other_position, (other_generator, other_image) in enumerate(
+                zip(generators, images)
+            ):
+                pairing = lattice.b(generator, other_generator)
+                moved = lattice.b(image, other_image)
+                assert moved == pairing, (
+                    f"{isometry} induces no isometry of {domain}: it does not preserve the "
+                    f"pairing of {lattice}, since b(e_{position}, e_{other_position}) = {pairing} "
+                    f"while the pairing of their images is {moved}"
+                )
+        return self.element_class(self, isometry)
+
+    @object_level
+    @cached_method
+    def identity(self):
+        r"""Return the identity arrow, induced by the identity isometry of the lattice."""
+        if self.domain() is not self.codomain():
+            raise ValueError(
+                f"there is no identity arrow from {self.domain()} to {self.codomain()}: an "
+                f"identity needs its domain and codomain to be the same hyperbolic space"
+            )
+        return self(self.domain().lattice().Aut().one())
+
+
+class HyperbolicManifoldMorCategoryConstruction(MorCategoryConstruction):
+    r"""The isometries of the hyperbolic spaces, at the hyperbolic owner."""
+
+    FixedCategoryClass = HyperbolicManifoldMor
+
+
 class HyperbolicSpaces(OwnedParameterizedCategory):
     r"""Hyperbolic spaces of dimension ``n``.
 
@@ -319,9 +527,9 @@ class HyperbolicSpaces(OwnedParameterizedCategory):
         return f"hyperbolic spaces of dimension {self.dimension()}"
 
     def super_categories(self):
-        from sage_extensions.categories.manifolds import RiemannianManifolds
-
         return [RiemannianManifolds().GloballySymmetric()]
+
+    _MorCategory = HyperbolicManifoldMorCategoryConstruction
 
     @cached_method
     def an_object(self):
@@ -438,27 +646,13 @@ class HyperbolicSpaces(OwnedParameterizedCategory):
             )
 
         def _isometry_image(self, element, point):
-            r"""The point ``eps g x`` for ``g`` an isometry of the lattice and ``x`` a point of the hyperboloid."""
-            frame = self._hyperboloid_frame()
-            lattice = self.lattice()
-            assert element.domain() is lattice and element.codomain() is lattice, (
-                f"{element} does not act on {self}: an isometry of the hyperboloid of {lattice} "
-                f"comes from an isometry of {lattice}, and {element} is a map "
-                f"{element.domain()} -> {element.codomain()}"
-            )
-            vector = frame.vector(tuple(point.coordinates()))
-            images = tuple(
-                frame.coordinates(element(generator)) for generator in frame.generators
-            )
-            image = tuple(
-                sum((vector[source] * images[source][target] for source in range(frame.rank)), RR.zero())
-                for target in range(frame.rank)
-            )
-            match frame.pairing(image, frame.timelike) > RR.zero():
-                case True:
-                    return self.point(frame.chart(image), "hyperboloid")
-                case False:
-                    return self.point(frame.chart(tuple(-entry for entry in image)), "hyperboloid")
+            r"""The point ``eps g x`` for ``g`` an isometry of the lattice and ``x`` a point of the hyperboloid.
+
+            The space is its own domain and codomain here, so this is the arrow
+            the isometry induces on it (:meth:`HyperbolicManifoldMor.ElementMethods._call_`)
+            with the same point map, read in this space's own frame twice.
+            """
+            return _isometry_image_of_point(self, self, element, point)
 
         @cached_method
         def _hyperboloid_frame(self):
@@ -748,6 +942,8 @@ def _hyperbolic_space(component):
 
 
 __all__ = [
+    "HYPERBOLOID_CHART",
+    "HyperbolicManifoldMor",
     "HyperbolicPolyhedra",
     "HyperbolicRationalPoints",
     "HyperbolicSpaces",

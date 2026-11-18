@@ -1843,6 +1843,7 @@ class RiemannianManifolds(OwnedCategory):
             ``t^perp_RR -> HH(C^+)``, since ``t^perp`` is negative definite.
             """
             from sage_extensions.categories.hyperbolic_geometry import (
+                HYPERBOLOID_CHART,
                 HyperbolicSpaces,
             )
 
@@ -1861,7 +1862,9 @@ class RiemannianManifolds(OwnedCategory):
                 manifold_field="real",
                 component=component,
             )
-            space.chart("hyperboloid", " ".join(f"y{index}" for index in range(dimension)))
+            space.chart(
+                HYPERBOLOID_CHART, " ".join(f"y{index}" for index in range(dimension))
+            )
             return space
 
         class ParentMethods:
