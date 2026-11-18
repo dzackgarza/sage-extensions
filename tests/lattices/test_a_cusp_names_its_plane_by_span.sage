@@ -78,3 +78,51 @@ def test_each_incidence_certificate_carries_its_terms_to_its_cusps() -> None:
             certificate.plane_transporter().transport_isotropic_object(plane)
             in certificate.plane_cusp()
         )
+
+
+def test_a_plane_cusp_answers_the_lift_its_row_registered_for_it() -> None:
+    r"""The registry is keyed by the span, and a cusp holds that span.
+
+    A plane row registers one lift per plane, keyed by the plane's span
+    (:meth:`...OrthogonalCharacterQuotient.register_isotropic_lift`), and a cusp
+    of the row keeps the representative's span and nothing else.  So the lift a
+    cusp names is the registry's answer to the span the cusp holds, and asking
+    the same registry with the plane rebuilt from that span is asking the same
+    question: the two reads are one datum, the lift and the finite element it
+    acts on the discriminant group by.
+
+    The lattice is \\(U \\oplus U(2) \\oplus \\langle -2 \\rangle\\), whose
+    \\(\\tilde O\\) row splits the one \\(O(L)\\)-orbit of primitive isotropic
+    planes into two, so the statement is asked of two cusps and not of one.
+
+    What the relation transports with that datum is stated too: the composite
+    \\(s_2 s_1^{-1}\\) of two planes' registered lifts carries the first plane
+    onto the second, which is the move the incidence carries a covering's line
+    classes by.
+    """
+    lattice = (
+        Lattices(ZZ)("U")
+        + Lattices(ZZ)("U").twist(2)
+        + Lattices(ZZ)([[-2]])
+    )
+    subgroup = lattice.stable_orthogonal_group()
+    quotient = subgroup.finite_character_quotient()
+    plane_cusps = subgroup.cusps(2)
+    assert plane_cusps.cardinality() == cardinal(2)
+
+    registered = []
+    for cusp in plane_cusps:
+        by_plane = quotient.registered_isotropic_lift(cusp.representative())
+        lift, finite_element = by_plane
+        # The lift is an isometry of the row's lattice, and the finite element
+        # beside it is its own character image: the two halves of one datum.
+        assert lift.domain() is lattice
+        assert lift.codomain() is lattice
+        assert quotient.image(lift)["discriminant"] == finite_element
+        assert cusp.representative().module_rank() == 2
+        registered.append((cusp, lift))
+
+    first_cusp, first_lift = registered[0]
+    second_cusp, second_lift = registered[1]
+    move = second_lift * ~first_lift
+    assert move.transport_isotropic_object(first_cusp.representative()) in second_cusp
