@@ -199,11 +199,15 @@ def _coxeter_matrix_of_cartan_label(label):
 
     Private adapter: Sage's ``CartanType`` and ``CoxeterMatrix`` read the
     label and supply the entries, which are raised to owned cardinals on the
-    index set Sage assigns to the type.
+    ordinals \(0\), \dots, \(n-1\), in the order the type lists its simple
+    roots.  The ordinal is the datum and the engine's naming of the simple
+    roots is not: the diagram of a Cartan label has the vertices of the rows
+    of its matrix and of the simple roots of the type's root lattice, so the
+    three constructions of one diagram are equal.
     """
     engine = CoxeterMatrix(CartanType(_engine_cartan_type_data(list(label))))
     engine_vertices = tuple(engine.index_set())
-    vertices = finite_ordered_set(engine_vertices)
+    vertices = finite_ordinal_set(int(engine.rank()))
     owned = dict(zip(engine_vertices, vertices, strict=True))
     return _owned_coxeter_matrix(
         vertices,
@@ -392,7 +396,7 @@ class CoxeterDiagrams(OwnedCategory):
             sage: C = CoxeterDiagrams()
             sage: C([[1, 3], [3, 1]]).coxeter_entry(0, 1) == 3
             True
-            sage: C(["A", 2]).coxeter_entry(1, 2) == 3
+            sage: C(["A", 2]).coxeter_entry(0, 1) == 3
             True
             sage: roots = Lattices(ZZ)([[-2, 2], [2, -2]]).module_generators()
             sage: C(roots).is_rooted()
