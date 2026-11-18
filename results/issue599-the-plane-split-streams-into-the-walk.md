@@ -465,24 +465,28 @@ each other's allocation; two caveats found in use -- a chat that writes it with 
 plain `>` truncates the others' lines (mine vanished once and was merged back),
 and the gate must read each claim's *current* RSS, not its projection.
 
-**The per-plane term is not in the quotient's span-keyed tables.**  Two hundred
-planes of `Otilde(T_Co)`'s split, built the way the row builds them, leave the
-lift registry with **200 entries** and the covering registry, the transport
-registry and the root bridges with **0 each**; dropping all four frees
-**0.0 MiB** (`retention.log`, peak 1 356 MiB).  The lift entries are words since
-`bebcacc` -- the registry keeps a spelling a plane and spells it on demand -- so
-the table that used to be the row's largest term is now negligible, and the
-"26.3 KiB a plane through the span-keyed caches" is not this tree's quotient
-state.
+**The per-plane term is the lift registry, and the earlier reading of it was
+wrong.**  Four marks on one walk -- 100, 200, 300 and 400 planes of
+`Otilde(T_Co)`'s split -- give 1 363.8, 1 364.2, 1 365.0 and 1 366.0 MiB, so
+**4.4, 7.6 and 10.4 KiB a plane** by band (`perplane.log`): the cost rises with
+the plane, which is the shape of a lift's word growing with the double coset
+reached.  The only table with a count that matches is the quotient's lift
+registry (400 entries; the covering, transport and root-bridge registries are
+empty).
 
-What the row does spend per plane is the split's own: its own marks on the tree
-with the release (`a821465`) give **9.6 KB a plane** between 10 000 planes
-(1 782 MiB) and 160 000 planes (3 190 MiB), so 189 720 planes is **~1.8 GiB** of
-planes on the ~0.8 GiB standing row, and the relation's records add ~0.9 GiB:
-**~3.5 GiB peak, under the 4 GiB clause** by this projection.  The projection is
-not the measurement -- the 5 490 MiB on record was taken before `bebcacc`,
-`4b43ef5` and `a821465` -- and the run that would measure it is queued behind the
-stage-1 rows by the host's priority rule.
+The previous reading -- that dropping the four tables frees 0.0 MiB and the
+registry is therefore negligible -- was an artefact of the allocator: freeing
+Python objects does not return their pages to the host, so RSS cannot show it.
+The count of entries, and the RSS *growth* across planes, are the honest signals,
+and both point at the registry.
+
+At 189 720 planes that is ~2.0-2.7 GiB of words on the ~0.86 GiB standing row,
+so the split ends near 3 GiB; the relation's records add ~0.2 GiB and the release
+(`a821465`) meanwhile returns the registry as it walks, so the peak projects at
+**~3-3.5 GiB, under the 4 GiB clause**.  The 5 490 MiB on record predates
+`bebcacc`, `4b43ef5` and `a821465`.  The projection is not the measurement: the
+run that would measure it is queued behind the stage-1 rows by the host's
+priority rule.
 
 **Why the counts have to be computed and cannot be extrapolated.**  The edge
 count is not a fixed multiple of the plane count.  On `U + U(2) + <-2>` both
