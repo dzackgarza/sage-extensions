@@ -2841,7 +2841,10 @@ end
         from sage_extensions.categories.group.groups import _law_reversed
 
         product = self._gap_product()[1]
-        to_permutation = libgap.IsomorphismPermGroup(product)
+        # The direct character product can have order 4.7e13 on T_Co.
+        # Its generic permutation isomorphism attempts a regular action;
+        # use the cached faithful factorwise model instead.
+        to_permutation = self._character_permutation_model()
         permutation_product = libgap.Range(to_permutation)
         point = libgap.Image(to_permutation, self._gap_of_key(self.image(witness)))
         stabilizer_generators = tuple(target_stabilizer_generators)
