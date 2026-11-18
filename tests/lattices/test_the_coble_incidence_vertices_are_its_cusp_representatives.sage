@@ -85,6 +85,27 @@ def test_the_kernel_incidence_vertices_of_6jrs_are_its_cusp_rows() -> None:
     assert relation.cardinality() == cardinal(1)
 
 
+def test_incidence_reconstructs_its_verified_flag_on_demand() -> None:
+    r"""Retain the verified basis, not every constructed flag parent in the row."""
+    lattice = _6jrs()
+    relation = lattice.stable_orthogonal_group().tits_building_incidence()
+    edge = next(iter(relation))
+    assert edge._flag is None
+    assert len(edge._flag_basis) == 2
+    flag = edge.flag()
+    assert flag is edge.flag()
+    line, plane = flag.terms()
+    assert _lies_in(line, plane)
+    assert _spans_one_another(
+        edge.line_transporter().transport_isotropic_object(line),
+        edge.line_cusp().representative(),
+    )
+    assert _spans_one_another(
+        edge.plane_transporter().transport_isotropic_object(plane),
+        edge.plane_cusp().representative(),
+    )
+
+
 def test_the_plus_kernel_incidence_vertices_of_6jrs_are_its_cusp_rows() -> None:
     r"""``6JRS``: ``Otilde+`` is ``O^+(L)`` there, and its vertices are its own cusps."""
     lattice = _6jrs()

@@ -1105,7 +1105,15 @@ class CuspIncidence(SageObject):
 
 
 class ArithmeticCuspIncidence(SageObject):
-    r"""One incident pair of cusp orbits, with an actual rank-``(1,2)`` flag certificate."""
+    r"""One incident pair of cusp orbits, with an actual rank-``(1,2)`` flag certificate.
+
+    The supplied flag and both transporters are checked at construction.
+    Only the flag's two isotropic basis vectors are retained until a reader
+    asks :meth:`flag`, which reconstructs the checked flag from those vectors.
+    This does not defer or weaken the containment and transporter checks; it
+    avoids retaining every constructed subobject parent of a large incidence
+    row when its reader needs only the relation between cusp vertices.
+    """
 
     def __init__(
         self,
@@ -1146,7 +1154,12 @@ class ArithmeticCuspIncidence(SageObject):
                 f"the isometry {plane_transporter} does not carry the plane {plane} of the flag {flag} to the representative {plane_cusp.representative()} of the cusp {plane_cusp}"
             )
         self._subgroup = subgroup
-        self._flag = flag
+        # The constructor has checked the actual flag and both transporters.
+        # Retain its isotropic basis, not the constructed subobject parents:
+        # a Coble kernel incidence row has 569160 distinct endpoint pairs.
+        # Reconstruct the same checked flag only when its accessor is asked.
+        self._flag_basis = tuple(flag.isotropic_basis())
+        self._flag = None
         self._line_cusp = line_cusp
         self._plane_cusp = plane_cusp
         self._line_transporter = line_transporter
@@ -1159,6 +1172,8 @@ class ArithmeticCuspIncidence(SageObject):
         return self.subgroup().supergroup().domain()
 
     def flag(self):
+        if self._flag is None:
+            self._flag = IsotropicFlag(self.lattice(), self._flag_basis)
         return self._flag
 
     def line(self):
