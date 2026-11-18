@@ -77,3 +77,51 @@ def test_the_stereographic_transition_of_the_circle_is_the_reciprocal_of_its_coo
     assert tuple(transition.inverse()(RR(1) / RR(2))) == (RR(2),)
     with pytest.raises(AssertionError):
         transition(0)
+
+
+def test_a_quotient_of_sections_is_a_function_on_the_open_subset_where_its_denominator_does_not_vanish() -> None:
+    r"""On ``R^2`` the quotient ``y/x`` is a function on the open subset ``{x != 0}``: there it is the quotient of the two restricted sections, read at the point the open subset's own chart gives, and at ``x = 0`` it is refused."""
+    plane = SmoothManifolds()(2, "R^2")
+    chart = plane.chart("U", "x y")
+    x = chart.coordinate(0)
+    y = chart.coordinate(1)
+    nonzero = plane.chart_on_open_subset("V", "x y", "U", (x,))
+    domain = nonzero.domain()
+    inner = domain(plane((3, -2), "U"))
+    quotient = chart.section_ratio(y, x)
+    restricted_x = nonzero.function_ring()(x)
+    restricted_y = nonzero.function_ring()(y)
+
+    assert quotient.numerator().parent() is chart.function_ring()
+    assert quotient.denominator().parent() is chart.function_ring()
+    assert domain is not plane
+    assert nonzero.function_ring().domain() is domain
+    assert plane.open_submanifold_inclusion(domain)(inner) == plane((3, -2), "U")
+    assert restricted_x.parent() is nonzero.function_ring()
+    assert (restricted_x(inner), restricted_y(inner)) == (RR(3), RR(-2))
+    assert quotient(inner) == restricted_y(inner) / restricted_x(inner)
+    assert quotient(inner) == RR(-2) / RR(3)
+    with pytest.raises(AssertionError):
+        quotient(plane((0, -2), "U"))
+
+
+def test_the_stereographic_overlap_is_an_open_subset_of_the_chart_the_quotient_divides_by() -> None:
+    r"""``U_N cap U_S`` is the open subset of the chart ``U_N`` where the squared norm of the coordinates does not vanish, and the coordinate change there is the quotient of the restricted sections."""
+    sphere = SmoothManifolds().sphere(2)
+    north = sphere.atlas()["U_N"]
+    norm_squared = sum(coordinate**2 for coordinate in north.coordinates())
+    overlap = sphere.chart_on_open_subset("U_N_overlap", "x1 x2", "U_N", (norm_squared,))
+    domain = overlap.domain()
+    inner = domain(sphere((3, -2), "U_N"))
+    quotient = north.section_ratio(north.coordinate(0), norm_squared)
+
+    assert domain is not sphere
+    assert north.domain() is not sphere
+    assert overlap.function_ring().domain() is domain
+    assert tuple(overlap.coordinate(index)(inner) for index in (0, 1)) == (RR(3), RR(-2))
+    assert overlap.function_ring()(norm_squared)(inner) == RR(13)
+    assert quotient(inner) == (
+        overlap.function_ring()(north.coordinate(0))(inner)
+        / overlap.function_ring()(norm_squared)(inner)
+    )
+    assert quotient(inner) == RR(3) / RR(13)
