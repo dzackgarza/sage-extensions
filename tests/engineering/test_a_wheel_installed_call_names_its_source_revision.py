@@ -22,6 +22,13 @@ sets aside for a program's state, and the same directory whatever the process
 was started from — never the working directory, and never a path inside the
 installed package.
 
+The installation is placed where a source checkout of this library also keeps a
+package -- ``<consumer>/src/sage_extensions``, under the consumer's own
+``pyproject.toml`` and beside its own git commit -- because that is the layout in
+which "the tree above my package is a source tree" is a false conclusion: the
+consumer's file is a project file, the consumer's revision is a revision, and
+neither is this library's.
+
 The call is the smallest row that is still the reported operation: one
 stage-timed ``isotropic_orbit_representatives(1)`` on ``L_1 = U + U + <-2>``,
 whose discriminant kernel has one line orbit.

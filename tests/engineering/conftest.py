@@ -733,23 +733,25 @@ def _installed_wheel() -> tuple[Path, Path, str]:
     r"""A wheel of this checkout, installed into a consumer's own project tree.
 
     One installation per session, because a wheel is what a consumer installs and
-    building it costs the whole tree: ``pip install --target vendor`` builds the
+    building it costs the whole tree: ``pip install --target src`` builds the
     wheel of this checkout's working tree, ``setup.py``'s ``build_py`` writes the
     revision it was built from into it, and pip puts it where a consumer keeps it.
 
-    The tree around it is a consumer's, not this checkout's: it holds its own
-    ``pyproject.toml`` and its own git repository with a commit of its own, one
-    directory above the ``vendor`` directory the package was installed into.  So
-    the run below has everything that could be mistaken for this library's source
-    -- a project file, a revision, a directory of the library's own name -- and
-    none of it is this library's.
+    The tree it is installed into is a consumer's, not this checkout's, and the
+    installation is put in the one place a source checkout of this library also
+    keeps a package: ``<consumer>/src/sage_extensions``, one directory below a
+    ``pyproject.toml`` that declares the consumer's own project and beside a git
+    repository whose commit is the consumer's.  So every fact a reader could take
+    for this library's source -- a package under ``src``, a project file above
+    it, a revision in that repository -- is present, and none of it is this
+    library's.
     """
     global _INSTALLED_WHEEL
     if _INSTALLED_WHEEL is not None and _INSTALLED_WHEEL[0].is_dir():
         return _INSTALLED_WHEEL
     WHEEL_ROOT.mkdir(parents=True, exist_ok=True)
     tree = Path(tempfile.mkdtemp(prefix="wheel-", dir=WHEEL_ROOT))
-    installed = tree / "vendor"
+    installed = tree / "src"
     placed = subprocess.run(
         (
             sys.executable, "-m", "pip", "install",
