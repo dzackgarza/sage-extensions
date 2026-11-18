@@ -510,3 +510,75 @@ def test_the_placed_euclidean_category_states_an_inhabitant() -> None:
 
     with pytest.raises(AssertionError):
         tuple(geometric)[0]
+
+
+def _face_correspondence(first, second, polytope, shifted, permutation):
+    r"""The faces' map a permutation of two congruent placed polygons induces.
+
+    A face is determined by the vertices it contains, so the face carrying each
+    vertex at position ``i`` to the vertex at ``permutation[i]`` is the face whose
+    vertex set is that image: this is the correspondence the same ambient map
+    induces on the faces, read off the two face objects.
+    """
+    first_lattice = tuple(polytope.vertices())
+    second_lattice = tuple(shifted.vertices())
+
+    def image_of(face):
+        signature = tuple(bool(face.contains_point(vertex)) for vertex in first_lattice)
+        return next(
+            candidate
+            for candidate in second.face_poset()
+            if tuple(
+                bool(candidate.contains_point(second_lattice[position]))
+                for position in permutation
+            )
+            == signature
+        )
+
+    return FiniteGradedPosets().Mor(first.face_poset(), second.face_poset())(image_of)
+
+
+def test_an_isometry_between_two_placed_euclidean_polytopes_is_an_arrow() -> None:
+    r"""The translation carrying the square onto its shift: an arrow, not an automorphism.
+
+    Two placed squares, `\operatorname{conv}\{(\pm1,\pm1)\}` and its translate by
+    `(2,2)`, are two objects of one placed Euclidean category.  The translation
+    is an isometry of the plane, and the faces' map it induces is the
+    correspondence its vertex permutation gives, so the pair is an arrow between
+    them and the metric owner admits it.  The dilation by two is no isometry of
+    the plane, and the very same faces' map with it is refused: the difference is
+    the metric decision, and not the shape of the faces' map.
+    """
+    vector_space, space = _plane()
+    category = EuclideanPolytopesIn(space)
+    (first_direction, second_direction) = vector_space.module_generators()
+    square = _square()
+    shifted = LatticePolygons(ZZ.free_module(2))(((1, 1), (1, 3), (3, 3), (3, 1)))
+    first = category.on(
+        ("vertices", square.vertices()), _placement(square, space, vector_space)
+    )
+    second = category.on(
+        ("vertices", shifted.vertices()), _placement(shifted, space, vector_space)
+    )
+    translation = _euclidean_arrow(
+        space, vector_space, (first_direction, second_direction), offset=vector_space((2, 2))
+    )
+    dilation = _euclidean_arrow(
+        space,
+        vector_space,
+        (first_direction + first_direction, second_direction + second_direction),
+    )
+    position_of = second.vertices().ranking_map()
+    permutation = tuple(int(position_of(translation(point))) for point in first.vertices())
+    faces = _face_correspondence(first, second, square, shifted, permutation)
+    arrow = category.Mor(first, second)(translation, faces)
+
+    assert first.ambient_space() is second.ambient_space()
+    assert space.is_an_isometry(translation) is True
+    assert tuple(first.vertices())[0] != tuple(second.vertices())[0]
+    assert arrow(tuple(first.vertices())[0]) == tuple(second.vertices())[0]
+    assert faces(square) == shifted
+
+    assert space.is_an_isometry(dilation) is False
+    with pytest.raises(ValueError):
+        category.Mor(first, second)(dilation, faces)
