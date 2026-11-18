@@ -521,3 +521,28 @@ completeness is; the two cannot both hold, and this note does not settle which. 
 checkable here is that the 56 generators are integral isometries with trivial discriminant
 action and that their classes span `\Gamma/\Gamma(4)` — that is what `mod_four_image_rank: 56`
 records — and that is not the disputed step.
+
+### The certificate measured
+
+The 56 generators of `bebcacc` were checked and their level-four content computed here, in
+`T_Co`'s own Gram:
+
+```
+generators: 56   all integral isometries: True   all in Gamma: True
+level-two class rank: 56
+level-four span of their commutators: 54
+level-four span of commutators and squares: 54
+```
+
+So the per-generator checks and the `mod_four_image_rank: 56` of the certificate are exactly
+what the certificate says, and the family does generate `\Gamma` modulo `\Gamma(4)`. What it
+does **not** do is reach a 55th level-four dimension: its commutators and squares span the
+same 54 as the reflection family's. Two independent families — one of reflections, one of
+parabolic unipotents — both stop at 54.
+
+That sharpens the conflict rather than settling it. If the level-four class space is 55, as
+the spinor-class-group computation in the previous section says, then no family yet written
+down reaches the missing dimension, and the certificate's completeness at level eight is
+unproved. If it is 54, then that computation has an error this note has not located, and the
+certificate stands. The discriminator is unchanged and is one object: an explicit element of
+`\Gamma(4)` whose class leaves the 54-space.
