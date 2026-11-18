@@ -463,6 +463,8 @@ def row_contract(lattice, subgroup, label, lines, planes, incidences, route) -> 
         keys = {id(cusp): line_datum_key(quotient, cusp) for cusp in lines}
     line_vertices = set()
     plane_vertices = set()
+    line_degrees = [0] * len(lines)
+    plane_degrees = [0] * len(planes)
     retained_pairs = set()
     edge_digest = hashlib.sha256()
     line_position = cusp_positions(lines)
@@ -499,6 +501,8 @@ def row_contract(lattice, subgroup, label, lines, planes, incidences, route) -> 
         edge_digest.update(f"{line_id}:{plane_id}\n".encode("ascii"))
         line_vertices.add(line_id)
         plane_vertices.add(plane_id)
+        line_degrees[line_id] += 1
+        plane_degrees[plane_id] += 1
         if position < 3 or position >= len(incidences) - 3:
             if route == "divided-class":
                 log(f"[{label}] edge {position}: L{line_id} < P{plane_id}")
@@ -518,6 +522,24 @@ def row_contract(lattice, subgroup, label, lines, planes, incidences, route) -> 
                 return RowOutcome(
                     label, RowStatus.CONTRACT_VIOLATION, f"line cusp {position} carries no edge"
                 )
+    if lattice is NamedLattices.Tco and label in ("Otilde", "Otilde+"):
+        # The independent 569160-flag integral archive proves 527 line
+        # classes, each incident with exactly 1080 plane classes, and 189720
+        # plane classes, each incident with exactly three line classes.
+        # Cardinalities alone would not detect an incorrect incidence graph
+        # with the same number of edges; verify the entire degree sequence.
+        if any(degree != 1080 for degree in line_degrees):
+            return RowOutcome(
+                label, RowStatus.COUNT_MISMATCH,
+                f"the 527 Coble kernel line cusps must each have degree 1080, "
+                f"but their degree distribution is {sorted(set(line_degrees))}",
+            )
+        if any(degree != 3 for degree in plane_degrees):
+            return RowOutcome(
+                label, RowStatus.COUNT_MISMATCH,
+                f"the 189720 Coble kernel plane cusps must each have degree 3, "
+                f"but their degree distribution is {sorted(set(plane_degrees))}",
+            )
     log(f"[{label}] audited {len(incidences)} distinct edges; ordered endpoint SHA-256: {edge_digest.hexdigest()}")
     return RowOutcome(
         label,
