@@ -47,7 +47,7 @@ from sage_extensions.categories.sets.indexed_families import (
     finite_indexed_family,
     indexed_family,
 )
-from sage_extensions.categories.sets.set_categories import NN, Sets
+from sage_extensions.categories.sets.set_categories import NN, OwnedSetMorphism, Sets
 from sage_extensions.categories.topological_spaces import TopologicalSpaces
 from sage_extensions.logic import ask
 from sage_extensions.owned_category import _object_of
@@ -1333,22 +1333,69 @@ class DifferentiableManifoldMorCategoryConstruction(MorCategoryConstruction):
 
 
 class SmoothManifoldMor(CategoricalMor):
-    r"""Chartwise smooth maps between selected smooth real manifolds."""
+    r"""Chartwise smooth maps between selected smooth real manifolds.
+
+    A smooth map ``f : X -> Y`` is given by its coordinate representations
+    ``f_{st} = psi_t o f o phi_s^{-1}``, one for each pair of charts ``(s, t)``
+    whose source charts ``U_s`` cover ``X`` (Lee, *Introduction to Smooth
+    Manifolds*, 2nd ed., Ch. 2).  A representation is a tuple of sections of
+    the source chart's ring of functions, one per coordinate of the target
+    chart: the value of the map at a point is read from the representation on
+    the chart that point is given in, and its composite with a second map is
+    the substitution of that map's representation in it.
+    """
 
     class ElementMethods:
-        def __init__(self, parent, topological_map, chart_maps):
-            Morphism.__init__(self, parent)
-            self._topological_map = topological_map
-            self._chart_maps = chart_maps
+        def __init__(self, parent, representations):
+            self._representations = representations
+            self._map_of_points = Sets().Mor(parent.domain(), parent.codomain())(
+                lambda point: self._evaluate_point(point)
+            )
+            OwnedSetMorphism.__init__(self, parent, self._map_of_points)
 
         def underlying_topological_morphism(self):
-            return self._topological_map
+            return self._map_of_points
 
         def chart_maps(self):
-            return self._chart_maps
+            r"""The coordinate representations of this map, indexed by the chart-label pairs they are given on."""
+            return self._representations
+
+        def chart_map(self, source_label, target_label):
+            r"""The coordinates of the target chart ``target_label``, as sections on the source chart ``source_label``."""
+            return self._representations[source_label, target_label]
+
+        def _representation_on(self, source_label):
+            r"""The target chart and the representation the map has on the source chart ``source_label``."""
+            pairs = tuple(
+                pair for pair in self._representations.keys() if pair[0] == source_label
+            )
+            assert len(pairs) == 1, (
+                f"cannot read {self} on the chart {source_label!r}: the map has "
+                f"{len(pairs)} coordinate representations whose source chart it is, and the "
+                f"value of a point is read off the one on the chart the point is given in"
+            )
+            source_label, target_label = pairs[0]
+            return target_label, self.chart_map(source_label, target_label)
+
+        def _evaluate_point(self, point):
+            r"""The point of the codomain that a point of the domain maps to.
+
+            The point is read in the chart it is given in, which is the source
+            chart of the map's representation there; each of that
+            representation's sections is a coordinate of the target chart, so
+            the values of the sections at the point are the coordinates of the
+            image, and the image is the codomain's point with them in that
+            target chart.
+            """
+            source_point = self.domain()(point)
+            target_label, representation = self._representation_on(
+                source_point.chart().label()
+            )
+            values = tuple(section(source_point) for section in representation)
+            return self.codomain().point(values, target_label)
 
         def _call_(self, point):
-            return self._topological_map(point)
+            return self._map_of_points(point)
 
         def weaken_to(self, degree):
             pass
@@ -1357,10 +1404,88 @@ class SmoothManifoldMor(CategoricalMor):
             pass
 
         def __mul__(self, other):
-            pass
+            r"""Return the composite ``self o other`` of smooth maps ``Z -> X -> Y``.
 
-    def _element_constructor_(self, topological_map, chart_maps):
-        pass
+            On the source chart of ``other`` its representation states the
+            coordinates of the middle manifold ``X``; substituting those for the
+            coordinates of ``self``'s representation on that same chart states
+            the coordinates of the composite's target, so the composite is the
+            map those substituted sections determine.
+            """
+            assert other.codomain() is self.domain(), (
+                f"cannot compose {self} with {other}: the codomain {other.codomain()} of the "
+                f"first map is not the domain {self.domain()} of the second"
+            )
+            representations = {}
+            for source_label, middle_label in other.chart_maps().keys():
+                inner = other.chart_map(source_label, middle_label)
+                target_label, outer = self._representation_on(middle_label)
+                source = other.domain().atlas()[source_label]
+                middle = self.domain().atlas()[middle_label]
+                representations[source_label, target_label] = tuple(
+                    _raise_manifold_expression(_engine_manifold_expression(section), source)
+                    for section in _substitute_chart_coordinates(outer, middle, inner)
+                )
+            return other.domain().Mor(self.codomain())(representations)
+
+    def _element_constructor_(self, representations):
+        r"""Return the smooth map whose coordinate representations are ``representations``.
+
+        ``representations`` maps a pair ``(s, t)`` of chart labels to the tuple
+        of sections of the source chart ``s`` of the domain that are the
+        coordinates of the target chart ``t`` of the codomain.  Each section is
+        admitted by the source chart's own ring of functions, and there is one
+        representation per source chart, so that the value of a point is read
+        off the representation on the chart the point is given in.  The caller
+        states that the source charts cover the domain: no finite set of charts
+        is decided to cover a manifold here.
+        """
+        domain = self.domain()
+        codomain = self.codomain()
+        admitted = {}
+        for pair, expressions in representations.items():
+            source_label, target_label = pair
+            assert source_label in tuple(domain.chart_labels()), (
+                f"cannot represent a map from {domain}: it has the charts "
+                f"{tuple(domain.chart_labels())} and not {source_label!r}"
+            )
+            assert target_label in tuple(codomain.chart_labels()), (
+                f"cannot represent a map to {codomain}: it has the charts "
+                f"{tuple(codomain.chart_labels())} and not {target_label!r}"
+            )
+            assert source_label not in tuple(label for label, _target in admitted), (
+                f"cannot represent a map from {domain} by two coordinate representations on "
+                f"the chart {source_label!r}: a point is given in one chart, and its value is "
+                f"read off the one representation on that chart"
+            )
+            values = _admit_manifold_expression_family(
+                expressions,
+                domain.atlas()[source_label],
+                name=(
+                    f"Coordinates of the chart {target_label} on the chart {source_label} "
+                    f"of a smooth map to {codomain}"
+                ),
+            )
+            assert values.cardinality() == codomain.dimension(), (
+                f"cannot represent a map to {codomain} by the coordinates {tuple(values)}: a "
+                f"map to a manifold of dimension {codomain.dimension()} has "
+                f"{codomain.dimension()} coordinate functions, and {values.cardinality()} "
+                f"were given"
+            )
+            admitted[pair] = values
+        assert admitted, (
+            f"cannot construct a smooth map {domain} -> {codomain} that states no "
+            f"coordinate representation: its value at every point would be unstated"
+        )
+        pairs = finite_ordered_set(tuple(admitted))
+        return self.element_class(
+            self,
+            indexed_family(
+                pairs,
+                lambda pair: admitted[pair],
+                name=f"Coordinate representations of a smooth map {domain} -> {codomain}",
+            ),
+        )
 
     @object_level
     def identity(self):
@@ -1545,6 +1670,36 @@ class SmoothManifolds(OwnedCategory):
         return _DifferentiableTopologyFunctor(self)
 
     class ParentMethods:
+        def open_submanifold_inclusion(self, open_manifold):
+            r"""Return the inclusion of an open submanifold that is the domain of one of this manifold's charts.
+
+            An open subset of a smooth manifold, with the restricted atlas, is a
+            smooth manifold of the same dimension and class (Lee, *Introduction
+            to Smooth Manifolds*, 2nd ed., Example 1.4), so its inclusion is a
+            smooth map into this manifold.  The chart it is the domain of
+            presents it: read in that chart of the open submanifold and in the
+            chart of this manifold it is the domain of, the coordinates of a
+            point and of its image are the same, because the two charts are the
+            same chart on the same set.  The inclusion is therefore the map
+            whose source chart is the submanifold's and whose coordinates in the
+            ambient chart are its own coordinates -- not the ambient manifold
+            itself, and not a chart of the whole manifold.
+            """
+            labels = tuple(
+                label
+                for label in self.chart_labels()
+                if self.atlas()[label].domain() is open_manifold
+            )
+            assert len(labels) == 1, (
+                f"cannot include {open_manifold} in {self}: the inclusion is presented by a "
+                f"chart that has the open submanifold as its domain, and {self} has "
+                f"{len(labels)} charts on it, its charts being "
+                f"{tuple(label for label in self.chart_labels())}"
+            )
+            label = labels[0]
+            source = open_manifold.atlas()[label]
+            return open_manifold.Mor(self)({(label, label): source.coordinates()})
+
         def as_ck_manifold(self):
             pass
 

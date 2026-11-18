@@ -392,10 +392,12 @@ class HyperbolicManifoldMor(RiemannianManifoldMor):
 
             Those are the arrow's values on points.  A smooth morphism between
             the two hyperboloid models is not a represented arrow of
-            ``SmoothManifolds()`` here -- that owner's constructor admits none
-            (``SmoothManifoldMor._element_constructor_``, ``manifolds.py``) --
-            so this returns the map of points the action is computed by rather
-            than a smooth morphism built by assumption.
+            ``SmoothManifolds()`` here -- that owner's constructor admits a map
+            only by its coordinate sections on a covering pair of charts
+            (``SmoothManifoldMor._element_constructor_``, ``manifolds.py``),
+            and this arrow states none -- so this returns the map of points the
+            action is computed by rather than a smooth morphism built by
+            assumption.
             """
             return self._map_of_points
 
