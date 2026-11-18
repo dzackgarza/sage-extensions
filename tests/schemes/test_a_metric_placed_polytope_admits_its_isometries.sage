@@ -68,6 +68,23 @@ def _euclidean_arrow(space, vector_space, images, offset=None):
     )
 
 
+def _line_arrow(space, model, affine_space, scale, shift):
+    r"""The arrow ``x \\mapsto scale * x + shift`` of a Euclidean line."""
+    linear_part = model.Mor(model)(
+        lambda label: scale * model.module_generator(label)
+    )
+    return EuclideanSpaces().Mor(space, space)(
+        RealAffineSpaces().Mor(affine_space, affine_space)(
+            linear_part,
+            Sets().Mor(affine_space.point_set(), affine_space.point_set())(
+                lambda point: space.translation_action()(
+                    linear_part(point), model((shift,))
+                )
+            ),
+        )
+    )
+
+
 def _circle(space, center, radius):
     r"""The round circle of ``space`` with this centre and radius, as a selected sphere."""
     inner_product = space.model_inner_product()
@@ -375,6 +392,9 @@ def test_the_spherical_owner_decides_an_isometry_both_ways() -> None:
     assert circle.is_an_isometry(about_one) is False
     assert circle.is_an_isometry(shear) is False
 
+    with pytest.raises(AssertionError):
+        SphericalSpaces().in_space(space, centre, RR.zero(), circle.inclusion())
+
 
 def test_the_placed_circle_diamond_answers_its_eight_isometries() -> None:
     r"""The diamond on the unit circle: the dihedral group of order eight.
@@ -431,3 +451,38 @@ def test_the_placed_circle_diamond_answers_its_eight_isometries() -> None:
             ),
             placed.face_poset().Aut().one(),
         )
+
+
+def test_the_zero_sphere_states_an_inhabitant_and_decides_its_isometries() -> None:
+    r"""`S^0`: the pair `\{-1,1\}` of the line, its swap admitted, a shift refused.
+
+    The sphere family states one of its spaces without being handed one: the pair
+    of points at distance one from the line's origin.  Its points are that pair,
+    its isometries the two permutations of it, and the swap is one of them, of
+    order two.  The translation `x \\mapsto x + 2` is an isometry of the line that
+    moves the centre, so the line admits it and the sphere refuses it: that is the
+    difference between this decision and the affine or Euclidean one.
+    """
+    sphere = SphericalSpaces().an_object()
+    line = sphere.euclidean_space()
+    model = line.model_vector_space()
+    affine_space = line.underlying_affine_space()
+    one = sphere.point_set()(model((1,)))
+    minus_one = sphere.point_set()(model((-1,)))
+    swap = SphericalSpaces().Mor(sphere, sphere)(
+        _line_arrow(line, model, affine_space, -1, 0)
+    )
+    shift = SphericalSpaces().Mor(sphere, sphere)(
+        _line_arrow(line, model, affine_space, 1, 2)
+    )
+
+    assert sphere in SphericalSpaces()
+    assert sphere.radius() == RR.one()
+    assert one in sphere.point_set()
+    assert minus_one in sphere.point_set()
+    assert (model((2,)) in sphere.point_set()) is False
+    assert sphere.is_an_isometry(swap) is True
+    assert line.is_an_isometry(shift.ambient_isometry()) is True
+    assert sphere.is_an_isometry(shift) is False
+    assert swap(minus_one) == one
+    assert (swap * swap)(one) == one
