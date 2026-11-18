@@ -354,6 +354,17 @@ MemAvailable (`fresh.log`, `row-Otilde+-coverage.log`): its coverage clauses
 print a minute after its relation, so the clause no longer waits on the 800 s of
 printing that the host's killer has taken every previous attempt inside.
 
+**`Otilde+` is killed in its relation, the fourth kernel row this host has
+taken.**  Its run with the coverage probe started at 08:06:14 on 7 582 MiB of
+MemAvailable, reached the relation 210 000 of 569 160 records in, and left the
+host at 09:11:17 with `# launcher exit: 0`, peak tree RSS **4 803 MiB**, low-water
+MemAvail **1 058 MiB**; `fresh.log` closes with `oom_kill 49` (`47` at its start).
+So its count and both coverage clauses are unmeasured, and the two rows together
+now bound the host's ceiling for one of these rows: `Otilde` died at 5 490 MiB
+and at 4 982 MiB, `Otilde+` at 4 803 MiB and 1 698 MiB -- the killer takes
+whatever is largest when MemAvail reaches about 1 GiB, and the row's own size is
+no longer the discriminator.
+
 **Why the counts have to be computed and cannot be extrapolated.**  The edge
 count is not a fixed multiple of the plane count.  On `U + U(2) + <-2>` both
 kernel rows decide **4 edges over 3 line cusps and 2 plane cusps** -- two edges a
