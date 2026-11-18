@@ -38,8 +38,8 @@ original_register = orthogonal_quotients.OrthogonalCharacterQuotient.register_is
 original_init = isotropic_orbits.DividedClassCuspIncidence.__init__
 
 
-def counting_register(self, plane, lift, generators, image):
-    answer = original_register(self, plane, lift, generators, image)
+def counting_register(self, plane, lift, generators, image, **rest):
+    answer = original_register(self, plane, lift, generators, image, **rest)
     planes[0] += 1
     if planes[0] % EVERY == 0:
         mark(f"the split: {planes[0]} planes registered")

@@ -1,0 +1,73 @@
+# tree: 9259a6b0610f0289f1ede70e8aa47b07d23760d5
+# status: 
+# port: 991b88b095a42a1e3679569ea42328c900c120f6
+# load: 2.24 3.97 5.87
+# free: 5566 MiB available
+# started: 2026-11-18T10:34:13Z
+# program: .tmp/issue381b/probe-row.py  PROBE_PLANES=unset PROBE_BAND=unset PYTHONHASHSEED=0
+[      0.0 s rss    269.8 MiB] Otilde: the driver's own row
+the lattice Integral lattice of rank 11 and signature (2, 9) of rank 11
+the rows ('Otilde',)
+[Otilde] the row's route: divided-class, as the run asked (decided in 0.0 s)
+Traceback (most recent call last):
+  File "sage/misc/cachefunc.pyx", line 1965, in sage.misc.cachefunc.CachedMethodCaller.__call__
+    return cache[k]
+KeyError: ((2,), ())
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/repos/sage-extensions/tests/coble_gamma_co_2_incidence_rows.py", line 591, in run_row
+    incidences = tuple(row_relation(subgroup, taken))
+                       ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/repos/sage-extensions/tests/coble_gamma_co_2_incidence_rows.py", line 355, in row_relation
+    return subgroup.tits_building_incidence_by_divided_classes()
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 1276, in tits_building_incidence_by_divided_classes
+    plane_cusps = self.cusps(2)
+  File "sage/misc/cachefunc.pyx", line 1970, in sage.misc.cachefunc.CachedMethodCaller.__call__
+    w = self._instance_call(*args, **kwds)
+  File "sage/misc/cachefunc.pyx", line 1848, in sage.misc.cachefunc.CachedMethodCaller._instance_call
+    return self.f(self._instance, *args, **kwds)
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 803, in cusps
+    return _distinct_finite_ordered_set(
+        _arithmetic_cusp(self, representative)
+    ...<2 lines>...
+        )
+    )
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/finite_ordered_sets.py", line 1119, in _distinct_finite_ordered_set
+    admitted = tuple(points)
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 805, in <genexpr>
+    for representative in _yield_subgroup_isotropic_orbit_representatives(
+                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self, rank
+        ^^^^^^^^^^
+    )
+    ^
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 4553, in _yield_subgroup_isotropic_orbit_representatives
+    yield from from_parabolic
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 4201, in _iter_transported_planes
+    quotient.register_isotropic_lift(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        transported, splitting, family, discriminant_image, spelling=spelling
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+TypeError: counting_register() got an unexpected keyword argument 'spelling'
+[Otilde] error: the row step raised TypeError: counting_register() got an unexpected keyword argument 'spelling'
+[    541.9 s rss   1555.8 MiB] the driver returned 4
+[    541.9 s rss   1556.0 MiB] done: 1 planes, 0 records
+[peakrss] row-Otilde-gated: child waited=0 shell_code=0 samples=275
+[peakrss] peak tree RSS      : 1565 MiB
+[peakrss] low-water MemAvail : 3470 MiB
+[peakrss] peak single VmHWM  : 1575 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     1571 MiB peak
+[peakrss]   bash                          3 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   546.5s procs=  2 rss=  1565 MiB hwm=  1575 MiB avail=  5260 MiB
+[peakrss]   t=   548.5s procs=  2 rss=  1563 MiB hwm=  1575 MiB avail=  5230 MiB
+[peakrss]   t=   544.5s procs=  2 rss=  1562 MiB hwm=  1575 MiB avail=  5269 MiB
+[peakrss]   t=   542.5s procs=  2 rss=  1546 MiB hwm=  1549 MiB avail=  5057 MiB
+[peakrss]   t=   540.5s procs=  2 rss=  1431 MiB hwm=  1433 MiB avail=  5411 MiB
+# launcher exit: 0  ended: 2026-11-18T10:43:24Z
