@@ -404,3 +404,31 @@ so with `subspace` in place `X - int(region)` is constructible.  What the three 
 methods still lack is only the collar: `IntegralAffineCollars.on`
 (`integral_affine_collars.py:89`) is still a `pass` body, so every `affine_collars` argument
 is unbuildable.  That is the next call to implement.
+
+## 13. The collar is in: the surgery's arguments are now all constructible
+
+`IntegralAffineCollars.on` (`integral_affine_collars.py:89`) was the last `pass` body among
+the three surgery methods' argument builders.  It now selects the four data a collar is --
+the affine piece, the face, a neighbourhood of the face, and an affine chart of that
+neighbourhood -- refusing a piece that is not an integral-affine manifold, a face or
+neighbourhood selected into another manifold, and a chart stated on something that is not
+the neighbourhood.
+
+One limit is stated in the docstring rather than papered over: an arrow of integral-affine
+manifolds has no constructor in this tree (`IntegralAffineManifoldMor._element_constructor_`
+is a `pass` body at `integral_affine_manifolds.py:71`), so a face cannot be selected into
+the piece *as an affine object*; the selections are into the smooth manifold the piece adds
+its structure to, which is where its faces live.
+
+Test: `tests/schemes/test_the_integral_affine_collar_selection.sage`, both bodies pass
+(2 passed, 0 failures) -- the retention of the four data on the plane's one-chart structure,
+and the three refusals.
+
+**State of the three surgery methods.**  `surgery(region_inclusion, replacement,
+boundary_isomorphism, affine_collars)` now has every argument it names constructible: a
+monomorphism of topological spaces, a singular integral-affine space (`on`, §11), an
+isomorphism of topological spaces, and collars (here).  What remains is the body itself:
+cut, using `subspace` (§12) on the complement named by `from_predicate`; glue, using the
+coproduct (`topological_spaces.py:683`) and the coequalizer (`:680`); and read the singular
+locus off the identified boundary.  That is the next piece of work, and it is construction
+rather than a missing operation.

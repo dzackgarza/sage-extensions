@@ -10,7 +10,9 @@ from sage_extensions.categories.abstract_categories.mor_categories import (
 from sage_extensions.categories.abstract_categories.mor_foundation import object_level
 from sage_extensions.categories.abstract_categories.objects import Objects, OwnedCategory
 from sage_extensions.categories.functors.core import Functor
+from sage_extensions.owned_category import _object_of
 from sage_extensions.categories.integral_affine_manifolds import (
+    IntegralAffineManifolds,
     IntegralAffineManifoldsWithCorners,
 )
 
@@ -87,8 +89,49 @@ class IntegralAffineCollars(OwnedCategory):
         pass
 
     def on(self, affine_piece, face_inclusion, neighborhood_inclusion, collar_chart):
-        r"""Select a face, its neighborhood in the piece, and an affine collar chart."""
-        pass
+        r"""Select a face, its neighborhood in the piece, and an affine collar chart.
+
+        A collar is the datum that makes "glue along this face" an integral-affine
+        operation rather than a topological one: a face of an affine piece, a
+        neighborhood of that face in the piece, and an affine chart of the
+        neighborhood, so that two pieces presented with collars along a common face
+        can be compared chartwise.  The four selected data are exactly that, and the
+        object retains them rather than reconstructing any of them (``OWN-15``).
+
+        Both inclusions select into the smooth manifold *this* affine structure is
+        added to -- the piece's own underlying manifold, which is where its faces
+        live -- and the collar chart is a chart of the neighborhood it is stated on.
+        An arrow of integral-affine manifolds has no constructor in this tree yet, so
+        a selection into the piece as an affine object is not writable, and a
+        selection into another manifold, even an equal one, is refused.  Whether the
+        neighbourhood really
+        is a neighbourhood of the face -- that the face lies in it and that it
+        contains an open set around every point of the face -- is a question about
+        the piece's own topology, and it is not re-decided here.
+        """
+        assert affine_piece in IntegralAffineManifolds(), (
+            f"a collar is selected on an integral-affine piece, and {affine_piece} is "
+            f"in {affine_piece.category()}"
+        )
+        selected_in = affine_piece.underlying_smooth_manifold()
+        for inclusion in (face_inclusion, neighborhood_inclusion):
+            assert inclusion.codomain() is selected_in, (
+                f"{inclusion} selects into {inclusion.codomain()}, not into "
+                f"{selected_in}, the manifold {affine_piece} adds its affine structure "
+                f"to: a collar's face and neighbourhood are selected in the piece itself"
+            )
+        assert collar_chart.domain() is neighborhood_inclusion.domain(), (
+            f"the collar chart is stated on the neighbourhood "
+            f"{neighborhood_inclusion.domain()}, but {collar_chart} is defined on "
+            f"{collar_chart.domain()}"
+        )
+        return _object_of(
+            self,
+            affine_piece=affine_piece,
+            face_inclusion=face_inclusion,
+            neighborhood_inclusion=neighborhood_inclusion,
+            collar_chart=collar_chart,
+        )
 
     def comparison(self, source_collar, target_collar, face_map, neighborhood_affine_map):
         r"""Select an affine extension of a specified face pairing."""
