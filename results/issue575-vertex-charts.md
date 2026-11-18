@@ -335,3 +335,16 @@ and its atlas lookup `0.014 s`.  The proposal for the owner is filed as
 `results/issue-proposal-the-gluing-datum-resolves-its-atlas-lazily.md`, with the
 install line, because this connection cannot create issues.
 
+## Round 9, 2026-11-18: where the gluing cost sits, layer by layer
+
+The proposal of round 8 is corrected and sharpened: timing the three layers separately
+on the same tree shows the cost is the *construction* of the pair transitions, not their
+verification.  `_toric_variety`'s tuple of `_face_transition` calls
+(`toric_schemes.py:2297-2300`) is `10.20 s`; entering `glue_affine_atlas` -- the datum's
+`_transition_directions`, its two validators and `_glued_scheme`
+(`gluing.py:954-967`) -- is `0.18 s`; the charts are `1.73 s`.  The call site cannot
+skip them because the datum indexes the family at every pair, and the scheme object
+reads them only when its space is asked for (`_chart_space_coproduct`,
+`gluing.py:579-626`).  The minimal owner-side change is therefore in the datum: resolve
+on first use, and let the first ask for the space pay.
+

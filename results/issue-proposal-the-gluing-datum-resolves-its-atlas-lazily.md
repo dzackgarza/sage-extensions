@@ -15,17 +15,28 @@ Body:
 
 ```
 `_toric_variety` supplies a family of `_face_transition` for every pair of maximal
-cones (`categories/schemes/toric/toric_schemes.py:2259-2264`).
+cones (`categories/schemes/toric/toric_schemes.py:2295-2300`).
 `_FiniteSchemeGluingDatum.__init__` resolves both directions of every pair
 (`categories/schemes/gluing.py:954-957`) and verifies them (`:965-966`) before
 `_glued_scheme` (`:967`) builds the scheme.  For a fan with n maximal cones that is
 2*C(n,2) isomorphisms of localizations before any chart can be asked for.
 
-It is not a verification pass that could simply be deferred: the scheme's own overlaps
-are the transitions.  `overlap(source, target)` is
-`transition_between(source, target).forward().domain()` (`gluing.py:1037-1038`), and
-`transition_between` reads the family, so the forward map of every pair is needed for
-the scheme to exist in the form this datum builds.
+Where the time actually is, measured by timing the three layers separately (same tree
+and host): the tuple of `_face_transition` calls that `_toric_variety` builds at
+`toric_schemes.py:2297-2300` is **10.20 s**; entering `glue_affine_atlas` -- the
+datum's own `_transition_directions` dict at `gluing.py:954-957`, its two validators at
+`:965-966`, and `_glued_scheme` at `:967` -- is **0.18 s**; the charts are `1.73 s`.
+So the construction of the 272 localization isomorphisms is the cost, not their
+verification.
+
+The call site cannot avoid them: `_FiniteSchemeGluingDatum.__init__` indexes the
+family at every pair (`gluing.py:954-957`) to build `_transition_directions`, so a lazy
+family would be materialized there anyway.  And `_glued_scheme` itself only constructs
+`_GluedScheme(datum, native)` (`:526-551`); the transitions are read when a consumer
+asks for the *space* -- `_chart_space_coproduct` reads `datum.overlap(...)` and
+`datum.transition_between(...)` (`:579-626`).  So the minimal change is in the datum:
+build `_transition_directions` and run the two validators on first use, and accept that
+the first ask for the underlying space pays them.
 
 Measured on cd58a62, sage 11.0.beta5, image sha256:59568577..., load average 12.85 on
 four CPUs, on the normal fan of the Sterk2 specimen (17 rays, 17 maximal cones):
