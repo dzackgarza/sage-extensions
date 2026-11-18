@@ -45,9 +45,9 @@ Schreier family of the orbit of a point of `A_L`, 2.3e7 members on `T_{Co}`
 | site | what it is |
 | --- | --- |
 | `_marked_automorphism_generators` (:2827) | the dispatch now asks `_isotropic_parabolic_generators` |
-| `_isotropic_parabolic_generators` (:2873) | rank one -> the line family, rank two -> the plane block family |
-| `_marked_primitive_isotropic_subobject` (:2887) | the prelude both constructions read |
-| `_isotropic_line_stabilizer_generators` (:2956) | **the repair**: the two-factor family |
+| `_isotropic_parabolic_generators` (:2872) | rank one -> the line family, rank two -> the plane block family |
+| `_marked_primitive_isotropic_subobject` (:2886) | the prelude both constructions read |
+| `_isotropic_line_stabilizer_generators` (:2955) | **the repair**: the two-factor family |
 
 `\rho: P_I \to O(K_I)`, `g \mapsto g|_{I^\perp/I}` with `K_I = I^\perp/I`, is a
 group morphism whose kernel is the pointwise part of the parabolic.
