@@ -18,11 +18,15 @@ and the operations below are methods of that object, in
 
 The degrees come from the eigenvalues of the Coxeter element, whose
 multiplicities are read off the power sums `tr(c^k)` by the discrete Fourier
-transform on `Z/h`; the geometric representation is built over `Q(zeta_L)` with
-`L` a multiple of every `2m_vw`, folded into `Q(zeta_0)` where `z` is a
-primitive root of unity of that order.  Finiteness of a standard parabolic
-subsystem is the existing ellipticity decision of `CoxeterDiagrams`, so no
-second criterion for `W_J` finite was introduced.
+transform on `Z/h`.  The geometric representation is first built over
+`Q(zeta_L)` with `L` a multiple of every `2m_vw`, which is where the order `h`
+of the Coxeter element is measured; the eigenvalues are `h`-th roots of unity
+and need not lie in that field (`m_vw` in `{2, 3}` gives `Q(zeta_6)` and
+`h = 30` for `E_8`), so the representation is rebuilt over
+`Q(zeta_{lcm(L,h)})`, where every eigenvalue is a power of the generator.
+Finiteness of a standard parabolic subsystem is the existing ellipticity
+decision of `CoxeterDiagrams`, so no second criterion for `W_J` finite was
+introduced.
 
 ## Closure specimens of the issue
 
