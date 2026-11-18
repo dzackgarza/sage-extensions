@@ -659,6 +659,17 @@ class HyperbolicSpaces(OwnedParameterizedCategory):
                 component=self._component,
             )
 
+        def point_set(self):
+            r"""Return the points of the hyperboloid: its rational points.
+
+            A point of a hyperboloid model is the ray of a positive vector of the
+            component, and the rays of its positive rational vectors are the points
+            this owner states -- the same set a hyperbolic polyhedron is cut out of
+            (:meth:`projectivize_cone`), and the set a placement into this space
+            lands in.
+            """
+            return self.rational_points()
+
         def rational_point(self, vector):
             r"""Return the rational point on the ray of ``vector``, a positive vector of the component."""
             return self.rational_points()(vector)

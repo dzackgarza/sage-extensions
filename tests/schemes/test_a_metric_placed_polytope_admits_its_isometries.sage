@@ -612,3 +612,64 @@ def test_the_hyperbolic_owner_decides_an_isometry() -> None:
 
     with pytest.raises(ValueError):
         space.is_an_isometry(Sets().Mor(space, space)(lambda point: point))
+
+
+def test_the_placed_hyperbolic_polygon_admits_its_isometry() -> None:
+    r"""A square of the disc placed on `HH^2`: the antipodal isometry is an arrow.
+
+    The points of a hyperboloid model are the rays of its positive rational
+    vectors, so a rational point `x` of the disc is placed at the ray of
+    `(-1, x_1, x_2)` scaled to integers, and `\operatorname{conv}\{(\pm
+    \frac12,\pm\frac12)\}` lands on four points of `HH^2`.  The sign change of
+    the timelike generator is an isometry of the lattice, so it is an arrow of the
+    hyperbolic space, and it carries those four points among themselves -- it is
+    the antipodal map of the disc -- so it is an arrow of the placed polygon,
+    admitted by the space's own decision.
+    """
+    space = HyperbolicSpaces(2).an_object()
+    lattice = space.lattice()
+    half = QQ(1) / QQ(2)
+    square = ConvexPolytopes(ZZ.free_module(2))(
+        ((-half, -half), (-half, half), (half, half), (half, -half))
+    )
+    polytope_labels = tuple(ZZ.free_module(2).module_generating_set())
+
+    def placement(point):
+        coordinates = tuple(QQ(point.to_vector()(label)) for label in polytope_labels)
+        denominator = max(coordinate.denominator() for coordinate in coordinates)
+        return space.rational_point(
+            lattice((-denominator, *(denominator * value for value in coordinates)))
+        )
+
+    category = HyperbolicGeodesicPolytopesIn(space)
+    placed = category.on(
+        ("vertices", square.vertices()), Sets().Mor(square, space.point_set())(placement)
+    )
+    labels = tuple(lattice.module_generating_set())
+    family = space.category().Mor(space, space)
+    images = {
+        label: (
+            -lattice.module_generator(label)
+            if label == labels[0]
+            else lattice.module_generator(label)
+        )
+        for label in labels
+    }
+    sign_flip = family(lattice.Mor(lattice)(lambda label: images[label]))
+    vertex_faces = tuple(placed.face_poset().faces(0))
+    face_of = [
+        next(face for face in vertex_faces if face.contains_point(corner))
+        for corner in square.vertices()
+    ]
+    antipode = (3, 2, 1, 0)
+    face_map = next(
+        candidate
+        for candidate in tuple(placed.abstract_automorphisms())
+        if all(candidate(face_of[index]) == face_of[antipode[index]] for index in range(4))
+    )
+    arrow = category.Mor(placed, placed)(sign_flip, face_map)
+
+    assert placed.dimension() == 2
+    assert placed.face_poset().faces(0).cardinality() == 4
+    assert space.is_an_isometry(sign_flip) is True
+    assert arrow.ambient_map() is sign_flip
