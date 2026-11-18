@@ -2878,6 +2878,26 @@ end
             return None
         return record[0], record[2]
 
+    def release_isotropic_lift_of_span(self, span) -> None:
+        r"""Drop the registered lift of the plane ``span`` names, which its walk has spent.
+
+        A row's walk reads one plane's lift once -- the composite that carries
+        the covering to it, and the finite element that acts on the classes --
+        and never asks for it again: what it keeps of the plane afterwards is the
+        span its cusp holds.  The registry is the row's largest per-plane term
+        (``register_isotropic_lift`` retains a spelling a plane, and a spelled
+        lift is the row's cost), so a walk that releases each entry as it passes
+        the plane makes the row's resident set its records and its cusps rather
+        than every lift it walked.
+
+        The plane's lift is spent by that: a second walk of the same row finds
+        no registered lift and says so where it looks for one.  The covering the
+        walk read is already retained beside its own reference
+        (:meth:`register_isotropic_covering`), so carrying to the *other* planes
+        is unaffected.
+        """
+        self.__dict__.get("_isotropic_lift_registry", {}).pop(span, None)
+
     def registered_isotropic_lift(self, plane):
         r"""``(lift, discriminant image)``: a plane's registered lift and its finite element.
 

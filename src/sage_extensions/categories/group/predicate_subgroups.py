@@ -1421,6 +1421,12 @@ class PredicateSubgroups(OwnedParameterizedCategory):
                         )
                     if span != reference_span:
                         transport_checked.add(position)
+                # The plane's lift is spent: the row read it once, above, and
+                # what it keeps of the plane from here on is the span its cusp
+                # holds.  Releasing it here is what makes a kernel row's
+                # resident set its records and its cusps rather than every lift
+                # it walked (``release_isotropic_lift_of_span``).
+                quotient.release_isotropic_lift_of_span(span)
             # The relation is a finite ordered set whose inverse is the walk's
             # own identity index.  A cusp's hash is constant over its universe
             # (``_ArithmeticCuspEngine.__hash__``: a cusp has no cheap canonical
