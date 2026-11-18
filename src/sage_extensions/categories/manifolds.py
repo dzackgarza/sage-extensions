@@ -740,6 +740,44 @@ def _engine_manifold_point(point):
     return point._engine_manifold_point()
 
 
+def _is_a_point_in(manifold, value) -> bool:
+    r"""Whether ``value`` is a point of another manifold that lies in ``manifold``.
+
+    The points of an open subset of a manifold are the points of the manifold
+    that lie in it (Lee, *Introduction to Smooth Manifolds*, 2nd ed., Example
+    1.4), so a point of an open submanifold is a point of the manifold it is
+    open in, and two open submanifolds that share a point share it.  The point's
+    private realization is a point of this manifold exactly when it lies in it,
+    which the engine decides; a point of another manifold does not lie in it.
+    """
+    if element_parent(value) is manifold:
+        return False
+    if getattr(value, "chart", None) is None:
+        return False
+    return _engine_manifold_point(value) in _engine_manifold(manifold)
+
+
+def _coordinates_of_a_point_in(manifold, value):
+    r"""The label and the coordinates, in a chart of ``manifold``, of a point of another manifold that lies in it.
+
+    The point is read in the chart it was given by when ``manifold`` carries
+    that chart too -- a chart of an open submanifold is a chart of the manifold
+    it is open in -- and otherwise in the chart of ``manifold`` the atlas
+    presents first, which is where a point of an open submanifold cut out inside
+    this manifold's own chart has its coordinates.
+    """
+    labels = tuple(manifold.chart_labels())
+    given = value.chart().label()
+    label = given if given in labels else labels[0]
+    field = manifold.coordinate_field()
+    return label, tuple(
+        field(coordinate)
+        for coordinate in _engine_manifold_chart(manifold.atlas()[label])(
+            _engine_manifold_point(value)
+        )
+    )
+
+
 class _ManifoldTopologyData(SageObject):
     r"""Private topology realization supplied by SageManifolds.
 
@@ -1059,9 +1097,10 @@ class TopologicalManifolds(OwnedCategory):
                 f"function is required to be nonzero: that subset is the whole chart "
                 f"{source_label!r}, and chart() registers the chart of the whole manifold"
             )
-            engine_open = self._engine_manifold_realization().open_subset(
+            engine_chart = _engine_manifold_chart(source)
+            engine_open = engine_chart.domain().open_subset(
                 str(label),
-                coord_def={_engine_manifold_chart(source): conditions},
+                coord_def={engine_chart: conditions},
             )
             return self._register_chart(label, engine_open.chart(coordinates))
 
@@ -1119,11 +1158,18 @@ class TopologicalManifolds(OwnedCategory):
             coordinates in a chart.  A chart that is not named is the chart the
             atlas presents first: the atlas' chart labels are a selected finite
             ordered family, so the first of them is a chart of this manifold and
-            not a guess among them.
+            not a guess among them.  A point of an open submanifold of this
+            manifold is a point of this manifold -- the points of an open subset
+            are the points of the manifold that lie in it (Lee, *Introduction to
+            Smooth Manifolds*, 2nd ed., Example 1.4) -- and is read at the
+            coordinates it has in a chart of this manifold.
             """
             match datum:
                 case _ if element_parent(datum) is self:
                     return datum
+                case _ if _is_a_point_in(self, datum):
+                    label, coordinates = _coordinates_of_a_point_in(self, datum)
+                    return self.element_class(self, coordinates, label)
                 case _:
                     coordinates = tuple(datum)
                     if len(coordinates) != self.dimension():
