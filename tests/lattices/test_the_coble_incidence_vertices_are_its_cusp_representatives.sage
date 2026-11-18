@@ -126,8 +126,11 @@ def test_kernel_incidence_refuses_a_missing_independent_edge() -> None:
     from unittest.mock import patch
 
     sys.path.insert(0, "tests")
-    import coble_gamma_co_2_incidence_rows as driver
-    from coble_row_status import RowStatus
+    try:
+        import coble_gamma_co_2_incidence_rows as driver
+        from coble_row_status import RowStatus
+    finally:
+        sys.path.pop(0)
 
     for label in ("Otilde", "Otilde+"):
         outcome = driver.RowOutcome(
