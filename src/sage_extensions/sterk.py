@@ -210,6 +210,17 @@ the length, numerator, denominator).
 """
 
 _STERK2_STORED_LENGTHS = (4, 1, 2, 1, 2, 1, 2, 1, 2, 0, 2, 1, 2, 1, 2, 1, 2, 1, 4)
+
+# The Sterk4 calculation's two data: cell 4's order of the twenty-two roots, and cell
+# 20's permutation of the formal root basis.
+_STERK4_ROOT_ORDER = (
+    "v13", "v12", "v11", "v10", "v9", "v8", "v7", "v6", "v5", "v4", "v3", "v2", "v1",
+    "v16", "v15", "v14", "v20", "v19", "v18", "v17", "v22", "v21",
+)
+
+_STERK4_ROOT_PERMUTATION = (
+    12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0, 15, 14, 13, 19, 18, 17, 16, 21, 20,
+)
 r"""The lengths ``ell`` of the Sterk2 specimen the plotting notebook stores.
 
 `Sterk IAS Plotting.ipynb` cell 12 fixes them beside the parameter vector ``a`` and plots that one
@@ -467,6 +478,44 @@ class Sterk:
     def roots_18_2_0():
         r"""Return the verified 22-root configuration in signature ``(18,2,0)``."""
         return dict(Sterk._roots_18_2_0_cached())
+
+    @staticmethod
+    def sterk4_root_order():
+        r"""Return the twenty-two roots in the order the Sterk4 projection reads them.
+
+        The roots are ``roots_18_2_0``'s, and the order is Sterk cell 4's ``W``: the
+        twelve roots ``v13, v12, ..., v1`` followed by ``v16, v15, v14``, then
+        ``v20, v19, v18, v17``, then ``v22, v21``.  The projection ``W`` of the Sterk4
+        calculation is the matrix of these roots in the lattice's selected basis, so
+        the order is part of the datum and not a relabelling of it.
+
+        EXAMPLES::
+
+            sage: from sage_extensions.sterk import Sterk
+            sage: Sterk.sterk4_root_order()[:3]
+            ('v13', 'v12', 'v11')
+            sage: Sterk.sterk4_root_order()[-2:]
+            ('v22', 'v21')
+        """
+        return tuple(_STERK4_ROOT_ORDER)
+
+    @staticmethod
+    def sterk4_root_permutation():
+        r"""Return Sterk cell 20's permutation of the twenty-two formal roots.
+
+        Cell 20 sends the formal root ``r_i`` to ``r_{permutation[i]}``: the first
+        thirteen roots reverse, ``r13, r14, r15`` reverse, ``r16 .. r19`` reverse, and
+        ``r20, r21`` swap.  That is the folding the Sterk4 calculation projects along.
+
+        EXAMPLES::
+
+            sage: from sage_extensions.sterk import Sterk
+            sage: Sterk.sterk4_root_permutation()[:2]
+            (12, 11)
+            sage: Sterk.sterk4_root_permutation()[20:]
+            (21, 20)
+        """
+        return tuple(_STERK4_ROOT_PERMUTATION)
 
     @staticmethod
     @cache
