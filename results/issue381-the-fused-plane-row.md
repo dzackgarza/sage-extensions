@@ -45,7 +45,7 @@ The adopted runtime, `U + U(2) + <-2>`, every run under `peakrss.py`:
 | `probe-fused-row.py`, the `Otilde` row (`fused-small.log`) | 2 plane cusps, 3 line cusps, 4 edges, **decided**, digest `47249bbc0b3c3303…`, **519 MiB** |
 | the driver, both rows (`fused-driver-small.log`) | 4 edges over 3 line and 2 plane cusps each, digest `04c17f79b45ca82a…` -- the parent's value on this tree |
 | `tests/lattices/test_the_divided_class_relation_is_decided_one_plane_at_a_time.sage` | **3 passed in 42.66 s**, 647 MiB |
-| `tests/lattices/test_the_incidence_decided_by_divided_classes.sage` | the two-route gate, unchanged |
+| `tests/lattices/test_the_incidence_decided_by_divided_classes.sage` | the two-route gate: **3 passed in 145.41 s**, 644 MiB (`divided-classes-consumer.log`) -- the class route, the certificate route and the flag row still state one relation through the composed call |
 
 The fused probe's digest differs from the driver's because the two drawings of
 the row name their cusps differently, not because the rows differ: the counts,
@@ -64,4 +64,6 @@ small row: the run that would give the number is ~70 minutes and is a background
 run, not this note's.
 
 Provenance: `main` at the commit this lands on; port `991b88b0`; probes and logs
-under `.tmp/issue381b/`.
+under `.tmp/issue381b/`.  The gate file above was still running when the change
+landed and finished green afterwards, which is why its result arrives a commit
+later.
