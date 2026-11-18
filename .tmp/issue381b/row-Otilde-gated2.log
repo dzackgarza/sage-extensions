@@ -1,0 +1,11 @@
+# tree: 3a90cd10e0f31acabc51f01b0e1123b10d39009c
+# status:  M .tmp/issue381b/probe-row.py 
+# port: 991b88b095a42a1e3679569ea42328c900c120f6
+# load: 2.68 3.83 5.01
+# free: 6657 MiB available
+# started: 2026-11-18T10:43:47Z
+# program: .tmp/issue381b/probe-row.py  PROBE_PLANES=unset PROBE_BAND=unset PYTHONHASHSEED=0
+[      0.0 s rss    270.0 MiB] Otilde: the driver's own row
+the lattice Integral lattice of rank 11 and signature (2, 9) of rank 11
+the rows ('Otilde',)
+[Otilde] the row's route: divided-class, as the run asked (decided in 0.0 s)

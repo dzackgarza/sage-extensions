@@ -198,7 +198,44 @@ launched only when `MemAvailable` exceeds the row's own peak plus 1 GiB
 of a process name is not, because a restarted or renamed job still holds the
 memory.
 
-## 8. What was run, and what was not
+## 8. Which allocation dominates the peak
+
+Everything below is from measurements already taken -- `#599`'s row marks and
+drop test, and this note's two probes -- not from a new run.
+
+| term | bytes a plane | at 189720 planes | where it is measured |
+| --- | ---: | ---: | --- |
+| **the cusp row** (`_ArithmeticCuspEngine`, one owned object a plane, beside `_distinct_finite_ordered_set`'s admitted tuple and its identity table) | **~9 000** | **~1.66 GiB** | the split's own marks less the registry: 16.1-18 KB a plane total against 9.2 KiB of product |
+| the transversal's GAP workspace (`FactorCosetAction`, the coset walk's lists, `DoubleCosets`' residue) | -- | **~0.88 GiB** | 887 MiB between the pre-split mark and the mark after 200 planes, of which the planes' own datums are ~4 MiB |
+| the standing row (527 line cusps, the ambient plane row, the subgroup and its character quotient) | -- | **0.71 GiB** | `#599` §5, 709.9 MiB at 866 s |
+| the relation's records (`DividedClassCuspIncidence`, 569160 of them) | 394.5 B an edge, three a plane | **0.21 GiB** | `#599` §2, counted with the record's set, its strings and its slot in the row's two tables |
+| the lift registry, now words | 150 B | **0.028 GiB** | section 6 (`registry-200.log`) |
+| the lift registry, before section 6 | 9 200 B | 1.67 GiB | `#599`'s drop test |
+
+The sum is **~3.5 GiB**, which is the ~3.4 GiB the last row reports.  **The
+dominant allocation is the cusp row**: 1.66 GiB, 48% of the peak, and it is the
+only term over a gigabyte that no repair of this issue has touched.
+
+What is *not* separated, and is the one thing the next window should not spend
+itself re-deriving: inside that 9 KB a plane, the split between
+
+* the **owned cusp object** -- `_object_of(Sets(), _engine=(Sets(),
+  _ArithmeticCuspEngine, None), subgroup=..., span=..., subobject_rank=...)`,
+  which carries its defining-construction tuple, its constructing category and
+  the parent machinery above it (`categories/isotropic_orbits.py`,
+  `_arithmetic_cusp`), and
+* **`_distinct_finite_ordered_set`'s two tables** -- the `admitted` tuple and the
+  `{id(point): position}` map the row's ingress builds
+  (`categories/sets/finite_ordered_sets.py`), plus whatever
+  `FiniteOrderedSets().from_indexed` keeps of them,
+
+is unmeasured: the 9 KB is the difference of two row-level marks, and either
+term could be most of it.  One probe decides it and costs one split: drop the
+ingress's tables and read the resident set, then drop the cusps and read it
+again.  Until that is done, no allocation inside the cusp row is attributed, and
+the row's peak cannot be lowered by editing either side on a guess.
+
+## 9. What was run, and what was not
 
 Run, off a worktree of `3998bd8` carrying only this change:
 
