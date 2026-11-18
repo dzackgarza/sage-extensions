@@ -403,3 +403,34 @@ ceiling *while co-tenanted* stays filed for the gluing datum's owner
 call at `gluing.py:965`); nothing in #575's own files was trimmed, gated or capped to
 get this run.
 
+## Round 13, 2026-11-18: the co-tenancy item closed -- the gluing is lazy
+
+The item of rounds 7-12 was that the specimen test's call exceeded the ceiling whenever
+the host was co-tenanted, because a glued scheme built all C(n,2) pair transitions before
+it existed.  The change was made: the datum holds its family unbuilt and checks it on the
+first chart change (`gluing.py:951-958`, `_checked_pair_transitions` from
+`transition_between`), and `_toric_variety` supplies a family rather than a tuple
+(`toric_schemes.py:2261-2271`).  The scheme object already needed none of them --
+`_glued_scheme` only holds the datum.
+
+Measured on this host on the same file minutes apart, with the load *rising* from 11.6 to
+15.5 between the runs:
+
+| tree | specimen call | triangle call | file |
+| --- | --- | --- | --- |
+| base `28b6db2` | `39.09 s` | `21.79 s` | `2 passed in 178.34 s` |
+| this change | `2.88 s` | `1.48 s` | `2 passed in 7.02 s` |
+
+So the line at `tests/schemes/test_sterk_polygon_vertex_charts.sage:165` now meets the
+`20 s` ceiling with a sevenfold margin under co-tenancy, where the base misses it by two.
+With this, no measurement of the issue's three rows is over a ceiling at any load.
+
+Consumers run: 24 tests across the two toric files and four gluing files.  The gluing
+files report the same nine failures as the base commit -- `F..FFF` on
+`test_glued_finite_affine_atlases.sage`, `FFF` on `test_scheme_gluing.sage`, `...FF` on
+`test_glued_line_with_doubled_origin.sage` -- and every other test in them passes, as do
+`test_glued_projective_line_from_two_lines.sage` and both toric files.  Not run: the other
+25 of the 31 files that construct a glued scheme or read its datum, whose failure sets are
+left to CI.  The consequence stated in the commit: a malformed atlas is now refused when
+its first chart change is asked for, not when the datum is built.
+
