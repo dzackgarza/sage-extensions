@@ -1,0 +1,26 @@
+# tree: 4e61ce4ac6cb426f28aad9fc3d8b7a0b73818f19
+# status:  M src/sage_extensions/categories/group/predicate_subgroups.py ?? .scratch-before.py ?? tests/lattices/test_the_divided_class_relation_is_decided_one_plane_at_a_time.sage 
+# free: 6585 MiB available
+# started: 2026-11-18T15:18:31Z
+...                                                                      [100%]
+============================== slowest durations ===============================
+19.34s call     tests/lattices/test_the_divided_class_relation_is_decided_one_plane_at_a_time.sage::test_the_whole_relation_is_the_composition_of_the_planes
+16.83s call     tests/lattices/test_the_divided_class_relation_is_decided_one_plane_at_a_time.sage::test_the_otilde_row_of_u_u2_m2_is_decided_one_plane_at_a_time
+5.62s call     tests/lattices/test_the_divided_class_relation_is_decided_one_plane_at_a_time.sage::test_the_otilde_plus_row_of_u_u2_m2_is_decided_one_plane_at_a_time
+
+(6 durations < 0.005s hidden.  Use -vv to show these durations.)
+3 passed in 42.66s
+[peakrss] one-plane-at-a-time6: child waited=0 shell_code=0 samples=25
+[peakrss] peak tree RSS      : 647 MiB
+[peakrss] low-water MemAvail : 5149 MiB
+[peakrss] peak single VmHWM  : 647 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      643 MiB peak
+[peakrss]   run.sh                        6 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    48.1s procs=  2 rss=   647 MiB hwm=   647 MiB avail=  5149 MiB
+[peakrss]   t=    46.1s procs=  2 rss=   646 MiB hwm=   646 MiB avail=  5257 MiB
+[peakrss]   t=    40.1s procs=  2 rss=   640 MiB hwm=   640 MiB avail=  5757 MiB
+[peakrss]   t=    42.1s procs=  2 rss=   640 MiB hwm=   640 MiB avail=  5676 MiB
+[peakrss]   t=    44.1s procs=  2 rss=   640 MiB hwm=   640 MiB avail=  5573 MiB
+# launcher exit: 0  ended: 2026-11-18T15:19:21Z
