@@ -287,7 +287,41 @@ the 6144 MiB guard, launched on 9.2 GiB of `MemAvailable`); its count, its
 coverage clauses and its peak are the run's own numbers, and they are appended
 here when it returns.
 
-## Provenance
+## 10. The row returns
+
+`Otilde(T_Co)`'s kernel incidence row **decided** on `main` `8c094f8`, one
+process, the driver's own caps (10800 s a row, 28800 s a run), launched at
+11:12:35 UTC on 9 775 MiB of `MemAvailable` (`row-Otilde-window.log`):
+
+```
+[Otilde] the row's calls returned in 2119.1 s
+[Otilde] audited 569160 distinct edges; ordered endpoint SHA-256: 2fcd49b9…284c7
+[Otilde] decided: 569160 edges over 527 line cusps and 189720 plane cusps
+```
+
+* **569 160 edges over 527 line cusps and 189 720 plane cusps** -- the
+  independent integral certificate's `(569160, 527, 189720)`, decided by the
+  driver's contract and not by a count the row prints about itself: every plane
+  cusp carries an edge, every line cusp carries one, the 569 160 endpoint pairs
+  are distinct, and the Coble degree sequence holds -- 527 line cusps of degree
+  1080 and 189 720 plane cusps of degree 3.
+* **2 119.1 s of calls against the 10 800 s cap**: 5.1x inside it.  The line row
+  and the ambient plane row take the first 437.8 s; the split's 189 720 planes
+  take ~1 990 s (10.5 ms a plane); the relation's 569 160 records ~108 s
+  (**0.19 ms a record**, against 2.6 ms before the span read, which was itself
+  against 66-81 ms a plane before the class-set record); the contract the rest.
+* **3 622 MiB of tree RSS** (3 625 MiB single-process `VmHWM`), low-water
+  `MemAvail` 4 180 MiB -- below the 6 144 MiB guard, below the ~3.4 GiB
+  projection, and below four of the five attempts that were killed (3 956,
+  4 803, 4 982, 5 490 MiB).  The split's own curve: 1 317.5, 1 536.9, 2 097.3,
+  2 758.6, 3 152.8 MiB at 10 000, 50 000, 100 000, 150 000 and 180 000 planes.
+* 189 721 planes registered and 569 160 records built, counted by the probe's
+  wrappers: one more plane than cusps, which is the source the split seeds.
+
+The row that five attempts could not finish now finishes in 35 minutes inside a
+3.6 GiB footprint.  `Otilde+` is the row still to return.
+
+## 11. Provenance
 
 `main` `3998bd8`; adopted runtime Sage 11.0.beta5; port `991b88b0` (the `T_Co`
 construction: D. Dolgachev and S. Kondō, Izv. Math. 77:3 (2013), §3, eq. (3.6),

@@ -1,0 +1,124 @@
+# tree: 8c094f85c5dda5d43789bb5502cf17f098bd2458
+# status: 
+# port: 991b88b095a42a1e3679569ea42328c900c120f6
+# load: 2.82 2.96 3.20
+# free: 9775 MiB available
+# started: 2026-11-18T11:12:35Z
+# program: .tmp/issue381b/probe-row.py  PROBE_PLANES=unset PROBE_BAND=unset PYTHONHASHSEED=0
+[      0.0 s rss    271.5 MiB] Otilde: the driver's own row
+the lattice Integral lattice of rank 11 and signature (2, 9) of rank 11
+the rows ('Otilde',)
+[Otilde] the row's route: divided-class, as the run asked (decided in 0.0 s)
+[    437.8 s rss   1317.5 MiB] the split: 10000 planes registered
+[    525.9 s rss   1440.3 MiB] the split: 20000 planes registered
+[    615.8 s rss   1300.0 MiB] the split: 30000 planes registered
+[    700.6 s rss   1382.3 MiB] the split: 40000 planes registered
+[    781.7 s rss   1536.9 MiB] the split: 50000 planes registered
+[    866.3 s rss   1682.1 MiB] the split: 60000 planes registered
+[    949.5 s rss   1823.2 MiB] the split: 70000 planes registered
+[   1041.8 s rss   1857.9 MiB] the split: 80000 planes registered
+[   1119.4 s rss   1983.2 MiB] the split: 90000 planes registered
+[   1199.1 s rss   2097.3 MiB] the split: 100000 planes registered
+[   1270.3 s rss   2259.7 MiB] the split: 110000 planes registered
+[   1336.5 s rss   2405.3 MiB] the split: 120000 planes registered
+[   1412.4 s rss   2486.8 MiB] the split: 130000 planes registered
+[   1510.5 s rss   2637.9 MiB] the split: 140000 planes registered
+[   1617.7 s rss   2758.6 MiB] the split: 150000 planes registered
+[   1745.3 s rss   2873.1 MiB] the split: 160000 planes registered
+[   1822.6 s rss   3022.1 MiB] the split: 170000 planes registered
+[   1901.6 s rss   3152.8 MiB] the split: 180000 planes registered
+[   2003.3 s rss   3460.8 MiB] the relation: 10000 records
+[   2005.5 s rss   3463.1 MiB] the relation: 20000 records
+[   2007.7 s rss   3465.4 MiB] the relation: 30000 records
+[   2010.4 s rss   3467.8 MiB] the relation: 40000 records
+[   2014.5 s rss   3469.8 MiB] the relation: 50000 records
+[   2017.1 s rss   3469.8 MiB] the relation: 60000 records
+[   2018.6 s rss   3471.4 MiB] the relation: 70000 records
+[   2020.0 s rss   3438.2 MiB] the relation: 80000 records
+[   2021.5 s rss   3391.5 MiB] the relation: 90000 records
+[   2023.0 s rss   3393.8 MiB] the relation: 100000 records
+[   2024.5 s rss   3396.0 MiB] the relation: 110000 records
+[   2026.0 s rss   3398.2 MiB] the relation: 120000 records
+[   2027.5 s rss   3400.6 MiB] the relation: 130000 records
+[   2028.9 s rss   3402.9 MiB] the relation: 140000 records
+[   2030.3 s rss   3405.2 MiB] the relation: 150000 records
+[   2031.6 s rss   3415.5 MiB] the relation: 160000 records
+[   2033.0 s rss   3417.8 MiB] the relation: 170000 records
+[   2034.4 s rss   3420.1 MiB] the relation: 180000 records
+[   2035.9 s rss   3422.4 MiB] the relation: 190000 records
+[   2037.5 s rss   3424.7 MiB] the relation: 200000 records
+[   2039.2 s rss   3427.0 MiB] the relation: 210000 records
+[   2041.0 s rss   3449.3 MiB] the relation: 220000 records
+[   2043.0 s rss   3451.6 MiB] the relation: 230000 records
+[   2045.3 s rss   3453.9 MiB] the relation: 240000 records
+[   2048.6 s rss   3456.2 MiB] the relation: 250000 records
+[   2050.4 s rss   3499.0 MiB] the relation: 260000 records
+[   2051.6 s rss   3501.3 MiB] the relation: 270000 records
+[   2052.8 s rss   3503.6 MiB] the relation: 280000 records
+[   2054.0 s rss   3505.9 MiB] the relation: 290000 records
+[   2055.2 s rss   3508.2 MiB] the relation: 300000 records
+[   2056.5 s rss   3510.5 MiB] the relation: 310000 records
+[   2057.7 s rss   3512.8 MiB] the relation: 320000 records
+[   2058.9 s rss   3515.1 MiB] the relation: 330000 records
+[   2060.2 s rss   3517.4 MiB] the relation: 340000 records
+[   2061.6 s rss   3519.7 MiB] the relation: 350000 records
+[   2062.9 s rss   3522.0 MiB] the relation: 360000 records
+[   2081.3 s rss   3523.6 MiB] the relation: 370000 records
+[   2082.7 s rss   3523.6 MiB] the relation: 380000 records
+[   2084.1 s rss   3523.6 MiB] the relation: 390000 records
+[   2085.6 s rss   3523.6 MiB] the relation: 400000 records
+[   2087.0 s rss   3539.7 MiB] the relation: 410000 records
+[   2088.7 s rss   3539.7 MiB] the relation: 420000 records
+[   2090.8 s rss   3539.7 MiB] the relation: 430000 records
+[   2093.6 s rss   3539.7 MiB] the relation: 440000 records
+[   2097.4 s rss   3584.2 MiB] the relation: 450000 records
+[   2098.5 s rss   3584.2 MiB] the relation: 460000 records
+[   2099.7 s rss   3584.2 MiB] the relation: 470000 records
+[   2100.9 s rss   3584.2 MiB] the relation: 480000 records
+[   2102.1 s rss   3584.2 MiB] the relation: 490000 records
+[   2103.4 s rss   3584.2 MiB] the relation: 500000 records
+[   2104.7 s rss   3584.2 MiB] the relation: 510000 records
+[   2106.7 s rss   3584.2 MiB] the relation: 520000 records
+[   2109.2 s rss   3584.2 MiB] the relation: 530000 records
+[   2111.9 s rss   3584.2 MiB] the relation: 540000 records
+[   2113.5 s rss   3584.2 MiB] the relation: 550000 records
+[   2116.2 s rss   3584.2 MiB] the relation: 560000 records
+[Otilde] the row's calls returned in 2119.1 s
+[Otilde] the quotient retains 529 carried-object transport datums: one for each carried isotropic object still registered, keyed by its span, each holding the object, its source and the isometry that placed it -- not the row's coverings and not its planes' lifts, which are retained separately
+[Otilde] line cusp 0: ((0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0),)
+[Otilde] line cusp 1: ((2, 0, 0, 1, 0, 2, 1, 1, 1, 0, 0),)
+[Otilde] line cusp 2: ((2, 0, -1, 1, 0, 2, 1, 1, 1, 0, 0),)
+[Otilde] line cusp 524: ((81370358371808, 412876536870793, 2673836769463200, -330317293650225, -174471691974787, -125064271073629, -348707536955328, -16412295495709, -390909769118282, 648968588824315, -191024330298584),)
+[Otilde] line cusp 525: ((70334, 100956, 651368, -69672, -129531, -152815, -279456, -86547, -240389, -630, -121011),)
+[Otilde] line cusp 526: ((19218142, 68884, -3700302, 11645218, 5729526, 22958985, 18004336, 13265158, 13402925, 2009857, -4783999),)
+[Otilde] plane cusp 0: ((2, 0, 0, 0, -1, -1, -2, -2, -2, -2, -2), (0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0))
+[Otilde] plane cusp 1: ((2, 0, 0, 4, 5, 7, 10, 8, 6, 4, 2), (0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0))
+[Otilde] plane cusp 2: ((2, 0, 0, 0, -1, -1, -2, -2, -2, -2, 0), (0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0))
+[Otilde] plane cusp 189717: ((2, 7, 11, -2, -4, -2, -5, -12, -14, -14, -8), (0, 30, 48, -11, -14, -14, -21, -52, -62, -60, -34))
+[Otilde] plane cusp 189718: ((2, 0, 1, 1, 0, 2, 1, 0, 0, 0, 0), (0, 5, 14, -1, -12, -12, -17, -17, -13, -4, -4))
+[Otilde] plane cusp 189719: ((2, 7, 16, 5, -4, -2, -5, -12, -14, -14, -8), (0, 30, 70, 19, -14, -14, -21, -52, -62, -60, -34))
+[Otilde] edge 0: L0 < P0
+[Otilde] edge 1: L378 < P0
+[Otilde] edge 2: L130 < P0
+[Otilde] edge 569157: L216 < P189719
+[Otilde] edge 569158: L155 < P189719
+[Otilde] edge 569159: L8 < P189719
+[Otilde] audited 569160 distinct edges; ordered endpoint SHA-256: 2fcd49b94cf30780a7e0a872f7e34275d13c21bf0aebc11f8b9a8432eee284c7
+[Otilde] decided: 569160 edges over 527 line cusps and 189720 plane cusps
+recorded counts: Otilde 569160 edges over 527 line and 189720 plane cusps
+[   2126.9 s rss   3619.5 MiB] the driver returned 0
+[   2126.9 s rss   3619.5 MiB] done: 189721 planes, 569160 records
+[peakrss] row-Otilde-window: child waited=0 shell_code=0 samples=1081
+[peakrss] peak tree RSS      : 3622 MiB
+[peakrss] low-water MemAvail : 4180 MiB
+[peakrss] peak single VmHWM  : 3625 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     3622 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   run.sh                        0 MiB peak
+[peakrss]   t=  2130.0s procs=  2 rss=  3622 MiB hwm=  3625 MiB avail=  4634 MiB
+[peakrss]   t=  2132.0s procs=  2 rss=  3622 MiB hwm=  3625 MiB avail=  4671 MiB
+[peakrss]   t=  2134.0s procs=  2 rss=  3622 MiB hwm=  3625 MiB avail=  4652 MiB
+[peakrss]   t=  2136.0s procs=  2 rss=  3622 MiB hwm=  3625 MiB avail=  4588 MiB
+[peakrss]   t=  2138.0s procs=  2 rss=  3622 MiB hwm=  3625 MiB avail=  4484 MiB
+# launcher exit: 0  ended: 2026-11-18T11:48:39Z
