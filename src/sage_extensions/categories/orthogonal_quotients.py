@@ -723,9 +723,31 @@ class OrthogonalCharacterQuotient:
 
         The returned homomorphism is defined by the product's own generators,
         each read one factor at a time through the product's projections and
-        written back through the permutation product's embeddings (GAP
-        reference 39.5, ``GroupHomomorphismByImages``); an image family that
-        does not respect them raises there rather than returning a wrong model.
+        written back through the permutation product's embeddings.
+
+        The constructor is the one that does not verify, because the image
+        family is a composite of homomorphisms and needs no verification: for
+        each character factor ``i`` the projection ``pi_i`` of the direct
+        product onto its factor is a homomorphism and the embedding of a factor
+        into the product is one, in the other direction (GAP Reference Manual,
+        ``DirectProduct`` with ``Projection`` and ``Embedding``);
+        ``IsomorphismPermGroup`` of that factor is an isomorphism onto its
+        permutation image (GAP Reference Manual, ``IsomorphismPermGroup``).  A
+        product of homomorphisms into subgroups that commute pairwise -- the
+        embedded factors of a direct product do -- is a homomorphism, so
+        ``g |-> prod_i emb_i(model_i(pi_i(g)))`` is a homomorphism, and it is
+        injective because each ``model_i`` is.  The verifying constructor asks
+        GAP to confirm exactly that from the source's stabilizer chain, and a
+        direct product of a discriminant factor with a sign factor has no such
+        chain that can be built at the orders this class meets, which is why
+        the image family is proved here rather than checked.
+
+        What this model is *not* is the elementwise route: ``Image`` of an
+        element of the product sifts it through the source's stabilizer chain,
+        which for this product is the word problem the model exists to avoid.
+        An element of the finite image is therefore mapped by
+        :meth:`_permutation_of_key`, factor by factor, and the callers that
+        walk a row use that; this model is what names the shared target group.
         """
         from functools import reduce
         from operator import mul
@@ -751,7 +773,7 @@ class OrthogonalCharacterQuotient:
             )
             for generator in generators
         ]
-        return libgap.GroupHomomorphismByImages(
+        return libgap.GroupHomomorphismByImagesNC(
             product, target, generators, images
         )
 
@@ -1011,13 +1033,47 @@ class OrthogonalCharacterQuotient:
     def _permutation_character_target(self):
         r"""The exact condition subgroup in the shared faithful permutation model.
 
-        Every incidence adjustment uses the same target subgroup.  Its image
-        under the GAP homomorphism is computed once, rather than once per
-        witness (up to 569160 witnesses in a Coble kernel incidence row).
+        Every incidence adjustment uses the same target subgroup.  It is
+        computed once, rather than once per witness (up to 569160 witnesses in
+        a Coble kernel incidence row), and it is computed factor by factor: the
+        condition subgroup of the character product is the meet of the retained
+        discriminant-preimage targets, each of which is a subgroup of the
+        discriminant factor, so its image is the meet of those targets' images
+        under that factor's own model.  No element and no subgroup of the
+        character product is built, which is what mapping the meet through the
+        product's homomorphism would cost: ``Image`` of a subgroup sifts each
+        of its generators through the source's stabilizer chain, and the direct
+        product of the discriminant factor with a sign factor has order 9.4e13
+        on ``T_Co``.
         """
-        return libgap.Image(
-            self._character_permutation_model(), self._gap_character_target()
+        from sage_extensions.categories.group.groups import _element_to_engine
+
+        factors, models, target, embeddings = self._character_permutation_factors()
+        if not self._has_discriminant:
+            return libgap.TrivialSubgroup(target)
+        position = next(
+            index for index, (label, _group) in enumerate(factors) if label == "discriminant"
         )
+        pieces = tuple(
+            libgap.Subgroup(
+                target,
+                [
+                    libgap.Image(
+                        embeddings[position],
+                        libgap.Image(
+                            models[position],
+                            _element_to_engine(self._discriminant_group, generator),
+                        ),
+                    )
+                    for generator in preimage.group_generators()
+                ],
+            )
+            for preimage in self.discriminant_preimages
+        )
+        condition = pieces[0]
+        for piece in pieces[1:]:
+            condition = libgap.Intersection(condition, piece)
+        return condition
 
     def subgroup_image_order(self) -> int:
         r"""``|chi(self.subgroup)|``, from the generated image; no image element is listed.
@@ -3148,12 +3204,14 @@ end
             return witness
         from sage_extensions.categories.group.groups import _law_reversed
 
-        product = self._gap_product()[1]
-        # The direct character product can have order 4.7e13 on T_Co.
-        # Its generic permutation isomorphism attempts a regular action;
-        # use the cached faithful factorwise model instead.
-        to_permutation = self._character_permutation_model()
-        permutation_product = libgap.Range(to_permutation)
+        # The shared faithful permutation target of the character factors.  The
+        # direct character product can have order 4.7e13 on T_Co (9.4e13 with a
+        # sign factor), and its generic permutation isomorphism attempts a
+        # regular action; the factors' own models are the group the double
+        # coset is computed in, and every element enters it through its own
+        # character key (_permutation_of_key) rather than through the product,
+        # whose elementwise images are a word problem.
+        permutation_product = self._character_permutation_factors()[2]
         point = self._permutation_of_key(self.image(witness))
         stabilizer_generators = tuple(target_stabilizer_generators)
         # The same target cusp is queried for many transported lines.  Its
@@ -4447,50 +4505,45 @@ def _plane_parabolic_incidence_flags(subgroup, plane, flag):
     if not family:
         return None
     # The finite image the covering descends to: chi on the certified parabolic,
-    # read in the character product, and its faithful permutation model, which
-    # is what the double cosets are computed in.
-    character_product = quotient._gap_product()[1]
-    to_permutation = quotient._character_permutation_model()
-    images = tuple(
-        quotient._gap_of_key(quotient.image(generator)) for generator in family
+    # read in the faithful permutation model of the character factors, which is
+    # the group the double cosets are computed in.  Every element enters that
+    # model through its own character key (``_permutation_of_key``), factor by
+    # factor: an element of the character product has to be sifted through the
+    # product's stabiliser chain to be mapped, and the product of the
+    # discriminant factor with a sign factor has no chain that can be built at
+    # the orders this quotient meets.
+    _factors, _models, permutation_target, _embeddings = (
+        quotient._character_permutation_factors()
     )
-    parabolic = libgap.Subgroup(character_product, images)
-    section = _GapWordSection(
-        tuple(libgap.Image(to_permutation, image) for image in images)
+    permutations = tuple(
+        quotient._permutation_of_key(quotient.image(generator)) for generator in family
     )
-    # chi(Gamma) cap chi(Pi): at index one chi(Gamma) is the whole image and
-    # contains chi(Pi), so the left group is the parabolic's own image, read
-    # rather than computed.  Otherwise chi(Gamma) is the quotient's retained
-    # image datum, re-parented into the product so the two are comparable.
-    if quotient.index() == 1:
-        left = parabolic
-    else:
-        subgroup_image = libgap.Subgroup(
-            character_product, libgap.GeneratorsOfGroup(quotient._gap_subgroup())
-        )
-        left = libgap.Intersection(subgroup_image, parabolic)
+    parabolic = libgap.Subgroup(permutation_target, permutations)
+    section = _GapWordSection(permutations)
+    # chi(K) = chi(Gamma) cap chi(Pi).  chi(Gamma) is the retained condition
+    # subgroup's own image, read factorwise, and chi(Pi) is the parabolic's, so
+    # the meet is taken between two subgroups of the one permutation target.
+    # At index one chi(Gamma) is the whole image and contains chi(Pi), and the
+    # meet then answers chi(Pi) itself without asking for the index, which is a
+    # quotient of two orders of 4.7e13 and costs a minute on the Coble lattice.
+    left = libgap.Intersection(quotient._permutation_character_target(), parabolic)
     # The right group: the image of the members of the certified family whose
     # Levi restriction on the plane fixes the line.
     line, plane_term = flag.terms()
     line_vector, line_coordinates = _line_generator_in_plane(plane_term, line)
     right_generators = [
-        image
-        for generator, image in zip(family, images, strict=True)
+        permutation
+        for generator, permutation in zip(family, permutations, strict=True)
         if _levi_restriction_fixes_line(
             plane_term, generator, line_vector, line_coordinates
         )
     ]
     if not right_generators:
         return None
-    right = libgap.Subgroup(character_product, right_generators)
-    permutation_image = section.permutation_group
+    right = libgap.Subgroup(permutation_target, right_generators)
     flags = []
     for double_coset in libgap.AsList(
-        libgap.DoubleCosets(
-            permutation_image,
-            libgap.Image(to_permutation, left),
-            libgap.Image(to_permutation, right),
-        )
+        libgap.DoubleCosets(parabolic, left, right)
     ):
         point = libgap.Representative(double_coset)
         letters = _letters_in_owned_order(
@@ -4501,10 +4554,7 @@ def _plane_parabolic_incidence_flags(subgroup, plane, flag):
             element = element * (
                 family[letter - 1] if letter > 0 else ~family[-letter - 1]
             )
-        if (
-            libgap.Image(to_permutation, quotient._gap_of_key(quotient.image(element)))
-            != point
-        ):
+        if quotient._permutation_of_key(quotient.image(element)) != point:
             raise ArithmeticError(
                 f"the word-section lift of a double-coset representative at {plane_term} "
                 f"was checked against the character map and maps elsewhere: the parabolic "
