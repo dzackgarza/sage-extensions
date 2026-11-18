@@ -72,6 +72,7 @@ from sage_extensions.categories.schemes.schemes import (
 from sage_extensions.categories.schemes.toric.fans import (
     RationalPolyhedralFans,
     _engine_cone,
+    _engine_covector,
     _engine_fan,
     _engine_vector,
     _owned_vector,
@@ -1643,7 +1644,7 @@ class ToricSchemes(OwnedCategoryOverBaseRing):
             weight = self.character_lattice()(weight)
             engine_divisor = self._engine_toric_divisor(divisor)
             simplicial = engine_divisor._sheaf_complex(
-                _engine_vector(self.character_lattice(), weight)
+                _engine_covector(self.character_lattice(), weight)
             )
             if int(simplicial.dimension()) == -1:
                 degree_zero = base.free_module(1)
