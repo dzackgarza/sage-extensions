@@ -358,3 +358,16 @@ compared against a clean worktree at the same base commit -- hours on a host at 
 its pair transitions resolved and verified, deferring both to the first ask for its
 space?), not a further measurement.
 
+## Round 11, 2026-11-18: the forcing call, isolated
+
+One call demands the whole transition family: `_verify_pairwise_transitions()` at
+`gluing.py:965`, which reads the family at every pair and is unconditional.  The
+`validate_transition_inverses(check=False)` beside it is a `@validator`
+(`validation.py:51-64`) and runs its law only with `check=True` or under strict
+checking, so it costs nothing at construction.  The datum reads transitions straight
+from the family (`transition_between`, `gluing.py:1012-1034`) and `_transition_directions`
+is read only by those two validators (`:1048`, `:1091`).  So the library-side change is
+that one call moved to first use, with the toric side passing an unbuilt family
+(`toric_schemes.py:2297-2300`); the decision it needs is the gluing owner's, priced at
+the 169 tests of 31 files recorded above.
+

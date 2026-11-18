@@ -95,3 +95,25 @@ both deferred to the first ask for its underlying space?  The alternative shape 
 construction verifying, and accept the cost -- leaves the Sterk2 specimen test over the
 call ceiling only when the host is co-tenanted, which is where it stands today.
 
+## The forcing call is one line
+
+`_FiniteSchemeGluingDatum.__init__` makes two calls that could touch the transitions:
+
+* `self._verify_pairwise_transitions()` (`gluing.py:965`) -- it reads
+  `self.transitions()[source, target]` for every pair, which is what forces the whole
+  family, and it is unconditional;
+* `self.validate_transition_inverses(check=False)` (`:966`) -- a `@validator`
+  (`validation.py:51-64`) runs its law only with `check=True` or under strict checking,
+  so at construction it is a no-op and costs nothing.
+
+So the C(n,2) construction cost is demanded by that one call at `:965`.  Deferring it to
+the first ask for a chart change is the whole library-side change; the toric side would
+then pass a family that is not built up front (`toric_schemes.py:2297-2300`).  The datum
+already reads transitions directly from the family (`transition_between`, `:1012-1034`),
+and `_transition_directions` is read only by the two validators (`:1048`, `:1091`), so
+nothing else depends on when they run.
+
+The decision this needs from the gluing owner is therefore exactly: may the pairwise
+verification run on first use instead of at construction?  Its price is the 169 tests of
+31 files named above.
+
