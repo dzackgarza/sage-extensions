@@ -434,3 +434,23 @@ files report the same nine failures as the base commit -- `F..FFF` on
 left to CI.  The consequence stated in the commit: a malformed atlas is now refused when
 its first chart change is asked for, not when the datum is built.
 
+## Round 14, 2026-11-18: the gluing change's whole consumer set compared
+
+The item left open by round 13 was that 25 of the 31 files consuming the gluing datum had
+not been run.  They have now, against a clean worktree at the same base commit `7c16bdc`,
+by failure and error *set*, not by count:
+
+| batch | files | change tree | base `7c16bdc` | comparison |
+| --- | --- | --- | --- | --- |
+| 1 | 13 | 18 failed, 46 passed | 18 failed, 46 passed | `diff` of the 18 `FAILED` ids: identical |
+| 2 | 13 | 10 failed, 50 passed, 25 errors | 10 failed, 50 passed, 25 errors | `diff` of the 10 `FAILED` ids and of the 25 `ERROR` ids: identical |
+| earlier (round 13) | 6 | 9 failed, 15 passed | 9 failed, 11 passed | identical per-file patterns `F..FFF`, `FFF`, `...FF` |
+
+So no test that passes at the base fails with the change, and no error appears that the
+base does not have already; the failures and errors that remain are the aborted ones of
+this repository at this base commit.  The change also made the batches cheaper: batch 2
+ran `43.16 s` against the base's `73.25 s`, batch 1 `55.98 s` against `75.35 s`.
+
+With that, every row of the issue is green and the gluing change is validated on the
+layer's own consumers, not only on the two files it was measured for.
+
