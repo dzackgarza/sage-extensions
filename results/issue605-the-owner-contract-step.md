@@ -73,3 +73,43 @@ selection goes red without anything being wrong with the mathematics.
   `sage-extensions` `main` this note names.
 * Anything about `lattice-database`'s own suite: only the owner-contract step's
   two files were selected.
+
+## Addendum, 2026-11-18: the selection in the container's own path shape
+
+The runs tabulated above bound this tree over both of the step's `PYTHONPATH`
+entries. CI does not: the image carries its own copy of the library at
+`/repos/sage-extensions`, and the step puts the checkout's `src` first. The
+selection re-run in that shape — checkout at `2286251`, the image's copy left
+at the second entry, the container given `safe.directory` for the checkout:
+
+    PYTHONPATH=/ci/tool-artifacts/pytest_plugins:/work/src:/repos/sage-extensions/src
+    sage_extensions from /work/src/sage_extensions/__init__.py
+    hyperbolic_partner from /work/src/sage_extensions/categories/lattices.py
+    13 passed in 33.24s
+
+So the code under test is the checkout's, and the second entry cannot supply
+it: the image's copy predates `sage_extensions.testing.timing_record`, which
+this tree's `addopts` load, and with that copy alone the session dies at plugin
+import with
+
+    ImportError: Error importing plugin "sage_extensions.testing.timing_record":
+    No module named 'sage_extensions.testing.timing_record'
+
+## What the next run tests
+
+`tests.yml` checks `sage-extensions` out with no `ref`, so it takes that
+repository's default branch, and the repair is on `main` (`741d6a3`, with this
+note at `e47bdb3`). The workflow runs on `cron: 17 3 * * *` and on
+`workflow_dispatch`; the next scheduled run is 2026-11-19T03:17Z. The verdict
+appears in the step named "Validate preamble owner contracts".
+
+The run list itself could not be read for this addendum: `api.github.com`
+answered
+
+    403 {"message":"API rate limit exceeded for 85.25.187.233. ...
+         x-ratelimit-reset: 1795045486"}
+
+for this shared egress (60 requests an hour, reset 2026-11-18T23:44:46Z), on
+two attempts 23:39Z and 23:43Z. Nothing in that list would have shown a run
+after the repair in any case, unless one was dispatched between 23:00Z and
+23:39Z: run 44392454284, the one #605 reports, started at 21:37Z.
