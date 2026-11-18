@@ -561,3 +561,20 @@ the one that returns `None`.
 That is the last link between this issue and the three surgery bodies: place a surface under
 a chart atlas, and its points, its subspaces, the cut, the coproduct and the coequalizer all
 follow from operations that are now implemented and tested here.
+
+### Re-measured after the evening's landings
+
+The two imports this issue needs besides the manifold placement were checked again at the
+head of `main` after #97 and the landings that followed it:
+
+```
+categories.schemes.polytopes     ValueError: base must be a subring of this ring
+manifolds                        OK
+integral_affine_manifolds        OK
+```
+
+`polytopes` still constructs the exact real field at import, so `sterk` and
+`Sterk.roots_18_2_0()` remain unreachable and the Sterk4-rank test remains unwritable,
+while the manifold and integral-affine layers import and their four stubs closed here
+(`SingularIntegralAffineSpaces.on`, `subspace`, `IntegralAffineCollars.on`, the atlas
+morphism arrow) are exercised by tests that run.
