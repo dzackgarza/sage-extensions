@@ -348,5 +348,17 @@ and whose subject is exactly how `RR` is constructed.  `#153` records a symptom 
 root (`matrix_rank()` over `ExactRealField`: "base_ring Real Field must be a ring"), and
 `#97` is the one that owns the construction.
 
+A third repair was tried before concluding, and it also fails for a reason worth recording:
+declaring `free_module = OwnedRings.ParentMethods.free_module` in the body of
+`ExactRealField` -- naming the owner's method rather than reimplementing it -- changes
+nothing either.  The class whose method is consulted is the generated
+`ExactRealField_with_category`, and the category parent classes Sage composes into it
+(`Fields.parent_class`, `Rings.parent_class`) shadow the attribute set on the Python base
+class.  The resolution therefore cannot be reached from the class body at all: what has to
+change is the category `ExactRealField` is placed in, which is what makes it a subclass of
+Sage's `Field` in the first place.
+
 So the surgery item, the Sterk4-rank test and the folding identification all wait on `#97`,
-or on the pinned Sage 11.0.beta5 image, and nothing in this issue can move them.
+or on the pinned Sage 11.0.beta5 image, and nothing in this issue can move them.  Three
+independent repairs have now been measured and refused, so a later round does not need to
+try them again: the meet's ordering, Sage's method, and the class body.
