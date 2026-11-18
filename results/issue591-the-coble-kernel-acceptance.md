@@ -636,3 +636,22 @@ So the statement above — that item 5 is blocked on `lattice-database#7` — is
 field returns and certifies there. This repository's digest is pinned at `1e1cadc`, which
 predates the field, and its refresh script reads a fixed set of 87 `gamma-h-*` cards; that is a
 snapshot of an older database ref, not a gap in the acceptance.
+
+## The certification path's memory, measured
+
+The database records this field's certify attempt as lost after 4782 s at 14 382 555 136 bytes
+against a 1 675 943 526-byte limit. That route was the Schreier family of the finite image.
+The direct resolution now installed by `stable_orthogonal_group_generators` is superseded onto
+the preimage at `lattices.py:4405`-`4418`, and the measurement here is
+
+```
+stable_orthogonal_group: PreimageSubgroups.parent_class, selected resolution True
+stable_orthogonal_group_generators: 56 elements            0.36 s
+stable_orthogonal_group().group_generators(): 56 elements  0.51 s
+peak tree RSS 319 MiB
+```
+
+So the call the database certifies against no longer enters the 4.7*10^13-coset machinery: it
+returns the 56 in half a second within a fifth of the memory the earlier attempt reached before
+dying. What remains for acceptance item 5 is the database's own certify re-run of `6JRR`, which
+is `dzackgarza/lattice-database#7`, not work in this repository.
