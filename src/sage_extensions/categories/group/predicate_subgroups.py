@@ -1344,14 +1344,15 @@ class PredicateSubgroups(OwnedParameterizedCategory):
                 # read for.  The one comparison that does need a lattice element
                 # -- the carried line's own classes, below -- builds it there.
                 span = plane_cusp.span()
-                registered = quotient.registered_isotropic_lift_of_span(span)
-                if registered is None:
+                target_discriminant = quotient.registered_isotropic_discriminant_of_span(
+                    span
+                )
+                if target_discriminant is None:
                     raise ArithmeticError(
                         f"the plane cusp {plane_cusp} of {self} has no registered lift, "
                         "so no covering of the row can be carried onto it: the class data of its lines "
                         "is what the lift carries, and without it the edges at this plane are undecided"
                     )
-                target_lift, target_discriminant = registered
                 for position, (
                     reference_span,
                     reference_lift,
@@ -1362,8 +1363,13 @@ class PredicateSubgroups(OwnedParameterizedCategory):
                     action = _composite_divided_class_action(
                         quotient, target_discriminant, reference_discriminant
                     )
+                    # The integral lift is spelled at the planes that transport
+                    # something and at no other: the row's own registry keeps a
+                    # word a plane, and spelling it a plane is the cost this
+                    # read exists to keep off the row.
                     check_move = (
-                        target_lift * ~reference_lift
+                        quotient.registered_isotropic_lift_of_span(span)[0]
+                        * ~reference_lift
                         if position not in transport_checked and span != reference_span
                         else None
                     )

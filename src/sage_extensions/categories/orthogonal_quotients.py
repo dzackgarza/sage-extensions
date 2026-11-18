@@ -1,5 +1,6 @@
 r"""Finite character quotients controlling arithmetic-subgroup orbit splitting."""
 from operator import index
+from typing import NamedTuple
 
 from sage.libs.gap.libgap import libgap
 from sage.misc.cachefunc import cached_method
@@ -1975,8 +1976,13 @@ class OrthogonalCharacterQuotient:
             )
         )
 
-    def _iter_splitting_isometries_in_im_rho(self, stabilizer_generators):
-        r"""Yield the lifts of :meth:`_splitting_isometries_in_im_rho` one at a time."""
+    def _iter_splitting_isometries_in_im_rho(self, stabilizer_generators, *, spellings=False):
+        r"""Yield the lifts of :meth:`_splitting_isometries_in_im_rho` one at a time.
+
+        ``spellings`` asks for each lift's own word beside it, as a
+        :class:`_LiftSpelling`, which is what a registry keeps in place of the
+        product (:meth:`register_isotropic_lift`).
+        """
         from sage_extensions.categories.group.groups import _element_to_engine
 
         rho = self.lattice.discriminant_representation()
@@ -1985,7 +1991,9 @@ class OrthogonalCharacterQuotient:
             for s in stabilizer_generators
         )
         return self._iter_splitting_isometries_in_im_rho_from_image(
-            discriminant_image_generators, self._stabilizer_sign_flips(stabilizer_generators)
+            discriminant_image_generators,
+            self._stabilizer_sign_flips(stabilizer_generators),
+            spellings=spellings,
         )
 
     def _stabilizer_sign_flips(self, stabilizer_generators):
@@ -2074,7 +2082,7 @@ class OrthogonalCharacterQuotient:
         return None
 
     def _iter_splitting_isometries_in_im_rho_from_image(
-        self, discriminant_image_generators, stab_sign_flip, *, point=None,
+        self, discriminant_image_generators, stab_sign_flip, *, point=None, spellings=False,
     ):
         r"""Yield the splitting lifts of
         :meth:`_iter_splitting_isometries_in_im_rho_from_image`, one ``(lift, image)`` at a time.
@@ -2217,13 +2225,20 @@ class OrthogonalCharacterQuotient:
                 lifts = [value]
                 if j >= 1 and len(sign_labels) == 1 and not stab_sign_flip and flip_element is not None:
                     lifts.append(flip_element * value)
-                for lift in lifts:
+                for position, lift in enumerate(lifts):
                     image_of_lift = self.image(lift)
                     if image_of_lift["discriminant"] != key_disc:
                         raise ArithmeticError(
                             "splitting lift's discriminant image disagrees with the word section"
                         )
-                    yield lift, image_of_lift["discriminant"]
+                    if spellings:
+                        yield (
+                            lift,
+                            image_of_lift["discriminant"],
+                            _LiftSpelling(letters, flip_element if position else None),
+                        )
+                    else:
+                        yield lift, image_of_lift["discriminant"]
             return
         # The coset-walk route, for callers that hold the integral stabilizer
         # generators (or their images) and no point of the finite set.  The
@@ -2370,7 +2385,15 @@ end
         remaining_children = [0] * (degree + 1)
         for point in queue:
             remaining_children[parents[point - 1]] += 1
+        # The word of every reached lift, in the left-to-right order of its
+        # product, so that a consumer can keep the word instead of the product:
+        # the product's integer entries grow with the plane, the word does not.
+        # A point whose children have all been spelled releases its word with
+        # its value, so the tree holds the open frontier and not every lift.
+        spellings_of = [None] * (degree + 1)
+        spellings_of[base] = ()
         checked = False
+        flipped_checked = False
         for point in representative_points:
             chain = []
             walker = point
@@ -2379,13 +2402,16 @@ end
                 walker = parents[walker - 1]
             for reached in reversed(chain):
                 edge = edge_numbers[reached - 1] - 1
+                letter = small_indices[edge] + 1
                 parent = parents[reached - 1]
                 if reversed_law:
                     values[reached] = ambient_subset[edge] * values[parent]
                     images[reached] = image_subset[edge] * images[parent]
+                    spellings_of[reached] = (letter,) + spellings_of[parent]
                 else:
                     values[reached] = values[parent] * ambient_subset[edge]
                     images[reached] = images[parent] * image_subset[edge]
+                    spellings_of[reached] = spellings_of[parent] + (letter,)
             value = values[point]
             if point != base and not checked:
                 # The spelled element against the character map, on a lift whose
@@ -2400,6 +2426,15 @@ end
                         "rho-images to rho of the lift, so no lift of this row may be "
                         "registered with the element it was spelled with"
                     )
+                if spellings and self._spelled_lift(_LiftSpelling(spellings_of[point], None)) != value:
+                    # The word the registry is handed must spell the lift the row
+                    # transports by, or every edge read from it is an edge at a
+                    # plane the word does not carry onto.
+                    raise ArithmeticError(
+                        "the word spelled beside a tree-spelled lift does not spell the lift: "
+                        "the row would register a word whose product carries its source plane "
+                        "elsewhere, so no lift of this row may be registered by its word"
+                    )
                 checked = True
             flipped = (
                 flip_element * value
@@ -2409,17 +2444,41 @@ end
                 and flip_element is not None
                 else None
             )
-            yield value, images[point]
+            if spellings and flipped is not None and not flipped_checked:
+                # The sign sheet's lift is a word times the kernel witness, and
+                # the word is what the registry keeps: checked once per row, on
+                # the first plane of that sheet, so a registry of Otilde+ lifts
+                # is never a registry of words whose witness sits on the wrong
+                # side.  No lattice a test can afford reaches this branch; the
+                # kernel rows of T_Co and of the Scattone lattices do.
+                if (
+                    self._spelled_lift(_LiftSpelling(spellings_of[point], flip_element))
+                    != flipped
+                ):
+                    raise ArithmeticError(
+                        "the word spelled beside a sign sheet's lift does not spell it: the "
+                        "sheet's lift is its kernel witness times that word, and a registry "
+                        "that keeps the word must keep the side the witness multiplies on"
+                    )
+                flipped_checked = True
+            if spellings:
+                yield value, images[point], _LiftSpelling(spellings_of[point], None)
+            else:
+                yield value, images[point]
             if flipped is not None:
                 # The sign sheet's lift is a kernel element times the lift, so
                 # it acts on the classes exactly as the lift does.
-                yield flipped, images[point]
+                if spellings:
+                    yield flipped, images[point], _LiftSpelling(spellings_of[point], flip_element)
+                else:
+                    yield flipped, images[point]
             parent = parents[point - 1]
             if parent:
                 remaining_children[parent] -= 1
                 if not remaining_children[parent]:
                     values[parent] = None
                     images[parent] = None
+                    spellings_of[parent] = None
 
     def witness_meets_subgroup(self, witness, stabilizer_generators) -> bool:
         return self.adjust_witness_into_subgroup(witness, stabilizer_generators) is not None
@@ -2694,8 +2753,28 @@ end
             )
         return carried
 
+    def _spelled_lift(self, spelling):
+        r"""The isometry a registered lift's word spells, in ``O(L)``.
+
+        ``spelling.letters`` are signed one-based indices into the ambient
+        generating family in left-to-right product order, so the product is the
+        same expression the walk and the word section composed: one product a
+        letter, and the sign sheet's witness on the left where the lift is that
+        sheet's.  This is the read that costs what the lift costs; the registry
+        keeps the word so that a row need not.
+        """
+        ambient = self._ambient_generators()
+        value = self.supergroup.one()
+        for letter in spelling.letters:
+            value = value * (
+                ambient[letter - 1] if letter > 0 else ~ambient[-letter - 1]
+            )
+        if spelling.flip is not None:
+            value = spelling.flip * value
+        return value
+
     def register_isotropic_lift(
-        self, plane, lift, parabolic_generators, discriminant_image
+        self, plane, lift, parabolic_generators, discriminant_image, *, spelling=None
     ):
         r"""Record one representative of the parabolic split and its certified data.
 
@@ -2723,12 +2802,26 @@ end
         kernel row registers 189720 of them, so the span key is what makes the
         lookup one dictionary hit instead of a scan of every plane recorded so
         far.
+
+        ``spelling`` records the lift as the word that spells it instead of as
+        the product: a row's lift is a word in the ambient generators whose
+        product has integer entries that grow with the plane it reaches, so a
+        registry of one product a plane costs 9.2 KiB an entry where the row
+        starts and ~18 KB a plane in its tail bands, while the word is hundreds
+        of bytes however far the walk has gone.  The product is spelled on
+        demand (:meth:`_spelled_lift`), and the planes no consumer transports
+        at are the row's 189720 -- the finite element beside the word is what a
+        per-plane reader uses.
         """
         from sage_extensions.categories.isotropic_orbits import _span_key
 
         self.__dict__.setdefault("_isotropic_lift_registry", {})[
             _span_key(plane)
-        ] = (lift, tuple(parabolic_generators), discriminant_image)
+        ] = (
+            lift if spelling is None else spelling,
+            tuple(parabolic_generators),
+            discriminant_image,
+        )
 
     def _registered_isotropic_split(self, plane):
         r"""The registered ``(lift, source parabolic generators, image)`` of ``plane``."""
@@ -2742,9 +2835,32 @@ end
         The registry is keyed by the span (:meth:`register_isotropic_lift`), so a
         reader that already holds one -- a cusp of the row, whose whole datum is
         its span -- asks here.  The plane-keyed read above is this one with the
-        span derived from the plane.
+        span derived from the plane.  ``lift`` is spelled from the word the
+        registry keeps when that is how the plane was registered: this is the
+        read that costs the isometry, and a caller that wants only the finite
+        element asks :meth:`registered_isotropic_discriminant_of_span`.
         """
-        return self.__dict__.get("_isotropic_lift_registry", {}).get(span)
+        record = self.__dict__.get("_isotropic_lift_registry", {}).get(span)
+        if record is None:
+            return None
+        retained, family, image = record
+        lift = (
+            self._spelled_lift(retained)
+            if isinstance(retained, _LiftSpelling)
+            else retained
+        )
+        return lift, family, image
+
+    def registered_isotropic_discriminant_of_span(self, span):
+        r"""The finite element of the plane ``span`` names, or ``None``.
+
+        ``rho`` of the plane's registered lift -- what the divided-class
+        incidence reads at every plane of a row, and all it reads: the integral
+        lift is needed only where something is transported by it, so this read
+        does not spell one.
+        """
+        record = self.__dict__.get("_isotropic_lift_registry", {}).get(span)
+        return None if record is None else record[2]
 
     def registered_isotropic_lift_of_span(self, span):
         r"""``(lift, discriminant image)`` of the plane ``span`` names, or ``None``.
@@ -2798,9 +2914,12 @@ end
         This is the finite element ``rho(s_P)`` in ``O(A_L)``, registered beside
         the lift by :meth:`register_isotropic_lift`; it is the datum an action
         on the divided classes is composed from, and it is read without
-        touching the lift's matrix.
+        touching the lift's matrix -- and, where the registry keeps the lift's
+        word, without spelling it.
         """
-        record = self._registered_isotropic_split(plane)
+        from sage_extensions.categories.isotropic_orbits import _span_key
+
+        record = self._registered_isotropic_split_of_span(_span_key(plane))
         return None if record is None else record[2]
 
     def register_isotropic_transport(self, subobject, source, transport):
@@ -4068,16 +4187,19 @@ def _iter_transported_planes(quotient, representative, family):
     the split is already lazy -- it yields one lift and its finite element at a
     time -- so the row is yielded here as well and the plane is the caller's to
     drop once its own datum (the cusp's span) exists.  What is retained per
-    plane is the lift registry's `(lift, source family, discriminant image)`,
-    keyed by the plane's span, which is what a consumer of the row reads: the
-    plane itself is not looked up again.
+    plane is the lift registry's `(spelling, source family, discriminant image)`,
+    keyed by the plane's span: the *word* the walk spelled the lift by and not
+    the lift's product, whose integer entries grow with the plane, because a
+    consumer of the row reads the finite element a plane and spells the isometry
+    only where it transports something
+    (:meth:`...OrthogonalCharacterQuotient.register_isotropic_lift`).
     """
-    for splitting, discriminant_image in quotient._iter_splitting_isometries_in_im_rho(
-        family
+    for splitting, discriminant_image, spelling in quotient._iter_splitting_isometries_in_im_rho(
+        family, spellings=True
     ):
         transported = splitting.transport_isotropic_object(representative)
         quotient.register_isotropic_lift(
-            transported, splitting, family, discriminant_image
+            transported, splitting, family, discriminant_image, spelling=spelling
         )
         yield transported
 
@@ -4139,6 +4261,26 @@ def _isotropic_line_image_key(quotient, line):
             _isotropic_line_class_points(quotient.lattice, line)
         )
     )
+
+
+class _LiftSpelling(NamedTuple):
+    r"""One lift of a plane row, as the word it was spelled by rather than as its matrix.
+
+    A lift of a kernel row is a word in the ambient group's selected generating
+    family -- the walk that reaches its double coset composes one generator per
+    edge of its own tree, and the double coset is spelled by the word section --
+    and the word's *product* has integer entries that grow with the plane it
+    reaches.  What a consumer of the row needs per plane is the finite element
+    (registered beside this), and the integral isometry only where it transports
+    something; so the registry keeps the word -- ``letters`` are signed,
+    one-based indices into :meth:`_ambient_generators`, negative for an inverse,
+    in left-to-right product order -- and the product is spelled when it is
+    asked for (:meth:`_spelled_lift`).  ``flip`` is the kernel-sign witness a
+    sign sheet's lift is multiplied by on the left, or ``None``.
+    """
+
+    letters: tuple
+    flip: object
 
 
 _SETWISE_DIVIDED_CLASS_ACTION = None
