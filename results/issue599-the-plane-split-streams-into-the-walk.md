@@ -448,6 +448,23 @@ the span its cusp holds", which replaced the loop's object comparison with
 `span != reference_span`).  Writing into it now would collide with a change in
 flight, so it is named here rather than landed.
 
+**Two more attempts, and a lease that makes the queue visible.**  The seventh died
+on this note's own probe within five minutes -- `register_isotropic_lift` has
+grown a `spelling=` keyword (`orthogonal_quotients.py:4201`) that the probe's
+counter refused (`TypeError: counting_register() got an unexpected keyword
+argument 'spelling'`), which is fixed by forwarding `**rest` and re-tested on
+`6JRS` (both coverage clauses HOLD, 1 of 1 each).  The eighth then ran 28 min 51 s
+on a host started at 6 884 MiB of MemAvailable and was killed at 150 000 planes,
+peak tree RSS **3 209 MiB**, low-water MemAvail **988 MiB**, `oom_kill` 59 -> 61.
+
+Eight attempts now, killed at 1 698, 3 209, 3 400, 3 956, 4 803, 4 922, 4 982 and
+5 490 MiB, every one with MemAvail at about 1 GiB: the row's own size is not the
+discriminator, the host is.  A `.scratch/memory-lease` ledger now carries each
+row's claim (`issue599-otildeplus 4.9 <epoch> <pid>`) so the three chats can see
+each other's allocation; two caveats found in use -- a chat that writes it with a
+plain `>` truncates the others' lines (mine vanished once and was merged back),
+and the gate must read each claim's *current* RSS, not its projection.
+
 **Why the counts have to be computed and cannot be extrapolated.**  The edge
 count is not a fixed multiple of the plane count.  On `U + U(2) + <-2>` both
 kernel rows decide **4 edges over 3 line cusps and 2 plane cusps** -- two edges a
