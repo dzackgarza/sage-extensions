@@ -93,3 +93,55 @@ def test_a_map_of_the_open_subset_composes_with_the_inclusion_into_the_plane() -
         RR(3),
         RR(1),
     )
+
+
+def test_a_map_of_the_plane_restricts_to_the_proper_chart_domain() -> None:
+    r"""The map ``(x, y) |-> (x, 2y)`` of the plane composed with the inclusion is its restriction to ``{x != 0}``, carrying ``(3, -1)`` to ``(3, -2)``.
+
+    The plane's atlas is what states the change of coordinates between the chart
+    ``U`` of the open subset and the chart ``base`` of the plane; the composite
+    is then the map of the open subset whose coordinate sections on ``U`` are
+    ``base``'s coordinates with that change substituted, and its source is the
+    open submanifold, not the plane.
+    """
+    plane, chart, domain = _the_plane_on_its_nonvanishing_open_subset()
+    base = plane.atlas()["base"]
+    point = plane((3, -1), "base")
+    inner = domain(point)
+    inclusion = plane.open_submanifold_inclusion(domain)
+    doubling = plane.Mor(plane)(
+        {("base", "base"): (base.coordinate(0), base.coordinate(1) + base.coordinate(1))}
+    )
+    change = plane.transition_map(
+        "U", "base", chart.coordinates(), base.coordinates(), target_overlap=(base.coordinate(0),)
+    )
+    restriction = doubling * inclusion
+
+    assert tuple(change.source_overlap()) == ()
+    assert restriction in domain.Mor(plane)
+    assert (restriction.domain() is domain, restriction.codomain() is plane) == (True, True)
+    assert restriction(inner) == plane((3, -2), "base")
+    assert tuple(section(inner) for section in restriction.chart_map("U", "base")) == (
+        RR(3),
+        RR(-2),
+    )
+
+
+def test_a_map_of_the_plane_is_not_restated_on_the_open_subsets_chart_by_assumption() -> None:
+    r"""Until the atlas states the change of coordinates, the plane's map is not restricted: an unstated change is not read as the identity.
+
+    The chart ``U`` of ``{x != 0}`` is a chart of the plane, and the plane's own
+    chart ``base`` is another; a map written on ``base`` states nothing about the
+    coordinates of ``U``, so composing it with the inclusion is refused rather
+    than assuming the two charts agree.
+    """
+    plane, _chart, domain = _the_plane_on_its_nonvanishing_open_subset()
+    base = plane.atlas()["base"]
+    inclusion = plane.open_submanifold_inclusion(domain)
+    doubling = plane.Mor(plane)(
+        {("base", "base"): (base.coordinate(0), base.coordinate(1) + base.coordinate(1))}
+    )
+
+    assert tuple(plane.transitions().keys()) == ()
+    with pytest.raises(AssertionError):
+        doubling * inclusion
