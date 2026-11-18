@@ -1176,6 +1176,15 @@ class ArithmeticCuspIncidence(SageObject):
             self._flag = IsotropicFlag(self.lattice(), self._flag_basis)
         return self._flag
 
+    def release_flag(self):
+        r"""Release a materialized flag after checking this certificate.
+
+        The checked isotropic basis and transporters remain retained, so
+        :meth:`flag` reconstructs the same flag on the next request.  A reader
+        inspecting every edge of a large row need not retain every flag.
+        """
+        self._flag = None
+
     def line(self):
         return self.flag().terms()[0]
 

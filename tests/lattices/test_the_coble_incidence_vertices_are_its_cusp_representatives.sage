@@ -104,6 +104,12 @@ def test_incidence_reconstructs_its_verified_flag_on_demand() -> None:
         edge.plane_transporter().transport_isotropic_object(plane),
         edge.plane_cusp().representative(),
     )
+    edge.release_flag()
+    assert edge._flag is None
+    reconstructed = edge.flag()
+    assert reconstructed is not flag
+    assert _spans_one_another(reconstructed.terms()[0], line)
+    assert _spans_one_another(reconstructed.terms()[1], plane)
 
 
 def test_the_plus_kernel_incidence_vertices_of_6jrs_are_its_cusp_rows() -> None:

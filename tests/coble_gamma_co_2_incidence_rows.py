@@ -241,12 +241,21 @@ def transport_violation(lattice, subgroup, incidence) -> str | None:
     return containment_violation(lattice, moved, incidence.plane_cusp().representative())
 
 
-def edge_violation(lattice, subgroup, incidence) -> str | None:
-    r"""Why one returned edge breaks the row's contract, or ``None``."""
-    violation = containment_violation(lattice, incidence.line(), incidence.plane())
-    if violation is not None:
-        return violation
-    return transport_violation(lattice, subgroup, incidence)
+def edge_violation(lattice, subgroup, incidence) -> tuple[str | None, tuple, tuple]:
+    r"""Audit an edge, retaining its coordinates but not its flag."""
+    try:
+        line, plane = incidence.flag().terms()
+        line_coordinates = _coordinates(line)
+        plane_coordinates = _coordinates(plane)
+        violation = containment_violation(lattice, line, plane)
+        if violation is not None:
+            return violation, line_coordinates, plane_coordinates
+        return transport_violation(lattice, subgroup, incidence), line_coordinates, plane_coordinates
+    finally:
+        # A certificate keeps its checked basis and exact transporters.
+        # Inspecting all 569160 Coble kernel edges must not retain one
+        # reconstructed flag/subobject-parent graph per inspected edge.
+        incidence.release_flag()
 
 
 def line_datum_key(quotient, cusp):
@@ -460,7 +469,9 @@ def row_contract(lattice, subgroup, label, lines, planes, incidences, route) -> 
         if route == "divided-class":
             violation = divided_class_violation(incidence, keys)
         else:
-            violation = edge_violation(lattice, subgroup, incidence)
+            violation, line_coordinates, plane_coordinates = edge_violation(
+                lattice, subgroup, incidence
+            )
         if violation is None and pair in retained_pairs:
             violation = (
                 f"two edges share the line and plane cusp endpoints L{line_id} and P{plane_id}"
@@ -479,7 +490,7 @@ def row_contract(lattice, subgroup, label, lines, planes, incidences, route) -> 
         else:
             log(
                 f"[{label}] edge {position}: L{line_id} < P{plane_id}; "
-                f"line={_coordinates(incidence.line())}; plane={_coordinates(incidence.plane())}"
+                f"line={line_coordinates}; plane={plane_coordinates}"
             )
     for position in range(len(planes)):
         if position not in plane_vertices:
