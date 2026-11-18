@@ -538,3 +538,26 @@ whose manifolds are built without a chart and therefore without an element const
 their points.  The atlas test that this issue's vertex work rests on already records the
 same limit for chart values ("a point of a real smooth manifold cannot be built in this
 tree"), and landings since then -- including #97 -- have not removed it.
+
+## 18. Where a manifold's points come from, and the call that is missing there
+
+§17's failing expression is not the end of the chain: a manifold *does* have points when it
+is placed under an atlas with charts (`manifolds.py`'s `point(coordinates, chart_label)`
+reads a chart of the manifold).  The placing operation is what is missing:
+
+```
+$ sage -c "... SmoothManifolds().on(X, None)"
+SmoothManifolds().on(space, atlas) -> None
+```
+
+`TopologicalManifolds.on(underlying_space, atlas)` is a `pass` body at
+`manifolds.py:959`, and the `C^k` and smooth versions repeat it at `:1891` and `:1968`.  The
+atlas side is ready -- `RealCkAtlases.on(topological_manifold, chart_domains,
+chart_domain_inclusions, charts, overlap_inclusions, transition_maps)`
+(`real_ck_atlases.py:130`) is implemented and returns the six selected data -- so a smooth
+manifold with a chart exists exactly when those two are joined, and the joining operation is
+the one that returns `None`.
+
+That is the last link between this issue and the three surgery bodies: place a surface under
+a chart atlas, and its points, its subspaces, the cut, the coproduct and the coequalizer all
+follow from operations that are now implemented and tested here.
