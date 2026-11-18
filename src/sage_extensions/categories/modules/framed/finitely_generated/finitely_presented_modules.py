@@ -314,7 +314,33 @@ def _fix_lazy_selected_module_presentation(module, base_ring, realization_factor
     )
 
 
-def _fix_lazy_cokernel_presentation(module, base_ring, presentation_factory, labels, cokernel_morphism=None) -> None:
+def _retained_generator_function(module):
+    r"""The degree-zero generator map a stronger level already fixed, if any.
+
+    A module another construction places at the presented level -- a
+    localization, whose generators are the images of its numerator's -- keeps
+    that construction's generator map, because the classes of its own cover's
+    basis vectors are not its generators.  The registration is read now,
+    before the presented level replaces it.
+    """
+    from sage_extensions.categories.abstract_categories.objects import _PendingResolution
+
+    selected = module._selected_data_registry().get(Modules(module.base_ring()))
+    match selected:
+        case _PendingResolution() if selected.has_generator_function():
+            return selected.generator
+        case _:
+            return None
+
+
+def _fix_lazy_cokernel_presentation(
+    module,
+    base_ring,
+    presentation_factory,
+    labels,
+    cokernel_morphism=None,
+    generator_function=None,
+) -> None:
     r"""Fix the finite presentation of a cokernel before its arrow exists.
 
     The defining datum of ``coker(rho)`` is ``rho``, which the construction
@@ -335,8 +361,10 @@ def _fix_lazy_cokernel_presentation(module, base_ring, presentation_factory, lab
     resolution_category = Modules(base_ring).FinitelyPresented().resolution_category()
     module._selected_module_presentation = _SelectedModulePresentationBackend(cokernel_morphism)
 
-    def generator_function(label):
-        return module._cover_generator(int(labels.ranking_map()(label)))
+    if generator_function is None:
+
+        def generator_function(label):
+            return module._cover_generator(int(labels.ranking_map()(label)))
 
     def selected_resolution():
         from sage_extensions.categories.modules.module_morphisms.module_morphisms import (
@@ -438,6 +466,11 @@ class _SelectedFinitePresentationModules(OwnedCategoryOverBaseRing):
                 presentation_factory,
                 self.selected_generating_set(),
                 cokernel_morphism,
+                generator_function=(
+                    None
+                    if getattr(self, "_generators_are_cover_classes", False)
+                    else _retained_generator_function(self)
+                ),
             )
 
         def _same_selected_presentation_as(self, other):
@@ -2033,6 +2066,14 @@ class _GeneralPresentedModule:
     itself constructs a framing morphism, whose Mor category asks this module for
     its zero element; the cover answers that without the relation matrix.
     """
+
+    # The generators of a module this class serves are the classes of its
+    # cover's basis vectors, which is what ``_cover_generator`` returns.  A
+    # module another construction places at the presented level -- a
+    # localization of a presented module, whose generators are the images of
+    # its numerator's -- keeps that construction's generators instead, and
+    # says so by not carrying this class.
+    _generators_are_cover_classes = True
 
     def __init__(
         self,
