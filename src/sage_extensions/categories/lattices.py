@@ -4474,6 +4474,24 @@ class Lattices(OwnedCategoryOverBaseRing):
             and \(\operatorname{rank}_2 \ge 6\) are therefore mutually exclusive
             among the rescalings of this form, and no cited statement generates
             the level-two kernel of an odd unimodular lattice.
+
+            **Past the level-two statement, what is settled.**  Write
+            \(\Gamma(2) = \ker(O(L)\to O(L/2L))\) and
+            \(\Gamma(4)=\ker(O(L)\to O(L/4L))\).  For \(X = I + 2A\) the identity
+            \(A^{\mathsf T}G_M + G_MA + 2A^{\mathsf T}G_MA = 0\) is exact, and its
+            \((i,i)\) entry is \(2(A^{\mathsf T}G_M)_{ii} +
+            2(A^{\mathsf T}G_MA)_{ii} = 0\); dividing by two and reducing modulo
+            two leaves, beside the condition on \(A\) modulo two, one further
+            linear condition per coordinate.  In the diagonal basis
+            \(G_M = \operatorname{diag}(\pm1)\) the two are the symmetry of \(A\)
+            and the row sums \(\sum_{k\neq i} A_{ik} = 0\), of rank \(10\), so the
+            classes \((X-I)/2\) span a space of dimension \(66 - 10 = 56\) and
+            \(\Gamma(2)/\Gamma(4)\cong(\mathbb{Z}/2)^{56}\).  A reflection in a
+            vector of square \(\pm1\) lies in \(\Gamma(2)\) with class
+            \(v\,(G_Mv)^{\mathsf T}\), and fifty-six of those classes are
+            independent, so the reflections generate \(\Gamma(2)\) modulo
+            \(\Gamma(4)\).  Generating modulo a deeper congruence subgroup is not
+            generating, so no family is returned as a generating set here.
             """
             from sage_extensions.categories.hyperbolic_lattices import HyperbolicLattices
 
