@@ -3130,9 +3130,30 @@ class OwnedRings(CategoryPacketMethods, OwnedCategory):
         return _owned_integers()
 
     def super_categories(self):
+        r"""The owned semirings, the owned rngs, the additive group, and Sage's ``Sets()``.
+
+        Sage's ``Sets()`` is a runtime edge here and not a mathematical one: the
+        owned graph's mathematics is stated on the owned levels, but every Hom
+        and every coercion map is built by asking whether its endpoints are in
+        the category it is stated over, and Sage states coercion maps over
+        ``Sets()``.  A ring that is not a Sage set has no coercion maps at all --
+        ``QQ.coerce_map_from(ZZ)`` cannot be built, and neither can the unique
+        unital map from the integers that every unital ring states
+        (:meth:`_coerce_map_from_`, Stacks Tag 00RM).  Stating the edge makes an
+        owned ring a Sage set at the implementation boundary and changes no
+        owned mathematics: its operations, its Mor categories and its
+        construction hooks remain its own levels' own.
+        """
+        from sage.categories.sets_cat import Sets as SageSets
+
         from sage_extensions.categories.group.magmas import AdditiveGroups
 
-        return [OwnedSemirings(), OwnedRngs(), AdditiveGroups().AdditiveCommutative()]
+        return [
+            OwnedSemirings(),
+            OwnedRngs(),
+            AdditiveGroups().AdditiveCommutative(),
+            SageSets(),
+        ]
 
     def Mor(self, domain, codomain):
         if domain not in self or codomain not in self:
