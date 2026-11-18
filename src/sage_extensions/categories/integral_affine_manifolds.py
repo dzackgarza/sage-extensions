@@ -573,6 +573,92 @@ class _RegularLocusSubobjectFunctor(Functor):
         pass
 
 
+def _surgery_data(region_inclusion, replacement, boundary_isomorphism, affine_collars):
+    r"""Return the four selected data of the surgery the arguments state.
+
+    Cutting the region out and sewing the replacement in along its boundary does not
+    change the ambient surface as a smooth manifold or as a topological space -- the
+    base of a Symington surgery is the surface it was cut from (Alexeev--Engel,
+    *Compactifications of moduli spaces of K3 surfaces with a nonsymplectic
+    involution*, arXiv:2208.10383v2, Construction 6.16, pp. 31--32) -- so the result
+    is the ambient space, the replacement's singular locus, the region as regular
+    locus, and the replacement's structure restricted to the region and reglued by the
+    collar charts.  The general category and its fixed-dimension stratum state the
+    result from these data; the construction is written once, here.
+    """
+    ambient = region_inclusion.codomain()
+    assert region_inclusion.domain() in SmoothManifolds(), (
+        f"the region {region_inclusion.domain()} is an open submanifold of the ambient "
+        f"surface, and it is in {region_inclusion.domain().category()}"
+    )
+    assert replacement in SingularIntegralAffineSpaces(), (
+        f"a surgery glues a singular integral-affine space along the region's "
+        f"boundary, and {replacement} is in {replacement.category()}"
+    )
+    assert replacement.underlying_topological_space() is ambient, (
+        f"the replacement is glued into the ambient surface: its underlying space is "
+        f"{replacement.underlying_topological_space()}, not {ambient}"
+    )
+    from sage_extensions.categories.integral_affine_atlases import IntegralAffineAtlases
+    from sage_extensions.categories.integral_affine_collars import IntegralAffineCollars
+    from sage_extensions.categories.sets.set_categories import Sets
+
+    source_collar, target_collar = affine_collars
+    for collar in (source_collar, target_collar):
+        assert collar in IntegralAffineCollars(), (
+            f"a surgery's regluing is read through its collars, and {collar} is in "
+            f"{collar.category()}"
+        )
+    assert boundary_isomorphism.domain() is source_collar.face(), (
+        f"the boundary isomorphism starts at {boundary_isomorphism.domain()}, not at "
+        f"the source collar's face {source_collar.face()}"
+    )
+    assert boundary_isomorphism.codomain() is target_collar.face(), (
+        f"the boundary isomorphism ends at {boundary_isomorphism.codomain()}, not at "
+        f"the target collar's face {target_collar.face()}"
+    )
+    restricted = replacement.regular_affine_manifold().affine_atlas().restrict(
+        region_inclusion
+    )
+    model = restricted.affine_model()
+    chart_domains = dict(restricted.chart_domains())
+    chart_domain_inclusions = {
+        chart: restricted.chart_domain_inclusion(chart) for chart in chart_domains
+    }
+    affine_charts = {
+        chart: restricted.affine_chart(chart) for chart in chart_domains
+    }
+    for collar in (source_collar, target_collar):
+        collar_chart = collar.collar_chart()
+        assert collar_chart.codomain() is model, (
+            f"the collar chart {collar_chart} is read in {collar_chart.codomain()}, not "
+            f"in the affine model {model} of the surface the surgery reglues"
+        )
+        neighbourhood = collar_chart.domain()
+        chart_domains[collar] = neighbourhood
+        chart_domain_inclusions[collar] = (
+            Sets().Mor(neighbourhood, region_inclusion.domain()).identity()
+            if neighbourhood is region_inclusion.domain()
+            else region_inclusion.domain().open_submanifold_inclusion(neighbourhood)
+        )
+        affine_charts[collar] = collar_chart
+    reglued = IntegralAffineAtlases().on(
+        region_inclusion.domain(),
+        model,
+        chart_domains,
+        chart_domain_inclusions,
+        affine_charts,
+        {},
+        {},
+    )
+    return {
+        "topological_space": ambient,
+        "singular_locus_inclusion": replacement.singular_locus_inclusion(),
+        "regular_locus_inclusion": region_inclusion,
+        "regular_affine_manifold": reglued.integral_affine_manifold(),
+    }
+
+
 class SingularIntegralAffineSpaces(OwnedCategory):
     r"""Spaces with a selected singular locus and affine regular complement."""
 
@@ -660,10 +746,6 @@ class SingularIntegralAffineSpaces(OwnedCategory):
             regular_affine_manifold=regular_affine_manifold,
         )
 
-    def from_face_gluing(self, gluing_cocone, singular_locus_inclusion, affine_collars):
-        r"""Select an affine structure from a complex quotient and collar data."""
-        pass
-
     def surgery(
         self,
         region_inclusion,
@@ -697,93 +779,11 @@ class SingularIntegralAffineSpaces(OwnedCategory):
         retains the replacement's singular inclusion, the region's inclusion, and the
         restricted structure's own charts (``OWN-15``).
         """
-        ambient = region_inclusion.codomain()
-        assert region_inclusion.domain() in SmoothManifolds(), (
-            f"the region {region_inclusion.domain()} is an open submanifold of the ambient "
-            f"surface, and it is in {region_inclusion.domain().category()}"
-        )
-        assert replacement in SingularIntegralAffineSpaces(), (
-            f"a surgery glues a singular integral-affine space along the region's "
-            f"boundary, and {replacement} is in {replacement.category()}"
-        )
-        assert replacement.underlying_topological_space() is ambient, (
-            f"the replacement is glued into the ambient surface: its underlying space is "
-            f"{replacement.underlying_topological_space()}, not {ambient}"
-        )
-        from sage_extensions.categories.integral_affine_atlases import IntegralAffineAtlases
-        from sage_extensions.categories.integral_affine_collars import IntegralAffineCollars
-        from sage_extensions.categories.sets.set_categories import Sets
-
-        source_collar, target_collar = affine_collars
-        for collar in (source_collar, target_collar):
-            assert collar in IntegralAffineCollars(), (
-                f"a surgery's regluing is read through its collars, and {collar} is in "
-                f"{collar.category()}"
-            )
-        assert boundary_isomorphism.domain() is source_collar.face(), (
-            f"the boundary isomorphism starts at {boundary_isomorphism.domain()}, not at "
-            f"the source collar's face {source_collar.face()}"
-        )
-        assert boundary_isomorphism.codomain() is target_collar.face(), (
-            f"the boundary isomorphism ends at {boundary_isomorphism.codomain()}, not at "
-            f"the target collar's face {target_collar.face()}"
-        )
-        restricted = replacement.regular_affine_manifold().affine_atlas().restrict(
-            region_inclusion
-        )
-        model = restricted.affine_model()
-        chart_domains = dict(restricted.chart_domains())
-        chart_domain_inclusions = {
-            chart: restricted.chart_domain_inclusion(chart) for chart in chart_domains
-        }
-        affine_charts = {
-            chart: restricted.affine_chart(chart) for chart in chart_domains
-        }
-        for collar in (source_collar, target_collar):
-            collar_chart = collar.collar_chart()
-            assert collar_chart.codomain() is model, (
-                f"the collar chart {collar_chart} is read in {collar_chart.codomain()}, not "
-                f"in the affine model {model} of the surface the surgery reglues"
-            )
-            neighbourhood = collar_chart.domain()
-            chart_domains[collar] = neighbourhood
-            chart_domain_inclusions[collar] = (
-                Sets().Mor(neighbourhood, region_inclusion.domain()).identity()
-                if neighbourhood is region_inclusion.domain()
-                else region_inclusion.domain().open_submanifold_inclusion(neighbourhood)
-            )
-            affine_charts[collar] = collar_chart
-        reglued = IntegralAffineAtlases().on(
-            region_inclusion.domain(),
-            model,
-            chart_domains,
-            chart_domain_inclusions,
-            affine_charts,
-            {},
-            {},
-        )
         return self.on(
-            ambient,
-            replacement.singular_locus_inclusion(),
-            region_inclusion,
-            reglued.integral_affine_manifold(),
+            **_surgery_data(
+                region_inclusion, replacement, boundary_isomorphism, affine_collars
+            )
         )
-
-    def symington_surgery(self, cut_inclusion, size, affine_regluing, affine_collars):
-        r"""Select a cut, size, and affine regluing through the surgery construction."""
-        pass
-
-    def basis_triangle_surgery(
-        self,
-        source_space,
-        point,
-        tangent_lattice_basis,
-        replacement,
-        boundary_isomorphism,
-        affine_collars,
-    ):
-        r"""Select the unimodular triangle at a point and its boundary gluing."""
-        pass
 
     @cached_method
     def forget(self):
@@ -916,17 +916,69 @@ class SingularIntegralAffineSpacesOfDimension(OwnedParameterizedCategory):
         regular_affine_manifold,
         local_models=None,
     ):
-        r"""Select the exact regular locus and, in higher dimension, local models."""
-        pass
+        r"""Select the exact regular locus of a space of this dimension, and its local models.
 
-    def from_face_gluing(
-        self,
-        gluing_cocone,
-        singular_locus_inclusion,
-        affine_collars,
-        local_models,
-    ):
-        pass
+        The four data are the general category's -- one topological space, the
+        singular locus selected in it, the regular locus selected in it, and the
+        integral-affine manifold on that regular locus -- together with the local
+        models of the singularities, which the fixed-dimension stratum adds.  The
+        affine structure must be one of this dimension: a dimension-``n`` space's
+        regular locus is ``n``-dimensional, and an atlas of another dimension would
+        state the space twice (``OWN-15``).
+
+        Whether the parts exhaust the space and meet only in the singular locus is a
+        question about the space, not re-decided here; and a stratum with no singular
+        models selected passes none, which is what the general category states.
+        """
+        assert topological_space in TopologicalSpaces(), (
+            f"a singular integral-affine space is a topological space with a selected "
+            f"singular locus, and {topological_space} is in "
+            f"{topological_space.category()}"
+        )
+        for inclusion in (singular_locus_inclusion, regular_locus_inclusion):
+            assert inclusion.codomain() is topological_space, (
+                f"{inclusion} selects into {inclusion.codomain()}, not into "
+                f"{topological_space}: a singular integral-affine space's parts are "
+                f"selected in the space itself"
+            )
+        assert singular_locus_inclusion.domain() is not regular_locus_inclusion.domain(), (
+            f"the singular locus {singular_locus_inclusion.domain()} and the regular "
+            f"locus {regular_locus_inclusion.domain()} are one object; an integral-affine "
+            f"structure on the complement of the singular locus is not added to the "
+            f"singular locus"
+        )
+        assert regular_affine_manifold in IntegralAffineManifolds(), (
+            f"the regular locus of a singular integral-affine space carries an "
+            f"integral-affine manifold, and {regular_affine_manifold} is in "
+            f"{regular_affine_manifold.category()}"
+        )
+        assert (
+            regular_locus_inclusion.domain()
+            is regular_affine_manifold.underlying_smooth_manifold()
+        ), (
+            f"the affine structure is selected on "
+            f"{regular_affine_manifold.underlying_smooth_manifold()}, but the regular "
+            f"locus of {topological_space} is {regular_locus_inclusion.domain()}"
+        )
+        assert regular_affine_manifold.dimension() == self.dimension(), (
+            f"a singular integral-affine space of dimension {self.dimension()} has an "
+            f"integral-affine regular locus of that dimension, and {regular_affine_manifold} "
+            f"has dimension {regular_affine_manifold.dimension()}"
+        )
+        if local_models is not None:
+            assert local_models in self.local_model_category(), (
+                f"the singular local models of a dimension-{self.dimension()} space are "
+                f"objects of {self.local_model_category()}, and {local_models} is in "
+                f"{local_models.category()}"
+            )
+        return _object_of(
+            self,
+            topological_space=topological_space,
+            singular_locus_inclusion=singular_locus_inclusion,
+            regular_locus_inclusion=regular_locus_inclusion,
+            regular_affine_manifold=regular_affine_manifold,
+            local_models=local_models,
+        )
 
     def surgery(
         self,
@@ -936,7 +988,20 @@ class SingularIntegralAffineSpacesOfDimension(OwnedParameterizedCategory):
         affine_collars,
         local_models,
     ):
-        pass
+        r"""Glue the replacement into a space of this dimension along the region's boundary.
+
+        The construction is the general category's (``_surgery_data``): the result is
+        the ambient space, the replacement's singular locus, the region as regular
+        locus, and the replacement's structure restricted to the region and reglued by
+        the collar charts.  The fixed-dimension stratum states the same result with its
+        dimension and the singular local models it is given.
+        """
+        return self.on(
+            **_surgery_data(
+                region_inclusion, replacement, boundary_isomorphism, affine_collars
+            ),
+            local_models=local_models,
+        )
 
     @cached_method
     def forget(self):
