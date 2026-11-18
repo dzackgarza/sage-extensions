@@ -89,6 +89,7 @@ import re
 import subprocess
 import threading
 import time
+import tomllib
 from contextlib import contextmanager
 from datetime import datetime, timezone
 from functools import lru_cache, wraps
@@ -121,6 +122,9 @@ r"""The variable that states the running user's state directory, per the XDG Bas
 
 SOURCE_REVISION_FILE_NAME = "source_revision"
 r"""The file a build writes the revision it built from into, beside this module (``setup.py``)."""
+
+DISTRIBUTION_NAME = "sage-extensions"
+r"""The project ``pyproject.toml`` declares this distribution to be, and what a source tree of it declares."""
 
 _COMMIT_ID = re.compile(r"[0-9a-f]{40}")
 r"""What a revision is: forty lowercase hexadecimal characters, and nothing else is one."""
@@ -230,19 +234,57 @@ def _package_directory() -> Path:
 def _checkout_root() -> Path | None:
     r"""The source checkout this module is a file of, and ``None`` for an installed package.
 
-    A checkout keeps the package at ``<tree>/src/sage_extensions`` and states the
-    tree at its root with a ``pyproject.toml``.  An installed package keeps it one
-    directory of ``site-packages``: its parent is the ``site-packages``, or the
-    ``--target`` directory a consumer installed it into, whose own parent may
-    well hold a ``pyproject.toml`` of that consumer's project.  So both the
-    ``src`` directory the package sits in and the tree's ``pyproject.toml`` are
-    read here, and nothing is inferred from a name.
+    Three facts about the installation itself, each read and none inferred from a
+    path: the tree above ``<tree>/src/sage_extensions`` declares this distribution
+    as its project, that tree's git tracks this very module, and it is the tree
+    whose ``HEAD`` the record is to name.  A package that an installation placed
+    in a consumer's tree -- ``pip install --target <consumer>/src`` puts
+    ``<consumer>/src/sage_extensions`` exactly where a checkout keeps one, under
+    the consumer's own ``pyproject.toml`` and beside the consumer's own commit --
+    sits in a tree that declares the consumer's project and tracks none of these
+    files, so it is an installation here however much it looks like a source tree
+    from above.
     """
     package = _package_directory()
-    if package.parent.name != "src":
-        return None
     tree = package.parents[1]
-    return tree if (tree / "pyproject.toml").is_file() else None
+    if _declared_project_name(tree) != DISTRIBUTION_NAME:
+        return None
+    if not _tracked(tree, package.relative_to(tree) / Path(__file__).name):
+        return None
+    return tree
+
+
+def _declared_project_name(tree: Path) -> str | None:
+    r"""The project ``<tree>/pyproject.toml`` declares, and ``None`` when it declares none.
+
+    A file that does not parse as TOML, or that is not there, declares no
+    project: the tree above an installation may hold a project file of its own,
+    and one this reads nothing from is not a statement that the tree is this
+    library's source.  That is the answer the caller acts on, not an error.
+    """
+    try:
+        declared = tomllib.loads((tree / "pyproject.toml").read_text(encoding="utf-8"))
+    except (OSError, tomllib.TOMLDecodeError):
+        return None
+    match declared.get("project"):
+        case {"name": str(name)}:
+            return name
+        case _:
+            return None
+
+
+def _tracked(tree: Path, path: Path) -> bool:
+    r"""Whether the repository at ``tree`` tracks ``path``, asked of git.
+
+    A source checkout tracks its own module; a directory an installation was
+    placed in holds files that are the installer's, and tracks none of them.
+    """
+    completed = subprocess.run(
+        ("git", "-C", str(tree), "ls-files", "--error-unmatch", str(path)),
+        capture_output=True,
+        text=True,
+    )
+    return completed.returncode == 0
 
 
 @lru_cache(maxsize=1)
@@ -266,13 +308,14 @@ def _built_revision() -> str | None:
 def timing_directory() -> Path:
     r"""The record directory, created if it is not there, and asserted.
 
-    ``.timings/`` at the root of the source checkout this module is a file of,
-    so the library's stage records and the test runs' report logs are kept
-    together there (``CONTRIBUTING.md`` ENV-03); and, for a package installed
-    from a wheel, the running user's state directory as the XDG Base Directory
-    Specification states it, ``$XDG_STATE_HOME`` or ``~/.local/state``, under
-    ``sage-extensions/timings``.  A directory that cannot be made is an error at
-    the first stage rather than a record silently not written.
+    ``.timings/`` at the root of the source checkout this module is a file of
+    (:func:`_checkout_root`), so the library's stage records and the test runs'
+    report logs are kept together there (``CONTRIBUTING.md`` ENV-03); and, for an
+    installation that is not a checkout, the running user's state directory as
+    the XDG Base Directory Specification states it, ``$XDG_STATE_HOME`` or
+    ``~/.local/state``, under ``sage-extensions/timings``.  A directory that
+    cannot be made is an error at the first stage rather than a record silently
+    not written.
     """
     checkout = _checkout_root()
     if checkout is not None:
@@ -292,16 +335,30 @@ def timing_directory() -> Path:
 def current_commit() -> str:
     r"""The revision of this library's source, resolved once per process.
 
-    From the checkout when this module is a file of one: that tree's own git,
-    and nothing else, because an environment variable names whatever the process
-    was told.  From the build when it is a file of an installed package: the
-    revision its build recorded beside it (:func:`_built_revision`), which is
-    the revision the installed code came from.  An installation that recorded
-    none raises: a record attributed to a commit nothing resolved would be a
-    claim about code that did not produce it.
+    From the installation's own record of what it was built from, when it has one
+    (:func:`_built_revision`): a wheel's build wrote the checkout's commit beside
+    this module, and that is the revision its code came from whatever trees the
+    wheel was installed into or beside.  From the checkout when this module is a
+    file of one -- that tree's own git, and nothing else, because an environment
+    variable names whatever the process was told.  An installation that has
+    neither raises: a record attributed to a commit nothing resolved, such as the
+    commit of the consumer tree the package sits in, would be a claim about code
+    that did not produce it.
     """
-    checkout = _checkout_root()
-    if checkout is not None:
+    recorded = _built_revision()
+    if recorded is not None:
+        resolved = recorded
+        source = (
+            f"the build revision recorded in {_package_directory() / SOURCE_REVISION_FILE_NAME}"
+        )
+    else:
+        checkout = _checkout_root()
+        assert checkout is not None, (
+            f"{_package_directory()} carries no {SOURCE_REVISION_FILE_NAME}, and the tree above it "
+            f"is not a source checkout of {DISTRIBUTION_NAME} -- none of its pyproject.toml declares "
+            "that project, or its git does not track this module -- so this installation knows no "
+            "revision to attribute its timing records to"
+        )
         completed = subprocess.run(
             ("git", "-C", str(checkout), "rev-parse", "HEAD"),
             capture_output=True,
@@ -310,14 +367,6 @@ def current_commit() -> str:
         )
         resolved = completed.stdout.strip()
         source = f"git rev-parse HEAD in {checkout}"
-    else:
-        resolved = _built_revision()
-        assert resolved is not None, (
-            f"{_package_directory()} is not a source checkout and carries no "
-            f"{SOURCE_REVISION_FILE_NAME}: this installation was not built from a git checkout, so "
-            "it knows no revision to attribute its timing records to"
-        )
-        source = f"the build revision recorded in {_package_directory() / SOURCE_REVISION_FILE_NAME}"
     assert _COMMIT_ID.fullmatch(resolved) is not None, (
         f"{source} returned {resolved!r}, which is not a commit id"
     )
