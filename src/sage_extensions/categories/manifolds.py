@@ -1145,7 +1145,18 @@ class TopologicalManifolds(OwnedCategory):
                 containing_manifold=self,
                 chart_label=label,
                 engine_chart=engine_chart,
+                **self._chart_domain_structure(label, engine_chart),
             )
+
+        def _chart_domain_structure(self, label, engine_chart) -> dict:
+            r"""The data a chart's domain object carries beyond the chart domain's own.
+
+            An open submanifold inherits the structure its ambient manifold
+            carries, so a category whose objects carry chosen structure states
+            here what the domain of a chart on it is given.  A manifold with no
+            structure beyond its atlas adds nothing.
+            """
+            return {}
 
         def __call__(self, *args, **kwargs):
             r"""Construct a point through the owned element construction directly."""
@@ -2258,7 +2269,10 @@ class RiemannianManifolds(OwnedCategory):
             r"""Return the chosen metric ``g``, a positive definite section of ``Sym^2 T^*M``.
 
             It is returned as it was stated: the family of its Gram matrices in
-            the charts of the atlas, ``chart label |-> (g(d/dx_i, d/dx_j))``.
+            the charts it is stated in, ``chart label |-> (g(d/dx_i, d/dx_j))``
+            — the charts of the atlas for an object selected by this category,
+            and the charts of the ambient manifold for an open submanifold of
+            it, whose metric is the restriction of the ambient one.
             """
             match self._preamble_metric:
                 case None:
@@ -2268,6 +2282,25 @@ class RiemannianManifolds(OwnedCategory):
                     )
                 case metric:
                     return metric
+
+        def _chart_domain_structure(self, label, engine_chart) -> dict:
+            r"""The domain of a chart on this manifold carries the restricted metric and its smooth domain.
+
+            An open subset of a Riemannian manifold is a Riemannian manifold
+            with the restricted metric (Lee, *Introduction to Smooth
+            Manifolds*, 2nd ed., Example 1.4, for the atlas; the metric is
+            restricted along the inclusion).  The metric is stated in the
+            charts it was stated in on the ambient manifold, which restrict to
+            the open subset, so the domain is given that same family; its
+            underlying smooth manifold is the domain of the same chart on the
+            smooth manifold this one is placed on.
+            """
+            return {
+                "metric": self.riemannian_metric(),
+                "underlying_smooth_manifold": self.underlying_smooth_manifold()._chart_domain(
+                    label, engine_chart
+                ),
+            }
 
         def isometry_group(self):
             r"""Return ``I(M, g)``, the group of isometries ``f: M -> M`` with ``f^* g = g``.

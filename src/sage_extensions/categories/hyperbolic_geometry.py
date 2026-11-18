@@ -583,6 +583,19 @@ class HyperbolicSpaces(OwnedParameterizedCategory):
         def lattice(self):
             return self._component.lattice()
 
+        def _chart_domain_structure(self, label, engine_chart) -> dict:
+            r"""An open subset of the hyperboloid lies in the same positive-cone component.
+
+            A chart on a proper open subset is a chart of the same space on
+            fewer points, so its domain is placed by the component the space is
+            placed by; what the Riemannian level adds to an open submanifold —
+            the restricted metric and its own smooth domain — comes with it.
+            """
+            return {
+                **super()._chart_domain_structure(label, engine_chart),
+                "component": self._component,
+            }
+
         def riemannian_metric(self):
             r"""Return the metric ``-b`` of the hyperboloid, in the charts of its atlas.
 
@@ -594,8 +607,13 @@ class HyperbolicSpaces(OwnedParameterizedCategory):
             ``chart label |-> (g(d/dy_i, d/dy_j))`` of
             :meth:`RiemannianManifolds.riemannian_metric`, whose entries are
             functions on the chart's domain
-            (:meth:`_HyperboloidFrame.metric_matrix` is their value).
+            (:meth:`_HyperboloidFrame.metric_matrix` is their value).  An open
+            submanifold of the hyperboloid carries no formula of its own and is
+            given the family of the space it is open in, whose charts restrict
+            to it, so that datum is returned when it is there.
             """
+            if self._preamble_metric is not None:
+                return self._preamble_metric
             return indexed_family(
                 self.chart_labels(),
                 self._metric_matrix_in_chart,
