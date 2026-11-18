@@ -215,3 +215,57 @@ transitions before gluing; that cost is `3-5 s` idle and tens of seconds under
 co-tenancy.  Deferring it is a change to the scheme gluing datum, which this
 issue does not own, so it is recorded here rather than made.
 
+## Round 5, 2026-11-18: a session caller's lengths, and two independent oracles
+
+Two oracles added, and the defect the second one found.
+
+`tests/schemes/test_the_vertex_cones_and_sterk2_coefficients_have_independent_routes.sage:52`
+enumerates the inner normals of `conv{(0,0),(2,0),(0,1)}` from the polytope's own
+`normal_value` pairings -- a primitive candidate whose minimum over the vertices
+is attained on exactly the two vertices of one edge and includes this vertex --
+and asserts that `vertex_normal_cone` returns exactly that cone at all three
+vertices, with two smooth ones and the index-two one.  `normal_supports_point`,
+which the shipped test leans on, is not consulted, so the ray set is decided
+twice by different routes.
+
+The same file at `:118` re-derives all nineteen `M_18_0_0` coefficients from the
+source's displayed rule in code that does not read
+`_STERK2_DIRECTION_COEFFICIENT_WEIGHTS`, for the stored `ell` and for
+`(1,...,1)`, keeps the two role kinds disjoint, re-runs the boundary walk from
+the boundary directions alone, and recomputes the closed path's shoelace.
+
+### The defect
+
+On the tree before the repair, that second test failed:
+`Sterk.sterk2_direction_coefficients((1,)*19)` -- a length vector written with
+the session's integer literals -- raised
+
+```
+ValueError: Integer Ring is not in Category of sets with partial maps
+```
+
+from `src/sage_extensions/sterk.py:267` in
+`_sterk2_engine_direction_coefficients`, which converted each length with the
+engine's rational field; that field cannot absorb a session integer, so the
+conversion fell into Sage's coercion discovery.  A session caller could not ask
+the public constructor for the coefficients of a length vector it writes.
+
+Repair: `_sterk2_length` (`src/sage_extensions/sterk.py:256`, used at `:277`)
+reads each length through the session's integers into the engine's rational
+field with `_engine_element`, so an ordinary integer, a session integer and a
+private-ring integer reach the arithmetic as the same exact rational.  Weights,
+arithmetic and returned values are unchanged.
+
+### Verdicts on this tree
+
+| # | item | verdict | the new evidence |
+| --- | --- | --- | --- |
+| 1 | vertex cone, dual lattice, chart in the atlas | green | the rays equal the normals the pairing alone finds, at all three triangle vertices, and the chart is the atlas entry at each |
+| 2 | the Sterk2 polygon from the native lengths | green | all nineteen coefficients follow the source rule for `ell` and `(1,...,1)`; the roles stay disjoint; the boundary walk lands on `p_17`; 18 points, 17 hull vertices, closing side, shoelace `820` |
+| 3 | the specimen through that constructor | green | as in round 3: the index-four apex cone, its five Hilbert-basis generators and both relations, the atlas entry at both vertices |
+
+Run, gates on, on this tree: `4 passed in 38.13 s` -- the two new oracles at
+`5.00 s` and `0.85 s`, the shipped triangle at `0.79 s`, the shipped specimen at
+`28.12 s` (load average `19.5` on four CPUs, so the call ceiling is over again;
+the environmental line of round 4 stands unchanged).
+
