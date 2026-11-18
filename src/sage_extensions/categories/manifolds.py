@@ -6,6 +6,7 @@ of labelled charts, and exact forward/inverse coordinate expressions for each
 represented atlas transition.
 """
 
+from functools import partial
 from itertools import combinations
 
 from sage.categories.category_with_axiom import all_axioms
@@ -800,6 +801,202 @@ class _DeferredEngineRealization:
         if self._engine is None:
             self._engine = self._engine_factory()
         return self._engine
+
+
+class _ChartwiseFunction:
+    r"""The chart expressions of a smooth function, as the function they define.
+
+    Private computation class (``OWN-06``).  A smooth function on a manifold is
+    a map ``M -> K``; its expression in a chart states it on that chart's
+    domain, and the expressions of one function agree on the overlaps where the
+    charts meet (``SmoothManifolds.ParentMethods.smooth_function``, which is the
+    only constructor).  The engine's formula for each expression is retained
+    here because the derivative of a function along a vector field is the
+    engine's own computation on formulas; the formulas are a private
+    representation, never a parent of an owned object.
+    """
+
+    def __init__(self, manifold, expressions, formulas) -> None:
+        self._manifold = manifold
+        self._expressions = expressions
+        self._formulas = formulas
+
+    def manifold(self):
+        r"""The manifold the function is on."""
+        return self._manifold
+
+    def expressions(self):
+        r"""The function's expression in each chart, as sections of that chart's function ring."""
+        return self._expressions
+
+    def formulas(self):
+        r"""The engine's formula for the function's expression in each chart (private adapter)."""
+        return self._formulas
+
+    def __call__(self, point):
+        r"""The value of the function at ``point``, in the manifold's coordinate field."""
+        manifold = self._manifold
+        label = point.chart().label()
+        assert label in self._formulas, (
+            f"the function is written on the charts {tuple(self._formulas)} of {manifold} and "
+            f"{point} is given in the chart {label}"
+        )
+        chart = _engine_manifold_chart(manifold.atlas()[label])
+        coordinates = tuple(chart(_engine_manifold_point(point)))
+        substitutions = dict(zip(tuple(chart[:]), coordinates, strict=True))
+        return manifold.coordinate_field()(self._formulas[label].subs(substitutions))
+
+    def _repr_(self):
+        return f"the smooth function with expressions on the charts {tuple(self._formulas)}"
+
+
+def _chartwise_formulas(function, manifold):
+    r"""The engine's formula for a smooth function in each chart of ``manifold``, or ``None``.
+
+    Private computation adapter (``OWN-06``).  A smooth function is written by
+    its chart expressions, and a function built from such functions by the
+    pointwise law of the algebra of functions -- a sum, a negative, a scalar
+    multiple, a product -- is written by the same law applied to theirs, which
+    is what the recorded operation states
+    (``categories.functions.real_functions._pointwise_derivation``).  A function
+    given only by a callable has no expression in any chart, and an operation
+    that needs one states that frontier rather than inventing one.
+    """
+    return _chartwise_formulas_of_definition(
+        _manifold_function_definition(function), manifold
+    )
+
+
+def _chartwise_formulas_of_definition(definition, manifold):
+    r"""The per-chart formulas of the function a definition states, or ``None``."""
+    from sage_extensions.categories.functions.real_functions import _ConstantMap
+    from sage_extensions.categories.modules.general_modules import _PointwiseValues
+
+    match definition:
+        case _ChartwiseFunction() as chartwise:
+            return chartwise.formulas()
+        case _ConstantMap() as constant:
+            value = _engine_scalar(constant.value())
+            return {label: value for label in tuple(manifold.chart_labels())}
+        case _PointwiseValues() as values:
+            families = tuple(
+                _chartwise_formulas_of_definition(
+                    _manifold_function_definition(operand), manifold
+                )
+                for operand in values.operands()
+            )
+            if any(family is None for family in families):
+                return None
+            return {
+                label: _rebuilt_pointwise_formula(
+                    values.operation(), tuple(family[label] for family in families)
+                )
+                for label in tuple(manifold.chart_labels())
+            }
+        case _:
+            return None
+
+
+def _rebuilt_pointwise_formula(operation, operands):
+    r"""The engine formula of the pointwise operation ``operation`` on ``operands``."""
+    from sage_extensions.categories.functions.real_functions import _pointwise_product
+    from sage_extensions.categories.modules.pure.modules import (
+        _pointwise_negative,
+        _pointwise_scalar_multiple,
+        _pointwise_sum,
+        _pointwise_zero,
+    )
+
+    match operation:
+        case _ if operation is _pointwise_sum:
+            return operands[0] + operands[1]
+        case _ if operation is _pointwise_negative:
+            return -operands[0]
+        case _ if operation is _pointwise_zero:
+            return SR.zero()
+        case _ if operation is _pointwise_product:
+            return operands[0] * operands[1]
+        case _ if (
+            isinstance(operation, partial) and operation.func is _pointwise_scalar_multiple
+        ):
+            return _engine_scalar(operation.args[0]) * operands[0]
+        case _:
+            return None
+
+
+def _chartwise_family_agrees(manifold, expressions, order) -> None:
+    r"""Decide that a chart-wise family states one object on ``manifold``, or state where it does not.
+
+    ``expressions[chart.label()]`` is the tuple of components of one object in
+    that chart's coordinates, and ``order`` is the order of the object: ``0``
+    for a function, whose expression is read where it is, and ``1`` for a vector
+    field, whose components transform by the derivative of the coordinate
+    change.  Writing ``y`` for the coordinates of the target chart as functions
+    of the coordinates ``x`` of the source chart, the two statements are
+    ``h_t(y(x)) = h_s(x)`` and ``a_t^j(y(x)) = sum_i a_s^i(x) dy_j/dx_i``
+    (Lee, *Introduction to Smooth Manifolds*, 2nd ed., Ch. 3).  The comparison
+    is made where the transition is stated -- its own expressions, on the
+    overlap its overlap functions cut out -- and a family that fails it is
+    refused, naming the two charts and the component.
+
+    Nothing is enumerated: the residuals are rational expressions in the
+    charts' coordinates, and their vanishing is decided exactly.
+    """
+    labels = tuple(manifold.chart_labels())
+    dimension = int(manifold.dimension())
+    for source_label, target_label in combinations(labels, 2):
+        for transition in (
+            manifold.transition(source_label, target_label),
+            manifold.transition(target_label, source_label),
+        ):
+            source = transition.source()
+            target = transition.target()
+            variables = tuple(_engine_manifold_chart(source)[:])
+            images = tuple(_engine_manifold_chart(target)[:])
+            forward = tuple(
+                SR(_engine_manifold_expression(expression))
+                for expression in transition.forward_expressions()
+            )
+            stated = tuple(
+                SR(_engine_manifold_expression(expression))
+                for expression in expressions[source.label()]
+            )
+            pulled = tuple(
+                SR(_engine_manifold_expression(expression)).subs(
+                    dict(zip(images, forward, strict=True))
+                )
+                for expression in expressions[target.label()]
+            )
+            match int(order):
+                case 0:
+                    transported = stated
+                case 1:
+                    jacobian = tuple(
+                        tuple(formula.diff(variable) for variable in variables)
+                        for formula in forward
+                    )
+                    transported = tuple(
+                        sum(
+                            stated[index] * jacobian[position][index]
+                            for index in range(dimension)
+                        )
+                        for position in range(dimension)
+                    )
+                case _:
+                    assert False, (
+                        f"a chart-wise family states objects of order 0 or 1, and {order} is "
+                        f"neither"
+                    )
+            for position, (left, right) in enumerate(
+                zip(transported, pulled, strict=True)
+            ):
+                residual = SR(left - right).simplify_full()
+                assert residual == 0, (
+                    f"the chart-wise family on {manifold} does not state one object: on the "
+                    f"chart {source.label()} the component {position} is {transported[position]}, "
+                    f"and the component stated on the chart {target.label()} is {pulled[position]} "
+                    f"there, which leaves the residual {residual}"
+                )
 
 
 class _ManifoldTopologyData(SageObject):
@@ -2093,8 +2290,83 @@ class SmoothManifolds(OwnedCategory):
         def underlying_topological_manifold(self):
             pass
 
+        @cached_method
+        def smooth_functions(self):
+            r"""``C^oo(M)``: the algebra of smooth real-valued functions on ``M``.
+
+            A smooth function is a map ``M -> R`` of class ``C^oo``, and the
+            smooth functions form an ``R``-algebra under the pointwise
+            operations (Lee, *Introduction to Smooth Manifolds*, 2nd ed.,
+            Ch. 2).  The algebra is the owned one: its elements are maps on this
+            manifold, evaluated at owned points, and the chart expressions that
+            state a derivative are the ones :meth:`smooth_function` retains.
+            """
+            from sage_extensions.categories.functions.real_functions import C
+
+            return C(Infinity, self, self.coordinate_field())
+
+        def smooth_function(self, expressions):
+            r"""The smooth function whose expression in each chart is ``expressions[label]``.
+
+            A smooth function is fixed by its expressions in the charts of an
+            atlas, provided they agree where the charts meet: on the overlap of
+            two charts each expression is the other read through the coordinate
+            change (Lee, *Introduction to Smooth Manifolds*, 2nd ed., Ch. 1).
+            The family is checked against every represented transition and
+            refused when it fails, so that what is returned is one function on
+            the manifold and not one function per chart.
+
+            The expressions are sections of each chart's function ring
+            (:meth:`ManifoldAtlasChart.function_ring`); a quotient of two
+            sections is stated where its denominator does not vanish
+            (:meth:`ManifoldAtlasChart.section_ratio`).
+            """
+            labels = tuple(self.chart_labels())
+            atlas = self.atlas()
+            missing = tuple(label for label in labels if label not in expressions)
+            extra = tuple(label for label in expressions if label not in labels)
+            assert not missing, (
+                f"a smooth function on {self} is stated on every chart of the manifold, and no "
+                f"expression is given for the charts {missing}"
+            )
+            assert not extra, (
+                f"a smooth function on {self} is stated on the charts of the manifold, and the "
+                f"expressions given for {extra} are on charts it does not have"
+            )
+            admitted = {
+                label: _admit_manifold_expression(expressions[label], atlas[label])
+                for label in labels
+            }
+            _chartwise_family_agrees(
+                self, {label: (admitted[label],) for label in labels}, 0
+            )
+            return self.smooth_functions()(
+                _ChartwiseFunction(
+                    self,
+                    admitted,
+                    {
+                        label: _engine_manifold_expression(admitted[label])
+                        for label in labels
+                    },
+                )
+            )
+
+        @cached_method
         def tangent_bundle(self):
-            pass
+            r"""``TM``, the tangent bundle of ``M``, as an owned smooth vector bundle.
+
+            The tangent space ``T_pM`` is the space of derivations of the algebra
+            of germs of smooth functions at ``p`` (Lee, *Introduction to Smooth
+            Manifolds*, 2nd ed., Ch. 3), so the disjoint union of the tangent
+            spaces is a smooth vector bundle of rank ``dim(M)`` whose sections
+            are the vector fields, and those sections are exactly the
+            derivations of ``C^oo(M)`` (Lee, Ch. 3 and Ch. 10).  Whether the
+            bundle is trivial is a separate question: a frame is a datum a
+            caller states, never a fact read off a list of charts.
+            """
+            from sage_extensions.categories.vector_bundles import SmoothVectorBundles
+
+            return SmoothVectorBundles(self).tangent_bundle()
 
         def weaken_to(self, degree):
             pass

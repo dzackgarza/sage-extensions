@@ -194,6 +194,9 @@ from sage_extensions.categories.manifolds import (  # noqa: F401
     SmoothManifolds,
     TopologicalManifolds,
 )
+from sage_extensions.categories.vector_bundles import (  # noqa: F401
+    SmoothVectorBundles,
+)
 from sage_extensions.categories.manifolds_with_boundary import (  # noqa: F401
     RealCkManifoldsWithBoundary,
     RealCkManifoldsWithCorners,
