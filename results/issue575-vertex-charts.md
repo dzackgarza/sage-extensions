@@ -371,3 +371,35 @@ that one call moved to first use, with the toric side passing an unbuilt family
 (`toric_schemes.py:2297-2300`); the decision it needs is the gluing owner's, priced at
 the 169 tests of 31 files recorded above.
 
+## Round 12, 2026-11-18: the ceiling item closes by measurement
+
+The open item was the specimen test's call against the per-call ceiling.  The host fell
+to the load its ceilings were calibrated for (`load average 1.63`, against `27-32` in
+rounds 6-11), and the deciding run is green with no gate report:
+
+```
+$ python -m pytest -o addopts= -p qc_sage_session \
+    -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint \
+    --durations=0 tests/schemes/test_the_vertex_cones_and_sterk2_coefficients_have_independent_routes.sage \
+                 tests/schemes/test_sterk_polygon_vertex_charts.sage
+time gates on: star import 1.25 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+4 passed in 6.48s
+ 4.36s  test_a_stored_sterk2_polygon_vertex_indexes_its_chart   (ceiling 20 s)
+ 0.82s  test_the_vertex_cone_rays_are_the_inner_normals_the_pairing_finds
+ 0.32s  test_every_sterk2_direction_carries_the_coefficient_the_source_gives_it
+ 0.09s  test_the_vertex_cones_of_a_triangle_index_charts_of_its_atlas
+peak tree RSS 425 MiB
+```
+
+So the line at `tests/schemes/test_sterk_polygon_vertex_charts.sage:165` meets the
+`20 s` ceiling (`testing/suite_budget.py:44`) on a host at the calibration load, with a
+`4.6x` margin, and no ceiling of this run is over.  The `28-180 s` calls of rounds 6-11
+were the same co-tenancy under which this host reports its file-independent session
+star import at `11-12.8 s` against its `3 s` ceiling.
+
+The item is closed as measured, and the code change that would keep it inside the
+ceiling *while co-tenanted* stays filed for the gluing datum's owner
+(`results/issue-proposal-the-gluing-datum-resolves-its-atlas-lazily.md`, the one forcing
+call at `gluing.py:965`); nothing in #575's own files was trimmed, gated or capped to
+get this run.
+
