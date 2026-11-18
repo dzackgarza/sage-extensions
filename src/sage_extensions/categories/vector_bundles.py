@@ -713,13 +713,8 @@ class SmoothSectionModules(OwnedParameterizedCategory):
                 f"the module of sections of {self._vector_bundle} retains no frame, and a "
                 f"trivialization of a bundle is read in a frame"
             )
-            assert int(self._vector_bundle.rank()) == 1, (
-                f"the trivialization of the rank-{self._vector_bundle.rank()} bundle "
-                f"{self._vector_bundle} is a matrix of functions per chart; this owner reads the "
-                f"rank-one case, whose trivialization is the frame's own section"
-            )
             return SmoothVectorBundleTrivialization(
-                self._vector_bundle, self._retained_frame[0]
+                self._vector_bundle, self._retained_frame
             )
 
         def _repr_(self):
@@ -727,21 +722,25 @@ class SmoothSectionModules(OwnedParameterizedCategory):
 
 
 class SmoothVectorBundleTrivialization(SageObject):
-    r"""The trivialization ``M x R -> E`` of a rank-one bundle that a global frame states.
+    r"""The trivialization ``M x R^r -> E`` that a global frame states.
 
-    The frame is a section that is a basis of every fibre, so a smooth function
-    ``a`` determines the section ``p |-> a(p) frame(p)`` and a section ``V``
-    determines the function ``p |-> a(p)`` with ``V(p) = a(p) frame(p)`` (Lee,
-    *Introduction to Smooth Manifolds*, 2nd ed., Ch. 10).  The two maps are
-    computed on the owned chart expressions: the product is the pointwise
-    product of functions, and the coordinate reads a section's component against
-    the frame's own, on the open subset where that component does not vanish
-    (:meth:`ManifoldAtlasChart.section_ratio`).
+    A frame is a family ``E_1, ..., E_r`` of sections that is a basis of every
+    fibre, and it states the isomorphism in two directions: a family of smooth
+    functions ``(a_1, ..., a_r)`` determines the section ``sum_i a_i E_i``, and a
+    section ``V`` determines the family with ``V = sum_i a_i E_i`` (Lee,
+    *Introduction to Smooth Manifolds*, 2nd ed., Ch. 10).  In a chart the second
+    is the linear system ``V_j = sum_i a_i (E_i)_j``, and its solution is
+    Cramer's rule: ``a_i`` is the determinant of the components' matrix with the
+    ``i``-th column replaced by the section's components, divided by the
+    determinant of the matrix itself.  That denominator is the determinant the
+    frame's being a basis decided to vanish nowhere on the chart, so each
+    coordinate is a quotient of sections read where its denominator does not
+    vanish (:meth:`ManifoldAtlasChart.section_ratio`).
     """
 
     def __init__(self, bundle, frame) -> None:
         self._bundle = bundle
-        self._frame = frame
+        self._frame = tuple(frame)
 
     def bundle(self):
         r"""The bundle this trivialization is of."""
@@ -752,71 +751,111 @@ class SmoothVectorBundleTrivialization(SageObject):
         return self._bundle.base_manifold()
 
     def frame(self):
-        r"""The global frame the trivialization is read in."""
+        r"""The global frame the trivialization is read in, as the family of its sections."""
         return self._frame
 
-    def forward(self, function):
-        r"""``a |-> a frame``: the section the smooth function ``a`` states.
+    def forward(self, functions):
+        r"""``(a_1, ..., a_r) |-> sum_i a_i E_i``: the section a family of functions states.
 
         The product of a function and a section is the pointwise product of
-        their components in a chart, which is how the ``C^oo(M)``-module
-        structure on sections is written (Lee, *Introduction to Smooth
-        Manifolds*, 2nd ed., Ch. 10).
+        their components in a chart, and the sum of the basis sections is taken
+        there, which is how the ``C^oo(M)``-module structure on sections is
+        written (Lee, *Introduction to Smooth Manifolds*, 2nd ed., Ch. 10).  One
+        function states the rank-one case.
         """
         manifold = self.base_manifold()
-        assert element_parent(function) is manifold.smooth_functions(), (
-            f"{function} is not a smooth function on {manifold}: its parent is "
-            f"{element_parent(function)}, and a trivialization is a map from "
-            f"{manifold.smooth_functions()}"
+        rank = int(self._bundle.rank())
+        family = (functions,) if rank == 1 else tuple(functions)
+        assert len(family) == rank, (
+            f"a section of the rank-{rank} bundle {self._bundle} is written as {rank} "
+            f"functions, one per basis section, and {len(family)} were given"
         )
-        function_formulas = _chartwise_formulas(function, manifold)
-        assert function_formulas is not None, (
-            f"cannot multiply the frame of {self._bundle} by {function}: the function is not "
-            f"written by chart expressions, and the product of a function and a section is read "
-            f"from the expressions of both"
-        )
-        frame_components = self._frame.components()
+        formulas = []
+        for function in family:
+            assert element_parent(function) is manifold.smooth_functions(), (
+                f"{function} is not a smooth function on {manifold}: its parent is "
+                f"{element_parent(function)}, and a trivialization is a map from as many "
+                f"copies of {manifold.smooth_functions()} as the rank"
+            )
+            chartwise = _chartwise_formulas(function, manifold)
+            assert chartwise is not None, (
+                f"cannot multiply the frame of {self._bundle} by {function}: the function is "
+                f"not written by chart expressions, and the product of a function and a "
+                f"section is read from the expressions of both"
+            )
+            formulas.append(chartwise)
+        components = tuple(section.components() for section in self._frame)
         return self._bundle.sections().section(
             {
                 label: tuple(
                     _raise_manifold_expression(
-                        function_formulas[label] * _engine_manifold_expression(entry),
+                        sum(
+                            formulas[index][label]
+                            * _engine_manifold_expression(components[index][label][entry])
+                            for index in range(rank)
+                        ),
                         manifold.atlas()[label],
                     )
-                    for entry in frame_components[label]
+                    for entry in range(rank)
                 )
                 for label in manifold.chart_labels()
             }
         )
 
     def inverse(self, section):
-        r"""``V |-> a``: the smooth function with ``V = a frame``.
+        r"""``V |-> (a_1, ..., a_r)``: the functions with ``V = sum_i a_i E_i``.
 
-        In a chart the section has components ``V_i`` and the frame has
-        components ``e_i``, and the function read there is ``V_i / e_i``.  The
-        quotient is stated where the frame's component does not vanish
-        (:meth:`ManifoldAtlasChart.section_ratio`), which for a frame is every
-        point of the chart by hypothesis.
+        In a chart the components of ``V`` are ``V_j`` and those of the frame are
+        ``(E_i)_j``, and the functions are the solution of
+        ``V_j = sum_i a_i (E_i)_j``: by Cramer's rule, ``a_i`` is the
+        determinant of the components' matrix with its ``i``-th column replaced
+        by ``V``, divided by the determinant of the matrix.  The division is
+        stated with :meth:`ManifoldAtlasChart.section_ratio`, which is read where
+        its denominator does not vanish -- the whole chart, by the frame's being
+        a basis.  One function is returned at rank one.
         """
+        from sage.matrix.constructor import matrix as _engine_matrix
+
         manifold = self.base_manifold()
         assert element_parent(section) is self._bundle.sections(), (
             f"{section} is not a section of {self._bundle}: its parent is "
             f"{element_parent(section)}"
         )
-        assert int(self._bundle.rank()) == 1, (
-            f"the coordinates of a section in a frame of rank {self._bundle.rank()} are one "
-            f"function per basis section; this owner reads the rank-one case"
-        )
-        frame_components = self._frame.components()
+        rank = int(self._bundle.rank())
+        components = tuple(entry.components() for entry in self._frame)
         section_components = section.components()
-        return manifold.smooth_function(
-            {
-                label: manifold.atlas()[label].section_ratio(
-                    section_components[label][0], frame_components[label][0]
+        coordinates = []
+        for index in range(rank):
+            per_chart = {}
+            for label in manifold.chart_labels():
+                chart = manifold.atlas()[label]
+                entries = tuple(
+                    SR(_engine_manifold_expression(components[basis][label][entry]))
+                    for entry in range(rank)
+                    for basis in range(rank)
                 )
-                for label in manifold.chart_labels()
-            }
-        )
+                stated = tuple(
+                    SR(_engine_manifold_expression(entry))
+                    for entry in section_components[label]
+                )
+                replaced = _engine_matrix(
+                    SR,
+                    rank,
+                    rank,
+                    tuple(
+                        stated[entry] if basis == index else entries[entry * rank + basis]
+                        for entry in range(rank)
+                        for basis in range(rank)
+                    ),
+                )
+                per_chart[label] = chart.section_ratio(
+                    _raise_manifold_expression(replaced.det(), chart),
+                    _raise_manifold_expression(
+                        _engine_matrix(SR, rank, rank, entries).det(), chart
+                    ),
+                )
+            coordinates.append(manifold.smooth_function(per_chart))
+        return coordinates[0] if rank == 1 else tuple(coordinates)
 
     def _repr_(self):
         return f"the trivialization of {self._bundle} by the frame {self._frame}"
