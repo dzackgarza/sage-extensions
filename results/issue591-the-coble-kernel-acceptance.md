@@ -497,3 +497,27 @@ reflection mechanism, of which it needs at least 57.
 This is a derivation from Chenevier's Lemma 3.1 and Corollary 3.7 plus the two vanishing
 quotients above, not a machine computation: the order `|S(K)| = 1` is not verified by an
 independent computation here, and the statement above should be read with that standing.
+
+## A conflict with the certificate now on `main`
+
+`main` has moved under this note: commit `bebcacc`, "expose certified Coble stable kernel
+generating resolutions", makes `stable_orthogonal_group_generators()` return 56 generators
+for `T_Co` from `src/sage_extensions/certificates/coble_kernel_fifty_six_congruence_generators.json`
+(`generator_count` 56, `mod_four_image_rank` 56), with completeness attributed to a theorem
+in another repository (`research/main 99f7680924`, `thm:coble-fifty-six-ordinary-full-kernel-generation`),
+and `tests/lattices/test_the_coble_lattice_certified_generators.sage` asserts it.
+
+That family is **not** a reflection family: each generator carries a
+`source.parabolic_generator_index`, i.e. it is a parabolic unipotent. So it sits outside the
+mechanism closed in section 8 and there is no contradiction with that part.
+
+There is a contradiction with the count. The argument recorded above gives
+`\Gamma/[ \Gamma,\Gamma ]\Gamma^2` dimension at least **57**: the level-two classes give 56,
+and one dimension of `\Gamma(4)/\Gamma(8)` is not a commutator of level-two classes, because
+`[\Gamma(4),\Gamma] \subseteq \Gamma(8)` makes every commutator of `\Gamma` congruent to a
+commutator of reflection classes, and those span only 54 of the 55. A generating set of 56
+elements therefore cannot exist. Either this counting argument is wrong, or the certificate's
+completeness is; the two cannot both hold, and this note does not settle which. What is
+checkable here is that the 56 generators are integral isometries with trivial discriminant
+action and that their classes span `\Gamma/\Gamma(4)` — that is what `mod_four_image_rank: 56`
+records — and that is not the disputed step.
