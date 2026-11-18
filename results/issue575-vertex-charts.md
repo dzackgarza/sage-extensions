@@ -17,7 +17,11 @@ that settles it.
 | established on a small polygon with known smooth and singular vertex cones | `test_the_vertex_cones_of_a_triangle_index_charts_of_its_atlas` | `tests/schemes/test_sterk_polygon_vertex_charts.sage:35` | 2 smooth and 1 index-two vertex cone; the singular chart's dual Hilbert basis `(0,-1),(1,-1),(2,-1)` satisfies `z0*z2 = z1**2` and is not a polynomial ring |
 | then on the stored St2 specimen through that public constructor | `test_a_stored_sterk2_polygon_vertex_indexes_its_chart` | `tests/schemes/test_sterk_polygon_vertex_charts.sage:125` | `(-24,0)`: rays `{(1,0),(0,1)}`, smooth, chart the atlas entry, 2 generators; `(-12,26)`: rays `{(-1,-2),(1,-2)}` (index `|det| = 4`), not smooth, all rays minimize there by `normal_supports_point`, chart the atlas entry, 5 generators; `cocharacter_lattice() == lattice.dual_module()` |
 
-## The stored specimen's deciding call is over the per-call ceiling
+## The stored specimen's deciding call is over the per-call ceiling (superseded below)
+
+The numbers in this section are the measurements of the tree before the
+vertex's cone was retained; the round-2 section at the end of this note
+records the run that fits the ceiling.
 
 `tests/schemes/test_sterk_polygon_vertex_charts.sage:165`
 (`variety = polygon.toric_variety(QQ)`) is the line that decides the specimen's
@@ -93,3 +97,40 @@ recomputed from the guide's rule in separate code from
 Not run: the CI image (`ghcr.io/dzackgarza/sage:develop` has no OCI runtime on
 this host), the ast-grep gates (`ast-grep` is not installed here), and the rest
 of the suite.
+
+## Round 2, 2026-11-18: the deciding call now fits the ceiling
+
+The section above concludes that the specimen's row cannot fit the ceiling
+without a change to the gluing.  That conclusion was too quick: the call paid
+the cone decision **six times**, not once.  `vertex_chart` is
+`affine_chart(vertex_normal_cone(vertex))`, so the test's request for the cone
+and then for the chart re-ran the scan of the fan's seventeen primitive normals
+against the polytope's seventeen vertices, and the atlas block ran it again.
+
+`vertex_normal_cone` now retains its answer per vertex of the polarizing
+polytope (`categories/schemes/toric/toric_schemes.py:723`, registry at `:773`,
+lookup at `:766`, the scan itself at `:782`), keyed by the vertex's coordinates
+in the polytope's lattice rather than by the lattice point, whose equality and
+hashing belong to the lattice the polytope lives in.  `vertex_chart` (`:824`)
+and every repeat request read the retained cone; the decision, its assertions
+and the cone returned are unchanged.
+
+| run (gates on) | session star import | specimen call | triangle call | verdict |
+| --- | --- | --- | --- | --- |
+| before, quiet host | `3.04 s` | `27.42 s` | `4.42 s` | red on the call ceiling |
+| after, quiet host | `1.92 s` | `18.49 s` | `3.39 s` | `2 passed in 25.60 s`, no gate report |
+
+Probes on the same tree: a repeated cone is the same object and costs `0.014 s`
+against `0.9-2.8 s` for the first; the chart of a decided vertex is `0.011 s`; a
+point that is not a vertex is still refused and adds no registry entry; a second
+variety of the same polygon keeps its own registry; on the specimen the apex
+cone is `0.89 s` first and `0.045 s` repeated, and its chart is still the atlas
+entry at that cone.
+
+What the specimen call still pays, unchanged, is the eager gluing of its
+seventeen charts in `_toric_variety`: 136 pair transitions at `13.9-23.4 s`.
+The margin under the ceiling is therefore about eight percent on a quiet host,
+and the call exceeds the ceiling again under heavy co-tenancy, where this file
+needed about `1.6x` its quiet time at load average 21.5 on four CPUs.  Deferring
+that gluing remains a change to the scheme gluing datum
+(`categories/schemes/gluing.py:929-967`), not to this operation.
