@@ -2037,7 +2037,7 @@ class ToricSchemes(OwnedCategoryOverBaseRing):
                 )
                 return target.linear_combination(
                     {
-                        label: integers(coefficient)
+                        label: _owned_engine_element(SageZZ, coefficient)
                         for label, coefficient in zip(target_labels, coordinates, strict=True)
                         if coefficient
                     }
