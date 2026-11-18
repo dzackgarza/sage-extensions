@@ -2179,6 +2179,19 @@ class RiemannianManifolds(OwnedCategory):
         """
 
         @cached_method
+        def an_object(self):
+            r"""The Euclidean line ``(R, dx^2)``, with its geodesic symmetries ``s_p(x) = 2p - x``.
+
+            Every point ``p`` of the line is an isolated fixed point of the
+            involutive isometry ``s_p``, which is the axiom (Helgason, Ch. IV,
+            §3, Definition), and the line is analytic, so it is an object of
+            this category and not only of the Riemannian manifolds.  The
+            metric is the Riemannian level's; what this category adds is the
+            statement that the space has the geodesic symmetries.
+            """
+            return RiemannianManifolds().an_object()._with_structure((self,), {})
+
+        @cached_method
         def forget_metric(self):
             r"""Forget the selected metric: the map from this category to ``SmoothManifolds()``.
 
@@ -2243,23 +2256,19 @@ class RiemannianManifolds(OwnedCategory):
                 f"{satake_diagram} has every node black, so it is the compact real form, and "
                 f"its symmetric space G/K is a point, not of the noncompact type"
             )
-            engine = _SageManifold(
-                int(dimension), "G/K", structure="smooth", unique_tag=object()
+            manifold = SmoothManifolds()(int(dimension), "G/K")
+            manifold.chart("p0", " ".join(f"x{index}" for index in range(int(dimension))))
+            space = manifold._with_structure(
+                (self,),
+                {
+                    "satake_diagram": satake_diagram,
+                    "real_rank": rank,
+                    "underlying_smooth_manifold": manifold,
+                },
+                engine=_RealFormSymmetricSpace,
             )
-            space = _object_of(
-                self,
-                _engine=(SmoothManifolds(), _RealFormSymmetricSpace, None),
-                topology_data=_ManifoldTopologyData(engine),
-                engine_manifold=engine,
-                manifold_dimension=int(dimension),
-                manifold_name="G/K",
-                manifold_structure="smooth",
-                differentiability_degree=Infinity,
-                manifold_field="real",
-                satake_diagram=satake_diagram,
-                real_rank=rank,
-            )
-            space.chart("p0", " ".join(f"x{index}" for index in range(int(dimension))))
+            for label in manifold.chart_labels():
+                space._register_chart(label, _engine_manifold_chart(manifold.atlas()[label]))
             return space
 
         def hyperbolic_space(self, component):
@@ -2285,23 +2294,16 @@ class RiemannianManifolds(OwnedCategory):
             )
 
             dimension = int(component.lattice().module_rank()) - 1
-            engine = _SageManifold(
-                dimension, f"HH^{dimension}", structure="smooth", unique_tag=object()
-            )
-            space = _object_of(
-                HyperbolicSpaces(dimension),
-                topology_data=_ManifoldTopologyData(engine),
-                engine_manifold=engine,
-                manifold_dimension=dimension,
-                manifold_name=f"HH^{dimension}",
-                manifold_structure="smooth",
-                differentiability_degree=Infinity,
-                manifold_field="real",
-                component=component,
-            )
-            space.chart(
+            manifold = SmoothManifolds()(dimension, f"HH^{dimension}")
+            manifold.chart(
                 HYPERBOLOID_CHART, " ".join(f"y{index}" for index in range(dimension))
             )
+            space = manifold._with_structure(
+                (HyperbolicSpaces(dimension),),
+                {"component": component, "underlying_smooth_manifold": manifold},
+            )
+            for label in manifold.chart_labels():
+                space._register_chart(label, _engine_manifold_chart(manifold.atlas()[label]))
             return space
 
         class ParentMethods:
