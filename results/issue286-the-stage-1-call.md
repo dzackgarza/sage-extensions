@@ -5,9 +5,9 @@ line orbit, one primitive isotropic plane orbit and one incidence edge; under
 `Õ(T_Co) = ker ρ` and under `Õ⁺(T_Co) = ker(ρ, sn_RR)` it returns 527 line
 orbits each, the number of nonzero isotropic classes of `A_{T_Co}`, so the index
 `[Stab_{O(q)}(v̄) : ρ(Stab_Γ(v))]` is 1 over every class.  The page-proof rows it
-can be compared with agree.  The kernel *plane* rows — 189 720 orbits each — are
-not run to completion here; what remains for them is the coset walk, not this
-call's structure.
+can be compared with agree.  The kernel *plane* rows — 189 720 orbits each — do
+not finish on this host (§ "The kernel plane rows"); `#588`'s span row is
+2.0 GiB and 1 179 s on a runner of its own.
 
 Measured in the adopted runtime (Sage 11.0.beta5 / Python 3.14, image
 `ghcr.io/dzackgarza/sage@sha256:59568577…`) on `main`
@@ -224,7 +224,7 @@ the run's: the port's generator search is not deterministic (330, 331, 335, 343,
 | 2 | the group rows by their constructions, `R_{Γ^K_En} = O(T_Co)` | indices `1` and `2·|O(q)|`, the page's |
 | 3 | the call on `T_Co` under `O(T_Co)`, with incidence | 1 line orbit, 1 plane orbit, 1 edge |
 | 4 | the known-answer comparisons | all ten rows are the cards' |
-| 5 | the kernel rows on `T_Co` | both line rows **527**; the plane rows are 189 720 planes and are #390's walk |
+| 5 | the kernel rows on `T_Co` | both line rows **527**; the plane rows are 189 720 planes each and are **blocked on the host** — see the section below |
 | 6 | `O(T_Co)` generators | return, 359 in 27.0 s, port `991b88b0` |
 
 ### The index over each finite class
@@ -254,3 +254,33 @@ Inside the adopted image, with the port bound ahead of the image's own copy:
 `tests/coble_gamma_co_2_incidence_rows.py --rows O --lattice Tco`, and the
 kernel line rows through
 `tests/lattices/test_the_coble_lattice_otilde_and_otilde_plus_line_rows.sage`.
+
+## The kernel plane rows, measured on `7753092`
+
+The two kernel plane rows are 189 720 planes each, and they were the last item
+open on this call.  Two instruments exist for them and they are not the same
+row: `subgroup.cusps(2)` keeps a **span** per cusp and builds the plane only when
+a reader asks for `representative()`, and
+`subgroup.isotropic_orbit_representatives(2)` keeps every constructed plane.
+`#588`'s retention repair (`#592`, `#593`) is stated on the first: the span row
+falls from 12.29 GiB to 2.0 GiB at that length.
+
+Four attempts on this host, none of which returns a count:
+
+| attempt | row | what it reached |
+| --- | --- | --- |
+| `tests/coble_kernel_plane_rows.py --cap 2400 --budget 5000` | both | ambient rows 76.7 s and 78.1 s, `is_parabolic_complete` 4.3 s, then killed (exit 137) 12 min into the walk |
+| `Õ⁺.isotropic_orbit_representatives(2)` | the materialized row | 3.2 GiB at 12 min 49 s, stopped |
+| `Õ⁺.cusps(2)` | the span row | killed by the host (exit 137) at 27.9 min, ~2 GiB |
+| `Õ.cusps(2)` | the span row | still building at 37 min, 3.2 GiB, stopped |
+
+The row is not refused and not wrong; it does not finish here.  The library's
+own records give its decided value — 189 720 planes per kernel group, from
+`#390`'s returned row — and `#588`'s acceptance states the span row at 2.0 GiB
+and 1 179 s on a runner that is not shared with other projects' jobs.  The venue
+for the run is `results/coble-kernel-plane-rows.yml`, the workflow this
+connection cannot install (`.github/workflows/` is outside its scope).
+
+So the item is **blocked on the host**, not decided here: three of the four
+attempts were killed by this VM, and the one instrument that carries the count,
+`tests/coble_kernel_plane_rows.py`, needs a job of its own.
