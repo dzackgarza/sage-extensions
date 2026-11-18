@@ -41,6 +41,24 @@ def test_an_arrow_of_hyperbolic_spaces_is_built_from_an_integral_isometry_of_the
     assert reflection.lattice_isometry() == lattice.reflection(root)
 
 
+def test_a_hyperbolic_arrow_is_an_arrow_of_the_manifolds_it_is_between() -> None:
+    r"""The arrow is also an arrow of the Riemannian, smooth and topological Mors.
+
+    An isometry of hyperbolic spaces preserves ``-b``, so it is a Riemannian
+    local isometry, a smooth map and a continuous map of the spaces it is
+    between.  The categories state exactly that, the hyperbolic category being a
+    subcategory of the Riemannian one, which declares the smooth one: so the
+    arrow the hyperbolic owner builds is admitted by each of those Mors at the
+    same endpoints, and is not an arrow of its own Mor only.
+    """
+    lattice, space, root = _hyperbolic_line()
+    reflection = space.category().Mor(space, space)(lattice.reflection(root))
+
+    assert reflection in RiemannianManifolds().Mor(space, space)
+    assert reflection in SmoothManifolds().Mor(space, space)
+    assert reflection in TopologicalManifolds().Mor(space, space)
+
+
 def test_a_hyperbolic_arrow_moves_a_point_by_the_isometry_that_induces_it() -> None:
     r"""The reflection negates the hyperboloid coordinate, and its square is the identity."""
     lattice, space, root = _hyperbolic_line()
