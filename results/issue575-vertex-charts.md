@@ -187,3 +187,31 @@ available.  The variety's eager gluing is `3-5 s` idle and `21.7 s` at load
 average 18, so under co-tenancy the call is over the ceiling whatever this test
 does; on a host that is not co-tenanted it is well under.
 
+## Acceptance verdicts, 2026-11-18, on `f59686c`
+
+Each item decided on its smallest deciding input, probes run on this tree.
+
+| # | item | verdict | statement or signature | file:line |
+| --- | --- | --- | --- | --- |
+| 1 | the cone of a selected vertex from its supporting primitive inner normals, in the dual of the polygon lattice; the actual chart of that cone, identified with the atlas; public correspondence; no second implementation | **green** | `vertex_normal_cone(vertex)` returns a cone of `self.fan()`; on `conv{(0,0),(2,0),(0,1)}` the primitive normals enumerated from the polytope's own `normal_value` pairing alone -- `n` minimized on exactly the edge through the vertex, candidates in `[-3,3]^2` -- equal the returned rays at all three vertices: `(0,0)` `{(1,0),(0,1)}`, `(0,1)` `{(1,0),(-1,-2)}`, `(2,0)` `{(0,1),(-1,-2)}`; every cone full-dimensional; `cocharacter_lattice() == lattice.dual_module()`; `affine_cover().enumeration()(cone) is vertex_chart(vertex) is affine_chart(cone)` at all three; generators `2,3,2` | `categories/schemes/toric/toric_schemes.py:723`, `:824`, `:701`, `:715`, `:263`; `categories/schemes/polytopes.py:2703`, `:2504` |
+| 2 | the source-faithful public Sterk2 polygon from the native lengths, with the two role kinds kept, the path walked under the source's weights, and the hull supplying the closing side | **green** | all 19 coefficients follow the source rule recomputed in separate code for the stored `ell` and for `(1,...,1)`; 17 boundary directions and 2 surgery directions are disjoint label sets and `v_1 == v_6 == (-1,2)` is one vector in two roles; walking the boundary directions alone lands on `p_17`; 18 labelled points, 17 distinct, `p_0=(0,0)`, `p_17=(-24,0)`, `p_8=p_9=(-12,26)`; hull 17 vertices with the closing side `p_17 -> p_0`; shoelace `820 = normalized_volume()`; lattice polygon | `sterk.py:139`, `:168`, `:177`, `:877`, `:893`, `:908`, `:920`, `:942`, `:976` |
+| 3 | the result first on a small polygon with known smooth and singular cones, then on the stored specimen through that constructor, with true assertions about rays, dual lattice, coordinate algebra and atlas identification, consuming the vertex-to-chart output | **green** | specimen `(-24,0)`: rays `{(1,0),(0,1)}`, smooth, all minimize there, chart is the atlas entry, 2 generators; `(-12,26)`: rays `{(1,-2),(-1,-2)}` (`|det| = 4`), not smooth, all minimize there, chart is the atlas entry, 5 generators; the five generators are the Hilbert basis `(-2,-1),(-1,-1),(0,-1),(1,-1),(2,-1)`, with `(-2,-1)+(2,-1) = 2(0,-1)` and `(-1,-1)+(1,-1) = 2(0,-1)` and the corresponding `z_left*z_right = z_base**2` in the chart's algebra; `cocharacter_lattice() == lattice.dual_module()` | `tests/schemes/test_sterk_polygon_vertex_charts.sage:35`, `:125`, `:157-158`, `:189-214`, `:219-224` |
+
+The deciding run of item 3 on this tree, gates on: `2 passed in 201.74 s`,
+specimen call `179.65 s`, triangle call `10.94 s`, at load average `21.3 -> 30.9`
+on four CPUs (star import `5.03 s`, collection `7.58 s`).  Every assertion is
+green; the call ceiling is the host's.
+
+### Still open, with its line
+
+`tests/schemes/test_sterk_polygon_vertex_charts.sage:165`
+(`variety = polygon.toric_variety(QQ)`) exceeds the `20 s` per-call ceiling
+(`src/sage_extensions/testing/suite_budget.py:44`) whenever the host is
+co-tenanted: `7.26 s` idle, `21.85 s` at load `16.5`, `179.65 s` at load
+`21.3 -> 30.9`.  The call is dominated by the eager gluing of the fan's 17
+charts at `categories/schemes/toric/toric_schemes.py:2259-2264` together with
+`categories/schemes/gluing.py:929-967`, which builds and verifies all 136 pair
+transitions before gluing; that cost is `3-5 s` idle and tens of seconds under
+co-tenancy.  Deferring it is a change to the scheme gluing datum, which this
+issue does not own, so it is recorded here rather than made.
+
