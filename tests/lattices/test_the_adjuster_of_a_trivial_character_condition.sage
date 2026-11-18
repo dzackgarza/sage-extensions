@@ -99,3 +99,4 @@ def test_repeated_line_adjustment_reuses_its_exact_stabilizer_section() -> None:
     assert first == second
     assert len(quotient._stabilizer_adjustment_sections) == 1
     assert len(quotient._exact_isotropic_stabilizer_families) == 1
+    assert quotient._permutation_character_target() is quotient._permutation_character_target()
