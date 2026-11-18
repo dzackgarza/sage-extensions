@@ -445,3 +445,28 @@ surjectivity of `O(M)(Z)` onto `O(M)(Z_2)` modulo the level-eight subgroup, i.e.
 double cover `\operatorname{Spin}(M)\to O(M)` with the component group accounted for. That
 is the one input this repository does not carry, and the level-four 54-versus-55 question
 waits on it.
+
+The statement itself, now in hand. G. Chenevier, *Statistics for Kneser p-neighbours*,
+arXiv:2104.06846v2, states it as his Lemma 3.4 (p. 11), "a reformulation of Kneser's strong
+approximation theorem for Spin groups [Kne66]": for a non-degenerate quadratic space `V`
+over `Q` with `dim V >= 3` and a prime `p` with `V_p` isotropic, the proof uses
+
+    Spin_V(A_f) = Spin(V) . K' . Spin(V_p),
+
+and the corollary used there is Corollary 3.7 (p. 13): when no exceptional set of primes is
+needed the spinor class group `\Sigma(K)` is trivial, and in general `\Sigma(K)` sits in
+`(\mathbb{Z}/N_T)^\times/(\mathbb{Z}/N_T)^{\times 2}` for the set `T` of primes at which the
+level structure is imposed. For `M = I_{2,9}` the space is isotropic at every p, the genus is
+a single class, and Section 5.5 of the same paper records the consequence used here: when
+`V_\infty` is isotropic, `s : X(K) \to S(K)` is bijective, so the level structures of a
+congruence level form as many classes as `S(K) = \Sigma(K)^*` has.
+
+So the fork is not strong approximation after all; it is the order of the spinor class group
+at the level-eight structure, which Corollary 3.7 bounds by
+`(\mathbb{Z}/8)^\times/(\mathbb{Z}/8)^{\times 2}` when only the prime 2 is exceptional. That
+finite group is the last object to compute, and it decides whether the level-eight quotient
+has one class (the reflections are level-eight complete at 54) or more (they are not, and the
+56 candidates fail).
+
+What is recorded here is the theorem with its locus and the reduction to `\Sigma(K_8)`; the
+order of that group is not computed in this repository.
