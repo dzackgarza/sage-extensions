@@ -161,6 +161,7 @@ kernel-plane-rows driver.
 """
 
 import argparse
+import hashlib
 import signal
 import sys
 import time
@@ -442,10 +443,14 @@ def row_contract(lattice, subgroup, label, lines, planes, incidences, route) -> 
     The returned relation is the input, so the contract is a statement about
     the library's answer and not about how the row was obtained.
     """
-    for position, cusp in enumerate(lines):
-        log(f"[{label}] line cusp {position}: {_coordinates(cusp.representative())}")
-    for position, cusp in enumerate(planes):
-        log(f"[{label}] plane cusp {position}: {_coordinates(cusp.representative())}")
+    # The complete Coble relation has 569160 edges and 189720 plane cusps.
+    # Printing every record can exhaust the Actions log before the mathematical
+    # verdict.  Audit every record, but print bounded endpoint samples and a
+    # deterministic digest of the entire ordered edge relation.
+    for name, cusps in (("line", lines), ("plane", planes)):
+        for position in sorted(set(range(min(3, len(cusps)))) |
+                               set(range(max(3, len(cusps) - 3), len(cusps)))):
+            log(f"[{label}] {name} cusp {position}: {_coordinates(cusps[position].representative())}")
     keys = {}
     if route == "divided-class":
         quotient = subgroup.finite_character_quotient()
@@ -453,6 +458,7 @@ def row_contract(lattice, subgroup, label, lines, planes, incidences, route) -> 
     line_vertices = set()
     plane_vertices = set()
     retained_pairs = set()
+    edge_digest = hashlib.sha256()
     line_position = cusp_positions(lines)
     plane_position = cusp_positions(planes)
     for position, incidence in enumerate(incidences):
@@ -483,15 +489,17 @@ def row_contract(lattice, subgroup, label, lines, planes, incidences, route) -> 
                 f"edge {position} of {len(incidences)}: {violation}",
             )
         retained_pairs.add(pair)
+        edge_digest.update(f"{line_id}:{plane_id}\n".encode("ascii"))
         line_vertices.add(line_id)
         plane_vertices.add(plane_id)
-        if route == "divided-class":
-            log(f"[{label}] edge {position}: L{line_id} < P{plane_id}")
-        else:
-            log(
-                f"[{label}] edge {position}: L{line_id} < P{plane_id}; "
-                f"line={line_coordinates}; plane={plane_coordinates}"
-            )
+        if position < 3 or position >= len(incidences) - 3:
+            if route == "divided-class":
+                log(f"[{label}] edge {position}: L{line_id} < P{plane_id}")
+            else:
+                log(
+                    f"[{label}] edge {position}: L{line_id} < P{plane_id}; "
+                    f"line={line_coordinates}; plane={plane_coordinates}"
+                )
     for position in range(len(planes)):
         if position not in plane_vertices:
             return RowOutcome(
@@ -503,6 +511,7 @@ def row_contract(lattice, subgroup, label, lines, planes, incidences, route) -> 
                 return RowOutcome(
                     label, RowStatus.CONTRACT_VIOLATION, f"line cusp {position} carries no edge"
                 )
+    log(f"[{label}] audited {len(incidences)} distinct edges; ordered endpoint SHA-256: {edge_digest.hexdigest()}")
     return RowOutcome(
         label,
         RowStatus.DECIDED,
