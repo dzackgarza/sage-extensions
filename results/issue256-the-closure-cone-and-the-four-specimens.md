@@ -304,3 +304,49 @@ issues that mention `free_module`, and neither is this -- and whether the meet s
 repaired or the pinned image restored is a decision, not a measurement: the pinned runtime
 is Sage 11.0.beta5 and this host is Sage 10.8, so a meet that is correct on one is not
 established on the other by anything measurable here.
+
+## 10. Where the runtime block actually lives: `ExactRealField`'s parent class
+
+The previous section left the repair as "the meet or the pinned image".  This round found
+the mechanism, by asking the regular-module construction which class its base ring is and
+which classes in that class's MRO provide `free_module`:
+
+```
+class: _OwnedRingParent_with_category          (the owned integers, and the rationals)
+  sage_extensions.categories.rings.ring_foundation._OwnedRingParent
+  sage_extensions.owned_category.OwnedJoinCategory.parent_class
+  ... OwnedRings.ParentMethods                 <-- provides free_module
+
+class: ExactRealField_with_category
+  sage.rings.ring.Field
+  sage.rings.ring.Ring
+  sage.structure.parent_old.Parent
+  sage.categories.category.JoinCategory.parent_class
+  sage.categories.fields.Fields.parent_class
+```
+
+`ExactRealField` is a Python subclass of **Sage's** `sage.rings.ring.Field`, while every
+other owned ring is built on the repository's own `_OwnedRingParent`.  Sage's parent classes
+therefore come first in the MRO, and `free_module` resolves to
+`sage.categories.rings.Rings.ParentMethods.free_module` -- the earlier probe's
+`Rings.parent_class` provider -- instead of `OwnedRings.ParentMethods.free_module`.  On the
+argument `1` that method reads `base`, refuses it, and the construction of `RR` stops before
+anything in the geometry layer exists.
+
+Two hypotheses were tested and both fail, so this is not a category-meet ordering issue:
+
+* naming `OwnedRings()` first in the meet `ExactRealField.__init__` builds changes nothing;
+  the same `ValueError` comes back from the same line;
+* patching Sage's `Rings.ParentMethods.free_module` before importing the module changes
+  nothing either, because Sage copies the method into the dynamically generated parent class
+  when that class is created.
+
+The file that would have to change is `src/sage_extensions/rings/real.py`, and the issue that
+declares it its owner is **dzackgarza/sage-extensions#97** ("The real line is a smooth
+manifold"), whose stated owner and delta are "`rings/real.py` and `categories/manifolds.py`"
+and whose subject is exactly how `RR` is constructed.  `#153` records a symptom of the same
+root (`matrix_rank()` over `ExactRealField`: "base_ring Real Field must be a ring"), and
+`#97` is the one that owns the construction.
+
+So the surgery item, the Sterk4-rank test and the folding identification all wait on `#97`,
+or on the pinned Sage 11.0.beta5 image, and nothing in this issue can move them.
