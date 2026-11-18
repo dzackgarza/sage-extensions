@@ -285,3 +285,51 @@ exit 0, 290.9 s
 Peak tree RSS 340 MiB on the second probe. The tests of the two touched
 behaviours are `tests/lattices/test_the_stable_orthogonal_group_generators_refuse.sage`
 and `tests/lattices/test_the_coble_lattice_carries_no_generating_set.sage`.
+
+## 6. Re-decided against the level-four theorem
+
+The five items below are decided on this tree. None of them is a generation
+proof, and the one that would be is stated as open with its exact statement.
+
+| item | state | where |
+|---|---|---|
+| the preimage owner | decided: `PreimageSubgroups`, not `KernelSubgroups` | `predicate_subgroups.py:1646`, install `:1655`-`:1657`, method `:1678`/`:1684`; the index it consumes at `groups.py:673`/`:677` |
+| integral isometry, per generator | delivered | `tests/lattices/test_the_coble_kernel_candidates_pass_the_generator_checks.sage`, `lattices.py:4149` is the descending check the library owns |
+| trivial discriminant action, per generator | delivered | same file; the library's own assert for a constructed family is `lattices.py:4594` |
+| a generating family, provably complete | **open** | `stable_orthogonal_group_generators`, `lattices.py:4404`, refuses; nothing is stored as a generating set |
+| no coset enumeration in the proof | delivered for the level-four statement | `\Gamma(2)/\Gamma(4) \cong (\mathbb{Z}/2)^{56}` by linear algebra in 56 dimensions, not by the 46 998 591 897 600-coset transversal |
+
+**The 56 candidates.**  The test file carries 56 vectors of square `\pm 2` in
+`T_Co`'s own form, i.e. of square `\pm 1` in the odd unimodular half, in the
+catalogue's basis; it builds each reflection with `L.reflection`, which is the
+library's own integral reflection, checks the displacement of every generator
+against the reflection formula, and asserts for every one that its discriminant
+image is trivial and that it lies in `stable_orthogonal_group()`.  The family is
+not stored anywhere else and is not the value of any field: a candidate whose
+completeness is open is not a generating set.  What makes the family worth
+carrying is the level-four statement: with `X = I + 2A` the exact identity
+`A^T G_M + G_M A + 2 A^T G_M A = 0` forces, after the divided diagonal, the row
+sums `\sum_{k \ne i} A_{ik} = 0` beside symmetry, ten independent conditions on
+the 66-dimensional symmetric space, so `\Gamma(2)/\Gamma(4)` is
+`(\mathbb{Z}/2)^{56}`; the 56 classes of the candidates were checked to be
+independent, hence they generate `\Gamma(2)` modulo `\Gamma(4)`.
+
+**What that does not give, and why it cannot be upgraded cheaply.**  A family
+that generates modulo `\Gamma(4)` generates only if `\Gamma(4)` is inside the
+subgroup it generates.  Two facts bound that: the reflection classes span all
+56 dimensions, so no level-four computation can separate the family from
+`\Gamma(2)`; and no finite-level computation can, since `H\cdot\Gamma(2^k) =
+\Gamma` for every `k` is compatible with `H` of infinite index (`3\mathbb{Z}`
+inside `\mathbb{Z}` with the `2`-power filtration).  The statement that would
+close it is `\Gamma(4) \leq \langle S\rangle`, equivalently that the maximal
+elementary abelian quotient of `\Gamma` is exactly `\Gamma/\Gamma(4)`; if it
+holds, the Frattini argument turns the 56 candidates into `\Gamma = \langle S\rangle`
+outright.
+
+**The database end, measured.**  `tests/cards/lattice-database-enriques.json`
+lists the arithmetic-group rows as `data.cardinality`,
+`data.abstract_structure`, `data.line_orbits`, `data.plane_orbits`,
+`data.flag_orbits`, `data.reference.citation`, `latex`, `lattice` and
+`parent_group`; `data.generator_morphisms` is not among them, so the field is
+absent at both ends — the library refuses to produce it and the digest this
+repository reads would not carry it if it did.
