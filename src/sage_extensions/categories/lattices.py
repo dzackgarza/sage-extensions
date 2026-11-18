@@ -2841,10 +2841,16 @@ class Lattices(OwnedCategoryOverBaseRing):
         are computed by integer linear algebra in this repository, from Dutour
         Sikirić--Hulek's block equations (Theorem 4.9, `theorem_isotropic_k_planes`,
         printed pp. 33--34), which determine them whether or not the plane splits off
-        the lattice.  The port's rank-two branch answers the same question by
-        converting each rational generator of its integral-structure action to
-        an integral isometry, and on \(T_{\mathrm{En}}\) that conversion does not
-        return (`TRAPS.md`).
+        the lattice.
+
+        When it is a primitive isotropic *line* \\(I=\mathbf Z e\\), they are the two
+        factors of the Levi split (:meth:`_isotropic_line_stabilizer_generators`):
+        the quotient action on \\(K_I=I^\perp/I\\) is onto with the section its own
+        construction selects, so one lift of each generator of \\(O(K_I)\\), together
+        with the kernel's own generators, generates the whole of the stabilizer.
+        The port's rank-one branch answers the same question by converting every
+        member of the integral-structure action's orbit Schreier family to an
+        integral isometry, one conversion per `(orbit point, letter)` pair.
 
         A coslice marking asks for the pointwise stabilizer of the plane, and an
         oriented plane for the kernel of the determinant on the plane; both are
@@ -2853,7 +2859,7 @@ class Lattices(OwnedCategoryOverBaseRing):
         parabolic = (
             None
             if isinstance(diagram_category, (CosliceCategory, OrientedIsotropicFlags))
-            else self._isotropic_plane_parabolic_generators(marked)
+            else self._isotropic_parabolic_generators(marked)
         )
         if parabolic is not None:
             return parabolic
@@ -2863,18 +2869,34 @@ class Lattices(OwnedCategoryOverBaseRing):
 
         return automorphism_group_generators(diagram_category, marked)
 
-    def _isotropic_plane_parabolic_generators(self, marked):
-        r"""Generators of the parabolic at a plane marking, or ``None`` when this is not one.
+    def _isotropic_parabolic_generators(self, marked):
+        r"""Generators of the parabolic at a primitive isotropic marking, or ``None``.
 
-        The marking must be an arrow whose source is a primitive totally
-        isotropic plane of an indefinite lattice over `ZZ`, and the lattice must
-        split along the plane; otherwise ``None`` is returned and the caller
-        keeps its own route.
+        Rank one is the Levi two-factor family
+        (:meth:`_isotropic_line_stabilizer_generators`) and rank two the block
+        family (:meth:`_isotropic_plane_parabolic_generators`).  Any other
+        marking -- a coslice object, a flag, another rank, another base ring --
+        is answered with ``None`` so the caller keeps its own route.
         """
-        from sage_extensions.categories.isotropic_parabolics import (
-            PrimitiveIsotropicSubobjects,
-        )
+        plane = self._isotropic_plane_parabolic_generators(marked)
+        if plane is not None:
+            return plane
+        return self._isotropic_line_stabilizer_generators(marked)
 
+    def _marked_primitive_isotropic_subobject(self, marked):
+        r"""The primitive isotropic subobject an arrow marking names, or ``None``.
+
+        Shared by the two parabolic constructions below.  The marking is an
+        arrow whose source is a primitive totally isotropic sublattice of rank
+        one or two in an indefinite *even* lattice over `ZZ`; every other
+        marking is answered with ``None``.
+
+        Evenness is a hypothesis of both families, not a convenience: their
+        elementary members are the Eichler transvections, whose coefficient
+        ``q(x)/2`` is half-integral on an even lattice, and on an odd lattice
+        the elementary generators are the reflections in the norm-``\pm 1``
+        vectors instead.
+        """
         arrow_member = getattr(marked, "arrow", None)
         if arrow_member is None:
             return None
@@ -2887,26 +2909,39 @@ class Lattices(OwnedCategoryOverBaseRing):
         if codomain.is_definite() is not False:
             return None
         if codomain.is_even() is not True:
-            # The radical's elementary transvections have the half-integral
-            # coefficient q(x)/2 of an even lattice; on an odd lattice the
-            # elementary generators are the reflections in the norm-+-1 vectors
-            # instead, and this construction is not stated for them.
             return None
         domain = arrow.domain()
-        if domain.module_rank() != cardinal(2):
+        rank = domain.module_rank()
+        if rank.is_finite() is not True or int(rank) not in (1, 2):
             return None
         images = tuple(
             arrow(domain.module_generator(label))
             for label in domain.module_generating_set()
         )
-        if len(images) != 2:
+        if len(images) != int(rank):
             return None
         zero = codomain.base_ring().zero()
-        if any(codomain.q(image) != zero for image in images) or codomain.b(
-            images[0], images[1]
-        ) != zero:
+        if any(codomain.q(image) != zero for image in images):
             return None
-        subobject = codomain.primitive_isotropic_subobject(*images)
+        if any(
+            codomain.b(left, right) != zero
+            for index, left in enumerate(images)
+            for right in images[index + 1:]
+        ):
+            return None
+        return codomain.primitive_isotropic_subobject(*images)
+
+    def _isotropic_plane_parabolic_generators(self, marked):
+        r"""Generators of the parabolic at a plane marking, or ``None`` when this is not one.
+
+        The marking must be an arrow whose source is a primitive totally
+        isotropic plane of an indefinite even lattice over `ZZ`, and the lattice
+        must split along the plane; otherwise ``None`` is returned and the
+        caller keeps its own route.
+        """
+        subobject = self._marked_primitive_isotropic_subobject(marked)
+        if subobject is None or int(subobject.module_rank()) != 2:
+            return None
         # Without a splitting L = P + U + K the block-equation family is only a
         # subgroup of the parabolic (is_parabolic_complete); the port's route
         # computes the whole stabilizer there.
@@ -2916,6 +2951,56 @@ class Lattices(OwnedCategoryOverBaseRing):
         if not family:
             return None
         return finite_ordered_set(family)
+
+    def _isotropic_line_stabilizer_generators(self, marked):
+        r"""Generators of the setwise stabilizer of a primitive isotropic line, or ``None``.
+
+        The marking must be an arrow whose source is a primitive isotropic line
+        `I = \mathbf Z e` of an indefinite even lattice over `ZZ` whose quotient
+        `K_I = I^\perp/I` has positive rank, and every generator of `O(K_I)`
+        must lie in the image of the quotient action; otherwise ``None`` is
+        returned and the caller keeps its own route.
+
+        The family is the two factors of that action.  `\rho: P_I -> O(K_I)`,
+        `g |-> g|_{I^\perp/I}`, is a surjective group morphism whose kernel is
+        the pointwise part of the parabolic, and the construction of
+        :meth:`sage_extensions.categories.lattices.Lattices.ParentMethods.isotropic_reduction`
+        states both: the section it selects on the image gives one lift of an
+        isometry of `K_I` (Zemel, arXiv:1902.08264v2, Proposition 1.6 on printed
+        p. 10, is the structure -- the parabolic maps onto the Levi quotient
+        with the unipotent radical as kernel), and its selected kernel
+        generators are `F^+(1) = K_{\mathbf Z}`, the integral Eichler
+        transvection kernel, together with one reversing element when that fibre
+        is nonempty.
+
+        For `g` in `P_I`, `\rho(g)` is a word in the selected generators of
+        `O(K_I)`; the same word in their lifts is an element of `P_I` with the
+        same image, so `g` differs from it by an element of the kernel and is a
+        word in the family.  Each lift carries a check that its isometry lies in
+        the image, so a proper image is refused here rather than answered with
+        a family that generates only a subgroup.
+
+        What the family costs is the size of the two factors -- the generators
+        of `O(K_I)` and the kernel's family -- not the `|orbit| * |letters|`
+        members of the orbit Schreier family that the port's rank-one branch
+        converts one by one.
+        """
+        subobject = self._marked_primitive_isotropic_subobject(marked)
+        if subobject is None or int(subobject.module_rank()) != 1:
+            return None
+        reduction = subobject.isotropic_reduction()
+        quotient = reduction.quotient_lattice()
+        rank = quotient.module_rank()
+        if rank.is_finite() is not True or int(rank) == 0:
+            return None
+        lifts = []
+        for generator in quotient.O().group_generators():
+            lift = reduction.levi_lift(generator)
+            if lift is None:
+                return None
+            lifts.append(lift)
+        kernel = tuple(reduction.levi_action().kernel().group_generators())
+        return finite_ordered_set(tuple(lifts) + kernel)
 
     def _marking_component(self, source_marking, target_marking, apex):
         r"""Implementer side of the marked-diagram contract: ``alpha`` with ``kappa alpha = g iota``.

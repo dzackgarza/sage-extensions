@@ -15,11 +15,13 @@ nonidentity image epimorphism, so the reading of ``L_p``'s own generators is
 exercised rather than an identity.
 
 The order of the two factors is the one ``orbit_schreier_factors`` documents,
-and the comparison against a realized family is a set because a Schreier family
-names words, not distinct elements: on these specimens the family has repeated
-images.  For the line, ``Stab_{O(L)}(Zu)`` is the parabolic subgroup, so its own
-realized generators are that family's distinct images and the comparison needs
-no private stabilizer handle.
+and the comparison is a set because a Schreier family names words, not distinct
+elements: on these specimens the family has repeated images.  The target of the
+comparison is the word itself, ``~t_(s.p) * s * t_p`` in the rational group the
+action is generated in, converted along ``L``: the family a stabilizer presents
+as its generators is a choice (the line's is its two Levi factors,
+``_isotropic_line_stabilizer_generators``), while the composite law is about
+the family the orbit defines.
 """
 
 from sage_extensions.all import *  # noqa: F401,F403
@@ -74,25 +76,46 @@ def _factor_composites(subobject):
     return tuple(composites)
 
 
-def test_the_line_stabilizers_family_is_its_factors_composites() -> None:
-    r"""Every composite of a letter with its two transports is a member of the realized family.
+def _realized_words(subobject):
+    r"""The orbit's Schreier family as isometries of `L`: one conversion per word.
 
-    A composite is an isometry of ``L`` and it stabilizes the line, and the set
-    of composites is exactly the set of the parabolic subgroup's own generators.
-    A ``middle_transport`` that read the transported source basis instead of
-    ``L_p``'s own generators gives a different map on this specimen, so the two
-    sets would differ.
+    ``stabilizer_schreier_factors`` returns the letters and the transversals as
+    elements of the rational group, so the word of the pair `(p, s)` is
+    ``~t_(s.p) * s * t_p`` there and its conversion along the ambient lattice is
+    that word as an isometry of `L`.
+    """
+    letters, transversals = subobject.stabilizer_schreier_factors()
+    records = subobject.orbit_lattice_records()
+    lattice = subobject.ambient_lattice()
+    words = []
+    for position, _record in enumerate(records):
+        for letter in tuple(letters):
+            middle = subobject.middle_transport(position, letter)
+            target = _orbit_position(records, middle.codomain())
+            words.append((~transversals[target]) * letter * transversals[position])
+    return tuple(lattice.integral_isometry(word) for word in words)
+
+
+def test_the_line_stabilizers_family_is_its_factors_composites() -> None:
+    r"""Every composite of a letter with its two transports is the word it names.
+
+    A composite is an isometry of ``L`` admitted by the parabolic, and the set
+    of composites is exactly the set of the orbit's Schreier words converted
+    along ``L``.  A ``middle_transport`` that read the transported source basis
+    instead of ``L_p``'s own generators gives a different map on this specimen,
+    so the two sets would differ.
     """
     lattice, line, subobject = _line_specimen()
     parabolic = subobject.parabolic_subgroup()
     composites = _factor_composites(subobject)
     assert all(composite in lattice.Isom(lattice) for composite in composites)
+    assert all(composite in parabolic for composite in composites)
     assert all(
         composite(line) == line
         or composite(line) == lattice.scalar_multiple(lattice.base_ring()(-1), line)
         for composite in composites
     )
-    assert set(composites) == set(parabolic.group_generators())
+    assert set(composites) == set(_realized_words(subobject))
 
 
 def test_the_line_stabilizers_family_negates_the_line_somewhere() -> None:
