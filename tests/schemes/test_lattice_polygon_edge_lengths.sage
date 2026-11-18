@@ -127,3 +127,64 @@ def test_edge_directions_with_no_positive_relation_close_no_polygon() -> None:
     assert lengths.contains(weights((0, 0)))
     assert not lengths.contains(weights((1, 0)))
     assert not lengths.contains(weights((0, 1)))
+
+
+def test_the_sterk2_boundary_path_closes_with_the_horizontal_side() -> None:
+    r"""The Sterk2 cusp's polygon has eighteen cyclic edges, not nineteen.
+
+    Coble cell 59 lists nineteen vectors labelled ``Sterk2Vectors``, and Sterk cells 7--8
+    give the two roles they have: ``v_1 = (-1,2)`` and ``v_19 = (1,2)`` are the surgery
+    triangles' side directions, and ``v_2`` through ``v_18`` are the seventeen steps of a
+    boundary path walked from the origin.  Every one of those seventeen has a nonpositive
+    x-coordinate, so the path cannot close on itself: it ends at ``(-24, 0)`` for the
+    stored lengths, and the closing side runs back along ``(1,0)``, which is the side the
+    plotter's convex hull supplies.  The polygon's edge directions are therefore ``v_2``
+    through ``v_18`` followed by ``(1,0)``.
+
+    The stored lengths are not the lattice lengths: the source's ``M_18_0_0`` halves the
+    odd-labelled ones and adds ``l_1/2`` to ``v_4`` and ``l_19/2`` to ``v_16``.  Read
+    through that matrix the seventeen boundary coefficients are
+    ``1, 1, 3, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 3, 1, 1``, so one prescribed direction has
+    length zero in this specimen and the closing side has length ``24``.  The closure cone
+    of the eighteen directions is sixteen-dimensional with sixty-five primitive rays, and
+    exactly two of those rays have a two-element support: the two antipodal pairs
+    ``{(0,1), (0,-1)}`` and ``{(-1,0), (1,0)}``.
+    """
+    plane = ZZ.free_module(2)
+    directions = (
+        (0, 1), (-1, 4), (-1, 3), (-2, 5), (-1, 2), (-2, 3), (-1, 1), (-2, 1), (-1, 0),
+        (-2, -1), (-1, -1), (-2, -3), (-1, -2), (-2, -5), (-1, -3), (-1, -4), (0, -1),
+        (1, 0),
+    )
+    weights = ZZ.free_module(18)
+    edge_directions = weights.Mor(plane)(
+        {index: plane(direction) for index, direction in enumerate(directions)}
+    )
+    lengths = RationalPolyhedralCones(weights).from_nonnegative_solutions(edge_directions)
+
+    boundary_coefficients = (1, 1, 3, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 3, 1, 1)
+    closing_length = 24
+    closure = sum(
+        coefficient * plane(direction)
+        for coefficient, direction in zip(boundary_coefficients, directions[:-1])
+    ) + closing_length * plane((1, 0))
+    assert closure == plane.zero()
+
+    assert lengths.dimension() == 16
+    assert lengths.is_pointed()
+    assert lengths.primitive_rays().cardinality() == 65
+    assert lengths.has_a_nonzero_point()
+    assert lengths.has_a_strictly_positive_point()
+
+    stored = weights(boundary_coefficients + (closing_length,))
+    assert lengths.contains(stored)
+
+    two_element_rays = tuple(
+        tuple(int(coordinate) for coordinate in ray.to_vector())
+        for ray in lengths.primitive_rays()
+        if sum(1 for coordinate in ray.to_vector() if coordinate != 0) == 2
+    )
+    assert two_element_rays == (
+        (0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1),
+        (1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0),
+    )

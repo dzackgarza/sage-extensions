@@ -287,3 +287,61 @@ def test_one_cone_with_a_lineality_of_non_unit_pivot_is_one_hash() -> None:
     assert hash(short) == hash(longer)
     assert cardinal(sum(1 for _ in {short, longer})) == cardinal(1)
     assert short.lineality_generators() == longer.lineality_generators()
+
+
+def test_a_nonzero_point_and_a_strictly_positive_point_are_two_decisions() -> None:
+    r"""Three directions, two of them opposite, have closed polygons and none using all three.
+
+    The closure cone of ``(1,0), (-1,0), (0,1)`` is ``l_1 = l_2, l_3 = 0``: one free
+    parameter, so the cone is nonzero and its single primitive ray is ``(1,1,0)``.  No
+    point of it has a positive third coordinate, so no polygon uses all three prescribed
+    edges.  Its being nonzero is not the same decision as its meeting the open orthant,
+    and the empty cone of two independent directions answers ``False`` to both.
+    """
+    plane = ZZ.free_module(2)
+    weights = ZZ.free_module(3)
+    edge_directions = weights.Mor(plane)(
+        {0: plane((1, 0)), 1: plane((-1, 0)), 2: plane((0, 1))}
+    )
+    lengths = RationalPolyhedralCones(weights).from_nonnegative_solutions(edge_directions)
+
+    assert lengths.dimension() == 1
+    assert lengths.has_a_nonzero_point()
+    assert not lengths.has_a_strictly_positive_point()
+    assert lengths.primitive_rays().cardinality() == 1
+    assert weights((1, 1, 0)) in lengths.primitive_rays()
+    assert lengths.contains(weights((3, 3, 0)))
+    assert not lengths.contains(weights((1, 1, 1)))
+
+
+def test_the_open_orthant_and_the_cone_meet_exactly_when_a_positive_relation_exists() -> None:
+    r"""A direction family with a strictly positive relation has a polygon on every edge.
+
+    The four primitive directions ``(1,-1), (1,1), (-1,1), (-1,-1)`` close with the
+    strictly positive lengths ``(3,2,3,2)``, so the closure cone meets the open orthant;
+    it is two-dimensional, spanned by ``(1,0,1,0)`` and ``(0,1,0,1)``.  Two independent
+    directions have the zero cone, which contains no nonzero point and meets no open
+    orthant.
+    """
+    plane = ZZ.free_module(2)
+    weights = ZZ.free_module(4)
+    edge_directions = weights.Mor(plane)(
+        {
+            0: plane((1, -1)),
+            1: plane((1, 1)),
+            2: plane((-1, 1)),
+            3: plane((-1, -1)),
+        }
+    )
+    lengths = RationalPolyhedralCones(weights).from_nonnegative_solutions(edge_directions)
+    assert lengths.dimension() == 2
+    assert lengths.has_a_nonzero_point()
+    assert lengths.has_a_strictly_positive_point()
+    assert lengths.contains(weights((3, 2, 3, 2)))
+
+    independent = ZZ.free_module(2)
+    pair = independent.Mor(plane)({0: plane((1, 0)), 1: plane((0, 1))})
+    none = RationalPolyhedralCones(independent).from_nonnegative_solutions(pair)
+    assert none.dimension() == 0
+    assert not none.has_a_nonzero_point()
+    assert not none.has_a_strictly_positive_point()
