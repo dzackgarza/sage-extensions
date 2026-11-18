@@ -8019,6 +8019,79 @@ def _owned_real_algebraic_numbers() -> _OwnedRingParent:
     return _OwnedRingParent(SageAA, named_placement=_real_algebraic_placements)
 
 
+def _real_algebraic_conjugates(number) -> tuple:
+    r"""The roots of the minimal polynomial of a real algebraic number, in the algebraic closure.
+
+    Private adapter of the real algebraic numbers: the minimal polynomial is the
+    ring's and its roots are read in the algebraic closure of the rationals,
+    both exactly.  A conjugate of the number is a root of that polynomial.
+    """
+    from sage.rings.qqbar import QQbar
+
+    engine = _engine_element(_owned_real_algebraic_numbers(), number)
+    return tuple(root for root, _multiplicity in engine.minpoly().roots(QQbar))
+
+
+def _perron_number_decision(number) -> bool:
+    r"""Whether a real algebraic number is a Perron number.
+
+    A Perron number is a real algebraic integer \(\alpha>1\) whose other
+    conjugates all have modulus less than \(\alpha\) (Lind, *The entropies of
+    topological Markov shifts and a related class of algebraic integers*,
+    Ergodic Theory Dynam. Systems 4 (1984)).  The growth rate of a faithful
+    train track map is such a number, and so is the growth rate of a hyperbolic
+    Coxeter group when it is not a Salem number.  Being an algebraic integer is
+    the minimal polynomial being monic, so \(1/2\) is not a Perron number, and
+    \(1\) is excluded by the strict inequality.
+    """
+    real_algebraics = _owned_real_algebraic_numbers()
+    engine = _engine_element(real_algebraics, real_algebraics(number))
+    if not engine > 1:
+        return False
+    if not engine.minpoly().is_monic():
+        return False
+    return all(
+        abs(conjugate) < engine
+        for conjugate in _real_algebraic_conjugates(number)
+        if conjugate != engine
+    )
+
+
+def _salem_number_decision(number) -> bool:
+    r"""Whether a real algebraic number is a Salem number.
+
+    A Salem number is a real algebraic integer \(\alpha>1\) whose conjugates
+    all have modulus at most \(1\), at least one of them on the unit circle, so
+    that \(\alpha^{-1}\) is a conjugate of \(\alpha\) and the minimal polynomial
+    is reciprocal.  The growth rate of a cocompact hyperbolic Coxeter group is
+    one (Parry, *Growth series of Coxeter groups and Salem numbers*, 1990, as
+    quoted by Kellerhals–Kolpakov, *The minimal growth rate of cocompact
+    Coxeter groups in hyperbolic 3-space*, Canad. J. Math. 66 (2014) 354–372).
+    """
+    real_algebraics = _owned_real_algebraic_numbers()
+    engine = _engine_element(real_algebraics, real_algebraics(number))
+    if not engine > 1:
+        return False
+    if not engine.minpoly().is_monic():
+        return False
+    conjugates = tuple(
+        conjugate for conjugate in _real_algebraic_conjugates(number) if conjugate != engine
+    )
+    return any(abs(conjugate) == 1 for conjugate in conjugates) and all(
+        abs(conjugate) <= 1 for conjugate in conjugates
+    )
+
+
+def _perron_numbers():
+    r"""The Perron numbers, as the class of real algebraic numbers they cut out."""
+    return _owned_real_algebraic_numbers().condition_set(_perron_number_decision)
+
+
+def _salem_numbers():
+    r"""The Salem numbers, as the class of real algebraic numbers they cut out."""
+    return _owned_real_algebraic_numbers().condition_set(_salem_number_decision)
+
+
 @cached_function(key=lambda characteristic: int(characteristic))
 def _owned_algebraic_closure_finite_field(characteristic: int) -> _OwnedRingParent:
     r"""The algebraic closure of a finite prime field, keyed by characteristic.

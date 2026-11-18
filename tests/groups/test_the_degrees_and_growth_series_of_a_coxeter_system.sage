@@ -183,3 +183,82 @@ def test_the_longest_element_of_a2_is_the_alternating_word():
     group = Groups.Coxeter(["A", 2])
     first, second = tuple(group.group_generators())
     assert group.longest_element() == first * second * first
+
+
+
+def _one_minus_power(degree):
+    r"""The owned polynomial $1-t^{\text{degree}}$."""
+    return _polynomial((1,)) - _polynomial(tuple(0 for _ in range(degree)) + (1,))
+
+
+def test_the_simple_and_positive_roots_of_a_finite_system():
+    r"""The rank counts the simple roots, and the positive roots number $\sum_i(d_i-1)$."""
+    for label, expected in ((("A", 2), 3), (("B", 2), 4), (("G", 2), 6), (("H", 3), 15), (("A", 3), 6)):
+        group = Groups.Coxeter(list(label))
+        rank = sum(1 for _degree in group.degrees())
+        positive = group.positive_roots()
+        assert int(group.simple_roots().cardinality()) == rank
+        assert int(positive.cardinality()) == expected
+        assert int(positive.cardinality()) == sum(
+            (int(degree) - 1 for degree in group.degrees()), 0
+        )
+
+
+def test_the_positive_roots_of_a2_are_the_simple_roots_and_their_sum():
+    r"""The three positive roots of $A_2$ are $\alpha_1$, $\alpha_2$ and their sum."""
+    first, second, third = tuple(Groups.Coxeter(["A", 2]).positive_roots())
+    assert first + second == third or first + third == second or second + third == first
+
+
+def test_the_fundamental_chamber_is_the_dual_cone_of_the_simple_roots():
+    r"""$\alpha_1+\alpha_2$ is in the chamber of $A_2$, and $-(\alpha_1+\alpha_2)$ and $\alpha_1-\alpha_2$ are not."""
+    group = Groups.Coxeter(["A", 2])
+    chamber = group.fundamental_chamber()
+    first, second = tuple(group.simple_roots())
+    assert first + second in chamber
+    assert -(first + second) not in chamber
+    assert first - second not in chamber
+
+
+def test_the_molien_series_of_the_invariant_ring_is_the_product_over_the_degrees():
+    r"""$k[V]^{W(A_2)}$ has Molien series $1/((1-t^2)(1-t^3))$, and $W(H_3)$ the product over $2,6,10$."""
+    series = Groups.Coxeter(["A", 2]).molien_series()
+    expected = _one_minus_power(2) * _one_minus_power(3)
+    assert series.numerator() == _polynomial((1,))
+    assert series.denominator() == expected or series.denominator() == -expected
+    series = Groups.Coxeter(["H", 3]).molien_series()
+    expected = _one_minus_power(2) * _one_minus_power(6) * _one_minus_power(10)
+    assert series.denominator() == expected or series.denominator() == -expected
+
+
+def test_lehmer_number_is_in_the_owned_perron_and_salem_classes():
+    r"""The $(2,3,7)$ growth rate is a Salem number, and the Salem numbers lie in the Perron numbers."""
+    growth_rate = Groups.Coxeter([[1, 3, 2], [3, 1, 7], [2, 7, 1]]).growth_rate()
+    assert growth_rate in PerronNumbers
+    assert growth_rate in SalemNumbers
+
+
+def test_the_two_classes_separate_what_their_definitions_separate():
+    r"""$2$ and $3$ are Perron numbers, $\sqrt2$ and $1/2$ are not, and $3$ has no conjugate on the unit circle."""
+    assert AA(2) in PerronNumbers
+    assert AA(3) in PerronNumbers
+    assert AA(3) not in SalemNumbers
+    assert AA(2).sqrt() not in PerronNumbers
+    assert (QQ(1) / QQ(2)) not in PerronNumbers
+    assert AA(1) not in PerronNumbers
+    assert AA(1) not in SalemNumbers
+
+
+def test_the_growth_rate_of_a_finite_or_affine_group_is_not_a_perron_number():
+    r"""The growth rate of a finite or affine system is $1$, which neither class contains."""
+    assert Groups.Coxeter(["A", 2]).growth_rate() not in PerronNumbers
+    assert Groups.Coxeter([[1, -1], [-1, 1]]).growth_rate() not in PerronNumbers
+
+
+def test_the_growth_series_of_the_affine_a2_group_is_one_plus_t_plus_t2_over_one_minus_t_squared():
+    r"""The affine $A_2$ system has $W(t)=(1+t+t^2)/(1-t)^2$, whose layers are $3k$ for $k\geq1$."""
+    series = Groups.Coxeter(["A", 2, 1]).poincare_series()
+    assert series.numerator() * (_one_minus_power(1) * _one_minus_power(1)) == _polynomial(
+        (1, 1, 1)
+    ) * series.denominator()
+    assert Groups.Coxeter(["A", 2, 1]).euler_characteristic() == 0

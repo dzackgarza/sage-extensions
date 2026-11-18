@@ -3197,6 +3197,93 @@ def _coxeter_growth_series_polynomials(rows):
     return series.numerator(), series.denominator()
 
 
+def _coxeter_real_representation(rows):
+    r"""The Gram matrix and the simple reflections of ``rows`` over the real algebraic numbers.
+
+    \(B(e_v,e_v)=1\), \(B(e_v,e_w)=-\cos(\pi/m_{vw})\), an infinite bond taking
+    the parallel boundary value \(\cos(\pi/\aleph_0)=-1\), and
+    \(s_v\colon x\mapsto x-2B(x,e_v)e_v\) acting on the coordinates in the
+    basis \(e_v\) of the simple roots (Humphreys, *Reflection groups and
+    Coxeter groups*, §5.3).  The coefficients are compared and ordered here,
+    which is what the positivity of a root needs, so they are real algebraic
+    numbers and not elements of a cyclotomic field.
+    """
+    from sage.all import AA as engine_real_algebraics
+    from sage.all import cos, pi
+
+    size = len(rows)
+    gram = [
+        [
+            engine_real_algebraics(1)
+            if left == right
+            else -engine_real_algebraics(-1)
+            if rows[left][right] is None
+            else -engine_real_algebraics(cos(pi / rows[left][right]))
+            for right in range(size)
+        ]
+        for left in range(size)
+    ]
+    reflections = []
+    for vertex in range(size):
+        reflection = [
+            [engine_real_algebraics(1) if row == column else engine_real_algebraics(0) for column in range(size)]
+            for row in range(size)
+        ]
+        for column in range(size):
+            reflection[vertex][column] = -2 * gram[vertex][column]
+        reflection[vertex][vertex] = engine_real_algebraics(-1)
+        reflections.append(reflection)
+    return gram, tuple(reflections)
+
+
+def _coxeter_root_orbit(rows):
+    r"""The root system of a finite Coxeter system, as coordinate tuples over the real algebraic numbers.
+
+    The roots are the translates of the simple roots by \(W\), so the orbit of
+    the simple roots under the simple reflections is the root system, and a
+    root is positive when its coordinates in the basis of simple roots are all
+    nonnegative and not all zero (Humphreys, *Reflection groups and Coxeter
+    groups*, §1.3 and §5.4).  Coordinates are over the real algebraic numbers,
+    which is an ordered field, so that test is exact.
+    """
+    size = len(rows)
+    _gram, reflections = _coxeter_real_representation(rows)
+    from sage.all import AA as engine_real_algebraics
+
+    def acted(reflection, coordinates):
+        return tuple(
+            sum(
+                (reflection[row][column] * coordinates[column] for column in range(size)),
+                engine_real_algebraics(0),
+            )
+            for row in range(size)
+        )
+
+    orbit = []
+    reached = set()
+    frontier = []
+    for vertex in range(size):
+        simple = tuple(
+            engine_real_algebraics(1) if position == vertex else engine_real_algebraics(0)
+            for position in range(size)
+        )
+        reached.add(simple)
+        orbit.append(simple)
+        frontier.append(simple)
+    while frontier:
+        following = []
+        for coordinates in frontier:
+            for reflection in reflections:
+                image = acted(reflection, coordinates)
+                if image in reached:
+                    continue
+                reached.add(image)
+                orbit.append(image)
+                following.append(image)
+        frontier = following
+    return tuple(orbit)
+
+
 def _owned_integer_polynomial(presentation, variable, polynomial):
     r"""The owned polynomial of an engine polynomial's integer coefficients.
 
@@ -8448,6 +8535,197 @@ class CoxeterGroups(OwnedCategory):
         def _integer_rows(self):
             r"""The rows of the retained Coxeter matrix, in the order of its vertices, \(\aleph_0\) as ``None``."""
             return _coxeter_integer_rows(self.coxeter_matrix())
+
+        def simple_roots(self):
+            r"""Return the simple roots, as the basis of the geometric representation.
+
+            The simple roots are the vectors \(\alpha_v=e_v\) of the geometric
+            representation \(V\) on which the simple reflection \(s_v\) acts by
+            \(x\mapsto x-2B(x,e_v)e_v\), with \(B(e_v,e_v)=1\) and
+            \(B(e_v,e_w)=-\cos(\pi/m_{vw})\) (Humphreys, *Reflection groups and
+            Coxeter groups*, §5.3).  They are indexed by the vertices of the
+            Coxeter matrix, in its order.
+
+            EXAMPLES::
+
+                sage: roots = tuple(Groups.Coxeter(["A", 2]).simple_roots())
+                sage: len(roots)
+                2
+                sage: roots[0] + roots[1] == roots[1] + roots[0]
+                True
+            """
+            from sage_extensions.categories.rings.ring_foundation import (
+                _owned_real_algebraic_numbers,
+            )
+            from sage_extensions.categories.sets.indexed_families import (
+                finite_indexed_family_from_values,
+            )
+
+            size = len(self._integer_rows())
+            real_algebraics = _owned_real_algebraic_numbers()
+            if size == 0:
+                return finite_indexed_family_from_values(None, ())
+            space = real_algebraics.free_module(size)
+            return finite_indexed_family_from_values(
+                None,
+                tuple(
+                    space(
+                        tuple(
+                            real_algebraics(1) if position == vertex else real_algebraics(0)
+                            for position in range(size)
+                        )
+                    )
+                    for vertex in range(size)
+                ),
+            )
+
+        def positive_roots(self):
+            r"""Return the positive roots of a finite Coxeter system.
+
+            The roots are the translates of the simple roots by \(W\), and a root
+            is positive when its coordinates in the basis of simple roots are
+            all nonnegative and not all zero (Humphreys, *Reflection groups and
+            Coxeter groups*, §1.3 and §5.4); the coordinates are real algebraic
+            numbers, an ordered field, so the test is exact.  Their number is
+            \(\sum_i(d_i-1)\), the number of reflections of \(W\), and for an
+            infinite \(W\) there are infinitely many, so only a finite
+            exponent can answer them here.
+
+            EXAMPLES::
+
+                sage: W = Groups.Coxeter(["A", 2])
+                sage: len(tuple(W.positive_roots()))
+                3
+                sage: W = Groups.Coxeter(["B", 2])
+                sage: len(tuple(W.positive_roots()))
+                4
+            """
+            from sage_extensions.categories.rings.ring_foundation import (
+                _owned_real_algebraic_numbers,
+            )
+            from sage_extensions.categories.sets.indexed_families import (
+                finite_indexed_family_from_values,
+            )
+
+            rows = self._integer_rows()
+            if not _coxeter_parabolic_is_finite(rows, tuple(range(len(rows)))):
+                raise ValueError(
+                    f"the positive roots of a Coxeter system are the finite root system of a finite "
+                    f"reflection group; the Coxeter diagram of {self} is not elliptic, so {self} has "
+                    f"infinitely many roots"
+                )
+            orbit = _coxeter_root_orbit(rows)
+            for root in orbit:
+                assert all(coordinate >= 0 for coordinate in root) or all(
+                    coordinate <= 0 for coordinate in root
+                ), (
+                    f"{root} is not a root: a root is a nonnegative or a nonpositive combination of the "
+                    f"simple roots"
+                )
+            positive = tuple(
+                root
+                for root in orbit
+                if all(coordinate >= 0 for coordinate in root) and any(coordinate != 0 for coordinate in root)
+            )
+            positive_roots = sum(degree - 1 for degree in _coxeter_degrees(rows))
+            assert len(positive) == positive_roots, (
+                f"the orbit of the simple roots of {self} has {len(positive)} positive roots, but W has "
+                f"{positive_roots} reflections"
+            )
+            from sage_extensions.categories.rings.ring_foundation import _owned_engine_element
+
+            real_algebraics = _owned_real_algebraic_numbers()
+            space = real_algebraics.free_module(len(rows))
+            return finite_indexed_family_from_values(
+                None,
+                tuple(
+                    space(
+                        tuple(
+                            _owned_engine_element(real_algebraics, coordinate) for coordinate in root
+                        )
+                    )
+                    for root in positive
+                ),
+            )
+
+        def fundamental_chamber(self):
+            r"""Return the closed fundamental chamber of the geometric representation, as a subset of \(V\).
+
+            The chamber is the dual cone of the simple roots,
+            \(C=\{x\in V : B(x,\alpha_v)\ge 0 \text{ for every } v\}\),
+            identified inside \(V\) through the Gram form of the geometric
+            representation; its walls are the mirrors of the simple reflections
+            (Humphreys, *Reflection groups and Coxeter groups*, ch. 5).
+            Only the chamber as a point set is represented here: the
+            polyhedral-cone structure is not, because the represented cones are
+            over a rational base and the coefficients of a non-crystallographic
+            geometric representation are irrational real algebraic numbers.
+
+            EXAMPLES::
+
+                sage: W = Groups.Coxeter(["A", 2])
+                sage: x, y = tuple(W.simple_roots())
+                sage: (x + y) in W.fundamental_chamber()
+                True
+                sage: (x - y) in W.fundamental_chamber()
+                False
+            """
+            from sage_extensions.categories.rings.ring_foundation import (
+                _owned_engine_element,
+                _owned_real_algebraic_numbers,
+            )
+
+            rows = self._integer_rows()
+            gram, _reflections = _coxeter_real_representation(rows)
+            real_algebraics = _owned_real_algebraic_numbers()
+            size = len(rows)
+            space = real_algebraics.free_module(size)
+
+            def is_in_the_chamber(vector):
+                coordinates = tuple(vector.to_vector())
+                return all(
+                    sum(
+                        (
+                            _owned_engine_element(real_algebraics, gram[wall][position])
+                            * coordinates[position]
+                            for position in range(size)
+                        ),
+                        real_algebraics(0),
+                    )
+                    >= 0
+                    for wall in range(size)
+                )
+
+            return space.condition_set(is_in_the_chamber)
+
+        def molien_series(self):
+            r"""Return the Molien series of the invariant ring of a finite reflection group.
+
+            The ring of invariants \(k[V]^W\) of the reflection representation is
+            a polynomial ring on \(n\) homogeneous generators of degrees
+            \(d_1,\dots,d_n\) (Chevalley, *Invariants of finite groups generated
+            by reflections*, Amer. J. Math. 77 (1955); Shephard–Todd, *Finite
+            unitary reflection groups*, Canad. J. Math. 6 (1954)), so its
+            Hilbert series — Molien's series — is
+            \(\prod_i\frac{1}{1-t^{d_i}}\), which is also Molien's formula
+            \(\frac{1}{|W|}\sum_{w\in W}\det(1-tw)^{-1}\) for the same ring.
+
+            EXAMPLES::
+
+                sage: W = Groups.Coxeter(["A", 2])
+                sage: series = W.molien_series()
+                sage: series.denominator() == (1 - t**2) * (1 - t**3)
+                True
+            """
+            from sage_extensions.categories.rings.ring_foundation import _owned_integers
+
+            presentation = _owned_integers().polynomial_ring("t")
+            variable = presentation.algebra_generator("t")
+            field = presentation.fraction_field()
+            denominator = presentation(1)
+            for degree in self.degrees():
+                denominator = denominator * (presentation(1) - variable ** int(degree))
+            return field(presentation(1)) / field(denominator)
 
         def degrees(self):
             r"""Return the degrees of the invariant ring of a finite Coxeter group.

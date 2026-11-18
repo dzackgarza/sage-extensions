@@ -72,6 +72,8 @@ from sage_extensions.categories.rings.ring_foundation import (
     _owned_rationals,
     _owned_real_algebraic_numbers,
     _owned_real_double_field,
+    _perron_numbers,
+    _salem_numbers,
 )
 from sage_extensions.categories.rings.ring_foundation import (
     ComplexField as _ComplexField,
@@ -162,6 +164,11 @@ def QuadraticField(discriminant, name="a"):
 ZZ = _owned_integers()
 QQ = _owned_rationals()
 AA = _public_commutative_ring(_owned_real_algebraic_numbers())
+# The two classes of real algebraic integers that the growth rate of a Coxeter
+# system lies in: a Perron number is the growth rate of an entropy, and a
+# cocompact hyperbolic reflection group has a Salem number (Parry).
+PerronNumbers = _perron_numbers()
+SalemNumbers = _salem_numbers()
 QQbar = _public_commutative_ring(_owned_algebraic_numbers())
 RDF = _public_commutative_ring(_owned_real_double_field())
 CDF = _public_commutative_ring(_owned_complex_double_field())
@@ -257,6 +264,7 @@ __all__ = [
     "OwnedOrderedRings",
     "OwnedPrincipalIdealDomains",
     "OwnedRings",
+    "PerronNumbers",
     "OwnedRngs",
     "OwnedSemirings",
     "PredicateSubrings",
@@ -293,6 +301,7 @@ __all__ = [
     "zeta",
     "RealApproximation",
     "RealField",
+    "SalemNumbers",
     "RealNumber",
     "RingMor",
     "RingMorphism",
