@@ -236,3 +236,80 @@ and the seven smooth-manifold consumer files earlier in this pass,
 `25 passed in 219.96 s`, with the one pre-existing call-gate overrun
 (`test_a_coordinate_of_a_complex_chart_is_a_section_valued_in_the_complex_field`,
 200.29 s here, 194.14 s on the parent tree) named rather than fixed.
+
+## Third pass: the six items decided again, and the last composition case closed
+
+On this tree the two commits are `fb99f6f` (test) and `ec6a6ea` (fix); this
+note is the head.  The line numbers below are this tree's; the first two
+sections keep their own.
+
+1. **Public red proof of the missing map constructor.** Delivered; unchanged by
+   this pass.  On `f4e467f`: `3 failed in 10.36 s`, the rows at
+   `tests/objects/test_the_proper_chart_domain_includes_smoothly.sage:46` and
+   `:65` (`assert None in Set of Morphisms from ... open submanifold U ... to
+   ... R^2 in Category of smooth manifolds`) and
+   `categories/abstract_categories/mor_foundation.py:61`
+   (`TypeError: SmoothManifoldMor._element_constructor_() missing 1 required
+   positional argument: 'chart_maps'`, stub `manifolds.py:1362` there).
+
+2. **The owned inclusion, source and target.** Delivered.
+   `SmoothManifolds.ParentMethods.open_submanifold_inclusion`,
+   `manifolds.py:1796`; the arrow is built at `manifolds.py:1824`.  Probed on
+   this tree: in `domain.Mor(plane)`, `domain() is domain`,
+   `codomain() is plane`, `chart.domain() is domain`.
+
+3. **Point values are the same intrinsic point.** Delivered.
+   `_evaluate_point`, `manifolds.py:1454`: the inclusion of the chart domain of
+   `{x != 0}` carries `(3, -1)` to the same point of the plane, given in the
+   domain's chart `U` and read in the plane's chart `base`; the image's
+   coordinates in the ambient chart are `(3, -1)` and the two sections are
+   sections of the open subset's function ring.
+
+4. **Restriction and composition.** Delivered in full, and this is what this
+   pass closed.  Three cases, all green in the file:
+   * a map written on the open subset's chart composed with the inclusion
+     (`:70-95`);
+   * a map of the plane written on the plane's chart `base` restricted to the
+     open subset through the atlas state of `U -> base` (`:98-127`), refused
+     when no change of coordinates is stated (`:130-147`);
+   * a map of the plane written on the *other* proper chart, `V` on
+     `{x + y != 0}`, restricted through the overlap of the two charts
+     (`:150-190`): red at `2be6b8e` on `:179` with
+     `manifolds.py:1422`, `AssertionError: cannot restate Generic endomorphism
+     ... its change of coordinates to the chart 'V' is defined only where (...)
+     do not vanish`, `1 failed, 5 passed in 14.59 s`; now the composite is
+     stated on `("U", "V")` with domain functions `x` and `x + y`, carries
+     `(3, -1)` to the point of `V`-coordinates `(2, -2)`, and refuses
+     `(1, -1)`, where `x + y` vanishes.
+
+   The owner now records a representation's domain:
+   `chart_map_domain` (`manifolds.py:1368`), admitted by the constructor's
+   `domains` argument (`manifolds.py:1529`, `:1585`), used by evaluation
+   (`:1454`), by composition (`:1486`) and by the restatement through an atlas
+   transition (`:1408`).  A map stated only by its coordinate sections is
+   unchanged: each pair defaults to the whole chart.
+
+5. **The proper domain is preserved.** Delivered.  `(0, 1)` on `x = 0` is
+   refused by the inclusion (`ValueError: the point does not belong to the
+   domain of Chart (U, (x, y))`, `:60-68`), the map's source is the open
+   submanifold, and its one datum is the coordinate sections, admitted by the
+   source chart's ring (`manifolds.py:1529`, `:1570`).
+
+6. **Scope.** The public additions are the inclusion operation and the smooth
+   morphism owner's constructor, accessors and composition; the neighbouring
+   stage stubs are untouched: `weaken_to` (`manifolds.py:1480`),
+   `as_ck_morphism` (`:1483`), and `SmoothManifolds.ParentMethods`'
+   `as_ck_manifold`/`underlying_topological_manifold`/`tangent_bundle`
+   (`:1826-1832`).
+
+Runs: `6 passed in 27.48 s` for this file; `29 passed in 454.38 s` for the
+eight consumer files, with two pre-existing call-gate overruns under a load
+average of 30 on 4 CPUs (`test_a_coordinate_of_a_complex_chart_is_a_section_valued_in_the_complex_field`
+at 406.33 s against 194.14 s on the parent tree, and
+`test_the_standard_riemannian_object_is_the_euclidean_line` at 26.40 s).
+
+Rebased onto `1fa5e73`, which changes the chart-domain path itself (an open
+submanifold inherits the structure of the manifold it is open in, and its points
+are that manifold's points), the same rows are green again on the rebased tree:
+`6 passed in 7.59 s` for this file and `29 passed in 62.64 s` for the eight
+consumer files, with the complex chart's call gate still over at 53.09 s.
