@@ -789,6 +789,20 @@ def main(argv):
         if "Gamma_{Co,2}" in counts and counts["Gamma_{Co,2}"] != (13, 4, 7):
             log("the Gamma_{Co,2} incidence is not the decided 13-edge relation over 4 line and 7 plane cusps")
             return RowStatus.COUNT_MISMATCH.exit_status
+        # The independent integral flag certificate of research#667 proves
+        # 527 line cusps, 23715 * 8 plane cusps and three distinct flag
+        # classes above each plane.  The real-spinor sign does not split
+        # these orbits.  Both public kernel rows must therefore return the
+        # exact same 569160-edge relation counts, not merely a self-consistent
+        # relation with some of its edges or vertices missing.
+        for kernel_label in ("Otilde", "Otilde+"):
+            if kernel_label in counts and counts[kernel_label] != (569160, 527, 189720):
+                log(
+                    f"the {kernel_label} incidence has {counts[kernel_label]} "
+                    "(edges, lines, planes), but the independent integral "
+                    "Coble flag certificate proves (569160, 527, 189720)"
+                )
+                return RowStatus.COUNT_MISMATCH.exit_status
     disagreement = _trivial_image_row_agreement(lattice, counts, arguments.route)
     if disagreement is not None:
         log(f"[run] {RowStatus.COUNT_MISMATCH.words}: {disagreement}")
