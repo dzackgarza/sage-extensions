@@ -269,3 +269,24 @@ Run, gates on, on this tree: `4 passed in 38.13 s` -- the two new oracles at
 `28.12 s` (load average `19.5` on four CPUs, so the call ceiling is over again;
 the environmental line of round 4 stands unchanged).
 
+## Round 6, 2026-11-18: the refusals that make the hull-vertex clause operational
+
+"A hull vertex, not every intermediate path point, indexes a chart" was, until
+this round, asserted arithmetically only: eighteen labelled path points against
+seventeen hull vertices.  Two refusals now state the capability side, in
+`tests/schemes/test_the_vertex_cones_and_sterk2_coefficients_have_independent_routes.sage:119`
+and `:124`:
+
+* the midpoint `(1,0)` of the triangle's closing edge is a point of the polytope
+  and not one of its vertices, and `vertex_normal_cone` raises (the assertion at
+  `categories/schemes/toric/toric_schemes.py:751`);
+* the same fan built without its polytope retains none, so `is_polarized()` is
+  `False` and `vertex_normal_cone` raises (the assertion at `:730`).  That
+  variety is the fan the test already holds, so its charts and pair transitions
+  are the cached ones and the check adds no construction.
+
+Run, gates on, on this tree: `4 passed in 57.47 s` -- the two oracles at
+`7.06 s` and `0.91 s`, the shipped triangle at `0.75 s`, the shipped specimen at
+`40.86 s` at load average `31.9` on four CPUs.  The call ceiling is over for the
+specimen test again; that is the environmental line of round 4, unchanged.
+
