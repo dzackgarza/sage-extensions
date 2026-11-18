@@ -313,3 +313,32 @@ submanifold inherits the structure of the manifold it is open in, and its points
 are that manifold's points), the same rows are green again on the rebased tree:
 `6 passed in 7.59 s` for this file and `29 passed in 62.64 s` for the eight
 consumer files, with the complex chart's call gate still over at 53.09 s.
+
+### Line numbers of this record against the tree it is pushed on
+
+The sections above were written on three different trees, and each was rewritten
+by the rebases that carried it to `main`.  The first measures `c71a004` and the
+second `2be6b8e`, as the notes at their heads say.  The third claims to give
+"this tree's" numbers and was written on `e86cdb2`; the two chart-domain commits
+that `1fa5e73` carries above it add 57 lines to `manifolds.py`, so every library
+line it cites is 57 higher here:
+
+| third pass | here | symbol or line |
+| --- | --- | --- |
+| 1368 | 1425 | `SmoothManifoldMor.ElementMethods.chart_map_domain` |
+| 1408 | 1465 | `SmoothManifoldMor.ElementMethods._representation_written_on` |
+| 1454 | 1511 | `SmoothManifoldMor.ElementMethods._evaluate_point` |
+| 1486 | 1543 | `SmoothManifoldMor.ElementMethods.__mul__` |
+| 1529 | 1586 | `SmoothManifoldMor._element_constructor_` |
+| 1570 | 1627 | the coordinate sections admitted in it |
+| 1585 | 1642 | the representation domains admitted in it |
+| 1796 | 1853 | `SmoothManifolds.ParentMethods.open_submanifold_inclusion` |
+| 1824 | 1881 | the inclusion it builds |
+| 1480, 1483 | 1537, 1540 | `weaken_to`, `as_ck_morphism` |
+| 1826-1832 | 1883-1889 | `as_ck_manifold`, `underlying_topological_manifold`, `tangent_bundle` |
+
+Its test lines need no correction: the file's first five rows are unchanged by
+the rebase and the sixth is at `:150-193`, where the third pass already puts it.
+The library lines quoted inside the red transcripts (`manifolds.py:1362` in the
+first section, `:1372` and `:1422` in the second and third) are the lines the
+failure was raised on in those trees, and are not rewritten.
