@@ -325,3 +325,13 @@ raised.
 The open line above is outside those three items: it is the host's ceiling on
 one test's call, not a claim of the acceptance.
 
+## Round 8, 2026-11-18: the blocker, filed
+
+The open line of round 7 is a scheme-layer cost, not this issue's operation: measured
+on `cd58a62` at load average 12.85, the Sterk2 specimen's seventeen-chart variety is
+`12.89 s`, of which the 136 pair transitions are `10.20 s` (79%), the charts `1.73 s`,
+the gluing `0.18 s`; the vertex cone it is asked for is `0.53 s`, its chart `0.02 s`
+and its atlas lookup `0.014 s`.  The proposal for the owner is filed as
+`results/issue-proposal-the-gluing-datum-resolves-its-atlas-lazily.md`, with the
+install line, because this connection cannot create issues.
+
