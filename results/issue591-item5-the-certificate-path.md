@@ -76,7 +76,12 @@ asked about once. Measured on the smallest lattice that shows the growth:
 ```
 r = 4 coset_space():   before 24.2 s, +90 MiB       after 7.8 s, +5 MiB
 r = 5 at 240 s        before +407 MiB (at 250 s)    after +184 MiB
+r = 5 to its cap      after: 520 s, peak 1 473 MiB, no family yet
 ```
+
+So the repair lowers the retention; it does not make that rung's sweep finish, and
+it does not change the verdict on `T_Co` — the route is avoided by the certified
+family, not tuned.
 
 No library answer changes, so this repair has no red test of its own; the red
 that item 5 has is the certificate's dispatch, below.
