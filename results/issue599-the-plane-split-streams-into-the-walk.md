@@ -278,6 +278,13 @@ it.  This also disposes of the one-pass redesign as a remedy for the *evidence*:
 it would lower the peak from ~5 GiB to ~1.5 GiB and would still have been killed
 here.
 
+**The host opened, and the row is running.**  The gated retry started at
+06:03:11 with 6 267 MiB of MemAvailable (`gated.log`, attempt 484) and is in its
+split at 130 000 of 189 720 planes, 3 335 MiB, 2 776 s, with the host at
+7 170 MiB available and the line row done in 315.6 s (`row-Otilde-retry.log`).
+Its peak, its two edge counts and the contract's witness verdict are the run's
+own numbers, and they arrive when it returns.
+
 **Why the counts have to be computed and cannot be extrapolated.**  The edge
 count is not a fixed multiple of the plane count.  On `U + U(2) + <-2>` both
 kernel rows decide **4 edges over 3 line cusps and 2 plane cusps** -- two edges a
