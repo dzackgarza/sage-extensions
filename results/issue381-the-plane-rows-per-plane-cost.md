@@ -180,7 +180,25 @@ issue is about.  The walk therefore checks that sheet too, once per row, against
 the lift it yields -- and says so where it does -- so a registry of `Otilde+`
 words never silently holds a witness on the wrong side.
 
-## 7. What was run, and what was not
+## 7. Why two rows do not share this VM
+
+The two rows of this issue cannot run together on a 15 GiB machine, and the
+reason is two numbers, not a preference:
+
+| row | peak tree RSS | where the number comes from |
+| --- | ---: | --- |
+| `Otilde`/`Otilde+` after both repairs | **~3.4 GiB** | projected from the measured per-plane terms: 0.71 GiB standing, ~0.8 GiB of GAP walk workspace, ~9 KB a plane of cusp row (1.7 GiB at 189720), 0.2 GiB of relation records. No run of it has returned yet to confirm the total. |
+| the stage-1 cusp computation (`p12_plane_cusps`) | **5.8 GiB** | that job's own measurement, on its own chat |
+
+Together that is 9.2 GiB of row on a machine whose other tenants hold 5–10 GiB,
+so the kernel's killer — which fires at about 1 GiB of `MemAvail` — takes
+whichever process is largest.  The stage-1 frontier has priority, and a row is
+launched only when `MemAvailable` exceeds the row's own peak plus 1 GiB
+(4.4 GiB for the figure above), which is the floor the kernel acts on; a check
+of a process name is not, because a restarted or renamed job still holds the
+memory.
+
+## 8. What was run, and what was not
 
 Run, off a worktree of `3998bd8` carrying only this change:
 
