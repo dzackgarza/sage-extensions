@@ -73,6 +73,14 @@ foreign orbit set refused with: AssertionError | Orbit set of {0, ..., 7} with S
 | the new module, time gates and the test lint on | 4 passed in 1.61 s |
 | `tests/lattices/test_coxeter_subdiagrams.sage` + `tests/objects/test_coxeter_diagram_a2.sage` | 13 passed in 3.57 s |
 | `tests/categories/test_partially_ordered_set_mor.sage` | 1 passed in 0.58 s |
+| `tests/lattices/test_the_maximal_subdiagram_orbits.sage` (#254's module, the other consumer of `subdiagram_orbit_poset`) | 7 passed in 418.89 s; the run ends red on the 20 s call gate alone, with 136.04 s, 46.24 s and 229.42 s on three rows |
+
+The last row is a cost reading, not a behaviour one: no test of that module
+fails, and the three overruns are on the heavy rows (partitioning the maximal
+elliptic orbits, `subdiagram_rank`, and the vertex relabelling). It was measured
+while three other sessions' jobs held the four CPUs (load average 5.8), so it is
+not a regression measurement against the parent; the cost of those rows belongs
+to #254's owner and is not a statement of this issue's delta.
 
 ## Outside this issue's delta
 
