@@ -47,7 +47,7 @@ from sage_extensions.categories.sets.indexed_families import (
     finite_indexed_family,
     indexed_family,
 )
-from sage_extensions.categories.sets.set_categories import NN, Sets
+from sage_extensions.categories.sets.set_categories import NN, OwnedSetMorphism, Sets
 from sage_extensions.categories.topological_spaces import TopologicalSpaces
 from sage_extensions.logic import ask
 from sage_extensions.owned_category import _object_of
@@ -121,6 +121,33 @@ class ManifoldAtlasChart(SageObject):
     def coordinate(self, index):
         position = self.coordinates().index_set()[int(index)]
         return self.coordinates()[position]
+
+    def section_ratio(self, numerator, denominator):
+        r"""The quotient of two sections of this chart's function ring, on the open subset where the denominator does not vanish.
+
+        The ring of functions on the chart's domain has no inverse for a
+        section that vanishes somewhere, and a chart change can divide by one:
+        the stereographic coordinate change ``y = x/|x|^2`` divides by the
+        squared norm, which vanishes at the pole the chart projects from.  The
+        quotient ``g/f`` is the function ``p |-> g(p)/f(p)`` on the open subset
+        ``{f != 0}`` (Lee, *Introduction to Smooth Manifolds*, 2nd ed., Ch. 1),
+        and ``f`` is what an atlas transition states as its overlap on this
+        chart (:meth:`transition_map`): the quotient is read where its
+        denominator does not vanish and nowhere else.
+        """
+        ring = self.function_ring()
+        misplaced = tuple(
+            operand
+            for operand in (numerator, denominator)
+            if element_parent(operand) is not ring
+        )
+        assert not misplaced, (
+            f"a quotient of sections of the chart {self.label()} is written with two "
+            f"sections of {ring}, the ring of functions the manifold assigns to that chart's "
+            f"domain, and {(numerator, denominator)!r} is written with the elements "
+            f"{tuple(str(element_parent(operand)) for operand in misplaced)}"
+        )
+        return _SectionRatio(numerator, denominator)
 
     def __call__(self, point):
         r"""The coordinates of ``point`` in this chart, one element of the coordinate field per dimension."""
@@ -354,6 +381,45 @@ class _ChartCoordinate(_ChartExpression):
         super().__init__(engine_chart, tuple(engine_chart[:])[self._index], field)
 
 
+class _SectionRatio:
+    r"""The quotient ``numerator / denominator`` of two sections of a chart's function ring, where it is defined.
+
+    A chart's function ring is a ring of functions on the chart's domain, and a
+    section that vanishes somewhere has no inverse in it: the quotient ``g/f``
+    of two sections is the function ``p |-> g(p)/f(p)`` on the open subset
+    ``{f != 0}``, and that open subset is where a chart change with denominator
+    ``f`` is read (:meth:`ManifoldAtlasChart.section_ratio`).  Both operands are
+    owned sections and the quotient is the function they define there; the
+    engine's formula for it is private, as it is for every other chart
+    expression of this module.
+    """
+
+    def __init__(self, numerator, denominator) -> None:
+        self._numerator = numerator
+        self._denominator = denominator
+
+    def numerator(self):
+        r"""The section divided."""
+        return self._numerator
+
+    def denominator(self):
+        r"""The section divided by, which does not vanish where the quotient is read."""
+        return self._denominator
+
+    def __call__(self, point):
+        r"""The quotient of the two values at ``point``, in the coordinate field."""
+        value = self._denominator(point)
+        assert ask(value != element_parent(value).zero()) is True, (
+            f"the quotient {self} is not defined at {point}: its denominator "
+            f"{self._denominator} takes the value {value} there, and the quotient is a "
+            f"function only on the open subset where the denominator does not vanish"
+        )
+        return self._numerator(point) / value
+
+    def _repr_(self):
+        return f"({self._numerator}) / ({self._denominator})"
+
+
 def _manifold_function_definition(value):
     r"""The private map a value of a manifold's function ring is defined by, or ``None``.
 
@@ -389,6 +455,25 @@ def _retained_chart_expression(value):
             return None
 
 
+def _constant_section_value(value):
+    r"""The value a constant section of a manifold's function ring takes, or ``None``.
+
+    The unit of the ring of functions on a chart's domain is the constant map
+    with value one, and the zero is the constant map with value zero, so a
+    section can be a constant map with no chart formula at all
+    (``categories.functions.real_functions._ConstantMap``).  Its value is what
+    states it, and the engine's formula for the constants of a chart's
+    coordinates is that value.
+    """
+    from sage_extensions.categories.functions.real_functions import _ConstantMap
+
+    match _manifold_function_definition(value):
+        case _ConstantMap() as constant:
+            return constant.value()
+        case _:
+            return None
+
+
 def _raise_manifold_expression(engine_formula, chart):
     r"""The section of a chart's function ring that an engine formula in its coordinates defines.
 
@@ -413,15 +498,26 @@ def _admit_manifold_expression(value, chart):
     r"""The section of a chart's function ring that ``value`` is, or a statement that it is none.
 
     A chart formula on ``U`` is an element of the ring of functions the
-    manifold assigns to ``U``; nothing else is a formula there.  Admission is
-    by the ring's own element type (``OWN-01``): the ring is the owner of what
-    a function on the chart's domain is, and this adapter only reads it.
+    manifold assigns to ``U``; nothing else is a formula there, except the
+    quotient of two such sections, which is a function on the open subset where
+    its denominator does not vanish and is stated as one
+    (:class:`_SectionRatio`).  Admission is by the ring's own element type
+    (``OWN-01``): the ring is the owner of what a function on the chart's
+    domain is, and this adapter only reads it.
     """
     ring = chart.function_ring()
-    assert element_parent(value) is ring, (
+    match value:
+        case _SectionRatio() as ratio:
+            operands = (ratio.numerator(), ratio.denominator())
+        case _:
+            operands = (value,)
+    misplaced = tuple(
+        operand for operand in operands if element_parent(operand) is not ring
+    )
+    assert not misplaced, (
         f"a chart formula on the chart {chart.label()} is a section of {ring}, the ring of "
-        f"functions the manifold assigns to that chart's domain, and {value!r} is an element "
-        f"of {element_parent(value)}"
+        f"functions the manifold assigns to that chart's domain, and {value!r} is written "
+        f"with the sections {tuple(str(element_parent(operand)) for operand in misplaced)}"
     )
     return value
 
@@ -510,19 +606,32 @@ def _engine_manifold_expression(value):
     Permitted callers are atlas/map/open-submanifold adapters in this module and
     the affine-analytification adapter.  A chart formula is the function it is,
     and the engine's formula retained by :class:`_ChartExpression` is how the
-    engine speaks about it; a formula written with the owned ring's pointwise
-    operations is rebuilt from its operands; any other owned value is a number
-    in the coordinate field, lowered as its engine element.
+    engine speaks about it; a quotient of sections is the quotient of their
+    formulas, a constant section is its value, a formula written with the owned
+    ring's pointwise operations is rebuilt from its operands; any other owned
+    value is a number in the coordinate field, lowered as its engine element.
     """
-    match _retained_chart_expression(value):
-        case None:
-            match _engine_formula_of_pointwise_section(value):
-                case None:
-                    return _engine_owned_number(value)
-                case formula:
-                    return formula
-        case expression:
-            return expression
+    match value:
+        case _SectionRatio() as ratio:
+            return _engine_manifold_expression(
+                ratio.numerator()
+            ) / _engine_manifold_expression(ratio.denominator())
+        case _:
+            return _engine_section_expression(value)
+
+
+def _engine_section_expression(value):
+    r"""Lower a section of a chart's function ring to the engine's expression for it."""
+    retained = _retained_chart_expression(value)
+    if retained is not None:
+        return retained
+    constant = _constant_section_value(value)
+    if constant is not None:
+        return _engine_scalar(constant)
+    formula = _engine_formula_of_pointwise_section(value)
+    if formula is not None:
+        return formula
+    return _engine_owned_number(value)
 
 
 def _upper_triangle(n):
@@ -629,6 +738,44 @@ def _raise_manifold_expression_family(values, chart, *, name):
 def _engine_manifold_point(point):
     r"""Return a point's private Sage realization for same-manifold equality."""
     return point._engine_manifold_point()
+
+
+def _is_a_point_in(manifold, value) -> bool:
+    r"""Whether ``value`` is a point of another manifold that lies in ``manifold``.
+
+    The points of an open subset of a manifold are the points of the manifold
+    that lie in it (Lee, *Introduction to Smooth Manifolds*, 2nd ed., Example
+    1.4), so a point of an open submanifold is a point of the manifold it is
+    open in, and two open submanifolds that share a point share it.  The point's
+    private realization is a point of this manifold exactly when it lies in it,
+    which the engine decides; a point of another manifold does not lie in it.
+    """
+    if element_parent(value) is manifold:
+        return False
+    if getattr(value, "chart", None) is None:
+        return False
+    return _engine_manifold_point(value) in _engine_manifold(manifold)
+
+
+def _coordinates_of_a_point_in(manifold, value):
+    r"""The label and the coordinates, in a chart of ``manifold``, of a point of another manifold that lies in it.
+
+    The point is read in the chart it was given by when ``manifold`` carries
+    that chart too -- a chart of an open submanifold is a chart of the manifold
+    it is open in -- and otherwise in the chart of ``manifold`` the atlas
+    presents first, which is where a point of an open submanifold cut out inside
+    this manifold's own chart has its coordinates.
+    """
+    labels = tuple(manifold.chart_labels())
+    given = value.chart().label()
+    label = given if given in labels else labels[0]
+    field = manifold.coordinate_field()
+    return label, tuple(
+        field(coordinate)
+        for coordinate in _engine_manifold_chart(manifold.atlas()[label])(
+            _engine_manifold_point(value)
+        )
+    )
 
 
 class _ManifoldTopologyData(SageObject):
@@ -950,9 +1097,10 @@ class TopologicalManifolds(OwnedCategory):
                 f"function is required to be nonzero: that subset is the whole chart "
                 f"{source_label!r}, and chart() registers the chart of the whole manifold"
             )
-            engine_open = self._engine_manifold_realization().open_subset(
+            engine_chart = _engine_manifold_chart(source)
+            engine_open = engine_chart.domain().open_subset(
                 str(label),
-                coord_def={_engine_manifold_chart(source): conditions},
+                coord_def={engine_chart: conditions},
             )
             return self._register_chart(label, engine_open.chart(coordinates))
 
@@ -997,7 +1145,18 @@ class TopologicalManifolds(OwnedCategory):
                 containing_manifold=self,
                 chart_label=label,
                 engine_chart=engine_chart,
+                **self._chart_domain_structure(label, engine_chart),
             )
+
+        def _chart_domain_structure(self, label, engine_chart) -> dict:
+            r"""The data a chart's domain object carries beyond the chart domain's own.
+
+            An open submanifold inherits the structure its ambient manifold
+            carries, so a category whose objects carry chosen structure states
+            here what the domain of a chart on it is given.  A manifold with no
+            structure beyond its atlas adds nothing.
+            """
+            return {}
 
         def __call__(self, *args, **kwargs):
             r"""Construct a point through the owned element construction directly."""
@@ -1010,11 +1169,18 @@ class TopologicalManifolds(OwnedCategory):
             coordinates in a chart.  A chart that is not named is the chart the
             atlas presents first: the atlas' chart labels are a selected finite
             ordered family, so the first of them is a chart of this manifold and
-            not a guess among them.
+            not a guess among them.  A point of an open submanifold of this
+            manifold is a point of this manifold -- the points of an open subset
+            are the points of the manifold that lie in it (Lee, *Introduction to
+            Smooth Manifolds*, 2nd ed., Example 1.4) -- and is read at the
+            coordinates it has in a chart of this manifold.
             """
             match datum:
                 case _ if element_parent(datum) is self:
                     return datum
+                case _ if _is_a_point_in(self, datum):
+                    label, coordinates = _coordinates_of_a_point_in(self, datum)
+                    return self.element_class(self, coordinates, label)
                 case _:
                     coordinates = tuple(datum)
                     if len(coordinates) != self.dimension():
@@ -1224,22 +1390,149 @@ class DifferentiableManifoldMorCategoryConstruction(MorCategoryConstruction):
 
 
 class SmoothManifoldMor(CategoricalMor):
-    r"""Chartwise smooth maps between selected smooth real manifolds."""
+    r"""Chartwise smooth maps between selected smooth real manifolds.
+
+    A smooth map ``f : X -> Y`` is given by its coordinate representations
+    ``f_{st} = psi_t o f o phi_s^{-1}``, one for each pair of charts ``(s, t)``
+    whose source charts ``U_s`` cover ``X`` (Lee, *Introduction to Smooth
+    Manifolds*, 2nd ed., Ch. 2).  A representation is a tuple of sections of
+    the source chart's ring of functions, one per coordinate of the target
+    chart: the value of the map at a point is read from the representation on
+    the chart that point is given in, and its composite with a second map is
+    the substitution of that map's representation in it.
+    """
 
     class ElementMethods:
-        def __init__(self, parent, topological_map, chart_maps):
-            Morphism.__init__(self, parent)
-            self._topological_map = topological_map
-            self._chart_maps = chart_maps
+        def __init__(self, parent, representations, domains):
+            self._representations = representations
+            self._representation_domains = domains
+            self._map_of_points = Sets().Mor(parent.domain(), parent.codomain())(
+                lambda point: self._evaluate_point(point)
+            )
+            OwnedSetMorphism.__init__(self, parent, self._map_of_points)
 
         def underlying_topological_morphism(self):
-            return self._topological_map
+            return self._map_of_points
 
         def chart_maps(self):
-            return self._chart_maps
+            r"""The coordinate representations of this map, indexed by the chart-label pairs they are given on."""
+            return self._representations
+
+        def chart_map(self, source_label, target_label):
+            r"""The coordinates of the target chart ``target_label``, as sections on the source chart ``source_label``."""
+            return self._representations[source_label, target_label]
+
+        def chart_map_domain(self, source_label, target_label):
+            r"""The sections on the source chart whose common nonvanishing locus is where the representation holds.
+
+            A coordinate representation need not hold on the whole of its
+            source chart: the map it states is defined where the sections it was
+            obtained from do not vanish -- a change of coordinates is defined on
+            the overlap of two charts, and the representation restated through it
+            holds there.  The empty family is the whole chart.
+            """
+            return self._representation_domains[source_label, target_label]
+
+        def _representation_at(self, source_label):
+            r"""The target chart, the representation and its domain on the source chart ``source_label``, or ``None`` when the map is written on another chart."""
+            pairs = tuple(
+                pair for pair in self._representations.keys() if pair[0] == source_label
+            )
+            assert len(pairs) <= 1, (
+                f"cannot read {self} on the chart {source_label!r}: the map has "
+                f"{len(pairs)} coordinate representations whose source chart it is, and the "
+                f"value of a point is read off the one on the chart the point is given in"
+            )
+            if not pairs:
+                return None
+            written_source, target_label = pairs[0]
+            return (
+                target_label,
+                self.chart_map(written_source, target_label),
+                self.chart_map_domain(written_source, target_label),
+            )
+
+        def _representation_on(self, source_label):
+            r"""The target chart, the representation and its domain that the map has on the source chart ``source_label``."""
+            representation = self._representation_at(source_label)
+            assert representation is not None, (
+                f"cannot read {self} on the chart {source_label!r}: the map has no coordinate "
+                f"representation whose source chart it is, and the value of a point is read off "
+                f"the one on the chart the point is given in"
+            )
+            return representation
+
+        def _representation_written_on(self, source_label):
+            r"""The representation on the chart ``source_label``, restated there through the atlas change of coordinates when the map is written on another chart.
+
+            A map written on the chart ``m'`` of its domain is the same map read in
+            the chart ``m``, wherever the coordinate change ``m -> m'`` is defined:
+            ``f_{mt} = f_{m't} o (phi_{m'} o phi_m^{-1})``, and the change is the
+            atlas transition from ``m`` to ``m'``.  The restated representation
+            holds where that change does, which the atlas states by the
+            transition's source overlap, and where the representation on ``m'``
+            already held, read through the same change; both are carried as the
+            restated representation's domain.
+            """
+            written = self._representation_at(source_label)
+            if written is not None:
+                return written
+            changes = tuple(
+                pair
+                for pair in self.domain().transitions().keys()
+                if pair[0] == source_label and self._representation_at(pair[1]) is not None
+            )
+            assert len(changes) == 1, (
+                f"cannot restate {self} on the chart {source_label!r}: the map is written on "
+                f"the source charts {tuple(pair[0] for pair in self._representations.keys())}, "
+                f"and {self.domain()} states {len(changes)} changes of coordinates from the "
+                f"chart {source_label!r} to one of them"
+            )
+            alternative_label = changes[0][1]
+            target_label, expressions, domain = self._representation_on(alternative_label)
+            change = self.domain().transition(source_label, alternative_label)
+            source = self.domain().atlas()[source_label]
+            alternative = self.domain().atlas()[alternative_label]
+
+            def restated(sections):
+                return tuple(
+                    _raise_manifold_expression(_engine_manifold_expression(section), source)
+                    for section in _substitute_chart_coordinates(
+                        sections, alternative, change.forward_expressions()
+                    )
+                )
+
+            return (
+                target_label,
+                restated(expressions),
+                tuple(change.source_overlap()) + restated(domain),
+            )
+
+        def _evaluate_point(self, point):
+            r"""The point of the codomain that a point of the domain maps to.
+
+            The point is read in the chart it is given in, which is the source
+            chart of the map's representation there; each of that
+            representation's sections is a coordinate of the target chart, so
+            the values of the sections at the point are the coordinates of the
+            image, and the image is the codomain's point with them in that
+            target chart.
+            """
+            source_point = self.domain()(point)
+            label = source_point.chart().label()
+            target_label, representation, where = self._representation_on(label)
+            field = self.domain().coordinate_field()
+            decisions = tuple(ask(section(source_point) != field.zero()) for section in where)
+            assert all(decision is True for decision in decisions), (
+                f"cannot evaluate {self} at {source_point}: its representation on the chart "
+                f"{label!r} is stated where {tuple(where)} do not vanish, and one of them "
+                f"vanishes there or its value is undecided"
+            )
+            values = tuple(section(source_point) for section in representation)
+            return self.codomain().point(values, target_label)
 
         def _call_(self, point):
-            return self._topological_map(point)
+            return self._map_of_points(point)
 
         def weaken_to(self, degree):
             pass
@@ -1248,10 +1541,131 @@ class SmoothManifoldMor(CategoricalMor):
             pass
 
         def __mul__(self, other):
-            pass
+            r"""Return the composite ``self o other`` of smooth maps ``Z -> X -> Y``.
 
-    def _element_constructor_(self, topological_map, chart_maps):
-        pass
+            On the source chart of ``other`` its representation states the
+            coordinates of the middle manifold ``X``; substituting those for the
+            coordinates of ``self``'s representation on that same chart states
+            the coordinates of the composite's target, so the composite is the
+            map those substituted sections determine.  When ``self`` is written
+            on another chart of that middle manifold, it is first restated on
+            the chart ``other`` states its values in, through the atlas change
+            of coordinates (:meth:`_representation_written_on`), which is what
+            restricts a map of a manifold to the open submanifold its chart is
+            the domain of.
+            """
+            assert other.codomain() is self.domain(), (
+                f"cannot compose {self} with {other}: the codomain {other.codomain()} of the "
+                f"first map is not the domain {self.domain()} of the second"
+            )
+            representations = {}
+            domains = {}
+            for source_label, middle_label in other.chart_maps().keys():
+                inner = other.chart_map(source_label, middle_label)
+                inner_domain = other.chart_map_domain(source_label, middle_label)
+                target_label, outer, outer_domain = self._representation_written_on(
+                    middle_label
+                )
+                source = other.domain().atlas()[source_label]
+                middle = self.domain().atlas()[middle_label]
+
+                def written(sections):
+                    return tuple(
+                        _raise_manifold_expression(
+                            _engine_manifold_expression(section), source
+                        )
+                        for section in _substitute_chart_coordinates(sections, middle, inner)
+                    )
+
+                representations[source_label, target_label] = written(outer)
+                domains[source_label, target_label] = tuple(inner_domain) + written(
+                    outer_domain
+                )
+            return other.domain().Mor(self.codomain())(representations, domains=domains)
+
+    def _element_constructor_(self, representations, *, domains=None):
+        r"""Return the smooth map whose coordinate representations are ``representations``.
+
+        ``representations`` maps a pair ``(s, t)`` of chart labels to the tuple
+        of sections of the source chart ``s`` of the domain that are the
+        coordinates of the target chart ``t`` of the codomain.  Each section is
+        admitted by the source chart's own ring of functions, and there is one
+        representation per source chart, so that the value of a point is read
+        off the representation on the chart the point is given in.  The caller
+        states that the source charts cover the domain: no finite set of charts
+        is decided to cover a manifold here.
+
+        ``domains`` maps a pair to the sections of that same source chart whose
+        common nonvanishing locus is where the representation holds; a pair it
+        omits holds on the whole chart.
+        """
+        domain = self.domain()
+        codomain = self.codomain()
+        domains = {} if domains is None else dict(domains)
+        assert set(domains) <= set(representations), (
+            f"cannot give the domain of a coordinate representation of a map "
+            f"{domain} -> {codomain} that is not stated: {tuple(domains)} are not among "
+            f"the chart pairs {tuple(representations)}"
+        )
+        admitted = {}
+        admitted_domains = {}
+        for pair, expressions in representations.items():
+            source_label, target_label = pair
+            assert source_label in tuple(domain.chart_labels()), (
+                f"cannot represent a map from {domain}: it has the charts "
+                f"{tuple(domain.chart_labels())} and not {source_label!r}"
+            )
+            assert target_label in tuple(codomain.chart_labels()), (
+                f"cannot represent a map to {codomain}: it has the charts "
+                f"{tuple(codomain.chart_labels())} and not {target_label!r}"
+            )
+            assert source_label not in tuple(label for label, _target in admitted), (
+                f"cannot represent a map from {domain} by two coordinate representations on "
+                f"the chart {source_label!r}: a point is given in one chart, and its value is "
+                f"read off the one representation on that chart"
+            )
+            values = _admit_manifold_expression_family(
+                expressions,
+                domain.atlas()[source_label],
+                name=(
+                    f"Coordinates of the chart {target_label} on the chart {source_label} "
+                    f"of a smooth map to {codomain}"
+                ),
+            )
+            assert values.cardinality() == codomain.dimension(), (
+                f"cannot represent a map to {codomain} by the coordinates {tuple(values)}: a "
+                f"map to a manifold of dimension {codomain.dimension()} has "
+                f"{codomain.dimension()} coordinate functions, and {values.cardinality()} "
+                f"were given"
+            )
+            admitted[pair] = values
+            admitted_domains[pair] = _admit_manifold_expression_family(
+                domains.get(pair, ()),
+                domain.atlas()[source_label],
+                name=(
+                    f"Domain of the coordinate representation {source_label} to "
+                    f"{target_label} of a smooth map to {codomain}"
+                ),
+            )
+        assert admitted, (
+            f"cannot construct a smooth map {domain} -> {codomain} that states no "
+            f"coordinate representation: its value at every point would be unstated"
+        )
+        pairs = finite_ordered_set(tuple(admitted))
+        return self.element_class(
+            self,
+            indexed_family(
+                pairs,
+                lambda pair: admitted[pair],
+                name=f"Coordinate representations of a smooth map {domain} -> {codomain}",
+            ),
+            indexed_family(
+                pairs,
+                lambda pair: admitted_domains[pair],
+                name=f"Domains of the coordinate representations of a smooth map "
+                f"{domain} -> {codomain}",
+            ),
+        )
 
     @object_level
     def identity(self):
@@ -1436,6 +1850,36 @@ class SmoothManifolds(OwnedCategory):
         return _DifferentiableTopologyFunctor(self)
 
     class ParentMethods:
+        def open_submanifold_inclusion(self, open_manifold):
+            r"""Return the inclusion of an open submanifold that is the domain of one of this manifold's charts.
+
+            An open subset of a smooth manifold, with the restricted atlas, is a
+            smooth manifold of the same dimension and class (Lee, *Introduction
+            to Smooth Manifolds*, 2nd ed., Example 1.4), so its inclusion is a
+            smooth map into this manifold.  The chart it is the domain of
+            presents it: read in that chart of the open submanifold and in the
+            chart of this manifold it is the domain of, the coordinates of a
+            point and of its image are the same, because the two charts are the
+            same chart on the same set.  The inclusion is therefore the map
+            whose source chart is the submanifold's and whose coordinates in the
+            ambient chart are its own coordinates -- not the ambient manifold
+            itself, and not a chart of the whole manifold.
+            """
+            labels = tuple(
+                label
+                for label in self.chart_labels()
+                if self.atlas()[label].domain() is open_manifold
+            )
+            assert len(labels) == 1, (
+                f"cannot include {open_manifold} in {self}: the inclusion is presented by a "
+                f"chart that has the open submanifold as its domain, and {self} has "
+                f"{len(labels)} charts on it, its charts being "
+                f"{tuple(label for label in self.chart_labels())}"
+            )
+            label = labels[0]
+            source = open_manifold.atlas()[label]
+            return open_manifold.Mor(self)({(label, label): source.coordinates()})
+
         def as_ck_manifold(self):
             pass
 
@@ -1516,9 +1960,24 @@ class SmoothManifolds(OwnedCategory):
         )
 
         def inversion(chart):
+            r"""The coordinate change ``y = x/|x|^2`` in the coordinates of ``chart``, and its squared norm.
+
+            The squared norm ``|x|^2`` is the pointwise sum of the squares of
+            the coordinates, a section of the chart's function ring, and it is
+            the function the change is defined away from: the quotient
+            ``x_k/|x|^2`` is a section on the open subset where the norm does
+            not vanish (:meth:`ManifoldAtlasChart.section_ratio`), which is the
+            overlap of the two stereographic charts.
+            """
             coordinates = chart.coordinates()
             norm_squared = sum(coordinate**2 for coordinate in coordinates)
-            return tuple(coordinate / norm_squared for coordinate in coordinates), norm_squared
+            return (
+                tuple(
+                    chart.section_ratio(coordinate, norm_squared)
+                    for coordinate in coordinates
+                ),
+                norm_squared,
+            )
 
         forward, north_overlap = inversion(north)
         inverse, south_overlap = inversion(south)
@@ -1662,11 +2121,11 @@ class RiemannianManifoldMorCategoryConstruction(MorCategoryConstruction):
 class _RiemannianSmoothFunctor(Functor):
     r"""Forget the selected metric on objects and local isometries."""
 
-    def __init__(self):
-        super().__init__(RiemannianManifolds(), SmoothManifolds())
+    def __init__(self, source):
+        super().__init__(source, SmoothManifolds())
 
     def _apply_object(self, manifold):
-        pass
+        return manifold.underlying_smooth_manifold()
 
     def _apply_morphism(self, morphism):
         return morphism.underlying_smooth_morphism()
@@ -1709,16 +2168,110 @@ class RiemannianManifolds(OwnedCategory):
         return "Riemannian manifolds"
 
     def an_object(self):
-        r"""The Euclidean line ``(R, dx^2)``."""
-        pass
+        r"""The Euclidean line ``(R, dx^2)``.
+
+        The space is the smooth line ``R`` with its one global chart ``x``: a
+        smooth structure is ``SmoothManifolds()``'s data and not this
+        category's, so it is taken from there.  The metric is ``dx (x) dx``,
+        carried in that chart's coordinates as the single Gram entry ``1``,
+        the constant section of ``C^inf(R, RR)`` the formula ``g(d/dx, d/dx)``
+        reads.
+        """
+        line = SmoothManifolds()(1, "R")
+        line.chart("x", "x")
+        charts = line.chart_labels()
+        metric = indexed_family(
+            charts,
+            lambda label: ((line.atlas()[label].function_ring().one(),),),
+            name="Gram matrix of dx (x) dx in each chart of the line",
+        )
+        return self(line, metric)
 
     def _call_(self, manifold, metric):
-        r"""Select ``(M, g)`` from a smooth manifold and its positive definite metric."""
-        pass
+        r"""Select ``(M, g)`` from a smooth manifold ``M`` and the metric's coordinates.
+
+        ``metric`` is a finite indexed family over the chart labels of ``M``
+        whose value at a label is the matrix ``(g(d/dx_i, d/dx_j))`` of the
+        pairings of that chart's coordinate vector fields.  A Riemannian metric
+        is a smooth section of ``Sym^2 T^*M``, and on the domain of a chart its
+        two arguments are coordinate vector fields, so those entries are
+        functions on that domain and they determine ``g`` there.  The metric is
+        chosen data — a smooth manifold admits many, none canonical — and it is
+        read from the caller and not computed here, as the inner product of a
+        ``EuclideanSpaces()`` space is.
+
+        What is checked is what the data are: that ``M`` is a smooth manifold,
+        that the family is indexed by exactly the charts of ``M`` (a metric is
+        stated in every chart of the atlas, so no chart is left without one),
+        and that each matrix is square of ``dim M``, symmetric, with entries in
+        the ring of functions the manifold assigns to that chart's domain.
+        Positive definiteness — ``g_p(v, v) > 0`` at every point ``p`` and for
+        every ``v != 0`` — is a statement about the entries as functions on an
+        open subset, not about finitely many of their values, and is the
+        hypothesis the caller states by handing the metric over.  So is the
+        agreement of the matrices on overlaps of charts, which says that the
+        chart transitions are isometries.
+        """
+        assert manifold in SmoothManifolds(), (
+            f"cannot select a Riemannian metric on {manifold}: a Riemannian manifold is a "
+            f"smooth manifold with a metric, and {manifold} is an object of "
+            f"{manifold.category()}"
+        )
+        charts = manifold.chart_labels()
+        assert tuple(metric.index_set()) == tuple(charts), (
+            f"the metric selected on {manifold} is stated in the charts "
+            f"{tuple(metric.index_set())}, but a metric on a manifold is stated in every "
+            f"chart of its atlas, and the charts of {manifold} are {tuple(charts)}"
+        )
+        dimension = int(manifold.dimension())
+        for label in charts:
+            entries = tuple(tuple(row) for row in metric[label])
+            ring = manifold.atlas()[label].function_ring()
+            assert len(entries) == dimension, (
+                f"the metric selected on {manifold} gives {len(entries)} rows in the chart "
+                f"{label!r}, but the Gram matrix of that chart's coordinate vector fields "
+                f"has one row per dimension, {dimension}"
+            )
+            for index, row in enumerate(entries):
+                assert len(row) == dimension, (
+                    f"the metric selected on {manifold} gives {len(row)} entries in row "
+                    f"{index} of the chart {label!r}, but the Gram matrix of that chart's "
+                    f"coordinate vector fields is square of size {dimension}"
+                )
+                for column, entry in enumerate(row):
+                    assert entry in ring, (
+                        f"the metric selected on {manifold} gives the entry "
+                        f"{index},{column} of the chart {label!r} as {entry}, which is not "
+                        f"a function on that chart's domain: a Gram entry "
+                        f"g(d/dx_{index}, d/dx_{column}) is a section of {ring}"
+                    )
+            for index in range(dimension):
+                for column in range(index + 1, dimension):
+                    assert entries[index][column] == entries[column][index], (
+                        f"the metric selected on {manifold} is not symmetric in the chart "
+                        f"{label!r}: the entries {index},{column} and {column},{index} are "
+                        f"{entries[index][column]} and {entries[column][index]}, and a "
+                        f"Gram matrix is symmetric"
+                    )
+        space = manifold._with_structure(
+            (self,),
+            {"underlying_smooth_manifold": manifold, "metric": metric},
+        )
+        for label in charts:
+            space._register_chart(label, _engine_manifold_chart(manifold.atlas()[label]))
+        return space
 
     @cached_method
     def forget_metric(self):
-        return _RiemannianSmoothFunctor()
+        r"""Forget the selected metric on objects and on their arrows.
+
+        An object ``(M, g)`` becomes the smooth manifold ``M`` it was selected
+        on, and a local isometry becomes the smooth map under it: the arrow
+        keeps its map and loses the statement ``f^* h = g``.  The globally
+        symmetric axiom keeps a metric too, so ``GloballySymmetric()`` declares
+        this same functor with itself as its source.
+        """
+        return _RiemannianSmoothFunctor(self)
 
     class SubcategoryMethods:
         def GloballySymmetric(self):
@@ -1733,12 +2286,79 @@ class RiemannianManifolds(OwnedCategory):
             return self._with_axiom("GloballySymmetric")
 
     class ParentMethods:
+        def __init__(
+            self,
+            metric=None,
+            underlying_smooth_manifold=None,
+            **rest,
+        ) -> None:
+            r"""Record the selected metric and the smooth manifold it is selected on.
+
+            ``metric`` is the family ``chart label |-> (g(d/dx_i, d/dx_j))`` of
+            :meth:`RiemannianManifolds._call_`: the metric's Gram matrix in
+            each chart of the atlas, whose entries are sections of the ring of
+            functions on that chart's domain.  ``underlying_smooth_manifold``
+            is the smooth manifold ``M`` the metric was selected on, which is
+            what :meth:`forget_metric` returns.
+
+            Neither is read off the object: a metric is chosen data of the
+            object, and an object constructed without one — the symmetric
+            space ``noncompact_type`` states, whose ``G``-invariant metric it
+            does not construct — carries ``None`` and refuses to answer for it.
+            """
+            self._preamble_metric = metric
+            self._preamble_underlying_smooth_manifold = underlying_smooth_manifold
+            super().__init__(**rest)
+
         def underlying_smooth_manifold(self):
-            pass
+            r"""Return ``M``, the smooth manifold this object selects its metric on."""
+            match self._preamble_underlying_smooth_manifold:
+                case None:
+                    raise ValueError(
+                        f"{self} has no underlying smooth manifold: it was constructed "
+                        f"from a manifold's own data and not from an object of "
+                        f"SmoothManifolds(), so no one object is the manifold to forget "
+                        f"the metric to"
+                    )
+                case manifold:
+                    return manifold
 
         def riemannian_metric(self):
-            r"""Return the chosen metric ``g``, a positive definite section of ``Sym^2 T^*M``."""
-            pass
+            r"""Return the chosen metric ``g``, a positive definite section of ``Sym^2 T^*M``.
+
+            It is returned as it was stated: the family of its Gram matrices in
+            the charts it is stated in, ``chart label |-> (g(d/dx_i, d/dx_j))``
+            — the charts of the atlas for an object selected by this category,
+            and the charts of the ambient manifold for an open submanifold of
+            it, whose metric is the restriction of the ambient one.
+            """
+            match self._preamble_metric:
+                case None:
+                    raise ValueError(
+                        f"{self} has no chosen metric: a Riemannian manifold's metric is "
+                        f"chosen data, and this object was constructed without it"
+                    )
+                case metric:
+                    return metric
+
+        def _chart_domain_structure(self, label, engine_chart) -> dict:
+            r"""The domain of a chart on this manifold carries the restricted metric and its smooth domain.
+
+            An open subset of a Riemannian manifold is a Riemannian manifold
+            with the restricted metric (Lee, *Introduction to Smooth
+            Manifolds*, 2nd ed., Example 1.4, for the atlas; the metric is
+            restricted along the inclusion).  The metric is stated in the
+            charts it was stated in on the ambient manifold, which restrict to
+            the open subset, so the domain is given that same family; its
+            underlying smooth manifold is the domain of the same chart on the
+            smooth manifold this one is placed on.
+            """
+            return {
+                "metric": self.riemannian_metric(),
+                "underlying_smooth_manifold": self.underlying_smooth_manifold()._chart_domain(
+                    label, engine_chart
+                ),
+            }
 
         def isometry_group(self):
             r"""Return ``I(M, g)``, the group of isometries ``f: M -> M`` with ``f^* g = g``.
@@ -1759,6 +2379,38 @@ class RiemannianManifolds(OwnedCategory):
         is an isolated fixed point of an involutive isometry ``s_p``, the
         geodesic symmetry at ``p``.
         """
+
+        @cached_method
+        def an_object(self):
+            r"""The Euclidean line ``(R, dx^2)``, with its geodesic symmetries ``s_p(x) = 2p - x``.
+
+            Every point ``p`` of the line is an isolated fixed point of the
+            involutive isometry ``s_p``, which is the axiom (Helgason, Ch. IV,
+            §3, Definition), and the line is analytic, so it is an object of
+            this category and not only of the Riemannian manifolds.  The
+            metric is the Riemannian level's; what this category adds is the
+            statement that the space has the geodesic symmetries.
+            """
+            return RiemannianManifolds().an_object()._with_structure((self,), {})
+
+        @cached_method
+        def forget_metric(self):
+            r"""Forget the selected metric: the map from this category to ``SmoothManifolds()``.
+
+            A globally symmetric space is a Riemannian manifold, so this is the
+            base category's forgetting functor with this category as its
+            source: an object becomes its smooth manifold and an arrow its
+            smooth map, and the symmetric structure is not what is forgotten.
+
+            It is declared here as well as on ``RiemannianManifolds`` because an
+            axiom category's runtime class carries the base category's
+            ``SubcategoryMethods`` and ``subcategory_class``, not the base
+            category class: ``an_object`` and ``_call_`` of
+            ``RiemannianManifolds`` are not reachable from this category
+            either.  A construction stated here is the axiom category's own,
+            and its source is this category.
+            """
+            return _RiemannianSmoothFunctor(self)
 
         @cached_method
         def noncompact_type(self, satake_diagram):
@@ -1806,23 +2458,19 @@ class RiemannianManifolds(OwnedCategory):
                 f"{satake_diagram} has every node black, so it is the compact real form, and "
                 f"its symmetric space G/K is a point, not of the noncompact type"
             )
-            engine = _SageManifold(
-                int(dimension), "G/K", structure="smooth", unique_tag=object()
+            manifold = SmoothManifolds()(int(dimension), "G/K")
+            manifold.chart("p0", " ".join(f"x{index}" for index in range(int(dimension))))
+            space = manifold._with_structure(
+                (self,),
+                {
+                    "satake_diagram": satake_diagram,
+                    "real_rank": rank,
+                    "underlying_smooth_manifold": manifold,
+                },
+                engine=_RealFormSymmetricSpace,
             )
-            space = _object_of(
-                self,
-                _engine=(SmoothManifolds(), _RealFormSymmetricSpace, None),
-                topology_data=_ManifoldTopologyData(engine),
-                engine_manifold=engine,
-                manifold_dimension=int(dimension),
-                manifold_name="G/K",
-                manifold_structure="smooth",
-                differentiability_degree=Infinity,
-                manifold_field="real",
-                satake_diagram=satake_diagram,
-                real_rank=rank,
-            )
-            space.chart("p0", " ".join(f"x{index}" for index in range(int(dimension))))
+            for label in manifold.chart_labels():
+                space._register_chart(label, _engine_manifold_chart(manifold.atlas()[label]))
             return space
 
         def hyperbolic_space(self, component):
@@ -1843,25 +2491,21 @@ class RiemannianManifolds(OwnedCategory):
             ``t^perp_RR -> HH(C^+)``, since ``t^perp`` is negative definite.
             """
             from sage_extensions.categories.hyperbolic_geometry import (
+                HYPERBOLOID_CHART,
                 HyperbolicSpaces,
             )
 
             dimension = int(component.lattice().module_rank()) - 1
-            engine = _SageManifold(
-                dimension, f"HH^{dimension}", structure="smooth", unique_tag=object()
+            manifold = SmoothManifolds()(dimension, f"HH^{dimension}")
+            manifold.chart(
+                HYPERBOLOID_CHART, " ".join(f"y{index}" for index in range(dimension))
             )
-            space = _object_of(
-                HyperbolicSpaces(dimension),
-                topology_data=_ManifoldTopologyData(engine),
-                engine_manifold=engine,
-                manifold_dimension=dimension,
-                manifold_name=f"HH^{dimension}",
-                manifold_structure="smooth",
-                differentiability_degree=Infinity,
-                manifold_field="real",
-                component=component,
+            space = manifold._with_structure(
+                (HyperbolicSpaces(dimension),),
+                {"component": component, "underlying_smooth_manifold": manifold},
             )
-            space.chart("hyperboloid", " ".join(f"y{index}" for index in range(dimension)))
+            for label in manifold.chart_labels():
+                space._register_chart(label, _engine_manifold_chart(manifold.atlas()[label]))
             return space
 
         class ParentMethods:

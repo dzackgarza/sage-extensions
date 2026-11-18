@@ -5,7 +5,11 @@ from functools import cache
 from sage.matrix.constructor import matrix as sage_matrix
 from sage.rings.rational_field import QQ
 
-from sage_extensions.categories.rings.ring_foundation import _owned_engine_element
+from sage_extensions.categories.rings.ring_foundation import (
+    _engine_element,
+    _owned_engine_element,
+    _owned_integers,
+)
 from sage_extensions.categories.schemes.polytopes import LatticePolygons
 from sage_extensions.categories.sets.indexed_families import finite_indexed_family_from_values
 from sage_extensions.catalogue import NamedLattices
@@ -249,6 +253,20 @@ figure; it is a `(-4)`-vector, and card `029J`'s 4.3.8 row stores the resulting 
 """
 
 
+def _sterk2_length(value):
+    r"""One printed length, as an exact element of the engine's rational field.
+
+    A length reaches this module as an ordinary integer, as an integer of the
+    session, or as an integer of the selected private ring.  Reading it through
+    the session's integers is what lets the one arithmetic below serve all
+    three: the engine's rational field does not accept a session integer
+    directly, so a caller writing the lengths would otherwise be unable to ask
+    for the coefficients at all.
+    """
+    integers = _owned_integers()
+    return QQ(_engine_element(integers, integers(value)))
+
+
 def _sterk2_engine_direction_coefficients(lengths):
     r"""The source's `M_18_0_0` applied to the lengths, in exact rationals.
 
@@ -256,7 +274,7 @@ def _sterk2_engine_direction_coefficients(lengths):
     arithmetic stays in the exact rational field until a lattice placement asks whether the
     resulting point is integral.
     """
-    lengths = tuple(lengths)
+    lengths = tuple(_sterk2_length(length) for length in lengths)
     assert len(lengths) == 19, (
         f"the ``18_0_0`` cusp is printed with nineteen lengths, one for each of its nineteen "
         f"directions, but {len(lengths)} were given"
@@ -264,7 +282,7 @@ def _sterk2_engine_direction_coefficients(lengths):
     return {
         label: sum(
             (
-                QQ(lengths[index - 1]) * (QQ(numerator) / QQ(denominator))
+                lengths[index - 1] * (QQ(numerator) / QQ(denominator))
                 for index, numerator, denominator in weights
             ),
             QQ.zero(),

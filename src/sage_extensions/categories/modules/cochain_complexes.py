@@ -31,9 +31,11 @@ from sage_extensions.categories.modules.pure.modules import (
     LinearEndCategoryConstruction,
     ModuleMorCategoryConstruction,
     Modules,
+    VectorSpaces,
 )
 from sage_extensions.categories.rings.ring_foundation import (
     OwnedCategoryOverBaseRing,
+    OwnedFields,
     _own_ring,
     _owned_integers,
 )
@@ -933,9 +935,15 @@ def _cohomology_along(complex_, degree, retraction, section):
             f"H^{degree} of {complex_} is ker(d)/im(d) of {comparison}, but this chosen "
             "finite-presentation realization requires finitely presented cycles"
         )
+    # A cohomology module of a complex over a field is a vector space, so the
+    # quotient is placed at the vector-space level beside the cohomology
+    # level's cycle and class operations, and has its dimension.
+    placement = [CohomologyModules(ring)]
+    if ring in OwnedFields():
+        placement.append(VectorSpaces(ring))
     return ModulesWithChosenFinitePresentation(ring)(
         boundary_in_cycles,
-        category=owned_category_join((CohomologyModules(ring),)),
+        category=owned_category_join(tuple(placement)),
         **{
             "cohomology_complex": complex_,
             "cohomology_degree": degree,

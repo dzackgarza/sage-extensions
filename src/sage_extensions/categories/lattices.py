@@ -4431,12 +4431,12 @@ class Lattices(OwnedCategoryOverBaseRing):
             subgroup property, rather than applying Kneser's theorem to the
             scaled lattice, whose ``rank_2`` is zero.
 
-            The rank-ten Enriques lattice ``Lambda(2)`` is a distinct case:
-            Allcock, *Congruence subgroups and Enriques surface
-            automorphisms*, J. London Math. Soc. 98 (2018), Theorem 1.1,
-            proves generation by an infinite Bertini-involution family,
-            not by the finite family this method would need to return.
-            Other lattices without a proved finite family are refused.
+            The rank-ten Enriques lattice ``Lambda(2)`` remains a distinct
+            case: Allcock's Bertini family proves a normal-generation result,
+            not a finite ordinary generating set returned by this method.
+            The congruence calculations for the Coble lattice and their
+            limitation are superseded here by the cited full generation theorem.
+
             """
             from sage_extensions.categories.hyperbolic_lattices import HyperbolicLattices
 

@@ -65,6 +65,19 @@ def _engine_vector(module, element):
     )
 
 
+def _engine_covector(module, element):
+    r"""Coordinates of an owned linear functional in the dual engine lattice.
+
+    The engine reads a character against a ray as the product ``m * ray``,
+    and Sage's toric lattices refuse that product inside one lattice: the
+    functional has to be an element of the dual ``M`` of the lattice ``N``
+    the fan's rays live in.
+    """
+    return _engine_lattice(module).dual()(
+        [int(coordinate) for coordinate in _engine_vector(module, element)]
+    )
+
+
 def _owned_vector(module, coordinates):
     r"""The element of the owned module with the stated frame coordinates."""
     integers = _integers()

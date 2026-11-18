@@ -11,13 +11,26 @@ from sage_extensions.all import *  # noqa: F401,F403
 
 
 def _projective_plane():
+    r"""The fan with rays ``e_1, e_2, -e_1 - e_2`` and maximal cones the consecutive pairs."""
     fans = RationalPolyhedralFans(ZZ.free_module(2))
-    return fans(((1, 0), (0, 1), (-1, -1)), ((0, 1), (1, 2), (2, 0))).toric_variety(QQ)
+    rays = ((1, 0), (0, 1), (-1, -1))
+    return fans(
+        ((rays[0], rays[1]), (rays[1], rays[2]), (rays[2], rays[0]))
+    ).toric_variety(QQ)
 
 
 def _p1_times_p1():
+    r"""The fan with rays ``±e_1, ±e_2`` and maximal cones the consecutive pairs."""
     fans = RationalPolyhedralFans(ZZ.free_module(2))
-    return fans(((1, 0), (0, 1), (-1, 0), (0, -1)), ((0, 1), (1, 2), (2, 3), (3, 0))).toric_variety(QQ)
+    rays = ((1, 0), (0, 1), (-1, 0), (0, -1))
+    return fans(
+        (
+            (rays[0], rays[1]),
+            (rays[1], rays[2]),
+            (rays[2], rays[3]),
+            (rays[3], rays[0]),
+        )
+    ).toric_variety(QQ)
 
 
 def test_the_weight_zero_piece_of_sections_of_a_torus_invariant_line_on_p2_is_one_dimensional() -> None:
@@ -53,7 +66,7 @@ def test_the_integral_cohomology_of_p2_has_ranks_1_0_1_0_1() -> None:
     r"""``H^*(P^2(CC), ZZ) = ZZ[h]/(h^3)`` with ``deg h = 2`` (Hatcher, *Algebraic Topology*, Thm. 3.12)."""
     plane = _projective_plane()
 
-    assert [plane.integral_singular_cohomology(k).rank() for k in range(5)] == [1, 0, 1, 0, 1]
+    assert [plane.integral_singular_cohomology(k).module_rank() for k in range(5)] == [1, 0, 1, 0, 1]
     assert all(plane.integral_singular_cohomology(k).is_torsion_free() for k in range(5))
 
 
@@ -65,21 +78,36 @@ def test_the_cycle_class_of_a_line_generates_h2_of_p2() -> None:
     """
     plane = _projective_plane()
     cycle_class = plane.cycle_class_isomorphism(1)
-    line = plane.chow_group(1)(plane.hyperplane_divisor())
-    c = cycle_class.forward()(line)
+    cycles = plane.torus_invariant_cycle_group(1)
+    ray = tuple(cycles.module_generating_set())[0]
+    c = cycle_class.forward()(
+        plane.torus_invariant_cycle_class_map(1)(cycles.module_generator(ray))
+    )
 
-    assert cycle_class.forward().is_bijective()
+    assert cycle_class.forward().is_injective()
+    assert cycle_class.forward().is_surjective()
     assert plane.middle_cohomology_form().b(c, c) == 1
 
 
 def test_the_intersection_form_on_h2_of_p2_is_the_unimodular_form_1() -> None:
-    r"""On ``H^2(P^2, ZZ) = ZZ h``, ``h · h = 1``: two lines meet in one point."""
+    r"""On ``H^2(P^2, ZZ) = ZZ h``, ``h · h = 1``: two lines meet in one point.
+
+    The form is read on the cohomology module's selected generator, so the Gram
+    matrix is ``[[1]]``: symmetric, odd, positive definite of rank one, and
+    unimodular with determinant ``1``.  ``is_unimodular`` is an undecided
+    proposition here because a presented module selects generators and no
+    basis, and the values on the generators are what decide the form.
+    """
     plane = _projective_plane()
     formed = plane.middle_cohomology_form()
+    (generator,) = tuple(formed.module_generators())
 
-    assert formed.rank() == 1
-    assert formed.determinant() == 1
-    assert formed.is_unimodular()
+    assert formed.is_symmetric()
+    assert formed.unformed_module().module_rank() == 1
+    assert formed.b(generator, generator) == 1
+    assert formed.is_even() is False
+    assert formed.signature_pair().first() == 1
+    assert formed.signature_pair().second() == 0
 
 
 def test_the_intersection_form_on_h2_of_p1_times_p1_is_the_hyperbolic_plane() -> None:
@@ -88,12 +116,16 @@ def test_the_intersection_form_on_h2_of_p1_times_p1_is_the_hyperbolic_plane() ->
     Derivation: fibre classes ``f_1, f_2`` with ``f_i^2 = 0`` and ``f_1 f_2 = 1``.
     """
     formed = _p1_times_p1().middle_cohomology_form()
+    first, second = tuple(formed.module_generators())
 
-    assert formed.rank() == 2
-    assert formed.is_unimodular()
-    assert formed.determinant() == -1
-    assert formed.is_even()
-    assert formed.signature_pair() == (1, 1)
+    assert formed.unformed_module().module_rank() == 2
+    assert formed.b(first, first) == 0
+    assert formed.b(first, second) == 1
+    assert formed.b(second, second) == 0
+    assert formed.is_symmetric()
+    assert formed.is_even() is True
+    assert formed.signature_pair().first() == 1
+    assert formed.signature_pair().second() == 1
 
 
 def test_p2_is_simply_connected() -> None:
@@ -105,10 +137,20 @@ def test_p2_is_simply_connected() -> None:
 
 
 def test_the_hodge_diamond_of_p2_is_diagonal() -> None:
-    r"""``h^{p,q}(P^2) = 1`` for ``p = q ≤ 2`` and ``0`` otherwise; ``h^{2,0} = h^0(K) = 0``."""
+    r"""``h^{p,q}(P^2) = 1`` for ``p = q ≤ 2`` and ``0`` otherwise; ``h^{2,0} = h^0(K) = 0``.
+
+    ``H^*(P^2)`` is not of one weight: its weight filtration has ``Gr^W_0 = H^0``,
+    ``Gr^W_2 = H^2`` and ``Gr^W_4 = H^4``, and each of the three is pure by
+    Jurkiewicz--Danilov.  What is diagonal is the Hodge bigrading, ``h^{p,q} = 0``
+    for ``p != q``: the structure is Hodge--Tate.
+    """
     hodge = _projective_plane().hodge_structure()
 
-    assert hodge.is_pure()
+    assert hodge.is_hodge_tate()
+    assert hodge.weight_support().cardinality() == 3
+    assert all(
+        hodge.weight_graded_piece(weight).is_pure() for weight in hodge.weight_support()
+    )
     assert hodge.hodge_number(0, 0) == 1
     assert hodge.hodge_number(1, 1) == 1
     assert hodge.hodge_number(2, 2) == 1
@@ -119,3 +161,19 @@ def test_the_hodge_diamond_of_p2_is_diagonal() -> None:
 def test_p1_times_p1_has_h11_equal_to_two() -> None:
     r"""``h^{1,1}(P^1 x P^1) = b_2 = 2`` by Künneth."""
     assert _p1_times_p1().hodge_structure().hodge_number(1, 1) == 2
+
+
+def test_the_rays_and_maximal_cones_of_the_projective_plane_are_the_projective_space_fan() -> None:
+    r"""``e_1, e_2, -e_1 - e_2`` with the consecutive pairs as maximal cones is the fan of ``P^2`` (Cox--Little--Schenck, Example 3.1.10)."""
+    plane = _projective_plane()
+    fans = RationalPolyhedralFans(ZZ.free_module(2))
+
+    assert plane.fan().is_isomorphic(fans.projective_space_fan())
+
+
+def test_the_rays_and_maximal_cones_of_p1_times_p1_are_the_hirzebruch_surface_fan_of_twist_zero() -> None:
+    r"""``±e_1, ±e_2`` with the consecutive pairs as maximal cones is the fan of ``F_0 = P^1 x P^1`` (Cox--Little--Schenck, Example 3.1.16)."""
+    quadric = _p1_times_p1()
+    fans = RationalPolyhedralFans(ZZ.free_module(2))
+
+    assert quadric.fan().is_isomorphic(fans.hirzebruch_surface_fan(0))

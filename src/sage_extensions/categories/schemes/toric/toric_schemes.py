@@ -72,6 +72,7 @@ from sage_extensions.categories.schemes.schemes import (
 from sage_extensions.categories.schemes.toric.fans import (
     RationalPolyhedralFans,
     _engine_cone,
+    _engine_covector,
     _engine_fan,
     _engine_vector,
     _owned_vector,
@@ -734,6 +735,10 @@ class ToricSchemes(OwnedCategoryOverBaseRing):
             of a full-dimensional polytope has a full-dimensional normal cone, so that cone is one
             of the fan's maximal cones and its chart is one chart of :meth:`affine_cover`.
 
+            The answer is retained per vertex of the polytope: the pairing that decides the
+            supporting normals is asked once for a vertex, and a repeat request -- including the
+            one :meth:`vertex_chart` makes -- reads the cone this variety already answered with.
+
             EXAMPLES::
 
                 sage: from sage_extensions.all import ConvexPolytopes, QQ, ZZ
@@ -749,12 +754,43 @@ class ToricSchemes(OwnedCategoryOverBaseRing):
                 "them"
             )
             polytope = self.polarizing_polytope()
-            fan = self.fan()
             vertex = polytope.ambient_lattice()(vertex)
             assert vertex in polytope.vertices(), (
                 f"the normal cone of {vertex} is taken at a vertex of {polytope}, and this is not "
                 "one of its vertices"
             )
+            position = tuple(
+                int(coordinate)
+                for coordinate in _engine_vector(polytope.ambient_lattice(), vertex)
+            )
+            decided = self._vertex_normal_cone_registry()
+            cone = decided.get(position)
+            if cone is None:
+                cone = self._vertex_normal_cone_of(vertex)
+                decided[position] = cone
+            return cone
+
+        @cached_method
+        def _vertex_normal_cone_registry(self):
+            r"""The normal cones this variety has already decided, by vertex coordinates.
+
+            Keyed by the vertex's coordinates in the polytope's lattice rather
+            than by the lattice point itself, whose equality and hashing belong
+            to the lattice the polytope lives in.
+            """
+            return {}
+
+        def _vertex_normal_cone_of(self, vertex):
+            r"""The cone of this fan spanned by the inner normals at ``vertex``.
+
+            The rays of the normal fan minimized at ``vertex`` are decided by the
+            polytope's own pairing (``normal_supports_point``); the one maximal
+            cone containing every one of them is the normal cone of the vertex,
+            and the assertions state what makes it one cone of this fan, of full
+            dimension, spanned by exactly those normals.
+            """
+            polytope = self.polarizing_polytope()
+            fan = self.fan()
             supporting = tuple(
                 ray for ray in fan.rays() if polytope.normal_supports_point(ray, vertex)
             )
@@ -1608,7 +1644,7 @@ class ToricSchemes(OwnedCategoryOverBaseRing):
             weight = self.character_lattice()(weight)
             engine_divisor = self._engine_toric_divisor(divisor)
             simplicial = engine_divisor._sheaf_complex(
-                _engine_vector(self.character_lattice(), weight)
+                _engine_covector(self.character_lattice(), weight)
             )
             if int(simplicial.dimension()) == -1:
                 degree_zero = base.free_module(1)
@@ -2001,7 +2037,7 @@ class ToricSchemes(OwnedCategoryOverBaseRing):
                 )
                 return target.linear_combination(
                     {
-                        label: integers(coefficient)
+                        label: _owned_engine_element(SageZZ, coefficient)
                         for label, coefficient in zip(target_labels, coordinates, strict=True)
                         if coefficient
                     }

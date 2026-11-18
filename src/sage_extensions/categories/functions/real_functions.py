@@ -579,19 +579,42 @@ def _engine_formula_value(value):
         return None
 
 
+class _ConstantMap:
+    r"""The constant map ``p |-> value``, with its value retained.
+
+    A constant function of a space of maps is the map that takes the same value
+    at every point, and an owned value is what states it: the engine writes no
+    formula for an element of an owned ring, so such a map is not a symbolic
+    expression.  The value is retained here so that a consumer which speaks
+    about the function -- the chart adapters of ``categories.manifolds``, which
+    lower a section to the engine's formula in a chart's coordinates -- reads
+    the constant instead of an opaque callable.
+    """
+
+    def __init__(self, value) -> None:
+        self._value = value
+
+    def value(self):
+        r"""The value the map is constant at."""
+        return self._value
+
+    def __call__(self, point):
+        return self._value
+
+
 def _constant_map(value):
     r"""The defining function of the constant map with value ``value``.
 
     A value the engine writes as a formula keeps one, so the operations that
     read a formula in one variable -- derivative, integral, Taylor series, the
     pairings -- work on a constant function too.  An owned value has no engine
-    formula, so the constant map is the value itself; an operation that needs a
-    formula then states that frontier, as it does for any other map given by a
-    callable.
+    formula, so the constant map is the value itself
+    (:class:`_ConstantMap`); an operation that needs a formula then states that
+    frontier, as it does for any other map given by a callable.
     """
     match _engine_formula_value(value):
         case None:
-            return lambda point: value
+            return _ConstantMap(value)
         case expression:
             return _formula_map(expression, SR.var("t"))
 

@@ -996,14 +996,17 @@ def _toric_middle_cohomology_form(scheme):
     cohomology_to_picard = picard_to_chow.inverse() * cycle_class.inverse()
     intersection = scheme.picard_intersection_pairing()
     integers = _owned_integers()
-    # Degree-two classes commute under cup product.
-    return BilinearFormModules(integers).Symmetric()(
+    # Degree-two classes commute under cup product.  The form is the kind's own
+    # construction datum, and commutativity is the category the construction is
+    # asked for: a property level names no construction of its own.
+    return BilinearFormModules(integers)(
         cohomology.bilinear_forms(integers)(
             lambda left, right: intersection(
                 cohomology_to_picard(left),
                 cohomology_to_picard(right),
             )
-        )
+        ),
+        _extra_categories=(BilinearFormModules(integers).Symmetric(),),
     )
 
 

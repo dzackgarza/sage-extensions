@@ -285,3 +285,131 @@ exit 0, 290.9 s
 Peak tree RSS 340 MiB on the second probe. The tests of the two touched
 behaviours are `tests/lattices/test_the_stable_orthogonal_group_generators_refuse.sage`
 and `tests/lattices/test_the_coble_lattice_carries_no_generating_set.sage`.
+
+## 6. Re-decided against the level-four theorem
+
+The five items below are decided on this tree. None of them is a generation
+proof, and the one that would be is stated as open with its exact statement.
+
+| item | state | where |
+|---|---|---|
+| the preimage owner | decided: `PreimageSubgroups`, not `KernelSubgroups` | `predicate_subgroups.py:1646`, install `:1655`-`:1657`, method `:1678`/`:1684`; the index it consumes at `groups.py:673`/`:677` |
+| integral isometry, per generator | delivered | `tests/lattices/test_the_coble_kernel_candidates_pass_the_generator_checks.sage`, `lattices.py:4149` is the descending check the library owns |
+| trivial discriminant action, per generator | delivered | same file; the library's own assert for a constructed family is `lattices.py:4594` |
+| a generating family, provably complete | **open** | `stable_orthogonal_group_generators`, `lattices.py:4404`, refuses; nothing is stored as a generating set |
+| no coset enumeration in the proof | delivered for the level-four statement | `\Gamma(2)/\Gamma(4) \cong (\mathbb{Z}/2)^{56}` by linear algebra in 56 dimensions, not by the 46 998 591 897 600-coset transversal |
+
+**The 56 candidates.**  The test file carries 56 vectors of square `\pm 2` in
+`T_Co`'s own form, i.e. of square `\pm 1` in the odd unimodular half, in the
+catalogue's basis; it builds each reflection with `L.reflection`, which is the
+library's own integral reflection, checks the displacement of every generator
+against the reflection formula, and asserts for every one that its discriminant
+image is trivial and that it lies in `stable_orthogonal_group()`.  The family is
+not stored anywhere else and is not the value of any field: a candidate whose
+completeness is open is not a generating set.  What makes the family worth
+carrying is the level-four statement: with `X = I + 2A` the exact identity
+`A^T G_M + G_M A + 2 A^T G_M A = 0` forces, after the divided diagonal, the row
+sums `\sum_{k \ne i} A_{ik} = 0` beside symmetry, ten independent conditions on
+the 66-dimensional symmetric space, so `\Gamma(2)/\Gamma(4)` is
+`(\mathbb{Z}/2)^{56}`; the 56 classes of the candidates were checked to be
+independent, hence they generate `\Gamma(2)` modulo `\Gamma(4)`.
+
+**What that does not give, and why it cannot be upgraded cheaply.**  A family
+that generates modulo `\Gamma(4)` generates only if `\Gamma(4)` is inside the
+subgroup it generates.  Two facts bound that: the reflection classes span all
+56 dimensions, so no level-four computation can separate the family from
+`\Gamma(2)`; and no finite-level computation can, since `H\cdot\Gamma(2^k) =
+\Gamma` for every `k` is compatible with `H` of infinite index (`3\mathbb{Z}`
+inside `\mathbb{Z}` with the `2`-power filtration).  The statement that would
+close it is `\Gamma(4) \leq \langle S\rangle`, equivalently that the maximal
+elementary abelian quotient of `\Gamma` is exactly `\Gamma/\Gamma(4)`; if it
+holds, the Frattini argument turns the 56 candidates into `\Gamma = \langle S\rangle`
+outright.
+
+**The database end, measured.**  `tests/cards/lattice-database-enriques.json`
+lists the arithmetic-group rows as `data.cardinality`,
+`data.abstract_structure`, `data.line_orbits`, `data.plane_orbits`,
+`data.flag_orbits`, `data.reference.citation`, `latex`, `lattice` and
+`parent_group`; `data.generator_morphisms` is not among them, so the field is
+absent at both ends — the library refuses to produce it and the digest this
+repository reads would not carry it if it did.
+
+## 7. Level eight: the ceiling of the reflection mechanism
+
+`results/coble-kernel-level-eight.py` computes, exactly and with no engine, what the
+reflections reach one level below the level-four statement. A reflection in a vector of
+square `\pm 1` is an involution, so squares contribute nothing to `\Gamma(4)/\Gamma(8)`;
+a product of two reflections lies in `\Gamma(4)` exactly when the two vectors agree
+modulo two.
+
+```
+commutators of the 56 candidates          1540 classes, span 54
+two-fold reflection products              2016 classes, span 54   (six unit vectors per class)
+commutators and two-fold products                           span 54
+four-fold reflection products (sampled)                     span 54
+```
+
+(An independent run over 3584 two-fold products, eight vectors per class, gave the same
+54, and 67 four-fold products also stayed inside it; the counts move with the sample, the
+dimension does not.)
+
+So one 54-dimensional subspace of the level-four class space contains **every** reflection
+product sampled, including classes produced by four-fold words that are not commutators.
+The class space itself is 54- or 55-dimensional: 55 is the alternating-space bound, 54 is
+what these products reach.
+
+That makes the remaining question binary and decidable by one computation:
+
+* if the level-four class space is 55-dimensional, then **no subgroup generated by
+  reflections in square-`\pm 1` vectors is all of `\Gamma`**, the 56 candidates do not
+  generate, and any generating set must carry an element outside the reflection mechanism;
+* if it is 54-dimensional, the reflections are level-eight complete and the missing step
+  is one level deeper.
+
+Deciding it needs one explicit element of `\Gamma(4)` whose class lies outside the
+54-space: `X = I + 4Y` with `Y` integral and `Y^T G_M + G_M Y + 4Y^T G_M Y = 0`, solved for
+`Y` in a class the reflections cannot reach. That lifting is a linear system modulo four in
+121 unknowns per class, and it is the next computation to run — noted here rather than
+claimed.
+
+What this settles for the acceptance: the reflection family, which is the only family the
+literature supplies for this lattice, is capped at level eight by a 54-versus-55 count. The
+database field stays absent either way, and nothing is stored as a generating set.
+
+## 8. Conjugating the level-four span by isometries outside the kernel
+
+The reflection span at level four is normalised by nothing on its face: a conjugate of a
+level-four element by *any* isometry of `M` is again level four, so an isometry outside
+`\Gamma` could carry a class out of the 54-dimensional span and settle the 54-versus-55
+question in the negative. Ten such isometries were tried, each checked to be an integral
+isometry of `M` with a nontrivial image modulo two: the eight reflections in the `E_8`
+coordinate vectors of square `-2`, the swap of the two hyperbolic coordinates, and the
+product of the swap with one of the `E_8` reflections. Every one of the 1540 commutator
+classes was conjugated by each, and the span stays **54** in all ten cases: no class left
+the span.
+
+So the conjugation mechanism does not produce the missing dimension. What remains is the
+lifting congruence itself: find `Y` integral with `Y^T G_M + G_M Y + 4Y^T G_M Y = 0` whose
+class modulo two lies outside the 54-space, or prove no such `Y` exists. Two facts bound
+it and are worth recording with the search: every level-four class is alternating (the
+55-dimensional bound), and every reflection product so far — commutators, two-fold words,
+four-fold words, and all ten conjugates — lies in the same 54.
+
+## The run of the level-eight script
+
+`python3 results/coble-kernel-level-eight.py` completes from the repository root and
+reproduces every number above: the reflection span `54` from `1540` commutators, the
+two-fold and four-fold products inside it, and the conjugation stage reporting
+`isometries outside Gamma that move a level-four class out of the span: 0` for all ten
+isometries. Measured at load 35: `exit 0`, 8 min 37 s wall; the arithmetic is exact
+integers and no engine is loaded.
+
+Why no reflection word escapes the 54, as an argument rather than a sample. The classes of
+the 56 reflections are a basis of the level-two class space, so a word in reflections lies
+in `\Gamma(4)` exactly when its class sum vanishes; modulo `\Gamma(8)` such a word reduces to
+a product of commutators and squares of the generators, and squares of reflections are the
+identity. Hence every reflection word's level-four class is a sum of commutators of the
+basis classes, which is the 54-dimensional span computed above — reached by 1540
+commutators, and not exceeded by two-fold words, four-fold words, ten conjugations, or the
+3182 unit vectors across 56 classes that were searched for a vanishing three-fold class sum
+(none exists: a sum of two distinct basis classes is not a reflection class).

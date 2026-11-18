@@ -167,6 +167,19 @@ class EuclideanSpaces(OwnedCategory):
             r"""The model space of the underlying affine space, where the inner product lives."""
             return self._affine_space.model_vector_space()
 
+        def translation_action(self):
+            r"""The translations of the underlying affine space, acting on the points of this space.
+
+            Forgetting the metric forgets this action and nothing else: the points
+            of a Euclidean space are the points of its affine space, so the same
+            model vectors translate them.
+            """
+            return self._affine_space.translation_action()
+
+        def difference(self, left, right):
+            r"""The model vector carrying the point ``right`` to the point ``left``."""
+            return self._affine_space.difference(left, right)
+
         def an_element(self):
             return self._affine_space.an_element()
 
@@ -226,15 +239,47 @@ class SphericalSpaceMor(CategoricalMor):
             return self._ambient_isometry(point)
 
         def __mul__(self, other):
-            pass
+            r"""Compose the ambient isometries of the two arrows, in this order.
+
+            An isometry of the sphere composed with an isometry of the sphere is
+            one, and the composite's ambient isometry is the composite of theirs:
+            the sphere's arrows carry no other datum.
+            """
+            if other.codomain() is not self.domain():
+                return NotImplemented
+            return self.parent().base_category().Mor(other.domain(), self.codomain())(
+                self._ambient_isometry * other._ambient_isometry
+            )
 
     def _element_constructor_(self, ambient_isometry):
-        pass
+        r"""Construct the arrow from the ambient isometry it is.
+
+        An arrow of a round sphere is an ambient isometry of the Euclidean space
+        the sphere lies in -- the datum this category states -- and one carrying
+        another sphere's Euclidean space is refused here rather than stored.  That
+        the ambient isometry preserves the sphere, and not only the Euclidean
+        metric, is the decision of
+        :meth:`SphericalSpaces.ParentMethods.is_an_isometry`, which this category
+        states and does not make.
+        """
+        if (
+            ambient_isometry.domain() is not self.domain().euclidean_space()
+            or ambient_isometry.codomain() is not self.codomain().euclidean_space()
+        ):
+            raise ValueError(
+                f"an arrow of {self} is an isometry of the Euclidean space "
+                f"{self.domain().euclidean_space()} the sphere lies in, but "
+                f"{ambient_isometry} carries {ambient_isometry.domain()} into "
+                f"{ambient_isometry.codomain()}"
+            )
+        return self.element_class(self, ambient_isometry)
 
     @object_level
     @cached_method
     def identity(self):
-        pass
+        r"""The identity isometry: the identity of the Euclidean space the sphere lies in."""
+        euclidean = self.domain().euclidean_space()
+        return self(euclidean.category().Mor(euclidean, euclidean).identity())
 
 
 class SphericalSpaceMorCategoryConstruction(MorCategoryConstruction):
@@ -254,10 +299,61 @@ class SphericalSpaces(OwnedCategory):
         return "round spherical spaces"
 
     def an_object(self):
-        pass
+        r"""Return the zero-sphere: the two points at distance one from the line's origin.
+
+        The round zero-sphere `S^0` is the pair `\{-1, 1\}` of the Euclidean line,
+        centred at the line's origin with radius one.  Its isometry group is the
+        pair of its two permutations, the identity and the swap, as the sphere's
+        own decision answers.
+        """
+        euclidean = EuclideanSpaces().an_object()
+        centre = euclidean.an_element()
+        radius = RR.one()
+        inner_product = euclidean.model_inner_product()
+        points = euclidean.point_set()
+        return self.in_space(
+            euclidean,
+            centre,
+            radius,
+            points.condition_set(
+                lambda point: inner_product(
+                    euclidean.difference(point, centre),
+                    euclidean.difference(point, centre),
+                )
+                == radius * radius
+            ).inclusion(),
+        )
 
     def in_space(self, euclidean_space, center, radius, inclusion):
-        pass
+        r"""Select the round sphere with this centre, radius and inclusion.
+
+        ``euclidean_space`` is the Euclidean space the sphere lies in, ``center``
+        its centre and ``radius`` its radius there, and ``inclusion`` is the map
+        of the sphere's points into that space's points.  These four are the
+        sphere: they are read from the caller and nothing is computed from them,
+        because which round sphere a use wants is a choice.  Every decision the
+        sphere makes is a decision about them -- an arrow of it is an ambient
+        isometry, and it preserves the sphere exactly when it fixes this centre
+        (:meth:`ParentMethods.is_an_isometry`).
+        """
+        assert euclidean_space in EuclideanSpaces(), (
+            f"a round sphere lies in a Euclidean space, but {euclidean_space} is in "
+            f"{euclidean_space.category()}"
+        )
+        assert inclusion.codomain() is euclidean_space.point_set(), (
+            f"the points of a sphere in {euclidean_space} are points of that space, but "
+            f"{inclusion} lands in {inclusion.codomain()}"
+        )
+        assert radius.is_zero() is False, (
+            f"a round sphere has a nonzero radius, and this one is selected with radius {radius}"
+        )
+        return _object_of(
+            self,
+            euclidean_space=euclidean_space,
+            center=center,
+            radius=radius,
+            inclusion=inclusion,
+        )
 
     class ParentMethods:
         def __init__(self, euclidean_space, center, radius, inclusion, **rest):
@@ -281,3 +377,44 @@ class SphericalSpaces(OwnedCategory):
 
         def underlying_sphere(self):
             return self._inclusion.domain()
+
+        def point_set(self):
+            r"""The points of the sphere: the points of its underlying sphere."""
+            return self._inclusion.domain()
+
+        def underlying_affine_space(self):
+            r"""The affine space of the Euclidean space the sphere lies in."""
+            return self._euclidean_space.underlying_affine_space()
+
+        def __contains__(self, point):
+            return point in self.point_set()
+
+        def _element_constructor_(self, point):
+            r"""Coerce a point through the point set: an element of this sphere is one of its points."""
+            return self.point_set()(point)
+
+        def is_an_isometry(self, ambient_map) -> bool:
+            r"""Decide whether a map of this round sphere is an isometry of it.
+
+            An arrow of a round sphere is an ambient isometry of the Euclidean
+            space it lies in, so the decision has two parts.  The ambient map must
+            be a Euclidean isometry, which that space decides from its own inner
+            product; and it must carry the sphere to itself, which -- the centre
+            determining the sphere it is the centre of -- is that it fixes the
+            centre.  A Euclidean isometry that moves the centre is a map of the
+            Euclidean space and not of this sphere, and is refused here, so no
+            affine or Euclidean check stands in for the sphere's own.
+
+            A map of another sphere is refused rather than answered: this
+            sphere's centre is not the centre of a map between other endpoints.
+            """
+            if ambient_map.domain() is not self or ambient_map.codomain() is not self:
+                raise ValueError(
+                    f"the isometry decision of {self} is a decision about its own maps, but "
+                    f"{ambient_map} carries {ambient_map.domain()} into {ambient_map.codomain()}"
+                )
+            euclidean = self.euclidean_space()
+            ambient = ambient_map.ambient_isometry()
+            if euclidean.is_an_isometry(ambient) is not True:
+                return False
+            return ambient(self.center()) == self.center()

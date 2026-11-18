@@ -3293,6 +3293,12 @@ class Algebras(OwnedCategoryOverBaseRing):
                     case _ if self is _scalar_module(ring):
                         # U_R(R) is the domain of its own unit map r |-> r * 1.
                         return super()._element_constructor_(value)
+                    case _ if type(value) is int:
+                        # A Python integer literal is an integer, and the
+                        # coefficient ring receives the integers: ``sum`` of
+                        # sections starts at the literal ``0``, which is the
+                        # constant map with value ``0``.
+                        return self.unit_morphism()(ring(value))
                     case _ if source is ring and self.unformed_module() is not ring:
                         return self.unit_morphism()(value)
                     case _ if (
