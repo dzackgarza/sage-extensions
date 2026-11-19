@@ -183,6 +183,38 @@ family generates `P_v^1`.  The remaining limitation is input availability, not
 this construction: an `O(K)` family must be supplied, and the completed
 chamber supplies it only for a reflective hyperbolic `K`.
 
+## The nonreflective quotient
+
+The remaining universal case is a nonreflective `K_I`.  The decisive small
+specimen is
+
+    L = U + K,   K = NamedLattices.BogachevKolpakovNonReflective,
+
+with `L` of signature `(2, 3)` and the pointed vector `e` the first generator of
+the `U` summand.  Here `K` has signature `(1, 2)`, `e` is primitive isotropic
+of divisibility one, and `K` is nonreflective: the edgewalk answers `False` in
+7.18 s.  The quotient is not the obstruction to having generators — the port's
+`O(K)` call returns 12 generators in 10.63 s.
+
+What does not return is the pointwise finite-residue action: on this `L`,
+`subobject.pointed_stabilizer_generators()` was still running at 520 s at
+1.08 GiB, and the public port fallback did not return at 120 s.  This is a cost
+bound, not a demonstrated absent family.  The residue bound
+`2 d^2 |disc(K_I)|^2 [L : i^*(L)]` is valid but its orbit span is too large to
+enumerate here.
+
+The narrow supported cases are already handled: on each of the two
+Bogachev--Kolpakov nonreflective lattices themselves, an `isotropic_vector()`
+has rank-one reduction; the owned action returns 28 generators in 4.38 s and
+56 in 31.01 s respectively, all fixing the vector.
+
+**Residual requirement.** A finite `O(K_I)`-set `X` of lift-torsor residues,
+strictly smaller than the orbit span of the displayed bound, with a named point
+`x` and the proved equality `M_I = Stab_{O(K_I)}(x)`.  With such an `X`, the
+existing `IntegralStructureAction` owner would give the stabilizer without the
+520-second orbit enumeration.  The present bound proves existence of a finite
+action but does not make it affordable at this specimen.
+
 ## Not run
 
 No full suite, no `just test`, no ast-grep gates (ast-grep is not installed).
