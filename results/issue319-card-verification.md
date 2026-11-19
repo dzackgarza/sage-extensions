@@ -153,17 +153,39 @@ count off that decomposition is therefore a decision about when the hypothesis
 holds, not a performance tweak, and it is not made here: the row keeps the
 exact double-coset walk and the card's plane row stays `UNDECIDED`.
 
+## The plane row has two entries, and neither decides the smallest card
+
+The number the card states is one thing; the entry point that returns it is
+another.  Card `gamma-h-3` states `#I_2 = 10` (Table 1, p. 13), and the library
+offers two public computations of that count, both measured here on that card:
+
+```
+<group>.isotropic_orbit_representatives(2)      still running at 480 s
+<group>.isotropic_plane_orbits(P1, P2)          still running at 300 s
+```
+
+The first is the row #286 names, and the section above says which of its routes
+it takes and why that route cannot return at this size.  The second is the
+divided-class decomposition: its hypothesis $\rho(G_x) = \mathrm{Stab}_Q(J_x)$
+is the one the published indices 527 and 23715 certify for $T_{\mathrm{En}}$
+(Dutour Sikirić--Hulek, §3.6, p. 22), and it is the call a reader would reach
+for to decide the row by another route.  It does not decide this card inside
+five minutes either, so the hypothesis question is not the whole gap: a plane
+row of a *subgroup* of $\Gamma_{\mathrm{En},2}$ is not answered by either entry
+today.
+
+That is where the acceptance's plane and flag rows stand, and the defect block
+above is unchanged.
+
 ## What this round did not do
 
 * The plane route and the flag route are not repaired: they are #390/#391's
   cost question (one double coset per class-set point), not a reading here.
 * `#\bar\Gamma_h` is compared nowhere yet: it needs the same plane and flag
   rows.
-* `tests/lattices/test_enriques_polarization_orbits.sage` still carries 261
-  parametrized comparisons of the same rows inside the per-test gate.  Each is
-  one public call of tens of seconds to 203 s (`results/issue17-gamma-h-line-rows.md`
-  records 10-20 s a card for `gamma-h-2` to `gamma-h-87` and 203 s for
-  `gamma-h-1`, on a warm process), against a 20 s call ceiling and a 60 s
-  timeout, so the file cannot pass the gate; the same rows are decided by the
-  image job, which is where the module keeps them.  Removing or re-homing that
-  copy is not part of this round's change.
+* `tests/lattices/test_enriques_polarization_orbits.sage` carried 261
+  parametrized comparisons of the same rows inside the per-test gate, each one
+  public call of tens of seconds to 203 s against a 20 s call ceiling.  They are
+  gone: the file keeps the decode and the card pinning that the comparison rests
+  on (`6 passed in 1.05s`), and the rows themselves are compared by the image
+  job.
