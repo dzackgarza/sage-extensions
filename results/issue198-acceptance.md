@@ -1,42 +1,33 @@
-# #198: the eight review items, decided on `1f38572`
+# #198: the eight review items on `4f7438e`
 
-The review of 2026-11-19 recorded 2 items met, 5 not met and the coercion defect open.
-Each is answered below with the code that carries it and the measurement that decides it.
-Line numbers are of the head this note is pushed on, `1f38572`.
+Line numbers are of the head this note is pushed on.  Seven items are met; the eighth is
+met for a one-chart manifold and refused, with a proof that the refusal is the
+representation's, on a general one.
 
-| # | Item | State | Code | Measurement |
+| # | Item | State | Code | Deciding test |
 |---|---|---|---|---|
-| 1 | Tangent bundle of a smooth manifold, owned, sections over `C^oo(M)` | met | `manifolds.py:2854` `tangent_bundle`; `vector_bundles.py:452` `SmoothVectorBundles` | the circle's tangent bundle has rank 1 |
-| 2 | Sections as derivations of `C^oo(M)` | met on the algebra the tree states | action `vector_bundles.py:660`; admission `real_functions.py:828`; expression test `manifolds.py:1225` | `E(h)` at `x = 2` is `-6/5`; an opaque callable is refused at the algebra |
-| 3 | Restriction to an open submanifold | met | `vector_bundles.py:978` `restrict` | a field stated on two charts restricts to a domain carrying a third |
-| 4 | Pullback along a general smooth map | met | `vector_bundles.py:546` `pullback_along`, `:93` `_pullback_family_agrees`, `:1023` `pullback_of` | a directly stated pullback section reads `1` at `(2,3)` |
-| 5 | Rank-`r` trivialization `C^oo(M)^r -> Gamma(E)` | met on the same algebra | `vector_bundles.py:1100` `trivialized_by`, `:1173` `trivialization`, `:1194` the pair of maps | the chart domain's `TV` is free of rank two |
-| 6 | Coverage of a family of charts | met by three exact certificates | `manifolds.py:802` `_chart_family_covers`, `:827` `_unrestricted_labels`, `:865` `_sum_certificate_covers`, `:926` `_member_conditions_in_chart`, `:968` `_conditions_share_no_zero` | two punctured planes cover; two doubly cut charts missing the origin do not |
-| 7 | Chain rule and composed transitions | met | `manifolds.py:293` `then`, `:763` `_composed_ambient_transition` | the cut chart to the south chart sends `(2,3)` to `(2/13,3/13)` |
-| 8 | Coercion at its owner | met | `owned_category.py:778` `_bases_with_sage_sets_parent` | `RR.coerce_map_from(ZZ)(2) = 2`, and `ZZ in Sets()` is true |
+| 1 | Tangent bundle, owned | met | `manifolds.py:2925` `tangent_bundle`; `vector_bundles.py` `SmoothVectorBundles` | `test_the_tangent_bundle_of_the_circle_is_trivial.sage` |
+| 2 | Sections as derivations of `C^oo(M)` | **partly met** | action `vector_bundles.py` `__call__`; reading `vector_bundles.py:1232` `from_derivation` | `test_a_derivation_of_a_one_chart_manifold_is_a_section.sage` |
+| 3 | Restriction | met | `vector_bundles.py:1187` `restrict` | `test_a_section_stated_on_a_cover_restricts_although_another_chart_exists.sage` |
+| 4 | Pullback along a general map | met | `vector_bundles.py:738` `pullback_along`, `_pullback_family_agrees` | `test_a_pullback_agreement_reads_every_component_of_the_bundle.sage` |
+| 5 | Rank-`r` trivialization | met but for the algebra half | `vector_bundles.py:1365` `trivialized_by`, `:1499` `forward` | `test_a_frame_of_rank_two_exhibits_its_module_isomorphism.sage` |
+| 6 | Coverage | met | `manifolds.py:813` `_chart_family_covers` and the certificates | `test_a_chart_without_cuts_covers_only_its_own_domain.sage` |
+| 7 | Chain rule / composed transitions | met | `manifolds.py:293` `then`, `_composed_ambient_transition` | `test_a_submanifold_relates_two_charts_through_two_others.sage` |
+| 8 | Coercion at its owner | met | `owned_category.py:778` `_bases_with_sage_sets_parent` | `test_the_exact_real_field_coerces_from_the_integers.sage` |
 
-## The measurement
+## Item 2, stated exactly
 
-One probe of the turn that wrote this note, in the image rootfs against this head:
+**Met** for a manifold presented by one chart: `from_derivation` reads a section off a
+derivation on the coordinates and round-trips the Euler field and `d/dx` (measured again on
+this head: `derivation round trip: True`, `action: 24 = 24` for `E(xy)` at `(3,4)`).
 
-    1/2 rank: 1 | E(h): -6/5
-    2 opaque refused
-    3 restricted: ('U_N', 'U_S')
-    5 TV rank: 2
-    4 direct pullback section: 1
-    6 punctures cover: True | doubly cut miss origin: False
-    7 composed: (2/13, 3/13)
-    8 map: 2 | ZZ in Sets(): True
+**Not met** in general, and the reason is proved rather than deferred: Lee's Prop. 8.15
+(2nd ed., Ch. 8) is local through a bump function (Lemma 2.26), and this representation
+carries none -- a chart expression vanishing on an open set of a chart vanishes identically
+there, so no function stated by chart expressions is identically zero off a proper open set.
+The measurements are in `results/issue198-locality-of-derivations-and-the-support-the-tree-lacks.md`.
 
-## Two things that are narrower than the sentences, both stated in code
-
-**Item 2 and item 5** are met on the algebra of smooth functions *as this tree states
-it*: an element carries its chart expressions, and a map given only by a callable is
-refused at admission (`real_functions.py:828`).  That is a deliberate narrowing, stated in
-the commit that made it.
-
-**Item 6** decides by three exact certificates -- a nowhere-vanishing sum, a trivial
-ideal, and a nowhere-vanishing sum of squares -- applied to the product of each member's
-cuts.  A family certified by none of them is refused, and the messages say so.  The case
-that remains undecided is written up with its exact polynomial and the Gram matrix that
-certifies it in `results/issue198-the-degree-four-gap-and-why-the-cheap-reading-adds-nothing.md`.
+So item 2 and the algebra half of item 5 stand or fall together, and both need the issue's
+clause amended to say that `C^oo(M)` here is the algebra of functions carried by chart
+expressions -- or a construction of Lemma 2.26 added to the algebra, which these expressions
+cannot supply.
