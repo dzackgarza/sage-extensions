@@ -799,3 +799,31 @@ been corrected by their own follow-up -- the 2^17-arithmetic and this refusal.
 Both were caught by doing the smallest thing rather than reasoning about the
 interface, which is the argument for the probe-per-round habit even when the
 round produces no code.
+
+## The locus is already an image set: the 2^17 was the probe's `list()`
+
+`integral_parameter_classes` returns
+
+    Sets().image_set(Mor(passing x kernel -> P/mP)(sum_of), passing x kernel, inverse=pair_of)
+
+so the locus is presented as `|passing| x |kernel|` and **never listed**.  The
+131 072 figure came from the probe doing `list(classes)` and iterating it in
+41.7 s, and the "replace the enumeration by a subgroup" change this note has
+been proposing for two sections is therefore **already in the code**.
+
+That corrects the previous section's claim that "what is left is the class-set
+construction": what is left is the 256 representatives' lifts and the class
+arithmetic that builds `passing` (256) and `kernel` (512) -- 768 class
+constructions at the finitely presented module's per-operation cost, which is
+what the 6.57 s is spent in, not an enumeration of 131 072.
+
+**So the shape of the remaining cost is different from what the last section
+said**, and the lever with it: not "avoid enumerating the classes", which is
+done, but the per-class cost of `classes_module`'s scalar multiplication and the
+line count.  Both are ordinary arithmetic questions, and neither is a design.
+
+**Counted corrections in this note now stand at three** -- the 2^17 x 0.1 ms
+arithmetic, the isometry constructor's "refusal", and this enumeration.  Each was
+caught by the round after it, by doing the smallest thing instead of reasoning
+about the interface or the set.  That is the strongest argument in this record
+for the probe-per-round habit, and the strongest warning against its prose.
