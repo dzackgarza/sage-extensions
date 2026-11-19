@@ -1,0 +1,34 @@
+results: the refusal has no cheaper route -- 83 cusps share classes, a transporter is 355 s (#381)
+
+Otilde+'s row refuses in the divided-class read because 24 of the 444 keys name
+more than one line cusp; the refusal names tits_building_incidence with a
+transporter.  Priced, from numbers already in the tree:
+
+  one matched cusp's transporter        did not return in 355 s
+  the 13-edge Gamma_{Co,2} T_Co row     1685.31 s  (130 s an edge)
+  line cusps / keys / multi-cusp keys   527 / 444 / 24, so 527-444 = 83 cusps share
+
+The archive gives each line cusp 1080 plane classes, so the 83 ambiguous cusps
+carry 83 x 1080 = 89640 edge endpoints: 89640 x 355 s = 31.8 million s, about 368
+days against the driver's 10800 s cap, and that is the floor.  At the flag
+route's own rate the row's 569160 edges are 74 million s, about 2.3 years.
+
+And no finer key of the same kind exists: the key is the rho(Gamma)-orbit of the
+line's divided class pair, whose fibres are the double cosets A \ F / F_P of
+Dutour Sikiric--Hulek, Lemma 3.6, printed p. 22; the fibre over a class pair is a
+torsor under Stab_F(c_0)/F_P, so any invariant that is a function of the line's
+discriminant class is constant on it.  A finer invariant must read something
+that is not a function of the class -- the stabilizer's own image, or an actual
+isometry.
+
+So the two kernel rows of T_Co are blocked on the invariant, not on cost or on
+the host.  The options are a design change that carries the stabilizer's image,
+or accepting the refusal as this lattice's answer.
+
+Not claimed: that all 83 cusps' edges need a question (an exact span match may
+decide some, so 368 days is an upper bound on that term and a floor on the
+route), and that Otilde's row refuses too -- it was killed by the host before its
+relation opened, twice, and that is unmeasured.
+
+No object introduced: the key is the library's, the double cosets and the fibre
+are Lemma 3.6's, and the figures are the tree's and the logs'.
