@@ -1004,3 +1004,26 @@ unmeasured.
 first plane-orbit computation and print the total call count -- the counter
 works through the profiler, so one longer profiled run is the measurement, at
 the cost of one turn.
+
+## The seven are distinct torsors, not a recomputation
+
+Before spending a long run on the count, the cheap question: is `cusps`
+recomputed?  It is not -- `predicate_subgroups.py:771` is `@cached_method` on
+`cusps(self, rank=1)`, and the row's own call sites ask `cusps(1)` and `cusps(2)`
+once each (`coble_gamma_co_2_incidence_rows.py:722`-`:723`).  So the seven
+`integral_parameter_classes` calls of the first minute are **seven distinct
+torsor objects**, not the same one recomputed, and the count is a count of
+*objects built*, not of cache misses.
+
+That rules out the cheapest explanation and leaves two: the plane-orbit walk
+builds a torsor per candidate it considers, or the rank-one orbit computation
+inside it does, per line it draws.  Both would be linear in something the row
+draws many of -- and `T_Co` has one line orbit and one plane orbit, so whatever
+that something is, it is not the orbit count.
+
+**The long profiled run is going** (600 s cap, `cProfile`, totals printed for
+`integral_parameter_classes`, `integral_members`, `_integral_parameter_cosets`,
+`_planes_through_line`, `_isotropic_orbit_representatives` and the covering), and
+its totals distinguish the two: a call count matching the candidates the walk
+draws points at the walk, a count matching the lines a rank-one computation
+draws points at the recursion.
