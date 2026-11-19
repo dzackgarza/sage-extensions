@@ -134,7 +134,47 @@ def test_the_tco_plane_gives_an_isotropic_subobject_with_orbit_and_stabilizer() 
     count = int(orbit.cardinality())
     assert order * count == total
 
+    # the ambient order is not this module's own number: it is the one card 6JRR
+    # certifies for `O(A_{T_Co}, q)`, so the product above is the card's
+    assert total == int(card("discriminant_forms", "6JRR")["orthogonal_group_order"])
+
     # one orbit point, built from the orbit itself: the same order and still isotropic
     neighbour = next(iter(orbit))
     assert neighbour.cardinality() == subobject.cardinality()
     assert form.form_vanishes_on(_elements_of(neighbour))
+
+def test_the_tco_card_certifies_the_isotropic_class_count_and_its_orbits() -> None:
+    r"""Card ``6JRR``'s isotropic class count and its orbit count, computed here.
+
+    The card's ``integral.discriminant_form`` block states two numbers beside the
+    order: the number of classes on which ``q`` vanishes, and the number of
+    ``O(q)``-orbits among them.  Both are read here through the same delivered
+    operations the plane result uses.  The zero class is an orbit of its own, and
+    the orbit of one nonzero isotropic class is every other isotropic class, so
+    the card's class count is that orbit's length plus one.
+
+    The nonzero class is taken from the module generators and their pairwise sums,
+    a set on which ``q`` determines the whole form, because ``q`` is quadratic with
+    polar ``b``.  Nothing here enumerates the module's 2048 classes.
+    """
+    _lattice, _plane, form, _subobject, _images = _tco_specimen()
+    group = form.orthogonal_group()
+    record = card("discriminant_forms", "6JRR")
+    zero = form.quadratic_value_module().zero()
+    basis = tuple(
+        form.module_generator(label) for label in form.module_generating_set()
+    )
+    probes = basis + tuple(
+        left + right
+        for index, left in enumerate(basis)
+        for right in basis[index + 1 :]
+    )
+
+    neighbour = next(
+        class_ for class_ in probes if class_ != form.zero() and form.q(class_) == zero
+    )
+    orbit = group.orbit(form.isotropic_subobject([neighbour]))
+
+    assert int(orbit.cardinality()) > 1
+    assert int(record["isotropic_classes"]) == 1 + int(orbit.cardinality())
+    assert int(record["isotropic_orbits"]) == 2
