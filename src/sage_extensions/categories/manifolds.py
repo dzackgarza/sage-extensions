@@ -839,7 +839,7 @@ def _sum_certificate_covers(manifold, labels, chart) -> bool:
     if not conditions:
         return False
     total = sum(conditions[1:], conditions[0])
-    return (
+    if (
         _decided_nowhere_vanishing(
             total,
             symbols,
@@ -848,7 +848,37 @@ def _sum_certificate_covers(manifold, labels, chart) -> bool:
             ),
         )
         is True
-    )
+    ):
+        return True
+    return _conditions_share_no_zero(conditions, symbols)
+
+
+def _conditions_share_no_zero(conditions, symbols) -> bool:
+    r"""Whether the conditions are decided to share no zero, so that the family covers.
+
+    The conditions cut out closed subsets, and their intersection is empty exactly when
+    the polynomials generate the whole polynomial ring over the algebraic closure -- a
+    question the ideal's Groebner basis answers exactly: the basis is ``{1}`` precisely
+    then (Cox, Little and O'Shea, *Ideals, Varieties, and Algorithms*, 3rd ed., Ch. 2,
+    §7, Prop. 8).  So this certificate is sound for the real chart too: no common complex
+    zero implies no common real zero.  It decides cases the sum certificate cannot --
+    ``x`` and ``x - 1`` share no zero although ``x + (x - 1) = 2x - 1`` has one -- and a
+    family it does not certify is refused, not guessed at.
+    """
+    from sage.rings.polynomial.polynomial_ring_constructor import PolynomialRing
+    from sage.rings.rational_field import QQ as SageQQ
+
+    numerators = []
+    for condition in conditions:
+        formula = SR(SR(condition).simplify_rational())
+        numerators.append(SR(formula.numerator()))
+    try:
+        ring = PolynomialRing(SageQQ, names=tuple(str(symbol) for symbol in symbols))
+        ideal = ring.ideal([ring(numerator) for numerator in numerators])
+        basis = ideal.groebner_basis()
+    except (TypeError, ValueError, ArithmeticError):
+        return False
+    return len(basis) == 1 and basis[0].is_unit()
 
 
 def _upper_triangle(n):
