@@ -404,3 +404,44 @@ Consumers: `test_pointwise_levi_images.sage`,
 `test_a_stabilizers_generators_generate_a_subgroup.sage` and
 `test_integral_stabilizers.sage` are **11 passed in 47.11 s**, the Enriques
 stabilizer call at 20.25 s and the rest under two seconds each.
+
+## The planes through a line: the lemma is the library's own, and one gate names the port
+
+The cusp step's cost is `_planes_through_line`
+(`isotropic_orbits.py:1781`), and the lemma behind it is already stated in that
+function's docstring with its printed source: a primitive isotropic plane `E`
+containing a primitive isotropic vector `v` corresponds to the primitive
+isotropic line `E/<v>` of the reduction `K_v = v^perp/<v>` -- Scattone, *On the
+Enriques surfaces*, Mem. AMS 374 (1987), **Proposition 5.4.7 with Corollary
+5.4.8(2), p. 78**, as `tests/fixtures/DATA_SOURCES.md` records it.  The
+library's frame of the reduction lifts the quotient's vectors into `v^perp <= L`,
+so each plane is `<v, lift>` in `L` itself.
+
+Two routes supply the classes of `K_v`, and both were measured at port
+`991b88b0`:
+
+| specimen | line | `_hyperbolic_completion` | chamber route |
+|---|---|---|---|
+| `U+U(2)+<-2>`, rank 5 | divisibility 1 | certified, 0.034 s | **declines**, 0.003 s |
+| `T_Co`, rank 11, Sterk's fifth cusp | divisibility 2 | **not certified**, 0.001 s | declines, 0.000 s |
+
+So the port is reached at `T_Co` for a named reason and not a mysterious one:
+`isotropic_vector_classes(K_v)` is the port's, and the library's own chamber
+route needs `_hyperbolic_completion` to certify the split -- the docstring says
+so in as many words ("the class set wanted here exactly when
+`_hyperbolic_completion` has certified the split; the caller checks that
+first").  At rank five the completion *is* certified and the chamber route
+still declines, so the certification is necessary and not sufficient; at rank
+eleven it is not certified at all.
+
+**What that changes.**  The remaining port dependency of the cusp step is one
+gate, and the gate decides in a millisecond: `_hyperbolic_completion`.  Either
+it certifies at `T_Co` -- and then the library's chamber route supplies the
+planes, if its remaining hypothesis holds too -- or it does not, and the reason
+is a property of the split at that line, which is a statement about the lattice
+and not about this machinery.  Nothing else on the path is the port's.
+
+**Next.**  Read `_hyperbolic_completion`'s hypothesis at `T_Co`'s cusp-5 line
+and decide which of the two it is.  That decision is a millisecond of
+computation and a short argument, and it is what tells us whether (A) is a
+library gap or a port necessity.

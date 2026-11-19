@@ -1,0 +1,27 @@
+tree SHA: 8789b5711bd1b8bfefe7f954fd101b719c4a43be (modified paths: 0)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 4.42 7.30 8.09 5/548 3227152
+probe: .tmp/probe-planes.py; inner 600 s
+===== U+U(2)+<-2>: rank 5 =====
+  line div 1
+  [   0.034s] hyperbolic completion
+  completion certified: True
+  [   0.003s] chamber route
+  chamber route answered: False
+===== T_Co: rank 11 =====
+  line div 2
+  [   0.001s] hyperbolic completion
+  completion certified: False
+  [   0.000s] chamber route
+  chamber route answered: False
+[peakrss] probe603: child waited=0 shell_code=0 samples=2
+[peakrss] peak tree RSS      : 306 MiB
+[peakrss] low-water MemAvail : 4712 MiB
+[peakrss] peak single VmHWM  : 306 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      295 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     2.0s procs=  3 rss=   306 MiB hwm=   306 MiB avail=  4712 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     0 MiB hwm=     0 MiB avail=  4817 MiB
+probe exit: 0
