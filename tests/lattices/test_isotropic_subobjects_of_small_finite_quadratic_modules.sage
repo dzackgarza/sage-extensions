@@ -113,3 +113,65 @@ def test_the_hyperbolic_plane_has_no_nonzero_class_at_all() -> None:
 
     assert int(form.cardinality()) == 1
     assert _first_isotropic_class(form) is None
+
+def test_a_quadratic_span_whose_generators_pair_nontrivially_is_refused() -> None:
+    r"""``A_{U + U(2)} = F_2^2``: two isotropic classes can span a class of nonzero ``q``.
+
+    ``q`` is a quadratic form with polar pairing ``b``, so
+    ``q(x + y) = q(x) + q(y) + b(x, y)`` (V. V. Nikulin, *Integral symmetric bilinear
+    forms and some of their applications*, Math. USSR-Izv. 14 (1980), section 1.1).
+    Here ``q([e/2]) = q([f/2]) = 0`` while ``q([e/2] + [f/2]) = 1/2``, so the module
+    those two classes span -- the whole of ``A`` -- is not isotropic and the call must
+    refuse it.  Both generators are individually isotropic: the pairing between them
+    is what decides, and it is the only input to that decision a span of isotropic
+    classes can fail.
+    """
+    lattice = Lattices(ZZ)("U") + Lattices(ZZ)("U").twist(2)
+    form = lattice.discriminant_quadratic_form()
+    zero = form.quadratic_value_module().zero()
+    isotropic = [
+        element
+        for element in form.elements()
+        if element != form.zero() and form.q(element) == zero
+    ]
+    first, second = isotropic
+
+    assert form.q(first) == zero
+    assert form.q(second) == zero
+    assert form.b(first, second) != form.bilinear_value_module().zero()
+    assert form.q(first + second) != zero
+
+    span = form.subobject_generated_by([first, second])
+    assert int(span.cardinality()) == int(form.cardinality())
+    assert not form.form_vanishes_on(_elements_of(span))
+
+    with pytest.raises(AssertionError):
+        form.isotropic_subobject([first, second])
+
+
+def test_a_bilinear_span_whose_generators_pair_nontrivially_is_refused() -> None:
+    r"""``A_{U(2)} = (Z/2)^2`` with its polar pairing: ``b`` vanishes on each generator.
+
+    ``A_{U(2)}`` is ``(Z/2)^2`` with ``b`` alternating, so ``b(x, x) = 0`` for *every*
+    class and the self-pairing of a generator says nothing; ``b([e/2], [f/2]) = 1/2``
+    is what makes the span of the two generators -- again the whole of ``A`` -- fail to
+    be isotropic.  A submodule is isotropic when ``b`` vanishes on it, which for a
+    bilinear ``b`` is exactly the vanishing on a generating family pairwise.
+    """
+    form = Lattices(ZZ)("U").twist(2).discriminant_bilinear_form()
+    zero = form.bilinear_value_module().zero()
+    module_generators = tuple(
+        form.module_generator(label) for label in form.module_generating_set()
+    )
+    first, second = module_generators
+
+    assert form.b(first, first) == zero
+    assert form.b(second, second) == zero
+    assert form.b(first, second) != zero
+
+    span = form.subobject_generated_by([first, second])
+    assert int(span.cardinality()) == int(form.cardinality())
+    assert not form.form_vanishes_on(_elements_of(span))
+
+    with pytest.raises(AssertionError):
+        form.isotropic_subobject([first, second])
