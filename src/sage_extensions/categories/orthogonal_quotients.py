@@ -1817,6 +1817,29 @@ class OrthogonalCharacterQuotient:
         # orbit carries each Gamma-orbit.
         return class_points, bool(sign_labels)
 
+    def is_no_split(self, datum) -> bool:
+        r"""Whether a line-splitting datum is this call's answer that nothing splits.
+
+        ``isotropic_line_stabilizer_image`` answers either with the no-split
+        value or with a class-point family; this asks which, so a consumer states
+        the branch instead of comparing against a spelling of it.
+        """
+        return isinstance(datum, str) and str(datum) == NO_SPLIT
+
+    def no_split_reasons(self) -> tuple:
+        r"""The witnesses a no-split answer can name, in this module's order.
+
+        The three are different arguments and fail differently -- a reflection
+        exhibited, a zero divided class, a sign space spanned -- so a caller that
+        reports one says which.  The names are this module's, and a reader asks
+        here rather than restating them.
+        """
+        return (
+            NO_SPLIT_BY_REFLECTION,
+            NO_SPLIT_BY_ZERO_CLASS,
+            NO_SPLIT_BY_SIGN_PATTERNS,
+        )
+
     def splitting_isometries_from_line_class(self, class_points, stab_sign_flip):
         r"""Splitting lifts from the rho(Gamma)-orbits on the isotropic class pairs.
 
