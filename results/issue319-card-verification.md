@@ -184,13 +184,21 @@ stage is `discriminant images`, and that stage alone runs to the end of the
  299.99s  raised    divided-class plane row
 ```
 
-`discriminant images` is `_DividedClassPlaneOrbitDecomposition.__init__`, and
-the line that costs is `subgroup.discriminant_image().group_generators()`: the
-finite image of $\Gamma_h$ and a generating set for it.  Nothing in that stage
-touches the class sets -- they are built after it, in 0.58 s before the
-interrupt.  So the plane row's first cost is the subgroup's discriminant image,
-the same finite object the line rows compute (their cards' images are of order
-up to 696729600) and the same one the character quotient is built from.
+`discriminant images` is `_DividedClassPlaneOrbitDecomposition.__init__`.
+Nothing in that stage touches the class sets -- they are built after it, in
+0.58 s before the interrupt -- but the two objects inside it that a reader would
+blame are both instant, measured in a fresh process on the same group:
+
+```
+group.finite_character_quotient()          0.0 s
+group.discriminant_image().order()         0.0 s   = 92897280
+```
+
+92897280 is card `gamma-h-3`'s own `|\bar\Gamma_h|`, so the finite image is
+computed at once and agrees with the card.  The 299 s is therefore in the rest
+of that constructor -- the ambient image `Q` with its word section, the class
+points, or the subgroup's generating family -- and this record does not say
+which: that split was not measured.
 
 That is where the acceptance's plane and flag rows stand, and the defect block
 above is unchanged.
