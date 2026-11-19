@@ -1,0 +1,20 @@
+tree SHA: d6cf5d5f8397c693481d190c01ec9d2e155651e2 (modified paths: 0)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 1.91 2.34 4.48 4/546 3409811
+probe: .tmp/probe-ctor.py; inner 600 s
+[    0.51s] rational lattice rank 5, base ring Fraction Field of Integer Ring
+[    0.51s] isometry from a QQ identity: OwnedLatticeIsometryMor_with_category_with_category.ArrowType  [0.001s]
+[    0.51s]   it fixes the generators: True
+[    0.51s] owned(1) = 1
+[    0.51s] done
+[peakrss] probe603: child waited=0 shell_code=0 samples=2
+[peakrss] peak tree RSS      : 261 MiB
+[peakrss] low-water MemAvail : 5609 MiB
+[peakrss] peak single VmHWM  : 261 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      250 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     2.0s procs=  3 rss=   261 MiB hwm=   261 MiB avail=  5609 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     3 MiB hwm=     3 MiB avail=  5730 MiB
+probe exit: 0

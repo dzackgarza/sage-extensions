@@ -758,3 +758,44 @@ framed-matrix read is documented for integral framings, and the isometry
 constructor's ring check is right about the owned field.  Using them anyway,
 through private coercions, would be the kind of shortcut this record has been
 refusing all along.
+
+## Correction: the isometry constructor works, in a millisecond
+
+The previous section reported that
+`rational.Isom(rational)._isometry_from_column_matrix(M)` refuses because "the
+owned field is not Sage's QQ".  That is right about the *message* and wrong
+about the conclusion: the message came from Sage's `matrix()` being handed the
+**owned** field by the probe, not from the constructor.  Given a matrix over
+Sage's `QQ`, at `U+U(2)+<-2>`:
+
+    rational.Isom(rational)._isometry_from_column_matrix(identity over QQ)
+      -> OwnedLatticeIsometryMor, 0.001 s, and it fixes the generators
+
+So the passing lifts *can* be raised from matrices, at a millisecond each, and
+the only thing that genuinely does not work is the framed-matrix read
+`matrix(_module_matrix(base_point()))` -- which the change does not need,
+because `base_point()` can be evaluated on the generators and its images read as
+coordinates by `to_vector()`.
+
+**The change is therefore fully unblocked**, and its shape is:
+
+1. read `z_i = base(y_i)`'s coordinates once, for the target's rational
+   generators `y_i` (fixed across the loop);
+2. per representative `a`, compute `E(z_i)` in coordinates with the target's
+   Gram -- `z_i - b(x,z_i) f + b(f,z_i) x - (q(x)/2) b(f,z_i) f`, `x = s(a)`,
+   `f` the marked isotropic vector;
+3. the representative passes exactly when every coordinate of every `E(z_i)` is
+   an integer -- the same question `integral_restriction` asks of the object,
+   asked of the matrix;
+4. for a passing representative, raise the lift with
+   `_isometry_from_column_matrix` on that matrix, 1 ms, instead of the 47 ms
+   transvection construction.
+
+**Oracle unchanged:** the same 512 passing/failing decisions as the present
+`_lift_at` + `integral_restriction` pair, and the same lifts.
+
+**A lesson worth keeping in the record.**  Two sections of this note have now
+been corrected by their own follow-up -- the 2^17-arithmetic and this refusal.
+Both were caught by doing the smallest thing rather than reasoning about the
+interface, which is the argument for the probe-per-round habit even when the
+round produces no code.
