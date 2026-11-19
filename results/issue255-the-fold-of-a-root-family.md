@@ -110,6 +110,23 @@ pairings fold, and of the 22 roots' eight diagram automorphisms (which are exact
 Gram-preserving permutations, since the Coxeter matrix is a function of the Gram) the six
 involutions all fold.
 
+**Corollary (the lemma this item turns on).**  *No permutation of Sterk's 22 roots keeps their Gram
+matrix and breaks one of their four rational relations.*  The 22 roots span rank 18 with signature
+(1,17), so \(W\) is nondegenerate and the consequence above applies; and the Gram-preserving
+permutations are exactly the eight automorphisms of their diagram, because the Coxeter matrix is a
+function of the Gram.  `results/issue255-the-invalidating-input-search.py` prints the eight and
+prints that none breaks a relation, and extends the answer to every subfamily of the 22 roots that
+carries a relation a datum could name (120 relation supports, 25 of them degenerate, none moved).
+
+*Sources.*  The 22 roots, their four rational relations and their rank are the issue's own specimen,
+cited there to `Coble ch. 8`, a notebook and not a printed paper; what the folds must reproduce is
+printed: Sterk, *Compactifications of the period space of Enriques surfaces, Part I*, Math. Z. 207
+(1991), 4.3.5--4.3.9 on pp. 19, 21, 22, 23 and 24 with Figs. 4, 6, 8, 10 and 12, as card `029J`'s
+`printed_page` and `figure` record per row.  No printed page is cited for the lemma itself: it is the
+definition of a nondegenerate form plus the two lines above, and this repository cites that
+definition by Bourbaki chapter and section rather than by page --- `src/sage_extensions/categories/algebras/algebras.py:5`
+cites *Algèbre* III §1.1 the same way.  A page number here would be invented.
+
 ## Proposition 2 (orbit sums, and the rescaling)
 
 Let \(g\) be an involution of \(W\) and \(O\) an orbit of \(g\) on the roots.  Then \(|O|\in\{1,2\}\),
