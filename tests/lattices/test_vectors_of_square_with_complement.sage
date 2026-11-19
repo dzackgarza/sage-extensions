@@ -245,6 +245,54 @@ def test_a_definite_complement_of_rank_three_is_reached_through_its_own_image() 
     )
 
 
+def test_two_glue_classes_of_a_definite_complement_collapse_to_one_orbit() -> None:
+    r"""Item 2 where the glue has more than one class: ``A5`` and the complement of a root.
+
+    ``A5``'s roots are thirty vectors of square ``-2`` and divisibility one, one
+    ``O(A5)``-orbit under its five simple reflections, so the enumerated fibre is
+    one orbit.  The complement of a root is rank four with determinant ``12``,
+    and its discriminant form carries two classes of the value and additive
+    order the glue prescribes: the collapse merges those two classes, so the
+    answer is one vector while the glue offers two.  That is the count the
+    enumeration decides, and it is the one the operation returns.
+    """
+    lattice = Lattices(ZZ)("A5")
+    labels = tuple(lattice.module_generating_set())
+    root = lattice.module_generators()[0]
+    complement = lattice.orthogonal_complement(lattice.subobject_on([root]))
+    assert complement.module_rank() == 4
+    assert int(complement.determinant()) == 12
+
+    found = tuple(lattice.vectors_of_square_with_complement(ZZ(-2), complement))
+    assert sum(1 for _entry in found) == 1
+    delta, _isometry = found[0]
+    assert delta.q() == ZZ(-2)
+    assert lattice.subobject_on([delta]).is_primitive() is True
+    assert complement.is_isometric_to(lattice.orthogonal_complement(lattice.subobject_on([delta]))) is True
+
+    def reflection(alpha):
+        def image(label):
+            vector = lattice.module_generator(label)
+            return vector + lattice.b(vector, alpha) * alpha
+
+        return lattice.Aut()(image)
+
+    reflections = tuple(reflection(lattice.module_generator(label)) for label in labels)
+    reached = [delta]
+    frontier = [delta]
+    while frontier:
+        current = frontier.pop()
+        for isometry_of_lattice in reflections:
+            image = isometry_of_lattice(current)
+            if _coordinates(image, labels) not in [_coordinates(vector, labels) for vector in reached]:
+                reached.append(image)
+                frontier.append(image)
+    fibre = tuple(lattice.vectors_of_square_and_divisibility(ZZ(-2), delta.div()))
+    assert sorted(_coordinates(vector, labels) for vector in reached) == sorted(
+        _coordinates(vector, labels) for vector in fibre
+    )
+
+
 def test_the_enriques_gluing_gives_a_vector_of_square_minus_two_with_complement_t_co() -> None:
     r"""Item 3: the consumer specimen, ``T_En`` with ``square = -2`` and complement ``T_Co``.
 
