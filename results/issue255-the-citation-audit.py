@@ -20,10 +20,12 @@ FILES = {
     "test_the_fold_of_a_root_family_by_a_diagram_involution.sage": "tests/lattices/test_the_fold_of_a_root_family_by_a_diagram_involution.sage",
     "coxeter_diagrams.py": "src/sage_extensions/categories/coxeter_diagrams.py",
     "sterk.py": "src/sage_extensions/sterk.py",
+    "lattice_morphisms.py": "src/sage_extensions/categories/lattice_morphisms.py",
 }
 DOCUMENTS = (
     "results/issue255-the-fold-of-a-root-family.md",
     "results/issue255-amended-invalidating-input.md",
+    "results/issue255-amended-issue-body.md",
 )
 
 CITATION = re.compile(r"([a-z_0-9]+\.(?:sage|py)):(\d+)|`:(\d+)`")

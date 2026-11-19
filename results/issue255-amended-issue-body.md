@@ -2,23 +2,25 @@
 
 `results/issue255-amended-invalidating-input.md` gives the two changed blocks as old-to-new.  This
 file is the whole body with them applied, so that the owner can replace #255's body in one paste.
-Everything outside the two blocks is the issue's own text, unchanged; the two blocks are marked
-*[amended]*.
+Everything outside the two blocks is the issue's own text, unchanged except where it states what
+the tree holds, which is stated as of this head; the two blocks are marked *[amended]*.  Its
+references are to the tree at this commit.
 
 The connection this repository is worked through cannot edit an issue body, so this is a proposal,
 not an edit.
 
 ---
 
-Sterk's five root configurations are stored as hard-coded orbit sums (`sterk.py:202-328`). The
-mathematics behind them is a folding: a diagram involution σ of the Coxeter diagram of a root family
+Sterk's five root configurations were stored as hard-coded orbit sums; they are folds now,
+`Sterk.foldings()` (`sterk.py:697`), built at `sterk.py:689` and `:691` and carried into the Del
+Pezzo lattice by `Sterk.sterk_roots()` (`sterk.py:784`). The mathematics behind them is a folding: a diagram involution σ of the Coxeter diagram of a root family
 R in a lattice L lifts to an isometry of L, and the orbit sums (or projections) of R span the
 σ-invariant lattice L^σ and form the root family of the folded diagram. The retired notebooks
 "Lattices and Coxeter Diagrams DZG" (folding cells), "Sterk IAS Plotting" (cells 14-17) and "Coble
-Lattice Invariants" chapter 8 all compute this by hand. The library owns the pieces
-(`LatticeMorphisms.invariant_lattice`, `lattice_morphisms.py:1621`; `formed_coinvariants`, `:1632`;
-`CoxeterDiagrams.Aut`, `coxeter_diagrams.py:1450`; `CoxeterDiagrams.from_roots`, `:1912`) but not the
-operation.
+Lattice Invariants" chapter 8 all compute this by hand. The pieces are the library's:
+`LatticeMorphisms.invariant_lattice` (`lattice_morphisms.py:2002`), `formed_coinvariants` (`:2012`),
+`CoxeterDiagrams.Aut` (`coxeter_diagrams.py:1445`), `CoxeterDiagrams.from_roots` (`:2179`), and the
+operation itself, `RootedCoxeterDiagrams.ParentMethods.fold` (`coxeter_diagrams.py:2489`).
 
 ## Operation *[amended: the datum is the involution's images, of which a permutation of the roots is
 the case where the images are roots; and two of Sterk's five need the images]*
@@ -36,8 +38,8 @@ Given a root family R in L and an involution \(g\) of its span that is an isomet
   orthogonal) and its Coxeter diagram.
 
 Sterk's roots become the output of this operation applied to the 22-root (18,2,0) family
-(`Sterk._roots_18_2_0_cached`, `sterk.py:123`) and the 19-root (18,0,0) family, and `sterk.py` stops
-storing orbit sums.  Three of the five configurations are folds by a permutation of the roots
+(`Sterk._roots_18_2_0_cached`, `sterk.py:562`) and the 19-root (18,0,0) family (its roots at
+`sterk.py:641`), and `sterk.py` no longer stores orbit sums.  Three of the five configurations are folds by a permutation of the roots
 (4.3.5 and 4.3.8 of the 22, 4.3.6 of the 19); 4.3.7 and 4.3.9 are folds by involutions of the
 22 roots' span that are no permutations of them, since the 22-root diagram has eight automorphisms
 and folding by the six that are involutions gives 4.3.5, 4.3.8, the identity's own family and two
