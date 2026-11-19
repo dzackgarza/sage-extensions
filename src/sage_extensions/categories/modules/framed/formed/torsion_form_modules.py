@@ -3167,7 +3167,14 @@ def _engine_two_primary_odd_orthogonal_generators(part, gens):
         # zero, so the only `q`-preserving linear map is the identity.
         return [], SageZZ.one()
     kernel = delta.right_kernel().basis_matrix()
-    assert kernel.nrows() == n - 1 and c * kernel.transpose() == 0, (
+    # The complement of the half-integral direction is its orthogonal
+    # complement, and that is stated with the polar form: `c` was solved out of
+    # `c B = delta`, so `B(c, w) = delta(w)`, which vanishes on the kernel by
+    # definition.  The plain dot product with `c` is a different functional --
+    # it vanishes on the kernel only when `c` is `delta` itself -- so it is not
+    # the pairing this split is stated in.  That the two factors span `A` is
+    # checked where the frame is built below.
+    assert kernel.nrows() == n - 1 and (c * bilinear) * kernel.transpose() == 0, (
         "the complement of the half-integral direction must be its orthogonal complement"
     )
     basis = []
