@@ -1,6 +1,6 @@
 # #279, acceptance item by item
 
-Fourth revision, to a fifth: the operation is
+Sixth revision.  The operation is
 `src/sage_extensions/categories/lattices.py:10223`
 (`Lattices.vectors_of_square_with_complement`); the test file is
 `tests/lattices/test_vectors_of_square_with_complement.sage`.  Each line number
@@ -14,6 +14,10 @@ the card's `O` row at norm two (`:112`), compared at `:122`.  The consumer test
 asserts its two specimens' descriptions from AEGS and Dolgachev--Kondo
 (`:295`--`:302`) and quotes the sentences its count stands on, from AEGS's
 section 2 and from Namikawa's own printed pages (`:279`--`:290`).
+
+This revision changes no test and no source line: it records, with a probe under
+item 2, what the definite controls do **not** exercise, so that the item is not
+read as stronger than its specimens make it.
 
 ## 1. Primitive, the square, the isometric complement, and the certificate's index
 
@@ -62,6 +66,32 @@ returned is a seed.
 The collapse the item exercises is `lattices.py:10334`--`:10350` (which group
 applies), `:10491`--`:10496` (a rank-one complement's own negation), `:10497`
 (the image of `O(C)`), `:10525`--`:10539` (the walk).
+
+What these controls do **not** exercise, measured rather than assumed: on every
+one of them the enumerated fibre is a **single** `O(T)`-orbit, so on these
+specimens "the count agrees with the enumeration" and "one representative per
+orbit" are the same assertion, and the clause "one representative per orbit"
+would be trivially true if it were written as a bijection check.  The probe
+`.tmp/279i-one-per-orbit.py` (log `.tmp/279i-one-per-orbit.log`, exit 0) placed
+each returned vector in its class of the enumerated fibre:
+
+| specimen | fibre | `O(T)`-classes | returned | class of the returned vector |
+| --- | --- | --- | --- | --- |
+| `A2` | 6 | 1 | 1 | `[0]` |
+| `A3` | 12 | 1 | 1 | `[0]` |
+| `D4` | 24 | 1 | 1 | `[0]` |
+| `A5` | 30 | 1 | 1 | `[0]` |
+| `<2> perp <2>` (with its swap) | 4 | 1 | 1 | `[0]` |
+
+In each row the returned vector lies in the only class, so a duplicate
+representative or an uncovered class is impossible here: with one class a
+duplicate would need two entries against a count of one, which the count
+assertion already fails.  A fibre with two classes under a prescribed complement
+is the case where those two assertions differ, and it is not among this issue's
+specimens -- the multi-orbit rows of this project are the indefinite ones
+(`Gamma_{Co,2}` and the `T_Co` line and plane rows), which are `sage_extensions#286`
+and `sage_extensions#381`, not this issue.  So the item is met at the strength the
+specimens allow, and that strength is one orbit.
 
 ## 3. The consumer specimen: `T_En`, square `-2`, complement `T_Co`
 
@@ -116,13 +146,18 @@ Both specimens are in the one file, both through
 - Green, the certificate test alone (`-k certificate`) at the parent `e1e8313`
   when item 1's count was sourced: `1 passed, 6 deselected in 7.47s`, the test
   call 1.10 s, `collection took 6.12 s` against the 6 s ceiling.
-- Green, the consumer test alone (`-k enriques`) at the parent this revision was
-  rebased onto, `3e92673`, with the change: `1 passed, 6 deselected in 18.92s`,
-  the test call 4.97 s, `collection took 13.67 s` against the 6 s ceiling and
-  `session star import took 3.20 s` against the 3 s one.  Both gate readings are
-  this host's load (7.4 at that run); the collection gate was over on the
-  unmodified parent when measured (`6.46 s`), nothing this change adds runs at
+- Green, the consumer test alone (`-k enriques`) at the parent `3e92673` when
+  item 3's oracle was read at Namikawa's pages: `1 passed, 6 deselected in
+  18.92s`, the test call 4.97 s, `collection took 13.67 s` against the 6 s
+  ceiling and `session star import took 3.20 s` against the 3 s one.  Both gate
+  readings are that run's host load (7.4); the collection gate was over on the
+  unmodified parent when measured (`6.46 s`), nothing those changes added ran at
   collection, and CI runs the gates.
+- Probe (`279i-one-per-orbit.py`, log `.tmp/279i-one-per-orbit.log`, exit 0) at
+  `67fc45a`, the tree this record is committed with: on `A2`, `A3`, `D4`, `A5`
+  and `<2> perp <2>` every enumerated fibre is one `O(T)`-orbit, each returned
+  vector lands in that class, and the numbers are the table under item 2.  That
+  is the measurement behind the note there, not a new assertion.
 - The citations this revision rests on were read as pages, not as citations:
   `.tmp/279r4-namikawa-quotes.txt` holds the Göttingen OCR of the pages quoted
   above (printed pp. 203 and 207, with the scan's own noise noted), and the
