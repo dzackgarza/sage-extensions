@@ -13507,37 +13507,34 @@ class IsotropicReductions(OwnedCategoryOverBaseRing):
             than rebuilding one.  What each rank asks for:
 
             * rank zero: \(U_I\) is trivial and the family is empty;
-            * rank one \(I=\mathbf Z e\), of divisibility one: the Eichler
-              transvections \(E_{e,x}\) over a `ZZ`-basis of
-              \(P=\{x\in I^\perp : q(x)\in 2\mathbf Z\}\).  The assignment
-              \(x\mapsto E_{e,x}\) is a group morphism whose kernel is
-              \(\mathbf Z e\)
+            * rank one \(I=\mathbf Z e\), of any divisibility \(d\): the
+              Eichler transvections \(E_{e,x}\) over a `ZZ`-basis of the
+              parameter lattice \(X\) that
+              :meth:`_pointwise_kernel_parameter_vectors` builds.  The
+              assignment \(x\mapsto E_{e,x}\) is a group morphism whose kernel
+              is \((1/d)\mathbf Z e\)
               (Gritsenko--Hulek--Sankaran, arXiv:0810.1614, section 3.1,
               equations (4)--(5), the additivity of the transvection
-              parameter), and it is an isomorphism onto \(U_I\): complete
-              \(e\) to a basis \(e,w\) of a hyperbolic plane inside \(L\), so
-              that \(L=J\oplus\mathbf Z w\) with \(J=I^\perp\) and
-              \(b(e,w)=1\).  An element of \(U_I\) sends \(y\in J\) to
+              parameter), and it is an isomorphism onto \(U_I\): fix a partner
+              \(w\) with \(b(e,w)=d\), so that \(L=J+\\mathbf Z w\) with
+              \(J=I^\perp\).  An element of \(U_I\) sends \(y\in J\) to
               \(y+c(y)e\) with \(c\in\operatorname{Hom}(J,\mathbf Z)\)
               vanishing on \(e\), and \(w\) to \(w+z\) with \(z\in J\); the
-              isometry equations are \(c(y)=-b(y,z)\) for every \(y\in J\)
-              and \(b(z,z)+2b(w,z)=0\), and \(x=z+\lambda e\) satisfies
-              \(E_{e,x}=g\) for every \(\lambda\).  So \(U_I\) is exactly the
-              image of \(P/\mathbf Z e\), of rank \(\operatorname{rank}K_I\),
-              and a basis of \(P\) maps onto it.  The parameters are
-              \(P\), not \(\operatorname{Hom}(K_I,\mathbf Z)\) and not
-              \(K_I\): at an odd \(x\) the coefficient \(q(x)/2\) of the
-              transvection is not integral, and
-              \(\operatorname{Hom}(K_I,\mathbf Z)\) is larger than
-              \(K_I\) by \(|{\rm disc}(K_I)|\) where \(K_I\) is not
+              isometry equations are \(d\,c(y)=-b(y,z)\) and
+              \(b(z,z)+2b(w,z)=0\), and the transvection at \(x\) satisfying
+              them is exactly the \(g\) that \(z\) describes, so \(U_I\) is the
+              image of \(X/((1/d)\mathbf Z e)\), of rank
+              \(\operatorname{rank}K_I\).  A basis of \(X\) therefore maps onto
+              a generating family, and no parameter outside \(X\) is one: the
+              three coefficients of the transvection's update are what \(X\)
+              is cut out by.  The parameters are \(X\), not
+              \(\operatorname{Hom}(K_I,\mathbf Z)\) and not \(K_I\): at
+              \(d=1\) a parameter of odd square has a non-integral
+              \(q(x)/2\), and \(\operatorname{Hom}(K_I,\mathbf Z)\) is larger
+              than \(K_I\) by \(|{\rm disc}(K_I)|\) where \(K_I\) is not
               unimodular -- neither is the parameter lattice;
-            * rank one of higher divisibility, and rank at least two: not
-              presented here.  At divisibility \(d>1\) the transvection
-              parameters of \(U_I\) are the \(x\in I^\perp\otimes\mathbf Q\)
-              with \(dx\in I^\perp\), \(b(I^\perp,x)\subseteq\mathbf Z\) and
-              \(q(x)d\in 2\mathbf Z\), a lattice strictly larger than the
-              even part of \(I^\perp\) that this call does not build; the
-              plane case instead reads the exact parameter lattice
+            * rank at least two: not presented here.  The plane case reads the
+              exact parameter lattice
               :meth:`...unipotent_parameter_lattice` decides -- one element
               over each vector of it together with a generator of the centre
               (:meth:`...unipotent_radical_generators`).  A parameter outside
@@ -13555,77 +13552,198 @@ class IsotropicReductions(OwnedCategoryOverBaseRing):
                     parabolic(generator)
                     for generator in subobject.unipotent_radical_generators()
                 )
-            quotient = self.quotient_lattice()
-            ring = lattice.base_ring()
-            marked = subobject.embedded_module_generators()[
-                subobject.module_generating_set()[0]
-            ]
-            if marked.div() != ring.one():
-                raise NotImplementedError(
-                    f"cannot present the radical of the pointwise stabilizer of {self} "
-                    f"from the Eichler transvections of the even part of I^perp: the "
-                    f"marked vector has divisibility {marked.div()} in {lattice}, and at "
-                    f"divisibility d > 1 the parameters of the integral kernel are the "
-                    f"x with d x in I^perp, b(x, I^perp) in ZZ and q(x) d in 2 ZZ, which "
-                    f"is strictly larger than {{x in I^perp : q(x) in 2 ZZ}}; that "
-                    f"lattice is not built here"
-                )
             family = []
             identity = lattice.Aut().identity()
-            for vector in self._pointwise_kernel_parameter_vectors():
-                transvection = subobject.eichler_transvection(vector)
+            for parameter in self._pointwise_kernel_parameter_vectors():
+                transvection = self._pointwise_kernel_transvection(parameter)
+                if transvection is None:
+                    raise ArithmeticError(
+                        f"the parameter {parameter} of the radical at {self} is not an "
+                        f"integral transvection: the parameter lattice is exactly the "
+                        f"integrality locus of the Eichler transvection, so a parameter "
+                        f"it contains and the rational transvection at it disagree"
+                    )
                 if transvection == identity:
                     continue
                 family.append(parabolic(transvection))
             return tuple(family)
 
         @cached_method
-        def _pointwise_kernel_parameter_vectors(self):
-            r"""Return a `ZZ`-basis of \(\{x\in I^\perp : q(x)\in 2\mathbf Z\}\), in the ambient lattice.
+        def _isotropic_bezout_partner(self):
+            r"""Return `w` with `b(e, w) = d`, for `e` the marked isotropic vector of divisibility `d`.
 
-            ``q(x)`` is even exactly on the parameters ``x`` for which the
-            Eichler transvection \(E_{e,x}\) is an integral isometry of `L`:
-            its update is
-            \(y\mapsto y-b(y,x)e\) on \(I^\perp\) and
-            \(w\mapsto w+x-(b(w,x)+q(x)/2)e\), so \(q(x)/2\) is the only
-            coefficient outside the ring
-            (:meth:`...PrimitiveIsotropicSubobjects.eichler_transvection`
-            refuses the others).  On an even lattice every parameter is
-            admissible; on an odd one the admissible parameters are an index
-            two sublattice, and this method returns a basis of that
-            sublattice, not one of the larger lattice it sits in.
-
-            \(q(x+y)-q(x)-q(y)=2b(x,y)\), so \(q\) is additive mod two and
-            \(x\mapsto q(x)\) is a linear functional on
-            \(I^\perp/2I^\perp\).  The recognised basis is the one that
-            functional describes: the basis vectors of even square, twice one
-            of odd square, and the sum of that one with each other odd-square
-            vector.  Their span lies in the even part and has index at most
-            two in \(I^\perp\), which the functional's nonvanishing makes
-            exact.
+            `e` is primitive, so `b(e, -)` is a nonzero functional, and its
+            image is `d Z` by the definition of the divisibility.  A preimage
+            of `d` is read from one Smith normal form of the single row of
+            pairings: with `u A v = (g, 0, ..., 0)` and `g` the gcd of that
+            row, `A (v (d/g) e_1) = u^{-1} (d, 0, ..., 0) = +- d`.
             """
+            from sage.matrix.constructor import matrix
+
             lattice = self.isotropic_embedding().codomain()
             ring = lattice.base_ring()
+            subobject = self.isotropic_sublattice()
+            marked = subobject.embedded_module_generators()[
+                subobject.module_generating_set()[0]
+            ]
+            labels = tuple(lattice.module_generating_set())
+            divisibility = int(marked.div())
+            pairings = matrix(
+                SageZZ,
+                1,
+                len(labels),
+                tuple(
+                    int(lattice.b(marked, lattice.module_generator(label)))
+                    for label in labels
+                ),
+            )
+            smith, left, right = pairings.smith_form()
+            common = abs(int(smith[0, 0]))
+            if common == 0 or divisibility % common:
+                raise ArithmeticError(
+                    f"the pairings b({marked}, -) have image {common} ZZ, but the "
+                    f"divisibility of {marked} is {divisibility}"
+                )
+            scale = (int(left[0, 0]) * divisibility) // common
+            coordinates = right * matrix(
+                SageZZ, len(labels), 1, [scale] + [0] * (len(labels) - 1)
+            )
+            return lattice.linear_combination(
+                {
+                    label: ring(int(coordinates[position, 0]))
+                    for position, label in enumerate(labels)
+                    if coordinates[position, 0]
+                }
+            )
+
+        @cached_method
+        def _pointwise_kernel_parameter_vectors(self):
+            r"""Return a `ZZ`-basis of the radical's parameter lattice, as vectors of `I^\perp`.
+
+            Write `I = Z e`, `d` for the divisibility of `e` and `J = I^\perp`,
+            and fix a partner `w` with `b(e, w) = d`, so that `L = J + Z w`.
+            An element of `U_I` sends `y in J` to `y + c(y) e` and `w` to
+            `w + z`, and the isometry equations are `d c(y) = -b(y, z)` and
+            `b(z, z) + 2 b(w, z) = 0`.  The Eichler transvection at a rational
+            parameter `x` sends `y` to `y - b(y, x) e` and `w` to
+            `w + d x - (b(w, x) + (d/2) b(x, x)) e`, and substituting it in
+            those equations leaves the second one satisfied identically: with
+            `z = d x - (b(w,x) + (d/2) b(x,x)) e` one gets
+            `b(z,z) + 2b(w,z) = d^2 b(x,x) + 2d b(w,x) - 2d(b(w,x) + (d/2)b(x,x))
+            = 0`.  The map `x |-> E_{e,x}` is therefore onto `U_I`, and its
+            kernel is `{x : b(x, J) = 0, d x in Z e} = (1/d) Z e`.
+
+            What remains is the integrality of that transvection, and it is
+            three conditions on `u = d x`, which lies in `J` exactly when `x`
+            does: `b(u, J) <= d Z`, which is the coefficient of `e` along
+            `J`; `u in L`, which is the coefficient of `x` along `w`; and
+            `b(u, u) + 2 b(w, u) in 2d Z`, which is the coefficient of `e`
+            along `w`.  Write `X` for the vectors satisfying them.
+            `b(u,u) + 2b(w,u)` is additive modulo `2d` on
+            `{u : b(u, J) <= dZ}`: the cross term of two such `u, u'` is
+            `2b(u,u')`, and `u' in J` gives `b(u,u') in d Z`.  Hence `X` is a
+            sublattice, its first two conditions are read off one Smith normal
+            form of the Gram matrix of `J`, and its third is the kernel of the
+            class of `b(u,u) + 2b(w,u)` in `Z/2d`.
+
+            At `d = 1` the three conditions are `u in J`, nothing, and
+            `b(u,u)` even, so `X` is the even part of `J`; the basis returned
+            here is that one in that case, and the family it indexes is the
+            same family, not a second construction.
+            """
+            from sage.matrix.constructor import matrix
+
+            lattice = self.isotropic_embedding().codomain()
+            ring = lattice.base_ring()
+            subobject = self.isotropic_sublattice()
+            marked = subobject.embedded_module_generators()[
+                subobject.module_generating_set()[0]
+            ]
+            divisibility = int(marked.div())
             perpendicular = self.orthogonal_complement()
             inclusion = perpendicular.inclusion()
+            labels = tuple(perpendicular.module_generating_set())
             basis = tuple(
-                inclusion(perpendicular.module_generator(label))
-                for label in tuple(perpendicular.module_generating_set())
+                inclusion(perpendicular.module_generator(label)) for label in labels
             )
-            even = tuple(
-                int(lattice.q(vector)) % 2 == 0 for vector in basis
+            gram = matrix(
+                SageZZ,
+                [[int(lattice.b(left, right)) for right in basis] for left in basis],
             )
-            parameters = []
-            odd = None
-            for vector, is_even in zip(basis, even):
-                if is_even:
-                    parameters.append(vector)
-                elif odd is None:
-                    odd = vector
-                    parameters.append(lattice.scalar_multiple(ring(2), vector))
-                else:
-                    parameters.append(vector + odd)
-            return tuple(parameters)
+            smith, _left, right = gram.smith_form()
+            columns = []
+            for index in range(smith.nrows()):
+                entry = abs(int(smith[index, index]))
+                step = 1 if entry == 0 else int(divisibility // gcd(entry, divisibility))
+                columns.append([int(value) * step for value in right.column(index)])
+
+            def combination(row, vectors):
+                return sum(
+                    (
+                        lattice.scalar_multiple(ring(coefficient), vector)
+                        for coefficient, vector in zip(row, vectors, strict=True)
+                        if coefficient
+                    ),
+                    lattice.zero(),
+                )
+
+            parameters = [combination(column, basis) for column in columns]
+            partner = self._isotropic_bezout_partner()
+            classes = [
+                int(lattice.q(vector)) + 2 * int(lattice.b(partner, vector))
+                for vector in parameters
+            ]
+            modulus = 2 * divisibility
+            class_row = matrix(SageZZ, 1, len(classes), classes)
+            class_smith, _class_left, class_right = class_row.smith_form()
+            common = abs(int(class_smith[0, 0]))
+            if common == 0:
+                return tuple(parameters)
+            step = int(modulus // gcd(common, modulus))
+            kernel_rows = [
+                [int(value) * step for value in class_right.column(0)]
+            ] + [
+                [int(value) for value in class_right.column(index)]
+                for index in range(1, len(classes))
+            ]
+            return tuple(combination(row, parameters) for row in kernel_rows)
+
+        def _pointwise_kernel_transvection(self, parameter):
+            r"""Return `E_{e, u/d}` as an isometry of `L`, or ``None`` if it is not one.
+
+            ``parameter`` is a vector `u` of
+            :meth:`_pointwise_kernel_parameter_vectors`; the transvection is
+            built at the rational parameter `u/d` in the rationalized lattice
+            and restricted to `L`.  The restriction exists exactly on the
+            parameter lattice -- the three conditions that define it are the
+            coefficients of `e`, of `x` and of `e` in the transvection's
+            update -- so a ``None`` here is a parameter outside it, and never
+            a rounded isometry.
+            """
+            from sage_extensions.categories.modules.pure.modules import (
+                ModulesOverIntegralDomains,
+            )
+
+            lattice = self.isotropic_embedding().codomain()
+            ring = lattice.base_ring()
+            subobject = self.isotropic_sublattice()
+            marked = subobject.embedded_module_generators()[
+                subobject.module_generating_set()[0]
+            ]
+            divisibility = int(marked.div())
+            fraction_map = ring.fraction_field_map()
+            rational = lattice.base_change(fraction_map)
+            rationalize = ModulesOverIntegralDomains(ring)(lattice).generic_fibre_map()
+            rational_marked = rationalize(marked).underlying_element()
+            rational_parameter = rational.scalar_multiple(
+                rational.base_ring().one() / rational.base_ring()(divisibility),
+                rationalize(parameter).underlying_element(),
+            )
+            extension = rational.eichler_transvection(
+                rational_marked, rational_parameter
+            )
+            return extension.integral_restriction(lattice, lattice)
+
 
         @cached_method
         def _pointwise_levi_integral_lift_or_none(self, isometry):
