@@ -125,6 +125,31 @@ def test_u2_bilinear_orthogonal_group_element_orbit() -> None:
     assert group.orbit_of_element(element).cardinality() == 3
 
 
+def test_the_group_orbit_of_an_element_is_the_public_orbit_call() -> None:
+    r"""``O(b).orbit`` of an element is that element's orbit, as it is for a submodule.
+
+    ``A_{U(2)} = (Z/2)^2`` with ``b`` alternating: every automorphism of the
+    module preserves ``b``, so ``O(b) = GL_2(F_2)``, and an invertible matrix
+    carries any nonzero vector to any other --- the orbit of a nonzero class is
+    every nonzero class, which is the module's cardinality less one.  The same
+    orbit is read here through both spellings, since one operation has the two
+    acted-on sorts and neither shadows the other.
+    """
+    form = Lattices(ZZ)("U").twist(2).discriminant_bilinear_form()
+    label = next(iter(form.module_generating_set()))
+    element = form.module_generator(label)
+    group = form.O()
+    nonzero_classes = cardinal(
+        sum(1 for class_ in form.elements() if class_ != form.zero())
+    )
+
+    orbit = group.orbit(element)
+
+    assert orbit.cardinality() == nonzero_classes
+    assert orbit.cardinality() == group.orbit_of_element(element).cardinality()
+    assert element in orbit
+
+
 def test_the_discriminant_forms_of_a1_are_one_half_mod_one_and_minus_one_half_mod_two() -> None:
     r"""$A_1 = \langle -2\rangle$: $A_1^\vee / A_1 = \mathbb{Z}/2$ on $e/2$, with $b = q = -1/2$."""
     a1 = Lattices(ZZ)("A1")

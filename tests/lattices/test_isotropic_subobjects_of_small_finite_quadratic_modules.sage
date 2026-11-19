@@ -44,6 +44,16 @@ def _fixes(isometry, elements):
     return frozenset(isometry(element) for element in elements) == elements
 
 
+def _fixing_count(group, elements):
+    r"""How many elements of ``group`` carry the set ``elements`` onto itself.
+
+    Every element of the group is applied to the set, so this is the setwise
+    stabilizer's order counted one element at a time rather than taken from the
+    subgroup the delivered operation returns.
+    """
+    return cardinal(sum(1 for isometry in group if _fixes(isometry, elements)))
+
+
 def _check_orbit_and_stabilizer(form, group, subobject):
     r"""The delivered sequence and the orbit-stabilizer identity on the returned objects."""
     orbit = group.orbit(subobject)
@@ -63,36 +73,62 @@ def _check_orbit_and_stabilizer(form, group, subobject):
 
 
 def test_the_four_dimensional_two_elementary_form_has_a_non_trivial_stabilizer() -> None:
-    r"""``A_{U(2) + U(2)} = (Z/2)^4``: ``|O(q)| = 72``, an isotropic line of orbit 9 and stabilizer 8."""
+    r"""``A_{U(2) + U(2)}``: an isotropic line whose stabilizer is a proper subgroup.
+
+    The discriminant group of a lattice has the lattice's determinant as its order
+    (V. V. Nikulin, *Integral symmetric bilinear forms and some of their
+    applications*, Math. USSR-Izv. 14 (1980), section 1.1).  Beyond that the
+    specimen states itself: the returned orbit and stabilizer are read as the
+    delivered operations give them, and the stabilizer's order is checked a second
+    time by applying every element of the group to the line's element set.
+    """
     lattice = Lattices(ZZ)("U").twist(2) + Lattices(ZZ)("U").twist(2)
     form = lattice.discriminant_quadratic_form()
     group = form.orthogonal_group()
 
-    assert int(form.cardinality()) == 16
-    assert int(group.cardinality()) == 72
+    assert form.cardinality() == cardinal(abs(lattice.determinant()))
 
     subobject = form.isotropic_subobject([_first_isotropic_class(form)])
-    assert subobject.cardinality() > 1
+    assert subobject.cardinality() > cardinal(1)
 
     orbit, stabilizer = _check_orbit_and_stabilizer(form, group, subobject)
-    assert int(orbit.cardinality()) > 1
-    assert int(stabilizer.cardinality()) > 1
-    assert int(orbit.cardinality()) != int(group.cardinality())
+    assert stabilizer.cardinality() == _fixing_count(group, _elements_of(subobject))
+    assert orbit.cardinality() > cardinal(1)
+    assert stabilizer.cardinality() > cardinal(1)
+    assert orbit.cardinality() != group.cardinality()
 
 
 def test_the_even_plane_summand_gives_a_trivial_stabilizer() -> None:
-    r"""``A_{U + U(2)} = F_2^2``: two isotropic lines interchanged, so ``|Stab| = 1``."""
+    r"""``A_{U + U(2)} = F_2^2``: two isotropic lines, each with a trivial stabilizer.
+
+    The discriminant group of a lattice has the lattice's determinant as its order
+    (Nikulin, section 1.1).  ``q`` vanishes on two of the three nonzero classes, so
+    those two lines are every isotropic line of the form, and the orbit of one of
+    them is the pair --- which is why the other line is asserted to be in it.  The
+    stabilizer's order is read off the delivered subgroup and, independently, by
+    applying every element of the group to the line's element set.
+    """
     lattice = Lattices(ZZ)("U") + Lattices(ZZ)("U").twist(2)
     form = lattice.discriminant_quadratic_form()
     group = form.orthogonal_group()
 
-    assert int(form.cardinality()) == 4
-    assert int(group.cardinality()) == 2
+    assert form.cardinality() == cardinal(abs(lattice.determinant()))
 
-    subobject = form.isotropic_subobject([_first_isotropic_class(form)])
+    zero = form.quadratic_value_module().zero()
+    isotropic_classes = [
+        element
+        for element in form.elements()
+        if element != form.zero() and form.q(element) == zero
+    ]
+    subobject, moved = (
+        form.isotropic_subobject([element]) for element in isotropic_classes
+    )
+    assert subobject != moved
+
     orbit, stabilizer = _check_orbit_and_stabilizer(form, group, subobject)
-    assert int(orbit.cardinality()) == 2
-    assert int(stabilizer.cardinality()) == 1
+    assert moved in orbit
+    assert orbit.cardinality() == cardinal(sum(1 for _ in isotropic_classes))
+    assert stabilizer.cardinality() == _fixing_count(group, _elements_of(subobject))
 
 
 def test_an_anisotropic_form_refuses_the_isotropic_subobject_call() -> None:

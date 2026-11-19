@@ -173,8 +173,20 @@ def test_the_tco_card_certifies_the_isotropic_class_count_and_its_orbits() -> No
     neighbour = next(
         class_ for class_ in probes if class_ != form.zero() and form.q(class_) == zero
     )
-    orbit = group.orbit(form.isotropic_subobject([neighbour]))
+    action = group.subobject_orbit_action(form.isotropic_subobject([neighbour]))
+    nonzero_class = action.point_set()
 
-    assert int(orbit.cardinality()) > 1
-    assert int(record["isotropic_classes"]) == 1 + int(orbit.cardinality())
-    assert int(record["isotropic_orbits"]) == 2
+    # the other orbit is the zero class, a single point because every selected
+    # generator fixes it; these two are the partition the card counts
+    selected = tuple(group.group_generators())
+    zero_class = frozenset(
+        {form.zero()} | {generator(form.zero()) for generator in selected}
+    )
+    classes = (zero_class, nonzero_class)
+
+    assert zero_class == frozenset({form.zero()})
+    assert int(nonzero_class.cardinality()) > 1
+    assert int(record["isotropic_classes"]) == int(
+        sum(1 for _ in zero_class)
+    ) + int(nonzero_class.cardinality())
+    assert int(record["isotropic_orbits"]) == int(sum(1 for _ in classes))
