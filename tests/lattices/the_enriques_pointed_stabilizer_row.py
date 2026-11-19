@@ -1,54 +1,45 @@
-r"""The pointed stabilizer rows of the Enriques period lattice, in the rows tier.
+r"""The Enriques period lattice's stabilizer rows, in the rows tier.
 
-This is the red of #603's pointed call, and it is not collected by pytest: its
-file name does not begin with ``test_``.  Its tier is the **rows tier** -- a call
-the construction answers in 12 s at the first cusp, above the 20 s per-test gate
-(``sage_extensions.testing.suite_budget``), so it belongs in the job that reports
-later and not in the per-test gate, as ``tests/coble_kernel_plane_rows.py`` and
-the other row scripts do.
+This is #603's row work on `N = U + U(2) + E8(-2)`, card ``029J``.  It is not
+collected by pytest (its name does not begin with ``test_``): the two calls below
+take 0.9 s and 80.5 s, above the 20 s per-test gate
+(``sage_extensions.testing.suite_budget``), so they belong in the job that reports
+later, as ``tests/coble_kernel_plane_rows.py`` and the other row scripts do.
 
-**What it shows.**  At `41f21a69` the call below does not return: the pointed
-marking at an isotropic vector was handed to `sage-indefinite-port`, which was
-still inside the stabilizer computation when stopped at 400 s
-(``results/issue603-acceptance.md``).  With the rank-one parabolic's family and
-Schreier's transversal the row at `L_1` returns and reproduces the card's number.
+Two rows are measured, and they are different rows:
 
-**The card.**  `N = U + U(2) + E8(-2)` is the Enriques period lattice, card
-``029J``.  Its ``O`` row cites the two `O(N)`-orbits of primitive isotropic lines
-"`L_1 = Ze_1` and `L_2 = Ze_3`, with images of their stabilizers in the
-discriminant group of index 1 and 527" (Dutour Sikirić--Hulek,
-arXiv:2302.01679v2, section 3.6, p. 22), and its ``Otilde+`` row states the same
-split as orbit lengths, which ``card_line_orbit_lengths`` reads by tag.  The
-stabilizer of the *line* `L_i` is the pointed family at its generator together
-with `-id`, which negates the generator and fixes every line, so the index of
-their image in the finite `O(A_N)` is the card's.
+**The line's finite image.**  `finite_character_quotient` of the stable
+orthogonal group `ker rho` presents the double coset space
+`ker rho \ O(N) / Stab(line)` through the exact finite image, and
+`isotropic_line_stabilizer_image` decides the right-hand group from the line's
+own residue data -- the half-vector Eichler transvections of #325, not the
+generators of `O(K_I)`.  The number of double cosets is the number of
+`ker rho`-orbits inside the `O(N)`-orbit of the line, which is
+`[rho(O(N)) : rho(Stab(line))]`; `rho` is onto, so that index is the card's.
 
-**Only `L_1` is a row here, and the reason is the next repair.**  `L_2`'s index,
-527, is the discriminating one -- a family generating everything else gives the
-index 1 of `L_1` too -- and the pointed construction does not reach it at a cost:
-`L_2`'s generator has divisibility 2, its `K_I` has rank 10, and `O(K_I)`'s own
-generating family is the indefinite port's there, so the call was still inside it
-at 400 s in two runs.  The row is offered per cusp (`--cusp L_2`) so that the
-measurement can be reproduced, and the card comparison stays narrow until that
-recursion is owned.
+**The pointed family.**  `O(N).stabilizer(e_1)` is #603's construction.  At
+`L_1 = Ze_1` it returns; at `L_2 = Ze_3` it does not, its complement `K_I` having
+rank 10 with `O(K_I)`'s own family the indefinite port's
+(``results/issue603-the-divisible-cusp-blocker.md``).
+
+The card is read by tag with `card_line_orbit_lengths("029J", "Otilde+")`, which
+is the `Otilde+` row's own per-orbit sentence: 528 lines in two orbits of lengths
+527 and 1.  The `O` row cites the same split as "images of their stabilizers in
+the discriminant group of index 1 and 527" (Dutour Sikirić--Hulek,
+arXiv:2302.01679v2, section 3.6, p. 22).
 
     python3 tests/lattices/the_enriques_pointed_stabilizer_row.py
-    python3 tests/lattices/the_enriques_pointed_stabilizer_row.py --cusp L_2
 """
 
 from __future__ import annotations
 
-import argparse
 import time
 
 from sage_extensions.all import *  # noqa: F401,F403
 from sage_extensions.lattice_database import card_line_orbit_lengths
 
 # The two cusps the card cites, by the library's own labels for DSH's e_1 and e_3.
-CUSPS = {
-    "L_1": 0,
-    "L_2": 2,
-}
+CUSPS = {"L_1": 0, "L_2": 2}
 
 
 def pointed_generators(lattice, vector):
@@ -56,39 +47,60 @@ def pointed_generators(lattice, vector):
     return tuple(lattice.Aut().stabilizer(vector).group_generators())
 
 
-def run(cusp: str) -> None:
-    r"""Assert the pointed row at one cusp against the card's cited index."""
+def line_orbit_count(lattice, vector):
+    r"""The number of ``ker rho``-orbits inside `O(N)`'s orbit of the line of ``vector``.
+
+    This is `[rho(O(N)) : rho(Stab(Zv))]`, computed from the line's own residue
+    data and the finite image, so it never asks `O(K_I)` for generators.
+    """
+    quotient = lattice.stable_orthogonal_group().finite_character_quotient()
+    line = vector.sublattice()
+    data = quotient.isotropic_line_stabilizer_image(line)
+    if data == "NOSPLIT":
+        # The sign witness proves the line's stabilizer meets every double coset.
+        return 1
+    return len(tuple(quotient.splitting_isometries_from_line_class(*data)))
+
+
+def run() -> None:
+    r"""Assert the card's two cited indices, and report the pointed family's two rows."""
     lattice = NamedLattices.TEn
     labels = tuple(lattice.module_generating_set())
-    vector = lattice.module_generator(labels[CUSPS[cusp]])
-    orthogonal = lattice.Aut()
-    discriminant = lattice.discriminant_representation()
-    finite = discriminant.codomain()
     stated = sorted(int(length) for length in card_line_orbit_lengths("029J", "Otilde+"))
+    orthogonal = lattice.Aut()
     reversing = orthogonal(lambda label: -lattice.module_generator(label))
 
-    name = "L_1 = Ze_1" if cusp == "L_1" else "L_2 = Ze_3"
-    assert lattice.q(vector) == ZZ(0), f"{name} must be isotropic"
-    assert vector.is_primitive() is True, f"{name} must be primitive"
-    assert reversing(vector) == -vector, "-id must negate the generator"
+    measured = []
+    for name, index in CUSPS.items():
+        vector = lattice.module_generator(labels[index])
+        assert lattice.q(vector) == ZZ(0), f"{name} must be isotropic"
+        assert vector.is_primitive() is True, f"{name} must be primitive"
+        assert reversing(vector) == -vector, "-id must negate the generator"
 
-    start = time.monotonic()
-    family = pointed_generators(lattice, vector)
-    elapsed = time.monotonic() - start
-    assert family, f"the pointed family at {name} is empty"
-    assert all(generator(vector) == vector for generator in family), (
-        f"a pointed family member at {name} does not fix it"
+        start = time.monotonic()
+        count = line_orbit_count(lattice, vector)
+        measured.append(count)
+        print(f"{name}: {count} ker-rho orbits in its O(N)-orbit, {time.monotonic() - start:.1f} s")
+
+    print(f"card 029J's cited orbit lengths: {stated}")
+    assert sorted(measured) == stated, (
+        f"the card cites the stabilizer image indices {stated}, and the finite image gives "
+        f"{sorted(measured)}"
     )
 
-    images = tuple(discriminant(generator) for generator in family) + (discriminant(reversing),)
-    image = finite.subgroup(images)
-    index = finite.cardinality().finite_value() // image.cardinality().finite_value()
-    print(f"{name}: {len(family)} generators in {elapsed:.1f} s, stabilizer image index {index}")
-    print(f"card 029J's cited indices: {stated}")
-    assert index in stated, f"the card cites {stated}, and the pointed row gives {index}"
+    # The pointed family, where the construction reaches it.
+    start = time.monotonic()
+    family = pointed_generators(lattice, lattice.module_generator(labels[CUSPS["L_1"]]))
+    print(
+        f"pointed family at L_1 = Ze_1: {len(family)} generators, "
+        f"{time.monotonic() - start:.1f} s"
+    )
+    assert family
+    assert all(
+        generator(lattice.module_generator(labels[CUSPS["L_1"]])) == lattice.module_generator(labels[CUSPS["L_1"]])
+        for generator in family
+    )
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--cusp", choices=tuple(CUSPS), default="L_1")
-    run(parser.parse_args().cusp)
+    run()
