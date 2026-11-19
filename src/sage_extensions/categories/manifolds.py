@@ -898,6 +898,8 @@ def _sum_certificate_covers(manifold, labels, chart) -> bool:
             SR(_engine_manifold_expression(condition)) for condition in member.nonvanishing()
         )
     if not conditions:
+        conditions = _conditions_read_in_chart(manifold, labels, chart)
+    if not conditions:
         return False
     total = sum(conditions[1:], conditions[0])
     if (
@@ -924,6 +926,48 @@ def _sum_certificate_covers(manifold, labels, chart) -> bool:
         )
         is True
     )
+
+
+def _conditions_read_in_chart(manifold, labels, chart):
+    r"""The family's cutting conditions read in ``chart``'s own coordinates, or an empty tuple.
+
+    A member that is not a subset of ``chart`` still leaves points of it out exactly where
+    one of its conditions vanishes there, and a condition of the member's chart is read in
+    ``chart``'s coordinates by composing it with the coordinate change the atlas states --
+    through a chain where the atlas does not relate the two charts directly (Lee,
+    *Introduction to Smooth Manifolds*, 2nd ed., Ch. 1).  Reading the conditions this way is
+    what lets a family cover a chart that is neither above nor below its members in the
+    atlas: the plane's two punctured charts cover the chart cut by ``y``, and neither is
+    contained in it.
+
+    A member with more than one condition leaves its points out where *some* condition
+    vanishes, and a union of zero sets is not one zero set; that case is not read here, so
+    the family is not certified rather than certified wrongly.
+    """
+    from sage.symbolic.ring import SR as _SR
+
+    symbols = tuple(_engine_manifold_chart(chart)[:])
+    read = []
+    for label in labels:
+        member = manifold.atlas()[label]
+        member_conditions = tuple(member.nonvanishing())
+        if len(member_conditions) != 1:
+            return ()
+        change = _composed_ambient_transition(manifold, chart.label(), label)
+        if change is None:
+            return ()
+        forward = tuple(
+            _SR(_engine_manifold_expression(expression))
+            for expression in change.forward_expressions()
+        )
+        member_symbols = tuple(_engine_manifold_chart(member)[:])
+        pulled = _SR(_engine_manifold_expression(member_conditions[0])).subs(
+            dict(zip(member_symbols, forward, strict=True))
+        )
+        if any(variable not in symbols for variable in pulled.variables()):
+            return ()
+        read.append(pulled)
+    return tuple(read)
 
 
 def _conditions_share_no_zero(conditions, symbols) -> bool:
