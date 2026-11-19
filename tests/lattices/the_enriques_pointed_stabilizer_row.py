@@ -111,7 +111,7 @@ def run() -> None:
             )
         )
         image_index = int(finite_orthogonal.cardinality()) // int(line_family.cardinality())
-        assert image_index == measured[CUSPS[name]], (
+        assert image_index == measured[name], (
             f"{name}'s pointed family, with -id, has discriminant image index {image_index}, "
             f"but its exact line-stabilizer index is {measured[name]}"
         )
