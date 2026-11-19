@@ -133,3 +133,8 @@ decisive comparison is the `T_En` row's, whose exit status distinguishes
 `agrees` from `DIFFERS`.  The value of the smallest case is that the
 construction runs end to end in one command, so a defect of the construction
 itself would surface here rather than after hours at rank 12.
+
+*Provenance of the probes: the worktrees these were run in are removed after the
+push, and the scripts are kept beside their logs in `.scratch/w286-probes/`
+(`probe-restriction.py`, `probe-vector-stabilizer.py`, `probe-intersection.py`,
+`probe-smallest-restriction.py`).*
