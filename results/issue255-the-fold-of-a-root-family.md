@@ -258,7 +258,9 @@ pytest -o addopts= -p qc_sage_session -p sage_extensions.testing.suite_budget \
 * The claim that the folded families *are* Sterk's printed chambers is carried by card `029J`'s rows
   and by Sterk's printed statements, not proved in this record.  What is checked for all five is
   that each fold agrees with its card row in the wall count, the squares, the sorted pairings, and
-  the invariant lattice's rank and signature: (12, 12×(−4), 10, (1,9)), (10, 9×(−4)+1×(−2), 10,
+  the invariant lattice's rank and signature --- the pairings for all five at
+  `tests/lattices/test_the_sterk_configurations_are_folds_of_the_two_root_families.sage:129`, which
+  until this commit compared only 4.3.5, 4.3.6 and 4.3.8: (12, 12×(−4), 10, (1,9)), (10, 9×(−4)+1×(−2), 10,
   (1,9)), (12, 10×(−4)+2×(−2), 10, (1,9)), (11, 9×(−4)+2×(−2), 10, (1,9)) and
   (14, 10×(−4)+4×(−2), 10, (1,9)) at 4.3.5–4.3.9 in that order.  The two sides are vectors of
   different lattices (\(T_{En}\) for the card's walls, \(T_{dP}\) for the roots), so equality of the
