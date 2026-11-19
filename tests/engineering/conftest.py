@@ -467,6 +467,7 @@ def pytest_configure(config) -> None:
     builtins.incidence_page_comparison = incidence_page_comparison
     builtins.restricted_stabilizer_outcome = restricted_stabilizer_outcome
     builtins.incidence_rows_run = incidence_rows_run
+    builtins.incidence_rows_plane_class_indices = incidence_rows_plane_class_indices
     builtins.RowStatus = _script("coble_row_status").RowStatus
 
 
@@ -489,6 +490,7 @@ def pytest_unconfigure(config) -> None:
     del builtins.incidence_page_comparison
     del builtins.restricted_stabilizer_outcome
     del builtins.incidence_rows_run
+    del builtins.incidence_rows_plane_class_indices
     del builtins.RowStatus
 
 
@@ -984,6 +986,19 @@ def incidence_rows_run(argv):
     del driver.RECORDED_COMPARISONS[:]
     status = driver.main(argv)
     return status, tuple(driver.RECORDED_COMPARISONS)
+
+
+def incidence_rows_plane_class_indices(argv):
+    r"""One run of the incidence driver's ``main``: its exit status and its plane class indices.
+
+    The driver keeps each row's recorded ``(classes J, index)`` pairs in
+    ``RECORDED_PLANE_CLASS_INDICES``, keyed by the row's label; this returns that
+    list with the status, so a test asks which rows the run recorded the index at.
+    """
+    driver = _incidence_row_driver()
+    del driver.RECORDED_PLANE_CLASS_INDICES[:]
+    status = driver.main(argv)
+    return status, tuple(driver.RECORDED_PLANE_CLASS_INDICES)
 
 
 def restricted_stabilizer_outcome(cap) -> int:

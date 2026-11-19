@@ -193,6 +193,7 @@ PREVIOUS_ROW = "the Γ_{Co,2} row decided in #391"
 
 
 RECORDED_COMPARISONS = []
+RECORDED_PLANE_CLASS_INDICES = []
 
 
 def record_comparison(label, statement, computed, recorded, source) -> bool:
@@ -265,6 +266,7 @@ def record_plane_class_indices(label, subgroup, planes, limit=8) -> tuple:
             f"|rho(Stab_{{O(L)}}(P))| = {image_order}, "
             f"index [Stab(J) : rho(Stab_O(L)(P))] = {index}"
         )
+    RECORDED_PLANE_CLASS_INDICES.append((label, tuple(recorded)))
     indices = {index for _classes, index in recorded}
     log(
         f"[{label}] the plane class index over {len(recorded)} of the row's distinct classes J "
