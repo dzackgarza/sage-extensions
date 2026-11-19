@@ -56,3 +56,27 @@ each chart, which the rational expressions of this representation can give only 
 numerator vanishes on an open set, i.e. never.  So the honest statement is that item 2's
 general case is **out of reach of this representation**, not that it awaits a patch, and the
 issue's algebra clause is the place to say so.
+
+## Correction, 2026-11-19: the obstruction is differentiability, not expressibility
+
+The section above says no function stated by chart expressions is identically zero off a
+proper open set.  That is **too strong**: the engine's expression language does contain step
+functions.  Measured on `b6b44d3`:
+
+    unit_step(x).diff(x)                   ->  dirac_delta(x)
+    (unit_step(x)*unit_step(1-x)).diff(x)  ->  -dirac_delta(-x+1)*unit_step(x)
+                                               + dirac_delta(x)*unit_step(-x+1)
+    smooth_function({"U": unit_step(u)})   ->  TypeError: cannot coerce arguments: no
+                                               canonical coercion from C(Infinity, ...)
+
+So a function with a genuine zero set can be *written*; what it cannot be is smooth: its
+derivative in this engine is a distribution, and admitting a step into the algebra fails at
+the coercion into the chart's coordinate field.  Lee's $\chi$ must be $C^\infty$ with a
+$C^\infty$ derivative, and a $\chi$ that is $\equiv 0$ off an open set and $\equiv 1$ near a
+point jumps somewhere -- a distributional derivative.  The tree therefore has no element of
+$C^\infty(M)$ that could play the bump.
+
+The note's conclusion stands, on the corrected premise: the locality lemma is not provable
+here because the algebra has no bump function, and the reason is that differentiability in
+this representation means "the derivative is again a function", not
+"a jump can be written down".

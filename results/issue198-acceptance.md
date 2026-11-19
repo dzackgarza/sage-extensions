@@ -6,7 +6,7 @@ Line numbers are of the head this note is pushed on.
 derivations of the *full* `C^oo(M)` --- is met on a manifold presented by one chart, and its
 general case is **refuted as unreachable in this representation**: the identification is
 Lee's Prop. 8.15 (2nd ed., Ch. 8), its locality step uses the bump function of Lemma 2.26,
-and no function stated by chart expressions is identically zero off a proper open set.  No
+and a bump has a jump somewhere, whose derivative in this engine is a distribution -- measured: `unit_step(x).diff(x)` is `dirac_delta(x)` (see the correction in the locality note).  No
 further lemma can advance it; what remains is a decision about the clause, not a proof.
 
 | # | Item | State | Code | Deciding test |
