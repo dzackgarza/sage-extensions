@@ -1,0 +1,48 @@
+tree SHA: 212f88e5549bcedbc82a3ec4add5a8d6f9f8dd68 (modified paths: 0)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 7.22 12.43 15.06 8/657 3041509
+probe: .tmp/probe-registry.py; inner 900 s
+[    3.95s] lattice Integral lattice of rank 5 and signature (2, 3) of rank 5
+[    3.96s] subgroup Orthogonal group O(Integral lattice of rank 5 and signature (2, 3))
+[O] the row's route: certificate, taken because it is the ambient orthogonal group, which retains no character quotient and so carries no divided-class datum (decided in 0.0 s)
+[O] the row's calls returned in 38.2 s
+[O] line cusp 0: ((1, 0, 0, 0, 0),)
+[O] line cusp 1: ((0, 0, 0, 1, 0),)
+[O] plane cusp 0: ((1, 0, 0, 0, 0), (0, 0, 0, 1, 0))
+[O] edge 0: L0 < P0; line=((1, 0, 0, 0, 0),); plane=((1, 0, 0, 0, 0), (0, 0, 0, 1, 0))
+[O] edge 1: L1 < P0; line=((0, 0, 0, 1, 0),); plane=((0, 1, 0, 0, 0), (0, 0, 0, 1, 0))
+[O] the degree sequence of the relation: line cusps [1] over 2, plane cusps [2] over 1
+[O] audited 2 distinct edges; ordered endpoint SHA-256: 8ff7c90b24c8f3e2f81f5d6cf799d49426b9dbf50614ed1e2f02d8dce272d027
+[   42.16s] row outcome: [O] decided: 2 edges over 2 line cusps and 1 plane cusps
+Traceback (most recent call last):
+  File "sage/structure/category_object.pyx", line 858, in sage.structure.category_object.CategoryObject.getattr_from_category
+    return self._cached_methods[name]
+KeyError: 'finite_character_quotient'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/repos/sage-extensions/.tmp/probe-registry.py", line 26, in <module>
+    quotient = subgroup.finite_character_quotient()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "sage/structure/category_object.pyx", line 852, in sage.structure.category_object.CategoryObject.__getattr__
+    return self.getattr_from_category(name)
+  File "sage/structure/category_object.pyx", line 867, in sage.structure.category_object.CategoryObject.getattr_from_category
+    attr = getattr_from_other_class(self, cls, name)
+  File "sage/cpython/getattr.pyx", line 362, in sage.cpython.getattr.getattr_from_other_class
+    raise AttributeError(dummy_error_message)
+AttributeError: 'OwnedLatticeIsometryMor_with_category_with_category' object has no attribute 'finite_character_quotient'
+[peakrss] probe603: child waited=1 shell_code=1 samples=24
+[peakrss] peak tree RSS      : 437 MiB
+[peakrss] low-water MemAvail : 4656 MiB
+[peakrss] peak single VmHWM  : 448 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      437 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    10.0s procs=  3 rss=   437 MiB hwm=   440 MiB avail=  4927 MiB
+[peakrss]   t=     8.0s procs=  3 rss=   427 MiB hwm=   428 MiB avail=  5026 MiB
+[peakrss]   t=    46.3s procs=  3 rss=   427 MiB hwm=   448 MiB avail=  4755 MiB
+[peakrss]   t=    44.3s procs=  3 rss=   426 MiB hwm=   448 MiB avail=  4661 MiB
+[peakrss]   t=    40.3s procs=  3 rss=   420 MiB hwm=   448 MiB avail=  4656 MiB
+probe exit: 1

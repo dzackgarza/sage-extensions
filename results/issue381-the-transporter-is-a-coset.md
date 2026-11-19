@@ -168,3 +168,41 @@ transporter, with the port kept as the fallback for planes of different
 sources.  It is not made in this round: the registry is shared machinery, and
 the change wants its own test on a lattice whose row registers at least two
 planes.
+
+## The registry exists only where a character quotient does
+
+Run of the `O` row on `U+U(2)+<-2>` (rank 5, signature `(2, 3)`) at port
+`991b88b0`, through the row's own entry points:
+
+    [O] the row's route: certificate, taken because it is the ambient orthogonal
+        group, which retains no character quotient and so carries no
+        divided-class datum (decided in 0.0 s)
+    [O] line cusp 0: ((1, 0, 0, 0, 0),)      [O] line cusp 1: ((0, 0, 0, 1, 0),)
+    [O] plane cusp 0: ((1, 0, 0, 0, 0), (0, 0, 0, 1, 0))
+    [O] edge 1: L1 < P0; plane=((0, 1, 0, 0, 0), (0, 0, 0, 1, 0))
+    [O] decided: 2 edges over 2 line cusps and 1 plane cusps          (42.16 s)
+
+and `subgroup.finite_character_quotient()` **raises** for the ambient group
+(`predicate_subgroups.py:507` answers only a subgroup whose characters are
+known complete).
+
+So the registry, which lives on `OrthogonalCharacterQuotient`, does not exist
+for the `O` rows at all: the ambient rows carry no divided-class datum and no
+lift registry, and their plane transporters go to the port by construction.
+The registry route is available only for `Gamma_{Co,2}`, `Otilde` and
+`Otilde+`, whose quotients do exist and are cached, so one registry persists per
+subgroup object.
+
+**Consequence for the routing change.**  It is scoped: it can remove the port
+call for the three character rows and cannot touch the ambient `O` rows.  The
+355 s figure was recorded as "one matched cusp" without naming the row, so the
+first thing the next round needs is that name: on a character row the registry
+route pays, on an `O` row it is irrelevant and the remaining route is the
+certificate route's own plane transporter, which this note does not cover.
+
+**What the small row also shows.**  At rank five the whole `O` row decides in
+42.16 s, two edges over two line cusps and one plane cusp, and the second edge's
+plane has a different span from the cusp's -- so a transporter between distinct
+planes is genuinely used, and the port answers it in seconds at that size.  The
+355 s is a rank-eleven figure, and nothing here measures its split between the
+port's two halves.
