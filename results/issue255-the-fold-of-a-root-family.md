@@ -335,19 +335,20 @@ pytest -o addopts= -p qc_sage_session -p sage_extensions.testing.suite_budget \
   determinants are \(-1024, 256, 256, 256, 256\) (invariant) and \(256, 256, 256, 256, 64\)
   (anti-invariant) — so all five answer: \((10,10,0)\) and \((8,8,0)\) for Sterk 1, \((10,8,0)\)
   and \((8,8,0)\) for Sterk 2, 3 and 4, and \((10,8,0)\) and \((8,6,0)\) for Sterk 5, checked
-  against each lattice's own rank and determinant in the exploration at `:146`.  The refusing branch
+  against each lattice's own rank and determinant in
+  `tests/lattices/test_the_five_sterk_root_configurations_as_foldings.sage:146`.  The refusing branch
   is exhibited on the \(A_2\) fold's anti-invariant lattice of square \(-6\), whose discriminant
   group is not 2-elementary
   (`tests/lattices/test_the_fold_of_a_root_family_by_a_diagram_involution.sage:173`, refusal
-  `:195`).
+  `:216`).
 
 ## 6. Where each acceptance item lives
 
 Line numbers are those of this commit.  Items 1 and 3 are met; item 2 is met only under the
 amendment at `results/issue255-amended-invalidating-input.md`, whose clause-by-clause assertions are
-tabulated there.  Nothing is queued behind another item.  Every citation here and in the amendment is
-resolved by `results/issue255-the-citation-audit.py`, which prints the line each names; it currently
-reports none out of range.
+tabulated there.  Nothing is queued behind another item.  Every citation here, in the amendment and
+in the issue body is checked by `results/issue255-the-citation-audit.py`, which holds the token each
+line must contain: 121 citations, 0 stale.
 
 **Item 1 — "The operation exists at its owner …, and `sterk.py` derives Sterk's roots from it."**
 
