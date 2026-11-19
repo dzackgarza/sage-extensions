@@ -135,6 +135,134 @@ def _decided_nowhere_vanishing(expression, variables, excluded=()):
     return _decided_no_real_zero(numerator, variables)
 
 
+def _definiteness(matrix):
+    r"""``+1``, ``-1``, ``0`` or ``None``: definite, semidefinite of either sign, or indefinite, by Sylvester's criterion.
+
+    A symmetric matrix over the rationals is positive definite exactly when all of
+    its leading principal minors are positive, and negative definite exactly when
+    those minors alternate in sign (Sylvester's criterion; Horn and Johnson,
+    *Matrix Analysis*, 2nd ed., Thm. 7.2.5).  A matrix that is neither is called
+    semidefinite of both signs when every principal minor is nonnegative or every
+    one of odd order is nonpositive with every one of even order nonnegative
+    (Thm. 7.2.4 for the principal-minor form), and indefinite otherwise.
+    """
+    size_count = matrix.nrows()
+    leading = tuple(
+        matrix[: size, : size].det() for size in range(1, size_count + 1)
+    )
+    if all(entry > 0 for entry in leading):
+        return 1
+    if all(
+        (entry if size % 2 == 0 else -entry) > 0
+        for size, entry in enumerate(leading, start=1)
+    ):
+        return -1
+    if size_count > 4:
+        return None
+    principal = []
+    for size in range(1, size_count + 1):
+        for subset in _subsets_of_size(size_count, size):
+            principal.append((size, matrix[list(subset), list(subset)].det()))
+    if all(entry >= 0 for _size, entry in principal):
+        return 0
+    if all((entry if size % 2 == 0 else -entry) >= 0 for size, entry in principal):
+        return 0
+    return None
+
+
+def _subsets_of_size(size_count, size):
+    r"""The subsets of ``{0, ..., size_count - 1}`` of ``size`` elements, in order."""
+    from itertools import combinations
+
+    return tuple(combinations(range(size_count), size))
+
+
+def _quadratic_minimum(matrix, vector, constant):
+    r"""The minimum of ``x^T matrix x + vector^T x + constant`` over the range of a semidefinite matrix, or ``None``.
+
+    For a positive semidefinite ``A`` the form is ``(x + u)^T A (x + u) + c - u^T A u``
+    with ``A u = b/2``: constant along the kernel and minimised at ``-u`` on the
+    range (Horn and Johnson, *Matrix Analysis*, 2nd ed., §7.1), so its minimum is
+    ``c - u^T A u`` and does not depend on which solution ``u`` is taken.  ``None``
+    is the answer when ``b/2`` is not in the range of ``A``, which makes the form
+    unbounded below and therefore a form that takes the value zero.
+    """
+    coefficient_ring = matrix.base_ring()
+    half = coefficient_ring(1) / coefficient_ring(2)
+    target = half * vector
+    augmented = matrix.augment(target.column())
+    if augmented.rank() != matrix.rank():
+        return None
+    if target.is_zero():
+        return constant
+    try:
+        solution = matrix.solve_right(target)
+    except (ValueError, ZeroDivisionError):
+        return None
+    return constant - solution.dot_product(matrix * solution)
+
+
+def _decided_quadratic(polynomial):
+    r"""Whether a polynomial of degree at most two takes no zero, decided by its quadratic form.
+
+    Writing the polynomial as ``x^T A x + b^T x + c`` over the rationals, the form
+    takes no zero exactly when its minimum is positive -- a form whose minimum is
+    zero takes that value, and one whose minimum is negative takes the value zero on
+    the way to its negative values.  The minimum is ``c - (1/4) b^T A^{-1} b`` for a
+    definite ``A`` and ``c - u^T A u`` for a semidefinite one with ``A u = b/2``
+    (:func:`_quadratic_minimum`).  An indefinite quadratic part makes the form
+    unbounded in both directions, so it takes the value zero too.
+
+    ``None`` is answered for a polynomial of higher degree, and for a semidefinite
+    form whose linear part leaves the range of its quadratic part in a case this
+    decision does not solve.
+    """
+    from sage.matrix.constructor import matrix as _engine_matrix
+    from sage.rings.rational_field import QQ as SageQQ
+
+    ring = polynomial.parent()
+    if polynomial.total_degree() > 2:
+        return None
+    variables = ring.gens()
+    number = len(variables)
+    linear = [SageQQ.zero() for _index in range(number)]
+    form = [[SageQQ.zero() for _index in range(number)] for _index in range(number)]
+    constant = SageQQ.zero()
+    for exponents, coefficient in polynomial.dict().items():
+        powers = tuple(int(power) for power in exponents)
+        degree = sum(powers)
+        if degree == 0:
+            constant = coefficient
+        elif degree == 1:
+            linear[powers.index(1)] = coefficient
+        else:
+            filled = tuple(index for index, power in enumerate(powers) if power)
+            if len(filled) == 1:
+                form[filled[0]][filled[0]] = coefficient
+            else:
+                first, second = filled
+                form[first][second] = coefficient / SageQQ(2)
+                form[second][first] = coefficient / SageQQ(2)
+    matrix = _engine_matrix(SageQQ, number, number, [entry for row in form for entry in row])
+    vector = __import__("sage.modules.free_module_element", fromlist=["vector"]).vector(SageQQ, linear)
+    match _definiteness(matrix):
+        case 1:
+            minimum = constant - (vector.dot_product(matrix.inverse() * vector)) / 4
+            return minimum > 0
+        case -1:
+            minimum = -(constant - (vector.dot_product(matrix.inverse() * vector)) / 4)
+            return minimum > 0
+        case 0:
+            if not matrix.is_zero() and not any(entry != 0 for entry in linear):
+                minimum = _quadratic_minimum(matrix, vector, constant)
+                return None if minimum is None else minimum > 0
+            if matrix.is_zero():
+                return False if any(entry != 0 for entry in linear) else None
+            return None
+        case _:
+            return False
+
+
 def _decided_no_real_zero(expression, variables):
     r"""Whether the real polynomial ``expression`` is decided to take no zero on the chart.
 
@@ -169,6 +297,9 @@ def _decided_no_real_zero(expression, variables):
         polynomial = ring(numerator)
     except (TypeError, ValueError):
         return None
+    quadratic = _decided_quadratic(polynomial)
+    if quadratic is not None:
+        return quadratic
     coefficients = {
         tuple(int(power) for power in monomial): coefficient
         for monomial, coefficient in polynomial.dict().items()
