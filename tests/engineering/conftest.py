@@ -465,6 +465,7 @@ def pytest_configure(config) -> None:
     builtins.incidence_edge_containment = incidence_edge_containment
     builtins.incidence_rows_exit = incidence_rows_exit
     builtins.incidence_page_comparison = incidence_page_comparison
+    builtins.restricted_stabilizer_outcome = restricted_stabilizer_outcome
     builtins.RowStatus = _script("coble_row_status").RowStatus
 
 
@@ -485,6 +486,7 @@ def pytest_unconfigure(config) -> None:
     del builtins.incidence_edge_containment
     del builtins.incidence_rows_exit
     del builtins.incidence_page_comparison
+    del builtins.restricted_stabilizer_outcome
     del builtins.RowStatus
 
 
@@ -966,6 +968,17 @@ def incidence_rows_exit(argv):
     asks it what it reports rather than re-deriving the selection it makes.
     """
     return _incidence_row_driver().main(argv)
+
+
+def restricted_stabilizer_outcome(cap) -> int:
+    r"""The exit status of one run of the restricted-stabilizer driver on `T_En`.
+
+    The driver is a script of the acceptance tier, like the incidence drivers:
+    it reports what the row did as an exit status -- 0 agreeing, 1 undecided
+    inside the cap, 2 returned and differing -- and a test asks the row for that
+    status rather than for the computation behind it.
+    """
+    return _script("coble_restricted_stabilizer").main(["--lattice", "TEn", "--cap", str(cap)])
 
 
 def incidence_page_comparison(label, statement, computed, recorded, source) -> bool:

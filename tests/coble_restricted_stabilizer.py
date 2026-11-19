@@ -38,15 +38,48 @@ def log(message=""):
     print(message, flush=True)
 
 
-def delta_and_perpendicular(lattice):
-    r"""`delta = e - f` of `T_En` and its perpendicular, which is `T_Co`."""
-    labels = tuple(lattice.module_generating_set())
-    delta = lattice.module_generator(labels[0]) - lattice.module_generator(labels[1])
+def delta_and_perpendicular(subgroup, select=None):
+    r"""The `(-2)`-vector `delta` of the subgroup's own lattice, and its perpendicular.
+
+    `delta` must be an element of the lattice the subgroup acts on, and that is
+    the subgroup's supergroup's -- the coinvariant extension's lattice for
+    `Gamma_{En,2}`, which is an equal but distinct copy of `T_En`.  A `delta`
+    taken from the catalogue object is a vector of a lattice none of this
+    subgroup's isometries is an isometry of, and the stabilizer call then treats
+    it as a family rather than as an element.
+
+    `select` names the vector in the lattice it is handed; the default is
+    `e - f` of the first two generators, which is `T_En`'s `(-2)`-vector
+    (Dolgachev--Kondō, Izv. Math. 77:3 (2013), p. 513).
+    """
+    lattice = subgroup.supergroup().domain()
+    delta = (select or _difference_of_the_first_two)(lattice)
+    if delta.parent() is not lattice:
+        raise ArithmeticError(
+            f"delta = {delta} is not an element of {lattice}, the lattice {subgroup} acts on"
+        )
+    if delta.q() != ZZ(-2):
+        raise ArithmeticError(f"delta = {delta} has q = {delta.q()}, not -2")
     perp = lattice.subobject_on((delta,)).inclusion().orthogonal_complement()
     return delta, perp
 
 
-def gamma_en_2(lattice):
+def _difference_of_the_first_two(lattice):
+    r"""`e - f` of the lattice's first two named generators."""
+    labels = tuple(lattice.module_generating_set())
+    return lattice.module_generator(labels[0]) - lattice.module_generator(labels[1])
+
+
+def _minus_two_generator(lattice):
+    r"""The lattice's first named generator of square `-2`."""
+    for label in lattice.module_generating_set():
+        vector = lattice.module_generator(label)
+        if lattice.q(vector) == ZZ(-2):
+            return vector
+    raise ArithmeticError(f"{lattice} names no generator of square -2")
+
+
+def gamma_en_2():
     r"""`Gamma_{En,2}`, the group of Alexeev--Engel--Garza--Schaffler, Def. 2.6."""
     invariant = Involutions.I_En.invariant_lattice()
     labels = tuple(invariant.module_generating_set())
@@ -81,18 +114,18 @@ def restricted(perp, isometries):
     )
 
 
-def run(lattice, cap):
+def run(cap):
     r"""What the construction returned, inside `cap` seconds, and what it says."""
     started = time.monotonic()
-    delta, perp = delta_and_perpendicular(lattice)
+    gamma = gamma_en_2()
+    log(f"[R] Gamma_En,2 built: characters complete {gamma.character_data_is_complete()}, "
+        f"contains a character kernel {gamma.contains_character_kernel()}")
+    delta, perp = delta_and_perpendicular(gamma)
     log(f"[R] delta: q = {delta.q()}, perp rank {perp.module_rank()}, "
         f"isometric to T_Co: {perp.is_isometric(NamedLattices.Tco)}")
     if not perp.is_isometric(NamedLattices.Tco):
         log("[R] the perpendicular is not T_Co: the row is about another lattice")
         return 2
-    gamma = gamma_en_2(lattice)
-    log(f"[R] Gamma_En,2 built: characters complete {gamma.character_data_is_complete()}, "
-        f"contains a character kernel {gamma.contains_character_kernel()}")
     signal.setitimer(signal.ITIMER_REAL, cap)
     try:
         stabilizer = gamma.stabilizer(delta)
@@ -183,20 +216,15 @@ def run_small(cap):
     r"""The same construction and comparison at rank five, where one command reaches it."""
     started = time.monotonic()
     lattice = small_specimen()
-    labels = tuple(lattice.module_generating_set())
-    delta = next(
-        lattice.module_generator(label) for label in labels
-        if lattice.q(lattice.module_generator(label)) == ZZ(-2)
-    )
-    perp = lattice.subobject_on((delta,)).inclusion().orthogonal_complement()
-    log(f"[R-small] {SMALL_SPECIMEN}: delta q = {delta.q()}, perp rank "
+    point = _class_set(lattice, _u2_labels(lattice))
+    gamma = lattice.Aut().discriminant_point_stabilizer(point)
+    log(f"[R-small] {SMALL_SPECIMEN}: the subgroup on L, as a discriminant preimage")
+    delta, perp = delta_and_perpendicular(gamma, _minus_two_generator)
+    log(f"[R-small] delta q = {delta.q()}, perp rank "
         f"{perp.module_rank()}, isometric to U + U(2): {perp.is_isometric(small_perpendicular())}")
     if not perp.is_isometric(small_perpendicular()):
         log("[R-small] the perpendicular is not U + U(2)")
         return 2
-    point = _class_set(lattice, _u2_labels(lattice))
-    gamma = lattice.Aut().discriminant_point_stabilizer(point)
-    log(f"[R-small] the subgroup on L, as a discriminant preimage")
     signal.setitimer(signal.ITIMER_REAL, cap)
     try:
         generators = tuple(gamma.group_generators())
@@ -242,7 +270,7 @@ def main(argv=None):
     try:
         if arguments.lattice == "small":
             return run_small(arguments.cap)
-        return run(NamedLattices.TEn, arguments.cap)
+        return run(arguments.cap)
     finally:
         signal.signal(signal.SIGALRM, previous)
 
