@@ -652,6 +652,45 @@ class Sterk:
 
     @staticmethod
     @cache
+    def _foldings_cached():
+        r"""Construct the five folds once, in documented order."""
+        v = Sterk.roots_18_2_0()
+        w = Sterk.roots_18_0_0()
+        families = {
+            "v": tuple(v[f"v{index}"] for index in range(1, 23)),
+            "w": tuple(w[f"w{index}"] for index in range(1, 20)),
+        }
+        foldings = {}
+        for name, (family, permutation) in _STERK_FOLDING_FAMILIES.items():
+            foldings[name] = CoxeterDiagrams().from_roots(families[family]).fold(permutation)
+        for name, involution_images in _STERK_TWISTED_FOLDS.items():
+            foldings[name] = CoxeterDiagrams().from_roots(families["v"]).fold_by(
+                involution_images(v)
+            )
+        return {name: foldings[name] for name in _STERK_CONFIGURATION_ORDER}
+
+    @staticmethod
+    def foldings():
+        r"""Return the five folds of the two root families, in documented order.
+
+        Each value is the record of one fold: the rooted diagram that was folded, the permutation
+        or the root images it was folded by, the isometry of the roots' span, that isometry's
+        invariant and anti-invariant lattices, the folded root family inside the invariant lattice,
+        and the orbit sums that were no roots.  ``Sterk_1``, ``Sterk_2`` and ``Sterk_4`` fold by
+        permutations of the roots and ``Sterk_3``, ``Sterk_5`` by involutions of the span that do
+        not permute them, so a caller reads the constructions here rather than repeating them.
+
+        EXAMPLES::
+
+            sage: from sage_extensions.sterk import Sterk
+            sage: foldings = Sterk.foldings()
+            sage: tuple(foldings[name].roots().cardinality() for name in foldings)
+            (12, 10, 12, 11, 14)
+        """
+        return dict(Sterk._foldings_cached())
+
+    @staticmethod
+    @cache
     def _sterk_roots_cached():
         r"""Return the five verified root configurations, each of them a fold.
 
@@ -669,13 +708,7 @@ class Sterk:
             "w": tuple(w[f"w{index}"] for index in range(1, 20)),
         }
         folded = {}
-        for name, (family, permutation) in _STERK_FOLDING_FAMILIES.items():
-            folding = CoxeterDiagrams().from_roots(families[family]).fold(permutation)
-            folded[name] = tuple(
-                _carried_into(NamedLattices.TdP, folding, root) for root in folding.roots()
-            )
-        for name, involution_images in _STERK_TWISTED_FOLDS.items():
-            folding = CoxeterDiagrams().from_roots(families["v"]).fold_by(involution_images(v))
+        for name, folding in Sterk._foldings_cached().items():
             folded[name] = tuple(
                 _carried_into(NamedLattices.TdP, folding, root) for root in folding.roots()
             )
