@@ -859,7 +859,7 @@ class Sterk:
         )
         assert len(roots) == 14
         assert all(root.q() in (-2, -4) for root in roots)
-        return lattice, roots
+        return lattice, finite_ordered_set(roots)
 
     @staticmethod
     def sterks_in_TEn():
@@ -896,7 +896,9 @@ class Sterk:
         }
         assert tuple(map(len, configurations.values())) == (12, 10, 12)
         assert all(root.q() in (-2, -4) for roots in configurations.values() for root in roots)
-        return configurations
+        return {
+            name: finite_ordered_set(roots) for name, roots in configurations.items()
+        }
 
     @staticmethod
     def isotropic_vectors():
