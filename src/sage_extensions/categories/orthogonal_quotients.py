@@ -2591,8 +2591,13 @@ end
                 # the word is what the registry keeps: checked once per row, on
                 # the first plane of that sheet, so a registry of Otilde+ lifts
                 # is never a registry of words whose witness sits on the wrong
-                # side.  No lattice a test can afford reaches this branch; the
-                # kernel rows of T_Co and of the Scattone lattices do.
+                # side.  The branch runs only where a stabilizer leaves a sign
+                # coset to lift and does not present it: no lattice a test can
+                # afford does, and neither of T_Co's kernel rows does -- Otilde
+                # has no sign character and Otilde+'s plane stabilizer presents
+                # the coset (its parabolic family holds an element of trivial
+                # discriminant image and spinor norm -1), so neither row spells
+                # a sheet's word here.
                 if (
                     self._spelled_lift(_LiftSpelling(spellings_of[point], flip_element))
                     != flipped
