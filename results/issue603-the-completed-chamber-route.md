@@ -217,7 +217,12 @@ one lift of each certified generator of `O(K)` and the pointwise kernel at the
 common lift denominator, and its finite module is the orbit span of the residue
 bound `2 d^2 |disc(K)|^2 [L : i^*(L)]`.  `IntegralStructureAction` cuts the
 stabilizer out as a point stabilizer in that module, so its ordered Schreier
-family generates `P_v^1`.  The remaining limitation is input availability, not
+family generates `P_v^1`.
+
+*Superseded:* it generates `G_QQ ∩ O(L)`, which is a subgroup of `P_v^1` and
+need not be all of it, for the reason withdrawn below.  The public family is
+now the lifted Levi image together with the radical; see "The correction is
+decided in coordinates, and the family is its two factors".  The remaining limitation is input availability, not
 this construction: an `O(K)` family must be supplied, and the completed
 chamber supplies it only for a reflective hyperbolic `K`.
 
@@ -612,6 +617,11 @@ membership test would turn a passing test into a timeout.  What the next round
 needs is either a membership test that is cheap off `Gamma_{K_I}(d)` as well,
 or that test's cost repriced with the reason stated.
 
+*Superseded:* the correction search became cheap off `Gamma_{K_I}(d)` by
+deciding the lift's own matrix rather than building a rational transvection per
+representative, the walk fell from 27.68 s to the numbers in "The correction is
+decided in coordinates", and the wiring is done.  See that section.
+
 ## The congruence fast path: attempted, refuted, not landed
 
 Trying the formula of the congruence lemma before the correction search --
@@ -620,6 +630,10 @@ arithmetic with no enumeration -- **failed its own guard**.  On the rank-five
 proper-image lattice the public lift then had the *wrong* Levi class:
 `test_the_congruence_lift_of_a_pointwise_levi_isometry.sage:100` compares the
 lift's class with the element it lifts and it was not equal.
+
+*Superseded as a route:* the cost it was meant to remove is now removed
+by deciding the lift's own matrix, so no congruence fast path is needed and
+this branch stays closed.
 
 The lemma is not in question: its proof is the six pairings of
 `(v, kappa_i, w)` and was checked independently in that same file.  What fails
@@ -630,9 +644,137 @@ patched under time pressure: a lift of the wrong Levi class is exactly the
 kind of silent wrongness the reduction lemma turns into a wrong pointed
 family.
 
+## The correction is decided in coordinates, and the family is its two factors
 
+Two repairs land together: the correction search stops rebuilding a rational
+transvection per box representative, and the public pointed family stops
+taking the rational group's integral part for the whole stabilizer.  Both are
+on `main` at the commit that carries this section.
 
+### The correction search: the lift's own matrix is the decision
 
+The corrected map is `g~` composed with the Eichler transvection, and on the
+framing of `L` it is the rank-two update
 
+    g~ E_{v,x}(z) = g~(z) - b(x,z) g~(v) + b(v,z) g~(x) - (q(x)/2) b(v,z) g~(v),
 
+so `g~` is read once on the framing and each representative of the box is
+decided by whether that matrix is integral.  One side suffices: the matrix is
+that of a rational isometry, so an integral one has a unit determinant --
+the discriminant is preserved -- and its inverse is integral too.  This is
+what `...IsotropicReductions._corrected_pointwise_levi_lift` now does; the
+integrality of the constructed matrix is checked against the form before an
+isometry is raised from it, so a formula error fails loudly instead of
+producing a lift of the wrong class.
 
+Measured with `.tmp/probe-corrected-fast.py` (load 2.88, port
+`991b88b0`), comparing the two decision procedures on **every**
+representative of every specimen:
+
+| specimen | box | old | new | integral representatives | agree |
+|---|---|---|---|---|---|
+| `U(2)+<2>` | `[2,4]` = 8 | 0.049 s | 0.001 s | 4 | yes |
+| `U(2)+<3>` | `[2,4]` = 8 | 0.043 s | 0.001 s | 4 | yes |
+| `U(3)+<3>` | `[3,6]` = 18 | 0.097 s | 0.001 s | 9 | yes |
+| rank five, gen 0 | `[4,4,4,8]` = 512 | 4.086 s | 0.028 s | 0 | yes |
+| rank five, gen 1 | `[2,2,2,4]` = 32 | 0.227 s | 0.002 s | 16 | yes |
+| rank five, gen 2 | `[2,2,2,4]` = 32 | 0.225 s | 0.002 s | 16 | yes |
+
+The empty fibre is the expensive case, and it is the one the walk hits: 512
+representatives at about 7 ms each, every one of them a rational transvection
+plus a restriction.  `test_the_pointed_stabilizer_of_a_primitive_vector.sage`'s
+rank-five call was 4.83 s in the round that priced the wiring and is 2.03 s
+to 2.22 s now; the file is 12 passed in 19.72 s on a quiet machine.
+
+No red is possible for this repair and none is claimed: both procedures
+decide the same set of representatives on every specimen above, so every
+public answer is unchanged.  What a test could not do before -- read the
+decision without a rational transvection -- is now what the code does.
+
+### The family: the lifted Levi image and the radical
+
+`pointed_stabilizer_generators`'s non-split branch returned
+`pointed_stabilizer_action().stabilizer()`.  That action's rational generators
+are one lift per generator of `O(K_I)`, and a word in them is a rational
+isometry, so its integral part is `G_QQ ∩ O(L)`, which need not map onto
+`M_I`: for `g` in `M_I` a word `psi` with class `g` exists, but `psi` is not
+integral, and the argument that `psi^{-1} phi` lies in the radical needs
+`psi ∈ O(L)`.  That is the reviewer's defect, and it is why the branch is now
+
+    one integral lift per generator of M_I  +  the radical's generators,
+
+where the lifts come from the coset graph of `O(K_I)/M_I`
+(`...IsotropicReductions.pointwise_levi_image_generators`).  It is the whole of
+`P_I^1`: the family's classes generate `M_I`, its second factor is `U_I`, and
+an element `g` differs from the word in the lifted classes carrying its class
+by `w^{-1} g`, whose class is trivial, so it lies in the kernel.
+
+The two constructions are now separate and both live: `pointed_stabilizer_action`
+still presents the finite-residue action, and its docstring says that its
+stabilizer is a subgroup of `P_I^1` and not that it is the group.  It has no
+caller in the source any more.
+
+Measured with `.tmp/probe-walk.py` (load 7.35, port `991b88b0`); every
+specimen below answers `_reduction_lift_splitting() is None`, so every one
+takes the new branch:
+
+| specimen | family | lifts + radical | coset walk | public call |
+|---|---|---|---|---|
+| `U(2)+<2>` | 3 | 1 + 2 | 0.723 s | 0.039 s |
+| `U(2)+<3>` | 2 | 1 + 1 | 0.185 s | 0.019 s |
+| `U(3)+<3>` | 3 | 1 + 2 | 0.185 s | 0.016 s |
+| `U(2)+<2>+<2>` | 5 | 2 + 3 | 0.096 s | 0.006 s |
+| rank five | 9 | 5 + 4 | 3.629 s | 0.014 s |
+| `T_Co` cusp 5 | 19 | 9 + 10 | 2.909 s | 0.012 s |
+
+Every member of every family was checked to fix the marked vector.  The same
+walk before the correction repair was 27.68 s on the rank-five specimen (load
+4.15) and 1.90 s on `T_Co` cusp 5 (load 0.40); the same probe on a quieter
+machine measured 1.306 s for the rank-five walk and 0.966 s for `T_Co`
+(load 2.27).  Load is the dominant term on this VM and none of these numbers
+is a claim about a quiet machine beyond the load printed beside it.
+
+### Why no test witnessed the missing radical, and what the tests assert
+
+Adding the radical leaves every Levi image unchanged -- its class is the
+identity -- so no comparison of finite images of `O(K_I)` can see it, and
+that is the comparison the pointed tests make.  The mod-two image is blind at
+the smallest specimen as well: at `U(2)+<2>` every member of the family and
+every radical generator acts as the identity on `L/2L` (measured with
+`.tmp/probe-mod2.py`).  Nor is subgroup membership available: "the radical's
+generator lies in the subgroup the family generates" is membership in a
+finitely generated subgroup of an infinite `O(L)`, which nothing here decides.
+
+What the tests assert is what is decidable: every member fixes the vector, its
+Levi class lies in `pointwise_levi_image()`, and the finite image of those
+classes is the one the liftable chamber generators generate.  The completeness
+statement itself is the argument above, not an assertion.
+
+### What is green
+
+    FILES="tests/lattices/test_the_pointed_stabilizer_of_a_primitive_vector.sage
+           tests/lattices/test_the_public_pointed_family_of_a_divisible_odd_line.sage
+           tests/lattices/test_the_levi_images_generators_by_schreier.sage
+           tests/lattices/test_the_pointwise_levi_lift_of_an_odd_line.sage
+           tests/lattices/test_the_congruence_lift_of_a_pointwise_levi_isometry.sage"
+
+is **21 passed in 35.76 s**, slowest call 3.47 s
+(`test_the_pointed_family_reaches_the_stabilizers_own_discriminant_image`),
+every call inside the 20 s ceiling.  The same five files at the base commit
+`6241968` are **21 passed in 92.58 s** and the run exits 1 there and here on
+the same thing: `collection took 23.31 s; the measured ceiling is 6 s`
+(70.00 s at the base).  That gate is a property of a five-file invocation, not
+of these files, and it is reported rather than fixed here.
+
+### What remains
+
+* `029J`'s `L_2` row (`tests/lattices/the_enriques_pointed_stabilizer_row.py`,
+  not collected): its pointed call was 320.6 s in the round that completed the
+  row, and the row has not been re-run since the family changed.  It takes the
+  new branch iff its splitting is `None`, which the row itself will show.
+* The acceptance items, one at a time, now that the family is the two factors:
+  `T_Co` cusp 5 (19 generators, 2.909 s walk plus 0.429 s radical at load
+  7.35; the test asserts it returns and fixes its vector), then `029J`'s
+  `L_2`, then the proper Levi image on a specimen whose index is not one.
+* The plane case's parameter lattice at null rank at least two, and the
+  coercion from `O(L)` into the residue action's rational group.
