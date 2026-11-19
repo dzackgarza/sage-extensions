@@ -245,3 +245,20 @@ def test_the_two_twisted_configurations_are_folds_of_the_twenty_two_roots() -> N
         assert int(folding.invariant_lattice().module_rank()) == 10
         assert _signature(folding.invariant_lattice()) == _signature(wall_span)
         assert _signature(folding.anti_invariant_lattice()) == (0, 8)
+
+def test_the_five_foldings_are_read_as_records_rather_than_repeated() -> None:
+    r"""Each configuration's involution, isometry and two lattices come from one reading."""
+    foldings = Sterk.foldings()
+
+    assert Set(foldings) == Set(_STATEMENTS)
+    for name, folding in foldings.items():
+        isometry = folding.isometry()
+        wall_span = NamedLattices.TEn.primitive_sublattice_from(_wall_vectors(_STATEMENTS[name]))
+
+        assert isometry * isometry == isometry.parent().identity()
+        assert int(folding.invariant_lattice().module_rank()) == 10
+        assert _signature(folding.invariant_lattice()) == _signature(wall_span)
+        assert _signature(folding.anti_invariant_lattice()) == (0, 8)
+        assert tuple(sorted(int(root.q()) for root in folding.roots())) == tuple(
+            sorted(int(wall.q()) for wall in _wall_vectors(_STATEMENTS[name]))
+        )
