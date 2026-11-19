@@ -74,11 +74,14 @@ class ManifoldAtlasChart(SageObject):
     domain gives the point's coordinate, an element of the coordinate field.
     """
 
-    def __init__(self, manifold, label, engine_chart, domain, nonvanishing=()) -> None:
+    def __init__(
+        self, manifold, label, engine_chart, domain, nonvanishing=(), cut_from=None
+    ) -> None:
         self._manifold = manifold
         self._label = label
         self._engine = engine_chart
         self._domain = domain
+        self._cut_from = cut_from
         self._function_ring = _manifold_function_ring(domain, manifold)
         self._nonvanishing = tuple(
             _raise_manifold_expression(_engine_manifold_expression(condition), self)
@@ -111,6 +114,16 @@ class ManifoldAtlasChart(SageObject):
     def domain(self):
         r"""The open subset of the manifold the chart is defined on."""
         return self._domain
+
+    def cut_from(self):
+        r"""The label of the chart this one was cut out of, or ``None`` for a chart of the whole manifold.
+
+        A chart registered by :meth:`TopologicalManifolds.ParentMethods.chart_on_open_subset`
+        is read on the points of another chart where its conditions do not vanish; that
+        chart is this one's source, and when the conditions vanish nowhere the two are the
+        same chart (Lee, *Introduction to Smooth Manifolds*, 2nd ed., Ch. 1).
+        """
+        return self._cut_from
 
     def nonvanishing(self):
         r"""The functions on this chart whose common nonvanishing locus is its domain.
@@ -797,9 +810,10 @@ def _chart_family_covers(manifold, labels):
     one: a family that covers by meeting instead of by containment is not decided
     here, and a caller is told so rather than being told its family covers.
     """
-    given = tuple(_engine_manifold_chart(manifold.atlas()[label]) for label in labels)
+    resolved = _unrestricted_labels(manifold, labels)
+    given = tuple(_engine_manifold_chart(manifold.atlas()[label]) for label in resolved)
     for label in manifold.chart_labels():
-        if label in labels:
+        if label in resolved:
             continue
         chart = manifold.atlas()[label]
         domain = _engine_manifold_chart(chart).domain()
@@ -808,6 +822,44 @@ def _chart_family_covers(manifold, labels):
         if not _sum_certificate_covers(manifold, labels, chart):
             return False
     return True
+
+
+def _unrestricted_labels(manifold, labels):
+    r"""``labels``, with every chart whose conditions vanish nowhere replaced by the chart it was cut from.
+
+    A chart read where its conditions do not vanish is the chart it was cut from when
+    those conditions have no zero at all: the cut selects nothing, so the two charts are
+    one chart on one open set (Lee, *Introduction to Smooth Manifolds*, 2nd ed., Ch. 1).
+    Coverage is a question about the sets a family covers, so such a chart is read as the
+    chart it came from -- after which a family's coverage no longer depends on which other
+    charts have since been registered on the manifold.
+    """
+    from sage_extensions.categories.vector_bundles import _decided_nowhere_vanishing
+
+    resolved = list(labels)
+    for label in labels:
+        current_label = label
+        for _step in range(len(manifold.chart_labels())):
+            chart = manifold.atlas()[current_label]
+            conditions = tuple(chart.nonvanishing())
+            if not conditions:
+                break
+            symbols = tuple(_engine_manifold_chart(chart)[:])
+            if not all(
+                _decided_nowhere_vanishing(
+                    _engine_manifold_expression(condition), symbols
+                )
+                is True
+                for condition in conditions
+            ):
+                break
+            source_label = chart.cut_from()
+            if source_label is None or source_label not in manifold.chart_labels():
+                break
+            current_label = source_label
+        if current_label != label and current_label not in resolved:
+            resolved.append(current_label)
+    return tuple(resolved)
 
 
 def _sum_certificate_covers(manifold, labels, chart) -> bool:
@@ -1770,7 +1822,10 @@ class TopologicalManifolds(OwnedCategory):
                 coord_def={engine_chart: conditions},
             )
             chart = self._register_chart(
-                label, engine_open.chart(coordinates), nonvanishing=nonvanishing
+                label,
+                engine_open.chart(coordinates),
+                nonvanishing=nonvanishing,
+                cut_from=source_label,
             )
             # The chart cut on the subset reads the same coordinates there, so the
             # coordinate change to the chart it was cut from is the identity; it is
@@ -1785,7 +1840,9 @@ class TopologicalManifolds(OwnedCategory):
             )
             return chart
 
-        def _register_chart(self, label, engine_chart, domain=None, nonvanishing=()):
+        def _register_chart(
+            self, label, engine_chart, domain=None, nonvanishing=(), cut_from=None
+        ):
             r"""Record the chart ``engine_chart`` of this manifold's engine under ``label``.
 
             The chart is defined on ``domain``, an open subset of this manifold.
@@ -1807,7 +1864,12 @@ class TopologicalManifolds(OwnedCategory):
                     else self._chart_domain(label, engine_chart)
                 )
             chart = ManifoldAtlasChart(
-                self, label, engine_chart, domain, nonvanishing=nonvanishing
+                self,
+                label,
+                engine_chart,
+                domain,
+                nonvanishing=nonvanishing,
+                cut_from=cut_from,
             )
             self._preamble_charts[label] = chart
             return chart
