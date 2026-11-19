@@ -294,11 +294,18 @@ def test_two_glue_classes_of_a_definite_complement_collapse_to_one_orbit() -> No
 
 
 def test_the_enriques_gluing_gives_a_vector_of_square_minus_two_with_complement_t_co() -> None:
-    r"""Item 3: the consumer specimen, ``T_En`` with ``square = -2`` and complement ``T_Co``.
+    r"""Items 3 and 4: the consumer specimen, its count, and its certificate.
 
     ``< -2 > perp T_Co`` sits in ``T_En`` with index two, so the gluing is one
-    index-two overlattice and the acceptance asks for at least one orbit.  Each
-    returned vector is the certificate's image, and its complement is ``T_Co``.
+    index-two overlattice.  The count is not this operation's own: Namikawa,
+    *Periods of Enriques surfaces*, Math. Ann. 270 (1985), Theorem 2.13, as
+    cited in Alexeev--Engel--Gritsenko--Sankaran, *Compact moduli of Enriques
+    surfaces of degree 2*, section 2, gives a unique ``(-2)``-vector in
+    ``T_En = U + U(2) + E8(2)`` modulo ``Gamma_En = O(T_En)``.  So ``T_En``
+    carries one orbit of ``(-2)``-vectors, and exactly one of them has the
+    complement of Dolgachev--Kondo, Izv. Math. 77:3 (2013), section 3 equation
+    (3.6), printed p. 513, which is the vector that exists.  Each returned
+    vector is the certificate's image, and its complement is ``T_Co``.
     """
     lattice = NamedLattices.TEn
     complement = NamedLattices.Tco
@@ -309,7 +316,7 @@ def test_the_enriques_gluing_gives_a_vector_of_square_minus_two_with_complement_
     index = ZZ(pair_order // lattice_order).sqrt()
 
     found = tuple(lattice.vectors_of_square_with_complement(ZZ(-2), complement))
-    assert found
+    assert sum(1 for _entry in found) == 1
 
     for delta, isometry in found:
         assert delta.q() == ZZ(-2)
