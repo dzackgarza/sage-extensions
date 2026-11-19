@@ -590,6 +590,47 @@ trivial Levi class -- a radical element -- with `M_I` of index two.  The test
 file asserts the two cheap specimens only, because 27.68 s is over the 20 s
 per-call ceiling; its run is 2 passed in 7.65 s.
 
+## The index on the headline specimen, and why the wiring is not done
+
+`T_Co` at Sterk's fifth cusp, the specimen its acceptance item names: nine
+certified generators of `O(K_I)`, and **all nine lift**, so `M_I = O(K_I)`
+there -- index one, and the coset graph has a single class.  The walk costs
+1.90 s on a quiet machine and 8.49 s at load 4.0, and the public pointed call
+4.89 s and 19.23 s in the same two runs; the load is the dominant term, and
+none of those numbers is a claim about a quiet machine.
+
+The rank-five proper-image lattice has index two and its walk was 27.68 s on a
+quiet machine before the congruence fast path below.  With it the walk did not
+finish inside the probe's window under load, so no number is claimed for it.
+
+**Decision.**  `pointwise_levi_image_generators` is **not** wired into
+`pointed_stabilizer_generators` in this round.  At index two the walk exceeds
+the 20 s per-call ceiling on the rank-five specimen, and
+`test_a_proper_pointwise_levi_image_still_has_the_full_finite_image` calls the
+public pointed family on exactly that lattice.  Wiring it without a cheaper
+membership test would turn a passing test into a timeout.  What the next round
+needs is either a membership test that is cheap off `Gamma_{K_I}(d)` as well,
+or that test's cost repriced with the reason stated.
+
+## The congruence fast path: attempted, refuted, not landed
+
+Trying the formula of the congruence lemma before the correction search --
+for `tau` the identity modulo `d`, the lift read off the frame in `O(r^2)`
+arithmetic with no enumeration -- **failed its own guard**.  On the rank-five
+proper-image lattice the public lift then had the *wrong* Levi class:
+`test_the_congruence_lift_of_a_pointwise_levi_isometry.sage:100` compares the
+lift's class with the element it lifts and it was not equal.
+
+The lemma is not in question: its proof is the six pairings of
+`(v, kappa_i, w)` and was checked independently in that same file.  What fails
+is my reading of `tau`'s action on the frame when the map is written on `L`'s
+own generators through the Gram of that basis -- the one place where the
+implementation is not the formula.  The change is reverted rather than
+patched under time pressure: a lift of the wrong Levi class is exactly the
+kind of silent wrongness the reduction lemma turns into a wrong pointed
+family.
+
+
 
 
 
