@@ -24,7 +24,7 @@ from sage_extensions.categories.abstract_categories.mor_categories import (
 )
 from sage_extensions.categories.abstract_categories.objects import OwnedCategory
 from sage_extensions.categories.graph_categories import LabelledGraphs
-from sage_extensions.categories.lattices import Lattices
+from sage_extensions.categories.lattices import EvenTwoElementaryLattices, Lattices
 from sage_extensions.categories.rings.ring_foundation import (
     OwnedRings,
     _cross_engine_ring_value,
@@ -2783,6 +2783,9 @@ class RootFamilyFolding:
     it was given, the formed lattice the isometry acts on (the whole lattice when the roots span it
     rationally and their saturated span otherwise), that isometry, the folded root family in its
     invariant lattice, and the orbit sums that were no roots of the span and so stayed out of it.
+    The two lattices answer their own signatures, and
+    :meth:`two_elementary_invariants` answers Nikulin's invariants of each when both are even
+    2-elementary.
     """
 
     def __init__(self, diagram, datum, span, isometry, roots, discarded) -> None:
@@ -2838,8 +2841,44 @@ class RootFamilyFolding:
             self._folded_diagram = CoxeterDiagrams().from_roots(self._roots)
         return self._folded_diagram
 
+    def two_elementary_invariants(self):
+        r"""Return Nikulin's \((r,a,\delta)\) of the invariant and of the anti-invariant lattice.
+
+        The two lattices are the ones the operation answers with, and Nikulin's invariants are
+        defined for an even 2-elementary lattice, so the answer is the pair of triples **when
+        defined**: the fold of two orthogonal \((-2)\)-roots by the map \(b\mapsto -b\) has
+        \(\mathbf Z a\) and \(\mathbf Z b\), both \(\langle-2\rangle\), and both triples are
+        \((1,1,1)\).  A fold whose lattice is not 2-elementary is refused naming which, rather than
+        answering an invariant that is not defined.
+
+        EXAMPLES::
+
+            sage: from sage_extensions.all import *
+            sage: a, b = Lattices(ZZ)([[-2, 0], [0, -2]]).module_generators()
+            sage: fold = CoxeterDiagrams().from_roots((a, b)).fold({0: a, 1: -b})
+            sage: invariant, anti_invariant = fold.two_elementary_invariants()
+            sage: invariant == nikulin_invariants(1, 1, 1)
+            True
+            sage: anti_invariant == nikulin_invariants(1, 1, 1)
+            True
+        """
+        return (
+            _two_elementary_invariants(self.invariant_lattice()),
+            _two_elementary_invariants(self.anti_invariant_lattice()),
+        )
+
 
 __all__ = ["CoxeterDiagrams", "RootedCoxeterDiagrams", "RootFamilyFolding"]
+
+
+def _two_elementary_invariants(lattice):
+    r"""Return Nikulin's \((r,a,\delta)\) of ``lattice``, which must be even and 2-elementary.
+
+    ``EvenTwoElementaryLattices`` owns that decision: it refuses a lattice that is not even, not
+    nondegenerate, or whose discriminant group is not 2-elementary, and the refusal names the
+    lattice, which is what "when defined" means for a fold's two lattices.
+    """
+    return EvenTwoElementaryLattices(lattice.base_ring())(lattice).two_elementary_invariants()
 
 
 def _root_family_coordinates(lattice, vector):

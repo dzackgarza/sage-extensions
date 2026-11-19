@@ -170,6 +170,32 @@ def test_a_degenerate_family_of_twenty_two_roots_refuses_a_gram_preserving_permu
         CoxeterDiagrams().from_roots(roots).fold(permutation)
 
 
+def test_the_two_elementary_invariants_are_answered_only_for_a_two_elementary_lattice() -> None:
+    r"""The fold of two orthogonal roots by \(b\mapsto -b\) has \(\langle-2\rangle\) on both sides.
+
+    Both of its lattices have Gram \([-2]\), so Nikulin's \((r,a,\delta)\) is \((1,1,1)\) on
+    each and the operation answers both.  The fold of \(A_2\)'s three roots has the anti-invariant
+    lattice of square \(-6\), whose discriminant group is not 2-elementary: the operation refuses
+    that answer rather than inventing one.
+    """
+    plane = Lattices(ZZ)([[-2, 0], [0, -2]])
+    first, second = plane.module_generators()
+    doubling = CoxeterDiagrams().from_roots((first, second)).fold({0: first, 1: -second})
+    invariant, anti_invariant = doubling.two_elementary_invariants()
+
+    assert invariant == nikulin_invariants(1, 1, 1)
+    assert anti_invariant == nikulin_invariants(1, 1, 1)
+
+    lattice = Lattices(ZZ)("A2")
+    left, right = lattice.module_generators()
+    other = CoxeterDiagrams().from_roots((left, right, left + right)).fold((1, 0, 2))
+
+    assert int(other.invariant_lattice().determinant()) == -2
+    assert int(other.anti_invariant_lattice().determinant()) == -6
+    with pytest.raises(ValueError):
+        other.two_elementary_invariants()
+
+
 def test_the_pairing_test_and_the_relation_test_decide_alike_over_a_nondegenerate_span() -> None:
     r"""Of the six permutations of \(A_2\)'s three roots, exactly the two that keep the pairings fold.
 

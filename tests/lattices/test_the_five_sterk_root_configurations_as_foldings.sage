@@ -141,3 +141,22 @@ def test_the_five_folded_families_carry_the_card_counts_and_squares() -> None:
             sorted(int(wall.q()) for wall in walls)
         )
         assert folding.folded_diagram().root_realization() is folding.invariant_lattice()
+
+
+def test_the_five_folded_lattices_answer_their_two_elementary_invariants() -> None:
+    r"""All ten lattices of the five folds are even 2-elementary, and the operation answers Nikulin's triple.
+
+    Nikulin's \((r,a,\delta)\) is the rank, the length of the discriminant group and the parity of
+    its form.  For a nondegenerate integral lattice \(|A_L|=|\det L|\), so a 2-elementary
+    discriminant group has \(2^a=|\det L|\) and \(r=\operatorname{rank}L\); the answer is checked
+    against the lattice's own rank and determinant rather than against a printed table.
+    """
+    for _name, folding in Sterk.foldings().items():
+        for lattice, invariant in zip(
+            (folding.invariant_lattice(), folding.anti_invariant_lattice()),
+            folding.two_elementary_invariants(),
+            strict=True,
+        ):
+            assert int(invariant[0]) == int(lattice.module_rank())
+            assert 2 ** int(invariant[1]) == abs(int(lattice.determinant()))
+            assert int(invariant[2]) in (0, 1)
