@@ -1,0 +1,22 @@
+tree SHA: 648dc58af6103cf1440f5785dbd871d1f9dc1530 (modified paths: 0)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 1.05 1.40 2.44 3/519 3461650
+probe: .tmp/probe-row-count.py; inner 1500 s
+[Otilde] the row's route: divided-class, taken because its lines carry divided classes and its covering is carried from one plane to the others (decided in 1.5 s)
+[  603.96s] outcome: [Otilde] undecided: the row did not return inside its 600 s cap  [601.55s]
+[  603.96s] lines visited (planes-through-a-line calls): 1
+[  603.96s] done
+[peakrss] probe603: child waited=0 shell_code=0 samples=306
+[peakrss] peak tree RSS      : 1328 MiB
+[peakrss] low-water MemAvail : 4079 MiB
+[peakrss] peak single VmHWM  : 1334 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     1323 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   404.5s procs=  3 rss=  1328 MiB hwm=  1331 MiB avail=  7564 MiB
+[peakrss]   t=   402.5s procs=  3 rss=  1324 MiB hwm=  1327 MiB avail=  7553 MiB
+[peakrss]   t=   398.5s procs=  3 rss=  1322 MiB hwm=  1325 MiB avail=  7834 MiB
+[peakrss]   t=   400.5s procs=  3 rss=  1322 MiB hwm=  1325 MiB avail=  7684 MiB
+[peakrss]   t=   394.5s procs=  3 rss=  1296 MiB hwm=  1299 MiB avail=  7731 MiB
+probe exit: 0

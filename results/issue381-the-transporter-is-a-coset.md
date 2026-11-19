@@ -860,3 +860,41 @@ and kernel sets.
 running at this head under its 600 s cap with a counter on
 `_planes_through_line`, and that count is what says whether the per-line cost
 still has to fall or whether the walk is short enough now.
+
+## The walk visits one line, and that one call is the 600 s
+
+The count this note said nobody had taken, at the head that carries the two
+changes, `Otilde` at `T_Co`, cap 600 s, with a counter wrapped round
+`_planes_through_line`:
+
+    [Otilde] the row's route: divided-class ... (decided in 1.5 s)
+    [  603.96s] outcome: [Otilde] undecided: the row did not return inside its 600 s cap  [601.55s]
+    [  603.96s] lines visited (planes-through-a-line calls): 1
+
+**One call.**  So the row is not walking many lines at 6.57 s each -- it is
+inside a *single* plane enumeration, and that one call is the 600 s.  Every
+"24 s a line times N lines" and "6.57 s a line times N lines" in the earlier
+sections of this note is therefore the wrong model, and the cap arithmetic
+built on it ("the cap falls at the twenty-fifth line", "at the ninetieth") is
+void.
+
+**What that one call is.**  `_planes_through_line` now (a) tries the chamber
+route, (b) takes `K_v.Aut().isotropic_orbit_representatives(1)`.  The cusp-5
+line's `K_v` answers in 2.84 s, so the call the row is stuck in is the plane
+enumeration of **some other line**, whose `K_v` is not the cusp's -- and the
+stack dumps of the substituted route put the time inside
+`isotropic_orbits._isotropic_orbit_representatives` ->
+`isotropic_lifts.integral_members`, i.e. inside the library's own line-orbit
+computation, paying a lifting torsor per line of that `K_v`.
+
+So the recursion is the cost: the plane orbits of `L` need the line orbits of
+`K_v`, and those need lifting torsors in `K_v`, one per line, with the torsor
+cost this note has now twice measured (8 classes at rank 5, 131 072 at rank 11).
+
+**The next measurement, and it is one call**: the first line's
+`K_v.Aut().isotropic_orbit_representatives(1)`, timed and capped.  If it is the
+600 s, then the whole of `#381`'s rank-eleven cost is the height of that
+recursion, and the question becomes whether the line orbits of a rank-nine
+`K_v` can be had without the torsor -- which is a question about
+`_isotropic_line_orbit_representatives`, not about the transporter, the cusps'
+port call, or the ring arithmetic.
