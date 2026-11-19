@@ -130,6 +130,46 @@ def test_a_permutation_that_keeps_the_pairings_and_breaks_a_relation_is_refused(
         CoxeterDiagrams().from_roots(roots).fold(permutation)
 
 
+def test_a_degenerate_family_of_twenty_two_roots_refuses_a_gram_preserving_permutation() -> None:
+    r"""The invalidating input at the issue's own arity: 22 roots whose span is degenerate.
+
+    Sterk's 22 roots span a nondegenerate \((1,17)\) lattice and so cannot host a Gram-preserving
+    permutation that breaks a relation (Proposition 1).  The family here has 22 roots and does host
+    one: the four roots \(r_1,r_2,r_1+r_2,r_1+z\) of the test above, which carry the relation
+    \(r_1+r_2-(r_1+r_2)=0\) and the radical vector \(z\), together with eighteen pairwise
+    orthogonal \((-2)\)-roots that every map here fixes.  The swap of \(r_1\) and \(r_1+z\),
+    extended by the identity, keeps every one of the 22 pairings and carries the relation to
+    \(z\ne0\), and the fold refuses it.
+    """
+    size = 21
+    gram = [
+        [
+            0
+            if 2 in (left, right)
+            else (-2 if left == right else (1 if {left, right} == {0, 1} else 0))
+            for right in range(size)
+        ]
+        for left in range(size)
+    ]
+    lattice = Lattices(ZZ)(gram)
+    basis = tuple(lattice.module_generators())
+    roots = (basis[0], basis[1], basis[0] + basis[1], basis[0] + basis[2]) + tuple(basis[3:21])
+    radical = basis[2]
+    permutation = (3, 1, 2, 0) + tuple(range(4, 22))
+    images = tuple(roots[position] for position in permutation)
+
+    assert int(CoxeterDiagrams().from_roots(roots).cardinality()) == 22
+    assert all(
+        lattice.b(roots[left], roots[right]) == lattice.b(images[left], images[right])
+        for left in range(22)
+        for right in range(22)
+    )
+    assert images[0] + images[1] - images[2] == radical
+    assert int(lattice.q(radical)) == 0
+    with pytest.raises(ValueError):
+        CoxeterDiagrams().from_roots(roots).fold(permutation)
+
+
 def test_the_pairing_test_and_the_relation_test_decide_alike_over_a_nondegenerate_span() -> None:
     r"""Of the six permutations of \(A_2\)'s three roots, exactly the two that keep the pairings fold.
 
