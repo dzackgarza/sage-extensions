@@ -324,6 +324,44 @@ def _twisted_images(name, roots):
     return images
 
 
+def test_the_archived_permutation_is_an_automorphism_and_folds_to_the_eleven_roots() -> None:
+    r"""The issue's specimen: the archived permutation of the 22 roots is in `Aut`, and folds to 4.3.8.
+
+    The Specimens table records the permutation
+    \((1,13)(2,12)(3,11)(4,10)(5,9)(6,8)(14,16)(17,20)(18,19)(21,22)\) as one of the 22-root
+    diagram's automorphisms, citing the archived folding.  It is an involution, it is among the
+    eight automorphisms, and the fold by it is the eleven-root family of 4.3.8: eleven roots, nine
+    of square \(-4\) and two of \(-2\), the card's squares and pairings for that statement, in an
+    invariant lattice of rank 10 and signature \((1,9)\).
+    """
+    pairs = ((1, 13), (2, 12), (3, 11), (4, 10), (5, 9), (6, 8), (14, 16), (17, 20), (18, 19), (21, 22))
+    image = list(range(1, 23))
+    for left, right in pairs:
+        image[left - 1], image[right - 1] = right, left
+    permutation = tuple(position - 1 for position in image)
+    roots = _root_family("Sterk_1")
+    diagram = CoxeterDiagrams().from_roots(roots)
+
+    assert all(permutation[permutation[position]] == position for position in range(22))
+    assert permutation in tuple(
+        tuple(int(automorphism(index)) - 1 for index in range(1, 23))
+        for automorphism in diagram.Aut()
+    )
+
+    folding = diagram.fold(permutation)
+    carried = tuple(
+        folding.span().inclusion()(folding.invariant_lattice().inclusion()(root))
+        for root in folding.roots()
+    )
+    walls = _wall_vectors("4.3.8")
+
+    assert int(folding.roots().cardinality()) == _chamber("4.3.8")["wall_count"]
+    assert _squares(carried) == _squares(walls)
+    assert _pairings(NamedLattices.TdP, carried) == _pairings(NamedLattices.TEn, walls)
+    assert int(folding.invariant_lattice().module_rank()) == 10
+    assert _signature(folding.invariant_lattice()) == (1, 9)
+
+
 def test_the_two_twisted_configurations_are_folds_of_the_twenty_two_roots() -> None:
     r"""Sterk 3 and Sterk 5 fold by involutions of the span that do not permute the roots.
 
