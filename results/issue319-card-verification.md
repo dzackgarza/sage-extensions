@@ -239,13 +239,29 @@ first appears in degree 12 where the stabilizer groups of the two polarizations
 $5g_1 + g_2$ and $g_1 + 2g_2$ actually agree" (§3.4, p. 17) -- and the number of
 distinct orders is the card's 3, not its `#h` of 4.
 
+Four further degrees, measured the same way in a second process:
+
+```
+degree  card #h  card #Gamma-bar_h   classes  distinct orders  time
+14      3        3                   3        3                31.0 s
+16      4        4                   4        4                14.2 s
+18      4        4                   4        4                26.3 s
+20      5        4                   5        4                37.9 s
+```
+
+Degree 20 is the second degree where two classes share an order, and there too
+the number of distinct orders is the card's `#Gamma-bar_h` (4) rather than its
+`#h` (5).  So **nine of the 36 degrees are decided this way**: 4, 6, 8, 10, 12,
+14, 16, 18, 20.  The remaining 27 are not measured here, and where their orders
+coincide the orbit sizes are what is left.
+
 Degree 4 is in the per-test gate
 (`tests/lattices/test_the_enriques_polarization_group_classes_by_card.py`, one
-call, 10.78 s measured); the other four are recorded here.  A call re-enumerates
+call, 10.78 s measured); the others are recorded here.  A call re-enumerates
 the degree's classes and builds each group, so it costs 11 s to 41 s, against the
 gate's 20 s call ceiling: degree 12 alone takes 41.3 s, and a loaded run of the
 degree-4 call was observed to pass 20 s, so the gate keeps the one case measured
-at 10.78 s rather than five near the ceiling.
+at 10.78 s rather than nine near the ceiling.
 
 ## What this round did not do
 
