@@ -445,3 +445,49 @@ and not about this machinery.  Nothing else on the path is the port's.
 and decide which of the two it is.  That decision is a millisecond of
 computation and a short argument, and it is what tells us whether (A) is a
 library gap or a port necessity.
+
+## The cusp-5 line does split -- and the chamber route cannot run at rank eleven anyway
+
+`_hyperbolic_completion` (`isotropic_orbits.py:1586`) looks for an isotropic `f`
+with `b(v, f) != 0` whose plane `⟨v, f⟩` is a direct summand, and its docstring
+is explicit about where it looks: "``None`` when no such ``f`` is exhibited
+**among the chosen generators of `L`**".
+
+At `T_Co`'s cusp-5 line -- `v` of divisibility 2, coordinates
+`(2, 0, 0, -4, -5, -7, -10, -8, -6, -4, -2)`, `det L = -2048` -- scanning the
+coefficient box `{-1, 0, 1}^11` instead of the generator list:
+
+    177147 coefficient vectors scanned in 0.20 s
+    isotropic f with |b(v, f)| = 2:                  48
+    of those, planes <v, f> that are direct summands: 48   (Smith form (1,1))
+
+so the split exists, forty-eight times over, and **not one of the witnesses is a
+chosen generator** -- the first is `(0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1)`.
+The gate's `None` is therefore an artifact of its search space and not a
+property of the lattice.  The criterion used is exact: `⟨v, f⟩` is a direct
+summand exactly when its two-row coordinate matrix has Smith form `(1, 1)`.
+
+**But certifying the split does not remove the port**, and that is the part
+that closes the question.  `_chamber_planes_through_line`'s own docstring says
+what it needs beyond the split: `M = ⟨v, f⟩^perp` must in turn split off a
+generator `⟨g⟩` of square `-|det M|` with
+
+    T = <v, f, g>^perp   even unimodular of signature (1, 17),
+
+i.e. `T` of rank **18**.  At `T_Co`, of rank 11, `T` has rank 8; at `T_En`, of
+rank 12, it has rank 9.  The chamber route's model genus
+`E8(-1)^2 + ⟨-|det M|⟩` is built for a lattice far larger than either, so the
+route is unavailable at `T_Co` **by rank**, whatever the split does.
+
+**So the two questions are answered, and they were different questions.**
+
+* the gate on the port is not the split: the split exists and the gate's scan
+  is too narrow (a real, small gap -- widening it to combinations is a
+  box scan of 0.2 s and an exact Smith-form test);
+* the port is not removable by that gap at `T_Co`: the library's own
+  alternative needs a rank-18 complement, and nothing at rank 11 can supply it.
+
+**What is actually open.**  A library-owned enumeration of the primitive
+isotropic *classes* of `K_v` at rank ten -- not the chamber route, which lives
+in another rank regime, and not the split, which is available.  That is a
+design of its own, and this record stops at naming it.

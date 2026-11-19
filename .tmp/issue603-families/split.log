@@ -1,0 +1,27 @@
+tree SHA: 73b099ebc698b6fe8b1f9439621493c0f2e7b1ed (modified paths: 0)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 1.24 3.67 6.36 4/532 3256244
+probe: .tmp/probe-split.py; inner 900 s
+[    0.15s] v of divisibility 2, q = 0
+[    0.16s] v coordinates (2, 0, 0, -4, -5, -7, -10, -8, -6, -4, -2)
+[    0.16s] gram determinant -2048, v G v = 0, div v = 2
+[    0.20s] box of 177147 coefficient vectors
+[    0.23s] isotropic f with |b(v,f)| = 2: 48
+[    0.24s] of those, planes <v,f> that are direct summands: 48
+[    0.24s]   f = (0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1)
+[    0.24s]   f = (0, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0)
+[    0.24s]   f = (0, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0)
+[    0.24s]   f = (0, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0)
+[    0.24s]   f = (0, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0)
+[    0.24s] done
+[peakrss] probe603: child waited=0 shell_code=0 samples=2
+[peakrss] peak tree RSS      : 283 MiB
+[peakrss] low-water MemAvail : 4136 MiB
+[peakrss] peak single VmHWM  : 283 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      272 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     2.0s procs=  3 rss=   283 MiB hwm=   283 MiB avail=  4136 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     3 MiB hwm=     3 MiB avail=  4330 MiB
+probe exit: 0
