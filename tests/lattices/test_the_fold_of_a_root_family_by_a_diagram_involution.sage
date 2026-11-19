@@ -36,10 +36,11 @@ Three permutations are refused, for three different reasons.  The three roots of
 affine diagram \(\tilde A_2\), whose automorphism group is all of \(S_3\), while only the two
 permutations fixing the pair \(\{r_1,r_2\}\) keep the pairings: the bond is \(|b|\), so a diagram
 symmetry may reverse a pairing.  A family whose span is degenerate satisfies relations its pairings
-do not see: in the lattice of Gram \([[-2,1,0],[1,-2,0],[0,0,0]]\), the five roots
-\(s_1,s_2,s_1+s_2,s_1+z,s_2+z\) have a Gram-preserving permutation that is no isometry of their
-span.  And a map given by images may fail to be an isometry at all, or may be no involution, which
-a fold requires because it sums over orbits.
+do not see: in the lattice of Gram \([[-2,1,0],[1,-2,0],[0,0,0]]\), the four roots
+\(r_1,r_2,r_1+r_2,r_1+z\) have a Gram-preserving permutation that is no isometry of their span ---
+it carries the relation \(r_1+r_2-(r_1+r_2)=0\) to \(z\), a nonzero point of the radical.  And a
+map given by images may fail to be an isometry at all, or may be no involution, which a fold
+requires because it sums over orbits.
 
 An orbit sum that is a multiple of a point of the span is rescaled to that point: a root is
 primitive, and the sum of an orbit's two roots has square \(2q(r)+2b(r,g(r))\), which is what
@@ -107,17 +108,24 @@ def test_a_diagram_symmetry_that_reverses_a_pairing_is_refused() -> None:
 
 
 def test_a_permutation_that_keeps_the_pairings_and_breaks_a_relation_is_refused() -> None:
+    r"""The swap of \(r_1\) and \(r_1+z\) keeps the pairings of the four roots and breaks a relation.
+
+    The relation \(r_1+r_2-(r_1+r_2)=0\) becomes \(z\) under the swap, and \(z\) is a nonzero
+    point of the radical: the four roots' span is degenerate, which is exactly where Proposition 1
+    leaves room for a Gram-preserving permutation that is no isometry of it.
+    """
     lattice = Lattices(ZZ)([[-2, 1, 0], [1, -2, 0], [0, 0, 0]])
     first, second, radical = lattice.module_generators()
-    roots = (first, second, first + second, first + radical, second + radical)
-    permutation = (3, 4, 2, 0, 1)
+    roots = (first, second, first + second, first + radical)
+    permutation = (3, 1, 2, 0)
     images = tuple(roots[position] for position in permutation)
 
     assert all(
         lattice.b(roots[left], roots[right]) == lattice.b(images[left], images[right])
-        for left in range(5)
-        for right in range(5)
+        for left in range(4)
+        for right in range(4)
     )
+    assert images[0] + images[1] - images[2] == radical
     with pytest.raises(ValueError):
         CoxeterDiagrams().from_roots(roots).fold(permutation)
 

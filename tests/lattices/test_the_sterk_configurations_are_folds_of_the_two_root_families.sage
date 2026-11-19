@@ -230,20 +230,25 @@ def test_the_two_root_families_fold_only_to_the_three_chambers() -> None:
     assert sorted(fourteen_root_signatures) == [((1, 10), (0, 7))]
     assert sorted(hits) == sorted(_fold_key(_fold(name)) for name in ("Sterk_1", "Sterk_2", "Sterk_4"))
 
-def test_every_diagram_automorphism_of_the_roots_keeps_the_gram_matrix() -> None:
-    r"""No permutation of the 22 roots keeps the Gram matrix and breaks a relation.
+def test_the_gram_preserving_permutations_of_the_twenty_two_roots_fold_or_are_refused() -> None:
+    r"""On the 22 roots: six Gram-preserving involutions fold, two Gram-preserving maps are refused.
 
     The span is nondegenerate, so the rational relations are exactly the kernel of the Gram matrix
-    and a Gram-preserving permutation carries each of them to a relation.  The Coxeter matrix is a
-    function of the Gram, so the Gram-preserving permutations are among the diagram's
-    automorphisms; all eight of those keep the Gram, so they are exactly the Gram-preserving
-    permutations, and the six that are involutions are all accepted as folds.
+    and a Gram-preserving permutation carries each of them to a relation; a permutation of these
+    roots therefore cannot be refused for the relations.  The Coxeter matrix is a function of the
+    Gram, so the Gram-preserving permutations are among the diagram's automorphisms, and all eight
+    of those keep the Gram: they are exactly the Gram-preserving permutations.  Six are involutions
+    and fold --- which is the relation test passed, since a fold decides it before it builds the
+    isometry --- and the two order-four automorphisms keep the Gram and every relation, name every
+    vertex and have integral matrices, so the one condition left to refuse them for is the one a
+    fold needs and they do not have: being an involution.
     """
     roots = _root_family("Sterk_1")
     lattice = NamedLattices.TdP
     diagram = CoxeterDiagrams().from_roots(roots)
     gram = tuple(tuple(lattice.b(left, right) for right in roots) for left in roots)
     folded = ()
+    refused = 0
 
     for automorphism in diagram.Aut():
         permutation = tuple(int(automorphism(index)) - 1 for index in range(1, 23))
@@ -251,9 +256,33 @@ def test_every_diagram_automorphism_of_the_roots_keeps_the_gram_matrix() -> None
         assert tuple(tuple(lattice.b(left, right) for right in images) for left in images) == gram
         if all(permutation[permutation[position]] == position for position in range(22)):
             folded = folded + (int(diagram.fold(permutation).roots().cardinality()),)
+            continue
+        with pytest.raises(ValueError):
+            diagram.fold(permutation)
+        refused = refused + 1
 
     assert diagram.Aut().order() == 8
     assert sorted(folded) == [11, 11, 12, 14, 14, 22]
+    assert refused == 2
+
+
+def test_the_twenty_two_roots_refuse_a_permutation_that_moves_a_pairing() -> None:
+    r"""The transposition of \(v_1\) and \(v_2\) is no isometry of the 22 roots, and is refused.
+
+    \(v_1\) pairs \(1\) with \(v_{17}\) while \(v_2\) pairs \(0\) with it, so no isometry
+    carries \(v_1\) to \(v_2\); the operation refuses the transposition for that pair.  This is
+    the first refusal a permutation of the roots can meet, and it is met on the 22 roots
+    themselves.
+    """
+    roots = _root_family("Sterk_1")
+    lattice = NamedLattices.TdP
+    diagram = CoxeterDiagrams().from_roots(roots)
+    permutation = (1, 0) + tuple(range(2, 22))
+
+    assert int(lattice.b(roots[0], roots[16])) == 1
+    assert int(lattice.b(roots[1], roots[16])) == 0
+    with pytest.raises(ValueError):
+        diagram.fold(permutation)
 
 
 def _twisted_images(name, roots):
