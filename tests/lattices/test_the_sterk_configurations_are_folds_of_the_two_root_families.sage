@@ -118,6 +118,27 @@ def _squares(vectors):
     return sorted(int(vector.q()) for vector in vectors)
 
 
+def test_the_stored_root_families_have_the_specimens_norm_counts_and_rank() -> None:
+    r"""The Specimens row: twenty roots of square \(-2\) and two of \(-4\) in the 22, all \(-2\) in the 19.
+
+    The two of square \(-4\) are \(v_{21}\) and \(v_{22}\); the 19 of the ``(18,0,0)`` family are
+    all of square \(-2\); and the 22 span rank 18, so their rational relations number
+    \(22-18=4\).  This is the row the folds are read from, so it is asserted on the stored families
+    rather than on the folds.
+    """
+    twenty_two = Sterk.roots_18_2_0()
+    nineteen = Sterk.roots_18_0_0()
+    squares = {label: int(root.q()) for label, root in twenty_two.items()}
+
+    assert sum(square == -2 for square in squares.values()) == 20
+    assert tuple(label for label, square in squares.items() if square == -4) == ("v21", "v22")
+    assert all(int(root.q()) == -2 for root in nineteen.values())
+    assert (
+        int(NamedLattices.TdP.primitive_sublattice_from(tuple(twenty_two.values())).module_rank())
+        == 18
+    )
+
+
 def test_the_five_configurations_have_the_card_wall_counts() -> None:
     configurations = Sterk.sterk_roots()
 
