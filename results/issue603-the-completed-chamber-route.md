@@ -1133,3 +1133,65 @@ of the withdrawal -- `029J`'s `L_2`, the proper Levi image, and the odd
 lattices -- are met by the family that is the two factors, and the
 library-owned clause is met where a chamber exists and refuted, with the index
 argument, where none does.
+
+## The issue's own acceptance, checked at the head
+
+#603's acceptance sentence has two clauses.  Both were checked at `b48ae63`,
+port `991b88b0`.
+
+**"A public call returns, for a primitive vector `v` of an indefinite lattice
+`L`, generators of `Stab_{O(L)}(v)` built by the library's own
+construction, as for lines and planes."**
+
+The public call is `lattice.Aut().stabilizer(v).group_generators()`, which is
+`PrimitiveIsotropicSubobjects.pointed_stabilizer_generators`
+(`isotropic_parabolics.py:1181`).  Its family is built from the library's own
+pieces, in the same two-factor shape the line and the plane cases have:
+
+* the Levi side is one integral lift per generator of `M_I`, read off the coset
+  graph of `O(K_I)/M_I` where a class is decided by the lift predicate
+  (`lattices.py:13677`), or, where the reduction splits along the lifts,
+  `id_M + sigma` directly;
+* the kernel side is the radical's parameter lattice (`lattices.py:13542`), the
+  same owner the line case reads;
+* the plane case's counterpart is `unipotent_radical_generators`
+  (`isotropic_parabolics.py:2304`) over the decided parameter lattice
+  (`:2817`), of index one (`:3466`).
+
+What is not the library's is one input: `O(K_I)`'s own generating family, which
+is the completed chamber's where the chamber exists (`lattice_morphisms.py:4736`)
+and the indefinite port's otherwise.  At a nonreflective `K_I` that cannot be
+otherwise -- the maximal reflection subgroup has infinite index (Bogachev--
+Kolpakov, arXiv:2112.14642v4, printed p. 2), so no finite reflection family
+generates `O(K_I)` -- which is the refutation recorded above, not a gap in the
+pointed construction.
+
+The run at this head:
+`tests/lattices/test_the_pointed_stabilizer_of_a_primitive_vector.sage` is
+**13 passed in 21.61 s** (load 5.30; slowest call 3.67 s), covering the
+rank-seven specimen, `T_Co` cusp 5, the rank-five proper-image specimen, the
+non-isotropic case and the card rows of `026E` and `0016`.
+
+**"On a lattice-database card with a cited or certified stabilizer (an orbit
+count of vectors that the stabilizer determines), the call reproduces the card
+value."**
+
+Card `029J`, whose `Otilde+` row is 528 lines in two orbits of lengths 527 and
+1 -- an index in the discriminant image, which the pointed stabilizer
+determines.  The row at this head:
+
+    L_1: 1 ker-rho orbits in its O(N)-orbit, 5.6 s
+    L_2: 527 ker-rho orbits in its O(N)-orbit, 128.5 s
+    card 029J's cited orbit lengths: [1, 527]
+    pointed family at L_1 = Ze_1: 20 generators, 1.6 s
+    L_1: pointed family's line-stabilizer image index 1
+    pointed family at L_2 = Ze_3: 20 generators, 2.2 s
+    L_2: pointed family's line-stabilizer image index 527
+    probe exit: 0
+
+The two counts are computed from the line's own residue data, independently of
+the family; the family plus `-id` presents the setwise stabilizer, and its
+discriminant image index is asserted against them.  So the call reproduces the
+card's 527 and its 1, and the two clauses of the acceptance sentence are met.
+
+Nothing else is open on this issue.
