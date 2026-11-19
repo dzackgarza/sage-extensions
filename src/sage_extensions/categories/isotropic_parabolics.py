@@ -1161,6 +1161,12 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             :func:`_pointed_stabilizer_action` for the lift denominators and
             the finite stable module.  The construction is for a primitive
             isotropic vector, so a subobject of any other rank is refused.
+
+            Its stabilizer is a subgroup of `P_I^1` and need not be all of it:
+            a word in rational lifts is a rational isometry, so no family read
+            off this action supplies the radical's parameters, and
+            :meth:`pointed_stabilizer_generators` generates the two factors
+            separately instead.
             """
             return _pointed_stabilizer_action(self)
 
@@ -1191,20 +1197,21 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
               unimodular, `v` lies in it and is primitive there, so
               `b(v, M) = Z`, and the even-square parameters are then the whole
               kernel;
-            * otherwise the residue action of :meth:`pointed_stabilizer_action`
-              cuts the integral stabilizer out of the rational group of lifts
-              over a finite module, and its stabilizer's family is returned.
-              That construction's integrality is decided by the marked-line
-              lift torsor, whose residue locus is computed as a union of cosets
-              of the transvection kernel only over an even lattice
-              (:mod:`sage_extensions.categories.isotropic_lifts`), and it
-              supplies the lifts alone -- the radical's parameters are not
-              among its generators.
+            * otherwise the two factors are generated separately: one
+              integral lift per generator of `M_I`, read off the coset graph of
+              `O(K_I)/M_I` where a class is decided by whether its element has
+              a pointwise lift
+              (:meth:`...IsotropicReductions.pointwise_levi_image_generators`),
+              together with the radical's own generators.  This is the whole of
+              `P_I^1` however proper `M_I` is: the classes of the family are a
+              generating set of `M_I` and the family contains `U_I`, so an
+              element of `P_I^1` differs from the word in the lifted classes
+              that carries its own class by an element of the kernel, which the
+              second factor generates.
 
             Every member is checked to fix the marked vector before it is
             returned.
             """
-            lattice = self.ambient_lattice()
             vector = self.inclusion()(
                 self.module_generator(next(iter(self.module_generating_set())))
             )
@@ -1217,9 +1224,8 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
                 ) + tuple(reduction._pointwise_kernel_generators())
             else:
                 family = tuple(
-                    lattice.integral_isometry(isometry)
-                    for isometry in self.pointed_stabilizer_action().stabilizer().group_generators()
-                )
+                    reduction.pointwise_levi_image_generators()
+                ) + tuple(reduction._pointwise_kernel_generators())
             if any(isometry(vector) != vector for isometry in family):
                 raise ArithmeticError(
                     f"the pointwise stabilizer action at {vector} returned an integral "
