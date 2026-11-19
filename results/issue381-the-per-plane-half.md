@@ -137,3 +137,38 @@ which before predicting was the missing step, not measuring after.
 per edge of an orbit walk with 2137 points and generators in the dozens.  That is
 inherent to acting on sorted sets, and the next change -- if there is one -- is
 to stop doing that; nothing smaller will move the row inside its cap.
+
+## Before rewriting the walk: the rank-two path has two fast routes ahead of it
+
+`_yield_subgroup_isotropic_orbit_representatives` (`orthogonal_quotients.py:4724`)
+does not go straight to the walk.  Per ambient representative it tries, in order:
+
+    rank 1:  quotient.isotropic_line_stabilizer_image(representative)   -> words
+             _line_orbit_from_divided_classes(subgroup, representative)  -> the divided classes
+    rank 2:  _plane_orbit_from_odd_stabilizer(subgroup, representative)
+             _plane_orbit_from_parabolic_stabilizer(subgroup, representative)
+    then:    quotient.exact_isotropic_stabilizer_generators(...)  and the cost walk
+
+The `T_Co` profile put 405 s in the walk, so at `T_Co` under `Otilde` **both
+in-repo plane routes declined** and the fallback ran.  That makes the first
+question not "how do we make the walk cheaper" but **why the two fast routes
+decline there** -- and unlike the rewrite, that is one call per route on one
+ambient representative, with a `None` or a tuple as the answer.
+
+**Why this matters for the change I proposed last section.**  Rewriting the walk
+to act on keys would make the fallback cheaper; making either fast route apply
+would make the fallback unnecessary.  The second is smaller, is the shape the
+line rows already use (the divided-class route, 527 keys in 3.96 s against 335 s
+for one line by the old per-flag scan), and does not touch shared walk machinery
+that four Coble row files depend on.
+
+**The check, and it is bounded**: the ambient plane row of `T_Co`
+(`isotropic_orbit_representatives(2)`, measured at 76 s in the same profile), one
+representative, then each fast route called on it and timed.  A `None` from
+`_plane_orbit_from_parabolic_stabilizer` names the declining hypothesis; a tuple
+names a mis-routing in the caller instead, which would be a different bug and a
+cheaper one.
+
+**No object introduced**: the routes, the divided-class route and the parabolic
+stabilizer are the library's own, and the fallback is the orbit--coset walk cited
+in its docstring.
