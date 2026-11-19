@@ -7,7 +7,7 @@ infinite in an indefinite ``T``, so it is never enumerated.  By Nikulin
 ``<d> perp C``, collapsed by ``O(<d>) x O(C)``.
 
 Each test below decides one item of the issue's acceptance on the smallest
-input that decides it.  The definite control is ``A2``, whose cardinality is
+input that decides it.  The definite controls are ``A2``, whose cardinality is
 card `0012`: the operation's orbit count at square ``-2`` is the card's ``O``
 row at norm two, and the enumerated fibre is what that count reduces.  The
 second definite control is ``<-2> perp <-2>``, whose complement ``<-2>`` has a
@@ -141,6 +141,56 @@ def test_a_rank_one_complement_of_order_two_collapses_by_its_own_negation() -> N
 
     transpose = lattice.Aut()(transposition)
     reached = (delta, -delta, transpose(delta), -transpose(delta))
+    fibre = tuple(lattice.vectors_of_square_and_divisibility(ZZ(-2), delta.div()))
+    assert sorted(_coordinates(vector, labels) for vector in reached) == sorted(
+        _coordinates(vector, labels) for vector in fibre
+    )
+
+
+def test_a_definite_complement_of_rank_two_is_collapsed_by_its_own_image() -> None:
+    r"""Item 2 at a complement of rank two: ``A3`` and the complement of a root.
+
+    ``A3``'s roots are twelve vectors of square ``-2`` and divisibility one, and
+    the three simple reflections carry one of them over all twelve, so the
+    enumerated fibre is one ``O(A3)``-orbit and the operation owes one vector.
+    The complement is ``[[-6, 2, 2], [2, -2, 0], [2, 0, -2]]``: rank two,
+    determinant eight, and its discriminant form has order eight and invariant
+    factors ``(2, 4)``, so it is neither elementary nor indefinite.  The
+    collapse there is by the image of ``O(C)`` itself -- a definite lattice's
+    isometry group is finite and its generators are computable -- and not by a
+    theorem about ``O(q_C)``.
+    """
+    lattice = Lattices(ZZ)("A3")
+    labels = tuple(lattice.module_generating_set())
+    root = lattice.module_generators()[0]
+    complement = lattice.orthogonal_complement(lattice.subobject_on([root]))
+    assert complement.module_rank() == 2
+    assert int(complement.discriminant_quadratic_form().cardinality()) == 8
+
+    found = tuple(lattice.vectors_of_square_with_complement(ZZ(-2), complement))
+    assert sum(1 for _entry in found) == 1
+    delta, _isometry = found[0]
+    assert delta.q() == ZZ(-2)
+    assert lattice.subobject_on([delta]).is_primitive() is True
+    assert complement.is_isometric_to(lattice.orthogonal_complement(lattice.subobject_on([delta]))) is True
+
+    def reflection(alpha):
+        def image(label):
+            vector = lattice.module_generator(label)
+            return vector + lattice.b(vector, alpha) * alpha
+
+        return lattice.Aut()(image)
+
+    reflections = tuple(reflection(lattice.module_generator(label)) for label in labels)
+    reached = [delta]
+    frontier = [delta]
+    while frontier:
+        current = frontier.pop()
+        for isometry_of_lattice in reflections:
+            image = isometry_of_lattice(current)
+            if _coordinates(image, labels) not in [_coordinates(vector, labels) for vector in reached]:
+                reached.append(image)
+                frontier.append(image)
     fibre = tuple(lattice.vectors_of_square_and_divisibility(ZZ(-2), delta.div()))
     assert sorted(_coordinates(vector, labels) for vector in reached) == sorted(
         _coordinates(vector, labels) for vector in fibre
