@@ -99,6 +99,60 @@ isotropic-orbit call do not return on Gamma_h
 The connected GitHub connection of this session cannot create issues (it reads
 issues and writes branches), so this block is what the orchestrator posts.
 
+## The plane row: which branch it takes, and what that branch costs
+
+The plane row of a `gamma-h-N` card is one call of
+`PredicateSubgroups.isotropic_orbit_representatives(2)`, and on the smallest
+card -- `gamma-h-3`, case 3, $S=\overline{\{7\}}$, $|\bar\Gamma_h| = 92897280$ --
+it does not return in 480 s.  Two cheap questions decide which of the row's
+three routes it takes, and both are measured:
+
+```
+Gamma_h,3 finite-character quotient: index 505920,
+    spinor_kernel False, determinant_kernel False, has_discriminant True
+P1 is_parabolic_complete: True  in  0.8 s
+P2 is_parabolic_complete: True  in 25.7 s
+```
+
+So the row cannot take the `O^+` route: `_plane_orbit_from_odd_stabilizer` is
+entered only for a subgroup that cuts the spinor character alone, and
+$\Gamma_h$ cuts a discriminant condition and no sign kernel.  It also does not
+fall back to the stabilizer closure -- both ambient representatives certify
+their parabolic as complete -- so the row is inside
+`_iter_transported_planes(quotient, representative, family)`, whose splitting
+walk is `_iter_splitting_isometries_in_im_rho(family, spellings=True)`, and
+that call passes **no `point`**.
+
+That is the whole of it: the walk's own docstring says which computation each
+form is.  With a `point` it computes the `rho(Gamma)`-orbits on the finite
+`im rho`-orbit of that point -- "the isotropic classes of `A_L`, or the images
+of the isotropic planes" -- and that is the route the line rows take: the class
+set `{c, -c}` is passed as the point.  Without one it runs
+the double-coset enumeration in `im rho`, and the same docstring records what
+that costs at this size: "the double-coset enumeration in a group of order
+`|im rho|` does not return at the Enriques size, while the orbit walk of the
+class set under the `im rho`-generators terminates".  The plane row is that enumeration,
+in a finite image in which `rho(Gamma_h)` has index 505920.
+
+Passing the plane's divided class set $J_x$ as the point would put the row on
+the fast side of that sentence, and the set's stabilizer in $Q$ is
+$\rho(G_x)$ exactly when the published indices certify it (527 and 23715 for
+$T_{\mathrm{En}}$, DSH §3.6, p. 22) -- and not otherwise: on
+$T_{\mathrm{Co}}$ the stabilizer is bigger by a factor 8, which
+`isotropic_plane_orbits`'s docstring records and which is why that call asks
+for the certificate instead of assuming it.
+
+The library already owns a finite computation of the same orbits,
+`isotropic_plane_orbits(representatives)`: its divided-class decomposition
+returns $\Gamma_{\mathrm{En},2}$'s 9 and $\widetilde{O}^+$'s 24242, the rows
+of card `029J`, and its hypothesis $\rho(G_x) = \mathrm{Stab}_Q(J_x)$ is
+certified from the published indices 527 and 23715 (Dutour Sikirić--Hulek,
+§3.6, p. 22).  That hypothesis genuinely fails on $T_{\mathrm{Co}}$, by a
+factor 8, which the call's own docstring records.  Whether the row may read its
+count off that decomposition is therefore a decision about when the hypothesis
+holds, not a performance tweak, and it is not made here: the row keeps the
+exact double-coset walk and the card's plane row stays `UNDECIDED`.
+
 ## What this round did not do
 
 * The plane route and the flag route are not repaired: they are #390/#391's
