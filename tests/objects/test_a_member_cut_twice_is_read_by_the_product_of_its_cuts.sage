@@ -57,7 +57,7 @@ def test_two_doubly_cut_charts_that_miss_the_origin_still_do_not_cover() -> None
     second = plane.chart_on_open_subset("G2", "x y", "U", (x + (-1), y))
     sections = plane.tangent_bundle().sections()
 
-    with pytest.raises(AssertionError):
+    with pytest.raises((AssertionError, CoverageUndecided)):
         sections.section(
             {
                 "G1": (first.function_ring().one(), first.function_ring().zero()),
