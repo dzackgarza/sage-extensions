@@ -1,0 +1,25 @@
+tree SHA: 6e78a69637ab84b2aa05f2909c859181d2ea7ebf (modified paths: 0)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 17.49 11.07 8.12 7/568 3395843
+probe: .tmp/probe-api.py; inner 600 s
+[    1.02s] base type: OwnedLatticeIsometryMor_with_category_with_category.ArrowType
+[    1.03s] framed type: OwnedModuleMor_with_category_with_category.ArrowType
+[    1.03s] matrix read failed: TypeError: the dimensions of the matrix must be specified
+[    1.03s] rational lattice: rank 5
+[    1.04s] isometry construction failed: TypeError: base_ring (=Fraction Field of Integer Ring) must be a ring or a semiring
+[    2.47s] 20 torsor constructions: 1.429s
+[    2.47s] done
+[peakrss] probe603: child waited=0 shell_code=0 samples=5
+[peakrss] peak tree RSS      : 271 MiB
+[peakrss] low-water MemAvail : 4276 MiB
+[peakrss] peak single VmHWM  : 271 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      260 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     4.0s procs=  3 rss=   271 MiB hwm=   271 MiB avail=  4404 MiB
+[peakrss]   t=     8.0s procs=  3 rss=   251 MiB hwm=   271 MiB avail=  6236 MiB
+[peakrss]   t=     6.0s procs=  3 rss=   237 MiB hwm=   271 MiB avail=  4276 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   154 MiB hwm=   154 MiB avail=  4570 MiB
+[peakrss]   t=     0.0s procs=  2 rss=     9 MiB hwm=     9 MiB avail=  4501 MiB
+probe exit: 0

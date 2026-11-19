@@ -716,3 +716,45 @@ change is the same: the same 512 passing/failing decisions as the current
 **Corrected arithmetic for the row.**  512 x 47 ms is 24 s a line; the cap at
 600 s therefore falls at about the twenty-fifth line, not the forty-seventh.
 The conclusion is unchanged and the lever is now a known one.
+
+## The two accessors the coordinate-level test would want do not work
+
+Before writing the change, the interface was probed at `U+U(2)+<-2>`, port
+`991b88b0`:
+
+    _module_matrix(base)                       framed morphism, and matrix(framed)
+                                              raises "the dimensions of the matrix
+                                              must be specified"
+    rational.Isom(rational)._isometry_from_column_matrix(M)
+                                              raises "base_ring (=Fraction Field of
+                                              Integer Ring) must be a ring or a
+                                              semiring" -- the owned field is not
+                                              Sage's QQ
+
+so neither reading `base_point()`'s matrix nor raising an isometry from a matrix
+works the way it does for the integral lattices of #603's correction search,
+where the second call is the one used.
+
+**What does work, and is the route for the change.**  `base` is evaluated on
+vectors by the library's own `__call__` -- the torsor uses it that way
+throughout -- and `to_vector()` reads coordinates on the rational framing.  So
+the integrality test can be taken entirely in coordinates, with no matrix object:
+
+* read `z_i = base(y_i)`'s coordinates once, for the target's generators `y_i`
+  (fixed across the loop);
+* per representative, `E(z_i) = z_i - b(x, z_i) f + b(f, z_i) x - (q(x)/2) b(f, z_i) f`
+  with `x = s(a)` and `f` the marked vector, all as coordinate arithmetic with
+  the target's Gram;
+* integral means every coordinate of every `E(z_i)` is an integer.
+
+The passing representatives still have to be turned into the retained lifts, and
+that is where the remaining half of the cost sits: 257 of the 512 pass, and each
+passing lift is an isometry object.  So the full win needs the second accessor
+fixed (Sage's `QQ` instead of the owned field), and without it the change buys
+about half -- 24 s a line down to roughly 12 s.
+
+**Reported rather than worked around.**  Neither refusal is a defect: the
+framed-matrix read is documented for integral framings, and the isometry
+constructor's ring check is right about the owned field.  Using them anyway,
+through private coercions, would be the kind of shortcut this record has been
+refusing all along.
