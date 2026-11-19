@@ -318,3 +318,58 @@ was wrong for that lattice: the covering computation comes first.
 **Next.**  Instrument the first covering of one plane at `T_Co` -- which step
 of it is running at the cap -- rather than the transporter.  Nothing else about
 this issue can be measured at rank eleven until that step is named.
+
+## The step, named by stack dumps
+
+The row was run at `T_Co` under a 240 s cap with `faulthandler.dump_traceback_later(30, repeat=True)`;
+eight dumps came back at port `991b88b0`, load 1.15.  They are two stacks, not
+one, and neither is the transporter.
+
+**Stack A -- the cusps, through the port's cell machinery** (in six of the
+eight dumps):
+
+    tests/.../coble_gamma_co_2_incidence_rows.py:477 row_relation
+    predicate_subgroups.py:1259  tits_building_incidence_by_divided_classes
+    predicate_subgroups.py:803   cusps
+    orthogonal_quotients.py:4736 _yield_subgroup_isotropic_orbit_representatives
+    lattice_morphisms.py:5507    isotropic_orbit_representatives
+    isotropic_orbits.py:2019     _isotropic_orbit_representatives
+    isotropic_orbits.py:1821     _isotropic_plane_orbit_representatives
+    isotropic_orbits.py:1781     _planes_through_line
+    port isotropic_induction.py:75/100  isotropic_vector_classes
+    port lorentzian_cells.py:3433       global_orbits
+                                       -> local_stabilizer_orbits (3368)
+                                       -> cell_primitive_rays (1173)
+                                       -> cell_cone (1020)
+    polyhedral_cones.py:336/159   from_rays -> PPL polyhedron construction
+
+So the cusps themselves are what the column cannot afford: the planes through a
+line are produced by the port's Vinberg-cell enumeration at rank eleven, and
+the row is inside `Polyhedron` for whole dump intervals.  This is why the
+covering registry is empty at the cap -- no plane is cusped yet, so no covering
+is carried and no transport is registered.
+
+**Stack B -- word evaluation paying source introspection** (three of eight):
+
+    groups.py:4792/4795 _evaluate_reduced_word -> _signed_generator_image
+      -> _admitted_generator_image (4728) -> groups.py:3784 __call__
+      -> lattice_morphisms.py:3620 one()
+      -> mor_foundation.py:441/359 __get__ / _copy_operation_metadata
+      -> sageinspect.py:2493 sage_getsourcelines -> inspect.getsourcelines
+
+Every realized generator pays `sage_getsourcelines`, i.e. a source-file read and
+parse, because `_copy_operation_metadata` reads `reading.__doc__` inside a
+`try` and the docstring's own note says that read runs `sage_getsourcelines` on
+a generated class: it is documented as a *correctness* workaround ("that
+failure made `O(T_En).one()` raise") and it is also what the dumps catch.
+
+**What that changes.**  The remaining cost of the `T_Co` kernel rows is (A) the
+cusp enumeration through the port's cell machinery, and (B) a library-side
+introspection bill on every realized word.  (B) is small and local --
+`_copy_operation_metadata` can skip the descriptor read rather than pay it and
+catch -- and it is the only one of the two that is this library's to fix; (A) is
+the port's cell walk, which is a different owner's cost.
+
+**Next.**  Take (B) first: measure one realized word with and without the
+`__doc__` read, and if the dumps are telling the truth it is a one-line
+change with its own test.  (A) is then a question for the port, not this issue.
