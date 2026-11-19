@@ -57,3 +57,30 @@ def test_a_derivation_that_is_twice_the_frame_is_read_as_twice_the_frame() -> No
 
     assert recovered.components()["U_N"][0](north.domain()((2,))) == RR(10)
     assert recovered == frame + frame
+
+
+def test_the_bracket_of_two_sections_is_read_as_the_section_it_is() -> None:
+    r"""$D f = E(gEf) - gE(Ef)$ is a derivation not presented as a section; it is the section $E(g)E$.
+
+    $[E, gE] = E(g)E$ (Lee, *Introduction to Smooth Manifolds*, 2nd ed., Prop. 8.28 (d)
+    reads $[X, gY] = g[X,Y] + (Xg)Y$, with $[E, E] = 0$).  With $g = u_1 = 2x/(1+x^2)$,
+    $E(g) = 2(1-x^2)/(1+x^2)$ on $U_N$, so the component is $2(1-x^2)$: $-6$ at $x = 2$.
+    On $U_S$ it is $2(1-y^2)$, $3/2$ at $y = 1/2$, which is $-6 \cdot (-y^2)$ at $y = 1/2$.
+    """
+    circle, north, south, sections, frame = _the_circle_and_its_frame()
+    x = north.coordinate(0)
+    y = south.coordinate(0)
+    g = circle.smooth_function(
+        {
+            "U_N": north.section_ratio(2 * x, north.function_ring().one() + x**2),
+            "U_S": south.section_ratio(2 * y, south.function_ring().one() + y**2),
+        }
+    )
+    scaled = g * frame
+
+    recovered = sections.from_derivation(
+        lambda function: frame(scaled(function)) - g * frame(frame(function))
+    )
+
+    assert recovered.components()["U_N"][0](north.domain()((2,))) == RR(-6)
+    assert recovered.components()["U_S"][0](south.domain()((RR(1) / RR(2),))) == RR(3) / RR(2)
