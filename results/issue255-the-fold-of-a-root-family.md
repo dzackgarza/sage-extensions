@@ -127,6 +127,17 @@ definition of a nondegenerate form plus the two lines above, and this repository
 definition by Bourbaki chapter and section rather than by page --- `src/sage_extensions/categories/algebras/algebras.py:5`
 cites *Algèbre* III §1.1 the same way.  A page number here would be invented.
 
+**Lemma (the converse this item's clause assumes, refuted).**  *A degenerate span is enough for a
+Gram-preserving permutation that breaks a relation.*  This is what the clause's demand would need, and
+it is false: Sterk's own 22 roots contain 25 subfamilies whose spans are degenerate — sizes 11, 16 and
+18, one per relation support the search finds — and **none** of them admits a Gram-preserving
+permutation that moves its relation, while the four-root family \(r_1,r_2,r_1+r_2,r_1+z\) does.
+Degeneracy is therefore necessary (Proposition 1) but not sufficient, and the amended clause's "where
+a degenerate span leaves room for one" is a condition to be checked on the family at hand, not a
+consequence of degeneracy.  Its source is the search
+`results/issue255-the-invalidating-input-search.py` (the 25 and the zero), against Sterk's printed
+chambers, pp. 19--24, which the folds reproduce.
+
 ## Proposition 2 (orbit sums, and the rescaling)
 
 Let \(g\) be an involution of \(W\) and \(O\) an orbit of \(g\) on the roots.  Then \(|O|\in\{1,2\}\),

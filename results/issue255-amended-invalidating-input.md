@@ -53,7 +53,9 @@ for such a permutation; there the relation is broken and the operation refuses i
 >   refusal this clause is for is exhibited where a degenerate span leaves room for one: on the four
 >   roots \(r_1,r_2,r_1+r_2,r_1+z\), whose swap of \(r_1\) and \(r_1+z\) carries the relation
 >   \(r_1+r_2-(r_1+r_2)=0\) to the nonzero radical vector \(z\), and on the 22-root family built from
->   it by eighteen pairwise orthogonal \((-2)\)-roots that the map fixes.
+>   it by eighteen pairwise orthogonal \((-2)\)-roots that the map fixes.  Degeneracy is necessary
+>   but not sufficient: 25 degenerate subfamilies of the 22 roots admit no such permutation, so this
+>   is a construction, not a consequence of degeneracy.
 
 ## Replace the second acceptance bullet with
 
