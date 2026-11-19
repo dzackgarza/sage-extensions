@@ -68,10 +68,10 @@ for such a permutation; there the relation is broken and the operation refuses i
 
 | clause | assertion |
 | --- | --- |
-| the five counts | `tests/lattices/test_the_sterk_configurations_are_folds_of_the_two_root_families.sage:126`; `tests/lattices/test_the_five_sterk_root_configurations_as_foldings.sage:139` |
-| both signatures | `...folds_of_the_two_root_families.sage:146`, `:152`, `:153`, `:335`, `:336`, `:349`, `:350`; exploration `:123`–`:126` |
-| the pairing-moving transposition | `...folds_of_the_two_root_families.sage:269` |
-| the two Gram-preserving non-involutions | `...folds_of_the_two_root_families.sage:233`, refusal `:260` |
+| the five counts | `tests/lattices/test_the_sterk_configurations_are_folds_of_the_two_root_families.sage:147`; `tests/lattices/test_the_five_sterk_root_configurations_as_foldings.sage:139` |
+| both signatures | `...folds_of_the_two_root_families.sage:182`, `:188`, `:189`, `:433`, `:434`, `:447`, `:448`; `tests/lattices/test_the_five_sterk_root_configurations_as_foldings.sage:123`–`:126` |
+| the pairing-moving transposition | `...folds_of_the_two_root_families.sage:305` |
+| the two Gram-preserving non-involutions | `...folds_of_the_two_root_families.sage:269`, refusal `:296` |
 | the four-root relation refusal | `tests/lattices/test_the_fold_of_a_root_family_by_a_diagram_involution.sage:110`, refusal `:129` |
 | the 22-root degenerate relation refusal | `tests/lattices/test_the_fold_of_a_root_family_by_a_diagram_involution.sage:133`, refusal `:169` |
 

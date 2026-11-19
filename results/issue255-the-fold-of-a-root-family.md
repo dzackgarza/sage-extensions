@@ -83,7 +83,7 @@ The issue's own named permutation,
 \((1,13)(2,12)(3,11)(4,10)(5,9)(6,8)(14,16)(17,20)(18,19)(21,22)\), is one of those two
 eleven-root folds: it is an involution among the eight automorphisms, and the fold by it has 4.3.8's
 eleven roots, squares and pairings in an invariant lattice of rank 10 and signature (1,9), asserted
-at `tests/lattices/test_the_sterk_configurations_are_folds_of_the_two_root_families.sage:327`.  So the
+at `tests/lattices/test_the_sterk_configurations_are_folds_of_the_two_root_families.sage:372`.  So the
 Specimens row that names it is read by the operation and not only by the notebook.
 
 So no permutation of either family folds it to 4.3.7 (the twelve-root fold is all (−4), 4.3.7 is
@@ -107,11 +107,11 @@ folds has rank 10.*  That row records "folding ranks 12, 12, 12, 14 with image r
 "one IAS cell prints 11 against an assertion of 10: the discrepancy is to be settled by the
 operation".  The operation settles it at 10: every fold's invariant lattice has rank 10 and signature
 (1,9), asserted for the two image folds at
-`tests/lattices/test_the_sterk_configurations_are_folds_of_the_two_root_families.sage:349`, for all
-five at `:363` and at `tests/lattices/test_the_five_sterk_root_configurations_as_foldings.sage:103`,
-and against the card's own wall spans --- rank 10 and signature (1,9) --- at the same file's
-`:158`--`:161` and the
-exploration's `:123`--`:126`.  *Sources:* the row's own citation is the IAS notebook (not a printed
+`tests/lattices/test_the_sterk_configurations_are_folds_of_the_two_root_families.sage:432`, for all
+five at `:446` and at `tests/lattices/test_the_five_sterk_root_configurations_as_foldings.sage:103`,
+and against the card's own wall spans --- rank 10 and signature (1,9) --- at
+`tests/lattices/test_the_sterk_configurations_are_folds_of_the_two_root_families.sage:179`--`:182`
+and `tests/lattices/test_the_five_sterk_root_configurations_as_foldings.sage:123`--`:126`.  *Sources:* the row's own citation is the IAS notebook (not a printed
 paper); what is printed is Sterk's five chambers, pp. 19--24, whose walls the card transcribes with
 their counts, and whose spans the same assertions compare against.  The cell that prints 11 is
 contradicted both by the operation and by the printed chambers, whose wall spans are the card's rank
@@ -190,7 +190,7 @@ datum about something other than a map of the span: that datum is refused by nam
 is cited: the proof is the
 definition of saturation, and the two paragraphs it is used in
 (\(\S3\) item 2's second refusal and the test at
-`tests/lattices/test_the_sterk_configurations_are_folds_of_the_two_root_families.sage:233`) are
+`tests/lattices/test_the_sterk_configurations_are_folds_of_the_two_root_families.sage:269`) are
 computations against Sterk's printed chambers, pp. 19--24.
 
 ## Proposition 2 (orbit sums, and the rescaling)
@@ -231,12 +231,16 @@ for every form of the invalidating input that exists; the form the issue names d
 `results/issue255-amended-invalidating-input.md`, and the whole body it leaves, for one paste, is
 `results/issue255-amended-issue-body.md`.**
 The counts are asserted against card `029J`'s row `gamma-en-2` by tag
-(`tests/lattices/test_the_sterk_configurations_are_folds_of_the_two_root_families.sage:126`,
-exploration `:139`); the invariant and anti-invariant signatures for all five ((1,9) and (0,8)) at
-`:146`, `:152`, `:153`, `:335`, `:336`, `:349` and the exploration's `:123`–`:126`.  Two refusals are
-asserted on the 22 roots: the transposition of \(v_1\) and \(v_2\), refused for the pairing it
-moves (`:269`), and the two order-four automorphisms, which keep the Gram matrix and hence every
-relation and are refused for being no involution (`:233`, refusal `:260`).
+(`tests/lattices/test_the_sterk_configurations_are_folds_of_the_two_root_families.sage:147`,
+`tests/lattices/test_the_five_sterk_root_configurations_as_foldings.sage:139`); the invariant and
+anti-invariant signatures for all five ((1,9) and (0,8)) at
+`tests/lattices/test_the_sterk_configurations_are_folds_of_the_two_root_families.sage:182`, `:188`,
+`:189`, `:433`, `:434`, `:447` and
+`tests/lattices/test_the_five_sterk_root_configurations_as_foldings.sage:123`–`:126`.  Two refusals
+are asserted on the 22 roots: the transposition of \(v_1\) and \(v_2\), refused for the pairing it
+moves (`tests/lattices/test_the_sterk_configurations_are_folds_of_the_two_root_families.sage:305`),
+and the two order-four automorphisms, which keep the Gram matrix and hence every relation and are
+refused for being no involution (`:269`, refusal `:296`).
 
 The clause's own input — a permutation of the 22 roots that keeps the Gram matrix and breaks a
 relation — **does not exist**, and the exhaustive check on those roots says so:
@@ -314,7 +318,7 @@ pytest -o addopts= -p qc_sage_session -p sage_extensions.testing.suite_budget \
   and by Sterk's printed statements, not proved in this record.  What is checked for all five is
   that each fold agrees with its card row in the wall count, the squares, the sorted pairings, and
   the invariant lattice's rank and signature --- the pairings for all five at
-  `tests/lattices/test_the_sterk_configurations_are_folds_of_the_two_root_families.sage:129`, which
+  `tests/lattices/test_the_sterk_configurations_are_folds_of_the_two_root_families.sage:159`, which
   until this commit compared only 4.3.5, 4.3.6 and 4.3.8: (12, 12×(−4), 10, (1,9)), (10, 9×(−4)+1×(−2), 10,
   (1,9)), (12, 10×(−4)+2×(−2), 10, (1,9)), (11, 9×(−4)+2×(−2), 10, (1,9)) and
   (14, 10×(−4)+4×(−2), 10, (1,9)) at 4.3.5–4.3.9 in that order.  The two sides are vectors of
@@ -341,7 +345,9 @@ pytest -o addopts= -p qc_sage_session -p sage_extensions.testing.suite_budget \
 
 Line numbers are those of this commit.  Items 1 and 3 are met; item 2 is met only under the
 amendment at `results/issue255-amended-invalidating-input.md`, whose clause-by-clause assertions are
-tabulated there.  Nothing is queued behind another item.
+tabulated there.  Nothing is queued behind another item.  Every citation here and in the amendment is
+resolved by `results/issue255-the-citation-audit.py`, which prints the line each names; it currently
+reports none out of range.
 
 **Item 1 — "The operation exists at its owner …, and `sterk.py` derives Sterk's roots from it."**
 
@@ -359,25 +365,25 @@ tabulated there.  Nothing is queued behind another item.
   inside `_foldings_cached` (`:679`); `foldings()` `:697`; `_sterk_roots_cached` `:718` reads them;
   `sterk_roots()` `:784`.
 * The derivation is asserted, not just read: `test_the_folded_configurations_are_the_constructions_sterk_returns`
-  at `tests/lattices/test_the_sterk_configurations_are_folds_of_the_two_root_families.sage:156`
-  (the folded family equals what `sterk_roots()` returns), the two image folds at `:283`, the five
-  records at `:309`, and the exploration's `:129` (each fold has its card row's count and squares and
+  at `tests/lattices/test_the_sterk_configurations_are_folds_of_the_two_root_families.sage:192`
+  (the folded family equals what `sterk_roots()` returns), the two image folds at `:410`, the five
+  records at `:436`, and `tests/lattices/test_the_five_sterk_root_configurations_as_foldings.sage:129` (each fold has its card row's count and squares and
   its folded diagram is rooted in the invariant lattice, `:143`).
 
 **Item 2 — "Tests assert the five root counts, the invariant and anti-invariant lattice signatures,
 and the refusal on the invalidating input." — met under the amendment, not as written.**
 
 * Counts against card `029J`'s row `gamma-en-2` by tag:
-  `tests/lattices/test_the_sterk_configurations_are_folds_of_the_two_root_families.sage:126`, and
+  `tests/lattices/test_the_sterk_configurations_are_folds_of_the_two_root_families.sage:147`, and
   `tests/lattices/test_the_five_sterk_root_configurations_as_foldings.sage:139`.
-* Signatures: the same file's `:146` (invariant equals the card walls' span), `:152` (the span is
-  \((1,17)\)) and `:153` (anti-invariant \((0,8)\)) for 4.3.5, 4.3.6 and 4.3.8; `:335`, `:336`,
-  `:349`, `:350` for the two image folds and the five records; and the exploration's `:123`–`:126`
+* Signatures: `tests/lattices/test_the_sterk_configurations_are_folds_of_the_two_root_families.sage:182` (invariant equals the card walls' span), `:188` (the span is
+  \((1,17)\)) and `:189` (anti-invariant \((0,8)\)) for 4.3.5, 4.3.6 and 4.3.8; `:433`, `:434`,
+  `:447`, `:448` for the two image folds and the five records; and `tests/lattices/test_the_five_sterk_root_configurations_as_foldings.sage:123`–`:126`
   for all five at once.
 * The refusals on Sterk's own 22 roots:
-  `tests/lattices/test_the_sterk_configurations_are_folds_of_the_two_root_families.sage:233`
+  `tests/lattices/test_the_sterk_configurations_are_folds_of_the_two_root_families.sage:269`
   asserts that all eight diagram automorphisms keep the Gram, that the six involutions fold, and
-  that the two order-four maps are refused (`:260`); `:269` asserts that a transposition of two
+  that the two order-four maps are refused (`:296`); `:305` asserts that a transposition of two
   roots is refused for the pairing it moves.
 * The invalidating input on a degenerate family of 22 roots:
   `tests/lattices/test_the_fold_of_a_root_family_by_a_diagram_involution.sage:133`, refused at
@@ -387,7 +393,7 @@ and the refusal on the invalidating input." — met under the amendment, not as 
   `tests/lattices/test_the_five_sterk_root_configurations_as_foldings.sage:146` and refused for a
   lattice that is not 2-elementary at
   `tests/lattices/test_the_fold_of_a_root_family_by_a_diagram_involution.sage:173`.
-* The rescaling the reviewer found absent: `tests/lattices/test_the_fold_of_a_root_family_by_a_diagram_involution.sage:257`,
+* The rescaling the reviewer found absent: `tests/lattices/test_the_fold_of_a_root_family_by_a_diagram_involution.sage:278`,
   red at `f6769cc`'s parent.
 
 **Item 3 — "The exploration … uses only this operation."**
