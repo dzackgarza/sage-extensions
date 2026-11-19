@@ -91,6 +91,47 @@ def _rational_polynomial(expression):
     return SR(expression).polynomial(QQ)
 
 
+def _function_formula_on(function, manifold, label):
+    r"""The engine formula of a smooth function on the chart ``label``, or ``None``.
+
+    A smooth function is fixed by its expressions on a cover of the manifold, so its
+    expression on any one chart is read from the chart it is stated on: writing ``y`` for
+    the coordinates of ``label`` and ``x`` for those of the chart the function is stated
+    on, the expression there is ``x = phi^{-1}(y)`` substituted into it (Lee,
+    *Introduction to Smooth Manifolds*, 2nd ed., Ch. 1).  ``None`` says no coordinate
+    change the atlas states carries the function's expression to this chart.
+    """
+    from sage_extensions.categories.manifolds import _composed_ambient_transition
+
+    formulas = _chartwise_formulas(function, manifold)
+    if formulas is None:
+        return None
+    if label in formulas:
+        return SR(formulas[label])
+    symbols = tuple(_engine_manifold_chart(manifold.atlas()[label])[:])
+    for other, formula in formulas.items():
+        change = _composed_ambient_transition(manifold, other, label)
+        if change is None:
+            continue
+        other_symbols = tuple(_engine_manifold_chart(manifold.atlas()[other])[:])
+        pulled = SR(formula).subs(
+            dict(
+                zip(
+                    other_symbols,
+                    tuple(
+                        SR(_engine_manifold_expression(expression))
+                        for expression in change.inverse_expressions()
+                    ),
+                    strict=True,
+                )
+            )
+        )
+        if any(variable not in symbols for variable in pulled.variables()):
+            continue
+        return pulled
+    return None
+
+
 def _pullback_family_agrees(manifold, mapping, components, rank) -> None:
     r"""Decide that a chart-wise family states one section of a pullback, or state where it does not.
 
@@ -1422,20 +1463,26 @@ class SmoothVectorBundleTrivialization(SageObject):
                 f"{element_parent(function)}, and a trivialization is a map from as many "
                 f"copies of {manifold.smooth_functions()} as the rank"
             )
-            chartwise = _chartwise_formulas(function, manifold)
-            assert chartwise is not None, (
-                f"cannot multiply the frame of {self._bundle} by {function}: the function is "
-                f"not written by chart expressions, and the product of a function and a "
-                f"section is read from the expressions of both"
+            on_the_frame = tuple(
+                _function_formula_on(function, manifold, label)
+                for label in self._frame[0].components()
             )
-            formulas.append(chartwise)
+            assert all(formula is not None for formula in on_the_frame), (
+                f"cannot multiply the frame of {self._bundle} by {function}: its expressions "
+                f"are on {tuple(_chartwise_formulas(function, manifold) or ())} and the frame's "
+                f"on {tuple(self._frame[0].components())}, and no coordinate change the atlas "
+                f"states carries one to the other"
+            )
+            formulas.append(
+                dict(zip(tuple(self._frame[0].components()), on_the_frame, strict=True))
+            )
         components = tuple(section.components() for section in self._frame)
         return self._bundle.sections().section(
             {
                 label: tuple(
                     _raise_manifold_expression(
                         sum(
-                            formulas[index][label]
+                            SR(formulas[index][label])
                             * _engine_manifold_expression(components[index][label][entry])
                             for index in range(rank)
                         ),
