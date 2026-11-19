@@ -1,0 +1,154 @@
+tree SHA: 0a81057f039c2eca5e2b91cb926e24aad2edf066 (modified paths: 0)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 8.66 8.85 7.86 4/568 3331247
+probe: .tmp/probe-stack2.py; inner 600 s
+[    2.15s] subgroup built
+[Otilde] the row's route: divided-class, taken because its lines carry divided classes and its covering is carried from one plane to the others (decided in 1.8 s)
+Timeout (0:00:30)!
+Thread 0x00007599cd814780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py", line 1707 in source_element
+  File "/repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py", line 1729 in fraction
+  <invalid frame>
+Timeout (0:00:30)!
+Thread 0x00007599cd814780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py", line 5874 in __init__
+  File "/repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py", line 6768 in _from_engine_element
+  File "/repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py", line 8365 in _owned_engine_element
+  File "/repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py", line 5918 in _mul_
+  File "/repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py", line 5961 in __mul__
+  File "/repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py", line 1187 in _add_
+  File "/repos/sage-extensions/src/sage_extensions/categories/algebras/algebras.py", line 1570 in __add__
+  File "/repos/sage-extensions/src/sage_extensions/tensors/tensor.py", line 835 in tensor_product
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattices.py", line 9320 in _eichler_transvection_column_matrix
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattices.py", line 9382 in eichler_transvection
+  File "/repos/sage-extensions/src/sage_extensions/categories/isotropic_lifts.py", line 444 in _lift_at
+  File "/repos/sage-extensions/src/sage_extensions/categories/isotropic_lifts.py", line 661 in <genexpr>
+  File "/repos/sage-extensions/src/sage_extensions/categories/isotropic_lifts.py", line 660 in _integral_parameter_cosets
+  File "/repos/sage-extensions/src/sage_extensions/categories/isotropic_lifts.py", line 721 in integral_parameter_classes
+  File "/repos/sage-extensions/src/sage_extensions/categories/isotropic_lifts.py", line 256 in _integral_lift_locus
+  File "/repos/sage-extensions/src/sage_extensions/categories/isotropic_lifts.py", line 319 in integral_members
+  File "/work/src/sage_indefinite_port/indefinite/recursive.py", line 1720 in _isotropic_pointed_isometry
+  File "/work/src/sage_indefinite_port/indefinite/recursive.py", line 1597 in pointed_isometry
+  File "/work/src/sage_indefinite_port/indefinite/recursive.py", line 1771 in <genexpr>
+  File "/work/src/sage_indefinite_port/indefinite/recursive.py", line 1771 in primitive_vector_classes
+  File "/work/src/sage_indefinite_port/indefinite/isotropic_induction.py", line 109 in _computed_isotropic_vector_classes
+  File "/work/src/sage_indefinite_port/indefinite/isotropic_induction.py", line 75 in isotropic_vector_classes
+  File "/work/src/sage_indefinite_port/indefinite/marked_lattices.py", line 195 in primitive_marking_classes
+  File "/repos/sage-extensions/src/sage_extensions/categories/isotropic_orbits.py", line 2053 in _isotropic_orbit_representatives
+  File "/repos/sage-extensions/src/sage_extensions/timing.py", line 509 in timed
+  File "/repos/sage-extensions/src/sage_extensions/categories/isotropic_orbits.py", line 1825 in _isotropic_plane_orbit_representatives
+  File "/repos/sage-extensions/src/sage_extensions/categories/isotropic_orbits.py", line 2027 in _isotropic_orbit_representatives
+  File "/repos/sage-extensions/src/sage_extensions/timing.py", line 509 in timed
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py", line 5507 in isotropic_orbit_representatives
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 4736 in _yield_subgroup_isotropic_orbit_representatives
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 805 in <genexpr>
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/finite_ordered_sets.py", line 1119 in _distinct_finite_ordered_set
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 803 in cusps
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 1259 in tits_building_incidence_by_divided_classes
+  File "/repos/sage-extensions/tests/coble_gamma_co_2_incidence_rows.py", line 477 in row_relation
+  File "/repos/sage-extensions/tests/coble_gamma_co_2_incidence_rows.py", line 721 in run_row
+  File "/repos/sage-extensions/.tmp/probe-stack2.py", line 24 in <module>
+Timeout (0:00:30)!
+Thread 0x00007599cd814780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/cardinals.py", line ??? in cardinal
+  <invalid frame>
+Timeout (0:00:30)!
+Thread 0x00007599cd814780 [python] (most recent call first):
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/weakref.py", line ??? in get
+  <invalid frame>
+Timeout (0:00:30)!
+Thread 0x00007599cd814780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py", line 826 in __call__
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py", line ??? in __call__
+  <invalid frame>
+Timeout (0:00:30)!
+Thread 0x00007599cd814780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 2383 in _iter_splitting_isometries_in_im_rho_from_image
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 4424 in _iter_transported_planes
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 4772 in _yield_subgroup_isotropic_orbit_representatives
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 805 in <genexpr>
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/finite_ordered_sets.py", line 1119 in _distinct_finite_ordered_set
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 803 in cusps
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 1259 in tits_building_incidence_by_divided_classes
+  File "/repos/sage-extensions/tests/coble_gamma_co_2_incidence_rows.py", line 477 in row_relation
+  File "/repos/sage-extensions/tests/coble_gamma_co_2_incidence_rows.py", line 721 in run_row
+  File "/repos/sage-extensions/.tmp/probe-stack2.py", line 24 in <module>
+Timeout (0:00:30)!
+Thread 0x00007599cd814780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 2383 in _iter_splitting_isometries_in_im_rho_from_image
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 4424 in _iter_transported_planes
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 4772 in _yield_subgroup_isotropic_orbit_representatives
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 805 in <genexpr>
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/finite_ordered_sets.py", line 1119 in _distinct_finite_ordered_set
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 803 in cusps
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 1259 in tits_building_incidence_by_divided_classes
+  File "/repos/sage-extensions/tests/coble_gamma_co_2_incidence_rows.py", line 477 in row_relation
+  File "/repos/sage-extensions/tests/coble_gamma_co_2_incidence_rows.py", line 721 in run_row
+  File "/repos/sage-extensions/.tmp/probe-stack2.py", line 24 in <module>
+Timeout (0:00:30)!
+Thread 0x00007599cd814780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 2383 in _iter_splitting_isometries_in_im_rho_from_image
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 4424 in _iter_transported_planes
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 4772 in _yield_subgroup_isotropic_orbit_representatives
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 805 in <genexpr>
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/finite_ordered_sets.py", line 1119 in _distinct_finite_ordered_set
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 803 in cusps
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 1259 in tits_building_incidence_by_divided_classes
+  File "/repos/sage-extensions/tests/coble_gamma_co_2_incidence_rows.py", line 477 in row_relation
+  File "/repos/sage-extensions/tests/coble_gamma_co_2_incidence_rows.py", line 721 in run_row
+  File "/repos/sage-extensions/.tmp/probe-stack2.py", line 24 in <module>
+Traceback (most recent call last):
+  File "/repos/sage-extensions/.tmp/probe-stack2.py", line 24, in <module>
+    outcome = rows.run_row(lattice, subgroup, "Otilde", 240, "auto")
+  File "/repos/sage-extensions/tests/coble_gamma_co_2_incidence_rows.py", line 721, in run_row
+    incidences = tuple(row_relation(subgroup, taken))
+                       ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/repos/sage-extensions/tests/coble_gamma_co_2_incidence_rows.py", line 477, in row_relation
+    return subgroup.tits_building_incidence_by_divided_classes()
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 1259, in tits_building_incidence_by_divided_classes
+    for _plane_cusp, entries in self.divided_class_incidence_of_planes(self.cusps(2)):
+                                                                       ~~~~~~~~~~^^^
+  File "sage/misc/cachefunc.pyx", line 1970, in sage.misc.cachefunc.CachedMethodCaller.__call__
+    w = self._instance_call(*args, **kwds)
+  File "sage/misc/cachefunc.pyx", line 1848, in sage.misc.cachefunc.CachedMethodCaller._instance_call
+    return self.f(self._instance, *args, **kwds)
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 803, in cusps
+    return _distinct_finite_ordered_set(
+        _arithmetic_cusp(self, representative)
+    ...<2 lines>...
+        )
+    )
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/finite_ordered_sets.py", line 1119, in _distinct_finite_ordered_set
+    admitted = tuple(points)
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 805, in <genexpr>
+    for representative in _yield_subgroup_isotropic_orbit_representatives(
+                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self, rank
+        ^^^^^^^^^^
+    )
+    ^
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 4772, in _yield_subgroup_isotropic_orbit_representatives
+    yield from from_parabolic
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 4424, in _iter_transported_planes
+    ) in enumerate(quotient._iter_splitting_isometries_in_im_rho(family, spellings=True)):
+         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 2383, in _iter_splitting_isometries_in_im_rho_from_image
+    action = libgap.FactorCosetAction(im_rho_perm, right_perm)
+  File "sage/libs/gap/element.pyx", line 2757, in sage.libs.gap.element.GapElement_Function.__call__
+    GAP_Enter()
+cysignals.signals.AlarmInterrupt
+[peakrss] probe603: child waited=0 shell_code=0 samples=124
+[peakrss] peak tree RSS      : 1168 MiB
+[peakrss] low-water MemAvail : 2514 MiB
+[peakrss] peak single VmHWM  : 1168 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     1157 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   246.2s procs=  3 rss=  1168 MiB hwm=  1168 MiB avail=  7864 MiB
+[peakrss]   t=   244.2s procs=  3 rss=  1166 MiB hwm=  1166 MiB avail=  7979 MiB
+[peakrss]   t=   240.2s procs=  3 rss=  1158 MiB hwm=  1158 MiB avail=  8315 MiB
+[peakrss]   t=   242.2s procs=  3 rss=  1158 MiB hwm=  1158 MiB avail=  8142 MiB
+[peakrss]   t=   238.2s procs=  3 rss=  1155 MiB hwm=  1155 MiB avail=  8583 MiB
+probe exit: 0

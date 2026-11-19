@@ -567,3 +567,47 @@ are not evidence for the new route: they were taken with the port in place.
 `faulthandler.dump_traceback_later(30, repeat=True)` run at `T_Co`, and the
 frames name which of the two it is.  Nothing else is worth measuring until
 that is answered.
+
+## With the port gone, the plane-orbit walk pays a lifting torsor per line
+
+The same dump run, on the substituted route: `Otilde` at `T_Co`, 240 s cap,
+`faulthandler` every 30 s, port `991b88b0`.  Eight dumps, and the frames have
+moved:
+
+| frame | before | after |
+|---|---|---|
+| `lorentzian_cells` (the port's cell walk) | 6 | **0** |
+| `_planes_through_line` | 1 | **0** |
+| `_evaluate_reduced_word` | 3 | **0** |
+| `isotropic_orbit_representatives` | 2 | 9 |
+| `cusps` | 6 | 6 |
+
+So the substitution removed the port from the path exactly as designed.  What
+the dumps show instead is the plane-orbit walk of `L` itself:
+
+    isotropic_lifts.py:319  integral_members
+      -> :256              _integral_lift_locus
+      -> :721              integral_parameter_classes
+      -> :660/661          _integral_parameter_cosets
+      -> :444              _lift_at
+      -> lattices.py:9382  eichler_transvection
+      -> :9320             _eichler_transvection_column_matrix
+    isotropic_orbits.py:2053  _isotropic_orbit_representatives
+      -> :1825                _isotropic_plane_orbit_representatives
+      -> :2027                _isotropic_orbit_representatives
+      -> lattice_morphisms.py:5507  isotropic_orbit_representatives
+      -> orthogonal_quotients.py:4736
+      -> predicate_subgroups.py:803  cusps
+
+i.e. **the plane cusps of `L` are enumerated line by line, and each line pays
+the marked-line lifting torsor** (`integral_members` over the parameter cosets,
+each decided by an Eichler transvection's column matrix).  The cusp-5 line's
+`K_v` was measured at 2.84 s; the walk visits many lines, and the per-line
+torsor is what the dumps catch.
+
+**So the cost has moved, and it is no longer the port's.**  The next question is
+arithmetic, not architectural: how many line representatives the plane-orbit
+walk visits, and what one line's lifting torsor costs -- `integral_members` is
+`isotropic_lifts.py`'s own, and its per-line cost is the thing to price before
+anything else is changed.  That is the next measurement, and it is a bounded
+one: one line's `integral_members` at `T_Co`, timed.
