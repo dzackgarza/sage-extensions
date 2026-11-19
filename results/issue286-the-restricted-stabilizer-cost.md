@@ -97,3 +97,39 @@ preimage the driver uses, and the `Gamma_{Co,2}` row is that subgroup's row.
 The driver's exit status says what happened: 0 the restricted image is the
 preimage group's discriminant image with both spinor signs, 1 the row did not
 return inside its cap, 2 the row returned and *differs*.
+
+## The smallest case: the two descriptions agree there
+
+The Coble statement is `Gamma_{Co,2} = R_{Gamma_{En,2}}` against the driver's
+`rho^{-1}(Stab_{O(q)}(J))`.  Its shape at the smallest size one command reaches
+is `L = U + U(2) + <-2>` (rank 5) with `delta` the `(-2)` generator, so
+`delta^perp = U + U(2)`:
+
+* the subgroup on `L` is the discriminant preimage `rho_L^{-1}(Stab(J_L))`,
+  `J_L` the `U(2)` block's classes — the driver's own kind of object;
+* the construction is the restriction of `Stab_Gamma(delta)` to `delta^perp`;
+* the driver's description on the perpendicular is `rho_M^{-1}(Stab(J_M))`.
+
+`tests/coble_restricted_stabilizer.py --lattice small --cap 200`
+(`.scratch/w286-probes/small-driver2.log`, adopted runtime, load 6.8, tree
+`f6c4f9c`; the same numbers at load 4 took 24 s in
+`.scratch/w286-probes/smallest2.log`):
+
+```
+[R-small] delta q = -2, perp rank 4, isometric to U + U(2): True
+[R-small] 144 generators of the subgroup, 61 restrictions to the perpendicular
+[R-small] |rho(R)| = 2; the driver's |Stab(J)| = 2; spinor signs 40 of +1, 21 of -1
+[R-small] agrees: the two descriptions have the same discriminant image
+[R-small] the row returned in 81.0 s
+```
+
+So at the smallest case the two descriptions **agree in the finite image**: the
+restricted image's discriminant order is the stabilizer of the class set, and
+both spinor signs occur among the restricted generators, so the restriction is
+not confined to `O^+(delta^perp)` — the property the `T_Co` comparison turns on.
+What this does not settle is equality of the two infinite groups: equal
+discriminant order and both signs present are *necessary* conditions, and the
+decisive comparison is the `T_En` row's, whose exit status distinguishes
+`agrees` from `DIFFERS`.  The value of the smallest case is that the
+construction runs end to end in one command, so a defect of the construction
+itself would surface here rather than after hours at rank 12.
