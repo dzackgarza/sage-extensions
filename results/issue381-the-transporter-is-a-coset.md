@@ -611,3 +611,35 @@ walk visits, and what one line's lifting torsor costs -- `integral_members` is
 `isotropic_lifts.py`'s own, and its per-line cost is the thing to price before
 anything else is changed.  That is the next measurement, and it is a bounded
 one: one line's `integral_members` at `T_Co`, timed.
+
+## One line's lifting torsor at `T_Co` is 131072 classes
+
+The per-line cost the dumps pointed at, measured directly at port `991b88b0`:
+
+| specimen | line | parameter classes | time |
+|---|---|---|---|
+| `U+U(2)+<-2>`, rank 5 | divisibility 1 | 8 | 0.06 s |
+| `T_Co`, rank 11, Sterk's cusp 5 | divisibility 2 | **131072** | **12.77 s** |
+
+`131072 = 2^17`, and `integral_parameter_classes()` builds one lift per class
+(`_integral_parameter_cosets` -> `_lift_at` -> `eichler_transvection`), so the
+class **count** is the cost: about 0.1 ms a class, times 2^17.
+
+That is also the number the row multiplies. The plane-orbit walk visits lines
+until its cap, and at 12.77 s a line the 600 s cap falls at about the
+forty-seventh line -- which is what both kernel rows show.
+
+**So the lever is the enumeration, not the per-class work.**  The admissible
+parameters are the integral points of a lattice, so the set of classes that
+lift should be a subgroup of `P/mP` cut out by congruences -- decided by a Smith
+form and a congruence rather than built class by class.  That is exactly the
+pattern the divisible-line radical already uses in this library
+(`_pointwise_kernel_parameter_vectors`, `lattices.py:13733`: one Smith normal
+form of the Gram of `J` and one congruence), and it is the change to make here.
+
+**What is not yet established, and is the next thing to check before touching
+it:** that the admissible classes *are* closed under addition -- the subgroup
+statement -- at the modulus `m` this torsor fixes.  If they are, the enumeration
+becomes a lattice computation and the per-line cost should collapse; if they are
+not, the enumeration is genuinely needed and the line count is the only lever
+left.
