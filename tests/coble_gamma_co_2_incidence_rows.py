@@ -192,6 +192,9 @@ PAGE_UNPOLARIZED = "the page's thm:unpolarized-cusps, one orbit of each kind"
 PREVIOUS_ROW = "the Γ_{Co,2} row decided in #391"
 
 
+RECORDED_COMPARISONS = []
+
+
 def record_comparison(label, statement, computed, recorded, source) -> bool:
     r"""Record a computed value beside the value a source states, and never gate on it.
 
@@ -206,6 +209,7 @@ def record_comparison(label, statement, computed, recorded, source) -> bool:
     row's status with it.
     """
     agrees = computed == recorded
+    RECORDED_COMPARISONS.append((label, statement, computed, recorded, agrees))
     log(
         f"[{label}] {statement}: computed {computed}; {source} states {recorded} — "
         f"{'agrees' if agrees else 'DIFFERS'}"
@@ -218,25 +222,45 @@ def record_plane_class_indices(label, subgroup, planes, limit=8) -> tuple:
 
     `J = [P/2]` is the order-four totally isotropic subgroup a plane's divided
     classes span, and the index is the plane analogue of the line row's
-    `[Stab_{O(q)}(v̄) : ρ(Stab_Γ(v))]`: the number of the subgroup's plane
-    orbits inside one class `J`.  It is computed by the quotient
-    (``OrthogonalCharacterQuotient.plane_class_index``) from the certified
-    parabolic and the condition subgroup, so it costs two finite orders per
-    class and never a new integral computation -- but a row of `T_Co` has
-    189720 plane cusps over 23715 classes, so a bounded number of classes is
+    `[Stab_{O(q)}(v̄) : ρ(Stab_Γ(v))]`: the number of the subgroup's plane orbits
+    inside one class `J`.
+
+    **Every row records it**, and the route is the row's own:
+
+    * a subgroup cut out by characters reads it from the finite image
+      (`OrthogonalCharacterQuotient.plane_class_index`: the meet
+      `chi(Gamma) cap chi(Pi)` against the stabilizer of the class set);
+    * the ambient `O(L)`, which retains no character quotient, reads it from the
+      plane's own parabolic (`stabilizer_discriminant_image_orders`: the
+      stabilizer of the class set against the image of the certified parabolic's
+      generators).  That is the pair `#360` measures at a `T_Co` plane as
+      `(1981808640, 247726080)`, index 8.
+
+    Two finite orders a class, and no new integral computation.  A row of `T_Co`
+    has 189720 plane cusps over 23715 classes, so a bounded number of classes is
     what one command records, and the bound is stated with the answer.
 
     The answer is the pairs `(classes, index)` recorded, so a caller compares
     them and no value here is a condition on the row.
     """
-    quotient = subgroup.finite_character_quotient()
+    characteristic = getattr(subgroup, "finite_character_quotient", None)
+    quotient = characteristic() if characteristic is not None else None
+    route = "the finite character image" if quotient is not None else "the plane's parabolic"
+    log(f"[{label}] the plane class index is read by {route}")
     recorded = []
     seen = set()
     for plane_cusp in planes:
         if len(recorded) >= limit:
             break
         plane = plane_cusp.representative()
-        classes, stabilizer_order, image_order, index = quotient.plane_class_index(plane)
+        if quotient is not None:
+            classes, stabilizer_order, image_order, index = quotient.plane_class_index(plane)
+            lattice = quotient.lattice
+        else:
+            lattice = subgroup.domain()
+            classes = _plane_class_set(lattice, plane)
+            stabilizer_order, image_order = plane.stabilizer_discriminant_image_orders()
+            index = stabilizer_order // image_order
         key = frozenset(classes)
         if key in seen:
             continue
@@ -254,18 +278,40 @@ def record_plane_class_indices(label, subgroup, planes, limit=8) -> tuple:
         f"{len(indices)} distinct value{'s' if len(indices) != 1 else ''}"
     )
     if recorded:
-        # The class count, from |O(q)| and the order of one class's stabilizer:
-        # the classes are one O(q)-orbit, and the index is constant over the row
-        # because chi(Gamma) is normal in chi(O(L)).
-        classes_seen, stabilizer_order, _image_order, _index = quotient.plane_class_index(
-            planes[0].representative()
+        stabilizer_order = (
+            quotient.plane_class_index(planes[0].representative())[1]
+            if quotient is not None
+            else planes[0].representative().stabilizer_discriminant_image_orders()[0]
         )
         log(
             f"[{label}] the liftable classes J number |O(q)| / |Stab(J)| = "
-            f"{int(quotient.lattice.discriminant_group().O().cardinality()) // stabilizer_order} "
+            f"{int(lattice.discriminant_group().O().cardinality()) // stabilizer_order} "
             f"at this row's first class"
         )
     return tuple(recorded)
+
+
+def _plane_class_set(lattice, plane):
+    r"""`J = [P/2]` for a plane, as the span of its divided classes.
+
+    The three nonzero cosets of `P/2P` carry every divided class of the plane on
+    a lattice whose discriminant group has exponent two, so the span of the
+    classes of the plane's two generators and of their sum is the whole class
+    set -- the same set the quotient reads, built here from the lattice's own
+    `divided_discriminant_class`.
+    """
+    form = lattice.discriminant_group()
+    inclusion = plane.inclusion()
+    domain = inclusion.domain()
+    basis = tuple(
+        inclusion(domain.module_generator(label))
+        for label in domain.module_generating_set()
+    )
+    closure = {form.zero()}
+    for vector in (basis[0], basis[1], basis[0] + basis[1]):
+        generator = lattice.divided_discriminant_class(vector)
+        closure |= {element + generator for element in closure}
+    return frozenset(closure)
 
 
 def _span(form, family):

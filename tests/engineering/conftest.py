@@ -466,6 +466,7 @@ def pytest_configure(config) -> None:
     builtins.incidence_rows_exit = incidence_rows_exit
     builtins.incidence_page_comparison = incidence_page_comparison
     builtins.restricted_stabilizer_outcome = restricted_stabilizer_outcome
+    builtins.incidence_rows_run = incidence_rows_run
     builtins.RowStatus = _script("coble_row_status").RowStatus
 
 
@@ -487,6 +488,7 @@ def pytest_unconfigure(config) -> None:
     del builtins.incidence_rows_exit
     del builtins.incidence_page_comparison
     del builtins.restricted_stabilizer_outcome
+    del builtins.incidence_rows_run
     del builtins.RowStatus
 
 
@@ -968,6 +970,20 @@ def incidence_rows_exit(argv):
     asks it what it reports rather than re-deriving the selection it makes.
     """
     return _incidence_row_driver().main(argv)
+
+
+def incidence_rows_run(argv):
+    r"""One run of the incidence driver's ``main``: its exit status and its comparisons.
+
+    The driver prints each stated value beside the computed one and keeps the
+    answer in ``RECORDED_COMPARISONS``; this returns that list with the status,
+    so a test asks what the run compared rather than what it printed -- text is
+    not a datum, and a run that stopped comparing would leave only text.
+    """
+    driver = _incidence_row_driver()
+    del driver.RECORDED_COMPARISONS[:]
+    status = driver.main(argv)
+    return status, tuple(driver.RECORDED_COMPARISONS)
 
 
 def restricted_stabilizer_outcome(cap) -> int:
