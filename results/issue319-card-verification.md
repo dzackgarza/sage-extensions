@@ -13,7 +13,7 @@ decided by `tests/lattices/test_the_enriques_polarization_degrees_by_card.py`.
 | card row | read by tag as | compared through | state at this commit |
 | --- | --- | --- | --- |
 | `0128` `#h`, degrees `2 … 72` | `card("polarization_counts", "rows")[2d]["primitive_classes"]` | `NamedLattices.E10.Aut().vector_orbit_representatives(2d, content=1)` | **36 of 36 equal**, one process, 2–6 s a degree (measured on the source's g-basis model of the same lattice; `NamedLattices.E10` gives the same counts at degrees 2 and 8) |
-| `0128` `#\bar\Gamma_h` | `[2d]["group_classes"]` | degree 4: the distinct orders of the classes' groups, conjugate subgroups having equal order (Table 4, p. 17; the class invariant is the order and the orbit sizes, p. 11); other degrees: the distinct line/plane/flag triples | **degree 4 decided and equal (348364800 and 92897280 are distinct, so the two classes are not conjugate)**; the other degrees need the plane and flag rows |
+| `0128` `#\bar\Gamma_h` | `[2d]["group_classes"]` | degrees 4, 6, 8, 10, 12: the distinct orders of the classes' groups, conjugate subgroups having equal order (Table 4, p. 17; the class invariant is the order and the orbit sizes, p. 11); the other degrees: the distinct line/plane/flag triples | **degrees 4, 6, 8, 10, 12 decided and equal**; the other 31 need the plane and flag rows |
 | `gamma-h-N` `#I_1` (lines) | `card("arithmetic_groups", tag)["line_orbits"]` | `Gamma_h.isotropic_orbit_representatives(1)` | **87 of 87 equal** (`results/issue17-gamma-h-line-rows.md` records the run over all 87); the smallest card re-measured at this commit: `gamma-h-3` → 5 in 61.7 s, after the ambient $O(N)$ line row (13.6 s) in the same process |
 | `gamma-h-N` `#I_2` (planes) | `["plane_orbits"]` | `isotropic_orbit_representatives(2)` | undecided (`gamma-h-3`, the smallest plane row, did not return in 480 s) |
 | `gamma-h-N` `#I_12` (flags) | `["flag_orbits"]` | `isotropic_orbit_representatives(2, flag=True)` | undecided (not measured: it reads the same ambient rank-2 classes, and its stabilizer search is the one the plane shortcut does not cover) |
@@ -213,13 +213,47 @@ the class points -- remains unattributed here.
 That is where the acceptance's plane and flag rows stand, and the defect block
 above is unchanged.
 
+## `#\bar\Gamma_h`: the groups' orders, degree by degree
+
+The runner reads `#\bar\Gamma_h` as the number of distinct line/plane/flag
+triples, which needs the plane and flag rows.  The paper's own invariant is
+"the order and the orbit sizes of the group" (p. 11), and conjugate subgroups
+are isomorphic, so they have equal order: the number of distinct orders among a
+degree's classes is a lower bound for `#\bar\Gamma_h`, and it *is* the row
+wherever the bound is attained.  Measured on the invariant lattice
+$M = 2M(1/2)$, one process:
+
+```
+degree  card #h  card #Gamma-bar_h   the classes' orders              distinct   time
+4       2        2                   348364800, 92897280             2           7.5 s
+6       2        2                   348364800, 17418240             2          16.2 s
+8       2        2                   348364800, 5160960              2          10.8 s
+10      3        3                   348364800, 5806080, 3628800    3          18.5 s
+12      4        3                   348364800, 348364800,
+                                     1244160, 5160960               3          41.3 s
+```
+
+Every row equals its card.  At degree 12 the first two classes have the *same*
+order, 348364800 -- the paper's own example of conjugacy, "this phenomenon
+first appears in degree 12 where the stabilizer groups of the two polarizations
+$5g_1 + g_2$ and $g_1 + 2g_2$ actually agree" (§3.4, p. 17) -- and the number of
+distinct orders is the card's 3, not its `#h` of 4.
+
+Degree 4 is in the per-test gate
+(`tests/lattices/test_the_enriques_polarization_group_classes_by_card.py`, one
+call, 10.78 s measured); the other four are recorded here.  A call re-enumerates
+the degree's classes and builds each group, so it costs 11 s to 41 s, against the
+gate's 20 s call ceiling: degree 12 alone takes 41.3 s, and a loaded run of the
+degree-4 call was observed to pass 20 s, so the gate keeps the one case measured
+at 10.78 s rather than five near the ceiling.
+
 ## What this round did not do
 
 * The plane route and the flag route are not repaired: they are #390/#391's
   cost question (one double coset per class-set point), not a reading here.
-* `#\bar\Gamma_h` is compared at degree 4 only (the two classes' groups have
-  different orders).  The other 35 degrees need the orbit sizes, hence the same
-  plane and flag rows.
+* `#\bar\Gamma_h` is compared at degrees 4, 6, 8, 10 and 12, where the groups'
+  orders separate the classes.  The other 31 degrees need the orbit sizes, hence
+  the same plane and flag rows.
 * `tests/lattices/test_enriques_polarization_orbits.sage` carried 261
   parametrized comparisons of the same rows inside the per-test gate, each one
   public call of tens of seconds to 203 s against a 20 s call ceiling.  They are
