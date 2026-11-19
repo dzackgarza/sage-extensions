@@ -1,0 +1,5 @@
+engine field: Vector field a section of TS^1 on the 1-dimensional differentiable manifold S^1
+Chart (U_N, (x1,)) [1]
+Chart (U_S, (y1,)) [1]
+Chart (U_N_inter_U_S, (x1,)) [1]
+Chart (U_N_inter_U_S, (y1,)) [-1/x1^2]

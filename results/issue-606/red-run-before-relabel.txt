@@ -1,0 +1,13 @@
+____ test_the_derivation_along_the_frame_of_the_circle_gives_back_the_frame ____
+E   AssertionError: cannot read a section off <function test_the_derivation_along_the_frame_of_the_circle_gives_back_the_frame.<locals>.<lambda> at 0x784badcf00f0> on 1-dimensional smooth manifold S^1: its charts are ('U_N', 'U_S'), and a derivation is read on coordinates that are functions on the manifold -- this reading is stated for a manifold presented by one chart
+_____ test_a_derivation_that_is_twice_the_frame_is_read_as_twice_the_frame _____
+E   AssertionError: cannot read a section off <function test_a_derivation_that_is_twice_the_frame_is_read_as_twice_the_frame.<locals>.<lambda> at 0x784badcf3320> on 1-dimensional smooth manifold S^1: its charts are ('U_N', 'U_S'), and a derivation is read on coordinates that are functions on the manifold -- this reading is stated for a manifold presented by one chart
+___ test_a_section_stated_on_a_chart_outside_the_frame_is_read_in_the_frame ____
+E   AssertionError: cannot read a section of rank-1 smooth real vector bundle on 1-dimensional smooth manifold S^1 in the frame of rank-1 smooth real vector bundle on 1-dimensional smooth manifold S^1: the frame is stated on the charts ('U_N', 'U_S') and the section on ('U_N', 'U_S', 'W'), so its components on ('W',) are not in the frame
+__________ test_a_frame_on_three_charts_reads_a_section_stated_on_two __________
+E   ValueError: cannot add a chart labelled 'W' to 1-dimensional smooth manifold S^1: its atlas already has a chart with that label
+FAILED tests/objects/test_a_derivation_of_the_circle_is_the_section_it_differentiates_along.sage::test_the_derivation_along_the_frame_of_the_circle_gives_back_the_frame
+FAILED tests/objects/test_a_derivation_of_the_circle_is_the_section_it_differentiates_along.sage::test_a_derivation_that_is_twice_the_frame_is_read_as_twice_the_frame
+FAILED tests/objects/test_a_frame_reads_a_section_stated_on_other_charts.sage::test_a_section_stated_on_a_chart_outside_the_frame_is_read_in_the_frame
+FAILED tests/objects/test_a_frame_reads_a_section_stated_on_other_charts.sage::test_a_frame_on_three_charts_reads_a_section_stated_on_two
+4 failed, 2 passed in 96.03s (0:01:36)

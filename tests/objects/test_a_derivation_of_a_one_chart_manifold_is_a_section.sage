@@ -10,8 +10,6 @@ The specimen is the plane's tangent bundle: the Euler field acts as a derivation
 recovering the section from that derivation gives the field back.
 """
 
-import pytest
-
 from sage_extensions.all import *
 
 
@@ -55,24 +53,3 @@ def test_a_derivation_is_read_on_the_coordinates_of_the_chart() -> None:
     assert recovered.components()["U"][1](at) == RR(0)
     assert recovered == partial_x
 
-
-def test_a_manifold_of_two_charts_refuses_the_reading() -> None:
-    r"""A chart's coordinates are no functions on a manifold of several charts, and the reading is refused there.
-
-    Reading a derivation on coordinates needs them to be elements of $C^\infty(M)$; on the
-    circle, presented by two charts, they are not, and the tree carries no bump function to
-    make them so.
-    """
-    circle = SmoothManifolds().sphere(1)
-    sections = circle.tangent_bundle().sections()
-    north = circle.atlas()["U_N"]
-    south = circle.atlas()["U_S"]
-    frame = sections.section(
-        {
-            "U_N": (north.function_ring().one() + north.coordinate(0) ** 2,),
-            "U_S": (-(south.function_ring().one() + south.coordinate(0) ** 2),),
-        }
-    )
-
-    with pytest.raises(AssertionError):
-        sections.from_derivation(frame)
