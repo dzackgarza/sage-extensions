@@ -117,3 +117,54 @@ span, and that read is the thing to verify before the routing change is made.
 
 Not measured this round beyond the coset numbers above: whether the row's own
 planes are registered needs the row's construction, which is its own run.
+
+## The check: what a registry entry is relative to, and why the composite needs it
+
+The routing change this record proposed last round needs one thing verified
+first, and the answer changes the proposal: **an entry is a lift of *its own
+row's* representative, and the record does not keep the representative.**
+
+`register_isotropic_lift` stores, at `_span_key(plane)`
+(`orthogonal_quotients.py:2944`),
+
+    ( lift or its spelling,  tuple(parabolic_generators),  discriminant_image )
+
+and the walk that fills it registers the plane it transported with the element
+that carried that row's `representative` there:
+
+    transported = splitting.transport_isotropic_object(representative)
+    quotient.register_isotropic_lift(transported, splitting, family, ...)
+
+(`_iter_transported_planes`, `:4425`-`:4430`), while the representative itself
+is registered with `quotient.supergroup.one()` (`:4361`, `:4383`).  So every
+entry's lift carries *that row's representative* to its plane, and the
+representative is not among the three recorded fields.
+
+**The corrected lemma.**  For two planes `P`, `Q` registered against the *same*
+representative `P_0`, the composite `g_Q g_P^-1` carries `P` to `Q`.  For two
+planes registered against different representatives `P_0 != P_0'` it carries
+`P` to `g_Q(P_0)`, which need not be `Q` at all.
+
+So the previous round's "the two ends fit without a new key" is **too strong**:
+the key says which plane an entry is about, and says nothing about which plane
+its lift starts from.  Two entries of one registry can be relative to different
+sources, and then the composite is not a transporter.
+
+**What is recoverable, and at what cost.**  The source is *implicitly* in the
+record: the recorded family generates the source plane's parabolic, whose fixed
+isotropic plane is the source.  So a reader could group entries by "same fixed
+plane" -- by comparing the recorded families.  That is a group-generation
+comparison per pair, not a lookup, and it is the very kind of computation this
+route exists to avoid.  Within one row the grouping is free (one family object),
+which is the case the incidence rows are in when both of their cusps come from
+the same walk -- and the row's own note says the drawn representative is not
+reproduced by a second process, so across rows it is not.
+
+**What to do instead.**  Record the source span in the entry -- a fourth field
+beside the lift, the family and the finite element -- and the composite becomes
+a lookup: `g_Q g_i^-1` where both entries name the same source, and the port
+otherwise.  That is a change at the registry's owner and one read in the
+transporter, with the port kept as the fallback for planes of different
+sources.  It is not made in this round: the registry is shared machinery, and
+the change wants its own test on a lattice whose row registers at least two
+planes.
