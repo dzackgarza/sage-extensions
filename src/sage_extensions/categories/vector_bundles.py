@@ -261,6 +261,115 @@ def _pullback_family_agrees(manifold, mapping, components, rank) -> None:
                 )
 
 
+def _section_components_on(section, label):
+    r"""The components of ``section`` on the chart ``label``, transported from a chart it is stated on.
+
+    A section is fixed by its components on a cover, and its components on another chart
+    are related to them by the change of frame: for a vector field, writing ``y`` for the
+    coordinates of ``label`` as functions of the coordinates ``x`` of a stated chart,
+    ``a_t^j = sum_i a_s^i dy_j/dx_i`` (Lee, *Introduction to Smooth Manifolds*, 2nd ed.,
+    Ch. 3); for a section of a pullback ``f^*E`` the change is that of the codomain's
+    frames at the image point, ``a_t = J_{V_s -> V_t}(T_s(x)) a_s`` (Lee, Ch. 10).  The
+    transported tuple is read back in ``y`` through the inverse of the coordinate change,
+    as a smooth function's expression is (:func:`_function_formula_on`).
+    """
+    from sage.matrix.constructor import matrix as _engine_matrix
+
+    from sage_extensions.categories.manifolds import _composed_ambient_transition
+
+    module = element_parent(section)
+    manifold = module.base_manifold()
+    stated = section.components()
+    if label in stated:
+        return stated[label]
+    bundle = module.vector_bundle()
+    rank = int(bundle.rank())
+    chart = manifold.atlas()[label]
+    target_symbols = tuple(_engine_manifold_chart(chart)[:])
+    underlying = bundle.underlying_bundle()
+    for source_label, component in stated.items():
+        change = _composed_ambient_transition(manifold, source_label, label)
+        if change is None:
+            continue
+        source_symbols = tuple(_engine_manifold_chart(manifold.atlas()[source_label])[:])
+        if underlying is None:
+            jacobian = _engine_matrix(
+                SR,
+                rank,
+                rank,
+                [
+                    SR(_engine_manifold_expression(expression)).diff(symbol)
+                    for expression in change.forward_expressions()
+                    for symbol in source_symbols
+                ],
+            )
+        else:
+            mapping = bundle.mapping()
+            codomain = mapping.codomain()
+            pairs = tuple(mapping.chart_maps().index_set())
+            image_source = next(pair[1] for pair in pairs if pair[0] == source_label)
+            image_target = next(pair[1] for pair in pairs if pair[0] == label)
+            if image_source == image_target:
+                jacobian = _engine_matrix(SR, rank, rank, 1)
+            else:
+                codomain_change = _composed_ambient_transition(
+                    codomain, image_source, image_target
+                )
+                assert codomain_change is not None, (
+                    f"cannot carry {section} to the chart {label}: the codomain's charts "
+                    f"{image_source} and {image_target} are joined by no stated coordinate change"
+                )
+                image_symbols = tuple(_engine_manifold_chart(codomain.atlas()[image_source])[:])
+                image = tuple(
+                    SR(_engine_manifold_expression(expression))
+                    for expression in mapping.chart_map(source_label, image_source)
+                )
+                jacobian = _engine_matrix(
+                    SR,
+                    rank,
+                    rank,
+                    [
+                        SR(_engine_manifold_expression(expression))
+                        .diff(symbol)
+                        .subs(dict(zip(image_symbols, image, strict=True)))
+                        for expression in codomain_change.forward_expressions()
+                        for symbol in image_symbols
+                    ],
+                )
+        back = dict(
+            zip(
+                source_symbols,
+                tuple(
+                    SR(_engine_manifold_expression(expression))
+                    for expression in change.inverse_expressions()
+                ),
+                strict=True,
+            )
+        )
+        entries = tuple(
+            SR(
+                sum(
+                    jacobian[row, column] * SR(_engine_manifold_expression(component[column]))
+                    for column in range(rank)
+                )
+            )
+            .subs(back)
+            .simplify_rational()
+            for row in range(rank)
+        )
+        if any(
+            variable not in target_symbols
+            for entry in entries
+            for variable in entry.variables()
+        ):
+            continue
+        return tuple(_raise_manifold_expression(entry, chart) for entry in entries)
+    assert False, (
+        f"cannot carry {section} to the chart {label}: it is stated on {tuple(stated)}, and no "
+        f"chain of stated coordinate changes joins any of them to {label}"
+    )
+
+
 def _decided_nowhere_vanishing(expression, variables, excluded=()):
     r"""Whether the real function ``expression`` of ``variables`` is decided to take no zero.
 
@@ -989,11 +1098,22 @@ class SmoothSectionModules(OwnedParameterizedCategory):
             components that agree on the overlaps because their operands do;
             :meth:`section` is where a caller's own components are decided.
             """
-            return self.element_class(
-                self,
-                components,
-                _engine_vector_field(self.base_manifold(), components),
-            )
+            return self.element_class(self, components, self._engine_field(components))
+
+        def _engine_field(self, components):
+            r"""The engine vector field of the section with these components, or ``None``.
+
+            Only the tangent bundle's own sections are vector fields on the base,
+            and they carry the engine field a derivation is read from; a section of
+            a pullback takes its values in the fibres of another bundle, with as
+            many components as that bundle's rank, and is no vector field here.
+            """
+            if (
+                self._vector_bundle.underlying_bundle() is None
+                and self._vector_bundle._bundle_tangent_manifold is not None
+            ):
+                return _engine_vector_field(self.base_manifold(), components)
+            return None
 
         def zero(self):
             r"""The zero section: the component zero in every chart's coordinate frame."""
@@ -1104,15 +1224,7 @@ class SmoothSectionModules(OwnedParameterizedCategory):
                     admitted,
                     int(self._vector_bundle.rank()),
                 )
-            # A section of a pullback is no vector field on the base: only the tangent
-            # bundle's own sections carry the engine field a derivation is read from.
-            engine_field = (
-                _engine_vector_field(manifold, admitted)
-                if underlying is None
-                and self._vector_bundle._bundle_tangent_manifold is not None
-                else None
-            )
-            return self.element_class(self, admitted, engine_field)
+            return self.element_class(self, admitted, self._engine_field(admitted))
 
         def coordinate_vector_field(self, chart, index):
             r"""The ``index``-th coordinate vector field of a chart, as a section of this bundle.
@@ -1230,60 +1342,61 @@ class SmoothSectionModules(OwnedParameterizedCategory):
             )
 
         def from_derivation(self, derivation):
-            r"""The section whose components are the derivation's values on a chart's coordinates.
+            r"""The section ``V`` with ``V f = derivation(f)`` for every smooth function ``f``.
 
             ``V |-> (f |-> V f)`` is an isomorphism from the sections of ``TM`` onto the
             derivations of ``C^oo(M)`` (Lee, *Introduction to Smooth Manifolds*, 2nd ed.,
-            Prop. 8.15), and its inverse reads the section off the derivation on the
-            coordinates: the ``i``-th component of ``V`` in a chart is ``V``'s value on that
-            chart's ``i``-th coordinate.
-
-            The reading needs those coordinates to be elements of ``C^oo(M)``, which they are
-            when one chart presents the manifold -- a chart whose domain is the manifold is
-            the smallest such case.  On a manifold of several charts a coordinate is a
-            function on its own chart only, and making it global needs a bump function this
-            tree does not carry, so the reading is refused there rather than guessed at.
+            Prop. 8.15), and its inverse is read on smooth functions ``g_1, ..., g_N`` whose
+            differentials span every cotangent space
+            (:meth:`SmoothManifolds.ParentMethods._cotangent_spanning_functions`): in a chart
+            with coordinates ``x``, ``V(g_k) = sum_i v^i dg_k/dx_i``, so with ``J`` the
+            Jacobian ``(dg_k/dx_i)``, of rank ``dim M`` at every point, the components are
+            ``v = (J^T J)^{-1} J^T (V(g_1), ..., V(g_N))``.  When one chart presents the
+            manifold the family is its coordinates, ``J`` is the identity, and ``v^i`` is
+            ``V(x_i)``.
             """
+            from sage.matrix.constructor import matrix as _engine_matrix
+            from sage.modules.free_module_element import vector as _engine_vector
+
             manifold = self.base_manifold()
-            labels = tuple(manifold.chart_labels())
-            assert len(labels) == 1, (
-                f"cannot read a section off {derivation} on {manifold}: its charts are "
-                f"{labels}, and a derivation is read on coordinates that are functions on the "
-                f"manifold -- this reading is stated for a manifold presented by one chart"
-            )
-            chart = manifold.atlas()[labels[0]]
-            assert chart.domain() is manifold, (
-                f"cannot read a section off {derivation}: the chart {chart.label()} of "
-                f"{manifold} is read on {chart.domain()}, not on the manifold"
-            )
-            ring = chart.function_ring()
-            components = tuple(
-                derivation(manifold.smooth_function({chart.label(): coordinate}))
-                for coordinate in chart.coordinates()
-            )
-            misplaced = tuple(
-                component
-                for component in components
-                if element_parent(component) is not ring
-            )
+            functions = manifold.smooth_functions()
+            spanning = manifold._cotangent_spanning_functions()
+            values = tuple(derivation(function) for function in spanning)
+            misplaced = tuple(value for value in values if element_parent(value) is not functions)
             assert not misplaced, (
-                f"cannot read a section off {derivation}: its values on the coordinates of "
-                f"{chart.label()} are not elements of {ring}"
+                f"cannot read a section off {derivation}: a derivation of {functions} takes "
+                f"its values there, and its values {misplaced} are not elements of it"
             )
-            # A value of the derivation is a function on the manifold, written chart by
-            # chart; the component of the section is that function's expression on this
-            # chart, raised into the chart's ring.
-            entries = []
-            for component in components:
-                formulas = _chartwise_formulas(component, manifold)
-                assert formulas is not None and chart.label() in formulas, (
-                    f"cannot read a section off {derivation}: its value {component} on a "
-                    f"coordinate of {chart.label()} is not written on that chart"
+            components = {}
+            for label in manifold.chart_labels():
+                chart = manifold.atlas()[label]
+                symbols = tuple(_engine_manifold_chart(chart)[:])
+                formulas = tuple(
+                    _function_formula_on(function, manifold, label)
+                    for function in spanning + values
                 )
-                entries.append(
-                    _raise_manifold_expression(formulas[chart.label()], chart)
+                assert all(formula is not None for formula in formulas), (
+                    f"cannot read a section off {derivation} on the chart {label}: a function "
+                    f"it is read on, or one of its values, has no expression there"
                 )
-            return self.section({chart.label(): tuple(entries)})
+                jacobian = _engine_matrix(
+                    SR,
+                    len(spanning),
+                    len(symbols),
+                    [
+                        formula.diff(symbol)
+                        for formula in formulas[: len(spanning)]
+                        for symbol in symbols
+                    ],
+                )
+                solved = (jacobian.transpose() * jacobian).inverse() * (
+                    jacobian.transpose() * _engine_vector(SR, formulas[len(spanning) :])
+                )
+                components[label] = tuple(
+                    _raise_manifold_expression(SR(entry).simplify_rational(), chart)
+                    for entry in solved
+                )
+            return self.section(components)
 
         def pullback_of(self, section):
             r"""The section ``q |-> s(f(q))`` of the pullback that ``section`` states.
@@ -1336,9 +1449,7 @@ class SmoothSectionModules(OwnedParameterizedCategory):
                     )
                     for entry in stated[target_label]
                 )
-            return self.element_class(
-                self, components, _engine_vector_field(domain, components)
-            )
+            return self.element_class(self, components, self._engine_field(components))
 
         def module_rank(self):
             r"""The rank of this module as a free ``C^oo(M)``-module.
@@ -1560,7 +1671,10 @@ class SmoothVectorBundleTrivialization(SageObject):
         by ``V``, divided by the determinant of the matrix.  The division is
         stated with :meth:`ManifoldAtlasChart.section_ratio`, which is read where
         its denominator does not vanish -- the whole chart, by the frame's being
-        a basis.  One function is returned at rank one.
+        a basis.  The system is solved on the charts the frame is stated on, and
+        the section's components there are transported from the charts it is
+        stated on (:func:`_section_components_on`).  One function is returned at
+        rank one.
         """
         from sage.matrix.constructor import matrix as _engine_matrix
 
@@ -1571,15 +1685,11 @@ class SmoothVectorBundleTrivialization(SageObject):
         )
         rank = int(self._bundle.rank())
         components = tuple(entry.components() for entry in self._frame)
-        section_components = section.components()
+        labels = tuple(components[0])
+        section_components = {
+            label: _section_components_on(section, label) for label in labels
+        }
         coordinates = []
-        labels = tuple(section_components)
-        undecided = tuple(label for label in labels if label not in components[0])
-        assert not undecided, (
-            f"cannot read {section} in the frame of {self._bundle}: the frame is stated on the "
-            f"charts {tuple(components[0])} and the section on {labels}, so its components on "
-            f"{undecided} are not in the frame"
-        )
         for index in range(rank):
             per_chart = {}
             for label in labels:

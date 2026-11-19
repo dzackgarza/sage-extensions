@@ -2846,6 +2846,35 @@ class SmoothManifolds(OwnedCategory):
             source = open_manifold.atlas()[label]
             return open_manifold.Mor(self)({(label, label): source.coordinates()})
 
+        def _cotangent_spanning_functions(self):
+            r"""Smooth functions on this manifold whose differentials span every cotangent space.
+
+            A derivation of ``C^oo(M)`` is read as a section on such a family
+            (:meth:`SmoothSectionModules.ParentMethods.from_derivation`): in a
+            chart, ``V(g_k) = sum_i v^i dg_k/dx_i``, and the Jacobian of the
+            family has rank ``dim M`` at every point.  When one chart presents
+            the manifold its coordinates are such a family.  On a manifold of
+            several charts a coordinate is a function on its own chart only;
+            the family is then the coordinates of an immersion into some
+            ``R^N`` (one exists by Whitney's theorem; Lee, *Introduction to
+            Smooth Manifolds*, 2nd ed., Thm. 6.15), which a manifold states
+            when it is constructed as a submanifold (:meth:`sphere`).  A
+            manifold of several charts that states none is refused: a general
+            immersion, or the bump functions that make coordinates global, is
+            no element of the chart-expression algebra this tree carries.
+            """
+            labels = tuple(self.chart_labels())
+            assert len(labels) == 1 and self.atlas()[labels[0]].domain() is self, (
+                f"{self} states no smooth functions whose differentials span its cotangent "
+                f"spaces: its charts are {labels}, and a chart's coordinates are functions on "
+                f"the manifold only when that one chart presents it"
+            )
+            chart = self.atlas()[labels[0]]
+            return tuple(
+                self.smooth_function({chart.label(): coordinate})
+                for coordinate in chart.coordinates()
+            )
+
         def as_ck_manifold(self):
             pass
 
@@ -3045,6 +3074,37 @@ class _StandardSphere:
     depend on the base point ``x`` up to isomorphism, and one module per
     degree serves every base point (Hatcher, *Algebraic Topology*, §4.1).
     """
+
+    def _cotangent_spanning_functions(self):
+        r"""The ambient coordinates ``u_1, ..., u_{n+1}`` of ``S^n`` in ``R^{n+1}``.
+
+        The inclusion ``S^n -> R^{n+1}`` is an embedding, so the differentials of
+        its coordinates span every cotangent space.  Read through the inverse
+        stereographic projections (Lee, *Introduction to Smooth Manifolds*, 2nd
+        ed., Problem 1-7) they are ``u_k = 2x_k/(1+|x|^2)``,
+        ``u_{n+1} = (|x|^2-1)/(1+|x|^2)`` on ``U_N`` and ``u_k = 2y_k/(1+|y|^2)``,
+        ``u_{n+1} = (1-|y|^2)/(1+|y|^2)`` on ``U_S``, which agree under
+        ``y = x/|x|^2``.
+        """
+        north = self.atlas()["U_N"]
+        south = self.atlas()["U_S"]
+
+        def ambient(chart, sign):
+            coordinates = tuple(chart.coordinates())
+            one = chart.function_ring().one()
+            norm_squared = sum(coordinate**2 for coordinate in coordinates)
+            denominator = one + norm_squared
+            return tuple(
+                chart.section_ratio(2 * coordinate, denominator)
+                for coordinate in coordinates
+            ) + (chart.section_ratio(sign * (norm_squared - one), denominator),)
+
+        return tuple(
+            self.smooth_function({"U_N": on_north, "U_S": on_south})
+            for on_north, on_south in zip(
+                ambient(north, 1), ambient(south, -1), strict=True
+            )
+        )
 
     def _an_element_(self):
         r"""The south pole: the origin of the chart ``U_N``, stereographic projection from the north pole."""
