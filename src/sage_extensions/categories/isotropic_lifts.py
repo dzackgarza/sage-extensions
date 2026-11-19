@@ -449,6 +449,98 @@ class IsotropicReductionLiftTorsors(OwnedCategoryOverBaseRing):
             )
 
         @cached_method
+        def _integral_lift_frame(self):
+            r"""The fixed data of the coordinate-level integrality test.
+
+            ``(rational, marked, base_images)``: the rational lattice the lifts
+            live in, the marked isotropic vector its transvections are taken at,
+            and the coordinates of ``base_point()``'s images of its generators.
+            Every representative's lift is ``E_{marked, x} . base`` for one
+            ``x``, so these are read once and the loop below varies only ``x``.
+            """
+            rational = self._target_witt.rational_lattice()
+            labels = tuple(rational.module_generating_set())
+            base = self.base_point()
+            images = tuple(
+                tuple(
+                    base(rational.module_generator(label)).to_vector()(other)
+                    for other in labels
+                )
+                for label in labels
+            )
+            return rational, self._target_witt.isotropic_vector(), images
+
+        def _integral_lift(self, coordinates):
+            r"""The integral lift at ``coordinates``, or ``None`` where there is none.
+
+            The lift is ``E_{f, x} . base`` with ``f`` the marked vector and
+            ``x = s(a)`` the section's parameter (:meth:`_lift_at`), and the
+            transvection is
+
+                ``E_{f,x}(z) = z + (b(z,x) - (q(x)/2) b(z,f)) f - b(z,f) x``,
+
+            Gritsenko--Hulek--Sankaran, arXiv:0810.1614, section 3.1, equation
+            (4), printed p. 8.  Applied to ``base``'s images of the generators
+            and read in coordinates, it gives the lift's column matrix, and the
+            lift is integral exactly when every entry of that matrix is an
+            integer: the map is a rational isometry, so an integral matrix on a
+            framing of the lattice has a unit determinant and its inverse is
+            integral too.  The isometry is raised from the matrix only when the
+            test passes, which is where the cost used to be paid for every
+            representative.
+            """
+            from sage.rings.rational_field import QQ as SageQQ
+            from sage.matrix.constructor import matrix as engine_matrix
+
+            rational, marked, base_images = self._integral_lift_frame()
+            labels = tuple(rational.module_generating_set())
+            generators = tuple(rational.module_generator(label) for label in labels)
+            rank = len(labels)
+            x = self._target_section(self._parameter_at(coordinates))
+            if x.parent() is not rational:
+                return None
+            half_square = rational.base_ring()(rational.q(x)) / rational.base_ring()(2)
+            entries = []
+            for image_of_generator in base_images:
+                z = sum(
+                    (
+                        rational.scalar_multiple(
+                            rational.base_ring()(coefficient), generator
+                        )
+                        for coefficient, generator in zip(
+                            image_of_generator, generators, strict=True
+                        )
+                        if coefficient
+                    ),
+                    rational.zero(),
+                )
+                against_x = rational.b(z, x)
+                against_marked = rational.b(z, marked)
+                moved = z + rational.scalar_multiple(
+                    against_x - half_square * against_marked, marked
+                ) - rational.scalar_multiple(against_marked, x)
+                values = moved.to_vector()
+                for label in labels:
+                    entry = values(label)
+                    numerator = getattr(entry, "numerator", entry)
+                    numerator = numerator() if callable(numerator) else numerator
+                    denominator = getattr(entry, "denominator", 1)
+                    denominator = denominator() if callable(denominator) else denominator
+                    numerator = int(numerator)
+                    denominator = int(denominator)
+                    if numerator % denominator:
+                        return None
+                    entries.append(SageQQ(numerator // denominator))
+            return rational.Isom(rational)._isometry_from_column_matrix(
+                engine_matrix(
+                    SageQQ,
+                    rank,
+                    rank,
+                    lambda row, position: entries[position * rank + row],
+                )
+            )
+
+        @cached_method
         def _integral_parameter_cosets(self):
             r"""The integral lift locus as cosets of the transvection kernel, and their parameters.
 
@@ -657,13 +749,11 @@ class IsotropicReductionLiftTorsors(OwnedCategoryOverBaseRing):
             tested = tuple(
                 coordinates_at(indices) for indices in parameters(coset_steps)
             )
-            lifts = tuple(
-                (coordinates, self._lift_at(coordinates)) for coordinates in tested
-            )
             admitting = tuple(
                 (coordinates, lift)
-                for coordinates, lift in lifts
-                if lift.integral_restriction(source, target) is not None
+                for coordinates in tested
+                for lift in (self._integral_lift(coordinates),)
+                if lift is not None
             )
             passing_coordinates = tuple(coordinates for coordinates, _lift in admitting)
             passing_lifts = tuple(lift for _coordinates, lift in admitting)
