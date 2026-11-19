@@ -919,7 +919,14 @@ def main(argv):
         if outcome.status is not RowStatus.DECIDED:
             return outcome.status.exit_status
         counts[label] = outcome.counts
-        if arguments.plane_class_index and subgroup.contains_character_kernel():
+        # The plane class index is a quotient of two orders of the finite
+        # character image, so it is asked only of a row that has one: the
+        # ambient O(L) row is the label without a quotient, and the driver's
+        # route decision reads the same fact.
+        if (
+            arguments.plane_class_index
+            and getattr(subgroup, "finite_character_quotient", None) is not None
+        ):
             record_plane_class_indices(
                 label, subgroup, tuple(subgroup.cusps(2)), arguments.plane_class_index
             )
