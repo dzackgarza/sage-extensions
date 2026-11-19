@@ -1,0 +1,36 @@
+tree SHA: 5e9f8af8e4f4e6a519d809a902889b2dc36cdd56 (modified paths: 0)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 3.11 3.99 3.95 3/593 2866638
+probe: .tmp/probe-plane.py; inner 900 s
+T_En: 12 signature (2, 10) even: True
+P_2 plane rank: 2 perpendicular rank: 10
+K = I^perp/I rank: 8
+  [   0.078s] modulus
+           modulus: 2
+  [   1.002s] class counts (modulus, classes, admissible)
+           counts: (2, 65536, 4096)
+  [   0.000s] parameter lattice
+           basis vectors: 16
+           shape: 16 x 16  rank: 16  determinant: 16
+  [   0.694s] radical generators
+           radical family: 31
+           transvections in the radical: 14
+  [   0.257s] translation rank of the transvections
+           translation rank: (12, 16)
+  [   0.171s] translation rank of the family
+           translation rank of the family: (16, 16)
+  [   0.169s] radical index
+           radical index: 1
+[   2.739s] done
+[peakrss] probe603: child waited=0 shell_code=0 samples=3
+[peakrss] peak tree RSS      : 325 MiB
+[peakrss] low-water MemAvail : 6986 MiB
+[peakrss] peak single VmHWM  : 325 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      314 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     4.0s procs=  3 rss=   325 MiB hwm=   325 MiB avail=  6986 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   289 MiB hwm=   290 MiB avail=  7000 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     0 MiB hwm=     0 MiB avail=  7047 MiB
+probe exit: 0

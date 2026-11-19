@@ -329,6 +329,10 @@ an element that is one of that group's generators.  And the plane case,
 `U_I` at null rank two and up, still carries the parameter-lattice question
 recorded above.
 
+*Superseded:* it does not.  The parameter lattice is decided at a computed
+modulus and the radical's index is one; see "The plane's radical: its
+parameter lattice is decided, and the decision is exact".
+
 No full suite, no `just test`, no ast-grep gates (ast-grep is not installed).
 The older `test_edgewalk_fundamental_domain.sage` does not
 collect because of its own pre-existing TL09 finding; its K3 option tests were
@@ -784,6 +788,7 @@ of these files, and it is reported rather than fixed here.
   `L_2`, then the proper Levi image on a specimen whose index is not one.
 * The plane case's parameter lattice at null rank at least two, and the
   coercion from `O(L)` into the residue action's rational group.
+  *Superseded for the first half:* the lattice is decided and the index is one.
 
 ## `029J`'s `L_2`: the card's 527 with the family as its two factors
 
@@ -860,6 +865,9 @@ to run.  The plane case (`unipotent_parameter_lattice` at null rank at least
 two) and the coercion from `O(L)` into the residue action's rational group are
 untouched.
 
+*Superseded for the plane half:* it is measured and closed in the section
+below; the coercion is the only item left.
+
 ## The nonreflective quotient: the family answers, and the library cannot own `O(K_I)`
 
 The item is the pointed family where `K_I` is nonreflective.
@@ -932,3 +940,85 @@ too: what is new is the measurement, the refutation, and the decision of
 at 6.97 s (load 8.77); the quiet-machine cost is the probe's 2.9 s above.  The
 collection ceiling is over in all three runs (6.20 s to 24.81 s against 6 s),
 which is the tree's pre-existing overrun under this machine's load.
+
+## The plane's radical: its parameter lattice is decided, and the decision is exact
+
+The item is `U_I` at null rank at least two -- the radical of the setwise
+stabilizer at a primitive isotropic plane, which the earlier sections leave
+open.  It is not open: the construction is there, the decision is exact, and
+this section measures it at the specimen the notes name, Sterk's `P_2` of
+`T_En`.
+
+**The shape.**  In the block basis `(U | P | K)` of `plane_block_basis` an
+element of `U_I` is `g = [[1,0,0],[a,1,tau],[c,0,1]]` with
+
+    tau = -J^{-1} c^t A_K,    J a + a^t J^t = -(Kc + c^t K^t + c^t A_K c),
+
+which is the block form of Dutour Sikiric--Hulek, Theorem 4.9, printed
+pp. 33--34.  So the element is determined by its parameter `c` -- the `(K, U)`
+block -- and the two equations decide which `c` occur.
+
+**Lemma (the decision is exact).**  The liftability of `c` depends only on
+`c mod m` for a modulus `m` that is computed, so deciding every class at `m`
+decides the whole parameter lattice, not a sample of it.
+
+*The first equation is linear in `c`*: `tau` is integral exactly when
+`adj(J) c^t A_K` is divisible by `det J` entrywise, and `m_1` is the least
+modulus making `m_1 adj(J) c^t A_K` vanish there for every `c` -- the lcm of
+the coordinate quotients of `det J`, computed and not assumed.
+
+*The second is quadratic in `c`*: writing `S(c) = -(Kc + c^t K^t + c^t A_K c)`,
+a step `m d` changes it by
+
+    S(c + m d) - S(c) = -m(Kd + d^t K^t) - m^2 d^t A_K d
+                        - m(c^t A_K d + d^t A_K c),
+
+which is quadratic in `d` and bilinear in `(c, d)`.  A quadratic form is
+determined by its values at `0`, at the unit vectors and at their pairwise
+sums, and a bilinear form by its values on pairs of unit vectors, so the three
+finite families `_unipotent_symmetric_uniform` checks decide
+`S(c + m d) - S(c) in Lambda_J` for every integral `c, d` at once.  Membership
+of `S(c)` in `Lambda_J` is then a class condition, and `m` is its lcm with
+`m_1`.
+
+*The admissible set is closed, and not by assumption*: the count of admissible
+classes times the index of the lattice they generate is checked against
+`m^16`, an identity that holds for a union of classes exactly when that union
+is a subgroup and fails otherwise.
+
+**Measured at Sterk's `P_2` of `T_En`** (port `991b88b0`, load 3.11; the plane
+is `primitive_isotropic_subobject(2e_1 + 2e_2 + e_5 + e_6, e_3)`, whose
+perpendicular has rank ten and whose `K` has rank eight):
+
+| quantity | value | time |
+|---|---|---|
+| modulus | 2 | 0.078 s |
+| classes / admissible | 65536 / 4096 | 1.002 s |
+| parameter lattice | 16 x 16, rank 16, determinant 16 | (cached) |
+| radical family | 31 = 14 transvections + 16 block + 1 centre | 0.694 s |
+| translation rank of the fourteen transvections | 12 of 16 | 0.257 s |
+| translation rank of the whole family | 16 of 16 | 0.171 s |
+| `unipotent_radical_index()` | 1 | 0.169 s |
+
+`4096 x 16 = 65536` is the exactness identity above.  The fourteen
+transvections alone span only 12 of the 16 dimensions of `tau(U_I)`, so they
+generate a subgroup of infinite index and the block generators are the family's
+other part; with the centre's generator the index is one.  The whole probe is
+2.7 s.
+
+**The source sentence that said otherwise.**  `_pointwise_kernel_generators`'s
+docstring said "rank at least two: not presented here ... which is what is
+open at Sterk's `P_2` of `T_En`".  The case is presented, the lattice is
+decided, and the index is one; that bullet now says so and carries these
+numbers.  It is this round's `fix:`.
+
+**Green.**  The parameter-lattice file with the new test is **6 passed in
+9.63 s** on this head (load 3.88), and **6 passed in 13.79 s** at the base
+commit `5e9f8af`, so the test is a pin and not a red.  Its own call is 0.02 s
+with the decision already cached by the tests before it, about a second on its
+own (`unipotent_parameter_class_counts` is the 65536-class decision).  The
+collection ceiling is over in both runs, as it is tree-wide here.
+
+**What remains beside the list.**  The coercion from `O(L)` into the residue
+action's rational group: it is the other item beside the list, and the only
+one left.

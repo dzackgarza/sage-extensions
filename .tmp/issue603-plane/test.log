@@ -1,0 +1,41 @@
+tree SHA: 8d1b0c18d2538f68cae4b751baef1b3871bb092a (modified paths: 0)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 3.88 4.21 4.06 4/606 2884849
+files: tests/lattices/test_the_parameter_lattice_of_the_unipotent_radical.sage; inner 900 s
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+time gates on: star import 0.48 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: asyncio-1.5.0, xdist-3.8.0, reportlog-1.0.0, platformdirs-4.13.5, hypothesis-6.170.15, anyio-4.15.1, timeout-2.4.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 6 items
+
+tests/lattices/test_the_parameter_lattice_of_the_unipotent_radical.sage . [ 16%]
+.....                                                                    [100%]
+
+=============================== time-gate report ===============================
+collection took 6.40 s; the measured ceiling is 6 s
+============================== slowest durations ===============================
+2.47s call     tests/lattices/test_the_parameter_lattice_of_the_unipotent_radical.sage::test_the_parameters_of_the_radical_transvections_lie_in_the_lattice
+0.55s call     tests/lattices/test_the_parameter_lattice_of_the_unipotent_radical.sage::test_every_basis_vector_has_an_element_of_the_radical_over_it
+0.04s call     tests/lattices/test_the_parameter_lattice_of_the_unipotent_radical.sage::test_the_centre_is_generated_over_the_vanishing_parameter
+0.03s call     tests/lattices/test_the_parameter_lattice_of_the_unipotent_radical.sage::test_the_parameters_of_the_third_and_fourth_vectors_of_the_quotient_lie_in_the_lattice
+0.02s call     tests/lattices/test_the_parameter_lattice_of_the_unipotent_radical.sage::test_the_decision_at_the_modulus_decides_the_whole_lattice
+
+(13 durations < 0.005s hidden.  Use -vv to show these durations.)
+============================== 6 passed in 9.63s ===============================
+[peakrss] test603: child waited=1 shell_code=1 samples=7
+[peakrss] peak tree RSS      : 518 MiB
+[peakrss] low-water MemAvail : 6529 MiB
+[peakrss] peak single VmHWM  : 518 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      507 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    12.0s procs=  3 rss=   518 MiB hwm=   518 MiB avail=  6529 MiB
+[peakrss]   t=    10.0s procs=  3 rss=   489 MiB hwm=   489 MiB avail=  6558 MiB
+[peakrss]   t=     8.0s procs=  3 rss=   468 MiB hwm=   468 MiB avail=  6694 MiB
+[peakrss]   t=     6.0s procs=  3 rss=   439 MiB hwm=   439 MiB avail=  6956 MiB
+[peakrss]   t=     4.0s procs=  3 rss=   407 MiB hwm=   407 MiB avail=  7274 MiB
+test exit: 1
