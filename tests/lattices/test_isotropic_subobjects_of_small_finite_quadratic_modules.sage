@@ -144,10 +144,18 @@ def test_an_anisotropic_form_refuses_the_isotropic_subobject_call() -> None:
 
 
 def test_the_hyperbolic_plane_has_no_nonzero_class_at_all() -> None:
-    r"""``A_{U + U}`` is trivial: one class, so there is nothing to be isotropic."""
-    form = (Lattices(ZZ)("U") + Lattices(ZZ)("U")).discriminant_quadratic_form()
+    r"""``A_{U + U}`` is trivial: one class, so there is nothing to be isotropic.
 
-    assert int(form.cardinality()) == 1
+    The discriminant group of a unimodular lattice is trivial, and a lattice's
+    discriminant group has the lattice's determinant as its order (V. V. Nikulin,
+    *Integral symmetric bilinear forms and some of their applications*, Math.
+    USSR-Izv. 14 (1980), section 1.1), so the order read here is the
+    determinant's and not a number of its own.
+    """
+    lattice = Lattices(ZZ)("U") + Lattices(ZZ)("U")
+    form = lattice.discriminant_quadratic_form()
+
+    assert form.cardinality() == cardinal(abs(lattice.determinant()))
     assert _first_isotropic_class(form) is None
 
 def test_a_quadratic_span_whose_generators_pair_nontrivially_is_refused() -> None:
