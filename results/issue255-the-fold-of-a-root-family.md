@@ -65,6 +65,13 @@ Three of them are folds by a permutation of the roots: 4.3.5 and 4.3.8 by two in
 | 19 roots | 2 | identity | 19 | 19 × (−2) | (1,17) | (0,0) |
 | 19 roots | | reversal | 10 | 9 × (−4), 1 × (−2) | (1,9) | (0,8) |
 
+The issue's own named permutation,
+\((1,13)(2,12)(3,11)(4,10)(5,9)(6,8)(14,16)(17,20)(18,19)(21,22)\), is one of those two
+eleven-root folds: it is an involution among the eight automorphisms, and the fold by it has 4.3.8's
+eleven roots, squares and pairings in an invariant lattice of rank 10 and signature (1,9), asserted
+at `tests/lattices/test_the_sterk_configurations_are_folds_of_the_two_root_families.sage:327`.  So the
+Specimens row that names it is read by the operation and not only by the notebook.
+
 So no permutation of either family folds it to 4.3.7 (the twelve-root fold is all (−4), 4.3.7 is
 ten (−4) and two (−2)) or to 4.3.9 (both fourteen-root folds have invariant signature (1,10) where
 every printed chamber's is (1,9)).  Sterk's third and fifth are folds all the same, by involutions
