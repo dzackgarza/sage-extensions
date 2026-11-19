@@ -160,14 +160,14 @@ zero-reduction file and its four pointwise-Levi neighbours were 5 passed in
 * **Proper Levi image, point stabilizer over finite residues:** MET for the
   even integral case with an available `O(K_I)` family.  The owned action and
   its rank-five regression are described in “The proper-image branch.”
-* **Every primitive isotropic vector of divisibility greater than one:** the
-  radical is exact at every divisibility (next item); the *public* pointed
-  family is not.  The two constructions that answer it are the split section,
-  and a splitting forces divisibility one, and the residue action, whose
-  integrality is decided by the marked-line torsor over an even lattice.  So an
-  even lattice of divisibility greater than one keeps the residue action and
-  the card row it was certified on (`029J`'s `L_2`), and an odd one is still
-  answered with `None`, so the caller keeps the port's route.
+* **Every primitive isotropic vector of divisibility greater than one:** MET,
+  for the radical and for the public pointed family alike.  The radical's
+  parameter lattice is `X`, the item below; the public family is answered by
+  the residue action, whose group now contains `U_I`, so it no longer depends
+  on the lifting torsor's even-lattice case and no parity gate remains.
+  `029J`'s `L_2` keeps the card row it was certified on, and an odd lattice of
+  divisibility greater than one is answered by the owned route rather than by
+  the port.
 * **The integral kernel of the pointwise parabolic at a line of every
   divisibility:** MET.  With `d` the divisibility of `e`, a partner `w` of
   `b(e,w) = d` and `J = I^\perp`, the radical is the image of the parameter
@@ -187,8 +187,8 @@ zero-reduction file and its four pointwise-Levi neighbours were 5 passed in
   at the even-square parameters, exact on an odd lattice and on an even one
   whose `K_I` is not unimodular, and both factors of the exact sequence are
   computable on the nonreflective odd specimen.  See “The nonreflective
-  quotient.”  Divisibility greater than one is not covered by the kernel's own
-  family and says so.
+  quotient.”  The higher-divisibility case is the item above, which replaces
+  this one's parameters by `X`.
 * **The public pointed family at an odd lattice of any divisibility:** MET.
   The residue action's rational group is the lifts of `O(K_I)`'s generators
   together with the pointwise Levi kernel `U_I`, so it is exactly `P_I^1` and
@@ -318,12 +318,31 @@ an element that is one of that group's generators.  And the plane case,
 `U_I` at null rank two and up, still carries the parameter-lattice question
 recorded above.
 
-
-
-
 No full suite, no `just test`, no ast-grep gates (ast-grep is not installed).
 The older `test_edgewalk_fundamental_domain.sage` does not
 collect because of its own pre-existing TL09 finding; its K3 option tests were
 therefore not part of the evidence.  The default edgewalk calls used by the
 repair were measured directly and returned reflectivity certificates in about
 one to three seconds on the target reductions.
+
+## The list at `a7632ba`, item by item
+
+Every acceptance item is met.  Each is anchored here at that commit: the site
+that does the work, and the test that asserts it.
+
+| item | the site | the test |
+|---|---|---|
+| Zero-rank Levi computation at the smallest divisibility-two lattice | `lattice_morphisms.py:3418` (`_definite_automorphisms`, whose zero-content guard returns the order `1` and no generators) and `:4688` (`_engine_subgroup_from_generators`, the rank-zero trivial subgroup) | `test_the_zero_reductions_pointwise_levi_image.sage:13` |
+| Public pointed family at `029J`'s `L_2`, its discriminant image of index 527 | `isotropic_parabolics.py:1168` (`pointed_stabilizer_generators`) over the action at `:202` | `tests/lattices/the_enriques_pointed_stabilizer_row.py:65` |
+| Library-owned generation in the submitted case, by the completed chamber | `lattice_morphisms.py:4736` (`_computed_group_generators`) with `hyperbolic_lattices.py:2229` and `:2252` (the edgewalk call) | the row script above, on the chamber's own generators; citation Belolipetsky, arXiv:1506.03111v4, Lemma 2.3, printed p. 7 |
+| Proper Levi image, point stabilizer over finite residues | `isotropic_parabolics.py:202` | `test_the_pointed_stabilizer_of_a_primitive_vector.sage:251` |
+| The research `T_Co` cusp-5 computation | `isotropic_parabolics.py:1168` | `test_the_pointed_stabilizer_of_a_primitive_vector.sage:303` |
+| Integral kernel of the pointwise parabolic at a line of every divisibility | `lattices.py:13492` (the family), `:13613` (the parameter lattice), `:13704` (the transvection at a rational parameter), `:13565` (the Bezout partner) | `test_the_pointwise_radical_of_a_divisible_isotropic_line.sage:80`, `:85`, `:90`, and at divisibility one `test_the_pointwise_radical_of_a_primitive_isotropic_line.sage:59`, `:96`, `:116`, `:142` |
+| Public pointed family at an odd splitting lattice | `isotropic_parabolics.py:1168` with `:311` (the kernel in the rational group) | `test_the_public_pointed_family_of_an_odd_isotropic_vector.sage:89`, `:108` |
+| Public pointed family at an odd lattice of any divisibility | `lattices.py:3027` and `:3089` (no parity gate remains); `isotropic_parabolics.py:202`, `:311` | `test_the_public_pointed_family_of_a_divisible_odd_line.sage:58`, `:63` |
+
+Two things are open *beside* the list, and neither is an acceptance item: the
+coercion that would let one ask whether an integral isometry lies in the
+residue action's rational group -- it answers `False` in both directions and
+even for an element that is one of that group's generators -- and the plane
+case's parameter lattice at null rank two and up.
