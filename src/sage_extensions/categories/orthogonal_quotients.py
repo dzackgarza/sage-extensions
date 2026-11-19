@@ -60,6 +60,53 @@ def _f2_rank(vectors, width):
     return matrix(GF(2), [[int(x) for x in v] for v in vectors]).rank()
 
 
+NO_SPLIT = "NOSPLIT"
+r"""The answer that an ambient line orbit does not split into more than one orbit."""
+
+NO_SPLIT_BY_REFLECTION = "a reflection fixing the line changes the character"
+r"""The witness of ``NO_SPLIT``: one integral reflection root, orthogonal to the
+line's generator, lying in the subgroup, and changing the character.  It proves
+``G = Gamma * Stab(line)`` outright -- Gritsenko--Hulek--Sankaran's criterion is
+not used -- so it needs no hypothesis on the lattice."""
+
+NO_SPLIT_BY_ZERO_CLASS = "the line's divided class is the zero class"
+r"""The witness of ``NO_SPLIT``: the divided class is `0`, where the double
+cosets are a single coset because the class stabilizer is the whole image."""
+
+NO_SPLIT_BY_SIGN_PATTERNS = "the stabilizer's sign patterns span the sign space"
+r"""The witness of ``NO_SPLIT``: the stabilizer's own exhibited elements present
+every sign coset that ``ker rho`` realizes, so the character image of the
+stabilizer is the whole preimage of the class stabilizer."""
+
+
+class _NoSplit(str):
+    r"""The answer that an ambient line orbit does not split, with the proof that said so.
+
+    It compares equal to the plain string ``"NOSPLIT"``, which is the answer every
+    consumer of this call tests for, and it carries the witness in ``reason`` --
+    one of ``NO_SPLIT_BY_REFLECTION``, ``NO_SPLIT_BY_ZERO_CLASS`` and
+    ``NO_SPLIT_BY_SIGN_PATTERNS``.  The three arguments are different: the first
+    exhibits a single element, the second counts double cosets at the zero class,
+    and the third spans a sign space; a run that reports only the answer cannot
+    say which of them held, and they fail differently.
+    """
+
+    reason = ""
+
+    def __new__(cls, reason):
+        assert reason in (
+            NO_SPLIT_BY_REFLECTION,
+            NO_SPLIT_BY_ZERO_CLASS,
+            NO_SPLIT_BY_SIGN_PATTERNS,
+        ), f"a no-split answer carries one of this module's three witnesses, not {reason!r}"
+        instance = super().__new__(cls, NO_SPLIT)
+        instance.reason = reason
+        return instance
+
+    def _repr_(self):
+        return f"{NO_SPLIT} ({self.reason})"
+
+
 class _GapWordSection:
     r"""A GAP stabilizer-chain word section of a finitely generated group.
 
@@ -1697,7 +1744,7 @@ class OrthogonalCharacterQuotient:
                 if lattice.b(root, vector) != zero or not root.is_integral_reflection_vector():
                     continue
                 if lattice.reflection(root) not in self.subgroup:
-                    return "NOSPLIT"
+                    return _NoSplit(NO_SPLIT_BY_REFLECTION)
         # The criterion's hypothesis is the lattice's own -- two orthogonal hyperbolic
         # planes and an even form (Gritsenko--Hulek--Sankaran, Lemma 7.8, p. 503) --
         # and ``Lattices.eichler_criterion_applies`` is where it is decided.
@@ -1733,13 +1780,13 @@ class OrthogonalCharacterQuotient:
             # that image.  The sign factors are presented by the stabilizer's own
             # exhibited patterns, which the test above has just certified to span
             # the sign space of ker rho, so no sign coset is left to lift.
-            return "NOSPLIT"
+            return _NoSplit(NO_SPLIT_BY_ZERO_CLASS)
         if not self._has_discriminant:
             # A sign-only character quotient has no im rho at all.  The same
             # principle applies: the stabilizer's patterns span every sign character,
             # so the signs it presents are the whole sign image of O(L) and the
             # ambient orbit does not split.
-            return "NOSPLIT"
+            return _NoSplit(NO_SPLIT_BY_SIGN_PATTERNS)
         finite_orthogonal = self._discriminant_group
         # An unoriented line is a *set*: its stabilizer may interchange v and -v, so
         # the discriminant image is the stabilizer of the class set {c, -c}, not of c
@@ -4792,4 +4839,10 @@ def _subgroup_isotropic_equivalence_witness(subgroup, left, right, *, flag=False
     )
 
 
-__all__ = ["OrthogonalCharacterQuotient"]
+__all__ = [
+    "OrthogonalCharacterQuotient",
+    "NO_SPLIT",
+    "NO_SPLIT_BY_REFLECTION",
+    "NO_SPLIT_BY_ZERO_CLASS",
+    "NO_SPLIT_BY_SIGN_PATTERNS",
+]
