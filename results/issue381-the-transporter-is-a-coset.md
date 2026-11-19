@@ -973,3 +973,34 @@ lifts at the cusp-5 torsor, and the same 768 classes.
 transvection build, which was real (12.77 s -> 6.57 s on the measured torso), but
 it kept the *element* arithmetic of the same construction, which is the part the
 dumps now catch.  The two are separable and only the first was done.
+
+## The count: seven nested enumerations in sixty seconds
+
+Two ways of counting the nested torsor enumerations failed -- a class scan that
+found nothing to wrap, and wrapping `integral_parameter_classes` directly, which
+is a `cached_method` and broke the descriptor (`__call__() takes exactly 0
+positional arguments`).  The profiler counts natively, and the row under
+`cProfile` at a 60 s cap says:
+
+    integral_parameter_classes   7 calls   41.92 s   5.99 s each
+    integral_members             7 calls   44.30 s   6.33 s each
+    (row total under the profiler: 63.26 s, undecided at its cap)
+
+So **seven nested enumerations in the first sixty seconds**, taking two thirds
+of the time; the other third is elsewhere in the row.  Unprofiled the cusp-5
+line's enumeration is 2.15 s, so the profiler's 6 s is about a factor of two of
+overhead and the real per-call cost here is around 3 s.
+
+**What that makes the remaining question.**  Not "how expensive is one
+enumeration" (2.15 s, measured) and not "how many lines does the walk visit"
+(one, measured) but **how many torsor enumerations the plane-orbit walk needs**
+in total -- seven in the first minute, with the row still undecided at 600 s, so
+the answer is at least tens and possibly hundreds.  Until that number is known,
+the per-call cost cannot be traded against it, and the honest statement is that
+the row is two-thirds nested enumeration at ~3 s a call and one-third something
+unmeasured.
+
+**What would settle it cheaply.**  A cap long enough for the row to finish its
+first plane-orbit computation and print the total call count -- the counter
+works through the profiler, so one longer profiled run is the measurement, at
+the cost of one turn.

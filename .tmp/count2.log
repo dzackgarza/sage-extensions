@@ -1,0 +1,108 @@
+tree SHA: 26a1ef905799f2368cf80712bfe64e2675caac9e (modified paths: 0)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 4.19 4.23 6.56 7/554 3547349
+probe: .tmp/probe-count2.py; inner 600 s
+[    1.97s] torsor class: <class 'sage_extensions.owned_category.OwnedJoinCategory.parent_class'>
+[    1.97s] wrapped
+[Otilde] the row's route: divided-class, taken because its lines carry divided classes and its covering is carried from one plane to the others (decided in 1.5 s)
+Traceback (most recent call last):
+  File "sage/misc/cachefunc.pyx", line 1965, in sage.misc.cachefunc.CachedMethodCaller.__call__
+    return cache[k]
+KeyError: ((2,), ())
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/repos/sage-extensions/tests/coble_gamma_co_2_incidence_rows.py", line 721, in run_row
+    incidences = tuple(row_relation(subgroup, taken))
+                       ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/repos/sage-extensions/tests/coble_gamma_co_2_incidence_rows.py", line 477, in row_relation
+    return subgroup.tits_building_incidence_by_divided_classes()
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 1259, in tits_building_incidence_by_divided_classes
+    for _plane_cusp, entries in self.divided_class_incidence_of_planes(self.cusps(2)):
+                                                                       ~~~~~~~~~~^^^
+  File "sage/misc/cachefunc.pyx", line 1970, in sage.misc.cachefunc.CachedMethodCaller.__call__
+    w = self._instance_call(*args, **kwds)
+  File "sage/misc/cachefunc.pyx", line 1848, in sage.misc.cachefunc.CachedMethodCaller._instance_call
+    return self.f(self._instance, *args, **kwds)
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 803, in cusps
+    return _distinct_finite_ordered_set(
+        _arithmetic_cusp(self, representative)
+    ...<2 lines>...
+        )
+    )
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/finite_ordered_sets.py", line 1119, in _distinct_finite_ordered_set
+    admitted = tuple(points)
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 805, in <genexpr>
+    for representative in _yield_subgroup_isotropic_orbit_representatives(
+                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self, rank
+        ^^^^^^^^^^
+    )
+    ^
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 4736, in _yield_subgroup_isotropic_orbit_representatives
+    sourced = orthogonal_group.isotropic_orbit_representatives(rank, flag=flag)
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py", line 5507, in isotropic_orbit_representatives
+    return _isotropic_orbit_representatives(self, rank, flag=flag)
+  File "/repos/sage-extensions/src/sage_extensions/timing.py", line 509, in timed
+    return function(*arguments, **keywords)
+  File "/repos/sage-extensions/src/sage_extensions/categories/isotropic_orbits.py", line 2027, in _isotropic_orbit_representatives
+    planes = _isotropic_plane_orbit_representatives(orthogonal_group)
+  File "/repos/sage-extensions/src/sage_extensions/categories/isotropic_orbits.py", line 1825, in _isotropic_plane_orbit_representatives
+    for line in _isotropic_orbit_representatives(orthogonal_group, 1):
+                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "/repos/sage-extensions/src/sage_extensions/timing.py", line 509, in timed
+    return function(*arguments, **keywords)
+  File "/repos/sage-extensions/src/sage_extensions/categories/isotropic_orbits.py", line 2053, in _isotropic_orbit_representatives
+    classes = primitive_marking_classes(category, shape, lattice)
+  File "/work/src/sage_indefinite_port/indefinite/marked_lattices.py", line 195, in primitive_marking_classes
+    classes = tuple(ARROWS.object(lattice.primitive_isotropic_subobject(vector_).inclusion()) for vector_ in INDUCTION.isotropic_vector_classes(lattice))
+                                                                                                             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/work/src/sage_indefinite_port/indefinite/isotropic_induction.py", line 75, in isotropic_vector_classes
+    self._line_classes[id(lattice)] = (lattice, self._computed_isotropic_vector_classes(lattice))
+                                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/work/src/sage_indefinite_port/indefinite/isotropic_induction.py", line 109, in _computed_isotropic_vector_classes
+    return tuple(vector_class.representative for vector_class in self.recursion.primitive_vector_classes(lattice, 0))
+                                                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/work/src/sage_indefinite_port/indefinite/recursive.py", line 1771, in primitive_vector_classes
+    match next(((witnesses, isometry) for kept, witnesses in bucket if (isometry := self.pointed_isometry(kept, candidate)) is not None), None):
+          ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/work/src/sage_indefinite_port/indefinite/recursive.py", line 1771, in <genexpr>
+    match next(((witnesses, isometry) for kept, witnesses in bucket if (isometry := self.pointed_isometry(kept, candidate)) is not None), None):
+                                                                                    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/work/src/sage_indefinite_port/indefinite/recursive.py", line 1597, in pointed_isometry
+    return self._isotropic_pointed_isometry(source, target)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/work/src/sage_indefinite_port/indefinite/recursive.py", line 1720, in _isotropic_pointed_isometry
+    if torsor.integral_members().is_empty() is False:
+       ~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "sage/misc/cachefunc.pyx", line 2328, in sage.misc.cachefunc.CachedMethodCallerNoArgs.__call__
+    self.cache = f(self._instance)
+  File "/repos/sage-extensions/src/sage_extensions/categories/isotropic_lifts.py", line 319, in integral_members
+    integral_kernel, locus = self._integral_lift_locus()
+                             ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "sage/misc/cachefunc.pyx", line 2328, in sage.misc.cachefunc.CachedMethodCallerNoArgs.__call__
+    self.cache = f(self._instance)
+  File "/repos/sage-extensions/src/sage_extensions/categories/isotropic_lifts.py", line 256, in _integral_lift_locus
+    classes = self.integral_parameter_classes()
+  File "/repos/sage-extensions/.tmp/probe-count2.py", line 31, in counting
+    value = original(self)
+TypeError: __call__() takes exactly 0 positional arguments (1 given)
+[    9.70s] outcome: [Otilde] error: the row step raised TypeError: __call__() takes exactly 0 positional arguments (1 given)  [7.65s]
+[    9.70s] integral_parameter_classes calls: 1, inside them 0.00s
+[    9.70s] done
+[peakrss] probe603: child waited=0 shell_code=0 samples=6
+[peakrss] peak tree RSS      : 482 MiB
+[peakrss] low-water MemAvail : 1059 MiB
+[peakrss] peak single VmHWM  : 488 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      477 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    10.0s procs=  3 rss=   482 MiB hwm=   488 MiB avail=  3120 MiB
+[peakrss]   t=     8.0s procs=  3 rss=   439 MiB hwm=   444 MiB avail=  3274 MiB
+[peakrss]   t=     6.0s procs=  3 rss=   425 MiB hwm=   430 MiB avail=  3356 MiB
+[peakrss]   t=     4.0s procs=  3 rss=   420 MiB hwm=   426 MiB avail=  3431 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   212 MiB hwm=   217 MiB avail=  3462 MiB
+probe exit: 0

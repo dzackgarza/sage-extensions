@@ -1,0 +1,63 @@
+tree SHA: 26a1ef905799f2368cf80712bfe64e2675caac9e (modified paths: 0)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 3.75 4.13 6.48 3/560 3547743
+probe: .tmp/probe-prof-row.py; inner 600 s
+[Otilde] the row's route: divided-class, taken because its lines carry divided classes and its covering is carried from one plane to the others (decided in 2.0 s)
+[   63.26s] outcome: [Otilde] undecided: the row did not return inside its 60 s cap
+         142669399 function calls (142130274 primitive calls) in 61.934 seconds
+
+   Ordered by: cumulative time
+   List reduced from 5885 to 30 due to restriction <30>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.000    0.000   61.954   61.954 /repos/sage-extensions/tests/coble_gamma_co_2_incidence_rows.py:687(run_row)
+        1    0.000    0.000   60.001   60.001 /repos/sage-extensions/tests/coble_gamma_co_2_incidence_rows.py:474(row_relation)
+        1    0.000    0.000   60.001   60.001 /repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py:1177(tits_building_incidence_by_divided_classes)
+        1    0.000    0.000   60.001   60.001 /repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py:771(cusps)
+        1    0.000    0.000   60.001   60.001 /repos/sage-extensions/src/sage_extensions/categories/sets/finite_ordered_sets.py:1095(_distinct_finite_ordered_set)
+        1    0.000    0.000   60.001   60.001 /repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py:803(<genexpr>)
+        1    0.000    0.000   60.000   60.000 /repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py:4705(_yield_subgroup_isotropic_orbit_representatives)
+        1    0.000    0.000   59.965   59.965 /repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py:5505(isotropic_orbit_representatives)
+      2/1    0.000    0.000   59.965   59.965 /repos/sage-extensions/src/sage_extensions/timing.py:506(timed)
+      2/1    0.000    0.000   59.954   59.954 /repos/sage-extensions/src/sage_extensions/categories/isotropic_orbits.py:1987(_isotropic_orbit_representatives)
+        1    0.000    0.000   59.954   59.954 /repos/sage-extensions/src/sage_extensions/categories/isotropic_orbits.py:1793(_isotropic_plane_orbit_representatives)
+        1    0.000    0.000   59.906   59.906 /work/src/sage_indefinite_port/indefinite/marked_lattices.py:181(primitive_marking_classes)
+        1    0.000    0.000   59.906   59.906 /work/src/sage_indefinite_port/indefinite/isotropic_induction.py:68(isotropic_vector_classes)
+        1    0.000    0.000   59.906   59.906 /work/src/sage_indefinite_port/indefinite/isotropic_induction.py:78(_computed_isotropic_vector_classes)
+        1    0.000    0.000   59.905   59.905 /work/src/sage_indefinite_port/indefinite/recursive.py:1754(primitive_vector_classes)
+32733/5294    0.013    0.000   52.780    0.010 {built-in method builtins.next}
+       22    0.000    0.000   52.747    2.398 /work/src/sage_indefinite_port/indefinite/recursive.py:1771(<genexpr>)
+       11    0.000    0.000   52.747    4.795 /work/src/sage_indefinite_port/indefinite/recursive.py:1572(pointed_isometry)
+       10    0.001    0.000   52.680    5.268 /work/src/sage_indefinite_port/indefinite/recursive.py:1695(_isotropic_pointed_isometry)
+        7    0.000    0.000   44.299    6.328 /repos/sage-extensions/src/sage_extensions/categories/isotropic_lifts.py:308(integral_members)
+        7    0.000    0.000   44.290    6.327 /repos/sage-extensions/src/sage_extensions/categories/isotropic_lifts.py:205(_integral_lift_locus)
+        7    0.001    0.000   41.923    5.989 /repos/sage-extensions/src/sage_extensions/categories/isotropic_lifts.py:816(integral_parameter_classes)
+        7    0.007    0.001   41.913    5.988 /repos/sage-extensions/src/sage_extensions/categories/isotropic_lifts.py:568(_integral_parameter_cosets)
+434454/203038    1.872    0.000   38.704    0.000 /repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py:791(__call__)
+   531452    1.615    0.000   38.473    0.000 {built-in method builtins.sum}
+     1648    0.023    0.000   36.936    0.022 /repos/sage-extensions/src/sage_extensions/categories/isotropic_lifts.py:777(<genexpr>)
+     3282    0.425    0.000   36.913    0.011 /repos/sage-extensions/src/sage_extensions/categories/isotropic_lifts.py:495(_integral_lift)
+22016/15019    0.042    0.000   34.144    0.002 /repos/sage-extensions/src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py:1229(_call_)
+13799/13220    0.045    0.000   33.590    0.003 /repos/sage-extensions/src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py:1198(_linear_combination_of_generator_images)
+5231/5017    0.003    0.000   25.997    0.005 /repos/sage-extensions/src/sage_extensions/categories/modules/framed/formed/form_modules.py:460(<lambda>)
+
+
+
+[   63.30s]   7    0.000    0.000   44.299    6.328 /repos/sage-extensions/src/sage_extensions/categories/isotropic_lifts.py:308(integral_members)
+[   63.30s]   7    0.001    0.000   41.923    5.989 /repos/sage-extensions/src/sage_extensions/categories/isotropic_lifts.py:816(integral_parameter_classes)
+[   63.30s]   7    0.007    0.001   41.913    5.988 /repos/sage-extensions/src/sage_extensions/categories/isotropic_lifts.py:568(_integral_parameter_cosets)
+[   63.30s] done
+[peakrss] probe603: child waited=0 shell_code=0 samples=33
+[peakrss] peak tree RSS      : 543 MiB
+[peakrss] low-water MemAvail : 1695 MiB
+[peakrss] peak single VmHWM  : 545 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      534 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    64.0s procs=  3 rss=   543 MiB hwm=   545 MiB avail=  4831 MiB
+[peakrss]   t=    62.0s procs=  3 rss=   531 MiB hwm=   532 MiB avail=  4840 MiB
+[peakrss]   t=    60.0s procs=  3 rss=   529 MiB hwm=   530 MiB avail=  4834 MiB
+[peakrss]   t=    58.0s procs=  3 rss=   527 MiB hwm=   528 MiB avail=  5197 MiB
+[peakrss]   t=    56.0s procs=  3 rss=   526 MiB hwm=   527 MiB avail=  6588 MiB
+probe exit: 0
