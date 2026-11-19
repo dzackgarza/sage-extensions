@@ -1,0 +1,25 @@
+tree SHA: de151b993bb6c8fe71ed5d9f5a622c145c94492c (modified paths: 0)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 2.26 1.42 2.52 3/735 2956461
+probe: .tmp/probe-coset.py; inner 600 s
+L: 5 (2, 3) even: True
+labels: (0, 1, 2, 3, 4)
+pairings: b(e,f)= 1  b(e2,f2)= 2  q(g)= -2
+P rank: 2  Q rank: 2
+  [   0.342s] transporter witness P -> Q
+  witness is None: False
+  witness carries P into Q: True
+  [   0.067s] radical of P
+  radical generators: 7
+  radical fixes P pointwise: True
+  every composed map carries P into Q: True
+  some composed map moves Q: True
+[   0.496s] done
+[peakrss] probe603: child waited=0 shell_code=0 samples=1
+[peakrss] peak tree RSS      : 7 MiB
+[peakrss] low-water MemAvail : 9708 MiB
+[peakrss] peak single VmHWM  : 7 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   t=     0.0s procs=  1 rss=     7 MiB hwm=     7 MiB avail=  9708 MiB
+probe exit: 0
