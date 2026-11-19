@@ -148,6 +148,10 @@ zero-reduction file and its four pointwise-Levi neighbours were 5 passed in
 
 ## Acceptance, item by item
 
+*Superseded by "Acceptance at the head, item by item, with its site and its
+test" at the end of this record: this list is an earlier round's, it repeats
+the withdrawn exactness sentence, and its counts are that round's.*
+
 * **Zero-rank Levi computation at the smallest divisibility-two lattice:**
   MET.
 * **Public pointed family at divisibility two on `029J`'s `L_2`:** MET, and
@@ -1090,3 +1094,42 @@ clean exit, collection under its ceiling), and **6 passed in 11.53 s** with
 `test_integral_stabilizers.sage` beside it.
 
 **What remains.**  Nothing beside the list: this was the last item on it.
+
+## Acceptance at the head, item by item, with its site and its test
+
+This is the list as the tree now stands.  Line numbers were read off the tree
+that carries this section and the tests below were run against it; the earlier
+"Acceptance, item by item" section above is the list of an earlier round and is
+superseded -- it repeats the withdrawn exactness sentence and its counts are
+that round's.
+
+One run, the cited files only, at port `991b88b0`, load 1.81:
+
+    FILES = the fifteen files in the right-hand column below
+    49 passed in 284.08 s; slowest call 7.80 s
+      (test_the_unipotent_radical_of_the_plane_is_measured.sage::
+       test_the_returned_family_reaches_the_radical_translation_rank)
+
+The run exits 1 on the collection ceiling -- 247.80 s against 6 s for a
+fifteen-file invocation -- and on nothing else; no test failed.
+
+| item | what stands | site | test |
+|---|---|---|---|
+| Zero-rank Levi at the smallest divisibility-two lattice | `O(0)` is the trivial subgroup of the one-dimensional matrix group, and the empty form's order is one | `lattice_morphisms.py:3418` (`_definite_automorphisms`), `:4688` (`_engine_subgroup_from_generators`) | `test_the_zero_reductions_pointwise_levi_image.sage` |
+| `029J`'s `L_2`: public pointed family, index 527 | 20 generators, ten lifts and the radical's ten, computed in 1.9 s; the index is the card's 527 | `isotropic_parabolics.py:1181`, `lattices.py:13677` | `test_the_second_cusp_of_the_enriques_lattice_lifts_the_whole_quotient`; the row `the_enriques_pointed_stabilizer_row.py` (not collected) |
+| Library-owned generation | MET where the chamber completes (`029J`); **impossible** at a nonreflective `K_I`, where the maximal reflection subgroup has infinite index | `lattice_morphisms.py:4736` | the row; `test_the_pointed_family_answers_at_a_nonreflective_quotient` |
+| Proper Levi image, point stabilizer over finite residues | the family is one lift per generator of `M_I` plus the radical; the index-two specimen is `9 = 5 + 4` | `isotropic_parabolics.py:1181`, `lattices.py:13677` | `test_a_proper_pointwise_levi_image_still_has_the_full_finite_image` |
+| Every primitive isotropic vector of divisibility greater than one | the radical is the parameter lattice `X`; the public family is the two factors; no parity gate remains | `lattices.py:13733`, `:13824`, `:13629` | `test_the_pointwise_radical_of_a_divisible_isotropic_line.sage` |
+| The integral kernel at a line of every divisibility | `X` under `u -> E_{e,u/d}`, kernel `Z e`, cut out by one Smith form and one congruence | `lattices.py:13542` | the same file |
+| The integral kernel at divisibility one, odd lattices included | the Eichler transvections at the even-square parameters | `lattices.py:13824`, `:13862`, `:13911` | `test_the_pointwise_radical_of_a_primitive_isotropic_line.sage`, `test_the_pointwise_levi_lift_of_an_odd_line.sage` |
+| The public pointed family at an odd lattice of any divisibility | the two factors; the residue action's stabilizer is a subgroup of `P_I^1` that contains `U_I`, and it is not asserted to be all of it | `isotropic_parabolics.py:1181`, `:202` | `test_the_public_pointed_family_of_a_divisible_odd_line.sage`, `test_the_residue_actions_integral_membership.sage` |
+| The research `T_Co` cusp-5 computation | the call returns 19 generators in 2.9 s and every one fixes the vector; the card has no `T_Co` row, so no count is asserted | `isotropic_parabolics.py:1181` | `test_the_coble_cusp_five_pointed_family_returns` |
+| The plane's radical, beside the list | modulus 2, 4096 of 65536 classes, lattice of rank and index 16, radical index 1 | `isotropic_parabolics.py:2817`, `:2304`, `:3466` | `test_the_parameter_lattice_of_the_unipotent_radical.sage`, `test_the_unipotent_radical_of_the_plane_is_measured.sage` |
+| The nonreflective quotient, beside the list | 16 generators (`12 + 4`) in 2.9 s, every one fixing the vector, complete relative to the port's `O(K_I)` family | `isotropic_parabolics.py:1181`, `lattice_morphisms.py:4736` | `test_the_pointed_family_at_a_nonreflective_quotient.sage` |
+| The coercion into the residue action, beside the list | `IntegralStructureAction.rational_image`; `U_I` lies in the action's stabilizer | `rational_integral_stabilizers.py:547`, `:792` | `test_the_residue_actions_integral_membership.sage` |
+
+Nothing on this list is open.  The three items that came open during the review
+of the withdrawal -- `029J`'s `L_2`, the proper Levi image, and the odd
+lattices -- are met by the family that is the two factors, and the
+library-owned clause is met where a chamber exists and refuted, with the index
+argument, where none does.

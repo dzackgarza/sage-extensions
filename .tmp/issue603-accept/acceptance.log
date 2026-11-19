@@ -1,0 +1,104 @@
+tree SHA: 7f72125bdde90c9c880feebe8967d55a22fadcf8 (modified paths: 0)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 1.81 2.83 3.99 5/566 2907302
+files: tests/lattices/test_the_zero_reductions_pointwise_levi_image.sage tests/lattices/test_the_pointed_stabilizer_of_a_primitive_vector.sage tests/lattices/test_the_pointwise_radical_of_a_divisible_isotropic_line.sage tests/lattices/test_the_pointwise_radical_of_a_primitive_isotropic_line.sage tests/lattices/test_the_public_pointed_family_of_a_divisible_odd_line.sage tests/lattices/test_the_public_pointed_family_of_an_odd_isotropic_vector.sage tests/lattices/test_the_congruence_lift_of_a_pointwise_levi_isometry.sage tests/lattices/test_the_pointwise_levi_lift_of_an_odd_line.sage tests/lattices/test_the_levi_images_generators_by_schreier.sage tests/lattices/test_the_pointed_family_at_a_nonreflective_quotient.sage tests/lattices/test_the_parameter_lattice_of_the_unipotent_radical.sage tests/lattices/test_the_unipotent_radical_of_the_plane_is_measured.sage tests/lattices/test_the_stabilizer_generators_carry_the_radical.sage tests/lattices/test_the_parabolic_completeness_of_an_enriques_plane.sage tests/lattices/test_the_residue_actions_integral_membership.sage; inner 1800 s
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+time gates on: star import 1.47 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: asyncio-1.5.0, xdist-3.8.0, reportlog-1.0.0, platformdirs-4.13.5, hypothesis-6.170.15, anyio-4.15.1, timeout-2.4.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 49 items
+
+tests/lattices/test_the_zero_reductions_pointwise_levi_image.sage .      [  2%]
+tests/lattices/test_the_pointed_stabilizer_of_a_primitive_vector.sage .. [  6%]
+...........                                                              [ 28%]
+tests/lattices/test_the_pointwise_radical_of_a_divisible_isotropic_line.sage . [ 30%]
+..                                                                       [ 34%]
+tests/lattices/test_the_pointwise_radical_of_a_primitive_isotropic_line.sage . [ 36%]
+...                                                                      [ 42%]
+tests/lattices/test_the_public_pointed_family_of_a_divisible_odd_line.sage . [ 44%]
+.                                                                        [ 46%]
+tests/lattices/test_the_public_pointed_family_of_an_odd_isotropic_vector.sage . [ 48%]
+.                                                                        [ 51%]
+tests/lattices/test_the_congruence_lift_of_a_pointwise_levi_isometry.sage . [ 53%]
+..                                                                       [ 57%]
+tests/lattices/test_the_pointwise_levi_lift_of_an_odd_line.sage ..       [ 61%]
+tests/lattices/test_the_levi_images_generators_by_schreier.sage ..       [ 65%]
+tests/lattices/test_the_pointed_family_at_a_nonreflective_quotient.sage . [ 67%]
+                                                                         [ 67%]
+tests/lattices/test_the_parameter_lattice_of_the_unipotent_radical.sage . [ 69%]
+.....                                                                    [ 79%]
+tests/lattices/test_the_unipotent_radical_of_the_plane_is_measured.sage . [ 81%]
+..                                                                       [ 85%]
+tests/lattices/test_the_stabilizer_generators_carry_the_radical.sage .   [ 87%]
+tests/lattices/test_the_parabolic_completeness_of_an_enriques_plane.sage . [ 89%]
+...                                                                      [ 95%]
+tests/lattices/test_the_residue_actions_integral_membership.sage ..      [100%]
+
+=============================== time-gate report ===============================
+collection took 247.80 s; the measured ceiling is 6 s
+============================== slowest durations ===============================
+7.80s call     tests/lattices/test_the_unipotent_radical_of_the_plane_is_measured.sage::test_the_returned_family_reaches_the_radical_translation_rank
+4.50s call     tests/lattices/test_the_pointed_stabilizer_of_a_primitive_vector.sage::test_the_pointed_family_reaches_the_stabilizers_own_discriminant_image
+2.67s call     tests/lattices/test_the_pointed_stabilizer_of_a_primitive_vector.sage::test_the_coble_cusp_five_pointed_family_returns
+2.64s call     tests/lattices/test_the_pointed_stabilizer_of_a_primitive_vector.sage::test_the_pointed_family_fixes_its_vector_and_the_setwise_one_does_not
+2.50s call     tests/lattices/test_the_pointed_stabilizer_of_a_primitive_vector.sage::test_the_second_cusp_of_the_enriques_lattice_lifts_the_whole_quotient
+2.16s call     tests/lattices/test_the_parameter_lattice_of_the_unipotent_radical.sage::test_the_parameters_of_the_radical_transvections_lie_in_the_lattice
+2.11s call     tests/lattices/test_the_pointwise_radical_of_a_primitive_isotropic_line.sage::test_the_odd_nonreflective_line_has_an_integral_levi_lift
+2.02s call     tests/lattices/test_the_pointed_stabilizer_of_a_primitive_vector.sage::test_a_proper_pointwise_levi_image_still_has_the_full_finite_image
+2.00s call     tests/lattices/test_the_parabolic_completeness_of_an_enriques_plane.sage::test_the_split_plane_action_has_index_three
+0.96s call     tests/lattices/test_the_public_pointed_family_of_an_odd_isotropic_vector.sage::test_the_public_pointed_family_of_the_odd_nonreflective_lattice_returns
+0.81s call     tests/lattices/test_the_stabilizer_generators_carry_the_radical.sage::test_the_stabilizer_generators_carry_a_generating_family_of_the_radical
+0.77s call     tests/lattices/test_the_zero_reductions_pointwise_levi_image.sage::test_the_zero_reduction_has_a_trivial_pointwise_levi_image
+0.72s call     tests/lattices/test_the_pointed_stabilizer_of_a_primitive_vector.sage::test_the_primitive_isotropic_orbit_counts_are_the_card_rows
+0.71s call     tests/lattices/test_the_unipotent_radical_of_the_plane_is_measured.sage::test_every_returned_unipotent_generator_lies_in_the_radical
+0.63s call     tests/lattices/test_the_parabolic_completeness_of_an_enriques_plane.sage::test_the_plane_actions_at_p2_are_all_of_the_general_linear_group
+0.47s call     tests/lattices/test_the_parabolic_completeness_of_an_enriques_plane.sage::test_the_plane_that_does_not_split_is_complete_by_its_three_factors
+0.43s call     tests/lattices/test_the_parameter_lattice_of_the_unipotent_radical.sage::test_every_basis_vector_has_an_element_of_the_radical_over_it
+0.18s call     tests/lattices/test_the_residue_actions_integral_membership.sage::test_the_radical_crosses_into_the_rational_group_and_into_its_stabilizer
+0.17s call     tests/lattices/test_the_public_pointed_family_of_an_odd_isotropic_vector.sage::test_the_public_pointed_family_of_an_odd_line_carries_both_factors
+0.15s call     tests/lattices/test_the_public_pointed_family_of_a_divisible_odd_line.sage::test_the_public_pointed_family_of_an_odd_divisibility_two_line_answers
+0.14s call     tests/lattices/test_the_pointwise_radical_of_a_divisible_isotropic_line.sage::test_the_divisible_line_of_rank_two_quotient_has_its_radical
+0.12s call     tests/lattices/test_the_pointwise_radical_of_a_primitive_isotropic_line.sage::test_a_nonunimodular_quotient_still_presents_its_radical
+0.11s call     tests/lattices/test_the_pointwise_radical_of_a_divisible_isotropic_line.sage::test_the_odd_divisible_line_of_rank_one_quotient_has_its_radical
+0.11s call     tests/lattices/test_the_parabolic_completeness_of_an_enriques_plane.sage::test_the_split_representative_is_completed_by_the_same_construction
+0.10s call     tests/lattices/test_the_pointwise_radical_of_a_divisible_isotropic_line.sage::test_the_divisible_line_of_rank_one_quotient_has_its_radical
+0.09s call     tests/lattices/test_the_pointed_stabilizer_of_a_primitive_vector.sage::test_the_setwise_stabilizer_of_a_nonsingular_line_returns
+0.09s call     tests/lattices/test_the_pointed_stabilizer_of_a_primitive_vector.sage::test_the_hyperbolic_planes_pointed_stabilizer_is_trivial
+0.07s call     tests/lattices/test_the_pointed_stabilizer_of_a_primitive_vector.sage::test_a_summands_generator_keeps_its_complements_isometries
+0.07s call     tests/lattices/test_the_public_pointed_family_of_a_divisible_odd_line.sage::test_the_public_pointed_family_of_an_odd_divisibility_three_line_answers
+0.05s call     tests/lattices/test_the_pointwise_radical_of_a_primitive_isotropic_line.sage::test_the_odd_line_radical_is_generated_by_its_transvections
+0.05s call     tests/lattices/test_the_pointed_stabilizer_of_a_primitive_vector.sage::test_a_nonsingular_vector_in_an_odd_lattice_is_answered_here
+0.05s call     tests/lattices/test_the_pointwise_radical_of_a_primitive_isotropic_line.sage::test_an_odd_line_has_an_integral_eichler_transvection
+0.04s call     tests/lattices/test_the_congruence_lift_of_a_pointwise_levi_isometry.sage::test_the_divisibility_two_line_lifts_its_congruent_isometries
+0.04s call     tests/lattices/test_the_pointed_stabilizer_of_a_primitive_vector.sage::test_the_pointed_family_fills_the_levi_factor_of_its_parabolic
+0.03s call     tests/lattices/test_the_parameter_lattice_of_the_unipotent_radical.sage::test_the_centre_is_generated_over_the_vanishing_parameter
+0.03s call     tests/lattices/test_the_parameter_lattice_of_the_unipotent_radical.sage::test_the_parameters_of_the_third_and_fourth_vectors_of_the_quotient_lie_in_the_lattice
+0.03s call     tests/lattices/test_the_pointed_stabilizer_of_a_primitive_vector.sage::test_the_pointed_stabilizer_of_a_nonsingular_line_is_the_complement
+0.03s call     tests/lattices/test_the_congruence_lift_of_a_pointwise_levi_isometry.sage::test_the_rank_five_lattice_lifts_its_congruent_isometries
+0.02s call     tests/lattices/test_the_pointed_stabilizer_of_a_primitive_vector.sage::test_the_glue_of_the_hyperbolic_plane_keeps_only_the_exchange
+0.01s call     tests/lattices/test_the_unipotent_radical_of_the_plane_is_measured.sage::test_the_radical_has_rank_two_rank_k_plus_one
+0.01s call     tests/lattices/test_the_parameter_lattice_of_the_unipotent_radical.sage::test_the_decision_at_the_modulus_decides_the_whole_lattice
+0.01s call     tests/lattices/test_the_levi_images_generators_by_schreier.sage::test_the_divisibility_two_line_has_its_image_generators
+0.01s call     tests/lattices/test_the_congruence_lift_of_a_pointwise_levi_isometry.sage::test_the_odd_divisibility_two_line_lifts_its_congruent_isometries
+0.01s call     tests/lattices/test_the_pointwise_levi_lift_of_an_odd_line.sage::test_the_odd_divisibility_two_line_has_its_integral_levi_lifts
+0.01s call     tests/lattices/test_the_pointwise_levi_lift_of_an_odd_line.sage::test_the_odd_divisibility_three_line_has_its_integral_levi_lifts
+
+(102 durations < 0.005s hidden.  Use -vv to show these durations.)
+======================== 49 passed in 284.08s (0:04:44) ========================
+[peakrss] test603: child waited=1 shell_code=1 samples=158
+[peakrss] peak tree RSS      : 1653 MiB
+[peakrss] low-water MemAvail : 3940 MiB
+[peakrss] peak single VmHWM  : 1656 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     1645 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   296.6s procs=  3 rss=  1653 MiB hwm=  1656 MiB avail=  5861 MiB
+[peakrss]   t=   298.6s procs=  3 rss=  1653 MiB hwm=  1656 MiB avail=  6209 MiB
+[peakrss]   t=   278.6s procs=  3 rss=  1652 MiB hwm=  1654 MiB avail=  6329 MiB
+[peakrss]   t=   280.6s procs=  3 rss=  1652 MiB hwm=  1654 MiB avail=  6342 MiB
+[peakrss]   t=   282.6s procs=  3 rss=  1652 MiB hwm=  1654 MiB avail=  6350 MiB
+test exit: 1
