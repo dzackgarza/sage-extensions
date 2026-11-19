@@ -1,49 +1,61 @@
-# #603: the divisibility-2 cusp — the degenerate blocker is gone, the construction is not written
+# #603: the divisibility-2 cusp — what is established, and the corrected route
 
-Status: **the construction named in the last report is still not delivered.** What
-changed is the blocker: the last note said the degenerate lattice `J = v^\perp`
-"needs its own class model". It does not, and this is the check.
+Status: **the construction is still not delivered.** This note corrects the
+route the previous note claimed and records the measurements taken; it does not
+claim an item met.  Everything is on the adopted runtime in a worktree of
+`main = 25d2190` (tree bound at `/repos/sage-extensions`, the port at `/work`).
 
-Every measurement is on the adopted runtime in a worktree of `main = f6c4f9c`
-(tree bound at `/repos/sage-extensions`, the port at `/work`).
+## Retraction: the rank-two fixed part is not the repair
 
-## J splits, and the split is nondegenerate
+The previous note said the repair was "one generalization" of the non-isotropic
+construction — its fixed part from rank one to rank two over `L_0 = <v, w> + K~`.
+That is wrong, and here is where it breaks.  An isometry `g` with `g(v) = v`
+sends `w` to `w + z` with `z in J = v^\perp`, because `b(v, .)` is preserved and
+`J` is exactly the kernel of `b(v, .)`.  So `g(L_0)` is not `L_0`, and
+"`(1 + sigma)(H) = H` for `H = L/L_0`" is neither necessary nor sufficient for
+`sigma` to lie in `M_I = rho(P_I)`.  The argument of the non-isotropic case needs
+`g` to fix the *whole* reference lattice pointwise; at an isotropic vector it does
+not, and the shift is precisely the unipotent radical that the rank-one
+construction carries as its kernel factor.
 
-For a primitive isotropic `v` with `d = div(v)`: `J = v^\perp` has rank `n-1` and
-radical `Zv`, `K_I = J/Zv`, and `J -> K_I` splits *as lattices*: a section
-`s: K_I -> J` gives `K~ = s(K_I)` with `b(s(x), s(y)) = b_{K_I}(x, y)` because the
-radical `Zv` is orthogonal to all of `J`.  Pick `w` with `b(v, w) = d` (integer
-solve of the pairing row against `d`), and
+The splitting itself stands (it was verified: `K~` is isometric to `K_I`, and
+`(v, w, K~)` has full rank with nonzero determinant on both `0125` and `026E`),
+but it gives a nondegenerate `L_0`, not the criterion.
 
-    L_0 = <v, w> + K~
+## What the membership needs
 
-is a **nondegenerate** sublattice of `L` of finite index.  Verified on both cusps:
+`M_I = rho(P_I)` is *decided* elementwise by
+`IsotropicReductions._levi_image_contains` (`lattices.py:13185`), at rank one by
+the emptiness of the two lift fibres over a complete residue system, and the
+exactly-sequenced statement is
+`P_I^1 = <lifts of M_I> * <unipotent_kernel>` (`RankOneParabolicLeviExactSequence`).
+What is missing is a *presentation* of `M_I` as the stabilizer of a point in a
+finite set, which is the input the Schreier step consumes.  A fibre is a torsor
+over a finite residue set, so the presentation is available in principle — as the
+action of `P_I` on the finite set of transport residues — and that is the piece
+still to be written.
 
-| lattice, vector | `d` | `K~` isometric to `K_I` | rank of `(v, w, K~)` | `det L_0` |
-| --- | --- | --- | --- | --- |
-| card `0125` = `U(2) + E8(-2)` at `2e_1` | 2 | yes, all 64 pairings | 10 / 10 | `-1024` |
-| card `026E` = `U + D4(-1) + A1(-1)` at `e_1` | 1 | yes, all 25 pairings | 7 / 7 | `8` |
+## Measurements this turn
 
-So the Smith-form class model the non-isotropic construction already uses — which
-inverts `L_0`'s Gram matrix — applies verbatim at an isotropic vector.  The
-`A_{L_0}` classes, the gluing subgroup `H = L/L_0`, and the orbit of `H` under
-`O(K~)` are all computed exactly as they are for a non-isotropic vector.
+`N = U + U(2) + E8(-2)`, card `029J`:
 
-## What the construction still needs
+| call | result |
+| --- | --- |
+| `N.discriminant_representation_is_surjective_by_theorem()` | `True`: `rho(O(N)) = O(A_N)`, so an index in `O(A_N)` is an index in the image |
+| `A_N` | `(Z/2)^10`, `|A_N| = 1024` |
+| `|O(A_N)|` | `46998591897600 = 2^21 * 3^5 * 5^2 * 7 * 17 * 31` |
+| setwise line family at `L_1 = Ze_1` (the #459 construction) | 26 members in **16.0 s**; image with `-id` has order `|O(A_N)|`, **index 1** — the card's `L_1` value, by an owned route and not by the pointed family |
+| setwise line family at `L_2 = Ze_3` | **not returned** in 4 min (stopped) |
+| `stabilizer_discriminant_image()` at `L_1` (the #312 route) | **not returned** in 5 min (stopped) |
+| pointed call at `L_2` (earlier rounds) | **not returned** in 400 s, twice |
+| pointed call at `0125`'s two hyperbolic generators (earlier) | 72.4 s and 105.5 s |
 
-`Stab(v) = {sigma in O(K~) : (1_{<v,w>} + sigma)(H) = H}`, i.e. the *same*
-construction with a **rank-two fixed part** (currently rank one) whose Gram is
-nondegenerate but has nonzero off-diagonal `b(v, w) = d`.  Concretely: the
-projection of a vector onto `<v, w> ⊗ Q` in
-`_nonisotropic_pointed_stabilizer_generators` is `c = b(x,v)/b(v,v)`, which needs
-`b(v,v) != 0`; for a rank-two fixed part it is `x_H = b(x, -) G_H^{-1}` on the
-`2 x 2` Gram `G_H`, and the rest of the code — the classes, the orbit, the
-Schreier family, the extension formula, the integrality check — is unchanged.
+So the card's `L_1` index is reproduced by `rho` of #459's own family with
+`rho` surjective by theorem — the cheap and owned half — and the discriminating
+`L_2` index, 527, is blocked at the same place from three different directions:
+the parabolic's `O(K_I)`, its setwise family, and its #312 image all stall at a
+divisibility-2 cusp with `K_I` of rank 10.  That is one blocker, not three, and
+it is `O(K_I)`'s own generating family.
 
-That is one generalization, not a new class model, and it is the repair: it makes
-`0125`'s two hyperbolic cusps and `029J`'s `L_2` answer from the construction
-instead of the port, and with them the card's discriminating index 527.
-
-Not written here: the generalization needs its own validation cycle, and each
-probe of the current path costs 72 s on `0125` and did not return on `029J`'s
-`L_2` in 400 s.  Nothing was changed to make a number look better.
+Nothing here was changed to make a number look better; no test asserts a value
+that was not measured.
