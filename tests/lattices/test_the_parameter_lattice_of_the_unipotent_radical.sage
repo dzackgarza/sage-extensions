@@ -185,6 +185,48 @@ def test_the_first_two_vectors_of_the_quotient_have_no_lift() -> None:
             )
 
 
+def test_the_decision_at_the_modulus_decides_the_whole_lattice() -> None:
+    r"""The class counts are exhaustive at the modulus, and the lattice is closed under addition.
+
+    `unipotent_parameter_modulus` is the modulus at which the two block
+    equations depend only on the parameter's class, so deciding every class
+    there decides the lattice and not a sample of it; the counts reported are
+    that decision's.  The addition checked here is the one the returned basis
+    needs: each basis vector lifts, and so does the sum of any two of them, so
+    the lattice those vectors span is a lattice of parameters rather than a
+    list of them.
+    """
+    plane = _second_representative(NamedLattices.TEn)
+    order = _coordinate_count(plane)
+    modulus, classes, admissible = plane.unipotent_parameter_class_counts()
+    parameters = plane.unipotent_parameter_lattice()
+
+    assert cardinal(classes) == cardinal(modulus) ** order
+    assert cardinal(sum(1 for _ in parameters)) == order
+    assert cardinal(admissible) < cardinal(classes)
+    assert cardinal(admissible) > cardinal(1)
+
+    lifted = tuple(
+        plane.unipotent_parameter_from_coordinates(
+            tuple(1 if position == index else 0 for position in range(order))
+        )
+        for index in range(order)
+    )
+    for parameter in lifted:
+        assert plane.unipotent_parameter_lifts(
+            plane.unipotent_parameter_matrix(parameter)
+        ) is True
+    for first in range(order):
+        for second in range(first + 1, order):
+            total = tuple(
+                left + right
+                for left, right in zip(lifted[first], lifted[second], strict=True)
+            )
+            assert plane.unipotent_parameter_lifts(
+                plane.unipotent_parameter_matrix(total)
+            ) is True
+
+
 def test_the_centre_is_generated_over_the_vanishing_parameter() -> None:
     r"""The centre's generator has vanishing parameter, translates nothing, and is not the identity.
 
