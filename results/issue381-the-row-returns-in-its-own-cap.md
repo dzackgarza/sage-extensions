@@ -1,5 +1,12 @@
 # The 600 s is a probe's cap: the row returns in its own, at 8.6 ms a plane
 
+> **The rate stands; the return does not.** The 8.6 ms a plane and the caps are
+> measured and unchanged, but the row that returned on `8c094f8` now refuses at
+> its first relation record on the current head -- see
+> `issue381-neither-kernel-row-returns-on-this-head.md`.  The 7.35 ms attribution
+> in this note still reproduces (both kernel rows split 189 721 planes at
+> 6.9-7.1 ms a plane).
+
 This note corrects the cost model two records carry
 (`issue381-the-per-plane-half.md`, and the handover that followed it), and it
 does so from a log already on `main`.  The model says the `Otilde` kernel row of

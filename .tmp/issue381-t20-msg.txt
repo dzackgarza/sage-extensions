@@ -1,0 +1,36 @@
+results: neither kernel row returns on this head -- Otilde refuses too (#381)
+
+The open question was whether Otilde's relation read refuses at its first record
+as Otilde+'s did.  Third attempt, host quiet (oom_kill 149 before and after),
+driver caps, 6144 MiB guard (row-otilde.log):
+
+  [1793.1 s rss 3220.6 MiB] the split: 180000 planes registered
+  [Otilde] error: the line of the covering flag ... lies in 2 line cusps ...
+  [1978.5 s rss 3496.2 MiB] done: 189721 planes, 0 records
+
+It refuses, at a bucket of 2 where Otilde+ refused at 4: the coverings differ
+because K = Gamma cap Pi differs, and they land in different fibres of the same
+key.
+
+  Otilde   189721 planes, 1793.1 s, peak 3514 MiB, 0 records, refused at 2
+  Otilde+  189721 planes, 1723.9 s, peak 3556 MiB, 1 record,  refused at 4
+
+So #381's returned row is stale.  Section 10 of
+issue381-the-plane-rows-per-plane-cost.md records Otilde deciding 569160 edges in
+2119.1 s on 8c094f8; the read that now refuses is newer, 9ae39a1 being a
+descendant of the evidence commit 3a4a210.  On this head the same row, caps and
+lattice produce no relation at all -- a lost answer, not a wrong one, and a
+regression with a clear owner.
+
+It is correctly refused given the key: the key is equivocal on 24 of 444 classes
+at T_Co and injective on every affordable lattice, so no route in the tree
+decides these rows on this head -- the divided-class read refuses, the
+transporter route is priced at about 368 days at the floor, and a finer invariant
+has no red test.
+
+Both records that assert the return are marked in place with what reproduces and
+what does not.
+
+No object introduced: the key, the double cosets and the fibre are Dutour
+Sikiric--Hulek, arXiv:2302.01679v2, Lemma 3.6, printed p. 22, and the figures are
+a log's.

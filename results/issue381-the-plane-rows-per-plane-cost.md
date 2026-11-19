@@ -289,6 +289,14 @@ here when it returns.
 
 ## 10. The row returns
 
+> **Superseded on the current head.** This section's return was measured on
+> `8c094f8`.  On `ba0ffa7`'s line at `b35da4c` the same row, caps and lattice
+> build the same 189 721 planes and then **refuse** at their first relation
+> record (`2 line cusps`), with 0 records; see
+> `issue381-neither-kernel-row-returns-on-this-head.md`.  The split half below
+> still reproduces (1 793.1 s, 3 220.6 MiB at 180 000 planes against 1 901.6 s
+> and 3 152.8 MiB here).
+
 `Otilde(T_Co)`'s kernel incidence row **decided** on `main` `8c094f8`, one
 process, the driver's own caps (10800 s a row, 28800 s a run), launched at
 11:12:35 UTC on 9 775 MiB of `MemAvailable` (`row-Otilde-window.log`):

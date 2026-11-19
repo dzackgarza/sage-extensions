@@ -1,0 +1,64 @@
+tree SHA: 4dcb745ff89974a1462a546dd381773abe1d1fde (modified paths: 0)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 1.56 1.78 2.75 5/526 3841040
+probe: .tmp/issue381b/probe-row.py; inner 11400 s
+[      0.0 s rss    271.1 MiB] Otilde: the driver's own row
+the lattice Integral lattice of rank 11 and signature (2, 9) of rank 11
+the rows ('Otilde',)
+[Otilde] the row's route: divided-class, as the run asked (decided in 0.0 s)
+[    431.2 s rss   1463.5 MiB] the split: 10000 planes registered
+[    508.5 s rss   1622.1 MiB] the split: 20000 planes registered
+[    580.7 s rss   1198.9 MiB] the split: 30000 planes registered
+[    646.8 s rss   1261.5 MiB] the split: 40000 planes registered
+[    716.8 s rss   1418.1 MiB] the split: 50000 planes registered
+[    788.2 s rss   1543.2 MiB] the split: 60000 planes registered
+[    860.1 s rss   1683.2 MiB] the split: 70000 planes registered
+[    985.1 s rss   1810.1 MiB] the split: 80000 planes registered
+[   1114.7 s rss   1980.1 MiB] the split: 90000 planes registered
+[   1205.6 s rss   2153.5 MiB] the split: 100000 planes registered
+[   1276.7 s rss   2285.2 MiB] the split: 110000 planes registered
+[   1350.1 s rss   2368.6 MiB] the split: 120000 planes registered
+[   1424.6 s rss   2549.3 MiB] the split: 130000 planes registered
+[   1490.4 s rss   2675.8 MiB] the split: 140000 planes registered
+[   1568.6 s rss   2781.8 MiB] the split: 150000 planes registered
+[   1643.2 s rss   2968.8 MiB] the split: 160000 planes registered
+[   1711.5 s rss   3025.3 MiB] the split: 170000 planes registered
+[   1793.1 s rss   3220.6 MiB] the split: 180000 planes registered
+Traceback (most recent call last):
+  File "/repos/sage-extensions/tests/coble_gamma_co_2_incidence_rows.py", line 721, in run_row
+    incidences = tuple(row_relation(subgroup, taken))
+                       ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/repos/sage-extensions/tests/coble_gamma_co_2_incidence_rows.py", line 477, in row_relation
+    return subgroup.tits_building_incidence_by_divided_classes()
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 1259, in tits_building_incidence_by_divided_classes
+    for _plane_cusp, entries in self.divided_class_incidence_of_planes(self.cusps(2)):
+                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 1552, in _divided_class_edges_per_plane
+    entries = self._divided_class_edges_at_plane(
+        lattice,
+    ...<7 lines>...
+        transport_checked,
+    )
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 1486, in _divided_class_edges_at_plane
+    raise ArithmeticError(
+    ...<5 lines>...
+    )
+ArithmeticError: the line of the covering flag Primitive totally isotropic flag of length 2 in Integral lattice of rank 11 and signature (2, 9) carried to Rank-2 cusp of {g in Orthogonal group O(Integral lattice of rank 11 and signature (2, 9)) : rho_L(g) lies in a subgroup given by its own generators} in Integral lattice of rank 11 and signature (2, 9) lies in 2 line cusps of {g in Orthogonal group O(Integral lattice of rank 11 and signature (2, 9)) : rho_L(g) lies in a subgroup given by its own generators} (Rank-1 cusp of {g in Orthogonal group O(Integral lattice of rank 11 and signature (2, 9)) : rho_L(g) lies in a subgroup given by its own generators} in Integral lattice of rank 11 and signature (2, 9), Rank-1 cusp of {g in Orthogonal group O(Integral lattice of rank 11 and signature (2, 9)) : rho_L(g) lies in a subgroup given by its own generators} in Integral lattice of rank 11 and signature (2, 9)): the finite image does not separate this line's cusp from the others, and no edge is read from class data that names more than one vertex; tits_building_incidence decides it with a transporter
+[Otilde] error: the row step raised ArithmeticError: the line of the covering flag Primitive totally isotropic flag of length 2 in Integral lattice of rank 11 and signature (2, 9) carried to Rank-2 cusp of {g in Orthogonal group O(Integral lattice of rank 11 and signature (2, 9)) : rho_L(g) lies in a subgroup given by its own generators} in Integral lattice of rank 11 and signature (2, 9) lies in 2 line cusps of {g in Orthogonal group O(Integral lattice of rank 11 and signature (2, 9)) : rho_L(g) lies in a subgroup given by its own generators} (Rank-1 cusp of {g in Orthogonal group O(Integral lattice of rank 11 and signature (2, 9)) : rho_L(g) lies in a subgroup given by its own generators} in Integral lattice of rank 11 and signature (2, 9), Rank-1 cusp of {g in Orthogonal group O(Integral lattice of rank 11 and signature (2, 9)) : rho_L(g) lies in a subgroup given by its own generators} in Integral lattice of rank 11 and signature (2, 9)): the finite image does not separate this line's cusp from the others, and no edge is read from class data that names more than one vertex; tits_building_incidence decides it with a transporter
+[   1978.5 s rss   3496.1 MiB] the driver returned 4
+[   1978.5 s rss   3496.2 MiB] done: 189721 planes, 0 records
+[peakrss] probe603: child waited=0 shell_code=0 samples=1010
+[peakrss] peak tree RSS      : 3514 MiB
+[peakrss] low-water MemAvail : 816 MiB
+[peakrss] peak single VmHWM  : 3520 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     3510 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=  1879.9s procs=  3 rss=  3514 MiB hwm=  3520 MiB avail=  5265 MiB
+[peakrss]   t=  1982.0s procs=  3 rss=  3503 MiB hwm=  3520 MiB avail=  3533 MiB
+[peakrss]   t=  1984.0s procs=  3 rss=  3499 MiB hwm=  3520 MiB avail=  3515 MiB
+[peakrss]   t=  1986.0s procs=  3 rss=  3499 MiB hwm=  3520 MiB avail=  3448 MiB
+[peakrss]   t=  2004.1s procs=  3 rss=  3491 MiB hwm=  3520 MiB avail=  2825 MiB
+probe exit: 0
