@@ -1,0 +1,41 @@
+results: Otilde+'s row raised -- the divided-class key is not complete at T_Co (#381)
+
+The confirming run went out on 8683 MiB of MemAvailable and came back with a
+refusal.  Otilde+ at T_Co, driver caps, 6144 MiB guard (row-otildeplus.log):
+
+  [1723.9 s] the split: 180000 planes registered
+  [Otilde+] error: the line of the covering flag ... carried to Rank-2 cusp ...
+    lies in 4 line cusps ...: the finite image does not separate this line's
+    cusp from the others ...
+  [1908.4 s rss 3549.3 MiB] done: 189721 planes, 1 records
+
+So the split finished at 189721 planes -- the count the last two notes predicted
+-- at 7.05 ms a plane and 3556 MiB, and the relation built one record and
+refused.
+
+Why: the key is _isotropic_line_image_key, the rho(Gamma)-orbit of the line's
+class pair, an invariant of the subgroup's orbits (Dutour Sikiric--Hulek,
+arXiv:2302.01679v2, Lemma 3.6, printed p. 22).  Measured on both rows
+(line-cusps.log):
+
+  Otilde   527 line cusps, 444 distinct keys, 24 keys name more than one cusp
+  Otilde+  527 line cusps, 444 distinct keys, 24 keys name more than one cusp
+           largest buckets 15, 12, 12, 11, 11, 9, 3, 2 -- identical
+
+The key separates cusps only partly, and it does so equally badly for both rows.
+The read refuses rather than guessing, and names the transporter route that
+decides such an edge.
+
+That refutes the previous note's step from "the vertices are the same" to "the
+relation is the same"; its vertex half stands (527 and 189720, now measured on
+Otilde+ directly).  The note is marked superseded in part.
+
+The larger finding is provenance: the Otilde row that returned ran on 8c094f8,
+and 9ae39a1 -- the divided-class relation decides its planes as they are reached
+-- is a descendant of the evidence commit 3a4a210.  So on this head the route is
+untested for Otilde too, and with identical cusp sets and keys it is expected to
+refuse at the same place.  That is a prediction; one run of Otilde on this head
+is what would settle it.
+
+No object introduced: the key is the library's, the orbit-coset correspondence is
+Lemma 3.6's, and the counts are the library's own.

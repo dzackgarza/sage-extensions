@@ -1,0 +1,26 @@
+tree SHA: 67c2d8704ca077d08185e731e60204c3ccd0f043 (modified paths: 0)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 5.60 2.68 2.79 8/548 3755818
+probe: .tmp/issue381-t16/probe-line-cusps.py; inner 1800 s
+[    4.37s] lattice: rank 11, signature (2, 9)
+[  265.86s] Otilde: 527 line cusps in 261.49 s
+[  265.86s] Otilde: image labels ['discriminant']
+[  270.02s] Otilde: 444 distinct keys in 4.16 s; largest buckets [15, 12, 12, 11, 11, 9, 3, 2]; 24 keys name more than one cusp
+[  373.08s] Otilde+: 527 line cusps in 103.06 s
+[  373.08s] Otilde+: image labels ['discriminant', 'spinor']
+[  377.44s] Otilde+: 444 distinct keys in 4.35 s; largest buckets [15, 12, 12, 11, 11, 9, 3, 2]; 24 keys name more than one cusp
+[  377.44s] done
+[peakrss] probe603: child waited=0 shell_code=0 samples=193
+[peakrss] peak tree RSS      : 845 MiB
+[peakrss] low-water MemAvail : 2987 MiB
+[peakrss] peak single VmHWM  : 851 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      840 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   286.4s procs=  3 rss=   845 MiB hwm=   851 MiB avail=  5681 MiB
+[peakrss]   t=   380.5s procs=  3 rss=   791 MiB hwm=   851 MiB avail=  3000 MiB
+[peakrss]   t=   356.4s procs=  3 rss=   789 MiB hwm=   851 MiB avail=  3517 MiB
+[peakrss]   t=   384.5s procs=  3 rss=   788 MiB hwm=   851 MiB avail=  4884 MiB
+[peakrss]   t=   354.4s procs=  3 rss=   787 MiB hwm=   851 MiB avail=  3590 MiB
+probe exit: 0

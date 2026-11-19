@@ -1,5 +1,12 @@
 # The two kernel rows carry one relation, and `Otilde+`'s is `Otilde`'s
 
+> **Superseded in part.** The rows' *vertex* half stands and is measured on both
+> rows (527 line cusps, 189 720 plane cusps).  The step from the vertices to the
+> relation does not: `Otilde+`'s row, run on `bb57ca7`'s line at `67c2d87`'s
+> tree, raised in the divided-class edge read because 24 of the 444 keys name
+> more than one line cusp -- for `Otilde` as well.  See
+> `issue381-the-divided-class-read-raises-at-tco.md`.
+
 Last round's note decided `Otilde+`'s cusp **counts** from the sign predicate.
 This one decides something stronger and cheaper to check: the two kernel rows
 have the same **cusps and the same incidence relation**, so `Otilde+`'s row is

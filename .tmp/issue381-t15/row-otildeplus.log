@@ -1,0 +1,64 @@
+tree SHA: 67c2d8704ca077d08185e731e60204c3ccd0f043 (modified paths: 0)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 1.25 1.51 2.19 3/522 3723499
+probe: .tmp/issue381-t15/probe-row-otildeplus.py; inner 11400 s
+[      0.0 s rss    296.5 MiB] Otilde+: the driver's own row
+the lattice Integral lattice of rank 11 and signature (2, 9) of rank 11
+the rows ('Otilde+',)
+[Otilde+] the row's route: divided-class, as the run asked (decided in 0.0 s)
+[    446.4 s rss   1147.1 MiB] the split: 10000 planes registered
+[    524.7 s rss    960.8 MiB] the split: 20000 planes registered
+[    596.4 s rss   1116.7 MiB] the split: 30000 planes registered
+[    671.4 s rss   1284.1 MiB] the split: 40000 planes registered
+[    737.2 s rss   1400.4 MiB] the split: 50000 planes registered
+[    802.7 s rss   1557.3 MiB] the split: 60000 planes registered
+[    869.6 s rss   1692.9 MiB] the split: 70000 planes registered
+[    937.5 s rss   1843.5 MiB] the split: 80000 planes registered
+[   1013.5 s rss   1993.5 MiB] the split: 90000 planes registered
+[   1127.2 s rss   2118.2 MiB] the split: 100000 planes registered
+[   1220.5 s rss   2212.9 MiB] the split: 110000 planes registered
+[   1306.3 s rss   2372.1 MiB] the split: 120000 planes registered
+[   1377.8 s rss   2559.8 MiB] the split: 130000 planes registered
+[   1442.1 s rss   2626.7 MiB] the split: 140000 planes registered
+[   1514.3 s rss   2771.0 MiB] the split: 150000 planes registered
+[   1577.0 s rss   2935.6 MiB] the split: 160000 planes registered
+[   1651.8 s rss   3007.8 MiB] the split: 170000 planes registered
+[   1723.9 s rss   3204.8 MiB] the split: 180000 planes registered
+Traceback (most recent call last):
+  File "/repos/sage-extensions/tests/coble_gamma_co_2_incidence_rows.py", line 721, in run_row
+    incidences = tuple(row_relation(subgroup, taken))
+                       ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/repos/sage-extensions/tests/coble_gamma_co_2_incidence_rows.py", line 477, in row_relation
+    return subgroup.tits_building_incidence_by_divided_classes()
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 1259, in tits_building_incidence_by_divided_classes
+    for _plane_cusp, entries in self.divided_class_incidence_of_planes(self.cusps(2)):
+                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 1552, in _divided_class_edges_per_plane
+    entries = self._divided_class_edges_at_plane(
+        lattice,
+    ...<7 lines>...
+        transport_checked,
+    )
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 1486, in _divided_class_edges_at_plane
+    raise ArithmeticError(
+    ...<5 lines>...
+    )
+ArithmeticError: the line of the covering flag Primitive totally isotropic flag of length 2 in Integral lattice of rank 11 and signature (2, 9) carried to Rank-2 cusp of {g in Orthogonal group O(Integral lattice of rank 11 and signature (2, 9)) : g lies in every selected subgroup} in Integral lattice of rank 11 and signature (2, 9) lies in 4 line cusps of {g in Orthogonal group O(Integral lattice of rank 11 and signature (2, 9)) : g lies in every selected subgroup} (Rank-1 cusp of {g in Orthogonal group O(Integral lattice of rank 11 and signature (2, 9)) : g lies in every selected subgroup} in Integral lattice of rank 11 and signature (2, 9), Rank-1 cusp of {g in Orthogonal group O(Integral lattice of rank 11 and signature (2, 9)) : g lies in every selected subgroup} in Integral lattice of rank 11 and signature (2, 9), Rank-1 cusp of {g in Orthogonal group O(Integral lattice of rank 11 and signature (2, 9)) : g lies in every selected subgroup} in Integral lattice of rank 11 and signature (2, 9), Rank-1 cusp of {g in Orthogonal group O(Integral lattice of rank 11 and signature (2, 9)) : g lies in every selected subgroup} in Integral lattice of rank 11 and signature (2, 9)): the finite image does not separate this line's cusp from the others, and no edge is read from class data that names more than one vertex; tits_building_incidence decides it with a transporter
+[Otilde+] error: the row step raised ArithmeticError: the line of the covering flag Primitive totally isotropic flag of length 2 in Integral lattice of rank 11 and signature (2, 9) carried to Rank-2 cusp of {g in Orthogonal group O(Integral lattice of rank 11 and signature (2, 9)) : g lies in every selected subgroup} in Integral lattice of rank 11 and signature (2, 9) lies in 4 line cusps of {g in Orthogonal group O(Integral lattice of rank 11 and signature (2, 9)) : g lies in every selected subgroup} (Rank-1 cusp of {g in Orthogonal group O(Integral lattice of rank 11 and signature (2, 9)) : g lies in every selected subgroup} in Integral lattice of rank 11 and signature (2, 9), Rank-1 cusp of {g in Orthogonal group O(Integral lattice of rank 11 and signature (2, 9)) : g lies in every selected subgroup} in Integral lattice of rank 11 and signature (2, 9), Rank-1 cusp of {g in Orthogonal group O(Integral lattice of rank 11 and signature (2, 9)) : g lies in every selected subgroup} in Integral lattice of rank 11 and signature (2, 9), Rank-1 cusp of {g in Orthogonal group O(Integral lattice of rank 11 and signature (2, 9)) : g lies in every selected subgroup} in Integral lattice of rank 11 and signature (2, 9)): the finite image does not separate this line's cusp from the others, and no edge is read from class data that names more than one vertex; tits_building_incidence decides it with a transporter
+[   1908.4 s rss   3549.3 MiB] the driver returned 4
+[   1908.4 s rss   3549.3 MiB] done: 189721 planes, 1 records
+[peakrss] probe603: child waited=0 shell_code=0 samples=966
+[peakrss] peak tree RSS      : 3556 MiB
+[peakrss] low-water MemAvail : 1753 MiB
+[peakrss] peak single VmHWM  : 3562 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     3551 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=  1911.7s procs=  3 rss=  3556 MiB hwm=  3562 MiB avail=  5611 MiB
+[peakrss]   t=  1913.7s procs=  3 rss=  3556 MiB hwm=  3562 MiB avail=  5591 MiB
+[peakrss]   t=  1915.7s procs=  3 rss=  3556 MiB hwm=  3562 MiB avail=  5589 MiB
+[peakrss]   t=  1917.7s procs=  3 rss=  3556 MiB hwm=  3562 MiB avail=  5590 MiB
+[peakrss]   t=  1919.7s procs=  3 rss=  3556 MiB hwm=  3562 MiB avail=  5519 MiB
+probe exit: 0
