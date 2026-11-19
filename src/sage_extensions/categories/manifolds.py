@@ -748,26 +748,41 @@ def _engine_section_expression(value):
 
 
 def _composed_ambient_transition(manifold, source_label, target_label):
-    r"""The change from ``source_label`` to ``target_label``, stated directly or through one chart.
+    r"""The change from ``source_label`` to ``target_label`` along a chain of stated changes, or ``None``.
 
-    A manifold states the changes between the charts it has them for, and two charts
-    of one atlas are related by composing changes through a third
-    (:meth:`ManifoldAtlasTransition.then`).  A chart another construction registered
-    may meet a chart whose change to it was never stated, and the composition is the
-    change the atlas has; ``None`` says there is none through one chart either.
+    The changes an atlas states generate a relation between the charts it carries:
+    two charts joined by a chain of stated changes are related by composing them
+    step by step, ``(phi_t o phi_c^{-1}) o (phi_c o phi_s^{-1})``
+    (:meth:`ManifoldAtlasTransition.then`; Lee, *Introduction to Smooth Manifolds*,
+    2nd ed., Ch. 1).  A chart another construction registered may meet only the
+    chart it was cut from, so the chain can be longer than one step -- a chart cut
+    on the north chart and one cut on the south chart are joined through both
+    stereographic charts -- and the composition along the shortest such chain is
+    the change the atlas has.  ``None`` says no chain joins them.
     """
     if (source_label, target_label) in manifold._preamble_transitions:
         return manifold.transition(source_label, target_label)
-    for middle_label in manifold.chart_labels():
-        if middle_label in (source_label, target_label):
-            continue
-        if (source_label, middle_label) not in manifold._preamble_transitions:
-            continue
-        if (middle_label, target_label) not in manifold._preamble_transitions:
-            continue
-        return manifold.transition(source_label, middle_label).then(
-            manifold.transition(middle_label, target_label)
-        )
+    stated = tuple(manifold._preamble_transitions)
+    reached = {source_label: None}
+    frontier = [source_label]
+    while frontier:
+        following = []
+        for label in frontier:
+            for left, right in stated:
+                if left != label or right in reached:
+                    continue
+                reached[right] = label
+                if right == target_label:
+                    chain = [right]
+                    while reached[chain[-1]] is not None:
+                        chain.append(reached[chain[-1]])
+                    chain.reverse()
+                    change = manifold.transition(chain[0], chain[1])
+                    for step in range(1, len(chain) - 1):
+                        change = change.then(manifold.transition(chain[step], chain[step + 1]))
+                    return change
+                following.append(right)
+        frontier = following
     return None
 
 
@@ -1840,7 +1855,9 @@ class TopologicalManifolds(OwnedCategory):
                     nonvanishing=tuple(
                         condition
                         for base in bases
-                        for condition in self.transition(base, label).target_overlap()
+                        for condition in _composed_ambient_transition(
+                            self, base, label
+                        ).target_overlap()
                     ),
                 )
             for source_label in tuple(domain.chart_labels()):
