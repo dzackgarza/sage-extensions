@@ -1748,6 +1748,44 @@ def infinite_cyclic_normalizer(group, isometry):
     return _infinite_order_centralizer_generators(group, isometry), inversion
 
 
+def _compact_cyclotomic_centralizer_generators(group, isometry):
+    r"""Complete integral centralizer when its rational adjoint group is compact.
+
+    The underlying trace lattice may be indefinite: a cyclotomic Hermitian
+    form can have different definite signs at distinct real embeddings.
+    The existing commutant's involution trace form detects compactness;
+    when positive definite, its exact finite short-vector enumeration
+    contains *every* integral centralizing isometry, not just an image.
+    Return ``None`` precisely when the commutant is noncompact.
+    """
+    from sage.matrix.constructor import matrix
+    from sage.rings.integer_ring import ZZ as SageZZ
+    from sage_extensions.algebras.isometry_commutant import IsometryCommutant
+
+    lattice = group.lattice()
+    basis = tuple(lattice.module_generators())
+    labels = tuple(lattice.module_generating_set())
+    gram = matrix(SageZZ, [[int(lattice.b(x, y)) for y in basis] for x in basis])
+    columns = matrix(SageZZ, [
+        [int(isometry(point).to_vector()(label)) for point in basis]
+        for label in labels
+    ])
+    commutant = IsometryCommutant(gram, (columns,))
+    if not commutant.is_compact():
+        return None
+    return tuple(
+        group({
+            label: sum(
+                (lattice.scalar_multiple(int(entry), point)
+                 for entry, point in zip(element.column(j), basis, strict=True) if entry),
+                lattice.zero(),
+            )
+            for j, label in enumerate(labels)
+        })
+        for element in commutant.compact_centralizer_elements()
+    )
+
+
 def _arithmetic_centralizer_group_generators(centralizer):
     r"""Compute a generating set of ``Z = Z_{O(L)}(f)`` for ``f`` of finite order.
 
@@ -1766,9 +1804,10 @@ def _arithmetic_centralizer_group_generators(centralizer):
       commit ``d135b70b``, ``lattices_with_isometry.jl:1737-1744``.
     - ``f`` of infinite order: the commutant algebra of ``f``, through
       :class:`~sage_extensions.algebras.isometry_commutant.IsometryCommutant`.
-    - One summand with ``d > 2`` of larger hermitian rank in an indefinite
-      ``L``: no route computes generators of its unitary group.  That frontier
-      asserts.
+    - A higher-rank cyclotomic unitary group which is definite at each real
+      place, even with mixed signs: enumerate the compact integral commutant.
+    - A noncompact cyclotomic unitary group without a recognized model
+      remains outside the implemented arithmetic generator algorithms.
     """
     from sage.rings.infinity import Infinity
 
@@ -1819,12 +1858,16 @@ def _arithmetic_centralizer_group_generators(centralizer):
             hyperbolic := _hyperbolic_unitary_generators(group, isometry, divisor)
         ) is not None:
             generators = hyperbolic
+        case (divisor,) if (
+            compact := _compact_cyclotomic_centralizer_generators(group, isometry)
+        ) is not None:
+            generators = compact
         case (divisor,):
             assert False, (
                 f"the centralizer of {isometry} in {group} is the unitary group of {lattice} "
                 f"as a hermitian lattice over ZZ[zeta_{divisor}], on which {isometry} acts "
-                f"by zeta_{divisor}; {lattice} is indefinite, and no route computes generators "
-                f"of that unitary group"
+                f"by zeta_{divisor}; its rational commutant is noncompact and no general "
+                f"integral unitary generation route is available for that model"
             )
     return finite_ordered_set(tuple(centralizer(generator) for generator in generators))
 
