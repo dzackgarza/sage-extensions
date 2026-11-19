@@ -300,6 +300,36 @@ def test_a_proper_pointwise_levi_image_still_has_the_full_finite_image() -> None
         assert finite_orthogonal.subgroup(tuple(rho(isometry) for isometry in images)).cardinality() == expected.cardinality()
 
 
+def test_the_coble_cusp_five_pointed_family_returns() -> None:
+    r"""`T_Co` at Sterk's fifth cusp: the public pointed family returns and fixes its vector.
+
+    Sterk (4.3.9), p. 24, gives the fifth cusp vector in `T_En`; it lies in
+    `T_Co` because its `e` and `f` coefficients agree.  At `54ce8cf` the
+    public pointed call had not returned at 520 s.  The owned pointwise action
+    returns 36 generators in about seven seconds, so this asserts the public
+    surface on that same vector, with no typed generator count.
+    """
+    enriques = NamedLattices.TEn
+    lattice = NamedLattices.Tco
+    cusp = Sterk.selected_isotropic_vectors()["Sterk_5"]
+    coordinates = cusp.to_vector()
+    labels = tuple(enriques.module_generating_set())
+    given = {label: int(coordinates(label)) for label in labels}
+    assert given["e"] == given["f"]
+    coefficients = {"h": ZZ(given["e"])} if given["e"] else {}
+    for label in ("ep", "fp") + tuple(f"a{index}" for index in range(1, 9)):
+        if given[label]:
+            coefficients[label] = ZZ(given[label])
+    vector = lattice.linear_combination(coefficients)
+
+    assert vector.q() == ZZ(0)
+    assert vector.is_primitive() is True
+    assert vector.div() == ZZ(2)
+    family = tuple(lattice.Aut().stabilizer(vector).group_generators())
+    assert family
+    assert all(generator(vector) == vector for generator in family)
+
+
 def test_the_hyperbolic_planes_pointed_stabilizer_is_trivial() -> None:
     r"""`K_I = 0`: the family is empty, and the card's one `O`-orbit of isotropic lines stands.
 
