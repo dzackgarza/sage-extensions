@@ -194,3 +194,55 @@ pytest -o addopts= -p qc_sage_session -p sage_extensions.testing.suite_budget \
   signatures and determinants, and the library's two-elementary invariants live on
   `EvenTwoElementaryLattices`, which these lattices are not asserted to lie in.  Nothing in the
   five folds needs them.
+
+## 6. Where each acceptance item lives
+
+Line numbers are those of this commit.  All three items are met, so nothing below is queued behind
+another item.
+
+**Item 1 — "The operation exists at its owner …, and `sterk.py` derives Sterk's roots from it."**
+
+* `src/sage_extensions/categories/coxeter_diagrams.py:2489` — `RootedCoxeterDiagrams.ParentMethods.fold(involution)`:
+  the one operation, whose datum is taken in either form at `:2560` through `_involution_images`
+  (`:2864`) and whose four decisions and two propositions are its docstring (`:2519` the
+  relations/pairings proposition, `:2531` the orbit sums and the rescaling).
+* `:2562` — `_folded_by_images`, the single decision path (relations, pairings, integrality,
+  involution) and the fold itself; `:2720` the orbit sums and the rescaling, `_coordinate_divisor`
+  at `:2946`.
+* `:2779` — `RootFamilyFolding`, the returned record: `isometry` `:2809`, `invariant_lattice` `:2813`,
+  `anti_invariant_lattice` `:2817`, `roots` `:2821`, `discarded_sums` `:2825`.
+* `src/sage_extensions/sterk.py:689` — the three permutation folds, `:691` the two image folds, both
+  inside `_foldings_cached` (`:679`); `foldings()` `:697`; `_sterk_roots_cached` `:718` reads them;
+  `sterk_roots()` `:784`.
+* The derivation is asserted, not just read: `test_the_folded_configurations_are_the_constructions_sterk_returns`
+  at `tests/lattices/test_the_sterk_configurations_are_folds_of_the_two_root_families.sage:156`
+  (the folded family equals what `sterk_roots()` returns), the two image folds at `:283`, the five
+  records at `:309`, and the exploration's `:129` (each fold has its card row's count and squares and
+  its folded diagram is rooted in the invariant lattice, `:143`).
+
+**Item 2 — "Tests assert the five root counts, the invariant and anti-invariant lattice signatures,
+and the refusal on the invalidating input."**
+
+* Counts against card `029J`'s row `gamma-en-2` by tag:
+  `tests/lattices/test_the_sterk_configurations_are_folds_of_the_two_root_families.sage:126`, and
+  `tests/lattices/test_the_five_sterk_root_configurations_as_foldings.sage:139`.
+* Signatures: the same file's `:146` (invariant equals the card walls' span), `:152` (the span is
+  \((1,17)\)) and `:153` (anti-invariant \((0,8)\)) for 4.3.5, 4.3.6 and 4.3.8; `:306`, `:307`,
+  `:320`, `:321` for the two image folds and the five records; and the exploration's `:123`–`:126`
+  for all five at once.
+* The refusal, and the reason it has its specimen where it does:
+  `tests/lattices/test_the_fold_of_a_root_family_by_a_diagram_involution.sage:121` refuses a
+  Gram-preserving permutation that breaks a relation on the degenerate family; `:125` asserts on
+  \(A_2\) that exactly the two permutations keeping the pairings fold; and
+  `tests/lattices/test_the_sterk_configurations_are_folds_of_the_two_root_families.sage:233`
+  asserts on the 22 roots that all eight diagram automorphisms keep the Gram and all six involutions
+  fold — no refusal exists there, which is Proposition 1.
+* The rescaling the reviewer found absent: `tests/lattices/test_the_fold_of_a_root_family_by_a_diagram_involution.sage:183`,
+  red at `f6769cc`'s parent.
+
+**Item 3 — "The exploration … uses only this operation."**
+
+* `tests/lattices/test_the_five_sterk_root_configurations_as_foldings.sage:1` is the exploration;
+  its only source of folds is `Sterk.foldings()` at `:93`, `:114` and `:136`, which is
+  `src/sage_extensions/sterk.py:697` and nothing else, and no other operation is called: the
+  filename, the docstring and the three reads name the one `fold`.
