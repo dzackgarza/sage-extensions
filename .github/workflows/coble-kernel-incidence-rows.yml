@@ -55,6 +55,11 @@ on:
         required: false
         default: "auto"
         type: string
+      restricted_stabilizer:
+        description: "also run the restricted-stabilizer row R_{Gamma_En,2} of #286 (GitHub caps a job at six hours)"
+        required: false
+        default: "false"
+        type: string
 permissions:
   contents: read
 concurrency:
@@ -110,3 +115,33 @@ jobs:
           retention-days: 90
           if-no-files-found: error
           include-hidden-files: true
+
+  restricted-stabilizer:
+    # The construction `Gamma_{Co,2} = R_{Gamma_{En,2}}` of #286: the image in
+    # `O(delta^perp)` of `Stab_{Gamma_{En,2}}(delta)`.  Its cost is the
+    # indefinite port's marked-diagram decision at a non-isotropic vector, which
+    # at rank 12 is minutes to hours, so it is its own job and its own input.
+    # Dispatch with `restricted_stabilizer: "true"` and `cap` at or under
+    # 21600 s (a GitHub-hosted job is capped at six hours).
+    name: Restricted stabilizer row R_Gamma_En,2
+    runs-on: ubuntu-latest
+    container: ghcr.io/dzackgarza/sage:develop
+    timeout-minutes: 350
+    if: ${{ inputs.restricted_stabilizer == 'true' }}
+    steps:
+      - name: Check out the commit under test
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: Mark the checkout as a safe git directory
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - name: Run the restricted-stabilizer row
+        env:
+          COBLE_CALL_CAP: ${{ inputs.cap || '10800' }}
+        run: |-
+          set -o pipefail
+          "$SAGE_BIN" --version
+          git rev-parse HEAD
+          sage_python="$("$SAGE_BIN" -c "import sys; print(sys.executable)")"
+          "$sage_python" tests/coble_restricted_stabilizer.py --cap "$COBLE_CALL_CAP"
+        shell: bash
