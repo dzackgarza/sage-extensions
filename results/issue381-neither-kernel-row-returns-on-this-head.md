@@ -31,6 +31,12 @@ half is not.
 
 ## So `#381`'s returned row is stale, and this is a regression
 
+> **Attribution corrected.** The refusal is not `9ae39a1`'s: it predates the
+> returning row (`b6d7bd8`, 17 Nov) and `9ae39a1` relocated the hunk.  The change
+> that makes the row refuse is downstream of the read.  See
+> `issue381-the-refusal-code-predates-the-return.md`.
+
+
 `issue381-the-plane-rows-per-plane-cost.md` §10 records `Otilde(T_Co)` deciding
 `569 160` edges over `527` and `189 720` cusps in 2 119.1 s -- **on `8c094f8`**.
 The relation read that now refuses is newer than that run: `9ae39a1`, *the

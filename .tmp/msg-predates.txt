@@ -1,0 +1,30 @@
+results: the refusal code predates the returning row, so the regression is downstream (#381)
+
+Two earlier records named 9ae39a1 as the place the refusing read sits, because it
+is a descendant of the evidence commit 3a4a210.  That is wrong:
+
+  git log -S "does not separate this line's cusp" -> b6d7bd8, 17 Nov
+  git log -S "line_cusps_by_key"                  -> b6d7bd8, 0e5ac18 (16 Nov)
+
+and both are ancestors of 3a4a210 (18 Nov).  git show 9ae39a1 -- predicate_subgroups.py
+shows the refusal hunk with both a - and a + side: it was moved out of
+_divided_class_edges_per_plane into _divided_class_edges_at_plane, not introduced.
+
+So the returning row on 8c094f8 ran with the refusal and never hit an ambiguous
+key; the rows here run with the same refusal and hit one at their first record.
+What changed is what the read is asked about: which plane is drawn (591bb08 reads
+the library's K_v line orbits), which flag is seeded (346113d reads the row's own
+transports), which lifts are registered, or the keys themselves.  The #603
+parabolic commits also touch _plane_parabolic_incidence_flags.
+
+No cheap oracle exists: the two leading candidates change exactly the datum an
+oracle would hold fixed -- the plane drawn and the flag seeded -- so a bisect
+costs one 33-minute run per candidate and is not done here.
+
+What stands: both kernel rows build 189721 planes and refuse at their first
+relation record, measured twice; the refusal is correct given the key, and the
+key is equivocal at T_Co and injective everywhere the suite can look.  Only the
+attribution is retracted.
+
+No object introduced: the key, the buckets and the refusal are the library's, and
+the commits are named by their subject lines.

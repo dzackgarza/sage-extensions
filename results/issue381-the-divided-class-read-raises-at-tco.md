@@ -62,6 +62,11 @@ separate them.
 
 ## The provenance point, and why it is the larger finding
 
+> **Corrected.** The attribution below to `9ae39a1` is wrong: the refusal and the
+> key predate the returning row (`b6d7bd8`, 17 Nov), and `9ae39a1` only moved the
+> hunk.  See `issue381-the-refusal-code-predates-the-return.md`.
+
+
 The `Otilde` row that returned (2 126.9 s, 569 160 records) ran on `8c094f8`,
 and the read that raises here is newer than that run: `9ae39a1`, *the
 divided-class relation decides its planes as they are reached, and a plane's lift
