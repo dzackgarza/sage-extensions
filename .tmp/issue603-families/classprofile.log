@@ -1,0 +1,43 @@
+tree SHA: 648dc58af6103cf1440f5785dbd871d1f9dc1530 (modified paths: 0)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 1.13 1.41 2.44 3/540 3461722
+probe: .tmp/probe-classprofile.py; inner 900 s
+[    6.52s] integral_parameter_classes: [5.93s]
+         34984946 function calls (34771495 primitive calls) in 14.075 seconds
+
+   Ordered by: internal time
+   List reduced from 1483 to 14 due to restriction <14>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+  1502461    1.152    0.000    1.575    0.000 /repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:6765(_from_engine_element)
+   178028    0.720    0.000    4.839    0.000 /repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:2239(_fraction_equality_status)
+   689293    0.445    0.000    1.757    0.000 /repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:5916(_mul_)
+  1502461    0.422    0.000    0.422    0.000 /repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:5873(__init__)
+1163879/1146997    0.398    0.000    1.984    0.000 /repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:8354(_owned_engine_element)
+  2968777    0.381    0.000    0.381    0.000 /repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:5877(_backend)
+   689293    0.373    0.000    2.130    0.000 /repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:5940(__mul__)
+83699/47850    0.355    0.000    3.412    0.000 /repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py:791(__call__)
+  3516651    0.303    0.000    0.303    0.000 {built-in method builtins.isinstance}
+   228511    0.300    0.000    0.420    0.000 /sage/.venv/lib/python3.14/site-packages/sage/categories/category_with_axiom.py:2021(__classget__)
+    77072    0.291    0.000    1.033    0.000 /repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:2030(_engine_element)
+  1494227    0.262    0.000    0.405    0.000 /repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:7975(_own_ring)
+   164514    0.239    0.000    0.431    0.000 /repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:1145(__init__)
+400492/400470    0.237    0.000    0.283    0.000 /sage/.venv/lib/python3.14/site-packages/sage/categories/category.py:436(__classcall__)
+
+
+
+[   20.60s] done
+[peakrss] probe603: child waited=0 shell_code=0 samples=12
+[peakrss] peak tree RSS      : 328 MiB
+[peakrss] low-water MemAvail : 6505 MiB
+[peakrss] peak single VmHWM  : 328 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      317 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    22.0s procs=  3 rss=   328 MiB hwm=   328 MiB avail=  6505 MiB
+[peakrss]   t=    20.0s procs=  3 rss=   325 MiB hwm=   325 MiB avail=  6536 MiB
+[peakrss]   t=    18.0s procs=  3 rss=   324 MiB hwm=   324 MiB avail=  6543 MiB
+[peakrss]   t=    16.0s procs=  3 rss=   323 MiB hwm=   323 MiB avail=  6555 MiB
+[peakrss]   t=    12.0s procs=  3 rss=   322 MiB hwm=   322 MiB avail=  6545 MiB
+probe exit: 0

@@ -827,3 +827,36 @@ arithmetic, the isometry constructor's "refusal", and this enumeration.  Each wa
 caught by the round after it, by doing the smallest thing instead of reasoning
 about the interface or the set.  That is the strongest argument in this record
 for the probe-per-round habit, and the strongest warning against its prose.
+
+## What the remaining 5.93 s is: owned-ring arithmetic, not module work
+
+Profiled `_integral_parameter_cosets` at `T_Co` (cusp-5 line) at the current
+head; `integral_parameter_classes` is 5.93 s unprofiled, and the top of the
+profile is the ring layer:
+
+    tottime  cumtime  calls    function
+    1.152    1.575    1502461  ring_foundation.py:6765 _from_engine_element
+    0.720    4.839     178028  ring_foundation.py:2239 _fraction_equality_status
+    0.445    1.757     689293  ring_foundation.py:5916 _mul_
+    0.381    4.839?     --      (cumulative through _from_engine_element)
+    0.355    3.412    83699/47850  set_categories.py:791 __call__
+
+So the cost is 1.5 million wrapped-element constructions and 178 000 fraction
+equality tests, i.e. **the owned ring's per-operation overhead**, not the module
+arithmetic the code is nominally doing.  The module work is 768 classes -- 256
+passing and 512 kernel -- built by `class_of`'s nine-term sum, roughly 6900
+`scalar_multiple` calls at ~0.7 ms each, and each of those spends about 220 ring
+operations internally.
+
+**The lever, therefore.**  `class_of` sums nine `classes_module.scalar_multiple`
+calls; the same class is one integer linear combination read modulo the module's
+invariant factors.  Forming the coordinates as plain integers and constructing
+the element once per class replaces 6900 scalar multiplications by 768
+constructions -- the same shape of saving as the transvection replacement, one
+layer down, and with the same oracle: the same 768 classes and the same passing
+and kernel sets.
+
+**Not yet measured:** how many lines the plane-orbit walk visits.  The row is
+running at this head under its 600 s cap with a counter on
+`_planes_through_line`, and that count is what says whether the per-line cost
+still has to fall or whether the walk is short enough now.
