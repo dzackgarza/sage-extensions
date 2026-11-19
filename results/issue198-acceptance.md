@@ -1,6 +1,7 @@
-# #198: the eight review items on `4f7438e`
+# #198: the eight review items on `699c39b`
 
-Line numbers are of the head this note is pushed on.
+Line numbers are of the head this note is pushed on.  Re-measured on `699c39b` with one
+probe, whose readings follow the table.
 
 **Verdict.** Seven of the eight review items are met.  The eighth --- sections as
 derivations of the *full* `C^oo(M)` --- is met on a manifold presented by one chart, and its
@@ -36,3 +37,16 @@ So item 2 and the algebra half of item 5 stand or fall together, and both need t
 clause amended to say that `C^oo(M)` here is the algebra of functions carried by chart
 expressions -- or a construction of Lemma 2.26 added to the algebra, which these expressions
 cannot supply.
+
+## Re-measured on `699c39b`
+
+    1 rank: 2 | module: True
+    2 round trip: True | E(xy)(3,4): 24
+    3 restrict: ('U_N', 'U_S')
+    5 trivialized rank: 2
+    6 one never-vanishing cut covers: True | the chart covers: True
+    8 coercion: 2 | QQ: -3
+
+Items 4 and 7 are decided by their test files, which the gate runs:
+`test_a_pullback_agreement_reads_every_component_of_the_bundle.sage` and
+`test_a_submanifold_relates_two_charts_through_two_others.sage`.
