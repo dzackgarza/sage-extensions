@@ -346,6 +346,107 @@ def _decided_quadratic(polynomial):
             return False
 
 
+def _decided_gram_no_zero(polynomial):
+    r"""Whether a quartic bounded away from zero is decided so by a Gram certificate, or ``None``.
+
+    A polynomial ``P`` of degree ``2d`` is a sum of squares of polynomials of degree
+    ``d`` when some positive semidefinite ``G`` satisfies ``P - P(0) = u^T G u`` for ``u``
+    the monomials of degree ``d``; with ``P(0) > 0`` that makes ``P`` bounded away from
+    zero (Lasserre, *Moments, Positive Polynomials and Their Applications*, Ch. 2).  The
+    monomials of ``P - P(0)`` are of degree ``2d``, and each splits into two of degree
+    ``d`` in finitely many ways; a monomial with more than one split -- ``x^2 y^2`` splits
+    as ``(x^2)(y^2)`` and as ``(xy)(xy)`` -- gives a different ``G`` for each choice, and
+    the certificate is found by trying them.
+
+    ``True`` is a proof, ``False`` is answered only when the constant term is zero (then
+    the chart's origin is a zero), and ``None`` says this certificate does not decide the
+    polynomial: it is a sufficient condition, and a quartic that is positive without being
+    a sum of squares of quadratics is left undecided.
+    """
+    from itertools import product as _iproduct
+
+    from sage.matrix.constructor import matrix as _engine_matrix
+    from sage.rings.rational_field import QQ as SageQQ
+
+    coefficients = {
+        tuple(int(power) for power in monomial): coefficient
+        for monomial, coefficient in polynomial.dict().items()
+    }
+    if not coefficients:
+        return False
+    variables = polynomial.parent().ngens()
+    constant = coefficients.get(tuple(0 for _index in range(variables)), SageQQ.zero())
+    degree = max(sum(monomial) for monomial in coefficients)
+    if degree % 2 or degree < 4 or degree > 4:
+        return None
+    half = degree // 2
+    part = {
+        monomial: coefficient
+        for monomial, coefficient in coefficients.items()
+        if sum(monomial) > 0
+    }
+    if not part or any(sum(monomial) != degree for monomial in part):
+        return None
+    if constant == 0:
+        return False
+    monomials = [
+        exponent
+        for exponent in _iproduct(range(half + 1), repeat=variables)
+        if sum(exponent) == half
+    ]
+    position = {exponent: index for index, exponent in enumerate(monomials)}
+    splits = {}
+    for monomial in part:
+        options = [
+            (left, tuple(whole - piece for whole, piece in zip(monomial, left)))
+            for left in monomials
+            if all(piece <= whole for piece, whole in zip(left, monomial))
+            and tuple(whole - piece for whole, piece in zip(monomial, left)) in position
+        ]
+        if not options:
+            return None
+        splits[monomial] = options
+    count = 1
+    for options in splits.values():
+        count *= len(options)
+    if count > 64:
+        return None
+    order = tuple(part)
+    for choice in _iproduct(*[splits[monomial] for monomial in order]):
+        size = len(monomials)
+        entries = [SageQQ.zero() for _index in range(size * size)]
+        for monomial, (left, right) in zip(order, choice):
+            coefficient = part[monomial]
+            row, column = position[left], position[right]
+            if row == column:
+                entries[row * size + column] += coefficient
+            else:
+                entries[row * size + column] += coefficient / SageQQ(2)
+                entries[column * size + row] += coefficient / SageQQ(2)
+        gram = _engine_matrix(SageQQ, size, size, entries)
+        if _gram_is_semidefinite(gram):
+            return True
+    return None
+
+
+def _gram_is_semidefinite(matrix) -> bool:
+    r"""Whether a symmetric matrix over the rationals has every principal minor nonnegative.
+
+    A symmetric real matrix is positive semidefinite exactly when all of its principal
+    minors are nonnegative (Horn and Johnson, *Matrix Analysis*, 2nd ed., Thm. 7.2.4);
+    the test is exact over the rationals and is applied only to matrices small enough for
+    every principal minor to be taken.
+    """
+    from itertools import combinations
+
+    size = matrix.nrows()
+    for order in range(1, size + 1):
+        for rows in combinations(range(size), order):
+            if matrix[list(rows), list(rows)].det() < 0:
+                return False
+    return True
+
+
 def _decided_no_real_zero(expression, variables):
     r"""Whether the real polynomial ``expression`` is decided to take no zero on the chart.
 
@@ -383,6 +484,9 @@ def _decided_no_real_zero(expression, variables):
     quadratic = _decided_quadratic(polynomial)
     if quadratic is not None:
         return quadratic
+    gram = _decided_gram_no_zero(polynomial)
+    if gram is not None:
+        return gram
     coefficients = {
         tuple(int(power) for power in monomial): coefficient
         for monomial, coefficient in polynomial.dict().items()
