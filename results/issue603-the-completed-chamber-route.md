@@ -189,17 +189,20 @@ zero-reduction file and its four pointwise-Levi neighbours were 5 passed in
   computable on the nonreflective odd specimen.  See “The nonreflective
   quotient.”  Divisibility greater than one is not covered by the kernel's own
   family and says so.
-* **The public pointed family at an odd lattice:** MET where the lattice
-  splits along the lifts of `K_I`, which is where the owned route is exact.
-  `U + BK_nonref` -- odd, signature `(2, 3)`, discriminant `2401`, marked
-  vector of divisibility one -- answers in 3.67 s with a family that fixes the
-  marked vector and whose image in the finite orthogonal group is the image of
-  `O(K_I)` itself
-  (`tests/lattices/test_the_public_pointed_family_of_an_odd_isotropic_vector.sage`;
-  the two-factor family is
-  `...PrimitiveIsotropicSubobjects.pointed_stabilizer_generators`).  An odd
-  lattice that does not split along the lifts is still answered with `None`,
-  so the caller keeps its own route.
+* **The public pointed family at an odd lattice of any divisibility:** MET.
+  The residue action's rational group is the lifts of `O(K_I)`'s generators
+  together with the pointwise Levi kernel `U_I`, so it is exactly `P_I^1` and
+  its integral stabilizer is exactly `P_I^1`; the gate that answered an odd
+  lattice with `None` is gone.  `U(2) + <3>` and `U(3) + <3>` answer in 1.09 s
+  and 0.31 s
+  (`tests/lattices/test_the_public_pointed_family_of_a_divisible_odd_line.sage`;
+  the same calls went to the port at 16.29 s before).
+  *Correction to the earlier items of this list:* the residue action's group
+  omitted the radical at **every** divisibility and parity, not only at the
+  odd case — the perpendicular kernel it used is trivial at a line — so the
+  families the card rows were certified on generated proper subgroups of
+  `P_I^1`.  The card values are finite-image statements and stand; the
+  families did not, and they do now.
 * **The research `T_Co` cusp-5 computation:** MET.  Sterk's fifth cusp
   vector is primitive isotropic of divisibility two in `T_Co`; the public
   pointed call returned 25 generators in 12.65 s including setup, and every
@@ -306,13 +309,15 @@ runs are with `--no-time-gates`; collection took 6.50 s against the 6 s
 ceiling in the repair's worktree before and after the change, which is the
 pre-existing overrun of that tree and not this line's.
 
-**Still open after this.**  The public pointed family on an *odd* lattice of
-divisibility greater than one: its radical is now exact, but the lift half is
-not -- the split section needs a splitting, which forces divisibility one,
-and the residue action's integrality is decided by the marked-line torsor,
-whose residue locus is a union of cosets of the transvection kernel only over
-an even lattice.  Such a lattice is answered with `None` and keeps the port's
-route.
+**Still open after this.**  Nothing on the acceptance list.  What is open
+beside it: the witness that would decide the residue action's exactness from
+outside -- whether a generator of `U_I` lies in the action's stabilizer -- is
+not askable, because an integral isometry is not coerced into the action's
+rational group; measured, it answers `False` in both directions and even for
+an element that is one of that group's generators.  And the plane case,
+`U_I` at null rank two and up, still carries the parameter-lattice question
+recorded above.
+
 
 
 
