@@ -90,6 +90,89 @@ def _rational_polynomial(expression):
     return SR(expression).polynomial(QQ)
 
 
+def _pullback_family_agrees(manifold, mapping, components) -> None:
+    r"""Decide that a chart-wise family states one section of a pullback, or state where it does not.
+
+    A section of ``f^*E`` over ``N`` assigns to ``q`` an element of the fibre at
+    ``f(q)`` (Lee, *Introduction to Smooth Manifolds*, 2nd ed., Ch. 10), so its tuple
+    of components on a chart ``W_1`` of ``N`` and its tuple on a chart ``W_2`` are
+    related by the derivative of the composite that carries a point of ``W_1`` to the
+    coordinates of ``f`` in the chart of ``M`` that ``W_2`` is represented in:
+    ``a_2(T(x)) = J_T(x) a_1(x)``.  ``T`` is read off the map's own chart
+    representations composed with the coordinate change the atlas states between the
+    two charts of the domain, and the comparison is made on those rational
+    expressions, so nothing is sampled and nothing is enumerated.
+    """
+    from itertools import combinations
+
+    from sage_extensions.categories.manifolds import _composed_ambient_transition
+
+    labels = tuple(components)
+    pairs = tuple(mapping.chart_maps().index_set())
+    dimension = int(manifold.dimension())
+    for left_label, right_label in combinations(labels, 2):
+        for source_label, target_label in (
+            (left_label, right_label),
+            (right_label, left_label),
+        ):
+            change = _composed_ambient_transition(manifold, source_label, target_label)
+            assert change is not None, (
+                f"cannot decide whether the family states one section of the pullback: the "
+                f"charts {source_label} and {target_label} are both given, and no chain of "
+                f"stated coordinate changes joins them"
+            )
+            images_in = tuple(
+                pair for pair in pairs if pair[0] == target_label
+            )
+            assert images_in, (
+                f"cannot decide whether the family states one section of the pullback: the map "
+                f"{mapping} is stated in no chart of the target on the chart {target_label}"
+            )
+            source_symbols = tuple(_engine_manifold_chart(manifold.atlas()[source_label])[:])
+            target_symbols = tuple(_engine_manifold_chart(manifold.atlas()[target_label])[:])
+            forward = tuple(
+                SR(_engine_manifold_expression(expression))
+                for expression in change.forward_expressions()
+            )
+            composed = tuple(
+                SR(_engine_manifold_expression(expression)).subs(
+                    dict(zip(target_symbols, forward, strict=True))
+                )
+                for expression in mapping.chart_map(target_label, images_in[0][1])
+            )
+            stated = tuple(
+                SR(_engine_manifold_expression(entry))
+                for entry in components[source_label]
+            )
+            carried = tuple(
+                SR(_engine_manifold_expression(entry)).subs(
+                    dict(zip(target_symbols, composed, strict=True))
+                )
+                for entry in components[target_label]
+            )
+            jacobian = tuple(
+                tuple(expression.diff(symbol) for symbol in source_symbols)
+                for expression in composed
+            )
+            transported = tuple(
+                sum(
+                    stated[index] * jacobian[position][index]
+                    for index in range(dimension)
+                )
+                for position in range(dimension)
+            )
+            for position, (left, right) in enumerate(
+                zip(transported, carried, strict=True)
+            ):
+                residual = SR(left - right).simplify_rational()
+                assert residual == 0, (
+                    f"the family states no one section of the pullback: on the chart "
+                    f"{source_label} the component {position} is {transported[position]}, and the "
+                    f"component stated on the chart {target_label} carries it to "
+                    f"{carried[position]} there, which leaves the residual {residual}"
+                )
+
+
 def _decided_nowhere_vanishing(expression, variables, excluded=()):
     r"""Whether the real function ``expression`` of ``variables`` is decided to take no zero.
 
@@ -787,11 +870,7 @@ class SmoothSectionModules(OwnedParameterizedCategory):
             """
             manifold = self.base_manifold()
             atlas = manifold.atlas()
-            assert self._vector_bundle.underlying_bundle() is None, (
-                f"a section of the pullback {self._vector_bundle} that is not the pullback of "
-                f"one is read in the bundle's trivializations on a cover of the target, which "
-                f"this owner does not retain; pullback_of states the sections that are"
-            )
+
             labels = tuple(components)
             extra = tuple(label for label in labels if label not in manifold.chart_labels())
             assert not extra, (
@@ -815,7 +894,13 @@ class SmoothSectionModules(OwnedParameterizedCategory):
                 admitted[label] = tuple(
                     _admit_manifold_expression(entry, chart) for entry in component
                 )
-            _chartwise_family_agrees(manifold, admitted, 1)
+            underlying = self._vector_bundle.underlying_bundle()
+            if underlying is None:
+                _chartwise_family_agrees(manifold, admitted, 1)
+            else:
+                _pullback_family_agrees(
+                    manifold, self._vector_bundle.mapping(), admitted
+                )
             return self.element_class(
                 self, admitted, _engine_vector_field(manifold, admitted)
             )
