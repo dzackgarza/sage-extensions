@@ -144,8 +144,9 @@ the images are roots.
 **2. "Tests assert the five root counts, the invariant and anti-invariant lattice signatures, and
 the refusal on the invalidating input." — the counts and the signatures are met; the refusal is met
 for every form of the invalidating input that exists; the form the issue names does not exist on the
-22 roots, so the item stands NOT MET while the issue stands unamended, and
-`results/issue255-amended-invalidating-input.md` is the edit that makes it met.**
+22 roots, so the item stands NOT MET while the issue stands unamended; the edit that makes it met is
+`results/issue255-amended-invalidating-input.md`, and the whole body it leaves, for one paste, is
+`results/issue255-amended-issue-body.md`.**
 The counts are asserted against card `029J`'s row `gamma-en-2` by tag
 (`tests/lattices/test_the_sterk_configurations_are_folds_of_the_two_root_families.sage:126`,
 exploration `:139`); the invariant and anti-invariant signatures for all five ((1,9) and (0,8)) at
@@ -212,8 +213,9 @@ pytest -o addopts= -p qc_sage_session -p sage_extensions.testing.suite_budget \
 
 * Item 2 is **not met as written**, and cannot be: the invalidating input it names — a permutation of
   the 22 roots that keeps the Gram matrix and breaks a relation — does not exist (Proposition 1 and
-  the probe quoted in §3).  `results/issue255-amended-invalidating-input.md` is the edit for the
-  owner to paste into the issue; under it, every clause is asserted.
+  the probe quoted in §3).  `results/issue255-amended-invalidating-input.md` is the edit, and
+  `results/issue255-amended-issue-body.md` the whole body, for the owner to paste into the issue;
+  under it, every clause is asserted.
 
 * The claim that the folded families *are* Sterk's printed chambers is carried by card `029J`'s rows
   and by Sterk's printed statements, not proved in this record.  What is checked for all five is

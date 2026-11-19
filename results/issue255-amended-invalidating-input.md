@@ -70,6 +70,7 @@ for such a permutation; there the relation is broken and the operation refuses i
 | the 22-root degenerate relation refusal | `tests/lattices/test_the_fold_of_a_root_family_by_a_diagram_involution.sage:133`, refusal `:169` |
 
 The connection this repository is worked through reads issues and pushes commits but cannot edit an
-issue body, so this file is the edit for the owner to paste into #255; the record
-`results/issue255-the-fold-of-a-root-family.md` states the item as NOT MET while the issue stands
-unamended and as MET under this text.
+issue body, and the platform offers no site whose API could: this file is the edit for the owner to
+paste into #255, with the whole body it leaves in `results/issue255-amended-issue-body.md`.  The
+record `results/issue255-the-fold-of-a-root-family.md` states the item as NOT MET while the issue
+stands unamended and as MET under this text.
