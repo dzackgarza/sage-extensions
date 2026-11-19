@@ -33,6 +33,15 @@ The public group is ``coinvariant_extension_subgroup``: $O(M,h)$ through the inv
 lattice's own orthogonal group, its image under $\pi_M$, the transport across the
 actual discriminant glue, and the exact preimage in $O(N)$.
 
+The three counts of a case are compared with that case's card by
+``tests/enriques_polarization_rows_by_card.py``, in the image job
+``enriques-polarization-rows``: one row is one public call of tens of seconds to
+203 s on a group of order up to 696729600, against this repository's 60 s hang
+bound and 20 s call ceiling, so the comparison cannot run in the per-test gate.
+What this file keeps is what the comparison rests on -- the subset each case
+decodes to, the wall vanishing it is checked against, the Table 3 anchor, and the
+transcribed rows pinned to their cards by tag.
+
 An exact subgroup boundary is retained, not resolved: the table's counts are orbits of
 $\Gamma^+_h = \Gamma_h \cap O^+(N)$, while the public method returns the full preimage
 $\Gamma_h$ in $O(N)$.  Equality of the line, plane and flag counts between the two is a
@@ -308,59 +317,6 @@ def _card_row(number):
     card by :func:`test_the_cited_rows_are_the_cards_rows`.
     """
     return card("arithmetic_groups", f"gamma-h-{number}")
-
-
-def _case_group(case):
-    r"""Return the public Gamma_h preimage subgroup of the case's representative."""
-    model = _doubled_invariant_model()
-    invariant = Involutions.I_En.invariant_lattice()
-    transport = model.isometry_to(invariant)
-    labels = tuple(model.module_generating_set())
-    h = sum(
-        (model.module_generator(labels[index - 1]) for index in _decode_support(case)),
-        model.zero(),
-    )
-    h_M = transport(h)
-    assert h_M.q() == h.q(), f"case {case[0]}: the transport changed the square"
-    return Involutions.I_En.polarized(invariant.inclusion()(h_M)).coinvariant_extension_subgroup()
-
-
-@pytest.mark.parametrize("case", _CASES, ids=lambda case: f"case-{case[0]}")
-def test_the_source_line_row_is_the_public_line_orbit_count(case) -> None:
-    r"""The case's cited line-orbit row, compared with the public orbit count."""
-    number, _nodes, _barred, _lines, _planes, _flags = case
-    group = _case_group(case)
-    stated = _card_row(number)
-    assert group.isotropic_orbit_representatives(1).cardinality() == cardinal(
-        stated["line_orbits"]
-    ), f"gamma-h-{number}: the public line orbits differ from the card's row"
-
-
-@pytest.mark.parametrize("case", _CASES, ids=lambda case: f"case-{case[0]}")
-def test_the_source_plane_row_is_the_public_plane_orbit_count(case) -> None:
-    r"""The case's cited plane-orbit row, compared with the public orbit count."""
-    number, _nodes, _barred, _lines, _planes, _flags = case
-    group = _case_group(case)
-    stated = _card_row(number)
-    assert group.isotropic_orbit_representatives(2).cardinality() == cardinal(
-        stated["plane_orbits"]
-    ), f"gamma-h-{number}: the public plane orbits differ from the card's row"
-
-
-@pytest.mark.parametrize("case", _CASES, ids=lambda case: f"case-{case[0]}")
-def test_the_source_flag_row_is_the_public_flag_orbit_count(case) -> None:
-    r"""The case's cited flag-orbit row, compared with the public flag orbit count.
-
-    The full-preimage versus positive-half flag equality is not established
-    (research #748's flag argument has a gap), so a difference here is a result about
-    that boundary, not an assertion to relax.
-    """
-    number, _nodes, _barred, _lines, _planes, _flags = case
-    group = _case_group(case)
-    stated = _card_row(number)
-    assert group.isotropic_orbit_representatives(2, flag=True).cardinality() == cardinal(
-        stated["flag_orbits"]
-    ), f"gamma-h-{number}: the public flag orbits differ from the card's row"
 
 
 def test_the_cited_rows_are_the_cards_rows() -> None:
