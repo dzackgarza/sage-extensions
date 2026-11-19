@@ -255,3 +255,27 @@ covering source, return `lift_target * ~lift_source`; otherwise the port.  The
 test that this is worth doing is the one the kernel rows already pass at rank
 five (36.67 s and 4.7 s for four edges); the cost it removes is the one the
 session records at rank eleven.
+
+## The routed transporter on the cheap consumers
+
+The Coble consumers of the change did not finish locally -- the two row files
+were still on their first test at the 1200 s cap -- so the first collected
+evidence for the route is the incidental consumers of the module it lives in,
+at port `991b88b0`, load 2.80:
+
+    tests/lattices/test_pointwise_levi_images.sage
+    tests/lattices/test_the_pointwise_radical_of_a_primitive_isotropic_line.sage
+
+    8 passed in 38.52 s; slowest call 5.55 s
+    (test_the_odd_nonreflective_line_has_an_integral_levi_lift)
+
+two of those calls on the plane case of the split lift
+(`test_split_pointwise_levi_lift_over_an_infinite_quotient[plane]`), which is
+where a transporter between two distinct planes is asked.  Collection took
+27.87 s against the 6 s ceiling, as it does on this tree under load.
+
+The rank-eleven measurement the route exists for -- the `Otilde` row on `T_Co`
+under its own cap, which is what fills the covering registry there -- is
+bounded and was still inside its cap when this was written; its result is the
+next thing to land, as either the measurement that closes this issue's cost or
+the refutation that sends it to the cross-row bridge.

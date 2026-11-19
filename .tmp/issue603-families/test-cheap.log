@@ -1,0 +1,45 @@
+tree SHA: 346113d75595167b9d6300faa5005b02cb78d4e1 (modified paths: 0)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 7.36 15.78 15.84 5/656 3155325
+files: tests/lattices/test_pointwise_levi_images.sage tests/lattices/test_the_pointwise_radical_of_a_primitive_isotropic_line.sage; inner 900 s
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+time gates on: star import 1.11 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: asyncio-1.5.0, xdist-3.8.0, reportlog-1.0.0, platformdirs-4.13.5, hypothesis-6.170.15, anyio-4.15.1, timeout-2.4.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 8 items
+
+tests/lattices/test_pointwise_levi_images.sage ....                      [ 50%]
+tests/lattices/test_the_pointwise_radical_of_a_primitive_isotropic_line.sage . [ 62%]
+...                                                                      [100%]
+
+=============================== time-gate report ===============================
+collection took 27.87 s; the measured ceiling is 6 s
+============================== slowest durations ===============================
+5.55s call     tests/lattices/test_the_pointwise_radical_of_a_primitive_isotropic_line.sage::test_the_odd_nonreflective_line_has_an_integral_levi_lift
+1.69s call     tests/lattices/test_pointwise_levi_images.sage::test_glued_line_pointwise_image_excludes_quotient_negation
+1.11s call     tests/lattices/test_pointwise_levi_images.sage::test_zero_null_pointwise_levi_lift_and_joint_kernel
+0.87s call     tests/lattices/test_pointwise_levi_images.sage::test_split_pointwise_levi_lift_over_an_infinite_quotient[line]
+0.25s call     tests/lattices/test_the_pointwise_radical_of_a_primitive_isotropic_line.sage::test_a_nonunimodular_quotient_still_presents_its_radical
+0.18s call     tests/lattices/test_pointwise_levi_images.sage::test_split_pointwise_levi_lift_over_an_infinite_quotient[plane]
+0.14s call     tests/lattices/test_the_pointwise_radical_of_a_primitive_isotropic_line.sage::test_an_odd_line_has_an_integral_eichler_transvection
+0.10s call     tests/lattices/test_the_pointwise_radical_of_a_primitive_isotropic_line.sage::test_the_odd_line_radical_is_generated_by_its_transvections
+
+(16 durations < 0.005s hidden.  Use -vv to show these durations.)
+============================== 8 passed in 38.52s ==============================
+[peakrss] test603: child waited=1 shell_code=1 samples=26
+[peakrss] peak tree RSS      : 620 MiB
+[peakrss] low-water MemAvail : 1108 MiB
+[peakrss] peak single VmHWM  : 633 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      622 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    42.1s procs=  3 rss=   620 MiB hwm=   633 MiB avail=  1440 MiB
+[peakrss]   t=    44.1s procs=  3 rss=   604 MiB hwm=   633 MiB avail=  1217 MiB
+[peakrss]   t=    48.1s procs=  3 rss=   604 MiB hwm=   633 MiB avail=  1129 MiB
+[peakrss]   t=    46.1s procs=  3 rss=   602 MiB hwm=   633 MiB avail=  1180 MiB
+[peakrss]   t=    50.1s procs=  3 rss=   599 MiB hwm=   633 MiB avail=  1108 MiB
+test exit: 1
