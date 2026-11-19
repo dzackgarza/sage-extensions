@@ -162,3 +162,44 @@ That is the site: an owned category's `parent_class` has to derive from the name
 the root's class.  It is not landed: it needs its own turn and a gate over the
 owned graph, and this turn spent its budget on a chain-of-charts repair in the
 module #198 contracts.
+
+## Attempt, 2026-11-19: the base added at the class, and the recursion it hits
+
+The repair the previous section names was tried.  `OwnedCategoryMixin._make_named_class`
+builds `parent_class` from `_owned_implementation_bases(category, provider_names)` --
+not from the super categories' named classes -- so the place a base can be added is
+that list, and `_bases_of_a_sage_sets_parent` appended `Sets().parent_class` after
+it (last, so every owned level keeps its methods ahead of it).
+
+It does not run.  `RR.coerce_map_from(ZZ)` and every construction that builds an
+owned parent class raise
+
+    RecursionError: maximum recursion depth exceeded
+
+with the recursion inside the owned linearization:
+
+    owned_category.py:1122  _make_named_class
+    owned_category.py:1048  _make_named_class
+    owned_category.py:738   _owned_implementation_bases
+    owned_category.py:718   _declared_category_linearization
+    owned_category.py:709   linearize   (repeating)
+
+A guard on the lookup of `Sets().parent_class` (a module-level cache plus a
+re-entry flag) does not stop it: the loop is in the linearization of the owned
+implementation bases, which reaches `parent_class` of a level again once the base
+list has changed.  The patch is reverted, and the site is now known to be two
+things, not one: the base list *and* `_declared_category_linearization`, which has
+to be able to linearize a level whose named class derives from a Sage one without
+re-entering itself.
+
+## Measured the same day: the remaining #198 residues are not observable
+
+The two decisions still listed as residues -- a determinant of degree four or more
+with mixed signs, and a semidefinite quadratic whose linear part leaves the range of
+its quadratic part -- can only turn a *refusal for want of a decision* into a
+*refusal by decision*.  They are not wrong answers, and nothing a caller can ask
+distinguishes them: `trivialized_by` refuses in both.  Measured on the plane with a
+frame whose determinant is `x^2 + y` (semidefinite part, linear part outside its
+range, zero at the origin): the frame is refused.  So those residues are quality of
+the message, not correctness, and a red test for them would have to assert printed
+text, which this tree's tests do not do.
