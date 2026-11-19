@@ -884,7 +884,35 @@ def _sum_certificate_covers(manifold, labels, chart) -> bool:
     """
     from sage_extensions.categories.vector_bundles import _decided_nowhere_vanishing
 
+    from sage_extensions.categories.vector_bundles import _decided_nowhere_vanishing
+
     symbols = tuple(_engine_manifold_chart(chart)[:])
+    chart_conditions = tuple(
+        _engine_manifold_expression(condition) for condition in chart.nonvanishing()
+    )
+    # A member all of whose conditions vanish nowhere is the chart its base chart is,
+    # so it covers this one outright: cutting by a condition with no zero selects
+    # nothing (Lee, Introduction to Smooth Manifolds, 2nd ed., Ch. 1).
+    for label in labels:
+        member = manifold.atlas()[label]
+        member_conditions = tuple(member.nonvanishing())
+        if not member_conditions:
+            continue
+        if all(
+            _decided_nowhere_vanishing(
+                _engine_manifold_expression(condition), symbols, chart_conditions
+            )
+            is True
+            for condition in member_conditions
+        ):
+            return True
+    # A member with more than one condition leaves out a union of zero sets, so the
+    # conditions below, which are intersected, would describe fewer uncovered points
+    # than there are.  Such a family is not certified here rather than certified wrongly.
+    if any(
+        len(tuple(manifold.atlas()[label].nonvanishing())) > 1 for label in labels
+    ):
+        return False
     conditions = []
     for label in labels:
         member = manifold.atlas()[label]
