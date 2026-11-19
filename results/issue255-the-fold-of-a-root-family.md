@@ -163,18 +163,28 @@ roots 22 rank 18 relations 4
 diagram automorphisms 8
 Gram-preserving permutations 8
 of those, breaking a rational relation 0
+relation supports with at least four zero coordinates 120
+of those, spans degenerate 25 sizes [11, 16, 18]
+degenerate supports whose automorphisms break a relation 0
 four-root control: relations 1 broken True
 ```
 
 The eight are all of them, because the Coxeter matrix is a function of the Gram; the theorem is
 Proposition 1, whose hypothesis (nondegenerate span of signature (1,17)) is asserted at
-`tests/lattices/test_the_five_sterk_root_configurations_as_foldings.sage:123`.  The four-root control
-is the smallest family where a degenerate span leaves room, and the operation refuses it there
-(`tests/lattices/test_the_fold_of_a_root_family_by_a_diagram_involution.sage:110`, refusal `:129`);
-the same construction at the issue's arity of 22 roots is refused at `:133`, refusal `:169`.  Under
-the amended clause in `results/issue255-amended-invalidating-input.md` — the pairing-moving
-transposition, the two Gram-preserving non-involutions, and the relation-breaking permutation on the
-degenerate families — every clause is asserted, at the lines tabulated there.
+`tests/lattices/test_the_five_sterk_root_configurations_as_foldings.sage:123`.  The second half of
+the search is over every subfamily of the 22 roots that carries a relation a datum could break: 120
+relation supports with at least four zero coordinates, 25 of them with degenerate spans, and no
+automorphism of any of the 25 moves its relation space.  So the relation refusal is unreachable on
+Sterk's own roots in every form — the whole family and every subfamily of it — and not only on the
+family the issue names.  The search is `results/issue255-the-invalidating-input-search.py`, runnable
+as it stands.
+
+The four-root control is the smallest family where a degenerate span leaves room, and the operation
+refuses it there (`tests/lattices/test_the_fold_of_a_root_family_by_a_diagram_involution.sage:110`,
+refusal `:129`); the same construction at the issue's arity of 22 roots is refused at `:133`, refusal
+`:169`.  Under the amended clause in `results/issue255-amended-invalidating-input.md` — the
+pairing-moving transposition, the two Gram-preserving non-involutions, and the relation-breaking
+permutation on the degenerate families — every clause is asserted, at the lines tabulated there.
 
 **3. "The exploration … uses only this operation." — MET.**  The exploration reads
 `Sterk.foldings()`, which is five `fold` calls and nothing else, and its prose states the datum, the

@@ -21,13 +21,17 @@ hence with all of \(W\), hence is a point of \(W\cap W^\perp=0\).
 
 The exhaustive check on the 22 roots themselves (every permutation of them that keeps the Gram
 matrix, and the Coxeter matrix is a function of the Gram, so those are the diagram's eight
-automorphisms):
+automorphisms), and over every subfamily of them that carries a relation (120 relation supports, 25
+of them degenerate), run by `results/issue255-the-invalidating-input-search.py`:
 
 ```
 roots 22 rank 18 relations 4
 diagram automorphisms 8
 Gram-preserving permutations 8
 of those, breaking a rational relation 0
+relation supports with at least four zero coordinates 120
+of those, spans degenerate 25 sizes [11, 16, 18]
+degenerate supports whose automorphisms break a relation 0
 four-root control: relations 1 broken True
 ```
 
