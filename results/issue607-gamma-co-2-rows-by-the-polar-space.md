@@ -120,14 +120,46 @@ The 4, 7 and 13 agree with the `#391` run record.  The flag row uses
 `rho(Stab(v, P)) = R_P cap Stab(p)`, whose order 82575360 equals
 `|O(q)| / 569160`, the kernel edge count of research#667's certificate.
 
-## The one lemma that is left
+## R_P ⊇ K_0, proved
 
-`R_P ⊇ K_0`: the mod-2 image of `Stab_{O(L)}(P)` contains the kernel of
-`Stab(J) -> O(J^perp/J)`.  The route is the Eichler transvections
-`E(e, x)`, `e in P`, `x in P^perp ∩ 2L^vee`, and the `GL(P)` Levi factor. Their
-discriminant images are the Siegel transvections and the `GL(J)` factor that
-generate `K_0`.  With the lemma, `R_P` is the `S_7` preimage, and the counts
-above are the `Gamma_{Co,2}` rows by proof plus a GAP orbit count that takes
-seconds.  Without it, the other index-8 shapes (image `S_8` with index 8 in
-`K_0`, or image `A_8` with index 4 in `K_0`) are not excluded.  The order match
-does not exclude them.
+**The radical.** For `e in P` and `a in L^# cap P^perp`, the Eichler transvection
+`t(e, a)(v) = v - (a, v) e + (e, v) a - (1/2)(a, a)(e, v) e` is an isometry of
+`L ⊗ Q` (Gritsenko-Hulek-Sankaran, arXiv:0810.1614, section 3.1, equation (4),
+printed p. 8).  It fixes `P` pointwise, so it lies in `Stab_{O(L)}(P)` whenever
+it is integral.  With `e` and `a` both in `L` its discriminant action is trivial
+(`t - 1` maps `L^#` into `Ze + Za`), so the generators use `a` in the dual.
+`results/issue607-the-radical-is-in-the-image.py` takes `e` in `{e_1, e_2,
+e_1 + e_2}`, a basis of `P`, and `a` over a basis of `L^# cap P^perp` and its pairwise sums.
+It keeps the 108 of 135 matrices that are integral, each checked to preserve the
+Gram matrix, and computes their action on `A_L`.  `A_L = Z^11/Gram Z^11 = (Z/2)^11` in
+pairing coordinates, tied to the library's classes of `b_i/2`.
+Log: `results/issue607-the-radical-is-in-the-image.log`.
+
+| quantity | value |
+| --- | --- |
+| `T = <rho t(e, a)>` | order 8192 |
+| `U` = kernel of `S = Stab(J)` on `J` and on `J^perp/J` | order 8192, `= O_2(S)` |
+| `T = U` | true |
+| `S/U` | order 241920 = 6 * 40320; images on `J` and `J^perp/J` of orders 6 and 40320 |
+
+So `rho(Stab P) ⊇ T = U`.  `S/U` embeds in `GL(J) x O(J^perp/J) = S_3 x S_8`,
+because `U` is the kernel of the two actions, and the orders are equal, so
+`S/U = S_3 x S_8`.
+
+**The rest, by group theory alone.**  `R_P/U` has order
+`247726080 / 8192 = 30240` (`#360`: the parabolic family is certified complete,
+#331, #366, so `|R_P|` is the order its images generate).  By Goursat,
+`|D| = |pi_2(D)| * |D cap (S_3 x 1)|` for `D = R_P/U`, so `|pi_2(D)| = 30240/k`
+with `k` in `{1, 2, 3, 6}`.  `S_8` has no subgroup of index `4/3`, `8/3` or `4`.
+A subgroup of index at most 4 contains `A_8`, since `A_8` is simple and the action
+on its cosets gives a homomorphism to `S_4`.  So `k = 6`, and `pi_2(D)` has index 8, a point stabilizer
+`S_7` (Dixon-Mortimer, GTM 163, Thm. 5.2B).  Hence `R_P/U = S_3 x S_7`:
+`R_P` contains `K_0` (`K_0/U = S_3 x 1`) and is the `S_7` preimage of the
+previous section.  That excludes the `S_8`/index-8 and `A_8`/index-4 shapes.
+
+**Conclusion (item 1).** `Gamma_{Co,2}` on `T_Co` has **4** line, **7** plane and
+**13** flag orbits.  These are the orbit counts of `Stab(p)`, of `R_P` and of
+`R_P cap Stab(p)` on the 67456 hyperbolic lines, 3 s each in GAP
+(`results/issue607-the-levi-candidate.log`).  The flag group is
+`rho(Stab(v, P)) = R_P cap Stab(p)`, which uses research#667's three line
+classes per plane; the line row uses its 527 classes.

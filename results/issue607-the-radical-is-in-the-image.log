@@ -1,0 +1,9 @@
+[  176.4s] |O(q)| = 46998591897600
+[  176.6s] P^perp has a Z-basis of 9 vectors
+[  201.6s] 108 of 135 transvections t(e, a), e in P, a in L^# cap P^perp, are integral
+[  250.4s] |T| = |<rho t(e, a)>| = 8192
+[  432.6s] |S| = 1981808640, |K_0| = 49152, |U| = 8192, |S/U| = 241920, image on J: 6, on J^perp/J: 40320
+[  434.0s] U is O_2(S): True
+[  434.0s] T is inside S: true; T = U: True
+[  434.0s] K_0 / U acts on J as GL(J): 6
+exit 0
