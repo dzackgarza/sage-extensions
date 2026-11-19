@@ -931,3 +931,45 @@ problem: the port's cell walk is off the path (measured, 6 frames to 0), the
 plane enumeration of a line is a hundredth of a second, and the per-lift cost
 is a millisecond.  Whatever the 600 s is, it is in code none of these rounds has
 touched.
+
+## The 600 s is inside `_integral_lift`, at its element addition
+
+Fresh dumps at this head (`Otilde` at `T_Co`, cap 240 s, `faulthandler` every
+30 s, port `991b88b0`), eight of them, and the stack is the same in six:
+
+    isotropic_lifts.py:319   integral_members
+      -> :256                _integral_lift_locus
+      -> :811                integral_parameter_classes
+      -> :752/:755           _integral_parameter_cosets
+      -> :505                _integral_lift            <-- the change of two rounds ago
+      -> framed_free_modules.py:218  _add_
+      -> ring_foundation.py:1291/1279/1274  __eq__ / _richcmp_ / equality_status
+      -> :2250               _fraction_equality_status
+      -> :1153               denominator
+
+    isotropic_orbits.py:2053 _isotropic_orbit_representatives
+      -> :1825                _isotropic_plane_orbit_representatives
+      -> :2027                _isotropic_orbit_representatives
+      -> lattice_morphisms.py:5507 -> orthogonal_quotients.py:4736
+      -> predicate_subgroups.py:803 cusps -> :1259 tits_building_incidence_by_divided_classes
+
+So the cost is **in the coordinate test this note introduced**, at its *element*
+arithmetic: `_integral_lift` builds each of `base`'s images as a sum of
+`rational.scalar_multiple(...)` terms, and each addition runs the owned ring's
+fraction-equality machinery.  The profile two sections ago priced exactly that
+(1.5 M `_from_engine_element`, 178 k `_fraction_equality_status`); what is new
+here is that it is *this* function doing it, inside a nested torsor computation,
+so the per-lift cost is paid at every level of the recursion.
+
+**The fix, and it is the one the earlier profile named:** `_integral_lift` must
+do its arithmetic in plain coordinates -- the target's Gram and integer or
+fraction coordinates -- and touch an owned-ring element only when it raises the
+matrix.  `base`'s images, `f` and `x` are all readable as coordinates
+(`to_vector`), and `b`, `q` are then sums of products of coordinates with the
+Gram entries.  The oracle is unchanged: the same 512 decisions and the same
+lifts at the cusp-5 torsor, and the same 768 classes.
+
+**What this says about the last round's change.**  It removed the 47 ms
+transvection build, which was real (12.77 s -> 6.57 s on the measured torso), but
+it kept the *element* arithmetic of the same construction, which is the part the
+dumps now catch.  The two are separable and only the first was done.
