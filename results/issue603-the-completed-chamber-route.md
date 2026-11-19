@@ -165,7 +165,10 @@ zero-reduction file and its four pointwise-Levi neighbours were 5 passed in
   case whose `O(K_I)` family is available; no chamber-symmetry result is
   transferred to a lattice that did not produce a completed chamber, and no
   generation result is inferred from a card alone.
-* **The research `T_Co` cusp-5 computation:** NOT RUN here.
+* **The research `T_Co` cusp-5 computation:** MET.  Sterk's fifth cusp
+  vector is primitive isotropic of divisibility two in `T_Co`; the public
+  pointed call returned 25 generators in 12.65 s including setup, and every
+  generator fixes it.  The parent had not returned at 520 s.
 
 ## The proper-image construction
 
@@ -182,8 +185,8 @@ chamber supplies it only for a reflective hyperbolic `K`.
 
 ## Not run
 
-No full suite, no `just test`, no ast-grep gates (ast-grep is not installed),
-and no `T_Co` run.  The older `test_edgewalk_fundamental_domain.sage` does not
+No full suite, no `just test`, no ast-grep gates (ast-grep is not installed).
+The older `test_edgewalk_fundamental_domain.sage` does not
 collect because of its own pre-existing TL09 finding; its K3 option tests were
 therefore not part of the evidence.  The default edgewalk calls used by the
 repair were measured directly and returned reflectivity certificates in about

@@ -3033,41 +3033,26 @@ class Lattices(OwnedCategoryOverBaseRing):
         ``None`` and the caller keeps its own route.
 
         The pointed stabilizer is ``P_I^1 = {g in P_I : g(v) = v}`` for
-        `I = \mathbf Z v`.  Its setwise companion `P_I` is the rank-one
-        parabolic, whose generators are constructed by
-        :meth:`_isotropic_line_stabilizer_generators` -- one integral lift of
-        each generator of `O(K_I)`, `K_I = I^\perp/I`, together with the
-        selected generators of the kernel -- and the sign of the action on `v`,
-        ``sgn: P_I -> O(I) = {\pm 1}``, cuts `P_I^1 = ker sgn` out of it.
-
-        **The family, and why it generates.**  `ker sgn` has index two in `P_I`,
-        so its left cosets are `K = ker sgn` and `a K` for any one reversing
-        member `a`.  Take the transversal `{1, a}` and, for a generating family
-        `S` of `P_I` made symmetric by adding the inverses, the family
-
-            `w_{tP}^{-1} t w_P`  for every coset `P` and every `t` in `S`,
-
-        where `w_K = 1` and `w_{aK} = a`.  Each of these lies in `K`, because it
-        fixes the coset `P`: `w_{tP}^{-1} t w_P (P) = w_{tP}^{-1}(tP) = K`.  And
-        they generate `K`: an element of `K` is a word in `S`, and reading the
-        word left to right, `w_{tP}^{-1} t w_P` is the correction that keeps the
-        running product in the coset the word has reached, so the word is their
-        product.  That is Schreier's lemma in its transversal form, and it is
-        why the family below has `2 |S|` members per coset and not the pairing
-        `a t` for reversing `t` alone: pairing drops the conjugates
-        `a^{-1} t a` of the members that already fix `v`, and those conjugates
-        are needed -- for `f = (12)(34)` even and `r = (02)` odd in `S_4` the
-        group `\langle f, r\rangle` has `ker sgn` of order six, while `f` and
-        `r^2 = 1` generate only `\langle f\rangle`.
+        `I = \mathbf Z v`.  Its family is read from the pointwise
+        integral-structure action at the rank-one isotropic subobject
+        (:meth:`...PrimitiveIsotropicSubobjects.pointed_stabilizer_action`).
+        That action's rational generators are one lift of each certified
+        generator of `O(K_I)`, `K_I = I^\perp/I`, together with the pointwise
+        kernel at the common lift denominator.  Its finite residue module is
+        the stable orbit span of
+        ``2 d^2 |disc(K_I)|^2 [L : i^*(L)]``, and the stabilizer is cut out as
+        the preimage of a point stabilizer in that module.  The lift formulas
+        are the marked-line torsors of Gritsenko--Hulek--Sankaran,
+        arXiv:0810.1614v1, section 3.1, equations (4)--(5), printed pp. 8--9;
+        the quotient block is Dutour Sikiric--Hulek, arXiv:2302.01679v2,
+        Theorem 4.9, printed pp. 33--34.
 
         At `K_I = 0` the perpendicular is the line itself, so ``P_I^1`` is the
         pointwise perpendicular kernel
         (:meth:`...IsotropicReductions.ParentMethods.pointwise_perpendicular_kernel`),
         whose generators are the integral parameter module's -- integer linear
-        algebra, with no isometry search.  This is the rank at which the setwise
-        construction declines, so it is answered here rather than left to the
-        port: on `U` the pointed stabilizer is trivial and the kernel family is
-        empty, as it must be.
+        algebra, with no isometry search.  On `U` the pointed stabilizer is
+        trivial and the kernel family is empty, as it must be.
 
         A non-isotropic `v` is answered by
         :meth:`_nonisotropic_pointed_stabilizer_generators`.
@@ -3095,42 +3080,7 @@ class Lattices(OwnedCategoryOverBaseRing):
             return finite_ordered_set(
                 tuple(reduction.pointwise_perpendicular_kernel().group_generators())
             )
-        setwise = self._isotropic_line_stabilizer_generators(marked)
-        if setwise is None:
-            return finite_ordered_set(subobject.pointed_stabilizer_generators())
-        fixing, reversing = [], []
-        for generator in setwise:
-            image = generator(vector)
-            if image == vector:
-                fixing.append(generator)
-            elif image == -vector:
-                reversing.append(generator)
-            else:
-                raise ValueError(
-                    f"the setwise parabolic family at {vector} contains {generator}, which carries "
-                    f"the primitive vector to {image}: a stabilizer of the line carries its primitive "
-                    f"generator to +-v"
-                )
-        if not reversing:
-            return finite_ordered_set(tuple(fixing))
-        symmetric = tuple(setwise) + tuple(generator.inverse() for generator in setwise)
-        anchor = reversing[0]
-        anchor_inverse = anchor.inverse()
-        family = []
-        for generator in symmetric:
-            if generator(vector) == vector:
-                family.append(generator)
-                family.append(anchor_inverse * generator * anchor)
-            else:
-                family.append(anchor_inverse * generator)
-                family.append(generator * anchor)
-        family = tuple(family)
-        if not all(generator(vector) == vector for generator in family):
-            raise ValueError(
-                f"the pointed family built at {vector} contains an element that does not fix it; "
-                f"the sign of the action on v was read from the setwise family it was built from"
-            )
-        return finite_ordered_set(family)
+        return finite_ordered_set(subobject.pointed_stabilizer_generators())
 
     def _nonisotropic_pointed_stabilizer_generators(self, marked, *, setwise=False):
         r"""Generators of the stabilizer of a primitive *non-isotropic* vector, or ``None``.
