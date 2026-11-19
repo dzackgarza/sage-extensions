@@ -71,3 +71,49 @@ stabilizer family is necessary and not sufficient.
 
 Not dispatched this round: the `T_Co` kernel rows, which this issue's own
 record forbids; the measurement above is on the five-dimensional specimen.
+
+## The registry already retains a transporter, and nothing reads it
+
+`orthogonal_quotients.py:2902` `register_isotropic_lift(plane, lift, parabolic_generators, discriminant_image, *, spelling=None)`
+says in its own words what it keeps: "``lift`` carries the source plane ...
+**to ``plane``**", keyed by `_span_key(plane)` (`:2944`), and
+`_registered_isotropic_split_of_span` (`:2958`) reads it back by span.  So for
+every registered plane `P` -- with one source plane `P_0` per registry -- the
+registry holds an isometry `g_P` with `g_P(P_0) = P`.
+
+Nothing in the transporter path reads it.  `_PrimitiveIsotropicSublatticeOrbitDecompositionEngine.transporter`
+(`isotropic_orbits.py:256`) calls `self.group().isotropic_equivalence_witness(source, target)`,
+which is `_isotropic_equivalence_witness` (`:2009`), which is the port for any
+two distinct subobjects; and `register_isotropic_lift`,
+`_registered_isotropic_split` and `_registered_isotropic_split_of_span` appear
+only in `orthogonal_quotients.py` -- not in `isotropic_orbits.py`, not in
+`lattice_morphisms.py`, and not in the incidence row script.
+
+**Lemma.**  Let `g_i` and `g_j` be the registered lifts of two planes `P_i`,
+`P_j` of one registry, so `g_i(P_0) = P_i` and `g_j(P_0) = P_j`.  Then
+
+    g_j g_i^-1  carries  P_i  to  P_j,
+
+and every transporter of `P_i` to `P_j` is `g_j s g_i^-1` with `s` fixing `P_0`.
+
+**Proof.**  `g_j g_i^-1(P_i) = g_j(P_0) = P_j`.  If `h` carries `P_i` to `P_j`
+then `g_j^-1 h g_i` carries `P_0` to `P_0`, which is the previous section's
+coset statement. ∎
+
+**Consequence: the port call is not necessary, only current.**  For two
+registered planes a transporter is the composite of two retained lifts.  The
+355 s is a property of the routing
+(`transporter -> isotropic_equivalence_witness -> port`), not of the
+mathematics, and the retained data that would replace it already sits one owner
+away.
+
+**What remains, sharpened.**  Route the transporter through the registry:
+return `g_j g_i^-1` when both spans are registered and fall back to the port
+otherwise.  The read is by span (`_registered_isotropic_split_of_span`), and a
+cusp's whole datum is its span, so the two ends fit without a new key.  What is
+not yet checked is whether the incidence rows register the plane cusps they
+then ask transporters for -- the #381 record says the row registers its lifts by
+span, and that read is the thing to verify before the routing change is made.
+
+Not measured this round beyond the coset numbers above: whether the row's own
+planes are registered needs the row's construction, which is its own run.
