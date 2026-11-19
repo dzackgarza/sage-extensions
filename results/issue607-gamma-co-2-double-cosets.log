@@ -1,0 +1,6 @@
+[  187.0s] |O(q)| = 46998591897600
+[  187.5s] |P_0| = 696729600
+[  188.7s] |O(q).A_U(2)| = 67456
+[  188.7s] generators ('h', 'ep', 'fp', 'a1', 'a2', 'a3', 'a4', 'a5', 'a6', 'a7', 'a8'); (h,h) = 2
+[  237.8s] plane Integral lattice of rank 2 and signature (0, 0); parabolic complete: True
+exit 124
