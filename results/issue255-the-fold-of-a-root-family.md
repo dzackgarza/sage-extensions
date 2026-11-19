@@ -14,7 +14,7 @@ and neither is quoted from a source.  The five chambers are Sterk's, and are cit
 formed lattice \(W\) the isometry acts on (the whole lattice when the roots span it rationally, the
 saturated span otherwise), \(g\), the folded root family in \(W^g=\ker(g-1)\), the orbit sums that
 are no roots, and — both lattices being even 2-elementary — Nikulin's \((r,a,\delta)\) of each
-(`two_elementary_invariants`, `src/sage_extensions/categories/coxeter_diagrams.py:2844`).
+(`two_elementary_invariants`, `src/sage_extensions/categories/coxeter_diagrams.py:2850`).
 
 The datum is \(g\), written in either of the two forms its images take:
 
@@ -137,6 +137,25 @@ a degenerate span leaves room for one" is a condition to be checked on the famil
 consequence of degeneracy.  Its source is the search
 `results/issue255-the-invalidating-input-search.py` (the 25 and the zero), against Sterk's printed
 chambers, pp. 19--24, which the folds reproduce.
+
+**Lemma (the integrality the refusals above rest on).**  *Let \(R\) be a family of roots of \(L\)
+spanning the saturated lattice \(W\) the operation takes as its span, and let \(g\) be a linear map
+of \(W\) carrying \(R\) to points of \(W\) and keeping their pairings.  Then \(g(W)=W\) and the
+matrix of \(g\) in any basis of \(W\) is integral.*  *Proof.*  \(g(W)\) is the saturation of
+\(g(R)\), which lies in \(W\), and a saturated sublattice contains the saturation of any of its
+subsets; the same for \(g^{-1}\), so \(g(W)=W\), and a linear map carrying one lattice basis into
+the lattice has an integral matrix.  ∎  This is why the two order-four automorphisms of the 22-root
+diagram are refused for the one condition they do not have --- being an involution --- and not for
+integrality: they carry roots to roots, so their matrices are integral by this lemma.  The
+operation's integrality test can fire only when an image is no point of the span at all, which is a
+datum about something other than a map of the span: that datum is refused by name at
+`src/sage_extensions/categories/coxeter_diagrams.py:2654` and tested at
+`tests/lattices/test_the_fold_of_a_root_family_by_a_diagram_involution.sage:173`.  No printed page
+is cited: the proof is the
+definition of saturation, and the two paragraphs it is used in
+(\(\S3\) item 2's second refusal and the test at
+`tests/lattices/test_the_sterk_configurations_are_folds_of_the_two_root_families.sage:233`) are
+computations against Sterk's printed chambers, pp. 19--24.
 
 ## Proposition 2 (orbit sums, and the rescaling)
 
@@ -270,7 +289,7 @@ pytest -o addopts= -p qc_sage_session -p sage_extensions.testing.suite_budget \
   integral isometric involution of the 22-root span, and that its fold has 4.3.7's invariants.
 * The issue's operation paragraph asks for two-elementary invariants "when defined", and the
   folding answers them: `RootFamilyFolding.two_elementary_invariants`
-  (`src/sage_extensions/categories/coxeter_diagrams.py:2844`) returns Nikulin's \((r,a,\delta)\)
+  (`src/sage_extensions/categories/coxeter_diagrams.py:2850`) returns Nikulin's \((r,a,\delta)\)
   of the invariant and of the anti-invariant lattice when both are even 2-elementary, and refuses
   naming the lattice when one is not.  All ten lattices of the five folds are 2-elementary — their
   determinants are \(-1024, 256, 256, 256, 256\) (invariant) and \(256, 256, 256, 256, 64\)
@@ -292,14 +311,14 @@ tabulated there.  Nothing is queued behind another item.
 
 * `src/sage_extensions/categories/coxeter_diagrams.py:2489` — `RootedCoxeterDiagrams.ParentMethods.fold(involution)`:
   the one operation, whose datum is taken in either form at `:2560` through `_involution_images`
-  (`:2903`) and whose four decisions and two propositions are its docstring (`:2519` the
+  (`:2909`) and whose four decisions and two propositions are its docstring (`:2519` the
   relations/pairings proposition, `:2531` the orbit sums and the rescaling).
 * `:2562` — `_folded_by_images`, the single decision path (relations, pairings, integrality,
-  involution) and the fold itself; `:2720` the orbit sums and the rescaling, `_coordinate_divisor`
-  at `:2985`.
-* `:2779` — `RootFamilyFolding`, the returned record: `isometry` `:2809`, `invariant_lattice` `:2813`,
-  `anti_invariant_lattice` `:2817`, `roots` `:2821`, `discarded_sums` `:2825`, and
-  `two_elementary_invariants` `:2844`.
+  involution) and the fold itself; `:2726` the orbit sums and the rescaling, `_coordinate_divisor`
+  at `:2991`; `:2654` the refusal of an image that is no point of the span.
+* `:2785` — `RootFamilyFolding`, the returned record: `isometry` `:2818`, `invariant_lattice` `:2822`,
+  `anti_invariant_lattice` `:2826`, `roots` `:2830`, `discarded_sums` `:2834`, and
+  `two_elementary_invariants` `:2850`.
 * `src/sage_extensions/sterk.py:689` — the three permutation folds, `:691` the two image folds, both
   inside `_foldings_cached` (`:679`); `foldings()` `:697`; `_sterk_roots_cached` `:718` reads them;
   `sterk_roots()` `:784`.
@@ -327,8 +346,8 @@ and the refusal on the invalidating input." — met under the amendment, not as 
 * The invalidating input on a degenerate family of 22 roots:
   `tests/lattices/test_the_fold_of_a_root_family_by_a_diagram_involution.sage:133`, refused at
   `:169`; the same construction at four roots, the smallest specimen, at `:110`, refused at `:129`.
-* The two-elementary invariants: `src/sage_extensions/categories/coxeter_diagrams.py:2844`
-  (helper `:2874`), answered for all five folds at
+* The two-elementary invariants: `src/sage_extensions/categories/coxeter_diagrams.py:2850`
+  (helper `:2880`), answered for all five folds at
   `tests/lattices/test_the_five_sterk_root_configurations_as_foldings.sage:146` and refused for a
   lattice that is not 2-elementary at
   `tests/lattices/test_the_fold_of_a_root_family_by_a_diagram_involution.sage:173`.
