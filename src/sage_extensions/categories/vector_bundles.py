@@ -38,6 +38,7 @@ from sage_extensions.categories.abstract_categories.objects import (
     OwnedParameterizedCategory,
 )
 from sage_extensions.categories.manifolds import (
+    CoverageUndecided,
     SmoothManifolds,
     _chart_family_covers,
     _engine_manifold_chart,
@@ -981,11 +982,19 @@ class SmoothSectionModules(OwnedParameterizedCategory):
                 f"a section of {self._vector_bundle} is stated on the charts of {manifold}, "
                 f"and the components given for {extra} are on charts it does not have"
             )
-            assert _chart_family_covers(manifold, labels), (
-                f"a section of {self._vector_bundle} is stated on a cover of {manifold}, and the "
-                f"charts {labels} do not cover it: a chart of the atlas lies inside none of them, "
-                f"so its points would have no component"
-            )
+            coverage = _chart_family_covers(manifold, labels)
+            if coverage is not True:
+                if coverage is False:
+                    assert False, (
+                        f"a section of {self._vector_bundle} is stated on a cover of {manifold}, "
+                        f"and the charts {labels} do not cover it: a chart of the atlas lies "
+                        f"outside every one of them, so its points would have no component"
+                    )
+                raise CoverageUndecided(
+                    f"whether the charts {labels} cover {manifold} is undecided: no certificate "
+                    f"decides it, so a section of {self._vector_bundle} is not refused for failing "
+                    f"to cover"
+                )
             admitted = {}
             for label in labels:
                 chart = atlas[label]
@@ -1237,11 +1246,18 @@ class SmoothSectionModules(OwnedParameterizedCategory):
                 )
             manifold = self.base_manifold()
             stated = tuple(family[0].components())
-            assert _chart_family_covers(manifold, stated), (
-                f"a frame of {self._vector_bundle} is a basis at every point, and the charts "
-                f"{stated} it is stated on do not cover {manifold}: a chart of the atlas lies "
-                f"inside none of them, so the fibres over its points would be undecided"
-            )
+            coverage = _chart_family_covers(manifold, stated)
+            if coverage is not True:
+                if coverage is False:
+                    assert False, (
+                        f"a frame of {self._vector_bundle} is a basis at every point, and the "
+                        f"charts {stated} it is stated on do not cover {manifold}: a chart of the "
+                        f"atlas lies outside every one of them"
+                    )
+                raise CoverageUndecided(
+                    f"whether the charts {stated} cover {manifold} is undecided, so the frame of "
+                    f"{self._vector_bundle} is not decided to be a basis at every point"
+                )
             for label in stated:
                 chart = manifold.atlas()[label]
                 entries = tuple(

@@ -189,6 +189,7 @@ from sage_extensions.categories.manifold_dimension_strata import (  # noqa: F401
 )
 from sage_extensions.categories.manifolds import (  # noqa: F401
     ComplexManifolds,
+    CoverageUndecided,
     DifferentiableManifolds,
     RiemannianManifolds,
     SmoothManifolds,

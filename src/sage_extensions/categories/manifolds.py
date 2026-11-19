@@ -799,6 +799,17 @@ def _composed_ambient_transition(manifold, source_label, target_label):
     return None
 
 
+class CoverageUndecided(ValueError):
+    r"""Raised when a family of charts is neither certified to cover nor decided to miss a point.
+
+    Coverage is the statement that no point of the manifold lies outside every chart of
+    the family (Lee, *Introduction to Smooth Manifolds*, 2nd ed., Ch. 1).  A decision that
+    finds no certificate has decided nothing, and this tree reports that as its own answer
+    rather than as the claim that the family does not cover: the two are different
+    statements about the mathematics, and only one of them is true.
+    """
+
+
 def _chart_family_covers(manifold, labels):
     r"""Whether the charts ``labels`` cover ``manifold``, decided by containment.
 
@@ -819,8 +830,12 @@ def _chart_family_covers(manifold, labels):
         domain = _engine_manifold_chart(chart).domain()
         if any(domain.is_subset(one.domain()) for one in given):
             continue
-        if not _sum_certificate_covers(manifold, labels, chart):
+        verdict = _sum_certificate_covers(manifold, labels, chart)
+        if verdict is True:
+            continue
+        if verdict is False:
             return False
+        return None
     return True
 
 
@@ -899,7 +914,7 @@ def _sum_certificate_covers(manifold, labels, chart) -> bool:
     for label in labels:
         read = _member_conditions_in_chart(manifold, label, chart)
         if read is None:
-            return False
+            return None
         kept = tuple(
             condition
             for condition in read
@@ -913,14 +928,25 @@ def _sum_certificate_covers(manifold, labels, chart) -> bool:
             product = product * condition
         products.append(product)
     if not products:
-        return False
+        return None
     total = sum(products[1:], products[0])
     if _decided_nowhere_vanishing(total, symbols, chart_conditions) is True:
         return True
-    if _conditions_share_no_zero(products, symbols):
+    if _conditions_share_no_zero(products, symbols) is True:
         return True
+    if _conditions_share_no_zero(products, symbols) is False:
+        return False
     squares = sum(product**2 for product in products)
-    return _decided_nowhere_vanishing(squares, symbols, chart_conditions) is True
+    if _decided_nowhere_vanishing(squares, symbols, chart_conditions) is True:
+        return True
+    # One member's uncovered set is its own zero set, and the nowhere-vanishing
+    # decision answers ``False`` when it decides that set is not empty: that is a
+    # decision that the family misses a point, which is the other answer.
+    if len(products) == 1 and (
+        _decided_nowhere_vanishing(products[0], symbols, chart_conditions) is False
+    ):
+        return False
+    return None
 
 
 def _member_conditions_in_chart(manifold, label, chart):
@@ -966,7 +992,7 @@ def _member_conditions_in_chart(manifold, label, chart):
 
 
 def _conditions_share_no_zero(conditions, symbols) -> bool:
-    r"""Whether the conditions are decided to share no zero, so that the family covers.
+    r"""``True`` when the conditions are decided to share no zero, ``None`` when not decided.
 
     The conditions cut out closed subsets, and their intersection is empty exactly when
     the polynomials generate the whole polynomial ring over the algebraic closure -- a
@@ -989,8 +1015,15 @@ def _conditions_share_no_zero(conditions, symbols) -> bool:
         ideal = ring.ideal([ring(numerator) for numerator in numerators])
         basis = ideal.groebner_basis()
     except (TypeError, ValueError, ArithmeticError):
-        return False
-    return len(basis) == 1 and basis[0].is_unit()
+        return None
+    one = len(basis) == 1 and basis[0].is_unit()
+    if one:
+        return True
+    # The conditions do share a zero over the algebraic closure, which says nothing
+    # about a real point unless the zero is real: only a nonzero constant in the
+    # elimination is a decision that no real common zero exists, so the answer here is
+    # undecided unless a certificate elsewhere decides it.
+    return None
 
 
 def _upper_triangle(n):
@@ -2827,11 +2860,19 @@ class SmoothManifolds(OwnedCategory):
                 f"a smooth function on {self} is stated on the charts of the manifold, and the "
                 f"expressions given for {extra} are on charts it does not have"
             )
-            assert _chart_family_covers(self, labels), (
-                f"a smooth function on {self} is stated on a cover of the manifold, and the "
-                f"charts {labels} do not cover it: a chart of the atlas lies inside none of them, "
-                f"so its points would have no value"
-            )
+            coverage = _chart_family_covers(self, labels)
+            if coverage is not True:
+                if coverage is False:
+                    assert False, (
+                        f"a smooth function on {self} is stated on a cover of the manifold, and "
+                        f"the charts {labels} do not cover it: a chart of the atlas lies outside "
+                        f"every one of them, so its points would have no value"
+                    )
+                raise CoverageUndecided(
+                    f"whether the charts {labels} cover {self} is undecided: no certificate "
+                    f"decides it, and a family that is not certified to cover is not decided "
+                    f"not to cover either"
+                )
             admitted = {
                 label: _admit_manifold_expression(expressions[label], atlas[label])
                 for label in labels
