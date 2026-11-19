@@ -132,14 +132,63 @@ def _decided_nowhere_vanishing(expression, variables, excluded=()):
             if SR(quotient * factor - numerator).simplify_rational() != 0:
                 break
             numerator = quotient
-    free = tuple(numerator.variables())
-    if not free:
+    return _decided_no_real_zero(numerator, variables)
+
+
+def _decided_no_real_zero(expression, variables):
+    r"""Whether the real polynomial ``expression`` is decided to take no zero on the chart.
+
+    Three cases are decided, and each is a proof rather than a sample.  A constant
+    is decided by the exact reals.  A polynomial of one variable is decided by
+    having no root in the real algebraic numbers, since a real polynomial with no
+    real root is never zero.  A polynomial of several variables is decided by its
+    monomials: when every exponent is even, every coefficient has the same sign,
+    and the constant term is nonzero with that sign, the polynomial is bounded away
+    from zero on the whole chart -- ``1 + x^2 + x^2y^2 >= 1`` -- and vanishes
+    nowhere; when the constant term is zero it vanishes at the chart's origin,
+    which is a decision the other way.  Anything else is undecided here, and the
+    caller is told that rather than that its determinant vanishes.
+    """
+    from sage.rings.polynomial.polynomial_ring_constructor import PolynomialRing
+    from sage.rings.rational_field import QQ as SageQQ
+
+    from sage_extensions.categories.functions.real_functions import _decided_nonzero
+
+    formula = SR(expression).simplify_rational()
+    numerator = SR(formula.numerator())
+    given = tuple(variables)
+    if not tuple(numerator.variables()):
         return _decided_nonzero(numerator)
-    match len(tuple(variables)):
-        case 1 if numerator.is_polynomial(tuple(variables)[0]):
-            return not tuple(_rational_polynomial(numerator).roots(AA))
-        case _:
-            return None
+    if len(given) == 1 and numerator.is_polynomial(given[0]):
+        from sage.rings.qqbar import AA
+
+        return not tuple(_rational_polynomial(numerator).roots(AA))
+    names = tuple(str(variable) for variable in given)
+    ring = PolynomialRing(SageQQ, names=names)
+    try:
+        polynomial = ring(numerator)
+    except (TypeError, ValueError):
+        return None
+    coefficients = {
+        tuple(int(power) for power in monomial): coefficient
+        for monomial, coefficient in polynomial.dict().items()
+    }
+    if not coefficients:
+        return False
+    monomials = tuple(coefficients)
+    if not all(
+        all(power % 2 == 0 for power in monomial) for monomial in monomials
+    ):
+        return None
+    constant = coefficients.get(tuple(0 for _ in names), SageQQ.zero())
+    if constant == 0:
+        return False
+    values = tuple(coefficients[monomial] for monomial in monomials)
+    if all(value > 0 for value in values) and constant > 0:
+        return True
+    if all(value < 0 for value in values) and constant < 0:
+        return True
+    return None
 
 
 def _is_an_open_inclusion(mapping, domain, manifold) -> bool:
