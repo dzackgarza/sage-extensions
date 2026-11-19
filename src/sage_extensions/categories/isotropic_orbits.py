@@ -258,7 +258,50 @@ class _PrimitiveIsotropicSublatticeOrbitDecompositionEngine(_FiniteOrbitDecompos
     def transporter(self, source, target):
         if source not in self.locus() or target not in self.locus():
             raise ValueError(f"cannot find an isometry carrying {source} to {target}: both must be among the primitive isotropic sublattices {self.locus()}")
+        registered = self._registered_transporter(source, target)
+        if registered is not None:
+            return registered
         return self.group().isotropic_equivalence_witness(source, target)
+
+    def _registered_transporter(self, source, target):
+        r"""The recorded transports' composite when both planes come from one row, else ``None``.
+
+        A row records, per plane it carries, the isometry that carried its own
+        base plane there (:meth:`...OrthogonalCharacterQuotient.register_isotropic_transport`),
+        so for two planes of one row the composite `g_target g_source^-1` carries
+        one onto the other and no isometry is searched for.  This is the
+        finite-character quotient's own
+        :meth:`...OrthogonalCharacterQuotient.isotropic_transport_between` read at
+        the same-root case only: there the composite is a product of the row's
+        own elements and so lies in the group, while across two rows it needs a
+        bridge in the ambient group, which is left to the equivalence witness
+        below.
+
+        The composite is checked against the target before it is returned, so a
+        registry that does not describe these planes falls through to the
+        witness rather than answering with an element that carries the source
+        elsewhere.
+        """
+        group = self.group()
+        if not hasattr(group, "character_data_is_complete"):
+            return None
+        if group.character_data_is_complete() is not True:
+            return None
+        quotient = group.finite_character_quotient()
+        left_root, left_element = quotient.transported_from_root(source)
+        right_root, right_element = quotient.transported_from_root(target)
+        if _span_key(left_root) != _span_key(right_root):
+            return None
+        witness = right_element * ~left_element
+        source_basis = tuple(
+            source.inclusion()(source.module_generator(label))
+            for label in source.module_generating_set()
+        )
+        return (
+            witness
+            if all(witness(vector) in target for vector in source_basis)
+            else None
+        )
 
 
 def _primitive_isotropic_sublattice_orbit_decomposition(group, locus):
