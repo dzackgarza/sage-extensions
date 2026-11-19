@@ -55,6 +55,14 @@ the 22 roots have square \(-2\) and two --- \(v_{21}\) and \(v_{22}\) --- have s
 \(22-18=4\) rational relations
 (`tests/lattices/test_the_sterk_configurations_are_folds_of_the_two_root_families.sage:121`).
 
+The other Specimens row, "the root-swap involution has a 10-dimensional invariant subspace; the
+Coxeter-graph involution has vertex orbits {0,2},{1,4},{3,6},{7,10},{8,9},{5}", is read on the folded
+4.3.8 diagram: the ten-dimensional invariant subspace is that fold's invariant lattice of rank 10,
+and the eleven-root diagram has exactly one non-trivial automorphism --- an involution with five
+2-cycles and one fixed vertex, the shape the row lists.  The index sets themselves are the archived
+folding's labelling, which the library does not record, so the test asserts the shape and the
+uniqueness (`tests/lattices/test_the_sterk_configurations_are_folds_of_the_two_root_families.sage:348`).
+
 Three of them are folds by a permutation of the roots: 4.3.5 and 4.3.8 by two involutions of the
 22-root family, 4.3.6 by the reversal of the 19-root family.  Two are not, and cannot be:
 
