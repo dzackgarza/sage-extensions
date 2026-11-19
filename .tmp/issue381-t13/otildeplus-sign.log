@@ -1,0 +1,35 @@
+tree SHA: 3ce2c94c6fbb7d4bdb06175d0f0b865a68e1b36d (modified paths: 1)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 4.62 4.49 4.57 4/545 3695790
+probe: .tmp/issue381-t13/probe-otildeplus-sign.py; inner 900 s
+[    1.53s] lattice: rank 11, signature (2, 9)
+[    1.73s] subgroup: {g in Orthogonal group O(Integral lattice of rank 11 and signature (2, 9)) : g lies in every selected subgroup}
+[   70.66s] quotient index: 93997183795200
+[   70.66s] _sign_descent_rank(): j=1, labels=['spinor'] in 0.00 s
+[   70.66s] ambient group (the O row): Orthogonal group O(Integral lattice of rank 11 and signature (2, 9))
+[   97.34s] ambient plane orbits: 1 in 26.68 s
+[  101.20s] is_parabolic_complete(): True in 3.86 s
+[  101.20s] parabolic_stabilizer_generators(): 113 generators in 0.00 s
+[  106.65s] _stabilizer_sign_flips(family): True in 5.44 s
+[  106.71s] _kernel_sign_flip('spinor'): answered in 0.06 s
+[  106.71s] witness: Morphism from Integral lattice of rank 11 and signature (2, 9) to Integral lattice of rank 11 and signature (2, 9)
+[  106.71s]   rho(witness) is trivial: True
+[  106.72s]   real spinor norm -1: True
+[  106.72s]   determinant one: False
+[  106.72s] the walk yields 1 lift(s) per double coset at this plane
+[  106.72s] done
+[peakrss] probe603: child waited=0 shell_code=0 samples=55
+[peakrss] peak tree RSS      : 613 MiB
+[peakrss] low-water MemAvail : 766 MiB
+[peakrss] peak single VmHWM  : 619 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      608 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   run.sh                        0 MiB peak
+[peakrss]   t=   108.1s procs=  3 rss=   613 MiB hwm=   619 MiB avail=  4622 MiB
+[peakrss]   t=   106.1s procs=  3 rss=   610 MiB hwm=   616 MiB avail=  4619 MiB
+[peakrss]   t=   104.1s procs=  3 rss=   609 MiB hwm=   615 MiB avail=  4601 MiB
+[peakrss]   t=   102.1s procs=  3 rss=   607 MiB hwm=   613 MiB avail=  4605 MiB
+[peakrss]   t=   100.1s procs=  3 rss=   598 MiB hwm=   604 MiB avail=  4608 MiB
+probe exit: 0

@@ -46,7 +46,9 @@ log(
 )
 
 started = time.perf_counter()
-planes = tuple(lattice.stable_orthogonal_group().isotropic_orbit_representatives(2))
+ambient_group = lattice.Aut()
+log(f"ambient group (the O row): {ambient_group}")
+planes = tuple(ambient_group.isotropic_orbit_representatives(2))
 log(f"ambient plane orbits: {len(planes)} in {time.perf_counter() - started:.2f} s")
 if not planes:
     raise SystemExit("no ambient plane orbit: the Otilde+ plane row has no plane cusp")

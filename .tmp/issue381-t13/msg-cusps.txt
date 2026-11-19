@@ -1,0 +1,44 @@
+results: Otilde+'s plane cusps are 189720, the sign sheet being redundant (#381)
+
+The walk yields a second lift per double coset exactly when j >= 1 and one sign
+label and not stab_sign_flip and a kernel witness exists.  For Otilde the sign
+list is empty -- _image_labels is ["discriminant"] there and ["discriminant",
+"spinor"] for Otilde+ (orthogonal_quotients.py:397-:406) -- so j = 0 and its
+189721 registered planes are the coset space's 189720 plus the source.  Nothing
+in Otilde's count says anything about the sign predicate.
+
+For Otilde+, measured at T_Co (probe-otildeplus-sign.py, otildeplus-sign.log):
+
+  quotient.index()                     93997183795200 = 2 x 46998591897600
+  _sign_descent_rank()                 j = 1, labels ['spinor']
+  ambient plane orbits                 1, in 26.68 s
+  is_parabolic_complete()              True, 3.86 s
+  parabolic_stabilizer_generators()    113 generators
+  _stabilizer_sign_flips(family)       True, 5.44 s
+  _kernel_sign_flip('spinor')          an integral isometry, 0.06 s
+    rho trivial / real spinor norm -1 True / True, determinant -1
+
+An element with rho(s) = 1 and spinor -1 lies in ker(rho, sn), so a true
+predicate is exactly "the stabilizer already presents the sign coset": no plane
+of the row yields a second lift.  T_Co has one O(T_Co)-orbit of planes and the
+predicate is a function of the plane and the lattice's characters, so the value
+holds at every plane of the row.
+
+So Otilde+'s planes are the double cosets A \ F / F_P with A = 1 of Dutour
+Sikiric--Hulek, arXiv:2302.01679v2, Lemma 3.6, printed p. 22 -- 189720 of them,
+the index 46998591897600/247726080 the cost probe read.  Its line row answers
+bool(sign_labels) as its stab_sign_flip (:1818) because the stabilizer's patterns
+span the sign space (:1780-:1782), so its lifts are one per point and its count
+is the orbit's 527.
+
+That is the (., 527, 189720) half of the archive's (569160, 527, 189720).  The
+edge count is the run's to decide and is not claimed: a smaller subgroup can only
+refine the incidence.
+
+What it settles is the row's length: 189720 planes at the measured 7.35 ms a
+plane is 1394 s of split, so Otilde+ costs what Otilde did, about 35 minutes
+inside the driver's 10800 s cap, and its two kills were the host's.
+
+No object introduced: rho and sn_RR are the lattice's characters, the double
+cosets and the index are Lemma 3.6's, and every count above is a datum the
+library printed.

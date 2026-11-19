@@ -1,0 +1,86 @@
+tree SHA: bb57ca742ca8c1522c9efe102cb1ee1333718733 (modified paths: 0)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 1.93 2.36 3.12 4/587 3664420
+probe: .tmp/issue381-t13/probe-gap-attrib.py; inner 800 s
+[    1.19s] lattice: rank 11, signature (2, 9)
+[    1.33s] subgroup: {g in Orthogonal group O(Integral lattice of rank 11 and signature (2, 9)) : rho_L(g) lies in a subgroup given by its own generators}
+[Otilde] the row's route: divided-class, taken because its lines carry divided classes and its covering is carried from one plane to the others (decided in 1.5 s)
+------------------------------------------------------------------------
+/sage/.venv/lib/python3.14/site-packages/cysignals/signals.cpython-314-x86_64-linux-gnu.so(+0x86e5) [0x7c7a277826e5]
+/sage/.venv/lib/python3.14/site-packages/cysignals/signals.cpython-314-x86_64-linux-gnu.so(+0x8786) [0x7c7a27782786]
+/sage/.venv/lib/python3.14/site-packages/cysignals/signals.cpython-314-x86_64-linux-gnu.so(+0x8b54) [0x7c7a27782b54]
+/lib/x86_64-linux-gnu/libc.so.6(+0x3fd70) [0x7c7a2948dd70]
+/lib/x86_64-linux-gnu/libc.so.6(+0xa06a6) [0x7c7a294ee6a6]
+/lib/x86_64-linux-gnu/libc.so.6(+0xa1eeb) [0x7c7a294efeeb]
+/lib/x86_64-linux-gnu/libc.so.6(malloc+0xfe) [0x7c7a294f09ce]
+/sage/.venv/bin/python() [0x1801f09]
+/sage/.venv/bin/python() [0x180668e]
+/sage/.venv/bin/python() [0x181215e]
+/sage/.venv/bin/python() [0x1817b85]
+/sage/.venv/bin/python() [0x1818312]
+/sage/.venv/bin/python() [0x180796d]
+/sage/.venv/lib/python3.14/site-packages/sage/misc/classcall_metaclass.cpython-314-x86_64-linux-gnu.so(+0xce9a) [0x7c7a27a4fe9a]
+/sage/.venv/bin/python() [0x1822c21]
+/sage/.venv/bin/python() [0x1817bbd]
+/sage/.venv/lib/python3.14/site-packages/sage/misc/classcall_metaclass.cpython-314-x86_64-linux-gnu.so(+0x9f78) [0x7c7a27a4cf78]
+/sage/.venv/bin/python() [0x1807716]
+/sage/.venv/bin/python() [0x1817b85]
+/sage/.venv/bin/python() [0x1818312]
+/sage/.venv/bin/python() [0x180796d]
+/sage/.venv/lib/python3.14/site-packages/sage/misc/classcall_metaclass.cpython-314-x86_64-linux-gnu.so(+0x9ff6) [0x7c7a27a4cff6]
+/sage/.venv/bin/python() [0x1807716]
+/sage/.venv/bin/python() [0x1817bbd]
+/sage/.venv/bin/python() [0x1817456]
+/sage/.venv/bin/python() [0x1822c21]
+/sage/.venv/bin/python() [0x1817bbd]
+/sage/.venv/bin/python() [0x19253bb]
+/sage/.venv/bin/python() [0x1807716]
+/sage/.venv/bin/python() [0x1817bbd]
+/sage/.venv/lib/python3.14/site-packages/sage/misc/cachefunc.cpython-314-x86_64-linux-gnu.so(+0x182cc) [0x7c7a279482cc]
+/sage/.venv/bin/python() [0x1807716]
+/sage/.venv/bin/python() [0x1817bc6]
+/sage/.venv/lib/python3.14/site-packages/sage/misc/cachefunc.cpython-314-x86_64-linux-gnu.so(+0x109af) [0x7c7a279409af]
+/sage/.venv/lib/python3.14/site-packages/sage/misc/cachefunc.cpython-314-x86_64-linux-gnu.so(+0x3dbc5) [0x7c7a2796dbc5]
+/sage/.venv/bin/python() [0x1822fe1]
+/sage/.venv/bin/python() [0x1817bbd]
+/sage/.venv/bin/python() [0x1817456]
+/sage/.venv/bin/python() [0x1822c21]
+/sage/.venv/bin/python() [0x1847e2b]
+/sage/.venv/bin/python(PySequence_Tuple+0x28b) [0x18a244b]
+/sage/.venv/bin/python() [0x183c463]
+/sage/.venv/bin/python() [0x1817bc6]
+/sage/.venv/lib/python3.14/site-packages/sage/misc/cachefunc.cpython-314-x86_64-linux-gnu.so(+0x17ce1) [0x7c7a27947ce1]
+/sage/.venv/lib/python3.14/site-packages/sage/cpython/string.cpython-314-x86_64-linux-gnu.so(+0x53cd) [0x7c7a290833cd]
+/sage/.venv/bin/python() [0x1ac3558]
+/sage/.venv/lib/python3.14/site-packages/sage/misc/cachefunc.cpython-314-x86_64-linux-gnu.so(+0x109af) [0x7c7a279409af]
+/sage/.venv/lib/python3.14/site-packages/sage/misc/cachefunc.cpython-314-x86_64-linux-gnu.so(+0x49907) [0x7c7a27979907]
+/sage/.venv/bin/python() [0x183c740]
+/sage/.venv/bin/python() [0x1892a83]
+/sage/.venv/bin/python(PyEval_EvalCode+0xa6) [0x18936bc]
+/sage/.venv/bin/python() [0x1929339]
+/sage/.venv/bin/python() [0x1a7109b]
+/sage/.venv/bin/python() [0x1a70c41]
+/sage/.venv/bin/python() [0x19835c6]
+/sage/.venv/bin/python() [0x198350e]
+/sage/.venv/bin/python() [0x198341d]
+/sage/.venv/bin/python(Py_RunMain+0x40c) [0x198404c]
+/sage/.venv/bin/python() [0x1983c16]
+/sage/.venv/bin/python() [0x1983a70]
+/lib/x86_64-linux-gnu/libc.so.6(+0x29ca8) [0x7c7a29477ca8]
+/lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0x85) [0x7c7a29477d65]
+/sage/.venv/bin/python(_start+0x29) [0x19f75e9]
+------------------------------------------------------------------------
+[peakrss] probe603: child waited=124 shell_code=124 samples=399
+[peakrss] peak tree RSS      : 1507 MiB
+[peakrss] low-water MemAvail : 795 MiB
+[peakrss] peak single VmHWM  : 1516 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     1505 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   526.7s procs=  3 rss=  1507 MiB hwm=  1513 MiB avail=  3041 MiB
+[peakrss]   t=   524.7s procs=  3 rss=  1504 MiB hwm=  1510 MiB avail=  3028 MiB
+[peakrss]   t=   522.7s procs=  3 rss=  1500 MiB hwm=  1506 MiB avail=  3048 MiB
+[peakrss]   t=   520.7s procs=  3 rss=  1497 MiB hwm=  1504 MiB avail=  3075 MiB
+[peakrss]   t=   518.6s procs=  3 rss=  1495 MiB hwm=  1504 MiB avail=  3034 MiB
+probe exit: 124
