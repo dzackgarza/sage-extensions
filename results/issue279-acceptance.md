@@ -64,26 +64,40 @@ applies), `:10491`--`:10496` (a rank-one complement's own negation), `:10497`
 ## 3. The consumer specimen: `T_En`, square `-2`, complement `T_Co`
 
 Decided by `test_the_enriques_gluing_gives_a_vector_of_square_minus_two_with_complement_t_co`
-(`tests/...:263`): the specimens are `NamedLattices.TEn` and `NamedLattices.Tco`
-(`:277`--`:278`, built at `catalogue.py:230` and `:204`), the index at
-`:279`--`:283`, the count at `:286`, and each returned vector's square,
-primitivity, complement, the certificate's domain, the overlattice's signature,
-the index relation and the image of `delta` at `:288`--`:300`.
+(`tests/...:263`).  The specimens are `NamedLattices.TEn` and `NamedLattices.Tco`
+(`:287`--`:288`, built at `catalogue.py:230` and `:204`), and the description
+that names each is asserted rather than assumed: rank 12, signature `(2, 10)`,
+even, `|A| = 2^10` for `T_En`, which is AEGS's `(12, 10, 0)_2` (`:290`--`:293`,
+and AEGS records that an indefinite even 2-elementary lattice is determined by
+its signature and its `(r, a, d)`); rank 11, signature `(2, 9)`, even,
+`|A| = 2^11` for `T_Co`, which is Dolgachev--Kondo's `N` (`:294`--`:297`).  The
+index is at `:299`--`:303`, the count at `:306`, and each returned vector's
+square, primitivity, complement, the certificate's domain, the overlattice's
+signature, the index relation and the image of `delta` at `:308`--`:320`.
 
-The count is Namikawa's, not the operation's: *Periods of Enriques surfaces*,
-Math. Ann. 270 (1985), 201--222, Theorem 2.13, as cited in
-Alexeev--Engel--Garza--Schaffler, *Compact moduli of Enriques surfaces of degree
-2*, Nagoya Math. J. 259 (2025), 581--624, section 2, gives a unique `(-2)`-vector
-in `T_En = U + U(2) + E8(2)` modulo `Gamma_En = O(T_En)`.  The complement is
-Dolgachev--Kondo, Izv. Math. 77:3 (2013), section 3 equation (3.6), printed
-p. 513.  There is no card row for `T_Co`; a published count is the oracle the
-acceptance allows for that, and a card row would replace it.
+The count is not the operation's own: Alexeev--Engel--Garza--Schaffler,
+*Compact moduli of Enriques surfaces of degree 2*, Nagoya Math. J. 259 (2025),
+581--624, section 2 (arXiv:2312.03638v2), writes "By [Nam85, 2.13] there is a
+unique (-2)-vector in T_En modulo Gamma_En", and its Definition 2.6 sets
+`Gamma_En = O(T_En)`; [Nam85, 2.13] is Namikawa, *Periods of Enriques surfaces*,
+Math. Ann. 270 (1985), 201--222.  The complement is Dolgachev--Kondo, Izv. Math.
+77:3 (2013), section 3 equation (3.6), printed p. 513, where the lattice is
+`N = <2> + E(2)` and `E = E8 + U` is called the Enriques lattice on printed
+p. 510.
+
+Both were read at the source for this revision: the AEGS sentence above is
+quoted from its section 2, and the Dolgachev--Kondo equation and printed page
+from the article's own PDF.  Namikawa's paper is not reachable from this host
+(EuDML answers 403 and the Springer article is paywalled), so theorem 2.13 is
+AEGS's citation of it and not a page read here.  There is no card row for
+`T_Co`; a published count is the oracle the acceptance allows for that, and a
+card row would replace it.
 
 ## 4. A regression test through the public route on both specimens
 
 Both specimens are in the one file, both through
 `Lattices.vectors_of_square_with_complement` (`lattices.py:10223`): `A2` at
-`:121` and `:153`, `T_En` at `:285`.
+`:121` and `:153`, `T_En` at `:305`.
 
 ## Runs
 
