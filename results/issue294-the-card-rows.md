@@ -76,6 +76,14 @@ connection reads issues and pushes commits; it cannot create one):
 > shadow. When `certify` mints `integral.primitive_orbits.<group>.planes` for
 > `6JRS`–`6JRW`, the row can be read by tag like the line counts now are.
 
+Re-checked at `dzackgarza/lattice-database` commit
+`3ff4dcffa4e5d3fe99d02ca0e504f9d8db36b5e1` (2026-11-19T02:05Z): on each of the
+five cards the `integral.primitive_orbits` rows for `O`, `Otilde` and `Otilde+`
+carry `constant`, `z` and `w` and no `planes`, and the cards' `integral` block
+has no cusp key either. There is therefore still no card value for a rank-five
+plane count, and the row stays out of the test rather than being asserted from a
+derivation: an expected value with no source is what this acceptance removes.
+
 The comparisons of the published known families — Scattone, `T_En` under `O`,
 `Õ⁺` and `Γ_{En,2}`, the Dutour Sikirić–Hulek strata and the 87 polarization
 groups — are part of #286's acceptance through the same call, and are not touched
