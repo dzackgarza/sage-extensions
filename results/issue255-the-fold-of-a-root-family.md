@@ -142,21 +142,38 @@ operation's datum is the involution's images, of which a permutation of the root
 the images are roots.
 
 **2. "Tests assert the five root counts, the invariant and anti-invariant lattice signatures, and
-the refusal on the invalidating input." — MET.**
-The counts are asserted against card `029J`'s row `gamma-en-2` by tag; the invariant and
-anti-invariant signatures are asserted for all five ((1,9) and (0,8)) at `:146`, `:152`, `:153`,
-`:335`, `:336`, `:349` and the exploration's `:123`–`:126`.  The invalidating input is exhibited and
-refused **on a family of 22 roots**:
-`tests/lattices/test_the_fold_of_a_root_family_by_a_diagram_involution.sage:133` takes the four
-roots \(r_1,r_2,r_1+r_2,r_1+z\) and eighteen pairwise orthogonal \((-2)\)-roots that the map
-fixes, so the swap of \(r_1\) and \(r_1+z\), extended by the identity, keeps all 22 pairings and
-carries \(r_1+r_2-(r_1+r_2)=0\) to the nonzero radical vector \(z\); `fold` refuses it
-(`:169`).  The same construction with four roots is the smallest specimen (`:110`, refused at
-`:129`).  Sterk's own 22 roots cannot host it: their span is nondegenerate of signature (1,17), so
-Proposition 1 makes a Gram-preserving permutation of them preserve every relation, and
-`...folds_of_the_two_root_families.sage:233` checks that hypothesis (all eight automorphisms keep the
-Gram) and its conclusion (the six involutions fold) beside the refusals that input does admit — the
-pairing-moving transposition at `:269` and the two Gram-preserving non-involutions at `:260`.
+the refusal on the invalidating input." — the counts and the signatures are met; the refusal is met
+for every form of the invalidating input that exists; the form the issue names does not exist on the
+22 roots, so the item stands NOT MET while the issue stands unamended, and
+`results/issue255-amended-invalidating-input.md` is the edit that makes it met.**
+The counts are asserted against card `029J`'s row `gamma-en-2` by tag
+(`tests/lattices/test_the_sterk_configurations_are_folds_of_the_two_root_families.sage:126`,
+exploration `:139`); the invariant and anti-invariant signatures for all five ((1,9) and (0,8)) at
+`:146`, `:152`, `:153`, `:335`, `:336`, `:349` and the exploration's `:123`–`:126`.  Two refusals are
+asserted on the 22 roots: the transposition of \(v_1\) and \(v_2\), refused for the pairing it
+moves (`:269`), and the two order-four automorphisms, which keep the Gram matrix and hence every
+relation and are refused for being no involution (`:233`, refusal `:260`).
+
+The clause's own input — a permutation of the 22 roots that keeps the Gram matrix and breaks a
+relation — **does not exist**, and the exhaustive check on those roots says so:
+
+```
+roots 22 rank 18 relations 4
+diagram automorphisms 8
+Gram-preserving permutations 8
+of those, breaking a rational relation 0
+four-root control: relations 1 broken True
+```
+
+The eight are all of them, because the Coxeter matrix is a function of the Gram; the theorem is
+Proposition 1, whose hypothesis (nondegenerate span of signature (1,17)) is asserted at
+`tests/lattices/test_the_five_sterk_root_configurations_as_foldings.sage:123`.  The four-root control
+is the smallest family where a degenerate span leaves room, and the operation refuses it there
+(`tests/lattices/test_the_fold_of_a_root_family_by_a_diagram_involution.sage:110`, refusal `:129`);
+the same construction at the issue's arity of 22 roots is refused at `:133`, refusal `:169`.  Under
+the amended clause in `results/issue255-amended-invalidating-input.md` — the pairing-moving
+transposition, the two Gram-preserving non-involutions, and the relation-breaking permutation on the
+degenerate families — every clause is asserted, at the lines tabulated there.
 
 **3. "The exploration … uses only this operation." — MET.**  The exploration reads
 `Sterk.foldings()`, which is five `fold` calls and nothing else, and its prose states the datum, the
@@ -185,10 +202,18 @@ pytest -o addopts= -p qc_sage_session -p sage_extensions.testing.suite_budget \
   and the 22-root Gram test 0.95 s;
 * at the previous round's head, the two files whose tests changed: **18 passed in 32.82 s** before
   the rebase and **18 passed in 56.72 s** after it, no lint findings;
-* at this round's head, the fold file and the exploration: **15 passed in 33.01 s** before the
-  rebase and **15 passed in 16.08 s** after it, no lint findings.
+* at the round that added the 22-root fixture and the two-elementary answers, the fold file and the
+  exploration: **15 passed in 33.01 s** before the rebase and **15 passed in 16.08 s** after it, no
+  lint findings.  This round changes no source and no test: the exhaustive check quoted in item 2 is
+  a probe on the 22 roots, not a test, and the assertion a test of the named input would make is the
+  negation of Proposition 1, so there is no red to write.
 
 ## 5. What is not verified here
+
+* Item 2 is **not met as written**, and cannot be: the invalidating input it names — a permutation of
+  the 22 roots that keeps the Gram matrix and breaks a relation — does not exist (Proposition 1 and
+  the probe quoted in §3).  `results/issue255-amended-invalidating-input.md` is the edit for the
+  owner to paste into the issue; under it, every clause is asserted.
 
 * The claim that the folded families *are* Sterk's printed chambers is carried by card `029J`'s rows
   and by Sterk's printed statements, not proved in this record.  What is checked for all five is
@@ -217,8 +242,9 @@ pytest -o addopts= -p qc_sage_session -p sage_extensions.testing.suite_budget \
 
 ## 6. Where each acceptance item lives
 
-Line numbers are those of this commit.  All three items are met, so nothing below is queued behind
-another item.
+Line numbers are those of this commit.  Items 1 and 3 are met; item 2 is met only under the
+amendment at `results/issue255-amended-invalidating-input.md`, whose clause-by-clause assertions are
+tabulated there.  Nothing is queued behind another item.
 
 **Item 1 — "The operation exists at its owner …, and `sterk.py` derives Sterk's roots from it."**
 
@@ -242,7 +268,7 @@ another item.
   its folded diagram is rooted in the invariant lattice, `:143`).
 
 **Item 2 — "Tests assert the five root counts, the invariant and anti-invariant lattice signatures,
-and the refusal on the invalidating input."**
+and the refusal on the invalidating input." — met under the amendment, not as written.**
 
 * Counts against card `029J`'s row `gamma-en-2` by tag:
   `tests/lattices/test_the_sterk_configurations_are_folds_of_the_two_root_families.sage:126`, and
