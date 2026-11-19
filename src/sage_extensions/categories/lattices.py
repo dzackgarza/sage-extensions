@@ -13576,13 +13576,27 @@ class IsotropicReductions(OwnedCategoryOverBaseRing):
               \(q(x)/2\), and \(\operatorname{Hom}(K_I,\mathbf Z)\) is larger
               than \(K_I\) by \(|{\rm disc}(K_I)|\) where \(K_I\) is not
               unimodular -- neither is the parameter lattice;
-            * rank at least two: not presented here.  The plane case reads the
-              exact parameter lattice
-              :meth:`...unipotent_parameter_lattice` decides -- one element
-              over each vector of it together with a generator of the centre
-              (:meth:`...unipotent_radical_generators`).  A parameter outside
-              that lattice is a missing generator, which is what is open at
-              Sterk's `P_2` of \(T_{\mathrm{En}}\).
+            * rank at least two: the plane's own family,
+              :meth:`...unipotent_radical_generators` -- its Eichler
+              transvections that fix the plane pointwise and act trivially on
+              \(I^\perp/I\), together with one block element over each vector
+              of :meth:`...unipotent_parameter_lattice` and a generator of the
+              centre \(\ker\tau\).  That lattice is decided and not sampled:
+              the block form is Dutour Sikiric--Hulek, Theorem 4.9, printed
+              pp. 33--34, the element is determined by its parameter \(c\), and
+              the two equations that determine it are linear and quadratic in
+              \(c\), so both are conditions on its class at the modulus
+              :meth:`...unipotent_parameter_modulus` computes and every class
+              there is decided.  A parameter outside the lattice is therefore
+              not a parameter of any element of \(U_I\), and the family is
+              the whole radical: its translations span
+              \(\tau(U_I)\) and its centre member generates the centre, so
+              :meth:`...unipotent_radical_index` is one.  At Sterk's `P_2` of
+              \(T_{\mathrm{En}}\) the modulus is \(2\), \(4096\) of
+              \(65536\) classes lift, and the lattice has rank and index
+              \(16\) in \(\mathbf Z^{16}\); the fourteen transvections that
+              lie in \(U_I\) translate only \(12\) of the \(16\) dimensions,
+              which is why the block generators are needed.
             """
             lattice = self.isotropic_embedding().codomain()
             subobject = self.isotropic_sublattice()
