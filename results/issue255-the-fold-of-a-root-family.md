@@ -141,14 +141,24 @@ operation's datum is the involution's images, of which a permutation of the root
 the images are roots.
 
 **2. "Tests assert the five root counts, the invariant and anti-invariant lattice signatures, and
-the refusal on the invalidating input." — MET, with the third clause as the mathematics allows.**
+the refusal on the invalidating input." — the counts and the signatures are met, and the refusal is
+asserted on the 22-root input in the two forms it admits there; the third form, which is the one the
+item names, has no specimen on that family, and the item needs amending.**
 The counts are asserted against card `029J`'s row `gamma-en-2` by tag; the invariant and
-anti-invariant signatures are asserted for all five ((1,9) and (0,8)); and the refusal is asserted
-on the smallest family where the invalidating input exists.  The clause as literally written — a
-permutation of the 22 roots that keeps the Gram and breaks a relation — is unsatisfiable, and
-Proposition 1 is why; the tests assert both halves of that: on the 22 roots no such permutation
-exists (all eight automorphisms keep the Gram, all six involutions fold), and on the degenerate
-family one does and is refused.
+anti-invariant signatures are asserted for all five ((1,9) and (0,8)).  The refusal is asserted
+twice **on the 22 roots themselves**: a transposition of two of them is refused for the pairing it
+moves (`:269`), and the two order-four automorphisms — which keep the Gram matrix, hence every
+relation, name every vertex and have integral matrices — are refused for the one condition left,
+being an involution (`:233`, refusal at `:260`).  What cannot be asserted on the 22 roots is a
+Gram-preserving permutation that breaks a relation: Proposition 1 says a nondegenerate span leaves
+none, and the same test checks its hypothesis (all eight automorphisms keep the Gram) and its
+conclusion (the six involutions fold, which is the relation test passed).  The smallest specimen of
+the specified kind is the four-root degenerate family of
+`test_the_fold_of_a_root_family_by_a_diagram_involution.sage:110`, refused at `:129`.  So the
+clause as written demands a test of an input that cannot exist on the 22-root family: what it is for
+— the operation refusing a permutation that is no isometry of the span, and refusing a map that is
+no involution — is tested there, and the relation refusal that needs a degenerate span is tested at
+the smallest specimen that has one.
 
 **3. "The exploration … uses only this operation." — MET.**  The exploration reads
 `Sterk.foldings()`, which is five `fold` calls and nothing else, and its prose states the datum, the
@@ -174,7 +184,10 @@ pytest -o addopts= -p qc_sage_session -p sage_extensions.testing.suite_budget \
 * at the fix's rebased head: **20 passed in 31.17 s**, no lint findings.  The three heaviest checks
   are the enumeration of the two families' folds (3.04 s), the exploration's fixed-point walk over
   the five folds (2.70 s) and the card chamber signature (1.46 s); the new rescaling test is 0.02 s
-  and the 22-root Gram test 0.95 s.
+  and the 22-root Gram test 0.95 s;
+* at this round's head, the two files whose tests changed (the exploration does not touch them):
+  **18 passed in 32.82 s** before the rebase and **18 passed in 56.72 s** after it, no lint findings;
+  the second run shared the VM with another chat's work.
 
 ## 5. What is not verified here
 
@@ -227,17 +240,19 @@ and the refusal on the invalidating input."**
   `tests/lattices/test_the_sterk_configurations_are_folds_of_the_two_root_families.sage:126`, and
   `tests/lattices/test_the_five_sterk_root_configurations_as_foldings.sage:139`.
 * Signatures: the same file's `:146` (invariant equals the card walls' span), `:152` (the span is
-  \((1,17)\)) and `:153` (anti-invariant \((0,8)\)) for 4.3.5, 4.3.6 and 4.3.8; `:306`, `:307`,
-  `:320`, `:321` for the two image folds and the five records; and the exploration's `:123`–`:126`
+  \((1,17)\)) and `:153` (anti-invariant \((0,8)\)) for 4.3.5, 4.3.6 and 4.3.8; `:335`, `:336`,
+  `:349`, `:350` for the two image folds and the five records; and the exploration's `:123`–`:126`
   for all five at once.
-* The refusal, and the reason it has its specimen where it does:
-  `tests/lattices/test_the_fold_of_a_root_family_by_a_diagram_involution.sage:121` refuses a
-  Gram-preserving permutation that breaks a relation on the degenerate family; `:125` asserts on
-  \(A_2\) that exactly the two permutations keeping the pairings fold; and
+* The refusals on the 22-root input:
   `tests/lattices/test_the_sterk_configurations_are_folds_of_the_two_root_families.sage:233`
-  asserts on the 22 roots that all eight diagram automorphisms keep the Gram and all six involutions
-  fold — no refusal exists there, which is Proposition 1.
-* The rescaling the reviewer found absent: `tests/lattices/test_the_fold_of_a_root_family_by_a_diagram_involution.sage:183`,
+  asserts that all eight diagram automorphisms keep the Gram, that the six involutions fold, and
+  that the two order-four maps are refused (`:260`); `:269` asserts that a transposition of two
+  roots is refused for the pairing it moves.
+* The refusal that needs a degenerate span, on the smallest specimen that has one:
+  `tests/lattices/test_the_fold_of_a_root_family_by_a_diagram_involution.sage:110` (the four roots
+  \(r_1,r_2,r_1+r_2,r_1+z\)), refused at `:129`; `:133` asserts on \(A_2\) that exactly the two
+  permutations keeping the pairings fold.
+* The rescaling the reviewer found absent: `tests/lattices/test_the_fold_of_a_root_family_by_a_diagram_involution.sage:191`,
   red at `f6769cc`'s parent.
 
 **Item 3 — "The exploration … uses only this operation."**
