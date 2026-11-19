@@ -2634,20 +2634,26 @@ class RootedCoxeterDiagrams(OwnedCategory):
             )
             root_rows = span_matrix.solve_left(coordinates)
             named_roots = _rows(root_rows, named)
-            named_images = span_matrix.solve_left(
-                sage_matrix(
-                    QQ,
-                    [
+            try:
+                named_images = span_matrix.solve_left(
+                    sage_matrix(
+                        QQ,
                         [
-                            QQ(coordinate)
-                            for coordinate in _root_family_coordinates(
-                                lattice, images[vertices[position]]
-                            )
-                        ]
-                        for position in named
-                    ],
+                            [
+                                QQ(coordinate)
+                                for coordinate in _root_family_coordinates(
+                                    lattice, images[vertices[position]]
+                                )
+                            ]
+                            for position in named
+                        ],
+                    )
                 )
-            )
+            except ValueError as failure:
+                raise ValueError(
+                    f"cannot fold {self} by {datum}: an image of a root is not a point of the span of "
+                    "the roots, so the datum is no map of that span"
+                ) from failure
             transformation = (
                 (named_roots.transpose() * named_roots).inverse()
                 * named_roots.transpose()

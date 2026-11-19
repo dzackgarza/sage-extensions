@@ -170,6 +170,27 @@ def test_a_degenerate_family_of_twenty_two_roots_refuses_a_gram_preserving_permu
         CoxeterDiagrams().from_roots(roots).fold(permutation)
 
 
+def test_an_image_outside_the_span_of_the_roots_is_refused() -> None:
+    r"""A datum whose image leaves the span is no map of the span, and is refused.
+
+    The one root \(a\) of \(A_2\) spans the line \(\mathbf Z a\), and \(a+b\) has the same
+    square and pairs with \(a\) as \(a\) does with itself, so the pairing test passes; but
+    \(a+b\) is no point of the line, so no endomorphism of the span carries \(a\) to it.  This is
+    the only shape of datum at which the integrality test could look: once the images are points of
+    the span, the matrix is integral (the span is saturated, and an isometry carrying the roots into
+    the span carries the span onto itself).
+    """
+    lattice = Lattices(ZZ)("A2")
+    first, second = lattice.module_generators()
+    diagram = CoxeterDiagrams().from_roots((first,))
+
+    assert int(diagram.root_realization().primitive_sublattice_from((first,)).module_rank()) == 1
+    assert int((first + second).q()) == -2
+    assert int(lattice.b(first, first + second)) == -1
+    with pytest.raises(ValueError):
+        diagram.fold({0: first + second})
+
+
 def test_the_two_elementary_invariants_are_answered_only_for_a_two_elementary_lattice() -> None:
     r"""The fold of two orthogonal roots by \(b\mapsto -b\) has \(\langle-2\rangle\) on both sides.
 
