@@ -81,6 +81,21 @@ of the 22-root family that are no permutations of the roots:
   v_{20}+v_{22},\ -v_{22}\).  Its discarded orbit sums are the two that fall on the isotropic
   \(v_{21}+v_{22}\) line.
 
+**Lemma (the Specimens table's last row, settled).**  *The invariant lattice of each of the five
+folds has rank 10.*  That row records "folding ranks 12, 12, 12, 14 with image rank 10" and says
+"one IAS cell prints 11 against an assertion of 10: the discrepancy is to be settled by the
+operation".  The operation settles it at 10: every fold's invariant lattice has rank 10 and signature
+(1,9), asserted for the two image folds at
+`tests/lattices/test_the_sterk_configurations_are_folds_of_the_two_root_families.sage:349`, for all
+five at `:363` and at `tests/lattices/test_the_five_sterk_root_configurations_as_foldings.sage:103`,
+and against the card's own wall spans --- rank 10 and signature (1,9) --- at the same file's
+`:158`--`:161` and the
+exploration's `:123`--`:126`.  *Sources:* the row's own citation is the IAS notebook (not a printed
+paper); what is printed is Sterk's five chambers, pp. 19--24, whose walls the card transcribes with
+their counts, and whose spans the same assertions compare against.  The cell that prints 11 is
+contradicted both by the operation and by the printed chambers, whose wall spans are the card's rank
+10.
+
 ## Proposition 1 (the relation test and the pairing test decide the same thing exactly on a nondegenerate span)
 
 Let \(r_1,\dots,r_n\) span \(W\subset L\), with coordinate matrix \(C\) (rows \(r_i\) in a basis of
