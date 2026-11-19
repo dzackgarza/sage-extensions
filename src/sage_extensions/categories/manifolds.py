@@ -1080,6 +1080,33 @@ class _ChartwiseFunction:
         return f"the smooth function with expressions on the charts {tuple(self._formulas)}"
 
 
+def _manifold_function_carries_expressions(value, manifold) -> bool:
+    r"""Whether a value of a ring of functions on ``manifold`` carries an expression in its charts.
+
+    A chart formula is an expression, and so is any value built from chart formulas by the
+    pointwise law of the algebra -- a sum, a negative, a scalar multiple, a product -- or a
+    constant.  A map given only by a callable carries none: it is no element of the algebra
+    the tree can differentiate, and the operations that need an expression state that.
+    """
+    from sage_extensions.categories.functions.real_functions import _ConstantMap
+    from sage_extensions.categories.modules.general_modules import _PointwiseValues
+
+    match _manifold_function_definition(value):
+        case _ChartExpression():
+            return True
+        case _ChartwiseFunction():
+            return True
+        case _ConstantMap():
+            return True
+        case _PointwiseValues() as values:
+            return all(
+                _manifold_function_carries_expressions(operand, manifold)
+                for operand in values.operands()
+            )
+        case _:
+            return False
+
+
 def _chartwise_formulas(function, manifold):
     r"""The engine's formula for a smooth function in each chart of ``manifold``, or ``None``.
 

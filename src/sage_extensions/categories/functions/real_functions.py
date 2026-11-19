@@ -825,6 +825,45 @@ class _FunctionSpace(_ConditionSubmodule):
             value = self.unformed_module().inclusion().codomain()(value)
         return super().__contains__(value)
 
+    def _element_constructor_(self, value):
+        r"""Admit ``value`` as a map of this space, and require the chart data its uses need.
+
+        A space of maps over a manifold admits the maps that carry their expressions in
+        the charts of the manifold, because that is what its elements are used for: the
+        sections of the tangent bundle act on them as derivations, and a derivative is a
+        computation on an expression (Lee, *Introduction to Smooth Manifolds*, 2nd ed.,
+        Ch. 3).  An opaque map -- a Python callable with no expression in any chart -- is
+        refused here, naming the construction that states one, rather than admitted and
+        then refused by every operation that needs its expression.  The tree cannot even
+        decide such a map's smoothness: the differentiability condition answers a
+        proposition on any domain but the line.
+
+        A space over a domain with no chart -- the line, read as a manifold of one chart
+        of its own -- is unchanged, and so is every space of maps that is not over a
+        manifold.
+        """
+        element = super()._element_constructor_(value)
+        domain = self.domain()
+        from sage_extensions.categories.manifolds import SmoothManifolds
+
+        if domain in SmoothManifolds() and hasattr(domain, "chart_labels"):
+            labels = tuple(domain.chart_labels())
+            if labels:
+                from sage_extensions.categories.manifolds import (
+                    _manifold_function_carries_expressions,
+                )
+
+                if not _manifold_function_carries_expressions(element, domain):
+                    assert False, (
+                        f"cannot admit {value} into {self}: its elements are the maps on "
+                        f"{domain} that carry their expressions in its charts, and this one has "
+                        f"no expression in any of {labels}.  State it with "
+                        f"{domain}.smooth_function({{chart label: expression}}) -- a map given "
+                        f"only by a callable is neither differentiable along a section of the "
+                        f"tangent bundle nor even decided to be smooth"
+                    )
+        return element
+
     def one(self):
         r"""The constant map with value one."""
         return self(_constant_map(self.codomain().one()))
