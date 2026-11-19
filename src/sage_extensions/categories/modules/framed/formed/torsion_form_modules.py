@@ -2824,6 +2824,62 @@ class TorsionFormOrthogonalGroup(CategoricalMor):
             )
         )
 
+    @cached_method
+    def class_orbits(self):
+        r"""Return this group's orbits on the classes of its form, as tuples of indices.
+
+        The classes are taken in the order :meth:`...elements` gives them, and an
+        orbit is a tuple of positions in that order, so a caller reads a class of
+        an orbit back without inverting any conversion: ``form.elements()[position]``
+        is the class itself.
+
+        **The computation.**  The engine holding ``O(q)`` is an automorphism group
+        of the abelian group ``A``, and the orbits of a finite group on a set it
+        acts on are the maintained computation (GAP's ``Orbits`` with the group's
+        own action, the orbit walk of Holt, Eick and O'Brien, *Handbook of
+        Computational Group Theory*, Chapman & Hall/CRC, 2005, Section 4.1,
+        p. 79).  Each class crosses into that action by
+        :meth:`_engine_abelian_element` and the orbits come back as engine
+        elements; the positions are read off a table of those same elements, one
+        entry per class, so no engine element has to be converted back into an
+        owned one.
+
+        The orbits are ordered by size, largest first, and their sizes sum to
+        ``|A|`` because the action is on the whole class set.
+        """
+        from sage.libs.gap.libgap import libgap
+
+        form = self.domain()
+        classes = tuple(form.elements())
+        engine = self._engine_group()
+        engine_classes = [self._engine_abelian_element(element) for element in classes]
+        position = {repr(element): index for index, element in enumerate(engine_classes)}
+        decomposition = libgap.Orbits(engine.gap(), engine_classes)
+        orbits = tuple(
+            tuple(position[repr(element)] for element in libgap.AsList(orbit))
+            for orbit in libgap.AsList(decomposition)
+        )
+        return tuple(sorted(orbits, key=lambda orbit: (-len(orbit), orbit)))
+
+    def class_orbit_sizes(self):
+        r"""Return the sizes of :meth:`class_orbits`, largest first."""
+        return tuple(len(orbit) for orbit in self.class_orbits())
+
+    def isotropic_class_orbits(self):
+        r"""Return the orbits of :meth:`class_orbits` all of whose classes are isotropic.
+
+        ``O(q)`` preserves the quadratic form, so an orbit is isotropic exactly
+        when one of its classes is: one ``q`` evaluation per orbit decides it,
+        which is why this is not an enumeration of the form.
+        """
+        form = self.domain()
+        classes = tuple(form.elements())
+        return tuple(
+            orbit
+            for orbit in self.class_orbits()
+            if form.q(classes[orbit[0]]) == form.q(form.zero())
+        )
+
     def _repr_(self):
         return f"Orthogonal group of {self.domain()}"
 
