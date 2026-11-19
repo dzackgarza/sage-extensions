@@ -995,14 +995,22 @@ def incidence_page_comparison(label, statement, computed, recorded, source) -> b
     )
 
 
-def incidence_row_contract(lattice, subgroup, lines, planes, incidences):
+def incidence_row_contract(lattice, subgroup, lines, planes, incidences, route="certificate"):
     r"""What the Γ_{Co,2} driver's contract makes of one relation of a row's vertices.
 
     ``lines``, ``planes`` and ``incidences`` are the row's own data: the vertices
     the row returned and the edges it joined them with.  The row step's contract
     is the driver's statement about that relation, so a test hands it the
     relation instead of the status the contract might have reached.
+
+    ``route`` is the route the relation was taken on, because the two routes'
+    edges carry different clauses: a certificate route's edge retains a flag and
+    its transporter, and the contract reads the line's containment in the plane
+    off them; a class route's edge retains only the line's divided-class orbit
+    and its clause is that orbit.  The default is the certificate route, whose
+    clause is the stronger of the two and the one a relation with actual line
+    and plane terms is read by.
     """
     return _incidence_row_driver().row_contract(
-        lattice, subgroup, "row", lines, planes, incidences
+        lattice, subgroup, "row", lines, planes, incidences, route
     )
