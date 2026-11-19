@@ -544,6 +544,38 @@ class IntegralStructureAction(SageObject):
     def lattice_inclusion(self):
         return self._lattice_inclusion
 
+    def rational_image(self, automorphism):
+        r"""Return the rational isometry an automorphism of the selected lattice induces.
+
+        Membership in :meth:`rational_group` and in :meth:`stabilizer` is asked
+        of elements of the rational group's own parent, and that test is
+        parent-strict: an element of `O(L)`'s group is not an element of
+        `O(L \otimes QQ)`'s, so asking it of an integral isometry answers
+        ``False`` however the isometry acts.  This is the crossing, extension of
+        scalars on the framing: the image of each generator of `L` is carried
+        into `L \otimes QQ` and the rational isometry is read off those images,
+        so the crossed element restricts to ``automorphism`` on `L`.
+
+        Membership of the crossed element in :meth:`stabilizer` is then the
+        statement that ``automorphism`` preserves `L`.  The group's resolution
+        answers that where it can decide it and refuses -- raising rather than
+        answering ``False`` -- where it cannot, which is the behaviour of an
+        infinite finitely generated subgroup.
+        """
+        from sage_extensions.categories.modules.pure.modules import (
+            ModulesOverIntegralDomains,
+        )
+
+        lattice = self.lattice_inclusion().domain()
+        ring = lattice.base_ring()
+        rational = lattice.base_change(ring.fraction_field_map())
+        ring_inclusion = ModulesOverIntegralDomains(ring)(lattice).generic_fibre_map()
+        return rational.Isom(rational)(
+            lambda label: ring_inclusion(
+                automorphism(lattice.module_generator(label))
+            ).underlying_element()
+        )
+
     def with_stable_containing_bound(self, containing_inclusion, *, check=False):
         r"""Return this action with a justified finite stable module containing ``L`` retained."""
         result = IntegralStructureAction(self.rational_group(), self.lattice_inclusion())
