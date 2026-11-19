@@ -154,6 +154,7 @@ from sage_extensions.categories.modules.base_change import (
 from sage_extensions.categories.modules.framed.formed.discriminant_modules import (
     DiscriminantBilinearModules,
     DiscriminantQuadraticModules,
+    _discriminant_gram_on,
     _discriminant_module,
 )
 from sage_extensions.categories.modules.framed.formed.form_modules import (
@@ -10281,12 +10282,12 @@ class Lattices(OwnedCategoryOverBaseRing):
             anti-isometry ``gamma`` between a subgroup ``H_d`` of
             ``A_<d>`` and a subgroup ``H_C`` of ``A_C``, and two such ``delta``
             are ``O(T)``-equivalent exactly when the glue data are equivalent
-            under ``O(<d>) x O(C)``.  ``O(<d>) = {+-1}`` fixes every class of
-            ``A_<d>``, and ``O(C)`` reaches ``A_C`` only through
-            ``rho_C: O(C) -> O(q_C)``, so the collapse is the orbit
-            decomposition of a finite set under a finite group acting on
-            ``A_C``.  ``O(T)`` is never enumerated and no vector of ``T`` is
-            ever searched for.
+            under ``O(<d>) x O(C)``.  ``O(<d>) = {+-1}`` negates the
+            ``<d>``-component of a glue class, which is the negation ``-1`` of
+            ``O(C)`` applied to the ``C``-component, so the collapse is the
+            orbit decomposition of the finite set of ``C``-components under the
+            finite image ``rho_C(O(C))`` acting on ``A_C``.  ``O(T)`` is never
+            enumerated and no vector of ``T`` is ever searched for.
 
             ``A_<d>`` is cyclic, so ``H_d`` is the subgroup of order
             ``[T : <d> perp C]`` and one class carries it; this is the case
@@ -10295,14 +10296,22 @@ class Lattices(OwnedCategoryOverBaseRing):
             and carries ``L``'s generator of the ``<d>`` summand to ``delta``,
             which is the certificate the operation is asked for.
 
-            ``rho_C`` is known to be onto for an even, 2-elementary, indefinite
-            ``C`` of rank at least three (Nikulin, Thm. 3.6.3) and for a rank-one
-            ``C``, whose ``O(C) = {+-1}`` is the whole automorphism group of its
-            cyclic form.  Outside those cases collapsing by ``O(q_C)`` would
+            The collapse is by ``rho_C(O(C))``.  A rank one ``C`` has
+            ``O(C) = {+-1}``, whose image in ``O(q_C)`` is the negation of
+            ``A_C`` -- the identity class when ``A_C`` has order two, whatever
+            further automorphisms the cyclic form itself has -- so that image is
+            constructed.  A ``C`` of higher rank is collapsed by the whole
+            ``O(q_C)``, which is ``rho_C(O(C))`` when ``C`` is even,
+            2-elementary, indefinite and of rank at least three (Nikulin,
+            *Integral symmetric bilinear forms and some of their applications*,
+            Theorem 3.6.3); outside those cases collapsing by ``O(q_C)`` would
             merge orbits that are not ``O(T)``-equivalent, so this raises with
             the named gap instead of answering with too few vectors.
             """
-            from math import isqrt
+            from math import isqrt, prod
+
+            import numpy
+            from sage.rings.rational_field import QQ as SageQQ
 
             from sage_extensions.categories.lattices import Lattices
 
@@ -10360,63 +10369,212 @@ class Lattices(OwnedCategoryOverBaseRing):
             # The glue is isotropic in A_M = A_<d> perp A_C, so the C-component
             # of a glue class carries exactly the negated value of the <d> one.
             line_value = complement_values(line_form.q(subgroup_generator))
-            if int(summand.module_rank()) == 1:
-                automorphisms = complement_form.orthogonal_group()
-                assert int(automorphisms.order()) == 2, (
-                    f"cannot collapse the gluing classes of {summand!r} by its automorphism group: a "
-                    f"rank-one lattice's orthogonal group is {{+-1}}, but the automorphisms of "
-                    f"{complement_form} have order {automorphisms.order()}"
-                )
-            else:
+            rank = int(summand.module_rank())
+            target_value = zero_value - line_value
+            if rank > 1:
                 elementary = summand.is_p_elementary(ring(2))
                 real, imaginary = summand.signature()
-                assert (
-                    elementary is True and int(real) > 0 and int(imaginary) > 0 and int(summand.module_rank()) >= 3
-                ), (
+                assert elementary is True and int(real) > 0 and int(imaginary) > 0 and rank >= 3, (
                     f"cannot collapse the gluing classes of {summand!r} by O(q_C): that needs rho_C: "
                     f"O(C) -> O(q_C) to be onto, which is known for an even 2-elementary indefinite C of "
-                    f"rank at least three (Nikulin, Thm. 3.6.3) and for rank one, but {summand!r} has "
-                    f"rank {int(summand.module_rank())}, signature {summand.signature()} and "
+                    f"rank at least three (Nikulin, Thm. 3.6.3), but {summand!r} has "
+                    f"rank {rank}, signature {summand.signature()} and "
                     f"2-elementary {elementary}; the non-cyclic and non-elementary cases are the gap this "
                     f"operation does not cover"
                 )
 
-            candidates = tuple(
-                element
-                for element in complement_form.elements()
-                if complement_form.q(element) + line_value == zero_value
-                and int(element.additive_order()) == index
+            # The candidates and their collapse are both computations on the
+            # invariant factor coordinates of A_C.  In that decomposition a class
+            # is a coordinate vector modulo the invariant factors, so `q` is one
+            # quadratic function of the coordinates, the additive order is read
+            # off them, and an automorphism of the form acts linearly: the filter
+            # over the whole group and the orbits under it are one pass over the
+            # coordinates each, and no class of A_C is asked for its value or its
+            # order.  `O(T)` is still never enumerated.
+            unformed = complement_form.unformed_module()
+            engine = unformed._smith_engine()
+            assert engine is not None, (
+                f"cannot list vectors of square {value} with complement {summand!r} in {lattice!r}: the "
+                f"classes of {complement_form} are enumerated in its invariant factor decomposition, which "
+                f"has not been computed for {complement_form}"
             )
+            invariant_factors = tuple(int(factor) for factor in engine.invariants())
+            coordinate_rank = len(invariant_factors)
+            moduli = numpy.array(invariant_factors, dtype=numpy.int64)
+            strides = numpy.array(
+                [
+                    prod(invariant_factors[position + 1 :], start=1)
+                    for position in range(coordinate_rank)
+                ],
+                dtype=numpy.int64,
+            )
+            smith_coordinates = (
+                numpy.stack(
+                    numpy.unravel_index(numpy.arange(prod(invariant_factors, start=1)), invariant_factors),
+                    axis=1,
+                ).astype(numpy.int64)
+                if coordinate_rank
+                else numpy.zeros((1, 0), dtype=numpy.int64)
+            )
+
+            def class_of(code):
+                r"""Raise the class whose code is ``code`` to ``A_C``."""
+                if not coordinate_rank:
+                    return complement_form.zero()
+                return complement_form._element_from_unformed_module(
+                    unformed._from_smith_engine_element(
+                        engine.linear_combination_of_smith_form_gens(
+                            tuple(int(entry) for entry in smith_coordinates[code])
+                        )
+                    )
+                )
+
+            def code_of(element):
+                r"""Lower a class of ``A_C`` to its code."""
+                if not coordinate_rank:
+                    return 0
+                return int(
+                    numpy.ravel_multi_index(
+                        tuple(
+                            int(entry) % modulus
+                            for entry, modulus in zip(
+                                unformed._to_smith_engine_element(
+                                    complement_form._element_of_unformed_module(element)
+                                ).vector(),
+                                invariant_factors,
+                                strict=True,
+                            )
+                        ),
+                        invariant_factors,
+                    )
+                )
+
+            smith_generators = tuple(
+                class_of(
+                    int(
+                        numpy.ravel_multi_index(
+                            tuple(int(position == other) for other in range(coordinate_rank)),
+                            invariant_factors,
+                        )
+                    )
+                )
+                for position in range(coordinate_rank)
+            )
+            # On the Smith coordinates q(x) = x^T G x, with the norms of the
+            # generators on the diagonal and the lifted pairing off it.  One
+            # pullback computes G; the filter compares values as integers scaled
+            # by the common denominator of G and of the target value.
+            gram = _discriminant_gram_on(complement_form, smith_generators, quadratic=True)
+            field = ring.fraction_field()
+            lifted_gram = tuple(
+                tuple(
+                    SageQQ(_engine_element(field, complement_values.lift(gram[left][right])))
+                    for right in range(coordinate_rank)
+                )
+                for left in range(coordinate_rank)
+            )
+            lifted_target = SageQQ(_engine_element(field, complement_values.lift(target_value)))
+            denominator = SageZZ(1)
+            for row in lifted_gram:
+                for entry in row:
+                    denominator = denominator.lcm(entry.denominator())
+            denominator = denominator.lcm(lifted_target.denominator())
+            assert all(
+                (entry * denominator).denominator() == 1 for row in lifted_gram for entry in row
+            ) and (lifted_target * denominator).denominator() == 1, (
+                f"the values of the form {complement_form} do not lie in one cyclic subgroup of its "
+                f"value module scaled by {denominator}"
+            )
+            # The value module is a quotient of the fraction field, so the
+            # congruence is taken modulo its period: for an even lattice, two.
+            period = 1
+            while complement_values(period) != zero_value:
+                period += 1
+            modulus = period * int(denominator)
+            residue = int(lifted_target * denominator) % modulus
+            integral_gram = numpy.array(
+                [[int(entry * denominator) for entry in row] for row in lifted_gram],
+                dtype=numpy.int64,
+            ).reshape(coordinate_rank, coordinate_rank)
+            values_on_codes = (
+                numpy.einsum("ij,jk,ik->i", smith_coordinates, integral_gram, smith_coordinates)
+                if coordinate_rank
+                else numpy.zeros(1, dtype=numpy.int64)
+            )
+            orders_on_codes = (
+                numpy.lcm.reduce(
+                    numpy.where(
+                        smith_coordinates % moduli != 0,
+                        moduli // numpy.gcd(smith_coordinates, moduli),
+                        1,
+                    ),
+                    axis=1,
+                )
+                if coordinate_rank
+                else numpy.ones(1, dtype=numpy.int64)
+            )
+            candidates = [
+                int(code)
+                for code in numpy.flatnonzero(values_on_codes % modulus == residue)
+                if int(orders_on_codes[int(code)]) == index
+            ]
             if not candidates:
                 return
 
-            automorphisms = complement_form.orthogonal_group()
-            generators = tuple(automorphisms.group_generators())
-
-            def orbit_of(seed):
-                found = {seed}
-                frontier = [seed]
-                while frontier:
-                    current = frontier.pop()
-                    for generator in generators:
-                        image = generator(current)
-                        if image not in found:
-                            found.add(image)
-                            frontier.append(image)
-                return found
+            if rank == 1:
+                # O(C) = {+-1} for a rank one lattice and its image in O(q_C) is
+                # the negation of A_C, which is the identity on a cyclic form of
+                # order two; that image is constructed, so a cyclic form with
+                # further automorphisms is not collapsed by them.
+                actions = (-numpy.eye(coordinate_rank, dtype=numpy.int64),)
+            else:
+                # An even 2-elementary indefinite C of rank at least three has
+                # rho_C onto, so O(q_C) is exactly the image to collapse by.  A
+                # generator acts on the Smith coordinates as the matrix of its
+                # images of the generators.
+                actions = tuple(
+                    numpy.array(
+                        [
+                            [
+                                int(entry)
+                                for entry in numpy.unravel_index(
+                                    code_of(generator(smith_generators[position])),
+                                    invariant_factors,
+                                )
+                            ]
+                            for position in range(coordinate_rank)
+                        ],
+                        dtype=numpy.int64,
+                    ).transpose()
+                    for generator in complement_form.orthogonal_group().group_generators()
+                )
 
             remaining = set(candidates)
             representatives = []
             while remaining:
-                seed = next(iter(remaining))
-                orbit = orbit_of(seed)
+                seed = remaining.pop()
+                orbit = {seed}
+                frontier = [seed]
+                while frontier:
+                    current = frontier.pop()
+                    point = smith_coordinates[current]
+                    for action in actions:
+                        image = int((action @ point % moduli) @ strides)
+                        if image not in orbit:
+                            orbit.add(image)
+                            frontier.append(image)
                 representatives.append(seed)
                 remaining -= orbit
 
             pair_dual = pair.dual_lattice()
             pair_labels = tuple(pair_dual.module_generating_set())
             complement_labels = tuple(summand.dual_lattice().module_generating_set())
-            for representative in representatives:
+            for code in representatives:
+                representative = class_of(code)
+                assert complement_form.q(representative) + line_value == zero_value, (
+                    f"the glue class {representative} of {complement_form} does not carry the negated "
+                    f"value of the <{value}> summand's class, so it is not isotropic against it"
+                )
                 lifted = complement_form.dual_lattice_lift(representative)
                 coordinates = lifted.to_vector()
                 glue_class = pair.discriminant_class(
