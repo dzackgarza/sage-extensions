@@ -1,0 +1,65 @@
+tree SHA: 6241968528c8986a4f7e8c58ba335db0308c9182 (modified paths: 0)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 2.88 2.56 4.61 4/550 2792935
+probe: .tmp/probe-corrected-fast.py; inner 900 s
+===== U(2)+<2> =====
+   rank: 3 div: 2 K_I rank: 1 generators: 1
+      nine evaluations of the lift:    0.001s
+   generator 0: scale 2 box [2, 4]
+   the lift fixes the marked vector: True
+   the indecomposable box of the lift: [2, 4]
+      slow    0.049s -> 4 of 8 integral
+      fast    0.001s -> 4 of 8 integral
+      agree: True
+===== U(2)+<3> =====
+   rank: 3 div: 2 K_I rank: 1 generators: 1
+      nine evaluations of the lift:    0.001s
+   generator 0: scale 2 box [2, 4]
+   the lift fixes the marked vector: True
+   the indecomposable box of the lift: [2, 4]
+      slow    0.043s -> 4 of 8 integral
+      fast    0.001s -> 4 of 8 integral
+      agree: True
+===== U(3)+<3> =====
+   rank: 3 div: 3 K_I rank: 1 generators: 1
+      nine evaluations of the lift:    0.001s
+   generator 0: scale 3 box [3, 6]
+   the lift fixes the marked vector: True
+   the indecomposable box of the lift: [3, 6]
+      slow    0.097s -> 9 of 18 integral
+      fast    0.001s -> 9 of 18 integral
+      agree: True
+===== rank five =====
+   rank: 5 div: 2 K_I rank: 3 generators: 3
+      nine evaluations of the lift:    0.001s
+   generator 0: scale 4 box [4, 4, 4, 8]
+   the lift fixes the marked vector: True
+   the indecomposable box of the lift: [4, 4, 4, 8]
+      slow    4.086s -> 0 of 512 integral
+      fast    0.028s -> 0 of 512 integral
+      agree: True
+      nine evaluations of the lift:    0.001s
+   generator 1: scale 2 box [2, 2, 2, 4]
+      slow    0.227s -> 16 of 32 integral
+      fast    0.002s -> 16 of 32 integral
+      agree: True
+      nine evaluations of the lift:    0.001s
+   generator 2: scale 2 box [2, 2, 2, 4]
+      slow    0.225s -> 16 of 32 integral
+      fast    0.002s -> 16 of 32 integral
+      agree: True
+[   6.022s] done
+[peakrss] probe603: child waited=0 shell_code=0 samples=5
+[peakrss] peak tree RSS      : 439 MiB
+[peakrss] low-water MemAvail : 3624 MiB
+[peakrss] peak single VmHWM  : 440 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      429 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     4.0s procs=  3 rss=   439 MiB hwm=   439 MiB avail=  4911 MiB
+[peakrss]   t=     6.0s procs=  3 rss=   439 MiB hwm=   440 MiB avail=  3624 MiB
+[peakrss]   t=     8.0s procs=  3 rss=   433 MiB hwm=   440 MiB avail=  3895 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   420 MiB hwm=   420 MiB avail=  5021 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     7 MiB hwm=     7 MiB avail=  5316 MiB
+probe exit: 0

@@ -1,0 +1,78 @@
+tree SHA: 6241968528c8986a4f7e8c58ba335db0308c9182 (modified paths: 0)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 0.93 2.67 5.22 2/574 2786603
+probe: .tmp/probe-lift-cost.py; inner 600 s
+rank: 5 div: 2 generators: 3
+[    1.090s] specimen and generators
+[    0.002s] kernel parameter vectors (first call)
+   parameters: 4
+[    0.057s] rational lift [0]
+   denominator: 2
+[    0.013s] rational lift [1]
+   denominator: 1
+[    0.010s] rational lift [2]
+   denominator: 1
+   box order: 512 counts: [4, 4, 4, 8]
+[    3.457s] corrected lift [0]
+   representatives tried: 512 lift is None: True
+   box order: 32 counts: [2, 2, 2, 4]
+[    0.010s] corrected lift [1]
+   representatives tried: 1 lift is None: False
+   box order: 32 counts: [2, 2, 2, 4]
+[    0.007s] corrected lift [2]
+   representatives tried: 1 lift is None: False
+   box order: 512 counts: [4, 4, 4, 8]
+   box order: 32 counts: [2, 2, 2, 4]
+   box order: 32 counts: [2, 2, 2, 4]
+liftable generators: [1, 2]
+[    0.000s] one full public membership test [0]
+---- profile of the non-liftable correction ----
+   box order: 512 counts: [4, 4, 4, 8]
+         18267460 function calls (17924691 primitive calls) in 7.808 seconds
+
+   Ordered by: cumulative time
+   List reduced from 589 to 24 due to restriction <24>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.006    0.006    7.808    7.808 /repos/sage-extensions/src/sage_extensions/categories/lattices.py:13897(_corrected_pointwise_levi_lift)
+      512    0.008    0.000    5.003    0.010 /repos/sage-extensions/src/sage_extensions/categories/lattices.py:9340(eichler_transvection)
+      512    0.018    0.000    4.253    0.008 /repos/sage-extensions/src/sage_extensions/categories/lattices.py:9258(_eichler_transvection_column_matrix)
+26561/12816    0.126    0.000    1.321    0.000 /repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py:791(__call__)
+      512    0.010    0.000    1.302    0.003 /repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py:1708(integral_restriction)
+     1024    0.006    0.000    1.277    0.001 /repos/sage-extensions/src/sage_extensions/tensors/tensor.py:2300(_sub_)
+     1536    0.026    0.000    1.253    0.001 /repos/sage-extensions/src/sage_extensions/categories/modules/pure/modules.py:8028(_engine_matrix)
+     1536    0.057    0.000    1.210    0.001 /repos/sage-extensions/src/sage_extensions/tensors/tensor.py:796(tensor_product)
+    26624    0.010    0.000    1.154    0.000 /repos/sage-extensions/src/sage_extensions/tensors/tensor.py:2307(<genexpr>)
+    25600    0.021    0.000    1.144    0.000 /repos/sage-extensions/src/sage_extensions/categories/algebras/algebras.py:1574(__sub__)
+    34244    0.024    0.000    1.033    0.000 /repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:1276(_richcmp_)
+    34244    0.043    0.000    1.004    0.000 /repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:1239(equality_status)
+    34244    0.146    0.000    0.955    0.000 /repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:2239(_fraction_equality_status)
+    43768    0.107    0.000    0.897    0.000 /repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:1183(_add_)
+5641/3077    0.011    0.000    0.896    0.000 /repos/sage-extensions/src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py:1229(_call_)
+404128/381656    0.141    0.000    0.797    0.000 /repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:8354(_owned_engine_element)
+     3072    0.010    0.000    0.754    0.000 /repos/sage-extensions/src/sage_extensions/categories/modules/pure/modules.py:8049(<genexpr>)
+      512    0.002    0.000    0.753    0.001 /repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py:1957(__mul__)
+      512    0.009    0.000    0.751    0.001 /repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py:5617(compose)
+     2560    0.021    0.000    0.743    0.000 /repos/sage-extensions/src/sage_extensions/categories/modules/pure/modules.py:7370(_matrix_column_coordinates)
+   225688    0.127    0.000    0.714    0.000 /repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:5940(__mul__)
+     1024    0.031    0.000    0.698    0.001 /repos/sage-extensions/src/sage_extensions/tensors/tensor.py:2323(__mul__)
+   225688    0.149    0.000    0.587    0.000 /repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:5916(_mul_)
+    25600    0.028    0.000    0.585    0.000 /repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:1233(_neg_)
+
+
+
+[   16.364s] done
+[peakrss] probe603: child waited=0 shell_code=0 samples=10
+[peakrss] peak tree RSS      : 450 MiB
+[peakrss] low-water MemAvail : 8988 MiB
+[peakrss] peak single VmHWM  : 450 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      439 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    12.0s procs=  3 rss=   450 MiB hwm=   450 MiB avail=  9023 MiB
+[peakrss]   t=    14.0s procs=  3 rss=   450 MiB hwm=   450 MiB avail=  9000 MiB
+[peakrss]   t=    16.0s procs=  3 rss=   450 MiB hwm=   450 MiB avail=  8998 MiB
+[peakrss]   t=    18.0s procs=  3 rss=   450 MiB hwm=   450 MiB avail=  8988 MiB
+[peakrss]   t=     8.0s procs=  3 rss=   445 MiB hwm=   445 MiB avail=  9055 MiB
+probe exit: 0

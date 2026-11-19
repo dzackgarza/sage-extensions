@@ -1,0 +1,46 @@
+tree SHA: 6241968528c8986a4f7e8c58ba335db0308c9182 (modified paths: 1)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 2.06 2.28 4.07 3/548 2794968
+files: tests/lattices/test_the_pointed_stabilizer_of_a_primitive_vector.sage; inner 900 s
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+time gates on: star import 0.33 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: asyncio-1.5.0, xdist-3.8.0, reportlog-1.0.0, platformdirs-4.13.5, hypothesis-6.170.15, anyio-4.15.1, timeout-2.4.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 12 items
+
+tests/lattices/test_the_pointed_stabilizer_of_a_primitive_vector.sage .. [ 16%]
+..........                                                               [100%]
+
+============================== slowest durations ===============================
+4.51s call     tests/lattices/test_the_pointed_stabilizer_of_a_primitive_vector.sage::test_the_coble_cusp_five_pointed_family_returns
+3.32s call     tests/lattices/test_the_pointed_stabilizer_of_a_primitive_vector.sage::test_the_pointed_family_reaches_the_stabilizers_own_discriminant_image
+2.39s call     tests/lattices/test_the_pointed_stabilizer_of_a_primitive_vector.sage::test_the_pointed_family_fixes_its_vector_and_the_setwise_one_does_not
+2.22s call     tests/lattices/test_the_pointed_stabilizer_of_a_primitive_vector.sage::test_a_proper_pointwise_levi_image_still_has_the_full_finite_image
+0.62s call     tests/lattices/test_the_pointed_stabilizer_of_a_primitive_vector.sage::test_the_setwise_stabilizer_of_a_nonsingular_line_returns
+0.53s call     tests/lattices/test_the_pointed_stabilizer_of_a_primitive_vector.sage::test_the_primitive_isotropic_orbit_counts_are_the_card_rows
+0.09s call     tests/lattices/test_the_pointed_stabilizer_of_a_primitive_vector.sage::test_the_hyperbolic_planes_pointed_stabilizer_is_trivial
+0.06s call     tests/lattices/test_the_pointed_stabilizer_of_a_primitive_vector.sage::test_a_summands_generator_keeps_its_complements_isometries
+0.04s call     tests/lattices/test_the_pointed_stabilizer_of_a_primitive_vector.sage::test_a_nonsingular_vector_in_an_odd_lattice_is_answered_here
+0.03s call     tests/lattices/test_the_pointed_stabilizer_of_a_primitive_vector.sage::test_the_pointed_family_fills_the_levi_factor_of_its_parabolic
+0.03s call     tests/lattices/test_the_pointed_stabilizer_of_a_primitive_vector.sage::test_the_pointed_stabilizer_of_a_nonsingular_line_is_the_complement
+0.02s call     tests/lattices/test_the_pointed_stabilizer_of_a_primitive_vector.sage::test_the_glue_of_the_hyperbolic_plane_keeps_only_the_exchange
+
+(24 durations < 0.005s hidden.  Use -vv to show these durations.)
+============================= 12 passed in 19.72s ==============================
+[peakrss] test603: child waited=0 shell_code=0 samples=13
+[peakrss] peak tree RSS      : 727 MiB
+[peakrss] low-water MemAvail : 8017 MiB
+[peakrss] peak single VmHWM  : 727 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      716 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    24.0s procs=  3 rss=   727 MiB hwm=   727 MiB avail=  8017 MiB
+[peakrss]   t=    22.0s procs=  3 rss=   726 MiB hwm=   726 MiB avail=  8256 MiB
+[peakrss]   t=    20.0s procs=  3 rss=   713 MiB hwm=   713 MiB avail=  8528 MiB
+[peakrss]   t=    18.0s procs=  3 rss=   703 MiB hwm=   703 MiB avail=  8398 MiB
+[peakrss]   t=    16.0s procs=  3 rss=   693 MiB hwm=   693 MiB avail=  8402 MiB
+test exit: 0

@@ -1,0 +1,91 @@
+tree SHA: 6241968528c8986a4f7e8c58ba335db0308c9182 (modified paths: 2)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 7.35 3.66 4.20 12/579 2799374
+probe: .tmp/probe-walk.py; inner 900 s
+===== U(2)+<2>: rank 3 div 2 =====
+  K_I rank 1  O(K_I) generators 1
+  [   0.053s] reduction splitting
+           splits along the lifts: False
+  [   0.723s] coset walk
+           M_I generators: 1  all fix v: True
+  [   0.046s] radical generators
+           U_I generators: 2
+  [   0.030s] owned pointed family
+           owned family: 3  all fix v: True
+  [   0.039s] public pointed family
+           public family: 3  all fix v: True
+===== U(2)+<3>: rank 3 div 2 =====
+  K_I rank 1  O(K_I) generators 1
+  [   0.024s] reduction splitting
+           splits along the lifts: False
+  [   0.185s] coset walk
+           M_I generators: 1  all fix v: True
+  [   0.042s] radical generators
+           U_I generators: 1
+  [   0.010s] owned pointed family
+           owned family: 2  all fix v: True
+  [   0.019s] public pointed family
+           public family: 2  all fix v: True
+===== U(3)+<3>: rank 3 div 3 =====
+  K_I rank 1  O(K_I) generators 1
+  [   0.033s] reduction splitting
+           splits along the lifts: False
+  [   0.185s] coset walk
+           M_I generators: 1  all fix v: True
+  [   0.049s] radical generators
+           U_I generators: 2
+  [   0.024s] owned pointed family
+           owned family: 3  all fix v: True
+  [   0.016s] public pointed family
+           public family: 3  all fix v: True
+===== U(2)+<2>+<2>: rank 4 div 2 =====
+  K_I rank 2  O(K_I) generators 2
+  [   0.010s] reduction splitting
+           splits along the lifts: False
+  [   0.096s] coset walk
+           M_I generators: 2  all fix v: True
+  [   0.027s] radical generators
+           U_I generators: 3
+  [   0.011s] owned pointed family
+           owned family: 5  all fix v: True
+  [   0.006s] public pointed family
+           public family: 5  all fix v: True
+===== rank five: rank 5 div 2 =====
+  K_I rank 3  O(K_I) generators 3
+  [   0.032s] reduction splitting
+           splits along the lifts: False
+  [   3.629s] coset walk
+           M_I generators: 5  all fix v: True
+  [   0.069s] radical generators
+           U_I generators: 4
+  [   0.011s] owned pointed family
+           owned family: 9  all fix v: True
+  [   0.014s] public pointed family
+           public family: 8  all fix v: True
+===== T_Co cusp 5: rank 11 div 2 =====
+  K_I rank 9  O(K_I) generators 9
+  [   0.068s] reduction splitting
+           splits along the lifts: False
+  [   2.909s] coset walk
+           M_I generators: 9  all fix v: True
+  [   0.429s] radical generators
+           U_I generators: 10
+  [   0.048s] owned pointed family
+           owned family: 19  all fix v: True
+  [   0.012s] public pointed family
+           public family: 19  all fix v: True
+[  15.264s] done
+[peakrss] probe603: child waited=0 shell_code=0 samples=12
+[peakrss] peak tree RSS      : 466 MiB
+[peakrss] low-water MemAvail : 5864 MiB
+[peakrss] peak single VmHWM  : 466 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      454 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    22.1s procs=  3 rss=   466 MiB hwm=   466 MiB avail=  5955 MiB
+[peakrss]   t=    20.1s procs=  3 rss=   464 MiB hwm=   464 MiB avail=  5864 MiB
+[peakrss]   t=    18.1s procs=  3 rss=   463 MiB hwm=   463 MiB avail=  6027 MiB
+[peakrss]   t=    16.1s procs=  3 rss=   457 MiB hwm=   457 MiB avail=  6006 MiB
+[peakrss]   t=    14.0s procs=  3 rss=   449 MiB hwm=   449 MiB avail=  6236 MiB
+probe exit: 0

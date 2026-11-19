@@ -1,0 +1,48 @@
+tree SHA: 6241968528c8986a4f7e8c58ba335db0308c9182 (modified paths: 1)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 1.62 2.32 4.28 2/528 2794355
+files: tests/lattices/test_the_pointwise_levi_lift_of_an_odd_line.sage tests/lattices/test_the_congruence_lift_of_a_pointwise_levi_isometry.sage tests/lattices/test_the_levi_images_generators_by_schreier.sage tests/lattices/test_the_public_pointed_family_of_a_divisible_odd_line.sage; inner 900 s
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+time gates on: star import 0.39 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: asyncio-1.5.0, xdist-3.8.0, reportlog-1.0.0, platformdirs-4.13.5, hypothesis-6.170.15, anyio-4.15.1, timeout-2.4.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 9 items
+
+tests/lattices/test_the_pointwise_levi_lift_of_an_odd_line.sage ..       [ 22%]
+tests/lattices/test_the_congruence_lift_of_a_pointwise_levi_isometry.sage . [ 33%]
+..                                                                       [ 55%]
+tests/lattices/test_the_levi_images_generators_by_schreier.sage ..       [ 77%]
+tests/lattices/test_the_public_pointed_family_of_a_divisible_odd_line.sage . [ 88%]
+.                                                                        [100%]
+
+=============================== time-gate report ===============================
+collection took 18.07 s; the measured ceiling is 6 s
+============================== slowest durations ===============================
+0.60s call     tests/lattices/test_the_congruence_lift_of_a_pointwise_levi_isometry.sage::test_the_rank_five_lattice_lifts_its_congruent_isometries
+0.60s call     tests/lattices/test_the_pointwise_levi_lift_of_an_odd_line.sage::test_the_odd_divisibility_two_line_has_its_integral_levi_lifts
+0.27s call     tests/lattices/test_the_public_pointed_family_of_a_divisible_odd_line.sage::test_the_public_pointed_family_of_an_odd_divisibility_two_line_answers
+0.24s call     tests/lattices/test_the_public_pointed_family_of_a_divisible_odd_line.sage::test_the_public_pointed_family_of_an_odd_divisibility_three_line_answers
+0.09s call     tests/lattices/test_the_congruence_lift_of_a_pointwise_levi_isometry.sage::test_the_divisibility_two_line_lifts_its_congruent_isometries
+0.09s call     tests/lattices/test_the_pointwise_levi_lift_of_an_odd_line.sage::test_the_odd_divisibility_three_line_has_its_integral_levi_lifts
+0.01s call     tests/lattices/test_the_levi_images_generators_by_schreier.sage::test_the_divisibility_two_line_has_its_image_generators
+0.01s call     tests/lattices/test_the_levi_images_generators_by_schreier.sage::test_the_odd_divisibility_two_line_has_its_image_generators
+
+(19 durations < 0.005s hidden.  Use -vv to show these durations.)
+============================== 9 passed in 20.11s ==============================
+[peakrss] test603: child waited=1 shell_code=1 samples=15
+[peakrss] peak tree RSS      : 844 MiB
+[peakrss] low-water MemAvail : 8859 MiB
+[peakrss] peak single VmHWM  : 844 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      832 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    26.0s procs=  3 rss=   844 MiB hwm=   844 MiB avail=  8883 MiB
+[peakrss]   t=    28.0s procs=  3 rss=   844 MiB hwm=   844 MiB avail=  8859 MiB
+[peakrss]   t=    24.0s procs=  3 rss=   843 MiB hwm=   843 MiB avail=  8900 MiB
+[peakrss]   t=    22.0s procs=  3 rss=   836 MiB hwm=   836 MiB avail=  8908 MiB
+[peakrss]   t=    20.0s procs=  3 rss=   674 MiB hwm=   674 MiB avail=  8997 MiB
+test exit: 1

@@ -1,0 +1,40 @@
+tree SHA: 6241968528c8986a4f7e8c58ba335db0308c9182 (modified paths: 2)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 6.29 6.86 5.52 3/561 2804330
+probe: .tmp/probe-mod2.py; inner 300 s
+===== U(2)+<2> =====
+  family 3, radical 2
+   [ 0] fixes v: True  trivial mod 2: True
+   [ 1] fixes v: True  trivial mod 2: True
+   [ 2] fixes v: True  trivial mod 2: True
+  radical elements among the family:
+   radical [0] trivial mod 2: True
+   radical [1] trivial mod 2: True
+===== rank five =====
+  family 9, radical 4
+   [ 0] fixes v: True  trivial mod 2: True
+   [ 1] fixes v: True  trivial mod 2: False
+   [ 2] fixes v: True  trivial mod 2: True
+   [ 3] fixes v: True  trivial mod 2: True
+   [ 4] fixes v: True  trivial mod 2: True
+   [ 5] fixes v: True  trivial mod 2: True
+   [ 6] fixes v: True  trivial mod 2: False
+   [ 7] fixes v: True  trivial mod 2: False
+   [ 8] fixes v: True  trivial mod 2: True
+  radical elements among the family:
+   radical [0] trivial mod 2: True
+   radical [1] trivial mod 2: False
+   radical [2] trivial mod 2: False
+   radical [3] trivial mod 2: True
+[peakrss] probe603: child waited=0 shell_code=0 samples=3
+[peakrss] peak tree RSS      : 441 MiB
+[peakrss] low-water MemAvail : 9098 MiB
+[peakrss] peak single VmHWM  : 441 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      430 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     4.0s procs=  3 rss=   441 MiB hwm=   441 MiB avail=  9098 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   285 MiB hwm=   285 MiB avail=  9206 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     4 MiB hwm=     5 MiB avail=  9356 MiB
+probe exit: 0

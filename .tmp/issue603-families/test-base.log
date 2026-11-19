@@ -1,0 +1,61 @@
+tree SHA: 6241968528c8986a4f7e8c58ba335db0308c9182 (modified paths: 0)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 12.13 6.01 4.98 15/608 2801687
+files: tests/lattices/test_the_pointed_stabilizer_of_a_primitive_vector.sage tests/lattices/test_the_public_pointed_family_of_a_divisible_odd_line.sage tests/lattices/test_the_levi_images_generators_by_schreier.sage tests/lattices/test_the_pointwise_levi_lift_of_an_odd_line.sage tests/lattices/test_the_congruence_lift_of_a_pointwise_levi_isometry.sage; inner 900 s
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+time gates on: star import 4.31 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: asyncio-1.5.0, xdist-3.8.0, reportlog-1.0.0, platformdirs-4.13.5, hypothesis-6.170.15, anyio-4.15.1, timeout-2.4.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 21 items
+
+tests/lattices/test_the_pointed_stabilizer_of_a_primitive_vector.sage .. [  9%]
+..........                                                               [ 57%]
+tests/lattices/test_the_public_pointed_family_of_a_divisible_odd_line.sage . [ 61%]
+.                                                                        [ 66%]
+tests/lattices/test_the_levi_images_generators_by_schreier.sage ..       [ 76%]
+tests/lattices/test_the_pointwise_levi_lift_of_an_odd_line.sage ..       [ 85%]
+tests/lattices/test_the_congruence_lift_of_a_pointwise_levi_isometry.sage . [ 90%]
+..                                                                       [100%]
+
+=============================== time-gate report ===============================
+session star import took 4.31 s; the measured ceiling is 3 s
+collection took 70.00 s; the measured ceiling is 6 s
+============================== slowest durations ===============================
+8.28s call     tests/lattices/test_the_pointed_stabilizer_of_a_primitive_vector.sage::test_a_proper_pointwise_levi_image_still_has_the_full_finite_image
+5.75s call     tests/lattices/test_the_pointed_stabilizer_of_a_primitive_vector.sage::test_the_coble_cusp_five_pointed_family_returns
+3.77s call     tests/lattices/test_the_pointed_stabilizer_of_a_primitive_vector.sage::test_the_pointed_family_reaches_the_stabilizers_own_discriminant_image
+2.10s call     tests/lattices/test_the_pointed_stabilizer_of_a_primitive_vector.sage::test_the_pointed_family_fixes_its_vector_and_the_setwise_one_does_not
+0.60s call     tests/lattices/test_the_pointed_stabilizer_of_a_primitive_vector.sage::test_the_setwise_stabilizer_of_a_nonsingular_line_returns
+0.57s call     tests/lattices/test_the_pointed_stabilizer_of_a_primitive_vector.sage::test_the_primitive_isotropic_orbit_counts_are_the_card_rows
+0.34s call     tests/lattices/test_the_public_pointed_family_of_a_divisible_odd_line.sage::test_the_public_pointed_family_of_an_odd_divisibility_three_line_answers
+0.34s call     tests/lattices/test_the_public_pointed_family_of_a_divisible_odd_line.sage::test_the_public_pointed_family_of_an_odd_divisibility_two_line_answers
+0.10s call     tests/lattices/test_the_levi_images_generators_by_schreier.sage::test_the_divisibility_two_line_has_its_image_generators
+0.09s call     tests/lattices/test_the_pointed_stabilizer_of_a_primitive_vector.sage::test_the_hyperbolic_planes_pointed_stabilizer_is_trivial
+0.07s call     tests/lattices/test_the_pointed_stabilizer_of_a_primitive_vector.sage::test_a_summands_generator_keeps_its_complements_isometries
+0.06s call     tests/lattices/test_the_pointed_stabilizer_of_a_primitive_vector.sage::test_the_pointed_stabilizer_of_a_nonsingular_line_is_the_complement
+0.05s call     tests/lattices/test_the_pointed_stabilizer_of_a_primitive_vector.sage::test_a_nonsingular_vector_in_an_odd_lattice_is_answered_here
+0.04s call     tests/lattices/test_the_levi_images_generators_by_schreier.sage::test_the_odd_divisibility_two_line_has_its_image_generators
+0.04s call     tests/lattices/test_the_pointwise_levi_lift_of_an_odd_line.sage::test_the_odd_divisibility_three_line_has_its_integral_levi_lifts
+0.03s call     tests/lattices/test_the_pointed_stabilizer_of_a_primitive_vector.sage::test_the_pointed_family_fills_the_levi_factor_of_its_parabolic
+0.02s call     tests/lattices/test_the_pointed_stabilizer_of_a_primitive_vector.sage::test_the_glue_of_the_hyperbolic_plane_keeps_only_the_exchange
+0.01s call     tests/lattices/test_the_congruence_lift_of_a_pointwise_levi_isometry.sage::test_the_rank_five_lattice_lifts_its_congruent_isometries
+
+(45 durations < 0.005s hidden.  Use -vv to show these durations.)
+======================== 21 passed in 92.58s (0:01:32) =========================
+[peakrss] test603: child waited=1 shell_code=1 samples=57
+[peakrss] peak tree RSS      : 914 MiB
+[peakrss] low-water MemAvail : 1451 MiB
+[peakrss] peak single VmHWM  : 917 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      906 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   112.2s procs=  3 rss=   914 MiB hwm=   917 MiB avail=  5749 MiB
+[peakrss]   t=   108.2s procs=  3 rss=   911 MiB hwm=   914 MiB avail=  5756 MiB
+[peakrss]   t=   110.2s procs=  3 rss=   911 MiB hwm=   914 MiB avail=  5754 MiB
+[peakrss]   t=   106.2s procs=  3 rss=   908 MiB hwm=   911 MiB avail=  5779 MiB
+[peakrss]   t=   104.2s procs=  3 rss=   896 MiB hwm=   899 MiB avail=  5786 MiB
+test exit: 1

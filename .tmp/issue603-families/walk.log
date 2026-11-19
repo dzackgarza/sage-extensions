@@ -1,0 +1,79 @@
+tree SHA: 6241968528c8986a4f7e8c58ba335db0308c9182 (modified paths: 1)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 2.27 2.31 4.00 3/514 2795113
+probe: .tmp/probe-walk.py; inner 900 s
+===== U(2)+<2>: rank 3 div 2 =====
+  K_I rank 1  O(K_I) generators 1
+  [   0.159s] coset walk
+           M_I generators: 1  all fix v: True
+  [   0.015s] radical generators
+           U_I generators: 2
+  [   0.288s] owned pointed family
+           owned family: 8  all fix v: True
+  [   0.010s] public pointed family
+           public family: 5  all fix v: True
+===== U(2)+<3>: rank 3 div 2 =====
+  K_I rank 1  O(K_I) generators 1
+  [   0.054s] coset walk
+           M_I generators: 1  all fix v: True
+  [   0.011s] radical generators
+           U_I generators: 1
+  [   0.239s] owned pointed family
+           owned family: 9  all fix v: True
+  [   0.004s] public pointed family
+           public family: 5  all fix v: True
+===== U(3)+<3>: rank 3 div 3 =====
+  K_I rank 1  O(K_I) generators 1
+  [   0.053s] coset walk
+           M_I generators: 1  all fix v: True
+  [   0.012s] radical generators
+           U_I generators: 2
+  [   0.232s] owned pointed family
+           owned family: 8  all fix v: True
+  [   0.004s] public pointed family
+           public family: 5  all fix v: True
+===== U(2)+<2>+<2>: rank 4 div 2 =====
+  K_I rank 2  O(K_I) generators 2
+  [   0.086s] coset walk
+           M_I generators: 2  all fix v: True
+  [   0.023s] radical generators
+           U_I generators: 3
+  [   0.381s] owned pointed family
+           owned family: 14  all fix v: True
+  [   0.005s] public pointed family
+           public family: 9  all fix v: True
+===== rank five: rank 5 div 2 =====
+  K_I rank 3  O(K_I) generators 3
+  [   1.306s] coset walk
+           M_I generators: 5  all fix v: True
+  [   0.029s] radical generators
+           U_I generators: 4
+  [   0.808s] owned pointed family
+           owned family: 40  all fix v: True
+  [   0.006s] public pointed family
+           public family: 16  all fix v: True
+===== T_Co cusp 5: rank 11 div 2 =====
+  K_I rank 9  O(K_I) generators 9
+  [   0.966s] coset walk
+           M_I generators: 9  all fix v: True
+  [   0.267s] radical generators
+           U_I generators: 10
+  [   2.637s] owned pointed family
+           owned family: 56  all fix v: True
+  [   0.008s] public pointed family
+           public family: 35  all fix v: True
+[   9.597s] done
+[peakrss] probe603: child waited=0 shell_code=0 samples=7
+[peakrss] peak tree RSS      : 489 MiB
+[peakrss] low-water MemAvail : 7197 MiB
+[peakrss] peak single VmHWM  : 489 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      478 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    12.0s procs=  3 rss=   489 MiB hwm=   489 MiB avail=  7197 MiB
+[peakrss]   t=    10.0s procs=  3 rss=   483 MiB hwm=   483 MiB avail=  7222 MiB
+[peakrss]   t=     8.0s procs=  3 rss=   476 MiB hwm=   476 MiB avail=  7256 MiB
+[peakrss]   t=     6.0s procs=  3 rss=   459 MiB hwm=   459 MiB avail=  7342 MiB
+[peakrss]   t=     4.0s procs=  3 rss=   438 MiB hwm=   438 MiB avail=  7413 MiB
+probe exit: 0
