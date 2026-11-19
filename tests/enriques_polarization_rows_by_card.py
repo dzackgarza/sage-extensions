@@ -14,7 +14,7 @@ reports later, not in the per-test gate.
 
 The rows are the cards' ``tests/cards/lattice-database-enriques.json``, read
 from ``dzackgarza/lattice-database`` at database commit
-``587d56febe5856d54c6bc9fc023fa5a425f76bfb`` by
+``23c0f9caff4d08b1f9795bba75f45cead4fc75df`` by
 ``tests/cards/refresh_lattice_database_enriques.py``.  Every expected value is
 that file's, with the card's own citation naming the paper, its table and page
 of the version read:

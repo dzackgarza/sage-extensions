@@ -28,7 +28,7 @@ Every expected number here is lattice card ``6JRR``'s, read by tag from
 ``tests/cards/lattice-database-enriques.json``, which
 ``tests/cards/refresh_lattice_database_enriques.py`` generates from
 ``dzackgarza/lattice-database`` at database commit
-``587d56febe5856d54c6bc9fc023fa5a425f76bfb``.  The card's
+``23c0f9caff4d08b1f9795bba75f45cead4fc75df``.  The card's
 ``integral.discriminant_form`` block states the order of `O(A, q)`, the number of
 isotropic classes and the number of `O(A, q)`-orbits among them, and the card
 certifies that block
