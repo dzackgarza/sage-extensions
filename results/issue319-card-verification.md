@@ -174,6 +174,24 @@ five minutes either, so the hypothesis question is not the whole gap: a plane
 row of a *subgroup* of $\Gamma_{\mathrm{En},2}$ is not answered by either entry
 today.
 
+The stage record says where the second one went.  Its constructor's first
+stage is `discriminant images`, and that stage alone runs to the end of the
+300 s:
+
+```
+  299.38s  returned  discriminant images        [divided-class plane row]
+   0.58s  raised    divided-class orbit set     [divided-class plane row]
+ 299.99s  raised    divided-class plane row
+```
+
+`discriminant images` is `_DividedClassPlaneOrbitDecomposition.__init__`, and
+the line that costs is `subgroup.discriminant_image().group_generators()`: the
+finite image of $\Gamma_h$ and a generating set for it.  Nothing in that stage
+touches the class sets -- they are built after it, in 0.58 s before the
+interrupt.  So the plane row's first cost is the subgroup's discriminant image,
+the same finite object the line rows compute (their cards' images are of order
+up to 696729600) and the same one the character quotient is built from.
+
 That is where the acceptance's plane and flag rows stand, and the defect block
 above is unchanged.
 
