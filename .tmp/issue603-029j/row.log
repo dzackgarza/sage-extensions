@@ -1,0 +1,25 @@
+tree SHA: 270fb8f7fa4f6c466400e93432f824c87bd2fda2 (modified paths: 0)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 0.70 1.24 2.74 1/504 2815621
+probe: tests/lattices/the_enriques_pointed_stabilizer_row.py; inner 900 s
+L_1: 1 ker-rho orbits in its O(N)-orbit, 2.3 s
+L_2: 527 ker-rho orbits in its O(N)-orbit, 77.3 s
+card 029J's cited orbit lengths: [1, 527]
+pointed family at L_1 = Ze_1: 20 generators, 1.4 s
+L_1: pointed family's line-stabilizer image index 1
+pointed family at L_2 = Ze_3: 20 generators, 1.9 s
+L_2: pointed family's line-stabilizer image index 527
+[peakrss] probe603: child waited=0 shell_code=0 samples=44
+[peakrss] peak tree RSS      : 687 MiB
+[peakrss] low-water MemAvail : 9610 MiB
+[peakrss] peak single VmHWM  : 687 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      676 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    86.1s procs=  3 rss=   687 MiB hwm=   687 MiB avail=  9722 MiB
+[peakrss]   t=    84.1s procs=  3 rss=   684 MiB hwm=   684 MiB avail=  9729 MiB
+[peakrss]   t=    82.1s procs=  3 rss=   674 MiB hwm=   674 MiB avail=  9745 MiB
+[peakrss]   t=    80.1s procs=  3 rss=   667 MiB hwm=   667 MiB avail=  9753 MiB
+[peakrss]   t=    78.0s procs=  3 rss=   666 MiB hwm=   666 MiB avail=  9753 MiB
+probe exit: 0

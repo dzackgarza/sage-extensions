@@ -778,3 +778,78 @@ of these files, and it is reported rather than fixed here.
   `L_2`, then the proper Levi image on a specimen whose index is not one.
 * The plane case's parameter lattice at null rank at least two, and the
   coercion from `O(L)` into the residue action's rational group.
+
+## `029J`'s `L_2`: the card's 527 with the family as its two factors
+
+The acceptance item is the pointed family at `029J`'s `L_2` and the index the
+card states for it.  `N = U + U(2) + E8(-2)` (rank 12, signature `(2, 10)`),
+`L_2 = Ze_3`, primitive isotropic of divisibility two, complement `K_I` of
+rank ten.  The row (`tests/lattices/the_enriques_pointed_stabilizer_row.py`,
+not collected) at port `991b88b0`, load 0.70:
+
+    L_1: 1 ker-rho orbits in its O(N)-orbit, 2.3 s
+    L_2: 527 ker-rho orbits in its O(N)-orbit, 77.3 s
+    card 029J's cited orbit lengths: [1, 527]
+    pointed family at L_1 = Ze_1: 20 generators, 1.4 s
+    L_1: pointed family's line-stabilizer image index 1
+    pointed family at L_2 = Ze_3: 20 generators, 1.9 s
+    L_2: pointed family's line-stabilizer image index 527
+    probe exit: 0
+
+The two counts are the card's, computed from the line's own residue data; each
+pointed family presents the setwise stabilizer together with `-id`, and its
+index is asserted against the count computed independently.  The same row in
+the round that first completed it printed 31 generators in 9.5 s at `L_1` and
+541 in 320.6 s at `L_2`.  The families are now the two factors -- ten lifts and
+the radical's ten at each cusp, since `L_1` splits along the lifts and `L_2`
+does not -- and the call at `L_2` is 1.9 s.
+
+The card's number is the same before and after the family changed, which is
+what a finite-image statement does: the radical's Levi class is the identity,
+so the lifts alone already had that image.  What changed is that the family at
+`L_2` is now the whole of `P_I^1` by the reduction lemma above, and that it is
+computed in 2.0 s rather than 320.6 s.
+
+### The lemma: `M_I = O(K_I)` at `L_2`
+
+`K_I` has rank ten at both cusps and `O(K_I)` has ten certified generators.
+The coset graph of `O(K_I)/M_I` is decided by the lift predicate and terminates
+because `Gamma_{K_I}(2)` lies in `M_I` -- the congruence lemma, whose formula
+is Gritsenko--Hulek--Sankaran, arXiv:0810.1614, equations (4) and (5), printed
+pp. 8--9 -- so the classes the walk finds are all of them.  It finds one: ten
+Schreier words from ten generators, hence `M_I = O(K_I)`.
+
+The earlier round reached the same conclusion another way: the ten wall
+reflections of the completed chamber lift, and the normalizer factorization
+(Belolipetsky, arXiv:1506.03111v4, Lemma 2.3, printed p. 7) makes the wall
+reflections together with the chamber symmetries generate `O(K_I)`.  That
+argument does not by itself reach the chamber symmetries, which were not among
+the ten lifts measured; the coset graph asks the predicate of every class.  The
+two routes agree here.
+
+`test_the_second_cusp_of_the_enriques_lattice_lifts_the_whole_quotient` pins
+the statement: `M_I` is a subgroup of `O(K_I)`, so containing a generating set
+makes it the whole quotient, and the test asks the lift predicate of each of
+the ten certified generators.  It is a pin, not a red -- the predicate answered
+the same at the parent commit, so no test could distinguish this round's
+change, and the completeness of the family is the reduction lemma of the
+previous section.
+
+**Green.** The pointed file with that test is **13 passed in 16.50 s**
+(`tests/lattices/test_the_pointed_stabilizer_of_a_primitive_vector.sage`), on a
+clean exit: collection and every call inside their ceilings, the new test 1.89 s
+and the slowest call 2.77 s.  Run beside the row job it was 13 passed in
+19.24 s with collection at 6.20 s against the 6 s ceiling, which is the load
+and not the file.
+
+**What remains.** Of the reviewer's five items: `T_Co` cusp 5 (19 generators,
+measured last round; the card has no `T_Co` row, so no count is asserted), the
+proper Levi image at index two (the rank-five specimen, family `9 = 5 + 4`),
+and the odd lattices (`U(2)+<3>` and `U(3)+<3>`, families 2 and 3) are
+measured; what the list still has no measurement for is the nonreflective
+`K_I` (`U + BogachevKolpakovNonReflective`), whose public call went through the
+residue action that no longer answers it -- the new branch asks only the lift
+predicate and `O(K_I).group_generators()`, so that specimen is the next thing
+to run.  The plane case (`unipotent_parameter_lattice` at null rank at least
+two) and the coercion from `O(L)` into the residue action's rational group are
+untouched.

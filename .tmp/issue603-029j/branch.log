@@ -1,0 +1,28 @@
+tree SHA: 699c39b81888c2a470f0073d612066b350860c78 (modified paths: 0)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 0.47 1.43 3.19 1/493 2809026
+probe: .tmp/probe-029j-branch.py; inner 900 s
+N: Integral lattice of rank 12 and signature (2, 10) rank 12 labels ('e', 'f', 'ep', 'fp', 'a1', 'a2', 'a3', 'a4', 'a5', 'a6', 'a7', 'a8')
+===== L_1 = Ze_1: div 1  K_I rank 10  O(K_I) generators 10  [   1.41s]
+   splits along the lifts: True  [   0.02s]
+   M_I generators: 10  all fix v: True  [   0.47s]
+   U_I generators: 10  [   0.28s]
+   family: 20  all fix v: True  [   0.00s]
+===== L_2 = Ze_3: div 2  K_I rank 10  O(K_I) generators 10  [   0.87s]
+   splits along the lifts: False  [   0.01s]
+   M_I generators: 10  all fix v: True  [   0.74s]
+   U_I generators: 10  [   0.24s]
+   family: 20  all fix v: True  [   0.01s]
+[peakrss] probe603: child waited=0 shell_code=0 samples=4
+[peakrss] peak tree RSS      : 463 MiB
+[peakrss] low-water MemAvail : 10025 MiB
+[peakrss] peak single VmHWM  : 463 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      452 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     6.0s procs=  3 rss=   463 MiB hwm=   463 MiB avail= 10025 MiB
+[peakrss]   t=     4.0s procs=  3 rss=   453 MiB hwm=   453 MiB avail= 10059 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   308 MiB hwm=   308 MiB avail= 10113 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     3 MiB hwm=     3 MiB avail= 10352 MiB
+probe exit: 0
