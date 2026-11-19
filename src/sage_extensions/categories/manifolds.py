@@ -1832,7 +1832,19 @@ class TopologicalManifolds(OwnedCategory):
             return self._preamble_manifold_field
 
         def coordinate_field(self):
-            r"""The field ``RR``: a chart of a real manifold is a homeomorphism onto an open subset of ``RR^n``."""
+            r"""The field ``RR``: a chart of a real manifold is a homeomorphism onto an open subset of ``RR^n``.
+
+            The field is one object, and it is returned resolved: ``RR`` is a lazy import in
+            this module, and returning the import the first time and the field afterwards
+            gave one manifold two function algebras -- the ring of a chart is keyed by this
+            field, so the chart's ring built on the import was a different object from the
+            manifold's smooth functions built on the field (measured: the first ask in a
+            process returned a ``LazyImport``, every later one the field).
+            """
+            from sage.misc.lazy_import import LazyImport as _LazyImport
+
+            if isinstance(RR, _LazyImport):
+                RR._get_object()
             return RR
 
         def regularity(self):
