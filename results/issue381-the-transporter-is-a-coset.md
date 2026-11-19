@@ -279,3 +279,42 @@ under its own cap, which is what fills the covering registry there -- is
 bounded and was still inside its cap when this was written; its result is the
 next thing to land, as either the measurement that closes this issue's cost or
 the refutation that sends it to the cross-row bridge.
+
+## At rank eleven the row dies before the registry is written
+
+The bounded run this record asked for: the `Otilde` row on `T_Co` (rank 11,
+signature `(2, 9)`), row cap 600 s, port `991b88b0`, load 2.80 at start:
+
+    [Otilde] the row's route: divided-class, taken because its lines carry
+             divided classes and its covering is carried from one plane to the
+             others (decided in 1.8 s)
+    [  604.52s] outcome: [Otilde] undecided: the row did not return inside its 600 s cap
+    [  604.52s] registered transports: 0
+
+Peak tree RSS 1486 MiB, inside the 6144 MiB guard.
+
+**The covering registry is empty when the cap fires.**  The row does not reach
+the point where a covering, and with it a transport, is registered, so the
+transporter route cannot help it -- not because the composite is wrong (it is
+proved, and green at rank five where the same rows decide with and without it),
+but because there is nothing registered to compose.  The guard added in the
+transporter falls through to the port exactly as designed, and the port is not
+what the row is spending its time in.
+
+**So the 355 s transporter is not the first obstacle at `T_Co`.**  Whatever the
+divided-class route does before it registers its first covering is, and the
+row's own log names that step: "its covering is carried from one plane to the
+others".  The first covering -- the flags over one plane, and the line orbits
+within it -- is computed before any transport exists, and that is where the
+rank-eleven run sits at 600 s.
+
+**What this does to the last four rounds.**  The routing change stands on its
+own measurement: at rank five the kernel rows decide with their calls in 17.0 s
+and 3.4 s instead of 25.6 s, and `isotropic_transport_between` is the library's
+own implementation of the coset lemma.  But it does **not** make the `T_Co`
+kernel rows runnable, and the sentence that "the port is the remaining cost"
+was wrong for that lattice: the covering computation comes first.
+
+**Next.**  Instrument the first covering of one plane at `T_Co` -- which step
+of it is running at the cap -- rather than the transporter.  Nothing else about
+this issue can be measured at rank eleven until that step is named.

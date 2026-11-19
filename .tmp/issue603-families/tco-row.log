@@ -1,0 +1,24 @@
+tree SHA: 346113d75595167b9d6300faa5005b02cb78d4e1 (modified paths: 0)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 2.80 9.66 13.24 3/564 3140159
+probe: .tmp/probe-tco-row.py; inner 1500 s
+[    2.59s] lattice: rank 11, signature (2, 9)
+[    2.75s] subgroup built: {g in Orthogonal group O(Integral lattice of rank 11 and signature (2, 9)) : rho_L(g) lies in a subgroup given by its own generators}
+[Otilde] the row's route: divided-class, taken because its lines carry divided classes and its covering is carried from one plane to the others (decided in 1.8 s)
+[  604.52s] outcome: [Otilde] undecided: the row did not return inside its 600 s cap
+[  604.52s] registered transports: 0
+[  604.52s] done
+[peakrss] probe603: child waited=0 shell_code=0 samples=255
+[peakrss] peak tree RSS      : 1486 MiB
+[peakrss] low-water MemAvail : 740 MiB
+[peakrss] peak single VmHWM  : 1492 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     1481 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   608.4s procs=  3 rss=  1486 MiB hwm=  1492 MiB avail=  5741 MiB
+[peakrss]   t=   602.4s procs=  3 rss=  1483 MiB hwm=  1490 MiB avail=  5542 MiB
+[peakrss]   t=   604.4s procs=  3 rss=  1483 MiB hwm=  1490 MiB avail=  5702 MiB
+[peakrss]   t=   606.4s procs=  3 rss=  1482 MiB hwm=  1490 MiB avail=  5709 MiB
+[peakrss]   t=   600.4s procs=  3 rss=  1478 MiB hwm=  1484 MiB avail=  5155 MiB
+probe exit: 0
