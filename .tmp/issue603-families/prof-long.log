@@ -1,0 +1,72 @@
+tree SHA: 49b826b2473e1b0d724aa8c3b8d906da2b236bd9 (modified paths: 0)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 1.97 2.71 4.11 2/522 3562768
+probe: .tmp/probe-prof-long.py; inner 2400 s
+[Otilde] the row's route: divided-class, taken because its lines carry divided classes and its covering is carried from one plane to the others (decided in 2.1 s)
+[  604.28s] outcome: [Otilde] undecided: the row did not return inside its 600 s cap
+         537786193 function calls (532581282 primitive calls) in 601.859 seconds
+
+   Ordered by: cumulative time
+   List reduced from 6514 to 40 due to restriction <40>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.000    0.000  602.123  602.123 /repos/sage-extensions/tests/coble_gamma_co_2_incidence_rows.py:687(run_row)
+        1    0.000    0.000  600.006  600.006 /repos/sage-extensions/tests/coble_gamma_co_2_incidence_rows.py:474(row_relation)
+        1    0.000    0.000  600.006  600.006 /repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py:1177(tits_building_incidence_by_divided_classes)
+        1    0.000    0.000  600.005  600.005 /repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py:771(cusps)
+        1    0.001    0.001  600.005  600.005 /repos/sage-extensions/src/sage_extensions/categories/sets/finite_ordered_sets.py:1095(_distinct_finite_ordered_set)
+     2137    0.002    0.000  600.005    0.281 /repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py:803(<genexpr>)
+     2137    0.001    0.000  595.593    0.279 /repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py:4705(_yield_subgroup_isotropic_orbit_representatives)
+     2137    0.009    0.000  488.612    0.229 /repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py:4392(_iter_transported_planes)
+     2138  166.461    0.078  405.532    0.190 /repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py:2210(_iter_splitting_isometries_in_im_rho_from_image)
+        1    0.034    0.034  234.766  234.766 /repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py:1365(_im_rho_engine_and_section)
+2821498/1046332   20.069    0.000  190.892    0.000 /repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py:791(__call__)
+4066/1990    0.033    0.000  173.668    0.087 /repos/sage-extensions/src/sage_extensions/categories/group/groups.py:3773(__call__)
+970891/382365    0.803    0.000  156.302    0.000 /repos/sage-extensions/src/sage_extensions/categories/abstract_categories/objects.py:373(selected_resolution)
+  258/143    0.000    0.000  155.834    1.090 /repos/sage-extensions/src/sage_extensions/categories/abstract_categories/objects.py:115(realize)
+        3    0.000    0.000  155.142   51.714 /repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py:650(_ambient_generators)
+      5/3    0.000    0.000  155.089   51.696 /repos/sage-extensions/src/sage_extensions/categories/group/groups.py:1204(selected_resolution)
+      3/2    0.000    0.000  155.079   77.539 /repos/sage-extensions/src/sage_extensions/categories/abstract_categories/arrow_categories.py:2476(<lambda>)
+      3/2    0.000    0.000  155.078   77.539 /repos/sage-extensions/src/sage_extensions/categories/lattices.py:2820(_core_automorphism_generators)
+      3/2    0.003    0.001  155.069   77.535 /repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py:4735(_computed_group_generators)
+    32/13    0.000    0.000  155.037   11.926 /repos/sage-extensions/src/sage_extensions/categories/group/groups.py:6362(selected_group_resolution)
+      8/4    0.000    0.000  155.025   38.756 /repos/sage-extensions/src/sage_extensions/categories/group/groups.py:6346(has_selected_finite_group_generating_set)
+        1    0.000    0.000  155.012  155.012 /work/src/sage_indefinite_port/indefinite/marked_lattices.py:105(automorphism_group_generators)
+      2/1    0.000    0.000  152.243  152.243 /work/src/sage_indefinite_port/indefinite/recursive.py:800(orthogonal_group_generators)
+        1    0.000    0.000  142.991  142.991 /work/src/sage_indefinite_port/indefinite/recursive.py:846(_generation_step)
+      477    0.015    0.000  139.971    0.293 /repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py:2252(discriminant_morphism)
+      476    0.008    0.000  139.827    0.294 /repos/sage-extensions/src/sage_extensions/categories/lattices.py:4835(image)
+1326888/1323201    4.847    0.000  126.184    0.000 {built-in method builtins.sum}
+       62    0.008    0.000  102.880    1.659 /work/src/sage_indefinite_port/indefinite/recursive.py:1572(pointed_isometry)
+2109723/1262984    2.826    0.000  100.149    0.000 /repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py:1755(__call__)
+346853/200572    0.761    0.000   98.359    0.000 /repos/sage-extensions/src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py:1229(_call_)
+      477    0.022    0.000   95.550    0.200 /repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py:2235(discriminant_isometry)
+      954    0.154    0.000   94.836    0.099 /repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py:2197(_discriminant_forward_morphism)
+505989/465670    1.205    0.000   85.917    0.000 /repos/sage-extensions/src/sage_extensions/categories/sets/indexed_families.py:115(_value_at_normalized_index)
+178901/170638    0.923    0.000   83.375    0.000 /repos/sage-extensions/src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py:1198(_linear_combination_of_generator_images)
+        1    0.000    0.000   79.649   79.649 /repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py:1394(ambient_discriminant_images)
+      364    0.001    0.000   79.620    0.219 /repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py:1414(<genexpr>)
+      2/1    0.000    0.000   76.416   76.416 /repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py:5505(isotropic_orbit_representatives)
+      3/1    0.000    0.000   76.416   76.416 /repos/sage-extensions/src/sage_extensions/timing.py:506(timed)
+      3/1    0.000    0.000   76.404   76.404 /repos/sage-extensions/src/sage_extensions/categories/isotropic_orbits.py:1987(_isotropic_orbit_representatives)
+        1    0.000    0.000   76.404   76.404 /repos/sage-extensions/src/sage_extensions/categories/isotropic_orbits.py:1793(_isotropic_plane_orbit_representatives)
+
+
+
+[  604.30s]   2137    0.001    0.000  595.593    0.279 /repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py:4705(_yield_subgroup_isotropic_orbit_representatives)
+[  604.30s]   3/1    0.000    0.000   76.404   76.404 /repos/sage-extensions/src/sage_extensions/categories/isotropic_orbits.py:1987(_isotropic_orbit_representatives)
+[  604.30s] done
+[peakrss] probe603: child waited=0 shell_code=0 samples=304
+[peakrss] peak tree RSS      : 1226 MiB
+[peakrss] low-water MemAvail : 1011 MiB
+[peakrss] peak single VmHWM  : 1235 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     1224 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   571.1s procs=  3 rss=  1226 MiB hwm=  1232 MiB avail=  3580 MiB
+[peakrss]   t=   569.1s procs=  3 rss=  1111 MiB hwm=  1117 MiB avail=  3860 MiB
+[peakrss]   t=   567.1s procs=  3 rss=  1106 MiB hwm=  1112 MiB avail=  3842 MiB
+[peakrss]   t=   563.1s procs=  3 rss=  1089 MiB hwm=  1095 MiB avail=  3940 MiB
+[peakrss]   t=   565.1s procs=  3 rss=  1089 MiB hwm=  1095 MiB avail=  3925 MiB
+probe exit: 0

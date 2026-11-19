@@ -1027,3 +1027,40 @@ that something is, it is not the orbit count.
 its totals distinguish the two: a call count matching the candidates the walk
 draws points at the walk, a count matching the lines a rank-one computation
 draws points at the recursion.
+
+## The cost accounted for: 235 s of finite image plus 2137 planes at 0.19 s
+
+The long profiled run came back: `Otilde` at `T_Co`, 600 s cap, undecided at
+604 s, and the profile accounts for **all** of it:
+
+    cusps(2)                                    1 call    600.01 s
+      _distinct_finite_ordered_set              1 call    600.01 s
+        <genexpr> (predicate_subgroups.py:803)  2137      600.01 s   0.281 s each
+          _yield_subgroup_isotropic_orbit_representatives 2137  595.59 s
+            _iter_transported_planes            2137      488.61 s   0.229 s each
+              _iter_splitting_isometries_in_im_rho_from_image 2138  405.53 s  0.190 s each
+                (tottime 166.46 s in that frame alone)
+    _im_rho_engine_and_section                  1 call    234.77 s   <-- once
+
+So the row's 600 s is **235 s of one-time finite-image construction** plus
+**2137 planes at 0.19 s** in the double-coset walk that spells each plane's
+lift, with 2.8 M calls through `set_categories.__call__` (190.9 s) underneath.
+
+**That is why the cap falls where it does.**  `235 + 2137 x 0.19` is about
+640 s against a 600 s cap: the row is not far off, it is about **seven per cent**
+over.  Halving either term -- the one-time engine or the per-plane walk -- would
+let the row decide inside its cap; reducing both would leave it comfortably
+inside.
+
+**And it explains the earlier count.**  Seven `integral_parameter_classes`
+calls in the first 60 s are seven of the 2137 planes' walks reaching a nested
+torsor, at ~3 s each once the plane's own enumeration is included -- not a
+per-line cost at all.
+
+**What the next change should target.**  Not the torsor (2.15 s, already cut
+twice), and not the plane enumeration (0.01 s): the **0.19 s per plane in
+`_iter_splitting_isometries_in_im_rho_from_image`**, whose own `tottime` of
+166 s says the time is in that frame's body rather than in what it calls, and
+the **235 s one-time `_im_rho_engine_and_section`**.  Both are in
+`orthogonal_quotients.py` and neither has been touched by any round of this
+issue.
