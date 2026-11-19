@@ -113,3 +113,48 @@ branch is byte-identical between `8c094f8` and `bb57ca7` (the only difference in
 the function is the `right_orders` hoist in the `point=` branch), so the
 per-lift body has not changed; whether the whole row's wall clock is unchanged
 too is what a run on this head would say, and it is not run.
+
+## What a window of the row is made of, measured on the row
+
+A second probe prices every GAP call the domain module makes and stamps when each
+first happens (`probe-gap-attrib.py`, row cap 420 s, `attrib2.log`).  The row is
+`Otilde` at `T_Co` on `bb57ca7`:
+
+| t | what | cost |
+| ---: | --- | ---: |
+| 0 → 107.1 s | the line row, the ambient plane orbit, the finite image | not GAP from this module |
+| 107.1 s | `IsomorphismPermGroup(im rho)`, a group of size 46 998 591 897 600 with 349 generators | 1.02 s, once |
+| 108.5 s | `FactorCosetAction(im rho_perm, right_perm)`, the subgroup of size 247 726 080 with 113 generators | **140.64 s, once** |
+| 249.1 s | `Index`, `GeneratorsOfGroup`, `TrivialSubgroup` | 0.24 ms, 16 µs, 0.15 ms |
+| 256.0 s | `ClosureGroup`, 11 calls; the generating subset and the coset walk | 0.03 s |
+| 256.5 s | the split's first plane | -- |
+| 423.9 s | **22 798 planes** | **7.35 ms a plane** |
+
+Three things follow, and they close the question the last three rounds opened.
+
+**The split's own rate is unchanged.** 7.35 ms a plane here against the returned
+row's 8.6 ms on `8c094f8`: the per-plane half never regressed, and the two
+instruments agree although one of them is the row running for real.
+
+**The `FactorCosetAction` the walk's docstring says "does not return at the
+Enriques size" does return** -- in 140.64 s, once per row.  What does not return
+is doing it per plane, and the walk is the route that pays it once.  It is a
+third of a 420 s window, and the row's cap is 10 800 s.
+
+**The coset space is exactly the row's length.** 46 998 591 897 600 /
+247 726 080 = **189 720**, so the walk's `degree` is the row's plane count and it
+yields one lift per coset -- which is what the returned row registered
+(189 721 planes, the extra one the source it seeds).
+
+The window's arithmetic: `257 s` of setup + `189 720 × 7.35 ms = 1394 s` of
+planes = `1651 s`, against the row's measured `2119 s` -- the relation's 569 160
+records and the contract being the rest.  That is the whole of the "600 s" the
+earlier rounds were reading as a deficit.
+
+## A note on the two group orders the probe prints
+
+`46 998 591 897 600` is `|O(A_{T_Co})|`, the card's `6JRR`; `247 726 080` is
+`|rho(Stab_{O(T_Co)}(P))|`, the stabilizer image the record carries, and their
+quotient is the index `189 720` the same record carries for the plane row.  The
+probe did not compute the index from a count of planes: it read it from the two
+groups, and it agrees.

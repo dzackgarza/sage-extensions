@@ -1,0 +1,36 @@
+tree SHA: 2af1b2fce7cf798f53661a52904dc08dc645a7db (modified paths: 1)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 5.90 7.14 5.65 4/558 3680570
+probe: .tmp/issue381-t13/probe-gap-attrib.py; inner 600 s
+[    1.88s] lattice: rank 11, signature (2, 9)
+[    2.08s] subgroup: {g in Orthogonal group O(Integral lattice of rank 11 and signature (2, 9)) : rho_L(g) lies in a subgroup given by its own generators}
+[Otilde] the row's route: divided-class, taken because its lines carry divided classes and its covering is carried from one plane to the others (decided in 1.8 s)
+[  423.92s] outcome: [Otilde] undecided: the row did not return inside its 420 s cap
+[  423.92s] ---- at the row's own 420 s cap ----
+[  423.92s] planes yielded by the split: 22798 (first at 256.5 s)
+[  423.92s] FactorCosetAction                  1 calls    140.64 s 140640.977 ms/call  first at   108.5 s  first=(<permutation group of size 46998591897600 with 349 generators>, <permutation group of size 247726080 with 113 generators>)
+[  423.92s] Image                            474 calls      7.23 s    15.262 ms/call  first at   108.2 s  first=(<action isomorphism>, <group with 113 generators>)
+[  423.92s] IsomorphismPermGroup               1 calls      1.02 s  1019.775 ms/call  first at   107.1 s  first=(<group with 349 generators>,)
+[  423.92s] Subgroup                           3 calls      0.04 s    12.700 ms/call  first at     3.9 s  first=(<group of size 46998591897600 with 4 generators>, 0)
+[  423.92s] ClosureGroup                      11 calls      0.03 s     2.312 ms/call  first at   256.0 s  first=(Group(()), (4,499)(5,59)(7,50)(9,540)(14,709)(15,104)(17,95)(19,750)(23,835)(24,140)(26,131)(28,876)(31,905)(32,168)(34,159)(36,946)(40,970)(42,979)(44,177)(45,983)(46,214)(48,223)(51,227)(52,200)(54,1006)(57,207)(60,211)(61,1013)(64,203)(65,1016)(68,1087)(69,260)(71,251)(73,1128)(76,1157)(77,288)(79,279)(81,1198)(85,1222)(87,1231)(89,297)(90,1235)(91,334)(93,343)(96,347)(97,320)(99,1258)(102,327)(105,331)(106,1265)(109,323)(110,1268)(112,1283)(113,372)(115,363)(117,1324)(121,1348)(123,1357)(125,381)(126,1361)(127,418)(129,427)(132,431)(133,404)(135,1384)(138,411)(141,415)(142,1391)(145,407)(146,1394)(149,1404)(151,1413)(153,437)(154,1417)(155,474)(157,483)(160,487)(161,460)(163,1440)(166,467)(169,471)(170,1447)(173,463)(174,1450)(179,520)(183,1459)(185,492)(186,1463)(188,504)(192,497)(193,1470)(196,500)(198,548)(201,552)(208,559)(212,532)(215,536)(216,1479)(219,528)(220,1482)( [...] ))
+[  423.92s] Index                              1 calls      0.00 s     0.236 ms/call  first at   249.1 s  first=(<permutation group of size 46998591897600 with 349 generators>, <permutation group of size 247726080 with 113 generators>)
+[  423.92s] TrivialSubgroup                    1 calls      0.00 s     0.147 ms/call  first at   256.0 s  first=(<permutation group of size 46998591897600 with 349 generators>,)
+[  423.92s] function_factory                   1 calls      0.00 s     0.141 ms/call  first at   256.1 s  first=('\nfunction(edges, degree, base)\n  local parents, edgenumbers, queue, head, p, i, q;\n  parents := List([1..degree], i -> 0);\n  edgenumbers := List([1..degree], i -> 0);\n  queue := [base];\n  head := 1;\n  while head <= Length(queue) do\n    p := queue[head];\n    head := head + 1;\n    for i in [1..Length(edges)] do\n      q := p ^ edges[i];\n      if q <> base and parents[q] = 0 then\n        parents[q] := p;\n        edgenumbers[q] := i;\n        Add(queue, q);\n      fi;\n    od;\n  od;\n  if Length(queue) <> degree then\n    Error("the coset walk did not reach every point of the coset action");\n  fi;\n  return [parents, edgenumbers, queue];\nend\n',)
+[  423.92s] Order                              5 calls      0.00 s     0.013 ms/call  first at     3.9 s  first=(<trivial group>,)
+[  423.92s] Range                              1 calls      0.00 s     0.027 ms/call  first at   108.2 s  first=(<action isomorphism>,)
+[  423.92s] GeneratorsOfGroup                  1 calls      0.00 s     0.016 ms/call  first at   249.1 s  first=(<permutation group of size 247726080 with 113 generators>,)
+[  423.92s] done
+[peakrss] probe603: child waited=0 shell_code=0 samples=216
+[peakrss] peak tree RSS      : 1495 MiB
+[peakrss] low-water MemAvail : 2731 MiB
+[peakrss] peak single VmHWM  : 1505 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     1494 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   378.5s procs=  3 rss=  1495 MiB hwm=  1502 MiB avail=  6749 MiB
+[peakrss]   t=   376.5s procs=  3 rss=  1491 MiB hwm=  1497 MiB avail=  6779 MiB
+[peakrss]   t=   374.5s procs=  3 rss=  1488 MiB hwm=  1495 MiB avail=  6787 MiB
+[peakrss]   t=   364.5s procs=  3 rss=  1487 MiB hwm=  1493 MiB avail=  6189 MiB
+[peakrss]   t=   366.5s procs=  3 rss=  1487 MiB hwm=  1493 MiB avail=  6360 MiB
+probe exit: 0

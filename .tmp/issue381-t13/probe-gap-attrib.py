@@ -1,19 +1,16 @@
-r"""#381: which GAP call a plane's cost is in -- measured on the row, not modelled.
+r"""#381: what a 420 s window of the row contains, measured on the row itself.
 
 The record attributes the walk's 166 s to the setwise action
 ``Set(List(x, y -> ImageElm(g, y)))``.  The plane route passes no ``point``, so
 it takes the ``FactorCosetAction`` branch instead.  This probe prices every GAP
-call that branch makes, on the row itself, and it dumps its table on an alarm so
-a kill cannot take the numbers with it.
+call the row makes and records **when** each first happens, so the fixed part of
+a window can be separated from the split's own work.
 
-Two counts matter and they are different numbers: ``_from_image`` *invocations*
-(one ``FactorCosetAction`` each) and the lifts it yields (one generator resume
-each).  ``FactorCosetAction``'s count is the first.
+No signal is used to stop it: the row's own cap does, because Sage's cysignals
+owns ``SIGALRM`` and turns a private timer into a backtrace.
 """
 
 import importlib.util
-import os
-import signal
 import sys
 import time
 from collections import defaultdict
@@ -58,12 +55,18 @@ class TimedGap:
         object.__setattr__(self, "calls", defaultdict(int))
         object.__setattr__(self, "seconds", defaultdict(float))
         object.__setattr__(self, "first", {})
+        object.__setattr__(self, "first_at", {})
 
     def __getattr__(self, name):
         attribute = getattr(self._wrapped, name)
         if name not in TRACKED or not callable(attribute):
             return attribute
-        calls, seconds, first = self.calls, self.seconds, self.first
+        calls, seconds, first, first_at = (
+            self.calls,
+            self.seconds,
+            self.first,
+            self.first_at,
+        )
 
         def timed(*args, **kwargs):
             start = time.perf_counter()
@@ -73,6 +76,7 @@ class TimedGap:
                 seconds[name] += time.perf_counter() - start
                 calls[name] += 1
                 if name not in first:
+                    first_at[name] = start - START
                     first[name] = tuple(
                         len(argument) if isinstance(argument, (list, tuple)) else argument
                         for argument in args
@@ -81,13 +85,15 @@ class TimedGap:
         return timed
 
 
-def report(proxy, note):
+def report(proxy, yielded, note):
     log(f"---- {note} ----")
+    log(f"planes yielded by the split: {yielded['planes']} (first at {yielded['first_at']:.1f} s)")
     for name in sorted(proxy.seconds, key=lambda key: -proxy.seconds[key]):
         per_call = proxy.seconds[name] / proxy.calls[name]
         log(
-            f"{name:30s} {proxy.calls[name]:7d} calls {proxy.seconds[name]:9.2f} s "
-            f"{per_call * 1000:9.3f} ms/call  first={proxy.first[name]!r}"
+            f"{name:28s} {proxy.calls[name]:7d} calls {proxy.seconds[name]:9.2f} s "
+            f"{per_call * 1000:9.3f} ms/call  first at {proxy.first_at[name]:7.1f} s  "
+            f"first={proxy.first[name]!r}"
         )
 
 
@@ -104,36 +110,24 @@ original = oq.libgap
 proxy = TimedGap(original)
 oq.libgap = proxy
 
-# The planes the split yields, counted where they are yielded: the walk's own
-# resumes are not a count of them, because one invocation yields many.
-yielded = {"planes": 0}
+yielded = {"planes": 0, "first_at": float("nan")}
 original_iter = oq._iter_transported_planes
 
 
 def counting_iter(*args, **kwargs):
     for plane in original_iter(*args, **kwargs):
+        if not yielded["planes"]:
+            yielded["first_at"] = time.perf_counter() - START
         yielded["planes"] += 1
         yield plane
 
 
 oq._iter_transported_planes = counting_iter
-
-
-def dump(_signum, _frame):
-    oq.libgap = original
-    log(f"planes yielded by the split: {yielded['planes']}")
-    report(proxy, "at the alarm")
-    log("done")
-    os._exit(0)
-
-
-signal.signal(signal.SIGALRM, dump)
-signal.setitimer(signal.ITIMER_REAL, 700.0)
 try:
-    outcome = rows.run_row(lattice, subgroup, "Otilde", 1200, "auto")
-    signal.setitimer(signal.ITIMER_REAL, 0.0)
+    outcome = rows.run_row(lattice, subgroup, "Otilde", 420, "auto")
 finally:
     oq.libgap = original
+    oq._iter_transported_planes = original_iter
 log(f"outcome: {outcome.report()}")
-report(proxy, "after the row")
+report(proxy, yielded, "at the row's own 420 s cap")
 log("done")
