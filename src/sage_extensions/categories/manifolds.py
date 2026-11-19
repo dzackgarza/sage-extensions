@@ -23,6 +23,7 @@ from sage.structure.element import Element
 from sage.structure.element import parent as element_parent
 from sage.structure.parent import Parent
 from sage.structure.sage_object import SageObject
+from sage.functions.other import sqrt
 from sage.symbolic.ring import SR
 
 from sage_extensions.categories.abstract_categories.mor_categories import (
@@ -697,9 +698,13 @@ def _engine_formula_of_pointwise_section(value):
 
 def _engine_scalar(value):
     r"""The engine's symbolic constant for a scalar of a pointwise operation."""
+    from sage_extensions.categories.rings.ring_foundation import _owned_integers
+
     match element_parent(value):
         case field if field is RR or field is _owned_complex_field():
             return value.expression()
+        case ring if ring is _owned_integers():
+            return SR(_engine_element(ring, value))
         case _:
             return SR(value)
 
@@ -1392,6 +1397,8 @@ def _chartwise_family_agrees(manifold, expressions, order) -> None:
     Nothing is enumerated: the residuals are rational expressions in the
     charts' coordinates, and their vanishing is decided exactly.
     """
+    from sage_extensions.categories.functions.real_functions import _flat_ratio_form
+
     labels = tuple(expressions)
     dimension = int(manifold.dimension())
     for source_label, target_label in combinations(labels, 2):
@@ -1447,13 +1454,169 @@ def _chartwise_family_agrees(manifold, expressions, order) -> None:
             for position, (left, right) in enumerate(
                 zip(transported, pulled, strict=True)
             ):
-                residual = SR(left - right).simplify_rational()
+                residual = SR(_flat_ratio_form(left - right)).simplify_rational()
                 assert residual == 0, (
                     f"the chart-wise family on {manifold} does not state one object: on the "
                     f"chart {source.label()} the component {position} is {transported[position]}, "
                     f"and the component stated on the chart {target.label()} is {pulled[position]} "
                     f"there, which leaves the residual {residual}"
                 )
+
+
+
+def _chart_bump_formulas(manifold, label, inner, outer, coordinate):
+    r"""The formulas, in every chart, of ``H`` or ``H x_k`` for the bump ``H`` of the chart ``label``.
+
+    In the coordinates ``x`` of the chart ``label``, ``H = h((outer^2 - |x|^2)/(outer^2 -
+    inner^2))`` with ``h`` the smooth step: ``H = 1`` where ``|x| <= inner`` and ``H = 0``
+    where ``|x| >= outer`` (Lee, *Introduction to Smooth Manifolds*, 2nd ed., Lemma 2.22,
+    with ``|x|^2`` for ``|x|``, which keeps it smooth at the origin).  The chart is onto
+    ``R^n``, so the closed ball ``|x| <= outer`` is compact, hence closed in the Hausdorff
+    manifold, and ``H`` extended by ``0`` is smooth on the manifold.  In another chart
+    with coordinates ``y`` the atlas states ``x = x(y)`` on the overlap; with ``|x(y)|^2 =
+    N/D`` in lowest terms, ``N`` of no real zero and positive, ``D > 0`` on the overlap and
+    ``D = 0`` off it.  There ``H = h`` with ``t = (outer^2 D - N)/(c D)`` written through
+    :func:`flat_exponential` with the first argument ``c D``, ``c = outer^2 - inner^2``:
+    where ``D`` vanishes the argument ``outer^2 D - N = -N`` is negative and ``H`` is
+    ``0`` near the point, as the extension by zero is.  ``coordinate = k`` multiplies by
+    ``x_k = p/q``, whose pole lies where ``D`` vanishes: ``q`` divides ``D^m`` and the
+    factor ``D^m`` is absorbed by the power ``a^(-m)`` of the flat factor.
+    """
+    from sage_extensions.categories.functions.real_functions import flat_exponential
+    from sage_extensions.categories.vector_bundles import _decided_no_real_zero
+
+    home = manifold.atlas()[label]
+    assert home.cut_from() is None, (
+        f"cannot build the bump of the chart {label} of {manifold}: the bump is stated on a "
+        f"closed coordinate ball, which is compact when the chart is onto R^n, and {label} is "
+        f"cut from {home.cut_from()} by the conditions {home.nonvanishing()}"
+    )
+    inner = _engine_scalar(inner)
+    outer = _engine_scalar(outer)
+    assert bool(0 < inner) and bool(inner < outer), (
+        f"a bump is 1 on the ball of radius inner and 0 outside the ball of radius outer, "
+        f"0 < inner < outer, and inner = {inner}, outer = {outer}"
+    )
+    scale = outer**2 - inner**2
+    formulas = {}
+    for other in tuple(manifold.chart_labels()):
+        chart = manifold.atlas()[other]
+        symbols = tuple(_engine_manifold_chart(chart)[:])
+        if other == label:
+            images = symbols
+        else:
+            change = _composed_ambient_transition(manifold, other, label)
+            assert change is not None, (
+                f"cannot state the bump of the chart {label} of {manifold} on the chart "
+                f"{other}: the atlas states no chain of coordinate changes from {other} to "
+                f"{label}"
+            )
+            images = tuple(
+                SR(_engine_manifold_expression(expression))
+                for expression in change.forward_expressions()
+            )
+        squared = SR(sum(image**2 for image in images)).simplify_rational()
+        numerator = SR(squared.numerator())
+        denominator = SR(squared.denominator())
+        assert denominator.is_constant() or _decided_no_real_zero(numerator, symbols), (
+            f"cannot state the bump of the chart {label} of {manifold} on the chart {other}: "
+            f"|x|^2 = {squared} there, and its numerator {numerator} is not decided to have "
+            f"no real zero, so the points off the overlap are not decided to lie outside the "
+            f"bump's support"
+        )
+        origin = {symbol: 0 for symbol in symbols}
+        if bool((denominator if denominator.is_constant() else numerator).subs(origin) < 0):
+            numerator, denominator = -numerator, -denominator
+        rising = flat_exponential(0, 0, 0, scale * denominator, outer**2 * denominator - numerator)
+        falling = flat_exponential(0, 0, 0, scale * denominator, numerator - inner**2 * denominator)
+        if coordinate is None:
+            formulas[other] = rising / (rising + falling)
+            continue
+        factor = SR(images[int(coordinate)]).simplify_rational()
+        power = 0
+        while not SR((denominator**power / factor.denominator()).simplify_rational().denominator()).is_constant():
+            power += 1
+        absorbed = SR(
+            (factor * denominator**power).simplify_rational()
+        ) * scale**power * flat_exponential(
+            0, 0, power, scale * denominator, outer**2 * denominator - numerator
+        )
+        formulas[other] = absorbed / (rising + falling)
+    return formulas
+
+
+def _radial_bound_decided(expression, symbols, radius) -> bool:
+    r"""Whether ``expression > 0`` is decided on ``{|y| >= radius}``.
+
+    Decided when the expression is a polynomial in ``rho = |y|^2`` alone: then it is a
+    univariate rational polynomial ``P(rho)``, and ``P > 0`` on ``[radius^2, oo)`` exactly
+    when ``P(radius^2) > 0``, the leading coefficient is positive and ``P`` has no real root
+    beyond ``radius^2``.  Any other expression is undecided.
+    """
+    from sage.rings.qqbar import AA
+    from sage.rings.rational_field import QQ as SageQQ
+
+    rho = SR.var("radial_rho")
+    on_axis = SR(expression).subs(
+        {symbol: (sqrt(rho) if position == 0 else 0) for position, symbol in enumerate(symbols)}
+    )
+    norm = sum(symbol**2 for symbol in symbols)
+    if not bool(SR(on_axis.subs({rho: norm}) - expression).simplify_rational() == 0):
+        return False
+    if not on_axis.is_polynomial(rho):
+        return False
+    polynomial = SR(on_axis).polynomial(SageQQ)
+    if polynomial.is_zero():
+        return False
+    bound = SageQQ(SR(radius) ** 2)
+    return (
+        polynomial(bound) > 0
+        and polynomial.leading_coefficient() > 0
+        and all(root <= bound for root in polynomial.roots(AA, multiplicities=False))
+    )
+
+
+def _inner_balls_cover(manifold, inner) -> bool:
+    r"""Whether the balls ``|x| < inner`` of the charts cover ``manifold``.
+
+    Each point of a chart ``U_b`` outside its own ball, ``|y| >= inner``, must lie in the
+    ball of another chart ``U_a``: in the overlap, ``D > 0``, with ``|x(y)|^2 = N/D <
+    inner^2``, so ``inner^2 D - N > 0`` and ``D > 0`` on ``{|y| >= inner}``.  These are
+    decided by :func:`_radial_bound_decided`; a chart for which no other chart is decided
+    to cover the outside of its ball leaves the cover undecided, and that raises.
+    """
+    labels = tuple(manifold.chart_labels())
+    for other in labels:
+        chart = manifold.atlas()[other]
+        symbols = tuple(_engine_manifold_chart(chart)[:])
+        covered = False
+        for label in labels:
+            if label == other:
+                continue
+            change = _composed_ambient_transition(manifold, other, label)
+            if change is None:
+                continue
+            images = tuple(
+                SR(_engine_manifold_expression(expression))
+                for expression in change.forward_expressions()
+            )
+            squared = SR(sum(image**2 for image in images)).simplify_rational()
+            numerator = SR(squared.numerator())
+            denominator = SR(squared.denominator())
+            if bool(SR(denominator).subs({symbol: 1 for symbol in symbols}) < 0):
+                numerator, denominator = -numerator, -denominator
+            if _radial_bound_decided(denominator, symbols, inner) and _radial_bound_decided(
+                SR(inner) ** 2 * denominator - numerator, symbols, inner
+            ):
+                covered = True
+                break
+        if not covered:
+            raise CoverageUndecided(
+                f"whether the coordinate balls of radius {inner} of the charts {labels} cover "
+                f"{manifold} is undecided: no other chart is decided to contain the points of "
+                f"{other} outside its ball"
+            )
+    return True
 
 
 class _ManifoldTopologyData(SageObject):
@@ -2850,29 +3013,52 @@ class SmoothManifolds(OwnedCategory):
             r"""Smooth functions on this manifold whose differentials span every cotangent space.
 
             A derivation of ``C^oo(M)`` is read as a section on such a family
-            (:meth:`SmoothSectionModules.ParentMethods.from_derivation`): in a
-            chart, ``V(g_k) = sum_i v^i dg_k/dx_i``, and the Jacobian of the
-            family has rank ``dim M`` at every point.  When one chart presents
-            the manifold its coordinates are such a family.  On a manifold of
-            several charts a coordinate is a function on its own chart only;
-            the family is then the coordinates of an immersion into some
-            ``R^N`` (one exists by Whitney's theorem; Lee, *Introduction to
-            Smooth Manifolds*, 2nd ed., Thm. 6.15), which a manifold states
-            when it is constructed as a submanifold (:meth:`sphere`).  A
-            manifold of several charts that states none is refused: a general
-            immersion, or the bump functions that make coordinates global, is
-            no element of the chart-expression algebra this tree carries.
+            (:meth:`SmoothSectionModules.ParentMethods.from_derivation`): in a chart,
+            ``V(g_k) = sum_i v^i dg_k/dx_i``, and the Jacobian of the family has rank
+            ``dim M`` at every point.  When one chart presents the manifold its coordinates
+            are such a family.  Otherwise the family is ``H_a x_a^i`` over the charts ``a``
+            and the coordinates ``x_a^i``, with ``H_a`` the bump of the chart ``a``
+            (:meth:`chart_bump`, radii ``2`` and ``3``): ``H_a = 1`` on the ball ``|x_a| <
+            2``, where ``d(H_a x_a^i) = dx_a^i``, and these balls cover the manifold
+            (Lee, *Introduction to Smooth Manifolds*, 2nd ed., Prop. 2.25 and the proof of
+            Prop. 8.15).
             """
             labels = tuple(self.chart_labels())
-            assert len(labels) == 1 and self.atlas()[labels[0]].domain() is self, (
-                f"{self} states no smooth functions whose differentials span its cotangent "
-                f"spaces: its charts are {labels}, and a chart's coordinates are functions on "
-                f"the manifold only when that one chart presents it"
-            )
-            chart = self.atlas()[labels[0]]
+            if len(labels) == 1 and self.atlas()[labels[0]].domain() is self:
+                chart = self.atlas()[labels[0]]
+                return tuple(
+                    self.smooth_function({chart.label(): coordinate})
+                    for coordinate in chart.coordinates()
+                )
+            inner, outer = 2, 3
+            _inner_balls_cover(self, inner)
             return tuple(
-                self.smooth_function({chart.label(): coordinate})
-                for coordinate in chart.coordinates()
+                self._glued_function(_chart_bump_formulas(self, label, inner, outer, index))
+                for label in labels
+                for index in range(int(self.dimension()))
+            )
+
+        def chart_bump(self, label, inner, outer):
+            r"""The bump ``H`` of the chart ``label``: ``1`` on ``|x| <= inner``, ``0`` off ``|x| < outer``.
+
+            ``H = h((outer^2 - |x|^2)/(outer^2 - inner^2))`` in the chart's coordinates,
+            with ``h`` the smooth step, extended by ``0`` (Lee, *Introduction to Smooth
+            Manifolds*, 2nd ed., Lemmas 2.20-2.22); its expression in every chart of the
+            atlas is :func:`_chart_bump_formulas`.
+            """
+            return self._glued_function(_chart_bump_formulas(self, label, inner, outer, None))
+
+        def _glued_function(self, formulas):
+            r"""The smooth function whose formula in each chart is ``formulas[label]``.
+
+            The formulas are raised to sections of the charts' function rings and stated
+            through :meth:`smooth_function`, which checks that they agree on the overlaps.
+            """
+            return self.smooth_function(
+                {
+                    label: _raise_manifold_expression(formula, self.atlas()[label])
+                    for label, formula in formulas.items()
+                }
             )
 
         def as_ck_manifold(self):
@@ -3074,37 +3260,6 @@ class _StandardSphere:
     depend on the base point ``x`` up to isomorphism, and one module per
     degree serves every base point (Hatcher, *Algebraic Topology*, §4.1).
     """
-
-    def _cotangent_spanning_functions(self):
-        r"""The ambient coordinates ``u_1, ..., u_{n+1}`` of ``S^n`` in ``R^{n+1}``.
-
-        The inclusion ``S^n -> R^{n+1}`` is an embedding, so the differentials of
-        its coordinates span every cotangent space.  Read through the inverse
-        stereographic projections (Lee, *Introduction to Smooth Manifolds*, 2nd
-        ed., Problem 1-7) they are ``u_k = 2x_k/(1+|x|^2)``,
-        ``u_{n+1} = (|x|^2-1)/(1+|x|^2)`` on ``U_N`` and ``u_k = 2y_k/(1+|y|^2)``,
-        ``u_{n+1} = (1-|y|^2)/(1+|y|^2)`` on ``U_S``, which agree under
-        ``y = x/|x|^2``.
-        """
-        north = self.atlas()["U_N"]
-        south = self.atlas()["U_S"]
-
-        def ambient(chart, sign):
-            coordinates = tuple(chart.coordinates())
-            one = chart.function_ring().one()
-            norm_squared = sum(coordinate**2 for coordinate in coordinates)
-            denominator = one + norm_squared
-            return tuple(
-                chart.section_ratio(2 * coordinate, denominator)
-                for coordinate in coordinates
-            ) + (chart.section_ratio(sign * (norm_squared - one), denominator),)
-
-        return tuple(
-            self.smooth_function({"U_N": on_north, "U_S": on_south})
-            for on_north, on_south in zip(
-                ambient(north, 1), ambient(south, -1), strict=True
-            )
-        )
 
     def _an_element_(self):
         r"""The south pole: the origin of the chart ``U_N``, stereographic projection from the north pole."""

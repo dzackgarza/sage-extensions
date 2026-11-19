@@ -1,0 +1,4 @@
+test_a_bump_of_a_chart_is_a_smooth_function_on_the_sphere.sage: 4 passed in 74.73s
+test_a_derivation_of_a_one_chart_manifold_is_a_section.sage: 2 passed in 57.21s
+test_a_frame_reads_a_section_stated_on_other_charts.sage: 2 passed in 55.87s
+test_a_derivation_of_the_circle_is_the_section_it_differentiates_along.sage (read on the chart bumps, the sphere immersion family removed): first run failed (SR variable named _radial_rho is refused by Sage; renamed radial_rho); rerun: 3 passed in 281.74s

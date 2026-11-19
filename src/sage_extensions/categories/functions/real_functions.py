@@ -55,6 +55,7 @@ from sage.rings.power_series_ring import PowerSeriesRing
 from sage.rings.qqbar import AA
 from sage.rings.rational_field import QQ
 from sage.symbolic.expression import Expression
+from sage.symbolic.function_factory import function as _symbolic_function
 from sage.symbolic.integration.integral import integrate
 from sage.symbolic.operators import add_vararg, mul_vararg
 from sage.symbolic.ring import SR
@@ -1061,6 +1062,122 @@ class _DifferentiabilityClassNotation:
 
 
 C = _DifferentiabilityClassNotation()
+
+
+def _flat_exponential_value(self, i, j, m, a, b):
+    r"""The value of ``flat_exponential(i, j, m, a, b)`` at constant arguments, or ``None``.
+
+    For ``b > 0`` it is ``d^i/da^i d^j/db^j (a^(-m) exp(-a/b))``, computed in closed form;
+    for ``b < 0`` it is ``0``, and so is every derivative, since the function vanishes on
+    the open half-plane ``b < 0``.  At ``b = 0`` it is ``0`` when ``a > 0``: there
+    ``exp(-a/b)`` and each of its derivatives tend to ``0`` faster than any power of ``b``
+    (Lee, *Introduction to Smooth Manifolds*, 2nd ed., Lemma 2.20).  ``None`` leaves the
+    expression symbolic.
+    """
+    if not SR(b).is_constant():
+        return None
+    if bool(SR(b) < 0):
+        return SR.zero()
+    if not SR(a).is_constant():
+        return None
+    if bool(SR(b) == 0):
+        assert bool(SR(a) > 0), (
+            f"flat_exponential({i}, {j}, {m}, {a}, {b}) is asked at b = 0 with a = {a}: the "
+            f"function a^(-m) exp(-a/b) is smooth at b = 0 only where a > 0"
+        )
+        return SR.zero()
+    first, second = SR.var("flat_a flat_b")
+    closed = (first ** (-int(m)) * (-first / second).exp()).diff(first, int(i)).diff(second, int(j))
+    return closed.subs({first: a, second: b})
+
+
+def _flat_exponential_derivative(self, i, j, m, a, b, diff_param):
+    r"""The partial derivatives of ``flat_exponential`` in ``a`` and ``b``: the next orders."""
+    assert int(diff_param) in (3, 4), (
+        f"flat_exponential({i}, {j}, {m}, {a}, {b}) is differentiated in its arguments a and b; "
+        f"the orders i, j and the power m are integers, and argument {diff_param} is one of them"
+    )
+    if int(diff_param) == 3:
+        return flat_exponential(i + 1, j, m, a, b)
+    return flat_exponential(i, j + 1, m, a, b)
+
+
+flat_exponential = _symbolic_function(
+    "flat_exponential",
+    nargs=5,
+    eval_func=_flat_exponential_value,
+    derivative_func=_flat_exponential_derivative,
+    latex_name=r"\mathcal{E}",
+)
+flat_exponential.__doc__ = r"""``flat_exponential(i, j, m, a, b)``: ``d^i_a d^j_b (a^(-m) exp(-a/b))`` for ``b > 0``, ``0`` for ``b <= 0``.
+
+The function ``f(t) = exp(-1/t)`` for ``t > 0`` and ``0`` for ``t <= 0`` is smooth
+(Lee, *Introduction to Smooth Manifolds*, 2nd ed., Lemma 2.20); ``flat_exponential(0, 0,
+0, 1, t)`` is it.  The two-argument form ``exp(-a/b) = f(b/a)`` for ``a > 0`` keeps every
+formula built from it regular where a denominator ``a`` vanishes on the side ``b < 0``,
+which is where the function is identically zero; the power ``a^(-m)`` absorbs a pole of
+order ``m`` there.  It is smooth on ``{b < 0} union {a > 0}``, and every formula of this
+package keeps its arguments there.  Its derivatives are its next orders, so the
+derivative of a formula built from it is again a closed formula.
+"""
+
+
+def smooth_step(below, above, scale):
+    r"""The smooth step ``h = f(b/a)/(f(b/a) + f(c/a))``, with ``b = below``, ``c = above``, ``a = scale``.
+
+    Lee's smooth step (*Introduction to Smooth Manifolds*, 2nd ed., Lemma 2.21) is
+    ``h(t) = f(t)/(f(t) + f(1 - t))``, with ``h = 0`` for ``t <= 0`` and ``h = 1`` for
+    ``t >= 1``; here ``t = below/scale`` and ``1 - t = above/scale``, so
+    ``below + above = scale``.  The denominator never vanishes, because ``t`` and
+    ``1 - t`` are not both nonpositive.
+    """
+    assert bool((SR(below) + SR(above) - SR(scale)).simplify_rational() == 0), (
+        f"the smooth step is f(t)/(f(t) + f(1 - t)) with t = {below}/{scale}, and "
+        f"{above}/{scale} is not 1 - t"
+    )
+    rising = flat_exponential(0, 0, 0, scale, below)
+    return rising / (rising + flat_exponential(0, 0, 0, scale, above))
+
+
+def _flat_ratio_value(self, k, r):
+    return None
+
+
+def _flat_ratio_derivative(self, k, r, diff_param):
+    return _flat_ratio(k + 1, r)
+
+
+_flat_ratio = _symbolic_function(
+    "_flat_ratio", nargs=2, eval_func=_flat_ratio_value, derivative_func=_flat_ratio_derivative
+)
+
+
+def _flat_ratio_form(expression):
+    r"""``expression`` with each ``flat_exponential(i, j, m, a, b)`` written through ``f(b/a)``.
+
+    Where ``a > 0``, ``a^(-m) exp(-a/b) = a^(-m) f(b/a)``, so the function is a formula in
+    the one quantity ``b/a`` and its derivatives are those of ``f`` at ``b/a``.  Two
+    formulas that state one function in two charts carry its flat factor with
+    arguments scaled differently -- ``(a, b)`` and ``(lambda a, lambda b)``,
+    ``lambda > 0`` the denominator of a coordinate change -- and this form, with
+    ``b/a`` brought to lowest terms, is the same for both.  It is the comparison form
+    of an overlap, where every first argument is positive; it is never a value.
+    """
+    expression = SR(expression)
+    operator = expression.operator()
+    if operator is None:
+        return expression
+    operands = tuple(_flat_ratio_form(operand) for operand in expression.operands())
+    if operator == flat_exponential:
+        i, j, m, a, b = operands
+        first, second = SR.var("flat_a flat_b")
+        form = (first ** (-int(m)) * _flat_ratio(0, second / first)).diff(first, int(i)).diff(
+            second, int(j)
+        )
+        ratio = (SR(b).simplify_rational() / SR(a).simplify_rational()).simplify_rational()
+        scaled = SR.var("flat_r")
+        return form.subs({second: scaled * first}).subs({first: a}).subs({scaled: ratio})
+    return operator(*operands)
 
 
 def _l2_pairing(left, right):

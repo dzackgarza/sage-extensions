@@ -76,3 +76,4 @@ def test_the_bump_of_the_north_chart_of_the_two_sphere() -> None:
     assert bump(sphere.point((1, 1), "U_N")) == RR(1)
     assert bump(sphere.point((RR(1) / RR(8), RR(1) / RR(8)), "U_S")) == RR(0)
     assert bump(sphere.point((0, 0), "U_S")) == RR(0)
+

@@ -1,17 +1,10 @@
 r"""On the two-chart circle, a derivation of $C^\infty(S^1)$ is the section it differentiates along.
 
 $\Gamma(TM) \to \operatorname{Der} C^\infty(M)$, $V \mapsto (f \mapsto Vf)$, is an isomorphism
-(Lee, *Introduction to Smooth Manifolds*, 2nd ed., Prop. 8.15).  On a manifold of
-several charts a chart's coordinates are no global functions, so the section is read on
-global functions whose differentials span every cotangent space.  For $S^1 \subset \mathbb R^2$
-these are the ambient coordinates, read through the inverse stereographic projections
-(Lee, Problem 1-7):
-
-$$u_1 = \frac{2x}{1+x^2},\quad u_2 = \frac{x^2-1}{1+x^2}\ \text{on } U_N,\qquad
-u_1 = \frac{2y}{1+y^2},\quad u_2 = \frac{1-y^2}{1+y^2}\ \text{on } U_S.$$
-
-In a chart, $V(u_k) = v\,u_k'$; the derivatives satisfy $u_1'^2 + u_2'^2 = 4/(1+x^2)^2 \ne 0$,
-so $v = (V(u_1) u_1' + V(u_2) u_2')/(u_1'^2 + u_2'^2)$.
+(Lee, *Introduction to Smooth Manifolds*, 2nd ed., Prop. 8.15).  The section is read on the
+functions $H_N x$ and $H_S y$, $H$ the bumps of the two stereographic charts (Lee,
+Lemma 2.22 and Prop. 2.25): $H_N = 1$ on $|x| < 2$ and $H_S = 1$ on $|y| < 2$, and these
+balls cover $S^1$, so in each chart some $d(H x)$ is $dx$ and the Jacobian has rank one.
 
 The specimen is the frame $E$ with $E_N = (1+x^2)\partial_x$, $E_S = -(1+y^2)\partial_y$
 (these agree, since $\partial_x = -y^2 \partial_y$ under $y = 1/x$), and the derivation

@@ -6,6 +6,8 @@ from sage_extensions.categories.functions.real_functions import (
     Lp,
     C,
     ell,
+    flat_exponential,
+    smooth_step,
 )
 
 # The graded Lebesgue module constructs its algebras and the convolution
