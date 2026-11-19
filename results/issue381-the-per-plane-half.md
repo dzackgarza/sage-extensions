@@ -94,3 +94,46 @@ edges, how many generators), and whether `str(image)` matters beside them.  At
 2137 points and a generator count in the dozens, three actions an edge is a
 large multiple of one, so the order hoist is worth doing first and measuring
 after.
+
+## The hoist does not move the row, and the reason is the guard's frequency
+
+`Otilde` at `T_Co`, 600 s cap, at the head that carries the order hoist:
+
+    [Otilde] the row's route: divided-class ... (decided in 1.4 s)
+    [  602.29s] Otilde: undecided: the row did not return inside its 600 s cap  [601.37s]
+
+So the change is behaviour-preserving -- the small rows are byte-identical -- and
+buys nothing at rank eleven.  The prediction in the last section ("two of the
+three actions go, the row falls to about 250 s") was **wrong**, and the walk's
+own body says why:
+
+    image = setwise_action(reached_point, generator)
+    marker = str(image)
+    if marker in keys:
+        continue                       # <-- every known image leaves here
+    ... setwise_action(point, reached) ...   # <-- only for a NEW point
+
+The composition check runs **once per new orbit point**, not once per edge: the
+`continue` above it skips every edge whose image is already in the walk.  There
+are 2137 new points and the walk visits 2137 x |generators| edges, so the check
+was a fraction `1/|generators|` of the set-actions, and hoisting it removes that
+fraction and no more.
+
+**What the per-edge cost therefore is.**  One `setwise_action`
+(`Set(List(x, y -> ImageElm(g, y)))`) per edge, which is the walk as written: to
+reach a point it must act on the previous one.  Reducing it is not a hoist but a
+change of representation -- carrying the reached point by a canonical key and
+acting on the key rather than on the sorted set -- and that is a change to the
+walk's data, not to its mathematics.  The points, the transversal and the
+orbit-coset bijection are unchanged either way, and they are
+Betten--Fripertinger--Kerber's, cited in the frame's docstring.
+
+**Sixth correction in this record's cost model**, and the same lesson as the five
+before it: the profile said "166 s in this frame", and the frame's *body*
+contains both the per-edge action and the per-new-point check; reading which is
+which before predicting was the missing step, not measuring after.
+
+**Where that leaves the issue.**  The 405 s per-plane half is one GAP set-action
+per edge of an orbit walk with 2137 points and generators in the dozens.  That is
+inherent to acting on sorted sets, and the next change -- if there is one -- is
+to stop doing that; nothing smaller will move the row inside its cap.
