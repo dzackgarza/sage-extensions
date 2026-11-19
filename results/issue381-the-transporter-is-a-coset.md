@@ -643,3 +643,40 @@ statement -- at the modulus `m` this torsor fixes.  If they are, the enumeration
 becomes a lattice computation and the per-line cost should collapse; if they are
 not, the enumeration is genuinely needed and the line count is the only lever
 left.
+
+## The admissible classes are a subgroup, and the enumeration can be a Smith form
+
+The check the last section named, at port `991b88b0`:
+
+| specimen | ambient class group | admissible classes | closure tested |
+|---|---|---|---|
+| `U+U(2)+<-2>`, rank 5 | `(Z/2)^3`, order 8 | 8, the whole group | **all 64 sums, 0 failures** |
+| `T_Co`, rank 11, cusp 5 | `(Z/4)^9`, order 262144 | **131072 = 2^17, index 2** | 1 000 000 sums did not finish in 240 s |
+
+So on the specimen where the whole thing is small enough to check exhaustively,
+the admissible classes are closed under addition — all 64 sums in 0 failures —
+and at `T_Co` they number exactly half of `(Z/4)^9`, which is the cardinality a
+subgroup of index 2 has.
+
+**The structural reason, which the code already states.**  `_integral_lift_locus`'s
+docstring says the integral locus is "the subset of `T` cut out by the parameter's
+residue class", and `integral_parameter_classes` enumerates the classes of `P/mP`
+that pass.  If liftability is a class condition at `m`, the admissible set is the
+image of the integral parameter lattice `{x in P : x integral}` under the residue
+map, and the image of a lattice under a homomorphism is a subgroup.  That is why
+the count comes out at index 1 and index 2 on the two specimens, and it is the
+statement the exhaustive check confirms where it can be run.
+
+**So the replacement is justified and its criterion is exact.**  The enumeration
+of `2^17` classes becomes one Smith normal form of the integral parameter lattice
+together with the congruence that cuts `P/mP` — the pattern
+`_pointwise_kernel_parameter_vectors` already uses for the divisible-line radical
+-- and the change is correct exactly when it returns the same `2^17` classes at
+`T_Co` and the same 8 at `U+U(2)+<-2>`, which the enumeration supplies as the
+oracle.
+
+**What the exhaustive check does not settle, and I am not claiming it does.**  At
+`T_Co` closure is *argued* from the image-of-a-lattice structure and supported by
+the index-two cardinality, not verified sum by sum: a million sums at this class
+type's cost is over four minutes, and the full `2^17 x 2^17` is out of reach.
+The oracle above is what will decide the replacement, not this section.

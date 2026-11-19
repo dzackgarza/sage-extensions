@@ -1,0 +1,31 @@
+tree SHA: 348464d55e60e3c9705d35a9497c27c99de81a86 (modified paths: 0)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 0.54 1.07 2.99 2/479 3364902
+probe: .tmp/probe-closure.py; inner 900 s
+[    0.02s] ===== U+U(2)+<-2> =====
+[    0.50s]   classes: 8  [0.06s]
+[    0.51s]   iterated 8
+[    0.51s]   element type: OwnedJoinCategory.element_class[_GeneralPresentedElement]; parent: Finitely presented module on 3 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 2, 1 ↦ 2, 2 ↦ 2]
+[    0.51s]   zero in classes: True
+[    0.54s]   closure over 8 x 8 = 64 sums: 0 failures  [0.03s]
+[    0.58s] ===== T_Co cusp 5 =====
+[   12.96s]   classes: 131072  [12.04s]
+[   54.63s]   iterated 131072
+[   54.63s]   element type: OwnedJoinCategory.element_class[_GeneralPresentedElement]; parent: Finitely presented module on 9 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 4, 1 ↦ 4, 2 ↦ 4, 3 ↦ 4, 4 ↦ 4, 5 ↦ 4, 6 ↦ 4, 7 ↦ 4, 8 ↦ 4]
+[   54.63s]   zero in classes: True
+[  294.63s]   closure check did not finish inside 240 s
+[  294.82s] done
+[peakrss] probe603: child waited=0 shell_code=0 samples=150
+[peakrss] peak tree RSS      : 436 MiB
+[peakrss] low-water MemAvail : 4238 MiB
+[peakrss] peak single VmHWM  : 436 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      425 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    58.0s procs=  3 rss=   436 MiB hwm=   436 MiB avail=  9219 MiB
+[peakrss]   t=    60.0s procs=  3 rss=   436 MiB hwm=   436 MiB avail=  9529 MiB
+[peakrss]   t=    62.0s procs=  3 rss=   436 MiB hwm=   436 MiB avail=  9427 MiB
+[peakrss]   t=    64.0s procs=  3 rss=   436 MiB hwm=   436 MiB avail=  9416 MiB
+[peakrss]   t=    66.0s procs=  3 rss=   436 MiB hwm=   436 MiB avail=  9359 MiB
+probe exit: 0
