@@ -1,0 +1,27 @@
+tree SHA: 4dcb745ff89974a1462a546dd381773abe1d1fde (modified paths: 0)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 0.99 1.73 2.78 2/506 3840075
+probe: .tmp/issue381-t19/probe-key-ambiguity.py; inner 900 s
+[    3.18s] 6JRS Otilde: 1 line cusps, 1 keys, multi-cusp keys 0, largest [1]
+[    5.14s] 6JRS Otilde+: 1 line cusps, 1 keys, multi-cusp keys 0, largest [1]
+[   14.50s] U+U(2)+<-2> Otilde: 3 line cusps, 3 keys, multi-cusp keys 0, largest [1, 1, 1]
+[   15.68s] U+U(2)+<-2> Otilde+: 3 line cusps, 3 keys, multi-cusp keys 0, largest [1, 1, 1]
+[   25.30s] U+U(2)+<-4> Otilde: 4 line cusps, 4 keys, multi-cusp keys 0, largest [1, 1, 1, 1]
+[   31.26s] U+U(2)+<-4> Otilde+: 4 line cusps, 4 keys, multi-cusp keys 0, largest [1, 1, 1, 1]
+[   31.49s] U+U+<-4> Otilde: 1 line cusps, 1 keys, multi-cusp keys 0, largest [1]
+[   33.05s] U+U+<-4> Otilde+: 1 line cusps, 1 keys, multi-cusp keys 0, largest [1]
+[   33.05s] done
+[peakrss] probe603: child waited=0 shell_code=0 samples=18
+[peakrss] peak tree RSS      : 601 MiB
+[peakrss] low-water MemAvail : 3964 MiB
+[peakrss] peak single VmHWM  : 601 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      590 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    34.0s procs=  3 rss=   601 MiB hwm=   601 MiB avail=  3964 MiB
+[peakrss]   t=    32.0s procs=  3 rss=   591 MiB hwm=   591 MiB avail=  4430 MiB
+[peakrss]   t=    30.0s procs=  3 rss=   587 MiB hwm=   587 MiB avail=  4534 MiB
+[peakrss]   t=    28.0s procs=  3 rss=   582 MiB hwm=   582 MiB avail=  4635 MiB
+[peakrss]   t=    26.0s procs=  3 rss=   578 MiB hwm=   578 MiB avail=  4707 MiB
+probe exit: 0

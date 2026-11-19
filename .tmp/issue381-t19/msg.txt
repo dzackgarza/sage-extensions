@@ -1,0 +1,28 @@
+results: the line-cusp key is exact on every lattice a test can afford (#381)
+
+The repair `issue381-the-refusal-has-no-cheaper-route.md` left open -- carry the
+stabilizer's image so the divided-class read can separate a fibre -- has to be
+priced for testability, and this is the measurement (key-ambiguity.log, both
+kernel rows of every lattice the driver names besides Tco):
+
+  6JRS          1 line cusp,  1 key,  0 multi-cusp keys
+  U+U(2)+<-2>   3 line cusps, 3 keys, 0
+  U+U(2)+<-4>   4 line cusps, 4 keys, 0
+  U+U+<-4>      1 line cusp,  1 key,  0
+  T_Co          527 line cusps, 444 keys, 24
+
+So the key is injective on every row of every affordable lattice and equivocal
+only at T_Co, where 83 cusps share a key and the buckets reach fifteen.
+
+Hence there is no red test to write for a finer invariant: on all four specimens
+the current key and any refinement of it answer the same, so a test would pass
+before and after.  The inertness is not in a branch but in the whole class of
+affordable specimens, which is the stronger statement; the only witness is the
+T_Co row, which costs 35 minutes of a quiet host and has been killed twice by
+other tenants.
+
+By this tree's rule an inert change is said so and never given a manufactured
+red.
+
+No object introduced: the key is the library's, its fibres are Lemma 3.6's double
+cosets (printed p. 22), and the counts are the library's own.
