@@ -13,7 +13,7 @@ decided by `tests/lattices/test_the_enriques_polarization_degrees_by_card.py`.
 | card row | read by tag as | compared through | state at this commit |
 | --- | --- | --- | --- |
 | `0128` `#h`, degrees `2 … 72` | `card("polarization_counts", "rows")[2d]["primitive_classes"]` | `NamedLattices.E10.Aut().vector_orbit_representatives(2d, content=1)` | **36 of 36 equal**, one process, 2–6 s a degree (measured on the source's g-basis model of the same lattice; `NamedLattices.E10` gives the same counts at degrees 2 and 8) |
-| `0128` `#\bar\Gamma_h` | `[2d]["group_classes"]` | the distinct line/plane/flag triples over those classes | undecided: it needs the plane and flag rows |
+| `0128` `#\bar\Gamma_h` | `[2d]["group_classes"]` | degree 4: the distinct orders of the classes' groups, conjugate subgroups having equal order (Table 4, p. 17; the class invariant is the order and the orbit sizes, p. 11); other degrees: the distinct line/plane/flag triples | **degree 4 decided and equal (348364800 and 92897280 are distinct, so the two classes are not conjugate)**; the other degrees need the plane and flag rows |
 | `gamma-h-N` `#I_1` (lines) | `card("arithmetic_groups", tag)["line_orbits"]` | `Gamma_h.isotropic_orbit_representatives(1)` | **87 of 87 equal** (`results/issue17-gamma-h-line-rows.md` records the run over all 87); the smallest card re-measured at this commit: `gamma-h-3` → 5 in 61.7 s, after the ambient $O(N)$ line row (13.6 s) in the same process |
 | `gamma-h-N` `#I_2` (planes) | `["plane_orbits"]` | `isotropic_orbit_representatives(2)` | undecided (`gamma-h-3`, the smallest plane row, did not return in 480 s) |
 | `gamma-h-N` `#I_12` (flags) | `["flag_orbits"]` | `isotropic_orbit_representatives(2, flag=True)` | undecided (not measured: it reads the same ambient rank-2 classes, and its stabilizer search is the one the plane shortcut does not cover) |
@@ -217,8 +217,9 @@ above is unchanged.
 
 * The plane route and the flag route are not repaired: they are #390/#391's
   cost question (one double coset per class-set point), not a reading here.
-* `#\bar\Gamma_h` is compared nowhere yet: it needs the same plane and flag
-  rows.
+* `#\bar\Gamma_h` is compared at degree 4 only (the two classes' groups have
+  different orders).  The other 35 degrees need the orbit sizes, hence the same
+  plane and flag rows.
 * `tests/lattices/test_enriques_polarization_orbits.sage` carried 261
   parametrized comparisons of the same rows inside the per-test gate, each one
   public call of tens of seconds to 203 s against a 20 s call ceiling.  They are
