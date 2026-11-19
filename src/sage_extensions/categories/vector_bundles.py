@@ -340,17 +340,29 @@ def _is_an_open_inclusion(mapping, domain, manifold) -> bool:
     )
     if not shared:
         return False
-    index_set = mapping.chart_maps().index_set()
-    for label in shared:
-        if (label, label) not in index_set:
-            return False
-        expressions = tuple(mapping.chart_map(label, label))
-        symbols = tuple(_engine_manifold_chart(domain.atlas()[label])[:])
+    index_set = tuple(mapping.chart_maps().index_set())
+    stated = tuple(
+        pair for pair in index_set if pair[0] == pair[1] and pair[0] in shared
+    )
+    if not stated:
+        return False
+    for source_label, target_label in stated:
+        expressions = tuple(mapping.chart_map(source_label, target_label))
+        symbols = tuple(_engine_manifold_chart(domain.atlas()[source_label])[:])
         if len(expressions) != len(symbols):
             return False
         for expression, symbol in zip(expressions, symbols, strict=True):
             if SR(_engine_manifold_expression(expression) - symbol).simplify_rational() != 0:
                 return False
+    # A label it does not state adds no point, exactly when its chart lies inside a
+    # chart it does state: the map is then the identity there too.
+    presented = tuple(_engine_manifold_chart(domain.atlas()[label]).domain() for label, _ in stated)
+    for label in shared:
+        if (label, label) in stated:
+            continue
+        chart_domain = _engine_manifold_chart(domain.atlas()[label]).domain()
+        if not any(chart_domain.is_subset(one) for one in presented):
+            return False
     return True
 
 
@@ -479,8 +491,10 @@ class SmoothVectorBundles(OwnedParameterizedCategory):
                 mapping, domain, manifold
             ):
                 return domain.tangent_bundle()
+            from sage_extensions.categories.vector_bundles import SmoothVectorBundles as _bundles
+
             return _object_of(
-                self.category(),
+                _bundles(domain),
                 bundle_base_manifold=domain,
                 bundle_rank=self.rank(),
                 engine_bundle=self._engine_bundle,
@@ -899,12 +913,15 @@ class SmoothSectionModules(OwnedParameterizedCategory):
             )
             domain = inclusion.domain()
             target = self._vector_bundle.pullback_along(inclusion).sections()
-            labels = tuple(domain.chart_labels())
             components = section.components()
-            missing = tuple(label for label in labels if label not in components)
-            assert not missing, (
-                f"cannot restrict {section} to {domain}: the restriction is stated on the "
-                f"charts of the open submanifold, and the section says nothing on {missing}"
+            labels = tuple(
+                label for label in components if label in domain.chart_labels()
+            )
+            assert _chart_family_covers(domain, labels), (
+                f"cannot restrict {section} to {domain}: the restriction is stated on the charts "
+                f"the section is stated on, {tuple(components)}, and those do not cover {domain} -- "
+                f"a chart of the submanifold lies inside none of them, so its points would have no "
+                f"component"
             )
             return target.section(
                 {
