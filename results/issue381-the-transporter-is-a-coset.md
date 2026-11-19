@@ -206,3 +206,52 @@ plane has a different span from the cusp's -- so a transporter between distinct
 planes is genuinely used, and the port answers it in seconds at that size.  The
 355 s is a rank-eleven figure, and nothing here measures its split between the
 port's two halves.
+
+## The source is already recorded, in the registry the kernel rows use
+
+The 355 s figure is not in this tree: it is the session record's sentence that
+"the kernel rows on `T_Co` stay unrunnable (189720 planes × 355 s +)".  So the
+row is a **kernel** row, `Otilde` or `Otilde+`, and those are exactly the rows
+that have a character quotient.  Running them at `U+U(2)+<-2>` (rank 5) through
+the driver's own entry points, port `991b88b0`:
+
+    [Otilde]  the row's route: divided-class ... decided in 0.0 s
+    [Otilde]  3 line cusps, 2 plane cusps, 4 edges, calls returned in 25.6 s
+    [Otilde]  the quotient retains 4 carried-object transport datums ... each
+              holding the object, its source and the isometry that placed it
+    [Otilde]  decided: 4 edges over 3 line cusps and 2 plane cusps      (36.67 s)
+    [Otilde+] the same relation, calls in 4.7 s                          (index 4)
+
+and `_isotropic_lift_registry` -- the certificate route's registry, the one the
+three earlier sections of this note are about -- is **empty** for both: four
+registered spans, zero, because the kernel rows do not take the certificate
+route.
+
+**The correcting fact.**  `orthogonal_quotients.py:2860` `transport_covering`
+composes exactly the element this note's lemma builds:
+
+    move = lift * ~reference_lift
+
+"the composite that carries the reference plane onto the target", and the
+registry behind it, `_isotropic_covering_registry`, records per plane
+`(source, span, lift, flags)` (`:2844`, `:2857`) -- **the source field whose
+absence the previous section reported, under another name, already populated by
+the route the kernel rows take.**
+
+So the sharpened position is:
+
+* the source *is* recorded, and the composite *is* implemented, for coverings
+  (`transport_covering`), and `isotropic_lift_of(other)` reads the registered
+  lift that carries the covering's source plane onto `other`;
+* what is missing is only the transporter's route: `transporter(source, target)`
+  asks the port, while `lift_target * ~lift_source` would answer it whenever
+  both planes are registered against one covering source;
+* the earlier "add a fourth field to `register_isotropic_lift`" is **withdrawn**:
+  it would duplicate a field the covering registry already keeps.
+
+**Next.**  Route `_PrimitiveIsotropicSublatticeOrbitDecompositionEngine.transporter`
+through the covering registry: if both spans are registered against the same
+covering source, return `lift_target * ~lift_source`; otherwise the port.  The
+test that this is worth doing is the one the kernel rows already pass at rank
+five (36.67 s and 4.7 s for four edges); the cost it removes is the one the
+session records at rank eleven.
