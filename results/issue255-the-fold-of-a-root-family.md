@@ -49,6 +49,12 @@ The counts, pages and figures are card `029J`'s `cusp_diagrams` row `gamma-en-2`
 figures are Sterk's, *Compactifications of the period space of Enriques surfaces, Part I*, Math. Z.
 207 (1991), §4.3, statements 4.3.5–4.3.9 on printed pages 19–24.
 
+The Specimens row the folds are read from is asserted on the stored families themselves: twenty of
+the 22 roots have square \(-2\) and two --- \(v_{21}\) and \(v_{22}\) --- have square \(-4\), the
+19 of the ``(18,0,0)`` family are all of square \(-2\), and the 22 span rank 18, so they satisfy
+\(22-18=4\) rational relations
+(`tests/lattices/test_the_sterk_configurations_are_folds_of_the_two_root_families.sage:121`).
+
 Three of them are folds by a permutation of the roots: 4.3.5 and 4.3.8 by two involutions of the
 22-root family, 4.3.6 by the reversal of the 19-root family.  Two are not, and cannot be:
 
