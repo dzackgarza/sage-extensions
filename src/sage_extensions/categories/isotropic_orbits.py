@@ -1745,18 +1745,17 @@ def _planes_through_line(orthogonal_group, line, completion=None):
     splits off a generator of square ``-|det K_v|`` next to a copy of
     ``II_{1,17}``, the candidates are read from the chamber classification of
     the genus of the definite summand, whose mass certificate is the
-    completeness certificate.  Otherwise ``isotropic_vector_classes(K_v)`` is
-    the port's classification of the primitive isotropic vectors of ``K_v``
-    modulo ``O(K_v)``, which is the class set wanted here exactly when
-    :func:`_hyperbolic_completion` has certified the split; the caller checks
-    that first.
+    completeness certificate.  Otherwise the lines are the primitive isotropic
+    line orbits of ``K_v``, read from
+    ``K_v.Aut().isotropic_orbit_representatives(1)``; a plane is ``<v, lift>``
+    for a lift of the representative's own generator, and the orbits of vectors
+    and of lines agree because ``-1`` lies in every orthogonal group while the
+    plane depends on the lifted vector only through its line.
     """
     lattice = orthogonal_group.domain()
     planes = _chamber_planes_through_line(lattice, line, completion)
     if planes is not None:
         return planes
-    from sage_indefinite_port.indefinite.marked_lattices import INDUCTION
-
     reduction = line.isotropic_reduction()
     quotient = reduction.quotient_lattice()
     labels = tuple(quotient.module_generating_set())
@@ -1777,8 +1776,17 @@ def _planes_through_line(orthogonal_group, line, completion=None):
 
     v = line.inclusion()(line.module_generator(line.module_generating_set()[0]))
     return tuple(
-        lattice.primitive_isotropic_subobject(v, lift(isotropic))
-        for isotropic in INDUCTION.isotropic_vector_classes(quotient)
+        lattice.primitive_isotropic_subobject(
+            v,
+            lift(
+                representative.inclusion()(
+                    representative.module_generator(
+                        representative.module_generating_set()[0]
+                    )
+                )
+            ),
+        )
+        for representative in quotient.Aut().isotropic_orbit_representatives(1)
     )
 
 
