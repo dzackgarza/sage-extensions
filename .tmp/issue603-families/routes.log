@@ -1,0 +1,34 @@
+tree SHA: 00067a20cb094c3b46ab860ac0fcb65c6b753975 (modified paths: 0)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 1.68 2.97 3.52 2/512 3644047
+probe: .tmp/probe-routes.py; inner 900 s
+[    0.20s] subgroup: {g in Orthogonal group O(Integral lattice of rank 11 and signature (2, 9)) : rho_L(g) lies in a subgroup given by its own generators}
+[   24.98s] ambient plane orbits: 1  [24.98s]
+[   24.98s] first representative: OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType
+[   24.98s] odd stabilizer: None (declined)  [0.00s]
+Traceback (most recent call last):
+  File "/repos/sage-extensions/.tmp/probe-routes.py", line 53, in <module>
+    log(f"{name}: {'None (declined)' if value is None else f'{len(tuple(value))} orbits'}  [{time.perf_counter() - start:.2f}s]")
+                                                                  ~~~~~^^^^^^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 4440, in _iter_transported_planes
+    ) in enumerate(quotient._iter_splitting_isometries_in_im_rho(family, spellings=True)):
+         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 2399, in _iter_splitting_isometries_in_im_rho_from_image
+    action = libgap.FactorCosetAction(im_rho_perm, right_perm)
+  File "sage/libs/gap/element.pyx", line 2757, in sage.libs.gap.element.GapElement_Function.__call__
+    GAP_Enter()
+cysignals.signals.AlarmInterrupt
+[peakrss] probe603: child waited=0 shell_code=0 samples=110
+[peakrss] peak tree RSS      : 919 MiB
+[peakrss] low-water MemAvail : 4424 MiB
+[peakrss] peak single VmHWM  : 922 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      911 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   214.2s procs=  3 rss=   919 MiB hwm=   921 MiB avail=  6197 MiB
+[peakrss]   t=   216.2s procs=  3 rss=   919 MiB hwm=   921 MiB avail=  6272 MiB
+[peakrss]   t=   212.2s procs=  3 rss=   916 MiB hwm=   918 MiB avail=  6134 MiB
+[peakrss]   t=   218.2s procs=  3 rss=   916 MiB hwm=   922 MiB avail=  6297 MiB
+[peakrss]   t=   210.2s procs=  3 rss=   915 MiB hwm=   918 MiB avail=  6192 MiB
+probe exit: 0

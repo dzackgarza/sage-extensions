@@ -172,3 +172,38 @@ cheaper one.
 **No object introduced**: the routes, the divided-class route and the parabolic
 stabilizer are the library's own, and the fallback is the orbit--coset walk cited
 in its docstring.
+
+## The check: one route declines instantly, the other is the wall the docstring names
+
+Taken at `T_Co`, port `991b88b0`:
+
+    ambient plane orbits of O(T_Co)          1 orbit    24.98 s
+    _plane_orbit_from_odd_stabilizer(first)  None (declined)   0.00 s
+    _plane_orbit_from_parabolic_stabilizer   reaches libgap.FactorCosetAction(im_rho_perm, right_perm)
+                                             and did not return inside 180 s
+
+So the routing question is answered and the answer is **not** a mis-routing:
+
+* the odd-stabilizer route declines at once -- its hypothesis simply does not hold
+  at this lattice;
+* the parabolic-stabilizer route runs, and its cost is GAP's `FactorCosetAction`
+  on the finite image, i.e. exactly the double-coset enumeration that
+  `_iter_splitting_isometries_in_im_rho_from_image`'s own docstring says "does
+  not return at the Enriques size, while the orbit walk of the class set under
+  the `im rho`-generators terminates".
+
+**Which means the walk is not a fallback that should have been avoided: it is the
+route the library chose because `FactorCosetAction` does not return.**  There is
+no cheaper in-repo route to switch to; the two fast routes are (i) inapplicable
+and (ii) the very enumeration the walk replaced.
+
+**So the deferred rewrite is the remaining lever after all**, and this round's
+value is that it says so on evidence rather than on the hope of avoiding a day's
+work.  The next change is the one the last two sections described: carry the
+reached point by a key and act on the key rather than on the GAP set, keeping
+`FactorCosetAction` out of the path and the small rows' SHA-256 as the check.
+
+**A note on the object rule.**  The orbit, the `im rho` action, the double cosets
+and the orbit--coset bijection are all the library's own and cited in the frame's
+docstring to Betten--Fripertinger--Kerber; `FactorCosetAction` is GAP's.  Nothing
+here is a definition of mine.
