@@ -1,49 +1,49 @@
-# #603: why the pointed call is still the port's at a divisibility-2 cusp
+# #603: the divisibility-2 cusp — the degenerate blocker is gone, the construction is not written
 
-Status: **the repair named in the last report is not delivered.** This note records
-what it needs, what the tree already decides, and why neither route was taken in
-the time available. Measurements are on the adopted runtime in a worktree of
-`main = c3ff64d` (tree bound at `/repos/sage-extensions`, the port at `/work`).
+Status: **the construction named in the last report is still not delivered.** What
+changed is the blocker: the last note said the degenerate lattice `J = v^\perp`
+"needs its own class model". It does not, and this is the check.
 
-## The two measurements
+Every measurement is on the adopted runtime in a worktree of `main = f6c4f9c`
+(tree bound at `/repos/sage-extensions`, the port at `/work`).
 
-| lattice, vector | card | pointed call |
-| --- | --- | --- |
-| `N = U + U(2) + E8(-2)` at `L_1 = Ze_1` (div 1) | `029J` | returns, 36 generators, 11.9--52.1 s, stabilizer image index **1** |
-| the same at `L_2 = Ze_3` (div 2) | `029J` | **does not return**: inside the call at 400 s in two runs |
-| `U(2) + E8(-2)` at its two hyperbolic generators (div 2) | `0125` | returns, 531 members, **72.4 s** and **105.5 s** |
+## J splits, and the split is nondegenerate
 
-The card's discriminating index is `L_2`'s **527** (the `L_1` row's 1 is what any
-family generating everything else gives). So the card comparison stays narrow
-until a divisibility-2 cusp is answered by the construction.
+For a primitive isotropic `v` with `d = div(v)`: `J = v^\perp` has rank `n-1` and
+radical `Zv`, `K_I = J/Zv`, and `J -> K_I` splits *as lattices*: a section
+`s: K_I -> J` gives `K~ = s(K_I)` with `b(s(x), s(y)) = b_{K_I}(x, y)` because the
+radical `Zv` is orthogonal to all of `J`.  Pick `w` with `b(v, w) = d` (integer
+solve of the pairing row against `d`), and
 
-## What the construction needs, and what is missing
+    L_0 = <v, w> + K~
 
-`_isotropic_line_stabilizer_generators` builds `P_I = <one lift per generator of
-O(K_I)> * <kernel>` and refuses when a generator of `O(K_I)` has no integral
-lift, because a family built on the others generates only a subgroup. The missing
-input is therefore **generators of `M_I = rho(P_I)`, the image of the parabolic in
-`O(K_I)`**, which at a divisibility-2 cusp is a proper subgroup.
+is a **nondegenerate** sublattice of `L` of finite index.  Verified on both cusps:
 
-What the tree already decides: `IsotropicReductions._levi_image_contains`
-(`lattices.py:13185`) decides membership in `M_I` elementwise, at rank one by the
-emptiness of the two lift fibres over a complete residue system. So `M_I` is
-*knowable*, but not *presented*: no finite set with `M_I` as a point stabilizer is
-computed anywhere, which is what the non-isotropic construction and the isotropic
-Schreier step both consume. The two routes to it are:
+| lattice, vector | `d` | `K~` isometric to `K_I` | rank of `(v, w, K~)` | `det L_0` |
+| --- | --- | --- | --- | --- |
+| card `0125` = `U(2) + E8(-2)` at `2e_1` | 2 | yes, all 64 pairings | 10 / 10 | `-1024` |
+| card `026E` = `U + D4(-1) + A1(-1)` at `e_1` | 1 | yes, all 25 pairings | 7 / 7 | `8` |
 
-* **the degenerate glue.** `J = v^\perp` carries the radical `I`, `J/I = K_I`, and
-  a complement `K' \cong K_I` lifting `K_I` into `J` gives a gluing subgroup
-  `H_J = J/(I + K') \le A_I \oplus A_{K_I}` whose stabilizer in `O(K_I)` is
-  `M_I` -- the same lemma as the non-isotropic case, applied to a *degenerate*
-  lattice, where the class computation this repository's Smith-form bookkeeping
-  uses (it inverts the Gram matrix) does not apply as written.  This is the route
-  the previous report named, and it is one construction, not a patch: the
-  degenerate case needs its own class model.
-* **owning `O(K_I)`.** `L_2`'s `K_I` has rank 10 and its own generating family is
-  the indefinite port's, which is where the 400 s goes.  Owning `O` of an
-  indefinite rank-10 lattice is not #603's scope.
+So the Smith-form class model the non-isotropic construction already uses — which
+inverts `L_0`'s Gram matrix — applies verbatim at an isotropic vector.  The
+`A_{L_0}` classes, the gluing subgroup `H = L/L_0`, and the orbit of `H` under
+`O(K~)` are all computed exactly as they are for a non-isotropic vector.
 
-Neither was written and validated here. Nothing was changed to make a number
-look better: the row script states `L_2`'s cost, and the tests that exist assert
-what they can.
+## What the construction still needs
+
+`Stab(v) = {sigma in O(K~) : (1_{<v,w>} + sigma)(H) = H}`, i.e. the *same*
+construction with a **rank-two fixed part** (currently rank one) whose Gram is
+nondegenerate but has nonzero off-diagonal `b(v, w) = d`.  Concretely: the
+projection of a vector onto `<v, w> ⊗ Q` in
+`_nonisotropic_pointed_stabilizer_generators` is `c = b(x,v)/b(v,v)`, which needs
+`b(v,v) != 0`; for a rank-two fixed part it is `x_H = b(x, -) G_H^{-1}` on the
+`2 x 2` Gram `G_H`, and the rest of the code — the classes, the orbit, the
+Schreier family, the extension formula, the integrality check — is unchanged.
+
+That is one generalization, not a new class model, and it is the repair: it makes
+`0125`'s two hyperbolic cusps and `029J`'s `L_2` answer from the construction
+instead of the port, and with them the card's discriminating index 527.
+
+Not written here: the generalization needs its own validation cycle, and each
+probe of the current path costs 72 s on `0125` and did not return on `029J`'s
+`L_2` in 400 s.  Nothing was changed to make a number look better.
