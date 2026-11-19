@@ -54,7 +54,14 @@ PARABOLIC_SUBDIAGRAM_TAGS = ("0125",)
 # The catalogued lattices whose primitive-orbit rows #345 reads: the hyperbolic
 # plane and U + D4(-1) + A1(-1), and the positive definite A2 that the
 # lattice-database certify run of #375 certifies beside the hyperbolic plane.
-PRIMITIVE_ORBIT_TAGS = ("0016", "026E", "0012")
+#
+# The five cards of U + U + <-2d>, d in {1, 2, 4, 9, 36}, carry the rows a
+# rank-five line count is compared with: the database's certify run minted them
+# under integral.primitive_orbits, with no published source to cite, so their
+# constant term is the computed count and its certification is the stamp it was
+# computed under.
+RANK_FIVE_LINE_TAGS = ("6JRS", "6JRT", "6JRU", "6JRV", "6JRW")
+PRIMITIVE_ORBIT_TAGS = ("0016", "026E", "0012") + RANK_FIVE_LINE_TAGS
 
 # The catalogued lattice whose certified reflection verdict #344 reads.
 REFLECTIVITY_TAGS = ("0026",)

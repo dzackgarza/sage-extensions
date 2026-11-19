@@ -9,9 +9,12 @@ that the bounded terms are empty.
 No expected count appears in this file.  A printed count, a docstring or an issue
 is not an oracle: the expected value of a known-answer test is a
 lattice-database card value named by tag and certified by citation or
-computation, and the five ``L_d`` cards do not exist yet.  What is asserted here
-holds whatever the count turns out to be — the series and the orbit call are two
-routes to one number, and they must agree on every lattice and every group:
+computation, and the five ``L_d`` cards state their rows under
+``integral.primitive_orbits``, which
+``test_isotropic_line_orbits_of_small_indefinite_lattices`` reads.  What is
+asserted here holds whatever the count turns out to be — the series and the
+orbit call are two routes to one number, and they must agree on every lattice
+and every group:
 
 * ``constant`` equals ``isotropic_orbit_representatives(1).cardinality()`` for
   the same subgroup of ``O(L)``;

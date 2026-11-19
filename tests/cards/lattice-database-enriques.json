@@ -5,7 +5,7 @@
    "lattice": "lattices/{tag}.md"
   },
   "generated_by": "tests/cards/refresh_lattice_database_enriques.py",
-  "ref": "1e1cadcfdca4dba2c0084a0bdc095b2d691126a8",
+  "ref": "23c0f9caff4d08b1f9795bba75f45cead4fc75df",
   "repository": "dzackgarza/lattice-database",
   "rows": {
    "arithmetic_group": [
@@ -3870,6 +3870,341 @@
     6
    ],
    "tag": "026E"
+  },
+  "6JRS": {
+   "certification": "66f4fd0377d69518bc0dccdbf83fe0492c8864efaef7db1791dd5a5d6883a1cf",
+   "determinant": -2,
+   "gram": [
+    [
+     0,
+     1,
+     0,
+     0,
+     0
+    ],
+    [
+     1,
+     0,
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     1,
+     0
+    ],
+    [
+     0,
+     0,
+     1,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     0,
+     -2
+    ]
+   ],
+   "latex": "L_{1}",
+   "name": "L_1",
+   "path": "lattices/6JRS.md",
+   "rank": 5,
+   "rows": {
+    "O": {
+     "constant": 1,
+     "w": [],
+     "z": []
+    },
+    "Otilde": {
+     "constant": 1,
+     "w": [],
+     "z": []
+    },
+    "Otilde+": {
+     "constant": 1,
+     "w": [],
+     "z": []
+    }
+   },
+   "signature": [
+    2,
+    3
+   ],
+   "tag": "6JRS"
+  },
+  "6JRT": {
+   "certification": "8537eac6fefc10bdc48fc25bda59e12d5c75d8b68e8c244e14ca7a4f93b9a17c",
+   "determinant": -4,
+   "gram": [
+    [
+     0,
+     1,
+     0,
+     0,
+     0
+    ],
+    [
+     1,
+     0,
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     1,
+     0
+    ],
+    [
+     0,
+     0,
+     1,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     0,
+     -4
+    ]
+   ],
+   "latex": "L_{2}",
+   "name": "L_2",
+   "path": "lattices/6JRT.md",
+   "rank": 5,
+   "rows": {
+    "O": {
+     "constant": 1,
+     "w": [],
+     "z": []
+    },
+    "Otilde": {
+     "constant": 1,
+     "w": [],
+     "z": []
+    },
+    "Otilde+": {
+     "constant": 1,
+     "w": [],
+     "z": []
+    }
+   },
+   "signature": [
+    2,
+    3
+   ],
+   "tag": "6JRT"
+  },
+  "6JRU": {
+   "certification": "eca9a44c0e247c7809b42786888fb16dabc7dbc100c4cb22a8b512b040200fea",
+   "determinant": -8,
+   "gram": [
+    [
+     0,
+     1,
+     0,
+     0,
+     0
+    ],
+    [
+     1,
+     0,
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     1,
+     0
+    ],
+    [
+     0,
+     0,
+     1,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     0,
+     -8
+    ]
+   ],
+   "latex": "L_{4}",
+   "name": "L_4",
+   "path": "lattices/6JRU.md",
+   "rank": 5,
+   "rows": {
+    "O": {
+     "constant": 2,
+     "w": [],
+     "z": []
+    },
+    "Otilde": {
+     "constant": 2,
+     "w": [],
+     "z": []
+    },
+    "Otilde+": {
+     "constant": 2,
+     "w": [],
+     "z": []
+    }
+   },
+   "signature": [
+    2,
+    3
+   ],
+   "tag": "6JRU"
+  },
+  "6JRV": {
+   "certification": "bbe0ab89e66ee78dc6485646647d4fd5ae322fb13ed6de860c628a5e39b09f5b",
+   "determinant": -18,
+   "gram": [
+    [
+     0,
+     1,
+     0,
+     0,
+     0
+    ],
+    [
+     1,
+     0,
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     1,
+     0
+    ],
+    [
+     0,
+     0,
+     1,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     0,
+     -18
+    ]
+   ],
+   "latex": "L_{9}",
+   "name": "L_9",
+   "path": "lattices/6JRV.md",
+   "rank": 5,
+   "rows": {
+    "O": {
+     "constant": 2,
+     "w": [],
+     "z": []
+    },
+    "Otilde": {
+     "constant": 2,
+     "w": [],
+     "z": []
+    },
+    "Otilde+": {
+     "constant": 2,
+     "w": [],
+     "z": []
+    }
+   },
+   "signature": [
+    2,
+    3
+   ],
+   "tag": "6JRV"
+  },
+  "6JRW": {
+   "certification": "6bc15dc76ab90b05bb0a5c6c62c10fdb6acbfa44fa869bf39aef776cc87c2a45",
+   "determinant": -72,
+   "gram": [
+    [
+     0,
+     1,
+     0,
+     0,
+     0
+    ],
+    [
+     1,
+     0,
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     1,
+     0
+    ],
+    [
+     0,
+     0,
+     1,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     0,
+     -72
+    ]
+   ],
+   "latex": "L_{36}",
+   "name": "L_36",
+   "path": "lattices/6JRW.md",
+   "rank": 5,
+   "rows": {
+    "O": {
+     "constant": 4,
+     "w": [],
+     "z": []
+    },
+    "Otilde": {
+     "constant": 4,
+     "w": [],
+     "z": []
+    },
+    "Otilde+": {
+     "constant": 4,
+     "w": [],
+     "z": []
+    }
+   },
+   "signature": [
+    2,
+    3
+   ],
+   "tag": "6JRW"
   }
  }
 }
