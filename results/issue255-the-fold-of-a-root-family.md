@@ -160,6 +160,21 @@ clause as written demands a test of an input that cannot exist on the 22-root fa
 no involution — is tested there, and the relation refusal that needs a degenerate span is tested at
 the smallest specimen that has one.
 
+**Proposed wording for the item**, since its third clause cannot be tested on the 22 roots: *"Tests
+assert the five root counts, the invariant and anti-invariant lattice signatures, and each refusal
+the operation owes: a permutation of the 22 roots that is no isometry of their span, refused for the
+pair it moves (the transposition of \(v_1\) and \(v_2\)); a permutation that keeps the Gram matrix
+but is no involution, refused because a fold takes the orbit sums of an involution (the two order-four
+automorphisms); and a permutation that keeps the Gram matrix but breaks a rational relation, which
+exists only over a degenerate span, refused for the relation that fails (the swap of \(r_1\) and
+\(r_1+z\) on \(r_1,r_2,r_1+r_2,r_1+z\), whose span has radical \(\mathbf Z z\))."*  Every
+clause of that sentence is asserted by one of
+`tests/lattices/test_the_sterk_configurations_are_folds_of_the_two_root_families.sage:233` (with the
+refusal at `:260`), `:269` and
+`tests/lattices/test_the_fold_of_a_root_family_by_a_diagram_involution.sage:110` (refused at
+`:129`); the amendment is the owner's to make, and the record asks for it here rather than claiming
+the item as written.
+
 **3. "The exploration … uses only this operation." — MET.**  The exploration reads
 `Sterk.foldings()`, which is five `fold` calls and nothing else, and its prose states the datum, the
 decisions and the rescaling.
