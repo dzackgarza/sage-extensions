@@ -1,5 +1,6 @@
 r"""Finite Coxeter diagrams, optionally rooted in an integral lattice."""
 
+from collections.abc import Mapping
 from itertools import combinations
 
 from sage.categories.map import Map
@@ -2484,8 +2485,346 @@ class RootedCoxeterDiagrams(OwnedCategory):
         def mirrors_are_divergent(self, left, right) -> bool:
             return self._root_pair_discriminant(left, right) > 0
 
+        def fold(self, permutation):
+            r"""Fold these roots by ``permutation``, a diagram involution that lifts to an isometry.
 
-__all__ = ["CoxeterDiagrams", "RootedCoxeterDiagrams"]
+            ``permutation`` is a bijection of the vertices, given either as a mapping
+            \(v\mapsto\sigma v\) or as the tuple of the images of the vertices in the order of
+            :meth:`vertices`.
+
+            Write \(R=\{r_v\}\) for the roots, \(\sigma\) for the permutation, and
+            \(g(\sum_v a_v r_v)=\sum_v a_v r_{\sigma v}\) for the linear map it induces on
+            \(W=\langle R\rangle\).  Two independent facts make \(g\) exist and be an isometry, and
+            neither is implied by \(\sigma\) being an automorphism of this diagram:
+
+            * \(g\) is well defined exactly when \(\sigma\) carries the rational relations of the
+              roots into relations: the diagram records the bond \(m_{vw}\), and for roots of equal
+              square the bond is \(|b(r_v,r_w)|\), so a bond-preserving permutation may reverse a
+              pairing and is then no isometry;
+            * \(g\) is an isometry exactly when it keeps every pairing
+              \(b(r_v,r_w)=b(r_{\sigma v},r_{\sigma w})\).
+
+            A permutation that fails either test is refused, and the refusal names the pairing or
+            the relation that failed.  When the roots span their lattice rationally the isometry is
+            taken on the whole lattice; otherwise it is taken on the saturated span of the roots,
+            which is a formed subobject of it.
+
+            The folded family is the family of orbit sums \(s_O=\sum_{v\in O}r_v\) of the orbits
+            \(O\) of \(\sigma\) that are roots --- primitive vectors of negative square, which is
+            what the roots of a family of root vectors are --- each distinct sum once.  An orbit sum
+            that is no root, an isotropic one among them, is retained by
+            :meth:`RootFamilyFolding.discarded_sums` and is not part of the family.  Each orbit sum
+            is fixed by \(g\), so the folded family lies in the invariant lattice \(W^\sigma\).
+
+            EXAMPLES::
+
+                sage: from sage_extensions.all import *
+                sage: a, b = Lattices(ZZ)([[-2, 0], [0, -2]]).module_generators()
+                sage: fold = CoxeterDiagrams().from_roots((a, b)).fold((1, 0))
+                sage: fold.isometry()(a) == b
+                True
+                sage: fold.invariant_lattice().module_rank()
+                1
+                sage: tuple(root.q() for root in fold.roots())
+                (-4,)
+            """
+            vertices = tuple(self.vertices())
+            roots = tuple(self.root(vertex) for vertex in vertices)
+            if not roots:
+                raise ValueError(
+                    f"cannot fold {self}: it has no vertices, so it has no roots to fold"
+                )
+            images = _permutation_images(permutation, vertices, self)
+            image_positions = tuple(vertices.index(image) for image in images)
+            lattice = self.root_realization()
+
+            for left in range(len(roots)):
+                for right in range(left, len(roots)):
+                    given = lattice.b(roots[left], roots[right])
+                    moved = lattice.b(roots[image_positions[left]], roots[image_positions[right]])
+                    if given != moved:
+                        raise ValueError(
+                            f"cannot fold {self} by {permutation}: that permutation is no symmetry "
+                            f"of the roots, since it keeps the bond of two of them but not their "
+                            f"pairing --- b(r_{left}, r_{right}) = {given} while "
+                            f"b(r_{image_positions[left]}, r_{image_positions[right]}) = {moved}"
+                        )
+
+            coordinates = sage_matrix(
+                QQ,
+                [
+                    [QQ(coordinate) for coordinate in _root_family_coordinates(lattice, root)]
+                    for root in roots
+                ],
+            )
+            relations = coordinates.transpose().right_kernel().basis_matrix()
+            for relation in relations.rows():
+                moved_relation = [QQ(0)] * len(roots)
+                for position, coefficient in enumerate(relation):
+                    moved_relation[image_positions[position]] += coefficient
+                if (
+                    relations.stack(sage_matrix(QQ, [moved_relation])).rank()
+                    != relations.rank()
+                ):
+                    raise ValueError(
+                        f"cannot fold {self} by {permutation}: that permutation is no symmetry of "
+                        f"the roots, since it moves a relation of the span to a vector that is not "
+                        f"one --- the relation {list(relation)} becomes {moved_relation}, which is "
+                        f"not a rational relation of the roots"
+                    )
+
+            if int(coordinates.rank()) == int(lattice.module_rank()):
+                span = lattice
+            else:
+                span = lattice.primitive_sublattice_from(roots)
+            span_basis = tuple(
+                span.module_generators()
+                if span is lattice
+                else tuple(span.inclusion()(generator) for generator in span.module_generators())
+            )
+            span_matrix = sage_matrix(
+                QQ,
+                [
+                    [QQ(coordinate) for coordinate in _root_family_coordinates(lattice, vector)]
+                    for vector in span_basis
+                ],
+            )
+            folded_rows = span_matrix.solve_left(coordinates)
+            labels = span.module_generating_set()
+            ring = span.base_ring()
+
+            def spanned(coefficients):
+                return span.linear_combination(
+                    {
+                        label: ring(int(coefficient))
+                        for label, coefficient in zip(labels, coefficients)
+                        if coefficient
+                    }
+                )
+
+            permutation_matrix = sage_matrix(
+                QQ,
+                len(roots),
+                len(roots),
+                {(position, image_positions[position]): QQ(1) for position in range(len(roots))},
+            )
+            transformation = (
+                (folded_rows.transpose() * folded_rows).inverse()
+                * folded_rows.transpose()
+                * (permutation_matrix * folded_rows)
+            ).transpose()
+            if any(coefficient.denominator() != 1 for coefficient in transformation.list()):
+                raise ValueError(
+                    f"cannot fold {self} by {permutation}: that permutation is no symmetry of the "
+                    f"lattice the roots span, since the isometry it induces on their span does not "
+                    f"carry that lattice into itself --- its matrix in the selected basis is "
+                    f"{transformation}"
+                )
+            isometry = span.Isom(span)(
+                tuple(
+                    spanned(transformation.column(column)) for column in range(span.module_rank())
+                )
+            )
+            assert all(
+                isometry(spanned(folded_rows.row(position)))
+                == spanned(folded_rows.row(image_positions[position]))
+                for position in range(len(roots))
+            ), (
+                f"the isometry built for the fold of {self} by {permutation} does not carry each "
+                "root to the image of the permutation, so the fold matrices were read in the "
+                "wrong convention"
+            )
+
+            orbits = []
+            placed = set()
+            for position in range(len(roots)):
+                if position in placed:
+                    continue
+                orbit = [position]
+                placed.add(position)
+                following = image_positions[position]
+                while following != position:
+                    orbit.append(following)
+                    placed.add(following)
+                    following = image_positions[following]
+                orbits.append(tuple(orbit))
+
+            sums = tuple(
+                [
+                    sum(folded_rows[position, column] for position in orbit)
+                    for column in range(folded_rows.ncols())
+                ]
+                for orbit in orbits
+            )
+            kept = []
+            discarded = []
+            recorded = set()
+            for row in sums:
+                element = spanned(row)
+                if element.is_primitive() is not True or element.q() >= span.base_ring().zero():
+                    discarded.append(element)
+                    continue
+                key = tuple(row)
+                if key in recorded:
+                    continue
+                recorded.add(key)
+                kept.append(row)
+
+            invariant = isometry.invariant_lattice()
+            invariant_labels = invariant.module_generating_set()
+            invariant_ring = invariant.base_ring()
+            invariant_matrix = sage_matrix(
+                QQ,
+                [
+                    [QQ(coordinate) for coordinate in _root_family_coordinates(span, generator)]
+                    for generator in (
+                        invariant.inclusion()(element)
+                        for element in invariant.module_generators()
+                    )
+                ],
+            )
+            folded = ()
+            if kept:
+                invariant_rows = invariant_matrix.solve_left(sage_matrix(QQ, kept))
+                assert all(
+                    coefficient.denominator() == 1 for coefficient in invariant_rows.list()
+                ), (
+                    f"the orbit sums of the fold of {self} by {permutation} are roots of the span "
+                    "but not points of its invariant lattice, which no isometry allows"
+                )
+                folded = tuple(
+                    invariant.linear_combination(
+                        {
+                            label: invariant_ring(int(coefficient))
+                            for label, coefficient in zip(invariant_labels, row)
+                            if coefficient
+                        }
+                    )
+                    for row in invariant_rows.rows()
+                )
+            return RootFamilyFolding(
+                self,
+                images,
+                span,
+                isometry,
+                finite_indexed_family_from_values(None, folded),
+                tuple(discarded),
+            )
+
+
+class RootFamilyFolding:
+    r"""The fold of a rooted diagram by a diagram involution that lifts to an isometry.
+
+    Every field is an owned object: the rooted diagram that was folded, the permutation of its
+    vertices, the formed lattice the isometry acts on (the whole lattice when the roots span it
+    rationally and their saturated span otherwise), that isometry, the folded root family in its
+    invariant lattice, and the orbit sums that were no roots of the span and so stayed out of it.
+    """
+
+    def __init__(self, diagram, permutation, span, isometry, roots, discarded) -> None:
+        self._diagram = diagram
+        self._permutation = permutation
+        self._span = span
+        self._isometry = isometry
+        self._roots = roots
+        self._discarded = discarded
+        self._folded_diagram = None
+
+    def diagram(self):
+        r"""Return the rooted diagram that was folded."""
+        return self._diagram
+
+    def permutation(self):
+        r"""Return the permutation of the vertices, as the tuple of the images in vertex order."""
+        return self._permutation
+
+    def span(self):
+        r"""Return the formed lattice the isometry acts on."""
+        return self._span
+
+    def isometry(self):
+        r"""Return \(g(\sum_v a_v r_v)=\sum_v a_v r_{\sigma v}\) as an isometry of :meth:`span`."""
+        return self._isometry
+
+    def invariant_lattice(self):
+        r"""Return \(\ker(g-1)\), the invariant lattice, as a formed subobject of :meth:`span`."""
+        return self._isometry.invariant_lattice()
+
+    def anti_invariant_lattice(self):
+        r"""Return the formed orthogonal complement of :meth:`invariant_lattice`."""
+        return self._isometry.formed_coinvariants()
+
+    def roots(self):
+        r"""Return the folded root family, a family of roots of :meth:`invariant_lattice`."""
+        return self._roots
+
+    def discarded_sums(self):
+        r"""Return the orbit sums of :meth:`span` that are no roots, in the order of the orbits."""
+        return self._discarded
+
+    def folded_diagram(self):
+        r"""Return the Coxeter diagram of :meth:`roots`, rooted in the invariant lattice."""
+        if self._folded_diagram is None:
+            if not tuple(self._roots):
+                raise ValueError(
+                    f"the fold of {self._diagram} by {self._permutation} has no roots: every orbit "
+                    f"sum of that permutation is no root of {self._span}, and a Coxeter diagram "
+                    f"needs at least one root to determine its lattice"
+                )
+            self._folded_diagram = CoxeterDiagrams().from_roots(self._roots)
+        return self._folded_diagram
+
+
+__all__ = ["CoxeterDiagrams", "RootedCoxeterDiagrams", "RootFamilyFolding"]
+
+
+def _root_family_coordinates(lattice, vector):
+    r"""Return the coordinates of ``vector`` in the selected basis of ``lattice``, over the rationals.
+
+    Coordinates are a chosen datum of the lattice, so they cross the owned scalar wrappers into
+    Sage's rational field once, and every linear map of the fold is read from them.
+    """
+    given = vector.to_vector()
+    ring = lattice.base_ring()
+    return [
+        QQ(_engine_element(ring, given(label)))
+        for label in lattice.module_generating_set()
+    ]
+
+
+def _permutation_images(permutation, vertices, diagram):
+    r"""Return the tuple of the images of ``vertices`` under ``permutation``, checked to be a bijection.
+
+    ``permutation`` is a mapping from a vertex to its image, or the tuple of the images of the
+    vertices in their own order.
+    """
+    if isinstance(permutation, Mapping):
+        missing = [vertex for vertex in vertices if vertex not in permutation]
+        if missing:
+            raise ValueError(
+                f"cannot fold {diagram} by {permutation}: that mapping says nothing about the "
+                f"vertices {missing}"
+            )
+        images = tuple(permutation[vertex] for vertex in vertices)
+    else:
+        images = tuple(permutation)
+        if len(images) != len(vertices):
+            raise ValueError(
+                f"cannot fold {diagram} by {permutation}: a permutation of the vertices "
+                f"{vertices} has {len(vertices)} images, and {len(images)} were given"
+            )
+    for image in images:
+        if image not in vertices:
+            raise ValueError(
+                f"cannot fold {diagram} by {permutation}: {image!r} is no vertex of the diagram, "
+                f"whose vertices are {vertices}"
+            )
+    if len(set(images)) != len(vertices):
+        raise ValueError(
+            f"cannot fold {diagram} by {permutation}: the images {images} are not a permutation of "
+            f"the vertices {vertices}, since two of them coincide"
+        )
+    return images
 
 
 def _coxeter_diagram(coxeter_matrix, *, category=None, roots=None, root_gram=None, **data):

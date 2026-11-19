@@ -69,18 +69,18 @@ def _correlation_preimage_from_gram_inverse(lattice, dual_element, inverse_gram)
 
 _STERK_DIAGRAM_LAYOUTS = {
     "Sterk_1": {
-        0: (0, 0),
-        1: (4, 0),
-        2: (8, 0),
-        3: (8, -4),
-        4: (8, -8),
-        5: (4, -8),
-        6: (0, -8),
-        7: (0, -4),
+        0: (0, -8),
+        1: (0, -4),
+        2: (0, 0),
+        3: (4, 0),
+        4: (8, 0),
+        5: (8, -4),
+        6: (8, -8),
+        7: (4, -8),
         8: (2, -6),
-        9: (QQ(13) / 4, -QQ(19) / 4),
-        10: (QQ(9) / 2, -QQ(7) / 2),
-        11: (6, -2),
+        9: (6, -2),
+        10: (QQ(13) / 4, -QQ(19) / 4),
+        11: (QQ(9) / 2, -QQ(7) / 2),
     },
     "Sterk_2": {
         0: (0, 0),
@@ -109,15 +109,15 @@ _STERK_DIAGRAM_LAYOUTS = {
         11: (14, 10),
     },
     "Sterk_4": {
-        0: (0, 0),
-        1: (0, 4),
-        2: (0, 8),
-        3: (4, 8),
-        4: (8, 8),
-        5: (12, 8),
-        6: (16, 8),
-        7: (16, 4),
-        8: (16, 0),
+        0: (0, 8),
+        1: (4, 8),
+        2: (8, 8),
+        3: (12, 8),
+        4: (16, 8),
+        5: (16, 4),
+        6: (16, 0),
+        7: (0, 4),
+        8: (0, 0),
         9: (4, 4),
         10: (12, 4),
     },
@@ -230,7 +230,36 @@ points coincide.
 """
 
 
-_STERK_FIG10_VERTEX_ORDER = (10, 7, 6, 5, 4, 3, 2, 0, 9, 8, 1)
+_STERK_CONFIGURATION_ORDER = ("Sterk_1", "Sterk_2", "Sterk_3", "Sterk_4", "Sterk_5")
+
+_STERK_FOLDING_FAMILIES = {
+    "Sterk_1": (
+        "v",
+        (8, 9, 10, 11, 12, 13, 14, 15, 0, 1, 2, 3, 4, 5, 6, 7, 18, 19, 16, 17, 20, 21),
+    ),
+    "Sterk_2": (
+        "w",
+        (16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0, 18, 17),
+    ),
+    "Sterk_4": ("v", _STERK4_ROOT_PERMUTATION),
+}
+r"""The three Sterk diagrams that are folds of a root family, and the involution each folds by.
+
+The permutation is read against the family named beside it, ``v`` the twenty-two roots of
+:meth:`Sterk.roots_18_2_0` and ``w`` the nineteen of :meth:`Sterk.roots_18_0_0`, in the order those
+carry them; each is an automorphism of that family's Coxeter diagram and lifts to an involution of
+its span, which :meth:`sage_extensions.categories.coxeter_diagrams.CoxeterDiagrams.ParentMethods.fold`
+decides.  ``Sterk_4``'s is the notebook cell's own permutation,
+:meth:`Sterk.sterk4_root_permutation`.
+
+The other two diagrams are no folds of either family.  The twenty-two roots have eight
+Gram-preserving permutations and the nineteen roots two, and folding by them returns the twelve
+roots of ``Sterk_1``, the eleven of ``Sterk_4``, the ten of ``Sterk_2`` and two further
+fourteen-root families whose diagrams are no printed chamber; that exhausts the automorphisms, so
+the twelve roots of ``Sterk_3`` and the fourteen of ``Sterk_5`` stay stored below.
+"""
+
+_STERK_FIG10_VERTEX_ORDER = (10, 5, 4, 3, 2, 1, 0, 8, 9, 6, 7)
 r"""The `II_{18,2}` vertex of Sterk's Fig. 10 (p. 23) carrying each printed label, in the order
 ``a₂, a₃, …, a₈, a₉, a₁₀, a₁₁, a₁₂`` of `Sterk._sterk4_in_TEn_cached`.
 
@@ -276,6 +305,18 @@ def _sterk2_length(value):
     """
     integers = _owned_integers()
     return QQ(_engine_element(integers, integers(value)))
+
+
+def _carried_into(lattice, folding, root):
+    r"""Return a root of ``folding``'s invariant lattice as an element of ``lattice``.
+
+    The folded roots are points of the invariant lattice, which is a formed subobject of the span
+    of the folded family; that span is either ``lattice`` itself, when the family spans it
+    rationally, or a formed subobject of it.
+    """
+    carried = folding.invariant_lattice().inclusion()(root)
+    span = folding.span()
+    return carried if span is lattice else span.inclusion()(carried)
 
 
 def _sterk2_engine_direction_coefficients(lengths):
@@ -558,6 +599,15 @@ class Sterk:
     @staticmethod
     @cache
     def _sterk_roots_cached():
+        r"""Return the five verified root configurations, three of them as folds.
+
+        ``Sterk_1``, ``Sterk_2`` and ``Sterk_4`` are the folds of the two root families by
+        :data:`_STERK_FOLDING_FAMILIES`' involutions, carried into ``T_dP``; ``Sterk_3`` and
+        ``Sterk_5`` are no folds of either family, and the module docstring of that table says why,
+        so their printed vectors stay here.  Every resulting vector is checked to be of square
+        \(-2\) or \(-4\) in one Gram contraction below, and ``Sterk_3``'s two reflection sums are
+        checked against the orbit sums they are.
+        """
         v = Sterk.roots_18_2_0()
         w = Sterk.roots_18_0_0()
 
@@ -568,33 +618,17 @@ class Sterk:
         def orbit_sum(x):
             return x + reflect(x)
 
-        configurations = {
-            "Sterk_1": (
-                v["v3"] + v["v11"],
-                v["v4"] + v["v12"],
-                v["v5"] + v["v13"],
-                v["v6"] + v["v14"],
-                v["v7"] + v["v15"],
-                v["v8"] + v["v16"],
-                v["v9"] + v["v1"],
-                v["v10"] + v["v2"],
-                v["v17"] + v["v19"],
-                v["v21"],
-                v["v22"],
-                v["v18"] + v["v20"],
-            ),
-            "Sterk_2": (
-                w["w1"] + w["w17"],
-                w["w2"] + w["w16"],
-                w["w3"] + w["w15"],
-                w["w4"] + w["w14"],
-                w["w5"] + w["w13"],
-                w["w6"] + w["w12"],
-                w["w7"] + w["w11"],
-                w["w8"] + w["w10"],
-                w["w9"],
-                w["w18"] + w["w19"],
-            ),
+        families = {
+            "v": tuple(v[f"v{index}"] for index in range(1, 23)),
+            "w": tuple(w[f"w{index}"] for index in range(1, 20)),
+        }
+        folded = {}
+        for name, (family, permutation) in _STERK_FOLDING_FAMILIES.items():
+            folding = CoxeterDiagrams().from_roots(families[family]).fold(permutation)
+            folded[name] = tuple(
+                _carried_into(NamedLattices.TdP, folding, root) for root in folding.roots()
+            )
+        stored = {
             "Sterk_3": (
                 v["v13"],
                 v["v14"] + v["v12"],
@@ -608,19 +642,6 @@ class Sterk:
                 v["v17"] + v["v19"],
                 orbit_sum(v["v20"]),
                 orbit_sum(v["v18"]),
-            ),
-            "Sterk_4": (
-                v["v15"],
-                v["v16"] + v["v14"],
-                v["v1"] + v["v13"],
-                v["v2"] + v["v12"],
-                v["v3"] + v["v11"],
-                v["v4"] + v["v10"],
-                v["v5"] + v["v9"],
-                v["v6"] + v["v8"],
-                v["v7"],
-                v["v17"] + v["v20"],
-                v["v18"] + v["v19"],
             ),
             "Sterk_5": (
                 v["v16"] + 2 * v["v1"] + v["v2"],
@@ -638,6 +659,10 @@ class Sterk:
                 v["v21"],
                 v["v22"],
             ),
+        }
+        configurations = {
+            name: folded[name] if name in folded else stored[name]
+            for name in _STERK_CONFIGURATION_ORDER
         }
         configurations = {
             name: finite_ordered_set(roots) for name, roots in configurations.items()
