@@ -4745,11 +4745,14 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
         exact isometry-equation roots in the same engine boundary; other
         definite base-ring regimes reach the stated frontier. For a split nondegenerate binary
         lattice, the complete finite group is read from its two finite square
-        fibres. For every other indefinite ``L``, ``sage_indefinite_port``
-        computes generators. All answers are untrusted
-        engine output: each computed isometry is constructed through ``O(L)``
-        into an element of ``O(L)``, and the family becomes one finite ordered
-        set of ``O(L)``.
+        fibres. For an indefinite ``L`` whose edgewalk completes a fundamental
+        chamber, the wall reflections and chamber symmetries generate ``O(L)``
+        (Vinberg's normalizer theorem; Belolipetsky, arXiv:1506.03111v4,
+        Lemma 2.3, printed p. 7). Every other indefinite ``L`` keeps
+        ``sage_indefinite_port``'s computation, whose generating claim remains
+        untrusted engine output. In every case each computed isometry is
+        constructed through ``O(L)`` into an element of ``O(L)``, and the
+        family becomes one finite ordered set of ``O(L)``.
         """
         lattice = self.domain()
         if lattice.module_rank() == 0:
@@ -4775,16 +4778,20 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
                 f"integral lattices over ZZ, but {lattice} is over "
                 f"{lattice.base_ring()}"
             )
-            from sage_extensions.categories.lattices import Lattices
-            from sage_indefinite_port.indefinite.marked_lattices import (
-                automorphism_group_generators,
-            )
+            chamber = lattice_engines._edgewalk_orthogonal_group_generators(lattice)
+            if chamber is not None:
+                generators = tuple(self(generator) for generator in chamber)
+            else:
+                from sage_extensions.categories.lattices import Lattices
+                from sage_indefinite_port.indefinite.marked_lattices import (
+                    automorphism_group_generators,
+                )
 
-            category = Lattices(lattice.base_ring())
-            generators = tuple(
-                self(generator)
-                for generator in automorphism_group_generators(category, lattice)
-            )
+                category = Lattices(lattice.base_ring())
+                generators = tuple(
+                    self(generator)
+                    for generator in automorphism_group_generators(category, lattice)
+                )
         positions = Sets.Δ[len(generators) - 1]
         return FiniteOrderedSets().from_indexed(
             positions,

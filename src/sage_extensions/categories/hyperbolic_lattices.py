@@ -2225,6 +2225,8 @@ class HyperbolicLattices(OwnedCategoryOverBaseRing):
             )
 
             if (self.signature_pair().second() == cardinal(1)) is True:
+                if option_norms == "all" and early_termination and initial_vertex is None:
+                    return edgewalk_fundamental_domain(self)
                 return edgewalk_fundamental_domain(
                     self, option_norms=option_norms,
                     early_termination=early_termination, initial_vertex=initial_vertex,
@@ -2246,10 +2248,13 @@ class HyperbolicLattices(OwnedCategoryOverBaseRing):
                     )
                 else:
                     initial_vertex = to_working(initial_vertex)
-            report = edgewalk_fundamental_domain(
-                working, option_norms=option_norms,
-                early_termination=early_termination, initial_vertex=initial_vertex,
-            )
+            if option_norms == "all" and early_termination and initial_vertex is None:
+                report = edgewalk_fundamental_domain(working)
+            else:
+                report = edgewalk_fundamental_domain(
+                    working, option_norms=option_norms,
+                    early_termination=early_termination, initial_vertex=initial_vertex,
+                )
             cones = RationalPolyhedralCones(self)
             return AllcockEdgewalkReport(
                 self,
