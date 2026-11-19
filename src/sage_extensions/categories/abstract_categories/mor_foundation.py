@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from functools import WRAPPER_ASSIGNMENTS
+from types import FunctionType, MethodType
 from typing import TYPE_CHECKING
 
 from sage.categories.category import Category
@@ -355,12 +356,17 @@ def _copy_operation_metadata(operation, reading) -> None:
         except AttributeError:
             continue
         setattr(operation, name, value)
-    try:
-        documentation = reading.__doc__
-    except (AttributeError, TypeError):
-        documentation = None
-    if isinstance(documentation, str):
-        operation.__doc__ = documentation
+    if isinstance(reading, (FunctionType, MethodType)):
+        # A function or method carries ``__doc__`` as a plain attribute, so
+        # this read is a slot lookup.  Every other reading is left alone: on a
+        # dynamically generated class the type's ``__doc__`` is Sage's
+        # ``InstanceDocDescriptor``, whose read runs
+        # ``sageinspect.sage_getsourcelines`` -- a source parse per realized
+        # operation, measured at 0.062 ms against 0.002 ms without it, and the
+        # failure the docstring above records is that same descriptor raising.
+        documentation = getattr(reading, "__doc__", None)
+        if isinstance(documentation, str):
+            operation.__doc__ = documentation
 
 
 def _asked_of_the_category(owner: Parent, objects: tuple) -> bool:
