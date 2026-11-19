@@ -95,10 +95,36 @@ disagreed.
 **6. "the card values for `T_Co` (lattice-database#7) take the values only after
 the known-family comparisons agree."**
 
-Open, and outside this repository: the card does not exist
-(`results/issue286-the-stage-1-call.md:449`).  The comparisons it waits on are
-the known families', each in its own issue, and their values agree now:
-`results/issue286-the-stage-1-call.md:128-150` (ten rows, read by card tag).
+**The card now exists.** `tests/cards/lattice-database-enriques.json` holds
+`discriminant_forms["6JRR"]` — `path` `lattices/6JRR.md`, `name` `T_Co`,
+`latex` `T_{\mathrm{Co}}` — generated from `dzackgarza/lattice-database` at the
+pinned ref `23c0f9caff4d08b1f9795bba75f45cead4fc75df` (the file's
+`_provenance.ref`).  Its six stated values, and where each is compared:
+
+| card field | value | read by |
+| --- | --- | --- |
+| `rank` | 11 | `tests/lattices/test_discriminant_form_of_the_coble_lattice.sage:102` |
+| `signature` | `[2, 9]` | same file `:103-104` |
+| `determinant` | -2048 | same file `:106-107` |
+| `orthogonal_group_order` | 46998591897600 | same file `:161`, `:220` |
+| `isotropic_classes` | 528 | **no test reads it** |
+| `isotropic_orbits` | 2 | **no test reads it** |
+
+The first four are exactly the values this issue computes and records
+(`results/issue286-the-stage-1-call.md:58-60` for rank, signature, determinant
+and the discriminant group), and they agree.  The last two agree with the
+computations too — 528 isotropic classes with 527 nonzero
+(`results/issue286-the-stage-1-call.md:60`), and two `O(q)`-orbits, `{0}` and the
+527 nonzero (`results/issue286-the-stage-1-call.md:104-105`, where the ambient
+row is one orbit over those 527) — but **no test compares them with the card**.
+
+Why not, and what it would cost: the isotropic enumeration runs over all 2048
+classes of `A_{T_Co}` at about 80 ms a class, 65.43 s in its own measurement
+(`results/issue286-the-stage-1-call.md:60`, the file cited there), which is over
+the 20 s per-call gate three times; comparing either field is therefore a
+dispatched row and not a gate test, and it is named here rather than guessed at.
+Writing the two orbit rows into the card is lattice-database#7's own work in
+that repository; the values to write are the ones in the two lines above.
 
 ## What is a reproduction and not an acceptance
 
