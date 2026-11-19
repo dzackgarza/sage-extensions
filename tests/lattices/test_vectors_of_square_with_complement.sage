@@ -98,8 +98,19 @@ def test_the_certificate_is_an_isometry_from_the_lattice_to_an_even_overlattice(
     ``|A_<d> perp A_C|^(1/2) / |A_T|^(1/2)``, read from the two cardinalities
     the library computes, and ``L``'s own discriminant order makes exactly that
     index: ``|A_L| * index^2 = |A_<d> perp C|``.
+
+    The count is the card's and not the operation's: card `0012` is ``A2``, whose
+    gram is this positive definite specimen, and its ``O`` row is the orbit
+    series of primitive vectors by square, so ``z[1]`` is the number of
+    ``O``-orbits of square two.  The card's own gram is carried through
+    ``is_isometric_to`` first, so the expected number is read from the card this
+    lattice is, not from a series of some other lattice.
     """
     lattice, _root, complement = _definite_control("A2")
+    specification = card("primitive_orbit_series", "0012")
+    assert Lattices(ZZ)(specification["gram"]).is_isometric_to(lattice) is True
+    expected = specification["rows"]["O"]["z"][1]
+
     pair_order = int((Lattices(ZZ)([[2]]) + complement).discriminant_group().cardinality())
     lattice_order = int(lattice.discriminant_group().cardinality())
     assert pair_order % lattice_order == 0
@@ -108,7 +119,7 @@ def test_the_certificate_is_an_isometry_from_the_lattice_to_an_even_overlattice(
     index = ZZ(index_squared).sqrt()
 
     found = tuple(lattice.vectors_of_square_with_complement(ZZ(2), complement))
-    assert sum(1 for _entry in found) == 1
+    assert sum(1 for _entry in found) == expected
     delta, isometry = found[0]
 
     assert delta.q() == ZZ(2)
