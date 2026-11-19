@@ -426,4 +426,52 @@ the owned route).  No red is claimed: the port answers these specimens too
 (`U + <3>` in 0.80 s, `U + <3> + <3>` in 0.69 s), so what changed is which
 construction answers, and that is not observable from the answer.
 
+## The correction lemma: integrality is a coset of the radical
+
+The withdrawn argument needed exactly one step, and it is a lemma about the
+kernel the earlier turns built.
+
+**Lemma.**  Let `L` be an integral lattice over `ZZ` of any parity, `v` a
+primitive isotropic vector of divisibility `d`, `J = v^\perp`, `w` a partner
+with `b(v,w) = d`, and
+
+    X = {u in J : b(u,J) <= d ZZ,  q(u) + 2 b(w,u) in 2d ZZ},
+
+which is the parameter lattice of the radical: `E_{v,u}` is an integral
+isometry exactly for `u` in `X`, and `u |-> E_{v,u}` kills exactly `Z v`.
+Then for any `g~` in `O(L \otimes QQ)` with `g~(v) = v`, if
+`g~ E_{v,x_0}` is integral for one `x_0` then `g~ E_{v,x}` is integral for
+every `x` in `x_0 + X`; and if `x_1`, `x_2` are both admissible then
+`x_1 - x_2` lies in `X`.  So the admissible parameters are empty or one coset
+of `X`.
+
+**Proof.**  `E_{v,x_0+u} = E_{v,x_0} E_{v,u}` is the composition law
+`E_{v,x} E_{v,y} = E_{v,x+y}` of Gritsenko--Hulek--Sankaran,
+arXiv:0810.1614, section 3.1, equation (5), printed p. 9; `E_{v,u}` is an
+integral isometry of `L` for `u` in `X` by equation (4) there, printed p. 8,
+which is the integrality computation `X` is defined by; so the product is
+integral.  Conversely `E_{v,x_1} E_{v,x_2}^{-1} = E_{v,x_1-x_2}` is integral
+by the same two equations with `x_2` replaced by `-x_2`, so `x_1 - x_2` is a
+parameter of an integral transvection, which is `X`.
+
+**Code.**  `_corrected_pointwise_levi_lift` (`lattices.py`) tries one
+representative per class of `(1/N) J` modulo `X`, `N` the divisibility times
+the rational lift's denominator, and decides each by the exact restriction of
+the corrected rational isometry to `L`; it runs after the split section and
+before the marked-line torsor, which stays as the fallback.  The red is the
+torsor's evenness assertion: the two odd divisible lines were
+`2 failed in 9.27 s` at `999c928` on `isotropic_lifts.py:525`, and are
+`2 passed in 6.65 s` with the correction
+(`tests/lattices/test_the_pointwise_levi_lift_of_an_odd_line.sage`).  At
+`T_Co`'s fifth cusp the public pointed call is 4.89 s against 4.40 s before,
+and the first three of its nine `O(K_I)` generators lift integrally in 0.08 s
+each, so the search is cheap at rank eleven.
+
+**What it does not do.**  It decides the lift; it does not assemble the
+pointed family from integral lifts.  That needs generators of `M_I`, and the
+liftability predicate cuts `M_I` out of `O(K_I)` without producing a
+generating set of it -- a filtered generating set of `O(K_I)` need not
+generate `M_I`.  That is the next question, not this lemma's.
+
+
 
