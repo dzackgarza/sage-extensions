@@ -4,7 +4,8 @@ Second revision, after a reviewer's findings.  The operation is
 `src/sage_extensions/categories/lattices.py:10273`
 (`Lattices.vectors_of_square_with_complement`); the tests are
 `tests/lattices/test_vectors_of_square_with_complement.sage`.  Each line number
-is that of the tree this record was written against, with its file named.
+is that of the tree this record was written against, with its file named, and
+every one of them was re-read at `7e4ff5a` and reads as stated there.
 
 ## 1. Primitive, the square, the isometric complement, and the certificate's index
 
