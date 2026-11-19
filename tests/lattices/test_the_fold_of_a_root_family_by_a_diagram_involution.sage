@@ -15,6 +15,12 @@ family may itself be the sum of the two swapped ones: the fold by the swap of \(
 invariant lattice \(\mathbf Z(r_1+r_2)\), of square \(-2\), and the anti-invariant lattice
 \(\mathbf Z(r_1-r_2)\), of square \(q(r_1)+q(r_2)-2b(r_1,r_2)=-6\).
 
+An orbit sum that is a multiple of a point of the span is rescaled to that point: a root is
+primitive, and the sum of an orbit's two roots has square \(2q(r)+2b(r,g(r))\), which is what
+bounds the multiple.  The smallest specimen is two roots \(t+u\), \(t-u\) of the lattice
+\(\mathbf Z t\oplus\mathbf Z u\) with \(q(t)=-2\) and \(u\) isotropic: they pair to \(-2\), their
+sum is \(2t\), and the fold's root is \(t\).
+
 Two permutations are refused, and they are refused for different reasons.  The three roots of
 \(A_2\) have the affine diagram \(\tilde A_2\), whose automorphism group is all of \(S_3\), while
 only the two permutations fixing the pair \(\{r_1,r_2\}\) keep the pairings: the bond is
@@ -129,3 +135,29 @@ def test_a_map_that_is_no_isometry_is_refused_when_it_is_given_by_images() -> No
         diagram.fold_by({0: 2 * first, 1: -second})
     with pytest.raises(ValueError):
         diagram.fold_by({0: first})
+
+
+def test_an_orbit_sum_that_is_a_multiple_of_a_root_is_rescaled() -> None:
+    r"""An orbit that is not orthogonal may sum to a multiple of a root, and the fold rescales it.
+
+    In the lattice \(\mathbf Z t\oplus\mathbf Z u\) with \(q(t)=-2\) and \(u\) isotropic, the roots
+    \(t+u\) and \(t-u\) pair to \(-2\), so their swap is an isometry and the diagram of the two
+    roots has an infinite bond.  Their orbit sum is \(2t\), which is no root, and the fold's root
+    is \(t\), of square \(-2\), which the involution fixes; the anti-invariant lattice is
+    \(\mathbf Z u\).
+    """
+    lattice = Lattices(ZZ)([[-2, 0], [0, 0]])
+    t, u = lattice.module_generators()
+    first, second = t + u, t - u
+    folding = CoxeterDiagrams().from_roots((first, second)).fold((1, 0))
+
+    assert int(lattice.q(first)) == -2
+    assert int(lattice.q(second)) == -2
+    assert int(lattice.b(first, second)) == -2
+    assert (first + second).is_primitive() is not True
+    assert folding.isometry()(first) == second
+    assert _folded_into(lattice, folding) == (t,)
+    assert tuple(root.q() for root in folding.roots()) == (-2,)
+    assert folding.discarded_sums() == ()
+    assert folding.folded_diagram().cardinality() == 1
+    assert folding.anti_invariant_lattice().gram_tensor() == tensor(ZZ, (), (1, 1), [[0]])
