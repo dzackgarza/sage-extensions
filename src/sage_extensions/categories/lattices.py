@@ -10292,8 +10292,8 @@ class Lattices(OwnedCategoryOverBaseRing):
             ``A_<d>`` is cyclic, so ``H_d`` is the subgroup of order
             ``[T : <d> perp C]`` and one class carries it; this is the case
             implemented here.  Each yielded entry is the pair ``(delta,
-            isometry)`` -- ``isometry`` maps the overlattice ``L`` onto ``T``
-            and carries ``L``'s generator of the ``<d>`` summand to ``delta``,
+            isometry)`` -- ``isometry`` maps ``T`` onto the overlattice ``L``
+            and carries ``delta`` to ``L``'s generator of the ``<d>`` summand,
             which is the certificate the operation is asked for.
 
             The collapse is by ``rho_C(O(C))``.  A rank one ``C`` has
@@ -10618,22 +10618,24 @@ class Lattices(OwnedCategoryOverBaseRing):
                 )
                 if enlarged.is_isometric_to(lattice) is not True:
                     continue
-                isometry = enlarged.isometry_to(lattice)
+                realizing = enlarged.isometry_to(lattice)
                 # the overlattice's selected basis is its own, recomputed from
                 # the glue; the vector to follow is the image of the <d>
                 # summand's generator under this embedding, not a basis vector
                 # of the enlarged lattice that happens to come first.
-                delta = isometry(
+                delta = realizing(
                     inclusion(pair.module_generator(tuple(pair.module_generating_set())[0]))
                 )
                 assert delta.q() == value, (
-                    f"the isometry {isometry} carries the <{value}> generator to {delta}, whose square is "
+                    f"the isometry {realizing} carries the <{value}> generator to {delta}, whose square is "
                     f"{delta.q()}"
                 )
                 assert delta.is_primitive() is True, (
                     f"the vector {delta} obtained from the gluing is not primitive in {lattice!r}"
                 )
-                yield delta, isometry
+                # the certificate is the isometry from T to the overlattice, so
+                # delta is the image of the <d> summand's generator under it
+                yield delta, realizing.inverse()
 
         def covering_discriminant_classes(self, square):
             r"""Return discriminant classes covering primitive vectors of ``square``.
