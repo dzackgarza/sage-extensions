@@ -19,9 +19,12 @@ the stamp they were computed under.
 
 from sage_extensions.all import *  # noqa: F401,F403
 
+import pytest
+
 # The five cards of U ⊕ U ⊕ ⟨−2d⟩, and the subgroups whose line rows they state.
 LINE_CARDS = ("6JRS", "6JRT", "6JRU", "6JRV", "6JRW")
 LINE_GROUPS = ("O", "Otilde", "Otilde+")
+LINE_ROWS = tuple((tag, group) for tag in LINE_CARDS for group in LINE_GROUPS)
 
 
 def stated_orbits(tag):
@@ -34,18 +37,20 @@ def carded_lattice(tag):
     return Lattices(ZZ)(stated_orbits(tag)["gram"])
 
 
-def line_representatives(lattice):
-    r"""The line-orbit sets of ``O``, ``Õ`` and ``Õ⁺`` on ``lattice``, by card row name."""
+def acting_group(lattice, group):
+    r"""The subgroup of ``O(L)`` that the card's row named ``group`` acts by."""
+    if group == "O":
+        return lattice.Aut()
     stable = lattice.stable_orthogonal_group()
-    return {
-        "O": lattice.Aut().isotropic_orbit_representatives(1),
-        "Otilde": stable.isotropic_orbit_representatives(1),
-        "Otilde+": stable.intersection(lattice.O_plus()).isotropic_orbit_representatives(1),
-    }
+    if group == "Otilde":
+        return stable
+    assert group == "Otilde+", group
+    return stable.intersection(lattice.O_plus())
 
 
-def check_the_line_rows(tag):
-    r"""Compare the three line counts on card ``tag``'s lattice with the card's own rows."""
+@pytest.mark.parametrize("tag,group", LINE_ROWS, ids=("6JRS-O", "6JRS-Otilde", "6JRS-Otilde+", "6JRT-O", "6JRT-Otilde", "6JRT-Otilde+", "6JRU-O", "6JRU-Otilde", "6JRU-Otilde+", "6JRV-O", "6JRV-Otilde", "6JRV-Otilde+", "6JRW-O", "6JRW-Otilde", "6JRW-Otilde+"))
+def test_the_line_count_of_a_card_row_is_the_cards_constant_term(tag, group):
+    r"""One count, one card row: card ``tag``'s lattice, its ``group``, and the card's ``constant``."""
     stated = stated_orbits(tag)
     lattice = carded_lattice(tag)
     basis = tuple(lattice.module_generators())
@@ -60,47 +65,20 @@ def check_the_line_rows(tag):
         [int(lattice.b(left, right)) for right in basis] for left in basis
     ] == stated["gram"], tag
 
-    representatives = line_representatives(lattice)
-    for group in LINE_GROUPS:
-        orbits = representatives[group]
-        assert orbits.cardinality() == int(stated["rows"][group]["constant"]), (tag, group)
-        for line in orbits:
-            vector = line.inclusion()(line.module_generator(0))
-            assert vector.q() == ZZ(0), (tag, group)
-            assert vector.is_primitive() is True, (tag, group)
-
-
-def test_the_line_counts_of_l_1_are_card_6jrs_s_rows() -> None:
-    r"""``L_1``: the three counts are the ``O``, ``Õ`` and ``Õ⁺`` rows of ``6JRS``."""
-    check_the_line_rows("6JRS")
-
-
-def test_the_line_counts_of_l_2_are_card_6jrt_s_rows() -> None:
-    r"""``L_2``: the three counts are the rows of ``6JRT``."""
-    check_the_line_rows("6JRT")
-
-
-def test_the_line_counts_of_l_4_are_card_6jru_s_rows() -> None:
-    r"""``L_4``: the three counts are the rows of ``6JRU``."""
-    check_the_line_rows("6JRU")
-
-
-def test_the_line_counts_of_l_9_are_card_6jrv_s_rows() -> None:
-    r"""``L_9``: the three counts are the rows of ``6JRV``."""
-    check_the_line_rows("6JRV")
-
-
-def test_the_line_counts_of_l_36_are_card_6jrw_s_rows() -> None:
-    r"""``L_36``: the three counts are the rows of ``6JRW``."""
-    check_the_line_rows("6JRW")
+    orbits = acting_group(lattice, group).isotropic_orbit_representatives(1)
+    assert orbits.cardinality() == int(stated["rows"][group]["constant"]), (tag, group)
+    for line in orbits:
+        vector = line.inclusion()(line.module_generator(0))
+        assert vector.q() == ZZ(0), (tag, group)
+        assert vector.is_primitive() is True, (tag, group)
 
 
 def test_the_two_witness_vectors_of_l_9_are_primitive_isotropic_of_divisibility_three() -> None:
     r"""``v = 3e + 3f + g`` and its negative, on the Gram tensor of card ``6JRV``.
 
     Both are isotropic and primitive, ``v`` has divisibility three, and the two
-    divided classes are distinct and of order three -- the arithmetic the
-    divisibility of ``v`` forces, computed by the library rather than assumed.
+    divided classes are distinct and of order three -- the arithmetic that
+    divisibility forces, computed by the library rather than assumed.
     """
     lattice = carded_lattice("6JRV")
     labels = tuple(lattice.module_generating_set())

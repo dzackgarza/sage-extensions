@@ -12,7 +12,7 @@ gone. Its fifteen line counts are the `O`, `Õ` and `Õ⁺` rows of cards `6JRS`
 | --- | --- |
 | each row of the test reads its expected value from a card tag | the five counts per card are `card("primitive_orbit_series", tag)["rows"][group]["constant"]`; no number is typed in the file |
 | the docstring derivation is gone | the docstring states what the rows are and where they are read; it derives no count, names no bibliography, and transcribes no witness |
-| five lattices, three subgroups | one test per card, each comparing `lattice.Aut()`, `lattice.stable_orthogonal_group()` and `stable.intersection(lattice.O_plus())` — `O`, `Otilde`, `Otilde+` — with the card's three rows, and asserting the card states exactly those three |
+| five lattices, three subgroups | fifteen rows, one test per (card, subgroup): `lattice.Aut()`, `lattice.stable_orthogonal_group()` and `stable.intersection(lattice.O_plus())` — `O`, `Otilde`, `Otilde+` — each compared with that card's own row, with an assertion that the card states exactly those three |
 | the lattice is the card's, not a substitute | the lattice is built from the card's `gram_tensor`, and its rank, signature, determinant and full Gram matrix are compared with the card before the orbit row is read |
 | expected values are card values, not brief values | the digest is generated from `dzackgarza/lattice-database` at a full commit; the rows are the database's computed ones and `certifications.integral.primitive_orbits` is the stamp they were computed under |
 
@@ -86,22 +86,32 @@ and a bare `/work` bind leaves it unattributable):
       tests/lattices/test_primitive_orbit_series_on_indefinite_lattices.sage'
 ```
 
-At the `test:` commit, with the digest still at `1e1cadc…`, the file is red
-before any orbit is computed — the digest holds no primitive-orbit row for those
-five tags:
+With the digest still at `1e1cadc…` — the parent of the pair, and every commit
+before the digest refresh — the file is red before any orbit is computed: the
+digest holds no primitive-orbit row for those five tags, so `card` raises for the
+first one it is asked for.
 
 ```
 section = 'primitive_orbit_series', tag = '6JRV'
     return json.loads(DIGEST.read_text(encoding="utf-8"))[section][tag]
 E       KeyError: '6JRV'
 tests/lattices/conftest.py:42: KeyError
-6 failed in 1.49s
+16 failed in 0.96s
 ```
 
-At the `fix:` commit, both files green: `8 passed in 36.60s`, the slowest call
-`14.05s` (`test_the_constant_term_agrees_with_the_line_orbit_call`), and the five
-card tests at `6.80/3.78/3.72/3.46/2.24s` — all inside the 20 s call gate. The
-single test over all five cards that this replaces took 25.09 s at the parent.
+At the `fix:` commit the same file is green: `16 passed in 23.33s` on its own,
+with no call over the 20 s ceiling. Together with the sibling module that
+compares the series against the orbit call, `18 passed in 24.20s`, the sibling's
+slowest call `8.89s` — that module's code is unchanged here, only its docstring.
+The single test over all five cards that this replaces took 25.09 s at the parent
+and printed the call-ceiling line.
+
+The cost of one row is the library's orbit call, not the lattice: building the
+lattice and its three subgroups is 0.01–0.36 s per card, while one orbit call is
+0.17–4.18 s (`6JRW` under `Otilde` the dearest). One test per row is what keeps
+every call inside the ceiling: with one test per card the `L_36` call reached
+20.49 s in a run made under unrelated load (load average 6.4 on four CPUs), while
+the same work split by row stayed at 10.24 s in a run under the same load.
 
 The runtime at `/work` needed `-b <repo>/.git:<repo>/.git`: a worktree's `.git` is
 a gitdir pointer at an absolute path, and without the bind
