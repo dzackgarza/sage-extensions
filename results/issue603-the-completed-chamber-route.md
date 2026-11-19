@@ -160,11 +160,28 @@ zero-reduction file and its four pointwise-Levi neighbours were 5 passed in
 * **Proper Levi image, point stabilizer over finite residues:** MET for the
   even integral case with an available `O(K_I)` family.  The owned action and
   its rank-five regression are described in “The proper-image branch.”
-* **Every primitive isotropic vector of divisibility greater than one:** NOT
-  CLAIMED universally.  The proper-image branch is owned for the even integral
-  case whose `O(K_I)` family is available; no chamber-symmetry result is
-  transferred to a lattice that did not produce a completed chamber, and no
-  generation result is inferred from a card alone.
+* **Every primitive isotropic vector of divisibility greater than one:** the
+  radical is exact at every divisibility (next item); the *public* pointed
+  family is not.  The two constructions that answer it are the split section,
+  and a splitting forces divisibility one, and the residue action, whose
+  integrality is decided by the marked-line torsor over an even lattice.  So an
+  even lattice of divisibility greater than one keeps the residue action and
+  the card row it was certified on (`029J`'s `L_2`), and an odd one is still
+  answered with `None`, so the caller keeps the port's route.
+* **The integral kernel of the pointwise parabolic at a line of every
+  divisibility:** MET.  With `d` the divisibility of `e`, a partner `w` of
+  `b(e,w) = d` and `J = I^\perp`, the radical is the image of the parameter
+  lattice
+  `X = {u in J : b(u,J) <= dZ, u in L, b(u,u) + 2b(w,u) in 2dZ}` under
+  `u |-> E_{e,u/d}`, with kernel `Z e`; the pairing in the third condition is
+  additive modulo `2d` there, so `X` is a lattice, and it is cut out by one
+  Smith normal form of the Gram matrix of `J` followed by one congruence.  At
+  `d = 1` it is the even part of `J`, so this is the same family as before and
+  not a second construction.  Asserted on `U(2) + <2>`, `U(3) + <3>` and
+  `U(2) + <2> + <2>`
+  (`tests/lattices/test_the_pointwise_radical_of_a_divisible_isotropic_line.sage`),
+  which were `3 failed in 9.91 s` at `c6cd4e1` on the refusal this replaces and
+  are `3 passed in 7.94 s` on the repair.
 * **The integral kernel of the pointwise parabolic at a line of divisibility
   one, odd lattices included:** MET.  The radical is the Eichler transvections
   at the even-square parameters, exact on an odd lattice and on an even one
@@ -289,14 +306,14 @@ runs are with `--no-time-gates`; collection took 6.50 s against the 6 s
 ceiling in the repair's worktree before and after the change, which is the
 pre-existing overrun of that tree and not this line's.
 
-**Still open after this.**  Divisibility `d > 1`: the parameters there are the
-`x` with `d x in I^perp`, `b(I^perp, x) subset ZZ` and `q(x) d in 2 ZZ`, a
-lattice strictly larger than the even part of `I^perp` that this call does not
-build, so it refuses and says so.  And an odd lattice that does not split
-along the lifts of `K_I`: the pointwise two-factor family is exact only under
-the splitting, and the residue action's integrality is decided by the
-marked-line torsor over an even lattice, so such a lattice is still answered
-with `None` and keeps the port's route.
+**Still open after this.**  The public pointed family on an *odd* lattice of
+divisibility greater than one: its radical is now exact, but the lift half is
+not -- the split section needs a splitting, which forces divisibility one,
+and the residue action's integrality is decided by the marked-line torsor,
+whose residue locus is a union of cosets of the transvection kernel only over
+an even lattice.  Such a lattice is answered with `None` and keeps the port's
+route.
+
 
 
 No full suite, no `just test`, no ast-grep gates (ast-grep is not installed).
