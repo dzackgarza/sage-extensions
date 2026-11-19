@@ -820,6 +820,15 @@ def _sum_certificate_covers(manifold, labels, chart) -> bool:
     *Introduction to Smooth Manifolds*, 2nd ed., Ch. 1, for the chart domains).  A family
     whose conditions do not add up to something decided nowhere-vanishing is not
     certified here, and the caller refuses rather than guessing.
+
+    Two further certificates are tried in turn, both exact and both about the real
+    chart.  The conditions share no zero when they generate the whole polynomial ring
+    over the algebraic closure (:func:`_conditions_share_no_zero`), and when their sum
+    of squares takes no zero: a sum of squares of reals vanishes only where every term
+    does, so $\sum_i g_i^2$ nowhere-vanishing decides that the intersection of the
+    $\{g_i = 0\}$ is empty even where those meet over $\mathbb{C}$ -- $x^2+1$ and $y$
+    share the zeros $(\pm i, 0)$ and none over the reals, and their squares sum to
+    $(x^2+1)^2 + y^2$, which takes no zero.
     """
     from sage_extensions.categories.vector_bundles import _decided_nowhere_vanishing
 
@@ -850,7 +859,19 @@ def _sum_certificate_covers(manifold, labels, chart) -> bool:
         is True
     ):
         return True
-    return _conditions_share_no_zero(conditions, symbols)
+    if _conditions_share_no_zero(conditions, symbols):
+        return True
+    squares = sum(condition**2 for condition in conditions)
+    return (
+        _decided_nowhere_vanishing(
+            squares,
+            symbols,
+            tuple(
+                _engine_manifold_expression(condition) for condition in chart.nonvanishing()
+            ),
+        )
+        is True
+    )
 
 
 def _conditions_share_no_zero(conditions, symbols) -> bool:
