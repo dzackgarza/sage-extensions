@@ -8,12 +8,24 @@ walls and that count per statement, by tag, and this test reads the counts and t
 there rather than transcribing them.
 
 `Sterk.sterk_roots()` returns the same five configurations as roots of \(T_{dP}\), and three of them
-are folds of the two stored root families: the twelve-root family of 4.3.5 and the eleven-root
-family of 4.3.8 by two involutions of the 22-root `(18,2,0)` family, and the ten-root family of
-4.3.6 by the reversal of the 19-root `(18,0,0)` family.  The fourth and fifth are no folds of
-either family: the 22 roots have eight Gram-preserving permutations and the 19 roots two, and
-folding by all of them returns the three above, the identity's own family, and two further
-fourteen-root families of no printed chamber.
+are folds of the two stored root families by a permutation of their roots: the twelve-root family of
+4.3.5 and the eleven-root family of 4.3.8 by two involutions of the 22-root `(18,2,0)` family, and
+the ten-root family of 4.3.6 by the reversal of the 19-root `(18,0,0)` family.  The third and fifth
+are no folds by a permutation of either family, and the count is what settles it: the 22 roots have
+eight diagram automorphisms and the 19 roots two, and folding by all ten returns the three above,
+the two identities' own families, and two fourteen-root families whose invariant lattices have
+signature \((1,10)\) and anti-invariant lattices \((0,7)\).  Every printed chamber's walls span
+\((1,9)\) inside a \((0,8)\) complement, and the twelve-root fold's roots are all of square
+\(-4\) where 4.3.7's are ten of \(-4\) and two of \(-2\).  Those two configurations are folds
+of the 22 roots all the same, by involutions of the span that carry roots to their negatives and to
+sums of roots: the operation takes those images as its datum.
+
+The span of the 22 roots is nondegenerate --- \((1,17)\) of rank eighteen in a lattice of rank
+twenty --- so the rational relations of the roots are exactly the kernel of their Gram matrix, and a
+permutation that keeps the Gram matrix keeps them.  That is why no permutation of the 22 roots
+exhibits a Gram-preserving map that breaks a relation, and why the refusal of such a map is tested
+on the degenerate family in
+`test_the_fold_of_a_root_family_by_a_diagram_involution.sage`.
 
 The card is also the oracle for the folded lattice.  At every one of the five cusps the walls span
 a rank-ten lattice of signature \((1,9)\) inside \(T_{En}\); the fold's invariant lattice is a
@@ -178,10 +190,19 @@ def _fold_key(folding):
 
 
 def test_the_two_root_families_fold_only_to_the_three_chambers() -> None:
-    r"""The two families have eight and two diagram automorphisms, and three folds are chambers."""
-    card_keys = {_card_key(statement) for statement in _STATEMENTS.values()}
+    r"""The two families have eight and two diagram automorphisms, and three folds are chambers.
+
+    The other two involutions of the 22-root family fold it to fourteen roots, and both fourteen-root
+    folds have an invariant lattice of signature \((1,10)\) and an anti-invariant lattice of
+    \((0,7)\) --- not the \((1,9)\) and \((0,8)\) of every printed chamber.  The two order-four
+    automorphisms are no involutions and are refused.
+    """
+    chambers = {
+        statement: _card_key(statement) for statement in _STATEMENTS.values()
+    }
 
     hits = set()
+    fourteen_root_signatures = set()
     for name in ("Sterk_1", "Sterk_2"):
         diagram = CoxeterDiagrams().from_roots(_root_family(name))
         cardinality = int(diagram.cardinality())
@@ -191,16 +212,49 @@ def test_the_two_root_families_fold_only_to_the_three_chambers() -> None:
                 with pytest.raises(ValueError):
                     diagram.fold(permutation)
                 continue
-            key = _fold_key(diagram.fold(permutation))
-            if key in card_keys:
+            folding = diagram.fold(permutation)
+            if int(folding.roots().cardinality()) == 14:
+                fourteen_root_signatures.add(
+                    (
+                        _signature(folding.invariant_lattice()),
+                        _signature(folding.anti_invariant_lattice()),
+                    )
+                )
+            key = _fold_key(folding)
+            if any(key == chamber for chamber in chambers.values()):
                 hits.add(key)
 
-    assert tuple(sorted(hits)) == tuple(
-        sorted(_card_key(statement) for statement in ("4.3.5", "4.3.6", "4.3.8"))
-    )
-    assert tuple(sorted(hits)) == tuple(
-        sorted(_fold_key(_fold(name)) for name in ("Sterk_1", "Sterk_2", "Sterk_4"))
-    )
+    assert sorted(hits) == sorted((chambers["4.3.5"], chambers["4.3.6"], chambers["4.3.8"]))
+    assert all(chambers["4.3.7"] != hit for hit in hits)
+    assert all(chambers["4.3.9"] != hit for hit in hits)
+    assert sorted(fourteen_root_signatures) == [((1, 10), (0, 7))]
+    assert sorted(hits) == sorted(_fold_key(_fold(name)) for name in ("Sterk_1", "Sterk_2", "Sterk_4"))
+
+def test_every_diagram_automorphism_of_the_roots_keeps_the_gram_matrix() -> None:
+    r"""No permutation of the 22 roots keeps the Gram matrix and breaks a relation.
+
+    The span is nondegenerate, so the rational relations are exactly the kernel of the Gram matrix
+    and a Gram-preserving permutation carries each of them to a relation.  The Coxeter matrix is a
+    function of the Gram, so the Gram-preserving permutations are among the diagram's
+    automorphisms; all eight of those keep the Gram, so they are exactly the Gram-preserving
+    permutations, and the six that are involutions are all accepted as folds.
+    """
+    roots = _root_family("Sterk_1")
+    lattice = NamedLattices.TdP
+    diagram = CoxeterDiagrams().from_roots(roots)
+    gram = tuple(tuple(lattice.b(left, right) for right in roots) for left in roots)
+    folded = ()
+
+    for automorphism in diagram.Aut():
+        permutation = tuple(int(automorphism(index)) - 1 for index in range(1, 23))
+        images = tuple(roots[position] for position in permutation)
+        assert tuple(tuple(lattice.b(left, right) for right in images) for left in images) == gram
+        if all(permutation[permutation[position]] == position for position in range(22)):
+            folded = folded + (int(diagram.fold(permutation).roots().cardinality()),)
+
+    assert diagram.Aut().order() == 8
+    assert sorted(folded) == [11, 11, 12, 14, 14, 22]
+
 
 def _twisted_images(name, roots):
     r"""Return the images of the roots that determine the involution ``name`` is folded by."""
@@ -227,12 +281,18 @@ def _twisted_images(name, roots):
 
 
 def test_the_two_twisted_configurations_are_folds_of_the_twenty_two_roots() -> None:
-    r"""Sterk 3 and Sterk 5 fold by involutions of the span that do not permute the roots."""
+    r"""Sterk 3 and Sterk 5 fold by involutions of the span that do not permute the roots.
+
+    Their images are the datum: the third carries ``v18``, ``v20``, ``v22`` to ``v18 + v22``,
+    ``v20 + v22``, ``-v22`` and transposes eight pairs of the sixteen-root chain, and the fifth is
+    the orthogonal reflection in the span of the eight even-indexed roots, which negates them and
+    sends each odd-indexed root to the sum of itself with its two neighbours.
+    """
     labelled = {f"v{index}": Sterk.roots_18_2_0()[f"v{index}"] for index in range(1, 23)}
     family = tuple(labelled[f"v{index}"] for index in range(1, 23))
 
     for name in ("Sterk_3", "Sterk_5"):
-        folding = CoxeterDiagrams().from_roots(family).fold_by(_twisted_images(name, labelled))
+        folding = CoxeterDiagrams().from_roots(family).fold(_twisted_images(name, labelled))
         carried = tuple(
             folding.span().inclusion()(folding.invariant_lattice().inclusion()(root))
             for root in folding.roots()

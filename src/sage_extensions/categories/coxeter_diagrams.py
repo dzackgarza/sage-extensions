@@ -2,6 +2,7 @@ r"""Finite Coxeter diagrams, optionally rooted in an integral lattice."""
 
 from collections.abc import Mapping
 from itertools import combinations
+from math import gcd
 
 from sage.categories.map import Map
 from sage.categories.morphism import Morphism
@@ -2485,20 +2486,56 @@ class RootedCoxeterDiagrams(OwnedCategory):
         def mirrors_are_divergent(self, left, right) -> bool:
             return self._root_pair_discriminant(left, right) > 0
 
-        def fold(self, permutation):
-            r"""Fold these roots by a permutation of the vertices that lifts to an isometry.
+        def fold(self, involution):
+            r"""Fold these roots by an involution of their span.
 
-            ``permutation`` is a bijection of the vertices, given either as a mapping
-            \(v\mapsto\sigma v\) or as the tuple of the images of the vertices in the order of
-            :meth:`vertices`.
+            An involution \(g\) of the span \(W\) of these roots folds the family: the orbit sums
+            \(s_O=\sum_{y\in O}y\) of its orbits are fixed by \(g\), so they lie in the invariant
+            lattice \(W^g=\ker(g-1)\); the orbits of an involution have one or two elements, so
+            \(s_O\) is the root itself or \(r+g(r)\); and the sums that are roots are the roots of
+            the folded diagram.  The anti-invariant lattice is \((W^g)^\perp\), the orthogonal
+            complement of \(W^g\) in \(W\).
 
-            A permutation of this diagram need not lift: the diagram records the bond
-            \(m_{vw}\), and for roots of equal square the bond is \(|b(r_v,r_w)|\), so a
-            bond-preserving permutation may reverse a pairing and is then no isometry; and a family
-            that spans a proper subspace of its lattice satisfies relations its pairings do not see.
-            Both are decided, and a permutation that fails either is refused naming what failed.
-            :meth:`fold_by` takes the more general datum, the images of the roots under an involution
-            of their span that does not permute them.
+            ``involution`` is the datum of \(g\), in either of the two forms its images take:
+
+            * a permutation of the vertices --- a mapping \(v\mapsto\sigma v\), or the tuple of the
+              images of the vertices in their own order --- for an involution that carries roots
+              to roots.  It is a symmetry of the Coxeter diagram when it keeps the bonds
+              \(m_{vw}\), and it lifts to an isometry when it keeps the pairings \(b(r_v,r_w)\).
+              The two conditions are different: for roots of equal square the bond is
+              \(|b(r_v,r_w)|\), so a symmetry of the diagram may reverse a pairing.
+            * the images of the roots --- a mapping \(v\mapsto g(r_v)\), or the tuple of those
+              images in the order of the vertices --- for an involution that is no permutation of
+              the roots, a root being carried to its negative or to the sum of itself with another
+              root.  The vertices it names must span the span of the whole family, since the
+              images of a spanning subfamily are what determine a linear map.
+
+            Both forms are one datum, decided by the same tests, each refusal naming what failed.
+            The map is well defined on the span when it carries the rational relations of the named
+            roots to relations; it is an isometry when it keeps their pairings; it is a symmetry of
+            the span's lattice when its matrix in the span's selected basis is integral; and a fold
+            takes an involution, so \(g^2=1\).
+
+            The relation test is not redundant with the pairing test, and the two decide the same
+            thing exactly on a nondegenerate span.  For a spanning set of roots \(r_i\) with Gram
+            \(G\), the rational relations are the kernel of the coordinate matrix, while
+            \(\ker G\) is the preimage of \(W\cap W^\perp\); the two kernels coincide exactly when
+            \(W\) is nondegenerate.  So a permutation of a family with nondegenerate span that
+            keeps the Gram matrix keeps every rational relation: if \(\sum_i c_i r_i=0\) then
+            \(\sum_i c_i r_{\sigma i}\) pairs to zero with every \(r_{\sigma j}\), hence with all
+            of \(W\), hence is a point of \(W\cap W^\perp=0\).  A permutation that keeps the Gram
+            matrix and breaks a relation therefore exists only over a degenerate span, which is
+            where a test can exhibit it.
+
+            The folded family is the family of orbit sums that are roots of the invariant lattice.
+            An orbit sum that is a multiple of a point of the span is rescaled to that point: a
+            root is primitive, and the multiple is the greatest common divisor of the sum's
+            coordinates.  The sum of the two roots of an orbit has square
+            \(q(r)+q(g(r))+2b(r,g(r))=2q(r)+2b(r,g(r))\), so the multiple is what that square
+            allows, and the rescaled point is a point of the invariant lattice because the sum is
+            fixed by \(g\).  A sum that is zero, or whose primitive direction is no point of the
+            invariant lattice or has nonnegative square, is no root: it is returned by
+            :meth:`RootFamilyFolding.discarded_sums` rather than silently dropped.
 
             EXAMPLES::
 
@@ -2511,48 +2548,16 @@ class RootedCoxeterDiagrams(OwnedCategory):
                 1
                 sage: tuple(root.q() for root in fold.roots())
                 (-4,)
+                sage: fold = CoxeterDiagrams().from_roots((a, b)).fold({0: a, 1: -b})
+                sage: tuple(int(sum.q()) for sum in fold.discarded_sums())
+                (0,)
             """
             vertices = tuple(self.vertices())
             if not tuple(self.root(vertex) for vertex in vertices):
                 raise ValueError(
                     f"cannot fold {self}: it has no vertices, so it has no roots to fold"
                 )
-            images = _permutation_images(permutation, vertices, self)
-            return self._folded_by_images(
-                {vertex: self.root(image) for vertex, image in zip(vertices, images)}, permutation
-            )
-
-        def fold_by(self, images):
-            r"""Fold these roots by an involution of their span given by the images of the roots.
-
-            ``images`` is a mapping from vertices to their images under the involution, each a vector
-            of the lattice these roots are realized in.  The roots whose images are given must span
-            the span of the whole family: the linear map is then the unique one their images
-            describe, which is what lets an involution that does not permute the roots --- the
-            reflection-twisted folding, where a root goes to a root plus a root --- be given by the
-            images of the roots a source names.
-
-            The map is refused when it is not well defined on the span (a relation of the given
-            roots does not hold of their images), when it does not keep the pairing, when it is not
-            integral, or when it is no involution.  The folded family, the isometry and the two
-            lattices are as in :meth:`fold`.
-
-            EXAMPLES::
-
-                sage: from sage_extensions.all import *
-                sage: a, b = Lattices(ZZ)([[-2, 0], [0, -2]]).module_generators()
-                sage: fold = CoxeterDiagrams().from_roots((a, b)).fold_by({0: b, 1: a})
-                sage: fold.isometry()(a) == b
-                True
-                sage: tuple(root.q() for root in fold.roots())
-                (-4,)
-            """
-            vertices = tuple(self.vertices())
-            if not tuple(self.root(vertex) for vertex in vertices):
-                raise ValueError(
-                    f"cannot fold {self}: it has no vertices, so it has no roots to fold"
-                )
-            return self._folded_by_images(_root_images(images, vertices, self), images)
+            return self._folded_by_images(*_involution_images(involution, vertices, self))
 
         def _folded_by_images(self, images, datum):
             r"""Fold these roots by the map given by ``images``, decided to be an integral isometric involution.
@@ -2713,9 +2718,19 @@ class RootedCoxeterDiagrams(OwnedCategory):
             kept = []
             discarded = []
             for row in sums:
+                total = spanned(row)
+                divisor = _coordinate_divisor(row)
+                if divisor == 0:
+                    # The orbit is a root with its negative, and its sum is the zero vector.
+                    discarded.append(total)
+                    continue
+                if divisor > 1:
+                    # A multiple of a point of the span is no root: rescale to the primitive
+                    # direction, which the involution fixes because it fixes the sum.
+                    row = [int(coefficient) // divisor for coefficient in row]
                 element = spanned(row)
                 if element.is_primitive() is not True or element.q() >= span.base_ring().zero():
-                    discarded.append(element)
+                    discarded.append(total)
                     continue
                 kept.append(row)
 
@@ -2762,10 +2777,10 @@ class RootedCoxeterDiagrams(OwnedCategory):
 
 
 class RootFamilyFolding:
-    r"""The fold of a rooted diagram by a diagram involution that lifts to an isometry.
+    r"""The fold of a rooted diagram by an involution of its span that is an isometry of it.
 
-    Every field is an owned object: the rooted diagram that was folded, the permutation of its
-    vertices, the formed lattice the isometry acts on (the whole lattice when the roots span it
+    Every field is an owned object: the rooted diagram that was folded, the involution's datum as
+    it was given, the formed lattice the isometry acts on (the whole lattice when the roots span it
     rationally and their saturated span otherwise), that isometry, the folded root family in its
     invariant lattice, and the orbit sums that were no roots of the span and so stayed out of it.
     """
@@ -2792,7 +2807,7 @@ class RootFamilyFolding:
         return self._span
 
     def isometry(self):
-        r"""Return \(g(\sum_v a_v r_v)=\sum_v a_v r_{\sigma v}\) as an isometry of :meth:`span`."""
+        r"""Return the involution of :meth:`span` that the roots were folded by."""
         return self._isometry
 
     def invariant_lattice(self):
@@ -2846,6 +2861,37 @@ def _rows(matrix, positions):
     return sage_matrix(QQ, [list(matrix.row(position)) for position in positions])
 
 
+def _involution_images(involution, vertices, diagram):
+    r"""Return the images of ``involution`` keyed by vertex, and that datum as it was given.
+
+    ``involution`` is the datum of an involution of the span of the diagram's roots, in either of
+    the two forms its images take: a permutation of the vertices (a mapping from a vertex to a
+    vertex, or the tuple of the images of the vertices in their own order), or the images of the
+    roots themselves (a mapping from a vertex to a point of the roots' lattice, or the tuple of
+    those images in the order of the vertices).
+    """
+    if isinstance(involution, Mapping):
+        given = dict(involution)
+    else:
+        entries = tuple(involution)
+        if len(entries) != len(vertices):
+            raise ValueError(
+                f"cannot fold {diagram} by {involution}: it has {len(vertices)} vertices, and "
+                f"{len(entries)} images were given"
+            )
+        given = dict(zip(vertices, entries, strict=True))
+    if all(image in vertices for image in given.values()):
+        permutation = _permutation_images(given, vertices, diagram)
+        return (
+            {
+                vertex: diagram.root(image)
+                for vertex, image in zip(vertices, permutation, strict=True)
+            },
+            involution,
+        )
+    return _root_images(given, vertices, diagram), involution
+
+
 def _root_images(images, vertices, diagram):
     r"""Return ``images`` keyed by vertex, checked to name vertices and to give lattice vectors."""
     for vertex, image in images.items():
@@ -2895,6 +2941,18 @@ def _permutation_images(permutation, vertices, diagram):
             f"the vertices {vertices}, since two of them coincide"
         )
     return images
+
+
+def _coordinate_divisor(row):
+    r"""Return the greatest common divisor of the integer coordinates ``row``, and zero on zero.
+
+    A point of a lattice is primitive exactly when the greatest common divisor of its coordinates
+    in the selected basis is one, so this is what an orbit sum is rescaled by.
+    """
+    divisor = 0
+    for coefficient in row:
+        divisor = gcd(divisor, int(coefficient))
+    return abs(divisor)
 
 
 def _coxeter_diagram(coxeter_matrix, *, category=None, roots=None, root_gram=None, **data):

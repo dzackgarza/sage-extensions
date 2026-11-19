@@ -3,22 +3,34 @@ r"""Semantic exploration: Sterk's five root configurations as foldings.
 H. Sterk, *Compactifications of the period space of Enriques surfaces, Part I*, Math. Z. 207
 (1991), 4.3.5--4.3.9, pp. 19--24, prints the chamber at each of the five `0`-cusps of
 \(\Gamma_{En,2}\).  This exploration reads those five chambers as **one operation**: fold a root
-family by a diagram involution that lifts to an isometry of its span.
+family by an involution of its span that is an isometry of it.
 
 The two families are the 22-root \(\Phi_{(18,2,0)}\) and the 19-root \(\Phi_{(18,0,0)}\), both of them
-in the lattice the library calls `T_dP`.  A fold of the roots \(r_v\) by an involution
-\(g(\sum_v a_v r_v)=\sum_v a_v r_{\sigma v}\) takes the orbit sums \(s_O=\sum_{v\in O}r_v\); each is
-fixed by \(g\), so the folded family lies in the invariant lattice \(W^g\), and the anti-invariant
-lattice is its orthogonal complement in the span of the roots.
+in the lattice the library calls `T_dP`.  A fold of the roots \(r_v\) by an involution \(g\) of
+their span takes the orbit sums \(s_O=\sum_{v\in O}r_v\); each is fixed by \(g\), so the folded
+family lies in the invariant lattice \(W^g\), and the anti-invariant lattice is its orthogonal
+complement in the span of the roots.  When \(g\) permutes the roots it is written
+\(g(\sum_v a_v r_v)=\sum_v a_v r_{\sigma v}\) with \(\sigma\) a permutation of the vertices; when it
+does not, it is written by the images of the roots.
 
-What the fold decides, and what it does not.  A permutation of the roots lifts to an isometry
-exactly when it keeps the pairings, and a symmetry of the Coxeter diagram need not: the diagram
-records the bond \(m_{vw}\), and for roots of equal square the bond is \(|b(r_v,r_w)|\).  Three of
-the five folds are by permutations of the roots; the other two are by involutions of the span that
-do not permute them --- Sterk's third is what the archived folding calls reflection-twisted, and
-its fifth is written as three-term sums --- which is why the operation has a second datum, the
-images of the roots.  Both are read here, and nothing else is: every number below comes from a
-fold, and the card supplies the expected values.
+What the fold decides.  An involution of the roots' span is given by its images: a permutation of
+the roots, when it carries roots to roots, or the images themselves when it does not.  The two
+forms are one datum, and the operation decides it the same way --- the rational relations must be
+carried to relations, the pairings must be kept, the map must be a symmetry of the span's lattice
+and must be an involution --- and then takes the orbit sums that are roots, rescaling a sum that is
+a multiple of a point of the span.  A symmetry of the Coxeter diagram need not be an isometry: the
+diagram records the bond \(m_{vw}\), and for roots of equal square the bond is \(|b(r_v,r_w)|\),
+so a symmetry may reverse a pairing.
+
+Three of the five folds are by permutations of the roots: 4.3.5 and 4.3.8 by two involutions of the
+22-root family, 4.3.6 by the reversal of the 19-root one.  The other two are by involutions that do
+not permute the roots, and they cannot be: the 22 roots have eight diagram automorphisms and
+folding by all of them returns 4.3.5, 4.3.8, the identity's own family and two fourteen-root
+families of invariant signature \((1,10)\), where every printed chamber's is \((1,9)\).  Sterk's
+third is what the archived folding calls reflection-twisted and its fifth is the orthogonal
+reflection in the span of the eight even-indexed roots, which negates them and carries each
+odd-indexed root to the sum of itself with its two neighbours.  Both are written as the images of
+the roots, and every number below comes from a fold: the card supplies the expected values.
 
 The epistemic status.  The counts, the squares, the two lattices and their signatures are exact
 computations of the operation, checked against card `029J`'s `cusp_diagrams` row `gamma-en-2`,

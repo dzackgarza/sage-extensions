@@ -243,17 +243,24 @@ _STERK_FOLDING_FAMILIES = {
     ),
     "Sterk_4": ("v", _STERK4_ROOT_PERMUTATION),
 }
-r"""The three Sterk diagrams that are folds of a root family, and the involution each folds by.
+r"""The three Sterk diagrams that are folds of a root family by a permutation of its roots.
 
 The permutation is read against the family named beside it, ``v`` the twenty-two roots of
 :meth:`Sterk.roots_18_2_0` and ``w`` the nineteen of :meth:`Sterk.roots_18_0_0`, in the order those
 carry them; each is an automorphism of that family's Coxeter diagram and lifts to an involution of
-its span, which :meth:`sage_extensions.categories.coxeter_diagrams.CoxeterDiagrams.ParentMethods.fold`
+its span, which
+:meth:`sage_extensions.categories.coxeter_diagrams.RootedCoxeterDiagrams.ParentMethods.fold`
 decides.  ``Sterk_4``'s is the notebook cell's own permutation,
 :meth:`Sterk.sterk4_root_permutation`.
 
-The other two are folds too, by involutions of the span that do not permute the roots; they are in
-:data:`_STERK_TWISTED_FOLDS`.
+These three are the only printed chambers that are folds by a permutation: the twenty-two roots
+have eight diagram automorphisms and the nineteen two, and folding by all ten returns these three,
+the two identities' own families, and two fourteen-root families whose invariant lattices have
+signature ``(1, 10)`` and anti-invariant lattices ``(0, 7)``, where every printed chamber's are
+``(1, 9)`` and ``(0, 8)``.  No fold has the twelve roots of 4.3.7 either: its roots are ten of
+square ``-4`` and two of ``-2``, and the twelve-root fold's are all of square ``-4``.  Sterk's third
+and fifth configurations are folds all the same, by involutions of the span that do not permute the
+roots; they are in :data:`_STERK_TWISTED_FOLDS`.
 """
 
 _STERK3_TRANSPOSITIONS = ((1, 9), (2, 8), (3, 7), (4, 6), (10, 16), (11, 15), (12, 14), (17, 19))
@@ -289,6 +296,13 @@ def _sterk5_involution_images(v):
     roots, and the even-indexed ones are negated, so each even root's orbit is a pair summing to
     zero.  That is the involution ``v(2k-1) -> v(2k-2) + v(2k-1) + v(2k)``, ``v(2k) -> -v(2k)`` on
     the sixteen roots, and the identity on ``v17, ..., v22``.
+
+    The eight even-indexed roots are pairwise orthogonal of square ``-2`` and stand at mutual
+    distance two on the sixteen-root chain, so each pairs ``1`` with the two odd-indexed roots
+    beside it.  The orthogonal reflection in their span negates them and sends ``v(2k-1)`` to
+    ``v(2k-1) + v(2k-2) + v(2k)``, and it fixes ``v17, ..., v22``, which are orthogonal to all
+    eight.  So the involution is that reflection: a product of eight commuting reflections in roots
+    of the family, which is no permutation of the family.
     """
     images = {}
     for index in range(1, 17):
@@ -309,8 +323,18 @@ _STERK_TWISTED_FOLDS = {
 r"""The two Sterk diagrams whose fold is an involution of the span that does not permute the roots.
 
 Each entry maps the labelled twenty-two roots to the images that determine the involution, which
-:meth:`sage_extensions.categories.coxeter_diagrams.CoxeterDiagrams.ParentMethods.fold_by` decides
-and folds by.
+:meth:`sage_extensions.categories.coxeter_diagrams.RootedCoxeterDiagrams.ParentMethods.fold`
+decides and folds by.  The images are the datum: neither involution carries a root to a root of the
+family, so neither is a permutation of the roots, and no permutation of the twenty-two roots folds
+the family to either configuration (see :data:`_STERK_FOLDING_FAMILIES`).  What each involution is,
+in the family's own terms:
+
+* the third is the printed reflection-twisted folding --- the roots of the eight transpositions and
+  the two fixed roots of the sixteen-root chain go to their partners, and ``v18``, ``v20``, ``v22``
+  go to ``v18 + v22``, ``v20 + v22``, ``-v22``;
+* the fifth is the orthogonal reflection in the span of the eight even-indexed roots
+  ``v2, v4, ..., v16``, which are pairwise orthogonal of square ``-2``: it negates each of them and
+  carries each odd-indexed root to the sum of itself with its two neighbours.
 """
 
 _STERK_FIG10_VERTEX_ORDER = (10, 5, 4, 3, 2, 1, 0, 8, 9, 6, 7)
@@ -664,7 +688,7 @@ class Sterk:
         for name, (family, permutation) in _STERK_FOLDING_FAMILIES.items():
             foldings[name] = CoxeterDiagrams().from_roots(families[family]).fold(permutation)
         for name, involution_images in _STERK_TWISTED_FOLDS.items():
-            foldings[name] = CoxeterDiagrams().from_roots(families["v"]).fold_by(
+            foldings[name] = CoxeterDiagrams().from_roots(families["v"]).fold(
                 involution_images(v)
             )
         return {name: foldings[name] for name in _STERK_CONFIGURATION_ORDER}
