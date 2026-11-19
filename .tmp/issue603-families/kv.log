@@ -1,0 +1,23 @@
+tree SHA: 9bb219c0052ca9f9bcc1eaeb47c179f923229bbf (modified paths: 0)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 3.55 7.56 8.98 6/592 3279672
+probe: .tmp/probe-kv.py; inner 600 s
+[    0.27s] small K_v: rank 3, signature (1, 2), disc -8
+[    0.96s] small K_v line orbits: 1  [0.96s]
+[    1.26s] T_Co K_v: rank 9, signature (1, 8), disc 512
+[    1.26s] T_Co K_v even: True
+[    2.84s] T_Co K_v line orbits: 1  [2.84s]
+[    2.84s] done
+[peakrss] probe603: child waited=0 shell_code=0 samples=4
+[peakrss] peak tree RSS      : 492 MiB
+[peakrss] low-water MemAvail : 9050 MiB
+[peakrss] peak single VmHWM  : 492 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      481 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     6.0s procs=  3 rss=   492 MiB hwm=   492 MiB avail=  9050 MiB
+[peakrss]   t=     4.0s procs=  3 rss=   455 MiB hwm=   455 MiB avail=  9117 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   254 MiB hwm=   254 MiB avail=  9266 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     7 MiB hwm=     7 MiB avail=  9411 MiB
+probe exit: 0

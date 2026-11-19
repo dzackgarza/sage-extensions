@@ -491,3 +491,46 @@ route is unavailable at `T_Co` **by rank**, whatever the split does.
 isotropic *classes* of `K_v` at rank ten -- not the chamber route, which lives
 in another rank regime, and not the split, which is available.  That is a
 design of its own, and this record stops at naming it.
+
+## The library already answers the question the cusp step asks -- at 2.84 s
+
+The cusp step wants, by the lemma and by its own docstring, the primitive
+isotropic **lines** of `K_v = v^perp/<v>`, and it obtains them from the port's
+`isotropic_vector_classes(K_v)`.  Asked of the library instead, at port
+`991b88b0`:
+
+| `K_v` | rank | signature | discriminant | `Aut().isotropic_orbit_representatives(1)` |
+|---|---|---|---|---|
+| of `U+U(2)+<-2>` at its first line | 3 | `(1, 2)` | -8 | **1 orbit**, 0.96 s |
+| of `T_Co` at Sterk's fifth cusp | 9 | `(1, 8)` | 512, even | **1 orbit**, 2.84 s |
+
+So the object the cusp step is actually asking for is answered by a public
+library call in **2.84 s** at `T_Co` -- where the step as written did not return
+in 600 s -- and the answer is **one orbit**: the cusp-5 line carries exactly one
+`O(K_v)`-class of isotropic lines, hence one plane class through it.
+
+**Why the two agree, and why lines suffice.**  The plane is `⟨v, lift(w)⟩`, which
+depends on `w` only through its line, so line classes are exactly the datum
+needed; and `-1` lies in every orthogonal group, so the `O(K_v)`-orbits of
+primitive isotropic vectors and of primitive isotropic lines are in bijection.
+The port's vector classes were therefore an equivalent -- and much more
+expensive -- answer to the same question.
+
+**The substitution, stated exactly.**  `_planes_through_line`'s fallback
+(`isotropic_orbits.py:1781`) replaces
+
+    for isotropic in INDUCTION.isotropic_vector_classes(quotient)
+
+with one lift per representative of `quotient.Aut().isotropic_orbit_representatives(1)`,
+using the function's own `lift`; the returned subobjects' generators are what
+`lift` takes.  Two things must be checked before it is landed, and they are what
+this round does **not** claim: that `isotropic_orbit_representatives(1)` returns
+subobjects rather than vectors in this build, and that its representatives are
+one per orbit rather than one per chosen sign -- the sign question is settled by
+`-1`, but the return type is not, and a substitution of the wrong kind would
+fail loudly rather than quietly, which is the only reason it is safe to propose.
+
+**What this would change.**  The cusp step at `T_Co` is the step the rank-eleven
+kernel rows never get past.  If the substitution is right, the cusp enumeration
+drops from a 600 s-plus port walk to a 2.84 s library call on this line, and the
+`T_Co` kernel rows become measurable for the first time.
