@@ -3435,6 +3435,10 @@ def _definite_automorphisms(gram):
     """
     from sage.arith.misc import factorial
 
+    if gram.nrows() == 0:
+        # The empty form has the trivial one-element orthogonal group.  Its
+        # scalar content is zero, so the normalization below is not defined.
+        return SageZZ.one(), ()
     # M^t (c G) M = c G is equivalent to M^t G M = G for c != 0.
     # Remove the scalar content before PARI converts entries to machine integers.
     gram = (gram / gram.gcd()).change_ring(SageZZ)
@@ -4691,6 +4695,12 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
         """
         matrices = tuple(self._row_action_matrix(generator) for generator in generators)
         lattice = self.domain()
+        if lattice.module_rank() == 0:
+            # Sage has no degree-zero matrix group.  The unique isometry of
+            # the zero lattice generates the trivial group, presented here
+            # by the trivial subgroup of the one-dimensional matrix group.
+            assert not matrices, f"the zero lattice {lattice} has a nonidentity isometry"
+            return MatrixGroup((identity_matrix(SageZZ, 1),)).subgroup(())
         if lattice.base_ring() is _owned_integers() and lattice.is_definite():
             from sage_extensions.categories.group.groups import _engine_generated_subgroup
 
