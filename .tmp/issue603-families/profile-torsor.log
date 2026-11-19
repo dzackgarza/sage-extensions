@@ -1,0 +1,47 @@
+tree SHA: 1461ff628eb5961e780aa57075df4b70d5823ad5 (modified paths: 0)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 1.93 3.10 3.99 5/541 3379289
+probe: .tmp/probe-profile.py; inner 900 s
+[   31.41s] classes: 131072
+         74177619 function calls (72809033 primitive calls) in 30.698 seconds
+
+   Ordered by: cumulative time
+   List reduced from 1843 to 18 due to restriction <18>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.000    0.000   30.707   30.707 /repos/sage-extensions/src/sage_extensions/categories/isotropic_lifts.py:701(integral_parameter_classes)
+        1    0.002    0.002   30.705   30.705 /repos/sage-extensions/src/sage_extensions/categories/isotropic_lifts.py:451(_integral_parameter_cosets)
+      513    0.001    0.000   24.276    0.047 /repos/sage-extensions/src/sage_extensions/categories/isotropic_lifts.py:660(<genexpr>)
+      512    0.006    0.000   24.275    0.047 /repos/sage-extensions/src/sage_extensions/categories/isotropic_lifts.py:436(_lift_at)
+      512    0.026    0.000   21.126    0.041 /repos/sage-extensions/src/sage_extensions/categories/lattices.py:9340(eichler_transvection)
+      512    0.044    0.000   19.769    0.039 /repos/sage-extensions/src/sage_extensions/categories/lattices.py:9258(_eichler_transvection_column_matrix)
+     1536    0.317    0.000    8.594    0.006 /repos/sage-extensions/src/sage_extensions/tensors/tensor.py:796(tensor_product)
+     1024    0.021    0.000    6.276    0.006 /repos/sage-extensions/src/sage_extensions/tensors/tensor.py:2300(_sub_)
+   124928    0.055    0.000    5.763    0.000 /repos/sage-extensions/src/sage_extensions/tensors/tensor.py:2307(<genexpr>)
+112193/71220    0.517    0.000    5.763    0.000 /repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py:791(__call__)
+   123904    0.099    0.000    5.708    0.000 /repos/sage-extensions/src/sage_extensions/categories/algebras/algebras.py:1574(__sub__)
+   197633    0.137    0.000    5.688    0.000 /repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:1276(_richcmp_)
+   197633    0.223    0.000    5.523    0.000 /repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:1239(equality_status)
+   249363    0.606    0.000    5.363    0.000 /repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:1183(_add_)
+      257    0.002    0.000    5.318    0.021 /repos/sage-extensions/src/sage_extensions/categories/isotropic_lifts.py:663(<genexpr>)
+      512    0.047    0.000    5.316    0.010 /repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py:1708(integral_restriction)
+   197633    0.788    0.000    5.262    0.000 /repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:2239(_fraction_equality_status)
+     1549    0.064    0.000    4.663    0.003 /repos/sage-extensions/src/sage_extensions/categories/modules/pure/modules.py:8028(_engine_matrix)
+
+
+
+[   31.65s] done
+[peakrss] probe603: child waited=0 shell_code=0 samples=18
+[peakrss] peak tree RSS      : 364 MiB
+[peakrss] low-water MemAvail : 4614 MiB
+[peakrss] peak single VmHWM  : 364 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      354 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    34.0s procs=  3 rss=   364 MiB hwm=   364 MiB avail=  4728 MiB
+[peakrss]   t=    32.0s procs=  3 rss=   355 MiB hwm=   355 MiB avail=  4809 MiB
+[peakrss]   t=    30.0s procs=  3 rss=   344 MiB hwm=   344 MiB avail=  4795 MiB
+[peakrss]   t=    26.0s procs=  3 rss=   336 MiB hwm=   336 MiB avail=  4759 MiB
+[peakrss]   t=    28.0s procs=  3 rss=   336 MiB hwm=   336 MiB avail=  4810 MiB
+probe exit: 0

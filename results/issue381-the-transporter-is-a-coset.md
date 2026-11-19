@@ -680,3 +680,39 @@ oracle.
 the index-two cardinality, not verified sum by sum: a million sums at this class
 type's cost is over four minutes, and the full `2^17 x 2^17` is out of reach.
 The oracle above is what will decide the replacement, not this section.
+
+## The enumeration is 512 lifts at 47 ms, not 2^17 tests at 0.1 ms
+
+Profiled one line's `integral_parameter_classes()` at `T_Co` (`cProfile`,
+`Sterk_5`'s line, `rational_lifts(reduction, identity)`), and the previous
+section's arithmetic was wrong:
+
+    integral_parameter_classes             1 call   30.70 s (12.77 s unprofiled)
+      _integral_parameter_cosets           1 call   30.71 s
+        _lift_at                         512 calls  24.28 s   47 ms each
+        integral_restriction             257 calls   5.32 s   21 ms each
+
+So the loop is over **512 representatives**, not 131072: the class count is
+`|passing cosets| x |K|`, and it is `K` -- the integral kernel of the transvection
+-- that multiplies it up to `2^17`.  The cost is 512 lifts, and each lift costs
+47 ms because `_lift_at` builds an Eichler transvection through
+`_eichler_transvection_column_matrix`'s tensor expression and then restricts it,
+exactly the construction #603's correction search replaced with a coordinate-level
+rank-two update (4.086 s -> 0.028 s there, on a 512-representative box).
+
+**So the fix is the same one, at a different owner.**  `_lift_at` needs only the
+*matrix* of `E_{f,s(a)} . base` on the target's framing, to ask
+`integral_restriction`'s question -- integrality of that matrix; the transvection
+is `id - f (s(a), .) + s(a) (f, .) - (q(s(a))/2) f (f, .)`, a rank-two update of
+one matrix, and `base` is fixed across the loop.  Built in coordinates and tested
+entry by entry, the 512 x 47 ms should fall by the order it fell in #603.
+
+**What this does not change.**  The admissible set is still a subgroup of
+`P/mP` and the closure statement of the previous section still stands; what
+changes is only how each representative is decided, and the oracle for the
+change is the same: the same 512 passing/failing decisions as the current
+`_lift_at` + `integral_restriction` pair.
+
+**Corrected arithmetic for the row.**  512 x 47 ms is 24 s a line; the cap at
+600 s therefore falls at about the twenty-fifth line, not the forty-seventh.
+The conclusion is unchanged and the lever is now a known one.
