@@ -1,0 +1,24 @@
+tree SHA: 91cb08043b1049a517ad34f9cb36409e3dfce0be (modified paths: 0)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 1.04 1.61 2.58 2/498 3479254
+probe: .tmp/probe-firstline.py; inner 1200 s
+[   29.99s] line representatives of L: 1  [29.99s]
+[   29.99s] first representative: Integral lattice of rank 1 and signature (0, 0)
+[   29.99s] K_v: rank 9, signature (1, 8), disc 512
+[   31.39s] K_v line orbits: 1  [1.40s]
+[   31.40s] planes through the first line: 1  [0.01s]
+[   31.40s] done
+[peakrss] probe603: child waited=0 shell_code=0 samples=18
+[peakrss] peak tree RSS      : 538 MiB
+[peakrss] low-water MemAvail : 5234 MiB
+[peakrss] peak single VmHWM  : 538 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      527 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    34.0s procs=  3 rss=   538 MiB hwm=   538 MiB avail=  5388 MiB
+[peakrss]   t=    32.0s procs=  3 rss=   520 MiB hwm=   520 MiB avail=  5234 MiB
+[peakrss]   t=    30.0s procs=  3 rss=   509 MiB hwm=   509 MiB avail=  5676 MiB
+[peakrss]   t=    28.0s procs=  3 rss=   508 MiB hwm=   508 MiB avail=  6679 MiB
+[peakrss]   t=    26.0s procs=  3 rss=   507 MiB hwm=   507 MiB avail=  6679 MiB
+probe exit: 0

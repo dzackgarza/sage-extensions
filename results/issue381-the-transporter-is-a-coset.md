@@ -898,3 +898,36 @@ recursion, and the question becomes whether the line orbits of a rank-nine
 `K_v` can be had without the torsor -- which is a question about
 `_isotropic_line_orbit_representatives`, not about the transporter, the cusps'
 port call, or the ring arithmetic.
+
+## The plane enumeration is 0.01 s, and `T_Co` has one line orbit
+
+The one call the last section named, taken directly at `T_Co`, port `991b88b0`:
+
+    L.Aut().isotropic_orbit_representatives(1)     1 orbit   29.99 s
+    its K_v                                         rank 9, signature (1,8), disc 512
+    K_v.Aut().isotropic_orbit_representatives(1)    1 orbit    1.40 s
+    _planes_through_line(first line, no completion) 1 plane    0.01 s
+
+So **`T_Co` has one `O(L)`-orbit of primitive isotropic lines**, its `K_v` has one
+orbit of isotropic lines, and the plane enumeration through that line is a
+**hundredth of a second**.  The recursion the last section described is real but
+shallow here, and it is not what the row is spending its 600 s in.
+
+That is the fifth correction in this note and the sharpest: the plane-cusp step,
+which four sections have been pricing down from a port walk to a torsor
+enumeration to one call, now measures **0.01 s at `T_Co`**.  The counter's
+"one call" is consistent with that -- the call happened and returned; the row's
+600 s is spent somewhere else entirely.
+
+**So the next datum is a fresh stack dump at this head**, not another price.
+The dumps this note quotes were taken before the last two changes, and the row's
+600 s has to be located again rather than inferred from a stale stack: the
+covering computation, the edge construction between cusps, and the line cusp
+enumeration are all still candidates, and none of them has been timed since the
+transporter and line-orbit changes landed.
+
+**What is settled, whatever the dump says.**  The changes already in are not the
+problem: the port's cell walk is off the path (measured, 6 frames to 0), the
+plane enumeration of a line is a hundredth of a second, and the per-lift cost
+is a millisecond.  Whatever the 600 s is, it is in code none of these rounds has
+touched.
