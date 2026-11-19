@@ -1,0 +1,12 @@
+[  171.0s] |O(q)| = 46998591897600
+[  313.2s] |J| = 4, |J^perp| = 512, q on J: [[0] in Fraction Field of Integer Ring / (2)Integer Ring, [0] in Fraction Field of Integer Ring / (2)Integer Ring, [0] in Fraction Field of Integer Ring / (2)Integer Ring]
+[  333.8s] |Stab J| = 1981808640, cosets of J in J^perp: 128
+[  333.8s] |image on J^perp/J| = 40320, kernel order 49152
+[  335.0s] image isomorphic to S_8: True
+[  335.1s] |R| = 247726080, [Stab J : R] = 8 (|rho(Stab P)| of #360: 247726080)
+[  335.1s] R orbits on J minus 0: [3]
+[  336.5s] |O(q).A_U(2)| = 67456
+[  339.2s] plane rows: 7 orbits, sizes [26880, 24576, 8064, 3360, 2688, 1120, 768]
+[  342.6s] flag rows: 13 orbits, sizes [17920, 16384, 8960, 8192, 5376, 3360, 2688, 1792, 1120, 896, 256, 256, 256], |R cap Stab p| = 82575360
+[  346.4s] line rows (Stab p): 4 orbits, sizes [34560, 17280, 15360, 256]
+exit 0

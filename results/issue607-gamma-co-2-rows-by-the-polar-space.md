@@ -90,18 +90,44 @@ number of `Stab_{P_0}(J_i)`-orbits on the eight cosets `Stab(J_i)/rho(Stab P_i)`
 So `7 = 1+1+1+1+1 + 2`, i.e. exactly two of the five pieces split once, or one
 piece splits into three; the run's 7 (`#391`) is a record, not this proof.
 
-## What is still missing: one subgroup
+## R_P from the Levi quotient
 
-The plane and flag rows need `R_P = rho(Stab_{O(L)}(P))`, the index-8 subgroup of
-`Stab_{O(q)}(J)` (orders 247726080 in 1981808640, `#360`).  Everything else is
-in `O(q)`.  The probe `results/issue607-gamma-co-2-double-cosets.py` builds an
-explicit plane `<ep, 2h + a_i + a_j>` (`is_parabolic_complete()` True at 50 s)
-and then asks `parabolic_stabilizer_generators()`, which does not return inside
-the ten-minute limit (`results/issue607-gamma-co-2-double-cosets.log`, exit 124
-after line 5).  With `R_P` in hand the plane row is `#Orbits(R_P, H)` and the
-flag row `#Orbits(R_P cap Stab(p), H)` on the 67456 hyperbolic lines, seconds
-in GAP.  The precise missing construction is therefore a description of `R_P`
-inside `Stab(J) = 2^{1+8+?}:(GL_2(2) x O^+_6(2))` without the integral
-parabolic: the Levi image of `Stab(P)` in `GL(P) x O(P^perp/P)` reduced mod 2.
-`O^+_6(2) = S_8` has a unique class of index-8 subgroups (`S_7`), which is the
-candidate; it is not proved here.
+`S = Stab_{O(q)}(J)` acts on `J^perp/J` (128 cosets; `O(q)` fixes `w`) through
+`O^+_6(2) = S_8`, image of order 40320, with kernel `K_0` of order 49152 (the
+unipotent radical and the `GL(J)` Levi factor).  `[S : R_P] = 8`
+(`#360`: 1981808640 / 247726080).
+
+**Lemma (proved).** If `R_P ⊇ K_0`, then `R_P` is the preimage of a point
+stabilizer `S_7`: the image of `R_P` then has index 8 in `S_8`, and for
+`n != 6` every subgroup of index `n` in `S_n` is a point stabilizer
+(J. D. Dixon and B. Mortimer, *Permutation Groups*, GTM 163, Springer 1996,
+Thm. 5.2B and the remark after it), one conjugacy class.  The `Gamma_{Co,2}`
+counts depend only on the conjugacy class of `R_P` in `O(q)`.
+
+**The candidate, computed** (`results/issue607-the-levi-candidate.py`, log
+`results/issue607-the-levi-candidate.log`, 346 s of which 335 s is building
+`O(q)` and `J^perp`; the orbit counts are 3 s each):
+
+| quantity | value |
+| --- | --- |
+| `|R|` | 247726080, equal to `#360`'s `|rho(Stab P)|` |
+| `R` on `J \ 0` | one orbit of 3 |
+| plane row: orbits of `R` on the 67456 hyperbolic lines | **7**: 26880, 24576, 8064, 3360, 2688, 1120, 768 |
+| flag row: orbits of `R cap Stab(p)` (order 82575360) | **13** |
+| line row: orbits of `Stab(p)` | **4**: 34560, 17280, 15360, 256 |
+
+The 4, 7 and 13 agree with the `#391` run record.  The flag row uses
+`rho(Stab(v, P)) = R_P cap Stab(p)`, whose order 82575360 equals
+`|O(q)| / 569160`, the kernel edge count of research#667's certificate.
+
+## The one lemma that is left
+
+`R_P ⊇ K_0`: the mod-2 image of `Stab_{O(L)}(P)` contains the kernel of
+`Stab(J) -> O(J^perp/J)`.  The route is the Eichler transvections
+`E(e, x)`, `e in P`, `x in P^perp ∩ 2L^vee`, and the `GL(P)` Levi factor. Their
+discriminant images are the Siegel transvections and the `GL(J)` factor that
+generate `K_0`.  With the lemma, `R_P` is the `S_7` preimage, and the counts
+above are the `Gamma_{Co,2}` rows by proof plus a GAP orbit count that takes
+seconds.  Without it, the other index-8 shapes (image `S_8` with index 8 in
+`K_0`, or image `A_8` with index 4 in `K_0`) are not excluded.  The order match
+does not exclude them.
