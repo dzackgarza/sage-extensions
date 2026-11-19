@@ -8,7 +8,7 @@ the orthogonal group of the trace lattice.
 """
 
 from copy import copy
-from itertools import product
+from itertools import permutations, product
 
 from sage.arith.functions import lcm
 from sage.matrix.constructor import matrix
@@ -518,7 +518,38 @@ class HermitianWittFrame(SageObject):
         return matrix(self._field, basis).transpose(), gram
 
     def quotient_unitary_elements(self):
-        r"""Return every element of ``U(I^perp / I)`` for a definite trace form on the quotient."""
+        r"""Return every element of ``U(I^perp / I)`` for a definite trace form on the quotient.
+
+        On a genuinely split Witt chart over an imaginary quadratic order,
+        when the middle Hermitian form is a nonzero scalar times the
+        identity, the integral quotient group is exactly the monomial
+        group ``mu(O)^m ⋊ S_m``. Indeed a column ``(x_i)`` of a unitary
+        matrix satisfies ``sum N(x_i)=1``; each ``N(x_i)`` is a nonnegative
+        integer, hence precisely one entry has norm one (a unit) and the
+        rest vanish. Orthogonality forces distinct nonzero positions in
+        different columns. Conversely every monomial unit matrix preserves
+        the scalar form. These are *all* integral quotient isometries,
+        with no independent full orthogonal-group enumeration needed.
+
+        The unimodular-frame test is essential: for a glued quotient or a
+        nontrivial module structure, its coordinate unitary group may be a
+        proper subgroup. The general definite trace-lattice algorithm is
+        retained there.
+        """
+        if (self._m > 0 and self._field.degree() == 2
+                and self._field.discriminant() < 0
+                and self._integral(self._frame) and self._integral(~self._frame)
+                and self._middle[0, 0] != 0
+                and self._middle == self._middle[0, 0] * matrix.identity(self._field, self._m)):
+            units = self._order_units()
+            elements = []
+            for positions in permutations(range(self._m)):
+                for diagonal in product(units, repeat=self._m):
+                    action = matrix(self._field, self._m, self._m)
+                    for row, column in enumerate(positions):
+                        action[row, column] = diagonal[row]
+                    elements.append(action)
+            return tuple(elements)
         return self.quotient_isometries_to(self)
 
     def quotient_isometries_to(self, other):
@@ -567,7 +598,21 @@ class HermitianWittFrame(SageObject):
         return tuple((matrix(self._field, 1, 1, [unit]), element) for unit in self._order_units() for element in self.quotient_unitary_elements())
 
     def levi_image(self):
-        r"""Return the pairs of :meth:`levi_candidates` that lift to integral isometries."""
+        r"""Return exactly the liftable pairs of :meth:`levi_candidates`.
+
+        If the Witt frame is a unimodular change of basis over the *actual*
+        Hermitian order, the integral lattice is an orthogonal direct sum
+        of its hyperbolic and middle factors. Every unit on the line and
+        every integral unitary action on the middle factor then extends by
+        ``diag(A,U,A^{-*})`` without a unipotent correction. This proves
+        that the *entire* direct product of these factors lifts and avoids
+        independently solving the same unipotent integral equation for
+        each of its elements. A non-split/glued frame still uses the exact
+        integral-lift test on every candidate; no product independence is
+        assumed in that case.
+        """
+        if self._integral(self._frame) and self._integral(~self._frame):
+            return self.levi_candidates()
         return self.liftable_levi_image(self.levi_candidates())
 
     def pointwise_levi_image(self):
@@ -725,7 +770,16 @@ class HermitianWittFrame(SageObject):
         return len(representatives), generators
 
     def levi_lift(self, A, U):
-        r"""Return parameters ``(Z,T)`` with ``l(A,U) n(Z,T)`` integral on ``O^n``, or ``None``."""
+        r"""Return parameters ``(Z,T)`` with ``l(A,U) n(Z,T)`` integral on ``O^n``, or ``None``.
+
+        When the diagonal Levi operator already preserves the lattice and
+        its inverse, the zero unipotent parameters are a complete explicit
+        integral lift. Otherwise solve the nontrivial unipotent congruence
+        equations, which may couple ``A`` and ``U`` across a glued frame.
+        """
+        if self.preserves_lattice(self.levi(A, U)):
+            return (matrix(self._field, self._m, self._k),
+                    matrix(self._field, self._k, self._k))
         return self._lift_to(self, A, U)
 
     def _lift_to(self, other, A, U):
