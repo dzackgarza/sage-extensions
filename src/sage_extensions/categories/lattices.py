@@ -3097,7 +3097,7 @@ class Lattices(OwnedCategoryOverBaseRing):
             )
         setwise = self._isotropic_line_stabilizer_generators(marked)
         if setwise is None:
-            return None
+            return finite_ordered_set(subobject.pointed_stabilizer_generators())
         fixing, reversing = [], []
         for generator in setwise:
             image = generator(vector)

@@ -1,17 +1,18 @@
-# #603: the divisibility-two row, and the proper-image lemma that remains
+# #603: the divisibility-two row and the proper Levi image
 
 ## Scope
 
-This note records two separate outcomes. It does not close #603 for every
-primitive isotropic vector.
+This note records the divisibility-two outcomes. It does not close #603 for
+every primitive isotropic vector.
 
 * the rank-zero Levi image at the smallest divisibility-two specimen is now
   computable;
 * the divisibility-two cusp `L_2 = Ze_3` of card `029J` now has a public
   pointed generating family, with its discriminant image certified against the
   card;
-* a general presentation of a **proper** Levi image as a point stabilizer over
-  lift-torsor residues was not needed for that cusp and is not implemented.
+* a proper Levi image now has a pointwise integral-structure action with
+  generators over its finite residue module, without the port's marked-lattice
+  entry.
 
 The previous rank-two fixed-part argument remains false: fixing `v` does not
 fix `<v,w> + K~`, because the unipotent shift moves `w` by an element of
@@ -90,6 +91,35 @@ This row is in the rows tier and is not collected by pytest.
    correction for `P_I/P_I^1` (Seress, *Permutation Group Algorithms*, Lemma
    4.2.1, printed p. 57).
 
+## The proper-image branch
+
+The rank-five lattice
+
+    [[0, 2, 0, 0, 0], [2, 0, 1, 0, 0], [0, 1, 0, 2, 0],
+     [0, 0, 2, 0, 0], [0, 0, 0, 0, -2]]
+
+has a primitive isotropic first generator of divisibility two with reduction
+`U(2) + <-2>`.  One certified generator of `O(K_I)` has no integral pointwise
+lift, so `M_I` is proper.
+
+`PrimitiveIsotropicSubobjects.pointed_stabilizer_action` now builds the
+pointwise action at that owner: rational lifts of the certified `O(K_I)`
+generators, the same lifts sheared along the isotropic line, and the pointwise
+kernel at the common lift denominator.  Its stable containing module is the
+orbit span of the explicitly bounded residue module, and
+`IntegralStructureAction` returns the stabilizer as the preimage of a point
+stabilizer in that finite module.  `pointed_stabilizer_generators` reads that
+stabilizer back into `O(L)` and checks that every member fixes `v`.
+
+The existing public family was already correct on this specimen; there was no
+value red to write.  The new regression test therefore records the proper
+branch rather than manufacturing a failure:
+`test_a_proper_pointwise_levi_image_still_has_the_full_finite_image` passed in
+4.83 s, with ten tests deselected.  It asserts that one chamber generator
+lacks a pointwise lift, at least one has one, and that both the owned family and
+the public pointed call generate the same finite image as the liftable
+chamber generators.
+
 ## What is green
 
 At `ce9b63e`, the whole row completed:
@@ -127,27 +157,28 @@ zero-reduction file and its four pointwise-Levi neighbours were 5 passed in
   chamber, the ten integral pointwise lifts, the parabolic exact sequence and
   Schreier's lemma.  No ambient `O(K_I)` answer from the indefinite port is
   used on this path.
+* **Proper Levi image, point stabilizer over finite residues:** MET for the
+  even integral case with an available `O(K_I)` family.  The owned action and
+  its rank-five regression are described in “The proper-image branch.”
 * **Every primitive isotropic vector of divisibility greater than one:** NOT
-  CLAIMED.  In particular no chamber-symmetry result is transferred to a
-  lattice that did not produce a completed chamber, and no generation result
-  is inferred from the card alone.
+  CLAIMED universally.  The proper-image branch is owned for the even integral
+  case whose `O(K_I)` family is available; no chamber-symmetry result is
+  transferred to a lattice that did not produce a completed chamber, and no
+  generation result is inferred from a card alone.
 * **The research `T_Co` cusp-5 computation:** NOT RUN here.
 
-## The precise remaining lemma
+## The proper-image construction
 
 Let `L` be even over `ZZ`, `v` primitive isotropic, `K = v^perp/Zv`, and let
-`lambda` be the Levi map. Suppose `M = lambda(P_v^1)` is **proper** in `O(K)`.
-What is not implemented is an explicit finite `O(K)`-set `X` of residues of the
-integral lift torsors such that
-
-    M = Stab_{O(K)}(x_M)
-
-for a named point `x_M in X`.  Given such an action, Schreier's lemma returns
-generators of `M`; one integral pointwise lift of each, together with the
-integral kernel generators of the identity lift torsor, then generates `P_v^1`.
-The exact sequence supplies the final equality, but it does not construct `X`
-or prove that its stabilizer is `M`.  In the `029J` cusp above `M = O(K)`, so
-this additional lemma is not needed.
+`lambda` be the Levi map. For a proper `M = lambda(P_v^1)`, the action built at
+`pointed_stabilizer_action` has stabilizer `P_v^1`: its rational generators are
+one lift of each certified generator of `O(K)` and the pointwise kernel at the
+common lift denominator, and its finite module is the orbit span of the residue
+bound `2 d^2 |disc(K)|^2 [L : i^*(L)]`.  `IntegralStructureAction` cuts the
+stabilizer out as a point stabilizer in that module, so its ordered Schreier
+family generates `P_v^1`.  The remaining limitation is input availability, not
+this construction: an `O(K)` family must be supplied, and the completed
+chamber supplies it only for a reflective hyperbolic `K`.
 
 ## Not run
 
