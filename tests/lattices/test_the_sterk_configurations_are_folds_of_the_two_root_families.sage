@@ -126,10 +126,25 @@ def test_the_five_configurations_have_the_card_wall_counts() -> None:
     } == {name: _chamber(statement)["wall_count"] for name, statement in _STATEMENTS.items()}
 
 
+def _carried_fold(name):
+    r"""Return the roots of ``name``'s fold as vectors of \(T_{dP}\), for folds of either form."""
+    folding = Sterk.foldings()[name]
+    return tuple(
+        folding.span().inclusion()(folding.invariant_lattice().inclusion()(root))
+        for root in folding.roots()
+    )
+
+
 def test_the_folded_families_carry_the_card_squares_and_pairings() -> None:
-    for name in ("Sterk_1", "Sterk_2", "Sterk_4"):
+    r"""All five folded families have their printed chamber's squares and pairings.
+
+    The pairings are the Gram matrix, up to the order the card lists the walls in, so this is the
+    printed chamber's Gram read at the fold: the same comparison for the two folds that are no
+    permutations (4.3.7 and 4.3.9) as for the three that are.
+    """
+    for name in _STATEMENTS:
         walls = _wall_vectors(_STATEMENTS[name])
-        folded = _carried(name)
+        folded = _carried_fold(name)
 
         assert _squares(folded) == _squares(walls)
         assert _pairings(NamedLattices.TdP, folded) == _pairings(NamedLattices.TEn, walls)
