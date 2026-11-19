@@ -53,3 +53,44 @@ Combinatorics Via Finite Group Actions*, chapter "Double Cosets", the
 orbit--coset bijection `U(gx) |-> UgG_x`).  The turn's product is the statement
 that the remaining 405 s is two thirds frame body and one third category
 dispatch, with the precise instrument named to divide it again.
+
+## What the 166 s is: three or four GAP set-actions an edge
+
+`print_callees` on the frame, at a 120 s cap:
+
+    _iter_splitting_isometries_in_im_rho_from_image ->
+        _im_rho_engine_and_section    1 call   0.000 s
+        sage_getargspec               1 call   0.000 s
+        inspect.isfunction            1 call   0.000 s
+
+**Nothing.**  The frame's 166 s of `tottime` is reached through no Python call
+at all, which leaves one place for it: the C-level `libgap` work in the
+generator's body.  And the body
+(`orthogonal_quotients.py:2290`-`:2313`) does, per edge of the orbit walk,
+
+    image  = setwise_action(reached_point, generator)      # GAP Set(List(x, y -> ImageElm(g, y)))
+    marker = str(image)
+    if marker in keys: continue
+    reached = generator * reached_element
+    if setwise_action(point, reached) != image:            # <-- another set action
+        reached = reached_element * generator
+        assert setwise_action(point, reached) == image     # <-- and a third
+
+so **three or four `Set(List(...))` actions per edge**, each building a list of
+images and sorting it into a set, and two of the three exist only to determine
+which product order carries the start to the image.
+
+**The lever, stated without minting anything.**  The composition law is uniform:
+if `generator * reached_element` carries the start to the image for one pair, it
+does for every pair.  The order can therefore be settled once -- by the first
+pair, or by two generators at the start -- and the per-edge re-derivation, one
+or two of the three set-actions, drops out.  Nothing about the walk changes: the
+points, the transversal and the orbit-coset bijection are
+Betten--Fripertinger--Kerber's, cited in the frame's docstring, and the change
+removes repeated evaluation of a fact that does not depend on the point.
+
+**What is not yet measured**: the exact split of the three actions (how many
+edges, how many generators), and whether `str(image)` matters beside them.  At
+2137 points and a generator count in the dozens, three actions an edge is a
+large multiple of one, so the order hoist is worth doing first and measuring
+after.

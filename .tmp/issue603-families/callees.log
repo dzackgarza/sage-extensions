@@ -1,0 +1,44 @@
+tree SHA: fed823d3cdc7ea8dc9b5b217bf2093a43b95dc09 (modified paths: 0)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 1.81 2.63 2.72 3/538 3596678
+probe: .tmp/probe-callees.py; inner 900 s
+[Otilde] the row's route: divided-class, taken because its lines carry divided classes and its covering is carried from one plane to the others (decided in 2.1 s)
+[  124.63s] outcome: [Otilde] undecided: the row did not return inside its 120 s cap
+[  126.07s] ---- callees of _iter_splitting_isometries_in_im_rho_from_image ----
+   Ordered by: cumulative time
+   List reduced from 6459 to 1 due to restriction <'_iter_splitting_isometries_in_im_rho_from_image'>
+
+Function                                                                                                                             called...
+                                                                                                                                         ncalls  tottime  cumtime
+/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py:2210(_iter_splitting_isometries_in_im_rho_from_image)  ->       0    0.000    0.000  /repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py:1365(_im_rho_engine_and_section)
+                                                                                                                                              1    0.000    0.000  /sage/.venv/lib/python3.14/site-packages/sage/misc/sageinspect.py:1369(sage_getargspec)
+                                                                                                                                              1    0.000    0.000  /workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/inspect.py:272(isfunction)
+
+
+
+[  126.11s] ---- callees of _im_rho_engine_and_section ----
+   Ordered by: cumulative time
+   List reduced from 6459 to 1 due to restriction <'_im_rho_engine_and_section'>
+
+Function                                                                                                        called...
+                                                                                                                    ncalls  tottime  cumtime
+/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py:1365(_im_rho_engine_and_section)  ->       1    0.000    0.000  /repos/sage-extensions/src/sage_extensions/categories/group/groups.py:178(_gap_model)
+                                                                                                                         0    0.000    0.000  /repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py:650(_ambient_generators)
+
+
+
+[  126.11s] done
+[peakrss] probe603: child waited=0 shell_code=0 samples=66
+[peakrss] peak tree RSS      : 535 MiB
+[peakrss] low-water MemAvail : 3664 MiB
+[peakrss] peak single VmHWM  : 537 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      526 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    52.0s procs=  3 rss=   535 MiB hwm=   535 MiB avail=  3948 MiB
+[peakrss]   t=    50.0s procs=  3 rss=   532 MiB hwm=   532 MiB avail=  3977 MiB
+[peakrss]   t=    48.0s procs=  3 rss=   530 MiB hwm=   530 MiB avail=  4038 MiB
+[peakrss]   t=    46.0s procs=  3 rss=   527 MiB hwm=   527 MiB avail=  4010 MiB
+[peakrss]   t=   128.1s procs=  3 rss=   526 MiB hwm=   537 MiB avail=  6430 MiB
+probe exit: 0
