@@ -116,3 +116,49 @@ categories (`Category._make_named_class`), not from their `parent_class`es, so
 this is a change to `_make_named_class` in `sage_extensions/owned_category.py` --
 a change to the class of **every owned parent**, and therefore one that needs its
 own turn with a broad gate over the owned graph, not a corner of one.
+
+## Correction, 2026-11-19: the table above measured the wrong relation
+
+The predicate in `category_singleton.pyx:75` is a **subtype** test on the parent
+class of the object's own category:
+
+    PyType_IsSubtype(<type>((x._category or x.category()).parent_class),
+                     Sets().parent_class)
+
+The table in the earlier section reports `isinstance(parent, Sets().parent_class)`,
+which is the instance relation and not the one the check asks.  Measured again, on
+`f9f4e69`, with the subtype test the check actually makes:
+
+    sage ZZ   issubclass(ZZ.category().parent_class, Sets().parent_class)   True
+    sage QQ   issubclass(QQ.category().parent_class, Sets().parent_class)   True
+    owned ZZ  issubclass(ZZ.category().parent_class, Sets().parent_class)   False
+    owned QQ  issubclass(QQ.category().parent_class, Sets().parent_class)   False
+    owned RR  issubclass(RR.category().parent_class, Sets().parent_class)   False
+
+So the substance of the earlier reading stands -- the graph says an owned parent is
+a set and the class does not -- and the table's column was the wrong measurement.
+
+## Where the base is lost
+
+`parent_class` is `dynamic_class(name, tuple(getattr(cat, "parent_class") for cat in
+self._super_categories_for_classes), ...)` (`sage/categories/category.py:1615`), so
+the named `Sets.parent_class` reaches an owned parent only through
+`_super_categories_for_classes`.  For `OwnedRings()` that list **does** name Sage's
+`Sets_with_category`, and yet `OwnedRings().parent_class` does not carry
+`Sets.parent_class`: its chain holds `Sets.ParentMethods` (the plain nested class,
+from the owned `Sets` level) and never the named class.
+
+The owned `Sets` is where the edge is lost: measured,
+`OwnedSets()._super_categories_for_classes` is `['Category of represented
+mathematical objects']` -- the owned `Objects()` alone -- although
+`OwnedSets().super_categories()` is `[Objects(), SageSets()]`.  Sage sets that
+attribute as a side effect of `_all_super_categories` (`category.py:869-877`, a C3
+merge of the super categories' lists), and for this category Sage's `Sets()` does
+not survive the merge into the list of parents that build classes.
+
+That is the site: an owned category's `parent_class` has to derive from the named
+`Sets.parent_class`, and the owned `Sets`' own class list is where it can be added
+-- a change to the class of every owned parent, since every owned category inherits
+the root's class.  It is not landed: it needs its own turn and a gate over the
+owned graph, and this turn spent its budget on a chain-of-charts repair in the
+module #198 contracts.
