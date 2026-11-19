@@ -149,16 +149,29 @@ def test_the_centralizer_of_minus_one_on_E8_is_all_of_O_E8() -> None:
     assert lattice.O().subgroup(group_generators).cardinality() == 696729600
 
 
-def test_an_indefinite_hermitian_component_asserts_its_frontier() -> None:
+def test_an_indefinite_hermitian_component_has_complete_unitary_generators() -> None:
     r"""The Coxeter rotation of ``A2`` has order three and fixes no vector,
     so on ``A2 + A2(-1)``, of signature ``(2, 2)``, the rotation of both
     summands has the single cyclotomic summand ``ker Phi_3 = L``: an
-    indefinite hermitian lattice over ``ZZ[zeta_3]``, whose unitary group has
-    no generating route, so reading its generators asserts."""
+    indefinite hermitian lattice over ``ZZ[zeta_3]``. The recognized
+    arithmetic commutant computes complete integral unitary generators,
+    including the nontrivial unipotent kernel omitted by a finite image."""
     lattice = Lattices(ZZ)([[2, -1], [-1, 2]]) + Lattices(ZZ)([[-2, 1], [1, -2]])
     labels = lattice.module_generating_set()
     a1, a2, b1, b2 = lattice.module_generators()
     rotation = lattice.O()({labels[0]: a2, labels[1]: -a1 - a2, labels[2]: b2, labels[3]: -b1 - b2})
 
-    with pytest.raises(AssertionError):
-        lattice.O().centralizer(rotation).group_generators()
+    generators = tuple(lattice.O().centralizer(rotation).group_generators())
+    assert generators
+    assert all(g * rotation == rotation * g for g in generators)
+    from sage.matrix.constructor import matrix as sage_matrix
+    from sage.matrix.special import identity_matrix
+    from sage.rings.integer_ring import ZZ as SageZZ
+
+    labels = tuple(lattice.module_generating_set())
+    matrices = [sage_matrix(SageZZ, [
+        [int(g(point).to_vector()(label)) for point in lattice.module_generators()]
+        for label in labels
+    ]) for g in generators]
+    identity = identity_matrix(SageZZ, 4)
+    assert any(g != identity and (g - identity)**2 == 0 for g in matrices)
