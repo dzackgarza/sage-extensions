@@ -2288,23 +2288,39 @@ class OrthogonalCharacterQuotient:
             orbit_elements = [identity]
             keys = {str(point): 0}
             frontier = [(point, identity)]
+            # Which product order carries the start to an image is a property of
+            # the action's composition law, not of the point: it is settled once
+            # per generator, on the first edge that generator reaches, and read
+            # from then on.  The check that settles it is the same assertion that
+            # guarded every edge before, so a generator whose order differed
+            # would still be caught -- and no edge pays a second set-action to
+            # re-derive a fact about the generator.
+            right_orders = [None] * len(rho_images)
             while frontier:
                 following = []
                 for reached_point, reached_element in frontier:
-                    for generator in rho_images:
+                    for position, generator in enumerate(rho_images):
                         image = setwise_action(reached_point, generator)
                         marker = str(image)
                         if marker in keys:
                             continue
-                        reached = generator * reached_element
-                        if setwise_action(point, reached) != image:
-                            # The engine product must compose as (g*h)(x) = g(h(x));
-                            # the other order carries the start to a different point.
+                        if right_orders[position] is None:
+                            reached = generator * reached_element
+                            if setwise_action(point, reached) != image:
+                                # The engine product must compose as (g*h)(x) = g(h(x));
+                                # the other order carries the start to a different point.
+                                reached = reached_element * generator
+                                assert setwise_action(point, reached) == image, (
+                                    "the orbit walk's transversal element does not carry the "
+                                    "start to the reached point"
+                                )
+                                right_orders[position] = True
+                            else:
+                                right_orders[position] = False
+                        elif right_orders[position]:
                             reached = reached_element * generator
-                            assert setwise_action(point, reached) == image, (
-                                "the orbit walk's transversal element does not carry the "
-                                "start to the reached point"
-                            )
+                        else:
+                            reached = generator * reached_element
                         keys[marker] = len(orbit_points)
                         orbit_points.append(image)
                         orbit_elements.append(reached)
