@@ -195,10 +195,20 @@ group.discriminant_image().order()         0.0 s   = 92897280
 ```
 
 92897280 is card `gamma-h-3`'s own `|\bar\Gamma_h|`, so the finite image is
-computed at once and agrees with the card.  The 299 s is therefore in the rest
-of that constructor -- the ambient image `Q` with its word section, the class
-points, or the subgroup's generating family -- and this record does not say
-which: that split was not measured.
+computed at once and agrees with the card.  Three of the constructor's remaining
+lines, timed one at a time in the same process, are:
+
+```
+_im_rho_engine_and_section()                    83.1 s   (a group of size 46998591897600, 4 generators)
+group.discriminant_image().group_generators()    0.7 s
+_divided_discriminant_classes(lattice, P1)       0.2 s   (4 classes)
+```
+
+The ambient image with its word section is the largest of the three by two
+orders of magnitude; the class sets, which are what the decomposition is for,
+are 0.2 s.  The measured lines do not sum to the stage's 299 s, so the rest of
+that stage -- the subgroup's image inside the engine and its generating set, and
+the class points -- remains unattributed here.
 
 That is where the acceptance's plane and flag rows stand, and the defect block
 above is unchanged.
