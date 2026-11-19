@@ -330,6 +330,39 @@ def test_the_coble_cusp_five_pointed_family_returns() -> None:
     assert all(generator(vector) == vector for generator in family)
 
 
+def test_the_second_cusp_of_the_enriques_lattice_lifts_the_whole_quotient() -> None:
+    r"""`029J`'s `L_2 = Ze_3`: every certified generator of `O(K_I)` has a pointwise lift.
+
+    `M_I` is the image of `P_I^1` in `O(K_I)`, hence a subgroup, so it is the
+    whole quotient exactly when it contains a generating set; the lift
+    predicate decides each certified generator.  This is what makes the
+    pointed family at that cusp one lift per generator together with the
+    radical, rather than a coset graph with more than one class, and the
+    card's index 527 is computed against that family.  The cusp vector is
+    primitive isotropic of divisibility two with a complement of rank ten
+    (Dutour Sikiric--Hulek, arXiv:2302.01679v2, Theorem 4.9, printed
+    pp. 33--34).
+    """
+    lattice = NamedLattices.TEn
+    labels = tuple(lattice.module_generating_set())
+    vector = lattice.module_generator(labels[2])
+    subobject = lattice.primitive_isotropic_subobject(vector)
+    reduction = subobject.isotropic_reduction()
+    quotient = reduction.quotient_lattice()
+    image = reduction.pointwise_levi_image()
+
+    assert vector.q() == ZZ(0)
+    assert vector.is_primitive() is True
+    assert vector.div() == ZZ(2)
+    assert quotient.module_rank() == NN(10)
+    for generator in quotient.O().group_generators():
+        assert generator in image
+
+    family = subobject.pointed_stabilizer_generators()
+    assert family
+    assert all(generator(vector) == vector for generator in family)
+
+
 def test_the_hyperbolic_planes_pointed_stabilizer_is_trivial() -> None:
     r"""`K_I = 0`: the family is empty, and the card's one `O`-orbit of isotropic lines stands.
 
