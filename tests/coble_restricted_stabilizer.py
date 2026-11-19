@@ -137,14 +137,111 @@ def run(lattice, cap):
     return 0 if agrees else 2
 
 
+SMALL_SPECIMEN = "U + U(2) + <-2>"
+
+
+def small_specimen():
+    r"""`L = U + U(2) + <-2>`, whose `(-2)`-vector has `U + U(2)` as its perpendicular.
+
+    The smallest lattice pair that carries the shape of the Coble statement: a
+    `(-2)`-vector `delta` whose perpendicular `M` is a smaller lattice, a
+    discriminant preimage on `L` playing `Gamma_{En,2}`'s role, and the same
+    preimage on `M` playing the incidence driver's.  The construction and the
+    comparison are the row's, at a size one command reaches.
+    """
+    U = Lattices(ZZ)("U")
+    U2 = Lattices(ZZ)([[0, 2], [2, 0]])
+    return U + U2 + Lattices(ZZ)([[-2]])
+
+
+def _u2_labels(block):
+    r"""The two labels of an isotropic pair of pairing two — the `U(2)` block's."""
+    labels = tuple(block.module_generating_set())
+    for left in labels:
+        for right in labels:
+            if left >= right:
+                continue
+            a, b = block.module_generator(left), block.module_generator(right)
+            if block.q(a) == ZZ.zero() and block.q(b) == ZZ.zero() and block.b(a, b) == ZZ(2):
+                return (left, right)
+    raise ArithmeticError(f"{block} has no isotropic pair of pairing two")
+
+
+def _class_set(block, labels):
+    r"""The span in `A_block` of the classes of `labels`, as a set of classes."""
+    form = block.discriminant_group()
+    closure = {form.zero()}
+    for label in labels:
+        generator = form.discriminant_class(
+            block.primitive_dual(block.module_generator(label))
+        )
+        closure |= {element + generator for element in closure}
+    return frozenset(closure)
+
+
+def run_small(cap):
+    r"""The same construction and comparison at rank five, where one command reaches it."""
+    started = time.monotonic()
+    lattice = small_specimen()
+    labels = tuple(lattice.module_generating_set())
+    delta = next(
+        lattice.module_generator(label) for label in labels
+        if lattice.q(lattice.module_generator(label)) == ZZ(-2)
+    )
+    perp = lattice.subobject_on((delta,)).inclusion().orthogonal_complement()
+    log(f"[R-small] {SMALL_SPECIMEN}: delta q = {delta.q()}, perp rank "
+        f"{perp.module_rank()}, isometric to U + U(2): {perp.is_isometric(small_perpendicular())}")
+    if not perp.is_isometric(small_perpendicular()):
+        log("[R-small] the perpendicular is not U + U(2)")
+        return 2
+    point = _class_set(lattice, _u2_labels(lattice))
+    gamma = lattice.Aut().discriminant_point_stabilizer(point)
+    log(f"[R-small] the subgroup on L, as a discriminant preimage")
+    signal.setitimer(signal.ITIMER_REAL, cap)
+    try:
+        generators = tuple(gamma.group_generators())
+        restrictions = restricted(perp, tuple(gamma.stabilizer(delta).group_generators()))
+    except RowUndecided:
+        log(f"[R-small] undecided: the stabilizer did not return in {cap:g} s")
+        return 1
+    finally:
+        signal.setitimer(signal.ITIMER_REAL, 0)
+    log(f"[R-small] {len(generators)} generators of the subgroup, "
+        f"{len(restrictions)} restrictions to the perpendicular")
+    rho = perp.discriminant_representation()
+    image_order = perp.discriminant_group().O().subgroup(
+        tuple(rho(generator) for generator in restrictions)
+    ).cardinality()
+    spinor = perp.O_plus().preimage_morphism()
+    signs = tuple(1 if spinor(generator).is_one() else -1 for generator in restrictions)
+    stabilizer_order = perp.discriminant_group().O().stabilizer_of_classes(
+        _class_set(perp, _u2_labels(perp))
+    ).cardinality()
+    log(f"[R-small] |rho(R)| = {image_order}; the driver's |Stab(J)| = {stabilizer_order}; "
+        f"spinor signs {signs.count(1)} of +1, {signs.count(-1)} of -1")
+    agrees = image_order == stabilizer_order
+    log(f"[R-small] {'agrees' if agrees else 'DIFFERS'}: the two descriptions "
+        f"{'have' if agrees else 'do not have'} the same discriminant image")
+    log(f"[R-small] the row returned in {time.monotonic() - started:.1f} s")
+    return 0 if agrees else 2
+
+
+def small_perpendicular():
+    r"""`U + U(2)`, the perpendicular of the `(-2)`-vector of the small specimen."""
+    return Lattices(ZZ)("U") + Lattices(ZZ)([[0, 2], [2, 0]])
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--cap", type=float, default=10800, help="seconds the row may take")
-    parser.add_argument("--lattice", default="TEn", choices=("TEn",),
-                        help="the lattice the (-2)-vector is taken in")
+    parser.add_argument("--lattice", default="TEn", choices=("TEn", "small"),
+                        help="the lattice pair the row is about: 'TEn' is the Coble one "
+                             "(`delta^perp` is `T_Co`), 'small' is `U + U(2) + <-2>`")
     arguments = parser.parse_args(argv)
     previous = signal.signal(signal.SIGALRM, _alarm)
     try:
+        if arguments.lattice == "small":
+            return run_small(arguments.cap)
         return run(NamedLattices.TEn, arguments.cap)
     finally:
         signal.signal(signal.SIGALRM, previous)
