@@ -95,18 +95,18 @@ _STERK_DIAGRAM_LAYOUTS = {
         9: (-2, 6),
     },
     "Sterk_3": {
-        0: (0, -4),
-        1: (0, 4),
-        2: (0, 8),
-        3: (0, 12),
-        4: (0, 16),
-        5: (4, 16),
-        6: (8, 16),
-        7: (12, 16),
-        8: (20, 16),
+        0: (0, 16),
+        1: (4, 16),
+        2: (8, 16),
+        3: (12, 16),
+        4: (20, 16),
+        5: (0, 12),
+        6: (0, 8),
+        7: (0, 4),
+        8: (0, -4),
         9: (4, 12),
-        10: (6, 2),
-        11: (14, 10),
+        10: (14, 10),
+        11: (6, 2),
     },
     "Sterk_4": {
         0: (0, 8),
@@ -252,11 +252,65 @@ its span, which :meth:`sage_extensions.categories.coxeter_diagrams.CoxeterDiagra
 decides.  ``Sterk_4``'s is the notebook cell's own permutation,
 :meth:`Sterk.sterk4_root_permutation`.
 
-The other two diagrams are no folds of either family.  The twenty-two roots have eight
-Gram-preserving permutations and the nineteen roots two, and folding by them returns the twelve
-roots of ``Sterk_1``, the eleven of ``Sterk_4``, the ten of ``Sterk_2`` and two further
-fourteen-root families whose diagrams are no printed chamber; that exhausts the automorphisms, so
-the twelve roots of ``Sterk_3`` and the fourteen of ``Sterk_5`` stay stored below.
+The other two are folds too, by involutions of the span that do not permute the roots; they are in
+:data:`_STERK_TWISTED_FOLDS`.
+"""
+
+_STERK3_TRANSPOSITIONS = ((1, 9), (2, 8), (3, 7), (4, 6), (10, 16), (11, 15), (12, 14), (17, 19))
+_STERK3_FIXED_ROOTS = (5, 13)
+
+
+def _sterk3_involution_images(v):
+    r"""Return the images that determine Sterk's third involution, keyed by zero-based position.
+
+    The archived "Lattices and Coxeter Diagrams DZG" folding is reflection-twisted rather than a
+    plain permutation: the roots of each pair, and the two roots it fixes, go to their partners, and
+    the three roots ``v18``, ``v20``, ``v22`` go to ``v18 + v22``, ``v20 + v22`` and ``-v22`` ---
+    the reflection in ``v22`` on that part.  ``v21``'s image is not printed; the twenty-one roots
+    named here span the roots' span, so they determine it, and it is the last image the fold reads.
+    """
+    images = {}
+    for left, right in _STERK3_TRANSPOSITIONS:
+        images[left - 1] = v[f"v{right}"]
+        images[right - 1] = v[f"v{left}"]
+    for index in _STERK3_FIXED_ROOTS:
+        images[index - 1] = v[f"v{index}"]
+    images[17] = v["v18"] + v["v22"]
+    images[19] = v["v20"] + v["v22"]
+    images[21] = -v["v22"]
+    return images
+
+
+def _sterk5_involution_images(v):
+    r"""Return the images that determine Sterk's fifth involution, keyed by zero-based position.
+
+    The archived folding's fourteen sums are ``v16 + 2 v1 + v2`` and ``v2 + 2 v3 + v4`` through
+    ``v14 + 2 v15 + v16``, together with ``v17, ..., v22``: the eight sums centre on the odd-indexed
+    roots, and the even-indexed ones are negated, so each even root's orbit is a pair summing to
+    zero.  That is the involution ``v(2k-1) -> v(2k-2) + v(2k-1) + v(2k)``, ``v(2k) -> -v(2k)`` on
+    the sixteen roots, and the identity on ``v17, ..., v22``.
+    """
+    images = {}
+    for index in range(1, 17):
+        if index % 2:
+            left = 16 if index == 1 else index - 1
+            images[index - 1] = v[f"v{left}"] + v[f"v{index}"] + v[f"v{index + 1}"]
+        else:
+            images[index - 1] = -v[f"v{index}"]
+    for index in range(17, 23):
+        images[index - 1] = v[f"v{index}"]
+    return images
+
+
+_STERK_TWISTED_FOLDS = {
+    "Sterk_3": _sterk3_involution_images,
+    "Sterk_5": _sterk5_involution_images,
+}
+r"""The two Sterk diagrams whose fold is an involution of the span that does not permute the roots.
+
+Each entry maps the labelled twenty-two roots to the images that determine the involution, which
+:meth:`sage_extensions.categories.coxeter_diagrams.CoxeterDiagrams.ParentMethods.fold_by` decides
+and folds by.
 """
 
 _STERK_FIG10_VERTEX_ORDER = (10, 5, 4, 3, 2, 1, 0, 8, 9, 6, 7)
@@ -599,24 +653,16 @@ class Sterk:
     @staticmethod
     @cache
     def _sterk_roots_cached():
-        r"""Return the five verified root configurations, three of them as folds.
+        r"""Return the five verified root configurations, each of them a fold.
 
         ``Sterk_1``, ``Sterk_2`` and ``Sterk_4`` are the folds of the two root families by
-        :data:`_STERK_FOLDING_FAMILIES`' involutions, carried into ``T_dP``; ``Sterk_3`` and
-        ``Sterk_5`` are no folds of either family, and the module docstring of that table says why,
-        so their printed vectors stay here.  Every resulting vector is checked to be of square
-        \(-2\) or \(-4\) in one Gram contraction below, and ``Sterk_3``'s two reflection sums are
-        checked against the orbit sums they are.
+        :data:`_STERK_FOLDING_FAMILIES`' permutations of the roots; ``Sterk_3`` and ``Sterk_5`` are
+        the folds by :data:`_STERK_TWISTED_FOLDS`' involutions of the span, which do not permute the
+        roots.  Every resulting vector is checked to be of square \(-2\) or \(-4\) in one Gram
+        contraction below.
         """
         v = Sterk.roots_18_2_0()
         w = Sterk.roots_18_0_0()
-
-        def reflect(x):
-            half = x.parent().base_ring()(v["v22"].b(x) / 2)
-            return x + half * v["v22"]
-
-        def orbit_sum(x):
-            return x + reflect(x)
 
         families = {
             "v": tuple(v[f"v{index}"] for index in range(1, 23)),
@@ -628,42 +674,12 @@ class Sterk:
             folded[name] = tuple(
                 _carried_into(NamedLattices.TdP, folding, root) for root in folding.roots()
             )
-        stored = {
-            "Sterk_3": (
-                v["v13"],
-                v["v14"] + v["v12"],
-                v["v15"] + v["v11"],
-                v["v16"] + v["v10"],
-                v["v1"] + v["v9"],
-                v["v2"] + v["v8"],
-                v["v3"] + v["v7"],
-                v["v4"] + v["v6"],
-                v["v5"],
-                v["v17"] + v["v19"],
-                orbit_sum(v["v20"]),
-                orbit_sum(v["v18"]),
-            ),
-            "Sterk_5": (
-                v["v16"] + 2 * v["v1"] + v["v2"],
-                v["v2"] + 2 * v["v3"] + v["v4"],
-                v["v4"] + 2 * v["v5"] + v["v6"],
-                v["v6"] + 2 * v["v7"] + v["v8"],
-                v["v8"] + 2 * v["v9"] + v["v10"],
-                v["v10"] + 2 * v["v11"] + v["v12"],
-                v["v12"] + 2 * v["v13"] + v["v14"],
-                v["v14"] + 2 * v["v15"] + v["v16"],
-                v["v17"],
-                v["v18"],
-                v["v19"],
-                v["v20"],
-                v["v21"],
-                v["v22"],
-            ),
-        }
-        configurations = {
-            name: folded[name] if name in folded else stored[name]
-            for name in _STERK_CONFIGURATION_ORDER
-        }
+        for name, involution_images in _STERK_TWISTED_FOLDS.items():
+            folding = CoxeterDiagrams().from_roots(families["v"]).fold_by(involution_images(v))
+            folded[name] = tuple(
+                _carried_into(NamedLattices.TdP, folding, root) for root in folding.roots()
+            )
+        configurations = {name: folded[name] for name in _STERK_CONFIGURATION_ORDER}
         configurations = {
             name: finite_ordered_set(roots) for name, roots in configurations.items()
         }
@@ -701,10 +717,10 @@ class Sterk:
                 f"the configuration {name} contains {root}, which is not a root: "
                 f"its square is {square}, not -2 or -4"
             )
-        assert reflect(reflect(v["v20"])) == v["v20"]
-        assert reflect(reflect(v["v18"])) == v["v18"]
-        assert orbit_sum(v["v20"]) == v["v22"] + 2 * v["v20"]
-        assert orbit_sum(v["v18"]) == v["v22"] + 2 * v["v18"]
+        assert v["v22"].b(v["v20"]) == 2 and v["v22"].b(v["v18"]) == 2, (
+            "the two roots Sterk's third folding twists are not the ones the reflection in v22 "
+            "moves by v22, so the images that folding is stated by are not its"
+        )
         return configurations
 
     @staticmethod
