@@ -13660,6 +13660,62 @@ class IsotropicReductions(OwnedCategoryOverBaseRing):
             )
 
         @cached_method
+        def pointwise_levi_image_generators(self):
+            r"""Return integral lifts of generators of ``M_I``, by Schreier over its coset graph.
+
+            Membership in `M_I` is decidable -- :meth:`pointwise_levi_lift`
+            answers with an integral lift or with ``None`` -- and `M_I`
+            contains the principal congruence subgroup `\Gamma_{K_I}(d)`, so
+            `O(K_I)/M_I` is finite.  Breadth first from the identity class over
+            the certified generators of `O(K_I)`, a candidate being placed in an
+            existing class exactly when the quotient of the two words lifts,
+            therefore terminates, and the classes found are the cosets.
+
+            Over such a transversal the words `w_{P'}^{-1} t w_P` lie in `M_I`
+            -- each returns from the class of `t w_P` to its representative, so
+            it fixes that class, and it fixes the identity class in particular
+            -- and they generate `M_I`: a word that fixes the identity class
+            can be rewritten through the transversal at every step, which is the
+            coset-rewriting argument and uses nothing beyond the transversal.
+            Each such word is lifted by the same predicate, so the returned
+            tuple is one integral isometry per generator of `M_I`.
+            """
+            quotient = self.quotient_lattice()
+            generators = tuple(quotient.O().group_generators())
+            identity = quotient.O().one()
+
+            def in_the_image(element):
+                return self.pointwise_levi_lift(element) is not None
+
+            def representative_of(element, representatives):
+                for representative in representatives:
+                    if in_the_image(~representative * element):
+                        return representative
+                return None
+
+            representatives = [identity]
+            words = []
+            frontier = [identity]
+            while frontier:
+                current = frontier.pop()
+                for generator in generators:
+                    moved = generator * current
+                    representative = representative_of(moved, representatives)
+                    if representative is None:
+                        representatives.append(moved)
+                        frontier.append(moved)
+                        continue
+                    words.append(~representative * moved)
+            lifts = tuple(self.pointwise_levi_lift(word) for word in words)
+            if any(lift is None for lift in lifts):
+                raise ArithmeticError(
+                    f"a Schreier word of the coset graph of {self} was found in the "
+                    f"Levi image and then had no integral lift: membership in M_I is "
+                    f"decided by that same lift, so the two answers disagree"
+                )
+            return lifts
+
+        @cached_method
         def _pointwise_kernel_parameter_vectors(self):
             r"""Return a `ZZ`-basis of the radical's parameter lattice, as vectors of `I^\perp`.
 
