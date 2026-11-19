@@ -10301,12 +10301,14 @@ class Lattices(OwnedCategoryOverBaseRing):
             ``A_C`` -- the identity class when ``A_C`` has order two, whatever
             further automorphisms the cyclic form itself has -- so that image is
             constructed.  A ``C`` of higher rank is collapsed by the whole
-            ``O(q_C)``, which is ``rho_C(O(C))`` when ``C`` is even,
-            2-elementary, indefinite and of rank at least three (Nikulin,
+            ``O(q_C)`` when that is the image, which it is for an even,
+            2-elementary, indefinite ``C`` of rank at least three (Nikulin,
             *Integral symmetric bilinear forms and some of their applications*,
-            Theorem 3.6.3); outside those cases collapsing by ``O(q_C)`` would
-            merge orbits that are not ``O(T)``-equivalent, so this raises with
-            the named gap instead of answering with too few vectors.
+            Theorem 3.6.3), and otherwise by the image of ``O(C)`` computed from
+            its own generators, which a definite ``C`` has finitely many of.  An
+            indefinite ``C`` outside the theorem's case would have to be
+            collapsed by a group that is not known, so this raises with the
+            named gap instead of answering with too few vectors.
             """
             from math import isqrt, prod
 
@@ -10371,16 +10373,31 @@ class Lattices(OwnedCategoryOverBaseRing):
             line_value = complement_values(line_form.q(subgroup_generator))
             rank = int(summand.module_rank())
             target_value = zero_value - line_value
+            # The collapse group is rho_C(O(C)): the whole O(q_C) when that is
+            # the image, which it is for an even 2-elementary indefinite C of
+            # rank at least three, and otherwise the image of the generators of
+            # O(C) itself, which a definite C has finitely many of.  An
+            # indefinite C outside the theorem's case has no known generating
+            # set, so it is refused rather than collapsed by too small a group.
+            collapse_by_theorem = False
+            collapse_by_image = False
             if rank > 1:
                 elementary = summand.is_p_elementary(ring(2))
                 real, imaginary = summand.signature()
-                assert elementary is True and int(real) > 0 and int(imaginary) > 0 and rank >= 3, (
-                    f"cannot collapse the gluing classes of {summand!r} by O(q_C): that needs rho_C: "
-                    f"O(C) -> O(q_C) to be onto, which is known for an even 2-elementary indefinite C of "
-                    f"rank at least three (Nikulin, Thm. 3.6.3), but {summand!r} has "
-                    f"rank {rank}, signature {summand.signature()} and "
-                    f"2-elementary {elementary}; the non-cyclic and non-elementary cases are the gap this "
-                    f"operation does not cover"
+                collapse_by_theorem = (
+                    elementary is True and int(real) > 0 and int(imaginary) > 0 and rank >= 3
+                )
+                collapse_by_image = summand.definiteness() in (
+                    "positive_definite",
+                    "negative_definite",
+                )
+                assert collapse_by_theorem or collapse_by_image, (
+                    f"cannot collapse the gluing classes of {summand!r} by rho_C(O(C)): that image is "
+                    f"O(q_C) for an even 2-elementary indefinite C of rank at least three (Nikulin, "
+                    f"Thm. 3.6.3) and is the image of a finite generating set for a definite C, but "
+                    f"{summand!r} has rank {rank}, signature {summand.signature()} and "
+                    f"2-elementary {elementary}, and it is indefinite, so no generating set of O(C) is "
+                    f"available here to compute the image"
                 )
 
             # The candidates and their collapse are both computations on the
@@ -10528,10 +10545,16 @@ class Lattices(OwnedCategoryOverBaseRing):
                 # further automorphisms is not collapsed by them.
                 actions = (-numpy.eye(coordinate_rank, dtype=numpy.int64),)
             else:
-                # An even 2-elementary indefinite C of rank at least three has
-                # rho_C onto, so O(q_C) is exactly the image to collapse by.  A
-                # generator acts on the Smith coordinates as the matrix of its
-                # images of the generators.
+                # A generator of the collapse group acts on the Smith
+                # coordinates as the matrix of its images of the generators.
+                # Where the theorem applies the group is the whole O(q_C); for a
+                # definite C it is the computed image of O(C), whose generators
+                # are its isometries' images in the discriminant form.
+                collapse_generators = (
+                    complement_form.orthogonal_group().group_generators()
+                    if collapse_by_theorem
+                    else summand.discriminant_image().group_generators()
+                )
                 actions = tuple(
                     numpy.array(
                         [
@@ -10546,7 +10569,7 @@ class Lattices(OwnedCategoryOverBaseRing):
                         ],
                         dtype=numpy.int64,
                     ).transpose()
-                    for generator in complement_form.orthogonal_group().group_generators()
+                    for generator in collapse_generators
                 )
 
             remaining = set(candidates)
