@@ -70,7 +70,7 @@ def run() -> None:
     orthogonal = lattice.Aut()
     reversing = orthogonal(lambda label: -lattice.module_generator(label))
 
-    measured = []
+    measured = {}
     for name, index in CUSPS.items():
         vector = lattice.module_generator(labels[index])
         assert lattice.q(vector) == ZZ(0), f"{name} must be isotropic"
@@ -79,27 +79,43 @@ def run() -> None:
 
         start = time.monotonic()
         count = line_orbit_count(lattice, vector)
-        measured.append(count)
+        measured[name] = count
         print(f"{name}: {count} ker-rho orbits in its O(N)-orbit, {time.monotonic() - start:.1f} s")
 
     print(f"card 029J's cited orbit lengths: {stated}")
-    assert sorted(measured) == stated, (
+    assert sorted(measured.values()) == stated, (
         f"the card cites the stabilizer image indices {stated}, and the finite image gives "
-        f"{sorted(measured)}"
+        f"{sorted(measured.values())}"
     )
 
-    # The pointed family, where the construction reaches it.
-    start = time.monotonic()
-    family = pointed_generators(lattice, lattice.module_generator(labels[CUSPS["L_1"]]))
-    print(
-        f"pointed family at L_1 = Ze_1: {len(family)} generators, "
-        f"{time.monotonic() - start:.1f} s"
-    )
-    assert family
-    assert all(
-        generator(lattice.module_generator(labels[CUSPS["L_1"]])) == lattice.module_generator(labels[CUSPS["L_1"]])
-        for generator in family
-    )
+    # Each pointed family is certified in the finite quotient by its own images:
+    # with -id it presents the setwise line stabilizer, whose image index is the
+    # independently computed count above.  The exact-sequence argument, not this
+    # finite quotient, is what certifies generation in the discriminant kernel.
+    discriminant = lattice.discriminant_representation()
+    finite_orthogonal = discriminant.codomain()
+    for name, index in CUSPS.items():
+        vector = lattice.module_generator(labels[index])
+        start = time.monotonic()
+        family = pointed_generators(lattice, vector)
+        print(
+            f"pointed family at {name} = Ze_{index + 1}: {len(family)} generators, "
+            f"{time.monotonic() - start:.1f} s"
+        )
+        assert family
+        assert all(generator(vector) == vector for generator in family)
+        line_family = finite_orthogonal.subgroup(
+            (
+                *(discriminant(generator) for generator in family),
+                discriminant(reversing),
+            )
+        )
+        image_index = int(finite_orthogonal.cardinality()) // int(line_family.cardinality())
+        assert image_index == measured[CUSPS[name]], (
+            f"{name}'s pointed family, with -id, has discriminant image index {image_index}, "
+            f"but its exact line-stabilizer index is {measured[name]}"
+        )
+        print(f"{name}: pointed family's line-stabilizer image index {image_index}")
 
 
 if __name__ == "__main__":
