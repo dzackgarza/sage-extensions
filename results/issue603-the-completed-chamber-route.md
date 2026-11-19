@@ -473,5 +473,50 @@ liftability predicate cuts `M_I` out of `O(K_I)` without producing a
 generating set of it -- a filtered generating set of `O(K_I)` need not
 generate `M_I`.  That is the next question, not this lemma's.
 
+## $M_I$'s generators: the reduction, and a refutation of the filtering route
+
+**Lemma (reduction).**  For a family `{g_s}` of integral lifts of a set
+`S <= M_I`, `\langle g_s \rangle . U_I = P` if and only if
+`\langle S \rangle = M_I`.
+
+**Proof.**  `lambda` carries `\langle g_s \rangle . U_I` onto
+`\langle S \rangle` with kernel `U_I`; it carries `P` onto `M_I` with the same
+kernel.  Two subgroups with the same image and the same kernel under one
+homomorphism coincide.
+
+So the pointed family is exact exactly when the lifted set generates `M_I`,
+and the question is `M_I`'s generators -- not the family's assembly.
+
+**Refutation of the filtering route.**  The liftability predicate decides
+membership in `M_I`; it does not produce a generating set, and the only route
+it offers -- take a generating set of `O(K_I)` and keep what lifts -- is not a
+theorem about `M_I`: for `O(K_I) = (Z/2)^2 = \langle a, b \rangle` and `M_I`
+the diagonal `\langle ab \rangle`, both `a` and `b` lie outside `M_I` while
+their product lies in it, so the filtered set is empty and generates the
+trivial group.  Two further observations from the specimens:
+
+* the rank-five proper-image specimen (`L` of rank five, signature (2,3),
+  `K_I` of rank three and discriminant `-8`, infinite `O(K_I)`) has three
+  generators, of which two lift and one does not, so filtering *does* leave
+  generators there -- it is the general statement that fails, not that
+  specimen;
+* a second generating set cannot be manufactured by translating the first:
+  for a liftable `t` the set `{s t}` needs `t^{-1}` in its span to generate,
+  and it need not, which the same specimen shows
+  (`\langle s t \rangle != O(K_I)`, measured).
+
+Whether a lattice realizes the `(Z/2)^2` pair is open and is not claimed.
+
+**The next lemma, stated but not proved.**  `M_I` contains a principal
+congruence subgroup of `O(K_I)` at an explicit modulus `m` built from the
+divisibility, the lift denominators and the discriminant of `K_I`.  If it
+holds, `M_I` has finite index, its generators are one lift per generator of
+the finite subgroup `M_I/m` together with generators of the congruence kernel,
+and the five withdrawn items can be re-argued on that basis.  The step that
+is missing is that a `\tau` congruent to the identity at `m` has a *rational*
+lift of denominator dividing `m`, hence a correctable one -- plausible from
+the correction lemma's bound and not established.
+
+
 
 
