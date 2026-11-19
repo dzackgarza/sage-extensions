@@ -326,6 +326,25 @@ def _gram_key(gram):
     )
 
 
+def _representatives_of_the_box(counts):
+    r"""Yield every tuple of integers ``t`` with ``0 <= t[i] < counts[i]``.
+
+    The representatives of a quotient of `\mathbf Z^m` by the row lattice of an
+    upper triangular Hermite form are exactly the integer points of that box,
+    one per class, in the standard basis of the ambient free module.
+    """
+    total = 1
+    for count in counts:
+        total *= count
+    for position in range(total):
+        representative = []
+        remainder = position
+        for count in counts:
+            remainder, value = divmod(remainder, count)
+            representative.append(value)
+        yield tuple(representative)
+
+
 def _register_indecomposable_gram(name, gram):
     r"""Register an exact Gram matrix under its indecomposable display name."""
     _INDECOMPOSABLE_NAMES.setdefault(_gram_key(gram), str(name))
@@ -13770,6 +13789,160 @@ class IsotropicReductions(OwnedCategoryOverBaseRing):
 
 
         @cached_method
+        def _rational_pointwise_levi_lift(self, isometry):
+            r"""Return a rational lift of ``isometry`` fixing the marked vector, with its denominator.
+
+            The marked vector is fixed and the lifts of `K_I`'s frame are sent
+            to lifts of their images; the extension to `L \otimes QQ` is then
+            forced, and it is
+            :func:`...isotropic_parabolics._extend_isotropic_basis_isometry`'s
+            Witt extension.  The second entry is the positive generator of the
+            denominator ideal of that extension, so the correction search of
+            :meth:`_corrected_pointwise_levi_lift` runs inside
+            `(1/(d D)) J`, `d` the marked vector's divisibility and `D` this
+            denominator.
+            """
+            from sage_extensions.categories.isotropic_parabolics import (
+                _extend_isotropic_basis_isometry,
+            )
+
+            lattice = self.isotropic_embedding().codomain()
+            quotient = self.quotient_lattice()
+            perpendicular = self.orthogonal_complement().inclusion()
+            frame = self.coordinate_frame()
+            labels = tuple(quotient.module_generating_set())
+            lifts = {label: perpendicular(frame(label)) for label in labels}
+            line = self.isotropic_sublattice()
+            vector = self.isotropic_embedding()(
+                line.module_generator(line.module_generating_set()[0])
+            )
+            basis = (vector, *(lifts[label] for label in labels))
+
+            def lift(element):
+                coordinates = element.to_vector()
+                return sum(
+                    (
+                        lattice.scalar_multiple(coordinates(label), lifts[label])
+                        for label in labels
+                        if coordinates(label)
+                    ),
+                    lattice.zero(),
+                )
+
+            images = (
+                vector,
+                *(
+                    lift(isometry(quotient.module_generator(label)))
+                    for label in labels
+                ),
+            )
+            return _extend_isotropic_basis_isometry(self, self, basis, images)
+
+        def _corrected_pointwise_levi_lift(self, isometry):
+            r"""Return an integral lift of ``isometry``, or ``None`` when its fibre has none.
+
+            Integrality of one rational lift is constant on the cosets of the
+            radical's parameter lattice `X`: the composition law
+            `E_{v,x} E_{v,y} = E_{v,x+y}` (Gritsenko--Hulek--Sankaran,
+            arXiv:0810.1614, section 3.1, equation (5), printed p. 9) makes
+            `g~ E_{v,x_0 + u} = (g~ E_{v,x_0}) E_{v,u}` integral for `u` in
+            `X`, whose transvections are integral by equation (4), printed
+            p. 8, and conversely `E_{v,x_1} E_{v,x_2}^{-1} = E_{v,x_1-x_2}`
+            integral forces `x_1 - x_2` into `X`.  So the admissible parameters
+            are empty or one coset, and it is enough to try one representative
+            of every class of `(1/N) J` modulo `X`, `N` the product of the
+            divisibility and the rational lift's denominator.  Each class is
+            decided by the exact restriction of the corrected rational
+            isometry to `L`, and no parity enters -- unlike the marked-line
+            torsor, whose cosets are those of the transvection kernel and whose
+            argument needs an even lattice.
+            """
+            from sage.matrix.constructor import matrix
+            from sage.rings.rational_field import QQ as SageQQ
+            from sage_extensions.categories.modules.pure.modules import (
+                ModulesOverIntegralDomains,
+            )
+
+            lattice = self.isotropic_embedding().codomain()
+            ring = lattice.base_ring()
+            line = self.isotropic_sublattice()
+            marked = line.embedded_module_generators()[
+                line.module_generating_set()[0]
+            ]
+            divisibility = int(marked.div())
+            fraction_map = ring.fraction_field_map()
+            rational = lattice.base_change(fraction_map)
+            rational_ring = rational.base_ring()
+            rationalize = ModulesOverIntegralDomains(ring)(lattice).generic_fibre_map()
+            rational_marked = rationalize(marked).underlying_element()
+            extension, denominator = self._rational_pointwise_levi_lift(isometry)
+            scale = divisibility * int(denominator)
+
+            labels = tuple(lattice.module_generating_set())
+            perpendicular = self.orthogonal_complement()
+            jlabels = tuple(perpendicular.module_generating_set())
+            jbasis = tuple(
+                perpendicular.inclusion()(perpendicular.module_generator(label))
+                for label in jlabels
+            )
+            width = len(labels)
+
+            def coordinates_of(element):
+                values = element.to_vector()
+                return [int(values(label)) for label in labels]
+
+            jrows = matrix(
+                SageQQ, [coordinates_of(vector) for vector in jbasis]
+            )
+            gram = jrows * jrows.transpose()
+            inverse = gram.inverse()
+
+            def on_the_perpendicular(element):
+                row = matrix(SageQQ, 1, width, coordinates_of(element))
+                return row * jrows.transpose() * inverse
+
+            parameters = matrix(
+                SageZZ,
+                [
+                    [int(value) * scale for value in on_the_perpendicular(parameter)[0]]
+                    for parameter in self._pointwise_kernel_parameter_vectors()
+                ],
+            )
+            diagonal = parameters.hermite_form()
+            representative_counts = [
+                int(diagonal[index, index]) for index in range(diagonal.nrows())
+            ]
+            for step, count in enumerate(representative_counts):
+                if count <= 0:
+                    raise ArithmeticError(
+                        f"the parameter lattice of the radical at {self} is not full rank "
+                        f"in the perpendicular: its Hermite form has "
+                        f"{count} on the diagonal at position {step}"
+                    )
+            for representative in _representatives_of_the_box(representative_counts):
+                combination = sum(
+                    (
+                        lattice.scalar_multiple(
+                            ring(int(value)), vector
+                        )
+                        for value, vector in zip(representative, jbasis, strict=True)
+                        if value
+                    ),
+                    lattice.zero(),
+                )
+                rational_parameter = rational.scalar_multiple(
+                    rational_ring.one() / rational_ring(scale),
+                    rationalize(combination).underlying_element(),
+                )
+                corrected = extension * rational.eichler_transvection(
+                    rational_marked, rational_parameter
+                )
+                integral = corrected.integral_restriction(lattice, lattice)
+                if integral is not None:
+                    return integral
+            return None
+
+        @cached_method
         def _pointwise_levi_integral_lift_or_none(self, isometry):
             r"""An integral quotient lift fixing the null sublattice pointwise, or ``None``.
 
@@ -13807,6 +13980,9 @@ class IsotropicReductions(OwnedCategoryOverBaseRing):
                 split_lift = self._split_pointwise_levi_lift(isometry)
                 if split_lift is not None:
                     return split_lift
+                corrected = self._corrected_pointwise_levi_lift(isometry)
+                if corrected is not None:
+                    return corrected
                 fixing, _reversing = self._levi_fibres(isometry)
                 point = fixing.integral_base_point_or_none()
                 return None if point is None else lattice.integral_isometry(point)
