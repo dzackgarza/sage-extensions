@@ -172,6 +172,17 @@ zero-reduction file and its four pointwise-Levi neighbours were 5 passed in
   computable on the nonreflective odd specimen.  See “The nonreflective
   quotient.”  Divisibility greater than one is not covered by the kernel's own
   family and says so.
+* **The public pointed family at an odd lattice:** MET where the lattice
+  splits along the lifts of `K_I`, which is where the owned route is exact.
+  `U + BK_nonref` -- odd, signature `(2, 3)`, discriminant `2401`, marked
+  vector of divisibility one -- answers in 3.67 s with a family that fixes the
+  marked vector and whose image in the finite orthogonal group is the image of
+  `O(K_I)` itself
+  (`tests/lattices/test_the_public_pointed_family_of_an_odd_isotropic_vector.sage`;
+  the two-factor family is
+  `...PrimitiveIsotropicSubobjects.pointed_stabilizer_generators`).  An odd
+  lattice that does not split along the lifts is still answered with `None`,
+  so the caller keeps its own route.
 * **The research `T_Co` cusp-5 computation:** MET.  Sterk's fifth cusp
   vector is primitive isotropic of divisibility two in `T_Co`; the public
   pointed call returned 25 generators in 12.65 s including setup, and every
@@ -281,11 +292,12 @@ pre-existing overrun of that tree and not this line's.
 **Still open after this.**  Divisibility `d > 1`: the parameters there are the
 `x` with `d x in I^perp`, `b(I^perp, x) subset ZZ` and `q(x) d in 2 ZZ`, a
 lattice strictly larger than the even part of `I^perp` that this call does not
-build, so it refuses and says so.  And the public pointed call,
-`_pointed_vector_stabilizer_generators`, still answers an odd lattice with
-`None` from its `is_even()` gate and falls through to the port, so the *public*
-surface on `T_Co`'s odd neighbours is unchanged: both factors of the exact
-sequence are computable there, the routing to them is not.
+build, so it refuses and says so.  And an odd lattice that does not split
+along the lifts of `K_I`: the pointwise two-factor family is exact only under
+the splitting, and the residue action's integrality is decided by the
+marked-line torsor over an even lattice, so such a lattice is still answered
+with `None` and keeps the port's route.
+
 
 No full suite, no `just test`, no ast-grep gates (ast-grep is not installed).
 The older `test_edgewalk_fundamental_domain.sage` does not
