@@ -1,0 +1,33 @@
+tree SHA: 5943710f76d8bac1c2b7202b28615f0b6a0ac7df (modified paths: 0)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 0.75 0.52 1.47 2/583 2819712
+probe: .tmp/probe-nonref.py; inner 900 s
+L: 5 signature (2, 3) even: False disc: -2401
+K_I: 3 signature (1, 2) disc: -2401
+marked div: 1 primitive: True q: 0
+  [   2.242s] O(K_I) generators
+           12 generators
+  [   0.014s] reduction splitting
+           splits along the lifts: True
+  [   0.299s] coset walk
+           M_I generators: 12  all fix v: True
+  [   0.047s] radical generators
+           U_I generators: 4
+  [   0.004s] owned pointed family
+           family: 16  all fix v: True
+  [   0.011s] public pointed family
+           public family: 16  all fix v: True
+[   2.904s] done
+[peakrss] probe603: child waited=0 shell_code=0 samples=4
+[peakrss] peak tree RSS      : 486 MiB
+[peakrss] low-water MemAvail : 9463 MiB
+[peakrss] peak single VmHWM  : 486 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      475 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     6.0s procs=  3 rss=   486 MiB hwm=   486 MiB avail=  9463 MiB
+[peakrss]   t=     4.0s procs=  3 rss=   449 MiB hwm=   449 MiB avail=  9662 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   286 MiB hwm=   286 MiB avail=  9722 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     4 MiB hwm=     4 MiB avail=  9771 MiB
+probe exit: 0

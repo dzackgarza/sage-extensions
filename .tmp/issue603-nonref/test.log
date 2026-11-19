@@ -1,0 +1,36 @@
+tree SHA: b888c93676c7fcf17a0658b361e44203ebe595c1 (modified paths: 0)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 8.77 6.79 3.99 7/700 2843157
+files: tests/lattices/test_the_pointed_family_at_a_nonreflective_quotient.sage; inner 900 s
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+time gates on: star import 1.00 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: asyncio-1.5.0, xdist-3.8.0, reportlog-1.0.0, platformdirs-4.13.5, hypothesis-6.170.15, anyio-4.15.1, timeout-2.4.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 1 item
+
+tests/lattices/test_the_pointed_family_at_a_nonreflective_quotient.sage . [100%]
+
+=============================== time-gate report ===============================
+collection took 13.90 s; the measured ceiling is 6 s
+============================== slowest durations ===============================
+6.97s call     tests/lattices/test_the_pointed_family_at_a_nonreflective_quotient.sage::test_the_pointed_family_answers_at_a_nonreflective_quotient
+
+(2 durations < 0.005s hidden.  Use -vv to show these durations.)
+============================== 1 passed in 21.20s ==============================
+[peakrss] test603: child waited=1 shell_code=1 samples=17
+[peakrss] peak tree RSS      : 667 MiB
+[peakrss] low-water MemAvail : 6795 MiB
+[peakrss] peak single VmHWM  : 667 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      656 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    30.1s procs=  3 rss=   667 MiB hwm=   667 MiB avail=  7033 MiB
+[peakrss]   t=    32.1s procs=  3 rss=   667 MiB hwm=   667 MiB avail=  6795 MiB
+[peakrss]   t=    28.1s procs=  3 rss=   666 MiB hwm=   666 MiB avail=  7265 MiB
+[peakrss]   t=    26.1s procs=  3 rss=   660 MiB hwm=   660 MiB avail=  7045 MiB
+[peakrss]   t=    24.1s procs=  3 rss=   628 MiB hwm=   628 MiB avail=  7219 MiB
+test exit: 1
