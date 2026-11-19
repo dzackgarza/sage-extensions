@@ -2654,17 +2654,33 @@ class TorsionFormOrthogonalGroup(CategoricalMor):
             self._point_elements, points, inverse=self._point_of_elements
         )
 
-    def orbit(self, subgroup):
-        r"""Return the orbit of the submodule ``subgroup`` under ``O(q)``, as submodules.
+    def orbit(self, point):
+        r"""Return the orbit of a submodule, or of an element, of the form under ``O(q)``.
 
-        The image of :meth:`orbit_points` under the submodule map, so the cardinality
-        is the orbit's and one submodule is built per orbit point only when it is
-        read.  The submodules are the form's, from its registry keyed by element set,
-        and the map is injective on the orbit because a submodule is its element set.
+        Two sorts are acted on, and the argument's own sort decides which action is
+        read: a submodule of the form is a point of the subobject action and an
+        element of the form is a point of the element action, so one name serves
+        both and neither spelling is taken from the other.  Anything that is
+        neither sort is refused rather than guessed at.
+
+        For a submodule the orbit is the image of :meth:`orbit_points` under the
+        submodule map, so the cardinality is the orbit's and one submodule is built
+        per orbit point only when it is read; the submodules are the form's, from
+        its registry keyed by element set, and the map is injective on the orbit
+        because a submodule is its element set.  For an element it is
+        :meth:`orbit_of_element`'s orbit through the element action.
         """
-        points = self.subobject_orbit_action(subgroup).point_set()
-        return Sets().image_set(
-            self._subobject_of_point, points, inverse=self._element_point
+        form = self.domain()
+        if point in ModuleSubobjects(form.base_ring()):
+            points = self.subobject_orbit_action(point).point_set()
+            return Sets().image_set(
+                self._subobject_of_point, points, inverse=self._element_point
+            )
+        if point in form:
+            return self.orbit_of_element(point)
+        raise TypeError(
+            f"the orbit under {self} is of a submodule of {form} or of an element of it, "
+            f"but {point!r} is neither"
         )
 
     def _engine_transversals(self, free, orbit, section, engine_letters, engine):
