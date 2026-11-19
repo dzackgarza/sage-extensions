@@ -801,10 +801,54 @@ def _chart_family_covers(manifold, labels):
     for label in manifold.chart_labels():
         if label in labels:
             continue
-        domain = _engine_manifold_chart(manifold.atlas()[label]).domain()
-        if not any(domain.is_subset(chart.domain()) for chart in given):
+        chart = manifold.atlas()[label]
+        domain = _engine_manifold_chart(chart).domain()
+        if any(domain.is_subset(one.domain()) for one in given):
+            continue
+        if not _sum_certificate_covers(manifold, labels, chart):
             return False
     return True
+
+
+def _sum_certificate_covers(manifold, labels, chart) -> bool:
+    r"""Whether the sum of the family's cutting conditions certifies that it covers ``chart``.
+
+    A chart cut by ``{g != 0}`` leaves out the points where ``g`` vanishes, so a family
+    of such charts covers ``chart`` when ``intersection {g_i = 0}`` is empty there.  One
+    exact certificate needs no real algebraic geometry: if ``sum_i g_i`` takes no zero on
+    the chart, no point has every ``g_i`` zero, and the family covers (Lee,
+    *Introduction to Smooth Manifolds*, 2nd ed., Ch. 1, for the chart domains).  A family
+    whose conditions do not add up to something decided nowhere-vanishing is not
+    certified here, and the caller refuses rather than guessing.
+    """
+    from sage_extensions.categories.vector_bundles import _decided_nowhere_vanishing
+
+    symbols = tuple(_engine_manifold_chart(chart)[:])
+    conditions = []
+    for label in labels:
+        member = manifold.atlas()[label]
+        if not _engine_manifold_chart(member).domain().is_subset(
+            _engine_manifold_chart(chart).domain()
+        ):
+            continue
+        if tuple(_engine_manifold_chart(member)[:]) != symbols:
+            continue
+        conditions.extend(
+            SR(_engine_manifold_expression(condition)) for condition in member.nonvanishing()
+        )
+    if not conditions:
+        return False
+    total = sum(conditions[1:], conditions[0])
+    return (
+        _decided_nowhere_vanishing(
+            total,
+            symbols,
+            tuple(
+                _engine_manifold_expression(condition) for condition in chart.nonvanishing()
+            ),
+        )
+        is True
+    )
 
 
 def _upper_triangle(n):
@@ -1131,14 +1175,16 @@ def _chartwise_family_agrees(manifold, expressions, order) -> None:
     labels = tuple(expressions)
     dimension = int(manifold.dimension())
     for source_label, target_label in combinations(labels, 2):
-        assert (source_label, target_label) in manifold._preamble_transitions, (
+        assert _composed_ambient_transition(
+            manifold, source_label, target_label
+        ) is not None, (
             f"cannot decide whether the chart-wise family states one object on {manifold}: the "
-            f"charts {source_label} and {target_label} are both given, and the atlas states no "
-            f"coordinate change between them"
+            f"charts {source_label} and {target_label} are both given, and no chain of stated "
+            f"coordinate changes joins them"
         )
         for transition in (
-            manifold.transition(source_label, target_label),
-            manifold.transition(target_label, source_label),
+            _composed_ambient_transition(manifold, source_label, target_label),
+            _composed_ambient_transition(manifold, target_label, source_label),
         ):
             source = transition.source()
             target = transition.target()
