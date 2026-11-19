@@ -517,6 +517,55 @@ is missing is that a `\tau` congruent to the identity at `m` has a *rational*
 lift of denominator dividing `m`, hence a correctable one -- plausible from
 the correction lemma's bound and not established.
 
+## The congruence lemma, proved: `Gamma_{K_I}(d)` lies in `M_I`
+
+The lemma stated above is true with `m = d`, and the lift is a formula rather
+than a search.  Fix `J = v^\perp`, a partner `w` with `b(v,w) = d`, and
+`J = Z v \perp K'` with `K'` spanned by the lifts `kappa_i` of `K_I`'s frame --
+orthogonal, since `v` is orthogonal to `J`.  For `tau` in `O(K_I)` write
+`tau^\sharp` for the isometry of `J` that fixes `v` and acts as `tau` on `K'`.
+
+**Lemma.**  If `tau` is congruent to the identity modulo `d`, then
+
+    g(v) = v,  g(kappa_i) = tau^\sharp(kappa_i) + c_i v,  g(w) = w,
+    c_i = b(w, kappa_i - tau^\sharp(kappa_i)) / d
+
+is an integral isometry of `L` with `g(v) = v` and `lambda(g) = tau`.
+
+**Proof.**  `kappa_i - tau^\sharp(kappa_i)` lies in `d J` because `tau` is the
+identity modulo `d` on the frame, and `b(w, J)` lies in `ZZ`, so `c_i` is an
+integer.  `g` is `ZZ`-linear on the basis `(v, kappa_i, w)` of `L`, hence
+integral.  It preserves the pairings of that basis: `(v,v)`, `(v,kappa_i)` and
+`(v,w)` because `tau^\sharp` fixes `v` and `b(v, J) = 0`; `(kappa_i,kappa_j)`
+because `tau^\sharp` is an isometry of `J`; `(w,w)` because `w` is fixed; and
+
+    b(g kappa_i, g w) = b(tau^\sharp kappa_i, w) + c_i d = b(kappa_i, w)
+
+by the definition of `c_i` and the symmetry of `b`.  So `g` is an isometry of
+`L`, and it acts as `tau` on `J / Z v`.  **Sources.**  None are quoted; the
+proof is the computation on that basis.
+
+**Consequences.**  `[O(K_I) : M_I] <= [O(K_I) : Gamma_{K_I}(d)] <=
+|GL_r(ZZ/d)|`, so `M_I` has finite index and the coset graph `O(K_I)/M_I` is
+finite; membership in `M_I` is decidable by the correction lemma, so BFS on
+that graph followed by Schreier's lemma yields generators of `M_I`, and by the
+reduction lemma above the pointed family is then exact.  The lift itself is
+`O(r^2)` arithmetic, with no search and no denominator bound.
+
+**Consistency, measured on the rank-five proper-image lattice** (`d = 2`,
+`K_I` of rank three, discriminant eight).  Of the three generators of
+`O(K_I)`, the residues of their matrices modulo two are
+`(1,1,0,1,1,0,0,0,0)`, `0` and `0`; the first is not congruent to the
+identity and does not lift, the other two are and do, and the first is an
+involution (`g_0^2` is the identity) whose failure to lift is exactly the
+witness that `M_I != O(K_I)` there.  The lemma is sharp at that element: it
+excludes precisely the one that fails.
+
+**What remains.**  The Schreier step -- BFS over the finite coset graph with
+the lift predicate as the membership test, then the Schreier family -- is
+stated above as the route and is not implemented here.
+
+
 
 
 
