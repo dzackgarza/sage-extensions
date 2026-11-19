@@ -1,0 +1,25 @@
+results: the Otilde run on this head was killed in its tail, and the split is unchanged (#381)
+
+The run that was to answer whether Otilde's relation read refuses at its first
+record too went out on 8864 MiB and was killed by the host in the split's last
+9720 planes (row-otilde.log, cbbe353, caps 10800/28800, 6144 MiB guard):
+
+  [1835.2 s rss 3206.6 MiB] the split: 180000 planes registered
+  peak tree RSS 3462 MiB, low-water MemAvail 607 MiB
+
+and then no error line, no verdict, no done.  vmstat's oom_kill went 147 -> 149
+across the run with another tenant holding several GiB, so the killer took it
+before the relation opened: the question stays open.
+
+What it measured is the half not in doubt: 180000 planes at 1835.2 s and
+3206.6 MiB here against 1901.6 s and 3152.8 MiB on 8c094f8 -- so the split half
+of both kernel rows is unchanged on the current head (Otilde+ measured 7.05 ms a
+plane and 189721 planes), and whatever changed between 8c094f8 and here is
+confined to the relation's key read, which is where 9ae39a1 sits.
+
+The next attempt wants ~5 GiB of headroom that stays free for 35 minutes; both
+runs on this head died because other tenants took 8-12 GiB mid-run, not because
+the row outgrew the machine.
+
+No object introduced: the marks are the driver's own, the kill is /proc/vmstat's,
+and the reference figures are the returned row's log.

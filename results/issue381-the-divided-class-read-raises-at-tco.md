@@ -82,3 +82,39 @@ is not answered here.
 No object is introduced: the key is the library's, the orbit--coset correspondence
 is Lemma 3.6's (printed p. 22), and every count above is a datum the library
 printed.
+
+## The `Otilde` run on this head: killed in its tail, and what it still measured
+
+The next step named above -- one run of `Otilde` on the current head -- went out on
+`8 864 MiB` of `MemAvailable` and did not come back
+(`.tmp/issue381-t17/row-otilde.log`, `cbbe353`, caps `10800`/`28800`, the
+`6144 MiB` guard):
+
+```
+[   1835.2 s rss   3206.6 MiB] the split: 180000 planes registered
+[peakrss] peak tree RSS      : 3462 MiB
+[peakrss] low-water MemAvail : 607 MiB
+```
+
+and then nothing: no error line, no verdict, no `done`.  `/proc/vmstat`'s
+`oom_kill` went **147 -> 149** across the run and `MemAvailable` fell to
+`607 MiB` with another tenant holding several GiB, so the host's killer took it
+in the split's last `9 720` planes, before the relation opened.  The question
+that run was sent to answer -- whether `Otilde`'s relation read refuses at its
+first record too -- is therefore **still open**.
+
+What it did measure is the half that is not in doubt:
+
+| | `8c094f8` (returned) | `cbbe353` (this run) |
+| --- | ---: | ---: |
+| 180 000 planes | 1 901.6 s / 3 152.8 MiB | 1 835.2 s / 3 206.6 MiB |
+| rate | 8.6 ms a plane | 6.9 ms a plane |
+
+So the split half is unchanged on the current head, for both kernel rows
+(`Otilde+` measured 7.05 ms a plane and 189 721 planes in the run before), and
+whatever changed between `8c094f8` and here is confined to the **relation's key
+read** -- which is where `9ae39a1` sits.
+
+The next attempt wants a host with ~5 GiB of headroom that stays free for 35
+minutes; the two runs on this head died because other tenants took 8-12 GiB
+mid-run, not because the row outgrew the machine.

@@ -1,0 +1,40 @@
+tree SHA: cbbe35373f528e36034a6bddbe17f0174d3d82e7 (modified paths: 0)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 0.79 2.21 2.95 1/517 3767093
+probe: .tmp/issue381b/probe-row.py; inner 11400 s
+[      0.0 s rss    296.6 MiB] Otilde: the driver's own row
+the lattice Integral lattice of rank 11 and signature (2, 9) of rank 11
+the rows ('Otilde',)
+[Otilde] the row's route: divided-class, as the run asked (decided in 0.0 s)
+[    545.1 s rss   1456.5 MiB] the split: 10000 planes registered
+[    620.7 s rss   1588.6 MiB] the split: 20000 planes registered
+[    688.7 s rss   1729.9 MiB] the split: 30000 planes registered
+[    755.7 s rss   1871.6 MiB] the split: 40000 planes registered
+[    820.7 s rss   2007.3 MiB] the split: 50000 planes registered
+[    890.3 s rss   2164.7 MiB] the split: 60000 planes registered
+[    959.4 s rss   1756.9 MiB] the split: 70000 planes registered
+[   1045.8 s rss   1831.2 MiB] the split: 80000 planes registered
+[   1133.3 s rss   1980.6 MiB] the split: 90000 planes registered
+[   1204.3 s rss   2137.1 MiB] the split: 100000 planes registered
+[   1302.3 s rss   2250.0 MiB] the split: 110000 planes registered
+[   1388.6 s rss   2347.4 MiB] the split: 120000 planes registered
+[   1468.7 s rss   2538.5 MiB] the split: 130000 planes registered
+[   1541.6 s rss   2650.3 MiB] the split: 140000 planes registered
+[   1615.9 s rss   2770.0 MiB] the split: 150000 planes registered
+[   1690.1 s rss   2950.3 MiB] the split: 160000 planes registered
+[   1758.5 s rss   3011.3 MiB] the split: 170000 planes registered
+[   1835.2 s rss   3206.6 MiB] the split: 180000 planes registered
+[peakrss] probe603: child waited=0 shell_code=0 samples=1009
+[peakrss] peak tree RSS      : 3462 MiB
+[peakrss] low-water MemAvail : 607 MiB
+[peakrss] peak single VmHWM  : 3468 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     3458 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=  1934.8s procs=  3 rss=  3462 MiB hwm=  3468 MiB avail=   696 MiB
+[peakrss]   t=  1932.8s procs=  3 rss=  3394 MiB hwm=  3401 MiB avail=   858 MiB
+[peakrss]   t=  1938.9s procs=  3 rss=  3352 MiB hwm=  3468 MiB avail=   718 MiB
+[peakrss]   t=  1959.1s procs=  3 rss=  3350 MiB hwm=  3468 MiB avail=   661 MiB
+[peakrss]   t=  1957.0s procs=  3 rss=  3347 MiB hwm=  3468 MiB avail=   659 MiB
+probe exit: 0
