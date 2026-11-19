@@ -3030,16 +3030,11 @@ class Lattices(OwnedCategoryOverBaseRing):
         The marking must be an arrow whose source is a rank-one lattice
         ``<q(v)>`` and whose image is a primitive isotropic vector `v` of an
         indefinite lattice over `ZZ`; every other marking is answered with
-        ``None`` and the caller keeps its own route.  Parity enters only
-        through which construction owns the answer: the even case is the
-        residue action below, which decides integrality by cosets of the
-        transvection kernel over an even lattice, and the odd case is owned
-        when `L` splits along the chosen lifts of `K_I`, where
-        `id_M + sigma` is an integral lift of every `sigma in O(K_I)` and the
-        radical is the even-square transvections.  An odd lattice that does
-        not split is answered with ``None``: neither construction is exact
-        there, and the caller keeps its own route rather than being handed a
-        family that generates a proper subgroup.
+        ``None`` and the caller keeps its own route.  Parity and divisibility
+        place no restriction on which lattice is answered: the two
+        constructions behind :meth:`...PrimitiveIsotropicSubobjects.pointed_stabilizer_generators`
+        are exact on an odd lattice of any divisibility as well as an even one,
+        and an odd lattice is no longer sent back to the port's route.
 
         The pointed stabilizer is ``P_I^1 = {g in P_I : g(v) = v}`` for
         `I = \mathbf Z v`.  Its family is read from the pointwise
@@ -3091,8 +3086,6 @@ class Lattices(OwnedCategoryOverBaseRing):
             return finite_ordered_set(
                 tuple(reduction.pointwise_perpendicular_kernel().group_generators())
             )
-        if codomain.is_even() is not True and reduction._reduction_lift_splitting() is None:
-            return None
         return finite_ordered_set(subobject.pointed_stabilizer_generators())
 
     def _nonisotropic_pointed_stabilizer_generators(self, marked, *, setwise=False):
