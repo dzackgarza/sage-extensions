@@ -1,6 +1,6 @@
 # #279, acceptance item by item
 
-Fourth revision.  The operation is
+Fourth revision, to a fifth: the operation is
 `src/sage_extensions/categories/lattices.py:10223`
 (`Lattices.vectors_of_square_with_complement`); the test file is
 `tests/lattices/test_vectors_of_square_with_complement.sage`.  Each line number
@@ -12,7 +12,8 @@ reads card `0012` by tag (`tests/...:110`), ties the card's lattice to its
 specimen through `is_isometric_to` (`:111`), and takes the expected count from
 the card's `O` row at norm two (`:112`), compared at `:122`.  The consumer test
 asserts its two specimens' descriptions from AEGS and Dolgachev--Kondo
-(`:290`--`:297`) and quotes the sentence its count stands on (`:279`--`:282`).
+(`:295`--`:302`) and quotes the sentences its count stands on, from AEGS's
+section 2 and from Namikawa's own printed pages (`:279`--`:290`).
 
 ## 1. Primitive, the square, the isometric complement, and the certificate's index
 
@@ -66,15 +67,15 @@ applies), `:10491`--`:10496` (a rank-one complement's own negation), `:10497`
 
 Decided by `test_the_enriques_gluing_gives_a_vector_of_square_minus_two_with_complement_t_co`
 (`tests/...:263`).  The specimens are `NamedLattices.TEn` and `NamedLattices.Tco`
-(`:287`--`:288`, built at `catalogue.py:230` and `:204`), and the description
+(`:292`--`:293`, built at `catalogue.py:230` and `:204`), and the description
 that names each is asserted rather than assumed: rank 12, signature `(2, 10)`,
-even, `|A| = 2^10` for `T_En`, which is AEGS's `(12, 10, 0)_2` (`:290`--`:293`,
+even, `|A| = 2^10` for `T_En`, which is AEGS's `(12, 10, 0)_2` (`:295`--`:298`,
 and AEGS records that an indefinite even 2-elementary lattice is determined by
 its signature and its `(r, a, d)`); rank 11, signature `(2, 9)`, even,
-`|A| = 2^11` for `T_Co`, which is Dolgachev--Kondo's `N` (`:294`--`:297`).  The
-index is at `:299`--`:303`, the count at `:306`, and each returned vector's
+`|A| = 2^11` for `T_Co`, which is Dolgachev--Kondo's `N` (`:299`--`:302`).  The
+index is at `:304`--`:308`, the count at `:311`, and each returned vector's
 square, primitivity, complement, the certificate's domain, the overlattice's
-signature, the index relation and the image of `delta` at `:308`--`:320`.
+signature, the index relation and the image of `delta` at `:313`--`:325`.
 
 The count is not the operation's own: Alexeev--Engel--Garza--Schaffler,
 *Compact moduli of Enriques surfaces of degree 2*, Nagoya Math. J. 259 (2025),
@@ -86,26 +87,53 @@ Math. Ann. 270 (1985), 201--222.  The complement is Dolgachev--Kondo, Izv. Math.
 `N = <2> + E(2)` and `E = E8 + U` is called the Enriques lattice on printed
 p. 510.
 
-Both were read at the source for this revision: the AEGS sentence above is
-quoted from its section 2, and the Dolgachev--Kondo equation and printed page
-from the article's own PDF.  Namikawa's paper is not reachable from this host
-(EuDML answers 403 and the Springer article is paywalled), so theorem 2.13 is
-AEGS's citation of it and not a page read here.  There is no card row for
-`T_Co`; a published count is the oracle the acceptance allows for that, and a
-card row would replace it.
+What was read for this revision.  Namikawa's own article was reached through the
+Göttingen digitisation of Mathematische Annalen 270, which answers where the
+publisher's copy does not from this host (EuDML answers 403 and the Springer
+article is paywalled; an earlier revision of this record therefore carried the
+theorem as AEGS's citation only, and that is corrected here).  Printed p. 203 has
+`M = E(2) = E8(-2) + U(2)` and `N = E8(-2) + U(2) + U`, which is this test's
+`T_En`; printed p. 207 has Theorem 2.13, "For any two roots l and l' in N there
+is an isometry phi in Gamma = O(N) with phi(l) = l'", summarised in the same
+section as "there are only one f with (f,f) = -2 (Theorem 2.13) and two f's with
+(f,f) = -4 (Theorem 2.15) up to O(N)".  AEGS section 2 (arXiv:2312.03638v2) was
+read and is quoted above for the identification `Gamma_En = O(T_En)` and for the
+same statement about this lattice; Dolgachev--Kondo's equation (3.6) and printed
+p. 513, and the Enriques lattice `E = E8 + U` on printed p. 510, were read from
+the article's own PDF.
+
+There is no card row for `T_Co`; a published count is the oracle the acceptance
+allows for that, and a card row would replace it.
 
 ## 4. A regression test through the public route on both specimens
 
 Both specimens are in the one file, both through
 `Lattices.vectors_of_square_with_complement` (`lattices.py:10223`): `A2` at
-`:121` and `:153`, `T_En` at `:305`.
+`:121` and `:153`, `T_En` at `:310`.
 
 ## Runs
 
-- Green, the certificate test alone (`-k certificate`) at the tree this record is
-  committed with: `1 passed, 6 deselected in 7.47s`, the test call 1.10 s.  The
-  run's only gate line is `collection took 6.12 s; the measured ceiling is 6 s`,
-  at host load 8.9 -- this host, not the change; CI runs that gate.
+- Green, the certificate test alone (`-k certificate`) at the parent `e1e8313`
+  when item 1's count was sourced: `1 passed, 6 deselected in 7.47s`, the test
+  call 1.10 s, `collection took 6.12 s` against the 6 s ceiling.
+- Green, the consumer test alone (`-k enriques`) at the parent this revision was
+  rebased onto, `3e92673`, with the change: `1 passed, 6 deselected in 18.92s`,
+  the test call 4.97 s, `collection took 13.67 s` against the 6 s ceiling and
+  `session star import took 3.20 s` against the 3 s one.  Both gate readings are
+  this host's load (7.4 at that run); the collection gate was over on the
+  unmodified parent when measured (`6.46 s`), nothing this change adds runs at
+  collection, and CI runs the gates.
+- The citations this revision rests on were read as pages, not as citations:
+  `.tmp/279r4-namikawa-quotes.txt` holds the Göttingen OCR of the pages quoted
+  above (printed pp. 203 and 207, with the scan's own noise noted), and the
+  Dolgachev--Kondo PDF supplied printed pp. 510 and 513.  The page texts are
+  quoted in the record and in the test's docstring, so they can be checked
+  without re-fetching.
+- No red test in this revision either, and why: the operation's specimens already
+  carry the invariants AEGS and Dolgachev--Kondo state, and its count already
+  equals Namikawa's, so no library answer is wrong to exhibit; what changed is
+  the evidence, not a behaviour.  A red would need `NamedLattices.TEn`/`Tco` to
+  differ from the published lattices.
 - Probe (`probe279_item1.py`, log `.tmp/279r2-probe-base.log`) on the parent
   `e1e8313`, the same specimen the certificate test uses: card `0012`'s `O` row
   is `{'constant': 0, 'w': [0, 0, 0, 0], 'z': [0, 1, 0, 0]}`, the operation's
@@ -129,7 +157,7 @@ Both specimens are in the one file, both through
 The operation refuses a complement that is indefinite and not 2-elementary,
 because there is then no known generating set of `O(C)` to compute the image to
 collapse by (`lattices.py:10344`--`:10351`, the named gap).  Namikawa's Theorem
-2.15 counts two `O(T_En)`-orbits of `(-4)`-vectors, one with complement
-`<4> + U + E8(2)`, and that orbit is one the operation refuses.  It is outside
-this issue's acceptance and closing it is the indefinite-generator question of
-`sage_extensions#381`.
+2.15, printed p. 207 of the same article, counts two `O(T_En)`-orbits of
+`(-4)`-vectors, one with complement `<4> + U + E8(2)`, and that orbit is one the
+operation refuses.  It is outside this issue's acceptance and closing it is the
+indefinite-generator question of `sage_extensions#381`.
