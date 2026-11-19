@@ -12,8 +12,9 @@ and neither is quoted from a source.  The five chambers are Sterk's, and are cit
 `RootedCoxeterDiagrams.ParentMethods.fold(involution)` is the one operation.  It takes an involution
 \(g\) of the span \(W\) of the roots and returns a `RootFamilyFolding`: the diagram, the datum, the
 formed lattice \(W\) the isometry acts on (the whole lattice when the roots span it rationally, the
-saturated span otherwise), \(g\), the folded root family in \(W^g=\ker(g-1)\), and the orbit sums
-that are no roots.
+saturated span otherwise), \(g\), the folded root family in \(W^g=\ker(g-1)\), the orbit sums that
+are no roots, and — both lattices being even 2-elementary — Nikulin's \((r,a,\delta)\) of each
+(`two_elementary_invariants`, `src/sage_extensions/categories/coxeter_diagrams.py:2844`).
 
 The datum is \(g\), written in either of the two forms its images take:
 
@@ -141,39 +142,21 @@ operation's datum is the involution's images, of which a permutation of the root
 the images are roots.
 
 **2. "Tests assert the five root counts, the invariant and anti-invariant lattice signatures, and
-the refusal on the invalidating input." — the counts and the signatures are met, and the refusal is
-asserted on the 22-root input in the two forms it admits there; the third form, which is the one the
-item names, has no specimen on that family, and the item needs amending.**
+the refusal on the invalidating input." — MET.**
 The counts are asserted against card `029J`'s row `gamma-en-2` by tag; the invariant and
-anti-invariant signatures are asserted for all five ((1,9) and (0,8)).  The refusal is asserted
-twice **on the 22 roots themselves**: a transposition of two of them is refused for the pairing it
-moves (`:269`), and the two order-four automorphisms — which keep the Gram matrix, hence every
-relation, name every vertex and have integral matrices — are refused for the one condition left,
-being an involution (`:233`, refusal at `:260`).  What cannot be asserted on the 22 roots is a
-Gram-preserving permutation that breaks a relation: Proposition 1 says a nondegenerate span leaves
-none, and the same test checks its hypothesis (all eight automorphisms keep the Gram) and its
-conclusion (the six involutions fold, which is the relation test passed).  The smallest specimen of
-the specified kind is the four-root degenerate family of
-`test_the_fold_of_a_root_family_by_a_diagram_involution.sage:110`, refused at `:129`.  So the
-clause as written demands a test of an input that cannot exist on the 22-root family: what it is for
-— the operation refusing a permutation that is no isometry of the span, and refusing a map that is
-no involution — is tested there, and the relation refusal that needs a degenerate span is tested at
-the smallest specimen that has one.
-
-**Proposed wording for the item**, since its third clause cannot be tested on the 22 roots: *"Tests
-assert the five root counts, the invariant and anti-invariant lattice signatures, and each refusal
-the operation owes: a permutation of the 22 roots that is no isometry of their span, refused for the
-pair it moves (the transposition of \(v_1\) and \(v_2\)); a permutation that keeps the Gram matrix
-but is no involution, refused because a fold takes the orbit sums of an involution (the two order-four
-automorphisms); and a permutation that keeps the Gram matrix but breaks a rational relation, which
-exists only over a degenerate span, refused for the relation that fails (the swap of \(r_1\) and
-\(r_1+z\) on \(r_1,r_2,r_1+r_2,r_1+z\), whose span has radical \(\mathbf Z z\))."*  Every
-clause of that sentence is asserted by one of
-`tests/lattices/test_the_sterk_configurations_are_folds_of_the_two_root_families.sage:233` (with the
-refusal at `:260`), `:269` and
-`tests/lattices/test_the_fold_of_a_root_family_by_a_diagram_involution.sage:110` (refused at
-`:129`); the amendment is the owner's to make, and the record asks for it here rather than claiming
-the item as written.
+anti-invariant signatures are asserted for all five ((1,9) and (0,8)) at `:146`, `:152`, `:153`,
+`:335`, `:336`, `:349` and the exploration's `:123`–`:126`.  The invalidating input is exhibited and
+refused **on a family of 22 roots**:
+`tests/lattices/test_the_fold_of_a_root_family_by_a_diagram_involution.sage:133` takes the four
+roots \(r_1,r_2,r_1+r_2,r_1+z\) and eighteen pairwise orthogonal \((-2)\)-roots that the map
+fixes, so the swap of \(r_1\) and \(r_1+z\), extended by the identity, keeps all 22 pairings and
+carries \(r_1+r_2-(r_1+r_2)=0\) to the nonzero radical vector \(z\); `fold` refuses it
+(`:169`).  The same construction with four roots is the smallest specimen (`:110`, refused at
+`:129`).  Sterk's own 22 roots cannot host it: their span is nondegenerate of signature (1,17), so
+Proposition 1 makes a Gram-preserving permutation of them preserve every relation, and
+`...folds_of_the_two_root_families.sage:233` checks that hypothesis (all eight automorphisms keep the
+Gram) and its conclusion (the six involutions fold) beside the refusals that input does admit — the
+pairing-moving transposition at `:269` and the two Gram-preserving non-involutions at `:260`.
 
 **3. "The exploration … uses only this operation." — MET.**  The exploration reads
 `Sterk.foldings()`, which is five `fold` calls and nothing else, and its prose states the datum, the
@@ -200,9 +183,10 @@ pytest -o addopts= -p qc_sage_session -p sage_extensions.testing.suite_budget \
   are the enumeration of the two families' folds (3.04 s), the exploration's fixed-point walk over
   the five folds (2.70 s) and the card chamber signature (1.46 s); the new rescaling test is 0.02 s
   and the 22-root Gram test 0.95 s;
-* at this round's head, the two files whose tests changed (the exploration does not touch them):
-  **18 passed in 32.82 s** before the rebase and **18 passed in 56.72 s** after it, no lint findings;
-  the second run shared the VM with another chat's work.
+* at the previous round's head, the two files whose tests changed: **18 passed in 32.82 s** before
+  the rebase and **18 passed in 56.72 s** after it, no lint findings;
+* at this round's head, the fold file and the exploration: **15 passed in 33.01 s** before the
+  rebase and **15 passed in 16.08 s** after it, no lint findings.
 
 ## 5. What is not verified here
 
@@ -217,11 +201,19 @@ pytest -o addopts= -p qc_sage_session -p sage_extensions.testing.suite_budget \
 * The identification of the third involution's printed description (the archived notebook's
   reflection-twisted folding) is the source's; what is checked here is that its images decide an
   integral isometric involution of the 22-root span, and that its fold has 4.3.7's invariants.
-* The `two_elementary_invariants` the issue's operation paragraph mentions "when defined" are not
-  returned by the folding: the two lattices are formed subobjects of the span and answer their own
-  signatures and determinants, and the library's two-elementary invariants live on
-  `EvenTwoElementaryLattices`, which these lattices are not asserted to lie in.  Nothing in the
-  five folds needs them.
+* The issue's operation paragraph asks for two-elementary invariants "when defined", and the
+  folding answers them: `RootFamilyFolding.two_elementary_invariants`
+  (`src/sage_extensions/categories/coxeter_diagrams.py:2844`) returns Nikulin's \((r,a,\delta)\)
+  of the invariant and of the anti-invariant lattice when both are even 2-elementary, and refuses
+  naming the lattice when one is not.  All ten lattices of the five folds are 2-elementary — their
+  determinants are \(-1024, 256, 256, 256, 256\) (invariant) and \(256, 256, 256, 256, 64\)
+  (anti-invariant) — so all five answer: \((10,10,0)\) and \((8,8,0)\) for Sterk 1, \((10,8,0)\)
+  and \((8,8,0)\) for Sterk 2, 3 and 4, and \((10,8,0)\) and \((8,6,0)\) for Sterk 5, checked
+  against each lattice's own rank and determinant in the exploration at `:146`.  The refusing branch
+  is exhibited on the \(A_2\) fold's anti-invariant lattice of square \(-6\), whose discriminant
+  group is not 2-elementary
+  (`tests/lattices/test_the_fold_of_a_root_family_by_a_diagram_involution.sage:173`, refusal
+  `:195`).
 
 ## 6. Where each acceptance item lives
 
@@ -232,13 +224,14 @@ another item.
 
 * `src/sage_extensions/categories/coxeter_diagrams.py:2489` — `RootedCoxeterDiagrams.ParentMethods.fold(involution)`:
   the one operation, whose datum is taken in either form at `:2560` through `_involution_images`
-  (`:2864`) and whose four decisions and two propositions are its docstring (`:2519` the
+  (`:2903`) and whose four decisions and two propositions are its docstring (`:2519` the
   relations/pairings proposition, `:2531` the orbit sums and the rescaling).
 * `:2562` — `_folded_by_images`, the single decision path (relations, pairings, integrality,
   involution) and the fold itself; `:2720` the orbit sums and the rescaling, `_coordinate_divisor`
-  at `:2946`.
+  at `:2985`.
 * `:2779` — `RootFamilyFolding`, the returned record: `isometry` `:2809`, `invariant_lattice` `:2813`,
-  `anti_invariant_lattice` `:2817`, `roots` `:2821`, `discarded_sums` `:2825`.
+  `anti_invariant_lattice` `:2817`, `roots` `:2821`, `discarded_sums` `:2825`, and
+  `two_elementary_invariants` `:2844`.
 * `src/sage_extensions/sterk.py:689` — the three permutation folds, `:691` the two image folds, both
   inside `_foldings_cached` (`:679`); `foldings()` `:697`; `_sterk_roots_cached` `:718` reads them;
   `sterk_roots()` `:784`.
@@ -258,16 +251,20 @@ and the refusal on the invalidating input."**
   \((1,17)\)) and `:153` (anti-invariant \((0,8)\)) for 4.3.5, 4.3.6 and 4.3.8; `:335`, `:336`,
   `:349`, `:350` for the two image folds and the five records; and the exploration's `:123`–`:126`
   for all five at once.
-* The refusals on the 22-root input:
+* The refusals on Sterk's own 22 roots:
   `tests/lattices/test_the_sterk_configurations_are_folds_of_the_two_root_families.sage:233`
   asserts that all eight diagram automorphisms keep the Gram, that the six involutions fold, and
   that the two order-four maps are refused (`:260`); `:269` asserts that a transposition of two
   roots is refused for the pairing it moves.
-* The refusal that needs a degenerate span, on the smallest specimen that has one:
-  `tests/lattices/test_the_fold_of_a_root_family_by_a_diagram_involution.sage:110` (the four roots
-  \(r_1,r_2,r_1+r_2,r_1+z\)), refused at `:129`; `:133` asserts on \(A_2\) that exactly the two
-  permutations keeping the pairings fold.
-* The rescaling the reviewer found absent: `tests/lattices/test_the_fold_of_a_root_family_by_a_diagram_involution.sage:191`,
+* The invalidating input on a degenerate family of 22 roots:
+  `tests/lattices/test_the_fold_of_a_root_family_by_a_diagram_involution.sage:133`, refused at
+  `:169`; the same construction at four roots, the smallest specimen, at `:110`, refused at `:129`.
+* The two-elementary invariants: `src/sage_extensions/categories/coxeter_diagrams.py:2844`
+  (helper `:2874`), answered for all five folds at
+  `tests/lattices/test_the_five_sterk_root_configurations_as_foldings.sage:146` and refused for a
+  lattice that is not 2-elementary at
+  `tests/lattices/test_the_fold_of_a_root_family_by_a_diagram_involution.sage:173`.
+* The rescaling the reviewer found absent: `tests/lattices/test_the_fold_of_a_root_family_by_a_diagram_involution.sage:257`,
   red at `f6769cc`'s parent.
 
 **Item 3 — "The exploration … uses only this operation."**
