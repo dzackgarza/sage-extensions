@@ -1,0 +1,38 @@
+tree SHA: cce3b23c95b562a01b65d5aeab27db83ae560b3b (modified paths: 0)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 2.56 2.50 3.17 3/579 2892728
+probe: .tmp/probe-membership.py; inner 600 s
+group: Subgroup of Orthogonal group O(Lattice of rank 3 and signature (2, 1))
+parent: <class 'sage_extensions.categories.group.groups.OwnedJoinCategory.parent_class[_GroupEngine].ObjectType'>
+generators: 4
+  [0] parent: Orthogonal group O(Lattice of rank 3 and signature (2, 1))  in group: True
+  [1] parent: Orthogonal group O(Lattice of rank 3 and signature (2, 1))  in group: True
+  [2] parent: Orthogonal group O(Lattice of rank 3 and signature (2, 1))  in group: True
+  [3] parent: Orthogonal group O(Lattice of rank 3 and signature (2, 1))  in group: True
+[   1.516s] membership in the group
+stabilizer: {g in Subgroup of Orthogonal group O(Lattice of rank 3 and signature (2, 1)) : Generic morphism:
+  From: Subgroup of Orthogonal group O(Lattice of rank 3 and signature (2, 1))
+  To:   Symmetric group on 2 points(g) lies in a subgroup given by its own generators}
+  [0] in stabilizer: True
+  [1] in stabilizer: False
+  [2] in stabilizer: True
+  [3] in stabilizer: True
+[   1.632s] membership in the stabilizer
+identity in group: True  identity in stabilizer: True
+kernel generators: 2
+  kernel [0] in stabilizer: False
+  kernel [1] in stabilizer: False
+[   1.636s] kernel membership
+[peakrss] probe603: child waited=0 shell_code=0 samples=4
+[peakrss] peak tree RSS      : 439 MiB
+[peakrss] low-water MemAvail : 4569 MiB
+[peakrss] peak single VmHWM  : 439 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      429 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     6.0s procs=  3 rss=   439 MiB hwm=   439 MiB avail=  4569 MiB
+[peakrss]   t=     4.0s procs=  3 rss=   299 MiB hwm=   299 MiB avail=  4731 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   187 MiB hwm=   187 MiB avail=  4894 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     2 MiB hwm=     2 MiB avail=  4795 MiB
+probe exit: 0

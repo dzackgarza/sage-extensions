@@ -1,0 +1,36 @@
+tree SHA: cce3b23c95b562a01b65d5aeab27db83ae560b3b (modified paths: 0)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 4.85 3.12 3.36 11/618 2895520
+probe: .tmp/probe-coerce.py; inner 600 s
+kernel generators: 2
+  kernel [0]: integral parent Orthogonal group O(Integral lattice of rank 3 and signature (2, 1))
+             rational parent Orthogonal group O(Lattice of rank 3 and signature (2, 1))
+             in group: True   in stabilizer: True
+  kernel [1]: integral parent Orthogonal group O(Integral lattice of rank 3 and signature (2, 1))
+             rational parent Orthogonal group O(Lattice of rank 3 and signature (2, 1))
+             in group: True   in stabilizer: True
+  generator [0] in stabilizer: True  in group: True
+  generator [1] in stabilizer: False  in group: True
+  generator [2] in stabilizer: True  in group: True
+  generator [3] in stabilizer: True  in group: True
+g_set: {0, 1} with Subgroup of Orthogonal group O(Lattice of rank 3 and signature (2, 1))-action
+selected point: 0
+  kernel [0] permutation fixes the point: True
+  kernel [1] permutation fixes the point: True
+finite stabilizer generators: 1
+[   3.584s] done
+[peakrss] probe603: child waited=0 shell_code=0 samples=7
+[peakrss] peak tree RSS      : 426 MiB
+[peakrss] low-water MemAvail : 5126 MiB
+[peakrss] peak single VmHWM  : 426 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      415 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   run.sh                        7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    12.0s procs=  3 rss=   426 MiB hwm=   426 MiB avail=  5278 MiB
+[peakrss]   t=    10.0s procs=  3 rss=   424 MiB hwm=   424 MiB avail=  5126 MiB
+[peakrss]   t=     8.0s procs=  3 rss=   357 MiB hwm=   357 MiB avail=  5429 MiB
+[peakrss]   t=     6.0s procs=  3 rss=   258 MiB hwm=   258 MiB avail=  5493 MiB
+[peakrss]   t=     4.0s procs=  3 rss=   198 MiB hwm=   198 MiB avail=  5786 MiB
+probe exit: 0

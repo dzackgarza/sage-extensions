@@ -1,0 +1,43 @@
+tree SHA: 6afb9c59251d8f065e9321c9bbd12de8384ad1ba (modified paths: 0)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 5.61 7.32 5.46 6/549 2902425
+files: tests/lattices/test_the_residue_actions_integral_membership.sage tests/lattices/test_integral_stabilizers.sage; inner 900 s
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+time gates on: star import 0.35 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: asyncio-1.5.0, xdist-3.8.0, reportlog-1.0.0, platformdirs-4.13.5, hypothesis-6.170.15, anyio-4.15.1, timeout-2.4.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 6 items
+
+tests/lattices/test_the_residue_actions_integral_membership.sage ..      [ 33%]
+tests/lattices/test_integral_stabilizers.sage ....                       [100%]
+
+=============================== time-gate report ===============================
+collection took 10.48 s; the measured ceiling is 6 s
+============================== slowest durations ===============================
+0.71s call     tests/lattices/test_the_residue_actions_integral_membership.sage::test_the_radical_crosses_into_the_rational_group_and_into_its_stabilizer
+0.11s call     tests/lattices/test_integral_stabilizers.sage::test_the_swap_stabilizes_the_standard_lattice_but_not_a_commensurable_one
+0.07s call     tests/lattices/test_integral_stabilizers.sage::test_a_completed_orbit_span_gives_the_least_module_and_lattice_cosets
+0.04s call     tests/lattices/test_integral_stabilizers.sage::test_diag_two_half_maps_an_isotropic_line_properly_into_itself_and_leaves_its_stabilizer
+0.02s call     tests/lattices/test_integral_stabilizers.sage::test_a_set_map_into_a_generated_subgroup_keeps_its_range_law
+0.01s call     tests/lattices/test_the_residue_actions_integral_membership.sage::test_a_generator_of_the_rational_group_is_outside_the_stabilizer
+
+(12 durations < 0.005s hidden.  Use -vv to show these durations.)
+============================== 6 passed in 11.53s ==============================
+[peakrss] test603: child waited=1 shell_code=1 samples=9
+[peakrss] peak tree RSS      : 688 MiB
+[peakrss] low-water MemAvail : 6679 MiB
+[peakrss] peak single VmHWM  : 688 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      677 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   run.sh                        2 MiB peak
+[peakrss]   t=    14.0s procs=  3 rss=   688 MiB hwm=   688 MiB avail=  6898 MiB
+[peakrss]   t=    16.0s procs=  3 rss=   688 MiB hwm=   688 MiB avail=  6679 MiB
+[peakrss]   t=    12.0s procs=  3 rss=   542 MiB hwm=   542 MiB avail=  7050 MiB
+[peakrss]   t=    10.0s procs=  3 rss=   511 MiB hwm=   511 MiB avail=  7136 MiB
+[peakrss]   t=     8.0s procs=  3 rss=   481 MiB hwm=   481 MiB avail=  7178 MiB
+test exit: 1

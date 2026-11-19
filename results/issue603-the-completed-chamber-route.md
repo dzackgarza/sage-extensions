@@ -1022,3 +1022,71 @@ collection ceiling is over in both runs, as it is tree-wide here.
 **What remains beside the list.**  The coercion from `O(L)` into the residue
 action's rational group: it is the other item beside the list, and the only
 one left.
+
+*Closed in the section below:* the crossing exists as extension of scalars, the
+question is askable, and `U_I` lies in the action's stabilizer.
+
+## The coercion into the residue action's rational group: the question is askable, and the answer is yes
+
+The last item beside the list is the coercion from `O(L)` into the pointed
+residue action's rational group, which the earlier sections call missing:
+"the witness that would decide the residue action's exactness from outside --
+whether a generator of `U_I` lies in the action's stabilizer -- is not askable,
+because an integral isometry is not coerced into the action's rational group;
+measured, it answers `False` in both directions and even for an element that is
+one of that group's generators."
+
+**That sentence is refuted, and the witness it proposed does not exist.**
+
+*The crossing.*  Containment in the rational group is parent-strict by design
+("test group elements, not categorical objects of a mixed Mor parent",
+`groups.py`), and the group's element constructor is an `Isom` constructor, not
+a base change -- it refuses an isometry of `L` with *"the isometry ... goes from
+L to L, so it is not an isometry from L x QQ to L x QQ"*.  What crosses is
+extension of scalars on the framing, which is the `rationalized` map
+`_pointed_stabilizer_action` already used for the kernel's generators.  It is
+now `IntegralStructureAction.rational_image`, and membership is asked of its
+image.
+
+*The answers*, measured at port `991b88b0`:
+
+| specimen | crossed element | in the group | in the stabilizer |
+|---|---|---|---|
+| `U(2)+<2>` | the radical's 2 generators | True | **True** |
+| `U(2)+<2>` | 4 rational generators | True | True, **False**, True, True |
+| rank five | the radical's 4 generators | True | **True** (all four) |
+| rank five | the coset graph's 5 words | True | True x 4, **refused** |
+
+The fifth word of the rank-five coset graph is not answered `False`: the
+group's `__contains__` raises *"membership of ... is undecided; supply a word
+witness to membership_decision"*, which is the right behaviour for a finitely
+generated subgroup of an infinite group and is exactly what the earlier
+sentence mistook for a negative answer.
+
+*What this decides.*  `U_I`'s generators are among the rational group's
+generators and are integral, so **`U_I` lies in the action's stabilizer** and no
+generator of the radical can witness a failure of exactness.  The residue
+action's stabilizer is a subgroup of `P_I^1` that contains the radical, so
+whether it is all of `P_I^1` turns on the lifts' integrality alone -- the
+Levi side -- which is what the withdrawal said and what this measurement
+localizes.
+
+**The source that said otherwise.**  `_pointed_stabilizer_action`'s docstring
+asserted the withdrawn claim: "That is what makes its integral stabilizer
+exactly the group that fixes `v` ... every element of `P_I^1` is one".  It now
+states what holds -- the stabilizer is a subgroup of `P_I^1`, it contains
+`U_I`, `G_QQ n O(L)` is what it is, and its Levi image need not be `M_I` --
+with the two measured rows above.  That is this round's `fix:`; the new
+`rational_image` is the crossing the docstring's questions are asked through.
+
+**No red, and none claimed.**  Nothing answered a library question wrongly: the
+`False`s were the documented parent-strict containment, and the missing method
+would show up only as an `AttributeError`, which is not a red.  The new file is
+a pin of the answers, not a repair of them.
+
+**Green.**  `tests/lattices/test_the_residue_actions_integral_membership.sage`
+is **2 passed in 6.76 s** on this head (load 5.05; calls 0.98 s and 0.01 s;
+clean exit, collection under its ceiling), and **6 passed in 11.53 s** with
+`test_integral_stabilizers.sage` beside it.
+
+**What remains.**  Nothing beside the list: this was the last item on it.

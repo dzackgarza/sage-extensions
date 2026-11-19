@@ -1,0 +1,42 @@
+tree SHA: cce3b23c95b562a01b65d5aeab27db83ae560b3b (modified paths: 0)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 11.64 5.66 4.23 14/648 2898296
+probe: .tmp/probe-crossing.py; inner 600 s
+Traceback (most recent call last):
+  File "/repos/sage-extensions/.tmp/probe-crossing.py", line 31, in <module>
+    crossed = group(element)
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/groups.py", line 1590, in __call__
+    return self._element_constructor_(value)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/groups.py", line 1601, in _element_constructor_
+    element = supergroup(value)
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/arrow_categories.py", line 2547, in __call__
+    return super().__call__(forward, **kwargs)
+           ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py", line 1076, in __call__
+    return OwnedMor.__call__(self, *args, **kwargs)
+           ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_foundation.py", line 61, in __call__
+    return self._element_constructor_(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py", line 3569, in _element_constructor_
+    isometry = self._morphism_from_images(images)
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py", line 3579, in _morphism_from_images
+    raise ValueError(
+        f"the isometry {images} goes from {images.domain()} to {images.codomain()}, so it is not an isometry from {self.domain()} to {self.codomain()}"
+    )
+ValueError: the isometry Morphism from Integral lattice of rank 3 and signature (2, 1) to Integral lattice of rank 3 and signature (2, 1) goes from Integral lattice of rank 3 and signature (2, 1) to Integral lattice of rank 3 and signature (2, 1), so it is not an isometry from Lattice of rank 3 and signature (2, 1) to Lattice of rank 3 and signature (2, 1)
+[peakrss] probe603: child waited=1 shell_code=1 samples=7
+[peakrss] peak tree RSS      : 426 MiB
+[peakrss] low-water MemAvail : 6438 MiB
+[peakrss] peak single VmHWM  : 426 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      415 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    12.0s procs=  3 rss=   426 MiB hwm=   426 MiB avail=  6701 MiB
+[peakrss]   t=    10.0s procs=  3 rss=   414 MiB hwm=   414 MiB avail=  6438 MiB
+[peakrss]   t=     8.0s procs=  3 rss=   282 MiB hwm=   282 MiB avail=  6625 MiB
+[peakrss]   t=     6.0s procs=  3 rss=   221 MiB hwm=   221 MiB avail=  6719 MiB
+[peakrss]   t=     4.0s procs=  3 rss=   147 MiB hwm=   147 MiB avail=  6762 MiB
+probe exit: 1
