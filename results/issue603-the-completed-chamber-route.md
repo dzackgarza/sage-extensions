@@ -208,13 +208,16 @@ Bogachev--Kolpakov nonreflective lattices themselves, an `isotropic_vector()`
 has rank-one reduction; the owned action returns 28 generators in 4.38 s and
 56 in 31.01 s respectively, all fixing the vector.
 
-**Residual requirement.** A finite `O(K_I)`-set `X` of lift-torsor residues,
-strictly smaller than the orbit span of the displayed bound, with a named point
-`x` and the proved equality `M_I = Stab_{O(K_I)}(x)`.  With such an `X`, the
-existing `IntegralStructureAction` owner would give the stabilizer without the
-520-second orbit enumeration.  The present bound proves existence of a finite
-action but does not make it affordable at this specimen.
-
+**Residual requirement, sharpened.**  The finite quotient is small enough to
+use: on the same specimen `|O(A_K)| = 112` and the discriminant representation
+is onto it, while the gross bound is already `2 |disc(K)|^2 = 11,529,602`
+before the denominator factors.  The pointwise-lift predicate cannot be used
+to test the 112 classes because it asserts that the target lattice is even:
+`isotropic_lifts._integral_parameter_cosets` refuses `L` of signature `(2, 3)`.
+The finite action needs an odd-capable liftability predicate on
+`O(A_K)/rho(Gamma_K)`, decided by the rational extension and its integral
+restriction, and then the Schreier family of `O(K)` on the cosets of the
+liftable subgroup.  That is the next construction; none is landed here.
 ## Not run
 
 No full suite, no `just test`, no ast-grep gates (ast-grep is not installed).
