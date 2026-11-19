@@ -565,6 +565,32 @@ excludes precisely the one that fails.
 the lift predicate as the membership test, then the Schreier family -- is
 stated above as the route and is not implemented here.
 
+## The coset graph construction, implemented
+
+`pointwise_levi_image_generators` walks `O(K_I)/M_I` breadth first from the
+identity class over the certified generators, placing a candidate in an
+existing class exactly when the quotient of the two words lifts, and collects
+the Schreier words `w_{P'}^{-1} t w_P` of the non-tree edges.  Those lie in
+`M_I` -- each returns from the class of `t w_P` to its representative -- and
+they generate it, since a word fixing the identity class can be rewritten
+through the transversal at every step.  Each word is lifted by the same
+predicate, and a word that was found in the image and then has no lift raises
+rather than being dropped.
+
+With the reduction lemma above this is the missing half of the pointed family:
+`P` is `<g_s> . U_I` exactly when the lifted set generates `M_I`, and this
+returns exactly that.  It is **not wired into** `pointed_stabilizer_generators`
+in this round: that changes the public path, and its cost is the next
+measurement rather than a claim here.
+
+Measured: `U(2) + <2>` one generator in 0.92 s and `U(2) + <3>` one in 0.16 s
+(both with `M_I = O(K_I)`, so the family is the certified generator); the
+rank-five proper-image lattice five Schreier words in 27.68 s, one of them of
+trivial Levi class -- a radical element -- with `M_I` of index two.  The test
+file asserts the two cheap specimens only, because 27.68 s is over the 20 s
+per-call ceiling; its run is 2 passed in 7.65 s.
+
+
 
 
 
