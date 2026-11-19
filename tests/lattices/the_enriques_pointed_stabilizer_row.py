@@ -1,10 +1,11 @@
 r"""The Enriques period lattice's stabilizer rows, in the rows tier.
 
 This is #603's row work on `N = U + U(2) + E8(-2)`, card ``029J``.  It is not
-collected by pytest (its name does not begin with ``test_``): the two calls below
-take 0.9 s and 80.5 s, above the 20 s per-test gate
-(``sage_extensions.testing.suite_budget``), so they belong in the job that reports
-later, as ``tests/coble_kernel_plane_rows.py`` and the other row scripts do.
+collected by pytest (its name does not begin with ``test_``): the second cusp's
+finite-image count takes 76.2 s, above the 20 s per-test gate
+(``sage_extensions.testing.suite_budget``), so the row belongs in the job that
+reports later, as ``tests/coble_kernel_plane_rows.py`` and the other row scripts
+do.
 
 Two rows are measured, and they are different rows:
 
@@ -17,10 +18,15 @@ generators of `O(K_I)`.  The number of double cosets is the number of
 `ker rho`-orbits inside the `O(N)`-orbit of the line, which is
 `[rho(O(N)) : rho(Stab(line))]`; `rho` is onto, so that index is the card's.
 
-**The pointed family.**  `O(N).stabilizer(e_1)` is #603's construction.  At
-`L_1 = Ze_1` it returns; at `L_2 = Ze_3` it does not, its complement `K_I` having
-rank 10 with `O(K_I)`'s own family the indefinite port's
-(``results/issue603-the-divisible-cusp-blocker.md``).
+**The pointed family.**  `O(N).stabilizer(e_1)` is #603's construction, and
+both cusps answer with its two factors generated separately.  At `L_1 = Ze_1`
+the reduction splits along the lifts, so the family is one lift per generator
+of `O(K_I)` together with the radical's ten.  At `L_2 = Ze_3` it does not
+split: the lifts come from the coset graph of `O(K_I)/M_I`, which has a single
+class there, so that family is one lift per generator as well.  Each family
+presents the setwise line stabilizer together with `-id`, and its discriminant
+image index is asserted against the count the first paragraph computes
+independently.
 
 The card is read by tag with `card_line_orbit_lengths("029J", "Otilde+")`, which
 is the `Otilde+` row's own per-orbit sentence: 528 lines in two orbits of lengths
