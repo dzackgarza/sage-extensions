@@ -1,13 +1,18 @@
 # #198: the eight review items on `4f7438e`
 
-Line numbers are of the head this note is pushed on.  Seven items are met; the eighth is
-met for a one-chart manifold and refused, with a proof that the refusal is the
-representation's, on a general one.
+Line numbers are of the head this note is pushed on.
+
+**Verdict.** Seven of the eight review items are met.  The eighth --- sections as
+derivations of the *full* `C^oo(M)` --- is met on a manifold presented by one chart, and its
+general case is **refuted as unreachable in this representation**: the identification is
+Lee's Prop. 8.15 (2nd ed., Ch. 8), its locality step uses the bump function of Lemma 2.26,
+and no function stated by chart expressions is identically zero off a proper open set.  No
+further lemma can advance it; what remains is a decision about the clause, not a proof.
 
 | # | Item | State | Code | Deciding test |
 |---|---|---|---|---|
 | 1 | Tangent bundle, owned | met | `manifolds.py:2925` `tangent_bundle`; `vector_bundles.py` `SmoothVectorBundles` | `test_the_tangent_bundle_of_the_circle_is_trivial.sage` |
-| 2 | Sections as derivations of `C^oo(M)` | **partly met** | action `vector_bundles.py` `__call__`; reading `vector_bundles.py:1232` `from_derivation` | `test_a_derivation_of_a_one_chart_manifold_is_a_section.sage` |
+| 2 | Sections as derivations of `C^oo(M)` | **met on a one-chart manifold; the general case REFUTED as unreachable here** | action `vector_bundles.py` `__call__`; reading `vector_bundles.py:1232` `from_derivation` | `test_a_derivation_of_a_one_chart_manifold_is_a_section.sage` |
 | 3 | Restriction | met | `vector_bundles.py:1187` `restrict` | `test_a_section_stated_on_a_cover_restricts_although_another_chart_exists.sage` |
 | 4 | Pullback along a general map | met | `vector_bundles.py:738` `pullback_along`, `_pullback_family_agrees` | `test_a_pullback_agreement_reads_every_component_of_the_bundle.sage` |
 | 5 | Rank-`r` trivialization | met but for the algebra half | `vector_bundles.py:1365` `trivialized_by`, `:1499` `forward` | `test_a_frame_of_rank_two_exhibits_its_module_isomorphism.sage` |
