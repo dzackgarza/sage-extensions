@@ -1,17 +1,18 @@
 # #279, acceptance item by item
 
-Third revision, after a second reviewer's finding.  The operation is
+Fourth revision.  The operation is
 `src/sage_extensions/categories/lattices.py:10223`
 (`Lattices.vectors_of_square_with_complement`); the test file is
 `tests/lattices/test_vectors_of_square_with_complement.sage`.  Each line number
 is that of the tree this record is committed with, and every one of them was
 re-read there.
 
-What this revision changes: the certificate test's count used to be a typed `1`,
-so its expected number was the operation's own answer and not an oracle.  The
-test now reads card `0012` by tag (`tests/...:110`), ties that card's lattice to
-the specimen through `is_isometric_to` (`:111`), and takes the expected count
-from the card's `O` row at norm two (`:112`), compared at `:122`.
+Two expected values that used to be typed are now sourced.  The certificate test
+reads card `0012` by tag (`tests/...:110`), ties the card's lattice to its
+specimen through `is_isometric_to` (`:111`), and takes the expected count from
+the card's `O` row at norm two (`:112`), compared at `:122`.  The consumer test
+asserts its two specimens' descriptions from AEGS and Dolgachev--Kondo
+(`:290`--`:297`) and quotes the sentence its count stands on (`:279`--`:282`).
 
 ## 1. Primitive, the square, the isometric complement, and the certificate's index
 
