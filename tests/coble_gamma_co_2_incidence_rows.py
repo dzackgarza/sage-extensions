@@ -247,10 +247,24 @@ def record_plane_class_indices(label, subgroup, planes, limit=8) -> tuple:
             f"|Stab_{{O(q)}}(J)| = {stabilizer_order}, "
             f"|rho(Stab_Gamma(P))| = {image_order}, index {index}"
         )
+    indices = {index for _classes, index in recorded}
     log(
         f"[{label}] the plane class index over {len(recorded)} of the row's distinct classes J "
-        f"(bounded at {limit}; the row has {len(planes)} plane cusps)"
+        f"(bounded at {limit}; the row has {len(planes)} plane cusps): "
+        f"{len(indices)} distinct value{'s' if len(indices) != 1 else ''}"
     )
+    if recorded:
+        # The class count, from |O(q)| and the order of one class's stabilizer:
+        # the classes are one O(q)-orbit, and the index is constant over the row
+        # because chi(Gamma) is normal in chi(O(L)).
+        classes_seen, stabilizer_order, _image_order, _index = quotient.plane_class_index(
+            planes[0].representative()
+        )
+        log(
+            f"[{label}] the liftable classes J number |O(q)| / |Stab(J)| = "
+            f"{int(quotient.lattice.discriminant_group().O().cardinality()) // stabilizer_order} "
+            f"at this row's first class"
+        )
     return tuple(recorded)
 
 
