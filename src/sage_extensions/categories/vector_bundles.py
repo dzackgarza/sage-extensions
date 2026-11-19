@@ -1229,6 +1229,62 @@ class SmoothSectionModules(OwnedParameterizedCategory):
                 }
             )
 
+        def from_derivation(self, derivation):
+            r"""The section whose components are the derivation's values on a chart's coordinates.
+
+            ``V |-> (f |-> V f)`` is an isomorphism from the sections of ``TM`` onto the
+            derivations of ``C^oo(M)`` (Lee, *Introduction to Smooth Manifolds*, 2nd ed.,
+            Prop. 8.15), and its inverse reads the section off the derivation on the
+            coordinates: the ``i``-th component of ``V`` in a chart is ``V``'s value on that
+            chart's ``i``-th coordinate.
+
+            The reading needs those coordinates to be elements of ``C^oo(M)``, which they are
+            when one chart presents the manifold -- a chart whose domain is the manifold is
+            the smallest such case.  On a manifold of several charts a coordinate is a
+            function on its own chart only, and making it global needs a bump function this
+            tree does not carry, so the reading is refused there rather than guessed at.
+            """
+            manifold = self.base_manifold()
+            labels = tuple(manifold.chart_labels())
+            assert len(labels) == 1, (
+                f"cannot read a section off {derivation} on {manifold}: its charts are "
+                f"{labels}, and a derivation is read on coordinates that are functions on the "
+                f"manifold -- this reading is stated for a manifold presented by one chart"
+            )
+            chart = manifold.atlas()[labels[0]]
+            assert chart.domain() is manifold, (
+                f"cannot read a section off {derivation}: the chart {chart.label()} of "
+                f"{manifold} is read on {chart.domain()}, not on the manifold"
+            )
+            ring = chart.function_ring()
+            components = tuple(
+                derivation(manifold.smooth_function({chart.label(): coordinate}))
+                for coordinate in chart.coordinates()
+            )
+            misplaced = tuple(
+                component
+                for component in components
+                if element_parent(component) is not ring
+            )
+            assert not misplaced, (
+                f"cannot read a section off {derivation}: its values on the coordinates of "
+                f"{chart.label()} are not elements of {ring}"
+            )
+            # A value of the derivation is a function on the manifold, written chart by
+            # chart; the component of the section is that function's expression on this
+            # chart, raised into the chart's ring.
+            entries = []
+            for component in components:
+                formulas = _chartwise_formulas(component, manifold)
+                assert formulas is not None and chart.label() in formulas, (
+                    f"cannot read a section off {derivation}: its value {component} on a "
+                    f"coordinate of {chart.label()} is not written on that chart"
+                )
+                entries.append(
+                    _raise_manifold_expression(formulas[chart.label()], chart)
+                )
+            return self.section({chart.label(): tuple(entries)})
+
         def pullback_of(self, section):
             r"""The section ``q |-> s(f(q))`` of the pullback that ``section`` states.
 
