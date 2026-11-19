@@ -264,18 +264,38 @@ def test_the_enriques_gluing_gives_a_vector_of_square_minus_two_with_complement_
     r"""Items 3 and 4: the consumer specimen, its source's count, and its certificate.
 
     ``< -2 > perp T_Co`` sits in ``T_En`` with index two, so the gluing is one
-    index-two overlattice.  The count is not this operation's own: Namikawa,
-    *Periods of Enriques surfaces*, Math. Ann. 270 (1985), 201--222, Theorem
-    2.13, as cited in Alexeev--Engel--Garza--Schaffler, *Compact moduli of
-    Enriques surfaces of degree 2*, Nagoya Math. J. 259 (2025), 581--624,
-    section 2, gives a unique ``(-2)``-vector in ``T_En = U + U(2) + E8(2)``
-    modulo ``Gamma_En = O(T_En)``.  So ``T_En`` carries one orbit of
-    ``(-2)``-vectors, and exactly one of them has the complement of
-    Dolgachev--Kondo, Izv. Math. 77:3 (2013), section 3 equation (3.6), printed
-    p. 513, which is the vector that exists.
+    index-two overlattice.  The specimens are the papers' lattices, and the
+    description that names each is checked here.  Alexeev--Engel--Garza--
+    Schaffler (AEGS), *Compact moduli of Enriques surfaces of degree 2*, Nagoya
+    Math. J. 259 (2025), 581--624, section 2 (arXiv:2312.03638v2), has
+    ``T_En = U + U(2) + E8(2)``, rank 12 of signature ``(2, 10)``, even with
+    ``|A| = 2^10`` -- their ``(12, 10, 0)_2``; Dolgachev--Kondo, Izv. Math.
+    77:3 (2013), section 3 equation (3.6), printed p. 513, has
+    ``T_Co = N = <2> + E(2)``, rank 11 of signature ``(2, 9)`` with
+    ``|A| = 2^11``.  AEGS records that an indefinite even 2-elementary lattice
+    is determined by its signature and its ``(r, a, d)``, so these invariants
+    are the lattice and not a sample of it.
+
+    The count is not this operation's own either: AEGS writes "By [Nam85, 2.13]
+    there is a unique (-2)-vector in T_En modulo Gamma_En", and its Definition
+    2.6 sets ``Gamma_En = O(T_En)``; [Nam85, 2.13] is Namikawa, *Periods of
+    Enriques surfaces*, Math. Ann. 270 (1985), 201--222, Theorem 2.13.  So
+    ``T_En`` carries one orbit of ``(-2)``-vectors, and exactly one of them has
+    the complement of Dolgachev--Kondo, equation (3.6), printed p. 513, which is
+    the vector that exists.
     """
     lattice = NamedLattices.TEn
     complement = NamedLattices.Tco
+
+    assert lattice.module_rank() == 12
+    assert tuple(lattice.signature()) == (2, 10)
+    assert lattice.is_even() is True
+    assert int(lattice.discriminant_group().cardinality()) == 2**10
+    assert complement.module_rank() == 11
+    assert tuple(complement.signature()) == (2, 9)
+    assert complement.is_even() is True
+    assert int(complement.discriminant_group().cardinality()) == 2**11
+
     pair_order = int((Lattices(ZZ)([[-2]]) + complement).discriminant_group().cardinality())
     lattice_order = int(lattice.discriminant_group().cardinality())
     assert pair_order % lattice_order == 0
