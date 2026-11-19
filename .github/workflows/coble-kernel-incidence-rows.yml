@@ -137,6 +137,7 @@ jobs:
         run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - name: Run the restricted-stabilizer row
         env:
+          PYTHONPATH: src
           COBLE_CALL_CAP: ${{ inputs.cap || '10800' }}
         run: |-
           set -o pipefail
