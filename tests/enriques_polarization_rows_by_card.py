@@ -41,9 +41,10 @@ What is compared, and through which public call of #286:
   ``(2)`` and ``(2, flag=True)``, the public call of #286
   (``PredicateSubgroups.isotropic_orbit_representatives``, with ``cusps`` and
   ``tits_building_incidence`` built on it).
-* a ``0128`` row's ``#h`` is ``L.Aut().vector_orbit_representatives(2d)`` on the
-  card's own lattice, the same public orbit classifier restricted to the
-  group of the card being read, and its ``#\bar\Gamma_h`` is the number of
+* a ``0128`` row's ``#h`` is ``L.Aut().vector_orbit_representatives(2d,
+  content=1)`` on the card's own lattice, the same public orbit classifier
+  restricted to the group of the card being read and to the primitive stratum
+  the table counts, and its ``#\bar\Gamma_h`` is the number of
   distinct line/plane/flag triples the call returns over those classes: the
   paper's own class invariant is the order and the orbit sizes of the group
   (p. 11), and the orbit sizes are what the call reports.
@@ -281,10 +282,20 @@ def report_table4_row(orthogonal, lattice_card, degree, cap):
     log(f"  citation: {row['citation']}")
     started = time.time()
 
-    # h^2 = 2d in M(1/2) is square 2 * (2d) in M = 2W.
+    # h^2 = 2d in M(1/2) is square 2 * (2d) in M = 2W.  The card's #h counts
+    # the primitive vectors alone (D. Dutour Sikirić, K. Hulek,
+    # arXiv:2302.01679v2, Table 4, p. 17: "the first line shows the number #h
+    # of orbits of primitive vectors in a given degree"), so the row is read
+    # from the primitive stratum: an isometry preserves content, and the
+    # square-2d shell also holds the classes of content c > 1 with c^2 | 2d,
+    # which are the non-primitive numerical polarizations the source
+    # disregards ("we disregard in our approach since they do not lead to new
+    # moduli spaces", section 3.5, p. 19).
     signal.alarm(cap)
     try:
-        classes = orthogonal.unimodular.Aut().vector_orbit_representatives(degree)
+        classes = orthogonal.unimodular.Aut().vector_orbit_representatives(
+            degree, content=1
+        )
         signal.alarm(0)
         counts = int(classes.cardinality())
     except RowUndecided:
