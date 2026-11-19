@@ -1162,24 +1162,65 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
         def pointed_stabilizer_generators(self):
             r"""Return generators of the stabilizer of this rank-one vector.
 
-            Every member is admitted by the exact lattice-stabilizer predicate
-            of :meth:`pointed_stabilizer_action`, and is checked to fix the
-            marked vector before it is returned.
+            `P_I^1` is the pointwise stabilizer of `I = Z e`, and it sits in
+            `1 -> U_I -> P_I^1 -> M_I -> 1`, where `M_I` is its image in
+            `O(K_I)` and `U_I` is the kernel.  Which of the two constructions
+            answers depends on whether `L` splits along the chosen lifts of
+            `K_I`:
+
+            * when `K'` is primitive and `M = K'^perp` is unimodular, every
+              isometry of `K_I` extends as `id_M + sigma`, so `M_I = O(K_I)`
+              and the family is one such lift of each generator of `O(K_I)`
+              together with the radical's own generators.  It is the whole of
+              `P_I^1`: the Levi class of an element is a word in those
+              generators, and the same word in their lifts differs from the
+              element by an element of the kernel, which the second factor
+              generates.  The lifts are
+              :meth:`...IsotropicReductions._split_pointwise_levi_lift`'s and
+              the kernel's family is
+              :meth:`...IsotropicReductions._pointwise_kernel_generators`'s --
+              the Eichler transvections at the even-square parameters, exact on
+              an odd lattice as well as an even one.  Splitting also forces the
+              marked vector's divisibility to be one: `M` is primitive and
+              unimodular, `v` lies in it and is primitive there, so
+              `b(v, M) = Z`, and the even-square parameters are then the whole
+              kernel;
+            * otherwise the residue action of :meth:`pointed_stabilizer_action`
+              cuts the integral stabilizer out of the rational group of lifts
+              over a finite module, and its stabilizer's family is returned.
+              That construction's integrality is decided by the marked-line
+              lift torsor, whose residue locus is computed as a union of cosets
+              of the transvection kernel only over an even lattice
+              (:mod:`sage_extensions.categories.isotropic_lifts`), and it
+              supplies the lifts alone -- the radical's parameters are not
+              among its generators.
+
+            Every member is checked to fix the marked vector before it is
+            returned.
             """
             lattice = self.ambient_lattice()
             vector = self.inclusion()(
                 self.module_generator(next(iter(self.module_generating_set())))
             )
-            family = tuple(
-                lattice.integral_isometry(isometry)
-                for isometry in self.pointed_stabilizer_action().stabilizer().group_generators()
-            )
+            reduction = self.isotropic_reduction()
+            if reduction._reduction_lift_splitting() is not None:
+                quotient = reduction.quotient_lattice()
+                family = tuple(
+                    reduction.pointwise_levi_lift(generator)
+                    for generator in quotient.O().group_generators()
+                ) + tuple(reduction._pointwise_kernel_generators())
+            else:
+                family = tuple(
+                    lattice.integral_isometry(isometry)
+                    for isometry in self.pointed_stabilizer_action().stabilizer().group_generators()
+                )
             if any(isometry(vector) != vector for isometry in family):
                 raise ArithmeticError(
                     f"the pointwise stabilizer action at {vector} returned an integral "
                     f"isometry that moves the marked vector"
                 )
             return family
+
 
         def unipotent_group_generators(self):
             r"""Return a finite indexed family generating the full integral unipotent radical.

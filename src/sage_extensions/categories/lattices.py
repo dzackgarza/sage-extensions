@@ -3029,8 +3029,17 @@ class Lattices(OwnedCategoryOverBaseRing):
 
         The marking must be an arrow whose source is a rank-one lattice
         ``<q(v)>`` and whose image is a primitive isotropic vector `v` of an
-        indefinite even lattice over `ZZ`; every other marking is answered with
-        ``None`` and the caller keeps its own route.
+        indefinite lattice over `ZZ`; every other marking is answered with
+        ``None`` and the caller keeps its own route.  Parity enters only
+        through which construction owns the answer: the even case is the
+        residue action below, which decides integrality by cosets of the
+        transvection kernel over an even lattice, and the odd case is owned
+        when `L` splits along the chosen lifts of `K_I`, where
+        `id_M + sigma` is an integral lift of every `sigma in O(K_I)` and the
+        radical is the even-square transvections.  An odd lattice that does
+        not split is answered with ``None``: neither construction is exact
+        there, and the caller keeps its own route rather than being handed a
+        family that generates a proper subgroup.
 
         The pointed stabilizer is ``P_I^1 = {g in P_I : g(v) = v}`` for
         `I = \mathbf Z v`.  Its family is read from the pointwise
@@ -3068,11 +3077,13 @@ class Lattices(OwnedCategoryOverBaseRing):
         codomain = arrow.codomain()
         if codomain.base_ring() is not _owned_integers():
             return None
-        if codomain.is_definite() is not False or codomain.is_even() is not True:
+        if codomain.is_definite() is not False:
             return None
         if vector.is_primitive() is not True:
             return None
         if vector.q() != codomain.base_ring().zero():
+            if codomain.is_even() is not True:
+                return None
             return self._nonisotropic_pointed_stabilizer_generators(marked, setwise=False)
         subobject = codomain.primitive_isotropic_subobject(vector)
         reduction = subobject.isotropic_reduction()
@@ -3080,6 +3091,8 @@ class Lattices(OwnedCategoryOverBaseRing):
             return finite_ordered_set(
                 tuple(reduction.pointwise_perpendicular_kernel().group_generators())
             )
+        if codomain.is_even() is not True and reduction._reduction_lift_splitting() is None:
+            return None
         return finite_ordered_set(subobject.pointed_stabilizer_generators())
 
     def _nonisotropic_pointed_stabilizer_generators(self, marked, *, setwise=False):
