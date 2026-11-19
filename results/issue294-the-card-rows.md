@@ -33,11 +33,23 @@ library's count, read off the digest rather than through the test, is in the
 count on the lattice the card states (rank 5, signature (2, 3), determinants
 −2, −4, −8, −18, −72).
 
-The two witness vectors `3e + 3f + g` and its negative on `L_9` stay in the file:
-their expected values are the arithmetic of the vector written down — isotropic,
-primitive, divisibility three, and the two divided classes distinct and of order
-three — which the test recomputes through the library, and which is not a count
-of anything. The lattice they live in is read from card `6JRV`'s `gram_tensor`.
+Every row of the file is now one of the fifteen card rows. The two witness
+vectors `3e + 3f + g` and its negative on `L_9` were the last row whose expected
+values were not a card's — divisibility three, and divided classes of order three
+— and that row is gone. Its facts stay asserted, with the same two vectors and on
+the same lattice, in
+`tests/lattices/test_discriminant_line_orbits.sage::test_vectors_are_not_identified_when_a_discriminant_class_differs_from_its_negative`,
+which also reads the line counts there; nothing about the two classes is left
+only in this file.
+
+The card-driven alternative was rejected on cost and on what the library states.
+Cards `6JRS`–`6JRW` do state `integral.discriminant_form.isotropic_classes`
+(1, 1, 2, 2, 4 … 6), so a row could read it, but comparing it with the library
+means counting the isotropic classes of `A_L` itself: the divided-class
+enumeration that attains them (`isotropic_lines_by_divided_class`) is a residue
+loop that refuses above 4·10⁶ candidates, and divisor 6 on `6JRW` (rank five)
+is 1.7·10⁶ before divisor 12 and 24 are asked for. A count taken any other way
+would be this file's own enumeration, not a card comparison.
 
 ## What is recorded rather than asserted
 

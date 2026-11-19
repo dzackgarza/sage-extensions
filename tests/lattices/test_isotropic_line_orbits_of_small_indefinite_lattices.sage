@@ -71,27 +71,3 @@ def test_the_line_count_of_a_card_row_is_the_cards_constant_term(tag, group):
         vector = line.inclusion()(line.module_generator(0))
         assert vector.q() == ZZ(0), (tag, group)
         assert vector.is_primitive() is True, (tag, group)
-
-
-def test_the_two_witness_vectors_of_l_9_are_primitive_isotropic_of_divisibility_three() -> None:
-    r"""``v = 3e + 3f + g`` and its negative, on the Gram tensor of card ``6JRV``.
-
-    Both are isotropic and primitive, ``v`` has divisibility three, and the two
-    divided classes are distinct and of order three -- the arithmetic that
-    divisibility forces, computed by the library rather than assumed.
-    """
-    lattice = carded_lattice("6JRV")
-    labels = tuple(lattice.module_generating_set())
-    e, f = lattice.module_generator(labels[0]), lattice.module_generator(labels[1])
-    g = lattice.module_generator(labels[4])
-
-    for sign in (1, -1):
-        vector = sign * (3 * e + 3 * f + g)
-        assert vector.q() == ZZ(0)
-        assert vector.is_primitive() is True
-        assert lattice.div(vector) == ZZ(3)
-        assert int(lattice.divided_discriminant_class(vector).additive_order()) == 3
-
-    first = 3 * e + 3 * f + g
-    second = -(3 * e + 3 * f + g)
-    assert lattice.divided_discriminant_class(first) != lattice.divided_discriminant_class(second)
