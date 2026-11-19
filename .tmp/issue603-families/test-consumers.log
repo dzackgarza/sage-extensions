@@ -1,0 +1,57 @@
+tree SHA: 591bb0881b4b61565d7b16d96aecff9ad14f62dd (modified paths: 0)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 4.80 6.86 7.20 4/566 3322543
+files: tests/lattices/test_pointwise_levi_images.sage tests/lattices/test_scattone_plane_orbits.sage tests/lattices/test_the_parameter_lattice_of_the_unipotent_radical.sage; inner 900 s
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+time gates on: star import 0.44 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: asyncio-1.5.0, xdist-3.8.0, reportlog-1.0.0, platformdirs-4.13.5, hypothesis-6.170.15, anyio-4.15.1, timeout-2.4.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 15 items
+
+tests/lattices/test_pointwise_levi_images.sage ....                      [ 26%]
+tests/lattices/test_scattone_plane_orbits.sage .....                     [ 60%]
+tests/lattices/test_the_parameter_lattice_of_the_unipotent_radical.sage . [ 66%]
+.....                                                                    [100%]
+
+=============================== time-gate report ===============================
+collection took 24.16 s; the measured ceiling is 6 s
+========================== test-call performance gate ==========================
+tests/lattices/test_scattone_plane_orbits.sage::test_6jrx_has_the_cards_plane_orbits_under_o: 144.28 s > 20 s
+tests/lattices/test_scattone_plane_orbits.sage::test_6jry_has_the_cards_plane_orbits_under_o: 49.48 s > 20 s
+tests/lattices/test_scattone_plane_orbits.sage::test_6jry_has_the_cards_plane_orbits_under_o_plus: 59.34 s > 20 s
+============================== slowest durations ===============================
+144.28s call     tests/lattices/test_scattone_plane_orbits.sage::test_6jrx_has_the_cards_plane_orbits_under_o
+59.34s call     tests/lattices/test_scattone_plane_orbits.sage::test_6jry_has_the_cards_plane_orbits_under_o_plus
+49.48s call     tests/lattices/test_scattone_plane_orbits.sage::test_6jry_has_the_cards_plane_orbits_under_o
+19.11s call     tests/lattices/test_scattone_plane_orbits.sage::test_6jrx_has_the_cards_plane_orbits_under_o_plus
+3.00s call     tests/lattices/test_the_parameter_lattice_of_the_unipotent_radical.sage::test_the_parameters_of_the_radical_transvections_lie_in_the_lattice
+1.56s call     tests/lattices/test_pointwise_levi_images.sage::test_split_pointwise_levi_lift_over_an_infinite_quotient[line]
+1.38s call     tests/lattices/test_pointwise_levi_images.sage::test_glued_line_pointwise_image_excludes_quotient_negation
+0.72s call     tests/lattices/test_pointwise_levi_images.sage::test_zero_null_pointwise_levi_lift_and_joint_kernel
+0.56s call     tests/lattices/test_the_parameter_lattice_of_the_unipotent_radical.sage::test_every_basis_vector_has_an_element_of_the_radical_over_it
+0.22s call     tests/lattices/test_pointwise_levi_images.sage::test_split_pointwise_levi_lift_over_an_infinite_quotient[plane]
+0.04s call     tests/lattices/test_scattone_plane_orbits.sage::test_the_card_inputs_are_the_published_rank_21_lattices
+0.04s call     tests/lattices/test_the_parameter_lattice_of_the_unipotent_radical.sage::test_the_centre_is_generated_over_the_vanishing_parameter
+0.03s call     tests/lattices/test_the_parameter_lattice_of_the_unipotent_radical.sage::test_the_parameters_of_the_third_and_fourth_vectors_of_the_quotient_lie_in_the_lattice
+0.02s call     tests/lattices/test_the_parameter_lattice_of_the_unipotent_radical.sage::test_the_decision_at_the_modulus_decides_the_whole_lattice
+0.01s setup    tests/lattices/test_the_parameter_lattice_of_the_unipotent_radical.sage::test_the_centre_is_generated_over_the_vanishing_parameter
+
+(30 durations < 0.005s hidden.  Use -vv to show these durations.)
+======================== 15 passed in 304.60s (0:05:04) ========================
+[peakrss] test603: child waited=1 shell_code=1 samples=157
+[peakrss] peak tree RSS      : 1017 MiB
+[peakrss] low-water MemAvail : 613 MiB
+[peakrss] peak single VmHWM  : 1026 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     1015 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   308.4s procs=  3 rss=  1017 MiB hwm=  1026 MiB avail=  4141 MiB
+[peakrss]   t=   306.4s procs=  3 rss=  1013 MiB hwm=  1019 MiB avail=  4170 MiB
+[peakrss]   t=   310.4s procs=  3 rss=  1010 MiB hwm=  1026 MiB avail=  4114 MiB
+[peakrss]   t=   314.4s procs=  3 rss=  1005 MiB hwm=  1026 MiB avail=  4068 MiB
+[peakrss]   t=   304.4s procs=  3 rss=  1004 MiB hwm=  1012 MiB avail=  4156 MiB
+test exit: 1

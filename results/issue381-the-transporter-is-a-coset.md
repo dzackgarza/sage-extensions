@@ -534,3 +534,36 @@ fail loudly rather than quietly, which is the only reason it is safe to propose.
 kernel rows never get past.  If the substitution is right, the cusp enumeration
 drops from a 600 s-plus port walk to a 2.84 s library call on this line, and the
 `T_Co` kernel rows become measurable for the first time.
+
+## The substitution holds its consumers, and `T_Co` is undecided for a second reason
+
+**Consumers.**  The route the substitution changes is the plane-orbit one, and
+its tests are the Scattone plane rows.  At port `991b88b0`, load 11.10:
+
+    tests/lattices/test_scattone_plane_orbits.sage            144.28 s, 59.34 s, 49.48 s, 19.11 s
+    tests/lattices/test_the_parameter_lattice_of_the_unipotent_radical.sage
+    tests/lattices/test_pointwise_levi_images.sage
+
+    **15 passed in 304.60 s**, collection 24.16 s against the 6 s ceiling.
+
+Every one of the four Scattone plane-row tests passes with the library's line
+orbits in place of the port's vector classes -- those rows read their counts off
+this very path -- and the small `Otilde`/`Otilde+` rows are byte-identical to
+the port route's run, as the commit records.
+
+**`T_Co` is still undecided.**  The `Otilde` row at rank eleven under the same
+600 s cap, with the substitution in place:
+
+    [Otilde] the row's route: divided-class ... (decided in 4.2 s)
+    [  609.06s] Otilde: undecided: the row did not return inside its 600 s cap  [604.22 s]
+
+So the substitution does what it was measured to do -- the `K_v` line
+enumeration of the cusp-5 line answers in 2.84 s -- and the row is still not
+past its cusps.  Either a *different* line's `K_v` is the slow one, or the cost
+after the cusps (the covering, or the planes' transport) is.  The earlier dumps
+are not evidence for the new route: they were taken with the port in place.
+
+**Next.**  Stack dumps on the new route, as before: the same
+`faulthandler.dump_traceback_later(30, repeat=True)` run at `T_Co`, and the
+frames name which of the two it is.  Nothing else is worth measuring until
+that is answered.

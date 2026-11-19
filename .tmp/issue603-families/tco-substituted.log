@@ -1,0 +1,7 @@
+tree SHA: 591bb0881b4b61565d7b16d96aecff9ad14f62dd (modified paths: 0)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 11.10 7.67 6.75 17/620 3311511
+probe: .tmp/probe-row-tco.py; inner 1500 s
+[Otilde] the row's route: divided-class, taken because its lines carry divided classes and its covering is carried from one plane to the others (decided in 4.2 s)
+[  609.06s] Otilde: [Otilde] undecided: the row did not return inside its 600 s cap  [604.22s]
+[Otilde+] the row's route: divided-class, taken because its lines carry divided classes and its covering is carried from one plane to the others (decided in 0.0 s)
