@@ -13494,38 +13494,42 @@ class IsotropicReductions(OwnedCategoryOverBaseRing):
             than rebuilding one.  What each rank asks for:
 
             * rank zero: \(U_I\) is trivial and the family is empty;
-            * rank one \(I=\mathbf Z e\): the Eichler transvections
-              \(E_{e,x}\) over one lift \(x\) of each generator of
-              \(K_I=I^\perp/I\).  The assignment \(x\mapsto E_{e,x}\) is a
-              group morphism killing \(e\)
+            * rank one \(I=\mathbf Z e\), of divisibility one: the Eichler
+              transvections \(E_{e,x}\) over a `ZZ`-basis of
+              \(P=\{x\in I^\perp : q(x)\in 2\mathbf Z\}\).  The assignment
+              \(x\mapsto E_{e,x}\) is a group morphism whose kernel is
+              \(\mathbf Z e\)
               (Gritsenko--Hulek--Sankaran, arXiv:0810.1614, section 3.1,
               equations (4)--(5), the additivity of the transvection
-              parameter) and every element of \(U_I\) acts on \(I^\perp\) by
-              \(y\mapsto y+\lambda(\bar y)e\) for one
-              \(\lambda\in\operatorname{Hom}(K_I,\mathbf Z)\), so the family
-              generates \(U_I\) once the parameters \(b(x,-)\), \(x\in K_I\),
-              exhaust \(\operatorname{Hom}(K_I,\mathbf Z)\) -- that is, once
-              \(K_I\) is unimodular.  Where they do not, the exact group is
-              the integral kernel of the marked-line reduction
-              (``integral_kernel_group_generators`` of
-              :mod:`sage_extensions.categories.isotropic_lifts`) and the call
-              refuses rather than returning a family of finite index in the
-              radical;
-            * rank at least two: the plane's own family, whose completeness
-              is the parameter lattice
+              parameter), and it is an isomorphism onto \(U_I\): complete
+              \(e\) to a basis \(e,w\) of a hyperbolic plane inside \(L\), so
+              that \(L=J\oplus\mathbf Z w\) with \(J=I^\perp\) and
+              \(b(e,w)=1\).  An element of \(U_I\) sends \(y\in J\) to
+              \(y+c(y)e\) with \(c\in\operatorname{Hom}(J,\mathbf Z)\)
+              vanishing on \(e\), and \(w\) to \(w+z\) with \(z\in J\); the
+              isometry equations are \(c(y)=-b(y,z)\) for every \(y\in J\)
+              and \(b(z,z)+2b(w,z)=0\), and \(x=z+\lambda e\) satisfies
+              \(E_{e,x}=g\) for every \(\lambda\).  So \(U_I\) is exactly the
+              image of \(P/\mathbf Z e\), of rank \(\operatorname{rank}K_I\),
+              and a basis of \(P\) maps onto it.  The parameters are
+              \(P\), not \(\operatorname{Hom}(K_I,\mathbf Z)\) and not
+              \(K_I\): at an odd \(x\) the coefficient \(q(x)/2\) of the
+              transvection is not integral, and
+              \(\operatorname{Hom}(K_I,\mathbf Z)\) is larger than
+              \(K_I\) by \(|{\rm disc}(K_I)|\) where \(K_I\) is not
+              unimodular -- neither is the parameter lattice;
+            * rank one of higher divisibility, and rank at least two: not
+              presented here.  At divisibility \(d>1\) the transvection
+              parameters of \(U_I\) are the \(x\in I^\perp\otimes\mathbf Q\)
+              with \(dx\in I^\perp\), \(b(I^\perp,x)\subseteq\mathbf Z\) and
+              \(q(x)d\in 2\mathbf Z\), a lattice strictly larger than the
+              even part of \(I^\perp\) that this call does not build; the
+              plane case instead reads the exact parameter lattice
               :meth:`...unipotent_parameter_lattice` decides -- one element
-              over each vector of the exact integral parameter lattice
-              together with a generator of the centre.  That is the family
-              :meth:`...unipotent_radical_generators` presents, and the
-              completeness claim travels with it: a parameter outside that
-              lattice is a missing generator, which is what is open at
+              over each vector of it together with a generator of the centre
+              (:meth:`...unipotent_radical_generators`).  A parameter outside
+              that lattice is a missing generator, which is what is open at
               Sterk's `P_2` of \(T_{\mathrm{En}}\).
-
-            The line case also needs the splitting hypothesis: a complement
-            \(U\) of \(I^\perp\) pairing trivially with \(K_I\) is what makes
-            the transvection parameters the whole of the radical, and where
-            \(U\) pairs nontrivially with \(K_I\) that step is not justified
-            here.
             """
             lattice = self.isotropic_embedding().codomain()
             subobject = self.isotropic_sublattice()
@@ -13539,36 +13543,76 @@ class IsotropicReductions(OwnedCategoryOverBaseRing):
                     for generator in subobject.unipotent_radical_generators()
                 )
             quotient = self.quotient_lattice()
-            if quotient.is_unimodular() is not True:
+            ring = lattice.base_ring()
+            marked = subobject.embedded_module_generators()[
+                subobject.module_generating_set()[0]
+            ]
+            if marked.div() != ring.one():
                 raise NotImplementedError(
-                    f"cannot present the radical of the pointwise stabilizer of {self} from its "
-                    f"Eichler transvections: they realize the functionals b(x, -) for x in "
-                    f"K_I = {quotient}, whose image has index |disc(K_I)| in Hom(K_I, ZZ), and "
-                    f"K_I is not unimodular, so those parameters span only a proper sublattice of "
-                    f"the radical.  The exact integral group there is the integral kernel of the "
-                    f"marked-line reduction, "
-                    f"isotropic_lifts.IsotropicReductionLiftTorsors.integral_kernel_group_generators"
-                )
-            if subobject.splitting_complement() is None:
-                raise NotImplementedError(
-                    f"cannot present the radical of the pointwise stabilizer of {self} from its "
-                    f"Eichler transvections: I = {subobject} has no complement in {lattice} that "
-                    f"pairs trivially with K_I = {quotient}, so an element of the radical may also "
-                    f"act on such a complement, and the transvection parameters alone are not "
-                    f"shown to generate the whole radical"
+                    f"cannot present the radical of the pointwise stabilizer of {self} "
+                    f"from the Eichler transvections of the even part of I^perp: the "
+                    f"marked vector has divisibility {marked.div()} in {lattice}, and at "
+                    f"divisibility d > 1 the parameters of the integral kernel are the "
+                    f"x with d x in I^perp, b(x, I^perp) in ZZ and q(x) d in 2 ZZ, which "
+                    f"is strictly larger than {{x in I^perp : q(x) in 2 ZZ}}; that "
+                    f"lattice is not built here"
                 )
             family = []
             identity = lattice.Aut().identity()
-            frame = subobject.quotient_frame_lifts()
-            for label in sorted(frame, key=int):
-                vector = frame[label]
-                if vector.is_zero():
-                    continue
+            for vector in self._pointwise_kernel_parameter_vectors():
                 transvection = subobject.eichler_transvection(vector)
                 if transvection == identity:
                     continue
                 family.append(parabolic(transvection))
             return tuple(family)
+
+        @cached_method
+        def _pointwise_kernel_parameter_vectors(self):
+            r"""Return a `ZZ`-basis of \(\{x\in I^\perp : q(x)\in 2\mathbf Z\}\), in the ambient lattice.
+
+            ``q(x)`` is even exactly on the parameters ``x`` for which the
+            Eichler transvection \(E_{e,x}\) is an integral isometry of `L`:
+            its update is
+            \(y\mapsto y-b(y,x)e\) on \(I^\perp\) and
+            \(w\mapsto w+x-(b(w,x)+q(x)/2)e\), so \(q(x)/2\) is the only
+            coefficient outside the ring
+            (:meth:`...PrimitiveIsotropicSubobjects.eichler_transvection`
+            refuses the others).  On an even lattice every parameter is
+            admissible; on an odd one the admissible parameters are an index
+            two sublattice, and this method returns a basis of that
+            sublattice, not one of the larger lattice it sits in.
+
+            \(q(x+y)-q(x)-q(y)=2b(x,y)\), so \(q\) is additive mod two and
+            \(x\mapsto q(x)\) is a linear functional on
+            \(I^\perp/2I^\perp\).  The recognised basis is the one that
+            functional describes: the basis vectors of even square, twice one
+            of odd square, and the sum of that one with each other odd-square
+            vector.  Their span lies in the even part and has index at most
+            two in \(I^\perp\), which the functional's nonvanishing makes
+            exact.
+            """
+            lattice = self.isotropic_embedding().codomain()
+            ring = lattice.base_ring()
+            perpendicular = self.orthogonal_complement()
+            inclusion = perpendicular.inclusion()
+            basis = tuple(
+                inclusion(perpendicular.module_generator(label))
+                for label in tuple(perpendicular.module_generating_set())
+            )
+            even = tuple(
+                int(lattice.q(vector)) % 2 == 0 for vector in basis
+            )
+            parameters = []
+            odd = None
+            for vector, is_even in zip(basis, even):
+                if is_even:
+                    parameters.append(vector)
+                elif odd is None:
+                    odd = vector
+                    parameters.append(lattice.scalar_multiple(ring(2), vector))
+                else:
+                    parameters.append(vector + odd)
+            return tuple(parameters)
 
         @cached_method
         def _pointwise_levi_integral_lift_or_none(self, isometry):
@@ -13582,8 +13626,12 @@ class IsotropicReductions(OwnedCategoryOverBaseRing):
             * rank zero: \(I=0\), so \(K_I=L\), \(P_I^1=O(L)\), and the class
               isometry is carried across the identification of the two by
               :meth:`...PrimitiveIsotropicSubobjects.pointwise_quotient_lift`;
-            * rank one: \(g\) fixes the single generator \(e\), so the fibre
-              is the marked-line lift torsor \(F^+(\gamma)\) of
+            * rank one: \(g\) fixes the single generator \(e\).  When `L`
+              splits along the chosen lifts as `M + K'` with `M` unimodular,
+              \(\mathrm{id}_M+\sigma\) is an integral lift for every
+              \(\sigma\in O(K_I)\), which is
+              :meth:`_split_pointwise_levi_lift`; otherwise the fibre is the
+              marked-line lift torsor \(F^+(\gamma)\) of
               :meth:`_levi_fibres`, and
               :meth:`...IsotropicReductionLiftTorsors.integral_base_point_or_none`
               decides emptiness from the finite integral residue locus rather
@@ -13601,10 +13649,32 @@ class IsotropicReductions(OwnedCategoryOverBaseRing):
             subobject = self.isotropic_sublattice()
             rank = int(subobject.module_rank())
             if rank == 1:
+                split_lift = self._split_pointwise_levi_lift(isometry)
+                if split_lift is not None:
+                    return split_lift
                 fixing, _reversing = self._levi_fibres(isometry)
                 point = fixing.integral_base_point_or_none()
                 return None if point is None else lattice.integral_isometry(point)
             return subobject.pointwise_quotient_lift(isometry)
+
+        def _split_pointwise_levi_lift(self, isometry):
+            r"""Return ``id_M + sigma`` when `L` splits along the lifts, else ``None``.
+
+            The splitting is :meth:`_reduction_lift_splitting`'s: when `L`
+            is `M + K'` with `M` unimodular, every isometry of `K_I` extends
+            to `L` fixing `M` pointwise, and `M` contains the marked line, so
+            the extension fixes the line as well.  The image of the pointwise
+            Levi action is then all of `O(K_I)`, and this section answers
+            every element of it without a residue orbit over
+            `2 d^2 |disc(K_I)|^2 [L : i^*(L)]` residue classes.
+
+            ``None`` says the lattice does not split along these lifts, and
+            the caller keeps the marked-line torsor, which decides the same
+            question from the finite integral residue locus.
+            """
+            if self._reduction_lift_splitting() is None:
+                return None
+            return self.lift_isometry(isometry)
 
         def _pointwise_levi_section(self, isometry):
             r"""An element of the pointwise parabolic realizing an isometry in its image."""
@@ -13638,6 +13708,45 @@ class IsotropicReductions(OwnedCategoryOverBaseRing):
             r"""Return the joint kernel on I and I-perp/I, with its integral generators."""
             return self.pointwise_levi_action(subgroup=subgroup).kernel()
 
+        @cached_method
+        def _reduction_lift_splitting(self):
+            r"""Return the splitting \\(L=M\\perp K'\\) along the chosen lifts, or ``None``.
+
+            The chosen lifts of the generators of \\(K_I\\) span
+            \\(K'\\subseteq I^\\perp\\), a copy of \\(K_I\\), and
+            \\(M=K'^\\perp\\) contains \\(I\\) because the lifts lie in
+            \\(I^\\perp\\).  The pair is a splitting of `L` exactly when `K'`
+            is primitive and `M` is unimodular, and only then is
+            \\(g=\\mathrm{id}_M\\perp\\sigma\\) an integral isometry for every
+            \\(\\sigma\\in O(K_I)\\).  The returned quadruple is
+            ``(embedded_lifts, complement, complement_inclusion,
+            unimodular_summand)``; ``None`` says this lattice does not split
+            along these lifts, which is a property of the lattice and the
+            lifts and not of any one isometry.
+            """
+            lattice = self.isotropic_embedding().codomain()
+            perpendicular_inclusion = self.orthogonal_complement().inclusion()
+            lifts = self.reduction_lifts()
+            labels = self.module_generating_set()
+            embedded_lifts = finite_indexed_family(
+                labels,
+                lambda label: perpendicular_inclusion(lifts(label)),
+                name="Embedded isotropic-reduction lifts",
+            )
+            complement = lattice.subobject_on(embedded_lifts)
+            unimodular_summand = complement.orthogonal_complement()
+            if (
+                complement.is_primitive() is not True
+                or unimodular_summand.is_unimodular() is not True
+            ):
+                return None
+            return (
+                embedded_lifts,
+                complement,
+                complement.inclusion(),
+                unimodular_summand,
+            )
+
         def lift_isometry(self, isometry):
             r"""Return \(g\in P_I\) with \(\bar g=\) ``isometry``, when \(L\) splits along the lifts.
 
@@ -13651,27 +13760,25 @@ class IsotropicReductions(OwnedCategoryOverBaseRing):
             Unimodularity of \(M\) is what makes the splitting computable:
             the correlation \(M\to M^\vee\) is then an isomorphism, and the
             \(M\)-component of \(x\in L\) is the correlation's inverse
-            applied to \(b(x,-)|_M\).
+            applied to \(b(x,-)|_M\).  The splitting itself is
+            :meth:`_reduction_lift_splitting`'s, so a caller that must
+            answer ``None`` instead of refusing reads it there.
             """
             automorphisms = self.Aut()
             assert isometry.parent() is automorphisms, (
                 f"cannot lift {isometry!r} to P_I: it lies in {isometry.parent()!r}, not in O(K_I) for K_I = {self!r}"
             )
             lattice = self.isotropic_embedding().codomain()
-            perpendicular_inclusion = self.orthogonal_complement().inclusion()
-            lifts = self.reduction_lifts()
-            labels = self.module_generating_set()
-            embedded_lifts = finite_indexed_family(
-                labels,
-                lambda label: perpendicular_inclusion(lifts(label)),
-                name="Embedded isotropic-reduction lifts",
-            )
-            complement = lattice.subobject_on(embedded_lifts)
-            unimodular_summand = complement.orthogonal_complement()
-            assert complement.is_primitive() and unimodular_summand.is_unimodular(), (
+            splitting = self._reduction_lift_splitting()
+            assert splitting is not None, (
                 f"cannot lift {isometry!r} from O(K_I) to P_I by id_M + sigma for K_I = {self!r}: the lifts of K_I span a sublattice K' of {lattice!r} that is not primitive or whose orthogonal complement M is not unimodular, so {lattice!r} does not split as M + K'"
             )
-            complement_inclusion = complement.inclusion()
+            (
+                embedded_lifts,
+                complement,
+                complement_inclusion,
+                unimodular_summand,
+            ) = splitting
             summand_inclusion = unimodular_summand.inclusion()
             into_complement = self.module_category().Mor(self, complement)(
                 lambda label: complement_inclusion.lift(embedded_lifts(label))

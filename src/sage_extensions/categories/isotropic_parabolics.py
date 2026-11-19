@@ -1091,13 +1091,20 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
 
             The framing supplies ``f``: the transvection depends on the chosen
             generator and not only on the line, since ``E_{-f,x} = E_{f,-x}``.
-            The coefficient ``q(x)/2`` is integral because ``x`` lies in an
-            even lattice, which is asserted.
+            The only coefficient outside `ZZ` is ``q(x)/2``, so the parameter
+            ``x`` is admissible exactly when ``q(x)`` is even -- not when the
+            whole lattice is even.  On an even lattice that is every ``x`` in
+            ``f^perp``; on an odd one it is the even-norm sublattice of
+            ``f^perp``, which is what a caller must ask for, and a parameter
+            outside it is refused below with ``q(x)`` in the message.
 
             ``E_{f,x}`` fixes ``f`` and satisfies ``(E_{f,x} - 1)(f^perp) <=
             Z f``, so it lies in ``unipotent_radical()``.  The assignment
             ``x -> E_{f,x}`` is a group morphism from ``(f^perp, +)`` killing
-            ``f``, hence a morphism from ``f^perp/f``.
+            ``f``, hence a morphism from ``f^perp/f``, which is an
+            isomorphism onto the radical on the even-norm parameters:
+            ``...IsotropicReductions._pointwise_kernel_generators`` reads the
+            kernel of the Levi action as their images.
             """
             lattice = self.ambient_lattice()
             ring = lattice.base_ring()
@@ -1105,11 +1112,6 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
                 f"no Eichler transvection is attached to {self}: an Eichler transvection "
                 f"needs an isotropic sublattice of rank one, but {self} has rank "
                 f"{self.module_rank()}"
-            )
-            assert lattice.is_even(), (
-                f"no Eichler transvection of {self} is defined in {lattice}: the "
-                f"coefficient q(x)/2 is integral only on an even lattice, and {lattice} "
-                f"is not even"
             )
             isotropic_vector = self.embedded_module_generators()[
                 self.module_generating_set()[0]
