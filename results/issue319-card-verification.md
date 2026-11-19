@@ -1,105 +1,115 @@
 # #319 — the card rows of the 87 numerical polarizations and of card 0128
 
-Commit: (this commit, `main`).
+The issue asks for one module that reads each card value by its tag and compares
+it with the public orbit call of #286, naming the paper, the table and the page
+of the version read; a disagreement is a defect of the call, and a tolerance or
+a skipped row is not a pass.  The module is
+`tests/enriques_polarization_rows_by_card.py`; the long rows run in the image
+job `enriques-polarization-rows`, and the rows that fit the per-test gate are
+decided by `tests/lattices/test_the_enriques_polarization_degrees_by_card.py`.
 
-This unit adds tests and edits no library file.  The acceptance module exists, runs
-end to end, and decides every row it can; the rows it cannot decide are reported
-`UNDECIDED` with the cap and the stage, which is red, not a pass.  **No row of the
-87 polarization cards is decided today**: the public call of #286 does not return on
-`Gamma_h` for the smallest of them, and the same call blocks the second line of
-every Table 4 row.
+## Which card row is compared through which call
 
-## What landed
+| card row | read by tag as | compared through | state at this commit |
+| --- | --- | --- | --- |
+| `0128` `#h`, degrees `2 … 72` | `card("polarization_counts", "rows")[2d]["primitive_classes"]` | `NamedLattices.E10.Aut().vector_orbit_representatives(2d, content=1)` | **36 of 36 equal**, one process, 2–6 s a degree (measured on the source's g-basis model of the same lattice; `NamedLattices.E10` gives the same counts at degrees 2 and 8) |
+| `0128` `#\bar\Gamma_h` | `[2d]["group_classes"]` | the distinct line/plane/flag triples over those classes | undecided: it needs the plane and flag rows |
+| `gamma-h-N` `#I_1` (lines) | `card("arithmetic_groups", tag)["line_orbits"]` | `Gamma_h.isotropic_orbit_representatives(1)` | **87 of 87 equal** (`results/issue17-gamma-h-line-rows.md` records the run over all 87); the smallest card re-measured at this commit: `gamma-h-3` → 5 in 61.7 s, after the ambient $O(N)$ line row (13.6 s) in the same process |
+| `gamma-h-N` `#I_2` (planes) | `["plane_orbits"]` | `isotropic_orbit_representatives(2)` | undecided (`gamma-h-3`, the smallest plane row, did not return in 480 s) |
+| `gamma-h-N` `#I_12` (flags) | `["flag_orbits"]` | `isotropic_orbit_representatives(2, flag=True)` | undecided (not measured: it reads the same ambient rank-2 classes, and its stabilizer search is the one the plane shortcut does not cover) |
 
-| path | what it is |
-| --- | --- |
-| `tests/cards/lattice-database-enriques.json` | the rows, read from `dzackgarza/lattice-database` at commit `587d56febe5856d54c6bc9fc023fa5a425f76bfb`: the 87 `gamma-h-N` cards (lattice, parent group, LaTeX subset `S`, `|Gamma-bar_h|`, `#I_1`, `#I_2`, `#I_12`, citation) and card `0128`'s `integral.polarization_counts` rows per degree `2d = 2, ..., 72` (`#h`, `#Gamma-bar_h`, citation) |
-| `tests/cards/refresh_lattice_database_enriques.py` | regenerates that digest from one database commit; it refuses a ref that is not a full 40-hex SHA |
-| `tests/cards/README.md` | which card field backs which digest field, and the paper version the cited pages belong to |
-| `tests/enriques_polarization_rows_by_card.py` | the acceptance module: builds each lattice and group as its card states, calls the public method, compares, prints a defect block on a difference, exit 1 on any difference or undecided row |
-| `.github/workflows/enriques-polarization-rows.yml` | the one CI job the long rows live in: `workflow_dispatch` (cards, degrees, per-call cap, budget) and nightly, 350-minute ceiling.  Stored at `results/issue319-enriques-polarization-rows.workflow.yml`: the GitHub connection of this session has no `workflows` permission, so a push creating a file under `.github/workflows/` is rejected for the whole ref (measured; see below) |
+## The defect this round repaired: `#h` is the primitive stratum
 
-## The acceptance, item by item
+Card `0128`'s Table 4 states `#h` per degree, and the sentence with the table
+says which vectors it counts: "the first line shows the number `#h` of orbits of
+**primitive** vectors in a given degree" (D. Dutour Sikirić, K. Hulek, *Moduli of
+polarised Enriques surfaces — computational aspects*, J. London Math. Soc. 110
+(2024), arXiv:2302.01679v2, Table 4, printed p. 17).  The module read it as
+`vector_orbit_representatives(2d)`, which is the whole square-`2d` shell: content
+is an isometry invariant, so that shell is the disjoint union of the classes of
+content `c` with `c² | 2d`, and the source disregards the non-primitive ones —
+"the list of [CDGK, Appendix] also contains nonprimitive numerical polarizations,
+which we disregard in our approach since they do not lead to new moduli spaces"
+(section 3.5, p. 19).  The row now reads
+`vector_orbit_representatives(2d, content=1)`, and the same classes feed the
+row's `#\bar\Gamma_h` line.
 
-**One test module reads each card value by its tag and compares it with the call's
-result through the same public call that #286 uses.**  `tests/cards/…json` is written
-by the refresher from the cards themselves; the module reads a row by its card tag
-(`gamma-h-N`, or `0128` and a degree) and compares:
-
-* a `gamma-h-N` row: the card names the lattice (`029J`, $N = U \oplus U(2) \oplus
-  E_8(-2)$) and the parent group (`o-t-en`, $O(N)$), and its LaTeX names the subset
-  $S$ that $h$ is orthogonal to — `\overline{\{0\}}` for card 1, `\emptyset` for card
-  87.  The module builds $h = \sum_{i \in S} g_i$ in the paper's $g$-basis (equation
-  (7), p. 9), transports it to the invariant lattice, and takes
-  `Involutions.I_En.polarized(h).coinvariant_extension_subgroup()` — $\Gamma_h$ as
-  equation (5), p. 7, defines it.  The three counts are
-  `isotropic_orbit_representatives(1)`, `(2)` and `(2, flag=True)`:
-  `PredicateSubgroups.isotropic_orbit_representatives`, the public call of #286 on
-  which `cusps` and `tits_building_incidence` are built.
-* an `0128` row: `#h` is `Lattices(ZZ)(W).Aut().vector_orbit_representatives(2d)` on
-  the card's own lattice, and `#Gamma-bar_h` is the number of distinct
-  line/plane/flag triples the call returns over those classes — the paper's own class
-  invariant is the order and the orbit sizes of the group (p. 11).
-
-Every row prints its card's citation, which names the paper, the table and the page:
-Table 1, p. 13 for cards 1–41 and Table 2, p. 14 for cards 42–87, Table 4, p. 17 for
-the degree rows, all of arXiv:2302.01679 **version 2 (26 Sep 2023)** — the version
-those page numbers were checked against.
-
-The decode is not trusted on its own: over the 87 cards it reproduces, row for row,
-the subset and the three counts that `tests/lattices/test_enriques_polarization_orbits.sage`
-transcribed from pages 13 and 14 — 87 cards compared, 0 disagreements, 87 distinct
-subsets (`python3 -` over the digest and that module's `_CASES`; recorded in
-`.tmp/qc-evidence/INDEX.md`).
-
-**A mismatch is filed the same day; a tolerance or a skipped row is not a pass.**
-Nothing today *differs*: the rows are undecided, because the call does not return.
-That is itself the defect to file, and it names the lattice and the group:
+Measured on the card's lattice, one process, all 36 degrees:
 
 ```
-dzackgarza/sage-extensions — the public isotropic-orbit call does not return on Gamma_h
+primitive stratum == card's #h : 36 of 36, 0 disagreements
+whole shell      != card's #h : 13 of 36, at 8, 16, 18, 24, 32, 36, 40, 48,
+                                50, 54, 56, 64, 72
+degree 8: card 2, primitive 2, shell 3
+          (the extra class is 2v with q(v) = 2, of content 2 and square 8)
+degree 16: card 4, primitive 4, shell 6
+degree 72: card 16, primitive 16, shell 23
+```
+
+So before this round the module would have printed a `DEFECT` block for 13 card
+rows the call reproduces, and would have built `Gamma_h` from non-primitive
+vectors at those 13 degrees.
+
+No library answer is wrong here: `vector_orbit_representatives(square)` returns
+every content stratum, as its own docstring states, and `content=1` is the
+primitive one.  The defect was the module's reading, so the red evidence is the
+module's own run (`#h: expected 2, call 3` at degree 8) rather than a failing
+test of a library call.  The guard that keeps the reading is
+`test_the_degree_eight_row_counts_the_primitive_class_alone`: it asserts both
+that the card's row is the primitive count and that the shell of square 8 is
+strictly larger, so a reader that drops `content=1` fails it.
+
+## The change, and what runs in the gate
+
+`tests/lattices/test_the_enriques_polarization_degrees_by_card.py` decides the
+part of Table 4 that fits the gate: the smallest row (degree 2) and the smallest
+degree where the two readings differ (degree 8), read by card tag:
+
+```
+tests/lattices/test_the_enriques_polarization_degrees_by_card.py ...  [100%]
+7.24s call  test_the_degree_eight_row_counts_the_primitive_class_alone
+5.02s call  test_the_smallest_degree_row_is_the_cards_orbit_count
+0.08s call  test_the_named_lattice_is_the_cards_lattice
+3 passed in 13.61s
+```
+
+The 34 other degrees are the same row of the same card and are compared by the
+image job, which the orchestrator dispatches; nothing here narrows that job.
+
+## The undecided rows, and the defect they are
+
+The plane and flag rows of a `gamma-h-N` card do not return, so the module
+reports them `UNDECIDED` and the run is red — the state the issue calls a
+non-pass.  The block to file, with the lattice and the group:
+
+```
+dzackgarza/sage-extensions — the plane and flag rows of the public
+isotropic-orbit call do not return on Gamma_h
   lattice: 029J (U + U(2) + E8(-2), rank 12, signature (2,10), determinant 1024)
-  group:   gamma-h-1 = Gamma_h of case 1, S = overline{0}, |Gamma-bar_h| = 696729600
-  row:     #I_1 = 5, #I_2 = 9, #I_12 = 18 (D. Dutour Sikirić, K. Hulek,
-           arXiv:2302.01679, Table 1, p. 13)
-  measured: Gamma_h builds in 38.0 s, contains_character_kernel() and
-           character_data_is_complete() are True, discriminant_image().order() is the
-           card's 696729600 in 136.7 s; isotropic_orbit_representatives(1), (2) and
-           (2, flag=True) each did not return in 300 s
+  group:   gamma-h-3 = Gamma_h of case 3, S = overline{7}, |Gamma-bar_h| = 92897280
+  row:     #I_2 = 10, #I_12 = 19 (D. Dutour Sikirić, K. Hulek,
+           arXiv:2302.01679v2, Table 1, p. 13)
+  measured at this commit: Gamma_h,3 builds in 3.2 s after the lattice's 1.0 s;
+           isotropic_orbit_representatives(1) returns the card's 5 in 61.7 s;
+           isotropic_orbit_representatives(2) was still running at the 480 s cap
+           of its run ("planes: UNDECIDED after 480s"), and the same module's
+           gamma-h-4 line row PASSes (expected 6, call 6) in 58 s
 ```
 
-The connected GitHub connection of this session cannot create issues (it reads issues
-and writes branches only), so this block is what the orchestrator posts; it is written
-here rather than left implicit.
+The connected GitHub connection of this session cannot create issues (it reads
+issues and writes branches), so this block is what the orchestrator posts.
 
-## What is decided today, with its output
+## What this round did not do
 
-* **Card `0128`, degree 6 (`#h`).** The card says 2; the call returns 2 in 285 s:
-  `#h: expected 2, call 2 (285 s)` — `.tmp/qc-evidence/p319-0128-runner-degree-6.log`.
-* **Card `0128`, the `#Gamma-bar_h` line of degree 6.** Undecided: class 1 of 2
-  transfers to the invariant lattice (`q = 6`), the group builds, and the line call
-  does not return in 300 s.  The same call blocks the row at every other degree.
-* **The `#h` line above degree 6.** Not measured: `2d = 2, 4, 8, 10, 12` did not
-  return in 120 s each on the card's own lattice (`.tmp/qc-evidence/p319-0128-h-unimodular.log`);
-  they belong to the CI job at its 1800 s cap.
-* **All 87 `gamma-h-N` rows.** Undecided: the group is the card's, the counts are not
-  reachable.  `gamma-h-1` is the cheapest of the 87 by every published count (5 line
-  orbits, the smallest row), so the block is not a per-card cost.
-
-## What this unit did not do
-
-* No library file is edited, so the missing capability is not repaired here; it is
-  named above.
-* `#Gamma-bar_h` is compared nowhere yet: it needs the same orbit call the
-  `gamma-h-N` rows need, so it becomes decidable when they do.
-* The workflow file is not installed under `.github/workflows/`.  The push that
-  carried it there was rejected — `refusing to allow a GitHub App to create or update
-  workflow .github/workflows/enriques-polarization-rows.yml without workflows
-  permission` — so it sits at `results/issue319-enriques-polarization-rows.workflow.yml`
-  with the one-command install in its header, and `just enriques-card-rows` runs the
-  same module from any checkout with the Sage container.
-* The job has not run: no run of this repository's CI has ever run (the shared
-  workflow drops the Sage container when the caller passes a setup recipe).  The job
-  is written so that the rows report progressively: `--cap` bounds one call,
-  `--budget` bounds one run, and a run that exhausts its budget names the rows it did
-  not reach instead of failing without a finding.
+* The plane route and the flag route are not repaired: they are #390/#391's
+  cost question (one double coset per class-set point), not a reading here.
+* `#\bar\Gamma_h` is compared nowhere yet: it needs the same plane and flag
+  rows.
+* `tests/lattices/test_enriques_polarization_orbits.sage` still carries 261
+  parametrized comparisons of the same rows inside the per-test gate.  Each is
+  one public call of tens of seconds to 203 s (`results/issue17-gamma-h-line-rows.md`
+  records 10-20 s a card for `gamma-h-2` to `gamma-h-87` and 203 s for
+  `gamma-h-1`, on a warm process), against a 20 s call ceiling and a 60 s
+  timeout, so the file cannot pass the gate; the same rows are decided by the
+  image job, which is where the module keeps them.  Removing or re-homing that
+  copy is not part of this round's change.
