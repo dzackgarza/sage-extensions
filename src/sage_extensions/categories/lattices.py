@@ -13908,10 +13908,16 @@ class IsotropicReductions(OwnedCategoryOverBaseRing):
             are empty or one coset, and it is enough to try one representative
             of every class of `(1/N) J` modulo `X`, `N` the product of the
             divisibility and the rational lift's denominator.  Each class is
-            decided by the exact restriction of the corrected rational
-            isometry to `L`, and no parity enters -- unlike the marked-line
-            torsor, whose cosets are those of the transvection kernel and whose
-            argument needs an even lattice.
+            decided by whether the corrected rational isometry carries the
+            framing of `L` into `L`, and that matrix is the rank-two update
+            `g~ E_{v,x}(z) = g~(z) - b(x,z) g~(v) + b(v,z) g~(x)
+            - (q(x)/2) b(v,z) g~(v)` of the lift's own: the lift is read once
+            on the framing and every representative is decided in coordinates.
+            An integral matrix of a rational isometry preserves `L` in both
+            directions, because its determinant is a unit -- the discriminant
+            is preserved -- so one side suffices.  No parity enters, unlike
+            the marked-line torsor, whose cosets are those of the transvection
+            kernel and whose argument needs an even lattice.
             """
             from sage.matrix.constructor import matrix
             from sage.rings.rational_field import QQ as SageQQ
@@ -13928,9 +13934,7 @@ class IsotropicReductions(OwnedCategoryOverBaseRing):
             divisibility = int(marked.div())
             fraction_map = ring.fraction_field_map()
             rational = lattice.base_change(fraction_map)
-            rational_ring = rational.base_ring()
             rationalize = ModulesOverIntegralDomains(ring)(lattice).generic_fibre_map()
-            rational_marked = rationalize(marked).underlying_element()
             extension, denominator = self._rational_pointwise_levi_lift(isometry)
             scale = divisibility * int(denominator)
 
@@ -13975,27 +13979,119 @@ class IsotropicReductions(OwnedCategoryOverBaseRing):
                         f"in the perpendicular: its Hermite form has "
                         f"{count} on the diagonal at position {step}"
                     )
-            for representative in _representatives_of_the_box(representative_counts):
-                combination = sum(
-                    (
-                        lattice.scalar_multiple(
-                            ring(int(value)), vector
+            form = matrix(
+                SageZZ,
+                width,
+                width,
+                [
+                    [
+                        int(
+                            lattice.b(
+                                lattice.module_generator(left),
+                                lattice.module_generator(right),
+                            )
                         )
-                        for value, vector in zip(representative, jbasis, strict=True)
+                        for right in labels
+                    ]
+                    for left in labels
+                ],
+            )
+            rational_labels = tuple(rational.module_generating_set())
+            if len(rational_labels) != width:
+                raise ArithmeticError(
+                    f"the rational framing of {lattice} has "
+                    f"{len(rational_labels)} labels and the integral one has {width}"
+                )
+
+            def as_rational(entry):
+                numerator = getattr(entry, "numerator", entry)
+                numerator = numerator() if callable(numerator) else numerator
+                denominator = getattr(entry, "denominator", 1)
+                denominator = denominator() if callable(denominator) else denominator
+                return SageQQ(int(numerator)) / SageQQ(int(denominator))
+
+            def column_of(element):
+                values = extension(rationalize(element).underlying_element()).to_vector()
+                return matrix(
+                    SageQQ,
+                    width,
+                    1,
+                    [as_rational(values(label)) for label in rational_labels],
+                )
+
+            zero_column = matrix(SageQQ, width, 1, [SageQQ(0)] * width)
+            marked_column = matrix(
+                SageQQ, width, 1, [SageQQ(value) for value in coordinates_of(marked)]
+            )
+            if column_of(marked) != marked_column:
+                raise ArithmeticError(
+                    f"the rational pointwise lift of {isometry} does not fix the "
+                    f"marked vector {marked}, so the correction below would decide "
+                    f"another fibre"
+                )
+            basis_columns = [
+                matrix(
+                    SageQQ,
+                    width,
+                    1,
+                    [SageQQ(value) for value in coordinates_of(vector)],
+                )
+                for vector in jbasis
+            ]
+            basis_images = [column_of(vector) for vector in jbasis]
+            generator_images = [
+                column_of(lattice.module_generator(label)) for label in labels
+            ]
+            pairing_with_marked = form * marked_column
+
+            for representative in _representatives_of_the_box(representative_counts):
+                coefficients = [int(value) for value in representative]
+                parameter = sum(
+                    (
+                        SageQQ(value) * column
+                        for value, column in zip(coefficients, basis_columns, strict=True)
                         if value
                     ),
-                    lattice.zero(),
-                )
-                rational_parameter = rational.scalar_multiple(
-                    rational_ring.one() / rational_ring(scale),
-                    rationalize(combination).underlying_element(),
-                )
-                corrected = extension * rational.eichler_transvection(
-                    rational_marked, rational_parameter
-                )
-                integral = corrected.integral_restriction(lattice, lattice)
-                if integral is not None:
-                    return integral
+                    zero_column,
+                ) / SageQQ(scale)
+                image_of_parameter = sum(
+                    (
+                        SageQQ(value) * column
+                        for value, column in zip(coefficients, basis_images, strict=True)
+                        if value
+                    ),
+                    zero_column,
+                ) / SageQQ(scale)
+                half_norm = (
+                    parameter.transpose() * form * parameter
+                )[0, 0] / SageQQ(2)
+                images = []
+                for column in generator_images:
+                    image = (
+                        column
+                        - (parameter.transpose() * form * column)[0, 0]
+                        * marked_column
+                        + (pairing_with_marked.transpose() * column)[0, 0]
+                        * (image_of_parameter - half_norm * marked_column)
+                    )
+                    entries = image.list()
+                    if any(not entry.is_integer() for entry in entries):
+                        break
+                    images.append([int(entry) for entry in entries])
+                else:
+                    columns = matrix(
+                        SageZZ,
+                        width,
+                        width,
+                        lambda row, position: images[position][row],
+                    )
+                    if columns.transpose() * form * columns != form:
+                        raise ArithmeticError(
+                            f"the corrected lift of {isometry} at the parameter "
+                            f"{coefficients} is integral but does not preserve the "
+                            f"form of {lattice}"
+                        )
+                    return lattice.Aut()._isometry_from_column_matrix(columns)
             return None
 
         @cached_method
