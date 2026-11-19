@@ -83,13 +83,22 @@ def test_the_pullback_is_additive_and_carries_the_negatives() -> None:
     assert pulled.sections().pullback_of(-first) == -(pulled.sections().pullback_of(first))
 
 
-def test_a_section_of_the_pullback_that_is_not_a_pullback_is_refused() -> None:
-    r"""$f^*T\mathbb{R}^2$'s sections are stated in the bundle's trivializations on a cover of the target, which this owner does not retain."""
-    plane, chart, x, _y, mapping = _the_plane()
-    pulled = plane.tangent_bundle().pullback_along(mapping)
+def test_a_section_of_the_pullback_is_stated_on_its_own_charts() -> None:
+    r"""$f^*T\mathbb{R}^2$'s sections are read in the bundle's frames, so one can be stated directly.
 
-    with pytest.raises(AssertionError):
-        pulled.sections().section({"U": (chart.coordinate(0), chart.coordinate(1))})
+    A section of a pullback is not only the pullback of a section of the base bundle: it is a
+    tuple per chart of the pullback's base, related by the frame law (see
+    ``test_a_pullback_agreement_reads_every_component_of_the_bundle.sage``).
+    """
+    plane, chart, x, y, mapping = _the_plane()
+    pulled = plane.tangent_bundle().pullback_along(mapping)
+    ring = chart.function_ring()
+
+    section = pulled.sections().section({"U": (x, ring.one())})
+
+    at = plane((1, 2))
+    assert section.components()["U"][0](at) == RR(1)
+    assert section.components()["U"][1](at) == RR(1)
 
 
 def test_the_pullback_along_an_open_inclusion_is_still_the_domain_s_tangent_bundle() -> None:
