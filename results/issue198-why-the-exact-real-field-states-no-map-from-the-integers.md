@@ -69,3 +69,50 @@ question about the Mor layer rather than about the reals.
 The first is the statement the mathematics makes and it fixes every owned ring at
 once; the second is narrower and depends on a layer that is not yet clear of the
 same check.
+
+## The mechanism, read from the source of the check
+
+`Sets()` is a Sage singleton, so `x in Sets()` is
+`Category_singleton.__contains__`, which is
+`Category_contains_method_by_parent_class(cls())`, whose `__call__` is, from
+`sage/categories/category_singleton.pyx:70-77`:
+
+    y = x
+    return PyType_IsSubtype(<type>((y._category or y.category()).parent_class),
+                            self._parent_class_of_category)
+
+So the question is whether the **parent class of the object's own category** is a
+subtype of `Sets().parent_class`.  Measured on `25d2190`:
+
+    Sage's QQ   in Sets()  True    isinstance(QQ, Sets().parent_class)  True
+    Sage's ZZ   in Sets()  True    isinstance(ZZ, Sets().parent_class)  False
+    owned ZZ    in Sets()  False   isinstance(ZZ, Sets().parent_class)  False
+    owned QQ    in Sets()  False   isinstance(QQ, Sets().parent_class)  False
+    owned RR    in Sets()  False   isinstance(RR, Sets().parent_class)  False
+
+Sage's own integer ring passes without being an instance of that class, so the
+test is on the category's parent class, not on the object's; every owned parent
+fails it, whatever its graph says.  The owned root's docstring
+(`sage_extensions/owned_category.py:44-52`) already names this relation as the
+reason Sage's `Sets()` is a super category of the owned root -- but the graph edge
+does not make the tree's `parent_class` a subtype of Sage's, which is what the
+check reads.
+
+## Two more attempts that do not reach it
+
+- `CallableConvertMap(source, self, _owned_ring_from_integer, parent_as_first_arg=True)`
+  returned from `ExactRealField._coerce_map_from_` for an owned integer source:
+  `RR.coerce_map_from(ZZ)` still raises the same `ValueError`.  The map is returned
+  and Sage still copies it through `Map.parent()`.
+- The owned morphism `RR.as_ZZ_algebra().algebra_structure_morphism()`: the same.
+
+## What is left
+
+One repair, and it is at the root: the owned categories' `parent_class` has to
+derive from `SageSets().parent_class`, so that
+`type((x._category or x.category()).parent_class)` is a subtype of it for every
+owned parent.  Sage builds `parent_class` from `ParentMethods` of the super
+categories (`Category._make_named_class`), not from their `parent_class`es, so
+this is a change to `_make_named_class` in `sage_extensions/owned_category.py` --
+a change to the class of **every owned parent**, and therefore one that needs its
+own turn with a broad gate over the owned graph, not a corner of one.
