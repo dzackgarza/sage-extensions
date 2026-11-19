@@ -1,0 +1,16 @@
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:834 Elementwise module morphism Module over Real Field on Classes in the multilinear tensor presentation -> C(Infinity, 2-dimensional open submanifold U_S of 2-dimensional smooth manifold S^2, the domain of its chart U_S, RR) accepted without exhaustive linearity verification; the source is not represented as finite
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:453 General module over Real Field retains its module laws as an undecided proposition
+=========================== short test summary info ============================
+FAILED tests/objects/test_a_bump_of_a_chart_is_a_smooth_function_on_the_sphere.sage::test_the_bump_of_the_north_chart_is_one_inside_and_zero_outside
+FAILED tests/objects/test_a_bump_of_a_chart_is_a_smooth_function_on_the_sphere.sage::test_a_section_differentiates_the_bump_and_its_product_with_a_coordinate
+FAILED tests/objects/test_a_bump_of_a_chart_is_a_smooth_function_on_the_sphere.sage::test_the_bump_times_the_frame_is_a_section_with_its_values
+FAILED tests/objects/test_a_bump_of_a_chart_is_a_smooth_function_on_the_sphere.sage::test_the_bump_of_the_north_chart_of_the_two_sphere
+4 failed in 71.42s (0:01:11)
+E   KeyError: 'chart_bump'
+E   AttributeError: 'OwnedJoinCategory.parent_class[_StandardSphere].ObjectType' object has no attribute 'chart_bump'
+E   KeyError: 'chart_bump'
+E   AttributeError: 'OwnedJoinCategory.parent_class[_StandardSphere].ObjectType' object has no attribute 'chart_bump'
+E   KeyError: 'chart_bump'
+E   AttributeError: 'OwnedJoinCategory.parent_class[_StandardSphere].ObjectType' object has no attribute 'chart_bump'
+E   KeyError: 'chart_bump'
+E   AttributeError: 'OwnedJoinCategory.parent_class[_StandardSphere].ObjectType' object has no attribute 'chart_bump'
