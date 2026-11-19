@@ -1,0 +1,50 @@
+tree SHA: bb57ca742ca8c1522c9efe102cb1ee1333718733 (modified paths: 0)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 8.65 4.34 3.57 7/677 3671716
+probe: .tmp/issue381-t13/probe-small-rows.py; inner 900 s
+[    5.36s] lattice: rank 5, signature (2, 3)
+[Otilde] the row's route: divided-class, taken because its lines carry divided classes and its covering is carried from one plane to the others (decided in 1.8 s)
+[Otilde] the row's calls returned in 64.3 s
+[Otilde] the quotient retains 4 carried-object transport datums: one for each carried isotropic object still registered, keyed by its span, each holding the object, its source and the isometry that placed it -- not the row's coverings and not its planes' lifts, which are retained separately
+[Otilde] line cusp 0: ((0, 1, 0, 0, 0),)
+[Otilde] line cusp 1: ((0, 0, 1, 0, 0),)
+[Otilde] line cusp 2: ((12, 6, -2, 9, -6),)
+[Otilde] plane cusp 0: ((0, 1, 0, 0, 0), (0, 0, 0, 1, 0))
+[Otilde] plane cusp 1: ((4, 0, -1, -2, -2), (0, 1, 0, 2, 0))
+[Otilde] edge 0: L0 < P0
+[Otilde] edge 1: L2 < P0
+[Otilde] edge 2: L0 < P1
+[Otilde] edge 3: L1 < P1
+[Otilde] the degree sequence of the relation: line cusps [1, 2] over 3, plane cusps [2] over 2
+[Otilde] audited 4 distinct edges; ordered endpoint SHA-256: 04c17f79b45ca82ac8fdb82e60dcf96f510b89d8c7c7d03748c27e67ff587dc2
+[   70.15s] Otilde: [Otilde] decided: 4 edges over 3 line cusps and 2 plane cusps
+[Otilde+] the row's route: divided-class, taken because its lines carry divided classes and its covering is carried from one plane to the others (decided in 0.0 s)
+[Otilde+] the row's calls returned in 12.7 s
+[Otilde+] the quotient retains 4 carried-object transport datums: one for each carried isotropic object still registered, keyed by its span, each holding the object, its source and the isometry that placed it -- not the row's coverings and not its planes' lifts, which are retained separately
+[Otilde+] line cusp 0: ((0, 1, 0, 0, 0),)
+[Otilde+] line cusp 1: ((0, 0, 1, 0, 0),)
+[Otilde+] line cusp 2: ((12, 6, -2, 9, -6),)
+[Otilde+] plane cusp 0: ((0, 1, 0, 0, 0), (0, 0, 0, 1, 0))
+[Otilde+] plane cusp 1: ((4, 0, -1, -2, -2), (0, 1, 0, 2, 0))
+[Otilde+] edge 0: L0 < P0
+[Otilde+] edge 1: L2 < P0
+[Otilde+] edge 2: L0 < P1
+[Otilde+] edge 3: L1 < P1
+[Otilde+] the degree sequence of the relation: line cusps [1, 2] over 3, plane cusps [2] over 2
+[Otilde+] audited 4 distinct edges; ordered endpoint SHA-256: 04c17f79b45ca82ac8fdb82e60dcf96f510b89d8c7c7d03748c27e67ff587dc2
+[   82.95s] Otilde+: [Otilde+] decided: 4 edges over 3 line cusps and 2 plane cusps
+[   82.95s] done
+[peakrss] probe603: child waited=0 shell_code=0 samples=44
+[peakrss] peak tree RSS      : 429 MiB
+[peakrss] low-water MemAvail : 793 MiB
+[peakrss] peak single VmHWM  : 434 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      423 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    86.1s procs=  3 rss=   429 MiB hwm=   434 MiB avail=  3343 MiB
+[peakrss]   t=    70.0s procs=  3 rss=   424 MiB hwm=   430 MiB avail=  3527 MiB
+[peakrss]   t=    82.1s procs=  3 rss=   422 MiB hwm=   432 MiB avail=  3408 MiB
+[peakrss]   t=    88.1s procs=  3 rss=   422 MiB hwm=   434 MiB avail=  3312 MiB
+[peakrss]   t=    74.0s procs=  3 rss=   418 MiB hwm=   432 MiB avail=  3478 MiB
+probe exit: 0
