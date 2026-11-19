@@ -772,6 +772,36 @@ def _owned_implementation_bases(
     return tuple(ordered) or (object,)
 
 
+_SAGE_SETS_PARENT_CLASS: list[type] = []
+
+
+def _bases_with_sage_sets_parent(bases: tuple[type, ...]) -> tuple[type, ...]:
+    r"""``bases``, with Sage's ``Sets().parent_class`` last when no base already derives from it.
+
+    ``Sets()`` is a Sage **singleton**, so ``x in Sets()`` is a class test on the
+    ``parent_class`` of the object's own category
+    (``sage/categories/category_singleton.pyx:70-77``), and an owned parent -- a set
+    only in the owned graph -- fails it.  Every Hom and every coercion map is built
+    with that test, so ``RR.coerce_map_from(ZZ)``, the unique unital map from the
+    integers that every unital ring states (Stacks, Tag 00RM), could not be built at
+    all.  Deriving the class from ``Sets().parent_class`` is the runtime edge the
+    owned category of sets names, placed where Sage reads it; it is last, so every
+    owned level keeps its methods ahead of it, and the owned graph is unchanged.
+
+    The base goes into the class only, not into the implementation-base list the
+    linearization consumes: that linearization would re-enter itself on a level whose
+    named class derives from a Sage one, which is why this is applied at the class.
+    """
+    if not _SAGE_SETS_PARENT_CLASS:
+        from sage.categories.sets_cat import Sets as SageSets
+
+        _SAGE_SETS_PARENT_CLASS.append(SageSets().parent_class)
+    target = _SAGE_SETS_PARENT_CLASS[0]
+    if any(base is target or issubclass(base, target) for base in bases):
+        return bases
+    return tuple(bases) + (target,)
+
+
 class OwnedCategoryMixin(CatConstructionsMixin):
     r"""Tie a category to its implementation classes.
 
@@ -1012,9 +1042,14 @@ class OwnedCategoryMixin(CatConstructionsMixin):
             # never asked for on this path, and its ``__slots__`` suppression,
             # which cannot fire because a provider is a plain Python class and
             # so always contributes a ``__dictoffset__``.
-            result = _abc_metaclass_for(bases)(
+            class_bases = (
+                bases
+                if name != "parent_class"
+                else _bases_with_sage_sets_parent(bases)
+            )
+            result = _abc_metaclass_for(class_bases)(
                 class_name,
-                bases,
+                class_bases,
                 {
                     "_reduction": reduction,
                     "_doccls": (doccls,),
