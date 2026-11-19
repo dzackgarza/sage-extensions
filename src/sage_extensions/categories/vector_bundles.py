@@ -91,26 +91,34 @@ def _rational_polynomial(expression):
     return SR(expression).polynomial(QQ)
 
 
-def _pullback_family_agrees(manifold, mapping, components) -> None:
+def _pullback_family_agrees(manifold, mapping, components, rank) -> None:
     r"""Decide that a chart-wise family states one section of a pullback, or state where it does not.
 
     A section of ``f^*E`` over ``N`` assigns to ``q`` an element of the fibre at
-    ``f(q)`` (Lee, *Introduction to Smooth Manifolds*, 2nd ed., Ch. 10), so its tuple
-    of components on a chart ``W_1`` of ``N`` and its tuple on a chart ``W_2`` are
-    related by the derivative of the composite that carries a point of ``W_1`` to the
-    coordinates of ``f`` in the chart of ``M`` that ``W_2`` is represented in:
-    ``a_2(T(x)) = J_T(x) a_1(x)``.  ``T`` is read off the map's own chart
-    representations composed with the coordinate change the atlas states between the
-    two charts of the domain, and the comparison is made on those rational
-    expressions, so nothing is sampled and nothing is enumerated.
+    ``f(q)``, and its tuple on a chart of ``N`` is read in the frame of a chart of the
+    codomain that this chart is represented in (Lee, *Introduction to Smooth Manifolds*,
+    2nd ed., Ch. 10).  Two charts ``W_s`` and ``W_t`` of the base therefore carry two
+    frames, ``V_s`` and ``V_t``, and the tuples are related by the codomain's coordinate
+    change at the image point:
+
+        a_t(x) = J_{V_s -> V_t}(T_s(x)) a_s(x),
+
+    where ``T_s`` carries a point of ``W_s`` to the coordinates of ``f`` in ``V_s``.  No
+    derivative of ``f`` appears: the tuples are coordinates in the bundle's frames, not a
+    vector field pushed along ``f``.  For ``f = id`` the codomain's change is the base's
+    own, which is the case the earlier specimens exercised.
+
+    The comparison is made on rational expressions, so nothing is sampled.
     """
     from itertools import combinations
+
+    from sage.matrix.constructor import matrix as _engine_matrix
 
     from sage_extensions.categories.manifolds import _composed_ambient_transition
 
     labels = tuple(components)
     pairs = tuple(mapping.chart_maps().index_set())
-    dimension = int(manifold.dimension())
+    codomain = mapping.codomain()
     for left_label, right_label in combinations(labels, 2):
         for source_label, target_label in (
             (left_label, right_label),
@@ -122,45 +130,83 @@ def _pullback_family_agrees(manifold, mapping, components) -> None:
                 f"charts {source_label} and {target_label} are both given, and no chain of "
                 f"stated coordinate changes joins them"
             )
-            images_in = tuple(
-                pair for pair in pairs if pair[0] == target_label
-            )
-            assert images_in, (
-                f"cannot decide whether the family states one section of the pullback: the map "
-                f"{mapping} is stated in no chart of the target on the chart {target_label}"
-            )
+            image_charts = {}
+            for label in (source_label, target_label):
+                images_in = tuple(pair for pair in pairs if pair[0] == label)
+                assert images_in, (
+                    f"cannot decide whether the family states one section of the pullback: the "
+                    f"map {mapping} is stated in no chart of the codomain on the chart {label}"
+                )
+                image_charts[label] = images_in[0][1]
             source_symbols = tuple(_engine_manifold_chart(manifold.atlas()[source_label])[:])
             target_symbols = tuple(_engine_manifold_chart(manifold.atlas()[target_label])[:])
             forward = tuple(
                 SR(_engine_manifold_expression(expression))
                 for expression in change.forward_expressions()
             )
-            composed = tuple(
-                SR(_engine_manifold_expression(expression)).subs(
-                    dict(zip(target_symbols, forward, strict=True))
+            image_in_source = tuple(
+                SR(_engine_manifold_expression(expression))
+                for expression in mapping.chart_map(
+                    source_label, image_charts[source_label]
                 )
-                for expression in mapping.chart_map(target_label, images_in[0][1])
             )
+            assert len(image_in_source) == int(rank), (
+                f"cannot decide whether the family states one section of the pullback: the map "
+                f"{mapping} has {len(image_in_source)} coordinates in the chart "
+                f"{image_charts[source_label]} and the pulled-back bundle has rank {rank}"
+            )
+            if image_charts[source_label] == image_charts[target_label]:
+                jacobian = _engine_matrix(
+                    SR,
+                    int(rank),
+                    int(rank),
+                    [
+                        1 if row == column else 0
+                        for row in range(int(rank))
+                        for column in range(int(rank))
+                    ],
+                )
+            else:
+                codomain_change = _composed_ambient_transition(
+                    codomain, image_charts[source_label], image_charts[target_label]
+                )
+                assert codomain_change is not None, (
+                    f"cannot decide whether the family states one section of the pullback: the "
+                    f"codomain's charts {image_charts[source_label]} and "
+                    f"{image_charts[target_label]} are joined by no stated coordinate change"
+                )
+                source_image_symbols = tuple(
+                    _engine_manifold_chart(codomain.atlas()[image_charts[source_label]])[:]
+                )
+                substitution = dict(zip(source_image_symbols, image_in_source, strict=True))
+                jacobian = _engine_matrix(
+                    SR,
+                    int(rank),
+                    int(rank),
+                    [
+                        SR(_engine_manifold_expression(expression))
+                        .diff(symbol)
+                        .subs(substitution)
+                        for expression in codomain_change.forward_expressions()
+                        for symbol in source_image_symbols
+                    ],
+                )
             stated = tuple(
                 SR(_engine_manifold_expression(entry))
                 for entry in components[source_label]
             )
             carried = tuple(
                 SR(_engine_manifold_expression(entry)).subs(
-                    dict(zip(target_symbols, composed, strict=True))
+                    dict(zip(target_symbols, forward, strict=True))
                 )
                 for entry in components[target_label]
             )
-            jacobian = tuple(
-                tuple(expression.diff(symbol) for symbol in source_symbols)
-                for expression in composed
-            )
             transported = tuple(
                 sum(
-                    stated[index] * jacobian[position][index]
-                    for index in range(dimension)
+                    stated[index] * jacobian[position, index]
+                    for index in range(int(rank))
                 )
-                for position in range(dimension)
+                for position in range(int(rank))
             )
             for position, (left, right) in enumerate(
                 zip(transported, carried, strict=True)
@@ -169,8 +215,8 @@ def _pullback_family_agrees(manifold, mapping, components) -> None:
                 assert residual == 0, (
                     f"the family states no one section of the pullback: on the chart "
                     f"{source_label} the component {position} is {transported[position]}, and the "
-                    f"component stated on the chart {target_label} carries it to "
-                    f"{carried[position]} there, which leaves the residual {residual}"
+                    f"component stated on the chart {target_label} is {carried[position]} there, "
+                    f"which leaves the residual {residual}"
                 )
 
 
@@ -1012,11 +1058,20 @@ class SmoothSectionModules(OwnedParameterizedCategory):
                 _chartwise_family_agrees(manifold, admitted, 1)
             else:
                 _pullback_family_agrees(
-                    manifold, self._vector_bundle.mapping(), admitted
+                    manifold,
+                    self._vector_bundle.mapping(),
+                    admitted,
+                    int(self._vector_bundle.rank()),
                 )
-            return self.element_class(
-                self, admitted, _engine_vector_field(manifold, admitted)
+            # A section of a pullback is no vector field on the base: only the tangent
+            # bundle's own sections carry the engine field a derivation is read from.
+            engine_field = (
+                _engine_vector_field(manifold, admitted)
+                if underlying is None
+                and self._vector_bundle._bundle_tangent_manifold is not None
+                else None
             )
+            return self.element_class(self, admitted, engine_field)
 
         def coordinate_vector_field(self, chart, index):
             r"""The ``index``-th coordinate vector field of a chart, as a section of this bundle.
