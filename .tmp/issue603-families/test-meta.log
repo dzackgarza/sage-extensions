@@ -1,0 +1,50 @@
+tree SHA: 7f5fab0aae9a40bee4f454b1d1f9c47044284437 (modified paths: 1)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 3.28 2.94 5.17 4/564 3199322
+files: tests/lattices/test_pointwise_levi_images.sage tests/groups/test_a_stabilizers_generators_generate_a_subgroup.sage tests/lattices/test_integral_stabilizers.sage; inner 900 s
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+time gates on: star import 0.44 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: asyncio-1.5.0, xdist-3.8.0, reportlog-1.0.0, platformdirs-4.13.5, hypothesis-6.170.15, anyio-4.15.1, timeout-2.4.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 11 items
+
+tests/lattices/test_pointwise_levi_images.sage ....                      [ 36%]
+tests/groups/test_a_stabilizers_generators_generate_a_subgroup.sage ...  [ 63%]
+tests/lattices/test_integral_stabilizers.sage ....                       [100%]
+
+=============================== time-gate report ===============================
+collection took 22.06 s; the measured ceiling is 6 s
+========================== test-call performance gate ==========================
+tests/groups/test_a_stabilizers_generators_generate_a_subgroup.sage::test_the_enriques_orthogonal_groups_line_stabilizer_generates_a_subgroup: 20.25 s > 20 s
+============================== slowest durations ===============================
+20.25s call     tests/groups/test_a_stabilizers_generators_generate_a_subgroup.sage::test_the_enriques_orthogonal_groups_line_stabilizer_generates_a_subgroup
+1.57s call     tests/lattices/test_pointwise_levi_images.sage::test_split_pointwise_levi_lift_over_an_infinite_quotient[line]
+1.13s call     tests/lattices/test_pointwise_levi_images.sage::test_glued_line_pointwise_image_excludes_quotient_negation
+0.46s call     tests/lattices/test_pointwise_levi_images.sage::test_zero_null_pointwise_levi_lift_and_joint_kernel
+0.37s call     tests/lattices/test_integral_stabilizers.sage::test_the_swap_stabilizes_the_standard_lattice_but_not_a_commensurable_one
+0.31s call     tests/groups/test_a_stabilizers_generators_generate_a_subgroup.sage::test_a_generated_groups_line_stabilizer_generates_a_subgroup
+0.20s call     tests/lattices/test_integral_stabilizers.sage::test_a_completed_orbit_span_gives_the_least_module_and_lattice_cosets
+0.17s call     tests/lattices/test_pointwise_levi_images.sage::test_split_pointwise_levi_lift_over_an_infinite_quotient[plane]
+0.10s call     tests/lattices/test_integral_stabilizers.sage::test_diag_two_half_maps_an_isotropic_line_properly_into_itself_and_leaves_its_stabilizer
+0.08s call     tests/groups/test_a_stabilizers_generators_generate_a_subgroup.sage::test_a_family_outside_the_group_is_refused
+0.05s call     tests/lattices/test_integral_stabilizers.sage::test_a_set_map_into_a_generated_subgroup_keeps_its_range_law
+
+(22 durations < 0.005s hidden.  Use -vv to show these durations.)
+============================= 11 passed in 47.11s ==============================
+[peakrss] test603: child waited=1 shell_code=1 samples=31
+[peakrss] peak tree RSS      : 787 MiB
+[peakrss] low-water MemAvail : 2863 MiB
+[peakrss] peak single VmHWM  : 788 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      777 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    36.1s procs=  3 rss=   787 MiB hwm=   787 MiB avail=  3742 MiB
+[peakrss]   t=    34.0s procs=  3 rss=   783 MiB hwm=   783 MiB avail=  3930 MiB
+[peakrss]   t=    32.0s procs=  3 rss=   779 MiB hwm=   779 MiB avail=  3863 MiB
+[peakrss]   t=    30.0s procs=  3 rss=   776 MiB hwm=   776 MiB avail=  3960 MiB
+[peakrss]   t=    44.1s procs=  3 rss=   771 MiB hwm=   788 MiB avail=  3059 MiB
+test exit: 1

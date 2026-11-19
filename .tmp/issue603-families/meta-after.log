@@ -1,0 +1,20 @@
+tree SHA: 7f5fab0aae9a40bee4f454b1d1f9c47044284437 (modified paths: 1)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 3.18 2.91 5.20 4/551 3199133
+probe: .tmp/probe-meta.py; inner 600 s
+warm-up                      3 calls    0.005s    1.522 ms each
+current                      60 calls    0.000s    0.001 ms each
+without the __doc__ read     60 calls    0.000s    0.001 ms each
+sage_getsourcelines         20 calls    0.058s    2.877 ms each
+[peakrss] probe603: child waited=0 shell_code=0 samples=3
+[peakrss] peak tree RSS      : 384 MiB
+[peakrss] low-water MemAvail : 5390 MiB
+[peakrss] peak single VmHWM  : 386 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      375 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     4.0s procs=  3 rss=   384 MiB hwm=   386 MiB avail=  5390 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   227 MiB hwm=   229 MiB avail=  5617 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     0 MiB hwm=     0 MiB avail=  5885 MiB
+probe exit: 0

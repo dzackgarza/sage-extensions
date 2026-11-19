@@ -373,3 +373,34 @@ the port's cell walk, which is a different owner's cost.
 **Next.**  Take (B) first: measure one realized word with and without the
 `__doc__` read, and if the dumps are telling the truth it is a one-line
 change with its own test.  (A) is then a question for the port, not this issue.
+
+## The introspection bill, measured and paid
+
+The `__doc__` read in `_copy_operation_metadata` was measured directly at port
+`991b88b0`, on `O(U + A2)`, one realized operation pair (`one()` and an
+inverse):
+
+| | 60 calls | per call |
+|---|---|---|
+| before | 0.004 s | 0.062 ms |
+| without the read | 0.000 s | 0.002 ms |
+| after the change | 0.000 s | 0.001 ms |
+
+and `sageinspect.sage_getsourcelines` itself is 2.9 ms on the first call and
+cached after, which is why the per-call figure is 0.06 ms rather than 3 ms.
+
+The read is now taken only where `__doc__` is a plain attribute -- a function
+or a method -- and every other reading keeps the behaviour the docstring
+describes, its documentation being left to the wrapped reading.
+
+**What it does and does not buy.**  0.06 ms per realized word is smallest where
+a row realizes the most of them: order a minute across a 189720-plane row at a
+handful of words each.  It is **not** what keeps the `T_Co` kernel rows
+unrunnable; that is the port's Vinberg-cell enumeration of the planes through a
+line, which stack A of the previous section names frame by frame.  So (B) is
+paid and (A) is where the issue actually is.
+
+Consumers: `test_pointwise_levi_images.sage`,
+`test_a_stabilizers_generators_generate_a_subgroup.sage` and
+`test_integral_stabilizers.sage` are **11 passed in 47.11 s**, the Enriques
+stabilizer call at 20.25 s and the rest under two seconds each.
