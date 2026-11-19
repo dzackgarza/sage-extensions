@@ -243,33 +243,27 @@ def record_plane_class_indices(label, subgroup, planes, limit=8) -> tuple:
     The answer is the pairs `(classes, index)` recorded, so a caller compares
     them and no value here is a condition on the row.
     """
-    characteristic = getattr(subgroup, "finite_character_quotient", None)
-    quotient = characteristic() if characteristic is not None else None
-    route = "the finite character image" if quotient is not None else "the plane's parabolic"
-    log(f"[{label}] the plane class index is read by {route}")
+    lattice = subgroup.domain()
+    form = lattice.discriminant_group()
     recorded = []
     seen = set()
     for plane_cusp in planes:
         if len(recorded) >= limit:
             break
         plane = plane_cusp.representative()
-        if quotient is not None:
-            classes, stabilizer_order, image_order, index = quotient.plane_class_index(plane)
-            lattice = quotient.lattice
-        else:
-            lattice = subgroup.domain()
-            classes = _plane_class_set(lattice, plane)
-            stabilizer_order, image_order = plane.stabilizer_discriminant_image_orders()
-            index = stabilizer_order // image_order
+        classes = _plane_class_set(lattice, plane)
         key = frozenset(classes)
         if key in seen:
             continue
         seen.add(key)
+        stabilizer_order, image_order = plane.stabilizer_discriminant_image_orders()
+        index = plane.stabilizer_discriminant_image_index()
         recorded.append((tuple(classes), index))
         log(
             f"[{label}] plane class {len(recorded)} of J = [P/2]: "
             f"|Stab_{{O(q)}}(J)| = {stabilizer_order}, "
-            f"|rho(Stab_Gamma(P))| = {image_order}, index {index}"
+            f"|rho(Stab_{{O(L)}}(P))| = {image_order}, "
+            f"index [Stab(J) : rho(Stab_O(L)(P))] = {index}"
         )
     indices = {index for _classes, index in recorded}
     log(
@@ -278,15 +272,12 @@ def record_plane_class_indices(label, subgroup, planes, limit=8) -> tuple:
         f"{len(indices)} distinct value{'s' if len(indices) != 1 else ''}"
     )
     if recorded:
-        stabilizer_order = (
-            quotient.plane_class_index(planes[0].representative())[1]
-            if quotient is not None
-            else planes[0].representative().stabilizer_discriminant_image_orders()[0]
-        )
+        stabilizer_order = planes[0].representative().stabilizer_discriminant_image_orders()[0]
+        classes_total = int(form.O().cardinality()) // int(stabilizer_order)
         log(
-            f"[{label}] the liftable classes J number |O(q)| / |Stab(J)| = "
-            f"{int(lattice.discriminant_group().O().cardinality()) // stabilizer_order} "
-            f"at this row's first class"
+            f"[{label}] the liftable classes J number |O(q)| / |Stab(J)| = {classes_total}, and "
+            f"the row's plane cusps number {len(planes)}: the quotient is "
+            f"{len(planes)} / {classes_total}"
         )
     return tuple(recorded)
 
