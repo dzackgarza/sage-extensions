@@ -345,6 +345,30 @@ def _twisted_images(name, roots):
     return images
 
 
+def test_the_eleven_root_diagrams_involution_has_five_pairs_and_one_fixed_vertex() -> None:
+    r"""The Specimens row's "Coxeter-graph involution", read on the folded 4.3.8 diagram.
+
+    The issue records that involution's vertex orbits as
+    \(\{0,2\},\{1,4\},\{3,6\},\{7,10\},\{8,9\},\{5\}\) --- five pairs and one fixed
+    vertex --- in the archived folding's own labelling.  The folded eleven-root diagram has exactly
+    one non-trivial automorphism and it has that shape; the index sets are the notebook's labelling,
+    which the library does not record, so what is asserted is the shape and the uniqueness.  The
+    "10-dimensional invariant subspace" of the same row is the fold's invariant lattice, rank 10.
+    """
+    roots = tuple(Sterk.sterk_roots()["Sterk_4"])
+    diagram = CoxeterDiagrams().from_roots(roots)
+
+    assert int(diagram.cardinality()) == 11
+    assert int(diagram.Aut().order()) == 2
+    shapes = set()
+    for automorphism in diagram.Aut():
+        permutation = [int(automorphism(index)) - 1 for index in range(1, 12)]
+        fixed = sum(1 for position in range(11) if permutation[position] == position)
+        shapes.add((fixed, 11 - fixed))
+    assert sorted(shapes) == [(1, 10), (11, 0)]
+    assert int(Sterk.foldings()["Sterk_4"].invariant_lattice().module_rank()) == 10
+
+
 def test_the_archived_permutation_is_an_automorphism_and_folds_to_the_eleven_roots() -> None:
     r"""The issue's specimen: the archived permutation of the 22 roots is in `Aut`, and folds to 4.3.8.
 
