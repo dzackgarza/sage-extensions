@@ -23,6 +23,8 @@ span is negative definite.
 
 from sage_extensions.all import *
 
+import pytest
+
 
 _STATEMENTS = {
     "Sterk_1": "4.3.5",
@@ -185,6 +187,10 @@ def test_the_two_root_families_fold_only_to_the_three_chambers() -> None:
         cardinality = int(diagram.cardinality())
         for automorphism in diagram.Aut():
             permutation = tuple(int(automorphism(index)) - 1 for index in range(1, cardinality + 1))
+            if any(permutation[permutation[index]] != index for index in range(cardinality)):
+                with pytest.raises(ValueError):
+                    diagram.fold(permutation)
+                continue
             key = _fold_key(diagram.fold(permutation))
             if key in card_keys:
                 hits.add(key)
@@ -195,3 +201,47 @@ def test_the_two_root_families_fold_only_to_the_three_chambers() -> None:
     assert tuple(sorted(hits)) == tuple(
         sorted(_fold_key(_fold(name)) for name in ("Sterk_1", "Sterk_2", "Sterk_4"))
     )
+
+def _twisted_images(name, roots):
+    r"""Return the images of the roots that determine the involution ``name`` is folded by."""
+    images = {}
+    if name == "Sterk_3":
+        for left, right in ((1, 9), (2, 8), (3, 7), (4, 6), (10, 16), (11, 15), (12, 14), (17, 19)):
+            images[left - 1] = roots[f"v{right}"]
+            images[right - 1] = roots[f"v{left}"]
+        for index in (5, 13):
+            images[index - 1] = roots[f"v{index}"]
+        images[17] = roots["v18"] + roots["v22"]
+        images[19] = roots["v20"] + roots["v22"]
+        images[21] = -roots["v22"]
+        return images
+    for index in range(1, 17):
+        if index % 2:
+            left = 16 if index == 1 else index - 1
+            images[index - 1] = roots[f"v{left}"] + roots[f"v{index}"] + roots[f"v{index + 1}"]
+        else:
+            images[index - 1] = -roots[f"v{index}"]
+    for index in range(17, 23):
+        images[index - 1] = roots[f"v{index}"]
+    return images
+
+
+def test_the_two_twisted_configurations_are_folds_of_the_twenty_two_roots() -> None:
+    r"""Sterk 3 and Sterk 5 fold by involutions of the span that do not permute the roots."""
+    labelled = {f"v{index}": Sterk.roots_18_2_0()[f"v{index}"] for index in range(1, 23)}
+    family = tuple(labelled[f"v{index}"] for index in range(1, 23))
+
+    for name in ("Sterk_3", "Sterk_5"):
+        folding = CoxeterDiagrams().from_roots(family).fold_by(_twisted_images(name, labelled))
+        carried = tuple(
+            folding.span().inclusion()(folding.invariant_lattice().inclusion()(root))
+            for root in folding.roots()
+        )
+        wall_span = NamedLattices.TEn.primitive_sublattice_from(
+            _wall_vectors(_STATEMENTS[name])
+        )
+
+        assert Set(carried) == Set(Sterk.sterk_roots()[name])
+        assert int(folding.invariant_lattice().module_rank()) == 10
+        assert _signature(folding.invariant_lattice()) == _signature(wall_span)
+        assert _signature(folding.anti_invariant_lattice()) == (0, 8)

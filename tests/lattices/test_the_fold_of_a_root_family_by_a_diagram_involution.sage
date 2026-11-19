@@ -104,3 +104,28 @@ def test_a_mapping_of_the_vertices_names_the_same_fold_as_the_tuple_of_its_image
     diagram = CoxeterDiagrams().from_roots((first, second))
 
     assert diagram.fold({0: 1, 1: 0}).roots().cardinality() == diagram.fold((1, 0)).roots().cardinality()
+
+def test_the_fold_by_an_involution_that_does_not_permute_the_roots() -> None:
+    r"""A root may go to its negative: \(b\mapsto -b\) is no permutation of the two roots."""
+    plane = Lattices(ZZ)([[-2, 0], [0, -2]])
+    first, second = plane.module_generators()
+    folding = CoxeterDiagrams().from_roots((first, second)).fold_by({0: first, 1: -second})
+
+    assert folding.isometry()(first) == first
+    assert folding.isometry()(second) == -second
+    assert folding.invariant_lattice().gram_tensor() == tensor(ZZ, (), (1, 1), [[-2]])
+    assert folding.anti_invariant_lattice().gram_tensor() == tensor(ZZ, (), (1, 1), [[-2]])
+    assert tuple(root.q() for root in _folded_into(plane, folding)) == (-2,)
+    assert folding.folded_diagram().cardinality() == 1
+    assert tuple(int(sum.q()) for sum in folding.discarded_sums()) == (0,)
+
+
+def test_a_map_that_is_no_isometry_is_refused_when_it_is_given_by_images() -> None:
+    plane = Lattices(ZZ)([[-2, 0], [0, -2]])
+    first, second = plane.module_generators()
+    diagram = CoxeterDiagrams().from_roots((first, second))
+
+    with pytest.raises(ValueError):
+        diagram.fold_by({0: 2 * first, 1: -second})
+    with pytest.raises(ValueError):
+        diagram.fold_by({0: first})
