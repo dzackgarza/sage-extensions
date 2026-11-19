@@ -276,13 +276,18 @@ def test_the_enriques_gluing_gives_a_vector_of_square_minus_two_with_complement_
     is determined by its signature and its ``(r, a, d)``, so these invariants
     are the lattice and not a sample of it.
 
-    The count is not this operation's own either: AEGS writes "By [Nam85, 2.13]
-    there is a unique (-2)-vector in T_En modulo Gamma_En", and its Definition
-    2.6 sets ``Gamma_En = O(T_En)``; [Nam85, 2.13] is Namikawa, *Periods of
-    Enriques surfaces*, Math. Ann. 270 (1985), 201--222, Theorem 2.13.  So
-    ``T_En`` carries one orbit of ``(-2)``-vectors, and exactly one of them has
-    the complement of Dolgachev--Kondo, equation (3.6), printed p. 513, which is
-    the vector that exists.
+    The count is not this operation's own either: Namikawa, *Periods of Enriques
+    surfaces*, Math. Ann. 270 (1985), 201--222, has ``N`` isometric to
+    ``E8(-2) + U(2) + U`` on printed p. 203 -- the lattice this test's ``T_En``
+    is -- and Theorem 2.13 on printed p. 207 reads "For any two roots l and l'
+    in N there is an isometry phi in Gamma = O(N) with phi(l) = l'", which the
+    section summarises as "there are only one f with (f,f) = -2 (Theorem 2.13)
+    and two f's with (f,f) = -4 (Theorem 2.15) up to O(N)".  AEGS writes the
+    same for this lattice: "By [Nam85, 2.13] there is a unique (-2)-vector in
+    T_En modulo Gamma_En", with ``Gamma_En = O(T_En)`` from its Definition 2.6.
+    So ``T_En`` carries one orbit of ``(-2)``-vectors, and exactly one of them
+    has the complement of Dolgachev--Kondo, equation (3.6), printed p. 513, which
+    is the vector that exists.
     """
     lattice = NamedLattices.TEn
     complement = NamedLattices.Tco
