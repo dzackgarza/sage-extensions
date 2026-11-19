@@ -1,0 +1,21 @@
+fix: the sign sheet's branch names where it runs, and T_Co is not one of them (#381)
+
+The comment over the sign sheet's spelling check said "No lattice a test can
+afford reaches this branch; the kernel rows of T_Co and of the Scattone lattices
+do".  At T_Co neither kernel row reaches it, and both halves are measured
+(probe-otilde-labels.py, probe-otildeplus-sign.py):
+
+  Otilde   _image_labels ['discriminant'],           j = 0, []
+  Otilde+  _image_labels ['discriminant', 'spinor'], j = 1, ['spinor']
+  Otilde+  _stabilizer_sign_flips(plane family) = True
+
+`flipped is not None` needs j >= 1 and one sign label and not stab_sign_flip, so
+the first row has no sign character to lift and the second's stabilizer presents
+the coset its character leaves: neither spells a sheet's word here.  The comment
+now says what the code does and what has been measured, and leaves the Scattone
+lattices unclaimed rather than asserting them.
+
+No red test, and none is manufactured: the corrected text is a comment, and the
+claim it made is about which rows reach a branch, which no assertion in the tree
+reads.  The measurements behind it are in
+results/issue381-the-two-kernel-rows-carry-one-relation.md.

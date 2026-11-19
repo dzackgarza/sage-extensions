@@ -1,0 +1,28 @@
+tree SHA: cc49744f149f3821860ab98f69ad74b3fe4e5297 (modified paths: 0)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 2.99 2.39 2.92 4/528 3708093
+probe: .tmp/issue381-t14/probe-otilde-labels.py; inner 900 s
+[    1.49s] lattice: rank 11, signature (2, 9)
+[    3.21s] Otilde: index 46998591897600
+[    3.21s] Otilde: _image_labels ['discriminant']
+[    3.21s] Otilde: determinant_kernel False; spinor_kernel False
+[    3.21s] Otilde: _sign_descent_rank() j=0, labels=[]
+[   65.82s] Otilde+: index 93997183795200
+[   65.82s] Otilde+: _image_labels ['discriminant', 'spinor']
+[   65.82s] Otilde+: determinant_kernel False; spinor_kernel True
+[   65.82s] Otilde+: _sign_descent_rank() j=1, labels=['spinor']
+[   65.82s] done
+[peakrss] probe603: child waited=0 shell_code=0 samples=35
+[peakrss] peak tree RSS      : 534 MiB
+[peakrss] low-water MemAvail : 1248 MiB
+[peakrss] peak single VmHWM  : 537 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      526 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    66.0s procs=  3 rss=   534 MiB hwm=   536 MiB avail=  3975 MiB
+[peakrss]   t=    68.0s procs=  3 rss=   533 MiB hwm=   537 MiB avail=  3902 MiB
+[peakrss]   t=    64.0s procs=  3 rss=   530 MiB hwm=   532 MiB avail=  3942 MiB
+[peakrss]   t=    62.0s procs=  3 rss=   528 MiB hwm=   530 MiB avail=  3906 MiB
+[peakrss]   t=    26.0s procs=  3 rss=   524 MiB hwm=   524 MiB avail=  1772 MiB
+probe exit: 0

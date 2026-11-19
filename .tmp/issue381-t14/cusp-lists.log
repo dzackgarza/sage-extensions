@@ -1,0 +1,33 @@
+tree SHA: cc49744f149f3821860ab98f69ad74b3fe4e5297 (modified paths: 0)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 2.94 2.24 2.90 5/528 3707379
+probe: .tmp/issue381-t14/probe-cusp-lists.py; inner 900 s
+[    2.38s] === U+U(2)+<-2>: rank 5, signature (2, 3) ===
+[   18.55s]   Otilde rank 1: 3 cusps
+[   19.99s]   Otilde+ rank 1: 3 cusps
+[   19.99s]   rank 1: lists equal True; sets equal True
+[   20.56s]   Otilde rank 2: 2 cusps
+[   21.37s]   Otilde+ rank 2: 2 cusps
+[   21.37s]   rank 2: lists equal True; sets equal True
+[   21.37s] === 6JRS: rank 5, signature (2, 3) ===
+[   21.52s]   Otilde rank 1: 1 cusps
+[   23.08s]   Otilde+ rank 1: 1 cusps
+[   23.08s]   rank 1: lists equal True; sets equal True
+[   23.31s]   Otilde rank 2: 1 cusps
+[   23.83s]   Otilde+ rank 2: 1 cusps
+[   23.83s]   rank 2: lists equal True; sets equal True
+[   23.83s] done
+[peakrss] probe603: child waited=0 shell_code=0 samples=13
+[peakrss] peak tree RSS      : 461 MiB
+[peakrss] low-water MemAvail : 683 MiB
+[peakrss] peak single VmHWM  : 467 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      456 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    24.1s procs=  3 rss=   461 MiB hwm=   467 MiB avail=  4153 MiB
+[peakrss]   t=    22.1s procs=  3 rss=   449 MiB hwm=   455 MiB avail=  4166 MiB
+[peakrss]   t=    20.1s procs=  3 rss=   426 MiB hwm=   432 MiB avail=  4174 MiB
+[peakrss]   t=    18.1s procs=  3 rss=   416 MiB hwm=   422 MiB avail=  4166 MiB
+[peakrss]   t=     8.0s procs=  3 rss=   402 MiB hwm=   417 MiB avail=   781 MiB
+probe exit: 0

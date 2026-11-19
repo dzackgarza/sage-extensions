@@ -1,0 +1,34 @@
+results: the two kernel rows carry one relation, and Otilde+'s is Otilde's (#381)
+
+The rows differ by one character: _image_labels is ['discriminant'] for Otilde
+and ['discriminant', 'spinor'] for Otilde+, measured on the quotients
+(otilde-labels.log):
+
+  Otilde   index 46998591897600, j = 0, []
+  Otilde+  index 93997183795200, j = 1, ['spinor'],
+           _stabilizer_sign_flips(plane family) True
+
+so neither row has a sign sheet.  The walk's other data -- right =
+rho(Stab(P)) from the plane's parabolic family, left = the subgroup's image,
+trivial for a kernel row, the coset queue, and the lifts spelled from the
+lattice's own generator images -- never mentions the subgroup.  Hence both rows
+yield the same planes in the same order, and since Otilde+ <= Otilde the two
+partitions coincide: the cusp sets are the same sets.
+
+An edge joins a line cusp to a plane cusp when some line of the line orbit lies
+in the plane orbit, which is a statement about the orbit sets; so the two rows'
+relations are the same relation, 569160 edges over 527 and 189720.
+
+Measured where the gate can afford it: the two rows' cusp lists are equal in
+order and coordinates at both ranks on U+U(2)+<-2> (3 and 2 cusps) and on 6JRS
+(1 and 1) -- cusp-lists.log -- and the driver gives both rows 4 edges over 3 and
+2 cusps with the same ordered digest on U+U(2)+<-2>, and the same counts on 6JRS
+and U+U(2)+<-4>.
+
+So Otilde+'s acceptance values are settled by transfer: (569160, 527, 189720).
+The row itself is not run: the T_Co step is an argument with its two inputs
+measured, and the host had 4085 MiB of MemAvailable with oom_kill up five since
+the last check, against the ~8 GiB gate a 3.6 GiB row needs.
+
+No object introduced: rho and the real spinor norm are the lattice's characters,
+the coset space and the index are Dutour Sikiric--Hulek Lemma 3.6, printed p. 22.
