@@ -1,0 +1,106 @@
+r"""Folding a root family by a diagram involution that lifts to an isometry of its span.
+
+A permutation \(\sigma\) of the roots \(r_1,\dots,r_n\) of one lattice induces the linear map
+\(g(\sum_v a_v r_v)=\sum_v a_v r_{\sigma v}\) on their span exactly when it carries the rational
+relations of the roots to relations, and \(g\) is an isometry exactly when it keeps every pairing.
+The folded family is the family of orbit sums \(s_O=\sum_{v\in O}r_v\) that are roots; each is
+fixed by \(g\), so the folded roots lie in the invariant lattice \(W^\sigma\), and
+\((W^\sigma)^\perp\) is the anti-invariant lattice.
+
+The smallest specimen that decides the isometry is two orthogonal \((-2)\)-roots
+\(a,b\) of \(A_1\oplus A_1\), swapped: the orbit sums are the one root \(a+b\), of square \(-4\),
+and the invariant and anti-invariant lattices are \(\mathbf Z(a+b)\) and \(\mathbf Z(a-b)\), both
+of square \(-4\).  Three roots of \(A_2\) --- \(r_1,r_2,r_1+r_2\) --- decide that a root of the
+family may itself be the sum of the two swapped ones: the fold by the swap of \(r_1,r_2\) has the
+invariant lattice \(\mathbf Z(r_1+r_2)\), of square \(-2\), and the anti-invariant lattice
+\(\mathbf Z(r_1-r_2)\), of square \(q(r_1)+q(r_2)-2b(r_1,r_2)=-6\).
+
+Two permutations are refused, and they are refused for different reasons.  The three roots of
+\(A_2\) have the affine diagram \(\tilde A_2\), whose automorphism group is all of \(S_3\), while
+only the two permutations fixing the pair \(\{r_1,r_2\}\) keep the pairings: the bond is
+\(|b|\), so a diagram symmetry may reverse a pairing.  And a family whose span is degenerate
+satisfies relations its pairings do not see: in the lattice of Gram
+\([[-2,1,0],[1,-2,0],[0,0,0]]\), the five roots \(s_1,s_2,s_1+s_2,s_1+z,s_2+z\) have a
+Gram-preserving permutation that is no isometry of their span.
+"""
+
+from sage_extensions.all import *
+
+import pytest
+
+
+def _folded_into(lattice, folding):
+    r"""Return the folded roots carried back into ``lattice``, the roots' own lattice."""
+    return tuple(
+        folding.span().inclusion()(folding.invariant_lattice().inclusion()(root))
+        if folding.span() is not lattice
+        else folding.invariant_lattice().inclusion()(root)
+        for root in folding.roots()
+    )
+
+
+def test_the_fold_of_two_orthogonal_roots_by_their_swap() -> None:
+    plane = Lattices(ZZ)([[-2, 0], [0, -2]])
+    first, second = plane.module_generators()
+    folding = CoxeterDiagrams().from_roots((first, second)).fold((1, 0))
+
+    assert folding.isometry()(first) == second
+    assert folding.isometry()(second) == first
+    assert folding.isometry() * folding.isometry() == folding.isometry().parent().identity()
+    assert folding.span() is plane
+    assert folding.invariant_lattice().gram_tensor() == tensor(ZZ, (), (1, 1), [[-4]])
+    assert folding.anti_invariant_lattice().gram_tensor() == tensor(ZZ, (), (1, 1), [[-4]])
+    assert folding.discarded_sums() == ()
+    assert tuple(root.q() for root in _folded_into(plane, folding)) == (-4,)
+    assert folding.folded_diagram().cardinality() == 1
+
+
+def test_the_fold_of_three_roots_of_a2_by_the_swap_of_two_of_them() -> None:
+    lattice = Lattices(ZZ)("A2")
+    first, second = lattice.module_generators()
+    diagram = CoxeterDiagrams().from_roots((first, second, first + second))
+    folding = diagram.fold((1, 0, 2))
+
+    assert diagram.Aut().order() == 6
+    assert folding.isometry()(first) == second
+    assert folding.isometry()(first + second) == first + second
+    assert folding.invariant_lattice().gram_tensor() == tensor(ZZ, (), (1, 1), [[-2]])
+    assert folding.anti_invariant_lattice().gram_tensor() == tensor(ZZ, (), (1, 1), [[-6]])
+    assert tuple(root.q() for root in _folded_into(lattice, folding)) == (-2,)
+    assert folding.folded_diagram().cardinality() == 1
+
+
+def test_a_diagram_symmetry_that_reverses_a_pairing_is_refused() -> None:
+    r"""\(\tilde A_2\)'s other four symmetries keep the bonds and not the pairings of the roots."""
+    lattice = Lattices(ZZ)("A2")
+    first, second = lattice.module_generators()
+    diagram = CoxeterDiagrams().from_roots((first, second, first + second))
+
+    assert diagram.Aut().order() == 6
+    for permutation in ((0, 2, 1), (2, 1, 0), (2, 0, 1), (1, 2, 0)):
+        with pytest.raises(ValueError):
+            diagram.fold(permutation)
+
+
+def test_a_permutation_that_keeps_the_pairings_and_breaks_a_relation_is_refused() -> None:
+    lattice = Lattices(ZZ)([[-2, 1, 0], [1, -2, 0], [0, 0, 0]])
+    first, second, radical = lattice.module_generators()
+    roots = (first, second, first + second, first + radical, second + radical)
+    permutation = (3, 4, 2, 0, 1)
+    images = tuple(roots[position] for position in permutation)
+
+    assert all(
+        lattice.b(roots[left], roots[right]) == lattice.b(images[left], images[right])
+        for left in range(5)
+        for right in range(5)
+    )
+    with pytest.raises(ValueError):
+        CoxeterDiagrams().from_roots(roots).fold(permutation)
+
+
+def test_a_mapping_of_the_vertices_names_the_same_fold_as_the_tuple_of_its_images() -> None:
+    plane = Lattices(ZZ)([[-2, 0], [0, -2]])
+    first, second = plane.module_generators()
+    diagram = CoxeterDiagrams().from_roots((first, second))
+
+    assert diagram.fold({0: 1, 1: 0}).roots().cardinality() == diagram.fold((1, 0)).roots().cardinality()
