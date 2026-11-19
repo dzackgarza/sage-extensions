@@ -921,8 +921,26 @@ def _sum_certificate_covers(manifold, labels, chart) -> bool:
             if _decided_nowhere_vanishing(condition, symbols, chart_conditions) is not True
         )
         if not kept:
-            # Every condition of this member vanishes nowhere, so it is the chart.
-            return True
+            # Every condition of this member vanishes nowhere, so the member is the chart
+            # its base chart is -- and that covers the chart being certified only when it
+            # reaches it.  A chart with no conditions at all is read on its own domain and
+            # says nothing about the points outside it.
+            if any(
+                _engine_manifold_chart(chart).domain().is_subset(
+                    _engine_manifold_chart(manifold.atlas()[label]).domain()
+                )
+                for label in labels
+                if not tuple(manifold.atlas()[label].nonvanishing())
+            ):
+                continue
+            if read and any(
+                _engine_manifold_chart(chart).domain().is_subset(
+                    _engine_manifold_chart(manifold.atlas()[label]).domain()
+                )
+                for label in labels
+            ):
+                continue
+            return None
         product = kept[0]
         for condition in kept[1:]:
             product = product * condition
