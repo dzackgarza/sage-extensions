@@ -1,5 +1,4 @@
 r"""Marked rank-one reduction lifts as kernel-group torsors.
-
 The defining map fixes a chosen isotropic vector and induces the specified
 isometry on its perpendicular quotient. A rational Witt splitting supplies
 one lift. Its left translates by the target reduction kernel are all lifts.
@@ -10,6 +9,7 @@ arXiv:0810.1614, section 3.1: equation (4), printed p. 8, is the transvection,
 equation (5), printed p. 9, composes and inverts it, and equation (10), printed
 p. 9, is its integrality on an even lattice).
 """
+from sage.matrix.constructor import matrix as engine_matrix
 
 from sage.misc.cachefunc import cached_method
 
@@ -452,23 +452,45 @@ class IsotropicReductionLiftTorsors(OwnedCategoryOverBaseRing):
         def _integral_lift_frame(self):
             r"""The fixed data of the coordinate-level integrality test.
 
-            ``(rational, marked, base_images)``: the rational lattice the lifts
-            live in, the marked isotropic vector its transvections are taken at,
-            and the coordinates of ``base_point()``'s images of its generators.
-            Every representative's lift is ``E_{marked, x} . base`` for one
-            ``x``, so these are read once and the loop below varies only ``x``.
+            ``(rational, gram, marked, base_images)``: the rational lattice the
+            lifts live in, its Gram matrix over the rationals, the coordinates of
+            the marked isotropic vector the transvections are taken at, and the
+            coordinates of ``base_point()``'s images of its generators.  Every
+            representative's lift is ``E_{marked, x} . base`` for one ``x``, so
+            these are read once and the loop below varies only ``x``.
+
+            Everything is a coordinate list over ``QQ``: the owned ring's
+            elements are read once here, and the per-representative arithmetic
+            never builds one (``ring_foundation``'s fraction equality was the
+            dominant cost of the object-level version).
             """
+            from sage.rings.rational_field import QQ as SageQQ
+
+            def rational_value(entry):
+                numerator = getattr(entry, "numerator", entry)
+                numerator = numerator() if callable(numerator) else numerator
+                denominator = getattr(entry, "denominator", 1)
+                denominator = denominator() if callable(denominator) else denominator
+                return SageQQ(int(numerator)) / SageQQ(int(denominator))
+
             rational = self._target_witt.rational_lattice()
             labels = tuple(rational.module_generating_set())
-            base = self.base_point()
-            images = tuple(
-                tuple(
-                    base(rational.module_generator(label)).to_vector()(other)
-                    for other in labels
-                )
-                for label in labels
+            generators = tuple(rational.module_generator(label) for label in labels)
+            rank = len(labels)
+            gram = engine_matrix(
+                SageQQ,
+                [[rational_value(rational.b(left, right)) for right in generators] for left in generators],
             )
-            return rational, self._target_witt.isotropic_vector(), images
+
+            def coordinates_of(element):
+                values = element.to_vector()
+                return [rational_value(values(label)) for label in labels]
+
+            base = self.base_point()
+            base_images = tuple(
+                coordinates_of(base(generator)) for generator in generators
+            )
+            return rational, gram, coordinates_of(self._target_witt.isotropic_vector()), base_images
 
         def _integral_lift(self, coordinates):
             r"""The integral lift at ``coordinates``, or ``None`` where there is none.
@@ -486,51 +508,54 @@ class IsotropicReductionLiftTorsors(OwnedCategoryOverBaseRing):
             integer: the map is a rational isometry, so an integral matrix on a
             framing of the lattice has a unit determinant and its inverse is
             integral too.  The isometry is raised from the matrix only when the
-            test passes, which is where the cost used to be paid for every
-            representative.
+            test passes.
+
+            The arithmetic is on coordinate lists over ``QQ`` throughout, with
+            the Gram read once by :meth:`_integral_lift_frame`; the section is
+            the only owned-ring object built per representative.
             """
             from sage.rings.rational_field import QQ as SageQQ
-            from sage.matrix.constructor import matrix as engine_matrix
 
-            rational, marked, base_images = self._integral_lift_frame()
+            rational, gram, marked, base_images = self._integral_lift_frame()
             labels = tuple(rational.module_generating_set())
-            generators = tuple(rational.module_generator(label) for label in labels)
             rank = len(labels)
             x = self._target_section(self._parameter_at(coordinates))
             if x.parent() is not rational:
                 return None
-            half_square = rational.base_ring()(rational.q(x)) / rational.base_ring()(2)
+            x_coordinates = [SageQQ(0)] * rank
+            values = x.to_vector()
+            for position, label in enumerate(labels):
+                entry = values(label)
+                numerator = getattr(entry, "numerator", entry)
+                numerator = numerator() if callable(numerator) else numerator
+                denominator = getattr(entry, "denominator", 1)
+                denominator = denominator() if callable(denominator) else denominator
+                x_coordinates[position] = SageQQ(int(numerator)) / SageQQ(int(denominator))
+
+            def pairing(left, right):
+                return sum(
+                    (
+                        left[index] * gram[index, other] * right[other]
+                        for index in range(rank)
+                        for other in range(rank)
+                    ),
+                    SageQQ(0),
+                )
+
+            half_square = pairing(x_coordinates, x_coordinates) / SageQQ(2)
             entries = []
             for image_of_generator in base_images:
-                z = sum(
-                    (
-                        rational.scalar_multiple(
-                            rational.base_ring()(coefficient), generator
-                        )
-                        for coefficient, generator in zip(
-                            image_of_generator, generators, strict=True
-                        )
-                        if coefficient
-                    ),
-                    rational.zero(),
-                )
-                against_x = rational.b(z, x)
-                against_marked = rational.b(z, marked)
-                moved = z + rational.scalar_multiple(
-                    against_x - half_square * against_marked, marked
-                ) - rational.scalar_multiple(against_marked, x)
-                values = moved.to_vector()
-                for label in labels:
-                    entry = values(label)
-                    numerator = getattr(entry, "numerator", entry)
-                    numerator = numerator() if callable(numerator) else numerator
-                    denominator = getattr(entry, "denominator", 1)
-                    denominator = denominator() if callable(denominator) else denominator
-                    numerator = int(numerator)
-                    denominator = int(denominator)
-                    if numerator % denominator:
+                against_x = pairing(image_of_generator, x_coordinates)
+                against_marked = pairing(image_of_generator, marked)
+                for index in range(rank):
+                    entry = (
+                        image_of_generator[index]
+                        + (against_x - half_square * against_marked) * marked[index]
+                        - against_marked * x_coordinates[index]
+                    )
+                    if entry.denominator() != 1:
                         return None
-                    entries.append(SageQQ(numerator // denominator))
+                    entries.append(entry)
             return rational.Isom(rational)._isometry_from_column_matrix(
                 engine_matrix(
                     SageQQ,
