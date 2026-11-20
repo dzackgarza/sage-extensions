@@ -1,0 +1,32 @@
+test: the line cusp partition must not depend on the process (red, #381)
+
+A line cusp is a Gamma-orbit and Gamma = ker rho acts trivially on A_L, so the
+divided class is constant on the orbit and the multiplicities of the classes over
+the cusps are a function of the lattice and the subgroup.  This test computes them
+through in_fresh_processes under PYTHONHASHSEED 1 and 2 and asserts equality.
+
+It is red on 76f06d2, both ways the defect shows:
+
+  * the child raises in the walk itself --
+    AssertionError: the orbit walk's transversal element does not carry the start
+    to the reached point
+    (1 failed in 128.80s, that run);
+  * and when both children complete, the multiplicities differ -- largest buckets
+    9,9,8,8,7,... against 7,5,5,5,5,... (probe-fork.log).
+
+The seat is measured: ambient = tuple(O(L).group_generators()) has 358 elements in
+one process and 336 in the other, so the same coset is spelled by a different
+word, its lift is a different isometry, and the cusp row yields a different set of
+representatives -- 480 and 520 of 527 spans exclusive (divergence.log).
+
+The function is module-level and returns a list of integers, so it is JSON and the
+fresh process can answer it.  No len(): the counts are accumulated.
+
+The test is marked pytest.mark.timeout(1200): the repository has no slow-tier
+marker -- pyproject's addopts carry --timeout=60 for every call -- and the
+precedent for a heavy file is pytest.mark.timeout(300) at
+tests/groups/test_discriminant_lifts_of_o_plus_8_2.sage.  Wall time is one child's,
+since in_fresh_processes runs them at once.
+
+No object introduced: the cusp, its representative, its divided class and the
+generating family are the library's.

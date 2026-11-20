@@ -1,0 +1,137 @@
+tree SHA: 76f06d2c746590ad08dbcf8c412461bee5a56eb6 (modified paths: 1)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 3.12 3.11 2.34 4/530 4011635
+files: tests/lattices/test_the_line_cusp_partition_is_the_same_in_every_process.sage; inner 1500 s
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+time gates on: star import 1.34 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: asyncio-1.5.0, xdist-3.8.0, reportlog-1.0.0, platformdirs-4.13.5, hypothesis-6.170.15, anyio-4.15.1, timeout-2.4.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 1 item
+
+tests/lattices/test_the_line_cusp_partition_is_the_same_in_every_process.sage F [100%]
+
+=================================== FAILURES ===================================
+_________ test_the_line_cusp_partition_does_not_depend_on_the_process __________
+
+    @pytest.mark.timeout(1200)
+    def test_the_line_cusp_partition_does_not_depend_on_the_process():
+>       first, second = in_fresh_processes(partitioned_line_cusps, [1, 2])
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/lattices/test_the_line_cusp_partition_is_the_same_in_every_process.sage:44: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+function = <function partitioned_line_cusps at 0x7b68d9d8e350>, seeds = [1, 2]
+
+    def in_fresh_processes(function, seeds):
+        r"""Return ``function()`` computed once per seed, each in a new Sage process with ``PYTHONHASHSEED`` that seed.
+    
+        ``function`` is a module-level function of the running test's file, taking
+        no argument and returning a JSON value (integers, strings, lists,
+        dictionaries with string keys).  Each new process runs the conftests above
+        that file, executes the file and calls the function by name, so the
+        function is linted with the test and is the same code in every process.
+        The processes run at once, so the wall time is that of one.  A property
+        that holds between processes (a partition, an order, a choice that must
+        not depend on string hashing) is asserted by comparing the values:
+    
+            first, second = in_fresh_processes(partition, [1, 2])
+            assert first == second
+    
+        A failure in a new process fails the test with that process's stderr.
+        """
+        test_file = os.environ["PYTEST_CURRENT_TEST"].split("::")[0]
+        processes = [
+            subprocess.Popen(
+                [sys.executable, "-c", FRESH_PROCESS_SCRIPT, test_file, function.__name__],
+                env=dict(os.environ, PYTHONHASHSEED=str(int(seed)), PYTHONPATH=os.pathsep.join(sys.path)),
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+            )
+            for seed in seeds
+        ]
+        values = []
+        for process in processes:
+            output, errors = process.communicate()
+>           assert process.returncode == 0, errors
+E           AssertionError: Traceback (most recent call last):
+E               File "sage/misc/cachefunc.pyx", line 1965, in sage.misc.cachefunc.CachedMethodCaller.__call__
+E                 return cache[k]
+E             KeyError: ((1,), ())
+E             
+E             During handling of the above exception, another exception occurred:
+E             
+E             Traceback (most recent call last):
+E               File "<string>", line 16, in <module>
+E                 print(json.dumps(namespace[function_name]()))
+E                                  ~~~~~~~~~~~~~~~~~~~~~~~~^^
+E               File "tests/lattices/test_the_line_cusp_partition_is_the_same_in_every_process.sage", line 32, in partitioned_line_cusps
+E                 for cusp in subgroup.cusps(1):
+E                             ^^^^^^^^^^^^^^^^^^
+E               File "sage/misc/cachefunc.pyx", line 1970, in sage.misc.cachefunc.CachedMethodCaller.__call__
+E                 w = self._instance_call(*args, **kwds)
+E               File "sage/misc/cachefunc.pyx", line 1848, in sage.misc.cachefunc.CachedMethodCaller._instance_call
+E                 return self.f(self._instance, *args, **kwds)
+E               File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 803, in cusps
+E                 return _distinct_finite_ordered_set(
+E                     _arithmetic_cusp(self, representative)
+E                 ...<2 lines>...
+E                     )
+E                 )
+E               File "/repos/sage-extensions/src/sage_extensions/categories/sets/finite_ordered_sets.py", line 1119, in _distinct_finite_ordered_set
+E                 admitted = tuple(points)
+E               File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 805, in <genexpr>
+E                 for representative in _yield_subgroup_isotropic_orbit_representatives(
+E                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+E                     self, rank
+E                     ^^^^^^^^^^
+E                 )
+E                 ^
+E               File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 4773, in _yield_subgroup_isotropic_orbit_representatives
+E                 for splitting in quotient.splitting_isometries_from_line_class(*line_image):
+E                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+E               File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 1864, in <genexpr>
+E                 for lift, _discriminant_image in self._iter_splitting_isometries_in_im_rho_from_image(
+E                                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+E                     (), stab_sign_flip, point=class_points
+E                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E                 )
+E                 ^
+E               File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 2313, in _iter_splitting_isometries_in_im_rho_from_image
+E                 assert setwise_action(point, reached) == image, (
+E                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E             AssertionError: the orbit walk's transversal element does not carry the start to the reached point
+E             
+E           assert 1 == 0
+E            +  where 1 = <Popen: returncode: 1 args: ['/sage/.venv/bin/python', '-c', '\nimport json,...>.returncode
+
+tests/lattices/conftest.py:240: AssertionError
+=============================== time-gate report ===============================
+collection took 6.27 s; the measured ceiling is 6 s
+========================== test-call performance gate ==========================
+tests/lattices/test_the_line_cusp_partition_is_the_same_in_every_process.sage::test_the_line_cusp_partition_does_not_depend_on_the_process: 120.44 s > 20 s
+============================== slowest durations ===============================
+120.44s call     tests/lattices/test_the_line_cusp_partition_is_the_same_in_every_process.sage::test_the_line_cusp_partition_does_not_depend_on_the_process
+
+(2 durations < 0.005s hidden.  Use -vv to show these durations.)
+=========================== short test summary info ============================
+FAILED tests/lattices/test_the_line_cusp_partition_is_the_same_in_every_process.sage::test_the_line_cusp_partition_does_not_depend_on_the_process
+======================== 1 failed in 128.80s (0:02:08) =========================
+[peakrss] test603: child waited=120 shell_code=120 samples=121
+[peakrss] peak tree RSS      : 1618 MiB
+[peakrss] low-water MemAvail : 2230 MiB
+[peakrss] peak single VmHWM  : 1710 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      625 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   102.1s procs=  5 rss=  1618 MiB hwm=  1702 MiB avail=  5151 MiB
+[peakrss]   t=   100.1s procs=  5 rss=  1616 MiB hwm=  1701 MiB avail=  5125 MiB
+[peakrss]   t=   104.1s procs=  5 rss=  1615 MiB hwm=  1704 MiB avail=  5200 MiB
+[peakrss]   t=    98.1s procs=  5 rss=  1613 MiB hwm=  1696 MiB avail=  5390 MiB
+[peakrss]   t=    96.1s procs=  5 rss=  1606 MiB hwm=  1689 MiB avail=  5125 MiB
+test exit: 120
