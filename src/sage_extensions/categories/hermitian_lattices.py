@@ -209,6 +209,83 @@ class HermitianLattice(SageObject):
             return tuple(lattice.O().centralizer(scaled.unit_isometry(zeta)).group_generators())
         return tuple(element for element in lattice.O() if scaled.is_order_linear(element))
 
+    def unitary_group_generators(self):
+        r"""Return complete integral generators of ``U(O^n,h)`` wherever the arithmetic commutant is constructive.
+
+        This method does *not* assume a norm-one scalar unit generating the
+        coefficient field. In the imaginary quadratic rings of discriminant
+        ``-8``, ``-7`` and ``-11`` the only such scalars are ``±1``;
+        centralizing them inside ``O(Tr h)`` would produce the *larger*
+        orthogonal group, not the unitary group.
+
+        Choose an integral element ``alpha`` of the order with
+        ``Q(alpha)=K``. The primitive element theorem guarantees the
+        increasing-coefficient search terminates. Its multiplication
+        operator ``F`` on the trace lattice generates the rational
+        ``K``-action. An integral isometry commutes with ``F`` exactly when
+        it commutes with every element of ``K``, hence with the given
+        order: this is exactly the unitary group of ``h``. Moreover
+        ``F^dagger`` is multiplication by ``conjugate(alpha)`` and belongs
+        to ``Q[F]``. The maintained integral commutant therefore applies
+        even when ``F`` is skew-adjoint or neither symmetric nor a unit.
+
+        The complete integral arithmetic generators come from the
+        source-backed commutant model, with the full congruence kernel
+        retained; there is no filtering of generators of ``O(Tr h)``.
+        If no source-backed unitary group construction applies, its
+        explicit missing-capability exception propagates.
+        """
+        from itertools import count, product
+
+        from sage.rings.integer_ring import ZZ as SageZZ
+        from sage_extensions.algebras.isometry_commutant import IsometryCommutant
+        from sage_indefinite_port.indefinite.commutant_groups import centralizer_generators
+
+        field = self._field
+        degree = int(field.degree())
+        primitive = None
+        for radius in count(1):
+            for coefficients in product(range(-radius, radius + 1), repeat=len(self._order_basis)):
+                if max(abs(int(c)) for c in coefficients) != radius:
+                    continue
+                element = sum((int(c) * a for c, a in zip(coefficients, self._order_basis, strict=True)), field.zero())
+                if int(element.minpoly().degree()) == degree:
+                    primitive = element
+                    break
+            if primitive is not None:
+                break
+
+        trace = self.trace_lattice()
+        frame = tuple(trace.module_generators())
+        labels = tuple(trace.module_generating_set())
+        gram = matrix(SageZZ, [[int(trace.b(x, y)) for y in frame] for x in frame])
+        action = self.order_action(primitive)
+        columns = matrix(SageZZ, [
+            [int(action(point).to_vector()(label)) for point in frame]
+            for label in labels
+        ])
+        commutant = IsometryCommutant(gram, (columns,))
+
+        result = []
+        for generator in centralizer_generators(commutant):
+            columns_g = matrix(SageZZ, generator)
+            if (columns_g.det() not in (1, -1)
+                    or columns_g.transpose() * gram * columns_g != gram
+                    or columns_g * columns != columns * columns_g):
+                raise ArithmeticError("the arithmetic commutant returned a nonunitary integral matrix")
+            owned = trace.O()({
+                label: sum(
+                    (trace.scalar_multiple(int(entry), point)
+                     for entry, point in zip(columns_g.column(j), frame, strict=True) if entry),
+                    trace.zero(),
+                )
+                for j, label in enumerate(labels)
+            })
+            if not self.is_order_linear(owned):
+                raise ArithmeticError("an integral commutant generator does not preserve the Hermitian order")
+            result.append(owned)
+        return tuple(result)
+
     def _generates_order(self, zeta):
         powers = matrix(SageQQ, [list((zeta**k).vector()) for k in range(self._field.degree())])
         return powers.det() != 0 and all(entry in SageZZ for entry in (self._basis_matrix * ~powers).list())

@@ -1,9 +1,12 @@
-r"""Simultaneous commutants of integral isometries.
+r"""Simultaneous commutants of integral operators with adjoint-stable rational algebras.
 
-For a nonsingular integral Gram matrix `B` and isometries `F_1, ..., F_s` acting on
+For a nonsingular integral Gram matrix `B` and integral operators `F_1, ..., F_s` acting on
 column vectors, `A` is the rational commutant, `O = A \cap M_r(Z)` its integral order
-and `a^\dagger = B^{-1} a^t B` the adjoint. Each `F_i^\dagger = F_i^{-1}`, so `A` is
-stable under the adjoint, and the centralizer of the `F_i` in `O(L)` is the set of units
+and `a^\dagger = B^{-1} a^t B` the adjoint. Require that each `F_i^\dagger` belongs to
+`Q[F_i]`: this holds for isometries (`F_i^\dagger=F_i^{-1}`), self-adjoint and
+skew-adjoint maps, and multiplication by a primitive element of a CM field on
+its Hermitian trace lattice (`F_i^\dagger` is multiplication by its conjugate).
+The commutant `A` is then stable under adjoint, and its unit group meets `O(L)` in the set of units
 `u` of `O` with `u^\dagger u = 1`. `O` need not be stable under the adjoint when `B`
 is not unimodular.
 
@@ -119,14 +122,17 @@ def _factor_centralizer_generators(factor):
 
 
 class IsometryCommutant:
-    r"""The commutant algebra and integral order of a set of isometries and self-adjoint maps.
+    r"""The commutant algebra and integral order of adjoint-stable operators.
 
-    Each source `F` is an isometry (`F^t B F = B`, adjoint `F^{-1}`) or `B`-self-adjoint
-    (`F^t B = B F`, adjoint `F`). In both cases the adjoint of `F` is a polynomial in `F`,
-    so the commutant `A` is stable under the adjoint and its unit group meets `O(L)` in the
-    centralizer of the sources. A self-adjoint source is, for example, multiplication by a
-    generator of `O_K` on the trace form of an `O_K`-lattice, whose commutant gives the
-    `O_K`-linear isometries.
+    Each source `F` satisfies `F^dagger in Q[F]`, checked by exact rational
+    linear algebra on `1,F,...,F^(r-1)` (Cayley--Hamilton). Consequently
+    every operator commuting with `F` commutes with `F^dagger`. Taking
+    adjoints and using `F = p(F^dagger)` for the same rational polynomial
+    `p` proves the commutant is adjoint-stable. Therefore its unitary units
+    are precisely the integral orthogonal centralizer of the sources.
+    In particular, this includes skew-adjoint multiplication by `sqrt(-d)`
+    on a Hermitian trace lattice over the imaginary quadratic order, where
+    there may be no nontrivial scalar isometry generating the field action.
     """
 
     def __init__(self, gram, isometries):
@@ -134,12 +140,22 @@ class IsometryCommutant:
         self.rank = self.gram.nrows()
         self.isometries = tuple(matrix(ZZ, self.rank, self.rank, F) for F in isometries)
         assert self.gram == self.gram.transpose() and self.gram.det() != 0
-        assert all(
-            (F.transpose() * self.gram * F == self.gram and F.det() in (1, -1))
-            or F.transpose() * self.gram == self.gram * F
-            for F in self.isometries
-        ), f"every source must be an isometry or self-adjoint for the Gram matrix {self.gram}"
         self._adjoint_factor = self.gram.change_ring(QQ).inverse()
+        gram_rational = self.gram.change_ring(QQ)
+        for source in self.isometries:
+            # The adjoint must lie in the *same* rational algebra Q[source].
+            # This precisely supplies the adjoint-closure hypothesis used
+            # by the arithmetic commutant/Levi algorithms; a random
+            # nonnormal integral operator is not admitted without proof.
+            powers = [identity_matrix(QQ, self.rank)]
+            for _ in range(1, self.rank):
+                powers.append(powers[-1] * source)
+            span = matrix(QQ, [power.list() for power in powers])
+            adjoint = self._adjoint_factor * source.transpose() * gram_rational
+            if span.rank() != span.stack(matrix(QQ, [adjoint.list()])).rank():
+                raise ValueError(
+                    "the adjoint of an integral commutant source is not in its generated rational algebra"
+                )
         self.order_basis = self._integral_basis()
         self._coordinates = matrix(QQ, [m.list() for m in self.order_basis])
 
