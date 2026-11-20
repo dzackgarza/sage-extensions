@@ -36,7 +36,7 @@ def partitioned_line_cusps():
         divided = lattice.divided_discriminant_class(vector)
         pair = frozenset([divided, -divided])
         counts[pair] = counts.get(pair, 0) + 1
-    return sorted(counts.values(), reverse=True)
+    return [int(value) for value in sorted(counts.values(), reverse=True)]
 
 
 @pytest.mark.timeout(1200)
