@@ -1,0 +1,23 @@
+test: the line-cusp walk answers its double-coset count in every process (guard, #381)
+
+The walk carries, beside every point it reaches, the element that carries the
+start to it, and asserts that it does.  On Otilde(T_Co) the assertion fires
+sometimes: a process either walks the 527 line cusps or raises
+"the orbit walk's transversal element does not carry the start to the reached
+point".
+
+This test asks the count in four fresh processes and asserts 527 in each.  It is
+GREEN on 5bbc0fa -- 1 passed in 266.95 s, counts (527, 527, 527, 527) -- so it is
+a guard and not a red witness: the assertion did not fire in any of the four.
+
+Where it has fired, on this tree, is recorded: .tmp/issue381-t23/key-stability.log
+(one process of four attempts) and the partition test's child at seed 1/2
+(.tmp/issue381-t26/red.log, 1 failed in 128.80s).  The defect is a lost invariant
+in the walk, not a wrong count, and it is intermittent, so no seed list makes it
+red on demand; manufacturing one is not done.
+
+It is a separate defect from the partition's dependence on the process, and it is
+recorded on its own so a repair of the partition cannot hide it.
+
+No object introduced: the walk, the transversal, the cusp and the double-coset
+count are the library's and Dutour Sikiric--Hulek Lemma 3.6's (printed p. 22).

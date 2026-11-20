@@ -1,0 +1,36 @@
+tree SHA: 5bbc0fa5f691759d9caba6ff78e4dcf624e97faa (modified paths: 1)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 0.01 0.44 1.42 1/474 4016247
+files: tests/lattices/test_the_line_cusp_walk_returns_a_transversal_element.sage; inner 1500 s
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+time gates on: star import 1.05 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: asyncio-1.5.0, xdist-3.8.0, reportlog-1.0.0, platformdirs-4.13.5, hypothesis-6.170.15, anyio-4.15.1, timeout-2.4.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 1 item
+
+tests/lattices/test_the_line_cusp_walk_returns_a_transversal_element.sage . [100%]
+
+========================== test-call performance gate ==========================
+tests/lattices/test_the_line_cusp_walk_returns_a_transversal_element.sage::test_the_line_cusp_walk_returns_a_transversal_in_every_process: 260.84 s > 20 s
+============================== slowest durations ===============================
+260.84s call     tests/lattices/test_the_line_cusp_walk_returns_a_transversal_element.sage::test_the_line_cusp_walk_returns_a_transversal_in_every_process
+
+(2 durations < 0.005s hidden.  Use -vv to show these durations.)
+======================== 1 passed in 266.95s (0:04:26) =========================
+[peakrss] test603: child waited=1 shell_code=1 samples=137
+[peakrss] peak tree RSS      : 3519 MiB
+[peakrss] low-water MemAvail : 5745 MiB
+[peakrss] peak single VmHWM  : 3719 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      820 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   106.1s procs=  7 rss=  3519 MiB hwm=  3719 MiB avail=  5928 MiB
+[peakrss]   t=   108.1s procs=  7 rss=  3519 MiB hwm=  3719 MiB avail=  6176 MiB
+[peakrss]   t=   114.1s procs=  7 rss=  3453 MiB hwm=  3719 MiB avail=  6139 MiB
+[peakrss]   t=   112.1s procs=  7 rss=  3450 MiB hwm=  3719 MiB avail=  6102 MiB
+[peakrss]   t=   110.1s procs=  7 rss=  3445 MiB hwm=  3719 MiB avail=  6137 MiB
+test exit: 1
