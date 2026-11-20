@@ -6053,9 +6053,15 @@ class Lattices(OwnedCategoryOverBaseRing):
                     and _engine_ring(field).is_absolute()
                 )
             )
-            assert supported_number_field, (
-                f"the spinor norm of {self!r} is computed here over represented absolute number fields, but Frac(R) = {field}"
-            )
+            if not supported_number_field:
+                raise NotImplementedError(
+                    f"the exact spinor norm of {self!r} over Frac(R) = {field} has no selected "
+                    "Wall-form or reflection-factorization implementation for this coefficient "
+                    "field. Supported intrinsic fields are QQ, represented absolute number "
+                    "fields and odd finite fields; integral lattices also admit exact base "
+                    "change to a selected field with decidable square classes (including "
+                    "the available local Q_p fields). No trivial spinor class is inferred."
+                )
             # Compute the unscaled Wall/Cartan--Dieudonne spinor in K when a
             # target field map is specified. Apply the scalar c in *K'*,
             # after pushing the square class forward: c need not lie in K.
