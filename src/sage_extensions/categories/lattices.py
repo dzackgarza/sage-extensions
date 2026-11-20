@@ -5941,8 +5941,10 @@ class Lattices(OwnedCategoryOverBaseRing):
             r"""Return the spinor norm \(g\mapsto\mathrm{sn}_{K'}(g\otimes K')\) on \(O(L)\).
 
             Let \(K=\operatorname{Frac}(R)\), \(V=L\otimes_R K\) the quadratic
-            space :meth:`vector_space`, and \(c\in K^\times\) the
-            ``form_multiplier``.  Every \(g\in O(V)\) is a product
+            space :meth:`vector_space`, and let \(c\) be the
+            ``form_multiplier``, a nonzero scalar in the **target field**
+            \(K'\) when ``field_map: K -> K'`` is supplied (in \(K\)
+            otherwise). Every \(g\in O(V)\) is a product
             \(s_{v_1}\cdots s_{v_m}\) of reflections in anisotropic vectors,
             and the class
             \[\mathrm{sn}_K(g)=\prod_{i=1}^{m}c\,(v_i,v_i)\,(K^\times)^2\in K^\times/(K^\times)^2\]
@@ -5960,8 +5962,9 @@ class Lattices(OwnedCategoryOverBaseRing):
             A field morphism \(\varphi\colon K\to K'\) (``field_map``, by
             default the identity of \(K\)) carries a factorization over \(K\)
             to one over \(K'\), so
-            \(\mathrm{sn}_{K'}(g\otimes K')=\varphi_*\,\mathrm{sn}_K(g)\) for
-            \(g\in O(V)\), with \(\varphi_*\) the square-class functor
+            \(\mathrm{sn}^{(c)}_{K'}(g\otimes K')=\varphi_*\,\mathrm{sn}^{(1)}_K(g)\,[c]^{\varepsilon(g)}\) for
+            \(g\in O(V)\), where \(\varepsilon(g)=0\) for determinant one
+            and \(1\) for determinant minus one, and \(\varphi_*\) is the square-class functor
             ``Monoids().Commutative().square_class_group()``.  The morphism returned
             is \(g\mapsto\varphi_*\,\mathrm{sn}_K(g\otimes K)\) on \(O(L)\): it
             is \(\mathrm{sn}_K\) of \(O(V)\) itself when \(R=K\), and along the
@@ -6053,7 +6056,14 @@ class Lattices(OwnedCategoryOverBaseRing):
             assert supported_number_field, (
                 f"the spinor norm of {self!r} is computed here over represented absolute number fields, but Frac(R) = {field}"
             )
-            multiplier = _spinor_norm_multiplier(field, form_multiplier)
+            # Compute the unscaled Wall/Cartan--Dieudonne spinor in K when a
+            # target field map is specified. Apply the scalar c in *K'*,
+            # after pushing the square class forward: c need not lie in K.
+            # For a product of m reflections its contribution is [c]^m,
+            # which depends only on det(g)=(-1)^m. In the unmapped case
+            # retain the existing normalized K-valued character unchanged.
+            multiplier = (_spinor_norm_multiplier(field, form_multiplier)
+                          if field_map is None else field.one())
             extension = self.orthogonal_group_base_change(ring.fraction_field_map())
             square_classes = field.square_class_group()
 
@@ -6081,8 +6091,14 @@ class Lattices(OwnedCategoryOverBaseRing):
                         f"the spinor norm of {self!r} is carried along a map out of Frac(R) = {field}, but {field_map} starts at {field_map.domain()}"
                     )
                     change_of_field = Monoids().Commutative().square_class_group()(field_map)
+                    target_multiplier = _spinor_norm_multiplier(field_map.codomain(), form_multiplier)
+                    target_classes = change_of_field.codomain()
+                    odd_multiplier_class = target_classes(target_multiplier)
                     return self.Aut().Mor(change_of_field.codomain())(
-                        lambda isometry: change_of_field(spinor_norm_class(isometry)),
+                        lambda isometry: change_of_field(spinor_norm_class(isometry)) * (
+                            odd_multiplier_class if isometry.determinant() == -ring.one()
+                            else target_classes.one()
+                        ),
                     )
 
         def spinor_kernel(self, field_map=None, form_multiplier=None):
