@@ -1,0 +1,37 @@
+tree SHA: c0a9d38399db3d78fbeccda62baa6f73657067b6 (modified paths: 0)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 2.06 1.10 0.90 2/553 3930775
+probe: .tmp/issue381-t22/probe-fibre-index.py; inner 1500 s
+[    2.18s] subgroup: {g in Orthogonal group O(Integral lattice of rank 11 and signature (2, 9)) : rho_L(g) lies in a subgroup given by its own generators}
+[    3.80s] quotient index: 46998591897600
+[   74.56s] im rho order: 46998591897600
+[  211.32s] parabolic family: 113 generators in 136.76 s
+[  236.93s] |F_P| = 247726080
+[  348.57s] line cusps 527, keys 351
+[  348.57s] ambiguous buckets: 104; sizes [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 6, 6, 6]
+[  348.58s] bucket of 2: key frozenset({'[ f2*f3*f10 ]'})
+Traceback (most recent call last):
+  File "/repos/sage-extensions/.tmp/issue381-t22/probe-fibre-index.py", line 80, in <module>
+    fixes = all(
+            ^^^
+  File "/repos/sage-extensions/.tmp/issue381-t22/probe-fibre-index.py", line 81, in <genexpr>
+    bool(point == point ^ image)
+                  ~~~~~~^~~~~~~
+  File "sage/structure/element.pyx", line 955, in sage.structure.element.Element.__xor__
+    raise RuntimeError("Use ** for exponentiation, not '^', which means xor\n"
+RuntimeError: Use ** for exponentiation, not '^', which means xor
+in Python, and has the wrong precedence.
+[peakrss] probe603: child waited=1 shell_code=1 samples=177
+[peakrss] peak tree RSS      : 819 MiB
+[peakrss] low-water MemAvail : 2815 MiB
+[peakrss] peak single VmHWM  : 834 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      823 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   266.6s procs=  3 rss=   819 MiB hwm=   821 MiB avail=  2815 MiB
+[peakrss]   t=   268.6s procs=  3 rss=   769 MiB hwm=   834 MiB avail=  2920 MiB
+[peakrss]   t=   270.6s procs=  3 rss=   769 MiB hwm=   834 MiB avail=  3936 MiB
+[peakrss]   t=   272.6s procs=  3 rss=   769 MiB hwm=   834 MiB avail=  4513 MiB
+[peakrss]   t=   262.6s procs=  3 rss=   737 MiB hwm=   739 MiB avail=  3267 MiB
+probe exit: 1

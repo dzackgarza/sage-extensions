@@ -1,0 +1,31 @@
+results: the divided-class key is not reproducible across processes at T_Co (#381)
+
+Theorem first: for Gamma = ker chi, Gamma acts trivially on A_L and the divided
+class is rho-equivariant (the equivariance _isotropic_line_image_key's own
+docstring states), so the class pair is constant on a Gamma-orbit of lines and
+the cusp-to-class-pair map is a function of the cusp.  The partition of the cusps
+by key is therefore determined by the lattice and the subgroup.
+
+Computation: it is not.  Otilde at T_Co, same tree, same subgroup, three
+processes:
+
+  line-cusps.log   527 cusps, 444 keys, 24 ambiguous, largest 15,12,12,11,11,9,3,2
+  fibre-index.log  527 cusps, 351 keys, 104 ambiguous, all of size 2
+  key-stability.log  the walk raised: "the orbit walk's transversal element does
+                     not carry the start to the reached point" (:2313)
+
+Order of construction is ruled out: building the character image before and
+after the cusps, in one process with the cache cleared, both answer 527 cusps
+(order2.log, 149.84 s and 68.51 s).
+
+So the count is stable and the partition is not.  By the theorem the partition is
+determined, so either the key is not computing the invariant its docstring names,
+or the 527 admitted cusps are not one representative per orbit.  Either way the
+refusal's trigger is not a property of the lattice: Otilde refused at a bucket of
+2, Otilde+ at 4, and the ambiguity count moves between 24 and 104.
+
+That supersedes reading the ambiguity as a fixed 24-of-444 structure.
+
+No object introduced: the divided class and its equivariance are the library's,
+the orbit-coset correspondence is Dutour Sikiric--Hulek Lemma 3.6 (printed p. 22),
+and the counts are logs'.

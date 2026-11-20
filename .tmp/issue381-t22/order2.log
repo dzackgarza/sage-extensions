@@ -1,0 +1,22 @@
+tree SHA: c0a9d38399db3d78fbeccda62baa6f73657067b6 (modified paths: 0)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 1.05 3.56 3.14 1/537 3948290
+probe: .tmp/issue381-t22/probe-order2.py; inner 1800 s
+[  150.94s] run 1, nothing built: OK, 527 line cusps in 149.84 s
+[  150.94s] character image built
+[  219.45s] run 2, after the character image: OK, 527 line cusps in 68.51 s
+[  219.45s] done
+[peakrss] probe603: child waited=0 shell_code=0 samples=112
+[peakrss] peak tree RSS      : 941 MiB
+[peakrss] low-water MemAvail : 7571 MiB
+[peakrss] peak single VmHWM  : 941 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      930 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   220.1s procs=  3 rss=   941 MiB hwm=   941 MiB avail=  7661 MiB
+[peakrss]   t=   222.1s procs=  3 rss=   941 MiB hwm=   941 MiB avail=  7662 MiB
+[peakrss]   t=   218.1s procs=  3 rss=   939 MiB hwm=   939 MiB avail=  7664 MiB
+[peakrss]   t=   216.1s procs=  3 rss=   938 MiB hwm=   938 MiB avail=  7663 MiB
+[peakrss]   t=   214.1s procs=  3 rss=   936 MiB hwm=   937 MiB avail=  7664 MiB
+probe exit: 0
