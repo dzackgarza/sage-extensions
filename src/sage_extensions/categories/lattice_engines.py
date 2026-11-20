@@ -980,6 +980,43 @@ def _rational_engine_matrix(value):
     return _engine_component_matrix(value).change_ring(SageQQ)
 
 
+def _gap_spinor_norm_class(gram, isometry, engine_field):
+    r"""Compute the spinor class representative by GAP's Wall form over an exact field.
+
+    The field has characteristic different from two and the Gram form is
+    nondegenerate there. Over any such field the nondegenerate Wall form on
+    ``im(1-g)`` has discriminant equal to the ordinary Cartan--Dieudonne
+    reflection-product spinor norm (Taylor, *The Geometry of the Classical
+    Groups*, p. 163). GAP's ``WallForm`` in ``grp/classic.gi`` computes the
+    form from the same row action used by the lattice engine. Its determinant
+    is a *representative*, not a canonical element of the square-class group.
+    The owning spinor morphism applies the selected multiplier ``c`` once
+    for every odd reflection parity (equivalently determinant ``-1``).
+
+    The double Gram tensor follows the existing rational adapter's row/
+    quadratic-form normalization. This is exact arithmetic in the selected
+    field: no real approximation, enumeration of the whole square-class
+    group, or characteristic-zero lifting of a finite-field isometry.
+    """
+    if engine_field.characteristic() == 2:
+        raise ValueError("the Wall spinor norm requires characteristic different from two")
+    form = _engine_component_matrix(gram).change_ring(engine_field)
+    row_action = _engine_row_action_matrix(isometry).change_ring(engine_field)
+    if form.det() == 0 or row_action * form * row_action.transpose() != form:
+        raise ValueError("the spinor norm needs an isometry of a nondegenerate form over the target field")
+    if row_action.is_one():
+        return engine_field.one()
+    from sage.libs.gap.libgap import libgap
+
+    wall_form = libgap.WallForm(libgap(2 * form), libgap(row_action))
+    value = engine_field(libgap.DeterminantMat(wall_form["form"]).sage())
+    if value == 0:
+        raise ArithmeticError(
+            f"GAP computed a degenerate Wall form for the isometry {isometry} of {gram} over {engine_field}"
+        )
+    return value
+
+
 def _gap_rational_spinor_norm_class(gram, isometry):
     r"""Return a representative in \(\mathbb Q^\times\) of the spinor norm of ``isometry`` on \((\mathbb Q^n, b)\), ``gram`` the Gram tensor of \(b\).
 
@@ -993,16 +1030,23 @@ def _gap_rational_spinor_norm_class(gram, isometry):
     For \(g=1\), \(W=0\) and the class is \(1\).  The route and its
     measurement are the ``TRAPS.md`` row on the rational spinor norm.
     """
-    row_action = _engine_row_action_matrix(isometry).change_ring(SageQQ)
-    if row_action.is_one():
-        return SageQQ.one()
-    from sage.libs.gap.libgap import libgap
+    return _gap_spinor_norm_class(gram, isometry, SageQQ)
 
-    wall_form = libgap.WallForm(libgap(2 * _rational_engine_matrix(gram)), libgap(row_action))
-    value = SageQQ(libgap.DeterminantMat(wall_form["form"]).sage())
-    if value == 0:
-        raise ArithmeticError(f"GAP computed a degenerate Wall form for the isometry {isometry} of the form {gram}, but the Wall form of an isometry of a nondegenerate space is nondegenerate")
-    return value
+
+def _gap_finite_field_spinor_norm_class(gram, isometry):
+    r"""An owned representative of the spinor norm over an odd finite field.
+
+    GAP computes the same exact Wall-form discriminant as over QQ, now in
+    the actual represented finite coefficient field. The public character
+    maps its representative to the *owned* square-class group of that field.
+    """
+    from sage.categories.finite_fields import FiniteFields as SageFiniteFields
+
+    field = isometry.domain().base_ring()
+    engine = _engine_ring(field)
+    if engine not in SageFiniteFields() or engine.characteristic() == 2:
+        raise ValueError(f"the finite-field spinor norm requires an odd finite field, not {field}")
+    return _owned_engine_element(field, _gap_spinor_norm_class(gram, isometry, engine))
 
 
 def _owned_embedding_from_row_action(ring, row_action):

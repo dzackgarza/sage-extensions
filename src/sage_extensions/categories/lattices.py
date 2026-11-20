@@ -5972,7 +5972,14 @@ class Lattices(OwnedCategoryOverBaseRing):
             the Wall form of the isometry, by GAP's ``WallForm``; represented
             absolute number fields diagonalize the Gram matrix and use OSCAR's
             reflection factorization ``spin`` through their selected
-            primitive-element presentation.
+            primitive-element presentation. Over an odd finite field, GAP's
+            same exact Wall-form discriminant computes the square class;
+            this covers a ring map ``R -> F_q`` in positive characteristic
+            whenever the reduced form is nondegenerate, without pretending
+            there exists a field map ``Frac(R) -> F_q`` (which cannot exist
+            when ``R=ZZ``). The reflection multiplier is evaluated *after*
+            reduction in the actual coefficient field, preserving its
+            characteristic and the chosen normalization.
             """
             ring = self.base_ring()
             field = ring.fraction_field()
@@ -5980,11 +5987,61 @@ class Lattices(OwnedCategoryOverBaseRing):
                 f"{self!r} has no spinor norm: the spinor norm is defined on the orthogonal group of a nondegenerate quadratic space of finite dimension"
             )
             from sage.rings.rational_field import QQ as SageQQ
+            from sage.categories.finite_fields import FiniteFields as SageFiniteFields
 
             from sage_extensions.categories.rings.number_fields import (
                 NumberFieldsWithChosenPrimitiveElement,
                 OwnedNumberFields,
             )
+
+            # A reduction modulo an odd prime (or into an extension of its
+            # residue field) is a ring map out of R, *not* a field map out
+            # of Frac(R). The target's own spinor norm is well-defined only
+            # if the reduced quadratic form is nondegenerate. Its composite
+            # with the actual orthogonal-group base-change morphism is the
+            # integral G -> F_q^x/(F_q^x)^2 character.
+            if (field_map is not None and field_map.domain() is ring
+                    and _engine_ring(field_map.codomain()) in SageFiniteFields()):
+                if int(field_map.codomain().characteristic()) == 2:
+                    raise ValueError("the reduced spinor norm needs a target field of characteristic different from two")
+                # Determinant is a polynomial in the Gram coefficients:
+                # det(phi(B)) = phi(det(B)). This decides nondegeneracy
+                # exactly *before* constructing a degenerate quotient
+                # module; no flat-base-change inference is being made.
+                if field_map(self.determinant()) == field_map.codomain().zero():
+                    raise ValueError("the reduced quadratic form is degenerate over the selected finite field")
+                changed = self.base_change(field_map)
+                extension = self.orthogonal_group_base_change(field_map)
+                character = changed.spinor_norm(form_multiplier=form_multiplier)
+                return self.Aut().Mor(character.codomain())(
+                    lambda g: character(extension(g))
+                )
+
+            if _engine_ring(field) in SageFiniteFields():
+                if int(field.characteristic()) == 2:
+                    raise ValueError("the spinor norm requires characteristic different from two")
+                multiplier = _spinor_norm_multiplier(field, form_multiplier)
+                classes = field.square_class_group()
+
+                def finite_field_spinor(g):
+                    representative = lattice_engines._gap_finite_field_spinor_norm_class(
+                        self.gram_tensor(), g,
+                    )
+                    # A reflection has determinant -1; the parity of a
+                    # Cartan--Dieudonne factorization is exactly its sign.
+                    return classes(multiplier * representative
+                                   if g.determinant() == -field.one()
+                                   else representative)
+
+                finite_character = self.Aut().Mor(classes)(finite_field_spinor)
+                if field_map is None:
+                    return finite_character
+                if field_map.domain() is not field:
+                    raise ValueError("a finite-field spinor base change must begin at the coefficient field")
+                change_of_field = Monoids().Commutative().square_class_group()(field_map)
+                return self.Aut().Mor(change_of_field.codomain())(
+                    lambda g: change_of_field(finite_character(g))
+                )
 
             supported_number_field = field in OwnedNumberFields() and (
                 _engine_ring(field) is SageQQ
