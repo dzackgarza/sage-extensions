@@ -4736,18 +4736,41 @@ def _yield_subgroup_isotropic_orbit_representatives(subgroup, rank, *, flag=Fals
     to hold every representative to reach the last one: a kernel plane row of
     ``T_{Co}`` has 189720 of them, and each is a constructed parent.
 
-    The row is the ambient ``O(L)``-orbits, split under the subgroup: the
-    character quotient's image (:mod:`sage_extensions.timing` records it as the
-    ``discriminant image`` stage), the ambient row, and the splitting of each
-    ambient representative by the coset walk and its transport, which the
-    per-representative stages record together as one interval because they are
-    one walk over the orbit's representatives rather than a measurement of any
-    single one of them.
+    The row is the ambient ``O(L)``-orbits, split under the subgroup.
+    A finite-codomain preimage uses the generic marked-lattice double-coset
+    action and its actual stabilizer image, regardless of whether that
+    subgroup contains a character kernel. The specialised character branch
+    retains its direct discriminant-image and parabolic orbit machinery.
     """
     if not flag and index(rank) == 0:
         yield from subgroup.supergroup().isotropic_orbit_representatives(0)
         return
     lattice = subgroup.supergroup().domain()
+    orthogonal_group = subgroup.supergroup()
+    from sage_extensions.categories.group.predicate_subgroups import PreimageSubgroups
+
+    if (
+        subgroup in PreimageSubgroups(orthogonal_group)
+        and subgroup.preimage_morphism().codomain().is_finite() is True
+    ):
+        # For H = rho^{-1}(K), H-orbits of G/P are precisely
+        # K \ rho(G) / rho(P). The marking owner already computes this
+        # exact finite double-coset space using the actual integral
+        # stabilizer P, preserving based/unbased/flag source automorphisms.
+        # Its representative diagrams retain every subobject embedding;
+        # recover the original isotropic object without taking another
+        # quotient or assuming a character-kernel description of H.
+        from sage_extensions.categories.isotropic_orbits import (
+            _isotropic_object_from_marked,
+            _marked_isotropic_object,
+        )
+
+        for representative in orthogonal_group.isotropic_orbit_representatives(rank, flag=flag):
+            marked = _marked_isotropic_object(representative, flag=flag)
+            for split in orthogonal_group.split_orbit(marked, subgroup):
+                yield _isotropic_object_from_marked(split, flag=flag)
+        return
+
     row = orbit_row_record_name(rank, flag=flag, lattice=lattice, subgroup=subgroup)
     with stage("discriminant image", row):
         _assert_isotropic_splitting_has_character_data(subgroup)
@@ -4837,6 +4860,37 @@ def _subgroup_isotropic_orbit_representatives(subgroup, rank, *, flag=False):
 
 def _subgroup_isotropic_equivalence_witness(subgroup, left, right, *, flag=False):
     orthogonal_group = subgroup.supergroup()
+    from sage_extensions.categories.group.predicate_subgroups import PreimageSubgroups
+
+    if (
+        subgroup in PreimageSubgroups(orthogonal_group)
+        and subgroup.preimage_morphism().codomain().is_finite() is True
+    ):
+        # A transporter between isotropic flags/subobjects is exactly
+        # an isomorphism of their marked diagrams. The generic core Mor
+        # adjusts its apex by the *actual* stabilizer in the finite
+        # quotient G/H; this decides negative cases without substituting
+        # the ordinary O(L)-equivalence relation.
+        from sage_extensions.categories.isotropic_orbits import (
+            _marked_isotropic_category,
+            _marked_isotropic_object,
+        )
+
+        source = _marked_isotropic_object(left, flag=flag)
+        target = _marked_isotropic_object(right, flag=flag)
+        category = _marked_isotropic_category(
+            orthogonal_group.domain(),
+            len(tuple(left.terms())) if flag else 1,
+        )
+        isomorphism = category.Core().Mor(source, target).an_element_in(subgroup)
+        if isomorphism is None:
+            return None
+        top = tuple(category.domain_category().objects())[-1]
+        witness = isomorphism.forward().component(top)
+        if witness not in subgroup:
+            raise ArithmeticError("the marked subgroup transporter did not lie in the requested finite preimage")
+        return witness
+
     quotient = None
     if subgroup.contains_character_kernel():
         quotient = subgroup.finite_character_quotient()
