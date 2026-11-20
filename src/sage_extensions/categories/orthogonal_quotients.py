@@ -2289,35 +2289,39 @@ class OrthogonalCharacterQuotient:
             keys = {str(point): 0}
             frontier = [(point, identity)]
             # Which product order carries the start to an image is a property of
-            # the action's composition law, not of the point: it is settled once
-            # per generator, on the first edge that generator reaches, and read
-            # from then on.  The check that settles it is the same assertion that
-            # guarded every edge before, so a generator whose order differed
-            # would still be caught -- and no edge pays a second set-action to
-            # re-derive a fact about the generator.
-            right_orders = [None] * len(rho_images)
+            # the action's composition law, not of a generator and not of a
+            # point: `setwise_action` rewrites the set by `ImageElm`, so the walk's
+            # element must compose on the side that action reads, and that side is
+            # the same for every generator.  It is therefore settled once, and not
+            # on the first edge a generator reaches: the frontier starts at the
+            # point itself, with the identity beside it, and at the identity both
+            # orders carry the start to the same image -- an answer read off that
+            # edge is an answer about nothing.  The order is settled on the first
+            # edge whose element is not the identity; until one is reached, the
+            # law's own order is used.
+            right_order = None
             while frontier:
                 following = []
                 for reached_point, reached_element in frontier:
-                    for position, generator in enumerate(rho_images):
+                    for generator in rho_images:
                         image = setwise_action(reached_point, generator)
                         marker = str(image)
                         if marker in keys:
                             continue
-                        if right_orders[position] is None:
-                            reached = generator * reached_element
-                            if setwise_action(point, reached) != image:
-                                # The engine product must compose as (g*h)(x) = g(h(x));
-                                # the other order carries the start to a different point.
-                                reached = reached_element * generator
+                        if right_order is None:
+                            reached = reached_element * generator
+                            if setwise_action(point, reached) == image:
+                                if reached_point is not point:
+                                    right_order = True
+                            else:
+                                reached = generator * reached_element
                                 assert setwise_action(point, reached) == image, (
                                     "the orbit walk's transversal element does not carry the "
                                     "start to the reached point"
                                 )
-                                right_orders[position] = True
-                            else:
-                                right_orders[position] = False
-                        elif right_orders[position]:
+                                if reached_point is not point:
+                                    right_order = False
+                        elif right_order:
                             reached = reached_element * generator
                         else:
                             reached = generator * reached_element
