@@ -1,0 +1,36 @@
+results: the nondeterminism is the non-canonical generating family of O(T_Co) (#381)
+
+The theorem makes the difference a defect: a line cusp is a Gamma-orbit and
+Gamma = ker rho acts trivially on A_L, so the cusp decides the divided class and
+the partition is determined.  This names the seat.
+
+First divergence (probe-divergence.py, divergence.log): the two seeded rows differ
+at position 0, share only 7 of 527 spans (480 exclusive to one, 520 to the other)
+and have different key multisets -- so they are disjoint enumerations, not the same
+objects reordered.  That rules out an ordering seat: not a Python set, not a dict,
+not the frontier's iteration.
+
+The seat (probe-generators.py, generators.log): ambient =
+tuple(O(L).group_generators()) has 358 elements in one process and 336 in the
+other.  The walk's letters index that family, so the same coset is spelled by
+different words, its lift is a different isometry, and every transported line
+differs.  The probe's "sets equal" line compares reprs of morphisms and is not
+evidence.
+
+Chain, each link measured but the last: family size 358 vs 336; spans 480/520
+exclusive; keys 365 vs 346 distinct; then the cusp row's dedup, whose fallback is a
+transporter search, admits a different 527 objects -- inferred, not measured.
+
+It also explains the record's earlier finding that the anchor is not reproduced by
+a second process, and the sign-ambiguous anchor v against -v.
+
+Two repairs are named: make the ambient generating family canonical, or make the
+walk's output independent of the family that spells it.  The first is smaller and
+its witness is the family dump.
+
+No repair yet: the lint that would carry the regression test is being repaired at
+its owner, and the exact test text is at
+results/issue381-subprocess-partition-test.py.
+
+No object introduced: the cusp, span, divided class, lift and generating family
+are the library's.
