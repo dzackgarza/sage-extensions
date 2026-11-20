@@ -1,0 +1,25 @@
+tree SHA: 8eee400b69bcbcfa53b030f99c71621594569f1b (modified paths: 0)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 3.03 2.23 1.74 2/539 3998714
+probe: .tmp/issue381-t25/probe-generators.py; inner 560 s
+[   34.14s] seed 0: rc 0
+[   39.01s] seed 1: rc 0
+generator counts: 358 and 336
+ordered families equal: False
+families equal as sets: True
+  first differing position: None
+done
+[peakrss] probe603: child waited=0 shell_code=0 samples=37
+[peakrss] peak tree RSS      : 651 MiB
+[peakrss] low-water MemAvail : 7471 MiB
+[peakrss] peak single VmHWM  : 651 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      543 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    72.1s procs=  4 rss=   651 MiB hwm=   651 MiB avail=  8128 MiB
+[peakrss]   t=    70.1s procs=  4 rss=   648 MiB hwm=   648 MiB avail=  8136 MiB
+[peakrss]   t=    34.0s procs=  4 rss=   647 MiB hwm=   647 MiB avail=  7907 MiB
+[peakrss]   t=    32.0s procs=  4 rss=   642 MiB hwm=   642 MiB avail=  8040 MiB
+[peakrss]   t=    68.1s procs=  4 rss=   639 MiB hwm=   639 MiB avail=  8144 MiB
+probe exit: 0

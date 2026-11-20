@@ -1,0 +1,30 @@
+tree SHA: 8eee400b69bcbcfa53b030f99c71621594569f1b (modified paths: 0)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 0.35 0.69 1.28 1/492 3987668
+probe: .tmp/issue381-t25/probe-divergence.py; inner 560 s
+[  157.29s] seed 0: rc 0
+[  179.86s] seed 1: rc 0
+cusps: 527 and 527
+first differing position: 0
+  seed 0: span ((0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0),) key ['[ f3 ]']
+  seed 1: span ((0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0),) key ['[ f2 ]']
+  prefixes equal: True
+span sets equal: False
+  spans only in seed 0: 480
+  spans only in seed 1: 520
+key multisets equal: False
+done
+[peakrss] probe603: child waited=0 shell_code=0 samples=169
+[peakrss] peak tree RSS      : 989 MiB
+[peakrss] low-water MemAvail : 6330 MiB
+[peakrss] peak single VmHWM  : 989 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      881 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   156.1s procs=  4 rss=   989 MiB hwm=   989 MiB avail=  7981 MiB
+[peakrss]   t=   154.1s procs=  4 rss=   987 MiB hwm=   987 MiB avail=  7980 MiB
+[peakrss]   t=   152.1s procs=  4 rss=   984 MiB hwm=   984 MiB avail=  7949 MiB
+[peakrss]   t=   150.1s procs=  4 rss=   981 MiB hwm=   981 MiB avail=  7935 MiB
+[peakrss]   t=   148.1s procs=  4 rss=   979 MiB hwm=   979 MiB avail=  8009 MiB
+probe exit: 0

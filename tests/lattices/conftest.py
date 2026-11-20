@@ -12,7 +12,8 @@ This module binds the session's names as builtins, which is the mechanism the
 lint documents: a directory's ``conftest.py`` binds the abbreviations its tests
 use, and the lint reads the allowed names after the conftests have run.
 ``card`` is a row of the digest; ``spans_built_by`` and ``displays_rendered_by``
-count what one action built and rendered.  Each instrument that patches does so
+count what one action built and rendered; ``in_fresh_processes`` computes a
+function of the test file again in new processes under chosen hash seeds.  Each instrument that patches does so
 with ``pytest.MonkeyPatch.context()``, so a failing action leaves the process as
 it found it.
 """
@@ -22,6 +23,9 @@ from __future__ import annotations
 import builtins
 import gc
 import json
+import os
+import subprocess
+import sys
 import weakref
 from pathlib import Path
 
@@ -181,3 +185,61 @@ def presentations_built_by(construction, request):
 
 
 builtins.presentations_built_by = presentations_built_by
+
+
+FRESH_PROCESS_SCRIPT = """
+import json, runpy, sys
+from pathlib import Path
+
+test_file, function_name = Path(sys.argv[1]), sys.argv[2]
+for directory in reversed(test_file.resolve().parents):
+    if (directory / "conftest.py").is_file():
+        runpy.run_path(str(directory / "conftest.py"))
+import sage.all_cmdline
+import sage_extensions.all
+from sage.repl.preparse import preparse_file
+
+namespace = dict(vars(sage.all_cmdline))
+source = test_file.read_text()
+exec(compile(preparse_file(source) if test_file.suffix == ".sage" else source, str(test_file), "exec"), namespace)
+print(json.dumps(namespace[function_name]()))
+"""
+
+
+def in_fresh_processes(function, seeds):
+    r"""Return ``function()`` computed once per seed, each in a new Sage process with ``PYTHONHASHSEED`` that seed.
+
+    ``function`` is a module-level function of the running test's file, taking
+    no argument and returning a JSON value (integers, strings, lists,
+    dictionaries with string keys).  Each new process runs the conftests above
+    that file, executes the file and calls the function by name, so the
+    function is linted with the test and is the same code in every process.
+    The processes run at once, so the wall time is that of one.  A property
+    that holds between processes (a partition, an order, a choice that must
+    not depend on string hashing) is asserted by comparing the values:
+
+        first, second = in_fresh_processes(partition, [1, 2])
+        assert first == second
+
+    A failure in a new process fails the test with that process's stderr.
+    """
+    test_file = os.environ["PYTEST_CURRENT_TEST"].split("::")[0]
+    processes = [
+        subprocess.Popen(
+            [sys.executable, "-c", FRESH_PROCESS_SCRIPT, test_file, function.__name__],
+            env=dict(os.environ, PYTHONHASHSEED=str(int(seed)), PYTHONPATH=os.pathsep.join(sys.path)),
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+        )
+        for seed in seeds
+    ]
+    values = []
+    for process in processes:
+        output, errors = process.communicate()
+        assert process.returncode == 0, errors
+        values.append(json.loads(output.splitlines()[-1]))
+    return tuple(values)
+
+
+builtins.in_fresh_processes = in_fresh_processes

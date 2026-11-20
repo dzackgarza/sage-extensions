@@ -1,0 +1,27 @@
+tree SHA: a4ad71f551e628f2041589a2e95e08f232aeac39 (modified paths: 1)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 0.69 1.28 1.73 1/494 3986541
+probe: .tmp/issue381-t24/probe-fork.py; inner 1800 s
+[  144.59s] seed 0: rc 0
+[  154.99s] seed 1: rc 0
+anchor equal: False
+  seed 0 anchor ((0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0),)
+  seed 1 anchor ((0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0),)
+distinct key sets equal: False
+distinct counts: 365 vs 346
+multiplicities equal: False
+done
+[peakrss] probe603: child waited=0 shell_code=0 samples=150
+[peakrss] peak tree RSS      : 990 MiB
+[peakrss] low-water MemAvail : 7883 MiB
+[peakrss] peak single VmHWM  : 990 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      882 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   298.2s procs=  4 rss=   990 MiB hwm=   990 MiB avail=  7888 MiB
+[peakrss]   t=   296.2s procs=  4 rss=   988 MiB hwm=   988 MiB avail=  7896 MiB
+[peakrss]   t=   294.2s procs=  4 rss=   984 MiB hwm=   984 MiB avail=  7896 MiB
+[peakrss]   t=   292.2s procs=  4 rss=   982 MiB hwm=   982 MiB avail=  7896 MiB
+[peakrss]   t=   290.2s procs=  4 rss=   980 MiB hwm=   980 MiB avail=  7904 MiB
+probe exit: 0
