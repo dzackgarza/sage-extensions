@@ -1,0 +1,47 @@
+tree SHA: a4ad71f551e628f2041589a2e95e08f232aeac39 (modified paths: 1)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 0.80 1.33 1.75 1/485 3986449
+files: tests/lattices/test_the_line_cusp_key_partition_across_processes.sage; inner 600 s
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+time gates on: star import 0.25 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: asyncio-1.5.0, xdist-3.8.0, reportlog-1.0.0, platformdirs-4.13.5, hypothesis-6.170.15, anyio-4.15.1, timeout-2.4.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 1 item
+
+tests/lattices/test_the_line_cusp_key_partition_across_processes.sage E  [100%]
+
+==================================== ERRORS ====================================
+_ ERROR at setup of test_the_line_cusp_key_partition_is_the_same_in_two_processes _
+tests/lattices/test_the_line_cusp_key_partition_across_processes.sage:17: TL01 import json: take every name from the session
+tests/lattices/test_the_line_cusp_key_partition_across_processes.sage:18: TL01 import os: take every name from the session
+tests/lattices/test_the_line_cusp_key_partition_across_processes.sage:19: TL01 import subprocess: take every name from the session
+tests/lattices/test_the_line_cusp_key_partition_across_processes.sage:20: TL01 import sys: take every name from the session
+tests/lattices/test_the_line_cusp_key_partition_across_processes.sage:60: TL10 len(): ask for a cardinality
+======================= test lint: 5 findings in 1 files =======================
+tests/lattices/test_the_line_cusp_key_partition_across_processes.sage:17: TL01 import json: take every name from the session
+tests/lattices/test_the_line_cusp_key_partition_across_processes.sage:18: TL01 import os: take every name from the session
+tests/lattices/test_the_line_cusp_key_partition_across_processes.sage:19: TL01 import subprocess: take every name from the session
+tests/lattices/test_the_line_cusp_key_partition_across_processes.sage:20: TL01 import sys: take every name from the session
+tests/lattices/test_the_line_cusp_key_partition_across_processes.sage:60: TL10 len(): ask for a cardinality
+============================== slowest durations ===============================
+
+(2 durations < 0.005s hidden.  Use -vv to show these durations.)
+=========================== short test summary info ============================
+ERROR tests/lattices/test_the_line_cusp_key_partition_across_processes.sage::test_the_line_cusp_key_partition_is_the_same_in_two_processes
+=============================== 1 error in 4.91s ===============================
+[peakrss] test603: child waited=1 shell_code=1 samples=4
+[peakrss] peak tree RSS      : 470 MiB
+[peakrss] low-water MemAvail : 8189 MiB
+[peakrss] peak single VmHWM  : 470 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      459 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     6.0s procs=  3 rss=   470 MiB hwm=   470 MiB avail=  8189 MiB
+[peakrss]   t=     4.0s procs=  3 rss=   428 MiB hwm=   428 MiB avail=  8230 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   384 MiB hwm=   384 MiB avail=  8264 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     3 MiB hwm=     3 MiB avail=  8564 MiB
+test exit: 1
