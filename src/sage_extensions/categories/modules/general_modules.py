@@ -330,8 +330,19 @@ class GeneralModules(OwnedCategoryOverBaseRing):
             cannot re-enter through that public input interpretation.
             """
             underlying = self.underlying_set()
-            normalized = value if value in underlying else underlying(value)
-            assert normalized in underlying, (
+            # A datum already owned by the literal underlying set is
+            # accepted by identity, without running another set-membership
+            # predicate. This is particularly important when that set is a
+            # finite quotient ring during construction of a polynomial
+            # algebra: Sage's Sets() runtime edge may expose an abstract
+            # ``__contains__`` before the ring's category has finished
+            # generating its concrete membership method. Ownership of the
+            # datum is a stronger and fully sufficient admission witness.
+            if element_parent(value) is underlying:
+                normalized = value
+            else:
+                normalized = value if value in underlying else underlying(value)
+            assert element_parent(normalized) is underlying or normalized in underlying, (
                 f"{value!r} is not an element of {self}: it is not in the underlying set {underlying}"
             )
             return self.element_class(self, normalized)
