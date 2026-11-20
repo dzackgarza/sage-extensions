@@ -90,6 +90,7 @@ EXPECTED = {
     ("tests/lattices/test_the_sterk_configurations_are_folds_of_the_two_root_families.sage", 182): 'assert _signature(folding.invariant_lattice(',
     ("tests/lattices/test_the_sterk_configurations_are_folds_of_the_two_root_families.sage", 188): 'assert _signature(folding.span()) == (1, 17)',
     ("tests/lattices/test_the_sterk_configurations_are_folds_of_the_two_root_families.sage", 189): 'assert _signature(folding.anti_invariant_lat',
+    ("tests/lattices/test_the_sterk_configurations_are_folds_of_the_two_root_families.sage", 469): 'def test_the_folded_families_are_the_printed_diagrams_vertex_by_vertex',
     ("tests/lattices/test_the_sterk_configurations_are_folds_of_the_two_root_families.sage", 192): 'def test_the_folded_configurations_are_the_constructions_sterk_returns',
     ("tests/lattices/test_the_sterk_configurations_are_folds_of_the_two_root_families.sage", 269): 'def test_the_gram_preserving_permutations_of_the_twenty_two_roots_fold_or_are_refused',
     ("tests/lattices/test_the_sterk_configurations_are_folds_of_the_two_root_families.sage", 296): 'with pytest.raises(ValueError):',

@@ -55,6 +55,16 @@ the 22 roots have square \(-2\) and two --- \(v_{21}\) and \(v_{22}\) --- have s
 \(22-18=4\) rational relations
 (`tests/lattices/test_the_sterk_configurations_are_folds_of_the_two_root_families.sage:121`).
 
+The folds are the printed chambers as **rooted diagrams**, not only up to a multiset of pairings: a
+recorded bijection between each folded family and its printed walls carries the Gram matrix onto the
+printed one entry by entry
+(`tests/lattices/test_the_sterk_configurations_are_folds_of_the_two_root_families.sage:189`), and
+the theorem that makes that a statement about diagrams is that the Coxeter entry is a function of the
+two squares and the pairing --- \(4\cos^2(\pi/m)=4b(r_v,r_w)^2/(q(r_v)q(r_w))\), Bourbaki, *Lie
+Groups and Lie Algebras*, Ch. VI, §1 --- which is what `from_roots` reads the diagram off.  A matching
+multiset of pairings would not be enough: two families can share their sorted pairings and differ in
+their diagram.
+
 The other Specimens row, "the root-swap involution has a 10-dimensional invariant subspace; the
 Coxeter-graph involution has vertex orbits {0,2},{1,4},{3,6},{7,10},{8,9},{5}", is read on the folded
 4.3.8 diagram: the ten-dimensional invariant subspace is that fold's invariant lattice of rank 10,
@@ -318,12 +328,15 @@ pytest -o addopts= -p qc_sage_session -p sage_extensions.testing.suite_budget \
   and by Sterk's printed statements, not proved in this record.  What is checked for all five is
   that each fold agrees with its card row in the wall count, the squares, the sorted pairings, and
   the invariant lattice's rank and signature --- the pairings for all five at
-  `tests/lattices/test_the_sterk_configurations_are_folds_of_the_two_root_families.sage:159`, which
-  until this commit compared only 4.3.5, 4.3.6 and 4.3.8: (12, 12×(−4), 10, (1,9)), (10, 9×(−4)+1×(−2), 10,
+  `tests/lattices/test_the_sterk_configurations_are_folds_of_the_two_root_families.sage:159`, and the
+  Gram matrix entry by entry under a recorded vertex bijection at `:469` -- so that what is not
+  asserted is only the placement, as the next sentence says.  The invariants are: (12, 12×(−4), 10, (1,9)), (10, 9×(−4)+1×(−2), 10,
   (1,9)), (12, 10×(−4)+2×(−2), 10, (1,9)), (11, 9×(−4)+2×(−2), 10, (1,9)) and
-  (14, 10×(−4)+4×(−2), 10, (1,9)) at 4.3.5–4.3.9 in that order.  The two sides are vectors of
-  different lattices (\(T_{En}\) for the card's walls, \(T_{dP}\) for the roots), so equality of the
-  two *families* is not asserted; the invariants are.
+  (14, 10×(−4)+4×(−2), 10, (1,9)) at 4.3.5–4.3.9 in that order.  What is *not* asserted is a
+  placement: the folds live in \(T_{dP}\) and the printed walls in \(T_{En}\), so the two families
+  are shown isometric as formed families with the diagram written out, not as subobjects of one
+  lattice -- except at 4.3.8, where the printed vectors themselves are transcribed in \(T_{En}\)
+  (`Sterk._sterk4_in_TEn_cached`) and compared with the fold's diagram.
 * The identification of the third involution's printed description (the archived notebook's
   reflection-twisted folding) is the source's; what is checked here is that its images decide an
   integral isometric involution of the 22-root span, and that its fold has 4.3.7's invariants.
@@ -381,6 +394,8 @@ and the refusal on the invalidating input." — met under the amendment, not as 
   \((1,17)\)) and `:189` (anti-invariant \((0,8)\)) for 4.3.5, 4.3.6 and 4.3.8; `:433`, `:434`,
   `:447`, `:448` for the two image folds and the five records; and `tests/lattices/test_the_five_sterk_root_configurations_as_foldings.sage:123`–`:126`
   for all five at once.
+* The reproduction as diagrams: `tests/lattices/test_the_sterk_configurations_are_folds_of_the_two_root_families.sage:189`,
+  the Gram matrices entry by entry under the recorded vertex bijections.
 * The refusals on Sterk's own 22 roots:
   `tests/lattices/test_the_sterk_configurations_are_folds_of_the_two_root_families.sage:269`
   asserts that all eight diagram automorphisms keep the Gram, that the six involutions fold, and
