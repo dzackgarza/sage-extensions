@@ -449,3 +449,49 @@ def test_the_five_foldings_are_read_as_records_rather_than_repeated() -> None:
         assert tuple(sorted(int(root.q()) for root in folding.roots())) == tuple(
             sorted(int(wall.q()) for wall in _wall_vectors(_STATEMENTS[name]))
         )
+
+
+_PRINTED_VERTEX_CORRESPONDENCE = {
+    "Sterk_1": (3, 2, 0, 10, 7, 6, 5, 4, 1, 9, 11, 8),
+    "Sterk_2": (0, 2, 3, 4, 5, 6, 7, 8, 9, 1),
+    "Sterk_3": (3, 2, 0, 10, 7, 4, 5, 6, 11, 1, 9, 8),
+    "Sterk_4": (2, 3, 4, 5, 6, 10, 7, 1, 9, 0, 8),
+    "Sterk_5": (2, 1, 9, 7, 6, 5, 4, 3, 13, 10, 12, 11, 0, 8),
+}
+r"""Which printed wall of each chamber carries the \(i\)-th root of its fold.
+
+The folded family's own order is the one the fold builds; the printed walls' order is the card's.
+The correspondence is the bijection found by matching the two Gram matrices, and it is what makes
+the next test a statement about the *diagrams* rather than about a multiset of pairings.
+"""
+
+
+def test_the_folded_families_are_the_printed_diagrams_vertex_by_vertex() -> None:
+    r"""The five folds are the printed chambers as rooted diagrams, not only up to their pairings.
+
+    The theorem that lets the comparison answer the question is that the Coxeter entry \(m_{vw}\)
+    is a function of the two squares and the pairing --- \(4\cos^2(\pi/m)=4b(r_v,r_w)^2/(q(r_v)q(r_w))\),
+    Bourbaki, *Lie Groups and Lie Algebras*, Ch. VI, §1, and the construction `from_roots` reads the
+    diagram off the roots' pairings --- so a bijection that carries the folded family's Gram matrix
+    onto the printed walls' is an isomorphism of the rooted diagrams.  A matching multiset of
+    pairings would not be: two families can share their sorted pairings and differ in their diagram.
+
+    The comparison is entry by entry under the recorded correspondence, and the correspondence is
+    first checked to be a bijection onto the printed walls.
+    """
+    for name, statement in _STATEMENTS.items():
+        folded = _carried_fold(name)
+        walls = _wall_vectors(statement)
+        correspondence = _PRINTED_VERTEX_CORRESPONDENCE[name]
+
+        assert Set(walls[correspondence[position]] for position, _root in enumerate(folded)) == Set(walls)
+        assert all(
+            int(NamedLattices.TdP.b(left, right))
+            == int(
+                NamedLattices.TEn.b(
+                    walls[correspondence[position]], walls[correspondence[other]]
+                )
+            )
+            for position, left in enumerate(folded)
+            for other, right in enumerate(folded)
+        )
