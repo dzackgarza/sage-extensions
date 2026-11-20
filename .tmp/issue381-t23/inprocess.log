@@ -1,0 +1,65 @@
+tree SHA: cd7710d3543a7985f5dd6164c3043f1f8f3a0772 (modified paths: 0)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 2.52 4.02 3.64 2/512 3968721
+probe: .tmp/issue381-t23/probe-inprocess.py; inner 1800 s
+Traceback (most recent call last):
+  File "sage/misc/cachefunc.pyx", line 1965, in sage.misc.cachefunc.CachedMethodCaller.__call__
+    return cache[k]
+KeyError: ((1,), ())
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/repos/sage-extensions/.tmp/issue381-t23/probe-inprocess.py", line 49, in <module>
+    first_buckets, first_spans = partition("run 1")
+                                 ~~~~~~~~~^^^^^^^^^
+  File "/repos/sage-extensions/.tmp/issue381-t23/probe-inprocess.py", line 34, in partition
+    line_cusps = tuple(subgroup.cusps(1))
+                       ~~~~~~~~~~~~~~^^^
+  File "sage/misc/cachefunc.pyx", line 1970, in sage.misc.cachefunc.CachedMethodCaller.__call__
+    w = self._instance_call(*args, **kwds)
+  File "sage/misc/cachefunc.pyx", line 1848, in sage.misc.cachefunc.CachedMethodCaller._instance_call
+    return self.f(self._instance, *args, **kwds)
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 803, in cusps
+    return _distinct_finite_ordered_set(
+        _arithmetic_cusp(self, representative)
+    ...<2 lines>...
+        )
+    )
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/finite_ordered_sets.py", line 1119, in _distinct_finite_ordered_set
+    admitted = tuple(points)
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 805, in <genexpr>
+    for representative in _yield_subgroup_isotropic_orbit_representatives(
+                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self, rank
+        ^^^^^^^^^^
+    )
+    ^
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 4773, in _yield_subgroup_isotropic_orbit_representatives
+    for splitting in quotient.splitting_isometries_from_line_class(*line_image):
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 1864, in <genexpr>
+    for lift, _discriminant_image in self._iter_splitting_isometries_in_im_rho_from_image(
+                                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        (), stab_sign_flip, point=class_points
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 2313, in _iter_splitting_isometries_in_im_rho_from_image
+    assert setwise_action(point, reached) == image, (
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: the orbit walk's transversal element does not carry the start to the reached point
+[peakrss] probe603: child waited=1 shell_code=1 samples=37
+[peakrss] peak tree RSS      : 645 MiB
+[peakrss] low-water MemAvail : 7681 MiB
+[peakrss] peak single VmHWM  : 645 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      634 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    72.0s procs=  3 rss=   645 MiB hwm=   645 MiB avail=  7681 MiB
+[peakrss]   t=    70.0s procs=  3 rss=   642 MiB hwm=   642 MiB avail=  7685 MiB
+[peakrss]   t=    68.0s procs=  3 rss=   641 MiB hwm=   641 MiB avail=  7688 MiB
+[peakrss]   t=    66.0s procs=  3 rss=   639 MiB hwm=   639 MiB avail=  7689 MiB
+[peakrss]   t=    64.0s procs=  3 rss=   638 MiB hwm=   638 MiB avail=  7692 MiB
+probe exit: 1

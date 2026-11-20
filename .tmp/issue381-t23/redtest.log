@@ -1,0 +1,36 @@
+tree SHA: cd7710d3543a7985f5dd6164c3043f1f8f3a0772 (modified paths: 1)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+load: 0.73 2.92 3.28 2/520 3969017
+files: tests/lattices/test_the_line_cusp_partition_is_one_partition.sage; inner 1800 s
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+time gates on: star import 0.26 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: asyncio-1.5.0, xdist-3.8.0, reportlog-1.0.0, platformdirs-4.13.5, hypothesis-6.170.15, anyio-4.15.1, timeout-2.4.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 1 item
+
+tests/lattices/test_the_line_cusp_partition_is_one_partition.sage .      [100%]
+
+========================== test-call performance gate ==========================
+tests/lattices/test_the_line_cusp_partition_is_one_partition.sage::test_the_line_cusps_of_the_coble_lattice_carry_one_partition: 218.76 s > 20 s
+============================== slowest durations ===============================
+218.76s call     tests/lattices/test_the_line_cusp_partition_is_one_partition.sage::test_the_line_cusps_of_the_coble_lattice_carry_one_partition
+
+(2 durations < 0.005s hidden.  Use -vv to show these durations.)
+======================== 1 passed in 223.84s (0:03:43) =========================
+[peakrss] test603: child waited=1 shell_code=1 samples=116
+[peakrss] peak tree RSS      : 1122 MiB
+[peakrss] low-water MemAvail : 7465 MiB
+[peakrss] peak single VmHWM  : 1122 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     1111 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   192.1s procs=  3 rss=  1122 MiB hwm=  1122 MiB avail=  7624 MiB
+[peakrss]   t=   190.1s procs=  3 rss=  1121 MiB hwm=  1121 MiB avail=  7624 MiB
+[peakrss]   t=   188.1s procs=  3 rss=  1120 MiB hwm=  1120 MiB avail=  7624 MiB
+[peakrss]   t=   186.1s procs=  3 rss=  1118 MiB hwm=  1118 MiB avail=  7624 MiB
+[peakrss]   t=   184.1s procs=  3 rss=  1117 MiB hwm=  1117 MiB avail=  7624 MiB
+test exit: 1
