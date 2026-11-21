@@ -82,3 +82,14 @@ The row closes when `isotropic_orbit_representatives(1)` returns a count on
 $O^+(\Lambda_4)$'s discriminant kernel for card `6JRY` and the count equals the
 card's row, in the acceptance module's own run.  The repair belongs to the owner of
 that call, and the acceptance module reads the closed row by tag without a change.
+
+## Correction, 2026-11-21
+
+The paragraph "The same row of the sister lattice returns" compares this row with
+row `6JRX:O+:lines`, which is the row of $O^+(\Lambda_2)$ and not of
+$\widetilde O^+(\Lambda_2)$.  The $\widetilde O^+(\Lambda_2)$ row was measured the
+same day and does not return either: it passes 5974 MiB at 834 s and was stopped
+there (`results/issue319-6jrx-otilde-plus-line-row.md`).  So the two $\widetilde
+O^+$ line rows of the two Scattone lattices are two instances of one defect, and
+the $O^+$ line row of $\Lambda_2$, which decides in 9.9 s, is not a control for
+either.
