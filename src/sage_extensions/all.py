@@ -149,10 +149,17 @@ from sage_extensions.categories.isotropic_parabolics import (  # noqa: F401
     PrimitiveIsotropicSubobjects,
 )
 from sage_extensions.lattice_database import (  # noqa: F401
+    card_arithmetic_group,
+    card_arithmetic_group_row,
+    card_lattice,
     card_line_orbit_lengths,
     card_line_orbit_row,
     card_plane_orbit_lengths,
     card_plane_orbit_row,
+    card_polarization_degrees,
+    card_polarization_lattice,
+    card_polarization_row,
+    card_provenance,
 )
 from sage_extensions.categories.lattice_centralizers import (  # noqa: F401
     IsometryPrimitiveExtension,

@@ -1,60 +1,83 @@
-r"""The 87 numerical polarizations and cart 0128's Table 4 rows, against their cards.
+r"""Every Enriques and K3 orbit row of the known families, against the card that states it.
 
-This is the acceptance entry point of #319: the verification half of #286.  It
-is not collected by pytest (its file name does not begin with ``test_``), because
-every row builds an arithmetic subgroup of $O(N)$ for the Enriques period
-lattice and calls the public orbit classifier on it; the rows are long by
-construction and belong in the CI job ``enriques-polarization-rows`` that
-reports later, not in the per-test gate.
+This is the acceptance entry point of #319: the verification half of #286.  It is
+not collected by pytest -- its file name does not begin with ``test_`` -- because
+each row builds an arithmetic group of an indefinite lattice and calls the public
+isotropic-orbit classifier on it, and the rows are minutes or hours each.  The
+whole module is one CI job that reports later
+(``.github/workflows/enriques-polarization-rows.yml``), never the per-test gate.
 
-    sage -python tests/enriques_polarization_rows_by_card.py            # every row
-    sage -python tests/enriques_polarization_rows_by_card.py --tags gamma-h-1
-    sage -python tests/enriques_polarization_rows_by_card.py --degrees 2,4,6
-    sage -python tests/enriques_polarization_rows_by_card.py --budget 18000
+    python3 tests/enriques_polarization_rows_by_card.py                 # every row
+    python3 tests/enriques_polarization_rows_by_card.py --tags 6JRX --rows planes
+    python3 tests/enriques_polarization_rows_by_card.py --one 029J:gamma-en-2:planes
+    python3 tests/enriques_polarization_rows_by_card.py --budget 18000
 
-The rows are the cards' ``tests/cards/lattice-database-enriques.json``, read
-from ``dzackgarza/lattice-database`` at database commit
-``23c0f9caff4d08b1f9795bba75f45cead4fc75df`` by
-``tests/cards/refresh_lattice_database_enriques.py``.  Every expected value is
-that file's, with the card's own citation naming the paper, its table and page
-of the version read:
+**Every expected value is a card's, read by tag.**  The rows live in
+``tests/cards/lattice-database-enriques.json``, generated from
+``dzackgarza/lattice-database`` at the database commit its ``_provenance.ref``
+names by ``tests/cards/refresh_lattice_database_enriques.py``, and are read through
+``sage_extensions.lattice_database`` -- ``card_line_orbit_row``,
+``card_plane_orbit_row``, ``card_arithmetic_group_row``, ``card_polarization_row``.
+No expected number is typed in this file, and no row is skipped: the module
+enumerates every row it knows, and a row whose card states nothing is reported as
+such rather than compared against an invented value.
 
-* the 87 arithmetic-group cards ``gamma-h-1`` .. ``gamma-h-87`` state
-  ``#I_1``, ``#I_2``, ``#I_12`` -- the numbers of orbits of isotropic lines,
-  planes and flags in $N$ under $\Gamma^+_h$ -- from D. Dutour Sikirić and
+**The rows, and the numbered statement of each.**  A row is named by the paper
+and the table, proposition, theorem, corollary, lemma or section the card cites for
+it, with the page references stripped: a row names its paper and its numbered
+statement, not a page.
+
+* card ``029J`` -- $N = U \oplus U(2) \oplus E_8(-2)$, the Enriques period
+  lattice, with rows ``O``, ``Otilde+`` and ``gamma-en-2``: H. Sterk,
+  *Compactifications of the period space of Enriques surfaces, Part I*,
+  Math. Z. 207 (1991), Propositions 4.5 and 4.6 (the two $O(N)$-orbits of
+  primitive isotropic lines and of planes) and Proposition 4.2.3 with
+  Remark 4.2.4 ($\Gamma_{\mathrm{En},2}$'s five $0$-cusps); D. Dutour Sikirić,
   K. Hulek, *Moduli of polarised Enriques surfaces -- computational aspects*,
-  J. London Math. Soc. 110 (2024), arXiv:2302.01679v2 (26 Sep 2023), Table 1,
-  p. 13 (cards 1-41) and Table 2, p. 14 (cards 42-87).
-* lattice card ``0128`` ($U \oplus E_8(-1)$, the Enriques lattice $M(1/2)$)
-  states, per degree $2d = 2, \dots, 72$, ``#h`` -- the number of
-  $O(M(1/2))$-orbits of primitive vectors of square $2d$ -- and ``#\bar\Gamma_h``
-  -- the number of conjugacy classes of groups $\bar\Gamma_h$ occurring in that
-  degree -- from the same paper, Table 4, p. 17.
+  J. London Math. Soc. 110 (2024), arXiv:2302.01679, Section 3.6 (the Tits
+  building); V. Alexeev, P. Engel, D. Z. Garza, L. Schaffler, *Compact moduli of
+  Enriques surfaces of degree 2*, Nagoya Math. J. 259 (2025), Definitions 2.6 and
+  2.7 with Corollary 3.12 and Section 3.3.
+* card ``otilde-plus-t-en`` -- the arithmetic group
+  $\widetilde O^+(T_{\mathrm{En}})$, same two rows, same Section 3.6 statement.
+* cards ``6JRX`` and ``6JRY`` -- Scattone's degree-two and degree-four period
+  lattices $\Lambda_2$ and $\Lambda_4$, rows ``O``, ``O+`` and ``Otilde+``:
+  J. Scattone, *On the compactification of moduli spaces for algebraic K3
+  surfaces*, Mem. Amer. Math. Soc. 374 (1987), Proposition 5.4.7 with
+  Corollary 5.4.8(2) and Sections 6.2 and 6.3 (the plane rows), Section 6 (the
+  $O^+$ rows) and Theorem 4.0.1 (the $\widetilde O^+$ rows).
+* cards ``gamma-h-1`` .. ``gamma-h-87`` -- the 87 numerical polarizations, rows
+  ``lines``, ``planes`` and ``flags``, each from Table 1 or Table 2 of Dutour
+  Sikirić--Hulek as the card itself cites it.
+* card ``0128`` -- $U \oplus E_8(-1)$, Table 4 rows: ``#h``, the number of
+  orbits of primitive vectors of square $2d$ under $O(U \oplus E_8(-1))$, and
+  ``#Γ̄_h``, the number of classes of polarizing groups occurring there.
 
-What is compared, and through which public call of #286:
+**What each row is compared with.**  The public call of #286, on the lattice and
+group the row names:
 
-* a ``gamma-h-N`` row is built as its card states it -- the card names the
-  lattice (``029J``, $N = U \oplus U(2) \oplus E_8(-2)$) and the parent group
-  (``o-t-en``, $O(N)$), and its LaTeX names the subset $S$ of the Coxeter
-  diagram of $O(U \oplus E_8(-1))$ that $h$ is orthogonal to -- and the three
-  counts are ``group.isotropic_orbit_representatives(1)``,
-  ``(2)`` and ``(2, flag=True)``, the public call of #286
-  (``PredicateSubgroups.isotropic_orbit_representatives``, with ``cusps`` and
-  ``tits_building_incidence`` built on it).
-* a ``0128`` row's ``#h`` is ``L.Aut().vector_orbit_representatives(2d,
-  content=1)`` on the card's own lattice, the same public orbit classifier
-  restricted to the group of the card being read and to the primitive stratum
-  the table counts, and its ``#\bar\Gamma_h`` is the number of
-  distinct line/plane/flag triples the call returns over those classes: the
-  paper's own class invariant is the order and the orbit sizes of the group
-  (p. 11), and the orbit sizes are what the call reports.
+* ``lines``: ``group.isotropic_orbit_representatives(1).cardinality()``;
+* ``planes``: ``group.isotropic_plane_orbits(representatives).cardinality()``
+  where the group is a proper subgroup of the Enriques lattice's orthogonal
+  group -- Sterk's two representatives are the argument -- and
+  ``group.isotropic_orbit_representatives(2).cardinality()`` otherwise;
+* ``flags``: ``group.isotropic_orbit_representatives(2, flag=True).cardinality()``;
+* ``#h``: ``W.Aut().vector_orbit_representatives(2d).cardinality()`` and
+  ``#Γ̄_h``: the number of distinct line/plane/flag triples the call returns over
+  those classes.  A triple of orbit counts is an invariant of the group, so the
+  computed number is at most the card's; a degree where it is smaller says the
+  three counts did not separate that degree's classes, and which of the two values
+  is right there is decided by proof, as the issue's acceptance requires.
 
-A row passes only when the call's numbers equal the card's.  A row whose call
-does not return inside the per-call cap is reported ``UNDECIDED`` with the cap
-and the stage that ran out -- that is not a pass and the run is red.  A
-mismatch prints a defect block naming the lattice, the group, the row and the
-citation, ready to be filed against this repository; nothing here repairs the
-call and no expected value is adjusted.
+**A row that does not decide is not a pass.**  Each row runs in a child process of
+its own, so a row that hangs or that grows past the machine's memory is reported as
+that row's outcome instead of taking the run's report with it; the report says
+which rows returned, which did not return inside ``--cap``, which died, and which
+the run's ``--budget`` never reached.  A row whose card states no such value is
+reported ``MISSING``, naming the card.  Any outcome other than ``PASS`` makes the
+run exit non-zero, and a row that disagrees with its card is printed as a ``DEFECT``
+block naming the lattice, the group, the expected value, the computed value and the
+card's citation, ready to be filed as an issue against this repository.
 """
 
 from __future__ import annotations
@@ -64,19 +87,18 @@ import json
 import os
 import re
 import signal
+import subprocess
 import sys
 import time
-from pathlib import Path
+from dataclasses import dataclass
 
 from sage_extensions.all import *  # noqa: F401,F403
 
-ROOT = Path(__file__).resolve().parents[1]
-DIGEST_PATH = ROOT / "tests" / "cards" / "lattice-database-enriques.json"
-
-# D. Dutour Sikirić and K. Hulek, arXiv:2302.01679v2, equation (7), p. 9: the
-# Gram matrix of the extreme-ray generators g_1, ..., g_10, a Z-basis of
-# U + E_8(-1), the lattice of card 0128.  Species (6) of the same page is the
-# paper's other normalization; W is unimodular of signature (1, 9).
+#: D. Dutour Sikirić and K. Hulek, arXiv:2302.01679v2, equation (7): the Gram
+#: matrix of the extreme-ray generators $g_1, \ldots, g_{10}$, a $\mathbb{Z}$-basis
+#: of $U \oplus E_8(-1)$, the lattice of card ``0128``.  A construction datum: the
+#: acceptance's expected values are the cards', and this matrix is what the card's
+#: lattice is built from.
 W_ROWS = (
     (0, 1, 2, 2, 3, 3, 4, 4, 5, 6),
     (1, 2, 4, 4, 6, 6, 8, 8, 10, 12),
@@ -92,120 +114,316 @@ W_ROWS = (
 
 WALL_INDICES = tuple(range(1, 11))
 
-# The source's node labels for the ten basis vectors, fixed against Table 3 and
-# used by tests/lattices/test_enriques_polarization_orbits.sage (case 1 {0} ->
-# g_2, case 3 {7} -> g_3, ..., case 5 {-1,7} -> g_1 + g_3).
+#: The source's node labels for the ten basis vectors of the diagram, fixed
+#: against Table 3 of the paper and used by the 87 polarization rows.
 NODE_TO_WALL = {-1: 1, 0: 2, 1: 4, 2: 6, 3: 8, 4: 9, 5: 10, 6: 7, 7: 3, 8: 5}
 
-# The card's stated lattice and parent group; a card naming anything else is a
-# card this runner cannot build, and it says so instead of substituting.
+#: The card of the Enriques period lattice and the parent group it names; a card
+#: that names anything else is a card this module cannot build, and it says so.
 ENRIQUES_LATTICE_TAG = "029J"
 ENRIQUES_PARENT_GROUP = "o-t-en"
 
+#: The card of $O(U \oplus E_8(-1))$'s Table 4.
+TABLE4_TAG = "0128"
 
-class RowUndecided(Exception):
-    """A call did not return inside the per-call cap."""
+#: A page reference in a card's citation, which a row does not name.
+_PAGE_REFERENCES = (
+    re.compile(r"\(\s*pp?\.\s*\d+(?:\s*[-\u2013]\s*\d+)?\s*\)"),
+    re.compile(r",?\s*\bpp?\.\s*\d+(?:\s*[-\u2013]\s*\d+)?(?!\d)"),
+)
+
+#: A numbered statement: the word and the number that follows it.
+_NUMBERED_STATEMENT = re.compile(
+    r"\b(?:Table|Proposition|Theorem|Corollary|Lemma|Section|Definition|Remark)\s+\d"
+)
+
+#: The line the child process writes its outcome on.
+_OUTCOME_PREFIX = "@@ROW@@ "
+
+#: What a child's failure to write an outcome may cost beyond the row's own cap:
+#: the interpreter starts, imports the library and builds nothing.
+_STARTUP_ALLOWANCE = 180
 
 
-def _alarm(signum, frame):
-    raise RowUndecided
+@dataclass(frozen=True)
+class Row:
+    r"""One row of one card: which group, which quantity, and (for 0128) the degree."""
+
+    card: str
+    group: str
+    quantity: str
+    degree: int = 0
+
+    def identifier(self) -> str:
+        r"""The row's name in this module, which its selection and its report use."""
+        if self.card == TABLE4_TAG:
+            return f"{self.card}:{self.quantity}:{self.degree}"
+        if self.group:
+            return f"{self.card}:{self.group}:{self.quantity}"
+        return f"{self.card}:{self.quantity}"
 
 
-signal.signal(signal.SIGALRM, _alarm)
+def _rows() -> tuple:
+    r"""Every row this module compares, in report order.
+
+    The 87 polarizations and card ``0128``'s degrees are enumerated from the
+    digest, so a card that gains or loses a row changes the run rather than this
+    file.
+    """
+    rows = []
+    for group in ("O", "Otilde+", "gamma-en-2"):
+        for quantity in ("lines", "planes"):
+            rows.append(Row(ENRIQUES_LATTICE_TAG, group, quantity))
+    for quantity in ("lines", "planes"):
+        rows.append(Row("otilde-plus-t-en", "", quantity))
+    for tag in ("6JRX", "6JRY"):
+        for group, quantity in (
+            ("O", "planes"),
+            ("O+", "lines"),
+            ("O+", "planes"),
+            ("Otilde+", "lines"),
+        ):
+            rows.append(Row(tag, group, quantity))
+    for index in range(1, 88):
+        for quantity in ("lines", "planes", "flags"):
+            rows.append(Row(f"gamma-h-{index}", "", quantity))
+    for degree in card_polarization_degrees():
+        for quantity in ("#h", "#Gamma_h"):
+            rows.append(Row(TABLE4_TAG, "", quantity, degree))
+    return tuple(rows)
 
 
-def log(message=""):
-    print(message, flush=True)
+def _select(rows, tags, degrees, quantities):
+    r"""The rows a run asks for: by card, by degree and by quantity, or all of them."""
+    selected = []
+    for row in rows:
+        if tags and row.card not in tags:
+            continue
+        if degrees and (row.card != TABLE4_TAG or row.degree not in degrees):
+            continue
+        if quantities and row.quantity not in quantities:
+            continue
+        selected.append(row)
+    return tuple(selected)
 
 
-def card_subset(latex):
-    r"""Return ``(nodes, barred)`` for the subset factor of a card's LaTeX name.
+def _statement(citation: str) -> str:
+    r"""The card's citation with its page references removed.
+
+    A row names its paper and its numbered table or statement, not a page: the two
+    readings are checked here rather than assumed, because a citation that stops
+    naming a numbered statement has stopped saying which statement the row is.
+    """
+    trimmed = citation
+    for pattern in _PAGE_REFERENCES:
+        trimmed = pattern.sub("", trimmed)
+    stripped = re.sub(r"\s+", " ", trimmed).replace(" .", ".").strip()
+    if re.search(r"\bpp?\.\s*\d", stripped):
+        raise ValueError(f"a page reference survives in {stripped!r}")
+    if _NUMBERED_STATEMENT.search(stripped) is None:
+        raise ValueError(
+            f"the citation {stripped!r} names no numbered table, proposition, theorem, "
+            "corollary, lemma, section, definition or remark"
+        )
+    return stripped
+
+
+class CardMissing(Exception):
+    r"""The card states no such row, or the digest carries no such card."""
+
+
+def _expected(row: Row):
+    r"""The card's own value for ``row``, or :class:`CardMissing` if it states none."""
+    try:
+        if row.card == TABLE4_TAG:
+            entry = card_polarization_row(row.degree)
+            return entry["primitive_classes" if row.quantity == "#h" else "group_classes"]
+        if row.card.startswith("gamma-h-") or row.card == "otilde-plus-t-en":
+            return card_arithmetic_group_row(row.card, row.quantity)
+        read = card_line_orbit_row if row.quantity == "lines" else card_plane_orbit_row
+        return read(row.card, row.group)
+    except KeyError as missing:
+        raise CardMissing(str(missing)) from None
+
+
+def _citation(row: Row) -> str:
+    r"""The card's citation for ``row``: its paper, with the numbered statement."""
+    if row.card == TABLE4_TAG:
+        return card_polarization_row(row.degree)["citation"]
+    if row.card.startswith("gamma-h-") or row.card == "otilde-plus-t-en":
+        return card_arithmetic_group(row.card)["citation"]
+    return card_lattice(row.card)["rows"][row.group]["citation"]
+
+
+def _card_lattice(tag: str):
+    r"""The lattice card ``tag`` describes, built from the decomposition it states.
+
+    The Enriques period lattice is the catalogue's ``T_En``; Scattone's period
+    lattices are $U^2 \oplus E_8(-1)^2 \oplus \langle -2k \rangle$ with $2k$ read
+    off the card's own determinant.  The two invariants the card states -- its
+    signature and its determinant -- are what the built lattice is checked against,
+    so a lattice that is not the card's is refused rather than compared.
+    """
+    card = card_lattice(tag)
+    if tag == ENRIQUES_LATTICE_TAG:
+        lattice = NamedLattices.TEn
+    else:
+        determinant = int(card["determinant"])
+        if determinant % 2:
+            raise ArithmeticError(f"card {tag} states determinant {determinant}, not twice an integer")
+        lattice = (
+            Lattices(ZZ)("U")
+            + Lattices(ZZ)("U")
+            + Lattices(ZZ)("E8")
+            + Lattices(ZZ)("E8")
+            + Lattices(ZZ)([[determinant]])
+        )
+    signature = lattice.signature_pair()
+    built = [int(signature.first()), int(signature.second())]
+    if built != [int(entry) for entry in card["signature"]]:
+        raise ArithmeticError(
+            f"the lattice built for card {tag} has signature {built}, "
+            f"against the card's {card['signature']}"
+        )
+    if lattice.determinant() != ZZ(card["determinant"]):
+        raise ArithmeticError(
+            f"the lattice built for card {tag} has determinant {lattice.determinant()}, "
+            f"against the card's {card['determinant']}"
+        )
+    return lattice
+
+
+def _sterk_plane_representatives(lattice):
+    r"""Sterk's two $O(N)$-orbit representatives of primitive isotropic planes.
+
+    $P_1 = \mathbb{Z} e_1 + \mathbb{Z} e_3$ and $P_2 = \mathbb{Z}(2 e_1 + 2 e_2 +
+    w) + \mathbb{Z} e_3$ with $w$ of norm $-8$ in $E_8(-2)$ (H. Sterk,
+    *Compactifications of the period space of Enriques surfaces, Part I*,
+    Math. Z. 207 (1991), Proposition 4.6), in the standard bases $(e_1, e_2)$ of
+    $U$ and $(e_3, e_4)$ of $U(2)$ that Dutour Sikirić--Hulek use.  They are the
+    argument of the subgroup plane call, not an expected value: the count that
+    comes back is the card's.
+    """
+    basis = list(lattice.module_generators())
+    first, second, third = basis[0], basis[1], basis[2]
+    w = basis[4] + basis[5]
+    if lattice.q(w) != ZZ(-8):
+        raise ArithmeticError(f"the vector w has square {lattice.q(w)}, not -8")
+    representatives = (
+        lattice.primitive_isotropic_subobject(first, third),
+        lattice.primitive_isotropic_subobject(2 * first + 2 * second + w, third),
+    )
+    for plane in representatives:
+        if plane.module_rank() != cardinal(2) or plane.is_primitive() is not True:
+            raise ArithmeticError(f"{plane} is not a primitive isotropic plane")
+        for left in plane.module_generating_set():
+            for right in plane.module_generating_set():
+                if lattice.b(
+                    plane.inclusion()(plane.module_generator(left)),
+                    plane.inclusion()(plane.module_generator(right)),
+                ) != ZZ(0):
+                    raise ArithmeticError(f"{plane} is not totally isotropic")
+    return representatives
+
+
+def _subgroup(lattice, name: str):
+    r"""The group a card row names, on ``lattice``.
+
+    ``O`` is the whole orthogonal group, ``O+`` its index-two subgroup, and
+    ``Otilde+`` the kernel of the discriminant character intersected with it.
+    """
+    if name == "O":
+        return lattice.Aut()
+    if name == "O+":
+        return lattice.O_plus()
+    if name == "Otilde+":
+        return lattice.stable_orthogonal_group().intersection(lattice.O_plus())
+    if name == "gamma-en-2":
+        return _gamma_en_2()
+    raise ValueError(f"{name!r} is not a group a card row of this module names")
+
+
+def _gamma_en_2():
+    r"""$\Gamma_{\mathrm{En},2}$, Alexeev--Engel--Garza--Schaffler, Definition 2.6.
+
+    The image in $O(T_{\mathrm{En}})$ of $\{g \in O(L) : g I_{\mathrm{En}} =
+    I_{\mathrm{En}} g,\ g(h) = h\}$ at the degree-two polarization $h$, built by the
+    coinvariant construction rather than from a description of its image in
+    $O(q)$.
+    """
+    invariant = Involutions.I_En.invariant_lattice()
+    basis_elements = list(invariant.module_generators())
+    marks = []
+    for left, left_vector in enumerate(basis_elements):
+        for right, right_vector in enumerate(basis_elements):
+            if right <= left:
+                continue
+            if (
+                invariant.q(left_vector) == ZZ.zero()
+                and invariant.q(right_vector) == ZZ.zero()
+                and invariant.b(left_vector, right_vector) != ZZ.zero()
+            ):
+                marks.append((left, right, invariant.b(left_vector, right_vector)))
+    left, right, _pairing = next(entry for entry in marks if entry[2] == ZZ(2))
+    h_invariant = basis_elements[left] + basis_elements[right]
+    polarized = Involutions.I_En.polarized(invariant.inclusion()(h_invariant))
+    return polarized.coinvariant_extension_subgroup()
+
+
+def _card_subset(latex: str):
+    r"""Return ``(nodes, barred)`` for the subset factor of a polarization card's LaTeX.
 
     A card writes $\overline{\Gamma}_{h,N}(\overline{\{0\}})$ when the printed
     subset is the complement of the generating set, and
     $\overline{\Gamma}_{h,N}(\{4, 6, 3, 5\})$ when the subset itself is the
-    generating set (the paper's convention, p. 12); the card's own LaTeX carries
-    that bar, so the decode reads it rather than inferring it from the size.
+    generating set; the card's own LaTeX carries that bar, so the decode reads it
+    rather than inferring it from the size.
     """
     opening = latex.rfind("(")
     closing = latex.rfind(")")
     if opening < 0 or closing < opening:
         raise ValueError(f"the card's LaTeX names no subset: {latex}")
     text = latex[opening + 1 : closing]
-    barred = "overline" in text
-    # The node labels are the only integers in the factor; \emptyset has none.
-    return tuple(int(part) for part in re.findall(r"-?\d+", text)), barred
+    return tuple(int(part) for part in re.findall(r"-?\d+", text)), "overline" in text
 
 
-def support(nodes, barred):
-    """Return the $g$-basis support Table 3 / the card's set denotes."""
+def _support(nodes, barred) -> tuple:
+    r"""The $g$-basis support the card's subset denotes."""
     walls = tuple(NODE_TO_WALL[node] for node in nodes)
     if barred:
         return tuple(sorted(walls))
     return tuple(wall for wall in WALL_INDICES if wall not in walls)
 
 
-def describe_subset(nodes, barred):
-    printed = "{" + ",".join(str(node) for node in nodes) + "}"
-    return f"overline{printed}" if barred else printed
-
-
-def orbit_rows(group, cap, rows=("lines", "planes", "flags")):
-    """Return the requested rows -- lines, planes, flags -- from the public call."""
-    selected = []
-    for label, rank, flag in (("lines", 1, False), ("planes", 2, False), ("flags", 2, True)):
-        if label not in rows:
-            continue
-        started = time.time()
-        signal.alarm(cap)
-        try:
-            count = group.isotropic_orbit_representatives(rank, flag=flag).cardinality()
-            signal.alarm(0)
-        except RowUndecided:
-            raise RowUndecided(
-                f"{label}: the public call did not return inside {cap} s "
-                f"({time.time() - started:.0f} s elapsed)"
-            )
-        finally:
-            signal.alarm(0)
-        selected.append((label, int(count), time.time() - started))
-    return tuple(selected)
-
-
 class Enriques:
-    r"""The card's lattice, its polarization lattice, and the $\Gamma_h$ construction."""
+    r"""The polarization lattice of card ``0128``, and the $\Gamma_h$ construction."""
 
     def __init__(self):
         self.invariant = Involutions.I_En.invariant_lattice()
-        # The card's own lattice M(1/2) = U + E8(-1) is W; M = U(2) + E8(-2) is
-        # 2W on the same coordinates, and the invariant lattice is isometric to
-        # it.  The doubling multiplies every square by two, which is the source's
-        # own normalization: a polarization of degree h^2 = 2d is a vector of
-        # square 2d in M(1/2) and of square 4d in M.
         self.unimodular = Lattices(ZZ)([list(row) for row in W_ROWS])
         self.doubled = Lattices(ZZ)([[2 * entry for entry in row] for row in W_ROWS])
         self.transport = self.doubled.isometry_to(self.invariant)
         self.labels = tuple(self.doubled.module_generating_set())
         self.ambient = Involutions.I_En.formed_coinvariants()
         if self.unimodular.determinant() != ZZ(-1):
-            raise ArithmeticError("W is not unimodular")
+            raise ArithmeticError("U + E8(-1) is not unimodular")
         if self.ambient.determinant() != ZZ(1024):
             raise ArithmeticError("the anti-invariant lattice is not the determinant-1024 T_En")
         if not self.ambient.is_isometric(NamedLattices.TEn):
             raise ArithmeticError("the anti-invariant lattice is not T_En")
 
     def doubled_point(self, support_indices):
-        """The polarization supported on the card's $g$-basis subset."""
+        r"""The polarization supported on the card's $g$-basis subset."""
         return sum(
             (self.doubled.module_generator(self.labels[index - 1]) for index in support_indices),
             self.doubled.zero(),
         )
 
     def doubled_from_unimodular(self, vector):
-        """The same coordinate vector read in M = 2W, where its square doubles."""
+        r"""The same coordinate vector read in $M = 2W$, where its square doubles."""
         coordinates = vector.to_vector()
-        source_labels = tuple(self.unimodular.module_generating_set())
         target_labels = tuple(self.doubled.module_generating_set())
+        source_labels = tuple(self.unimodular.module_generating_set())
         image = sum(
             (
                 self.doubled.scalar_multiple(
@@ -222,213 +440,311 @@ class Enriques:
         return image
 
     def group(self, vector_of_doubled):
-        r"""$\Gamma_h$ of the card: the image of $O(M, h)$, transported, preimage in $O(N)$."""
+        r"""$\Gamma_h$: the image of $O(M, h)$, transported, preimage in $O(N)$."""
         vector_in_M = self.transport(vector_of_doubled)
         return Involutions.I_En.polarized(
             self.invariant.inclusion()(vector_in_M)
         ).coinvariant_extension_subgroup()
 
+    def polarization_group(self, card):
+        r"""The group a polarization card names, built from the card's own subset."""
+        if card["lattice"] != ENRIQUES_LATTICE_TAG:
+            raise CardMissing(
+                f"the card names lattice {card['lattice']}, not {ENRIQUES_LATTICE_TAG}"
+            )
+        if card["parent_group"] != ENRIQUES_PARENT_GROUP:
+            raise CardMissing(
+                f"the card names parent group {card['parent_group']}, not {ENRIQUES_PARENT_GROUP}"
+            )
+        nodes, barred = _card_subset(card["latex"])
+        return self.group(self.doubled_point(_support(nodes, barred)))
 
-def report_card_row(orthogonal, card, cap, selection=("lines", "planes", "flags")):
-    """Compare one ``gamma-h-N`` card with the public call on the group it names."""
-    tag = card["tag"]
-    label = f"{tag}"
-    log("")
-    log(f"ROW {label}  ({card['name']})")
-    log(f"  citation: {card['citation']}")
-    if card["lattice"] != ENRIQUES_LATTICE_TAG:
-        log(f"  UNDECIDED: the card names lattice {card['lattice']}, not {ENRIQUES_LATTICE_TAG}")
-        return "undecided", None
-    if card["parent_group"] != ENRIQUES_PARENT_GROUP:
-        log(f"  UNDECIDED: the card names parent group {card['parent_group']}, not {ENRIQUES_PARENT_GROUP}")
-        return "undecided", None
-    nodes, barred = card_subset(card["latex"])
-    indices = support(nodes, barred)
-    log(f"  group: S = {describe_subset(nodes, barred)}, h = sum of g_{{{','.join(map(str, indices))}}}, "
-        f"|Gamma-bar_h| = {card['cardinality']}")
-    expected = {"lines": card["line_orbits"], "planes": card["plane_orbits"], "flags": card["flag_orbits"]}
-    started = time.time()
+
+def _computed(row: Row) -> int:
+    r"""The number the public call of #286 returns for ``row``."""
+    if row.card == TABLE4_TAG:
+        return _computed_table4_row(row)
+    if row.card.startswith("gamma-h-"):
+        group = Enriques().polarization_group(card_arithmetic_group(row.card))
+        return _orbit_count(group, row.quantity, None)
+    if row.card == "otilde-plus-t-en":
+        lattice = _card_lattice(card_arithmetic_group(row.card)["lattice"])
+        return _orbit_count(
+            _subgroup(lattice, "Otilde+"),
+            row.quantity,
+            _sterk_plane_representatives(lattice),
+        )
+    lattice = _card_lattice(row.card)
+    representatives = (
+        _sterk_plane_representatives(lattice)
+        if row.card == ENRIQUES_LATTICE_TAG and row.group != "O"
+        else None
+    )
+    return _orbit_count(_subgroup(lattice, row.group), row.quantity, representatives)
+
+
+def _orbit_count(group, quantity: str, representatives) -> int:
+    r"""One public orbit count of the group ``group``."""
+    if quantity == "lines":
+        return int(group.isotropic_orbit_representatives(1).cardinality())
+    if quantity == "planes":
+        if representatives is not None:
+            return int(group.isotropic_plane_orbits(representatives).cardinality())
+        return int(group.isotropic_orbit_representatives(2).cardinality())
+    if quantity == "flags":
+        return int(group.isotropic_orbit_representatives(2, flag=True).cardinality())
+    raise ValueError(f"{quantity!r} is not an orbit quantity this module compares")
+
+
+def _computed_table4_row(row: Row) -> int:
+    r"""Card ``0128``'s Table 4 row: ``#h``, or the number of distinct group classes."""
+    orthogonal = Enriques()
+    classes = orthogonal.unimodular.Aut().vector_orbit_representatives(row.degree)
+    count = int(classes.cardinality())
+    if row.quantity == "#h":
+        return count
+    if row.quantity != "#Gamma_h":
+        raise ValueError(f"{row.quantity!r} is not a Table 4 quantity")
+    triples = []
+    for representative in tuple(classes):
+        group = orthogonal.group(orthogonal.doubled_from_unimodular(representative))
+        triples.append(
+            tuple(
+                _orbit_count(group, quantity, None)
+                for quantity in ("lines", "planes", "flags")
+            )
+        )
+    return len(set(triples))
+
+
+def _lattice_and_group(row: Row) -> tuple:
+    r"""The lattice and the group a row is about, named as its card names them.
+
+    A defect names the lattice and the group, so the two are read from the card
+    rather than restated: a lattice card names its lattice, and an
+    arithmetic-group card names both its lattice and itself.
+    """
+    if row.card == TABLE4_TAG:
+        lattice = card_polarization_lattice()
+        return (f"{lattice['tag']}: {lattice['name']}", f"O({lattice['name']})")
+    if row.card.startswith("gamma-h-") or row.card == "otilde-plus-t-en":
+        group = card_arithmetic_group(row.card)
+        lattice = card_lattice(group["lattice"])
+        return (f"{lattice['tag']}: {lattice['name']}", group["name"])
+    lattice = card_lattice(row.card)
+    return (f"{row.card}: {lattice['name']}", row.group)
+
+
+def _outcome(row: Row, cap: int) -> dict:
+    r"""One row's outcome: the card's value, the call's value, and which is which."""
+    outcome = {"id": row.identifier(), "card": row.card, "group": row.group}
     try:
-        group = orthogonal.group(orthogonal.doubled_point(indices))
-        rows = orbit_rows(group, cap, selection)
-    except RowUndecided as undecided:
-        log(f"  UNDECIDED: {undecided} (after {time.time() - started:.0f} s)")
-        return "undecided", None
-    got = {label: count for label, count, _elapsed in rows}
-    timings = ", ".join(f"{label} {elapsed:.0f} s" for label, _count, elapsed in rows)
-    log("  expected " + ", ".join(f"{label} {expected[label]}" for label in got))
-    log("  call     " + ", ".join(f"{label} {got[label]}" for label in got) + f"   ({timings})")
-    disagreeing = [label for label in got if got[label] != expected[label]]
-    if not disagreeing:
-        log(f"  PASS (row total {time.time() - started:.0f} s)")
-        return "pass", None
-    log(f"  FAIL (row total {time.time() - started:.0f} s)")
-    defect = {
-        "card": tag,
-        "lattice": card["lattice"],
-        "group": f"{card['name']}, S = {describe_subset(nodes, barred)}, |Gamma-bar_h| = {card['cardinality']}",
-        "expected": ", ".join(f"{label} {expected[label]}" for label in disagreeing),
-        "actual": ", ".join(f"{label} {got[label]}" for label in disagreeing),
-        "citation": card["citation"],
-    }
-    return "fail", defect
-
-
-def report_table4_row(orthogonal, lattice_card, degree, cap):
-    """Compare one degree row of card 0128's Table 4 with the public call."""
-    row = lattice_card["rows"][str(degree)]
-    log("")
-    log(f"ROW 0128 degree={degree} (genus {degree // 2})")
-    log(f"  citation: {row['citation']}")
+        expected = _expected(row)
+        citation = _citation(row)
+    except CardMissing as missing:
+        outcome.update(state="MISSING", detail=str(missing))
+        return outcome
+    outcome["expected"] = int(expected)
+    outcome["statement"] = _statement(citation)
+    outcome["lattice"], outcome["group"] = _lattice_and_group(row)
     started = time.time()
 
-    # h^2 = 2d in M(1/2) is square 2 * (2d) in M = 2W.  The card's #h counts
-    # the primitive vectors alone (D. Dutour Sikirić, K. Hulek,
-    # arXiv:2302.01679v2, Table 4, p. 17: "the first line shows the number #h
-    # of orbits of primitive vectors in a given degree"), so the row is read
-    # from the primitive stratum: an isometry preserves content, and the
-    # square-2d shell also holds the classes of content c > 1 with c^2 | 2d,
-    # which are the non-primitive numerical polarizations the source
-    # disregards ("we disregard in our approach since they do not lead to new
-    # moduli spaces", section 3.5, p. 19).
+    def interrupt(signum, frame):
+        raise TimeoutError
+
+    signal.signal(signal.SIGALRM, interrupt)
     signal.alarm(cap)
     try:
-        classes = orthogonal.unimodular.Aut().vector_orbit_representatives(
-            degree, content=1
+        computed = int(_computed(row))
+        signal.alarm(0)
+    except TimeoutError:
+        outcome.update(
+            state="UNDECIDED",
+            detail=f"the public call did not return inside {cap} s",
+            elapsed=round(time.time() - started, 1),
         )
-        signal.alarm(0)
-        counts = int(classes.cardinality())
-    except RowUndecided:
-        signal.alarm(0)
-        log(f"  UNDECIDED #h: the vector orbit call did not return inside {cap} s")
-        return "undecided", None
+        return outcome
+    except Exception as error:  # a row that raises is that row's outcome, not the run's
+        outcome.update(
+            state="BROKEN",
+            detail=f"{type(error).__name__}: {error}",
+            elapsed=round(time.time() - started, 1),
+        )
+        return outcome
     finally:
         signal.alarm(0)
-    expected_counts = int(row["primitive_classes"])
-    log(f"  #h: expected {expected_counts}, call {counts}   ({time.time() - started:.0f} s)")
-    outcome = "pass" if counts == expected_counts else "fail"
-    defect = None
-    if outcome == "fail":
-        defect = {
-            "card": "0128",
-            "lattice": "0128 (U + E8(-1), rank 10, unimodular, signature (1, 9))",
-            "group": "O(U + E8(-1))",
-            "expected": f"#h = {expected_counts} at degree {degree}",
-            "actual": f"#h = {counts}",
-            "citation": row["citation"],
+    outcome["computed"] = computed
+    outcome["elapsed"] = round(time.time() - started, 1)
+    outcome["state"] = "PASS" if computed == outcome["expected"] else "FAIL"
+    return outcome
+
+
+def _run_row_in_child(row: Row, cap: int) -> dict:
+    r"""Run one row in a child process of its own and return its outcome.
+
+    A row that hangs past its cap or that grows past the machine's memory is that
+    row's outcome: the child is killed and reported, and the run's report survives
+    to name it.
+    """
+    command = [
+        sys.executable,
+        os.path.abspath(__file__),
+        "--one",
+        row.identifier(),
+        "--cap",
+        str(cap),
+    ]
+    started = time.time()
+    try:
+        completed = subprocess.run(
+            command,
+            capture_output=True,
+            text=True,
+            timeout=cap + _STARTUP_ALLOWANCE,
+        )
+    except subprocess.TimeoutExpired:
+        return {
+            "id": row.identifier(),
+            "card": row.card,
+            "group": row.group,
+            "state": "UNDECIDED",
+            "detail": f"the row did not finish inside {cap + _STARTUP_ALLOWANCE} s",
+            "elapsed": round(time.time() - started, 1),
         }
-
-    triples = []
-    representatives = tuple(classes)
-    for index, representative in enumerate(representatives):
-        log(f"  class {index + 1}/{len(representatives)}: q = {representative.q()}")
-        try:
-            group = orthogonal.group(orthogonal.doubled_from_unimodular(representative))
-            rows = orbit_rows(group, cap, ("lines", "planes", "flags"))
-        except RowUndecided as undecided:
-            log(f"  UNDECIDED #Gamma-bar_h: {undecided} (after {time.time() - started:.0f} s)")
-            return "undecided", defect
-        triples.append(tuple(count for _label, count, _elapsed in rows))
-        log(f"    lines/planes/flags = {'/'.join(str(count) for count in triples[-1])}")
-    distinct = len(set(triples))
-    expected_distinct = int(row["group_classes"])
-    log(f"  #Gamma-bar_h: expected {expected_distinct}, call {distinct}   "
-        f"({time.time() - started:.0f} s)")
-    if distinct != expected_distinct:
-        outcome = "fail"
-        defect = {
-            "card": "0128",
-            "lattice": "0128 (U + E8(-1), rank 10, unimodular, signature (1, 9))",
-            "group": f"the {counts} classes of primitive vectors of square {degree}",
-            "expected": f"#Gamma-bar_h = {expected_distinct} at degree {degree}",
-            "actual": f"#Gamma-bar_h = {distinct} from the triples {sorted(set(triples))}",
-            "citation": row["citation"],
-        }
-    log(f"  {'PASS' if outcome == 'pass' else 'FAIL'} (row total {time.time() - started:.0f} s)")
-    return outcome, defect
+    for line in completed.stdout.splitlines():
+        if line.startswith(_OUTCOME_PREFIX):
+            return json.loads(line[len(_OUTCOME_PREFIX) :])
+    tail = completed.stderr.strip().splitlines()
+    return {
+        "id": row.identifier(),
+        "card": row.card,
+        "group": row.group,
+        "state": "BROKEN",
+        "detail": (
+            f"the child exited {completed.returncode} with no outcome; "
+            f"{tail[-1] if tail else 'no stderr'}"
+        ),
+        "elapsed": round(time.time() - started, 1),
+    }
 
 
-def main(argv=None):
+def _log(message: str = "") -> None:
+    print(message, flush=True)
+
+
+def _report(outcome: dict) -> None:
+    r"""Print one row's outcome, and its defect block when it disagrees with its card."""
+    _log("")
+    _log(f"ROW {outcome['id']}  [{outcome['state']}]")
+    if "statement" in outcome:
+        _log(f"  lattice {outcome['lattice']}   group {outcome['group']}")
+        _log(f"  card: {outcome['statement']}")
+    if outcome["state"] == "MISSING":
+        _log(f"  MISSING: {outcome['detail']}")
+        return
+    if "expected" in outcome:
+        _log(f"  expected {outcome['expected']}  call {outcome.get('computed', '-')}"
+             f"   ({outcome.get('elapsed', '-')} s)")
+    if outcome["state"] != "PASS":
+        _log(f"  {outcome['state']}: {outcome.get('detail', 'no detail')}")
+    if outcome["state"] == "FAIL":
+        _log("  DEFECT")
+        _log(f"    card: {outcome['card']}")
+        _log(f"    lattice: {outcome['lattice']}")
+        _log(f"    group: {outcome['group']}")
+        _log(f"    expected: {outcome['expected']}")
+        _log(f"    computed: {outcome['computed']}")
+        _log(f"    citation: {outcome['statement']}")
+
+
+def _parse(argv):
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument("--tags", default=None, help="comma-separated gamma-h-N cards")
-    parser.add_argument("--degrees", default=None, help="comma-separated degrees 2d of card 0128")
-    parser.add_argument("--cap", type=int, default=int(os.environ.get("ENRIQUES_CALL_CAP", "1800")),
-                        help="seconds one public call may take before its row is undecided")
-    parser.add_argument("--budget", type=int, default=int(os.environ.get("ENRIQUES_ROW_BUDGET", "0")),
-                        help="seconds for the whole run; 0 runs every selected row")
-    parser.add_argument("--rows", default=os.environ.get("ENRIQUES_ROWS", "lines,planes,flags"),
-                        help="comma-separated rows of a gamma-h card to run: lines, planes, flags")
-    arguments = parser.parse_args(argv)
-
-    digest = json.loads(DIGEST_PATH.read_text())
-    provenance = digest["_provenance"]
-    log(f"cards: {provenance['repository']} at {provenance['ref']}")
-    log(f"replica of the paper read: arXiv:2302.01679v2 (26 Sep 2023), Tables 1 and 2 pp. 13-14, Table 4 p. 17")
-    log(f"per-call cap {arguments.cap} s, budget {arguments.budget or 'unbounded'} s")
-
-    tags = (
-        arguments.tags.split(",")
-        if arguments.tags and arguments.tags != "none"
-        else []
-        if arguments.tags == "none"
-        else sorted(digest["arithmetic_groups"], key=lambda tag: int(tag.rsplit("-", 1)[1]))
+    parser.add_argument("--one", default=None, help="one row's identifier, run in this process")
+    parser.add_argument("--tags", default=None, help="comma-separated card tags")
+    parser.add_argument("--degrees", default=None, help="comma-separated degrees of card 0128")
+    parser.add_argument(
+        "--rows",
+        default=None,
+        help="comma-separated quantities: lines, planes, flags, #h, #Gamma_h",
     )
-    degrees = (
-        [] if arguments.degrees == "none"
-        else [int(degree) for degree in arguments.degrees.split(",")]
-        if arguments.degrees
-        else sorted(int(degree) for degree in digest["polarization_counts"]["rows"])
+    parser.add_argument(
+        "--cap",
+        type=int,
+        default=int(os.environ.get("ENRIQUES_CALL_CAP", "1800")),
+        help="seconds one row's public calls may take before the row is undecided",
     )
+    parser.add_argument(
+        "--budget",
+        type=int,
+        default=int(os.environ.get("ENRIQUES_ROW_BUDGET", "0")),
+        help="seconds for the whole run; 0 runs every selected row",
+    )
+    return parser.parse_args(argv)
 
-    orthogonal = Enriques()
-    log(f"lattice {ENRIQUES_LATTICE_TAG} is T_En: rank {orthogonal.ambient.module_rank()}, "
-        f"determinant {orthogonal.ambient.determinant()}")
 
-    selection = tuple(part.strip() for part in arguments.rows.split(",") if part.strip())
-    unknown = tuple(row for row in selection if row not in ("lines", "planes", "flags"))
-    if unknown:
-        parser.error(f"unknown row(s) {unknown}: choose from lines, planes, flags")
-    log(f"rows per card: {', '.join(selection)}")
+def _split(value):
+    return () if value is None else tuple(part.strip() for part in value.split(",") if part.strip())
+
+
+def main(argv=None) -> int:
+    arguments = _parse(argv)
+    rows = _rows()
+    if arguments.one is not None:
+        matches = tuple(row for row in rows if row.identifier() == arguments.one)
+        if not matches:
+            _log(f"no row has the identifier {arguments.one!r}")
+            return 2
+        outcome = _outcome(matches[0], arguments.cap)
+        _log(_OUTCOME_PREFIX + json.dumps(outcome))
+        return 0
+
+    tags = _split(arguments.tags)
+    degrees = tuple(int(degree) for degree in _split(arguments.degrees))
+    quantities = _split(arguments.rows)
+    selected = _select(rows, tags, degrees, quantities)
+
+    _log(f"rows: {len(rows)} known, {len(selected)} selected")
+    provenance = card_provenance()
+    _log(f"cards: {provenance['repository']} at its commit {provenance['ref']}")
+    _log(f"per-row cap {arguments.cap} s, budget {arguments.budget or 'unbounded'} s")
 
     deadline = time.time() + arguments.budget if arguments.budget else None
-    outcomes = {"pass": [], "fail": [], "undecided": [], "notreached": []}
-    defects = []
-
-    for tag in tags:
+    outcomes = []
+    for row in selected:
         if deadline is not None and time.time() > deadline:
-            outcomes["notreached"].append(tag)
+            outcomes.append(
+                {
+                    "id": row.identifier(),
+                    "card": row.card,
+                    "group": row.group,
+                    "state": "NOT REACHED",
+                    "detail": f"the run's {arguments.budget} s budget ended before this row",
+                }
+            )
             continue
-        outcome, defect = report_card_row(
-            orthogonal, digest["arithmetic_groups"][tag], arguments.cap, selection
-        )
-        outcomes[outcome].append(tag)
-        if defect is not None:
-            defects.append(defect)
+        outcome = _run_row_in_child(row, arguments.cap)
+        _report(outcome)
+        outcomes.append(outcome)
 
-    lattice_card = digest["polarization_counts"]
-    for degree in degrees:
-        if deadline is not None and time.time() > deadline:
-            outcomes["notreached"].append(f"0128 degree {degree}")
-            continue
-        outcome, defect = report_table4_row(orthogonal, lattice_card, degree, arguments.cap)
-        outcomes[outcome].append(f"0128 degree {degree}")
-        if defect is not None:
-            defects.append(defect)
-
-    log("")
-    log("SUMMARY")
-    for name in ("pass", "fail", "undecided", "notreached"):
-        log(f"  {name}: {len(outcomes[name])}")
-        for row in outcomes[name]:
-            log(f"    {row}")
+    _log("")
+    _log("SUMMARY")
+    for state in ("PASS", "FAIL", "MISSING", "UNDECIDED", "BROKEN", "NOT REACHED"):
+        named = [outcome["id"] for outcome in outcomes if outcome["state"] == state]
+        _log(f"  {state}: {len(named)}")
+        for identifier in named:
+            _log(f"    {identifier}")
+    defects = [outcome for outcome in outcomes if outcome["state"] == "FAIL"]
     for defect in defects:
-        log("")
-        log("DEFECT")
-        for key in ("card", "lattice", "group", "expected", "actual", "citation"):
-            log(f"  {key}: {defect[key]}")
-    if outcomes["fail"] or outcomes["undecided"] or outcomes["notreached"]:
-        return 1
-    return 0
+        _log("")
+        _log(
+            f"DEFECT {defect['id']}: {defect['lattice']} under {defect['group']}: "
+            f"expected {defect['expected']}, computed {defect['computed']}"
+        )
+        _log(f"  {defect['statement']}")
+    decided = sum(1 for outcome in outcomes if outcome["state"] == "PASS")
+    _log("")
+    _log(f"{decided} of {len(outcomes)} rows agree with their cards")
+    return 0 if decided == len(outcomes) else 1
 
 
 if __name__ == "__main__":

@@ -30,6 +30,12 @@ RAW = "https://raw.githubusercontent.com/dzackgarza/lattice-database/{ref}/{path
 # The two card paths, as the database lays them out.
 ARITHMETIC_GROUP_PATH = "arithmetic-groups/{slug}.md"
 
+# The arithmetic-group cards that are not one of the 87 numerical polarizations:
+# the group card of $\widetilde O^+(T_{\mathrm{En}})$, which states the two rows
+# that are also ``029J``'s ``Otilde+`` row.  A row read from this card and from
+# ``029J`` is one row of one group, and the acceptance reads it from both cards.
+FIXED_ARITHMETIC_GROUP_SLUGS = ("otilde-plus-t-en",)
+
 # The lattice cards whose primitive-isotropic-plane rows are read: the two
 # Scattone rank-21 cards, and the Enriques period lattice 029J whose two
 # O(N)-orbits of primitive isotropic planes (#295, #316) are Sterk's.
@@ -86,6 +92,13 @@ def front_matter(text: str, path: str) -> dict:
 
 
 def arithmetic_group(ref: str, slug: str) -> dict:
+    r"""One arithmetic-group card's rows.
+
+    A card states the rows it has: the 87 polarization cards state all three, and
+    the group card of $\widetilde O^+(T_{\mathrm{En}})$ states its line and plane
+    rows and no flag row.  A row the card does not state is kept as null, so a
+    reader meets the card's silence rather than a number from somewhere else.
+    """
     path = ARITHMETIC_GROUP_PATH.format(slug=slug)
     card = front_matter(fetch(ref, path), path)
     data = card["data"]
@@ -98,9 +111,9 @@ def arithmetic_group(ref: str, slug: str) -> dict:
         "parent_group": card.get("parent_group"),
         "cardinality": data["cardinality"],
         "abstract_structure": data.get("abstract_structure"),
-        "line_orbits": data["line_orbits"],
-        "plane_orbits": data["plane_orbits"],
-        "flag_orbits": data["flag_orbits"],
+        "line_orbits": data.get("line_orbits"),
+        "plane_orbits": data.get("plane_orbits"),
+        "flag_orbits": data.get("flag_orbits"),
         "citation": data["reference"]["citation"],
     }
 
@@ -419,6 +432,9 @@ def main(argv: list[str]) -> int:
         f"gamma-h-{index}": arithmetic_group(ref, f"gamma-h-{index}")
         for index in range(1, 88)
     }
+    groups.update(
+        {slug: arithmetic_group(ref, slug) for slug in FIXED_ARITHMETIC_GROUP_SLUGS}
+    )
     digest = {
         "_provenance": {
             "repository": "dzackgarza/lattice-database",

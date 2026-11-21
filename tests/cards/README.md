@@ -14,11 +14,18 @@ fetches only the front matter of the named cards and keeps only the rows the
 tests read, so a refresh is one HTTP request per card and the diff is the
 database's change, not a transcription.
 
+The arithmetic-group cards are the 87 numerical polarizations and the group card
+`otilde-plus-t-en`, which states the line and plane rows of
+$\widetilde O^+(T_{\mathrm{En}})$ that `029J`'s own `Otilde+` row states. A card
+states the rows it has: where one states no flag row, the digest keeps that row
+null and a reader that asks for it raises, so a comparison reports the card's
+silence instead of a number of another group's.
+
 What is read, and from where:
 
 | field | card | row |
 | --- | --- | --- |
-| `arithmetic_groups[tag].lattice`, `.parent_group` | `arithmetic-groups/gamma-h-N.md` | `lattice`, `parent_group` |
+| `arithmetic_groups[tag].lattice`, `.parent_group` | `arithmetic-groups/gamma-h-N.md`, `arithmetic-groups/otilde-plus-t-en.md` | `lattice`, `parent_group` |
 | `arithmetic_groups[tag].latex` | same | `latex` — the subset `S` of the Coxeter diagram, with the paper's overline when the printed set is a complement |
 | `arithmetic_groups[tag].cardinality` | same | `data.cardinality` — the order of `/bar Gamma_h` |
 | `arithmetic_groups[tag].line_orbits`, `.plane_orbits`, `.flag_orbits` | same | `data.line_orbits`, `data.plane_orbits`, `data.flag_orbits` — `#I_1`, `#I_2`, `#I_12` |

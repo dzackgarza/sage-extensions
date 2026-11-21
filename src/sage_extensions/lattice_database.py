@@ -243,10 +243,130 @@ def card_line_orbit_lengths(tag: str, group: str):
     return tuple(found)
 
 
+_ARITHMETIC_GROUP_QUANTITIES = {
+    "lines": "line_orbits",
+    "planes": "plane_orbits",
+    "flags": "flag_orbits",
+}
+r"""The three orbit rows an arithmetic-group card states, and the field of each."""
+
+
+def card_provenance() -> dict:
+    r"""Return the digest's provenance: the database, the commit, and the rows kept.
+
+    A run's report names the commit its expected values were read at, so a reader
+    can reproduce the reading rather than trust the row.
+    """
+    return dict(_digest()["_provenance"])
+
+
+def card_arithmetic_group(tag: str) -> dict:
+    r"""Return arithmetic-group card ``tag``'s kept rows.
+
+    The card's own name, LaTeX, lattice, parent group, cardinality, three orbit rows
+    and the citation each row carries.  A tag the digest carries no card for raises.
+    """
+    cards = _digest().get("arithmetic_groups", {})
+    if tag not in cards:
+        raise KeyError(
+            f"the digest carries no arithmetic-group card {tag!r}: it carries "
+            f"{len(cards)} cards, {sorted(cards)[:3]} ... {sorted(cards)[-1:]}"
+        )
+    return cards[tag]
+
+
+def card_arithmetic_group_row(tag: str, quantity: str) -> int:
+    r"""Return arithmetic-group card ``tag``'s number of orbits of ``quantity``.
+
+    ``quantity`` is ``lines``, ``planes`` or ``flags``: the card's own
+    ``data.line_orbits``, ``data.plane_orbits`` and ``data.flag_orbits``, which
+    count the orbits of primitive isotropic lines, of primitive isotropic planes
+    and of isotropic flags of the group the card is about.  The 87 numerical
+    polarizations state all three; the card of
+    $\widetilde O^+(T_{\mathrm{En}})$ states its line and plane rows and no flag
+    row.  A row the card does not state raises here, so a caller reports the
+    card's silence rather than comparing against a number of another group's, and
+    a tag the digest carries no card for raises naming the tags it does carry.
+    """
+    if quantity not in _ARITHMETIC_GROUP_QUANTITIES:
+        raise KeyError(
+            f"{quantity!r} is not an orbit quantity a card states: choose from "
+            f"{sorted(_ARITHMETIC_GROUP_QUANTITIES)}"
+        )
+    card = card_arithmetic_group(tag)
+    value = card.get(_ARITHMETIC_GROUP_QUANTITIES[quantity])
+    if value is None:
+        raise KeyError(
+            f"arithmetic-group card {tag} states no {quantity} row: its citation is "
+            f"{card['citation']!r}"
+        )
+    return value
+
+
+def card_lattice(tag: str) -> dict:
+    r"""Return lattice card ``tag``'s kept rows: its invariants and its orbit rows.
+
+    The digest keeps the card's name, its LaTeX, its aliases, its signature and its
+    determinant beside ``integral.primitive_orbits``, so a caller builds the lattice
+    the card describes and checks the two against each other by the invariants the
+    card states.  A tag the digest keeps no lattice row for raises.
+    """
+    cards = _digest().get("plane_orbits", {})
+    if tag not in cards:
+        raise KeyError(
+            f"the digest carries no lattice card {tag!r}: it carries {sorted(cards)}"
+        )
+    return cards[tag]
+
+
+def card_polarization_lattice() -> dict:
+    r"""Return card ``0128``'s own name for its lattice: its tag, its name, its LaTeX."""
+    card = _digest().get("polarization_counts")
+    if card is None:
+        raise KeyError("the digest carries no polarization-count rows: card 0128 is absent")
+    return {"tag": card["tag"], "name": card["name"]}
+
+
+def card_polarization_degrees() -> tuple:
+    r"""Return the degrees of card ``0128``'s Table 4 rows, as the card states them."""
+    card = _digest().get("polarization_counts")
+    if card is None:
+        raise KeyError("the digest carries no polarization-count rows: card 0128 is absent")
+    return tuple(sorted(int(degree) for degree in card["rows"]))
+
+
+def card_polarization_row(degree: int) -> dict:
+    r"""Return card ``0128``'s Table 4 row for degree ``degree``.
+
+    The row is ``integral.polarization_counts.{degree}``, whose ``#h`` is the
+    number of orbits of primitive vectors of that square in the card's lattice
+    $U \oplus E_8(-1)$ and whose ``#Γ̄_h`` is the number of classes of polarizing
+    groups occurring there, with the citation the card gives for the row.  A
+    degree the card states no row for raises.
+    """
+    card = _digest().get("polarization_counts")
+    if card is None:
+        raise KeyError("the digest carries no polarization-count rows: card 0128 is absent")
+    row = card["rows"].get(str(degree))
+    if row is None:
+        raise KeyError(
+            f"card {card['tag']} states no Table 4 row for degree {degree}: it states "
+            f"{sorted(int(entry) for entry in card['rows'])}"
+        )
+    return row
+
+
 __all__ = [
+    "card_arithmetic_group",
+    "card_arithmetic_group_row",
+    "card_lattice",
     "card_line_orbit_lengths",
     "card_line_orbit_row",
     "card_plane_orbit_lengths",
     "card_plane_orbit_row",
+    "card_polarization_degrees",
+    "card_polarization_lattice",
+    "card_polarization_row",
+    "card_provenance",
     "DIGEST",
 ]
