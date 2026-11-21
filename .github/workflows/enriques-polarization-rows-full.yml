@@ -1,0 +1,72 @@
+# What it runs: every row of tests/enriques_polarization_rows_by_card.py, with no
+# card, degree or quantity selected, so the job's row set is the module's
+# enumeration (349 rows at #319's merge).  The module prints each row's outcome as
+# it is decided and exits non-zero on anything that is not an agreement with the
+# row's card, so the job's log is the report: rows that returned and agreed, rows
+# whose card states no such value, rows a per-row cap or the run's budget left
+# undecided, and rows the budget never reached.  Nothing here waits for a row.
+name: Enriques polarization rows, the whole module (#319)
+on:
+  workflow_dispatch: {}
+  schedule:
+    - cron: '43 3 * * *'
+permissions:
+  contents: read
+  packages: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  whole-module:
+    name: Every row of the acceptance module, against the card that states it
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    container:
+      image: ghcr.io/dzackgarza/sage:develop
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ github.token }}
+      options: --user root
+    env:
+      SAGE_BIN: /sage/.venv/bin/sage
+    steps:
+      - name: Check out the commit under test
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: Mark the checkout as a safe git directory
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - name: Install the checkout into the image's Sage environment
+        # The image owns every dependency except the Julia bridge; install the
+        # checkout without dependency resolution, as the consumers do.
+        run: |
+          sage_python="$("$SAGE_BIN" -c 'import sys; print(sys.executable)')"
+          uv pip install --quiet --python "$sage_python" "sage-julia-bridge @ git+https://github.com/dzackgarza/sage-julia-bridge"
+          uv pip install --quiet --python "$sage_python" --no-deps -e .
+      - name: Run every row
+        # --cap bounds one row's public calls; --budget bounds the run, and a run
+        # that exhausts it names the rows it never reached instead of ending with no
+        # finding.  The module starts each row in a child process, so a row that
+        # hangs or is killed for its memory is that row's outcome and never the
+        # report's end.
+        env:
+          PYTHONPATH: src
+        run: |
+          set -o pipefail
+          "$SAGE_BIN" --version
+          git rev-parse HEAD
+          sage_python="$("$SAGE_BIN" -c "import sys; print(sys.executable)")"
+          "$sage_python" tests/enriques_polarization_rows_by_card.py \
+            --cap 1800 --budget 19200
+      # The run's own timing record (CONTRIBUTING.md ENV-03): the stage records the
+      # library appended as it computed.  A run that leaves none fails its job
+      # rather than uploading an empty artifact.
+      - name: Keep the run's timing record
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: timings-${{ github.job }}-${{ github.sha }}
+          path: .timings/
+          retention-days: 90
+          if-no-files-found: error
+          include-hidden-files: true
