@@ -48,9 +48,9 @@ reader is the conftest and every test names only its row.
 
 The paper the orbit rows come from is D. Dutour Sikirić and K. Hulek, *Moduli of
 polarised Enriques surfaces — computational aspects*, J. London Math. Soc. 110
-(2024), arXiv:2302.01679; the pages the cards cite are Table 1 (p. 13), Table 2
-(p. 14) and Table 4 (p. 17) of version 2 (26 Sep 2023), which is the version
-those page numbers were checked against.
+(2024), arXiv:2302.01679: the polarization rows are its Table 1 (cards 1 to 41)
+and Table 2 (cards 42 to 87), and the degree rows of `0128` its Table 4. The
+version read is 2 (26 Sep 2023).
 
 The port's `tests/fixtures/DATA_SOURCES.md` in `dzackgarza/sage-indefinite-port`
 lists the same sources. The port is paused; nothing here reads it.

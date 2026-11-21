@@ -88,9 +88,9 @@ def card_line_orbit_row(tag: str, group: str) -> int:
     1-dimensional cusps (isotropic planes); under O^+_10(F_2) the 528 lines fall in
     two orbits, of lengths 527 and 1" (D. Dutour Sikirić, K. Hulek, *Moduli of
     polarised Enriques surfaces -- computational aspects*, arXiv:2302.01679v2,
-    section 3.6, p. 22).  Its ``O`` row states 2: Sterk's two orbits of primitive
+    Section 3.6).  Its ``O`` row states 2: Sterk's two orbits of primitive
     isotropic lines (*Compactifications of the period space of Enriques surfaces,
-    Part I*, Math. Z. 207 (1991), Proposition 4.5, p. 28).
+    Part I*, Math. Z. 207 (1991), Proposition 4.5).
 
     A card that states no such row raises, rather than returning another group's
     count.

@@ -148,7 +148,7 @@ def plane_orbits(ref: str, tag: str) -> dict:
     sizes of the plane orbits and not only how many there are.  ``029J``'s
     ``Otilde+`` row states all three -- 528 lines, 24242 planes and their split
     527 + 23715 -- and names ``Otilde^+(N)`` acting on ``N = U + U(2) + E8(-2)``
-    for them (Dutour Sikirić--Hulek, arXiv:2302.01679v2, section 3.6, p. 22), so a
+    for them (Dutour Sikirić--Hulek, arXiv:2302.01679v2, Section 3.6), so a
     line count is read from the card by tag here and the ``constant`` key is
     renamed to the ``lines`` it states, and the per-orbit lengths are kept as the
     list the card states, in its citation's order.  A row keeping only some of them
