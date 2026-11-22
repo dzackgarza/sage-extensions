@@ -1,13 +1,9 @@
-# DRAFT: the #319 acceptance module as one job per card group, installed by one
-# command from a checkout of the commit that carries this file:
+# DRAFT: installed by one command from a checkout of the commit that carries it
 #
 #     cp results/issue319-enriques-polarization-rows.workflow.yml \
 #        .github/workflows/enriques-polarization-rows-full.yml
 #
-# It is a draft because this session's GitHub connection has no `workflows`
-# permission: a push that creates or updates a file under `.github/workflows/` is
-# refused for the whole ref.  The chat writes it; the orchestrator installs it.
-#
+# This connection cannot write workflows; the orchestrator installs it.
 # One job per card or card group, each running the module restricted to its own
 # cards with its own budget, because one run cannot report every row: run
 # 44924240209 of the single whole-module job used its 19200 s budget at row 36 of
@@ -24,6 +20,12 @@
 # What does not change: the container, the per-row cap of 1800 s, and the report.
 # `slug` names the job's artifact; a label carries characters an artifact name may
 # not.
+#
+# Card 0128 is three jobs, not one: its #Gamma_h rows cost 372 to 887 s each at
+# 2d = 4 to 22 and more as the class count grows (results/issue622-the-table-4-rows-
+# one-per-probe.md), so 72 rows do not fit one 19200 s budget, and a high-degree row
+# passes the 1800 s per-row cap whatever the budget.  The split is by degree range,
+# with each job's budget sized from the measured per-row costs.
 #
 # Every job prints the module's own report -- each row with its card's citation,
 # its expected and computed values, and a SUMMARY naming every row in every
@@ -75,9 +77,17 @@ jobs:
             slug: 6JRY
             args: --tags 6JRY
             budget: 2400
-          - label: "0128: Table 4, #h and #Gamma_h at every degree"
-            slug: 0128
-            args: --tags 0128
+          - label: "0128: Table 4, #h and #Gamma_h, 2d = 2 to 22"
+            slug: "0128-2-22"
+            args: --tags 0128 --degrees 2,4,6,8,10,12,14,16,18,20,22
+            budget: 10800
+          - label: "0128: Table 4, #h and #Gamma_h, 2d = 24 to 48"
+            slug: "0128-24-48"
+            args: --tags 0128 --degrees 24,26,28,30,32,34,36,38,40,42,44,46,48
+            budget: 19200
+          - label: "0128: Table 4, #h and #Gamma_h, 2d = 50 to 72"
+            slug: "0128-50-72"
+            args: --tags 0128 --degrees 50,52,54,56,58,60,62,64,66,68,70,72
             budget: 19200
           - label: "gamma-h-1 to gamma-h-6"
             slug: gamma-1-6

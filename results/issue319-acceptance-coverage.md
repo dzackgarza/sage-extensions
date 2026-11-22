@@ -74,3 +74,24 @@ no value at all.
 Nothing in this audit changes an expected value.  A computed value that differs
 from its card is a defect of the public call of #286 and belongs to that owner;
 none is known at this revision.
+
+## Correction, 2026-11-21
+
+Two counts in the table above are wrong and one gap is missing; each was checked
+against the file that settles it.
+
+* **`0128` `#h` is 36 of 36, not 3.**  `results/issue621-the-primitive-stratum.md`
+  records the whole family passing — "36 of 36 rows agree with their cards", each
+  row in a child process, 3.9 to 5.2 s per row — so every `#h` row has a
+  current-revision value and only `#Gamma_h` is pending in that job.
+* **The `gamma-h` flag rows have no recorded outcome.**  The table above cites
+  `#620`'s opening sentence, that the flag-orbit row "on the same cards returned
+  the card's value"; that is a claim in that note, not a run record, and no file
+  carries 87 per-row flag outcomes.  They are pending, with the 86 plane rows.
+* **The `0128` job cannot reach its own 72 rows.**  Its `#Gamma_h` rows cost 372 to
+  887 s each at `2d` = 4 to 22 and cost more as the class count grows, so 72 rows
+  do not fit the job's 19200 s budget, and a degree whose class count is large
+  passes the 1800 s per-row cap whatever the budget.  The correction is the matrix
+  split by degree range carried in
+  `results/issue319-enriques-polarization-rows.workflow.yml` — not a changed
+  expected value and not a raised cap.
