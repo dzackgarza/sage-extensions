@@ -1949,11 +1949,24 @@ class OrthogonalCharacterQuotient:
         # The port's marked-lattice family for a plane reaches the same stabilizer
         # by spelling each of its generators as a word in the ambient generating
         # family and multiplying the word out, which is minutes a plane on the
-        # Enriques period lattice.  Either family is a seed only: the closure below
-        # certifies ``chi(H)`` against the upper bound, so what it needs from this
-        # line is elements of ``H``, not a family that generates it.
+        # Enriques period lattice.  The parabolic family is taken in ``O(L)``, so an
+        # element of it need not lie in the ambient group ``H`` is a subgroup of --
+        # ``O^+``, ``Otilde``, ``Otilde^+`` or a polarization group -- and only the
+        # elements that do are elements of ``H``: each one is asked of the ambient
+        # group itself, whose membership predicate is the character test defining
+        # it.  Either family is a seed only: the closure below certifies ``chi(H)``
+        # against the upper bound, so what it needs from this line is elements of
+        # ``H``, not a family that generates ``H``.
         if not flag and int(representative.module_rank()) == 2:
-            generators = list(representative.parabolic_stabilizer_generators())
+            in_ambient = tuple(
+                generator
+                for generator in representative.parabolic_stabilizer_generators()
+                if generator in ambient
+            )
+        else:
+            in_ambient = ()
+        if in_ambient:
+            generators = list(in_ambient)
         else:
             generators = list(ambient.isotropic_stabilizer_generators(representative, flag=flag))
         _section_generators, _images, section = self._image_section()
