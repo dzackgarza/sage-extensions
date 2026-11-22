@@ -123,3 +123,11 @@ against the file that settles it.
   `results/issue319-rows-2026-11-22.log` at `97f2f72`: `0128`'s `#Gamma_h` at
   `2d` = 2 and 4, the eight `029J`/`otilde-plus-t-en` rows, `gamma-h-1` to
   `gamma-h-8` planes, and `gamma-h-1` flags.  Every one agrees with its card.
+* **Later the same day, 27 rows more.**  The 36 `#h` rows and the nine
+  `0128:#Gamma_h` rows at `2d` = 6 to 22 returned at `97f2f72` and agree with
+  their cards — all 36 `#h` in 3.6 to 5.2 s, the nine `#Gamma_h` in 341.1 to
+  920.1 s — so 63 rows of the 349 have a current-revision value and the raw
+  blocks of all of them are in `results/issue319-rows-2026-11-22.log`.  Still
+  without one: `0128:#Gamma_h` at `2d` = 24 to 72 (25 rows, never measured), 79
+  polarization plane rows, 86 flag rows, 87 line rows, and the 8 `6JRX`/`6JRY`
+  rows recorded only at `9e36bc4`.  `#622` is not complete.
