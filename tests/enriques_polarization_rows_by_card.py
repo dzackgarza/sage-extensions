@@ -75,11 +75,14 @@ group the row names:
   nonprimitive numerical polarizations, which we disregard in our approach since
   they do not lead to new moduli spaces" (Section 3.5).  Table 4 counts the
   primitive classes, so this row does too.
-* ``#Γ̄_h``: the number of distinct line/plane/flag triples the call returns over
-  the ``#h`` classes.  A triple of orbit counts is an invariant of the group, so
-  the computed number is at most the card's; a degree where it is smaller says the
-  three counts did not separate that degree's classes, and which of the two values
-  is right there is decided by proof, as the issue's acceptance requires.
+* ``#Γ̄_h``: the number of conjugacy classes of the discriminant images
+  $\bar\Gamma_h = \pi_M(O(M,h))$ over the ``#h`` classes.  Equation (5) defines
+  $\Gamma_h = \pi_N^{-1}(\pi_M(O(M,h)))$, so the public group's
+  ``discriminant_image()`` is exactly this finite subgroup of $O^+(\mathbb F_2^{10})$.
+  Section 2 reduces the conjugacy question to those images, Section 3.3 computes
+  their conjugacy classes, and Section 3.4 defines Table 4's second line as their
+  number.  The classes here are decided by the ambient finite group's public
+  subgroup-conjugation action, not by numerical invariants of the groups.
 
 **The `#h` rows are the guard that keeps this reading.**  Dropping the stratum is a
 one-argument change in this file, and nothing else in the repository fails when it is
@@ -519,8 +522,32 @@ def _orbit_count(group, quantity: str, representatives) -> int:
     raise ValueError(f"{quantity!r} is not an orbit quantity this module compares")
 
 
+def _discriminant_image_conjugacy_classes(images) -> tuple:
+    r"""The conjugacy classes of subgroups of their common finite orthogonal group.
+
+    Dutour Sikirić--Hulek, arXiv:2302.01679v2, Section 2, Question 2.1, asks
+    for the conjugacy classes of $\bar\Gamma_h = \pi_M(O(M,h))$ in
+    $O^+(\mathbb F_2^{10})$, and Section 3.3 computes exactly this finite-group
+    relation.  Orbit objects of the public subgroup-conjugation action retain
+    that relation; equality of numerical invariants does not.
+    """
+    images = tuple(images)
+    if not images:
+        return ()
+    ambient = images[0].supergroup()
+    if any(image.supergroup() is not ambient for image in images):
+        raise ValueError("subgroup conjugacy requires one common ambient group")
+    quotient = ambient.subgroup_conjugation_g_set().orbits()
+    classes = []
+    for image in images:
+        candidate = quotient.orbit_of(image)
+        if all(candidate != known for known in classes):
+            classes.append(candidate)
+    return tuple(classes)
+
+
 def _computed_table4_row(row: Row) -> int:
-    r"""Card ``0128``'s Table 4 row: ``#h``, or the number of distinct group classes.
+    r"""Card ``0128``'s Table 4 row: ``#h``, or the number of conjugacy classes.
 
     Both rows are read off the same classes, and the source's classes are those of
     *primitive* vectors of square ``row.degree``: Section 2, the paragraph
@@ -540,16 +567,16 @@ def _computed_table4_row(row: Row) -> int:
         return count
     if row.quantity != "#Gamma_h":
         raise ValueError(f"{row.quantity!r} is not a Table 4 quantity")
-    triples = []
-    for representative in tuple(classes):
-        group = orthogonal.group(orthogonal.doubled_from_unimodular(representative))
-        triples.append(
-            tuple(
-                _orbit_count(group, quantity, None)
-                for quantity in ("lines", "planes", "flags")
-            )
-        )
-    return len(set(triples))
+    # Equation (5), Section 2: Gamma_h is the full discriminant preimage of
+    # pi_M(O(M,h)), so its discriminant image is DSH's barred Gamma_h.  Question
+    # 2.1 and Section 3.3 count these images up to conjugacy; Table 4's second
+    # line, Section 3.4, counts the classes occurring in this degree.
+    images = tuple(
+        orthogonal.group(orthogonal.doubled_from_unimodular(representative))
+        .discriminant_image()
+        for representative in classes
+    )
+    return len(_discriminant_image_conjugacy_classes(images))
 
 
 def _lattice_and_group(row: Row) -> tuple:

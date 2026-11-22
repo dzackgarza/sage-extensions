@@ -1,17 +1,20 @@
-r"""Card 0128's #Gamma-bar_h at degree 4, read by tag, from the groups' orders.
+r"""Card 0128's #Gamma-bar_h rows, read by tag, from finite-group conjugacy.
 
 D. Dutour Sikirić and K. Hulek, *Moduli of polarised Enriques surfaces --
 computational aspects*, J. London Math. Soc. 110 (2024), arXiv:2302.01679v2,
 state in Table 4, printed p. 17, two numbers for each degree: ``#h``, the
 classes of primitive polarizations, and ``#Gamma-bar_h``, the conjugacy classes
-of the groups those classes define.  The invariant the paper separates the
-classes by is the order and the orbit sizes of the group (p. 11).
+of the groups those classes define.  Equation (5) and Question 2.1 identify the
+latter with conjugacy classes of the finite discriminant images; Section 3.3
+computes that relation.  Orders and orbit sizes are only invariants used in
+their computation, not the equivalence relation.
 
 At degree 4 the card states two classes and two conjugacy classes, and the
 order alone separates them: conjugate subgroups are isomorphic, so they have
-equal order, and two groups of different order are not conjugate.  That decides
-this row without any orbit call, which matters because the plane and flag rows
-of the same cards do not return at this size.
+equal order, and two groups of different order are not conjugate.  At degrees
+12 and 20, Table 3 identifies exactly one pair of polarization orbits and leaves
+the remaining classes distinct; the tests below decide the entire partitions
+by finite-subgroup conjugacy, not by orders or isotropic-orbit counts.
 
 The card's lattice is $M(1/2) = U \oplus E_8(-1)$, whose basis is the paper's
 $g_1, \ldots, g_{10}$ (equation (7), p. 9), and a polarization of degree $2d$ is
@@ -40,6 +43,61 @@ def _class_group_orders(degree):
         polarized = Involutions.I_En.polarized(invariant.inclusion()(representative))
         orders.append(polarized.coinvariant_extension_subgroup().discriminant_image().order())
     return orders
+
+
+def _class_relation(degree):
+    r"""The primitive vector orbits and the conjugacy relation of their group images.
+
+    DSH equation (5) makes the discriminant image of the full preimage
+    $\Gamma_h$ equal to $\bar\Gamma_h = \pi_M(O(M,h))$.  Question 2.1 and
+    Section 3.3 then define the group classes by conjugacy in the common finite
+    orthogonal group, which is the relation the public conjugation action decides.
+    """
+    invariant = Involutions.I_En.invariant_lattice()
+    representatives = invariant.Aut().vector_orbit_representatives(
+        2 * degree, content=1
+    )
+    images = tuple(
+        Involutions.I_En.polarized(invariant.inclusion()(representative))
+        .coinvariant_extension_subgroup()
+        .discriminant_image()
+        for representative in representatives
+    )
+    quotient = images[0].supergroup().subgroup_conjugation_g_set().orbits()
+    return representatives, tuple(quotient.orbit_of(image) for image in images)
+
+
+def _assert_table3_has_one_identified_pair(degree):
+    r"""The whole Table 3 partition and both Table 4 numbers of one deciding degree."""
+    representatives, orbits = _class_relation(degree)
+    row = card("polarization_counts", "rows")[f"{degree}"]
+    class_count = sum(
+        1
+        for position, orbit in enumerate(orbits)
+        if all(orbit != previous for previous in orbits[:position])
+    )
+    identified_pairs = sum(
+        1
+        for position, orbit in enumerate(orbits)
+        for previous in orbits[:position]
+        if orbit == previous
+    )
+
+    assert representatives.cardinality() == row["primitive_classes"]
+    assert class_count == row["group_classes"]
+    # Table 3, printed p. 16: at degrees 12 and 20 exactly two vector orbits
+    # give one conjugacy class, and every other pair gives distinct classes.
+    assert identified_pairs == 1
+
+
+def test_the_degree_twelve_group_classes_are_the_finite_conjugacy_classes() -> None:
+    r"""Degree 12: four vector orbits, three group classes, one identified pair."""
+    _assert_table3_has_one_identified_pair(12)
+
+
+def test_the_degree_twenty_group_classes_are_the_finite_conjugacy_classes() -> None:
+    r"""Degree 20: five vector orbits, four group classes, one identified pair."""
+    _assert_table3_has_one_identified_pair(20)
 
 
 def test_the_degree_four_classes_define_groups_of_different_orders() -> None:
