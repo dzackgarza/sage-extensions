@@ -35,10 +35,11 @@ call is what has to agree.
 
 from sage_extensions.all import *
 
-# The card's rows, (row tag, lines, planes), read from tag 029J.
-_ROWS = (
-    ("O", 2, 2),
-)
+# The card's row tag.  Its two counts are read from card 029J by that tag in each
+# test below, never written here: a count typed into this file is a second copy of
+# the card, and a card whose value changed would leave this file asserting the old
+# one.
+_ROW_TAG = "O"
 
 
 def _primitive_isotropic_rank_two(planes, lattice) -> None:
@@ -66,7 +67,7 @@ def _primitive_isotropic_lines(lines, lattice) -> None:
 
 def test_the_o_row_states_two_primitive_isotropic_lines() -> None:
     r"""``029J``, row ``O``: ``constant: 2`` primitive isotropic lines modulo $O(N)$."""
-    tag, expected_lines, _planes = _ROWS[0]
+    expected_lines = card_line_orbit_row("029J", _ROW_TAG)
     lattice = NamedLattices.TEn
     lines = lattice.Aut().isotropic_orbit_representatives(1)
 
@@ -76,7 +77,7 @@ def test_the_o_row_states_two_primitive_isotropic_lines() -> None:
 
 def test_the_o_row_states_two_primitive_isotropic_planes() -> None:
     r"""``029J``, row ``O``: ``planes: 2`` primitive isotropic planes modulo $O(N)$."""
-    tag, _lines, expected_planes = _ROWS[0]
+    expected_planes = card_plane_orbit_row("029J", _ROW_TAG)
     lattice = NamedLattices.TEn
     planes = lattice.Aut().isotropic_orbit_representatives(2)
 
