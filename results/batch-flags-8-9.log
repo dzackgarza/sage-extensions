@@ -1,0 +1,31 @@
+tree: 0efed8380e3d7400bba41b203114931820f58da4
+started: 2026-11-22T17:39:19Z
+
+$ --tags gamma-h-8,gamma-h-9 --rows flags --cap 900
+rows: 349 known, 2 selected
+cards: dzackgarza/lattice-database at its commit 23c0f9caff4d08b1f9795bba75f45cead4fc75df
+per-row cap 900 s, budget unbounded s
+
+ROW gamma-h-8:flags  [PASS]
+  lattice 029J: U + U(2) + E8(-2)   group Gamma_h,8
+  card: D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 1: case 8 with S = \overline{\{2\}}, #I_1 = 8, #I_2 = 22, #I_12 = 47 — the numbers of orbits of isotropic lines, planes and flags in N.
+  expected 47  call 47   (185.1 s)
+
+ROW gamma-h-9:flags  [PASS]
+  lattice 029J: U + U(2) + E8(-2)   group Gamma_h,9
+  card: D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 1: case 9 with S = \overline{\{0,7\}}, #I_1 = 11, #I_2 = 34, #I_12 = 77 — the numbers of orbits of isotropic lines, planes and flags in N.
+  expected 77  call 77   (187.4 s)
+
+SUMMARY
+  PASS: 2
+    gamma-h-8:flags
+    gamma-h-9:flags
+  FAIL: 0
+  MISSING: 0
+  UNDECIDED: 0
+  BROKEN: 0
+  NOT REACHED: 0
+
+2 of 2 rows agree with their cards
+record: /work/.timings/rows-0efed8380e3d-2067436.jsonl
+[exit 0 at 2026-11-22T17:45:41Z]
