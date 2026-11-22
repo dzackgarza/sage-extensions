@@ -202,6 +202,45 @@ equations, which needs no knowledge of the type. The five-plane count of Sterk's
 needs the labelling, and the research page `cusps-over-sterk-cusps.md` that records the
 types with their multiplicities is not on this machine either.
 
+## 4c. The five planes, built, and what their stabilizers are in `O(T_En)`
+
+The five coordinate pairs are the project's `.tmp/sources/coble_789-one-cusp-divisibility.py`,
+in the basis `(e, f, e', f', a_1, ..., a_8)`: they are computational inputs and every claim
+below about them is checked. Each pair spans a primitive totally isotropic plane of
+`T_En`; `Pi^perp/Pi` has rank 8 and determinant 64; and it has exactly 16 vectors of square
+`-2`, the 8 antipodal pairs the acceptance row counts.
+
+| type | `Pi` primitive and isotropic | `[Pi^perp : ...]` | vectors of square `-2` | splitting complement | radical index | plane index | quotient index | complete |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `{2,4,5}` | yes | rank 8, det 64 | 16 | none | 1 | 1 | 1 | True |
+| `{4,5}` | yes | rank 8, det 64 | 16 | none | 1 | 1 | 1 | True |
+| `{3,5}` | yes | rank 8, det 64 | 16 | none | 1 | 1 | 1 | True |
+| `{3,4}` | yes | rank 8, det 64 | 16 | none | 1 | 1 | 1 | True |
+| `{5,5}` | yes | rank 8, det 64 | 16 | none | 1 | 1 | 1 | True |
+
+For `{3,4}` the printed formula of (4.3.17) reproduces in the library's coordinates:
+`v = e' + f' + bar alpha_8` is `Sterk_3`, `omega = alpha_9 + alpha_12 + alpha_1 + alpha_3 +
+alpha_4 + alpha_5 + alpha_6 + alpha_7 + alpha_13` with `alpha_9 = f - e`,
+`alpha_12 = 2e + (bar alpha_1 - bar alpha_8)`, `alpha_13 = (e + f) + (a_8 - f')` is
+isotropic, orthogonal to `v`, and orthogonal to all five of `alpha_9, ..., alpha_13`; the
+script's pair is a different representative of the same cusp pair, not the printed plane.
+
+**The five plane projections are full.** Every one of these planes has all its isotropic
+vectors of divisibility 2, so none is equivalent to `ZZ e + ZZ e'`, and Sterk (4.7) gives
+`SL(F)` for the other class: the plane projection of `M` is `SL(F)` and, with `-1`, all of
+`GL_2(ZZ)`. That is what the computed index 1 says, and it is a departure from the reading
+of (4.3.17) that would put a proper congruence subgroup in `O(T_En)`: (4.3.17) is a
+statement about `Gamma_{En,2}`, and the proper subgroup `Gamma(2)` or `Gamma^1(2)` is the
+image of `Stab_{Gamma_{En,2}}(Pi)`, not of `Stab_{O(T_En)}(Pi)`.
+
+Consequently the family generates `Stab_{O(T_En)}(Pi)` at all five planes -- the image is
+the whole product `GL(Pi) x O(Pi^perp/Pi)` and the radical is generated, so Milne's
+correspondence gives `H = P_I` without a graph-subgroup gap, the product being `M` itself
+here. What the acceptance row measures is a different group: the orbits of
+`<F cap Gamma_{En,2}>` on the 8 pairs, which is `Stab_{Gamma_{En,2}}(Pi)` only when the
+family's intersection with `Gamma_{En,2}` generates it. A generating family of `P_I` does
+not imply that, and that is where the reported `(1, 4, 2, 2, 3)` lives.
+
 ## 5. Commands
 
 ```
