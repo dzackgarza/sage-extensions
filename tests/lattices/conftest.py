@@ -48,6 +48,42 @@ def card(section: str, tag: str) -> dict:
 
 builtins.card = card
 
+
+def counts_in_bounded_child(source, memory_bytes, alarm_seconds):
+    r"""Return the ``count`` lines a child interpreter prints under two bounds.
+
+    A row whose call grows without bound has to be this test's outcome and not the
+    suite's: the child gets an address-space bound and an alarm, so the growth
+    stops inside it, and the parent reads what it printed.  ``source`` runs in a
+    fresh Sage interpreter with the same import path as the session, so it is the
+    library the test imports that the child measures.
+
+    The child's lines that begin ``count `` are returned as their last fields, in
+    order, beside the exit status and the tail of its stderr.
+    """
+    import subprocess
+    import sys
+
+    program = "import signal\n" f"signal.alarm({alarm_seconds})\n"
+    if memory_bytes:
+        program += (
+            "import resource\n"
+            f"resource.setrlimit(resource.RLIMIT_AS, ({memory_bytes}, {memory_bytes}))\n"
+        )
+    program += "from sage_extensions.all import *  # noqa: F401,F403\n" + source
+    completed = subprocess.run(
+        [sys.executable, "-c", program], capture_output=True, text=True
+    )
+    counts = [
+        line.split()[-1]
+        for line in completed.stdout.splitlines()
+        if line.startswith("count ")
+    ]
+    return completed.returncode, counts, completed.stderr.strip().splitlines()[-3:]
+
+
+builtins.counts_in_bounded_child = counts_in_bounded_child
+
 # A released object is observable only through a weak reference: identity and
 # value say nothing about whether something still holds it.  ``weakref`` and
 # ``gc`` are not session names, so they are bound here rather than imported by
