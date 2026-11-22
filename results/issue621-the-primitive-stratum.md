@@ -6,9 +6,10 @@ The card is right. `#h` in Table 4 is the number of `O(M(1/2))`-orbits of *primi
 vectors of degree `2d`, and the acceptance row compared it with the number of
 `O(M(1/2))`-orbits of *all* vectors of that square. On the square-8 shell the call
 returns three classes where the card states two: two primitive classes of square 8,
-and the class of `2w` with `q(w) = 2`, which is not a primitive vector and so not a
-numerical polarization in the source's sense. No card value is touched and no
-certificate is refuted.
+and the class of `2w` with `q(w) = 2`. That third class is a numerical polarization
+too — the source lists nonprimitive numerical polarizations and disregards them
+(Section 3.5) — and Table 4, which counts the primitive ones, does not count it. No
+card value is touched and no certificate is refuted.
 
 The reading was repaired once already. `69469e7` (*fix: The Table 4 degree row asks
 for the primitive vectors the card counts*, 2026-11-19) made exactly this change, with
@@ -16,8 +17,9 @@ exactly this diagnosis and this count of thirteen affected degrees; `5befdf9` (*
 every Enriques and K3 orbit row is compared with the card that states it*,
 2026-11-21) rewrote the module and dropped the argument, and issue #621 was filed the
 next day reporting the three degrees the earlier run reached. This round restores the
-argument, states the source's condition where a rewrite reads it, and records that the
-guard the earlier round named does not test the module at all.
+argument, states the source's condition where a rewrite reads it, and states which
+instrument is the guard: this module's scheduled `0128:#h` row, not the library-level
+test `69469e7` named.
 
 ## The source's definition, with its numbered statements
 
@@ -94,9 +96,11 @@ vector of content 1. Its failure of primitivity is the volume's condition: `Z ->
 `1 |-> 2w` has cokernel presented by the `10 x 1` matrix of its coordinates, whose
 Smith form is `diag(2)`, so the cokernel is `Z^9 ⊕ Z/2` and carries torsion; the
 subobject is therefore not a primitive one (the definition of a primitive embedding
-in the volume, `@def:primitive-embedding`). Section 2's `h` is primitive, so class 3
-is not a numerical polarization in the source's sense, and Table 4 does not count
-it. Classes 1 and 2 are the source's two classes at this degree: the library's
+in the volume, `@def:primitive-embedding`). It is nevertheless a numerical
+polarization of positive degree, which is what the source calls the nonprimitive ones
+it lists and disregards (Section 3.5); Table 4 counts the primitive classes, and
+Section 2's `h` is primitive, so the row does not count this class. Classes 1 and 2
+are the source's two classes at this degree: the library's
 decision that they are inequivalent is the marked-lattice computation of
 `Lattices(ZZ).CosliceUnder([[8]])` (its `primitive_marking_classes`), and Table 4
 with the paper's two other statements of the same list --- it agrees with
@@ -250,12 +254,22 @@ row is the instrument that measures this defect --- it is red on `main` in run
 44958950940 as the issue records, and red here at `be381be3` --- and the gate that
 runs it is the image job `enriques-polarization-rows`.
 
-What would guard it is a reading that cannot be written without the argument. The
-library offers none: `vector_orbit_representatives(square)` is the shell and
-`content=1` is the primitive stratum, and a second name for the one-argument call
-would be a duplicate spelling of an operation the tree already presents. So the
-module's docstring states the condition at the row it belongs to, and the row is the
-check.
+**The guard is the module's scheduled `0128:#h` row.** It is the only instrument in
+the repository that can fail when the stratum is dropped: every degree of the card is
+in `_rows()`, each row runs in a child process of its own under the image job
+`enriques-polarization-rows`, and at degree 8 the row prints `#h: expected 2, call 3`
+when the argument is missing. `tests/lattices/test_the_enriques_polarization_degrees_by_card.py`
+is a *library-level* test and is not that guard: it imports only the session, calls
+`NamedLattices.E10.Aut()` itself, and asserts the mathematics of the card's row, so it
+cannot see the module's row at all -- which is why it was green at `be381be3` while
+the row was red, and why `69469e7`'s sentence naming it as the guard was false.
+
+No reading in the library can be written without the argument either:
+`vector_orbit_representatives(square)` is the shell, `content=1` is the primitive
+stratum, and a second name for the one-argument call would be a duplicate spelling of
+an operation the tree already presents. So the condition is stated at the row in the
+module's own documentation, where a rewrite of the file meets it, and the scheduled
+row is the check.
 
 ## Reproducing the two strata
 

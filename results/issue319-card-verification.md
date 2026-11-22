@@ -297,3 +297,12 @@ condition is stated in the module's documentation of the row, and the evidence i
 `results/issue621-the-primitive-stratum.md`.  No other reading in the module changed
 in `5befdf9`: the `lines`, `planes` and `flags` calls are the ones this section
 records.
+
+Which instrument is the guard, stated positively: the module's scheduled `0128:#h`
+row is.  Every degree of the card is in `_rows()`, each row runs in a child process of
+its own under the image job `enriques-polarization-rows`, and the row prints
+`#h: expected 2, call 3` at degree 8 when the stratum is dropped from
+`_computed_table4_row`.  The pytest file above cannot be that guard and does not claim
+to be: it imports only the session, calls `NamedLattices.E10.Aut()` itself, and
+asserts the mathematics of the card's row, so a module that read the shell again would
+leave it green.

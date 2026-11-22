@@ -3,8 +3,8 @@ r"""Card 0128's Table 4 degree rows, read by tag and compared through the orbit 
 The card is ``0128`` of ``dzackgarza/lattice-database``, the lattice
 $U \oplus E_8(-1) = M(1/2)$ of the Enriques paper.  D. Dutour Sikirić and
 K. Hulek, *Moduli of polarised Enriques surfaces -- computational aspects*,
-J. London Math. Soc. 110 (2024), arXiv:2302.01679v2, Table 4, printed p. 17,
-states for each degree $2d = 2, \ldots, 72$ the number ``#h``, and the sentence
+J. London Math. Soc. 110 (2024), arXiv:2302.01679v2, Table 4, states for each
+degree $2d = 2, \ldots, 72$ the number ``#h``, and the sentence
 with the table says which vectors it counts: "the first line shows the number
 $\#h$ of orbits of primitive vectors in a given degree".
 ``tests/cards/lattice-database-enriques.json`` keeps that row as
@@ -15,7 +15,7 @@ vector, so the square-$2d$ shell is the disjoint union of the classes of
 content $c$ with $c^2 \mid 2d$, and the shell holds a non-primitive class from
 $2d = 8$ on.  The paper disregards those: "the list of [CDGK, Appendix] also
 contains nonprimitive numerical polarizations, which we disregard in our
-approach since they do not lead to new moduli spaces" (section 3.5, p. 19).  So
+approach since they do not lead to new moduli spaces" (Section 3.5).  So
 the card's row is the orbit count of the primitive stratum, which
 ``vector_orbit_representatives(2d, content=1)`` returns.
 
@@ -26,6 +26,13 @@ primitive stratum from the shell.  The other 34 degrees are the same row of the
 same card and are compared by the image job ``enriques-polarization-rows``,
 which runs ``tests/enriques_polarization_rows_by_card.py`` over every degree and
 every ``gamma-h-N`` card.
+
+This file is a *library-level* test and is not that module's regression guard.
+It imports only the session and calls ``NamedLattices.E10.Aut()`` itself, so it
+asserts the mathematics of the card's row and cannot see the module's row: a
+module that read the shell again would leave every test here green.  The guard
+is the module's scheduled ``0128:#h`` row, which runs in the image job and fails
+when the stratum is dropped.
 """
 
 from sage_extensions.all import *  # noqa: F401,F403
