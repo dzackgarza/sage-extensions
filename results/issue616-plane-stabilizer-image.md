@@ -241,6 +241,40 @@ here. What the acceptance row measures is a different group: the orbits of
 family's intersection with `Gamma_{En,2}` generates it. A generating family of `P_I` does
 not imply that, and that is where the reported `(1, 4, 2, 2, 3)` lives.
 
+## 4d. The acceptance row
+
+For the five planes in the order `{2,4,5}, {4,5}, {3,5}, {3,4}, {5,5}`, the number of
+orbits of `Stab_{O(T_En)}(Pi) cap Gamma_{En,2}` on the eight antipodal pairs of `(-2)`-classes
+of `Pi^perp/Pi` is
+
+```
+(1, 1, 2, 1, 2)      sizes [8], [8], [2, 6], [8], [2, 6]
+```
+
+which is the acceptance value. It is not the count of the filtered generator family: the
+members of `setwise_stabilizer(Pi)` that lie in `Gamma_{En,2}` span a proper subgroup of
+`Stab(Pi) cap Gamma_{En,2}` -- `Gamma_{En,2}` has index `67456` -- and their orbits refine
+the acceptance partition on `{4,5}`, `{3,4}` and `{5,5}`:
+
+```
+(1, 4, 2, 2, 3)      refinement, not the answer
+```
+
+So the tuple the issue was filed on is what a subgroup gives, and the stabilizer's own row
+is the acceptance value. The two rows are computed from the same family: the stabilizer's
+by a breadth-first walk on the pair `(sigma(h) x, rho(h) J_0)` in
+`8 x orbit_{rho(H)}(J_0)`, which carries the element `h` and therefore certifies membership
+in `Stab(Pi) cap Gamma_{En,2}` rather than in a projection of it.
+
+Reproduced independently at `e06ff20` in the pinned image, one process, 131.1 s:
+`.ultramath/smwrp9aak/m5/.scratch/tree/.scratch/probe8.py`.
+
+This sits on top of the previous section: the family generates `Stab_{O(T_En)}(Pi)` at all
+five planes, so `Stab(Pi) cap Gamma_{En,2}` is `langle F rangle cap Gamma_{En,2}`, and no
+part of the row depends on the decision being right about `M` -- but if the family were only
+a subgroup, the row would be a refinement of this one, which is exactly the failure mode the
+issue reported.
+
 ## 5. Commands
 
 ```
