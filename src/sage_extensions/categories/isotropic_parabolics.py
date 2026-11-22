@@ -5451,6 +5451,54 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
               lattice (:meth:`half_vector_transvection_generators`), which are
               the ones that move the discriminant classes.
 
+            **The decomposition this family has to cover.**  An integral
+            parabolic at a primitive isotropic plane is the semidirect product
+            `P_I = U_I rtimes L_I`, and in the block basis `(U | P | K)` of
+            :meth:`plane_block_basis` an element is
+
+            .. math::
+                \begin{pmatrix} g_{11} & 0 & 0 \\ a & 1 & \tau \\ c & 0 & g_{22}
+                \end{pmatrix},
+
+            with three different pieces, and each is a place the family can
+            fall short:
+
+            * the **definite Levi action** `(g_{11}, g_{22}) in GL(I) x
+              O(I^perp/I)`, whose second factor is definite (the quotient
+              lattice is negative definite at a maximal isotropic plane) and
+              whose first is the plane action; this is what
+              :meth:`levi_lift_generators` and
+              :meth:`quotient_reflection_generators` have to fill, and what
+              :meth:`levi_plane_action_index` and
+              :meth:`levi_quotient_image_index` measure;
+            * the **unipotent block** `c in Hom(U, K)`, the shear that moves the
+              second hyperbolic summand along the quotient -- a lattice
+              parameter, one generator per lattice vector
+              (:meth:`unipotent_radical_block_generators`);
+            * the **remaining translations**: `tau in Hom(K, P)` is *determined*
+              by `c` (`tau = -J^{-1} c^t A`) and `a in Hom(U, P)` is determined
+              by `c` up to the skew part, which is the centre of `U_I`
+              (:meth:`unipotent_block_solution`).  So the radical's parameters
+              are `c` together with that one central coordinate, and
+              :meth:`unipotent_radical_index` is the index of their span --
+              in exactly those two factors.
+
+            **The contract.**  This family generates `P_I` exactly when
+            :meth:`parabolic_completeness_decision` answers `True`, and that
+            decision has four premises, each computed: this family contains
+            :meth:`unipotent_radical_generators`; that family's index in `U_I`
+            is `1`; the plane actions of the members trivial on `I^perp/I` fill
+            the classes of `GL(I)` that admit an integral lift; and the quotient
+            images of the members fixing `I` pointwise have index `1` in
+            `O(I^perp/I)`.  What the third premise rests on is stated where it
+            is computed (:meth:`parabolic_completeness_decision`).  The public
+            stabilizer of a plane marking
+            (:meth:`sage_extensions.categories.lattices.Lattices.ParentMethods.stabilizer`,
+            through ``_isotropic_plane_parabolic_generators``) returns this
+            family when that decision is `True` and keeps another route when it
+            is not, so a caller never receives a family whose completeness is
+            unestablished.
+
             When `L` splits along the plane as `P \perp U \perp K` with
             `(P, U)` an orthogonal summand and `K = P^\perp/P`, this is a
             generating set of the whole parabolic: an isometry `g` preserving
