@@ -65,4 +65,37 @@ def test_a_row_whose_latest_attempt_did_not_decide_is_absent(tmp_path) -> None:
         "--coverage", ledger, "--tags", "otilde-plus-t-en", "--rows", "lines"
     )
     assert status == 1, (status, output)
-    assert [line for line in output if "the latest attempt is BROKEN" in line], output
+    assert [line for line in output if "are not PASS" in line], output
+
+
+def test_a_passing_rerun_does_not_erase_an_attempt_that_raised(tmp_path) -> None:
+    r"""Two attempts at one revision, one of them raised: the row is not established.
+
+    An operation that raises on one attempt and returns the card's number on the
+    next has not decided the row, so the later happy run cannot turn the earlier
+    exception into an agreement.  The revision is what the two lines are compared
+    at, so this also decides that coverage reads a row's attempts and not only the
+    last line written.
+    """
+    ledger = ledger_holding(
+        tmp_path,
+        [
+            _row_line("BROKEN", None, "ValueError: the flag row raised"),
+            _row_line("PASS", 528),
+        ],
+    )
+    status, output, _rows = runs_the_module(
+        "--coverage", ledger, "--tags", "otilde-plus-t-en", "--rows", "lines"
+    )
+    assert status == 1, (status, output)
+    assert [line for line in output if "are not PASS" in line], output
+
+
+def test_two_attempts_that_return_different_numbers_are_not_a_decision(tmp_path) -> None:
+    r"""Two passes with different values are two answers, and the row is undecided."""
+    ledger = ledger_holding(tmp_path, [_row_line("PASS", 528), _row_line("PASS", 527)])
+    status, output, _rows = runs_the_module(
+        "--coverage", ledger, "--tags", "otilde-plus-t-en", "--rows", "lines"
+    )
+    assert status == 1, (status, output)
+    assert [line for line in output if "returned different numbers" in line], output

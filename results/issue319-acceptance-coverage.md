@@ -151,3 +151,12 @@ against the file that settles it.
   (0, 0) To: Integral lattice of rank 10 and signature (1, 9) is not a morphism`
   -- which is filed as a defect of the flag branch at lattice `029J` under
   `Γ_{h,2}` (Dutour Sikirić-Hulek Table 1 case 2, `#I_12 = 28`), not as a pass.
+* **223 of 349 decided, and the coverage rule now reads every attempt.**
+  `gamma-h-2:flags` returned 28 on two seeded re-runs and raised on its first
+  attempt, all at `56f0ec8`, so the flag branch is **intermittent** there and a
+  single pass does not establish the row: `--coverage` now requires every attempt a
+  row has at its latest revision to be a `PASS` with one value, and names the row
+  absent otherwise ("1 of 3 attempts at 56f0ec868006 are not PASS").  The 18 plane
+  rows of `gamma-h-60` to `gamma-h-77` returned their cards, so the plane leg is
+  decided for 77 of 87 cards and absent for `gamma-h-78` to `-87`.
+

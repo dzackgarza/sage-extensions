@@ -753,8 +753,8 @@ def _revision() -> str:
 
 
 def _latest_attempts(paths) -> dict:
-    r"""Each row's latest attempt over ``paths``, read in the order the lines were appended."""
-    latest = {}
+    r"""Every attempt each row has over ``paths``, in the order the lines were appended."""
+    attempts = {}
     for path in paths:
         with open(path, encoding="utf-8") as handle:
             for line in handle:
@@ -762,27 +762,55 @@ def _latest_attempts(paths) -> dict:
                 if not stripped:
                     continue
                 attempt = json.loads(stripped)
-                latest[attempt["row"]] = attempt
-    return latest
+                attempts.setdefault(attempt["row"], []).append(attempt)
+    return attempts
 
 
 def _coverage(rows, latest) -> tuple:
     r"""Which required rows the ledger holds a ``PASS`` for, and which it does not.
 
-    A required row is absent when the ledger holds no attempt for it at all, and it
-    is absent when its latest attempt is anything other than ``PASS`` -- a row that
-    raised, did not decide inside its cap, or was never reached is not an
-    agreement, so the aggregate comparison cannot be a pass that leaves it out.
+    A row's attempts are read at the latest revision it was tried at, and every one
+    of them has to be a ``PASS`` with the card's value: an operation that raises on
+    one attempt and returns the card's number on the next has not established the
+    row at that revision, and a later happy run cannot erase the attempt that
+    raised.  A required row is absent when the ledger holds no attempt for it at
+    all, when any attempt at that revision is not a ``PASS``, and when two of them
+    return different numbers -- which is the same statement about the operation.
     """
+    attempted = {}
+    for row in rows:
+        attempts = latest.get(row.identifier())
+        if attempts:
+            attempted[row.identifier()] = attempts
     decided, absent = [], []
     for row in rows:
-        attempt = latest.get(row.identifier())
-        if attempt is None:
+        attempts = attempted.get(row.identifier())
+        if not attempts:
             absent.append((row, "no attempt recorded"))
-        elif attempt["state"] != "PASS":
-            absent.append((row, f"the latest attempt is {attempt['state']}: {attempt.get('detail')}"))
-        else:
-            decided.append((row, attempt))
+            continue
+        revision = attempts[-1]["revision"]
+        at_revision = [attempt for attempt in attempts if attempt["revision"] == revision]
+        broken = [attempt for attempt in at_revision if attempt["state"] != "PASS"]
+        if broken:
+            absent.append(
+                (
+                    row,
+                    f"{len(broken)} of {len(at_revision)} attempts at {revision[:12]} "
+                    f"are not PASS; the latest is {broken[-1]['state']}: {broken[-1].get('detail')}",
+                )
+            )
+            continue
+        values = {attempt["returned"] for attempt in at_revision}
+        if len(values) > 1:
+            absent.append(
+                (
+                    row,
+                    f"the attempts at {revision[:12]} returned different numbers: "
+                    f"{sorted(values)}",
+                )
+            )
+            continue
+        decided.append((row, at_revision[-1]))
     return decided, absent
 
 
