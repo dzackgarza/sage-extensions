@@ -5257,7 +5257,12 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
 
             * the image of :meth:`unipotent_radical_block_generators` is `\tau(U_I)` and it
               contains `Z`, so the radical is generated exactly when
-              :meth:`unipotent_radical_index` is `1` -- the `\ker` half;
+              :meth:`unipotent_radical_index` is `1` -- the `\ker` half.  That index is the
+              index of :meth:`unipotent_radical_generators` in `U_I`, so it is a statement
+              about *this* family only when this family contains that one, which is checked
+              here rather than left to the two methods happening to be built from the same
+              pieces: with the containment, `U_I` lies in the subgroup's radical part, and
+              without it the index would certify a different family's radical;
             * the plane projection of `M` is the set of plane actions that occur in an
               integral lift at all, which :meth:`liftable_plane_action_classes` reads off the
               block equations of Dutour Sikirić--Hulek, Theorem 4.9, equations `(E_2)` and
@@ -5309,6 +5314,23 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
                         f"subobject has rank {rank}",
                     )
                 failures = []
+                family = self.parabolic_stabilizer_generators()
+                radical_family = self.unipotent_radical_generators()
+                missing = [
+                    member for member in radical_family if member not in family
+                ]
+                if missing:
+                    return (
+                        False,
+                        f"the family this decision certifies at {self} does not contain the "
+                        f"unipotent family whose index in the radical the radical factor "
+                        f"computes: {len(missing)} of its {len(radical_family)} generators are "
+                        f"missing from the returned family, the first being {missing[0]}.  The "
+                        f"radical factor is then a statement about another family and does not "
+                        f"transfer by the correspondence theorem, so the returned family is "
+                        f"only a subgroup of the parabolic (Milne, Group Theory, v4.01, "
+                        f"Theorem 1.47 with Corollary 1.48, applied to the map P_I -> M)",
+                    )
                 try:
                     radical = self.unipotent_radical_index()
                 except (ArithmeticError, NotImplementedError, ValueError) as error:
