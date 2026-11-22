@@ -143,3 +143,31 @@ Neither route is landed in this commit.  What is landed is the measurement above
 the stage, the file and function that own it, the growth law, and the two entry
 points (`isotropic_line_stabilizer_image` and
 `discriminant_representation_is_surjective`) that reach for the same family.
+
+## The branch, landed 2026-11-21
+
+The repair is in `orthogonal_quotients.py`:
+`_eichler_line_representatives` runs before the ambient row is sourced, and
+`_yield_subgroup_isotropic_orbit_representatives` yields from it and returns when
+it answers.  It checks three conditions rather than assuming them: the subgroup's
+character labels are among the discriminant and spinor characters, so its kernel
+contains $\widetilde O^+(L)$; `L.eichler_criterion_applies()` holds, which is the
+hypothesis of Gritsenko--Hulek--Sankaran, arXiv:0810.1614v1, Proposition 3.3(i), a
+$U \oplus U$ summand; and every covering class of square zero is the zero class,
+so the values of $(v, v)$ and $[v/\mathrm{div}\,v]$ admit one class.  Under those
+three, $E_U(L_1) \subseteq \widetilde O^+(L) \subseteq \Gamma$ acts transitively on
+the primitive isotropic vectors, one representative is built from the lattice's
+own generating set, and neither the ambient integral generating family nor
+`_sign_descent_rank` is touched.
+
+Measured with the acceptance module unchanged:
+
+```
+6JRY:Otilde+:lines   expected 1   call 1   2.1 s   PASS
+6JRX:Otilde+:lines   expected 1   call 1   2.1 s   PASS
+```
+
+against "no return at 6312 MiB in 90 s" and "5974 MiB at 834 s, stopped" for the
+same two rows at `5befdf9`.  The row's own test,
+`tests/lattices/test_the_otilde_plus_line_row_of_lambda_4.py`, passes in 5.32 s
+where it failed in 95.70 s, by the child stopping itself at its 700 MiB bound.
