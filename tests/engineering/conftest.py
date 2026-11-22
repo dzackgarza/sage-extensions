@@ -1086,6 +1086,23 @@ def runs_the_module(*arguments):
 builtins.runs_the_module = runs_the_module
 
 
+def card_row_value(tag: str, quantity: str) -> int:
+    r"""The number a card states for one row, read by the row's own tag.
+
+    The acceptance module reads every expected value through the digest's public
+    readers, so a regression that asks what the aggregate compares a ledger's line
+    against asks the card the same way rather than restating a number the database
+    owns.  ``tag`` is the card's tag and ``quantity`` the row within it (``lines``,
+    ``planes``, ``flags``), exactly as the module's ``--rows`` names them.
+    """
+    from sage_extensions.lattice_database import card_arithmetic_group_row
+
+    return int(card_arithmetic_group_row(tag, quantity))
+
+
+builtins.card_row_value = card_row_value
+
+
 def ledger_holding(directory, attempts):
     r"""Write ``attempts`` as the ledger at ``directory``, and return its path.
 
