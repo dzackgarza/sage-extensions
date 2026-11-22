@@ -1941,7 +1941,21 @@ class OrthogonalCharacterQuotient:
                 return result
 
         ambient = self.supergroup
-        generators = list(ambient.isotropic_stabilizer_generators(representative, flag=flag))
+        # The stabilizer of a primitive isotropic plane is the parabolic subgroup at
+        # it, and that subgroup's own construction hands out its elements from the
+        # plane's block equations (Dutour Sikirić and Hulek, *Moduli of polarised
+        # Enriques surfaces -- computational aspects*, arXiv:2302.01679v2,
+        # Theorem 4.9, the block form of an isometry preserving an isotropic plane).
+        # The port's marked-lattice family for a plane reaches the same stabilizer
+        # by spelling each of its generators as a word in the ambient generating
+        # family and multiplying the word out, which is minutes a plane on the
+        # Enriques period lattice.  Either family is a seed only: the closure below
+        # certifies ``chi(H)`` against the upper bound, so what it needs from this
+        # line is elements of ``H``, not a family that generates it.
+        if not flag and int(representative.module_rank()) == 2:
+            generators = list(representative.parabolic_stabilizer_generators())
+        else:
+            generators = list(ambient.isotropic_stabilizer_generators(representative, flag=flag))
         _section_generators, _images, section = self._image_section()
         image = self._gap_image()
         factors, product, _embeddings, projections = self._gap_product()
