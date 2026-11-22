@@ -77,6 +77,10 @@ jobs:
             slug: 6JRY
             args: --tags 6JRY
             budget: 2400
+          - label: "0128: #h at every degree, the row that reads one shell"
+            slug: "0128-h"
+            args: --tags 0128 --rows "#h"
+            budget: 1200
           - label: "0128: Table 4, #h and #Gamma_h, 2d = 2 to 22"
             slug: "0128-2-22"
             args: --tags 0128 --degrees 2,4,6,8,10,12,14,16,18,20,22

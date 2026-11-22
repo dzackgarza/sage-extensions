@@ -95,3 +95,14 @@ against the file that settles it.
   split by degree range carried in
   `results/issue319-enriques-polarization-rows.workflow.yml` — not a changed
   expected value and not a raised cap.
+
+* **The raw logs are not in the repository.**  `.tmp/issue319/`,
+  `.tmp/issue618/` and the `.tmp/p621` logs are untracked and absent from the
+  remote, so the paths the commit bodies cite cannot be opened by anyone else.
+  What stands is the values pasted into those bodies and into this file, and the
+  `report.txt` each matrix job now uploads beside its `.timings/`; a raw log under
+  `.tmp/` is a working note, not evidence.
+* **The `#h` guard ran in no job.**  The `#h` rows are the cheapest in the module
+  (about 5 s each) and are the rows the `content=1` reading was repaired against,
+  yet no matrix entry selected them: run 44924240209 stopped at row 36 of 349
+  before any `0128` row.  The draft now carries a `--tags 0128 --rows "#h"` job.
