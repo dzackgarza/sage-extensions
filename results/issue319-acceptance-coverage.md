@@ -131,3 +131,13 @@ against the file that settles it.
   without one: `0128:#Gamma_h` at `2d` = 24 to 72 (25 rows, never measured), 79
   polarization plane rows, 86 flag rows, 87 line rows, and the 8 `6JRX`/`6JRY`
   rows recorded only at `9e36bc4`.  `#622` is not complete.
+* **The line leg is decided at the current revision, and two counts were one low.**
+  All 87 `gamma-h-N` line rows returned at `85336de`, every one its card's
+  `line_orbits`, in 38.2 to 69.3 s a row and 3737.6 s together
+  (`results/issue319-line-rows-2026-11-22.log`, one JSON object a row in
+  `results/issue319-line-rows-2026-11-22.jsonl`), so the leg no longer rests on a
+  record that names no tree revision.  151 of the 349 rows have a
+  current-revision value; the 198 that do not are the 25 `0128:#Gamma_h` rows at
+  `2d` = 24 to 72, 79 plane rows, 86 flag rows and the 8 `6JRX`/`6JRY` rows.
+  The commit messages carrying the first 64 rows say "18" and "63"; both are one
+  low, the flag row being a row of its own.  `#622` is still not complete.
