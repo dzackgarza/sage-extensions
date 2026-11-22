@@ -303,6 +303,24 @@ def card_arithmetic_group_row(tag: str, quantity: str) -> int:
     return value
 
 
+def card_arithmetic_group_tags() -> tuple:
+    r"""Return the arithmetic-group card tags the digest carries, in a stable order.
+
+    The ``gamma-h-N`` cards lead, ordered by ``N`` so that a run reports the
+    numerical polarizations in their published numbering, and any other group card
+    follows by its tag.  A reader enumerates this rather than a written range, so a
+    card the database gains is enumerated without a change here.
+    """
+    cards = _digest().get("arithmetic_groups", {})
+
+    def order(tag):
+        if tag.startswith("gamma-h-"):
+            return (0, int(tag.rsplit("-", 1)[1]), tag)
+        return (1, 0, tag)
+
+    return tuple(sorted(cards, key=order))
+
+
 def card_lattice(tag: str) -> dict:
     r"""Return lattice card ``tag``'s kept rows: its invariants and its orbit rows.
 
@@ -359,6 +377,7 @@ def card_polarization_row(degree: int) -> dict:
 __all__ = [
     "card_arithmetic_group",
     "card_arithmetic_group_row",
+    "card_arithmetic_group_tags",
     "card_lattice",
     "card_line_orbit_lengths",
     "card_line_orbit_row",

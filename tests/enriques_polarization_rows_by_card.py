@@ -4,8 +4,9 @@ This is the acceptance entry point of #319: the verification half of #286.  It i
 not collected by pytest -- its file name does not begin with ``test_`` -- because
 each row builds an arithmetic group of an indefinite lattice and calls the public
 isotropic-orbit classifier on it, and the rows are minutes or hours each.  The
-whole module is one CI job that reports later
-(``.github/workflows/enriques-polarization-rows.yml``), never the per-test gate.
+whole module is one matrix of CI jobs that reports later
+(``.github/workflows/enriques-polarization-rows-full.yml``), never the per-test
+gate.
 
     python3 tests/enriques_polarization_rows_by_card.py                 # every row
     python3 tests/enriques_polarization_rows_by_card.py --tags 6JRX --rows planes
@@ -204,9 +205,11 @@ def _rows() -> tuple:
             ("Otilde+", "lines"),
         ):
             rows.append(Row(tag, group, quantity))
-    for index in range(1, 88):
+    for tag in card_arithmetic_group_tags():
+        if not tag.startswith("gamma-h-"):
+            continue
         for quantity in ("lines", "planes", "flags"):
-            rows.append(Row(f"gamma-h-{index}", "", quantity))
+            rows.append(Row(tag, "", quantity))
     for degree in card_polarization_degrees():
         for quantity in ("#h", "#Gamma_h"):
             rows.append(Row(TABLE4_TAG, "", quantity, degree))
@@ -734,6 +737,12 @@ def main(argv=None) -> int:
     degrees = tuple(int(degree) for degree in _split(arguments.degrees))
     quantities = _split(arguments.rows)
     selected = _select(rows, tags, degrees, quantities)
+    if not selected:
+        _log(
+            f"no row of the {len(rows)} this module enumerates matches the selection: "
+            f"tags {tags}, degrees {degrees}, quantities {quantities}"
+        )
+        return 2
 
     _log(f"rows: {len(rows)} known, {len(selected)} selected")
     provenance = card_provenance()

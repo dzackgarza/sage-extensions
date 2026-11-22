@@ -370,7 +370,7 @@ test-lint *paths:
 # card 0128's Table 4 rows, each compared with the public isotropic-orbit call.
 # A row builds an arithmetic subgroup of O(U + U(2) + E8(-2)) and calls the orbit
 # classifier on it, so the rows are minutes each and are not part of `just test`.
-# The nightly job that runs them is results/issue319-enriques-polarization-rows.workflow.yml.
+# The nightly jobs that run them are the matrix at results/issue319-enriques-polarization-rows.workflow.yml.
 # Run every row with no arguments; narrow with the module's own flags, e.g.
 # `just enriques-card-rows --tags gamma-h-1 --cap 120`.
 [positional-arguments]

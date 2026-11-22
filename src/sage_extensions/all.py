@@ -151,6 +151,7 @@ from sage_extensions.categories.isotropic_parabolics import (  # noqa: F401
 from sage_extensions.lattice_database import (  # noqa: F401
     card_arithmetic_group,
     card_arithmetic_group_row,
+    card_arithmetic_group_tags,
     card_lattice,
     card_line_orbit_lengths,
     card_line_orbit_row,
