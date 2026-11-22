@@ -3,9 +3,9 @@ r"""The plane stabilizer includes generators of its whole congruence Levi projec
 The split plane below has block data $H=0$, $J=\operatorname{diag}(1,5)$ and
 $A=(-2)$.  Dutour Sikiri\'c--Hulek, Theorem 4.9 (arXiv:2302.01679v2, printed
 pp. 33--34), gives $P_1=JQ_1^{-t}J^{-1}$ for a lift with trivial quotient action.
-The upper shear of level five is admissible, so an integral lift of it belongs to
+The lower shear of level five is admissible, so an integral lift of it belongs to
 $P_I$.  It is also a necessary member of the constructive answer: the lower unit
-shear, the upper level-five shear, and the sign reversals present the plane part
+shear, the lower level-five shear, and the sign reversals present the plane part
 in this split case.  A finite list of shears of levels $1,2,3,4,6$ cannot generate
 that group.
 """
@@ -48,4 +48,4 @@ def test_the_public_stabilizer_contains_the_level_five_levi_shear() -> None:
     lattice, plane = _the_level_five_split_plane()
     family = lattice.Aut().stabilizer(plane, action="setwise").group_generators()
     actions = tuple(_plane_action(plane, generator) for generator in family)
-    assert matrix([[1, 5], [0, 1]]).transpose() in actions
+    assert matrix([[1, 5], [0, 1]]) in actions
