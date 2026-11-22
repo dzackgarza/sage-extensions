@@ -1946,18 +1946,28 @@ class OrthogonalCharacterQuotient:
         # plane's block equations (Dutour Sikirić and Hulek, *Moduli of polarised
         # Enriques surfaces -- computational aspects*, arXiv:2302.01679v2,
         # Theorem 4.9, the block form of an isometry preserving an isotropic plane).
-        # The port's marked-lattice family for a plane reaches the same stabilizer
-        # by spelling each of its generators as a word in the ambient generating
-        # family and multiplying the word out, which is minutes a plane on the
-        # Enriques period lattice.  The parabolic family is taken in ``O(L)``, so an
-        # element of it need not lie in the ambient group ``H`` is a subgroup of --
-        # ``O^+``, ``Otilde``, ``Otilde^+`` or a polarization group -- and only the
-        # elements that do are elements of ``H``: each one is asked of the ambient
-        # group itself, whose membership predicate is the character test defining
-        # it.  Either family is a seed only: the closure below certifies ``chi(H)``
-        # against the upper bound, so what it needs from this line is elements of
-        # ``H``, not a family that generates ``H``.
-        if not flag and int(representative.module_rank()) == 2:
+        # A flag is stabilized by the elements of its top term's parabolic that fix
+        # its lower terms: ``Stab_{O(L)}(l <= P) = Stab_{O(L)}(P) cap Stab_{O(L)}(l)``,
+        # by the definition of a stabilizer.  The marked-lattice family for a plane or
+        # a flag reaches the same stabilizer by spelling each of its generators as a
+        # word in the ambient generating family and multiplying the word out, which is
+        # minutes a plane and more than that a flag at the Enriques rank.  The
+        # parabolic family is taken in ``O(L)``, so an element of it need not lie in
+        # the ambient group ``H`` is a subgroup of -- ``O^+``, ``Otilde``,
+        # ``Otilde^+`` or a polarization group -- and only the elements that do are
+        # elements of ``H``: each one is asked of the ambient group itself, whose
+        # membership predicate is the character test defining it.  Either family is a
+        # seed only: the closure below certifies ``chi(H)`` against the upper bound, so
+        # what it needs from this line is elements of ``H``, not a family that
+        # generates ``H``.
+        if flag and int(representative.top().module_rank()) == 2:
+            in_ambient = tuple(
+                generator
+                for generator in representative.top().parabolic_stabilizer_generators()
+                if generator in ambient
+                and all(term.stabilizes(generator) for term in representative.terms())
+            )
+        elif not flag and int(representative.module_rank()) == 2:
             in_ambient = tuple(
                 generator
                 for generator in representative.parabolic_stabilizer_generators()
