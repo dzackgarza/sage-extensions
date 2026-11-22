@@ -1,0 +1,107 @@
+REFUSED OwnedModuleMor_with_category_with_category.ArrowType Integral lattice of rank 4 and signature (2, 2) -> Integral lattice of rank 12 and signature (2, 10) degenerate=False
+  File "/work/.tmp/probe-spy.py", line 39, in <module>
+    value = module._orbit_count(group, "flags", None)
+  File "/work/tests/enriques_polarization_rows_by_card.py", line 518, in _orbit_count
+    return int(group.isotropic_orbit_representatives(2, flag=True).cardinality())
+  File "/work/src/sage_extensions/categories/group/predicate_subgroups.py", line 605, in isotropic_orbit_representatives
+    return _subgroup_isotropic_orbit_representatives(
+  File "/work/src/sage_extensions/timing.py", line 509, in timed
+    return function(*arguments, **keywords)
+  File "/work/src/sage_extensions/categories/orthogonal_quotients.py", line 4949, in _subgroup_isotropic_orbit_representatives
+    tuple(_yield_subgroup_isotropic_orbit_representatives(subgroup, rank, flag=flag))
+  File "/work/src/sage_extensions/categories/orthogonal_quotients.py", line 4876, in _yield_subgroup_isotropic_orbit_representatives
+    sourced = orthogonal_group.isotropic_orbit_representatives(rank, flag=flag)
+  File "/work/src/sage_extensions/categories/lattice_morphisms.py", line 5587, in isotropic_orbit_representatives
+    return _isotropic_orbit_representatives(self, rank, flag=flag)
+  File "/work/src/sage_extensions/timing.py", line 509, in timed
+    return function(*arguments, **keywords)
+  File "/work/src/sage_extensions/categories/isotropic_orbits.py", line 2053, in _isotropic_orbit_representatives
+    classes = primitive_marking_classes(category, shape, lattice)
+  File "/repos/sage-indefinite-port/src/sage_indefinite_port/indefinite/marked_lattices.py", line 285, in primitive_marking_classes
+    classes = tuple(category(_flag_marking_from_basis(lattice, basis, dimensions)) for basis in INDUCTION.isotropic_flag_bases(lattice, dimensions))
+  File "/repos/sage-indefinite-port/src/sage_indefinite_port/indefinite/isotropic_induction.py", line 488, in isotropic_flag_bases
+    for basis in self._reduced_isotropic_flag_bases(reduction.reduced, dimensions)
+  File "/repos/sage-indefinite-port/src/sage_indefinite_port/indefinite/isotropic_induction.py", line 495, in _reduced_isotropic_flag_bases
+    representatives = tuple((point,) for point in self.isotropic_vector_classes(lattice))
+  File "/repos/sage-indefinite-port/src/sage_indefinite_port/indefinite/isotropic_induction.py", line 167, in isotropic_vector_classes
+    self._line_classes[id(lattice)] = (lattice, self._computed_isotropic_vector_classes(lattice))
+  File "/repos/sage-indefinite-port/src/sage_indefinite_port/indefinite/isotropic_induction.py", line 201, in _computed_isotropic_vector_classes
+    return tuple(vector_class.representative for vector_class in self.recursion.primitive_vector_classes(lattice, 0))
+  File "/repos/sage-indefinite-port/src/sage_indefinite_port/indefinite/recursive.py", line 2153, in primitive_vector_classes
+    for candidate in self._model(profile.signed_view).primitive_covering_vectors(profile.sign * int(square)):
+  File "/repos/sage-indefinite-port/src/sage_indefinite_port/indefinite/recursive.py", line 1114, in _model
+    self._models[lattice] = OrbitCoverModel(lattice)
+  File "/repos/sage-indefinite-port/src/sage_indefinite_port/indefinite/eichler.py", line 904, in __init__
+    self.envelope = EichlerEnvelope(lattice)
+  File "/repos/sage-indefinite-port/src/sage_indefinite_port/indefinite/eichler.py", line 404, in __init__
+    self.model = self.envelope.two_u_eichler_model_from_represented_biproduct()
+  File "/work/src/sage_extensions/categories/lattices.py", line 9163, in two_u_eichler_model_from_represented_biproduct
+    return TwoUEichlerModel.from_represented_biproduct(self)
+  File "/work/src/sage_extensions/categories/eichler_criterion.py", line 104, in from_represented_biproduct
+    descend(lattice, lattice.identity_morphism())
+  File "/work/src/sage_extensions/categories/eichler_criterion.py", line 102, in descend
+    descend(child, inclusion * factor.injection(index))
+  File "/work/src/sage_extensions/categories/lattice_morphisms.py", line 1962, in __mul__
+    return super().__mul__(other)
+  File "/work/src/sage_extensions/categories/lattice_morphisms.py", line 739, in __mul__
+    return super().__mul__(other)
+  File "/work/src/sage_extensions/categories/abstract_categories/mor_categories.py", line 1798, in __mul__
+    if not (_precomposable(self, other) or _precomposable(self.forward(), other)):
+  File "/work/src/sage_extensions/categories/abstract_categories/mor_categories.py", line 317, in _precomposable
+    return _category_accepts_morphism(
+  File "/work/.tmp/probe-spy.py", line 29, in spy
+    traceback.print_stack()
+REFUSED OwnedModuleMor_with_category_with_category.ArrowType Integral lattice of rank 8 and signature (0, 8) -> Integral lattice of rank 12 and signature (2, 10) degenerate=False
+  File "/work/.tmp/probe-spy.py", line 39, in <module>
+    value = module._orbit_count(group, "flags", None)
+  File "/work/tests/enriques_polarization_rows_by_card.py", line 518, in _orbit_count
+    return int(group.isotropic_orbit_representatives(2, flag=True).cardinality())
+  File "/work/src/sage_extensions/categories/group/predicate_subgroups.py", line 605, in isotropic_orbit_representatives
+    return _subgroup_isotropic_orbit_representatives(
+  File "/work/src/sage_extensions/timing.py", line 509, in timed
+    return function(*arguments, **keywords)
+  File "/work/src/sage_extensions/categories/orthogonal_quotients.py", line 4949, in _subgroup_isotropic_orbit_representatives
+    tuple(_yield_subgroup_isotropic_orbit_representatives(subgroup, rank, flag=flag))
+  File "/work/src/sage_extensions/categories/orthogonal_quotients.py", line 4876, in _yield_subgroup_isotropic_orbit_representatives
+    sourced = orthogonal_group.isotropic_orbit_representatives(rank, flag=flag)
+  File "/work/src/sage_extensions/categories/lattice_morphisms.py", line 5587, in isotropic_orbit_representatives
+    return _isotropic_orbit_representatives(self, rank, flag=flag)
+  File "/work/src/sage_extensions/timing.py", line 509, in timed
+    return function(*arguments, **keywords)
+  File "/work/src/sage_extensions/categories/isotropic_orbits.py", line 2053, in _isotropic_orbit_representatives
+    classes = primitive_marking_classes(category, shape, lattice)
+  File "/repos/sage-indefinite-port/src/sage_indefinite_port/indefinite/marked_lattices.py", line 285, in primitive_marking_classes
+    classes = tuple(category(_flag_marking_from_basis(lattice, basis, dimensions)) for basis in INDUCTION.isotropic_flag_bases(lattice, dimensions))
+  File "/repos/sage-indefinite-port/src/sage_indefinite_port/indefinite/isotropic_induction.py", line 488, in isotropic_flag_bases
+    for basis in self._reduced_isotropic_flag_bases(reduction.reduced, dimensions)
+  File "/repos/sage-indefinite-port/src/sage_indefinite_port/indefinite/isotropic_induction.py", line 495, in _reduced_isotropic_flag_bases
+    representatives = tuple((point,) for point in self.isotropic_vector_classes(lattice))
+  File "/repos/sage-indefinite-port/src/sage_indefinite_port/indefinite/isotropic_induction.py", line 167, in isotropic_vector_classes
+    self._line_classes[id(lattice)] = (lattice, self._computed_isotropic_vector_classes(lattice))
+  File "/repos/sage-indefinite-port/src/sage_indefinite_port/indefinite/isotropic_induction.py", line 201, in _computed_isotropic_vector_classes
+    return tuple(vector_class.representative for vector_class in self.recursion.primitive_vector_classes(lattice, 0))
+  File "/repos/sage-indefinite-port/src/sage_indefinite_port/indefinite/recursive.py", line 2153, in primitive_vector_classes
+    for candidate in self._model(profile.signed_view).primitive_covering_vectors(profile.sign * int(square)):
+  File "/repos/sage-indefinite-port/src/sage_indefinite_port/indefinite/recursive.py", line 1114, in _model
+    self._models[lattice] = OrbitCoverModel(lattice)
+  File "/repos/sage-indefinite-port/src/sage_indefinite_port/indefinite/eichler.py", line 904, in __init__
+    self.envelope = EichlerEnvelope(lattice)
+  File "/repos/sage-indefinite-port/src/sage_indefinite_port/indefinite/eichler.py", line 404, in __init__
+    self.model = self.envelope.two_u_eichler_model_from_represented_biproduct()
+  File "/work/src/sage_extensions/categories/lattices.py", line 9163, in two_u_eichler_model_from_represented_biproduct
+    return TwoUEichlerModel.from_represented_biproduct(self)
+  File "/work/src/sage_extensions/categories/eichler_criterion.py", line 104, in from_represented_biproduct
+    descend(lattice, lattice.identity_morphism())
+  File "/work/src/sage_extensions/categories/eichler_criterion.py", line 102, in descend
+    descend(child, inclusion * factor.injection(index))
+  File "/work/src/sage_extensions/categories/lattice_morphisms.py", line 1962, in __mul__
+    return super().__mul__(other)
+  File "/work/src/sage_extensions/categories/lattice_morphisms.py", line 739, in __mul__
+    return super().__mul__(other)
+  File "/work/src/sage_extensions/categories/abstract_categories/mor_categories.py", line 1798, in __mul__
+    if not (_precomposable(self, other) or _precomposable(self.forward(), other)):
+  File "/work/src/sage_extensions/categories/abstract_categories/mor_categories.py", line 317, in _precomposable
+    return _category_accepts_morphism(
+  File "/work/.tmp/probe-spy.py", line 29, in spy
+    traceback.print_stack()
+RETURNED 28 in 171.8 s, refusals=2
