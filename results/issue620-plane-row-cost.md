@@ -118,3 +118,33 @@ value wherever it returns, and every family
 `exact_isotropic_stabilizer_generators` returns is a family whose image is the
 upper bound.  The defect is a slow run, so there is no failing assertion to write,
 and none is manufactured to stand in for one.  The record above is the evidence.
+
+## The seed's premise, and what it costs
+
+The closure certifies `chi(H)` for `H = Stab_{Gamma_0}(x)`, where `Gamma_0` is the
+quotient's ambient group.  A seed element outside `Gamma_0` is not an element of
+`H`, and the closure would not notice: `upper` is computed inside `Gamma_0`'s
+character image, so the image is capped there and a foreign generator is returned
+as if it were a stabilizer element.  The parabolic family is taken in `O(N)`, so
+the seed keeps only the generators the ambient group's own membership predicate
+admits, and falls back to `isotropic_stabilizer_generators` when it admits none.
+
+Measured on `gamma-h-25`: 173 parabolic generators tested in 0.0 s, all 173
+admitted, closure 27.6 s, 17 splitting lifts.  The predicate is the character
+test that defines the group, so the filter is free.
+
+Measured on `U + U(2) + <-2>` (rank 5, `|A_L| = 8`), about whether a quotient
+with a proper ambient group exists here at all:
+
+| subgroup | its `supergroup()` | quotient's ambient group | index |
+| --- | --- | --- | --- |
+| `O^+` | `O(L)` | `O(L)` | 2 |
+| `Otilde` | `O(L)` | `O(L)` | 2 |
+| `Otilde^+` | `O(L)` | `O(L)` | 4 |
+
+So no construction in this tree produces a quotient whose ambient group is a
+proper subgroup, and the case the restriction protects against has no specimen
+here: the plane's parabolic family on that lattice has 27 generators, 2 of them
+outside `O^+`, and those two are inside the ambient group the quotient is
+actually built over.  The restriction is what keeps the premise true for a
+subgroup-of-a-subgroup construction, which this tree does not have yet.
