@@ -1998,6 +1998,13 @@ class OrthogonalCharacterQuotient:
         while int(libgap.Size(lower)) < target:
             before = int(libgap.Size(lower))
             for coset in libgap.AsList(libgap.RightTransversal(upper, lower)):
+                # The transversal is a transversal of the subgroup this pass
+                # started from, so it lists more cosets than the image still
+                # misses: the pass ends the moment the image reaches its upper
+                # bound, and every question asked after that point is one the
+                # pass has already answered.
+                if int(libgap.Size(lower)) == target:
+                    break
                 lift = self._checked_lift(self._key_of_gap(coset), section.letters_of(coset))
                 moved = lift.transport_isotropic_object(representative)
                 witness = ambient.isotropic_equivalence_witness(moved, representative, flag=flag)
