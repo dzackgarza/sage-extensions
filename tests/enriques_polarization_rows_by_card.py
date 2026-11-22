@@ -62,10 +62,17 @@ group the row names:
   group -- Sterk's two representatives are the argument -- and
   ``group.isotropic_orbit_representatives(2).cardinality()`` otherwise;
 * ``flags``: ``group.isotropic_orbit_representatives(2, flag=True).cardinality()``;
-* ``#h``: ``W.Aut().vector_orbit_representatives(2d).cardinality()`` and
-  ``#Γ̄_h``: the number of distinct line/plane/flag triples the call returns over
-  those classes.  A triple of orbit counts is an invariant of the group, so the
-  computed number is at most the card's; a degree where it is smaller says the
+* ``#h``: ``W.Aut().vector_orbit_representatives(2d, content=1).cardinality()`` --
+  the orbits of *primitive* vectors of square $2d$, which is what Table 4's first
+  line states (Section 3.4), the source having fixed the primitivity of ``h`` in
+  Section 2, the paragraph introducing (3).  The square-$2d$ shell of $W$ carries,
+  besides those, the classes $c \cdot w$ of every content $c > 1$ with
+  $c^2 \mid 2d$ and $w$ primitive of square $2d/c^2$; an isometry preserves
+  content, so they are $O(W)$-classes of their own and none of them is a
+  numerical polarization in the source's sense;
+* ``#Γ̄_h``: the number of distinct line/plane/flag triples the call returns over
+  the ``#h`` classes.  A triple of orbit counts is an invariant of the group, so
+  the computed number is at most the card's; a degree where it is smaller says the
   three counts did not separate that degree's classes, and which of the two values
   is right there is decided by proof, as the issue's acceptance requires.
 
@@ -497,9 +504,21 @@ def _orbit_count(group, quantity: str, representatives) -> int:
 
 
 def _computed_table4_row(row: Row) -> int:
-    r"""Card ``0128``'s Table 4 row: ``#h``, or the number of distinct group classes."""
+    r"""Card ``0128``'s Table 4 row: ``#h``, or the number of distinct group classes.
+
+    Both rows are read off the same classes, and the source's classes are those of
+    *primitive* vectors of square ``row.degree``: Section 2, the paragraph
+    introducing (3), fixes the primitivity of ``h``, and Section 3.4 states Table 4's
+    first line as the number of orbits of primitive vectors in a given degree.  The
+    square-``2d`` shell also carries the classes ``c * w`` of every content ``c > 1``
+    with ``c^2 | 2d``, which no isometry can carry onto a primitive vector, so
+    reading the shell without that stratum counts vectors that are not numerical
+    polarizations of the source's sense.
+    """
     orthogonal = Enriques()
-    classes = orthogonal.unimodular.Aut().vector_orbit_representatives(row.degree)
+    classes = orthogonal.unimodular.Aut().vector_orbit_representatives(
+        row.degree, content=1
+    )
     count = int(classes.cardinality())
     if row.quantity == "#h":
         return count
