@@ -141,3 +141,13 @@ against the file that settles it.
   `2d` = 24 to 72, 79 plane rows, 86 flag rows and the 8 `6JRX`/`6JRY` rows.
   The commit messages carrying the first 64 rows say "18" and "63"; both are one
   low, the flag row being a row of its own.  `#622` is still not complete.
+* **The aggregate now decides the no-skip rule, and 205 of 349 rows stand.**
+  `results/issue319-rows-ledger.jsonl` is the durable per-attempt record and
+  `tests/enriques_polarization_rows_by_card.py --coverage` fails listing every
+  required row whose latest attempt is not a `PASS`, so a family's report can no
+  longer stand for the acceptance.  At `56f0ec8`: 205 decided, 144 absent, and
+  `gamma-h-2:flags` is one of the absent ones because its call raised --
+  `ValueError: Generic morphism: From: Integral lattice of rank 1 and signature
+  (0, 0) To: Integral lattice of rank 10 and signature (1, 9) is not a morphism`
+  -- which is filed as a defect of the flag branch at lattice `029J` under
+  `Γ_{h,2}` (Dutour Sikirić-Hulek Table 1 case 2, `#I_12 = 28`), not as a pass.

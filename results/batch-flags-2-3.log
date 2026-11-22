@@ -1,0 +1,34 @@
+tree: 56f0ec868006b50aaf14ed4c23cf11142b700ba5
+started: 2026-11-22T16:59:33Z
+
+$ --tags gamma-h-2,gamma-h-3 --rows flags --cap 900
+rows: 349 known, 2 selected
+cards: dzackgarza/lattice-database at its commit 23c0f9caff4d08b1f9795bba75f45cead4fc75df
+per-row cap 900 s, budget unbounded s
+
+ROW gamma-h-2:flags  [BROKEN]
+  lattice 029J: U + U(2) + E8(-2)   group Gamma_h,2
+  card: D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 1: case 2 with S = \overline{\{-1,0\}}, #I_1 = 7, #I_2 = 13, #I_12 = 28 — the numbers of orbits of isotropic lines, planes and flags in N.
+  expected 28  call -   (176.3 s)
+  BROKEN: ValueError: Generic morphism:
+  From: Integral lattice of rank 1 and signature (0, 0)
+  To:   Integral lattice of rank 10 and signature (1, 9) is not a morphism Integral lattice of rank 1 and signature (0, 0) -> Integral lattice of rank 10 and signature (1, 9) of the base category
+
+ROW gamma-h-3:flags  [PASS]
+  lattice 029J: U + U(2) + E8(-2)   group Gamma_h,3
+  card: D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 1: case 3 with S = \overline{\{7\}}, #I_1 = 5, #I_2 = 10, #I_12 = 19 — the numbers of orbits of isotropic lines, planes and flags in N.
+  expected 19  call 19   (243.5 s)
+
+SUMMARY
+  PASS: 1
+    gamma-h-3:flags
+  FAIL: 0
+  MISSING: 0
+  UNDECIDED: 0
+  BROKEN: 1
+    gamma-h-2:flags
+  NOT REACHED: 0
+
+1 of 2 rows agree with their cards
+record: /work/.timings/rows-56f0ec868006-2055388.jsonl
+[exit 1 at 2026-11-22T17:06:45Z]

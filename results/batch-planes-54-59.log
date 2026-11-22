@@ -1,0 +1,55 @@
+tree: 56f0ec868006b50aaf14ed4c23cf11142b700ba5
+started: 2026-11-22T16:59:23Z
+
+$ --tags gamma-h-54,gamma-h-55,gamma-h-56,gamma-h-57,gamma-h-58,gamma-h-59 --rows planes --cap 900
+rows: 349 known, 6 selected
+cards: dzackgarza/lattice-database at its commit 23c0f9caff4d08b1f9795bba75f45cead4fc75df
+per-row cap 900 s, budget unbounded s
+
+ROW gamma-h-54:planes  [PASS]
+  lattice 029J: U + U(2) + E8(-2)   group Gamma_h,54
+  card: D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 2: case 54 with S = \overline{\{0,1,5\}}, #I_1 = 45, #I_2 = 429, #I_12 = 1175 — the numbers of orbits of isotropic lines, planes and flags in N.
+  expected 429  call 429   (89.2 s)
+
+ROW gamma-h-55:planes  [PASS]
+  lattice 029J: U + U(2) + E8(-2)   group Gamma_h,55
+  card: D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 2: case 55 with S = \overline{\{0,1,3,7\}}, #I_1 = 48, #I_2 = 435, #I_12 = 1184 — the numbers of orbits of isotropic lines, planes and flags in N.
+  expected 435  call 435   (99.0 s)
+
+ROW gamma-h-56:planes  [PASS]
+  lattice 029J: U + U(2) + E8(-2)   group Gamma_h,56
+  card: D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 2: case 56 with S = \overline{\{2,3,7,8\}}, #I_1 = 51, #I_2 = 463, #I_12 = 1298 — the numbers of orbits of isotropic lines, planes and flags in N.
+  expected 463  call 463   (97.4 s)
+
+ROW gamma-h-57:planes  [PASS]
+  lattice 029J: U + U(2) + E8(-2)   group Gamma_h,57
+  card: D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 2: case 57 with S = \overline{\{1,5,8\}}, #I_1 = 40, #I_2 = 341, #I_12 = 937 — the numbers of orbits of isotropic lines, planes and flags in N.
+  expected 341  call 341   (86.7 s)
+
+ROW gamma-h-58:planes  [PASS]
+  lattice 029J: U + U(2) + E8(-2)   group Gamma_h,58
+  card: D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 2: case 58 with S = \overline{\{0,5,7,8\}}, #I_1 = 53, #I_2 = 512, #I_12 = 1433 — the numbers of orbits of isotropic lines, planes and flags in N.
+  expected 512  call 512   (79.5 s)
+
+ROW gamma-h-59:planes  [PASS]
+  lattice 029J: U + U(2) + E8(-2)   group Gamma_h,59
+  card: D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 2: case 59 with S = \overline{\{-1,0,1,2,8\}}, #I_1 = 54, #I_2 = 465, #I_12 = 1315 — the numbers of orbits of isotropic lines, planes and flags in N.
+  expected 465  call 465   (70.6 s)
+
+SUMMARY
+  PASS: 6
+    gamma-h-54:planes
+    gamma-h-55:planes
+    gamma-h-56:planes
+    gamma-h-57:planes
+    gamma-h-58:planes
+    gamma-h-59:planes
+  FAIL: 0
+  MISSING: 0
+  UNDECIDED: 0
+  BROKEN: 0
+  NOT REACHED: 0
+
+6 of 6 rows agree with their cards
+record: /work/.timings/rows-56f0ec868006-2055327.jsonl
+[exit 0 at 2026-11-22T17:08:33Z]
