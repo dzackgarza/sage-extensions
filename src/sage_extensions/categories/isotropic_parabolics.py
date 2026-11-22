@@ -5080,6 +5080,21 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             first_class = parity([int(entry) for entry in coordinates_of(lattice.module_generator(labels[2]))])
             second_class = parity([int(entry) for entry in coordinates_of(lattice.module_generator(labels[3]))])
             base_span = span_of(first_class, second_class)
+
+            def image_of_the_class(rows, entry):
+                r"""The image of a class at ``entry``, read through the images of the basis.
+
+                ``rows`` holds the image of each basis vector of the framing, one mask
+                per position, so a class is carried by the exclusive-or of the rows its
+                mask selects: the action of the element on `L/2L`, which is the action
+                on `A_L` read at coordinates.
+                """
+                value = 0
+                for position, row in enumerate(rows):
+                    if (entry >> position) & 1:
+                        value ^= row
+                return value
+
             parity_rows = []
             for generator in generators:
                 standard = ambient_matrix(generator)
@@ -5089,14 +5104,8 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
                     rows.append(parity(column))
                 parity_rows.append(tuple(rows))
                 moved = span_of(
-                    parity([
-                        sum(int(standard[row, position]) * int(coordinates_of(lattice.module_generator(labels[2]))[row]) for row in range(len(labels)))
-                        for position in range(len(labels))
-                    ]),
-                    parity([
-                        sum(int(standard[row, position]) * int(coordinates_of(lattice.module_generator(labels[3]))[row]) for row in range(len(labels)))
-                        for position in range(len(labels))
-                    ]),
+                    image_of_the_class(rows, first_class),
+                    image_of_the_class(rows, second_class),
                 )
                 if (moved == base_span) != bool(generator in character_subgroup):
                     raise ArithmeticError(
