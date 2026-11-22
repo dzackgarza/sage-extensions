@@ -341,6 +341,21 @@ def test_the_cut_orbits_at_the_first_type() -> None:
     _assert_the_cut_orbits("first", [8])
 
 
+def test_the_cut_orbits_at_the_second_type() -> None:
+    r"""Type `{4,5}`: the cut is transitive, one orbit of eight."""
+    _assert_the_cut_orbits("second", [8])
+
+
+def test_the_cut_orbits_at_the_third_type() -> None:
+    r"""Type `{3,5}`: the cut splits the eight pairs into orbits of two and six."""
+    _assert_the_cut_orbits("third", [2, 6])
+
+
+def test_the_cut_orbits_at_the_fourth_type() -> None:
+    r"""Type `{3,4}`: the cut is transitive, one orbit of eight."""
+    _assert_the_cut_orbits("fourth", [8])
+
+
 def test_the_cut_orbits_at_the_fifth_type() -> None:
     r"""Type `{5,5}`: the cut splits the eight pairs into orbits of two and six."""
     _assert_the_cut_orbits("fifth", [2, 6])
