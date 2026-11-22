@@ -1,13 +1,11 @@
 r"""The plane stabilizer includes generators of its whole congruence Levi projection.
 
 The split plane below has block data $H=0$, $J=\operatorname{diag}(1,5)$ and
-$A=(-2)$.  Dutour Sikiri\'c--Hulek, Theorem 4.9 (arXiv:2302.01679v2, printed
+$A=(-2)$.  Dutour Sikirić--Hulek, Theorem 4.9 (arXiv:2302.01679v2, printed
 pp. 33--34), gives $P_1=JQ_1^{-t}J^{-1}$ for a lift with trivial quotient action.
-The lower shear of level five is admissible, so an integral lift of it belongs to
-$P_I$.  It is also a necessary member of the constructive answer: the lower unit
-shear, the lower level-five shear, and the sign reversals present the plane part
-in this split case.  A finite list of shears of levels $1,2,3,4,6$ cannot generate
-that group.
+The lower shear of level five is therefore induced by an element of $P_I$, and
+a constructive generating family must cover that direction.  The old finite list
+of candidate shears had levels $1,2,3,4,6$ and constructed no lift of this one.
 """
 
 from sage_extensions.all import *  # noqa: F401,F403
@@ -49,3 +47,5 @@ def test_the_public_stabilizer_contains_the_level_five_levi_shear() -> None:
     family = lattice.Aut().stabilizer(plane, action="setwise").group_generators()
     actions = tuple(_plane_action(plane, generator) for generator in family)
     assert matrix([[1, 5], [0, 1]]) in actions
+    assert plane.levi_plane_action_projection_index() == cardinal(6)
+    assert plane.levi_plane_action_index(trivial_on_quotient=True) == cardinal(6)

@@ -665,22 +665,31 @@ def _general_linear_classes(modulus):
 def _unimodular_lift(entries, modulus):
     r"""Return an integral matrix of determinant `\pm 1` in the class ``entries`` modulo ``modulus``.
 
-    ``entries`` are the four entries of a class of `\GL_2(\ZZ/m)`, in row order.
-    The lift is built rather than searched for, and the construction is the
-    Euclidean algorithm.  That class's first column generates `\ZZ/m`, so adding
-    multiples of `m` to one of its entries gives two coprime integers: a prime
-    dividing both is either a prime of `m`, which cannot divide both of them
-    because the column generates `\ZZ/m`, or one that the shift avoids by the
-    Chinese remainder theorem over the primes of the other entry.  The Euclidean
-    algorithm on that coprime pair is a product of integral matrices of
-    determinant `\pm 1` and ends in a matrix whose first column is `(\pm 1, 0)`;
-    its bottom-right entry is then congruent to `\pm 1` modulo `m`, because the
-    determinant is unchanged modulo `m`, and replacing it by that sign leaves the
-    class alone and makes the determinant `\pm 1`.
+    Let the given class be `(a,b;c,d)`.  Its first column generates `ZZ/m`, so
+    adding multiples of `m` to `a` and `c` makes them coprime.  Write their
+    Bezout relation as `u a + v c = 1`, and let `s = \pm 1` be the determinant
+    of the class.  Since `t = (ad-bc-s)/m` is integral, the matrices
+
+    .. math:: \begin{pmatrix} a & b+mtv\\ c & d-mtu \end{pmatrix}
+
+    have the required residues, because `m` divides the two added terms.  Their
+    determinant is `ad-bc-mt(a u+c v) = s`.  The construction
+    therefore preserves both the whole residue class and the determinant sign.
     """
     first_entry, second_entry, third_entry, fourth_entry = (
         int(entry) for entry in entries
     )
+    if modulus <= 0:
+        raise ValueError(f"a residue lift needs a positive modulus, not {modulus}")
+    determinant = first_entry * fourth_entry - second_entry * third_entry
+    if modulus <= 2 or (determinant - 1) % modulus == 0:
+        closed = 1
+    elif (determinant + 1) % modulus == 0:
+        closed = -1
+    else:
+        raise ArithmeticError(
+            f"the class {entries} modulo {modulus} has determinant neither +1 nor -1"
+        )
     coprime = None
     for shift in range(modulus + 1):
         for extra in (0, 1):
@@ -699,37 +708,23 @@ def _unimodular_lift(entries, modulus):
             f"column by multiples of {modulus} makes the two entries coprime, and a class of "
             f"GL_2(ZZ/{modulus}) has a generating first column"
         )
-    rows = [[coprime[0], second_entry], [coprime[1], fourth_entry]]
-    while rows[1][0]:
-        quotient = rows[0][0] // rows[1][0]
-        rows = [
-            rows[1],
-            [
-                rows[0][0] - quotient * rows[1][0],
-                rows[0][1] - quotient * rows[1][1],
-            ],
-        ]
-    corner, upper = rows[0]
-    remainder = rows[1][1]
-    if abs(corner) != 1:
-        raise ArithmeticError(
-            f"the Euclidean walk on the class {entries} modulo {modulus} ended with "
-            f"{corner} in place of a unit"
-        )
-    residue = SageZZ(remainder) % SageZZ(modulus)
-    if modulus <= 2:
-        closed = 1 if remainder >= 0 else -1
-    elif residue == SageZZ.one():
-        closed = 1
-    elif residue == SageZZ(modulus - 1):
-        closed = -1
-    else:
-        raise ArithmeticError(
-            f"the bottom-right entry {remainder} of the lift of {entries} modulo {modulus} is "
-            f"not congruent to a sign, although the class has determinant +-1"
-        )
-    return matrix(SageZZ, [[corner, upper], [SageZZ.zero(), SageZZ(closed)]])
-
+    left, right = coprime
+    divisor, bezout_left, bezout_right = SageZZ(left).xgcd(SageZZ(right))
+    assert divisor == 1
+    multiplier = (left * fourth_entry - right * second_entry - closed) // modulus
+    lifted = matrix(
+        SageZZ,
+        [
+            [left, second_entry + modulus * multiplier * bezout_right],
+            [right, fourth_entry - modulus * multiplier * bezout_left],
+        ],
+    )
+    assert int(lifted.determinant()) == closed
+    assert all(
+        (int(value) - int(entry)) % modulus == 0
+        for value, entry in zip(lifted.list(), entries, strict=True)
+    ), f"the lift {lifted} is not in the class {entries} modulo {modulus}"
+    return lifted
 
 def _row_congruence_coset(rectangle, target, modulus):
     r"""Return the solutions of `z\cdot\texttt{rectangle}\equiv \texttt{target}` modulo ``modulus``.
@@ -4532,136 +4527,230 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             )
 
         @cached_method
-        def levi_quotient_kernel_generators(self):
-            r"""Return generators of `\ker(P_I -> O(K_I))`, the setwise quotient kernel.
+        def _levi_plane_congruence_level(self):
+            r"""Return a level on which existence of an integral plane lift is constant.
 
-            The kernel consists of the elements whose class action is trivial, and
-            the block form splits them: modulo the unipotent radical (the elements
-            with `Q_1 = Q_3 = 1`, hence the radical of the *pointwise* stabilizer,
-            :meth:`unipotent_radical_generators`) an element of the kernel is
-            determined by its plane action `Q_1`, normalized to `Q_2 = 0`
-            (:meth:`plane_block_lift`).  So
+            Put `D=|\det J|` and `E=|\det A|`, and replace `Q_1` by `Q_1+NX`
+            with `N=2D^3E^2`.  In the formulas of :meth:`_plane_block_lift_for`,
+            the change in `P_1=JQ_1^{-t}J^{-1}` is divisible by `2D^2E^2`, and
+            the change in `P_3=(K-P_1K)A^{-1}` is divisible by `2D^2E`.
+            Since `P_1` and `P_3` have denominators at most `D` and `DE`,
+            respectively, the change of their remainder is divisible by `2D`.
+            Consequently the change of
+            `P_2=(remainder/2+skew)^tJ^{-t}Q_1` is integral: the remainder term
+            is handled by that divisibility, and the `Q_1` term by `NX`.
 
-            .. math:: \ker(P_I \to O(K_I)) = U_I \rtimes \Gamma', \qquad
-                \Gamma' = \{A \in GL_2(ZZ) : \text{a lift with } Q_1 = A,\ Q_3 = 1 \text{ exists}\},
-
-            which is the integral form of Zemel, arXiv:1902.08264v2, section 1,
-            Proposition 1.6 (printed p. 10): over a field the quotient is the
-            semi-direct product in which `GL(U) x O(W)` acts on the radical, and
-            the kernel of the class map is the radical extended by the plane
-            actions.
-
-            `\Gamma'` is decided here by two computed indices, and the answer is
-            returned only when they agree: `H = <the plane actions of the lifts
-            below>` is a subgroup of `\Gamma'`, and `\Gamma'` is a subgroup of
-            the stabilizer of the lattice spanned by the rows of `J^t` (Dutour
-            Sikirić--Hulek, Theorem 4.9, printed p. 34: "if we force `Q_1` to
-            preserve the lattice `L_{J^T}` ... then `P_1` is integral").  When
-            `[GL_2(ZZ) : H]` and `[GL_2(ZZ) : \mathrm{Stab}(L_{J^T})]` agree,
-            all three groups coincide.  Where they do not, the call raises and
-            names both indices.
+            Hence if one of `P_1,P_2,P_3` is integral for one determinant-sign
+            representative of a class modulo `N`, the same is true for every
+            representative of that class.  Dutour Sikirić--Hulek, Theorem 4.9
+            (arXiv:2302.01679v2, printed pp. 33--34), supplies these formulas.
             """
-            radical = self.unipotent_radical_generators()
-            lifts = []
-            for action in self._elementary_plane_actions():
-                lift = self.plane_block_lift(action)
-                if lift is not None:
-                    lifts.append(lift)
-            if not lifts:
-                raise NotImplementedError(
-                    f"no plane action lifts at {self} with a trivial class action, so the kernel "
-                    f"of the setwise quotient action is not presented here"
+            _change, _inverse, _H, J, _K, A = self.plane_block_gram()
+            determinant = abs(int(J.determinant()))
+            discriminant = abs(int(A.determinant()))
+            if determinant == 0 or discriminant == 0:
+                raise ValueError(
+                    f"the plane block at {self} is degenerate, so its Levi plane "
+                    f"projection has no congruence presentation"
                 )
-            generated = _plane_action_index(
-                tuple(_plane_action_matrix(self, lift) for lift in lifts), self
+            return 2 * determinant**3 * discriminant**2
+
+        def _levi_plane_residue_lift(self, residues):
+            r"""Return the integral plane lift of a residue class, or ``None``.
+
+            ``residues`` has determinant one.  The class lift preserves its
+            residues and determinant, and :meth:`_levi_plane_congruence_level`
+            makes the answer independent of the representative.
+            """
+            level = self._levi_plane_congruence_level()
+            action = _unimodular_lift(residues, level)
+            assert int(action.determinant()) == 1
+            return self.plane_block_lift(action)
+
+        @cached_method
+        def _levi_plane_action_presentation(self):
+            r"""Return the SL presentation of the plane projection and a reversing lift.
+
+            The projection of the setwise quotient kernel is
+
+            .. math:: \Gamma' = \{Q_1 : Q_1 \text{ has an integral lift with } Q_3=1\}.
+
+            This is a congruence subgroup of `GL_2(ZZ)` by
+            :meth:`_levi_plane_congruence_level`.  The special-linear part is
+            enumerated by an *ordinary transitive right-coset action*.  Starting
+            with the identity coset, the two elementary shears generate every
+            right coset of `H=\Gamma'\cap SL_2(ZZ)`.  Candidates are identified
+            by testing `xy^{-1}` in `H`; this is an exact integral lift test, not
+            a bounded word search and not an enumeration of unimodular sequences.
+            Sage's `ArithmeticSubgroup_Permutation` then reconstructs `H` from
+            that permutation action and returns its generators.
+
+            For determinant `-1`, write every action as `diag(-1,1)S` with
+            `S\in SL_2(ZZ)`.  The same direct action enumerates the right
+            `H`-orbits.  Liftability is constant on such an orbit, so its
+            representatives decide whether a reversing element exists.  One
+            reversing lift, if present, together with `H` gives all of
+            `\Gamma'`; otherwise `\Gamma'=H`.
+            """
+            from collections import deque
+
+            from sage.modular.arithgroup.arithgroup_perm import (
+                ArithmeticSubgroup_Permutation,
             )
-            stabilizer = _first_block_stabilizer_index(self.plane_block_gram()[3])
-            if generated != stabilizer:
-                raise NotImplementedError(
-                    f"the plane actions of the constructed lifts at {self} generate a subgroup "
-                    f"of index {generated} in GL_2(ZZ), while the stabilizer of the lattice "
-                    f"spanned by the rows of J^t has index {stabilizer}: the kernel of the "
-                    f"setwise quotient action lies between them and is not decided here"
+
+            level = self._levi_plane_congruence_level()
+            identity = matrix(SageZZ, [[1, 0], [0, 1]])
+            shears = (
+                matrix(SageZZ, [[1, 1], [0, 1]]),
+                matrix(SageZZ, [[1, 0], [1, 1]]),
+            )
+            decisions = {}
+
+            def residues(action):
+                return tuple(int(entry) % level for entry in action.list())
+
+            def is_in_special_projection(action):
+                key = residues(action)
+                if key not in decisions:
+                    decisions[key] = self._levi_plane_residue_lift(key) is not None
+                return decisions[key]
+
+            if not is_in_special_projection(identity):
+                raise ArithmeticError(
+                    f"the identity plane action has no integral lift at {self}, although "
+                    f"the identity of the lattice is such a lift"
                 )
-            return tuple(radical) + tuple(lifts)
+            representatives = [identity]
+            queue = deque([0])
+            tables = ({}, {})
+            while queue:
+                source = queue.popleft()
+                for position, shear in enumerate(shears):
+                    candidate = representatives[source] * shear
+                    target = next(
+                        (
+                            index
+                            for index, representative in enumerate(representatives)
+                            if is_in_special_projection(
+                                candidate * representative.adjugate()
+                            )
+                        ),
+                        None,
+                    )
+                    if target is None:
+                        target = len(representatives)
+                        representatives.append(candidate)
+                        queue.append(target)
+                    tables[position][source] = target
+            permutations = tuple(
+                [table[index] + 1 for index in range(len(representatives))]
+                for table in tables
+            )
+            special = ArithmeticSubgroup_Permutation(
+                L=permutations[0], R=permutations[1]
+            )
+
+            reversing = matrix(SageZZ, [[-1, 0], [0, 1]])
+            reversing_lift = self.plane_block_lift(reversing)
+            if reversing_lift is not None:
+                return special, reversing_lift
+            representatives = [reversing]
+            queue = deque([0])
+            while queue:
+                source = queue.popleft()
+                for shear in shears:
+                    candidate = representatives[source] * shear
+                    target = next(
+                        (
+                            index
+                            for index, representative in enumerate(representatives)
+                            if is_in_special_projection(
+                                representative.adjugate() * candidate
+                            )
+                        ),
+                        None,
+                    )
+                    if target is not None:
+                        continue
+                    reversing_lift = self.plane_block_lift(candidate)
+                    if reversing_lift is not None:
+                        return special, reversing_lift
+                    representatives.append(candidate)
+                    queue.append(len(representatives) - 1)
+            return special, None
+
+        @cached_method
+        def levi_plane_action_projection_index(self) -> int:
+            r"""Return the index in `GL_2(ZZ)` of the plane actions with trivial class action.
+
+            The coset action of :meth:`_levi_plane_action_presentation` gives
+            the special-linear index directly.  If no determinant-reversing
+            lift exists, the projection lies in `SL_2(ZZ)` and the index in
+            `GL_2(ZZ)` has one further factor of two.
+            """
+            special, reversing = self._levi_plane_action_presentation()
+            return int(special.index()) * (1 if reversing is not None else 2)
+
+        @cached_method
+        def levi_quotient_kernel_generators(self):
+            r"""Return generators of `\ker(P_I\to O(K_I))`.
+
+            Modulo the unipotent radical, an element of this kernel is
+            determined by its plane action `Q_1` after normalizing `Q_2=0`
+            (:meth:`plane_block_lift`).  The plane actions form exactly the
+            congruence group generated by :meth:`levi_lift_generators`, so the
+            kernel is generated by those lifts together with
+            :meth:`unipotent_radical_generators`.
+            """
+            return tuple(self.unipotent_radical_generators()) + tuple(
+                self.levi_lift_generators()
+            )
 
         @cached_method
         def levi_lift_generators(self):
-            r"""Return the integral lifts of the Levi factor on \(P\).
+            r"""Return integral lifts generating the full plane projection with trivial class action.
 
-            An isometry of `L` preserving `P` carries `P` by a matrix
-            \(M \in GL_2(ZZ)\) and \(P^\perp/P\) by an isometry of `K`; the two
-            actions are not independent, because an isometry must also carry the
-            block \(K = b(U, K)\) of :meth:`plane_block_basis` correctly.  This
-            method returns one integral isometry for each of a finite list of
-            plane actions for which :meth:`plane_block_lift` finds one, and
-            those are the lifts: they are the `M`-half of the Levi factor, the
-            `K`-half being :meth:`quotient_reflection_generators`.
+            For every matrix returned by Sage's transitive-coset arithmetic
+            subgroup presentation, :meth:`plane_block_lift` constructs the
+            integral isometry with trivial quotient action.  Their plane
+            actions generate the special-linear part of the projection; the
+            optional determinant-reversing lift completes the other determinant
+            class.  A missing lift is an error, never a generator silently
+            omitted from the answer.  The two level-`|\det J|` shears are also
+            included whenever they lift: they are useful elementary witnesses
+            of the congruence condition, but completeness rests on the coset
+            presentation, not on those or any other finite list of shears.
 
-            The block equations and the reason a fixed list of candidates is
-            searched are Dutour Sikirić--Hulek, *Moduli of polarised Enriques
-            surfaces -- computational aspects*, J. London Math. Soc. 110 (2024),
-            arXiv:2302.01679v2, Theorem 4.9 (`theorem_isotropic_k_planes`,
-            printed pp. 33--34): the second equation `J = P_1 J Q_1^t` determines
-            `P_1` from the plane action alone, the third determines the
-            `K`-mixing block, and the first is a linear system for the last
-            block whose right side is symmetric and which therefore always has a
-            rational solution -- while the *integral* solutions exist only on a
-            finite-index subgroup of the plane actions.  The paper says so: "we
-            could not find a universal construction of such a lattice.  However,
-            in all the cases we considered, a practical algorithm allowed us to
-            solve this problem".  The practical algorithm here is the search
-            below over the elementary matrices of `GL_2(ZZ)` -- the two shears of
-            levels 1, 2, 3, 4 and 6, their signs and the swap, the same list the
-            split case takes -- and the ones whose blocks come out integral are
-            kept; :meth:`plane_block_lift` answers the same question for any
-            other plane action a caller names.
-
-            When the plane splits off `L`, the `K` block of the block form is
-            zero, `P_3` vanishes, and the condition on `M` is exactly the
-            congruence `J M^{-t} J^{-1}` integral -- for `J = diag(1, 2)` that
-            is `\\Gamma^0(2)`, generated by `[[1, 0], [1, 1]]`,
-            `[[1, 2], [0, 1]]` and `\pm 1`; the search finds those and nothing
-            else.  When it does not split, the `K` block is nonzero, `P_3` is
-            the block that carries it, and the admissible plane actions are the
-            ones this search finds.
+            The proof is the correspondence theorem applied to the quotient by
+            the unipotent radical (Milne, *Group Theory*, v4.01, Theorem 1.47,
+            printed p. 22, with Corollary 1.48, p. 23): arbitrary elements of
+            the kernel's plane projection reduce into the certified special
+            generators and, when present, the reversing lift.  It is not an
+            inference from the five Enriques orbit rows.
             """
-            lattice = self.ambient_lattice()
-            found = []
-            for first_entry, second_entry, third_entry, fourth_entry in (
-                (1, 0, 1, 1),
-                (1, 0, -1, 1),
-                (1, 1, 0, 1),
-                (1, -1, 0, 1),
-                (1, 2, 0, 1),
-                (1, -2, 0, 1),
-                (1, 0, 2, 1),
-                (1, 0, -2, 1),
-                (1, 4, 0, 1),
-                (1, 0, 4, 1),
-                (1, 6, 0, 1),
-                (1, 0, 6, 1),
-                (1, 0, 3, 1),
-                (1, 0, -3, 1),
-                (-1, 0, 0, -1),
-                (-1, 0, 0, 1),
-                (1, 0, 0, -1),
-                (0, 1, 1, 0),
+            special, reversing = self._levi_plane_action_presentation()
+            lifts = []
+            for generator in special.generators():
+                lift = self.plane_block_lift(generator.matrix())
+                if lift is None:
+                    raise ArithmeticError(
+                        f"the arithmetic-group generator {generator.matrix()} at {self} "
+                        f"has no integral lift with trivial quotient action, contradicting "
+                        f"the residue-class certificate used to construct that generator"
+                    )
+                lifts.append(lift)
+            if reversing is not None:
+                lifts.append(reversing)
+            level = abs(int(self.plane_block_gram()[3].determinant()))
+            for action in (
+                matrix(SageZZ, [[1, level], [0, 1]]),
+                matrix(SageZZ, [[1, 0], [level, 1]]),
             ):
-                determinant = first_entry * fourth_entry - second_entry * third_entry
-                if abs(determinant) != 1:
-                    continue
-                action = matrix(
-                    SageZZ,
-                    [
-                        [first_entry, second_entry],
-                        [third_entry, fourth_entry],
-                    ],
-                )
                 lift = self.plane_block_lift(action)
                 if lift is not None:
-                    found.append(lift)
-            return tuple(found)
+                    lifts.append(lift)
+            return tuple(lifts)
+
 
         @cached_method
         def _discriminant_orthogonal_action(self):
@@ -4820,24 +4909,25 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             Then `[\GL(I) : H] = 6 / |H \text{ in } \GL_2(\FF_2)|`, because
             `H/\Gamma(2)` is that image once `\Gamma(2) \subseteq H`.
 
-            With ``trivial_on_quotient`` the same index is asked of the
-            generators that act as the identity on `I^\perp/I`.  Those are the
-            elements `(M, 1)` of `\GL(I) \times O(I^\perp/I)`, so when their
-            plane actions already fill `\GL(I)`, every plane action lifts with
-            trivial quotient action -- and then the Levi image of the parabolic is
-            the whole product `\GL(I) \times H_0` with `H_0` the quotient
-            actions that lift at all (:meth:`parabolic_obstruction`).
+            With ``trivial_on_quotient`` the answer is instead read from the
+            ordinary transitive right-coset presentation of
+            :meth:`_levi_plane_action_presentation`.  Those are the elements
+            `(M, 1)` of `\GL(I) \times O(I^\perp/I)`, and their full
+            congruence projection is constructed at the level on which all
+            three block equations are constant.  No `\Gamma(2)` hypothesis is
+            needed in this case.  When that projection is all of `\GL(I)`, the
+            Levi image is the whole product `\GL(I) \times H_0` with `H_0`
+            the quotient actions that lift at all (:meth:`parabolic_obstruction`).
 
             A plane whose family does not exhibit one of the three witnesses
             raises, naming it and the bound on the searched products: the index
             of that subgroup is not decided by this certificate, and returning a
             measured congruence level instead would be a number without a proof.
             """
+            if trivial_on_quotient:
+                return self.levi_plane_action_projection_index()
             return _plane_action_index(
-                self.levi_plane_action_generators(
-                    trivial_on_quotient=trivial_on_quotient
-                ),
-                self,
+                self.levi_plane_action_generators(), self
             )
 
         def levi_plane_action_generators(self, trivial_on_quotient=False):
@@ -5263,12 +5353,11 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
               here rather than left to the two methods happening to be built from the same
               pieces: with the containment, `U_I` lies in the subgroup's radical part, and
               without it the index would certify a different family's radical;
-            * the plane projection of `M` is the set of plane actions that occur in an
-              integral lift at all, which :meth:`liftable_plane_action_classes` reads off the
-              block equations of Dutour Sikirić--Hulek, Theorem 4.9, equations `(E_2)` and
-              `(E_3)`, and the family reaches it when those classes are all attained modulo
-              `2` and :meth:`levi_plane_action_index` certifies `\Gamma(2)` inside the group
-              the family's plane actions generate;
+            * the plane projection with trivial class action is constructed in full by
+              :meth:`levi_lift_generators`: a congruence level certifies the residue-class
+              membership test, an ordinary transitive right-coset action presents its
+              special-linear part, and a direct action decides the determinant-minus-one
+              class.  The family must contain those lifts;
             * the quotient projection is :meth:`levi_quotient_image_index` with
               ``trivial_on_plane`` equal to `1` against the order of `O(I^\perp/I)`.
 
@@ -5288,9 +5377,9 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             splitting complement alone does not make the image the product.
 
             A computation that is not available -- a quotient that is not definite, a
-            parameter lattice the enumeration refuses, a plane action whose `\Gamma(2)`
-            certificate does not settle the congruence level -- is reported as ``False``
-            with that refusal as the reason.  That is what this predicate's `False` has
+            parameter lattice the enumeration refuses, or a full congruence presentation
+            that is not constructed -- is reported as ``False`` with that refusal as the
+            reason.  That is what this predicate's `False` has
             always meant: not established.
 
             The decision is one stage of the timing record
@@ -5344,38 +5433,21 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
                         f"the radical is not generated (unipotent_radical_index() = {radical})"
                     )
                 try:
-                    plane_index = self.levi_plane_action_index(trivial_on_quotient=True)
+                    plane_lifts = self.levi_lift_generators()
                 except (ArithmeticError, NotImplementedError, ValueError) as error:
                     return (
                         False,
-                        f"the plane-action factor at {self} is not decided: {error}; the family is "
-                        f"then only a subgroup of the parabolic",
+                        f"the full plane-action presentation at {self} is not constructed: "
+                        f"{error}; the family is then only a subgroup of the parabolic",
                     )
-                if plane_index != 1:
-                    determinant = abs(int(self.plane_block_gram()[3].determinant()))
-                    if determinant not in (1, 2):
-                        failures.append(
-                            f"the plane actions of the members that act trivially on I^perp/I "
-                            f"have index {plane_index} in GL(I), the plane's congruence level "
-                            f"is |det J| = {determinant}, and the classes modulo 2 do not decide "
-                            f"that image"
-                        )
-                    else:
-                        try:
-                            liftable = self.liftable_plane_action_classes()
-                        except (ArithmeticError, NotImplementedError, ValueError) as error:
-                            return (
-                                False,
-                                f"the liftable plane-action classes at {self} are not decided: "
-                                f"{error}; the family is then only a subgroup of the parabolic",
-                            )
-                        achieved = self.plane_action_class_image()
-                        if not liftable <= achieved:
-                            failures.append(
-                                f"the plane actions of the members that act trivially on "
-                                f"I^perp/I miss {len(liftable - achieved)} of the "
-                                f"{len(liftable)} classes modulo 2 that admit an integral lift"
-                            )
+                missing_plane_lifts = [
+                    member for member in plane_lifts if member not in family
+                ]
+                if missing_plane_lifts:
+                    failures.append(
+                        f"the family omits {len(missing_plane_lifts)} of the integral lifts "
+                        f"that generate the full plane projection with trivial class action"
+                    )
                 try:
                     quotient_index = self.levi_quotient_image_index(trivial_on_plane=True)
                 except (ArithmeticError, NotImplementedError, ValueError) as error:

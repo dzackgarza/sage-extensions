@@ -2965,16 +2965,15 @@ class Lattices(OwnedCategoryOverBaseRing):
         r"""Generators of the parabolic at a plane marking, or ``None`` when this is not one.
 
         The marking must be an arrow whose source is a primitive totally
-        isotropic plane of an indefinite even lattice over `ZZ`, and the lattice
-        must split along the plane; otherwise ``None`` is returned and the
-        caller keeps its own route.
+        isotropic plane of an indefinite even lattice over `ZZ`.  The block
+        family is returned once its own constructive completeness decision
+        establishes it; otherwise ``None`` leaves the caller's other route.
         """
         subobject = self._marked_primitive_isotropic_subobject(marked)
         if subobject is None or int(subobject.module_rank()) != 2:
             return None
-        # Without a splitting L = P + U + K the block-equation family is only a
-        # subgroup of the parabolic (is_parabolic_complete); the port's route
-        # computes the whole stabilizer there.
+        # The plane projection is constructed by congruence right-coset
+        # presentation at split and non-split planes alike.
         if not subobject.is_parabolic_complete():
             return None
         family = subobject.parabolic_stabilizer_generators()

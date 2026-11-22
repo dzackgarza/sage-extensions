@@ -38,9 +38,9 @@ of `Stab_{Gamma_{En,2}}(Pi)` on the eight antipodal pairs of `(-2)`-classes of `
 
 **Which planes carry the row here.**  `antipodal_root_class_orbits` walks `8 x |orbit of J_0|` states
 with the whole parabolic family, and that orbit has 768, 4480, 10752, 24576 and 26880 spans at the five
-planes in this file's order.  The two cheapest states are asserted; the three dearer ones are over the
-per-call ceiling in this form, so their row is measured and reported rather than gated, and closing
-that gap is the operation's own remaining work -- not a reason to weaken what is asserted.
+planes in this file's order.  All five rows are asserted in this file; the three rows that exceed the
+ordinary per-call ceiling are run with time gates disabled rather than left ungated by weakening the
+assertion.
 
 **The character, executed at its own data.**  Membership is decided by evaluating
 `preimage_morphism()` on a point of `O(L^-)` and admitting the image into `target_subgroup()`, so the
