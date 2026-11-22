@@ -1851,20 +1851,17 @@ class PreimageSubgroups(_PredicateSubgroupConstruction):
         def _point_of_the_domain(self, element):
             r"""Read ``element`` as a point of the domain group, across an equal copy of its lattice.
 
-            The lattice of a group of isometries is its domain's lattice, and a
-            lattice built twice with the same Gram matrix has the same
-            coordinates for the same vector, so an isometry of such a copy and
-            its generator images read coordinate-wise name an isometry of the
-            domain's lattice.  The equality of the two Gram matrices is what
-            makes that an isometry and is checked here; an isometry of a
-            different lattice is refused rather than read as some isometry of
-            this one.
+            The lattice of a group of isometries is its domain's lattice, and a lattice
+            built twice with the same Gram matrix has the same coordinates for the same
+            vector, so an isometry of such a copy names an isometry of the domain's
+            lattice.  The reading is the domain's own element constructor's
+            (:meth:`LatticeIsometryMor._generator_images_of_an_equal_copy`): this method
+            only decides when it applies, by the Gram matrix the owner's reading turns on.
 
-            Anything else --- a point of the domain itself, an isometry of a
-            lattice whose Gram matrix differs, or data the domain does not
-            admit --- is returned unchanged, so the domain's own ingress
-            decides it: such a value is not a point of this group, which is
-            what membership of it answers.
+            Anything else --- a point of the domain itself, an isometry of a lattice whose
+            Gram matrix differs, or data the domain does not admit --- is returned
+            unchanged, so the domain's own ingress decides it: such a value is not a point
+            of this group, which is what membership of it answers.
             """
             domain = self.supergroup()
             owner = element_parent(element)
@@ -1876,27 +1873,9 @@ class PreimageSubgroups(_PredicateSubgroupConstruction):
 
             if not isinstance(element, LatticeIsometryMethods):
                 return element
-            lattice = domain.domain()
-            source = owner.domain()
-            if source is lattice or source.gram_tensor() != lattice.gram_tensor():
+            if owner.domain().gram_tensor() != domain.domain().gram_tensor():
                 return element
-            source_labels = tuple(source.module_generating_set())
-            domain_labels = tuple(lattice.module_generating_set())
-            assert len(source_labels) == len(domain_labels), (
-                f"cannot read {element!r} of {source!r} in {lattice}: the two framings have "
-                f"{len(source_labels)} and {len(domain_labels)} generators, so their "
-                f"coordinates do not correspond"
-            )
-            return domain(
-                {
-                    lattice.module_generator(domain_label): lattice(
-                        [int(entry) for entry in element(source.module_generator(source_label)).to_vector()]
-                    )
-                    for source_label, domain_label in zip(
-                        source_labels, domain_labels, strict=True
-                    )
-                }
-            )
+            return domain(element)
 
         def has_finite_coset_space(self) -> bool:
             r"""Whether ``G/f^-1(K)`` is realized through ``f`` into a finite group with selected generators of ``G``."""

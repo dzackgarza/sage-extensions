@@ -3575,13 +3575,14 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
 
     def _morphism_from_images(self, images):
         if isinstance(images, LatticeIsometryMethods):
-            if images.domain() is not self.domain() or images.codomain() is not self.codomain():
-                raise ValueError(
-                    f"the isometry {images} goes from {images.domain()} to {images.codomain()}, so it is not an isometry from {self.domain()} to {self.codomain()}"
-                )
-            if images.parent() is self:
+            same_lattices = (
+                images.domain() is self.domain() and images.codomain() is self.codomain()
+            )
+            if same_lattices and images.parent() is self:
                 return images
-            _refuse_foreign_arrow(self, images, "use the functor between the source and target categories")
+            if same_lattices:
+                _refuse_foreign_arrow(self, images, "use the functor between the source and target categories")
+            images = self._generator_images_of_an_equal_copy(images)
         if isinstance(images, (Map, CategoricalArrow)):
             # A module isomorphism or automorphism, a lattice endomorphism or a
             # set map: almost none is an isometry (``CON-17``).
@@ -3592,6 +3593,52 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
         if isinstance(images, dict):
             images = _labelled_generator_images(self.domain(), images)
         return self.element_class(self, images)
+
+    def _generator_images_of_an_equal_copy(self, isometry):
+        r"""Read an isometry of an equal copy of this arrow's lattices as generator images here.
+
+        Two lattices with the same Gram matrix have the same coordinates for the same
+        vector, so an isometry written in one names the same isometry of the other: its
+        images of the framing's generators, read coordinate-wise, are the generator images
+        this arrow is posed by.  That is the reading a caller of
+        :meth:`discriminant_representation` is promised --- an isometry of ``L``, its
+        matrix, or a form-preserving morphism of an equal copy --- and the reading
+        ``IsotropicVectorReductionImage._coerced`` performs for a single vector.
+
+        The equality of the Gram matrices is what makes the reading an isometry rather
+        than a guess, and it is checked here: an isometry of a lattice with a different
+        Gram matrix has coordinates that are not this lattice's, and is refused.
+        """
+        domain = self.domain()
+        codomain = self.codomain()
+        for lattice, other in (
+            (domain, isometry.domain()),
+            (codomain, isometry.codomain()),
+        ):
+            if other is lattice:
+                continue
+            if other.gram_tensor() != lattice.gram_tensor():
+                raise ValueError(
+                    f"the isometry {isometry} goes from {isometry.domain()} to "
+                    f"{isometry.codomain()}, and {other} has a different Gram matrix from "
+                    f"{lattice}: its coordinates are not an isometry of {lattice}, so it is "
+                    f"not an isometry from {domain} to {codomain}"
+                )
+        source_labels = tuple(isometry.domain().module_generating_set())
+        labels = tuple(domain.module_generating_set())
+        if len(source_labels) != len(labels):
+            raise ValueError(
+                f"the isometry {isometry} is written over {len(source_labels)} generators of "
+                f"{isometry.domain()}, and {domain} has {len(labels)}: their coordinates do "
+                f"not correspond"
+            )
+        images = {}
+        for source_label, label in zip(source_labels, labels, strict=True):
+            image = isometry(isometry.domain().module_generator(source_label))
+            images[domain.module_generator(label)] = codomain(
+                [int(entry) for entry in image.to_vector()]
+            )
+        return images
 
     def super_categories(self):
         packet = self.base_category().category_packet()
