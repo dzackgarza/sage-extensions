@@ -106,3 +106,20 @@ against the file that settles it.
   (about 5 s each) and are the rows the `content=1` reading was repaired against,
   yet no matrix entry selected them: run 44924240209 stopped at row 36 of 349
   before any `0128` row.  The draft now carries a `--tags 0128 --rows "#h"` job.
+
+## Correction, 2026-11-22
+
+* **The duplication is removed.**  `.github/workflows/enriques-polarization-rows.yml`
+  is deleted in the commit that carries `results/issue319-rows-2026-11-22.md`, so
+  `enriques-polarization-rows-full.yml` — twenty jobs, 92 distinct tags, no gap
+  and no duplicate — is the workflow that owns the remaining rows.
+* **Section 3's `gamma-h-*` line row is not supported by its record.**
+  `results/issue17-gamma-h-line-rows.md` names the port (`991b88b0`) and the card
+  digest (`dbc9fc6a`) and no tree revision, so "the revision is the one that
+  record names" names nothing: those 87 rows are pending, as the plane and flag
+  rows are.
+* **Rows with a current-revision value are the 18 of
+  `results/issue319-rows-2026-11-22.md`**, each with its raw `@@ROW@@` line in
+  `results/issue319-rows-2026-11-22.log` at `97f2f72`: `0128`'s `#Gamma_h` at
+  `2d` = 2 and 4, the eight `029J`/`otilde-plus-t-en` rows, `gamma-h-1` to
+  `gamma-h-8` planes, and `gamma-h-1` flags.  Every one agrees with its card.
