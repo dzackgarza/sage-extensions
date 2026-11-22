@@ -128,6 +128,36 @@ are the one `O(L_-)`-class whose image is `Gamma^1(2)`; at most one of the two a
 can be the truth about that class, and the `False` one is the answer that discards the
 block family.
 
+## 3b. A candidate defect at `P_1` that does not hold, and the invariant that settles it
+
+The radical half deserves its own check, because the index-1 measurement above tests the
+translation block and the centre, not the `(P,U)`-block `a`. At `P_1` the family has 45
+members in `U_P` (40 of them with `c != 0`); their `a`-parts span rank 3 of the four
+entries of `a`, and the functional `lambda(a) = a_12 + 2 a_21` vanishes on all 45, while
+`U_P` does contain an `a` with `lambda = -8`.
+
+That is not a deficit, because `lambda` is not additive on `U_P`: the block law is
+`(a, c, tau)(a', c', tau') = (a + a' + tau c', c + c', tau + tau')`, so
+`lambda(gh) = lambda(g) + lambda(h) + lambda(tau c')`, and `tau c'` is the antisymmetric
+part. The additive functional is
+
+```
+F(g) = lambda(a) - (1/2) lambda(tau c),
+```
+
+which is additive because `lambda(tau(c) c') = -(S_12 + S_21)` with `S = c^t A c'`, and
+`S_12 + S_21` is symmetric in `(c, c')`. Measured: `F` takes the single value `0` on all
+45 members, `F(gh) = F(g) + F(h)` on 64 products (no failure), and `F` vanishes on the
+element `c* = (4,-4,5,-5,7,-7,10,-10,8,-8,6,-6,4,-4,2,-2)`, `a(c*) = (4,-8,0,2)` that
+`lambda` singles out — `lambda(a(c*)) = -8` and `(1/2) lambda(tau(c*) c*) = -8`. So the
+rank-3 `a`-part is what the equation `J a + a^t J^t = -(c^t A c)` leaves at `P_1`
+(`K = 0` there); the rank-4 baseline is not the right one at a splitting plane, and no
+linear invariant separates the family's radical from `U_P` at `P_1`.
+
+What remains true: the radical half of completeness is decided by
+`unipotent_radical_index()` (parameter lattice and centre), not by an `a`-rank count, and
+that is the assumption the certificate rests on.
+
 ## 4. What is open, and the next two steps
 
 1. **The five planes are not constructed in this repository.** (4.3.17) states the
