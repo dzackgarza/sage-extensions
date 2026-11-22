@@ -1045,3 +1045,42 @@ def incidence_row_contract(lattice, subgroup, lines, planes, incidences, route="
     return _incidence_row_driver().row_contract(
         lattice, subgroup, "row", lines, planes, incidences, route
     )
+
+
+def runs_the_module(*arguments):
+    r"""Run the acceptance module with ``arguments`` and return what it left behind.
+
+    The module is a script rather than a collected test, so a regression on its own
+    contract -- that an absent or non-agreeing row cannot be reported as agreement
+    -- runs it as a child of the checkout and reads three things: its exit status,
+    its last lines of output, and the per-row record it appends under ``.timings/``.
+    That record is the durable one the matrix's jobs upload, so reading it here
+    exercises the retention as well as the status.
+
+    Returns ``(status, stdout_lines, rows)`` where ``rows`` is the parsed
+    ``rows-*.jsonl`` written by this run, newest first.
+    """
+    import json
+    import subprocess
+    import sys
+    from pathlib import Path
+
+    root = Path(__file__).resolve().parents[2]
+    completed = subprocess.run(
+        [sys.executable, str(root / "tests" / "enriques_polarization_rows_by_card.py"), *arguments],
+        capture_output=True,
+        text=True,
+        cwd=str(root),
+    )
+    records = sorted(
+        (root / ".timings").glob("rows-*.jsonl"),
+        key=lambda path: path.stat().st_mtime,
+        reverse=True,
+    )
+    rows = []
+    if records:
+        rows = [json.loads(line) for line in records[0].read_text().splitlines() if line.strip()]
+    return completed.returncode, completed.stdout.splitlines()[-6:], rows
+
+
+builtins.runs_the_module = runs_the_module

@@ -663,6 +663,44 @@ def _run_row_in_child(row: Row, cap: int) -> dict:
     }
 
 
+def _run_exit(outcomes) -> int:
+    r"""The run's exit status: 0 only when every row agrees with its card.
+
+    An absent row is not an agreement.  A selection that matches none of the rows
+    this module enumerates is 2, so a matrix entry whose arguments miss every row
+    fails instead of comparing nothing; any row that is not ``PASS`` -- ``FAIL``,
+    ``MISSING``, ``UNDECIDED``, ``BROKEN`` or ``NOT REACHED`` -- is 1, so a skipped,
+    absent or undecided row can never be counted as agreement.
+    """
+    if not outcomes:
+        return 2
+    return 0 if all(outcome["state"] == "PASS" for outcome in outcomes) else 1
+
+
+def _retain(outcomes, run_exit) -> str:
+    r"""Append one JSON object per row to the run's own record under ``.timings/``.
+
+    CONTRIBUTING.md ENV-03 keeps a run's record where the workflow uploads it, so
+    every outcome carries its row identity, the card it was read from, the lattice
+    and group its card names, both values, the state, the revision and the run's
+    exit status.  One line per row makes a current raw outcome retrievable per row
+    rather than only as prose in a log, which is what an audit of these rows needs.
+    """
+    from sage_extensions.timing import current_commit, timing_directory
+
+    directory = timing_directory()
+    directory.mkdir(parents=True, exist_ok=True)
+    revision = current_commit()
+    path = directory / f"rows-{revision[:12]}-{os.getpid()}.jsonl"
+    with path.open("a", encoding="utf-8") as handle:
+        for outcome in outcomes:
+            handle.write(
+                json.dumps({**outcome, "revision": revision, "run_exit": run_exit})
+                + "\n"
+            )
+    return f"{path}"
+
+
 def _log(message: str = "") -> None:
     print(message, flush=True)
 
@@ -730,8 +768,10 @@ def main(argv=None) -> int:
             _log(f"no row has the identifier {arguments.one!r}")
             return 2
         outcome = _outcome(matches[0], arguments.cap)
+        status = _run_exit([outcome])
         _log(_OUTCOME_PREFIX + json.dumps(outcome))
-        return 0 if outcome["state"] == "PASS" else 1
+        _log(f"record: {_retain([outcome], status)}")
+        return status
 
     tags = _split(arguments.tags)
     degrees = tuple(int(degree) for degree in _split(arguments.degrees))
@@ -785,7 +825,9 @@ def main(argv=None) -> int:
     decided = sum(1 for outcome in outcomes if outcome["state"] == "PASS")
     _log("")
     _log(f"{decided} of {len(outcomes)} rows agree with their cards")
-    return 0 if decided == len(outcomes) else 1
+    status = _run_exit(outcomes)
+    _log(f"record: {_retain(outcomes, status)}")
+    return status
 
 
 if __name__ == "__main__":
