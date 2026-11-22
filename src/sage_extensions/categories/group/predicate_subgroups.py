@@ -1,6 +1,7 @@
 """Subgroups specified by a membership predicate rather than generators."""
 
 from sage.misc.cachefunc import cached_method
+from sage.structure.element import parent as element_parent
 
 from sage_extensions.categories.abstract_categories.cat import Cat
 from sage_extensions.categories.abstract_categories.objects import (
@@ -1821,6 +1822,81 @@ class PreimageSubgroups(_PredicateSubgroupConstruction):
 
         def target_subgroup(self):
             return self._target_subgroup
+
+        def __contains__(self, element):
+            r"""Whether ``element`` satisfies ``morphism(g) in subgroup``, the relation cutting this preimage out.
+
+            The relation is stated on the elements of the domain: ``f^-1(K)`` is
+            ``{g in G : f(g) in K}``, so membership is decided by evaluating the
+            morphism on the point and admitting the image into the target
+            subgroup, and never by a second condition kept beside it.
+
+            ``element`` is read as a point of the domain first.  A group whose
+            elements are isometries owns elements only for its own lattice
+            object, and the same lattice constructed twice is a second object;
+            two lattices with the same Gram matrix have the same coordinates
+            for the same vector, so the generator images of an isometry of such
+            a copy, read coordinate-wise, are the generator images of an
+            isometry of the domain's lattice.  That is the reading
+            :meth:`_point_of_the_domain` performs and checks; anything the
+            domain does not admit is left to the domain's own ingress, which
+            rejects it.
+            """
+            return _ConditionSetEngine.__contains__(
+                self, self._point_of_the_domain(element)
+            )
+
+        is_parent_of = __contains__
+
+        def _point_of_the_domain(self, element):
+            r"""Read ``element`` as a point of the domain group, across an equal copy of its lattice.
+
+            The lattice of a group of isometries is its domain's lattice, and a
+            lattice built twice with the same Gram matrix has the same
+            coordinates for the same vector, so an isometry of such a copy and
+            its generator images read coordinate-wise name an isometry of the
+            domain's lattice.  The equality of the two Gram matrices is what
+            makes that an isometry and is checked here; an isometry of a
+            different lattice is refused rather than read as some isometry of
+            this one.
+
+            Anything else --- a point of the domain itself, an isometry of a
+            lattice whose Gram matrix differs, or data the domain does not
+            admit --- is returned unchanged, so the domain's own ingress
+            decides it: such a value is not a point of this group, which is
+            what membership of it answers.
+            """
+            domain = self.supergroup()
+            owner = element_parent(element)
+            if owner is domain:
+                return element
+            from sage_extensions.categories.lattice_morphisms import (
+                LatticeIsometryMethods,
+            )
+
+            if not isinstance(element, LatticeIsometryMethods):
+                return element
+            lattice = domain.domain()
+            source = owner.domain()
+            if source is lattice or source.gram_tensor() != lattice.gram_tensor():
+                return element
+            source_labels = tuple(source.module_generating_set())
+            domain_labels = tuple(lattice.module_generating_set())
+            assert len(source_labels) == len(domain_labels), (
+                f"cannot read {element!r} of {source!r} in {lattice}: the two framings have "
+                f"{len(source_labels)} and {len(domain_labels)} generators, so their "
+                f"coordinates do not correspond"
+            )
+            return domain(
+                {
+                    lattice.module_generator(domain_label): lattice(
+                        [int(entry) for entry in element(source.module_generator(source_label)).to_vector()]
+                    )
+                    for source_label, domain_label in zip(
+                        source_labels, domain_labels, strict=True
+                    )
+                }
+            )
 
         def has_finite_coset_space(self) -> bool:
             r"""Whether ``G/f^-1(K)`` is realized through ``f`` into a finite group with selected generators of ``G``."""
