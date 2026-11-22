@@ -767,15 +767,24 @@ def _latest_attempts(paths) -> dict:
 
 
 def _coverage(rows, latest) -> tuple:
-    r"""Which required rows the ledger holds a ``PASS`` for, and which it does not.
+    r"""Which required rows the ledger decides, and which it does not.
+
+    The card is the oracle and a ledger line is a claim about it.  The ``state`` on
+    a line is the state the measuring run reached, not a comparison it made against
+    anything: it is written by whichever run measured the row, at whichever
+    revision, and read here by a process that measured nothing.  So a line decides
+    nothing by its label.  What it is read for is the value it says the call
+    returned, set against the number the row's card states -- read by the row's tag
+    here and now, never out of the line's own ``expected`` field.
 
     A row's attempts are read at the latest revision it was tried at, and every one
-    of them has to be a ``PASS`` with the card's value: an operation that raises on
-    one attempt and returns the card's number on the next has not established the
-    row at that revision, and a later happy run cannot erase the attempt that
-    raised.  A required row is absent when the ledger holds no attempt for it at
-    all, when any attempt at that revision is not a ``PASS``, and when two of them
-    return different numbers -- which is the same statement about the operation.
+    of them has to pass that comparison: an operation that raises on one attempt and
+    returns the card's number on the next has not decided the row at that revision,
+    and a later happy run cannot erase the attempt that raised.  A required row is
+    therefore absent when the ledger holds no attempt for it at all, when its card
+    states no such row, when any attempt at that revision is not a ``PASS``, when
+    two of them returned different numbers, and when the number they returned is not
+    the card's.
     """
     attempted = {}
     for row in rows:
@@ -787,6 +796,11 @@ def _coverage(rows, latest) -> tuple:
         attempts = attempted.get(row.identifier())
         if not attempts:
             absent.append((row, "no attempt recorded"))
+            continue
+        try:
+            stated = int(_expected(row))
+        except CardMissing as missing:
+            absent.append((row, f"the card states no such row: {missing}"))
             continue
         revision = attempts[-1]["revision"]
         at_revision = [attempt for attempt in attempts if attempt["revision"] == revision]
@@ -810,6 +824,16 @@ def _coverage(rows, latest) -> tuple:
                 )
             )
             continue
+        returned = at_revision[-1]["returned"]
+        if returned != stated:
+            absent.append(
+                (
+                    row,
+                    f"the attempts at {revision[:12]} returned {returned} and the card "
+                    f"states {stated}",
+                )
+            )
+            continue
         decided.append((row, at_revision[-1]))
     return decided, absent
 
@@ -827,6 +851,14 @@ def _coverage_report(selected, decided, absent) -> None:
         agreed, missing = dimensions[name]
         _log(f"  {name}: {agreed} decided, {missing} absent")
     _log(f"  decided {len(decided)}, absent {len(absent)}")
+    revisions = {}
+    for _row, attempt in decided:
+        revisions[attempt["revision"][:12]] = revisions.get(attempt["revision"][:12], 0) + 1
+    if revisions:
+        _log(
+            "  the decided rows rest on the revision each was measured at: "
+            + ", ".join(f"{revision} ({count})" for revision, count in sorted(revisions.items()))
+        )
     for row, reason in absent:
         _log(f"  ABSENT {row.identifier()}: {reason}")
 
