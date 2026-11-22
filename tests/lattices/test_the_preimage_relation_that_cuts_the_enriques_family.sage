@@ -41,6 +41,23 @@ with the whole parabolic family, and that orbit has 768, 4480, 10752, 24576 and 
 planes in this file's order.  The two cheapest states are asserted; the three dearer ones are over the
 per-call ceiling in this form, so their row is measured and reported rather than gated, and closing
 that gap is the operation's own remaining work -- not a reason to weaken what is asserted.
+
+**The character, executed at its own data.**  Membership is decided by evaluating
+`preimage_morphism()` on a point of `O(L^-)` and admitting the image into `target_subgroup()`, so the
+tests below do exactly that on the generators `setwise_stabilizer` returns: the law is executed, not
+merely agreed with through `in`.  Reading an isometry of the equal copy `T_{En}` as a point of
+`O(L^-)` is the lattice isometry constructor's own reading
+(`LatticeIsometryMor._generator_images_of_an_equal_copy`), the form `discriminant_representation`
+promises its callers; before it, `rho_{L^-}` could not be applied to a single generator of the public
+family and every one of them raised.
+
+**What generates the parabolic.**  `setwise_stabilizer` answers with `parabolic_stabilizer_generators()`
+exactly when `is_parabolic_complete()`, so the returned family is the family the three factors are
+computed for.  Generation is then the correspondence theorem (Milne, *Group Theory*, v4.01 of
+6 November 2025, Theorem 1.47, printed p. 22) and not an orbit count: the family contains the
+unipotent family whose index in the radical is 1, and its two Levi projections fill `GL(I)` and
+`O(I^perp/I)`, so the subgroup contains `U_I` and maps onto `M`, hence is `P_I`.  Each of those
+premises is asserted below, at every plane.
 """
 
 from sage_extensions.all import *  # noqa: F401,F403
@@ -177,6 +194,121 @@ def _assert_the_cut_orbits(name, sizes) -> None:
         _family(name), character_subgroup=_gamma_en_2()
     )
     assert sorted(sum(1 for _ in orbit) for orbit in orbits) == sizes
+
+
+def _the_character(generator):
+    r"""The defining relation `rho_{L^-}(g) in H`, through the preimage's own morphism and target.
+
+    `H` is the target the construction retained, and `rho_{L^-}` is the morphism it is the
+    preimage along; nothing else is consulted, so this is the law read at its own two data.
+    """
+    gamma = _gamma_en_2()
+    return gamma.target_subgroup().is_parent_of(gamma.preimage_morphism()(generator))
+
+
+def _assert_every_generator_lies_by_the_character(name) -> None:
+    r"""Each generator's image under the defining morphism is admitted exactly when it carries the span."""
+    family = _family(name)
+    assert family
+    for generator in family:
+        assert _the_character(generator) == _carries_the_divided_span(generator)
+
+
+def _assert_the_family_generates_the_parabolic(name) -> None:
+    r"""The returned family generates `Stab_{O(T_{En})}(Pi)`, by the correspondence theorem.
+
+    `P_I -> M <= GL(I) x O(I^perp/I)` has kernel the unipotent radical `U_I`, and a subgroup of
+    `P_I` that contains `U_I` is `P_I` exactly when its image is `M` (Milne, *Group Theory*, v4.01
+    of 6 November 2025, Theorem 1.47, printed p. 22, with Corollary 1.48, p. 23).  Both premises
+    are computed here on this family, not on a family beside it:
+
+    * the family is the one the three factors are computed for -- the public call returns
+      `parabolic_stabilizer_generators()` and nothing else, and this asserts the two agree;
+    * its radical part is `U_I`: the family contains `unipotent_radical_generators()`, whose index
+      in `U_I` is 1, so the subgroup's intersection with `U_I` is all of `U_I`;
+    * its image is `M`: the plane actions of the members trivial on `I^perp/I` have index 1 in
+      `GL(I)` and the quotient images of the members fixing `I` pointwise have index 1 in
+      `O(I^perp/I)`, so the two subgroups generate the whole product, which contains `M` while
+      `M` contains the image.
+
+    No orbit count enters: transitivity on eight pairs is a proper subgroup's operation too.
+    """
+    plane = _type(name)
+    family = _family(name)
+    parabolic = plane.parabolic_stabilizer_generators()
+    assert all(member in family for member in parabolic)
+    assert all(member in parabolic for member in family)
+    for member in plane.unipotent_radical_generators():
+        assert member in family
+    assert plane.unipotent_radical_index() == 1
+    assert plane.levi_plane_action_index(trivial_on_quotient=True) == 1
+    assert plane.levi_quotient_image_index(trivial_on_plane=True) == 1
+    assert plane.is_parabolic_complete() is True
+
+
+def test_the_character_is_evaluated_on_a_generator_of_the_public_stabilizer() -> None:
+    r"""One generator of `setwise_stabilizer`'s family has its image under `rho_{L^-}` admitted.
+
+    This is the whole of the membership law at one point: the morphism the preimage was built
+    along, applied to the element the public call returns, and admitted into the target.  A
+    generator of the family at type `{2,4,5}` that carries the span is the specimen.
+    """
+    generator = next(
+        member
+        for member in _family("first")
+        if _carries_the_divided_span(member)
+    )
+    assert _the_character(generator) is True
+
+
+def test_the_character_decides_every_generator_at_the_first_type() -> None:
+    r"""Type `{2,4,5}`: every generator's image under `rho_{L^-}` is admitted exactly when it carries the span."""
+    _assert_every_generator_lies_by_the_character("first")
+
+
+def test_the_character_decides_every_generator_at_the_second_type() -> None:
+    r"""Type `{4,5}`: every generator's image under `rho_{L^-}` is admitted exactly when it carries the span."""
+    _assert_every_generator_lies_by_the_character("second")
+
+
+def test_the_character_decides_every_generator_at_the_third_type() -> None:
+    r"""Type `{3,5}`: every generator's image under `rho_{L^-}` is admitted exactly when it carries the span."""
+    _assert_every_generator_lies_by_the_character("third")
+
+
+def test_the_character_decides_every_generator_at_the_fourth_type() -> None:
+    r"""Type `{3,4}`: every generator's image under `rho_{L^-}` is admitted exactly when it carries the span."""
+    _assert_every_generator_lies_by_the_character("fourth")
+
+
+def test_the_character_decides_every_generator_at_the_fifth_type() -> None:
+    r"""Type `{5,5}`: every generator's image under `rho_{L^-}` is admitted exactly when it carries the span."""
+    _assert_every_generator_lies_by_the_character("fifth")
+
+
+def test_the_family_generates_the_parabolic_at_the_first_type() -> None:
+    r"""Type `{2,4,5}`: the returned family's radical part and image are `U_I` and `M`."""
+    _assert_the_family_generates_the_parabolic("first")
+
+
+def test_the_family_generates_the_parabolic_at_the_second_type() -> None:
+    r"""Type `{4,5}`: the returned family's radical part and image are `U_I` and `M`."""
+    _assert_the_family_generates_the_parabolic("second")
+
+
+def test_the_family_generates_the_parabolic_at_the_third_type() -> None:
+    r"""Type `{3,5}`: the returned family's radical part and image are `U_I` and `M`."""
+    _assert_the_family_generates_the_parabolic("third")
+
+
+def test_the_family_generates_the_parabolic_at_the_fourth_type() -> None:
+    r"""Type `{3,4}`: the returned family's radical part and image are `U_I` and `M`."""
+    _assert_the_family_generates_the_parabolic("fourth")
+
+
+def test_the_family_generates_the_parabolic_at_the_fifth_type() -> None:
+    r"""Type `{5,5}`: the returned family's radical part and image are `U_I` and `M`."""
+    _assert_the_family_generates_the_parabolic("fifth")
 
 
 def test_the_defining_relation_at_the_first_type() -> None:
