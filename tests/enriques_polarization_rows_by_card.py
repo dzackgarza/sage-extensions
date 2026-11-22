@@ -572,7 +572,13 @@ def _lattice_and_group(row: Row) -> tuple:
 
 def _outcome(row: Row, cap: int) -> dict:
     r"""One row's outcome: the card's value, the call's value, and which is which."""
-    outcome = {"id": row.identifier(), "card": row.card, "group": row.group}
+    outcome = {
+        "id": row.identifier(),
+        "card": row.card,
+        "group": row.group,
+        "quantity": row.quantity,
+        "degree": row.degree or None,
+    }
     try:
         expected = _expected(row)
         citation = _citation(row)
@@ -701,6 +707,109 @@ def _retain(outcomes, run_exit) -> str:
     return f"{path}"
 
 
+def _append_ledger(paths, outcomes, revision: str) -> None:
+    r"""Append one durable line per attempted row: card, dimension, what it returned, and when.
+
+    The ledger is the acceptance's raw record, so a line is written for *every*
+    attempt and none is edited afterwards: a row that raised carries the
+    exception's text in ``detail`` and ``returned`` is ``null``, a row that did not
+    return inside its cap carries the state it reached, and a row that improved on
+    a later revision is a second line rather than a replacement of the first.  The
+    dimension is the card's quantity and, for card ``0128``, the degree, so
+    coverage can be read per dimension rather than per family.
+    """
+    written = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+    for path in paths:
+        with open(path, "a", encoding="utf-8") as handle:
+            for outcome in outcomes:
+                handle.write(
+                    json.dumps(
+                        {
+                            "row": outcome["id"],
+                            "card": outcome["card"],
+                            "quantity": outcome.get("quantity"),
+                            "degree": outcome.get("degree"),
+                            "lattice": outcome.get("lattice"),
+                            "group": outcome.get("group"),
+                            "expected": outcome.get("expected"),
+                            "returned": outcome.get("computed"),
+                            "detail": outcome.get("detail"),
+                            "state": outcome["state"],
+                            "elapsed": outcome.get("elapsed"),
+                            "revision": revision,
+                            "measured_at": written,
+                        },
+                        ensure_ascii=False,
+                    )
+                    + "\n"
+                )
+
+
+def _revision() -> str:
+    r"""The revision these rows are measured at, as the library records its own source."""
+    from sage_extensions.timing import current_commit
+
+    return current_commit()
+
+
+def _latest_attempts(paths) -> dict:
+    r"""Each row's latest attempt over ``paths``, read in the order the lines were appended."""
+    latest = {}
+    for path in paths:
+        with open(path, encoding="utf-8") as handle:
+            for line in handle:
+                stripped = line.strip()
+                if not stripped:
+                    continue
+                attempt = json.loads(stripped)
+                latest[attempt["row"]] = attempt
+    return latest
+
+
+def _coverage(rows, latest) -> tuple:
+    r"""Which required rows the ledger holds a ``PASS`` for, and which it does not.
+
+    A required row is absent when the ledger holds no attempt for it at all, and it
+    is absent when its latest attempt is anything other than ``PASS`` -- a row that
+    raised, did not decide inside its cap, or was never reached is not an
+    agreement, so the aggregate comparison cannot be a pass that leaves it out.
+    """
+    decided, absent = [], []
+    for row in rows:
+        attempt = latest.get(row.identifier())
+        if attempt is None:
+            absent.append((row, "no attempt recorded"))
+        elif attempt["state"] != "PASS":
+            absent.append((row, f"the latest attempt is {attempt['state']}: {attempt.get('detail')}"))
+        else:
+            decided.append((row, attempt))
+    return decided, absent
+
+
+def _coverage_report(selected, decided, absent) -> None:
+    r"""Print coverage per dimension, then name every absent row with its reason."""
+    dimensions = {}
+    for row, _attempt in decided:
+        dimensions.setdefault(_dimension(row), [0, 0])[0] += 1
+    for row, _reason in absent:
+        dimensions.setdefault(_dimension(row), [0, 0])[1] += 1
+    _log("")
+    _log(f"COVERAGE over the {len(selected)} required rows of this selection")
+    for name in sorted(dimensions):
+        agreed, missing = dimensions[name]
+        _log(f"  {name}: {agreed} decided, {missing} absent")
+    _log(f"  decided {len(decided)}, absent {len(absent)}")
+    for row, reason in absent:
+        _log(f"  ABSENT {row.identifier()}: {reason}")
+
+
+def _dimension(row: Row) -> str:
+    r"""The dimension a row is counted in: its card and quantity, with the degree for ``0128``."""
+    if row.card == TABLE4_TAG:
+        return f"{row.card} {row.quantity} at 2d = {row.degree}"
+    return f"{row.card} {row.quantity}"
+
+
 def _log(message: str = "") -> None:
     print(message, flush=True)
 
@@ -752,6 +861,19 @@ def _parse(argv):
         default=int(os.environ.get("ENRIQUES_ROW_BUDGET", "0")),
         help="seconds for the whole run; 0 runs every selected row",
     )
+    parser.add_argument(
+        "--ledger",
+        default=None,
+        help="append every attempted row to each named JSONL ledger, comma separated",
+    )
+    parser.add_argument(
+        "--coverage",
+        default=None,
+        help=(
+            "comma-separated ledgers to check instead of computing: exit 1 and name "
+            "every required row whose latest attempt there is not a PASS"
+        ),
+    )
     return parser.parse_args(argv)
 
 
@@ -770,6 +892,8 @@ def main(argv=None) -> int:
         outcome = _outcome(matches[0], arguments.cap)
         status = _run_exit([outcome])
         _log(_OUTCOME_PREFIX + json.dumps(outcome))
+        if arguments.ledger:
+            _append_ledger(_split(arguments.ledger), [outcome], _revision())
         _log(f"record: {_retain([outcome], status)}")
         return status
 
@@ -783,6 +907,22 @@ def main(argv=None) -> int:
             f"tags {tags}, degrees {degrees}, quantities {quantities}"
         )
         return 2
+
+    if arguments.coverage:
+        ledgers = _split(arguments.coverage)
+        _log(f"coverage of {len(selected)} required rows against {', '.join(ledgers)}")
+        decided, absent = _coverage(selected, _latest_attempts(ledgers))
+        _coverage_report(selected, decided, absent)
+        if absent:
+            _log("")
+            _log(
+                f"{len(absent)} of the {len(selected)} required rows have no PASS in the "
+                f"ledger; the aggregate comparison is not a pass"
+            )
+            return 1
+        _log("")
+        _log(f"all {len(selected)} required rows have a PASS in the ledger")
+        return 0
 
     _log(f"rows: {len(rows)} known, {len(selected)} selected")
     provenance = card_provenance()
@@ -826,6 +966,8 @@ def main(argv=None) -> int:
     _log("")
     _log(f"{decided} of {len(outcomes)} rows agree with their cards")
     status = _run_exit(outcomes)
+    if arguments.ledger:
+        _append_ledger(_split(arguments.ledger), outcomes, _revision())
     _log(f"record: {_retain(outcomes, status)}")
     return status
 

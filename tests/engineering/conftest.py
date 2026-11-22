@@ -1084,3 +1084,26 @@ def runs_the_module(*arguments):
 
 
 builtins.runs_the_module = runs_the_module
+
+
+def ledger_holding(directory, attempts):
+    r"""Write ``attempts`` as the ledger at ``directory``, and return its path.
+
+    A ledger is the acceptance's raw record: one JSON line per attempted row, with
+    the row, its card, its dimension, the value the call returned or the exception
+    it raised, the state, the elapsed time and the revision.  A test asks the
+    aggregate what it makes of a ledger it wrote, so this writes one rather than
+    reading a run's -- the aggregate's rule is about the lines, not about a
+    particular evening's computation.
+    """
+    import json
+    from pathlib import Path
+
+    path = Path(directory) / "ledger.jsonl"
+    path.write_text(
+        "".join(json.dumps(attempt) + "\n" for attempt in attempts), encoding="utf-8"
+    )
+    return path.as_posix()
+
+
+builtins.ledger_holding = ledger_holding
