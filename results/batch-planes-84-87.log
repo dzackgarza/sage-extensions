@@ -1,0 +1,43 @@
+tree: 0efed8380e3d7400bba41b203114931820f58da4
+started: 2026-11-22T17:25:15Z
+
+$ --tags gamma-h-84,gamma-h-85,gamma-h-86,gamma-h-87 --rows planes --cap 900
+rows: 349 known, 4 selected
+cards: dzackgarza/lattice-database at its commit 23c0f9caff4d08b1f9795bba75f45cead4fc75df
+per-row cap 900 s, budget unbounded s
+
+ROW gamma-h-84:planes  [PASS]
+  lattice 029J: U + U(2) + E8(-2)   group Gamma_h,84
+  card: D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 2: case 84 with S = \{4,3\}, #I_1 = 256, #I_2 = 7242, #I_12 = 21471 — the numbers of orbits of isotropic lines, planes and flags in N.
+  expected 7242  call 7242   (150.7 s)
+
+ROW gamma-h-85:planes  [PASS]
+  lattice 029J: U + U(2) + E8(-2)   group Gamma_h,85
+  card: D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 2: case 85 with S = \{4,6\}, #I_1 = 292, #I_2 = 9246, #I_12 = 27411 — the numbers of orbits of isotropic lines, planes and flags in N.
+  expected 9246  call 9246   (156.6 s)
+
+ROW gamma-h-86:planes  [PASS]
+  lattice 029J: U + U(2) + E8(-2)   group Gamma_h,86
+  card: D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 2: case 86 with S = \{4\}, #I_1 = 392, #I_2 = 14926, #I_12 = 44387 — the numbers of orbits of isotropic lines, planes and flags in N.
+  expected 14926  call 14926   (170.3 s)
+
+ROW gamma-h-87:planes  [PASS]
+  lattice 029J: U + U(2) + E8(-2)   group Gamma_h,87
+  card: D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 2: case 87 with S = \emptyset, #I_1 = 528, #I_2 = 24242, #I_12 = 72199 — the numbers of orbits of isotropic lines, planes and flags in N.
+  expected 24242  call 24242   (217.8 s)
+
+SUMMARY
+  PASS: 4
+    gamma-h-84:planes
+    gamma-h-85:planes
+    gamma-h-86:planes
+    gamma-h-87:planes
+  FAIL: 0
+  MISSING: 0
+  UNDECIDED: 0
+  BROKEN: 0
+  NOT REACHED: 0
+
+4 of 4 rows agree with their cards
+record: /work/.timings/rows-0efed8380e3d-2064973.jsonl
+[exit 0 at 2026-11-22T17:37:39Z]
