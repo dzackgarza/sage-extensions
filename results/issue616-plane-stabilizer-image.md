@@ -184,6 +184,24 @@ are shown, the sub-direct-product question is not, and a family whose image agre
 with `M` in both projections can still be smaller than `M`. That question is what
 the `{3,4}` member is for.
 
+## 4b. Where the {3,4} plane stands, and why the five-plane count did not land
+
+(4.3.17) states the `{3,4}` member as `F = Z v + Z omega` with `v = e' + f' + bar
+alpha_8` and `omega = alpha_9 + alpha_12 + alpha_1 + alpha_3 + alpha_4 + alpha_5 +
+alpha_6 + alpha_7 + alpha_13`. The library's chamber for that cusp
+(`Sterk.cusp_roots_in_TEn("Sterk_3")`) has twelve walls, and the printed sum has nine
+terms, three of them carrying indices beyond that list. Searching the twelve walls for an
+isotropic vector orthogonal to `v` gives no nine-term unsigned sum, and 122 nine-term
+signed sums — so the printed labels are not the library's wall order and the coordinates
+cannot be recovered from the sum alone. What is missing is the two figures of (4.3.7) and
+(4.3.17) that label the nodes, which this machine does not have; a plane picked out of the
+122 by a criterion chosen after the fact would be a guessed specimen and is not used.
+
+The repair landed without them: it compares the family with the lift classes of the block
+equations, which needs no knowledge of the type. The five-plane count of Sterk's types
+needs the labelling, and the research page `cusps-over-sterk-cusps.md` that records the
+types with their multiplicities is not on this machine either.
+
 ## 5. Commands
 
 ```
