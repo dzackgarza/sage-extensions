@@ -3300,252 +3300,252 @@
   "path": "lattices/0128.md",
   "rows": {
    "10": {
-    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4, p. 17.",
+    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4.",
     "degree": 10,
     "group_classes": 3,
     "primitive_classes": 3,
     "url": "https://arxiv.org/abs/2302.01679"
    },
    "12": {
-    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4, p. 17.",
+    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4.",
     "degree": 12,
     "group_classes": 3,
     "primitive_classes": 4,
     "url": "https://arxiv.org/abs/2302.01679"
    },
    "14": {
-    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4, p. 17.",
+    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4.",
     "degree": 14,
     "group_classes": 3,
     "primitive_classes": 3,
     "url": "https://arxiv.org/abs/2302.01679"
    },
    "16": {
-    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4, p. 17.",
+    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4.",
     "degree": 16,
     "group_classes": 4,
     "primitive_classes": 4,
     "url": "https://arxiv.org/abs/2302.01679"
    },
    "18": {
-    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4, p. 17.",
+    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4.",
     "degree": 18,
     "group_classes": 4,
     "primitive_classes": 4,
     "url": "https://arxiv.org/abs/2302.01679"
    },
    "2": {
-    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4, p. 17.",
+    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4.",
     "degree": 2,
     "group_classes": 1,
     "primitive_classes": 1,
     "url": "https://arxiv.org/abs/2302.01679"
    },
    "20": {
-    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4, p. 17.",
+    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4.",
     "degree": 20,
     "group_classes": 4,
     "primitive_classes": 5,
     "url": "https://arxiv.org/abs/2302.01679"
    },
    "22": {
-    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4, p. 17.",
+    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4.",
     "degree": 22,
     "group_classes": 5,
     "primitive_classes": 5,
     "url": "https://arxiv.org/abs/2302.01679"
    },
    "24": {
-    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4, p. 17.",
+    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4.",
     "degree": 24,
     "group_classes": 4,
     "primitive_classes": 6,
     "url": "https://arxiv.org/abs/2302.01679"
    },
    "26": {
-    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4, p. 17.",
+    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4.",
     "degree": 26,
     "group_classes": 5,
     "primitive_classes": 5,
     "url": "https://arxiv.org/abs/2302.01679"
    },
    "28": {
-    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4, p. 17.",
+    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4.",
     "degree": 28,
     "group_classes": 6,
     "primitive_classes": 8,
     "url": "https://arxiv.org/abs/2302.01679"
    },
    "30": {
-    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4, p. 17.",
+    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4.",
     "degree": 30,
     "group_classes": 5,
     "primitive_classes": 7,
     "url": "https://arxiv.org/abs/2302.01679"
    },
    "32": {
-    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4, p. 17.",
+    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4.",
     "degree": 32,
     "group_classes": 6,
     "primitive_classes": 6,
     "url": "https://arxiv.org/abs/2302.01679"
    },
    "34": {
-    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4, p. 17.",
+    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4.",
     "degree": 34,
     "group_classes": 8,
     "primitive_classes": 8,
     "url": "https://arxiv.org/abs/2302.01679"
    },
    "36": {
-    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4, p. 17.",
+    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4.",
     "degree": 36,
     "group_classes": 6,
     "primitive_classes": 8,
     "url": "https://arxiv.org/abs/2302.01679"
    },
    "38": {
-    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4, p. 17.",
+    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4.",
     "degree": 38,
     "group_classes": 7,
     "primitive_classes": 7,
     "url": "https://arxiv.org/abs/2302.01679"
    },
    "4": {
-    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4, p. 17.",
+    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4.",
     "degree": 4,
     "group_classes": 2,
     "primitive_classes": 2,
     "url": "https://arxiv.org/abs/2302.01679"
    },
    "40": {
-    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4, p. 17.",
+    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4.",
     "degree": 40,
     "group_classes": 7,
     "primitive_classes": 10,
     "url": "https://arxiv.org/abs/2302.01679"
    },
    "42": {
-    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4, p. 17.",
+    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4.",
     "degree": 42,
     "group_classes": 7,
     "primitive_classes": 10,
     "url": "https://arxiv.org/abs/2302.01679"
    },
    "44": {
-    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4, p. 17.",
+    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4.",
     "degree": 44,
     "group_classes": 7,
     "primitive_classes": 10,
     "url": "https://arxiv.org/abs/2302.01679"
    },
    "46": {
-    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4, p. 17.",
+    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4.",
     "degree": 46,
     "group_classes": 10,
     "primitive_classes": 11,
     "url": "https://arxiv.org/abs/2302.01679"
    },
    "48": {
-    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4, p. 17.",
+    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4.",
     "degree": 48,
     "group_classes": 7,
     "primitive_classes": 11,
     "url": "https://arxiv.org/abs/2302.01679"
    },
    "50": {
-    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4, p. 17.",
+    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4.",
     "degree": 50,
     "group_classes": 9,
     "primitive_classes": 9,
     "url": "https://arxiv.org/abs/2302.01679"
    },
    "52": {
-    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4, p. 17.",
+    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4.",
     "degree": 52,
     "group_classes": 10,
     "primitive_classes": 14,
     "url": "https://arxiv.org/abs/2302.01679"
    },
    "54": {
-    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4, p. 17.",
+    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4.",
     "degree": 54,
     "group_classes": 11,
     "primitive_classes": 11,
     "url": "https://arxiv.org/abs/2302.01679"
    },
    "56": {
-    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4, p. 17.",
+    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4.",
     "degree": 56,
     "group_classes": 8,
     "primitive_classes": 12,
     "url": "https://arxiv.org/abs/2302.01679"
    },
    "58": {
-    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4, p. 17.",
+    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4.",
     "degree": 58,
     "group_classes": 12,
     "primitive_classes": 14,
     "url": "https://arxiv.org/abs/2302.01679"
    },
    "6": {
-    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4, p. 17.",
+    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4.",
     "degree": 6,
     "group_classes": 2,
     "primitive_classes": 2,
     "url": "https://arxiv.org/abs/2302.01679"
    },
    "60": {
-    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4, p. 17.",
+    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4.",
     "degree": 60,
     "group_classes": 9,
     "primitive_classes": 16,
     "url": "https://arxiv.org/abs/2302.01679"
    },
    "62": {
-    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4, p. 17.",
+    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4.",
     "degree": 62,
     "group_classes": 11,
     "primitive_classes": 13,
     "url": "https://arxiv.org/abs/2302.01679"
    },
    "64": {
-    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4, p. 17.",
+    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4.",
     "degree": 64,
     "group_classes": 14,
     "primitive_classes": 15,
     "url": "https://arxiv.org/abs/2302.01679"
    },
    "66": {
-    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4, p. 17.",
+    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4.",
     "degree": 66,
     "group_classes": 11,
     "primitive_classes": 16,
     "url": "https://arxiv.org/abs/2302.01679"
    },
    "68": {
-    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4, p. 17.",
+    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4.",
     "degree": 68,
     "group_classes": 11,
     "primitive_classes": 16,
     "url": "https://arxiv.org/abs/2302.01679"
    },
    "70": {
-    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4, p. 17.",
+    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4.",
     "degree": 70,
     "group_classes": 12,
     "primitive_classes": 18,
     "url": "https://arxiv.org/abs/2302.01679"
    },
    "72": {
-    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4, p. 17.",
+    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4.",
     "degree": 72,
     "group_classes": 10,
     "primitive_classes": 16,
     "url": "https://arxiv.org/abs/2302.01679"
    },
    "8": {
-    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4, p. 17.",
+    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4.",
     "degree": 8,
     "group_classes": 2,
     "primitive_classes": 2,

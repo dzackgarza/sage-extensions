@@ -68,13 +68,26 @@ group the row names:
   Section 2, the paragraph introducing (3).  The square-$2d$ shell of $W$ carries,
   besides those, the classes $c \cdot w$ of every content $c > 1$ with
   $c^2 \mid 2d$ and $w$ primitive of square $2d/c^2$; an isometry preserves
-  content, so they are $O(W)$-classes of their own and none of them is a
-  numerical polarization in the source's sense;
+  content, so they are $O(W)$-classes of their own.  They are numerical
+  polarizations in the source's sense and the source disregards them: comparing
+  its list with [CDGK, Appendix], "the list of [CDGK, Appendix] also contains
+  nonprimitive numerical polarizations, which we disregard in our approach since
+  they do not lead to new moduli spaces" (Section 3.5).  Table 4 counts the
+  primitive classes, so this row does too.
 * ``#Γ̄_h``: the number of distinct line/plane/flag triples the call returns over
   the ``#h`` classes.  A triple of orbit counts is an invariant of the group, so
   the computed number is at most the card's; a degree where it is smaller says the
   three counts did not separate that degree's classes, and which of the two values
   is right there is decided by proof, as the issue's acceptance requires.
+
+**The `#h` rows are the guard that keeps this reading.**  Dropping the stratum is a
+one-argument change in this file, and nothing else in the repository fails when it is
+made: `tests/lattices/test_the_enriques_polarization_degrees_by_card.py` is a
+library-level test -- it imports only the session and calls `NamedLattices.E10.Aut()`
+itself -- so it cannot see this module's row and is not this guard.  The guard is the
+scheduled `0128:#h` row: every degree of the card is in `_rows()`, the row fails when
+the stratum is dropped (`#h: expected 2, call 3` at degree 8), and the image job
+`enriques-polarization-rows` runs it.
 
 **A row that does not decide is not a pass.**  Each row runs in a child process of
 its own, so a row that hangs or that grows past the machine's memory is reported as
@@ -511,9 +524,9 @@ def _computed_table4_row(row: Row) -> int:
     introducing (3), fixes the primitivity of ``h``, and Section 3.4 states Table 4's
     first line as the number of orbits of primitive vectors in a given degree.  The
     square-``2d`` shell also carries the classes ``c * w`` of every content ``c > 1``
-    with ``c^2 | 2d``, which no isometry can carry onto a primitive vector, so
-    reading the shell without that stratum counts vectors that are not numerical
-    polarizations of the source's sense.
+    with ``c^2 | 2d``, which no isometry can carry onto a primitive vector: they are
+    the nonprimitive numerical polarizations the source lists and disregards
+    (Section 3.5), and Table 4 does not count them.
     """
     orthogonal = Enriques()
     classes = orthogonal.unimodular.Aut().vector_orbit_representatives(
