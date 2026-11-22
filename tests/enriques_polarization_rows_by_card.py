@@ -731,7 +731,7 @@ def main(argv=None) -> int:
             return 2
         outcome = _outcome(matches[0], arguments.cap)
         _log(_OUTCOME_PREFIX + json.dumps(outcome))
-        return 0
+        return 0 if outcome["state"] == "PASS" else 1
 
     tags = _split(arguments.tags)
     degrees = tuple(int(degree) for degree in _split(arguments.degrees))
