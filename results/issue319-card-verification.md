@@ -279,3 +279,21 @@ at 10.78 s rather than eleven near the ceiling.
   gone: the file keeps the decode and the card pinning that the comparison rests
   on (`6 passed in 1.05s`), and the rows themselves are compared by the image
   job.
+
+## Correction, 2026-11-22 (sage-extensions#621)
+
+The section *The defect this round repaired: `#h` is the primitive stratum* names
+`tests/lattices/test_the_enriques_polarization_degrees_by_card.py` as "the guard that
+keeps the reading", and says a reader that drops `content=1` fails that test.  It
+does not: the file imports only the session and calls `NamedLattices.E10.Aut()`
+itself, so it asserts the mathematics of the row and never reaches the module.
+Measured at `be381be3`, where the row is red (`#h: expected 2, call 3` at degree 8),
+that file is green: `3 passed in 14.64s`, `5.01s call
+test_the_degree_eight_row_counts_the_primitive_class_alone`.  And the reading was in
+fact dropped: `5befdf9`, which replaced the module the next round, reads
+`vector_orbit_representatives(row.degree)` without the stratum, and #621 was filed
+against the resulting counts.  The argument is restored at its call site, the
+condition is stated in the module's documentation of the row, and the evidence is
+`results/issue621-the-primitive-stratum.md`.  No other reading in the module changed
+in `5befdf9`: the `lines`, `planes` and `flags` calls are the ones this section
+records.
