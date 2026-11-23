@@ -174,3 +174,17 @@ Body:
 > search and rescale the witness (the gcd of a Gram's entries is invariant under
 > an integral change of basis, so isometric forms have equal content and the
 > solution set is unchanged); a pair of unequal contents is not isometric.
+
+## Extended measurement, 2026-11-23
+
+Four further runs of the same row carried the instrumented search at the same
+revision: `162` each, in 182.9, 187.8, 221.1 and 182.0 s, and each entered
+`_definite_isometry_matrix` four times on rank-8 Grams whose largest entry is 6
+bits. No run raised and no input was dumped. The row has now been run twelve
+times at `5265775`: one `BROKEN` (the batch's 163.3 s) and eleven `PASS`.
+
+The size at which the search would refuse was therefore never reached in a
+decided run, which bounds the inference above rather than confirming it: the
+failing run took a path these twelve runs did not, and only capturing that run's
+Gram would show which input it was. The measured defect — the same function
+refusing a public isometry call whose Gram is large — is unaffected by this.
