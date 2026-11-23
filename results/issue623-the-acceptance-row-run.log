@@ -1,0 +1,13 @@
+SESSION FROM /repo/src/sage_extensions/__init__.py
+LOADED /repo/tests/lattices/test_the_plane_stabilizer_has_its_reversing_half.sage in 0.3s
+INFO:sage_extensions.timing:parabolic completeness decision
+PASS test_the_stabilizer_has_its_reversing_half_at_the_fifth_type (19.6s)
+INFO:sage_extensions.timing:parabolic completeness decision
+PASS test_the_stabilizer_has_its_reversing_half_at_the_first_type (11.6s)
+INFO:sage_extensions.timing:parabolic completeness decision
+PASS test_the_stabilizer_has_its_reversing_half_at_the_fourth_type (46.4s)
+INFO:sage_extensions.timing:parabolic completeness decision
+PASS test_the_stabilizer_has_its_reversing_half_at_the_second_type (51.0s)
+INFO:sage_extensions.timing:parabolic completeness decision
+PASS test_the_stabilizer_has_its_reversing_half_at_the_third_type (25.6s)
+SUMMARY 5 tests, 0 failures

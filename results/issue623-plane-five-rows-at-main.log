@@ -1,0 +1,20 @@
+CLONE HEAD: 1b20f7168cff36c882fbd016496609cc5aebc9d8
+SESSION FROM /repo/src/sage_extensions/__init__.py
+gamma_en_2 built in 2.8s rss=435MiB
+INFO:sage_extensions.timing:parabolic completeness decision
+PLANE first: family=121 lattice_det={1: 57, -1: 64} plane_actions=10 plane_action_det={1: 9, -1: 1} levi_index_trivial_on_quotient=1 parabolic=123 t_plane=0.0s t_family=3.8s t_act=0.1s t_index=0.0s rss=450MiB
+INFO:sage_extensions.timing:parabolic completeness decision
+PLANE second: family=121 lattice_det={1: 57, -1: 64} plane_actions=15 plane_action_det={1: 14, -1: 1} levi_index_trivial_on_quotient=1 parabolic=123 t_plane=0.0s t_family=3.6s t_act=0.1s t_index=0.0s rss=459MiB
+INFO:sage_extensions.timing:parabolic completeness decision
+PLANE third: family=121 lattice_det={1: 57, -1: 64} plane_actions=11 plane_action_det={1: 10, -1: 1} levi_index_trivial_on_quotient=1 parabolic=124 t_plane=0.0s t_family=3.5s t_act=0.1s t_index=0.0s rss=470MiB
+INFO:sage_extensions.timing:parabolic completeness decision
+PLANE fourth: family=120 lattice_det={1: 56, -1: 64} plane_actions=18 plane_action_det={1: 17, -1: 1} levi_index_trivial_on_quotient=1 parabolic=122 t_plane=0.0s t_family=3.8s t_act=0.1s t_index=0.0s rss=479MiB
+INFO:sage_extensions.timing:parabolic completeness decision
+PLANE fifth: family=120 lattice_det={1: 56, -1: 64} plane_actions=12 plane_action_det={1: 11, -1: 1} levi_index_trivial_on_quotient=1 parabolic=121 t_plane=0.0s t_family=3.8s t_act=0.1s t_index=0.0s rss=490MiB
+ORBITS first: sizes=[8] count=1 t=7.4s rss=497MiB
+ORBITS second: sizes=[8] count=1 t=45.6s rss=534MiB
+ORBITS third: sizes=[2, 6] count=2 t=21.4s rss=534MiB
+ORBITS fourth: sizes=[8] count=1 t=42.3s rss=545MiB
+ORBITS fifth: sizes=[2, 6] count=2 t=12.9s rss=545MiB
+DONE
+exit=0
