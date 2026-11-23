@@ -7,7 +7,9 @@ integral isometries of determinant `-1`, their plane actions are integral unimod
 `2 x 2` matrices of determinant `-1`, and the `Gamma_{En,2}` cut leaves `1, 1, 2, 1, 2`
 orbits of sizes `[8], [8], [2,6], [8], [2,6]`. The new acceptance file
 `tests/lattices/test_the_plane_stabilizer_has_its_reversing_half.sage` runs all five
-in 155.6 s, 0 failures (`15` = 5 tests, order as printed).
+in 154.2 s of test time, 5 tests, 0 failures (the log is
+`results/issue623-the-acceptance-row-run.log`; an earlier run of the same file took
+155.6 s with the per-test times shifted by under a second).
 
 **The rows were already green before the repair, and this file is not the repair's red
 test.** The same probe was run at `19903dc` (the commit the repair `1b20f71` sits on) and
@@ -63,11 +65,11 @@ plane, each asserting three things on that plane:
 ```
 SESSION FROM /repo/src/sage_extensions/__init__.py
 LOADED /repo/tests/lattices/test_the_plane_stabilizer_has_its_reversing_half.sage in 0.3s
-PASS test_the_stabilizer_has_its_reversing_half_at_the_fifth_type (20.0s)
-PASS test_the_stabilizer_has_its_reversing_half_at_the_first_type (11.9s)
-PASS test_the_stabilizer_has_its_reversing_half_at_the_fourth_type (47.1s)
-PASS test_the_stabilizer_has_its_reversing_half_at_the_second_type (51.2s)
-PASS test_the_stabilizer_has_its_reversing_half_at_the_third_type (25.4s)
+PASS test_the_stabilizer_has_its_reversing_half_at_the_fifth_type (19.6s)
+PASS test_the_stabilizer_has_its_reversing_half_at_the_first_type (11.6s)
+PASS test_the_stabilizer_has_its_reversing_half_at_the_fourth_type (46.4s)
+PASS test_the_stabilizer_has_its_reversing_half_at_the_second_type (51.0s)
+PASS test_the_stabilizer_has_its_reversing_half_at_the_third_type (25.6s)
 SUMMARY 5 tests, 0 failures
 ```
 
