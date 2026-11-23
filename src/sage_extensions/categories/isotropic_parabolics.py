@@ -414,36 +414,64 @@ def _matrix_key(entry):
     return tuple(int(value) for value in entry.list())
 
 
+def _unimodular_inverse(entry):
+    r"""Return the inverse of a `2 \times 2` integer matrix of determinant `\pm 1`.
+
+    `\operatorname{adj}(E) E = \det(E) 1`, so the adjugate is the inverse
+    exactly when the determinant is `1`; a reversing element has determinant
+    `-1`, and its inverse is `-\operatorname{adj}(E)`.  A comparison of cosets
+    may not drop that sign: `-1` lies in the congruence subgroup only at level
+    at most two, and every level occurs below.
+    """
+    determinant = int(entry.determinant())
+    if abs(determinant) != 1:
+        raise ValueError(
+            f"no inverse is read for {entry}: it has determinant {determinant}, "
+            f"and only a matrix of determinant +-1 is invertible over ZZ"
+        )
+    return determinant * entry.adjugate()
+
+
 def right_coset_action(generators, in_subgroup, *, start=None, accept=None):
-    r"""Return the action of ``generators`` on the cosets of `H` by right multiplication.
+    r"""Return the action of ``generators`` on the right cosets of `H` by right multiplication.
 
     `H = \{x : \text{in\_subgroup}(x)\}` is a subgroup of `\mathrm{GL}_2(\ZZ)`
     given by its membership predicate, and the walk multiplies **on the
-    right**: every representative it reaches is a word
-    `\text{start} \cdot g_{i_1} \cdots g_{i_k}`, and its tables are the
-    permutation representation of the generators on the cosets reached.  A
-    candidate `x` is identified with the representative `y` it is first found
-    to satisfy `\operatorname{adj}(y) x \in H` with.
+    right**: every coset it reaches is named by a word
+    `\text{start} \cdot g_{i_1} \cdots g_{i_k}`.  The right cosets of `H` are
+    the sets `Hx = \{h x\}`, so `Hx = Hy` exactly when `x y^{-1} \in H`, and
+    that is the comparison this walk makes, with the inverse of `y` taken
+    exactly (:func:`_unimodular_inverse`).  Two other comparisons are
+    different partitions of the same group, and neither is what a right action
+    enumerates: `y^{-1} x \in H` compares left cosets `xH = yH`, and
+    `\operatorname{adj}(y) x \in H` compares or reverses neither, because
+    `\operatorname{adj}(y) = \det(y) y^{-1}` differs from `y^{-1}` by a sign
+    at every reversing element.
 
-    This is the walk the determinant-reversing half of the plane projection is
-    enumerated by
+    This is the one walk the plane stabilizer's completeness rests on
     (:meth:`...PrimitiveIsotropicSubobjects.ParentMethods._levi_plane_action_presentation`):
-    it starts at `\mathrm{diag}(-1,1)` and accepts the first representative
-    whose plane action has an integral lift with trivial class action
-    (:meth:`...plane_block_lift`), because liftability is constant on the
-    class the walk enumerates.  It is public so that a finite specimen of that
-    comparison can be run and asserted without a lattice.
+    the special-linear half of the projection `\Gamma'` is its action on the
+    right cosets of `H = \Gamma' \cap SL_2(\ZZ)`, and the
+    determinant-reversing half is its action started at `\mathrm{diag}(-1,1)`,
+    whose terminal word has determinant `-1`.  It is public so that a finite
+    specimen of that comparison can be run and asserted without a lattice.
 
     ``start`` is the element the walk begins at, the identity by default.
     ``accept`` is an optional callback for a caller that stops at the first
     acceptable representative: it is called with every representative as the
     walk discovers it, beginning with ``start``, and once it answers something
-    other than ``None`` the walk stops and returns that answer.
+    other than ``None`` the walk stops and returns that answer.  Liftability of
+    a plane action is constant on the right cosets of `H`, since
+    `x y^{-1} \in H` transports the lift of `x` to one of `y`, so the reversing
+    search decides one representative per coset and takes
+    :meth:`...plane_block_lift` as its ``accept``.
 
     Returns ``(representatives, tables, found)``.  ``tables[j][i]`` is the
-    position of the coset of ``representatives[i] * generators[j]``; ``found``
-    is ``None`` unless ``accept`` answered, and ``tables`` is ``None`` when the
-    walk stopped at an answer before it finished.
+    position of the coset of ``representatives[i] * generators[j]``, so the
+    tables are the permutation representation of the generators on the cosets
+    the walk reached; ``found`` is ``None`` unless ``accept`` answered, and
+    ``tables`` is ``None`` when the walk stopped at an answer before it
+    finished.
     """
     from collections import deque
 
@@ -462,7 +490,7 @@ def right_coset_action(generators, in_subgroup, *, start=None, accept=None):
                 (
                     index
                     for index, representative in enumerate(representatives)
-                    if in_subgroup(representative.adjugate() * candidate)
+                    if in_subgroup(candidate * _unimodular_inverse(representative))
                 ),
                 None,
             )
@@ -4639,24 +4667,34 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             .. math:: \Gamma' = \{Q_1 : Q_1 \text{ has an integral lift with } Q_3=1\}.
 
             This is a congruence subgroup of `GL_2(ZZ)` by
-            :meth:`_levi_plane_congruence_level`.  The special-linear part is
-            enumerated by an *ordinary transitive right-coset action*.  Starting
-            with the identity coset, the two elementary shears generate every
-            right coset of `H=\Gamma'\cap SL_2(ZZ)`.  Candidates are identified
-            by testing `xy^{-1}` in `H`; this is an exact integral lift test, not
-            a bounded word search and not an enumeration of unimodular sequences.
-            Sage's `ArithmeticSubgroup_Permutation` then reconstructs `H` from
-            that permutation action and returns its generators.
+            :meth:`_levi_plane_congruence_level`.  Both determinant halves are
+            the same walk, :func:`right_coset_action`, and the walk's
+            comparison is `xy^{-1}\in H`: it multiplies on the right, so the
+            classes it enumerates are the right cosets `Hx`, and no left coset
+            and no adjugate stands in for the inverse.  The special-linear part
+            is the action of the two elementary shears on the right cosets of
+            `H=\Gamma'\cap SL_2(ZZ)`.  Starting with the identity coset the
+            shears reach every right coset, because they generate `SL_2(ZZ)` and
+            `SL_2(ZZ)\to SL_2(ZZ/\text{level})` is onto.  Candidates are
+            identified by an exact integral lift test
+            (:meth:`_levi_plane_residue_lift`), not by a bounded word search and
+            not by an enumeration of unimodular sequences.  Sage's
+            `ArithmeticSubgroup_Permutation` then reconstructs `H` from that
+            permutation action and returns its generators.
 
             For determinant `-1`, write every action as `diag(-1,1)S` with
-            `S\in SL_2(ZZ)`.  The same direct action enumerates the right
-            `H`-orbits.  Liftability is constant on such an orbit, so its
-            representatives decide whether a reversing element exists.  One
-            reversing lift, if present, together with `H` gives all of
-            `\Gamma'`; otherwise `\Gamma'=H`.
+            `S\in SL_2(ZZ)`.  The same walk started at `diag(-1,1)` enumerates
+            the right cosets of `H` in the reversing half.  Both elements of a
+            comparison there have determinant `-1`, so the inverse it uses is
+            `-\operatorname{adj}` (:func:`_unimodular_inverse`); the order of
+            the product and that sign are the whole difference between this
+            partition and the left-coset one, which
+            `tests/lattices/test_the_plane_projection_walks_its_right_cosets.sage`
+            separates on a finite specimen.  Liftability is constant on such a
+            right coset, so one representative per coset decides whether a
+            reversing lift exists.  One reversing lift, if present, together
+            with `H` gives all of `\Gamma'`; otherwise `\Gamma'=H`.
             """
-            from collections import deque
-
             from sage.modular.arithgroup.arithgroup_perm import (
                 ArithmeticSubgroup_Permutation,
             )
@@ -4683,28 +4721,9 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
                     f"the identity plane action has no integral lift at {self}, although "
                     f"the identity of the lattice is such a lift"
                 )
-            representatives = [identity]
-            queue = deque([0])
-            tables = ({}, {})
-            while queue:
-                source = queue.popleft()
-                for position, shear in enumerate(shears):
-                    candidate = representatives[source] * shear
-                    target = next(
-                        (
-                            index
-                            for index, representative in enumerate(representatives)
-                            if is_in_special_projection(
-                                candidate * representative.adjugate()
-                            )
-                        ),
-                        None,
-                    )
-                    if target is None:
-                        target = len(representatives)
-                        representatives.append(candidate)
-                        queue.append(target)
-                    tables[position][source] = target
+            representatives, tables, _ = right_coset_action(
+                shears, is_in_special_projection, start=identity
+            )
             permutations = tuple(
                 [table[index] + 1 for index in range(len(representatives))]
                 for table in tables
