@@ -3365,6 +3365,19 @@ def _definite_isometry_matrix(domain_gram, codomain_gram, sign):
 
     The search depends only on the two immutable Gram matrices, so it is run
     once per pair for every lattice object carrying them.
+
+    Both Grams are divided by their scalar content before the search.  An
+    integral change of basis preserves that content: every entry of
+    ``W~ G W`` is an integral combination of the entries of ``G``, and ``W``
+    is unimodular, so each content divides the other, and isometric forms
+    have equal content.  Unequal contents therefore decide non-isometry.  For
+    equal nonzero content ``c`` the equation
+    ``W~ (codomain/c) W == domain/c`` is ``W~ codomain W == domain`` over
+    ``ZZ``, so the witness of the normalized pair is already the witness of
+    the supplied pair, on the supplied bases.  The division is what lets the
+    search run at all: PARI's ``qfisom`` converts its arguments to machine
+    integers (``t_INT-->long``), so a Gram with a large minimal vector has no
+    decided isometry until its content is removed.
     """
     from sage.quadratic_forms.quadratic_form import QuadraticForm
 
@@ -3388,8 +3401,21 @@ def _definite_isometry_matrix(domain_gram, codomain_gram, sign):
     # W~ target W == source.
     from sage.libs.pari import pari
 
-    source_pari = pari(2 * sign * domain_gram)
-    target_pari = pari(2 * sign * codomain_gram)
+    # A primitive pair has the same isometries as the pair it came from, and
+    # it is the pair PARI can hold.  Equal content is necessary for
+    # isometry, so the unequal case is decided here without a search.
+    content = domain_gram.gcd()
+    if content != codomain_gram.gcd():
+        return False
+    if content == 0:
+        # The zero form is its own content, so it has no primitive form.
+        source_form = domain_gram
+        target_form = codomain_gram
+    else:
+        source_form = (domain_gram / content).change_ring(SageZZ)
+        target_form = (codomain_gram / content).change_ring(SageZZ)
+    source_pari = pari(2 * sign * source_form)
+    target_pari = pari(2 * sign * target_form)
     source_transformation = source_pari.qflllgram()
     target_transformation = target_pari.qflllgram()
     reduced_source = (source_transformation.mattranspose() * source_pari * source_transformation).sage()
