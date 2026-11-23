@@ -147,6 +147,7 @@ from sage_extensions.categories.isotropic_orbits import (  # noqa: F401
 from sage_extensions.categories.isotropic_parabolics import (  # noqa: F401
     LeviQuotientLiftAbsent,
     PrimitiveIsotropicSubobjects,
+    right_coset_action,
 )
 from sage_extensions.lattice_database import (  # noqa: F401
     card_arithmetic_group,

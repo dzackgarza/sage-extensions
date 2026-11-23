@@ -414,6 +414,69 @@ def _matrix_key(entry):
     return tuple(int(value) for value in entry.list())
 
 
+def right_coset_action(generators, in_subgroup, *, start=None, accept=None):
+    r"""Return the action of ``generators`` on the cosets of `H` by right multiplication.
+
+    `H = \{x : \text{in\_subgroup}(x)\}` is a subgroup of `\mathrm{GL}_2(\ZZ)`
+    given by its membership predicate, and the walk multiplies **on the
+    right**: every representative it reaches is a word
+    `\text{start} \cdot g_{i_1} \cdots g_{i_k}`, and its tables are the
+    permutation representation of the generators on the cosets reached.  A
+    candidate `x` is identified with the representative `y` it is first found
+    to satisfy `\operatorname{adj}(y) x \in H` with.
+
+    This is the walk the determinant-reversing half of the plane projection is
+    enumerated by
+    (:meth:`...PrimitiveIsotropicSubobjects.ParentMethods._levi_plane_action_presentation`):
+    it starts at `\mathrm{diag}(-1,1)` and accepts the first representative
+    whose plane action has an integral lift with trivial class action
+    (:meth:`...plane_block_lift`), because liftability is constant on the
+    class the walk enumerates.  It is public so that a finite specimen of that
+    comparison can be run and asserted without a lattice.
+
+    ``start`` is the element the walk begins at, the identity by default.
+    ``accept`` is an optional callback for a caller that stops at the first
+    acceptable representative: it is called with every representative as the
+    walk discovers it, beginning with ``start``, and once it answers something
+    other than ``None`` the walk stops and returns that answer.
+
+    Returns ``(representatives, tables, found)``.  ``tables[j][i]`` is the
+    position of the coset of ``representatives[i] * generators[j]``; ``found``
+    is ``None`` unless ``accept`` answered, and ``tables`` is ``None`` when the
+    walk stopped at an answer before it finished.
+    """
+    from collections import deque
+
+    identity = matrix(SageZZ, [[1, 0], [0, 1]])
+    representatives = [identity if start is None else start]
+    tables = [{} for _ in generators]
+    found = None if accept is None else accept(representatives[0])
+    if found is not None:
+        return tuple(representatives), None, found
+    frontier = deque([0])
+    while frontier:
+        source = frontier.popleft()
+        for position, generator in enumerate(generators):
+            candidate = representatives[source] * generator
+            target = next(
+                (
+                    index
+                    for index, representative in enumerate(representatives)
+                    if in_subgroup(representative.adjugate() * candidate)
+                ),
+                None,
+            )
+            if target is None:
+                target = len(representatives)
+                representatives.append(candidate)
+                found = None if accept is None else accept(candidate)
+                if found is not None:
+                    return tuple(representatives), None, found
+                frontier.append(target)
+            tables[position][source] = target
+    return tuple(representatives), tuple(tables), found
+
+
 def _word_witness(generators, target, bound=_PLANE_ACTION_WITNESS_BOUND):
     r"""Return a tuple of ``generators`` whose product is ``target``, or ``None``.
 
@@ -4649,35 +4712,13 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             special = ArithmeticSubgroup_Permutation(
                 L=permutations[0], R=permutations[1]
             )
-
-            reversing = matrix(SageZZ, [[-1, 0], [0, 1]])
-            reversing_lift = self.plane_block_lift(reversing)
-            if reversing_lift is not None:
-                return special, reversing_lift
-            representatives = [reversing]
-            queue = deque([0])
-            while queue:
-                source = queue.popleft()
-                for shear in shears:
-                    candidate = representatives[source] * shear
-                    target = next(
-                        (
-                            index
-                            for index, representative in enumerate(representatives)
-                            if is_in_special_projection(
-                                representative.adjugate() * candidate
-                            )
-                        ),
-                        None,
-                    )
-                    if target is not None:
-                        continue
-                    reversing_lift = self.plane_block_lift(candidate)
-                    if reversing_lift is not None:
-                        return special, reversing_lift
-                    representatives.append(candidate)
-                    queue.append(len(representatives) - 1)
-            return special, None
+            _, _, reversing_lift = right_coset_action(
+                shears,
+                is_in_special_projection,
+                start=matrix(SageZZ, [[-1, 0], [0, 1]]),
+                accept=self.plane_block_lift,
+            )
+            return special, reversing_lift
 
         @cached_method
         def levi_plane_action_projection_index(self) -> int:
@@ -5604,7 +5645,7 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             )
 
 
-__all__ = ["PrimitiveIsotropicSubobjects"]
+__all__ = ["PrimitiveIsotropicSubobjects", "right_coset_action"]
 
 # ---------------------------------------------------------------------------
 # The parabolic subgroup of an isotropic plane, by its published block form.
