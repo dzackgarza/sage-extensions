@@ -43,24 +43,26 @@ def test_the_complement_swap_does_not_extend_across_the_gluing() -> None:
     r"""$k_4 \leftrightarrow k_5$ is an isometry of the quadratic space, and not of $L$.
 
     In the integral basis $(w, k_1, k_2, k_3, k_4, k_5, f)$ the form has
-    $q(w) = q(k_i) = 2$, $q(f) = 0$, $b(w, f) = 1$, $b(w, k_i) = 2$ for
-    $i \le 4$, $b(w, k_5) = 0$ and $b(k_i, k_j) = 4\delta_{ij}$, so $L$ is even
+    $q(w) = q(k_i) = 2$, $q(f) = 0$, $b(w, f) = 1$, $b(w, k_i) = 1$ for
+    $i \le 4$, $b(w, k_5) = 0$ and $b(k_i, k_j) = 2\delta_{ij}$, so $L$ is even
     integral with $\det L = -32$; its basis is
     $e = 2w - k_1 - k_2 - k_3 - k_4$, $f$, and $K = \langle k_1, \dots, k_5\rangle$,
     and $e$ is primitive with $b(e, f) = 2$, hence of divisor two in $L$.  The
     complement of $\langle e, f\rangle$ is exactly $K$: it contains $K$ and both
-    have rank five, and $b(e, f) = 2 \ne 0$ makes the two constraints independent.
+    have rank five, and the two pairing constraints with $e$ and with $f$ are
+    independent in this basis (their coefficient rows are $b(e, \cdot)$ and
+    $b(f, \cdot)$), so nothing outside $K$ is orthogonal to the plane.
     """
     from fractions import Fraction
 
     gram = _gram(
         [
-            (4, 2, 2, 2, 2, 0, 1),
-            (2, 4, 0, 0, 0, 0, 0),
-            (2, 0, 4, 0, 0, 0, 0),
-            (2, 0, 0, 4, 0, 0, 0),
-            (2, 0, 0, 0, 4, 0, 0),
-            (0, 0, 0, 0, 0, 4, 0),
+            (2, 1, 1, 1, 1, 0, 1),
+            (1, 2, 0, 0, 0, 0, 0),
+            (1, 0, 2, 0, 0, 0, 0),
+            (1, 0, 0, 2, 0, 0, 0),
+            (1, 0, 0, 0, 2, 0, 0),
+            (0, 0, 0, 0, 0, 2, 0),
             (1, 0, 0, 0, 0, 0, 0),
         ]
     )
@@ -121,7 +123,7 @@ def test_the_complement_swap_does_not_extend_across_the_gluing() -> None:
     # O(q_K) (the unit vectors and the characteristic vector are the classes of
     # q-value 1/2, so every q-isometry is a permutation).  Surjectivity on the
     # complement therefore holds, and the swap still does not extend.
-    assert pairing(k4, k4) == pairing(k5, k5) == 4
+    assert pairing(k4, k4) == pairing(k5, k5) == 2
     assert pairing(k4, k5) == 0
 
 
