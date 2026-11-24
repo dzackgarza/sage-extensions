@@ -1766,7 +1766,7 @@ class OrthogonalCharacterQuotient:
             # size is the index in the exact ambient stabilizer image. A lower
             # bound equal to the target certifies index one. Otherwise this
             # test makes no claim about the index; keep the exact route.
-            if general_image_certificate(self, representative) != 1:
+            if general_image_certificate(self, representative) is None:
                 return None
         discriminant_class = lattice.divided_discriminant_class(vector)
         zero_class = lattice.discriminant_group().zero()
@@ -4189,7 +4189,7 @@ def _split_signature_witness(lattice, vector):
 
 
 def general_image_certificate(quotient, representative):
-    r"""Return ``1`` when the line's datum fibre has one ``ker rho``-orbit, else ``None``.
+    r"""Return the datum orbit (with its integral transporters) when the fibre has one ``ker rho``-orbit, else ``None``.
 
     Let ``G = O(L)``, ``H = Stab_G(x)`` for a primitive isotropic line ``x``,
     ``N = ker rho`` and ``D = {c, -c}`` with ``c = [v/div v]`` for a
@@ -4228,6 +4228,16 @@ def general_image_certificate(quotient, representative):
     For a sign-only quotient there is no discriminant factor at all, the datum
     is trivial and its stabilizer is the whole retained sign image, which is
     what the second branch computes from the sign patterns.
+
+    When the two orders agree the index is one, and the call returns the datum
+    orbit itself as a tuple of ``(datum, transporter)`` pairs: ``datum`` is the
+    divided-class set of one ``ker rho``-orbit, ``transporter`` an actual
+    integral isometry of ``L`` carrying the representative's line onto a line of
+    that datum, and the first pair is the representative with the identity.  The
+    orbit is walked breadth-first over an exactly chosen generating subfamily of
+    the ambient discriminant images, each kept beside the integral generator
+    producing it, so it is exhaustive and no edge rebuilds a section or a
+    ``rho`` image.
 
     ``None`` is the other answer, and it is not a guess: the family's image is
     then a proper subgroup of the datum's stabilizer, or the family is too short
@@ -4287,7 +4297,17 @@ def general_image_certificate(quotient, representative):
                 f"{stabilizer_order}, which is not a multiple of the ambient sign image's "
                 f"order {target}; the stabilizer's image must lie in it"
             )
-        return None if target != stabilizer_order else 1
+        if target != stabilizer_order:
+            return None
+        # No discriminant factor means the datum is a single point of the
+        # retained image: its orbit is itself, transported by the identity.
+        datum = libgap.Set(
+            [
+                quotient._discriminant_group._engine_abelian_element(divided_class)
+                for divided_class in _isotropic_divided_class_set(lattice, representative)
+            ]
+        )
+        return ((datum, quotient.supergroup.one()),)
 
     finite_orthogonal = quotient._discriminant_group
     terms = (representative,)
@@ -4322,8 +4342,60 @@ def general_image_certificate(quotient, representative):
             f"multiple of the order {stabilizer_order} of the stabilizer's discriminant image; "
             "the stabilizer's image must lie in the datum's stabilizer"
         )
-    index = target // stabilizer_order
-    return None if index != 1 else 1
+    if target != stabilizer_order:
+        return None
+    # The fibre index is one, so the `ker rho`-orbits inside this `O(L)`-orbit are
+    # in bijection with the points of the datum orbit under `im rho` -- and every
+    # point of that orbit is reached by an actual integral isometry, not by a
+    # reconstructed vector: the walk below composes the ambient generators that
+    # `rho` is evaluated on, whose images are `ambient_discriminant_images()` in
+    # the same order as `_ambient_generators()`.
+    #
+    # The finite image generates as a monoid, so a generating subfamily suffices
+    # and the breadth-first walk over it is exhaustive.  The subfamily is chosen
+    # by exact membership in the subgroup accumulated so far (``libgap.IN``), and
+    # the integral generator producing each kept image is retained beside it; no
+    # image is rebuilt, and `rho` is not evaluated again on any of them.
+    ambient_images = quotient.ambient_discriminant_images()
+    ambient_order = int(libgap.Size(im_rho))
+    kept_images, kept_isometries = [], []
+    accumulated = None
+    for image, isometry in zip(ambient_images, _ambient, strict=True):
+        if accumulated is not None and bool(libgap.IN(image, accumulated)):
+            continue
+        kept_images.append(image)
+        kept_isometries.append(isometry)
+        accumulated = libgap.Subgroup(engine, kept_images)
+        if int(libgap.Size(accumulated)) == ambient_order:
+            break
+    if accumulated is None or int(libgap.Size(accumulated)) != ambient_order:
+        raise ArithmeticError(
+            f"the discriminant images of the ambient generators of {lattice!r} do not "
+            f"generate the retained image of order {ambient_order}; the datum orbit cannot be "
+            "walked from them"
+        )
+    identity = quotient.supergroup.one()
+    # ``data[0]`` is this line's own divided-class set, already in the engine
+    # model the generators act on: the start of the walk is that datum and the
+    # identity isometry.
+    walk = [(data[0], identity)]
+    reached = {str(walk[0][0]): 0}
+    frontier = [0]
+    while frontier:
+        position = frontier.pop()
+        current, transporter = walk[position]
+        for image, isometry in zip(kept_images, kept_isometries, strict=True):
+            moved = termwise_action(current, image)
+            key = str(moved)
+            if key in reached:
+                continue
+            # The one-step transport of the datum is the ambient generator itself,
+            # composed after the path that reached its predecessor, so every point
+            # of the orbit carries an actual integral isometry onto it.
+            reached[key] = len(walk)
+            walk.append((moved, lattice.compose(isometry, transporter)))
+            frontier.append(len(walk) - 1)
+    return tuple(walk)
 
 
 def _line_orbit_from_divided_classes(subgroup, representative):
@@ -4362,99 +4434,32 @@ def _line_orbit_from_divided_classes(subgroup, representative):
     divisor = lattice.div(vector)
     if divisor <= lattice.base_ring().zero():
         return None
-    image_of_group = subgroup.supergroup().discriminant_image()
-    image_of_stabilizer = representative.stabilizer_discriminant_image()
-    order = image_of_group.cardinality().finite_value()
-    stabilizer_order = image_of_stabilizer.cardinality().finite_value()
-    if order % stabilizer_order:
-        raise ArithmeticError(
-            f"the discriminant image of the stabilizer of {representative!r} has order "
-            f"{stabilizer_order}, which does not divide the order {order} of the image of "
-            f"{subgroup.supergroup()}; the stabilizer's image must lie in the group's image"
-        )
-    # The datum of an unoriented line is the *set* ``{c, -c}``, not the signed
-    # class ``c``: an element of the line's stabilizer may carry ``v`` to ``-v``
-    # and so ``c`` to ``-c``, and then ``rho(H)`` is not a subgroup of the
-    # signed class's stabilizer.  ``stabilizer_discriminant_image`` is the image
-    # of the line's setwise stabilizer, so the index below is the setwise one
-    # for every divisor.
-    class_of = lattice.divided_discriminant_class
-    signed_class = class_of(vector)
-    # The class orbit in the order the walk reaches it, so the representatives this
-    # function returns are the same tuple on every call: a set's iteration order is
-    # not a datum a comparison against a recorded list can be made against.
-    seen = {signed_class}
-    class_orbit = [signed_class]
-    frontier = [signed_class]
-    while frontier:
-        current = frontier.pop()
-        for generator in image_of_group.group_generators():
-            moved = generator(current)
-            if moved not in seen:
-                seen.add(moved)
-                class_orbit.append(moved)
-                frontier.append(moved)
-    if order % len(class_orbit):
-        raise ArithmeticError(
-            f"the class orbit of {representative!r} has {len(class_orbit)} elements, which does "
-            f"not divide the order {order} of the discriminant image of {subgroup.supergroup()}"
-        )
-    signed_stabilizer_order = order // len(class_orbit)
-    # If c differs from -c and -c occurs in the signed orbit, the map
-    # c' -> {c', -c'} is two-to-one on that orbit. Otherwise it is one-to-one.
-    # Thus the setwise stabilizer has twice the signed stabilizer's order
-    # exactly in the first case.
-    if signed_class == -signed_class:
-        set_stabilizer_order = signed_stabilizer_order
-    elif -signed_class in seen:
-        set_stabilizer_order = 2 * signed_stabilizer_order
-    else:
-        set_stabilizer_order = signed_stabilizer_order
-    if set_stabilizer_order % stabilizer_order:
-        raise ArithmeticError(
-            f"the setwise datum stabilizer of {representative!r} has order "
-            f"{set_stabilizer_order}, which is not a multiple of the order "
-            f"{stabilizer_order} of the line stabilizer's discriminant image"
-        )
-    if set_stabilizer_order != stabilizer_order:
-        return None
-    # One signed class per unordered pair, in the order the walk reaches them.
-    classes = []
-    used = set()
-    for component in class_orbit:
-        if component in used or -component in used:
-            continue
-        used.add(component)
-        used.add(-component)
-        classes.append(component)
-    # One construction for the whole orbit: the residue loop asks for the orbit's
-    # classes together, so it fixes their residues in one pass over the translations
-    # instead of one search per class (which would rebuild the search 527 times on
-    # ``T_Co``, where the class orbit is the 527 nonzero isotropic classes).
-    vectors = lattice.isotropic_lines_by_divided_class(divisor, classes=tuple(classes))
-    missing = tuple(component for component in classes if component not in vectors)
-    if missing:
-        raise ValueError(
-            f"the divided classes of the line orbit of {representative!r} in {lattice!r} are not "
-            f"all realized at divisor {divisor}: {len(missing)} of the {len(classes)} classes "
-            f"have no primitive isotropic vector there, the first being {missing[0]}.  The "
-            f"divided-class route supplies one representative per class or none, so this refuses "
-            f"rather than returning a short family"
-        )
-    # A divided class names a vector up to the discriminant action, not up to
-    # the integral orbit: the constructed line is admitted only when the
-    # ambient group itself exhibits an isometry from the chosen representative
-    # onto it.  Otherwise the classes are not representatives of this orbit and
-    # the caller keeps its exact route.
-    ambient = subgroup.supergroup()
-    representatives = tuple(
-        lattice.primitive_isotropic_subobject(vectors[component])
-        for component in classes
+    walk = general_image_certificate(
+        subgroup.finite_character_quotient(), representative
     )
-    for line in representatives:
-        if ambient.isotropic_equivalence_witness(representative, line) is None:
-            return None
-    return representatives
+    if walk is None:
+        return None
+    # Each point of the datum orbit carries an actual integral isometry of ``L``
+    # onto it, built by the walk out of the ambient generators.  The line is that
+    # isometry's image of the representative -- no divided-class search and no
+    # general isometry search reconstructs it, and the same isometry is the
+    # transporter the caller registers for the pair.
+    inclusion = representative.inclusion()
+    source = tuple(
+        inclusion(representative.module_generator(label)) for label in labels
+    )
+    orbit = []
+    for datum, transporter in walk:
+        images = tuple(transporter(vector) for vector in source)
+        line = lattice.primitive_isotropic_subobject(*images)
+        if lattice.divided_discriminant_class(images[0]) not in datum:
+            raise ArithmeticError(
+                f"the transporter carried {representative!r} to a line whose divided class is "
+                f"not in the datum it was walked to: the datum orbit and the integral orbit "
+                "disagree"
+            )
+        orbit.append(line)
+    return tuple(orbit)
 
 
 def _plane_orbit_from_odd_stabilizer(subgroup, representative):

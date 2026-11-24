@@ -190,3 +190,58 @@ the new and corrected regressions.
 ### Independent native-image verification (2026-11-24)
 
 The returned revision `f5590c255a05` was tested in the pinned Sage 11.0.beta5 image, using the actual `just test` entry point with the repository source checkout on PYTHONPATH. The three new production tests (scaled odd specimen, its complete image, and glued swap) and five existing affected tests passed. The two independent arithmetic tests had setup lint errors, so that run was not accepted. The correction uses the doubled integral matrix in the gluing check and verifies the four exact binary column masks. Quadratic preservation on a basis and preservation of the six pairings imply preservation on the whole binary space; nondegeneracy of the pairing implies invertibility. The two generators are checked as commuting involutions and their four products exhaust the computed set. Both corrected independent tests passed (2 passed in 59.74 s; 0.21 s and 10.85 s test-call times). The existing small-lattice stable-line consumer also passed in the second invocation. Time gates were disabled during diagnosis; this is correctness evidence, not a performance certification. The full Coble consumer run had not returned when this record was written.
+
+## Third round: the certificate returns the walk, and the consumer transports
+
+`general_image_certificate` certified the fibre index but returned `1`, and
+`_line_orbit_from_divided_classes` then rebuilt the orbit's lines by searching
+`isotropic_lines_by_divided_class` and admitting them with
+`isotropic_equivalence_witness` — a divided-class search and a general isometry
+search per line, neither of which is a transporter.
+
+The certificate now returns the walk itself.  After the two orders agree it
+chooses an exactly generating subfamily of the ambient discriminant images by
+membership in the subgroup accumulated so far (`libgap.IN`), keeping beside each
+kept image the integral generator that produces it
+(`ambient_discriminant_images()` and `_ambient_generators()` index the same
+family, so no `rho` is evaluated again and no section is rebuilt per edge), and
+walks the datum orbit breadth-first over that subfamily.  A finite image
+generates as a monoid, so the walk is exhaustive; every new datum is reached by
+the one-step image of its predecessor and is stored with its actual integral
+transporter, `isometry ∘ transporter` — the ambient generator composed after the
+path.  The first pair is the representative with the identity.  `None` remains
+the undecided answer, unchanged.
+
+`_line_orbit_from_divided_classes` now reads that walk and returns the actual
+images `transporter(representative)`; it no longer searches for vectors or for
+isometries, and it refuses (`ArithmeticError`) if a transporter's image of the
+representative has a divided class outside the datum it was walked to.  Its
+index bookkeeping is gone with it: the certificate is that computation, once.
+
+The sign-only branch returns the single-point orbit `(datum, identity)`, so the
+return type is uniform; the stable-only path still needs no sign witness, and the
+joint-character saturation checks in `isotropic_line_stabilizer_image` are
+untouched.
+
+### What ran, and what did not
+
+Run: `py_compile` on `orthogonal_quotients.py`, `ast.parse` on the updated
+regression file, `libgap.IN` semantics checked directly in this VM's Sage
+(`h in S` true/false as expected, `Size(Subgroup(...))` = 4 on `S_4`).
+
+**Not run:** every Sage path that imports `sage_extensions`.  `sage -c "import
+sage_extensions.all"` on this VM fails with `ModuleNotFoundError: sageparse`, and
+there is no pinned image in this container.  So the walk, the subfamily choice
+and the unchanged Coble consumer (`test_the_stable_line_orbit_row_*`,
+`test_a_line_row_says_which_proof_stopped_the_split`) are **not** verified here,
+and the full row is **not claimed**.  Profile and run on Core2 with:
+
+```
+cd /repo && /opt/sage/bin/sage -t \
+  tests/lattices/test_line_stabilizer_image_requires_eichlers_hypothesis.sage \
+  tests/lattices/test_the_line_stabilizer_image_certificate_is_divisor_independent.sage \
+  tests/lattices/test_the_line_stabilizer_image_certificate_runs_on_the_scaled_odd_specimen.sage \
+  tests/lattices/test_a_line_row_says_which_proof_stopped_the_split.sage \
+  tests/lattices/test_the_stable_line_orbit_row_returns_on_the_coble_lattice.sage \
+  tests/lattices/test_the_stable_line_orbit_row_comes_from_the_exact_finite_image.sage
+```

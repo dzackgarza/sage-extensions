@@ -73,9 +73,31 @@ def test_the_scaled_odd_specimen_certificate_answers_one() -> None:
     lattice, labels, vector, line = _scaled_odd_specimen()
     assert lattice.div(vector) == 2, "the specimen's line must have divisor two"
     stable = lattice.stable_orthogonal_group()
-    assert general_image_certificate(stable.finite_character_quotient(), line) == 1
+    walk = general_image_certificate(stable.finite_character_quotient(), line)
+    assert walk is not None, "the divisor-two line's datum fibre must be certified"
+    assert walk[0][1] == stable.supergroup().one(), "the walk starts at the representative"
+    label = line.module_generating_set()[0]
+    source = line.inclusion()(line.module_generator(label))
+    classes = set()
+    for datum, transporter in walk:
+        moved = transporter(source)
+        assert moved.q() == lattice.base_ring().zero(), "a transported image must be isotropic"
+        assert moved.is_primitive(), "a transported image must be primitive"
+        assert lattice.div(moved) == 2, "a transported image keeps the line's divisor"
+        # The pair's datum records which ``ker rho``-orbit the edge serves; the
+        # line is the transporter's actual image, and its own unoriented datum is
+        # the set of the walk's points it lands in.
+        assert datum is not None
+        c = lattice.divided_discriminant_class(moved)
+        classes.add(frozenset({c, -c}))
+    assert len(classes) == len(walk), (
+        "the walk's edges must carry the representative to pairwise distinct lines"
+    )
+    assert len(walk) == len(general_image_certificate(stable.finite_character_quotient(), line)), (
+        "the walk is a function of the line, not of the call"
+    )
     joint = stable.intersection(lattice.O_plus())
-    assert general_image_certificate(joint.finite_character_quotient(), line) == 1
+    assert general_image_certificate(joint.finite_character_quotient(), line) is not None
 
 
 def test_the_scaled_odd_specimens_image_is_the_four_enumerated_matrices() -> None:
