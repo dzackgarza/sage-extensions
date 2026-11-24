@@ -1756,8 +1756,8 @@ class OrthogonalCharacterQuotient:
         # discriminant action is not that index: it is surjective on its own
         # discriminant group for the divisor-2 line of an even glued overlattice
         # whose complement isometries still do not extend integrally, so the
-        # complement's surjectivity neither implies nor is implied by the index
-        # being one.  Both halves are computed, never asserted; a failure of
+        # complement's surjectivity alone does not justify the index-one
+        # assertion.  Both halves are computed, never asserted; a failure of
         # either returns ``None`` and the caller keeps its exact integral route.
         if not lattice.eichler_criterion_applies():
             if _split_signature_witness(lattice, vector) is None:
@@ -4210,8 +4210,9 @@ def general_image_certificate(quotient, representative):
     ``H`` may interchange ``v`` with ``-v``, so the signed class ``c`` alone is
     the wrong datum for an unoriented line.  A caller that works with a signed
     primitive vector throughout and fixes its orientation uses ``c`` instead;
-    that index is this one divided by the sign ``H`` realises, so the two
-    conventions are not interchangeable and this call is the line's own.
+    then uses the vector stabilizer in place of the line stabilizer. Both
+    numerator and denominator must be changed; the two conventions are not
+    interchangeable and this call is the line's own.
 
     Both groups are computed, never assumed.  The right-hand group is the
     setwise stabilizer of ``D(x)`` inside ``im rho`` -- the image of the
@@ -4334,17 +4335,17 @@ def _line_orbit_from_divided_classes(subgroup, representative):
     and equal to the kernel of ``rho``, the double cosets ``Gamma \\ G / H`` correspond
     bijectively to the cosets ``rho(G)/rho(H)`` -- orbit--stabilizer for the action of the
     quotient ``G/ker rho``, which acts through ``rho`` -- and the map ``Gamma g x |-> rho(g) c``
-    sends an orbit to its class, with fibre over ``c`` of size
-    ``[Stab_(rho(G))(c) : rho(H)]`` for an *oriented* line.  An unoriented line's datum is
+    sends an orbit of a *signed vector* to its class, with fibre over ``c``
+    of size ``[Stab_(rho(G))(c) : rho(Stab_G(v))]``.  An unoriented line's datum is
     the set ``{c, -c}``, because its stabilizer may carry ``v`` to ``-v``; the index computed
     below is the setwise one, ``[Stab_(rho(G))({c, -c}) : rho(H)]``, with ``rho(H)`` from
     :meth:`stabilizer_discriminant_image` and never from a signed-class stabilizer.
 
     When that index is 1 -- computed here from the two exact images, not assumed -- the
-    ``Gamma``-orbits in ``G x`` are in bijection with the classes of ``rho(G) c``, and a
-    representative of each orbit is *any* primitive isotropic line with that divided class, so
-    no isometry is needed: the lines come from
-    ``Lattices.ParentMethods.primitive_isotropic_vector_of_divided_class``.  An index greater
+    ``Gamma``-orbits in ``G x`` are in bijection with the orbit of the unordered
+    datum ``{c, -c}``. A representative must be in the specified ambient orbit;
+    constructing a line with the same datum in a different ambient orbit is
+    not sufficient. The exact witness check below enforces that condition.  An index greater
     than one is a case of the mathematics, not a fallback: the caller keeps the explicit
     isometry route, which is how the case of several isometries per class is handled.
 
@@ -4400,9 +4401,10 @@ def _line_orbit_from_divided_classes(subgroup, representative):
             f"not divide the order {order} of the discriminant image of {subgroup.supergroup()}"
         )
     signed_stabilizer_order = order // len(class_orbit)
-    # The set ``{c, -c}``'s orbit is the signed orbit when the walk meets ``-c``
-    # (and always when ``c = -c``), and twice it otherwise; the setwise
-    # stabilizer is twice the signed one exactly in the first nontrivial case.
+    # If c differs from -c and -c occurs in the signed orbit, the map
+    # c' -> {c', -c'} is two-to-one on that orbit. Otherwise it is one-to-one.
+    # Thus the setwise stabilizer has twice the signed stabilizer's order
+    # exactly in the first case.
     if signed_class == -signed_class:
         set_stabilizer_order = signed_stabilizer_order
     elif -signed_class in seen:

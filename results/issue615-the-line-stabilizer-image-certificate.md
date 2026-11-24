@@ -21,7 +21,7 @@ same `N`-orbit. Nothing about a plane's complement enters.
 
 The datum for an *unoriented* line is the set `{c, -c}` (one element when `c = -c`),
 because `H` may interchange `v` and `-v`; a signed primitive vector fixed in
-orientation uses `c` and gets the same index divided by the sign `H` realises.
+orientation uses `c` and the vector stabilizer. Both groups in the index must be changed.
 
 `general_image_certificate(quotient, representative)` returns `1` exactly when the
 right-hand group -- the setwise stabilizer of `D(x)` inside `im rho`, the retained
@@ -126,9 +126,8 @@ not have.
 `_line_orbit_from_divided_classes` treated the *signed* class `c` as the datum
 and divided orders by floor division.  The line's datum is the set `{c, -c}` —
 its stabilizer may carry `v` to `-v` — so the setwise index is now computed
-from the signed class orbit the walk already performs (the set orbit is the
-signed one when the walk meets `-c`, twice it otherwise, and the setwise
-stabilizer order is twice the signed one exactly in the first nontrivial case),
+from the signed class orbit the walk already performs (the set orbit has half the signed orbit size if `c != -c` and the walk meets `-c`, and the same size otherwise; the setwise
+stabilizer order is twice the signed one exactly in the first case),
 with `rho(H)` from `stabilizer_discriminant_image`, the ambient setwise owner.
 Its representatives are now admitted only when the ambient group exhibits an
 isometry from the chosen representative onto each constructed line.
@@ -185,3 +184,7 @@ cd /repo && /opt/sage/bin/sage -t \
 
 The last four are the affected consumers and must stay green; the first two are
 the new and corrected regressions.
+
+### Independent native-image verification (2026-11-24)
+
+The returned revision `f5590c255a05` was tested in the pinned Sage 11.0.beta5 image, using the actual `just test` entry point with the repository source checkout on PYTHONPATH. The three new production tests (scaled odd specimen, its complete image, and glued swap) and five existing affected tests passed. The two independent arithmetic tests had setup lint errors, so that run was not accepted. The correction uses the doubled integral matrix in the gluing check and verifies the four exact binary column masks. Quadratic preservation on a basis and preservation of the six pairings imply preservation on the whole binary space; nondegeneracy of the pairing implies invertibility. The two generators are checked as commuting involutions and their four products exhaust the computed set. Both corrected independent tests passed (2 passed in 59.74 s; 0.21 s and 10.85 s test-call times). The existing small-lattice stable-line consumer also passed in the second invocation. Time gates were disabled during diagnosis; this is correctness evidence, not a performance certification. The full Coble consumer run had not returned when this record was written.

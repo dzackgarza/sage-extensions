@@ -53,8 +53,6 @@ def test_the_complement_swap_does_not_extend_across_the_gluing() -> None:
     independent in this basis (their coefficient rows are $b(e, \cdot)$ and
     $b(f, \cdot)$), so nothing outside $K$ is orthogonal to the plane.
     """
-    from fractions import Fraction
-
     gram = _gram(
         [
             (2, 1, 1, 1, 1, 0, 1),
@@ -66,11 +64,11 @@ def test_the_complement_swap_does_not_extend_across_the_gluing() -> None:
             (1, 0, 0, 0, 0, 0, 0),
         ]
     )
-    rank = len(gram)
+    rank = 7  # The displayed basis (w, k1, ..., k5, f).
 
     def pairing(left, right):
         return sum(
-            Fraction(left[i]) * gram[i][j] * Fraction(right[j])
+            left[i] * gram[i][j] * right[j]
             for i in range(rank)
             for j in range(rank)
         )
@@ -89,35 +87,33 @@ def test_the_complement_swap_does_not_extend_across_the_gluing() -> None:
     # sigma: the identity on the Q-span of e and f, and the swap k_4 <-> k_5.
     # Its matrix in the integral basis is integral everywhere except at w, where
     # sigma(w) = w + (k_5 - k_4)/2 has coordinate -1/2 at k_4.
-    identity = [[1 if i == j else 0 for j in range(rank)] for i in range(rank)]
-    sigma = [[Fraction(entry) for entry in row] for row in identity]
-    sigma[4][4] = Fraction(0)
-    sigma[4][5] = Fraction(1)
-    sigma[5][5] = Fraction(0)
-    sigma[5][4] = Fraction(1)
-    sigma[4][0] = Fraction(-1, 2)
-    sigma[5][0] = Fraction(1, 2)
-    # It fixes e and f, so the plane is fixed pointwise.
-    image_of_e = tuple(
-        sum(sigma[i][j] * Fraction(e[j]) for j in range(rank)) for i in range(rank)
+    # Work with twice the rational matrix, an exact integer matrix.
+    # The equalities below therefore use no rational-engine operation.
+    twice_sigma = [[2 if i == j else 0 for j in range(rank)] for i in range(rank)]
+    twice_sigma[4][4] = 0
+    twice_sigma[4][5] = 2
+    twice_sigma[5][5] = 0
+    twice_sigma[5][4] = 2
+    twice_sigma[4][0] = -1
+    twice_sigma[5][0] = 1
+    twice_image_of_e = tuple(
+        sum(twice_sigma[i][j] * e[j] for j in range(rank)) for i in range(rank)
     )
-    image_of_f = tuple(
-        sum(sigma[i][j] * Fraction(f[j]) for j in range(rank)) for i in range(rank)
+    twice_image_of_f = tuple(
+        sum(twice_sigma[i][j] * f[j] for j in range(rank)) for i in range(rank)
     )
-    assert image_of_e == tuple(Fraction(entry) for entry in e)
-    assert image_of_f == tuple(Fraction(entry) for entry in f)
-    assert any(
-        sigma[i][j].denominator != 1 for i in range(rank) for j in range(rank)
-    ), "a swap that is integral in this basis would preserve L, so it would not obstruct"
-    # And it is an isometry of L tensor Q: S^t G S = G.
+    assert twice_image_of_e == tuple(2 * entry for entry in e)
+    assert twice_image_of_f == tuple(2 * entry for entry in f)
+    assert twice_sigma[4][0] == -1  # sigma(w) has a half-integral coefficient.
+    # (2S)^t G (2S) = 4G is exactly the rational Gram identity S^t G S = G.
     for left in range(rank):
         for right in range(rank):
             value = sum(
-                sigma[i][left] * gram[i][j] * sigma[j][right]
+                twice_sigma[i][left] * gram[i][j] * twice_sigma[j][right]
                 for i in range(rank)
                 for j in range(rank)
             )
-            assert value == gram[left][right]
+            assert value == 4 * gram[left][right]
     # Its restriction to K swaps two orthogonal basis vectors of equal norm, so
     # it is an isometry of K, and K's signed permutations realize the whole of
     # O(q_K) (the unit vectors and the characteristic vector are the classes of
@@ -168,16 +164,19 @@ def test_the_positive_divisor_two_image_is_the_four_enumerated_matrices() -> Non
             sum(matrix[j][i] * vector[j] for j in range(4)) % 2 for i in range(4)
         )
 
+    def pairing(left, right):
+        return sum(left[i] * gram_b[i][j] * right[j]
+                   for i in range(4) for j in range(4))
+
     def preserves(matrix):
-        return all(
-            quadratic(image(matrix, vector)) % 4 == quadratic(vector) % 4
-            for vector in (
-                (a, b, c, d)
-                for a in (0, 1)
-                for b in (0, 1)
-                for c in (0, 1)
-                for d in (0, 1)
-            )
+        # Quadratic preservation on all binary vectors follows from
+        # the four squares mod 4 and the six pairings mod 2.
+        # The pairing matrix modulo 2 is nondegenerate, so a matrix
+        # satisfying these constraints is automatically invertible.
+        return all(quadratic(matrix[i]) % 4 == gram_b[i][i] % 4
+                   for i in range(4)) and all(
+            pairing(matrix[i], matrix[j]) % 2 == gram_b[i][j] % 2
+            for i in range(4) for j in range(i+1, 4)
         )
 
     e = (1, 0, 0, 0)
@@ -194,23 +193,25 @@ def test_the_positive_divisor_two_image_is_the_four_enumerated_matrices() -> Non
                 matrix = (e, second, third, fourth)
                 if preserves(matrix):
                     found.append(matrix)
-    assert len(found) == 4, f"the class stabilizer of [e/2] has {len(found)} binary isometries"
+    # Column masks of the independently enumerated four-element group.
+    def mask(column):
+        return sum(entry * 2**index for index, entry in enumerate(column))
+
+    assert {tuple(mask(column) for column in matrix) for matrix in found} == {
+        (1, 2, 4, 8), (1, 2, 8, 4), (1, 15, 5, 9), (1, 15, 9, 5)
+    }
     found_set = {matrix for matrix in found}
     for matrix in found:
         assert image(matrix, e) == e, "every one of them fixes the divided class of e"
     assert swap in found_set
     assert transvection in found_set
     assert swap != transvection
-    # The group they generate is the whole of the four, so the two integral
-    # elements' reductions generate the enumerated image.
-    generated = {swap, transvection}
-    frontier = [swap, transvection]
-    while frontier:
-        current = frontier.pop()
-        for generator in (swap, transvection):
-            # compose as matrices: (current * generator) sends e_j to current(gen(e_j))
-            product = tuple(image(current, generator[column]) for column in range(4))
-            if product not in generated:
-                generated.add(product)
-                frontier.append(product)
-    assert generated == found_set
+    # The two displayed reductions are commuting involutions. Their four
+    # products give the whole independently enumerated stabilizer.
+    identity = tuple(tuple(int(i == j) for i in range(4)) for j in range(4))
+    def product(left, right):
+        return tuple(image(left, column) for column in right)
+    assert product(swap, swap) == identity
+    assert product(transvection, transvection) == identity
+    assert product(swap, transvection) == product(transvection, swap)
+    assert {identity, swap, transvection, product(swap, transvection)} == found_set
