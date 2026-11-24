@@ -10,9 +10,9 @@ Let `G = O(L)`, `H = Stab_G(x)` for a primitive isotropic line `x`, `N = ker rho
 `c = [v/div v]` for a generator `v` of `x`. `N` is normal in `G`, so the `N`-orbits
 inside the single `G`-orbit `Gx` are the double cosets `N \ G / H`, and the
 orbit--stabilizer theorem for the action of `G/N = im rho` identifies those with
-`im rho / rho(H)`. The datum map `N g x |-> rho(g) c` has fibre over `c` of size
+`im rho / rho(H)`. The datum map `N g x |-> rho(g) D`, with `D = {c, -c}`, has fibre over `D` of size
 
-    [Stab_{im rho}(c) : rho(H)].
+    [Stab_{im rho}(D) : rho(H)].
 
 Proof of the fibre statement: if `rho(g') = rho(g) rho(h)` with `h` in `H` then
 `g' = n g h` for `n = g'(gh)^{-1}`, which lies in `ker rho = N` because
@@ -23,14 +23,16 @@ The datum for an *unoriented* line is the set `{c, -c}` (one element when `c = -
 because `H` may interchange `v` and `-v`; a signed primitive vector fixed in
 orientation uses `c` and the vector stabilizer. Both groups in the index must be changed.
 
-`general_image_certificate(quotient, representative)` returns `1` exactly when the
-right-hand group -- the setwise stabilizer of `D(x)` inside `im rho`, the retained
-image of the quotient's own subgroup, never `O(A_L)` -- has the order of the image
-of the subgroup's exhibited stabilizer family. `None` is the other answer: the
-image is then a proper subgroup (or the family is too short to decide), the index
-is not one, and the caller keeps the exact integral route, which is the actual
-integral orbit classification including the nontrivial split. It is never decided
-by a complement's action being surjective.
+`general_image_certificate(quotient, representative)` returns `1` if the
+image of the exhibited ambient line-stabilizer family has the order of the
+setwise stabilizer of `D(x)` inside the actual ambient `im rho` (not the
+selected subgroup's image or all of `O(A_L)`). Containment follows from
+equivariance, so equality of orders proves equality of groups. If the
+exhibited image is smaller, `None` means that the shortcut does not certify
+the index, not that the exact index is necessarily greater than one. The caller
+uses the integral double-coset route instead. For a sign-only quotient, the
+analogous sufficient certificate compares the exhibited stabilizer's sign
+image with the ambient sign image.
 
 ## Why the old shortcut was not a proof
 
