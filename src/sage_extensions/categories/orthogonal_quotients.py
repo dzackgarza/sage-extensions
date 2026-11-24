@@ -1752,14 +1752,23 @@ class OrthogonalCharacterQuotient:
         # the split-signature witness -- an element of the stabilizer with trivial
         # discriminant image and real spinor norm ``-1``, the Levi part ``(1, -1)``
         # of Zemel's Proposition 1.10 (arXiv:1902.08264v2, p. 13) -- together with
-        # the complement's discriminant image being surjective, which at a
-        # divisor-1 line is exactly the class-stabilizer equality.  Both are
-        # computed, never asserted; a failure of either returns ``None`` and the
-        # caller keeps its exact integral route.
+        # the exact fibre index of the line's divided datum.  The complement's own
+        # discriminant action is not that index: it is surjective on its own
+        # discriminant group for the divisor-2 line of an even glued overlattice
+        # whose complement isometries still do not extend integrally, so the
+        # complement's surjectivity neither implies nor is implied by the index
+        # being one.  Both halves are computed, never asserted; a failure of
+        # either returns ``None`` and the caller keeps its exact integral route.
         if not lattice.eichler_criterion_applies():
             if _split_signature_witness(lattice, vector) is None:
                 return None
-            if not _complement_discriminant_surjective(lattice, vector):
+            # The class route below is the fibre of the datum map, and its fibre
+            # size is the index computed here -- never the surjectivity of the
+            # complement's action, which is a different question once the
+            # divisor is larger than one.  An index other than one means the
+            # line's own class carries several `ker rho`-orbits, and the caller
+            # keeps the exact integral route that exhibits them.
+            if general_image_certificate(self, representative) != 1:
                 return None
         discriminant_class = lattice.divided_discriminant_class(vector)
         zero_class = lattice.discriminant_group().zero()
@@ -4181,59 +4190,108 @@ def _split_signature_witness(lattice, vector):
     return witness
 
 
-def _complement_discriminant_surjective(lattice, vector):
-    r"""Return whether the complement's discriminant representation is surjective.
+def general_image_certificate(quotient, representative):
+    r"""Return ``1`` when the line's datum fibre has one ``ker rho``-orbit, else ``None``.
 
-    The isometries ``1_plane + gamma`` with ``gamma`` in the orthogonal group of
-    the complement fix the representative's plane pointwise, so they lie in the
-    line stabilizer, and their discriminant image is the discriminant action of
-    ``gamma`` on the complement's own discriminant group.  The stabilizer's image
-    therefore contains the complement's image; at a divisor-1 line -- where the
-    complement's discriminant group is the ambient one, the plane contributing
-    nothing -- the class-stabilizer equality ``rho(Stab(v)) = O(A_L)`` therefore
-    holds exactly when that image is surjective.  The complement is the kernel of
-    the two pairing constraints -- the vectors orthogonal to the representative
-    and to its Bezout partner -- computed from the Gram matrix, and its Gram
-    matrix is the pairing matrix of that kernel's basis.
+    Let ``G = O(L)``, ``H = Stab_G(x)`` for a primitive isotropic line ``x``,
+    ``N = ker rho`` and ``c = [v/div v]`` for a generator ``v`` of ``x``.  ``N``
+    is normal in ``G``, so the ``N``-orbits inside the one ``G``-orbit ``G x``
+    are the double cosets ``N \\ G / H``, and the orbit--stabilizer theorem for
+    the action of ``G/N = im rho`` identifies those with the cosets
+    ``im rho / rho(H)``: the coset ``N g x`` is sent to ``rho(g) c``, and the
+    fibre of that map over ``c`` is ``[Stab_{im rho}(c) : rho(H)]``.  If
+    ``rho(g') = rho(g) rho(h)`` then ``g' = n g h`` with ``n`` in the normal
+    ``N``, so ``g'`` and ``g h`` lie in the same ``N``-orbit: that is the whole
+    proof, and no property of the plane's complement is used anywhere in it.
+
+    The datum is the *unoriented* line's set ``D(x) = {c, -c}`` -- written by
+    :func:`_isotropic_divided_class_set`, as a one-element set when ``c = -c``
+    -- because that is what the stabilizer of a line preserves: an element of
+    ``H`` may interchange ``v`` with ``-v``, so the signed class ``c`` alone is
+    the wrong datum for an unoriented line.  A caller that works with a signed
+    primitive vector throughout and fixes its orientation uses ``c`` instead;
+    that index is this one divided by the sign ``H`` realises, so the two
+    conventions are not interchangeable and this call is the line's own.
+
+    Both groups are computed, never assumed.  The right-hand group is the
+    setwise stabilizer of ``D(x)`` inside ``im rho`` -- the *retained* image of
+    this quotient's own subgroup, which is in general a proper subgroup of
+    ``O(A_L)`` and is never replaced by it.  The left-hand group is the image of
+    the subgroup's own stabilizer family
+    (``isotropic_stabilizer_generators``), every element of which is exhibited,
+    so the lower bound is genuine; when its order reaches the right-hand one the
+    two groups are equal and ``1`` is returned with nothing assumed.
+
+    ``None`` is the other answer, and it is not a guess: the family's image is
+    then a proper subgroup of the datum's stabilizer, or the family is too short
+    to decide, and either way the datum may carry several ``ker rho``-orbits.
+    The caller keeps the exact integral route (``splitting_isometries``, one
+    double coset at a time), which exhibits them -- that is the actual integral
+    orbit classification, including the nontrivial split.  The index is never
+    replaced by the surjectivity of a complement's discriminant action: that
+    implication fails for an even lattice with a divisor-2 line, where the
+    complement's action is surjective on its own discriminant group while its
+    isometries do not all extend integrally across the gluing that makes the
+    line primitive of divisor two, so the complement says nothing about the
+    ambient datum's fibre.
     """
-    labels = tuple(lattice.module_generating_set())
-    basis = tuple(lattice.module_generator(label) for label in labels)
-    gram = [[int(lattice.b(left, right)) for right in basis] for left in basis]
-    coordinates = [int(vector.to_vector()(label)) for label in labels]
-    row = [
-        sum(gram[i][j] * coordinates[i] for i in range(len(coordinates)))
-        for j in range(len(basis))
-    ]
-    divisor, partner = _bezout_partner(row)
-    if divisor == 0:
-        # The pairing row vanishes identically, so no partner realizes the
-        # divisor and the complement is not defined here.
-        return False
-    from sage.matrix.constructor import matrix as sage_matrix
-    from sage.rings.integer_ring import ZZ as SageZZ
+    from sage.libs.gap.libgap import libgap
 
-    paired = [
-        sum(gram[i][j] * coordinates[j] for j in range(len(coordinates)))
-        for i in range(len(coordinates))
-    ]
-    partner_product = [
-        sum(gram[i][j] * partner[j] for j in range(len(partner)))
-        for i in range(len(coordinates))
-    ]
-    constraints = sage_matrix(SageZZ, [paired, partner_product])
-    kernel = constraints.right_kernel_matrix()
-    if kernel.nrows() != len(basis) - 2:
-        return False
-    sub_gram = kernel * sage_matrix(SageZZ, gram) * kernel.transpose()
-    integer_gram = [[int(entry) for entry in row] for row in sub_gram.rows()]
-    from sage_extensions.categories.lattices import Lattices
+    lattice = quotient.lattice
+    if int(representative.module_rank()) != 1:
+        raise ValueError(
+            f"the datum fibre index is the primitive isotropic *line*'s: {representative!r} "
+            f"has rank {int(representative.module_rank())}, and a higher-rank term's datum "
+            "carries incidence data this call does not model"
+        )
+    finite_orthogonal = quotient._discriminant_group
+    terms = (representative,)
+    data = libgap(
+        [
+            libgap.Set(
+                [
+                    finite_orthogonal._engine_abelian_element(divided_class)
+                    for divided_class in _isotropic_divided_class_set(lattice, term)
+                ]
+            )
+            for term in terms
+        ]
+    )
+    termwise_action = libgap.function_factory(
+        "function(x, g) return List(x, part -> Set(List(part, y -> ImageElm(g, y)))); end"
+    )
+    engine, im_rho, _section, _ambient = quotient._im_rho_engine_and_section()
+    stabilizer_of_datum = libgap.Stabilizer(im_rho, data, termwise_action)
+    target = int(libgap.Size(stabilizer_of_datum))
+    # The left-hand group is the image of the stabilizer *inside this quotient's
+    # subgroup* -- the group whose double cosets the caller walks -- and not the
+    # ambient ``O(L)`` stabilizer, which is larger and would understate the
+    # index.  The subgroup's own family is a genuine lower bound: every one of
+    # its elements is an isometry of ``L`` fixing the line, so its image lies in
+    # ``rho(H)`` and in the datum's stabilizer.  When that lower bound already
+    # has the datum stabilizer's order the two are equal and the index is one,
+    # with nothing assumed; when it is short the index is *not decided here*, and
+    # the caller keeps the exact integral route, whose closure family is the
+    # owner that certifies the larger image or refuses.
+    rho = quotient.lattice.discriminant_representation()
+    from sage_extensions.categories.group.groups import _element_to_engine
 
-    complement_lattice = Lattices(lattice.base_ring())(integer_gram)
-    image = complement_lattice.discriminant_image()
-    order = image.cardinality().finite_value()
-    target = complement_lattice.discriminant_group().orthogonal_group()
-    target_order = target.cardinality().finite_value()
-    return order == target_order
+    images = [
+        _element_to_engine(finite_orthogonal, rho(generator))
+        for generator in quotient.subgroup.isotropic_stabilizer_generators(
+            representative, flag=False
+        )
+    ]
+    lower = libgap.Subgroup(engine, images) if images else libgap.TrivialSubgroup(engine)
+    stabilizer_order = int(libgap.Size(lower))
+    if target % stabilizer_order:
+        raise ArithmeticError(
+            f"the datum stabilizer of {representative!r} has order {target}, which is not a "
+            f"multiple of the order {stabilizer_order} of the stabilizer's discriminant image; "
+            "the stabilizer's image must lie in the datum's stabilizer"
+        )
+    index = target // stabilizer_order
+    return None if index != 1 else 1
 
 
 def _line_orbit_from_divided_classes(subgroup, representative):

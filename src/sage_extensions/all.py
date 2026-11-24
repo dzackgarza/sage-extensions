@@ -149,6 +149,9 @@ from sage_extensions.categories.isotropic_parabolics import (  # noqa: F401
     PrimitiveIsotropicSubobjects,
     right_coset_action,
 )
+from sage_extensions.categories.orthogonal_quotients import (  # noqa: F401
+    general_image_certificate,
+)
 from sage_extensions.lattice_database import (  # noqa: F401
     card_arithmetic_group,
     card_arithmetic_group_row,
