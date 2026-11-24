@@ -1763,11 +1763,9 @@ class OrthogonalCharacterQuotient:
             if _split_signature_witness(lattice, vector) is None:
                 return None
             # The class route below is the fibre of the datum map, and its fibre
-            # size is the index computed here -- never the surjectivity of the
-            # complement's action, which is a different question once the
-            # divisor is larger than one.  An index other than one means the
-            # line's own class carries several `ker rho`-orbits, and the caller
-            # keeps the exact integral route that exhibits them.
+            # size is the index in the exact ambient stabilizer image. A lower
+            # bound equal to the target certifies index one. Otherwise this
+            # test makes no claim about the index; keep the exact route.
             if general_image_certificate(self, representative) != 1:
                 return None
         discriminant_class = lattice.divided_discriminant_class(vector)
@@ -4194,12 +4192,13 @@ def general_image_certificate(quotient, representative):
     r"""Return ``1`` when the line's datum fibre has one ``ker rho``-orbit, else ``None``.
 
     Let ``G = O(L)``, ``H = Stab_G(x)`` for a primitive isotropic line ``x``,
-    ``N = ker rho`` and ``c = [v/div v]`` for a generator ``v`` of ``x``.  ``N``
+    ``N = ker rho`` and ``D = {c, -c}`` with ``c = [v/div v]`` for a
+    primitive generator ``v`` of ``x``.  ``N``
     is normal in ``G``, so the ``N``-orbits inside the one ``G``-orbit ``G x``
     are the double cosets ``N \\ G / H``, and the orbit--stabilizer theorem for
     the action of ``G/N = im rho`` identifies those with the cosets
-    ``im rho / rho(H)``: the coset ``N g x`` is sent to ``rho(g) c``, and the
-    fibre of that map over ``c`` is ``[Stab_{im rho}(c) : rho(H)]``.  If
+    ``im rho / rho(H)``: the coset ``N g x`` is sent to ``rho(g) D``, and the
+    fibre over ``D`` has cardinality ``[Stab_{im rho}(D) : rho(H)]``.  If
     ``rho(g') = rho(g) rho(h)`` then ``g' = n g h`` with ``n`` in the normal
     ``N``, so ``g'`` and ``g h`` lie in the same ``N``-orbit: that is the whole
     proof, and no property of the plane's complement is used anywhere in it.
