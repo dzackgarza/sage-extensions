@@ -4214,13 +4214,20 @@ def general_image_certificate(quotient, representative):
     conventions are not interchangeable and this call is the line's own.
 
     Both groups are computed, never assumed.  The right-hand group is the
-    setwise stabilizer of ``D(x)`` inside ``im rho`` -- the *retained* image of
-    this quotient's own subgroup, which is in general a proper subgroup of
-    ``O(A_L)`` and is never replaced by it.  The left-hand group is the image of
-    the subgroup's own stabilizer family
-    (``isotropic_stabilizer_generators``), every element of which is exhibited,
-    so the lower bound is genuine; when its order reaches the right-hand one the
-    two groups are equal and ``1`` is returned with nothing assumed.
+    setwise stabilizer of ``D(x)`` inside ``im rho`` -- the image of the
+    *ambient* orthogonal group, which is in general a proper subgroup of
+    ``O(A_L)`` and is never replaced by it, and which is the group whose cosets
+    the double cosets are counted in.  The left-hand group is the image of the
+    ambient line stabilizer ``Stab_{O(L)}(x)``'s own exhibited family
+    (``supergroup.isotropic_stabilizer_generators``), every element of which is
+    exhibited, so the lower bound is genuine; when its order reaches the
+    right-hand one the two groups are equal and ``1`` is returned with nothing
+    assumed.  Taking that family from the *selected* subgroup instead is wrong:
+    for ``Gamma = ker rho`` every one of its elements has trivial image, so the
+    lower bound would be trivial while ``rho(Stab_{O(L)}(x))`` need not be.
+    For a sign-only quotient there is no discriminant factor at all, the datum
+    is trivial and its stabilizer is the whole retained sign image, which is
+    what the second branch computes from the sign patterns.
 
     ``None`` is the other answer, and it is not a guess: the family's image is
     then a proper subgroup of the datum's stabilizer, or the family is too short
@@ -4244,6 +4251,44 @@ def general_image_certificate(quotient, representative):
             f"has rank {int(representative.module_rank())}, and a higher-rank term's datum "
             "carries incidence data this call does not model"
         )
+    # The lower bound is the image of the *ambient* line stabilizer's own
+    # exhibited family -- ``Stab_{O(L)}(x)``, the owner of the setwise line
+    # stabilizer -- and never the selected subgroup's stabilizer family.  A
+    # subgroup that is a kernel has trivial image at every one of its elements,
+    # so ``rho(Gamma cap H)`` is trivial for ``Gamma = ker rho`` while
+    # ``rho(Stab_{O(L)}(x))`` need not be, and comparing the datum against the
+    # former would report an index for a group the caller never walks.
+    family = quotient.supergroup.isotropic_stabilizer_generators(
+        representative, flag=False
+    )
+    if not quotient._has_discriminant:
+        # A sign-only quotient retains no discriminant factor, so the datum is
+        # trivial in every component it has and every element of the retained
+        # image fixes it: the target is the ambient sign image.  The lower bound
+        # is the sign image of the ambient stabilizer's family.  Signs multiply
+        # componentwise, so both orders are the sizes of the F2-spans of the
+        # component patterns.
+        labels = tuple(quotient._image_labels)
+
+        def pattern(isometry):
+            key = quotient.image(isometry)
+            return tuple(0 if key[label].is_one() else 1 for label in labels)
+
+        target = 2 ** _f2_rank(
+            [pattern(generator) for generator in quotient._ambient_generators()],
+            len(labels),
+        )
+        stabilizer_order = 2 ** _f2_rank(
+            [pattern(element) for element in family], len(labels)
+        )
+        if target % stabilizer_order:
+            raise ArithmeticError(
+                f"the sign image of the stabilizer of {representative!r} has order "
+                f"{stabilizer_order}, which is not a multiple of the ambient sign image's "
+                f"order {target}; the stabilizer's image must lie in it"
+            )
+        return None if target != stabilizer_order else 1
+
     finite_orthogonal = quotient._discriminant_group
     terms = (representative,)
     data = libgap(
@@ -4263,24 +4308,11 @@ def general_image_certificate(quotient, representative):
     engine, im_rho, _section, _ambient = quotient._im_rho_engine_and_section()
     stabilizer_of_datum = libgap.Stabilizer(im_rho, data, termwise_action)
     target = int(libgap.Size(stabilizer_of_datum))
-    # The left-hand group is the image of the stabilizer *inside this quotient's
-    # subgroup* -- the group whose double cosets the caller walks -- and not the
-    # ambient ``O(L)`` stabilizer, which is larger and would understate the
-    # index.  The subgroup's own family is a genuine lower bound: every one of
-    # its elements is an isometry of ``L`` fixing the line, so its image lies in
-    # ``rho(H)`` and in the datum's stabilizer.  When that lower bound already
-    # has the datum stabilizer's order the two are equal and the index is one,
-    # with nothing assumed; when it is short the index is *not decided here*, and
-    # the caller keeps the exact integral route, whose closure family is the
-    # owner that certifies the larger image or refuses.
     rho = quotient.lattice.discriminant_representation()
     from sage_extensions.categories.group.groups import _element_to_engine
 
     images = [
-        _element_to_engine(finite_orthogonal, rho(generator))
-        for generator in quotient.subgroup.isotropic_stabilizer_generators(
-            representative, flag=False
-        )
+        _element_to_engine(finite_orthogonal, rho(generator)) for generator in family
     ]
     lower = libgap.Subgroup(engine, images) if images else libgap.TrivialSubgroup(engine)
     stabilizer_order = int(libgap.Size(lower))
@@ -4303,7 +4335,10 @@ def _line_orbit_from_divided_classes(subgroup, representative):
     bijectively to the cosets ``rho(G)/rho(H)`` -- orbit--stabilizer for the action of the
     quotient ``G/ker rho``, which acts through ``rho`` -- and the map ``Gamma g x |-> rho(g) c``
     sends an orbit to its class, with fibre over ``c`` of size
-    ``[Stab_(rho(G))(c) : rho(H)]``.
+    ``[Stab_(rho(G))(c) : rho(H)]`` for an *oriented* line.  An unoriented line's datum is
+    the set ``{c, -c}``, because its stabilizer may carry ``v`` to ``-v``; the index computed
+    below is the setwise one, ``[Stab_(rho(G))({c, -c}) : rho(H)]``, with ``rho(H)`` from
+    :meth:`stabilizer_discriminant_image` and never from a signed-class stabilizer.
 
     When that index is 1 -- computed here from the two exact images, not assumed -- the
     ``Gamma``-orbits in ``G x`` are in bijection with the classes of ``rho(G) c``, and a
@@ -4337,12 +4372,20 @@ def _line_orbit_from_divided_classes(subgroup, representative):
             f"{stabilizer_order}, which does not divide the order {order} of the image of "
             f"{subgroup.supergroup()}; the stabilizer's image must lie in the group's image"
         )
+    # The datum of an unoriented line is the *set* ``{c, -c}``, not the signed
+    # class ``c``: an element of the line's stabilizer may carry ``v`` to ``-v``
+    # and so ``c`` to ``-c``, and then ``rho(H)`` is not a subgroup of the
+    # signed class's stabilizer.  ``stabilizer_discriminant_image`` is the image
+    # of the line's setwise stabilizer, so the index below is the setwise one
+    # for every divisor.
+    class_of = lattice.divided_discriminant_class
+    signed_class = class_of(vector)
     # The class orbit in the order the walk reaches it, so the representatives this
     # function returns are the same tuple on every call: a set's iteration order is
     # not a datum a comparison against a recorded list can be made against.
-    seen = {lattice.divided_discriminant_class(vector)}
-    class_orbit = [lattice.divided_discriminant_class(vector)]
-    frontier = [lattice.divided_discriminant_class(vector)]
+    seen = {signed_class}
+    class_orbit = [signed_class]
+    frontier = [signed_class]
     while frontier:
         current = frontier.pop()
         for generator in image_of_group.group_generators():
@@ -4356,27 +4399,61 @@ def _line_orbit_from_divided_classes(subgroup, representative):
             f"the class orbit of {representative!r} has {len(class_orbit)} elements, which does "
             f"not divide the order {order} of the discriminant image of {subgroup.supergroup()}"
         )
-    index_per_class = (order // len(class_orbit)) // stabilizer_order
-    if index_per_class != 1:
+    signed_stabilizer_order = order // len(class_orbit)
+    # The set ``{c, -c}``'s orbit is the signed orbit when the walk meets ``-c``
+    # (and always when ``c = -c``), and twice it otherwise; the setwise
+    # stabilizer is twice the signed one exactly in the first nontrivial case.
+    if signed_class == -signed_class:
+        set_stabilizer_order = signed_stabilizer_order
+    elif -signed_class in seen:
+        set_stabilizer_order = 2 * signed_stabilizer_order
+    else:
+        set_stabilizer_order = signed_stabilizer_order
+    if set_stabilizer_order % stabilizer_order:
+        raise ArithmeticError(
+            f"the setwise datum stabilizer of {representative!r} has order "
+            f"{set_stabilizer_order}, which is not a multiple of the order "
+            f"{stabilizer_order} of the line stabilizer's discriminant image"
+        )
+    if set_stabilizer_order != stabilizer_order:
         return None
+    # One signed class per unordered pair, in the order the walk reaches them.
+    classes = []
+    used = set()
+    for component in class_orbit:
+        if component in used or -component in used:
+            continue
+        used.add(component)
+        used.add(-component)
+        classes.append(component)
     # One construction for the whole orbit: the residue loop asks for the orbit's
     # classes together, so it fixes their residues in one pass over the translations
     # instead of one search per class (which would rebuild the search 527 times on
     # ``T_Co``, where the class orbit is the 527 nonzero isotropic classes).
-    vectors = lattice.isotropic_lines_by_divided_class(divisor, classes=tuple(class_orbit))
-    missing = tuple(component for component in class_orbit if component not in vectors)
+    vectors = lattice.isotropic_lines_by_divided_class(divisor, classes=tuple(classes))
+    missing = tuple(component for component in classes if component not in vectors)
     if missing:
         raise ValueError(
             f"the divided classes of the line orbit of {representative!r} in {lattice!r} are not "
-            f"all realized at divisor {divisor}: {len(missing)} of the {len(class_orbit)} classes "
+            f"all realized at divisor {divisor}: {len(missing)} of the {len(classes)} classes "
             f"have no primitive isotropic vector there, the first being {missing[0]}.  The "
             f"divided-class route supplies one representative per class or none, so this refuses "
             f"rather than returning a short family"
         )
-    return tuple(
+    # A divided class names a vector up to the discriminant action, not up to
+    # the integral orbit: the constructed line is admitted only when the
+    # ambient group itself exhibits an isometry from the chosen representative
+    # onto it.  Otherwise the classes are not representatives of this orbit and
+    # the caller keeps its exact route.
+    ambient = subgroup.supergroup()
+    representatives = tuple(
         lattice.primitive_isotropic_subobject(vectors[component])
-        for component in class_orbit
+        for component in classes
     )
+    for line in representatives:
+        if ambient.isotropic_equivalence_witness(representative, line) is None:
+            return None
+    return representatives
 
 
 def _plane_orbit_from_odd_stabilizer(subgroup, representative):
