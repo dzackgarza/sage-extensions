@@ -73,31 +73,9 @@ def test_the_scaled_odd_specimen_certificate_answers_one() -> None:
     lattice, labels, vector, line = _scaled_odd_specimen()
     assert lattice.div(vector) == 2, "the specimen's line must have divisor two"
     stable = lattice.stable_orthogonal_group()
-    walk = general_image_certificate(stable.finite_character_quotient(), line)
-    assert walk is not None, "the divisor-two line's datum fibre must be certified"
-    assert walk[0][1] == stable.supergroup().one(), "the walk starts at the representative"
-    label = line.module_generating_set()[0]
-    source = line.inclusion()(line.module_generator(label))
-    classes = set()
-    for datum, transporter in walk:
-        moved = transporter(source)
-        assert moved.q() == lattice.base_ring().zero(), "a transported image must be isotropic"
-        assert moved.is_primitive(), "a transported image must be primitive"
-        assert lattice.div(moved) == 2, "a transported image keeps the line's divisor"
-        # The pair's datum records which ``ker rho``-orbit the edge serves; the
-        # line is the transporter's actual image, and its own unoriented datum is
-        # the set of the walk's points it lands in.
-        assert datum is not None
-        c = lattice.divided_discriminant_class(moved)
-        classes.add(frozenset({c, -c}))
-    assert len(classes) == len(walk), (
-        "the walk's edges must carry the representative to pairwise distinct lines"
-    )
-    assert len(walk) == len(general_image_certificate(stable.finite_character_quotient(), line)), (
-        "the walk is a function of the line, not of the call"
-    )
+    assert general_image_certificate(stable.finite_character_quotient(), line) == 1
     joint = stable.intersection(lattice.O_plus())
-    assert general_image_certificate(joint.finite_character_quotient(), line) is not None
+    assert general_image_certificate(joint.finite_character_quotient(), line) == 1
 
 
 def test_the_scaled_odd_specimens_image_is_the_four_enumerated_matrices() -> None:
@@ -166,3 +144,45 @@ def test_the_glued_swap_is_not_integral_and_the_lattice_says_so() -> None:
     assert lattice.div(two_x) == 1, (
         "an element of 2L has all pairings even; this one's pairing with w is three"
     )
+
+
+def test_the_stable_line_walk_returns_the_three_exact_unoriented_classes() -> None:
+    r"""For B=U+<-1>^2, the three nonzero singular classes of B/2B occur.
+
+    The norm modulo four is 2ef-d1^2-d2^2. Enumerating binary entries
+    gives exactly e, f and e+f+d1+d2. Swapping e and f and the integral
+    Eichler transvection with parameter d1+d2 transport e to all three.
+    Every primitive isotropic vector of the odd unimodular B has
+    divisor one. Its square-zero hyperbolic partner can be chosen
+    since its reduction is not the characteristic class d1+d2
+    (that class has norm two modulo four). The orthogonal complement
+    is a negative definite unimodular binary lattice, necessarily
+    <-1>^2: Gauss reduction gives a shortest norm a with
+    1=ac-b^2 >= 3a^2/4, hence a=1. Splitting off that vector proves
+    the assertion. Thus the ambient line orbit is single.
+    The four-element stabilizer image is independently enumerated in
+    the companion arithmetic test, and equals the finite class stabilizer.
+    The normal-kernel double-coset bijection then gives these three
+    actual kernel orbits, not just a count.
+    """
+    lattice, labels, vector, line = _scaled_odd_specimen()
+    e, f, d1, d2 = tuple(lattice.module_generator(label) for label in labels)
+    stable = lattice.stable_orthogonal_group()
+    # Both collections are Python sets. A brace literal in a .sage file is
+    # lowered to an owned finite set, not the type constructed by set().
+    expected = set((
+        lattice.divided_discriminant_class(e),
+        lattice.divided_discriminant_class(f),
+        lattice.divided_discriminant_class(e + f + d1 + d2),
+    ))
+    representatives = stable.isotropic_orbit_representatives(1)
+    assert representatives.cardinality() == cardinal(3)
+    actual = set()
+    for representative in representatives:
+        label = tuple(representative.module_generating_set())[0]
+        moved = representative.inclusion()(representative.module_generator(label))
+        assert moved.is_primitive()
+        assert moved.q() == lattice.base_ring().zero()
+        assert lattice.div(moved) == 2
+        actual.add(lattice.divided_discriminant_class(moved))
+    assert actual == expected

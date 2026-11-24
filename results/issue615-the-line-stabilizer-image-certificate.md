@@ -191,7 +191,7 @@ the new and corrected regressions.
 
 The returned revision `f5590c255a05` was tested in the pinned Sage 11.0.beta5 image, using the actual `just test` entry point with the repository source checkout on PYTHONPATH. The three new production tests (scaled odd specimen, its complete image, and glued swap) and five existing affected tests passed. The two independent arithmetic tests had setup lint errors, so that run was not accepted. The correction uses the doubled integral matrix in the gluing check and verifies the four exact binary column masks. Quadratic preservation on a basis and preservation of the six pairings imply preservation on the whole binary space; nondegeneracy of the pairing implies invertibility. The two generators are checked as commuting involutions and their four products exhaust the computed set. Both corrected independent tests passed (2 passed in 59.74 s; 0.21 s and 10.85 s test-call times). The existing small-lattice stable-line consumer also passed in the second invocation. Time gates were disabled during diagnosis; this is correctness evidence, not a performance certification. The full Coble consumer run had not returned when this record was written.
 
-## Third round: the certificate returns the walk, and the consumer transports
+## Third round (superseded attempt): the certificate returns the walk, and the consumer transports
 
 `general_image_certificate` certified the fibre index but returned `1`, and
 `_line_orbit_from_divided_classes` then rebuilt the orbit's lines by searching
@@ -245,3 +245,42 @@ cd /repo && /opt/sage/bin/sage -t \
   tests/lattices/test_the_stable_line_orbit_row_returns_on_the_coble_lattice.sage \
   tests/lattices/test_the_stable_line_orbit_row_comes_from_the_exact_finite_image.sage
 ```
+
+
+## Independent repair of the third-round return (2026-11-24)
+
+The third-round commit 956a2e2c applied the action on a list of sets to a
+single set, compared owned classes directly with GAP elements, accessed
+the absent discriminant engine on sign-only quotients, and did not register
+the claimed transports. The return-type change also broke the existing
+index-one contract. Those defects are repaired here.
+
+Keep the certificate at 1 or None, with an explicit finite subgroup
+containment check before comparing orders. For the stable line consumer,
+walk the orbit of the actual unordered divided class in the ambient
+discriminant image, retaining the integral generators. A generating
+subfamily is checked for equality with the actual ambient image. Each
+edge applies the generator to the preceding vector; verify the resulting
+line's class in the same finite engine, and register the one-step integral
+transport. The count is checked against the exact finite orbit index.
+The stable-only route is tried before the generic coset splitting route.
+This does not replace the exact route for an uncertified fibre or the
+separate joint-character hypotheses.
+
+The independent rank-four specimen has three nonzero singular classes,
+e, f, e+f+d1+d2 modulo 2. The new public-consumer regression asserts exactly
+these three classes, as well as primitivity, isotropy and divisor two.
+The original exact four-matrix and gluing regressions remain unchanged
+in mathematical content. The initial harness failure was independently
+reproduced and diagnosed: the preparser lowered the expected brace literal
+to Owned_FiniteLiteralSet, while the actual set was a Python set. Every
+corresponding class had equal parent, difference zero, equality true and
+equal hash; both collections now use set() with identical assertions.
+
+Pinned native Sage, actual just test entrypoint with time gates disabled
+for correctness diagnosis: all four specimen tests passed in 64.63 s
+(collection 45.12 s; test calls 10.71, 3.03, 0.04 and 5.39 s).
+The unchanged small stable-line consumer passed in the preceding run
+(19.29 s call). The separate full Coble row is not yet verified on this
+repair. This record does not claim issue completion or performance
+acceptance.
