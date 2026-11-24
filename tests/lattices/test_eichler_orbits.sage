@@ -179,3 +179,35 @@ def test_a_vector_with_divisibility_one_has_a_trivial_divided_class() -> None:
     assert isotropic.div() == 1
     assert isotropic.divided_discriminant_class() == lattice.discriminant_group().zero()
     assert lattice.are_in_one_stable_orbit(isotropic, lattice.module_generator(2))
+
+def test_the_covering_classes_match_the_exact_binary_norm_congruence() -> None:
+    r"""For the scaled unimodular B=U+<-1>^2, enumerate the full covering list.
+
+    The discriminant module of B(2) is B/2B. Every nonzero binary class
+    has order two, and its quadratic value is (2ef-d1^2-d2^2)/2 modulo
+    two. Thus for square k the nonzero classes are exactly those with
+    2(2ef-d1^2-d2^2) congruent to k modulo eight. The zero class has
+    order one and occurs exactly for even k. This independently checks
+    both inclusion and exclusion, without using the computed covering list
+    to obtain expected classes.
+    """
+    lattice = (NamedLattices.U + Lattices(ZZ)([[-1]]) + Lattices(ZZ)([[-1]])).twist(2)
+    labels = tuple(lattice.module_generating_set())
+    discriminant = lattice.discriminant_group()
+    binary_classes = []
+    for mask in range(1, 16):
+        bits = tuple((mask // (2 ** i)) % 2 for i in range(4))
+        e, f, d1, d2 = bits
+        norm = 2 * e * f - d1 - d2
+        v = lattice.linear_combination({
+            label: ZZ(bit) for label, bit in zip(labels, bits, strict=True) if bit
+        })
+        binary_classes.append((norm, lattice.divided_discriminant_class(v)))
+    assert sum(1 for _ in set(cls for _, cls in binary_classes)) == 15
+    for k in (-4, -2, 0, 1, 2, 4):
+        expected = set(cls for norm, cls in binary_classes if (2 * norm - k) % 8 == 0)
+        if k % 2 == 0:
+            expected.add(discriminant.zero())
+        actual = lattice.covering_discriminant_classes(ZZ(k))
+        assert actual.cardinality() == cardinal(sum(1 for _ in expected))
+        assert set(actual) == expected

@@ -10768,8 +10768,9 @@ class Lattices(OwnedCategoryOverBaseRing):
 
             targets_by_order = {}
             matches = []
-            for position in range(int(engine.cardinality())):
-                engine_element = engine[position]
+            # The finite Smith module's indexing materializes its full list.
+            # Iteration visits the same elements in the same order, exactly once.
+            for engine_element in engine:
                 order = int(engine_element.additive_order())
                 target_value = targets_by_order.get(order)
                 if target_value is None:
