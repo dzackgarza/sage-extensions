@@ -9,18 +9,22 @@ the orbit--stabilizer correspondence for the action of the quotient `G/ker rho`,
 whose discriminant image lies in that coset.
 
 `T_Co = <2> + (U + E8(-1))(2)` (Dolgachev--Kondo, Izv. Math. 77:3 (2013), section 3, eq.
-(3.6), printed p. 513), rank 11, signature (2, 9), whose marked `U(2)` line `<e_1>` is the
-line of #322.  It exhibits no *unimodular* hyperbolic plane, so
-`isotropic_line_stabilizer_image` refuses it -- Eichler's criterion needs two of them in the
-lattice itself (#315) -- and the row falls back to `splitting_isometries`, which stops:
-`_splitting_isometries_in_im_rho_from_image` evaluates `rho` on the ambient group's
-generating family and does not return (`.tmp/p310-probe9.log`, still inside that frame at
-420 s).
-
-Both finite images it needs are computable without that family:
-`lattice.Aut().discriminant_image()` and `subobject.stabilizer_discriminant_image()`
-(``thm:schreier-discriminant-image``, research#750).  The index they give is the orbit count
-this file asks the row for.
+(3.6), printed p. 513), rank 11, signature (2, 9), has no unimodular
+hyperbolic summand. Its unscaled odd unimodular lattice is I_(2,9).
+The primitive isotropic vectors form a single ambient orbit by integral
+hyperbolic splitting and indefinite unimodular classification
+(Peters--Sterk, Theorem 2.3.1). Every primitive vector has divisor two
+after scaling. The independent exact integral root-lift certificate in
+research, lem:coble-full-finite-image-root-lifts and
+lem:coble-explicit-vector-parabolic-image, gives ambient image order
+46998591897600, stabilizer image order 89181388800, and 527 nonzero
+singular classes. Its proof lifts norm +/-2 roots in the unscaled
+lattice, checks integral vector fixing, and computes the finite group
+orders on the singular classes. The corresponding finite images are
+computed here through the public operations, not supplied to them.
+The divided classes have exponent two, so distinct divided classes
+distinguish the unoriented stable line orbits. Equality of the stabilizer
+image with the class stabilizer proves completeness of the class list.
 """
 
 from sage_extensions.all import *  # noqa: F401,F403
@@ -56,7 +60,8 @@ def test_the_stable_line_orbit_row_returns_with_the_index_of_the_discriminant_im
     image_of_stabilizer = subobject.stabilizer_discriminant_image()
     order = image_of_group.cardinality().finite_value()
     stabilizer_order = image_of_stabilizer.cardinality().finite_value()
-    # The stabilizer's image lies in the group's image, so the quotient is the index.
+    assert order == 46998591897600
+    assert stabilizer_order == 89181388800
     assert all(
         generator in image_of_group for generator in image_of_stabilizer.group_generators()
     )
@@ -68,3 +73,13 @@ def test_the_stable_line_orbit_row_returns_with_the_index_of_the_discriminant_im
         _is_a_primitive_isotropic_line(lattice, representative) for representative in lines
     )
     assert lines.cardinality().finite_value() == order // stabilizer_order
+    assert lines.cardinality().finite_value() == 527
+    classes = set()
+    for line in lines:
+        label = tuple(line.module_generating_set())[0]
+        vector = line.inclusion()(line.module_generator(label))
+        assert lattice.div(vector) == 2
+        divided = lattice.divided_discriminant_class(vector)
+        assert divided != lattice.discriminant_group().zero()
+        classes.add(divided)
+    assert len(classes) == 527

@@ -334,3 +334,27 @@ finite images and the test's checks outside the row.
 The correctness run had time gates disabled: the 20 s call ceiling and
 6 s collection ceiling were not met. This does not assert performance
 acceptance or independent review of the general proof.
+
+## Reuse the actual finite stabilizer image
+
+The discriminant branch now consumes the subobject's existing exact
+`stabilizer_discriminant_image()`. The proof of this operation is the
+finite-lattice-orbit Schreier theorem and composition of discriminant
+isometries between the integral orbit lattices (research,
+thm:schreier-discriminant-image). This avoids reconstructing the full
+integral stabilizer generating family merely to take its finite image.
+The comparison is still with the setwise stabilizer of the unoriented
+divided class in the actual ambient image, and checks containment before
+equality of orders. A joint quotient still requires the separate sign
+kernel certificate; a sign-only quotient retains its own sign-image
+comparison. The docstrings now state these distinctions.
+
+The five unchanged public small-lattice regressions passed in the pinned
+native Sage session: exact four-element image, divisor-two certificate,
+gluing obstruction, three distinct stable line classes and the U(2)+<-6>
+stable-line consumer. 5 passed in 43.02 s; test call times 10.70, 0.39,
+0.06, 6.79 and 15.11 s; time gates disabled for diagnosis (collection
+9.64 s > 6 s). Strengthened the full Coble regression to assert the
+independently proved ambient and parabolic image orders, 527 lines,
+divisor two and 527 distinct nonzero divided classes. This strengthened
+full regression has not yet returned on the new implementation.

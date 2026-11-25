@@ -1683,8 +1683,8 @@ class OrthogonalCharacterQuotient:
         independently of the number of integral hyperbolic planes.
 
         Let ``x = <v>`` be a primitive isotropic line, ``p = div(v)`` and ``c = [v/p]`` in
-        ``A_L``.  The claim is ``rho(Stab_{O(L)}(x)) = Stab_{O(A_L)}(c)`` in the
-        discriminant factor, and no integral stabilizer is needed for it.
+        ``A_L``.  The discriminant-factor claim is that
+        ``rho(Stab_{O(L)}(x)) = Stab_{im rho}({c,-c})``.
         Eichler's criterion (Gritsenko--Hulek--Sankaran, Lemma 7.8, p. 503) says that, in a
         lattice with two orthogonal hyperbolic planes, the ``\widetilde{SO}(L)``-orbit of a
         primitive vector is decided by its length and its normalized discriminant class.
@@ -1695,17 +1695,15 @@ class OrthogonalCharacterQuotient:
         :meth:`sage_extensions.categories.lattices.Lattices.eichler_criterion_applies`
         decides them.
 
-        **A lattice where the criterion does not apply is refused.**  What decides
-        the ``O(L)``-orbit of a primitive isotropic ``v`` there is the isometry class
-        of ``v^\perp/\mathbb{Z} v`` (Conway--Sloane, *Sphere Packings, Lattices and
-        Groups*, ch. 16), so the call below returns ``None`` and the caller keeps
-        its exact integral route.
-        Let ``gamma`` belong to ``Stab_{O(A_L)}(c)`` and choose ``g`` in ``O(L)`` above it
-        (the character representation is computed by this quotient, so such a lift exists).
-        Then ``g(v)`` has the same length and the same normalized class ``c`` as ``v``, so by
-        the criterion some ``k`` in ``\widetilde{SO}(L)`` takes ``g(v)`` to ``v``; then
-        ``kg`` fixes ``v``, and ``kg`` has the same discriminant image ``gamma``.  That is
-        surjectivity of the line stabilizer onto the finite class stabilizer.
+        Under Eichler's hypotheses, choose a lift ``g`` of an element of
+        ``Stab_{im rho}({c,-c})``. Its image of ``v`` has divided class ``c``
+        or ``-c``; in the second case compare it to ``-v`` instead. Eichler
+        gives a discriminant-kernel isometry carrying ``g(v)`` to that
+        chosen signed generator. The composite fixes the unoriented line
+        and has the original discriminant image. Outside these hypotheses,
+        :func:`general_image_certificate` checks the actual stabilizer image
+        for the supplied ambient orbit. An uncertified fibre or missing
+        sign witness leaves the exact integral splitting route in charge.
 
         The sign characters are separate and are decided by the pattern space of the
         stabilizer's own exhibited elements
@@ -4189,7 +4187,7 @@ def _split_signature_witness(lattice, vector):
 
 
 def general_image_certificate(quotient, representative):
-    r"""Return ``1`` when the line's datum fibre has one ``ker rho``-orbit, else ``None``.
+    r"""Certify index one in the retained discriminant factor, or the sign-only image.
 
     Let ``G = O(L)``, ``H = Stab_G(x)`` for a primitive isotropic line ``x``,
     ``N = ker rho`` and ``D = {c, -c}`` with ``c = [v/div v]`` for a
@@ -4217,21 +4215,23 @@ def general_image_certificate(quotient, representative):
     setwise stabilizer of ``D(x)`` inside ``im rho`` -- the image of the
     *ambient* orthogonal group, which is in general a proper subgroup of
     ``O(A_L)`` and is never replaced by it, and which is the group whose cosets
-    the double cosets are counted in.  The left-hand group is the image of the
-    ambient line stabilizer ``Stab_{O(L)}(x)``'s own exhibited family
-    (``supergroup.isotropic_stabilizer_generators``), every element of which is
-    exhibited, so the lower bound is genuine; when its order reaches the
-    right-hand one the two groups are equal and ``1`` is returned with nothing
-    assumed.  Taking that family from the *selected* subgroup instead is wrong:
-    for ``Gamma = ker rho`` every one of its elements has trivial image, so the
-    lower bound would be trivial while ``rho(Stab_{O(L)}(x))`` need not be.
+    the double cosets are counted in.  The other group is the ambient line's
+    actual ``stabilizer_discriminant_image()``, obtained from the finite
+    lattice-orbit Schreier factors and functorial discriminant transports
+    between integral orbit lattices. The stabilizer fixes the datum by
+    equivariance; containment and equality of orders decide equality.
+    This reuses the image owned by the subobject instead of constructing
+    the full integral generating family again. With extra sign characters,
+    the discriminant equality alone is not a joint-image certificate:
+    ``isotropic_line_stabilizer_image`` separately certifies the sign image
+    inside the discriminant kernel.
     For a sign-only quotient there is no discriminant factor at all, the datum
     is trivial and its stabilizer is the whole retained sign image, which is
     what the second branch computes from the sign patterns.
 
-    ``None`` is the other answer, and it is not a guess: the family's image is
-    then a proper subgroup of the datum's stabilizer, or the family is too short
-    to decide, and either way the datum may carry several ``ker rho``-orbits.
+    ``None`` leaves the exact splitting route in charge. In the discriminant
+    branch the actual image is then a proper subgroup of the datum stabilizer.
+    In the sign-only branch the exhibited family does not certify equality.
     The caller keeps the exact integral route (``splitting_isometries``, one
     double coset at a time), which exhibits them -- that is the actual integral
     orbit classification, including the nontrivial split.  The index is never
@@ -4251,16 +4251,6 @@ def general_image_certificate(quotient, representative):
             f"has rank {int(representative.module_rank())}, and a higher-rank term's datum "
             "carries incidence data this call does not model"
         )
-    # The lower bound is the image of the *ambient* line stabilizer's own
-    # exhibited family -- ``Stab_{O(L)}(x)``, the owner of the setwise line
-    # stabilizer -- and never the selected subgroup's stabilizer family.  A
-    # subgroup that is a kernel has trivial image at every one of its elements,
-    # so ``rho(Gamma cap H)`` is trivial for ``Gamma = ker rho`` while
-    # ``rho(Stab_{O(L)}(x))`` need not be, and comparing the datum against the
-    # former would report an index for a group the caller never walks.
-    family = quotient.supergroup.isotropic_stabilizer_generators(
-        representative, flag=False
-    )
     if not quotient._has_discriminant:
         # A sign-only quotient retains no discriminant factor, so the datum is
         # trivial in every component it has and every element of the retained
@@ -4269,6 +4259,9 @@ def general_image_certificate(quotient, representative):
         # componentwise, so both orders are the sizes of the F2-spans of the
         # component patterns.
         labels = tuple(quotient._image_labels)
+        family = quotient.supergroup.isotropic_stabilizer_generators(
+            representative, flag=False
+        )
 
         def pattern(isometry):
             key = quotient.image(isometry)
@@ -4284,7 +4277,7 @@ def general_image_certificate(quotient, representative):
         if target % stabilizer_order:
             raise ArithmeticError(
                 f"the sign image of the stabilizer of {representative!r} has order "
-                f"{stabilizer_order}, which is not a multiple of the ambient sign image's "
+                f"{stabilizer_order}, which does not divide the ambient sign image's "
                 f"order {target}; the stabilizer's image must lie in it"
             )
         return None if target != stabilizer_order else 1
@@ -4308,11 +4301,12 @@ def general_image_certificate(quotient, representative):
     engine, im_rho, _section, _ambient = quotient._im_rho_engine_and_section()
     stabilizer_of_datum = libgap.Stabilizer(im_rho, data, termwise_action)
     target = int(libgap.Size(stabilizer_of_datum))
-    rho = quotient.lattice.discriminant_representation()
     from sage_extensions.categories.group.groups import _element_to_engine
 
+    image = representative.stabilizer_discriminant_image()
     images = [
-        _element_to_engine(finite_orthogonal, rho(generator)) for generator in family
+        _element_to_engine(finite_orthogonal, generator)
+        for generator in image.group_generators()
     ]
     lower = libgap.Subgroup(engine, images) if images else libgap.TrivialSubgroup(engine)
     if not bool(libgap.IsSubgroup(stabilizer_of_datum, lower)):
