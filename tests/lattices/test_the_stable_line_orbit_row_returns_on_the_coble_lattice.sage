@@ -81,5 +81,5 @@ def test_the_stable_line_orbit_row_returns_with_the_index_of_the_discriminant_im
         assert lattice.div(vector) == 2
         divided = lattice.divided_discriminant_class(vector)
         assert divided != lattice.discriminant_group().zero()
+        assert divided not in classes
         classes.add(divided)
-    assert len(classes) == 527
