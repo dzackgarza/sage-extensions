@@ -397,3 +397,46 @@ Time gates disabled for correctness diagnosis only. The earlier
 strengthened Coble test at 7dadd77d entered its mathematical call
 but was terminated by signal 15; no completed correctness verdict
 at that revision. Independent review of this repair remains required.
+
+## Exact nontrivial fibres and the finite-image consumer
+
+The divisor-two specimen L=(U+<-12>)(2) has ambient discriminant
+image of order 32 and line stabilizer image of order 4. The proof is
+in the regression: on A_L=Z/2+Z/2+Z/24 use 24q(x,y,z)=24xy-z^2
+modulo 48. There are eight possible ordered images of the hyperbolic
+order-two pair, and for each four choices of the third coordinate of
+the order-24 generator. This bounds the full finite orthogonal group
+by 32. The explicit integral lifts realize four distinct divided
+classes. The block equations for the actual line stabilizer give
+exactly four finite images, while an additional lift fixes the divided
+class but acts by 5 rather than +/-1 on the invariant B^dual/B.
+Orbit-stabilizer gives the reverse bound 4*8=32 on the actual image.
+The double-coset formula of Dutour Sikirić--Hulek, Lemma 3.6, gives
+eight stable orbits in this ambient orbit, two over each class.
+
+When class data alone does not separate two lines, the exact finite
+image of the source stabilizer tests membership of rho(g) in
+rho(Gamma) rho(Stab(x)); this is necessary for a joint character
+quotient, sufficient for a pure discriminant quotient. The engine
+product order is reversed where required. A pure discriminant split
+now consumes the actual finite stabilizer image and the existing
+finite coset-action walk, not an additional full integral stabilizer
+family. Positive transporter adjustment and joint sign conditions
+retain the complete integral family.
+
+Red native check: the old class-only negative test returned False
+on the exhibited same-class, inequivalent witness. Green native
+check: both determinant and divisor-two regressions passed after
+the direct finite-image separation. The strengthened test also
+asserts the independently derived group orders, eight primitive
+integral lifts, pairwise distinct cosets, and exactly two lifts
+over each of four explicitly identified classes. An intermediate
+Python set comparison failed on equivalent signed presentations;
+a direct probe found their equality and hashes equal, so no hash
+defect is established. The final test checks mathematical equality
+and exact multiplicities directly. All strengthened checks passed
+in the pinned native Sage runtime, 2 passed in 32.31 s, calls
+20.29 s and 2.56 s. Collection 9.20 s and the first call exceed
+the unchanged 6 s and 20 s performance gates; correctness was
+checked with time gates disabled. The large Coble regression and
+independent whole-claim review remain outstanding.

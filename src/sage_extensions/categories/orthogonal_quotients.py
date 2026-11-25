@@ -2065,6 +2065,18 @@ class OrthogonalCharacterQuotient:
         """
         if self.index() == 1:
             return finite_ordered_set((self.supergroup.one(),))
+        if self._has_discriminant and not (self.determinant_kernel or self.spinor_kernel):
+            from sage_extensions.categories.group.groups import _element_to_engine
+
+            images = tuple(
+                _element_to_engine(self._discriminant_group, key["discriminant"])
+                for key in stabilizer_image
+            )
+            return finite_ordered_set(tuple(
+                lift for lift, _image in self._iter_splitting_isometries_in_im_rho_from_image(
+                    images, False
+                )
+            ))
         generators, _images, section = self._image_section()
         to_permutation = section._to_permutation
         permutation_image = section.permutation_group
@@ -2655,6 +2667,12 @@ end
           its length is the orbit of a class set, at most the number of
           isotropic classes of ``A_L``.  This direction needs no hypothesis:
           the equivariance holds for every isometry.
+          If the class orbit does not separate, the exact finite image of the
+          line's integral stabilizer decides membership of the witness in
+          ``rho(Gamma) rho(Stab(left))``. A strict datum fibre is thereby
+          detected without constructing integral stabilizer generators.
+          A negative answer also separates a joint sign quotient; a positive
+          answer leaves the sign conditions to the full adjustment.
 
         * **Rank two, complete parabolic.**  A subgroup element ``gamma``
           carrying ``left`` to ``witness(left)`` factors as ``witness s`` with
@@ -2683,7 +2701,28 @@ end
             target = _isotropic_line_class_points(
                 lattice, witness.transport_isotropic_object(left)
             )
-            return str(target) not in self.isotropic_class_orbit(source)
+            if str(target) not in self.isotropic_class_orbit(source):
+                return True
+            from sage_extensions.categories.group.groups import (
+                _element_to_engine,
+                _gap_model,
+                _law_reversed,
+            )
+
+            orthogonal = self._discriminant_group
+            engine = _gap_model(orthogonal)
+            stabilizer = left.stabilizer_discriminant_image()
+            right_image = libgap.Subgroup(
+                engine,
+                [_element_to_engine(orthogonal, g) for g in stabilizer.group_generators()],
+            )
+            left_image = self._joint_discriminant_image_gap()
+            point = _element_to_engine(orthogonal, self.image(witness)["discriminant"])
+            if int(libgap.Size(left_image)) == 1:
+                return not bool(point in right_image)
+            if _law_reversed(orthogonal):
+                left_image, right_image = right_image, left_image
+            return not bool(point in libgap.DoubleCoset(left_image, libgap.One(engine), right_image))
         if rank == 2:
             from sage_extensions.categories.group.groups import (
                 _element_to_engine,
@@ -4979,10 +5018,19 @@ def _yield_subgroup_isotropic_orbit_representatives(subgroup, rank, *, flag=Fals
                 if from_parabolic is not None:
                     yield from from_parabolic
                     continue
-            stabilizer = quotient.exact_isotropic_stabilizer_generators(
-                representative, flag=flag
-            )
-            for splitting in quotient.splitting_isometries(stabilizer):
+            if (not flag and rank == 1 and quotient._has_discriminant
+                    and not (quotient.determinant_kernel or quotient.spinor_kernel)):
+                image = representative.stabilizer_discriminant_image()
+                splittings = quotient.splitting_isometries_from_stabilizer_image(
+                    tuple(quotient.image_space()(lambda _label, g=g: g)
+                          for g in image.group_generators())
+                )
+            else:
+                stabilizer = quotient.exact_isotropic_stabilizer_generators(
+                    representative, flag=flag
+                )
+                splittings = quotient.splitting_isometries(stabilizer)
+            for splitting in splittings:
                 transported = splitting.transport_isotropic_object(representative)
                 source_terms = (
                     tuple(representative.terms()) if flag else (representative,)

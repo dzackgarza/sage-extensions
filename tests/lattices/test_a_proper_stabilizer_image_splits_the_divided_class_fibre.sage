@@ -14,6 +14,26 @@ would give a line stabilizer acting by 5 or its inverse there.
 The same argument applies in B, where the divided datum is zero.
 The finite-image fallback must decide these two distinct orbits
 without requiring the actual image to exhaust the datum stabilizer.
+
+The exact number of orbits in O(L).Ze is eight. Write A_L as
+Z/2 e' + Z/2 f' + Z/24 k', with 24q(x,y,z)=24xy-z^2 modulo 48.
+A nonzero singular element of order two is one of e', f',
+e'+12k', f'+12k', 12k'. The last pairs trivially with all the
+order-two elements and cannot be an image of e' because b(e',f')=1/2.
+There are eight possible ordered images of (e',f') with pairing 1/2.
+For each, orthogonality forces the first two coordinates of the image
+of k' (its third coordinate is odd), and its norm requires either
+z^2=1 or z^2=25 modulo 48, each giving four residues modulo 24.
+Thus |O(A_L)| <= 32. A stabilizer of Ze has h(e)=eps e,
+h(k)=12 eps delta c e+delta k, h(f)=6 eps c^2 e+eps f+c k
+for eps,delta in {+1,-1} and integral c, by the Gram equations.
+Its image depends only on c modulo 2 and delta, with all four
+possibilities realized by t and negation of k. The lifts s,g,t give
+four distinct images of e'; the lift a fixes e' but lies outside
+the image of the line stabilizer. Its datum stabilizer has at least
+two cosets of that order-four group, so the ambient image has at
+least 4*8=32 elements. Hence the orders are exactly 32 and 4, and
+each of the four divided classes carries two stable line orbits.
 """
 
 from sage_extensions.all import *  # noqa: F401,F403
@@ -37,6 +57,7 @@ def test_divisor_two_fibre_has_distinct_stable_line_orbits():
     stable = lattice.stable_orthogonal_group()
     quotient = stable.finite_character_quotient()
     assert general_image_certificate(quotient, line) is None
+    assert quotient.separates_witness_orbits(a, line) is True
     family = quotient.exact_isotropic_stabilizer_generators(line)
     assert all(line.stabilizes(h) for h in family)
     image = line.stabilizer_discriminant_image()
@@ -44,6 +65,28 @@ def test_divisor_two_fibre_has_distinct_stable_line_orbits():
     generated = lattice.discriminant_group().O().subgroup(tuple(rho(h) for h in family))
     assert all(h in generated for h in image.group_generators())
     assert all(h in image for h in generated.group_generators())
+    assert image.cardinality() == cardinal(4)
+    assert group.discriminant_image().cardinality() == cardinal(32)
+    lifts = quotient.splitting_isometries_from_stabilizer_image(
+        tuple(quotient.image_space()(lambda _label, g=g: g)
+              for g in image.group_generators())
+    )
+    assert lifts.cardinality() == cardinal(8)
+    classes = []
+    prior = []
+    for lift in lifts:
+        point = lift(e)
+        assert point.is_primitive() is True and point.q() == 0
+        assert lattice.div(point) == 2
+        classes.append(lattice.divided_discriminant_class(point))
+        for earlier in prior:
+            assert rho(~earlier * lift) not in image
+        prior.append(lift)
+    expected = tuple(lattice.divided_discriminant_class(x)
+                     for x in (e, f, g(e), (s*g)(e)))
+    assert all(x != y for i, x in enumerate(expected) for y in expected[i+1:])
+    assert all(sum(1 for x in classes if x == target) == 2 for target in expected)
+    assert all(any(x == target for target in expected) for x in classes)
     assert stable.isotropic_equivalence_witness(line, other) is None
 
 
