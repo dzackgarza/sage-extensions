@@ -313,3 +313,24 @@ branch (Coble call 1.07 s, diagonal rank-five call 0.71 s; 2 passed in
 13.27 s, test time gates disabled for diagnosis). This establishes the
 ambient step only. The finite stabilizer image and full stable-kernel
 consumer must still be checked, not inferred from ambient transitivity.
+
+## Full Coble regression in the native environment
+
+At exact revision `36c1d779bbb34c407955e3233fb4eaf01359ece5`,
+the unchanged full public regression
+`test_the_stable_line_orbit_row_returns_on_the_coble_lattice.sage`
+returned PASS in the pinned Sage runtime (2026-11-25).
+The explicit module-path probe selected the detached worktree
+`/repos/sage-extensions/.scratch/om319-0912/src`. The test ran
+on the original rank-11 Gram, computed the two finite images, checked
+inclusion of the stabilizer image in the ambient image, returned primitive
+isotropic lines, and asserted the exact ratio of their orders. Call
+515.2356609767303 s; total 524.48 s; exit 0. The report records commit
+`36c1d779` and 227.51656859880313 s for the public subgroup row,
+including 0.06410127086564898 s for its ambient row and
+226.12769082421437 s for coset splitting and transport.
+The difference (287.72 s) includes the independent setup of the two
+finite images and the test's checks outside the row.
+The correctness run had time gates disabled: the 20 s call ceiling and
+6 s collection ceiling were not met. This does not assert performance
+acceptance or independent review of the general proof.
