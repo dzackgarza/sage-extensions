@@ -2886,14 +2886,17 @@ class Lattices(OwnedCategoryOverBaseRing):
         """
         if isinstance(diagram_category, CosliceCategory):
             pointed = self._pointed_vector_stabilizer_generators(marked)
-        elif isinstance(diagram_category, OrientedIsotropicFlags):
-            pointed = None
-        else:
+        elif isinstance(diagram_category, _WalkingArrowFunctorCategory):
             pointed = self._isotropic_parabolic_generators(marked)
             if pointed is None:
                 pointed = self._nonisotropic_pointed_stabilizer_generators(
                     marked, setwise=True
                 )
+        else:
+            # A chain is not a single lattice arrow: its functor has an
+            # indexing category as domain. Preserve all its marking legs
+            # through the port's finite-sequence or oriented-flag classifier.
+            pointed = None
         if pointed is not None:
             return pointed
         from sage_indefinite_port.indefinite.marked_lattices import (

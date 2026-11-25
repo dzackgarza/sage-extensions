@@ -4951,10 +4951,10 @@ def _yield_subgroup_isotropic_orbit_representatives(subgroup, rank, *, flag=Fals
     ``T_{Co}`` has 189720 of them, and each is a constructed parent.
 
     The row is the ambient ``O(L)``-orbits, split under the subgroup.
-    A finite-codomain preimage uses the generic marked-lattice double-coset
-    action and its actual stabilizer image, regardless of whether that
-    subgroup contains a character kernel. The specialised character branch
-    retains its direct discriminant-image and parabolic orbit machinery.
+    A subgroup with complete finite-character data uses its direct
+    discriminant-image and parabolic orbit machinery. Other finite-codomain
+    preimages use the generic marked-lattice double-coset action and its
+    actual stabilizer image.
     """
     if not flag and index(rank) == 0:
         yield from subgroup.supergroup().isotropic_orbit_representatives(0)
@@ -4965,6 +4965,7 @@ def _yield_subgroup_isotropic_orbit_representatives(subgroup, rank, *, flag=Fals
 
     if (
         subgroup in PreimageSubgroups(orthogonal_group)
+        and not subgroup.contains_character_kernel()
         and subgroup.preimage_morphism().codomain().is_finite() is True
     ):
         # For H = rho^{-1}(K), H-orbits of G/P are precisely
@@ -5083,6 +5084,7 @@ def _subgroup_isotropic_equivalence_witness(subgroup, left, right, *, flag=False
 
     if (
         subgroup in PreimageSubgroups(orthogonal_group)
+        and not subgroup.contains_character_kernel()
         and subgroup.preimage_morphism().codomain().is_finite() is True
     ):
         # A transporter between isotropic flags/subobjects is exactly
@@ -5124,12 +5126,15 @@ def _subgroup_isotropic_equivalence_witness(subgroup, left, right, *, flag=False
     # The parabolic split's own lifts are ambient isometries between the
     # representatives it produced, so two registered planes have a witness
     # that no isometry search has to find.
-    left_lift = quotient.isotropic_lift_of(left) if quotient is not None else None
-    right_lift = quotient.isotropic_lift_of(right) if quotient is not None else None
+    # These registries are keyed by individual sublattice spans, not
+    # whole flags. A plane transporter need not preserve its marked line.
+    use_span_registry = quotient is not None and not flag
+    left_lift = quotient.isotropic_lift_of(left) if use_span_registry else None
+    right_lift = quotient.isotropic_lift_of(right) if use_span_registry else None
     witness = None
     if left_lift is not None and right_lift is not None:
         witness = right_lift * ~left_lift
-    elif quotient is not None:
+    elif use_span_registry:
         # The rows that produced these objects hold the words that transported
         # them, so an isometry between two transported objects is the composite
         # `g_right * b * ~g_left` of those words; no search is started for it.
