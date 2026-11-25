@@ -83,18 +83,9 @@ class ManifoldAtlasChart(SageObject):
         self._engine = engine_chart
         self._domain = domain
         self._cut_from = cut_from
-        self._function_ring = _manifold_function_ring(domain, manifold)
         self._nonvanishing = tuple(
             _raise_manifold_expression(_engine_manifold_expression(condition), self)
             for condition in nonvanishing
-        )
-        field = manifold.coordinate_field()
-        self._coordinates = finite_family(
-            tuple(
-                self._function_ring(_ChartCoordinate(engine_chart, index, field))
-                for index in range(int(manifold.dimension()))
-            ),
-            name=f"Coordinates of chart {label}",
         )
 
     def manifold(self):
@@ -139,16 +130,26 @@ class ManifoldAtlasChart(SageObject):
         """
         return self._nonvanishing
 
+    @cached_method
     def function_ring(self):
         r"""The owned ring of real-valued functions on the chart's domain.
 
         A chart coordinate is a section of this ring, and the ring's elements
         are the functions on the chart's domain the manifold assigns there.
         """
-        return self._function_ring
+        return _manifold_function_ring(self._domain, self._manifold)
 
+    @cached_method
     def coordinates(self):
-        return self._coordinates
+        field = self._manifold.coordinate_field()
+        ring = self.function_ring()
+        return finite_family(
+            tuple(
+                ring(_ChartCoordinate(self._engine, index, field))
+                for index in range(int(self._manifold.dimension()))
+            ),
+            name=f"Coordinates of chart {self._label}",
+        )
 
     def coordinate(self, index):
         position = self.coordinates().index_set()[int(index)]
@@ -910,11 +911,6 @@ def _sum_certificate_covers(manifold, labels, chart) -> bool:
     chart_conditions = tuple(
         _engine_manifold_expression(condition) for condition in chart.nonvanishing()
     )
-    # A member cut by several conditions leaves a point out where *some* condition
-    # vanishes, which is where their product vanishes; so each member contributes one
-    # condition, its product, and the family's uncovered set is the intersection of
-    # those (Lee, *Introduction to Smooth Manifolds*, 2nd ed., Ch. 1).  A condition
-    # decided to vanish nowhere is dropped first: cutting by it selects nothing.
     products = []
     for label in labels:
         read = _member_conditions_in_chart(manifold, label, chart)
@@ -926,10 +922,6 @@ def _sum_certificate_covers(manifold, labels, chart) -> bool:
             if _decided_nowhere_vanishing(condition, symbols, chart_conditions) is not True
         )
         if not kept:
-            # Every condition of this member vanishes nowhere, so the member is the chart
-            # its base chart is -- and that covers the chart being certified only when it
-            # reaches it.  A chart with no conditions at all is read on its own domain and
-            # says nothing about the points outside it.
             if any(
                 _engine_manifold_chart(chart).domain().is_subset(
                     _engine_manifold_chart(manifold.atlas()[label]).domain()
@@ -962,9 +954,6 @@ def _sum_certificate_covers(manifold, labels, chart) -> bool:
     squares = sum(product**2 for product in products)
     if _decided_nowhere_vanishing(squares, symbols, chart_conditions) is True:
         return True
-    # One member's uncovered set is its own zero set, and the nowhere-vanishing
-    # decision answers ``False`` when it decides that set is not empty: that is a
-    # decision that the family misses a point, which is the other answer.
     if len(products) == 1 and (
         _decided_nowhere_vanishing(products[0], symbols, chart_conditions) is False
     ):
@@ -1042,10 +1031,6 @@ def _conditions_share_no_zero(conditions, symbols) -> bool:
     one = len(basis) == 1 and basis[0].is_unit()
     if one:
         return True
-    # The conditions do share a zero over the algebraic closure, which says nothing
-    # about a real point unless the zero is real: only a nonzero constant in the
-    # elimination is a decision that no real common zero exists, so the answer here is
-    # undecided unless a certificate elsewhere decides it.
     return None
 
 
@@ -1837,10 +1822,6 @@ class TopologicalManifolds(OwnedCategory):
         coordinates of a point are elements of the coordinate field ``K``.
         """
 
-        # A point built here keeps the engine point its coordinates name.  An
-        # element that is the manifold's own element -- a real number is a
-        # point of the real line -- was not built here and keeps none: the
-        # chart it presents reads it through the coordinates it states.
         _engine_point = None
 
         def __init__(self, parent: Parent, coordinates, chart_label) -> None:
@@ -2092,10 +2073,6 @@ class TopologicalManifolds(OwnedCategory):
                 nonvanishing=nonvanishing,
                 cut_from=source_label,
             )
-            # The chart cut on the subset reads the same coordinates there, so the
-            # coordinate change to the chart it was cut from is the identity; it is
-            # defined on the whole of the cut chart, which is the subset of the chart
-            # it was cut from that its conditions select.
             self.transition_map(
                 label,
                 source_label,
@@ -2324,9 +2301,6 @@ class TopologicalManifolds(OwnedCategory):
                         continue
                     source_chart = domain.atlas()[source_label]
                     target_chart = domain.atlas()[target_label]
-                    # A chart whose domain is already the intersection states the
-                    # overlap as the whole of itself; a chart read on the whole
-                    # submanifold keeps the ambient overlap, read in its own ring.
                     domain.transition_map(
                         source_label,
                         target_label,
@@ -4302,8 +4276,6 @@ class ComplexManifolds(OwnedCategory):
         one = SR.one()
 
         def homogeneous(i):
-            # The engine's symbols for the homogeneous coordinates of a point of
-            # U_i, normalized by x_i = 1.
             affine = iter(tuple(_engine_manifold_chart(charts[i])[:]))
             return {k: one if k == i else next(affine) for k in indices}
 
