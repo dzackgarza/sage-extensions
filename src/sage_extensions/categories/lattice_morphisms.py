@@ -1605,9 +1605,6 @@ class LatticeIsometryMethods:
             extension = source.Isom(target)._isometry_from_column_matrix(
                 _engine_column_matrix_from_row_action(coisotropic)
             )
-            # The engine solution satisfies the pairing equations with the
-            # partial isometry exactly, so it is a point of the locus by
-            # construction; ``extension in points`` remains the explicit check.
             points = locus.object()
             return points.inclusion()(points._retain_admitted_member(extension))
         for inclusion in (source_inclusion, target_inclusion):
@@ -1744,28 +1741,12 @@ class LatticeIsometryMethods:
             and source.module_rank() == target.module_rank()
             and ring is _owned_integers()
         ):
-            # The lattice frame carried by each base change is the integral
-            # basis itself, so integral membership of the forward map is read
-            # directly from rational coordinates against that frame, and the
-            # same rows feed the unimodular gate: a square integral matrix
-            # has an integral two-sided inverse exactly when its determinant
-            # is +-1, and that inverse's coordinates are what the general
-            # route computes as the second rational preimage.  The whole
-            # per-element factor/preimage machinery of the general route is
-            # thereby answered from one coordinate pass per conversion: the
-            # general route runs one element preimage and one solve per
-            # conversion, and this pass computes the same data once.
-            # The framed matrix of the rational map is read in one engine
-            # call: column s is the coordinate vector of the image of e_s.
             rational_matrix = _engine_matrix(_module_matrix(self))
             if any(not entry.is_integer() for entry in rational_matrix.list()):
                 return None
             coordinates = rational_matrix.change_ring(SageZZ)
             if int(coordinates.determinant()) not in (1, -1):
                 return None
-            # Both factors are raised from their framed matrices; the backward
-            # factor is the integral inverse matrix (columns are the images
-            # of the target generators).
             forward = _morphism_from_engine_matrix(source.module_category().Mor(source, target), coordinates)
             backward = _morphism_from_engine_matrix(
                 source.module_category().Mor(target, source), coordinates.inverse().change_ring(SageZZ)
@@ -1906,9 +1887,6 @@ class LatticeIsometryMethods:
             and other.codomain() is self.codomain()
         ):
             return False
-        # The complete type-(1,1) coordinate tensor determines this linear
-        # map in the selected endpoint framings. Retain that same value used
-        # by hashing instead of reevaluating each generator image per query.
         return other._engine_coordinate_matrix() == self._engine_coordinate_matrix()
 
     def __ne__(self, other) -> bool:
@@ -1956,8 +1934,6 @@ class LatticeIsometryMethods:
 
     def __mul__(self, other):
         if isinstance(other, LatticeIsometryMethods) and other.codomain() is self.domain():
-            # Every composable pair, endomorphism or not, composes as the
-            # product of its endpoint-framed matrices.
             return self.parent().compose(self, other)
         return super().__mul__(other)
 
@@ -1974,16 +1950,6 @@ class LatticeIsometryMethods:
 
         match obj in ModuleSubobjects(self.codomain().base_ring()):
             case True:
-                # The image of a primitive isotropic subobject under an
-                # isometry is again one, and ``primitive_isotropic_subobject``
-                # re-verifies both facts and places the result in the category
-                # that owns the parabolic and reduction methods, which the bare
-                # module image does not.
-                #
-                # The plane's image is therefore computed there and nowhere
-                # else: the images of the plane's basis are carried by this
-                # isometry, one matrix product a vector, and their span is the
-                # image plane.
                 inclusion = obj.inclusion()
                 domain = inclusion.domain()
                 basis = tuple(
@@ -2056,8 +2022,6 @@ class LatticeIsometryMethods:
 
         lattice = self.domain()
         ring = lattice.base_ring()
-        # Sage chooses a sparse exponent dictionary by default for orders
-        # such as 4.  This evaluation iterates consecutive powers of f.
         coefficients = cyclotomic_coeffs(int(order), sparse=False)
 
         def image(label):
@@ -2114,8 +2078,6 @@ class LatticeIsometryMethods:
         if empty is True:
             return None
         if target.module_rank().is_finite() and target.is_definite():
-            # The search runs over the finite group O(L) of a definite lattice over ZZ
-            # (orthogonalGroup_finite); over QQ they form O(V), not finite in rank at least 2.
             assert target.base_ring() is _owned_integers(), (
                 f"cannot find an isometry h: {source} -> {target} with h*{self} = {other}*h: "
                 f"the search runs over the finite orthogonal group of a definite lattice over ZZ, "
@@ -2399,9 +2361,6 @@ def _hermitian_miranda_morrison_image(isometry, action):
             label: sum((int(entry) * image for entry, image in zip(row, classes, strict=True)), form.zero())
             for label, row in zip(form.module_generating_set(), matrix.rows(), strict=True)
         })
-        # The native kernel acts by isometries on the dual-basis classes.
-        # Retain the inverse on that finite module before the form owner's
-        # normalization transports this isometry into its orthogonal group.
         isometry_on_form = _torsion_form_isometry(
             forward, forward.inverse(), quadratic=True,
         )
@@ -3336,7 +3295,6 @@ def _summandwise_isometry(source, target):
                 break
         else:
             return False
-    # W sends the source summand basis to the matched target images.
     source_change = engine_matrix(SageZZ, source_columns).transpose()
     target_change = engine_matrix(SageZZ, target_columns).transpose()
     return target_change * source_change.inverse()
@@ -3381,34 +3339,12 @@ def _definite_isometry_matrix(domain_gram, codomain_gram, sign):
     """
     from sage.quadratic_forms.quadratic_form import QuadraticForm
 
-    # The isometry search runs on LLL-reduced grams: PARI's qfisom
-    # enumerates the vectors of norm up to the maximal diagonal
-    # entry of the form it is given (The PARI Group, *PARI/GP*,
-    # qfisominit), so a search on reduced grams keeps that
-    # enumeration small; the reduction of each gram is PARI's
-    # qflllgram (The PARI Group, *PARI/GP*, qflllgram: the
-    # unimodular transformation matrix T with x*T an LLL-reduced
-    # basis for the gram
-    # G = x~*x).  When the two reduced grams coincide no search is
-    # needed at all: the equation
-    # Ts~ source Ts == Tt~ target Tt solves for the column action
-    # W = Tt Ts^-1, which satisfies W~ target W == source.  When
-    # they differ, the search runs on the reduced grams as well:
-    # the equation
-    # U~ Tt~ target Tt U == Ts~ source Ts solves for the column
-    # action U on the reduced pair, and the conjugation
-    # W = Tt U Ts^-1 carries it back, still satisfying
-    # W~ target W == source.
     from sage.libs.pari import pari
 
-    # A primitive pair has the same isometries as the pair it came from, and
-    # it is the pair PARI can hold.  Equal content is necessary for
-    # isometry, so the unequal case is decided here without a search.
     content = domain_gram.gcd()
     if content != codomain_gram.gcd():
         return False
     if content == 0:
-        # The zero form is its own content, so it has no primitive form.
         source_form = domain_gram
         target_form = codomain_gram
     else:
@@ -3462,11 +3398,7 @@ def _definite_automorphisms(gram):
     from sage.arith.misc import factorial
 
     if gram.nrows() == 0:
-        # The empty form has the trivial one-element orthogonal group.  Its
-        # scalar content is zero, so the normalization below is not defined.
         return SageZZ.one(), ()
-    # M^t (c G) M = c G is equivalent to M^t G M = G for c != 0.
-    # Remove the scalar content before PARI converts entries to machine integers.
     gram = (gram / gram.gcd()).change_ring(SageZZ)
     summands = indecomposable_summand_bases(gram)
     if summands is None or len(summands) == 1:
@@ -3475,7 +3407,6 @@ def _definite_automorphisms(gram):
             engine_matrix(SageZZ, generator.sage()).transpose()
             for generator in order_and_generators[1]
         )
-    # Column action in the basis adapted to the summands.
     change = engine_matrix(SageZZ, [row for basis in summands for row in basis.rows()]).transpose()
     reduced = change.transpose() * gram * change
     blocks = []
@@ -3610,8 +3541,6 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
                 _refuse_foreign_arrow(self, images, "use the functor between the source and target categories")
             images = self._generator_images_of_an_equal_copy(images)
         if isinstance(images, (Map, CategoricalArrow)):
-            # A module isomorphism or automorphism, a lattice endomorphism or a
-            # set map: almost none is an isometry (``CON-17``).
             _refuse_foreign_arrow(
                 self, images, "an isometry is given by its generator images, a function on elements or a "
                 "matrix; the scalar extension of an isometry is its base_change"
@@ -4129,9 +4058,6 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
             preimage, orbit_points, orbit_words, augmentation
         ):
             if candidate == one:
-                # The pair whose word first reaches its point: its image is the
-                # identity, which is what ``drop_trivial`` leaves out of the
-                # presented family, and no subgroup fails to contain it.
                 continue
             image = _element_to_engine(orthogonal, image_of(candidate))
             if subgroup is not None and image in subgroup:
@@ -4197,10 +4123,6 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
         by_identity = {
             id(isometry): permutation for isometry, permutation in zip(generators, permutations)
         }
-        # The table is keyed by object identity, so the elements in it must stay
-        # alive: an id is reused once its object is collected, and a reused id
-        # would hand this action a different element's permutation --- which
-        # silently shrinks the orbit.  ``retained`` is that ownership.
         retained = list(generators)
 
         def action(element, point):
@@ -4689,11 +4611,6 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
             and lattice.module_rank() == 1
             and lattice.is_definite()
         ):
-            # BilinModuleCat.orthogonalSubgroup in
-            # LeanCategories/Modules/Bilinear/Valued/OrthogonalGroup.lean
-            # requires b(gx, gy)=b(x,y). In one coordinate its defining
-            # equation is a*u^2=a. Sage's exact polynomial roots supply all
-            # solutions in the base ring; GAP retains their generated matrix group.
             from sage.rings.polynomial.polynomial_ring_constructor import PolynomialRing
 
             ring = _engine_ring(lattice.base_ring())
@@ -4709,12 +4626,6 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
         signature = lattice.signature_pair()
         if signature.first() == lattice.base_ring().zero() and signature.second() != lattice.base_ring().zero():
             gram = -gram
-        # Sage IntegralLattice.orthogonal_group uses this same PARI qfauto
-        # computation and transposes its column-action generators. Retain
-        # PARI's full order as well as the generators in the private engine.
-        # https://doc.sagemath.org/html/en/reference/modules/sage/modules/free_quadratic_module_integer_symmetric.html
-        # One PARI qfauto call returns |O(L)| and generators acting on
-        # columns (PARI 2.17 manual, qfauto); transpose them to row actions.
         gram.set_immutable()
         order, generators = _definite_automorphisms(gram)
         engine = IntegralLattice(gram).orthogonal_group(gens=list(generators), is_finite=True)
@@ -4769,10 +4680,6 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
         matrices = tuple(self._row_action_matrix(generator) for generator in generators)
         lattice = self.domain()
         if lattice.module_rank() == 0:
-            # Sage has no degree-zero matrix group.  The unique isometry of
-            # the zero lattice generates the trivial group, presented here
-            # by the trivial subgroup of the one-dimensional matrix group.
-            assert not matrices, f"the zero lattice {lattice} has a nonidentity isometry"
             return MatrixGroup((identity_matrix(SageZZ, 1),)).subgroup(())
         if lattice.base_ring() is _owned_integers() and lattice.is_definite():
             from sage_extensions.categories.group.groups import _engine_generated_subgroup
@@ -4792,10 +4699,6 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
 
     def _engine_subgroup_contains(self, automorphism, engine_subgroup):
         matrix = self._row_action_matrix(automorphism)
-        # The selected generator and its inverse are members by the
-        # definition of generated subgroup, independently of whether Sage's
-        # matrix-group membership algorithm decides an infinite subgroup.
-        # Orbit-span closure needs precisely these two directions.
         if any(matrix == generator.matrix() or matrix == generator.matrix().inverse()
                for generator in engine_subgroup.gens()):
             return True
@@ -4829,8 +4732,6 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
         """
         lattice = self.domain()
         if lattice.module_rank() == 0:
-            # O(0) is trivial, generated by the empty family (TRAPS.md: Sage's
-            # GroupOfIsometries cannot be formed on an empty generating family).
             generators = ()
         elif (
             lattice.base_ring() is _owned_integers()
@@ -5018,8 +4919,6 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
             print(f"[se-stage] _marked_automorphism_generators start t={_time.monotonic():.1f}", flush=True)
         _t = _time.monotonic()
         result = lattice.lattice_category()._marked_automorphism_generators(category, marked)
-        # Materialize the returned family once, so the debug count below
-        # never consumes a one-shot iterator ahead of the real consumer.
         counted = list(result)
         if _os.environ.get("SE_DEBUG_STAGES"):
             print(f"[se-stage] _marked_automorphism_generators done in {_time.monotonic()-_t:.1f}s: {len(counted)} gens", flush=True)
@@ -5112,9 +5011,6 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
                     if arrow.domain().module_rank() == 1:
                         images = tuple(arrow(point) for point in arrow.domain().module_generators())
                         if len(images) == 1 and images[0].is_primitive() and images[0].q() == lattice.base_ring().zero():
-                            # The existing Eichler certificate computes the image of
-                            # the setwise line stabilizer, including its sign factor.
-                            # A coslice fixes its source generator and cannot use it.
                             line_image = quotient.isotropic_line_stabilizer_image(lattice.subobject_on(images))
                             if line_image == "NOSPLIT":
                                 return finite_ordered_set((marked,))
@@ -5141,7 +5037,6 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
             and subgroup.supergroup() is self
             and subgroup.preimage_morphism().codomain().is_finite() is True
         ):
-            # H \\ G / P = K \\ F / rho(P), using the finite image F of rho.
             representation = subgroup.preimage_morphism()
             image = representation.codomain()
             stabilizer_image = image.subgroup(tuple(
@@ -5730,14 +5625,8 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
             modules = domain.module_category()
             matrices = MatrixSpaces(ring)
             if modules.Mor(domain, middle) in matrices and modules.Mor(middle, codomain) in matrices:
-                # In the actual endpoint framings, second after first has
-                # column matrix B*A. The module owner's existing adapters
-                # retain those framings and immediately raise the product.
                 product = _engine_matrix(second.module_morphism()) * _engine_matrix(first.module_morphism())
                 linear = _morphism_from_engine_matrix(modules.Mor(domain, codomain), product)
-                # The two supplied isometries establish form preservation.
-                # Retain their linear composite as this owner's constructor
-                # datum, including its selected module realization.
                 parent = domain.Isom(codomain)
                 return parent.element_class(parent, linear)
         return first.domain().Isom(second.codomain())(lambda label: second(first(first.domain().module_generator(label))))
@@ -5778,8 +5667,6 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
         from sage_extensions.categories.modules.pure.modules import _linear_arrow_from_engine_matrix
         from sage_extensions.categories.rings.ring_foundation import _linear_algebra_ring
 
-        # Columns are generator images of a free module, so their linear
-        # extensions are linear: no relation is checked.
         def framed(mor, matrix):
             snapshot = matrix.change_ring(_linear_algebra_ring(mor.base_ring()))
             snapshot.set_immutable()
@@ -5903,8 +5790,6 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
                     return (True, None)
                 return (False, "equivalent in the cycle classification of binary forms [CS99, Ch. 15, §3.3]")
             case True, _:
-                # Cardinality parents are not scalar elements of the base ring;
-                # coerce their finite integer value before entering the fraction field.
                 order = int(domain.orthogonal_group().cardinality())
                 if domain.genus().mass() * domain.base_ring().fraction_field()(order) == 1:
                     return (False, "a genus of mass 1/|O(L)| is one class [Conway--Sloane, Low-dimensional lattices IV, eq. (1)]")
@@ -6010,17 +5895,10 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
             return None
         if int(domain.module_rank()) != int(codomain.module_rank()):
             return None
-        # The route serves indefinite pairs; a definite pair (one signature
-        # part zero) is the definite route's, and the port only receives
-        # what no route of this library decided.
         signature = domain.signature_pair()
         if signature.first() == 0 or signature.second() == 0:
             return None
 
-        # The represented U + U + K decompositions, with the two hyperbolic
-        # planes first and the even unimodular definite complement last.
-        # A lattice not constructed as a biproduct has no represented
-        # decomposition, so the pair is outside this route's scope.
         from sage_extensions.categories.modules.pure.modules import BiproductModules
 
         if domain not in BiproductModules(domain.base_ring()) or codomain not in BiproductModules(codomain.base_ring()):
@@ -6046,10 +5924,6 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
         if int(domain_complement.module_rank()) != int(codomain_complement.module_rank()):
             return None
 
-        # The E8(-1)^2 side: its complement splits as two rank-8 unimodular
-        # even definite factors.  The route constructs from that side
-        # towards the other; when the codomain is that side, the constructed
-        # column matrix is inverted for the forward witness.
         def _splits_as_two_e8_sums(complement):
             try:
                 factors = (complement.biproduct_factor(0), complement.biproduct_factor(1))
@@ -6076,15 +5950,10 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
         target_gram = _engine_component_matrix(target.gram_tensor()).change_ring(SageZZ)
         rank = int(source.module_rank())
         gram8 = source_gram.matrix_from_rows_and_columns(range(4, 12), range(4, 12))
-        # The complement K of the source's own 2U-splitting: the neighbour is
-        # constructed on K's Gram matrix, and the E8(-1) summand shells live
-        # in it.
         complement_gram = source_gram.matrix_from_rows_and_columns(range(4, rank), range(4, rank))
         target_complement_gram = target_gram.matrix_from_rows_and_columns(range(4, rank), range(4, rank))
         target_order = QuadraticForm(SageZZ, -target_complement_gram).number_of_automorphisms()
 
-        # The neighbour search: the diagonal w = v + v over the norm-(-4),
-        # divisibility-one shell of one E8(-1) summand, in the shell's order.
         shell = QuadraticForm(SageZZ, -gram8).short_vector_list_up_to_length(4)[2]
         chosen = None
         for coordinates in shell:
@@ -6110,14 +5979,11 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
             return None
         w, coefficient = chosen
 
-        # The isotropic vector u = 2f + w + ce in the first U + K; its
-        # divisibility and isotropy are decided by computation.
         u = engine_vector(SageZZ, [coefficient, 2, 0, 0] + list(w))
         pairings = source_gram * u
         if int(pairings * u) != 0 or gcd(*(int(entry) for entry in pairings)) != 1:
             return None
 
-        # z with u.z = 1, isotropic, from the Smith form of the pairing row.
         system = engine_matrix(SageZZ, [list(pairings)])
         _, _, V = system.smith_form()
         z0 = V.column(0)
@@ -6132,8 +5998,6 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
         if int(z * source_gram * u) != 1 or int(z * source_gram * z) != 0:
             return None
 
-        # M1 = u^perp cap z^perp within the first U + K: the second plane's
-        # coordinates are pinned to zero by the last two selector rows.
         conditions = engine_matrix(
             SageZZ,
             [
@@ -6148,8 +6012,6 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
             return None
         member_gram = member * source_gram * member.transpose()
 
-        # The definite isometry M1 -> the target complement, by the
-        # library's own exact route; its row matrix is verified exactly.
         member_lattice = Lattices(SageZZ)([list(row) for row in member_gram])
         target_lattice = Lattices(SageZZ)([list(row) for row in target_complement_gram])
         witness = member_lattice.Isom(target_lattice).an_element()
@@ -6161,8 +6023,6 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
         if definite * target_complement_gram * definite.transpose() != member_gram:
             return None
 
-        # The new basis (u, z, M1, e_b, f_b) of the source and the images
-        # (e_a', f_a', T16, e_b', f_b'); the change of basis is unimodular.
         new_basis = [list(u), list(z)] + [list(row) for row in member.rows()]
         new_basis += [[0, 0, 1, 0] + [0] * (rank - 4), [0, 0, 0, 1] + [0] * (rank - 4)]
         change = engine_matrix(SageZZ, [list(column) for column in zip(*new_basis)])
