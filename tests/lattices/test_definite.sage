@@ -98,6 +98,38 @@ def test_orthogonal_group_of_a2_has_order_12() -> None:
                 )
 
 
+
+def test_orthogonal_group_is_invariant_under_large_unimodular_shear() -> None:
+    r"""A sheared A2 still has its twelve integral automorphisms.
+
+    The basis (e, f + 2^35 e) has determinant one relative to (e, f).
+    Conway--Sloane, SPLAG 4.6.1, gives the A2 group order 12.
+    """
+    root = Lattices(ZZ)([[2, -1], [-1, 2]])
+    e, f = tuple(root.module_generators())
+    changed = (e, f + ZZ(2)**35 * e)
+    lattice = Lattices(ZZ)(tuple(tuple(root.b(x, y) for y in changed) for x in changed))
+    group = lattice.O()
+    assert group.order() == 12
+    basis = tuple(lattice.module_generators())
+    generators = tuple(group.group_generators())
+    assert generators
+    assert all(lattice.b(g(x), g(y)) == lattice.b(x, y)
+               for g in generators for x in basis for y in basis)
+    # The orbit of an ordered basis under a group of lattice automorphisms
+    # has trivial stabilizer. Check generation, not only the engine's order.
+    orbit = {basis}
+    frontier = [basis]
+    while frontier:
+        x, y = frontier.pop()
+        for g in generators:
+            image = (g(x), g(y))
+            if image not in orbit:
+                orbit.add(image)
+                frontier.append(image)
+    assert len(orbit) == 12
+
+
 def test_indefinite_isometry_ladder_uses_parity_as_an_exact_obstruction() -> None:
     even = Lattices(ZZ)("U")
     odd = Lattices(ZZ)([[1, 0], [0, -1]])
