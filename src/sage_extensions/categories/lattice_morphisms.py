@@ -3402,9 +3402,16 @@ def _definite_automorphisms(gram):
     gram = (gram / gram.gcd()).change_ring(SageZZ)
     summands = indecomposable_summand_bases(gram)
     if summands is None or len(summands) == 1:
-        order_and_generators = pari(gram).qfauto()
+        # The decomposition's single-summand result may be the original
+        # basis, not an LLL-reduced one. Compute in a reduced integral basis
+        # and conjugate back: U^t G U = G_red implies that U h U^-1 is an
+        # automorphism of G for every automorphism h of G_red, and conversely.
+        change = pari(gram).qflllgram().sage()
+        reduced = change.transpose() * gram * change
+        change_inverse = change.inverse()
+        order_and_generators = pari(reduced).qfauto()
         return SageZZ(order_and_generators[0]), tuple(
-            engine_matrix(SageZZ, generator.sage()).transpose()
+            engine_matrix(SageZZ, change * generator.sage() * change_inverse).transpose()
             for generator in order_and_generators[1]
         )
     change = engine_matrix(SageZZ, [row for basis in summands for row in basis.rows()]).transpose()
