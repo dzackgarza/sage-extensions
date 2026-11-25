@@ -185,7 +185,7 @@ when it agrees with those sources.
 
 # Performance claims (always-on)
 
-**Never report a call count as an efficiency metric.** Not "2,502 constructions",
+Do not report a call count as an efficiency metric. Not "2,502 constructions",
 not "~3 million calls to `coordinate_ring`", not "it runs 484 times". A count is
 not a cost: a million cheap calls can be free and four hundred expensive ones can
 be the whole run, so the number carries no information about what to fix and
@@ -265,7 +265,7 @@ the category states. Every construction in the tree moves to this shape;
   generators, an inverse, a Gram matrix of a sublattice, a genus symbol) is
   computed on the first request, cached on the object, and reused by every
   method that needs it.
-- **Checking is a validator, never inline.** A well-definedness condition
+- **Checking is a validator, not inline code.** A well-definedness condition
   (linearity, isometry, equivariance, injectivity, an algebra's relations) is a
   validator method of the object. Construction calls the validators once,
   after the object exists, and each validator returns at once unless the
@@ -765,7 +765,7 @@ real morphisms. A design that threads only object parents has not started.
 `PLAN-threading-set-behaviour` records the runtime evidence; the later public type-protocol
 decision supersedes its Sage method-container vocabulary.
 
-**Added structure enriches an object; it never wraps one.** A formed module *is* a
+Added structure enriches an object; it does not wrap one. A formed module *is* a
 module that additionally has a form. An abelian group *is* a $\mathbb{Z}$-module.
 `ZZ` is at once a ring, a rank-one $\mathbb{Z}$-module, a rank-one
 $\mathbb{Z}$-algebra, a group and a monoid — one object, several categories. A
@@ -810,7 +810,7 @@ supercategory. No implementation base is written. A leaf knows its own level and
 above: it never names a category two levels up, never restates anything from below, and never
 writes a forwarding method. Obligations compose by induction — if every level fulfils the one
 above it, every object's obligations are met and no leaf carries the transitive burden.
-**The author of a lattice category never writes the word cardinality**; they construct the
+The author of a lattice category does not write the word cardinality; they construct the
 underlying module and stop. The decay signal is a leaf *reaching down*: importing a lower
 implementation class to call it, restating a lower level's computation because the chain did
 not deliver it, or calling `Parent.__init__`. The decision record, with the runtime evidence
@@ -966,7 +966,7 @@ datum; a method on an object returning a morphism between two *other* objects; a
 `from_*` classmethod duplicating a homset's `_element_constructor_`.
 (Vault: `a-group-action-is-a-morphism-the-caller-constructs`.)
 
-**Shared infrastructure never carries a local exception.** The global QC in
+Shared infrastructure does not carry a local exception. The global QC in
 `~/ai-review-ci` is machine-wide and already has sanctioned routes for shielding code
 (the excluded directory names, the archived paths). A repo-specific rule, exclusion
 or suppression written into it inverts ownership in either direction — a local ruling
@@ -1062,7 +1062,7 @@ Put such tables on the namespace that owns the specimens.
 
 Prefer **one clean export** for a catalogue surface: import `Lattices`, use `Lattices.…`. Do not re-export every attribute at module level.
 
-**Functors, adjunctions and constructions are spelled on categories, never as standalone functions** (ruled 2026-09-05; the expectation files under `tests/constructions/` and `tests/user_simulations/` are written this way and are the spec). One rule per kind:
+Functors, adjunctions and constructions are spelled on categories, not as standalone functions (ruled 2026-09-05; the expectation files under `tests/constructions/` and `tests/user_simulations/` are written this way and are the spec). One rule per kind:
 
 - A functor is a method of its domain category, named by the construction, taking only what fixes the codomain: `Modules(ZZ[H]).induction(G)`, `FiniteGSets(G).orbits_functor()`, `Groups().abelianization()`, `Algebras(R).Associative().Unital().Commutative().spectrum()`.
 - An adjunction is a method of the left adjoint's domain category, named by the pair: `Modules(ZZ[H]).induction_restriction_adjunction(G)`, `FiniteSets().free_underlying_adjunction(G)`.
@@ -1517,7 +1517,7 @@ If that cannot be done exactly, surface the nuance and defer the mathematical de
 
 ## `object` is never a type; `Any` has exactly one position
 
-**`object` is never allowed as a type. There is no exception.** Not as a
+`object` is not allowed as a type, in any position. Not as a
 parameter, not as a return, not inside a container, not under `TYPE_CHECKING`.
 A value annotated `object` supports no arithmetic, no membership and no method,
 so the annotation states nothing about the value and the checker admits
@@ -1531,7 +1531,7 @@ anything, and answering is the method's whole purpose. If some other site
 appears to take genuinely arbitrary input, that is a finding to raise, not a
 licence to widen an annotation.
 
-**`Any` is never valid as a return type.** A method knows what it produces.
+`Any` is not valid as a return type. A method knows what it produces.
 Write the type:
 
 - `Self`, when the method returns another object of the receiver's own kind;
