@@ -142,72 +142,10 @@ the remaining shared presentation with its consumer.
 
 # Mathematical structure as implementation compression
 
-An advisor can compress a large mathematical correction into one short
-question.  The student must unfold the structure that makes the correction
-true.  The question is not a request for the smallest compatible patch.
-
-Consider an integral domain \(R\) and its fraction field
-\(K=\operatorname{Frac}(R)\).  The advisor asks why ideals are not presented as
-\(R\)-submodules of the regular module \(R\).  The advisor also asks why an
-integral basis is not an \(R\)-basis of the relevant integral \(R\)-algebra.
-These are not two method requests.  They expose one missing mathematical
-foundation.
-
-Scalar extension relates the algebra and module categories:
-
-```text
-Alg_R  -- K tensor_R (-) -->  Alg_K
- | U_R                         | U_K
- v                             v
-Mod_R  -- K tensor_R (-) -->  Mod_K
-```
-
-The vertical functors take the underlying modules.  The horizontal functors
-change scalars.  Their compatibility explains how algebra structure, module
-structure, bases, subobjects, and morphisms move together.
-
-For an integral \(R\)-algebra \(O\), its base change can give a
-\(K\)-algebra \(A\):
-
-\[
-K\otimes_R O \cong A.
-\]
-
-The integral basis then belongs to the underlying \(R\)-module of \(O\).
-It is not a new tuple-valued operation attached directly to \(A\).  The same
-base-change structure gives \(K\otimes_R R[x]\cong K[x]\).  Polynomial rings
-and number-field algebras therefore belong to one scalar-change theory.
-
-This theory is implementation compression.  Ideals can use module and
-subobject operations.  Bases can use the free-module structure.  Algebra
-morphisms can move through scalar extension.  Many apparent missing methods
-become consequences of structures that `lean-categories` formalizes and the
-repository already presents.
-
-The failed trajectory hears only the word "basis".  It asks PARI for
-elements and returns a tuple in \(A\).  It can also take a chosen
-\(K\)-basis and clear denominators.  Both actions produce local data while
-leaving the algebra and functors absent.
-
-Clearing denominators selects a presentation-dependent \(R\)-lattice.  It
-does not by itself select the integral closure or a maximal order.  It gives
-no coherent action on morphisms.  It therefore cannot explain later basis,
-ideal, or transport operations.
-
-Rejecting a Sage order wrapper does not remove the mathematical order.  It
-makes ownership of the integral \(R\)-algebra more important.  PARI can
-compute data used to construct that object.  PARI cannot replace the object
-or the functorial structure around it.
-
-The advisor's question reveals why dozens of methods remain missing.  Their
-absence is not necessarily a backlog of local implementations.  It can show
-that one theoretical foundation is absent.  Once that foundation exists,
-the apparently difficult work can become generic and small.
-
-The lesson is not a rule that functors always precede methods.  The lesson is
-to recognize mathematical compression.  A deep correction can change which
-work exists at all.  Preserving the old implementation with a cheap
-workaround preserves the misunderstanding that created the work.
+When an owner's short question or correction asks why one object is not
+presented through a more general structure, read
+[implementation compression](docs/agents/implementation-compression.md)
+before writing any method it seems to request.
 
 # Search the formalization corpus first (always-on)
 
@@ -595,16 +533,14 @@ the preamble and answers while that tree is mid-refactor and does not load.
 The graph theory is Sage's -- homology, minimum cycle basis, transitive
 reduction -- so the recipes run under Sage's own interpreter:
 
-```bash
-just category-graph                     # every category, and what it declares
-just category-graph by-supercategory    # each supercategory, and who claims it
-just category-graph foreign             # owned categories declaring a Sage category
-just category-graph shape               # breadth, depth, shortcut declarations
-just category-graph cells               # homology, and the cycles owing a 2-cell
-just category-graph-svg                 # the literal graph, rendered
-just category-graph constructions       # each construction on objects, and where its result is placed
-just category-graph routes              # where objects reach an operation's fallback assertion
-```
+- `just category-graph`: every category, and what it declares.
+- `just category-graph by-supercategory`: each supercategory, and who claims it.
+- `just category-graph foreign`: owned categories declaring a Sage category.
+- `just category-graph shape`: breadth, depth, shortcut declarations.
+- `just category-graph cells`: homology, and the cycles owing a 2-cell.
+- `just category-graph-svg`: the literal graph, rendered.
+- `just category-graph constructions`: each construction on objects, and where its result is placed.
+- `just category-graph routes`: where objects reach an operation's fallback assertion.
 
 The `by-supercategory` view is the audit surface: a large group under one
 heading is one mathematical claim made many times over, and reading the members
@@ -1093,7 +1029,7 @@ may implement that runtime; Sage's concrete mathematical parents and element typ
 do not become the public objects. Do not introduce an `ElementFacade`,
 `MorphismFacade`, or generic attribute-forwarding layer to preserve a foreign API.
 
-See [private runtime realization](#addendum-private-sage-runtime-realization-of-owned-category-types)
+See [private runtime realization](docs/agents/private-sage-runtime-realization.md)
 for the permitted host boundary and the architecture specification for the public
 construction and private computation contracts.
 
@@ -1853,124 +1789,18 @@ such a case is a criterion smuggled in without its theorem.
 
 # Addendum: private Sage-runtime realization of preamble category types
 
-The [architecture specification](CONTRIBUTING.md#preamble-architecture-specification)
-governs this boundary. Host runtime reuse and engine computation are different
-responsibilities. Neither permits a Sage mathematical parent or element to become
-the public preamble object by reclassification, subclassing, or facade parenting.
-
-The preamble's category graph supplies `ObjectType`, `ElementType`, and
-Hom-category types. Its root runtime may use Sage `Parent`, `Element`,
-dynamic-class machinery, and method containers to realize those generated types.
-`ParentMethods`, `ElementMethods`, and `SubcategoryMethods` name private Sage
-mechanisms, not public placement. Keep the mapping in the shared runtime; descendants
-declare their immediate mathematical structure and do not assemble host bases.
-
-The shared construction path establishes required data before public return.
-Only the root owns non-cooperative host initialization. A host post-init or
-element-construction hook implements that path and cannot bypass it. Refinement
-acts on a preamble object whose supplied data place it in the added category;
-it neither constructs missing data by a label, nor follows a computed answer,
-nor adopts a foreign instance.
-
-Method-resolution details remain private. The runtime must make the selected
-preamble operation authoritative, preserve existing justified placements, and
-propagate element and morphism behavior through the same graph. If private
-Sage category joining or dynamic-class ordering is required, implement it once
-at that owner under its declared protocol. Consumers do not call
-`_refine_category_`, rebuild `__class__`, install methods, or intercept engine
-constructors to change a result's public meaning.
-
-Concrete Sage rings, modules, groups, matrices, and their elements remain private
-computation representations. An adapter builds them from preamble data, invokes
-established algorithms, then raises every result through the preamble constructors.
-It does not reclass those Sage objects, patch their APIs, or teach Sage
-constructors to accept preamble parents. Private computational workspace mutation
-does not alter the defining data. Cache and lifetime choices respect `OWN-10`.
-
-Historical mechanisms remain inspectable at
-`archives/lattice-research/src/sage_patches/ring_base_category.py`,
-`archives/lattice-research/src/sage_patches/ideal_submodule.py`,
-`archives/lattice-research/src/sage_patches/fraction_quotients.py`, and
-`archives/lattice-research/src/sage_patches/module_enrichment.py`, or in their
-source history. These are references, not sanctioned public construction routes.
-The live construction contract above is what future code must satisfy.
+Before editing the root runtime, dynamic classes, host `Parent`/`Element`
+initialization, category refinement or an engine adapter, read
+[private runtime realization](docs/agents/private-sage-runtime-realization.md).
 
 # Transcript-derived research directives (2026-08-21)
 
-The governing model is:
-
-- Mathematics determines the architecture.
-- Categories own generic operations.
-- Concrete classes store only necessary construction data.
-- A leaf category handles only its immediate supercategory.
-- Structure and methods must then propagate through the full category chain.
-- The system must support parent, element, and subcategory methods.
-- Category methods should precede class methods in the MRO.
-- Concrete classes can then supply faster implementations when necessary.
-- New leaf categories must need little repeated code.
-- Generated methods are unacceptable because mathematicians cannot audit their source.
-
-Specific mathematical directives include:
-
-- A lattice is first a set and a module.
-- Cardinality belongs to its underlying set.
-- A formed module is constructed from its form morphism.
-- Bilinear forms use the tensor square.
-- Quadratic forms use the divided square.
-- These form types require separate free-forgetful adjunctions.
-- Forgetting a form is a functor, not an object method.
-- Module morphisms require the same base ring.
-- Every module-related category must require its base ring.
-- `IntegralLattices` must also require an explicit ring.
-- Membership predicates belong to refined subcategories.
-- An object claiming membership must supply the required predicate.
-- Other operations should remain category methods.
-- Axiomatic subcategories need not have separate concrete realization classes.
-- Special algorithms can make otherwise undecidable questions decidable on restricted categories.
-- KBMAG is valuable for exactly this reason.
-- Differences between full reflection groups and smaller reflection subgroups are substantive research results.
-
-The migration philosophy is semantic preservation:
-
-- A corpus selected for migration is presumed valuable.
-- Every file must receive one semantic reading.
-- Preserve mathematics, specifications, tests, examples, design work, and incomplete research.
-- Incomplete research is not disposable.
-- Foundational categories remain valuable without current callers.
-- Tests and known values are mathematical products.
-- Incorrect mathematics should produce a corrected statement.
-- Deletion alone does not preserve the lesson.
-- Remove a source only after its useful content has a durable destination.
-- Byte equality, execution status, file names, maturity, and polish do not measure mathematical value.
-- Do not split reading and implementation between agents when the reader’s mathematical context is essential.
-- Prefer migration of existing prior art over a parallel implementation.
-
-The epistemic directive is equally strong:
-
-- A false architectural claim requires a review of foundational assumptions.
-- Local counts and reduced error totals do not establish correctness.
-- Inspect existing code, archived work, plans, and repository memory first.
-- Use transcripts only when those sources do not resolve the question.
-- Do not ask the user to make a technical decision that the assigned research should determine.
-- Ask only when several materially different interpretations remain.
-
-The recent verification rules were specific to the migration project:
-
-- Perform the complete semantic migration before automated verification.
-- Do not treat unverified work as deferred verification.
-- Do not run Sage, tests, or hooks during that migration.
-- Commit migration units without verification.
-- Hold pushes until the later integrated verification pass.
-- That later pass must use global `ai-review-ci` ownership.
-- Sage source must be lowered before Python type analysis.
-- QC must preserve detailed logs and wall-time reports.
-- Local projects should follow current upstream `main`, not fixed revision pins.
-
-Communication must report mathematical effects. It must not report token use, agent waves, repeated checks, or administrative state.
+Before migrating a corpus or reconciling archived code, read the
+[first synthesis of the 2026-08-21 directives](docs/agents/transcript-directives-2026-08-21.md).
 
 # Mathematical judgment and repository practice from transcript corrections (2026-08-21)
 
-The preceding section records a first synthesis. This section adds the mathematical
+The [transcript-derived research directives](docs/agents/transcript-directives-2026-08-21.md) record a first synthesis. This section adds the mathematical
 reasoning, cognitive corrections, repository rules, and style requirements that the
 short synthesis did not capture.
 
@@ -2157,71 +1987,9 @@ These recall `lean-categories`' definitions to fix the presentation; where they 
 
 ## Semantic migration
 
-- The preamble centrally holds research's locally-authored Sage code. The mathematics it presents is `lean-categories`'.
-- A migration request establishes the value of the selected corpus.
-- The executor decides destination and synthesis, not whether the corpus deserved preservation.
-- The unit of migration is a mathematical notion, not a file.
-- Read each notion once for semantics.
-- The reader should migrate or synthesize it while that context is live.
-- Do not separate deep analysis from implementation when implementation needs that mathematical context.
-- Do not make one agent produce a report for an unrelated new agent to interpret.
-- A summary is not the migrated mathematics.
-- Move prior art into the live preamble before reconciling it with current code.
-- Prefer a real move over a parallel rewrite.
-- After a mistaken edit yields the correct state, repair forward.
-- Do not undo the correct state merely to reproduce it by a preferred method.
-- Reconcile source and destination until the result is semantically a move plus required updates.
-- Delete the original only after every useful notion has a destination: a preamble presentation, or a `lean-categories` request for mathematics it lacks.
-- Deletion is a receipt for completed relocation.
-- It is never a value judgment on the source.
-- Preserve code, tests, specifications, examples, design corpora, and incomplete research.
-- Incomplete research remains research.
-- Planning corpora can contain mathematical structure and future categorical homes; the mathematics in them is carried to `lean-categories` as requests, never adopted here.
-- Stub declarations can present structure `lean-categories` formalizes before algorithms exist.
-- Existing TDD suites are forward requirements and must migrate to the preamble surface.
-- Existing parity tests can document delegation boundaries.
-- False source mathematics creates an obligation: record it with its evidence and request the corrected mathematics from `lean-categories`.
-- Do not delete the false statement and preserve only an error ledger.
-- Non-code logs, telemetry, caches, and tool output are outside a mathematical code migration.
-- Do not create dispositions or rulings for irrelevant material.
-
-## Value and evidence during migration
-
-- Byte equality has no positive or negative mathematical meaning.
-- A checksum can locate possible duplicates but cannot decide semantic equivalence.
-- Execution status does not determine research value.
-- Maturity, polish, file name, directory, and current scope do not determine research value.
-- The absence of callers does not determine research value.
-- The absence of complete algorithms does not determine research value.
-- A source outside the current preamble scope is a reason to enrich the preamble.
-- It is not a deletion reason.
-- Compare source and destination definitions, hypotheses, codomains, conventions, and behavior.
-- Verify that the destination presents every useful mathematical distinction.
-- If the destination cannot express a notion because `lean-categories` lacks it, request it there; research does not define it.
-- Do not discard the notion because the destination is incomplete.
-
-## Execution shape for large migrations
-
-- Inventory files once.
-- Partition them into disjoint semantic batches.
-- Assign one reader to each artifact or notion.
-- Read, decide, migrate or synthesize, and retire the source in one context.
-- Do not analyze the same material in repeated waves.
-- Do not create an analysis fleet followed by a context-free implementation fleet.
-- Preserve an agent's mathematical context when revising its instructions.
-- Ask it to checkpoint before stopping it.
-- Stop only when its frame is unusable, not when one instruction changes.
-- Use agent reasoning effort that matches the mathematics.
-- Do not spend a large research context on a file move or import update.
-- Perform simple moves and direct edits directly.
-- Do not write edit scripts for a bounded hand edit.
-- Do not replace a direct migration with scripts that match and rewrite source text.
-- A sweeping architectural refactor need not pass tests at each intermediate state.
-- Determine the correct final migration and execute the coherent sweep.
-- Do not invent an incremental-green requirement that the user did not give.
-- During a declared semantic-only migration, do not run tests, hooks, or Sage.
-- Commit those migration units with the user's declared hook posture.
-- Run the separate integrated verification pass only after the semantic migration finishes.
+Before migrating a corpus, file or archived notion into the preamble, read
+[semantic migration](docs/agents/semantic-migration.md): the migration unit,
+value and evidence during migration, and the execution shape of a large migration.
 
 ## Architecture before local repair
 
@@ -2295,20 +2063,8 @@ When one condition occurs:
 
 ## QC and tooling house rules
 
-- Global QC belongs in `ai-review-ci`.
-- Local repositories delegate to that global owner.
-- Sage source must be lowered to Python before Python type analysis.
-- Type checkers inspect the lowered Python, not raw `.sage` syntax.
-- The custom Sage parser must be globally available to the lowering path.
-- `sage-stubs` supplies the global Sage type surface.
-- Owned tools track the latest upstream default branch.
-- Do not create fixed revision policy for fast-moving local projects.
-- Diagnostic recipes must preserve detailed errors, warnings, and issues in logs.
-- Their final output must name the detailed log paths.
-- Test execution must produce wall-time and profiling artifacts.
-- Agents should inspect those artifacts instead of rerunning long commands for omitted output.
-- These rules govern the later verification pass.
-- They do not authorize running verification during a semantic-only migration.
+Before changing QC, Sage lowering, type-check or verification tooling, read
+[QC and tooling house rules](docs/agents/semantic-migration.md#qc-and-tooling-house-rules).
 
 ## Communication and research style
 
@@ -2331,71 +2087,11 @@ When one condition occurs:
 
 # Categorical constructions carry structural relations
 
-The preamble has categories, method classes, and the category graph. It has no
-independent behavior-composition layer.
+Do not call a preamble component a `mixin`.
+Do not insert a hand-written Python base to state a mathematical relation.
+State the relation, as `lean-categories` formalizes it, in the category graph.
 
-- Do not call a preamble component a `mixin`.
-- Do not insert a hand-written Python base to state a mathematical relation.
-- State the relation, as `lean-categories` formalizes it, in the category graph.
-- Class inheritance can implement the graph after category placement.
-- Class inheritance must never replace categorical placement.
-- `ObjectType`, `ElementType`, and Hom-category element types expose operations placed
-  on a category in the public preamble architecture.
-- Sage `ParentMethods`, `ElementMethods`, and `MorphismMethods` are private runtime
-  implementation vocabulary during migration, not a second public class graph.
-
-The set of core categorical constructions is small. Inspect all existing owners
-before creating another construction.
-
-- Start with `Cat.Object`, `SliceOver`, `CosliceUnder`, `Product`, `Coproduct`,
-  `Biproduct`, `TensorProduct`, `Kernel`, and `Cokernel`.
-- Inspect the preamble's module-level `Subobjects` construction as part of the same
-  analysis.
-- Use this subtree as the canonical construction vocabulary.
-- Do not create a local helper for a relation already represented there.
-- Do not let a preamble category silently use Sage's parallel construction.
-- Resolve the construction owner instead of patching each call site.
-- Do not keep two construction paths for the same mathematical construction.
-
-Modules with varying base rings project to the category of rings. Modules over a
-fixed ring form one fiber of that projection.
-
-- A construction that requires one base ring belongs inside that fiber.
-- Scalar extension and scalar restriction connect different fibers.
-- Do not encode the same-base condition through Python inheritance or method
-  resolution.
-- Products, coproducts, tensor products, kernels, and cokernels must preserve the
-  selected base ring when their definitions require it.
-- A category join that returns `None` from `base_ring()` exposes an incorrect
-  categorical relation.
-- Fix the join or construction that lost the base ring.
-- Do not add a local `base_ring()` override before that relation is correct.
-
-A formed module is a module equipped with a form morphism. It is not a wrapper
-around another module.
-
-- Never inspect `__dict__` to discover mathematical structure.
-- Never recover a deleted wrapper field through direct storage access.
-- Ask the category-owned interface for the form and its defining module.
-- A construction must define its action on objects and morphisms.
-- A parent-only result does not establish a categorical construction.
-
-Let `i: A -> M` be a subobject inclusion. For a bilinear form
-`b: M tensor M -> R`, the induced form is `b compose (i tensor i)`.
-
-- Implement formed subobjects through this functorial pullback.
-- For another form classifier, apply its source functor to `i` before composition.
-- Do not infer formed-subobject behavior from `_form` or `_module` storage fields.
-- The subobject construction owns this transport.
-
-When a correction identifies an existing construction subtree, return to that
-owner immediately.
-
-- Do not reduce the correction to a naming change.
-- Do not continue a local field repair after the ownership error is known.
-- Trace the canonical constructor, category join, parent construction, morphism
-  action, and inherited methods as one path.
-- A local patch is incomplete while that path remains incoherent.
-- If local edits stop producing mathematical progress, return to the categorical
-  construction. Do not stop the assigned work.
-
+Before creating or changing a categorical construction (a product, coproduct,
+tensor product, kernel, cokernel, slice, coslice or subobject), a base-ring join,
+or a formed subobject, read
+[categorical constructions](docs/agents/categorical-constructions.md).
