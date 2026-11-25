@@ -61,10 +61,14 @@ jobs:
             slug: 6JRX
             args: --tags 6JRX
             budget: 2400
-          - label: "6JRY: O, O+ and Otilde+ rows"
-            slug: 6JRY
-            args: --tags 6JRY
-            budget: 2400
+          - label: "6JRY: O+ and Otilde+ lines"
+            slug: 6JRY-lines
+            args: --tags 6JRY --rows lines
+            budget: 3600
+          - label: "6JRY: O and O+ planes"
+            slug: 6JRY-planes
+            args: --tags 6JRY --rows planes
+            budget: 3600
           - label: "0128: Table 4, #h and #Gamma_h at every degree"
             slug: 0128
             args: --tags 0128
