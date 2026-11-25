@@ -2088,7 +2088,7 @@ class Modules(OwnedCategoryOverBaseRing):
             modules; only this private crossing exposes the numbers, and it is the one place
             that conversion is written.
             """
-            from sage.all import QQ
+            from sage.rings.rational_field import QQ
             from sage.matrix.constructor import matrix
 
             from sage_extensions.categories.rings.ring_foundation import _engine_element

@@ -358,3 +358,42 @@ stable-line consumer. 5 passed in 43.02 s; test call times 10.70, 0.39,
 independently proved ambient and parabolic image orders, 527 lines,
 divisor two and 527 distinct nonzero divided classes. This strengthened
 full regression has not yet returned on the new implementation.
+
+## Proper-image fallback and independent counterexamples
+
+An independent review of the all-divisor certificate identified a false
+fallback premise: the image of an integral line stabilizer need not
+exhaust the stabilizer of its divided datum in the ambient finite
+image. The exact marked-lattice stabilizer supplies the full integral
+family, so its character image is exact without that equality. For a
+plane or flag an exhibited parabolic family's image suffices only when
+it actually attains the upper bound; otherwise use the complete marked
+stabilizer. The old loop attempting to force equality is removed.
+
+The new regression gives two independent counterexamples. In U, the
+line stabilizer is {+I,-I}, so its determinant is +1, while the ambient
+determinant image has order two; SO(U) has two line orbits. For
+B=U+<-12> and L=B(2), the integral isometry a constructed in the test
+fixes the divided class of e but acts by 5 on the invariant cyclic
+subgroup B^dual/B of L^dual/L. Every integral line stabilizer acts by
++/-1 there, so the two lines belong to distinct stable orbits. The
+test checks the actual finite image from the complete family against
+the exact Schreier image and the public negative transporter decision.
+Both cases refute an unconditional datum-stabilizer equality.
+
+The negative transporter also exposed an unrelated representation
+boundary in its integral-lift calculation: sage.all QQ and ZZ are
+owned rings after preamble import, not the Sage engine rings needed
+by the private exact coordinate matrices. Import the actual engine
+rings in these existing owners; use integer gcd/lcm. No change to
+the public owned object.
+
+Native focused run (2026-11-25, detached source path
+/repos/sage-extensions/.scratch/om319-0912/src, before committing these
+changes): 4 passed in 40.30s. Counterexample calls 25.41s and 3.00s;
+rational-coordinate tests 0.07s and 0.01s. Collection 11.50s and
+divisor-two call 25.41s exceed the respective 6s and 20s gates.
+Time gates disabled for correctness diagnosis only. The earlier
+strengthened Coble test at 7dadd77d entered its mathematical call
+but was terminated by signal 15; no completed correctness verdict
+at that revision. Independent review of this repair remains required.

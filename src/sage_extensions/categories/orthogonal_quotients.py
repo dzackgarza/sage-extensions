@@ -1875,33 +1875,26 @@ class OrthogonalCharacterQuotient:
     def exact_isotropic_stabilizer_generators(self, representative, *, flag=False):
         r"""Return elements of ``H = Stab_{O(L)}(representative)`` whose image ``chi(H)`` is exact.
 
-        The double-coset split of :meth:`splitting_isometries` is
-        ``chi(Gamma) \ Q / chi(H)`` with ``Q = chi(O(L))``, so it needs the finite
-        image ``chi(H)`` exactly; generators of a proper subgroup of ``H`` with a
-        smaller image split one ``Gamma``-orbit into several.  The ambient
-        family ``isotropic_stabilizer_generators`` need not generate ``H``: the
-        plane-parabolic family is complete only when the lattice splits along the
-        plane (``is_parabolic_complete``), which fails on ``U(2) + U(2) + A_2``.
+        The finite double-coset split is
+        ``chi(Gamma) \ Q / chi(H)``, where ``Q = chi(O(L))``. The image
+        of the actual integral stabilizer is required, whether or not it
+        exhausts the stabilizer of the divided discriminant data.
 
-        **Upper bound.**  Every term ``W`` of the representative (the subobject
-        itself, or each term of a flag) has the divided class set
-        ``D(W) = {[u/div(u)] : u primitive in W}`` in ``A_L``
-        (:func:`_isotropic_divided_class_set`).  An element of ``H`` carries each
-        term onto itself and primitive vectors to primitive vectors of the same
-        divisibility, so ``rho(h)`` preserves every ``D(W)``.  Hence
-        ``chi(H) <= U = {q in Q : pi_disc(q) D(W) = D(W) for every term W}``,
-        and ``|U| = |Q| / |orbit of the data|`` by orbit--stabilizer.
+        The marked-lattice stabilizer construction supplies generators
+        of the full integral stabilizer: the rational isotropic parabolic
+        with the allowed action on the marking is intersected with the
+        integral lattice using the full finite-orbit Schreier family.
+        For a line the allowed action is GL_1(ZZ) = {+1,-1}. Applying
+        the character to a generating family gives its exact image.
 
-        **Lower bound and closure.**  ``chi`` of the ambient family generates
-        ``V <= chi(H)``.  While ``V != U``, each right-coset representative ``r``
-        of ``V`` in ``U`` is lifted to ``g`` in ``O(L)`` by the word section
-        (checked against the character map); ``g`` carries the representative to
-        an object with the same divided data, and the ambient equivalence
-        witness ``k`` with ``k(g x) = x`` gives ``k g`` in ``H``.  Its image is
-        added to ``V``.  The loop ends when ``|V| = |U|``, which proves
-        ``chi(H) = U`` with every generator an exhibited element of ``H``.  A
-        pass that adds nothing certifies nothing, and raises: the divided data
-        need not be a complete invariant, and no smaller image is guessed.
+        For a plane or flag, a smaller exhibited parabolic family can
+        suffice. Its image lies in the actual stabilizer image, which
+        lies in the setwise stabilizer of all divided-class sets in Q
+        (the whole Q when there is no discriminant factor). If the
+        exhibited image equals this upper bound, it is already exact.
+        Otherwise use the full marked-lattice construction. A strict
+        upper bound is possible: no ambient transporter can be assumed
+        to exhaust it, and no additional elements are fabricated.
 
         **Retention.**  The family is a function of the spans of the
         representative's terms
@@ -1946,25 +1939,6 @@ class OrthogonalCharacterQuotient:
                 return result
 
         ambient = self.supergroup
-        # The stabilizer of a primitive isotropic plane is the parabolic subgroup at
-        # it, and that subgroup's own construction hands out its elements from the
-        # plane's block equations (Dutour Sikirić and Hulek, *Moduli of polarised
-        # Enriques surfaces -- computational aspects*, arXiv:2302.01679v2,
-        # Theorem 4.9, the block form of an isometry preserving an isotropic plane).
-        # A flag is stabilized by the elements of its top term's parabolic that fix
-        # its lower terms: ``Stab_{O(L)}(l <= P) = Stab_{O(L)}(P) cap Stab_{O(L)}(l)``,
-        # by the definition of a stabilizer.  The marked-lattice family for a plane or
-        # a flag reaches the same stabilizer by spelling each of its generators as a
-        # word in the ambient generating family and multiplying the word out, which is
-        # minutes a plane and more than that a flag at the Enriques rank.  The
-        # parabolic family is taken in ``O(L)``, so an element of it need not lie in
-        # the ambient group ``H`` is a subgroup of -- ``O^+``, ``Otilde``,
-        # ``Otilde^+`` or a polarization group -- and only the elements that do are
-        # elements of ``H``: each one is asked of the ambient group itself, whose
-        # membership predicate is the character test defining it.  Either family is a
-        # seed only: the closure below certifies ``chi(H)`` against the upper bound, so
-        # what it needs from this line is elements of ``H``, not a family that
-        # generates ``H``.
         if flag and int(representative.top().module_rank()) == 2:
             in_ambient = tuple(
                 generator
@@ -1980,11 +1954,12 @@ class OrthogonalCharacterQuotient:
             )
         else:
             in_ambient = ()
-        if in_ambient:
-            generators = list(in_ambient)
-        else:
-            generators = list(ambient.isotropic_stabilizer_generators(representative, flag=flag))
-        _section_generators, _images, section = self._image_section()
+        if not in_ambient:
+            result = tuple(ambient.isotropic_stabilizer_generators(representative, flag=flag))
+            if key is not None:
+                families[key] = result
+            return result
+
         image = self._gap_image()
         factors, product, _embeddings, projections = self._gap_product()
         if self._has_discriminant:
@@ -2015,46 +1990,17 @@ class OrthogonalCharacterQuotient:
         else:
             upper = image
         lower = libgap.Subgroup(
-            product, [self._gap_of_key(self.image(generator)) for generator in generators]
+            product, [self._gap_of_key(self.image(generator)) for generator in in_ambient]
         )
         if not bool(libgap.IsSubset(upper, lower)):
             raise ArithmeticError(
                 f"an ambient stabilizer generator of {representative} moves its divided "
                 f"discriminant data: it does not stabilize {representative}"
             )
-        target = int(libgap.Size(upper))
-        while int(libgap.Size(lower)) < target:
-            before = int(libgap.Size(lower))
-            for coset in libgap.AsList(libgap.RightTransversal(upper, lower)):
-                # The transversal is a transversal of the subgroup this pass
-                # started from, so it lists more cosets than the image still
-                # misses: the pass ends the moment the image reaches its upper
-                # bound, and every question asked after that point is one the
-                # pass has already answered.
-                if int(libgap.Size(lower)) == target:
-                    break
-                lift = self._checked_lift(self._key_of_gap(coset), section.letters_of(coset))
-                moved = lift.transport_isotropic_object(representative)
-                witness = ambient.isotropic_equivalence_witness(moved, representative, flag=flag)
-                if witness is None:
-                    raise ArithmeticError(
-                        f"{lift} is an element of {ambient}, yet {ambient} does not carry "
-                        f"{moved} back to {representative}"
-                    )
-                element = witness * lift
-                key = self._gap_of_key(self.image(element))
-                closed = libgap.ClosureGroup(lower, key)
-                if int(libgap.Size(closed)) > int(libgap.Size(lower)):
-                    generators.append(element)
-                    lower = closed
-            if int(libgap.Size(lower)) == before:
-                raise ArithmeticError(
-                    f"the stabilizer of {representative} in {ambient} has character image of "
-                    f"order at least {before}, and the stabilizer of its divided discriminant "
-                    f"data has order {target}; no exhibited stabilizer element closes the index "
-                    f"{target // before}, so the exact image chi(Stab) is not certified"
-                )
-        result = tuple(generators)
+        if lower == upper:
+            result = in_ambient
+        else:
+            result = tuple(ambient.isotropic_stabilizer_generators(representative, flag=flag))
         if key is not None:
             families[key] = result
         return result

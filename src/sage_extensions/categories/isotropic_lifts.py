@@ -634,7 +634,9 @@ class IsotropicReductionLiftTorsors(OwnedCategoryOverBaseRing):
             generators ``V(gcd(step_i, m) e_i)`` of ``K``, of the period's own generators,
             and the lift of each passing representative in the same order.
             """
-            from sage.all import QQ, ZZ, gcd, lcm
+            from math import gcd, lcm
+            from sage.rings.integer_ring import ZZ
+            from sage.rings.rational_field import QQ
             from sage.matrix.constructor import matrix
 
             source = self.source_reduction().isotropic_embedding().codomain()
