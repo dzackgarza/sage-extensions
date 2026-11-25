@@ -1,9 +1,3 @@
-# sage-extensions — the mathematical library behind the research session.
-#
-# QC delegates to ~/ai-review-ci/justfiles/sage.just. Project-specific recipes
-# below are non-QC entry points or narrow repo orchestration.
-
-# ai-review-ci contract variables consumed by doctor and workflow installers.
 ai_review_ci_schema_version := "1"
 ai_review_ci_profile := "sage"
 ai_review_ci_ref := "main"
@@ -12,29 +6,27 @@ ai_review_ci_workflow_template_version := "1"
 ai_review_ci_local_delegation := "global-justfile"
 ai_review_ci_default_branch := "main"
 
-# List available recipes
+[doc("List available recipes")]
 default:
     @just --list
 
-# Development commits inspect staged source syntax only. The repository-owned
-# coordinate-ownership scan is retained as an independent CI diagnostic.
+[doc("Development commits inspect staged source syntax only. The repository-owned")]
 test-commit:
     @just -f ~/ai-review-ci/justfiles/sage.just -d . test-commit
 
-# No full-tree scan on the publication path.
+[doc("No full-tree scan on the publication path.")]
 test-push:
     @just -f ~/ai-review-ci/justfiles/sage.just -d . test-push
 
-# Run CI suites and the repository-owned tensor-ownership detector independently,
-# retaining both in one nonblocking findings/burndown report.
+[doc("Run CI suites and the repository-owned tensor-ownership detector independently,")]
 test-ci:
     @python3 ~/ai-review-ci/scripts/ci-triage.py sage --caller-check sage-extensions-tensor-boundary tensor-boundary
 
-# The scheduled whole-tree audit includes the tensor-ownership detector.
+[doc("The scheduled whole-tree audit includes the tensor-ownership detector.")]
 ambient:
     @python3 ~/ai-review-ci/scripts/ci-triage.py sage --tier ambient --caller-check sage-extensions-tensor-boundary tensor-boundary
 
-# CI-only provision for the repository-specific scanner, not a local hook.
+[doc("CI-only provision for the repository-specific scanner, not a local hook.")]
 _ci-tensor-tools:
     #!/usr/bin/env bash
     set -euo pipefail
@@ -42,11 +34,7 @@ _ci-tensor-tools:
     npm install --prefix "$prefix" --no-audit --no-fund @ast-grep/cli@0.41.0
     printf '%s\n' "$prefix/node_modules/.bin" >> "$GITHUB_PATH"
 
-# Detect coordinate conventions written outside the tensor package (OWN-24).
-# AST provenance, not identical source-line text, exempts the typed Mor
-# transpose. Encoding Smith coordinates as ordinal indices is not a pairing.
-# The scan is necessary but not sufficient: semantic ownership needs review.
-# scope=staged is an optional focused check; scope=all is the CI diagnostic.
+[doc("Detect coordinate conventions written outside the tensor package (OWN-24).")]
 tensor-boundary scope="all":
     #!/usr/bin/env bash
     set -uo pipefail
@@ -65,7 +53,6 @@ tensor-boundary scope="all":
     for pattern in '$X.transpose()' '$X.T' '$X.matrix_action_right($$$A)' '$X.matrix_action_left($$$A)' '$X.einsum($$$A)' 'einsum($$$A)' '$X.matmul($$$A)' 'matmul($$$A)' '$X.dot($$$A)' '$X @ $Y'; do
         matches=$(ast-grep run --lang python --pattern "$pattern" --json $files)
         status=$?
-        # ast-grep returns 1 for a valid query with zero matches.
         if [ "$status" -gt 1 ]; then
             echo "tensor-boundary scanner failed (status $status) for $pattern" >&2
             exit "$status"
@@ -78,9 +65,6 @@ tensor-boundary scope="all":
         source = pathlib.Path(path).read_text()
         tree = ast.parse(source, filename=path)
 
-        # The owned MatrixSpaces.ElementMethods implementation makes product
-        # by composing two elements of the module Mor. Its transpose is a Mor
-        # element with reversed endpoints, not a Sage-matrix convention.
         if (path == "src/sage_extensions/categories/modules/pure/modules.py"
                 and hit["text"] == "product.transpose()"):
             owned_transpose = False
@@ -110,8 +94,6 @@ tensor-boundary scope="all":
             if owned_transpose:
                 continue
 
-        # The three existing @ strides calls encode finite tuples as their
-        # mixed-radix ordinal: this is indexing, not a bilinear contraction.
         if (path == "src/sage_extensions/categories/modules/framed/formed/discriminant_modules.py"
                 and hit["metaVariables"]["single"].get("Y", {}).get("text") == "strides"):
             ordinal_index = False
@@ -146,21 +128,16 @@ tensor-boundary scope="all":
     fi
     echo "No prohibited syntax detected; categorical ownership still requires source review."
 
-
-# Run the test suite, or the named tests, under Sage's Python.
+[doc("Run the test suite, or the named tests, under Sage's Python.")]
 [positional-arguments]
 test *args:
     PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" \
         "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
 
-# The README example, under the repository's own pytest configuration.
+[doc("The README example, under the repository's own pytest configuration.")]
 readme:
     #!/usr/bin/env bash
     set -euo pipefail
-    # The interpreter is the one the named launcher runs, asked of the launcher
-    # itself: on a runner SAGE_BIN is the image's own /sage/.venv/bin/sage, and
-    # there is no host layout to read an interpreter out of.  SAGE_PYTHON_BIN
-    # names an interpreter outright, for a launcher that enters the image.
     if [ -z "${SAGE_PYTHON_BIN:-}" ]; then
         if [ -z "${SAGE_BIN:-}" ]; then
             echo "readme: set SAGE_BIN to the Sage launcher; the README example workflow names the" \
@@ -181,29 +158,23 @@ readme:
     fi
     "$SAGE_PYTHON_BIN" -m pytest --doctest-glob=README.md README.md
 
-# The suite runs in parallel, one Sage process per worker, and records which
-# test ran each line; only lines a passing test ran count as covered.
-# Every sage_extensions line and branch no passing test runs, file by file
+[doc("The suite runs in parallel, one Sage process per worker, and records which")]
 coverage workers="6":
     #!/usr/bin/env bash
     set -euo pipefail
     qc=~/ai-review-ci/justfiles/sage.just
-    # tests/ is the suite for src/; computation scripts elsewhere are not.
     mapfile -t tests < <(just -f "$qc" -d . _sage-test-files; just -f "$qc" -d . _sage-python-test-files)
     mapfile -t tests < <(printf '%s\n' "${tests[@]}" | grep '^tests/')
     out=.tmp/coverage
     mkdir -p "$out"
     for old in "$out"/*.jsonl; do if [ -e "$old" ]; then gio trash "$old"; fi; done
     touch "$out/measured-at"
-    # Work stealing rebalances the few long tests across idle workers.
     status=0
     just _coverage-pytest "$out/.coverage" "$out/run.jsonl" -n {{workers}} --dist worksteal "${tests[@]}" || status=$?
     just coverage-report
     echo "pytest exit status: $status"
 
-# Use it while writing tests against a gap the full run reported; it costs
-# the named tests, not the suite.
-# Add the named tests to the last full run; report the source files they reach
+[doc("Use it while writing tests against a gap the full run reported; it costs")]
 [positional-arguments]
 coverage-add +tests:
     #!/usr/bin/env bash
@@ -213,10 +184,8 @@ coverage-add +tests:
     sage_python="$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)"
     run="$(date +%s%N)"
     status=0
-    # Many tests share out across workers; a few run in one process, sparing the worker startups.
     parallel=(); if [ "$#" -gt 50 ]; then parallel=(-n 6 --dist worksteal); fi
     just _coverage-pytest "$out/.coverage.add-$run" "$out/add-$run.jsonl" "${parallel[@]}" "$@" || status=$?
-    # Several sessions may add at once; the lock serializes the merge and the report.
     flock "$out/.lock" "$sage_python" -m coverage combine --keep --append \
         --data-file="$out/.coverage" "$out/.coverage.add-$run"
     flock "$out/.lock" "$sage_python" -m sage_extensions.testing.coverage_gaps \
@@ -224,9 +193,7 @@ coverage-add +tests:
     gio trash "$out/.coverage.add-$run"
     echo "pytest exit status: $status"
 
-# The stored data records which tests ran each source file, so after an edit
-# only those tests, and the edited test files, run again.
-# Remeasure what edits since the last measurement reach, then report
+[doc("The stored data records which tests ran each source file, so after an edit")]
 coverage-update:
     #!/usr/bin/env bash
     set -euo pipefail
@@ -234,7 +201,6 @@ coverage-update:
     if [ ! -e "$out/.coverage" ]; then echo "nothing measured yet: run just coverage first"; exit 1; fi
     sage_python="$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)"
     mapfile -t tests < <(flock "$out/.lock" "$sage_python" -m sage_extensions.testing.coverage_gaps --select-affected)
-    # A purged file whose lines only the import runs is remeasured by collection alone.
     if [ "${#tests[@]}" -eq 0 ]; then
         just coverage-add --collect-only "$(git ls-files 'tests/**/test_*.sage' | head -n 1)" > /dev/null
         just coverage-report
@@ -243,7 +209,7 @@ coverage-update:
     echo "rerunning ${#tests[@]} tests reached by the edits"
     just coverage-add "${tests[@]}"
 
-# The coverage recorded so far, for all of sage_extensions or for the source paths matching globs such as '*/schemes/*'
+[doc("The coverage recorded so far, for all of sage_extensions or for the source paths matching globs such as '*/schemes/*'")]
 [positional-arguments]
 coverage-report *include:
     #!/usr/bin/env bash
@@ -251,12 +217,7 @@ coverage-report *include:
     select=(); if [ "$#" -gt 0 ]; then select=(--include "$@"); fi
     "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m sage_extensions.testing.coverage_gaps "${select[@]}"
 
-# The specification subtrees are red until sage_extensions meets them, so a
-# failing suite still yields its coverage; the caller reports the exit status.
-# No per-test timeout: its SIGALRM inside Cython ends the whole run (TRAPS.md),
-# and coverage tracing changes runtime materially. The measurement-only flag
-# keeps timing output without applying baselines gathered without tracing.
-# One-line tracebacks keep failure reports from computing owned reprs.
+[doc("The specification subtrees are red until sage_extensions meets them, so a")]
 [positional-arguments]
 _coverage-pytest data log *args:
     #!/usr/bin/env bash
@@ -270,13 +231,7 @@ _coverage-pytest data log *args:
         --cov=sage_extensions --cov-branch --cov-context=test --cov-report= \
         "$@"
 
-# Check that the proof surface stays inside the mathematical universe.
-# Policies: CONTRIBUTING.md DEV-37 (a test stays inside the universe) and
-# DEV-38 (assert the object, not a chosen presentation).
-#
-# tests/engineering/ is the cordon for tests that prove no mathematics.
-# ast-grep matches the syntax tree, so `== (0, 2)` is found wherever it is
-# written -- across line breaks, and never inside a string or a docstring.
+[doc("Check that the proof surface stays inside the mathematical universe.")]
 test-universe:
     #!/usr/bin/env bash
     set -uo pipefail
@@ -313,13 +268,7 @@ test-universe:
     fi
     echo "The proof surface stays inside the universe."
 
-# The category graph the tree declares, read out of the source with `ast`, so it
-# answers on a tree that does not import.  The views that compute homology,
-# cycles or a complex load Sage's graph library; the rest read the source and run
-# under plain Python.  Views: table (the default), json, by-supercategory,
-# foreign, audit, shape, cells, routes, constructions, properties, slice,
-# topology, dot.  AGENTS.md, "Reading the declarations", and
-# docs/architecture-inspection.md, for what each answer says and what it cannot.
+[doc("The category graph the tree declares, read out of the source with `ast`, so it")]
 [positional-arguments]
 category-graph view="table" *args:
     #!/usr/bin/env bash
@@ -329,14 +278,12 @@ category-graph view="table" *args:
             inspection_python="$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" ;;
         *) inspection_python=python3 ;;
     esac
-    # just passes every parameter as a positional argument, the view among them;
-    # the tool reads the view from --format, so the rest is what follows it.
     positional=("$@")
     if [ "${#positional[@]}" -gt 0 ]; then positional=("${positional[@]:1}"); fi
     PYTHONPATH="src${PYTHONPATH:+:$PYTHONPATH}" "$inspection_python" \
         -m sage_extensions.testing.category_graph --format "{{view}}" "${positional[@]}"
 
-# The literal graph, drawn: .tmp/category-graph/declared-graph.dot and its SVG.
+[doc("The literal graph, drawn: .tmp/category-graph/declared-graph.dot and its SVG.")]
 category-graph-svg:
     #!/usr/bin/env bash
     set -euo pipefail
@@ -348,9 +295,7 @@ category-graph-svg:
     dot -Tsvg "$directory/declared-graph.dot" -o "$directory/declared-graph.svg"
     echo "wrote $directory/declared-graph.svg"
 
-# `just category-graph constructions` reads the placement of a result from the
-# source; this calls each category's example object first and adds the category
-# the returned value's class names, where the source builds nothing to follow.
+[doc("`just category-graph constructions` reads the placement of a result from the")]
 category-constructions *args:
     #!/usr/bin/env bash
     set -euo pipefail
@@ -360,19 +305,12 @@ category-constructions *args:
         -m sage_extensions.testing.category_inference -o .tmp/category-inference.json
     just category-graph constructions --inferred .tmp/category-inference.json {{args}}
 
-# Lint the test tree against the session standard (sage_extensions.testing.test_lint).
-# With no paths it lints every test.
+[doc("Lint the test tree against the session standard (sage_extensions.testing.test_lint).")]
 test-lint *paths:
     "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" \
         -m sage_extensions.testing.test_lint {{paths}}
 
-# The #319 card rows: the 87 numerical polarizations of Dutour Sikirić--Hulek and
-# card 0128's Table 4 rows, each compared with the public isotropic-orbit call.
-# A row builds an arithmetic subgroup of O(U + U(2) + E8(-2)) and calls the orbit
-# classifier on it, so the rows are minutes each and are not part of `just test`.
-# The nightly jobs that run them are the matrix at results/issue319-enriques-polarization-rows.workflow.yml.
-# Run every row with no arguments; narrow with the module's own flags, e.g.
-# `just enriques-card-rows --tags gamma-h-1 --cap 120`.
+[doc("The #319 card rows: the 87 numerical polarizations of Dutour Sikirić--Hulek and")]
 [positional-arguments]
 enriques-card-rows *args:
     PYTHONPATH="src${PYTHONPATH:+:$PYTHONPATH}" \
