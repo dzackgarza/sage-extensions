@@ -2005,6 +2005,22 @@ def _isotropic_orbit_representatives(orthogonal_group, rank, *, flag=False):
     This is the ambient row of every subgroup row that rests on it: the
     ``O(L)``-orbits themselves, recorded as one stage of the timing record
     (:mod:`sage_extensions.timing`) under the lattice they are computed for.
+
+    In odd rank, if the Gram content is ``d > 0`` and ``abs(det L) = d^rank``,
+    the untwisted form is unimodular. When both signature indices are at
+    least two, it has exactly one primitive isotropic vector orbit. No
+    isotropic vector is characteristic: in the odd diagonal unimodular
+    model a characteristic vector has odd square. For every primitive
+    isotropic vector choose a dual partner, adjust its parity in the
+    perpendicular, and subtract half its square times the isotropic
+    vector. The resulting hyperbolic plane splits integrally, and its odd
+    indefinite unimodular complement is determined by signature
+    (Peters--Sterk, Symmetric and Quadratic Forms, Theorem 2.3.1).
+    Matching the marked hyperbolic planes and their complements proves
+    transitivity; multiplying the form by ``d`` leaves the action intact.
+    The existing isotropic-vector operation supplies a representative if
+    none of the module generators is isotropic. The marking classifier
+    remains responsible for all forms outside these hypotheses.
     """
     lattice = orthogonal_group.domain()
     if flag:
@@ -2014,6 +2030,22 @@ def _isotropic_orbit_representatives(orthogonal_group, rank, *, flag=False):
         rank = index(rank)
         if rank == 0:
             return finite_ordered_set((lattice.primitive_isotropic_subobject(),))
+        if rank == 1 and int(lattice.module_rank()) % 2 == 1:
+            from sage_extensions.categories.rings.ring_foundation import _owned_integers
+
+            if lattice.base_ring() is _owned_integers():
+                content = lattice.form_content()
+                if content != 0 and abs(lattice.determinant()) == content ** int(lattice.module_rank()):
+                    signature = lattice.signature_pair()
+                    if min(int(signature.first()), int(signature.second())) >= 2:
+                        representative = next(
+                            (v for v in lattice.module_generators() if v.q() == 0),
+                            None,
+                        )
+                        if representative is None:
+                            representative = lattice.isotropic_vector()
+                        assert representative.is_primitive() is True and representative.q() == 0
+                        return finite_ordered_set((lattice.primitive_isotropic_subobject(representative),))
         if rank == 1 and int(lattice.module_rank()) == 4 and int(lattice.witt_index()) == 1:
             # Witt index one has no second hyperbolic plane, so the Eichler
             # envelope below does not reach it; the Hilbert model answers by cusp

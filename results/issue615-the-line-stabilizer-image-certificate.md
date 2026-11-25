@@ -284,3 +284,32 @@ The unchanged small stable-line consumer passed in the preceding run
 (19.29 s call). The separate full Coble row is not yet verified on this
 repair. This record does not claim issue completion or performance
 acceptance.
+
+## Ambient line classification on scaled odd-rank unimodular forms
+
+The full consumer's older timeout traceback was in the ambient marking
+classification (`primitive_vector_classes` -> pointed isometry -> integral
+lift torsor), before the finite fibre walk, not evidence of a false fibre
+certificate. The newer pinned run was interrupted without a verdict. A
+separate pinned test of just the ambient Coble line row entered the test
+call and was terminated by its 90-second outer deadline.
+
+The general theorem is proved in research
+`lem:odd-rank-scaled-unimodular-line-transitivity` at
+[e2700d15](https://github.com/dzackgarza/research/commit/e2700d15bad77abf264f40a84c1853e7df003508),
+using Peters--Sterk, Theorem 2.3.1. In odd rank, the positive Gram content
+d and determinant identity |det L| = d^rank establish the untwisted
+unimodular hypothesis. Both signature indices must be at least two.
+A primitive null vector is noncharacteristic, splits a unimodular
+hyperbolic plane, and the complementary odd indefinite unimodular
+lattice is classified by its signature. This gives one ambient line
+orbit, not a claim about the stable-kernel orbits. Other forms retain the
+existing classifier.
+
+The native Sage test uses the actual detached source path
+`/repos/sage-extensions/.scratch/om319-0912/src`, verified before the
+baseline. Both ambient regressions passed after the theorem-based
+branch (Coble call 1.07 s, diagonal rank-five call 0.71 s; 2 passed in
+13.27 s, test time gates disabled for diagnosis). This establishes the
+ambient step only. The finite stabilizer image and full stable-kernel
+consumer must still be checked, not inferred from ambient transitivity.
