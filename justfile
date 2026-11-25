@@ -10,7 +10,7 @@ ai_review_ci_default_branch := "main"
 default:
     @just --list
 
-[doc("Development commits inspect staged source syntax only. The repository-owned")]
+[doc("Development commits inspect staged source syntax only.")]
 test-commit:
     @just -f ~/ai-review-ci/justfiles/sage.just -d . test-commit
 
@@ -18,7 +18,7 @@ test-commit:
 test-push:
     @just -f ~/ai-review-ci/justfiles/sage.just -d . test-push
 
-[doc("Run CI suites and the repository-owned tensor-ownership detector independently,")]
+[doc("Run CI suites and the repository-owned tensor-ownership detector independently, retaining both in one nonblocking findings/burndown report.")]
 test-ci:
     @python3 ~/ai-review-ci/scripts/ci-triage.py sage --caller-check sage-extensions-tensor-boundary tensor-boundary
 
@@ -158,7 +158,7 @@ readme:
     fi
     "$SAGE_PYTHON_BIN" -m pytest --doctest-glob=README.md README.md
 
-[doc("The suite runs in parallel, one Sage process per worker, and records which")]
+[doc("The suite runs in parallel, one Sage process per worker, and records which test ran each line; only lines a passing test ran count as covered.")]
 coverage workers="6":
     #!/usr/bin/env bash
     set -euo pipefail
@@ -174,7 +174,7 @@ coverage workers="6":
     just coverage-report
     echo "pytest exit status: $status"
 
-[doc("Use it while writing tests against a gap the full run reported; it costs")]
+[doc("Use it while writing tests against a gap the full run reported; it costs the named tests, not the suite.")]
 [positional-arguments]
 coverage-add +tests:
     #!/usr/bin/env bash
@@ -193,7 +193,7 @@ coverage-add +tests:
     gio trash "$out/.coverage.add-$run"
     echo "pytest exit status: $status"
 
-[doc("The stored data records which tests ran each source file, so after an edit")]
+[doc("The stored data records which tests ran each source file, so after an edit only those tests, and the edited test files, run again.")]
 coverage-update:
     #!/usr/bin/env bash
     set -euo pipefail
@@ -217,7 +217,7 @@ coverage-report *include:
     select=(); if [ "$#" -gt 0 ]; then select=(--include "$@"); fi
     "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m sage_extensions.testing.coverage_gaps "${select[@]}"
 
-[doc("The specification subtrees are red until sage_extensions meets them, so a")]
+[doc("The specification subtrees are red until sage_extensions meets them, so a failing suite still yields its coverage; the caller reports the exit status.")]
 [positional-arguments]
 _coverage-pytest data log *args:
     #!/usr/bin/env bash
@@ -268,7 +268,7 @@ test-universe:
     fi
     echo "The proof surface stays inside the universe."
 
-[doc("The category graph the tree declares, read out of the source with `ast`, so it")]
+[doc("The category graph the tree declares, read out of the source with `ast`, so it answers on a tree that does not import.")]
 [positional-arguments]
 category-graph view="table" *args:
     #!/usr/bin/env bash
@@ -295,7 +295,7 @@ category-graph-svg:
     dot -Tsvg "$directory/declared-graph.dot" -o "$directory/declared-graph.svg"
     echo "wrote $directory/declared-graph.svg"
 
-[doc("`just category-graph constructions` reads the placement of a result from the")]
+[doc("`just category-graph constructions` reads the placement of a result from the source; this calls each category's example object first and adds the category the returned value's class names, where the source builds nothing to follow.")]
 category-constructions *args:
     #!/usr/bin/env bash
     set -euo pipefail
@@ -310,7 +310,7 @@ test-lint *paths:
     "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" \
         -m sage_extensions.testing.test_lint {{paths}}
 
-[doc("The #319 card rows: the 87 numerical polarizations of Dutour Sikirić--Hulek and")]
+[doc("The #319 card rows: the 87 numerical polarizations of Dutour Sikirić--Hulek and card 0128's Table 4 rows, each compared with the public isotropic-orbit call.")]
 [positional-arguments]
 enriques-card-rows *args:
     PYTHONPATH="src${PYTHONPATH:+:$PYTHONPATH}" \
