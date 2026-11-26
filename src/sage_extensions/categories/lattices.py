@@ -12002,6 +12002,13 @@ class Lattices(OwnedCategoryOverBaseRing):
             if norm == ring.zero():
                 # s_r exists only for b(r, r) != 0, so a vector of square zero is not one.
                 return False
+            if parent.module_rank().is_finite() and parent.value_module() is ring and _engine_ring(ring) is SageZZ:
+                # b(r,e_j) are the entries of the selected Gram contraction.
+                # Divisibility of their doubles by b(r,r) is the exact
+                # integral coefficient criterion, without field coercions.
+                _ring, _labels, gram = parent._engine_gram()
+                pairings = parent._engine_coordinate_row(self) * gram
+                return all(2 * entry % int(norm) == 0 for entry in pairings)
             fraction_field = ring if ring.is_field() else ring.fraction_field()
             norm_in_fraction_field = fraction_field(norm)
             return all(

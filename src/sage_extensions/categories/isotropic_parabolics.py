@@ -2607,6 +2607,7 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
                 )
             return lattice.Aut()(images)
 
+        @cached_method
         def _unipotent_symmetric_lattice(self):
             r"""Return `(adjugate, determinant)` deciding membership in `\Lambda_J`.
 
@@ -2648,7 +2649,7 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
                     f"not 3, so the second block equation is not the membership test "
                     f"this method returns the data for"
                 )
-            basis = matrix(SageZZ, 3, 3, [entry for row in kept for entry in row])
+            basis = matrix(SageZZ, 3, 3, [entry for row in kept for entry in row]).transpose()
             determinant = abs(int(basis.determinant()))
             assert determinant and basis * basis.adjugate() == determinant * identity_matrix(
                 SageZZ, 3
@@ -2858,65 +2859,58 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
 
         @cached_method
         def _unipotent_parameter_decision(self):
-            r"""Return `(modulus, classes, admissible, basis)` of the parameter lattice.
+            r"""Return the exact parameter lattice and its finite class counts.
 
-            Every class of the parameter at :meth:`unipotent_parameter_modulus` is
-            decided by :meth:`unipotent_parameter_lifts`, so the answer is the whole
-            set and not a sample of it.  The admissible classes are checked to be a
-            subgroup: the lattice they generate together with the modulus times the
-            coordinate lattice must have exactly as many classes as there are
-            admissible ones -- `|admissible| \cdot [\ZZ^{16} : L] = \text{modulus}^{16}`
-            -- which holds for a union of classes exactly when that union is a subgroup,
-            and fails otherwise.
+            First take the kernel of the linear translation congruence
+            adj(J) c^t A = 0 modulo |det J|. On this lattice the symmetric
+            defect S(c) is additive modulo Lambda_J: for two parameters
+            c,d the cross term c^t A d + d^t A c is J a + a^t J^t with
+            a = J^(-1)c^t A d integral by the translation congruence.
+            Thus the second condition is another linear congruence in
+            a basis of the first kernel. Compute both kernels over ZZ
+            by adjoining modulus times the identity to the coefficient
+            matrix and projecting its saturated integer kernel. The
+            auxiliary variables are uniquely determined by each parameter,
+            so projection is an isomorphism onto the congruence kernel.
+            This gives the complete lattice without enumerating classes.
             """
-            rows = int(self.plane_block_gram()[5].nrows())
-            order = 2 * rows
+            _change, _inverse, _h, J, _K, A = self.plane_block_gram()
+            order = 2 * A.nrows()
             modulus = self.unipotent_parameter_modulus()
             classes = modulus**order
-            if classes > _UNIPOTENT_PARAMETER_CLASS_LIMIT:
-                raise NotImplementedError(
-                    f"the parameters of the radical at {self} are decided on {classes} "
-                    f"classes -- {order} coordinates modulo {modulus} -- and deciding every "
-                    f"one of them is what makes the answer exact; this construction decides "
-                    f"at most {_UNIPOTENT_PARAMETER_CLASS_LIMIT} and refuses rather than "
-                    f"truncating the residue system"
-                )
-            generators = []
-            for position in range(order):
-                row = [0] * order
-                row[position] = modulus
-                generators.append(row)
-            admissible = 0
-            for state in range(classes):
-                values = []
-                remainder = state
-                for _position in range(order):
-                    values.append(remainder % modulus)
-                    remainder //= modulus
-                if not self.unipotent_parameter_lifts(
-                    self.unipotent_parameter_matrix(tuple(values))
-                ):
-                    continue
-                admissible += 1
-                generators.append(values)
-            reduced = matrix(SageZZ, generators).hermite_form()
-            basis = [
-                tuple(int(entry) for entry in row) for row in reduced.rows() if any(row)
-            ]
-            if len(basis) != order:
-                raise ArithmeticError(
-                    f"the parameters of the radical at {self} span rank {len(basis)}, but "
-                    f"the radical's translation lattice has rank {order}"
-                )
-            index = abs(int(matrix(SageZZ, [list(row) for row in basis]).determinant()))
-            if admissible * index != classes:
-                raise ArithmeticError(
-                    f"the admissible parameters of the radical at {self} are not a "
-                    f"subgroup: {admissible} of {classes} classes lift, and the lattice "
-                    f"they generate has index {index}, whose product with the count is "
-                    f"{admissible * index} and not {classes}"
-                )
-            return modulus, classes, admissible, tuple(basis)
+            if not order:
+                return modulus, classes, 1, ()
+
+            def congruence_kernel(coefficient, level):
+                height, width = coefficient.nrows(), coefficient.ncols()
+                system = coefficient.augment(-level * identity_matrix(SageZZ, height))
+                return matrix(SageZZ, [list(v[:width]) for v in system.right_kernel().basis()])
+
+            adjugate = J.adjugate()
+            determinant = abs(int(J.determinant()))
+            translation = matrix(SageZZ, [
+                (adjugate * unit.transpose() * A).list()
+                for unit in self._unipotent_parameter_units()
+            ]).transpose()
+            first = congruence_kernel(translation, determinant)
+            symmetric_adjugate, symmetric_determinant = self._unipotent_symmetric_lattice()
+            symmetric_adjugate = matrix(SageZZ, symmetric_adjugate)
+            obstruction = matrix(SageZZ, [
+                list(symmetric_adjugate * vector(SageZZ, self._unipotent_symmetric_defect(
+                    self.unipotent_parameter_matrix(tuple(row))
+                )))
+                for row in first.rows()
+            ]).transpose()
+            second = congruence_kernel(obstruction, symmetric_determinant)
+            basis = (second * first).hermite_form()
+            index = abs(int(basis.determinant()))
+            assert index and classes % index == 0
+            assert all(
+                self.unipotent_parameter_lifts(self.unipotent_parameter_matrix(tuple(row)))
+                for row in basis.rows()
+            )
+            assert all(entry in SageZZ for entry in (modulus * basis.inverse()).list())
+            return modulus, classes, classes // index, tuple(tuple(int(x) for x in row) for row in basis.rows())
 
         def unipotent_parameter_lattice(self):
             r"""Return a `ZZ`-basis of the parameters `c` of `U_I`, as sixteen-tuples.
@@ -2933,20 +2927,12 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
                 \tau = -J^{-1} c^t A_K, \qquad
                 J a + a^t J^t = -(Kc + c^t K^t + c^t A_K c),
 
-            so `c` is a parameter of an element of `U_I` exactly when those have an
-            integral solution.  Both are congruence conditions: the first is linear in
-            `c`, the second quadratic.  :meth:`unipotent_parameter_modulus` computes
-            the modulus at which each depends only on the class of `c`, and every class
-            at that modulus is decided by :meth:`unipotent_parameter_lifts`, with no
-            residue table and no range: what comes back is the lattice of all the
-            parameters that lift.
-
-            The admissible classes are a subgroup, and not by assumption: the product
-            of their count with the index of the lattice they generate is checked
-            against the number of classes in `\ZZ^{\text{order}}`, which is a subgroup
-            only then.  A parameter outside the returned lattice is therefore not a
-            parameter of any element of `U_I`, and :meth:`unipotent_parameter_lifts`
-            says so on the class.
+            The translation congruence is linear, and on its kernel the
+            symmetric obstruction is additive modulo the symmetric image
+            lattice. The two exact integer congruence kernels of
+            :meth:`_unipotent_parameter_decision` therefore construct all
+            parameters. The class counts follow from the index of their
+            lattice and the uniform modulus, not a sample of parameters.
 
             At Sterk's `P_2` of \(T_{\mathrm{En}}\): modulus `2`, `4096` of
             `65536` classes admissible, rank `16`, index `16` in `\ZZ^{16}`; the
@@ -4010,16 +3996,12 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             on one rational parameter `s`.  It is periodic: adding the least common
             multiple of the denominators of `K (P_1J)^{-t}` to `s` adds an integral
             matrix to `P_2`, and nothing smaller does.  That multiple is the period
-            returned here, and searching `s` over it is a complete residue system --
-            the exact criterion.
+            returned here. A period of the rational parameter is not a proof
+            that an integral solution has an integral parameter value.
+            The lift itself uses the integral symmetric linear system.
 
-            The period divides `|\det J|`: `(P_1J)^{-t} = J^{-t} Q_1` with
-            `J^{-t} = \mathrm{adj}(J)^t/\det J` and `Q_1` the integral plane action,
-            so the denominators of `K (P_1J)^{-t}` divide `\det J`.  The range
-            `\pm(2|\det J| + 2)` that :meth:`plane_block_lift` searched before was
-            therefore already a complete residue system, and a lift that exists
-            cannot have been reported as `None` for an integral `action`.  Computing
-            the period states that criterion instead of relying on the inequality.
+            The period divides $|\det J|$, since
+            $(P_1J)^{-t}=J^{-t}Q_1$ has denominators dividing $\det J$.
             """
             from sage.rings.rational_field import QQ as SageQQ
 
@@ -4078,7 +4060,7 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
                 image = quotient_action(vector)
                 target = matrix(
                     SageZZ,
-                    width,
+                    len(labels),
                     1,
                     [int(image.to_vector()(label)) for label in labels],
                 )
@@ -4102,43 +4084,17 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
 
             \[
             g = \begin{pmatrix} P_1 & P_2 & P_3\\ 0 & Q_1 & 0\\ 0 & Q_2 & Q_3\end{pmatrix},
-            \qquad Q_1 = \text{action},\quad Q_2 = 0,\quad Q_3 = \\text{quotient action},
+            \qquad Q_1 = \text{action},\quad Q_3 = \\text{quotient action},
             \]
 
             ``quotient_action`` is an isometry of \\(K_I=P^\\perp/P\\), read on the
             reduction's frame, and its matrix \\(Q_3\\) is the third diagonal block;
-            the default is the identity, which is the plane part of the kernel of the
-            Levi map.  \\(Q_2 = 0\\) loses nothing: an element with \\(Q_3\\) and a
-            nonzero \\(Q_2\\) differs from the one built here by an element with
-            \\(Q_1 = Q_3 = 1\\), i.e. by an element of the unipotent radical
-            (:meth:`unipotent_radical_generators`), so a lift of the pair \\((Q_1, Q_3)\\)
-            exists exactly when one with \\(Q_2 = 0\\) does.
-
-            with the paper's equations, in their row-vector convention --
-            "here we recall that we use the action on row vectors from the
-            right" -- and with their `K` block kept, which is what a plane that
-            does not split needs:
-
-            \[
-            J = P_1 J Q_1^t,\qquad
-            K = P_1 J Q_2^t + P_1 K Q_3^t + P_3 A Q_3^t,\qquad
-            H = P_1 H P_1^t + \{P_2 J^t P_1^t + P_1 J P_2^t\}
-                + \{P_3 K^t P_1^t + P_1 K P_3^t\} + P_3 A P_3^t .
-            \]
-
-            The second equation determines `P_1` and the third determines `P_3`
-            uniquely; the first is the linear system their proof calls
-            (Equa_P2) for `P_2`, whose kernel has dimension `k(k-1)/2` -- one for
-            a plane -- so its integral solutions, when there are any, form a
-            coset of that one-parameter family, and the parameter is searched over a
-            complete residue system of its period
-            (:meth:`plane_block_parameter_period`), so ``None`` means that *no*
-            integral solution exists and not that none was found in some range.  What
-            remains is the paper's own caveat, that an extension is rational for every
-            isometry of \(P^\perp\) but integral only on a finite-index subgroup: "we
-            could not find a universal construction of such a lattice.  However, in all
-            the cases we considered, a practical algorithm allowed us to solve this
-            problem".
+            The default quotient action is the identity. The row block Q2 is free; setting it to zero is only a rational normal form, not an integral hypothesis.
+            Solve the three equations of Dutour Sikirić--Hulek, Theorem 4.9,
+            printed pp. 33--34, including the mixed term P1 J Q2^t in E3.
+            The last symmetric equation is an integer linear system for P2.
+            The finite residue orbit in _plane_block_lift_for decides it
+            for all integral solutions of E3, not just Q2=0.
             """
             from sage.rings.rational_field import QQ as SageQQ
 
@@ -4164,17 +4120,10 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
                     identity_breadth[position, position] = 1
                 quotients = [identity_breadth]
             else:
-                read = self._frame_matrix(quotient_action)
-                requested_frame = read
-                if read.nrows() != breadth or read.ncols() != breadth:
-                    raise ValueError(
-                        f"the class action at {self} is read on {read.nrows()} x {read.ncols()} "
-                        f"coordinates, but the K block of the plane's basis has {breadth} vectors: "
-                        f"the reduction's frame is a section on a generating set and not a basis of "
-                        f"K_I here, so the block's Q_3 is not read from it"
-                    )
-                read = read.change_ring(rational)
-                quotients = [read.transpose(), read]
+                requested_frame = self._frame_matrix(quotient_action)
+                quotients = [
+                    self.quotient_block_matrix(quotient_action).transpose().change_ring(rational)
+                ]
             for quotient in quotients:
                 found = self._plane_block_lift_for(
                     action, quotient, requested_frame, change, inverse, H, J, K, A, rank, rational
@@ -4190,55 +4139,157 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             lattice = self.ambient_lattice()
             ring = lattice.base_ring()
             first = J * action.transpose().inverse() * J.inverse()
-            third = (K - first * K * quotient.transpose()) * (A * quotient.transpose()).inverse()
-            remainder = (
-                H
-                - first * H * first.transpose()
-                - third * A * third.transpose()
-                - (third * K.transpose() * first.transpose() + first * K * third.transpose())
+            if any(entry not in SageZZ for entry in first.list()):
+                return None
+            if abs(action.determinant()) != 1 or abs(quotient.determinant()) != 1:
+                return None
+            if quotient * A * quotient.transpose() != A:
+                return None
+            first = first.change_ring(SageZZ)
+            H, J, K, A = (block.change_ring(SageZZ) for block in (H, J, K, A))
+            action, quotient = action.change_ring(SageZZ), quotient.change_ring(SageZZ)
+            mixed = first * J
+            definite = A * quotient.transpose()
+            target = K - first * K * quotient.transpose()
+            breadth = A.nrows()
+            entries = ((0, 0), (0, 1), (1, 1))
+            symmetric_system = matrix(
+                SageZZ, 3, 4,
+                lambda row, col: (
+                    int(entries[row][1] == col // 2) * mixed[entries[row][0], col % 2]
+                    + int(entries[row][0] == col // 2) * mixed[entries[row][1], col % 2]
+                ),
             )
-            inverting = (first * J).transpose().inverse()
-            # A complete residue system of the free parameter: its period is the lcm
-            # of the denominators of the linear part, and the integral solutions of
-            # the P_2 equation are one coset of it (plane_block_parameter_period).
-            for parameter in range(self.plane_block_parameter_period(action)):
-                skew = matrix(rational, [[0, parameter], [-parameter, 0]])
-                second = (remainder / 2 + skew).transpose() * inverting
-                block = matrix(rational, rank, rank, 0)
+
+            def build(third, quotient_mixed):
+                remainder = (
+                    H - first * H * first.transpose() - third * A * third.transpose()
+                    - third * K.transpose() * first.transpose()
+                    - first * K * third.transpose()
+                )
+                if remainder.is_zero():
+                    second = matrix(SageZZ, 2, 2)
+                else:
+                    solution = _integral_solution(
+                        symmetric_system,
+                        matrix(SageZZ, 3, 1, [remainder[i, j] for i, j in entries]),
+                    )
+                    if solution is None:
+                        return None
+                    second = matrix(SageZZ, 2, 2, solution)
+                block = matrix(SageZZ, rank, rank)
                 block[0:2, 0:2] = first
                 block[0:2, 2:4] = second
                 block[0:2, 4:rank] = third
                 block[2:4, 2:4] = action
+                block[4:rank, 2:4] = quotient_mixed
                 block[4:rank, 4:rank] = quotient
-                if any(entry not in SageZZ for entry in block.list()):
-                    continue
-                # The paper's block is the matrix of the isometry acting on *row*
-                # vectors ("we use the action on row vectors from the right"), so
-                # the column-coordinate matrix on the ambient lattice is its
-                # transpose, transported by the change of basis.
                 lifted = change.transpose() * block.transpose() * inverse.transpose()
-                if any(entry not in SageZZ for entry in lifted.list()):
-                    continue
-                images = {}
-                for column, label in enumerate(lattice.module_generating_set()):
-                    images[label] = lattice.linear_combination(
-                        {
-                            other: ring(int(lifted[row, column]))
-                            for row, other in enumerate(
-                                lattice.module_generating_set()
-                            )
-                            if lifted[row, column]
-                        }
-                    )
+                images = {
+                    label: lattice.linear_combination({
+                        other: ring(int(lifted[row, column]))
+                        for row, other in enumerate(lattice.module_generating_set())
+                        if lifted[row, column]
+                    })
+                    for column, label in enumerate(lattice.module_generating_set())
+                }
                 candidate = lattice.Aut()(images)
-                if self._preserves_the_form(candidate) is not True:
-                    continue
+                assert self._preserves_the_form(candidate) is True
+                assert self.stabilizes(candidate)
                 if requested_frame is not None:
                     induced = self.isotropic_reduction().levi_action()(candidate)
-                    if self._frame_matrix(induced) != requested_frame:
-                        continue
+                    assert self._frame_matrix(induced) == requested_frame
                 return candidate
+
+            third = target * definite.inverse() if breadth else matrix(SageZZ, 2, 0)
+            if all(entry in SageZZ for entry in third.list()):
+                found = build(third.change_ring(SageZZ), matrix(SageZZ, breadth, 2))
+                if found is not None:
+                    return found
+            if breadth == 0:
+                return None
+
+            # Smith coordinates separate the two mixed rows and the two
+            # diagonal quadratic conditions. Only the cross-pairing couples
+            # the rows. The changes of coordinates are integral unimodular.
+            diagonal, left, right = mixed.smith_form()
+            scales = tuple(abs(int(diagonal[i, i])) for i in range(2))
+            assert all(scales)
+            h = left * (H - first * H * first.transpose()) * left.transpose()
+            k = left * first * K
+            t = left * target
+            even = all(A[i, i] % 2 == 0 for i in range(breadth))
+
+            def rows(i):
+                d = scales[i]
+                # A shift by d preserves the norm condition modulo 2d when
+                # the quotient is even or d is even; otherwise use 2d.
+                modulus = d if even or d % 2 == 0 else 2 * d
+                system = definite.transpose().augment(d * identity_matrix(SageZZ, breadth))
+                solution = _integral_solution(system, matrix(SageZZ, breadth, 1, list(t.row(i))))
+                if solution is None:
+                    return
+                start = tuple(int(x) % modulus for x in solution[:breadth])
+                generators = tuple(
+                    tuple(int(x) % modulus for x in v[:breadth])
+                    for v in system.right_kernel().basis()
+                )
+                frontier = [start]
+                seen = {start}
+                while frontier:
+                    current = frontier.pop()
+                    y = vector(SageZZ, current)
+                    ay = A * y
+                    if (h[i, i] - y.dot_product(ay) - 2 * y.dot_product(k.row(i))) % (2 * d) == 0:
+                        yield y
+                    for generator in generators:
+                        moved = tuple((x + z) % modulus for x, z in zip(current, generator, strict=True))
+                        if moved not in seen:
+                            seen.add(moved)
+                            frontier.append(moved)
+
+            second_rows = tuple(rows(1))
+            if not second_rows:
+                return None
+            cross_modulus = SageZZ(scales[0]).gcd(scales[1])
+            for y0 in rows(0):
+                for y1 in second_rows:
+                    if (
+                        h[0, 1] - y0.dot_product(A * y1)
+                        - y0.dot_product(k.row(1)) - k.row(0).dot_product(y1)
+                    ) % cross_modulus:
+                        continue
+                    transformed = matrix(SageZZ, [y0, y1])
+                    third = left.inverse() * transformed
+                    quotient_mixed = (right * diagonal.inverse() * (t - transformed * definite)).transpose()
+                    found = build(third.change_ring(SageZZ), quotient_mixed.change_ring(SageZZ))
+                    assert found is not None, "Smith-row divisibility implies an integral symmetric solution"
+                    return found
             return None
+
+        def _plane_mixed_block_system(self, mixed, definite):
+            r"""Integer system for mixed Q2 and P3 in the third block equation.
+
+            For M=P1 J, N=A Q3^t, the unknowns are the entries of Q2^t
+            and P3 in row order. The equation is M Q2^t + P3 N = target.
+            Its full solution lattice projects to the P3 residue classes
+            modulo 2|det J|. Replacing P3 by another representative of
+            such a class changes the symmetric remainder by a multiple
+            of 2|det J|. The correction
+            (delta_remainder/2)(M^t)^-1 is integral, so existence of an
+            integral P2 is constant on this class. A finite orbit of the
+            projected integer kernel therefore decides all mixed lifts.
+            """
+            breadth = definite.nrows()
+            return matrix(
+                SageZZ, 2 * breadth, 4 * breadth,
+                lambda row, col: (
+                    mixed[row // breadth, col // breadth] * int(row % breadth == col % breadth)
+                    if col < 2 * breadth else
+                    int(row // breadth == (col - 2 * breadth) // breadth)
+                    * definite[(col - 2 * breadth) % breadth, row % breadth]
+                ),
+            )
 
         def _elementary_plane_actions(self):
             r"""Return the elementary plane actions whose lifts present the kernel's plane factor.
@@ -4278,326 +4329,90 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             )
 
         def plane_action_congruence_classes(self, quotient_action):
-            r"""Return one plane action per class of `\GL_2(\ZZ)` the block equations leave open.
+            r"""Plane residue classes admitting integral blocks P1,Q2,P3.
 
-            **The equations.**  In the basis `(U \mid P \mid K)` of
-            :meth:`plane_block_basis` the Gram matrix is
-
-            \[
-            B = \begin{pmatrix} H & J & K\\ J^t & 0 & 0\\ K^t & 0 & A\end{pmatrix}
-            \]
-
-            and an isometry preserving `P` is
-            `((P_1, P_2, P_3), (0, Q_1, 0), (0, Q_2, Q_3))` with `Q_3 A Q_3^t = A`
-            -- Dutour Sikirić--Hulek, *Moduli of polarised Enriques surfaces --
-            computational aspects*, J. London Math. Soc. 110 (2024),
-            arXiv:2302.01679v2, **Theorem 4.9 and its proof, printed pp. 33--34**,
-            where the action is on row vectors from the right.  Expanding
-            `P B P^t = B` gives the paper's three equations, and the paper says what
-            each determines: *"The second equation determines `P_1 \in GL_k(\QQ)`
-            uniquely.  Then the third equation will determine `P_3 \in
-            M_{k,n-2k}(\QQ)` uniquely"* (**printed p. 33**), while the first leaves
-            `P_2` underdetermined with a kernel of dimension `k(k-1)/2` -- one for
-            a plane.
-
-            So `Q_3` is prescribed (``quotient_action``), `Q_1` is the plane action
-            sought, `Q_2 = 0` loses nothing (:meth:`plane_block_lift`), and what
-            remains is a condition on `Q_1`:
-
-            \[
-            (E_2)\quad P_1 = J Q_1^{-t} J^{-1} \in M_{k,k}(\ZZ),\qquad
-            (E_3)\quad (K Q_3^{-t} - P_1 K) A^{-1} \in M_{k,n-2k}(\ZZ).
-            \]
-
-            **The two levels.**  For `(E_2)` the paper's own words are the
-            criterion: `J^t = Q_1 J^t P_1` implies `P_1^{-1} = (J^t)^{-1} Q_1 J^t`,
-            and *"if we force `Q_1` to preserve the lattice `L_{J^T}` spanned by the
-            rows of the matrix `J^T`, then `P_1` is integral"* (**printed p. 34**).
-            That condition is read modulo `D = |\det J|`: writing
-            `P_1 = J Q_1^{-t} \operatorname{adj}(J)/D`, the numerator is a
-            polynomial in the entries of `Q_1`, so `Q_1 \equiv Q_1' \pmod D` makes
-            `P_1 - P_1'` integral.  For `(E_3)` the paper supplies a denominator:
-            `P_3 = (K - P_1JQ_2^t - P_1KQ_3^t)(Q_3^t)^{-1}A^{-1}` *"implies that
-            there exists a denominator `d_3` such that `P_3 \in \frac{1}{d_3}
-            M_{k,n-2k}(\ZZ)`, for example `d_3 = |\det(A)|`"* (**printed p. 34**),
-            so with `Q_2 = 0` and `E = |\det A|` the second condition is the
-            congruence `(K Q_3^{-t} - P_1 K)\operatorname{adj}(A) \equiv 0 \pmod E`.
-
-            Writing `U = Q_1^{-t}`, a bijection of `\GL_2(\ZZ)` onto itself, and
-            `\Omega = \operatorname{adj}(J) K`, that congruence is **linear in
-            `U`**:
-
-            \[
-            \Omega\, Q_3^{-t} \operatorname{adj}(A) \equiv U\, \Omega \operatorname{adj}(A)
-            \pmod{E},
-            \]
-
-            because `\operatorname{adj}(J)(K Q_3^{-t} - P_1K)\operatorname{adj}(A)
-            = \Omega Q_3^{-t}\operatorname{adj}(A) - U \Omega \operatorname{adj}(A)`
-            and `\operatorname{adj}(J) J = D`.  Its solutions are a coset of the
-            square of the row-syzygy module of `\Omega \operatorname{adj}(A)`,
-            computed by Smith normal form in :func:`_row_congruence_coset`.  That
-            this coupling of the two factors is a *finite* condition, and not a
-            second infinite search, is the shape Zemel gives the integral
-            parabolic: *The Structure of Integral Parabolic Subgroups of Orthogonal
-            Groups*, arXiv:1902.08264v2, **Proposition 3.2, printed pp. 21--22**,
-            and **Theorem 3.4, printed p. 24**, describe the image of the arithmetic
-            parabolic as `SL(I_{L^*}, I) \times \Gamma_\Lambda` -- the plane actions
-            confined to a congruence subgroup of `SL(I)`, the class actions
-            otherwise free -- with the `\psi`-coordinate of the radical's part in
-            the coset of `\Hom(\Lambda, I)` modulo `\Hom(\Lambda^*, I)` that
-            `b_M = (\mathrm{id}_U - M)\circ\iota^*` picks out (**Proposition 3.5,
-            printed p. 25**): a class in a finite group, which is `(E_3)` above.
-
-            **What this returns.**  One integral matrix of determinant `\pm 1` per
-            class of `\GL_2(\ZZ)` modulo `\Gamma(\operatorname{lcm}(D, E))` that
-            satisfies both conditions -- those are all the plane actions that can
-            occur in an integral lift, and :func:`_general_linear_classes` covers
-            every class of `\GL_2(\ZZ)`, so an exhaustive answer here decides
-            `(E_2)` and `(E_3)` on the whole of `\GL_2(\ZZ)`.  When no class
-            satisfies them the call raises :class:`LeviQuotientLiftAbsent`, and that
-            is a proof that *no* element of `P_I` induces ``quotient_action``: the
-            two conditions are necessary, and each is read modulo a modulus dividing
-            the one enumerated over.
-
-            What is *not* decided here is the first equation, the paper's system
-            `(13)` for `P_2`.  Its right side is symmetric, so it has the rational
-            solution `X = \texttt{remainder}/2`, and at a given plane action its
-            integral solutions are one coset of a one-parameter family that
-            :meth:`plane_block_parameter_period` covers completely.  The paper's
-            denominator `d_2 | 2 d_3^3` (printed p. 34) bounds those solutions only
-            by `(1/d_2)M_{k,k}(\ZZ)` -- a finite-index condition on the plane action
-            and not an identity -- which is why :meth:`levi_quotient_lift` solves the
-            first equation at each class returned here instead of assuming it.
+            The second and third equations of Dutour Sikirić--Hulek,
+            Theorem 4.9 (printed pp. 33--34), are necessary but not
+            sufficient for the full lift. For a prescribed quotient action
+            C, P1=J Q1^(-t) J^-1 must be integral, and the third equation
+            is the integer linear system in _plane_mixed_block_system.
+            These conditions are constant on fixed-determinant classes
+            modulo |det J|^2: P1 changes by a multiple of |det J|,
+            and the change in the third equation can be absorbed in Q2
+            since the columns of P1 J span the same lattice as J.
+            A multiple of this modulus distinguishes the determinant signs
+            and retains parity. The full lift uses the exact coset method
+            rather than enumerating this potentially large residue set.
             """
-            change, inverse, H, J, K, A = self.plane_block_gram()
-            rows = K.nrows()
+            _change, _inverse, _H, J, K, A = self.plane_block_gram()
+            quotient = self.quotient_block_matrix(quotient_action).transpose()
             determinant = abs(int(J.determinant()))
             discriminant = abs(int(A.determinant()))
-            if determinant == 0 or discriminant == 0:
-                raise ValueError(
-                    f"the complement of P^perp found for {self} does not pair "
-                    f"nondegenerately with the plane, or its quotient K_I is degenerate"
-                )
-            # The block's Q_3 is the *row-vector* matrix of the class action on the K
-            # block (Dutour Sikirić--Hulek, printed p. 33: "we use the action on row
-            # vectors from the right"), which is the transpose of the column-vector
-            # matrix quotient_block_matrix returns.
-            quotient_block = self.quotient_block_matrix(quotient_action).transpose()
-            closed_block = int(quotient_block.determinant())
-            if abs(closed_block) != 1:
-                raise ArithmeticError(
-                    f"the class action at {self} has determinant {closed_block} on the K block, "
-                    f"so it is not an isometry of K_I"
-                )
-            omega = J.adjugate() * K
-            gluing = omega * A.adjugate()
-            target = (
-                omega
-                * (closed_block * quotient_block.adjugate().transpose())
-                * A.adjugate()
-            )
-            level = int(
-                SageZZ(determinant)
-                * SageZZ(discriminant)
-                // SageZZ(determinant).gcd(SageZZ(discriminant))
-            )
-            admissible = [
-                action
-                for action in _general_linear_classes(determinant)
-                if all(
-                    int(value) % determinant == 0
-                    for value in (J * action * J.adjugate()).list()
-                )
-            ]
-            if not admissible:
+            assert determinant and discriminant
+            level = determinant**2
+            if level <= 2:
+                level *= 4
+            if level % 2:
+                level *= 2
+            definite = A * quotient.transpose()
+            breadth = A.nrows()
+            classes = []
+            for action in _general_linear_classes(level):
+                first = J * action.transpose().inverse() * J.inverse()
+                if any(entry not in SageZZ for entry in first.list()):
+                    continue
+                first = first.change_ring(SageZZ)
+                target = K - first * K * quotient.transpose()
+                if target.is_zero() or breadth == 0:
+                    classes.append(action)
+                    continue
+                system = self._plane_mixed_block_system(first * J, definite)
+                if _integral_solution(system, matrix(SageZZ, 2 * breadth, 1, target.list())) is not None:
+                    classes.append(action)
+            if not classes:
                 raise LeviQuotientLiftAbsent(
-                    f"no plane action admits an integral P_1 at {self}: the second block "
-                    f"equation of Dutour Sikirić--Hulek, Theorem 4.9 (arXiv:2302.01679v2, "
-                    f"printed p. 34) makes P_1 = J Q_1^-t J^-1 integral only when Q_1 preserves "
-                    f"the lattice spanned by the rows of J^t, and no class of "
-                    f"GL_2(ZZ/{determinant}) does"
+                    f"no integral second and third block equation solution at {self}"
                 )
-            if all(int(value) % discriminant == 0 for value in gluing.list()):
-                # The gluing block vanishes modulo the discriminant of K_I, so the third
-                # equation's congruence holds for every plane action that reaches (E_2);
-                # the classes modulo the level are then the admissible ones themselves.
-                if any(int(value) % discriminant for value in target.list()):
-                    raise LeviQuotientLiftAbsent(
-                        f"the class action does not lift at {self}: the third block equation of "
-                        f"Dutour Sikirić--Hulek, Theorem 4.9 (arXiv:2302.01679v2, printed "
-                        f"pp. 33--34) reads K Q_3^-t adj(A) = P_1 K adj(A) modulo "
-                        f"|det A| = {discriminant}; the gluing block b(U, K_I) vanishes modulo "
-                        f"{discriminant}, so that congruence holds for every plane action or for "
-                        f"none, and the right side does not vanish"
-                    )
-                return tuple(
-                    int(action.determinant()) * action.adjugate().transpose()
-                    for action in admissible
-                )
-            cosets = []
-            for row in range(rows):
-                coset = _row_congruence_coset(
-                    gluing,
-                    tuple(int(target[row, column]) for column in range(gluing.ncols())),
-                    discriminant,
-                )
-                if coset is None:
-                    raise LeviQuotientLiftAbsent(
-                        f"the class action does not lift at {self}: the third block equation of "
-                        f"Dutour Sikirić--Hulek, Theorem 4.9 (arXiv:2302.01679v2, printed "
-                        f"pp. 33--34) reads Omega Q_3^-t adj(A) = Q_1^-t Omega adj(A) modulo "
-                        f"|det A| = {discriminant}, with Omega = adj(J) K, and its {row}-th row "
-                        f"has no solution at all, so no plane action reaches it"
-                    )
-                cosets.append(coset)
-            plane_actions = []
-            seen = set()
-            unity = int(SageZZ.one() % SageZZ(discriminant))
-            minus_unity = int(SageZZ(discriminant - 1) % SageZZ(discriminant))
-            for first in _coset_elements(cosets[0], discriminant):
-                for second in _coset_elements(cosets[1], discriminant):
-                    solution = matrix(
-                        SageZZ, [[first[0], first[1]], [second[0], second[1]]]
-                    )
-                    closed_solution = int(solution.determinant()) % discriminant
-                    if closed_solution not in (unity, minus_unity):
-                        continue
-                    sign = 1 if closed_solution == unity else -1
-                    # Q_1 = U^-t = det(U) adj(U)^t; its class is what (E_3) constrains.
-                    candidate = sign * solution.adjugate().transpose()
-                    if discriminant % determinant == 0:
-                        # The wider modulus is a multiple of the narrower one, so the class
-                        # modulo |det A| already fixes the class modulo |det J|.
-                        if any(
-                            int(value) % determinant
-                            for value in (J * solution * J.adjugate()).list()
-                        ):
-                            continue
-                        entries = tuple(
-                            int(candidate[index, column]) % level
-                            for index in (0, 1)
-                            for column in (0, 1)
-                        )
-                        if entries in seen:
-                            continue
-                        seen.add(entries)
-                        plane_actions.append(_unimodular_lift(entries, level))
-                        continue
-                    for action in admissible:
-                        combined = _chinese_remainder_matrix(
-                            action, solution, determinant, discriminant
-                        )
-                        if combined is None:
-                            continue
-                        closed_combined = int(combined.determinant()) % level
-                        if closed_combined not in (unity, minus_unity):
-                            continue
-                        combined_sign = 1 if closed_combined == unity else -1
-                        entries = tuple(
-                            int(value) % level
-                            for value in (
-                                combined_sign * combined.adjugate().transpose()
-                            ).list()
-                        )
-                        if entries in seen:
-                            continue
-                        seen.add(entries)
-                        plane_actions.append(_unimodular_lift(entries, level))
-            if not plane_actions:
-                raise LeviQuotientLiftAbsent(
-                    f"the class action does not lift at {self}: the third block equation of "
-                    f"Dutour Sikirić--Hulek, Theorem 4.9 (arXiv:2302.01679v2, printed "
-                    f"pp. 33--34) is solvable modulo |det A| = {discriminant} only on plane "
-                    f"actions whose class modulo |det J| = {determinant} does not make "
-                    f"P_1 = J Q_1^-t J^-1 integral, so no plane action in GL_2(ZZ) satisfies "
-                    f"both conditions"
-                )
-            return tuple(plane_actions)
+            return tuple(classes)
 
         def levi_quotient_lift(self, quotient_action):
-            r"""Return an element of `P_I` inducing ``quotient_action`` on `K_I`, or prove none does.
+            r"""Lift a quotient action by the integral plane projection cosets.
 
-            This is the *setwise* quotient action `P_I \to O(K_I)`, as opposed to the
-            pointwise one of
-            :meth:`~sage_extensions.categories.lattices.IsotropicReductions.ParentMethods.pointwise_levi_action`:
-            the plane's own action on `I` is free here, so a lift of
-            ``quotient_action`` is a solution of the block system of Dutour
-            Sikirić--Hulek, Theorem 4.9 (arXiv:2302.01679v2, printed pp. 33--34)
-            with `Q_3` prescribed and `(Q_1, P_1, P_2, P_3)` free.  Zemel,
-            arXiv:1902.08264v2, Lemma 1.1 (printed p. 5) and Proposition 1.6
-            (printed p. 10), is the structure: the parabolic maps onto the Levi
-            quotient `GL(I) \times O(K_I)`, and the kernel is the unipotent radical.
-
-            The plane actions that can occur are decided by
-            :meth:`plane_action_congruence_classes`: conditions `(E_2)` and `(E_3)`
-            of that method are necessary, each is read modulo a modulus dividing
-            `\operatorname{lcm}(|\det J|, |\det A|)`, and the residue system
-            enumerated there covers `\GL_2(\ZZ)`.  So every plane action of every
-            integral lift lies in the finite set that method returns, and the list
-            searched below is that set together with
-            :meth:`_elementary_plane_actions`, ordered by height so that the cheap
-            actions come first.
-
-            At each plane action the first equation -- the paper's system `(13)`
-            for `P_2` -- is solved exactly, over the complete residue system of its
-            free parameter that :meth:`plane_block_parameter_period` computes, and
-            the resulting element is checked against the pairing and against
-            ``quotient_action``: what is returned is an element of `P_I` inducing
-            it, not a matrix that solves the block equations in one basis.
-
-            Two answers other than a lift are possible, and they are different.
-            When no plane action satisfies `(E_2)` and `(E_3)` the call raises
-            :class:`LeviQuotientLiftAbsent`, and that *proves* the fibre is empty:
-            no element of `P_I` induces ``quotient_action``.  When some plane action
-            satisfies both conditions and no integral `P_2` exists at any of the
-            classes returned, absence is **not** claimed -- the paper's denominator
-            `d_2 | 2 d_3^3` (printed p. 34) makes the first equation's integrality a
-            congruence of level dividing `2|\det J|^2|\det A|`, on a residue system
-            finer than the one searched -- and the call raises ``NotImplementedError``
-            naming that equation.
+            Let H be the plane projection of the kernel of the quotient
+            action, intersected with SL_2(ZZ). The exact block lift
+            decides membership in H. It contains the principal congruence
+            subgroup at _levi_plane_congruence_level, hence has finite
+            index. For fixed quotient action the liftable plane actions
+            are a union of right cosets Hx (indeed one coset of the full
+            kernel projection when nonempty). Thus the transitive coset
+            walk in each determinant component decides existence.
             """
-            candidates = self.plane_action_congruence_classes(quotient_action)
-            change, inverse, H, J, K, A = self.plane_block_gram()
-            rank = len(self.plane_block_basis())
-            from sage.rings.rational_field import QQ as SageQQ
+            for action in self._elementary_plane_actions():
+                found = self.plane_block_lift(action, quotient_action)
+                if found is not None:
+                    return found
+            level = self._levi_plane_congruence_level()
+            decisions = {}
 
-            quotient_block = (
-                self.quotient_block_matrix(quotient_action).transpose().change_ring(SageQQ)
+            def in_special(action):
+                key = tuple(int(entry) % level for entry in action.list())
+                if key not in decisions:
+                    decisions[key] = self.plane_block_lift(action) is not None
+                return decisions[key]
+
+            generators = (
+                matrix(SageZZ, [[1, 1], [0, 1]]),
+                matrix(SageZZ, [[1, 0], [1, 1]]),
             )
-            requested_frame = self._frame_matrix(quotient_action)
-            actions = {}
-            for action in tuple(candidates) + tuple(self._elementary_plane_actions()):
-                actions.setdefault(tuple(int(entry) for entry in action.list()), action)
-            ordered = sorted(
-                actions.items(),
-                key=lambda pair: (sum(abs(entry) for entry in pair[0]), pair[0]),
-            )
-            for _, action in ordered:
-                found = self._plane_block_lift_for(
-                    action,
-                    quotient_block,
-                    requested_frame,
-                    change,
-                    inverse,
-                    H,
-                    J,
-                    K,
-                    A,
-                    rank,
-                    SageQQ,
+            for start in (matrix.identity(SageZZ, 2), matrix(SageZZ, [[-1, 0], [0, 1]])):
+                _, _, found = right_coset_action(
+                    generators, in_special, start=start,
+                    accept=lambda action: self.plane_block_lift(action, quotient_action),
                 )
                 if found is not None:
                     return found
-            raise NotImplementedError(
-                f"no integral lift of the class action is constructed at {self}: "
-                f"{len(ordered)} plane actions satisfy both congruence conditions of the block "
-                f"equations (Dutour Sikirić--Hulek, Theorem 4.9, arXiv:2302.01679v2, printed "
-                f"pp. 33--34) and at none of them does the first equation -- the paper's system "
-                f"(13) for P_2 -- have an integral solution.  That equation's denominator is "
-                f"bounded by 2|det A|^3 (printed p. 34), so its integrality is a congruence of "
-                f"level dividing 2|det J|^2|det A| and is read on a finer residue system than "
-                f"the one searched here: the fibre is not decided, and an absence is not claimed"
+            raise LeviQuotientLiftAbsent(
+                f"the quotient action at {self} has no integral lift in either determinant component"
             )
 
         @cached_method
@@ -4638,7 +4453,7 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             Put `D=|\det J|` and `E=|\det A|`, and replace `Q_1` by `Q_1+NX`
             with `N=2D^3E^2`.  In the formulas of :meth:`_plane_block_lift_for`,
             the change in `P_1=JQ_1^{-t}J^{-1}` is divisible by `2D^2E^2`, and
-            the change in `P_3=(K-P_1K)A^{-1}` is divisible by `2D^2E`.
+            the change in `P_3=(K-P_1JQ_2^t-P_1K)A^{-1}`, keeping the mixed block Q2 fixed, is divisible by `2D^2E`.
             Since `P_1` and `P_3` have denominators at most `D` and `DE`,
             respectively, the change of their remainder is divisible by `2D`.
             Consequently the change of
@@ -4727,7 +4542,7 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             def is_in_special_projection(action):
                 key = residues(action)
                 if key not in decisions:
-                    decisions[key] = self._levi_plane_residue_lift(key) is not None
+                    decisions[key] = self.plane_block_lift(action) is not None
                 return decisions[key]
 
             if not is_in_special_projection(identity):
@@ -4770,7 +4585,7 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             r"""Return generators of `\ker(P_I\to O(K_I))`.
 
             Modulo the unipotent radical, an element of this kernel is
-            determined by its plane action `Q_1` after normalizing `Q_2=0`
+            determined by its plane action `Q_1`, since two lifts differ by the radical
             (:meth:`plane_block_lift`).  The plane actions form exactly the
             congruence group generated by :meth:`levi_lift_generators`, so the
             kernel is generated by those lifts together with
@@ -5034,34 +4849,26 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             return tuple(actions)
 
         def liftable_plane_action_classes(self):
-            r"""Return the classes modulo `2` of the plane actions that admit an integral lift.
+            r"""Exact parity classes of the plane projection with trivial quotient action.
 
-            An isometry of `L` preserving `I` with a trivial class action on `I^\perp/I` has
-            a plane action `Q_1` whose blocks are determined by the block equations of
-            Dutour Sikirić--Hulek, Theorem 4.9 (`theorem_isotropic_k_planes`, equations
-            `(E_2)` and `(E_3)`): `Q_1` must preserve the lattice spanned by the rows of
-            `J^t`, and the class action must satisfy the third equation modulo `|\det A|`.
-            :meth:`plane_action_congruence_classes` enumerates a complete residue system of
-            `\GL_2(\ZZ)` and returns one representative of every class satisfying both, so
-            the set returned here is a superset of the plane actions of the image `M` of
-            the parabolic, and it is what `M`'s plane projection has to be compared with.
-            Its matrices are in the row-vector convention of that theorem, and the
-            transposes are the column-vector actions of :meth:`levi_plane_action_generators`.
-
-            The comparison is modulo `2` because that is where the two congruence subgroups
-            this decides differ: for `T_{\mathrm{En}}` at a plane with `|\det J| = 2` the
-            image is `\Gamma(2)` or `\Gamma^1(2)` -- H. Sterk, *Compactifications of the
-            period space of Enriques surfaces, Part I*, Math. Z. 207 (1991), (4.3.17), for
-            the five plane types of `\Gamma_{En,2}`, and (4.7) for the two classes modulo
-            `O(L_-)` -- and `\Gamma^1(2)/\Gamma(2)` has order two.
+            Reduce the complete integral Levi lifts and close their finite
+            image. No condition on only two of the block equations is used
+            as an exact liftability criterion.
             """
-            def identity(vector):
-                return vector
-
-            return frozenset(
-                _class_modulo_two(action.transpose())
-                for action in self.plane_action_congruence_classes(identity)
+            generators = tuple(
+                _class_modulo_two(_plane_action_matrix(self, lift))
+                for lift in self.levi_lift_generators()
             )
+            generated = {(1, 0, 0, 1)}
+            frontier = list(generated)
+            while frontier:
+                current = frontier.pop()
+                for generator in generators:
+                    moved = _class_product(current, generator)
+                    if moved not in generated:
+                        generated.add(moved)
+                        frontier.append(moved)
+            return frozenset(generated)
 
         def antipodal_root_class_pairs(self):
             r"""Return the antipodal pairs of vectors of square `-2` in `I^\perp/I`.
