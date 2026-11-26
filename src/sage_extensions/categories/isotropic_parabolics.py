@@ -2065,20 +2065,13 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             proof, printed pp. 33--34, the block form of an isometry
             preserving a totally isotropic \(k\)-plane).
 
-            Under that hypothesis a lift exists for every
-            ``quotient_action``, so this method raises rather than answering
-            ``None`` when the construction does not produce one: a ``None``
-            here would say that the fibre over an isometry of \(K_I\) is
-            empty, which the block equation contradicts.  Two cases are
-            declined, each naming the missing datum: a line, whose pointwise
-            fibre is decided by its signed lift torsor instead, and a plane
-            with no complement of \(I^\perp\) pairing trivially with
-            \(K_I\), where the lift needs the mixed block entries that the
-            split hypothesis makes vanish.  At rank zero \(I=0\),
-            \(I^\perp=L\), and the reduction's projection
-            \(L\twoheadrightarrow K_I\) is an isomorphism, so the class
-            isometry is carried across that identification and the result is
-            kept only after it is checked against the pairing.
+            At rank two the exact integral block equations with plane action
+            identity decide the general nonsplit case as well. A return of
+            ``None`` there proves that the prescribed quotient action does not
+            lift pointwise. At rank zero the quotient is canonically the
+            original lattice; at rank one the marked-line lift torsor owns
+            the decision. For higher ranks the split construction requires
+            its orthogonal complement.
             """
             rank = int(self.module_rank())
             lattice = self.ambient_lattice()
@@ -2137,6 +2130,8 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
                         f"{lattice} at the zero subobject {self} does not preserve the pairing"
                     )
                 return candidate
+            if rank == 2:
+                return self.plane_block_lift(identity_matrix(SageZZ, 2), quotient_action)
             if self.splitting_complement() is None:
                 raise NotImplementedError(
                     f"cannot construct the pointwise lift of {quotient_action} in {lattice}: the "
@@ -4424,17 +4419,17 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             return lift
 
         @cached_method
-        def levi_quotient_image_lifts(self):
-            r"""Lift generators of the actual quotient image of a maximal plane.
+        def levi_quotient_image_lifts(self, trivial_on_plane=False):
+            r"""Lift generators of the actual definite quotient image.
 
-            The image M of the integral plane stabilizer in O(K) is a
-            subgroup, with membership decided by the exact block lift.
-            The quotient K is definite (or zero), so O(K) is finite.
-            If its generators lift, their lifts suffice. Otherwise form
-            the actual coset space O(K)/M using that membership predicate
-            and read its complete Schreier family. Lifting those elements
-            gives a family whose quotient image is exactly M, even if M
-            is proper or its lifts require nontrivial plane actions.
+            For the setwise stabilizer, membership in its image is decided
+            by the integral plane-action cosets; for the pointwise
+            stabilizer, fix the plane matrix to the identity. Both images
+            are subgroups of the finite orthogonal group of the quotient.
+            Lifts of its generators suffice when all lift. Otherwise
+            use the exact membership predicate in the finite coset space
+            and lift its full Schreier family. Thus a proper image is
+            computed as a group in its own right.
             """
             reduction = self.isotropic_reduction()
             quotient = reduction.quotient_lattice()
@@ -4442,22 +4437,26 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
                 return ()
             assert quotient.is_definite() is True
             orthogonal = reduction.levi_action().codomain()
+            lift = (
+                self.pointwise_quotient_lift if trivial_on_plane
+                else self.levi_quotient_lift_or_none
+            )
             generators = tuple(orthogonal.group_generators())
-            lifts = tuple(self.levi_quotient_lift_or_none(g) for g in generators)
-            if all(lift is not None for lift in lifts):
+            lifts = tuple(lift(g) for g in generators)
+            if all(member is not None for member in lifts):
                 return lifts
             liftable = orthogonal.predicate_subgroup(
-                lambda action: self.levi_quotient_lift_or_none(action) is not None,
-                lambda: "quotient actions with an integral plane stabilizer lift",
+                lambda action: lift(action) is not None,
+                lambda: "quotient actions admitting an integral stabilizer lift",
             )
             cosets = orthogonal.left_cosets(liftable)
             result = []
             for action in cosets.schreier_family_members():
                 if action == orthogonal.one():
                     continue
-                lift = self.levi_quotient_lift_or_none(action)
-                assert lift is not None
-                result.append(lift)
+                member = lift(action)
+                assert member is not None
+                result.append(member)
             return tuple(result)
 
         @cached_method
@@ -5182,38 +5181,24 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
 
         @cached_method
         def levi_quotient_image_index(self, trivial_on_plane=False) -> int:
-            r"""Return `[O(I^\perp/I) : H_0]`, the index of the returned generators' quotient image.
+            r"""Return the index of the actual quotient image in O(I^perp/I).
 
-            `H_0` is the subgroup of `O(I^\perp/I)` generated by the images of
-            :meth:`parabolic_stabilizer_generators` under the Levi quotient action
-            :meth:`~sage_extensions.categories.lattices.IsotropicReductions.ParentMethods.levi_action`.
-            Those generators are isometries with `g(I) = I`, so their images lie in the image
-            `M` of the whole setwise stabilizer, and `M` lies in `O(I^\perp/I)` by definition:
-
-            .. math:: H_0 \subseteq M \subseteq O(I^\perp/I).
-
-            Without a plane-action restriction, the complete family
-            contains lifts of generators of M by
-            :meth:`levi_quotient_image_lifts`, so the index is exact,
-            including when M is proper.
-
-            With ``trivial_on_plane`` use only the returned generators
-            fixing I pointwise. Their quotient image is a subgroup of
-            the actual pointwise stabilizer image; index one proves
-            surjectivity, but a larger index need not give the exact
-            pointwise image. This diagnostic is not a completeness
-            condition for the full parabolic.
-
-            For a maximal isotropic plane the quotient is definite or
-            zero; its orthogonal group is finite.
+            With ``trivial_on_plane`` take the pointwise plane stabilizer;
+            otherwise take the setwise stabilizer. In either case the
+            membership decision and finite Schreier family in
+            :meth:`levi_quotient_image_lifts` give its complete image.
+            Filtering individual generators of the full parabolic by a
+            pointwise condition would not in general generate the image
+            of the pointwise stabilizer.
             """
             reduction = self.isotropic_reduction()
-            orthogonal = reduction.quotient_lattice().Aut()
+            orthogonal = reduction.levi_action().codomain()
             levi = reduction.levi_action()
             images = tuple(
                 levi(generator)
-                for generator in self.parabolic_stabilizer_generators()
-                if not trivial_on_plane or self._fixes_isotropic_pointwise(generator)
+                for generator in self.levi_quotient_image_lifts(
+                    trivial_on_plane=trivial_on_plane
+                )
             )
             generated = orthogonal.subgroup(images)
             total = int(orthogonal.cardinality())

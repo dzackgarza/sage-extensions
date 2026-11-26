@@ -111,6 +111,10 @@ def test_nonsplit_quotient_sign_lifts_with_nonzero_mixed_block() -> None:
     lift = plane.levi_quotient_lift(quotient_action)
     assert lift in group and plane.stabilizes(lift)
     assert reduction.levi_action()(lift) == quotient_action
+    pointwise = reduction.pointwise_levi_lift(quotient_action)
+    assert pointwise in group
+    assert all(pointwise(vector) == vector for vector in (p, q))
+    assert reduction.pointwise_levi_action()(pointwise) == quotient_action
 
 
 def test_a_proper_quotient_image_has_a_complete_parabolic_family() -> None:
@@ -171,3 +175,6 @@ def test_coupled_plane_and_quotient_actions_generate_the_actual_image() -> None:
     assert actual.cardinality() == cardinal(8)
     assert levi(swap) in actual
     assert plane.levi_quotient_image_is_all() is True
+    reduction = plane.isotropic_reduction()
+    assert reduction.pointwise_levi_lift(levi(swap)) is None
+    assert plane.levi_quotient_image_index(trivial_on_plane=True) == 2
