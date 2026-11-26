@@ -4375,8 +4375,9 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
                 )
             return tuple(classes)
 
-        def levi_quotient_lift(self, quotient_action):
-            r"""Lift a quotient action by the integral plane projection cosets.
+        @cached_method
+        def levi_quotient_lift_or_none(self, quotient_action):
+            r"""Decide and lift a quotient action by the integral plane projection cosets.
 
             Let H be the plane projection of the kernel of the quotient
             action, intersected with SL_2(ZZ). The exact block lift
@@ -4411,59 +4412,91 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
                 )
                 if found is not None:
                     return found
-            raise LeviQuotientLiftAbsent(
-                f"the quotient action at {self} has no integral lift in either determinant component"
+            return None
+
+        def levi_quotient_lift(self, quotient_action):
+            r"""An integral lift of the given quotient isometry, if it exists."""
+            lift = self.levi_quotient_lift_or_none(quotient_action)
+            if lift is None:
+                raise LeviQuotientLiftAbsent(
+                    f"the quotient action at {self} has no integral lift in either determinant component"
+                )
+            return lift
+
+        @cached_method
+        def levi_quotient_image_lifts(self):
+            r"""Lift generators of the actual quotient image of a maximal plane.
+
+            The image M of the integral plane stabilizer in O(K) is a
+            subgroup, with membership decided by the exact block lift.
+            The quotient K is definite (or zero), so O(K) is finite.
+            If its generators lift, their lifts suffice. Otherwise form
+            the actual coset space O(K)/M using that membership predicate
+            and read its complete Schreier family. Lifting those elements
+            gives a family whose quotient image is exactly M, even if M
+            is proper or its lifts require nontrivial plane actions.
+            """
+            reduction = self.isotropic_reduction()
+            quotient = reduction.quotient_lattice()
+            if int(quotient.module_rank()) == 0:
+                return ()
+            assert quotient.is_definite() is True
+            orthogonal = reduction.levi_action().codomain()
+            generators = tuple(orthogonal.group_generators())
+            lifts = tuple(self.levi_quotient_lift_or_none(g) for g in generators)
+            if all(lift is not None for lift in lifts):
+                return lifts
+            liftable = orthogonal.predicate_subgroup(
+                lambda action: self.levi_quotient_lift_or_none(action) is not None,
+                lambda: "quotient actions with an integral plane stabilizer lift",
             )
+            cosets = orthogonal.left_cosets(liftable)
+            result = []
+            for action in cosets.schreier_family_members():
+                if action == orthogonal.one():
+                    continue
+                lift = self.levi_quotient_lift_or_none(action)
+                assert lift is not None
+                result.append(lift)
+            return tuple(result)
 
         @cached_method
         def levi_quotient_image_is_all(self) -> bool:
-            r"""Return whether every class action lifts, i.e. whether `P_I -> O(K_I)` is onto.
+            r"""Surjectivity onto the actual definite quotient orthogonal group.
 
-            Two statements decide it, each checked when this runs:
-
-            * a plane that splits off, `I^\perp` a summand with a complement
-              orthogonal to `K_I`: the block `\mathrm{diag}(1, 1, Q_3)` of
-              :meth:`~sage_extensions.categories.lattices.IsotropicReductions.ParentMethods.pointwise_quotient_lift`
-              is an isometry for every `Q_3` preserving the form on `K_I`, so the
-              pointwise stabilizer already maps onto `O(K_I)`;
-            * otherwise the computed orders of
-              :meth:`levi_quotient_image_index` with ``trivial_on_plane=True``:
-              the image of the elements fixing `I` pointwise is a subgroup of
-              `O(K_I)`, and index `1` says it is all of it.
-
-            A larger index does not identify the image -- it lies between that
-            subgroup and `O(K_I)` -- so the answer raises there, naming the
-            bound, instead of answering.
+            The image is a subgroup, so it is all of O(K) exactly when
+            every member of a complete generating family of O(K) lifts.
+            The integral lift decision checks both determinant components
+            of the plane action, not merely the pointwise plane stabilizer.
             """
-            if self.splitting_complement() is not None:
+            reduction = self.isotropic_reduction()
+            if int(reduction.quotient_lattice().module_rank()) == 0:
                 return True
-            index = self.levi_quotient_image_index(trivial_on_plane=True)
-            if index == 1:
-                return True
-            raise NotImplementedError(
-                f"the image of P_I -> O(K_I) at {self} is not decided: the elements fixing I "
-                f"pointwise map onto a subgroup of index {index} in O(K_I), so the full image "
-                f"lies between that subgroup and O(K_I), and no statement here separates the two"
+            assert reduction.quotient_lattice().is_definite() is True
+            return all(
+                self.levi_quotient_lift_or_none(action) is not None
+                for action in reduction.levi_action().codomain().group_generators()
             )
 
         @cached_method
         def _levi_plane_congruence_level(self):
             r"""Return a level on which existence of an integral plane lift is constant.
 
-            Put `D=|\det J|` and `E=|\det A|`, and replace `Q_1` by `Q_1+NX`
-            with `N=2D^3E^2`.  In the formulas of :meth:`_plane_block_lift_for`,
-            the change in `P_1=JQ_1^{-t}J^{-1}` is divisible by `2D^2E^2`, and
-            the change in `P_3=(K-P_1JQ_2^t-P_1K)A^{-1}`, keeping the mixed block Q2 fixed, is divisible by `2D^2E`.
-            Since `P_1` and `P_3` have denominators at most `D` and `DE`,
-            respectively, the change of their remainder is divisible by `2D`.
-            Consequently the change of
-            `P_2=(remainder/2+skew)^tJ^{-t}Q_1` is integral: the remainder term
-            is handled by that divisibility, and the `Q_1` term by `NX`.
-
-            Hence if one of `P_1,P_2,P_3` is integral for one determinant-sign
-            representative of a class modulo `N`, the same is true for every
-            representative of that class.  Dutour Sikirić--Hulek, Theorem 4.9
-            (arXiv:2302.01679v2, printed pp. 33--34), supplies these formulas.
+            Put `D=|\det J|` and `E=|\det A|`. For plane matrices
+            of the same determinant sign, congruence modulo `2D^2` makes
+            their inverse transposes congruent modulo `2D^2` by the
+            two-by-two adjugate formula. Thus their `U=JB^{-t}J^{-1}`
+            differ by a multiple of `2D`, preserving integrality.
+            Both mixed coefficient matrices `M=UJ=JB^{-t}` have
+            column lattice `J\ZZ^2`. Keep the same free block Y:
+            the change of the mixed right-hand side is divisible by
+            `2D` and hence lies in that column lattice. The symmetric
+            coefficient image is unchanged under unimodular column
+            operations on M. Its right-hand side changes by a symmetric
+            matrix Delta divisible by `2D`; the integral correction
+            `(\Delta/2)M^{-t}` maps to Delta. Reversing the argument
+            proves equivalence of liftability. The returned level
+            `2D^3E^2` is a multiple of this sufficient level.
             """
             _change, _inverse, _H, J, _K, A = self.plane_block_gram()
             determinant = abs(int(J.determinant()))
@@ -4506,7 +4539,7 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             shears reach every right coset, because they generate `SL_2(ZZ)` and
             `SL_2(ZZ)\to SL_2(ZZ/\text{level})` is onto.  Candidates are
             identified by an exact integral lift test
-            (:meth:`_levi_plane_residue_lift`), not by a bounded word search and
+            (:meth:`plane_block_lift`), not by a bounded word search and
             not by an enumeration of unimodular sequences.  Sage's
             `ArithmeticSubgroup_Permutation` then reconstructs `H` from that
             permutation action and returns its generators.
@@ -5159,33 +5192,20 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
 
             .. math:: H_0 \subseteq M \subseteq O(I^\perp/I).
 
-            Equal orders settle both ends at once.  When the index below is `1`,
-            `|H_0| = |O(I^\perp/I)|`, so `M` is all of `O(I^\perp/I)` and `H_0` **is** `M`:
-            the image of the full setwise stabilizer is identified by this computation,
-            with no generation statement about the parabolic used or needed.  At Sterk's
-            `P_2` of `T_{\mathrm{En}}` this is the case — `|H_0| = |O(P_2^\perp/P_2)|` =
-            10 321 920, both computed here.
+            Without a plane-action restriction, the complete family
+            contains lifts of generators of M by
+            :meth:`levi_quotient_image_lifts`, so the index is exact,
+            including when M is proper.
 
-            An index greater than `1` does **not** identify `M`: the subgroup sits between
-            `H_0` and `O(I^\perp/I)` and nothing here decides where.  The returned number is
-            then the bound `[O(I^\perp/I) : H_0]`, which is what
-            :meth:`parabolic_obstruction` reports it as.
+            With ``trivial_on_plane`` use only the returned generators
+            fixing I pointwise. Their quotient image is a subgroup of
+            the actual pointwise stabilizer image; index one proves
+            surjectivity, but a larger index need not give the exact
+            pointwise image. This diagnostic is not a completeness
+            condition for the full parabolic.
 
-            With ``trivial_on_plane`` the same index is asked of the members of
-            :meth:`parabolic_stabilizer_generators` that fix `I` **pointwise**, i.e. of the
-            elements `(1, N)` of `\GL(I) \times O(I^\perp/I)`
-            (:meth:`quotient_reflection_generators` supplies the reflection part of them).
-            A value of `1` there says every quotient action occurs with a trivial plane
-            action, which together with
-            `\GL(I)` occurring with a trivial quotient action
-            (:meth:`levi_plane_action_index` with ``trivial_on_quotient``) makes the image
-            of the parabolic the whole product -- the computation
-            :meth:`parabolic_completeness_decision` runs.
-
-            The quotient lattice is negative definite at a maximal isotropic plane of a
-            `(2,n)` lattice, so `O(I^\perp/I)` is finite and its order is the engine's
-            (`O(K_I).cardinality()`); the subgroup's order is the engine's too
-            (:meth:`~sage_extensions.categories.group.groups.*.subgroup`).
+            For a maximal isotropic plane the quotient is definite or
+            zero; its orthogonal group is finite.
             """
             reduction = self.isotropic_reduction()
             orthogonal = reduction.quotient_lattice().Aut()
@@ -5195,11 +5215,6 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
                 for generator in self.parabolic_stabilizer_generators()
                 if not trivial_on_plane or self._fixes_isotropic_pointwise(generator)
             )
-            if not images:
-                raise ArithmeticError(
-                    f"no generator of the parabolic at {self} fixes the plane pointwise, so "
-                    f"there is no quotient image to compare with O(I^perp/I)"
-                )
             generated = orthogonal.subgroup(images)
             total = int(orthogonal.cardinality())
             part = int(generated.cardinality())
@@ -5214,274 +5229,57 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
 
         @cached_method
         def parabolic_completeness_decision(self):
-            r"""Return `(complete, reason)` for the parabolic's generators, `reason` ``None`` when complete.
+            r"""Construct and certify the complete integral maximal-plane family.
 
-            `P_I = \mathrm{Stab}_{O(L)}(I)` maps onto a subgroup `M` of
-            `\GL(I) \times O(I^\perp/I)` with kernel `U_I`, so a subgroup of `P_I` that
-            contains `U_I` is `P_I` exactly when its image is `M`.  That is the
-            correspondence between the subgroups of a group containing a normal subgroup and
-            the subgroups of the quotient: Milne, *Group Theory*, v4.01 of 6 November 2025,
-            **Theorem 1.47 (Correspondence Theorem)**, printed **p. 22**, with **Corollary
-            1.48**, printed **p. 23**.  The returned family's image is what has to be
-            compared with `M`, and `M` is what the two projections of the family's image
-            have to fill:
-
-            * the image of :meth:`unipotent_radical_block_generators` is `\tau(U_I)` and it
-              contains `Z`, so the radical is generated exactly when
-              :meth:`unipotent_radical_index` is `1` -- the `\ker` half.  That index is the
-              index of :meth:`unipotent_radical_generators` in `U_I`, so it is a statement
-              about *this* family only when this family contains that one, which is checked
-              here rather than left to the two methods happening to be built from the same
-              pieces: with the containment, `U_I` lies in the subgroup's radical part, and
-              without it the index would certify a different family's radical;
-            * the plane projection with trivial class action is constructed in full by
-              :meth:`levi_lift_generators`: a congruence level certifies the residue-class
-              membership test, an ordinary transitive right-coset action presents its
-              special-linear part, and a direct action decides the determinant-minus-one
-              class.  The family must contain those lifts;
-            * the quotient projection is :meth:`levi_quotient_image_index` with
-              ``trivial_on_plane`` equal to `1` against the order of `O(I^\perp/I)`.
-
-            The image of `M` is **not** the product in general, and asking for the product
-            would refuse a correct family: H. Sterk, *Compactifications of the period space of
-            Enriques surfaces, Part I*, Math. Z. 207 (1991), (4.3.17) gives
-            `\Gamma(F) \cap \SL(F) = \Gamma(2)` for the plane type `{2,4,5}` and
-            `\Gamma^1(2)` for the types `{4,5}`, `{3,5}` and `{3,4}` of `\Gamma_{En,2}`,
-            and (4.7) gives `\Gamma^1(2)` for the class of `\ZZ e + \ZZ e'` modulo
-            `O(L_-)` -- a proper congruence subgroup of `\GL(I)` of index three in each
-            case.  At Sterk's `P_2` of \(T_{\mathrm{En}}\) the product is reached and all
-            the factors are `1`, so the parabolic there is generated.
-
-            A **split** plane is decided the same way: the block equations' third equation
-            `K = P_1 J Q_2^t + P_1 K Q_3^t + P_3 A Q_3^t` is only vacuous when `K = 0`, and
-            the second equation `J = P_1 J Q_1^t` still constrains the plane action, so a
-            splitting complement alone does not make the image the product.
-
-            A computation that is not available -- a quotient that is not definite, a
-            parameter lattice the enumeration refuses, or a full congruence presentation
-            that is not constructed -- is reported as ``False`` with that refusal as the
-            reason.  That is what this predicate's `False` has
-            always meant: not established.
-
-            The decision is one stage of the timing record
-            (:mod:`sage_extensions.timing`), timed here rather than by a decorator:
-            this method is cached, and a wrapper would replace the signature
-            ``cached_method`` builds its argument fixer from with
-            ``(*arguments, **keywords)``.
+            The block radical generators lift a basis of the full translation
+            lattice and a generator of its central kernel. The complete
+            trivial-quotient plane lifts generate the remaining kernel of
+            the quotient action. Finally levi_quotient_image_lifts computes
+            lifts of generators of the actual image, not necessarily O(K).
+            Success in these three constructions proves generation by the
+            subgroup correspondence theorem. No equality of an exhibited
+            pointwise image with O(K) is required.
             """
-            with stage(
-                "parabolic completeness decision",
-                subobject_record_name(self),
-            ):
-                rank = int(self.module_rank())
-                if rank != 2:
-                    return (
-                        False,
-                        f"no cited statement shows that the generators of the parabolic at {self} "
-                        f"generate it: the block equations of Dutour Sikirić--Hulek, Theorem 4.9 "
-                        f"(arXiv:2302.01679v2, printed pp. 33--34), and the three factors this decides "
-                        f"for a plane, are stated for a primitive isotropic plane, and this "
-                        f"subobject has rank {rank}",
-                    )
-                failures = []
-                family = self.parabolic_stabilizer_generators()
-                radical_family = self.unipotent_radical_generators()
-                missing = [
-                    member for member in radical_family if member not in family
-                ]
-                if missing:
-                    return (
-                        False,
-                        f"the family this decision certifies at {self} does not contain the "
-                        f"unipotent family whose index in the radical the radical factor "
-                        f"computes: {len(missing)} of its {len(radical_family)} generators are "
-                        f"missing from the returned family, the first being {missing[0]}.  The "
-                        f"radical factor is then a statement about another family and does not "
-                        f"transfer by the correspondence theorem, so the returned family is "
-                        f"only a subgroup of the parabolic (Milne, Group Theory, v4.01, "
-                        f"Theorem 1.47 with Corollary 1.48, applied to the map P_I -> M)",
-                    )
-                try:
-                    radical = self.unipotent_radical_index()
-                except (ArithmeticError, NotImplementedError, ValueError) as error:
-                    return (
-                        False,
-                        f"the radical factor at {self} is not decided: {error}; the family is then "
-                        f"only a subgroup of the parabolic",
-                    )
-                if radical != 1:
-                    failures.append(
-                        f"the radical is not generated (unipotent_radical_index() = {radical})"
-                    )
-                try:
-                    plane_lifts = self.levi_lift_generators()
-                except (ArithmeticError, NotImplementedError, ValueError) as error:
-                    return (
-                        False,
-                        f"the full plane-action presentation at {self} is not constructed: "
-                        f"{error}; the family is then only a subgroup of the parabolic",
-                    )
-                missing_plane_lifts = [
-                    member for member in plane_lifts if member not in family
-                ]
-                if missing_plane_lifts:
-                    failures.append(
-                        f"the family omits {len(missing_plane_lifts)} of the integral lifts "
-                        f"that generate the full plane projection with trivial class action"
-                    )
-                try:
-                    quotient_index = self.levi_quotient_image_index(trivial_on_plane=True)
-                except (ArithmeticError, NotImplementedError, ValueError) as error:
-                    return (
-                        False,
-                        f"the quotient factor at {self} is not decided: {error}; the family is "
-                        f"then only a subgroup of the parabolic",
-                    )
-                if quotient_index != 1:
-                    failures.append(
-                        f"the quotient images of the members that fix I pointwise have index "
-                        f"{quotient_index} in O(I^perp/I)"
-                    )
-                if failures:
-                    return (
-                        False,
-                        f"the image of the parabolic's generators at {self} does not reach the "
-                        f"stabilizer's image M: " + "; ".join(failures) + ". The family is then a "
-                        f"proper subgroup of the parabolic (Milne, Group Theory, v4.01, Theorem "
-                        f"1.47 with Corollary 1.48, applied to the map P_I -> M)",
-                    )
-                return True, None
+            if int(self.module_rank()) != 2:
+                return False, "the complete block construction is for a primitive plane"
+            quotient = self.isotropic_reduction().quotient_lattice()
+            if int(quotient.module_rank()) and quotient.is_definite() is not True:
+                return False, "the quotient of this plane is not definite"
+            self.parabolic_stabilizer_generators()
+            return True, None
 
         def is_parabolic_complete(self) -> bool:
-            r"""Return whether the generators of :meth:`parabolic_stabilizer_generators` are the whole parabolic.
-
-            The answer is :meth:`parabolic_completeness_decision`'s first component, and
-            `False` means *not established* rather than established otherwise --
-            :meth:`parabolic_obstruction` gives the reason.
-
-            The three factors are computed at every plane, split or not: the radical by its
-            parameter lattice and centre (:meth:`unipotent_radical_index`), the plane
-            projection against the classes that admit an integral lift
-            (:meth:`liftable_plane_action_classes`, :meth:`plane_action_class_image`), and
-            the quotient projection against `O(I^\perp/I)`
-            (:meth:`levi_quotient_image_index`).  The image of the parabolic in
-            `\GL(I) \times O(I^\perp/I)` is a proper congruence subgroup on the plane types
-            of Sterk (4.3.17) and (4.7), so a decision that asks for the product answers
-            `False` on a family that is correct; this one asks for the lift classes.
-            """
+            r"""Whether the complete integral maximal-plane construction applies."""
             return self.parabolic_completeness_decision()[0]
 
         def parabolic_obstruction(self) -> str | None:
             r"""Return why the parabolic's generators are not established to be all of it.
 
             ``None`` exactly when :meth:`is_parabolic_complete` is ``True``; otherwise the
-            reason :meth:`parabolic_completeness_decision` gives -- which factor of
-            `P_I \to M \subseteq \GL(I) \times O(I^\perp/I)` is not `1`, with its computed
-            value, or which of the three computations is not available here.
+            reason :meth:`parabolic_completeness_decision` gives.
             """
             return self.parabolic_completeness_decision()[1]
 
         @cached_method
         def parabolic_stabilizer_generators(self):
-            r"""Return generators of the parabolic \(P_I = \mathrm{Stab}_{O(L)}(I)\) at this plane.
+            r"""Complete generators of the integral maximal-plane stabilizer.
 
-            The construction is the published block decomposition of the
-            parabolic, and its three factors are constructed separately:
-
-            * the **Eichler transvections** of the plane, over a `ZZ`-basis of
-              \(p^\perp\) for each \(p\) in the plane's basis
-              (:meth:`parabolic_transvection_generators`); they lie in the parabolic,
-              and the ones that also fix the plane pointwise are the part of the
-              unipotent radical this family sees
-              (:meth:`unipotent_radical_generators`);
-            * the **Levi factor on \(I^\perp/I\)**, as the reflections in the
-              root shells of the definite quotient lifted into \(I^\perp\)
-              (:meth:`quotient_reflection_generators`);
-            * the **Levi factor on \(I\)**, as the integral lifts of the
-              elementary matrices of `GL_2(ZZ)` (:meth:`levi_lift_generators`).
-            * the **half-vector transvections**, as the Eichler transvections
-              `E_{e,w}` along a vector `w` of the metric dual and not of the
-              lattice (:meth:`half_vector_transvection_generators`), which are
-              the ones that move the discriminant classes.
-
-            **The decomposition this family has to cover.**  An integral
-            parabolic at a primitive isotropic plane is the semidirect product
-            `P_I = U_I rtimes L_I`, and in the block basis `(U | P | K)` of
-            :meth:`plane_block_basis` an element is
-
-            .. math::
-                \begin{pmatrix} g_{11} & 0 & 0 \\ a & 1 & \tau \\ c & 0 & g_{22}
-                \end{pmatrix},
-
-            with three different pieces, and each is a place the family can
-            fall short:
-
-            * the **definite Levi action** `(g_{11}, g_{22}) in GL(I) x
-              O(I^perp/I)`, whose second factor is definite (the quotient
-              lattice is negative definite at a maximal isotropic plane) and
-              whose first is the plane action; this is what
-              :meth:`levi_lift_generators` and
-              :meth:`quotient_reflection_generators` have to fill, and what
-              :meth:`levi_plane_action_index` and
-              :meth:`levi_quotient_image_index` measure;
-            * the **unipotent block** `c in Hom(U, K)`, the shear that moves the
-              second hyperbolic summand along the quotient -- a lattice
-              parameter, one generator per lattice vector
-              (:meth:`unipotent_radical_block_generators`);
-            * the **remaining translations**: `tau in Hom(K, P)` is *determined*
-              by `c` (`tau = -J^{-1} c^t A`) and `a in Hom(U, P)` is determined
-              by `c` up to the skew part, which is the centre of `U_I`
-              (:meth:`unipotent_block_solution`).  So the radical's parameters
-              are `c` together with that one central coordinate, and
-              :meth:`unipotent_radical_index` is the index of their span --
-              in exactly those two factors.
-
-            **The contract.**  This family generates `P_I` exactly when
-            :meth:`parabolic_completeness_decision` answers `True`, and that
-            decision has four premises, each computed: this family contains
-            :meth:`unipotent_radical_generators`; that family's index in `U_I`
-            is `1`; the plane actions of the members trivial on `I^perp/I` fill
-            the classes of `GL(I)` that admit an integral lift; and the quotient
-            images of the members fixing `I` pointwise have index `1` in
-            `O(I^perp/I)`.  What the third premise rests on is stated where it
-            is computed (:meth:`parabolic_completeness_decision`).  The public
-            stabilizer of a plane marking
-            (:meth:`sage_extensions.categories.lattices.Lattices.ParentMethods.stabilizer`,
-            through ``_isotropic_plane_parabolic_generators``) returns this
-            family when that decision is `True` and keeps another route when it
-            is not, so a caller never receives a family whose completeness is
-            unestablished.
-
-            When `L` splits along the plane as `P \perp U \perp K` with
-            `(P, U)` an orthogonal summand and `K = P^\perp/P`, this is a
-            generating set of the whole parabolic: an isometry `g` preserving
-            `I` induces `(g|_I, g|_K)` in `GL(I) \times O(K)`, a lift of that
-            pair differs from `g` by an element of the radical, and each of the
-            three factors is generated above.  Without the splitting the same
-            conclusion is a computation rather than a hypothesis, and
-            :meth:`parabolic_completeness_decision` runs it: the radical is
-            generated when :meth:`unipotent_radical_index` is `1`, the plane
-            actions of the members trivial on `I^\perp/I` fill `GL(I)`, and the
-            quotient images of the members that fix `I` pointwise fill
-            `O(I^\perp/I)`.  At Sterk's `P_2` of \(T_{\mathrm{En}}\) all three
-            hold, so this family is the whole parabolic there and
-            :meth:`parabolic_obstruction` is ``None``.
-
-            Sources, all read in the arXiv text of the cited version: Dutour
-            Sikirić--Hulek, arXiv:2302.01679v2, §"The Tits building",
-            Theorem `theorem_isotropic_k_planes` (the block form of an isometry
-            preserving an isotropic `k`-plane, its Levi blocks `P_1, Q_1, Q_3`
-            and the unipotent blocks, with their row-vector convention), and
-            the "Approximate models" subsection (Eichler's criterion: the
-            transvections `E_{e,x}`, `e` isotropic and `x \perp e`, after
-            Scattone, *Ph.D. thesis*, §3.7 Proposition 3.7.3).
+            In the parabolic map to O(P^perp/P), the kernel is generated by
+            the exact radical block generators and the full integral plane
+            projection with trivial quotient action. The image is generated
+            by the quotient actions lifted by levi_quotient_image_lifts.
+            Thus the three complete families generate the actual integral
+            parabolic by the correspondence theorem, without assuming a
+            splitting or surjectivity onto a direct product. Include the
+            existing transvection witnesses used by the discriminant-image
+            calculations; no generation claim about these witnesses is needed.
             """
             return (
                 self.parabolic_transvection_generators()
                 + self.half_vector_transvection_generators()
-                + self.quotient_reflection_generators()
-                + self.levi_lift_generators()
                 + self.unipotent_radical_block_generators()
+                + self.levi_lift_generators()
+                + self.levi_quotient_image_lifts()
             )
 
 

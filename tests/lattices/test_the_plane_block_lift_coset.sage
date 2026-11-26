@@ -111,3 +111,63 @@ def test_nonsplit_quotient_sign_lifts_with_nonzero_mixed_block() -> None:
     lift = plane.levi_quotient_lift(quotient_action)
     assert lift in group and plane.stabilizes(lift)
     assert reduction.levi_action()(lift) == quotient_action
+
+
+def test_a_proper_quotient_image_has_a_complete_parabolic_family() -> None:
+    r"""The nonsplit plane has a proper quotient image, not an incomplete family.
+
+    J=2I, A=-4I and K has columns (1,0)^t and 0. Reducing the
+    mixed-block equation modulo 2 shows that a quotient action must
+    preserve the kernel of K modulo 2. Thus it cannot swap the two
+    orthogonal directions of the definite quotient. Both signs lift:
+    d maps to p-d, and the other quotient vector maps to its negative.
+    The actual quotient image has order four in the group of order eight.
+    """
+    lattice = Lattices(ZZ)([
+        [0, 0, 2, 0, 1, 0], [0, 0, 0, 2, 0, 0],
+        [2, 0, 0, 0, 0, 0], [0, 2, 0, 0, 0, 0],
+        [1, 0, 0, 0, -4, 0], [0, 0, 0, 0, 0, -4],
+    ])
+    u, v, p, q, d, f = tuple(lattice.module_generators())
+    plane = lattice.primitive_isotropic_subobject(p, q)
+    reduction = plane.isotropic_reduction()
+    levi = reduction.levi_action()
+    group = lattice.O()
+    sign_d = group(dict(zip(lattice.module_generating_set(), (u, v, p, q, p - d, f), strict=True)))
+    sign_f = group(dict(zip(lattice.module_generating_set(), (u, v, p, q, d, -f), strict=True)))
+    expected = levi.codomain().subgroup((levi(sign_d), levi(sign_f)))
+    assert expected.cardinality() == cardinal(4)
+    assert plane.is_parabolic_complete() is True
+    family = plane.parabolic_stabilizer_generators()
+    actual = levi.codomain().subgroup(tuple(levi(g) for g in family))
+    assert actual.cardinality() == expected.cardinality()
+    assert all(levi(g) in expected for g in family)
+    assert levi(sign_d) in actual and levi(sign_f) in actual
+    assert plane.levi_quotient_image_index() == 2
+    assert plane.levi_quotient_image_is_all() is False
+
+def test_coupled_plane_and_quotient_actions_generate_the_actual_image() -> None:
+    r"""A quotient swap must also act nontrivially on the plane.
+
+    J=2I, A=-4I and K=I. The mixed equation modulo 2 forces U C^t=I.
+    The swap is impossible with plane action identity, but simultaneous
+    swaps of the dual, plane, and quotient directions are integral.
+    The quotient signs and swap generate O(-4I).
+    """
+    lattice = Lattices(ZZ)([
+        [0, 0, 2, 0, 1, 0], [0, 0, 0, 2, 0, 1],
+        [2, 0, 0, 0, 0, 0], [0, 2, 0, 0, 0, 0],
+        [1, 0, 0, 0, -4, 0], [0, 1, 0, 0, 0, -4],
+    ])
+    u, v, p, q, d, f = tuple(lattice.module_generators())
+    plane = lattice.primitive_isotropic_subobject(p, q)
+    levi = plane.isotropic_reduction().levi_action()
+    swap = lattice.O()(dict(zip(lattice.module_generating_set(), (v, u, q, p, f, d), strict=True)))
+    assert plane.stabilizes(swap)
+    assert plane.plane_block_lift(plane.plane_block_gram()[3].parent().one(), levi(swap)) is None
+    assert plane.is_parabolic_complete() is True
+    family = plane.parabolic_stabilizer_generators()
+    actual = levi.codomain().subgroup(tuple(levi(g) for g in family))
+    assert actual.cardinality() == cardinal(8)
+    assert levi(swap) in actual
+    assert plane.levi_quotient_image_is_all() is True

@@ -13461,57 +13461,16 @@ class IsotropicReductions(OwnedCategoryOverBaseRing):
 
         @cached_method
         def _levi_integral_lift_or_none(self, isometry):
-            r"""An integral lift at a rank other than one, with the quotient map prescribed.
-
-            The setwise quotient action \(P_I\to O(K_I)\) leaves the plane's own
-            action on \(I\) free, so a lift of ``isometry`` is a solution of the
-            block equations of Dutour Sikirić--Hulek, Theorem 4.9, printed
-            pp. 33--34, for a pair \((Q_1, Q_3)\) with \(Q_3\) prescribed
-            (Zemel, arXiv:1902.08264v2, section 1, Lemma 1.1 on printed p. 5 and
-            Proposition 1.6 on printed p. 10, is the structure: the parabolic maps
-            onto the Levi quotient, and the kernel is the unipotent radical).  The
-            solve is
-            :meth:`...PrimitiveIsotropicSubobjects.ParentMethods.levi_quotient_lift`,
-            which decides the plane actions over the whole of \(GL_2(ZZ)\): it
-            returns a lift, raises
-            :class:`...isotropic_parabolics.LeviQuotientLiftAbsent` when no plane
-            action admits an integral block at all, and raises
-            ``NotImplementedError`` only when plane actions of a possible lift do
-            exist and the one block equation left undecided there -- the paper's
-            system (13) for \(P_2\) -- has no integral solution at any of them.
-            The first of those refusals is a proof of absence and the second is
-            not, so only the first is answered as ``None`` here.
-            """
+            r"""Decide a prescribed quotient action by integral block lifts."""
             subobject = self.isotropic_sublattice()
             if int(subobject.module_rank()) == 0:
                 return subobject.pointwise_quotient_lift(isometry)
-            return subobject.levi_quotient_lift(isometry)
+            return subobject.levi_quotient_lift_or_none(isometry)
 
         def _levi_image_contains(self, isometry):
-            r"""Whether the prescribed quotient isometry has an integral parabolic lift.
-
-            At rank at least two this answers ``True`` exactly when
-            :meth:`_levi_integral_lift_or_none` constructs a lift, and ``False``
-            exactly when that call proves there is none: the setwise quotient
-            action is decided by
-            :meth:`...PrimitiveIsotropicSubobjects.ParentMethods.plane_action_congruence_classes`,
-            whose necessary conditions are read on a complete residue system of
-            \(GL_2(ZZ)\), and
-            :class:`...isotropic_parabolics.LeviQuotientLiftAbsent` is raised only
-            when no class of that system satisfies them.  The
-            ``NotImplementedError`` naming the undecided \(P_2\) equation is *not*
-            an absence, and it is left to propagate.
-            """
-            from sage_extensions.categories.isotropic_parabolics import (
-                LeviQuotientLiftAbsent,
-            )
-
+            r"""Whether the prescribed quotient isometry has an integral parabolic lift."""
             if self.isotropic_sublattice().module_rank() != NN(1):
-                try:
-                    self._levi_integral_lift_or_none(isometry)
-                except LeviQuotientLiftAbsent:
-                    return False
-                return True
+                return self._levi_integral_lift_or_none(isometry) is not None
             return any(
                 fibre.integral_base_point_or_none() is not None
                 for fibre in self._levi_fibres(isometry)
