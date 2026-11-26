@@ -648,8 +648,16 @@ class OrthogonalCharacterQuotient:
         return factors, product, embeddings, projections
 
     def _ambient_generators(self):
-        r"""The selected finite generating family of ``O(L)`` driving this quotient."""
+        r"""Integral lifts generating this quotient's actual character image.
+
+        A pure discriminant quotient may use the certified discriminant
+        image lifts. Sign and joint quotients use the selected full
+        integral generating family, as the discriminant image alone
+        does not determine the additional characters.
+        """
         ambient = self.supergroup
+        if self._has_discriminant and not (self.determinant_kernel or self.spinor_kernel):
+            return tuple(ambient.discriminant_image_lifts())
         if not (
             ambient.has_selected_group_resolution()
             and ambient.has_selected_finite_group_generating_set()

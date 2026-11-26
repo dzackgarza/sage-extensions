@@ -1107,11 +1107,25 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             integral orbit lattices, so no individual rational transporter is
             applied to A_L. The radical action is the full general linear
             group of the isotropic sublattice at every positive rank.
+            At rank one, the ambient orthogonal group's certified reflection
+            lifts may already attain the entire finite class stabilizer.
+            In that case the two containments prove the actual image
+            without constructing the lattice orbit. Otherwise the exact
+            Schreier calculation remains required.
             The zero sublattice has the full ambient orthogonal stabilizer.
             """
+            lattice = self.ambient_lattice()
+            if int(self.module_rank()) == 1:
+                label = next(iter(self.module_generating_set()))
+                vector = self.inclusion()(self.module_generator(label))
+                lifts = lattice.O().discriminant_image_reflection_lifts(vector)
+                if lifts is not None:
+                    return lattice.discriminant_group().O().subgroup(
+                        tuple(g.discriminant_morphism() for g in lifts)
+                    )
             action = self._stabilizer_action()
             if action is None:
-                return self.ambient_lattice().O().discriminant_image()
+                return lattice.O().discriminant_image()
             return action.finite_representation().stabilizer_discriminant_image()
 
         def rational_stabilizer_right_cosets(self):

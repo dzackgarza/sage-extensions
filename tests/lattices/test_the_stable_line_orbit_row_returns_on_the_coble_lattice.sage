@@ -54,8 +54,13 @@ def test_the_stable_line_orbit_row_returns_with_the_index_of_the_discriminant_im
     r"""The row returns, and its orbit count is ``[rho(O(T_Co)) : rho(Stab(line))]``."""
     lattice = _coble_lattice()
     labels = tuple(lattice.module_generating_set())
-    subobject = lattice.primitive_isotropic_subobject(lattice.module_generator(labels[1]))
+    vector = lattice.module_generator(labels[1])
+    subobject = lattice.primitive_isotropic_subobject(vector)
 
+    ambient_lifts = lattice.Aut().discriminant_image_reflection_lifts()
+    fixing_lifts = lattice.Aut().discriminant_image_reflection_lifts(vector)
+    assert all(g in lattice.O() for g in ambient_lifts)
+    assert all(g(vector) == vector for g in fixing_lifts)
     image_of_group = lattice.Aut().discriminant_image()
     image_of_stabilizer = subobject.stabilizer_discriminant_image()
     order = image_of_group.cardinality().finite_value()
