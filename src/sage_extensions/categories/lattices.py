@@ -6763,27 +6763,26 @@ class Lattices(OwnedCategoryOverBaseRing):
             The contraction ``x^T G y`` is one engine matrix-vector product on
             the framing coordinates; its value is raised into the Gram's ring.
             """
-            ring, labels, gram = self._engine_gram()
-            ambient = self._engine_coordinate_space()
+            ring, _labels, gram = self._engine_gram()
+            left_row = self._engine_coordinate_row(left)
+            right_row = left_row if right is left else self._engine_coordinate_row(right)
+            return _owned_engine_element(ring, left_row * gram * right_row)
 
+        def _engine_coordinate_row(self, element):
+            r"""Read one element in the retained finite Gram's framing."""
+            _ring, labels, _gram = self._engine_gram()
+            ambient = self._engine_coordinate_space()
             engine = ambient.base_ring()
             zero = engine.zero()
-
-            def row(element):
-                # The stored coefficients are the finitely supported function on the framing labels.
-                coefficients = element.to_vector()._coefficient_data()
-                return ambient(
-                    [
-                        zero
-                        if (value := coefficients.get(label)) is None
-                        else engine(_engine_element(element_parent(value), value))
-                        for label in labels
-                    ]
-                )
-
-            left_row = row(left)
-            right_row = left_row if right is left else row(right)
-            return _owned_engine_element(ring, left_row * gram * right_row)
+            coefficients = element.to_vector()._coefficient_data()
+            return ambient(
+                [
+                    zero
+                    if (value := coefficients.get(label)) is None
+                    else engine(_engine_element(element_parent(value), value))
+                    for label in labels
+                ]
+            )
 
         @cached_method
         def _engine_coordinate_space(self):
@@ -7720,6 +7719,15 @@ class Lattices(OwnedCategoryOverBaseRing):
             )
             match self.module_rank().is_finite():
                 case True:
+                    if self.value_module() is self.base_ring() and _engine_ring(self.base_ring()) is SageZZ:
+                        # The j-th entry of v^T G is b(v,e_j). One contraction
+                        # reads all pairings in the retained selected framing.
+                        ring, labels, gram = self._engine_gram()
+                        values = self._engine_coordinate_row(element) * gram
+                        return {
+                            label: _owned_engine_element(ring, value)
+                            for label, value in zip(labels, values, strict=True)
+                        }
                     return {
                         label: element.b(self.module_generator(label))
                         for label in self.module_generating_set()
@@ -7756,13 +7764,20 @@ class Lattices(OwnedCategoryOverBaseRing):
                     f"cannot compute the divisibility of {element!r} in {self!r}: the vector lies in {element.parent()!r}, not in this lattice"
                 )
 
+            return self._divisor_of_pairings(self._integral_generator_pairings(element))
+
+        def _integral_generator_pairings(self, element):
+            r"""The generator pairings used to read an integer divisibility."""
             ring = self.base_ring()
             assert _engine_ring(ring) is SageZZ, (
                 f"cannot compute the divisibility of {element!r} as an integer: {self!r} is over {ring}, not ZZ; use divisibility_ideal for the ideal b(v, L)"
             )
-            pairings = tuple(
-                abs(ring(value)) for value in self.generator_pairings(element).values()
-            )
+            return self.generator_pairings(element)
+
+        def _divisor_of_pairings(self, generator_pairings):
+            r"""The nonnegative generator of the integral pairing ideal."""
+            ring = self.base_ring()
+            pairings = tuple(abs(ring(value)) for value in generator_pairings.values())
             if not pairings:
                 return ring.zero()
             divisor = pairings[0]
@@ -7971,19 +7986,30 @@ class Lattices(OwnedCategoryOverBaseRing):
                 raise TypeError(
                     f"cannot form the primitive dual correlation(v)/div(v) of {element!r} in {self!r}: the vector lies in {element.parent()!r}, not in this lattice"
                 )
-            correlation_image = self.correlation_morphism()(element)
             if element.is_zero():
-                return correlation_image
-            divisibility = self.div(element)
+                return self.correlation_morphism()(element)
+            pairings = self._integral_generator_pairings(element)
+            divisibility = self._divisor_of_pairings(pairings)
             if divisibility <= self.base_ring().zero():
                 raise ArithmeticError(
                     f"the nonzero vector {element!r} of {self!r} has divisibility {divisibility}, but the divisibility of a nonzero vector is a positive integer"
                 )
+            return self._primitive_dual_from_pairings(element, pairings, divisibility)
+
+        def _primitive_dual_from_pairings(self, element, pairings, divisibility):
+            r"""Divide the correlation coordinates in the selected metric-dual basis.
+
+            The basis is dual to the lattice's selected basis. Its coordinates
+            on the correlation of v are exactly b(v,e_i), so the same owned
+            pairing family determines both the positive generator of the
+            pairing ideal and every coefficient of the divided dual vector.
+            """
             dual_lattice = self.dual_lattice()
             divided_coefficients = {}
-            coordinates = correlation_image.to_vector()
-            for label in coordinates.support().domain():
-                coefficient = coordinates(label)
+            for label, value in pairings.items():
+                coefficient = self.base_ring()(value)
+                if coefficient == 0:
+                    continue
                 quotient = coefficient // divisibility
                 if divisibility * quotient != coefficient:
                     raise ArithmeticError(
@@ -7998,12 +8024,13 @@ class Lattices(OwnedCategoryOverBaseRing):
                 raise TypeError(
                     f"cannot form the discriminant class of correlation(v)/div(v) for {element!r} in {self!r}: the vector lies in {element.parent()!r}, not in this lattice"
                 )
-            divisibility = self.div(element)
+            pairings = self._integral_generator_pairings(element)
+            divisibility = self._divisor_of_pairings(pairings)
             if divisibility == 0:
                 raise ValueError(
                     f"{element!r} has divisibility 0 in {self!r}, so correlation(v)/div(v) is undefined; the discriminant class [v/div(v)] needs a vector with nonzero pairing against the lattice"
                 )
-            return self.discriminant_class(self.primitive_dual(element))
+            return self.discriminant_class(self._primitive_dual_from_pairings(element, pairings, divisibility))
 
         def divided_class_residue(self, divided_class, divisibility):
             r"""Return the residue ``v mod d L`` of the divided class ``[v/d]``, by coordinates.

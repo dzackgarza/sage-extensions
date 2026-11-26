@@ -1,0 +1,57 @@
+discriminant setup 0.7542052567005157
+32 lines 1.5786307989619672
+32 class sets 2.0349966529756784
+32 validation 1.5556897576898336
+         1297965 function calls (1291719 primitive calls) in 5.163 seconds
+
+   Ordered by: cumulative time
+   List reduced from 1873 to 45 due to restriction <45>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+       64    0.002    0.000    3.048    0.048 lattices.py:7995(divided_discriminant_class)
+       33    0.001    0.000    2.035    0.062 <stdin>:19(<genexpr>)
+       32    0.002    0.000    2.034    0.064 orthogonal_quotients.py:3998(_isotropic_divided_class_set)
+       64    0.014    0.000    2.023    0.032 lattices.py:7961(primitive_dual)
+3348/2535    0.175    0.000    1.684    0.001 set_categories.py:791(__call__)
+       33    0.000    0.000    1.579    0.048 <stdin>:16(<genexpr>)
+       32    0.001    0.000    1.578    0.049 lattices.py:10345(primitive_isotropic_subobject)
+      160    0.011    0.000    1.550    0.010 lattices.py:7752(div)
+       32    0.004    0.000    1.529    0.048 lattices.py:456(_primitive_isotropic_subobject)
+        7    0.002    0.000    1.351    0.193 __init__.py:1(<module>)
+      160    0.046    0.000    1.257    0.008 lattices.py:7711(generator_pairings)
+       33    0.001    0.000    1.058    0.032 <stdin>:24(<genexpr>)
+  352/224    0.007    0.000    1.028    0.005 module_morphisms.py:1229(_call_)
+       64    0.002    0.000    0.978    0.015 modules.py:4325(is_primitive)
+     1867    0.009    0.000    0.888    0.000 modules.py:1981(module_generator)
+     1867    0.018    0.000    0.766    0.000 objects.py:398(selected_resolution_generator)
+       64    0.038    0.001    0.727    0.011 module_morphisms.py:1241(_engine_image)
+     88/3    0.002    0.000    0.660    0.220 <frozen importlib._bootstrap>:1360(_find_and_load)
+     88/3    0.002    0.000    0.659    0.220 <frozen importlib._bootstrap>:1308(_find_and_load_unlocked)
+     86/3    0.001    0.000    0.647    0.216 <frozen importlib._bootstrap>:914(_load_unlocked)
+     84/3    0.001    0.000    0.647    0.216 <frozen importlib._bootstrap_external>:757(exec_module)
+    299/6    0.001    0.000    0.639    0.107 <frozen importlib._bootstrap>:483(_call_with_frames_removed)
+     84/3    0.001    0.000    0.639    0.213 {built-in method builtins.exec}
+     1770    0.020    0.000    0.631    0.000 resolutions.py:694(generator)
+       64    0.003    0.000    0.608    0.010 framed_free_modules.py:140(support)
+   473/10    0.002    0.000    0.603    0.060 {built-in method builtins.__import__}
+  424/326    0.002    0.000    0.603    0.002 mor_categories.py:1069(__call__)
+  424/326    0.005    0.000    0.601    0.002 mor_foundation.py:51(__call__)
+  548/424    0.002    0.000    0.589    0.001 <frozen importlib._bootstrap>:1409(_handle_fromlist)
+       64    0.000    0.000    0.583    0.009 set_categories.py:4004(__call__)
+       64    0.002    0.000    0.582    0.009 set_categories.py:4008(_element_constructor_)
+       32    0.002    0.000    0.563    0.018 lattices.py:4603(subobject_on)
+       64    0.000    0.000    0.554    0.009 set_categories.py:3551(__call__)
+       64    0.002    0.000    0.554    0.009 set_categories.py:3555(_element_constructor_)
+       32    0.000    0.000    0.554    0.017 modules.py:4300(inclusion)
+       32    0.000    0.000    0.554    0.017 modules.py:4223(inclusion)
+       32    0.000    0.000    0.553    0.017 lattices.py:552(inclusion_factory)
+       64    0.008    0.000    0.547    0.009 set_categories.py:3505(_from_finite_members)
+       32    0.001    0.000    0.512    0.016 lattices.py:430(_lattice_subobject_spanning)
+       32    0.007    0.000    0.511    0.016 lattices.py:504(_lattice_subobject_on_basis)
+       32    0.000    0.000    0.497    0.016 lattice_morphisms.py:2452(_element_constructor_)
+       32    0.001    0.000    0.497    0.016 lattice_morphisms.py:2460(_morphism_from_images)
+1120/1090    0.038    0.000    0.495    0.000 mor_categories.py:2330(Of)
+1205/1073    0.007    0.000    0.449    0.000 mor_foundation.py:442(operation)
+       64    0.001    0.000    0.422    0.007 module_morphisms.py:1921(is_primitive)
+
+

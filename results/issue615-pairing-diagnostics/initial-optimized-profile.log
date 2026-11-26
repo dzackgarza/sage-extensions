@@ -1,0 +1,57 @@
+discriminant setup 0.44710935885086656
+32 lines 1.1515144659206271
+32 class sets 0.25953963957726955
+32 validation 0.3038062322884798
+         680954 function calls (677103 primitive calls) in 1.710 seconds
+
+   Ordered by: cumulative time
+   List reduced from 1310 to 45 due to restriction <45>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+       33    0.000    0.000    1.151    0.035 <stdin>:16(<genexpr>)
+       32    0.001    0.000    1.151    0.036 lattices.py:10366(primitive_isotropic_subobject)
+       32    0.003    0.000    1.127    0.035 lattices.py:456(_primitive_isotropic_subobject)
+       64    0.001    0.000    0.709    0.011 modules.py:4325(is_primitive)
+       32    0.001    0.000    0.427    0.013 lattices.py:4603(subobject_on)
+  358/260    0.001    0.000    0.418    0.002 mor_categories.py:1069(__call__)
+  358/260    0.002    0.000    0.417    0.002 mor_foundation.py:51(__call__)
+       32    0.000    0.000    0.395    0.012 modules.py:4300(inclusion)
+       32    0.000    0.000    0.395    0.012 modules.py:4223(inclusion)
+       32    0.000    0.000    0.394    0.012 lattices.py:552(inclusion_factory)
+       32    0.000    0.000    0.386    0.012 lattices.py:430(_lattice_subobject_spanning)
+       32    0.005    0.000    0.386    0.012 lattices.py:504(_lattice_subobject_on_basis)
+       64    0.001    0.000    0.377    0.006 lattices.py:8015(divided_discriminant_class)
+       32    0.000    0.000    0.354    0.011 lattice_morphisms.py:2452(_element_constructor_)
+       32    0.001    0.000    0.353    0.011 lattice_morphisms.py:2460(_morphism_from_images)
+       64    0.001    0.000    0.312    0.005 module_morphisms.py:1921(is_primitive)
+       64    0.050    0.001    0.270    0.004 module_morphisms.py:1979(_primitivity_by_invariant_factors)
+       33    0.000    0.000    0.259    0.008 <stdin>:19(<genexpr>)
+       32    0.002    0.000    0.259    0.008 orthogonal_quotients.py:3998(_isotropic_divided_class_set)
+       32    0.001    0.000    0.258    0.008 lattice_morphisms.py:674(__init__)
+ 1332/519    0.043    0.000    0.246    0.000 set_categories.py:791(__call__)
+  601/571    0.015    0.000    0.242    0.000 mor_categories.py:2330(Of)
+       64    0.000    0.000    0.225    0.004 lattices.py:7965(discriminant_class)
+       64    0.001    0.000    0.225    0.004 discriminant_modules.py:100(discriminant_class)
+  226/116    0.002    0.000    0.203    0.002 owned_category.py:862(retaining_initializer)
+  288/160    0.003    0.000    0.196    0.001 module_morphisms.py:1229(_call_)
+      160    0.003    0.000    0.183    0.001 module_morphisms.py:1198(_linear_combination_of_generator_images)
+    81/80    0.001    0.000    0.180    0.002 mor_categories.py:964(__classcall__)
+       64    0.000    0.000    0.174    0.003 module_morphisms.py:2014(_smith_coordinate_matrix)
+      132    0.001    0.000    0.169    0.001 modules.py:1555(Mor)
+15014/14989    0.087    0.000    0.166    0.000 category.py:436(__classcall__)
+       64    0.001    0.000    0.157    0.002 {built-in method builtins.sum}
+      256    0.002    0.000    0.154    0.001 module_morphisms.py:1219(<genexpr>)
+       32    0.002    0.000    0.149    0.005 framed_free_modules.py:1616(_module_subobject_constructor_data)
+       35    0.000    0.000    0.147    0.004 module_morphisms.py:3553(__init__)
+       35    0.002    0.000    0.147    0.004 module_morphisms.py:3094(_initialize_module_mor_parent)
+       33    0.000    0.000    0.147    0.004 <stdin>:24(<genexpr>)
+  687/555    0.003    0.000    0.138    0.000 mor_foundation.py:442(operation)
+       65    0.007    0.000    0.138    0.002 modules.py:8028(_engine_matrix)
+       73    0.003    0.000    0.134    0.002 mor_categories.py:944(element_class)
+       73    0.002    0.000    0.130    0.002 mor_categories.py:670(_generated_arrow_type)
+       65    0.000    0.000    0.130    0.002 module_morphisms.py:3562(__call__)
+       65    0.003    0.000    0.129    0.002 module_morphisms.py:3240(_element_constructor_)
+       32    0.001    0.000    0.123    0.004 _lattice.py:444(_lattice_object)
+      296    0.013    0.000    0.122    0.000 owned_category.py:1679(_object_of)
+
+

@@ -1,0 +1,31 @@
+Running 8 items in this shard
+........                                                                 [100%]
+-------------- generated report log file: tests/.report/run.jsonl --------------
+=============================== time-gate report ===============================
+collection took 7.50 s; the measured ceiling is 6 s
+============================== slowest durations ===============================
+18.14s call     tests/lattices/test_a_proper_stabilizer_image_splits_the_divided_class_fibre.sage::test_divisor_two_fibre_has_distinct_stable_line_orbits
+1.72s call     tests/lattices/test_a_proper_stabilizer_image_splits_the_divided_class_fibre.sage::test_the_determinant_fibre_of_the_hyperbolic_plane_splits
+0.51s call     tests/lattices/test_isotropic_type_archive.sage::test_divisibility_two_u2_vector_is_even_ordinary
+0.18s call     tests/lattices/test_isotropic_type_archive.sage::test_characteristic_divisibility_two_vector_is_even_characteristic
+0.11s call     tests/lattices/test_divisibility_from_pairings.sage::test_the_pairings_of_a_simple_root_of_a2_with_the_basis
+0.09s call     tests/lattices/test_isotropic_type_archive.sage::test_divisibility_one_isotropic_vector_has_odd_cusp_type
+0.04s call     tests/lattices/test_divisibility_from_pairings.sage::test_primitive_vectors_of_the_unimodular_plane_have_divisibility_one
+0.00s call     tests/lattices/test_divisibility_from_pairings.sage::test_the_difference_of_the_simple_roots_of_a2_is_three_divisible
+0.00s setup    tests/lattices/test_divisibility_from_pairings.sage::test_the_pairings_of_a_simple_root_of_a2_with_the_basis
+0.00s setup    tests/lattices/test_isotropic_type_archive.sage::test_divisibility_two_u2_vector_is_even_ordinary
+0.00s teardown tests/lattices/test_divisibility_from_pairings.sage::test_the_pairings_of_a_simple_root_of_a2_with_the_basis
+0.00s setup    tests/lattices/test_divisibility_from_pairings.sage::test_primitive_vectors_of_the_unimodular_plane_have_divisibility_one
+0.00s setup    tests/lattices/test_divisibility_from_pairings.sage::test_the_difference_of_the_simple_roots_of_a2_is_three_divisible
+0.00s teardown tests/lattices/test_a_proper_stabilizer_image_splits_the_divided_class_fibre.sage::test_the_determinant_fibre_of_the_hyperbolic_plane_splits
+0.00s setup    tests/lattices/test_a_proper_stabilizer_image_splits_the_divided_class_fibre.sage::test_divisor_two_fibre_has_distinct_stable_line_orbits
+0.00s setup    tests/lattices/test_isotropic_type_archive.sage::test_divisibility_one_isotropic_vector_has_odd_cusp_type
+0.00s teardown tests/lattices/test_a_proper_stabilizer_image_splits_the_divided_class_fibre.sage::test_divisor_two_fibre_has_distinct_stable_line_orbits
+0.00s teardown tests/lattices/test_divisibility_from_pairings.sage::test_primitive_vectors_of_the_unimodular_plane_have_divisibility_one
+0.00s setup    tests/lattices/test_isotropic_type_archive.sage::test_characteristic_divisibility_two_vector_is_even_characteristic
+0.00s teardown tests/lattices/test_divisibility_from_pairings.sage::test_the_difference_of_the_simple_roots_of_a2_is_three_divisible
+0.00s setup    tests/lattices/test_a_proper_stabilizer_image_splits_the_divided_class_fibre.sage::test_the_determinant_fibre_of_the_hyperbolic_plane_splits
+0.00s teardown tests/lattices/test_isotropic_type_archive.sage::test_characteristic_divisibility_two_vector_is_even_characteristic
+0.00s teardown tests/lattices/test_isotropic_type_archive.sage::test_divisibility_one_isotropic_vector_has_odd_cusp_type
+0.00s teardown tests/lattices/test_isotropic_type_archive.sage::test_divisibility_two_u2_vector_is_even_ordinary
+8 passed in 29.09s

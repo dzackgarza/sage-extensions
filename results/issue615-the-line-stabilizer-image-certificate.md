@@ -501,3 +501,37 @@ full regression, the measured call is much shorter, but still exceeds
 20 s; collection 10.36 s exceeds 6 s. Time gates were disabled for
 this correctness diagnosis only. The independent whole-original
 review and performance acceptance remain outstanding.
+
+### Pairing contraction at the lattice owner (2026-11-26)
+
+For the selected basis e_i of an integral lattice and the metric dual
+basis e_i^#, write v = sum_i v_i e_i. The jth coordinate of v^t G is
+b(v,e_j), and correlation(v) = sum_j b(v,e_j)e_j^#. Consequently
+if d = gcd_j b(v,e_j) is nonzero, the divided dual has coordinates
+b(v,e_j)/d. One pairing family suffices for both the divisibility and
+construction of that actual dual element; projecting it gives [v/d].
+The finite integral scalar-valued route contracts once in the retained
+Gram framing; other pairing routes are unchanged. Zero correlation and
+undefined divided class at d=0 retain their respective behavior.
+
+The diagnostic in issue615-pairing-diagnostics/probe.py profiles the
+same 32 primitive isotropic vectors e+2nh-2n^2f (h^2=2, e.f=2) on
+T_Co. Their norm is 8n^2-8n^2=0, their e-coordinate is 1, and since
+T_Co is twice a unimodular form their divisor is 2. On bb070b51 the
+32 class-set operations took 2.035 s and validation 1.556 s. On the
+initial optimized code they took 0.260 s and 0.304 s respectively;
+the initial profile precedes the final integral ring-guard adjustment.
+Both raw profiles are retained. The final tested source blob is
+lattices.py cfa5eea76458c1dc6abc5603f7d90529f7d3161b. All other
+production and test blobs match bb070b51. Native focused tests: eight
+passed, total 29.09 s; longest call 18.14 s, collection 7.50 s. These
+include divisibilities, cusp types, the exact eight-orbit nontrivial
+fibre and determinant-only split. Native full strengthened Coble test:
+report SessionFinish exitstatus=0, all 527 lines and exact image checks
+passed, call 100.0907 s, JUnit total 107.640 s. Stage times: public row
+60.8333 s, coset splitting and transport 56.4628 s. These full-run
+measurements are worse than the earlier 94.23 s call/50.47 s row; no
+end-to-end speedup is established. Time gates disabled only for
+correctness diagnosis; both 6 s collection and 20 s call remain unmet.
+The exact reports and stage records are retained in the diagnostic
+directory. No independent whole-original acceptance is asserted.
