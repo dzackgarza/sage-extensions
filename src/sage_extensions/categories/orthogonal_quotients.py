@@ -1508,11 +1508,11 @@ class OrthogonalCharacterQuotient:
         never about a determinant or a spinor norm read separately -- and it is one
         element's evaluation, not an enumeration of the image.
 
-        ``None`` means no candidate action in the list admitted a lift outside `Gamma`;
-        it is not a claim that `chi(Stab(P))` is contained in `chi(Gamma)`, and the
-        caller must then keep the exact route (:func:`_plane_orbit_from_odd_stabilizer` keeps
-        it by splitting with an ambient odd isometry instead, only after checking that
-        the subgroup has index two).
+        If the elementary actions give no witness, try the integral Levi
+        lifts with trivial quotient action. A returned lift outside `Gamma`
+        suffices, regardless of whether these lifts generate the full stabilizer.
+        ``None`` is inconclusive: the caller computes the exact character image
+        of the integral stabilizer before deciding whether the orbit splits.
         """
         from sage.matrix.constructor import matrix
         from sage.rings.integer_ring import ZZ as SageZZ
@@ -1573,6 +1573,9 @@ class OrthogonalCharacterQuotient:
             lift = representative.plane_block_lift(action)
             if lift is None:
                 continue
+            if lift not in self.subgroup:
+                return lift
+        for lift in representative.levi_lift_generators():
             if lift not in self.subgroup:
                 return lift
         return None
@@ -4423,30 +4426,11 @@ def _plane_orbit_from_odd_stabilizer(subgroup, representative):
     `chi(Gamma) \\ chi(G) / chi(H)`, where `chi = (rho, sn)` is the joint finite
     character.
 
-    Exactly two answers, and both are computed:
-
-    * an element of `H` whose character image lies outside `chi(Gamma)` puts
-      `chi(H)` across both cosets, so `chi(Gamma) chi(H) = chi(G)` and the whole
-      `G`-orbit is one `Gamma`-orbit -- its representative is the ambient one;
-    * when no such element is found, the ambient `G`-orbit splits, and it splits into
-      exactly two because `Gamma` has index two and `chi(H)` would then be contained
-      in `chi(Gamma)`: the two representatives are `P` and `g_0 P`, with
-      `g_0` any integral isometry of odd real spinor norm, which is computed here as a
-      reflection in a square-two vector and checked not to lie in `O^+`.
-
-    Nothing here enumerated a stabilizer's generating family, and no isometry is
-    guessed: the odd stabilizer element comes from the plane block equations
-    (:meth:`...PrimitiveIsotropicSubobjects.plane_block_lift`), and the ambient odd
-    element is a reflection the constructor verifies.
+    A negative-spinor element of `H` proves that the ambient orbit is a
+    single `Gamma`-orbit. If the witness search is inconclusive, use the exact
+    stabilizer character image and the finite double-coset construction.
+    In particular a failed search is never evidence of two orbits.
     """
-    lattice = subgroup.supergroup().domain()
-    # Recognise `O^+` by the character data that defines it, never by comparing
-    # subgroup objects: a comparison of two preimage subgroups can be false for the
-    # same subgroup reached by another route, and a false answer here does not fail
-    # loudly -- it falls through to the stabilizer enumeration this route exists to
-    # avoid, which exceeds the runtime's memory guard on `6JRX` without
-    # returning.  `O^+ = sn^{-1}(+1)` is exactly the subgroup cut out by the
-    # spinor character alone.
     quotient = subgroup.finite_character_quotient()
     if not (
         quotient.spinor_kernel
@@ -4454,16 +4438,14 @@ def _plane_orbit_from_odd_stabilizer(subgroup, representative):
         and not quotient._has_discriminant
     ):
         return None
-    # `O^+ = sn^{-1}(+1)` is the kernel of the real spinor norm, which is onto
-    # `{+-1}` as soon as the lattice exhibits one integral odd element, so its index
-    # is two and neither character image's order has to be computed: the odd element
-    # below either exists -- and then it both certifies the index and supplies the
-    # second representative of the split -- or the call refuses by name.
     witness = quotient.plane_odd_character_witness(representative)
     if witness is not None:
         return (representative,)
-    odd_ambient = lattice.odd_spinor_norm_isometry()
-    return (representative, odd_ambient.transport_isotropic_object(representative))
+    stabilizer = quotient.exact_isotropic_stabilizer_generators(representative)
+    return tuple(
+        splitting.transport_isotropic_object(representative)
+        for splitting in quotient.splitting_isometries(stabilizer)
+    )
 
 
 def _plane_orbit_from_parabolic_stabilizer(subgroup, representative):

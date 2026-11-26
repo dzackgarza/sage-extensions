@@ -74,3 +74,24 @@ def test_the_plane_count_under_o_plus_is_the_count_under_o() -> None:
         under_o_plus = lattice.O_plus().isotropic_orbit_representatives(2).cardinality()
         assert int(under_o) == 1
         assert int(under_o_plus) == int(under_o)
+
+
+def test_nondiagonal_plane_levi_character() -> None:
+    r"""The actual stabilizer has an odd element outside the elementary trial actions.
+
+    In the basis (p,q,u,v), the Gram matrix is [0,3I;3I,C] with
+    C=[[4,-2],[-2,2]]. The block diagonal map with plane action
+    A=[[1,2],[0,-1]] and dual action A^(-t) preserves the Gram matrix.
+    Its spinor sign is det(A)=-1 because the plane is maximal isotropic:
+    the action on the oriented positive two-plane of the split real form
+    has that sign. Thus its ambient plane orbit is one O+ orbit.
+    """
+    lattice = Lattices(ZZ)([[0, 0, 3, 0], [0, 0, 0, 3], [3, 0, 4, -2], [0, 3, -2, 2]])
+    p, q, u, v = tuple(lattice.module_generators())
+    plane = lattice.primitive_isotropic_subobject(p, q)
+    ambient = lattice.O()
+    positive = lattice.O_plus()
+    expected = ambient(dict(zip(lattice.module_generating_set(), (p, 2 * p - q, u + 2 * v, -v), strict=True)))
+    assert plane.stabilizes(expected) and expected not in positive
+    witness = positive.finite_character_quotient().plane_odd_character_witness(plane)
+    assert witness in ambient and plane.stabilizes(witness) and witness not in positive
