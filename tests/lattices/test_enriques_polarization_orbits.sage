@@ -42,14 +42,18 @@ What this file keeps is what the comparison rests on -- the subset each case
 decodes to, the wall vanishing it is checked against, the Table 3 anchor, and the
 transcribed rows pinned to their cards by tag.
 
-An exact subgroup boundary is retained, not resolved: the table's counts are orbits of
-$\Gamma^+_h = \Gamma_h \cap O^+(N)$, while the public method returns the full preimage
-$\Gamma_h$ in $O(N)$.  Equality of the line, plane and flag counts between the two is a
-separate statement being settled in research #748, whose flag part currently has a gap
-(a totally isotropic plane contains infinitely many lines and the displayed
-$\operatorname{diag}(1,-1)$ witness fixes only two).  The line and plane stabilizer
-witnesses are distinct from that missing flag proof.  No equality is inferred from the
-table.
+The table's counts are orbits of $\Gamma^+_h = \Gamma_h \cap O^+(N)$,
+while the public method returns the full preimage $\Gamma_h$ in $O(N)$
+(DSH arXiv:2302.01679v2, equation (5), p. 7; Tables 1--2, pp. 13--14).
+The orbit partitions agree on primitive lines, planes and flags by
+research `thm:enriques-spinor-orbit-agreement` and
+`thm:enriques-flag-witnesses`, with application
+`cor:enriques-preimage-vs-positive` at 19d91f9babd6f63232402752921420ef7059c974.
+In particular, on the second plane the odd--odd line has the
+component-reversing witness $E_1\tau_0$; the level-two shears transport
+it throughout that parity class. Each flag's stabilizer thus meets the
+negative component inside the discriminant kernel. No equality is
+inferred from matching the table.
 """
 
 from sage_extensions.all import *  # noqa: F401,F403

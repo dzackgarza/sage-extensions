@@ -25,8 +25,8 @@ such rather than compared against an invented value.
 
 **The rows, and the numbered statement of each.**  A row is named by the paper
 and the table, proposition, theorem, corollary, lemma or section the card cites for
-it, with the page references stripped: a row names its paper and its numbered
-statement, not a page.
+it, preserving its printed page references. The DSH locations refer to the
+checked arXiv:2302.01679v2, including the Table 4 locator absent from the card.
 
 * card ``029J`` -- $N = U \oplus U(2) \oplus E_8(-2)$, the Enriques period
   lattice, with rows ``O``, ``Otilde+`` and ``gamma-en-2``: H. Sterk,
@@ -75,6 +75,13 @@ group the row names:
   nonprimitive numerical polarizations, which we disregard in our approach since
   they do not lead to new moduli spaces" (Section 3.5).  Table 4 counts the
   primitive classes, so this row does too.
+* For the polarization orbit rows the computed group is the full preimage
+  $\Gamma_h$ of equation (5), p. 7, not a separately constructed positive
+  group. Its orbit partitions on lines, planes and flags equal those of
+  $\Gamma_h^+$ (Tables 1--2, pp. 13--14) by the component-reversing
+  level-two stabilizer witnesses in research, `thm:enriques-spinor-orbit-agreement`
+  and `thm:enriques-flag-witnesses` (research 19d91f9babd6f63232402752921420ef7059c974).
+  This is a group-theoretic justification, not an inference from matching counts.
 * ``#Γ̄_h``: the number of conjugacy classes of the discriminant images
   $\bar\Gamma_h = \pi_M(O(M,h))$ over the ``#h`` classes.  Equation (5) defines
   $\Gamma_h = \pi_N^{-1}(\pi_M(O(M,h)))$, so the public group's
@@ -149,12 +156,6 @@ ENRIQUES_PARENT_GROUP = "o-t-en"
 
 #: The card of $O(U \oplus E_8(-1))$'s Table 4.
 TABLE4_TAG = "0128"
-
-#: A page reference in a card's citation, which a row does not name.
-_PAGE_REFERENCES = (
-    re.compile(r"\(\s*pp?\.\s*\d+(?:\s*[-\u2013]\s*\d+)?\s*\)"),
-    re.compile(r",?\s*\bpp?\.\s*\d+(?:\s*[-\u2013]\s*\d+)?(?!\d)"),
-)
 
 #: A numbered statement: the word and the number that follows it.
 _NUMBERED_STATEMENT = re.compile(
@@ -234,18 +235,9 @@ def _select(rows, tags, degrees, quantities):
 
 
 def _statement(citation: str) -> str:
-    r"""The card's citation with its page references removed.
-
-    A row names its paper and its numbered table or statement, not a page: the two
-    readings are checked here rather than assumed, because a citation that stops
-    naming a numbered statement has stopped saying which statement the row is.
-    """
-    trimmed = citation
-    for pattern in _PAGE_REFERENCES:
-        trimmed = pattern.sub("", trimmed)
-    stripped = re.sub(r"\s+", " ", trimmed).replace(" .", ".").strip()
-    if re.search(r"\bpp?\.\s*\d", stripped):
-        raise ValueError(f"a page reference survives in {stripped!r}")
+    r"""The numbered source statement, retaining the printed page and version."""
+    citation = re.sub(r"arXiv:2302\.01679(?![\dv])", "arXiv:2302.01679v2", citation)
+    stripped = re.sub(r"\s+", " ", citation).replace(" .", ".").strip()
     if _NUMBERED_STATEMENT.search(stripped) is None:
         raise ValueError(
             f"the citation {stripped!r} names no numbered table, proposition, theorem, "
@@ -275,7 +267,11 @@ def _expected(row: Row):
 def _citation(row: Row) -> str:
     r"""The card's citation for ``row``: its paper, with the numbered statement."""
     if row.card == TABLE4_TAG:
-        return card_polarization_row(row.degree)["citation"]
+        citation = card_polarization_row(row.degree)["citation"]
+        if "arXiv:2302.01679" in citation and "Table 4" in citation and "p. 17" not in citation:
+            # Table 4, checked against the rendered arXiv v2, printed page 17.
+            citation = citation.replace("Table 4", "Table 4, p. 17", 1)
+        return citation
     if row.card.startswith("gamma-h-") or row.card == "otilde-plus-t-en":
         return card_arithmetic_group(row.card)["citation"]
     return card_lattice(row.card)["rows"][row.group]["citation"]
