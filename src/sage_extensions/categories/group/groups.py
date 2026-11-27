@@ -5045,6 +5045,34 @@ class IndexedFreeGroupMor(_GroupMorRealizationMixin, CategoricalMor):
             injectivity_decision=injectivity_decision,
         )
 
+    def _from_engine_morphism(self, mapping, *, check=False):
+        r"""Raise the selected engine computation of a map out of ``F(S)``.
+
+        A homomorphism out of a free group is a map on its free basis, which
+        is the datum this Mor stores.  At this protected crossing the engine
+        morphism, read on the free generators of the domain's engine model,
+        supplies the values of that basis map, and the free extension
+        evaluates the whole arrow as a product of basis images; a free group
+        has no relators, so there is nothing for ``check`` to decide.
+
+        The route needs an elementwise engine model of the domain, which a
+        free group has when its chosen basis is finite -- the case of a
+        finitely presented free factor of a free product.  A free group on an
+        infinite basis keeps its basis-only construction.
+        """
+        domain = self.domain()
+        assert domain.free_basis() in FiniteSets(), (
+            f"the map {domain} -> {self.codomain()} cannot be raised from an engine morphism: "
+            f"the free group {domain} has no elementwise engine model on its infinite basis "
+            f"{domain.free_basis()}"
+        )
+        return self._from_elementwise_rule(
+            lambda element: _element_from_engine(
+                self.codomain(),
+                mapping.Image(_element_to_engine(domain, element)),
+            )
+        )
+
     @cached_method
     def _from_subgroup_inclusion(self):
         r"""The inclusion ``F(S) -> G`` of a free subgroup, given by the images ``s -> s`` of its free basis."""
