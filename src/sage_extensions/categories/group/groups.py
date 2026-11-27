@@ -1172,7 +1172,7 @@ def _group_generating_epimorphism(group, source, labels, generator_morphism):
     assert source.free_basis() is labels, (
         f"the free group {source} does not have {labels} as its free basis, so it cannot map onto {group} by sending the free generators to the elements indexed by {labels}"
     )
-    return IndexedFreeGroupMor(OwnedGroups().MorCategory(), source, group)(generator_morphism)
+    return OwnedGroups().MorCategory().Of(source, group)(generator_morphism)
 
 
 def _fix_selected_group_resolution_data(
