@@ -1318,6 +1318,8 @@ class _SelectedFinitePresentationModules(OwnedCategoryOverBaseRing):
             """
 
             ring = self.base_ring()
+            if ring in LocalizationRings() and self.is_zero() is True:
+                return Cardinalities().one()
             presentation = self.presentation()
             if (presentation == presentation.parent().zero()) is True:
                 # The actual zero presentation has the same underlying set
@@ -1375,7 +1377,7 @@ class _SelectedFinitePresentationModules(OwnedCategoryOverBaseRing):
                 case _:
                     size = self._cardinality_decision()
                     if size is None or not cardinal(size).expression().is_normal_form():
-                        return AtomicProposition("is_finite", self)
+                        return super()._finiteness_decision()
                     return cardinal(size).is_finite()
 
         @cached_method

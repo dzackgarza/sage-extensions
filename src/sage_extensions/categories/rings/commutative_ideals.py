@@ -690,6 +690,8 @@ class CommutativeIdeals(OwnedCategoryOverBaseRing):
             Owner: CommutativeIdeals.ParentMethods. Permitted callers are
             ideal_saturation, this owner's contraction and source/cover
             transports, and LocalizationRings.inverted_submonoid_meets.
+            If J is contained in I, then I:J is already the unit ideal.
+            Membership of every selected generator of J certifies this case.
             Inputs are ideals of one exact ring; a result is their saturation
             in that same ring. None preserves a predicate's undecided case.
             """
@@ -701,6 +703,9 @@ class CommutativeIdeals(OwnedCategoryOverBaseRing):
                 return self._binary_localized_ideal_result(other, "_ideal_saturation_decision")
             if self._selected_engine_ideal is None or other._selected_engine_ideal is None:
                 return None
+            if all(self.contains_ambient_element(generator) is True
+                   for generator in other.ideal_generators()):
+                return ring.ideal(ring.one())
             if _realized_as_quotient(ring):
                 return self._binary_cover_ideal_result(other, "saturation")
             # Same preimage construction as the colon, one power up: over a
