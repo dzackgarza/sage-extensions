@@ -7,6 +7,14 @@ product by $x \mapsto (f_i(x))_i$.  The equalizer of $f, g: M \to N$ is
 $\{m : f(m) = g(m)\}$ with its inclusion, and the coequalizer is $N / (f - g)(M)$, by the definitions.  On $\mathbb Z/6$,
 multiplication by $5$ and the identity agree exactly on $\{x : 4x = 0\} = \{0, 3\}$, and
 $\mathbb Z/6 / 4\mathbb Z/6 = \mathbb Z/2$.
+
+An equalizing map has image in $\{0,3\}$, so it factors uniquely through the
+inclusion.  A coequalizing map $h$ satisfies $4h(1)=0$ and $6h(1)=0$, hence
+$2h(1)=0$, and therefore factors uniquely through the parity quotient.
+Multiplication by $3$ is a nonzero example of both kinds of map; its factors
+are determined by sending $1$ to the lift of $3$, and the class of $1$ to $3$,
+respectively.  Injectivity of the inclusion and surjectivity of the quotient
+give uniqueness.
 """
 
 from sage_extensions.all import *  # noqa: F401,F403
@@ -99,19 +107,41 @@ def test_three_lifts_to_the_equalizer_of_five_and_the_identity_on_z6() -> None:
     its lift maps back to $3$ under the inclusion."""
     modules = Modules(ZZ)
     six = cyclic(6)
-    times_five = modules.Mor(six, six)(lambda x: 5 * x)
+    times_five = modules.Mor(six, six)(ZZ(5))
+    assert times_five(six(1)) == six(5)
+    assert times_five(six.zero()) == six.zero()
     construction = modules.equalizer_construction(times_five, modules.Mor(six, six).identity())
     inclusion = construction.structure_morphism(construction.diagram().domain().source())
     lifted = modules.equalizer_element(construction, six(3))
 
     assert inclusion(lifted) == six(3)
+    equalizer = construction.object()
+    assert inclusion.domain() is equalizer and inclusion.codomain() is six
+    assert equalizer.cardinality() == 2
+    assert inclusion(equalizer.zero()) == six.zero()
+    assert times_five(inclusion(lifted)) == inclusion(lifted)
+
+    times_three = modules.Mor(six, six)(ZZ(3))
+    shape = construction.diagram().domain()
+    cone = construction.diagram().Cones().cone(
+        six,
+        lambda index: times_three if index is shape.source() else times_five * times_three,
+    )
+    factor = construction.factor(cone).apex_map()
+    specified_factor = modules.Mor(six, equalizer)({six(1): lifted})
+    assert inclusion * factor == times_three
+    assert inclusion * specified_factor == times_three
+    assert factor == specified_factor
+    assert factor(six(1)) == lifted
 
 
 def test_the_equalizer_of_five_and_the_identity_on_z6_has_two_elements() -> None:
     r"""$\{x \in \mathbb Z/6 : 5x = x\} = \{0, 3\}$."""
     modules = Modules(ZZ)
     six = cyclic(6)
-    times_five = modules.Mor(six, six)(lambda x: 5 * x)
+    times_five = modules.Mor(six, six)(ZZ(5))
+    assert times_five(six(1)) == six(5)
+    assert times_five(six.zero()) == six.zero()
 
     assert modules.equalizer(times_five, modules.Mor(six, six).identity()).cardinality() == 2
 
@@ -120,6 +150,33 @@ def test_the_coequalizer_of_five_and_the_identity_on_z6_is_z2() -> None:
     r"""$\mathbb Z/6 / (5 - 1)\mathbb Z/6 = \mathbb Z/6 / \{0, 2, 4\} \cong \mathbb Z/2$."""
     modules = Modules(ZZ)
     six = cyclic(6)
-    times_five = modules.Mor(six, six)(lambda x: 5 * x)
+    times_five = modules.Mor(six, six)(ZZ(5))
+    assert times_five(six(1)) == six(5)
+    assert times_five(six.zero()) == six.zero()
 
     assert modules.coequalizer(times_five, modules.Mor(six, six).identity()).cardinality() == 2
+
+    construction = modules.coequalizer_construction(times_five, modules.Mor(six, six).identity())
+    quotient = construction.object()
+    shape = construction.diagram().domain()
+    projection = construction.costructure_morphism(shape.target())
+    assert projection.domain() is six and projection.codomain() is quotient
+    assert projection(six.zero()) == quotient.zero()
+    assert projection(six(1)) != quotient.zero()
+    assert projection(six(2)) == quotient.zero()
+    assert projection(six(3)) == projection(six(1))
+    assert projection(six(4)) == quotient.zero()
+    assert projection(six(5)) == projection(six(1))
+    assert projection * times_five == projection * modules.Mor(six, six).identity()
+
+    times_three = modules.Mor(six, six)(ZZ(3))
+    cocone = construction.diagram().Cocones().cocone(
+        six,
+        lambda index: times_three * times_five if index is shape.source() else times_three,
+    )
+    factor = construction.factor(cocone).apex_map()
+    specified_factor = modules.Mor(quotient, six)({projection(six(1)): six(3)})
+    assert factor * projection == times_three
+    assert specified_factor * projection == times_three
+    assert factor == specified_factor
+    assert factor(projection(six(1))) == six(3)
