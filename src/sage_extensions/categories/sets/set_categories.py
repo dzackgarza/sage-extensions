@@ -1049,10 +1049,16 @@ class OwnedSetMorphism:
     def is_surjective(self) -> bool | Predicate:
         r"""Decide that every point of the codomain is a value.
 
-        Decided on finite enumerated endpoints; otherwise the answer is the
-        proposition that ``f`` is surjective.
+        A selected section decides it at once: ``f(s(y)) = y`` exhibits every
+        point of the codomain as the value at ``s(y)``, so a right inverse is a
+        witness of surjectivity and no value has to be evaluated to read it.
+        Otherwise decided on finite enumerated endpoints; otherwise the answer is
+        the proposition that ``f`` is surjective.
         """
         from sage_extensions.logic import AtomicProposition, conjunction
+
+        if self.has_selected_section():
+            return True
 
         domain = self.domain()
         codomain = self.codomain()
@@ -1067,6 +1073,154 @@ class OwnedSetMorphism:
                 return conjunction(image.is_parent_of(point) for point in codomain)
             case _:
                 return AtomicProposition("is_surjective", self)
+
+    _SELECTED_SECTION = "set section of the surjection"
+    _DERIVED_SECTION = "set section derived from the preimage table"
+
+    @cached_method
+    def _selected_data_registry(self):
+        r"""The data selected on this arrow, by key, as objects hold theirs (``select_left_cosets``).
+
+        The registry is this arrow's own datum, not a property of its function:
+        no finite testing of values promotes a map to a section, and the two
+        entries a section is recorded under say where it came from -- the
+        client's choice (:meth:`select_section`) or this owner's one derivation
+        from the preimage table (:meth:`section`).
+        """
+        return {}
+
+    def _recorded_section(self):
+        r"""The section already recorded on this arrow, or ``None``; computes nothing."""
+        registry = self._selected_data_registry()
+        recorded = registry.get(self._SELECTED_SECTION)
+        return recorded if recorded is not None else registry.get(self._DERIVED_SECTION)
+
+    def has_selected_section(self) -> bool:
+        r"""Whether a section of this arrow was selected with :meth:`select_section`."""
+        return self._SELECTED_SECTION in self._selected_data_registry()
+
+    def selected_section(self):
+        r"""The set map ``s: Y -> X`` selected on this arrow with :meth:`select_section`."""
+        assert self.has_selected_section(), (
+            f"{self} has no selected section: select one with select_section, or ask for the one "
+            f"derived from the preimage table with section()"
+        )
+        return self._selected_data_registry()[self._SELECTED_SECTION]
+
+    def _refuse_wrong_right_inverse(self, section) -> None:
+        r"""Refuse a choice that fails ``f(s(y)) = y`` at a point where the equation is decided.
+
+        The equation at a point is decided on a finite enumerated codomain, and
+        that is where a choice is checked, one point of the codomain at a time
+        and no point of the source.  On any other codomain it is the proposition
+        that two points of the source agree, so the choice stands as the datum
+        it is (``CON-08``) and its equation remains its premise.
+        """
+        codomain = self.codomain()
+        if not (Sets().is_provably_finite(codomain) and codomain in EnumeratedSets()):
+            return
+        for point in codomain:
+            chosen = section(point)
+            if (self(chosen) == point) is not True:
+                raise ValueError(
+                    f"cannot select {section} as a section of {self}: it sends the point {point} "
+                    f"to {chosen}, which maps to {self(chosen)}, not to {point}"
+                )
+
+    def select_section(self, section):
+        r"""Select the section ``s: Y -> X`` of this set map, and return the arrow.
+
+        ``section`` is a morphism of ``Sets`` from the codomain back to the source
+        with ``f s = id_Y``: one chosen point of each fibre.  It is a chosen datum
+        (``CON-08``), recorded in this arrow's registry of selected data under the
+        key ``"set section of the surjection"``, and a right inverse decides that
+        this arrow is surjective.  The equation is decided, and a wrong choice
+        refused, where the codomain is finite enumerated; elsewhere it is the
+        premise the choice was made with and is not re-decided.  This arrow
+        answers with one section: a choice made before the arrow is asked for its
+        section, or the derived one thereafter.  Replacing a recorded section
+        would make :meth:`section` depend on the order of selection, so a second
+        choice is refused.  Selecting computes no value of ``section``.
+        """
+        assert section.codomain() is self.domain(), (
+            f"a section of {self} lands in its source {self.domain()}, but {section} lands in "
+            f"{section.codomain()}"
+        )
+        assert section.domain() is self.codomain(), (
+            f"a section of {self} starts at its codomain {self.codomain()}, but {section} starts "
+            f"at {section.domain()}"
+        )
+        recorded = self._recorded_section()
+        assert recorded is None, (
+            f"{self} already answers with the section {recorded}, "
+            f"{'selected' if self.has_selected_section() else 'derived from its preimage table'}; "
+            "a second one would make section() depend on the order of selection"
+        )
+        self._refuse_wrong_right_inverse(section)
+        self._selected_data_registry()[self._SELECTED_SECTION] = section
+        return self
+
+    @cached_method
+    def _section_preimage_table(self):
+        r"""One source point above every point of a finite enumerated codomain.
+
+        The preimage table of ``f: X -> Y``: the codomain's own ranking is an
+        exact equality decision on its points, so one pass over the source
+        retains the first point over each, and no point of the source is
+        searched for twice.  This is the selected preimages as a table;
+        :meth:`section` is the map it presents.  Derivation needs the source
+        enumerated as well, and refuses when a point of the codomain is not a
+        value, which is the proof that no section exists.
+        """
+        domain = self.domain()
+        codomain = self.codomain()
+        assert Sets().is_provably_finite(domain) and domain in EnumeratedSets(), (
+            f"a preimage table of {self} needs a finite enumerated source, but {domain} is not "
+            "enumerated: select the section with select_section instead"
+        )
+        assert Sets().is_provably_finite(codomain) and codomain in EnumeratedSets(), (
+            f"a preimage table of {self} needs a finite enumerated codomain, but {codomain} is not "
+            "enumerated: select the section with select_section instead"
+        )
+        ranking = codomain.ranking_map()
+        table = [None] * int(codomain.cardinality().finite_value())
+        for point in domain:
+            position = int(ranking(self(point)))
+            if table[position] is None:
+                table[position] = point
+        unfilled = [position for position, point in enumerate(table) if point is None]
+        if unfilled:
+            raise ValueError(
+                f"the map {self} has no section: the points of {codomain} at positions {unfilled} "
+                "are not values, so no map back can send them into their fibres"
+            )
+        return tuple(table)
+
+    def section(self):
+        r"""The section ``s: Y -> X`` of this surjection, as an arrow of ``Sets``.
+
+        The section selected with :meth:`select_section` when there is one;
+        otherwise derived once from :meth:`_section_preimage_table`, which needs
+        both endpoints finite enumerated.  The arrow is a morphism of ``Sets``
+        composable with this one -- ``s.domain()`` is the codomain and
+        ``s.codomain()`` the source -- and ``f s`` is the identity arrow of
+        ``Mor_Set(Y, Y)``: ``__mul__`` reads the recorded section instead of
+        evaluating the composite at every point, so the equation is decided on an
+        infinite target too.  An arrow with neither a choice nor a finite
+        preimage table has no section to answer with and says so.
+        """
+        recorded = self._recorded_section()
+        if recorded is not None:
+            return recorded
+        table = self._section_preimage_table()
+        codomain = self.codomain()
+        domain = self.domain()
+        ranking = codomain.ranking_map()
+        derived = Sets().Mor(codomain, domain)(
+            lambda point: table[int(ranking(codomain(point)))]
+        )
+        self._selected_data_registry()[self._DERIVED_SECTION] = derived
+        return derived
 
     def inverse(self):
         r"""Return the inverse of a bijection between finite enumerated sets."""
@@ -1119,6 +1273,13 @@ class OwnedSetMorphism:
             return NotImplemented
         if other.domain() is other.codomain() and other is other.parent().identity():
             return self
+        if other is self._recorded_section():
+            # The section recorded on this arrow is its right inverse, so the
+            # composite is the identity arrow of ``Mor_Set(Y, Y)`` by the datum
+            # the section was selected with, not by evaluating every point
+            # (``OWN-22``); where the codomain is finite enumerated, selecting it
+            # decided that equation point by point.
+            return Sets().Mor(other.domain(), other.domain()).identity()
         return self._composition(other)
 
     def _composition(self, right):
