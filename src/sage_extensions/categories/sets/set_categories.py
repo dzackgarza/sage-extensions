@@ -291,6 +291,20 @@ def _represented_set_coequalizer(left_morphism, right_morphism):
     return quotient, quotient.projection(), lambda label: label.representative()
 
 
+def _selected_generated_relation_quotient(target, morphisms):
+    r"""Ask ``target`` for its selected realization of the generated relation.
+
+    ``Sets.ParentMethods.generated_relation_quotient`` is an optional
+    operation: on a set whose structure selects no such quotient it resolves to
+    ``NotImplemented``, which is a value and not a callable.  Read it, compare
+    it, and call it only when it is implemented.
+    """
+    construction = target.generated_relation_quotient
+    if construction is NotImplemented:
+        return NotImplemented
+    return construction(morphisms)
+
+
 class EnumeratedSets(OwnedCategory):
     r"""Sets equipped with a represented ranking/enumeration.
 
@@ -742,8 +756,10 @@ class OwnedSetMorphism:
         function: Callable[[SourcePointT], TargetPointT],
         *,
         composite_factors=None,
+        translation_step=None,
     ) -> None:
         self._composition_factors = composite_factors
+        self._translation_step = translation_step
         if composite_factors is not None:
             left, right = composite_factors
             function = lambda point, *args, **kwargs: left(
@@ -807,18 +823,16 @@ class OwnedSetMorphism:
         return target(image)
 
     def selected_integer_translation_step(self):
-        r"""The stated integer translation displacement, or ``None``.
+        r"""The integer displacement this arrow was constructed with, or ``None``.
 
-        Only the owned translation constructor supplies this datum.
-        Equality of arbitrary set-map callbacks, even ones computing
-        ``n+d``, does not certify a translation law; their result is
-        ``None`` rather than an inferred displacement.
+        The datum is recorded by ``Sets().integer_translation(d)`` itself, as
+        the arrow's defining displacement; it is not recovered by inspecting
+        the arrow's function, its class or its identity.  An arrow built any
+        other way, including a callable computing ``n + d``, carries no
+        displacement and answers ``None``: no finite testing of values
+        promotes a function to the translation construction.
         """
-        if self.domain() is self.codomain() and isinstance(
-            self._owned_function, _IntegerTranslationOnZZ
-        ):
-            return self._owned_function.displacement()
-        return None
+        return self._translation_step
 
     def __eq__(self, other: object) -> bool | Predicate:
         r"""Compare two arrows of one Mor through ``_richcmp_``.
@@ -1403,19 +1417,24 @@ class Sets(CategoryPacketMethods, OwnedCategory):
         r"""The selected set map ``t_d: ZZ -> ZZ,`` ``n |-> n+d``.
 
         It is a function of underlying sets and generally not a group
-        homomorphism. Its retained integer displacement certifies the
-        generated-equivalence computation of its coequalizer with
-        ``id_ZZ``. No other black-box function is promoted to this
-        mathematical construction by testing finitely many inputs.
+        homomorphism.  The arrow records ``d`` as its defining displacement,
+        which the integers' owner reads to realize the coequalizer of ``t_d``
+        with another translation as the orbit set of the additive subgroup
+        their differences generate.  No other black-box function is promoted
+        to this construction by testing finitely many values; ``t_0`` is the
+        identity map.
         """
         from sage_extensions.categories.rings.ring_foundation import _own_ring
 
         integers = _own_ring(SageZZ)
         displacement = integers(displacement)
+        arrows = self.Mor(integers, integers)
         if displacement == integers.zero():
-            return self.Mor(integers, integers).identity()
-        return self.Mor(integers, integers)(
-            _IntegerTranslationOnZZ(integers, displacement)
+            return arrows.identity()
+        return arrows.element_class(
+            arrows,
+            _IntegerTranslationOnZZ(integers, displacement),
+            translation_step=displacement,
         )
 
     def Subobjects(self, base_object: Parent) -> Category:
@@ -1869,8 +1888,8 @@ class Sets(CategoryPacketMethods, OwnedCategory):
                 and source in EnumeratedSets()
                 and target in EnumeratedSets()
             )
-            selected_quotient = target.generated_relation_quotient(
-                (left_morphism, right_morphism)
+            selected_quotient = _selected_generated_relation_quotient(
+                target, (left_morphism, right_morphism)
             )
 
             if left_morphism is right_morphism or (
@@ -1987,8 +2006,8 @@ class Sets(CategoryPacketMethods, OwnedCategory):
                 and source in EnumeratedSets()
                 and target in EnumeratedSets()
             )
-            selected_quotient = target.generated_relation_quotient(
-                tuple(morphisms.value(label) for label in labels)
+            selected_quotient = _selected_generated_relation_quotient(
+                target, tuple(morphisms.value(label) for label in labels)
             )
 
             if all(morphisms.value(label) is reference for label in labels) or (
@@ -2214,10 +2233,11 @@ class Sets(CategoryPacketMethods, OwnedCategory):
             r"""Return this set's selected realization of a generated equivalence quotient.
 
             ``morphisms`` is a finite family of parallel maps of this set.
-            Two points are related when finitely many steps, each carrying a
-            point ``x`` to ``f_i(x)`` for one member, join them; the quotient
-            is the set of classes of that relation.  A structure that computes
-            that quotient as one of its own objects answers the triple
+            Two points are related when the pairs ``(f_i(x), f_j(x))`` they
+            generate are joined by finitely many such steps, for every member
+            ``i``, ``j`` and every point ``x``; the quotient is the set of
+            classes of that relation.  A structure that computes that quotient
+            as one of its own objects answers the triple
             ``(quotient, projection, representative)``: the quotient set, the
             projection of this set onto it, and a choice of one point of this
             set in each class.  The default answers ``NotImplemented``, and

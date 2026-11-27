@@ -1718,17 +1718,22 @@ def _orbit_set_presented_by(g_set, covering):
 
 
 def _translation_orbit_set(ring, step):
-    r"""The orbit set of ``ring`` under translation by the subgroup ``step*ZZ``.
+    r"""The orbit set of the integers under translation by the subgroup ``step*ZZ``.
 
     The infinite cyclic group presented by ``Groups.Free(1)`` acts on the
-    underlying set of ``ring`` by ``k . x = x + k*step``.  Its orbits are the
-    cosets of the ideal ``(step)``, so two points lie in one orbit exactly
-    when their difference does, and the ring's maintained ideal quotient
-    decides that relation and names each orbit.
+    underlying set of ``ring`` by ``k . n = n + k*step``.  Its orbits are the
+    cosets of the additive subgroup ``step*ZZ``, so two integers lie in one
+    orbit exactly when ``step`` divides their difference; the integers'
+    maintained ideal quotient ``ZZ/(step)`` decides that relation and names
+    each orbit.
+
+    This is the integer case: ``step`` is an integer, and ``ZZ/(step)`` is the
+    additive quotient ``ZZ/step*ZZ``.  No statement is made here about a
+    translation of another ring's additive group.
 
     Returns ``(orbit_set, projection, representative)``: the orbit set as an
     object of ``Sets()``, the projection of ``ring`` onto it, and a choice of
-    one point of ``ring`` in each orbit, read from the quotient's lift.  For
+    one point of ``ring`` in each orbit (the residue in ``[0, |step|)``).  For
     ``step = 0`` the action is trivial and the quotient is ``ring`` itself
     with the identity projection.
     """

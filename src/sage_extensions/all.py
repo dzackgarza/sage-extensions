@@ -312,7 +312,13 @@ from sage_extensions.categories.vinberg_invariants import (  # noqa: F401
     VinbergInvariantMatrices,
     reflection_cosines,
 )
-from sage_extensions.logic import Predicate, Propositions, Unknown, ask  # noqa: F401
+from sage_extensions.logic import (
+    AtomicProposition,
+    Predicate,
+    Propositions,
+    Unknown,
+    ask,
+)  # noqa: F401
 from sage_extensions.rings import (  # noqa: F401
     _restore_session_ring_bindings,
 )
