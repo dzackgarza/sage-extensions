@@ -1544,6 +1544,32 @@ class _OrbitSet:
         return f"Orbit set of {self.g_set()}"
 
 
+class _TranslationOrbitSet(_OrbitSet):
+    r"""The orbit set of a cyclic translation ``x |-> x + step`` on a ring.
+
+    The acting group is the infinite cyclic group presented by
+    ``Groups.Free(1)``; its generator moves a point by ``step``, so the
+    orbits are the cosets of the ideal ``(step)``.  That ideal's maintained
+    quotient decides the class relation, and this object reads its
+    cardinality when the quotient is finite: the class map is onto that
+    quotient with fibres the orbits, so the two cardinalities are one.
+    """
+
+    def __init__(self, g_set, quotient, **rest) -> None:
+        self._quotient = quotient
+        super().__init__(g_set, **rest)
+
+    def quotient(self):
+        r"""Return the ring quotient whose elements name the orbits."""
+        return self._quotient
+
+    def cardinality(self):
+        return self.quotient().cardinality()
+
+    def _repr_(self) -> str:
+        return f"Orbit set of the translation action on {self.g_set().point_set()}"
+
+
 class _DoubleCosetSet(_OrbitSet):
     r"""``Q \\ G / H`` as the ``Q``-orbits on the coset space ``G/H``.
 
@@ -1689,6 +1715,63 @@ def _orbit_set_presented_by(g_set, covering):
         g_set=g_set,
         orbit_covering=covering,
     )
+
+
+def _translation_orbit_set(ring, step):
+    r"""The orbit set of ``ring`` under translation by the subgroup ``step*ZZ``.
+
+    The infinite cyclic group presented by ``Groups.Free(1)`` acts on the
+    underlying set of ``ring`` by ``k . x = x + k*step``.  Its orbits are the
+    cosets of the ideal ``(step)``, so two points lie in one orbit exactly
+    when their difference does, and the ring's maintained ideal quotient
+    decides that relation and names each orbit.
+
+    Returns ``(orbit_set, projection, representative)``: the orbit set as an
+    object of ``Sets()``, the projection of ``ring`` onto it, and a choice of
+    one point of ``ring`` in each orbit, read from the quotient's lift.  For
+    ``step = 0`` the action is trivial and the quotient is ``ring`` itself
+    with the identity projection.
+    """
+    from sage_extensions.categories.sets.set_categories import Sets
+
+    if step == ring.zero():
+        identity = Sets().Mor(ring, ring).identity()
+        return ring, identity, identity
+    quotient = ring.quotient_ring(ring.ideal(step))
+    ideal = ring.ideal(step)
+    cyclic = OwnedGroups.Free(1)
+    generator = cyclic.group_generators()[0]
+
+    def exponent(word):
+        r"""The integer ``k`` whose power of the generator is ``word``.
+
+        ``Groups.Free(1)`` is the free group on one letter, so its element's
+        syllable decomposition is that power; the backend word states it.
+        """
+        return sum(
+            int(sign) for sign in word._backend_element.Tietze()
+        )
+
+    g_set = GObjects(cyclic, Sets()).on_set(
+        ring,
+        lambda word, point: point + step * exponent(word),
+        orbit_relation=lambda source, target: (target - source) in ideal,
+    )
+    category = Sets()
+    orbits = _object_of(
+        category,
+        _engine=(category, _TranslationOrbitSet, _Orbit),
+        g_set=g_set,
+        quotient=quotient,
+    )
+    projection = Sets().Mor(ring, orbits)(
+        lambda point: orbits.orbit_of(ring(point))
+    )
+    modulus = abs(int(step))
+    representative = Sets().Mor(orbits, ring)(
+        lambda orbit: ring(int(orbit.representative()) % modulus)
+    )
+    return orbits, projection, representative
 
 
 def _orbit_set(g_set):
