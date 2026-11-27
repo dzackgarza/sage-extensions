@@ -350,7 +350,7 @@ def test_infinite_presented_group_coequalizer_descends_homomorphism() -> None:
     )
     factor = construction.factor(cocone).apex_map()
 
-    assert quotient in GroupsWithChosenFinitePresentation()
+    assert quotient in Groups().FinitelyPresentedAsGroup()
     assert projection(generator**2) == quotient.one()
     assert factor(projection(generator)) == h
     assert factor * projection == reduction
