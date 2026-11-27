@@ -810,14 +810,21 @@ def _edgewalk_orthogonal_group_generators(lattice):
     reflection group ``W(L)``, together with generators of its symmetry group.
     On a nonreflective lattice it returns no such chamber and this function
     declines.  On a reflective one, the walls and the symmetry generators
-    generate ``O(L)``: conjugation permutes integral root reflections, making
-    ``W(L)`` normal in ``O(L)``; an isometry carries the chamber to another
-    chamber; an element of ``W(L)`` carries that image back.  Their product in
-    the other order is then a chamber symmetry, so every isometry is a wall word
-    followed by a symmetry.  This is the integral part of Vinberg's normalizer
+    generate the subgroup preserving the chosen sheet of the timelike cone:
+    each spacelike root reflection fixes a timelike vector, and a chamber
+    symmetry preserves that sheet.  Conjugation by any integral isometry
+    permutes integral root reflections, making ``W(L)`` normal in ``O(L)``.
+    A sheet-preserving isometry carries the chamber to another chamber in
+    that sheet; an element of ``W(L)`` carries that image back.  Thus every
+    sheet-preserving isometry is a wall word followed by a chamber symmetry.
+    This is the integral part of Vinberg's normalizer
     statement, stated as M. Belolipetsky, *Arithmetic hyperbolic reflection
     groups*, arXiv:1506.03111v4, Lemma 2.3, printed p. 7: the reflective
-    quotient is the symmetry group of the Coxeter polyhedron.
+    quotient in the sheet-preserving group is the symmetry group of the
+    Coxeter polyhedron.  Negation exchanges the two sheets and is central in
+    ``O(L)``; composing any sheet-exchanging isometry with negation preserves
+    the chosen sheet.  Adjoining negation therefore generates the full
+    integral ``O(L)``, not merely its index-two sheet-preserving subgroup.
     """
     from sage_extensions.categories.hyperbolic_lattices import HyperbolicLattices
     from sage_extensions.categories.rings.ring_foundation import _owned_integers
@@ -831,6 +838,7 @@ def _edgewalk_orthogonal_group_generators(lattice):
     if report.is_reflective() is not True:
         return None
     return (
+        lattice.Aut()(lambda label: -lattice.module_generator(label)),
         *(lattice.reflection(root) for root in report.simple_roots()),
         *report.polyhedron_isometry_generators(),
     )
