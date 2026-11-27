@@ -1,5 +1,7 @@
 r"""Hyperbolic lattices and the reflection algorithms that run on them.
 
+The source correspondence is recorded in docs/hyperbolic-lattice-source-correspondence.md.
+
 A lattice is hyperbolic in either Lorentzian sign convention, \((n,1)\) or
 \((1,n)\), so that the real points \(L\otimes\mathbb R\) carry a light cone and
 \(O(L)\) acts on the hyperbolic space of one of its two halves.  That is the
@@ -444,7 +446,6 @@ class NumberFieldVinbergLattice(SageObject):
         return f"Number-field Vinberg lattice ({self.lattice()}, {self.real_embedding()})"
 
 
-#: Sentinel for "the cell at the controlling vector has not been asked for yet".
 _NO_CELL = object()
 
 
@@ -812,9 +813,6 @@ def _filtered_vinal_class():
                 return self._cell
             roots = self._initial_cone
             if roots is None:
-                # ``FundCone`` is cutting the cell itself and asks the layer
-                # enumeration on the way; the walk has written no root yet, so
-                # the cell is not cut and there is nothing to cache.
                 return None
             self._cell = None
             normals = tuple(root for root in roots if self.v0.inner_product(root) == 0)
@@ -837,13 +835,6 @@ def _filtered_vinal_class():
                     return None
                 self._cell = (normals, gram.change_ring(SageQQ), factor, None)
                 return self._cell
-            # One lineality direction: the primitive vector of v0^perp
-            # orthogonal to every normal.  The normals are independent,
-            # because their Gram factored, so together with v0 they have
-            # rank n-1 and the kernel below is a line; its primitive
-            # generator is integral, orthogonal to the normals and to v0,
-            # and of positive square, because it lies in the positive
-            # definite v0^perp.
             rows = engine_matrix([list(normal) for normal in normals] + [list(self.v0)])
             generator = (rows * self.M).right_kernel().basis()[0]
             entries = [int(entry) for entry in generator]
@@ -852,13 +843,6 @@ def _filtered_vinal_class():
                 entries = [-entry for entry in entries]
             m = self.V(entries)
             m_square = int(m.inner_product(m))
-            # The frame of the normals and m generates v0^perp up to a
-            # finite index, and the index is paid in coset
-            # representatives: a vector of v0^perp is written in the
-            # frame's coordinates only after its representative is added.
-            # The representatives are the integer points of the
-            # parallelepiped of the frame's coordinates in a basis of
-            # v0^perp, the same construction as the engine's own W.
             basis = self.V1.matrix()
             inserted = basis.insert_row(int(self.n) - 1, self.v0)
             coordinates = (
@@ -866,9 +850,6 @@ def _filtered_vinal_class():
                 * inserted.change_ring(SageQQ).inverse()
             ).matrix_from_columns(range(len(normals) + 1))
             if any(value not in SageZZ for value in coordinates.list()):
-                # The frame lies in v0^perp, so its coordinates in a basis of
-                # v0^perp are integral; a fractional entry means the frame is
-                # not what the construction above says it is.
                 return None
             cosets = tuple(
                 self.V(list(engine_vector(SageZZ, point) * basis))
@@ -1015,9 +996,6 @@ def _filtered_vinal_class():
                     sum((triangular[j][i] * x[j] for j in range(len(normals))), Fraction(0))
                     for i in range(len(normals))
                 ]
-                # The integers t with q(m)(alpha + t)^2 <= remaining: the
-                # square-root bound is a floor of the real root, so each
-                # end is extended while the exact inequality still holds.
                 bound = _square_root_bound(remaining / m_square_fraction)
                 high = int((bound - alpha).__floor__())
                 while m_square_fraction * (alpha + high + 1) ** 2 <= remaining:
@@ -1110,11 +1088,6 @@ def _filtered_vinal_class():
             )
             if not walls:
                 return ()
-            # One family -- the walls, the normals, the offset and the
-            # lineality direction -- and its Gram matrix is the whole of the
-            # pairings this method reads: the wall-by-normal block is the rows
-            # of the constraints, and the last two columns are their
-            # right-hand sides.
             family = (
                 tuple(walls)
                 + tuple(normals)
@@ -1200,11 +1173,6 @@ def _filtered_vinal_class():
                             f"cell is not acute-angled"
                         )
             lowest = [int(Fraction(value).__ceil__()) for value in floors]
-            # Every cut the enumeration keeps is one of these rows, with its
-            # right-hand side and the two running sums that make it a bound on
-            # the current level: what the coefficients already chosen spend of
-            # it, and what the ones below the current level spend at their
-            # floors.
             cuts = [
                 [
                     tuple(int(value) for value in row),
@@ -1799,11 +1767,6 @@ class HyperbolicLattices(OwnedCategoryOverBaseRing):
             from sage.geometry.cone import Cone
 
             engine_gram, negated = self._engine_gram_of_signature_n_1()
-            # The full group's chamber is the restricted walk with the filter
-            # that admits every root: the enumeration of §4.1 in the cell's own
-            # coordinates, and the candidate test of :meth:`_FilteredVinAl.
-            # IsNewRoot`, are the same questions the engine answers, and both
-            # answer them for the walls listed here.
             _complete, roots = self._vinberg_search(
                 None, None, None, admits_root=lambda row: True
             )
@@ -1942,13 +1905,6 @@ class HyperbolicLattices(OwnedCategoryOverBaseRing):
             spaces* (1975), and Conway--Sloane, *SPLAG*, Ch. 27, §2.
             """
             subgroup = self.O().subgroup(tuple(generators))
-            # The algorithm asks about the same root repeatedly, once per
-            # decomposition it belongs to, and membership in a subgroup of
-            # infinite index is not cheap; the answers are memoised for the one
-            # call.  A caller whose subgroup has its own decidable criterion
-            # should pass it to `fundamental_chamber(admits_root=...)` instead:
-            # that is the path `subgroup_cusp_chamber` takes, with the discriminant
-            # criterion of the stabilizer's image.
             decided = {}
 
             def admits_root(root):
@@ -2037,7 +1993,6 @@ class HyperbolicLattices(OwnedCategoryOverBaseRing):
                     f"cannot anchor the chamber of a subgroup at {cusp!r}: the vector is not "
                     f"primitive, so it names no 0-cusp of {self}"
                 )
-            # The finite discriminant-image subgroup the given generators build.
             discriminant = self.discriminant_group()
             ambient = discriminant.orthogonal_group()
             rho = self.discriminant_representation()
@@ -2046,9 +2001,6 @@ class HyperbolicLattices(OwnedCategoryOverBaseRing):
                 tuple(image for image in images if image != ambient.one())
             )
 
-            # One sift per distinct root: the algorithm asks about the same root
-            # once per decomposition it belongs to, while the answer depends only
-            # on the root's coordinates.
             decided = {}
 
             def admits_root(root):
@@ -2057,30 +2009,12 @@ class HyperbolicLattices(OwnedCategoryOverBaseRing):
                     decided[key] = bool(rho(self.reflection(root)) in subgroup)
                 return decided[key]
 
-            # The anchor: the vertex of the full chamber furthest from the light
-            # cone at which the subgroup still leaves a cell.  The layers of the
-            # walk are indexed by the height \(b(a,v_0)\), and with
-            # \(a=W+mv_0\) that height runs over \(b(W,v_0)+m\,q(v_0)\): an
-            # arithmetic progression whose step is the controlling vector's own
-            # square, so a vertex of larger square resolves the same height
-            # range in fewer layers, and each layer's candidates grow with the
-            # height it is at.  A vertex whose cell does not span leaves the walk
-            # without coordinates to enumerate in, so the vertex taken is the
-            # first, in decreasing square, at which the subgroup admits at least
-            # \(\operatorname{rank}(v_0^\perp)-1\) of the walls through it; if
-            # there is none, the one admitting most.  Every vertex of the full
-            # chamber is a valid controlling vector (Vinberg 1972, §3.2, the
-            # construction after Proposition 3, p. 27), so the choice changes
-            # only the cost.
             rank = int(self.module_rank()) - 1
             best = None
             for coordinates, square, through, basis in sorted(
                 self._full_chamber_vertices(), key=lambda entry: -entry[1]
             ):
                 if square <= 0 or not basis:
-                    # An ideal vertex is not a point of the hyperbolic space, and
-                    # a vertex whose walls are not a Z-basis of its orthogonal
-                    # complement leaves the walk's own cell condition unsatisfied.
                     continue
                 admitted = sum(1 for root in through if admits_root(root))
                 if best is None or admitted > best[0]:
@@ -2181,10 +2115,6 @@ class HyperbolicLattices(OwnedCategoryOverBaseRing):
                 f"{timelike} is not timelike in {self}: a vector is timelike exactly when its orthogonal complement is definite, and {complement} is not definite"
             )
             inclusion = complement.inclusion()
-            # The framing coordinates arrive in the engine ring, so the divisibility test and
-            # the reconstruction are engine arithmetic, and the candidate is read back as
-            # integers: ``coordinate // square`` is a quotient of engine integers by the
-            # engine image of ``square``, which is what makes the reconstruction integral.
             engine_square = _engine_element(integers, square)
 
             isotropic = []
@@ -2221,7 +2151,7 @@ class HyperbolicLattices(OwnedCategoryOverBaseRing):
             return finite_ordered_set(tuple(isotropic))
 
         @cached_method
-        def _edgewalk(self, *, option_norms="all", early_termination=True, compute_all_simple_roots=True, option_initial_vertex="isotropic_vinberg", initial_vertex=None):
+        def _edgewalk(self, *, option_norms="all", early_termination=True, compute_all_simple_roots=True, option_initial_vertex="isotropic_vinberg", apply_reduction=True, initial_vertex=None):
             r"""Walk the reflection chamber through the port's owned lattice API.
 
             The port's entry uses signature ``(n,1)``. For ``(1,n)``, use the
@@ -2239,12 +2169,13 @@ class HyperbolicLattices(OwnedCategoryOverBaseRing):
             )
 
             if (self.signature_pair().second() == cardinal(1)) is True:
-                if option_norms == "all" and early_termination and compute_all_simple_roots and option_initial_vertex == "isotropic_vinberg" and initial_vertex is None:
+                if option_norms == "all" and early_termination and compute_all_simple_roots and option_initial_vertex == "isotropic_vinberg" and apply_reduction and initial_vertex is None:
                     return edgewalk_fundamental_domain(self)
                 return edgewalk_fundamental_domain(
                     self, option_norms=option_norms,
                     early_termination=early_termination, compute_all_simple_roots=compute_all_simple_roots,
                     option_initial_vertex=option_initial_vertex,
+                    apply_reduction=apply_reduction,
                     initial_vertex=initial_vertex,
                 )
             twist = Lattices(self.base_ring()).twist_functor(-1)
@@ -2264,13 +2195,14 @@ class HyperbolicLattices(OwnedCategoryOverBaseRing):
                     )
                 else:
                     initial_vertex = to_working(initial_vertex)
-            if option_norms == "all" and early_termination and compute_all_simple_roots and option_initial_vertex == "isotropic_vinberg" and initial_vertex is None:
+            if option_norms == "all" and early_termination and compute_all_simple_roots and option_initial_vertex == "isotropic_vinberg" and apply_reduction and initial_vertex is None:
                 report = edgewalk_fundamental_domain(working)
             else:
                 report = edgewalk_fundamental_domain(
                     working, option_norms=option_norms,
                     early_termination=early_termination, compute_all_simple_roots=compute_all_simple_roots,
                     option_initial_vertex=option_initial_vertex,
+                    apply_reduction=apply_reduction,
                     initial_vertex=initial_vertex,
                 )
             cones = RationalPolyhedralCones(self)
@@ -2297,7 +2229,7 @@ class HyperbolicLattices(OwnedCategoryOverBaseRing):
                 simple_roots_computed=report.has_computed_simple_roots(),
             )
 
-        def allcock_edgewalk(self, *, option_norms="all", early_termination=True, compute_all_simple_roots=True, option_initial_vertex="isotropic_vinberg", initial_vertex=None):
+        def allcock_edgewalk(self, *, option_norms="all", early_termination=True, compute_all_simple_roots=True, option_initial_vertex="isotropic_vinberg", apply_reduction=True, initial_vertex=None):
             r"""Return Allcock's owned fundamental-domain report.
 
             ``option_norms="all"`` uses every reflective root length;
@@ -2312,15 +2244,17 @@ class HyperbolicLattices(OwnedCategoryOverBaseRing):
             lattice; ``"isotropic_vinberg"`` (the default) first finds a
             null ray when one exists. ``initial_vertex`` instead supplies a vertex vector,
             or a pair consisting of that vector and its simple wall roots,
-            as elements of this lattice. These are the pinned edgewalk's
+            as elements of this lattice. Set ``apply_reduction=False`` to
+            search for an automatic corner in the original integral presentation.
+            These are the pinned edgewalk's
             OptionNorms, EarlyTerminationIfNotReflective, ComputeAllSimpleRoots,
-            OptionInitialVertex, FileVertex and
+            OptionInitialVertex, ApplyReduction, FileVertex and
             FileVertexRoots parameters (``edgewalk.h:55-67,2100-2126``).
             """
             return self._edgewalk(
                 option_norms=option_norms, early_termination=early_termination,
                 compute_all_simple_roots=compute_all_simple_roots,
-                option_initial_vertex=option_initial_vertex, initial_vertex=initial_vertex,
+                option_initial_vertex=option_initial_vertex, apply_reduction=apply_reduction, initial_vertex=initial_vertex,
             )
 
         def edgewalk_isometry(self, other):
