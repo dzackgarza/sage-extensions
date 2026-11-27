@@ -4703,6 +4703,79 @@ class ModulesWithChosenFinitePresentation(OwnedCategoryOverBaseRing):
 
             return _TensorMorAdjunction(self)
 
+        def _presented_biproduct_over(
+            self, labels, factors, *, extra_categories=(), extra_construction_data=None
+        ):
+            r"""Use the selected presentations of the factors to construct their biproduct."""
+            from sage_extensions.categories.modules.framed.finitely_generated.finitely_presented_modules import (
+                _selected_presentation_biproduct,
+            )
+
+            return _selected_presentation_biproduct(
+                self, labels, factors,
+                extra_categories=extra_categories,
+                extra_construction_data=extra_construction_data,
+            )
+
+        def _represented_kernel_of_morphism(self, morphism):
+            from sage_extensions.categories.modules.framed.finitely_generated.finitely_presented_modules import (
+                _selected_presentation_kernel,
+            )
+
+            if self not in (morphism.domain(), morphism.codomain()):
+                return NotImplemented
+            if (
+                morphism.codomain() is self
+                and morphism.domain() is self.presentation().codomain()
+                and morphism == self.presentation_projection()
+            ):
+                return self.presentation().image()
+            return _selected_presentation_kernel(morphism)
+
+        def _represented_cokernel_of_morphism(self, morphism):
+            from sage_extensions.categories.modules.framed.finitely_generated.finitely_presented_modules import (
+                _presented_module_from_morphism,
+                _cokernel_into_a_framed_free_codomain,
+            )
+
+            if morphism.codomain() is self:
+                return _presented_module_from_morphism(
+                    morphism, _cokernel_morphism=morphism
+                )
+            if morphism.domain() is self:
+                return _cokernel_into_a_framed_free_codomain(morphism)
+            return NotImplemented
+
+        def whole_subobject(self):
+            r"""Return this selected presentation as the full subobject of itself."""
+            from sage_extensions.categories.modules.framed.finitely_generated.finitely_presented_modules import (
+                _presented_module_from_morphism,
+            )
+
+            def lift_from_ambient(image, element):
+                element = element if element.parent() is self else self(element)
+                coordinates = self._framing_lift(self(element))
+                return image.linear_combination(coordinates.parent()._selected_module_coefficients(coordinates))
+
+            return _presented_module_from_morphism(
+                self.presentation(),
+                _subobject_ambient=self,
+                _subobject_generator_images=lambda label: self.module_generator(label),
+                _subobject_lift=lift_from_ambient,
+            )
+
+        def presentation_projection(self):
+            r"""Return the selected quotient map ``F_0 -> M``."""
+            selected = self.selected_module_resolution()
+            match selected.truncation():
+                case 1:
+                    return selected.augmentation()
+                case _:
+                    raise TypeError(
+                        f"{self} has no selected finite-presentation projection: its chosen module "
+                        f"resolution is truncated in degree {selected.truncation()}"
+                    )
+
         def _selected_relation_morphism(self):
             r"""Return the selected relation morphism ``r: F_1 -> F_0`` to module-construction adapters.
 
