@@ -1884,8 +1884,22 @@ class PreimageSubgroups(_PredicateSubgroupConstruction):
                 and self.supergroup().has_selected_group_resolution()
             )
 
+        @cached_method(
+            key=lambda self, generators=None: (
+                None if generators is None else tuple(generators)
+            )
+        )
         def coset_space(self, *, generators=None):
-            r"""``G/f^-1(K)`` as the orbit of ``K`` in ``Q/K`` under ``G`` acting through ``f``."""
+            r"""``G/f^-1(K)`` as the orbit of ``K`` in ``Q/K`` under ``G`` acting through ``f``.
+
+            The orbit, its section and the Schreier family read off them are one
+            datum of this subgroup: the index (:meth:`index`), the generating
+            morphism (:meth:`schreier_generating_morphism`) and the selected
+            resolution of ``G`` all read this coset space.  The orbit sweep is
+            therefore run on the first request and answered from the cache
+            afterwards (``OWN-22``), keyed by the generators of the ambient
+            group the request names.
+            """
             return _preimage_coset_space(
                 self, self.preimage_morphism(), self.target_subgroup(), generators
             )
