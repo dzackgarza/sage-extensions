@@ -23,3 +23,21 @@ def test_the_zero_reduction_has_a_trivial_pointwise_levi_image() -> None:
     assert reduction.pointwise_levi_image().cardinality() == cardinal(1)
     assert tuple(reduction.pointwise_levi_image().group_generators()) == ()
     assert tuple(lattice.Aut().stabilizer(vector).group_generators()) == ()
+
+
+def test_the_orthogonal_group_of_the_zero_reduction_contains_only_its_identity() -> None:
+    r"""Issue #625: the zero module has exactly one linear automorphism."""
+    plane = Lattices(ZZ)("U")
+    e = tuple(plane.module_generators())[0]
+    quotient = plane.primitive_isotropic_subobject(e).isotropic_reduction().quotient_lattice()
+    assert quotient.module_rank() == NN(0)
+    group = quotient.O()
+    identity = group.identity()
+    assert identity in group
+    assert group.cardinality() == cardinal(1)
+    assert tuple(group.group_generators()) == ()
+    assert tuple(group) == (identity,)
+    generated = group.subgroup((identity,))
+    assert generated.cardinality() == cardinal(1)
+    assert identity in generated
+    assert tuple(generated) == (identity,)
