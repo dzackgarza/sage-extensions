@@ -6022,6 +6022,14 @@ class OwnedGroups(CategoryPacketMethods, OwnedCategory):
         def _categorical_equalizer_construction(self, left_morphism, right_morphism):
             r"""The equalizer subgroup of parallel group homomorphisms.
 
+            For a finite target the equalizer is retained as the preimage of
+            the diagonal under ``(f, g)``: the product supplies the pair map
+            and the diagonal, and :class:`PreimageSubgroups` supplies the
+            finite-index coset space and the Schreier generating morphism of
+            the preimage.  An infinite target keeps the defining predicate,
+            because neither a finite coset space nor a generating family is
+            determined by that datum.
+
             The represented predicate is f(g)=h(g); the inclusion and its
             universal cone are the subgroup construction's actual maps.
             Finiteness of the subgroup follows from finiteness of its source,
@@ -6048,10 +6056,36 @@ class OwnedGroups(CategoryPacketMethods, OwnedCategory):
             ):
                 raise TypeError("a group equalizer requires two morphisms in its selected group category")
 
-            equalizer = source.predicate_subgroup(
-                lambda element: left_morphism(element) == right_morphism(element),
-                lambda: f"{left_morphism}(g) = {right_morphism}(g)",
-            )
+            def stated_clause():
+                return f"{left_morphism}(g) = {right_morphism}(g)"
+
+            if target in OwnedFiniteGroups():
+                # E = (f, g)^-1(diag H) <= G.  The pair map is the selected
+                # product's universal arrow and the diagonal is the image of
+                # that product's two identity legs, so both are actual maps
+                # of the product.  The preimage owner then supplies the
+                # finite-index coset space and the Schreier family of E.
+                product = self.product_construction((target, target))
+                factors = product.diagram().domain()
+                first = factors(0)
+                identity = target.Mor(target).identity()
+                diagonal = product.factor(
+                    product.diagram().Cones().cone(target, lambda _index: identity)
+                ).apex_map().image()
+                pair_map = product.factor(
+                    product.diagram().Cones().cone(
+                        source,
+                        lambda index: left_morphism if index is first else right_morphism,
+                    )
+                ).apex_map()
+                equalizer = pair_map.preimage_subgroup(
+                    diagonal, stated_clause=stated_clause
+                )
+            else:
+                equalizer = source.predicate_subgroup(
+                    lambda element: left_morphism(element) == right_morphism(element),
+                    stated_clause,
+                )
             if equalizer not in self:
                 raise TypeError(
                     f"the equalizer of {left_morphism} and {right_morphism} is a subgroup of {source}, "
