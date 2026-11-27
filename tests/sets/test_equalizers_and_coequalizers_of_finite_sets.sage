@@ -69,8 +69,6 @@ def test_the_coequalizer_of_x_and_x_plus_one_glues_zero_one_two_and_leaves_three
 
 
 def test_identical_pair_has_identity_coequalizer_even_with_unenumerated_source() -> None:
-    from sage_extensions.logic import AtomicProposition
-
     ambient = Sets.Δ[2]
     source = Sets().condition_set(
         ambient, lambda x: AtomicProposition("undecided_subset_membership", x)
@@ -154,8 +152,6 @@ def test_selected_integer_translations_handle_reversal_and_zero() -> None:
 
 def test_selected_wide_integer_translations_generate_the_gcd_relation() -> None:
     r"""The maps n+1, n+3, n+5 generate the congruence modulo gcd(2,4)."""
-    from sage_extensions.categories.sets.indexed_families import indexed_family
-
     integers = ZZ
     maps = tuple(Sets().integer_translation(integers(d)) for d in (1, 3, 5))
     family = indexed_family(Sets.Δ[2], lambda index: maps[int(index)])
@@ -217,8 +213,6 @@ def test_equal_integer_translations_have_the_identity_coequalizer() -> None:
 
 
 def test_coequalizer_uses_the_targets_selected_ranking() -> None:
-    from sage_extensions.categories.sets.finite_ordered_sets import finite_ordered_set
-
     source = Sets.Δ[0]
     target = finite_ordered_set(("c", "a", "b"))
     first = Sets().Mor(source, target)(lambda _point: target("c"))
@@ -296,8 +290,6 @@ def test_singleton_target_coequalizes_an_unenumerated_infinite_relation_exactly(
 
 def test_wide_infinite_source_coequalizer_retains_every_relation_map() -> None:
     r"""The family n, n+2, n+4 on ZZ induces one coequalizer with a parity factor."""
-    from sage_extensions.categories.sets.indexed_families import indexed_family
-
     integers = ZZ
     maps = (
         Sets().Mor(integers, integers).identity(),
