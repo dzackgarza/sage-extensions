@@ -964,7 +964,18 @@ class CommutativeIdeals(OwnedCategoryOverBaseRing):
             elif operation == "product":
                 result = left * right
             elif operation == "intersection":
-                result = left.intersection(right)
+                from sage_extensions.categories.rings.ring_foundation import (
+                    PrincipalIdealDomains,
+                )
+
+                match self.ring():
+                    case _ if self.ring() in PrincipalIdealDomains():
+                        # In a principal ideal domain (a) cap (b) = (lcm(a, b));
+                        # the engine's principal ideals carry ``gen`` and the
+                        # ring's ``lcm`` but supply no ``intersection``.
+                        result = left.ring().ideal(left.gen().lcm(right.gen()))
+                    case _:
+                        result = left.intersection(right)
             else:
                 raise ValueError(f"unknown binary ideal operation {operation!r}")
             return _from_engine_ideal(self.ring(), result)
