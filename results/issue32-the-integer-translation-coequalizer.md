@@ -122,3 +122,40 @@ member's 56 public-API specimens and 35 owner-route assertions (written against
   kernels/cokernels/equalizers, pullback and pushout cones, module images and
   the empty biproduct, retained action/ideal structure, generating
   epimorphisms and sections) are untouched here and remain open.
+
+## Correction after review of 028b2f1
+
+The first fix called `target.generated_relation_quotient(...)` unconditionally.
+On a set that does not implement the optional operation the attribute resolves
+to `NotImplemented` itself, so every general coequalizer raised
+`TypeError: NotImplementedType object is not callable` at
+`set_categories.py:1872` (family: `:1990`), before the identity, empty-source,
+singleton and represented branches.  The operation is now read through
+`_selected_generated_relation_quotient`, which compares the attribute with
+`NotImplemented` and calls it only when implemented — the idiom `cat.py` already
+uses for its optional constructions.  Executed after the correction: the plain
+pair of maps `Δ[1] -> Δ[3]` has the two classes `{0,1,2}` and `{3}`, a
+singleton target one class, an identical pair the target, an opaque
+non-translation relation the represented quotient, and the translation cases are
+unchanged.
+
+The same round removed three further defects in the first fix:
+
+* `selected_integer_translation_step` read the function object by `isinstance`;
+  the displacement is now recorded on the arrow at construction
+  (`translation_step`, beside `composite_factors`) and read from that datum, and
+  an opaque callback still answers `None`.
+* the hook prose stated the relation `x ~ f_i(x)`.  The wide coequalizer
+  generates `f_i(x) ~ f_j(x)`; the implementation always used the differences,
+  and the prose now says so.
+* the ring method claimed a general ring formula.  It is the integer case: the
+  classes are the cosets of the additive subgroup `g*ZZ`, and over `QQ`
+  translations by `1` generate `ZZ`, not the ideal `(1) = QQ`.  The docstrings
+  state the integer case and the limit.
+
+The test file imported `indexed_family` and `finite_ordered_set` from private
+modules and `AtomicProposition` inside a test body; under the M1 harness those
+are setup errors, so none of its tests ran.  The first two are session names;
+`AtomicProposition` is now published by the session from `logic.__all__`.  All
+13 test functions of the file pass when the session names are supplied directly
+(the session import itself is still unavailable on this VM).
