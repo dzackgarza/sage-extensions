@@ -2207,7 +2207,7 @@ class HyperbolicLattices(OwnedCategoryOverBaseRing):
             return finite_ordered_set(tuple(isotropic))
 
         @cached_method
-        def _edgewalk(self, *, option_norms="all", early_termination=True, initial_vertex=None):
+        def _edgewalk(self, *, option_norms="all", early_termination=True, option_initial_vertex="isotropic_vinberg", initial_vertex=None):
             r"""Walk the reflection chamber through the port's owned lattice API.
 
             The port's entry uses signature ``(n,1)``. For ``(1,n)``, use the
@@ -2225,11 +2225,12 @@ class HyperbolicLattices(OwnedCategoryOverBaseRing):
             )
 
             if (self.signature_pair().second() == cardinal(1)) is True:
-                if option_norms == "all" and early_termination and initial_vertex is None:
+                if option_norms == "all" and early_termination and option_initial_vertex == "isotropic_vinberg" and initial_vertex is None:
                     return edgewalk_fundamental_domain(self)
                 return edgewalk_fundamental_domain(
                     self, option_norms=option_norms,
-                    early_termination=early_termination, initial_vertex=initial_vertex,
+                    early_termination=early_termination, option_initial_vertex=option_initial_vertex,
+                    initial_vertex=initial_vertex,
                 )
             twist = Lattices(self.base_ring()).twist_functor(-1)
             working = HyperbolicLattices(self.base_ring())(twist(self))
@@ -2248,12 +2249,13 @@ class HyperbolicLattices(OwnedCategoryOverBaseRing):
                     )
                 else:
                     initial_vertex = to_working(initial_vertex)
-            if option_norms == "all" and early_termination and initial_vertex is None:
+            if option_norms == "all" and early_termination and option_initial_vertex == "isotropic_vinberg" and initial_vertex is None:
                 report = edgewalk_fundamental_domain(working)
             else:
                 report = edgewalk_fundamental_domain(
                     working, option_norms=option_norms,
-                    early_termination=early_termination, initial_vertex=initial_vertex,
+                    early_termination=early_termination, option_initial_vertex=option_initial_vertex,
+                    initial_vertex=initial_vertex,
                 )
             cones = RationalPolyhedralCones(self)
             return AllcockEdgewalkReport(
@@ -2278,22 +2280,25 @@ class HyperbolicLattices(OwnedCategoryOverBaseRing):
                 reason_non_reflective=report.reason_non_reflective(),
             )
 
-        def allcock_edgewalk(self, *, option_norms="all", early_termination=True, initial_vertex=None):
+        def allcock_edgewalk(self, *, option_norms="all", early_termination=True, option_initial_vertex="isotropic_vinberg", initial_vertex=None):
             r"""Return Allcock's owned fundamental-domain report.
 
             ``option_norms="all"`` uses every reflective root length;
             ``"K3"`` uses roots of square 2 in signature ``(n,1)`` and
             square -2 in signature ``(1,n)``. Setting ``early_termination``
             false continues after nonreflectivity is detected to enumerate
-            every vertex orbit. ``initial_vertex`` supplies a vertex vector,
+            every vertex orbit. ``option_initial_vertex="vinberg"`` searches
+            automatically by the Vinberg algorithm, even on an isotropic
+            lattice; ``"isotropic_vinberg"`` (the default) first finds a
+            null ray when one exists. ``initial_vertex`` instead supplies a vertex vector,
             or a pair consisting of that vector and its simple wall roots,
             as elements of this lattice. These are the pinned edgewalk's
-            OptionNorms, EarlyTerminationIfNotReflective, FileVertex and
+            OptionNorms, EarlyTerminationIfNotReflective, OptionInitialVertex, FileVertex and
             FileVertexRoots parameters (``edgewalk.h:55-67,2100-2126``).
             """
             return self._edgewalk(
                 option_norms=option_norms, early_termination=early_termination,
-                initial_vertex=initial_vertex,
+                option_initial_vertex=option_initial_vertex, initial_vertex=initial_vertex,
             )
 
         def edgewalk_isometry(self, other):
