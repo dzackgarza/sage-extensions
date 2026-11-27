@@ -1376,10 +1376,14 @@ class AllcockEdgewalkReport(SageObject):
         vertices,
         isometry_generators,
         reason_non_reflective=None,
+        simple_roots_computed=None,
     ) -> None:
         self._lattice = lattice
         self._reflective = bool(reflective)
         self._simple_roots = finite_ordered_set(tuple(simple_roots))
+        self._simple_roots_computed = (
+            bool(reflective) if simple_roots_computed is None else bool(simple_roots_computed)
+        )
         self._vertices = finite_ordered_set(tuple(vertices))
         self._isometry_generators = finite_ordered_set(tuple(isometry_generators))
         self._reason_non_reflective = reason_non_reflective
@@ -1394,7 +1398,17 @@ class AllcockEdgewalkReport(SageObject):
         r"""The source's reason when the walk stopped by proving non-reflectivity, else ``None``."""
         return self._reason_non_reflective
 
+    def has_computed_simple_roots(self) -> bool:
+        r"""Whether the finite report contains the complete simple-root family."""
+        return self._simple_roots_computed
+
     def simple_roots(self):
+        r"""The computed simple-root family; empty when the source omits it.
+
+        Use :meth:`has_computed_simple_roots` to distinguish omission from
+        a computed family. In particular a nonreflective chamber may have
+        infinitely many walls.
+        """
         return self._simple_roots
 
     def vertices(self):
@@ -2207,7 +2221,7 @@ class HyperbolicLattices(OwnedCategoryOverBaseRing):
             return finite_ordered_set(tuple(isotropic))
 
         @cached_method
-        def _edgewalk(self, *, option_norms="all", early_termination=True, option_initial_vertex="isotropic_vinberg", initial_vertex=None):
+        def _edgewalk(self, *, option_norms="all", early_termination=True, compute_all_simple_roots=True, option_initial_vertex="isotropic_vinberg", initial_vertex=None):
             r"""Walk the reflection chamber through the port's owned lattice API.
 
             The port's entry uses signature ``(n,1)``. For ``(1,n)``, use the
@@ -2225,11 +2239,12 @@ class HyperbolicLattices(OwnedCategoryOverBaseRing):
             )
 
             if (self.signature_pair().second() == cardinal(1)) is True:
-                if option_norms == "all" and early_termination and option_initial_vertex == "isotropic_vinberg" and initial_vertex is None:
+                if option_norms == "all" and early_termination and compute_all_simple_roots and option_initial_vertex == "isotropic_vinberg" and initial_vertex is None:
                     return edgewalk_fundamental_domain(self)
                 return edgewalk_fundamental_domain(
                     self, option_norms=option_norms,
-                    early_termination=early_termination, option_initial_vertex=option_initial_vertex,
+                    early_termination=early_termination, compute_all_simple_roots=compute_all_simple_roots,
+                    option_initial_vertex=option_initial_vertex,
                     initial_vertex=initial_vertex,
                 )
             twist = Lattices(self.base_ring()).twist_functor(-1)
@@ -2249,12 +2264,13 @@ class HyperbolicLattices(OwnedCategoryOverBaseRing):
                     )
                 else:
                     initial_vertex = to_working(initial_vertex)
-            if option_norms == "all" and early_termination and option_initial_vertex == "isotropic_vinberg" and initial_vertex is None:
+            if option_norms == "all" and early_termination and compute_all_simple_roots and option_initial_vertex == "isotropic_vinberg" and initial_vertex is None:
                 report = edgewalk_fundamental_domain(working)
             else:
                 report = edgewalk_fundamental_domain(
                     working, option_norms=option_norms,
-                    early_termination=early_termination, option_initial_vertex=option_initial_vertex,
+                    early_termination=early_termination, compute_all_simple_roots=compute_all_simple_roots,
+                    option_initial_vertex=option_initial_vertex,
                     initial_vertex=initial_vertex,
                 )
             cones = RationalPolyhedralCones(self)
@@ -2278,26 +2294,32 @@ class HyperbolicLattices(OwnedCategoryOverBaseRing):
                     for isometry in report.polyhedron_isometry_generators()
                 ),
                 reason_non_reflective=report.reason_non_reflective(),
+                simple_roots_computed=report.has_computed_simple_roots(),
             )
 
-        def allcock_edgewalk(self, *, option_norms="all", early_termination=True, option_initial_vertex="isotropic_vinberg", initial_vertex=None):
+        def allcock_edgewalk(self, *, option_norms="all", early_termination=True, compute_all_simple_roots=True, option_initial_vertex="isotropic_vinberg", initial_vertex=None):
             r"""Return Allcock's owned fundamental-domain report.
 
             ``option_norms="all"`` uses every reflective root length;
             ``"K3"`` uses roots of square 2 in signature ``(n,1)`` and
             square -2 in signature ``(1,n)``. Setting ``early_termination``
             false continues after nonreflectivity is detected to enumerate
-            every vertex orbit. ``option_initial_vertex="vinberg"`` searches
+            every reachable vertex orbit without attempting an infinite wall
+            enumeration. ``compute_all_simple_roots=False`` selects the
+            source's orbit-only output (``ComputeAllSimpleRoots``).
+            ``option_initial_vertex="vinberg"`` searches
             automatically by the Vinberg algorithm, even on an isotropic
             lattice; ``"isotropic_vinberg"`` (the default) first finds a
             null ray when one exists. ``initial_vertex`` instead supplies a vertex vector,
             or a pair consisting of that vector and its simple wall roots,
             as elements of this lattice. These are the pinned edgewalk's
-            OptionNorms, EarlyTerminationIfNotReflective, OptionInitialVertex, FileVertex and
+            OptionNorms, EarlyTerminationIfNotReflective, ComputeAllSimpleRoots,
+            OptionInitialVertex, FileVertex and
             FileVertexRoots parameters (``edgewalk.h:55-67,2100-2126``).
             """
             return self._edgewalk(
                 option_norms=option_norms, early_termination=early_termination,
+                compute_all_simple_roots=compute_all_simple_roots,
                 option_initial_vertex=option_initial_vertex, initial_vertex=initial_vertex,
             )
 
