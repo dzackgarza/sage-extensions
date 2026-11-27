@@ -1437,6 +1437,31 @@ class Sets(CategoryPacketMethods, OwnedCategory):
             translation_step=displacement,
         )
 
+    def ordered(self, points):
+        r"""The finite ordered set whose points are ``points``, in that order.
+
+        The sequence is the datum: the $i$-th point is the $i$-th position, and
+        ``ranking_map`` inverts that enumeration.  This is the top-level route
+        to a finite ordered set of chosen points, so a caller names the points
+        rather than the implementation that holds them.
+        """
+        from sage_extensions.categories.sets.finite_ordered_sets import (
+            finite_ordered_set,
+        )
+
+        return finite_ordered_set(points)
+
+    def family(self, index_set, element_at):
+        r"""The family of the points ``element_at(i)`` indexed by ``index_set``.
+
+        A family over a set is a map out of it: the index set carries the
+        labels and ``element_at`` names the value at each label, so the
+        members of a family need not be sets.  A finite family of parallel set
+        maps is this same construction over its positions, and the wide
+        (co)equalizer reads it as the arrow family of its walking diagram.
+        """
+        return indexed_family(index_set, element_at)
+
     def Subobjects(self, base_object: Parent) -> Category:
         r"""Return the monomorphism subcategory of the slice over ``base_object``.
 
