@@ -154,7 +154,7 @@ def test_selected_wide_integer_translations_generate_the_gcd_relation() -> None:
     r"""The maps n+1, n+3, n+5 generate the congruence modulo gcd(2,4)."""
     integers = ZZ
     maps = tuple(Sets().integer_translation(integers(d)) for d in (1, 3, 5))
-    family = indexed_family(Sets.Δ[2], lambda index: maps[int(index)])
+    family = Sets().family(Sets.Δ[2], lambda index: maps[int(index)])
     construction = Sets().coequalizer_of_family_construction(family)
     quotient = construction.object()
     shape = construction.diagram().domain()
@@ -214,7 +214,7 @@ def test_equal_integer_translations_have_the_identity_coequalizer() -> None:
 
 def test_coequalizer_uses_the_targets_selected_ranking() -> None:
     source = Sets.Δ[0]
-    target = finite_ordered_set(("c", "a", "b"))
+    target = Sets().ordered(("c", "a", "b"))
     first = Sets().Mor(source, target)(lambda _point: target("c"))
     second = Sets().Mor(source, target)(lambda _point: target("b"))
     quotient = Sets().coequalizer(first, second)
@@ -296,7 +296,7 @@ def test_wide_infinite_source_coequalizer_retains_every_relation_map() -> None:
         Sets().Mor(integers, integers)(lambda n: integers(n + integers(2))),
         Sets().Mor(integers, integers)(lambda n: integers(n + integers(4))),
     )
-    family = indexed_family(Sets.Δ[2], lambda index: maps[int(index)])
+    family = Sets().family(Sets.Δ[2], lambda index: maps[int(index)])
     construction = Sets().coequalizer_of_family_construction(family)
     shape = construction.diagram().domain()
     quotient = construction.object()
