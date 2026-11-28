@@ -84,6 +84,7 @@ class ManifoldAtlasChart(SageObject):
         self._engine = engine_chart
         self._domain = domain
         self._cut_from = cut_from
+        self._coordinate_restriction_of = None
         self._cut_conditions = tuple(cut_conditions)
         self._nonvanishing = tuple(
             _raise_manifold_expression(_engine_manifold_expression(condition), self)
@@ -226,7 +227,9 @@ class ManifoldAtlasChart(SageObject):
         )
         local = self._engine.restrict(engine_open)
         domain = self.manifold()._chart_domain(self.label(), local)
-        return domain.atlas()[self.label()]
+        result = domain.atlas()[self.label()]
+        result._coordinate_restriction_of = self
+        return result
 
     def _restricted_by_owned_conditions(self, conditions, local_radius):
         """Retain an actual smooth open locus and its local closed-ball witness."""
@@ -252,6 +255,7 @@ class ManifoldAtlasChart(SageObject):
         local.domain().manifold()._owned_coordinate_data = True
         domain = self.manifold()._chart_domain(self.label(), local)
         result = domain.atlas()[self.label()]
+        result._coordinate_restriction_of = self
         result._nonvanishing = tuple(conditions)
         return result
 
@@ -1854,6 +1858,88 @@ class _ManifoldTopologyData(SageObject):
     def __init__(self, engine_manifold, induced_from=None) -> None:
         self._engine_manifold = engine_manifold
         self._induced_from = induced_from
+        self._chart_box_separators = []
+
+    def declare_chart_box_separation(self, separator, on_charts=None):
+        r"""Retain an effective name of the complement of the diagonal.
+
+        The supplied finite-stage predicate accepts two charts, their
+        rational closed coordinate boxes, and a natural-number effort.
+        True certifies disjoint images of the portions of the boxes in the
+        charts. False means no certificate at this stage, not intersection.
+        At every unequal pair of points, sufficiently small boxes around
+        their coordinates must be certified for all sufficiently large
+        efforts, uniformly for boxes contained in those neighborhoods.
+        Thus this datum represents an open complement of the diagonal,
+        not a decision of equality of points.
+        """
+        assert callable(separator)
+        assert on_charts is None or callable(on_charts)
+        self._chart_box_separators.append((separator, on_charts))
+
+    def _separation_providers(self, left, right):
+        return tuple(separator for separator, applies in self._chart_box_separators
+                     if applies is None or applies(left, right))
+
+    def _separates_chart_boxes(self, left, a, right, b, effort):
+        left_native, right_native = map(_engine_manifold_chart, (left, right))
+        if (left_native is right_native or left_native in right_native._subcharts
+                or left_native in right_native._supercharts):
+            if any(hi < lo2 or hi2 < lo for (lo, hi), (lo2, hi2) in zip(a, b, strict=True)):
+                return True
+        providers = self._separation_providers(left, right)
+        if not providers:
+            return False
+        from sage_extensions.categories.rings.ring_foundation import _owned_rationals
+        rational = _owned_rationals()
+        a = tuple((rational(lo), rational(hi)) for lo, hi in a)
+        b = tuple((rational(lo), rational(hi)) for lo, hi in b)
+        for separator in providers:
+            answer = separator(left, a, right, b, NN(effort))
+            assert answer is True or answer is False
+            if answer is True:
+                return True
+        return False
+
+    def _excludes_chart_ball(self, home, center, radius, source, coordinates, effort):
+        r"""A finite compact-separation search, with no equality decision.
+
+        Cover an enclosing rational box of the coordinate ball by dyadic
+        boxes. Discard a box only by a strict lower distance bound from the
+        center or by a certified separation of its image from the query
+        point's enclosure. A successful finite cover proves exclusion.
+        For a point outside the compact ball, effective Hausdorff separation
+        and compactness give a uniform neighborhood size and finite effort
+        for the separating boxes, so refinement eventually succeeds.
+        """
+        from sage.rings.real_arb import RealBallField
+        precision = RealBallField(64 + 8 * effort)
+        field = home.manifold().coordinate_field()
+
+        def enclose(values):
+            return tuple(tuple(endpoint.exact_rational() for endpoint in
+                               field(value)._arb_(precision).endpoints()) for value in values)
+
+        c = enclose(center)
+        q = enclose(coordinates)
+        outer = tuple((lo-radius, hi+radius) for lo, hi in c)
+        pending = [(outer, effort)]
+        while pending:
+            box, remaining = pending.pop()
+            distance = sum(max(0, lo-hi2, lo2-hi)**2
+                           for (lo, hi), (lo2, hi2) in zip(c, box, strict=True))
+            if distance > radius**2:
+                continue
+            if self._separates_chart_boxes(source, q, home, box, effort):
+                continue
+            if remaining == 0:
+                return False
+            axis = max(range(len(box)), key=lambda i: box[i][1]-box[i][0])
+            lo, hi = box[axis]
+            middle = (lo+hi)/2
+            pending.append((box[:axis]+((lo, middle),)+box[axis+1:], remaining-1))
+            pending.append((box[:axis]+((middle, hi),)+box[axis+1:], remaining-1))
+        return True
 
     def _engine_manifold_realization(self):
         engine = self._engine_manifold
@@ -2296,6 +2382,19 @@ class TopologicalManifolds(OwnedCategory):
                 case _:
                     return engine
 
+        def declare_chart_box_separation(self, separator, *, on_charts=None):
+            r"""Specify effective Hausdorff separation of this manifold's atlas.
+
+            The certificate is a finite-stage predicate on pairs of charts
+            and rational coordinate boxes, as described by the topology's
+            closed-diagonal representation. It is defining topology data,
+            not an oracle for a particular smooth function. If on_charts
+            is supplied, its predicate on pairs of charts states precisely
+            the pairs covered by this representation. Multiple declarations
+            may cover different parts of the atlas.
+            """
+            self._topology_data().declare_chart_box_separation(separator, on_charts)
+
         def chart(self, label, coordinates):
             return self._register_chart(label, self._engine_manifold_realization().chart(coordinates))
 
@@ -2348,6 +2447,7 @@ class TopologicalManifolds(OwnedCategory):
                     label, source_label, chart.coordinates(), source.coordinates(),
                     target_overlap=nonvanishing,
                 )
+                chart._coordinate_restriction_of = source
             return chart
 
         def restricted_chart(self, label, nonvanishing, *, local_radius=None):
@@ -3691,6 +3791,37 @@ class SmoothManifolds(OwnedCategory):
             source_overlap=(north_overlap,), target_overlap=(south_overlap,),
         )
         engine.declare_union(engine.subsets())
+
+        def coordinate_sign(chart):
+            while chart._coordinate_restriction_of is not None:
+                chart = chart._coordinate_restriction_of
+            native = _engine_manifold_chart(chart)
+            for base, sign in ((north, 1), (south, -1)):
+                base_native = _engine_manifold_chart(base)
+                if native is base_native or native in base_native._subcharts:
+                    return sign
+            return None
+
+        def separate(left, a, right, b, effort):
+            from sage.rings.real_mpfi import RealIntervalField
+            rational = _owned_rationals()
+            intervals = RealIntervalField(64 + 8 * int(effort))
+
+            def embedding(chart, box):
+                sign = coordinate_sign(chart)
+                assert sign is not None
+                x = tuple(intervals(_engine_element(rational, lo),
+                                    _engine_element(rational, hi)) for lo, hi in box)
+                norm = sum(t**2 for t in x)
+                return tuple(2*t/(1+norm) for t in x)+(sign*(1-2/(1+norm)),)
+
+            x, y = embedding(left, a), embedding(right, b)
+            return any(u.upper() < v.lower() or v.upper() < u.lower()
+                       for u, v in zip(x, y, strict=True))
+
+        from sage_extensions.categories.rings.ring_foundation import _owned_rationals
+        sphere.declare_chart_box_separation(separate, on_charts=lambda left, right:
+            coordinate_sign(left) is not None and coordinate_sign(right) is not None)
         return sphere
 
 

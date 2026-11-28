@@ -162,7 +162,7 @@ def _valid_exact_coordinates(chart, coordinates):
     """
     from operator import eq, ne, lt, le, gt, ge
     from sage.rings.infinity import Infinity
-    from sage_extensions.rings.real import RR
+    from sage_extensions.rings.real import RR, _UndecidedRealDivision
     from sage_extensions.logic import ask
 
     if len(coordinates) != len(tuple(chart[:])):
@@ -189,7 +189,7 @@ def _valid_exact_coordinates(chart, coordinates):
             return None
         try:
             value = RR._evaluate_formula(condition.lhs()-condition.rhs(), symbols, coordinates)
-        except (ZeroDivisionError, NotImplementedError):
+        except (ZeroDivisionError, NotImplementedError, _UndecidedRealDivision):
             return None
         answer = ask(condition.operator()(value, RR.zero()))
         return answer if answer is True or answer is False else None
@@ -660,7 +660,8 @@ def _bump_extended_coordinate(manifold, home, center, index):
     from sage_extensions.categories.manifolds import (
         _engine_manifold_chart, _engine_manifold_expression, CoverageUndecided,
     )
-    from sage_extensions.logic import ask
+    from sage_extensions.logic import ask, _comparison_precision_at
+    from sage_extensions.rings.real import _UndecidedRealDivision
 
     field = manifold.coordinate_field()
     native = _engine_manifold_chart(home)
@@ -677,22 +678,29 @@ def _bump_extended_coordinate(manifold, home, center, index):
     def provider(chart, point, order):
         source = _engine_manifold_chart(chart)
         values = _coordinates_in_chart(chart, point)
-        change = _coordinate_change_jets(source, values, native, field, order)
+        def try_change(target, requested_order):
+            try:
+                return _coordinate_change_jets(source, values, target, field, requested_order)
+            except _UndecidedRealDivision:
+                return None
+
+        change = try_change(native, order)
         if change is not None:
-            if formula is None or _has_cauchy_coordinate(values) or getattr(
-                    source.domain().manifold(), "_owned_coordinate_data", False):
-                return _exact_bump_coordinate_jet(change, center, radius, index)
-            return _symbolic_jet(field, formula, symbols,
-                                 tuple(jet.value() for jet in change), order).compose(change)
-
-
+            try:
+                if formula is None or _has_cauchy_coordinate(values) or getattr(
+                        source.domain().manifold(), "_owned_coordinate_data", False):
+                    return _exact_bump_coordinate_jet(change, center, radius, index)
+                return _symbolic_jet(field, formula, symbols,
+                                     tuple(jet.value() for jet in change), order).compose(change)
+            except _UndecidedRealDivision:
+                pass
 
         for label, target_label in manifold.transitions().keys():
             target = manifold.atlas()[target_label]
             if not native.domain().is_subset(_engine_manifold_chart(target).domain()):
                 continue
             current = manifold.atlas()[label]
-            coordinates = _coordinate_change_jets(source, values, _engine_manifold_chart(current), field, 0)
+            coordinates = try_change(_engine_manifold_chart(current), 0)
             if coordinates is None:
                 continue
             transition = manifold.transition(label, target_label)
@@ -701,9 +709,26 @@ def _bump_extended_coordinate(manifold, home, center, index):
             if _valid_exact_coordinates(overlap, local_values) is False:
                 return _TaylorJet.constant(field, len(values), order, field.zero())
             local = manifold.point(local_values, label)
-            if any(ask(c(local) == field.zero()) is True
-                   for c in transition.source_overlap()):
-                return _TaylorJet.constant(field, len(values), order, field.zero())
+            for condition in transition.source_overlap():
+                try:
+                    excluded = ask(condition(local) == field.zero()) is True
+                except _UndecidedRealDivision:
+                    continue
+                if excluded:
+                    return _TaylorJet.constant(field, len(values), order, field.zero())
+        topology = manifold._topology_data()
+        if topology._separation_providers(chart, home):
+            from itertools import count
+            for effort in count():
+                if topology._excludes_chart_ball(home, center, radius, chart, values, effort):
+                    return _TaylorJet.constant(field, len(values), order, field.zero())
+                with _comparison_precision_at(128 << effort):
+                    change = try_change(native, order)
+                    if change is not None:
+                        try:
+                            return _exact_bump_coordinate_jet(change, center, radius, index)
+                        except _UndecidedRealDivision:
+                            continue
         raise CoverageUndecided("the atlas does not certify whether the point belongs to the bump chart")
 
     return manifold.smooth_functions()(_SmoothGermFunction(manifold, provider))

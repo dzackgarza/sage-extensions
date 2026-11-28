@@ -13,6 +13,9 @@ relation ``R`` on a set ``X`` at a point ``x``, whose computation is deferred.
 ``True | False | Unknown`` (`DEF-06`).
 """
 
+from contextlib import contextmanager
+from contextvars import ContextVar
+
 from sage.misc.abstract_method import abstract_method
 from sage.misc.unknown import Unknown, UnknownClass
 from sage.structure.element import parent as element_parent
@@ -176,10 +179,23 @@ def conjunction(statements) -> bool | Predicate:
             return Conjunction(tuple(undecided))
 
 
+_default_comparison_precision = ContextVar("comparison_precision", default=4096)
+
+
+@contextmanager
+def _comparison_precision_at(precision):
+    r"""Bound all implicit predicate queries in one finite search stage."""
+    token = _default_comparison_precision.set(precision)
+    try:
+        yield
+    finally:
+        _default_comparison_precision.reset(token)
+
+
 def ask(
     statement: bool | UnknownClass | Predicate,
     *,
-    max_prec: int = 4096,
+    max_prec: int | None = None,
 ) -> bool | UnknownClass:
     r"""Return the truth value of ``statement``, or ``Unknown`` if undecided.
 
@@ -187,6 +203,8 @@ def ask(
     evaluation algorithms.  ``Unknown`` also passes through, so callers can
     compose this with existing Sage three-valued predicates.
     """
+    if max_prec is None:
+        max_prec = _default_comparison_precision.get()
     match statement:
         case _ if statement is True or statement is False or statement is Unknown:
             return statement

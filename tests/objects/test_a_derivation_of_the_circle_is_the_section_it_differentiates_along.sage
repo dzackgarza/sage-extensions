@@ -133,11 +133,58 @@ def test_derivation_reads_global_extension_at_a_cauchy_presented_pole():
     field = sections.trivialized_by(frame).trivialization().forward(scalar)
     zero = RR.of_cauchy(Sets().Mor(NN, QQ)(lambda n: QQ(1)/QQ(2)**int(n)))
     pole = circle.point((zero,), "U_S")
+    observed = []
 
     def derivation(f):
-        value = f(pole)
-        assert value.parent() is RR
-        return field(f)
+        result = field(f)
+        observed.append((f(pole), result(pole)))
+        return result
 
     recovered = sections.from_derivation(derivation)
     assert tuple(recovered.components_at(circle.point((2,), "U_N"))) == (RR(10),)
+    assert observed
+    assert observed[-1] == (RR.zero(), RR.zero())
+
+def test_effective_separation_for_a_new_coordinate_presentation():
+    r"""The affine coordinate w=x+1 has the same circle topology as x.
+
+    The separated-box certificate is computed from the stereographic
+    embedding on the new chart, not from membership or a known bump value.
+    """
+    circle, north, south, sections, frame = _the_circle_and_its_frame()
+    algebra = circle.smooth_functions()
+    scalar = algebra.from_local_derivatives(
+        lambda chart, point, alpha: RR(0) if any(alpha) else RR(2))
+    field = sections.trivialized_by(frame).trivialization().forward(scalar)
+    shifted = circle.chart_on_open_subset("shifted", "w", "U_N",
+                                        (north.function_ring().one(),))
+    circle.transition_map("shifted", "U_N",
+                          (shifted.coordinate(0)-shifted.function_ring().one(),),
+                          (north.coordinate(0)+north.function_ring().one(),))
+    def image_box(chart, box):
+        lo, hi = box[0]
+        if chart.label() == "shifted":
+            lo, hi = lo-QQ.one(), hi-QQ.one()
+        lower = QQ.zero() if lo <= 0 <= hi else min(lo**2, hi**2)
+        upper = max(lo**2, hi**2)
+        xs = tuple(2*t/(1+q) for t in (lo, hi) for q in (lower, upper))
+        sign = -1 if chart.label() == "U_S" else 1
+        zs = tuple(sign*(1-2/(1+q)) for q in (lower, upper))
+        return ((min(xs), max(xs)), (min(zs), max(zs)))
+    def separate(left, a, right, b, effort):
+        return any(hi < lo2 or hi2 < lo for (lo, hi), (lo2, hi2)
+                   in zip(image_box(left, a), image_box(right, b), strict=True))
+    circle.declare_chart_box_separation(separate, on_charts=lambda a,b:
+                                       {a.label(), b.label()} == {"shifted", "U_S"})
+    zero = RR.of_cauchy(Sets().Mor(NN, QQ)(lambda n: QQ(1)/QQ(2)**int(n)))
+    pole = circle.point((zero,), "U_S")
+    overlap = circle.point((RR(1)/RR(2),), "U_S")
+    observed = []
+    def derivation(f):
+        result = field(f)
+        observed.append((f(pole), result(pole), f(overlap), result(overlap)))
+        return result
+    recovered = sections.from_derivation(derivation)
+    point = circle.point((3,), "shifted")
+    assert tuple(recovered.components_at(point)) == (RR(10),)
+    assert observed[-1] == (RR(0), RR(0), RR(3), RR(10))

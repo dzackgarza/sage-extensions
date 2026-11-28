@@ -385,6 +385,10 @@ class _CauchyRealComputation(LazyFieldElement):
         return (_CauchyRealComputation, (self._sequence,))
 
 
+class _UndecidedRealDivision(ValueError):
+    r"""The denominator was not certified nonzero within the current budget."""
+
+
 class ExactRealNumber(FieldElement):
     r"""An exact, explicitly real number."""
 
@@ -668,7 +672,7 @@ class ExactRealNumber(FieldElement):
         if decision is False:
             raise ZeroDivisionError(f"cannot divide {self} by {other}: the denominator is zero")
         if decision is Unknown:
-            raise ValueError(
+            raise _UndecidedRealDivision(
                 f"cannot divide {self} by {other}: it is undecided whether {other} is zero"
             )
         return self.parent()._divide_by_nonzero(self, other)
