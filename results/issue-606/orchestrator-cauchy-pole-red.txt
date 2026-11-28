@@ -1,0 +1,145 @@
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+time gates on: star import 2.74 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+rootdir: /repos/sage-extensions/.scratch/worker318-k606
+configfile: pyproject.toml
+plugins: reportlog-1.0.0, xdist-3.8.0, shard-0.1.2, instafail-0.5.0, platformdirs-4.13.5, timeout-2.4.0, anyio-4.15.1, hypothesis-6.170.15
+timeout: 60.0s
+timeout method: signal
+timeout func_only: False
+collected 6 items / 5 deselected / 1 selected
+Running 1 items in this shard
+
+tests/objects/test_a_derivation_of_the_circle_is_the_section_it_differentiates_along.sage F [100%]
+
+=================================== FAILURES ===================================
+______ test_derivation_reads_global_extension_at_a_cauchy_presented_pole _______
+
+    def test_derivation_reads_global_extension_at_a_cauchy_presented_pole():
+        r"""A Cauchy name of zero must not require deciding exact equality to zero."""
+        circle, north, south, sections, frame = _the_circle_and_its_frame()
+        algebra = circle.smooth_functions()
+        scalar = algebra.from_local_derivatives(
+            lambda chart, point, alpha: RR(0) if any(alpha) else RR(2))
+        field = sections.trivialized_by(frame).trivialization().forward(scalar)
+        zero = RR.of_cauchy(Sets().Mor(NN, QQ)(lambda n: QQ(1)/QQ(2)**int(n)))
+        pole = circle.point((zero,), "U_S")
+    
+        def derivation(f):
+            value = f(pole)
+            assert value.parent() is RR
+            return field(f)
+    
+        recovered = sections.from_derivation(derivation)
+>       assert tuple(recovered.components_at(circle.point((2,), "U_N"))) == (RR(10),)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/objects/test_a_derivation_of_the_circle_is_the_section_it_differentiates_along.sage:143: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/vector_bundles.py:1177: in components_at
+    _section_jets(self, point.chart(), point, 0, frame)),
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/vector_bundles.py:149: in _section_jets
+    return section._jet_evaluation(chart, point, order, frame)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/vector_bundles.py:1528: in germs
+    return provider(chart, point, order)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/vector_bundles.py:1962: in provider
+    derivative = derivation(extended)
+                 ^^^^^^^^^^^^^^^^^^^^
+tests/objects/test_a_derivation_of_the_circle_is_the_section_it_differentiates_along.sage:138: in derivation
+    value = f(pole)
+            ^^^^^^^
+src/sage_extensions/categories/functions/real_functions.py:836: in __call__
+    return self.underlying_element()(point)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/general_modules.py:597: in __call__
+    return self.underlying_element()(point)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/sets/set_categories.py:822: in __call__
+    image = function(point, *args, **kwargs)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/functions/smooth_germs.py:377: in __call__
+    return self.jet(point.chart(), point, 0).value()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/functions/smooth_germs.py:391: in jet
+    return self.provider(chart, local_point, order)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+chart = Chart U_S of 1-dimensional smooth manifold S^1
+point = Point (Limit of Generic morphism:
+  From: NN = {0, 1, 2, ...}
+  To:   Fraction Field of Integer Ring) in the chart U_S of 1-dimensional smooth manifold S^1
+order = 0
+
+    def provider(chart, point, order):
+        source = _engine_manifold_chart(chart)
+        values = _coordinates_in_chart(chart, point)
+        change = _coordinate_change_jets(source, values, native, field, order)
+        if change is not None:
+            if formula is None or _has_cauchy_coordinate(values) or getattr(
+                    source.domain().manifold(), "_owned_coordinate_data", False):
+                return _exact_bump_coordinate_jet(change, center, radius, index)
+            return _symbolic_jet(field, formula, symbols,
+                                 tuple(jet.value() for jet in change), order).compose(change)
+    
+    
+    
+        for label, target_label in manifold.transitions().keys():
+            target = manifold.atlas()[target_label]
+            if not native.domain().is_subset(_engine_manifold_chart(target).domain()):
+                continue
+            current = manifold.atlas()[label]
+            coordinates = _coordinate_change_jets(source, values, _engine_manifold_chart(current), field, 0)
+            if coordinates is None:
+                continue
+            transition = manifold.transition(label, target_label)
+            overlap = _engine_manifold_chart(transition.source_overlap_chart())
+            local_values = tuple(jet.value() for jet in coordinates)
+            if _valid_exact_coordinates(overlap, local_values) is False:
+                return _TaylorJet.constant(field, len(values), order, field.zero())
+            local = manifold.point(local_values, label)
+            if any(ask(c(local) == field.zero()) is True
+                   for c in transition.source_overlap()):
+                return _TaylorJet.constant(field, len(values), order, field.zero())
+>       raise CoverageUndecided("the atlas does not certify whether the point belongs to the bump chart")
+E       sage_extensions.categories.manifolds.CoverageUndecided: the atlas does not certify whether the point belongs to the bump chart
+
+src/sage_extensions/categories/functions/smooth_germs.py:707: CoverageUndecided
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:464 General module over Real Field retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:464 General module over Real Field retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:464 General module over Real Field retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:834 Elementwise module morphism Module over Real Field on Classes in the multilinear tensor presentation -> C(Infinity, 1-dimensional open submanifold U_N of 1-dimensional smooth manifold S^1, the domain of its chart U_N, RR) accepted without exhaustive linearity verification; the source is not represented as finite
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:464 General module over Real Field retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:464 General module over Real Field retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:464 General module over Real Field retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:464 General module over Real Field retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:834 Elementwise module morphism Module over Real Field on Classes in the multilinear tensor presentation -> C(Infinity, 1-dimensional open submanifold U_S of 1-dimensional smooth manifold S^1, the domain of its chart U_S, RR) accepted without exhaustive linearity verification; the source is not represented as finite
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:464 General module over Real Field retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:464 General module over Real Field retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:464 General module over Real Field retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:464 General module over Real Field retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:834 Elementwise module morphism Module over Real Field on Classes in the multilinear tensor presentation -> C(Infinity, 1-dimensional open submanifold U_N of 1-dimensional smooth manifold S^1, the domain of its chart U_N, RR) accepted without exhaustive linearity verification; the source is not represented as finite
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:464 General module over Real Field retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:464 General module over Real Field retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:464 General module over Real Field retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:464 General module over Real Field retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:834 Elementwise module morphism Module over Real Field on Classes in the multilinear tensor presentation -> C(Infinity, 1-dimensional open submanifold U_S of 1-dimensional smooth manifold S^1, the domain of its chart U_S, RR) accepted without exhaustive linearity verification; the source is not represented as finite
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:464 General module over Real Field retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:464 General module over Real Field retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:464 General module over Real Field retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:464 General module over Real Field retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:834 Elementwise module morphism Module over Real Field on Classes in the multilinear tensor presentation -> C(Infinity, 1-dimensional smooth manifold S^1, RR) accepted without exhaustive linearity verification; the source is not represented as finite
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:464 General module over Real Field retains its module laws as an undecided proposition
+- generated xml file: /repos/sage-extensions/.scratch/worker318-k606/tests/.report/junit.xml -
+-------------- generated report log file: tests/.report/run.jsonl --------------
+============================== slowest durations ===============================
+7.57s call     tests/objects/test_a_derivation_of_the_circle_is_the_section_it_differentiates_along.sage::test_derivation_reads_global_extension_at_a_cauchy_presented_pole
+0.00s teardown tests/objects/test_a_derivation_of_the_circle_is_the_section_it_differentiates_along.sage::test_derivation_reads_global_extension_at_a_cauchy_presented_pole
+0.00s setup    tests/objects/test_a_derivation_of_the_circle_is_the_section_it_differentiates_along.sage::test_derivation_reads_global_extension_at_a_cauchy_presented_pole
+=========================== short test summary info ============================
+FAILED tests/objects/test_a_derivation_of_the_circle_is_the_section_it_differentiates_along.sage::test_derivation_reads_global_extension_at_a_cauchy_presented_pole
+======================= 1 failed, 5 deselected in 11.00s =======================

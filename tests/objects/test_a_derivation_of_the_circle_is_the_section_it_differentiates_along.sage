@@ -122,3 +122,22 @@ def test_derivation_on_a_cut_chart_reads_global_extension_at_an_excluded_point()
     recovered = sections.from_derivation(derivation)
     point = circle.point((2,), "V")
     assert tuple(recovered.components_at(point, "V")) == (RR(10),)
+
+
+def test_derivation_reads_global_extension_at_a_cauchy_presented_pole():
+    r"""A Cauchy name of zero must not require deciding exact equality to zero."""
+    circle, north, south, sections, frame = _the_circle_and_its_frame()
+    algebra = circle.smooth_functions()
+    scalar = algebra.from_local_derivatives(
+        lambda chart, point, alpha: RR(0) if any(alpha) else RR(2))
+    field = sections.trivialized_by(frame).trivialization().forward(scalar)
+    zero = RR.of_cauchy(Sets().Mor(NN, QQ)(lambda n: QQ(1)/QQ(2)**int(n)))
+    pole = circle.point((zero,), "U_S")
+
+    def derivation(f):
+        value = f(pole)
+        assert value.parent() is RR
+        return field(f)
+
+    recovered = sections.from_derivation(derivation)
+    assert tuple(recovered.components_at(circle.point((2,), "U_N"))) == (RR(10),)
