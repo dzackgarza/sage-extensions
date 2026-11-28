@@ -13,7 +13,7 @@ matrices tells the two orders apart.
 
 import pytest
 
-from sage_extensions.all import *  # noqa: F401,F403
+from sage_extensions.all import *
 
 
 def test_a_matrix_divides_by_the_inverse_of_the_divisor_on_the_right() -> None:
@@ -88,3 +88,26 @@ def test_a_field_states_its_reciprocal_as_its_division_of_one() -> None:
     assert 1 / (root - 1) == root + 1
     assert RR(4).inverse_of_unit() == RR(1) / RR(4)
     assert CC(4).inverse_of_unit() == CC(1) / CC(4)
+
+
+def test_the_exact_complex_field_preserves_the_embedded_algebraic_arithmetic() -> None:
+    r"""For z=1+2i and w=3-i, zw=5+5i and z/w=(1+7i)/10.
+
+    Both operations, the additive inverse and exact equality are operations
+    of the owned complex field on its embedded algebraic numbers.
+    """
+    z, w = CC(1)+2*I, CC(3)-I
+    assert (-CC.zero()).parent() is CC
+    assert -CC.zero() == CC.zero()
+    assert (z*w).parent() is CC
+    assert z*w == CC(5)+5*I
+    assert z+w == CC(4)+I
+    assert z-w == CC(-2)+3*I
+    assert (z/w).parent() is CC
+    assert z/w == (CC(1)+7*I)/CC(10)
+    assert (z/w)*w == z
+    assert z.conjugate() == CC(1)-2*I
+    assert I*I == CC(-1)
+    assert z != w
+    with pytest.raises(ZeroDivisionError):
+        z / CC.zero()

@@ -8,15 +8,18 @@ the functions below and every backend value is crossed back before return.
 from __future__ import annotations
 
 from collections.abc import Iterable
+from dataclasses import replace
+import operator
 from typing import cast
 
 from sage.structure.element import parent as element_parent
-from sageparse import Context, Node, splice
+from sageparse import Context, Node, lower_node, pad_to_source_lines, splice
 from sageparse.extensions.research import EXTENSION as _RESEARCH_EXTENSION
 from sageparse.preparser import register_extension
 
 from sage_extensions.categories.rings.ring_foundation import (
     OwnedRings,
+    _engine_element,
     _owned_engine_element,
     _owned_integers,
     _OwnedIntegerElement,
@@ -35,7 +38,7 @@ from sage_extensions.rings.real import (
 
 def Integer(value: int | str | _OwnedIntegerElement = 0) -> _OwnedIntegerElement:
 
-    # The ZZ parent selects _OwnedIntegerElement as its Element class.
+
     return cast(_OwnedIntegerElement, _owned_integers()(value))
 
 
@@ -57,8 +60,8 @@ def ComplexNumber(real, imag=None):
     backend = (
         create_ComplexNumber(real) if imag is None else create_ComplexNumber(real, imag)
     )
-    # create_ComplexNumber selects the native complex field precision; raise
-    # that datum through the owned field constructor, not generic engine ingress.
+
+
     from sage_extensions.categories.rings.ring_foundation import (
         _owned_complex_field_of_precision,
     )
@@ -118,7 +121,111 @@ def ellipsis_iter(*args):
     return iter(ellipsis_range(*args))
 
 
+def _formula_scalar(value):
+    r"""Private exact scalar representation used inside an explicit symbolic formula."""
+    from sage.symbolic.expression import Expression
+    from sage.symbolic.ring import SR
+
+    from sage_extensions.categories.sets.set_categories import _FormulaMap
+
+    if isinstance(value, _FormulaMap):
+        return value._formula_data()[0]
+    if isinstance(value, Expression):
+        return value
+    parent = element_parent(value)
+    if parent in OwnedRings():
+        return SR(_engine_element(parent, value))
+    return SR(value)
+
+
+_FORMULA_OPERATIONS = {
+    "+": operator.add, "-": operator.sub, "*": operator.mul,
+    "/": operator.truediv, "//": operator.floordiv,
+    "%": operator.mod, "^": operator.pow, "**": operator.pow,
+}
+
+
+def _formula_binary(operation, left, right):
+    r"""Compute a formula node without installing a mixed-parent coercion."""
+    from sage.symbolic.expression import Expression
+
+    from sage_extensions.categories.sets.set_categories import _FormulaMap
+
+    if isinstance(left, (Expression, _FormulaMap)) or isinstance(right, (Expression, _FormulaMap)):
+        left, right = _formula_scalar(left), _formula_scalar(right)
+    return _FORMULA_OPERATIONS[operation](left, right)
+
+
+def _formula_factorial(value):
+    from sage.symbolic.expression import Expression
+    if isinstance(value, Expression):
+        from sage.functions.other import factorial as symbolic_factorial
+
+        return symbolic_factorial(value)
+    return factorial(value)
+
+
+def FormulaFunction(variables, builder):
+    r"""Construct the retained callable datum of an explicit formula declaration.
+
+    The lowering binds the formula-building operations as local parameters
+    of the builder. They are not session arithmetic operations.
+    """
+    from sage_extensions.categories.sets.set_categories import _FormulaMap
+
+    return _FormulaMap(_formula_scalar(builder(_formula_binary, _formula_factorial)), variables)
+
+
+def _lower_formula_binary(node: Node, context: Context) -> str | None:
+    op = node.child_by_field_name("operator")
+    if op is None or context.text(op) not in _FORMULA_OPERATIONS:
+        return None
+    left, right = node.child_by_field_name("left"), node.child_by_field_name("right")
+    assert left is not None and right is not None
+    return f"_formula_binary({context.text(op)!r}, {lower_node(left, context)}, {lower_node(right, context)})"
+
+
+def _lower_formula_product(node: Node, context: Context) -> str | None:
+    if context.products == "explicit":
+        return context.text(node)
+    left, right = node.child_by_field_name("left"), node.child_by_field_name("right")
+    assert left is not None and right is not None
+    return f"_formula_binary('*', {lower_node(left, context)}, {lower_node(right, context)})"
+
+
+def _lower_formula_factorial(node: Node, context: Context) -> str:
+    argument = node.child_by_field_name("argument")
+    assert argument is not None
+    return f"_formula_factorial({lower_node(argument, context)})"
+
+
+def _lower_formula_call(node: Node, context: Context) -> str | None:
+    function = node.child_by_field_name("function")
+    if function is not None and context.text(function) == "factorial":
+        arguments = node.child_by_field_name("arguments")
+        assert arguments is not None
+        return f"_formula_factorial{lower_node(arguments, context)}"
+    return None
+
+
+def _lower_session_formula(node: Node, context: Context) -> str:
+    r"""Retain the core explicit formula syntax, with its own scalar boundary."""
+    name, body = node.child_by_field_name("name"), node.child_by_field_name("body")
+    assert name is not None and body is not None
+    parameters = ",".join(context.text(p) for p in node.children_by_field_name("parameter"))
+    local = replace(context, rules=context.rules | {
+        "binary_operator": _lower_formula_binary,
+        "sage_implicit_product": _lower_formula_product,
+        "sage_factorial": _lower_formula_factorial,
+        "call": _lower_formula_call,
+    })
+    lowered = lower_node(body, local)
+    rebuilt = f'__tmp__=var("{parameters}"); {context.text(name)} = FormulaFunction(({parameters},), lambda _formula_binary, _formula_factorial: {lowered})'
+    return pad_to_source_lines(rebuilt, node, context)
+
+
 _RUNTIME = {
+    "FormulaFunction": FormulaFunction,
     "Integer": Integer,
     "RealNumber": RealNumber,
     "ComplexNumber": ComplexNumber,
@@ -132,12 +239,12 @@ _RUNTIME = {
 _IMPORTS = {
     name: f"from sage_extensions.language_runtime import {name}" for name in _RUNTIME
 }
-# The modules whose star import is the complete session, and the names such an
-# import binds.  A file that writes ``from <module> import *`` binds names the
-# parse cannot see, so the lowering below separates the two readings of
-# ``R = A[x]`` by whether ``x`` is one of them.  The module that publishes the
-# names declares them in its own body and registers that declaration here; this
-# module reads no namespace and imports no sibling to recover one.
+
+
+
+
+
+
 _SESSION_MODULES: set[str] = {"sage_extensions.all"}
 _SESSION_NAMES: frozenset[str] = frozenset()
 _RESEARCH_ASSIGNMENT = _RESEARCH_EXTENSION["assignment"]
@@ -193,19 +300,22 @@ def _lower_session_assignment(node: Node, context: Context) -> str | None:
     ``R.<x> = A[x]`` is a ``sage_generator_assignment``, not an assignment, so
     this rule does not reach it.
     """
-    if _has_session_star_import(node, context) and _assignment_uses_session_name(
+    if _assignment_uses_session_name(node, context) and _has_session_star_import(
         node, context
     ):
         return splice(node, context)
     return _RESEARCH_ASSIGNMENT(node, context)
 
 
-_EXTENSION = {"assignment": _lower_session_assignment}
+_EXTENSION = {
+    "assignment": _lower_session_assignment,
+    "sage_symbolic_function_assignment": _lower_session_formula,
+}
 
-# Importing this module installs it, as importing ``sageparse.preparser.research``
-# installs the dialect it extends: the rules, the names they emit and the imports
-# that bind them are the module's declarations, so registering them is what the
-# module does, not a step a caller performs on it.
+
+
+
+
 register_extension(_EXTENSION, runtime=_RUNTIME, imports=_IMPORTS)
 
 

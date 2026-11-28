@@ -122,9 +122,9 @@ def _finite_set_quotient_by_generated_relation(target, relation_pairs):
         f"the finite quotient algorithm requires a selected enumeration of {target}; "
         "finiteness alone gives no ranking of quotient relation vertices"
     )
-    # The target already retains its chosen bijection to its finite ordinal.
-    # Reconstructing a second finite ordered set would replace that datum
-    # and could compare symbolic target points to recover their positions.
+
+
+
     target_ranking = target.ranking_map()
     target_points = tuple(target)
 
@@ -177,7 +177,7 @@ class _GeneratedEquivalenceClass(Element):
         return result if op == op_EQ else negation(result)
 
     def __hash__(self):
-        # Distinct representatives may name the same class.
+
         return hash(id(self.parent()))
 
     def _repr_(self):
@@ -214,14 +214,14 @@ class _GeneratedRelationQuotient:
         if left is right or (left == right) is True:
             return True
         if self.left_morphism() is self.right_morphism():
-            # The identical pair generates only the diagonal relation.
+
             return left == right
         source = self.left_morphism().domain()
         if Sets().is_provably_finite(source) and source in EnumeratedSets():
-            # The finite list of relation edges generates its connected
-            # components, even when the ambient target is infinite. Traverse
-            # only certified endpoint equalities: an undecidable comparison
-            # cannot be used either to join or to separate components.
+
+
+
+
             edges = tuple(
                 (self.left_morphism()(point), self.right_morphism()(point))
                 for point in source
@@ -239,15 +239,15 @@ class _GeneratedRelationQuotient:
                                 added = True
                 if not added:
                     break
-            # All certified finite paths have been explored. Distinct
-            # representatives may still compare undecidably, so a failed
-            # search alone never certifies inequivalence.
+
+
+
             if any((right == seen) is True for seen in reached):
                 return True
-            # Finite support and decidable equality on its vertices also
-            # certify nonmembership in the generated equivalence class.
-            # Never conclude False when an unknown endpoint comparison
-            # could connect another component to the explored one.
+
+
+
+
             vertices = (left, right) + tuple(value for edge in edges for value in edge)
             decisions = tuple(a == b for a in vertices for b in vertices)
             if all(decision is True or decision is False for decision in decisions):
@@ -462,8 +462,8 @@ class AugmentedSimplexCategory(OwnedCategory):
         return finite_ordinal_set(3)
 
     def super_categories(self):
-        # [n] is a finite totally ordered set, enumerated by itself: it is the
-        # base case of the enumeration datum.  The ordinal n is its order type.
+
+
         from sage_extensions.categories.sets.finite_ordered_sets import (
             FiniteOrderedSets,
         )
@@ -484,8 +484,8 @@ class AugmentedSimplexCategory(OwnedCategory):
             assert self._size >= 0 and size == self._size, (
                 f"the finite ordinal [n] = {{0, ..., n-1}} needs n a nonnegative integer, but n = {size!r}"
             )
-            # [n] is its own index set, and its enumeration is the identity: the
-            # point at position k is k.
+
+
             super().__init__(
                 index_set=self,
                 element_at=_ORDINAL_POINT_AT_POSITION,
@@ -795,18 +795,18 @@ class OwnedSetMorphism:
         """
         function = self._owned_function
         if self._composition_factors is not None:
-            # Composition retains the actual factors. The right factor owns
-            # source ingress and the left factor owns its admitted range;
-            # asking the target to admit that image again can discard a
-            # subgroup word or a subset-inclusion premise (OWN-09, OWN-14).
+
+
+
+
             return function(element, *args, **kwargs)
         if (
             isinstance(function, (Morphism, CategoricalArrow))
             and function.domain() is self.domain()
             and function.codomain() is self.codomain()
         ):
-            # The retained arrow owns both ingress and its admitted range.
-            # Re-admitting its value can discard a subset-inclusion premise.
+
+
             return function(element, *args, **kwargs)
         source = self.domain()
         point = None
@@ -814,7 +814,12 @@ class OwnedSetMorphism:
             point = source._normalize_admitted_element(element)
         if point is None:
             point = source(element)
-        image = function(point, *args, **kwargs)
+        if isinstance(function, _FormulaMap):
+            image = function._evaluate_formula(point, *args, **kwargs)
+        elif isinstance(function, Expression):
+            image = _evaluate_symbolic_formula(function, point, *args, **kwargs)
+        else:
+            image = function(point, *args, **kwargs)
         target = self.codomain()
         if isinstance(target, OwnedParent) and target.category().is_subcategory(Sets()):
             admitted = target._normalize_admitted_element(image)
@@ -884,11 +889,11 @@ class OwnedSetMorphism:
         return equal if op == op_EQ else negation(equal)
 
     def __hash__(self) -> int:
-        # Equality is extensional, within one Mor or across a stronger Mor
-        # with the same endpoints, so this hash reads the arrow on the domain,
-        # not on its presentation.  ``arrow_hash`` supplies the values on one
-        # canonical finite probe of the domain when there is one, and falls back
-        # to the endpoints when there is not.
+
+
+
+
+
         return arrow_hash(self)
 
     def is_identity(self) -> bool | Predicate:
@@ -943,9 +948,9 @@ class OwnedSetMorphism:
         domain = self.domain()
         match domain:
             case _ if Sets().is_provably_finite(domain) and domain in EnumeratedSets():
-                # Finite domain enumeration does not decide equality of
-                # symbolic image values. Only an exact image-cardinality
-                # computation can certify injectivity or its failure.
+
+
+
                 image_size = self.image()._cardinality_decision()
                 domain_size = domain._cardinality_decision()
                 if image_size is not None and domain_size is not None:
@@ -1068,8 +1073,8 @@ class OwnedSetMorphism:
                 for end in (domain, codomain)
             ):
                 image = self.image()
-                # Surjectivity is the conjunction of image-membership
-                # propositions, not Python truthiness of those propositions.
+
+
                 return conjunction(image.is_parent_of(point) for point in codomain)
             case _:
                 return AtomicProposition("is_surjective", self)
@@ -1230,9 +1235,9 @@ class OwnedSetMorphism:
             f"{self} has no inverse: it is not known to be a bijection {domain} -> {codomain} "
             "(injectivity and surjectivity are decided only between finite enumerated sets)"
         )
-        # The codomain's selected ranking is an exact equality decision for
-        # its elements. Construct the inverse table once, indexed by ordinal
-        # coordinates, instead of searching the source on each application.
+
+
+
         ranking = codomain.ranking_map()
         inverse_values = [None] * int(codomain.cardinality().finite_value())
         occupied = [False] * len(inverse_values)
@@ -1274,11 +1279,11 @@ class OwnedSetMorphism:
         if other.domain() is other.codomain() and other is other.parent().identity():
             return self
         if other is self._recorded_section():
-            # The section recorded on this arrow is its right inverse, so the
-            # composite is the identity arrow of ``Mor_Set(Y, Y)`` by the datum
-            # the section was selected with, not by evaluating every point
-            # (``OWN-22``); where the codomain is finite enumerated, selecting it
-            # decided that equation point by point.
+
+
+
+
+
             return Sets().Mor(other.domain(), other.domain()).identity()
         return self._composition(other)
 
@@ -1340,8 +1345,8 @@ class SetMorCategory(CategoricalMor):
         domain: Parent,
         codomain: Parent,
     ) -> None:
-        # Placement reads the endpoints' placements; constructing a Mor runs
-        # no finiteness or cardinality decision (OWN-22).
+
+
         placement = (
             FinitelySupportedFunctionSets()
             if domain in FiniteSets()
@@ -1438,6 +1443,47 @@ class SetMorCategory(CategoricalMor):
         return f"Mor_Set({self.domain()}, {self.codomain()})"
 
 
+def _evaluate_symbolic_formula(formula, *points, **named):
+    r"""Evaluate the private formula on scalar realizations, not on owned elements."""
+    from sage_extensions.categories.rings.ring_foundation import OwnedRings, _engine_element
+    from sage_extensions.rings.real import RR, ExactRealNumber
+
+    if points and not named and all(isinstance(value, ExactRealNumber) for value in points):
+        if any(value._symbolic_expression() is None for value in points):
+            return RR._evaluate_formula(SR(formula), formula.arguments(), points)
+
+    def argument(value):
+        parent = element_parent(value)
+        return _engine_element(parent, value) if parent in OwnedRings() else value
+
+    return formula(*(argument(p) for p in points), **{k: argument(p) for k,p in named.items()})
+
+
+class _FormulaMap:
+    r"""A callable formula datum, with the symbolic realization retained privately."""
+
+    def __init__(self, body, variables):
+        self._body = SR(body)
+        self._variables = tuple(variables)
+
+    def _formula_data(self):
+        return self._body, self._variables
+
+    def _evaluate_formula(self, *points, **named):
+        return _evaluate_symbolic_formula(self._body.function(*self._variables), *points, **named)
+
+    def __call__(self, *points, **named):
+        from sage_extensions.rings.real import RR
+        from sage_extensions.rings.complex import CC
+
+        result = self._evaluate_formula(*points, **named)
+        if element_parent(result) is RR or element_parent(result) is CC:
+            return result
+        if result.variables():
+            return _FormulaMap(result, result.variables())
+        return RR(result) if result.is_real() is True else CC(result)
+
+
 def _formula_binding_its_variable(formula, domain, codomain):
     r"""The callable symbolic expression ``x |-> formula`` binding the one free variable ``x`` of ``formula``.
 
@@ -1452,7 +1498,7 @@ def _formula_binding_its_variable(formula, domain, codomain):
         f"cannot read {formula} as a map {domain} -> {codomain}: a formula is a map of one argument "
         f"when it has exactly one free variable, which it binds, but its free variables are {variables}"
     )
-    return formula.function(variables[0])
+    return _FormulaMap(formula, variables)
 
 
 class SetMorCategoryConstruction(MorCategoryConstruction):
@@ -1746,10 +1792,10 @@ class Sets(CategoryPacketMethods, OwnedCategory):
                     if finite
                     else cone.transformation()
                 )
-                # This is a limit in Sets. Its apex need not carry the
-                # additive structure that the product's factors happen to
-                # possess, so the additive-monoid/group specialization of
-                # from_maps is not the universal set-map constructor.
+
+
+
+
                 return CartesianProductsOfSets.ParentMethods.from_maps(
                     product,
                     cone.apex(),
@@ -2082,26 +2128,26 @@ class Sets(CategoryPacketMethods, OwnedCategory):
                 Sets().is_provably_finite(source)
                 and source.cardinality() == cardinal(0)
             ):
-                # An empty relation generates equality, even when the
-                # target is infinite and has no selected enumeration. The
-                # same holds for an identical parallel pair f = g.
+
+
+
                 quotient = target
                 projection = Sets().Mor(target, target).identity()
                 representative_point = target
             elif selected_quotient is not NotImplemented:
                 quotient, projection, representative_point = selected_quotient
             elif target in EnumeratedSets() and target.cardinality() == cardinal(1):
-                # Every equivalence relation on a singleton is equality,
-                # even if the relation source is infinite and unenumerated.
-                # Retain the literal target as quotient without asking to
-                # enumerate or decide that relation. This also handles BG
-                # for an arbitrary group G and its single categorical object.
+
+
+
+
+
                 quotient = target
                 projection = Sets().Mor(target, target).identity()
                 representative_point = target
             elif enumerated_finite_relation:
-                # DisjointSet computes the closure over a selected finite
-                # enumeration; this is a computation of the same quotient.
+
+
                 quotient, projection, representative_point = (
                     _finite_set_quotient_by_generated_relation(
                         target,
@@ -2112,9 +2158,9 @@ class Sets(CategoryPacketMethods, OwnedCategory):
                     )
                 )
             else:
-                # The arbitrary relation is still a represented quotient;
-                # no enumeration or equality decision is inferred from the
-                # cardinalities of either endpoint.
+
+
+
                 quotient, projection, representative_point = (
                     _represented_set_coequalizer(left_morphism, right_morphism)
                 )
@@ -2221,10 +2267,10 @@ class Sets(CategoryPacketMethods, OwnedCategory):
                     )
                 )
             else:
-                # A finite family of relations with an infinite source is
-                # one parallel pair on the coproduct of the source indexed
-                # by that family. Reuse the same represented coequalizer
-                # owner rather than introducing a second quotient theory.
+
+
+
+
                 sources = indexed_family(
                     morphisms.index_set(),
                     lambda _index: source,
@@ -2277,8 +2323,8 @@ class Sets(CategoryPacketMethods, OwnedCategory):
             r"""A Mor object of any owned category is a set."""
             return Mors()
 
-        # Functors out of ``Set``, each spelled as a method of this, their
-        # domain category, and named by the construction it performs.
+
+
 
         def free_module(self, base_ring: Parent) -> Functor:
             r"""``F_R : Set -> Mod_R``, the free ``R``-module functor.
@@ -2400,6 +2446,11 @@ class Sets(CategoryPacketMethods, OwnedCategory):
 
     def TotallyOrdered(self) -> Category:
         return TotallyOrderedSets()
+
+    def indexed_family(self, index_set, values):
+        """A family indexed by an owned set, retaining its actual indices."""
+        assert index_set in self
+        return indexed_family(index_set, values)
 
     class ParentMethods:
         @RealizationHook
@@ -2573,10 +2624,10 @@ class Sets(CategoryPacketMethods, OwnedCategory):
                                         else _cardinalities().sum(*values)
                                     )
                         else:
-                            # This existing cardinal constructor retains the
-                            # infinite family without evaluating its terms.
-                            # Its index-size read is already supplied above;
-                            # factor cardinalities are exact-valued lazy data.
+
+
+
+
                             result = (
                                 _cardinalities().indexed_product(
                                     indices,
@@ -2718,9 +2769,9 @@ class Sets(CategoryPacketMethods, OwnedCategory):
                 case False:
                     return _multisets_of_size(self, size)
 
-        # Recorded by the construction that builds the object (``_object_of``
-        # through the root ``OwnedParent``, or the ring route); ``None`` for an
-        # object no category's constructor built.
+
+
+
         _constructing_category = None
 
         def ambient_category(self) -> Category:
@@ -2876,7 +2927,7 @@ class Sets(CategoryPacketMethods, OwnedCategory):
                 r"""Return the finite cardinality as a Python length."""
                 return int(self.cardinality())
 
-        # Functors into finite G-sets, sited on their domain.
+
 
         def trivial_action(self, group: Parent) -> Functor:
             r"""``Triv_G : FinSet -> FinGSet_G``, every point fixed."""
@@ -3034,16 +3085,16 @@ class _FiniteLiteralSet(Sets().ObjectType):
             raise TypeError(f"union requires a set, not {other!r}")
         if isinstance(other, _FiniteLiteralSet):
             return _FiniteLiteralSet(self._points.union(other._points))
-        # The chosen ambient of a predicate subset supplies its inclusion,
-        # independently of whether the predicate can be decided or listed.
-        # Hence A union B = A whenever B is constructed as a subset of A.
+
+
+
         if isinstance(other, _ConditionSetEngine) and other.universe() is self:
             return self
         if Sets().is_provably_finite(other) and other in EnumeratedSets():
             return _FiniteLiteralSet((*self, *other))
-        # The image of the fold A ⊔ B -> A ∪ B defines the union for any
-        # set B, including infinite and non-enumerated sets. Its finiteness
-        # is inherited only when both factors are finite.
+
+
+
         sum_set = self.coproduct_with(other)
         return Sets().image_set(lambda summand: summand.summand_element(), sum_set)
 
@@ -3053,9 +3104,9 @@ class _FiniteLiteralSet(Sets().ObjectType):
             raise TypeError(f"intersection requires a set, not {other!r}")
         if isinstance(other, _FiniteLiteralSet):
             return _FiniteLiteralSet(self._points.intersection(other._points))
-        # Finiteness of the ambient does not supply a chosen enumeration.
-        # The subset constructor retains the inclusion and predicate without
-        # searching through the ambient points to decide membership.
+
+
+
         return Sets().condition_set(self, lambda member: other.is_parent_of(member))
 
     def difference(self, other):
@@ -3237,9 +3288,9 @@ class SetInjection(OwnedSetMorphism):
                     f"the inverse of {self} on its image exists, but it is read off the values of the map "
                     f"here only when {domain} is finite and enumerated"
                 )
-                # Read image values from their existing computation owner;
-                # do not evaluate the defining arrow again merely to build
-                # its inverse. Source order is exactly its chosen enumeration.
+
+
+
                 image_values = (
                     image._finite_image_values()
                     if isinstance(image, _ImageSetEngine)
@@ -3267,9 +3318,9 @@ class SetInjection(OwnedSetMorphism):
                                     "injectivity of the selected image values is undecided"
                                 )
 
-                    # A finite unhashable image has no dictionary backend.
-                    # Retain its represented pairs without assuming that
-                    # undecidable point equality is Boolean.
+
+
+
                     def preimage(value):
                         for key, point in pairs:
                             same = True if key is value else key == value
@@ -3282,10 +3333,10 @@ class SetInjection(OwnedSetMorphism):
                         try:
                             return lookup[value]
                         except (TypeError, ValueError):
-                            # A query may have undecidable hash equality even
-                            # when the image values established an injective
-                            # hash table. A witnessed pair still has an
-                            # inverse; an unresolved comparison is not one.
+
+
+
+
                             for key, point in pairs:
                                 if key is value or (key == value) is True:
                                     return point
@@ -3300,8 +3351,8 @@ class SetInjection(OwnedSetMorphism):
         image = self.image()
 
         def characteristic(point):
-            # A total map to 2 requires a decision for every input. An
-            # unresolved image-membership proposition is not false.
+
+
             admitted = image.is_parent_of(point)
             if admitted is True:
                 return truth_values(1)
@@ -3704,8 +3755,8 @@ class PowerSets(OwnedCategory):
                         f"{member!r} is not proved to be an element of {base}, so its inclusion is not certified"
                     )
                 normalized.append(base(member))
-            # ``finite_ordered_set`` identifies equal points; identifying them
-            # here as well compared every pair twice.
+
+
             points = finite_ordered_set(tuple(normalized))
             subset = _object_of(
                 FiniteOrderedSets(),
@@ -3743,13 +3794,13 @@ class PowerSets(OwnedCategory):
                 )
                 if candidate in EnumeratedSets():
                     return self._from_finite_members(candidate)
-                # A finite set whose points are presented without an owned
-                # ranking is still read through them: a Sage enumerated set is
-                # finite and iterable but carries no ranking map onto the
-                # standard well-order, so requiring ``EnumeratedSets()`` here
-                # rejected the very points the ``Iterable`` branch below
-                # accepts from a tuple.  Only an unenumerable finite set is
-                # refused, and the refusal says so.
+
+
+
+
+
+
+
                 try:
                     members = tuple(candidate)
                 except TypeError:
@@ -3796,7 +3847,7 @@ class PowerSets(OwnedCategory):
                 case _:
                     return False
 
-        # Preserve undecidable subset containment through the owned API.
+
         is_parent_of = __contains__
 
         @cached_method
@@ -3854,8 +3905,8 @@ class PowerSets(OwnedCategory):
             target = morphism.codomain().power_set()
 
             def direct_image(subset):
-                # The represented subobject is a Set with a chosen inclusion;
-                # direct image belongs to Sets, not to the inclusion's host.
+
+
                 image = subset.image_set(morphism)
                 return Sets().Subobjects(morphism.codomain())(
                     Sets().Mono(image, morphism.codomain())._from_subset_inclusion()
@@ -3899,9 +3950,9 @@ def _finite_subset_ranking_map(subset_set, source) -> CategoricalIsomorphism:
         subset = subset_set(subset)
         members = subset.domain()
         if members in EnumeratedSets() and Sets().is_provably_finite(members):
-            # The selected finite member enumeration already witnesses the
-            # support. Read its positions directly rather than searching the
-            # ambient enumeration, including for sparse finite sources.
+
+
+
             position = 0
             for member in members:
                 position |= 1 << int(source.ranking_map()(member))
@@ -4081,17 +4132,17 @@ class _EnumeratedFixedCardinalitySubsetSetEngine:
             subset = self(subset)
             needed = self.subset_cardinality()
             if needed == 0:
-                # The unique zero-element subset has combinadic rank zero;
-                # neither the size of its ambient set nor an enumeration of
-                # the empty subset is needed to select this rank.
+
+
+
                 return selections.ranking_map()(
                     selections.from_source_rank_positions(())
                 )
             members = subset.domain()
             if members in EnumeratedSets() and Sets().is_provably_finite(members):
-                # The actual finite member enumeration determines the rank
-                # positions. Scanning the ambient enumeration does not
-                # terminate for sparse subsets of an infinite source.
+
+
+
                 positions = sorted(
                     int(self.source().ranking_map()(member)) for member in members
                 )
@@ -4654,8 +4705,8 @@ class _ConditionSetEngine:
                     self._retain_admitted_member(point)
                 return member
             case _:
-                # P is defined on X; uncertain ingress into X does not
-                # authorize applying P to an arbitrary foreign value.
+
+
                 return AtomicProposition("is_parent_of", self, element)
 
     is_parent_of = __contains__
@@ -4671,11 +4722,11 @@ class _ConditionSetEngine:
 
     def __iter__(self):
         universe = self.universe()
-        # Use an actual supplied iterator. A complete search iterator need
-        # not supply the ranking isomorphism required by EnumeratedSets
-        # (nor decide whether the next point exists). Conversely a finite
-        # cardinality alone supplies no iterator: iter(universe) still
-        # refuses when its construction has none.
+
+
+
+
+
         return self._points_satisfying(iter(universe))
 
     def _points_satisfying(self, points):
@@ -4814,11 +4865,11 @@ class _ImageSetEngine:
         equality. Enumeration requires the complete decided tuple. An
         unavailable tuple is not cached as permanent mathematical data.
         """
-        # A finite image is a set of values, not a list of pairwise
-        # comparisons. For hashable points the set engine decides duplicate
-        # values while insertion order retains the selected enumeration.
-        # Only a genuinely unhashable representation requires the general
-        # equality procedure below, which can return an undecided result.
+
+
+
+
+
         values = self._finite_image_values()
         if values is None:
             return None
@@ -4898,9 +4949,9 @@ class _ImageSetEngine:
         source = self.source_set()
         match source:
             case _ if self._image_inverse is not None:
-                # The defining inverse is a membership witness independently
-                # of the source's cardinality. In particular, a finite image
-                # with an inverse must not reconstruct its entire value set.
+
+
+
                 preimage = self._image_inverse(element)
                 from sage_extensions.logic import conjunction
 
@@ -4910,9 +4961,9 @@ class _ImageSetEngine:
                 if admitted is False:
                     return False
                 if admitted is not True:
-                    # The inverse is meaningful only on the image. Until
-                    # its purported preimage is admitted, evaluating the
-                    # forward map would apply it outside its domain.
+
+
+
                     from sage_extensions.logic import AtomicProposition
 
                     return conjunction(
@@ -4929,10 +4980,10 @@ class _ImageSetEngine:
                         return element in hashed
                     except (TypeError, ValueError):
                         pass
-                # Membership is the finite existential proposition
-                # exists a in A, f(a) = element. It does not require
-                # deciding equality *between* image values, which is needed
-                # only to enumerate the image without repetitions.
+
+
+
+
                 from sage_extensions.logic import conjunction, negation
 
                 return negation(
@@ -4942,17 +4993,17 @@ class _ImageSetEngine:
                     )
                 )
             case _:
-                # Without an inverse or a finite enumeration, existence of a
-                # preimage is still a well-defined proposition. The inability
-                # to decide it does not make the image or its membership
-                # relation undefined.
+
+
+
+
                 from sage_extensions.logic import AtomicProposition
 
                 return AtomicProposition("is_member", element, self)
 
-    # Python's `element in parent` forces a Boolean. Preserve an undecided
-    # existential image-membership proposition at the owned set interface,
-    # as condition sets already do.
+
+
+
     is_parent_of = __contains__
 
     def _element_constructor_(self, element):
@@ -5035,9 +5086,9 @@ def _cartesian_product_of(family: IndexedFamily) -> Sets().ObjectType:
     if diagram is not None and diagram.codomain().is_subcategory(commutative_groups):
         placements.append(commutative_groups)
     if Sets().is_provably_finite(index_set) and index_set in EnumeratedSets():
-        # Select the finite factor family once. Both categorical placement
-        # and its enumeration must read the same retained values; independent
-        # calls can otherwise repeat an expensive value-selection engine.
+
+
+
         factors = tuple(family(index) for index in index_set)
         if all(factor in AdditiveMonoids() for factor in factors):
             placements.append(CartesianProductsOfAdditiveMonoids())
@@ -5111,8 +5162,8 @@ class CartesianProductsOfSets(OwnedCategory):
             Element.__init__(self, parent)
             self._components = components
             self._positional_components = positional_components
-            # A point of a product has fixed components; each is read into its
-            # factor once and kept, not re-validated on every hash or comparison.
+
+
             self._resolved_components = []
             self._resolved_component_hash_buckets = {}
             self._resolved_component_unhashable = []
@@ -5123,8 +5174,8 @@ class CartesianProductsOfSets(OwnedCategory):
             normalized = self.parent().index_set()(index)
             indices = self.parent().index_set()
             if self.parent().has_finite_index_set() and indices in EnumeratedSets():
-                # The selected ranking is a bijection, hence its integer
-                # coordinate decides index equality without pairwise tests.
+
+
                 position = int(indices.ranking_map()(normalized))
                 if position in self._resolved_component_positions:
                     return self._resolved_component_positions[position]
@@ -5155,9 +5206,9 @@ class CartesianProductsOfSets(OwnedCategory):
                         resolved,
                     )
                     return resolved
-                # An undecided comparison supplies neither an identification
-                # nor an inequality. Keep this presentation independent in
-                # the memoization cache until equality is decided.
+
+
+
             if self._positional_components is not None:
                 position = int(self.parent().index_set().ranking_map()(normalized))
                 resolved = self._positional_components[position]
@@ -5234,8 +5285,8 @@ class CartesianProductsOfSets(OwnedCategory):
             return negation(self == other)
 
         def __hash__(self) -> int:
-            # A product of sets imposes no hashability requirement on its
-            # component points. Equality only relates points of one parent.
+
+
             return hash(id(self.parent()))
 
     def _call_(self, family: IndexedFamily) -> Sets().ObjectType:
@@ -5288,7 +5339,7 @@ class CartesianProductsOfSets(OwnedCategory):
             factors = tuple(self.factor(index) for index in self.index_set())
             if not all(Sets().is_provably_finite(factor) for factor in factors):
                 raise TypeError("unranked product iteration requires finite factors")
-            # itertools.product uses the supplied complete finite iterators.
+
             return (self(values) for values in product(*factors))
 
         def factor(self, index: IndexT) -> Sets().ObjectType:
@@ -5320,12 +5371,12 @@ class CartesianProductsOfSets(OwnedCategory):
                     self.has_finite_index_set()
                     and self.index_set() in EnumeratedSets()
                 ):
-                    # A point of a product has fixed components, so the
-                    # callable is read once here and not kept: a section that
-                    # closes over a loop variable would otherwise resolve to
-                    # different components depending on when it was read, and
-                    # two points of one product that were built from the same
-                    # variable would compare equal.
+
+
+
+
+
+
                     indices = tuple(self.index_set())
                     ranking = self.index_set().ranking_map()
                     resolved = tuple(
@@ -5441,9 +5492,9 @@ class CartesianProductsOfSets(OwnedCategory):
                     "a set product without finite enumerated indices requires a selected "
                     "natural transformation of component morphisms"
                 )
-            # The chosen enumeration is a bijection, so it supplies the
-            # component selector without re-solving equality of index labels
-            # on every evaluation (labels can themselves be unhashable).
+
+
+
             from sage_extensions.categories.abstract_categories.functors import (
                 DiscreteCategory,
                 _ConstantDiagram,
@@ -5466,8 +5517,8 @@ class CartesianProductsOfSets(OwnedCategory):
                     and maps.target().domain() is index_category
                     and maps.target().codomain().is_subcategory(Sets())
                 ):
-                    # Every factor can be inspected at finite enumerated
-                    # indices; the diagram must agree at every actual object.
+
+
                     if all(
                         maps.target()(index_category.object(label))
                         is self.factor(label)
@@ -5570,9 +5621,9 @@ class CartesianProductsOfAdditiveGroups(OwnedCategory):
             underlying = CartesianProductsOfAdditiveMonoids.ParentMethods.from_maps(
                 self, source, maps
             )
-            # The same product remains a product in additive monoids. An
-            # additive-monoid source need not itself possess inverses, so its
-            # universal arrow must keep the weaker Mor parent.
+
+
+
             if source not in AdditiveGroups():
                 return underlying
             return AdditiveGroups().Mor(source, self)(lambda point: underlying(point))
@@ -5662,10 +5713,10 @@ class CartesianProductsOfAdditiveMonoids(OwnedCategory):
                 target_diagram = maps.target()
                 constant_factor = self.family().constant_value()
                 if diagram is None and constant_factor is not None:
-                    # The family indexed_family(I, A) is a mathematically
-                    # selected constant family even without a separately
-                    # stored functor. A selected constant target diagram at
-                    # that very A presents exactly its component endpoints.
+
+
+
+
                     if (
                         not isinstance(target_diagram, _ConstantDiagram)
                         or target_diagram.constant_value() is not constant_factor
@@ -5942,9 +5993,9 @@ class CoproductsOfSets(OwnedCategory):
             right_index = other.summand_index()
             indices = self.parent().index_set()
             if Sets().is_provably_finite(indices) and indices in EnumeratedSets():
-                # The chosen index enumeration is a bijection. Distinct
-                # ordinal positions certify distinct summands without asking
-                # for equality of symbolic or undecidable index points.
+
+
+
                 ranking = indices.ranking_map()
                 same_index = ranking(left_index) == ranking(right_index)
             else:
@@ -5955,9 +6006,9 @@ class CoproductsOfSets(OwnedCategory):
                 return False
             if same_index is True:
                 return self.summand_element() == other.summand_element()
-            # With undecided index equality, the two values may inhabit
-            # different summands. They cannot be compared independently as
-            # points of one factor; retain the actual coproduct equation.
+
+
+
             from sage_extensions.logic import AtomicProposition
 
             return AtomicProposition("equal", self, other)
@@ -5968,8 +6019,8 @@ class CoproductsOfSets(OwnedCategory):
             return negation(self == other)
 
         def __hash__(self) -> int:
-            # Neither summand indices nor summand points need a Python hash.
-            # Equality only compares elements within this coproduct parent.
+
+
             return hash(id(self.parent()))
 
     def _call_(self, family: IndexedFamily) -> Sets().ObjectType:
@@ -6130,8 +6181,8 @@ class CoproductsOfSets(OwnedCategory):
                     and maps.source().domain() is shape
                     and maps.source().codomain().is_subcategory(Sets())
                 ):
-                    # At finite enumerated indices, validate the complete
-                    # supplied diagram against the actual summand family.
+
+
                     if all(
                         maps.source()(shape.object(index)) is self.cofactor(index)
                         for index in index_set
@@ -6181,8 +6232,8 @@ class CoproductsOfSets(OwnedCategory):
                     equal = True if index is label else index == label
                     if equal is True:
                         return morphism(element.summand_element())
-                    # An earlier undecided comparison cannot invalidate a
-                    # subsequent witnessed match of the retained summand.
+
+
                 raise ValueError(
                     f"cannot select the cocone component for {label}: "
                     "the finite index set has no decided equality or selected ranking"
@@ -6313,8 +6364,8 @@ class EnumeratedCoproductsOfSets(OwnedCategory):
                     layer += 1
                 return
 
-            # Countably indexed coproduct: diagonalize N x N.  Missing positions in
-            # finite/empty summands are skipped; no index family is materialized.
+
+
             index_at = self.index_set().ranking_map().inverse()
             diagonal = 0
             remaining = self._known_finite_size()
@@ -6350,9 +6401,9 @@ class EnumeratedCoproductsOfSets(OwnedCategory):
                 if sizes is not None:
                     from bisect import bisect_right
 
-                    # The cumulative number of points up to layer k is
-                    # sum(min(k + 1, n_j)). Search those monotone cumulative
-                    # counts without enumerating earlier coproduct elements.
+
+
+
                     layer = bisect_right(
                         range(max(sizes, default=0)),
                         position,
@@ -6398,9 +6449,9 @@ class EnumeratedCoproductsOfSets(OwnedCategory):
                             for length in lengths
                         )
 
-                    # With an infinite summand these cumulative layer counts
-                    # are unbounded. Bound the desired layer by doubling,
-                    # rather than enumerating every earlier point.
+
+
+
                     upper = 1
                     while preceding(upper) <= position:
                         upper *= 2
@@ -6439,19 +6490,19 @@ class EnumeratedCoproductsOfSets(OwnedCategory):
                 )
                 sizes = self._finite_summand_sizes()
                 if sizes is not None:
-                    # Rank-layer order counts one point from every summand
-                    # whose size exceeds the layer. Sum those contributions
-                    # directly rather than replaying the entire enumeration.
+
+
+
                     summand_rank, layer = target
                     return sum(min(layer, size) for size in sizes) + sum(
                         size > layer for size in sizes[:summand_rank]
                     )
                 finite_indices = self._finite_index_count()
                 if finite_indices is not None:
-                    # The same rank-layer formula applies when some of the
-                    # finitely many summands are infinite. An infinite
-                    # summand contributes one point at every preceding layer;
-                    # do not replay those layers to rank a large element.
+
+
+
+
                     index_at = self.index_set().ranking_map().inverse()
                     lengths = tuple(
                         cardinal(self.cofactor(index_at(j)).cardinality())
@@ -6721,8 +6772,8 @@ def _cartesian_product_morphism[IndexT](
             raise TypeError(
                 f"component at {index} is not a set morphism between its selected factors"
             )
-    # The finite enumeration gives the unique coordinate of each label.
-    # Do not search component labels with potentially symbolic equality.
+
+
     ranking = index_set.ranking_map()
     arrows = tuple(arrow for _, arrow in components)
     return Sets().Mor(source, target)(
@@ -6755,8 +6806,8 @@ def _coproduct_of_indexed_family(family: IndexedFamily) -> Sets().ObjectType:
         _cardinalities().set_indexed_category(family, operation="sum"),
     ]
     if Sets().is_provably_finite(index_set) and index_set in EnumeratedSets():
-        # Select the summand family once, retaining exactly the values used
-        # by the coproduct's dependent family and cardinality supplier.
+
+
         summands = tuple(family(index) for index in index_set)
         if all(summand in EnumeratedSets() for summand in summands):
             placements.append(EnumeratedCoproductsOfSets())
@@ -6776,9 +6827,9 @@ def _coproduct_of_indexed_family(family: IndexedFamily) -> Sets().ObjectType:
             )
         )
     ):
-        # The diagonal enumeration uses the index ranking and each factor's
-        # ranking. A constant value or an established category-valued diagram
-        # certifies the entire infinite family without sampling callbacks.
+
+
+
         placements.append(EnumeratedCoproductsOfSets())
     return _object_of(owned_category_join(placements), family=family)
 
@@ -6899,8 +6950,8 @@ class NaturalNumberSets(OwnedCategory):
     def super_categories(self):
         from sage_extensions.categories.rings.semirings import OwnedSemirings
 
-        # The identity ranking is the chosen enumeration.  Declared by the
-        # category rather than joined for the one object.
+
+
         return [
             EnumeratedSets(),
             Sets().Infinite(),
@@ -6912,9 +6963,9 @@ class NaturalNumberSets(OwnedCategory):
 
         def __init__(self, parent: Parent, value: int) -> None:
             Element.__init__(self, parent)
-            # The datum is a Python integer; admission of foreign data is
-            # the parent's element constructor's, which is the one boundary
-            # that reads it.
+
+
+
             assert value >= 0, f"{value} is not a natural number: it is negative"
             self._value = value
 
@@ -6924,8 +6975,8 @@ class NaturalNumberSets(OwnedCategory):
         __index__ = __int__
 
         def __hash__(self):
-            # Equality is decided on the number, not on the parent that
-            # presented it, so the hash is the number's.
+
+
             return hash(self._value)
 
         def __eq__(self, other: object) -> bool:

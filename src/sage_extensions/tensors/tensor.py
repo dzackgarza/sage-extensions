@@ -75,9 +75,6 @@ from sage_extensions.static_types import ProductOfNaturalNumbers
 
 _Rings = OwnedRings()
 _SageRings = SageRings()
-# Every tensor type is a point of this one fixed codomain.  Construct it once
-# with the tensor vocabulary, rather than at the first tensor operation.
-_TENSOR_TYPES = NN**2
 
 
 @cached_function
@@ -482,7 +479,7 @@ class Tensor:
             return self is other
         ring = self.base_ring()
         if other.base_ring() is ring and _engine_ring(ring).is_exact() is True:
-            # Exact engine equality decides each component.
+
             return all(
                 _engine_element(ring, left) == _engine_element(ring, right)
                 for left, right in zip(self._flat_components(), other._flat_components(), strict=True)
@@ -694,7 +691,7 @@ class Tensor:
                     f"covariant tensor contraction takes, in a slot of rank {rank}, "
                     f"a vector of {slot_module}"
                 )
-        # The pairing G(x, y) = x^t G y is evaluated at the tensor owner.
+
         if len(vectors) == 2:
             left, right = vectors
             left_rank, right_rank = self._lower_index_ranks()
@@ -704,8 +701,8 @@ class Tensor:
                 )
             ring = self.base_ring()
             if ring is _owned_integers() or ring is _owned_rationals():
-                # Sage's exact matrix product and Vector.dot_product retain
-                # arbitrary-size coefficients in both tensor slots.
+
+
                 image = _engine_component_matrix(self) * _engine_component_vector(right)
                 value = _engine_component_vector(left).dot_product(image)
                 return _owned_engine_element(ring, value)
@@ -885,8 +882,8 @@ class Tensor:
 
         inverse = _engine_component_matrix(formed_module.gram_tensor()).inverse()
         ring = self.base_ring()
-        # The inverse is computed over the engine's fraction field; the index
-        # is raised over ``ring`` exactly when every entry lies in ``ring``.
+
+
         engine = _engine_ring(ring)
         if not all(entry in engine for entry in inverse.list()):
             raise ValueError(
@@ -1001,7 +998,7 @@ class Tensor:
         """
         valence = self.tensor_valence()
         first_rank, second_rank = self._index_ranks()
-        if valence in {_TENSOR_TYPES((0, 2)), _TENSOR_TYPES((2, 0))}:
+        if valence in {(NN**2)((0, 2)), (NN**2)((2, 0))}:
             if first_rank != second_rank:
                 raise ValueError(
                     f"cannot dualize this type-{valence} tensor with index ranks "
@@ -1014,7 +1011,7 @@ class Tensor:
                 tuple(_owned_engine_element(ring, entry) for entry in row)
                 for row in inverse.rows()
             ]
-            if valence == _TENSOR_TYPES((0, 2)):
+            if valence == (NN**2)((0, 2)):
                 return tensor(ring, (first_rank, second_rank), (), components)
             return tensor(ring, (), (first_rank, second_rank), components)
         raise TypeError(
@@ -1032,7 +1029,7 @@ class Tensor:
         is again type ``(0,2)``.
         """
         valence = self.tensor_valence()
-        match valence == _TENSOR_TYPES((0, 2)):
+        match valence == (NN**2)((0, 2)):
             case False:
                 raise TypeError(
                     f"cannot form the dual pairing of a type-{valence} tensor: "
@@ -1092,9 +1089,9 @@ class Tensor:
         ring = self.base_ring()
         source_ranks = tuple(matrix.parent().matrix_shape()[1] for matrix in matrices)
 
-        # The ubiquitous bilinear case is exactly A_1^t G A_2.  Use the
-        # selected exact matrix backend only inside this boundary and cross
-        # every entry back before constructing the owned tensor.
+
+
+
         from sage_extensions.rings.real import RR
 
         if q == 2 and ring is not RR:
@@ -1159,7 +1156,7 @@ def _covariant_bilinear_coordinate_rows(value, left_rank, right_rank):
         case True:
             pass
     valence = value.tensor_valence()
-    match valence == _TENSOR_TYPES((0, 2)):
+    match valence == (NN**2)((0, 2)):
         case False:
             raise TypeError(
                 f"a bilinear form is a covariant 2-tensor of type (0, 2), "
@@ -1222,8 +1219,8 @@ def _engine_component_matrix(value):
             f"cannot write a tensor with index ranks ({rows}, {columns}) as a matrix: "
             f"an index of infinite rank has no finite matrix"
         )
-    # A tensor is immutable, so its engine matrix is read once and retained
-    # on it; each caller receives its own mutable copy.
+
+
     retained = value.__dict__.get("_engine_component_matrix")
     if retained is None:
         rows, columns = int(rows), int(columns)
@@ -1232,8 +1229,8 @@ def _engine_component_matrix(value):
             _linear_algebra_ring(ring),
             rows,
             columns,
-            # The flat components are in tensor-index order, which for two
-            # indices is the row-major order of the matrix.
+
+
             [_linear_algebra_element(ring, entry) for entry in value._flat_components()],
         )
         retained.set_immutable()
@@ -1241,16 +1238,16 @@ def _engine_component_matrix(value):
     return copy(retained)
 
 
-# Protected engine-adapter contract (OWN-05, OWN-06, OWN-24): the
-# ``_engine_*`` row-action functions below are the one place where Sage's
-# row-action convention and coordinate matrices are handled.  Owner: this
-# tensor package.  Permitted callers: the group-realization adapters of the
-# automorphism groups that lower an element to a row action and raise one
-# back (``LatticeIsometryMor``, ``ModuleAutomorphismGroup`` and the module
-# engine adapter ``_flag_stabilizer_engine_data``).  Inputs are owned
-# morphisms or raw engine matrices produced by these functions; outputs are
-# raw engine matrices that the caller raises immediately.  Mathematical
-# code never receives them.
+
+
+
+
+
+
+
+
+
+
 
 
 def _engine_row_hermite_form(rows):
@@ -1483,7 +1480,7 @@ def _engine_general_linear_two_coset_permutations(generator_row_actions, index):
         f"the subgroup was stated to have index {index} in GL_2(ZZ), but Todd--Coxeter enumeration "
         f"found {libgap.Length(table[0])} cosets"
     )
-    # Row 2k of GAP's coset table is the right action of the k-th generator.
+
     return tuple(tuple(int(point) - 1 for point in table[2 * position]) for position in range(3))
 
 
@@ -1744,8 +1741,8 @@ def _engine_coisotropic_witt_rows(left_form, right_form, left, right):
     difference = complement * left_form * complement.transpose() - candidate * right_form * candidate.transpose()
     pairing = right_normal * right_form * candidate.transpose()
 
-    # SpecialEquationSolving: X is flattened by rows, and each equation
-    # (i,j) reads (X A + A^t X^t)[i,j].
+
+
     equation = _sage_matrix(SageQQ, dimension * dimension, dimension * dimension)
     for i in range(dimension):
         for j in range(dimension):
@@ -1766,11 +1763,11 @@ def _engine_coisotropic_witt_rows(left_form, right_form, left, right):
             )).list()
             for row in homogeneous.rows()
         ])
-        # A W B = D gives a unimodular coordinate change B taking the
-        # rational homogeneous space to its first rank(W) coordinate axes.
-        # Their inverse images form the complete saturated integral module;
-        # the remaining axes give an integral complement, as in the source's
-        # IntegralSpaceSaturation/SubspaceCompletionInt construction.
+
+
+
+
+
         integral_directions = (directions.denominator() * directions).change_ring(SageZZ)
         diagonal, _row_change, column_change = integral_directions.smith_form()
         dimension_homogeneous = diagonal.rank()
@@ -1856,10 +1853,9 @@ class _TensorVectorConstructor:
             raise TypeError(
                 f"tensor.vector(R, components) over {base_ring} was given no components"
             )
-        _refuse_element_components("tensor.vector", components)
-        # Literal component data: a natural number is the rank of the zero
-        # vector; a Python mapping gives the nonzero components by position;
-        # anything else is the sequence of components in order.
+
+
+
         match components:
             case _ if components in NN:
                 entries = tuple(base_ring.zero() for _ in range(int(components)))
@@ -1869,6 +1865,7 @@ class _TensorVectorConstructor:
                     components.get(index, base_ring.zero()) for index in range(size)
                 )
             case _:
+                _refuse_element_components("tensor.vector", components)
                 entries = tuple(components)
         return tensor(base_ring, (len(entries),), (), entries)
 
@@ -1892,7 +1889,6 @@ class _TensorCovectorConstructor:
     """
 
     def __call__(self, base_ring, components=None, *args, **kwds):
-        _refuse_element_components("tensor.covector", components)
         contravariant = _TensorVectorConstructor()(
             base_ring, components, *args, **kwds
         )
@@ -2043,12 +2039,12 @@ class _TensorMatrixConstructor:
                         f"tensor as a matrix: a matrix has exactly two indices, this "
                         f"tensor has {components.tensor_order()}"
                     )
-                # Reinterpretation: the two index ranks are read off, and the
-                # result is the type-(1,1) tensor this constructor makes.  The
-                # input's own variance does not survive, which is the whole
-                # content of reading its components as a matrix.  The tensor
-                # is over this constructor's ring: moving components to
-                # another ring is scalar change, done by ``change_ring``.
+
+
+
+
+
+
                 contravariant_rank, covariant_rank = components._index_ranks()
                 return tensor(
                     base,
@@ -2335,6 +2331,23 @@ class _CoordinateTensor(ModuleElement, Tensor):
         if other in ring:
             return self._lmul_(ring(other))
         if not _is_coordinate_tensor(other, ring):
+            upper_modules = tuple(self.contravariant_index_modules())
+            lower_modules = tuple(self.covariant_index_modules())
+            if lower_modules and element_parent(other) is lower_modules[-1]:
+                result = self * tensor.coordinates(other)
+                if not upper_modules and len(lower_modules) == 2:
+                    return lower_modules[0].dual_module()(tuple(result[i] for i in range(self._lower_index_ranks()[0])))
+                if len(upper_modules) == len(lower_modules) == 1:
+                    return upper_modules[0](tuple(result[i] for i in range(self._upper_index_ranks()[0])))
+                return result
+            if not lower_modules and len(upper_modules) >= 2 and element_parent(other) is upper_modules[-1].dual_module():
+                module = upper_modules[-1]
+                coordinates = tuple(module.dual_evaluation(other, module.module_generator(label))
+                                    for label in module.module_generating_set())
+                result = self * tensor.covector(ring, coordinates)
+                if len(upper_modules) == 2:
+                    return upper_modules[0](tuple(result[i] for i in range(self._upper_index_ranks()[0])))
+                return result
             raise TypeError(
                 f"cannot multiply a tensor over {ring} by {other!r}: the product is "
                 f"defined with a scalar of {ring} or a tensor over {ring}; otherwise use "
@@ -2346,7 +2359,7 @@ class _CoordinateTensor(ModuleElement, Tensor):
         other_valence = other.tensor_valence()
         from itertools import product as cartesian_product
 
-        if len(upper) >= 2 and not lower and other_valence == _TENSOR_TYPES((0, 1)):
+        if len(upper) >= 2 and not lower and other_valence == (NN**2)((0, 1)):
             if upper[-1] != other._lower_index_ranks()[0]:
                 raise ValueError(
                     f"cannot multiply a type-{valence} tensor by a covector of rank "
@@ -2364,7 +2377,7 @@ class _CoordinateTensor(ModuleElement, Tensor):
                 for position in positions
             )
             return tensor(ring, output_upper, (), _nested(entries, output_upper))
-        if other_valence == _TENSOR_TYPES((1, 0)):
+        if other_valence == (NN**2)((1, 0)):
             if not lower:
                 raise TypeError(
                     f"a type-{valence} tensor has no covariant index, so it cannot be "
@@ -2377,10 +2390,10 @@ class _CoordinateTensor(ModuleElement, Tensor):
                     f"{lower[-1]}, and the two ranks must agree"
                 )
 
-            # Multiplication contracts the rightmost covariant index.  Thus a
-            # bilinear form G in M* tensor M* acts on v in M as G*v in M*,
-            # with components (G*v)_i = sum_j G_{ij} v_j.  No row-vector or
-            # transpose convention enters the public tensor calculus.
+
+
+
+
             output_upper = upper
             output_lower = lower[:-1]
             output_shape = output_upper + output_lower
@@ -2389,10 +2402,10 @@ class _CoordinateTensor(ModuleElement, Tensor):
                 self.tensor_order() == 2
                 and (ring is _owned_integers() or ring is _owned_rationals())
             ):
-                # The row-major component matrix enumerates every index but
-                # the contracted one in the output's own order, so the pairings
-                # of the family are one engine matrix product -- the same
-                # exact arithmetic the two-vector evaluation of a pairing is.
+
+
+
+
                 product = _engine_component_matrix(self) * _engine_component_vector(
                     other
                 )
@@ -2415,7 +2428,7 @@ class _CoordinateTensor(ModuleElement, Tensor):
             if not output_shape:
                 return entries[0]
             return tensor(ring, output_upper, output_lower, _nested(entries, output_shape))
-        if valence == _TENSOR_TYPES((1, 1)) and other_valence == _TENSOR_TYPES((1, 1)):
+        if valence == (NN**2)((1, 1)) and other_valence == (NN**2)((1, 1)):
             if lower != other._upper_index_ranks():
                 raise ValueError(
                     f"cannot compose type-(1, 1) tensors with index ranks "
@@ -2423,9 +2436,9 @@ class _CoordinateTensor(ModuleElement, Tensor):
                     f"rank {lower} of the left must equal the contravariant rank "
                     f"{other._upper_index_ranks()} of the right"
                 )
-            # In U tensor V* tensor V tensor W*, contract the adjacent V*, V
-            # factors.  Under Hom(V,U) = U tensor V* this agrees with map
-            # composition, but its owner here is tensor evaluation.
+
+
+
             rows = upper[0]
             inner = other._upper_index_ranks()[0]
             columns = other._lower_index_ranks()[0]
@@ -2435,8 +2448,8 @@ class _CoordinateTensor(ModuleElement, Tensor):
                 for j in range(columns)
             )
             return tensor(ring, (rows,), (columns,), _nested(entries, (rows, columns)))
-        if valence == _TENSOR_TYPES((0, 1)) and other_valence == _TENSOR_TYPES((1, 1)):
-            # In V* tensor V tensor W*, evaluate the adjacent V*, V pair.
+        if valence == (NN**2)((0, 1)) and other_valence == (NN**2)((1, 1)):
+
             if lower != other._upper_index_ranks():
                 raise ValueError(
                     f"cannot multiply a covector of rank {lower} by a type-(1, 1) tensor "
@@ -2546,7 +2559,7 @@ class _CoordinateTensorModule:
     @cached_method
     def tensor_type(self) -> ProductOfNaturalNumbers:
         r"""Return the type $(p, q)$ as a point of $\mathbb N^2$ (`CON-15`)."""
-        return _TENSOR_TYPES((len(self._upper_ranks), len(self._lower_ranks)))
+        return (NN**2)((len(self._upper_ranks), len(self._lower_ranks)))
 
     def tensor_valence(self) -> ProductOfNaturalNumbers:
         return self.tensor_type()
@@ -2609,7 +2622,7 @@ class _CoordinateTensorModule:
         )
 
     def _element_constructor_(self, entries):
-        r"""Admit a tensor of this module, or its row-major component sequence."""
+        r"""Admit a tensor, rectangular components, or a flat row-major sequence."""
         if element_parent(entries) is self:
             return entries
         shape = self._index_ranks()
@@ -2617,7 +2630,17 @@ class _CoordinateTensorModule:
             f"cannot build an element of {self} from components: its index ranks "
             f"{shape} include an infinite rank"
         )
-        entries = tuple(entries)
+        nested_shape = _component_shape(entries)
+        if nested_shape == shape and nested_shape:
+            entries = _flatten(entries, shape)
+        elif not nested_shape or nested_shape == (prod(shape),):
+            entries = tuple(entries)
+        else:
+            raise ValueError(
+                f"an element of {self} with index ranks {shape} needs components "
+                f"of shape {shape} or a flat list of {prod(shape)}; got shape "
+                f"{nested_shape}"
+            )
         if len(entries) != prod(shape):
             raise ValueError(
                 f"an element of {self} with index ranks {shape} has {prod(shape)} "
@@ -2714,7 +2737,7 @@ def _tensor_module_on(base_ring, upper_ranks, lower_ranks):
 
 def _mixed_tensor_valence(valence) -> ProductOfNaturalNumbers:
     r"""Normalize one bidegree ``(p,q)`` of the mixed tensor algebra."""
-    return _TENSOR_TYPES(valence)
+    return (NN**2)(valence)
 
 
 class MixedTensorAlgebraElement(GradedDirectSumElement):
@@ -2829,7 +2852,7 @@ def _mixed_tensor_algebra(module):
     )
     ring = _own_ring(module.base_ring())
     size = int(rank)
-    bigrades = _TENSOR_TYPES
+    bigrades = NN**2
     pieces = indexed_family(
         bigrades,
         lambda valence: TensorModule(
@@ -2915,22 +2938,7 @@ def _coordinate_tensor(
     components,
 ) -> Tensor:
     r"""Construct a coordinate tensor that is not a Sage vector or matrix."""
-    shape = upper_ranks + lower_ranks
-    nested_shape = _component_shape(components)
-    if nested_shape:
-        if nested_shape == shape:
-            entries = _flatten(components, shape)
-        elif nested_shape == (prod(shape),):
-            entries = tuple(components)
-        else:
-            raise ValueError(
-                f"a tensor over {base_ring} with index ranks {shape} needs components "
-                f"of shape {shape} or a flat list of {prod(shape)}; got shape "
-                f"{nested_shape}"
-            )
-    else:
-        entries = tuple(components)
-    return TensorModule(base_ring, upper_ranks, lower_ranks)(entries)
+    return TensorModule(base_ring, upper_ranks, lower_ranks)(components)
 
 
 class _TensorConstructor:
@@ -2968,9 +2976,9 @@ class _TensorConstructor:
         from sage_extensions.categories.modules.pure.modules import _engine_matrix
         from sage_extensions.categories.rings.ring_foundation import _owned_engine_element
 
-        # The engine matrix is the matrix's retained realization, row-major in
-        # the same label order; reading it is one engine call, not one owned
-        # coordinate evaluation per entry.
+
+
+
         return self(
             ring,
             (parent.nrows(),),

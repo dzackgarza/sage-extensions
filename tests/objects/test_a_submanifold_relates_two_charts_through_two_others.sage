@@ -27,13 +27,13 @@ def _the_submanifold_with_two_cut_charts(north_label, south_label):
         north_label,
         "x1 x2",
         "U_N",
-        (north.coordinate(0) ** 2 + north.coordinate(1) ** 2,),
+        (north.coordinate(0) ** 2 + north.coordinate(1) ** 2,), same_coordinates=True,
     )
     sphere.chart_on_open_subset(
         south_label,
         "y1 y2",
         "U_S",
-        (south.coordinate(0) ** 2 + south.coordinate(1) ** 2,),
+        (south.coordinate(0) ** 2 + south.coordinate(1) ** 2,), same_coordinates=True,
     )
     domain = north.domain()
     return sphere.open_submanifold(sphere.open_submanifold_inclusion(domain))

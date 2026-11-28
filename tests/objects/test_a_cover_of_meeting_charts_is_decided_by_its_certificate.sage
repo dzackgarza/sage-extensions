@@ -21,9 +21,9 @@ def _the_plane_with_two_punctures():
     plane = SmoothManifolds()(2, "R^2")
     chart = plane.chart("U", "x y")
     x, y = chart.coordinate(0), chart.coordinate(1)
-    origin = plane.chart_on_open_subset("P0", "x y", "U", (x**2 + y**2,))
+    origin = plane.chart_on_open_subset("P0", "x y", "U", (x**2 + y**2,), same_coordinates=True)
     other = plane.chart_on_open_subset(
-        "P1", "x y", "U", ((x + (-1)) ** 2 + (y + (-1)) ** 2,)
+        "P1", "x y", "U", ((x + (-1)) ** 2 + (y + (-1)) ** 2,), same_coordinates=True
     )
     return plane, chart, x, y, origin, other
 

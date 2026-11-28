@@ -31,7 +31,7 @@ def _the_stereographic_chart_domain(label):
     sphere = SmoothManifolds().sphere(2)
     north = sphere.atlas()["U_N"]
     norm_squared = north.coordinate(0) ** 2 + north.coordinate(1) ** 2
-    chart = sphere.chart_on_open_subset(label, "x1 x2", "U_N", (norm_squared,))
+    chart = sphere.chart_on_open_subset(label, "x1 x2", "U_N", (norm_squared,), same_coordinates=True)
     return sphere, chart, chart.domain(), sphere.open_submanifold_inclusion(chart.domain())
 
 
@@ -81,7 +81,7 @@ def test_a_section_restricts_to_a_section_of_the_open_submanifold() -> None:
     plane = SmoothManifolds()(2, "R^2")
     chart = plane.chart("U", "x y")
     x, y = chart.coordinate(0), chart.coordinate(1)
-    punctured = plane.chart_on_open_subset("W", "x y", "U", (x,))
+    punctured = plane.chart_on_open_subset("W", "x y", "U", (x,), same_coordinates=True)
     domain = punctured.domain()
     inclusion = plane.open_submanifold_inclusion(domain)
     sections = plane.tangent_bundle().sections()

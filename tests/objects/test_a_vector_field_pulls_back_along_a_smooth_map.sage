@@ -3,11 +3,10 @@ r"""A vector field pulls back along a smooth map, and the pullback is a bundle o
 The pullback $f^*E$ of a vector bundle $E \to M$ along a smooth map $f: N \to M$ is the
 bundle over $N$ whose fibre at $q$ is the fibre of $E$ at $f(q)$; a section of $E$ gives
 one of $f^*E$ by $q \mapsto s(f(q))$ (Lee, *Introduction to Smooth Manifolds*, 2nd ed.,
-Ch. 10).  Along an open inclusion the differential is an isomorphism at every point and
-the pullback of the tangent bundle is the tangent bundle of the domain, but along any
-other smooth map it is a bundle of its own: $f^*TM$ need not be $TN$, and a section of
-it that is not the pullback of one needs the bundle's transition functions on a cover of
-the target.
+Ch. 10).  Along an open inclusion the differential canonically identifies the
+pullback tangent bundle with the domain's tangent bundle.  The chosen pullback
+still retains the map: composing a section with it uses that datum.  For a general
+smooth map $f^*TM$ need not be $TN$.
 
 The specimen is the plane's tangent bundle along $f(x, y) = (2x, 3y)$: the section
 $(x, y)$ pulls back to $(2x, 3y)$, taking at $(1, 2)$ the value that $(x, y)$ takes at
@@ -81,6 +80,7 @@ def test_the_pullback_is_additive_and_carries_the_negatives() -> None:
         pulled.sections().pullback_of(first) + pulled.sections().pullback_of(second)
     )
     assert pulled.sections().pullback_of(-first) == -(pulled.sections().pullback_of(first))
+    assert pulled.sections().pullback_of(first) != pulled.sections().pullback_of(second)
 
 
 def test_a_section_of_the_pullback_is_stated_on_its_own_charts() -> None:
@@ -101,16 +101,24 @@ def test_a_section_of_the_pullback_is_stated_on_its_own_charts() -> None:
     assert section.components()["U"][1](at) == RR(1)
 
 
-def test_the_pullback_along_an_open_inclusion_is_still_the_domain_s_tangent_bundle() -> None:
-    r"""The canonical case is unchanged: along the inclusion of a chart domain the pullback of $T\mathbb{R}^2$ is the tangent bundle of that domain."""
+def test_the_pullback_along_an_open_inclusion_retains_the_map_for_sections() -> None:
+    r"""The chosen pullback retains the inclusion even though its fibres identify canonically with the domain's tangent spaces."""
     plane = SmoothManifolds()(2, "R^2")
     chart = plane.chart("U", "x y")
-    punctured = plane.chart_on_open_subset("W", "x y", "U", (chart.coordinate(0),))
+    punctured = plane.chart_on_open_subset("W", "x y", "U", (chart.coordinate(0),), same_coordinates=True)
     domain = punctured.domain()
     inclusion = plane.open_submanifold_inclusion(domain)
 
     pulled = plane.tangent_bundle().pullback_along(inclusion)
 
     assert pulled.base_manifold() is domain
-    assert pulled.is_pullback() is False
+    assert pulled.is_pullback() is True
+    assert pulled.mapping() is inclusion
+    assert pulled.underlying_bundle() is plane.tangent_bundle()
     assert pulled.rank() == 2
+    vector = plane.tangent_bundle().sections().section({"U": (chart.coordinate(0), chart.coordinate(1))})
+    section = pulled.sections().pullback_of(vector)
+    assert tuple(section.components_at(domain((2, 3), "W"), "U")) == (RR(2), RR(3))
+    restricted = plane.tangent_bundle().sections().restrict(vector, inclusion)
+    assert restricted.parent() is domain.tangent_bundle().sections()
+    assert restricted(domain.atlas()["W"].coordinate(0))(domain((2, 3), "W")) == RR(2)

@@ -60,7 +60,7 @@ def test_the_dual_map_has_the_transposed_matrix() -> None:
     plane = ZZ.free_module(2)
     space = ZZ.free_module(3)
     linear = _linear_map(space, plane, ((1, 4), (2, 5), (3, 6)))
-    dual_map = linear.dual_module_morphism()
+    dual_map = Modules(ZZ).dualization()(linear)
     covectors = plane.dual_module()
 
     assert dual_map(covectors((1, 0))) == space.dual_module()((1, 2, 3))
@@ -117,16 +117,3 @@ def test_pulling_back_a_bilinear_form_along_a_linear_map_is_p_transpose_b_p() ->
     change = _linear_map(plane, plane, ((1, 0), (1, 1)))
 
     assert forms([[2, 1], [1, 3]]).pullback(change) == forms([[2, 3], [3, 7]])
-
-
-def test_integral_fractions_enter_a_zz_tensor_as_integers() -> None:
-    r"""`G = [[2/1, -1], [-1, 2]]` over $\mathbb{Z}$: Python fractions with
-    denominator 1 are integers, so the tensor admits them; a non-integral
-    fraction is still rejected."""
-    from fractions import Fraction
-
-    gram = tensor(ZZ, (), (2, 2), [[Fraction('2'), -1], [-1, 2]])
-    assert gram == tensor(ZZ, (), (2, 2), [[2, -1], [-1, 2]])
-    assert gram.is_symmetric()
-    with pytest.raises(TypeError):
-        tensor(ZZ, (), (2, 2), [[Fraction('1/2'), 0], [0, 1]])

@@ -23,8 +23,8 @@ def _the_plane_with_two_cut_charts():
     chart = plane.chart("U", "x y")
     x, y = chart.coordinate(0), chart.coordinate(1)
     return plane, (
-        plane.chart_on_open_subset("E1", "x y", "U", (x, y)),
-        plane.chart_on_open_subset("E2", "x y", "U", (x + (-1), y)),
+        plane.chart_on_open_subset("E1", "x y", "U", (x, y), same_coordinates=True),
+        plane.chart_on_open_subset("E2", "x y", "U", (x + (-1), y), same_coordinates=True),
     )
 
 
@@ -56,7 +56,7 @@ def test_a_chart_whose_conditions_all_vanish_nowhere_covers_the_plane() -> None:
     plane = SmoothManifolds()(2, "R^2")
     chart = plane.chart("U", "x y")
     x, y = chart.coordinate(0), chart.coordinate(1)
-    whole = plane.chart_on_open_subset("E3", "x y", "U", (x**2 + 1, y**2 + 1))
+    whole = plane.chart_on_open_subset("E3", "x y", "U", (x**2 + 1, y**2 + 1), same_coordinates=True)
 
     section = plane.tangent_bundle().sections().section(
         {"E3": (whole.function_ring().one(), whole.function_ring().zero())}

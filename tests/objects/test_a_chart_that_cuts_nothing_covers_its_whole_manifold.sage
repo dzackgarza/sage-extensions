@@ -25,7 +25,7 @@ def _the_plane():
 def test_a_chart_cut_by_a_nowhere_vanishing_condition_covers_the_manifold() -> None:
     r"""$x^2 + 1 \ne 0$ for every real $x$, so the cut chart is the plane, and a section stated on it is admitted."""
     plane, _chart, x, _y = _the_plane()
-    never_zero = plane.chart_on_open_subset("W1", "x y", "U", (x**2 + 1,))
+    never_zero = plane.chart_on_open_subset("W1", "x y", "U", (x**2 + 1,), same_coordinates=True)
 
     section = plane.tangent_bundle().sections().section(
         {"W1": (never_zero.function_ring().one(), never_zero.function_ring().zero())}
@@ -42,8 +42,8 @@ def test_registering_another_chart_does_not_take_the_cover_away() -> None:
     it is covered by the first -- which is the whole plane -- so the family still covers.
     """
     plane, _chart, x, y = _the_plane()
-    never_zero = plane.chart_on_open_subset("W2", "x y", "U", (x**2 + 1,))
-    plane.chart_on_open_subset("W3", "x y", "U", (y,))
+    never_zero = plane.chart_on_open_subset("W2", "x y", "U", (x**2 + 1,), same_coordinates=True)
+    plane.chart_on_open_subset("W3", "x y", "U", (y,), same_coordinates=True)
 
     section = plane.tangent_bundle().sections().section(
         {"W2": (never_zero.function_ring().one(), never_zero.function_ring().zero())}

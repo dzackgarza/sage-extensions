@@ -12,80 +12,80 @@ from importlib import import_module as _import_module
 from importlib.util import find_spec as _find_spec
 from pathlib import Path as _Path
 
-# The session's numeric vocabulary and its parser are one contract: decimal
-# literals remain explicit MPFR approximations even though ``RealNumber`` now
-# names an exact element of ``RR``.
-import sageparse.preparser.research  # noqa: F401
+
+
+
+import sageparse.preparser.research
 from sage.misc.lazy_import import lazy_import as _lazy_import
 from sage.repl.load import load as _sage_load
 
 from sage_extensions import language_runtime as _language_runtime
 
-# The session publishes what each area package declares.  A package's
-# ``__all__`` is the one authority for its names (OWN-19; AGENTS, "Names and
-# ownership"), so this module names no member of those declarations: each star
-# import below binds exactly that package's whole ``__all__``, in this order.  An
-# area's constructor is a session name by construction, so a second hand-written
-# list cannot drift from the owner's (API-06, API-07).
-#
-# The star import is the binding and nothing else: a name an area declares is
-# written once, in the owner's ``__all__``, and appears here only as the package
-# that declares it.  ``import *`` is defined as "bind ``__all__``", so a name an
-# owner adds reaches the session without an edit here; the F403 suppression marks
-# that this module deliberately consumes the declaration rather than restating it
-# (STY-120: no ``globals()`` mutation, no string lookup, no ``getattr``).
-from sage_extensions.categories.abstract_categories import *  # noqa: F403
-from sage_extensions.categories.algebras import *  # noqa: F403
-from sage_extensions.categories.divisors import *  # noqa: F403
-from sage_extensions.categories.forms import *  # noqa: F403
-from sage_extensions.categories.functions import *  # noqa: F403
-from sage_extensions.categories.group.profinite import *  # noqa: F403
-from sage_extensions.categories.modules import *  # noqa: F403
-from sage_extensions.categories.modules.framed import *  # noqa: F403
-from sage_extensions.categories.modules.framed.finitely_generated import *  # noqa: F403
-from sage_extensions.categories.modules.framed.formed import *  # noqa: F403
-from sage_extensions.categories.modules.group_modules import *  # noqa: F403
-from sage_extensions.categories.modules.pure import *  # noqa: F403
-from sage_extensions.categories.modules.pure.finitely_generated import *  # noqa: F403
-from sage_extensions.categories.schemes.toric import *  # noqa: F403
-from sage_extensions.categories.sets import *  # noqa: F403
-from sage_extensions.categories.sets.enumerated import *  # noqa: F403
-from sage_extensions.groups import *  # noqa: F403
-from sage_extensions.lexicon import *  # noqa: F403
-from sage_extensions.rings import *  # noqa: F403
-from sage_extensions.schemes import *  # noqa: F403
-from sage_extensions.static_types import *  # noqa: F403
-from sage_extensions.tensors import *  # noqa: F403
-from sage_extensions.categories.abstract_categories.functors import (  # noqa: F401
+
+
+
+
+
+
+
+
+
+
+
+
+
+from sage_extensions.categories.abstract_categories import *
+from sage_extensions.categories.algebras import *
+from sage_extensions.categories.divisors import *
+from sage_extensions.categories.forms import *
+from sage_extensions.categories.functions import *
+from sage_extensions.categories.group.profinite import *
+from sage_extensions.categories.modules import *
+from sage_extensions.categories.modules.framed import *
+from sage_extensions.categories.modules.framed.finitely_generated import *
+from sage_extensions.categories.modules.framed.formed import *
+from sage_extensions.categories.modules.group_modules import *
+from sage_extensions.categories.modules.pure import *
+from sage_extensions.categories.modules.pure.finitely_generated import *
+from sage_extensions.categories.schemes.toric import *
+from sage_extensions.categories.sets import *
+from sage_extensions.categories.sets.enumerated import *
+from sage_extensions.groups import *
+from sage_extensions.lexicon import *
+from sage_extensions.rings import *
+from sage_extensions.schemes import *
+from sage_extensions.static_types import *
+from sage_extensions.tensors import *
+from sage_extensions.categories.abstract_categories.functors import (
     DiscreteCategories,
     DiscreteCategory,
     ObjectSetFunctor,
 )
-from sage_extensions.categories.algebras.algebras import (  # noqa: F401
+from sage_extensions.categories.algebras.algebras import (
     MatrixAlgebras,
 )
-from sage_extensions.categories.cell_complexes import (  # noqa: F401
+from sage_extensions.categories.cell_complexes import (
     CellComplexes,
     DeltaComplexes,
     PolytopalComplexes,
     SimplicialComplexes,
     SimplicialSets,
 )
-from sage_extensions.categories.chamber_systems import (  # noqa: F401
+from sage_extensions.categories.chamber_systems import (
     ChamberSystems,
 )
-from sage_extensions.categories.complex_affine_spaces import (  # noqa: F401
+from sage_extensions.categories.complex_affine_spaces import (
     ComplexAffineSpaces,
     ComplexVectorSpaces,
 )
-from sage_extensions.categories.complex_analytic_spaces import (  # noqa: F401
+from sage_extensions.categories.complex_analytic_spaces import (
     ComplexAnalyticSpaces,
 )
 from sage_extensions.categories.coxeter_diagrams import (
     CoxeterDiagrams as CoxeterDiagrams,
 )
 
-# Explicit redundant aliases below are public session exports, not private imports.
+
 from sage_extensions.categories.functors.core import (
     Adjunction as Adjunction,
 )
@@ -98,61 +98,61 @@ from sage_extensions.categories.functors.core import (
 from sage_extensions.categories.functors.core import (
     NaturalTransformation as NaturalTransformation,
 )
-from sage_extensions.categories.graph_categories import (  # noqa: F401
+from sage_extensions.categories.graph_categories import (
     Digraphs,
     Graphs,
     LabelledDigraphs,
     LabelledGraphs,
 )
-from sage_extensions.categories.group.groups import (  # noqa: F401
+from sage_extensions.categories.group.groups import (
     LieGroups,
     TopologicalGroups,
 )
-from sage_extensions.categories.holomorphic_atlases import (  # noqa: F401
+from sage_extensions.categories.holomorphic_atlases import (
     HolomorphicAtlases,
 )
-from sage_extensions.categories.hyperbolic_geometry import (  # noqa: F401
+from sage_extensions.categories.hyperbolic_geometry import (
     HyperbolicPolyhedra,
     HyperbolicRationalPoints,
     HyperbolicSpaces,
     PositiveConeComponents,
 )
-from sage_extensions.categories.hyperbolic_lattices import (  # noqa: F401
+from sage_extensions.categories.hyperbolic_lattices import (
     HyperbolicLattices,
 )
-from sage_extensions.categories.integral_affine_atlases import (  # noqa: F401
+from sage_extensions.categories.integral_affine_atlases import (
     IntegralAffineAtlases,
 )
-from sage_extensions.categories.integral_affine_collars import (  # noqa: F401
+from sage_extensions.categories.integral_affine_collars import (
     IntegralAffineCollars,
 )
-from sage_extensions.categories.integral_affine_manifolds import (  # noqa: F401
+from sage_extensions.categories.integral_affine_manifolds import (
     IntegralAffineManifolds,
     IntegralAffineManifoldsWithBoundary,
     IntegralAffineManifoldsWithCorners,
     SingularIntegralAffineLocalModels,
     SingularIntegralAffineSpaces,
 )
-from sage_extensions.categories.integral_affine_stratified_atlases import (  # noqa: F401
+from sage_extensions.categories.integral_affine_stratified_atlases import (
     IntegralAffineBoundaryAtlases,
     IntegralAffineCornerAtlases,
 )
-from sage_extensions.categories.isotropic_orbits import (  # noqa: F401
+from sage_extensions.categories.isotropic_orbits import (
     DividedClassCuspIncidence,
     FlagType,
     IsotropicFlag,
     OrientedIsotropicFlag,
     RationalIsotropicFlagComplex,
 )
-from sage_extensions.categories.isotropic_parabolics import (  # noqa: F401
+from sage_extensions.categories.isotropic_parabolics import (
     LeviQuotientLiftAbsent,
     PrimitiveIsotropicSubobjects,
     right_coset_action,
 )
-from sage_extensions.categories.orthogonal_quotients import (  # noqa: F401
+from sage_extensions.categories.orthogonal_quotients import (
     general_image_certificate,
 )
-from sage_extensions.lattice_database import (  # noqa: F401
+from sage_extensions.lattice_database import (
     card_arithmetic_group,
     card_arithmetic_group_row,
     card_arithmetic_group_tags,
@@ -166,19 +166,19 @@ from sage_extensions.lattice_database import (  # noqa: F401
     card_polarization_row,
     card_provenance,
 )
-from sage_extensions.categories.lattice_centralizers import (  # noqa: F401
+from sage_extensions.categories.lattice_centralizers import (
     IsometryPrimitiveExtension,
 )
-from sage_extensions.categories.lattice_morphisms import (  # noqa: F401
+from sage_extensions.categories.lattice_morphisms import (
     LatticeEmbedding,
     LatticeIsometry,
     LatticeMor,
     LatticeMorphism,
 )
-from sage_extensions.categories.definite_lattices import (  # noqa: F401
+from sage_extensions.categories.definite_lattices import (
     definite_indecomposable_summands,
 )
-from sage_extensions.categories.lattices import (  # noqa: F401  # noqa: F401
+from sage_extensions.categories.lattices import (
     DefiniteLattices,
     EvenLattices,
     EvenTwoElementaryLattices,
@@ -195,11 +195,11 @@ from sage_extensions.categories.lattices import (  # noqa: F401  # noqa: F401
     signature_pair,
     signature_pairs,
 )
-from sage_extensions.categories.manifold_dimension_strata import (  # noqa: F401
+from sage_extensions.categories.manifold_dimension_strata import (
     ManifoldsOfDimensionAtMost,
     PureDimensionalManifolds,
 )
-from sage_extensions.categories.manifolds import (  # noqa: F401
+from sage_extensions.categories.manifolds import (
     ComplexManifolds,
     CoverageUndecided,
     DifferentiableManifolds,
@@ -207,10 +207,10 @@ from sage_extensions.categories.manifolds import (  # noqa: F401
     SmoothManifolds,
     TopologicalManifolds,
 )
-from sage_extensions.categories.vector_bundles import (  # noqa: F401
+from sage_extensions.categories.vector_bundles import (
     SmoothVectorBundles,
 )
-from sage_extensions.categories.manifolds_with_boundary import (  # noqa: F401
+from sage_extensions.categories.manifolds_with_boundary import (
     RealCkManifoldsWithBoundary,
     RealCkManifoldsWithCorners,
     SmoothManifoldsWithBoundary,
@@ -218,62 +218,62 @@ from sage_extensions.categories.manifolds_with_boundary import (  # noqa: F401
     TopologicalManifoldsWithBoundary,
     TopologicalManifoldsWithCorners,
 )
-from sage_extensions.categories.metric_affine_spaces import (  # noqa: F401
+from sage_extensions.categories.metric_affine_spaces import (
     EuclideanSpaces,
     SphericalSpaces,
 )
-from sage_extensions.categories.modules.hodge_structures import (  # noqa: F401
+from sage_extensions.categories.modules.hodge_structures import (
     FilteredModules,
     HodgeStructures,
     MixedHodgeStructures,
     PolarizedHodgeStructures,
 )
-from sage_extensions.categories.modules.pure.modules import (  # noqa: F401
+from sage_extensions.categories.modules.pure.modules import (
     MatrixEndomorphismSpaces,
     MatrixSpaces,
 )
-from sage_extensions.categories.orbifolds import (  # noqa: F401
+from sage_extensions.categories.orbifolds import (
     ComplexOrbifolds,
     Orbifolds,
     RiemannianOrbifolds,
 )
-from sage_extensions.categories.polyhedral_cones import (  # noqa: F401
+from sage_extensions.categories.polyhedral_cones import (
     RationalPolyhedralCones,
 )
-from sage_extensions.categories.rational_integral_stabilizers import (  # noqa: F401
+from sage_extensions.categories.rational_integral_stabilizers import (
     FiniteCommensurabilityQuotient,
     IntegralStructureAction,
 )
-from sage_extensions.categories.real_affine_spaces import (  # noqa: F401
+from sage_extensions.categories.real_affine_spaces import (
     AffineSpacesWithLattice,
     RealAffineSpaces,
     RealVectorSpaces,
 )
-from sage_extensions.categories.real_ck_atlases import (  # noqa: F401
+from sage_extensions.categories.real_ck_atlases import (
     RealCkAtlases,
 )
-from sage_extensions.categories.real_ck_manifolds import (  # noqa: F401
+from sage_extensions.categories.real_ck_manifolds import (
     RealCkManifolds,
 )
 from sage_extensions.categories.satake_diagrams import (
     SatakeDiagrams as SatakeDiagrams,
 )
-from sage_extensions.categories.schemes.degeneration_central_fibers import (  # noqa: F401
+from sage_extensions.categories.schemes.degeneration_central_fibers import (
     DegenerationCentralFibers,
 )
-from sage_extensions.categories.sets.finite_graded_posets import (  # noqa: F401
+from sage_extensions.categories.sets.finite_graded_posets import (
     FiniteGradedPosets,
 )
-from sage_extensions.categories.stratified_atlases import (  # noqa: F401
+from sage_extensions.categories.stratified_atlases import (
     RealCkBoundaryAtlases,
     RealCkCornerAtlases,
     TopologicalBoundaryAtlases,
     TopologicalCornerAtlases,
 )
-from sage_extensions.categories.topological_atlases import (  # noqa: F401
+from sage_extensions.categories.topological_atlases import (
     TopologicalAtlases,
 )
-from sage_extensions.categories.triangulations import (  # noqa: F401
+from sage_extensions.categories.triangulations import (
     ChosenTriangulations,
 )
 
@@ -281,34 +281,34 @@ _lazy_import(
     "sage_extensions.categories.schemes.cyclic_covers",
     "CyclicCovers",
 )
-from sage_extensions.categories.algebras.subalgebras import (  # noqa: F401
+from sage_extensions.categories.algebras.subalgebras import (
     GeneratedSubalgebras,
 )
-from sage_extensions.categories.algebras.algebra_ideals import (  # noqa: F401
+from sage_extensions.categories.algebras.algebra_ideals import (
     GeneratedAlgebraIdeals,
 )
-from sage_extensions.categories.algebras.graded_lie_algebras import (  # noqa: F401
+from sage_extensions.categories.algebras.graded_lie_algebras import (
     GradedLieAlgebras,
 )
-from sage_extensions.categories.algebras.graded_nonassociative_algebras import (  # noqa: F401
+from sage_extensions.categories.algebras.graded_nonassociative_algebras import (
     GradedNonassociativeAlgebras,
 )
-from sage_extensions.categories.fundamental_groupoids import (  # noqa: F401
+from sage_extensions.categories.fundamental_groupoids import (
     FundamentalGroupoid,
     FundamentalGroupoids,
 )
-from sage_extensions.categories.pointed_topological_spaces import (  # noqa: F401
+from sage_extensions.categories.pointed_topological_spaces import (
     TopologicalSpaceCoslices,
 )
-from sage_extensions.categories.topological_spaces import (  # noqa: F401
+from sage_extensions.categories.topological_spaces import (
     ContinuousMap,
     TopologicalSpaceMor,
     TopologicalSpaces,
 )
-from sage_extensions.categories.vector_orbits import (  # noqa: F401
+from sage_extensions.categories.vector_orbits import (
     VectorPrimitiveExtension,
 )
-from sage_extensions.categories.vinberg_invariants import (  # noqa: F401
+from sage_extensions.categories.vinberg_invariants import (
     VinbergInvariantMatrices,
     reflection_cosines,
 )
@@ -318,8 +318,8 @@ from sage_extensions.logic import (
     Propositions,
     Unknown,
     ask,
-)  # noqa: F401
-from sage_extensions.rings import (  # noqa: F401
+)
+from sage_extensions.rings import (
     _restore_session_ring_bindings,
 )
 from sage_extensions.utilities import (
@@ -334,7 +334,7 @@ from sage_extensions.utilities import (
 from sage_extensions.utilities import (
     zipsum as zipsum,
 )
-from sage_extensions.validation import strict_checking  # noqa: F401
+from sage_extensions.validation import strict_checking
 
 
 def load(filename: str, globals: dict | None = None, attach: bool = False) -> None:
@@ -359,21 +359,21 @@ def load(filename: str, globals: dict | None = None, attach: bool = False) -> No
             relative = source.relative_to(root)
         except ValueError:
             continue
-        # Canonicalize package sources in either source format.  An ordinary
-        # top-level Sage script still uses Sage's execute-into-scope loader,
-        # even though sageparse also makes top-level .sage files importable.
+
+
+
         if relative.suffix not in (".py", ".sage"):
             continue
         root_is_package = (root / "__init__.py").is_file() or (
             root / "__init__.sage"
         ).is_file()
         if root_is_package and relative.name not in ("__init__.py", "__init__.sage"):
-            # This sys.path entry is itself a package directory. Names derived
-            # relative to it omit that package's qualified prefix; probing
-            # them with find_spec can import the same source under a second
-            # top-level alias before a broader sys.path root is considered.
-            # Let a broader root resolve the source without executing this
-            # short alias. If none exists, fail closed below.
+
+
+
+
+
+
             parts = list(relative.with_suffix("").parts)
             if parts and all(part.isidentifier() for part in parts):
                 candidate = ".".join(parts)
@@ -387,11 +387,11 @@ def load(filename: str, globals: dict | None = None, attach: bool = False) -> No
             "__init__.py",
             "__init__.sage",
         ):
-            # A source at the root of a package directory is a package module,
-            # but this sys.path entry alone omits the package's parent name.
-            # Do not import it under a short top-level alias. A broader import
-            # root may still provide the canonical qualified name later in the
-            # loop; if none does, the unresolved-package check fails closed.
+
+
+
+
+
             if (root / "__init__.py").is_file() or (root / "__init__.sage").is_file():
                 unresolved_package_source = (source.stem, 1)
             continue
@@ -412,21 +412,21 @@ def load(filename: str, globals: dict | None = None, attach: bool = False) -> No
             )
         )
         if not package_parent:
-            # A dotted-looking path below sys.path is not itself a package
-            # contract: Sage scripts are often kept in subdirectories without
-            # package initializers. Keep those on Sage's normal load route;
-            # only package-owned sources must share import-module identity.
+
+
+
+
             continue
-        # Only delegate when the installed sageparse finder chooses this exact
-        # source; package directories may have their own loader.
+
+
         try:
             spec = _find_spec(candidate)
         except (ImportError, ModuleNotFoundError, ValueError):
-            # find_spec for a dotted name may import its parent package. If
-            # that package fails to initialize, do not treat the exception as
-            # proof that this package source is non-importable and fall back to
-            # Sage's independent exec route. Preserve the most-qualified failed
-            # package candidate so the failure is reported below.
+
+
+
+
+
             if package_parent and (
                 unresolved_package_source is None
                 or len(parts) > unresolved_package_source[1]
@@ -434,9 +434,9 @@ def load(filename: str, globals: dict | None = None, attach: bool = False) -> No
                 unresolved_package_source = (candidate, len(parts))
             continue
         if spec is None or spec.origin is None:
-            # This sys.path entry did not make the source importable under the
-            # candidate name (a nested path entry may be only a partial name).
-            # It is not evidence of a competing canonical module.
+
+
+
             if package_parent and (
                 unresolved_package_source is None
                 or len(parts) > unresolved_package_source[1]
@@ -444,19 +444,19 @@ def load(filename: str, globals: dict | None = None, attach: bool = False) -> No
                 unresolved_package_source = (candidate, len(parts))
             continue
         if _Path(spec.origin).resolve() == source:
-            # Overlapping sys.path entries can make one file importable under
-            # both its full package name and a shorter alias (for example,
-            # ``pkg.mod`` and ``mod``).  The package-qualified route is the
-            # canonical population; choosing the first matching path entry
-            # would make identity depend on sys.path insertion order.
+
+
+
+
+
             if len(parts) > module_depth:
                 module_name = candidate
                 module_depth = len(parts)
         else:
             resolved_source = _Path(spec.origin).resolve()
-            # The sageparse finder deliberately prefers a generated .py beside
-            # its .sage source. Canonicalize through that selected module rather
-            # than rejecting the source or executing it into a second scope.
+
+
+
             same_compiled_source = (
                 resolved_source.parent == source.parent
                 and resolved_source.stem == source.stem
@@ -468,9 +468,9 @@ def load(filename: str, globals: dict | None = None, attach: bool = False) -> No
                     module_name = candidate
                     module_depth = len(parts)
             else:
-                # A shallow alias conflict must not hide a more-qualified
-                # package conflict discovered through another sys.path root.
-                # Prefer the strongest ownership evidence, then name depth.
+
+
+
                 conflict = (candidate, resolved_source, package_parent, len(parts))
                 if (
                     conflicting_source is None
@@ -482,10 +482,10 @@ def load(filename: str, globals: dict | None = None, attach: bool = False) -> No
                 ):
                     conflicting_source = conflict
     if module_name is not None:
-        # The importer is the sole owner of module execution and identity.
-        # Reloading here would recreate classes in the same module object while
-        # already-imported consumers retain references to the old classes,
-        # reintroducing the split population this route exists to prevent.
+
+
+
+
         imported = _import_module(module_name)
     elif conflicting_source is not None and (
         conflicting_source[2]
@@ -494,11 +494,11 @@ def load(filename: str, globals: dict | None = None, attach: bool = False) -> No
             and conflicting_source[1].stem == source.stem
         )
     ):
-        # Normal import resolution selected a different source for a module
-        # name that this package source would otherwise claim. Falling back to
-        # exec-into-scope here would create a second class population. A bare
-        # session script that happens to share a dotted candidate with some
-        # unrelated import keeps the traditional Sage loading behavior.
+
+
+
+
+
         raise ImportError(
             f"{source} is under an import root but is not the canonical source "
             f"for {conflicting_source[0]!r}; import the module selected by sageparse instead"
@@ -527,10 +527,11 @@ def load(filename: str, globals: dict | None = None, attach: bool = False) -> No
     scope["load"] = load
 
 
-# The dialect's names are the owned constructors, and the scalar rings are the
-# names the ring package declares: this module binds every session name itself,
-# through the imports above and the assignments here, so the session's namespace
-# is the module's text and nothing outside it writes into it.
+
+
+
+
+FormulaFunction = _language_runtime.FormulaFunction
 Integer = _language_runtime.Integer
 RealNumber = _language_runtime.RealNumber
 ComplexNumber = _language_runtime.ComplexNumber
@@ -540,8 +541,8 @@ ellipsis_range = _language_runtime.ellipsis_range
 ellipsis_iter = _language_runtime.ellipsis_iter
 
 
-# The catalogue constructs named lattices at import time, so it is imported
-# last, after every name it uses exists.
+
+
 _lazy_import(
     "sage_extensions.catalogue",
     (
@@ -558,11 +559,11 @@ _lazy_import("sage_extensions.coble", "Coble")
 _lazy_import("sage_extensions.sterk", "Sterk")
 
 
-# The names this module publishes are the names its own statements bind: the star
-# imports above, the assignments and the deferred re-exports here.  The
-# declaration is what ``from sage_extensions.all import *`` binds, and it is also
-# the vocabulary the dialect needs to tell a subscript of a session name from a
-# generator declaration, so the session states it once, at the end of its own
-# body, and registers that statement.
+
+
+
+
+
+
 __all__ = tuple(sorted(name for name in globals() if not name.startswith("_")))
 _language_runtime.register_session_names(__all__)

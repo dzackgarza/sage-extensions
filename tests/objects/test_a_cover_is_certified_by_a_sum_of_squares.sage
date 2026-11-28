@@ -24,8 +24,8 @@ def _the_plane_with_two_cuts():
     chart = plane.chart("U", "x y")
     x, y = chart.coordinate(0), chart.coordinate(1)
     return plane, chart, x, y, (
-        plane.chart_on_open_subset("S1", "x y", "U", (x**2 + 1,)),
-        plane.chart_on_open_subset("S2", "x y", "U", (y,)),
+        plane.chart_on_open_subset("S1", "x y", "U", (x**2 + 1,), same_coordinates=True),
+        plane.chart_on_open_subset("S2", "x y", "U", (y,), same_coordinates=True),
     )
 
 
@@ -63,3 +63,21 @@ def test_a_family_that_shares_a_real_zero_still_does_not_cover() -> None:
                 "S2": (origin_cut.function_ring().one(), origin_cut.function_ring().zero()),
             }
         )
+
+
+def test_a_shifted_negative_semidefinite_quadratic_cut_covers_in_dimension_five() -> None:
+    r"""The guard -1-(x+y-1)^2 is strictly negative on R^5.
+
+    Its nonvanishing domain is the whole manifold, including the four
+    flat directions of its rank-one quadratic part.
+    """
+    manifold = SmoothManifolds()(5, "R5 quadratic cover")
+    base = manifold.chart("U", "x y z u v")
+    x, y, z, u, v = base.coordinates()
+    one = base.function_ring().one()
+    whole = manifold.chart_on_open_subset(
+        "V", "x y z u v", "U", (-(one+(x+y-one)**2),), same_coordinates=True)
+    function = manifold.smooth_function({"V": whole.coordinate(0)})
+    assert function.parent() is manifold.smooth_functions()
+    assert function(manifold.point((2, -1, 3, 4, 5), "U")) == RR(2)
+    assert function(manifold.point((0, 0, 0, 0, 0), "U")) == RR(0)

@@ -24,7 +24,7 @@ def _the_sphere_with_an_extra_chart(label):
     sphere = SmoothManifolds().sphere(2)
     north = sphere.atlas()["U_N"]
     norm_squared = north.coordinate(0) ** 2 + north.coordinate(1) ** 2
-    sphere.chart_on_open_subset(label, "x1 x2", "U_N", (norm_squared,))
+    sphere.chart_on_open_subset(label, "x1 x2", "U_N", (norm_squared,), same_coordinates=True)
     domain = north.domain()
     return sphere, sphere.open_submanifold(sphere.open_submanifold_inclusion(domain))
 

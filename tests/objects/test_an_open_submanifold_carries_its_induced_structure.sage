@@ -24,7 +24,7 @@ def _the_punctured_line():
     r"""The real line, its chart ``x``, and the open submanifold ``{x != 0}`` it is the domain of."""
     line = SmoothManifolds()(1, "R")
     chart = line.chart("x", "x")
-    punctured = line.chart_on_open_subset("U", "x", "x", (chart.coordinate(0),))
+    punctured = line.chart_on_open_subset("U", "x", "x", (chart.coordinate(0),), same_coordinates=True)
     return line, chart, punctured, punctured.domain()
 
 

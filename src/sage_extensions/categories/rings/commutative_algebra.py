@@ -142,8 +142,8 @@ class _PrimeSpectrumTopologyData:
         )
 
     def is_open_subset(self, spectrum, subset) -> bool:
-        # ``D(f)`` is the complement of the closed set ``V(f)`` (Stacks 00E0,
-        # Lemma 10.17.2(11)), hence open.
+
+
         match subset:
             case _ if subset in DistinguishedOpenSubobjects(spectrum):
                 return True
@@ -531,7 +531,7 @@ class PrimeSpectra(OwnedCategory):
                 f"cannot count the prime ideals of {ring}: the number of points of Spec(R) is computed here "
                 "only for R a field or ZZ/(n)"
             )
-            # The primes of ZZ/(n) are the (p)/(n) for the primes p dividing n.
+
             modulus = SageZZ(
                 _engine_ideal(_owned_integers(), ring.defining_ideal()).gen()
             )
@@ -692,8 +692,8 @@ class _PrimeSpectrumFunctor(Functor):
         def prime_map(prime_source, prime_target, preimage):
             def image(point):
                 contracted = preimage(prime_source(point).ideal())
-                # PrimeSpectrum.comap_asIdeal: primality follows from the
-                # unital map and the source prime.
+
+
                 return prime_target.element_class(prime_target, contracted)
 
             return (
@@ -703,9 +703,9 @@ class _PrimeSpectrumFunctor(Functor):
             )
 
         if isinstance(ring_map, CategoricalIsomorphism):
-            # For an isomorphism f, f^-1(J) is extension along its inverse.
-            # These ideal transports are inverse, so their continuous maps
-            # form the homeomorphism Spec(f), without a new inverse search.
+
+
+
             forward = prime_map(
                 source, target, ring_map.inverse().forward().extension_of_ideal
             )
@@ -1110,10 +1110,10 @@ class QuotientRings(OwnedCategory):
                 return value
             quotient_source = self.quotient_source()
             if source is quotient_source or quotient_source in LocalizationRings():
-                # A class of an actual source element needs no computation
-                # model, including for localizations with zero divisors.
-                # The quotient factory supplies no native quotient engine
-                # for a localized source; its exact comparison is separate.
+
+
+
+
                 return self.element_class(self, quotient_source(value))
             source_engine = _engine_ring(quotient_source)
             value_parent = source
@@ -1148,6 +1148,26 @@ class QuotientRings(OwnedCategory):
             elif value_parent is source_engine:
                 value = _owned_engine_element(quotient_source, source_engine(value))
             return self.element_class(self, value)
+
+        def __contains__(self, value) -> bool:
+            r"""Membership of represented classes in this quotient.
+
+            A class is a point of its quotient, including when read through
+            its own unformed module. A source representative may also be
+            supplied along an already selected canonical scalar map, as
+            for other owned rings. The quotient's constructor alone is not
+            a test of membership of an arbitrary foreign object.
+            """
+            from sage_extensions.categories.modules.pure.modules import Modules
+
+            source = element_parent(value)
+            if source is self:
+                return True
+            if source in Modules(self.base_ring()) and source.unformed_module() is self:
+                return True
+            if source in OwnedRings():
+                return self.has_coerce_map_from(source)
+            return isinstance(value, int)
 
         def __call__(self, value):
             return self._element_constructor_(value)
@@ -1283,8 +1303,8 @@ class QuotientRings(OwnedCategory):
                 )
             source = self.quotient_source()
             if source in LocalizationRings():
-                # The canonical contracted quotient embeds into this
-                # localization; if finite, it already inverts S.
+
+
                 comparison = source._quotient_contraction_map_decision(self)
                 if comparison is None:
                     return AtomicProposition("is_finite", self)
@@ -1297,21 +1317,21 @@ class QuotientRings(OwnedCategory):
             return AtomicProposition("is_finite", self)
 
         def _cardinality_decision(self):
-            # Sage's generic quotient of a field by its unit ideal has no
-            # cardinality method; R/R has exactly one element.
+
+
             if self._is_zero_ring() is True:
                 return cardinal(1)
             if self._preamble_engine_ring is not None:
                 engine = self._preamble_engine_ring
                 if not isinstance(engine, QuotientRing_generic):
                     return cardinal(engine.cardinality())
-                # Sage's generic quotient has no total cardinality method.
-                # Retain the source/ideal computations below rather than
-                # treating an absent method as a mathematical answer.
-            # For a k-algebra A over a field k and a proper ideal I, the
-            # structure map k -> A/I is a ring map from a field to a nonzero
-            # ring, hence injective, and A -> A/I is onto, so
-            # |k| <= |A/I| <= |A|.  When |k| = |A| the cardinality is decided.
+
+
+
+
+
+
+
             base = self.quotient_source().base_ring()
             if base is not self.quotient_source() and base in OwnedFields():
                 lower = base._cardinality_decision()
@@ -1331,13 +1351,13 @@ class QuotientRings(OwnedCategory):
                 )
             source = self.quotient_source()
             if source in FiniteSets():
-                # A finite source maps onto its quotient, so ``R/I`` is the image
-                # of that map and ``|R/I| = |R| / |I|``: the killed elements are
-                # exactly the ideal.  The size of the ideal is counted here
-                # because an owned ideal states no cardinality of its own, and
-                # asking the quotient's elements instead would be asking the
-                # question being answered.  An undecided comparison leaves the
-                # cardinality undecided rather than guessed.
+
+
+
+
+
+
+
                 source_cardinality = source._cardinality_decision()
                 if source_cardinality is None:
                     return None
@@ -1361,7 +1381,7 @@ class QuotientRings(OwnedCategory):
             if source_engine is None:
                 return None
             if source_engine is SageZZ:
-                # Every nonzero ideal of ZZ is (n), and ZZ/(n) has |n| elements.
+
                 generator = _engine_ideal(source, self.defining_ideal()).gen()
                 if generator != 0:
                     return cardinal(abs(generator))
@@ -1626,8 +1646,8 @@ class QuotientRings(OwnedCategory):
         def _characteristic_decision(self):
             source = self.quotient_source()
             if source is _owned_integers():
-                # The selected integer ideal is canonicalized by Sage from
-                # its entire generating family, not its first written entry.
+
+
                 generator = abs(_engine_ideal(source, self.defining_ideal()).gen())
                 return _owned_engine_element(SageZZ, generator)
             if (
@@ -1636,14 +1656,14 @@ class QuotientRings(OwnedCategory):
             ):
                 return source.characteristic()
             if source in LocalizationRings():
-                # This canonical map is injective and unital even when its
-                # domain is infinite, so it preserves the characteristic.
+
+
                 return source.quotient_contraction_map(self).domain().characteristic()
             engine = self._preamble_engine_ring
             if engine is not None:
                 return _owned_engine_element(SageZZ, SageZZ(engine.characteristic()))
-            # A localization's fraction-field model need not have the
-            # characteristic of its quotient by the selected ideal.
+
+
             return None
 
         @cached_method
@@ -1749,10 +1769,10 @@ class QuotientRings(OwnedCategory):
                 return None
             source = self.quotient_source()
             if source in LocalizationRings():
-                # For I contracted from J, every denominator acts regularly
-                # on B=R/I by S-saturation. It is already invertible in Q(B),
-                # so localization changes neither that total quotient ring
-                # nor its surviving component fields. Reuse their owner.
+
+
+
+
                 contracted_quotient = source.quotient_contraction_map(self).domain()
                 total_map = contracted_quotient.total_quotient_map()
                 source_map = total_map * contracted_quotient.quotient_map()
@@ -1767,9 +1787,9 @@ class QuotientRings(OwnedCategory):
             field_maps = tuple(
                 component.fraction_field_map() for component in components
             )
-            # Compose genuine ring arrows A -> A/p -> Frac(A/p) at the
-            # categorical Mor owner. The component maps are independent of
-            # any chosen lift of a representative in the presentation ring.
+
+
+
             component_maps = tuple(
                 field_map * component.quotient_map()
                 for component, field_map in zip(components, field_maps, strict=True)
@@ -2001,9 +2021,9 @@ def _localized_affine_normalization_data(localization, source_data):
             component_localization * component_map
         )
 
-    # If every minimal component is killed, a power of an element of S is
-    # zero in A. Thus L itself is the zero ring and represents the empty
-    # product; the product of rings is represented for a nonempty family.
+
+
+
     component_values = tuple(localized_components[index] for index in indices)
     normalization = (
         OwnedRings().product(component_values) if component_values else localization
@@ -2118,9 +2138,9 @@ def _localized_affine_normalization_data(localization, source_data):
     regular_comparison = _isomorphism_from_known_inverse_pair(to_regular, from_regular)
     unit_map = localized_unit * regular_comparison.inverse().forward()
 
-    # The square changes only the actual rank-one source of the unit map.
-    # The existing cokernel functor supplies its induced isomorphism, which
-    # composes with the localization functor's own cokernel comparison.
+
+
+
     cokernels = Modules(localization).FinitelyPresented().cokernel_arrow_functor()
     arrows = cokernels.domain()
     localized_arrow = arrows(localized_unit)
@@ -2175,9 +2195,9 @@ def _localized_affine_normalization_data(localization, source_data):
 
     def component_numerators(index):
         numerators = source_data.component_module_numerators.value(index)
-        # Direct affine packets retain polynomial-cover numerators. Read
-        # them in their actual source A before applying A -> L. An already
-        # localized packet has A-valued numerators and uses the same map.
+
+
+
         return finite_indexed_family(
             numerators.index_set(),
             lambda label: localization_map(source(numerators.value(label))),
@@ -2250,8 +2270,8 @@ def _affine_normalization_module_maps(
     target = target_regular.restrict_scalars(normalization_map)
 
     def in_product(position, value):
-        # Coordinate insertion is additive and A-linear; for more than one
-        # component it is not unital and must never be made a ring morphism.
+
+
         if len(component_values) == 1:
             return value
         values = tuple(
@@ -2389,8 +2409,8 @@ def _affine_quotient_normalization_data(quotient):
 
         normal_rings = normal_data[1]
 
-        # Retain the native diagnostic on the radical input. The public
-        # conductor is Ann_A(B/image(A)) in the original quotient A.
+
+
         source_engine._singular_(singular).set_ring()
         conductor_singular = defining_singular.normalConductor(normal_data)
         conductor_engine = conductor_singular.sage(source_engine)
@@ -2403,17 +2423,17 @@ def _affine_quotient_normalization_data(quotient):
 
         total_delta = int(normal_data[3][2].sage())
 
-        # These ideals live in the ORIGINAL polynomial ring.  Their exact
-        # generator order is data: the last entry is the common denominator.
-        # computeRing may eliminate variables of the normalization cover, so
-        # these positions are not positions of its polynomial generators.
+
+
+
+
         source_engine._singular_(singular).set_ring()
         module_numerator_families = []
         for position in range(1, len(normal_rings) + 1):
             numerator_singular = normal_data[2][position]
-            # Converting the ideal as a whole would call a Sage ideal
-            # constructor, which may normalize its generators. These
-            # positions, especially the final denominator, are retained data.
+
+
+
             numerators = tuple(
                 _owned_engine_element(source, generator.sage_poly(source_engine))
                 for generator in numerator_singular
@@ -2443,16 +2463,16 @@ def _affine_quotient_normalization_data(quotient):
             normal_ring_singular.set_ring()
             normal_cover_engine = normal_ring_singular.sage()
             normal_ideal_engine = singular("norid").sage(normal_cover_engine)
-            # These are the images of the ordered source variables, not an
-            # ideal to canonicalize in the normalization cover.
+
+
             normal_map_images = tuple(
                 generator.sage_poly(normal_cover_engine)
                 for generator in singular("normap")
             )
-            # Singular returned a polynomial presentation with these literal
-            # coefficient ring and ordered variable labels. Reconstruct the
-            # owned cover from that datum rather than adopting the returned
-            # engine parent as a second ring object.
+
+
+
+
             normal_cover = _own_ring(normal_cover_engine.base_ring()).polynomial_ring(
                 tuple(normal_cover_engine.variable_names())
             )
@@ -2552,9 +2572,9 @@ def _affine_quotient_normalization_data(quotient):
         )
         normality = conjunction((reduced, unit_map.cokernel().is_zero()))
         if normality is True:
-            # For reduced A, eta is injective. Its zero cokernel makes it
-            # an isomorphism, so its unique lifts realize the SAME selected
-            # N and numerator labels in A with identity normalization.
+
+
+
             normalization = quotient
             normalization_map = OwnedRings().Mor(quotient, quotient).identity()
             reduced_normalization_map = normalization_map
@@ -2793,10 +2813,10 @@ class PrimeLocalizations(OwnedCategory):
                 if base is not None and source in Algebras(base).Associative().Unital()
                 else None
             )
-            # This constructor owns the decision from ``source``; the object
-            # factory may already have forwarded the same datum. Consume that
-            # copy rather than passing duplicate ``algebra_source`` keywords
-            # down to LocalizationRings.ParentMethods.
+
+
+
+
             rest.pop("algebra_source", None)
             super().__init__(
                 source,
@@ -2902,7 +2922,7 @@ class PrimeLocalizations(OwnedCategory):
                     for killer in annihilator.ideal_generators():
                         matches = prime.contains_ambient_element(killer)
                         if matches is False:
-                            # A killer outside p: this generator dies in R_p.
+
                             decisions.append(True)
                             break
                         if matches is not True:
@@ -3529,17 +3549,17 @@ def _exact_integer_rational_parts(value, source):
     parent = element_parent(value)
     if parent is None:
         return None
-    # Recognizing a supported source comes first, before any fraction-field
-    # request: only the integers are read this way, and a non-domain source has
-    # no fraction field to ask for at all.  A completion of another ring -- a
-    # polynomial ring at a point, whose fraction field is a rational function
-    # field -- keeps its own source expressions and is not reinterpreted here;
-    # the exact integer and rational literals above still cross, because they
-    # are exact numbers of any such source.
+
+
+
+
+
+
+
     if _engine_ring(source) is not SageZZ:
-        # An element of another owned ring is an exact number this reduction
-        # does not read: the comparison is undecided, not false and not an
-        # error.  A host object is not an exact number at all and stays false.
+
+
+
         from sage_extensions.categories.rings.ring_foundation import OwnedRings
 
         if parent in OwnedRings():
@@ -3772,8 +3792,8 @@ class _AdicCompletionElement(_OwnedAlgebraElement):
     def _completion_equal(self, other):
         pair = self._exact_operand_pair(other)
         if pair is _EXACT_LITERAL_UNSUPPORTED:
-            # An exact number this completion does not reinterpret: unknown,
-            # neither false nor an exception.
+
+
             return AtomicProposition("equal", self, other)
         if pair is None:
             return False
@@ -3921,6 +3941,17 @@ class _AdicCompletionAlgebraParent(_OwnedAlgebraParent):
 
     Element = _AdicCompletionElement
 
+    def _cardinality_decision(self):
+
+
+
+        from sage_extensions.categories.sets.cardinals import continuum
+
+        if (self._adic_completion_source is _owned_integers()
+                and self._adic_completion_ideal.is_maximal() is True):
+            return continuum
+        return super()._cardinality_decision()
+
     def __init__(
         self,
         engine,
@@ -3976,18 +4007,18 @@ class _AdicCompletionAlgebraParent(_OwnedAlgebraParent):
                 completion_map_image,
                 selected_engine_map,
             )
-            # The ring map is retained by the construction, so a consumer that
-            # needs a ring homomorphism reads this arrow and never the Python
-            # type of the core arrow built below (``OWN-05``).
+
+
+
             self._adic_completion_ring_morphism = forward
             if not self.completion_defining_power_vanishes():
                 return forward
-            # A power of the defining ideal is zero, so the source is its own
-            # completion and the map is an isomorphism: it is built as one
-            # (``OWN-22``), not as a map carrying a boolean saying so.  Its
-            # inverse is the identification with the source, which the
-            # construction realizes by presenting the completion on the
-            # source's own engine.
+
+
+
+
+
+
             assert _engine_ring(source) is engine, (
                 f"the completion of {source} at {defining_ideal} is the source itself, because "
                 f"a power of {defining_ideal} is zero, so it is presented on the source's own "
@@ -4053,11 +4084,11 @@ class _AdicCompletionAlgebraParent(_OwnedAlgebraParent):
                     and formal_base in OwnedRings().Commutative().Local().Complete()
                 )
 
-        # A formal-power-series specialization knows the quotient by its
-        # represented ideal of variables exactly. For an arbitrary adic
-        # completion, maximality is the defining ideal owner's computation;
-        # a failure of that selected computation is a failure, not a category
-        # decision.
+
+
+
+
+
         if formal_parameter_labels is not None and formal_base is not None:
             defining_ideal_is_maximal = (
                 True if formal_base in OwnedRings().Division().Commutative() else None
@@ -4094,12 +4125,12 @@ class _AdicCompletionAlgebraParent(_OwnedAlgebraParent):
             )
 
         if algebra_base is None and self._adic_defining_power_vanishes:
-            # A power of the defining ideal is zero, so the completion is the
-            # source and, read over that source, it is free of rank one on the
-            # unit: the frame is the completion map, which is an isomorphism,
-            # and its inverse is that map's inverse.  The basis is stated here,
-            # by the construction that retains the datum; the ring owner reads
-            # no engine and infers no basis from a shared presentation.
+
+
+
+
+
+
             from sage_extensions.categories.modules.native_modules import (
                 _power_module_basis,
             )
@@ -4142,16 +4173,16 @@ class _AdicCompletionAlgebraParent(_OwnedAlgebraParent):
                     ),
                     residue_field=residue,
                     residue_map=residue_map,
-                    # The field decision, stated rather than decided from the
-                    # ideal: extending an ideal along the completion map builds
-                    # a free module over this ring, whose placement asks whether
-                    # it is a field -- this same decision.  Stating it keeps
-                    # that circle open.  It is stated by case, because the
-                    # construction admits degenerate input: with no formal
-                    # parameter the completion is the base ring itself, whose
-                    # maximal ideal is zero exactly when the base is a field;
-                    # in the zero ring every element is zero, so no parameter
-                    # generates anything, and the ring is still not a field.
+
+
+
+
+
+
+
+
+
+
                     maximal_ideal_is_zero_factory=lambda: _completion_field_decision(
                         self, formal_base, formal_parameters
                     ),
@@ -4452,11 +4483,11 @@ def _quotient_ring(source, defining_ideal):
     actual classes. This includes a further quotient of an engine-free
     quotient; neither its source nor its defining ideal is flattened away.
     """
-    # The one-variable maximal quotient QQ[t]/(f) is the number-field
-    # construction already interned by its monic defining polynomial. Route
-    # this presentation through that owner before making a generic quotient;
-    # otherwise the same field acquires a second owned parent with a different
-    # cache key and loses the number-field element operations/resolution.
+
+
+
+
+
     if (
         source.base_ring() is _owned_rationals()
         and source in SymmetricAlgebras(source.base_ring())
@@ -4465,10 +4496,10 @@ def _quotient_ring(source, defining_ideal):
     ):
         generators = tuple(defining_ideal.ideal_generators())
         if generators:
-            # In QQ[t], the gcd of the selected ideal generators is the
-            # principal generator of their ideal. A maximal ideal need not
-            # have a one-element selected generating family, so normalize the
-            # whole family before entering the canonical number-field owner.
+
+
+
+
             generator = _engine_element(source, generators[0])
             for other in generators[1:]:
                 generator = generator.gcd(_engine_element(source, other))
@@ -4486,37 +4517,37 @@ def _quotient_ring(source, defining_ideal):
         defining = _engine_ideal(source, defining_ideal)
         match engine:
             case SageNumberFieldOrder():
-                # Sage's generic QuotientRing order branch attempts to replace an
-                # order ideal I by K.ideal(I), treating the ideal itself as a field
-                # element.  The owned quotient already has the exact class model:
-                # equality is membership modulo I.
+
+
+
+
                 quotient_engine = None
             case QuotientRing_generic():
                 lifted = _engine_quotient_cover_ideal(source, defining)
                 quotient_engine = lifted.ring().quotient(lifted)
             case _ if engine in SageFields():
-                # Sage names a field's quotient generator after the field's
-                # generator, which for Qp(3) is the invalid "3bar"
-                # (TRAPS.md); the quotient of a field is the field or zero,
-                # so the private name is never read.
+
+
+
+
                 quotient_engine = engine.quotient(
                     defining, names=("quotient_generator",)
                 )
             case _:
                 quotient_engine = engine.quotient(defining)
 
-    # O/I is finite for an order O and a nonzero ideal I, placed by that
-    # construction: O is a free ZZ-module of finite rank, so a nonzero ideal
-    # has full rank and finite index (Mathlib
-    # ``Ideal.finiteQuotientOfFreeOfNeBot``,
-    # Mathlib/LinearAlgebra/FreeModule/IdealQuotient.lean).  ZZ is the order
-    # of QQ: ZZ/(n) is ``ZMod n`` (``Int.quotientSpanNatEquivZMod``), finite
-    # for n != 0 (``ZMod.fintype``, Mathlib/Data/ZMod/Defs.lean).  The
-    # placement reads the source's construction and the ideal's generators,
-    # never the class of a realization (ARC-08).
-    # A nonzero ideal of a finite-rank order has finite index, so its quotient
-    # is finite and Artinian. Read only the retained generators here: an
-    # undecided equality to zero is not a premise for finite placement.
+
+
+
+
+
+
+
+
+
+
+
+
     finite_order_quotient = (
         not exact_source_quotient
         and source in OwnedOrders()
@@ -4526,10 +4557,10 @@ def _quotient_ring(source, defining_ideal):
         )
     )
 
-    # A field/domain placement is inherited from the ideal's construction
-    # category, never selected by asking its maximality/primality predicate.
-    # Unplaced ideals leave the quotient's corresponding property to the
-    # caller, as required by CON-07 and ARC-08.
+
+
+
+
     quotient_is_field = not exact_source_quotient and Category.__contains__(
         CommutativeIdeals(source).Maximal(), defining_ideal
     )
@@ -4539,25 +4570,25 @@ def _quotient_ring(source, defining_ideal):
             CommutativeIdeals(source).PrimeAsIdeal(), defining_ideal
         )
     )
-    # ZZ/(p) for a maximal (p) is the prime field F_p, one object for every
-    # route (``GF(p)``, ``PrimeFields()(p)``, ``Zmod(p)``).  It has no proper
-    # subfield: every ring map into ZZ/(p) is onto (Mathlib
-    # ``ZMod.ringHom_surjective``, Mathlib/Data/ZMod/Basic.lean:1135, with
-    # ``Int.quotientSpanNatEquivZMod``), so a subfield, containing the image
-    # of ZZ, is all of it.  Sage's prime field ``GF(p)`` is selected as the
-    # private realization of this quotient (CON-12).
+
+
+
+
+
+
+
     prime_field = (
         quotient_is_field and not exact_source_quotient and source is _owned_integers()
     )
     if prime_field:
         quotient_engine = _SageGF(abs(defining.gen()))
-    # F_p[t]/(m) for a maximal (m) is the field F_q, q = p^(deg m): the
-    # classes of 1, t, ..., t^(deg m - 1) are an F_p-basis (Mathlib
-    # ``AdjoinRoot.powerBasis``, Mathlib/RingTheory/AdjoinRoot.lean), so it
-    # has p^(deg m) elements.  This is the construction of ``GF(q, label)``.
-    # Sage's finite field with modulus exactly m is selected as its private
-    # realization (CON-12); the modulus is the caller's (OWN-22), so Sage
-    # does not re-test irreducibility.
+
+
+
+
+
+
+
     finite_extension_field = (
         quotient_is_field
         and not exact_source_quotient
@@ -4579,9 +4610,9 @@ def _quotient_ring(source, defining_ideal):
         )
     from sage_extensions.categories.group.magmas import AdditiveGroups
 
-    # The quotient has the quotient abelian-group structure of its source.
-    # Record the inherited additive axiom on the concrete parent rather than
-    # relying on the category join to materialize it transitively.
+
+
+
     placements = [AdditiveGroups().AdditiveCommutative()]
     if source in OwnedRings().Noetherian():
         placements.append(OwnedRings().Noetherian())
@@ -4590,7 +4621,7 @@ def _quotient_ring(source, defining_ideal):
     if quotient_is_field:
         placements.append(OwnedRings().Division().Commutative())
     elif quotient_is_domain:
-        # A prime ideal is proper, so this quotient is also nontrivial.
+
         placements.append(OwnedIntegralDomains())
     if source in FiniteSets() or finite_order_quotient or finite_extension_field:
         placements.append(FiniteSets())
@@ -4610,15 +4641,15 @@ def _quotient_ring(source, defining_ideal):
         _engine_ring=quotient_engine,
     )
 
-    # For p prime and k > 1, an integer class modulo p^k is a unit exactly
-    # when it is not divisible by p.  Thus all nonunits lie in (p), making
-    # (p) the unique maximal ideal; the quotient by it is Z/p.  The selected
-    # locality criterion is Stacks Project, Lemma 10.18.3 (Tag 00E9),
-    # https://stacks.math.columbia.edu/tag/00E9: all elements outside this
-    # maximal ideal are units, by Bezout applied to their lift and p^k.
-    # The integer generator is the construction datum; use its exact prime-power
-    # factorization rather than testing any property of the quotient or its
-    # engine realization.
+
+
+
+
+
+
+
+
+
     if source is _owned_integers() and not exact_source_quotient:
         integer_generators = tuple(defining_ideal.ideal_generators())
         if len(integer_generators) == 1:
@@ -4817,9 +4848,9 @@ def _flattened_symmetric_localization_engine(source, inverted):
     coefficient_engine = _engine_ring(coefficient_ring)
     coefficient_bottom_engine = _engine_ring(coefficient_bottom)
     names = tuple(source_engine.variable_names())
-    # In one variable Sage's own localization of C[x] decides units, while
-    # the flattened A[x] inverting a constant raises on every nonconstant
-    # element (TRAPS.md); only several variables take the flattened route.
+
+
+
     if len(names) == 1:
         return None, None, None
     polynomial_bottom = _SagePolynomialRing(
@@ -4912,8 +4943,8 @@ def _finite_generated_localization(source, submonoid):
     if all(value.is_unit() for value in values):
         localization_engine = engine_bottom
     elif isinstance(engine_bottom, QuotientRing_generic):
-        # Protected OWN-06 dispatch: a Sage generic quotient parent requires
-        # the standard auxiliary-variable localization presentation.
+
+
         cover = engine_bottom.cover_ring()
         defining = engine_bottom.defining_ideal()
         cover_names = tuple(cover.variable_names())
@@ -4925,8 +4956,8 @@ def _finite_generated_localization(source, submonoid):
                 candidate = "localization_" + candidate
             occupied.add(candidate)
             inverse_names.append(candidate)
-        # An explicit variable count selects Sage's multivariate model even
-        # for one inverse variable; its ideal reduction also works over ZZ.
+
+
         extended_cover = _SagePolynomialRing(
             cover.base_ring(),
             len(cover_names) + len(inverse_names),
@@ -4958,10 +4989,10 @@ def _finite_generated_localization(source, submonoid):
         and hasattr(engine_bottom, "variable_names")
         and engine_bottom.base_ring().is_integral_domain() is False
     ):
-        # An arbitrary commutative coefficient ring admits localization,
-        # although Sage's PolynomialRing.localization demands a domain.
-        # The inverse-variable presentation represents the universal ring
-        # without imposing a false no-zero-divisors hypothesis.
+
+
+
+
         source_names = tuple(engine_bottom.variable_names())
         occupied = set(source_names)
         inverse_names = []
@@ -4992,10 +5023,10 @@ def _finite_generated_localization(source, submonoid):
             localization_engine = engine_bottom.localization(values)
     from sage_extensions.categories.group.magmas import AdditiveGroups
 
-    # Localization inherits the source ring's abelian addition, including
-    # the zero localization.  Owned joins do not guarantee that this inherited
-    # facet is materialized on the concrete parent; module construction and
-    # the fraction-field path require the actual additive-group placement.
+
+
+
+
     placements = [
         *_localization_size_placements(source, submonoid),
         AdditiveGroups().AdditiveCommutative(),
@@ -5003,11 +5034,11 @@ def _finite_generated_localization(source, submonoid):
     if source in OwnedRings().Noetherian():
         placements.append(OwnedRings().Noetherian())
     if source in OwnedRings().Commutative().NoZeroDivisors():
-        # The zero-product property survives even the zero localization.
+
         placements.append(OwnedRings().Commutative().NoZeroDivisors())
-    # Localization preserves a domain (and a PID) only when zero is not
-    # inverted. Noetherianity also holds for the zero localization. An
-    # undecided zero-membership predicate supplies no nontriviality edge.
+
+
+
     if (
         source in OwnedIntegralDomains()
         and _submonoid_contains_zero_in_domain(source, submonoid) is False
@@ -5096,14 +5127,14 @@ def _fraction_field_localization(source, submonoid):
     )
     match engine:
         case QuotientRing_generic():
-            # Sage's IntegralDomains.ParentMethods.fraction_field is precisely
-            # FractionField_generic(self).  A represented quotient carries the
-            # domain theorem in its owned construction, while its private Sage
-            # realization remains in Sage's quotient-ring category.  Use that
-            # maintained constructor directly instead of mutating the
-            # realization merely to make the category method appear.  An owned
-            # quotient whose engine is not a generic quotient (ZZ/(0) is
-            # realized by ZZ itself) asks its engine, which knows its field.
+
+
+
+
+
+
+
+
             fraction_engine = SageFractionField(engine)
         case _:
             fraction_engine = engine.fraction_field()
@@ -5116,11 +5147,11 @@ def _fraction_field_localization(source, submonoid):
     ]
     if source in OwnedRings().Noetherian():
         placements.append(OwnedRings().Noetherian())
-    # An ordered integral domain has a unique order extension to its fraction
-    # field. Newer Sage versions expose that contract as OrderedFields. Older
-    # supported Sage images lack the category module, so retain the order only
-    # for QQ or an unchanged field engine there; do not infer an order for an
-    # arbitrary rational-function or other field merely from field membership.
+
+
+
+
+
     realizes_ordered_field = (
         fraction_engine is SageQQ
         or fraction_engine is engine
@@ -5149,13 +5180,13 @@ def _fraction_field_localization(source, submonoid):
             algebra_categories.append(
                 Algebras(algebra_base).Associative().Unital().Commutative()
             )
-    # ``Frac(ZZ)`` is the *named* rational field, so it carries the placement
-    # that names it: the prime field of characteristic 0, ordered, and the
-    # number field of degree one (``_rational_placements``).  The localization
-    # construction above supplies only the localization and field placements,
-    # so without this a guard reading ``QQ in PrimeFields()`` -- the spinor-norm
-    # entry points of ``Lattices.O_plus`` among them -- rejects the field whose
-    # own placement declares it.  Other fraction fields are unaffected.
+
+
+
+
+
+
+
     if source is _owned_integers():
         from sage_extensions.categories.rings.ring_foundation import (
             _rational_placements,
@@ -5221,11 +5252,11 @@ def _localization_at_submonoid(source, submonoid):
         localization = _fraction_field_localization(source, submonoid)
     else:
         localization = _finite_generated_localization(source, submonoid)
-    # All represented localizations are unital rings over their retained
-    # source. Their object constructor is _object_of rather than
-    # _OwnedRingParent, so make the regular module explicit at this common
-    # construction boundary. The fraction-field specialization has already
-    # done this and is idempotently recognized here.
+
+
+
+
+
     from sage_extensions.categories.algebras.algebras import (
         _algebra_from_native_ring,
     )
@@ -5238,15 +5269,15 @@ def _localization_at_submonoid(source, submonoid):
             if algebra_source is None:
                 scalar_image = localization(scalar)
             else:
-                # Preserve the source algebra's selected structure map
-                # k -> A, then apply the canonical localization map A -> S^-1 A.
-                # Coercing k directly into the localization can choose a
-                # different ambient coercion path and loses the exact retained
-                # scalar structure when A was constructed over a nontrivial map.
-                # A unital algebra's structure map is recovered from its
-                # retained scalar action on 1. Do not use parent coercion as
-                # a substitute: coercion can follow a different ambient route
-                # from the selected k-algebra structure.
+
+
+
+
+
+
+
+
+
                 source_scalar = algebra_source._owned_scalar_multiple(
                     scalar, algebra_source.one()
                 )
@@ -5520,9 +5551,9 @@ def _PrimeLocalizationFromSubmonoid(source, submonoid):
         )
     from sage_extensions.categories.group.magmas import AdditiveGroups
 
-    # Prime localization is still a localization of the source ring, so its
-    # addition is abelian.  It has a separate owner from finite-generated
-    # localization because its inverted set has no selected finite family.
+
+
+
     placements = [
         *_localization_size_placements(source, submonoid),
         AdditiveGroups().AdditiveCommutative(),
@@ -5664,8 +5695,8 @@ def _adic_completion_from_owned_data(source, defining, precision):
                 if source in OwnedRings().Noetherian()
                 else None
             ),
-            # The selected maximal ideal is proper, so the completion has
-            # a nonzero residue quotient.
+
+
             extra_categories=(OwnedRings().Nontrivial(),),
         )
     defining_engine = _engine_ideal(source, defining)
@@ -5689,9 +5720,9 @@ def _adic_completion_from_owned_data(source, defining, precision):
                 and (defining == zero_ideal) is True
             )
         ):
-            # Zero coefficients and an empty variable family may be realized
-            # by scalar engines. Their fixed formal variables and coefficient
-            # ring remain the data of the same formal-series construction.
+
+
+
             degenerate_formal_data = {
                 "algebra_base": base,
                 "formal_parameter_labels": tuple(labels),
@@ -5722,8 +5753,8 @@ def _adic_completion_from_owned_data(source, defining, precision):
             completion_map_kernel=unit_ideal,
             **degenerate_formal_data,
         )
-    # Completion maps onto R/I; proper I implies nontrivial completion.
-    # This says nothing about zero divisors or a truncation model's domain status.
+
+
     nontrivial_categories = (
         (OwnedRings().Nontrivial(),) if defining_is_unit is False else ()
     )
@@ -5737,10 +5768,10 @@ def _adic_completion_from_owned_data(source, defining, precision):
         def projection_lift(value, _exponent):
             return _owned_engine_element(source, engine(value))
 
-        # The zero ideal has every power zero, so every truncation is the ring
-        # itself: the completion is the source on the source's own engine, and
-        # the parent builds the completion map as the isomorphism that this
-        # presentation is.
+
+
+
+
         return _AdicCompletionAlgebraParent(
             engine,
             source,
@@ -5876,8 +5907,8 @@ def _adic_completion_from_owned_data(source, defining, precision):
         completed_ideal_generators=completed_ideal_generators,
         projection_lift=projection_lift,
         arithmetic_mode="exact_lazy",
-        # A polynomial has finite degree in the selected variables over any
-        # coefficient ring, so no nonzero polynomial lies in all their powers.
+
+
         completion_map_kernel=zero_ideal,
         algebra_base=algebra_base,
         formal_parameter_labels=formal_parameter_labels,
@@ -6067,8 +6098,8 @@ def Zp(*args, **kwargs):
     owned_prime = _exact_integral_input(prime_value, source, "the prime of Zp")
     prime = SageZZ(_engine_element(source, owned_prime))
     engine_kwargs = dict(kwargs)
-    # The precision is a session integer, which Sage's factory cannot read;
-    # it crosses as the Sage integer it names.
+
+
     match args[1:2]:
         case (precision,):
             args = (
@@ -6109,18 +6140,18 @@ class _DualNumbersAlgebraParent(_OwnedAlgebraParent):
                     _engine_element(parent._quotient_source, backend_value)
                 )
             elif source is parent:
-                # This ring's own element: the engine value is its datum.
+
                 backend_value = backend_value._backend()
             elif source is parent._engine:
-                # The engine element itself, which is what a coercion map hands
-                # back: the private realization is exactly this ring's datum.
+
+
                 pass
             else:
-                # A scalar of the tower or a host number.  The coefficient map is
-                # the constant term, so the value enters through the polynomial
-                # source, where the whole tower already lands: ``ZZ -> R -> R[eps]``.
-                # The polynomial ring's own constructor decides what it admits;
-                # this class does not invent a second scalar ingress.
+
+
+
+
+
                 backend_value = parent._engine(
                     _engine_element(parent._quotient_source, parent._quotient_source(backend_value))
                 )
@@ -6205,13 +6236,13 @@ class _DualNumbersAlgebraParent(_OwnedAlgebraParent):
                 ),
                 residue_field=residue,
                 residue_map=residue_map,
-                # Not a field, and stated rather than decided from the ideal:
-                # the ideal route builds a free module over this ring, whose
-                # placement asks this very question.  Two cases, and the answer
-                # is the same in both: over a nonzero base ``epsilon`` is not
-                # zero, so ``(epsilon)`` is a nonzero maximal ideal; over the
-                # zero ring every element is zero and the ring is not a field
-                # either, since ``1 = 0``.
+
+
+
+
+
+
+
                 maximal_ideal_is_zero=False,
             )
 

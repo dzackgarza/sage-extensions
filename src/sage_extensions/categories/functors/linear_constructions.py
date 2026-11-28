@@ -23,6 +23,22 @@ class _DualizationFunctor(Functor):
     def _repr_(self):
         return "Dual-module functor (-)^*"
 
+    def __call__(self, value):
+        r"""Read ordinary modules and arrows in the opposite before applying duality."""
+        from sage.categories.map import Map
+        from sage_extensions.categories.abstract_categories.mor_foundation import CategoricalArrow
+        from sage_extensions.categories.abstract_categories.category_constructions import OppositeMorphism
+
+        opposite = self.domain()
+        if isinstance(value, OppositeMorphism):
+            return self.morphism_image(value)
+        if isinstance(value, (Map, CategoricalArrow)):
+            arrow = opposite.Mor(opposite(value.codomain()), opposite(value.domain()))(value)
+            return self.morphism_image(arrow)
+        if value in opposite.base_category():
+            value = opposite(value)
+        return self.object_image(value)
+
     def _apply_object(self, opposite_module):
         return opposite_module.underlying_object().dual_module()
 

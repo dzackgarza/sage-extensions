@@ -1,0 +1,77 @@
+name: "Smooth kernel normal acceptance (#606)"
+on:
+  workflow_dispatch: {}
+permissions:
+  contents: read
+  packages: read
+jobs:
+  acceptance:
+    name: "Normal #606 gate (${{ matrix.source }})"
+    strategy:
+      fail-fast: false
+      matrix:
+        source: [baseline, candidate]
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/dzackgarza/sage@sha256:8bd6051c8f05c42b1dc67190b53c896bcc480b4671b75bfcafce0ca425699169
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ github.token }}
+      options: --user root
+    timeout-minutes: 40
+    env:
+      SAGE_BIN: /sage/.venv/bin/sage
+      BASELINE_SHA: 1d2005ba6a8707805aaebda7ac5a50ae7dac52b5
+      SELECTED_SOURCE: ${{ matrix.source }}
+    steps:
+      - name: Check out exact acceptance corpus
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - name: Check out unchanged main baseline
+        if: matrix.source == 'baseline'
+        uses: actions/checkout@v4
+        with:
+          ref: 1d2005ba6a8707805aaebda7ac5a50ae7dac52b5
+          path: .baseline
+      - name: Check out pinned Sage collector
+        uses: actions/checkout@v4
+        with:
+          repository: dzackgarza/ai-review-ci
+          ref: 0ceb9ab92679bb8c38ed1b84460e97831e5bad0f
+          path: .qc-infra
+      - name: Run the same normal gate on the selected exact library
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          mkdir -p "$HOME" .606-ci
+          ln -sfn "$GITHUB_WORKSPACE/.qc-infra" "$HOME/ai-review-ci"
+          library="$GITHUB_WORKSPACE"
+          if [ "$SELECTED_SOURCE" = baseline ]; then
+            library="$GITHUB_WORKSPACE/.baseline"
+            git config --global --add safe.directory "$library"
+            test "$(git -C "$library" rev-parse HEAD)" = "$BASELINE_SHA"
+          fi
+          source_sha="$(git -C "$library" rev-parse HEAD)"
+          test "$(git rev-parse HEAD)" = "${{ github.sha }}"
+          export PYTHONPATH="$library/src"
+          export PYTHONNOUSERSITE=1
+          printf 'Library source: %s\nAcceptance corpus: %s\n' "$source_sha" "$(git rev-parse HEAD)" | tee .606-ci/provenance.txt
+          "$SAGE_BIN" --version
+          /sage/.venv/bin/python -c 'import importlib.util, os; from pathlib import Path; p=Path(importlib.util.find_spec("sage_extensions").origin).resolve(); print("Loaded source:", p); assert p.is_relative_to(Path(os.environ["PYTHONPATH"]).resolve())'
+          sha256sum results/issue-606/worker340-acceptance.paths pyproject.toml | tee -a .606-ci/provenance.txt
+          mapfile -t paths < results/issue-606/worker340-acceptance.paths
+          just test -v "${paths[@]}" 2>&1 | tee .606-ci/normal-gate.log
+      - name: Keep actual gate report and provenance
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: normal-606-${{ matrix.source }}-${{ github.sha }}
+          path: |
+            .606-ci/
+            .timings/
+            tests/.report/
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 90

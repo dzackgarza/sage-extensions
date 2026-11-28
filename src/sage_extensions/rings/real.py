@@ -64,9 +64,9 @@ def RealApproximation(value):
     r"""Return the owned finite-precision real represented by ``value``."""
     backend = _create_real_approximation(value)
 
-    # The approximation constructor selects its MPFR precision. Preserve that
-    # defining datum through the owned field constructor rather than adopting
-    # the native RealField parent by engine class.
+
+
+
     from sage_extensions.categories.rings.ring_foundation import (
         _owned_real_field,
     )
@@ -133,7 +133,7 @@ def _contains_approximation(expression: Expression) -> bool:
     atom_parent = parent(atom)
     if atom_parent in SageRings():
         return not bool(atom_parent.is_exact())
-    # Symbolic constants and foreign Python atoms are not approximation rings.
+
     return False
 
 
@@ -222,9 +222,9 @@ def _sign_from_algebraic(expression: Expression):
 def _sign_from_ball(expression: Expression | LazyFieldElement, precision: int):
     r"""Certify the sign using an Arb enclosure, or return ``None``."""
     field = RealBallField(precision)
-    # ``expression in RealBallField`` is False even for pi^2 and sqrt(2),
-    # which the field encloses; a closed real expression is what it
-    # converts (TRAPS.md).
+
+
+
     if isinstance(expression, LazyFieldElement):
         ball = expression.eval(field)
     else:
@@ -450,10 +450,10 @@ class ExactRealNumber(FieldElement):
 
     def __init__(self, parent: ExactRealField, expression: Expression | LazyFieldElement) -> None:
         self._expression = expression
-        # The constructor admits two presentations, and this is where it says
-        # which of them it holds; the element retains that decision rather than
-        # asking it again.  A computation retains no symbolic expression and is
-        # keyed by its own identity token instead.
+
+
+
+
         self._retained_expression = None if isinstance(expression, LazyFieldElement) else expression
         if isinstance(expression, LazyFieldElement):
             self._cache_token = object()
@@ -567,10 +567,10 @@ class ExactRealNumber(FieldElement):
         return integer_ring(self._rational_())
 
     def _rational_(self):
-        # The symbolic ring keeps distinct square roots apart, so
-        # sqrt(6)*sqrt(3)*sqrt(2) is no numeric rational to it.  The value
-        # reading that equality and the hash use places it exactly, as the
-        # relations of this field already do.
+
+
+
+
         expression = self._symbolic_expression()
         if expression is not None:
             value = self._algebraic_value()
@@ -886,11 +886,11 @@ class ExactRealField(UniqueRepresentation, Field):
             FinitelyGeneratedFreeModules,
         )
 
-        # The constructing category is construction data (OWN-15): a field is
-        # built by the ring route, as every owned ring is.  The real line is
-        # this field, and the field's own construction places it in the smooth
-        # manifolds, so the placement is a membership of the field rather than a
-        # manifold built beside it (CAT-15, CAT-23).
+
+
+
+
+
         self._constructing_category = OwnedRings()
         regular_algebra = Algebras(self).Associative().Unital().Commutative()
         Field.__init__(
@@ -937,6 +937,57 @@ class ExactRealField(UniqueRepresentation, Field):
         refuses this serialization rather than substituting an approximation.
         """
         return SR
+
+    def _evaluate_formula(self, formula, variables, coordinates):
+        r"""Evaluate a private scalar formula over the exact real field.
+
+        For symbolically realized coordinates, use exact substitution.
+        A Cauchy-real coordinate instead requires the same expression's
+        operations in the owned field. The compiled expression is evaluated
+        in this field, not in a floating-point field.
+        """
+        coordinates = tuple(self(value) for value in coordinates)
+        variables = tuple(variables)
+        assert len(coordinates) == len(variables)
+        if all(value._symbolic_expression() is not None for value in coordinates):
+            return self(SR(formula).subs(dict(zip(variables,
+                (value.expression() for value in coordinates), strict=True))))
+        from sage.ext.fast_callable import fast_callable
+        from contextlib import ExitStack
+        from sage_extensions.categories.functions.real_functions import (
+            flat_exponential, _flat_exponential_exact,
+        )
+
+        formula = SR(formula)
+        flat_nodes = {}
+
+        def collect(expression):
+            if expression.operator() is flat_exponential:
+                flat_nodes[expression] = None
+            else:
+                for operand in expression.operands():
+                    collect(operand)
+
+        collect(formula)
+        if not flat_nodes:
+            return self(fast_callable(formula, vars=variables, domain=self)(*coordinates))
+
+
+
+        with ExitStack() as stack:
+            replacement, arguments = {}, []
+            for node in flat_nodes:
+                i, j, m, a, b = node.operands()
+                assert all(order in ZZ for order in (i, j, m))
+                value = _flat_exponential_exact(int(i), int(j), int(m),
+                    self._evaluate_formula(a, variables, coordinates),
+                    self._evaluate_formula(b, variables, coordinates))
+                placeholder = stack.enter_context(SR.temp_var())
+                replacement[node] = placeholder
+                arguments.append(value)
+            compiled = fast_callable(formula.subs(replacement),
+                vars=(*variables, *replacement.values()), domain=self)
+            return self(compiled(*coordinates, *arguments))
 
     def _engine_element(self, element):
         r"""Serialize a real with an available exact symbolic expression."""
@@ -986,8 +1037,8 @@ class ExactRealField(UniqueRepresentation, Field):
         """
         numerator, denominator = self(numerator), self(denominator)
         left, right = numerator._arithmetic_values(denominator)
-        # Field closure under division by this known nonzero real supplies
-        # reality; a symbolic engine need not re-decide that hypothesis.
+
+
         return self.element_class(self, left / right)
 
     def _matrix_determinant(self, components) -> ExactRealNumber:
@@ -1127,7 +1178,7 @@ class ExactRealField(UniqueRepresentation, Field):
         return True
 
     def _coerce_map_from_(self, source):
-        # A coercion into a ring is a ring morphism, so only a ring has one.
+
         match source:
             case _ if source in OwnedRings() or source in SageRings():
                 pass
@@ -1185,6 +1236,12 @@ class ExactRealField(UniqueRepresentation, Field):
         """
         if not self._preamble_charts:
             self.chart("identity", "x")
+
+    def point(self, coordinates, chart_label=None):
+        r"""Read a point in the identity chart of the real line."""
+        assert chart_label is None or chart_label == self.identity_chart().label()
+        (coordinate,) = tuple(coordinates)
+        return self(coordinate)
 
     def identity_chart(self):
         r"""The coordinate chart of the real line on this exact field.

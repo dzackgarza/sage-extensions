@@ -25,7 +25,7 @@ def _the_plane_with_four_charts():
     chart = plane.chart("U", "x y")
     x, y = chart.coordinate(0), chart.coordinate(1)
     cuts = {
-        label: plane.chart_on_open_subset(label, "x y", "U", condition)
+        label: plane.chart_on_open_subset(label, "x y", "U", condition, same_coordinates=True)
         for label, condition in (
             ("N1", (x**2 + 1,)),
             ("N2", (y,)),

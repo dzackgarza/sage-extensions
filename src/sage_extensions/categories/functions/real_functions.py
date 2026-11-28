@@ -90,7 +90,7 @@ from sage_extensions.categories.rings.ring_foundation import (
     _owned_integers,
 )
 from sage_extensions.categories.sets.cardinals import continuum
-from sage_extensions.categories.sets.set_categories import NN
+from sage_extensions.categories.sets.set_categories import NN, _FormulaMap
 from sage_extensions.logic import AtomicProposition
 from sage_extensions.rings.real import RR
 
@@ -333,9 +333,9 @@ def _l2_symbolic_verdict(expression, variable):
 
 
 
-# The generators of the two classes of functions recognized structurally,
-# each closed under the operations of _is_built_from: the first three are
-# C^infinity, and all are continuous on the whole line.
+
+
+
 _SMOOTH_FUNCTIONS = (exp, sin, cos)
 _CONTINUOUS_FUNCTIONS = _SMOOTH_FUNCTIONS + (sinh, cosh, tanh, sech, arctan, erf, abs_symbolic)
 
@@ -414,9 +414,9 @@ def _are_holder_conjugates(p, q) -> bool:
 
 
 
-# ---------------------------------------------------------------------------
-# The formula adapter.
-# ---------------------------------------------------------------------------
+
+
+
 
 
 def _function_formula(function):
@@ -434,6 +434,9 @@ def _function_formula(function):
     one states that frontier.
     """
     match function:
+        case _FormulaMap():
+            body, variables = function._formula_data()
+            return (body, variables[0]) if len(variables) == 1 else None
         case Expression() if len(function.arguments()) == 1:
             variable = function.arguments()[0]
             return function(variable), variable
@@ -521,6 +524,44 @@ def _pointwise_derivation(element):
             return values.operation(), tuple(values.operands())
         case _:
             return None
+
+
+def _has_smooth_representation(definition, domain):
+    """Read the data of a represented smooth scalar map, not a smoothness test.
+
+    Formula and local derivative constructors declare their mathematical
+    hypotheses. The pointwise laws preserve that datum; they cannot create
+    it from an evaluation-only map. In particular no finite sample or Python
+    callable type supplies derivatives of every order.
+    """
+    from sage_extensions.categories.functions.smooth_germs import _SmoothGermFunction
+    from sage_extensions.categories.manifolds import (
+        _ChartExpression, _ChartwiseFunction, _RestrictedManifoldFunction,
+    )
+
+    if isinstance(definition, _SmoothGermFunction):
+        return definition.manifold is domain
+    if isinstance(definition, _ChartExpression):
+        return True
+    if isinstance(definition, _ChartwiseFunction):
+        return definition.manifold() is domain
+    if isinstance(definition, _RestrictedManifoldFunction):
+        return definition.domain is domain
+    if isinstance(definition, _ConstantMap):
+        return True
+    if isinstance(definition, _PointwiseValues):
+        operation = definition.operation()
+        if not (operation in (_pointwise_zero, _pointwise_sum, _pointwise_negative,
+                              _pointwise_product)
+                or isinstance(operation, functools.partial)
+                and operation.func is _pointwise_scalar_multiple):
+            return False
+        return all(_has_smooth_representation(_defining_function_of(operand), domain)
+                   for operand in definition.operands())
+    if isinstance(definition, (Expression, _FormulaMap)):
+        formula = _function_formula(definition)
+        return formula is not None and (domain is RR or not formula[0].variables())
+    return False
 
 
 def _required_formula(element, operation):
@@ -635,9 +676,9 @@ def _constant_map(value):
             return _formula_map(expression, SR.var("t"))
 
 
-# ---------------------------------------------------------------------------
-# Conditions.
-# ---------------------------------------------------------------------------
+
+
+
 
 
 def _differentiability_condition(regularity, domain):
@@ -706,9 +747,9 @@ def _summability_condition(exponent, domain):
     return condition
 
 
-# ---------------------------------------------------------------------------
-# The function-space computation classes.
-# ---------------------------------------------------------------------------
+
+
+
 
 
 class _FunctionSpaceMap(_ConditionSubmoduleElement):
@@ -827,43 +868,35 @@ class _FunctionSpace(_ConditionSubmodule):
         return super().__contains__(value)
 
     def _element_constructor_(self, value):
-        r"""Admit ``value`` as a map of this space, and require the chart data its uses need.
+        r"""Admit the map by the function space's defining condition (OWN-22).
 
-        A space of maps over a manifold admits the maps that carry their expressions in
-        the charts of the manifold, because that is what its elements are used for: the
-        sections of the tangent bundle act on them as derivations, and a derivative is a
-        computation on an expression (Lee, *Introduction to Smooth Manifolds*, 2nd ed.,
-        Ch. 3).  An opaque map -- a Python callable with no expression in any chart -- is
-        refused here, naming the construction that states one, rather than admitted and
-        then refused by every operation that needs its expression.  The tree cannot even
-        decide such a map's smoothness: the differentiability condition answers a
-        proposition on any domain but the line.
-
-        A space over a domain with no chart -- the line, read as a manifold of one chart
-        of its own -- is unchanged, and so is every space of maps that is not over a
-        manifold.
+        Smoothness is a hypothesis, not a symbolic-expression test.
+        The smooth scalar specialization requires retained differential
+        data at its defining representation boundary.
         """
-        element = super()._element_constructor_(value)
         domain = self.domain()
         from sage_extensions.categories.manifolds import SmoothManifolds
 
-        if domain in SmoothManifolds() and hasattr(domain, "chart_labels"):
-            labels = tuple(domain.chart_labels())
-            if labels:
-                from sage_extensions.categories.manifolds import (
-                    _manifold_function_carries_expressions,
-                )
 
-                if not _manifold_function_carries_expressions(element, domain):
-                    assert False, (
-                        f"cannot admit {value} into {self}: its elements are the maps on "
-                        f"{domain} that carry their expressions in its charts, and this one has "
-                        f"no expression in any of {labels}.  State it with "
-                        f"{domain}.smooth_function({{chart label: expression}}) -- a map given "
-                        f"only by a callable is neither differentiable along a section of the "
-                        f"tangent bundle nor even decided to be smooth"
-                    )
-        return element
+
+
+        from sage.structure.element import parent as element_parent
+        source = element_parent(value)
+        if (
+            isinstance(self, _DifferentiabilityClass)
+            and isinstance(source, _DifferentiabilityClass)
+            and source is not self
+            and domain is not source.domain()
+            and self.codomain() is source.codomain()
+            and self.differentiability() <= source.differentiability()
+            and domain in SmoothManifolds()
+            and source.domain() in SmoothManifolds()
+        ):
+            from sage_extensions.categories.manifolds import _engine_manifold, _RestrictedManifoldFunction
+
+            if _engine_manifold(domain).is_subset(_engine_manifold(source.domain())):
+                value = _RestrictedManifoldFunction(value, domain)
+        return super()._element_constructor_(value)
 
     def one(self):
         r"""The constant map with value one."""
@@ -884,9 +917,23 @@ class _DifferentiableMap(_FunctionSpaceMap):
         k = min(outer.differentiability(), inner.differentiability())
         target = C(k, inner.domain(), outer.codomain())
         outer_formula, inner_formula = _map_formula(self), _map_formula(other)
-        if outer_formula is None or inner_formula is None:
-            return target(lambda point: self(other(point)))
-        return target(_formula_map(outer_formula[0].subs({outer_formula[1]: inner_formula[0]}), inner_formula[1]))
+        if outer_formula is not None and inner_formula is not None:
+            return target(_formula_map(outer_formula[0].subs({outer_formula[1]: inner_formula[0]}), inner_formula[1]))
+        from sage_extensions.categories.manifolds import SmoothManifolds
+        if (k == Infinity and outer.domain() is RR and outer.codomain() is RR
+                and inner.domain() in SmoothManifolds()):
+            from sage_extensions.categories.functions.smooth_germs import (
+                _SmoothGermFunction, _function_jet,
+            )
+            manifold = inner.domain()
+
+            def provider(chart, point, order):
+                argument = _function_jet(other, chart, point, order)
+                outer_jet = _function_jet(self, RR.identity_chart(), argument.value(), order)
+                return outer_jet.compose((argument,))
+
+            return target(_SmoothGermFunction(manifold, provider))
+        return target(lambda point: self(other(point)))
 
     def derivative(self):
         r"""Return \(f'\), in \(C^{k-1}(X,Y)\) when \(k\) is finite."""
@@ -897,8 +944,15 @@ class _DifferentiableMap(_FunctionSpaceMap):
             f"cannot differentiate {self}: the derivative is computed from a formula in one real "
             f"variable, which is the derivative on the domain RR, but {space} has domain {space.domain()}"
         )
-        body, variable = _required_formula(self, "the derivative")
         target = space if k is Infinity else C(k - 1, space.domain(), space.codomain())
+        formula = _map_formula(self)
+        if formula is None and k is Infinity and space.codomain() is RR:
+            from sage_extensions.categories.functions.smooth_germs import (
+                _SmoothGermFunction, _function_jet,
+            )
+            return target(_SmoothGermFunction(RR, lambda chart, point, order:
+                _function_jet(self, chart, point, order + 1).partial(0)))
+        body, variable = _required_formula(self, "the derivative")
         return target(_formula_map(body.diff(variable), variable))
 
     def integral_from(self, lower):
@@ -940,6 +994,76 @@ class _DifferentiabilityClass(_FunctionSpace):
 
     def differentiability(self):
         return self._condition_engine_data["regularity"]
+
+    def _requires_smooth_germs(self):
+        from sage_extensions.categories.manifolds import SmoothManifolds
+
+        return (self.differentiability() == Infinity
+                and self.domain() in SmoothManifolds()
+                and self.codomain() is self.domain().coordinate_field())
+
+    def _element_from_underlying_set(self, value):
+        element = super()._element_from_underlying_set(value)
+        if self._requires_smooth_germs():
+            assert _has_smooth_representation(_defining_function_of(element), self.domain()), (
+                "A smooth scalar map requires its smooth local representation: "
+                "supply chart expressions or from_local_derivatives. "
+                "An evaluation-only callable defines a set map, not that datum."
+            )
+        return element
+
+    def __contains__(self, value):
+        from sage.structure.element import parent as element_parent
+
+        if self._requires_smooth_germs() and element_parent(value) is not self:
+            definition = _defining_function_of(value)
+            if not _has_smooth_representation(
+                    value if definition is None else definition, self.domain()):
+
+
+                return False
+        return super().__contains__(value)
+
+    def _derivation_module_realization(self, target_module):
+        r"""For A=C^oo(M), identify Der_R(A,A) with the owned sections of TM.
+
+        The regular module is read through its canonical scalar identification.
+        This uses the locality and chart-germ construction of the tangent
+        section owner, not the existence of a polynomial presentation of A.
+        """
+        from sage_extensions.categories.manifolds import SmoothManifolds
+
+        manifold = self.domain()
+        if (self.differentiability() == Infinity and manifold in SmoothManifolds()
+                and self.codomain() is manifold.coordinate_field()
+                and manifold.smooth_functions() is self
+                and target_module is self.regular_module()):
+            return manifold.tangent_bundle().sections()
+        return None
+
+    def from_local_derivatives(self, derivatives):
+        r"""Construct a smooth real function from its local derivatives.
+
+        The datum ``derivatives(chart, point, alpha)`` returns the owned
+        value of the partial derivative of multi-order ``alpha`` at a point
+        of the chart. Order zero is the function itself. The hypothesis is
+        that these are the derivatives of a smooth function and satisfy
+        the coordinate change laws on the actual overlaps (OWN-22).
+        This presentation is available for every smooth function, with no
+        assumption of analytic Taylor convergence or symbolic formulas.
+        """
+        from sage_extensions.categories.functions.smooth_germs import (
+            _SmoothGermFunction, _TaylorJet,
+        )
+        from sage_extensions.categories.manifolds import SmoothManifolds
+
+        manifold = self.domain()
+        assert manifold in SmoothManifolds() and self.differentiability() == Infinity
+        field = manifold.coordinate_field()
+        assert self.codomain() is field
+        return self(_SmoothGermFunction(manifold, lambda chart, point, order:
+            _TaylorJet.derivatives(field, int(manifold.dimension()), order,
+                                  lambda alpha: derivatives(chart, point, alpha))))
 
     def _cardinality_decision(self):
         r"""\(|C^k(\mathbb R,\mathbb R)|=2^{\aleph_0}\): a continuous map is fixed by its values on \(\mathbb Q\), and the constants give at least that many."""
@@ -1022,8 +1146,8 @@ def _differentiability_class(regularity, domain, codomain):
     )
     if codomain is not field:
         return module
-    # C^k(X, K) is closed under the pointwise product, which is K-bilinear,
-    # associative, commutative and has the constant one as unit.
+
+
     tensor = Modules(field).tensor_product((module, module))
     multiplication = tensor.from_bilinear_map(
         module, lambda left, right: module(_product_of_sections(left, right))
@@ -1086,9 +1210,92 @@ def _flat_exponential_value(self, i, j, m, a, b):
             f"function a^(-m) exp(-a/b) is smooth at b = 0 only where a > 0"
         )
         return SR.zero()
-    first, second = SR.var("flat_a flat_b")
-    closed = (first ** (-int(m)) * (-first / second).exp()).diff(first, int(i)).diff(second, int(j))
-    return closed.subs({first: a, second: b})
+    a, b = SR(a), SR(b)
+    polynomial = sum((SR(c)*a**p*b**q for p,q,c in _flat_monomials(int(i), int(j), int(m))), SR.zero())
+    return (-a/b).exp()*polynomial
+
+
+@cached_function
+def _flat_monomials(i, j, m):
+    r"""Coefficients of the Laurent polynomial multiplying exp(-a/b).
+
+    Starting with a^(-m), apply the product rule for differentiation in
+    a and b. All b exponents are nonpositive. When m <= 0 the a
+    exponents remain nonnegative, including after differentiation; thus
+    the formula introduces no spurious pole at a=0 on b>0.
+    """
+    assert i >= 0 and j >= 0
+    terms = {(-m, 0): 1}
+    for in_a in (True,)*i + (False,)*j:
+        next_terms = {}
+        for (p, q), c in terms.items():
+            contributions = (
+                (((p-1, q), p*c), ((p, q-1), -c)) if in_a
+                else (((p, q-1), q*c), ((p+1, q-2), c))
+            )
+            for exponent, coefficient in contributions:
+                if coefficient:
+                    next_terms[exponent] = next_terms.get(exponent, 0) + coefficient
+        terms = {exponent: c for exponent,c in next_terms.items() if c}
+    return tuple((p, q, c) for (p,q),c in terms.items())
+
+
+def _flat_exponential_exact(i, j, m, a, b):
+    r"""Evaluate the represented mixed derivative in the owned real field.
+
+    On b>0, use outward enclosures of the explicit Laurent polynomial
+    times exp(-a/b). For b<=0 and a>0, the extension has value zero.
+    A box straddling b=0 with a>0 also has a certified enclosure:
+    writing u=a/b on its positive part, a^p b^q exp(-u)
+    has absolute value at most (1-q)! |a^(p+q-1)| b, since
+    u^(-q) exp(-u) <= (1-q)!/u. This bound tends to zero at the
+    boundary for every derivative, without deciding Cauchy equality.
+    """
+    from math import factorial
+    from sage.rings.real_arb import RealBallField
+    from sage_extensions.logic import ask
+    from sage_extensions.rings.real import RR, _cauchy_sequence_from_enclosures
+    from sage_extensions.categories.manifolds import CoverageUndecided
+
+    a, b = RR(a), RR(b)
+    zero = RR.zero()
+    terms = _flat_monomials(i, j, m)
+    if ask(b < zero, max_prec=64) is True:
+        return zero
+
+
+
+    if not (ask(b > zero, max_prec=64) is True and m <= 0):
+        if ask(a > zero) is not True:
+            if ask(b < zero) is True:
+                return zero
+            if ask(b > zero) is not True or (m > 0 and ask(a != zero) is not True):
+                raise CoverageUndecided("the flat exponential's actual smooth domain is not certified")
+
+    def enclose(precision):
+        field = RealBallField(precision)
+        A, B = a._arb_(field), b._arb_(field)
+        if not A.is_finite():
+            return A
+        if not B.is_finite():
+            return B
+        lower, upper = B.endpoints()
+        if upper <= 0:
+            return field.zero()
+        if lower > 0:
+            if m > 0 and A.contains_zero():
+                return field("NaN")
+            polynomial = sum((field(c)*A**p*B**q for p,q,c in terms), field.zero())
+            return (-A/B).exp()*polynomial
+        if A.lower() <= 0:
+            return field("NaN")
+        bound = sum((abs(c)*factorial(1-q)*abs(A**(p+q-1))
+                     for p,q,c in terms), field.zero()) * upper.exact_rational()
+        if not bound.is_finite():
+            return bound
+        return field(0, rad=bound.upper().exact_rational())
+
+    return RR.of_cauchy(_cauchy_sequence_from_enclosures(enclose))
 
 
 def _flat_exponential_derivative(self, i, j, m, a, b, diff_param):
@@ -1116,8 +1323,9 @@ The function ``f(t) = exp(-1/t)`` for ``t > 0`` and ``0`` for ``t <= 0`` is smoo
 0, 1, t)`` is it.  The two-argument form ``exp(-a/b) = f(b/a)`` for ``a > 0`` keeps every
 formula built from it regular where a denominator ``a`` vanishes on the side ``b < 0``,
 which is where the function is identically zero; the power ``a^(-m)`` absorbs a pole of
-order ``m`` there.  It is smooth on ``{b < 0} union {a > 0}``, and every formula of this
-package keeps its arguments there.  Its derivatives are its next orders, so the
+order ``m`` there. It is smooth on ``{b < 0} union {a > 0}`` and also where
+``b > 0`` and ``a^(-m)`` is smooth (in particular, at ``a=0`` when ``m<=0``).
+Its derivatives are its next orders, so the
 derivative of a formula built from it is again a closed formula.
 """
 

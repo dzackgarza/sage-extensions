@@ -1,21 +1,14 @@
-r"""An element of $C^\infty(M)$ carries its chart expressions, so every one of them is differentiable.
+r"""Smooth functions need not possess symbolic formulas.
 
 The sections of the tangent bundle act on the smooth functions as derivations (Lee,
-*Introduction to Smooth Manifolds*, 2nd ed., Ch. 3), and that action is a computation on the
-function's expression in a chart.  An algebra whose elements may also be opaque maps -- a
-Python callable with no expression anywhere -- is an algebra on which the action is not
-defined: the tree can neither differentiate such a map nor even decide its smoothness, since
-the differentiability condition answers a proposition on any domain but the line.
-
-So the algebra of smooth functions on a manifold admits the maps it states by their chart
-expressions, and refuses an opaque map at its own boundary, naming the construction that
-states one.  What it admits, it differentiates: the frame of the circle acts on every
-element, including the constants and the products the algebra builds.
+*Introduction to Smooth Manifolds*, 2nd ed., Ch. 3). The differentiability
+hypothesis is independent of availability of a symbolic formula.
+An all-order local derivative datum supports exact differential computation,
+including for functions that are not analytic.
 """
 
-import pytest
-
 from sage_extensions.all import *
+import pytest
 
 
 def _the_circle():
@@ -32,20 +25,59 @@ def _the_circle():
     return circle, north, south, frame
 
 
-def test_an_opaque_map_is_refused_by_the_algebra_of_smooth_functions() -> None:
-    r"""A Python callable with no chart expression is not an element of $C^\infty(S^1)$ here.
+def test_a_set_map_needs_smooth_local_data_to_enter_the_smooth_algebra() -> None:
+    r"""The constant point map is smooth, but its opaque program supplies no jets.
 
-    The algebra admits the maps it can state in charts; a callable carries no expression, so
-    the tree could neither decide that it is smooth nor differentiate it, and admitting it
-    would put an element in the algebra that no derivation is defined on.
+    The same mathematical function enters by its actual constant or
+    all-order derivative datum; its derivatives are identically zero.
     """
-    circle, _north, _south, _frame = _the_circle()
-
+    circle, _north, _south, frame = _the_circle()
+    algebra = circle.smooth_functions()
+    evaluator = lambda point: RR(1)
+    general = Sets().Mor(circle, RR)(evaluator)
+    point = circle.point((2,), "U_N")
+    assert general(point) == RR(1)
+    assert evaluator not in algebra
+    assert general not in algebra
     with pytest.raises(AssertionError):
-        circle.smooth_functions()(lambda point: RR(1))
+        algebra(evaluator)
+    with pytest.raises(AssertionError):
+        algebra(general)
+    function = algebra.from_local_derivatives(
+        lambda chart, point, alpha: RR(1) if sum(alpha) == 0 else RR(0))
+    for constant in (function, algebra.one()):
+        assert constant.parent() is algebra
+        assert constant(point) == RR(1)
+        assert frame(constant)(point) == RR(0)
+        assert frame(frame(constant))(point) == RR(0)
 
 
-def test_every_element_the_algebra_admits_is_differentiated_by_the_frame() -> None:
+def test_derivation_and_local_inverse_with_all_order_derivative_data() -> None:
+    r"""A constant coefficient supplied as a smooth germ datum, not a Sage formula.
+
+    With E the global frame of the circle, D = 2 E has components
+    2(1+x^2) and -2(1+y^2). D of the stereographic smooth function
+    h=2x/(1+x^2) is -12/5 at x=2.
+    """
+    circle, north, south, frame = _the_circle()
+    algebra = circle.smooth_functions()
+    two = algebra.from_local_derivatives(lambda chart, point, alpha:
+                                         RR(2) if sum(alpha) == 0 else RR(0))
+    field = frame.parent().scalar_multiple(two, frame)
+    x, y = north.coordinate(0), south.coordinate(0)
+    h = circle.smooth_function({
+        "U_N": north.section_ratio(x + x, north.function_ring().one() + x**2),
+        "U_S": south.section_ratio(y + y, south.function_ring().one() + y**2),
+    })
+    point = circle.point((2,), "U_N")
+    assert field(h)(point) == -RR(12) / RR(5)
+    recovered = frame.parent().from_derivation(lambda f: field(f))
+    assert recovered.components()["U_N"][0](north.domain()((2,))) == RR(10)
+    assert recovered.components()["U_S"][0](south.domain()((RR(1)/2,))) == -RR(5)/2
+    assert recovered(h)(point) == -RR(12)/5
+
+
+def test_the_frame_differentiates_chart_functions_and_products() -> None:
     r"""The frame acts on a chart-stated function, on a constant, and on their product: $E(h)$, $E(1) = 0$, and Leibniz.
 
     For $h_N(x) = 2x/(1+x^2)$ and $E_N = (1+x^2)\partial_x$, the derivative takes
@@ -64,3 +96,48 @@ def test_every_element_the_algebra_admits_is_differentiated_by_the_frame() -> No
     assert frame(h)(at) == -RR(6) / RR(5)
     assert frame(constant)(at) == RR(0)
     assert frame(h * h)(at) == 2 * h(at) * frame(h)(at)
+
+
+def test_the_smooth_algebra_owns_its_derivations_as_tangent_sections() -> None:
+    r"""Der_R(C^oo(M), C^oo(M)) is Gamma(TM), not a finite algebra presentation.
+
+    Lee, *Introduction to Smooth Manifolds*, 2nd ed., Prop. 8.15. With
+    E=(1+x^2)d/dx on the north chart and D=2E, D of h=2x/(1+x^2)
+    is -12/5 at x=2, and D(h^2)=2hD(h). Both scalar structures are
+    those of the same function algebra.
+    """
+    circle, north, south, frame = _the_circle()
+    algebra = circle.smooth_functions()
+    sections = circle.tangent_bundle().sections()
+    assert algebra.derivations() is sections
+    assert algebra.derivations(algebra.regular_module()) is sections
+    assert algebra.vector_fields() is sections
+    assert sections.base_ring() is algebra
+    coefficient = algebra.from_local_derivatives(lambda chart, point, alpha:
+        RR(2) if sum(alpha) == 0 else RR(0))
+    vector = sections.scalar_multiple(coefficient, frame)
+    assert sections.from_derivation(vector) is vector
+    h = circle.smooth_function({
+        "U_N": north.section_ratio(2*north.coordinate(0), north.function_ring().one()+north.coordinate(0)**2),
+        "U_S": south.section_ratio(2*south.coordinate(0), south.function_ring().one()+south.coordinate(0)**2),
+    })
+    p = circle.point((2,), "U_N")
+    derivative = sections.from_derivation(lambda f: vector(f))
+    assert derivative(h).parent() is algebra
+    assert derivative(h)(p) == -RR(12)/5
+    assert derivative(h*h)(p) == 2*h(p)*derivative(h)(p)
+    assert derivative(algebra.one())(p) == RR(0)
+
+
+def test_zero_derivation_annihilates_a_smooth_function() -> None:
+    r"""The zero vector field annihilates every smooth function, independently of its presentation."""
+    circle, _north, _south, frame = _the_circle()
+    algebra = circle.smooth_functions()
+    function = algebra.from_local_derivatives(
+        lambda chart, point, alpha: RR(1) if sum(alpha) == 0 else RR(0))
+    p = circle.point((2,), "U_N")
+    zero = frame.parent().zero()
+    assert function.parent() is algebra
+    assert zero(function).parent() is algebra
+    assert zero(function)(p) == RR(0)
+    assert frame(zero(function))(p) == RR(0)

@@ -35,35 +35,35 @@ from sage_extensions.categories.abstract_categories.mor_foundation import (
 _PREAMBLE_PACKAGE = __name__.rpartition(".")[0] + "."
 
 
-# A methods class naming one of these among its bases is an implementation
-# class, not a mixin: it is the class an owned category is tied to.
+
+
 _IMPLEMENTATION_BASES = (Parent, Element, Morphism)
 
-# The Python language reference's two sections of special methods that act on
-# an object's value: emulating container types (Data Model, §3.3.7) and
-# emulating numeric types (§3.3.8), Python 3.14 Language Reference,
-# https://docs.python.org/3/reference/datamodel.html.  A category level
-# declares operations on the object's value, so these are the dunder names a
-# rebuild may order; every other dunder names identity, construction, attribute
-# access, representation, comparison, a call or a context manager, and stays
-# with the object's own class and its runtime.
+
+
+
+
+
+
+
+
 _VALUE_PROTOCOL_NAMES = frozenset({
-    # Emulating container types, §3.3.7.
+
     "__len__", "__length_hint__", "__getitem__", "__setitem__", "__delitem__",
     "__missing__", "__iter__", "__reversed__", "__contains__",
-    # Emulating numeric types, §3.3.8: the binary arithmetic operations.
+
     "__add__", "__sub__", "__mul__", "__matmul__", "__truediv__",
     "__floordiv__", "__mod__", "__divmod__", "__pow__", "__lshift__",
     "__rshift__", "__and__", "__xor__", "__or__",
-    # Their reflected forms.
+
     "__radd__", "__rsub__", "__rmul__", "__rmatmul__", "__rtruediv__",
     "__rfloordiv__", "__rmod__", "__rdivmod__", "__rpow__", "__rlshift__",
     "__rrshift__", "__rand__", "__rxor__", "__ror__",
-    # Their augmented assignments.
+
     "__iadd__", "__isub__", "__imul__", "__imatmul__", "__itruediv__",
     "__ifloordiv__", "__imod__", "__ipow__", "__ilshift__", "__irshift__",
     "__iand__", "__ixor__", "__ior__",
-    # The unary operations, the conversions and the roundings.
+
     "__neg__", "__pos__", "__abs__", "__invert__",
     "__complex__", "__int__", "__float__", "__index__",
     "__round__", "__trunc__", "__floor__", "__ceil__",
@@ -81,7 +81,7 @@ def _owned_mixins(category: Category, attr: str) -> tuple[type, ...]:
     declares the name, and the walk records every category that does.
 
     Class $P$ precedes class $Q$ when a proper supercategory of a category
-    reaching $P$ reaches $Q$ (:func:`_precedes`), and $P$ comes before $Q$
+    reaching $P$ reaches $Q$, and $P$ comes before $Q$
     whenever $P$ precedes $Q$: the order is a linear extension of the relation.
     The classes are the nodes of a :class:`graphlib.TopologicalSorter` graph
     whose edges are the pairs the relation holds, so a cycle among them is
@@ -110,15 +110,16 @@ def _owned_mixins(category: Category, attr: str) -> tuple[type, ...]:
             reached[provider].append(cat)
     ordering = TopologicalSorter()
     for provider in reached:
-        ordering.add(
-            provider,
-            *(
-                earlier
-                for earlier in reached
-                if earlier is not provider
-                and _precedes(reached, attr, earlier, provider)
-            ),
-        )
+        ordering.add(provider)
+    for provider, categories in reached.items():
+        successors = {
+            _nearest_provider(supercategory, attr)
+            for cat in categories
+            for supercategory in cat.all_super_categories(proper=True)
+        }
+        for successor in successors.intersection(reached):
+            if successor is not provider:
+                ordering.add(successor, provider)
     ordering.prepare()
     position = {provider: index for index, provider in enumerate(reached)}
     ordered: list[type] = []
@@ -147,29 +148,13 @@ def _nearest_provider(category: Category, attr: str) -> type | None:
         if not isinstance(provider, type):
             continue
         if issubclass(provider, _IMPLEMENTATION_BASES):
-            # The root of an owned construction chain declares its methods
-            # class over the host runtime base, so that class *is* the
-            # implementation rather than a mixin over one.  An adopted Sage
-            # parent already has its own, and hoisting this one would shadow it.
+
+
+
+
             continue
         return provider
     return None
-
-
-def _precedes(
-    reached: dict[type, list[Category]], attr: str, left: type, right: type
-) -> bool:
-    """Whether a supercategory of a category reaching ``left`` reaches ``right``.
-
-    A pair the relation does not order in either direction -- two categories
-    that are not below one another, such as a ring and a module over it -- is
-    left to the walk's own order.
-    """
-    return any(
-        _nearest_provider(supercategory, attr) is right
-        for cat in reached[left]
-        for supercategory in cat.all_super_categories(proper=True)
-    )
 
 
 class RealizationHook:
@@ -313,17 +298,17 @@ def owned_parent_class(
     carried = frozenset(inherited.__mro__)
     mixins = tuple(provider for provider in providers if provider is not object and provider not in carried)
     if not mixins:
-        # Sage's category-backed dynamic class can carry an AbstractMethod in
-        # its own dictionary even though the selected category MRO has a
-        # concrete owner for that operation. Such a local descriptor shadows
-        # every category provider. Install the existing owner descriptor on a
-        # thin runtime class; do not duplicate the method implementation.
+
+
+
+
+
         def is_abstract(value):
             return isinstance(value, AbstractMethod) or getattr(
                 value, "__isabstractmethod__", False
             )
 
-        overrides = {}
+        overrides = _final_category_operations(providers, carried, implementation)
         for name, value in implementation.__dict__.items():
             if not is_abstract(value):
                 continue
@@ -348,20 +333,20 @@ def owned_parent_class(
         new_class._preamble_inherited = inherited
         return new_class
 
-    # ``inherited`` already contains the method providers reached by earlier
-    # construction steps.  A later refinement prepends only newly reached
-    # providers, which can otherwise let a *supercategory* method shadow the
-    # more specific operation already selected by the final category.  Keep
-    # the final category order authoritative for colliding public operations.
-    # The alias is the original provider's descriptor, not a second
-    # implementation.  Private construction hooks stay on their provider so
-    # ``run_construction_hooks`` still executes each level exactly once.
+
+
+
+
+
+
+
+
     concrete = implementation.__dict__.get("_preamble_concrete", inherited)
     new_class = _owned_dynamic_class(f"Owned{concrete.__name__}", (*mixins, inherited), concrete)
-    # ``_owned_dynamic_class`` returns one class per (name, bases, doccls).
-    # The aliases below are a function of that class and ``providers``; a
-    # second run for the providers that last prepared it adds nothing, since
-    # each alias it set now resolves on the class itself.
+
+
+
+
     if new_class.__dict__.get("_preamble_prepared_for") == providers:
         return new_class
     for name, value in _final_category_operations(providers, carried, new_class).items():
@@ -434,7 +419,14 @@ def _final_category_operations(
             answering = supplied.get(name, provider)
             if answering not in carried or resolved.get(name) is answering:
                 continue
-            if resolved.get(name) in known:
+            actual = resolved.get(name)
+            if actual in known or (
+                actual is not None and actual.__module__.startswith("sage.categories.")
+                and name == "cardinality"
+            ):
+
+
+
                 selected[name] = vars(answering)[name]
     return selected
 
@@ -479,8 +471,8 @@ def _is_bookkeeping_or_hook(name: str) -> bool:
 def _rebuild_element_class(parent: Parent, category: Category) -> None:
     from sage.categories.sets_cat import Sets as SageSets
 
-    # A facade's elements belong to the parents it stands for; it has no
-    # element class of its own to rebuild.
+
+
     if category.is_subcategory(SageSets().Facade()):
         return
     providers = _owned_mixins(category, "ElementMethods")
@@ -617,10 +609,10 @@ def refine[SageObjectT: SageObject](
     target = category if isinstance(category, Category) else owned_category_join(tuple(category))
     check_certifying_predicates(obj, target, obj.category())
     if isinstance(obj, (Morphism, CategoricalArrow)):
-        # A morphism's mathematical membership is determined by its Mor
-        # parent.  There is no independent Sage category slot to mutate here;
-        # the target only supplies the owned morphism-method surface selected
-        # by that already-constructed Mor theory.
+
+
+
+
         _rebuild_morphism_class(obj, target)
         return obj
     with construction_scope(obj) as reached:

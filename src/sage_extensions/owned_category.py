@@ -88,12 +88,12 @@ if TYPE_CHECKING:
     from sage.structure.parent import Parent
     from sage_extensions.lexicon.category_theory import ObjectOfCategory
 
-    # The construction data one level of an owned chain hands to the levels
-    # above it.  Genuinely open: each level consumes the datum it declares and
-    # passes the rest on, and the union closes only at the root, in Sage's
-    # ``Parent.__init__`` keywords.  Named and aliased exactly once, here, so
-    # that every ``**rest`` in every chain says what it carries and no site
-    # writes the bare escape.
+
+
+
+
+
+
     type ConstructionData = Any
 
 
@@ -177,9 +177,9 @@ class _OwnedOrderMetaclass(type):
             + [level_nodes(provider.__mro__[1:]) for provider in own]
             + [level_nodes(others)]
         )
-        # One authored class can serve several generated classes: a
-        # parameterized category's instances share it.  It then follows the
-        # last level that uses it, which every one of them precedes.
+
+
+
         levels = [cls, *merged]
         last_owner = {}
         for index, entry in enumerate(levels):
@@ -192,12 +192,12 @@ class _OwnedOrderMetaclass(type):
         return order
 
 
-# One ordered metaclass over Sage's most derived dynamic metaclass, so it
-# dominates every mixture of Sage's four: Sage re-wraps an adopted parent's
-# class with the category's ``parent_class`` choosing among its own four, and
-# only a common subclass lets Python resolve that class.  ``ABCMeta`` comes
-# first in the crossed one so its ``__new__`` runs ahead of the Cython
-# metaclasses and records the abstract methods.
+
+
+
+
+
+
 class _OwnedDynamicMetaclass(_OwnedOrderMetaclass, DynamicInheritComparisonClasscallMetaclass):
     pass
 
@@ -207,10 +207,10 @@ class _DynamicABCMetaclass(ABCMeta, _OwnedDynamicMetaclass):
 
 
 for _owned_metaclass in (_OwnedDynamicMetaclass, _DynamicABCMetaclass):
-    # Pickle dispatches a *class* on its metaclass, and Sage registers its four
-    # dynamic metaclasses this way; without the same registration for the
-    # owned ones, pickling a parent_class falls through to a by-name lookup
-    # that cannot resolve a dynamic class.
+
+
+
+
     copyreg.pickle(_owned_metaclass, _owned_metaclass.__reduce__)
 
 
@@ -301,9 +301,9 @@ def _category_graph_signature(category: Category, memo=None):
     if cached is not None:
         return cached
     declaring = _declared_category_class(category)
-    # Install a temporary acyclic marker only to make an accidental category
-    # graph cycle fail here rather than recurse indefinitely.  Sage category
-    # graphs are DAGs, so encountering it is a structural defect.
+
+
+
     marker = ("<category-cycle>", declaring.__module__, declaring.__qualname__)
     memo[identity] = marker
     supers = tuple(
@@ -342,9 +342,9 @@ def _category_graph_depth(category: Category, memo=None) -> int:
             )
         return cached
     supers = tuple(category._super_categories)
-    # Mark the active recursion path before visiting parents. Without this
-    # marker, a malformed/cyclic declared graph recurses until Python's limit
-    # instead of identifying the category edge responsible for the cycle.
+
+
+
     memo[identity] = Ellipsis
     if not supers:
         memo[identity] = 0
@@ -398,12 +398,12 @@ def _category_parameter_signature(category: Category):
             continue
         parameter_type = type(parameter)
         signature = (accessor, parameter_type.__module__, parameter_type.__qualname__)
-        # A fixed Mor is both a Category and a Sage Parent.  As a parameter it
-        # is the parent object, just like any other ambient group or module;
-        # its runtime type supplies the structural part and Sage's retained
-        # session counter separates distinct instances.  Traversing its whole
-        # semantic Mor graph here would compute derived arrow structure merely
-        # to construct a category parameterized by that parent.
+
+
+
+
+
+
         if isinstance(parameter, Category) and not isinstance(parameter, SageParent):
             return (accessor, _category_graph_signature(parameter))
         engine = getattr(parameter, "_engine", None)
@@ -437,8 +437,8 @@ def _category_provider_order_key(category: Category):
         repr(_category_graph_signature(category)),
         category._cmp_key[1],
     )
-    # Depth, signature and session counter are fixed once computed, so the
-    # order key is retained on the category rather than per linearization.
+
+
     category._owned_provider_order_key = key
     return key
 
@@ -462,9 +462,9 @@ class _OwnedCategoryComparisonKey:
     def __get__(self, category: Category | None, owner=None):
         if category is None:
             return self
-        # Preserve Sage's native C-int flags and C-long session counter exactly.
-        # The category graph's provider order is controlled separately and must
-        # not be encoded into this inherited native flag field.
+
+
+
         native_descriptor = Category.__dict__["_cmp_key"]
         return native_descriptor.__get__(category, type(category))
 
@@ -503,7 +503,7 @@ class CatConstructionsMixin:
     ) -> type:
         if name == "subcategory_class":
             return self._subcategory_class_with_cat_constructions(method_provider, cache=cache, picklable=picklable)
-        return super()._make_named_class(  # type: ignore[misc]
+        return super()._make_named_class(
             name, method_provider, cache=cache, picklable=picklable
         )
 
@@ -548,7 +548,7 @@ class CatConstructionsMixin:
             f"in more than one class: {inherited}; they must be declared once"
         )
         if provider is cat_constructions:
-            return super()._make_named_class(  # type: ignore[misc]
+            return super()._make_named_class(
                 "subcategory_class",
                 method_provider,
                 cache=cache,
@@ -559,20 +559,20 @@ class CatConstructionsMixin:
         if provider is not None and not any(provider in base.mro() for base in bases):
             bases = (provider,) + bases
         if not carried:
-            # Last, never first.  A base that already carries the
-            # constructions has them at the end of its own linearization, so
-            # asking for them first here contradicts that base's order and C3
-            # refuses the class: ``TypeError: Cannot create a consistent method
-            # resolution order (MRO) for bases Rngs.subcategory_class,
-            # Cat.ParentMethods, ...``.  Most general goes last, and nothing
-            # here competes for a name anyway.
+
+
+
+
+
+
+
             bases = bases + (cat_constructions,)
         declaring_class = type(category)
         if declaring_class.__name__.endswith("_with_category"):
             declaring_class = declaring_class.__base__
         doccls = provider or declaring_class
-        # A base reached twice -- a join whose members share a super
-        # category -- is one base, in the position it was first required.
+
+
         seen: dict[type, None] = {}
         for base in bases:
             seen.setdefault(base, None)
@@ -626,9 +626,9 @@ def declared_implementation_types(
     instead of vanishing.
     """
     if declaring_class.__name__.endswith("_with_category"):
-        # Sage's per-category dynamic class, whose second base is the
-        # ``subcategory_class``.  What a category declares is on the class it
-        # was written as, so that is the graph read here.
+
+
+
         declaring_class = declaring_class.__base__
     declared: list[type] = []
     for ancestor in declaring_class.__mro__:
@@ -646,36 +646,27 @@ def declared_implementation_types(
 
 
 def _declared_category_linearization(category: Category) -> tuple[Category, ...]:
-    r"""Linearize the declared graph using Sage's controlled provider ordering.
+    r"""Linearize the immutable declared graph in controlled provider order.
 
-    ``C3_sorted_merge`` computes the provider order and, when plain C3 would
-    fail, the controlled order compatible with a total ordering of categories.
-    The returned suggestion is the direct-supercategory ordering Sage would
-    need to realize that linearization in a Python class MRO. We retain the
-    declared edges; only their provider order is controlled.
+    The result is a datum of this category, shared by all its named
+    classes. Like the provider order key, it is read directly from the
+    category's instance data: a cached_method descriptor can consult
+    the named classes that this computation is itself constructing.
+    No declared edge or mathematical category placement is changed.
     """
     from sage.misc.c3_controlled import C3_sorted_merge
 
-    cache = {}
-    provider_order_key = _category_provider_order_key
-
-    def linearize(node):
-        known = cache.get(id(node))
-        if known is not None:
-            return known
-        parents = tuple(
-            sorted(node.super_categories(), key=provider_order_key, reverse=True)
-        )
-        sequences = [list(linearize(parent)) for parent in parents]
-        sequences.append(list(parents))
-        merged, _suggestion = C3_sorted_merge(
-            sequences, key=provider_order_key
-        )
-        result = (node, *merged)
-        cache[id(node)] = result
-        return result
-
-    return linearize(category)
+    known = category.__dict__.get("_owned_declared_provider_linearization")
+    if known is not None:
+        return known
+    parents = tuple(sorted(category.super_categories(),
+                           key=_category_provider_order_key, reverse=True))
+    sequences = [list(_declared_category_linearization(parent)) for parent in parents]
+    sequences.append(list(parents))
+    merged, _suggestion = C3_sorted_merge(sequences, key=_category_provider_order_key)
+    result = (category, *merged)
+    category._owned_declared_provider_linearization = result
+    return result
 
 
 def _owned_implementation_bases(
@@ -711,14 +702,14 @@ def _owned_implementation_bases(
             ]
             bases.append(candidate)
 
-    # A stronger construction can consume one datum and derive a lower-level
-    # constructor parameter before cooperative ``super()`` reaches that owner.
-    # Flattening branch implementation classes must retain that dependency,
-    # not merely the category comparison order.  ``BiproductModules`` is the
-    # canonical example: it consumes ``biproduct_factors`` and derives the
-    # ``summands`` parameter of ``DirectSumObjects``.  Put every such producer
-    # before the providers that explicitly consume its derived names, keeping
-    # the category-linearized order as the stable tie-breaker.
+
+
+
+
+
+
+
+
     explicit_parameters: dict[type, frozenset[str]] = {}
     for provider in bases:
         initializer = provider.__dict__.get("__init__")
@@ -735,9 +726,9 @@ def _owned_implementation_bases(
         )
 
     predecessors = {provider: set() for provider in bases}
-    # Objects owns the terminal Sage Parent initialization. Every other
-    # cooperative provider must consume its construction data before that
-    # boundary, including providers from a different branch of a join.
+
+
+
     from sage_extensions.categories.abstract_categories.objects import Objects
 
     if Objects.ParentMethods in predecessors:
@@ -830,12 +821,12 @@ class OwnedCategoryMixin(CatConstructionsMixin):
 
     _TIED_NAMED_CLASSES = frozenset(("parent_class", "element_class", "morphism_class"))
 
-    # Sage's default key ends in a global creation counter.  Owned categories
-    # instead derive that ordering component from their declared graph, so class
-    # construction is independent of which branch a session happened to touch
-    # first.  The descriptor is inherited by every owned category shape in
-    # ``owned_category_bases.py`` and intentionally does not affect Sage-native
-    # categories.
+
+
+
+
+
+
     _cmp_key = _OwnedCategoryComparisonKey()
 
     def __init_subclass__(cls, **options) -> None:
@@ -980,7 +971,7 @@ class OwnedCategoryMixin(CatConstructionsMixin):
         picklable: bool = True,
     ) -> type:
         if name not in self._TIED_NAMED_CLASSES:
-            return super()._make_named_class(  # type: ignore[misc]
+            return super()._make_named_class(
                 name, method_provider, cache=cache, picklable=picklable
             )
         assert cache is False, (
@@ -1012,15 +1003,15 @@ class OwnedCategoryMixin(CatConstructionsMixin):
         class_name = f"{declaring_class.__name__}.{name}"
         reduction = (reduction_function, (category,)) if picklable else None
 
-        # Sharing the named class between categories that differ only in a
-        # parameter is ``CategoryWithParameters``' whole reason to exist, and
-        # its own doctest asserts ``Algebras(GF(7)).parent_class is
-        # Algebras(GF(5)).parent_class``.  Intercepting the tied names ahead of
-        # that override would drop it, so the cache is honoured here instead.
-        # It stays sound under the flip because the parameter is never on the
-        # class: two such categories have the same ``ParentMethods`` and the
-        # same super-category named classes, hence literally the same bases,
-        # and each object carries its own parameter as instance data.
+
+
+
+
+
+
+
+
+
         key: tuple[type, str, Hashable] | None = None
         if isinstance(category, CategoryWithParameters):
             key = (declaring_class, name, bases)
@@ -1029,19 +1020,19 @@ class OwnedCategoryMixin(CatConstructionsMixin):
                 return shared
 
         def build() -> type:
-            # Built with the owned crossed metaclass, whose ``mro`` keeps each
-            # level's authored classes next to its generated class, and which
-            # carries any obligations a level declared.  Built by hand because
-            # :func:`dynamic_class` takes no metaclass, so the crossed
-            # dynamic/ABCMeta one cannot be requested from it; this mirrors
-            # ``dynamic_class_internal`` in
-            # ``sage/structure/dynamic_class.py`` and reproduces exactly its
-            # ``_reduction`` / ``_doccls`` / ``__doc__`` / ``__module__``
-            # bookkeeping.  Two things there are deliberately not mirrored: its
-            # ``weak_cached_function`` cache, which the assertion above shows is
-            # never asked for on this path, and its ``__slots__`` suppression,
-            # which cannot fire because a provider is a plain Python class and
-            # so always contributes a ``__dictoffset__``.
+
+
+
+
+
+
+
+
+
+
+
+
+
             class_bases = (
                 bases
                 if name != "parent_class"
@@ -1057,12 +1048,12 @@ class OwnedCategoryMixin(CatConstructionsMixin):
                     "__module__": doccls.__module__,
                 },
             )
-            # Sage's dynamic/Classcall/InheritComparison metaclasses perform
-            # their required initialization when called above, but their type
-            # construction path precedes ``ABCMeta.__new__`` in the metaclass
-            # MRO.  Initialize CPython's ABC state explicitly after preserving
-            # that Sage lifecycle; otherwise ``isinstance`` reaches
-            # ``ABCMeta.__instancecheck__`` with no ``_abc_impl``.
+
+
+
+
+
+
             _abc_init(result)
             return result
 
@@ -1070,9 +1061,9 @@ class OwnedCategoryMixin(CatConstructionsMixin):
         if key is not None:
             current_bases = _owned_implementation_bases(category, provider_names)
             if key[2] != current_bases:
-                # The parameter's category was refined while we built, so the
-                # key we would store is stale.  Sage's own override handles
-                # this the same way: discard and recompute.
+
+
+
                 return self._make_named_class(name, method_provider, cache=cache, picklable=picklable)
             category._make_named_class_cache[key] = result
         if name == "parent_class":
@@ -1177,14 +1168,14 @@ def _declared_category_is_subcategory(category: Category, target: Category) -> b
             for branch in category._super_categories
         )
 
-    # Some parameterized families carry mathematically canonical change-of-
-    # parameter inclusions which are not inheritance edges.  The distinction is
-    # essential when only part of the source refinement survives the parameter
-    # change: declaring a raw supercategory edge would make Sage propagate every
-    # axiom through it.  When ordinary graph ancestry does not already decide
-    # it, ask each declared ancestor directly for such a relation:
-    # the unaxiomatized owner is already among those ancestors, while forcing
-    # _without_axioms here can recursively normalize unrelated categories.
+
+
+
+
+
+
+
+
     if target in category._set_of_super_categories:
         return True
     sources = (category, *category._set_of_super_categories)
@@ -1472,11 +1463,11 @@ def _construction_contract_from_type(
         for parameter in discovered:
             if parameter.kind == Parameter.VAR_KEYWORD.name:
                 if provider is OwnedParent:
-                    # ``OwnedParent`` is the terminal host-runtime sink of the
-                    # cooperative chain, not a mathematical constructor level.
-                    # Counting its ``**rest`` would make every owned contract
-                    # permanently open and would prevent _object_of from ever
-                    # detecting undeclared public construction data.
+
+
+
+
+
                     continue
                 variadic.append(provider)
                 continue
@@ -1543,16 +1534,16 @@ def _implementation_with_engine(implementation: type, owner: type, engine: type)
     data are passed to the resulting object, never stored on this type.
     """
     if not issubclass(implementation, owner):
-        # An owned join linearizes the declared method providers directly, so
-        # its implementation type need not (and in the interesting C3 cases
-        # cannot) subclass the already-composed dynamic class of each branch.
-        # The owner's providers are nevertheless present among the join's
-        # direct bases.  Insert the private engine immediately before the first
-        # such base, preserving the same semantic precedence as the ordinary
-        # subclass path below: stronger providers first, engine computation,
-        # then the owner's defaults and the weaker structure underneath it.
-        # A retained computation class can already inherit these providers;
-        # it must precede each such ancestor as required by C3.
+
+
+
+
+
+
+
+
+
+
         anchors = tuple(
             index
             for index, base in enumerate(implementation.__bases__)
@@ -1581,13 +1572,13 @@ def _implementation_with_engine(implementation: type, owner: type, engine: type)
                 cache=False,
             )
         methods = dict(implementation.__dict__)
-        # Sage's dynamic parent-class builder can leave an abstract method in
-        # the implementation class dictionary even when the selected owned
-        # category contributes a concrete implementation later in the MRO.
-        # Copying that descriptor onto the engine-backed class would shadow
-        # the concrete category owner (for example Algebras.Unital.one).
-        # Preserve local abstract declarations only when no concrete provider
-        # exists among the selected bases.
+
+
+
+
+
+
+
         for name, value in tuple(methods.items()):
             if not getattr(value, "__isabstractmethod__", False):
                 continue
@@ -1646,15 +1637,15 @@ def _engine_object_type(object_type, owner_object_type, object_engine, element_t
     }
     match element_engine:
         case None:
-            # The category's element type is the implementation, which
-            # OwnedParent.element_class returns for a parent declaring no
-            # Element; declaring it would make Sage compose it with itself.
+
+
+
             pass
         case _:
-            # Sage Parent.element_class consumes Element; the owned public
-            # type protocol already has the complete implementation.  Expose
-            # it directly so Sage does not wrap it in a second dynamic class
-            # carrying the same category element base.
+
+
+
+
             elements = _implementation_with_engine(element_type, owner_element_type, element_engine)
             namespace["Element"] = elements
             namespace["ElementType"] = elements
@@ -1721,10 +1712,10 @@ def _object_of(
                 category.ObjectType, owner.ObjectType, object_engine,
                 category.ElementType, owner.ElementType, element_engine,
             )
-    # The ambient category (ARC-07) is the placement category unless the
-    # construction names the category of whose objects this is one, either
-    # here or, for a route that reaches this entry through
-    # ``_with_structure``, as the construction datum ``_constructing_category``.
+
+
+
+
     ambient = data.pop("_constructing_category", _ambient)
     _construction_contract_from_type(
         category, implementation, owned_object_chain=True
@@ -1821,11 +1812,11 @@ class OwnedParent:
 
     @lazy_attribute
     def element_class(self) -> type:
-        # A chain-built parent declares no ``Element``: the category's
-        # ``ElementMethods`` is the element implementation, for the same reason
-        # ``ParentMethods`` is the parent one.  A parent still declaring its own
-        # -- one not yet migrated onto the chain -- keeps it, which is Sage's
-        # own rule and what lets the two coexist while the migration runs.
+
+
+
+
+
         declared = getattr(type(self), "Element", None)
         if declared is None:
             return self.category().ElementType
@@ -2027,10 +2018,10 @@ def _category_structure_realization(
     if engine is None:
         return boundary
 
-    # The private engine owns construction data at this realization level.
-    # Put it before the owner boundary so its cooperative initializer consumes
-    # that datum, then let the boundary reconstruct the original category from
-    # the retained defining call.
+
+
+
+
     bases = (engine, boundary)
     realization = _abc_metaclass_for(bases)(
         name,

@@ -2,7 +2,9 @@ r"""The exact complex field.
 
 Sage's global ``CC`` is MPFR: a 53-bit approximation field.  This module
 presents \(\mathbb C = \mathbb R[i]/(i^2+1)\) with Nemo's ``CalciumField``
-as its exact arithmetic and comparison engine.  An element also retains a
+as its exact arithmetic and comparison engine on general expressions, and
+Sage's exact algebraic-number field on the embedded algebraic subfield.
+An element also retains a
 closed Sage expression for display and for Sage polynomial construction.
 Approximation is explicit: ``z.n(prec)`` maps into the owned
 ``ComplexField(prec)``.
@@ -240,14 +242,28 @@ class ComplexRelation(Predicate):
 class ExactComplexNumber(FieldElement):
     r"""An exact complex number, given by a closed exact symbolic expression."""
 
-    def __init__(self, parent: ExactComplexField, expression: Expression, native=None) -> None:
+    def __init__(self, parent: ExactComplexField, expression: Expression, native=None, *, algebraic=None) -> None:
         self._expression = expression
         self._native = native
+        self._algebraic_representation = algebraic
         FieldElement.__init__(self, parent)
+
+    @cached_method
+    def _algebraic_value(self):
+        r"""An exact algebraic realization if the expression admits one."""
+        if self._algebraic_representation is not None:
+            return self._algebraic_representation
+        if self._expression in QQbar:
+            return QQbar(self._expression)
+        return None
 
     def _calcium_(self):
         if self._native is None:
-            self._native = _calcium_value(self._expression)
+            algebraic = self._algebraic_value()
+            if algebraic is not None and algebraic not in QQ and algebraic != QQbar(SR.I()):
+                self._native = _qqbar_to_calcium(algebraic)
+            else:
+                self._native = _calcium_value(self._expression)
         return self._native
 
     def expression(self) -> Expression:
@@ -261,12 +277,13 @@ class ExactComplexNumber(FieldElement):
         consistent with ``==``.  Equality of other exact complex numbers is
         not decided in general, so they have none.
         """
-        if self._expression not in QQbar:
+        algebraic = self._algebraic_value()
+        if algebraic is None:
             raise TypeError(
                 f"the complex number {self} is not known to be algebraic, so equality with it is "
                 "not decided and it has no hash"
             )
-        return hash(QQbar(self._expression))
+        return hash(algebraic)
 
     def _repr_(self) -> str:
         return repr(self._expression)
@@ -315,23 +332,24 @@ class ExactComplexNumber(FieldElement):
         r"""The absolute value \(|z| = \sqrt{z\bar z}\), an element of ``RR``."""
         return RR(abs(self._expression))
 
-    def _add_(self, other):
-        return self.parent().element_class(
-            self.parent(), self._expression + other._expression,
-            _julia().call("+", self._calcium_(), other._calcium_()),
+    def _binary_operation(self, other, operation, calcium_name):
+        expression = operation(self._expression, other._expression)
+        left, right = self._algebraic_value(), other._algebraic_value()
+        field = self.parent()
+        if left is not None and right is not None:
+            return field.element_class(field, expression, algebraic=operation(left, right))
+        return field.element_class(
+            field, expression, _julia().call(calcium_name, self._calcium_(), other._calcium_()),
         )
+
+    def _add_(self, other):
+        return self._binary_operation(other, operator.add, "+")
 
     def _sub_(self, other):
-        return self.parent().element_class(
-            self.parent(), self._expression - other._expression,
-            _julia().call("-", self._calcium_(), other._calcium_()),
-        )
+        return self._binary_operation(other, operator.sub, "-")
 
     def _mul_(self, other):
-        return self.parent().element_class(
-            self.parent(), self._expression * other._expression,
-            _julia().call("*", self._calcium_(), other._calcium_()),
-        )
+        return self._binary_operation(other, operator.mul, "*")
 
     def __mul__(self, other):
         r"""Use the exact scalar product, or the action on an owned module.
@@ -361,13 +379,14 @@ class ExactComplexNumber(FieldElement):
             raise ValueError(
                 f"cannot divide {self} by {other}: it is undecided whether {other} is zero"
             )
-        return self.parent().element_class(
-            self.parent(), self._expression / other._expression,
-            _julia().call("/", self._calcium_(), other._calcium_()),
-        )
+        return self._binary_operation(other, operator.truediv, "/")
 
     def _neg_(self):
-        return self.parent().element_class(self.parent(), -self._expression, _julia().call("-", self._calcium_()))
+        algebraic = self._algebraic_value()
+        field = self.parent()
+        if algebraic is not None:
+            return field.element_class(field, -self._expression, algebraic=-algebraic)
+        return field.element_class(field, -self._expression, _julia().call("-", self._calcium_()))
 
     def __invert__(self):
         r"""``z^{-1}``: the reciprocal of ``z`` in this field, its unit inverse."""
@@ -431,12 +450,16 @@ class ExactComplexNumber(FieldElement):
         return self.parent()(_sage_hyperbolic.sech(self._expression))
 
     def __eq__(self, other):
+        if parent(other) is self.parent():
+            return self.parent().relation(self, other, operator.eq)
         expression = _exact_complex_expression(other)
         if expression is None:
             return False
         return self.parent().relation(self, self.parent()(expression), operator.eq)
 
     def __ne__(self, other):
+        if parent(other) is self.parent():
+            return self.parent().relation(self, other, operator.ne)
         expression = _exact_complex_expression(other)
         if expression is None:
             return True
@@ -498,8 +521,8 @@ class ExactComplexField(UniqueRepresentation, Field):
             FinitelyGeneratedFreeModules,
         )
 
-        # The constructing category is construction data (OWN-15): a field is
-        # built by the ring route, as every owned ring is.
+
+
         self._constructing_category = OwnedRings()
         regular_algebra = Algebras(self).Associative().Unital().Commutative()
         Field.__init__(
@@ -565,7 +588,7 @@ class ExactComplexField(UniqueRepresentation, Field):
         if source in Modules(self) and source.unformed_module() is self:
             return source._element_of_unformed_module(value)
         if source is QQbar:
-            return self.element_class(self, _closed_exact_complex_expression(value), _qqbar_to_calcium(value))
+            return self.element_class(self, _closed_exact_complex_expression(value), algebraic=value)
         return self.element_class(self, _closed_exact_complex_expression(value))
 
     def _from_engine_expression(self, value) -> ExactComplexNumber:
@@ -578,7 +601,7 @@ class ExactComplexField(UniqueRepresentation, Field):
 
     def _coerce_map_from_(self, source):
         r"""``RR`` and the exact rings that embed in ``QQbar`` coerce into ``CC``."""
-        # A coercion into a ring is a ring morphism, so only a ring has one.
+
         match source:
             case _ if source is RR:
                 return True
@@ -593,6 +616,9 @@ class ExactComplexField(UniqueRepresentation, Field):
         r"""Return a decided Boolean or an exact complex relation predicate."""
         left = self(left)
         right = self(right)
+        algebraic_left, algebraic_right = left._algebraic_value(), right._algebraic_value()
+        if algebraic_left is not None and algebraic_right is not None:
+            return _relation_answer(bool(algebraic_left == algebraic_right), relation)
         equal = _julia().call("preamble_cc_equal", left._calcium_(), right._calcium_())
         if equal is not None:
             return _relation_answer(equal, relation)
@@ -678,12 +704,12 @@ CC = ExactComplexField()
 I = CC.imaginary_unit()
 
 
-# The elementary functions of a session.  On a real number whose value is
-# real each is the operation of the real field; on any other complex number
-# it is the principal-branch operation of the complex field.  Any other
-# argument -- a power series, a matrix, a symbolic expression -- goes to
-# Sage's function of the same name, which applies the argument's own method
-# where it has one.
+
+
+
+
+
+
 
 
 def _decided(proposition):

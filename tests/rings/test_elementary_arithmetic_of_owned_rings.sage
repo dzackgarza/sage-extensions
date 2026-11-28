@@ -7,9 +7,7 @@ order of a primitive root modulo 7, and the resultant ``Res(f, x - a) = f(a)`` f
 polynomial ``f`` of even degree.
 """
 
-from fractions import Fraction
-
-from sage_extensions.all import *  # noqa: F401,F403
+from sage_extensions.all import *
 
 
 def test_gcd_lcm_and_bezout_in_the_integers() -> None:
@@ -75,24 +73,26 @@ def test_rationals_in_lowest_terms_and_their_inverses() -> None:
 
 def test_owned_rational_equality_realizes_exact_python_fraction_literals() -> None:
     half = QQ(1) / QQ(2)
-    literal = Fraction(1, 2)
+    literal = Fraction("1/2")
 
     assert half == literal
     assert literal == half
-    assert -half == Fraction(-1, 2)
+    assert -half == Fraction("-1/2")
     assert (-half).parent() is QQ
 
     localized_integers = ZZ.localization(2)
     assert localized_integers.fraction(1, 2) == literal
-    assert localized_integers.one() != Fraction(1, 3)
+    assert localized_integers.one() != Fraction("1/3")
 
 
 def test_the_owned_integers_coerce_canonically_into_the_rationals_and_reals() -> None:
     rational_coercion = QQ.coerce_map_from(ZZ)
     real_coercion = RR.coerce_map_from(ZZ)
 
-    assert rational_coercion is not None
-    assert real_coercion is not None
+    assert rational_coercion.domain() is ZZ
+    assert rational_coercion.codomain() is QQ
+    assert real_coercion.domain() is ZZ
+    assert real_coercion.codomain() is RR
     assert rational_coercion(ZZ(4)) == QQ(4)
     assert real_coercion(ZZ(4)) == RR(4)
 

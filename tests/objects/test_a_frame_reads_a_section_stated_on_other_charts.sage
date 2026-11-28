@@ -22,7 +22,7 @@ def _the_circle_with_a_third_chart(label):
     circle = SmoothManifolds().sphere(1)
     north = circle.atlas()["U_N"]
     circle.chart_on_open_subset(
-        label, "x1", "U_N", (north.coordinate(0) - north.function_ring().one(),)
+        label, "x1", "U_N", (north.coordinate(0) - north.function_ring().one(),), same_coordinates=True
     )
     return circle, north, circle.atlas()["U_S"], circle.atlas()[label]
 

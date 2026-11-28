@@ -20,7 +20,7 @@ def _the_plane_with_a_redundant_cut():
     plane = SmoothManifolds()(2, "R^2")
     chart = plane.chart("U", "x y")
     x, y = chart.coordinate(0), chart.coordinate(1)
-    cut = plane.chart_on_open_subset("V1", "x y", "U", (x**2 + 1,))
+    cut = plane.chart_on_open_subset("V1", "x y", "U", (x**2 + 1,), same_coordinates=True)
     return plane, chart, cut
 
 

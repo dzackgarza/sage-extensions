@@ -77,3 +77,46 @@ def test_the_bump_of_the_north_chart_of_the_two_sphere() -> None:
     assert bump(sphere.point((RR(1) / RR(8), RR(1) / RR(8)), "U_S")) == RR(0)
     assert bump(sphere.point((0, 0), "U_S")) == RR(0)
 
+
+
+def test_the_chart_bump_reads_cauchy_presented_support_boundaries_and_pole() -> None:
+    r"""H is one at x=2, zero at x=3 and at the reciprocal chart's pole.
+
+    Each input is a regular Cauchy presentation of the stated real.
+    The comparisons test certified exact-real bounds, not symbolic
+    substitution of a representative or a floating-point approximation.
+    """
+    circle, _, _, _ = _the_circle_and_its_frame()
+    bump = circle.chart_bump("U_N", 2, 3)
+    epsilon = RR(QQ(1)/QQ(2)**20)
+    for limit, label, expected in ((2,"U_N",1), (3,"U_N",0), (0,"U_S",0)):
+        point = RR.of_cauchy(Sets().Mor(NN, QQ)(
+            lambda n: QQ(limit)+QQ(1)/QQ(2)**int(n)))
+        value = bump(circle.point((point,), label))
+        assert value.parent() is RR
+        assert ask(value > RR(expected)-epsilon) is True
+        assert ask(value < RR(expected)+epsilon) is True
+
+
+def test_the_chart_bump_differentiates_at_an_exact_cauchy_point_in_its_transition_region() -> None:
+    r"""At x=5/2, t=(9-x^2)/5=11/20 and t'=-1.
+
+    For h(t)=f(t)/(f(t)+f(1-t)), f(t)=exp(-1/t), differentiation
+    gives h'=h(1-h)(1/t^2+1/(1-t)^2). The frame acts by
+    (1+x^2)d/dx, so its derivative is -29/4 times h'.
+    """
+    circle, _, _, frame = _the_circle_and_its_frame()
+    bump = circle.chart_bump("U_N", 2, 3)
+    a = RR.of_cauchy(Sets().Mor(NN, QQ)(
+        lambda n: QQ(5)/QQ(2)+QQ(1)/QQ(2)**int(n)))
+    p = circle.point((a,), "U_N")
+    t = RR(11)/RR(20)
+    rising = (-RR.one()/t).exp()
+    falling = (-RR.one()/(RR.one()-t)).exp()
+    h = rising/(rising+falling)
+    derivative = -RR(29)/RR(4)*h*(RR.one()-h)*(t**(-2)+(RR.one()-t)**(-2))
+    epsilon = RR(QQ(1)/QQ(2)**20)
+    for value, expected in ((bump(p),h), (frame(bump)(p),derivative)):
+        assert value.parent() is RR
+        assert ask(value > expected-epsilon) is True
+        assert ask(value < expected+epsilon) is True

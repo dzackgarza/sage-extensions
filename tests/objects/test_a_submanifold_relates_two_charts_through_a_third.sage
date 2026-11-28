@@ -24,7 +24,7 @@ def _the_submanifold_with_a_cut_chart(label):
     sphere = SmoothManifolds().sphere(2)
     north = sphere.atlas()["U_N"]
     norm_squared = north.coordinate(0) ** 2 + north.coordinate(1) ** 2
-    sphere.chart_on_open_subset(label, "x1 x2", "U_N", (norm_squared,))
+    sphere.chart_on_open_subset(label, "x1 x2", "U_N", (norm_squared,), same_coordinates=True)
     domain = north.domain()
     return sphere.open_submanifold(sphere.open_submanifold_inclusion(domain))
 
@@ -83,3 +83,20 @@ def test_the_composed_change_is_stated_where_both_legs_are() -> None:
 
     with pytest.raises((AssertionError, ValueError)):
         tuple(transition(RR.zero(), RR.zero()))
+
+
+def test_restriction_retains_stated_transition_edges_without_redundant_composites() -> None:
+    r"""Restriction preserves the given graph; composing a path adds no new stated edge."""
+    sphere = SmoothManifolds().sphere(2)
+    north = sphere.atlas()["U_N"]
+    norm_squared = sum(x*x for x in north.coordinates())
+    for label in ("SPARSE_A", "SPARSE_B", "SPARSE_C"):
+        sphere.chart_on_open_subset(label, "x1 x2", "U_N", (norm_squared,), same_coordinates=True)
+    domain = north.domain()
+    restricted = sphere.open_submanifold(sphere.open_submanifold_inclusion(domain))
+    edges = tuple(restricted.transitions().keys())
+    assert set(edges) == set(sphere.transitions().keys())
+    change = restricted.transition("U_S", "SPARSE_C")
+    assert tuple(change(RR(2)/RR(13), RR(3)/RR(13))) == (RR(2), RR(3))
+    assert tuple(change.inverse()(RR(2), RR(3))) == (RR(2)/RR(13), RR(3)/RR(13))
+    assert tuple(restricted.transitions().keys()) == edges

@@ -141,3 +141,59 @@ def test_the_charts_of_the_complex_projective_plane_change_coordinates_by_ratios
     )
     assert tuple(transition(2 * I, 3 * I)) == (CC(1) / (3 * I), (2 * I) / (3 * I))
     assert tuple(transition.inverse()(2 * I, 3 * I)) == (CC(3) / 2, -(CC(1) / 2) * I)
+
+
+def test_renaming_a_restricted_chart_transports_its_actual_domain_guards() -> None:
+    r"""The cut x!=0 in coordinates (u,v)=(x,y) has defining guard u!=0."""
+    plane = SmoothManifolds()(2, "renamed cut")
+    source = plane.chart("base", "x y")
+    x = source.coordinate(0)
+    target = plane.chart_on_open_subset(
+        "V", "u v", "base", (x,), same_coordinates=True,
+    )
+    assert tuple(plane.transition("V", "base")(2, 3)) == (RR(2), RR(3))
+    assert tuple(plane.transition("base", "V")(2, 3)) == (RR(2), RR(3))
+    assert target.cut_conditions()[0].parent() is source.function_ring()
+    assert target.cut_conditions()[0](plane.point((0, 1), "base")) == RR(0)
+    assert target.nonvanishing()[0].parent() is target.function_ring()
+    assert target.nonvanishing()[0](plane.point((2, 3), "V")) == RR(2)
+    with pytest.raises(ValueError):
+        plane.point((0, 1), "V")
+
+
+def test_exact_cauchy_coordinates_are_transported_by_the_actual_atlas() -> None:
+    r"""For the real represented by 5+2^-n, the shear sends (5,2) to (7,2).
+
+    The cut x!=0 contains the point, and the bounded chart 0<r<4
+    excludes its first coordinate. Values of the chart polynomial and
+    its derivative do not require symbolic serialization of the Cauchy input.
+    """
+    plane = SmoothManifolds()(2, "Cauchy plane")
+    source, target, shear, inverse = _shear_of_two_charts(plane)
+    plane.transition_map("U", "V", shear, inverse)
+    sequence = Sets().Mor(NN, QQ)(lambda n: QQ(5)+QQ(1)/QQ(2)**int(n))
+    a = RR.of_cauchy(sequence)
+    p = plane.point((a, RR(2)), "U")
+    assert p.parent() is plane
+    assert p.coordinates()[0] is a
+    u, v = target(p)
+    assert u.parent() is RR and ask(u > RR(6)) is True and ask(u < RR(8)) is True
+    assert v == RR(2)
+    x, y = source.coordinates()
+    cut = plane.chart_on_open_subset("W", "x y", "U", (x,), same_coordinates=True)
+    q = cut.domain()(p)
+    assert q.parent() is cut.domain()
+    assert ask(q.coordinates()[0]>RR(4)) is True
+    assert ask(q.coordinates()[0]<RR(6)) is True
+    assert q.coordinates()[1] == RR(2)
+    f = plane.smooth_function({"U": x*x+y*y})
+    value = f(p)
+    assert value.parent() is RR and ask(value>RR(28)) is True and ask(value<RR(30)) is True
+    X = plane.tangent_bundle().sections().coordinate_vector_field(source, 0)
+    derivative = X(f)(p)
+    assert derivative.parent() is RR
+    assert ask(derivative>RR(9)) is True and ask(derivative<RR(11)) is True
+    bounded = SmoothManifolds()(2, "Bounded exact chart")
+    bounded.chart("B", "r:(0,4) s")
+    with pytest.raises(ValueError):
+        bounded.point((a,RR(2)), "B")

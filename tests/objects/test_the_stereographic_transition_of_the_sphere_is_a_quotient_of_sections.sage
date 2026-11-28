@@ -85,7 +85,7 @@ def test_a_quotient_of_sections_is_a_function_on_the_open_subset_where_its_denom
     chart = plane.chart("U", "x y")
     x = chart.coordinate(0)
     y = chart.coordinate(1)
-    nonzero = plane.chart_on_open_subset("V", "x y", "U", (x,))
+    nonzero = plane.chart_on_open_subset("V", "x y", "U", (x,), same_coordinates=True)
     domain = nonzero.domain()
     inner = domain(plane((3, -2), "U"))
     quotient = chart.section_ratio(y, x)
@@ -110,7 +110,7 @@ def test_the_stereographic_overlap_is_an_open_subset_of_the_chart_the_quotient_d
     sphere = SmoothManifolds().sphere(2)
     north = sphere.atlas()["U_N"]
     norm_squared = sum(coordinate**2 for coordinate in north.coordinates())
-    overlap = sphere.chart_on_open_subset("U_N_overlap", "x1 x2", "U_N", (norm_squared,))
+    overlap = sphere.chart_on_open_subset("U_N_overlap", "x1 x2", "U_N", (norm_squared,), same_coordinates=True)
     domain = overlap.domain()
     inner = domain(sphere((3, -2), "U_N"))
     quotient = north.section_ratio(north.coordinate(0), norm_squared)

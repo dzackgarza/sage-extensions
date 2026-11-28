@@ -76,13 +76,15 @@ class ManifoldAtlasChart(SageObject):
     """
 
     def __init__(
-        self, manifold, label, engine_chart, domain, nonvanishing=(), cut_from=None
+        self, manifold, label, engine_chart, domain, nonvanishing=(), cut_from=None,
+        cut_conditions=(),
     ) -> None:
         self._manifold = manifold
         self._label = label
         self._engine = engine_chart
         self._domain = domain
         self._cut_from = cut_from
+        self._cut_conditions = tuple(cut_conditions)
         self._nonvanishing = tuple(
             _raise_manifold_expression(_engine_manifold_expression(condition), self)
             for condition in nonvanishing
@@ -112,10 +114,23 @@ class ManifoldAtlasChart(SageObject):
 
         A chart registered by :meth:`TopologicalManifolds.ParentMethods.chart_on_open_subset`
         is read on the points of another chart where its conditions do not vanish; that
-        chart is this one's source, and when the conditions vanish nowhere the two are the
-        same chart (Lee, *Introduction to Smooth Manifolds*, 2nd ed., Ch. 1).
+        chart is this one's source. When the conditions vanish nowhere the
+        two have the same domain; their coordinate maps need not coincide.
         """
         return self._cut_from
+
+    def _retain_coordinate_guards(self, formulas):
+        r"""Raise the already transported engine guards in this chart's own ring."""
+        self._nonvanishing = tuple(_raise_manifold_expression(formula, self)
+                                   for formula in formulas)
+
+    def cut_conditions(self):
+        r"""The defining nonvanishing sections in the source chart's function ring.
+
+        These define the open subset, not its new coordinate map. They cannot
+        be read in the new coordinates without a stated coordinate change.
+        """
+        return self._cut_conditions
 
     def nonvanishing(self):
         r"""The functions on this chart whose common nonvanishing locus is its domain.
@@ -193,6 +208,53 @@ class ManifoldAtlasChart(SageObject):
             name=f"Coordinates of a point of {self.manifold()} in the chart {self.label()}",
         )
 
+    @cached_method
+    def _restricted_by_engine_conditions(self, conditions):
+        r"""The chart of the open submanifold defined by these retained guards.
+
+        Equal defining conditions on this chart determine the same open
+        submanifold and the same restricted coordinates. Reuse that chart
+        rather than registering another engine subchart for every expression.
+        """
+        from uuid import uuid4
+
+        if not conditions:
+            return self
+        engine_open = self._engine.domain().open_subset(
+            f"{self.label()}_local_{uuid4().hex}",
+            coord_def={self._engine: list(conditions)},
+        )
+        local = self._engine.restrict(engine_open)
+        domain = self.manifold()._chart_domain(self.label(), local)
+        return domain.atlas()[self.label()]
+
+    def _restricted_by_owned_conditions(self, conditions, local_radius):
+        """Retain an actual smooth open locus and its local closed-ball witness."""
+        from uuid import uuid4
+        from sage_extensions.categories.functions.smooth_germs import _valid_exact_coordinates
+
+        source = self
+        field = self.manifold().coordinate_field()
+        engine_open = self._engine.domain().open_subset(f"{self.label()}_local_{uuid4().hex}")
+        local = self._engine.restrict(engine_open)
+        def condition(coordinates):
+            verdict = _valid_exact_coordinates(source._engine, tuple(field(c) for c in coordinates))
+            if verdict is not True:
+                return verdict
+            point = source.domain().point(tuple(field(c) for c in coordinates), source.label())
+            answers = tuple(ask(entry(point) != field.zero()) for entry in conditions)
+            if any(answer is False for answer in answers):
+                return False
+            return True if all(answer is True for answer in answers) else None
+
+        local._owned_open_conditions = (*getattr(self._engine, "_owned_open_conditions", ()), condition)
+        local._owned_local_radius = local_radius
+        local.domain().manifold()._owned_coordinate_data = True
+        domain = self.manifold()._chart_domain(self.label(), local)
+        result = domain.atlas()[self.label()]
+        result._nonvanishing = tuple(conditions)
+        return result
+
     def _engine_chart(self):
         return self._engine
 
@@ -212,38 +274,45 @@ class ManifoldAtlasTransition(SageObject):
     r"""An invertible atlas coordinate change with retained regularity."""
 
     def __init__(
-        self,
-        source,
-        target,
-        engine_transition,
-        forward_expressions,
-        inverse_expressions,
-        source_overlap,
-        target_overlap,
+        self, source, target, engine_transition, forward_expressions,
+        inverse_expressions, source_overlap, target_overlap, *, _local_formulas=False, _owned_local_charts=None,
     ) -> None:
         self._source = source
         self._target = target
         self._engine = engine_transition
-        self._forward = _admit_manifold_expression_family(
-            forward_expressions,
-            source,
-            name=f"Coordinate change {source.label()} to {target.label()}",
+        self._owned_local_charts = _owned_local_charts
+        if _owned_local_charts is not None:
+            self._source_local, self._target_local = _owned_local_charts
+            self._forward = finite_family(tuple(forward_expressions))
+            self._inverse_expressions = finite_family(tuple(inverse_expressions))
+            self._source_overlap = finite_family(tuple(source_overlap))
+            self._target_overlap = finite_family(tuple(target_overlap))
+            self._inverse_transition = None
+            return
+        if not _local_formulas:
+            forward_expressions = tuple(_admit_manifold_expression(c, source) for c in forward_expressions)
+            inverse_expressions = tuple(_admit_manifold_expression(c, target) for c in inverse_expressions)
+            source_overlap = tuple(_admit_manifold_expression(c, source) for c in source_overlap)
+            target_overlap = tuple(_admit_manifold_expression(c, target) for c in target_overlap)
+            source_overlap = tuple(c.denominator() for c in forward_expressions + source_overlap
+                if isinstance(c, _SectionRatio)) + source_overlap
+            target_overlap = tuple(c.denominator() for c in inverse_expressions + target_overlap
+                if isinstance(c, _SectionRatio)) + target_overlap
+            forward_expressions = tuple(_engine_manifold_expression(c) for c in forward_expressions)
+            inverse_expressions = tuple(_engine_manifold_expression(c) for c in inverse_expressions)
+            source_overlap = tuple(_engine_manifold_expression(c) for c in source_overlap)
+            target_overlap = tuple(_engine_manifold_expression(c) for c in target_overlap)
+        forward, source_guards, _source_local = _local_chart_expressions(
+            source, forward_expressions, source_overlap
         )
-        self._inverse_expressions = _admit_manifold_expression_family(
-            inverse_expressions,
-            target,
-            name=f"Coordinate change {target.label()} to {source.label()}",
+        inverse, target_guards, _target_local = _local_chart_expressions(
+            target, inverse_expressions, target_overlap
         )
-        self._source_overlap = _admit_manifold_expression_family(
-            source_overlap,
-            source,
-            name=f"Overlap of {source.label()} with {target.label()} in {source.label()}",
-        )
-        self._target_overlap = _admit_manifold_expression_family(
-            target_overlap,
-            target,
-            name=f"Overlap of {target.label()} with {source.label()} in {target.label()}",
-        )
+        self._source_local, self._target_local = _source_local, _target_local
+        self._forward = finite_family(forward, name=f"Coordinate change {source.label()} to {target.label()}")
+        self._inverse_expressions = finite_family(inverse, name=f"Coordinate change {target.label()} to {source.label()}")
+        self._source_overlap = finite_family(source_guards, name=f"Overlap in {source.label()}")
+        self._target_overlap = finite_family(target_guards, name=f"Overlap in {target.label()}")
         self._inverse_transition = None
 
     def source(self):
@@ -260,6 +329,14 @@ class ManifoldAtlasTransition(SageObject):
 
     def inverse_expressions(self):
         return self._inverse_expressions
+
+    def source_overlap_chart(self):
+        """The actual restricted chart on which the source overlap is stated."""
+        return self._source_local
+
+    def target_overlap_chart(self):
+        """The actual restricted chart on which the target overlap is stated."""
+        return self._target_local
 
     def source_overlap(self):
         r"""The functions on the source chart whose common nonvanishing locus is the overlap.
@@ -278,15 +355,24 @@ class ManifoldAtlasTransition(SageObject):
         return self.manifold().regularity()
 
     def inverse(self):
+        if self._inverse_transition is None and self._owned_local_charts is not None:
+            inverse = ManifoldAtlasTransition(
+                self.target(), self.source(), None,
+                self.inverse_expressions(), self.forward_expressions(),
+                self.target_overlap(), self.source_overlap(),
+                _owned_local_charts=tuple(reversed(self._owned_local_charts)))
+            inverse._inverse_transition = self
+            self._inverse_transition = inverse
         if self._inverse_transition is None:
             inverse = ManifoldAtlasTransition(
                 self.target(),
                 self.source(),
-                self._engine.inverse(),
-                self.inverse_expressions(),
-                self.forward_expressions(),
-                self.target_overlap(),
-                self.source_overlap(),
+                None if self._engine is None else self._engine.inverse(),
+                tuple(_engine_manifold_expression(c) for c in self.inverse_expressions()),
+                tuple(_engine_manifold_expression(c) for c in self.forward_expressions()),
+                tuple(_engine_manifold_expression(c) for c in self.target_overlap()),
+                tuple(_engine_manifold_expression(c) for c in self.source_overlap()),
+                _local_formulas=True,
             )
             inverse._inverse_transition = self
             self._inverse_transition = inverse
@@ -352,39 +438,15 @@ class ManifoldAtlasTransition(SageObject):
             )
             for expression in self.target_overlap()
         )
-        forward_owned = _raise_manifold_expression_family(
-            forward,
-            source,
-            name=f"Coordinate change {source.label()} to {target.label()}",
-        )
-        inverse_owned = _raise_manifold_expression_family(
-            inverse,
-            target,
-            name=f"Coordinate change {target.label()} to {source.label()}",
-        )
-        source_overlap_owned = _raise_manifold_expression_family(
-            source_overlap,
-            source,
-            name=f"Overlap of {source.label()} with {target.label()} in {source.label()}",
-        )
-        target_overlap_owned = _raise_manifold_expression_family(
-            target_overlap,
-            target,
-            name=f"Overlap of {source.label()} with {target.label()} in {target.label()}",
-        )
         return ManifoldAtlasTransition(
             source,
             target,
-            _engine_manifold_chart(source).transition_map(
-                _engine_manifold_chart(target),
-                forward,
-                restrictions1=_engine_nonvanishing_conditions(source_overlap_owned),
-                restrictions2=_engine_nonvanishing_conditions(target_overlap_owned),
-            ),
-            forward_owned,
-            inverse_owned,
-            source_overlap_owned,
-            target_overlap_owned,
+            None,
+            forward,
+            inverse,
+            source_overlap,
+            target_overlap,
+            _local_formulas=True,
         )
 
     def __call__(self, *coordinates):
@@ -402,10 +464,12 @@ class ManifoldAtlasTransition(SageObject):
         source = self.source()
         field = self.manifold().coordinate_field()
         point = self.manifold()(coordinates, chart_label=source.label())
-        decisions = tuple(
-            ask(section(point) != field.zero()) for section in tuple(self.source_overlap())
-        )
-        assert all(decision is True for decision in decisions), (
+        if self._owned_local_charts is not None:
+            from sage_extensions.categories.functions.smooth_germs import _valid_exact_coordinates
+            assert _valid_exact_coordinates(
+                _engine_manifold_chart(self.source_overlap_chart()), point.coordinates()) is True, (
+                    "the point must belong to the actual source overlap")
+        assert all(ask(section(point) != field.zero()) is True for section in self.source_overlap()), (
             f"cannot read the coordinates of {point} in the chart {self.target().label()}: the "
             f"coordinate change from the chart {source.label()} is defined on the overlap of the "
             f"two charts, and its overlapping functions do not all take a decided nonzero value "
@@ -433,8 +497,9 @@ def _engine_manifold(manifold):
     implementation endpoint is
     \`TopologicalManifolds.ParentMethods._engine_manifold_realization\`.  Permitted
     callers are the point, chart, holomorphic-map, and analytic-open adapters
-    in this module after the corresponding owned construction has been
-    selected.  The Sage manifold remains private to those adapters.
+    in this module and the tangent-bundle/section adapters in vector_bundles,
+    after the corresponding owned construction has been selected.  The Sage
+    manifold remains private to those adapters.
     """
     return manifold._engine_manifold_realization()
 
@@ -444,7 +509,8 @@ def _engine_manifold_chart(chart):
 
     The implementation endpoint is :meth:\`ManifoldAtlasChart._engine_chart\`.
     Permitted callers are the point, transition, map, and open-submanifold
-    adapters in this module.  The raw chart never becomes mathematical output.
+    adapters in this module and the smooth bundle/section computation adapters
+    in vector_bundles.  The raw chart never becomes mathematical output.
     """
     return chart._engine_chart()
 
@@ -488,7 +554,11 @@ class _ChartExpression:
 
     def __call__(self, point):
         r"""The value of the formula at ``point``, in the coordinate field."""
-        coordinates = tuple(self._engine_chart(_engine_manifold_point(point)))
+        coordinates = _point_coordinates_in_engine_chart(point, self._engine_chart)
+        from sage_extensions.rings.real import RR
+
+        if self._field is RR:
+            return self._field._evaluate_formula(self._engine_formula, tuple(self._engine_chart[:]), coordinates)
         substitutions = dict(zip(tuple(self._engine_chart[:]), coordinates, strict=True))
         return self._field(self._engine_formula.subs(substitutions))
 
@@ -647,6 +717,11 @@ def _admit_manifold_expression(value, chart):
         f"functions the manifold assigns to that chart's domain, and {value!r} is written "
         f"with the sections {tuple(str(element_parent(operand)) for operand in misplaced)}"
     )
+    if isinstance(value, _SectionRatio):
+        return value
+    formulas = _chartwise_formulas(value, chart.domain())
+    if formulas is not None and chart.label() in formulas:
+        return _raise_manifold_expression(formulas[chart.label()], chart)
     return value
 
 
@@ -735,8 +810,9 @@ def _engine_manifold_expression(value):
     r"""Lower one owned manifold value to the engine's expression.
 
     Protected manifold-expression contract under ``OWN-05``--``OWN-07``.
-    Permitted callers are atlas/map/open-submanifold adapters in this module and
-    the affine-analytification adapter.  A chart formula is the function it is,
+    Permitted callers are atlas/map/open-submanifold adapters in this module,
+    the smooth bundle/section adapters in vector_bundles, and the
+    affine-analytification adapter.  A chart formula is the function it is,
     and the engine's formula retained by :class:`_ChartExpression` is how the
     engine speaks about it; a quotient of sections is the quotient of their
     formulas, a constant section is its value, a formula written with the owned
@@ -780,7 +856,7 @@ def _composed_ambient_transition(manifold, source_label, target_label):
     the change the atlas has.  ``None`` says no chain joins them.
     """
     if (source_label, target_label) in manifold._preamble_transitions:
-        return manifold.transition(source_label, target_label)
+        return manifold._preamble_transitions[source_label, target_label]
     stated = tuple(manifold._preamble_transitions)
     reached = {source_label: None}
     frontier = [source_label]
@@ -816,18 +892,25 @@ class CoverageUndecided(ValueError):
     """
 
 
-def _chart_family_covers(manifold, labels):
-    r"""Whether the charts ``labels`` cover ``manifold``, decided by containment.
+def _chart_family_covers(manifold, labels, *, local_domains=None):
+    r"""Certify a cover by whole charts or by their actual local domains.
 
-    A family of charts covers the manifold when every point of the manifold is a
-    point of one of them; the decision here is the one the atlas can make from
-    its own chart domains -- every chart the manifold carries lies inside one of
-    the charts given ``(Lee, *Introduction to Smooth Manifolds*, 2nd ed., Ch. 1,
-    for a chart's domain)``.  That is a sufficient condition, not a necessary
-    one: a family that covers by meeting instead of by containment is not decided
-    here, and a caller is told so rather than being told its family covers.
+    The optional local_domains assigns each index a pair (source_label, guards);
+    its ordered guards define an open subset of that source chart.  Only
+    unrestricted members may use chart containment.  Otherwise all actual
+    transition-path domains are retained in the covering certificate.
     """
-    resolved = _unrestricted_labels(manifold, labels)
+    labels = tuple(labels)
+    if local_domains is None and isinstance(manifold, _StandardSphere):
+        if labels == ("U_N",) or labels == ("U_S",):
+
+
+
+            return False
+    whole = labels if local_domains is None else tuple(
+        local_domains[key][0] for key in labels if not local_domains[key][1]
+    )
+    resolved = _unrestricted_labels(manifold, whole)
     given = tuple(_engine_manifold_chart(manifold.atlas()[label]) for label in resolved)
     for label in manifold.chart_labels():
         if label in resolved:
@@ -836,14 +919,10 @@ def _chart_family_covers(manifold, labels):
         domain = _engine_manifold_chart(chart).domain()
         if any(domain.is_subset(one.domain()) for one in given):
             continue
-        verdict = _sum_certificate_covers(manifold, labels, chart)
-        if verdict is True:
-            continue
-        if verdict is False:
-            return False
-        return None
+        verdict = _sum_certificate_covers(manifold, labels, chart, local_domains=local_domains)
+        if verdict is not True:
+            return verdict
     return True
-
 
 def _unrestricted_labels(manifold, labels):
     r"""``labels``, with every chart whose conditions vanish nowhere replaced by the chart it was cut from.
@@ -862,13 +941,15 @@ def _unrestricted_labels(manifold, labels):
         current_label = label
         for _step in range(len(manifold.chart_labels())):
             chart = manifold.atlas()[current_label]
-            conditions = tuple(chart.nonvanishing())
-            if not conditions:
+            conditions = chart.cut_conditions()
+            source_label = chart.cut_from()
+            if source_label is None or not conditions:
                 break
-            symbols = tuple(_engine_manifold_chart(chart)[:])
+            symbols = tuple(_engine_manifold_chart(manifold.atlas()[source_label])[:])
             if not all(
                 _decided_nowhere_vanishing(
-                    _engine_manifold_expression(condition), symbols
+                    SR(_engine_manifold_expression(condition)).simplify_rational().numerator()
+                    * SR(_engine_manifold_expression(condition)).simplify_rational().denominator(), symbols
                 )
                 is True
                 for condition in conditions
@@ -883,125 +964,121 @@ def _unrestricted_labels(manifold, labels):
     return tuple(resolved)
 
 
-def _sum_certificate_covers(manifold, labels, chart) -> bool:
-    r"""Whether the sum of the family's cutting conditions certifies that it covers ``chart``.
+def _rational_guard_product(conditions, ring):
+    r"""Retain each rational guard's numerator and denominator in a polynomial ring.
 
-    A chart cut by ``{g != 0}`` leaves out the points where ``g`` vanishes, so a family
-    of such charts covers ``chart`` when ``intersection {g_i = 0}`` is empty there.  One
-    exact certificate needs no real algebraic geometry: if ``sum_i g_i`` takes no zero on
-    the chart, no point has every ``g_i`` zero, and the family covers (Lee,
-    *Introduction to Smooth Manifolds*, 2nd ed., Ch. 1, for the chart domains).  A family
-    whose conditions do not add up to something decided nowhere-vanishing is not
-    certified here, and the caller refuses rather than guessing.
-
-    Two further certificates are tried in turn, both exact and both about the real
-    chart.  The conditions share no zero when they generate the whole polynomial ring
-    over the algebraic closure (:func:`_conditions_share_no_zero`), and when their sum
-    of squares takes no zero: a sum of squares of reals vanishes only where every term
-    does, so $\sum_i g_i^2$ nowhere-vanishing decides that the intersection of the
-    $\{g_i = 0\}$ is empty even where those meet over $\mathbb{C}$ -- $x^2+1$ and $y$
-    share the zeros $(\pm i, 0)$ and none over the reals, and their squares sum to
-    $(x^2+1)^2 + y^2$, which takes no zero.
+    This private adapter is shared by actual-domain cover and inequality
+    certificates.  A nonzero value of the product satisfies every guard;
+    factors from distinct guards are never canceled against one another.
+    Return None when an expression is not represented over the supplied ring.
     """
+    product = ring.one()
+    for condition in conditions:
+        formula = SR(condition).simplify_rational()
+        try:
+            product *= ring(formula.numerator()) * ring(formula.denominator())
+        except (TypeError, ValueError, ArithmeticError):
+            return None
+    return product
+
+
+def _sum_certificate_covers(manifold, labels, chart, *, local_domains=None):
+    r"""A positive covering certificate using the actual represented open patches.
+
+    A path and a member's local guards give a conjunction g_j != 0.  For
+    rational g_j=n_j/d_j, retain both factors before forming P=product(n_j*d_j).
+    Thus P != 0 lies in that actual patch, even when algebraic cancellation
+    would remove a pole.  The patches cover if their products have no common
+    zero: a nowhere-zero sum, a unit polynomial ideal, or a nowhere-zero sum
+    of squares proves this.  Unsupported guards supply no certificate.
+    """
+    from sage.rings.polynomial.polynomial_ring_constructor import PolynomialRing
+    from sage.rings.rational_field import QQ as SageQQ
     from sage_extensions.categories.vector_bundles import _decided_nowhere_vanishing
 
-    from sage_extensions.categories.vector_bundles import _decided_nowhere_vanishing
-
-    symbols = tuple(_engine_manifold_chart(chart)[:])
-    chart_conditions = tuple(
-        _engine_manifold_expression(condition) for condition in chart.nonvanishing()
-    )
+    engine_chart = _engine_manifold_chart(chart)
+    symbols = tuple(engine_chart[:])
+    ring = PolynomialRing(SageQQ, names=tuple(str(s) for s in symbols)) if symbols else SageQQ
+    chart_conditions = tuple(_engine_manifold_expression(c) for c in chart.nonvanishing())
     products = []
-    for label in labels:
-        read = _member_conditions_in_chart(manifold, label, chart)
-        if read is None:
-            return None
-        kept = tuple(
-            condition
-            for condition in read
-            if _decided_nowhere_vanishing(condition, symbols, chart_conditions) is not True
-        )
-        if not kept:
-            if any(
-                _engine_manifold_chart(chart).domain().is_subset(
-                    _engine_manifold_chart(manifold.atlas()[label]).domain()
-                )
-                for label in labels
-                if not tuple(manifold.atlas()[label].nonvanishing())
-            ):
-                continue
-            if read and any(
-                _engine_manifold_chart(chart).domain().is_subset(
-                    _engine_manifold_chart(manifold.atlas()[label]).domain()
-                )
-                for label in labels
-            ):
-                continue
-            return None
-        product = kept[0]
-        for condition in kept[1:]:
-            product = product * condition
-        products.append(product)
+    for key in labels:
+        label, guards = (key, ()) if local_domains is None else local_domains[key]
+        for conditions in _member_conditions_in_chart(manifold, label, chart, guards):
+            product = _rational_guard_product(conditions, ring)
+            if product is not None:
+                if product != 0:
+                    reduced = ring.one()
+                    for factor, multiplicity in product.factor():
+                        if _decided_nowhere_vanishing(SR(factor), symbols) is not True:
+                            reduced *= factor ** multiplicity
+                    product = reduced
+                product = SR(product)
+                if product not in products:
+                    products.append(product)
     if not products:
         return None
-    total = sum(products[1:], products[0])
-    if _decided_nowhere_vanishing(total, symbols, chart_conditions) is True:
+    if _decided_nowhere_vanishing(sum(products), symbols, chart_conditions) is True:
         return True
     if _conditions_share_no_zero(products, symbols) is True:
         return True
-    if _conditions_share_no_zero(products, symbols) is False:
-        return False
-    squares = sum(product**2 for product in products)
-    if _decided_nowhere_vanishing(squares, symbols, chart_conditions) is True:
+    if _decided_nowhere_vanishing(sum(p*p for p in products), symbols, chart_conditions) is True:
         return True
-    if len(products) == 1 and (
-        _decided_nowhere_vanishing(products[0], symbols, chart_conditions) is False
-    ):
-        return False
+
+
+
+
+
+    if (local_domains is None and labels and not chart_conditions
+        and not engine_chart._restrictions
+        and all(low[0] == -Infinity and high[0] == Infinity
+                for low, high in engine_chart.coord_bounds())):
+        common = ring.zero()
+        for label in labels:
+            member = manifold.atlas()[label]
+            if member.cut_from() != chart.label():
+                break
+            product = ring.one()
+            for guard in member.cut_conditions():
+                formula = SR(_engine_manifold_expression(guard)).simplify_rational()
+                try:
+                    if ring(formula.denominator()) != 1:
+                        break
+                    product *= ring(formula.numerator())
+                except (TypeError, ValueError, ArithmeticError):
+                    break
+            else:
+                common = common.gcd(product)
+                continue
+            break
+        else:
+            if _decided_nowhere_vanishing(SR(common), symbols) is False:
+                return False
     return None
 
 
-def _member_conditions_in_chart(manifold, label, chart):
-    r"""The cutting conditions of one member, read in ``chart``'s own coordinates, or ``None``.
+def _member_conditions_in_chart(manifold, label, chart, local_conditions=()):
+    r"""All represented domains of one member in the queried chart's coordinates.
 
-    A condition of a member's chart is read in another chart by composing it with the
-    coordinate change the atlas states, through a chain where the atlas does not relate
-    the two charts directly (Lee, *Introduction to Smooth Manifolds*, 2nd ed., Ch. 1).
-    ``None`` means it cannot be read there -- no chain joins the two charts -- and the
-    family is then not certified rather than certified wrongly.
+    Each path contributes its own overlap, followed by the member's extra
+    local conditions pulled through that path.  Connectivity alone gives no
+    coverage assertion.  Inherited cuts occur on the path into the member;
+    no condition is extrapolated beyond that path's actual source domain.
     """
-    from sage.symbolic.ring import SR as _SR
-
+    if label == chart.label():
+        return (tuple(SR(_engine_manifold_expression(c)) for c in local_conditions),)
     member = manifold.atlas()[label]
-    conditions = tuple(member.nonvanishing())
-    if not conditions:
-        return ()
-    symbols = tuple(_engine_manifold_chart(chart)[:])
-    if (
-        _engine_manifold_chart(member).domain().is_subset(
-            _engine_manifold_chart(chart).domain()
-        )
-        and tuple(_engine_manifold_chart(member)[:]) == symbols
-    ):
-        return tuple(SR(_engine_manifold_expression(condition)) for condition in conditions)
-    change = _composed_ambient_transition(manifold, chart.label(), label)
-    if change is None:
-        return None
-    forward = tuple(
-        _SR(_engine_manifold_expression(expression))
-        for expression in change.forward_expressions()
-    )
-    member_symbols = tuple(_engine_manifold_chart(member)[:])
-    read = []
-    for condition in conditions:
-        pulled = _SR(_engine_manifold_expression(condition)).subs(
-            dict(zip(member_symbols, forward, strict=True))
-        )
-        if any(variable not in symbols for variable in pulled.variables()):
-            return None
-        read.append(pulled)
-    return tuple(read)
-
+    symbols = tuple(_engine_manifold_chart(member)[:])
+    domains = []
+    if not local_conditions and member.cut_from() == chart.label():
+        domains.append(tuple(SR(_engine_manifold_expression(c))
+                             for c in member.cut_conditions()))
+    for change in manifold.coordinate_changes(chart.label(), label).values():
+        substitution = dict(zip(symbols, tuple(
+            SR(_engine_manifold_expression(c)) for c in change.forward_expressions()
+        ), strict=True))
+        domains.append(tuple(SR(_engine_manifold_expression(c)) for c in change.source_overlap())
+            + tuple(SR(_engine_manifold_expression(c)).subs(substitution) for c in local_conditions))
+    return tuple(domains)
 
 def _conditions_share_no_zero(conditions, symbols) -> bool:
     r"""``True`` when the conditions are decided to share no zero, ``None`` when not decided.
@@ -1118,13 +1195,37 @@ def _admit_manifold_expression_family(values, chart, *, name):
     )
 
 
+def _trivial_unit_formula(formula):
+    r"""Recognize literal unit expressions without a general symbolic relation.
+
+    Only a proved identity with 1 or -1 permits deleting a guard. An
+    expression not recognized by the immediate symbolic simplifier
+    remains a guard; this is not a decision of its nonvanishing.
+    """
+    return (formula - 1).is_trivial_zero() or (formula + 1).is_trivial_zero()
+
+
 def _engine_nonvanishing_conditions(functions):
     r"""Lower the open set ``{f != 0 for every f}`` to SageManifolds chart restrictions.
 
     SageManifolds reads a list of restrictions as their conjunction; the empty
     family is ``None``, no restriction.
     """
-    conditions = [_engine_manifold_expression(function) != 0 for function in functions]
+    conditions = []
+    for function in functions:
+        expression = SR(_engine_manifold_expression(function))
+        numerator = expression.numerator(normalize=True)
+        denominator = expression.denominator(normalize=True)
+        variables = expression.variables()
+        if all(part.is_polynomial(variable) for part in (numerator, denominator)
+               for variable in variables):
+
+
+
+            conditions.extend(part != 0 for part in (numerator, denominator)
+                              if not _trivial_unit_formula(part))
+        else:
+            conditions.append(expression != 0)
     return conditions or None
 
 
@@ -1135,9 +1236,73 @@ def _raise_manifold_expression_family(values, chart, *, name):
     )
 
 
+def _local_chart_expressions(chart, formulas, nonvanishing):
+    r"""Raise local formulas only on their actual domain (private chart adapter).
+
+    The guards are ordered: each is a smooth function on the domain cut out
+    by the preceding guards.  After imposing them all, the coefficients belong
+    to the function ring of that open submanifold.  In particular 1/t is never
+    made an element of C^infinity(R) when its stated domain is t != 0.
+    """
+    local = chart
+    conditions = []
+    imposed = []
+    for formula in nonvanishing:
+        formula = SR(formula)
+
+
+        guard_chart = chart if all(formula.is_polynomial(v) for v in formula.variables()) else local
+        conditions.append(_raise_manifold_expression(formula, guard_chart))
+        if not _trivial_unit_formula(formula) and not any(
+                (formula - guard).is_trivial_zero() for guard in imposed):
+            local = chart.manifold().restricted_chart(chart.label(), conditions)
+            imposed.append(formula)
+    return (
+        tuple(_raise_manifold_expression(SR(formula), local) for formula in formulas),
+        tuple(conditions),
+        local,
+    )
+
+
 def _engine_manifold_point(point):
     r"""Return a point's private Sage realization for same-manifold equality."""
     return point._engine_manifold_point()
+
+
+def _point_coordinates_in_engine_chart(point, target):
+    r"""Read actual chart coordinates without requiring a symbolic real presentation."""
+    from sage_extensions.categories.functions.smooth_germs import (
+        _has_cauchy_coordinate, _coordinate_change_jets, _point_coordinate_values,
+    )
+
+    source = _engine_manifold_chart(point.chart())
+    if (not _has_cauchy_coordinate(tuple(point.coordinates()))
+            and not getattr(source.domain().manifold(), "_owned_coordinate_data", False)):
+        return tuple(target(_engine_manifold_point(point)))
+    change = _coordinate_change_jets(source, _point_coordinate_values(point), target,
+                                     point.manifold().coordinate_field(), 0)
+    if change is None:
+        raise CoverageUndecided("no represented chart change certifies the point's membership")
+    return tuple(jet.value() for jet in change)
+
+
+def _cauchy_point_chart(manifold, point):
+    r"""Select a chart in the actual target manifold that contains the point."""
+    from sage_extensions.categories.functions.smooth_germs import _coordinate_change_jets
+
+    source = _engine_manifold_chart(point.chart())
+    if source.domain().manifold() is not _engine_manifold(manifold).manifold():
+        return None
+    labels = tuple(dict.fromkeys((point.chart().label(), *manifold.selected_finite_chart_labels())))
+    for label in labels:
+        if label not in manifold.chart_labels():
+            continue
+        target = _engine_manifold_chart(manifold.atlas()[label])
+        change = _coordinate_change_jets(source, tuple(point.coordinates()), target,
+                                         manifold.coordinate_field(), 0)
+        if change is not None:
+            return label, tuple(jet.value() for jet in change)
+    raise CoverageUndecided("no represented target chart certifies membership of this exact point")
 
 
 def _is_a_point_in(manifold, value) -> bool:
@@ -1154,6 +1319,11 @@ def _is_a_point_in(manifold, value) -> bool:
         return False
     if getattr(value, "chart", None) is None:
         return False
+    from sage_extensions.categories.functions.smooth_germs import _has_cauchy_coordinate
+
+    if (_has_cauchy_coordinate(tuple(value.coordinates())) or getattr(
+            _engine_manifold_chart(value.chart()).domain().manifold(), "_owned_coordinate_data", False)):
+        return _cauchy_point_chart(manifold, value) is not None
     return _engine_manifold_point(value) in _engine_manifold(manifold)
 
 
@@ -1166,6 +1336,13 @@ def _coordinates_of_a_point_in(manifold, value):
     presents first, which is where a point of an open submanifold cut out inside
     this manifold's own chart has its coordinates.
     """
+    from sage_extensions.categories.functions.smooth_germs import _has_cauchy_coordinate
+
+    if (_has_cauchy_coordinate(tuple(value.coordinates())) or getattr(
+            _engine_manifold_chart(value.chart()).domain().manifold(), "_owned_coordinate_data", False)):
+        result = _cauchy_point_chart(manifold, value)
+        assert result is not None
+        return result
     labels = tuple(manifold.chart_labels())
     given = value.chart().label()
     label = given if given in labels else labels[0]
@@ -1200,6 +1377,52 @@ class _DeferredEngineRealization:
         if self._engine is None:
             self._engine = self._engine_factory()
         return self._engine
+
+
+class _RestrictedManifoldFunction:
+    r"""Restriction of a smooth function along an actual open inclusion.
+
+    The defining value at ``p`` is the value of the original function at its
+    image under the inclusion. A chart expression is cached only when the
+    entire requested chart is contained in its original domain and the
+    coordinate change on that overlap is stated. Restricting a smooth map
+    to an open submanifold preserves its differentiability (Lee, Prop. 2.6).
+    """
+
+    def __init__(self, function, domain):
+        self.function = function
+        self.domain = domain
+
+    def __call__(self, point):
+        return self.function(self.function.parent().domain()(point))
+
+    def formulas(self):
+        source = self.function.parent().domain()
+        original = _chartwise_formulas(self.function, source)
+        if original is None:
+            return None
+        result = {}
+        for label in self.domain.chart_labels():
+            target = self.domain.atlas()[label]
+            engine = _engine_manifold_chart(target)
+            for original_label, formula in original.items():
+                old = source.atlas()[original_label]
+                old_engine = _engine_manifold_chart(old)
+                if not engine.domain().is_subset(old_engine.domain()):
+                    continue
+                if engine is old_engine or old_engine in engine._supercharts:
+                    result[label] = SR(formula).subs(dict(zip(tuple(old_engine[:]), tuple(engine[:]), strict=True)))
+                    break
+                if label not in source.chart_labels() or _engine_manifold_chart(source.atlas()[label]) is not engine:
+                    continue
+                if (label, original_label) not in source.transitions().keys():
+                    continue
+                change = source.transition(label, original_label)
+                result[label] = SR(formula).subs(dict(zip(tuple(old_engine[:]), tuple(
+                    _engine_manifold_expression(entry) for entry in change.forward_expressions()
+                ), strict=True)))
+                break
+        return result or None
 
 
 class _ChartwiseFunction:
@@ -1240,24 +1463,20 @@ class _ChartwiseFunction:
         chart of the cover through the coordinate change the atlas states between
         them (Lee, *Introduction to Smooth Manifolds*, 2nd ed., Ch. 1).
         """
+        from sage_extensions.categories.functions.smooth_germs import _coordinate_change_jets, _point_coordinate_values
+
         manifold = self._manifold
-        label = point.chart().label()
-        if label not in self._formulas:
-            stated = tuple(self._formulas)
-            stated_pairs = tuple(pair for pair in manifold.transitions().index_set())
-            reachable = tuple(
-                other for other in stated if (label, other) in stated_pairs
-            )
-            assert reachable, (
-                f"the function is written on the charts {stated} of {manifold} and {point} is "
-                f"given in the chart {label}: the atlas states no coordinate change from that "
-                f"chart to any chart the function is written on"
-            )
-            label = reachable[0]
-        chart = _engine_manifold_chart(manifold.atlas()[label])
-        coordinates = tuple(chart(_engine_manifold_point(point)))
-        substitutions = dict(zip(tuple(chart[:]), coordinates, strict=True))
-        return manifold.coordinate_field()(self._formulas[label].subs(substitutions))
+        source = _engine_manifold_chart(point.chart())
+        values = _point_coordinate_values(point)
+        for label, expression in self._expressions.items():
+            chart = manifold.atlas()[label]
+            native = _engine_manifold_chart(chart)
+            change = _coordinate_change_jets(source, values, native, manifold.coordinate_field(), 0)
+            if change is None:
+                continue
+            local = chart.domain().point(tuple(jet.value() for jet in change), label)
+            return expression(local)
+        raise CoverageUndecided("no stated function domain is certified to contain the point")
 
     def _repr_(self):
         return f"the smooth function with expressions on the charts {tuple(self._formulas)}"
@@ -1275,6 +1494,8 @@ def _manifold_function_carries_expressions(value, manifold) -> bool:
     from sage_extensions.categories.modules.general_modules import _PointwiseValues
 
     match _manifold_function_definition(value):
+        case _RestrictedManifoldFunction():
+            return True
         case _ChartExpression():
             return True
         case _ChartwiseFunction():
@@ -1313,8 +1534,14 @@ def _chartwise_formulas_of_definition(definition, manifold):
     from sage_extensions.categories.modules.general_modules import _PointwiseValues
 
     match definition:
+        case _RestrictedManifoldFunction() as restricted:
+            return restricted.formulas()
+        case _ChartExpression() as local:
+            formulas = {label: local.engine_expression() for label in manifold.chart_labels()
+                if _engine_manifold_chart(manifold.atlas()[label]) is local._engine_chart}
+            return formulas or None
         case _ChartwiseFunction() as chartwise:
-            return chartwise.formulas()
+            return chartwise.formulas() or None
         case _ConstantMap() as constant:
             value = _engine_scalar(constant.value())
             return {label: value for label in tuple(manifold.chart_labels())}
@@ -1331,7 +1558,8 @@ def _chartwise_formulas_of_definition(definition, manifold):
                 label: _rebuilt_pointwise_formula(
                     values.operation(), tuple(family[label] for family in families)
                 )
-                for label in tuple(manifold.chart_labels())
+                for label in (families[0] if families else tuple(manifold.chart_labels()))
+                if all(label in family for family in families)
             }
         case _:
             return None
@@ -1696,6 +1924,10 @@ class _ChartDomainRealization:
         r"""The manifold this open subset is open in."""
         return self._containing_manifold
 
+    def defining_chart(self):
+        """The restricted chart whose domain defines this open submanifold."""
+        return self.atlas()[self._chart_label]
+
     def _element_constructor_(self, datum, chart_label=None):
         r"""The point of this open submanifold that a point of the ambient manifold in it is.
 
@@ -1716,7 +1948,7 @@ class _ChartDomainRealization:
                 return self._element_constructor_(
                     tuple(
                         field(value)
-                        for value in engine_chart(_engine_manifold_point(datum))
+                        for value in _point_coordinates_in_engine_chart(datum, engine_chart)
                     ),
                     label,
                 )
@@ -1832,6 +2064,19 @@ class TopologicalManifolds(OwnedCategory):
                 name=f"Coordinates of point of {parent}",
             )
             self._chart_label = chart_label
+            from sage_extensions.categories.functions.smooth_germs import (
+                _has_cauchy_coordinate, _valid_exact_coordinates,
+            )
+
+            native = _engine_manifold_chart(parent.atlas()[chart_label])
+            if (_has_cauchy_coordinate(tuple(self._coordinates))
+                    or getattr(native, "_owned_open_conditions", ())):
+                valid = _valid_exact_coordinates(native, tuple(self._coordinates))
+                if valid is False:
+                    raise ValueError("the exact coordinates lie outside the stated chart")
+                if valid is not True:
+                    raise CoverageUndecided("the exact coordinates do not certify membership of the stated chart")
+                return
             self._engine_point = _engine_manifold(parent)(
                 tuple(
                     _engine_manifold_expression(coordinate)
@@ -1895,6 +2140,20 @@ class TopologicalManifolds(OwnedCategory):
                     )
                     return all(relation is True for relation in relations)
                 case False:
+                    from sage_extensions.categories.functions.smooth_germs import _has_cauchy_coordinate
+
+                    if (_has_cauchy_coordinate((*self.coordinates(), *other.coordinates()))
+                            or getattr(_engine_manifold_chart(self.chart()).domain().manifold(),
+                                       "_owned_coordinate_data", False)):
+                        values = _point_coordinates_in_engine_chart(other, _engine_manifold_chart(self.chart()))
+                        field = self.parent().coordinate_field()
+                        relations = tuple(ask(left == field(right))
+                                          for left, right in zip(self.coordinates(), values, strict=True))
+                        if any(r is False for r in relations):
+                            return False
+                        if all(r is True for r in relations):
+                            return True
+                        raise CoverageUndecided("the exact coordinate equalities are undecided")
                     return _engine_manifold_point(other) == self._engine_manifold_point()
 
         def __ne__(self, other) -> bool:
@@ -2040,7 +2299,8 @@ class TopologicalManifolds(OwnedCategory):
         def chart(self, label, coordinates):
             return self._register_chart(label, self._engine_manifold_realization().chart(coordinates))
 
-        def chart_on_open_subset(self, label, coordinates, source_label, nonvanishing):
+        def chart_on_open_subset(self, label, coordinates, source_label, nonvanishing, *,
+                                 same_coordinates=False):
             r"""Register the chart ``coordinates`` on the open subset where the given sections do not vanish.
 
             The sections are read in the chart ``source_label`` of this
@@ -2051,13 +2311,15 @@ class TopologicalManifolds(OwnedCategory):
             subset, an open submanifold
             (:meth:`ManifoldAtlasChart.domain`), not the whole manifold.  It is
             a chart of the same manifold as the chart that states the
-            condition, so a transition map is asked of this manifold.
+            condition, but specifying its domain does not specify its transition.
+            With same_coordinates=True the caller specifies the restriction
+            of the source coordinates in the given order (possibly renamed).
+            Otherwise the coordinate changes are separate defining data.
             """
             source = self.atlas()[source_label]
-            conditions = tuple(
-                _engine_manifold_expression(section) for section in nonvanishing
-            )
-            assert conditions, (
+            nonvanishing = tuple(nonvanishing)
+            conditions = _engine_nonvanishing_conditions(nonvanishing)
+            assert nonvanishing, (
                 f"cannot register the chart {label!r} on the open subset of {self} where no "
                 f"function is required to be nonzero: that subset is the whole chart "
                 f"{source_label!r}, and chart() registers the chart of the whole manifold"
@@ -2065,25 +2327,51 @@ class TopologicalManifolds(OwnedCategory):
             engine_chart = _engine_manifold_chart(source)
             engine_open = engine_chart.domain().open_subset(
                 str(label),
-                coord_def={engine_chart: conditions},
+                coord_def={engine_chart: conditions or []},
             )
+            native = engine_open.chart(coordinates)
+            guards = ()
+            if same_coordinates:
+                substitution = dict(zip(tuple(engine_chart[:]), tuple(native[:]), strict=True))
+                guards = tuple(SR(_engine_manifold_expression(c)).subs(substitution)
+                               for c in nonvanishing)
+                if conditions:
+                    native.add_restrictions([condition.subs(substitution)
+                                             for condition in conditions])
             chart = self._register_chart(
-                label,
-                engine_open.chart(coordinates),
-                nonvanishing=nonvanishing,
-                cut_from=source_label,
+                label, native, cut_from=source_label,
+                cut_conditions=nonvanishing,
             )
-            self.transition_map(
-                label,
-                source_label,
-                chart.coordinates(),
-                source.coordinates(),
-                target_overlap=tuple(nonvanishing),
-            )
+            if same_coordinates:
+                chart._retain_coordinate_guards(guards)
+                self.transition_map(
+                    label, source_label, chart.coordinates(), source.coordinates(),
+                    target_overlap=nonvanishing,
+                )
             return chart
 
+        def restricted_chart(self, label, nonvanishing, *, local_radius=None):
+            r"""Restrict a chart to a local domain without adding a chart to this atlas.
+
+            The result charts the open submanifold where the supplied functions
+            are nonzero.  Its function ring therefore has that actual domain.
+            This is restriction of a chart, not a new coordinate choice (Lee,
+            Example 1.4 and Proposition 2.5).  Private realization uses Sage's
+            restriction of the existing chart; the owned atlas is unchanged.
+            """
+            source = self.atlas()[label]
+            if local_radius is not None:
+
+
+
+                guards = tuple(_admit_manifold_expression(entry, source) for entry in nonvanishing)
+                return source._restricted_by_owned_conditions(guards, local_radius)
+            conditions = _engine_nonvanishing_conditions(nonvanishing)
+            return source._restricted_by_engine_conditions(tuple(dict.fromkeys(conditions or ())))
+
         def _register_chart(
-            self, label, engine_chart, domain=None, nonvanishing=(), cut_from=None
+            self, label, engine_chart, domain=None, nonvanishing=(), cut_from=None,
+            cut_conditions=(),
         ):
             r"""Record the chart ``engine_chart`` of this manifold's engine under ``label``.
 
@@ -2112,6 +2400,7 @@ class TopologicalManifolds(OwnedCategory):
                 domain,
                 nonvanishing=nonvanishing,
                 cut_from=cut_from,
+                cut_conditions=cut_conditions,
             )
             self._preamble_charts[label] = chart
             return chart
@@ -2288,55 +2577,23 @@ class TopologicalManifolds(OwnedCategory):
                         ).target_overlap()
                     ),
                 )
-            for source_label in tuple(domain.chart_labels()):
-                for target_label in tuple(domain.chart_labels()):
-                    if source_label == target_label:
-                        continue
-                    if (source_label, target_label) in domain._preamble_transitions:
-                        continue
-                    ambient = _composed_ambient_transition(
-                        self, source_label, target_label
-                    )
-                    if ambient is None:
-                        continue
-                    source_chart = domain.atlas()[source_label]
-                    target_chart = domain.atlas()[target_label]
-                    domain.transition_map(
-                        source_label,
-                        target_label,
-                        tuple(
-                            _raise_manifold_expression(
-                                _engine_manifold_expression(expression), source_chart
-                            )
-                            for expression in ambient.forward_expressions()
-                        ),
-                        tuple(
-                            _raise_manifold_expression(
-                                _engine_manifold_expression(expression), target_chart
-                            )
-                            for expression in ambient.inverse_expressions()
-                        ),
-                        source_overlap=tuple(
-                            _raise_manifold_expression(
-                                _engine_manifold_expression(expression), source_chart
-                            )
-                            for expression in (
-                                ambient.source_overlap()
-                                if source_chart.domain() is domain
-                                else ()
-                            )
-                        ),
-                        target_overlap=tuple(
-                            _raise_manifold_expression(
-                                _engine_manifold_expression(expression), target_chart
-                            )
-                            for expression in (
-                                ambient.target_overlap()
-                                if target_chart.domain() is domain
-                                else ()
-                            )
-                        ),
-                    )
+            for (source_label, target_label), ambient in self.transitions().items():
+                if (source_label, target_label) in domain._preamble_transitions:
+                    continue
+                source_chart = domain.atlas()[source_label]
+                target_chart = domain.atlas()[target_label]
+                domain.transition_map(
+                    source_label,
+                    target_label,
+                    tuple(_raise_manifold_expression(_engine_manifold_expression(expression), source_chart)
+                          for expression in ambient.forward_expressions()),
+                    tuple(_raise_manifold_expression(_engine_manifold_expression(expression), target_chart)
+                          for expression in ambient.inverse_expressions()),
+                    source_overlap=tuple(_raise_manifold_expression(_engine_manifold_expression(condition), source_chart)
+                                         for condition in ambient.source_overlap()),
+                    target_overlap=tuple(_raise_manifold_expression(_engine_manifold_expression(condition), target_chart)
+                                         for condition in ambient.target_overlap()),
+                )
             return domain
 
         def open_submanifold_inclusion(self, open_manifold):
@@ -2350,6 +2607,9 @@ class TopologicalManifolds(OwnedCategory):
             inverse_expressions,
             source_overlap=(),
             target_overlap=(),
+            *,
+            source_local=None,
+            target_local=None,
         ):
             r"""Record the coordinate change between the charts ``U_s`` and ``U_t`` on ``U_s \cap U_t``.
 
@@ -2366,6 +2626,34 @@ class TopologicalManifolds(OwnedCategory):
             """
             source = self.atlas()[source_label]
             target = self.atlas()[target_label]
+            if source_local is not None or target_local is not None:
+                from sage_extensions.categories.functions.smooth_germs import _function_jet
+
+                assert source_local is not None and target_local is not None
+                assert source_local.label() == source.label() and target_local.label() == target.label()
+                for local, ambient in ((source_local, source), (target_local, target)):
+                    assert _engine_manifold_chart(local).domain().is_subset(
+                        _engine_manifold_chart(ambient).domain())
+                forward = tuple(_admit_manifold_expression(entry, source_local) for entry in forward_expressions)
+                backward = tuple(_admit_manifold_expression(entry, target_local) for entry in inverse_expressions)
+                assert len(forward) == len(backward) == int(self.dimension())
+                transition = ManifoldAtlasTransition(
+                    source, target, None, forward, backward, source_overlap, target_overlap,
+                    _owned_local_charts=(source_local, target_local))
+                reverse = transition.inverse()
+                for local, other, entries in ((source_local, target_local, forward),
+                                               (target_local, source_local, backward)):
+                    native = _engine_manifold_chart(local)
+                    native.domain().manifold()._owned_coordinate_data = True
+                    def provider(coordinates, order, local=local, entries=entries):
+                        point = local.domain().point(coordinates, local.label())
+                        return tuple(_function_jet(entry, local, point, order) for entry in entries)
+                    edges = getattr(native, "_owned_coordinate_transitions", {})
+                    edges[_engine_manifold_chart(other)] = provider
+                    native._owned_coordinate_transitions = edges
+                self._preamble_transitions[source_label, target_label] = transition
+                self._preamble_transitions[target_label, source_label] = reverse
+                return transition
             forward_expressions = _admit_manifold_expression_family(
                 forward_expressions,
                 source,
@@ -2429,11 +2717,18 @@ class TopologicalManifolds(OwnedCategory):
             return transition
 
         def transition(self, source_label, target_label):
-            assert (source_label, target_label) in self._preamble_transitions, (
-                f"{self} has no transition map from the chart {source_label!r} to the "
-                f"chart {target_label!r}: none was defined with transition_map"
+            r"""Read a stated change or its composition along a represented chain.
+
+            A composite retains the actual intersection of the domains of
+            its legs. It is not added to the atlas as a new independent edge;
+            coordinate_changes reads the family of all represented paths
+            when one chain does not certify the entire overlap.
+            """
+            change = _composed_ambient_transition(self, source_label, target_label)
+            assert change is not None, (
+                f"{self} has no represented transition from {source_label!r} to {target_label!r}"
             )
-            return self._preamble_transitions[source_label, target_label]
+            return change
 
         def transitions(self):
             index_set = finite_ordered_set(tuple(self._preamble_transitions))
@@ -2441,6 +2736,43 @@ class TopologicalManifolds(OwnedCategory):
                 index_set,
                 lambda pair: self._preamble_transitions[pair],
                 description=lambda self=self: f"Atlas transitions of {self}",
+            )
+
+        def coordinate_changes(self, source_label, target_label):
+            r"""The local changes along all simple paths between two distinct charts.
+
+            Each composite retains the intersection of its edge domains.  A
+            single path need not cover the overlap of the endpoint charts.
+            Every valid finite path contains a simple path valid at the same
+            point: deleting a repeated-chart cycle preserves the coordinates
+            and removes restrictions.  Thus simple paths cover precisely the
+            overlap represented by the stated transitions, without adding a
+            chart or enlarging any transition domain (Lee, Proposition 1.17).
+            """
+            assert source_label != target_label
+            paths = []
+            pending = [(source_label,)]
+            edges = tuple(self.transitions().keys())
+            while pending:
+                path = pending.pop()
+                for left, right in edges:
+                    if left != path[-1] or right in path:
+                        continue
+                    extended = path + (right,)
+                    if right == target_label:
+                        paths.append(extended)
+                    else:
+                        pending.append(extended)
+
+            def composite(path):
+                change = self.transition(path[0], path[1])
+                for position in range(1, len(path) - 1):
+                    change = change.then(self.transition(path[position], path[position + 1]))
+                return change
+
+            return indexed_family(
+                finite_ordered_set(tuple(paths)), composite,
+                name=f"Local coordinate changes from {source_label} to {target_label}",
             )
 
         def _repr_(self):
@@ -2506,9 +2838,14 @@ class SmoothManifoldMor(CategoricalMor):
     """
 
     class ElementMethods:
-        def __init__(self, parent, representations, domains):
+        def __init__(self, parent, representations, domains, charts, evaluation=None, composition=None, locate=None, target_charts=None):
             self._representations = representations
             self._representation_domains = domains
+            self._representation_charts = charts
+            self._defining_evaluation = evaluation
+            self._defining_composition = composition
+            self._locate_representation = locate
+            self._representation_targets = target_charts
             self._map_of_points = Sets().Mor(parent.domain(), parent.codomain())(
                 lambda point: self._evaluate_point(point)
             )
@@ -2518,98 +2855,97 @@ class SmoothManifoldMor(CategoricalMor):
             return self._map_of_points
 
         def chart_maps(self):
-            r"""The coordinate representations of this map, indexed by the chart-label pairs they are given on."""
+            r"""Computed local representations, indexed by chart pairs and optional local indices.
+
+            A composite also retains its defining point-map composition;
+            incomplete transition data need not compute a covering family
+            of its coordinate descriptions.
+            """
             return self._representations
 
-        def chart_map(self, source_label, target_label):
-            r"""The coordinates of the target chart ``target_label``, as sections on the source chart ``source_label``."""
-            return self._representations[source_label, target_label]
+        def _local_keys(self, point):
+            if self._locate_representation is not None:
+                return (self._locate_representation(point),)
+            return self.chart_maps().keys()
 
-        def chart_map_domain(self, source_label, target_label):
-            r"""The sections on the source chart whose common nonvanishing locus is where the representation holds.
+        def local_representation(self, index):
+            """The actual source chart, target chart and coordinate functions."""
+            if self._representation_targets is not None:
+                return (self._representation_charts[index],
+                        self._representation_targets[index], self._representations[index])
+            return (self.chart_map_chart(*index), self.codomain().atlas()[index[1]],
+                    self.chart_map(*index))
+
+        def chart_map(self, source_label, target_label, *local_index):
+            r"""The target coordinates as smooth functions on the actual local source domain."""
+            key = (source_label, target_label) + local_index
+            if key not in self._representations.keys() and not local_index:
+                keys = tuple(k for k in self._representations.keys() if k[:2] == key)
+                assert len(keys) == 1, "name the local index of this chart representation"
+                key = keys[0]
+            return self._representations[key]
+
+        def chart_map_chart(self, source_label, target_label, *local_index):
+            r"""The restricted source chart that owns this representation's coefficient functions."""
+            key = (source_label, target_label) + local_index
+            if key not in self._representations.keys() and not local_index:
+                keys = tuple(k for k in self._representations.keys() if k[:2] == key)
+                assert len(keys) == 1, "name the local index of this chart representation"
+                key = keys[0]
+            return self._representation_charts[key]
+
+        def chart_map_domain(self, source_label, target_label, *local_index):
+            r"""The ordered nonvanishing guards defining the representation's domain.
 
             A coordinate representation need not hold on the whole of its
             source chart: the map it states is defined where the sections it was
             obtained from do not vanish -- a change of coordinates is defined on
             the overlap of two charts, and the representation restated through it
-            holds there.  The empty family is the whole chart.
+            holds there.  Each guard is defined where all preceding guards
+            hold; the empty family is the whole source chart.
             """
-            return self._representation_domains[source_label, target_label]
+            key = (source_label, target_label) + local_index
+            if key not in self._representation_domains.keys() and not local_index:
+                keys = tuple(k for k in self._representation_domains.keys() if k[:2] == key)
+                assert len(keys) == 1, "name the local index of this chart representation"
+                key = keys[0]
+            return self._representation_domains[key]
 
-        def _representation_at(self, source_label):
-            r"""The target chart, the representation and its domain on the source chart ``source_label``, or ``None`` when the map is written on another chart."""
-            pairs = tuple(
-                pair for pair in self._representations.keys() if pair[0] == source_label
-            )
-            assert len(pairs) <= 1, (
-                f"cannot read {self} on the chart {source_label!r}: the map has "
-                f"{len(pairs)} coordinate representations whose source chart it is, and the "
-                f"value of a point is read off the one on the chart the point is given in"
-            )
-            if not pairs:
-                return None
-            written_source, target_label = pairs[0]
-            return (
-                target_label,
-                self.chart_map(written_source, target_label),
-                self.chart_map_domain(written_source, target_label),
-            )
+        def _representations_written_on(self, source_label):
+            r"""All local representations in these coordinates, with their domains.
 
-        def _representation_on(self, source_label):
-            r"""The target chart, the representation and its domain that the map has on the source chart ``source_label``."""
-            representation = self._representation_at(source_label)
-            assert representation is not None, (
-                f"cannot read {self} on the chart {source_label!r}: the map has no coordinate "
-                f"representation whose source chart it is, and the value of a point is read off "
-                f"the one on the chart the point is given in"
-            )
-            return representation
-
-        def _representation_written_on(self, source_label):
-            r"""The representation on the chart ``source_label``, restated there through the atlas change of coordinates when the map is written on another chart.
-
-            A map written on the chart ``m'`` of its domain is the same map read in
-            the chart ``m``, wherever the coordinate change ``m -> m'`` is defined:
-            ``f_{mt} = f_{m't} o (phi_{m'} o phi_m^{-1})``, and the change is the
-            atlas transition from ``m`` to ``m'``.  The restated representation
-            holds where that change does, which the atlas states by the
-            transition's source overlap, and where the representation on ``m'``
-            already held, read through the same change; both are carried as the
-            restated representation's domain.
+            Private chart adapter: a change A -> B restates a representation
+            on B only on A intersect B intersect f^{-1}(its target chart).
+            The local index retains different pieces of the same chart pair.
             """
-            written = self._representation_at(source_label)
-            if written is not None:
-                return written
-            changes = tuple(
-                pair
-                for pair in self.domain().transitions().keys()
-                if pair[0] == source_label and self._representation_at(pair[1]) is not None
-            )
-            assert len(changes) == 1, (
-                f"cannot restate {self} on the chart {source_label!r}: the map is written on "
-                f"the source charts {tuple(pair[0] for pair in self._representations.keys())}, "
-                f"and {self.domain()} states {len(changes)} changes of coordinates from the "
-                f"chart {source_label!r} to one of them"
-            )
-            alternative_label = changes[0][1]
-            target_label, expressions, domain = self._representation_on(alternative_label)
-            change = self.domain().transition(source_label, alternative_label)
-            source = self.domain().atlas()[source_label]
-            alternative = self.domain().atlas()[alternative_label]
-
-            def restated(sections):
-                return tuple(
-                    _raise_manifold_expression(_engine_manifold_expression(section), source)
-                    for section in _substitute_chart_coordinates(
-                        sections, alternative, change.forward_expressions()
-                    )
-                )
-
-            return (
-                target_label,
-                restated(expressions),
-                tuple(change.source_overlap()) + restated(domain),
-            )
+            manifold = self.domain()
+            result = {}
+            for pair in self.chart_maps().keys():
+                written_label, target_label = pair[:2]
+                expressions = tuple(SR(_engine_manifold_expression(c)) for c in self.chart_map(*pair))
+                where = tuple(SR(_engine_manifold_expression(c)) for c in self.chart_map_domain(*pair))
+                if source_label == written_label:
+                    result[pair] = (target_label, tuple(expressions), tuple(where))
+                    continue
+                for path, change in manifold.coordinate_changes(source_label, written_label).items():
+                    symbols = tuple(_engine_manifold_chart(change.target())[:])
+                    substitutions = dict(zip(symbols, (
+                        _engine_manifold_expression(entry)
+                        for entry in change.forward_expressions()
+                    ), strict=True))
+                    domain = [SR(_engine_manifold_expression(c)) for c in change.source_overlap()]
+                    for condition in where:
+                        formula = condition.subs(substitutions)
+                        domain.append(formula)
+                        if formula == 0:
+                            break
+                    else:
+                        result[(pair, path)] = (
+                            target_label,
+                            tuple(entry.subs(substitutions) for entry in expressions),
+                            tuple(domain),
+                        )
+            return result
 
         def _evaluate_point(self, point):
             r"""The point of the codomain that a point of the domain maps to.
@@ -2622,17 +2958,57 @@ class SmoothManifoldMor(CategoricalMor):
             target chart.
             """
             source_point = self.domain()(point)
-            label = source_point.chart().label()
-            target_label, representation, where = self._representation_on(label)
+            if self._defining_evaluation is not None:
+                return self._defining_evaluation(source_point)
+            from sage_extensions.categories.functions.smooth_germs import _coordinate_change_jets, _point_coordinate_values
+
             field = self.domain().coordinate_field()
-            decisions = tuple(ask(section(source_point) != field.zero()) for section in where)
-            assert all(decision is True for decision in decisions), (
-                f"cannot evaluate {self} at {source_point}: its representation on the chart "
-                f"{label!r} is stated where {tuple(where)} do not vanish, and one of them "
-                f"vanishes there or its value is undecided"
+            source = _engine_manifold_chart(source_point.chart())
+            values = _point_coordinate_values(source_point)
+            for key in self._local_keys(source_point):
+                local, target, entries = self.local_representation(key)
+                change = _coordinate_change_jets(source, values, _engine_manifold_chart(local), field, 0)
+                if change is None:
+                    continue
+                local_point = local.domain().point(tuple(jet.value() for jet in change), local.label())
+                return self.codomain().point(tuple(entry(local_point) for entry in entries), target.label())
+            if self._locate_representation is None and self._all_stated_domains_exclude(source_point):
+                raise AssertionError(f"the stated coordinate domains exclude {source_point}")
+            raise CoverageUndecided(
+                f"no represented local domain of {self} is known to contain {source_point}"
             )
-            values = tuple(section(source_point) for section in representation)
-            return self.codomain().point(values, target_label)
+
+        def _all_stated_domains_exclude(self, point):
+            r"""Prove exclusion from every stated local domain by an exact zero guard.
+
+            A direct stated transition describes the overlap of its charts.
+            If a guard of that overlap vanishes, the target chart is excluded.
+            If no direct transition is stated, a failure to find a path is
+            not an exclusion proof. Read the guards in their defining order.
+            """
+            manifold = self.domain()
+            zero = manifold.coordinate_field().zero()
+            source_label = point.chart().label()
+            keys = tuple(self.chart_maps().keys())
+            if not keys:
+                return False
+            for key in keys:
+                written = key[0]
+                if written == source_label:
+                    guards = self.chart_map_domain(*key)
+                else:
+                    if (source_label, written) not in manifold.transitions().keys():
+                        return False
+                    guards = manifold.transition(source_label, written).source_overlap()
+                for guard in guards:
+                    value = guard(point)
+                    if ask(value == zero) is True:
+                        break
+                    if ask(value != zero) is not True:
+                        return False
+                else:
+                    return False
+            return True
 
         def _call_(self, point):
             return self._map_of_points(point)
@@ -2653,7 +3029,7 @@ class SmoothManifoldMor(CategoricalMor):
             map those substituted sections determine.  When ``self`` is written
             on another chart of that middle manifold, it is first restated on
             the chart ``other`` states its values in, through the atlas change
-            of coordinates (:meth:`_representation_written_on`), which is what
+            of coordinates (:meth:`_representations_written_on`), which is what
             restricts a map of a manifold to the open submanifold its chart is
             the domain of.
             """
@@ -2661,42 +3037,66 @@ class SmoothManifoldMor(CategoricalMor):
                 f"cannot compose {self} with {other}: the codomain {other.codomain()} of the "
                 f"first map is not the domain {self.domain()} of the second"
             )
+
+
+            if self._locate_representation is not None or other._locate_representation is not None:
+                return other.domain().Mor(self.codomain())._construct(
+                    {}, {}, evaluation=lambda point: self(other(point)), composition=(self, other))
+            outer_labels = tuple(key[0] for key in self.chart_maps().keys())
+            inner_labels = tuple(key[1] for key in other.chart_maps().keys())
+            if outer_labels and inner_labels and self._defining_evaluation is None and other._defining_evaluation is None:
+                assert any(
+                    middle == written or _composed_ambient_transition(self.domain(), middle, written) is not None
+                    for middle in inner_labels for written in outer_labels
+                ), "no stated coordinate change joins the two maps' middle charts"
+            try:
+                return self._compose_symbolic(other)
+            except (AssertionError, TypeError, ValueError, NotImplementedError, CoverageUndecided):
+                return other.domain().Mor(self.codomain())._construct(
+                    {}, {}, evaluation=lambda point: self(other(point)), composition=(self, other))
+
+        def _compose_symbolic(self, other):
+            """Optional cached local symbolic representations of the composition."""
             representations = {}
             domains = {}
-            for source_label, middle_label in other.chart_maps().keys():
-                inner = other.chart_map(source_label, middle_label)
-                inner_domain = other.chart_map_domain(source_label, middle_label)
-                target_label, outer, outer_domain = self._representation_written_on(
-                    middle_label
-                )
-                source = other.domain().atlas()[source_label]
+            for inner_key in other.chart_maps().keys():
+                source_label, middle_label = inner_key[:2]
+                inner = other.chart_map(*inner_key)
+                inner_domain = tuple(SR(_engine_manifold_expression(c)) for c in other.chart_map_domain(*inner_key))
+                if any(condition == 0 for condition in inner_domain):
+                    continue
                 middle = self.domain().atlas()[middle_label]
+                substitution = dict(zip(tuple(_engine_manifold_chart(middle)[:]),
+                    tuple(SR(_engine_manifold_expression(c)) for c in inner), strict=True))
 
-                def written(sections):
-                    return tuple(
-                        _raise_manifold_expression(
-                            _engine_manifold_expression(section), source
-                        )
-                        for section in _substitute_chart_coordinates(sections, middle, inner)
-                    )
+                for outer_key, (target_label, outer, outer_domain) in self._representations_written_on(middle_label).items():
+                    key = (source_label, target_label, (inner_key, outer_key))
+                    local_domain = list(inner_domain)
+                    for condition in outer_domain:
+                        pulled = condition.subs(substitution)
+                        local_domain.append(pulled)
+                        if pulled == 0:
+                            break
+                    else:
+                        representations[key] = tuple(formula.subs(substitution) for formula in outer)
+                        domains[key] = tuple(local_domain)
+            return other.domain().Mor(self.codomain())._construct(
+                representations, domains, evaluation=lambda point: self(other(point)),
+                composition=(self, other)
+            )
 
-                representations[source_label, target_label] = written(outer)
-                domains[source_label, target_label] = tuple(inner_domain) + written(
-                    outer_domain
-                )
-            return other.domain().Mor(self.codomain())(representations, domains=domains)
-
-    def _element_constructor_(self, representations, *, domains=None):
+    def _element_constructor_(self, representations, *, domains=None, local_charts=None, target_charts=None, locate=None):
         r"""Return the smooth map whose coordinate representations are ``representations``.
 
         ``representations`` maps a pair ``(s, t)`` of chart labels to the tuple
         of sections of the source chart ``s`` of the domain that are the
         coordinates of the target chart ``t`` of the codomain.  Each section is
         admitted by the source chart's own ring of functions, and there is one
-        representation per source chart, so that the value of a point is read
-        off the representation on the chart the point is given in.  The caller
-        states that the source charts cover the domain: no finite set of charts
-        is decided to cover a manifold here.
+        local representation per index.  An index is ``(s, t)`` or
+        ``(s, t, local_index)``; the latter permits several local formulas for
+        the same chart pair.  The caller supplies compatible formulas whose
+        actual domains cover the source, as in Lee, Corollary 2.8 (p. 35).
+        Evaluation selects a domain containing the point, not a chart label.
 
         ``domains`` maps a pair to the sections of that same source chart whose
         common nonvanishing locus is where the representation holds; a pair it
@@ -2704,6 +3104,30 @@ class SmoothManifoldMor(CategoricalMor):
         """
         domain = self.domain()
         codomain = self.codomain()
+        if locate is not None:
+
+
+
+            assert local_charts is not None and target_charts is not None and domains is None
+            indices = representations.index_set()
+            assert local_charts.index_set() is indices and target_charts.index_set() is indices
+
+            def admit(key):
+                local = local_charts[key]
+                target = target_charts[key]
+                assert target is codomain.atlas()[target.label()]
+                assert _engine_manifold_chart(local).domain().is_subset(
+                    _engine_manifold_chart(domain.atlas()[local.label()]).domain())
+                values = tuple(_admit_manifold_expression(entry, local)
+                               for entry in representations[key])
+                assert len(values) == int(codomain.dimension())
+                return finite_family(values)
+
+            return self.element_class(
+                self, indexed_family(indices, admit),
+                indexed_family(indices, lambda key: finite_family(())),
+                local_charts, locate=locate, target_charts=target_charts)
+        assert local_charts is None and target_charts is None
         domains = {} if domains is None else dict(domains)
         assert set(domains) <= set(representations), (
             f"cannot give the domain of a coordinate representation of a map "
@@ -2711,21 +3135,19 @@ class SmoothManifoldMor(CategoricalMor):
             f"the chart pairs {tuple(representations)}"
         )
         admitted = {}
+        owned_values = {}
+        symbolic = True
         admitted_domains = {}
         for pair, expressions in representations.items():
-            source_label, target_label = pair
-            assert source_label in tuple(domain.chart_labels()), (
+            assert len(pair) in (2, 3)
+            source_label, target_label = pair[:2]
+            assert source_label in domain.chart_labels(), (
                 f"cannot represent a map from {domain}: it has the charts "
                 f"{tuple(domain.chart_labels())} and not {source_label!r}"
             )
-            assert target_label in tuple(codomain.chart_labels()), (
+            assert target_label in codomain.chart_labels(), (
                 f"cannot represent a map to {codomain}: it has the charts "
                 f"{tuple(codomain.chart_labels())} and not {target_label!r}"
-            )
-            assert source_label not in tuple(label for label, _target in admitted), (
-                f"cannot represent a map from {domain} by two coordinate representations on "
-                f"the chart {source_label!r}: a point is given in one chart, and its value is "
-                f"read off the one representation on that chart"
             )
             values = _admit_manifold_expression_family(
                 expressions,
@@ -2741,8 +3163,13 @@ class SmoothManifoldMor(CategoricalMor):
                 f"{codomain.dimension()} coordinate functions, and {values.cardinality()} "
                 f"were given"
             )
-            admitted[pair] = values
-            admitted_domains[pair] = _admit_manifold_expression_family(
+            quotient_domains = tuple(value.denominator() for value in values if isinstance(value, _SectionRatio))
+            owned_values[pair] = tuple(values)
+            try:
+                admitted[pair] = tuple(SR(_engine_manifold_expression(value)) for value in values)
+            except (AssertionError, TypeError, ValueError, NotImplementedError):
+                symbolic = False
+            conditions = _admit_manifold_expression_family(
                 domains.get(pair, ()),
                 domain.atlas()[source_label],
                 name=(
@@ -2750,24 +3177,54 @@ class SmoothManifoldMor(CategoricalMor):
                     f"{target_label} of a smooth map to {codomain}"
                 ),
             )
-        assert admitted, (
+            quotient_domains += tuple(value.denominator() for value in conditions if isinstance(value, _SectionRatio))
+            admitted_domains[pair] = tuple(SR(_engine_manifold_expression(value)) for value in
+                quotient_domains + tuple(conditions))
+        assert owned_values, (
             f"cannot construct a smooth map {domain} -> {codomain} that states no "
             f"coordinate representation: its value at every point would be unstated"
         )
+        return self._construct(admitted if symbolic else owned_values, admitted_domains,
+                               owned=not symbolic)
+
+    def _construct(self, formulas, domains, evaluation=None, composition=None, *, owned=False):
+        r"""Raise already admitted local map formulas on their actual source domains.
+
+        Private map adapter shared by the public constructor and composition.
+        Composition retains the ordered intersections of the original domains;
+        the public constructor admits the caller's owned expressions first.
+        """
+        domain, codomain = self.domain(), self.codomain()
+        admitted, admitted_domains, charts = {}, {}, {}
+        for pair, values in formulas.items():
+            source = domain.atlas()[pair[0]]
+            if not owned:
+                admitted[pair], admitted_domains[pair], charts[pair] = _local_chart_expressions(
+                    source, values, domains[pair])
+            else:
+                from sage_extensions.categories.functions.smooth_germs import _SmoothGermFunction, _function_jet
+                _, admitted_domains[pair], local = _local_chart_expressions(source, (), domains[pair])
+                charts[pair] = local
+                admitted[pair] = tuple(local.function_ring()(_SmoothGermFunction(
+                    local.domain(), lambda chart, point, order, value=value:
+                        _function_jet(value, chart, point, order))) for value in values)
         pairs = finite_ordered_set(tuple(admitted))
         return self.element_class(
             self,
             indexed_family(
                 pairs,
-                lambda pair: admitted[pair],
+                lambda pair: finite_family(admitted[pair]),
                 name=f"Coordinate representations of a smooth map {domain} -> {codomain}",
             ),
             indexed_family(
                 pairs,
-                lambda pair: admitted_domains[pair],
+                lambda pair: finite_family(admitted_domains[pair]),
                 name=f"Domains of the coordinate representations of a smooth map "
                 f"{domain} -> {codomain}",
             ),
+            charts,
+            evaluation,
+            composition,
         )
 
     @object_level
@@ -2968,6 +3425,10 @@ class SmoothManifolds(OwnedCategory):
             ambient chart are its own coordinates -- not the ambient manifold
             itself, and not a chart of the whole manifold.
             """
+            if isinstance(open_manifold, _ChartDomainRealization) and open_manifold.containing_manifold() is self:
+                source = open_manifold.defining_chart()
+                label = source.label()
+                return open_manifold.Mor(self)({(label, label): source.coordinates()})
             labels = tuple(
                 label
                 for label in self.chart_labels()
@@ -2984,33 +3445,13 @@ class SmoothManifolds(OwnedCategory):
             return open_manifold.Mor(self)({(label, label): source.coordinates()})
 
         def _cotangent_spanning_functions(self):
-            r"""Smooth functions on this manifold whose differentials span every cotangent space.
+            r"""An optional certified global family for symbolic differentiation.
 
-            A derivation of ``C^oo(M)`` is read as a section on such a family
-            (:meth:`SmoothSectionModules.ParentMethods.from_derivation`): in a chart,
-            ``V(g_k) = sum_i v^i dg_k/dx_i``, and the Jacobian of the family has rank
-            ``dim M`` at every point.  When one chart presents the manifold its coordinates
-            are such a family.  Otherwise the family is ``H_a x_a^i`` over the charts ``a``
-            and the coordinates ``x_a^i``, with ``H_a`` the bump of the chart ``a``
-            (:meth:`chart_bump`, radii ``2`` and ``3``): ``H_a = 1`` on the ball ``|x_a| <
-            2``, where ``d(H_a x_a^i) = dx_a^i``, and these balls cover the manifold
-            (Lee, *Introduction to Smooth Manifolds*, 2nd ed., Prop. 2.25 and the proof of
-            Prop. 8.15).
+            General manifolds need no finite compact-support spanning family.
+            The local inverse of a derivation uses Lee, Proposition 8.15,
+            independently of this optimization.
             """
-            labels = tuple(self.chart_labels())
-            if len(labels) == 1 and self.atlas()[labels[0]].domain() is self:
-                chart = self.atlas()[labels[0]]
-                return tuple(
-                    self.smooth_function({chart.label(): coordinate})
-                    for coordinate in chart.coordinates()
-                )
-            inner, outer = 2, 3
-            _inner_balls_cover(self, inner)
-            return tuple(
-                self._glued_function(_chart_bump_formulas(self, label, inner, outer, index))
-                for label in labels
-                for index in range(int(self.dimension()))
-            )
+            return None
 
         def chart_bump(self, label, inner, outer):
             r"""The bump ``H`` of the chart ``label``: ``1`` on ``|x| <= inner``, ``0`` off ``|x| < outer``.
@@ -3056,22 +3497,44 @@ class SmoothManifolds(OwnedCategory):
 
             return C(Infinity, self, self.coordinate_field())
 
-        def smooth_function(self, expressions):
+        def smooth_function(self, expressions, *, check=True, local_charts=None, locate=None):
             r"""The smooth function whose expression in each chart is ``expressions[label]``.
 
             A smooth function is fixed by its expressions in the charts of an
             atlas, provided they agree where the charts meet: on the overlap of
             two charts each expression is the other read through the coordinate
             change (Lee, *Introduction to Smooth Manifolds*, 2nd ed., Ch. 1).
-            The family is checked against every represented transition and
-            refused when it fails, so that what is returned is one function on
-            the manifold and not one function per chart.
+            With check=True, certify the cover and overlap equalities by the
+            available exact symbolic procedures. With check=False the
+            caller supplies the mathematical hypotheses that these domains
+            cover and the smooth local functions agree on every overlap.
+            This is the usual gluing construction, not a demand that its
+            hypotheses be algorithmically decidable (OWN-22).
 
             The expressions are sections of each chart's function ring
             (:meth:`ManifoldAtlasChart.function_ring`); a quotient of two
             sections is stated where its denominator does not vanish
             (:meth:`ManifoldAtlasChart.section_ratio`).
             """
+            if locate is not None:
+                from sage_extensions.categories.functions.smooth_germs import (
+                    _SmoothGermFunction, _function_jet,
+                )
+                assert not check and local_charts is not None
+                indices = expressions.index_set()
+                assert local_charts.index_set() is indices
+
+                def provider(chart, point, order):
+                    key = locate(point)
+                    local = local_charts[key]
+                    assert _engine_manifold_chart(local).domain().is_subset(
+                        _engine_manifold_chart(self.atlas()[local.label()]).domain())
+                    expression = _admit_manifold_expression(expressions[key], local)
+                    return _function_jet(expression, chart, point, order)
+
+
+                return self.smooth_functions()(_SmoothGermFunction(self, provider))
+            assert local_charts is None
             atlas = self.atlas()
             labels = tuple(expressions)
             extra = tuple(label for label in labels if label not in self.chart_labels())
@@ -3079,7 +3542,7 @@ class SmoothManifolds(OwnedCategory):
                 f"a smooth function on {self} is stated on the charts of the manifold, and the "
                 f"expressions given for {extra} are on charts it does not have"
             )
-            coverage = _chart_family_covers(self, labels)
+            coverage = _chart_family_covers(self, labels) if check else True
             if coverage is not True:
                 if coverage is False:
                     assert False, (
@@ -3096,17 +3559,21 @@ class SmoothManifolds(OwnedCategory):
                 label: _admit_manifold_expression(expressions[label], atlas[label])
                 for label in labels
             }
-            _chartwise_family_agrees(
-                self, {label: (admitted[label],) for label in labels}, 0
-            )
+            if check:
+                _chartwise_family_agrees(
+                    self, {label: (admitted[label],) for label in labels}, 0
+                )
+            formulas = {}
+            for label, expression in admitted.items():
+                try:
+                    formulas[label] = _engine_manifold_expression(expression)
+                except (AssertionError, TypeError, ValueError, NotImplementedError):
+                    pass
             return self.smooth_functions()(
                 _ChartwiseFunction(
                     self,
                     admitted,
-                    {
-                        label: _engine_manifold_expression(admitted[label])
-                        for label in labels
-                    },
+                    formulas,
                 )
             )
 
@@ -3238,6 +3705,26 @@ class _StandardSphere:
     def _an_element_(self):
         r"""The south pole: the origin of the chart ``U_N``, stereographic projection from the north pole."""
         return self.point((0,) * self.dimension(), "U_N")
+
+    def _cotangent_spanning_functions(self):
+        r"""Coordinates of the standard embedding S^n into R^(n+1).
+
+        The north formula is (2x/(1+|x|^2), (|x|^2-1)/(1+|x|^2));
+        the south formula has the opposite last coordinate. The chart
+        inverses u/(1-z) and u/(1+z) show that the differential is
+        injective, so the coordinate differentials span each cotangent
+        space. This shortcut is specific to the standard sphere.
+        """
+        north, south = self.atlas()["U_N"], self.atlas()["U_S"]
+        expressions = []
+        for chart, sign in ((north, 1), (south, -1)):
+            x = tuple(chart.coordinates())
+            one = chart.function_ring().one()
+            norm = sum(c**2 for c in x)
+            expressions.append(tuple(chart.section_ratio(c+c, one+norm) for c in x)
+                               + (chart.section_ratio(sign*(norm-one), one+norm),))
+        return tuple(self.smooth_function({"U_N": a, "U_S": b})
+                     for a, b in zip(*expressions, strict=True))
 
     def _homotopy_group_module(self, base_point, degree):
         r"""``pi_k(S^n, x)`` for ``k < n``, ``k = n``, and ``(n, k) = (2, 3)``.

@@ -48,10 +48,15 @@ from sage_extensions.categories.manifolds import (
     _engine_manifold,
     _engine_manifold_chart,
     _engine_manifold_expression,
+    _local_chart_expressions,
+    _rational_guard_product,
     _raise_manifold_expression,
+    _sum_certificate_covers,
 )
 from sage_extensions.categories.modules.pure.modules import Modules
 from sage_extensions.categories.sets.set_categories import Sets
+from sage_extensions.categories.sets.finite_families import finite_family
+from sage_extensions.logic import ask
 from sage_extensions.owned_category import _object_of
 
 
@@ -69,15 +74,206 @@ def _engine_vector_field(manifold, components):
     components, and its transition maps are what make the result one object on
     the manifold.  Private computation adapter (``OWN-06``): the engine's
     vector field is the computation, and the owned section is built on it.
+    Each coefficient is supplied with its chart: a coordinate expression is
+    a function on that chart's domain, not a scalar constant on every chart.
     """
     engine = _engine_manifold(manifold)
     field = engine.vector_field(name=f"a section of T{manifold.manifold_name()}")
     for label, component in components.items():
         chart = _engine_manifold_chart(manifold.atlas()[label])
         field.restrict(chart.domain())[chart.frame(), :] = [
-            _engine_manifold_expression(entry) for entry in component
+            chart.domain().scalar_field({chart: _engine_manifold_expression(entry)})
+            for entry in component
         ]
     return field
+
+
+def _tangent_section_jets(section, chart, point, order):
+    """Read a tangent section in an actual local coordinate frame."""
+    return _section_jets(section, chart, point, order, chart)
+
+
+def _mapping_germ(mapping, chart, point, order):
+    """The smooth map's germ in a target chart that actually contains its image."""
+    from sage_extensions.categories.functions.smooth_germs import (
+        _coordinate_change_jets, _coordinates_in_chart, _function_jet,
+    )
+
+    native = _engine_manifold_chart(chart)
+    composition = getattr(mapping, "_defining_composition", None)
+    if composition is not None:
+        outer, inner = composition
+        middle, image, arguments = _mapping_germ(inner, chart, point, order)
+        target, result, expressions = _mapping_germ(outer, middle, image, order)
+        return target, result, tuple(entry.compose(arguments) for entry in expressions)
+    for key in mapping._local_keys(point):
+        local, target, entries = mapping.local_representation(key)
+        local_native = _engine_manifold_chart(local)
+        if not (local_native is native and _engine_manifold_chart(point.chart()) is native):
+            if _coordinate_change_jets(native, _coordinates_in_chart(chart, point),
+                    local_native, chart.manifold().coordinate_field(), 0) is None:
+                continue
+        arguments = tuple(_function_jet(entry, chart, point, order) for entry in entries)
+        image = mapping.codomain().point(tuple(argument.value() for argument in arguments), target.label())
+        return target, image, arguments
+    raise CoverageUndecided("no actual local representation of the map contains the point")
+
+
+def _bundle_image_germ(bundle, chart, point, order):
+    """The germ of the composite map to the original tangent bundle's base."""
+    from sage_extensions.categories.functions.smooth_germs import _coordinate_jets
+
+    if bundle.is_pullback():
+        target, image, arguments = _mapping_germ(bundle.mapping(), chart, point, order)
+        original, final, expressions = _bundle_image_germ(bundle.underlying_bundle(), target, image, order)
+        return original, final, tuple(entry.compose(arguments) for entry in expressions)
+    return chart, point, _coordinate_jets(chart, point, order)
+
+
+def _section_jets(section, chart, point, order, frame=None):
+    """Section coefficient germs in one fibre frame, over the actual local base.
+
+    For a pullback the fibre transition is the target coordinate Jacobian
+    evaluated along the composite map to the original tangent bundle base.
+    It is not the differential of the pullback map.
+    """
+    from sage_extensions.categories.functions.smooth_germs import (
+        _coordinate_change_jets, _coordinates_in_chart, _function_jet,
+    )
+
+    bundle = section.parent().vector_bundle()
+    root, image, image_jets = _bundle_image_germ(bundle, chart, point, order)
+    if frame is None:
+        frame = root
+    if section._jet_evaluation is not None:
+        return section._jet_evaluation(chart, point, order, frame)
+    native = _engine_manifold_chart(chart)
+    image_native = _engine_manifold_chart(root)
+    target = _engine_manifold_chart(frame)
+    field = chart.manifold().coordinate_field()
+    for local_chart, original_chart, component in section._local_component_pieces(point):
+        local = _engine_manifold_chart(local_chart)
+        if not (local is native and _engine_manifold_chart(point.chart()) is native):
+            if _coordinate_change_jets(native, _coordinates_in_chart(chart, point),
+                    local, field, 0) is None:
+                continue
+        original = _engine_manifold_chart(original_chart)
+        coeffs = tuple(_function_jet(entry, chart, point, order) for entry in component)
+        if original is target:
+            return coeffs
+        image_values = _coordinates_in_chart(root, image)
+        forward = _coordinate_change_jets(image_native, image_values, original, field, order)
+        if forward is None:
+            continue
+        backward = _coordinate_change_jets(original, tuple(jet.value() for jet in forward),
+                                           target, field, order + 1)
+        if backward is None:
+            continue
+        original_jets = tuple(entry.compose(image_jets) for entry in forward)
+        rows = tuple(tuple(entry.partial(i).compose(original_jets)
+                           for i in range(len(forward))) for entry in backward)
+        return tuple(
+            sum((factor * entry for factor, entry in zip(row, coeffs, strict=True)),
+                row[0].scale(field.zero()))
+            for row in rows
+        )
+    raise CoverageUndecided("no actual section domain and fibre-frame transition contains the point")
+
+
+def _jet_determinant(columns):
+    """Determinant over the commutative finite-order germ algebra."""
+    if len(columns) == 1:
+        return columns[0][0]
+    field = columns[0][0].field
+    result = columns[0][0].scale(field.zero())
+    for i, column in enumerate(columns):
+        minor = tuple(other[1:] for j, other in enumerate(columns) if j != i)
+        result = result + (column[0] * _jet_determinant(minor)).scale(field((-1)**i))
+    return result
+
+
+def _symbolic_section_pieces(section, chart, root, image, map_guards):
+    """Coefficient formulas on actual common source domains and one fibre frame."""
+    manifold = section.parent().base_manifold()
+    symbols = tuple(_engine_manifold_chart(chart)[:])
+    root_symbols = tuple(_engine_manifold_chart(root)[:])
+    root_substitution = dict(zip(root_symbols, image, strict=True))
+    for key, coefficients in section.components().items():
+        source = section.component_chart(key)
+        paths = {(): None} if source.label() == chart.label() else dict(
+            manifold.coordinate_changes(chart.label(), source.label()).items())
+        for change in paths.values():
+            source_symbols = tuple(_engine_manifold_chart(source)[:])
+            in_source = symbols if change is None else tuple(
+                SR(_engine_manifold_expression(c)) for c in change.forward_expressions())
+            substitute = dict(zip(source_symbols, in_source, strict=True))
+            where = tuple(map_guards) + (() if change is None else tuple(
+                SR(_engine_manifold_expression(c)) for c in change.source_overlap()))
+            where += tuple(SR(_engine_manifold_expression(c)).subs(substitute)
+                           for c in section.component_nonvanishing(key))
+            if any(guard == 0 for guard in where):
+                continue
+            entries = tuple(SR(_engine_manifold_expression(c)).subs(substitute)
+                            for c in coefficients)
+            original = section.component_frame(key)
+            if original is root:
+                yield entries, where
+                continue
+            for frame_change in root.manifold().coordinate_changes(root.label(), original.label()).values():
+                overlap = tuple(SR(_engine_manifold_expression(c)).subs(root_substitution)
+                                for c in frame_change.source_overlap())
+                if any(c == 0 for c in overlap):
+                    continue
+                variables = tuple(_engine_manifold_chart(original)[:])
+                in_original = tuple(SR(_engine_manifold_expression(c)).subs(root_substitution)
+                                    for c in frame_change.forward_expressions())
+                back = dict(zip(variables, in_original, strict=True))
+                converted = tuple(sum(SR(_engine_manifold_expression(formula)).diff(var).subs(back) * value
+                                      for var, value in zip(variables, entries, strict=True))
+                                  for formula in frame_change.inverse_expressions())
+                yield converted, where + overlap
+
+
+def _certify_frame_on_common_refinement(family):
+    """Prove the pointwise basis property on a certified common refinement.
+
+    All columns are first expressed in one fibre frame over an actual common
+    intersection. A nonzero determinant certificate on those intersections
+    and a covering certificate suffice; no point sampling is used.
+    """
+    from itertools import product
+    from sage.matrix.constructor import matrix as _engine_matrix
+
+    module = family[0].parent()
+    manifold = module.base_manifold()
+    bundle = module.vector_bundle()
+    composite = None
+    while bundle.is_pullback():
+        mapping = bundle.mapping()
+        composite = mapping if composite is None else mapping * composite
+        bundle = bundle.underlying_bundle()
+    witnesses = {}
+    for label in manifold.chart_labels():
+        chart = manifold.atlas()[label]
+        symbols = tuple(_engine_manifold_chart(chart)[:])
+        if composite is None:
+            images = ((chart, symbols, ()),)
+        else:
+            images = tuple((composite.codomain().atlas()[target], expressions, where)
+                           for target, expressions, where in composite._representations_written_on(label).values())
+        for root, image, where in images:
+            local = tuple(tuple(_symbolic_section_pieces(section, chart, root, image, where))
+                          for section in family)
+            for combination in product(*local):
+                columns = tuple(entries for entries, _ in combination)
+                guards = tuple(c for _, conditions in combination for c in conditions)
+                determinant = _engine_matrix(SR, list(zip(*columns, strict=True))).det()
+                excluded = tuple(_engine_manifold_expression(c) for c in chart.nonvanishing()) + guards
+                if _decided_nowhere_vanishing(determinant, symbols, excluded) is True:
+                    witnesses[len(witnesses)] = (
+                        label, tuple(_raise_manifold_expression(guard, chart) for guard in guards)
+                    )
+    return _chart_family_covers(manifold, tuple(witnesses), local_domains=witnesses) is True
 
 
 def _rational_polynomial(expression):
@@ -101,8 +297,6 @@ def _function_formula_on(function, manifold, label):
     *Introduction to Smooth Manifolds*, 2nd ed., Ch. 1).  ``None`` says no coordinate
     change the atlas states carries the function's expression to this chart.
     """
-    from sage_extensions.categories.manifolds import _composed_ambient_transition
-
     formulas = _chartwise_formulas(function, manifold)
     if formulas is None:
         return None
@@ -110,9 +304,16 @@ def _function_formula_on(function, manifold, label):
         return SR(formulas[label])
     symbols = tuple(_engine_manifold_chart(manifold.atlas()[label])[:])
     for other, formula in formulas.items():
-        change = _composed_ambient_transition(manifold, other, label)
-        if change is None:
+        requested = _engine_manifold_chart(manifold.atlas()[label])
+        given = _engine_manifold_chart(manifold.atlas()[other])
+        if (not requested.domain().is_subset(given.domain())
+            and _sum_certificate_covers(manifold, (other,), manifold.atlas()[label]) is not True):
             continue
+        if given in requested._supercharts:
+            return SR(formula).subs(dict(zip(tuple(given[:]), symbols, strict=True)))
+        if (label, other) not in manifold.transitions().keys():
+            continue
+        change = manifold.transition(label, other)
         other_symbols = tuple(_engine_manifold_chart(manifold.atlas()[other])[:])
         pulled = SR(formula).subs(
             dict(
@@ -120,7 +321,7 @@ def _function_formula_on(function, manifold, label):
                     other_symbols,
                     tuple(
                         SR(_engine_manifold_expression(expression))
-                        for expression in change.inverse_expressions()
+                        for expression in change.forward_expressions()
                     ),
                     strict=True,
                 )
@@ -281,6 +482,13 @@ def _section_components_on(section, label):
     manifold = module.base_manifold()
     stated = section.components()
     if label in stated:
+        guards = section.component_nonvanishing(label)
+        if guards:
+            local = {label: (section.component_chart(label).label(), guards)}
+            if _sum_certificate_covers(manifold, (label,), manifold.atlas()[label], local_domains=local) is not True:
+                raise CoverageUndecided("this local component does not certify a description on the whole requested chart")
+            return tuple(_raise_manifold_expression(_engine_manifold_expression(entry), manifold.atlas()[label])
+                for entry in stated[label])
         return stated[label]
     bundle = module.vector_bundle()
     rank = int(bundle.rank())
@@ -288,9 +496,20 @@ def _section_components_on(section, label):
     target_symbols = tuple(_engine_manifold_chart(chart)[:])
     underlying = bundle.underlying_bundle()
     for source_label, component in stated.items():
+        if source_label not in manifold.chart_labels() or section.component_nonvanishing(source_label):
+            raise CoverageUndecided("transport of this local component requires its actual domain and fibre frame")
         change = _composed_ambient_transition(manifold, source_label, label)
         if change is None:
             continue
+        source_chart = manifold.atlas()[source_label]
+        requested = _engine_manifold_chart(chart)
+        given = _engine_manifold_chart(source_chart)
+        if (not requested.domain().is_subset(given.domain())
+            and _sum_certificate_covers(manifold, (source_label,), chart) is not True):
+            continue
+        if (source_label, label) not in manifold.transitions().keys():
+            continue
+        change = manifold.transition(source_label, label)
         source_symbols = tuple(_engine_manifold_chart(manifold.atlas()[source_label])[:])
         if underlying is None:
             jacobian = _engine_matrix(
@@ -415,87 +634,64 @@ def _decided_nowhere_vanishing(expression, variables, excluded=()):
     return _decided_no_real_zero(numerator, variables)
 
 
-def _definiteness(matrix):
-    r"""``+1``, ``-1``, ``0`` or ``None``: definite, semidefinite of either sign, or indefinite, by Sylvester's criterion.
+def _quadratic_signs(matrix):
+    r"""Decide whether the rational symmetric form takes positive/negative values.
 
-    A symmetric matrix over the rationals is positive definite exactly when all of
-    its leading principal minors are positive, and negative definite exactly when
-    those minors alternate in sign (Sylvester's criterion; Horn and Johnson,
-    *Matrix Analysis*, 2nd ed., Thm. 7.2.5).  A matrix that is neither is called
-    semidefinite of both signs when every principal minor is nonnegative or every
-    one of odd order is nonpositive with every one of even order nonnegative
-    (Thm. 7.2.4 for the principal-minor form), and indefinite otherwise.
+    A nonzero diagonal pivot d splits the form by congruence as
+    d z^2 + y^T (B - vv^T/d)y, where v is its off-diagonal column
+    and B the remaining principal matrix. The change of variables is
+    invertible. If all diagonal entries vanish but an off-diagonal entry
+    A_ij is nonzero, e_i+e_j and e_i-e_j give opposite signs.
+    Thus exact elimination decides both signs, including singular forms.
     """
-    size_count = matrix.nrows()
-    leading = tuple(
-        matrix[: size, : size].det() for size in range(1, size_count + 1)
-    )
-    if all(entry > 0 for entry in leading):
-        return 1
-    if all(
-        (entry if size % 2 == 0 else -entry) > 0
-        for size, entry in enumerate(leading, start=1)
-    ):
-        return -1
-    if size_count > 4:
-        return None
-    principal = []
-    for size in range(1, size_count + 1):
-        for subset in _subsets_of_size(size_count, size):
-            principal.append((size, matrix[list(subset), list(subset)].det()))
-    if all(entry >= 0 for _size, entry in principal):
-        return 0
-    if all((entry if size % 2 == 0 else -entry) >= 0 for size, entry in principal):
-        return 0
-    return None
-
-
-def _subsets_of_size(size_count, size):
-    r"""The subsets of ``{0, ..., size_count - 1}`` of ``size`` elements, in order."""
-    from itertools import combinations
-
-    return tuple(combinations(range(size_count), size))
+    positive = negative = False
+    while matrix.nrows():
+        n = matrix.nrows()
+        pivot = next((i for i in range(n) if matrix[i, i] != 0), None)
+        if pivot is None:
+            return (True, True) if not matrix.is_zero() else (positive, negative)
+        diagonal = matrix[pivot, pivot]
+        positive = positive or diagonal > 0
+        negative = negative or diagonal < 0
+        if positive and negative:
+            return True, True
+        rest = [i for i in range(n) if i != pivot]
+        if not rest:
+            break
+        column = matrix[rest, [pivot]]
+        matrix = matrix[rest, rest] - column * column.transpose() / diagonal
+    return positive, negative
 
 
 def _quadratic_minimum(matrix, vector, constant):
-    r"""The minimum of ``x^T matrix x + vector^T x + constant`` over the range of a semidefinite matrix, or ``None``.
+    r"""The attained minimum of a positive semidefinite quadratic, or None.
 
-    For a positive semidefinite ``A`` the form is ``(x + u)^T A (x + u) + c - u^T A u``
-    with ``A u = b/2``: constant along the kernel and minimised at ``-u`` on the
-    range (Horn and Johnson, *Matrix Analysis*, 2nd ed., §7.1), so its minimum is
-    ``c - u^T A u`` and does not depend on which solution ``u`` is taken.  ``None``
-    is the answer when ``b/2`` is not in the range of ``A``, which makes the form
-    unbounded below and therefore a form that takes the value zero.
+    If b/2 is outside the range of A, symmetry gives a vector in ker A
+    with nonzero pairing with b. Along that line the polynomial takes
+    every real value. Otherwise solve Au=b/2. Completing the square gives
+    (x+u)^T A (x+u) + c - u^T A u and the minimum occurs at -u.
     """
     coefficient_ring = matrix.base_ring()
-    half = coefficient_ring(1) / coefficient_ring(2)
-    target = half * vector
-    augmented = matrix.augment(target.column())
-    if augmented.rank() != matrix.rank():
+    target = vector / coefficient_ring(2)
+    if matrix.augment(target.column()).rank() != matrix.rank():
         return None
     if target.is_zero():
         return constant
-    try:
-        solution = matrix.solve_right(target)
-    except (ValueError, ZeroDivisionError):
-        return None
+    solution = matrix.solve_right(target)
+    assert matrix * solution == target
     return constant - solution.dot_product(matrix * solution)
 
 
 def _decided_quadratic(polynomial):
-    r"""Whether a polynomial of degree at most two takes no zero, decided by its quadratic form.
+    r"""Decide real zero existence for every rational polynomial of degree <=2.
 
-    Writing the polynomial as ``x^T A x + b^T x + c`` over the rationals, the form
-    takes no zero exactly when its minimum is positive -- a form whose minimum is
-    zero takes that value, and one whose minimum is negative takes the value zero on
-    the way to its negative values.  The minimum is ``c - (1/4) b^T A^{-1} b`` for a
-    definite ``A`` and ``c - u^T A u`` for a semidefinite one with ``A u = b/2``
-    (:func:`_quadratic_minimum`).  An indefinite quadratic part makes the form
-    unbounded in both directions, so it takes the value zero too.
-
-    ``None`` is answered for a polynomial of higher degree, and for a semidefinite
-    form whose linear part leaves the range of its quadratic part in a case this
-    decision does not solve.
+    An indefinite quadratic part takes both signs for sufficiently large
+    multiples of suitable vectors, so the polynomial has a zero by
+    continuity. Multiply a negative semidefinite form by -1. A nonzero
+    positive semidefinite form is unbounded above, and has a zero precisely
+    when its attained minimum is nonpositive or its linear term has a
+    nonzero component along the kernel. A linear or constant polynomial is
+    decided directly. Higher degrees require another certificate.
     """
     from sage.matrix.constructor import matrix as _engine_matrix
     from sage.rings.rational_field import QQ as SageQQ
@@ -525,22 +721,15 @@ def _decided_quadratic(polynomial):
                 form[second][first] = coefficient / SageQQ(2)
     matrix = _engine_matrix(SageQQ, number, number, [entry for row in form for entry in row])
     vector = __import__("sage.modules.free_module_element", fromlist=["vector"]).vector(SageQQ, linear)
-    match _definiteness(matrix):
-        case 1:
-            minimum = constant - (vector.dot_product(matrix.inverse() * vector)) / 4
-            return minimum > 0
-        case -1:
-            minimum = -(constant - (vector.dot_product(matrix.inverse() * vector)) / 4)
-            return minimum > 0
-        case 0:
-            if not matrix.is_zero() and not any(entry != 0 for entry in linear):
-                minimum = _quadratic_minimum(matrix, vector, constant)
-                return None if minimum is None else minimum > 0
-            if matrix.is_zero():
-                return False if any(entry != 0 for entry in linear) else None
-            return None
-        case _:
-            return False
+    positive, negative = _quadratic_signs(matrix)
+    if positive and negative:
+        return False
+    if not positive and not negative:
+        return vector.is_zero() and constant != 0
+    if negative:
+        matrix, vector, constant = -matrix, -vector, -constant
+    minimum = _quadratic_minimum(matrix, vector, constant)
+    return minimum is not None and minimum > 0
 
 
 def _decided_gram_no_zero(polynomial):
@@ -706,50 +895,6 @@ def _decided_no_real_zero(expression, variables):
     return None
 
 
-def _is_an_open_inclusion(mapping, domain, manifold) -> bool:
-    r"""Whether ``mapping`` is the inclusion of an open submanifold of ``manifold``, read in the charts both carry.
-
-    The inclusion of an open submanifold reads the same coordinates on the
-    charts it shares with the manifold (``SmoothManifolds.open_submanifold``),
-    so its coordinate representations are the identity: on each shared label the
-    ``i``-th coordinate of the target is the ``i``-th coordinate of the source
-    (Lee, *Introduction to Smooth Manifolds*, 2nd ed., Example 1.4).  A map whose
-    representations are not the identity is no inclusion, and the pullback of the
-    tangent bundle along it is not the tangent bundle of its domain.
-    """
-    if int(domain.dimension()) != int(manifold.dimension()):
-        return False
-    shared = tuple(
-        label for label in domain.chart_labels() if label in manifold.chart_labels()
-    )
-    if not shared:
-        return False
-    index_set = tuple(mapping.chart_maps().index_set())
-    stated = tuple(
-        pair for pair in index_set if pair[0] == pair[1] and pair[0] in shared
-    )
-    if not stated:
-        return False
-    for source_label, target_label in stated:
-        expressions = tuple(mapping.chart_map(source_label, target_label))
-        symbols = tuple(_engine_manifold_chart(domain.atlas()[source_label])[:])
-        if len(expressions) != len(symbols):
-            return False
-        for expression, symbol in zip(expressions, symbols, strict=True):
-            if SR(_engine_manifold_expression(expression) - symbol).simplify_rational() != 0:
-                return False
-    # A label it does not state adds no point, exactly when its chart lies inside a
-    # chart it does state: the map is then the identity there too.
-    presented = tuple(_engine_manifold_chart(domain.atlas()[label]).domain() for label, _ in stated)
-    for label in shared:
-        if (label, label) in stated:
-            continue
-        chart_domain = _engine_manifold_chart(domain.atlas()[label]).domain()
-        if not any(chart_domain.is_subset(one) for one in presented):
-            return False
-    return True
-
-
 class SmoothVectorBundles(OwnedParameterizedCategory):
     r"""Smooth real vector bundles on one smooth manifold.
 
@@ -851,15 +996,11 @@ class SmoothVectorBundles(OwnedParameterizedCategory):
             over the image, ``q |-> s(f(q))`` (Lee, *Introduction to Smooth
             Manifolds*, 2nd ed., Ch. 10, where the pullback of a vector bundle is
             the bundle whose fibre at ``q`` is the fibre of ``E`` at ``f(q)``).
-            For an open inclusion the differential is an isomorphism at every
-            point, so the pullback of the tangent bundle is the tangent bundle of
-            the inclusion's domain, and that is what is returned there.  Along
-            any other smooth map the pullback is its own bundle over the map's
-            domain: its sections are the pullbacks of the bundle's sections
-            (:meth:`SmoothSectionModules.ParentMethods.pullback_of`), and a
-            section of it that is not the pullback of one needs the bundle's
-            transition functions on a cover of the target, which this owner does
-            not retain.
+            The pullback retains this bundle and the chosen map, including for
+            an identity or open inclusion.  For an open inclusion the
+            differential identifies its tangent pullback with the domain's
+            tangent bundle; that isomorphism does not discard the defining map
+            of this pullback (Tu, Theorem 20.6).
             """
             manifold = self.base_manifold()
             assert mapping.codomain() is manifold, (
@@ -871,10 +1012,6 @@ class SmoothVectorBundles(OwnedParameterizedCategory):
                 f"cannot pull {self} back along {mapping}: its domain {domain} is not a smooth "
                 f"manifold"
             )
-            if self._bundle_tangent_manifold is not None and _is_an_open_inclusion(
-                mapping, domain, manifold
-            ):
-                return domain.tangent_bundle()
             from sage_extensions.categories.vector_bundles import SmoothVectorBundles as _bundles
 
             return _object_of(
@@ -949,14 +1086,150 @@ class SmoothSectionModules(OwnedParameterizedCategory):
         manifold rather than one object per chart.
         """
 
-        def __init__(self, parent, components, engine_field) -> None:
+        def __init__(self, parent, components, engine_field, *, charts=None, domains=None, frames=None, local_charts=None, evaluation=None, jet_evaluation=None, local_cover=None, locate=None) -> None:
             Element.__init__(self, parent)
             self._components = components
             self._engine_field = engine_field
+            self._section_evaluation = evaluation
+            self._jet_evaluation = jet_evaluation
+            self._local_cover = local_cover
+            self._locate_component = locate
+            manifold = parent.base_manifold()
+            self._component_charts = (
+                {key: manifold.atlas()[key] for key in components}
+                if charts is None else charts
+            )
+            self._component_domains = (
+                {key: () for key in components} if domains is None else domains
+            )
+            self._component_local_charts = (
+                self._component_charts if local_charts is None else local_charts
+            )
+            if frames is None:
+                bundle = parent.vector_bundle()
+                if bundle.is_pullback():
+                    mapping = bundle.mapping()
+                    frames = {}
+                    for key, chart in self._component_charts.items():
+                        pairs = tuple(p for p in mapping.chart_maps().keys() if p[0] == chart.label())
+                        assert len(pairs) == 1, "local pullback components require their stated fibre frame"
+                        frames[key] = mapping.codomain().atlas()[pairs[0][1]]
+                else:
+                    frames = self._component_charts
+            self._component_frames = frames
+
+        def _local_component_pieces(self, point):
+            if self._local_cover is not None:
+                yield self._local_cover[self._locate_component(point)]
+                return
+            for key, component in self._components.items():
+                yield self._component_local_charts[key], self._component_frames[key], component
+
+        def local_cover(self):
+            """The retained independently indexed cover, when supplied."""
+            return self._local_cover
 
         def components(self):
-            r"""The components of the section in each chart's coordinate frame."""
-            return self._components
+            r"""Local component tuples, with domains and frames given by their accessors.
+
+            Each coefficient belongs to the function ring of its actual local
+            domain.  A local index need not be an atlas label: distinct pieces
+            in the same source chart can have different domains and frames.
+            For a derived section these are computed local descriptions; its
+            retained defining evaluation, not this dictionary, defines the
+            global section when the available transitions leave descriptions
+            uncomputed.
+            """
+            return dict(self._components)
+
+        def component_chart(self, index):
+            r"""The source coordinates in which this local component is written."""
+            return self._component_charts[index]
+
+        def component_domain(self, index):
+            r"""The actual open submanifold on which this component is defined."""
+            return self._component_local_charts[index].domain()
+
+        def component_nonvanishing(self, index):
+            r"""Ordered nonvanishing conditions in the source chart for this local domain."""
+            return self._component_domains[index]
+
+        def component_frame(self, index):
+            r"""The bundle's coordinate frame used by this local component."""
+            return self._component_frames[index]
+
+        def components_at(self, point, frame_label=None):
+            r"""Fibre coordinates at a point, in the requested coordinate frame.
+
+            Select an actual local domain before evaluating a coefficient.
+            Fibre transitions are evaluated at the image point, with no
+            differential of the pullback map (Tu, Proposition 20.7).
+            """
+            manifold = self.parent().base_manifold()
+            point = manifold(point)
+            if (self._jet_evaluation is not None or self._local_cover is not None
+                    or getattr(_engine_manifold_chart(point.chart()).domain().manifold(),
+                               "_owned_coordinate_data", False)):
+                bundle = self.parent().vector_bundle()
+                root, _image, _jets = _bundle_image_germ(bundle, point.chart(), point, 0)
+                frame = root if frame_label is None else root.manifold().atlas()[frame_label]
+                return finite_family(tuple(jet.value() for jet in
+                    _section_jets(self, point.chart(), point, 0, frame)),
+                    name="Fibre coordinates of a smooth section")
+            if self._section_evaluation is not None:
+                return self._section_evaluation(point, frame_label)
+            bundle = self.parent().vector_bundle()
+            image = point
+            while bundle.is_pullback():
+                image = bundle.mapping()(image)
+                bundle = bundle.underlying_bundle()
+            target_label = image.chart().label() if frame_label is None else frame_label
+            source_label = point.chart().label()
+            field = manifold.coordinate_field()
+            for key, component in self._components.items():
+                source = self._component_charts[key]
+                changes = (None,) if source.label() == source_label else tuple(
+                    manifold.coordinate_changes(source_label, source.label()).values()
+                )
+                for change in changes:
+                    if change is None:
+                        local_point = point
+                    else:
+                        if not all(ask(c(point) != field.zero()) is True for c in change.source_overlap()):
+                            continue
+                        local_point = manifold.point(tuple(c(point) for c in change.forward_expressions()), source.label())
+                    if not all(ask(c(local_point) != field.zero()) is True for c in self._component_domains[key]):
+                        continue
+                    values = tuple(entry(local_point) for entry in component)
+                    frame = self._component_frames[key]
+                    if frame.label() == target_label:
+                        return finite_family(values, name="Fibre coordinates of a smooth section")
+                    frame_points = []
+                    if bundle is self.parent().vector_bundle() and frame is source:
+                        frame_points.append(local_point)
+                    elif image.chart().label() == frame.label():
+                        frame_points.append(image)
+                    else:
+                        for image_change in frame.manifold().coordinate_changes(image.chart().label(), frame.label()).values():
+                            if all(ask(c(image) != field.zero()) is True for c in image_change.source_overlap()):
+                                frame_points.append(frame.manifold().point(
+                                    tuple(c(image) for c in image_change.forward_expressions()), frame.label()))
+                    for frame_change in frame.manifold().coordinate_changes(frame.label(), target_label).values():
+                        for frame_point in frame_points:
+                            if not all(ask(c(frame_point) != field.zero()) is True for c in frame_change.source_overlap()):
+                                continue
+                            variables = tuple(_engine_manifold_chart(frame)[:])
+                            substitution = dict(zip(variables,
+                                tuple(_engine_manifold_expression(c) for c in frame_point.coordinates()), strict=True))
+                            entries = tuple(
+                                sum((
+                                    field(SR(_engine_manifold_expression(formula)).diff(variable).subs(substitution)) * value
+                                    for variable, value in zip(variables, values, strict=True)
+                                ), field.zero())
+                                for formula in frame_change.forward_expressions()
+                            )
+                            return finite_family(entries, name="Fibre coordinates of a smooth section")
+            raise CoverageUndecided(f"no represented section domain and frame transition contains {point}")
 
         def __call__(self, function):
             r"""The derivative ``V f`` of a smooth function along this section.
@@ -981,11 +1254,31 @@ class SmoothSectionModules(OwnedParameterizedCategory):
                 f"{element_parent(function)}"
             )
             formulas = _chartwise_formulas(function, manifold)
-            assert formulas is not None, (
-                f"cannot differentiate {function} along {self}: the function is not written by "
-                f"chart expressions, and a derivation is computed on the expressions both are "
-                f"written by"
-            )
+            local_labels = tuple(label for label in self.components()
+                                 if label in (formulas or {})
+                                 and not self.component_nonvanishing(label))
+            if (formulas is None or self._engine_field is None
+                or _chart_family_covers(manifold, local_labels) is not True):
+                from sage_extensions.categories.functions.smooth_germs import (
+                    _SmoothGermFunction, _function_jet, _TaylorJet,
+                )
+
+                def provider(chart, point, order):
+                    components = _tangent_section_jets(self, chart, point, order)
+                    field = chart.manifold().coordinate_field()
+                    zero = _TaylorJet.constant(field, int(manifold.dimension()), order, field.zero())
+
+
+
+                    from sage_extensions.logic import ask
+                    if all(ask(c == field.zero()) is True for component in components
+                           for c in component.coefficients.values()):
+                        return zero
+                    jet = _function_jet(function, chart, point, order + 1)
+                    return sum((component * jet.partial(i)
+                                for i, component in enumerate(components)), zero)
+
+                return manifold.smooth_functions()(_SmoothGermFunction(manifold, provider))
             engine = _engine_manifold(manifold)
             scalar_field = engine.scalar_field(
                 {
@@ -1000,7 +1293,7 @@ class SmoothSectionModules(OwnedParameterizedCategory):
                         derivative.expr(_engine_manifold_chart(manifold.atlas()[label])),
                         manifold.atlas()[label],
                     )
-                    for label in manifold.chart_labels()
+                    for label in local_labels
                 }
             )
 
@@ -1008,6 +1301,42 @@ class SmoothSectionModules(OwnedParameterizedCategory):
             r"""``V + W``: the section whose value at ``p`` is ``V(p) + W(p)``."""
             components = self.components()
             other_components = other.components()
+            if self.parent().vector_bundle().is_pullback():
+                def germs(chart, point, order, frame):
+                    return tuple(left + right for left, right in zip(
+                        _section_jets(self, chart, point, order, frame),
+                        _section_jets(other, chart, point, order, frame), strict=True))
+
+                def evaluation(point, frame):
+                    return finite_family(tuple(left + right for left, right in zip(
+                        self.components_at(point, frame), other.components_at(point, frame), strict=True
+                    )), name="Fibre coordinates of the sum of sections")
+
+                pairs = tuple((left, right) for left in components for right in other_components
+                    if self.component_chart(left) is other.component_chart(right)
+                    and self.component_frame(left) is other.component_frame(right))
+                try:
+                    formulas = {
+                    (a, b): tuple(SR(_engine_manifold_expression(left)) + SR(_engine_manifold_expression(right))
+                        for left, right in zip(components[a], other_components[b], strict=True))
+                    for a, b in pairs
+                    }
+                except (AssertionError, TypeError, ValueError, NotImplementedError):
+                    return self.parent().element_class(self.parent(), {}, None, jet_evaluation=germs)
+                return self.parent()._construct(formulas, charts={(a, b): self.component_chart(a) for a, b in pairs},
+                    domains={(a, b): tuple(SR(_engine_manifold_expression(c)) for c in
+                        self.component_nonvanishing(a) + other.component_nonvanishing(b)) for a, b in pairs},
+                    frames={(a, b): self.component_frame(a) for a, b in pairs}, evaluation=evaluation,
+                    jet_evaluation=germs)
+            if self._engine_field is None or other._engine_field is None or components.keys() != other_components.keys() or any(
+                self.component_nonvanishing(key) or other.component_nonvanishing(key)
+                for key in components
+            ):
+                return self.parent()._from_tangent_jets(
+                    lambda chart, point, order: tuple(
+                        a + b for a, b in zip(
+                            _tangent_section_jets(self, chart, point, order),
+                            _tangent_section_jets(other, chart, point, order), strict=True)))
             return self.parent()._construct(
                 {
                     label: tuple(
@@ -1022,6 +1351,23 @@ class SmoothSectionModules(OwnedParameterizedCategory):
 
         def _neg_(self):
             r"""``-V``: the section whose value at ``p`` is ``-V(p)``."""
+            if self.parent().vector_bundle().is_pullback():
+                def germs(chart, point, order, frame):
+                    return tuple(-entry for entry in _section_jets(self, chart, point, order, frame))
+                try:
+                    formulas = {key: tuple(-SR(_engine_manifold_expression(entry)) for entry in component)
+                                for key, component in self.components().items()}
+                except (AssertionError, TypeError, ValueError, NotImplementedError):
+                    return self.parent().element_class(self.parent(), {}, None, jet_evaluation=germs)
+                return self.parent()._construct(formulas, charts=self._component_charts,
+                    domains={key: tuple(SR(_engine_manifold_expression(c)) for c in where)
+                        for key, where in self._component_domains.items()}, frames=self._component_frames,
+                    evaluation=lambda point, frame: finite_family(tuple(-entry for entry in self.components_at(point, frame)), name="Fibre coordinates of the negative section"),
+                    jet_evaluation=germs)
+            if self._engine_field is None:
+                return self.parent()._from_tangent_jets(
+                    lambda chart, point, order: tuple(-entry for entry in
+                        _tangent_section_jets(self, chart, point, order)))
             return self.parent()._construct(
                 {
                     label: tuple(-entry for entry in component)
@@ -1034,33 +1380,55 @@ class SmoothSectionModules(OwnedParameterizedCategory):
             return self.parent().scalar_multiple(scalar, self)
 
         def __eq__(self, other) -> bool:
-            r"""Two sections of one bundle are equal when their components agree in every chart.
+            r"""Certify equality by matching fibre coordinates on an actual cover.
 
-            The components of a section in a chart are its values in that
-            chart's coordinate frame, and the frames of the charts of an atlas
-            are related by the transitions, so the components agree in one
-            chart exactly when they agree in every chart.
+            A local equality is a witness only on the intersection of its two
+            domains, in one source chart and one fibre frame.  Agreement on a
+            proper open subset does not determine a general smooth section.
+            A nonzero rational residual proves inequality only after proving
+            its actual common domain nonempty.  Unsupported comparisons are
+            undecided, rather than identities by analytic continuation.
             """
+            from sage.rings.infinity import Infinity
+            from sage.rings.polynomial.polynomial_ring_constructor import PolynomialRing
+
+            if self is other:
+                return True
             if element_parent(other) is not self.parent():
                 return False
-            shared = tuple(
-                label for label in self._components if label in other.components()
-            )
-            assert shared, (
-                f"cannot decide whether {self} and {other} are equal: they are stated on "
-                f"disjoint families of charts, {tuple(self._components)} and "
-                f"{tuple(other.components())}"
-            )
-            for label in shared:
-                component = self._components[label]
-                other_component = other.components()[label]
-                for left, right in zip(component, other_component, strict=True):
-                    residual = SR(
-                        _engine_manifold_expression(left) - _engine_manifold_expression(right)
-                    ).simplify_full()
-                    if residual != 0:
-                        return False
-            return True
+            witnesses = {}
+            for left_key, component in self._components.items():
+                for right_key, other_component in other.components().items():
+                    if (self.component_chart(left_key) is not other.component_chart(right_key)
+                        or self.component_frame(left_key) is not other.component_frame(right_key)):
+                        continue
+                    chart = self.component_chart(left_key)
+                    conditions = self.component_nonvanishing(left_key) + other.component_nonvanishing(right_key)
+                    residuals = tuple(SR(_engine_manifold_expression(left) - _engine_manifold_expression(right)).simplify_full()
+                        for left, right in zip(component, other_component, strict=True))
+                    if all(residual == 0 for residual in residuals):
+                        witnesses[left_key, right_key] = (
+                            chart.label(), conditions,
+                        )
+                        continue
+                    engine_chart = _engine_manifold_chart(chart)
+                    if (chart.nonvanishing() or engine_chart._restrictions
+                        or any(low[0] != -Infinity or high[0] != Infinity
+                               for low, high in engine_chart.coord_bounds())):
+                        continue
+                    symbols = tuple(engine_chart[:])
+                    ring = PolynomialRing(QQ, names=tuple(str(s) for s in symbols)) if symbols else QQ
+                    for residual in residuals:
+                        product = _rational_guard_product((residual,) + tuple(
+                            _engine_manifold_expression(c) for c in conditions), ring)
+
+
+
+                        if product is not None and product != 0:
+                            return False
+            if _chart_family_covers(self.parent().base_manifold(), tuple(witnesses), local_domains=witnesses) is True:
+                return True
+            raise CoverageUndecided("the proved local coefficient equalities do not certify a cover of the base")
 
         def __ne__(self, other) -> bool:
             return not self == other
@@ -1090,7 +1458,7 @@ class SmoothSectionModules(OwnedParameterizedCategory):
             r"""``C^oo(M)``, the algebra the sections are a module over."""
             return self._base_ring
 
-        def _construct(self, components):
+        def _construct(self, components, *, charts=None, domains=None, frames=None, evaluation=None, engine_field=None, jet_evaluation=None):
             r"""The section with these components, built without re-deciding that they state one object.
 
             The callers are this module's own operations -- the sum, the negative,
@@ -1098,7 +1466,26 @@ class SmoothSectionModules(OwnedParameterizedCategory):
             components that agree on the overlaps because their operands do;
             :meth:`section` is where a caller's own components are decided.
             """
-            return self.element_class(self, components, self._engine_field(components))
+            if charts is None:
+                if engine_field is None:
+                    engine_field = self._engine_field(components)
+                return self.element_class(self, components, engine_field, evaluation=evaluation,
+                                          jet_evaluation=jet_evaluation)
+            source_labels = tuple(chart.label() for chart in charts.values())
+            names = {key: (chart.label() if source_labels.count(chart.label()) == 1
+                and (chart.label() not in components or chart.label() == key) else key)
+                for key, chart in charts.items()}
+            admitted, admitted_domains, local_charts = {}, {}, {}
+            for key, values in components.items():
+                index = names[key]
+                admitted[index], admitted_domains[index], local_charts[index] = _local_chart_expressions(
+                    charts[key], values, domains[key]
+                )
+            return self.element_class(
+                self, admitted, engine_field, charts={names[key]: chart for key, chart in charts.items()},
+                domains=admitted_domains, frames={names[key]: frame for key, frame in frames.items()},
+                local_charts=local_charts, evaluation=evaluation, jet_evaluation=jet_evaluation,
+            )
 
         def _engine_field(self, components):
             r"""The engine vector field of the section with these components, or ``None``.
@@ -1112,12 +1499,54 @@ class SmoothSectionModules(OwnedParameterizedCategory):
                 self._vector_bundle.underlying_bundle() is None
                 and self._vector_bundle._bundle_tangent_manifold is not None
             ):
-                return _engine_vector_field(self.base_manifold(), components)
+                try:
+                    return _engine_vector_field(self.base_manifold(), components)
+                except (AssertionError, TypeError, ValueError, NotImplementedError):
+
+
+                    return None
             return None
+
+        def _from_tangent_jets(self, provider):
+            """The tangent section specified by compatible local coefficient germs."""
+            from sage_extensions.categories.functions.smooth_germs import (
+                _SmoothGermFunction, _coordinate_change_jets, _coordinates_in_chart,
+            )
+
+            manifold = self.base_manifold()
+            components = {}
+            for label in manifold.selected_finite_chart_labels():
+                home = manifold.atlas()[label]
+                components[label] = tuple(home.function_ring()(_SmoothGermFunction(
+                    home.domain(), lambda chart, point, order, i=i: provider(chart, point, order)[i],
+                    charts=(home,)))
+                    for i in range(int(self.vector_bundle().rank())))
+
+            def germs(chart, point, order, frame):
+                native, target = _engine_manifold_chart(chart), _engine_manifold_chart(frame)
+                if native is target:
+                    return provider(chart, point, order)
+                values = _coordinates_in_chart(chart, point)
+                field = manifold.coordinate_field()
+                args = _coordinate_change_jets(native, values, target, field, order)
+                if args is None:
+                    raise CoverageUndecided("the requested tangent frame does not contain the point")
+                local_point = frame.domain().point(tuple(jet.value() for jet in args), frame.label())
+                return tuple(entry.compose(args) for entry in provider(frame, local_point, order))
+
+            return self.element_class(self, components, None, jet_evaluation=germs)
 
         def zero(self):
             r"""The zero section: the component zero in every chart's coordinate frame."""
+            if self._vector_bundle.is_pullback():
+                return self.pullback_of(self._vector_bundle.underlying_bundle().sections().zero())
             manifold = self.base_manifold()
+            if manifold._preamble_chart_index_set is not None:
+                from sage_extensions.categories.functions.smooth_germs import _TaylorJet
+                field = manifold.coordinate_field()
+                return self._from_tangent_jets(lambda chart, point, order:
+                    tuple(_TaylorJet.constant(field, int(manifold.dimension()), order, field.zero())
+                          for _ in range(int(self.vector_bundle().rank()))))
             return self.section(
                 {
                     label: tuple(
@@ -1148,12 +1577,39 @@ class SmoothSectionModules(OwnedParameterizedCategory):
                 f"{element_parent(element)}"
             )
             formulas = _chartwise_formulas(scalar, manifold)
-            assert formulas is not None, (
-                f"cannot multiply the section {element} by {scalar}: the function is not "
-                f"written by chart expressions, and the product is read from the expressions "
-                f"both are written by"
-            )
             components = element.components()
+            if self._vector_bundle.is_pullback():
+                from sage_extensions.categories.functions.smooth_germs import _function_jet
+
+                def germs(chart, point, order, frame):
+                    factor = _function_jet(scalar, chart, point, order)
+                    return tuple(factor * entry for entry in _section_jets(element, chart, point, order, frame))
+                formulas = {} if formulas is None else formulas
+                described = tuple(key for key in components if element.component_chart(key).label() in formulas)
+                try:
+                    products = {
+                    key: tuple(formulas[element.component_chart(key).label()] * _engine_manifold_expression(entry)
+                        for entry in component)
+                    for key, component in components.items() if key in described
+                    }
+                except (AssertionError, TypeError, ValueError, NotImplementedError):
+                    return self.element_class(self, {}, None, jet_evaluation=germs)
+                return self._construct(products, charts={key: element.component_chart(key) for key in described},
+                    domains={key: tuple(SR(_engine_manifold_expression(c)) for c in element.component_nonvanishing(key))
+                        for key in described},
+                    frames={key: element.component_frame(key) for key in described},
+                    evaluation=lambda point, frame: finite_family(tuple(scalar(point) * entry for entry in element.components_at(point, frame)), name="Fibre coordinates of a scaled section"),
+                    jet_evaluation=germs)
+            if (formulas is None or any(label not in formulas for label in components)
+                or element._engine_field is None or any(element.component_nonvanishing(key)
+                    for key in components)):
+                from sage_extensions.categories.functions.smooth_germs import _function_jet
+
+                def provider(chart, point, order):
+                    function = _function_jet(scalar, chart, point, order)
+                    return tuple(function * component for component in
+                                 _tangent_section_jets(element, chart, point, order))
+                return self._from_tangent_jets(provider)
             return self._construct(
                 {
                     label: tuple(
@@ -1163,11 +1619,11 @@ class SmoothSectionModules(OwnedParameterizedCategory):
                         )
                         for entry in components[label]
                     )
-                    for label in manifold.chart_labels()
+                    for label in components
                 }
             )
 
-        def section(self, components):
+        def section(self, components, *, check=True, local_charts=None, fibre_frames=None, domains=None, locate=None):
             r"""The section whose component in each chart is ``components[label]``.
 
             A section is stated on a chart by the components of its value in
@@ -1179,9 +1635,86 @@ class SmoothSectionModules(OwnedParameterizedCategory):
             *Introduction to Smooth Manifolds*, 2nd ed., Ch. 3).  A family that
             does not satisfy that is a different vector field on each chart, and
             is refused here rather than becoming a section of anything.
+
+            The check=False construction uses the caller's hypotheses that
+            these smooth local coefficients cover and satisfy the stated
+            transition law (OWN-22). For an independently indexed local cover,
+            local_charts specifies the owned restricted source charts and
+            fibre_frames specifies the original tangent bundle coordinate
+            frames containing the images of those domains. Domains, if given,
+            records the nonvanishing conditions in the source atlas coordinates.
+            These data describe a section of a pullback without requiring it
+            to be a pullback of any global vector field. A cover, image
+            containment, and transition compatibility are hypotheses, not
+            numerical tests on the local coefficients.
             """
             manifold = self.base_manifold()
             atlas = manifold.atlas()
+            if locate is not None:
+                from sage_extensions.categories.sets.set_categories import indexed_family
+                assert not check and local_charts is not None and domains is None
+                indices = components.index_set()
+                assert local_charts.index_set() is indices
+                bundle = self._vector_bundle
+                root = bundle
+                while root.is_pullback():
+                    root = root.underlying_bundle()
+                original = root.base_manifold()
+                if fibre_frames is not None:
+                    assert fibre_frames.index_set() is indices
+                else:
+                    assert not bundle.is_pullback()
+
+                def admit(key):
+                    local = local_charts[key]
+                    source = atlas[local.label()]
+                    assert _engine_manifold_chart(local).domain().is_subset(
+                        _engine_manifold_chart(source).domain())
+                    frame = source if fibre_frames is None else fibre_frames[key]
+                    assert frame is original.atlas()[frame.label()]
+                    coefficients = tuple(_admit_manifold_expression(entry, local)
+                                         for entry in components[key])
+                    assert len(coefficients) == int(bundle.rank())
+                    return local, frame, coefficients
+
+                return self.element_class(self, {}, None,
+                    local_cover=indexed_family(indices, admit), locate=locate)
+            if local_charts is not None:
+                assert not check, "general local gluing requires the cover and compatibility hypotheses (check=False)"
+                assert set(local_charts) == set(components)
+                bundle = self._vector_bundle
+                root = bundle
+                while root.is_pullback():
+                    root = root.underlying_bundle()
+                original = root.base_manifold()
+                if fibre_frames is None:
+                    assert not bundle.is_pullback(), "the original fibre frames must be specified"
+                    fibre_frames = {key: atlas[chart.label()] for key, chart in local_charts.items()}
+                assert set(fibre_frames) == set(components)
+                charts, admitted = {}, {}
+                for key, coefficients in components.items():
+                    local = local_charts[key]
+                    source = atlas[local.label()]
+                    assert _engine_manifold_chart(local).domain().is_subset(
+                        _engine_manifold_chart(source).domain())
+                    assert fibre_frames[key] is original.atlas()[fibre_frames[key].label()]
+                    coefficients = tuple(coefficients)
+                    assert len(coefficients) == int(bundle.rank())
+                    charts[key] = source
+                    admitted[key] = tuple(_admit_manifold_expression(entry, local) for entry in coefficients)
+                domain_data = {key: () for key in components} if domains is None else domains
+                assert set(domain_data) == set(components)
+                result = self.element_class(self, admitted, None, charts=charts,
+                    local_charts=local_charts, domains=domain_data, frames=fibre_frames)
+                def evaluate(point, frame_label):
+                    chart, _image, _jets = _bundle_image_germ(bundle, point.chart(), point, 0)
+                    frame = chart if frame_label is None else original.atlas()[frame_label]
+                    return finite_family(tuple(jet.value() for jet in
+                        _section_jets(result, point.chart(), point, 0, frame)),
+                        name="Fibre coordinates of a smooth section")
+                result._section_evaluation = evaluate
+                return result
+            assert fibre_frames is None and domains is None
 
             labels = tuple(components)
             extra = tuple(label for label in labels if label not in manifold.chart_labels())
@@ -1189,7 +1722,7 @@ class SmoothSectionModules(OwnedParameterizedCategory):
                 f"a section of {self._vector_bundle} is stated on the charts of {manifold}, "
                 f"and the components given for {extra} are on charts it does not have"
             )
-            coverage = _chart_family_covers(manifold, labels)
+            coverage = _chart_family_covers(manifold, labels) if check else True
             if coverage is not True:
                 if coverage is False:
                     assert False, (
@@ -1215,9 +1748,9 @@ class SmoothSectionModules(OwnedParameterizedCategory):
                     _admit_manifold_expression(entry, chart) for entry in component
                 )
             underlying = self._vector_bundle.underlying_bundle()
-            if underlying is None:
+            if check and underlying is None:
                 _chartwise_family_agrees(manifold, admitted, 1)
-            else:
+            elif check:
                 _pullback_family_agrees(
                     manifold,
                     self._vector_bundle.mapping(),
@@ -1297,7 +1830,7 @@ class SmoothSectionModules(OwnedParameterizedCategory):
             return self.section(components)
 
         def restrict(self, section, inclusion):
-            r"""The section of the pulled-back bundle that ``section`` restricts to.
+            r"""Restrict along an actual open inclusion, using TU for vector fields.
 
             A section is a map into the fibres, so its composite with an open
             inclusion is a section of the pulled-back bundle, and on the charts
@@ -1307,6 +1840,13 @@ class SmoothSectionModules(OwnedParameterizedCategory):
             Ch. 8, where vector fields restrict to open submanifolds).  Nothing
             is extended the other way: a section of the restriction need not
             come from one of the manifold.
+
+            For TM, the differential of the open inclusion identifies its
+            pullback with TU.  This restriction uses that canonical tangent
+            bundle and remains a derivation of C^infinity(U).  The separately
+            chosen pullback still retains the inclusion.  This operation's
+            inclusion premise is not inferred from chart labels; arbitrary
+            smooth-map pullback is the operation :meth:`pullback_of`.
             """
             manifold = self.base_manifold()
             assert inclusion.codomain() is manifold, (
@@ -1319,48 +1859,133 @@ class SmoothSectionModules(OwnedParameterizedCategory):
             )
             domain = inclusion.domain()
             target = self._vector_bundle.pullback_along(inclusion).sections()
+            tangent = self._vector_bundle._bundle_tangent_manifold is manifold
+            if not tangent:
+                return target.pullback_of(section)
+            engine_field = None
+            if tangent:
+                target = domain.tangent_bundle().sections()
+                if section._engine_field is None or getattr(
+                    _engine_manifold(manifold).manifold(), "_owned_coordinate_data", False
+                ):
+
+
+
+                    def provider(chart, point, order):
+                        image_chart, image, arguments = _mapping_germ(inclusion, chart, point, order)
+                        ambient_frame = manifold.atlas()[chart.label()]
+                        return tuple(coefficient.compose(arguments) for coefficient in
+                                     _section_jets(section, image_chart, image, order, ambient_frame))
+                    return target._from_tangent_jets(provider)
+                engine_field = section._engine_field.restrict(_engine_manifold(domain))
+            described = section
             components = section.components()
-            labels = tuple(
-                label for label in components if label in domain.chart_labels()
-            )
-            assert _chart_family_covers(domain, labels), (
-                f"cannot restrict {section} to {domain}: the restriction is stated on the charts "
-                f"the section is stated on, {tuple(components)}, and those do not cover {domain} -- "
-                f"a chart of the submanifold lies inside none of them, so its points would have no "
-                f"component"
-            )
-            return target.section(
-                {
-                    label: tuple(
-                        _raise_manifold_expression(
-                            _engine_manifold_expression(entry), domain.atlas()[label]
-                        )
-                        for entry in components[label]
-                    )
-                    for label in labels
-                }
+            charts = {key: domain.atlas()[section.component_chart(key).label()]
+                for key in components if section.component_chart(key).label() in domain.chart_labels()}
+            if not charts:
+                if not tangent:
+                    return target.pullback_of(section)
+                described = self._vector_bundle.pullback_along(inclusion).sections().pullback_of(section)
+                components = described.components()
+                charts = {key: described.component_chart(key) for key in components
+                    if described.component_frame(key).label() == described.component_chart(key).label()}
+            return target._construct(
+                {key: tuple(SR(_engine_manifold_expression(entry)) for entry in components[key]) for key in charts},
+                charts=charts,
+                domains={key: tuple(SR(_engine_manifold_expression(c)) for c in described.component_nonvanishing(key))
+                    for key in charts},
+                frames=charts if tangent else {key: described.component_frame(key) for key in charts},
+                evaluation=lambda point, frame: section.components_at(inclusion(point),
+                    point.chart().label() if tangent and frame is None else frame),
+                engine_field=engine_field,
             )
 
         def from_derivation(self, derivation):
             r"""The section ``V`` with ``V f = derivation(f)`` for every smooth function ``f``.
 
-            ``V |-> (f |-> V f)`` is an isomorphism from the sections of ``TM`` onto the
-            derivations of ``C^oo(M)`` (Lee, *Introduction to Smooth Manifolds*, 2nd ed.,
-            Prop. 8.15), and its inverse is read on smooth functions ``g_1, ..., g_N`` whose
-            differentials span every cotangent space
-            (:meth:`SmoothManifolds.ParentMethods._cotangent_spanning_functions`): in a chart
-            with coordinates ``x``, ``V(g_k) = sum_i v^i dg_k/dx_i``, so with ``J`` the
-            Jacobian ``(dg_k/dx_i)``, of rank ``dim M`` at every point, the components are
-            ``v = (J^T J)^{-1} J^T (V(g_1), ..., V(g_N))``.  When one chart presents the
-            manifold the family is its coordinates, ``J`` is the identity, and ``v^i`` is
-            ``V(x_i)``.
+            A derivation is local: if f vanishes near p, a bump h supported
+            there and equal to one near p gives hf=0 and therefore Df(p)=0
+            by Leibniz. Extend each local coordinate by a bump equal to one
+            near p. The ith coefficient near p is D of this extended
+            coordinate, restricted to that neighbourhood. Thus it is smooth
+            and independent of the bump. The germ derivation chain rule gives
+            the coordinate transition law and Df = V(f), and also uniqueness.
+            This is Lee, Introduction to Smooth Manifolds, 2nd ed., Prop. 8.15.
+
+            A globally spanning symbolic family, when separately certified,
+            can compute the same coefficients at once. It is not a condition
+            of construction.
             """
+            from sage_extensions.categories.functions.smooth_germs import (
+                _SmoothGermFunction, _function_jet, _coordinates_in_chart,
+                _bump_extended_coordinate,
+            )
+
+            manifold = self.base_manifold()
+            assert self.vector_bundle()._bundle_tangent_manifold is not None
+            functions = manifold.smooth_functions()
+
+
+            if element_parent(derivation) is self:
+                return derivation
+            try:
+                if manifold._preamble_chart_index_set is not None:
+                    raise CoverageUndecided("a general atlas is not enumerated")
+                symbolic = self._from_derivation_symbolic(derivation)
+            except (CoverageUndecided, AssertionError, TypeError, ValueError, NotImplementedError):
+                symbolic = None
+            if symbolic is not None:
+                return symbolic
+
+            global_charts = tuple(manifold.atlas()[label]
+                                  for label in manifold.selected_finite_chart_labels()
+                                  if manifold.atlas()[label].domain() is manifold)
+            if global_charts:
+                home = global_charts[0]
+                coordinates = tuple(manifold.smooth_function({home.label(): coordinate})
+                                    for coordinate in home.coordinates())
+                coefficients = tuple(derivation(coordinate) for coordinate in coordinates)
+                assert all(element_parent(coefficient) is functions for coefficient in coefficients), (
+                    "the derivation must take values in its smooth function algebra"
+                )
+                section = self.element_class(self, {home.label(): coefficients}, None)
+                if manifold._preamble_chart_index_set is None and len(tuple(manifold.chart_labels())) == 1:
+                    return section
+                return self._from_tangent_jets(lambda chart, point, order:
+                    _section_jets(section, chart, point, order, chart))
+
+            def provider(chart, point, order):
+                center = _coordinates_in_chart(chart, point)
+                values = []
+                for index in range(int(manifold.dimension())):
+                    extended = _bump_extended_coordinate(manifold, chart, center, index)
+                    derivative = derivation(extended)
+                    assert element_parent(derivative) is functions, (
+                        "the derivation must take values in its smooth function algebra"
+                    )
+                    values.append(_function_jet(derivative, chart, point, order))
+                return tuple(values)
+
+
+            return self._from_tangent_jets(provider)
+
+        def _from_derivation_symbolic(self, derivation):
+            """Optional simultaneous exact calculation of the local inverse."""
             from sage.matrix.constructor import matrix as _engine_matrix
             from sage.modules.free_module_element import vector as _engine_vector
 
             manifold = self.base_manifold()
             functions = manifold.smooth_functions()
-            spanning = manifold._cotangent_spanning_functions()
+            global_charts = tuple(chart for chart in manifold.atlas().values()
+                                  if chart.domain() is manifold)
+            if global_charts:
+                chart = global_charts[0]
+                spanning = tuple(manifold.smooth_function({chart.label(): coordinate})
+                                 for coordinate in chart.coordinates())
+            else:
+                spanning = manifold._cotangent_spanning_functions()
+            if spanning is None:
+                return None
             values = tuple(derivation(function) for function in spanning)
             misplaced = tuple(value for value in values if element_parent(value) is not functions)
             assert not misplaced, (
@@ -1401,13 +2026,14 @@ class SmoothSectionModules(OwnedParameterizedCategory):
         def pullback_of(self, section):
             r"""The section ``q |-> s(f(q))`` of the pullback that ``section`` states.
 
-            A section of the pullback over ``N`` along ``f: N -> M`` is a map into
-            the fibres of ``E`` over the image, so a section of ``E`` gives one:
-            in a chart ``W`` of ``N`` and the chart ``U`` of ``M`` the map is
-            stated in, the pullback's component is the section's component on
-            ``U`` composed with the coordinate representation of ``f``, and the
-            result is raised to a section of the pulled-back bundle's charts
-            (Lee, *Introduction to Smooth Manifolds*, 2nd ed., Ch. 10).
+            On a map representation D in source chart A with image in U,
+            and a section description on V, use J_{V->U}(f(q)) s_V(f(q))
+            only on D intersect f^{-1}(U intersect V).  Every transition path
+            contributes its own actual overlap.  These domains cover the source
+            when the input map domains and section domains cover and the atlas
+            supplies its transitions on their overlaps.  This is the inverse
+            image of a cover, not analytic continuation (Lee, Proposition 2.5,
+            Corollary 2.8; Tu, Theorem 20.6 and Proposition 20.7).
             """
             bundle = self._vector_bundle
             underlying = bundle.underlying_bundle()
@@ -1420,36 +2046,86 @@ class SmoothSectionModules(OwnedParameterizedCategory):
                 f"{element_parent(section)}"
             )
             mapping = bundle.mapping()
+            def germs(chart, point, order, frame):
+                target, image, arguments = _mapping_germ(mapping, chart, point, order)
+                return tuple(entry.compose(arguments) for entry in
+                             _section_jets(section, target, image, order, frame))
+            try:
+                if mapping._locate_representation is not None or section._local_cover is not None:
+                    raise CoverageUndecided("local indexed covers are evaluated at the point")
+                result = self._pullback_of_symbolic(section)
+            except (AssertionError, TypeError, ValueError, NotImplementedError, CoverageUndecided):
+                result = self.element_class(self, {}, None)
+            result._jet_evaluation = germs
+            return result
+
+        def _pullback_of_symbolic(self, section):
+            """Optional local symbolic descriptions of the defining pullback germ."""
+            bundle = self._vector_bundle
+            underlying = bundle.underlying_bundle()
+            mapping = bundle.mapping()
             domain = bundle.base_manifold()
             base = underlying.base_manifold()
             stated = section.components()
-            index_set = mapping.chart_maps().index_set()
             components = {}
-            for label in domain.chart_labels():
-                chart = domain.atlas()[label]
-                pairs = tuple(pair for pair in index_set if pair[0] == label)
-                assert pairs, (
-                    f"cannot pull {section} back to {domain}: the map {mapping} is stated in no "
-                    f"chart of the target on the chart {label}"
-                )
-                source_label, target_label = pairs[0]
-                assert target_label in stated, (
-                    f"cannot read {section} on the chart {target_label} of {base}, which is the "
-                    f"chart the map {mapping} carries the chart {label} into"
-                )
+            charts, domains, frames = {}, {}, {}
+            for map_index in mapping.chart_maps().index_set():
+                source_label, target_label = map_index[:2]
+                chart = domain.atlas()[source_label]
+                target = base.atlas()[target_label]
                 expressions = tuple(
                     SR(_engine_manifold_expression(expression))
-                    for expression in mapping.chart_map(source_label, target_label)
+                    for expression in mapping.chart_map(*map_index)
                 )
-                symbols = tuple(_engine_manifold_chart(base.atlas()[target_label])[:])
+                symbols = tuple(_engine_manifold_chart(target)[:])
                 substitution = dict(zip(symbols, expressions, strict=True))
-                components[label] = tuple(
-                    _raise_manifold_expression(
-                        SR(_engine_manifold_expression(entry)).subs(substitution), chart
+                direct = tuple(key for key in stated
+                    if section.component_chart(key).label() == target_label
+                    and not section.component_nonvanishing(key))
+                section_indices = direct[:1] if direct else tuple(stated)
+                for section_index in section_indices:
+                    section_chart = section.component_chart(section_index)
+                    section_label = section_chart.label()
+                    changes = {(): None} if section_label == target_label else dict(
+                        base.coordinate_changes(target_label, section_label).items()
                     )
-                    for entry in stated[target_label]
-                )
-            return self.element_class(self, components, self._engine_field(components))
+                    for path, change in changes.items():
+                        where = [SR(_engine_manifold_expression(c)) for c in mapping.chart_map_domain(*map_index)]
+                        if any(c == 0 for c in where):
+                            continue
+                        overlap = () if change is None else change.source_overlap()
+                        for condition in overlap:
+                            formula = SR(_engine_manifold_expression(condition)).subs(substitution)
+                            where.append(formula)
+                            if formula == 0:
+                                break
+                        else:
+                            in_section = expressions if change is None else tuple(
+                                SR(_engine_manifold_expression(entry)).subs(substitution)
+                                for entry in change.forward_expressions()
+                            )
+                            section_symbols = tuple(_engine_manifold_chart(section_chart)[:])
+                            section_substitution = dict(zip(section_symbols, in_section, strict=True))
+                            for condition in section.component_nonvanishing(section_index):
+                                formula = SR(_engine_manifold_expression(condition)).subs(section_substitution)
+                                where.append(formula)
+                                if formula == 0:
+                                    break
+                            else:
+                                values = tuple(SR(_engine_manifold_expression(entry)).subs(section_substitution)
+                                    for entry in stated[section_index])
+                                frame = section.component_frame(section_index)
+                                if not underlying.is_pullback() and change is not None:
+                                    values = tuple(sum(
+                                        SR(_engine_manifold_expression(coordinate)).diff(variable).subs(section_substitution) * value
+                                        for variable, value in zip(section_symbols, values, strict=True)
+                                    ) for coordinate in change.inverse_expressions())
+                                    frame = target
+                                key = (map_index, section_index, path)
+                                components[key] = values
+                                charts[key], domains[key], frames[key] = chart, tuple(where), frame
+            return self._construct(components, charts=charts, domains=domains, frames=frames,
+                evaluation=lambda point, frame: section.components_at(mapping(point), frame))
 
         def module_rank(self):
             r"""The rank of this module as a free ``C^oo(M)``-module.
@@ -1473,7 +2149,7 @@ class SmoothSectionModules(OwnedParameterizedCategory):
             )
             return tuple(self._retained_frame)
 
-        def trivialized_by(self, frame):
+        def trivialized_by(self, frame, *, check=True):
             r"""These sections read through the stated global frame.
 
             A frame is a family of as many sections as the rank, a basis of
@@ -1507,9 +2183,40 @@ class SmoothSectionModules(OwnedParameterizedCategory):
                     f"{section} is not a section of {self._vector_bundle}: its parent is "
                     f"{element_parent(section)}"
                 )
+            if not check:
+
+
+                return _object_of(self.category(), vector_bundle=self._vector_bundle,
+                                  base_ring=self.base_ring(), retained_frame=family)
+
+
+            if any(set(vector.components()) != set(family[0].components())
+                   for vector in family) or any(
+                key not in self.base_manifold().chart_labels()
+                or any(vector.component_chart(key) is not family[0].component_chart(key)
+                       or vector.component_frame(key) is not family[0].component_frame(key)
+                       for vector in family)
+                for key in family[0].components()
+            ):
+                try:
+                    certified = _certify_frame_on_common_refinement(family)
+                except (AssertionError, TypeError, ValueError, NotImplementedError, CoverageUndecided):
+                    certified = False
+                if not certified:
+                    raise CoverageUndecided("no certified common local frame refinement covers the base")
+                return _object_of(self.category(), vector_bundle=self._vector_bundle,
+                                  base_ring=self.base_ring(), retained_frame=family)
             manifold = self.base_manifold()
             stated = tuple(family[0].components())
-            coverage = _chart_family_covers(manifold, stated)
+            domains = {}
+            for label in stated:
+                if label not in manifold.chart_labels() or any(label not in section.components() for section in family):
+                    raise CoverageUndecided("the frame requires a common local coordinate cover")
+                if any(section.component_chart(label) is not family[0].component_chart(label)
+                    or section.component_frame(label) is not family[0].component_frame(label) for section in family):
+                    raise CoverageUndecided("frame columns must be expressed in one common source chart and fibre frame")
+                domains[label] = (label, tuple(c for section in family for c in section.component_nonvanishing(label)))
+            coverage = _chart_family_covers(manifold, stated, local_domains=domains)
             if coverage is not True:
                 if coverage is False:
                     assert False, (
@@ -1534,7 +2241,7 @@ class SmoothSectionModules(OwnedParameterizedCategory):
                     tuple(_engine_manifold_chart(chart)[:]),
                     tuple(
                         _engine_manifold_expression(condition)
-                        for condition in chart.nonvanishing()
+                        for condition in tuple(chart.nonvanishing()) + domains[label][1]
                     ),
                 )
                 assert verdict is True, (
@@ -1623,6 +2330,37 @@ class SmoothVectorBundleTrivialization(SageObject):
             f"a section of the rank-{rank} bundle {self._bundle} is written as {rank} "
             f"functions, one per basis section, and {len(family)} were given"
         )
+        assert all(element_parent(f) is manifold.smooth_functions() for f in family)
+        try:
+            if any(section._local_cover is not None or not section.components()
+                   for section in self._frame):
+                raise CoverageUndecided("the frame is represented by local germs")
+            return self._forward_symbolic(family)
+        except (AssertionError, TypeError, ValueError, KeyError, NotImplementedError, CoverageUndecided):
+            from sage_extensions.categories.functions.smooth_germs import _function_jet, _TaylorJet
+
+            module = self._bundle.sections()
+            def germs(chart, point, order, frame=None):
+                factors = tuple(_function_jet(f, chart, point, order) for f in family)
+                vectors = tuple(_section_jets(section, chart, point, order, frame)
+                                for section in self._frame)
+                zero = _TaylorJet.constant(factors[0].field, factors[0].n, order, 0)
+                return tuple(sum((a*v for a, v in zip(factors, column, strict=True)), zero)
+                             for column in zip(*vectors, strict=True))
+            if self._bundle.is_pullback():
+                return module.element_class(module, {}, None, jet_evaluation=germs)
+            return module._from_tangent_jets(germs)
+
+    def _forward_symbolic(self, family):
+        """Optional exact chartwise calculation of the frame map."""
+        manifold = self.base_manifold()
+        rank = int(self._bundle.rank())
+        if self._bundle.is_pullback():
+            module = self._bundle.sections()
+            result = module.zero()
+            for function, vector in zip(family, self._frame, strict=True):
+                result = result + module.scalar_multiple(function, vector)
+            return result
         formulas = []
         for function in family:
             assert element_parent(function) is manifold.smooth_functions(), (
@@ -1644,6 +2382,11 @@ class SmoothVectorBundleTrivialization(SageObject):
                 dict(zip(tuple(self._frame[0].components()), on_the_frame, strict=True))
             )
         components = tuple(section.components() for section in self._frame)
+        if any(set(entries) != set(components[0]) for entries in components):
+            raise CoverageUndecided("symbolic frame coefficients lack a common cover")
+        if any(section.component_nonvanishing(label) for section in self._frame
+               for label in components[0]):
+            raise CoverageUndecided("the symbolic frame map needs a common local refinement")
         return self._bundle.sections().section(
             {
                 label: tuple(
@@ -1676,16 +2419,53 @@ class SmoothVectorBundleTrivialization(SageObject):
         stated on (:func:`_section_components_on`).  One function is returned at
         rank one.
         """
-        from sage.matrix.constructor import matrix as _engine_matrix
-
         manifold = self.base_manifold()
         assert element_parent(section) is self._bundle.sections(), (
             f"{section} is not a section of {self._bundle}: its parent is "
             f"{element_parent(section)}"
         )
+        try:
+            if any(vector._local_cover is not None or not vector.components()
+                   for vector in (*self._frame, section)):
+                raise CoverageUndecided("the frame or section is represented by local germs")
+            return self._inverse_symbolic(section)
+        except (AssertionError, TypeError, ValueError, KeyError, NotImplementedError, CoverageUndecided):
+            from sage_extensions.categories.functions.smooth_germs import _SmoothGermFunction
+
+            rank = int(self._bundle.rank())
+            def coordinate(index):
+                def provider(chart, point, order):
+                    frame, _image, _args = _bundle_image_germ(self._bundle, chart, point, order)
+                    columns = tuple(_section_jets(v, chart, point, order, frame) for v in self._frame)
+                    value = _section_jets(section, chart, point, order, frame)
+                    determinant = _jet_determinant(columns)
+                    replaced = tuple(value if j == index else col for j, col in enumerate(columns))
+                    return _jet_determinant(replaced) * determinant.reciprocal()
+                return manifold.smooth_functions()(_SmoothGermFunction(manifold, provider))
+            coordinates = tuple(coordinate(i) for i in range(rank))
+            return coordinates[0] if rank == 1 else coordinates
+
+    def _inverse_symbolic(self, section):
+        """Optional symbolic evaluation of the inverse frame map."""
+        from sage.matrix.constructor import matrix as _engine_matrix
+
+        manifold = self.base_manifold()
         rank = int(self._bundle.rank())
         components = tuple(entry.components() for entry in self._frame)
         labels = tuple(components[0])
+        if not labels or any(label not in manifold.chart_labels() for label in labels):
+            raise CoverageUndecided("the frame has no common whole-chart symbolic description")
+        if any(set(entries) != set(labels) for entries in components):
+            raise CoverageUndecided("the symbolic frame inverse needs a common local refinement")
+        if any(vector.component_nonvanishing(label) for vector in self._frame for label in labels):
+            raise CoverageUndecided("the symbolic frame inverse cannot extrapolate a local description")
+        if any(vector.component_frame(label) is not self._frame[0].component_frame(label)
+               for vector in self._frame for label in labels):
+            raise CoverageUndecided("the symbolic frame columns are in different fibre frames")
+        if self._bundle.is_pullback() and section._section_evaluation is not None:
+            if any(label not in section.components()
+                or section.component_frame(label) is not self._frame[0].component_frame(label) for label in labels):
+                raise CoverageUndecided("inverse trivialization requires the section in the frame's common fibre coordinates")
         section_components = {
             label: _section_components_on(section, label) for label in labels
         }

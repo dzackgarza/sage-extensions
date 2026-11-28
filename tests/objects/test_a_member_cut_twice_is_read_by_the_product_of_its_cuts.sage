@@ -30,8 +30,8 @@ def test_redundant_cuts_are_dropped_and_the_cover_is_decided() -> None:
     Every point has $x \ne 0$ or $x \ne 1$; a section stated on the two charts is admitted.
     """
     plane, _chart, x, y = _the_plane()
-    first = plane.chart_on_open_subset("F1", "x y", "U", (x**2 + 1, x))
-    second = plane.chart_on_open_subset("F2", "x y", "U", (y**2 + 1, x + (-1)))
+    first = plane.chart_on_open_subset("F1", "x y", "U", (x**2 + 1, x), same_coordinates=True)
+    second = plane.chart_on_open_subset("F2", "x y", "U", (y**2 + 1, x + (-1)), same_coordinates=True)
     sections = plane.tangent_bundle().sections()
 
     section = sections.section(
@@ -53,8 +53,8 @@ def test_two_doubly_cut_charts_that_miss_the_origin_still_do_not_cover() -> None
     give.
     """
     plane, _chart, x, y = _the_plane()
-    first = plane.chart_on_open_subset("G1", "x y", "U", (x, y))
-    second = plane.chart_on_open_subset("G2", "x y", "U", (x + (-1), y))
+    first = plane.chart_on_open_subset("G1", "x y", "U", (x, y), same_coordinates=True)
+    second = plane.chart_on_open_subset("G2", "x y", "U", (x + (-1), y), same_coordinates=True)
     sections = plane.tangent_bundle().sections()
 
     with pytest.raises((AssertionError, CoverageUndecided)):
@@ -69,7 +69,7 @@ def test_two_doubly_cut_charts_that_miss_the_origin_still_do_not_cover() -> None
 def test_a_member_whose_cuts_all_vanish_nowhere_covers_on_its_own() -> None:
     r"""$\{x^2+1, y^2+1\}$ selects nothing away, so that chart is the plane."""
     plane, _chart, x, y = _the_plane()
-    whole = plane.chart_on_open_subset("H1", "x y", "U", (x**2 + 1, y**2 + 1))
+    whole = plane.chart_on_open_subset("H1", "x y", "U", (x**2 + 1, y**2 + 1), same_coordinates=True)
 
     section = plane.tangent_bundle().sections().section(
         {"H1": (whole.function_ring().one(), whole.function_ring().zero())}

@@ -1,0 +1,3 @@
+ee3f2f8d87a8fca806b41ee45acdb3dfb348b11a 871614ec815a114d8783f47608d1c1c5537d51e5 Resolve provider precedence without repeated graph walks and retain quotient membership
+871614ec815a114d8783f47608d1c1c5537d51e5 f5fa51ac009b5697cd2d764a07f5197e95fe4f74 Preserve exact #606 mathematical and performance gate evidence
+f5fa51ac009b5697cd2d764a07f5197e95fe4f74 1d2005ba6a8707805aaebda7ac5a50ae7dac52b5 Complete smooth local germ calculus and tangent-section equivalence (#606)

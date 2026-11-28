@@ -21,8 +21,8 @@ def _the_line_with_two_points_removed():
     chart = line.chart("U", "x")
     x = chart.coordinate(0)
     return line, chart, x, (
-        line.chart_on_open_subset("L0", "x", "U", (x,)),
-        line.chart_on_open_subset("L1", "x", "U", (x + (-1),)),
+        line.chart_on_open_subset("L0", "x", "U", (x,), same_coordinates=True),
+        line.chart_on_open_subset("L1", "x", "U", (x + (-1),), same_coordinates=True),
     )
 
 

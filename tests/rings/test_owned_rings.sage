@@ -1,6 +1,6 @@
 r"""Centres, finite local rings, real quadratic fields and cardinalities of the number systems."""
 
-from sage_extensions.all import *  # noqa: F401,F403
+from sage_extensions.all import *
 
 
 def test_the_algebraic_reals_embed_in_the_reals_and_the_algebraic_numbers_do_not() -> None:
@@ -89,7 +89,7 @@ def test_finite_owned_ring_iteration_enumerates_its_points() -> None:
     points = tuple(ring)
 
     assert Set(ring) is ring
-    assert len(points) == ring.cardinality() == 25
+    assert cardinal(sum(1 for point in points)) == ring.cardinality() == 25
     assert all(points[i] != points[j] for i in range(25) for j in range(i))
     assert all(point.parent() is ring for point in points)
 

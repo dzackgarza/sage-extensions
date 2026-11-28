@@ -8,7 +8,8 @@ entries exactly this way: the card stores each entry as a bare ``Fraction``
 (lattice-database#37, row 7, #347).
 """
 
-from sage_extensions.all import *  # noqa: F401,F403
+from sage_extensions.all import *
+import pytest
 
 
 def test_a_python_fraction_is_its_numerator_over_its_denominator() -> None:
@@ -27,3 +28,14 @@ def test_a_nested_gram_of_python_fractions_constructs_the_lattice() -> None:
 
     assert lattice.module_rank() == cardinal(2)
     assert lattice.determinant() == QQ(1) / QQ(3)
+
+
+def test_integral_fractions_enter_a_zz_tensor_as_integers() -> None:
+    r"""`G = [[2/1, -1], [-1, 2]]` over $\mathbb{Z}$: Python fractions with
+    denominator 1 are integers, so the tensor admits them; a non-integral
+    fraction is still rejected."""
+    gram = tensor(ZZ, (), (2, 2), [[Fraction('2'), -1], [-1, 2]])
+    assert gram == tensor(ZZ, (), (2, 2), [[2, -1], [-1, 2]])
+    assert gram.is_symmetric()
+    with pytest.raises(TypeError):
+        tensor(ZZ, (), (2, 2), [[Fraction('1/2'), 0], [0, 1]])

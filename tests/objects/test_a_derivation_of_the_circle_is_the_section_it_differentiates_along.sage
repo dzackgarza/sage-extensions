@@ -77,3 +77,29 @@ def test_the_bracket_of_two_sections_is_read_as_the_section_it_is() -> None:
 
     assert recovered.components()["U_N"][0](north.domain()((2,))) == RR(-6)
     assert recovered.components()["U_S"][0](south.domain()((RR(1) / RR(2),))) == RR(3) / RR(2)
+
+
+def test_recovering_a_derivation_at_a_cauchy_presented_circle_point() -> None:
+    r"""On the north chart, 2(1+x^2) d/dx has coefficient 52 at x=5.
+
+    The scalar factor is a retained smooth germ, not a symbolic formula;
+    the inverse must use locality rather than assume a global coordinate
+    expression for every value of the derivation.
+    """
+    circle = SmoothManifolds().sphere(1)
+    north, south = circle.atlas()["U_N"], circle.atlas()["U_S"]
+    sections = circle.tangent_bundle().sections()
+    frame = sections.section({
+        "U_N": (north.function_ring().one()+north.coordinate(0)**2,),
+        "U_S": (-(south.function_ring().one()+south.coordinate(0)**2),),
+    })
+    scalar = circle.smooth_functions().from_local_derivatives(
+        lambda chart, point, alpha: RR(0) if any(alpha) else RR(2))
+    field = sections.trivialized_by(frame).trivialization().forward(scalar)
+    recovered = sections.from_derivation(lambda f: field(f))
+    a = RR.of_cauchy(Sets().Mor(NN,QQ)(lambda n: QQ(5)+QQ(1)/QQ(2)**int(n)))
+    point = circle.point((a,),"U_N")
+    value = recovered.components()["U_N"][0](north.domain()(point))
+    assert recovered.parent() is sections
+    assert value.parent() is RR
+    assert ask(value>RR(51)) is True and ask(value<RR(53)) is True
