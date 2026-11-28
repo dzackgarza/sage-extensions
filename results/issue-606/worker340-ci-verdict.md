@@ -1,0 +1,10 @@
+# Pinned normal CI verdict for #606
+
+Published implementation and test source: `a6fa4bbd888b62f229d67b9bc179862071cf1f2c`. Normal commit and push hooks passed. Parent baseline: `1d2005ba6a8707805aaebda7ac5a50ae7dac52b5`. Both jobs used the pinned research image digest `8bd6051c8f05c42b1dc67190b53c896bcc480b4671b75bfcafce0ca425699169` and pinned collector `0ceb9ab92679bb8c38ed1b84460e97831e5bad0f`.
+
+[Actual comparison run 46148223544](https://github.com/dzackgarza/sage-extensions/actions/runs/46148223544).
+
+- [Candidate job 140988853648](https://github.com/dzackgarza/sage-extensions/actions/runs/46148223544/job/140988853648): success, complete unchanged 44-file selection, 187 collected and 187 passed in 44.92 seconds, 72 warnings, startup 1.49s. Normal startup (3s), collection (6s), call (20s) and timeout (60s) gates enabled and satisfied. No disabled gates or subset retries. Both source and test corpus are the exact published candidate.
+- [Baseline job 140988853341](https://github.com/dzackgarza/sage-extensions/actions/runs/46148223544/job/140988853341): failure, unchanged baseline library with the identical candidate test corpus. 90 failed, 97 passed in 76.70s, startup 1.46s, collection 6.61s against 6s, two calls above 20s. The overall comparison workflow is red because this intentionally unmodified baseline failed. The candidate's actual gate step and job both succeeded.
+
+Both jobs recorded identical test-selection and gate-configuration hashes. The raw CI logs, JUnit, report JSONL, provenance, job verdicts and normal publication hook output are preserved byte-for-byte in `worker340-ci-46148223544.tar.gz`. The preceding local host timing failures are retained in the original raw evidence archive; they were not removed or used to waive a gate. The provider-precedence optimization preserves the exact same directed relation and tie-break, and the quotient membership owner repair passed its local public red/green specimen. Mathematical justification for the smooth kernel is in `worker340-source-proof.md`.
