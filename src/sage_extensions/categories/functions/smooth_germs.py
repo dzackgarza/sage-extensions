@@ -688,13 +688,14 @@ def _bump_extended_coordinate(manifold, home, center, index):
 
 
         for label, target_label in manifold.transitions().keys():
-            if target_label != home.label():
+            target = manifold.atlas()[target_label]
+            if not native.domain().is_subset(_engine_manifold_chart(target).domain()):
                 continue
             current = manifold.atlas()[label]
             coordinates = _coordinate_change_jets(source, values, _engine_manifold_chart(current), field, 0)
             if coordinates is None:
                 continue
-            transition = manifold.transition(label, home.label())
+            transition = manifold.transition(label, target_label)
             overlap = _engine_manifold_chart(transition.source_overlap_chart())
             local_values = tuple(jet.value() for jet in coordinates)
             if _valid_exact_coordinates(overlap, local_values) is False:

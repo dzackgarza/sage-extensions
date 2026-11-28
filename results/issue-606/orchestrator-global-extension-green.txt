@@ -1,0 +1,28 @@
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+time gates on: star import 2.52 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+rootdir: /repos/sage-extensions/.scratch/worker318-k606
+configfile: pyproject.toml
+plugins: reportlog-1.0.0, xdist-3.8.0, shard-0.1.2, instafail-0.5.0, platformdirs-4.13.5, timeout-2.4.0, anyio-4.15.1, hypothesis-6.170.15
+timeout: 60.0s
+timeout method: signal
+timeout func_only: False
+collected 5 items / 4 deselected / 1 selected
+Running 1 items in this shard
+
+tests/objects/test_a_derivation_of_the_circle_is_the_section_it_differentiates_along.sage . [100%]
+
+=============================== warnings summary ===============================
+tests/objects/test_a_derivation_of_the_circle_is_the_section_it_differentiates_along.sage::test_derivation_on_a_cut_chart_reads_global_extension_at_an_excluded_point
+  /sage/.venv/lib/python3.14/site-packages/sage/manifolds/chart.py:2309: DeprecationWarning: Chart.add_restrictions is deprecated; provide the restrictions at the time of creating the chart
+  See https://github.com/sagemath/sage/issues/32102 for details.
+    super().add_restrictions(restrictions)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+- generated xml file: /repos/sage-extensions/.scratch/worker318-k606/tests/.report/junit.xml -
+-------------- generated report log file: tests/.report/run.jsonl --------------
+============================== slowest durations ===============================
+9.65s call     tests/objects/test_a_derivation_of_the_circle_is_the_section_it_differentiates_along.sage::test_derivation_on_a_cut_chart_reads_global_extension_at_an_excluded_point
+0.00s setup    tests/objects/test_a_derivation_of_the_circle_is_the_section_it_differentiates_along.sage::test_derivation_on_a_cut_chart_reads_global_extension_at_an_excluded_point
+0.00s teardown tests/objects/test_a_derivation_of_the_circle_is_the_section_it_differentiates_along.sage::test_derivation_on_a_cut_chart_reads_global_extension_at_an_excluded_point
+================= 1 passed, 4 deselected, 1 warning in 13.29s ==================
