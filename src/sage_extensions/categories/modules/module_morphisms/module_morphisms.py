@@ -72,7 +72,8 @@ def _engine_matrix_mor(parent) -> bool:
     r"""Whether the arrows of ``parent`` are framed matrices over an exact engine.
 
     That is a Mor of finite framed free modules (``MatrixSpaces``) whose
-    scalars have exact linear algebra.  Its arrows are then determined by one
+    scalars select an exact engine coordinate matrix (CoordinateMatrixRings).
+    Its arrows are then determined by one
     engine matrix, and their evaluation, sums, negatives, scalar multiples,
     composites and comparison are engine products.  The decision depends only
     on the Mor, so it is made once per Mor.
@@ -85,7 +86,12 @@ def _engine_matrix_mor(parent) -> bool:
 
 
     ring = parent.base_ring()
-    decision = ring is not None and parent in MatrixSpaces(ring) and _linear_algebra_ring(ring).is_exact() is True
+    decision = (
+        ring is not None
+        and parent in MatrixSpaces(ring)
+        and ring in CoordinateMatrixRings()
+        and _linear_algebra_ring(ring).is_exact() is True
+    )
     parent._engine_matrix_mor_decision = decision
     return decision
 

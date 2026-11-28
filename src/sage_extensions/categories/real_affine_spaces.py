@@ -141,17 +141,8 @@ class RealAffineSpaceMor(CategoricalMor):
                     f"{other.codomain()} of the second map is not the domain "
                     f"{self.domain()} of the first"
                 )
-            # A linear map is its images on the model's selected generating
-            # set, so the composite's linear part is the composite's values
-            # there; the point maps compose as maps of sets.
-            model = self.codomain().model_vector_space()
-            composite_linear = model.Mor(model)(
-                lambda label: self.linear_part()(
-                    other.linear_part()(model.module_generator(label))
-                )
-            )
             return RealAffineSpaces().Mor(other.domain(), self.codomain())(
-                composite_linear,
+                self.linear_part() * other.linear_part(),
                 self.point_map() * other.point_map(),
             )
 
