@@ -125,8 +125,9 @@ class _SparseFreeModuleElement(ModuleElement):
         An element of the free module \(R^{(I)}\) on \(I\) is a finitely
         supported function \(I\to R\), and its value at a basis label is the
         coefficient of that basis element.
+
+        A stored label is a selected basis label of the parent.
         """
-        # A stored label is a selected basis label of the parent.
         if label in self._coefficients:
             return self._coefficients[label]
         labels = self.parent().module_generating_set()
@@ -212,6 +213,10 @@ class _SparseFreeModuleElement(ModuleElement):
         return next(iter(self._coefficients))
 
     def _add_(self, other):
+        r"""
+        Every coefficient is a sum in the base ring with its proved zeros
+        removed: the stored invariant holds without conversion.
+        """
         ring = self.parent().base_ring()
         coefficients = dict(self._coefficients)
         for label, coefficient in other._coefficients.items():
@@ -220,8 +225,6 @@ class _SparseFreeModuleElement(ModuleElement):
                 coefficients.pop(label, None)
             else:
                 coefficients[label] = value
-        # Every coefficient is a sum in the base ring with its proved zeros
-        # removed: the stored invariant holds without conversion.
         return _SparseFreeModuleElement._from_owned_support(self.parent(), coefficients)
 
     def _neg_(self):
@@ -267,8 +270,10 @@ class _SparseFreeModuleElement(ModuleElement):
         return equal if op == op_EQ else negation(equal)
 
     def __hash__(self):
-        # The coefficients are fixed at construction, so the hash is a datum
-        # of the element, computed on the first request.
+        r"""
+        The coefficients are fixed at construction, so the hash is a datum
+        of the element, computed on the first request.
+        """
         cached = self.__dict__.get("_hash_value")
         if cached is not None:
             return cached
@@ -332,10 +337,12 @@ class _SparseFreeModuleParent:
         module_generating_set,
         **rest,
     ) -> None:
+        r"""
+        The free module ``F_R(S)`` is constructed on the set ``S``: that set
+        is this level's datum, and the framing it declares is the identity
+        of ``F_R(S)`` read on its basis.
+        """
         ring = _owned_ring(base_ring)
-        # The free module ``F_R(S)`` is constructed on the set ``S``: that set
-        # is this level's datum, and the framing it declares is the identity
-        # of ``F_R(S)`` read on its basis.
         self._module_generating_set = module_generating_set
         super().__init__(
             base_ring=ring,
@@ -361,9 +368,19 @@ class _SparseFreeModuleParent:
         return self._element_constructor_(value)
 
     def _element_constructor_(self, value):
-        # The basis is this level's construction datum.  Reading it through
-        # module_generating_set() realizes the selected resolution, whose
-        # augmentation constructs elements of this module.
+        r"""
+        The basis is this level's construction datum.  Reading it through
+        module_generating_set() realizes the selected resolution, whose
+        augmentation constructs elements of this module.
+
+        Sequence inputs are coordinate syntax, never candidate scalars.
+        Only after the structured ingress cases may a free module ask
+        whether the input is a scalar of its base ring.
+
+        A label is its basis element: the unit ``S -> F(S)`` of the
+        free-forgetful adjunction, as in Sage's
+        ``CombinatorialFreeModule._element_constructor_``.
+        """
         labels = self._module_generating_set
         ring = self.base_ring()
         source = element_parent(value)
@@ -410,17 +427,11 @@ class _SparseFreeModuleParent:
                     for position, coefficient in enumerate(value)
                 }
                 return self.element_class(self, coefficients)
-            # Sequence inputs are coordinate syntax, never candidate scalars.
-            # Only after the structured ingress cases may a free module ask
-            # whether the input is a scalar of its base ring.
             case _ if value in ring and (ring(value) == ring.zero()) is True:
                 return self.zero()
             case _ if value in ring and labels.cardinality() == cardinal(1):
                 return self.element_class(self, {labels[0]: ring(value)})
             case _ if value in labels:
-                # A label is its basis element: the unit ``S -> F(S)`` of the
-                # free-forgetful adjunction, as in Sage's
-                # ``CombinatorialFreeModule._element_constructor_``.
                 return self._basis_element(value)
             case _:
                 raise TypeError(f"{value!r} does not describe an element of {self}")
@@ -479,6 +490,9 @@ class FramedFreeModules(OwnedCategoryOverBaseRing):
     def super_categories(self):
         r"""The chosen free basis refines free modules over the same ring.
 
+        The Free axiom belongs to Modules; use that base rather than the
+        group-algebra specialization when constructing the axiom category.
+
         sage: from dzack_research.preamble.all import ZZ, Modules
         sage: F = FramedFreeModules(ZZ).an_object()
         sage: F in Modules(ZZ).Free() and F in FramedFreeModules(ZZ)
@@ -490,8 +504,6 @@ class FramedFreeModules(OwnedCategoryOverBaseRing):
             OwnedCategoryOverBaseRing,
         )
 
-        # The Free axiom belongs to Modules; use that base rather than the
-        # group-algebra specialization when constructing the axiom category.
         ordinary = OwnedCategoryOverBaseRing.__classcall__(Modules, self.base_ring())
         return [ordinary.Free()]
 
@@ -612,12 +624,20 @@ class FramedFreeModules(OwnedCategoryOverBaseRing):
             return finite_ordered_set(_finite_index_submodule_orbits(self, divisors, automorphisms))
 
         def _repr_(self):
-            r"""Name the basis by its elements, printed as the basis vectors ``[i]`` print."""
-            # A number-field order is also a finite free ZZ-module, but its
-            # elements' representation refers to the order. Printing the
-            # module basis here therefore recurses through the parent. Prefer
-            # the ring's intrinsic order presentation when this module is the
-            # order itself; ordinary free modules retain the basis display.
+            r"""Name the basis by its elements, printed as the basis vectors ``[i]`` print.
+
+            A number-field order is also a finite free ZZ-module, but its
+            elements' representation refers to the order. Printing the
+            module basis here therefore recurses through the parent. Prefer
+            the ring's intrinsic order presentation when this module is the
+            order itself; ordinary free modules retain the basis display.
+
+            Printing the basis vectors is possible only when the number of
+            them is a decided finite number; a basis whose cardinality is an
+            unevaluated sum over an infinite index set (a graded sum's
+            componentwise framing) is named by its label set instead.  A
+            representation never decides that question.
+            """
             if getattr(self, "_preamble_is_number_field_order", lambda: False)():
                 from sage_extensions.categories.rings.ring_foundation import (
                     _engine_ring,
@@ -629,11 +649,6 @@ class FramedFreeModules(OwnedCategoryOverBaseRing):
                 return f"Order of rank {int(engine.rank())} over Integer Ring{suffix}"
             labels = self.module_generating_set()
             size = cardinal(labels.cardinality())
-            # Printing the basis vectors is possible only when the number of
-            # them is a decided finite number; a basis whose cardinality is an
-            # unevaluated sum over an infinite index set (a graded sum's
-            # componentwise framing) is named by its label set instead.  A
-            # representation never decides that question.
             decided = size.expression().is_normal_form()
             match (labels in EnumeratedSets(), decided and size.is_finite()):
                 case (True, True) if int(size.finite_value()) <= 12:
@@ -783,11 +798,12 @@ class FramedFreeModules(OwnedCategoryOverBaseRing):
             The finite-support formula is ``|R|^|S|`` for finite ``S`` and
             ``max(|R|, |S|)`` for infinite ``S`` over a nonzero ring. A
             missing parameter cardinal supplies no exact value here.
+            A ring as the rank-one free module over itself: its
+            underlying set is the ring's, which the ring level answers.
+
             """
 
             if self.base_ring() is self:
-                # A ring as the rank-one free module over itself: its
-                # underlying set is the ring's, which the ring level answers.
                 return super()._cardinality_decision()
             scalars = self.base_ring()._cardinality_decision()
             labels = self.module_generating_set()._cardinality_decision()
@@ -821,10 +837,12 @@ class FramedFreeModules(OwnedCategoryOverBaseRing):
                 return AtomicProposition("is_finite", self)
             return cardinal(size).is_finite()
 
-        # Arrow equality is a proposition, so the cache is keyed by the given map.
         @_instance_address_registry
         def base_change(self, ring_map, *, _extra_construction_data=None):
-            r"""Return ``S tensor_R M`` along the specified ring map ``R -> S``."""
+            r"""Return ``S tensor_R M`` along the specified ring map ``R -> S``.
+
+            Arrow equality is a proposition, so the cache is keyed by the given map.
+            """
             return _framed_free_base_change(self, ring_map, _extra_construction_data)
 
         @cached_method
@@ -941,7 +959,12 @@ class FramedFreeModules(OwnedCategoryOverBaseRing):
                     sage: T = Lattices(QQ)([[1]])
                     sage: v = next(iter(T.elements_of_norm(QQ(1)/4)))
                     sage: assert T.q(v) == QQ(1)/4
-                    sage: assert tuple(Lattices(QQ)(0)) == (Lattices(QQ)(0).zero(),)
+                    sage: Z = Lattices(QQ)(0)
+                    sage: points = tuple(Z)
+                    sage: points
+                    (0,)
+                    sage: assert points == (Z.zero(),)
+                    sage: assert points[0].parent() is Z
                 """
                 labels = self.module_generating_set()
                 if labels.cardinality() == cardinal(0):
@@ -1068,7 +1091,6 @@ class FramedFreeModules(OwnedCategoryOverBaseRing):
                     case _:
                         return selected.differential(1)
 
-            # Arrow equality is a proposition, so the cache is keyed by the given map.
             @_instance_address_registry
             def base_change(self, ring_map, *, _extra_construction_data=None):
                 r"""Return ``S tensor_R R^(S) = S^(S)`` on the same basis labels.
@@ -1078,6 +1100,8 @@ class FramedFreeModules(OwnedCategoryOverBaseRing):
                 precedence over the transport of the chosen presentation from
                 ``ModulesWithChosenFinitePresentation``, whose ``F_0`` is this
                 module itself.
+                Arrow equality is a proposition, so the cache is keyed by the given map.
+
                 """
                 return _framed_free_base_change(
                     self, ring_map, _extra_construction_data
@@ -1106,6 +1130,10 @@ class FramedFreeModules(OwnedCategoryOverBaseRing):
                 A stronger linear arrow keeps its own parent when read in
                 the module Mor. Its coordinate realization, rather than
                 Mor admission, supplies the matrix computation.
+
+                A kernel over a polynomial quotient need not be free.
+                Retain its finite presentation and inclusion through
+                the common presentation owner, not a PID span basis.
 
                 EXAMPLES::
 
@@ -1158,9 +1186,6 @@ class FramedFreeModules(OwnedCategoryOverBaseRing):
                         _selected_presentation_kernel,
                     )
 
-                    # A kernel over a polynomial quotient need not be free.
-                    # Retain its finite presentation and inclusion through
-                    # the common presentation owner, not a PID span basis.
                     return _selected_presentation_kernel(morphism)
                 coordinate_mor = self.module_category().Mor(self, morphism.codomain())
                 from sage_extensions.categories.modules.pure.modules import MatrixSpaces
@@ -1291,11 +1316,13 @@ def _new_sparse_free_module(
     extra_categories=(),
     extra_construction_data=None,
 ):
-    r"""Build a sparse free module through the category constructor chain."""
+    r"""Build a sparse free module through the category constructor chain.
+
+    A submodule is a module with an inclusion as additional data: the
+    categories of its objects are those of the free module, without the
+    subobject placements appended below (ARC-07, AGENTS subobjects).
+    """
     categories = _finitely_generated_free_placement(ring, labels)
-    # A submodule is a module with an inclusion as additional data: the
-    # categories of its objects are those of the free module, without the
-    # subobject placements appended below (ARC-07, AGENTS subobjects).
     module_categories = list(categories)
     data = {
         "base_ring": ring,
@@ -1344,14 +1371,16 @@ def _element_from_row(module, row):
 
 
 def _known_finite_generator_family(module_generating_set):
-    r"""Normalize one explicitly finite spanning family without guessing finiteness."""
+    r"""Normalize one explicitly finite spanning family without guessing finiteness.
+
+    A family spans what its values span; kernels hand theirs over
+    this way, indexed by the finite set of solution vectors.
+    """
 
     match module_generating_set:
         case tuple() | list() | range():
             return finite_ordered_set(module_generating_set)
         case IndexedFamily():
-            # A family spans what its values span; kernels hand theirs over
-            # this way, indexed by the finite set of solution vectors.
             assert module_generating_set.cardinality().is_finite(), (
                 "subobject generators indexed by a family need a finite index set, but "
                 f"{module_generating_set.index_set()} is not finite"
@@ -1389,7 +1418,21 @@ def _finite_support_labels(module, elements):
 
 
 def _span_basis_elements(module, module_generating_set):
-    r"""Return the canonical span basis using only the finite union of supports."""
+    r"""Return the canonical span basis using only the finite union of supports.
+
+    One nonzero vector is a basis of the cyclic submodule it
+    generates as soon as the base ring is an integral domain: a free
+    module over a domain is torsion-free, so the map r |-> r * v is
+    injective and (v) is a basis of its image.  No principal ideal
+    domain is needed, so a principal syzygy over QQ[x,y] keeps its
+    actual one-element basis instead of being refused.
+
+    Retain that mathematical basis instead of echelon-normalizing it;
+    p-adic backends otherwise divide through nonunit pivots.
+
+    Private finite backend serialization.  Only the finite support window is
+    materialized; the ambient framing itself is never enumerated.
+    """
 
     ring = module.base_ring()
     assert module in FramedFreeModules(ring), (
@@ -1402,19 +1445,11 @@ def _span_basis_elements(module, module_generating_set):
         generator = next(iter(generators))
         generator = generator if generator.parent() is module else module(generator)
         if (generator != module.zero()) is True:
-            # One nonzero vector is a basis of the cyclic submodule it
-            # generates as soon as the base ring is an integral domain: a free
-            # module over a domain is torsion-free, so the map r |-> r * v is
-            # injective and (v) is a basis of its image.  No principal ideal
-            # domain is needed, so a principal syzygy over QQ[x,y] keeps its
-            # actual one-element basis instead of being refused.
             assert ring in IntegralDomains(), (
                 f"cannot compute a basis of the cyclic submodule of {module} generated by "
                 f"{generator}: the base ring {ring} must be an integral domain, otherwise "
                 "that cyclic submodule carries torsion and is not free on this vector"
             )
-            # Retain that mathematical basis instead of echelon-normalizing it;
-            # p-adic backends otherwise divide through nonunit pivots.
             return finite_ordered_set((generator,))
     assert ring in PrincipalIdealDomains(), (
         f"cannot compute a basis of a submodule of {module}: the base ring {ring} "
@@ -1445,8 +1480,6 @@ def _span_basis_elements(module, module_generating_set):
             description=lambda module=module: f"Canonical span basis in {module}",
         )
 
-    # Private finite backend serialization.  Only the finite support window is
-    # materialized; the ambient framing itself is never enumerated.
     engine = _linear_algebra_ring(ring)
     support_count = len(support_points)
     free = _SageFreeModule(engine, support_count)
@@ -1552,10 +1585,12 @@ def _restricted_fraction_field_subobject_on(module, module_generators):
         )
 
     def lift(source, element):
+        r"""
+        As in lift_from_finite_support, read the finite coefficient family:
+        its keys contain the support, and omitted coefficients are zero.
+        """
         underlying_element = module(element).underlying_element()
         coordinates = underlying_element.to_vector()
-        # As in lift_from_finite_support, read the finite coefficient family:
-        # its keys contain the support, and omitted coefficients are zero.
         retained = coordinates.parent()._selected_module_coefficients(coordinates)
         outside_zero = conjunction(
             coefficient == fractions.zero()
@@ -1624,7 +1659,11 @@ def _module_subobject_spanning_with_structure(
 
 
 def _module_subobject_constructor_data(module, basis):
-    r"""Return labels, generator images, and lift data for a finite span."""
+    r"""Return labels, generator images, and lift data for a finite span.
+
+    The map F(labels) -> F(support) sending the i-th label to the
+    coordinates of the i-th spanning element on the support.
+    """
 
     ring = module.base_ring()
     assert module in FramedFreeModules(ring), (
@@ -1642,8 +1681,6 @@ def _module_subobject_constructor_data(module, basis):
     source_rank = len(basis_elements)
     support_rank_count = len(support_points)
     if source_rank:
-        # The map F(labels) -> F(support) sending the i-th label to the
-        # coordinates of the i-th spanning element on the support.
         coordinate_space = ring.matrix_space(support_rank_count, source_rank)
         support_module = coordinate_space.codomain()
         support_module_labels = tuple(support_module.module_generating_set())
@@ -1715,6 +1752,11 @@ def _module_generating_set(labels):
     A rank ``n``, an integer or a finite cardinal, names the ordinal ``{0, ..., n-1}``; an explicit finite
     family of labels names the ordered set of them; an owned set is its own
     label set.
+    One datum, one label set: the polynomial ring, the free module
+    and the symmetric algebra on the same ordered labels must land on
+    the same selected index set, because the module's framing records
+    that set object (OWN-02).
+
     """
     integers = _owned_integers()
     match labels:
@@ -1729,10 +1771,6 @@ def _module_generating_set(labels):
             )
             rank = labels.finite_value()
         case tuple() | list() | range():
-            # One datum, one label set: the polynomial ring, the free module
-            # and the symmetric algebra on the same ordered labels must land on
-            # the same selected index set, because the module's framing records
-            # that set object (OWN-02).
             return interned_finite_ordered_set(tuple(labels))
         case _:
             assert labels in Sets(), (
