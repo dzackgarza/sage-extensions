@@ -1,6 +1,6 @@
 r"""Modules over group rings: invariants, coinvariants, splitting fields and base change."""
 
-from sage_extensions.all import *  # noqa: F401,F403
+from sage_extensions.all import *
 
 
 def _trivial_and_sign_lines(ring):
@@ -31,7 +31,8 @@ def test_the_invariants_of_the_regular_representation_of_s3_are_one_dimensional(
     group = Groups.S(3)
     regular = QQ[group].regular_representation()
 
-    assert regular.module_rank() == 6
+    assert regular.module_rank() == 1
+    assert regular.coefficient_module_rank() == 6
     assert regular.module_invariants().module_rank() == 1
 
 
