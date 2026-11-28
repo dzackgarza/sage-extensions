@@ -1,0 +1,58 @@
+name: Enriques stabilizer generator subgroup test (#342)
+on:
+  workflow_dispatch: {}
+permissions:
+  contents: read
+  packages: read
+concurrency:
+  group: enriques-stabilizer-generator-test
+  cancel-in-progress: false
+jobs:
+  enriques-stabilizer:
+    name: Enriques line stabilizer generator subgroup
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/dzackgarza/sage@sha256:8bd6051c8f05c42b1dc67190b53c896bcc480b4671b75bfcafce0ca425699169
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ github.token }}
+      options: --user root
+    timeout-minutes: 180
+    env:
+      SAGE_BIN: /sage/.venv/bin/sage
+    steps:
+      - name: Check out the commit under test
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+      - name: Check out the Sage pytest collector plugin
+        uses: actions/checkout@v4
+        with:
+          repository: dzackgarza/ai-review-ci
+          ref: 0ceb9ab92679bb8c38ed1b84460e97831e5bad0f
+          path: .qc-infra
+      - name: Mark the checkout as a safe git directory
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - name: Run the Enriques case through the repository's own just test
+        env:
+          PYTHONPATH: src
+        run: |
+          set -euo pipefail
+          "$SAGE_BIN" --version
+          git rev-parse HEAD
+          sha256sum tests/groups/test_a_stabilizers_generators_generate_a_subgroup.sage
+          mkdir -p "$HOME"
+          ln -sfn "$GITHUB_WORKSPACE/.qc-infra" "$HOME/ai-review-ci"
+          just test tests/groups/test_a_stabilizers_generators_generate_a_subgroup.sage \
+            -k enriques --no-time-gates --timeout 7200 -v
+        shell: bash
+      - name: Keep the run's timing record
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: timings-${{ github.job }}-${{ github.sha }}
+          path: .timings/
+          retention-days: 90
+          if-no-files-found: error
+          include-hidden-files: true
