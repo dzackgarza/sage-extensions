@@ -103,3 +103,22 @@ def test_recovering_a_derivation_at_a_cauchy_presented_circle_point() -> None:
     assert recovered.parent() is sections
     assert value.parent() is RR
     assert ask(value>RR(51)) is True and ask(value<RR(53)) is True
+
+
+def test_derivation_on_a_cut_chart_reads_global_extension_at_an_excluded_point():
+    r"""Local coordinate recovery uses a genuine global smooth function."""
+    circle, north, south, sections, frame = _the_circle_and_its_frame()
+    scalar = circle.smooth_functions().from_local_derivatives(
+        lambda chart, point, alpha: RR(0) if any(alpha) else RR(2))
+    field = sections.trivialized_by(frame).trivialization().forward(scalar)
+    circle.chart_on_open_subset("V", "x1", "U_N", (north.coordinate(0),),
+                                same_coordinates=True)
+    pole = circle.point((0,), "U_S")
+
+    def derivation(f):
+        assert f(pole).parent() is RR
+        return field(f)
+
+    recovered = sections.from_derivation(derivation)
+    point = circle.point((2,), "V")
+    assert tuple(recovered.components_at(point, "V")) == (RR(10),)
